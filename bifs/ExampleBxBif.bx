@@ -1,0 +1,52 @@
+/**
+ * This is a BOXLANG BIF.  Please note that all BIFs are registered
+ * as singletons.
+ *
+ * Annotations you can use on a BIF:
+ * <pre>
+ * // The alias of the BIF, defaults to the name of the Class
+ * @BoxBIF - The BIF is registered as the name of the class
+ * @BoxBIF( 'myBifAlias' ) - Register with the specific name
+ * @BoxBIF( [ 'myBifAlias', 'myOtherBifAlias' ] ) - Register with all these names
+ * @BoxMember( 'string' ) : Register also as a member method on strings.
+ * @BoxMember( { 'string' : { name : '', objectArgument : '' }, 'array' : { name : '', objectArgument : '' } } ) - Register on multiple types
+ * </pre>
+ *
+ * The runtime injects the following into the `variables` scope:
+ * 
+ * - boxRuntime : BoxLangRuntime
+ * - log : A logger
+ * - functionService : The BoxLang FunctionService
+ * - interceptorService : The BoxLang InterceptorService
+ * - moduleRecord : The ModuleRecord instance
+ *
+ */
+@BoxBIF( "ExampleBxBIF" )
+class {
+
+    /**
+     * --------------------------------------------------------------------------
+     * Injections
+     * --------------------------------------------------------------------------
+     */
+    property name="moduleRecord";
+    property name="boxRuntime";
+    property name="functionService";
+    property name="componentService";
+    property name="interceptorService";
+    property name="asyncService";
+    property name="schedulerService";
+    property name="datasourceService";
+    property name="cacheService";
+    property name="log";
+
+    /**
+     * An example BIF
+     * 
+     * @name The name to use
+     */
+    function invoke( required name ) {
+        return "Hello from an #name#!";
+    }
+
+}

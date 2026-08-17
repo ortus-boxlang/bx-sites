@@ -1,0 +1,23 @@
+name: Pull Requests
+
+on:
+  push:
+    branches-ignore:
+      - "main"
+      - "master"
+      - "development"
+      - "releases/v*"
+  pull_request:
+    branches:
+      - "releases/v*"
+      - development
+
+jobs:
+  tests:
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
+      issues: read
+    uses: ./.github/workflows/tests.yml
+    secrets: inherit

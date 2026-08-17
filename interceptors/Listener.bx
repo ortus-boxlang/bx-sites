@@ -1,0 +1,39 @@
+/**
+ * A basic listener
+ */
+class{
+
+	/**
+     * --------------------------------------------------------------------------
+     * Injections
+     * --------------------------------------------------------------------------
+     * - name : The name of the interceptor
+     * - properties : The struct of properties this interceptor was defined in the ModuleConfig
+     * - log : A runtime logger configured for you to use
+     * - interceptorService : A reference to the runtime InterceptorService class
+     * - boxRuntime : A reference to the BoxRuntime class
+     * - moduleRecord : The module record object
+     */
+	property name="name";
+	property name="properties";
+	property name="log";
+	property name="nterceptorService";
+	property name="boxRuntime";
+	property name="moduleRecord";
+
+	/**
+	 * Configure the interceptor
+	 * This is called when the interceptor is being activated and before listening to any events
+	 */
+	function configure(){
+		
+	}
+
+	/**
+     * --------------------------------------------------------------------------
+     * Listen to events below
+     * --------------------------------------------------------------------------
+     * https://boxlang.ortusbooks.com/boxlang-framework/interceptors/core-interception-points
+     */
+
+}

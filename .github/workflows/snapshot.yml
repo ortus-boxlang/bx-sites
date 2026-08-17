@@ -1,0 +1,58 @@
+name: Build Snapshot
+
+on:
+  push:
+    branches:
+      - development
+  # Manual Trigger
+  workflow_dispatch:
+
+#Cancel running builds if another push to branch is made while this build is running
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  MODULE_ID: ${{ github.event.repository.name }}
+  JDK_VERSION: 21
+
+jobs:
+  #############################################
+  # Tests First baby! We fail, no build :(
+  #############################################
+  tests:
+    uses: ./.github/workflows/tests.yml
+    secrets: inherit
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
+      issues: read
+
+  #############################################
+  # Build Snapshot Release
+  # Requires the tests to pass
+  #############################################
+  build:
+    uses: ./.github/workflows/release.yml
+    needs: [ tests ]
+    secrets: inherit
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: write
+      issues: write
+    with:
+      snapshot: true
+
+  #############################################
+  # Generate API documentation via DocBox
+  #############################################
+  docbox:
+    uses: ./.github/workflows/docbox.yml
+    secrets: inherit
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
+      issues: read

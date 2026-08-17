@@ -1,0 +1,97 @@
+name: Test Suites
+
+# We are a reusable Workflow only
+on:
+  workflow_call:
+    secrets:
+      SLACK_WEBHOOK_URL:
+        required: false
+
+  # Manual Trigger
+  workflow_dispatch:
+
+env:
+  MODULE_ID: ${{ github.event.repository.name }}
+  JDK_VERSION: 21
+
+jobs:
+  tests:
+    name: Tests ${{ github.event.repository.name }}
+    runs-on: ${{ matrix.os }}
+    env:
+      DB_USER: root
+      DB_PASSWORD: root
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest"]
+        experimental: [false]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Setup BoxLang
+        uses: ortus-boxlang/setup-boxlang@1.4.0
+        with:
+          with-commandbox: true
+          modules: bx-esapi
+
+      - name: Check BoxLang Version
+        run: boxlang --version
+
+      - name: Install Dev Dependencies
+        run: box install id=testbox --verbose --nosave
+
+      - name: Test Module
+        run: |
+          mkdir -p ${GITHUB_WORKSPACE}/.boxlang/modules
+          ln -s "$(pwd)" ${GITHUB_WORKSPACE}/.boxlang/modules/"$(basename "$(pwd)")"
+
+      - name: Run Tests
+        run: |
+          ./testbox/run --reporter=ANTJunit --verbose
+          mv tests/results/report.txt tests/results/junit.xml
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tests-${{ matrix.os }}
+          path: |
+            tests/results/**
+
+      # UNCOMMENT THE FOLLOWING LINES TO ENABLE SLACK NOTIFICATIONS
+      # - name: Inform Slack
+      #   if: ${{ failure() && github.ref == 'refs/heads/development' }}
+      #   uses: rtCamp/action-slack-notify@v2
+      #   env:
+      #     SLACK_CHANNEL: coding
+      #     SLACK_COLOR: ${{ job.status }} # or a specific color like 'green' or '#ff00ff'
+      #     SLACK_ICON_EMOJI: ":bell:"
+      #     SLACK_MESSAGE: "${{ env.MODULE_ID }} Tests FAILED!  You broke the build! :("
+      #     SLACK_TITLE: "${{ env.MODULE_ID }} Build Failure"
+      #     SLACK_USERNAME: CI
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  publish-test-results:
+    name: Publish Test Results
+    runs-on: ubuntu-latest
+    needs: tests
+    if: always()
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
+      issues: read
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: |
+            artifacts/**/*.xml
