@@ -18,6 +18,8 @@
 
 @MODULE_DESCRIPTION@
 
+See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's development.
+
 ----
 
 This template can be used to create Ortus based BoxLang Modules written in BoxLang. To use, just click the `Use this Template` button in the github repository: https://github.com/ortus-boxlang/boxlang-module-template-bx and run the setup task from where you cloned it.
