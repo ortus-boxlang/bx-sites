@@ -12,7 +12,7 @@ class {
 	 *
 	 * @pages Array of page structs with an added `contentHtml` key (BuildPipeline sets this before calling)
 	 *
-	 * @return Array of { title, url, headings, body } - the mkdocs-style search index entries (module spec section 5, step 5)
+	 * @return Array of { title, url, headings, body, tags } - the mkdocs-style search index entries (module spec section 5, step 5)
 	 */
 	array function build( required array pages ) {
 		return arguments.pages
@@ -22,7 +22,8 @@ class {
 					title    : page.title,
 					url      : page.urlPath,
 					headings : extractHeadings( page.contentHtml ),
-					body     : truncate( stripTags( page.contentHtml ), 400 )
+					body     : truncate( stripTags( page.contentHtml ), 400 ),
+					tags     : page.tags ?: []
 				}
 			} )
 	}

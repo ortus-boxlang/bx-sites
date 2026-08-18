@@ -1,6 +1,9 @@
 ---
 title: Getting Started
 order: 2
+icon: 🚀
+summary: Install the module, scaffold a project, and build your first site.
+tags: [guides, setup]
 ---
 
 # Getting Started
@@ -52,6 +55,9 @@ docs/
 │   └── deployment.md     -> /guides/deployment/
 ```
 
+(A large site can override this inferred order/grouping entirely with an
+explicit nav - see [`nav`](configuration.md#nav).)
+
 Each page can start with a small frontmatter block:
 
 ```markdown
@@ -60,6 +66,10 @@ title: Deployment
 order: 2
 hidden: false
 description: How to deploy a built BX Docs site.
+tags: [guides, deployment]
+icon: 🚀
+summary: Everything you need to publish a built site.
+ogImage: assets/deployment-card.png
 ---
 
 # Deployment
@@ -73,6 +83,20 @@ Your content here.
 - `description` - this page's social-card/meta description (see
   [`ogImage`](configuration.md#ogimage)); falls back to the site-wide
   `description` in `bxdocs.json` when omitted
+- `tags` - an array of tags for this page, rendered as clickable badges
+  under the title and collected into a site-wide `/tags/` index page
+  (only built at all once at least one page has tags); also boosts search
+  relevance for matching queries
+- `icon` - a short emoji/text icon shown next to the page title
+- `summary` - a one-line lead-in shown under the title (distinct from
+  `description`, which is meta-tag-only and never rendered on the page itself)
+- `ogImage` - overrides this one page's social-card image - see
+  [`ogImage`](configuration.md#ogimage)
+
+Frontmatter values can be inline lists (`tags: [a, b, c]`), YAML-style block
+lists (`tags:` followed by indented `- item` lines), or `>`/`|` block
+scalars for a multi-line value - it's a small hand-rolled parser though, not
+full YAML, so nested objects/maps aren't supported.
 
 ## Build
 

@@ -1,6 +1,7 @@
 ---
 title: Themes
 order: 1
+tags: [guides, themes]
 ---
 
 # Themes
@@ -26,9 +27,12 @@ page features:
   than one level deep under a linked ancestor.
 - **Prev/next page links** at the bottom of the article, following the
   nav's own reading order.
-- **Syntax-highlighted code blocks**, via [highlight.js](https://highlightjs.org/),
+- **Syntax-highlighted code blocks**, via [highlight.js](https://highlightjs.org/)
+  plus a BoxLang grammar of its own (` ```bx `/` ```boxlang `/` ```cfscript `),
   each with a **copy button** - shown on hover on devices that support it,
-  always visible on touch devices (there's no hover to reveal it there).
+  always visible on touch devices (there's no hover to reveal it there). See
+  [Markdown Extensions](markdown.md#code-blocks).
+- **Self-hosted webfonts** - no `fonts.googleapis.com` request at view time.
 - **A dark/light mode toggle**, powered by [Alpine.js](https://alpinejs.dev/)
   for reactivity. The visitor's choice is remembered in `localStorage`
   (falling back to their OS preference), and applied before first paint to
@@ -59,8 +63,15 @@ page features:
   [Configuration](../configuration.md#analytics).
 - **Social share cards** (Open Graph + Twitter Card meta tags), sourced
   from each page's `description` frontmatter (or the site-wide
-  `description`) and `bxdocs.json`'s `ogImage`. See
+  `description`) and its own `ogImage` (or the site-wide one) - optionally
+  auto-generated per page via `bxdocs.json`'s `generateOgImages`. See
   [Configuration](../configuration.md#ogimage).
+- **Page tags, an icon and a summary line**, all opt-in via a page's own
+  frontmatter - tags render as badges linking into a site-wide `/tags/`
+  index. See [Getting Started](../getting-started.md#add-pages).
+- **An explicit nav override**, in `bxdocs.json` or its own `docs/nav.json`,
+  replacing folder-inference for large sites. See
+  [Configuration](../configuration.md#nav).
 - **Extra CSS/JS**, injected via `bxdocs.json`'s `extraCss`/`extraJs`. See
   [Configuration](../configuration.md#extracss--extrajs).
 - **Admonition (note/warning/tip/...) callout boxes**, on by default in any

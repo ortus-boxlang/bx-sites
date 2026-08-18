@@ -1,3 +1,28 @@
+/* Self-hosted Poppins (SIL Open Font License) - see resources/assets/fonts/. */
+@font-face {
+	font-family: "Poppins";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url( "../fonts/poppins-400.woff2" ) format( "woff2" );
+}
+
+@font-face {
+	font-family: "Poppins";
+	font-style: normal;
+	font-weight: 600;
+	font-display: swap;
+	src: url( "../fonts/poppins-600.woff2" ) format( "woff2" );
+}
+
+@font-face {
+	font-family: "Poppins";
+	font-style: normal;
+	font-weight: 700;
+	font-display: swap;
+	src: url( "../fonts/poppins-700.woff2" ) format( "woff2" );
+}
+
 /*
  * Small overrides layered on top of the Tailwind Play CDN's utility classes
  * (loaded inline in layout.bxm) - kept minimal since the theme is

@@ -1,3 +1,28 @@
+/* Self-hosted Roboto + Poppins (both SIL Open Font License) - see resources/assets/fonts/. */
+@font-face {
+	font-family: "Roboto";
+	font-style: normal;
+	font-weight: 400 700;
+	font-display: swap;
+	src: url( "../fonts/roboto-400-500-700.woff2" ) format( "woff2" );
+}
+
+@font-face {
+	font-family: "Poppins";
+	font-style: normal;
+	font-weight: 600;
+	font-display: swap;
+	src: url( "../fonts/poppins-600.woff2" ) format( "woff2" );
+}
+
+@font-face {
+	font-family: "Poppins";
+	font-style: normal;
+	font-weight: 700;
+	font-display: swap;
+	src: url( "../fonts/poppins-700.woff2" ) format( "woff2" );
+}
+
 :root {
 	--bxdocs-gradient-start: #00FF78;
 	--bxdocs-gradient-end: #00DBFF;
@@ -569,6 +594,40 @@ dd {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.3rem;
+}
+
+.page-icon {
+	display: inline-block;
+}
+
+.page-summary {
+	font-size: 1.15rem;
+	color: #6c757d;
+	margin-top: -0.5rem;
+	margin-bottom: 1.5rem;
+}
+
+.page-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-bottom: 1.5rem;
+}
+
+.page-tag {
+	display: inline-block;
+	padding: 0.2rem 0.7rem;
+	border-radius: 999px;
+	background: rgba( 0, 219, 255, 0.12 );
+	color: var( --md-link );
+	font-size: 0.8rem;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.page-tag:hover {
+	background: rgba( 0, 219, 255, 0.22 );
+	color: var( --md-link-hover );
 }
 
 @media ( max-width: 900px ) {

@@ -1,6 +1,9 @@
 ---
 title: CLI Reference
 order: 3
+icon: ⌨️
+summary: Every boxlang module:bxDocs verb and its flags.
+tags: [reference, cli]
 ---
 
 # CLI Reference
@@ -69,3 +72,22 @@ Remove `site/` and any build cache, leaving `docs/` and `bxdocs.json` alone.
 ```bash
 boxlang module:bxDocs clean
 ```
+
+## `gh-deploy`
+
+Builds the site, then force-pushes it to a `gh-pages`-style branch - one
+commit per deploy, no accumulated history on that branch, matching mkdocs'
+own `mkdocs gh-deploy` convention. Requires the project to be a git
+repository with a configured remote; never touches your own current branch
+or working tree (it does the push from a throwaway `git worktree`).
+
+```bash
+boxlang module:bxDocs gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
+```
+
+- `--branch` - defaults to `gh-pages`
+- `--remote` - defaults to `origin`
+- `--message` - the branch's single commit message, defaults to `"Deploy site via bxDocs gh-deploy"`
+
+See [Deployment](guides/deployment.md) for the full GitHub Pages setup
+(enabling Pages for the branch, `baseURL`, etc.).

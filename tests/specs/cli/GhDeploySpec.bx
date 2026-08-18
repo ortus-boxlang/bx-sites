@@ -1,0 +1,85 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.GhDeploy", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.GhDeploy@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function git( required array cmd, required string cwd ) {
+				var pb = createObject( "java", "java.lang.ProcessBuilder" ).init( arguments.cmd );
+				pb.directory( createObject( "java", "java.io.File" ).init( arguments.cwd ) );
+				pb.redirectErrorStream( true );
+				var process = pb.start();
+				var output = createObject( "java", "java.lang.String" ).init( process.getInputStream().readAllBytes(), "UTF-8" );
+				process.waitFor();
+				return output;
+			}
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "throws BxDocs.ConfigNotFound when the project has no bxdocs.json", function() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-ghdeploy-" );
+				tempDirs.append( dir );
+
+				expect( function() {
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxDocs.ConfigNotFound" );
+			} );
+
+			it( "throws BxDocs.NotAGitRepo when the project has no .git, even with a valid bxdocs.json", function() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-ghdeploy-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite( dir & "/bxdocs.json", '{"name":"Test Site"}' );
+				fileWrite( dir & "/docs/index.md", "Home" );
+
+				expect( function() {
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxDocs.NotAGitRepo" );
+			} );
+
+			it( "builds then pushes to a custom --branch/--remote/--message", function() {
+				var remote = createTempDirectory( prefix = "bxdocs-cli-ghdeploy-remote-" );
+				tempDirs.append( remote );
+				git( [ "git", "init", "--bare", "--initial-branch=main", remote ], remote );
+
+				var dir = createTempDirectory( prefix = "bxdocs-cli-ghdeploy-project-" );
+				tempDirs.append( dir );
+				git( [ "git", "init", "--initial-branch=main", dir ], dir );
+				git( [ "git", "-C", dir, "config", "user.email", "test@example.com" ], dir );
+				git( [ "git", "-C", dir, "config", "user.name", "Test" ], dir );
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite( dir & "/bxdocs.json", '{"name":"Test Site"}' );
+				fileWrite( dir & "/docs/index.md", "Home" );
+				git( [ "git", "-C", dir, "add", "-A" ], dir );
+				git( [ "git", "-C", dir, "commit", "-m", "initial" ], dir );
+				git( [ "git", "-C", dir, "remote", "add", "origin", remote ], dir );
+
+				var result = verb.run( { projectRoot : dir, branch : "pages", remote : "origin", message : "custom message" } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toInclude( "origin/pages" );
+
+				var branches = git( [ "git", "-C", remote, "branch", "--list" ], remote );
+				expect( branches ).toInclude( "pages" );
+			} );
+
+		} );
+	}
+
+}

@@ -1,6 +1,7 @@
 ---
 title: Markdown Extensions
 order: 4
+tags: [guides, markdown]
 ---
 
 # Markdown Extensions
@@ -134,6 +135,26 @@ Second term
 :   Second definition.
 
 Off by default - turn it on with `{"markdown":{"enableDefinitionLists":true}}`.
+
+## Code Blocks
+
+Fenced code blocks are syntax-highlighted client-side (highlight.js), no
+config needed - the language identifier after the opening ` ``` ` selects
+the grammar, e.g. ` ```json `. On top of highlight.js's own bundled
+languages, BX Docs registers its own lightweight BoxLang grammar under
+`bx`/`boxlang`/`bxs`/`bxm`/`cfscript`:
+
+```bx
+class {
+
+	numeric function add( required numeric a, required numeric b ) {
+		var result = a + b
+		var message = "The sum is #result#"
+		return result
+	}
+
+}
+```
 
 ## Diagrams
 

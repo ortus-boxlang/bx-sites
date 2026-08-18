@@ -18,6 +18,8 @@ class {
 	variables.markdownRenderer = new "models.build.MarkdownRenderer@bxdocs"()
 	variables.gitRevisionDate  = new "models.build.GitRevisionDate@bxdocs"()
 	variables.versionsDiscoverer = new "models.build.VersionsDiscoverer@bxdocs"()
+	variables.tagsIndexBuilder = new "models.build.TagsIndexBuilder@bxdocs"()
+	variables.socialCardGenerator = new "models.build.SocialCardGenerator@bxdocs"()
 
 	/**
 	 * Swaps in a fake/test markdown renderer. The real one (MarkdownRenderer.bx)
@@ -51,7 +53,8 @@ class {
 		var versionNames = variables.versionsDiscoverer.discover( root & "/docs" )
 		var versions = buildVersionsList( versionNames, urls.basePath )
 
-		var mainResult = renderDocTree( root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "" )
+		var navConfig = resolveExplicitNav( root & "/docs", config.nav )
+		var mainResult = renderDocTree( root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", navConfig )
 		var allPages = duplicate( mainResult.pages )
 		copyAssets( root, themeDir, siteDir, config.search, config.mermaid )
 
@@ -73,6 +76,7 @@ class {
 		}
 
 		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, "Latest" )
+		writeTagsPage( mainResult.pages, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions )
 
 		if ( len( urls.absolute ) ) {
 			fileWrite( siteDir & "/sitemap.xml", variables.sitemapGenerator.build( allPages, urls.absolute ) )
@@ -99,6 +103,7 @@ class {
 	 * @versions Version switcher entries as `[ { label, url } ]`, shared by every tree so the switcher is consistent everywhere
 	 * @currentVersion Which `versions` entry this tree IS, for the switcher's own "selected" state
 	 * @docsRelativePrefix Empty for the main/"Latest" tree; `"versions/<name>/"` for a version tree - see assignEditAndLastUpdated()
+	 * @navConfig An explicit nav tree (NavBuilder.build()'s own `navConfig` shape) for this doc tree - empty (the default) infers nav from folder structure. Only ever non-empty for the main tree - see resolveExplicitNav()
 	 *
 	 * @return { pages, nav }
 	 */
@@ -111,10 +116,11 @@ class {
 		required string root,
 		required array versions,
 		required string currentVersion,
-		required string docsRelativePrefix
+		required string docsRelativePrefix,
+		array navConfig = []
 	) {
 		var pages = variables.docsLoader.load( arguments.docsDir )
-		var nav = variables.navBuilder.build( pages )
+		var nav = variables.navBuilder.build( pages, arguments.navConfig )
 		var flatSequence = variables.navBuilder.flatten( nav )
 
 		directoryCreate( arguments.outputDir, true, true )
@@ -124,6 +130,7 @@ class {
 		assignPrevNext( pages, flatSequence )
 		assignBreadcrumbs( pages, nav )
 		assignEditAndLastUpdated( pages, arguments.config, arguments.root, arguments.docsRelativePrefix )
+		assignOgImages( pages, arguments.config, arguments.outputDir )
 
 		for ( var page in pages ) {
 			var html = variables.themeRenderer.renderPage(
@@ -139,6 +146,51 @@ class {
 		}
 
 		return { pages : pages, nav : nav }
+	}
+
+	/**
+	 * Resolves the main tree's explicit nav override, if any - `bxdocs.json`'s
+	 * own `nav` array wins when non-empty (it can get large for a big site,
+	 * which is exactly why a project can move it out to its own file
+	 * instead); otherwise a `docs/nav.json` file, if present, is used;
+	 * otherwise empty, meaning "infer from folder structure" (NavBuilder.bx's
+	 * default). Only ever consulted for the main tree - a `docs/versions/<name>/`
+	 * tree always uses its own folder structure, even when the main tree has
+	 * an explicit nav (see renderDocTree()'s docblock).
+	 *
+	 * @docsDir Absolute path to the main tree's own `docs/` directory
+	 * @configNav The site's bxdocs.json `nav` array (already validated to be an array by ConfigLoader.bx)
+	 *
+	 * @return NavBuilder.build()'s `navConfig` shape - empty when neither source is set
+	 */
+	private array function resolveExplicitNav( required string docsDir, required array configNav ) {
+		if ( arguments.configNav.len() ) {
+			return arguments.configNav
+		}
+
+		var navJsonPath = arguments.docsDir & "/nav.json"
+		if ( !fileExists( navJsonPath ) ) {
+			return []
+		}
+
+		var parsed = ""
+		try {
+			parsed = jsonDeserialize( fileRead( navJsonPath ) )
+		} catch ( any e ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "docs/nav.json is not valid JSON: #e.message#"
+			)
+		}
+
+		if ( !isArray( parsed ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "docs/nav.json must contain a JSON array"
+			)
+		}
+
+		return parsed
 	}
 
 	/**
@@ -302,6 +354,54 @@ class {
 	}
 
 	/**
+	 * Fills in each page's own `og:image` when `bxdocs.json`'s `generateOgImages`
+	 * is on - a page with its own frontmatter `ogImage` keeps that untouched
+	 * (it already wins); every other page gets a per-page social card
+	 * rendered by SocialCardGenerator.bx (its title + the site name) under
+	 * `<outputDir>/assets/og/`. A no-op entirely when `generateOgImages` is
+	 * off - `page.ogImage` then stays whatever DocsLoader.bx read from
+	 * frontmatter (usually empty), and layout.bxm's own `og:image` falls
+	 * back to `bxdocs.json`'s site-wide `ogImage` in that case.
+	 *
+	 * @pages Array of page structs (already markdown-converted, titles final)
+	 * @config The site's bxdocs.json config
+	 * @outputDir Absolute path this tree's pages are being written under (`site/` or `site/versions/<name>/`)
+	 */
+	private void function assignOgImages( required array pages, required struct config, required string outputDir ) {
+		if ( !arguments.config.generateOgImages ) {
+			return
+		}
+
+		for ( var page in arguments.pages ) {
+			if ( len( trim( page.ogImage ?: "" ) ) ) {
+				continue
+			}
+
+			var relativePath = "assets/og/" & generatedOgImageFileName( page.urlPath )
+			var outputPath = arguments.outputDir & "/" & relativePath
+			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
+			variables.socialCardGenerator.generate( page.title, arguments.config.name, outputPath )
+			page.ogImage = relativePath
+		}
+	}
+
+	/**
+	 * Derives a per-page social-card filename from its own `urlPath`, e.g.
+	 * `"guides/setup/index.html"` -> `"guides-setup.png"`; the root
+	 * `"index.html"` -> `"home.png"` (an empty base would otherwise collide
+	 * with the site-wide default's own naming).
+	 *
+	 * @urlPath The page's own urlPath (DocsLoader.bx's pretty-URL output path)
+	 */
+	private string function generatedOgImageFileName( required string urlPath ) {
+		var base = arguments.urlPath.reReplaceNoCase( "/?index\.html$", "", "one" )
+		if ( !len( base ) ) {
+			base = "home"
+		}
+		return base.reReplace( "[\/]", "-", "all" ) & ".png"
+	}
+
+	/**
 	 * Joins a repo URL, an edit URI (e.g. `edit/main/docs/`) and a docs/-relative
 	 * page path into one URL, tolerating either side's leading/trailing slashes.
 	 *
@@ -345,6 +445,44 @@ class {
 	}
 
 	/**
+	 * Writes `site/tags/index.html` - every frontmatter `tags` value used
+	 * anywhere in the main tree, each with a `##tag-<slug>` anchor and a list
+	 * of every page carrying it (TagsIndexBuilder.bx). Skipped entirely when
+	 * no page uses `tags` - no empty page for projects not using the feature.
+	 * Version trees don't get their own tags page; tag badges on a version's
+	 * pages still link to the main site's one.
+	 *
+	 * @pages The main tree's pages (already markdown-converted, `tags` included)
+	 * @nav The main tree's nav
+	 * @config The site's bxdocs.json config
+	 * @themeDir Absolute path to the resolved theme folder
+	 * @siteDir Absolute path to the build output directory
+	 * @basePath Root-relative base path ending with `/`
+	 * @versions Version switcher entries as `[ { label, url } ]`
+	 */
+	private void function writeTagsPage( required array pages, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions ) {
+		var built = variables.tagsIndexBuilder.build( arguments.pages, arguments.basePath )
+		if ( !built.hasTags ) {
+			return
+		}
+
+		var page = {
+			title       : "Tags",
+			contentHtml : built.contentHtml,
+			toc         : [],
+			prevPage    : { title : "", url : "" },
+			nextPage    : { title : "", url : "" },
+			breadcrumbs : []
+		}
+
+		var html = variables.themeRenderer.renderPage(
+			page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, "Latest"
+		)
+		directoryCreate( arguments.siteDir & "/tags", true, true )
+		fileWrite( arguments.siteDir & "/tags/index.html", html )
+	}
+
+	/**
 	 * @pages Array of page structs with `contentHtml` already set
 	 * @siteDir Absolute path to the build output directory (must already exist)
 	 *
@@ -378,6 +516,8 @@ class {
 		directoryCreate( arguments.siteDir & "/assets", true, true )
 		fileCopy( moduleAssetsDir() & "/copy-code.js", arguments.siteDir & "/assets/copy-code.js" )
 		fileCopy( moduleAssetsDir() & "/admonition-collapse.js", arguments.siteDir & "/assets/admonition-collapse.js" )
+		fileCopy( moduleAssetsDir() & "/highlight-boxlang.js", arguments.siteDir & "/assets/highlight-boxlang.js" )
+		directoryCopy( moduleAssetsDir() & "/fonts", arguments.siteDir & "/assets/fonts", true )
 
 		if ( arguments.searchEnabled ) {
 			fileCopy( moduleAssetsDir() & "/search.js", arguments.siteDir & "/assets/search.js" )

@@ -1,0 +1,34 @@
+/**
+ * `gh-deploy` CLI verb - builds the site, then force-pushes it to a
+ * `gh-pages`-style branch (GhPagesDeployer.bx). CLI-agnostic: takes an
+ * already-parsed options struct (see ModuleConfig.bx's main()), never
+ * touches raw argv or the current working directory itself.
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path), branch, remote, message }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxDocs.MissingProjectRoot", message = "`gh-deploy` requires a project root" )
+		}
+
+		var branch = len( trim( arguments.options.branch ?: "" ) ) ? trim( arguments.options.branch ) : "gh-pages"
+		var remote = len( trim( arguments.options.remote ?: "" ) ) ? trim( arguments.options.remote ) : "origin"
+		var message = len( trim( arguments.options.message ?: "" ) ) ? trim( arguments.options.message ) : "Deploy site via bxDocs gh-deploy"
+
+		var pipeline = new "models.build.BuildPipeline@bxdocs"()
+		var buildResult = pipeline.build( projectRoot )
+
+		var deployer = new "models.build.GhPagesDeployer@bxdocs"()
+		var deployResult = deployer.deploy( projectRoot, buildResult.siteDir, branch, remote, message )
+
+		return {
+			exitCode : 0,
+			message  : "Built #buildResult.pageCount# page(s) and pushed to #deployResult.remote#/#deployResult.branch#"
+		}
+	}
+
+}

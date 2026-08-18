@@ -1,0 +1,65 @@
+/**
+ * SocialCardGenerator.bx renders real PNGs via java.awt/javax.imageio, so
+ * these specs exercise the actual renderer rather than a fake - there's no
+ * external dependency to seam around (unlike MarkdownRenderer.bx's bx-markdown
+ * dependency), just the JVM's own always-available AWT/ImageIO classes.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.SocialCardGenerator", function() {
+
+			beforeEach( function() {
+				variables.generator = new "models.build.SocialCardGenerator@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newOutputPath() {
+				var dir = createTempDirectory( prefix = "bxdocs-socialcard-" );
+				tempDirs.append( dir );
+				return dir & "/card.png";
+			}
+
+			it( "writes a 1200x630 PNG file", function() {
+				var outputPath = newOutputPath();
+
+				generator.generate( "A Page Title", "My Site", outputPath );
+
+				expect( fileExists( outputPath ) ).toBeTrue();
+
+				var image = createObject( "java", "javax.imageio.ImageIO" ).read( createObject( "java", "java.io.File" ).init( outputPath ) );
+				expect( image.getWidth() ).toBe( 1200 );
+				expect( image.getHeight() ).toBe( 630 );
+			} );
+
+			it( "still produces a valid PNG for a title long enough to wrap and truncate", function() {
+				var outputPath = newOutputPath();
+				var longTitle = "A Genuinely Very Long Page Title That Will Need To Wrap Across Several Lines And Then Get Truncated With An Ellipsis Because It Just Keeps Going On And On";
+
+				generator.generate( longTitle, "My Site", outputPath );
+
+				var image = createObject( "java", "javax.imageio.ImageIO" ).read( createObject( "java", "java.io.File" ).init( outputPath ) );
+				expect( image.getWidth() ).toBe( 1200 );
+				expect( image.getHeight() ).toBe( 630 );
+			} );
+
+			it( "produces a valid PNG for an empty title", function() {
+				var outputPath = newOutputPath();
+
+				generator.generate( "", "My Site", outputPath );
+
+				expect( fileExists( outputPath ) ).toBeTrue();
+			} );
+
+		} );
+	}
+
+}
