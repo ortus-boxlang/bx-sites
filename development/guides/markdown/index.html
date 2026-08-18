@@ -72,42 +72,101 @@
 				<article class="page-content">
 <nav class="breadcrumb-nav mb-3" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/bx-docs/development/guides/index.html">Guides</a></li><li class="breadcrumb-item active" aria-current="page">Markdown Extensions</li></ol></nav>
 					<h1 class="page-title">Markdown Extensions</h1>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/markdown.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 8:21:12 PM</span></div>
-<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#admonitions">Admonitions</a></li><li class="toc-level-2"><a href="#diagrams">Diagrams</a></li></ul></nav>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/markdown.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 10:32:45 PM</span></div>
+<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#admonitions">Admonitions</a></li><li class="toc-level-3"><a href="#collapsible-admonitions">Collapsible admonitions</a></li><li class="toc-level-2"><a href="#footnotes">Footnotes</a></li><li class="toc-level-2"><a href="#definition-lists">Definition Lists</a></li><li class="toc-level-2"><a href="#diagrams">Diagrams</a></li><li class="toc-level-2"><a href="#plugin-extensions">Plugin extensions</a></li></ul></nav>
 					<h1 id="markdown-extensions"><a href="#markdown-extensions" id="markdown-extensions" name="markdown-extensions" class="anchor"></a>Markdown Extensions</h1>
-<p>Beyond standard Markdown (and whatever <a href="../configuration.md#markdown">bx-markdown option</a>
-you've turned on), BX Docs adds two content extensions of its own: admonitions
-and Mermaid diagrams.</p>
+<p>Beyond standard Markdown, BX Docs turns on three of bx-markdown's native
+Flexmark extensions by default - admonitions, footnotes and definition lists</p>
+<ul>
+<li>plus a Mermaid diagram integration of its own. All four are configurable
+via <a href="../configuration.md#markdown"><code>bxdocs.json</code>'s <code>markdown</code>/<code>mermaid</code> keys</a>.</li>
+</ul>
 <h2 id="admonitions"><a href="#admonitions" id="admonitions" name="admonitions" class="anchor"></a>Admonitions</h2>
-<p>A callout/note box - no <code>bxdocs.json</code> config needed, just write it:</p>
+<p>A callout/note box - on by default, no <code>bxdocs.json</code> config needed:</p>
 <pre><code class="language-markdown">!!! note &quot;Heads Up&quot;
     This is an admonition. Its content is regular markdown - **bold**,
     `code`, [links](../index.md) and lists all work exactly as normal.
 </code></pre>
 <p>Which renders as:</p>
-<div class="admonition note"><p class="admonition-title">Heads Up</p><p>This is an admonition. Its content is regular markdown - <strong>bold</strong>,
+<p>!!! note &quot;Heads Up&quot;
+This is an admonition. Its content is regular markdown - <strong>bold</strong>,
 <code>code</code>, <a href="../index.md">links</a> and lists all work exactly as normal.</p>
-</div>
-<p>The type (<code>note</code> above) becomes the box's CSS class and, if you don't give
-an explicit <code>&quot;Title&quot;</code>, its own capitalized name is used instead. A handful
-of types get their own accent color out of the box:</p>
-<div class="admonition tip"><p class="admonition-title">tip / hint / success / check / done</p><p>Green.</p>
-</div>
-<div class="admonition warning"><p class="admonition-title">warning / caution / attention</p><p>Orange.</p>
-</div>
-<div class="admonition danger"><p class="admonition-title">danger / error / failure / fail / missing</p><p>Red.</p>
-</div>
-<div class="admonition question"><p class="admonition-title">question / help / faq</p><p>Amber.</p>
-</div>
-<div class="admonition example"><p class="admonition-title">example</p><p>Purple.</p>
-</div>
-<p>Any other type still renders as a valid admonition box (in the default blue
-accent) - the type list above is just which ones get their own color.</p>
+<p>The type (<code>note</code> above) becomes the box's icon/color and, if you don't give
+an explicit <code>&quot;Title&quot;</code>, its own capitalized name is used instead. Many
+common synonyms resolve to the same 12 canonical types, each with its own
+accent color:</p>
+<p>!!! note &quot;note&quot;
+Blue - also the fallback for any type not in this list.</p>
+<p>!!! abstract &quot;abstract / summary / tldr&quot;
+Light blue.</p>
+<p>!!! info &quot;info / todo&quot;
+Cyan.</p>
+<p>!!! tip &quot;tip / hint / important&quot;
+Teal.</p>
+<p>!!! success &quot;success / check / done&quot;
+Green.</p>
+<p>!!! faq &quot;question / help / faq&quot;
+Lime.</p>
+<p>!!! warning &quot;warning / caution / attention&quot;
+Orange.</p>
+<p>!!! fail &quot;failure / fail / missing&quot;
+Light red.</p>
+<p>!!! danger &quot;danger / error&quot;
+Red.</p>
+<p>!!! bug &quot;bug&quot;
+Pink.</p>
+<p>!!! example &quot;example&quot;
+Purple.</p>
+<p>!!! quote &quot;quote / cite&quot;
+Gray.</p>
 <p>The body must stay indented by 4 spaces (or a tab); the block ends at the
 first non-indented, non-blank line. Blank lines are fine <em>inside</em> the block</p>
 <ul>
 <li>they just start a new paragraph, same as anywhere else in markdown.</li>
 </ul>
+<h3 id="collapsible-admonitions"><a href="#collapsible-admonitions" id="collapsible-admonitions" name="collapsible-admonitions" class="anchor"></a>Collapsible admonitions</h3>
+<p>Prefix the type with <code>???</code> instead of <code>!!!</code> to make the block collapsible -
+<code>???</code> starts collapsed, <code>???+</code> starts open. Either way the heading is
+clickable to toggle it:</p>
+<pre><code class="language-markdown">??? tip &quot;Click to expand&quot;
+    This starts collapsed.
+
+???+ tip &quot;Click to collapse&quot;
+    This starts open.
+</code></pre>
+<p>??? tip &quot;Click to expand&quot;
+This starts collapsed.</p>
+<p>???+ tip &quot;Click to collapse&quot;
+This starts open.</p>
+<p>Turn admonitions off entirely with <code>{&quot;markdown&quot;:{&quot;enableAdmonition&quot;:false}}</code>.</p>
+<h2 id="footnotes"><a href="#footnotes" id="footnotes" name="footnotes" class="anchor"></a>Footnotes</h2>
+<p>Reference a footnote inline with <code>[^label]</code> and define its text anywhere in
+the document with <code>[^label]: text</code>:</p>
+<pre><code class="language-markdown">Here's a claim that needs backing up[^1].
+
+[^1]: Here's the backup.
+</code></pre>
+<p>Here's a claim that needs backing up[^1].</p>
+<p>[^1]: Here's the backup.</p>
+<p>Footnote definitions are collected and rendered as a numbered list at the
+bottom of the page regardless of where in the source they're written. Off by
+default - turn it on with <code>{&quot;markdown&quot;:{&quot;enableFootnotes&quot;:true}}</code>.</p>
+<h2 id="definition-lists"><a href="#definition-lists" id="definition-lists" name="definition-lists" class="anchor"></a>Definition Lists</h2>
+<p>A term line followed by one or more <code>:</code> description lines becomes a
+<code>&lt;dl&gt;</code>:</p>
+<pre><code class="language-markdown">Term
+:   Its definition.
+
+Second term
+:   First definition.
+:   Second definition.
+</code></pre>
+<p>Term
+:   Its definition.</p>
+<p>Second term
+:   First definition.
+:   Second definition.</p>
+<p>Off by default - turn it on with <code>{&quot;markdown&quot;:{&quot;enableDefinitionLists&quot;:true}}</code>.</p>
 <h2 id="diagrams"><a href="#diagrams" id="diagrams" name="diagrams" class="anchor"></a>Diagrams</h2>
 <p>Opt-in via <code>bxdocs.json</code>'s <a href="../configuration.md#mermaid"><code>mermaid</code></a> key:</p>
 <pre><code class="language-json">{ &quot;mermaid&quot;: true }
@@ -122,6 +181,11 @@ first non-indented, non-blank line. Blank lines are fine <em>inside</em> the blo
 <p>Mermaid supports flowcharts, sequence diagrams, class diagrams, Gantt
 charts and more - see <a href="https://mermaid.js.org/intro/syntax-reference.html">Mermaid's own syntax reference</a>
 for everything it can draw.</p>
+<h2 id="plugin-extensions"><a href="#plugin-extensions" id="plugin-extensions" name="plugin-extensions" class="anchor"></a>Plugin extensions</h2>
+<p>Admonitions, footnotes and definition lists cover the common cases, but
+bx-markdown itself has no opinion beyond those three - any other Flexmark
+extension can be registered directly against it with <code>markdownRegisterExtension()</code>,
+independent of BX Docs. See bx-markdown's own readme for details.</p>
 
 				</article>
 
@@ -153,6 +217,7 @@ for everything it can draw.</p>
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
 	<script>hljs.highlightAll();</script>
 	<script src="/bx-docs/development/assets/copy-code.js" defer></script>
+	<script src="/bx-docs/development/assets/admonition-collapse.js" defer></script>
 
 	<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 	<script src="/bx-docs/development/assets/mermaid-init.js"></script>

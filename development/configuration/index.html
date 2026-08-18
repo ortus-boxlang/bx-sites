@@ -72,7 +72,7 @@
 				<article class="page-content">
 
 					<h1 class="page-title">Configuration</h1>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 8:21:12 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 10:32:45 PM</span></div>
 <nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#name">name</a></li><li class="toc-level-2"><a href="#description">description</a></li><li class="toc-level-2"><a href="#baseurl">baseURL</a></li><li class="toc-level-2"><a href="#llmstxt">llms.txt</a></li><li class="toc-level-2"><a href="#sitemapxml">sitemap.xml</a></li><li class="toc-level-2"><a href="#theme">theme</a></li><li class="toc-level-2"><a href="#search">search</a></li><li class="toc-level-2"><a href="#nav">nav</a></li><li class="toc-level-2"><a href="#markdown">markdown</a></li><li class="toc-level-2"><a href="#repo">repo</a></li><li class="toc-level-2"><a href="#social">social</a></li><li class="toc-level-2"><a href="#footer">footer</a></li><li class="toc-level-2"><a href="#lastupdated">lastUpdated</a></li><li class="toc-level-2"><a href="#analytics">analytics</a></li><li class="toc-level-2"><a href="#ogimage">ogImage</a></li><li class="toc-level-2"><a href="#extracss--extrajs">extraCss / extraJs</a></li><li class="toc-level-2"><a href="#mermaid">mermaid</a></li><li class="toc-level-2"><a href="#versioning">Versioning</a></li></ul></nav>
 					<h1 id="configuration"><a href="#configuration" id="configuration" name="configuration" class="anchor"></a>Configuration</h1>
 <p>Every project has one <code>bxdocs.json</code> at its root:</p>
@@ -199,12 +199,17 @@ own module settings before each page renders. BX Docs doesn't redefine or
 validate these keys; whatever you put here is bx-markdown's own option set,
 straight through - so this list can drift from bx-markdown's own as it
 evolves. Tables, <code>~~strikethrough~~</code>, <code>- [ ]</code> task-list checkboxes and the
-in-page table of contents are always on, with no toggle.</p>
+in-page table of contents are always on, with no toggle. The one exception
+is <code>enableAdmonition</code> - bx-markdown itself defaults it to <code>false</code>, but BX
+Docs defaults it to <code>true</code> (see the <a href="guides/markdown.md">Markdown Extensions guide</a>).</p>
 <table class="table">
 <thead>
 <tr><th>Key</th><th>Default</th><th>Effect</th></tr>
 </thead>
 <tbody>
+<tr><td><code>enableAdmonition</code></td><td><code>true</code> <em>(BX Docs default; bx-markdown's own default is <code>false</code>)</em></td><td><code>!!!</code>/<code>???</code>/<code>???+</code> callout blocks - see the <a href="guides/markdown.md#admonitions">Markdown Extensions guide</a></td></tr>
+<tr><td><code>enableFootnotes</code></td><td><code>false</code></td><td><code>[^label]</code> footnote references - see the <a href="guides/markdown.md#footnotes">Markdown Extensions guide</a></td></tr>
+<tr><td><code>enableDefinitionLists</code></td><td><code>false</code></td><td><code>Term\n: Definition</code> lists - see the <a href="guides/markdown.md#definition-lists">Markdown Extensions guide</a></td></tr>
 <tr><td><code>autoLinkUrls</code></td><td><code>true</code></td><td>Auto-links bare URLs and email addresses</td></tr>
 <tr><td><code>anchorLinks</code></td><td><code>true</code></td><td>Adds a clickable anchor link to every heading</td></tr>
 <tr><td><code>anchorSetId</code></td><td><code>true</code></td><td>Stamps an <code>id</code> attribute onto every heading</td></tr>
@@ -224,6 +229,8 @@ in-page table of contents are always on, with no toggle.</p>
 </table>
 <pre><code class="language-json">{
 	&quot;markdown&quot;: {
+		&quot;enableFootnotes&quot;: true,
+		&quot;enableDefinitionLists&quot;: true,
 		&quot;anchorLinks&quot;: false,
 		&quot;enableYouTubeTransformer&quot;: true
 	}
@@ -373,6 +380,7 @@ main site's.</p>
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
 	<script>hljs.highlightAll();</script>
 	<script src="/bx-docs/development/assets/copy-code.js" defer></script>
+	<script src="/bx-docs/development/assets/admonition-collapse.js" defer></script>
 
 	<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 	<script src="/bx-docs/development/assets/mermaid-init.js"></script>
