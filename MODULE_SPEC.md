@@ -51,12 +51,12 @@ boxlang module:bxDocs <verb> [options]
 
 ```
 docs/                  # markdown source; folder nesting = nav structure
-bx-docs.json           # site config
+bxdocs.json            # site config
 theme/                 # optional project-level theme override
 site/                  # build output (generated)
 ```
 
-## 4. Config file — bx-docs.json
+## 4. Config file — bxdocs.json
 
 Site name, description, nav (auto-inferred from folder/file structure, overridable), theme name + theme options, base URL, search on/off, markdown-extension passthrough settings (table options, anchor links, YouTube transformer, code style — all sourced from bx-markdown's existing option set).
 
@@ -73,7 +73,7 @@ Site name, description, nav (auto-inferred from folder/file structure, overridab
 
 - Themes are native **BoxLang `.bxm` templates** — no separate template engine
 - `ThemeProvider` contract: each theme folder provides `layout.bxm`, `page.bxm`, `search.bxm` (or search partial), `assets/` (css/js)
-- Built-in themes ship in module `resources/themes/`; custom/project themes resolved relative to project root and referenced by name/path in `bx-docs.json`
+- Built-in themes ship in module `resources/themes/`; custom/project themes resolved relative to project root and referenced by name/path in `bxdocs.json`
 
 ### Built-in themes (v1)
 
@@ -105,7 +105,7 @@ None currently blocking. Deferred to later phases:
 
 **Phase 1 — Module skeleton**
 - box.json, ModuleConfig.bx `main()` + verb stubs
-- bx-docs.json loader/validator
+- bxdocs.json loader/validator
 - `new` verb (scaffold project + bootstrap theme default)
 
 **Phase 2 — Core build pipeline**
