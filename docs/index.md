@@ -38,3 +38,4 @@ repository's own `docs/` folder - see
 - [Themes](guides/themes.md) - the built-in themes, and how to write your own
 - [Search](guides/search.md) - how the static search index works
 - [Deploying to GitHub Pages](guides/deployment.md) - the built-in GitHub Actions workflow
+- [Releases](releases/index.md) - versioning policy and what's new per release
