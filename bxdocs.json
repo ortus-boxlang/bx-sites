@@ -14,7 +14,6 @@
 		"editUri": "edit/main/docs/"
 	},
 	"social": [
-		{ "url": "https://github.com/ortus-boxlang/bx-docs", "icon": "github", "label": "bx-docs on GitHub" },
 		{ "url": "https://github.com/ortus-boxlang/BoxLang", "icon": "github", "label": "BoxLang on GitHub" },
 		{ "url": "https://x.com/TryBoxLang", "icon": "twitter", "label": "X (Twitter)" },
 		{ "url": "https://www.youtube.com/@OrtusSolutions", "icon": "youtube", "label": "YouTube" },
