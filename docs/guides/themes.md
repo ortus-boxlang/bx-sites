@@ -63,6 +63,11 @@ page features:
   [Configuration](../configuration.md#ogimage).
 - **Extra CSS/JS**, injected via `bxdocs.json`'s `extraCss`/`extraJs`. See
   [Configuration](../configuration.md#extracss--extrajs).
+- **Admonition (note/warning/tip) callout boxes**, always available in any
+  page's markdown - no config needed. See
+  [Markdown Extensions](markdown.md#admonitions).
+- **Mermaid diagrams**, opt-in via `bxdocs.json`'s `mermaid`. See
+  [Markdown Extensions](markdown.md#diagrams).
 
 Set which one a project uses in `bxdocs.json`:
 

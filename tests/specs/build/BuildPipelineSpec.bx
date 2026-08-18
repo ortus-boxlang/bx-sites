@@ -329,6 +329,49 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "assets/copy-code.js" );
 			} );
 
+			it( "renders an admonition block as a titled div, with its own inner content still independently markdown-rendered", function() {
+				var root = newProject();
+				var body = '!!! note "Heads Up"' & char( 10 ) & '    Some **inner** text.' & char( 10 ) & char( 10 ) & 'Regular paragraph after.';
+				fileWrite( root & "/docs/index.md", body );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( '<div class="admonition note">' );
+				expect( html ).toInclude( '<p class="admonition-title">Heads Up</p>' );
+				expect( html ).toInclude( "<p>Some **inner** text.</p>" );
+				expect( html ).toInclude( "<p>Regular paragraph after.</p>" );
+				expect( html ).notToInclude( "data-bxdocs-admonition" );
+
+				var calls = fakeMarkdown.getCalls();
+				expect( calls.len() ).toBe( 2 );
+			} );
+
+			it( "renders mermaid.js and its init script only when [mermaid] is enabled, across every built-in theme", function() {
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var root = newProject( themeName );
+					fileWrite( root & "/docs/index.md", "Home" );
+					pipeline.build( root );
+
+					var offHtml = fileRead( root & "/site/index.html" );
+					expect( offHtml ).notToInclude( "mermaid" );
+					expect( fileExists( root & "/site/assets/mermaid-init.js" ) ).toBeFalse();
+
+					var mermaidRoot = newProject( themeName );
+					fileWrite(
+						mermaidRoot & "/bxdocs.json",
+						'{"name":"Test Site","theme":{"name":"' & themeName & '"},"mermaid":true}'
+					);
+					fileWrite( mermaidRoot & "/docs/index.md", "Home" );
+					pipeline.build( mermaidRoot );
+
+					var onHtml = fileRead( mermaidRoot & "/site/index.html" );
+					expect( onHtml ).toInclude( "mermaid.min.js" );
+					expect( onHtml ).toInclude( "assets/mermaid-init.js" );
+					expect( fileExists( mermaidRoot & "/site/assets/mermaid-init.js" ) ).toBeTrue();
+				}
+			} );
+
 			it( "renders breadcrumbs for a nested page under a linked ancestor but not for a top-level page", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Home" );

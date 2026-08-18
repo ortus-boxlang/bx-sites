@@ -139,10 +139,29 @@ frontmatter); this key is validated but not yet consumed.
 ## `markdown`
 
 Forwarded as-is to [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)'s
-own module settings before each page renders - table options, anchor
-links, the YouTube embed transformer, code block styling, and everything
-else bx-markdown supports. BX Docs doesn't redefine or validate these keys;
-whatever you put here is bx-markdown's own option set, straight through.
+own module settings before each page renders. BX Docs doesn't redefine or
+validate these keys; whatever you put here is bx-markdown's own option set,
+straight through - so this list can drift from bx-markdown's own as it
+evolves. Tables, `~~strikethrough~~`, `- [ ]` task-list checkboxes and the
+in-page table of contents are always on, with no toggle.
+
+| Key | Default | Effect |
+|---|---|---|
+| `autoLinkUrls` | `true` | Auto-links bare URLs and email addresses |
+| `anchorLinks` | `true` | Adds a clickable anchor link to every heading |
+| `anchorSetId` | `true` | Stamps an `id` attribute onto every heading |
+| `achorSetName` *(sic)* | `true` | Stamps a `name` attribute onto every heading |
+| `anchorWrapText` | `false` | Wraps the whole heading text in the anchor link, instead of just a bare marker |
+| `anchorClass` | `"anchor"` | CSS class on the anchor `<a>` |
+| `anchorPrefix` / `anchorSuffix` | `""` | Raw HTML injected immediately before/after the heading text |
+| `enableYouTubeTransformer` | `false` | Auto-embeds bare YouTube links as a player |
+| `codeStyleHTMLOpen` / `codeStyleHTMLClose` | `"<code>"` / `"</code>"` | Wrapper HTML around inline code spans |
+| `fencedCodeLanguageClassPrefix` | `"language-"` | Class prefix bx-docs's client-side syntax highlighter (and Mermaid, see below) key off of, e.g. ` ```js ` -> `class="language-js"` |
+| `tableOptions.columnSpans` | `true` | Honors `colspan`-style merged table cells |
+| `tableOptions.appendMissingColumns` | `true` | Pads a short row out to the header's column count |
+| `tableOptions.discardExtraColumns` | `true` | Drops extra cells in an over-long row |
+| `tableOptions.className` | `"table"` | CSS class on every rendered `<table>` |
+| `tableOptions.headerSeparationColumnMatch` | `true` | Requires the `---` separator row to match the header's column count |
 
 ```json
 {
@@ -255,6 +274,21 @@ is used as-is). `extraJs` entries are loaded with `defer`.
 	"extraJs": [ "assets/custom.js" ]
 }
 ```
+
+## `mermaid`
+
+`false` (the default) - no [Mermaid](https://mermaid.js.org/) diagram
+support shipped at all. `true` loads `mermaid.js` client-side and renders
+every ` ```mermaid ` fenced code block as a diagram. See
+[Markdown Extensions](guides/markdown.md#diagrams) for the syntax.
+
+```json
+{ "mermaid": true }
+```
+
+Admonitions (note/warning/tip-style callout boxes) are always available in
+every page's markdown, no config needed - see
+[Markdown Extensions](guides/markdown.md#admonitions).
 
 ## Versioning
 

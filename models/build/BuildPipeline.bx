@@ -16,6 +16,7 @@ class {
 	variables.sitemapGenerator = new "models.build.SitemapGenerator@bxdocs"()
 	variables.llmsTxtGenerator = new "models.build.LlmsTxtGenerator@bxdocs"()
 	variables.markdownRenderer = new "models.build.MarkdownRenderer@bxdocs"()
+	variables.admonitionProcessor = new "models.build.AdmonitionProcessor@bxdocs"()
 	variables.gitRevisionDate  = new "models.build.GitRevisionDate@bxdocs"()
 	variables.versionsDiscoverer = new "models.build.VersionsDiscoverer@bxdocs"()
 
@@ -53,7 +54,7 @@ class {
 
 		var mainResult = renderDocTree( root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "" )
 		var allPages = duplicate( mainResult.pages )
-		copyAssets( root, themeDir, siteDir, config.search )
+		copyAssets( root, themeDir, siteDir, config.search, config.mermaid )
 
 		for ( var versionName in versionNames ) {
 			var versionOutputDir = siteDir & "/versions/" & versionName
@@ -69,7 +70,7 @@ class {
 				"versions/" & versionName & "/"
 			)
 			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
-			copyAssets( root, themeDir, versionOutputDir, config.search )
+			copyAssets( root, themeDir, versionOutputDir, config.search, config.mermaid )
 		}
 
 		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, "Latest" )
@@ -210,14 +211,27 @@ class {
 	/**
 	 * Converts every page's raw markdown body to HTML in place (adds a
 	 * `contentHtml` key to each page struct), applying bxdocs.json's
-	 * markdown passthrough options.
+	 * markdown passthrough options. Admonition blocks (AdmonitionProcessor.bx)
+	 * are pulled out of the body first, converted as their own independent
+	 * markdown pass, and spliced back into the rendered HTML afterward - see
+	 * that class's docblock for why.
 	 *
 	 * @pages Array of page structs from DocsLoader.load()
 	 * @config The site's bxdocs.json config
 	 */
 	private void function convertMarkdown( required array pages, required struct config ) {
 		for ( var page in arguments.pages ) {
-			page.contentHtml = variables.markdownRenderer.toHtml( page.body, arguments.config.markdown )
+			var extraction = variables.admonitionProcessor.extract( page.body )
+			page.contentHtml = variables.markdownRenderer.toHtml( extraction.body, arguments.config.markdown )
+
+			if ( extraction.admonitions.len() ) {
+				var wrapped = {}
+				for ( var admonition in extraction.admonitions ) {
+					var renderedContent = variables.markdownRenderer.toHtml( admonition.content, {} )
+					wrapped[ admonition.token ] = variables.admonitionProcessor.wrap( admonition, renderedContent )
+				}
+				page.contentHtml = variables.admonitionProcessor.substitute( page.contentHtml, wrapped )
+			}
 		}
 	}
 
@@ -365,8 +379,9 @@ class {
 	 * @themeDir Absolute path to the resolved theme folder
 	 * @siteDir Absolute path to the build output directory
 	 * @searchEnabled Whether to copy the shared search.js widget
+	 * @mermaidEnabled Whether to copy the shared mermaid-init.js widget
 	 */
-	private void function copyAssets( required string root, required string themeDir, required string siteDir, required boolean searchEnabled ) {
+	private void function copyAssets( required string root, required string themeDir, required string siteDir, required boolean searchEnabled, required boolean mermaidEnabled ) {
 		var themeAssetsDir = arguments.themeDir & "/assets"
 		if ( directoryExists( themeAssetsDir ) ) {
 			directoryCopy( themeAssetsDir, arguments.siteDir & "/assets/theme", true )
@@ -377,6 +392,10 @@ class {
 
 		if ( arguments.searchEnabled ) {
 			fileCopy( moduleAssetsDir() & "/search.js", arguments.siteDir & "/assets/search.js" )
+		}
+
+		if ( arguments.mermaidEnabled ) {
+			fileCopy( moduleAssetsDir() & "/mermaid-init.js", arguments.siteDir & "/assets/mermaid-init.js" )
 		}
 
 		var docsAssetsDir = arguments.root & "/docs/assets"

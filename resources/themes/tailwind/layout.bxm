@@ -87,6 +87,7 @@
 	variables.ogDescription = len( variables.page.description ?: "" ) ? variables.page.description : ( variables.siteConfig.description ?: "" )
 	variables.analyticsProvider = trim( variables.siteConfig.analytics.provider ?: "" )
 	variables.analyticsId = trim( variables.siteConfig.analytics.id ?: "" )
+	variables.mermaidEnabled = ( variables.siteConfig.mermaid ?: false ) ? true : false
 </bx:script>
 <bx:output><!doctype html>
 <html lang="en">
@@ -177,6 +178,10 @@
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
 	<script>hljs.highlightAll();</script>
 	<script src="#variables.basePath#assets/copy-code.js" defer></script>
+</bx:output><bx:if condition="#variables.mermaidEnabled#"><bx:output>
+	<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+	<script src="#variables.basePath#assets/mermaid-init.js"></script>
+</bx:output></bx:if><bx:output>
 	#renderExtraJs( variables.siteConfig.extraJs ?: [] )#
 </body>
 </html>
