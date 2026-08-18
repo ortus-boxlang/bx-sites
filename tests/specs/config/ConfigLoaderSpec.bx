@@ -166,6 +166,109 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxDocs.InvalidConfig" );
 			} );
 
+			it( "applies defaults for [theme.logo], [theme.favicon], [analytics], [ogImage], [extraCss] and [extraJs]", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				var config = loader.load( dir );
+
+				expect( config.theme.logo ).toBe( "" );
+				expect( config.theme.favicon ).toBe( "" );
+				expect( config.analytics.provider ).toBe( "" );
+				expect( config.analytics.id ).toBe( "" );
+				expect( config.ogImage ).toBe( "" );
+				expect( config.extraCss ).toBeArray();
+				expect( config.extraCss.len() ).toBe( 0 );
+				expect( config.extraJs ).toBeArray();
+				expect( config.extraJs.len() ).toBe( 0 );
+			} );
+
+			it( "preserves user-supplied [theme.logo] and [theme.favicon]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","theme":{"logo":"assets/logo.svg","favicon":"assets/favicon.ico"}}' );
+				var config = loader.load( dir );
+
+				expect( config.theme.logo ).toBe( "assets/logo.svg" );
+				expect( config.theme.favicon ).toBe( "assets/favicon.ico" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [theme.logo] isn't a string", function() {
+				var dir = newProjectDir( '{"name":"My Docs","theme":{"logo":["not","a","string"]}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "accepts boolean [theme.options.navCollapsible] and [theme.options.navExpandAll]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","theme":{"options":{"navCollapsible":true,"navExpandAll":false}}}' );
+				var config = loader.load( dir );
+
+				expect( config.theme.options.navCollapsible ).toBeTrue();
+				expect( config.theme.options.navExpandAll ).toBeFalse();
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [theme.options.navCollapsible] isn't a boolean", function() {
+				var dir = newProjectDir( '{"name":"My Docs","theme":{"options":{"navCollapsible":["not","a","boolean"]}}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "preserves a user-supplied Google [analytics] block", function() {
+				var dir = newProjectDir( '{"name":"My Docs","analytics":{"provider":"google","id":"G-ABC123"}}' );
+				var config = loader.load( dir );
+
+				expect( config.analytics.provider ).toBe( "google" );
+				expect( config.analytics.id ).toBe( "G-ABC123" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [analytics.provider] isn't google", function() {
+				var dir = newProjectDir( '{"name":"My Docs","analytics":{"provider":"plausible","id":"abc"}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [analytics.provider] is set without an [analytics.id]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","analytics":{"provider":"google"}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [analytics.id] contains invalid characters", function() {
+				var dir = newProjectDir( '{"name":"My Docs","analytics":{"provider":"google","id":"G-ABC 123!"}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "preserves a user-supplied [ogImage]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","ogImage":"assets/social-card.png"}' );
+				var config = loader.load( dir );
+
+				expect( config.ogImage ).toBe( "assets/social-card.png" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [ogImage] isn't a string", function() {
+				var dir = newProjectDir( '{"name":"My Docs","ogImage":["not","a","string"]}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "preserves user-supplied [extraCss] and [extraJs] arrays", function() {
+				var dir = newProjectDir( '{"name":"My Docs","extraCss":["assets/extra.css"],"extraJs":["assets/extra.js"]}' );
+				var config = loader.load( dir );
+
+				expect( config.extraCss ).toBe( [ "assets/extra.css" ] );
+				expect( config.extraJs ).toBe( [ "assets/extra.js" ] );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when an [extraCss] entry is empty", function() {
+				var dir = newProjectDir( '{"name":"My Docs","extraCss":[""]}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
 		} );
 	}
 

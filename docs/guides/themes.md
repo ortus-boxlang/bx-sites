@@ -51,6 +51,18 @@ page features:
   [Configuration](../configuration.md#versioning).
 - **A themed `404.html`**, served automatically by most static hosts
   (including GitHub Pages) for any unmatched path.
+- **A custom logo and favicon**, when `bxdocs.json`'s `theme.logo`/
+  `theme.favicon` are set. See [Configuration](../configuration.md#theme).
+- **A collapsible sidebar nav**, opt-in via `theme.options.navCollapsible`.
+  See [Configuration](../configuration.md#theme).
+- **Google Analytics**, when `bxdocs.json`'s `analytics` is configured. See
+  [Configuration](../configuration.md#analytics).
+- **Social share cards** (Open Graph + Twitter Card meta tags), sourced
+  from each page's `description` frontmatter (or the site-wide
+  `description`) and `bxdocs.json`'s `ogImage`. See
+  [Configuration](../configuration.md#ogimage).
+- **Extra CSS/JS**, injected via `bxdocs.json`'s `extraCss`/`extraJs`. See
+  [Configuration](../configuration.md#extracss--extrajs).
 
 Set which one a project uses in `bxdocs.json`:
 
