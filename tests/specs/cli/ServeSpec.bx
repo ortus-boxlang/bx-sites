@@ -1,7 +1,13 @@
+/**
+ * `serve` runs in the foreground until interrupted (Ctrl+C) once it starts
+ * successfully, so its happy path isn't something a test suite can safely
+ * call directly - see DevServerSpec.bx for real coverage of the
+ * start/stop/rebuild logic this verb only drives.
+ */
 class extends="testbox.system.BaseSpec" {
 
 	function run() {
-		describe( "cli.Serve (stub)", function() {
+		describe( "cli.Serve", function() {
 
 			beforeEach( function() {
 				variables.verb = new "models.cli.Serve@bxdocs"();
@@ -11,13 +17,6 @@ class extends="testbox.system.BaseSpec" {
 				expect( function() {
 					verb.run( {} );
 				} ).toThrow( "BxDocs.MissingProjectRoot" );
-			} );
-
-			it( "returns a non-zero exit code with a not-implemented message", function() {
-				var result = verb.run( { projectRoot : "/tmp/whatever" } );
-
-				expect( result.exitCode ).toBe( 1 );
-				expect( result.message ).toInclude( "not implemented" );
 			} );
 
 		} );

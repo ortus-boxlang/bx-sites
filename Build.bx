@@ -14,7 +14,9 @@ class{
 			"docker-compose.yml",
 	        "SetupTemplate.bx",
 			"server-.*\.json",
-			"tests"
+			"tests",
+			"site",
+			"\.cache"
 	    ];
 	    // Current working directories
 	    cwd = server.cli.executionPath & "/";

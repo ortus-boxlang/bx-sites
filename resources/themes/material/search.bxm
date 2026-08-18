@@ -1,0 +1,5 @@
+<bx:output><div class="bxdocs-search md-search">
+	<input type="search" id="bxdocs-search-input" class="md-search__input" placeholder="Search docs..." aria-label="Search">
+	<ul id="bxdocs-search-results" class="bxdocs-search-results"></ul>
+</div>
+</bx:output>

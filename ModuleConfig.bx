@@ -173,7 +173,7 @@ class {
 		var verbDescriptions = {
 			"new"          : "Scaffold a docs project                ([--theme], [--name])",
 			"build"        : "Render docs/**.md into a static site in site/",
-			"serve"        : "Build and serve the site locally with live reload",
+			"serve"        : "Build and serve the site locally with live reload ([--port], [--host])",
 			"search-index" : "Rebuild the search index standalone",
 			"clean"        : "Remove site/ and any build cache"
 		}

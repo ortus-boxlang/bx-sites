@@ -1,7 +1,7 @@
 /**
- * `search-index` CLI verb - stub for now. Search is explicitly deferred:
- * the static index builder and client search UI land in Phase 4 of the
- * module spec; this verb only validates dispatch wiring.
+ * `search-index` CLI verb - thin dispatcher over BuildPipeline.buildSearchIndex().
+ * Rebuilds just `site/search-index.json` standalone; `build` also runs this
+ * same step automatically (module spec section 2).
  */
 class {
 
@@ -14,9 +14,19 @@ class {
 			throw( type = "BxDocs.MissingProjectRoot", message = "`search-index` requires a project root" )
 		}
 
+		var pipeline = new "models.build.BuildPipeline@bxdocs"()
+		var result = pipeline.buildSearchIndex( projectRoot )
+
+		if ( result.skipped ) {
+			return {
+				exitCode : 0,
+				message  : "Search is disabled in bxdocs.json ([search]: false) - nothing to index"
+			}
+		}
+
 		return {
-			exitCode : 1,
-			message  : "`search-index` is not implemented yet (Phase 4 of the module spec - search comes later)."
+			exitCode : 0,
+			message  : "Indexed #result.pageCount# page(s) to #result.indexPath#"
 		}
 	}
 

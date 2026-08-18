@@ -124,6 +124,86 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( root & "/site/index.html" ) ).toBeTrue();
 			} );
 
+			it( "builds search-index.json and copies the shared search.js widget when search is enabled (the default)", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "title: Home" & char( 10 ) & "---" & char( 10 ) & "Welcome home" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/search-index.json" ) ).toBeTrue();
+				expect( fileExists( root & "/site/assets/search.js" ) ).toBeTrue();
+
+				var index = jsonDeserialize( fileRead( root & "/site/search-index.json" ) );
+				expect( index.len() ).toBe( 1 );
+				expect( index[ 1 ].title ).toBe( "Home" );
+				expect( index[ 1 ].url ).toBe( "index.html" );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "bxdocs-search-input" );
+				expect( html ).toInclude( "lunr" );
+			} );
+
+			it( "skips the search index, search.js and search UI when search is disabled", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"search":false}'
+				);
+				fileWrite( root & "/docs/index.md", "Welcome home" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/search-index.json" ) ).toBeFalse();
+				expect( fileExists( root & "/site/assets/search.js" ) ).toBeFalse();
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).notToInclude( "bxdocs-search-input" );
+				expect( html ).notToInclude( "lunr" );
+			} );
+
+			it( "excludes hidden pages from the search index too", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				fileWrite( root & "/docs/secret.md", "---" & char( 10 ) & "title: Secret" & char( 10 ) & "hidden: true" & char( 10 ) & "---" & char( 10 ) & "Shh" );
+
+				pipeline.build( root );
+
+				var index = jsonDeserialize( fileRead( root & "/site/search-index.json" ) );
+				expect( index.len() ).toBe( 1 );
+				expect( index[ 1 ].title ).notToBe( "Secret" );
+			} );
+
+			it( "buildSearchIndex() writes just site/search-index.json, without rendering pages or copying assets", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "title: Home" & char( 10 ) & "---" & char( 10 ) & "Welcome home" );
+
+				var result = pipeline.buildSearchIndex( root );
+
+				expect( result.skipped ).toBeFalse();
+				expect( result.pageCount ).toBe( 1 );
+				expect( result.indexPath ).toBe( root & "/site/search-index.json" );
+				expect( fileExists( root & "/site/search-index.json" ) ).toBeTrue();
+				expect( fileExists( root & "/site/index.html" ) ).toBeFalse();
+				expect( fileExists( root & "/site/assets/theme/style.css" ) ).toBeFalse();
+
+				var index = jsonDeserialize( fileRead( root & "/site/search-index.json" ) );
+				expect( index[ 1 ].title ).toBe( "Home" );
+			} );
+
+			it( "buildSearchIndex() reports skipped without writing anything when search is disabled", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"search":false}'
+				);
+				fileWrite( root & "/docs/index.md", "Welcome home" );
+
+				var result = pipeline.buildSearchIndex( root );
+
+				expect( result.skipped ).toBeTrue();
+				expect( fileExists( root & "/site/search-index.json" ) ).toBeFalse();
+			} );
+
 			it( "throws BxDocs.ConfigNotFound when the project has no bxdocs.json", function() {
 				var root = createTempDirectory( prefix = "bxdocs-buildpipeline-noconfig-" );
 				tempDirs.append( root );

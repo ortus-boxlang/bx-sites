@@ -1,14 +1,16 @@
 /**
  * Orchestrates the full `build` verb end to end (module spec section 5):
  * load config -> load docs -> build nav -> convert markdown -> render
- * through the theme -> write site/ -> copy assets.
+ * through the theme -> write site/ -> build the search index -> copy assets.
+ * Also backs the standalone `search-index` verb (buildSearchIndex()).
  */
 class {
 
-	variables.configLoader    = new "models.config.ConfigLoader@bxdocs"()
-	variables.docsLoader      = new "models.build.DocsLoader@bxdocs"()
-	variables.navBuilder      = new "models.build.NavBuilder@bxdocs"()
-	variables.themeRenderer   = new "models.build.ThemeRenderer@bxdocs"()
+	variables.configLoader     = new "models.config.ConfigLoader@bxdocs"()
+	variables.docsLoader       = new "models.build.DocsLoader@bxdocs"()
+	variables.navBuilder       = new "models.build.NavBuilder@bxdocs"()
+	variables.themeRenderer    = new "models.build.ThemeRenderer@bxdocs"()
+	variables.searchIndexer    = new "models.build.SearchIndexer@bxdocs"()
 	variables.markdownRenderer = new "models.build.MarkdownRenderer@bxdocs"()
 
 	/**
@@ -29,7 +31,7 @@ class {
 	 * @return { siteDir, pageCount }
 	 */
 	struct function build( required string projectRoot ) {
-		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		var root = normalizeRoot( arguments.projectRoot )
 		var config = variables.configLoader.load( root )
 		var pages = variables.docsLoader.load( root & "/docs" )
 		var nav = variables.navBuilder.build( pages )
@@ -41,37 +43,123 @@ class {
 		}
 		directoryCreate( siteDir, true, true )
 
+		convertMarkdown( pages, config )
+
 		for ( var page in pages ) {
-			page.contentHtml = variables.markdownRenderer.toHtml( page.body, config.markdown )
 			var html = variables.themeRenderer.renderPage( page, nav, config, themeDir )
 			var outputPath = siteDir & "/" & page.urlPath
 			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
 			fileWrite( outputPath, html )
 		}
 
-		copyAssets( root, themeDir, siteDir )
+		if ( config.search ) {
+			writeSearchIndex( pages, siteDir )
+		}
+
+		copyAssets( root, themeDir, siteDir, config.search )
 
 		return { siteDir : siteDir, pageCount : pages.len() }
 	}
 
 	/**
-	 * Copies theme assets to `site/assets/theme/`, and a project's own
+	 * Rebuilds just the search index standalone (module spec section 2 -
+	 * the `search-index` verb). Still loads docs and converts markdown (the
+	 * index needs headings/body text), but never touches theme rendering or
+	 * assets - it only ever writes `site/search-index.json`.
+	 *
+	 * @projectRoot Absolute path to the project root
+	 *
+	 * @return { skipped (true when bxdocs.json's `search` is off), indexPath, pageCount }
+	 */
+	struct function buildSearchIndex( required string projectRoot ) {
+		var root = normalizeRoot( arguments.projectRoot )
+		var config = variables.configLoader.load( root )
+
+		if ( !config.search ) {
+			return { skipped : true, indexPath : "", pageCount : 0 }
+		}
+
+		var pages = variables.docsLoader.load( root & "/docs" )
+		convertMarkdown( pages, config )
+
+		var siteDir = root & "/site"
+		directoryCreate( siteDir, true, true )
+
+		return {
+			skipped   : false,
+			indexPath : writeSearchIndex( pages, siteDir ),
+			pageCount : pages.len()
+		}
+	}
+
+	/**
+	 * Converts every page's raw markdown body to HTML in place (adds a
+	 * `contentHtml` key to each page struct), applying bxdocs.json's
+	 * markdown passthrough options.
+	 *
+	 * @pages Array of page structs from DocsLoader.load()
+	 * @config The site's bxdocs.json config
+	 */
+	private void function convertMarkdown( required array pages, required struct config ) {
+		for ( var page in arguments.pages ) {
+			page.contentHtml = variables.markdownRenderer.toHtml( page.body, arguments.config.markdown )
+		}
+	}
+
+	/**
+	 * @pages Array of page structs with `contentHtml` already set
+	 * @siteDir Absolute path to the build output directory (must already exist)
+	 *
+	 * @return Absolute path to the written search-index.json
+	 */
+	private string function writeSearchIndex( required array pages, required string siteDir ) {
+		var searchIndex = variables.searchIndexer.build( arguments.pages )
+		var indexPath = arguments.siteDir & "/search-index.json"
+		fileWrite( indexPath, jsonSerialize( searchIndex ) )
+		return indexPath
+	}
+
+	/**
+	 * Copies theme assets to `site/assets/theme/`, this module's own shared
+	 * search widget script (when search is enabled), and a project's own
 	 * `docs/assets/**` to `site/assets/` (module spec section 5, step 6).
 	 *
 	 * @root Absolute path to the project root
 	 * @themeDir Absolute path to the resolved theme folder
 	 * @siteDir Absolute path to the build output directory
+	 * @searchEnabled Whether to copy the shared search.js widget
 	 */
-	private void function copyAssets( required string root, required string themeDir, required string siteDir ) {
+	private void function copyAssets( required string root, required string themeDir, required string siteDir, required boolean searchEnabled ) {
 		var themeAssetsDir = arguments.themeDir & "/assets"
 		if ( directoryExists( themeAssetsDir ) ) {
 			directoryCopy( themeAssetsDir, arguments.siteDir & "/assets/theme", true )
+		}
+
+		if ( arguments.searchEnabled ) {
+			directoryCreate( arguments.siteDir & "/assets", true, true )
+			fileCopy( moduleAssetsDir() & "/search.js", arguments.siteDir & "/assets/search.js" )
 		}
 
 		var docsAssetsDir = arguments.root & "/docs/assets"
 		if ( directoryExists( docsAssetsDir ) ) {
 			directoryCopy( docsAssetsDir, arguments.siteDir & "/assets", true )
 		}
+	}
+
+	/**
+	 * Absolute path to this module's own shared (theme-independent) assets,
+	 * found relative to this class's own file - the same approach
+	 * ThemeRenderer.bx uses for its built-in themes folder.
+	 */
+	private string function moduleAssetsDir() {
+		return getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]models[\/]build[\/]?$", "" ) & "/resources/assets"
+	}
+
+	/**
+	 * @projectRoot A project root, trailing slash optional
+	 */
+	private string function normalizeRoot( required string projectRoot ) {
+		return arguments.projectRoot.reReplace( "[\/]+$", "" )
 	}
 
 }

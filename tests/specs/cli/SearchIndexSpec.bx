@@ -1,10 +1,19 @@
 class extends="testbox.system.BaseSpec" {
 
 	function run() {
-		describe( "cli.SearchIndex (stub)", function() {
+		describe( "cli.SearchIndex", function() {
 
 			beforeEach( function() {
 				variables.verb = new "models.cli.SearchIndex@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
 			} );
 
 			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
@@ -13,11 +22,25 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxDocs.MissingProjectRoot" );
 			} );
 
-			it( "returns a non-zero exit code with a not-implemented message", function() {
-				var result = verb.run( { projectRoot : "/tmp/whatever" } );
+			it( "throws BxDocs.ConfigNotFound when the project has no bxdocs.json", function() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-searchindex-" );
+				tempDirs.append( dir );
 
-				expect( result.exitCode ).toBe( 1 );
-				expect( result.message ).toInclude( "not implemented" );
+				expect( function() {
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxDocs.ConfigNotFound" );
+			} );
+
+			it( "reports search as disabled without error when bxdocs.json turns it off", function() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-searchindex-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite( dir & "/bxdocs.json", '{"name":"Test Site","search":false}' );
+
+				var result = verb.run( { projectRoot : dir } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toInclude( "disabled" );
 			} );
 
 		} );

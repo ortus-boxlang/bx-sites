@@ -21,6 +21,9 @@
 		html &= "</ul>"
 		return html
 	}
+
+	// module spec section 7 - search is fully static/client-side and opt-out via bxdocs.json
+	variables.searchEnabled = ( variables.siteConfig.search ?: false ) ? true : false
 </bx:script>
 <bx:output><!doctype html>
 <html lang="en">
@@ -32,10 +35,15 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="/assets/theme/style.css">
+</bx:output><bx:if condition="#variables.searchEnabled#"><bx:output>
+	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
+	<script src="/assets/search.js" defer></script>
+</bx:output></bx:if><bx:output>
 </head>
 <body class="min-h-screen bg-slate-50 font-[Poppins,sans-serif] text-slate-900">
 	<header class="flex h-16 items-center px-6 bg-gradient-to-r from-[##00FF78] to-[##00DBFF] shadow">
 		<a class="text-lg font-bold text-slate-900" href="/">⚡ #encodeForHTML( variables.siteConfig.name )#</a>
+</bx:output><bx:if condition="#variables.searchEnabled#"><bx:include template="#variables.themeDir#/search.bxm"></bx:if><bx:output>
 	</header>
 	<div class="mx-auto flex max-w-6xl">
 		<nav class="w-64 shrink-0 p-4" aria-label="Navigation">

@@ -1,0 +1,5 @@
+<bx:output><div class="bxdocs-search position-relative">
+	<input type="search" id="bxdocs-search-input" class="form-control" placeholder="Search docs..." aria-label="Search">
+	<ul id="bxdocs-search-results" class="bxdocs-search-results list-unstyled"></ul>
+</div>
+</bx:output>

@@ -49,3 +49,40 @@ a:hover {
 	padding-bottom: 0.5rem;
 	margin-bottom: 1.5rem;
 }
+
+.bxdocs-search {
+	margin-left: auto;
+	max-width: 260px;
+	width: 100%;
+}
+
+.bxdocs-search-results {
+	display: none;
+	position: absolute;
+	z-index: 20;
+	background: #fff;
+	border: 1px solid rgba( 0, 0, 0, 0.15 );
+	border-radius: 4px;
+	margin-top: 0.25rem;
+	max-height: 320px;
+	overflow-y: auto;
+	box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.15 );
+	min-width: 260px;
+	padding: 0;
+}
+
+.bxdocs-search-results.bxdocs-search-open {
+	display: block;
+}
+
+.bxdocs-search-results a,
+.bxdocs-search-results .bxdocs-search-empty {
+	display: block;
+	padding: 0.5rem 0.75rem;
+	color: #04121a;
+	text-decoration: none;
+}
+
+.bxdocs-search-results a:hover {
+	background: rgba( 0, 219, 255, 0.15 );
+}

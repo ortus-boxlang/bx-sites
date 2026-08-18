@@ -1,0 +1,69 @@
+/**
+ * Builds the static search index (module spec section 5, step 5; section 7 -
+ * "fully static, client-side, matches mkdocs' default (lunr.js)"). This
+ * class only builds the JSON payload; BuildPipeline decides whether to call
+ * it at all (bxdocs.json's `search` flag) and where to write the result.
+ */
+class {
+
+	/**
+	 * Hidden pages are excluded, matching NavBuilder's own treatment of them
+	 * - a page that isn't linked from the nav shouldn't be searchable either.
+	 *
+	 * @pages Array of page structs with an added `contentHtml` key (BuildPipeline sets this before calling)
+	 *
+	 * @return Array of { title, url, headings, body } - the mkdocs-style search index entries (module spec section 5, step 5)
+	 */
+	array function build( required array pages ) {
+		return arguments.pages
+			.filter( page => !page.hidden )
+			.map( page => {
+				return {
+					title    : page.title,
+					url      : page.urlPath,
+					headings : extractHeadings( page.contentHtml ),
+					body     : truncate( stripTags( page.contentHtml ), 400 )
+				}
+			} )
+	}
+
+	/**
+	 * @html Rendered page HTML (already-converted markdown)
+	 *
+	 * @return Array of heading text strings, in document order
+	 */
+	private array function extractHeadings( required string html ) {
+		return reMatch( "<h[1-6][^>]*>.*?</h[1-6]>", arguments.html )
+			.map( match => trim( stripTags( match ) ) )
+			.filter( text => len( text ) )
+	}
+
+	/**
+	 * Strips HTML tags and decodes the handful of entities bx-markdown's
+	 * output commonly contains, collapsing whitespace down to single spaces.
+	 *
+	 * @html Rendered HTML
+	 */
+	private string function stripTags( required string html ) {
+		var text = arguments.html.reReplace( "<[^>]+>", " ", "all" )
+		text = text.replace( "&nbsp;", " ", "all" )
+		text = text.replace( "&amp;", "&", "all" )
+		text = text.replace( "&lt;", "<", "all" )
+		text = text.replace( "&gt;", ">", "all" )
+		text = text.replace( "&quot;", '"', "all" )
+		text = text.replace( "&##39;", "'", "all" )
+		return trim( text.reReplace( "[ \t\r\n]+", " ", "all" ) )
+	}
+
+	/**
+	 * @text Plain text to truncate
+	 * @maxLength Maximum length before truncating with an ellipsis
+	 */
+	private string function truncate( required string text, required numeric maxLength ) {
+		if ( len( arguments.text ) <= arguments.maxLength ) {
+			return arguments.text
+		}
+		return left( arguments.text, arguments.maxLength ) & "…"
+	}
+
+}

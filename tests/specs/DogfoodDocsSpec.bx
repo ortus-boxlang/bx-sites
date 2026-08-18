@@ -1,0 +1,58 @@
+/**
+ * Confirms this repository's own dogfooded `bxdocs.json` + `docs/` (module
+ * spec Phase 5 - "docs + examples for bx-docs itself") actually build
+ * cleanly through the real pipeline, using the same fake markdown renderer
+ * seam as BuildPipelineSpec.bx. Builds into a temp copy so it never leaves
+ * a stray `site/` in the working tree.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "Dogfooded docs (this repo's own docs/ + bxdocs.json)", function() {
+
+			beforeEach( function() {
+				variables.repoRoot = getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]tests[\/]specs[\/]?$", "" )
+				variables.tempRoot = createTempDirectory( prefix = "bxdocs-dogfood-" )
+				directoryCopy( variables.repoRoot & "/docs", variables.tempRoot & "/docs", true )
+				fileCopy( variables.repoRoot & "/bxdocs.json", variables.tempRoot & "/bxdocs.json" )
+
+				variables.pipeline = new "models.build.BuildPipeline@bxdocs"()
+				variables.pipeline.setMarkdownRenderer( new "tests.support.FakeMarkdownRenderer@bxdocs"() )
+			} );
+
+			afterEach( function() {
+				if ( directoryExists( variables.tempRoot ) ) {
+					directoryDelete( variables.tempRoot, true )
+				}
+			} );
+
+			it( "loads and validates bxdocs.json", function() {
+				var config = new "models.config.ConfigLoader@bxdocs"().load( repoRoot )
+				expect( config.name ).toBe( "BX Docs" )
+				expect( config.theme.name ).toBe( "bootstrap" )
+			} );
+
+			it( "builds every dogfooded page without error, with a non-empty nav", function() {
+				var result = pipeline.build( tempRoot )
+
+				expect( result.pageCount ).toBeGTE( 5 )
+				expect( fileExists( tempRoot & "/site/index.html" ) ).toBeTrue()
+				expect( fileExists( tempRoot & "/site/getting-started/index.html" ) ).toBeTrue()
+				expect( fileExists( tempRoot & "/site/guides/themes/index.html" ) ).toBeTrue()
+
+				var nav = new "models.build.NavBuilder@bxdocs"().build( new "models.build.DocsLoader@bxdocs"().load( tempRoot & "/docs" ) )
+				expect( nav.len() ).toBeGT( 0 )
+			} );
+
+			it( "builds a non-empty search index for the dogfooded docs", function() {
+				pipeline.build( tempRoot )
+
+				expect( fileExists( tempRoot & "/site/search-index.json" ) ).toBeTrue()
+				var index = jsonDeserialize( fileRead( tempRoot & "/site/search-index.json" ) )
+				expect( index.len() ).toBeGTE( 5 )
+			} );
+
+		} );
+	}
+
+}

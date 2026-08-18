@@ -26,17 +26,17 @@ Static documentation site generator for BoxLang, built on bx-markdown.
 boxlang module:bxDocs <verb> [options]
 ```
 
-| Verb | Purpose | Status |
-|---|---|---|
-| `new` | Scaffold a docs project (`docs/` + `bxdocs.json`, defaulting to the `bootstrap` theme) | Available |
-| `build` | Render `docs/**.md` into a static site in `site/` | Available (needs [bx-markdown](https://github.com/ortus-boxlang/bx-markdown) installed) |
-| `serve` | Build and serve the site locally with live reload | Planned (Phase 5) |
-| `search-index` | Rebuild the search index standalone | Planned (Phase 4) |
-| `clean` | Remove `site/` and any build cache | Available |
+| Verb | Purpose |
+|---|---|
+| `new` | Scaffold a docs project (`docs/` + `bxdocs.json`, defaulting to the `bootstrap` theme) |
+| `build` | Render `docs/**.md` into a static site in `site/`, including the search index and assets. Needs [bx-markdown](https://github.com/ortus-boxlang/bx-markdown) installed |
+| `serve` | Build and serve the site locally with live reload (needs bx-markdown too) |
+| `search-index` | Rebuild `site/search-index.json` standalone (also runs automatically during `build`) |
+| `clean` | Remove `site/` and any build cache |
 
 Every verb accepts `--projectRoot=<path>` (or a bare positional path) to target a project other than the current directory. Run `boxlang module:bxDocs --help` for full usage.
 
-See [MODULE_SPEC.md](MODULE_SPEC.md) for the full design spec driving this module's development.
+This repository documents itself with BX Docs - see `bxdocs.json` and `docs/` at the repo root, and [CLI Reference](docs/cli-reference.md) / [Configuration](docs/configuration.md) for the full reference docs. See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's development.
 
 ## Install Skills
 
@@ -59,6 +59,8 @@ Here is a brief overview of the directory structure:
 - `interceptors` - Where you can code BoxLang interceptors
 - `models` - The module's own source classes: `models/cli` (one dispatcher per `bxDocs` verb), `models/config` (bxdocs.json loader/validator), `models/build` (project scaffolding + the docs/nav/markdown/theme build pipeline)
 - `resources/themes` - Built-in themes (native BoxLang `.bxm` templates + assets): `bootstrap` (default), `material`, `tailwind` - all with the BoxLang brand palette applied. A project can override any of them via its own `theme/` folder (same `layout.bxm` + `page.bxm` contract)
+- `resources/assets` - Module-wide shared assets (currently just the client-side search widget, `search.js`)
+- `docs` / `bxdocs.json` - This repository's own docs, built by BX Docs itself (`boxlang module:bxDocs build`) - see [Getting Started](docs/getting-started.md)
 - `lib` - Place any Jar's or classes for your module that will be class loaded for you
 - `.cfformat.json` - A format config using the Ortus Standards
 - `.editorconfig` - Smooth consistency between editors

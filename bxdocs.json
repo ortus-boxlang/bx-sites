@@ -1,0 +1,12 @@
+{
+	"name": "BX Docs",
+	"description": "Static documentation site generator for BoxLang, built on bx-markdown",
+	"baseURL": "/",
+	"theme": {
+		"name": "bootstrap",
+		"options": {}
+	},
+	"search": true,
+	"nav": [],
+	"markdown": {}
+}
