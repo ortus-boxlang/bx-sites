@@ -45,17 +45,17 @@ class {
 	 * The BoxLang mapping for your module.  All BoxLang modules are registered with an internal
 	 * mapping prefix of : bxModules.{this.mapping}, /bxmodules/{this.mapping}. Ex: bxModules.test, /bxmodules/test
 	 */
-	this.mapping = "@MODULE_REGISTERED_NAME@";
+	this.mapping = "bxdocs";
 
 	/**
 	 * Who built the module
 	 */
-	this.author = "Luis Majano";
+	this.author = "Ortus Solutions";
 
 	/**
 	 * The module description
 	 */
-	this.description = "This module does amazing things";
+	this.description = "Static documentation site generator for BoxLang, built on bx-markdown";
 
 	/**
 	 * The module web URL
@@ -126,5 +126,236 @@ class {
 	 * that match the approved runtime interception points
 	 * https://boxlang.ortusbooks.com/boxlang-framework/interceptors/core-interception-points
 	 */
+
+	/**
+	 * --------------------------------------------------------------------------
+	 * CLI Entry Point
+	 * --------------------------------------------------------------------------
+	 * Every BoxLang module may declare `main( args )`; `boxlang module:bxDocs
+	 * <verb> ...` invokes it directly. `args` contains ONLY the arguments
+	 * AFTER `module:bxDocs` - the module name itself is never included, so
+	 * args[1] = the verb, args[2..] = the verb's own flags/positional args.
+	 *
+	 * Dispatch itself is CLI-agnostic: raw argv is parsed once here into a
+	 * plain options struct via `parseCliOptions()`, then handed to one thin
+	 * dispatcher class per verb under `models/cli/` - each is unit-tested
+	 * directly against that struct shape, without going through argv parsing.
+	 *
+	 * Argument parsing follows BoxLang's own documented CLI conventions (see
+	 * https://boxlang.ortusbooks.com/getting-started/running-boxlang/cli-scripting#parsed-arguments):
+	 * `--option` (boolean true), `--option=value` / `--option="quoted value"`,
+	 * `-o=value` / `-o` (short form), `-abc` (combined single-char shorthand),
+	 * and `--!option` / `--no-option` (negation, sets false). Everything else
+	 * becomes a positional. There is deliberately no `--key value`
+	 * (space-separated) form - BoxLang's own convention doesn't have one.
+	 *
+	 * `--version`/`-v` and `--help`/`-h` (or no verb, or the `help` verb) are
+	 * handled before verb dispatch and never reach a verb class.
+	 *
+	 * @args The raw CLI argv, module name and dispatch token excluded
+	 *
+	 * @return The process exit code (0 success, 1 failure)
+	 */
+	function main( args = [] ) {
+		// Relative to this file's OWN location (the module root) - BoxLang
+		// resolves a bare dotted path like "models.cli.New" relative to the
+		// module root only from the file the runtime directly invokes as the
+		// module's main() (this one). Nested classes must use the "Class@bxdocs"
+		// suffix form instead when referencing each other.
+		var verbs = {
+			"new"          : "models.cli.New",
+			"build"        : "models.cli.Build",
+			"serve"        : "models.cli.Serve",
+			"search-index" : "models.cli.SearchIndex",
+			"clean"        : "models.cli.Clean"
+		}
+
+		var verbDescriptions = {
+			"new"          : "Scaffold a docs project                ([--theme], [--name])",
+			"build"        : "Render docs/**.md into a static site in site/",
+			"serve"        : "Build and serve the site locally with live reload",
+			"search-index" : "Rebuild the search index standalone",
+			"clean"        : "Remove site/ and any build cache"
+		}
+
+		var firstToken = arrayLen( arguments.args ) >= 1 ? arguments.args[ 1 ] : ""
+
+		if ( firstToken == "--version" || firstToken == "-v" ) {
+			println( "bxDocs v#this.version#" )
+			return 0
+		}
+
+		if ( firstToken == "--help" || firstToken == "-h" || firstToken == "help" ) {
+			printUsage( verbs, verbDescriptions )
+			return 0
+		}
+
+		if ( !len( firstToken ) ) {
+			printUsage( verbs, verbDescriptions )
+			return 1
+		}
+
+		var verbName = firstToken
+
+		if ( !verbs.keyExists( verbName ) ) {
+			println( "Unknown verb [#verbName#]." )
+			println( "" )
+			printUsage( verbs, verbDescriptions )
+			return 1
+		}
+
+		var rawVerbArgs = []
+		for ( var i = 2; i <= arrayLen( arguments.args ); i++ ) {
+			rawVerbArgs.append( arguments.args[ i ] )
+		}
+
+		var options = parseCliOptions( rawVerbArgs )
+		options.projectRoot = resolveProjectRoot( options )
+
+		try {
+			var verbClass = new "#verbs[ verbName ]#"()
+			var result = verbClass.run( options )
+			if ( len( result.message ?: "" ) ) {
+				println( result.message )
+			}
+			return result.exitCode ?: 0
+		} catch ( any e ) {
+			println( "Error: #e.message#" )
+			return 1
+		}
+	}
+
+	/**
+	 * Prints the `--help`/no-verb/unknown-verb usage text: module identity,
+	 * one line per verb (sorted alphabetically) with its description, and the
+	 * two global flags handled before verb dispatch.
+	 *
+	 * @verbs Struct mapping verb name -> dispatch class path
+	 * @verbDescriptions Struct mapping verb name -> one-line help text
+	 */
+	private void function printUsage( required struct verbs, required struct verbDescriptions ) {
+		println( "bxDocs v#this.version# - #this.description#" )
+		println( "" )
+		println( "Usage: boxlang module:bxDocs <verb> [options]" )
+		println( "" )
+
+		for ( var verbName in arguments.verbs.keyArray().sort( "textnocase" ) ) {
+			println( "  #verbName.lJustify( 13 )# #arguments.verbDescriptions[ verbName ] ?: ''#" )
+		}
+
+		println( "" )
+		println( "Global options:" )
+		println( "  -h, --help     Show this help message and exit" )
+		println( "  -v, --version  Show the module version and exit" )
+		println( "" )
+		println( "Every verb also accepts --projectRoot=<path> (or a bare positional path) to" )
+		println( "target a project other than the current directory." )
+	}
+
+	/**
+	 * Parses a verb's own argv (module name + verb already stripped) into a
+	 * plain options struct, following BoxLang's own documented CLI argument
+	 * conventions (see `main()`'s docblock for why this exists instead of
+	 * just calling `CLIGetArgs()`, which is tied to the runtime's real
+	 * process-launch argv and has no equivalent that parses an arbitrary array):
+	 *
+	 * - `--option`          -> `true`
+	 * - `--option=value`    -> `value` (surrounding `"..."` / `'...'` stripped)
+	 * - `-o=value`          -> short form with a value
+	 * - `-o`                -> short form, `true`
+	 * - `-abc`              -> combined single-char shorthand: a/b/c all `true`
+	 * - `--!option`         -> negation, `false`
+	 * - `--no-option`       -> negation, `false`
+	 * - anything else       -> a positional; the first one becomes
+	 *                          `_positional` (a fallback project path for
+	 *                          `resolveProjectRoot()`)
+	 *
+	 * Repeated options override earlier ones, matching the documented "last
+	 * one wins" rule.
+	 *
+	 * @rawArgs A verb's own argv, with the module name and verb token already stripped
+	 *
+	 * @return A plain options struct (flag names -> value/true/false), plus an optional `_positional` key for the first bare positional argument
+	 */
+	private struct function parseCliOptions( required array rawArgs ) {
+		var options = {}
+
+		for ( var token in arguments.rawArgs ) {
+			if ( token.startsWith( "--!" ) ) {
+				options[ token.right( len( token ) - 3 ) ] = false
+			} else if ( token.startsWith( "--no-" ) ) {
+				options[ token.right( len( token ) - 5 ) ] = false
+			} else if ( token.startsWith( "--" ) ) {
+				var body = token.right( len( token ) - 2 )
+				var eqPos = body.find( "=" )
+				if ( eqPos ) {
+					options[ body.left( eqPos - 1 ) ] = stripQuotes( body.right( len( body ) - eqPos ) )
+				} else {
+					options[ body ] = true
+				}
+			} else if ( token.startsWith( "-" ) && len( token ) > 1 ) {
+				var body = token.right( len( token ) - 1 )
+				var eqPos = body.find( "=" )
+				if ( eqPos ) {
+					options[ body.left( eqPos - 1 ) ] = stripQuotes( body.right( len( body ) - eqPos ) )
+				} else if ( len( body ) > 1 ) {
+					for ( var charIndex = 1; charIndex <= len( body ); charIndex++ ) {
+						options[ body.mid( charIndex, 1 ) ] = true
+					}
+				} else {
+					options[ body ] = true
+				}
+			} else if ( !options.keyExists( "_positional" ) ) {
+				options[ "_positional" ] = token
+			}
+		}
+
+		return options
+	}
+
+	/**
+	 * Strips one layer of matching surrounding `"..."` / `'...'` quotes from
+	 * a `--option="value"` / `--option='value'` assignment, per BoxLang's own
+	 * documented convention.
+	 *
+	 * @value The raw assigned value, quotes included if present
+	 *
+	 * @return The value with one layer of matching surrounding quotes removed, or unchanged if none/mismatched
+	 */
+	private string function stripQuotes( required string value ) {
+		if ( len( arguments.value ) < 2 ) {
+			return arguments.value
+		}
+		var first = arguments.value.left( 1 )
+		var last  = arguments.value.right( 1 )
+		if ( ( first == '"' && last == '"' ) || ( first == "'" && last == "'" ) ) {
+			return arguments.value.right( len( arguments.value ) - 1 ).left( len( arguments.value ) - 2 )
+		}
+		return arguments.value
+	}
+
+	/**
+	 * Precedence: --projectRoot flag > first positional arg > the shell's
+	 * current working directory. A relative value is resolved against the
+	 * CWD, never against this module's own file location.
+	 *
+	 * @options The parsed options struct from parseCliOptions()
+	 *
+	 * @return An absolute, trailing-slash-free path to the target project root
+	 */
+	private string function resolveProjectRoot( required struct options ) {
+		var cwd = getSystemSetting( "user.dir", "" )
+		var candidate = len( arguments.options.projectRoot ?: "" )
+			? arguments.options.projectRoot
+			: ( len( arguments.options._positional ?: "" ) ? arguments.options._positional : "." )
+
+		if ( candidate == "." ) {
+			return cwd.reReplace( "[\/]+$", "" )
+		}
+
+		var isAbsolute = candidate.startsWith( "/" ) || reFind( "^[A-Za-z]:", candidate ) > 0
+		var resolved = isAbsolute ? candidate : ( cwd & "/" & candidate )
+		return resolved.reReplace( "[\/]+$", "" )
+	}
 
 }

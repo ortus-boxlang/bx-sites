@@ -1,4 +1,4 @@
-# ⚡︎ @MODULE_NAME@
+# ⚡︎ BX Docs
 
 ```
 |:------------------------------------------------------:|
@@ -16,19 +16,27 @@
 
 <p>&nbsp;</p>
 
-@MODULE_DESCRIPTION@
-
-See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's development.
+Static documentation site generator for BoxLang, built on bx-markdown.
 
 ----
 
-This template can be used to create Ortus based BoxLang Modules written in BoxLang. To use, just click the `Use this Template` button in the github repository: https://github.com/ortus-boxlang/boxlang-module-template-bx and run the setup task from where you cloned it.
+## Usage
 
 ```bash
-boxlang SetupTemplate.bx
+boxlang module:bxDocs <verb> [options]
 ```
 
-The `SetupTemplate` task will ask you for your module name, id and description and configure the template for you! Enjoy!
+| Verb | Purpose | Status |
+|---|---|---|
+| `new` | Scaffold a docs project (`docs/` + `bxdocs.json`, defaulting to the `bootstrap` theme) | Available |
+| `build` | Render `docs/**.md` into a static site in `site/` | Planned (Phase 2) |
+| `serve` | Build and serve the site locally with live reload | Planned (Phase 5) |
+| `search-index` | Rebuild the search index standalone | Planned (Phase 4) |
+| `clean` | Remove `site/` and any build cache | Available |
+
+Every verb accepts `--projectRoot=<path>` (or a bare positional path) to target a project other than the current directory. Run `boxlang module:bxDocs --help` for full usage.
+
+See [MODULE_SPEC.md](MODULE_SPEC.md) for the full design spec driving this module's development.
 
 ## Install Skills
 
@@ -49,6 +57,7 @@ Here is a brief overview of the directory structure:
 - `bifs` - Where you can code Built in Functions for BoxLang
 - `components` - Where you can code BoxLang components
 - `interceptors` - Where you can code BoxLang interceptors
+- `models` - The module's own source classes: `models/cli` (one dispatcher per `bxDocs` verb), `models/config` (bxdocs.json loader/validator), `models/build` (project scaffolding, and the future build pipeline)
 - `lib` - Place any Jar's or classes for your module that will be class loaded for you
 - `.cfformat.json` - A format config using the Ortus Standards
 - `.editorconfig` - Smooth consistency between editors
@@ -80,7 +89,8 @@ boxlang Build.bx --version=1.1.0
 ## Running Tests
 
 1. With CommandBox installed, install testbox: `box install`
-2. With the Boxlang CLI installed, run tests using `./testbox/run`
+2. Register the module so BoxLang can resolve its `bxdocs.*` source classes: `mkdir -p ~/.boxlang/modules && ln -s "$(pwd)" ~/.boxlang/modules/"$(basename "$(pwd)")"` (already done for you in CI - see `.github/workflows/tests.yml`)
+3. With the BoxLang CLI installed, run tests using `./testbox/run`
 
 ## Version Management
 

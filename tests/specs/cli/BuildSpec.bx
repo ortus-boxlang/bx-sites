@@ -1,0 +1,26 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.Build (stub)", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.Build@bxdocs"();
+			} );
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "returns a non-zero exit code with a not-implemented message", function() {
+				var result = verb.run( { projectRoot : "/tmp/whatever" } );
+
+				expect( result.exitCode ).toBe( 1 );
+				expect( result.message ).toInclude( "not implemented" );
+			} );
+
+		} );
+	}
+
+}

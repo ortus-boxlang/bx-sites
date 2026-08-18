@@ -25,7 +25,7 @@ class{
 	function main( args = [] ){
 		// Prep incoming arguments
 		var options = cliGetArgs().options;
-		variables.moduleSlug = "@MODULE_SLUG@";
+		variables.moduleSlug = "bx-docs";
 		variables.version = options.version ?: "1.0.0"
 		variables.buildId = options.buildId ?: createUUID()
 		variables.branch = options.branch ?: "development"

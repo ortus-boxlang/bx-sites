@@ -1,24 +1,29 @@
 {
-    "name":"@MODULE_NAME@",
-    "version":"1.0.0",
-    "location":"@MODULE_STORAGE@",
+    "name":"BX Docs",
+    "version":"@build.version@+@build.number@",
+    "location":"https://downloads.ortussolutions.com/ortussolutions/boxlang-modules/bx-docs/@build.version@/bx-docs-@build.version@.zip",
     "author":"Ortus Solutions",
-    "homepage":"https://github.com/ortus-boxlang/@MODULE_SLUG@",
-    "documentation":"https://github.com/ortus-boxlang/@MODULE_SLUG@",
+    "homepage":"https://github.com/ortus-boxlang/bx-docs",
+    "documentation":"https://github.com/ortus-boxlang/bx-docs",
     "repository":{
         "type":"git",
-        "URL":"https://github.com/ortus-boxlang/@MODULE_SLUG@"
+        "URL":"https://github.com/ortus-boxlang/bx-docs"
     },
     "bugs":"https://ortussolutions.atlassian.net/browse/BLMODULES",
-    "slug":"@MODULE_SLUG@",
-    "shortDescription":"@MODULE_DESCRIPTION@",
+    "slug":"bx-docs",
+    "shortDescription":"Static documentation site generator for BoxLang, built on bx-markdown",
     "type":"boxlang-modules",
     "keywords":[
-        "boxlang"
+        "boxlang",
+        "docs",
+        "documentation",
+        "static-site",
+        "markdown"
     ],
     "boxlang":{
         "minimumVersion":"1.0.0",
-        "moduleName":"@MODULE_REGISTERED_NAME@"
+        "moduleName":"bxdocs",
+        "executable":"bxDocs"
     },
     "private":false,
     "license":[
@@ -27,6 +32,9 @@
             "URL":"https://www.apache.org/licenses/LICENSE-2.0"
         }
     ],
+    "dependencies":{
+        "bx-markdown":"*"
+    },
     "devDependencies":{
         "commandbox-boxlang":"*",
         "commandbox-cfformat":"*",
@@ -42,9 +50,6 @@
         "/src/**",
         "gradle/**"
     ],
-    "scripts":{
-        "setupTemplate":"task run taskFile=src/build/SetupTemplate.cfc"
-    },
     "installPaths":{
         "testbox":"testbox/"
     }

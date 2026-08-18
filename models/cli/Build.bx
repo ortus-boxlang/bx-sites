@@ -1,0 +1,23 @@
+/**
+ * `build` CLI verb - stub for now. The real build pipeline (loader, nav
+ * builder, bx-markdown rendering, theme rendering, asset copy) lands in
+ * Phase 2 of the module spec; this verb only validates dispatch wiring.
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxDocs.MissingProjectRoot", message = "`build` requires a project root" )
+		}
+
+		return {
+			exitCode : 1,
+			message  : "`build` is not implemented yet (Phase 2 of the module spec) - run `new` to scaffold a project in the meantime."
+		}
+	}
+
+}

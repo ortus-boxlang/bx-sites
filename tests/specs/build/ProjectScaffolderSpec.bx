@@ -1,0 +1,66 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.ProjectScaffolder", function() {
+
+			beforeEach( function() {
+				variables.scaffolder = new "models.build.ProjectScaffolder@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newTargetDir() {
+				var parent = createTempDirectory( prefix = "bxdocs-scaffolder-" );
+				tempDirs.append( parent );
+				return parent & "/my-site";
+			}
+
+			it( "creates docs/index.md and bxdocs.json", function() {
+				var dir = newTargetDir();
+				var result = scaffolder.scaffold( dir, "My Site", "bootstrap" );
+
+				expect( fileExists( dir & "/docs/index.md" ) ).toBeTrue();
+				expect( fileExists( dir & "/bxdocs.json" ) ).toBeTrue();
+				expect( directoryExists( dir & "/docs/assets" ) ).toBeTrue();
+				expect( result.projectRoot ).toBe( dir );
+			} );
+
+			it( "writes a bxdocs.json that the ConfigLoader accepts, with the requested theme", function() {
+				var dir = newTargetDir();
+				scaffolder.scaffold( dir, "My Site", "material", "A cool site" );
+
+				var config = new "models.config.ConfigLoader@bxdocs"().load( dir );
+				expect( config.name ).toBe( "My Site" );
+				expect( config.description ).toBe( "A cool site" );
+				expect( config.theme.name ).toBe( "material" );
+			} );
+
+			it( "escapes quotes in the site name/description so the JSON stays valid", function() {
+				var dir = newTargetDir();
+				scaffolder.scaffold( dir, 'Say "Hi"', "bootstrap", 'Quote: "hello"' );
+
+				var config = new "models.config.ConfigLoader@bxdocs"().load( dir );
+				expect( config.name ).toBe( 'Say "Hi"' );
+				expect( config.description ).toBe( 'Quote: "hello"' );
+			} );
+
+			it( "refuses to overwrite a project that already has a bxdocs.json", function() {
+				var dir = newTargetDir();
+				scaffolder.scaffold( dir, "My Site", "bootstrap" );
+
+				expect( function() {
+					scaffolder.scaffold( dir, "My Site", "bootstrap" );
+				} ).toThrow( "BxDocs.ProjectAlreadyExists" );
+			} );
+
+		} );
+	}
+
+}

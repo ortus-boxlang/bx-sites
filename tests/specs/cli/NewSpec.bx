@@ -1,0 +1,74 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.New", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.New@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newTargetDir() {
+				var parent = createTempDirectory( prefix = "bxdocs-cli-new-" );
+				tempDirs.append( parent );
+				return parent & "/my-docs";
+			}
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "scaffolds a project defaulting to the bootstrap theme, returning exitCode 0", function() {
+				var dir = newTargetDir();
+				var result = verb.run( { projectRoot : dir } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( fileExists( dir & "/bxdocs.json" ) ).toBeTrue();
+				expect( result.message ).toInclude( "bootstrap" );
+			} );
+
+			it( "derives the site name from the target directory name when --name is omitted", function() {
+				var dir = newTargetDir();
+				verb.run( { projectRoot : dir } );
+
+				var config = new "models.config.ConfigLoader@bxdocs"().load( dir );
+				expect( config.name ).toBe( "my-docs" );
+			} );
+
+			it( "honors an explicit --name", function() {
+				var dir = newTargetDir();
+				verb.run( { projectRoot : dir, name : "Custom Name" } );
+
+				var config = new "models.config.ConfigLoader@bxdocs"().load( dir );
+				expect( config.name ).toBe( "Custom Name" );
+			} );
+
+			it( "honors an explicit --theme", function() {
+				var dir = newTargetDir();
+				verb.run( { projectRoot : dir, theme : "tailwind" } );
+
+				var config = new "models.config.ConfigLoader@bxdocs"().load( dir );
+				expect( config.theme.name ).toBe( "tailwind" );
+			} );
+
+			it( "throws BxDocs.UnknownTheme for a theme outside the built-in set", function() {
+				var dir = newTargetDir();
+				expect( function() {
+					verb.run( { projectRoot : dir, theme : "not-a-real-theme" } );
+				} ).toThrow( "BxDocs.UnknownTheme" );
+			} );
+
+		} );
+	}
+
+}

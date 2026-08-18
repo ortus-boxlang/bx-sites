@@ -1,0 +1,154 @@
+/**
+ * Reads, defaults, and validates a project's `bxdocs.json` site configuration
+ * (module spec section 4). Pure struct in, struct out - no CLI/argv concerns,
+ * so it is unit-testable directly against a temp project directory.
+ */
+class {
+
+	/**
+	 * Default site configuration, deep-merged with the user's bxdocs.json.
+	 * Markdown passthrough options are intentionally left empty here - they
+	 * are forwarded as-is to bx-markdown, which owns its own defaults.
+	 */
+	variables.defaults = {
+		"description" : "",
+		"baseURL"     : "/",
+		"theme"       : { "name" : "bootstrap", "options" : {} },
+		"search"      : true,
+		"nav"         : [],
+		"markdown"    : {}
+	}
+
+	/**
+	 * The theme names shipped by this module in v1 (module spec section 6).
+	 */
+	variables.builtInThemes = [ "bootstrap", "material", "tailwind" ]
+
+	/**
+	 * Reads and validates `<projectRoot>/bxdocs.json`, merging it over the
+	 * module's own defaults.
+	 *
+	 * @projectRoot Absolute path to the project root
+	 *
+	 * @return The normalized site configuration struct
+	 */
+	struct function load( required string projectRoot ) {
+		var configPath = configPathFor( arguments.projectRoot )
+
+		if ( !fileExists( configPath ) ) {
+			throw(
+				type    = "BxDocs.ConfigNotFound",
+				message = "No bxdocs.json found at [#configPath#] - run `new` to scaffold a project first"
+			)
+		}
+
+		var parsed = ""
+		try {
+			parsed = jsonDeserialize( fileRead( configPath ) )
+		} catch ( any e ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json at [#configPath#] is not valid JSON: #e.message#"
+			)
+		}
+
+		if ( !isStruct( parsed ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json at [#configPath#] must contain a JSON object"
+			)
+		}
+
+		return validate( mergeDefaults( parsed ) )
+	}
+
+	/**
+	 * The absolute path to a project's `bxdocs.json`, regardless of whether it exists yet.
+	 *
+	 * @projectRoot Absolute path to the project root
+	 */
+	string function configPathFor( required string projectRoot ) {
+		return arguments.projectRoot.reReplace( "[\/]+$", "" ) & "/bxdocs.json"
+	}
+
+	/**
+	 * Deep-merges a parsed bxdocs.json struct over the module defaults - a
+	 * user-supplied key wins outright, a user-supplied struct key is merged
+	 * one level deep (so `{"theme":{"name":"material"}}` still keeps the
+	 * default empty `options`), everything else falls back to the default.
+	 *
+	 * @config The parsed bxdocs.json struct
+	 *
+	 * @return The config struct with defaults applied
+	 */
+	struct function mergeDefaults( required struct config ) {
+		var merged = duplicate( variables.defaults )
+
+		for ( var key in arguments.config ) {
+			if ( isStruct( merged[ key ] ?: "" ) && isStruct( arguments.config[ key ] ) ) {
+				for ( var subKey in arguments.config[ key ] ) {
+					merged[ key ][ subKey ] = arguments.config[ key ][ subKey ]
+				}
+			} else {
+				merged[ key ] = arguments.config[ key ]
+			}
+		}
+
+		return merged
+	}
+
+	/**
+	 * Validates a merged site configuration struct.
+	 *
+	 * @config The merged config struct to validate
+	 *
+	 * @return The same config struct, unchanged, if valid
+	 */
+	struct function validate( required struct config ) {
+		if ( !len( trim( arguments.config.name ?: "" ) ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json is missing a required [name] property"
+			)
+		}
+
+		var theme = arguments.config.theme ?: ""
+		if ( !isStruct( theme ) || !len( trim( theme.name ?: "" ) ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [theme] must be an object with a [name] property"
+			)
+		}
+
+		if ( !isBoolean( arguments.config.search ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [search] must be a boolean"
+			)
+		}
+
+		if ( !isArray( arguments.config.nav ?: "" ) && !isStruct( arguments.config.nav ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [nav], when present, must be an array or an object"
+			)
+		}
+
+		if ( !isStruct( arguments.config.markdown ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [markdown], when present, must be an object"
+			)
+		}
+
+		return arguments.config
+	}
+
+	/**
+	 * The theme names this module ships built-in support for (module spec section 6).
+	 */
+	array function getBuiltInThemes() {
+		return variables.builtInThemes
+	}
+
+}

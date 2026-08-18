@@ -1,0 +1,112 @@
+/**
+ * Exercises the bxdocs.json loader/validator directly against temp project
+ * directories - no CLI dispatch involved (see ModuleConfigCliSpec.bx for that).
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "config.ConfigLoader", function() {
+
+			beforeEach( function() {
+				variables.loader = new "models.config.ConfigLoader@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newProjectDir( string configJson = "" ) {
+				var dir = createTempDirectory( prefix = "bxdocs-configloader-" );
+				tempDirs.append( dir );
+				if ( len( arguments.configJson ) ) {
+					fileWrite( dir & "/bxdocs.json", arguments.configJson );
+				}
+				return dir;
+			}
+
+			it( "throws BxDocs.ConfigNotFound when bxdocs.json is missing", function() {
+				var dir = newProjectDir();
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.ConfigNotFound" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig for malformed JSON", function() {
+				var dir = newProjectDir( "{ not valid json" );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [name] is missing", function() {
+				var dir = newProjectDir( '{"description":"no name here"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "applies defaults for description, baseURL, theme, search, nav and markdown", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				var config = loader.load( dir );
+
+				expect( config.name ).toBe( "My Docs" );
+				expect( config.description ).toBe( "" );
+				expect( config.baseURL ).toBe( "/" );
+				expect( config.theme.name ).toBe( "bootstrap" );
+				expect( config.theme.options ).toBeStruct();
+				expect( config.search ).toBeTrue();
+				expect( config.nav ).toBeArray();
+				expect( config.markdown ).toBeStruct();
+			} );
+
+			it( "deep-merges a partial [theme] override, keeping default options", function() {
+				var dir = newProjectDir( '{"name":"My Docs","theme":{"name":"material"}}' );
+				var config = loader.load( dir );
+
+				expect( config.theme.name ).toBe( "material" );
+				expect( config.theme.options ).toBeStruct();
+			} );
+
+			it( "preserves user-supplied values that override defaults", function() {
+				var dir = newProjectDir( '{"name":"My Docs","baseURL":"/docs/","search":false}' );
+				var config = loader.load( dir );
+
+				expect( config.baseURL ).toBe( "/docs/" );
+				expect( config.search ).toBeFalse();
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [search] is not a boolean", function() {
+				var dir = newProjectDir( '{"name":"My Docs","search":"not-a-boolean-at-all"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [theme.name] is explicitly blank", function() {
+				var dir = newProjectDir( '{"name":"My Docs","theme":{"name":"","options":{}}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "defaults [theme.name] to bootstrap when [theme] is present but has no [name] key at all", function() {
+				var dir = newProjectDir( '{"name":"My Docs","theme":{"options":{"foo":"bar"}}}' );
+				var config = loader.load( dir );
+
+				expect( config.theme.name ).toBe( "bootstrap" );
+				expect( config.theme.options.foo ).toBe( "bar" );
+			} );
+
+			it( "exposes the v1 built-in theme names", function() {
+				expect( loader.getBuiltInThemes() ).toBe( [ "bootstrap", "material", "tailwind" ] );
+			} );
+
+		} );
+	}
+
+}
