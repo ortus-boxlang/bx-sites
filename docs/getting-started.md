@@ -8,12 +8,14 @@ order: 2
 ## Install
 
 BX Docs depends on [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
-for Markdown rendering. With [CommandBox](https://commandbox.ortusbooks.com/)
+for Markdown rendering and [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
+for HTML-encoding. With [CommandBox](https://commandbox.ortusbooks.com/)
 installed:
 
 ```bash
 box install bx-docs
 box install bx-markdown
+box install bx-esapi
 ```
 
 ## Scaffold a project

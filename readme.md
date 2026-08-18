@@ -23,9 +23,10 @@ Static documentation site generator for BoxLang, built on bx-markdown - in the s
 ## Quick Start
 
 ```bash
-# Install this module and its Markdown renderer, via CommandBox
+# Install this module and its dependencies, via CommandBox
 box install bx-docs
 box install bx-markdown
+box install bx-esapi
 
 # Scaffold a new docs project (docs/ + bxdocs.json)
 boxlang module:bxDocs new my-docs
@@ -49,8 +50,8 @@ boxlang module:bxDocs <verb> [options]
 | Verb | Purpose |
 |---|---|
 | `new` | Scaffold a docs project (`docs/` + `bxdocs.json`, defaulting to the `bootstrap` theme) |
-| `build` | Render `docs/**.md` into a static site in `site/`, including the search index, `sitemap.xml`, `llms.txt` and assets. Needs bx-markdown installed |
-| `serve` | Build and serve the site locally with live reload (needs bx-markdown too) |
+| `build` | Render `docs/**.md` into a static site in `site/`, including the search index, `sitemap.xml`, `llms.txt` and assets. Needs bx-markdown and bx-esapi installed |
+| `serve` | Build and serve the site locally with live reload (needs bx-markdown and bx-esapi too) |
 | `search-index` | Rebuild `site/search-index.json` standalone (also runs automatically during `build`) |
 | `clean` | Remove `site/` and any build cache |
 
