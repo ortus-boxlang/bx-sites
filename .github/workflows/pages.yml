@@ -50,11 +50,11 @@ jobs:
 
       - name: Register this module so `module:bxDocs` resolves
         run: |
-          # setup-boxlang's own install can leave ${HOME}/.boxlang root-owned,
-          # so reclaim it before creating modules/ underneath it.
-          sudo mkdir -p "${HOME}/.boxlang/modules"
-          sudo chown -R "$(id -u):$(id -g)" "${HOME}/.boxlang"
-          ln -s "$(pwd)" "${HOME}/.boxlang/modules/$(basename "$(pwd)")"
+          # setup-boxlang points BOXLANG_HOME at ${GITHUB_WORKSPACE}/.boxlang
+          # (already owned by the runner user) - that's where BoxLang actually
+          # looks for modules/, not under ${HOME}.
+          mkdir -p "${BOXLANG_HOME}/modules"
+          ln -s "$(pwd)" "${BOXLANG_HOME}/modules/$(basename "$(pwd)")"
 
       - name: Build the site
         run: boxlang module:bxDocs build
