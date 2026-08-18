@@ -74,6 +74,20 @@ class extends="testbox.system.BaseSpec" {
 				expect( calls[ 1 ].options.anchorLinks ).toBeFalse();
 			} );
 
+			it( "builds end to end with the material and tailwind themes too", function() {
+				for ( var themeName in [ "material", "tailwind" ] ) {
+					var root = newProject( themeName );
+					fileWrite( root & "/docs/index.md", "Welcome home" );
+
+					var result = pipeline.build( root );
+
+					expect( result.pageCount ).toBe( 1 );
+					var html = fileRead( root & "/site/index.html" );
+					expect( html ).toInclude( "<p>Welcome home</p>" );
+					expect( fileExists( root & "/site/assets/theme/style.css" ) ).toBeTrue();
+				}
+			} );
+
 			it( "copies theme assets to site/assets/theme and docs/assets to site/assets", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Home" );

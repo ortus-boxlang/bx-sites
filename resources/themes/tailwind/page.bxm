@@ -1,0 +1,7 @@
+<bx:output>			<article class="rounded-lg bg-white p-8 shadow-sm ring-1 ring-slate-200">
+				<h1 class="mb-6 border-b-4 border-[##FFF500] pb-2 text-2xl font-bold">#encodeForHTML( variables.page.title )#</h1>
+				<div class="prose max-w-none">
+					#variables.page.contentHtml#
+				</div>
+			</article>
+</bx:output>

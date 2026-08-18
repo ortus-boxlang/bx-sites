@@ -1,0 +1,49 @@
+<bx:script>
+	/**
+	 * Recursively renders a nav tree (module spec section 5, step 4) as a
+	 * nested Material-style list. A node with no `url` (a folder with no
+	 * `index.md`) renders as a section heading instead of a link.
+	 */
+	function renderNavList( required array nodes, boolean nested = false ) {
+		var html = "<ul class=""md-nav" & ( arguments.nested ? " md-nav--nested" : "" ) & """>"
+		for ( var node in arguments.nodes ) {
+			html &= "<li class=""md-nav__item"">"
+			if ( len( node.url ) ) {
+				html &= "<a class=""md-nav__link"" href=""/" & node.url & """>" & encodeForHTML( node.title ) & "</a>"
+			} else {
+				html &= "<span class=""md-nav__heading"">" & encodeForHTML( node.title ) & "</span>"
+			}
+			if ( node.children.len() ) {
+				html &= renderNavList( node.children, true )
+			}
+			html &= "</li>"
+		}
+		html &= "</ul>"
+		return html
+	}
+</bx:script>
+<bx:output><!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="/assets/theme/style.css">
+</head>
+<body class="md-body">
+	<header class="md-header">
+		<a class="md-header__brand" href="/">⚡ #encodeForHTML( variables.siteConfig.name )#</a>
+	</header>
+	<div class="md-layout">
+		<nav class="md-sidebar" aria-label="Navigation">
+			#renderNavList( variables.nav )#
+		</nav>
+		<main class="md-content">
+</bx:output><bx:include template="#variables.themeDir#/page.bxm"><bx:output>
+		</main>
+	</div>
+</body>
+</html>
+</bx:output>

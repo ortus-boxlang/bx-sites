@@ -36,14 +36,34 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxDocs.ThemeNotFound" );
 			} );
 
-			it( "prefers a project-level theme/ override that has its own layout.bxm", function() {
+			it( "prefers a project-level theme/ override that satisfies the ThemeProvider contract", function() {
 				var root = newProjectRoot();
 				directoryCreate( root & "/theme", true, true );
 				fileWrite( root & "/theme/layout.bxm", "<bx:output>custom layout</bx:output>" );
+				fileWrite( root & "/theme/page.bxm", "<bx:output>custom page</bx:output>" );
 
 				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
 
 				expect( themeDir ).toBe( root & "/theme" );
+			} );
+
+			it( "throws BxDocs.InvalidTheme when a project theme/ override is missing page.bxm", function() {
+				var root = newProjectRoot();
+				directoryCreate( root & "/theme", true, true );
+				fileWrite( root & "/theme/layout.bxm", "<bx:output>custom layout</bx:output>" );
+
+				expect( function() {
+					renderer.resolveThemeDir( "bootstrap", root );
+				} ).toThrow( "BxDocs.InvalidTheme" );
+			} );
+
+			it( "resolves each built-in theme (bootstrap, material, tailwind) with a valid ThemeProvider contract", function() {
+				var root = newProjectRoot();
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					expect( fileExists( themeDir & "/layout.bxm" ) ).toBeTrue();
+					expect( fileExists( themeDir & "/page.bxm" ) ).toBeTrue();
+				}
 			} );
 
 			it( "renders a page through the built-in bootstrap theme, including title, nav and content", function() {
@@ -71,6 +91,24 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "guides" );
 				expect( html ).toInclude( 'href="/guides/setup/index.html"' );
 				expect( html ).toInclude( "<!doctype html>" );
+			} );
+
+			it( "renders a page through every built-in theme without error", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Hello World</p>" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var config = { name : "My Site" };
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					var html = renderer.renderPage( page, nav, config, themeDir );
+
+					expect( html ).toInclude( "<!doctype html>" );
+					expect( html ).toInclude( "My Page" );
+					expect( html ).toInclude( "My Site" );
+					expect( html ).toInclude( "<p>Hello World</p>" );
+					expect( html ).toInclude( 'href="/index.html"' );
+				}
 			} );
 
 			it( "HTML-escapes the page title and site name", function() {

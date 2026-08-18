@@ -1,0 +1,50 @@
+<bx:script>
+	/**
+	 * Recursively renders a nav tree (module spec section 5, step 4) as a
+	 * nested Tailwind-utility nav list. A node with no `url` (a folder with
+	 * no `index.md`) renders as a section heading instead of a link.
+	 */
+	function renderNavList( required array nodes, boolean nested = false ) {
+		var html = "<ul class=""space-y-1" & ( arguments.nested ? " ml-4 mt-1" : "" ) & """>"
+		for ( var node in arguments.nodes ) {
+			html &= "<li>"
+			if ( len( node.url ) ) {
+				html &= "<a class=""block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50"" href=""/" & node.url & """>" & encodeForHTML( node.title ) & "</a>"
+			} else {
+				html &= "<span class=""block px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400"">" & encodeForHTML( node.title ) & "</span>"
+			}
+			if ( node.children.len() ) {
+				html &= renderNavList( node.children, true )
+			}
+			html &= "</li>"
+		}
+		html &= "</ul>"
+		return html
+	}
+</bx:script>
+<bx:output><!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="/assets/theme/style.css">
+</head>
+<body class="min-h-screen bg-slate-50 font-[Poppins,sans-serif] text-slate-900">
+	<header class="flex h-16 items-center px-6 bg-gradient-to-r from-[##00FF78] to-[##00DBFF] shadow">
+		<a class="text-lg font-bold text-slate-900" href="/">⚡ #encodeForHTML( variables.siteConfig.name )#</a>
+	</header>
+	<div class="mx-auto flex max-w-6xl">
+		<nav class="w-64 shrink-0 p-4" aria-label="Navigation">
+			#renderNavList( variables.nav )#
+		</nav>
+		<main class="min-w-0 flex-1 p-8">
+</bx:output><bx:include template="#variables.themeDir#/page.bxm"><bx:output>
+		</main>
+	</div>
+</body>
+</html>
+</bx:output>

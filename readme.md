@@ -58,7 +58,7 @@ Here is a brief overview of the directory structure:
 - `components` - Where you can code BoxLang components
 - `interceptors` - Where you can code BoxLang interceptors
 - `models` - The module's own source classes: `models/cli` (one dispatcher per `bxDocs` verb), `models/config` (bxdocs.json loader/validator), `models/build` (project scaffolding + the docs/nav/markdown/theme build pipeline)
-- `resources/themes` - Built-in themes (native BoxLang `.bxm` templates + assets) - `bootstrap` ships in v1
+- `resources/themes` - Built-in themes (native BoxLang `.bxm` templates + assets): `bootstrap` (default), `material`, `tailwind` - all with the BoxLang brand palette applied. A project can override any of them via its own `theme/` folder (same `layout.bxm` + `page.bxm` contract)
 - `lib` - Place any Jar's or classes for your module that will be class loaded for you
 - `.cfformat.json` - A format config using the Ortus Standards
 - `.editorconfig` - Smooth consistency between editors

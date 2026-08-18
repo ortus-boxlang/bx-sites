@@ -1,0 +1,5 @@
+<bx:output>			<article class="md-card">
+				<h1 class="md-title">#encodeForHTML( variables.page.title )#</h1>
+				#variables.page.contentHtml#
+			</article>
+</bx:output>

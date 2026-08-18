@@ -1,17 +1,33 @@
 /**
  * Resolves a theme folder and renders a single page through its `layout.bxm`
- * (module spec section 5, step 4; section 6 theme contract). A theme folder
- * is a plain pair of native BoxLang `.bxm` templates - `layout.bxm` (the
- * outer shell + nav) includes the sibling `page.bxm` (the article body) via
- * `variables.themeDir`, which BoxLang's include scope-absorption carries
- * through automatically (no explicit hand-off needed).
+ * (module spec section 5, step 4; section 6 theme contract).
+ *
+ * The `ThemeProvider` contract (module spec section 6) a theme folder must
+ * satisfy:
+ *   - `layout.bxm` (required) - the outer HTML shell + nav; receives
+ *     `variables.page`, `variables.nav`, `variables.siteConfig` and
+ *     `variables.themeDir` in scope, and includes the sibling `page.bxm` via
+ *     `#variables.themeDir#/page.bxm` (BoxLang's include scope-absorption
+ *     carries those variables through automatically - no explicit hand-off).
+ *   - `page.bxm` (required) - the article body; renders `variables.page.contentHtml`
+ *     (the already-converted markdown, set by BuildPipeline before rendering).
+ *   - `search.bxm` (optional, not yet enforced - module spec section 7,
+ *     deferred to Phase 4) - the search UI partial.
+ *   - `assets/` (optional) - theme CSS/JS, copied to `site/assets/theme/` by
+ *     BuildPipeline's asset pipeline.
  */
 class {
 
 	/**
+	 * The files every theme folder must provide (the required half of the
+	 * `ThemeProvider` contract documented on this class).
+	 */
+	variables.requiredFiles = [ "layout.bxm", "page.bxm" ]
+
+	/**
 	 * Resolution order: a project-level `theme/` override (module spec
-	 * section 3) if it has its own `layout.bxm`, else this module's
-	 * built-in `resources/themes/<themeName>` (section 6).
+	 * section 3) if it satisfies the `ThemeProvider` contract, else this
+	 * module's built-in `resources/themes/<themeName>` (section 6).
 	 *
 	 * @themeName The configured theme name (bxdocs.json's `theme.name`)
 	 * @projectRoot Absolute path to the project root
@@ -20,19 +36,43 @@ class {
 	 */
 	string function resolveThemeDir( required string themeName, required string projectRoot ) {
 		var projectTheme = arguments.projectRoot.reReplace( "[\/]+$", "" ) & "/theme"
-		if ( fileExists( projectTheme & "/layout.bxm" ) ) {
-			return projectTheme
+		if ( directoryExists( projectTheme ) ) {
+			return assertThemeProvider( projectTheme )
 		}
 
 		var builtIn = builtInThemesDir() & "/" & arguments.themeName
-		if ( fileExists( builtIn & "/layout.bxm" ) ) {
-			return builtIn
+		if ( directoryExists( builtIn ) ) {
+			return assertThemeProvider( builtIn )
 		}
 
 		throw(
 			type    = "BxDocs.ThemeNotFound",
-			message = "No layout.bxm found for theme [#arguments.themeName#] - looked in [#projectTheme#] and [#builtIn#]"
+			message = "No theme found for [#arguments.themeName#] - looked in [#projectTheme#] and [#builtIn#]"
 		)
+	}
+
+	/**
+	 * Validates that a resolved theme folder satisfies the `ThemeProvider`
+	 * contract (this class's own docblock), so a broken/incomplete theme
+	 * fails with one clear message up front instead of a confusing
+	 * `include` error deep inside rendering.
+	 *
+	 * @themeDir Absolute path to a theme folder that exists
+	 *
+	 * @return The same themeDir, unchanged, if it satisfies the contract
+	 */
+	private string function assertThemeProvider( required string themeDir ) {
+		var dir = arguments.themeDir
+		var missing = variables.requiredFiles.filter( fileName => !fileExists( dir & "/" & fileName ) )
+
+		if ( missing.len() ) {
+			throw(
+				type    = "BxDocs.InvalidTheme",
+				message = "Theme at [#dir#] is missing required file(s): #missing.toList( ', ' )#"
+			)
+		}
+
+		return dir
 	}
 
 	/**
