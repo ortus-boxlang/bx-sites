@@ -347,6 +347,102 @@ class extends="testbox.system.BaseSpec" {
 				expect( setupHtml ).toInclude( ">Setup<" );
 			} );
 
+			it( "renders a repo link when [repo.url] is configured, and none when it isn't", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"repo":{"url":"https://github.com/acme/docs"}}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "repo-link" );
+				expect( html ).toInclude( "github.com" );
+				expect( html ).toInclude( "acme" );
+			} );
+
+			it( "omits the repo link when [repo.url] isn't configured", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).notToInclude( "repo-link" );
+			} );
+
+			it( "computes editUrl from [repo.url] + [repo.editUri] + the page's relative path", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"repo":{"url":"https://github.com/acme/docs","editUri":"edit/main/docs/"}}'
+				);
+				directoryCreate( root & "/docs/guides", true, true );
+				fileWrite( root & "/docs/guides/setup.md", "---" & char( 10 ) & "title: Setup" & char( 10 ) & "---" & char( 10 ) & "Setup body" );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/guides/setup/index.html" );
+				expect( html ).toInclude( "github.com" );
+				expect( html ).toInclude( "edit" );
+				expect( html ).toInclude( "guides" );
+				expect( html ).toInclude( "setup.md" );
+				expect( html ).toInclude( "Edit this page" );
+			} );
+
+			it( "omits the edit link when [repo.url] is set but [repo.editUri] isn't", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"repo":{"url":"https://github.com/acme/docs"}}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).notToInclude( "Edit this page" );
+			} );
+
+			it( "renders a footer with social links and copyright only when [footer] is enabled", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"footer":true,"social":[{"url":"https://twitter.com/acme","icon":"twitter","label":"Twitter"}]}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "bxdocs-footer" );
+				expect( html ).toInclude( "social-link" );
+				expect( html ).toInclude( "twitter.com" );
+				expect( html ).toInclude( "Test Site" );
+			} );
+
+			it( "omits the footer entirely when [footer] is off (the default)", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).notToInclude( "bxdocs-footer" );
+			} );
+
+			it( "omits lastUpdated when the [lastUpdated] option is off (the default)", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).notToInclude( "Last updated" );
+			} );
+
 		} );
 	}
 
