@@ -7,6 +7,13 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Themes - BX Docs</title>
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="BX Docs">
+	<meta property="og:title" content="Themes">
+
+	<meta name="description" content="Static documentation site generator for BoxLang, built on bx-markdown">
+	<meta property="og:description" content="Static documentation site generator for BoxLang, built on bx-markdown">
+
 	<script>
 		( function () {
 			var configuredMode = "auto";
@@ -23,6 +30,7 @@
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
 	<link rel="stylesheet" href="/bx-docs/development/assets/theme/style.css">
+	
 
 	<script>window.__BXDOCS_BASE_PATH__ = "/bx-docs/development/";</script>
 	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
@@ -64,7 +72,7 @@
 				<article class="page-content">
 <nav class="breadcrumb-nav mb-3" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/bx-docs/development/guides/index.html">Guides</a></li><li class="breadcrumb-item active" aria-current="page">Themes</li></ol></nav>
 					<h1 class="page-title">Themes</h1>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 5:44:55 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 6:10:04 PM</span></div>
 <nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#built-in">Built in</a></li><li class="toc-level-2"><a href="#the-themeprovider-contract">The ThemeProvider contract</a></li><li class="toc-level-2"><a href="#overriding-a-theme">Overriding a theme</a></li></ul></nav>
 					<h1 id="themes"><a href="#themes" id="themes" name="themes" class="anchor"></a>Themes</h1>
 <p>Themes are native BoxLang <code>.bxm</code> templates - there's no separate template
@@ -115,6 +123,18 @@ credit) when <code>bxdocs.json</code>'s <code>footer</code> is <code>true</code>
 <a href="../configuration.md#versioning">Configuration</a>.</li>
 <li><strong>A themed <code>404.html</code></strong>, served automatically by most static hosts
 (including GitHub Pages) for any unmatched path.</li>
+<li><strong>A custom logo and favicon</strong>, when <code>bxdocs.json</code>'s <code>theme.logo</code>/
+<code>theme.favicon</code> are set. See <a href="../configuration.md#theme">Configuration</a>.</li>
+<li><strong>A collapsible sidebar nav</strong>, opt-in via <code>theme.options.navCollapsible</code>.
+See <a href="../configuration.md#theme">Configuration</a>.</li>
+<li><strong>Google Analytics</strong>, when <code>bxdocs.json</code>'s <code>analytics</code> is configured. See
+<a href="../configuration.md#analytics">Configuration</a>.</li>
+<li><strong>Social share cards</strong> (Open Graph + Twitter Card meta tags), sourced
+from each page's <code>description</code> frontmatter (or the site-wide
+<code>description</code>) and <code>bxdocs.json</code>'s <code>ogImage</code>. See
+<a href="../configuration.md#ogimage">Configuration</a>.</li>
+<li><strong>Extra CSS/JS</strong>, injected via <code>bxdocs.json</code>'s <code>extraCss</code>/<code>extraJs</code>. See
+<a href="../configuration.md#extracss--extrajs">Configuration</a>.</li>
 </ul>
 <p>Set which one a project uses in <code>bxdocs.json</code>:</p>
 <pre><code class="language-json">{ &quot;theme&quot;: { &quot;name&quot;: &quot;material&quot; } }
@@ -191,6 +211,7 @@ satisfies the contract above - the built-in themes under this module's own
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
 	<script>hljs.highlightAll();</script>
 	<script src="/bx-docs/development/assets/copy-code.js" defer></script>
+	
 </body>
 </html>
 
