@@ -1,7 +1,7 @@
 /**
- * `build` CLI verb - stub for now. The real build pipeline (loader, nav
- * builder, bx-markdown rendering, theme rendering, asset copy) lands in
- * Phase 2 of the module spec; this verb only validates dispatch wiring.
+ * `build` CLI verb - thin dispatcher over BuildPipeline. CLI-agnostic: takes
+ * an already-parsed options struct (see ModuleConfig.bx's main()), never
+ * touches raw argv or the current working directory itself.
  */
 class {
 
@@ -14,9 +14,12 @@ class {
 			throw( type = "BxDocs.MissingProjectRoot", message = "`build` requires a project root" )
 		}
 
+		var pipeline = new "models.build.BuildPipeline@bxdocs"()
+		var result = pipeline.build( projectRoot )
+
 		return {
-			exitCode : 1,
-			message  : "`build` is not implemented yet (Phase 2 of the module spec) - run `new` to scaffold a project in the meantime."
+			exitCode : 0,
+			message  : "Built #result.pageCount# page(s) to #result.siteDir#"
 		}
 	}
 

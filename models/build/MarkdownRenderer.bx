@@ -1,0 +1,44 @@
+/**
+ * Converts markdown to HTML via bx-markdown's `Markdown()` BIF (module spec
+ * section 5, step 2 - "delegates to bx-markdown; no custom parser").
+ *
+ * `Markdown()` itself takes no per-call options - confirmed against
+ * bx-markdown's own source, it only reads its `MarkdownService` singleton's
+ * module-level settings struct. The only documented way to influence it per
+ * project is `ModuleService.getModuleSettings( "bx-markdown" )`, mutated in
+ * place before each call, so that's what this class does with a project's
+ * `bxdocs.json` `markdown` passthrough options (module spec section 4).
+ *
+ * This class has a hard runtime dependency on the bx-markdown module being
+ * activated (box.json declares it as a dependency) and so has no unit tests
+ * of its own - BuildPipeline takes this class behind a swappable seam
+ * (`setMarkdownRenderer()`) for exactly that reason; see BuildPipelineSpec.bx.
+ */
+class {
+
+	/**
+	 * @markdown The raw markdown body text
+	 * @options Passthrough options (bx-markdown's own option set) merged into its module settings before conversion
+	 *
+	 * @return The rendered HTML
+	 */
+	string function toHtml( required string markdown, struct options = {} ) {
+		if ( !arguments.options.isEmpty() ) {
+			var moduleSettings = getBoxRuntime().getModuleService().getModuleSettings( "bx-markdown" )
+			for ( var key in arguments.options ) {
+				moduleSettings[ key ] = arguments.options[ key ]
+			}
+		}
+
+		return Markdown( arguments.markdown )
+	}
+
+	/**
+	 * The running BoxRuntime singleton, reached the same way core module
+	 * classes do from outside a BIF/component/interceptor injection context.
+	 */
+	private any function getBoxRuntime() {
+		return createObject( "java", "ortus.boxlang.runtime.BoxRuntime" ).getInstance()
+	}
+
+}

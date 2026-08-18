@@ -1,0 +1,101 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.NavBuilder", function() {
+
+			beforeEach( function() {
+				variables.navBuilder = new "models.build.NavBuilder@bxdocs"();
+			} );
+
+			private struct function page(
+				string relativePath,
+				string title,
+				numeric order = 999999,
+				boolean hidden = false,
+				string urlPath = ""
+			) {
+				return {
+					relativePath : arguments.relativePath,
+					title        : arguments.title,
+					order        : arguments.order,
+					hidden       : arguments.hidden,
+					urlPath      : len( arguments.urlPath ) ? arguments.urlPath : arguments.relativePath.reReplaceNoCase( "\.md$", "/index.html" )
+				};
+			}
+
+			it( "returns an empty nav for an empty page list", function() {
+				expect( navBuilder.build( [] ) ).toBeArray();
+				expect( navBuilder.build( [] ).len() ).toBe( 0 );
+			} );
+
+			it( "builds flat top-level nav entries for flat pages, sorted by order", function() {
+				var pages = [
+					page( relativePath = "b.md", title = "B", order = 2 ),
+					page( relativePath = "a.md", title = "A", order = 1 )
+				];
+
+				var nav = navBuilder.build( pages );
+
+				expect( nav.len() ).toBe( 2 );
+				expect( nav[ 1 ].title ).toBe( "A" );
+				expect( nav[ 2 ].title ).toBe( "B" );
+			} );
+
+			it( "excludes hidden pages entirely", function() {
+				var pages = [
+					page( relativePath = "visible.md", title = "Visible" ),
+					page( relativePath = "secret.md", title = "Secret", hidden = true )
+				];
+
+				var nav = navBuilder.build( pages );
+
+				expect( nav.len() ).toBe( 1 );
+				expect( nav[ 1 ].title ).toBe( "Visible" );
+			} );
+
+			it( "groups nested pages under a folder node with no link when the folder has no index.md", function() {
+				var pages = [
+					page( relativePath = "guides/setup.md", title = "Setup", urlPath = "guides/setup/index.html" )
+				];
+
+				var nav = navBuilder.build( pages );
+
+				expect( nav.len() ).toBe( 1 );
+				expect( nav[ 1 ].title ).toBe( "guides" );
+				expect( nav[ 1 ].url ).toBe( "" );
+				expect( nav[ 1 ].children.len() ).toBe( 1 );
+				expect( nav[ 1 ].children[ 1 ].title ).toBe( "Setup" );
+				expect( nav[ 1 ].children[ 1 ].url ).toBe( "guides/setup/index.html" );
+			} );
+
+			it( "uses a folder's index.md as that folder's own nav entry", function() {
+				var pages = [
+					page( relativePath = "guides/index.md", title = "Guides Home", order = 1, urlPath = "guides/index.html" ),
+					page( relativePath = "guides/setup.md", title = "Setup", order = 2, urlPath = "guides/setup/index.html" )
+				];
+
+				var nav = navBuilder.build( pages );
+
+				expect( nav.len() ).toBe( 1 );
+				expect( nav[ 1 ].title ).toBe( "Guides Home" );
+				expect( nav[ 1 ].url ).toBe( "guides/index.html" );
+				expect( nav[ 1 ].children.len() ).toBe( 1 );
+				expect( nav[ 1 ].children[ 1 ].title ).toBe( "Setup" );
+			} );
+
+			it( "sorts sibling nodes (folders and pages together) by order then title", function() {
+				var pages = [
+					page( relativePath = "zeta.md", title = "Zeta", order = 1 ),
+					page( relativePath = "alpha/index.md", title = "Alpha Group", order = 0, urlPath = "alpha/index.html" )
+				];
+
+				var nav = navBuilder.build( pages );
+
+				expect( nav[ 1 ].title ).toBe( "Alpha Group" );
+				expect( nav[ 2 ].title ).toBe( "Zeta" );
+			} );
+
+		} );
+	}
+
+}

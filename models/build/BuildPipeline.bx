@@ -1,0 +1,77 @@
+/**
+ * Orchestrates the full `build` verb end to end (module spec section 5):
+ * load config -> load docs -> build nav -> convert markdown -> render
+ * through the theme -> write site/ -> copy assets.
+ */
+class {
+
+	variables.configLoader    = new "models.config.ConfigLoader@bxdocs"()
+	variables.docsLoader      = new "models.build.DocsLoader@bxdocs"()
+	variables.navBuilder      = new "models.build.NavBuilder@bxdocs"()
+	variables.themeRenderer   = new "models.build.ThemeRenderer@bxdocs"()
+	variables.markdownRenderer = new "models.build.MarkdownRenderer@bxdocs"()
+
+	/**
+	 * Swaps in a fake/test markdown renderer. The real one (MarkdownRenderer.bx)
+	 * depends on the bx-markdown module being activated, which this
+	 * pipeline's own unit tests don't have - see MarkdownRenderer.bx's
+	 * docblock for why that dependency is kept behind this seam.
+	 *
+	 * @renderer Any object exposing `toHtml( markdown, options = {} )`
+	 */
+	void function setMarkdownRenderer( required any renderer ) {
+		variables.markdownRenderer = arguments.renderer
+	}
+
+	/**
+	 * @projectRoot Absolute path to the project root
+	 *
+	 * @return { siteDir, pageCount }
+	 */
+	struct function build( required string projectRoot ) {
+		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		var config = variables.configLoader.load( root )
+		var pages = variables.docsLoader.load( root & "/docs" )
+		var nav = variables.navBuilder.build( pages )
+		var themeDir = variables.themeRenderer.resolveThemeDir( config.theme.name, root )
+		var siteDir = root & "/site"
+
+		if ( directoryExists( siteDir ) ) {
+			directoryDelete( siteDir, true )
+		}
+		directoryCreate( siteDir, true, true )
+
+		for ( var page in pages ) {
+			page.contentHtml = variables.markdownRenderer.toHtml( page.body, config.markdown )
+			var html = variables.themeRenderer.renderPage( page, nav, config, themeDir )
+			var outputPath = siteDir & "/" & page.urlPath
+			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
+			fileWrite( outputPath, html )
+		}
+
+		copyAssets( root, themeDir, siteDir )
+
+		return { siteDir : siteDir, pageCount : pages.len() }
+	}
+
+	/**
+	 * Copies theme assets to `site/assets/theme/`, and a project's own
+	 * `docs/assets/**` to `site/assets/` (module spec section 5, step 6).
+	 *
+	 * @root Absolute path to the project root
+	 * @themeDir Absolute path to the resolved theme folder
+	 * @siteDir Absolute path to the build output directory
+	 */
+	private void function copyAssets( required string root, required string themeDir, required string siteDir ) {
+		var themeAssetsDir = arguments.themeDir & "/assets"
+		if ( directoryExists( themeAssetsDir ) ) {
+			directoryCopy( themeAssetsDir, arguments.siteDir & "/assets/theme", true )
+		}
+
+		var docsAssetsDir = arguments.root & "/docs/assets"
+		if ( directoryExists( docsAssetsDir ) ) {
+			directoryCopy( docsAssetsDir, arguments.siteDir & "/assets", true )
+		}
+	}
+
+}

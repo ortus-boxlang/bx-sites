@@ -1,0 +1,69 @@
+/**
+ * Resolves a theme folder and renders a single page through its `layout.bxm`
+ * (module spec section 5, step 4; section 6 theme contract). A theme folder
+ * is a plain pair of native BoxLang `.bxm` templates - `layout.bxm` (the
+ * outer shell + nav) includes the sibling `page.bxm` (the article body) via
+ * `variables.themeDir`, which BoxLang's include scope-absorption carries
+ * through automatically (no explicit hand-off needed).
+ */
+class {
+
+	/**
+	 * Resolution order: a project-level `theme/` override (module spec
+	 * section 3) if it has its own `layout.bxm`, else this module's
+	 * built-in `resources/themes/<themeName>` (section 6).
+	 *
+	 * @themeName The configured theme name (bxdocs.json's `theme.name`)
+	 * @projectRoot Absolute path to the project root
+	 *
+	 * @return Absolute path to the resolved theme's own folder
+	 */
+	string function resolveThemeDir( required string themeName, required string projectRoot ) {
+		var projectTheme = arguments.projectRoot.reReplace( "[\/]+$", "" ) & "/theme"
+		if ( fileExists( projectTheme & "/layout.bxm" ) ) {
+			return projectTheme
+		}
+
+		var builtIn = builtInThemesDir() & "/" & arguments.themeName
+		if ( fileExists( builtIn & "/layout.bxm" ) ) {
+			return builtIn
+		}
+
+		throw(
+			type    = "BxDocs.ThemeNotFound",
+			message = "No layout.bxm found for theme [#arguments.themeName#] - looked in [#projectTheme#] and [#builtIn#]"
+		)
+	}
+
+	/**
+	 * Absolute path to this module's own bundled themes folder, found
+	 * relative to this class's own file rather than any module-registration
+	 * mapping, so it resolves the same way whether the module is fully
+	 * activated or just loaded for a unit test.
+	 */
+	string function builtInThemesDir() {
+		return getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]models[\/]build[\/]?$", "" ) & "/resources/themes"
+	}
+
+	/**
+	 * @page A page struct with an added `contentHtml` key (the already-converted markdown body)
+	 * @nav The site's nav tree, from NavBuilder.build()
+	 * @config The site's bxdocs.json config
+	 * @themeDir Absolute path to the resolved theme folder (from resolveThemeDir())
+	 *
+	 * @return The rendered page HTML
+	 */
+	string function renderPage( required struct page, required array nav, required struct config, required string themeDir ) {
+		variables.page = arguments.page
+		variables.nav = arguments.nav
+		variables.siteConfig = arguments.config
+		variables.themeDir = arguments.themeDir
+
+		var html = ""
+		bx:savecontent variable="html" {
+			include arguments.themeDir & "/layout.bxm"
+		}
+		return html
+	}
+
+}

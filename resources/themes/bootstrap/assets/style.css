@@ -1,0 +1,51 @@
+:root {
+	--bxdocs-gradient-start: #00FF78;
+	--bxdocs-gradient-end: #00DBFF;
+	--bxdocs-accent: #FFF500;
+}
+
+body {
+	font-family: "Poppins", sans-serif;
+}
+
+.brand-navbar {
+	background: linear-gradient( 90deg, var( --bxdocs-gradient-start ), var( --bxdocs-gradient-end ) );
+}
+
+.brand-mark {
+	color: #04121a;
+	font-weight: 700;
+}
+
+.sidebar {
+	padding-top: 1.5rem;
+}
+
+.sidebar .nav-link {
+	color: #04121a;
+}
+
+.sidebar .nav-link.disabled {
+	color: #6c757d;
+	font-weight: 600;
+	text-transform: uppercase;
+	font-size: 0.8rem;
+}
+
+.content {
+	padding: 2rem;
+}
+
+a {
+	color: #0d7a8f;
+}
+
+a:hover {
+	color: #00a3bf;
+}
+
+.page-title {
+	border-bottom: 3px solid var( --bxdocs-accent );
+	padding-bottom: 0.5rem;
+	margin-bottom: 1.5rem;
+}

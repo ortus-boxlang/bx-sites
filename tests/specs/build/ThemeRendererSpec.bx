@@ -1,0 +1,90 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.ThemeRenderer", function() {
+
+			beforeEach( function() {
+				variables.renderer = new "models.build.ThemeRenderer@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newProjectRoot() {
+				var dir = createTempDirectory( prefix = "bxdocs-themerenderer-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "resolves the built-in bootstrap theme by name", function() {
+				var themeDir = renderer.resolveThemeDir( "bootstrap", newProjectRoot() );
+
+				expect( fileExists( themeDir & "/layout.bxm" ) ).toBeTrue();
+				expect( fileExists( themeDir & "/page.bxm" ) ).toBeTrue();
+			} );
+
+			it( "throws BxDocs.ThemeNotFound for an unknown theme with no project override", function() {
+				var root = newProjectRoot();
+				expect( function() {
+					renderer.resolveThemeDir( "not-a-real-theme", root );
+				} ).toThrow( "BxDocs.ThemeNotFound" );
+			} );
+
+			it( "prefers a project-level theme/ override that has its own layout.bxm", function() {
+				var root = newProjectRoot();
+				directoryCreate( root & "/theme", true, true );
+				fileWrite( root & "/theme/layout.bxm", "<bx:output>custom layout</bx:output>" );
+
+				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+
+				expect( themeDir ).toBe( root & "/theme" );
+			} );
+
+			it( "renders a page through the built-in bootstrap theme, including title, nav and content", function() {
+				var root = newProjectRoot();
+				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+
+				var page = {
+					title       : "My Page",
+					contentHtml : "<p>Hello World</p>"
+				};
+				var nav = [
+					{ title : "My Page", url : "index.html", order : 1, children : [] },
+					{ title : "guides", url : "", order : 2, children : [
+						{ title : "Setup", url : "guides/setup/index.html", order : 1, children : [] }
+					] }
+				];
+				var config = { name : "My Site" };
+
+				var html = renderer.renderPage( page, nav, config, themeDir );
+
+				expect( html ).toInclude( "My Page" );
+				expect( html ).toInclude( "My Site" );
+				expect( html ).toInclude( "<p>Hello World</p>" );
+				expect( html ).toInclude( 'href="/index.html"' );
+				expect( html ).toInclude( "guides" );
+				expect( html ).toInclude( 'href="/guides/setup/index.html"' );
+				expect( html ).toInclude( "<!doctype html>" );
+			} );
+
+			it( "HTML-escapes the page title and site name", function() {
+				var root = newProjectRoot();
+				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+
+				var page = { title : '<script>alert(1)</script>', contentHtml : "<p>Body</p>" };
+				var html = renderer.renderPage( page, [], { name : "Safe & Sound" }, themeDir );
+
+				expect( html ).notToInclude( "<script>alert(1)</script>" );
+				expect( html ).toInclude( "Safe &amp; Sound" );
+			} );
+
+		} );
+	}
+
+}

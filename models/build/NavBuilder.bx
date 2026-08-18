@@ -1,0 +1,88 @@
+/**
+ * Builds a nested nav tree from a flat list of loaded pages - folder/file
+ * structure becomes nav structure (module spec section 5, step 3). A
+ * folder's own `index.md` becomes that folder's nav entry (its title, url
+ * and order); a folder with no `index.md` is still a group node, just with
+ * no link of its own. Hidden pages are excluded entirely - they are still
+ * built, just never linked from the nav.
+ */
+class {
+
+	/**
+	 * @pages The array of page structs from DocsLoader.load()
+	 *
+	 * @return Array of nav nodes, sorted by [order] then [title]: { title, url, order, children }
+	 */
+	array function build( required array pages ) {
+		var root = { children : {} }
+
+		for ( var page in arguments.pages ) {
+			if ( page.hidden ) {
+				continue
+			}
+			addPage( root, page )
+		}
+
+		return toSortedArray( root.children )
+	}
+
+	/**
+	 * @root The synthetic root node (struct-keyed children map)
+	 * @page A single visible page struct
+	 */
+	private void function addPage( required struct root, required struct page ) {
+		var segments = listToArray( arguments.page.relativePath, "/" )
+		var fileName = segments[ segments.len() ]
+		var folders = segments.len() > 1 ? segments.slice( 1, segments.len() - 1 ) : []
+		var isIndex = compareNoCase( fileName.reReplaceNoCase( "\.md$", "" ), "index" ) == 0
+
+		var current = arguments.root
+		for ( var folderName in folders ) {
+			if ( !current.children.keyExists( folderName ) ) {
+				current.children[ folderName ] = { title : folderName, url : "", order : 999999, children : {} }
+			}
+			current = current.children[ folderName ]
+		}
+
+		if ( isIndex ) {
+			current.title = arguments.page.title
+			current.url   = arguments.page.urlPath
+			current.order = arguments.page.order
+		} else {
+			current.children[ fileName ] = {
+				title    : arguments.page.title,
+				url      : arguments.page.urlPath,
+				order    : arguments.page.order,
+				children : {}
+			}
+		}
+	}
+
+	/**
+	 * Recursively converts a struct-keyed children map into a sorted array.
+	 *
+	 * @childrenMap A struct mapping folder/file name -> node struct
+	 */
+	private array function toSortedArray( required struct childrenMap ) {
+		var nodes = []
+		for ( var key in arguments.childrenMap ) {
+			var node = arguments.childrenMap[ key ]
+			nodes.append( {
+				title    : node.title,
+				url      : node.url,
+				order    : node.order,
+				children : toSortedArray( node.children )
+			} )
+		}
+
+		nodes.sort( ( a, b ) => {
+			if ( a.order != b.order ) {
+				return a.order < b.order ? -1 : 1
+			}
+			return compareNoCase( a.title, b.title )
+		} )
+
+		return nodes
+	}
+
+}

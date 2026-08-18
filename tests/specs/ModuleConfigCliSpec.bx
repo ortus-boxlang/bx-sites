@@ -78,7 +78,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( directoryExists( projectRoot & "/site" ) ).toBeFalse();
 			} );
 
-			it( "returns exit code 1 and a message for the `build` stub", function() {
+			it( "returns exit code 1 when `build` runs against a project with no bxdocs.json", function() {
 				var parent = newTempDir();
 				var exitCode = moduleConfig.main( [ "build", parent ] );
 

@@ -1,0 +1,66 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.FrontmatterParser", function() {
+
+			beforeEach( function() {
+				variables.parser = new "models.build.FrontmatterParser@bxdocs"();
+			} );
+
+			it( "returns the whole content as body when there is no frontmatter block", function() {
+				var result = parser.parse( "## Hello" & char( 10 ) & char( 10 ) & "World" );
+
+				expect( result.frontmatter ).toBeStruct();
+				expect( result.frontmatter.isEmpty() ).toBeTrue();
+				expect( result.body ).toBe( "## Hello" & char( 10 ) & char( 10 ) & "World" );
+			} );
+
+			it( "parses a frontmatter block and strips it from the body", function() {
+				var content = "---" & char( 10 ) &
+					"title: My Page" & char( 10 ) &
+					"order: 3" & char( 10 ) &
+					"hidden: true" & char( 10 ) &
+					"---" & char( 10 ) &
+					"## Body content";
+
+				var result = parser.parse( content );
+
+				expect( result.frontmatter.title ).toBe( "My Page" );
+				expect( result.frontmatter.order ).toBe( 3 );
+				expect( result.frontmatter.hidden ).toBeTrue();
+				expect( result.body ).toBe( "## Body content" );
+			} );
+
+			it( "unwraps quoted string values", function() {
+				var content = "---" & char( 10 ) & 'title: "Quoted Title"' & char( 10 ) & "---" & char( 10 ) & "Body";
+				var result = parser.parse( content );
+
+				expect( result.frontmatter.title ).toBe( "Quoted Title" );
+			} );
+
+			it( "treats an unterminated frontmatter block as no frontmatter at all", function() {
+				var content = "---" & char( 10 ) & "title: Oops" & char( 10 ) & "no closing delimiter";
+				var result = parser.parse( content );
+
+				expect( result.frontmatter.isEmpty() ).toBeTrue();
+				expect( result.body ).toBe( content );
+			} );
+
+			it( "ignores blank lines and lines without a colon inside the frontmatter block", function() {
+				var content = "---" & char( 10 ) &
+					"title: OK" & char( 10 ) &
+					"" & char( 10 ) &
+					"not a key value line" & char( 10 ) &
+					"---" & char( 10 ) &
+					"Body";
+
+				var result = parser.parse( content );
+
+				expect( result.frontmatter.title ).toBe( "OK" );
+				expect( result.frontmatter.count() ).toBe( 1 );
+			} );
+
+		} );
+	}
+
+}

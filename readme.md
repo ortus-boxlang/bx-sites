@@ -29,7 +29,7 @@ boxlang module:bxDocs <verb> [options]
 | Verb | Purpose | Status |
 |---|---|---|
 | `new` | Scaffold a docs project (`docs/` + `bxdocs.json`, defaulting to the `bootstrap` theme) | Available |
-| `build` | Render `docs/**.md` into a static site in `site/` | Planned (Phase 2) |
+| `build` | Render `docs/**.md` into a static site in `site/` | Available (needs [bx-markdown](https://github.com/ortus-boxlang/bx-markdown) installed) |
 | `serve` | Build and serve the site locally with live reload | Planned (Phase 5) |
 | `search-index` | Rebuild the search index standalone | Planned (Phase 4) |
 | `clean` | Remove `site/` and any build cache | Available |
@@ -57,7 +57,8 @@ Here is a brief overview of the directory structure:
 - `bifs` - Where you can code Built in Functions for BoxLang
 - `components` - Where you can code BoxLang components
 - `interceptors` - Where you can code BoxLang interceptors
-- `models` - The module's own source classes: `models/cli` (one dispatcher per `bxDocs` verb), `models/config` (bxdocs.json loader/validator), `models/build` (project scaffolding, and the future build pipeline)
+- `models` - The module's own source classes: `models/cli` (one dispatcher per `bxDocs` verb), `models/config` (bxdocs.json loader/validator), `models/build` (project scaffolding + the docs/nav/markdown/theme build pipeline)
+- `resources/themes` - Built-in themes (native BoxLang `.bxm` templates + assets) - `bootstrap` ships in v1
 - `lib` - Place any Jar's or classes for your module that will be class loaded for you
 - `.cfformat.json` - A format config using the Ortus Standards
 - `.editorconfig` - Smooth consistency between editors
