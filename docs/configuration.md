@@ -150,8 +150,9 @@ when both keys are set, an "Edit this page" link on every page.
 An array of social/external links rendered in the footer (see
 [`footer`](#footer) - has no effect unless it's also turned on). Each entry
 needs a `url`; `icon` selects from a small built-in icon set (`github`,
-`twitter`/`x`, `rss`, `email`, falling back to a generic link glyph for
-anything else), and `label` sets the link's accessible name/tooltip
+`twitter`/`x`, `youtube`, `linkedin`, `facebook`, `bluesky`, `threads`,
+`slack`, `patreon`, `rss`, `email`, falling back to a generic link glyph
+for anything else), and `label` sets the link's accessible name/tooltip
 (defaults to `icon`, then `"Link"`).
 
 ```json
