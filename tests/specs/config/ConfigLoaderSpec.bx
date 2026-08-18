@@ -108,6 +108,23 @@ class extends="testbox.system.BaseSpec" {
 				expect( config.theme.options.foo ).toBe( "bar" );
 			} );
 
+			it( "accepts [theme.options.colorMode] of light, dark or auto, defaulting to auto when absent", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).theme.options.colorMode ?: "auto" ).toBe( "auto" );
+
+				for ( var mode in [ "light", "dark", "auto" ] ) {
+					var modeDir = newProjectDir( '{"name":"My Docs","theme":{"options":{"colorMode":"' & mode & '"}}}' );
+					expect( loader.load( modeDir ).theme.options.colorMode ).toBe( mode );
+				}
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [theme.options.colorMode] isn't light, dark or auto", function() {
+				var dir = newProjectDir( '{"name":"My Docs","theme":{"options":{"colorMode":"purple"}}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
 			it( "exposes the v1 built-in theme names", function() {
 				expect( loader.getBuiltInThemes() ).toBe( [ "bootstrap", "material", "tailwind" ] );
 			} );
