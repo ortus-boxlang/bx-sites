@@ -14,7 +14,9 @@ Every project has one `bxdocs.json` at its root:
 	"baseURL": "/",
 	"theme": {
 		"name": "bootstrap",
-		"options": {}
+		"options": {},
+		"logo": "",
+		"favicon": ""
 	},
 	"search": true,
 	"nav": [],
@@ -25,7 +27,14 @@ Every project has one `bxdocs.json` at its root:
 	},
 	"social": [],
 	"footer": false,
-	"lastUpdated": false
+	"lastUpdated": false,
+	"analytics": {
+		"provider": "",
+		"id": ""
+	},
+	"ogImage": "",
+	"extraCss": [],
+	"extraJs": []
 }
 ```
 
@@ -40,8 +49,9 @@ The site name, shown in the header/brand mark and page titles. Required.
 
 ## `description`
 
-An optional site description. Not yet surfaced in the built-in themes'
-markup, but reserved for future use (meta tags, RSS, etc.).
+An optional site description, used as the fallback `<meta name="description">`
+and `og:description` for any page that doesn't set its own `description`
+frontmatter (see [Getting Started](getting-started.md#add-pages)).
 
 ## `baseURL`
 
@@ -83,8 +93,15 @@ non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
 - `theme.name` - one of the built-in themes (`bootstrap`, `material`,
   `tailwind`), or the name of a custom theme you provide via a `theme/`
   folder at the project root (see [Themes](guides/themes.md))
-- `theme.options` - theme-specific options. The only one every built-in
-  theme currently reads is:
+- `theme.logo` - path/URL to an image shown in the header brand mark instead
+  of the default "⚡ &lt;site name&gt;" text - a relative path (e.g.
+  `"assets/logo.svg"`, resolved against `docs/assets/`) is prefixed with
+  `baseURL` like any other internal asset; an absolute URL is used as-is.
+  Left blank (the default), the header keeps the default text mark.
+- `theme.favicon` - path/URL to a favicon, resolved the same way as
+  `theme.logo`. Left blank (the default), no `<link rel="icon">` is
+  rendered at all (falling back to the browser's own default behavior).
+- `theme.options` - theme-specific options, read by every built-in theme:
   - `theme.options.colorMode` - `"auto"` (the default), `"light"` or
     `"dark"`. Controls which mode a first-time visitor sees before they've
     picked one themselves via the header's dark/light toggle - `"auto"`
@@ -94,6 +111,17 @@ non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
 
     ```json
     { "theme": { "options": { "colorMode": "dark" } } }
+    ```
+  - `theme.options.navCollapsible` - `false` (the default) renders every nav
+    section heading always expanded, as today. `true` renders each nav
+    section (a folder with no `index.md`) as a native `<details>`/`<summary>`
+    disclosure the visitor can collapse - no JS framework involved.
+  - `theme.options.navExpandAll` - only relevant when `navCollapsible` is
+    `true`. `true` (the default) starts every section open; `false` starts
+    every section collapsed.
+
+    ```json
+    { "theme": { "options": { "navCollapsible": true, "navExpandAll": false } } }
     ```
 
 ## `search`
@@ -186,6 +214,46 @@ breaking the build.
 
 ```json
 { "lastUpdated": true }
+```
+
+## `analytics`
+
+Wires up pageview analytics. Currently supports Google Analytics
+(`gtag.js`) only:
+
+- `analytics.provider` - `"google"` to enable it; left blank (the default),
+  no analytics script is shipped at all.
+- `analytics.id` - the Google Analytics measurement ID (e.g. `"G-ABC123"`).
+  Required when `provider` is `"google"`.
+
+```json
+{ "analytics": { "provider": "google", "id": "G-ABC123" } }
+```
+
+## `ogImage`
+
+Path/URL to a default social-card image, rendered as `og:image` (and paired
+with a `twitter:card` of `summary_large_image`) on every page - resolved
+the same way as `theme.logo` (relative paths are prefixed with `baseURL`,
+absolute URLs are used as-is). Left blank (the default), no `og:image`/
+`twitter:card` tags are rendered.
+
+```json
+{ "ogImage": "assets/social-card.png" }
+```
+
+## `extraCss` / `extraJs`
+
+Arrays of extra stylesheet/script URLs to include on every page, appended
+after the theme's own assets - each entry is resolved the same way as
+`theme.logo` (a relative path is prefixed with `baseURL`; an absolute URL
+is used as-is). `extraJs` entries are loaded with `defer`.
+
+```json
+{
+	"extraCss": [ "assets/custom.css" ],
+	"extraJs": [ "assets/custom.js" ]
+}
 ```
 
 ## Versioning

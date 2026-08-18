@@ -13,14 +13,18 @@ class {
 	variables.defaults = {
 		"description"  : "",
 		"baseURL"      : "/",
-		"theme"        : { "name" : "bootstrap", "options" : {} },
+		"theme"        : { "name" : "bootstrap", "options" : {}, "logo" : "", "favicon" : "" },
 		"search"       : true,
 		"nav"          : [],
 		"markdown"     : {},
 		"repo"         : { "url" : "", "editUri" : "" },
 		"social"       : [],
 		"footer"       : false,
-		"lastUpdated"  : false
+		"lastUpdated"  : false,
+		"analytics"    : { "provider" : "", "id" : "" },
+		"ogImage"      : "",
+		"extraCss"     : [],
+		"extraJs"      : []
 	}
 
 	/**
@@ -132,6 +136,22 @@ class {
 			)
 		}
 
+		if ( !isSimpleValue( theme.logo ?: "" ) || !isSimpleValue( theme.favicon ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [theme.logo]/[theme.favicon], when present, must be strings"
+			)
+		}
+
+		for ( var navFlag in [ "navCollapsible", "navExpandAll" ] ) {
+			if ( theme.options.keyExists( navFlag ) && !isBoolean( theme.options[ navFlag ] ) ) {
+				throw(
+					type    = "BxDocs.InvalidConfig",
+					message = "bxdocs.json [theme.options.#navFlag#], when present, must be a boolean"
+				)
+			}
+		}
+
 		if ( !isBoolean( arguments.config.search ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
@@ -188,6 +208,58 @@ class {
 				type    = "BxDocs.InvalidConfig",
 				message = "bxdocs.json [lastUpdated] must be a boolean"
 			)
+		}
+
+		var analytics = arguments.config.analytics ?: ""
+		if ( !isStruct( analytics ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [analytics], when present, must be an object"
+			)
+		}
+		var analyticsProvider = trim( analytics.provider ?: "" )
+		if ( len( analyticsProvider ) && analyticsProvider != "google" ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [analytics.provider], when present, must be: google"
+			)
+		}
+		if ( analyticsProvider == "google" && !len( trim( analytics.id ?: "" ) ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [analytics.id] is required when [analytics.provider] is set"
+			)
+		}
+		if ( len( analyticsProvider ) && !reFind( "^[A-Za-z0-9\-]+$", trim( analytics.id ?: "" ) ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [analytics.id] must contain only letters, numbers and hyphens"
+			)
+		}
+
+		if ( !isSimpleValue( arguments.config.ogImage ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [ogImage], when present, must be a string"
+			)
+		}
+
+		for ( var assetsKey in [ "extraCss", "extraJs" ] ) {
+			var assetUrls = arguments.config[ assetsKey ] ?: ""
+			if ( !isArray( assetUrls ) ) {
+				throw(
+					type    = "BxDocs.InvalidConfig",
+					message = "bxdocs.json [#assetsKey#], when present, must be an array"
+				)
+			}
+			for ( var assetUrl in assetUrls ) {
+				if ( !isSimpleValue( assetUrl ) || !len( trim( assetUrl ) ) ) {
+					throw(
+						type    = "BxDocs.InvalidConfig",
+						message = "bxdocs.json [#assetsKey#] entries must be non-empty strings"
+					)
+				}
+			}
 		}
 
 		return arguments.config

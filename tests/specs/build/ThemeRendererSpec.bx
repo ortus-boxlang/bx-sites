@@ -318,6 +318,142 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "renders a brand logo <img> when [theme.logo] is configured, and the default mark otherwise, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+
+					var defaultHtml = renderer.renderPage( page, nav, { name : "My Site" }, themeDir );
+					expect( defaultHtml ).notToInclude( "brand-logo" );
+
+					var logoConfig = { name : "My Site", theme : { logo : "assets/logo.svg" } };
+					var logoHtml = renderer.renderPage( page, nav, logoConfig, themeDir );
+					expect( logoHtml ).toInclude( "brand-logo" );
+					expect( logoHtml ).toInclude( 'src="/assets/logo.svg"' );
+				}
+			} );
+
+			it( "renders a favicon link only when [theme.favicon] is configured, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+
+					expect( renderer.renderPage( page, nav, { name : "My Site" }, themeDir ) ).notToInclude( 'rel="icon"' );
+
+					var faviconConfig = { name : "My Site", theme : { favicon : "assets/favicon.ico" } };
+					var html = renderer.renderPage( page, nav, faviconConfig, themeDir );
+					expect( html ).toInclude( 'rel="icon" href="/assets/favicon.ico"' );
+				}
+			} );
+
+			it( "renders collapsible <details>/<summary> nav sections only when [theme.options.navCollapsible] is true, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [
+					{ title : "My Page", url : "index.html", order : 1, children : [] },
+					{ title : "Guides", url : "", order : 2, children : [
+						{ title : "Setup", url : "guides/setup/index.html", order : 1, children : [] }
+					] }
+				];
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+
+					var flatHtml = renderer.renderPage( page, nav, { name : "My Site" }, themeDir );
+					expect( flatHtml ).notToInclude( "<details" );
+
+					var collapsibleConfig = { name : "My Site", theme : { options : { navCollapsible : true } } };
+					var collapsibleHtml = renderer.renderPage( page, nav, collapsibleConfig, themeDir );
+					expect( collapsibleHtml ).toInclude( "<details" );
+					expect( collapsibleHtml ).toInclude( "<summary" );
+					expect( collapsibleHtml ).toInclude( ">Guides<" );
+				}
+			} );
+
+			it( "renders Open Graph and Twitter Card meta tags from page/site description and [ogImage], across every built-in theme", function() {
+				var root = newProjectRoot();
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var page = {
+					title       : "My Page",
+					contentHtml : "<p>Body</p>",
+					description : "A page about things"
+				};
+				var config = {
+					name    : "My Site",
+					ogImage : "assets/social-card.png"
+				};
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					var html = renderer.renderPage( page, nav, config, themeDir );
+
+					expect( html ).toInclude( 'property="og:type" content="website"' );
+					expect( html ).toInclude( 'property="og:title" content="My Page"' );
+					expect( html ).toInclude( 'name="description" content="A page about things"' );
+					expect( html ).toInclude( 'property="og:description" content="A page about things"' );
+					expect( html ).toInclude( 'property="og:image" content="/assets/social-card.png"' );
+					expect( html ).toInclude( 'name="twitter:card" content="summary_large_image"' );
+				}
+			} );
+
+			it( "omits social-card meta tags entirely when unconfigured, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var config = { name : "My Site" };
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					var html = renderer.renderPage( page, nav, config, themeDir );
+
+					expect( html ).notToInclude( 'name="description"' );
+					expect( html ).notToInclude( "og:image" );
+				}
+			} );
+
+			it( "injects Google Analytics gtag.js only when [analytics.provider] is google, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+
+					expect( renderer.renderPage( page, nav, { name : "My Site" }, themeDir ) ).notToInclude( "googletagmanager" );
+
+					var analyticsConfig = { name : "My Site", analytics : { provider : "google", id : "G-ABC123" } };
+					var html = renderer.renderPage( page, nav, analyticsConfig, themeDir );
+					expect( html ).toInclude( "googletagmanager.com/gtag/js?id=G-ABC123" );
+					expect( html ).toInclude( "gtag('config', 'G-ABC123')" );
+				}
+			} );
+
+			it( "renders extraCss <link> and extraJs <script> tags, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var config = {
+					name     : "My Site",
+					extraCss : [ "assets/extra.css", "https://cdn.example.com/extra.css" ],
+					extraJs  : [ "assets/extra.js" ]
+				};
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					var html = renderer.renderPage( page, nav, config, themeDir );
+
+					expect( html ).toInclude( '<link rel="stylesheet" href="/assets/extra.css">' );
+					expect( html ).toInclude( '<link rel="stylesheet" href="https://cdn.example.com/extra.css">' );
+					expect( html ).toInclude( '<script src="/assets/extra.js" defer></script>' );
+				}
+			} );
+
 		} );
 	}
 

@@ -115,6 +115,21 @@ body.md-body {
 	color: #6c757d;
 }
 
+.md-nav__section > summary.md-nav__heading {
+	cursor: pointer;
+	list-style: none;
+}
+
+.md-nav__section > summary.md-nav__heading::-webkit-details-marker {
+	display: none;
+}
+
+.brand-logo {
+	height: 28px;
+	width: auto;
+	display: block;
+}
+
 .md-content {
 	flex: 1;
 	padding: 2rem;

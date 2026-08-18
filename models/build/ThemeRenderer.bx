@@ -12,10 +12,11 @@
  *   - `page.bxm` (required) - the article body; renders `variables.page.contentHtml`
  *     (the already-converted markdown, set by BuildPipeline before rendering).
  *     `variables.page.toc`, `.prevPage`, `.nextPage`, `.breadcrumbs`,
- *     `.editUrl` and `.lastUpdated` are always present too (defaulted by
- *     `renderPage()` below if the caller didn't set them - the latter two
- *     are empty strings when `bxdocs.json`'s `repo.editUri`/`lastUpdated`
- *     aren't configured), so a theme's `page.bxm` never needs to guard their
+ *     `.editUrl`, `.lastUpdated` and `.description` are always present too
+ *     (defaulted by `renderPage()` below if the caller didn't set them - the
+ *     latter three are empty strings when `bxdocs.json`'s `repo.editUri`/
+ *     `lastUpdated` aren't configured, or the page has no frontmatter
+ *     `description`), so a theme's `page.bxm` never needs to guard their
  *     existence. `variables.basePath` (module spec section 4's `baseURL`,
  *     via BaseUrlResolver.bx) is always a root-relative path ending with
  *     `/` - every internal `href`/`src` a theme renders should be prefixed
@@ -142,6 +143,9 @@ class {
 		}
 		if ( !variables.page.keyExists( "lastUpdated" ) ) {
 			variables.page.lastUpdated = ""
+		}
+		if ( !variables.page.keyExists( "description" ) ) {
+			variables.page.description = ""
 		}
 		variables.nav = arguments.nav
 		variables.siteConfig = arguments.config

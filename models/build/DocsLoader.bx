@@ -11,7 +11,7 @@ class {
 	/**
 	 * @docsDir Absolute path to the project's docs/ directory
 	 *
-	 * @return Array of page structs, sorted by [order] then [title]: { relativePath, sourcePath, urlPath, title, order, hidden, body }
+	 * @return Array of page structs, sorted by [order] then [title]: { relativePath, sourcePath, urlPath, title, description, order, hidden, body }
 	 */
 	array function load( required string docsDir ) {
 		var dir = arguments.docsDir.reReplace( "[\/]+$", "" )
@@ -49,6 +49,7 @@ class {
 			sourcePath   : arguments.filePath,
 			urlPath      : urlPathFor( relativePath ),
 			title        : len( trim( fm.title ?: "" ) ) ? fm.title : titleFromFileName( relativePath ),
+			description  : trim( fm.description ?: "" ),
 			order        : isNumeric( fm.order ?: "" ) ? val( fm.order ) : 999999,
 			hidden       : ( fm.hidden ?: false ) ? true : false,
 			body         : parsed.body

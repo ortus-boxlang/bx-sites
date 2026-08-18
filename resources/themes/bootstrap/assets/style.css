@@ -109,6 +109,21 @@ body {
 	font-size: 0.8rem;
 }
 
+.nav-section > summary.nav-link {
+	cursor: pointer;
+	list-style: none;
+}
+
+.nav-section > summary.nav-link::-webkit-details-marker {
+	display: none;
+}
+
+.brand-logo {
+	height: 28px;
+	width: auto;
+	display: block;
+}
+
 .content {
 	padding: 2rem;
 }

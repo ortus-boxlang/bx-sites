@@ -47,6 +47,21 @@
 	min-width: 0;
 }
 
+.nav-section > summary {
+	cursor: pointer;
+	list-style: none;
+}
+
+.nav-section > summary::-webkit-details-marker {
+	display: none;
+}
+
+.brand-logo {
+	height: 28px;
+	width: auto;
+	display: block;
+}
+
 .navbar-controls {
 	display: flex;
 	align-items: center;

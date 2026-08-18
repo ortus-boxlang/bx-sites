@@ -57,6 +57,7 @@ Each page can start with a small frontmatter block:
 title: Deployment
 order: 2
 hidden: false
+description: How to deploy a built BX Docs site.
 ---
 
 # Deployment
@@ -67,6 +68,9 @@ Your content here.
 - `title` - overrides the nav/page title (otherwise derived from the filename)
 - `order` - controls sibling ordering in the nav (lower sorts first; omitted pages sort last, alphabetically)
 - `hidden` - `true` excludes the page from the nav (and from search) without excluding it from the build
+- `description` - this page's social-card/meta description (see
+  [`ogImage`](configuration.md#ogimage)); falls back to the site-wide
+  `description` in `bxdocs.json` when omitted
 
 ## Build
 
