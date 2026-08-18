@@ -9,9 +9,11 @@
 	<title>Themes - BX Docs</title>
 	<script>
 		( function () {
+			var configuredMode = "auto";
 			var stored = localStorage.getItem( "bxdocs-theme" );
 			var prefersDark = window.matchMedia( "(prefers-color-scheme: dark)" ).matches;
-			if ( stored === "dark" || ( !stored && prefersDark ) ) {
+			var wantsDark = stored ? stored === "dark" : ( configuredMode === "dark" || ( configuredMode === "auto" && prefersDark ) );
+			if ( wantsDark ) {
 				document.documentElement.setAttribute( "data-theme", "dark" );
 			}
 		} )();
@@ -62,7 +64,7 @@
 				<article class="page-content">
 <nav class="breadcrumb-nav mb-3" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/bx-docs/development/guides/index.html">Guides</a></li><li class="breadcrumb-item active" aria-current="page">Themes</li></ol></nav>
 					<h1 class="page-title">Themes</h1>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 4:35:29 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 5:23:51 PM</span></div>
 <nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#built-in">Built in</a></li><li class="toc-level-2"><a href="#the-themeprovider-contract">The ThemeProvider contract</a></li><li class="toc-level-2"><a href="#overriding-a-theme">Overriding a theme</a></li></ul></nav>
 					<h1 id="themes"><a href="#themes" id="themes" name="themes" class="anchor"></a>Themes</h1>
 <p>Themes are native BoxLang <code>.bxm</code> templates - there's no separate template

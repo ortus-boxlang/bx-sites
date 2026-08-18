@@ -9,9 +9,11 @@
 	<title>Configuration - BX Docs</title>
 	<script>
 		( function () {
+			var configuredMode = "auto";
 			var stored = localStorage.getItem( "bxdocs-theme" );
 			var prefersDark = window.matchMedia( "(prefers-color-scheme: dark)" ).matches;
-			if ( stored === "dark" || ( !stored && prefersDark ) ) {
+			var wantsDark = stored ? stored === "dark" : ( configuredMode === "dark" || ( configuredMode === "auto" && prefersDark ) );
+			if ( wantsDark ) {
 				document.documentElement.setAttribute( "data-theme", "dark" );
 			}
 		} )();
@@ -62,7 +64,7 @@
 				<article class="page-content">
 
 					<h1 class="page-title">Configuration</h1>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 4:35:29 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 5:23:51 PM</span></div>
 <nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#name">name</a></li><li class="toc-level-2"><a href="#description">description</a></li><li class="toc-level-2"><a href="#baseurl">baseURL</a></li><li class="toc-level-2"><a href="#llmstxt">llms.txt</a></li><li class="toc-level-2"><a href="#sitemapxml">sitemap.xml</a></li><li class="toc-level-2"><a href="#theme">theme</a></li><li class="toc-level-2"><a href="#search">search</a></li><li class="toc-level-2"><a href="#nav">nav</a></li><li class="toc-level-2"><a href="#markdown">markdown</a></li><li class="toc-level-2"><a href="#repo">repo</a></li><li class="toc-level-2"><a href="#social">social</a></li><li class="toc-level-2"><a href="#footer">footer</a></li><li class="toc-level-2"><a href="#lastupdated">lastUpdated</a></li><li class="toc-level-2"><a href="#versioning">Versioning</a></li></ul></nav>
 					<h1 id="configuration"><a href="#configuration" id="configuration" name="configuration" class="anchor"></a>Configuration</h1>
 <p>Every project has one <code>bxdocs.json</code> at its root:</p>
@@ -129,8 +131,21 @@ non-hidden page per the <a href="https://www.sitemaps.org/">sitemaps.org</a> pro
 <li><code>theme.name</code> - one of the built-in themes (<code>bootstrap</code>, <code>material</code>,
 <code>tailwind</code>), or the name of a custom theme you provide via a <code>theme/</code>
 folder at the project root (see <a href="guides/themes.md">Themes</a>)</li>
-<li><code>theme.options</code> - reserved for theme-specific options in a future release;
-currently unused by the built-in themes</li>
+<li><code>theme.options</code> - theme-specific options. The only one every built-in
+theme currently reads is:
+<ul>
+<li>
+<p><code>theme.options.colorMode</code> - <code>&quot;auto&quot;</code> (the default), <code>&quot;light&quot;</code> or
+<code>&quot;dark&quot;</code>. Controls which mode a first-time visitor sees before they've
+picked one themselves via the header's dark/light toggle - <code>&quot;auto&quot;</code>
+follows their OS preference, <code>&quot;light&quot;</code>/<code>&quot;dark&quot;</code> pins a fixed default.
+Once a visitor toggles the switch, their own choice (stored in
+<code>localStorage</code>) always wins on later visits, regardless of this setting.</p>
+<pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;colorMode&quot;: &quot;dark&quot; } } }
+</code></pre>
+</li>
+</ul>
+</li>
 </ul>
 <h2 id="search"><a href="#search" id="search" name="search" class="anchor"></a><code>search</code></h2>
 <p><code>true</code> (the default) builds a static search index and wires up the search
