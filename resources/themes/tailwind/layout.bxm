@@ -54,7 +54,7 @@
 	function renderBrandMark() {
 		var logo = trim( variables.siteConfig.theme.logo ?: "" )
 		if ( len( logo ) ) {
-			return '<img class="brand-logo" src="' & encodeForHTML( resolveAssetUrl( logo ) ) & '" alt="' & encodeForHTML( variables.siteConfig.name ) & '">'
+			return '<img class="brand-logo" src="' & resolveAssetUrl( logo ) & '" alt="' & encodeForHTML( variables.siteConfig.name ) & '">'
 		}
 		return '⚡ ' & encodeForHTML( variables.siteConfig.name )
 	}
@@ -62,7 +62,7 @@
 	function renderExtraCss( required array urls ) {
 		var html = ""
 		for ( var url in arguments.urls ) {
-			html &= '<link rel="stylesheet" href="' & encodeForHTML( resolveAssetUrl( url ) ) & '">'
+			html &= '<link rel="stylesheet" href="' & resolveAssetUrl( url ) & '">'
 		}
 		return html
 	}
@@ -70,7 +70,7 @@
 	function renderExtraJs( required array urls ) {
 		var html = ""
 		for ( var url in arguments.urls ) {
-			html &= '<script src="' & encodeForHTML( resolveAssetUrl( url ) ) & '" defer></script>'
+			html &= '<script src="' & resolveAssetUrl( url ) & '" defer></script>'
 		}
 		return html
 	}
@@ -101,10 +101,10 @@
 	<meta name="description" content="#encodeForHTML( variables.ogDescription )#">
 	<meta property="og:description" content="#encodeForHTML( variables.ogDescription )#">
 </bx:output></bx:if><bx:if condition="#len( variables.ogImageUrl )#"><bx:output>
-	<meta property="og:image" content="#encodeForHTML( resolveAssetUrl( variables.ogImageUrl ) )#">
+	<meta property="og:image" content="#resolveAssetUrl( variables.ogImageUrl )#">
 	<meta name="twitter:card" content="summary_large_image">
 </bx:output></bx:if><bx:if condition="#len( variables.faviconUrl )#"><bx:output>
-	<link rel="icon" href="#encodeForHTML( resolveAssetUrl( variables.faviconUrl ) )#">
+	<link rel="icon" href="#resolveAssetUrl( variables.faviconUrl )#">
 </bx:output></bx:if><bx:output>
 	<script>
 		( function () {
