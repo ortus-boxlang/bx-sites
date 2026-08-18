@@ -4,7 +4,9 @@
 	"baseURL": "https://ortus-boxlang.github.io/bx-docs/",
 	"theme": {
 		"name": "bootstrap",
-		"options": {}
+		"options": {},
+		"logo": "assets/boxlang-icon-full.svg",
+		"favicon": "assets/boxlang-icon-full.svg"
 	},
 	"search": true,
 	"nav": [],
@@ -29,5 +31,6 @@
 	],
 	"footer": true,
 	"lastUpdated": true,
-	"mermaid": true
+	"mermaid": true,
+	"ogImage": "assets/og-image.png"
 }
