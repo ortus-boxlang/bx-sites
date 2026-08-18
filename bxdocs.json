@@ -25,5 +25,6 @@
 		{ "url": "https://www.patreon.com/ortussolutions", "icon": "patreon", "label": "Patreon" }
 	],
 	"footer": true,
-	"lastUpdated": true
+	"lastUpdated": true,
+	"mermaid": true
 }

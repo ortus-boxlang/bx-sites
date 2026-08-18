@@ -21,6 +21,7 @@ class {
 		"social"       : [],
 		"footer"       : false,
 		"lastUpdated"  : false,
+		"mermaid"      : false,
 		"analytics"    : { "provider" : "", "id" : "" },
 		"ogImage"      : "",
 		"extraCss"     : [],
@@ -156,6 +157,13 @@ class {
 			throw(
 				type    = "BxDocs.InvalidConfig",
 				message = "bxdocs.json [search] must be a boolean"
+			)
+		}
+
+		if ( !isBoolean( arguments.config.mermaid ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [mermaid] must be a boolean"
 			)
 		}
 

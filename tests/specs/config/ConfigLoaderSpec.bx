@@ -269,6 +269,23 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxDocs.InvalidConfig" );
 			} );
 
+			it( "defaults [mermaid] to false", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).mermaid ).toBeFalse();
+			} );
+
+			it( "preserves a user-supplied [mermaid]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","mermaid":true}' );
+				expect( loader.load( dir ).mermaid ).toBeTrue();
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [mermaid] is not a boolean", function() {
+				var dir = newProjectDir( '{"name":"My Docs","mermaid":"yes please"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
 		} );
 	}
 

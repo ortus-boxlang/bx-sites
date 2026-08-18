@@ -1,0 +1,159 @@
+/**
+ * Recognizes mkdocs-style admonition ("callout") blocks in a page's raw
+ * markdown body:
+ *
+ *   !!! type "Optional Title"
+ *       Indented body - one or more paragraphs. Blank lines are fine as
+ *       long as the next non-blank line is still indented; the block ends
+ *       at the first non-blank, non-indented line (or EOF). A `!!!` line
+ *       inside a fenced code block (` ``` `/`~~~`) is never treated as the
+ *       start of a real admonition - e.g. a markdown snippet demonstrating
+ *       the syntax itself stays a plain code listing.
+ *
+ * bx-markdown (Flexmark) has no block-level extension API to teach it this
+ * syntax directly (see MarkdownRenderer.bx's docblock), so each block is
+ * pulled out of the body here and replaced with a self-closing placeholder
+ * `<div>` - a raw HTML block Flexmark passes through untouched. The
+ * caller renders each admonition's own extracted content as its own
+ * independent markdown pass (recursively, via the same renderer used for
+ * the page), so formatting inside an admonition - links, code, bold,
+ * lists - still works, rather than being frozen as literal escaped text
+ * the way embedding it directly as raw HTML would leave it. wrap() then
+ * builds the final markup, and substitute() splices it into the
+ * already-rendered page HTML in place of the placeholder.
+ */
+class {
+
+	/**
+	 * @body Raw markdown page body
+	 *
+	 * @return { body: string (admonition blocks replaced with placeholder divs), admonitions: array of { token, type, title, content } }
+	 */
+	struct function extract( required string body ) {
+		var normalized = arguments.body.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" )
+		var lines = listToArray( normalized, char( 10 ), true )
+		var outputLines = []
+		var admonitions = []
+		var insideFence = false
+
+		for ( var i = 1; i <= lines.len(); i++ ) {
+			var line = lines[ i ]
+
+			if ( line.reFindNoCase( "^ {0,3}(`{3,}|~{3,})" ) ) {
+				insideFence = !insideFence
+				outputLines.append( line )
+				continue
+			}
+
+			if ( insideFence || !line.reFindNoCase( "^!!!\s+\S" ) ) {
+				outputLines.append( line )
+				continue
+			}
+
+			var type = line.reReplace( "^!!!\s+(\S+).*", "\1", "one" )
+			var title = line.find( '"' )
+				? line.reReplace( '^!!!\s+\S+\s+"([^"]*)".*', "\1", "one" )
+				: defaultTitle( type )
+
+			var blockEnd = i
+			var j = i + 1
+			for ( j = i + 1; j <= lines.len(); j++ ) {
+				var next = lines[ j ]
+				var isBlank = !len( trim( next ) )
+				if ( !isBlank && next.left( 4 ) != "    " && next.left( 1 ) != char( 9 ) ) {
+					break
+				}
+				if ( !isBlank ) {
+					blockEnd = j
+				}
+			}
+
+			var contentLines = []
+			for ( var k = i + 1; k <= blockEnd; k++ ) {
+				contentLines.append( dedent( lines[ k ] ) )
+			}
+
+			var token = "bxdocs-admonition-" & ( admonitions.len() + 1 )
+			admonitions.append( {
+				token   : token,
+				type    : sanitizeType( type ),
+				title   : title,
+				content : contentLines.toList( char( 10 ) )
+			} )
+			outputLines.append( '<div data-bxdocs-admonition="' & token & '"></div>' )
+
+			i = blockEnd
+		}
+
+		return { body : outputLines.toList( char( 10 ) ), admonitions : admonitions }
+	}
+
+	/**
+	 * @admonition One entry from extract()'s `admonitions`
+	 * @renderedContent That admonition's own `content`, already converted to HTML by the caller
+	 *
+	 * @return The admonition's final <div> markup
+	 */
+	string function wrap( required struct admonition, required string renderedContent ) {
+		return '<div class="admonition ' & arguments.admonition.type & '">' &
+			'<p class="admonition-title">' & encodeForHTML( arguments.admonition.title ) & '</p>' &
+			arguments.renderedContent &
+			'</div>'
+	}
+
+	/**
+	 * @html Page HTML already rendered from extract()'s `body`
+	 * @wrapped A struct mapping each admonition's `token` -> its own wrap()'d HTML
+	 *
+	 * @return html with every placeholder div replaced by its final markup
+	 */
+	string function substitute( required string html, required struct wrapped ) {
+		var result = arguments.html
+		for ( var token in arguments.wrapped ) {
+			result = result.replace( '<div data-bxdocs-admonition="' & token & '"></div>', arguments.wrapped[ token ], "all" )
+		}
+		return result
+	}
+
+	/**
+	 * Strips a content line's 4-space (or single-tab) indent. A blank line
+	 * dedents to an empty string regardless of its own whitespace.
+	 *
+	 * @line One raw line from inside an admonition block
+	 */
+	private string function dedent( required string line ) {
+		if ( !len( trim( arguments.line ) ) ) {
+			return ""
+		}
+		if ( arguments.line.left( 4 ) == "    " ) {
+			return arguments.line.right( len( arguments.line ) - 4 )
+		}
+		if ( arguments.line.left( 1 ) == char( 9 ) ) {
+			return arguments.line.right( len( arguments.line ) - 1 )
+		}
+		return arguments.line
+	}
+
+	/**
+	 * A type with no explicit "Title" defaults to its own capitalized name, e.g. `note` -> `Note`.
+	 *
+	 * @type The raw (unsanitized) type token from the `!!!` line
+	 */
+	private string function defaultTitle( required string type ) {
+		var clean = arguments.type.reReplace( "[^a-zA-Z0-9]", " ", "all" )
+		return clean.left( 1 ).uCase() & clean.right( len( clean ) - 1 ).lCase()
+	}
+
+	/**
+	 * Lower-cases and strips a type down to safe CSS-class characters, so
+	 * arbitrary markdown content can never inject attribute/HTML syntax via
+	 * the `!!! type` line - falls back to "note" if nothing safe remains.
+	 *
+	 * @type The raw (unsanitized) type token from the `!!!` line
+	 */
+	private string function sanitizeType( required string type ) {
+		var clean = lCase( arguments.type ).reReplace( "[^a-z0-9\-]", "", "all" )
+		return len( clean ) ? clean : "note"
+	}
+
+}
