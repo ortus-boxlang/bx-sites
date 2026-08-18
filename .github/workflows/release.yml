@@ -41,7 +41,7 @@ jobs:
       issues: write
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup BoxLang
         uses: ortus-boxlang/setup-boxlang@1.4.0
@@ -168,7 +168,7 @@ jobs:
       issues: write
     steps:
       - name: Checkout Development Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: development
 
