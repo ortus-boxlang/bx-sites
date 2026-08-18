@@ -7,8 +7,11 @@ class {
 
 	/**
 	 * Default site configuration, deep-merged with the user's bxdocs.json.
-	 * Markdown passthrough options are intentionally left empty here - they
-	 * are forwarded as-is to bx-markdown, which owns its own defaults.
+	 * Markdown passthrough options are otherwise left to bx-markdown's own
+	 * defaults - the one exception is `enableAdmonition`, which bx-docs
+	 * itself defaults to `true` (admonition callout blocks have always been
+	 * an out-of-the-box bx-docs feature; a project can still turn them off
+	 * via `{"markdown":{"enableAdmonition":false}}`).
 	 */
 	variables.defaults = {
 		"description"  : "",
@@ -16,7 +19,7 @@ class {
 		"theme"        : { "name" : "bootstrap", "options" : {}, "logo" : "", "favicon" : "" },
 		"search"       : true,
 		"nav"          : [],
-		"markdown"     : {},
+		"markdown"     : { "enableAdmonition" : true },
 		"repo"         : { "url" : "", "editUri" : "" },
 		"social"       : [],
 		"footer"       : false,

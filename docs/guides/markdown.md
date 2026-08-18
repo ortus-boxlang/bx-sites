@@ -5,13 +5,14 @@ order: 4
 
 # Markdown Extensions
 
-Beyond standard Markdown (and whatever [bx-markdown option](../configuration.md#markdown)
-you've turned on), BX Docs adds two content extensions of its own: admonitions
-and Mermaid diagrams.
+Beyond standard Markdown, BX Docs turns on three of bx-markdown's native
+Flexmark extensions by default - admonitions, footnotes and definition lists
+- plus a Mermaid diagram integration of its own. All four are configurable
+via [`bxdocs.json`'s `markdown`/`mermaid` keys](../configuration.md#markdown).
 
 ## Admonitions
 
-A callout/note box - no `bxdocs.json` config needed, just write it:
+A callout/note box - on by default, no `bxdocs.json` config needed:
 
 ```markdown
 !!! note "Heads Up"
@@ -25,31 +26,114 @@ Which renders as:
     This is an admonition. Its content is regular markdown - **bold**,
     `code`, [links](../index.md) and lists all work exactly as normal.
 
-The type (`note` above) becomes the box's CSS class and, if you don't give
-an explicit `"Title"`, its own capitalized name is used instead. A handful
-of types get their own accent color out of the box:
+The type (`note` above) becomes the box's icon/color and, if you don't give
+an explicit `"Title"`, its own capitalized name is used instead. Many
+common synonyms resolve to the same 12 canonical types, each with its own
+accent color:
 
-!!! tip "tip / hint / success / check / done"
+!!! note "note"
+    Blue - also the fallback for any type not in this list.
+
+!!! abstract "abstract / summary / tldr"
+    Light blue.
+
+!!! info "info / todo"
+    Cyan.
+
+!!! tip "tip / hint / important"
+    Teal.
+
+!!! success "success / check / done"
     Green.
+
+!!! faq "question / help / faq"
+    Lime.
 
 !!! warning "warning / caution / attention"
     Orange.
 
-!!! danger "danger / error / failure / fail / missing"
+!!! fail "failure / fail / missing"
+    Light red.
+
+!!! danger "danger / error"
     Red.
 
-!!! question "question / help / faq"
-    Amber.
+!!! bug "bug"
+    Pink.
 
 !!! example "example"
     Purple.
 
-Any other type still renders as a valid admonition box (in the default blue
-accent) - the type list above is just which ones get their own color.
+!!! quote "quote / cite"
+    Gray.
 
 The body must stay indented by 4 spaces (or a tab); the block ends at the
 first non-indented, non-blank line. Blank lines are fine *inside* the block
 - they just start a new paragraph, same as anywhere else in markdown.
+
+### Collapsible admonitions
+
+Prefix the type with `???` instead of `!!!` to make the block collapsible -
+`???` starts collapsed, `???+` starts open. Either way the heading is
+clickable to toggle it:
+
+```markdown
+??? tip "Click to expand"
+    This starts collapsed.
+
+???+ tip "Click to collapse"
+    This starts open.
+```
+
+??? tip "Click to expand"
+    This starts collapsed.
+
+???+ tip "Click to collapse"
+    This starts open.
+
+Turn admonitions off entirely with `{"markdown":{"enableAdmonition":false}}`.
+
+## Footnotes
+
+Reference a footnote inline with `[^label]` and define its text anywhere in
+the document with `[^label]: text`:
+
+```markdown
+Here's a claim that needs backing up[^1].
+
+[^1]: Here's the backup.
+```
+
+Here's a claim that needs backing up[^1].
+
+[^1]: Here's the backup.
+
+Footnote definitions are collected and rendered as a numbered list at the
+bottom of the page regardless of where in the source they're written. Off by
+default - turn it on with `{"markdown":{"enableFootnotes":true}}`.
+
+## Definition Lists
+
+A term line followed by one or more `:   ` description lines becomes a
+`<dl>`:
+
+```markdown
+Term
+:   Its definition.
+
+Second term
+:   First definition.
+:   Second definition.
+```
+
+Term
+:   Its definition.
+
+Second term
+:   First definition.
+:   Second definition.
+
+Off by default - turn it on with `{"markdown":{"enableDefinitionLists":true}}`.
 
 ## Diagrams
 
@@ -72,3 +156,10 @@ flowchart LR
 Mermaid supports flowcharts, sequence diagrams, class diagrams, Gantt
 charts and more - see [Mermaid's own syntax reference](https://mermaid.js.org/intro/syntax-reference.html)
 for everything it can draw.
+
+## Plugin extensions
+
+Admonitions, footnotes and definition lists cover the common cases, but
+bx-markdown itself has no opinion beyond those three - any other Flexmark
+extension can be registered directly against it with `markdownRegisterExtension()`,
+independent of BX Docs. See bx-markdown's own readme for details.

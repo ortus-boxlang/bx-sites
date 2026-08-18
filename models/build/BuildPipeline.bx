@@ -16,7 +16,6 @@ class {
 	variables.sitemapGenerator = new "models.build.SitemapGenerator@bxdocs"()
 	variables.llmsTxtGenerator = new "models.build.LlmsTxtGenerator@bxdocs"()
 	variables.markdownRenderer = new "models.build.MarkdownRenderer@bxdocs"()
-	variables.admonitionProcessor = new "models.build.AdmonitionProcessor@bxdocs"()
 	variables.gitRevisionDate  = new "models.build.GitRevisionDate@bxdocs"()
 	variables.versionsDiscoverer = new "models.build.VersionsDiscoverer@bxdocs"()
 
@@ -211,27 +210,16 @@ class {
 	/**
 	 * Converts every page's raw markdown body to HTML in place (adds a
 	 * `contentHtml` key to each page struct), applying bxdocs.json's
-	 * markdown passthrough options. Admonition blocks (AdmonitionProcessor.bx)
-	 * are pulled out of the body first, converted as their own independent
-	 * markdown pass, and spliced back into the rendered HTML afterward - see
-	 * that class's docblock for why.
+	 * markdown passthrough options (bx-markdown's own `enableAdmonition`/
+	 * `enableFootnotes`/`enableDefinitionLists`/etc. settings included -
+	 * see ConfigLoader.bx's own default for `markdown.enableAdmonition`).
 	 *
 	 * @pages Array of page structs from DocsLoader.load()
 	 * @config The site's bxdocs.json config
 	 */
 	private void function convertMarkdown( required array pages, required struct config ) {
 		for ( var page in arguments.pages ) {
-			var extraction = variables.admonitionProcessor.extract( page.body )
-			page.contentHtml = variables.markdownRenderer.toHtml( extraction.body, arguments.config.markdown )
-
-			if ( extraction.admonitions.len() ) {
-				var wrapped = {}
-				for ( var admonition in extraction.admonitions ) {
-					var renderedContent = variables.markdownRenderer.toHtml( admonition.content, {} )
-					wrapped[ admonition.token ] = variables.admonitionProcessor.wrap( admonition, renderedContent )
-				}
-				page.contentHtml = variables.admonitionProcessor.substitute( page.contentHtml, wrapped )
-			}
+			page.contentHtml = variables.markdownRenderer.toHtml( page.body, arguments.config.markdown )
 		}
 	}
 
@@ -389,6 +377,7 @@ class {
 
 		directoryCreate( arguments.siteDir & "/assets", true, true )
 		fileCopy( moduleAssetsDir() & "/copy-code.js", arguments.siteDir & "/assets/copy-code.js" )
+		fileCopy( moduleAssetsDir() & "/admonition-collapse.js", arguments.siteDir & "/assets/admonition-collapse.js" )
 
 		if ( arguments.searchEnabled ) {
 			fileCopy( moduleAssetsDir() & "/search.js", arguments.siteDir & "/assets/search.js" )

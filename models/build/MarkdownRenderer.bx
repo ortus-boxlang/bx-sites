@@ -5,9 +5,11 @@
  * `Markdown()` itself takes no per-call options - confirmed against
  * bx-markdown's own source, it only reads its `MarkdownService` singleton's
  * module-level settings struct. The only documented way to influence it per
- * project is `ModuleService.getModuleSettings( "bx-markdown" )`, mutated in
- * place before each call, so that's what this class does with a project's
- * `bxdocs.json` `markdown` passthrough options (module spec section 4).
+ * project is `ModuleService.getModuleSettings( "bxMarkdown" )` (bx-markdown's
+ * own module registry key - its own `this.mapping`, not its box.json/ForgeBox
+ * slug "bx-markdown"), mutated in place before each call, so that's what
+ * this class does with a project's `bxdocs.json` `markdown` passthrough
+ * options (module spec section 4).
  *
  * This class has a hard runtime dependency on the bx-markdown module being
  * activated (box.json declares it as a dependency) and so has no unit tests
@@ -24,7 +26,7 @@ class {
 	 */
 	string function toHtml( required string markdown, struct options = {} ) {
 		if ( !arguments.options.isEmpty() ) {
-			var moduleSettings = getBoxRuntime().getModuleService().getModuleSettings( "bx-markdown" )
+			var moduleSettings = getBoxRuntime().getModuleService().getModuleSettings( "bxMarkdown" )
 			for ( var key in arguments.options ) {
 				moduleSettings[ key ] = arguments.options[ key ]
 			}

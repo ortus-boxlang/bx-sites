@@ -63,7 +63,7 @@ Site name, description, nav (auto-inferred from folder/file structure, overridab
 ## 5. Core pipeline
 
 1. **Loader** — walks `docs/`, reads `.md` files + frontmatter (`title`, `order`, `hidden`)
-2. **Parser** — delegates to **bx-markdown** (`Markdown()` BIF / `bx:markdown` component) for the actual markdown-to-HTML conversion. The one exception: bx-markdown (Flexmark) has no block-extension API, so admonition (`!!! type "Title"`) blocks are pulled out and rendered as their own independent bx-markdown pass by `AdmonitionProcessor.bx` before/after the main conversion - see its docblock. No other custom parsing.
+2. **Parser** — delegates entirely to **bx-markdown** (`Markdown()` BIF / `bx:markdown` component) for markdown-to-HTML conversion, including admonitions (`!!! type "Title"`), footnotes and definition lists via bx-markdown's own native Flexmark extensions (`markdown.enableAdmonition`/`enableFootnotes`/`enableDefinitionLists`). No custom parsing on the bx-docs side.
 3. **Nav builder** — folder/file structure → nav tree, frontmatter overrides applied
 4. **Theme renderer** — invokes the active theme's `.bxm` templates with page data + nav tree in scope
 5. **Search indexer** — builds a static JSON index (title, url, headings, truncated body text)
@@ -99,8 +99,8 @@ Site name, description, nav (auto-inferred from folder/file structure, overridab
 None currently blocking. Deferred to later phases:
 - Optional `bx-docs-search-meilisearch` add-on
 - Versioned docs (multiple doc sets / version switcher) — **done**, see section 5's `docs/versions/` convention
-- Admonition callouts and Mermaid diagrams — **done**, see section 5 step 2 and `bxdocs.json`'s `mermaid` key
-- Plugin hook system beyond themes (e.g. registering a wholly new markdown syntax extension, custom nav sources) - still deferred; bx-markdown itself has no such API today
+- Admonitions, footnotes, definition lists and Mermaid diagrams — **done**, see section 5 step 2 and `bxdocs.json`'s `mermaid` key
+- Plugin hook system beyond themes (e.g. custom nav sources) - still deferred for bx-docs itself; bx-markdown now has a `markdownRegisterExtension()`/`markdownUnregisterExtension()` API for registering arbitrary Flexmark extensions, independent of bx-docs
 
 ## 9. Phased task breakdown
 
