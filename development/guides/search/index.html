@@ -1,0 +1,122 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Search - BX Docs</title>
+	<script>
+		( function () {
+			var stored = localStorage.getItem( "bxdocs-theme" );
+			var prefersDark = window.matchMedia( "(prefers-color-scheme: dark)" ).matches;
+			if ( stored === "dark" || ( !stored && prefersDark ) ) {
+				document.documentElement.setAttribute( "data-theme", "dark" );
+			}
+		} )();
+	</script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
+	<link rel="stylesheet" href="/bx-docs/development/assets/theme/style.css">
+
+	<script>window.__BXDOCS_BASE_PATH__ = "/bx-docs/development/";</script>
+	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
+	<script src="/bx-docs/development/assets/search.js" defer></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+</head>
+<body x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxdocs-theme', v ? 'dark' : 'light' ) } )">
+	<nav class="navbar navbar-expand-lg brand-navbar">
+		<div class="container-fluid">
+			<a class="navbar-brand brand-mark" href="/bx-docs/development/">⚡ BX Docs</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bxdocs-sidebar" aria-controls="bxdocs-sidebar" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="d-flex align-items-center order-lg-3 ms-lg-3">
+				<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="Toggle dark mode">
+					<span x-show="!dark">&#127769;</span>
+					<span x-show="dark" x-cloak>&#9728;&#65039;</span>
+				</button>
+			</div>
+<div class="bxdocs-search position-relative">
+	<input type="search" id="bxdocs-search-input" class="form-control" placeholder="Search docs..." aria-label="Search">
+	<ul id="bxdocs-search-results" class="bxdocs-search-results list-unstyled"></ul>
+</div>
+
+
+		</div>
+	</nav>
+	<div class="container-fluid">
+		<div class="row">
+			<aside class="col-lg-3 col-xl-2 sidebar collapse d-lg-block" id="bxdocs-sidebar">
+				<ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/index.html">Home</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/getting-started/index.html">Getting Started</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/cli-reference/index.html">CLI Reference</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/configuration/index.html">Configuration</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/index.html">Guides</a><ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/themes/index.html">Themes</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/search/index.html">Search</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/deployment/index.html">Deploying to GitHub Pages</a></li></ul></li></ul>
+			</aside>
+			<main class="col-lg-9 col-xl-10 content">
+
+				<article class="page-content">
+<nav class="breadcrumb-nav mb-3" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/bx-docs/development/guides/index.html">Guides</a></li><li class="breadcrumb-item active" aria-current="page">Search</li></ol></nav>
+					<h1 class="page-title">Search</h1>
+<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#how-it-works">How it works</a></li><li class="toc-level-2"><a href="#keyboard-shortcuts">Keyboard shortcuts</a></li><li class="toc-level-2"><a href="#turning-it-off">Turning it off</a></li><li class="toc-level-2"><a href="#rebuilding-just-the-index">Rebuilding just the index</a></li></ul></nav>
+					<h1 id="search"><a href="#search" id="search" name="search" class="anchor"></a>Search</h1>
+<p>BX Docs' search is fully static and client-side - the same approach
+<a href="https://www.mkdocs.org/">mkdocs</a> uses by default: an index built once at
+<code>build</code> time, and <a href="https://lunrjs.com/">lunr.js</a> doing the actual searching
+in the visitor's browser. There's no server, database, or external search
+service involved.</p>
+<h2 id="how-it-works"><a href="#how-it-works" id="how-it-works" name="how-it-works" class="anchor"></a>How it works</h2>
+<ol>
+<li>At <code>build</code> time, <code>SearchIndexer</code> walks every non-hidden page and writes
+<code>site/search-index.json</code>: one entry per page with its <code>title</code>, <code>url</code>,
+the text of every heading on the page, and a truncated plain-text copy
+of its body (HTML tags stripped).</li>
+<li>Each theme's <code>search.bxm</code> partial renders a search box; <code>layout.bxm</code>
+only includes it (and the <code>lunr.js</code> + shared <code>search.js</code> scripts) when
+<code>bxdocs.json</code>'s <code>search</code> is <code>true</code>.</li>
+<li>In the browser, the shared <code>assets/search.js</code> widget fetches
+<code>search-index.json</code> once, builds a <code>lunr</code> index from it (title weighted
+highest, then headings, then body text), and re-searches it on every
+keystroke - no network round-trip per query.</li>
+</ol>
+<h2 id="keyboard-shortcuts"><a href="#keyboard-shortcuts" id="keyboard-shortcuts" name="keyboard-shortcuts" class="anchor"></a>Keyboard shortcuts</h2>
+<ul>
+<li><strong><code>/</code></strong> focuses the search box from anywhere on the page (unless you're
+already typing in another field) - the same convention
+<a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a> uses.</li>
+<li><strong><code>Escape</code></strong> closes the results dropdown and blurs the search box.</li>
+</ul>
+<h2 id="turning-it-off"><a href="#turning-it-off" id="turning-it-off" name="turning-it-off" class="anchor"></a>Turning it off</h2>
+<pre><code class="language-json">{ &quot;search&quot;: false }
+</code></pre>
+<p>Skips building <code>search-index.json</code> entirely, and skips the search box, the
+<code>lunr.js</code> CDN script, and the shared <code>search.js</code> widget in every rendered
+page - a project with search off ships nothing search-related at all.</p>
+<h2 id="rebuilding-just-the-index"><a href="#rebuilding-just-the-index" id="rebuilding-just-the-index" name="rebuilding-just-the-index" class="anchor"></a>Rebuilding just the index</h2>
+<pre><code class="language-bash">boxlang module:bxDocs search-index
+</code></pre>
+<p>Useful if you only need to refresh <code>search-index.json</code> - <code>build</code> already
+does this as one of its own steps, so you don't need to run this
+separately after a normal build.</p>
+
+				</article>
+
+				<nav class="page-nav d-flex justify-content-between" aria-label="Page navigation">
+
+					<a class="page-nav__prev" href="/bx-docs/development/guides/themes/index.html">&larr; Themes</a>
+
+					<a class="page-nav__next" href="/bx-docs/development/guides/deployment/index.html">Deploying to GitHub Pages &rarr;</a>
+
+				</nav>
+
+
+
+			</main>
+		</div>
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+	<script>hljs.highlightAll();</script>
+	<script src="/bx-docs/development/assets/copy-code.js" defer></script>
+</body>
+</html>
+

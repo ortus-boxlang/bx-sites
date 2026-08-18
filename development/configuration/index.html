@@ -1,0 +1,165 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Configuration - BX Docs</title>
+	<script>
+		( function () {
+			var stored = localStorage.getItem( "bxdocs-theme" );
+			var prefersDark = window.matchMedia( "(prefers-color-scheme: dark)" ).matches;
+			if ( stored === "dark" || ( !stored && prefersDark ) ) {
+				document.documentElement.setAttribute( "data-theme", "dark" );
+			}
+		} )();
+	</script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
+	<link rel="stylesheet" href="/bx-docs/development/assets/theme/style.css">
+
+	<script>window.__BXDOCS_BASE_PATH__ = "/bx-docs/development/";</script>
+	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
+	<script src="/bx-docs/development/assets/search.js" defer></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+</head>
+<body x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxdocs-theme', v ? 'dark' : 'light' ) } )">
+	<nav class="navbar navbar-expand-lg brand-navbar">
+		<div class="container-fluid">
+			<a class="navbar-brand brand-mark" href="/bx-docs/development/">⚡ BX Docs</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bxdocs-sidebar" aria-controls="bxdocs-sidebar" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="d-flex align-items-center order-lg-3 ms-lg-3">
+				<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="Toggle dark mode">
+					<span x-show="!dark">&#127769;</span>
+					<span x-show="dark" x-cloak>&#9728;&#65039;</span>
+				</button>
+			</div>
+<div class="bxdocs-search position-relative">
+	<input type="search" id="bxdocs-search-input" class="form-control" placeholder="Search docs..." aria-label="Search">
+	<ul id="bxdocs-search-results" class="bxdocs-search-results list-unstyled"></ul>
+</div>
+
+
+		</div>
+	</nav>
+	<div class="container-fluid">
+		<div class="row">
+			<aside class="col-lg-3 col-xl-2 sidebar collapse d-lg-block" id="bxdocs-sidebar">
+				<ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/index.html">Home</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/getting-started/index.html">Getting Started</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/cli-reference/index.html">CLI Reference</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/configuration/index.html">Configuration</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/index.html">Guides</a><ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/themes/index.html">Themes</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/search/index.html">Search</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/deployment/index.html">Deploying to GitHub Pages</a></li></ul></li></ul>
+			</aside>
+			<main class="col-lg-9 col-xl-10 content">
+
+				<article class="page-content">
+
+					<h1 class="page-title">Configuration</h1>
+<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#name">name</a></li><li class="toc-level-2"><a href="#description">description</a></li><li class="toc-level-2"><a href="#baseurl">baseURL</a></li><li class="toc-level-2"><a href="#llmstxt">llms.txt</a></li><li class="toc-level-2"><a href="#sitemapxml">sitemap.xml</a></li><li class="toc-level-2"><a href="#theme">theme</a></li><li class="toc-level-2"><a href="#search">search</a></li><li class="toc-level-2"><a href="#nav">nav</a></li><li class="toc-level-2"><a href="#markdown">markdown</a></li></ul></nav>
+					<h1 id="configuration"><a href="#configuration" id="configuration" name="configuration" class="anchor"></a>Configuration</h1>
+<p>Every project has one <code>bxdocs.json</code> at its root:</p>
+<pre><code class="language-json">{
+	&quot;name&quot;: &quot;My Docs&quot;,
+	&quot;description&quot;: &quot;&quot;,
+	&quot;baseURL&quot;: &quot;/&quot;,
+	&quot;theme&quot;: {
+		&quot;name&quot;: &quot;bootstrap&quot;,
+		&quot;options&quot;: {}
+	},
+	&quot;search&quot;: true,
+	&quot;nav&quot;: [],
+	&quot;markdown&quot;: {}
+}
+</code></pre>
+<p>Only <code>name</code> is required - everything else falls back to the defaults shown
+above. A partial <code>theme</code> object is merged one level deep, so
+<code>{&quot;theme&quot;:{&quot;name&quot;:&quot;material&quot;}}</code> alone still keeps the default (empty)
+<code>options</code>.</p>
+<h2 id="name"><a href="#name" id="name" name="name" class="anchor"></a><code>name</code></h2>
+<p>The site name, shown in the header/brand mark and page titles. Required.</p>
+<h2 id="description"><a href="#description" id="description" name="description" class="anchor"></a><code>description</code></h2>
+<p>An optional site description. Not yet surfaced in the built-in themes'
+markup, but reserved for future use (meta tags, RSS, etc.).</p>
+<h2 id="baseurl"><a href="#baseurl" id="baseurl" name="baseurl" class="anchor"></a><code>baseURL</code></h2>
+<p>Controls how every internal link, asset path and nav entry is prefixed, and
+doubles as the site's canonical URL for <code>sitemap.xml</code> and <code>llms.txt</code>.</p>
+<ul>
+<li>Left blank or <code>&quot;/&quot;</code> (the default) - links stay root-relative (<code>/page/</code>),
+and neither <code>sitemap.xml</code> nor an absolute-URL <code>llms.txt</code> is generated
+(there's no canonical domain to build them from).</li>
+<li>A bare path, e.g. <code>&quot;my-docs&quot;</code> or <code>&quot;/my-docs/&quot;</code> - the site is assumed to be
+served from that sub-path, and every internal link, nav entry and asset
+is prefixed with it (<code>/my-docs/page/</code>). Still no <code>sitemap.xml</code>, since
+there's still no absolute domain.</li>
+<li>A full URL, e.g. <code>&quot;https://docs.example.com/&quot;</code> - the path portion
+(<code>/</code> here) is used the same way a bare path would be, <strong>and</strong>
+<code>sitemap.xml</code> is written at build time with every non-hidden page's
+absolute URL under that domain.</li>
+</ul>
+<p><code>llms.txt</code> (see <a href="#llms-txt">below</a>) is always written; it just prefers an
+absolute URL when <code>baseURL</code> provides one.</p>
+<h2 id="llmstxt"><a href="#llmstxt" id="llmstxt" name="llmstxt" class="anchor"></a><code>llms.txt</code></h2>
+<p>Every build writes a <code>llms.txt</code> to the site root - a plain Markdown index of
+every non-hidden page, following the emerging
+<a href="https://llmstxt.org">llms.txt</a> convention for helping LLM-based tools
+navigate a site without crawling its rendered HTML. There's no config key
+for this; it's generated automatically, using an absolute URL per link when
+<code>baseURL</code> is a full URL, or a <code>basePath</code>-relative one otherwise.</p>
+<h2 id="sitemapxml"><a href="#sitemapxml" id="sitemapxml" name="sitemapxml" class="anchor"></a><code>sitemap.xml</code></h2>
+<p>Written at the site root, but only when <code>baseURL</code> is a full URL (see
+above) - a sitemap needs an absolute domain to be meaningful. Lists every
+non-hidden page per the <a href="https://www.sitemaps.org/">sitemaps.org</a> protocol.</p>
+<h2 id="theme"><a href="#theme" id="theme" name="theme" class="anchor"></a><code>theme</code></h2>
+<ul>
+<li><code>theme.name</code> - one of the built-in themes (<code>bootstrap</code>, <code>material</code>,
+<code>tailwind</code>), or the name of a custom theme you provide via a <code>theme/</code>
+folder at the project root (see <a href="guides/themes.md">Themes</a>)</li>
+<li><code>theme.options</code> - reserved for theme-specific options in a future release;
+currently unused by the built-in themes</li>
+</ul>
+<h2 id="search"><a href="#search" id="search" name="search" class="anchor"></a><code>search</code></h2>
+<p><code>true</code> (the default) builds a static search index and wires up the search
+box; <code>false</code> skips both entirely - no <code>search-index.json</code>, no search UI, no
+extra JS shipped. See <a href="guides/search.md">Search</a>.</p>
+<h2 id="nav"><a href="#nav" id="nav" name="nav" class="anchor"></a><code>nav</code></h2>
+<p>Reserved for a hand-authored nav override. In v1, nav is always inferred
+from <code>docs/</code>'s own folder/file structure (with <code>order</code>/<code>hidden</code>
+frontmatter); this key is validated but not yet consumed.</p>
+<h2 id="markdown"><a href="#markdown" id="markdown" name="markdown" class="anchor"></a><code>markdown</code></h2>
+<p>Forwarded as-is to <a href="https://github.com/ortus-boxlang/bx-markdown">bx-markdown</a>'s
+own module settings before each page renders - table options, anchor
+links, the YouTube embed transformer, code block styling, and everything
+else bx-markdown supports. BX Docs doesn't redefine or validate these keys;
+whatever you put here is bx-markdown's own option set, straight through.</p>
+<pre><code class="language-json">{
+	&quot;markdown&quot;: {
+		&quot;anchorLinks&quot;: false,
+		&quot;enableYouTubeTransformer&quot;: true
+	}
+}
+</code></pre>
+
+				</article>
+
+				<nav class="page-nav d-flex justify-content-between" aria-label="Page navigation">
+
+					<a class="page-nav__prev" href="/bx-docs/development/cli-reference/index.html">&larr; CLI Reference</a>
+
+					<a class="page-nav__next" href="/bx-docs/development/guides/index.html">Guides &rarr;</a>
+
+				</nav>
+
+
+
+			</main>
+		</div>
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+	<script>hljs.highlightAll();</script>
+	<script src="/bx-docs/development/assets/copy-code.js" defer></script>
+</body>
+</html>
+

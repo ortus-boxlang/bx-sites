@@ -1,0 +1,116 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Home - BX Docs</title>
+	<script>
+		( function () {
+			var stored = localStorage.getItem( "bxdocs-theme" );
+			var prefersDark = window.matchMedia( "(prefers-color-scheme: dark)" ).matches;
+			if ( stored === "dark" || ( !stored && prefersDark ) ) {
+				document.documentElement.setAttribute( "data-theme", "dark" );
+			}
+		} )();
+	</script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
+	<link rel="stylesheet" href="/bx-docs/development/assets/theme/style.css">
+
+	<script>window.__BXDOCS_BASE_PATH__ = "/bx-docs/development/";</script>
+	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
+	<script src="/bx-docs/development/assets/search.js" defer></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+</head>
+<body x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxdocs-theme', v ? 'dark' : 'light' ) } )">
+	<nav class="navbar navbar-expand-lg brand-navbar">
+		<div class="container-fluid">
+			<a class="navbar-brand brand-mark" href="/bx-docs/development/">⚡ BX Docs</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bxdocs-sidebar" aria-controls="bxdocs-sidebar" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="d-flex align-items-center order-lg-3 ms-lg-3">
+				<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="Toggle dark mode">
+					<span x-show="!dark">&#127769;</span>
+					<span x-show="dark" x-cloak>&#9728;&#65039;</span>
+				</button>
+			</div>
+<div class="bxdocs-search position-relative">
+	<input type="search" id="bxdocs-search-input" class="form-control" placeholder="Search docs..." aria-label="Search">
+	<ul id="bxdocs-search-results" class="bxdocs-search-results list-unstyled"></ul>
+</div>
+
+
+		</div>
+	</nav>
+	<div class="container-fluid">
+		<div class="row">
+			<aside class="col-lg-3 col-xl-2 sidebar collapse d-lg-block" id="bxdocs-sidebar">
+				<ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/index.html">Home</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/getting-started/index.html">Getting Started</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/cli-reference/index.html">CLI Reference</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/configuration/index.html">Configuration</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/index.html">Guides</a><ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/themes/index.html">Themes</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/search/index.html">Search</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/deployment/index.html">Deploying to GitHub Pages</a></li></ul></li></ul>
+			</aside>
+			<main class="col-lg-9 col-xl-10 content">
+
+				<article class="page-content">
+
+					<h1 class="page-title">Home</h1>
+<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#highlights">Highlights</a></li><li class="toc-level-2"><a href="#where-to-go-next">Where to go next</a></li></ul></nav>
+					<h1 id="bx-docs"><a href="#bx-docs" id="bx-docs" name="bx-docs" class="anchor"></a>BX Docs</h1>
+<p>BX Docs is a BoxLang module that generates static documentation sites from
+Markdown, in the spirit of <a href="https://www.mkdocs.org/">mkdocs</a> and
+<a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a>.</p>
+<p>This very site is built by BX Docs, from the Markdown files in this
+repository's own <code>docs/</code> folder - see
+<a href="getting-started.md">Getting Started</a> to build it yourself.</p>
+<h2 id="highlights"><a href="#highlights" id="highlights" name="highlights" class="anchor"></a>Highlights</h2>
+<ul>
+<li><strong>Markdown in, static HTML out.</strong> Point it at a <code>docs/</code> folder and it
+renders a complete site into <code>site/</code> - no server required to host it.</li>
+<li><strong>Folder structure is nav structure.</strong> Nest folders and files under
+<code>docs/</code> and the navigation builds itself, in the order you set via
+frontmatter.</li>
+<li><strong>Three built-in themes.</strong> <code>bootstrap</code> (the default), <code>material</code> and
+<code>tailwind</code> - all sharing the same BoxLang brand palette, and all
+overridable with your own theme.</li>
+<li><strong>Static, client-side search.</strong> A <a href="https://lunrjs.com/">lunr.js</a>-powered
+search box, wired against a search index built at <code>build</code> time - the same
+approach mkdocs itself uses by default, no server dependency.</li>
+<li><strong>Markdown handled by <a href="https://github.com/ortus-boxlang/bx-markdown">bx-markdown</a>.</strong>
+BX Docs doesn't parse Markdown itself; it delegates to bx-markdown and
+forwards your own <code>bxdocs.json</code> options straight through to it.</li>
+</ul>
+<h2 id="where-to-go-next"><a href="#where-to-go-next" id="where-to-go-next" name="where-to-go-next" class="anchor"></a>Where to go next</h2>
+<ul>
+<li><a href="getting-started.md">Getting Started</a> - install, scaffold a project, build and serve it</li>
+<li><a href="cli-reference.md">CLI Reference</a> - every verb and its options</li>
+<li><a href="configuration.md">Configuration</a> - the full <code>bxdocs.json</code> reference</li>
+<li><a href="guides/themes.md">Themes</a> - the built-in themes, and how to write your own</li>
+<li><a href="guides/search.md">Search</a> - how the static search index works</li>
+<li><a href="guides/deployment.md">Deploying to GitHub Pages</a> - the built-in GitHub Actions workflow</li>
+</ul>
+
+				</article>
+
+				<nav class="page-nav d-flex justify-content-between" aria-label="Page navigation">
+
+					<span></span>
+
+					<a class="page-nav__next" href="/bx-docs/development/getting-started/index.html">Getting Started &rarr;</a>
+
+				</nav>
+
+
+
+			</main>
+		</div>
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+	<script>hljs.highlightAll();</script>
+	<script src="/bx-docs/development/assets/copy-code.js" defer></script>
+</body>
+</html>
+
