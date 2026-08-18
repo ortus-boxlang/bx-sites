@@ -6,10 +6,10 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>CLI Reference - BX Docs</title>
+	<title>Release Policy - BX Docs</title>
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="BX Docs">
-	<meta property="og:title" content="CLI Reference">
+	<meta property="og:title" content="Release Policy">
 
 	<meta name="description" content="Static documentation site generator for BoxLang, built on bx-markdown">
 	<meta property="og:description" content="Static documentation site generator for BoxLang, built on bx-markdown">
@@ -71,63 +71,34 @@
 
 				<article class="page-content">
 
-					<h1 class="page-title">CLI Reference</h1>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 6:56:21 PM</span></div>
-<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#global-options">Global options</a></li><li class="toc-level-2"><a href="#new">new</a></li><li class="toc-level-2"><a href="#build">build</a></li><li class="toc-level-2"><a href="#serve">serve</a></li><li class="toc-level-2"><a href="#search-index">search-index</a></li><li class="toc-level-2"><a href="#clean">clean</a></li></ul></nav>
-					<h1 id="cli-reference"><a href="#cli-reference" id="cli-reference" name="cli-reference" class="anchor"></a>CLI Reference</h1>
-<pre><code class="language-bash">boxlang module:bxDocs &lt;verb&gt; [options]
-</code></pre>
-<p>Every verb accepts <code>--projectRoot=&lt;path&gt;</code> (or a bare positional path) to
-target a project other than the current directory, and the two global
-flags below can appear before any verb.</p>
-<h2 id="global-options"><a href="#global-options" id="global-options" name="global-options" class="anchor"></a>Global options</h2>
-<table class="table">
-<thead>
-<tr><th>Flag</th><th>Description</th></tr>
-</thead>
-<tbody>
-<tr><td><code>-h</code>, <code>--help</code></td><td>Show usage and exit</td></tr>
-<tr><td><code>-v</code>, <code>--version</code></td><td>Show the module version and exit</td></tr>
-</tbody>
-</table>
-<h2 id="new"><a href="#new" id="new" name="new" class="anchor"></a><code>new</code></h2>
-<p>Scaffold a docs project.</p>
-<pre><code class="language-bash">boxlang module:bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...]
-</code></pre>
+					<h1 class="page-title">Release Policy</h1>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/releases/index.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 6:56:21 PM</span></div>
+
+					<h1 id="release-policy"><a href="#release-policy" id="release-policy" name="release-policy" class="anchor"></a>Release Policy</h1>
+<p>BX Docs follows <a href="https://semver.org/">Semantic Versioning</a> - the version in
+<a href="https://github.com/ortus-boxlang/bx-docs/blob/development/box.json"><code>box.json</code></a>
+is what gets published to <a href="https://forgebox.io/">ForgeBox</a> and tagged in the
+repo for every release.</p>
 <ul>
-<li><code>--name</code> - the site name written into <code>bxdocs.json</code> (defaults to the target directory's name)</li>
-<li><code>--theme</code> - defaults to <code>bootstrap</code></li>
-<li><code>--description</code> - the site description written into <code>bxdocs.json</code></li>
+<li><strong><code>development</code></strong> is the working branch - every merge there triggers a
+snapshot build (<code>-snapshot</code> version suffix), published for early testing
+but not meant for production use.</li>
+<li><strong><code>main</code></strong> is the stable branch - a push there cuts a real, tagged
+release: the <code>[Unreleased]</code> section of the project's own
+<a href="https://github.com/ortus-boxlang/bx-docs/blob/main/changelog.md"><code>changelog.md</code></a>
+is finalized under that version number, a Git tag and GitHub Release are
+created from it, and the module is published to ForgeBox.</li>
 </ul>
-<h2 id="build"><a href="#build" id="build" name="build" class="anchor"></a><code>build</code></h2>
-<p>Render <code>docs/**.md</code> into a static site in <code>site/</code>. Also builds the search
-index (unless <code>search</code> is <code>false</code> in <code>bxdocs.json</code>) and copies theme +
-<code>docs/assets/**</code> into <code>site/</code>.</p>
-<pre><code class="language-bash">boxlang module:bxDocs build
-</code></pre>
-<h2 id="serve"><a href="#serve" id="serve" name="serve" class="anchor"></a><code>serve</code></h2>
-<p>Build and serve the site locally with live reload.</p>
-<pre><code class="language-bash">boxlang module:bxDocs serve [--port=8080] [--host=127.0.0.1]
-</code></pre>
-<p>Runs in the foreground until interrupted (Ctrl+C).</p>
-<h2 id="search-index"><a href="#search-index" id="search-index" name="search-index" class="anchor"></a><code>search-index</code></h2>
-<p>Rebuild <code>site/search-index.json</code> standalone, without re-rendering pages or
-copying assets. <code>build</code> already runs this same step automatically - this
-verb exists for when you only need to refresh the index.</p>
-<pre><code class="language-bash">boxlang module:bxDocs search-index
-</code></pre>
-<h2 id="clean"><a href="#clean" id="clean" name="clean" class="anchor"></a><code>clean</code></h2>
-<p>Remove <code>site/</code> and any build cache, leaving <code>docs/</code> and <code>bxdocs.json</code> alone.</p>
-<pre><code class="language-bash">boxlang module:bxDocs clean
-</code></pre>
+<p>A &quot;what's new&quot; page for each version is generated automatically as part of
+that release process - pulled straight from its <code>changelog.md</code> section - and
+appears in this section going forward. The same notes are also attached to
+its <a href="https://github.com/ortus-boxlang/bx-docs/releases">GitHub Release</a>.</p>
 
 				</article>
 
 				<nav class="page-nav d-flex justify-content-between" aria-label="Page navigation">
 
-					<a class="page-nav__prev" href="/bx-docs/development/getting-started/index.html">&larr; Getting Started</a>
-
-					<a class="page-nav__next" href="/bx-docs/development/configuration/index.html">Configuration &rarr;</a>
+					<a class="page-nav__prev" href="/bx-docs/development/guides/deployment/index.html">&larr; Deploying to GitHub Pages</a>
 
 				</nav>
 
