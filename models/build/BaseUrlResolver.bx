@@ -1,0 +1,49 @@
+/**
+ * Resolves bxdocs.json's `baseURL` into the two things the rest of the
+ * pipeline needs (module spec section 4, previously reserved/unused):
+ *
+ * - `basePath` - always a root-relative path starting and ending with `/`
+ *   (e.g. `/`, `/my-docs/`) - every internal link (nav, prev/next, assets,
+ *   search) is prefixed with this, so a site can be hosted from a sub-path.
+ * - `absolute` - the full public URL ending with `/` (e.g.
+ *   `https://example.github.io/my-docs/`), or `""` if `baseURL` was only a
+ *   path. Only known when `baseURL` is a full `http(s)://` URL - matches
+ *   mkdocs' own `site_url`, which doubles as both the link-prefix source
+ *   and the absolute base for canonical links/sitemap.xml. Features that
+ *   need a real absolute URL (sitemap.xml, canonical link tags) are simply
+ *   skipped when this is empty, rather than emitting invalid URLs.
+ */
+class {
+
+	/**
+	 * @baseURL The raw bxdocs.json `baseURL` value
+	 *
+	 * @return { basePath, absolute }
+	 */
+	struct function resolve( required string baseURL ) {
+		var raw = trim( arguments.baseURL )
+		if ( !len( raw ) ) {
+			raw = "/"
+		}
+
+		if ( raw.reFindNoCase( "^https?://" ) ) {
+			var absolute = raw.right( 1 ) == "/" ? raw : raw & "/"
+			var basePath = absolute.reReplaceNoCase( "^https?://[^/]+", "" )
+			if ( !len( basePath ) ) {
+				basePath = "/"
+			}
+			return { basePath : basePath, absolute : absolute }
+		}
+
+		var basePath = raw
+		if ( basePath.left( 1 ) != "/" ) {
+			basePath = "/" & basePath
+		}
+		if ( basePath.right( 1 ) != "/" ) {
+			basePath &= "/"
+		}
+
+		return { basePath : basePath, absolute : "" }
+	}
+
+}

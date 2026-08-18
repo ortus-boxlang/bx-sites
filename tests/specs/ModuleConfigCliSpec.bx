@@ -1,0 +1,118 @@
+/**
+ * Exercises ModuleConfig.bx's main(args) CLI dispatch end-to-end - argv
+ * parsing, project-root resolution, and delegating to the real verb classes
+ * under models/cli/ (each of which has its own dedicated, more thorough spec).
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "ModuleConfig CLI dispatch", function() {
+
+			beforeEach( function() {
+				variables.moduleConfig = new "ModuleConfig@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newTempDir() {
+				var dir = createTempDirectory( prefix = "bxdocs-moduleconfig-cli-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "returns exit code 1 and prints usage when no verb is given", function() {
+				expect( moduleConfig.main( [] ) ).toBe( 1 );
+			} );
+
+			it( "returns exit code 1 for an unknown verb", function() {
+				expect( moduleConfig.main( [ "frobnicate" ] ) ).toBe( 1 );
+			} );
+
+			it( "returns exit code 0 and prints usage for --help / -h / help", function() {
+				expect( moduleConfig.main( [ "--help" ] ) ).toBe( 0 );
+				expect( moduleConfig.main( [ "-h" ] ) ).toBe( 0 );
+				expect( moduleConfig.main( [ "help" ] ) ).toBe( 0 );
+			} );
+
+			it( "returns exit code 0 and prints the module version for --version / -v", function() {
+				expect( moduleConfig.main( [ "--version" ] ) ).toBe( 0 );
+				expect( moduleConfig.main( [ "-v" ] ) ).toBe( 0 );
+			} );
+
+			it( "dispatches `new` with an absolute --projectRoot flag and returns exit code 0", function() {
+				var parent = newTempDir();
+				var projectRoot = parent & "/site";
+
+				var exitCode = moduleConfig.main( [ "new", "--projectRoot=#projectRoot#" ] );
+
+				expect( exitCode ).toBe( 0 );
+				expect( fileExists( projectRoot & "/bxdocs.json" ) ).toBeTrue();
+			} );
+
+			it( "dispatches `new` with the project root as a bare positional argument", function() {
+				var parent = newTempDir();
+				var projectRoot = parent & "/site";
+
+				var exitCode = moduleConfig.main( [ "new", projectRoot ] );
+
+				expect( exitCode ).toBe( 0 );
+				expect( fileExists( projectRoot & "/bxdocs.json" ) ).toBeTrue();
+			} );
+
+			it( "dispatches `clean` after `new` and removes site/", function() {
+				var parent = newTempDir();
+				var projectRoot = parent & "/site";
+				moduleConfig.main( [ "new", projectRoot ] );
+				directoryCreate( projectRoot & "/site", true, true );
+
+				var exitCode = moduleConfig.main( [ "clean", projectRoot ] );
+
+				expect( exitCode ).toBe( 0 );
+				expect( directoryExists( projectRoot & "/site" ) ).toBeFalse();
+			} );
+
+			it( "returns exit code 1 when `build` runs against a project with no bxdocs.json", function() {
+				var parent = newTempDir();
+				var exitCode = moduleConfig.main( [ "build", parent ] );
+
+				expect( exitCode ).toBe( 1 );
+			} );
+
+			it( "strips matching surrounding quotes from a --key=`value` assignment, per BoxLang's own CLI convention", function() {
+				var parent = newTempDir();
+				var projectRoot = parent & "/site"
+
+				var exitCode = moduleConfig.main( [
+					"new",
+					"--projectRoot=#projectRoot#",
+					'--description="Hello World, quoted!"'
+				] );
+
+				expect( exitCode ).toBe( 0 );
+				var configSource = fileRead( projectRoot & "/bxdocs.json" );
+				expect( configSource ).toInclude( '"description": "Hello World, quoted!"' );
+			} );
+
+			it( "parses --no-{opt} / --!opt negation and combined -abc shorthand without breaking dispatch", function() {
+				var parent = newTempDir();
+				var projectRoot = parent & "/site"
+
+				var exitCode = moduleConfig.main( [
+					"new", "--projectRoot=#projectRoot#", "--debug", "--!verbose", "--no-color", "-abc"
+				] );
+
+				expect( exitCode ).toBe( 0 );
+				expect( fileExists( projectRoot & "/bxdocs.json" ) ).toBeTrue();
+			} );
+
+		} );
+	}
+
+}

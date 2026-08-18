@@ -1,0 +1,53 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.TableOfContents", function() {
+
+			beforeEach( function() {
+				variables.toc = new "models.build.TableOfContents@bxdocs"();
+			} );
+
+			it( "returns an empty array when there are no h2/h3 headings", function() {
+				var result = toc.build( "<h1 id=""title"">Title</h1><p>No sub-headings here.</p>" );
+				expect( result ).toBeArray();
+				expect( result.len() ).toBe( 0 );
+			} );
+
+			it( "extracts h2 and h3 headings with their id and text, in document order", function() {
+				var html = '<h1 id="page-title">Page Title</h1>' &
+					'<p>Intro</p>' &
+					'<h2 id="install">Install</h2>' &
+					'<p>...</p>' &
+					'<h3 id="prerequisites">Prerequisites</h3>' &
+					'<p>...</p>' &
+					'<h2 id="usage">Usage</h2>';
+
+				var result = toc.build( html );
+
+				expect( result.len() ).toBe( 3 );
+				expect( result[ 1 ] ).toBe( { level : 2, id : "install", text : "Install" } );
+				expect( result[ 2 ] ).toBe( { level : 3, id : "prerequisites", text : "Prerequisites" } );
+				expect( result[ 3 ] ).toBe( { level : 2, id : "usage", text : "Usage" } );
+			} );
+
+			it( "strips inline markup (e.g. <code>) from the heading text", function() {
+				var html = '<h2 id="the-bxdocs-json-file">The <code>bxdocs.json</code> file</h2>';
+
+				var result = toc.build( html );
+
+				expect( result[ 1 ].text ).toBe( "The bxdocs.json file" );
+			} );
+
+			it( "skips headings with no id (nothing to link to)", function() {
+				var html = '<h2>No Id Here</h2><h2 id="has-id">Has Id</h2>';
+
+				var result = toc.build( html );
+
+				expect( result.len() ).toBe( 1 );
+				expect( result[ 1 ].id ).toBe( "has-id" );
+			} );
+
+		} );
+	}
+
+}

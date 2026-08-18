@@ -1,0 +1,178 @@
+/**
+ * Builds a nested nav tree from a flat list of loaded pages - folder/file
+ * structure becomes nav structure (module spec section 5, step 3). A
+ * folder's own `index.md` becomes that folder's nav entry (its title, url
+ * and order); a folder with no `index.md` is still a group node, just with
+ * no link of its own. Hidden pages are excluded entirely - they are still
+ * built, just never linked from the nav.
+ */
+class {
+
+	/**
+	 * @pages The array of page structs from DocsLoader.load()
+	 *
+	 * @return Array of nav nodes, sorted by [order] then [title]: { title, url, order, children }
+	 */
+	array function build( required array pages ) {
+		var root = { children : {} }
+
+		for ( var page in arguments.pages ) {
+			if ( page.hidden ) {
+				continue
+			}
+			addPage( root, page )
+		}
+
+		// A root-level index.md (no parent folder) sets root.title/url/order
+		// directly in addPage() below, since - unlike a nested folder's own
+		// index.md - it has no children-map slot of its own to land in and
+		// be picked up by toSortedArray(). Splice it in under a key no real
+		// file/folder name can ever produce, so it sorts alongside its true
+		// top-level siblings instead of being silently dropped from the nav.
+		if ( len( root.url ?: "" ) ) {
+			root.children[ "" ] = { title : root.title, url : root.url, order : root.order, children : {} }
+		}
+
+		return toSortedArray( root.children )
+	}
+
+	/**
+	 * @root The synthetic root node (struct-keyed children map)
+	 * @page A single visible page struct
+	 */
+	private void function addPage( required struct root, required struct page ) {
+		var segments = listToArray( arguments.page.relativePath, "/" )
+		var fileName = segments[ segments.len() ]
+		var folders = segments.len() > 1 ? segments.slice( 1, segments.len() - 1 ) : []
+		var isIndex = compareNoCase( fileName.reReplaceNoCase( "\.md$", "" ), "index" ) == 0
+
+		var current = arguments.root
+		for ( var folderName in folders ) {
+			if ( !current.children.keyExists( folderName ) ) {
+				current.children[ folderName ] = { title : folderName, url : "", order : 999999, children : {} }
+			}
+			current = current.children[ folderName ]
+		}
+
+		if ( isIndex ) {
+			current.title = arguments.page.title
+			current.url   = arguments.page.urlPath
+			current.order = arguments.page.order
+		} else {
+			current.children[ fileName ] = {
+				title    : arguments.page.title,
+				url      : arguments.page.urlPath,
+				order    : arguments.page.order,
+				children : {}
+			}
+		}
+	}
+
+	/**
+	 * Recursively converts a struct-keyed children map into a sorted array.
+	 *
+	 * @childrenMap A struct mapping folder/file name -> node struct
+	 */
+	private array function toSortedArray( required struct childrenMap ) {
+		var nodes = []
+		for ( var key in arguments.childrenMap ) {
+			var node = arguments.childrenMap[ key ]
+			nodes.append( {
+				title    : node.title,
+				url      : node.url,
+				order    : node.order,
+				children : toSortedArray( node.children )
+			} )
+		}
+
+		nodes.sort( ( a, b ) => {
+			if ( a.order != b.order ) {
+				return a.order < b.order ? -1 : 1
+			}
+			return compareNoCase( a.title, b.title )
+		} )
+
+		return nodes
+	}
+
+	/**
+	 * Flattens a nav tree into the linear "reading order" used for prev/next
+	 * page links - a depth-first walk in the same sorted order `build()`
+	 * already established. Folder-group nodes with no `url` of their own
+	 * (no `index.md`) are skipped; their children are still visited.
+	 *
+	 * @nav A nav tree from build()
+	 *
+	 * @return Array of { title, url }, in reading order
+	 */
+	array function flatten( required array nav ) {
+		var flat = []
+		flattenInto( arguments.nav, flat )
+		return flat
+	}
+
+	/**
+	 * @nodes A nav tree (or subtree) to walk
+	 * @flat The accumulator array, appended to in place
+	 */
+	private void function flattenInto( required array nodes, required array flat ) {
+		for ( var node in arguments.nodes ) {
+			if ( len( node.url ) ) {
+				arguments.flat.append( { title : node.title, url : node.url } )
+			}
+			if ( node.children.len() ) {
+				flattenInto( node.children, arguments.flat )
+			}
+		}
+	}
+
+	/**
+	 * Finds the ancestor chain (root -> ... -> the page itself) for a given
+	 * page's url, for rendering breadcrumbs. Link-less folder-group nodes
+	 * are walked through but never appear in the returned chain themselves
+	 * (there's nothing to link to).
+	 *
+	 * @nav A nav tree from build()
+	 * @urlPath The page's own urlPath to find
+	 *
+	 * @return Array of { title, url }, root-first, ending with the page itself - empty if not found (e.g. a hidden page)
+	 */
+	array function breadcrumbs( required array nav, required string urlPath ) {
+		var path = []
+		findPath( arguments.nav, arguments.urlPath, path )
+		return path
+	}
+
+	/**
+	 * Backtracking depth-first search for `urlPath`, building `path` in
+	 * place as it descends and unwinding a branch once it's ruled out.
+	 *
+	 * @nodes A nav tree (or subtree) to search
+	 * @urlPath The page's own urlPath to find
+	 * @path The accumulator array, appended to (and unwound from) in place
+	 *
+	 * @return true once `urlPath` is found anywhere under `nodes`
+	 */
+	private boolean function findPath( required array nodes, required string urlPath, required array path ) {
+		for ( var node in arguments.nodes ) {
+			if ( len( node.url ) ) {
+				arguments.path.append( { title : node.title, url : node.url } )
+			}
+
+			if ( node.url == arguments.urlPath ) {
+				return true
+			}
+
+			if ( node.children.len() && findPath( node.children, arguments.urlPath, arguments.path ) ) {
+				return true
+			}
+
+			if ( len( node.url ) ) {
+				arguments.path.deleteAt( arguments.path.len() )
+			}
+		}
+
+		return false
+	}
+
+}

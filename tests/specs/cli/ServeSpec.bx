@@ -1,0 +1,25 @@
+/**
+ * `serve` runs in the foreground until interrupted (Ctrl+C) once it starts
+ * successfully, so its happy path isn't something a test suite can safely
+ * call directly - see DevServerSpec.bx for real coverage of the
+ * start/stop/rebuild logic this verb only drives.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.Serve", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.Serve@bxdocs"();
+			} );
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+		} );
+	}
+
+}

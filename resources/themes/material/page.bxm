@@ -1,0 +1,46 @@
+<bx:script>
+	function renderBreadcrumbs( required array crumbs ) {
+		if ( !arguments.crumbs.len() ) {
+			return ""
+		}
+		var html = '<nav class="md-breadcrumb" aria-label="breadcrumb"><ol>'
+		for ( var i = 1; i <= arguments.crumbs.len(); i++ ) {
+			var crumb = arguments.crumbs[ i ]
+			if ( i == arguments.crumbs.len() ) {
+				html &= '<li class="md-breadcrumb__item md-breadcrumb__item--active" aria-current="page">' & encodeForHTML( crumb.title ) & '</li>'
+			} else {
+				html &= '<li class="md-breadcrumb__item"><a href="' & variables.basePath & crumb.url & '">' & encodeForHTML( crumb.title ) & '</a></li>'
+			}
+		}
+		html &= '</ol></nav>'
+		return html
+	}
+
+	function renderToc( required array toc ) {
+		var html = '<nav class="md-toc" aria-label="On this page">'
+		html &= '<div class="md-toc__title">On this page</div><ul>'
+		for ( var item in arguments.toc ) {
+			html &= '<li class="md-toc__item md-toc__item--' & item.level & '"><a href="##' & item.id & '">' & encodeForHTML( item.text ) & '</a></li>'
+		}
+		html &= '</ul></nav>'
+		return html
+	}
+</bx:script>
+<bx:output>			<article class="md-card">
+</bx:output><bx:if condition="#variables.page.breadcrumbs.len() gt 1#"><bx:output>#renderBreadcrumbs( variables.page.breadcrumbs )#</bx:output></bx:if><bx:output>
+				<h1 class="md-title">#encodeForHTML( variables.page.title )#</h1>
+</bx:output><bx:if condition="#variables.page.toc.len() gt 0#"><bx:output>#renderToc( variables.page.toc )#</bx:output></bx:if><bx:output>
+				#variables.page.contentHtml#
+			</article>
+</bx:output><bx:if condition="#len( variables.page.prevPage.url ) or len( variables.page.nextPage.url )#"><bx:output>
+			<nav class="md-page-nav" aria-label="Page navigation">
+</bx:output><bx:if condition="#len( variables.page.prevPage.url )#"><bx:output>
+				<a class="md-page-nav__prev" href="#variables.basePath##variables.page.prevPage.url#">&larr; #encodeForHTML( variables.page.prevPage.title )#</a>
+</bx:output></bx:if><bx:if condition="#!len( variables.page.prevPage.url )#"><bx:output>
+				<span></span>
+</bx:output></bx:if><bx:if condition="#len( variables.page.nextPage.url )#"><bx:output>
+				<a class="md-page-nav__next" href="#variables.basePath##variables.page.nextPage.url#">#encodeForHTML( variables.page.nextPage.title )# &rarr;</a>
+</bx:output></bx:if><bx:output>
+			</nav>
+</bx:output></bx:if><bx:output>
+</bx:output>

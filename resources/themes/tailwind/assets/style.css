@@ -1,0 +1,108 @@
+/*
+ * Small overrides layered on top of the Tailwind Play CDN's utility classes
+ * (loaded inline in layout.bxm) - kept minimal since the theme is
+ * utility-class-driven, not stylesheet-driven. Dark-mode rules need
+ * !important since they must win over the CDN's own injected utility
+ * classes rather than a shared set of CSS custom properties.
+ */
+
+[x-cloak] {
+	display: none !important;
+}
+
+.theme-toggle {
+	background: transparent;
+	border: 1px solid rgba( 0, 0, 0, 0.2 );
+	border-radius: 6px;
+	font-size: 1.1rem;
+	line-height: 1;
+	padding: 0.35rem 0.6rem;
+	cursor: pointer;
+}
+
+.theme-toggle:hover {
+	background: rgba( 0, 0, 0, 0.08 );
+}
+
+[data-theme="dark"] body {
+	background: #14181c !important;
+	color: #e6edf3 !important;
+}
+
+[data-theme="dark"] #bxdocs-sidebar a {
+	color: #dce3ea !important;
+}
+
+[data-theme="dark"] article,
+[data-theme="dark"] .bxdocs-search-results {
+	background: #1b2027 !important;
+	color: #e6edf3 !important;
+}
+
+[data-theme="dark"] .prose {
+	color: #e6edf3 !important;
+}
+
+[data-theme="dark"] nav.mt-8,
+[data-theme="dark"] .ring-slate-200,
+[data-theme="dark"] .border-slate-200 {
+	border-color: rgba( 255, 255, 255, 0.12 ) !important;
+}
+
+.prose pre {
+	position: relative;
+}
+
+.bxdocs-copy-btn {
+	position: absolute;
+	top: 0.5rem;
+	right: 0.5rem;
+	font-size: 0.75rem;
+	padding: 0.2rem 0.5rem;
+	border-radius: 4px;
+	border: 1px solid rgba( 255, 255, 255, 0.25 );
+	background: rgba( 255, 255, 255, 0.1 );
+	color: inherit;
+	cursor: pointer;
+	opacity: 0;
+	transition: opacity 0.15s ease-in-out;
+}
+
+.bxdocs-pre:hover .bxdocs-copy-btn,
+.bxdocs-copy-btn:focus {
+	opacity: 1;
+}
+
+.prose :where(h2, h3, h4) {
+	font-weight: 700;
+	margin-top: 1.5em;
+}
+
+.prose pre {
+	border-radius: 0.5rem;
+}
+
+.bxdocs-search-results {
+	display: none;
+	list-style: none;
+	max-height: 320px;
+	overflow-y: auto;
+	padding: 0;
+}
+
+.bxdocs-search-results.bxdocs-search-open {
+	display: block;
+}
+
+.bxdocs-search-results a,
+.bxdocs-search-results .bxdocs-search-empty {
+	display: block;
+	padding: 0.5rem 0.75rem;
+	color: #1e293b;
+	text-decoration: none;
+	font-size: 0.875rem;
+}
+
+.bxdocs-search-results a:hover {
+	background: #ecfeff;
+}

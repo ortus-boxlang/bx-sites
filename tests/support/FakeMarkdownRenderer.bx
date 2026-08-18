@@ -1,0 +1,30 @@
+/**
+ * A deterministic stand-in for MarkdownRenderer.bx, used to test
+ * BuildPipeline.bx without a live bx-markdown module activation - see
+ * MarkdownRenderer.bx's docblock for why the real one can't be unit tested
+ * directly.
+ */
+class {
+
+	/**
+	 * Wraps each non-blank line in its own `<p>`, and records every call so
+	 * tests can assert what the pipeline actually asked to be converted
+	 * (body text, and the passthrough options it was given).
+	 */
+	variables.calls = []
+
+	string function toHtml( required string markdown, struct options = {} ) {
+		variables.calls.append( { markdown : arguments.markdown, options : arguments.options } )
+
+		var lines = listToArray( arguments.markdown, char( 10 ), true )
+			.filter( line => len( trim( line ) ) )
+			.map( line => "<p>" & trim( line ) & "</p>" )
+
+		return lines.toList( "" )
+	}
+
+	array function getCalls() {
+		return variables.calls
+	}
+
+}

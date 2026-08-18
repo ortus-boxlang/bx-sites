@@ -1,0 +1,353 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.BuildPipeline", function() {
+
+			beforeEach( function() {
+				variables.pipeline = new "models.build.BuildPipeline@bxdocs"();
+				variables.fakeMarkdown = new "tests.support.FakeMarkdownRenderer@bxdocs"();
+				pipeline.setMarkdownRenderer( fakeMarkdown );
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newProject( string themeName = "bootstrap" ) {
+				var dir = createTempDirectory( prefix = "bxdocs-buildpipeline-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite(
+					dir & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"' & themeName & '"}}'
+				);
+				return dir;
+			}
+
+			it( "builds a single page site end to end", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Welcome home" );
+
+				var result = pipeline.build( root );
+
+				expect( result.pageCount ).toBe( 1 );
+				expect( result.siteDir ).toBe( root & "/site" );
+				expect( fileExists( root & "/site/index.html" ) ).toBeTrue();
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "Test Site" );
+				expect( html ).toInclude( "<p>Welcome home</p>" );
+			} );
+
+			it( "builds nested pages at their pretty-URL paths and links them in the nav", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/guides", true, true );
+				fileWrite( root & "/docs/guides/setup.md", "---" & char( 10 ) & "title: Setup" & char( 10 ) & "---" & char( 10 ) & "Setup body" );
+
+				var result = pipeline.build( root );
+
+				expect( result.pageCount ).toBe( 2 );
+				expect( fileExists( root & "/site/guides/setup/index.html" ) ).toBeTrue();
+
+				var homeHtml = fileRead( root & "/site/index.html" );
+				expect( homeHtml ).toInclude( 'href="/guides/setup/index.html"' );
+				expect( homeHtml ).toInclude( 'href="/index.html"' );
+			} );
+
+			it( "passes bxdocs.json's markdown options through to the markdown renderer", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"markdown":{"anchorLinks":false}}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				var calls = fakeMarkdown.getCalls();
+				expect( calls.len() ).toBe( 1 );
+				expect( calls[ 1 ].options.anchorLinks ).toBeFalse();
+			} );
+
+			it( "builds end to end with the material and tailwind themes too", function() {
+				for ( var themeName in [ "material", "tailwind" ] ) {
+					var root = newProject( themeName );
+					fileWrite( root & "/docs/index.md", "Welcome home" );
+
+					var result = pipeline.build( root );
+
+					expect( result.pageCount ).toBe( 1 );
+					var html = fileRead( root & "/site/index.html" );
+					expect( html ).toInclude( "<p>Welcome home</p>" );
+					expect( fileExists( root & "/site/assets/theme/style.css" ) ).toBeTrue();
+				}
+			} );
+
+			it( "copies theme assets to site/assets/theme and docs/assets to site/assets", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/assets", true, true );
+				fileWrite( root & "/docs/assets/logo.svg", "<svg></svg>" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/assets/theme/style.css" ) ).toBeTrue();
+				expect( fileExists( root & "/site/assets/logo.svg" ) ).toBeTrue();
+			} );
+
+			it( "excludes hidden pages from the nav but still builds them", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				fileWrite( root & "/docs/secret.md", "---" & char( 10 ) & "title: Secret" & char( 10 ) & "hidden: true" & char( 10 ) & "---" & char( 10 ) & "Shh" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/secret/index.html" ) ).toBeTrue();
+				var homeHtml = fileRead( root & "/site/index.html" );
+				expect( homeHtml ).notToInclude( "Secret" );
+			} );
+
+			it( "removes a previous site/ before rebuilding", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/site/stale", true, true );
+				fileWrite( root & "/site/stale/old.html", "old" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/stale/old.html" ) ).toBeFalse();
+				expect( fileExists( root & "/site/index.html" ) ).toBeTrue();
+			} );
+
+			it( "builds search-index.json and copies the shared search.js widget when search is enabled (the default)", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "title: Home" & char( 10 ) & "---" & char( 10 ) & "Welcome home" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/search-index.json" ) ).toBeTrue();
+				expect( fileExists( root & "/site/assets/search.js" ) ).toBeTrue();
+
+				var index = jsonDeserialize( fileRead( root & "/site/search-index.json" ) );
+				expect( index.len() ).toBe( 1 );
+				expect( index[ 1 ].title ).toBe( "Home" );
+				expect( index[ 1 ].url ).toBe( "index.html" );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "bxdocs-search-input" );
+				expect( html ).toInclude( "lunr" );
+			} );
+
+			it( "skips the search index, search.js and search UI when search is disabled", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"search":false}'
+				);
+				fileWrite( root & "/docs/index.md", "Welcome home" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/search-index.json" ) ).toBeFalse();
+				expect( fileExists( root & "/site/assets/search.js" ) ).toBeFalse();
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).notToInclude( "bxdocs-search-input" );
+				expect( html ).notToInclude( "lunr" );
+			} );
+
+			it( "excludes hidden pages from the search index too", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				fileWrite( root & "/docs/secret.md", "---" & char( 10 ) & "title: Secret" & char( 10 ) & "hidden: true" & char( 10 ) & "---" & char( 10 ) & "Shh" );
+
+				pipeline.build( root );
+
+				var index = jsonDeserialize( fileRead( root & "/site/search-index.json" ) );
+				expect( index.len() ).toBe( 1 );
+				expect( index[ 1 ].title ).notToBe( "Secret" );
+			} );
+
+			it( "buildSearchIndex() writes just site/search-index.json, without rendering pages or copying assets", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "title: Home" & char( 10 ) & "---" & char( 10 ) & "Welcome home" );
+
+				var result = pipeline.buildSearchIndex( root );
+
+				expect( result.skipped ).toBeFalse();
+				expect( result.pageCount ).toBe( 1 );
+				expect( result.indexPath ).toBe( root & "/site/search-index.json" );
+				expect( fileExists( root & "/site/search-index.json" ) ).toBeTrue();
+				expect( fileExists( root & "/site/index.html" ) ).toBeFalse();
+				expect( fileExists( root & "/site/assets/theme/style.css" ) ).toBeFalse();
+
+				var index = jsonDeserialize( fileRead( root & "/site/search-index.json" ) );
+				expect( index[ 1 ].title ).toBe( "Home" );
+			} );
+
+			it( "buildSearchIndex() reports skipped without writing anything when search is disabled", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"search":false}'
+				);
+				fileWrite( root & "/docs/index.md", "Welcome home" );
+
+				var result = pipeline.buildSearchIndex( root );
+
+				expect( result.skipped ).toBeTrue();
+				expect( fileExists( root & "/site/search-index.json" ) ).toBeFalse();
+			} );
+
+			it( "renders an in-page table of contents from the page's own headings", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", '<h2 id="install">Install</h2>' & char( 10 ) & '<h3 id="prereqs">Prereqs</h3>' );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "On this page" );
+				expect( html ).toInclude( 'href="##install"' );
+				expect( html ).toInclude( ">Install<" );
+				expect( html ).toInclude( 'href="##prereqs"' );
+			} );
+
+			it( "links prev/next pages in nav reading order", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "title: Home" & char( 10 ) & "order: 1" & char( 10 ) & "---" & char( 10 ) & "Home body" );
+				fileWrite( root & "/docs/middle.md", "---" & char( 10 ) & "title: Middle" & char( 10 ) & "order: 2" & char( 10 ) & "---" & char( 10 ) & "Middle body" );
+				fileWrite( root & "/docs/last.md", "---" & char( 10 ) & "title: Last" & char( 10 ) & "order: 3" & char( 10 ) & "---" & char( 10 ) & "Last body" );
+
+				pipeline.build( root );
+
+				var homeHtml = fileRead( root & "/site/index.html" );
+				expect( homeHtml ).notToInclude( "page-nav__prev" );
+				expect( homeHtml ).toInclude( "Middle" );
+
+				var middleHtml = fileRead( root & "/site/middle/index.html" );
+				expect( middleHtml ).toInclude( "Home" );
+				expect( middleHtml ).toInclude( "Last" );
+
+				var lastHtml = fileRead( root & "/site/last/index.html" );
+				expect( lastHtml ).toInclude( "Middle" );
+				expect( lastHtml ).notToInclude( "page-nav__next" );
+			} );
+
+			it( "writes a themed 404.html", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/404.html" ) ).toBeTrue();
+				var html = fileRead( root & "/site/404.html" );
+				expect( html ).toInclude( "Page Not Found" );
+				expect( html ).toInclude( "Test Site" );
+			} );
+
+			it( "throws BxDocs.ConfigNotFound when the project has no bxdocs.json", function() {
+				var root = createTempDirectory( prefix = "bxdocs-buildpipeline-noconfig-" );
+				tempDirs.append( root );
+				directoryCreate( root & "/docs", true, true );
+
+				expect( function() {
+					pipeline.build( root );
+				} ).toThrow( "BxDocs.ConfigNotFound" );
+			} );
+
+			it( "prefixes every internal link with a path-only baseURL override", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"my-docs"}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/guides", true, true );
+				fileWrite( root & "/docs/guides/setup.md", "---" & char( 10 ) & "title: Setup" & char( 10 ) & "---" & char( 10 ) & "Setup body" );
+
+				pipeline.build( root );
+
+				var homeHtml = fileRead( root & "/site/index.html" );
+				expect( homeHtml ).toInclude( 'href="/my-docs/guides/setup/index.html"' );
+				expect( homeHtml ).toInclude( 'href="/my-docs/assets/theme/style.css"' );
+			} );
+
+			it( "writes sitemap.xml with absolute URLs only when baseURL is a full URL", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"https://docs.example.com/"}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/sitemap.xml" ) ).toBeTrue();
+				var xml = fileRead( root & "/site/sitemap.xml" );
+				expect( xml ).toInclude( "<loc>https://docs.example.com/index.html</loc>" );
+			} );
+
+			it( "skips sitemap.xml when baseURL has no absolute URL", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/sitemap.xml" ) ).toBeFalse();
+			} );
+
+			it( "always writes llms.txt, falling back to basePath when baseURL has no absolute URL", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "title: Home" & char( 10 ) & "---" & char( 10 ) & "Welcome" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/llms.txt" ) ).toBeTrue();
+				var txt = fileRead( root & "/site/llms.txt" );
+				expect( txt ).toInclude( "Test Site" );
+				expect( txt ).toInclude( "(/index.html)" );
+			} );
+
+			it( "copies the shared copy-code.js widget regardless of whether search is enabled", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"search":false}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/assets/copy-code.js" ) ).toBeTrue();
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "assets/copy-code.js" );
+			} );
+
+			it( "renders breadcrumbs for a nested page under a linked ancestor but not for a top-level page", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/guides", true, true );
+				fileWrite( root & "/docs/guides/index.md", "---" & char( 10 ) & "title: Guides" & char( 10 ) & "---" & char( 10 ) & "Guides body" );
+				fileWrite( root & "/docs/guides/setup.md", "---" & char( 10 ) & "title: Setup" & char( 10 ) & "---" & char( 10 ) & "Setup body" );
+
+				pipeline.build( root );
+
+				var homeHtml = fileRead( root & "/site/index.html" );
+				expect( homeHtml ).notToInclude( "breadcrumb-nav" );
+
+				var setupHtml = fileRead( root & "/site/guides/setup/index.html" );
+				expect( setupHtml ).toInclude( "breadcrumb-nav" );
+				expect( setupHtml ).toInclude( ">Guides<" );
+				expect( setupHtml ).toInclude( ">Setup<" );
+			} );
+
+		} );
+	}
+
+}

@@ -1,0 +1,81 @@
+/**
+ * Splits a markdown file's raw content into frontmatter + body. This is
+ * deliberately a small `key: value` block parser, not full YAML - module
+ * spec section 5 only needs `title`, `order` and `hidden` out of it.
+ */
+class {
+
+	/**
+	 * @content The raw file content, frontmatter block included if present
+	 *
+	 * @return { frontmatter: struct, body: string }
+	 */
+	struct function parse( required string content ) {
+		var normalized = arguments.content.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" )
+		var lines = listToArray( normalized, char( 10 ), true )
+
+		if ( !lines.len() || trim( lines[ 1 ] ) != "---" ) {
+			return { frontmatter : {}, body : arguments.content }
+		}
+
+		var closingIndex = 0
+		for ( var i = 2; i <= lines.len(); i++ ) {
+			if ( trim( lines[ i ] ) == "---" ) {
+				closingIndex = i
+				break
+			}
+		}
+
+		if ( !closingIndex ) {
+			return { frontmatter : {}, body : arguments.content }
+		}
+
+		var frontmatter = {}
+		for ( var i = 2; i < closingIndex; i++ ) {
+			var trimmedLine = trim( lines[ i ] )
+			if ( !len( trimmedLine ) ) {
+				continue
+			}
+			var colonPos = trimmedLine.find( ":" )
+			if ( !colonPos ) {
+				continue
+			}
+			var key = trim( trimmedLine.left( colonPos - 1 ) )
+			var value = trim( trimmedLine.right( len( trimmedLine ) - colonPos ) )
+			frontmatter[ key ] = coerce( value )
+		}
+
+		var bodyLines = []
+		for ( var i = closingIndex + 1; i <= lines.len(); i++ ) {
+			bodyLines.append( lines[ i ] )
+		}
+
+		return { frontmatter : frontmatter, body : bodyLines.toList( char( 10 ) ) }
+	}
+
+	/**
+	 * Coerces a raw frontmatter scalar value: quoted strings unwrap, `true`/`false`
+	 * become booleans, numeric-looking values become numbers, everything else
+	 * stays a string.
+	 *
+	 * @value The raw (already-trimmed) value text
+	 */
+	private any function coerce( required string value ) {
+		var v = arguments.value
+
+		if ( len( v ) >= 2 && ( ( v.left( 1 ) == '"' && v.right( 1 ) == '"' ) || ( v.left( 1 ) == "'" && v.right( 1 ) == "'" ) ) ) {
+			return v.mid( 2, len( v ) - 2 )
+		}
+		if ( v == "true" ) {
+			return true
+		}
+		if ( v == "false" ) {
+			return false
+		}
+		if ( isNumeric( v ) ) {
+			return val( v )
+		}
+		return v
+	}
+
+}

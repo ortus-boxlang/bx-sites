@@ -1,0 +1,93 @@
+/**
+ * Walks a project's `docs/` directory and loads every `.md` file into a
+ * page struct: frontmatter applied, a pretty-URL output path computed, and
+ * `docs/assets/**` excluded (that tree is copied verbatim by the asset
+ * pipeline instead - module spec section 5, step 1).
+ */
+class {
+
+	variables.frontmatterParser = new "models.build.FrontmatterParser@bxdocs"()
+
+	/**
+	 * @docsDir Absolute path to the project's docs/ directory
+	 *
+	 * @return Array of page structs, sorted by [order] then [title]: { relativePath, sourcePath, urlPath, title, order, hidden, body }
+	 */
+	array function load( required string docsDir ) {
+		var dir = arguments.docsDir.reReplace( "[\/]+$", "" )
+
+		if ( !directoryExists( dir ) ) {
+			throw( type = "BxDocs.DocsDirNotFound", message = "No docs/ directory found at [#dir#]" )
+		}
+
+		var pages = directoryList( dir, true, "path", "*.md" )
+			.filter( path => !path.reReplace( dir, "", "one" ).reFindNoCase( "^[\/]assets[\/]" ) )
+			.map( path => loadFile( dir, path ) )
+
+		pages.sort( ( a, b ) => {
+			if ( a.order != b.order ) {
+				return a.order < b.order ? -1 : 1
+			}
+			return compareNoCase( a.title, b.title )
+		} )
+
+		return pages
+	}
+
+	/**
+	 * @docsDir Absolute path to the project's docs/ directory
+	 * @filePath Absolute path to the .md file being loaded
+	 */
+	private struct function loadFile( required string docsDir, required string filePath ) {
+		var relativePath = arguments.filePath.reReplace( arguments.docsDir, "", "one" ).reReplace( "^[\/]", "" )
+		var parsed = variables.frontmatterParser.parse( fileRead( arguments.filePath ) )
+		var fm = parsed.frontmatter
+
+		return {
+			relativePath : relativePath,
+			sourcePath   : arguments.filePath,
+			urlPath      : urlPathFor( relativePath ),
+			title        : len( trim( fm.title ?: "" ) ) ? fm.title : titleFromFileName( relativePath ),
+			order        : isNumeric( fm.order ?: "" ) ? val( fm.order ) : 999999,
+			hidden       : ( fm.hidden ?: false ) ? true : false,
+			body         : parsed.body
+		}
+	}
+
+	/**
+	 * Converts a docs/-relative `.md` path into its pretty-URL output path:
+	 * `index.md` stays `index.html` at the same folder depth; any other
+	 * `name.md` becomes `name/index.html`, so the page serves at `/name/`.
+	 *
+	 * @relativePath The docs/-relative source path, e.g. "guides/setup.md"
+	 */
+	private string function urlPathFor( required string relativePath ) {
+		var segments = listToArray( arguments.relativePath, "/" )
+		var baseName = segments[ segments.len() ].reReplaceNoCase( "\.md$", "" )
+		segments.deleteAt( segments.len() )
+
+		if ( compareNoCase( baseName, "index" ) == 0 ) {
+			segments.append( "index.html" )
+		} else {
+			segments.append( baseName )
+			segments.append( "index.html" )
+		}
+
+		return segments.toList( "/" )
+	}
+
+	/**
+	 * Derives a fallback title from a page's filename when frontmatter has none:
+	 * `getting-started.md` -> "Getting Started".
+	 *
+	 * @relativePath The docs/-relative source path
+	 */
+	private string function titleFromFileName( required string relativePath ) {
+		var segments = listToArray( arguments.relativePath, "/" )
+		var baseName = segments[ segments.len() ].reReplaceNoCase( "\.md$", "" )
+		return baseName
+			.reReplace( "[-_]", " ", "all" )
+			.reReplace( "\b(\w)", "\U\1", "all" )
+	}
+
+}

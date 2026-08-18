@@ -17,3 +17,7 @@ bin/**
 testbox/**
 tests/results/**
 .agents/skills/**
+
+# This module's own dogfooded docs build output (see docs/, bxdocs.json)
+/site/
+/.cache/

@@ -1,0 +1,45 @@
+/**
+ * `new` CLI verb - thin dispatcher over ProjectScaffolder. CLI-agnostic:
+ * takes an already-parsed options struct (see ModuleConfig.bx's main()),
+ * never touches raw argv or the current working directory itself.
+ */
+class {
+
+	/**
+	 * The theme names this module ships built-in support for (module spec section 6).
+	 */
+	variables.builtInThemes = [ "bootstrap", "material", "tailwind" ]
+
+	/**
+	 * @options { projectRoot (required, absolute path), name, theme (defaults to "bootstrap"), description }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxDocs.MissingProjectRoot", message = "`new` requires a target directory" )
+		}
+
+		var theme = trim( len( arguments.options.theme ?: "" ) ? arguments.options.theme : "bootstrap" )
+		if ( !variables.builtInThemes.contains( theme ) ) {
+			throw(
+				type    = "BxDocs.UnknownTheme",
+				message = "Unknown theme [#theme#] - must be one of [#variables.builtInThemes.toList( ', ' )#]"
+			)
+		}
+
+		var name = trim( arguments.options.name ?: "" )
+		if ( !len( name ) ) {
+			var segments = listToArray( projectRoot.reReplace( "[\/]+$", "" ), "/" )
+			name = segments.len() ? segments[ segments.len() ] : "bx-docs-site"
+		}
+
+		var scaffolder = new "models.build.ProjectScaffolder@bxdocs"()
+		var result = scaffolder.scaffold( projectRoot, name, theme, arguments.options.description ?: "" )
+
+		return {
+			exitCode : 0,
+			message  : "Created new BX Docs project [#name#] at #result.projectRoot# (theme: #theme#)"
+		}
+	}
+
+}

@@ -1,0 +1,34 @@
+/**
+ * `clean` CLI verb - recursively removes a project's `site/` build output
+ * and `.cache/` directories, without touching anything else (docs/,
+ * bxdocs.json, theme/, etc. are never touched).
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxDocs.MissingProjectRoot", message = "`clean` requires a project root" )
+		}
+
+		var root = projectRoot.reReplace( "[\/]+$", "" )
+		var removed = []
+
+		for ( var folder in [ "site", ".cache" ] ) {
+			var path = root & "/" & folder
+			if ( directoryExists( path ) ) {
+				directoryDelete( path, true )
+				removed.append( folder )
+			}
+		}
+
+		return {
+			exitCode : 0,
+			message  : removed.len() ? "Removed: #removed.toList( ', ' )#" : "Nothing to clean"
+		}
+	}
+
+}

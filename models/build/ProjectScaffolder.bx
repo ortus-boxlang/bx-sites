@@ -1,0 +1,111 @@
+/**
+ * Scaffolds a new bx-docs project skeleton - the `new` CLI verb's real
+ * implementation: a `docs/` folder with a starter `index.md`, and a
+ * `bxdocs.json` site config defaulted to the requested (or bootstrap)
+ * theme (module spec sections 3, 4 and 6).
+ */
+class {
+
+	/**
+	 * @targetDir Absolute path to the new project directory (created if missing; refuses to run if it already contains a bxdocs.json)
+	 * @name The site name written into bxdocs.json
+	 * @theme The built-in theme name to default the project to
+	 * @description Optional site description
+	 *
+	 * @return { projectRoot, configPath, indexPath }
+	 */
+	struct function scaffold(
+		required string targetDir,
+		required string name,
+		required string theme,
+		string description = ""
+	) {
+		var dir = arguments.targetDir.reReplace( "[\/]+$", "" )
+		var configPath = dir & "/bxdocs.json"
+
+		if ( fileExists( configPath ) ) {
+			throw(
+				type    = "BxDocs.ProjectAlreadyExists",
+				message = "[#dir#] already contains a bxdocs.json - refusing to overwrite an existing project"
+			)
+		}
+
+		directoryCreate( path = dir, createPath = true, ignoreExists = true )
+		directoryCreate( path = dir & "/docs", createPath = true, ignoreExists = true )
+		directoryCreate( path = dir & "/docs/assets", createPath = true, ignoreExists = true )
+
+		var indexPath = dir & "/docs/index.md"
+		fileWrite( indexPath, renderIndexMd( arguments.name ) )
+
+		fileWrite( configPath, renderConfig( arguments.name, arguments.theme, arguments.description ) )
+
+		return {
+			projectRoot : dir,
+			configPath  : configPath,
+			indexPath   : indexPath
+		}
+	}
+
+	/**
+	 * @name The site name
+	 * @theme The default theme name
+	 * @description The site description
+	 *
+	 * @return The rendered bxdocs.json source
+	 */
+	private string function renderConfig( required string name, required string theme, required string description ) {
+		var lines = [
+			"{",
+			'	"name": "#jsonEscape( arguments.name )#",',
+			'	"description": "#jsonEscape( arguments.description )#",',
+			'	"baseURL": "/",',
+			'	"theme": {',
+			'		"name": "#jsonEscape( arguments.theme )#",',
+			'		"options": {}',
+			"	},",
+			'	"search": true,',
+			'	"nav": [],',
+			'	"markdown": {}',
+			"}",
+			""
+		]
+		return lines.toList( char( 10 ) )
+	}
+
+	/**
+	 * Escapes a plain string for embedding as a JSON string value.
+	 *
+	 * @value The raw value to escape
+	 */
+	private string function jsonEscape( required string value ) {
+		return arguments.value
+			.replace( char( 92 ), char( 92 ) & char( 92 ), "all" )
+			.replace( '"', char( 92 ) & '"', "all" )
+			.replace( char( 10 ), char( 92 ) & "n", "all" )
+			.replace( char( 13 ), char( 92 ) & "r", "all" )
+			.replace( char( 9 ), char( 92 ) & "t", "all" )
+	}
+
+	/**
+	 * @name The site name, used as the starter page's H1
+	 *
+	 * @return The rendered docs/index.md source
+	 */
+	private string function renderIndexMd( required string name ) {
+		var lines = [
+			"---",
+			"title: Home",
+			"order: 1",
+			"---",
+			"",
+			"## #arguments.name#",
+			"",
+			"Welcome to your new documentation site. Edit this page at `docs/index.md`,",
+			"and add more `.md` files under `docs/` - folder and file nesting becomes",
+			"the site navigation automatically.",
+			""
+		]
+		return lines.toList( char( 10 ) )
+	}
+
+}

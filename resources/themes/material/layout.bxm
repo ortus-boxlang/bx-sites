@@ -1,0 +1,77 @@
+<bx:script>
+	/**
+	 * Recursively renders a nav tree (module spec section 5, step 4) as a
+	 * nested Material-style list. A node with no `url` (a folder with no
+	 * `index.md`) renders as a section heading instead of a link.
+	 */
+	function renderNavList( required array nodes, boolean nested = false ) {
+		var html = "<ul class=""md-nav" & ( arguments.nested ? " md-nav--nested" : "" ) & """>"
+		for ( var node in arguments.nodes ) {
+			html &= "<li class=""md-nav__item"">"
+			if ( len( node.url ) ) {
+				html &= "<a class=""md-nav__link"" href=""" & variables.basePath & node.url & """>" & encodeForHTML( node.title ) & "</a>"
+			} else {
+				html &= "<span class=""md-nav__heading"">" & encodeForHTML( node.title ) & "</span>"
+			}
+			if ( node.children.len() ) {
+				html &= renderNavList( node.children, true )
+			}
+			html &= "</li>"
+		}
+		html &= "</ul>"
+		return html
+	}
+
+	// module spec section 7 - search is fully static/client-side and opt-out via bxdocs.json
+	variables.searchEnabled = ( variables.siteConfig.search ?: false ) ? true : false
+</bx:script>
+<bx:output><!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#</title>
+	<script>
+		( function () {
+			var stored = localStorage.getItem( "bxdocs-theme" );
+			var prefersDark = window.matchMedia( "(prefers-color-scheme: dark)" ).matches;
+			if ( stored === "dark" || ( !stored && prefersDark ) ) {
+				document.documentElement.setAttribute( "data-theme", "dark" );
+			}
+		} )();
+	</script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
+	<link rel="stylesheet" href="#variables.basePath#assets/theme/style.css">
+</bx:output><bx:if condition="#variables.searchEnabled#"><bx:output>
+	<script>window.__BXDOCS_BASE_PATH__ = "#variables.basePath#";</script>
+	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
+	<script src="#variables.basePath#assets/search.js" defer></script>
+</bx:output></bx:if><bx:output>
+	<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+</head>
+<body class="md-body" x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxdocs-theme', v ? 'dark' : 'light' ) } )">
+	<header class="md-header">
+		<button class="md-nav-toggle" type="button" aria-controls="bxdocs-sidebar" aria-label="Toggle navigation" onclick="document.getElementById('bxdocs-sidebar').classList.toggle('md-sidebar--open')">☰</button>
+		<a class="md-header__brand" href="#variables.basePath#">⚡ #encodeForHTML( variables.siteConfig.name )#</a>
+		<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="Toggle dark mode">
+			<span x-show="!dark">&##127769;</span>
+			<span x-show="dark" x-cloak>&##9728;&##65039;</span>
+		</button>
+</bx:output><bx:if condition="#variables.searchEnabled#"><bx:include template="#variables.themeDir#/search.bxm"></bx:if><bx:output>
+	</header>
+	<div class="md-layout">
+		<nav class="md-sidebar" id="bxdocs-sidebar" aria-label="Navigation">
+			#renderNavList( variables.nav )#
+		</nav>
+		<main class="md-content">
+</bx:output><bx:include template="#variables.themeDir#/page.bxm"><bx:output>
+		</main>
+	</div>
+	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+	<script>hljs.highlightAll();</script>
+	<script src="#variables.basePath#assets/copy-code.js" defer></script>
+</body>
+</html>
+</bx:output>

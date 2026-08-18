@@ -1,4 +1,4 @@
-# ⚡︎ @MODULE_NAME@
+# ⚡︎ BX Docs
 
 ```
 |:------------------------------------------------------:|
@@ -16,17 +16,29 @@
 
 <p>&nbsp;</p>
 
-@MODULE_DESCRIPTION@
+Static documentation site generator for BoxLang, built on bx-markdown.
 
 ----
 
-This template can be used to create Ortus based BoxLang Modules written in BoxLang. To use, just click the `Use this Template` button in the github repository: https://github.com/ortus-boxlang/boxlang-module-template-bx and run the setup task from where you cloned it.
+## Usage
 
 ```bash
-boxlang SetupTemplate.bx
+boxlang module:bxDocs <verb> [options]
 ```
 
-The `SetupTemplate` task will ask you for your module name, id and description and configure the template for you! Enjoy!
+| Verb | Purpose |
+|---|---|
+| `new` | Scaffold a docs project (`docs/` + `bxdocs.json`, defaulting to the `bootstrap` theme) |
+| `build` | Render `docs/**.md` into a static site in `site/`, including the search index and assets. Needs [bx-markdown](https://github.com/ortus-boxlang/bx-markdown) installed |
+| `serve` | Build and serve the site locally with live reload (needs bx-markdown too) |
+| `search-index` | Rebuild `site/search-index.json` standalone (also runs automatically during `build`) |
+| `clean` | Remove `site/` and any build cache |
+
+Every verb accepts `--projectRoot=<path>` (or a bare positional path) to target a project other than the current directory. Run `boxlang module:bxDocs --help` for full usage.
+
+This repository documents itself with BX Docs - see `bxdocs.json` and `docs/` at the repo root, and [CLI Reference](docs/cli-reference.md) / [Configuration](docs/configuration.md) for the full reference docs. See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's development.
+
+Those docs auto-publish to GitHub Pages via `.github/workflows/pages.yml` on every push to `development` that touches `docs/`, `bxdocs.json`, or the module's own source - see [Deploying to GitHub Pages](docs/guides/deployment.md). One-time setup: **Settings -> Pages -> Source: GitHub Actions**.
 
 ## Install Skills
 
@@ -47,6 +59,10 @@ Here is a brief overview of the directory structure:
 - `bifs` - Where you can code Built in Functions for BoxLang
 - `components` - Where you can code BoxLang components
 - `interceptors` - Where you can code BoxLang interceptors
+- `models` - The module's own source classes: `models/cli` (one dispatcher per `bxDocs` verb), `models/config` (bxdocs.json loader/validator), `models/build` (project scaffolding + the docs/nav/markdown/theme build pipeline)
+- `resources/themes` - Built-in themes (native BoxLang `.bxm` templates + assets): `bootstrap` (default), `material`, `tailwind` - all with the BoxLang brand palette applied. A project can override any of them via its own `theme/` folder (same `layout.bxm` + `page.bxm` contract)
+- `resources/assets` - Module-wide shared assets (currently just the client-side search widget, `search.js`)
+- `docs` / `bxdocs.json` - This repository's own docs, built by BX Docs itself (`boxlang module:bxDocs build`) - see [Getting Started](docs/getting-started.md)
 - `lib` - Place any Jar's or classes for your module that will be class loaded for you
 - `.cfformat.json` - A format config using the Ortus Standards
 - `.editorconfig` - Smooth consistency between editors
@@ -78,7 +94,8 @@ boxlang Build.bx --version=1.1.0
 ## Running Tests
 
 1. With CommandBox installed, install testbox: `box install`
-2. With the Boxlang CLI installed, run tests using `./testbox/run`
+2. Register the module so BoxLang can resolve its `bxdocs.*` source classes: `mkdir -p ~/.boxlang/modules && ln -s "$(pwd)" ~/.boxlang/modules/"$(basename "$(pwd)")"` (already done for you in CI - see `.github/workflows/tests.yml`)
+3. With the BoxLang CLI installed, run tests using `./testbox/run`
 
 ## Version Management
 

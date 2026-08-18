@@ -45,8 +45,8 @@ jobs:
 
       - name: Test Module
         run: |
-          mkdir -p ${GITHUB_WORKSPACE}/.boxlang/modules
-          ln -s "$(pwd)" ${GITHUB_WORKSPACE}/.boxlang/modules/"$(basename "$(pwd)")"
+          mkdir -p ${HOME}/.boxlang/modules
+          ln -s "$(pwd)" ${HOME}/.boxlang/modules/"$(basename "$(pwd)")"
 
       - name: Run Tests
         run: |

@@ -1,0 +1,196 @@
+/**
+ * Backs the `serve` CLI verb (module spec section 2 - "Build + serve
+ * locally with live reload"). Serves a project's `site/` over a plain JDK
+ * `com.sun.net.httpserver.SimpleFileServer` (no external server binary or
+ * compiled Java needed - just JDK interop, consistent with this module
+ * staying BoxLang-first), and supports polling-based live reload: every
+ * rebuilt page gets a small injected script that polls a `/__bxdocs/version`
+ * endpoint and reloads the browser when the served build version changes.
+ *
+ * `start()`/`stop()`/`checkAndRebuild()` are the real, independently
+ * testable surface. The "watch forever" loop itself belongs to the CLI verb
+ * (Serve.bx), since blocking there - not here - is what keeps this class
+ * testable without hanging a test run.
+ */
+class {
+
+	variables.buildPipeline = new "models.build.BuildPipeline@bxdocs"()
+	variables.projectRoot   = ""
+	variables.fileFingerprint = { count : 0, maxModified : 0 }
+	variables.buildVersion  = 0
+	variables.started       = false
+
+	/**
+	 * Swaps in a fake/test markdown renderer, forwarded straight to the
+	 * underlying BuildPipeline - see MarkdownRenderer.bx's docblock for why
+	 * this seam exists.
+	 *
+	 * @renderer Any object exposing `toHtml( markdown, options = {} )`
+	 */
+	void function setMarkdownRenderer( required any renderer ) {
+		variables.buildPipeline.setMarkdownRenderer( arguments.renderer )
+	}
+
+	/**
+	 * Builds the project, starts the static file server, and injects the
+	 * live-reload poller into the freshly built pages.
+	 *
+	 * @projectRoot Absolute path to the project root
+	 * @port TCP port to listen on (0 lets the OS pick a free port)
+	 * @host Host/interface to bind to
+	 *
+	 * @return { url, port }
+	 */
+	struct function start( required string projectRoot, numeric port = 8080, string host = "127.0.0.1" ) {
+		variables.projectRoot = arguments.projectRoot.reReplace( "[\/]+$", "" )
+
+		rebuild()
+
+		var addr = createObject( "java", "java.net.InetSocketAddress" ).init( arguments.host, javaCast( "int", arguments.port ) )
+		var rootPath = createObject( "java", "java.nio.file.Paths" ).get( variables.projectRoot & "/site", [] )
+		var outputLevel = createObject( "java", "com.sun.net.httpserver.SimpleFileServer$OutputLevel" ).NONE
+
+		variables.httpServer = createObject( "java", "com.sun.net.httpserver.SimpleFileServer" ).createFileServer( addr, rootPath, outputLevel )
+		variables.httpServer.createContext( "/__bxdocs/version", versionHandler() )
+		variables.httpServer.start()
+		variables.started = true
+
+		var boundPort = variables.httpServer.getAddress().getPort()
+
+		return {
+			url  : "http://#arguments.host#:#boundPort#/",
+			port : boundPort
+		}
+	}
+
+	/**
+	 * Stops the file server. Safe to call even if `start()` was never called.
+	 */
+	void function stop() {
+		if ( variables.started ) {
+			variables.httpServer.stop( javaCast( "int", 0 ) )
+			variables.started = false
+		}
+	}
+
+	/**
+	 * Rebuilds the project if `docs/`, `bxdocs.json` or a project `theme/`
+	 * override changed since the last build, bumping the version the
+	 * live-reload poller compares against. Cheap to call repeatedly - the
+	 * CLI verb's own watch loop is expected to call this every second or so
+	 * while `serve` is running in the foreground.
+	 *
+	 * @return true if a rebuild actually happened
+	 */
+	boolean function checkAndRebuild() {
+		var current = currentFingerprint()
+		if ( current.count == variables.fileFingerprint.count && current.maxModified == variables.fileFingerprint.maxModified ) {
+			return false
+		}
+		rebuild()
+		return true
+	}
+
+	/**
+	 * The live-reload poller's current version number, exposed for tests -
+	 * the same value the `/__bxdocs/version` endpoint serves.
+	 */
+	numeric function getBuildVersion() {
+		return variables.buildVersion
+	}
+
+	private void function rebuild() {
+		variables.buildPipeline.build( variables.projectRoot )
+		injectLiveReload()
+		variables.fileFingerprint = currentFingerprint()
+		variables.buildVersion++
+	}
+
+	/**
+	 * Appends the live-reload poller script to every built page and writes
+	 * the poller script itself to `site/__bxdocs-live-reload.js` - both
+	 * wiped and rewritten on every rebuild, since BuildPipeline.build()
+	 * deletes and recreates `site/` wholesale each time.
+	 */
+	private void function injectLiveReload() {
+		var siteDir = variables.projectRoot & "/site"
+		fileWrite( siteDir & "/__bxdocs-live-reload.js", liveReloadScript() )
+
+		var scriptTag = '<script src="/__bxdocs-live-reload.js"></script></body>'
+		for ( var path in directoryList( siteDir, true, "path", "*.html" ) ) {
+			var html = fileRead( path )
+			if ( html.findNoCase( "</body>" ) ) {
+				fileWrite( path, html.reReplaceNoCase( "</body>", scriptTag, "one" ) )
+			}
+		}
+	}
+
+	/**
+	 * @return { count, maxModified } across bxdocs.json, docs/** and a project theme/ override, if present
+	 */
+	private struct function currentFingerprint() {
+		var paths = []
+		var configPath = variables.projectRoot & "/bxdocs.json"
+		if ( fileExists( configPath ) ) {
+			paths.append( configPath )
+		}
+		if ( directoryExists( variables.projectRoot & "/docs" ) ) {
+			paths.addAll( directoryList( variables.projectRoot & "/docs", true, "path" ) )
+		}
+		if ( directoryExists( variables.projectRoot & "/theme" ) ) {
+			paths.addAll( directoryList( variables.projectRoot & "/theme", true, "path" ) )
+		}
+
+		var maxModified = 0
+		for ( var path in paths ) {
+			var lastModified = createObject( "java", "java.io.File" ).init( path ).lastModified()
+			if ( lastModified > maxModified ) {
+				maxModified = lastModified
+			}
+		}
+
+		return { count : paths.len(), maxModified : maxModified }
+	}
+
+	/**
+	 * A closure handed straight to `HttpServer.createContext()` as its
+	 * `HttpHandler` - BoxLang closures satisfy single-method Java functional
+	 * interfaces directly, no adapter class needed.
+	 */
+	private any function versionHandler() {
+		return function( exchange ) {
+			var body = createObject( "java", "java.lang.String" ).init( toString( variables.buildVersion ) ).getBytes()
+			exchange.getResponseHeaders().add( "Content-Type", "text/plain" )
+			exchange.getResponseHeaders().add( "Cache-Control", "no-store" )
+			exchange.sendResponseHeaders( javaCast( "int", 200 ), javaCast( "long", arrayLen( body ) ) )
+			var responseBody = exchange.getResponseBody()
+			responseBody.write( body )
+			responseBody.close()
+		}
+	}
+
+	private string function liveReloadScript() {
+		var lines = [
+			"(function () {",
+			"	var lastVersion = null;",
+			"	setInterval( function () {",
+			'		fetch( "/__bxdocs/version", { cache : "no-store" } )',
+			"			.then( function ( res ) { return res.text(); } )",
+			"			.then( function ( version ) {",
+			"				if ( lastVersion === null ) {",
+			"					lastVersion = version;",
+			"					return;",
+			"				}",
+			"				if ( version !== lastVersion ) {",
+			"					location.reload();",
+			"				}",
+			"			} )",
+			'			.catch( function () {} );',
+			"	}, 1000 );",
+			"})();",
+			""
+		]
+		return lines.toList( char( 10 ) )
+	}
+
+}

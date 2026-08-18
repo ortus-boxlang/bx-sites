@@ -1,0 +1,116 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.DevServer", function() {
+
+			beforeEach( function() {
+				variables.devServer = new "models.build.DevServer@bxdocs"();
+				variables.fakeMarkdown = new "tests.support.FakeMarkdownRenderer@bxdocs"();
+				devServer.setMarkdownRenderer( fakeMarkdown );
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				devServer.stop();
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newProject() {
+				var dir = createTempDirectory( prefix = "bxdocs-devserver-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite( dir & "/bxdocs.json", '{"name":"Test Site","theme":{"name":"bootstrap"}}' );
+				fileWrite( dir & "/docs/index.md", "Welcome home" );
+				return dir;
+			}
+
+			private struct function get( required string url ) {
+				bx:http url="#arguments.url#" result="res" timeout="10" {}
+				return res;
+			}
+
+			it( "builds and serves the project, returning a reachable url", function() {
+				var root = newProject();
+				var started = devServer.start( root, 0, "127.0.0.1" );
+
+				expect( started.url ).toInclude( "http://127.0.0.1:" );
+				expect( fileExists( root & "/site/index.html" ) ).toBeTrue();
+
+				var res = get( started.url & "index.html" );
+				expect( res.status_code ).toBe( 200 );
+				expect( res.fileContent ).toInclude( "<p>Welcome home</p>" );
+			} );
+
+			it( "injects a live-reload script into every built page", function() {
+				var root = newProject();
+				var started = devServer.start( root, 0, "127.0.0.1" );
+
+				var res = get( started.url & "index.html" );
+				expect( res.fileContent ).toInclude( "__bxdocs-live-reload.js" );
+
+				var scriptRes = get( started.url & "__bxdocs-live-reload.js" );
+				expect( scriptRes.status_code ).toBe( 200 );
+				expect( scriptRes.fileContent ).toInclude( "/__bxdocs/version" );
+			} );
+
+			it( "serves an incrementing build version at /__bxdocs/version", function() {
+				var root = newProject();
+				var started = devServer.start( root, 0, "127.0.0.1" );
+
+				var res = get( started.url & "__bxdocs/version" );
+				expect( trim( res.fileContent ) ).toBe( "1" );
+				expect( devServer.getBuildVersion() ).toBe( 1 );
+			} );
+
+			it( "checkAndRebuild() returns false when nothing under docs/ or bxdocs.json changed", function() {
+				var root = newProject();
+				devServer.start( root, 0, "127.0.0.1" );
+
+				expect( devServer.checkAndRebuild() ).toBeFalse();
+				expect( devServer.getBuildVersion() ).toBe( 1 );
+			} );
+
+			it( "checkAndRebuild() rebuilds and bumps the version when a docs/ file changes", function() {
+				var root = newProject();
+				devServer.start( root, 0, "127.0.0.1" );
+
+				fileWrite( root & "/docs/index.md", "Updated content" );
+				var futureMillis = createObject( "java", "java.lang.System" ).currentTimeMillis() + 5000;
+				createObject( "java", "java.io.File" ).init( root & "/docs/index.md" ).setLastModified( javaCast( "long", futureMillis ) );
+
+				expect( devServer.checkAndRebuild() ).toBeTrue();
+				expect( devServer.getBuildVersion() ).toBe( 2 );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "<p>Updated content</p>" );
+			} );
+
+			it( "checkAndRebuild() also reacts to a bxdocs.json change", function() {
+				var root = newProject();
+				devServer.start( root, 0, "127.0.0.1" );
+
+				fileWrite( root & "/bxdocs.json", '{"name":"Renamed Site","theme":{"name":"bootstrap"}}' );
+				var futureMillis = createObject( "java", "java.lang.System" ).currentTimeMillis() + 5000;
+				createObject( "java", "java.io.File" ).init( root & "/bxdocs.json" ).setLastModified( javaCast( "long", futureMillis ) );
+
+				expect( devServer.checkAndRebuild() ).toBeTrue();
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "Renamed Site" );
+			} );
+
+			it( "stop() is safe to call even when never started, and safe to call twice", function() {
+				expect( function() {
+					devServer.stop();
+					devServer.stop();
+				} ).notToThrow();
+			} );
+
+		} );
+	}
+
+}

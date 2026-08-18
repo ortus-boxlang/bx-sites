@@ -1,0 +1,263 @@
+/**
+ * Orchestrates the full `build` verb end to end (module spec section 5):
+ * load config -> load docs -> build nav -> convert markdown -> render
+ * through the theme -> write site/ -> build the search index -> copy assets.
+ * Also backs the standalone `search-index` verb (buildSearchIndex()).
+ */
+class {
+
+	variables.configLoader     = new "models.config.ConfigLoader@bxdocs"()
+	variables.docsLoader       = new "models.build.DocsLoader@bxdocs"()
+	variables.navBuilder       = new "models.build.NavBuilder@bxdocs"()
+	variables.themeRenderer    = new "models.build.ThemeRenderer@bxdocs"()
+	variables.searchIndexer    = new "models.build.SearchIndexer@bxdocs"()
+	variables.tableOfContents  = new "models.build.TableOfContents@bxdocs"()
+	variables.baseUrlResolver  = new "models.build.BaseUrlResolver@bxdocs"()
+	variables.sitemapGenerator = new "models.build.SitemapGenerator@bxdocs"()
+	variables.llmsTxtGenerator = new "models.build.LlmsTxtGenerator@bxdocs"()
+	variables.markdownRenderer = new "models.build.MarkdownRenderer@bxdocs"()
+
+	/**
+	 * Swaps in a fake/test markdown renderer. The real one (MarkdownRenderer.bx)
+	 * depends on the bx-markdown module being activated, which this
+	 * pipeline's own unit tests don't have - see MarkdownRenderer.bx's
+	 * docblock for why that dependency is kept behind this seam.
+	 *
+	 * @renderer Any object exposing `toHtml( markdown, options = {} )`
+	 */
+	void function setMarkdownRenderer( required any renderer ) {
+		variables.markdownRenderer = arguments.renderer
+	}
+
+	/**
+	 * @projectRoot Absolute path to the project root
+	 *
+	 * @return { siteDir, pageCount }
+	 */
+	struct function build( required string projectRoot ) {
+		var root = normalizeRoot( arguments.projectRoot )
+		var config = variables.configLoader.load( root )
+		var pages = variables.docsLoader.load( root & "/docs" )
+		var nav = variables.navBuilder.build( pages )
+		var flatSequence = variables.navBuilder.flatten( nav )
+		var urls = variables.baseUrlResolver.resolve( config.baseURL )
+		var themeDir = variables.themeRenderer.resolveThemeDir( config.theme.name, root )
+		var siteDir = root & "/site"
+
+		if ( directoryExists( siteDir ) ) {
+			directoryDelete( siteDir, true )
+		}
+		directoryCreate( siteDir, true, true )
+
+		convertMarkdown( pages, config )
+		assignTableOfContents( pages )
+		assignPrevNext( pages, flatSequence )
+		assignBreadcrumbs( pages, nav )
+
+		for ( var page in pages ) {
+			var html = variables.themeRenderer.renderPage( page, nav, config, themeDir, urls.basePath )
+			var outputPath = siteDir & "/" & page.urlPath
+			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
+			fileWrite( outputPath, html )
+		}
+
+		write404Page( nav, config, themeDir, siteDir, urls.basePath )
+
+		if ( config.search ) {
+			writeSearchIndex( pages, siteDir )
+		}
+
+		if ( len( urls.absolute ) ) {
+			fileWrite( siteDir & "/sitemap.xml", variables.sitemapGenerator.build( pages, urls.absolute ) )
+		}
+
+		fileWrite( siteDir & "/llms.txt", variables.llmsTxtGenerator.build( pages, config, urls.absolute, urls.basePath ) )
+
+		copyAssets( root, themeDir, siteDir, config.search )
+
+		return { siteDir : siteDir, pageCount : pages.len() }
+	}
+
+	/**
+	 * Rebuilds just the search index standalone (module spec section 2 -
+	 * the `search-index` verb). Still loads docs and converts markdown (the
+	 * index needs headings/body text), but never touches theme rendering or
+	 * assets - it only ever writes `site/search-index.json`.
+	 *
+	 * @projectRoot Absolute path to the project root
+	 *
+	 * @return { skipped (true when bxdocs.json's `search` is off), indexPath, pageCount }
+	 */
+	struct function buildSearchIndex( required string projectRoot ) {
+		var root = normalizeRoot( arguments.projectRoot )
+		var config = variables.configLoader.load( root )
+
+		if ( !config.search ) {
+			return { skipped : true, indexPath : "", pageCount : 0 }
+		}
+
+		var pages = variables.docsLoader.load( root & "/docs" )
+		convertMarkdown( pages, config )
+
+		var siteDir = root & "/site"
+		directoryCreate( siteDir, true, true )
+
+		return {
+			skipped   : false,
+			indexPath : writeSearchIndex( pages, siteDir ),
+			pageCount : pages.len()
+		}
+	}
+
+	/**
+	 * Converts every page's raw markdown body to HTML in place (adds a
+	 * `contentHtml` key to each page struct), applying bxdocs.json's
+	 * markdown passthrough options.
+	 *
+	 * @pages Array of page structs from DocsLoader.load()
+	 * @config The site's bxdocs.json config
+	 */
+	private void function convertMarkdown( required array pages, required struct config ) {
+		for ( var page in arguments.pages ) {
+			page.contentHtml = variables.markdownRenderer.toHtml( page.body, arguments.config.markdown )
+		}
+	}
+
+	/**
+	 * Adds a `toc` key (the "On this page" list, from TableOfContents.bx) to
+	 * every page, built from its already-converted `contentHtml`.
+	 *
+	 * @pages Array of page structs with `contentHtml` already set
+	 */
+	private void function assignTableOfContents( required array pages ) {
+		for ( var page in arguments.pages ) {
+			page.toc = variables.tableOfContents.build( page.contentHtml )
+		}
+	}
+
+	/**
+	 * Adds `prevPage`/`nextPage` keys (each `{ title, url }`, or `{ title:"", url:"" }`
+	 * when there is none) to every page, based on its position in the nav's
+	 * own reading order. A page not present in `flatSequence` (i.e. hidden)
+	 * gets no prev/next at all - prev/next is a nav concept, and a hidden
+	 * page isn't part of the nav.
+	 *
+	 * @pages Array of page structs
+	 * @flatSequence NavBuilder.flatten()'s own output for this build
+	 */
+	private void function assignPrevNext( required array pages, required array flatSequence ) {
+		var none = { title : "", url : "" }
+
+		for ( var page in arguments.pages ) {
+			page.prevPage = none
+			page.nextPage = none
+
+			for ( var i = 1; i <= arguments.flatSequence.len(); i++ ) {
+				if ( arguments.flatSequence[ i ].url == page.urlPath ) {
+					page.prevPage = i > 1 ? arguments.flatSequence[ i - 1 ] : none
+					page.nextPage = i < arguments.flatSequence.len() ? arguments.flatSequence[ i + 1 ] : none
+					break
+				}
+			}
+		}
+	}
+
+	/**
+	 * Adds a `breadcrumbs` key (root -> ... -> the page itself, from
+	 * NavBuilder.breadcrumbs()) to every page. Empty for a hidden page - it
+	 * isn't in the nav to begin with.
+	 *
+	 * @pages Array of page structs
+	 * @nav The site's nav tree, from NavBuilder.build()
+	 */
+	private void function assignBreadcrumbs( required array pages, required array nav ) {
+		for ( var page in arguments.pages ) {
+			page.breadcrumbs = variables.navBuilder.breadcrumbs( arguments.nav, page.urlPath )
+		}
+	}
+
+	/**
+	 * Renders a generic "page not found" page through the active theme and
+	 * writes it to `site/404.html` - the filename GitHub Pages (and most
+	 * static hosts) automatically serve for any unmatched path.
+	 *
+	 * @nav The site's nav tree
+	 * @config The site's bxdocs.json config
+	 * @themeDir Absolute path to the resolved theme folder
+	 * @siteDir Absolute path to the build output directory
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	private void function write404Page( required array nav, required struct config, required string themeDir, required string siteDir, required string basePath ) {
+		var page = {
+			title       : "Page Not Found",
+			contentHtml : "<p>Sorry, that page doesn't exist. Try the search box, or head back to the homepage.</p>",
+			toc         : [],
+			prevPage    : { title : "", url : "" },
+			nextPage    : { title : "", url : "" },
+			breadcrumbs : []
+		}
+
+		var html = variables.themeRenderer.renderPage( page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath )
+		fileWrite( arguments.siteDir & "/404.html", html )
+	}
+
+	/**
+	 * @pages Array of page structs with `contentHtml` already set
+	 * @siteDir Absolute path to the build output directory (must already exist)
+	 *
+	 * @return Absolute path to the written search-index.json
+	 */
+	private string function writeSearchIndex( required array pages, required string siteDir ) {
+		var searchIndex = variables.searchIndexer.build( arguments.pages )
+		var indexPath = arguments.siteDir & "/search-index.json"
+		fileWrite( indexPath, jsonSerialize( searchIndex ) )
+		return indexPath
+	}
+
+	/**
+	 * Copies theme assets to `site/assets/theme/`, this module's own shared
+	 * scripts (the search widget when search is enabled; the copy-code
+	 * button unconditionally), and a project's own `docs/assets/**` to
+	 * `site/assets/` (module spec section 5, step 6).
+	 *
+	 * @root Absolute path to the project root
+	 * @themeDir Absolute path to the resolved theme folder
+	 * @siteDir Absolute path to the build output directory
+	 * @searchEnabled Whether to copy the shared search.js widget
+	 */
+	private void function copyAssets( required string root, required string themeDir, required string siteDir, required boolean searchEnabled ) {
+		var themeAssetsDir = arguments.themeDir & "/assets"
+		if ( directoryExists( themeAssetsDir ) ) {
+			directoryCopy( themeAssetsDir, arguments.siteDir & "/assets/theme", true )
+		}
+
+		directoryCreate( arguments.siteDir & "/assets", true, true )
+		fileCopy( moduleAssetsDir() & "/copy-code.js", arguments.siteDir & "/assets/copy-code.js" )
+
+		if ( arguments.searchEnabled ) {
+			fileCopy( moduleAssetsDir() & "/search.js", arguments.siteDir & "/assets/search.js" )
+		}
+
+		var docsAssetsDir = arguments.root & "/docs/assets"
+		if ( directoryExists( docsAssetsDir ) ) {
+			directoryCopy( docsAssetsDir, arguments.siteDir & "/assets", true )
+		}
+	}
+
+	/**
+	 * Absolute path to this module's own shared (theme-independent) assets,
+	 * found relative to this class's own file - the same approach
+	 * ThemeRenderer.bx uses for its built-in themes folder.
+	 */
+	private string function moduleAssetsDir() {
+		return getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]models[\/]build[\/]?$", "" ) & "/resources/assets"
+	}
+
+	/**
+	 * @projectRoot A project root, trailing slash optional
+	 */
+	private string function normalizeRoot( required string projectRoot ) {
+		return arguments.projectRoot.reReplace( "[\/]+$", "" )
+	}
+
+}

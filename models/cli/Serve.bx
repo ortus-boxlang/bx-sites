@@ -1,0 +1,38 @@
+/**
+ * `serve` CLI verb - builds the project, serves `site/` locally, and
+ * watches for changes with live reload (module spec section 2). Runs in the
+ * foreground until interrupted (Ctrl+C) - see DevServer.bx for the actual
+ * server/rebuild-detection logic this only drives.
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path), port (default 8080), host (default 127.0.0.1) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxDocs.MissingProjectRoot", message = "`serve` requires a project root" )
+		}
+
+		var port = isNumeric( arguments.options.port ?: "" ) ? val( arguments.options.port ) : 8080
+		var host = len( trim( arguments.options.host ?: "" ) ) ? arguments.options.host : "127.0.0.1"
+
+		var devServer = new "models.build.DevServer@bxdocs"()
+		var started = devServer.start( projectRoot, port, host )
+
+		println( "Serving #projectRoot# at #started.url# (Ctrl+C to stop)" )
+
+		try {
+			while ( true ) {
+				sleep( 1000 )
+				devServer.checkAndRebuild()
+			}
+		} finally {
+			devServer.stop()
+		}
+
+		return { exitCode : 0, message : "" }
+	}
+
+}

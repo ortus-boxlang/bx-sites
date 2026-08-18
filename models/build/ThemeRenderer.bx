@@ -1,0 +1,131 @@
+/**
+ * Resolves a theme folder and renders a single page through its `layout.bxm`
+ * (module spec section 5, step 4; section 6 theme contract).
+ *
+ * The `ThemeProvider` contract (module spec section 6) a theme folder must
+ * satisfy:
+ *   - `layout.bxm` (required) - the outer HTML shell + nav; receives
+ *     `variables.page`, `variables.nav`, `variables.siteConfig` and
+ *     `variables.themeDir` in scope, and includes the sibling `page.bxm` via
+ *     `#variables.themeDir#/page.bxm` (BoxLang's include scope-absorption
+ *     carries those variables through automatically - no explicit hand-off).
+ *   - `page.bxm` (required) - the article body; renders `variables.page.contentHtml`
+ *     (the already-converted markdown, set by BuildPipeline before rendering).
+ *     `variables.page.toc`, `.prevPage`, `.nextPage` and `.breadcrumbs` are
+ *     always present too (defaulted by `renderPage()` below if the caller
+ *     didn't set them), so a theme's `page.bxm` never needs to guard their
+ *     existence. `variables.basePath` (module spec section 4's `baseURL`,
+ *     via BaseUrlResolver.bx) is always a root-relative path ending with
+ *     `/` - every internal `href`/`src` a theme renders should be prefixed
+ *     with it instead of a hardcoded `/`, so the site still works hosted
+ *     from a sub-path.
+ *   - `search.bxm` (optional, not yet enforced - module spec section 7,
+ *     deferred to Phase 4) - the search UI partial.
+ *   - `assets/` (optional) - theme CSS/JS, copied to `site/assets/theme/` by
+ *     BuildPipeline's asset pipeline.
+ */
+class {
+
+	/**
+	 * The files every theme folder must provide (the required half of the
+	 * `ThemeProvider` contract documented on this class).
+	 */
+	variables.requiredFiles = [ "layout.bxm", "page.bxm" ]
+
+	/**
+	 * Resolution order: a project-level `theme/` override (module spec
+	 * section 3) if it satisfies the `ThemeProvider` contract, else this
+	 * module's built-in `resources/themes/<themeName>` (section 6).
+	 *
+	 * @themeName The configured theme name (bxdocs.json's `theme.name`)
+	 * @projectRoot Absolute path to the project root
+	 *
+	 * @return Absolute path to the resolved theme's own folder
+	 */
+	string function resolveThemeDir( required string themeName, required string projectRoot ) {
+		var projectTheme = arguments.projectRoot.reReplace( "[\/]+$", "" ) & "/theme"
+		if ( directoryExists( projectTheme ) ) {
+			return assertThemeProvider( projectTheme )
+		}
+
+		var builtIn = builtInThemesDir() & "/" & arguments.themeName
+		if ( directoryExists( builtIn ) ) {
+			return assertThemeProvider( builtIn )
+		}
+
+		throw(
+			type    = "BxDocs.ThemeNotFound",
+			message = "No theme found for [#arguments.themeName#] - looked in [#projectTheme#] and [#builtIn#]"
+		)
+	}
+
+	/**
+	 * Validates that a resolved theme folder satisfies the `ThemeProvider`
+	 * contract (this class's own docblock), so a broken/incomplete theme
+	 * fails with one clear message up front instead of a confusing
+	 * `include` error deep inside rendering.
+	 *
+	 * @themeDir Absolute path to a theme folder that exists
+	 *
+	 * @return The same themeDir, unchanged, if it satisfies the contract
+	 */
+	private string function assertThemeProvider( required string themeDir ) {
+		var dir = arguments.themeDir
+		var missing = variables.requiredFiles.filter( fileName => !fileExists( dir & "/" & fileName ) )
+
+		if ( missing.len() ) {
+			throw(
+				type    = "BxDocs.InvalidTheme",
+				message = "Theme at [#dir#] is missing required file(s): #missing.toList( ', ' )#"
+			)
+		}
+
+		return dir
+	}
+
+	/**
+	 * Absolute path to this module's own bundled themes folder, found
+	 * relative to this class's own file rather than any module-registration
+	 * mapping, so it resolves the same way whether the module is fully
+	 * activated or just loaded for a unit test.
+	 */
+	string function builtInThemesDir() {
+		return getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]models[\/]build[\/]?$", "" ) & "/resources/themes"
+	}
+
+	/**
+	 * @page A page struct with an added `contentHtml` key (the already-converted markdown body)
+	 * @nav The site's nav tree, from NavBuilder.build()
+	 * @config The site's bxdocs.json config
+	 * @themeDir Absolute path to the resolved theme folder (from resolveThemeDir())
+	 * @basePath Root-relative base path ending with `/` (BaseUrlResolver's `basePath`) - defaults to `/`
+	 *
+	 * @return The rendered page HTML
+	 */
+	string function renderPage( required struct page, required array nav, required struct config, required string themeDir, string basePath = "/" ) {
+		variables.page = arguments.page
+		if ( !variables.page.keyExists( "toc" ) ) {
+			variables.page.toc = []
+		}
+		if ( !variables.page.keyExists( "prevPage" ) ) {
+			variables.page.prevPage = { title : "", url : "" }
+		}
+		if ( !variables.page.keyExists( "nextPage" ) ) {
+			variables.page.nextPage = { title : "", url : "" }
+		}
+		if ( !variables.page.keyExists( "breadcrumbs" ) ) {
+			variables.page.breadcrumbs = []
+		}
+		variables.nav = arguments.nav
+		variables.siteConfig = arguments.config
+		variables.themeDir = arguments.themeDir
+		variables.basePath = len( trim( arguments.basePath ) ) ? arguments.basePath : "/"
+
+		var html = ""
+		bx:savecontent variable="html" {
+			include arguments.themeDir & "/layout.bxm"
+		}
+		return html
+	}
+
+}

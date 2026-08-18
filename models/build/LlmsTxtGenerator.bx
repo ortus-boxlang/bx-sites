@@ -1,0 +1,44 @@
+/**
+ * Builds `llms.txt` - the emerging convention (llmstxt.org) for giving LLMs
+ * a clean, markdown index of a site's content instead of making them parse
+ * rendered HTML. Always generated (unlike sitemap.xml, it's useful even
+ * with only a root-relative baseURL). Hidden pages are excluded, same as
+ * the nav, search index and sitemap.
+ */
+class {
+
+	/**
+	 * @pages Array of page structs from DocsLoader.load()
+	 * @config The site's bxdocs.json config
+	 * @siteUrl The absolute site URL ending with `/` (BaseUrlResolver's `absolute`), or "" if unknown
+	 * @basePath The root-relative base path ending with `/` (BaseUrlResolver's `basePath`) - used when `siteUrl` is unknown
+	 *
+	 * @return The rendered llms.txt content
+	 */
+	string function build( required array pages, required struct config, required string siteUrl, required string basePath ) {
+		var lines = [ "## " & arguments.config.name ]
+		lines.append( "" )
+
+		if ( len( trim( arguments.config.description ) ) ) {
+			lines.append( "> " & arguments.config.description )
+			lines.append( "" )
+		}
+
+		lines.append( "#### Pages" )
+		lines.append( "" )
+
+		var urlPrefix = len( arguments.siteUrl ) ? arguments.siteUrl : arguments.basePath
+
+		for ( var page in arguments.pages ) {
+			if ( page.hidden ) {
+				continue
+			}
+			lines.append( "- [" & page.title & "](" & urlPrefix & page.urlPath & ")" )
+		}
+
+		lines.append( "" )
+
+		return lines.toList( char( 10 ) )
+	}
+
+}

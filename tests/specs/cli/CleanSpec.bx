@@ -1,0 +1,68 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.Clean", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.Clean@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newProjectDir() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-clean-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "removes site/ and .cache/ when present, and reports what it removed", function() {
+				var dir = newProjectDir();
+				directoryCreate( dir & "/site", true, true );
+				directoryCreate( dir & "/.cache", true, true );
+
+				var result = verb.run( { projectRoot : dir } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( directoryExists( dir & "/site" ) ).toBeFalse();
+				expect( directoryExists( dir & "/.cache" ) ).toBeFalse();
+				expect( result.message ).toInclude( "site" );
+				expect( result.message ).toInclude( ".cache" );
+			} );
+
+			it( "leaves docs/ and bxdocs.json alone", function() {
+				var dir = newProjectDir();
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite( dir & "/bxdocs.json", '{"name":"Keep Me"}' );
+				directoryCreate( dir & "/site", true, true );
+
+				verb.run( { projectRoot : dir } );
+
+				expect( directoryExists( dir & "/docs" ) ).toBeTrue();
+				expect( fileExists( dir & "/bxdocs.json" ) ).toBeTrue();
+			} );
+
+			it( "reports nothing to clean when there is no site/ or .cache/", function() {
+				var dir = newProjectDir();
+				var result = verb.run( { projectRoot : dir } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toBe( "Nothing to clean" );
+			} );
+
+		} );
+	}
+
+}
