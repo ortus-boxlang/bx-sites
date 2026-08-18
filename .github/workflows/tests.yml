@@ -45,8 +45,11 @@ jobs:
 
       - name: Test Module
         run: |
-          mkdir -p ${HOME}/.boxlang/modules
-          ln -s "$(pwd)" ${HOME}/.boxlang/modules/"$(basename "$(pwd)")"
+          # setup-boxlang's own install can leave ${HOME}/.boxlang root-owned,
+          # so reclaim it before creating modules/ underneath it.
+          sudo mkdir -p "${HOME}/.boxlang/modules"
+          sudo chown -R "$(id -u):$(id -g)" "${HOME}/.boxlang"
+          ln -s "$(pwd)" "${HOME}/.boxlang/modules/$(basename "$(pwd)")"
 
       - name: Run Tests
         run: |
