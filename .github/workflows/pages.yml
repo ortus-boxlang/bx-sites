@@ -2,12 +2,16 @@ name: Publish Docs
 
 # Builds this repository's own dogfooded docs (docs/ + bxdocs.json at the
 # repo root - see readme.md) with bx-docs itself, and publishes site/ to
-# GitHub Pages. Requires GitHub Pages to be enabled for this repository
-# with its source set to "GitHub Actions" (Settings -> Pages -> Source).
+# GitHub Pages - main publishes to the site root (stable), development
+# publishes to /development/ (latest), so both versions stay live at once.
+# Requires GitHub Pages enabled for this repository with its source set to
+# "Deploy from a branch" -> gh-pages -> / (root) (Settings -> Pages -> Source).
+# gh-pages is created automatically by the first successful run below.
 
 on:
   push:
     branches:
+      - main
       - development
     paths:
       - "docs/**"
@@ -24,19 +28,17 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
-# Only one concurrent deployment, but don't cancel in-progress runs, so a
-# deploy that's already underway always finishes.
+# Each branch publishes to its own destination_dir, so main and development
+# deploys never conflict - only serialize a branch against its own prior runs.
 concurrency:
-  group: "pages"
+  group: "pages-${{ github.ref_name }}"
   cancel-in-progress: false
 
 jobs:
   build:
-    name: Build Docs
+    name: Build & Publish (${{ github.ref_name }})
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -56,25 +58,32 @@ jobs:
           mkdir -p "${BOXLANG_HOME}/modules"
           ln -s "$(pwd)" "${BOXLANG_HOME}/modules/$(basename "$(pwd)")"
 
+      - name: Point baseURL at this branch's own sub-path
+        if: github.ref_name != 'main'
+        run: |
+          # main's committed bxdocs.json already points baseURL at the site
+          # root - every other branch publishes under /<branch-name>/ instead,
+          # so patch a throwaway copy of the config just for this build.
+          jq --arg url "https://ortus-boxlang.github.io/bx-docs/${{ github.ref_name }}/" \
+            '.baseURL = $url' bxdocs.json > bxdocs.json.tmp
+          mv bxdocs.json.tmp bxdocs.json
+
       - name: Build the site
         run: boxlang module:bxDocs build
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy main to the site root
+        if: github.ref_name == 'main'
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: site
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          keep_files: true
 
-  deploy:
-    name: Deploy to GitHub Pages
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Deploy development to /development/
+        if: github.ref_name == 'development'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          destination_dir: development
+          keep_files: true
