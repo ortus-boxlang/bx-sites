@@ -68,8 +68,9 @@ Or read the source directly:
 
 - [Getting Started](docs/getting-started.md)
 - [CLI Reference](docs/cli-reference.md)
-- [Configuration](docs/configuration.md) (`bxdocs.json` - `baseURL`, `theme`, `search`, `markdown`)
+- [Configuration](docs/configuration.md) - the full `bxdocs.json` reference
 - Guides: [Themes](docs/guides/themes.md) · [Search](docs/guides/search.md) · [Deploying to GitHub Pages](docs/guides/deployment.md)
+- [Releases](docs/releases/index.md) - versioning policy and what's new per release
 
 See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's development.
 

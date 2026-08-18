@@ -77,6 +77,42 @@ jobs:
           changelogPath: ./changelog.md
           tag: v${{ env.MODULE_VERSION }}
 
+      - name: Generate a docs/releases/ "what's new" page for this version
+        if: env.SNAPSHOT == 'false'
+        run: |
+          TAG="v${{ env.MODULE_VERSION }}"
+          RELEASE_DATE=$(date +%Y-%m-%d)
+          mkdir -p docs/releases
+
+          # Extract this version's own section from changelog.md - everything
+          # between its "## [tag]" heading and the next "## [" heading (or EOF).
+          awk -v tag="$TAG" '
+            BEGIN { capture = 0 }
+            /^## \[/ {
+              if (capture) { exit }
+              if (index($0, "[" tag "]") > 0) { capture = 1; next }
+            }
+            capture { print }
+          ' changelog.md > /tmp/release-body.md
+
+          # Trim leading/trailing blank lines left over from the heading split.
+          sed -i -e '/./,$!d' -e ':a' -e '/^\n*$/{$d;N;ba' -e '}' /tmp/release-body.md
+
+          # Sort newest-first in the nav: order is the version's magnitude,
+          # negated, so a higher version always sorts ahead of a lower one.
+          ORDER=$(echo "${{ env.MODULE_VERSION }}" | awk -F. '{ printf "%d", -(($1+0)*100000000 + ($2+0)*10000 + ($3+0)) }')
+
+          {
+            echo "---"
+            echo "title: ${TAG}"
+            echo "order: ${ORDER}"
+            echo "---"
+            echo ""
+            echo "# ${TAG} - ${RELEASE_DATE}"
+            echo ""
+            cat /tmp/release-body.md
+          } > "docs/releases/${TAG}.md"
+
       - name: Build it!
         run: |
           npm install -g markdownlint-cli
@@ -93,7 +129,9 @@ jobs:
           author_name: Github Actions
           author_email: info@ortussolutions.com
           message: "Finalized changelog for v${{ env.MODULE_VERSION }}"
-          add: changelog.md
+          add: |
+            changelog.md
+            docs/releases/*.md
 
       - name: Tag Version
         uses: rickstaa/action-create-tag@v1.7.2
@@ -110,6 +148,7 @@ jobs:
           name: boxlang-build
           path: |
             changelog.md
+            docs/releases/*.md
 
       # UNCOMMENT THE FOLLOWING LINES TO ENABLE S3 UPLOADS
       # - name: Upload Distributions to S3
@@ -178,9 +217,11 @@ jobs:
           name: boxlang-build
           path: .tmp
 
-      - name: Copy Changelog
+      - name: Copy Changelog & Release Notes
         run: |
           cp .tmp/changelog.md changelog.md
+          mkdir -p docs/releases
+          cp .tmp/docs/releases/*.md docs/releases/ 2>/dev/null || true
 
       - name: Bump Version
         run: |
@@ -195,3 +236,4 @@ jobs:
           add: |
             box.json
             changelog.md
+            docs/releases/*.md
