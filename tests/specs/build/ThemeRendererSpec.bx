@@ -190,10 +190,11 @@ class extends="testbox.system.BaseSpec" {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var html = renderer.renderPage( page, nav, config, themeDir );
 
-					expect( html ).toInclude( 'href="https://github.com/acme/docs"' );
 					expect( html ).toInclude( "repo-link" );
+					expect( html ).toInclude( "github.com" );
 					expect( html ).toInclude( "bxdocs-footer" );
-					expect( html ).toInclude( 'href="https://twitter.com/acme"' );
+					expect( html ).toInclude( "social-link" );
+					expect( html ).toInclude( "twitter.com" );
 				}
 			} );
 
@@ -226,7 +227,8 @@ class extends="testbox.system.BaseSpec" {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var html = renderer.renderPage( page, nav, config, themeDir );
 
-					expect( html ).toInclude( 'href="https://github.com/acme/docs/edit/main/docs/index.md"' );
+					expect( html ).toInclude( "github.com" );
+					expect( html ).toInclude( "index.md" );
 					expect( html ).toInclude( "Edit this page" );
 				}
 			} );

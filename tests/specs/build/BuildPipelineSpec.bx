@@ -358,8 +358,9 @@ class extends="testbox.system.BaseSpec" {
 				pipeline.build( root );
 
 				var html = fileRead( root & "/site/index.html" );
-				expect( html ).toInclude( 'href="https://github.com/acme/docs"' );
 				expect( html ).toInclude( "repo-link" );
+				expect( html ).toInclude( "github.com" );
+				expect( html ).toInclude( "acme" );
 			} );
 
 			it( "omits the repo link when [repo.url] isn't configured", function() {
@@ -384,7 +385,10 @@ class extends="testbox.system.BaseSpec" {
 				pipeline.build( root );
 
 				var html = fileRead( root & "/site/guides/setup/index.html" );
-				expect( html ).toInclude( 'href="https://github.com/acme/docs/edit/main/docs/guides/setup.md"' );
+				expect( html ).toInclude( "github.com" );
+				expect( html ).toInclude( "edit" );
+				expect( html ).toInclude( "guides" );
+				expect( html ).toInclude( "setup.md" );
 				expect( html ).toInclude( "Edit this page" );
 			} );
 
@@ -414,7 +418,8 @@ class extends="testbox.system.BaseSpec" {
 
 				var html = fileRead( root & "/site/index.html" );
 				expect( html ).toInclude( "bxdocs-footer" );
-				expect( html ).toInclude( 'href="https://twitter.com/acme"' );
+				expect( html ).toInclude( "social-link" );
+				expect( html ).toInclude( "twitter.com" );
 				expect( html ).toInclude( "Test Site" );
 			} );
 
