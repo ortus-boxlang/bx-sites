@@ -169,6 +169,37 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "renders a distinct, recognized icon for every built-in social platform, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				// one short, near-unique fragment lifted from each icon's own SVG path -
+				// confirms bxdocsIcon() resolved the real icon rather than falling back to "generic"
+				var iconFingerprints = {
+					"youtube"  : "31.7",
+					"linkedin" : "20.447 20.452",
+					"facebook" : "24 12.073c0-6.627",
+					"bluesky"  : "4.046-6.053",
+					"threads"  : "12.186 24",
+					"slack"    : "5.042 15.165",
+					"patreon"  : "15.211 0c-4.831"
+				};
+				var config = {
+					name   : "My Site",
+					social : iconFingerprints.keyArray().map( icon => { return { url : "https://example.com/" & icon, icon : icon } } ),
+					footer : true
+				};
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					var html = renderer.renderPage( page, nav, config, themeDir );
+
+					for ( var icon in iconFingerprints ) {
+						expect( html ).toInclude( iconFingerprints[ icon ] );
+					}
+				}
+			} );
+
 			it( "renders breadcrumbs when the page has more than one, and skips them otherwise", function() {
 				var root = newProjectRoot();
 				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
