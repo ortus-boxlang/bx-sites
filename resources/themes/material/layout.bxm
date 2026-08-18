@@ -177,6 +177,7 @@
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
 	<script>hljs.highlightAll();</script>
 	<script src="#variables.basePath#assets/copy-code.js" defer></script>
+	<script src="#variables.basePath#assets/admonition-collapse.js" defer></script>
 </bx:output><bx:if condition="#variables.mermaidEnabled#"><bx:output>
 	<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 	<script src="#variables.basePath#assets/mermaid-init.js"></script>

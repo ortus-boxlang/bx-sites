@@ -143,10 +143,15 @@ own module settings before each page renders. BX Docs doesn't redefine or
 validate these keys; whatever you put here is bx-markdown's own option set,
 straight through - so this list can drift from bx-markdown's own as it
 evolves. Tables, `~~strikethrough~~`, `- [ ]` task-list checkboxes and the
-in-page table of contents are always on, with no toggle.
+in-page table of contents are always on, with no toggle. The one exception
+is `enableAdmonition` - bx-markdown itself defaults it to `false`, but BX
+Docs defaults it to `true` (see the [Markdown Extensions guide](guides/markdown.md)).
 
 | Key | Default | Effect |
 |---|---|---|
+| `enableAdmonition` | `true` *(BX Docs default; bx-markdown's own default is `false`)* | `!!!`/`???`/`???+` callout blocks - see the [Markdown Extensions guide](guides/markdown.md#admonitions) |
+| `enableFootnotes` | `false` | `[^label]` footnote references - see the [Markdown Extensions guide](guides/markdown.md#footnotes) |
+| `enableDefinitionLists` | `false` | `Term\n:   Definition` lists - see the [Markdown Extensions guide](guides/markdown.md#definition-lists) |
 | `autoLinkUrls` | `true` | Auto-links bare URLs and email addresses |
 | `anchorLinks` | `true` | Adds a clickable anchor link to every heading |
 | `anchorSetId` | `true` | Stamps an `id` attribute onto every heading |
@@ -166,6 +171,8 @@ in-page table of contents are always on, with no toggle.
 ```json
 {
 	"markdown": {
+		"enableFootnotes": true,
+		"enableDefinitionLists": true,
 		"anchorLinks": false,
 		"enableYouTubeTransformer": true
 	}

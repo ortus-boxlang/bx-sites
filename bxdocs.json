@@ -8,7 +8,10 @@
 	},
 	"search": true,
 	"nav": [],
-	"markdown": {},
+	"markdown": {
+		"enableFootnotes": true,
+		"enableDefinitionLists": true
+	},
 	"repo": {
 		"url": "https://github.com/ortus-boxlang/bx-docs",
 		"editUri": "edit/main/docs/"
