@@ -72,15 +72,17 @@
 				<article class="page-content">
 
 					<h1 class="page-title">Getting Started</h1>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 6:10:04 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 6:35:11 PM</span></div>
 <nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#install">Install</a></li><li class="toc-level-2"><a href="#scaffold-a-project">Scaffold a project</a></li><li class="toc-level-2"><a href="#add-pages">Add pages</a></li><li class="toc-level-2"><a href="#build">Build</a></li><li class="toc-level-2"><a href="#serve-locally">Serve locally</a></li><li class="toc-level-2"><a href="#clean">Clean</a></li></ul></nav>
 					<h1 id="getting-started"><a href="#getting-started" id="getting-started" name="getting-started" class="anchor"></a>Getting Started</h1>
 <h2 id="install"><a href="#install" id="install" name="install" class="anchor"></a>Install</h2>
 <p>BX Docs depends on <a href="https://github.com/ortus-boxlang/bx-markdown">bx-markdown</a>
-for Markdown rendering. With <a href="https://commandbox.ortusbooks.com/">CommandBox</a>
+for Markdown rendering and <a href="https://github.com/ortus-boxlang/bx-esapi">bx-esapi</a>
+for HTML-encoding. With <a href="https://commandbox.ortusbooks.com/">CommandBox</a>
 installed:</p>
 <pre><code class="language-bash">box install bx-docs
 box install bx-markdown
+box install bx-esapi
 </code></pre>
 <h2 id="scaffold-a-project"><a href="#scaffold-a-project" id="scaffold-a-project" name="scaffold-a-project" class="anchor"></a>Scaffold a project</h2>
 <pre><code class="language-bash">boxlang module:bxDocs new my-docs
