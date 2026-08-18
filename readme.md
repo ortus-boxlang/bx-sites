@@ -16,9 +16,29 @@
 
 <p>&nbsp;</p>
 
-Static documentation site generator for BoxLang, built on bx-markdown.
+Static documentation site generator for BoxLang, built on bx-markdown - in the spirit of [mkdocs](https://www.mkdocs.org/): write Markdown in `docs/`, get a themed, searchable static site out.
 
 ----
+
+## Quick Start
+
+```bash
+# Install this module and its Markdown renderer, via CommandBox
+box install bx-docs
+box install bx-markdown
+
+# Scaffold a new docs project (docs/ + bxdocs.json)
+boxlang module:bxDocs new my-docs
+cd my-docs
+
+# Build the static site to site/
+boxlang module:bxDocs build
+
+# Or build and serve locally with live reload while you write
+boxlang module:bxDocs serve
+```
+
+See [Getting Started](docs/getting-started.md) for the full walkthrough.
 
 ## Usage
 
@@ -29,57 +49,48 @@ boxlang module:bxDocs <verb> [options]
 | Verb | Purpose |
 |---|---|
 | `new` | Scaffold a docs project (`docs/` + `bxdocs.json`, defaulting to the `bootstrap` theme) |
-| `build` | Render `docs/**.md` into a static site in `site/`, including the search index and assets. Needs [bx-markdown](https://github.com/ortus-boxlang/bx-markdown) installed |
+| `build` | Render `docs/**.md` into a static site in `site/`, including the search index, `sitemap.xml`, `llms.txt` and assets. Needs bx-markdown installed |
 | `serve` | Build and serve the site locally with live reload (needs bx-markdown too) |
 | `search-index` | Rebuild `site/search-index.json` standalone (also runs automatically during `build`) |
 | `clean` | Remove `site/` and any build cache |
 
 Every verb accepts `--projectRoot=<path>` (or a bare positional path) to target a project other than the current directory. Run `boxlang module:bxDocs --help` for full usage.
 
-This repository documents itself with BX Docs - see `bxdocs.json` and `docs/` at the repo root, and [CLI Reference](docs/cli-reference.md) / [Configuration](docs/configuration.md) for the full reference docs. See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's development.
+## Documentation
 
-Those docs auto-publish to GitHub Pages via `.github/workflows/pages.yml` on every push to `development` that touches `docs/`, `bxdocs.json`, or the module's own source - see [Deploying to GitHub Pages](docs/guides/deployment.md). One-time setup: **Settings -> Pages -> Source: GitHub Actions**.
+This repository documents itself with BX Docs - see `bxdocs.json` and `docs/` at the repo root, published at:
 
-## Install Skills
+- **[ortus-boxlang.github.io/bx-docs](https://ortus-boxlang.github.io/bx-docs/)** - stable docs, built from `main`
+- **[ortus-boxlang.github.io/bx-docs/development](https://ortus-boxlang.github.io/bx-docs/development/)** - latest/unreleased docs, built from `development`
 
-If you are using the Copilot agent workflow with this template, restore the project skills from `skills-lock.json` when you first start working in the project:
+Or read the source directly:
 
-```bash
-npx skills experimental_install
-```
+- [Getting Started](docs/getting-started.md)
+- [CLI Reference](docs/cli-reference.md)
+- [Configuration](docs/configuration.md) (`bxdocs.json` - `baseURL`, `theme`, `search`, `markdown`)
+- Guides: [Themes](docs/guides/themes.md) · [Search](docs/guides/search.md) · [Deploying to GitHub Pages](docs/guides/deployment.md)
 
-Run the command from the project root so the workspace restores the pinned skills defined for this template.
+See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's development.
 
 ## Directory Structure
 
-Here is a brief overview of the directory structure:
-
-- `.github/workflows` - These are the github actions to test and build the module via CI
-- `.vscode` - VScode additions
-- `bifs` - Where you can code Built in Functions for BoxLang
-- `components` - Where you can code BoxLang components
-- `interceptors` - Where you can code BoxLang interceptors
-- `models` - The module's own source classes: `models/cli` (one dispatcher per `bxDocs` verb), `models/config` (bxdocs.json loader/validator), `models/build` (project scaffolding + the docs/nav/markdown/theme build pipeline)
-- `resources/themes` - Built-in themes (native BoxLang `.bxm` templates + assets): `bootstrap` (default), `material`, `tailwind` - all with the BoxLang brand palette applied. A project can override any of them via its own `theme/` folder (same `layout.bxm` + `page.bxm` contract)
-- `resources/assets` - Module-wide shared assets (currently just the client-side search widget, `search.js`)
-- `docs` / `bxdocs.json` - This repository's own docs, built by BX Docs itself (`boxlang module:bxDocs build`) - see [Getting Started](docs/getting-started.md)
-- `lib` - Place any Jar's or classes for your module that will be class loaded for you
-- `.cfformat.json` - A format config using the Ortus Standards
-- `.editorconfig` - Smooth consistency between editors
-- `.gitattributes` - Git attributes
-- `.gitignore` - Basic ignores. Modify as needed.
-- `.markdownlint.json` - A linting file for markdown docs
-- `box.json` - The box.json for your module used to publish to ForgeBox
-- `changelog.md` - A nice changelog tracking file
-- `CONTRIBUTING.md` - A contribution guideline
-- `ModuleConfig.bx` - Your module's configuration file
-- `readme.md` - Your module's readme. Modify as needed.
+- `.github/workflows` - CI: tests (`tests.yml`), PR checks (`pr.yml`), snapshot/release builds (`snapshot.yml`, `release.yml`), and publishing this repo's own docs to GitHub Pages (`pages.yml`)
+- `models` - the module's own source: `models/cli` (one dispatcher per `bxDocs` verb), `models/config` (`bxdocs.json` loader/validator), `models/build` (project scaffolding + the docs/nav/markdown/theme/search/sitemap build pipeline)
+- `resources/themes` - built-in themes (native BoxLang `.bxm` templates + assets): `bootstrap` (default), `material`, `tailwind` - all with the BoxLang brand palette, dark mode, breadcrumbs and code-copy buttons applied out of the box. A project can override any of them via its own `theme/` folder (same `layout.bxm` + `page.bxm` contract - see [Themes](docs/guides/themes.md))
+- `resources/assets` - module-wide shared client-side assets: the search widget (`search.js`) and the copy-code button (`copy-code.js`)
+- `docs` / `bxdocs.json` - this repository's own docs, built by BX Docs itself (`boxlang module:bxDocs build`)
+- `tests/specs` - TestBox specs, one bundle per class under `models/`
+- `bifs`, `components`, `interceptors` - unused by this module today, kept for BoxLang module convention
+- `box.json` - package metadata used to publish to ForgeBox
+- `ModuleConfig.bx` - this module's configuration/CLI entry point
 
 ## Local Building
 
-The `Build.bx` is used to package your module so it can be distributed to FORGEBOX or to a friend.  It will create a zip file in the `build` directory with the name of your module and the version number.  The zip file will contain all the files needed to run your module, including the `box.json` file, the `ModuleConfig.bx` file, and any other files you have in your module.
+`Build.bx` packages this module for distribution to ForgeBox: it produces a zip in `build/` containing everything needed to run the module (`box.json`, `ModuleConfig.bx`, and the rest of the module's own files).
 
-If you want to build the module, you can use `boxlang Build.bx` to build the module.  Here are the options you can pass to the script:
+```bash
+boxlang Build.bx --version=1.1.0
+```
 
 | Option    | Required | Default Value    | Description                        |
 | --------- | -------- | ---------------- | ---------------------------------- |
@@ -87,26 +98,28 @@ If you want to build the module, you can use `boxlang Build.bx` to build the mod
 | `branch`  | No       | `development`    | The branch being built.            |
 | `buildId` | No       | UUID (generated) | A unique identifier for the build. |
 
-```bash
-boxlang Build.bx --version=1.1.0
-```
-
 ## Running Tests
 
-1. With CommandBox installed, install testbox: `box install`
-2. Register the module so BoxLang can resolve its `bxdocs.*` source classes: `mkdir -p ~/.boxlang/modules && ln -s "$(pwd)" ~/.boxlang/modules/"$(basename "$(pwd)")"` (already done for you in CI - see `.github/workflows/tests.yml`)
+1. With CommandBox installed, install TestBox: `box install`
+2. Register the module so BoxLang can resolve its `bxdocs.*` source classes: symlink this repo into your BoxLang home's `modules/` folder - that's `~/.boxlang/modules` unless `$BOXLANG_HOME` is set to something else (CI pins it to the checkout's own `.boxlang/`, per `.github/workflows/tests.yml`):
+   ```bash
+   mkdir -p "${BOXLANG_HOME:-$HOME/.boxlang}/modules"
+   ln -s "$(pwd)" "${BOXLANG_HOME:-$HOME/.boxlang}/modules/$(basename "$(pwd)")"
+   ```
 3. With the BoxLang CLI installed, run tests using `./testbox/run`
 
 ## Version Management
 
-This module uses [SemVer](https://semver.org/) for versioning.  The version is stored in the `box.json` file and is used to publish to FORGEBOX and the GithubActions will atuomatically bump it for you.  The version is also used to tag the repo for releases.
+This module uses [SemVer](https://semver.org/) for versioning. The version is stored in `box.json`, used to publish to ForgeBox, and bumped automatically by the release workflow, which also tags the repo for each release.
 
-## Github Actions Automation
+## GitHub Actions Automation
 
-This repo has all kinds of automation for PRs, snapshots, tests and releases.  Use them as you see fit.
-If you will be doing FORGEBOX publishing, then you will need to set up a FORGEBOX API key in the secrets of your repository.
-
-- `FORGEBOX_API_TOKEN` - This is your FORGEBOX API key. You can get it from your FORGEBOX account settings.  This is used to publish to FORGEBOX.
+- `pr.yml` - runs the test suite against every pull request
+- `tests.yml` - the reusable test-suite workflow (`./testbox/run`), called by both `pr.yml` and `snapshot.yml`
+- `snapshot.yml` - on every push to `development`: runs tests, then builds and publishes a snapshot release
+- `release.yml` - builds and publishes a release to ForgeBox (a stable release from `main`, or a snapshot when called from `snapshot.yml`); requires a `FORGEBOX_API_TOKEN` secret
+- `pages.yml` - builds and publishes this repo's own dogfooded docs to GitHub Pages (see [Deploying to GitHub Pages](docs/guides/deployment.md))
+- `cron.yml` - runs the test suite daily against `development`
 
 ## Ortus Sponsors
 
