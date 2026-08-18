@@ -44,15 +44,3 @@ jobs:
       issues: write
     with:
       snapshot: true
-
-  #############################################
-  # Generate API documentation via DocBox
-  #############################################
-  docbox:
-    uses: ./.github/workflows/docbox.yml
-    secrets: inherit
-    permissions:
-      checks: write
-      pull-requests: write
-      contents: read
-      issues: read
