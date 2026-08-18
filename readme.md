@@ -38,6 +38,8 @@ Every verb accepts `--projectRoot=<path>` (or a bare positional path) to target 
 
 This repository documents itself with BX Docs - see `bxdocs.json` and `docs/` at the repo root, and [CLI Reference](docs/cli-reference.md) / [Configuration](docs/configuration.md) for the full reference docs. See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's development.
 
+Those docs auto-publish to GitHub Pages via `.github/workflows/pages.yml` on every push to `development` that touches `docs/`, `bxdocs.json`, or the module's own source - see [Deploying to GitHub Pages](docs/guides/deployment.md). One-time setup: **Settings -> Pages -> Source: GitHub Actions**.
+
 ## Install Skills
 
 If you are using the Copilot agent workflow with this template, restore the project skills from `skills-lock.json` when you first start working in the project:

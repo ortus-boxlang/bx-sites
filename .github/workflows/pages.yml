@@ -1,0 +1,77 @@
+name: Publish Docs
+
+# Builds this repository's own dogfooded docs (docs/ + bxdocs.json at the
+# repo root - see readme.md) with bx-docs itself, and publishes site/ to
+# GitHub Pages. Requires GitHub Pages to be enabled for this repository
+# with its source set to "GitHub Actions" (Settings -> Pages -> Source).
+
+on:
+  push:
+    branches:
+      - development
+    paths:
+      - "docs/**"
+      - "bxdocs.json"
+      - "resources/**"
+      - "models/**"
+      - "bifs/**"
+      - "components/**"
+      - "interceptors/**"
+      - "ModuleConfig.bx"
+      - ".github/workflows/pages.yml"
+
+  # Manual Trigger
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one concurrent deployment, but don't cancel in-progress runs, so a
+# deploy that's already underway always finishes.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Setup BoxLang
+        uses: ortus-boxlang/setup-boxlang@1.4.0
+        with:
+          with-commandbox: true
+          modules: bx-markdown
+
+      - name: Register this module so `module:bxDocs` resolves
+        run: |
+          mkdir -p ${HOME}/.boxlang/modules
+          ln -s "$(pwd)" ${HOME}/.boxlang/modules/"$(basename "$(pwd)")"
+
+      - name: Build the site
+        run: boxlang module:bxDocs build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

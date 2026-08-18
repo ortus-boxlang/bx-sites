@@ -37,3 +37,4 @@ repository's own `docs/` folder - see
 - [Configuration](configuration.md) - the full `bxdocs.json` reference
 - [Themes](guides/themes.md) - the built-in themes, and how to write your own
 - [Search](guides/search.md) - how the static search index works
+- [Deploying to GitHub Pages](guides/deployment.md) - the built-in GitHub Actions workflow

@@ -1,0 +1,36 @@
+/**
+ * Extracts an in-page table of contents from a page's rendered HTML - the
+ * "On this page" list mkdocs shows on every page. Only `<h2>`/`<h3>`
+ * headings are considered (the `<h1>` is the page title itself, already
+ * rendered separately). Relies on bx-markdown's own `anchorLinks`/
+ * `anchorSetId` settings (both on by default) having already stamped `id`
+ * attributes onto headings - a heading with no `id` is skipped, since there
+ * would be nothing to link to.
+ */
+class {
+
+	/**
+	 * @html Rendered page HTML (already-converted markdown)
+	 *
+	 * @return Array of { level (2 or 3), id, text }, in document order
+	 */
+	array function build( required string html ) {
+		return reMatch( "<h[2-3][^>]*>.*?</h[2-3]>", arguments.html )
+			.map( match => parseHeading( match ) )
+			.filter( item => len( item.id ) && len( item.text ) )
+	}
+
+	/**
+	 * @match One full `<h2 ...>...</h2>` / `<h3 ...>...</h3>` match
+	 */
+	private struct function parseHeading( required string match ) {
+		var level = val( arguments.match.reReplace( "^<h([2-3]).*", "\1", "one" ) )
+		var id = arguments.match.findNoCase( 'id="' )
+			? arguments.match.reReplace( '.*?id="([^"]*)".*', "\1", "one" )
+			: ""
+		var text = trim( arguments.match.reReplace( "<[^>]+>", " ", "all" ).reReplace( "[ \t\r\n]+", " ", "all" ) )
+
+		return { level : level, id : id, text : text }
+	}
+
+}

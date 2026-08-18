@@ -34,6 +34,7 @@
 	<script src="https://cdn.tailwindcss.com"></script>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
 	<link rel="stylesheet" href="/assets/theme/style.css">
 </bx:output><bx:if condition="#variables.searchEnabled#"><bx:output>
 	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
@@ -41,18 +42,21 @@
 </bx:output></bx:if><bx:output>
 </head>
 <body class="min-h-screen bg-slate-50 font-[Poppins,sans-serif] text-slate-900">
-	<header class="flex h-16 items-center px-6 bg-gradient-to-r from-[##00FF78] to-[##00DBFF] shadow">
+	<header class="flex h-16 items-center gap-3 px-6 bg-gradient-to-r from-[##00FF78] to-[##00DBFF] shadow">
+		<button type="button" class="text-xl md:hidden" aria-controls="bxdocs-sidebar" aria-label="Toggle navigation" onclick="document.getElementById('bxdocs-sidebar').classList.toggle('hidden')">☰</button>
 		<a class="text-lg font-bold text-slate-900" href="/">⚡ #encodeForHTML( variables.siteConfig.name )#</a>
 </bx:output><bx:if condition="#variables.searchEnabled#"><bx:include template="#variables.themeDir#/search.bxm"></bx:if><bx:output>
 	</header>
 	<div class="mx-auto flex max-w-6xl">
-		<nav class="w-64 shrink-0 p-4" aria-label="Navigation">
+		<nav id="bxdocs-sidebar" class="hidden w-64 shrink-0 p-4 md:block" aria-label="Navigation">
 			#renderNavList( variables.nav )#
 		</nav>
 		<main class="min-w-0 flex-1 p-8">
 </bx:output><bx:include template="#variables.themeDir#/page.bxm"><bx:output>
 		</main>
 	</div>
+	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+	<script>hljs.highlightAll();</script>
 </body>
 </html>
 </bx:output>

@@ -1,7 +1,31 @@
+<bx:script>
+	function renderToc( required array toc ) {
+		var html = '<nav class="mb-6 rounded border border-slate-200 bg-cyan-50/40 px-4 py-3 text-sm">'
+		html &= '<div class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">On this page</div><ul class="space-y-1">'
+		for ( var item in arguments.toc ) {
+			var indent = item.level == 3 ? " ml-4" : ""
+			html &= '<li class="' & indent & '"><a class="text-slate-700 hover:text-cyan-700" href="##' & item.id & '">' & encodeForHTML( item.text ) & '</a></li>'
+		}
+		html &= '</ul></nav>'
+		return html
+	}
+</bx:script>
 <bx:output>			<article class="rounded-lg bg-white p-8 shadow-sm ring-1 ring-slate-200">
 				<h1 class="mb-6 border-b-4 border-[##FFF500] pb-2 text-2xl font-bold">#encodeForHTML( variables.page.title )#</h1>
+</bx:output><bx:if condition="#variables.page.toc.len() gt 0#"><bx:output>#renderToc( variables.page.toc )#</bx:output></bx:if><bx:output>
 				<div class="prose max-w-none">
 					#variables.page.contentHtml#
 				</div>
 			</article>
+</bx:output><bx:if condition="#len( variables.page.prevPage.url ) or len( variables.page.nextPage.url )#"><bx:output>
+			<nav class="mt-8 flex justify-between border-t border-slate-200 pt-4 text-sm font-semibold" aria-label="Page navigation">
+</bx:output><bx:if condition="#len( variables.page.prevPage.url )#"><bx:output>
+				<a class="text-cyan-700 hover:text-cyan-900" href="/#variables.page.prevPage.url#">&larr; #encodeForHTML( variables.page.prevPage.title )#</a>
+</bx:output></bx:if><bx:if condition="#!len( variables.page.prevPage.url )#"><bx:output>
+				<span></span>
+</bx:output></bx:if><bx:if condition="#len( variables.page.nextPage.url )#"><bx:output>
+				<a class="text-cyan-700 hover:text-cyan-900" href="/#variables.page.nextPage.url#">#encodeForHTML( variables.page.nextPage.title )# &rarr;</a>
+</bx:output></bx:if><bx:output>
+			</nav>
+</bx:output></bx:if><bx:output>
 </bx:output>

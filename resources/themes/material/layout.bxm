@@ -33,6 +33,7 @@
 	<title>#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
 	<link rel="stylesheet" href="/assets/theme/style.css">
 </bx:output><bx:if condition="#variables.searchEnabled#"><bx:output>
 	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
@@ -41,17 +42,20 @@
 </head>
 <body class="md-body">
 	<header class="md-header">
+		<button class="md-nav-toggle" type="button" aria-controls="bxdocs-sidebar" aria-label="Toggle navigation" onclick="document.getElementById('bxdocs-sidebar').classList.toggle('md-sidebar--open')">☰</button>
 		<a class="md-header__brand" href="/">⚡ #encodeForHTML( variables.siteConfig.name )#</a>
 </bx:output><bx:if condition="#variables.searchEnabled#"><bx:include template="#variables.themeDir#/search.bxm"></bx:if><bx:output>
 	</header>
 	<div class="md-layout">
-		<nav class="md-sidebar" aria-label="Navigation">
+		<nav class="md-sidebar" id="bxdocs-sidebar" aria-label="Navigation">
 			#renderNavList( variables.nav )#
 		</nav>
 		<main class="md-content">
 </bx:output><bx:include template="#variables.themeDir#/page.bxm"><bx:output>
 		</main>
 	</div>
+	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+	<script>hljs.highlightAll();</script>
 </body>
 </html>
 </bx:output>

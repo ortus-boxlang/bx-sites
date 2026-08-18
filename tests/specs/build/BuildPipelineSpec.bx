@@ -57,6 +57,7 @@ class extends="testbox.system.BaseSpec" {
 
 				var homeHtml = fileRead( root & "/site/index.html" );
 				expect( homeHtml ).toInclude( 'href="/guides/setup/index.html"' );
+				expect( homeHtml ).toInclude( 'href="/index.html"' );
 			} );
 
 			it( "passes bxdocs.json's markdown options through to the markdown renderer", function() {
@@ -202,6 +203,52 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( result.skipped ).toBeTrue();
 				expect( fileExists( root & "/site/search-index.json" ) ).toBeFalse();
+			} );
+
+			it( "renders an in-page table of contents from the page's own headings", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", '<h2 id="install">Install</h2>' & char( 10 ) & '<h3 id="prereqs">Prereqs</h3>' );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "On this page" );
+				expect( html ).toInclude( 'href="##install"' );
+				expect( html ).toInclude( ">Install<" );
+				expect( html ).toInclude( 'href="##prereqs"' );
+			} );
+
+			it( "links prev/next pages in nav reading order", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "title: Home" & char( 10 ) & "order: 1" & char( 10 ) & "---" & char( 10 ) & "Home body" );
+				fileWrite( root & "/docs/middle.md", "---" & char( 10 ) & "title: Middle" & char( 10 ) & "order: 2" & char( 10 ) & "---" & char( 10 ) & "Middle body" );
+				fileWrite( root & "/docs/last.md", "---" & char( 10 ) & "title: Last" & char( 10 ) & "order: 3" & char( 10 ) & "---" & char( 10 ) & "Last body" );
+
+				pipeline.build( root );
+
+				var homeHtml = fileRead( root & "/site/index.html" );
+				expect( homeHtml ).notToInclude( "page-nav__prev" );
+				expect( homeHtml ).toInclude( "Middle" );
+
+				var middleHtml = fileRead( root & "/site/middle/index.html" );
+				expect( middleHtml ).toInclude( "Home" );
+				expect( middleHtml ).toInclude( "Last" );
+
+				var lastHtml = fileRead( root & "/site/last/index.html" );
+				expect( lastHtml ).toInclude( "Middle" );
+				expect( lastHtml ).notToInclude( "page-nav__next" );
+			} );
+
+			it( "writes a themed 404.html", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/404.html" ) ).toBeTrue();
+				var html = fileRead( root & "/site/404.html" );
+				expect( html ).toInclude( "Page Not Found" );
+				expect( html ).toInclude( "Test Site" );
 			} );
 
 			it( "throws BxDocs.ConfigNotFound when the project has no bxdocs.json", function() {

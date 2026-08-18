@@ -158,3 +158,76 @@ a:hover {
 .bxdocs-search-results a:hover {
 	background: rgba( 0, 219, 255, 0.15 );
 }
+
+.md-nav-toggle {
+	display: none;
+	border: none;
+	background: transparent;
+	font-size: 1.5rem;
+	line-height: 1;
+	margin-right: 0.75rem;
+	cursor: pointer;
+	color: #04121a;
+}
+
+.md-toc {
+	border: 1px solid rgba( 0, 0, 0, 0.1 );
+	border-radius: 6px;
+	padding: 0.75rem 1rem;
+	background: rgba( 0, 219, 255, 0.05 );
+	margin-bottom: 1.5rem;
+}
+
+.md-toc__title {
+	font-weight: 500;
+	text-transform: uppercase;
+	font-size: 0.75rem;
+	color: #6c757d;
+	margin-bottom: 0.25rem;
+}
+
+.md-toc ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.md-toc__item--3 {
+	padding-left: 1rem;
+	font-size: 0.9em;
+}
+
+.md-page-nav {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 2rem;
+	padding-top: 1rem;
+	border-top: 1px solid rgba( 0, 0, 0, 0.1 );
+}
+
+.md-page-nav a {
+	font-weight: 600;
+}
+
+@media ( max-width: 900px ) {
+	.md-nav-toggle {
+		display: inline-block;
+	}
+
+	.md-sidebar {
+		display: none;
+		position: fixed;
+		top: 64px;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		width: auto;
+		background: var( --md-bg );
+		overflow-y: auto;
+		z-index: 9;
+	}
+
+	.md-sidebar.md-sidebar--open {
+		display: block;
+	}
+}

@@ -86,3 +86,41 @@ a:hover {
 .bxdocs-search-results a:hover {
 	background: rgba( 0, 219, 255, 0.15 );
 }
+
+.toc {
+	border: 1px solid rgba( 0, 0, 0, 0.1 );
+	border-radius: 6px;
+	padding: 0.75rem 1rem;
+	background: rgba( 0, 219, 255, 0.05 );
+}
+
+.toc-title {
+	font-weight: 600;
+	text-transform: uppercase;
+	font-size: 0.75rem;
+	color: #6c757d;
+	margin-bottom: 0.25rem;
+}
+
+.toc .toc-level-3 {
+	padding-left: 1rem;
+	font-size: 0.9em;
+}
+
+.page-nav {
+	margin-top: 2rem;
+	padding-top: 1rem;
+	border-top: 1px solid rgba( 0, 0, 0, 0.1 );
+}
+
+.page-nav a {
+	font-weight: 600;
+}
+
+@media ( max-width: 991.98px ) {
+	.sidebar {
+		background: #fff;
+		box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.15 );
+		padding: 1rem;
+	}
+}

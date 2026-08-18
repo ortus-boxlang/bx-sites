@@ -11,6 +11,9 @@
  *     carries those variables through automatically - no explicit hand-off).
  *   - `page.bxm` (required) - the article body; renders `variables.page.contentHtml`
  *     (the already-converted markdown, set by BuildPipeline before rendering).
+ *     `variables.page.toc`, `.prevPage` and `.nextPage` are always present
+ *     too (defaulted by `renderPage()` below if the caller didn't set them),
+ *     so a theme's `page.bxm` never needs to guard their existence.
  *   - `search.bxm` (optional, not yet enforced - module spec section 7,
  *     deferred to Phase 4) - the search UI partial.
  *   - `assets/` (optional) - theme CSS/JS, copied to `site/assets/theme/` by
@@ -95,6 +98,15 @@ class {
 	 */
 	string function renderPage( required struct page, required array nav, required struct config, required string themeDir ) {
 		variables.page = arguments.page
+		if ( !variables.page.keyExists( "toc" ) ) {
+			variables.page.toc = []
+		}
+		if ( !variables.page.keyExists( "prevPage" ) ) {
+			variables.page.prevPage = { title : "", url : "" }
+		}
+		if ( !variables.page.keyExists( "nextPage" ) ) {
+			variables.page.nextPage = { title : "", url : "" }
+		}
 		variables.nav = arguments.nav
 		variables.siteConfig = arguments.config
 		variables.themeDir = arguments.themeDir

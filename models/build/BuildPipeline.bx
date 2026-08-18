@@ -11,6 +11,7 @@ class {
 	variables.navBuilder       = new "models.build.NavBuilder@bxdocs"()
 	variables.themeRenderer    = new "models.build.ThemeRenderer@bxdocs"()
 	variables.searchIndexer    = new "models.build.SearchIndexer@bxdocs"()
+	variables.tableOfContents  = new "models.build.TableOfContents@bxdocs"()
 	variables.markdownRenderer = new "models.build.MarkdownRenderer@bxdocs"()
 
 	/**
@@ -35,6 +36,7 @@ class {
 		var config = variables.configLoader.load( root )
 		var pages = variables.docsLoader.load( root & "/docs" )
 		var nav = variables.navBuilder.build( pages )
+		var flatSequence = variables.navBuilder.flatten( nav )
 		var themeDir = variables.themeRenderer.resolveThemeDir( config.theme.name, root )
 		var siteDir = root & "/site"
 
@@ -44,6 +46,8 @@ class {
 		directoryCreate( siteDir, true, true )
 
 		convertMarkdown( pages, config )
+		assignTableOfContents( pages )
+		assignPrevNext( pages, flatSequence )
 
 		for ( var page in pages ) {
 			var html = variables.themeRenderer.renderPage( page, nav, config, themeDir )
@@ -51,6 +55,8 @@ class {
 			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
 			fileWrite( outputPath, html )
 		}
+
+		write404Page( nav, config, themeDir, siteDir )
 
 		if ( config.search ) {
 			writeSearchIndex( pages, siteDir )
@@ -104,6 +110,68 @@ class {
 		for ( var page in arguments.pages ) {
 			page.contentHtml = variables.markdownRenderer.toHtml( page.body, arguments.config.markdown )
 		}
+	}
+
+	/**
+	 * Adds a `toc` key (the "On this page" list, from TableOfContents.bx) to
+	 * every page, built from its already-converted `contentHtml`.
+	 *
+	 * @pages Array of page structs with `contentHtml` already set
+	 */
+	private void function assignTableOfContents( required array pages ) {
+		for ( var page in arguments.pages ) {
+			page.toc = variables.tableOfContents.build( page.contentHtml )
+		}
+	}
+
+	/**
+	 * Adds `prevPage`/`nextPage` keys (each `{ title, url }`, or `{ title:"", url:"" }`
+	 * when there is none) to every page, based on its position in the nav's
+	 * own reading order. A page not present in `flatSequence` (i.e. hidden)
+	 * gets no prev/next at all - prev/next is a nav concept, and a hidden
+	 * page isn't part of the nav.
+	 *
+	 * @pages Array of page structs
+	 * @flatSequence NavBuilder.flatten()'s own output for this build
+	 */
+	private void function assignPrevNext( required array pages, required array flatSequence ) {
+		var none = { title : "", url : "" }
+
+		for ( var page in arguments.pages ) {
+			page.prevPage = none
+			page.nextPage = none
+
+			for ( var i = 1; i <= arguments.flatSequence.len(); i++ ) {
+				if ( arguments.flatSequence[ i ].url == page.urlPath ) {
+					page.prevPage = i > 1 ? arguments.flatSequence[ i - 1 ] : none
+					page.nextPage = i < arguments.flatSequence.len() ? arguments.flatSequence[ i + 1 ] : none
+					break
+				}
+			}
+		}
+	}
+
+	/**
+	 * Renders a generic "page not found" page through the active theme and
+	 * writes it to `site/404.html` - the filename GitHub Pages (and most
+	 * static hosts) automatically serve for any unmatched path.
+	 *
+	 * @nav The site's nav tree
+	 * @config The site's bxdocs.json config
+	 * @themeDir Absolute path to the resolved theme folder
+	 * @siteDir Absolute path to the build output directory
+	 */
+	private void function write404Page( required array nav, required struct config, required string themeDir, required string siteDir ) {
+		var page = {
+			title       : "Page Not Found",
+			contentHtml : "<p>Sorry, that page doesn't exist. Try the search box, or head back to the homepage.</p>",
+			toc         : [],
+			prevPage    : { title : "", url : "" },
+			nextPage    : { title : "", url : "" }
+		}
+
+		var html = variables.themeRenderer.renderPage( page, arguments.nav, arguments.config, arguments.themeDir )
+		fileWrite( arguments.siteDir & "/404.html", html )
 	}
 
 	/**

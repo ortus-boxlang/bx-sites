@@ -23,6 +23,16 @@ class {
 			addPage( root, page )
 		}
 
+		// A root-level index.md (no parent folder) sets root.title/url/order
+		// directly in addPage() below, since - unlike a nested folder's own
+		// index.md - it has no children-map slot of its own to land in and
+		// be picked up by toSortedArray(). Splice it in under a key no real
+		// file/folder name can ever produce, so it sorts alongside its true
+		// top-level siblings instead of being silently dropped from the nav.
+		if ( len( root.url ?: "" ) ) {
+			root.children[ "" ] = { title : root.title, url : root.url, order : root.order, children : {} }
+		}
+
 		return toSortedArray( root.children )
 	}
 
@@ -83,6 +93,37 @@ class {
 		} )
 
 		return nodes
+	}
+
+	/**
+	 * Flattens a nav tree into the linear "reading order" used for prev/next
+	 * page links - a depth-first walk in the same sorted order `build()`
+	 * already established. Folder-group nodes with no `url` of their own
+	 * (no `index.md`) are skipped; their children are still visited.
+	 *
+	 * @nav A nav tree from build()
+	 *
+	 * @return Array of { title, url }, in reading order
+	 */
+	array function flatten( required array nav ) {
+		var flat = []
+		flattenInto( arguments.nav, flat )
+		return flat
+	}
+
+	/**
+	 * @nodes A nav tree (or subtree) to walk
+	 * @flat The accumulator array, appended to in place
+	 */
+	private void function flattenInto( required array nodes, required array flat ) {
+		for ( var node in arguments.nodes ) {
+			if ( len( node.url ) ) {
+				arguments.flat.append( { title : node.title, url : node.url } )
+			}
+			if ( node.children.len() ) {
+				flattenInto( node.children, arguments.flat )
+			}
+		}
 	}
 
 }

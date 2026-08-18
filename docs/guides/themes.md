@@ -17,7 +17,18 @@ engine or build step involved.
 | `tailwind` | [Tailwind Play CDN](https://tailwindcss.com/) | Utility-class driven, no build step |
 
 All three apply the same BoxLang brand palette: a `#00FF78 -> #00DBFF`
-gradient and a `#FFF500` accent.
+gradient and a `#FFF500` accent - and all three ship with the same set of
+page features:
+
+- **An in-page "On this page" table of contents**, generated from each
+  page's own `h2`/`h3` headings.
+- **Prev/next page links** at the bottom of the article, following the
+  nav's own reading order.
+- **Syntax-highlighted code blocks**, via [highlight.js](https://highlightjs.org/).
+- **A responsive, collapsible nav** on narrow viewports (a hamburger toggle
+  in `bootstrap`/`material`/`tailwind` alike).
+- **A themed `404.html`**, served automatically by most static hosts
+  (including GitHub Pages) for any unmatched path.
 
 Set which one a project uses in `bxdocs.json`:
 
