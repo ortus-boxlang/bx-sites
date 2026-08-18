@@ -124,6 +124,14 @@ class {
 			)
 		}
 
+		var colorMode = theme.options.colorMode ?: "auto"
+		if ( !listFindNoCase( "light,dark,auto", colorMode ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [theme.options.colorMode], when present, must be one of: light, dark, auto"
+			)
+		}
+
 		if ( !isBoolean( arguments.config.search ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",

@@ -55,9 +55,11 @@
 	<title>#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#</title>
 	<script>
 		( function () {
+			var configuredMode = "#variables.siteConfig.theme.options.colorMode ?: 'auto'#";
 			var stored = localStorage.getItem( "bxdocs-theme" );
 			var prefersDark = window.matchMedia( "(prefers-color-scheme: dark)" ).matches;
-			if ( stored === "dark" || ( !stored && prefersDark ) ) {
+			var wantsDark = stored ? stored === "dark" : ( configuredMode === "dark" || ( configuredMode === "auto" && prefersDark ) );
+			if ( wantsDark ) {
 				document.documentElement.setAttribute( "data-theme", "dark" );
 			}
 		} )();

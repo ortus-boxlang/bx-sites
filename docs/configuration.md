@@ -83,8 +83,18 @@ non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
 - `theme.name` - one of the built-in themes (`bootstrap`, `material`,
   `tailwind`), or the name of a custom theme you provide via a `theme/`
   folder at the project root (see [Themes](guides/themes.md))
-- `theme.options` - reserved for theme-specific options in a future release;
-  currently unused by the built-in themes
+- `theme.options` - theme-specific options. The only one every built-in
+  theme currently reads is:
+  - `theme.options.colorMode` - `"auto"` (the default), `"light"` or
+    `"dark"`. Controls which mode a first-time visitor sees before they've
+    picked one themselves via the header's dark/light toggle - `"auto"`
+    follows their OS preference, `"light"`/`"dark"` pins a fixed default.
+    Once a visitor toggles the switch, their own choice (stored in
+    `localStorage`) always wins on later visits, regardless of this setting.
+
+    ```json
+    { "theme": { "options": { "colorMode": "dark" } } }
+    ```
 
 ## `search`
 

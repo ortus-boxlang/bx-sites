@@ -152,6 +152,23 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "embeds bxdocs.json's [theme.options.colorMode] as the pre-paint default, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+
+					var autoHtml = renderer.renderPage( page, nav, { name : "My Site" }, themeDir );
+					expect( autoHtml ).toInclude( 'configuredMode = "auto"' );
+
+					var darkConfig = { name : "My Site", theme : { options : { colorMode : "dark" } } };
+					var darkHtml = renderer.renderPage( page, nav, darkConfig, themeDir );
+					expect( darkHtml ).toInclude( 'configuredMode = "dark"' );
+				}
+			} );
+
 			it( "renders breadcrumbs when the page has more than one, and skips them otherwise", function() {
 				var root = newProjectRoot();
 				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
