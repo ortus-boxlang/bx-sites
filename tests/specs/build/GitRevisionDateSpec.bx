@@ -1,0 +1,37 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.GitRevisionDate", function() {
+
+			beforeEach( function() {
+				variables.service = new "models.build.GitRevisionDate@bxdocs"();
+				variables.repoRoot = getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]tests[\/]specs[\/]build[\/]?$", "" );
+			} );
+
+			it( "returns an ISO-8601 date for a file tracked in a real git repo", function() {
+				var result = service.forFile( repoRoot, "readme.md" );
+
+				expect( result ).notToBe( "" );
+				expect( result.reFind( "^\d{4}-\d{2}-\d{2}" ) ).toBeGT( 0 );
+			} );
+
+			it( "returns an empty string for a file that doesn't exist", function() {
+				var result = service.forFile( repoRoot, "this-file-does-not-exist.md" );
+
+				expect( result ).toBe( "" );
+			} );
+
+			it( "returns an empty string (never throws) when projectRoot isn't a git repo at all", function() {
+				var tempDir = createTempDirectory( prefix = "bxdocs-gitrevisiondate-" );
+
+				var result = service.forFile( tempDir, "whatever.md" );
+
+				expect( result ).toBe( "" );
+
+				directoryDelete( tempDir, true );
+			} );
+
+		} );
+	}
+
+}

@@ -16,6 +16,7 @@ class {
 	variables.sitemapGenerator = new "models.build.SitemapGenerator@bxdocs"()
 	variables.llmsTxtGenerator = new "models.build.LlmsTxtGenerator@bxdocs"()
 	variables.markdownRenderer = new "models.build.MarkdownRenderer@bxdocs"()
+	variables.gitRevisionDate  = new "models.build.GitRevisionDate@bxdocs"()
 
 	/**
 	 * Swaps in a fake/test markdown renderer. The real one (MarkdownRenderer.bx)
@@ -53,6 +54,7 @@ class {
 		assignTableOfContents( pages )
 		assignPrevNext( pages, flatSequence )
 		assignBreadcrumbs( pages, nav )
+		assignEditAndLastUpdated( pages, config, root )
 
 		for ( var page in pages ) {
 			var html = variables.themeRenderer.renderPage( page, nav, config, themeDir, urls.basePath )
@@ -174,6 +176,43 @@ class {
 		for ( var page in arguments.pages ) {
 			page.breadcrumbs = variables.navBuilder.breadcrumbs( arguments.nav, page.urlPath )
 		}
+	}
+
+	/**
+	 * Adds `editUrl` (a GitHub-style "edit this page" link, empty when
+	 * `bxdocs.json`'s `repo.url`/`repo.editUri` aren't both set) and
+	 * `lastUpdated` (an ISO date-time from `git log`, empty unless
+	 * `lastUpdated` is turned on) to every page.
+	 *
+	 * @pages Array of page structs with `relativePath` already set (DocsLoader.load())
+	 * @config The site's bxdocs.json config
+	 * @root Absolute path to the project root - git's working directory for the `lastUpdated` lookup
+	 */
+	private void function assignEditAndLastUpdated( required array pages, required struct config, required string root ) {
+		var repoUrl = trim( arguments.config.repo.url ?: "" )
+		var editUri = trim( arguments.config.repo.editUri ?: "" )
+		var canEdit = len( repoUrl ) && len( editUri )
+
+		for ( var page in arguments.pages ) {
+			page.editUrl = canEdit ? buildEditUrl( repoUrl, editUri, page.relativePath ) : ""
+			page.lastUpdated = arguments.config.lastUpdated
+				? variables.gitRevisionDate.forFile( arguments.root, "docs/" & page.relativePath )
+				: ""
+		}
+	}
+
+	/**
+	 * Joins a repo URL, an edit URI (e.g. `edit/main/docs/`) and a docs/-relative
+	 * page path into one URL, tolerating either side's leading/trailing slashes.
+	 *
+	 * @repoUrl bxdocs.json's `repo.url`, non-empty
+	 * @editUri bxdocs.json's `repo.editUri`, non-empty
+	 * @relativePath The page's docs/-relative source path, e.g. "guides/setup.md"
+	 */
+	private string function buildEditUrl( required string repoUrl, required string editUri, required string relativePath ) {
+		var base = arguments.repoUrl.reReplace( "[\/]+$", "" )
+		var uri = arguments.editUri.reReplace( "^[\/]+|[\/]+$", "", "all" )
+		return base & "/" & uri & "/" & arguments.relativePath
 	}
 
 	/**

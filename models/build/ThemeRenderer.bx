@@ -11,9 +11,11 @@
  *     carries those variables through automatically - no explicit hand-off).
  *   - `page.bxm` (required) - the article body; renders `variables.page.contentHtml`
  *     (the already-converted markdown, set by BuildPipeline before rendering).
- *     `variables.page.toc`, `.prevPage`, `.nextPage` and `.breadcrumbs` are
- *     always present too (defaulted by `renderPage()` below if the caller
- *     didn't set them), so a theme's `page.bxm` never needs to guard their
+ *     `variables.page.toc`, `.prevPage`, `.nextPage`, `.breadcrumbs`,
+ *     `.editUrl` and `.lastUpdated` are always present too (defaulted by
+ *     `renderPage()` below if the caller didn't set them - the latter two
+ *     are empty strings when `bxdocs.json`'s `repo.editUri`/`lastUpdated`
+ *     aren't configured), so a theme's `page.bxm` never needs to guard their
  *     existence. `variables.basePath` (module spec section 4's `baseURL`,
  *     via BaseUrlResolver.bx) is always a root-relative path ending with
  *     `/` - every internal `href`/`src` a theme renders should be prefixed
@@ -94,6 +96,16 @@ class {
 	}
 
 	/**
+	 * Absolute path to this module's own shared (theme-independent) assets
+	 * folder - exposed to every theme at render time as `variables.moduleAssetsDir`,
+	 * so a theme can `<bx:include template="#variables.moduleAssetsDir#/icons.bxm">`
+	 * for the shared repo/social icon partial rather than duplicating it.
+	 */
+	private string function computeModuleAssetsDir() {
+		return getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]models[\/]build[\/]?$", "" ) & "/resources/assets"
+	}
+
+	/**
 	 * @page A page struct with an added `contentHtml` key (the already-converted markdown body)
 	 * @nav The site's nav tree, from NavBuilder.build()
 	 * @config The site's bxdocs.json config
@@ -116,10 +128,17 @@ class {
 		if ( !variables.page.keyExists( "breadcrumbs" ) ) {
 			variables.page.breadcrumbs = []
 		}
+		if ( !variables.page.keyExists( "editUrl" ) ) {
+			variables.page.editUrl = ""
+		}
+		if ( !variables.page.keyExists( "lastUpdated" ) ) {
+			variables.page.lastUpdated = ""
+		}
 		variables.nav = arguments.nav
 		variables.siteConfig = arguments.config
 		variables.themeDir = arguments.themeDir
 		variables.basePath = len( trim( arguments.basePath ) ) ? arguments.basePath : "/"
+		variables.moduleAssetsDir = computeModuleAssetsDir()
 
 		var html = ""
 		bx:savecontent variable="html" {

@@ -8,5 +8,15 @@
 	},
 	"search": true,
 	"nav": [],
-	"markdown": {}
+	"markdown": {},
+	"repo": {
+		"url": "https://github.com/ortus-boxlang/bx-docs",
+		"editUri": "edit/main/docs/"
+	},
+	"social": [
+		{ "url": "https://github.com/ortus-boxlang/bx-docs", "icon": "github", "label": "GitHub" },
+		{ "url": "https://www.boxlang.io", "icon": "generic", "label": "BoxLang" }
+	],
+	"footer": true,
+	"lastUpdated": true
 }

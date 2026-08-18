@@ -10,7 +10,8 @@
 	display: none !important;
 }
 
-.theme-toggle {
+.theme-toggle,
+.repo-link {
 	background: transparent;
 	border: 1px solid rgba( 0, 0, 0, 0.2 );
 	border-radius: 6px;
@@ -18,10 +19,45 @@
 	line-height: 1;
 	padding: 0.35rem 0.6rem;
 	cursor: pointer;
+	flex-shrink: 0;
+	color: inherit;
+	display: inline-flex;
+	align-items: center;
 }
 
-.theme-toggle:hover {
+.theme-toggle:hover,
+.repo-link:hover {
 	background: rgba( 0, 0, 0, 0.08 );
+}
+
+.navbar-row {
+	flex-wrap: nowrap;
+}
+
+.brand-mark {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	min-width: 0;
+}
+
+.navbar-controls {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-left: auto;
+	min-width: 0;
+}
+
+.bxdocs-search {
+	flex: 1 1 120px;
+	min-width: 70px;
+	max-width: 260px;
+}
+
+.repo-link svg,
+.social-link svg {
+	display: block;
 }
 
 [data-theme="dark"] body {
@@ -71,6 +107,57 @@
 .bxdocs-pre:hover .bxdocs-copy-btn,
 .bxdocs-copy-btn:focus {
 	opacity: 1;
+}
+
+/* Touch devices have no hover state to reveal the button on, so it needs to
+   just be visible outright there - opacity would otherwise make it
+   permanently unreachable on mobile. */
+@media ( hover: none ) {
+	.bxdocs-copy-btn {
+		opacity: 1;
+	}
+}
+
+.bxdocs-footer {
+	margin-top: 3rem;
+	border-top: 1px solid #e2e8f0;
+	padding: 1.5rem;
+	font-size: 0.875rem;
+	color: #475569;
+}
+
+[data-theme="dark"] .bxdocs-footer {
+	border-color: rgba( 255, 255, 255, 0.12 ) !important;
+	color: #dce3ea !important;
+}
+
+.bxdocs-footer__inner {
+	max-width: 72rem;
+	margin: 0 auto;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.bxdocs-footer__social {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.social-link {
+	color: inherit;
+	display: inline-flex;
+}
+
+.social-link:hover {
+	color: #0e7490;
+}
+
+.bxdocs-footer__credit a {
+	font-weight: 600;
 }
 
 .prose :where(h2, h3, h4) {

@@ -1,3 +1,4 @@
+<bx:include template="#variables.moduleAssetsDir#/icons.bxm">
 <bx:script>
 	/**
 	 * Recursively renders a nav tree (module spec section 5, step 4) as a
@@ -22,8 +23,19 @@
 		return html
 	}
 
+	function renderSocialLinks( required array links ) {
+		var html = ""
+		for ( var link in arguments.links ) {
+			html &= '<a class="social-link" href="' & encodeForHTML( link.url ) & '" target="_blank" rel="noopener noreferrer" aria-label="' & encodeForHTML( link.label ?: link.icon ?: "Link" ) & '" title="' & encodeForHTML( link.label ?: link.icon ?: "Link" ) & '">' & bxdocsIcon( link.icon ?: "generic" ) & '</a>'
+		}
+		return html
+	}
+
 	// module spec section 7 - search is fully static/client-side and opt-out via bxdocs.json
 	variables.searchEnabled = ( variables.siteConfig.search ?: false ) ? true : false
+	variables.repoUrl = trim( variables.siteConfig.repo.url ?: "" )
+	variables.socialLinks = variables.siteConfig.social ?: []
+	variables.footerEnabled = ( variables.siteConfig.footer ?: false ) ? true : false
 </bx:script>
 <bx:output><!doctype html>
 <html lang="en">
@@ -55,11 +67,16 @@
 	<header class="md-header">
 		<button class="md-nav-toggle" type="button" aria-controls="bxdocs-sidebar" aria-label="Toggle navigation" onclick="document.getElementById('bxdocs-sidebar').classList.toggle('md-sidebar--open')">☰</button>
 		<a class="md-header__brand" href="#variables.basePath#">⚡ #encodeForHTML( variables.siteConfig.name )#</a>
-		<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="Toggle dark mode">
-			<span x-show="!dark">&##127769;</span>
-			<span x-show="dark" x-cloak>&##9728;&##65039;</span>
-		</button>
+		<div class="md-header__controls">
 </bx:output><bx:if condition="#variables.searchEnabled#"><bx:include template="#variables.themeDir#/search.bxm"></bx:if><bx:output>
+</bx:output><bx:if condition="#len( variables.repoUrl )#"><bx:output>
+			<a class="repo-link" href="#encodeForHTML( variables.repoUrl )#" target="_blank" rel="noopener noreferrer" aria-label="Repository" title="Repository">#bxdocsIcon( "github" )#</a>
+</bx:output></bx:if><bx:output>
+			<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="Toggle dark mode">
+				<span x-show="!dark">&##127769;</span>
+				<span x-show="dark" x-cloak>&##9728;&##65039;</span>
+			</button>
+		</div>
 	</header>
 	<div class="md-layout">
 		<nav class="md-sidebar" id="bxdocs-sidebar" aria-label="Navigation">
@@ -69,6 +86,17 @@
 </bx:output><bx:include template="#variables.themeDir#/page.bxm"><bx:output>
 		</main>
 	</div>
+</bx:output><bx:if condition="#variables.footerEnabled#"><bx:output>
+	<footer class="bxdocs-footer">
+		<div class="bxdocs-footer__inner">
+			<div class="bxdocs-footer__copy">&copy; #year( now() )# #encodeForHTML( variables.siteConfig.name )#</div>
+</bx:output><bx:if condition="#variables.socialLinks.len() gt 0#"><bx:output>
+			<div class="bxdocs-footer__social">#renderSocialLinks( variables.socialLinks )#</div>
+</bx:output></bx:if><bx:output>
+			<div class="bxdocs-footer__credit">Built with <a href="https://github.com/ortus-boxlang/bx-docs" target="_blank" rel="noopener noreferrer">BX Docs</a></div>
+		</div>
+	</footer>
+</bx:output></bx:if><bx:output>
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
 	<script>hljs.highlightAll();</script>
 	<script src="#variables.basePath#assets/copy-code.js" defer></script>

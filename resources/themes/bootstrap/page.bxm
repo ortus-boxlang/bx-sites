@@ -16,6 +16,18 @@
 		return html
 	}
 
+	function renderPageMeta( required string editUrl, required string lastUpdated ) {
+		var html = '<div class="page-meta">'
+		if ( len( arguments.editUrl ) ) {
+			html &= '<a href="' & encodeForHTML( arguments.editUrl ) & '" target="_blank" rel="noopener noreferrer">' & bxdocsIcon( "edit" ) & ' Edit this page</a>'
+		}
+		if ( len( arguments.lastUpdated ) ) {
+			html &= '<span class="page-meta__item">' & bxdocsIcon( "clock" ) & ' Last updated ' & encodeForHTML( dateTimeFormat( arguments.lastUpdated, "medium" ) ) & '</span>'
+		}
+		html &= '</div>'
+		return html
+	}
+
 	function renderToc( required array toc ) {
 		var html = '<nav class="toc mb-4" aria-label="On this page">'
 		html &= '<div class="toc-title">On this page</div><ul class="list-unstyled">'
@@ -29,6 +41,7 @@
 <bx:output>				<article class="page-content">
 </bx:output><bx:if condition="#variables.page.breadcrumbs.len() gt 1#"><bx:output>#renderBreadcrumbs( variables.page.breadcrumbs )#</bx:output></bx:if><bx:output>
 					<h1 class="page-title">#encodeForHTML( variables.page.title )#</h1>
+</bx:output><bx:if condition="#len( variables.page.editUrl ) or len( variables.page.lastUpdated )#"><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated )#</bx:output></bx:if><bx:output>
 </bx:output><bx:if condition="#variables.page.toc.len() gt 0#"><bx:output>#renderToc( variables.page.toc )#</bx:output></bx:if><bx:output>
 					#variables.page.contentHtml#
 				</article>

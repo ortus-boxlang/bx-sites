@@ -18,7 +18,14 @@ Every project has one `bxdocs.json` at its root:
 	},
 	"search": true,
 	"nav": [],
-	"markdown": {}
+	"markdown": {},
+	"repo": {
+		"url": "",
+		"editUri": ""
+	},
+	"social": [],
+	"footer": false,
+	"lastUpdated": false
 }
 ```
 
@@ -106,4 +113,66 @@ whatever you put here is bx-markdown's own option set, straight through.
 		"enableYouTubeTransformer": true
 	}
 }
+```
+
+## `repo`
+
+Adds a repository icon link to the header (all three built-in themes) and,
+when both keys are set, an "Edit this page" link on every page.
+
+- `repo.url` - your repo's URL, e.g. `"https://github.com/acme/docs"`.
+  Renders the header icon link on its own; leave blank to omit it entirely.
+- `repo.editUri` - the path segment between the repo URL and a page's own
+  source path, e.g. `"edit/main/docs/"` (GitHub's own "edit" URL
+  convention). Combined with `repo.url` and a page's `docs/`-relative
+  source path to build its edit link - e.g. with the example above,
+  `docs/guides/setup.md` gets
+  `https://github.com/acme/docs/edit/main/docs/guides/setup.md`. Requires
+  `repo.url` too; leave blank to omit edit links while still showing the
+  header icon.
+
+```json
+{ "repo": { "url": "https://github.com/acme/docs", "editUri": "edit/main/docs/" } }
+```
+
+## `social`
+
+An array of social/external links rendered in the footer (see
+[`footer`](#footer) - has no effect unless it's also turned on). Each entry
+needs a `url`; `icon` selects from a small built-in icon set (`github`,
+`twitter`/`x`, `rss`, `email`, falling back to a generic link glyph for
+anything else), and `label` sets the link's accessible name/tooltip
+(defaults to `icon`, then `"Link"`).
+
+```json
+{
+	"social": [
+		{ "url": "https://twitter.com/acme", "icon": "twitter", "label": "Twitter" },
+		{ "url": "https://acme.com/rss.xml", "icon": "rss", "label": "RSS" }
+	]
+}
+```
+
+## `footer`
+
+`false` (the default) - no footer at all. `true` adds one to every page:
+a copyright line (`© <year> <site name>`), the `social` links (if any),
+and a "Built with BX Docs" credit.
+
+```json
+{ "footer": true }
+```
+
+## `lastUpdated`
+
+`false` (the default) - no last-updated date. `true` adds a "Last updated"
+line next to the edit link (or on its own, if `repo.editUri` isn't set),
+sourced from `git log` on each page's own Markdown file at build time.
+Silently omitted for a page git has no history for - a fresh `git init`
+with no commits yet, a build running from a downloaded zip with no `.git`
+at all, or git not being installed on the build machine - rather than
+breaking the build.
+
+```json
+{ "lastUpdated": true }
 ```

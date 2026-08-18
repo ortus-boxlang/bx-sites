@@ -175,6 +175,62 @@ class extends="testbox.system.BaseSpec" {
 				expect( htmlWithoutCrumbs ).notToInclude( "breadcrumb-nav" );
 			} );
 
+			it( "renders a repo link, social links and a footer when configured, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var config = {
+					name   : "My Site",
+					repo   : { url : "https://github.com/acme/docs", editUri : "edit/main/docs/" },
+					social : [ { url : "https://twitter.com/acme", icon : "twitter", label : "Twitter" } ],
+					footer : true
+				};
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					var html = renderer.renderPage( page, nav, config, themeDir );
+
+					expect( html ).toInclude( 'href="https://github.com/acme/docs"' );
+					expect( html ).toInclude( "repo-link" );
+					expect( html ).toInclude( "bxdocs-footer" );
+					expect( html ).toInclude( 'href="https://twitter.com/acme"' );
+				}
+			} );
+
+			it( "omits the repo link and footer entirely when unconfigured, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var config = { name : "My Site" };
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					var html = renderer.renderPage( page, nav, config, themeDir );
+
+					expect( html ).notToInclude( "repo-link" );
+					expect( html ).notToInclude( "bxdocs-footer" );
+				}
+			} );
+
+			it( "renders the edit-this-page link from the page's own editUrl, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = {
+					title       : "My Page",
+					contentHtml : "<p>Body</p>",
+					editUrl     : "https://github.com/acme/docs/edit/main/docs/index.md"
+				};
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var config = { name : "My Site" };
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					var html = renderer.renderPage( page, nav, config, themeDir );
+
+					expect( html ).toInclude( 'href="https://github.com/acme/docs/edit/main/docs/index.md"' );
+					expect( html ).toInclude( "Edit this page" );
+				}
+			} );
+
 		} );
 	}
 

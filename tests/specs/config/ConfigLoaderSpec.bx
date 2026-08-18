@@ -50,7 +50,7 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxDocs.InvalidConfig" );
 			} );
 
-			it( "applies defaults for description, baseURL, theme, search, nav and markdown", function() {
+			it( "applies defaults for description, baseURL, theme, search, nav, markdown, repo, social, footer and lastUpdated", function() {
 				var dir = newProjectDir( '{"name":"My Docs"}' );
 				var config = loader.load( dir );
 
@@ -62,6 +62,12 @@ class extends="testbox.system.BaseSpec" {
 				expect( config.search ).toBeTrue();
 				expect( config.nav ).toBeArray();
 				expect( config.markdown ).toBeStruct();
+				expect( config.repo.url ).toBe( "" );
+				expect( config.repo.editUri ).toBe( "" );
+				expect( config.social ).toBeArray();
+				expect( config.social.len() ).toBe( 0 );
+				expect( config.footer ).toBeFalse();
+				expect( config.lastUpdated ).toBeFalse();
 			} );
 
 			it( "deep-merges a partial [theme] override, keeping default options", function() {
@@ -104,6 +110,43 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "exposes the v1 built-in theme names", function() {
 				expect( loader.getBuiltInThemes() ).toBe( [ "bootstrap", "material", "tailwind" ] );
+			} );
+
+			it( "deep-merges a partial [repo] override, keeping the default empty editUri", function() {
+				var dir = newProjectDir( '{"name":"My Docs","repo":{"url":"https://github.com/acme/docs"}}' );
+				var config = loader.load( dir );
+
+				expect( config.repo.url ).toBe( "https://github.com/acme/docs" );
+				expect( config.repo.editUri ).toBe( "" );
+			} );
+
+			it( "preserves a user-supplied [social] array", function() {
+				var dir = newProjectDir( '{"name":"My Docs","social":[{"url":"https://twitter.com/acme","icon":"twitter"}]}' );
+				var config = loader.load( dir );
+
+				expect( config.social.len() ).toBe( 1 );
+				expect( config.social[ 1 ].url ).toBe( "https://twitter.com/acme" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when a [social] entry has no [url]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","social":[{"icon":"twitter"}]}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [footer] is not a boolean", function() {
+				var dir = newProjectDir( '{"name":"My Docs","footer":"yes please"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [lastUpdated] is not a boolean", function() {
+				var dir = newProjectDir( '{"name":"My Docs","lastUpdated":"yes please"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
 			} );
 
 		} );

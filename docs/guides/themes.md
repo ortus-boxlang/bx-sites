@@ -27,16 +27,25 @@ page features:
 - **Prev/next page links** at the bottom of the article, following the
   nav's own reading order.
 - **Syntax-highlighted code blocks**, via [highlight.js](https://highlightjs.org/),
-  each with a **copy button** on hover.
+  each with a **copy button** - shown on hover on devices that support it,
+  always visible on touch devices (there's no hover to reveal it there).
 - **A dark/light mode toggle**, powered by [Alpine.js](https://alpinejs.dev/)
   for reactivity. The visitor's choice is remembered in `localStorage`
   (falling back to their OS preference), and applied before first paint to
   avoid a flash of the wrong theme.
-- **A responsive, collapsible nav** on narrow viewports (a hamburger toggle
-  in `bootstrap`/`material`/`tailwind` alike).
+- **A responsive header** that stays a single row at every width - a
+  narrow viewport shrinks the search box rather than wrapping it onto its
+  own line - plus a collapsible sidebar nav (a hamburger toggle in
+  `bootstrap`/`material`/`tailwind` alike).
 - **Keyboard shortcuts** in the search box: `/` focuses search from
   anywhere on the page, and `Escape` closes the results. See
   [Search](search.md).
+- **A repo link and "Edit this page"/"Last updated" line**, when
+  `bxdocs.json`'s `repo`/`lastUpdated` options are set. See
+  [Configuration](../configuration.md#repo).
+- **An opt-in footer** (copyright, `social` links, a "Built with BX Docs"
+  credit) when `bxdocs.json`'s `footer` is `true`. See
+  [Configuration](../configuration.md#footer).
 - **A themed `404.html`**, served automatically by most static hosts
   (including GitHub Pages) for any unmatched path.
 
@@ -65,6 +74,16 @@ A theme is just a folder with:
   [Search](search.md).
 - **`assets/`** (optional) - theme CSS/JS, copied to `site/assets/theme/`
   at build time.
+
+`variables.page.editUrl`/`.lastUpdated` (empty strings when unconfigured)
+and `variables.siteConfig.repo`/`.social`/`.footer` are always available too,
+backing the repo link/edit link/last-updated/footer features above - a
+custom theme decides for itself whether and how to render them, same as
+everything else. The three built-in themes get their repo/social icons from
+a small shared SVG lookup, `<bx:include template="#variables.moduleAssetsDir#/icons.bxm">`
+(defines `bxdocsIcon( name )`, one of `github`, `twitter`/`x`, `rss`,
+`email`, `edit`, `clock`, falling back to a generic link glyph) - a custom
+theme can include it the same way, or supply its own icons entirely.
 
 A theme folder missing either required file fails fast with a clear
 `BxDocs.InvalidTheme` error at build time, rather than a confusing template

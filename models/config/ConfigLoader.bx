@@ -11,12 +11,16 @@ class {
 	 * are forwarded as-is to bx-markdown, which owns its own defaults.
 	 */
 	variables.defaults = {
-		"description" : "",
-		"baseURL"     : "/",
-		"theme"       : { "name" : "bootstrap", "options" : {} },
-		"search"      : true,
-		"nav"         : [],
-		"markdown"    : {}
+		"description"  : "",
+		"baseURL"      : "/",
+		"theme"        : { "name" : "bootstrap", "options" : {} },
+		"search"       : true,
+		"nav"          : [],
+		"markdown"     : {},
+		"repo"         : { "url" : "", "editUri" : "" },
+		"social"       : [],
+		"footer"       : false,
+		"lastUpdated"  : false
 	}
 
 	/**
@@ -138,6 +142,43 @@ class {
 			throw(
 				type    = "BxDocs.InvalidConfig",
 				message = "bxdocs.json [markdown], when present, must be an object"
+			)
+		}
+
+		var repo = arguments.config.repo ?: ""
+		if ( !isStruct( repo ) || !isSimpleValue( repo.url ?: "" ) || !isSimpleValue( repo.editUri ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [repo], when present, must be an object with string [url]/[editUri]"
+			)
+		}
+
+		if ( !isArray( arguments.config.social ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [social], when present, must be an array"
+			)
+		}
+		for ( var link in arguments.config.social ) {
+			if ( !isStruct( link ) || !len( trim( link.url ?: "" ) ) ) {
+				throw(
+					type    = "BxDocs.InvalidConfig",
+					message = "bxdocs.json [social] entries must be objects with a non-empty [url]"
+				)
+			}
+		}
+
+		if ( !isBoolean( arguments.config.footer ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [footer] must be a boolean"
+			)
+		}
+
+		if ( !isBoolean( arguments.config.lastUpdated ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [lastUpdated] must be a boolean"
 			)
 		}
 
