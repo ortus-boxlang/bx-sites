@@ -22,6 +22,7 @@ class {
 
 		var pages = directoryList( dir, true, "path", "*.md" )
 			.filter( path => !path.reReplace( dir, "", "one" ).reFindNoCase( "^[\/]assets[\/]" ) )
+			.filter( path => !path.reReplace( dir, "", "one" ).reFindNoCase( "^[\/]versions[\/]" ) )
 			.map( path => loadFile( dir, path ) )
 
 		pages.sort( ( a, b ) => {

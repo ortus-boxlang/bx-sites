@@ -25,6 +25,13 @@
  *     deferred to Phase 4) - the search UI partial.
  *   - `assets/` (optional) - theme CSS/JS, copied to `site/assets/theme/` by
  *     BuildPipeline's asset pipeline.
+ *
+ * `variables.versions` (`[ { label, url } ]`, "Latest" first) and
+ * `variables.currentVersion` (the `label` being rendered right now) back
+ * a version switcher for projects using the `docs/versions/` convention
+ * (VersionsDiscoverer.bx) - empty/`"Latest"` for a project that isn't
+ * versioned, so a theme only needs to render the switcher when
+ * `variables.versions.len() gt 1`.
  */
 class {
 
@@ -111,10 +118,12 @@ class {
 	 * @config The site's bxdocs.json config
 	 * @themeDir Absolute path to the resolved theme folder (from resolveThemeDir())
 	 * @basePath Root-relative base path ending with `/` (BaseUrlResolver's `basePath`) - defaults to `/`
+	 * @versions Version switcher entries as `[ { label, url } ]` ("Latest" first, then each discovered docs/versions/ folder) - empty when the project doesn't use versioning
+	 * @currentVersion The `label` (from `versions`) of the version being rendered right now - `"Latest"` for the default/unversioned build
 	 *
 	 * @return The rendered page HTML
 	 */
-	string function renderPage( required struct page, required array nav, required struct config, required string themeDir, string basePath = "/" ) {
+	string function renderPage( required struct page, required array nav, required struct config, required string themeDir, string basePath = "/", array versions = [], string currentVersion = "Latest" ) {
 		variables.page = arguments.page
 		if ( !variables.page.keyExists( "toc" ) ) {
 			variables.page.toc = []
@@ -139,6 +148,8 @@ class {
 		variables.themeDir = arguments.themeDir
 		variables.basePath = len( trim( arguments.basePath ) ) ? arguments.basePath : "/"
 		variables.moduleAssetsDir = computeModuleAssetsDir()
+		variables.versions = arguments.versions
+		variables.currentVersion = arguments.currentVersion
 
 		var html = ""
 		bx:savecontent variable="html" {

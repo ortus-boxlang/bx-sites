@@ -95,6 +95,18 @@ class extends="testbox.system.BaseSpec" {
 				expect( pages[ 1 ].relativePath ).toBe( "real.md" );
 			} );
 
+			it( "excludes docs/versions/** from the loaded pages (VersionsDiscoverer/BuildPipeline own that tree)", function() {
+				var dir = newDocsDir();
+				directoryCreate( dir & "/versions/1.0", true, true );
+				fileWrite( dir & "/versions/1.0/index.md", "Old docs" );
+				fileWrite( dir & "/real.md", "Included" );
+
+				var pages = loader.load( dir );
+
+				expect( pages.len() ).toBe( 1 );
+				expect( pages[ 1 ].relativePath ).toBe( "real.md" );
+			} );
+
 			it( "sorts pages by order, then by title", function() {
 				var dir = newDocsDir();
 				fileWrite( dir & "/b.md", "---" & char( 10 ) & "title: B Page" & char( 10 ) & "order: 1" & char( 10 ) & "---" & char( 10 ) & "b" );
