@@ -6,10 +6,10 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Home - BX Docs</title>
+	<title>Markdown Extensions - BX Docs</title>
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="BX Docs">
-	<meta property="og:title" content="Home">
+	<meta property="og:title" content="Markdown Extensions">
 
 	<meta name="description" content="Static documentation site generator for BoxLang, built on bx-markdown">
 	<meta property="og:description" content="Static documentation site generator for BoxLang, built on bx-markdown">
@@ -70,53 +70,66 @@
 			<main class="col-lg-9 col-xl-10 content">
 
 				<article class="page-content">
-
-					<h1 class="page-title">Home</h1>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/index.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 8:21:12 PM</span></div>
-<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#highlights">Highlights</a></li><li class="toc-level-2"><a href="#where-to-go-next">Where to go next</a></li></ul></nav>
-					<h1 id="bx-docs"><a href="#bx-docs" id="bx-docs" name="bx-docs" class="anchor"></a>BX Docs</h1>
-<p>BX Docs is a BoxLang module that generates static documentation sites from
-Markdown, in the spirit of <a href="https://www.mkdocs.org/">mkdocs</a> and
-<a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a>.</p>
-<p>This very site is built by BX Docs, from the Markdown files in this
-repository's own <code>docs/</code> folder - see
-<a href="getting-started.md">Getting Started</a> to build it yourself.</p>
-<h2 id="highlights"><a href="#highlights" id="highlights" name="highlights" class="anchor"></a>Highlights</h2>
+<nav class="breadcrumb-nav mb-3" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/bx-docs/development/guides/index.html">Guides</a></li><li class="breadcrumb-item active" aria-current="page">Markdown Extensions</li></ol></nav>
+					<h1 class="page-title">Markdown Extensions</h1>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/markdown.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 8:21:12 PM</span></div>
+<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#admonitions">Admonitions</a></li><li class="toc-level-2"><a href="#diagrams">Diagrams</a></li></ul></nav>
+					<h1 id="markdown-extensions"><a href="#markdown-extensions" id="markdown-extensions" name="markdown-extensions" class="anchor"></a>Markdown Extensions</h1>
+<p>Beyond standard Markdown (and whatever <a href="../configuration.md#markdown">bx-markdown option</a>
+you've turned on), BX Docs adds two content extensions of its own: admonitions
+and Mermaid diagrams.</p>
+<h2 id="admonitions"><a href="#admonitions" id="admonitions" name="admonitions" class="anchor"></a>Admonitions</h2>
+<p>A callout/note box - no <code>bxdocs.json</code> config needed, just write it:</p>
+<pre><code class="language-markdown">!!! note &quot;Heads Up&quot;
+    This is an admonition. Its content is regular markdown - **bold**,
+    `code`, [links](../index.md) and lists all work exactly as normal.
+</code></pre>
+<p>Which renders as:</p>
+<div class="admonition note"><p class="admonition-title">Heads Up</p><p>This is an admonition. Its content is regular markdown - <strong>bold</strong>,
+<code>code</code>, <a href="../index.md">links</a> and lists all work exactly as normal.</p>
+</div>
+<p>The type (<code>note</code> above) becomes the box's CSS class and, if you don't give
+an explicit <code>&quot;Title&quot;</code>, its own capitalized name is used instead. A handful
+of types get their own accent color out of the box:</p>
+<div class="admonition tip"><p class="admonition-title">tip / hint / success / check / done</p><p>Green.</p>
+</div>
+<div class="admonition warning"><p class="admonition-title">warning / caution / attention</p><p>Orange.</p>
+</div>
+<div class="admonition danger"><p class="admonition-title">danger / error / failure / fail / missing</p><p>Red.</p>
+</div>
+<div class="admonition question"><p class="admonition-title">question / help / faq</p><p>Amber.</p>
+</div>
+<div class="admonition example"><p class="admonition-title">example</p><p>Purple.</p>
+</div>
+<p>Any other type still renders as a valid admonition box (in the default blue
+accent) - the type list above is just which ones get their own color.</p>
+<p>The body must stay indented by 4 spaces (or a tab); the block ends at the
+first non-indented, non-blank line. Blank lines are fine <em>inside</em> the block</p>
 <ul>
-<li><strong>Markdown in, static HTML out.</strong> Point it at a <code>docs/</code> folder and it
-renders a complete site into <code>site/</code> - no server required to host it.</li>
-<li><strong>Folder structure is nav structure.</strong> Nest folders and files under
-<code>docs/</code> and the navigation builds itself, in the order you set via
-frontmatter.</li>
-<li><strong>Three built-in themes.</strong> <code>bootstrap</code> (the default), <code>material</code> and
-<code>tailwind</code> - all sharing the same BoxLang brand palette, and all
-overridable with your own theme.</li>
-<li><strong>Static, client-side search.</strong> A <a href="https://lunrjs.com/">lunr.js</a>-powered
-search box, wired against a search index built at <code>build</code> time - the same
-approach mkdocs itself uses by default, no server dependency.</li>
-<li><strong>Markdown handled by <a href="https://github.com/ortus-boxlang/bx-markdown">bx-markdown</a>.</strong>
-BX Docs doesn't parse Markdown itself; it delegates to bx-markdown and
-forwards your own <code>bxdocs.json</code> options straight through to it.</li>
+<li>they just start a new paragraph, same as anywhere else in markdown.</li>
 </ul>
-<h2 id="where-to-go-next"><a href="#where-to-go-next" id="where-to-go-next" name="where-to-go-next" class="anchor"></a>Where to go next</h2>
-<ul>
-<li><a href="getting-started.md">Getting Started</a> - install, scaffold a project, build and serve it</li>
-<li><a href="cli-reference.md">CLI Reference</a> - every verb and its options</li>
-<li><a href="configuration.md">Configuration</a> - the full <code>bxdocs.json</code> reference</li>
-<li><a href="guides/themes.md">Themes</a> - the built-in themes, and how to write your own</li>
-<li><a href="guides/search.md">Search</a> - how the static search index works</li>
-<li><a href="guides/deployment.md">Deploying to GitHub Pages</a> - the built-in GitHub Actions workflow</li>
-<li><a href="guides/markdown.md">Markdown Extensions</a> - admonitions and Mermaid diagrams</li>
-<li><a href="releases/index.md">Releases</a> - versioning policy and what's new per release</li>
-</ul>
+<h2 id="diagrams"><a href="#diagrams" id="diagrams" name="diagrams" class="anchor"></a>Diagrams</h2>
+<p>Opt-in via <code>bxdocs.json</code>'s <a href="../configuration.md#mermaid"><code>mermaid</code></a> key:</p>
+<pre><code class="language-json">{ &quot;mermaid&quot;: true }
+</code></pre>
+<p>Once enabled, any <code>```mermaid</code> fenced code block renders as a live
+<a href="https://mermaid.js.org/">Mermaid</a> diagram instead of a code listing:</p>
+<pre><code class="language-mermaid">flowchart LR
+    A[docs/*.md] --&gt; B[bx-markdown]
+    B --&gt; C[Theme]
+    C --&gt; D[site/*.html]
+</code></pre>
+<p>Mermaid supports flowcharts, sequence diagrams, class diagrams, Gantt
+charts and more - see <a href="https://mermaid.js.org/intro/syntax-reference.html">Mermaid's own syntax reference</a>
+for everything it can draw.</p>
 
 				</article>
 
 				<nav class="page-nav d-flex justify-content-between" aria-label="Page navigation">
 
-					<span></span>
+					<a class="page-nav__prev" href="/bx-docs/development/guides/deployment/index.html">&larr; Deploying to GitHub Pages</a>
 
-					<a class="page-nav__next" href="/bx-docs/development/getting-started/index.html">Getting Started &rarr;</a>
+					<a class="page-nav__next" href="/bx-docs/development/releases/index.html">Release Policy &rarr;</a>
 
 				</nav>
 
