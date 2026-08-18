@@ -38,9 +38,38 @@ markup, but reserved for future use (meta tags, RSS, etc.).
 
 ## `baseURL`
 
-Reserved for serving a site from a sub-path. The built-in themes currently
-link with root-relative URLs (`/page/`); full `baseURL` support is a future
-enhancement.
+Controls how every internal link, asset path and nav entry is prefixed, and
+doubles as the site's canonical URL for `sitemap.xml` and `llms.txt`.
+
+- Left blank or `"/"` (the default) - links stay root-relative (`/page/`),
+  and neither `sitemap.xml` nor an absolute-URL `llms.txt` is generated
+  (there's no canonical domain to build them from).
+- A bare path, e.g. `"my-docs"` or `"/my-docs/"` - the site is assumed to be
+  served from that sub-path, and every internal link, nav entry and asset
+  is prefixed with it (`/my-docs/page/`). Still no `sitemap.xml`, since
+  there's still no absolute domain.
+- A full URL, e.g. `"https://docs.example.com/"` - the path portion
+  (`/` here) is used the same way a bare path would be, **and**
+  `sitemap.xml` is written at build time with every non-hidden page's
+  absolute URL under that domain.
+
+`llms.txt` (see [below](#llms-txt)) is always written; it just prefers an
+absolute URL when `baseURL` provides one.
+
+## `llms.txt`
+
+Every build writes a `llms.txt` to the site root - a plain Markdown index of
+every non-hidden page, following the emerging
+[llms.txt](https://llmstxt.org) convention for helping LLM-based tools
+navigate a site without crawling its rendered HTML. There's no config key
+for this; it's generated automatically, using an absolute URL per link when
+`baseURL` is a full URL, or a `basePath`-relative one otherwise.
+
+## `sitemap.xml`
+
+Written at the site root, but only when `baseURL` is a full URL (see
+above) - a sitemap needs an absolute domain to be meaningful. Lists every
+non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
 
 ## `theme`
 

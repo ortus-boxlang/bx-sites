@@ -42,3 +42,19 @@ Copy `.github/workflows/pages.yml` into your own project (adjust the
 `modules:` line if your project needs anything beyond `bx-markdown`, and
 the trigger branch if you don't use `development`), enable Pages as above,
 and pushes to your docs will publish the same way.
+
+## Serving from a project Pages sub-path
+
+A GitHub *project* Pages site (as opposed to a `<user>.github.io` *user*
+site) is served from `https://<user>.github.io/<repo>/`, not from the
+domain root. Set `baseURL` in `bxdocs.json` to that full URL so every
+internal link, asset and nav entry gets the `/<repo>/` prefix it needs -
+and so a real `sitemap.xml` gets generated too:
+
+```json
+{ "baseURL": "https://<user>.github.io/<repo>/" }
+```
+
+See [Configuration](../configuration.md#baseurl) for the full breakdown of
+what `baseURL` does. A `<user>.github.io` user site, or any custom domain
+mapped to the site root, can leave `baseURL` at its default (`/`).

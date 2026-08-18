@@ -11,9 +11,14 @@
  *     carries those variables through automatically - no explicit hand-off).
  *   - `page.bxm` (required) - the article body; renders `variables.page.contentHtml`
  *     (the already-converted markdown, set by BuildPipeline before rendering).
- *     `variables.page.toc`, `.prevPage` and `.nextPage` are always present
- *     too (defaulted by `renderPage()` below if the caller didn't set them),
- *     so a theme's `page.bxm` never needs to guard their existence.
+ *     `variables.page.toc`, `.prevPage`, `.nextPage` and `.breadcrumbs` are
+ *     always present too (defaulted by `renderPage()` below if the caller
+ *     didn't set them), so a theme's `page.bxm` never needs to guard their
+ *     existence. `variables.basePath` (module spec section 4's `baseURL`,
+ *     via BaseUrlResolver.bx) is always a root-relative path ending with
+ *     `/` - every internal `href`/`src` a theme renders should be prefixed
+ *     with it instead of a hardcoded `/`, so the site still works hosted
+ *     from a sub-path.
  *   - `search.bxm` (optional, not yet enforced - module spec section 7,
  *     deferred to Phase 4) - the search UI partial.
  *   - `assets/` (optional) - theme CSS/JS, copied to `site/assets/theme/` by
@@ -93,10 +98,11 @@ class {
 	 * @nav The site's nav tree, from NavBuilder.build()
 	 * @config The site's bxdocs.json config
 	 * @themeDir Absolute path to the resolved theme folder (from resolveThemeDir())
+	 * @basePath Root-relative base path ending with `/` (BaseUrlResolver's `basePath`) - defaults to `/`
 	 *
 	 * @return The rendered page HTML
 	 */
-	string function renderPage( required struct page, required array nav, required struct config, required string themeDir ) {
+	string function renderPage( required struct page, required array nav, required struct config, required string themeDir, string basePath = "/" ) {
 		variables.page = arguments.page
 		if ( !variables.page.keyExists( "toc" ) ) {
 			variables.page.toc = []
@@ -107,9 +113,13 @@ class {
 		if ( !variables.page.keyExists( "nextPage" ) ) {
 			variables.page.nextPage = { title : "", url : "" }
 		}
+		if ( !variables.page.keyExists( "breadcrumbs" ) ) {
+			variables.page.breadcrumbs = []
+		}
 		variables.nav = arguments.nav
 		variables.siteConfig = arguments.config
 		variables.themeDir = arguments.themeDir
+		variables.basePath = len( trim( arguments.basePath ) ) ? arguments.basePath : "/"
 
 		var html = ""
 		bx:savecontent variable="html" {

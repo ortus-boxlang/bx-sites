@@ -1,0 +1,61 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.LlmsTxtGenerator", function() {
+
+			beforeEach( function() {
+				variables.generator = new "models.build.LlmsTxtGenerator@bxdocs"();
+			} );
+
+			private struct function page( string title, string urlPath, boolean hidden = false ) {
+				return { title : arguments.title, urlPath : arguments.urlPath, hidden : arguments.hidden };
+			}
+
+			it( "starts with an H1 of the site name", function() {
+				var txt = generator.build( [], { name : "My Docs", description : "" }, "", "/" );
+
+				expect( txt ).toInclude( "## My Docs" );
+			} );
+
+			it( "includes the description as a blockquote when present", function() {
+				var txt = generator.build( [], { name : "My Docs", description : "A cool site" }, "", "/" );
+
+				expect( txt ).toInclude( "> A cool site" );
+			} );
+
+			it( "omits the blockquote entirely when there is no description", function() {
+				var txt = generator.build( [], { name : "My Docs", description : "" }, "", "/" );
+
+				expect( txt ).notToInclude( ">" );
+			} );
+
+			it( "lists each visible page as a markdown link, using the absolute site URL when known", function() {
+				var pages = [ page( "Home", "index.html" ), page( "Setup", "guides/setup/index.html" ) ];
+
+				var txt = generator.build( pages, { name : "My Docs", description : "" }, "https://example.com/", "/" );
+
+				expect( txt ).toInclude( "- [Home](https://example.com/index.html)" );
+				expect( txt ).toInclude( "- [Setup](https://example.com/guides/setup/index.html)" );
+			} );
+
+			it( "falls back to the root-relative basePath when there is no absolute site URL", function() {
+				var pages = [ page( "Home", "index.html" ) ];
+
+				var txt = generator.build( pages, { name : "My Docs", description : "" }, "", "/my-docs/" );
+
+				expect( txt ).toInclude( "- [Home](/my-docs/index.html)" );
+			} );
+
+			it( "excludes hidden pages", function() {
+				var pages = [ page( "Home", "index.html" ), page( "Secret", "secret/index.html", true ) ];
+
+				var txt = generator.build( pages, { name : "My Docs", description : "" }, "", "/" );
+
+				expect( txt ).toInclude( "Home" );
+				expect( txt ).notToInclude( "Secret" );
+			} );
+
+		} );
+	}
+
+}

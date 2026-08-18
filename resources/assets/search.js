@@ -4,9 +4,17 @@
  * (lunr.js) per module spec section 7. Every theme's own search.bxm partial
  * just renders the markup (an #bxdocs-search-input + #bxdocs-search-results
  * pair); this one script wires all of them the same way against the shared
- * /search-index.json format built by SearchIndexer.bx.
+ * search-index.json format built by SearchIndexer.bx.
+ *
+ * `window.__BXDOCS_BASE_PATH__` (set inline by layout.bxm from
+ * BaseUrlResolver's `basePath`) prefixes both the index fetch and every
+ * result link, so search still works when a site is hosted from a sub-path.
  */
 ( function () {
+	function basePath() {
+		return window.__BXDOCS_BASE_PATH__ || "/";
+	}
+
 	function init() {
 		var input = document.getElementById( "bxdocs-search-input" );
 		var results = document.getElementById( "bxdocs-search-results" );
@@ -17,7 +25,7 @@
 		var docsById = {};
 		var idx = null;
 
-		fetch( "/search-index.json" )
+		fetch( basePath() + "search-index.json" )
 			.then( function ( res ) {
 				return res.json();
 			} )
@@ -84,7 +92,7 @@
 				}
 				var li = document.createElement( "li" );
 				var a = document.createElement( "a" );
-				a.href = "/" + doc.url;
+				a.href = basePath() + doc.url;
 				a.textContent = doc.title;
 				li.appendChild( a );
 				results.appendChild( li );
@@ -93,10 +101,31 @@
 			results.classList.add( "bxdocs-search-open" );
 		} );
 
+		input.addEventListener( "keydown", function ( evt ) {
+			if ( evt.key === "Escape" ) {
+				closeResults();
+				input.blur();
+			}
+		} );
+
 		document.addEventListener( "click", function ( evt ) {
 			if ( evt.target !== input && !results.contains( evt.target ) ) {
 				closeResults();
 			}
+		} );
+
+		// mkdocs-material's own convention: "/" focuses search from anywhere
+		// on the page, unless the visitor is already typing somewhere else.
+		document.addEventListener( "keydown", function ( evt ) {
+			if ( evt.key !== "/" || evt.target === input ) {
+				return;
+			}
+			var tag = ( evt.target.tagName || "" ).toLowerCase();
+			if ( tag === "input" || tag === "textarea" || evt.target.isContentEditable ) {
+				return;
+			}
+			evt.preventDefault();
+			input.focus();
 		} );
 	}
 

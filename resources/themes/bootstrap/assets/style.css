@@ -2,10 +2,54 @@
 	--bxdocs-gradient-start: #00FF78;
 	--bxdocs-gradient-end: #00DBFF;
 	--bxdocs-accent: #FFF500;
+	--bxdocs-bg: #fff;
+	--bxdocs-text: #212529;
+	--bxdocs-sidebar-bg: #fff;
+	--bxdocs-sidebar-text: #04121a;
+	--bxdocs-border: rgba( 0, 0, 0, 0.1 );
+	--bxdocs-link: #0d7a8f;
+	--bxdocs-link-hover: #00a3bf;
+	--bxdocs-code-bg: #f6f8fa;
+}
+
+[data-theme="dark"] {
+	--bxdocs-bg: #14181c;
+	--bxdocs-text: #e6edf3;
+	--bxdocs-sidebar-bg: #1b2027;
+	--bxdocs-sidebar-text: #dce3ea;
+	--bxdocs-border: rgba( 255, 255, 255, 0.12 );
+	--bxdocs-link: #5fd3e8;
+	--bxdocs-link-hover: #8ce3f2;
+	--bxdocs-code-bg: #1e242b;
+}
+
+[x-cloak] {
+	display: none !important;
 }
 
 body {
 	font-family: "Poppins", sans-serif;
+	background: var( --bxdocs-bg );
+	color: var( --bxdocs-text );
+}
+
+.theme-toggle {
+	background: transparent;
+	border: 1px solid rgba( 0, 0, 0, 0.2 );
+	border-radius: 6px;
+	font-size: 1.1rem;
+	line-height: 1;
+	padding: 0.35rem 0.6rem;
+	cursor: pointer;
+}
+
+.theme-toggle:hover {
+	background: rgba( 0, 0, 0, 0.08 );
+}
+
+.breadcrumb-nav .breadcrumb {
+	margin-bottom: 0;
+	font-size: 0.875rem;
 }
 
 .brand-navbar {
@@ -19,10 +63,11 @@ body {
 
 .sidebar {
 	padding-top: 1.5rem;
+	background: var( --bxdocs-sidebar-bg );
 }
 
 .sidebar .nav-link {
-	color: #04121a;
+	color: var( --bxdocs-sidebar-text );
 }
 
 .sidebar .nav-link.disabled {
@@ -37,11 +82,11 @@ body {
 }
 
 a {
-	color: #0d7a8f;
+	color: var( --bxdocs-link );
 }
 
 a:hover {
-	color: #00a3bf;
+	color: var( --bxdocs-link-hover );
 }
 
 .page-title {
@@ -60,7 +105,7 @@ a:hover {
 	display: none;
 	position: absolute;
 	z-index: 20;
-	background: #fff;
+	background: var( --bxdocs-bg );
 	border: 1px solid rgba( 0, 0, 0, 0.15 );
 	border-radius: 4px;
 	margin-top: 0.25rem;
@@ -79,7 +124,7 @@ a:hover {
 .bxdocs-search-results .bxdocs-search-empty {
 	display: block;
 	padding: 0.5rem 0.75rem;
-	color: #04121a;
+	color: var( --bxdocs-text );
 	text-decoration: none;
 }
 
@@ -88,7 +133,7 @@ a:hover {
 }
 
 .toc {
-	border: 1px solid rgba( 0, 0, 0, 0.1 );
+	border: 1px solid var( --bxdocs-border );
 	border-radius: 6px;
 	padding: 0.75rem 1rem;
 	background: rgba( 0, 219, 255, 0.05 );
@@ -110,16 +155,39 @@ a:hover {
 .page-nav {
 	margin-top: 2rem;
 	padding-top: 1rem;
-	border-top: 1px solid rgba( 0, 0, 0, 0.1 );
+	border-top: 1px solid var( --bxdocs-border );
 }
 
 .page-nav a {
 	font-weight: 600;
 }
 
+.bxdocs-pre {
+	position: relative;
+}
+
+.bxdocs-copy-btn {
+	position: absolute;
+	top: 0.5rem;
+	right: 0.5rem;
+	font-size: 0.75rem;
+	padding: 0.2rem 0.5rem;
+	border-radius: 4px;
+	border: 1px solid rgba( 255, 255, 255, 0.25 );
+	background: rgba( 255, 255, 255, 0.1 );
+	color: inherit;
+	cursor: pointer;
+	opacity: 0;
+	transition: opacity 0.15s ease-in-out;
+}
+
+.bxdocs-pre:hover .bxdocs-copy-btn,
+.bxdocs-copy-btn:focus {
+	opacity: 1;
+}
+
 @media ( max-width: 991.98px ) {
 	.sidebar {
-		background: #fff;
 		box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.15 );
 		padding: 1rem;
 	}

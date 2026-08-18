@@ -9,7 +9,7 @@
 		for ( var node in arguments.nodes ) {
 			html &= "<li class=""md-nav__item"">"
 			if ( len( node.url ) ) {
-				html &= "<a class=""md-nav__link"" href=""/" & node.url & """>" & encodeForHTML( node.title ) & "</a>"
+				html &= "<a class=""md-nav__link"" href=""" & variables.basePath & node.url & """>" & encodeForHTML( node.title ) & "</a>"
 			} else {
 				html &= "<span class=""md-nav__heading"">" & encodeForHTML( node.title ) & "</span>"
 			}
@@ -31,19 +31,34 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#</title>
+	<script>
+		( function () {
+			var stored = localStorage.getItem( "bxdocs-theme" );
+			var prefersDark = window.matchMedia( "(prefers-color-scheme: dark)" ).matches;
+			if ( stored === "dark" || ( !stored && prefersDark ) ) {
+				document.documentElement.setAttribute( "data-theme", "dark" );
+			}
+		} )();
+	</script>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
-	<link rel="stylesheet" href="/assets/theme/style.css">
+	<link rel="stylesheet" href="#variables.basePath#assets/theme/style.css">
 </bx:output><bx:if condition="#variables.searchEnabled#"><bx:output>
+	<script>window.__BXDOCS_BASE_PATH__ = "#variables.basePath#";</script>
 	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
-	<script src="/assets/search.js" defer></script>
+	<script src="#variables.basePath#assets/search.js" defer></script>
 </bx:output></bx:if><bx:output>
+	<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
 </head>
-<body class="md-body">
+<body class="md-body" x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxdocs-theme', v ? 'dark' : 'light' ) } )">
 	<header class="md-header">
 		<button class="md-nav-toggle" type="button" aria-controls="bxdocs-sidebar" aria-label="Toggle navigation" onclick="document.getElementById('bxdocs-sidebar').classList.toggle('md-sidebar--open')">☰</button>
-		<a class="md-header__brand" href="/">⚡ #encodeForHTML( variables.siteConfig.name )#</a>
+		<a class="md-header__brand" href="#variables.basePath#">⚡ #encodeForHTML( variables.siteConfig.name )#</a>
+		<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="Toggle dark mode">
+			<span x-show="!dark">&##127769;</span>
+			<span x-show="dark" x-cloak>&##9728;&##65039;</span>
+		</button>
 </bx:output><bx:if condition="#variables.searchEnabled#"><bx:include template="#variables.themeDir#/search.bxm"></bx:if><bx:output>
 	</header>
 	<div class="md-layout">
@@ -56,6 +71,7 @@
 	</div>
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
 	<script>hljs.highlightAll();</script>
+	<script src="#variables.basePath#assets/copy-code.js" defer></script>
 </body>
 </html>
 </bx:output>

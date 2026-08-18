@@ -12,6 +12,9 @@ class {
 	variables.themeRenderer    = new "models.build.ThemeRenderer@bxdocs"()
 	variables.searchIndexer    = new "models.build.SearchIndexer@bxdocs"()
 	variables.tableOfContents  = new "models.build.TableOfContents@bxdocs"()
+	variables.baseUrlResolver  = new "models.build.BaseUrlResolver@bxdocs"()
+	variables.sitemapGenerator = new "models.build.SitemapGenerator@bxdocs"()
+	variables.llmsTxtGenerator = new "models.build.LlmsTxtGenerator@bxdocs"()
 	variables.markdownRenderer = new "models.build.MarkdownRenderer@bxdocs"()
 
 	/**
@@ -37,6 +40,7 @@ class {
 		var pages = variables.docsLoader.load( root & "/docs" )
 		var nav = variables.navBuilder.build( pages )
 		var flatSequence = variables.navBuilder.flatten( nav )
+		var urls = variables.baseUrlResolver.resolve( config.baseURL )
 		var themeDir = variables.themeRenderer.resolveThemeDir( config.theme.name, root )
 		var siteDir = root & "/site"
 
@@ -48,19 +52,26 @@ class {
 		convertMarkdown( pages, config )
 		assignTableOfContents( pages )
 		assignPrevNext( pages, flatSequence )
+		assignBreadcrumbs( pages, nav )
 
 		for ( var page in pages ) {
-			var html = variables.themeRenderer.renderPage( page, nav, config, themeDir )
+			var html = variables.themeRenderer.renderPage( page, nav, config, themeDir, urls.basePath )
 			var outputPath = siteDir & "/" & page.urlPath
 			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
 			fileWrite( outputPath, html )
 		}
 
-		write404Page( nav, config, themeDir, siteDir )
+		write404Page( nav, config, themeDir, siteDir, urls.basePath )
 
 		if ( config.search ) {
 			writeSearchIndex( pages, siteDir )
 		}
+
+		if ( len( urls.absolute ) ) {
+			fileWrite( siteDir & "/sitemap.xml", variables.sitemapGenerator.build( pages, urls.absolute ) )
+		}
+
+		fileWrite( siteDir & "/llms.txt", variables.llmsTxtGenerator.build( pages, config, urls.absolute, urls.basePath ) )
 
 		copyAssets( root, themeDir, siteDir, config.search )
 
@@ -152,6 +163,20 @@ class {
 	}
 
 	/**
+	 * Adds a `breadcrumbs` key (root -> ... -> the page itself, from
+	 * NavBuilder.breadcrumbs()) to every page. Empty for a hidden page - it
+	 * isn't in the nav to begin with.
+	 *
+	 * @pages Array of page structs
+	 * @nav The site's nav tree, from NavBuilder.build()
+	 */
+	private void function assignBreadcrumbs( required array pages, required array nav ) {
+		for ( var page in arguments.pages ) {
+			page.breadcrumbs = variables.navBuilder.breadcrumbs( arguments.nav, page.urlPath )
+		}
+	}
+
+	/**
 	 * Renders a generic "page not found" page through the active theme and
 	 * writes it to `site/404.html` - the filename GitHub Pages (and most
 	 * static hosts) automatically serve for any unmatched path.
@@ -160,17 +185,19 @@ class {
 	 * @config The site's bxdocs.json config
 	 * @themeDir Absolute path to the resolved theme folder
 	 * @siteDir Absolute path to the build output directory
+	 * @basePath Root-relative base path ending with `/`
 	 */
-	private void function write404Page( required array nav, required struct config, required string themeDir, required string siteDir ) {
+	private void function write404Page( required array nav, required struct config, required string themeDir, required string siteDir, required string basePath ) {
 		var page = {
 			title       : "Page Not Found",
 			contentHtml : "<p>Sorry, that page doesn't exist. Try the search box, or head back to the homepage.</p>",
 			toc         : [],
 			prevPage    : { title : "", url : "" },
-			nextPage    : { title : "", url : "" }
+			nextPage    : { title : "", url : "" },
+			breadcrumbs : []
 		}
 
-		var html = variables.themeRenderer.renderPage( page, arguments.nav, arguments.config, arguments.themeDir )
+		var html = variables.themeRenderer.renderPage( page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath )
 		fileWrite( arguments.siteDir & "/404.html", html )
 	}
 
@@ -189,8 +216,9 @@ class {
 
 	/**
 	 * Copies theme assets to `site/assets/theme/`, this module's own shared
-	 * search widget script (when search is enabled), and a project's own
-	 * `docs/assets/**` to `site/assets/` (module spec section 5, step 6).
+	 * scripts (the search widget when search is enabled; the copy-code
+	 * button unconditionally), and a project's own `docs/assets/**` to
+	 * `site/assets/` (module spec section 5, step 6).
 	 *
 	 * @root Absolute path to the project root
 	 * @themeDir Absolute path to the resolved theme folder
@@ -203,8 +231,10 @@ class {
 			directoryCopy( themeAssetsDir, arguments.siteDir & "/assets/theme", true )
 		}
 
+		directoryCreate( arguments.siteDir & "/assets", true, true )
+		fileCopy( moduleAssetsDir() & "/copy-code.js", arguments.siteDir & "/assets/copy-code.js" )
+
 		if ( arguments.searchEnabled ) {
-			directoryCreate( arguments.siteDir & "/assets", true, true )
 			fileCopy( moduleAssetsDir() & "/search.js", arguments.siteDir & "/assets/search.js" )
 		}
 

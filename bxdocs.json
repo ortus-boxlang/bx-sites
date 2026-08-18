@@ -1,7 +1,7 @@
 {
 	"name": "BX Docs",
 	"description": "Static documentation site generator for BoxLang, built on bx-markdown",
-	"baseURL": "/",
+	"baseURL": "https://ortus-boxlang.github.io/bx-docs/",
 	"theme": {
 		"name": "bootstrap",
 		"options": {}

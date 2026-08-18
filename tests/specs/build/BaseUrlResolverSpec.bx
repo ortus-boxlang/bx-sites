@@ -1,0 +1,60 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.BaseUrlResolver", function() {
+
+			beforeEach( function() {
+				variables.resolver = new "models.build.BaseUrlResolver@bxdocs"();
+			} );
+
+			it( "defaults blank baseURL to root", function() {
+				var result = resolver.resolve( "" );
+				expect( result.basePath ).toBe( "/" );
+				expect( result.absolute ).toBe( "" );
+			} );
+
+			it( "treats a bare '/' as root, with no absolute URL", function() {
+				var result = resolver.resolve( "/" );
+				expect( result.basePath ).toBe( "/" );
+				expect( result.absolute ).toBe( "" );
+			} );
+
+			it( "normalizes a path-only baseURL to start and end with /", function() {
+				expect( resolver.resolve( "my-docs" ).basePath ).toBe( "/my-docs/" );
+				expect( resolver.resolve( "/my-docs" ).basePath ).toBe( "/my-docs/" );
+				expect( resolver.resolve( "my-docs/" ).basePath ).toBe( "/my-docs/" );
+				expect( resolver.resolve( "/my-docs/" ).basePath ).toBe( "/my-docs/" );
+			} );
+
+			it( "a path-only baseURL never produces an absolute URL", function() {
+				expect( resolver.resolve( "/my-docs/" ).absolute ).toBe( "" );
+			} );
+
+			it( "derives basePath and absolute from a full https:// baseURL with a sub-path", function() {
+				var result = resolver.resolve( "https://example.github.io/my-docs" );
+				expect( result.basePath ).toBe( "/my-docs/" );
+				expect( result.absolute ).toBe( "https://example.github.io/my-docs/" );
+			} );
+
+			it( "derives basePath / from a full https:// baseURL with no sub-path", function() {
+				var result = resolver.resolve( "https://example.com" );
+				expect( result.basePath ).toBe( "/" );
+				expect( result.absolute ).toBe( "https://example.com/" );
+			} );
+
+			it( "leaves an already-trailing-slash absolute URL unchanged", function() {
+				var result = resolver.resolve( "https://example.com/docs/" );
+				expect( result.absolute ).toBe( "https://example.com/docs/" );
+				expect( result.basePath ).toBe( "/docs/" );
+			} );
+
+			it( "supports http:// as well as https://", function() {
+				var result = resolver.resolve( "http://localhost:8080/" );
+				expect( result.absolute ).toBe( "http://localhost:8080/" );
+				expect( result.basePath ).toBe( "/" );
+			} );
+
+		} );
+	}
+
+}

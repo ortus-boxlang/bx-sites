@@ -9,7 +9,7 @@
 		for ( var node in arguments.nodes ) {
 			html &= "<li>"
 			if ( len( node.url ) ) {
-				html &= "<a class=""block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50"" href=""/" & node.url & """>" & encodeForHTML( node.title ) & "</a>"
+				html &= "<a class=""block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50"" href=""" & variables.basePath & node.url & """>" & encodeForHTML( node.title ) & "</a>"
 			} else {
 				html &= "<span class=""block px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400"">" & encodeForHTML( node.title ) & "</span>"
 			}
@@ -31,20 +31,35 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#</title>
+	<script>
+		( function () {
+			var stored = localStorage.getItem( "bxdocs-theme" );
+			var prefersDark = window.matchMedia( "(prefers-color-scheme: dark)" ).matches;
+			if ( stored === "dark" || ( !stored && prefersDark ) ) {
+				document.documentElement.setAttribute( "data-theme", "dark" );
+			}
+		} )();
+	</script>
 	<script src="https://cdn.tailwindcss.com"></script>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
-	<link rel="stylesheet" href="/assets/theme/style.css">
+	<link rel="stylesheet" href="#variables.basePath#assets/theme/style.css">
 </bx:output><bx:if condition="#variables.searchEnabled#"><bx:output>
+	<script>window.__BXDOCS_BASE_PATH__ = "#variables.basePath#";</script>
 	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
-	<script src="/assets/search.js" defer></script>
+	<script src="#variables.basePath#assets/search.js" defer></script>
 </bx:output></bx:if><bx:output>
+	<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
 </head>
-<body class="min-h-screen bg-slate-50 font-[Poppins,sans-serif] text-slate-900">
+<body class="min-h-screen bg-slate-50 font-[Poppins,sans-serif] text-slate-900" x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxdocs-theme', v ? 'dark' : 'light' ) } )">
 	<header class="flex h-16 items-center gap-3 px-6 bg-gradient-to-r from-[##00FF78] to-[##00DBFF] shadow">
 		<button type="button" class="text-xl md:hidden" aria-controls="bxdocs-sidebar" aria-label="Toggle navigation" onclick="document.getElementById('bxdocs-sidebar').classList.toggle('hidden')">☰</button>
-		<a class="text-lg font-bold text-slate-900" href="/">⚡ #encodeForHTML( variables.siteConfig.name )#</a>
+		<a class="text-lg font-bold text-slate-900" href="#variables.basePath#">⚡ #encodeForHTML( variables.siteConfig.name )#</a>
+		<button type="button" class="theme-toggle ml-auto" @click="dark = !dark" aria-label="Toggle dark mode">
+			<span x-show="!dark">&##127769;</span>
+			<span x-show="dark" x-cloak>&##9728;&##65039;</span>
+		</button>
 </bx:output><bx:if condition="#variables.searchEnabled#"><bx:include template="#variables.themeDir#/search.bxm"></bx:if><bx:output>
 	</header>
 	<div class="mx-auto flex max-w-6xl">
@@ -57,6 +72,7 @@
 	</div>
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
 	<script>hljs.highlightAll();</script>
+	<script src="#variables.basePath#assets/copy-code.js" defer></script>
 </body>
 </html>
 </bx:output>

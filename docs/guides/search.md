@@ -25,6 +25,13 @@ service involved.
    highest, then headings, then body text), and re-searches it on every
    keystroke - no network round-trip per query.
 
+## Keyboard shortcuts
+
+- **`/`** focuses the search box from anywhere on the page (unless you're
+  already typing in another field) - the same convention
+  [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) uses.
+- **`Escape`** closes the results dropdown and blurs the search box.
+
 ## Turning it off
 
 ```json

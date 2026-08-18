@@ -122,6 +122,59 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "Safe &amp; Sound" );
 			} );
 
+			it( "prefixes nav, asset and brand links with a non-default basePath", function() {
+				var root = newProjectRoot();
+				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var html = renderer.renderPage( page, nav, { name : "My Site" }, themeDir, "/my-docs/" );
+
+				expect( html ).toInclude( 'href="/my-docs/index.html"' );
+				expect( html ).toInclude( 'href="/my-docs/assets/theme/style.css"' );
+				expect( html ).toInclude( 'href="/my-docs/"' );
+			} );
+
+			it( "includes Alpine.js and a dark-mode toggle, and the copy-code script, in every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var config = { name : "My Site" };
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					var html = renderer.renderPage( page, nav, config, themeDir );
+
+					expect( html ).toInclude( "alpinejs" );
+					expect( html ).toInclude( "theme-toggle" );
+					expect( html ).toInclude( "data-theme" );
+					expect( html ).toInclude( "assets/copy-code.js" );
+				}
+			} );
+
+			it( "renders breadcrumbs when the page has more than one, and skips them otherwise", function() {
+				var root = newProjectRoot();
+				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var config = { name : "My Site" };
+
+				var withCrumbs = {
+					title       : "Setup",
+					contentHtml : "<p>Body</p>",
+					breadcrumbs : [
+						{ title : "Guides", url : "guides/index.html" },
+						{ title : "Setup", url : "guides/setup/index.html" }
+					]
+				};
+				var htmlWithCrumbs = renderer.renderPage( withCrumbs, nav, config, themeDir );
+				expect( htmlWithCrumbs ).toInclude( "breadcrumb-nav" );
+				expect( htmlWithCrumbs ).toInclude( ">Guides<" );
+
+				var withoutCrumbs = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var htmlWithoutCrumbs = renderer.renderPage( withoutCrumbs, nav, config, themeDir );
+				expect( htmlWithoutCrumbs ).notToInclude( "breadcrumb-nav" );
+			} );
+
 		} );
 	}
 

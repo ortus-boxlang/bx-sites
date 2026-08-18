@@ -133,6 +133,63 @@ class extends="testbox.system.BaseSpec" {
 				expect( flat[ 4 ].title ).toBe( "Deploy" );
 			} );
 
+			it( "breadcrumbs() returns just the page itself for a top-level page", function() {
+				var pages = [ page( relativePath = "about.md", title = "About" ) ];
+				var nav = navBuilder.build( pages );
+
+				var crumbs = navBuilder.breadcrumbs( nav, "about/index.html" );
+
+				expect( crumbs.len() ).toBe( 1 );
+				expect( crumbs[ 1 ].title ).toBe( "About" );
+			} );
+
+			it( "breadcrumbs() includes a link-less folder group ancestor by title only", function() {
+				var pages = [ page( relativePath = "guides/setup.md", title = "Setup", urlPath = "guides/setup/index.html" ) ];
+				var nav = navBuilder.build( pages );
+
+				var crumbs = navBuilder.breadcrumbs( nav, "guides/setup/index.html" );
+
+				expect( crumbs.len() ).toBe( 1 );
+				expect( crumbs[ 1 ].title ).toBe( "Setup" );
+			} );
+
+			it( "breadcrumbs() returns the full root-first ancestor chain for a nested page under a real folder index.md", function() {
+				var pages = [
+					page( relativePath = "guides/index.md", title = "Guides", order = 1, urlPath = "guides/index.html" ),
+					page( relativePath = "guides/setup.md", title = "Setup", order = 2, urlPath = "guides/setup/index.html" )
+				];
+				var nav = navBuilder.build( pages );
+
+				var crumbs = navBuilder.breadcrumbs( nav, "guides/setup/index.html" );
+
+				expect( crumbs.len() ).toBe( 2 );
+				expect( crumbs[ 1 ].title ).toBe( "Guides" );
+				expect( crumbs[ 1 ].url ).toBe( "guides/index.html" );
+				expect( crumbs[ 2 ].title ).toBe( "Setup" );
+			} );
+
+			it( "breadcrumbs() returns an empty array for a url not present in the nav (e.g. a hidden page)", function() {
+				var pages = [ page( relativePath = "about.md", title = "About" ) ];
+				var nav = navBuilder.build( pages );
+
+				expect( navBuilder.breadcrumbs( nav, "secret/index.html" ) ).toBeArray();
+				expect( navBuilder.breadcrumbs( nav, "secret/index.html" ).len() ).toBe( 0 );
+			} );
+
+			it( "breadcrumbs() doesn't leak a sibling branch's ancestor after backtracking", function() {
+				var pages = [
+					page( relativePath = "guides/index.md", title = "Guides", order = 1, urlPath = "guides/index.html" ),
+					page( relativePath = "guides/setup.md", title = "Setup", order = 2, urlPath = "guides/setup/index.html" ),
+					page( relativePath = "about.md", title = "About", order = 2 )
+				];
+				var nav = navBuilder.build( pages );
+
+				var crumbs = navBuilder.breadcrumbs( nav, "about/index.html" );
+
+				expect( crumbs.len() ).toBe( 1 );
+				expect( crumbs[ 1 ].title ).toBe( "About" );
+			} );
+
 		} );
 	}
 

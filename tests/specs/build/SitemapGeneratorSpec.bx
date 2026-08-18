@@ -1,0 +1,49 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.SitemapGenerator", function() {
+
+			beforeEach( function() {
+				variables.generator = new "models.build.SitemapGenerator@bxdocs"();
+			} );
+
+			private struct function page( string urlPath, boolean hidden = false ) {
+				return { urlPath : arguments.urlPath, hidden : arguments.hidden };
+			}
+
+			it( "renders a valid sitemap.xml wrapper for an empty page list", function() {
+				var xml = generator.build( [], "https://example.com/" );
+
+				expect( xml ).toInclude( '<?xml version="1.0" encoding="UTF-8"?>' );
+				expect( xml ).toInclude( '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' );
+				expect( xml ).toInclude( "</urlset>" );
+			} );
+
+			it( "renders one absolute <loc> per visible page", function() {
+				var pages = [ page( "index.html" ), page( "guides/setup/index.html" ) ];
+
+				var xml = generator.build( pages, "https://example.com/" );
+
+				expect( xml ).toInclude( "<loc>https://example.com/index.html</loc>" );
+				expect( xml ).toInclude( "<loc>https://example.com/guides/setup/index.html</loc>" );
+			} );
+
+			it( "respects a sub-path site URL", function() {
+				var xml = generator.build( [ page( "index.html" ) ], "https://example.github.io/my-docs/" );
+
+				expect( xml ).toInclude( "<loc>https://example.github.io/my-docs/index.html</loc>" );
+			} );
+
+			it( "excludes hidden pages", function() {
+				var pages = [ page( "index.html" ), page( "secret/index.html", true ) ];
+
+				var xml = generator.build( pages, "https://example.com/" );
+
+				expect( xml ).toInclude( "index.html</loc>" );
+				expect( xml ).notToInclude( "secret" );
+			} );
+
+		} );
+	}
+
+}
