@@ -62,7 +62,7 @@
 				<article class="page-content">
 <nav class="breadcrumb-nav mb-3" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/bx-docs/development/guides/index.html">Guides</a></li><li class="breadcrumb-item active" aria-current="page">Themes</li></ol></nav>
 					<h1 class="page-title">Themes</h1>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 4:34:58 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 4:35:29 PM</span></div>
 <nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#built-in">Built in</a></li><li class="toc-level-2"><a href="#the-themeprovider-contract">The ThemeProvider contract</a></li><li class="toc-level-2"><a href="#overriding-a-theme">Overriding a theme</a></li></ul></nav>
 					<h1 id="themes"><a href="#themes" id="themes" name="themes" class="anchor"></a>Themes</h1>
 <p>Themes are native BoxLang <code>.bxm</code> templates - there's no separate template
@@ -108,6 +108,9 @@ anywhere on the page, and <code>Escape</code> closes the results. See
 <li><strong>An opt-in footer</strong> (copyright, <code>social</code> links, a &quot;Built with BX Docs&quot;
 credit) when <code>bxdocs.json</code>'s <code>footer</code> is <code>true</code>. See
 <a href="../configuration.md#footer">Configuration</a>.</li>
+<li><strong>A version switcher</strong>, appearing automatically once a project has a
+<code>docs/versions/</code> folder with more than one version in it. See
+<a href="../configuration.md#versioning">Configuration</a>.</li>
 <li><strong>A themed <code>404.html</code></strong>, served automatically by most static hosts
 (including GitHub Pages) for any unmatched path.</li>
 </ul>
@@ -137,7 +140,11 @@ at build time.</li>
 and <code>variables.siteConfig.repo</code>/<code>.social</code>/<code>.footer</code> are always available too,
 backing the repo link/edit link/last-updated/footer features above - a
 custom theme decides for itself whether and how to render them, same as
-everything else. The three built-in themes get their repo/social icons from
+everything else. <code>variables.versions</code> (<code>[ { label, url } ]</code>, &quot;Latest&quot;
+first) and <code>variables.currentVersion</code> (the <code>label</code> being rendered right
+now) back the version switcher - empty/<code>&quot;Latest&quot;</code> for a project that isn't
+versioned, so a theme only needs to render a switcher when
+<code>variables.versions.len() gt 1</code>. The three built-in themes get their repo/social icons from
 a small shared SVG lookup, <code>&lt;bx:include template=&quot;#variables.moduleAssetsDir#/icons.bxm&quot;&gt;</code>
 (defines <code>bxdocsIcon( name )</code>, one of <code>github</code>, <code>twitter</code>/<code>x</code>, <code>rss</code>,
 <code>email</code>, <code>edit</code>, <code>clock</code>, falling back to a generic link glyph) - a custom
