@@ -17,6 +17,7 @@ class {
 	variables.llmsTxtGenerator = new "models.build.LlmsTxtGenerator@bxdocs"()
 	variables.markdownRenderer = new "models.build.MarkdownRenderer@bxdocs"()
 	variables.gitRevisionDate  = new "models.build.GitRevisionDate@bxdocs"()
+	variables.versionsDiscoverer = new "models.build.VersionsDiscoverer@bxdocs"()
 
 	/**
 	 * Swaps in a fake/test markdown renderer. The real one (MarkdownRenderer.bx)
@@ -38,9 +39,6 @@ class {
 	struct function build( required string projectRoot ) {
 		var root = normalizeRoot( arguments.projectRoot )
 		var config = variables.configLoader.load( root )
-		var pages = variables.docsLoader.load( root & "/docs" )
-		var nav = variables.navBuilder.build( pages )
-		var flatSequence = variables.navBuilder.flatten( nav )
 		var urls = variables.baseUrlResolver.resolve( config.baseURL )
 		var themeDir = variables.themeRenderer.resolveThemeDir( config.theme.name, root )
 		var siteDir = root & "/site"
@@ -50,34 +48,132 @@ class {
 		}
 		directoryCreate( siteDir, true, true )
 
-		convertMarkdown( pages, config )
+		var versionNames = variables.versionsDiscoverer.discover( root & "/docs" )
+		var versions = buildVersionsList( versionNames, urls.basePath )
+
+		var mainResult = renderDocTree( root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "" )
+		var allPages = duplicate( mainResult.pages )
+		copyAssets( root, themeDir, siteDir, config.search )
+
+		for ( var versionName in versionNames ) {
+			var versionOutputDir = siteDir & "/versions/" & versionName
+			var versionResult = renderDocTree(
+				root & "/docs/versions/" & versionName,
+				config,
+				themeDir,
+				versionOutputDir,
+				urls.basePath & "versions/" & versionName & "/",
+				root,
+				versions,
+				versionName,
+				"versions/" & versionName & "/"
+			)
+			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
+			copyAssets( root, themeDir, versionOutputDir, config.search )
+		}
+
+		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, "Latest" )
+
+		if ( len( urls.absolute ) ) {
+			fileWrite( siteDir & "/sitemap.xml", variables.sitemapGenerator.build( allPages, urls.absolute ) )
+		}
+
+		fileWrite( siteDir & "/llms.txt", variables.llmsTxtGenerator.build( allPages, config, urls.absolute, urls.basePath ) )
+
+		return { siteDir : siteDir, pageCount : mainResult.pages.len() }
+	}
+
+	/**
+	 * Loads, renders and writes one self-contained doc tree - either the
+	 * project's own `docs/` (the "Latest"/default build), or one
+	 * `docs/versions/<name>/` folder (module spec's versions-by-convention:
+	 * VersionsDiscoverer.bx). Both are built the exact same way, just
+	 * rooted/output/base-pathed differently.
+	 *
+	 * @docsDir Absolute path to this tree's own docs root (`<root>/docs` or `<root>/docs/versions/<name>`)
+	 * @config The site's bxdocs.json config
+	 * @themeDir Absolute path to the resolved theme folder
+	 * @outputDir Absolute path to write this tree's pages to (`site/` or `site/versions/<name>/`)
+	 * @basePath Root-relative base path ending with `/`, already namespaced under `versions/<name>/` for a version build
+	 * @root Absolute path to the project root - git's working directory for the `lastUpdated` lookup
+	 * @versions Version switcher entries as `[ { label, url } ]`, shared by every tree so the switcher is consistent everywhere
+	 * @currentVersion Which `versions` entry this tree IS, for the switcher's own "selected" state
+	 * @docsRelativePrefix Empty for the main/"Latest" tree; `"versions/<name>/"` for a version tree - see assignEditAndLastUpdated()
+	 *
+	 * @return { pages, nav }
+	 */
+	private struct function renderDocTree(
+		required string docsDir,
+		required struct config,
+		required string themeDir,
+		required string outputDir,
+		required string basePath,
+		required string root,
+		required array versions,
+		required string currentVersion,
+		required string docsRelativePrefix
+	) {
+		var pages = variables.docsLoader.load( arguments.docsDir )
+		var nav = variables.navBuilder.build( pages )
+		var flatSequence = variables.navBuilder.flatten( nav )
+
+		directoryCreate( arguments.outputDir, true, true )
+
+		convertMarkdown( pages, arguments.config )
 		assignTableOfContents( pages )
 		assignPrevNext( pages, flatSequence )
 		assignBreadcrumbs( pages, nav )
-		assignEditAndLastUpdated( pages, config, root )
+		assignEditAndLastUpdated( pages, arguments.config, arguments.root, arguments.docsRelativePrefix )
 
 		for ( var page in pages ) {
-			var html = variables.themeRenderer.renderPage( page, nav, config, themeDir, urls.basePath )
-			var outputPath = siteDir & "/" & page.urlPath
+			var html = variables.themeRenderer.renderPage(
+				page, nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, arguments.currentVersion
+			)
+			var outputPath = arguments.outputDir & "/" & page.urlPath
 			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
 			fileWrite( outputPath, html )
 		}
 
-		write404Page( nav, config, themeDir, siteDir, urls.basePath )
-
-		if ( config.search ) {
-			writeSearchIndex( pages, siteDir )
+		if ( arguments.config.search ) {
+			writeSearchIndex( pages, arguments.outputDir )
 		}
 
-		if ( len( urls.absolute ) ) {
-			fileWrite( siteDir & "/sitemap.xml", variables.sitemapGenerator.build( pages, urls.absolute ) )
+		return { pages : pages, nav : nav }
+	}
+
+	/**
+	 * sitemap.xml/llms.txt are built once, from `allPages`, against the
+	 * site-wide `siteUrl`/`basePath` - but a version tree's own pages carry
+	 * `urlPath`s relative to their own `docs/versions/<name>/` root (e.g.
+	 * `"index.html"`), not the site root. This rebuilds `urlPath` with the
+	 * `versions/<name>/` prefix folded in, so those two generators produce
+	 * correct locations for version pages without needing to know versioning
+	 * exists at all.
+	 *
+	 * @pages A version tree's own pages (unmutated - copies are returned)
+	 * @prefix e.g. `"versions/1.0/"`
+	 */
+	private array function prefixPageUrls( required array pages, required string prefix ) {
+		return arguments.pages.map( function( page ) {
+			var copy = duplicate( arguments.page )
+			copy.urlPath = prefix & copy.urlPath
+			return copy
+		} )
+	}
+
+	/**
+	 * Builds the version switcher's own entries - "Latest" (the project's
+	 * regular `docs/`) first, then one per discovered `docs/versions/` folder.
+	 *
+	 * @versionNames VersionsDiscoverer.discover()'s own output, newest first
+	 * @basePath The main/"Latest" build's own basePath
+	 */
+	private array function buildVersionsList( required array versionNames, required string basePath ) {
+		var versions = [ { label : "Latest", url : arguments.basePath } ]
+		for ( var versionName in arguments.versionNames ) {
+			versions.append( { label : versionName, url : arguments.basePath & "versions/" & versionName & "/" } )
 		}
-
-		fileWrite( siteDir & "/llms.txt", variables.llmsTxtGenerator.build( pages, config, urls.absolute, urls.basePath ) )
-
-		copyAssets( root, themeDir, siteDir, config.search )
-
-		return { siteDir : siteDir, pageCount : pages.len() }
+		return versions
 	}
 
 	/**
@@ -187,16 +283,18 @@ class {
 	 * @pages Array of page structs with `relativePath` already set (DocsLoader.load())
 	 * @config The site's bxdocs.json config
 	 * @root Absolute path to the project root - git's working directory for the `lastUpdated` lookup
+	 * @docsRelativePrefix `page.relativePath` is relative to whichever docs tree was loaded (`docs/` or `docs/versions/<name>/`) - this is the bit in between, e.g. `"versions/1.0/"`, so the real `docs/`-relative path (for both the edit URL and the git lookup) can be rebuilt as `docsRelativePrefix & page.relativePath`. Empty for the main/"Latest" tree.
 	 */
-	private void function assignEditAndLastUpdated( required array pages, required struct config, required string root ) {
+	private void function assignEditAndLastUpdated( required array pages, required struct config, required string root, string docsRelativePrefix = "" ) {
 		var repoUrl = trim( arguments.config.repo.url ?: "" )
 		var editUri = trim( arguments.config.repo.editUri ?: "" )
 		var canEdit = len( repoUrl ) && len( editUri )
 
 		for ( var page in arguments.pages ) {
-			page.editUrl = canEdit ? buildEditUrl( repoUrl, editUri, page.relativePath ) : ""
+			var pathFromDocsRoot = arguments.docsRelativePrefix & page.relativePath
+			page.editUrl = canEdit ? buildEditUrl( repoUrl, editUri, pathFromDocsRoot ) : ""
 			page.lastUpdated = arguments.config.lastUpdated
-				? variables.gitRevisionDate.forFile( arguments.root, "docs/" & page.relativePath )
+				? variables.gitRevisionDate.forFile( arguments.root, "docs/" & pathFromDocsRoot )
 				: ""
 		}
 	}
@@ -225,8 +323,10 @@ class {
 	 * @themeDir Absolute path to the resolved theme folder
 	 * @siteDir Absolute path to the build output directory
 	 * @basePath Root-relative base path ending with `/`
+	 * @versions Version switcher entries as `[ { label, url } ]`
+	 * @currentVersion Always `"Latest"` - the 404 page is only ever written once, for the main site
 	 */
-	private void function write404Page( required array nav, required struct config, required string themeDir, required string siteDir, required string basePath ) {
+	private void function write404Page( required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required string currentVersion ) {
 		var page = {
 			title       : "Page Not Found",
 			contentHtml : "<p>Sorry, that page doesn't exist. Try the search box, or head back to the homepage.</p>",
@@ -236,7 +336,9 @@ class {
 			breadcrumbs : []
 		}
 
-		var html = variables.themeRenderer.renderPage( page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath )
+		var html = variables.themeRenderer.renderPage(
+			page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, arguments.currentVersion
+		)
 		fileWrite( arguments.siteDir & "/404.html", html )
 	}
 

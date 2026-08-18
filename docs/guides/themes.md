@@ -46,6 +46,9 @@ page features:
 - **An opt-in footer** (copyright, `social` links, a "Built with BX Docs"
   credit) when `bxdocs.json`'s `footer` is `true`. See
   [Configuration](../configuration.md#footer).
+- **A version switcher**, appearing automatically once a project has a
+  `docs/versions/` folder with more than one version in it. See
+  [Configuration](../configuration.md#versioning).
 - **A themed `404.html`**, served automatically by most static hosts
   (including GitHub Pages) for any unmatched path.
 
@@ -79,7 +82,11 @@ A theme is just a folder with:
 and `variables.siteConfig.repo`/`.social`/`.footer` are always available too,
 backing the repo link/edit link/last-updated/footer features above - a
 custom theme decides for itself whether and how to render them, same as
-everything else. The three built-in themes get their repo/social icons from
+everything else. `variables.versions` (`[ { label, url } ]`, "Latest"
+first) and `variables.currentVersion` (the `label` being rendered right
+now) back the version switcher - empty/`"Latest"` for a project that isn't
+versioned, so a theme only needs to render a switcher when
+`variables.versions.len() gt 1`. The three built-in themes get their repo/social icons from
 a small shared SVG lookup, `<bx:include template="#variables.moduleAssetsDir#/icons.bxm">`
 (defines `bxdocsIcon( name )`, one of `github`, `twitter`/`x`, `rss`,
 `email`, `edit`, `clock`, falling back to a generic link glyph) - a custom

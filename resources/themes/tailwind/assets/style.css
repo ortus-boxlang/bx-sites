@@ -30,6 +30,12 @@
 	background: rgba( 0, 0, 0, 0.08 );
 }
 
+.version-switcher {
+	flex-shrink: 0;
+	width: auto;
+	max-width: 6.5rem;
+}
+
 .navbar-row {
 	flex-wrap: nowrap;
 }

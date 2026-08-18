@@ -54,6 +54,12 @@ body {
 	color: #04121a;
 }
 
+.version-switcher {
+	flex-shrink: 0;
+	width: auto;
+	max-width: 6.5rem;
+}
+
 .breadcrumb-nav .breadcrumb {
 	margin-bottom: 0;
 	font-size: 0.875rem;

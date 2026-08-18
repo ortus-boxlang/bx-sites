@@ -443,6 +443,128 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).notToInclude( "Last updated" );
 			} );
 
+			it( "builds each docs/versions/* folder as its own tree under site/versions/*, alongside the main build", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Latest home" );
+				directoryCreate( root & "/docs/versions/1.0", true, true );
+				fileWrite( root & "/docs/versions/1.0/index.md", "1.0 home" );
+				directoryCreate( root & "/docs/versions/2.0", true, true );
+				fileWrite( root & "/docs/versions/2.0/index.md", "2.0 home" );
+
+				var result = pipeline.build( root );
+
+				expect( result.pageCount ).toBe( 1 );
+				expect( fileExists( root & "/site/index.html" ) ).toBeTrue();
+				expect( fileExists( root & "/site/versions/1.0/index.html" ) ).toBeTrue();
+				expect( fileExists( root & "/site/versions/2.0/index.html" ) ).toBeTrue();
+
+				var mainHtml = fileRead( root & "/site/index.html" );
+				expect( mainHtml ).toInclude( "Latest home" );
+				expect( mainHtml ).notToInclude( "1.0 home" );
+
+				var v1Html = fileRead( root & "/site/versions/1.0/index.html" );
+				expect( v1Html ).toInclude( "1.0 home" );
+
+				var v2Html = fileRead( root & "/site/versions/2.0/index.html" );
+				expect( v2Html ).toInclude( "2.0 home" );
+			} );
+
+			it( "prefixes a version build's internal links with its own versions/<name>/ basePath", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Latest home" );
+				directoryCreate( root & "/docs/versions/1.0/guides", true, true );
+				fileWrite( root & "/docs/versions/1.0/index.md", "1.0 home" );
+				fileWrite( root & "/docs/versions/1.0/guides/setup.md", "---" & char( 10 ) & "title: Setup" & char( 10 ) & "---" & char( 10 ) & "Setup body" );
+
+				pipeline.build( root );
+
+				var v1Html = fileRead( root & "/site/versions/1.0/index.html" );
+				expect( v1Html ).toInclude( 'href="/versions/1.0/guides/setup/index.html"' );
+				expect( v1Html ).toInclude( 'href="/versions/1.0/assets/theme/style.css"' );
+
+				var mainHtml = fileRead( root & "/site/index.html" );
+				expect( mainHtml ).toInclude( 'href="/assets/theme/style.css"' );
+				expect( mainHtml ).notToInclude( "/versions/1.0/guides" );
+			} );
+
+			it( "renders a version switcher with the current version selected when docs/versions/* exist, and none when there aren't any", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Latest home" );
+				directoryCreate( root & "/docs/versions/1.0", true, true );
+				fileWrite( root & "/docs/versions/1.0/index.md", "1.0 home" );
+
+				pipeline.build( root );
+
+				var mainHtml = fileRead( root & "/site/index.html" );
+				expect( mainHtml ).toInclude( "version-switcher" );
+				expect( mainHtml ).toInclude( ">Latest<" );
+				expect( mainHtml ).toInclude( ">1.0<" );
+
+				var v1Html = fileRead( root & "/site/versions/1.0/index.html" );
+				expect( v1Html ).toInclude( "version-switcher" );
+
+				var unversionedRoot = newProject();
+				fileWrite( unversionedRoot & "/docs/index.md", "Home" );
+				pipeline.build( unversionedRoot );
+				var unversionedHtml = fileRead( unversionedRoot & "/site/index.html" );
+				expect( unversionedHtml ).notToInclude( "version-switcher" );
+			} );
+
+			it( "computes editUrl and lastUpdated for a versioned page relative to its own docs/versions/<name>/ folder", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"repo":{"url":"https://github.com/acme/docs","editUri":"edit/main/docs/"}}'
+				);
+				fileWrite( root & "/docs/index.md", "Latest home" );
+				directoryCreate( root & "/docs/versions/1.0", true, true );
+				fileWrite( root & "/docs/versions/1.0/index.md", "1.0 home" );
+
+				pipeline.build( root );
+
+				var v1Html = fileRead( root & "/site/versions/1.0/index.html" );
+				expect( v1Html ).toInclude( "Edit this page" );
+				expect( v1Html ).toInclude( "versions" );
+				expect( v1Html ).toInclude( "1.0" );
+			} );
+
+			it( "includes version pages in sitemap.xml and llms.txt alongside the main tree", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"https://docs.example.com/"}'
+				);
+				fileWrite( root & "/docs/index.md", "Latest home" );
+				directoryCreate( root & "/docs/versions/1.0", true, true );
+				fileWrite( root & "/docs/versions/1.0/index.md", "1.0 home" );
+
+				pipeline.build( root );
+
+				var sitemap = fileRead( root & "/site/sitemap.xml" );
+				expect( sitemap ).toInclude( "<loc>https://docs.example.com/index.html</loc>" );
+				expect( sitemap ).toInclude( "<loc>https://docs.example.com/versions/1.0/index.html</loc>" );
+
+				var llms = fileRead( root & "/site/llms.txt" );
+				expect( llms ).toInclude( "(https://docs.example.com/index.html)" );
+				expect( llms ).toInclude( "(https://docs.example.com/versions/1.0/index.html)" );
+			} );
+
+			it( "ignores loose files directly under docs/versions/ and only builds its subfolders", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Latest home" );
+				directoryCreate( root & "/docs/versions", true, true );
+				fileWrite( root & "/docs/versions/README.md", "not a version" );
+				directoryCreate( root & "/docs/versions/1.0", true, true );
+				fileWrite( root & "/docs/versions/1.0/index.md", "1.0 home" );
+
+				var result = pipeline.build( root );
+
+				expect( result.pageCount ).toBe( 1 );
+				expect( fileExists( root & "/site/versions/1.0/index.html" ) ).toBeTrue();
+				expect( directoryExists( root & "/site/versions/README.md" ) ).toBeFalse();
+				expect( fileExists( root & "/site/versions/README.md" ) ).toBeFalse();
+			} );
+
 		} );
 	}
 

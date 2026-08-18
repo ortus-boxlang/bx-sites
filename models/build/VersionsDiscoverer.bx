@@ -1,0 +1,64 @@
+/**
+ * Discovers a project's documented versions "by convention" - any direct
+ * subfolder of `docs/versions/` is a self-contained, independently-built
+ * version of the docs (its own nested pages, own nav), with no config
+ * beyond just existing there. Projects that don't use versioning simply
+ * have no `docs/versions/` folder, and this returns an empty array.
+ */
+class {
+
+	/**
+	 * @docsDir Absolute path to the project's docs/ directory
+	 *
+	 * @return Version folder names directly under docs/versions/, newest first
+	 */
+	array function discover( required string docsDir ) {
+		var versionsDir = arguments.docsDir.reReplace( "[\/]+$", "" ) & "/versions"
+
+		if ( !directoryExists( versionsDir ) ) {
+			return []
+		}
+
+		var names = directoryList( versionsDir, false, "name" )
+			.filter( name => directoryExists( versionsDir & "/" & name ) )
+
+		names.sort( ( a, b ) => compareVersionsDescending( a, b ) )
+
+		return names
+	}
+
+	/**
+	 * A "natural" comparator so folder names like "2.0", "10.0" and "9.0"
+	 * sort as a human expects (10 after 9) rather than lexicographically
+	 * (10 before 9) - splits each name into alternating digit/non-digit
+	 * chunks and compares numeric chunks as numbers, everything else as text.
+	 *
+	 * @a A version folder name
+	 * @b Another version folder name
+	 *
+	 * @return -1 if a is newer than b, 1 if older, 0 if equal (descending sort)
+	 */
+	private numeric function compareVersionsDescending( required string a, required string b ) {
+		var chunksA = arguments.a.reMatch( "[0-9]+|[^0-9]+" )
+		var chunksB = arguments.b.reMatch( "[0-9]+|[^0-9]+" )
+		var count = max( chunksA.len(), chunksB.len() )
+
+		for ( var i = 1; i <= count; i++ ) {
+			var chunkA = i <= chunksA.len() ? chunksA[ i ] : ""
+			var chunkB = i <= chunksB.len() ? chunksB[ i ] : ""
+
+			if ( chunkA == chunkB ) {
+				continue
+			}
+
+			if ( isNumeric( chunkA ) && isNumeric( chunkB ) ) {
+				return val( chunkA ) < val( chunkB ) ? 1 : -1
+			}
+
+			return compareNoCase( chunkA, chunkB ) < 0 ? 1 : -1
+		}
+
+		return 0
+	}
+
+}

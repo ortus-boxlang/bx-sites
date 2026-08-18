@@ -158,6 +158,12 @@ a:hover {
 	align-items: center;
 }
 
+.version-switcher {
+	flex-shrink: 0;
+	width: auto;
+	max-width: 6.5rem;
+}
+
 .theme-toggle:hover,
 .repo-link:hover {
 	background: rgba( 0, 0, 0, 0.08 );

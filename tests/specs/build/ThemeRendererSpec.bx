@@ -233,6 +233,43 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "renders a version switcher with the current version selected when more than one version is passed, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var config = { name : "My Site" };
+				var versions = [
+					{ label : "Latest", url : "/" },
+					{ label : "1.0", url : "/versions/1.0/" }
+				];
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					var html = renderer.renderPage( page, nav, config, themeDir, "/", versions, "1.0" );
+
+					expect( html ).toInclude( "version-switcher" );
+					expect( html ).toInclude( ">Latest<" );
+					expect( html ).toInclude( " selected>1.0<" );
+					expect( html ).notToInclude( " selected>Latest<" );
+				}
+			} );
+
+			it( "omits the version switcher when 0 or 1 versions are passed, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var config = { name : "My Site" };
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+
+					expect( renderer.renderPage( page, nav, config, themeDir ) ).notToInclude( "version-switcher" );
+					expect(
+						renderer.renderPage( page, nav, config, themeDir, "/", [ { label : "Latest", url : "/" } ], "Latest" )
+					).notToInclude( "version-switcher" );
+				}
+			} );
+
 		} );
 	}
 

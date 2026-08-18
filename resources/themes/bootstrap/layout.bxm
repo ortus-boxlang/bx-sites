@@ -31,6 +31,16 @@
 		return html
 	}
 
+	function renderVersionSwitcher( required array versions, required string currentVersion ) {
+		var html = '<select class="version-switcher form-select form-select-sm" onchange="location.href=this.value" aria-label="Version">'
+		for ( var v in arguments.versions ) {
+			var selected = v.label == arguments.currentVersion ? " selected" : ""
+			html &= '<option value="' & encodeForHTML( v.url ) & '"' & selected & '>' & encodeForHTML( v.label ) & '</option>'
+		}
+		html &= '</select>'
+		return html
+	}
+
 	// module spec section 7 - search is fully static/client-side and opt-out via bxdocs.json
 	variables.searchEnabled = ( variables.siteConfig.search ?: false ) ? true : false
 	variables.repoUrl = trim( variables.siteConfig.repo.url ?: "" )
@@ -70,7 +80,9 @@
 			<a class="navbar-brand brand-mark" href="#variables.basePath#">⚡ #encodeForHTML( variables.siteConfig.name )#</a>
 			<div class="navbar-controls">
 </bx:output><bx:if condition="#variables.searchEnabled#"><bx:include template="#variables.themeDir#/search.bxm"></bx:if><bx:output>
-</bx:output><bx:if condition="#len( variables.repoUrl )#"><bx:output>
+</bx:output><bx:if condition="#variables.versions.len() gt 1#"><bx:output>
+				#renderVersionSwitcher( variables.versions, variables.currentVersion )#
+</bx:output></bx:if><bx:if condition="#len( variables.repoUrl )#"><bx:output>
 				<a class="repo-link" href="#encodeForHTML( variables.repoUrl )#" target="_blank" rel="noopener noreferrer" aria-label="Repository" title="Repository">#bxdocsIcon( "github" )#</a>
 </bx:output></bx:if><bx:output>
 				<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="Toggle dark mode">
