@@ -54,7 +54,6 @@ jobs:
       - name: Run Tests
         run: |
           ./testbox/run --reporter=ANTJunit --verbose
-          mv tests/results/report.txt tests/results/junit.xml
 
       - name: Upload Test Results
         if: always()
