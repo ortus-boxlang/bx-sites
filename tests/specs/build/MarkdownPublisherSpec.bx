@@ -1,0 +1,72 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.MarkdownPublisher", function() {
+
+			beforeEach( function() {
+				variables.publisher = new "models.build.MarkdownPublisher@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			it( "copies a page's source .md to outputDir at its own relativePath, byte for byte", function() {
+				var sourceDir = createTempDirectory( prefix = "bxdocs-mdpub-src-" );
+				var outputDir = createTempDirectory( prefix = "bxdocs-mdpub-out-" );
+				tempDirs.append( sourceDir );
+				tempDirs.append( outputDir );
+
+				fileWrite( sourceDir & "/index.md", "---" & char( 10 ) & "title: Home" & char( 10 ) & "---" & char( 10 ) & "Hello" );
+
+				var pages = [ { relativePath : "index.md", sourcePath : sourceDir & "/index.md" } ];
+				publisher.publish( pages, outputDir );
+
+				expect( fileExists( outputDir & "/index.md" ) ).toBeTrue();
+				expect( fileRead( outputDir & "/index.md" ) ).toBe( fileRead( sourceDir & "/index.md" ) );
+			} );
+
+			it( "creates nested directories for a page under a subfolder", function() {
+				var sourceDir = createTempDirectory( prefix = "bxdocs-mdpub-src-" );
+				var outputDir = createTempDirectory( prefix = "bxdocs-mdpub-out-" );
+				tempDirs.append( sourceDir );
+				tempDirs.append( outputDir );
+
+				directoryCreate( sourceDir & "/guides", true, true );
+				fileWrite( sourceDir & "/guides/setup.md", "Setup body" );
+
+				var pages = [ { relativePath : "guides/setup.md", sourcePath : sourceDir & "/guides/setup.md" } ];
+				publisher.publish( pages, outputDir );
+
+				expect( fileExists( outputDir & "/guides/setup.md" ) ).toBeTrue();
+				expect( fileRead( outputDir & "/guides/setup.md" ) ).toBe( "Setup body" );
+			} );
+
+			it( "publishes every page in the array", function() {
+				var sourceDir = createTempDirectory( prefix = "bxdocs-mdpub-src-" );
+				var outputDir = createTempDirectory( prefix = "bxdocs-mdpub-out-" );
+				tempDirs.append( sourceDir );
+				tempDirs.append( outputDir );
+
+				fileWrite( sourceDir & "/a.md", "A" );
+				fileWrite( sourceDir & "/b.md", "B" );
+
+				var pages = [
+					{ relativePath : "a.md", sourcePath : sourceDir & "/a.md" },
+					{ relativePath : "b.md", sourcePath : sourceDir & "/b.md" }
+				];
+				publisher.publish( pages, outputDir );
+
+				expect( fileExists( outputDir & "/a.md" ) ).toBeTrue();
+				expect( fileExists( outputDir & "/b.md" ) ).toBeTrue();
+			} );
+
+		} );
+	}
+
+}

@@ -71,7 +71,7 @@ flowchart TD
     D --> E["NavBuilder.build()\n+ onNav"]
     E --> F["convertMarkdown()\nper page, see below"]
     F --> G["ThemeRenderer.renderPage()"]
-    G --> H["write site/*.html"]
+    G --> H["write site/*.html\n+ MarkdownPublisher.publish()"]
     H --> I["SearchIndexer, sitemap.xml,\nllms.txt, tags/, assets"]
     I --> J["onBuildComplete"]
 ```
@@ -89,7 +89,7 @@ flowchart LR
 1. **Loader** — walks `docs/`, reads `.md` files + frontmatter (`title`, `order`, `hidden`)
 2. **Parser** — delegates entirely to **bx-markdown** (`Markdown()` BIF / `bx:markdown` component) for markdown-to-HTML conversion, including admonitions (`!!! type "Title"`), footnotes and definition lists via bx-markdown's own native Flexmark extensions (`markdown.enableAdmonition`/`enableFootnotes`/`enableDefinitionLists`). No custom parsing on the bx-docs side for those three. Content tabs (`=== "Title"`), math (`$...$`/`$$...$$`, KaTeX client-side), and fenced-code `hl_lines`/`linenums`/`title` annotations have no Flexmark extension to lean on, so bx-docs implements each as its own pre/post-processing pass around `Markdown()` instead (`TabsProcessor`/`MathProtector`/`CodeAnnotationProcessor`) — protect the source from Flexmark's own inline parsing before conversion, restore/apply against the rendered HTML after. A page-to-page link written the normal mkdocs way — a file-relative path to another page's `.md` source, e.g. `[Search](../guides/search.md)` — is also rendered by bx-markdown completely verbatim, since it has no concept of where that file will eventually be built; `MarkdownLinkResolver` runs as a post-processing-only pass (no pre-processing needed) that rewrites every such `href` to its built pretty-URL, resolved against the *linking* page's own directory.
 3. **Nav builder** — folder/file structure → nav tree, frontmatter overrides applied
-4. **Theme renderer** — invokes the active theme's `.bxm` templates with page data + nav tree in scope
+4. **Theme renderer** — invokes the active theme's `.bxm` templates with page data + nav tree in scope, alongside `MarkdownPublisher`, which copies each page's own original `.md` source to `site/` at the same docs/-relative path its built HTML sits under (`guides/themes.md` next to `guides/themes/index.html`) — a "Download Markdown" link on the page itself points to it (`page.markdownUrl`)
 5. **Search indexer** — builds a static JSON index (title, url, headings, truncated body text)
 6. **Asset pipeline** — copies theme assets + `docs/assets/` into `site/`
 

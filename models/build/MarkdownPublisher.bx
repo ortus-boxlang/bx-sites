@@ -1,0 +1,35 @@
+/**
+ * Publishes every page's original Markdown source alongside its built
+ * HTML - `docs/guides/themes.md` (source) ends up copied to
+ * `site/guides/themes.md`, sitting next to the page's own
+ * `site/guides/themes/index.html`, at the exact same docs/-relative path
+ * it already had (DocsLoader.bx's own `relativePath`) - so an LLM (or
+ * anyone else) can fetch a page's raw Markdown directly instead of
+ * scraping rendered HTML, the same motivation as `llms.txt`
+ * (LlmsTxtGenerator.bx). Unlike the built HTML, this is the file exactly
+ * as authored - frontmatter included, original relative links
+ * unmodified - since the whole `docs/` tree is mirrored 1:1, so those
+ * links keep working read this way too.
+ *
+ * A page's raw `.md` is written regardless of its own `hidden`
+ * frontmatter, matching how the page itself is still built (just left out
+ * of the nav/search/sitemap/llms.txt indexes) when hidden.
+ */
+class {
+
+	/**
+	 * Copies every page's original `.md` source into `outputDir`, at its
+	 * own docs/-relative path.
+	 *
+	 * @pages Array of page structs (DocsLoader.load() shape - `sourcePath`/`relativePath` used)
+	 * @outputDir Absolute path this doc tree is being written to (`site/` or `site/versions/<name>/`)
+	 */
+	void function publish( required array pages, required string outputDir ) {
+		for ( var page in arguments.pages ) {
+			var targetPath = arguments.outputDir & "/" & page.relativePath
+			directoryCreate( getDirectoryFromPath( targetPath ), true, true )
+			fileCopy( page.sourcePath, targetPath )
+		}
+	}
+
+}

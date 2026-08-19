@@ -164,6 +164,9 @@ class {
 		if ( !variables.page.keyExists( "ogImage" ) ) {
 			variables.page.ogImage = ""
 		}
+		if ( !variables.page.keyExists( "markdownUrl" ) ) {
+			variables.page.markdownUrl = ""
+		}
 		variables.nav = arguments.nav
 		variables.siteConfig = arguments.config
 		variables.themeDir = arguments.themeDir

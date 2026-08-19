@@ -281,6 +281,29 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "renders a Download Markdown link from the page's own markdownUrl, across every built-in theme, and omits it when markdownUrl is empty", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>", markdownUrl : "guides/setup.md" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var config = { name : "My Site" };
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					var html = renderer.renderPage( page, nav, config, themeDir );
+
+					expect( html ).toInclude( 'href="/guides/setup.md" download' );
+					expect( html ).toInclude( "Download Markdown" );
+				}
+
+				var pageWithoutMarkdown = { title : "My Page", contentHtml : "<p>Body</p>" };
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					var html = renderer.renderPage( pageWithoutMarkdown, nav, config, themeDir );
+
+					expect( html ).notToInclude( "Download Markdown" );
+				}
+			} );
+
 			it( "renders a version switcher with the current version selected when more than one version is passed, across every built-in theme", function() {
 				var root = newProjectRoot();
 				var page = { title : "My Page", contentHtml : "<p>Body</p>" };

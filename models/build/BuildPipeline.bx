@@ -24,6 +24,7 @@ class {
 	variables.mathProtector = new "models.build.MathProtector@bxdocs"()
 	variables.codeAnnotationProcessor = new "models.build.CodeAnnotationProcessor@bxdocs"()
 	variables.markdownLinkResolver = new "models.build.MarkdownLinkResolver@bxdocs"()
+	variables.markdownPublisher = new "models.build.MarkdownPublisher@bxdocs"()
 	variables.pluginLoader = new "models.build.PluginLoader@bxdocs"()
 	variables.pluginsOverride = []
 	variables.hasPluginsOverride = false
@@ -180,6 +181,7 @@ class {
 		assignBreadcrumbs( pages, nav )
 		assignEditAndLastUpdated( pages, arguments.config, arguments.root, arguments.docsRelativePrefix )
 		assignOgImages( pages, arguments.config, arguments.outputDir )
+		assignMarkdownUrl( pages )
 
 		for ( var page in pages ) {
 			var html = variables.themeRenderer.renderPage(
@@ -189,6 +191,8 @@ class {
 			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
 			fileWrite( outputPath, html )
 		}
+
+		variables.markdownPublisher.publish( pages, arguments.outputDir )
 
 		if ( arguments.config.search ) {
 			writeSearchIndex( pages, arguments.outputDir )
@@ -479,6 +483,22 @@ class {
 			base = "home"
 		}
 		return base.reReplace( "[\/]", "-", "all" ) & ".png"
+	}
+
+	/**
+	 * Fills in each page's own `markdownUrl` - where its raw `.md` source
+	 * ends up once MarkdownPublisher.bx copies it alongside the built HTML
+	 * (`site/guides/themes.md`, next to `site/guides/themes/index.html`) -
+	 * so a theme's `page.bxm` can link to it ("View as Markdown"). Root-relative
+	 * but not basePath-prefixed yet - same convention as `page.urlPath`/
+	 * `prevPage.url`/`nextPage.url`, prefixed by the theme at render time.
+	 *
+	 * @pages Array of page structs (relativePath already set by DocsLoader.bx)
+	 */
+	private void function assignMarkdownUrl( required array pages ) {
+		for ( var page in arguments.pages ) {
+			page.markdownUrl = page.relativePath
+		}
 	}
 
 	/**
