@@ -24,19 +24,18 @@ class extends="testbox.system.BaseSpec" {
 				expect( protectedResult.formulas.count() ).toBe( 1 );
 
 				var restored = protector.restore( "<p>" & protectedResult.markdown & "</p>", protectedResult.formulas );
-				expect( restored ).toBe( "<p>Euler: $e^{i\pi}+1=0$ is famous.</p>" );
+				expect( restored ).toBe( "<p>Euler: " & encodeForHTML( "$e^{i\pi}+1=0$" ) & " is famous.</p>" );
 			} );
 
 			it( "replaces a block $$...$$ formula spanning multiple lines with a single token", function() {
-				var md = "Before." & char( 10 ) & char( 10 ) &
-					"$$" & char( 10 ) & "\int_0^1 x^2 dx" & char( 10 ) & "$$" &
-					char( 10 ) & char( 10 ) & "After.";
+				var formula = "$$" & char( 10 ) & "\int_0^1 x^2 dx" & char( 10 ) & "$$";
+				var md = "Before." & char( 10 ) & char( 10 ) & formula & char( 10 ) & char( 10 ) & "After.";
 
 				var protectedResult = protector.protect( md );
 				expect( protectedResult.formulas.count() ).toBe( 1 );
 
 				var restored = protector.restore( protectedResult.markdown, protectedResult.formulas );
-				expect( restored ).toBe( md );
+				expect( restored ).toBe( "Before." & char( 10 ) & char( 10 ) & encodeForHTML( formula ) & char( 10 ) & char( 10 ) & "After." );
 			} );
 
 			it( "does not treat currency amounts on the same line as a formula", function() {
@@ -63,7 +62,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( protectedResult.formulas.count() ).toBe( 2 );
 
 				var restored = protector.restore( protectedResult.markdown, protectedResult.formulas );
-				expect( restored ).toBe( md );
+				expect( restored ).toBe( "First " & encodeForHTML( "$a$" ) & " and second " & encodeForHTML( "$b$" ) & " formula." );
 			} );
 
 		} );

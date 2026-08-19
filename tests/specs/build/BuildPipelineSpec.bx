@@ -460,6 +460,8 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "loads KaTeX and restores literal math formula text only when [math] is enabled, across every built-in theme", function() {
+				var expectedFormula = encodeForHTML( "$e^{i\pi}+1=0$" );
+
 				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
 					var root = newProject( themeName );
 					fileWrite( root & "/docs/index.md", 'Euler: $e^{i\pi}+1=0$ here.' );
@@ -468,7 +470,7 @@ class extends="testbox.system.BaseSpec" {
 					var offHtml = fileRead( root & "/site/index.html" );
 					expect( offHtml ).notToInclude( "katex" );
 					expect( fileExists( root & "/site/assets/math-init.js" ) ).toBeFalse();
-					expect( offHtml ).toInclude( "$e^{i\pi}+1=0$" );
+					expect( offHtml ).toInclude( expectedFormula );
 
 					var mathRoot = newProject( themeName );
 					fileWrite(
@@ -482,7 +484,7 @@ class extends="testbox.system.BaseSpec" {
 					expect( onHtml ).toInclude( "katex.min.css" );
 					expect( onHtml ).toInclude( "katex.min.js" );
 					expect( onHtml ).toInclude( "assets/math-init.js" );
-					expect( onHtml ).toInclude( "$e^{i\pi}+1=0$" );
+					expect( onHtml ).toInclude( expectedFormula );
 					expect( fileExists( mathRoot & "/site/assets/math-init.js" ) ).toBeTrue();
 				}
 			} );
