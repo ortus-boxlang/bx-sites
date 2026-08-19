@@ -75,6 +75,8 @@ This repository documents itself with BX Docs - see `bxdocs.json` and `docs/` at
 - **[ortus-boxlang.github.io/bx-docs](https://ortus-boxlang.github.io/bx-docs/)** - stable docs, built from `main`
 - **[ortus-boxlang.github.io/bx-docs/development](https://ortus-boxlang.github.io/bx-docs/development/)** - latest/unreleased docs, built from `development`
 
+Both are built with all three built-in themes side by side (`bootstrap` at the root, `material`/`tailwind` under `theme/material/`/`theme/tailwind/`) via `buildMultiTheme.sh` - use the switcher next to the dark-mode toggle to flip between them on any page.
+
 Or read the source directly:
 
 - [Getting Started](docs/getting-started.md)

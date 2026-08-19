@@ -33,5 +33,6 @@
 	"lastUpdated": true,
 	"mermaid": true,
 	"math": true,
-	"ogImage": "assets/og-image.png"
+	"ogImage": "assets/og-image.png",
+	"extraJs": [ "assets/theme-switcher.js" ]
 }
