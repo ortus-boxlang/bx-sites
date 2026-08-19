@@ -25,11 +25,13 @@ class {
 		"footer"       : false,
 		"lastUpdated"  : false,
 		"mermaid"      : false,
+		"math"         : false,
 		"analytics"    : { "provider" : "", "id" : "" },
 		"ogImage"      : "",
 		"generateOgImages" : false,
 		"extraCss"     : [],
-		"extraJs"      : []
+		"extraJs"      : [],
+		"plugins"      : []
 	}
 
 	/**
@@ -171,6 +173,13 @@ class {
 			)
 		}
 
+		if ( !isBoolean( arguments.config.math ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [math] must be a boolean"
+			)
+		}
+
 		if ( !isArray( arguments.config.nav ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
@@ -278,6 +287,21 @@ class {
 						message = "bxdocs.json [#assetsKey#] entries must be non-empty strings"
 					)
 				}
+			}
+		}
+
+		if ( !isArray( arguments.config.plugins ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [plugins], when present, must be an array"
+			)
+		}
+		for ( var pluginName in arguments.config.plugins ) {
+			if ( !isSimpleValue( pluginName ) || !len( trim( pluginName ) ) ) {
+				throw(
+					type    = "BxDocs.InvalidConfig",
+					message = "bxdocs.json [plugins] entries must be non-empty strings (BoxLang module names)"
+				)
 			}
 		}
 

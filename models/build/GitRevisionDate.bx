@@ -8,6 +8,9 @@
 class {
 
 	/**
+	 * Looks up a file's most recent git commit date via `git log -1
+	 * --format=%aI`, for the `lastUpdated` config option.
+	 *
 	 * @projectRoot Absolute path to the project root - used as git's working directory, so a relative path resolves correctly
 	 * @filePath Absolute or project-relative path to the file to look up
 	 *

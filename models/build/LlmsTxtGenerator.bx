@@ -8,6 +8,9 @@
 class {
 
 	/**
+	 * Renders `llms.txt` - an H1 of the site name, an optional description
+	 * blockquote, and a markdown link per visible page.
+	 *
 	 * @pages Array of page structs from DocsLoader.load()
 	 * @config The site's bxdocs.json config
 	 * @siteUrl The absolute site URL ending with `/` (BaseUrlResolver's `absolute`), or "" if unknown

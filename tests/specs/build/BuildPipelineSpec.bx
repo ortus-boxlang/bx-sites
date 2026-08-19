@@ -424,6 +424,118 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "copies the shared tabs.js and code-lines.js widgets unconditionally, loading code-lines.js after hljs.highlightAll()", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/assets/tabs.js" ) ).toBeTrue();
+				expect( fileExists( root & "/site/assets/code-lines.js" ) ).toBeTrue();
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "assets/tabs.js" );
+				var codeLinesPos = html.findNoCase( "assets/code-lines.js" );
+				var highlightAllPos = html.findNoCase( "hljs.highlightAll" );
+				expect( codeLinesPos ).toBeGT( highlightAllPos );
+			} );
+
+			it( "converts a === ""Title"" content tab block into a tab widget, rendering each tab's own markdown", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/docs/index.md",
+					'=== "Java"' & char( 10 ) & "    hello java" & char( 10 ) & char( 10 ) &
+						'=== "BoxLang"' & char( 10 ) & "    hello bx"
+				);
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( 'class="bxdocs-tabs" data-bxdocs-tabgroup' );
+				expect( html ).toInclude( ">Java</button>" );
+				expect( html ).toInclude( ">BoxLang</button>" );
+				expect( html ).toInclude( "<p>hello java</p>" );
+				expect( html ).toInclude( "<p>hello bx</p>" );
+				expect( html ).notToInclude( "data-bxdocs-token" );
+			} );
+
+			it( "loads KaTeX and restores literal math formula text only when [math] is enabled, across every built-in theme", function() {
+				var expectedFormula = encodeForHTML( "$e^{i\pi}+1=0$" );
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var root = newProject( themeName );
+					fileWrite( root & "/docs/index.md", 'Euler: $e^{i\pi}+1=0$ here.' );
+					pipeline.build( root );
+
+					var offHtml = fileRead( root & "/site/index.html" );
+					expect( offHtml ).notToInclude( "katex" );
+					expect( fileExists( root & "/site/assets/math-init.js" ) ).toBeFalse();
+					expect( offHtml ).toInclude( expectedFormula );
+
+					var mathRoot = newProject( themeName );
+					fileWrite(
+						mathRoot & "/bxdocs.json",
+						'{"name":"Test Site","theme":{"name":"' & themeName & '"},"math":true}'
+					);
+					fileWrite( mathRoot & "/docs/index.md", 'Euler: $e^{i\pi}+1=0$ here.' );
+					pipeline.build( mathRoot );
+
+					var onHtml = fileRead( mathRoot & "/site/index.html" );
+					expect( onHtml ).toInclude( "katex.min.css" );
+					expect( onHtml ).toInclude( "katex.min.js" );
+					expect( onHtml ).toInclude( "assets/math-init.js" );
+					expect( onHtml ).toInclude( expectedFormula );
+					expect( fileExists( mathRoot & "/site/assets/math-init.js" ) ).toBeTrue();
+				}
+			} );
+
+			it( "runs a plugin's onConfig/onPageMarkdown/onPageHtml/onNav/onBuildComplete hooks in the pipeline, via the setPlugins() test seam", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				var fakePlugin = {
+					onConfig : function( required struct config ) {
+						arguments.config.pluginTouchedConfig = true;
+						return arguments.config;
+					},
+					onPageMarkdown : function( required string markdown, required struct page, required struct config ) {
+						return arguments.markdown & char( 10 ) & "Injected line.";
+					},
+					onPageHtml : function( required string html, required struct page, required struct config ) {
+						return arguments.html & "<!--plugin-html-->";
+					},
+					onNav : function( required array nav, required struct config ) {
+						arguments.nav.append( { title : "Plugin Page", url : "plugin.html", order : 0, children : [] } );
+						return arguments.nav;
+					},
+					onBuildComplete : function( required string siteDir, required struct config ) {
+						fileWrite( arguments.siteDir & "/plugin-marker.txt", "built" );
+					}
+				};
+				pipeline.setPlugins( [ { name : "fake", instance : fakePlugin } ] );
+
+				var result = pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "Injected line." );
+				expect( html ).toInclude( "<!--plugin-html-->" );
+				expect( html ).toInclude( "Plugin Page" );
+				expect( fileExists( root & "/site/plugin-marker.txt" ) ).toBeTrue();
+			} );
+
+			it( "throws BxDocs.PluginNotFound when bxdocs.json [plugins] names an uninstalled module, without the setPlugins() seam", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","plugins":["someUnknownModule"]}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				expect( function() {
+					pipeline.build( root );
+				} ).toThrow( "BxDocs.PluginNotFound" );
+			} );
+
 			it( "uses bxdocs.json's [nav] array as the nav tree, in its own order, instead of folder inference", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Home" );

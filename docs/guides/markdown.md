@@ -11,6 +11,20 @@ Flexmark extensions by default - admonitions, footnotes and definition lists
 - plus a Mermaid diagram integration of its own. All four are configurable
 via [`bxdocs.json`'s `markdown`/`mermaid` keys](../configuration.md#markdown).
 
+On top of those, BX Docs implements three more extensions of its own that
+Flexmark has no concept of at all - content tabs, math, and fenced-code
+`hl_lines`/`linenums`/`title` annotations. Since bx-docs can't fork
+bx-markdown's parser, each one works as a pre/post-processing pass around
+the normal markdown conversion instead - see the sections below.
+
+```mermaid
+flowchart LR
+    A["Raw markdown"] --> B["Pre-process:\nextract tabs, protect math,\nstrip code annotations"]
+    B --> C["Markdown()\n(bx-markdown)"]
+    C --> D["Post-process:\nrestore tabs, restore math,\napply code annotations"]
+    D --> E["Final page HTML"]
+```
+
 ## Admonitions
 
 A callout/note box - on by default, no `bxdocs.json` config needed:
@@ -136,6 +150,41 @@ Second term
 
 Off by default - turn it on with `{"markdown":{"enableDefinitionLists":true}}`.
 
+## Content Tabs
+
+Group alternative content - different languages, different platforms -
+behind a set of clickable tabs with `=== "Title"`, indented the same way an
+admonition body is (4 spaces or a tab):
+
+```markdown
+=== "Java"
+    ```java
+    System.out.println( "Hi" );
+    ```
+
+=== "BoxLang"
+    ```bx
+    println( "Hi" )
+    ```
+```
+
+Which renders as:
+
+=== "Java"
+    ```java
+    System.out.println( "Hi" );
+    ```
+
+=== "BoxLang"
+    ```bx
+    println( "Hi" )
+    ```
+
+Consecutive `=== "..."` blocks (separated by at most one blank line) form a
+single tab group; a tab's own content is full markdown, so code fences,
+lists, admonitions, whatever you'd write anywhere else. No `bxdocs.json`
+config needed - always on.
+
 ## Code Blocks
 
 Fenced code blocks are syntax-highlighted client-side (highlight.js), no
@@ -155,6 +204,33 @@ class {
 
 }
 ```
+
+### Line numbers, highlighted lines, and titles
+
+Add `linenums`, `hl_lines` and/or `title` to a fence's info string - any
+combination, all optional:
+
+````markdown
+```bx hl_lines="2" linenums="1" title="add.bx"
+numeric function add( required numeric a, required numeric b ) {
+	return a + b
+}
+```
+````
+
+Which renders as:
+
+```bx hl_lines="2" linenums="1" title="add.bx"
+numeric function add( required numeric a, required numeric b ) {
+	return a + b
+}
+```
+
+`linenums="N"` starts the gutter counting at `N`; `hl_lines` takes
+space-separated line numbers and/or ranges (`"2 4-6"`) to highlight, counted
+from the top of the block regardless of where `linenums` starts; `title`
+adds a small title bar above the block. No `bxdocs.json` config needed -
+always available.
 
 ## Diagrams
 
@@ -177,6 +253,36 @@ flowchart LR
 Mermaid supports flowcharts, sequence diagrams, class diagrams, Gantt
 charts and more - see [Mermaid's own syntax reference](https://mermaid.js.org/intro/syntax-reference.html)
 for everything it can draw.
+
+## Math
+
+Opt-in via `bxdocs.json`'s [`math`](../configuration.md#math) key:
+
+```json
+{ "math": true }
+```
+
+Once enabled, [KaTeX](https://katex.org/) typesets `$...$` for inline math
+and `$$...$$` for a centered block, both written straight into the markdown
+body:
+
+```markdown
+Euler's identity, $e^{i\pi} + 1 = 0$, relates five constants in one line.
+
+$$
+\int_0^1 x^2 \, dx = \frac{1}{3}
+$$
+```
+
+Euler's identity, $e^{i\pi} + 1 = 0$, relates five constants in one line.
+
+$$
+\int_0^1 x^2 \, dx = \frac{1}{3}
+$$
+
+A `$` immediately followed or preceded by whitespace is left alone (so
+"$5 and $10" isn't misread as a formula) - typeset math always sits flush
+against both delimiters.
 
 ## Plugin extensions
 

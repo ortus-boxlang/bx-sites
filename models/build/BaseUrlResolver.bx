@@ -16,6 +16,10 @@
 class {
 
 	/**
+	 * Splits bxdocs.json's `baseURL` into a root-relative `basePath` (used
+	 * for every internal link) and, when `baseURL` is a full URL, an
+	 * `absolute` site URL (used only where an absolute URL is required).
+	 *
 	 * @baseURL The raw bxdocs.json `baseURL` value
 	 *
 	 * @return { basePath, absolute }

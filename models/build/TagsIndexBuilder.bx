@@ -10,6 +10,9 @@
 class {
 
 	/**
+	 * Groups every visible page by its frontmatter `tags` into the
+	 * `site/tags/index.html` page body.
+	 *
 	 * @pages Array of page structs (DocsLoader.load() shape, `tags` included)
 	 * @basePath Root-relative base path ending with `/`, prefixed onto every linked page's `urlPath`
 	 *
@@ -56,6 +59,9 @@ class {
 	}
 
 	/**
+	 * Slugs a tag into its anchor id - matches `page.bxm`'s own `tagSlug()`
+	 * in every built-in theme (kept in sync by convention).
+	 *
 	 * @tag The raw tag text
 	 */
 	private string function tagSlug( required string tag ) {

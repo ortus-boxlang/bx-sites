@@ -7,6 +7,8 @@
 class {
 
 	/**
+	 * Writes a starter `bxdocs.json` and `docs/index.md` for the `new` verb.
+	 *
 	 * @targetDir Absolute path to the new project directory (created if missing; refuses to run if it already contains a bxdocs.json)
 	 * @name The site name written into bxdocs.json
 	 * @theme The built-in theme name to default the project to
@@ -47,6 +49,9 @@ class {
 	}
 
 	/**
+	 * Renders a starter `bxdocs.json`, escaping `name`/`description` so
+	 * quotes in either can't break the generated JSON.
+	 *
 	 * @name The site name
 	 * @theme The default theme name
 	 * @description The site description
@@ -87,6 +92,8 @@ class {
 	}
 
 	/**
+	 * Renders a minimal starter `docs/index.md`.
+	 *
 	 * @name The site name, used as the starter page's H1
 	 *
 	 * @return The rendered docs/index.md source

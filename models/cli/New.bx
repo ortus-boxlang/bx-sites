@@ -11,6 +11,9 @@ class {
 	variables.builtInThemes = [ "bootstrap", "material", "tailwind" ]
 
 	/**
+	 * Dispatches the `new` verb to ProjectScaffolder.scaffold(), after
+	 * validating `--theme` against the built-in theme names.
+	 *
 	 * @options { projectRoot (required, absolute path), name, theme (defaults to "bootstrap"), description }
 	 */
 	struct function run( struct options = {} ) {

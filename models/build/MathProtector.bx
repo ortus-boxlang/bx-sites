@@ -1,0 +1,92 @@
+/**
+ * Shields LaTeX math spans (`$...$` inline, `$$...$$` block) from
+ * CommonMark's own inline parsing - `_`/`*` inside a formula would
+ * otherwise risk being read as emphasis markers, and bx-markdown/Flexmark
+ * has no math extension to lean on instead (module spec: math is rendered
+ * client-side by KaTeX, this module only needs to deliver the literal
+ * formula source to the browser intact).
+ *
+ * Same two-phase shape as TabsProcessor.bx: `protect()` swaps every
+ * formula for a plain alphanumeric token (no markdown-special characters
+ * at all, so it can never be mis-parsed) before `Markdown()` runs;
+ * `restore()` swaps the token back for the original formula text,
+ * HTML-escaped, once rendering is done. KaTeX's auto-render extension
+ * (loaded client-side, see layout.bxm) then scans the final page text for
+ * the `$`/`$$` delimiters and typesets them in the browser.
+ *
+ * Inline formulas require no whitespace touching either `$` (so
+ * `$5 and $10` is left alone rather than misread as one formula) and
+ * never span a line break; block formulas may span multiple lines. Both
+ * use `java.util.regex` directly - `reReplace()` has no callback-based
+ * replacement, only fixed/backreference strings, so a manual
+ * find/appendReplacement loop is the only way to mint one fresh token per
+ * match.
+ */
+class {
+
+	variables.blockPattern  = createObject( "java", "java.util.regex.Pattern" ).compile( "\$\$([\s\S]+?)\$\$" )
+	variables.inlinePattern = createObject( "java", "java.util.regex.Pattern" ).compile( "\$([^\s\$][^\$\n]*?[^\s\$]|[^\s\$])\$" )
+
+	/**
+	 * Replaces every `$...$`/`$$...$$` formula with a plain alphanumeric
+	 * token, so CommonMark's inline parsing can never mis-read a `_`/`*`
+	 * inside a formula as emphasis.
+	 *
+	 * @markdown The raw markdown body text
+	 *
+	 * @return { markdown: string with formulas replaced by placeholder tokens, formulas: { token: original delimited formula text } }
+	 */
+	struct function protect( required string markdown ) {
+		var formulas = {}
+		var afterBlocks = tokenizeMatches( arguments.markdown, variables.blockPattern, formulas )
+		var afterInline = tokenizeMatches( afterBlocks, variables.inlinePattern, formulas )
+		return { markdown : afterInline, formulas : formulas }
+	}
+
+	/**
+	 * Swaps every placeholder token from protect() back for its original,
+	 * HTML-escaped formula text, for KaTeX to typeset client-side.
+	 *
+	 * @html Already-rendered HTML (from Markdown() on protect()'s output)
+	 * @formulas protect()'s own `formulas` struct
+	 *
+	 * @return html with every placeholder token swapped back for its original (HTML-escaped) formula text
+	 */
+	string function restore( required string html, required struct formulas ) {
+		var result = arguments.html
+		for ( var token in arguments.formulas ) {
+			result = result.replace( token, encodeForHTML( arguments.formulas[ token ] ), "all" )
+		}
+		return result
+	}
+
+	/**
+	 * Replaces every match of `pattern` in `text` with a fresh token,
+	 * recording `token -> matched text` into `formulas` (mutated in place).
+	 *
+	 * @text The source text to scan
+	 * @pattern A compiled java.util.regex.Pattern
+	 * @formulas Accumulator struct, mutated in place
+	 */
+	private string function tokenizeMatches( required string text, required any pattern, required struct formulas ) {
+		var matcher = arguments.pattern.matcher( arguments.text )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+		while ( matcher.find() ) {
+			var token = nextToken()
+			arguments.formulas[ token ] = matcher.group()
+			matcher.appendReplacement( buffer, token )
+		}
+		matcher.appendTail( buffer )
+		return buffer.toString()
+	}
+
+	/**
+	 * A placeholder guaranteed to contain no markdown-special characters
+	 * (letters/digits only), so it always survives CommonMark inline
+	 * parsing as plain, unmangled text.
+	 */
+	private string function nextToken() {
+		return "bxdocsmath" & replace( createUUID(), "-", "", "all" )
+	}
+
+}

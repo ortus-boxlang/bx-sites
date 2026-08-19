@@ -28,23 +28,34 @@ box install bx-docs
 box install bx-markdown
 box install bx-esapi
 
+# ...or, without CommandBox, BoxLang's own installer takes all three at once:
+# install-bx-module bx-docs bx-markdown bx-esapi
+
 # Scaffold a new docs project (docs/ + bxdocs.json)
-boxlang module:bxDocs new my-docs
+bxDocs new my-docs
 cd my-docs
 
 # Build the static site to site/
-boxlang module:bxDocs build
+bxDocs build
 
 # Or build and serve locally with live reload while you write
-boxlang module:bxDocs serve
+bxDocs serve
 ```
 
 See [Getting Started](docs/getting-started.md) for the full walkthrough.
 
 ## Usage
 
+`box install` drops a standalone `bxDocs` script on your `PATH` (via
+`box.json`'s `boxlang.executable`), so every verb can be run either that
+short way, or as `boxlang module:bxdocs <verb>` - both run the exact same
+thing; use the longer form anywhere the `PATH` shim isn't set up (a CI
+runner, a module registered by hand):
+
 ```bash
-boxlang module:bxDocs <verb> [options]
+bxDocs <verb> [options]
+# or, equivalently:
+boxlang module:bxdocs <verb> [options]
 ```
 
 | Verb | Purpose |
@@ -55,7 +66,7 @@ boxlang module:bxDocs <verb> [options]
 | `search-index` | Rebuild `site/search-index.json` standalone (also runs automatically during `build`) |
 | `clean` | Remove `site/` and any build cache |
 
-Every verb accepts `--projectRoot=<path>` (or a bare positional path) to target a project other than the current directory. Run `boxlang module:bxDocs --help` for full usage.
+Every verb accepts `--projectRoot=<path>` (or a bare positional path) to target a project other than the current directory. Run `bxDocs --help` for full usage.
 
 ## Documentation
 

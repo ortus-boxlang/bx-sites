@@ -99,6 +99,10 @@ class {
 		return variables.buildVersion
 	}
 
+	/**
+	 * Runs a full BuildPipeline.build(), re-injects the live-reload script,
+	 * and bumps `buildVersion` so polling clients pick up the change.
+	 */
 	private void function rebuild() {
 		variables.buildPipeline.build( variables.projectRoot )
 		injectLiveReload()
@@ -126,6 +130,10 @@ class {
 	}
 
 	/**
+	 * Snapshots the watched files' count and newest modified time, so
+	 * checkAndRebuild() can detect a change without re-reading file
+	 * contents.
+	 *
 	 * @return { count, maxModified } across bxdocs.json, docs/** and a project theme/ override, if present
 	 */
 	private struct function currentFingerprint() {
@@ -169,6 +177,10 @@ class {
 		}
 	}
 
+	/**
+	 * Builds the client-side poller script - polls `/__bxdocs/version` and
+	 * reloads the page the first time the version number changes.
+	 */
 	private string function liveReloadScript() {
 		var lines = [
 			"(function () {",

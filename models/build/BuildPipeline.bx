@@ -20,6 +20,12 @@ class {
 	variables.versionsDiscoverer = new "models.build.VersionsDiscoverer@bxdocs"()
 	variables.tagsIndexBuilder = new "models.build.TagsIndexBuilder@bxdocs"()
 	variables.socialCardGenerator = new "models.build.SocialCardGenerator@bxdocs"()
+	variables.tabsProcessor = new "models.build.TabsProcessor@bxdocs"()
+	variables.mathProtector = new "models.build.MathProtector@bxdocs"()
+	variables.codeAnnotationProcessor = new "models.build.CodeAnnotationProcessor@bxdocs"()
+	variables.pluginLoader = new "models.build.PluginLoader@bxdocs"()
+	variables.pluginsOverride = []
+	variables.hasPluginsOverride = false
 
 	/**
 	 * Swaps in a fake/test markdown renderer. The real one (MarkdownRenderer.bx)
@@ -34,6 +40,26 @@ class {
 	}
 
 	/**
+	 * Bypasses PluginLoader.discover() (real BoxLang module lookup - no
+	 * unit test of its own, see PluginLoader.bx's docblock) with an
+	 * already-resolved plugins list, so BuildPipelineSpec.bx can test the
+	 * pipeline's own onConfig/onPageMarkdown/onPageHtml/onNav/onBuildComplete
+	 * wiring against plain fake plugin objects without a real second
+	 * BoxLang module registered.
+	 *
+	 * @plugins PluginLoader.discover()'s own output shape: array of { name, instance }
+	 */
+	void function setPlugins( required array plugins ) {
+		variables.pluginsOverride = arguments.plugins
+		variables.hasPluginsOverride = true
+	}
+
+	/**
+	 * Runs the full `build` verb end to end: load config -> resolve plugins
+	 * -> render the main doc tree and every `docs/versions/<name>/` tree ->
+	 * copy assets -> write 404/tags/sitemap.xml/llms.txt -> fire
+	 * `onBuildComplete`.
+	 *
 	 * @projectRoot Absolute path to the project root
 	 *
 	 * @return { siteDir, pageCount }
@@ -41,6 +67,8 @@ class {
 	struct function build( required string projectRoot ) {
 		var root = normalizeRoot( arguments.projectRoot )
 		var config = variables.configLoader.load( root )
+		var plugins = resolvePlugins( config )
+		config = variables.pluginLoader.applyOnConfig( plugins, config )
 		var urls = variables.baseUrlResolver.resolve( config.baseURL )
 		var themeDir = variables.themeRenderer.resolveThemeDir( config.theme.name, root )
 		var siteDir = root & "/site"
@@ -54,9 +82,9 @@ class {
 		var versions = buildVersionsList( versionNames, urls.basePath )
 
 		var navConfig = resolveExplicitNav( root & "/docs", config.nav )
-		var mainResult = renderDocTree( root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", navConfig )
+		var mainResult = renderDocTree( root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, navConfig )
 		var allPages = duplicate( mainResult.pages )
-		copyAssets( root, themeDir, siteDir, config.search, config.mermaid )
+		copyAssets( root, themeDir, siteDir, config.search, config.mermaid, config.math )
 
 		for ( var versionName in versionNames ) {
 			var versionOutputDir = siteDir & "/versions/" & versionName
@@ -69,10 +97,11 @@ class {
 				root,
 				versions,
 				versionName,
-				"versions/" & versionName & "/"
+				"versions/" & versionName & "/",
+				plugins
 			)
 			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
-			copyAssets( root, themeDir, versionOutputDir, config.search, config.mermaid )
+			copyAssets( root, themeDir, versionOutputDir, config.search, config.mermaid, config.math )
 		}
 
 		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, "Latest" )
@@ -84,7 +113,23 @@ class {
 
 		fileWrite( siteDir & "/llms.txt", variables.llmsTxtGenerator.build( allPages, config, urls.absolute, urls.basePath ) )
 
+		variables.pluginLoader.applyOnBuildComplete( plugins, siteDir, config )
+
 		return { siteDir : siteDir, pageCount : mainResult.pages.len() }
+	}
+
+	/**
+	 * Resolves this build's plugin list - PluginLoader.discover()'s real
+	 * BoxLang-module lookup against `config.plugins`, unless setPlugins()
+	 * already provided one (test seam - see its own docblock).
+	 *
+	 * @config The site's bxdocs.json config, already defaulted/validated
+	 */
+	private array function resolvePlugins( required struct config ) {
+		if ( variables.hasPluginsOverride ) {
+			return variables.pluginsOverride
+		}
+		return variables.pluginLoader.discover( arguments.config.plugins )
 	}
 
 	/**
@@ -103,6 +148,7 @@ class {
 	 * @versions Version switcher entries as `[ { label, url } ]`, shared by every tree so the switcher is consistent everywhere
 	 * @currentVersion Which `versions` entry this tree IS, for the switcher's own "selected" state
 	 * @docsRelativePrefix Empty for the main/"Latest" tree; `"versions/<name>/"` for a version tree - see assignEditAndLastUpdated()
+	 * @plugins resolvePlugins()'s own output, applied via onNav/onPageMarkdown/onPageHtml
 	 * @navConfig An explicit nav tree (NavBuilder.build()'s own `navConfig` shape) for this doc tree - empty (the default) infers nav from folder structure. Only ever non-empty for the main tree - see resolveExplicitNav()
 	 *
 	 * @return { pages, nav }
@@ -117,15 +163,17 @@ class {
 		required array versions,
 		required string currentVersion,
 		required string docsRelativePrefix,
+		required array plugins,
 		array navConfig = []
 	) {
 		var pages = variables.docsLoader.load( arguments.docsDir )
 		var nav = variables.navBuilder.build( pages, arguments.navConfig )
+		nav = variables.pluginLoader.applyOnNav( arguments.plugins, nav, arguments.config )
 		var flatSequence = variables.navBuilder.flatten( nav )
 
 		directoryCreate( arguments.outputDir, true, true )
 
-		convertMarkdown( pages, arguments.config )
+		convertMarkdown( pages, arguments.config, arguments.plugins )
 		assignTableOfContents( pages )
 		assignPrevNext( pages, flatSequence )
 		assignBreadcrumbs( pages, nav )
@@ -246,8 +294,11 @@ class {
 			return { skipped : true, indexPath : "", pageCount : 0 }
 		}
 
+		var plugins = resolvePlugins( config )
+		config = variables.pluginLoader.applyOnConfig( plugins, config )
+
 		var pages = variables.docsLoader.load( root & "/docs" )
-		convertMarkdown( pages, config )
+		convertMarkdown( pages, config, plugins )
 
 		var siteDir = root & "/site"
 		directoryCreate( siteDir, true, true )
@@ -266,12 +317,33 @@ class {
 	 * `enableFootnotes`/`enableDefinitionLists`/etc. settings included -
 	 * see ConfigLoader.bx's own default for `markdown.enableAdmonition`).
 	 *
+	 * Also runs three bx-docs-only extensions Flexmark itself has no
+	 * concept of - content tabs, math spans, and fenced-code
+	 * `hl_lines`/`linenums`/`title` annotations - each as a pre-process
+	 * pass (protect the body from `Markdown()`'s own inline parsing) and a
+	 * post-process pass (restore/apply against the rendered HTML). See
+	 * TabsProcessor.bx/MathProtector.bx/CodeAnnotationProcessor.bx's own
+	 * docblocks for why this shape is necessary.
+	 *
 	 * @pages Array of page structs from DocsLoader.load()
 	 * @config The site's bxdocs.json config
 	 */
-	private void function convertMarkdown( required array pages, required struct config ) {
+	private void function convertMarkdown( required array pages, required struct config, array plugins = [] ) {
 		for ( var page in arguments.pages ) {
-			page.contentHtml = variables.markdownRenderer.toHtml( page.body, arguments.config.markdown )
+			var markdown = variables.pluginLoader.applyOnPageMarkdown( arguments.plugins, page.body, page, arguments.config )
+
+			var tabsExtracted = variables.tabsProcessor.extract( markdown )
+			var mathProtected = variables.mathProtector.protect( tabsExtracted.markdown )
+			var codeExtracted = variables.codeAnnotationProcessor.extractAndStrip( mathProtected.markdown )
+
+			var html = variables.markdownRenderer.toHtml( codeExtracted.markdown, arguments.config.markdown )
+			html = variables.codeAnnotationProcessor.applyToHtml( html, codeExtracted.annotations )
+			html = variables.mathProtector.restore( html, mathProtected.formulas )
+			html = variables.tabsProcessor.restore( html, tabsExtracted.groups, variables.markdownRenderer, arguments.config.markdown )
+
+			html = variables.pluginLoader.applyOnPageHtml( arguments.plugins, html, page, arguments.config )
+
+			page.contentHtml = html
 		}
 	}
 
@@ -483,6 +555,9 @@ class {
 	}
 
 	/**
+	 * Builds the search index from already-converted pages and writes it to
+	 * `siteDir`.
+	 *
 	 * @pages Array of page structs with `contentHtml` already set
 	 * @siteDir Absolute path to the build output directory (must already exist)
 	 *
@@ -498,7 +573,8 @@ class {
 	/**
 	 * Copies theme assets to `site/assets/theme/`, this module's own shared
 	 * scripts (the search widget when search is enabled; the copy-code
-	 * button unconditionally), and a project's own `docs/assets/**` to
+	 * button, tab widget, and code line-number/highlight widget
+	 * unconditionally), and a project's own `docs/assets/**` to
 	 * `site/assets/` (module spec section 5, step 6).
 	 *
 	 * @root Absolute path to the project root
@@ -506,8 +582,9 @@ class {
 	 * @siteDir Absolute path to the build output directory
 	 * @searchEnabled Whether to copy the shared search.js widget
 	 * @mermaidEnabled Whether to copy the shared mermaid-init.js widget
+	 * @mathEnabled Whether to copy the shared math-init.js (KaTeX auto-render) widget
 	 */
-	private void function copyAssets( required string root, required string themeDir, required string siteDir, required boolean searchEnabled, required boolean mermaidEnabled ) {
+	private void function copyAssets( required string root, required string themeDir, required string siteDir, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false ) {
 		var themeAssetsDir = arguments.themeDir & "/assets"
 		if ( directoryExists( themeAssetsDir ) ) {
 			directoryCopy( themeAssetsDir, arguments.siteDir & "/assets/theme", true )
@@ -517,6 +594,8 @@ class {
 		fileCopy( moduleAssetsDir() & "/copy-code.js", arguments.siteDir & "/assets/copy-code.js" )
 		fileCopy( moduleAssetsDir() & "/admonition-collapse.js", arguments.siteDir & "/assets/admonition-collapse.js" )
 		fileCopy( moduleAssetsDir() & "/highlight-boxlang.js", arguments.siteDir & "/assets/highlight-boxlang.js" )
+		fileCopy( moduleAssetsDir() & "/tabs.js", arguments.siteDir & "/assets/tabs.js" )
+		fileCopy( moduleAssetsDir() & "/code-lines.js", arguments.siteDir & "/assets/code-lines.js" )
 		directoryCopy( moduleAssetsDir() & "/fonts", arguments.siteDir & "/assets/fonts", true )
 
 		if ( arguments.searchEnabled ) {
@@ -525,6 +604,10 @@ class {
 
 		if ( arguments.mermaidEnabled ) {
 			fileCopy( moduleAssetsDir() & "/mermaid-init.js", arguments.siteDir & "/assets/mermaid-init.js" )
+		}
+
+		if ( arguments.mathEnabled ) {
+			fileCopy( moduleAssetsDir() & "/math-init.js", arguments.siteDir & "/assets/math-init.js" )
 		}
 
 		var docsAssetsDir = arguments.root & "/docs/assets"
@@ -543,6 +626,9 @@ class {
 	}
 
 	/**
+	 * Strips a trailing slash so every path built from `projectRoot`
+	 * elsewhere in this class never ends up with a doubled `//`.
+	 *
 	 * @projectRoot A project root, trailing slash optional
 	 */
 	private string function normalizeRoot( required string projectRoot ) {

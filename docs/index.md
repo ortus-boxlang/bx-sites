@@ -29,6 +29,8 @@ repository's own `docs/` folder - see
 - **Markdown handled by [bx-markdown](https://github.com/ortus-boxlang/bx-markdown).**
   BX Docs doesn't parse Markdown itself; it delegates to bx-markdown and
   forwards your own `bxdocs.json` options straight through to it.
+- **A plugin system built on BoxLang's own module system.** A plugin is
+  just another installed BoxLang module - no separate plugin API to learn.
 
 ## Where to go next
 
@@ -38,5 +40,6 @@ repository's own `docs/` folder - see
 - [Themes](guides/themes.md) - the built-in themes, and how to write your own
 - [Search](guides/search.md) - how the static search index works
 - [Deploying to GitHub Pages](guides/deployment.md) - the built-in GitHub Actions workflow
-- [Markdown Extensions](guides/markdown.md) - admonitions, footnotes, definition lists and Mermaid diagrams
+- [Markdown Extensions](guides/markdown.md) - admonitions, footnotes, definition lists, content tabs, math, code annotations and Mermaid diagrams
+- [Plugins](guides/plugins.md) - extending BX Docs with a BoxLang module of your own
 - [Releases](releases/index.md) - versioning policy and what's new per release

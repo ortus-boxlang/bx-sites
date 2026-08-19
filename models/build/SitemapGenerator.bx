@@ -8,6 +8,8 @@
 class {
 
 	/**
+	 * Renders `sitemap.xml`, one `<url><loc>` per visible page.
+	 *
 	 * @pages Array of page structs from DocsLoader.load()
 	 * @siteUrl The absolute site URL, ending with `/` (BaseUrlResolver's `absolute`)
 	 *

@@ -6,6 +6,8 @@
 class {
 
 	/**
+	 * Dispatches the `clean` verb - removes `site/` and `.cache/`.
+	 *
 	 * @options { projectRoot (required, absolute path) }
 	 */
 	struct function run( struct options = {} ) {

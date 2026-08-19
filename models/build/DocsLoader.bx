@@ -9,6 +9,9 @@ class {
 	variables.frontmatterParser = new "models.build.FrontmatterParser@bxdocs"()
 
 	/**
+	 * Walks every `.md` file under `docsDir` (excluding `docs/assets/**` and
+	 * `docs/versions/**`) and loads each into a page struct.
+	 *
 	 * @docsDir Absolute path to the project's docs/ directory
 	 *
 	 * @return Array of page structs, sorted by [order] then [title]: { relativePath, sourcePath, urlPath, title, description, order, hidden, tags, icon, summary, ogImage, body }
@@ -36,6 +39,10 @@ class {
 	}
 
 	/**
+	 * Reads one `.md` file, splits its frontmatter from its body, and
+	 * derives its `urlPath` (folder-relative, `index.md` mapped to the
+	 * folder itself) and title (frontmatter, else the filename).
+	 *
 	 * @docsDir Absolute path to the project's docs/ directory
 	 * @filePath Absolute path to the .md file being loaded
 	 */

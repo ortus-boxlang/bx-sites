@@ -10,6 +10,10 @@
 class {
 
 	/**
+	 * Force-pushes `siteDir` to `branch` as a single orphan commit, from a
+	 * throwaway `git worktree` so the caller's own branch/working tree is
+	 * never touched.
+	 *
 	 * @projectRoot Absolute path to the project root (must be a git repository)
 	 * @siteDir Absolute path to the already-built site (must exist - run `build` first)
 	 * @branch The branch to force-push the site to
@@ -97,6 +101,9 @@ class {
 	}
 
 	/**
+	 * Runs a command via `java.lang.ProcessBuilder`, capturing its combined
+	 * stdout/stderr and exit code.
+	 *
 	 * @cmd Full argv
 	 * @cwd Working directory for the process
 	 *

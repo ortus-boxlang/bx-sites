@@ -21,3 +21,6 @@ tests/results/**
 # This module's own dogfooded docs build output (see docs/, bxdocs.json)
 /site/
 /.cache/
+
+# Generated DocBox API docs output (see runDocs.sh)
+/apidocs/

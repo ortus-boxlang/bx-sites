@@ -79,8 +79,12 @@ page features:
   [Markdown Extensions](markdown.md#admonitions).
 - **Footnotes and definition lists**, opt-in via `bxdocs.json`'s `markdown`.
   See [Markdown Extensions](markdown.md#footnotes).
+- **Content tabs** and **code line numbers/highlighted lines/titles**, no
+  config needed. See [Markdown Extensions](markdown.md#content-tabs).
 - **Mermaid diagrams**, opt-in via `bxdocs.json`'s `mermaid`. See
   [Markdown Extensions](markdown.md#diagrams).
+- **Math** (KaTeX), opt-in via `bxdocs.json`'s `math`. See
+  [Markdown Extensions](markdown.md#math).
 
 Set which one a project uses in `bxdocs.json`:
 
@@ -119,7 +123,9 @@ versioned, so a theme only needs to render a switcher when
 `variables.versions.len() gt 1`. The three built-in themes get their repo/social icons from
 a small shared SVG lookup, `<bx:include template="#variables.moduleAssetsDir#/icons.bxm">`
 (defines `bxdocsIcon( name )`, one of `github`, `twitter`/`x`, `rss`,
-`email`, `edit`, `clock`, falling back to a generic link glyph) - a custom
+`youtube`, `linkedin`, `facebook`, `bluesky`, `threads`, `slack`,
+`patreon`, `email`, `edit`, `clock`, falling back to a generic link glyph)
+- a custom
 theme can include it the same way, or supply its own icons entirely.
 
 A theme folder missing either required file fails fast with a clear

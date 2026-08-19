@@ -2,14 +2,24 @@
 title: CLI Reference
 order: 3
 icon: ⌨️
-summary: Every boxlang module:bxDocs verb and its flags.
+summary: Every bxDocs verb and its flags.
 tags: [reference, cli]
 ---
 
 # CLI Reference
 
 ```bash
-boxlang module:bxDocs <verb> [options]
+bxDocs <verb> [options]
+```
+
+`box install bx-docs` drops a standalone `bxDocs` script on your `PATH`
+(via `box.json`'s `boxlang.executable`), so every verb below can be run
+either that short way, or as `boxlang module:bxdocs <verb>` - both run the
+exact same thing; use the longer form anywhere the `PATH` shim isn't set
+up (a CI runner, a module registered by hand):
+
+```bash
+boxlang module:bxdocs <verb> [options]
 ```
 
 Every verb accepts `--projectRoot=<path>` (or a bare positional path) to
@@ -28,7 +38,7 @@ flags below can appear before any verb.
 Scaffold a docs project.
 
 ```bash
-boxlang module:bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...]
+bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...]
 ```
 
 - `--name` - the site name written into `bxdocs.json` (defaults to the target directory's name)
@@ -42,7 +52,7 @@ index (unless `search` is `false` in `bxdocs.json`) and copies theme +
 `docs/assets/**` into `site/`.
 
 ```bash
-boxlang module:bxDocs build
+bxDocs build
 ```
 
 ## `serve`
@@ -50,7 +60,7 @@ boxlang module:bxDocs build
 Build and serve the site locally with live reload.
 
 ```bash
-boxlang module:bxDocs serve [--port=8080] [--host=127.0.0.1]
+bxDocs serve [--port=8080] [--host=127.0.0.1]
 ```
 
 Runs in the foreground until interrupted (Ctrl+C).
@@ -62,7 +72,7 @@ copying assets. `build` already runs this same step automatically - this
 verb exists for when you only need to refresh the index.
 
 ```bash
-boxlang module:bxDocs search-index
+bxDocs search-index
 ```
 
 ## `clean`
@@ -70,7 +80,7 @@ boxlang module:bxDocs search-index
 Remove `site/` and any build cache, leaving `docs/` and `bxdocs.json` alone.
 
 ```bash
-boxlang module:bxDocs clean
+bxDocs clean
 ```
 
 ## `gh-deploy`
@@ -82,7 +92,7 @@ repository with a configured remote; never touches your own current branch
 or working tree (it does the push from a throwaway `git worktree`).
 
 ```bash
-boxlang module:bxDocs gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
+bxDocs gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
 ```
 
 - `--branch` - defaults to `gh-pages`

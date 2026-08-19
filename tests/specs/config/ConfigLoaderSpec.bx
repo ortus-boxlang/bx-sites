@@ -318,6 +318,48 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxDocs.InvalidConfig" );
 			} );
 
+			it( "defaults [math] to false", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).math ).toBeFalse();
+			} );
+
+			it( "preserves a user-supplied [math]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","math":true}' );
+				expect( loader.load( dir ).math ).toBeTrue();
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [math] is not a boolean", function() {
+				var dir = newProjectDir( '{"name":"My Docs","math":"yes please"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "defaults [plugins] to an empty array", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).plugins ).toBeArray();
+				expect( loader.load( dir ).plugins.len() ).toBe( 0 );
+			} );
+
+			it( "preserves a user-supplied [plugins] array of module names", function() {
+				var dir = newProjectDir( '{"name":"My Docs","plugins":["someBxModule"]}' );
+				expect( loader.load( dir ).plugins ).toBe( [ "someBxModule" ] );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [plugins] is not an array", function() {
+				var dir = newProjectDir( '{"name":"My Docs","plugins":"someBxModule"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when a [plugins] entry is an empty string", function() {
+				var dir = newProjectDir( '{"name":"My Docs","plugins":[""]}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
 		} );
 	}
 
