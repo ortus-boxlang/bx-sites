@@ -214,6 +214,21 @@ class {
 	}
 
 	/**
+	 * A minimal, attribute-value-safe escape for an `href`/`src` value that
+	 * must stay literally path-parseable downstream - `encodeForHTML()`
+	 * also entity-escapes "safe" characters like `/` (its exact range is
+	 * locale/JVM-dependent), which would silently break
+	 * MarkdownLinkResolver.bx's later `.md`-relative-link resolution (it
+	 * re-parses this same href text as a literal file path) and
+	 * PageLinkResolver.bx's later href-to-page lookup. Only `&`/`"`/`<` -
+	 * the characters that actually matter inside a double-quoted HTML
+	 * attribute - are escaped.
+	 */
+	private string function attrEscape( required string value ) {
+		return arguments.value.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
+	}
+
+	/**
 	 * `::: expandable "Title"` - a plain collapsible `<details>` section,
 	 * with none of an admonition's callout type/color/icon. Add `open`
 	 * (bare, e.g. `::: expandable "Title" open="true"`) to start expanded.
@@ -239,11 +254,11 @@ class {
 			var attrs = parseAttrs( child.attrsRaw )
 			var href = trim( attrs.href ?: "" )
 			var tag = len( href ) ? "a" : "div"
-			var hrefAttr = len( href ) ? ' href="' & encodeForHTML( href ) & '"' : ""
+			var hrefAttr = len( href ) ? ' href="' & attrEscape( href ) & '"' : ""
 
 			html &= "<" & tag & ' class="bxdocs-card"' & hrefAttr & ">"
 			if ( len( trim( attrs.image ?: "" ) ) ) {
-				html &= '<img class="bxdocs-card__image" src="' & encodeForHTML( attrs.image ) & '" alt="">'
+				html &= '<img class="bxdocs-card__image" src="' & attrEscape( attrs.image ) & '" alt="">'
 			} else if ( len( trim( attrs.icon ?: "" ) ) ) {
 				html &= '<div class="bxdocs-card__icon">' & encodeForHTML( attrs.icon ) & '</div>'
 			}
@@ -358,7 +373,7 @@ class {
 			return '<div class="bxdocs-file bxdocs-file--invalid">::: file - missing required src="..."</div>'
 		}
 		var title = len( trim( arguments.attrs.title ?: "" ) ) ? trim( arguments.attrs.title ) : listLast( src, "/" )
-		return '<a class="bxdocs-file" href="' & encodeForHTML( src ) & '" download>'
+		return '<a class="bxdocs-file" href="' & attrEscape( src ) & '" download>'
 			& '<span class="bxdocs-file__icon" aria-hidden="true">📎</span>'
 			& '<span class="bxdocs-file__title">' & encodeForHTML( title ) & '</span>'
 			& '</a>'
@@ -379,11 +394,11 @@ class {
 		var embedUrl = resolveEmbedUrl( url )
 
 		if ( !len( embedUrl ) ) {
-			return '<a class="bxdocs-embed-fallback" href="' & encodeForHTML( url ) & '" target="_blank" rel="noopener noreferrer">'
+			return '<a class="bxdocs-embed-fallback" href="' & attrEscape( url ) & '" target="_blank" rel="noopener noreferrer">'
 				& ( len( title ) ? encodeForHTML( title ) : encodeForHTML( url ) ) & ' ↗</a>'
 		}
 
-		var html = '<div class="bxdocs-embed"><iframe src="' & encodeForHTML( embedUrl ) & '" loading="lazy" allowfullscreen'
+		var html = '<div class="bxdocs-embed"><iframe src="' & attrEscape( embedUrl ) & '" loading="lazy" allowfullscreen'
 			& ' referrerpolicy="strict-origin-when-cross-origin"></iframe></div>'
 		if ( len( title ) ) {
 			html &= '<div class="bxdocs-embed__caption">' & encodeForHTML( title ) & '</div>'
@@ -484,7 +499,7 @@ class {
 		if ( !len( href ) ) {
 			return '<div class="bxdocs-page-link bxdocs-page-link--invalid">::: page-link - missing required href="..."</div>'
 		}
-		return '<a class="bxdocs-page-link" href="' & encodeForHTML( href ) & '" data-bxdocs-page-link>'
+		return '<a class="bxdocs-page-link" href="' & attrEscape( href ) & '" data-bxdocs-page-link>'
 			& '<span class="bxdocs-page-link__title">' & encodeForHTML( href ) & '</span>'
 			& '</a>'
 	}

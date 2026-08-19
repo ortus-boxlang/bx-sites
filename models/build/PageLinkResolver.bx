@@ -63,7 +63,7 @@ class {
 		var icon = trim( arguments.target.icon ?: "" )
 		var summary = len( trim( arguments.target.summary ?: "" ) ) ? trim( arguments.target.summary ) : trim( arguments.target.description ?: "" )
 
-		var html = '<a class="bxdocs-page-link" href="' & encodeForHTML( arguments.href ) & '" data-bxdocs-page-link>'
+		var html = '<a class="bxdocs-page-link" href="' & attrEscape( arguments.href ) & '" data-bxdocs-page-link>'
 		if ( len( icon ) ) {
 			html &= '<span class="bxdocs-page-link__icon">' & encodeForHTML( icon ) & '</span>'
 		}
@@ -74,6 +74,18 @@ class {
 		}
 		html &= '</span></a>'
 		return html
+	}
+
+	/**
+	 * A minimal, attribute-value-safe escape for an `href` that's already
+	 * a final built URL - `encodeForHTML()` also entity-escapes "safe"
+	 * characters like `/` (its exact range is locale/JVM-dependent), which
+	 * is needlessly noisy in a plain URL attribute. Only `&`/`"`/`<` - the
+	 * characters that actually matter inside a double-quoted HTML
+	 * attribute - are escaped.
+	 */
+	private string function attrEscape( required string value ) {
+		return arguments.value.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
 	}
 
 	/**

@@ -10,7 +10,24 @@ class extends="testbox.system.BaseSpec" {
 
 			private string function render( required string markdown ) {
 				var extracted = processor.extract( markdown );
-				return processor.restore( extracted.markdown, extracted.blocks, renderer, {} );
+				return htmlDecode( processor.restore( extracted.markdown, extracted.blocks, renderer, {} ) );
+			}
+
+			// encodeForHTML()'s exact escaping range for "safe" ASCII punctuation
+			// (e.g. "/") and non-ASCII characters (emoji) is environment-dependent
+			// (locale/JVM-charset-driven) - both the escaped numeric-entity form and
+			// the raw character are equally valid, equivalent HTML, so assertions
+			// below compare against decoded output rather than pinning one form.
+			private string function htmlDecode( required string text ) {
+				var matcher = createObject( "java", "java.util.regex.Pattern" ).compile( '&##x([0-9a-fA-F]+);' ).matcher( arguments.text )
+				var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+				while ( matcher.find() ) {
+					var codepoint = createObject( "java", "java.lang.Integer" ).parseInt( matcher.group( 1 ), 16 )
+					var chars = createObject( "java", "java.lang.String" ).valueOf( createObject( "java", "java.lang.Character" ).toChars( codepoint ) )
+					matcher.appendReplacement( buffer, createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( chars ) )
+				}
+				matcher.appendTail( buffer )
+				return buffer.toString()
 			}
 
 			it( "leaves markdown with no directives untouched aside from trimming", function() {

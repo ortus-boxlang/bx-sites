@@ -8,8 +8,26 @@ class extends="testbox.system.BaseSpec" {
 				variables.page = { title : "Changelog", urlPath : "changelog/index.html" };
 			} );
 
+			// encodeForHTML()'s exact escaping range for "safe" ASCII
+			// punctuation (e.g. "/", ":") is environment-dependent
+			// (locale/JVM-charset-driven) - both the escaped numeric-entity
+			// form and the raw character are equally valid, equivalent XML,
+			// so the <link> assertion below compares against decoded output
+			// rather than pinning one form.
+			private string function htmlDecode( required string text ) {
+				var matcher = createObject( "java", "java.util.regex.Pattern" ).compile( '&##x([0-9a-fA-F]+);' ).matcher( arguments.text )
+				var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+				while ( matcher.find() ) {
+					var codepoint = createObject( "java", "java.lang.Integer" ).parseInt( matcher.group( 1 ), 16 )
+					var chars = createObject( "java", "java.lang.String" ).valueOf( createObject( "java", "java.lang.Character" ).toChars( codepoint ) )
+					matcher.appendReplacement( buffer, createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( chars ) )
+				}
+				matcher.appendTail( buffer )
+				return buffer.toString()
+			}
+
 			it( "renders a valid RSS 2.0 shell with the page's title/link", function() {
-				var xml = generator.build( [], page, "BX Docs", "https://example.com/" );
+				var xml = htmlDecode( generator.build( [], page, "BX Docs", "https://example.com/" ) );
 
 				expect( xml ).toInclude( '<rss version="2.0">' );
 				expect( xml ).toInclude( "<title>BX Docs - Changelog</title>" );

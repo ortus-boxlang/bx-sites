@@ -27,15 +27,15 @@ class {
 			'<?xml version="1.0" encoding="UTF-8"?>',
 			'<rss version="2.0"><channel>',
 			"	<title>" & encodeForHTML( arguments.siteName & " - " & arguments.page.title ) & "</title>",
-			"	<link>" & encodeForHTML( pageUrl ) & "</link>",
+			"	<link>" & attrEscape( pageUrl ) & "</link>",
 			"	<description>" & encodeForHTML( "Changelog updates for " & arguments.page.title ) & "</description>"
 		]
 
 		for ( var entry in sorted ) {
 			lines.append( "	<item>" )
 			lines.append( "		<title>" & encodeForHTML( len( trim( entry.date ) ) ? entry.date : arguments.page.title ) & "</title>" )
-			lines.append( "		<link>" & encodeForHTML( pageUrl ) & "</link>" )
-			lines.append( '		<guid isPermaLink="false">' & encodeForHTML( pageUrl & "##" & entry.date & "-" & hash( entry.contentHtml ) ) & "</guid>" )
+			lines.append( "		<link>" & attrEscape( pageUrl ) & "</link>" )
+			lines.append( '		<guid isPermaLink="false">' & attrEscape( pageUrl & "##" & entry.date & "-" & hash( entry.contentHtml ) ) & "</guid>" )
 			if ( len( trim( entry.date ) ) && isDate( entry.date ) ) {
 				lines.append( "		<pubDate>" & dateTimeFormat( entry.date, "EEE, dd MMM yyyy" ) & " 00:00:00 +0000</pubDate>" )
 			}
@@ -50,6 +50,17 @@ class {
 		lines.append( "" )
 
 		return lines.toList( char( 10 ) )
+	}
+
+	/**
+	 * A minimal, XML-text-safe escape for a `<link>`/`<guid>` URL value -
+	 * `encodeForHTML()` also entity-escapes "safe" characters like `/`
+	 * (its exact range is locale/JVM-dependent), which is needlessly
+	 * noisy in a plain URL. Only `&`/`"`/`<` - the characters that
+	 * actually matter in XML text content - are escaped.
+	 */
+	private string function attrEscape( required string value ) {
+		return arguments.value.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
 	}
 
 }

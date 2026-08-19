@@ -7,6 +7,23 @@ class extends="testbox.system.BaseSpec" {
 				variables.resolver = new "models.build.PageLinkResolver@bxdocs"();
 			} );
 
+			// encodeForHTML()'s exact escaping range for non-ASCII characters
+			// (emoji) is environment-dependent (locale/JVM-charset-driven) - both
+			// the escaped numeric-entity form and the raw character are equally
+			// valid, equivalent HTML, so the emoji assertion below compares
+			// against decoded output rather than pinning one form.
+			private string function htmlDecode( required string text ) {
+				var matcher = createObject( "java", "java.util.regex.Pattern" ).compile( '&##x([0-9a-fA-F]+);' ).matcher( arguments.text )
+				var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+				while ( matcher.find() ) {
+					var codepoint = createObject( "java", "java.lang.Integer" ).parseInt( matcher.group( 1 ), 16 )
+					var chars = createObject( "java", "java.lang.String" ).valueOf( createObject( "java", "java.lang.Character" ).toChars( codepoint ) )
+					matcher.appendReplacement( buffer, createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( chars ) )
+				}
+				matcher.appendTail( buffer )
+				return buffer.toString()
+			}
+
 			it( "enriches a page-link stub with its target page's title/icon/summary", function() {
 				var pages = [
 					{
@@ -17,10 +34,11 @@ class extends="testbox.system.BaseSpec" {
 				];
 
 				resolver.resolve( pages, "/" );
+				var decoded = htmlDecode( pages[ 1 ].contentHtml );
 
-				expect( pages[ 1 ].contentHtml ).toInclude( '<span class="bxdocs-page-link__icon">🎨</span>' );
-				expect( pages[ 1 ].contentHtml ).toInclude( '<span class="bxdocs-page-link__title">Themes</span>' );
-				expect( pages[ 1 ].contentHtml ).toInclude( '<span class="bxdocs-page-link__summary">Customize the look.</span>' );
+				expect( decoded ).toInclude( '<span class="bxdocs-page-link__icon">🎨</span>' );
+				expect( decoded ).toInclude( '<span class="bxdocs-page-link__title">Themes</span>' );
+				expect( decoded ).toInclude( '<span class="bxdocs-page-link__summary">Customize the look.</span>' );
 			} );
 
 			it( "falls back to a page's description when it has no summary", function() {
