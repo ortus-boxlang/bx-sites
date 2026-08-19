@@ -44,6 +44,27 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "<p>Welcome home</p>" );
 			} );
 
+			it( "publishes every page's raw .md source alongside its built HTML, and links to it from the page", function() {
+				var root = newProject();
+				var markdown = "---" & char( 10 ) & "title: Setup" & char( 10 ) & "---" & char( 10 ) & "Setup body";
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/guides", true, true );
+				fileWrite( root & "/docs/guides/setup.md", markdown );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/index.md" ) ).toBeTrue();
+				expect( fileRead( root & "/site/index.md" ) ).toBe( "Home" );
+
+				expect( fileExists( root & "/site/guides/setup.md" ) ).toBeTrue();
+				expect( fileRead( root & "/site/guides/setup.md" ) ).toBe( markdown );
+				// The raw .md sits alongside setup/index.html, not nested under it.
+				expect( fileExists( root & "/site/guides/setup/index.html" ) ).toBeTrue();
+
+				var setupHtml = fileRead( root & "/site/guides/setup/index.html" );
+				expect( setupHtml ).toInclude( 'href="/guides/setup.md" download' );
+			} );
+
 			it( "builds nested pages at their pretty-URL paths and links them in the nav", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Home" );

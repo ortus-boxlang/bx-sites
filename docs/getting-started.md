@@ -103,6 +103,19 @@ working if you read the file directly on GitHub instead of the built
 site: it's a real, valid relative path to a real file either way. Absolute
 URLs, `mailto:`, and links already starting with `/` are left untouched.
 
+### Downloading a page as Markdown
+
+Every built page also gets its own original `.md` source published
+alongside it - `docs/guides/deployment.md` ends up copied to
+`site/guides/deployment.md`, right next to
+`site/guides/deployment/index.html` - with a "Download Markdown" link on
+the page itself, next to "Edit this page". No config needed, always on.
+
+This is the same motivation as [`llms.txt`](../configuration.md#llmstxt) -
+a person (or an LLM) can fetch a page's raw Markdown directly instead of
+scraping rendered HTML - and since the whole `docs/` tree is mirrored 1:1,
+a page's own relative links keep working read this way too.
+
 Each page can start with a small frontmatter block:
 
 ```markdown

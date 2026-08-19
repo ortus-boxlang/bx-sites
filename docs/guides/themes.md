@@ -47,6 +47,11 @@ page features:
 - **A repo link and "Edit this page"/"Last updated" line**, when
   `bxdocs.json`'s `repo`/`lastUpdated` options are set. See
   [Configuration](../configuration.md#repo).
+- **A "Download Markdown" link**, next to "Edit this page" - every page's
+  raw `.md` source is published alongside its built HTML (`guides/themes.md`
+  sitting next to `guides/themes/index.html`), so it (or an LLM) can read
+  the page as plain Markdown directly instead of parsing rendered HTML.
+  Always on, no config needed. See [Getting Started](../getting-started.md#downloading-a-page-as-markdown).
 - **An opt-in footer** (copyright, `social` links, a "Built with BX Docs"
   credit) when `bxdocs.json`'s `footer` is `true`. See
   [Configuration](../configuration.md#footer).

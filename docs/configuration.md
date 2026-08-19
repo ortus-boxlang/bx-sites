@@ -77,7 +77,7 @@ doubles as the site's canonical URL for `sitemap.xml` and `llms.txt`.
   `sitemap.xml` is written at build time with every non-hidden page's
   absolute URL under that domain.
 
-`llms.txt` (see [below](#llms-txt)) is always written; it just prefers an
+`llms.txt` (see [below](#llmstxt)) is always written; it just prefers an
 absolute URL when `baseURL` provides one.
 
 ## `llms.txt`
