@@ -31,8 +31,6 @@
 		} )();
 	</script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
 	<link rel="stylesheet" href="/bx-docs/development/assets/theme/style.css">
 	
@@ -46,7 +44,7 @@
 <body x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxdocs-theme', v ? 'dark' : 'light' ) } )">
 	<nav class="navbar navbar-expand-lg brand-navbar">
 		<div class="container-fluid navbar-row">
-			<a class="navbar-brand brand-mark" href="/bx-docs/development/"><img class="brand-logo" src="/bx-docs/development/assets/boxlang-icon-full.svg" alt="BX Docs"></a>
+			<a class="navbar-brand brand-mark" href="/bx-docs/development/"><img class="brand-logo" src="/bx-docs/development/assets/boxlang-icon-full.svg" alt=""><span class="brand-name">BX Docs</span></a>
 			<div class="navbar-controls">
 <div class="bxdocs-search position-relative">
 	<input type="search" id="bxdocs-search-input" class="form-control" placeholder="Search docs..." aria-label="Search">
@@ -76,9 +74,10 @@
 
 				<article class="page-content">
 
-					<h1 class="page-title">Configuration</h1>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 11:05:43 PM</span></div>
-<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#name">name</a></li><li class="toc-level-2"><a href="#description">description</a></li><li class="toc-level-2"><a href="#baseurl">baseURL</a></li><li class="toc-level-2"><a href="#llmstxt">llms.txt</a></li><li class="toc-level-2"><a href="#sitemapxml">sitemap.xml</a></li><li class="toc-level-2"><a href="#theme">theme</a></li><li class="toc-level-2"><a href="#search">search</a></li><li class="toc-level-2"><a href="#nav">nav</a></li><li class="toc-level-2"><a href="#markdown">markdown</a></li><li class="toc-level-2"><a href="#repo">repo</a></li><li class="toc-level-2"><a href="#social">social</a></li><li class="toc-level-2"><a href="#footer">footer</a></li><li class="toc-level-2"><a href="#lastupdated">lastUpdated</a></li><li class="toc-level-2"><a href="#analytics">analytics</a></li><li class="toc-level-2"><a href="#ogimage">ogImage</a></li><li class="toc-level-2"><a href="#extracss--extrajs">extraCss / extraJs</a></li><li class="toc-level-2"><a href="#mermaid">mermaid</a></li><li class="toc-level-2"><a href="#versioning">Versioning</a></li></ul></nav>
+					<h1 class="page-title"><span class="page-icon">⚙️</span> Configuration</h1>
+					<p class="page-summary">Every bxdocs.json key, what it defaults to, and what it does.</p>
+<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-reference">reference</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-configuration">configuration</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 1:30:17 AM</span></div>
+<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#name">name</a></li><li class="toc-level-2"><a href="#description">description</a></li><li class="toc-level-2"><a href="#baseurl">baseURL</a></li><li class="toc-level-2"><a href="#llmstxt">llms.txt</a></li><li class="toc-level-2"><a href="#sitemapxml">sitemap.xml</a></li><li class="toc-level-2"><a href="#theme">theme</a></li><li class="toc-level-2"><a href="#search">search</a></li><li class="toc-level-2"><a href="#nav">nav</a></li><li class="toc-level-2"><a href="#markdown">markdown</a></li><li class="toc-level-2"><a href="#repo">repo</a></li><li class="toc-level-2"><a href="#social">social</a></li><li class="toc-level-2"><a href="#footer">footer</a></li><li class="toc-level-2"><a href="#lastupdated">lastUpdated</a></li><li class="toc-level-2"><a href="#analytics">analytics</a></li><li class="toc-level-2"><a href="#ogimage">ogImage</a></li><li class="toc-level-3"><a href="#generateogimages">generateOgImages</a></li><li class="toc-level-2"><a href="#extracss--extrajs">extraCss / extraJs</a></li><li class="toc-level-2"><a href="#mermaid">mermaid</a></li><li class="toc-level-2"><a href="#versioning">Versioning</a></li></ul></nav>
 					<h1 id="configuration"><a href="#configuration" id="configuration" name="configuration" class="anchor"></a>Configuration</h1>
 <p>Every project has one <code>bxdocs.json</code> at its root:</p>
 <pre><code class="language-json">{
@@ -195,9 +194,49 @@ every section collapsed.</p>
 box; <code>false</code> skips both entirely - no <code>search-index.json</code>, no search UI, no
 extra JS shipped. See <a href="guides/search.md">Search</a>.</p>
 <h2 id="nav"><a href="#nav" id="nav" name="nav" class="anchor"></a><code>nav</code></h2>
-<p>Reserved for a hand-authored nav override. In v1, nav is always inferred
-from <code>docs/</code>'s own folder/file structure (with <code>order</code>/<code>hidden</code>
-frontmatter); this key is validated but not yet consumed.</p>
+<p>By default, nav is inferred from <code>docs/</code>'s own folder/file structure (with
+<code>order</code>/<code>hidden</code> frontmatter) - fine for small sites, but a large one can
+outgrow it: an explicit nav lets you title, group and order pages however
+you want, independent of where their files actually live.</p>
+<p>An empty array (the default) means &quot;infer from folder structure&quot;. A
+non-empty array replaces that inference entirely - array order becomes nav
+order, and a page not referenced anywhere in it is still built, just not
+linked from the nav (same as <code>hidden: true</code>). Each entry is either:</p>
+<ul>
+<li>a bare docs/-relative path string, e.g. <code>&quot;guides/setup.md&quot;</code> - title comes
+from that page's own frontmatter/filename, same as folder-inference would
+give it</li>
+<li>an object <code>{ &quot;title&quot;, &quot;path&quot;, &quot;children&quot; }</code> - <code>path</code> and <code>children</code> are
+both optional; a <code>title</code>-only entry with no <code>path</code> is an unlinked group
+heading (like a folder with no <code>index.md</code> today), and an explicit <code>title</code>
+always overrides the linked page's own title in the nav (the page's real
+<code>&lt;h1&gt;</code>/<code>&lt;title&gt;</code> is untouched - only the nav label changes)</li>
+</ul>
+<pre><code class="language-json">{
+	&quot;nav&quot;: [
+		&quot;index.md&quot;,
+		{
+			&quot;title&quot;: &quot;Guides&quot;,
+			&quot;children&quot;: [
+				{ &quot;title&quot;: &quot;Quick Start&quot;, &quot;path&quot;: &quot;guides/setup.md&quot; },
+				&quot;guides/deployment.md&quot;
+			]
+		}
+	]
+}
+</code></pre>
+<p>For a nav large enough that it clutters <code>bxdocs.json</code>, move it to its own
+<code>docs/nav.json</code> file instead - same array shape, just as the whole file's
+top-level content:</p>
+<pre><code class="language-json">[
+	&quot;index.md&quot;,
+	{ &quot;title&quot;: &quot;Guides&quot;, &quot;children&quot;: [ &quot;guides/setup.md&quot; ] }
+]
+</code></pre>
+<p><code>bxdocs.json</code>'s own <code>nav</code>, when non-empty, always wins over <code>docs/nav.json</code>.
+Only the main tree honors either - a <code>docs/versions/&lt;name&gt;/</code> tree always
+infers its nav from its own folder structure, even when the main tree has
+an explicit one.</p>
 <h2 id="markdown"><a href="#markdown" id="markdown" name="markdown" class="anchor"></a><code>markdown</code></h2>
 <p>Forwarded as-is to <a href="https://github.com/ortus-boxlang/bx-markdown">bx-markdown</a>'s
 own module settings before each page renders. BX Docs doesn't redefine or
@@ -302,11 +341,24 @@ Required when <code>provider</code> is <code>&quot;google&quot;</code>.</li>
 </code></pre>
 <h2 id="ogimage"><a href="#ogimage" id="ogimage" name="ogimage" class="anchor"></a><code>ogImage</code></h2>
 <p>Path/URL to a default social-card image, rendered as <code>og:image</code> (and paired
-with a <code>twitter:card</code> of <code>summary_large_image</code>) on every page - resolved
-the same way as <code>theme.logo</code> (relative paths are prefixed with <code>baseURL</code>,
-absolute URLs are used as-is). Left blank (the default), no <code>og:image</code>/
-<code>twitter:card</code> tags are rendered.</p>
+with a <code>twitter:card</code> of <code>summary_large_image</code>) on every page that doesn't
+override it - resolved the same way as <code>theme.logo</code> (relative paths are
+prefixed with <code>baseURL</code>, absolute URLs are used as-is). Left blank (the
+default) and <code>generateOgImages</code> off, no <code>og:image</code>/<code>twitter:card</code> tags are
+rendered.</p>
 <pre><code class="language-json">{ &quot;ogImage&quot;: &quot;assets/social-card.png&quot; }
+</code></pre>
+<p>A page's own frontmatter <code>ogImage</code> (see <a href="getting-started.md#add-pages">Getting Started</a>)
+always wins over this site-wide default for that one page.</p>
+<h3 id="generateogimages"><a href="#generateogimages" id="generateogimages" name="generateogimages" class="anchor"></a><code>generateOgImages</code></h3>
+<p><code>false</code> (the default) - no per-page cards. <code>true</code> renders a real 1200x630
+PNG social card for every page that doesn't already have its own
+frontmatter <code>ogImage</code> - the page's title on the brand gradient, written to
+<code>site/assets/og/&lt;page&gt;.png</code> - instead of every page sharing one generic
+site-wide image. Pure <code>java.awt</code>/<code>javax.imageio</code> under the hood (part of
+any JVM BoxLang runs on), so this needs no headless browser, external
+service, or network access at build time.</p>
+<pre><code class="language-json">{ &quot;generateOgImages&quot;: true }
 </code></pre>
 <h2 id="extracss--extrajs"><a href="#extracss--extrajs" id="extracss--extrajs" name="extracss--extrajs" class="anchor"></a><code>extraCss</code> / <code>extraJs</code></h2>
 <p>Arrays of extra stylesheet/script URLs to include on every page, appended
@@ -383,6 +435,7 @@ main site's.</p>
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+	<script src="/bx-docs/development/assets/highlight-boxlang.js"></script>
 	<script>hljs.highlightAll();</script>
 	<script src="/bx-docs/development/assets/copy-code.js" defer></script>
 	<script src="/bx-docs/development/assets/admonition-collapse.js" defer></script>

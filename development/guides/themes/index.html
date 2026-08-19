@@ -31,8 +31,6 @@
 		} )();
 	</script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
 	<link rel="stylesheet" href="/bx-docs/development/assets/theme/style.css">
 	
@@ -46,7 +44,7 @@
 <body x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxdocs-theme', v ? 'dark' : 'light' ) } )">
 	<nav class="navbar navbar-expand-lg brand-navbar">
 		<div class="container-fluid navbar-row">
-			<a class="navbar-brand brand-mark" href="/bx-docs/development/"><img class="brand-logo" src="/bx-docs/development/assets/boxlang-icon-full.svg" alt="BX Docs"></a>
+			<a class="navbar-brand brand-mark" href="/bx-docs/development/"><img class="brand-logo" src="/bx-docs/development/assets/boxlang-icon-full.svg" alt=""><span class="brand-name">BX Docs</span></a>
 			<div class="navbar-controls">
 <div class="bxdocs-search position-relative">
 	<input type="search" id="bxdocs-search-input" class="form-control" placeholder="Search docs..." aria-label="Search">
@@ -77,7 +75,7 @@
 				<article class="page-content">
 <nav class="breadcrumb-nav mb-3" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/bx-docs/development/guides/index.html">Guides</a></li><li class="breadcrumb-item active" aria-current="page">Themes</li></ol></nav>
 					<h1 class="page-title">Themes</h1>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 18, 2026, 11:05:43 PM</span></div>
+<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-themes">themes</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 1:30:17 AM</span></div>
 <nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#built-in">Built in</a></li><li class="toc-level-2"><a href="#the-themeprovider-contract">The ThemeProvider contract</a></li><li class="toc-level-2"><a href="#overriding-a-theme">Overriding a theme</a></li></ul></nav>
 					<h1 id="themes"><a href="#themes" id="themes" name="themes" class="anchor"></a>Themes</h1>
 <p>Themes are native BoxLang <code>.bxm</code> templates - there's no separate template
@@ -103,9 +101,12 @@ page's own <code>h2</code>/<code>h3</code> headings.</li>
 than one level deep under a linked ancestor.</li>
 <li><strong>Prev/next page links</strong> at the bottom of the article, following the
 nav's own reading order.</li>
-<li><strong>Syntax-highlighted code blocks</strong>, via <a href="https://highlightjs.org/">highlight.js</a>,
+<li><strong>Syntax-highlighted code blocks</strong>, via <a href="https://highlightjs.org/">highlight.js</a>
+plus a BoxLang grammar of its own (<code>```bx</code>/<code>```boxlang</code>/<code>```cfscript</code>),
 each with a <strong>copy button</strong> - shown on hover on devices that support it,
-always visible on touch devices (there's no hover to reveal it there).</li>
+always visible on touch devices (there's no hover to reveal it there). See
+<a href="markdown.md#code-blocks">Markdown Extensions</a>.</li>
+<li><strong>Self-hosted webfonts</strong> - no <code>fonts.googleapis.com</code> request at view time.</li>
 <li><strong>A dark/light mode toggle</strong>, powered by <a href="https://alpinejs.dev/">Alpine.js</a>
 for reactivity. The visitor's choice is remembered in <code>localStorage</code>
 (falling back to their OS preference), and applied before first paint to
@@ -136,8 +137,15 @@ See <a href="../configuration.md#theme">Configuration</a>.</li>
 <a href="../configuration.md#analytics">Configuration</a>.</li>
 <li><strong>Social share cards</strong> (Open Graph + Twitter Card meta tags), sourced
 from each page's <code>description</code> frontmatter (or the site-wide
-<code>description</code>) and <code>bxdocs.json</code>'s <code>ogImage</code>. See
+<code>description</code>) and its own <code>ogImage</code> (or the site-wide one) - optionally
+auto-generated per page via <code>bxdocs.json</code>'s <code>generateOgImages</code>. See
 <a href="../configuration.md#ogimage">Configuration</a>.</li>
+<li><strong>Page tags, an icon and a summary line</strong>, all opt-in via a page's own
+frontmatter - tags render as badges linking into a site-wide <code>/tags/</code>
+index. See <a href="../getting-started.md#add-pages">Getting Started</a>.</li>
+<li><strong>An explicit nav override</strong>, in <code>bxdocs.json</code> or its own <code>docs/nav.json</code>,
+replacing folder-inference for large sites. See
+<a href="../configuration.md#nav">Configuration</a>.</li>
 <li><strong>Extra CSS/JS</strong>, injected via <code>bxdocs.json</code>'s <code>extraCss</code>/<code>extraJs</code>. See
 <a href="../configuration.md#extracss--extrajs">Configuration</a>.</li>
 <li><strong>Admonition (note/warning/tip/...) callout boxes</strong>, on by default in any
@@ -221,6 +229,7 @@ satisfies the contract above - the built-in themes under this module's own
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+	<script src="/bx-docs/development/assets/highlight-boxlang.js"></script>
 	<script>hljs.highlightAll();</script>
 	<script src="/bx-docs/development/assets/copy-code.js" defer></script>
 	<script src="/bx-docs/development/assets/admonition-collapse.js" defer></script>
