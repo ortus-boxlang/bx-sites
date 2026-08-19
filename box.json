@@ -1,6 +1,6 @@
 {
     "name":"BX Docs",
-    "version":"@build.version@+@build.number@",
+    "version":"1.0.0",
     "location":"https://downloads.ortussolutions.com/ortussolutions/boxlang-modules/bx-docs/@build.version@/bx-docs-@build.version@.zip",
     "author":"Ortus Solutions",
     "homepage":"https://github.com/ortus-boxlang/bx-docs",
