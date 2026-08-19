@@ -1,0 +1,113 @@
+/**
+ * Resolves an `icon` value (frontmatter `icon`, or a nav entry's own
+ * `icon`) into safe, ready-to-embed HTML - either a literal emoji/short
+ * text passed through HTML-escaped (the original, still-supported
+ * behavior), or a named icon from one of three self-hosted libraries
+ * (`resources/assets/icons/{phosphor,lucide,tabler}/*.svg`, vendored by
+ * `vendorIcons.mjs` - MIT/ISC licensed, ~8,700 icons combined) inlined as
+ * raw SVG, or a project's own `docs/assets/icons/*.svg`.
+ *
+ * A named icon is referenced as a bare lowercase-kebab-case name
+ * (`icon: rocket`, defaulting to the `phosphor` library), or namespaced
+ * as `library:name` (`icon: lucide:rocket`, `icon: tabler:rocket`,
+ * `icon: custom:my-icon` for a project's own `docs/assets/icons/my-icon.svg`).
+ * Only one SVG file is ever read per distinct icon reference across a
+ * whole build (cached on this instance), and only the icons a build
+ * actually references are ever read at all - the vendored libraries
+ * themselves never ship to a built site.
+ *
+ * A value that isn't a valid `[library:]name` reference at all (an
+ * emoji, arbitrary text) is treated as literal, matching `icon`
+ * frontmatter's original, still fully supported behavior. An
+ * unrecognized library or a name not found in it falls back to
+ * rendering the original value as literal text too, rather than
+ * silently rendering nothing - a typo'd icon name should still show
+ * *something*, not vanish.
+ */
+class {
+
+	variables.libraries = [ "phosphor", "lucide", "tabler" ]
+	variables.refPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '^(?:([a-z][a-z0-9-]*):)?([a-z][a-z0-9-]*)$' )
+	variables.cache = {}
+
+	/**
+	 * @value The raw `icon` value exactly as authored (frontmatter or a nav entry's own `icon`)
+	 * @docsDir Absolute path to the current project's `docs/` directory - only needed to resolve a `custom:` icon; omit when none will be used
+	 *
+	 * @return Safe HTML ready to embed as-is - "" for a blank/absent value
+	 */
+	string function resolve( required string value, string docsDir = "" ) {
+		var trimmed = trim( arguments.value )
+		if ( !len( trimmed ) ) {
+			return ""
+		}
+
+		var matcher = variables.refPattern.matcher( trimmed )
+		if ( !matcher.matches() ) {
+			return textEscape( trimmed )
+		}
+
+		var library = isNull( matcher.group( 1 ) ) ? "phosphor" : lCase( matcher.group( 1 ) )
+		var name = lCase( matcher.group( 2 ) )
+		var svg = loadIcon( library, name, arguments.docsDir )
+
+		return len( svg ) ? svg : textEscape( trimmed )
+	}
+
+	/**
+	 * A minimal, HTML-text-content-safe escape for a literal emoji/typo'd
+	 * icon reference - `encodeForHTML()` also entity-escapes "safe"
+	 * characters like `:` and non-ASCII text (its exact range is
+	 * locale/JVM-dependent), which is both needlessly noisy here and
+	 * genuinely inconsistent across environments. Only `&`/`<`/`>` - the
+	 * characters that actually matter in HTML text content - are escaped.
+	 */
+	private string function textEscape( required string value ) {
+		return arguments.value.replace( "&", "&amp;", "all" ).replace( "<", "&lt;", "all" ).replace( ">", "&gt;", "all" )
+	}
+
+	/**
+	 * @library "custom", or one of `variables.libraries`
+	 * @name Lowercase-kebab-case icon name, exactly matching its source SVG's own filename (no extension)
+	 * @docsDir Absolute path to the current project's `docs/` directory - only consulted for `library == "custom"`
+	 *
+	 * @return The icon's own SVG markup (class/aria attributes added), or "" if `library`/`name` don't resolve to a real file
+	 */
+	private string function loadIcon( required string library, required string name, required string docsDir ) {
+		var cacheKey = arguments.library & "::" & arguments.name
+		if ( variables.cache.keyExists( cacheKey ) ) {
+			return variables.cache[ cacheKey ]
+		}
+
+		var path = ""
+		if ( arguments.library == "custom" ) {
+			path = len( trim( arguments.docsDir ) ) ? arguments.docsDir & "/assets/icons/" & arguments.name & ".svg" : ""
+		} else if ( variables.libraries.contains( arguments.library ) ) {
+			path = moduleAssetsDir() & "/icons/" & arguments.library & "/" & arguments.name & ".svg"
+		}
+
+		var svg = ( len( path ) && fileExists( path ) ) ? addAttributes( fileRead( path ) ) : ""
+		variables.cache[ cacheKey ] = svg
+		return svg
+	}
+
+	/**
+	 * Stamps a vendored icon's own `<svg ...>` opening tag with a shared
+	 * class (for CSS sizing/alignment - see each theme's own style.css)
+	 * and `aria-hidden`, since every icon here is decorative, paired with
+	 * visible text (a page/nav title) right next to it.
+	 */
+	private string function addAttributes( required string svg ) {
+		return arguments.svg.reReplaceNoCase( "^<svg ", '<svg class="bxdocs-icon" aria-hidden="true" ', "one" )
+	}
+
+	/**
+	 * Absolute path to this module's own `resources/assets` folder, found
+	 * relative to this class's own file - same convention as
+	 * ThemeRenderer.bx's `computeModuleAssetsDir()`.
+	 */
+	private string function moduleAssetsDir() {
+		return getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]models[\/]build[\/]?$", "" ) & "/resources/assets"
+	}
+
+}

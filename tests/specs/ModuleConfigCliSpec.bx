@@ -94,6 +94,27 @@ class extends="testbox.system.BaseSpec" {
 				expect( exitCode ).toBe( 1 );
 			} );
 
+			it( "dispatches `migrate` and returns exit code 0 for a valid GitBook --source", function() {
+				var parent = newTempDir();
+				var projectRoot = parent & "/site";
+				var source = newTempDir();
+				fileWrite( source & "/SUMMARY.md", "* [Home](README.md)" );
+				fileWrite( source & "/README.md", "Welcome." );
+
+				var exitCode = moduleConfig.main( [ "migrate", "--projectRoot=#projectRoot#", "--source=#source#" ] );
+
+				expect( exitCode ).toBe( 0 );
+				expect( fileExists( projectRoot & "/docs/nav.json" ) ).toBeTrue();
+			} );
+
+			it( "returns exit code 1 when `migrate` runs with no --source", function() {
+				var parent = newTempDir();
+
+				var exitCode = moduleConfig.main( [ "migrate", parent ] );
+
+				expect( exitCode ).toBe( 1 );
+			} );
+
 			it( "strips matching surrounding quotes from a --key=`value` assignment, per BoxLang's own CLI convention", function() {
 				var parent = newTempDir();
 				var projectRoot = parent & "/site"

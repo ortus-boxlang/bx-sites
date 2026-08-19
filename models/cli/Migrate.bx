@@ -1,0 +1,53 @@
+/**
+ * `migrate` CLI verb - converts a GitBook export into this project's
+ * `docs/` tree (GitBookMigrator.bx). CLI-agnostic: takes an
+ * already-parsed options struct (see ModuleConfig.bx's main()), never
+ * touches raw argv or the current working directory itself.
+ */
+class {
+
+	/**
+	 * Dispatches the `migrate` verb: validates `--source` points at a real
+	 * directory, creates `docs/` if it doesn't exist yet, then hands off
+	 * to GitBookMigrator.migrate() and reports its own result (including
+	 * anything it couldn't auto-convert) as the verb's own message.
+	 *
+	 * @options { projectRoot (required, absolute path), source (required, path to a GitBook export containing SUMMARY.md) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxDocs.MissingProjectRoot", message = "`migrate` requires a project root" )
+		}
+
+		var source = trim( arguments.options.source ?: "" )
+		if ( !len( source ) ) {
+			throw(
+				type    = "BxDocs.MissingMigrateSource",
+				message = "`migrate` requires --source=<path> - a GitBook export directory containing SUMMARY.md"
+			)
+		}
+		if ( !directoryExists( source ) ) {
+			throw( type = "BxDocs.MigrateSourceNotFound", message = "No directory at [#source#]" )
+		}
+
+		var docsDir = projectRoot & "/docs"
+		if ( !directoryExists( docsDir ) ) {
+			directoryCreate( docsDir, true, true )
+		}
+
+		var migrator = new "models.build.GitBookMigrator@bxdocs"()
+		var result = migrator.migrate( source, docsDir )
+
+		var message = "Migrated #result.pagesConverted# page(s) from [#source#] into #docsDir#/, wrote #result.navPath#"
+		if ( result.warnings.len() ) {
+			message &= char( 10 ) & char( 10 ) & result.warnings.len() & " item(s) need a manual look:"
+			for ( var w in result.warnings ) {
+				message &= char( 10 ) & "  - " & w
+			}
+		}
+
+		return { exitCode : 0, message : message }
+	}
+
+}

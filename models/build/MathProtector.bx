@@ -37,10 +37,41 @@ class {
 	 * @return { markdown: string with formulas replaced by placeholder tokens, formulas: { token: original delimited formula text } }
 	 */
 	struct function protect( required string markdown ) {
+		// Scanned run-by-run rather than as one whole-text regex pass, so a
+		// $...$/$$...$$ span shown *inside* a fenced code block (e.g. this
+		// module's own docs demonstrating the syntax as a literal example) is
+		// left completely untouched instead of being mistaken for real math -
+		// same FenceTracker.bx CommonMark-nesting awareness TabsProcessor.bx
+		// uses for its own `=== "..."` syntax.
+		var normalized = arguments.markdown.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" )
+		var lines = listToArray( normalized, char( 10 ), true )
+		var tracker = new "models.build.FenceTracker@bxdocs"()
+		var fenced = lines.map( line => tracker.consume( line ) )
+
 		var formulas = {}
-		var afterBlocks = tokenizeMatches( arguments.markdown, variables.blockPattern, formulas )
-		var afterInline = tokenizeMatches( afterBlocks, variables.inlinePattern, formulas )
-		return { markdown : afterInline, formulas : formulas }
+		var outputLines = []
+		var i = 1
+		while ( i <= lines.len() ) {
+			if ( fenced[ i ] ) {
+				outputLines.append( lines[ i ] )
+				i++
+				continue
+			}
+
+			var runLines = []
+			while ( i <= lines.len() && !fenced[ i ] ) {
+				runLines.append( lines[ i ] )
+				i++
+			}
+
+			var afterBlocks = tokenizeMatches( runLines.toList( char( 10 ) ), variables.blockPattern, formulas )
+			var afterInline = tokenizeMatches( afterBlocks, variables.inlinePattern, formulas )
+			for ( var outLine in listToArray( afterInline, char( 10 ), true ) ) {
+				outputLines.append( outLine )
+			}
+		}
+
+		return { markdown : outputLines.toList( char( 10 ) ), formulas : formulas }
 	}
 
 	/**

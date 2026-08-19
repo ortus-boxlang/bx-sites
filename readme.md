@@ -16,7 +16,7 @@
 
 <p>&nbsp;</p>
 
-Static documentation site generator for BoxLang, built on bx-markdown - in the spirit of [mkdocs](https://www.mkdocs.org/): write Markdown in `docs/`, get a themed, searchable static site out.
+Static documentation site generator for BoxLang, built on bx-markdown - in the spirit of [mkdocs](https://www.mkdocs.org/): write Markdown in `docs/`, get a themed, searchable static site out. Already on GitBook? `bxDocs migrate --source=...` converts an export straight into a bx-docs project - see [Migrating from GitBook](docs/guides/migrating-from-gitbook.md).
 
 ----
 
@@ -65,6 +65,7 @@ boxlang module:bxdocs <verb> [options]
 | `serve` | Build and serve the site locally with live reload (needs bx-markdown and bx-esapi too) |
 | `search-index` | Rebuild `site/search-index.json` standalone (also runs automatically during `build`) |
 | `clean` | Remove `site/` and any build cache |
+| `migrate` | Convert a GitBook export (`SUMMARY.md` + `.md` files) into `docs/` + `nav.json` |
 
 Every verb accepts `--projectRoot=<path>` (or a bare positional path) to target a project other than the current directory. Run `bxDocs --help` for full usage.
 
@@ -82,7 +83,7 @@ Or read the source directly:
 - [Getting Started](docs/getting-started.md)
 - [CLI Reference](docs/cli-reference.md)
 - [Configuration](docs/configuration.md) - the full `bxdocs.json` reference
-- Guides: [Themes](docs/guides/themes.md) · [Search](docs/guides/search.md) · [Deploying to GitHub Pages](docs/guides/deployment.md)
+- Guides: [Themes](docs/guides/themes.md) · [Search](docs/guides/search.md) · [Deploying to GitHub Pages](docs/guides/deployment.md) · [Migrating from GitBook](docs/guides/migrating-from-gitbook.md)
 - [Releases](docs/releases/index.md) - versioning policy and what's new per release
 
 See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's development.

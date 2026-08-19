@@ -1,0 +1,326 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.GitBookMigrator", function() {
+
+			beforeEach( function() {
+				variables.migrator = new "models.build.GitBookMigrator@bxdocs"();
+				variables.sourceDir = createTempDirectory( prefix = "bxdocs-gitbook-source-" );
+				variables.docsDir = createTempDirectory( prefix = "bxdocs-gitbook-docs-" );
+			} );
+
+			afterEach( function() {
+				if ( directoryExists( sourceDir ) ) {
+					directoryDelete( sourceDir, true );
+				}
+				if ( directoryExists( docsDir ) ) {
+					directoryDelete( docsDir, true );
+				}
+			} );
+
+			it( "throws BxDocs.MigrateMissingSummary when the source has no SUMMARY.md", function() {
+				expect( function() {
+					migrator.migrate( sourceDir, docsDir );
+				} ).toThrow( "BxDocs.MigrateMissingSummary" );
+			} );
+
+			it( "converts SUMMARY.md into a nested nav.json tree, renaming README.md to index.md", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", '
+## Table of contents
+
+* [Introduction](README.md)
+
+#### Guides
+
+* [Getting Started](guides/getting-started.md)
+  * [Installation](guides/installation.md)
+* [Advanced](advanced/README.md)
+' );
+				fileWrite( sourceDir & "/README.md", "## Welcome" );
+				directoryCreate( sourceDir & "/guides", true, true );
+				fileWrite( sourceDir & "/guides/getting-started.md", "## Getting Started" );
+				fileWrite( sourceDir & "/guides/installation.md", "## Installation" );
+				directoryCreate( sourceDir & "/advanced", true, true );
+				fileWrite( sourceDir & "/advanced/README.md", "## Advanced" );
+
+				var result = migrator.migrate( sourceDir, docsDir );
+
+				expect( result.pagesConverted ).toBe( 4 );
+				var nav = JSONDeserialize( fileRead( docsDir & "/nav.json" ) );
+				expect( nav[ 1 ].title ).toBe( "Introduction" );
+				expect( nav[ 1 ].path ).toBe( "index.md" );
+				expect( nav[ 2 ].title ).toBe( "Guides" );
+				expect( nav[ 2 ].path ).toBe( "" );
+				expect( nav[ 2 ].children[ 1 ].title ).toBe( "Getting Started" );
+				expect( nav[ 2 ].children[ 1 ].path ).toBe( "guides/getting-started.md" );
+				expect( nav[ 2 ].children[ 1 ].children[ 1 ].path ).toBe( "guides/installation.md" );
+				expect( nav[ 2 ].children[ 2 ].path ).toBe( "advanced/index.md" );
+
+				expect( fileExists( docsDir & "/index.md" ) ).toBeTrue();
+				expect( fileExists( docsDir & "/advanced/index.md" ) ).toBeTrue();
+			} );
+
+			it( "converts {% hint %} into a native admonition, indented 4 spaces", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '{% hint style="warning" %}
+Be careful.
+{% endhint %}' );
+
+				migrator.migrate( sourceDir, docsDir );
+				var converted = fileRead( docsDir & "/page.md" );
+
+				expect( converted ).toInclude( "!!! warning" );
+				expect( converted ).toInclude( "    Be careful." );
+			} );
+
+			it( "defaults an unrecognized hint style to note and reports a warning", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '{% hint style="mystery" %}
+Text.
+{% endhint %}' );
+
+				var result = migrator.migrate( sourceDir, docsDir );
+
+				expect( fileRead( docsDir & "/page.md" ) ).toInclude( "!!! note" );
+				expect( result.warnings.toList( char( 10 ) ) ).toInclude( 'style="mystery"' );
+			} );
+
+			it( "converts {% tabs %}/{% tab %} into === titled tabs", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '{% tabs %}
+{% tab title="Java" %}
+Java content.
+{% endtab %}
+{% tab title="BoxLang" %}
+BoxLang content.
+{% endtab %}
+{% endtabs %}' );
+
+				migrator.migrate( sourceDir, docsDir );
+				var converted = fileRead( docsDir & "/page.md" );
+
+				expect( converted ).toInclude( '=== "Java"' );
+				expect( converted ).toInclude( "    Java content." );
+				expect( converted ).toInclude( '=== "BoxLang"' );
+				expect( converted ).toInclude( "    BoxLang content." );
+			} );
+
+			it( "converts {% cards %}/{% card %} into ::: cards / ::: card, rewriting a README.md href", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '{% cards %}
+{% card title="Setup" icon="rocket" href="setup/README.md" %}
+Get started.
+{% endcard %}
+{% endcards %}' );
+
+				migrator.migrate( sourceDir, docsDir );
+				var converted = fileRead( docsDir & "/page.md" );
+
+				expect( converted ).toInclude( "::: cards" );
+				expect( converted ).toInclude( '::: card title="Setup" icon="rocket" href="setup/index.md"' );
+				expect( converted ).toInclude( "Get started." );
+			} );
+
+			it( "normalizes a bare-number {% column width %} to a percentage", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '{% columns %}
+{% column width="60" %}
+Wide.
+{% endcolumn %}
+{% column %}
+Narrow.
+{% endcolumn %}
+{% endcolumns %}' );
+
+				migrator.migrate( sourceDir, docsDir );
+				var converted = fileRead( docsDir & "/page.md" );
+
+				expect( converted ).toInclude( '::: column width="60%"' );
+				expect( converted ).toInclude( "::: column" & char( 10 ) & "Narrow." );
+			} );
+
+			it( "drops an invalid column width and reports a warning", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '{% columns %}
+{% column width="one-third" %}
+Text.
+{% endcolumn %}
+{% endcolumns %}' );
+
+				var result = migrator.migrate( sourceDir, docsDir );
+
+				expect( fileRead( docsDir & "/page.md" ) ).toInclude( "::: column" & char( 10 ) & "Text." );
+				expect( result.warnings.toList( char( 10 ) ) ).toInclude( "one-third" );
+			} );
+
+			it( "converts {% stepper %}/{% step %}, deriving each step's title from its own heading", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '{% stepper %}
+{% step %}
+## Install
+Run the installer.
+{% endstep %}
+{% step %}
+## Configure
+Edit the config.
+{% endstep %}
+{% endstepper %}' );
+
+				migrator.migrate( sourceDir, docsDir );
+				var converted = fileRead( docsDir & "/page.md" );
+
+				expect( converted ).toInclude( '::: step "Install"' );
+				expect( converted ).toInclude( "Run the installer." );
+				expect( converted ).notToInclude( "## Install" );
+				expect( converted ).toInclude( '::: step "Configure"' );
+			} );
+
+			it( "falls back to Step N when a step has no title attribute or heading", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '{% stepper %}
+{% step %}
+Just text, no heading.
+{% endstep %}
+{% endstepper %}' );
+
+				migrator.migrate( sourceDir, docsDir );
+
+				expect( fileRead( docsDir & "/page.md" ) ).toInclude( '::: step "Step 1"' );
+			} );
+
+			it( "converts {% file %}, rewriting a .gitbook/assets/ src and copying the asset", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '{% file src="../.gitbook/assets/spec.pdf" title="API Spec" %}
+{% endfile %}' );
+				directoryCreate( sourceDir & "/.gitbook/assets", true, true );
+				fileWrite( sourceDir & "/.gitbook/assets/spec.pdf", "fake-pdf-bytes" );
+
+				migrator.migrate( sourceDir, docsDir );
+				var converted = fileRead( docsDir & "/page.md" );
+
+				expect( converted ).toInclude( '::: file src="assets/gitbook/spec.pdf" title="API Spec"' );
+				expect( fileExists( docsDir & "/assets/gitbook/spec.pdf" ) ).toBeTrue();
+			} );
+
+			it( "converts {% embed %}, using its body as a fallback title when no title attribute is given", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '{% embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" %}
+A demo video
+{% endembed %}' );
+
+				migrator.migrate( sourceDir, docsDir );
+
+				expect( fileRead( docsDir & "/page.md" ) ).toInclude( '::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo video"' );
+			} );
+
+			it( "converts {% content-ref %} into ::: page-link, rewriting a README.md url", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '{% content-ref url="../advanced/README.md" %}
+[Advanced](../advanced/README.md)
+{% endcontent-ref %}' );
+
+				migrator.migrate( sourceDir, docsDir );
+
+				expect( fileRead( docsDir & "/page.md" ) ).toInclude( '::: page-link href="../advanced/index.md"' );
+			} );
+
+			it( "leaves an unsupported block in its original syntax and reports a warning", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '{% ai-chat %}
+Ask away.
+{% endai-chat %}' );
+
+				var result = migrator.migrate( sourceDir, docsDir );
+				var converted = fileRead( docsDir & "/page.md" );
+
+				expect( converted ).toInclude( "{% ai-chat %}" );
+				expect( converted ).toInclude( "Ask away." );
+				expect( converted ).toInclude( "{% endai-chat %}" );
+				expect( result.warnings.toList( char( 10 ) ) ).toInclude( "ai-chat" );
+			} );
+
+			it( "leaves a block shown inside a fenced code example untouched", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", 'Example syntax:
+
+```markdown
+{% hint style="info" %}
+Example only.
+{% endhint %}
+```
+
+Real text after.' );
+
+				migrator.migrate( sourceDir, docsDir );
+				var converted = fileRead( docsDir & "/page.md" );
+
+				expect( converted ).toInclude( '{% hint style="info" %}' );
+				expect( converted ).notToInclude( "!!! info" );
+				expect( converted ).toInclude( "Real text after." );
+			} );
+
+			it( "carries GitBook's own title/description/tags frontmatter into the migrated page's bx-docs frontmatter", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '---
+title: Real Title
+description: "A real description."
+tags:
+  - news
+  - beta
+---
+Body text.' );
+
+				migrator.migrate( sourceDir, docsDir );
+				var converted = fileRead( docsDir & "/page.md" );
+
+				expect( converted ).toInclude( "title: Real Title" );
+				expect( converted ).toInclude( "description: A real description." );
+				expect( converted ).toInclude( "tags: [news, beta]" );
+				expect( converted ).toInclude( "Body text." );
+			} );
+
+			it( "carries an icon field through opportunistically when GitBook frontmatter has one", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '---
+icon: rocket
+---
+Body.' );
+
+				migrator.migrate( sourceDir, docsDir );
+
+				expect( fileRead( docsDir & "/page.md" ) ).toInclude( "icon: rocket" );
+			} );
+
+			it( "writes no frontmatter block at all when the source page has none", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", "Just body text, no frontmatter." );
+
+				migrator.migrate( sourceDir, docsDir );
+
+				expect( fileRead( docsDir & "/page.md" ) ).notToInclude( "---" );
+			} );
+
+			it( "reports a warning and skips a SUMMARY.md entry whose file doesn't exist", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Missing](missing.md)" );
+
+				var result = migrator.migrate( sourceDir, docsDir );
+
+				expect( result.pagesConverted ).toBe( 0 );
+				expect( result.warnings.toList( char( 10 ) ) ).toInclude( "missing.md" );
+			} );
+
+			it( "reports a warning when it overwrites an already-existing destination file", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", "Fresh content." );
+				fileWrite( docsDir & "/page.md", "Old content." );
+
+				var result = migrator.migrate( sourceDir, docsDir );
+
+				expect( fileRead( docsDir & "/page.md" ) ).toBe( "Fresh content." );
+				expect( result.warnings.toList( char( 10 ) ) ).toInclude( "page.md already existed" );
+			} );
+
+		} );
+	}
+
+}

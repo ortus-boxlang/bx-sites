@@ -1,0 +1,121 @@
+/**
+ * Reusable content - `::: include src="guides/_shared/warning.md"` splices
+ * another file's raw Markdown in place, resolved file-relative to the
+ * *including* page's own directory (same convention as an ordinary
+ * relative page link - see MarkdownLinkResolver.bx). Unlike every other
+ * GitBook-style block (DirectiveBlockProcessor.bx), an include has to
+ * become real page content - headings, paragraphs, its own nested
+ * directives - not an HTML-wrapped block, so this runs as its own
+ * markdown-to-markdown pass, first, before DirectiveBlockProcessor even
+ * sees the page (an included file's own directive blocks are picked up
+ * naturally once its text has been spliced into the page - it's normal
+ * page content again by that point).
+ *
+ * A self-closing line, not a `:::` ... `:::` pair - there's no body to
+ * close, so `::: include ...` is complete on one line.
+ */
+class {
+
+	variables.includePattern = createObject( "java", "java.util.regex.Pattern" ).compile( '^:::\s*include\s+src="([^"]*)"\s*$' )
+	variables.frontmatterParser = new "models.build.FrontmatterParser@bxdocs"()
+
+	/**
+	 * Replaces every `::: include src="..."` line in `markdown` with that
+	 * file's own raw body (frontmatter stripped, if it has any),
+	 * recursively - an included file can itself include others.
+	 *
+	 * @markdown The raw markdown body text
+	 * @docsDir Absolute path to the project's `docs/` directory
+	 * @currentRelativePath The including page's own docs/-relative path (e.g. "guides/setup.md") - `src` is resolved against its directory
+	 * @seen Absolute paths already included along this chain - internal, used to detect a circular include
+	 *
+	 * @return markdown with every include spliced in
+	 */
+	string function process( required string markdown, required string docsDir, required string currentRelativePath, array seen = [] ) {
+		var normalized = arguments.markdown.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" )
+		var lines = listToArray( normalized, char( 10 ), true )
+		var currentDir = directoryOf( arguments.currentRelativePath )
+		var outputLines = []
+		var tracker = new "models.build.FenceTracker@bxdocs"()
+
+		for ( var line in lines ) {
+			// An `::: include ...` line shown inside a fenced code example
+			// (e.g. this very guide, demonstrating the syntax) is literal
+			// text, not a real include - see FenceTracker.bx.
+			if ( tracker.consume( line ) ) {
+				outputLines.append( line )
+				continue
+			}
+
+			var matcher = variables.includePattern.matcher( trim( line ) )
+			if ( !matcher.matches() ) {
+				outputLines.append( line )
+				continue
+			}
+
+			var src = matcher.group( 1 )
+			var resolvedRelativePath = resolvePath( currentDir, src )
+			var absolutePath = arguments.docsDir & "/" & resolvedRelativePath
+
+			if ( !fileExists( absolutePath ) ) {
+				throw(
+					type    = "BxDocs.IncludeNotFound",
+					message = "::: include src=""#src#"" (from #arguments.currentRelativePath#) - no file at #resolvedRelativePath#"
+				)
+			}
+			if ( arguments.seen.findNoCase( absolutePath ) ) {
+				throw(
+					type    = "BxDocs.CircularInclude",
+					message = "Circular ::: include chain: #arguments.seen.toList( ' -> ' )# -> #resolvedRelativePath#"
+				)
+			}
+
+			var included = variables.frontmatterParser.parse( fileRead( absolutePath ) ).body
+			var nextSeen = duplicate( arguments.seen )
+			nextSeen.append( absolutePath )
+			var expanded = process( included, arguments.docsDir, resolvedRelativePath, nextSeen )
+
+			for ( var expandedLine in listToArray( expanded, char( 10 ), true ) ) {
+				outputLines.append( expandedLine )
+			}
+		}
+
+		return outputLines.toList( char( 10 ) )
+	}
+
+	/**
+	 * @relativePath A docs/-relative path, e.g. "guides/setup.md"
+	 *
+	 * @return Its directory, e.g. "guides" - "" for a root-level page
+	 */
+	private string function directoryOf( required string relativePath ) {
+		var segments = listToArray( arguments.relativePath, "/", true )
+		segments.deleteAt( segments.len() )
+		return segments.toList( "/" )
+	}
+
+	/**
+	 * Resolves a `.` / `..` / sibling-relative path against a base
+	 * directory - standard filesystem-style segment resolution, mirroring
+	 * MarkdownLinkResolver.bx's own `resolvePath()`.
+	 *
+	 * @baseDir A docs/-relative directory (directoryOf()'s own output)
+	 * @relativePath The include's `src` value
+	 */
+	private string function resolvePath( required string baseDir, required string relativePath ) {
+		var stack = []
+		for ( var segment in listToArray( arguments.baseDir & "/" & arguments.relativePath, "/", true ) ) {
+			if ( segment == "." || !len( segment ) ) {
+				continue
+			} else if ( segment == ".." ) {
+				if ( stack.len() ) {
+					stack.deleteAt( stack.len() )
+				}
+			} else {
+				stack.append( segment )
+			}
+		}
+		return stack.toList( "/" )
+	}
+
+}

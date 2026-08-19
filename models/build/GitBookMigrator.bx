@@ -1,0 +1,786 @@
+/**
+ * Converts a GitBook export (a `SUMMARY.md` table of contents plus its
+ * referenced `.md` files, GitBook's own on-disk sync format - see
+ * https://gitbook.com/docs/create-content/blocks) into a bx-docs `docs/`
+ * tree: `SUMMARY.md` becomes `docs/nav.json` (NavBuilder.bx's own
+ * documented override format), each `{% block %}...{% endblock %}` becomes
+ * its bx-docs equivalent (DirectiveBlockProcessor.bx's `::: name`
+ * directives, or the native `=== "Title"` tabs / `!!! type` admonition
+ * syntax where a closer match already exists), `README.md` files become
+ * `index.md` (bx-docs' own folder-index convention - NavBuilder.bx), and
+ * `.gitbook/assets/**` is copied to `docs/assets/gitbook/`.
+ *
+ * A handful of GitBook blocks have no bx-docs equivalent at all (Prompt,
+ * Conditional content, the Ask-AI search bar) and, along with anything
+ * this converter doesn't recognize, are left in their original `{% %}`
+ * syntax rather than silently dropped - every such spot, plus every
+ * lower-confidence guess (an unrecognized hint style, a column width that
+ * isn't a plain length), is collected into `migrate()`'s own `warnings`
+ * array for the `migrate` CLI verb to print, so nothing needs a second
+ * silent pass to discover.
+ */
+class {
+
+	variables.frontmatterParser = new "models.build.FrontmatterParser@bxdocs"()
+
+	variables.summaryHeadingPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '^(##{1,6})\s+(.*)$' )
+	variables.summaryItemPattern    = createObject( "java", "java.util.regex.Pattern" ).compile( '^(\s*)[-*+]\s+\[([^\]]*)\]\(([^)]+)\)\s*$' )
+
+	variables.openPattern    = createObject( "java", "java.util.regex.Pattern" ).compile( '^\{%\s*([a-zA-Z][\w-]*)\s*(.*?)\s*%\}$' )
+	variables.closePattern   = createObject( "java", "java.util.regex.Pattern" ).compile( '^\{%\s*end([a-zA-Z][\w-]*)\s*%\}$' )
+	variables.attrPattern    = createObject( "java", "java.util.regex.Pattern" ).compile( '([\w-]+)="([^"]*)"' )
+	variables.headingPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '^##{1,6}\s+(.*)$' )
+	variables.linkTargetPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '\]\(([^)\s]+)\)' )
+
+	variables.hintStyleMap = { "info" : "info", "warning" : "warning", "danger" : "danger", "success" : "success", "hint" : "tip" }
+
+	/**
+	 * Migrates a GitBook export at `sourceDir` into `docsDir` - reads and
+	 * parses `sourceDir/SUMMARY.md`, converts and writes every page it
+	 * references, copies `.gitbook/assets/**`, and writes `docsDir/nav.json`.
+	 *
+	 * @sourceDir Absolute path to the GitBook export's root (contains SUMMARY.md)
+	 * @docsDir Absolute path to the target project's docs/ directory
+	 *
+	 * @return { pagesConverted: numeric, warnings: array of human-readable strings, navPath: string }
+	 */
+	struct function migrate( required string sourceDir, required string docsDir ) {
+		var summaryPath = arguments.sourceDir & "/SUMMARY.md"
+		if ( !fileExists( summaryPath ) ) {
+			throw(
+				type    = "BxDocs.MigrateMissingSummary",
+				message = "No SUMMARY.md found at [#arguments.sourceDir#] - GitBook migration requires its table-of-contents file"
+			)
+		}
+
+		var parsed = parseSummary( fileRead( summaryPath ) )
+		var warnings = []
+		var pagesConverted = 0
+
+		for ( var sourceRelativePath in parsed.pages ) {
+			var sourcePath = arguments.sourceDir & "/" & sourceRelativePath
+			if ( !fileExists( sourcePath ) ) {
+				warnings.append( "SUMMARY.md references [#sourceRelativePath#], but that file doesn't exist - skipped" )
+				continue
+			}
+
+			var parsedFile = variables.frontmatterParser.parse( fileRead( sourcePath ) )
+			var linksRewritten = rewriteLinksInText( parsedFile.body )
+			var pageWarnings = []
+			var converted = serializeFrontmatter( parsedFile.frontmatter ) & convert( linksRewritten, pageWarnings )
+			for ( var w in pageWarnings ) {
+				warnings.append( "#sourceRelativePath#: #w#" )
+			}
+
+			var destRelativePath = destPathFor( sourceRelativePath )
+			var destPath = arguments.docsDir & "/" & destRelativePath
+			if ( fileExists( destPath ) ) {
+				warnings.append( "#destRelativePath# already existed in docs/ and was overwritten by this migration" )
+			}
+			var destDir = getDirectoryFromPath( destPath )
+			if ( len( destDir ) && !directoryExists( destDir ) ) {
+				directoryCreate( destDir, true, true )
+			}
+			fileWrite( destPath, converted )
+			pagesConverted++
+		}
+
+		copyGitbookAssets( arguments.sourceDir, arguments.docsDir )
+
+		var navPath = arguments.docsDir & "/nav.json"
+		if ( fileExists( navPath ) ) {
+			warnings.append( "docs/nav.json already existed and was overwritten by this migration" )
+		}
+		fileWrite( navPath, JSONSerialize( parsed.nav ) )
+
+		return { pagesConverted : pagesConverted, warnings : warnings, navPath : navPath }
+	}
+
+	/**
+	 * Parses a GitBook `SUMMARY.md` into a bx-docs `nav.json` tree
+	 * (NavBuilder.bx's own `navConfig` shape: `{ title, path, children }`)
+	 * plus the flat, de-duplicated list of docs/-relative `.md` paths it
+	 * references, in encounter order.
+	 *
+	 * A `#`/`##`/... heading resets nesting to a fresh top-level, path-less
+	 * group node (the doc's own top `#` title/"Table of contents" heading
+	 * is skipped, not turned into a group); a `- [Title](path.md)` list
+	 * item nests under the current group by its own indentation, matching
+	 * GitBook's own SUMMARY.md convention. Any list item whose target
+	 * isn't a bare relative `.md` path (an external URL, an anchor-only
+	 * link) is skipped as not a page to migrate.
+	 *
+	 * @content SUMMARY.md's raw text
+	 *
+	 * @return { nav: array of nav nodes, pages: array of docs/-relative .md source paths }
+	 */
+	private struct function parseSummary( required string content ) {
+		var normalized = arguments.content.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" )
+		var lines = listToArray( normalized, char( 10 ), true )
+
+		var root = []
+		var seenPaths = {}
+		var pages = []
+		var stack = [ { indent : -1, children : root } ]
+		var sawTitle = false
+
+		for ( var line in lines ) {
+			if ( !len( trim( line ) ) ) {
+				continue
+			}
+
+			var headingMatcher = variables.summaryHeadingPattern.matcher( trim( line ) )
+			if ( headingMatcher.matches() ) {
+				if ( len( headingMatcher.group( 1 ) ) == 1 && !sawTitle ) {
+					sawTitle = true
+					continue
+				}
+				var groupNode = { title : trim( headingMatcher.group( 2 ) ), path : "", children : [] }
+				root.append( groupNode )
+				stack = [ { indent : -1, children : groupNode.children } ]
+				continue
+			}
+
+			var itemMatcher = variables.summaryItemPattern.matcher( line )
+			if ( !itemMatcher.matches() ) {
+				continue
+			}
+
+			var rawPath = trim( itemMatcher.group( 3 ) )
+			var sourceRelativePath = rawPath.reReplace( "[##?].*$", "", "one" )
+			if ( !len( sourceRelativePath ) || !sourceRelativePath.reFindNoCase( "\.md$" ) || sourceRelativePath.reFindNoCase( "^[a-z][a-z0-9+.\-]*:" ) ) {
+				continue
+			}
+
+			var indent = len( itemMatcher.group( 1 ) )
+			while ( stack.len() > 1 && stack[ stack.len() ].indent >= indent ) {
+				stack.deleteAt( stack.len() )
+			}
+
+			var node = { title : trim( itemMatcher.group( 2 ) ), path : destPathFor( sourceRelativePath ), children : [] }
+			stack[ stack.len() ].children.append( node )
+			stack.append( { indent : indent, children : node.children } )
+
+			if ( !seenPaths.keyExists( lCase( sourceRelativePath ) ) ) {
+				seenPaths[ lCase( sourceRelativePath ) ] = true
+				pages.append( sourceRelativePath )
+			}
+		}
+
+		return { nav : root, pages : pages }
+	}
+
+	/**
+	 * Carries GitBook's own real, confirmed Git-Sync frontmatter fields
+	 * (`title`, `description`, `tags`) over into a bx-docs frontmatter
+	 * block, plus `icon` opportunistically - GitBook's own docs don't
+	 * confirm a page-icon field actually survives a Git-Sync export at
+	 * all, but FrontmatterParser.bx parses whatever key/value pairs are
+	 * genuinely present, so if one ever is (or a project's own export
+	 * tooling adds one by hand), it's carried through unchanged rather
+	 * than silently dropped like the rest of `frontmatter` already was
+	 * before this - now meaningful since bx-docs' own `icon` accepts a
+	 * named Phosphor/Lucide/Tabler icon, not just an emoji.
+	 *
+	 * @frontmatter FrontmatterParser.parse()'s own `frontmatter` struct
+	 *
+	 * @return A `---`-delimited bx-docs frontmatter block, or "" when none of the recognized fields are present
+	 */
+	private string function serializeFrontmatter( required struct frontmatter ) {
+		var lines = []
+
+		var title = trim( arguments.frontmatter.title ?: "" )
+		if ( len( title ) ) {
+			lines.append( "title: " & title )
+		}
+
+		var description = trim( arguments.frontmatter.description ?: "" )
+		if ( len( description ) ) {
+			lines.append( "description: " & description )
+		}
+
+		var tags = isArray( arguments.frontmatter.tags ?: "" ) ? arguments.frontmatter.tags : []
+		var tagNames = tags.map( tag => trim( tag ) ).filter( tag => len( tag ) )
+		if ( tagNames.len() ) {
+			lines.append( "tags: [" & tagNames.toList( ", " ) & "]" )
+		}
+
+		var icon = trim( arguments.frontmatter.icon ?: "" )
+		if ( len( icon ) ) {
+			lines.append( "icon: " & icon )
+		}
+
+		if ( !lines.len() ) {
+			return ""
+		}
+		return "---" & char( 10 ) & lines.toList( char( 10 ) ) & char( 10 ) & "---" & char( 10 ) & char( 10 )
+	}
+
+	/**
+	 * @sourceRelativePath A GitBook-export-relative `.md` path
+	 *
+	 * @return The same path with a trailing `README.md` segment (case-insensitive) renamed to `index.md` - bx-docs' own folder-index convention (NavBuilder.bx)
+	 */
+	private string function destPathFor( required string sourceRelativePath ) {
+		var segments = listToArray( arguments.sourceRelativePath, "/", true )
+		var last = segments[ segments.len() ]
+		if ( compareNoCase( last.reReplaceNoCase( "\.md$", "" ), "README" ) == 0 ) {
+			segments[ segments.len() ] = "index.md"
+		}
+		return segments.toList( "/" )
+	}
+
+	/**
+	 * Converts one page's already frontmatter-stripped, link-rewritten
+	 * GitBook markdown body into bx-docs markdown - splits it into
+	 * text/block segments (splitBlocks()) and renders each in order.
+	 *
+	 * @markdown Raw GitBook markdown body text
+	 * @warnings Accumulator array, mutated in place with anything needing a manual look
+	 */
+	private string function convert( required string markdown, required array warnings ) {
+		return renderSegments( splitBlocks( arguments.markdown ), arguments.warnings )
+	}
+
+	/**
+	 * Splits `text` into an ordered array of `{ type: "text", content }` /
+	 * `{ type: "block", tag, attrsRaw, segments }` segments - a
+	 * stack-based scan of `{% tag attrs %}` ... `{% endtag %}` pairs,
+	 * fence-aware (FenceTracker.bx) so a doc page showing this syntax as a
+	 * literal fenced example isn't misread as a real block. A block's own
+	 * `segments` are themselves already fully split (not re-scanned later),
+	 * so nested blocks (a hint inside a tab, say) just fall out of the same
+	 * single pass. An unmatched/mismatched `{% endX %}` is left as literal
+	 * text rather than corrupting the stack; a block left unclosed at EOF
+	 * is flushed as if closed there, rather than silently dropping its
+	 * remaining content.
+	 *
+	 * @text Raw markdown text to split
+	 */
+	private array function splitBlocks( required string text ) {
+		var normalized = arguments.text.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" )
+		var lines = listToArray( normalized, char( 10 ), true )
+		var tracker = new "models.build.FenceTracker@bxdocs"()
+		var rootSegments = []
+		var rootBuffer = []
+		var stack = []
+
+		for ( var line in lines ) {
+			var targetBuffer = stack.len() ? stack[ stack.len() ].buffer : rootBuffer
+			var targetSegments = stack.len() ? stack[ stack.len() ].segments : rootSegments
+
+			if ( tracker.consume( line ) ) {
+				targetBuffer.append( line )
+				continue
+			}
+
+			var trimmedLine = trim( line )
+
+			var closeMatcher = variables.closePattern.matcher( trimmedLine )
+			if ( closeMatcher.matches() ) {
+				if ( !stack.len() || compareNoCase( stack[ stack.len() ].tag, closeMatcher.group( 1 ) ) != 0 ) {
+					targetBuffer.append( line )
+					continue
+				}
+				flushTextBuffer( targetBuffer, targetSegments )
+				var frame = stack[ stack.len() ]
+				stack.deleteAt( stack.len() )
+				var parentSegments = stack.len() ? stack[ stack.len() ].segments : rootSegments
+				parentSegments.append( { type : "block", tag : frame.tag, attrsRaw : frame.attrsRaw, segments : frame.segments } )
+				continue
+			}
+
+			var openMatcher = variables.openPattern.matcher( trimmedLine )
+			if ( openMatcher.matches() ) {
+				flushTextBuffer( targetBuffer, targetSegments )
+				stack.append( { tag : openMatcher.group( 1 ), attrsRaw : trim( openMatcher.group( 2 ) ), segments : [], buffer : [] } )
+				continue
+			}
+
+			targetBuffer.append( line )
+		}
+
+		while ( stack.len() ) {
+			var frame = stack[ stack.len() ]
+			stack.deleteAt( stack.len() )
+			flushTextBuffer( frame.buffer, frame.segments )
+			var parentSegments = stack.len() ? stack[ stack.len() ].segments : rootSegments
+			parentSegments.append( { type : "block", tag : frame.tag, attrsRaw : frame.attrsRaw, segments : frame.segments } )
+		}
+		flushTextBuffer( rootBuffer, rootSegments )
+
+		return rootSegments
+	}
+
+	/**
+	 * Appends `buffer`'s accumulated lines as one `{ type: "text" }`
+	 * segment onto `segments` (skipped when `buffer` is empty), then
+	 * empties `buffer` - both mutated in place.
+	 *
+	 * @buffer Accumulated raw lines since the last flush
+	 * @segments The segments array to append to
+	 */
+	private void function flushTextBuffer( required array buffer, required array segments ) {
+		if ( arguments.buffer.len() ) {
+			arguments.segments.append( { type : "text", content : arguments.buffer.toList( char( 10 ) ) } )
+			while ( arguments.buffer.len() ) {
+				arguments.buffer.deleteAt( arguments.buffer.len() )
+			}
+		}
+	}
+
+	/**
+	 * Renders an ordered segments array (splitBlocks()'s own output, or a
+	 * block's own `segments`) back into markdown text - a text segment
+	 * passes through verbatim, a block segment is dispatched to its own
+	 * renderer.
+	 *
+	 * @segments An array of splitBlocks() segments
+	 * @warnings Accumulator array, mutated in place
+	 */
+	private string function renderSegments( required array segments, required array warnings ) {
+		var out = []
+		for ( var seg in arguments.segments ) {
+			out.append( seg.type == "text" ? seg.content : renderBlock( seg, arguments.warnings ) )
+		}
+		return out.toList( char( 10 ) )
+	}
+
+	/**
+	 * Dispatches one block segment to its own bx-docs equivalent. A
+	 * child-only tag (`tab`/`card`/`column`/`step`) found outside its
+	 * expected group wrapper, and any tag this converter doesn't
+	 * recognize at all (`prompt`, `conditional-content`, `ai-chat`, or
+	 * simply a typo), is reported into `warnings` and left in its
+	 * original `{% %}` syntax rather than silently dropped.
+	 *
+	 * @block One `{ type: "block", tag, attrsRaw, segments }` entry
+	 * @warnings Accumulator array, mutated in place
+	 */
+	private string function renderBlock( required struct block, required array warnings ) {
+		var attrs = parseAttrs( arguments.block.attrsRaw )
+		switch ( lCase( trim( arguments.block.tag ) ) ) {
+			case "hint":
+				return renderHint( arguments.block, attrs, arguments.warnings )
+			case "tabs":
+				return renderTabsGroup( arguments.block, arguments.warnings )
+			case "cards":
+				return renderCardsGroup( arguments.block, arguments.warnings )
+			case "columns":
+				return renderColumnsGroup( arguments.block, arguments.warnings )
+			case "stepper":
+				return renderStepperGroup( arguments.block, arguments.warnings )
+			case "file":
+				return renderFile( attrs )
+			case "embed":
+				return renderEmbed( arguments.block, attrs, arguments.warnings )
+			case "content-ref":
+				return renderPageLink( attrs )
+			case "details":
+			case "expand":
+				return renderExpandable( arguments.block, attrs, arguments.warnings )
+			case "tab":
+			case "card":
+			case "column":
+			case "step":
+				arguments.warnings.append( "Found {% #arguments.block.tag# %} outside its expected group wrapper - kept as plain content" )
+				return renderSegments( arguments.block.segments, arguments.warnings )
+			default:
+				arguments.warnings.append( "Unsupported GitBook block [{% #arguments.block.tag# %}] - left in its original syntax, needs manual conversion" )
+				return rawBlockText( arguments.block, arguments.warnings )
+		}
+	}
+
+	/**
+	 * Reconstructs a block's original `{% tag attrs %}` ... `{% endtag %}`
+	 * text - used for a block type this converter doesn't recognize, so
+	 * its content survives the migration (just not auto-converted)
+	 * instead of being silently dropped.
+	 */
+	private string function rawBlockText( required struct block, required array warnings ) {
+		var out = [ "{% " & arguments.block.tag & ( len( arguments.block.attrsRaw ) ? " " & arguments.block.attrsRaw : "" ) & " %}" ]
+		var body = renderSegments( arguments.block.segments, arguments.warnings )
+		if ( len( body ) ) {
+			out.append( body )
+		}
+		out.append( "{% end" & arguments.block.tag & " %}" )
+		return out.toList( char( 10 ) )
+	}
+
+	/**
+	 * `{% hint style="..." %}` -> `!!! type` (bx-markdown's native
+	 * admonition syntax - see docs/guides/markdown.md#admonitions), body
+	 * indented 4 spaces (blank lines left bare). An unrecognized style
+	 * falls back to `note` and is reported into `warnings`.
+	 */
+	private string function renderHint( required struct block, required struct attrs, required array warnings ) {
+		var style = lCase( trim( arguments.attrs.style ?: "" ) )
+		var type = variables.hintStyleMap.keyExists( style ) ? variables.hintStyleMap[ style ] : "note"
+		if ( len( style ) && !variables.hintStyleMap.keyExists( style ) ) {
+			arguments.warnings.append( 'Unrecognized hint style="#style#" - defaulted to "note"' )
+		}
+
+		var body = renderSegments( arguments.block.segments, arguments.warnings )
+		var out = [ "!!! " & type ]
+		for ( var line in listToArray( body, char( 10 ), true ) ) {
+			out.append( len( trim( line ) ) ? "    " & line : "" )
+		}
+		return out.toList( char( 10 ) )
+	}
+
+	/**
+	 * `{% tabs %}{% tab title="..." %}...{% endtab %}{% endtabs %}` ->
+	 * `=== "Title"` (TabsProcessor.bx's own native syntax, not a `:::`
+	 * directive - see docs/guides/markdown.md#content-tabs), body
+	 * indented 4 spaces.
+	 */
+	private string function renderTabsGroup( required struct block, required array warnings ) {
+		var out = []
+		var found = false
+
+		for ( var seg in arguments.block.segments ) {
+			if ( seg.type != "block" || compareNoCase( seg.tag, "tab" ) != 0 ) {
+				if ( seg.type == "text" && len( trim( seg.content ) ) ) {
+					arguments.warnings.append( "Text directly inside {% tabs %} (outside any {% tab %}) was dropped" )
+				}
+				continue
+			}
+			found = true
+			var attrs = parseAttrs( seg.attrsRaw )
+			var title = len( trim( attrs.title ?: "" ) ) ? trim( attrs.title ) : "Tab"
+
+			out.append( '=== "' & escapeAttr( title ) & '"' )
+			var body = renderSegments( seg.segments, arguments.warnings )
+			for ( var line in listToArray( body, char( 10 ), true ) ) {
+				out.append( len( trim( line ) ) ? "    " & line : "" )
+			}
+			out.append( "" )
+		}
+
+		if ( !found ) {
+			arguments.warnings.append( "{% tabs %} block has no {% tab %} children - skipped entirely" )
+			return ""
+		}
+		return out.toList( char( 10 ) )
+	}
+
+	/**
+	 * `{% cards %}{% card title="..." icon="..." href="..." %}...{% endcard %}{% endcards %}`
+	 * -> `::: cards` / `::: card ...` (DirectiveBlockProcessor.bx).
+	 */
+	private string function renderCardsGroup( required struct block, required array warnings ) {
+		var out = [ "::: cards" ]
+		var found = false
+
+		for ( var seg in arguments.block.segments ) {
+			if ( seg.type != "block" || compareNoCase( seg.tag, "card" ) != 0 ) {
+				if ( seg.type == "text" && len( trim( seg.content ) ) ) {
+					arguments.warnings.append( "Text directly inside {% cards %} (outside any {% card %}) was dropped" )
+				}
+				continue
+			}
+			found = true
+			var attrs = parseAttrs( seg.attrsRaw )
+			var line = "::: card"
+			if ( len( trim( attrs.title ?: "" ) ) ) {
+				line &= ' title="' & escapeAttr( attrs.title ) & '"'
+			}
+			if ( len( trim( attrs.icon ?: "" ) ) ) {
+				line &= ' icon="' & escapeAttr( attrs.icon ) & '"'
+			}
+			if ( len( trim( attrs.image ?: "" ) ) ) {
+				line &= ' image="' & escapeAttr( rewritePath( attrs.image ) ) & '"'
+			}
+			if ( len( trim( attrs.href ?: "" ) ) ) {
+				line &= ' href="' & escapeAttr( rewriteLink( attrs.href ) ) & '"'
+			}
+			out.append( line )
+			var body = renderSegments( seg.segments, arguments.warnings )
+			if ( len( trim( body ) ) ) {
+				out.append( body )
+			}
+			out.append( ":::" )
+		}
+
+		if ( !found ) {
+			arguments.warnings.append( "{% cards %} block has no {% card %} children - skipped entirely" )
+			return ""
+		}
+		out.append( ":::" )
+		return out.toList( char( 10 ) )
+	}
+
+	/**
+	 * `{% columns %}{% column width="N" %}...{% endcolumn %}{% endcolumns %}`
+	 * -> `::: columns` / `::: column ...`. A bare number becomes a
+	 * percentage; anything else that isn't already a plain CSS
+	 * length/percentage is dropped (DirectiveBlockProcessor.bx would
+	 * silently ignore it anyway) and reported into `warnings`.
+	 */
+	private string function renderColumnsGroup( required struct block, required array warnings ) {
+		var out = [ "::: columns" ]
+		var found = false
+
+		for ( var seg in arguments.block.segments ) {
+			if ( seg.type != "block" || compareNoCase( seg.tag, "column" ) != 0 ) {
+				if ( seg.type == "text" && len( trim( seg.content ) ) ) {
+					arguments.warnings.append( "Text directly inside {% columns %} (outside any {% column %}) was dropped" )
+				}
+				continue
+			}
+			found = true
+			var attrs = parseAttrs( seg.attrsRaw )
+			var width = trim( attrs.width ?: "" )
+			if ( len( width ) && width.reFind( "^\d+(\.\d+)?$" ) ) {
+				width &= "%"
+			} else if ( len( width ) && !width.reFind( "^\d+(\.\d+)?(%|px|rem|em)$" ) ) {
+				arguments.warnings.append( 'Column width="#width#" is not a plain length/percentage - dropped, review manually' )
+				width = ""
+			}
+			out.append( "::: column" & ( len( width ) ? ' width="' & width & '"' : "" ) )
+			var body = renderSegments( seg.segments, arguments.warnings )
+			if ( len( trim( body ) ) ) {
+				out.append( body )
+			}
+			out.append( ":::" )
+		}
+
+		if ( !found ) {
+			arguments.warnings.append( "{% columns %} block has no {% column %} children - skipped entirely" )
+			return ""
+		}
+		out.append( ":::" )
+		return out.toList( char( 10 ) )
+	}
+
+	/**
+	 * `{% stepper %}{% step %}...{% endstep %}{% endstepper %}` -> `:::
+	 * stepper` / `::: step "Title"`. GitBook steps carry no `title`
+	 * attribute of their own - the title is conventionally the step's
+	 * first heading line, which is extracted and stripped from the body;
+	 * a step with neither falls back to "Step N".
+	 */
+	private string function renderStepperGroup( required struct block, required array warnings ) {
+		var out = [ "::: stepper" ]
+		var found = false
+		var index = 0
+
+		for ( var seg in arguments.block.segments ) {
+			if ( seg.type != "block" || compareNoCase( seg.tag, "step" ) != 0 ) {
+				if ( seg.type == "text" && len( trim( seg.content ) ) ) {
+					arguments.warnings.append( "Text directly inside {% stepper %} (outside any {% step %}) was dropped" )
+				}
+				continue
+			}
+			found = true
+			index++
+			var attrs = parseAttrs( seg.attrsRaw )
+			var title = trim( attrs.title ?: "" )
+			var childSegments = seg.segments
+
+			if ( !len( title ) && childSegments.len() && childSegments[ 1 ].type == "text" ) {
+				var firstLines = listToArray( childSegments[ 1 ].content, char( 10 ), true )
+				var headingLineIndex = 0
+				for ( var i = 1; i <= firstLines.len(); i++ ) {
+					if ( len( trim( firstLines[ i ] ) ) ) {
+						headingLineIndex = i
+						break
+					}
+				}
+				if ( headingLineIndex > 0 ) {
+					var headingMatcher = variables.headingPattern.matcher( trim( firstLines[ headingLineIndex ] ) )
+					if ( headingMatcher.matches() ) {
+						title = trim( headingMatcher.group( 1 ) )
+						firstLines.deleteAt( headingLineIndex )
+						childSegments[ 1 ] = { type : "text", content : firstLines.toList( char( 10 ) ) }
+					}
+				}
+			}
+			if ( !len( title ) ) {
+				title = "Step " & index
+			}
+
+			out.append( '::: step "' & escapeAttr( title ) & '"' )
+			var body = renderSegments( childSegments, arguments.warnings )
+			if ( len( trim( body ) ) ) {
+				out.append( body )
+			}
+			out.append( ":::" )
+		}
+
+		if ( !found ) {
+			arguments.warnings.append( "{% stepper %} block has no {% step %} children - skipped entirely" )
+			return ""
+		}
+		out.append( ":::" )
+		return out.toList( char( 10 ) )
+	}
+
+	/**
+	 * `{% file src="..." title="..." %}` -> `::: file src="..." title="..."`.
+	 */
+	private string function renderFile( required struct attrs ) {
+		var src = trim( arguments.attrs.src ?: "" )
+		if ( !len( src ) ) {
+			return ""
+		}
+		var title = trim( arguments.attrs.title ?: "" )
+		var line = '::: file src="' & escapeAttr( rewritePath( src ) ) & '"'
+		if ( len( title ) ) {
+			line &= ' title="' & escapeAttr( title ) & '"'
+		}
+		return line & char( 10 ) & ":::"
+	}
+
+	/**
+	 * `{% embed url="..." %}` -> `::: embed url="..."`. GitBook embeds
+	 * have no `title` attribute of their own - a caption written as the
+	 * block's body text (its first line) is used instead, when present.
+	 */
+	private string function renderEmbed( required struct block, required struct attrs, required array warnings ) {
+		var url = trim( arguments.attrs.url ?: "" )
+		if ( !len( url ) ) {
+			return ""
+		}
+		var title = trim( arguments.attrs.title ?: "" )
+		if ( !len( title ) ) {
+			var body = trim( renderSegments( arguments.block.segments, arguments.warnings ) )
+			if ( len( body ) ) {
+				title = trim( listToArray( body, char( 10 ), true )[ 1 ] )
+			}
+		}
+		var line = '::: embed url="' & escapeAttr( url ) & '"'
+		if ( len( title ) ) {
+			line &= ' title="' & escapeAttr( title ) & '"'
+		}
+		return line & char( 10 ) & ":::"
+	}
+
+	/**
+	 * `{% content-ref url="..." %}` -> `::: page-link href="..."`.
+	 */
+	private string function renderPageLink( required struct attrs ) {
+		var url = trim( arguments.attrs.url ?: "" )
+		if ( !len( url ) ) {
+			return ""
+		}
+		return '::: page-link href="' & escapeAttr( rewriteLink( url ) ) & '"' & char( 10 ) & ":::"
+	}
+
+	/**
+	 * `{% details title="..." %}` / `{% expand title="..." %}` -> `:::
+	 * expandable "..."`.
+	 */
+	private string function renderExpandable( required struct block, required struct attrs, required array warnings ) {
+		var title = trim( arguments.attrs.title ?: "" )
+		var body = renderSegments( arguments.block.segments, arguments.warnings )
+		var out = [ "::: expandable" & ( len( title ) ? ' "' & escapeAttr( title ) & '"' : "" ) ]
+		if ( len( trim( body ) ) ) {
+			out.append( body )
+		}
+		out.append( ":::" )
+		return out.toList( char( 10 ) )
+	}
+
+	/**
+	 * Parses a `{% tag attrs %}`/`{% tag %}` line's own `attrsRaw` -
+	 * every `key="value"` pair it contains, GitBook blocks have no
+	 * positional/shorthand attribute form of their own.
+	 *
+	 * @attrsRaw The raw attribute text, e.g. `title="Getting Started" icon="rocket"`
+	 */
+	private struct function parseAttrs( required string attrsRaw ) {
+		var attrs = {}
+		var matcher = variables.attrPattern.matcher( arguments.attrsRaw )
+		while ( matcher.find() ) {
+			attrs[ matcher.group( 1 ) ] = matcher.group( 2 )
+		}
+		return attrs
+	}
+
+	/**
+	 * Our own `key="value"` attribute syntax has no escape sequence for an
+	 * embedded `"` - replaced with a plain `'` rather than breaking the
+	 * enclosing attribute.
+	 */
+	private string function escapeAttr( required string value ) {
+		return arguments.value.replace( '"', "'", "all" )
+	}
+
+	/**
+	 * Rewrites every markdown link/image target (`](...)`  ) in raw
+	 * source text - README.md -> index.md renaming and `.gitbook/assets/`
+	 * -> `assets/gitbook/` path rewriting - ahead of block conversion,
+	 * since ordinary prose links/images never go through `parseAttrs()`.
+	 *
+	 * @text Raw markdown text (a whole page's body, pre-block-conversion)
+	 */
+	private string function rewriteLinksInText( required string text ) {
+		var matcher = variables.linkTargetPattern.matcher( arguments.text )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+		while ( matcher.find() ) {
+			matcher.appendReplacement( buffer, quoteReplacement( "](" & rewriteLink( matcher.group( 1 ) ) & ")" ) )
+		}
+		matcher.appendTail( buffer )
+		return buffer.toString()
+	}
+
+	/**
+	 * @path An asset src/href value (attribute or link target) exactly as GitBook wrote it
+	 *
+	 * @return path unchanged, unless it points inside `.gitbook/assets/` - rewritten to its `assets/gitbook/...` copy destination (copyGitbookAssets())
+	 */
+	private string function rewritePath( required string path ) {
+		if ( !len( trim( arguments.path ) ) || arguments.path.reFindNoCase( "^[a-z][a-z0-9+.\-]*:" ) ) {
+			return arguments.path
+		}
+		if ( arguments.path.reFindNoCase( "(^|/)\.gitbook/assets/" ) ) {
+			return "assets/gitbook/" & arguments.path.reReplaceNoCase( "^.*?\.gitbook/assets/", "", "one" )
+		}
+		return arguments.path
+	}
+
+	/**
+	 * Like rewritePath(), plus renames a trailing `readme.md` path segment
+	 * (case-insensitive, anchor/query preserved) to `index.md` -
+	 * destPathFor()'s own rename, applied to link/href targets that point
+	 * at another GitBook page.
+	 *
+	 * @href A link href / page-reference attribute value exactly as GitBook wrote it
+	 */
+	private string function rewriteLink( required string href ) {
+		var rewritten = rewritePath( arguments.href )
+		if ( rewritten.reFindNoCase( "(^|/)readme\.md($|[##?])" ) ) {
+			rewritten = rewritten.reReplaceNoCase( "readme\.md", "index.md", "one" )
+		}
+		return rewritten
+	}
+
+	/**
+	 * @text Literal replacement text (may itself contain regex backreference-like characters, e.g. `$`)
+	 *
+	 * @return text, safe to pass as Matcher#appendReplacement's own replacement argument
+	 */
+	private string function quoteReplacement( required string text ) {
+		return createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( arguments.text )
+	}
+
+	/**
+	 * Copies a GitBook export's `.gitbook/assets/**` (its own convention
+	 * for every image/file a page references) to `docsDir/assets/gitbook/`
+	 * - a no-op when the export has no such directory.
+	 *
+	 * @sourceDir Absolute path to the GitBook export's root
+	 * @docsDir Absolute path to the target project's docs/ directory
+	 */
+	private void function copyGitbookAssets( required string sourceDir, required string docsDir ) {
+		var assetsSource = arguments.sourceDir & "/.gitbook/assets"
+		if ( !directoryExists( assetsSource ) ) {
+			return
+		}
+		var assetsDest = arguments.docsDir & "/assets/gitbook"
+		directoryCreate( assetsDest, true, true )
+		directoryCopy( assetsSource, assetsDest, true )
+	}
+
+}

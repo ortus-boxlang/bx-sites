@@ -41,11 +41,16 @@ class {
 		var lines = listToArray( normalized, char( 10 ), true )
 		var outputLines = []
 		var groups = []
+		var tracker = new "models.build.FenceTracker@bxdocs"()
 		var i = 1
 
 		while ( i <= lines.len() ) {
 			var line = lines[ i ]
-			if ( !trim( line ).reFind( variables.tabHeaderPattern ) ) {
+			// A `=== "..."` line inside a fenced code block (e.g. a doc page
+			// showing this very syntax as a literal example) is fence-protected
+			// text, not a real tab header - see FenceTracker.bx.
+			var fenced = tracker.consume( line )
+			if ( fenced || !trim( line ).reFind( variables.tabHeaderPattern ) ) {
 				outputLines.append( line )
 				i++
 				continue
@@ -53,11 +58,13 @@ class {
 
 			var tabs = []
 			while ( i <= lines.len() && trim( lines[ i ] ).reFind( variables.tabHeaderPattern ) ) {
+				tracker.consume( lines[ i ] )
 				var title = trim( lines[ i ] ).reReplace( variables.tabHeaderPattern, "\1", "one" )
 				i++
 
 				var contentLines = []
 				while ( i <= lines.len() && isTabBodyLine( lines[ i ] ) ) {
+					tracker.consume( lines[ i ] )
 					contentLines.append( dedentTabLine( lines[ i ] ) )
 					i++
 				}

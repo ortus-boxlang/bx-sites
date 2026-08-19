@@ -172,7 +172,8 @@ class {
 			"serve"        : "models.cli.Serve",
 			"search-index" : "models.cli.SearchIndex",
 			"clean"        : "models.cli.Clean",
-			"gh-deploy"    : "models.cli.GhDeploy"
+			"gh-deploy"    : "models.cli.GhDeploy",
+			"migrate"      : "models.cli.Migrate"
 		}
 
 		var verbDescriptions = {
@@ -181,7 +182,8 @@ class {
 			"serve"        : "Build and serve the site locally with live reload ([--port], [--host])",
 			"search-index" : "Rebuild the search index standalone",
 			"clean"        : "Remove site/ and any build cache",
-			"gh-deploy"    : "Build and force-push site/ to a gh-pages branch ([--branch], [--remote], [--message])"
+			"gh-deploy"    : "Build and force-push site/ to a gh-pages branch ([--branch], [--remote], [--message])",
+			"migrate"      : "Convert a GitBook export into docs/ + nav.json (--source, required)"
 		}
 
 		var firstToken = arrayLen( arguments.args ) >= 1 ? arguments.args[ 1 ] : ""

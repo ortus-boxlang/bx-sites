@@ -1,0 +1,82 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.IconResolver", function() {
+
+			beforeEach( function() {
+				variables.resolver = new "models.build.IconResolver@bxdocs"();
+			} );
+
+			it( "returns an empty string for a blank value", function() {
+				expect( resolver.resolve( "" ) ).toBe( "" );
+				expect( resolver.resolve( "   " ) ).toBe( "" );
+			} );
+
+			it( "passes an emoji through HTML-escaped, unresolved", function() {
+				expect( resolver.resolve( "🚀" ) ).toBe( "🚀" );
+			} );
+
+			it( "HTML-escapes arbitrary text that isn't a valid icon reference", function() {
+				expect( resolver.resolve( "<script>" ) ).toBe( "&lt;script&gt;" );
+			} );
+
+			it( "resolves a bare name against the default (phosphor) library", function() {
+				var svg = resolver.resolve( "rocket" );
+				expect( svg ).toInclude( "<svg" );
+				expect( svg ).toInclude( "bxdocs-icon" );
+				expect( svg ).toInclude( "viewBox" );
+			} );
+
+			it( "resolves an explicit phosphor: reference the same way as the bare name", function() {
+				expect( resolver.resolve( "phosphor:rocket" ) ).toBe( resolver.resolve( "rocket" ) );
+			} );
+
+			it( "resolves a lucide: reference", function() {
+				var svg = resolver.resolve( "lucide:rocket" );
+				expect( svg ).toInclude( "<svg" );
+				expect( svg ).toInclude( "bxdocs-icon" );
+			} );
+
+			it( "resolves a tabler: reference", function() {
+				var svg = resolver.resolve( "tabler:rocket" );
+				expect( svg ).toInclude( "<svg" );
+				expect( svg ).toInclude( "bxdocs-icon" );
+			} );
+
+			it( "different libraries resolve to different markup for the same icon name", function() {
+				expect( resolver.resolve( "lucide:rocket" ) ).notToBe( resolver.resolve( "tabler:rocket" ) );
+			} );
+
+			it( "falls back to literal text for a name not found in a real library", function() {
+				expect( resolver.resolve( "not-a-real-icon-xyz" ) ).toBe( "not-a-real-icon-xyz" );
+			} );
+
+			it( "falls back to literal text for an unrecognized library prefix", function() {
+				expect( resolver.resolve( "notalib:rocket" ) ).toBe( "notalib:rocket" );
+			} );
+
+			it( "resolves a custom: icon from the project's own docs/assets/icons/", function() {
+				var docsDir = createTempDirectory( prefix = "bxdocs-iconresolver-" );
+				directoryCreate( docsDir & "/assets/icons", true, true );
+				fileWrite( docsDir & "/assets/icons/my-icon.svg", '<svg viewBox="0 0 24 24"><path d="M0 0h24v24H0z"/></svg>' );
+
+				var svg = resolver.resolve( "custom:my-icon", docsDir );
+
+				expect( svg ).toInclude( "bxdocs-icon" );
+				expect( svg ).toInclude( 'd="M0 0h24v24H0z"' );
+
+				directoryDelete( docsDir, true );
+			} );
+
+			it( "falls back to literal text for a custom: icon when no docsDir is given, or the file doesn't exist", function() {
+				expect( resolver.resolve( "custom:my-icon" ) ).toBe( "custom:my-icon" );
+
+				var docsDir = createTempDirectory( prefix = "bxdocs-iconresolver-" );
+				expect( resolver.resolve( "custom:missing", docsDir ) ).toBe( "custom:missing" );
+				directoryDelete( docsDir, true );
+			} );
+
+		} );
+	}
+
+}

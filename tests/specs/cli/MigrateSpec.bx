@@ -1,0 +1,63 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.Migrate", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.Migrate@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( { source : "/tmp/wherever" } );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "throws BxDocs.MissingMigrateSource when --source is blank", function() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-migrate-" );
+				tempDirs.append( dir );
+
+				expect( function() {
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxDocs.MissingMigrateSource" );
+			} );
+
+			it( "throws BxDocs.MigrateSourceNotFound when --source doesn't exist", function() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-migrate-" );
+				tempDirs.append( dir );
+
+				expect( function() {
+					verb.run( { projectRoot : dir, source : dir & "/no-such-dir" } );
+				} ).toThrow( "BxDocs.MigrateSourceNotFound" );
+			} );
+
+			it( "migrates a GitBook export into the project's docs/ tree, creating docs/ if needed", function() {
+				var projectRoot = createTempDirectory( prefix = "bxdocs-cli-migrate-project-" );
+				var source = createTempDirectory( prefix = "bxdocs-cli-migrate-source-" );
+				tempDirs.append( projectRoot );
+				tempDirs.append( source );
+
+				fileWrite( source & "/SUMMARY.md", "* [Home](README.md)" );
+				fileWrite( source & "/README.md", "Welcome." );
+
+				var result = verb.run( { projectRoot : projectRoot, source : source } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toInclude( "Migrated 1 page(s)" );
+				expect( fileExists( projectRoot & "/docs/index.md" ) ).toBeTrue();
+				expect( fileExists( projectRoot & "/docs/nav.json" ) ).toBeTrue();
+			} );
+
+		} );
+	}
+
+}

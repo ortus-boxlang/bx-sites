@@ -25,7 +25,12 @@ class {
 	variables.codeAnnotationProcessor = new "models.build.CodeAnnotationProcessor@bxdocs"()
 	variables.markdownLinkResolver = new "models.build.MarkdownLinkResolver@bxdocs"()
 	variables.markdownPublisher = new "models.build.MarkdownPublisher@bxdocs"()
+	variables.includeProcessor = new "models.build.IncludeProcessor@bxdocs"()
+	variables.directiveBlockProcessor = new "models.build.DirectiveBlockProcessor@bxdocs"()
+	variables.pageLinkResolver = new "models.build.PageLinkResolver@bxdocs"()
+	variables.updatesFeedGenerator = new "models.build.UpdatesFeedGenerator@bxdocs"()
 	variables.pluginLoader = new "models.build.PluginLoader@bxdocs"()
+	variables.iconResolver = new "models.build.IconResolver@bxdocs"()
 	variables.pluginsOverride = []
 	variables.hasPluginsOverride = false
 
@@ -84,7 +89,7 @@ class {
 		var versions = buildVersionsList( versionNames, urls.basePath )
 
 		var navConfig = resolveExplicitNav( root & "/docs", config.nav )
-		var mainResult = renderDocTree( root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, navConfig )
+		var mainResult = renderDocTree( root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, navConfig )
 		var allPages = duplicate( mainResult.pages )
 		copyAssets( root, themeDir, siteDir, config.search, config.mermaid, config.math )
 
@@ -100,7 +105,8 @@ class {
 				versions,
 				versionName,
 				"versions/" & versionName & "/",
-				plugins
+				plugins,
+				urls.absolute
 			)
 			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
 			copyAssets( root, themeDir, versionOutputDir, config.search, config.mermaid, config.math )
@@ -151,6 +157,7 @@ class {
 	 * @currentVersion Which `versions` entry this tree IS, for the switcher's own "selected" state
 	 * @docsRelativePrefix Empty for the main/"Latest" tree; `"versions/<name>/"` for a version tree - see assignEditAndLastUpdated()
 	 * @plugins resolvePlugins()'s own output, applied via onNav/onPageMarkdown/onPageHtml
+	 * @absoluteUrl The absolute site URL, ending with `/` (BaseUrlResolver's `absolute`), or "" if unknown - gates `::: updates` feed.xml generation, same as sitemap.xml
 	 * @navConfig An explicit nav tree (NavBuilder.build()'s own `navConfig` shape) for this doc tree - empty (the default) infers nav from folder structure. Only ever non-empty for the main tree - see resolveExplicitNav()
 	 *
 	 * @return { pages, nav }
@@ -166,22 +173,26 @@ class {
 		required string currentVersion,
 		required string docsRelativePrefix,
 		required array plugins,
+		required string absoluteUrl,
 		array navConfig = []
 	) {
 		var pages = variables.docsLoader.load( arguments.docsDir )
 		var nav = variables.navBuilder.build( pages, arguments.navConfig )
 		nav = variables.pluginLoader.applyOnNav( arguments.plugins, nav, arguments.config )
 		var flatSequence = variables.navBuilder.flatten( nav )
+		assignNavIconHtml( nav, arguments.docsDir )
 
 		directoryCreate( arguments.outputDir, true, true )
 
-		convertMarkdown( pages, arguments.config, arguments.plugins, arguments.basePath )
+		convertMarkdown( pages, arguments.config, arguments.plugins, arguments.basePath, arguments.docsDir )
+		variables.pageLinkResolver.resolve( pages, arguments.basePath )
 		assignTableOfContents( pages )
 		assignPrevNext( pages, flatSequence )
 		assignBreadcrumbs( pages, nav )
 		assignEditAndLastUpdated( pages, arguments.config, arguments.root, arguments.docsRelativePrefix )
 		assignOgImages( pages, arguments.config, arguments.outputDir )
 		assignMarkdownUrl( pages )
+		assignIconHtml( pages, arguments.docsDir )
 
 		for ( var page in pages ) {
 			var html = variables.themeRenderer.renderPage(
@@ -190,6 +201,11 @@ class {
 			var outputPath = arguments.outputDir & "/" & page.urlPath
 			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
 			fileWrite( outputPath, html )
+
+			if ( len( arguments.absoluteUrl ) && ( page.updatesFeedEntries ?: [] ).len() ) {
+				var feedXml = variables.updatesFeedGenerator.build( page.updatesFeedEntries, page, arguments.config.name, arguments.absoluteUrl )
+				fileWrite( getDirectoryFromPath( outputPath ) & "/feed.xml", feedXml )
+			}
 		}
 
 		variables.markdownPublisher.publish( pages, arguments.outputDir )
@@ -303,7 +319,7 @@ class {
 		config = variables.pluginLoader.applyOnConfig( plugins, config )
 
 		var pages = variables.docsLoader.load( root & "/docs" )
-		convertMarkdown( pages, config, plugins )
+		convertMarkdown( pages, config, plugins, "/", root & "/docs" )
 
 		var siteDir = root & "/site"
 		directoryCreate( siteDir, true, true )
@@ -335,19 +351,32 @@ class {
 	 * built-site-readable alike) into its built pretty-URL equivalent -
 	 * see MarkdownLinkResolver.bx.
 	 *
+	 * Also splices in any `::: include src="..."` reusable content
+	 * (IncludeProcessor.bx, run first - the only one of these that has to
+	 * become real page markdown rather than an HTML-wrapped block) and
+	 * every GitBook-style `:::` container block - expandable, cards,
+	 * columns, stepper, updates, file, embed, page-link
+	 * (DirectiveBlockProcessor.bx). A page whose `::: updates` block has
+	 * entries gets `page.updatesFeedEntries` set too, consumed by
+	 * `renderDocTree()` to write that page's own `feed.xml`.
+	 *
 	 * @pages Array of page structs from DocsLoader.load()
 	 * @config The site's bxdocs.json config
 	 * @basePath Root-relative base path ending with `/` - relative `.md` links are re-rooted under it, same as every other internal link the theme renders
+	 * @docsDir Absolute path to this tree's own docs root - `::: include` paths are resolved against it
 	 */
-	private void function convertMarkdown( required array pages, required struct config, array plugins = [], string basePath = "/" ) {
+	private void function convertMarkdown( required array pages, required struct config, array plugins = [], string basePath = "/", string docsDir = "" ) {
 		for ( var page in arguments.pages ) {
 			var markdown = variables.pluginLoader.applyOnPageMarkdown( arguments.plugins, page.body, page, arguments.config )
+			markdown = variables.includeProcessor.process( markdown, arguments.docsDir, page.relativePath )
 
 			var tabsExtracted = variables.tabsProcessor.extract( markdown )
 			var mathProtected = variables.mathProtector.protect( tabsExtracted.markdown )
 			var codeExtracted = variables.codeAnnotationProcessor.extractAndStrip( mathProtected.markdown )
+			var directivesExtracted = variables.directiveBlockProcessor.extract( codeExtracted.markdown )
 
-			var html = variables.markdownRenderer.toHtml( codeExtracted.markdown, arguments.config.markdown )
+			var html = variables.markdownRenderer.toHtml( directivesExtracted.markdown, arguments.config.markdown )
+			html = variables.directiveBlockProcessor.restore( html, directivesExtracted.blocks, variables.markdownRenderer, arguments.config.markdown )
 			html = variables.codeAnnotationProcessor.applyToHtml( html, codeExtracted.annotations )
 			html = variables.mathProtector.restore( html, mathProtected.formulas )
 			html = variables.tabsProcessor.restore( html, tabsExtracted.groups, variables.markdownRenderer, arguments.config.markdown )
@@ -356,7 +385,28 @@ class {
 			html = variables.pluginLoader.applyOnPageHtml( arguments.plugins, html, page, arguments.config )
 
 			page.contentHtml = html
+			page.updatesFeedEntries = collectUpdatesFeedEntries( directivesExtracted.blocks, arguments.config.markdown )
 		}
+	}
+
+	/**
+	 * Flattens every top-level `::: updates` block's own `::: update`
+	 * children into one feed-ready entry array - a page normally has at
+	 * most one `::: updates` block, but more than one is merged rather
+	 * than only honoring the first.
+	 *
+	 * @blocks convertMarkdown()'s own `directivesExtracted.blocks` for one page
+	 * @markdownOptions Passthrough options forwarded to the renderer for each entry's own content
+	 */
+	private array function collectUpdatesFeedEntries( required array blocks, required struct markdownOptions ) {
+		var entries = []
+		for ( var block in arguments.blocks ) {
+			if ( lCase( trim( block.type ) ) != "updates" ) {
+				continue
+			}
+			entries.append( variables.directiveBlockProcessor.extractUpdateEntries( block, variables.markdownRenderer, arguments.markdownOptions ), true )
+		}
+		return entries
 	}
 
 	/**
@@ -498,6 +548,39 @@ class {
 	private void function assignMarkdownUrl( required array pages ) {
 		for ( var page in arguments.pages ) {
 			page.markdownUrl = page.relativePath
+		}
+	}
+
+	/**
+	 * Resolves each page's own frontmatter `icon` into ready-to-embed HTML
+	 * (IconResolver.bx) - a theme's `page.bxm` renders `page.iconHtml`
+	 * directly next to the title, never touching `icon`/IconResolver.bx
+	 * itself.
+	 *
+	 * @pages Array of page structs (`icon` already set by DocsLoader.bx)
+	 * @docsDir Absolute path to this tree's own docs root - resolves a `custom:` icon against its `assets/icons/`
+	 */
+	private void function assignIconHtml( required array pages, required string docsDir ) {
+		for ( var page in arguments.pages ) {
+			page.iconHtml = variables.iconResolver.resolve( page.icon ?: "", arguments.docsDir )
+		}
+	}
+
+	/**
+	 * Resolves every nav node's own `icon` (NavBuilder.bx) into ready-to-embed
+	 * HTML, recursively - a theme's `layout.bxm` renders each node's own
+	 * `iconHtml` directly next to its title, never touching IconResolver.bx
+	 * itself. Mutates `nodes` in place.
+	 *
+	 * @nodes A nav tree (or subtree) from NavBuilder.build()
+	 * @docsDir Absolute path to this tree's own docs root - resolves a `custom:` icon against its `assets/icons/`
+	 */
+	private void function assignNavIconHtml( required array nodes, required string docsDir ) {
+		for ( var node in arguments.nodes ) {
+			node.iconHtml = variables.iconResolver.resolve( node.icon ?: "", arguments.docsDir )
+			if ( node.children.len() ) {
+				assignNavIconHtml( node.children, arguments.docsDir )
+			}
 		}
 	}
 

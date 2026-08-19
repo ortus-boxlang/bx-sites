@@ -1,0 +1,92 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.PageLinkResolver", function() {
+
+			beforeEach( function() {
+				variables.resolver = new "models.build.PageLinkResolver@bxdocs"();
+			} );
+
+			// encodeForHTML()'s exact escaping range for non-ASCII characters
+			// (emoji) is environment-dependent (locale/JVM-charset-driven) - both
+			// the escaped numeric-entity form and the raw character are equally
+			// valid, equivalent HTML, so the emoji assertion below compares
+			// against decoded output rather than pinning one form.
+			private string function htmlDecode( required string text ) {
+				var matcher = createObject( "java", "java.util.regex.Pattern" ).compile( '&##x([0-9a-fA-F]+);' ).matcher( arguments.text )
+				var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+				while ( matcher.find() ) {
+					var codepoint = createObject( "java", "java.lang.Integer" ).parseInt( matcher.group( 1 ), 16 )
+					var chars = createObject( "java", "java.lang.String" ).valueOf( createObject( "java", "java.lang.Character" ).toChars( codepoint ) )
+					matcher.appendReplacement( buffer, createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( chars ) )
+				}
+				matcher.appendTail( buffer )
+				return buffer.toString()
+			}
+
+			it( "enriches a page-link stub with its target page's title/icon/summary", function() {
+				var pages = [
+					{
+						urlPath : "index.html",
+						contentHtml : '<a class="bxdocs-page-link" href="/guides/themes/index.html" data-bxdocs-page-link><span class="bxdocs-page-link__title">/guides/themes/index.html</span></a>'
+					},
+					{ urlPath : "guides/themes/index.html", title : "Themes", icon : "🎨", summary : "Customize the look." }
+				];
+
+				resolver.resolve( pages, "/" );
+				var decoded = htmlDecode( pages[ 1 ].contentHtml );
+
+				expect( decoded ).toInclude( '<span class="bxdocs-page-link__icon">🎨</span>' );
+				expect( decoded ).toInclude( '<span class="bxdocs-page-link__title">Themes</span>' );
+				expect( decoded ).toInclude( '<span class="bxdocs-page-link__summary">Customize the look.</span>' );
+			} );
+
+			it( "falls back to a page's description when it has no summary", function() {
+				var pages = [
+					{
+						urlPath : "index.html",
+						contentHtml : '<a class="bxdocs-page-link" href="/guides/themes/index.html" data-bxdocs-page-link><span class="bxdocs-page-link__title">x</span></a>'
+					},
+					{ urlPath : "guides/themes/index.html", title : "Themes", icon : "", summary : "", description : "A description." }
+				];
+
+				resolver.resolve( pages, "/" );
+
+				expect( pages[ 1 ].contentHtml ).toInclude( '<span class="bxdocs-page-link__summary">A description.</span>' );
+			} );
+
+			it( "leaves a stub untouched when its href doesn't match any page (dead link)", function() {
+				var original = '<a class="bxdocs-page-link" href="/nowhere/index.html" data-bxdocs-page-link><span class="bxdocs-page-link__title">/nowhere/index.html</span></a>';
+				var pages = [ { urlPath : "index.html", contentHtml : original } ];
+
+				resolver.resolve( pages, "/" );
+
+				expect( pages[ 1 ].contentHtml ).toBe( original );
+			} );
+
+			it( "is a no-op on a page with no page-link stubs at all", function() {
+				var pages = [ { urlPath : "index.html", contentHtml : "<p>Nothing here.</p>" } ];
+
+				resolver.resolve( pages, "/" );
+
+				expect( pages[ 1 ].contentHtml ).toBe( "<p>Nothing here.</p>" );
+			} );
+
+			it( "resolves stubs correctly under a non-root basePath", function() {
+				var pages = [
+					{
+						urlPath : "index.html",
+						contentHtml : '<a class="bxdocs-page-link" href="/my-docs/guides/themes/index.html" data-bxdocs-page-link><span class="bxdocs-page-link__title">x</span></a>'
+					},
+					{ urlPath : "guides/themes/index.html", title : "Themes" }
+				];
+
+				resolver.resolve( pages, "/my-docs/" );
+
+				expect( pages[ 1 ].contentHtml ).toInclude( '<span class="bxdocs-page-link__title">Themes</span>' );
+			} );
+
+		} );
+	}
+
+}

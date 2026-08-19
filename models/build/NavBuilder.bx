@@ -19,15 +19,18 @@ class {
 	 * @pages The array of page structs from DocsLoader.load()
 	 * @navConfig An explicit nav tree to build from instead of inferring one
 	 * from folder structure - each entry is either a bare docs/-relative
-	 * path string (`"guides/setup.md"`, title/order taken from that page),
-	 * or an object `{ "title", "path", "children" }` (`path` and `children`
-	 * both optional - a `title`-only, path-less entry is an unlinked group
-	 * heading, exactly like a folder with no `index.md` today). Array
-	 * position sets nav order; pages not referenced anywhere in `navConfig`
-	 * are still built, just not linked from the nav (same as a `hidden`
-	 * page). Empty (the default) means "infer from folder structure".
+	 * path string (`"guides/setup.md"`, title/order/icon taken from that
+	 * page), or an object `{ "title", "path", "icon", "children" }` (`path`,
+	 * `icon` and `children` all optional - a `title`-only, path-less entry
+	 * is an unlinked group heading, exactly like a folder with no
+	 * `index.md` today). An explicit `icon` overrides the target page's
+	 * own frontmatter `icon` (IconResolver.bx resolves either); omitted
+	 * falls back to the page's own. Array position sets nav order; pages
+	 * not referenced anywhere in `navConfig` are still built, just not
+	 * linked from the nav (same as a `hidden` page). Empty (the default)
+	 * means "infer from folder structure".
 	 *
-	 * @return Array of nav nodes, sorted (unless navConfig is given, which is already author-ordered): { title, url, order, children }
+	 * @return Array of nav nodes, sorted (unless navConfig is given, which is already author-ordered): { title, url, order, icon, children }
 	 */
 	array function build( required array pages, array navConfig = [] ) {
 		if ( arguments.navConfig.len() ) {
@@ -50,7 +53,7 @@ class {
 		// file/folder name can ever produce, so it sorts alongside its true
 		// top-level siblings instead of being silently dropped from the nav.
 		if ( len( root.url ?: "" ) ) {
-			root.children[ "" ] = { title : root.title, url : root.url, order : root.order, children : {} }
+			root.children[ "" ] = { title : root.title, url : root.url, order : root.order, icon : root.icon ?: "", children : {} }
 		}
 
 		return toSortedArray( root.children )
@@ -113,7 +116,12 @@ class {
 			title = isNull( page ) ? "" : page.title
 		}
 
-		return { title : title, url : isNull( page ) ? "" : page.urlPath, order : 0, children : children }
+		var icon = trim( arguments.entry.icon ?: "" )
+		if ( !len( icon ) && !isNull( page ) ) {
+			icon = page.icon ?: ""
+		}
+
+		return { title : title, url : isNull( page ) ? "" : page.urlPath, order : 0, icon : icon, children : children }
 	}
 
 	/**
@@ -150,7 +158,7 @@ class {
 		var current = arguments.root
 		for ( var folderName in folders ) {
 			if ( !current.children.keyExists( folderName ) ) {
-				current.children[ folderName ] = { title : folderName, url : "", order : 999999, children : {} }
+				current.children[ folderName ] = { title : folderName, url : "", order : 999999, icon : "", children : {} }
 			}
 			current = current.children[ folderName ]
 		}
@@ -159,11 +167,13 @@ class {
 			current.title = arguments.page.title
 			current.url   = arguments.page.urlPath
 			current.order = arguments.page.order
+			current.icon  = arguments.page.icon ?: ""
 		} else {
 			current.children[ fileName ] = {
 				title    : arguments.page.title,
 				url      : arguments.page.urlPath,
 				order    : arguments.page.order,
+				icon     : arguments.page.icon ?: "",
 				children : {}
 			}
 		}
@@ -182,6 +192,7 @@ class {
 				title    : node.title,
 				url      : node.url,
 				order    : node.order,
+				icon     : node.icon ?: "",
 				children : toSortedArray( node.children )
 			} )
 		}

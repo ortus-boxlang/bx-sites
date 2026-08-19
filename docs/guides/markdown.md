@@ -284,6 +284,211 @@ A `$` immediately followed or preceded by whitespace is left alone (so
 "$5 and $10" isn't misread as a formula) - typeset math always sits flush
 against both delimiters.
 
+## GitBook-style blocks
+
+On top of everything above, BX Docs supports a family of GitBook-style
+content blocks - handy on its own, and the reason a GitBook site's content
+is straightforward to migrate: each of these maps directly to a GitBook
+block of the same name. Every one uses the same `::: name ... :::`
+container syntax (a bare `:::` on its own line closes whichever block is
+currently open) - no `bxdocs.json` config needed, always available. A
+block can nest inside another (an expandable containing a cards group,
+for instance) - each is scanned again for further blocks inside its own
+content.
+
+### Expandable
+
+A plain collapsible section - no callout icon/color, unlike a collapsible
+admonition (`???`, see [Admonitions](#collapsible-admonitions)):
+
+```markdown
+::: expandable "Is this different from a collapsible admonition?"
+Yes - this has no type/icon/color, just a plain expand/collapse section.
+Add `open="true"` to start it expanded.
+:::
+```
+
+::: expandable "Is this different from a collapsible admonition?"
+Yes - this has no type/icon/color, just a plain expand/collapse section.
+Add `open="true"` to start it expanded.
+:::
+
+### Cards
+
+A grid of link cards, each its own `::: card` inside a `::: cards`
+wrapper - `title`, `icon`, `image` and `href` are all optional (a card
+with no `href` renders as a plain, non-clickable card):
+
+```markdown
+::: cards
+::: card title="Getting Started" icon="🚀" href="../getting-started.md"
+Install, scaffold and build your first site.
+:::
+::: card title="Themes" icon="🎨" href="themes.md"
+Customize a built-in theme or write your own.
+:::
+:::
+```
+
+::: cards
+::: card title="Getting Started" icon="🚀" href="../getting-started.md"
+Install, scaffold and build your first site.
+:::
+::: card title="Themes" icon="🎨" href="themes.md"
+Customize a built-in theme or write your own.
+:::
+:::
+
+### Columns
+
+A side-by-side layout - `::: column` accepts an optional `width` (a plain
+CSS length/percentage, e.g. `"40%"`); columns with no explicit width
+share the row equally:
+
+```markdown
+::: columns
+::: column width="60%"
+The wider column.
+:::
+::: column
+The narrower one.
+:::
+:::
+```
+
+::: columns
+::: column width="60%"
+The wider column.
+:::
+::: column
+The narrower one.
+:::
+:::
+
+### Stepper
+
+A numbered, connected sequence of steps:
+
+```markdown
+::: stepper
+::: step "Install"
+`install-bx-module bx-docs`
+:::
+::: step "Scaffold"
+`boxlang module:bxDocs new`
+:::
+:::
+```
+
+::: stepper
+::: step "Install"
+`install-bx-module bx-docs`
+:::
+::: step "Scaffold"
+`boxlang module:bxDocs new`
+:::
+:::
+
+### File
+
+A download card for a PDF, video, or any other project asset - `src` is
+resolved the same way `theme.logo`/frontmatter `ogImage` already are
+(relative to `docs/assets/`):
+
+```markdown
+::: file src="assets/spec.pdf" title="API Specification"
+:::
+```
+
+### Embed
+
+A responsive iframe embed for a recognized provider - currently YouTube,
+Vimeo, CodePen, Spotify, Loom and Figma. A URL from anywhere else falls
+back to a plain "visit ↗" link card instead of an iframe that would just
+refuse to render (most sites block being framed):
+
+```markdown
+::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
+:::
+```
+
+### Page link
+
+A rich preview card linking to another page - `href` follows the same
+file-relative convention as an ordinary [page link](#linking-between-pages).
+Unlike a card, its title/icon/summary are pulled automatically from the
+target page's own frontmatter, so it stays in sync if that page is
+renamed or its summary changes:
+
+```markdown
+::: page-link href="../getting-started.md"
+:::
+```
+
+::: page-link href="../getting-started.md"
+:::
+
+### Updates (changelog)
+
+A dated, taggable changelog list - `::: update` accepts `date="YYYY-MM-DD"`
+and an optional comma-separated `tags`:
+
+```markdown
+::: updates
+::: update date="2026-01-15" tags="feature,fix"
+Added dark mode and fixed a footer alignment bug.
+:::
+::: update date="2026-01-01"
+Initial release.
+:::
+:::
+```
+
+A page with an `::: updates` block also gets its own `feed.xml` (RSS 2.0)
+written alongside it once `bxdocs.json`'s `baseURL` is a full URL - same
+requirement as `sitemap.xml` - so readers can subscribe to just that
+page's changelog.
+
+### Reusable content (includes)
+
+`::: include src="..."` splices another file's raw Markdown in at that
+point - resolved file-relative to the *including* page's own directory,
+same convention as an ordinary page link. Unlike every block above, this
+becomes real page content (headings, paragraphs, its own nested blocks),
+not something wrapped in a widget - useful for a warning/notice repeated
+across several pages:
+
+```markdown
+::: include src="_shared/beta-notice.md"
+```
+
+An included file can itself include another (a circular chain throws
+`BxDocs.CircularInclude` at build time rather than looping forever).
+
+### Images: captions, alignment and framing {#images}
+
+A caption, a frame, or a multi-image gallery are all just block-level
+HTML - which bx-markdown/Flexmark passes through completely untouched
+(CommonMark's own "HTML block" rule), so no bx-docs-specific syntax is
+needed at all:
+
+```markdown
+<figure>
+  <img src="../assets/screenshot.png" alt="The build output">
+  <figcaption>A freshly built site</figcaption>
+</figure>
+
+<div data-with-frame="true">
+  <img src="../assets/screenshot.png" alt="Framed">
+</div>
+
+<div class="bxdocs-gallery">
+  <img src="../assets/one.png" alt="">
+  <img src="../assets/two.png" alt="">
+  <img src="../assets/three.png" alt="">
+</div>
+```
+
 ## Plugin extensions
 
 Admonitions, footnotes and definition lists cover the common cases, but

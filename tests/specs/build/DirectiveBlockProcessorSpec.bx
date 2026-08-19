@@ -1,0 +1,178 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.DirectiveBlockProcessor", function() {
+
+			beforeEach( function() {
+				variables.processor = new "models.build.DirectiveBlockProcessor@bxdocs"();
+				variables.renderer = new "tests.support.FakeMarkdownRenderer@bxdocs"();
+			} );
+
+			private string function render( required string markdown ) {
+				var extracted = processor.extract( markdown );
+				return htmlDecode( processor.restore( extracted.markdown, extracted.blocks, renderer, {} ) );
+			}
+
+			// encodeForHTML()'s exact escaping range for "safe" ASCII punctuation
+			// (e.g. "/") and non-ASCII characters (emoji) is environment-dependent
+			// (locale/JVM-charset-driven) - both the escaped numeric-entity form and
+			// the raw character are equally valid, equivalent HTML, so assertions
+			// below compare against decoded output rather than pinning one form.
+			private string function htmlDecode( required string text ) {
+				var matcher = createObject( "java", "java.util.regex.Pattern" ).compile( '&##x([0-9a-fA-F]+);' ).matcher( arguments.text )
+				var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+				while ( matcher.find() ) {
+					var codepoint = createObject( "java", "java.lang.Integer" ).parseInt( matcher.group( 1 ), 16 )
+					var chars = createObject( "java", "java.lang.String" ).valueOf( createObject( "java", "java.lang.Character" ).toChars( codepoint ) )
+					matcher.appendReplacement( buffer, createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( chars ) )
+				}
+				matcher.appendTail( buffer )
+				return buffer.toString()
+			}
+
+			it( "leaves markdown with no directives untouched aside from trimming", function() {
+				var md = "Just a paragraph.";
+				var extracted = processor.extract( md );
+
+				expect( extracted.blocks.len() ).toBe( 0 );
+				expect( extracted.markdown ).toInclude( "Just a paragraph." );
+			} );
+
+			it( "renders an expandable as a <details>/<summary>, closed by default", function() {
+				var html = render( '::: expandable "FAQ"' & char( 10 ) & "Body text." & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( '<details class="bxdocs-expandable">' );
+				expect( html ).toInclude( "<summary>FAQ</summary>" );
+				expect( html ).toInclude( "Body text." );
+				expect( html ).notToInclude( " open>" );
+			} );
+
+			it( "opens an expandable by default when open=""true""", function() {
+				var html = render( '::: expandable "FAQ" open="true"' & char( 10 ) & "Body." & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( '<details class="bxdocs-expandable" open>' );
+			} );
+
+			it( "renders a cards group with nested card children, each with title/icon/href/body", function() {
+				var md = "::: cards" & char( 10 ) &
+					'::: card title="Getting Started" icon="🚀" href="getting-started.md"' & char( 10 ) &
+					"Install and scaffold." & char( 10 ) & ":::" & char( 10 ) &
+					'::: card title="Themes"' & char( 10 ) &
+					"No href here." & char( 10 ) & ":::" & char( 10 ) &
+					":::";
+				var html = render( md );
+
+				expect( html ).toInclude( '<div class="bxdocs-cards">' );
+				expect( html ).toInclude( '<a class="bxdocs-card" href="getting-started.md">' );
+				expect( html ).toInclude( '<div class="bxdocs-card__icon">🚀</div>' );
+				expect( html ).toInclude( '<div class="bxdocs-card__title">Getting Started</div>' );
+				expect( html ).toInclude( "Install and scaffold." );
+				// A card with no href renders as a plain <div>, not a link.
+				expect( html ).toInclude( '<div class="bxdocs-card">' );
+				expect( html ).toInclude( '<div class="bxdocs-card__title">Themes</div>' );
+			} );
+
+			it( "renders columns honoring a valid CSS width and ignoring an invalid one", function() {
+				var md = "::: columns" & char( 10 ) &
+					'::: column width="50%"' & char( 10 ) & "Left." & char( 10 ) & ":::" & char( 10 ) &
+					'::: column width="javascript:alert(1)"' & char( 10 ) & "Right." & char( 10 ) & ":::" & char( 10 ) &
+					":::";
+				var html = render( md );
+
+				expect( html ).toInclude( 'style="--bxdocs-column-width:50%"' );
+				expect( html ).notToInclude( "javascript:" );
+			} );
+
+			it( "renders a numbered stepper from step children, in order", function() {
+				var md = "::: stepper" & char( 10 ) &
+					'::: step "Install"' & char( 10 ) & "Step one." & char( 10 ) & ":::" & char( 10 ) &
+					'::: step "Build"' & char( 10 ) & "Step two." & char( 10 ) & ":::" & char( 10 ) &
+					":::";
+				var html = render( md );
+
+				expect( html ).toInclude( '<div class="bxdocs-step__marker">1</div>' );
+				expect( html ).toInclude( '<div class="bxdocs-step__title">Install</div>' );
+				expect( html ).toInclude( '<div class="bxdocs-step__marker">2</div>' );
+				expect( html ).toInclude( '<div class="bxdocs-step__title">Build</div>' );
+			} );
+
+			it( "recurses into a directive nested inside another block's content", function() {
+				var md = '::: expandable "Outer"' & char( 10 ) &
+					"::: cards" & char( 10 ) &
+					'::: card title="Inner" href="x.md"' & char( 10 ) & "Inner body." & char( 10 ) & ":::" & char( 10 ) &
+					":::" & char( 10 ) &
+					":::";
+				var html = render( md );
+
+				expect( html ).toInclude( "<summary>Outer</summary>" );
+				expect( html ).toInclude( '<div class="bxdocs-cards">' );
+				expect( html ).toInclude( '<div class="bxdocs-card__title">Inner</div>' );
+			} );
+
+			it( "renders a file block as a download link, falling back to the filename when no title is given", function() {
+				var html = render( '::: file src="assets/spec.pdf"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( '<a class="bxdocs-file" href="assets/spec.pdf" download>' );
+				expect( html ).toInclude( "spec.pdf" );
+			} );
+
+			it( "resolves a YouTube embed URL to its iframe embed form", function() {
+				var html = render( '::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="Demo"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( 'src="https://www.youtube.com/embed/dQw4w9WgXcQ"' );
+				expect( html ).toInclude( '<div class="bxdocs-embed__caption">Demo</div>' );
+			} );
+
+			it( "falls back to a plain link card for an unrecognized embed provider", function() {
+				var html = render( '::: embed url="https://example.com/random-page"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( '<a class="bxdocs-embed-fallback" href="https://example.com/random-page"' );
+				expect( html ).notToInclude( "<iframe" );
+			} );
+
+			it( "renders a page-link as a plain stub anchor - enrichment is PageLinkResolver's job", function() {
+				var html = render( '::: page-link href="guides/themes.md"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( '<a class="bxdocs-page-link" href="guides/themes.md" data-bxdocs-page-link>' );
+			} );
+
+			it( "renders updates entries with date, tags and body, most-recent-first order left to the caller", function() {
+				var md = "::: updates" & char( 10 ) &
+					'::: update date="2026-01-15" tags="feature,fix"' & char( 10 ) & "Added dark mode." & char( 10 ) & ":::" & char( 10 ) &
+					'::: update date="2026-01-01"' & char( 10 ) & "Initial release." & char( 10 ) & ":::" & char( 10 ) &
+					":::";
+				var html = render( md );
+
+				expect( html ).toInclude( '<time class="bxdocs-update__date" datetime="2026-01-15">2026-01-15</time>' );
+				expect( html ).toInclude( '<span class="bxdocs-update__tag">feature</span>' );
+				expect( html ).toInclude( '<span class="bxdocs-update__tag">fix</span>' );
+				expect( html ).toInclude( "Added dark mode." );
+				expect( html ).toInclude( "Initial release." );
+			} );
+
+			it( "extractUpdateEntries() returns structured entries from an already-extracted updates block", function() {
+				var md = "::: updates" & char( 10 ) &
+					'::: update date="2026-01-01" tags="a, b"' & char( 10 ) & "Body." & char( 10 ) & ":::" & char( 10 ) &
+					":::";
+				var extracted = processor.extract( md );
+				var updatesBlock = extracted.blocks[ 1 ];
+
+				var entries = processor.extractUpdateEntries( updatesBlock, renderer, {} );
+
+				expect( entries.len() ).toBe( 1 );
+				expect( entries[ 1 ].date ).toBe( "2026-01-01" );
+				expect( entries[ 1 ].tags ).toBe( [ "a", "b" ] );
+				expect( entries[ 1 ].contentHtml ).toInclude( "Body." );
+			} );
+
+			it( "flushes an unclosed directive at end of file instead of dropping its content", function() {
+				var html = render( '::: expandable "Oops, forgot to close"' & char( 10 ) & "Still here." );
+
+				expect( html ).toInclude( "<summary>Oops, forgot to close</summary>" );
+				expect( html ).toInclude( "Still here." );
+			} );
+
+		} );
+	}
+
+}

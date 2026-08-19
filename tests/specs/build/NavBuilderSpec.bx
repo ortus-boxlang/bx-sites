@@ -12,13 +12,15 @@ class extends="testbox.system.BaseSpec" {
 				string title,
 				numeric order = 999999,
 				boolean hidden = false,
-				string urlPath = ""
+				string urlPath = "",
+				string icon = ""
 			) {
 				return {
 					relativePath : arguments.relativePath,
 					title        : arguments.title,
 					order        : arguments.order,
 					hidden       : arguments.hidden,
+					icon         : arguments.icon,
 					urlPath      : len( arguments.urlPath ) ? arguments.urlPath : arguments.relativePath.reReplaceNoCase( "\.md$", "/index.html" )
 				};
 			}
@@ -139,6 +141,33 @@ class extends="testbox.system.BaseSpec" {
 				expect( nav[ 1 ].children.len() ).toBe( 1 );
 				expect( nav[ 1 ].children[ 1 ].title ).toBe( "Getting Set Up" );
 				expect( nav[ 1 ].children[ 1 ].url ).toBe( pages[ 1 ].urlPath );
+			} );
+
+			it( "carries a page's own frontmatter icon through to its inferred nav node", function() {
+				var pages = [
+					page( relativePath = "index.md", title = "Home", order = 1, icon = "rocket" ),
+					page( relativePath = "about.md", title = "About", order = 2 )
+				];
+
+				var nav = navBuilder.build( pages );
+
+				expect( nav[ 1 ].icon ).toBe( "rocket" );
+				expect( nav[ 2 ].icon ).toBe( "" );
+			} );
+
+			it( "carries a page's own frontmatter icon through to its explicit navConfig node, unless the entry sets its own", function() {
+				var pages = [
+					page( relativePath = "index.md", title = "Home", icon = "rocket" ),
+					page( relativePath = "about.md", title = "About", icon = "lucide:info" )
+				];
+
+				var nav = navBuilder.build( pages, [
+					"index.md",
+					{ "path" : "about.md", "icon" : "tabler:wand" }
+				] );
+
+				expect( nav[ 1 ].icon ).toBe( "rocket" );
+				expect( nav[ 2 ].icon ).toBe( "tabler:wand" );
 			} );
 
 			it( "throws BxDocs.InvalidConfig when a navConfig entry references a path that doesn't exist", function() {

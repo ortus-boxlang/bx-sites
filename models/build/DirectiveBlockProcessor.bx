@@ -1,0 +1,507 @@
+/**
+ * A generic `::: name attr="value" ...` ... `:::` container-block syntax -
+ * the shared foundation for every GitBook-style block Flexmark has no
+ * native concept of: expandable, cards/card, columns/column,
+ * stepper/step, updates/update, file, embed, and page-link (see each
+ * block's own `render*()` docblock below). Nests arbitrarily deep (a
+ * `::: cards` block's own content is itself re-scanned for `::: card`
+ * children, recursively) using the same two-phase pre/post-processing
+ * shape as TabsProcessor.bx - `extract()` runs before `Markdown()`,
+ * pulling every top-level directive out into a placeholder `<div>` (a
+ * bare `<div ...></div>` on its own line is recognized by CommonMark as
+ * an HTML block and passed through untouched); `restore()` runs after,
+ * rendering each one's own markup (recursing into nested directives and
+ * markdown alike) and swapping it back in for its placeholder.
+ *
+ * Syntax: `::: name` optionally followed by a leading `"Title"` and/or
+ * `key="value"` attributes, e.g. `::: card title="Themes" href="themes.md"`.
+ * A bare `:::` on its own line closes the innermost still-open block.
+ */
+class {
+
+	variables.openPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^:::\s*([a-zA-Z][\w-]*)\s*(.*)$" )
+	variables.attrPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(\w+)="([^"]*)"' )
+	variables.titlePattern = createObject( "java", "java.util.regex.Pattern" ).compile( '^"([^"]*)"\s*(.*)$' )
+
+	/**
+	 * Pulls every top-level `::: name ... :::` directive block out of the
+	 * raw markdown and replaces it with a lone placeholder `<div>` on its
+	 * own line. A directive nested inside another (e.g. `::: card` inside
+	 * `::: cards`) is left as literal `:::`-fenced text within its
+	 * parent's own captured content, to be found again by that parent's
+	 * own render function via a fresh `extract()` call - see `restore()`.
+	 *
+	 * @markdown The raw markdown body text
+	 *
+	 * @return { markdown: string with top-level directives replaced by placeholders, blocks: array of { token, type, attrsRaw, content } }
+	 */
+	struct function extract( required string markdown ) {
+		var normalized = arguments.markdown.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" )
+		var lines = listToArray( normalized, char( 10 ), true )
+		var outputLines = []
+		var blocks = []
+		var stack = []
+		var tracker = new "models.build.FenceTracker@bxdocs"()
+
+		for ( var line in lines ) {
+			var trimmedLine = trim( line )
+
+			// A `:::` line shown inside a fenced code example (e.g. this very
+			// guide, demonstrating the syntax) is literal fence content, not
+			// a real directive marker - see FenceTracker.bx.
+			if ( tracker.consume( line ) ) {
+				if ( stack.len() ) {
+					stack[ stack.len() ].lines.append( line )
+				} else {
+					outputLines.append( line )
+				}
+				continue
+			}
+
+			if ( trimmedLine == ":::" ) {
+				if ( !stack.len() ) {
+					outputLines.append( line )
+					continue
+				}
+				var frame = stack[ stack.len() ]
+				stack.deleteAt( stack.len() )
+				var content = frame.lines.toList( char( 10 ) )
+
+				if ( !stack.len() ) {
+					var token = "bxdocsdirective" & replace( createUUID(), "-", "", "all" )
+					blocks.append( { token : token, type : frame.type, attrsRaw : frame.attrsRaw, content : content } )
+					outputLines.append( "" )
+					outputLines.append( '<div class="bxdocs-raw-block" data-bxdocs-token="' & token & '"></div>' )
+					outputLines.append( "" )
+				} else {
+					var parent = stack[ stack.len() ]
+					parent.lines.append( "::: " & frame.type & " " & frame.attrsRaw )
+					parent.lines.append( content )
+					parent.lines.append( ":::" )
+				}
+				continue
+			}
+
+			var matcher = variables.openPattern.matcher( trimmedLine )
+			if ( matcher.matches() ) {
+				stack.append( { type : matcher.group( 1 ), attrsRaw : trim( matcher.group( 2 ) ), lines : [] } )
+				continue
+			}
+
+			if ( stack.len() ) {
+				stack[ stack.len() ].lines.append( line )
+			} else {
+				outputLines.append( line )
+			}
+		}
+
+		// Any directive left unclosed at EOF is flushed as if closed here,
+		// rather than silently dropping its content - a typo'd or missing
+		// closing `:::` shouldn't eat the rest of the page.
+		while ( stack.len() ) {
+			var frame = stack[ stack.len() ]
+			stack.deleteAt( stack.len() )
+			var content = frame.lines.toList( char( 10 ) )
+			if ( !stack.len() ) {
+				var token = "bxdocsdirective" & replace( createUUID(), "-", "", "all" )
+				blocks.append( { token : token, type : frame.type, attrsRaw : frame.attrsRaw, content : content } )
+				outputLines.append( "" )
+				outputLines.append( '<div class="bxdocs-raw-block" data-bxdocs-token="' & token & '"></div>' )
+				outputLines.append( "" )
+			} else {
+				var parent = stack[ stack.len() ]
+				parent.lines.append( "::: " & frame.type & " " & frame.attrsRaw )
+				parent.lines.append( content )
+			}
+		}
+
+		return { markdown : outputLines.toList( char( 10 ) ), blocks : blocks }
+	}
+
+	/**
+	 * Renders every top-level block from `extract()` and swaps each one's
+	 * placeholder for its final markup.
+	 *
+	 * @html Already-rendered HTML (from Markdown() on extract()'s output)
+	 * @blocks extract()'s own `blocks` array
+	 * @renderer Any object exposing `toHtml( markdown, options = {} )`, used to render markdown found inside a block (and, recursively, inside its own nested directives)
+	 * @markdownOptions Passthrough options forwarded to the renderer, same as the surrounding page
+	 *
+	 * @return html with every directive placeholder swapped for its rendered markup
+	 */
+	string function restore( required string html, required array blocks, required any renderer, struct markdownOptions = {} ) {
+		var result = arguments.html
+		for ( var block in arguments.blocks ) {
+			var placeholder = '<div class="bxdocs-raw-block" data-bxdocs-token="' & block.token & '"></div>'
+			result = result.replace( placeholder, renderBlock( block, arguments.renderer, arguments.markdownOptions ), "one" )
+		}
+		return result
+	}
+
+	/**
+	 * Runs `markdown` through the full extract -> Markdown() -> restore()
+	 * cycle - the same shape `BuildPipeline.convertMarkdown()` applies to
+	 * a whole page, applied here to a single block's own inner content, so
+	 * a block nested inside another (or ordinary markdown inside a leaf
+	 * block, e.g. an expandable's body) gets identical treatment to the
+	 * page itself: nested directives, code fences, admonitions, all of it.
+	 *
+	 * @markdown Raw markdown text (a block's own `content`)
+	 * @renderer Any object exposing `toHtml( markdown, options = {} )`
+	 * @markdownOptions Passthrough options forwarded to the renderer
+	 */
+	private string function renderNested( required string markdown, required any renderer, required struct markdownOptions ) {
+		var extracted = this.extract( arguments.markdown )
+		var html = arguments.renderer.toHtml( extracted.markdown, arguments.markdownOptions )
+		return this.restore( html, extracted.blocks, arguments.renderer, arguments.markdownOptions )
+	}
+
+	/**
+	 * Dispatches one block to its type's own renderer. An unrecognized
+	 * `type` falls back to rendering its content as plain markdown inside
+	 * a neutral wrapper, rather than silently dropping it - a typo'd
+	 * directive name should still show its content.
+	 *
+	 * @block One entry from extract()'s own `blocks` array (or a nested child, same shape)
+	 */
+	private string function renderBlock( required struct block, required any renderer, required struct markdownOptions ) {
+		var attrs = parseAttrs( block.attrsRaw )
+		switch ( lCase( trim( block.type ) ) ) {
+			case "expandable":
+				return renderExpandable( block, attrs, renderer, markdownOptions )
+			case "cards":
+				return renderCards( block, renderer, markdownOptions )
+			case "columns":
+				return renderColumns( block, renderer, markdownOptions )
+			case "stepper":
+				return renderStepper( block, renderer, markdownOptions )
+			case "updates":
+				return renderUpdates( block, renderer, markdownOptions )
+			case "file":
+				return renderFile( attrs )
+			case "embed":
+				return renderEmbed( attrs )
+			case "page-link":
+				return renderPageLinkStub( attrs )
+			default:
+				return '<div class="bxdocs-directive-unknown">' & renderNested( block.content, renderer, markdownOptions ) & '</div>'
+		}
+	}
+
+	/**
+	 * Parses a directive's `attrsRaw` (everything after its type name) -
+	 * an optional leading `"Title"` shorthand becomes `attrs.title`,
+	 * followed by any number of `key="value"` pairs.
+	 *
+	 * @attrsRaw The raw attribute text, e.g. `"Themes" href="themes.md"`
+	 */
+	private struct function parseAttrs( required string attrsRaw ) {
+		var rest = arguments.attrsRaw
+		var attrs = {}
+
+		var titleMatcher = variables.titlePattern.matcher( trim( rest ) )
+		if ( titleMatcher.matches() ) {
+			attrs.title = titleMatcher.group( 1 )
+			rest = titleMatcher.group( 2 )
+		}
+
+		var matcher = variables.attrPattern.matcher( rest )
+		while ( matcher.find() ) {
+			attrs[ matcher.group( 1 ) ] = matcher.group( 2 )
+		}
+
+		return attrs
+	}
+
+	/**
+	 * A minimal, attribute-value-safe escape for an `href`/`src` value that
+	 * must stay literally path-parseable downstream - `encodeForHTML()`
+	 * also entity-escapes "safe" characters like `/` (its exact range is
+	 * locale/JVM-dependent), which would silently break
+	 * MarkdownLinkResolver.bx's later `.md`-relative-link resolution (it
+	 * re-parses this same href text as a literal file path) and
+	 * PageLinkResolver.bx's later href-to-page lookup. Only `&`/`"`/`<` -
+	 * the characters that actually matter inside a double-quoted HTML
+	 * attribute - are escaped.
+	 */
+	private string function attrEscape( required string value ) {
+		return arguments.value.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
+	}
+
+	/**
+	 * `::: expandable "Title"` - a plain collapsible `<details>` section,
+	 * with none of an admonition's callout type/color/icon. Add `open`
+	 * (bare, e.g. `::: expandable "Title" open="true"`) to start expanded.
+	 */
+	private string function renderExpandable( required struct block, required struct attrs, required any renderer, required struct markdownOptions ) {
+		var title = trim( arguments.attrs.title ?: "" )
+		var openAttr = ( arguments.attrs.open ?: "" ) == "true" ? " open" : ""
+		return '<details class="bxdocs-expandable"' & openAttr & '><summary>' & encodeForHTML( title )
+			& '</summary><div class="bxdocs-expandable__body">' & renderNested( arguments.block.content, arguments.renderer, arguments.markdownOptions )
+			& '</div></details>'
+	}
+
+	/**
+	 * `::: cards` containing `::: card title="..." icon="..." href="..." image="..."`
+	 * children - a responsive grid of link cards. A card with no `href`
+	 * renders as a plain (non-clickable) card.
+	 */
+	private string function renderCards( required struct block, required any renderer, required struct markdownOptions ) {
+		var children = this.extract( arguments.block.content ).blocks
+		var html = '<div class="bxdocs-cards">'
+
+		for ( var child in children ) {
+			var attrs = parseAttrs( child.attrsRaw )
+			var href = trim( attrs.href ?: "" )
+			var tag = len( href ) ? "a" : "div"
+			var hrefAttr = len( href ) ? ' href="' & attrEscape( href ) & '"' : ""
+
+			html &= "<" & tag & ' class="bxdocs-card"' & hrefAttr & ">"
+			if ( len( trim( attrs.image ?: "" ) ) ) {
+				html &= '<img class="bxdocs-card__image" src="' & attrEscape( attrs.image ) & '" alt="">'
+			} else if ( len( trim( attrs.icon ?: "" ) ) ) {
+				html &= '<div class="bxdocs-card__icon">' & encodeForHTML( attrs.icon ) & '</div>'
+			}
+			if ( len( trim( attrs.title ?: "" ) ) ) {
+				html &= '<div class="bxdocs-card__title">' & encodeForHTML( attrs.title ) & '</div>'
+			}
+			if ( len( trim( child.content ) ) ) {
+				html &= '<div class="bxdocs-card__body">' & renderNested( child.content, arguments.renderer, arguments.markdownOptions ) & '</div>'
+			}
+			html &= "</" & tag & ">"
+		}
+
+		return html & "</div>"
+	}
+
+	/**
+	 * `::: columns` containing `::: column width="50%"` children - a
+	 * side-by-side layout. `width` is optional; columns with no explicit
+	 * width share the row equally.
+	 */
+	private string function renderColumns( required struct block, required any renderer, required struct markdownOptions ) {
+		var children = this.extract( arguments.block.content ).blocks
+		var html = '<div class="bxdocs-columns">'
+
+		for ( var child in children ) {
+			var attrs = parseAttrs( child.attrsRaw )
+			var width = trim( attrs.width ?: "" )
+			// Only a plain CSS length/percentage is honored (e.g. "50%", "20rem") -
+			// anything else is silently ignored rather than trusted verbatim into
+			// a style="" attribute.
+			var styleAttr = width.reFind( "^\d+(\.\d+)?(%|px|rem|em)$" )
+				? ' style="--bxdocs-column-width:' & width & '"'
+				: ""
+			html &= '<div class="bxdocs-column"' & styleAttr & '>' & renderNested( child.content, arguments.renderer, arguments.markdownOptions ) & '</div>'
+		}
+
+		return html & "</div>"
+	}
+
+	/**
+	 * `::: stepper` containing `::: step "Title"` children - a numbered,
+	 * connected sequence of steps.
+	 */
+	private string function renderStepper( required struct block, required any renderer, required struct markdownOptions ) {
+		var children = this.extract( arguments.block.content ).blocks
+		var html = '<div class="bxdocs-stepper">'
+		var idx = 0
+
+		for ( var child in children ) {
+			idx++
+			var attrs = parseAttrs( child.attrsRaw )
+			var title = trim( attrs.title ?: "" )
+
+			html &= '<div class="bxdocs-step">'
+				& '<div class="bxdocs-step__marker">' & idx & '</div>'
+				& '<div class="bxdocs-step__content">'
+			if ( len( title ) ) {
+				html &= '<div class="bxdocs-step__title">' & encodeForHTML( title ) & '</div>'
+			}
+			html &= renderNested( child.content, arguments.renderer, arguments.markdownOptions )
+				& '</div></div>'
+		}
+
+		return html & "</div>"
+	}
+
+	/**
+	 * `::: updates` containing `::: update date="YYYY-MM-DD" tags="a,b"`
+	 * children - a changelog list of dated, optionally-tagged entries.
+	 * `tags` is a comma-separated list, each rendered as its own badge.
+	 * See `UpdatesFeedGenerator.bx` for the accompanying `feed.xml` this
+	 * block's presence on a page triggers.
+	 */
+	private string function renderUpdates( required struct block, required any renderer, required struct markdownOptions ) {
+		var children = this.extract( arguments.block.content ).blocks
+		var html = '<div class="bxdocs-updates">'
+
+		for ( var child in children ) {
+			var attrs = parseAttrs( child.attrsRaw )
+			var date = trim( attrs.date ?: "" )
+			var tags = listToArray( trim( attrs.tags ?: "" ), "," ).map( tag => trim( tag ) ).filter( tag => len( tag ) )
+
+			html &= '<div class="bxdocs-update">'
+			if ( len( date ) || tags.len() ) {
+				html &= '<div class="bxdocs-update__meta">'
+				if ( len( date ) ) {
+					html &= '<time class="bxdocs-update__date" datetime="' & encodeForHTML( date ) & '">' & encodeForHTML( date ) & '</time>'
+				}
+				for ( var tag in tags ) {
+					html &= '<span class="bxdocs-update__tag">' & encodeForHTML( tag ) & '</span>'
+				}
+				html &= '</div>'
+			}
+			html &= '<div class="bxdocs-update__body">' & renderNested( child.content, arguments.renderer, arguments.markdownOptions ) & '</div>'
+				& '</div>'
+		}
+
+		return html & "</div>"
+	}
+
+	/**
+	 * `::: file src="assets/spec.pdf" title="Spec Document"` - a download
+	 * card for a PDF, video, or any other project asset. `src` is resolved
+	 * relative to `docs/assets/` the same way `theme.logo`/frontmatter
+	 * `ogImage` already are - left as-authored here and prefixed with
+	 * `basePath` at render time, not at extraction time (this processor
+	 * has no `basePath` in scope; see MarkdownRenderer.bx's own callers).
+	 */
+	private string function renderFile( required struct attrs ) {
+		var src = trim( arguments.attrs.src ?: "" )
+		if ( !len( src ) ) {
+			return '<div class="bxdocs-file bxdocs-file--invalid">::: file - missing required src="..."</div>'
+		}
+		var title = len( trim( arguments.attrs.title ?: "" ) ) ? trim( arguments.attrs.title ) : listLast( src, "/" )
+		return '<a class="bxdocs-file" href="' & attrEscape( src ) & '" download>'
+			& '<span class="bxdocs-file__icon" aria-hidden="true">📎</span>'
+			& '<span class="bxdocs-file__title">' & encodeForHTML( title ) & '</span>'
+			& '</a>'
+	}
+
+	/**
+	 * `::: embed url="https://..." title="Caption"` - a responsive iframe
+	 * embed for a recognized provider (YouTube, Vimeo, CodePen, Spotify,
+	 * Loom, Figma); an unrecognized URL falls back to a plain link card
+	 * instead of guessing at an iframe that won't work.
+	 */
+	private string function renderEmbed( required struct attrs ) {
+		var url = trim( arguments.attrs.url ?: "" )
+		if ( !len( url ) ) {
+			return '<div class="bxdocs-embed bxdocs-embed--invalid">::: embed - missing required url="..."</div>'
+		}
+		var title = trim( arguments.attrs.title ?: "" )
+		var embedUrl = resolveEmbedUrl( url )
+
+		if ( !len( embedUrl ) ) {
+			return '<a class="bxdocs-embed-fallback" href="' & attrEscape( url ) & '" target="_blank" rel="noopener noreferrer">'
+				& ( len( title ) ? encodeForHTML( title ) : encodeForHTML( url ) ) & ' ↗</a>'
+		}
+
+		var html = '<div class="bxdocs-embed"><iframe src="' & attrEscape( embedUrl ) & '" loading="lazy" allowfullscreen'
+			& ' referrerpolicy="strict-origin-when-cross-origin"></iframe></div>'
+		if ( len( title ) ) {
+			html &= '<div class="bxdocs-embed__caption">' & encodeForHTML( title ) & '</div>'
+		}
+		return html
+	}
+
+	/**
+	 * Recognizes a handful of common providers' page URLs and converts
+	 * each to its own dedicated iframe-embeddable URL - returns `""` for
+	 * anything else, rather than emitting an iframe pointed at a page that
+	 * will just refuse to render inside one (most sites send
+	 * `X-Frame-Options`/CSP `frame-ancestors` precisely to prevent that).
+	 *
+	 * @url The page URL as authored in `::: embed url="..."`
+	 */
+	private string function resolveEmbedUrl( required string url ) {
+		var youtube = arguments.url.reFind( "(?:youtube\.com/watch\?v=|youtu\.be/)([\w-]+)" )
+			? arguments.url.reReplaceNoCase( ".*(?:youtube\.com/watch\?v=|youtu\.be/)([\w-]+).*", "\1", "one" )
+			: ""
+		if ( len( youtube ) ) {
+			return "https://www.youtube.com/embed/" & youtube
+		}
+
+		var vimeo = arguments.url.reFindNoCase( "vimeo\.com/(\d+)" )
+			? arguments.url.reReplaceNoCase( ".*vimeo\.com/(\d+).*", "\1", "one" )
+			: ""
+		if ( len( vimeo ) ) {
+			return "https://player.vimeo.com/video/" & vimeo
+		}
+
+		if ( arguments.url.reFindNoCase( "codepen\.io/[^/]+/pen/[\w-]+" ) ) {
+			return arguments.url.reReplaceNoCase( "codepen\.io/([^/]+)/pen/([\w-]+)", "codepen.io/\1/embed/\2?default-tab=result", "one" )
+		}
+
+		if ( arguments.url.reFindNoCase( "open\.spotify\.com/(track|album|playlist|episode|show)/[\w]+" ) ) {
+			return arguments.url.reReplaceNoCase( "open\.spotify\.com/", "open.spotify.com/embed/", "one" )
+		}
+
+		if ( arguments.url.reFindNoCase( "loom\.com/share/[\w]+" ) ) {
+			return arguments.url.reReplaceNoCase( "loom\.com/share/", "loom.com/embed/", "one" )
+		}
+
+		if ( arguments.url.reFindNoCase( "figma\.com/(file|design)/" ) ) {
+			return "https://www.figma.com/embed?embed_host=bxdocs&url=" & urlEncodedFormat( arguments.url )
+		}
+
+		return ""
+	}
+
+	/**
+	 * Extracts `::: update` entries from one already-extracted `::: updates`
+	 * block (see `extract()`'s own `blocks` array) - used by BuildPipeline
+	 * to build that page's own `feed.xml` (UpdatesFeedGenerator.bx),
+	 * independent of `restore()`'s own HTML rendering of the same block.
+	 *
+	 * @updatesBlock One `extract()` block whose `type` is `"updates"`
+	 * @renderer Any object exposing `toHtml( markdown, options = {} )`
+	 * @markdownOptions Passthrough options forwarded to the renderer
+	 *
+	 * @return Array of { date, tags: array, contentHtml }, in source order
+	 */
+	array function extractUpdateEntries( required struct updatesBlock, required any renderer, required struct markdownOptions ) {
+		var children = this.extract( arguments.updatesBlock.content ).blocks
+		var entries = []
+
+		for ( var child in children ) {
+			var attrs = parseAttrs( child.attrsRaw )
+			var tags = listToArray( trim( attrs.tags ?: "" ), "," ).map( tag => trim( tag ) ).filter( tag => len( tag ) )
+			entries.append( {
+				date        : trim( attrs.date ?: "" ),
+				tags        : tags,
+				contentHtml : renderNested( child.content, arguments.renderer, arguments.markdownOptions )
+			} )
+		}
+
+		return entries
+	}
+
+	/**
+	 * `::: page-link href="guides/themes.md"` - a rich preview card
+	 * linking to another page. This processor only ever sees one page's
+	 * own markdown in isolation, so it can't know that page's title/icon/
+	 * summary here - it emits a stub the theme can style immediately (the
+	 * link itself works even with no further processing) and stamps
+	 * `data-bxdocs-page-link` on it; PageLinkResolver.bx (run once, after
+	 * every page in the tree is loaded - the same shape as
+	 * `assignPrevNext()`/`assignBreadcrumbs()` in BuildPipeline.bx) finds
+	 * these stubs across all rendered pages and fills each in with its
+	 * real target's title/icon/summary.
+	 *
+	 * @attrs `href` is resolved the same file-relative way as an ordinary
+	 * markdown link (MarkdownLinkResolver.bx runs after this, so a
+	 * relative `.md` path here still gets rewritten to its built URL).
+	 */
+	private string function renderPageLinkStub( required struct attrs ) {
+		var href = trim( arguments.attrs.href ?: "" )
+		if ( !len( href ) ) {
+			return '<div class="bxdocs-page-link bxdocs-page-link--invalid">::: page-link - missing required href="..."</div>'
+		}
+		return '<a class="bxdocs-page-link" href="' & attrEscape( href ) & '" data-bxdocs-page-link>'
+			& '<span class="bxdocs-page-link__title">' & encodeForHTML( href ) & '</span>'
+			& '</a>'
+	}
+
+}

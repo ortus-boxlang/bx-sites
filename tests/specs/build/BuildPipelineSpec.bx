@@ -98,6 +98,68 @@ class extends="testbox.system.BaseSpec" {
 				expect( setupHtml ).toInclude( 'href="/guides/other/index.html##anchor"' );
 			} );
 
+			it( "wires includes, directive blocks and page-link enrichment together end to end", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/_shared.md", "Shared note." );
+				fileWrite(
+					root & "/docs/index.md",
+					'::: include src="_shared.md"' & char( 10 ) &
+					char( 10 ) &
+					'::: expandable "FAQ"' & char( 10 ) &
+					"Body." & char( 10 ) &
+					":::" & char( 10 ) &
+					char( 10 ) &
+					'::: page-link href="guides/setup.md"' & char( 10 ) &
+					":::"
+				);
+				directoryCreate( root & "/docs/guides", true, true );
+				fileWrite( root & "/docs/guides/setup.md", "---" & char( 10 ) & "title: Setup" & char( 10 ) & "---" & char( 10 ) & "Setup body" );
+
+				pipeline.build( root );
+
+				var homeHtml = fileRead( root & "/site/index.html" );
+				expect( homeHtml ).toInclude( "Shared note." );
+				expect( homeHtml ).toInclude( '<details class="bxdocs-expandable">' );
+				expect( homeHtml ).toInclude( "<summary>FAQ</summary>" );
+				// The page-link stub got enriched with its target's real title.
+				expect( homeHtml ).toInclude( '<span class="bxdocs-page-link__title">Setup</span>' );
+			} );
+
+			it( "resolves a named icon in both a page's own header and its nav entry", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "icon: rocket" & char( 10 ) & "---" & char( 10 ) & "Home" );
+
+				pipeline.build( root );
+				var html = fileRead( root & "/site/index.html" );
+
+				expect( html ).toInclude( '<span class="page-icon"><svg class="bxdocs-icon"' );
+				// Same resolved icon also appears a second time, in the sidebar nav entry for this page.
+				expect( reMatch( 'class="bxdocs-icon"', html ).len() ).toBeGTE( 2 );
+			} );
+
+			it( "writes a feed.xml alongside a page with an ::: updates block, only when baseURL is absolute", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/docs/changelog.md",
+					"::: updates" & char( 10 ) &
+					'::: update date="2026-01-01" tags="feature"' & char( 10 ) &
+					"Initial release." & char( 10 ) &
+					":::" & char( 10 ) &
+					":::"
+				);
+
+				pipeline.build( root );
+				expect( fileExists( root & "/site/changelog/feed.xml" ) ).toBeFalse();
+
+				fileWrite( root & "/bxdocs.json", '{"name":"Test Site","baseURL":"https://example.com/","theme":{"name":"bootstrap"}}' );
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/changelog/feed.xml" ) ).toBeTrue();
+				var feed = fileRead( root & "/site/changelog/feed.xml" );
+				expect( feed ).toInclude( "<rss version=" );
+				expect( feed ).toInclude( "Initial release." );
+			} );
+
 			it( "passes bxdocs.json's markdown options through to the markdown renderer", function() {
 				var root = newProject();
 				fileWrite(

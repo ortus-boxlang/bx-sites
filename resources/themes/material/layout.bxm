@@ -9,14 +9,14 @@
 		var html = "<ul class=""md-nav" & ( arguments.nested ? " md-nav--nested" : "" ) & """>"
 		for ( var node in arguments.nodes ) {
 			if ( !len( node.url ) && node.children.len() && variables.navCollapsible ) {
-				html &= "<li class=""md-nav__item""><details class=""md-nav__section""" & ( variables.navExpandAll ? " open" : "" ) & "><summary class=""md-nav__heading"">" & encodeForHTML( node.title ) & "</summary>" & renderNavList( node.children, true ) & "</details></li>"
+				html &= "<li class=""md-nav__item""><details class=""md-nav__section""" & ( variables.navExpandAll ? " open" : "" ) & "><summary class=""md-nav__heading"">" & ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title ) & "</summary>" & renderNavList( node.children, true ) & "</details></li>"
 				continue
 			}
 			html &= "<li class=""md-nav__item"">"
 			if ( len( node.url ) ) {
-				html &= "<a class=""md-nav__link"" href=""" & variables.basePath & node.url & """>" & encodeForHTML( node.title ) & "</a>"
+				html &= "<a class=""md-nav__link"" href=""" & variables.basePath & node.url & """>" & ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title ) & "</a>"
 			} else {
-				html &= "<span class=""md-nav__heading"">" & encodeForHTML( node.title ) & "</span>"
+				html &= "<span class=""md-nav__heading"">" & ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title ) & "</span>"
 			}
 			if ( node.children.len() ) {
 				html &= renderNavList( node.children, true )

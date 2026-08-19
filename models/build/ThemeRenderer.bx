@@ -13,7 +13,7 @@
  *     (the already-converted markdown, set by BuildPipeline before rendering).
  *     `variables.page.toc`, `.prevPage`, `.nextPage`, `.breadcrumbs`,
  *     `.editUrl`, `.lastUpdated`, `.description`, `.tags`, `.icon`,
- *     `.summary` and `.ogImage` are always present too (defaulted by
+ *     `.iconHtml`, `.summary` and `.ogImage` are always present too (defaulted by
  *     `renderPage()` below if the caller didn't set them - empty
  *     string/array when `bxdocs.json`'s `repo.editUri`/`lastUpdated` aren't
  *     configured, or the page has no matching frontmatter key), so a
@@ -157,6 +157,9 @@ class {
 		}
 		if ( !variables.page.keyExists( "icon" ) ) {
 			variables.page.icon = ""
+		}
+		if ( !variables.page.keyExists( "iconHtml" ) ) {
+			variables.page.iconHtml = ""
 		}
 		if ( !variables.page.keyExists( "summary" ) ) {
 			variables.page.summary = ""
