@@ -1,11 +1,16 @@
 // Vendors the self-hosted icon libraries under resources/assets/icons/ -
 // bx-docs' own `icon:` frontmatter/nav-icon support (IconResolver.bx)
 // reads one SVG file per icon straight off disk at build time and inlines
-// it into the page, so the *installed module* carries every icon in all
-// four libraries (a few thousand small SVGs, tens of MB on disk) while
-// any one built *site* only ever pays for the handful it actually
+// it into the page, so the *installed module* carries every icon in
+// every library/weight (many thousand small SVGs, tens of MB on disk)
+// while any one built *site* only ever pays for the handful it actually
 // references - same approach mkdocs-material's own bundled Material/
 // FontAwesome/Octicons icon sets use.
+//
+// Phosphor ships all six of its own weights (thin/light/regular/bold/
+// fill/duotone) - each vendored as its own library, e.g.
+// `phosphor-thin:rocket`, with bare `phosphor:` staying an alias for
+// regular.
 //
 // Font Awesome is deliberately not one of these: its Duotone style (and
 // most of its non-brand icon set in v6+) is Pro-only, not available
@@ -60,6 +65,10 @@ function vendor(label, sourceDir, destSubdir, stripSuffix = "") {
 }
 
 vendor("phosphor", "node_modules/@phosphor-icons/core/assets/regular", "phosphor");
+vendor("phosphor-thin", "node_modules/@phosphor-icons/core/assets/thin", "phosphor-thin", "-thin");
+vendor("phosphor-light", "node_modules/@phosphor-icons/core/assets/light", "phosphor-light", "-light");
+vendor("phosphor-bold", "node_modules/@phosphor-icons/core/assets/bold", "phosphor-bold", "-bold");
+vendor("phosphor-fill", "node_modules/@phosphor-icons/core/assets/fill", "phosphor-fill", "-fill");
 vendor("phosphor-duotone", "node_modules/@phosphor-icons/core/assets/duotone", "phosphor-duotone", "-duotone");
 vendor("lucide", "node_modules/lucide-static/icons", "lucide");
 vendor("tabler", "node_modules/@tabler/icons/icons/outline", "tabler");

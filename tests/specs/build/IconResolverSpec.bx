@@ -51,6 +51,18 @@ class extends="testbox.system.BaseSpec" {
 				expect( svg ).notToBe( resolver.resolve( "phosphor:rocket" ) );
 			} );
 
+			it( "resolves every Phosphor weight to distinct markup for the same icon name", function() {
+				var weights = [ "phosphor-thin", "phosphor-light", "phosphor", "phosphor-bold", "phosphor-fill", "phosphor-duotone" ];
+				var seen = {};
+				for ( var weight in weights ) {
+					var svg = resolver.resolve( weight & ":rocket" );
+					expect( svg ).toInclude( "<svg" );
+					expect( svg ).toInclude( "bxdocs-icon" );
+					expect( seen.keyExists( svg ) ).toBeFalse( "#weight# produced markup identical to another weight" );
+					seen[ svg ] = true;
+				}
+			} );
+
 			it( "different libraries resolve to different markup for the same icon name", function() {
 				expect( resolver.resolve( "lucide:rocket" ) ).notToBe( resolver.resolve( "tabler:rocket" ) );
 			} );
