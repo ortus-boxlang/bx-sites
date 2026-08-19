@@ -28,6 +28,9 @@ box install bx-docs
 box install bx-markdown
 box install bx-esapi
 
+# ...or, without CommandBox, BoxLang's own installer takes all three at once:
+# install-bx-module bx-docs bx-markdown bx-esapi
+
 # Scaffold a new docs project (docs/ + bxdocs.json)
 bxDocs new my-docs
 cd my-docs

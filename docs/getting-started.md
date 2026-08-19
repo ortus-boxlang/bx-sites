@@ -21,6 +21,13 @@ box install bx-markdown
 box install bx-esapi
 ```
 
+Or, without CommandBox, BoxLang's own installer takes all three in one
+command:
+
+```bash
+install-bx-module bx-docs bx-markdown bx-esapi
+```
+
 `box install`/`install-bx-module` reads `box.json`'s `boxlang.executable`
 and drops a `bxDocs` script on your `PATH` (in `~/.boxlang/bin`), so every
 command below works either as a short standalone command:
