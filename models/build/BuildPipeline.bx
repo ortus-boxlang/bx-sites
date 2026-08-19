@@ -23,6 +23,7 @@ class {
 	variables.tabsProcessor = new "models.build.TabsProcessor@bxdocs"()
 	variables.mathProtector = new "models.build.MathProtector@bxdocs"()
 	variables.codeAnnotationProcessor = new "models.build.CodeAnnotationProcessor@bxdocs"()
+	variables.markdownLinkResolver = new "models.build.MarkdownLinkResolver@bxdocs"()
 	variables.pluginLoader = new "models.build.PluginLoader@bxdocs"()
 	variables.pluginsOverride = []
 	variables.hasPluginsOverride = false
@@ -173,7 +174,7 @@ class {
 
 		directoryCreate( arguments.outputDir, true, true )
 
-		convertMarkdown( pages, arguments.config, arguments.plugins )
+		convertMarkdown( pages, arguments.config, arguments.plugins, arguments.basePath )
 		assignTableOfContents( pages )
 		assignPrevNext( pages, flatSequence )
 		assignBreadcrumbs( pages, nav )
@@ -325,10 +326,16 @@ class {
 	 * TabsProcessor.bx/MathProtector.bx/CodeAnnotationProcessor.bx's own
 	 * docblocks for why this shape is necessary.
 	 *
+	 * Also rewrites every relative `.md` link (`[Search](search.md)`,
+	 * mkdocs' own file-relative-link convention, GitHub-readable and
+	 * built-site-readable alike) into its built pretty-URL equivalent -
+	 * see MarkdownLinkResolver.bx.
+	 *
 	 * @pages Array of page structs from DocsLoader.load()
 	 * @config The site's bxdocs.json config
+	 * @basePath Root-relative base path ending with `/` - relative `.md` links are re-rooted under it, same as every other internal link the theme renders
 	 */
-	private void function convertMarkdown( required array pages, required struct config, array plugins = [] ) {
+	private void function convertMarkdown( required array pages, required struct config, array plugins = [], string basePath = "/" ) {
 		for ( var page in arguments.pages ) {
 			var markdown = variables.pluginLoader.applyOnPageMarkdown( arguments.plugins, page.body, page, arguments.config )
 
@@ -340,6 +347,7 @@ class {
 			html = variables.codeAnnotationProcessor.applyToHtml( html, codeExtracted.annotations )
 			html = variables.mathProtector.restore( html, mathProtected.formulas )
 			html = variables.tabsProcessor.restore( html, tabsExtracted.groups, variables.markdownRenderer, arguments.config.markdown )
+			html = variables.markdownLinkResolver.resolve( html, page.relativePath, arguments.basePath )
 
 			html = variables.pluginLoader.applyOnPageHtml( arguments.plugins, html, page, arguments.config )
 

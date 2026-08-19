@@ -83,6 +83,26 @@ docs/
 (A large site can override this inferred order/grouping entirely with an
 explicit nav - see [`nav`](configuration.md#nav).)
 
+### Linking between pages
+
+Link to another page the normal mkdocs way - a file-relative path to its
+`.md` source, exactly as if the two files were sitting next to each other
+on disk (because they are):
+
+```markdown
+See [Deployment](guides/deployment.md) or, from that same guide,
+[back to Getting Started](../getting-started.md#add-pages).
+```
+
+BX Docs rewrites every such link to its built pretty-URL at build time
+(`guides/deployment.md` -> `/guides/deployment/index.html`, anchors and
+query strings preserved), resolved against the *linking* page's own
+folder - `../` and sibling references work exactly like they would
+resolving any other relative path. This is also why the link keeps
+working if you read the file directly on GitHub instead of the built
+site: it's a real, valid relative path to a real file either way. Absolute
+URLs, `mailto:`, and links already starting with `/` are left untouched.
+
 Each page can start with a small frontmatter block:
 
 ```markdown

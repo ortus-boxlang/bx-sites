@@ -81,13 +81,13 @@ flowchart LR
     A["page.body\n(raw markdown)"] --> B["onPageMarkdown\n(plugins)"]
     B --> C["TabsProcessor.extract()\nMathProtector.protect()\nCodeAnnotationProcessor.extractAndStrip()"]
     C --> D["Markdown()\n(bx-markdown)"]
-    D --> E["CodeAnnotationProcessor.applyToHtml()\nMathProtector.restore()\nTabsProcessor.restore()"]
+    D --> E["CodeAnnotationProcessor.applyToHtml()\nMathProtector.restore()\nTabsProcessor.restore()\nMarkdownLinkResolver.resolve()"]
     E --> F["onPageHtml\n(plugins)"]
     F --> G["page.contentHtml"]
 ```
 
 1. **Loader** — walks `docs/`, reads `.md` files + frontmatter (`title`, `order`, `hidden`)
-2. **Parser** — delegates entirely to **bx-markdown** (`Markdown()` BIF / `bx:markdown` component) for markdown-to-HTML conversion, including admonitions (`!!! type "Title"`), footnotes and definition lists via bx-markdown's own native Flexmark extensions (`markdown.enableAdmonition`/`enableFootnotes`/`enableDefinitionLists`). No custom parsing on the bx-docs side for those three. Content tabs (`=== "Title"`), math (`$...$`/`$$...$$`, KaTeX client-side), and fenced-code `hl_lines`/`linenums`/`title` annotations have no Flexmark extension to lean on, so bx-docs implements each as its own pre/post-processing pass around `Markdown()` instead (`TabsProcessor`/`MathProtector`/`CodeAnnotationProcessor`) — protect the source from Flexmark's own inline parsing before conversion, restore/apply against the rendered HTML after.
+2. **Parser** — delegates entirely to **bx-markdown** (`Markdown()` BIF / `bx:markdown` component) for markdown-to-HTML conversion, including admonitions (`!!! type "Title"`), footnotes and definition lists via bx-markdown's own native Flexmark extensions (`markdown.enableAdmonition`/`enableFootnotes`/`enableDefinitionLists`). No custom parsing on the bx-docs side for those three. Content tabs (`=== "Title"`), math (`$...$`/`$$...$$`, KaTeX client-side), and fenced-code `hl_lines`/`linenums`/`title` annotations have no Flexmark extension to lean on, so bx-docs implements each as its own pre/post-processing pass around `Markdown()` instead (`TabsProcessor`/`MathProtector`/`CodeAnnotationProcessor`) — protect the source from Flexmark's own inline parsing before conversion, restore/apply against the rendered HTML after. A page-to-page link written the normal mkdocs way — a file-relative path to another page's `.md` source, e.g. `[Search](../guides/search.md)` — is also rendered by bx-markdown completely verbatim, since it has no concept of where that file will eventually be built; `MarkdownLinkResolver` runs as a post-processing-only pass (no pre-processing needed) that rewrites every such `href` to its built pretty-URL, resolved against the *linking* page's own directory.
 3. **Nav builder** — folder/file structure → nav tree, frontmatter overrides applied
 4. **Theme renderer** — invokes the active theme's `.bxm` templates with page data + nav tree in scope
 5. **Search indexer** — builds a static JSON index (title, url, headings, truncated body text)
