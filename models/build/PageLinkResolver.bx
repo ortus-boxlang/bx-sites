@@ -1,0 +1,88 @@
+/**
+ * Enriches every `::: page-link href="..."` stub (DirectiveBlockProcessor.bx's
+ * `renderPageLinkStub()`) with its target page's own title/icon/summary,
+ * turning a plain link into a rich preview card. Runs once, after every
+ * page in the tree has been through `convertMarkdown()` - the same shape
+ * as `BuildPipeline.assignPrevNext()`/`assignBreadcrumbs()` - because a
+ * page-link stub only knows the page it's written on; the page it points
+ * *at* is only known once the whole tree's pages are loaded.
+ *
+ * By the time this runs, MarkdownLinkResolver.bx has already rewritten
+ * the stub's `href` from its authored relative `.md` path to its final
+ * built URL (`basePath` + `urlPath`) - the same string every other page's
+ * `urlPath` resolves to - so matching a stub to its target page is a
+ * plain lookup, not another round of relative-path resolution.
+ */
+class {
+
+	variables.stubPattern = createObject( "java", "java.util.regex.Pattern" ).compile(
+		'<a class="bxdocs-page-link" href="([^"]*)" data-bxdocs-page-link><span class="bxdocs-page-link__title">[^<]*</span></a>'
+	)
+
+	/**
+	 * Replaces every page-link stub across `pages` with a rich preview
+	 * card once its target is found in `pages` itself; a stub whose
+	 * target isn't found (a typo, or a link out of this tree) is left as
+	 * the plain link the stub already renders as - broken enrichment
+	 * degrades to "just a link", not a build failure.
+	 *
+	 * @pages Array of page structs, each with `contentHtml` already set by convertMarkdown()
+	 * @basePath Root-relative base path ending with `/` - every page's own `urlPath` is matched against a stub's href as `basePath & urlPath`
+	 */
+	void function resolve( required array pages, required string basePath ) {
+		var byUrl = {}
+		for ( var page in arguments.pages ) {
+			byUrl[ arguments.basePath & page.urlPath ] = page
+		}
+
+		for ( var page in arguments.pages ) {
+			if ( !findNoCase( "data-bxdocs-page-link", page.contentHtml ?: "" ) ) {
+				continue
+			}
+
+			var matcher = variables.stubPattern.matcher( page.contentHtml )
+			var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+
+			while ( matcher.find() ) {
+				var href = matcher.group( 1 )
+				var target = byUrl[ href ] ?: javacast( "null", "" )
+				var replacement = isNull( target ) ? matcher.group() : renderCard( href, target )
+				matcher.appendReplacement( buffer, quoteReplacement( replacement ) )
+			}
+			matcher.appendTail( buffer )
+
+			page.contentHtml = buffer.toString()
+		}
+	}
+
+	/**
+	 * @href The stub's own (already fully-resolved) href
+	 * @target The matching page struct from `pages`
+	 */
+	private string function renderCard( required string href, required struct target ) {
+		var icon = trim( arguments.target.icon ?: "" )
+		var summary = len( trim( arguments.target.summary ?: "" ) ) ? trim( arguments.target.summary ) : trim( arguments.target.description ?: "" )
+
+		var html = '<a class="bxdocs-page-link" href="' & encodeForHTML( arguments.href ) & '" data-bxdocs-page-link>'
+		if ( len( icon ) ) {
+			html &= '<span class="bxdocs-page-link__icon">' & encodeForHTML( icon ) & '</span>'
+		}
+		html &= '<span class="bxdocs-page-link__text">'
+			& '<span class="bxdocs-page-link__title">' & encodeForHTML( arguments.target.title ) & '</span>'
+		if ( len( summary ) ) {
+			html &= '<span class="bxdocs-page-link__summary">' & encodeForHTML( summary ) & '</span>'
+		}
+		html &= '</span></a>'
+		return html
+	}
+
+	/**
+	 * Escapes literal text for use as a `Matcher#appendReplacement` argument.
+	 *
+	 * @text Literal text to safely pass through java.util.regex.Matcher#appendReplacement, which otherwise treats `$` and `\` as backreference syntax
+	 */
+	private string function quoteReplacement( required string text ) {
+		return createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( arguments.text )
+	}
+
+}

@@ -672,3 +672,318 @@ dd {
 [data-theme="dark"] .bxdocs-hl-line {
 	background: rgba( 255, 213, 0, 0.12 );
 }
+
+/* GitBook-style ::: directive blocks (see DirectiveBlockProcessor.bx) */
+.bxdocs-expandable {
+	margin: 1rem 0;
+	border: 1px solid rgba( 0, 0, 0, 0.12 );
+	border-radius: 6px;
+	padding: 0.75rem 1rem;
+}
+
+.bxdocs-expandable > summary {
+	cursor: pointer;
+	font-weight: 600;
+}
+
+.bxdocs-expandable__body {
+	margin-top: 0.75rem;
+}
+
+.bxdocs-expandable__body > :last-child {
+	margin-bottom: 0;
+}
+
+.bxdocs-cards {
+	display: grid;
+	grid-template-columns: repeat( auto-fill, minmax( 220px, 1fr ) );
+	gap: 1rem;
+	margin: 1.5rem 0;
+}
+
+.bxdocs-card {
+	display: block;
+	border: 1px solid rgba( 0, 0, 0, 0.12 );
+	border-radius: 8px;
+	padding: 1.25rem;
+	color: inherit;
+	text-decoration: none;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+a.bxdocs-card:hover {
+	border-color: var( --bxdocs-link );
+	box-shadow: 0 2px 10px rgba( 0, 0, 0, 0.08 );
+}
+
+.bxdocs-card__image {
+	display: block;
+	width: 100%;
+	border-radius: 6px;
+	margin-bottom: 0.75rem;
+}
+
+.bxdocs-card__icon {
+	font-size: 1.75rem;
+	margin-bottom: 0.5rem;
+}
+
+.bxdocs-card__title {
+	font-weight: 600;
+	margin-bottom: 0.35rem;
+}
+
+.bxdocs-card__body {
+	font-size: 0.9rem;
+	opacity: 0.85;
+}
+
+.bxdocs-card__body > :last-child {
+	margin-bottom: 0;
+}
+
+.bxdocs-columns {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.5rem;
+	margin: 1.5rem 0;
+}
+
+.bxdocs-column {
+	flex: 1 1 0;
+	min-width: 200px;
+	width: var( --bxdocs-column-width, auto );
+}
+
+.bxdocs-column > :last-child {
+	margin-bottom: 0;
+}
+
+.bxdocs-stepper {
+	margin: 1.5rem 0;
+}
+
+.bxdocs-step {
+	display: flex;
+	gap: 1rem;
+	padding-bottom: 1.5rem;
+	position: relative;
+}
+
+.bxdocs-step:not( :last-child )::before {
+	content: "";
+	position: absolute;
+	left: 0.9rem;
+	top: 2rem;
+	bottom: 0;
+	width: 2px;
+	background: rgba( 0, 0, 0, 0.12 );
+}
+
+.bxdocs-step__marker {
+	flex-shrink: 0;
+	width: 1.9rem;
+	height: 1.9rem;
+	border-radius: 50%;
+	background: var( --bxdocs-accent );
+	color: #04121a;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 700;
+	font-size: 0.85rem;
+	z-index: 1;
+}
+
+.bxdocs-step__content {
+	padding-top: 0.15rem;
+}
+
+.bxdocs-step__title {
+	font-weight: 600;
+	margin-bottom: 0.25rem;
+}
+
+.bxdocs-step__content > :last-child {
+	margin-bottom: 0;
+}
+
+.bxdocs-file {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	border: 1px solid rgba( 0, 0, 0, 0.12 );
+	border-radius: 6px;
+	padding: 0.5rem 0.9rem;
+	margin: 0.5rem 0;
+	color: inherit;
+	text-decoration: none;
+	font-weight: 600;
+}
+
+.bxdocs-file:hover {
+	border-color: var( --bxdocs-link );
+}
+
+.bxdocs-embed {
+	position: relative;
+	margin: 1.5rem 0;
+	padding-top: 56.25%;
+	border-radius: 8px;
+	overflow: hidden;
+	background: rgba( 0, 0, 0, 0.06 );
+}
+
+.bxdocs-embed iframe {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	border: 0;
+}
+
+.bxdocs-embed__caption {
+	margin-top: 0.5rem;
+	font-size: 0.85rem;
+	opacity: 0.75;
+}
+
+.bxdocs-embed-fallback {
+	display: inline-block;
+	margin: 0.5rem 0;
+}
+
+.bxdocs-page-link {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	border: 1px solid rgba( 0, 0, 0, 0.12 );
+	border-radius: 8px;
+	padding: 0.9rem 1.1rem;
+	margin: 1rem 0;
+	color: inherit;
+	text-decoration: none;
+}
+
+.bxdocs-page-link:hover {
+	border-color: var( --bxdocs-link );
+}
+
+.bxdocs-page-link__icon {
+	font-size: 1.5rem;
+	flex-shrink: 0;
+}
+
+.bxdocs-page-link__title {
+	font-weight: 600;
+	display: block;
+}
+
+.bxdocs-page-link__summary {
+	display: block;
+	font-size: 0.85rem;
+	opacity: 0.75;
+	margin-top: 0.15rem;
+}
+
+.bxdocs-updates {
+	margin: 1.5rem 0;
+}
+
+.bxdocs-update {
+	border-left: 2px solid rgba( 0, 0, 0, 0.12 );
+	padding: 0 0 1.5rem 1.25rem;
+	margin-left: 0.25rem;
+}
+
+.bxdocs-update__meta {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-bottom: 0.5rem;
+}
+
+.bxdocs-update__date {
+	font-weight: 700;
+}
+
+.bxdocs-update__tag {
+	background: rgba( 0, 0, 0, 0.06 );
+	border-radius: 999px;
+	padding: 0.1rem 0.6rem;
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
+.bxdocs-update__body > :last-child {
+	margin-bottom: 0;
+}
+
+[data-theme="dark"] .bxdocs-expandable,
+[data-theme="dark"] .bxdocs-card,
+[data-theme="dark"] .bxdocs-file,
+[data-theme="dark"] .bxdocs-page-link,
+[data-theme="dark"] .bxdocs-update {
+	border-color: rgba( 255, 255, 255, 0.15 );
+}
+
+[data-theme="dark"] .bxdocs-step:not( :last-child )::before {
+	background: rgba( 255, 255, 255, 0.15 );
+}
+
+[data-theme="dark"] .bxdocs-embed {
+	background: rgba( 255, 255, 255, 0.06 );
+}
+
+[data-theme="dark"] .bxdocs-update__tag {
+	background: rgba( 255, 255, 255, 0.08 );
+}
+
+/* Image captions/alignment/framing - GitBook-compatible raw HTML
+   (<figure>/<figcaption>, [data-with-frame]) that bx-markdown/Flexmark
+   already passes through untouched as a block-level HTML element - see
+   docs/guides/markdown.md#images. */
+.page-content figure,
+.md-card figure {
+	margin: 1.5rem 0;
+	text-align: center;
+}
+
+.page-content figure img,
+.md-card figure img {
+	max-width: 100%;
+	border-radius: 6px;
+}
+
+.page-content figcaption,
+.md-card figcaption {
+	margin-top: 0.5rem;
+	font-size: 0.85rem;
+	opacity: 0.75;
+}
+
+[data-with-frame] {
+	display: inline-block;
+	padding: 0.5rem;
+	border: 1px solid rgba( 0, 0, 0, 0.12 );
+	border-radius: 8px;
+}
+
+[data-theme="dark"] [data-with-frame] {
+	border-color: rgba( 255, 255, 255, 0.15 );
+}
+
+.bxdocs-gallery {
+	display: grid;
+	grid-template-columns: repeat( auto-fill, minmax( 160px, 1fr ) );
+	gap: 0.75rem;
+	margin: 1.5rem 0;
+}
+
+.bxdocs-gallery img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 6px;
+}

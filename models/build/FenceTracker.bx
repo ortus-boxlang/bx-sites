@@ -1,0 +1,59 @@
+/**
+ * Tracks whether the current line of a markdown document sits inside an
+ * open fenced code block, one line at a time, in document order -
+ * CommonMark-nesting-aware (a fence opened with 4+ backticks can only be
+ * closed by a line of 4+ backticks; a 3-backtick line "inside" it is
+ * literal content, e.g. a doc page showing fence syntax as an example -
+ * see CodeAnnotationProcessor.bx's own docblock for the fuller
+ * explanation of why this matters).
+ *
+ * Every line-scanning pre-processor that looks for its own trigger
+ * syntax directly in raw markdown text (TabsProcessor, MathProtector,
+ * IncludeProcessor, DirectiveBlockProcessor) needs this same fence
+ * awareness - without it, a page demonstrating that syntax *as* a
+ * fenced-code example (rather than using it for real) gets its example
+ * misread as the real thing. One `FenceTracker` instance per document,
+ * `consume()` called once per line in order.
+ */
+class {
+
+	variables.fenceChar = ""
+	variables.fenceLength = 0
+
+	/**
+	 * Advances the tracker by one line and reports whether that line is
+	 * off-limits for any other processor's own special-syntax matching -
+	 * either because a fence is already open, or because this line is
+	 * itself a fence delimiter (opening or closing).
+	 *
+	 * @line The next raw source line, in document order, at its original indentation
+	 *
+	 * @return true if `line` is fence-protected (skip special-syntax matching on it)
+	 */
+	boolean function consume( required string line ) {
+		var trimmedLine = trim( arguments.line )
+		// A fence delimiter (open or close) only counts as one when indented
+		// at most 3 spaces (CommonMark) - a 4+ space or tab indent makes it
+		// just body content, e.g. a code sample shown *inside* an indented
+		// tab/admonition body that itself contains a fenced snippet.
+		var tooIndented = arguments.line.reFind( "^(\t| {4,})" ) > 0
+
+		if ( variables.fenceLength > 0 ) {
+			if ( !tooIndented && trimmedLine.reFind( "^" & variables.fenceChar & "{" & variables.fenceLength & ",}$" ) ) {
+				variables.fenceLength = 0
+				variables.fenceChar = ""
+			}
+			return true
+		}
+
+		if ( tooIndented || !trimmedLine.reFind( "^(```+|~~~+)" ) ) {
+			return false
+		}
+
+		var marker = trimmedLine.reReplace( "^(```+|~~~+).*", "\1", "one" )
+		variables.fenceChar = left( marker, 1 )
+		variables.fenceLength = len( marker )
+		return true
+	}
+
+}

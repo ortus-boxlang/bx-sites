@@ -1,0 +1,54 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.UpdatesFeedGenerator", function() {
+
+			beforeEach( function() {
+				variables.generator = new "models.build.UpdatesFeedGenerator@bxdocs"();
+				variables.page = { title : "Changelog", urlPath : "changelog/index.html" };
+			} );
+
+			it( "renders a valid RSS 2.0 shell with the page's title/link", function() {
+				var xml = generator.build( [], page, "BX Docs", "https://example.com/" );
+
+				expect( xml ).toInclude( '<rss version="2.0">' );
+				expect( xml ).toInclude( "<title>BX Docs - Changelog</title>" );
+				expect( xml ).toInclude( "<link>https://example.com/changelog/index.html</link>" );
+			} );
+
+			it( "sorts entries newest date first regardless of input order", function() {
+				var entries = [
+					{ date : "2026-01-01", tags : [], contentHtml : "<p>Old.</p>" },
+					{ date : "2026-02-01", tags : [], contentHtml : "<p>New.</p>" }
+				];
+
+				var xml = generator.build( entries, page, "BX Docs", "https://example.com/" );
+
+				expect( xml.find( "New." ) ).toBeLT( xml.find( "Old." ) );
+			} );
+
+			it( "renders one <category> per tag and none when an entry has no tags", function() {
+				var entries = [
+					{ date : "2026-01-01", tags : [ "feature", "fix" ], contentHtml : "<p>A.</p>" },
+					{ date : "2026-01-02", tags : [], contentHtml : "<p>B.</p>" }
+				];
+
+				var xml = generator.build( entries, page, "BX Docs", "https://example.com/" );
+
+				expect( xml ).toInclude( "<category>feature</category>" );
+				expect( xml ).toInclude( "<category>fix</category>" );
+			} );
+
+			it( "HTML-escapes an entry's rendered content in <description>", function() {
+				var entries = [ { date : "2026-01-01", tags : [], contentHtml : "<p>A & B</p>" } ];
+
+				var xml = generator.build( entries, page, "BX Docs", "https://example.com/" );
+
+				expect( xml ).toInclude( "&lt;p&gt;" );
+				expect( xml ).notToInclude( "<p>A & B</p>" );
+			} );
+
+		} );
+	}
+
+}

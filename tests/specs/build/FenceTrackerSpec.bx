@@ -1,0 +1,53 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.FenceTracker", function() {
+
+			beforeEach( function() {
+				variables.tracker = new "models.build.FenceTracker@bxdocs"();
+			} );
+
+			it( "reports ordinary text as unprotected", function() {
+				expect( tracker.consume( "Just a paragraph." ) ).toBeFalse();
+			} );
+
+			it( "protects an opening fence line itself and everything until its matching close", function() {
+				expect( tracker.consume( "```bx" ) ).toBeTrue();
+				expect( tracker.consume( "some code" ) ).toBeTrue();
+				expect( tracker.consume( "```" ) ).toBeTrue();
+				expect( tracker.consume( "back to normal" ) ).toBeFalse();
+			} );
+
+			it( "does not let a shorter fence marker close a longer one (CommonMark nesting)", function() {
+				expect( tracker.consume( "````markdown" ) ).toBeTrue();
+				expect( tracker.consume( "```bx" ) ).toBeTrue();
+				expect( tracker.consume( "code" ) ).toBeTrue();
+				expect( tracker.consume( "```" ) ).toBeTrue();
+				// Still inside the outer 4-backtick fence.
+				expect( tracker.consume( "more text" ) ).toBeTrue();
+				expect( tracker.consume( "````" ) ).toBeTrue();
+				expect( tracker.consume( "back to normal" ) ).toBeFalse();
+			} );
+
+			it( "does not treat a 4+ space indented backtick line as a real fence delimiter", function() {
+				expect( tracker.consume( "```markdown" ) ).toBeTrue();
+				expect( tracker.consume( "    ```java" ) ).toBeTrue();
+				expect( tracker.consume( "    code" ) ).toBeTrue();
+				expect( tracker.consume( "    ```" ) ).toBeTrue();
+				// Still inside the outer fence - the indented ``` lines didn't close it.
+				expect( tracker.consume( "still inside" ) ).toBeTrue();
+				expect( tracker.consume( "```" ) ).toBeTrue();
+				expect( tracker.consume( "back to normal" ) ).toBeFalse();
+			} );
+
+			it( "supports ~~~ fences the same way as ```", function() {
+				expect( tracker.consume( "~~~" ) ).toBeTrue();
+				expect( tracker.consume( "code" ) ).toBeTrue();
+				expect( tracker.consume( "~~~" ) ).toBeTrue();
+				expect( tracker.consume( "back to normal" ) ).toBeFalse();
+			} );
+
+		} );
+	}
+
+}

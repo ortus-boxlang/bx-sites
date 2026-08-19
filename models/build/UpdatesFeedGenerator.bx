@@ -1,0 +1,55 @@
+/**
+ * Builds an RSS 2.0 feed for one page's `::: updates` block
+ * (DirectiveBlockProcessor.bx) - the same "subscribe to a changelog"
+ * convention GitBook's own Updates block offers. Only meaningful with a
+ * real absolute site URL, same as SitemapGenerator.bx - RSS `<link>`
+ * values must be absolute - so BuildPipeline only calls this when
+ * BaseUrlResolver found one.
+ */
+class {
+
+	/**
+	 * Renders one page's changelog as `feed.xml`, newest entry first.
+	 *
+	 * @entries Array of `{ date, tags, contentHtml }`, in source order (DirectiveBlockProcessor's own `::: update` children, already markdown-rendered)
+	 * @page The page struct the `::: updates` block lives on (`title`/`urlPath` used)
+	 * @siteName The site's own name (bxdocs.json's `name`), used as the feed's channel title prefix
+	 * @siteUrl The absolute site URL, ending with `/` (BaseUrlResolver's `absolute`)
+	 *
+	 * @return The rendered feed.xml content
+	 */
+	string function build( required array entries, required struct page, required string siteName, required string siteUrl ) {
+		var pageUrl = arguments.siteUrl & arguments.page.urlPath
+		var sorted = duplicate( arguments.entries )
+		sorted.sort( ( a, b ) => compare( b.date, a.date ) )
+
+		var lines = [
+			'<?xml version="1.0" encoding="UTF-8"?>',
+			'<rss version="2.0"><channel>',
+			"	<title>" & encodeForHTML( arguments.siteName & " - " & arguments.page.title ) & "</title>",
+			"	<link>" & encodeForHTML( pageUrl ) & "</link>",
+			"	<description>" & encodeForHTML( "Changelog updates for " & arguments.page.title ) & "</description>"
+		]
+
+		for ( var entry in sorted ) {
+			lines.append( "	<item>" )
+			lines.append( "		<title>" & encodeForHTML( len( trim( entry.date ) ) ? entry.date : arguments.page.title ) & "</title>" )
+			lines.append( "		<link>" & encodeForHTML( pageUrl ) & "</link>" )
+			lines.append( '		<guid isPermaLink="false">' & encodeForHTML( pageUrl & "##" & entry.date & "-" & hash( entry.contentHtml ) ) & "</guid>" )
+			if ( len( trim( entry.date ) ) && isDate( entry.date ) ) {
+				lines.append( "		<pubDate>" & dateTimeFormat( entry.date, "EEE, dd MMM yyyy" ) & " 00:00:00 +0000</pubDate>" )
+			}
+			for ( var tag in ( entry.tags ?: [] ) ) {
+				lines.append( "		<category>" & encodeForHTML( tag ) & "</category>" )
+			}
+			lines.append( "		<description>" & encodeForHTML( entry.contentHtml ) & "</description>" )
+			lines.append( "	</item>" )
+		}
+
+		lines.append( "</channel></rss>" )
+		lines.append( "" )
+
+		return lines.toList( char( 10 ) )
+	}
+
+}
