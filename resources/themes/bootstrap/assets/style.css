@@ -143,6 +143,11 @@ body {
 	font-size: 0.8rem;
 }
 
+.nav--nested {
+	padding-left: 1rem;
+	font-size: 0.9rem;
+}
+
 .nav-section > summary.nav-link {
 	cursor: pointer;
 	list-style: none;
