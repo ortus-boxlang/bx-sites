@@ -46,7 +46,7 @@ page - a project with search off ships nothing search-related at all.
 ## Rebuilding just the index
 
 ```bash
-boxlang module:bxDocs search-index
+bxDocs search-index
 ```
 
 Useful if you only need to refresh `search-index.json` - `build` already

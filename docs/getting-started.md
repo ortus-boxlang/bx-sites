@@ -21,10 +21,28 @@ box install bx-markdown
 box install bx-esapi
 ```
 
+`box install`/`install-bx-module` reads `box.json`'s `boxlang.executable`
+and drops a `bxDocs` script on your `PATH` (in `~/.boxlang/bin`), so every
+command below works either as a short standalone command:
+
+```bash
+bxDocs <verb> [options]
+```
+
+or, everywhere BoxLang is available but that `PATH` shim isn't (a CI
+runner, a module registered by hand rather than installed) - both forms
+run the exact same thing:
+
+```bash
+boxlang module:bxdocs <verb> [options]
+```
+
+The rest of this guide uses the short form.
+
 ## Scaffold a project
 
 ```bash
-boxlang module:bxDocs new my-docs
+bxDocs new my-docs
 cd my-docs
 ```
 
@@ -101,7 +119,7 @@ full YAML, so nested objects/maps aren't supported.
 ## Build
 
 ```bash
-boxlang module:bxDocs build
+bxDocs build
 ```
 
 Renders every page in `docs/` into a static site in `site/`, ready to host
@@ -110,7 +128,7 @@ anywhere that serves static files.
 ## Serve locally
 
 ```bash
-boxlang module:bxDocs serve
+bxDocs serve
 ```
 
 Builds the project, serves `site/` at `http://127.0.0.1:8080/`, and
@@ -121,7 +139,7 @@ on its own. Pass `--port=3000` or `--host=0.0.0.0` to change how it binds.
 ## Clean
 
 ```bash
-boxlang module:bxDocs clean
+bxDocs clean
 ```
 
 Removes `site/` and any build cache, without touching your `docs/` source.

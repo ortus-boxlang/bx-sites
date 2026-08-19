@@ -131,10 +131,14 @@ class {
 	 * --------------------------------------------------------------------------
 	 * CLI Entry Point
 	 * --------------------------------------------------------------------------
-	 * Every BoxLang module may declare `main( args )`; `boxlang module:bxDocs
-	 * <verb> ...` invokes it directly. `args` contains ONLY the arguments
-	 * AFTER `module:bxDocs` - the module name itself is never included, so
-	 * args[1] = the verb, args[2..] = the verb's own flags/positional args.
+	 * Every BoxLang module may declare `main( args )`; `boxlang module:bxdocs
+	 * <verb> ...` invokes it directly - as does the standalone `bxDocs`
+	 * script `box install`/`install-bx-module` drops on PATH (`box.json`'s
+	 * `boxlang.executable`), which is just a one-line wrapper around the
+	 * same `boxlang module:bxdocs "$@"` call. Either way `args` contains
+	 * ONLY the arguments after the verb dispatch token - the module name
+	 * itself is never included, so args[1] = the verb, args[2..] = the
+	 * verb's own flags/positional args.
 	 *
 	 * Dispatch itself is CLI-agnostic: raw argv is parsed once here into a
 	 * plain options struct via `parseCliOptions()`, then handed to one thin
@@ -238,7 +242,8 @@ class {
 	private void function printUsage( required struct verbs, required struct verbDescriptions ) {
 		println( "bxDocs v#this.version# - #this.description#" )
 		println( "" )
-		println( "Usage: boxlang module:bxDocs <verb> [options]" )
+		println( "Usage: bxDocs <verb> [options]" )
+		println( "   or: boxlang module:bxdocs <verb> [options]" )
 		println( "" )
 
 		for ( var verbName in arguments.verbs.keyArray().sort( "textnocase" ) ) {
