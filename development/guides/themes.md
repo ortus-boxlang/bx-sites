@@ -101,9 +101,9 @@ Set which one a project uses in `bxdocs.json`:
 
 A page's own `icon` frontmatter (shown next to its title, and next to its
 entry in the sidebar nav) accepts either a plain emoji/short text - the
-original, still fully supported form - or a named icon from one of three
+original, still fully supported form - or a named icon from one of four
 self-hosted libraries, all MIT/ISC-licensed and bundled with this module
-(~8,700 icons combined, no CDN, nothing added to a built page's own
+(~10,200 icons combined, no CDN, nothing added to a built page's own
 weight beyond the handful of icons it actually uses - see IconResolver.bx):
 
 ```markdown
@@ -118,12 +118,24 @@ icon: lucide:rocket
 ---
 ```
 
+```markdown
+---
+icon: phosphor-duotone:rocket
+---
+```
+
 Bare `rocket` defaults to [Phosphor](https://phosphoricons.com/) (regular
-weight); prefix with `lucide:` for [Lucide](https://lucide.dev/icons/) or
-`tabler:` for [Tabler](https://tabler.io/icons) instead. Browse each
-site's own gallery for the exact name - it matches this module's own
-vendored filename exactly (lowercase, hyphenated, e.g. `book-open`,
-`arrow-up-right`).
+weight); prefix with `phosphor-duotone:` for Phosphor's own two-tone
+weight, `lucide:` for [Lucide](https://lucide.dev/icons/), or `tabler:`
+for [Tabler](https://tabler.io/icons) instead. Browse each site's own
+gallery for the exact name - it matches this module's own vendored
+filename exactly (lowercase, hyphenated, e.g. `book-open`,
+`arrow-up-right`; Phosphor's own site shows a weight switcher - "Duotone"
+there is this module's `phosphor-duotone:`).
+
+Font Awesome is deliberately not one of the four - its Duotone style (and
+most of its icon set from v6 on) is Pro-only, not available under a
+license this module could bundle and redistribute for free.
 
 A project's own SVG works too - drop it at `docs/assets/icons/my-icon.svg`
 and reference it as `icon: custom:my-icon`.
