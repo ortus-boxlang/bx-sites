@@ -81,6 +81,22 @@
 			return;
 		}
 
+		// highlight.js's own `hljs.highlightAll()` (in layout.bxm) only ever
+		// *schedules* highlighting when the page is still parsing - it defers
+		// itself to a `window`-level "DOMContentLoaded" listener, which fires
+		// *after* this script's own `document`-level listener (DOM event
+		// propagation runs document-target listeners before window-bubble
+		// ones). So on first load this element may still be raw/un-highlighted
+		// here. Force it now - `highlightElement` stamps `dataset.highlighted`
+		// and is a no-op if that's already set, so this is safe whether
+		// highlight.js already ran (nothing to do) or hasn't yet (highlights
+		// it immediately) - and either way, once stamped, highlight.js's own
+		// later sweep will skip this element instead of re-highlighting over
+		// (and silently discarding) the line-split structure built below.
+		if ( window.hljs && !code.dataset.highlighted ) {
+			window.hljs.highlightElement( code );
+		}
+
 		var hlLines = parseHlLines( pre.getAttribute( "data-bxdocs-hl-lines" ) );
 		var startLineAttr = pre.getAttribute( "data-bxdocs-start-line" );
 		var showNumbers = startLineAttr !== null;

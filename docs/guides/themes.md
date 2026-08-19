@@ -132,6 +132,44 @@ A theme folder missing either required file fails fast with a clear
 `BxDocs.InvalidTheme` error at build time, rather than a confusing template
 error deep inside rendering.
 
+## Customizing colors without a theme override
+
+For a color/font tweak, forking a whole theme is overkill - each built-in
+theme reads its palette from a handful of CSS custom properties on `:root`,
+re-declared under `[data-theme="dark"]` for dark mode. `bxdocs.json`'s
+[`extraCss`](../configuration.md#extracss--extrajs) loads *after* the
+theme's own stylesheet, so a same-specificity re-declaration in it wins
+without touching `resources/themes/` at all:
+
+```json
+{ "extraCss": [ "assets/brand.css" ] }
+```
+
+```css
+/* docs/assets/brand.css - copied to site/assets/brand.css at build time */
+:root {
+	--bxdocs-gradient-start: #7C3AED;
+	--bxdocs-gradient-end: #DB2777;
+	--bxdocs-accent: #FBBF24;
+	--bxdocs-link: #7C3AED;
+	--bxdocs-link-hover: #9F5AF0;
+}
+
+[data-theme="dark"] {
+	--bxdocs-link: #C4B5FD;
+	--bxdocs-link-hover: #DDD6FE;
+}
+```
+
+The `bootstrap` theme's own set (`resources/themes/bootstrap/assets/style.css`)
+is `--bxdocs-gradient-start`/`-end`, `--bxdocs-accent`, `--bxdocs-bg`,
+`--bxdocs-text`, `--bxdocs-sidebar-bg`, `--bxdocs-sidebar-text`,
+`--bxdocs-border`, `--bxdocs-link`, `--bxdocs-link-hover` and
+`--bxdocs-code-bg` - `material` and `tailwind` follow the same `--bxdocs-*`
+naming with their own small variations. Anything beyond color/font
+(layout, adding/removing chrome) needs a real override or a custom theme -
+see below.
+
 ## Overriding a theme
 
 Drop your own `layout.bxm` + `page.bxm` (and optionally `search.bxm` /
@@ -139,3 +177,125 @@ Drop your own `layout.bxm` + `page.bxm` (and optionally `search.bxm` /
 project-level `theme/` override over any built-in theme, as long as it
 satisfies the contract above - the built-in themes under this module's own
 `resources/themes/` are a good starting point to copy and adapt.
+
+A worked example - start from `bootstrap` and swap its brand palette and
+heading font for your own, keeping everything else (nav, search, dark mode,
+code highlighting, ...) exactly as it already works:
+
+```markdown
+my-project/
+├── bxdocs.json
+├── docs/
+└── theme/                    ← project-level override, checked before any built-in theme
+    ├── layout.bxm             ← copied from resources/themes/bootstrap/layout.bxm
+    ├── page.bxm                ← copied from resources/themes/bootstrap/page.bxm, unchanged
+    ├── search.bxm               ← copied unchanged
+    └── assets/
+        └── style.css              ← copied from bootstrap's assets/style.css, then edited
+```
+
+1. Copy the three `.bxm` files and `assets/style.css` out of this module's
+   `resources/themes/bootstrap/` into your project's `theme/`.
+2. Edit only what you need to change. To swap the brand palette and font,
+   that's just the top of `theme/assets/style.css`:
+
+   ```css
+   :root {
+   	--bxdocs-gradient-start: #7C3AED;  /* was #00FF78 */
+   	--bxdocs-gradient-end: #DB2777;    /* was #00DBFF */
+   	--bxdocs-accent: #FBBF24;          /* was #FFF500 */
+   }
+
+   body {
+   	font-family: "Inter", system-ui, sans-serif;  /* was "Poppins" */
+   }
+   ```
+
+3. Run `boxlang module:bxDocs build` (or `serve` while iterating) - BX Docs
+   picks up `theme/` automatically, no `bxdocs.json` change needed (a
+   project-level `theme/` folder always takes precedence over the built-in
+   theme named in `theme.name`). Everything you didn't touch - nav
+   rendering, search, the dark-mode toggle, code annotations - keeps
+   working exactly as it did in the original `bootstrap` theme, since it's
+   still the exact same `layout.bxm`/`page.bxm` markup underneath.
+
+A project `theme/` folder is all-or-nothing, though - once BX Docs finds
+one, it's used instead of the built-in theme entirely, so it still needs
+its own `layout.bxm` + `page.bxm` even if all you changed is
+`assets/style.css` (a folder missing either fails fast with
+`BxDocs.InvalidTheme` rather than silently falling back). For a
+CSS-only/no-`.bxm` tweak, use [`extraCss`](#customizing-colors-without-a-theme-override)
+above instead - it layers on top of whichever theme `bxdocs.json` names,
+no `theme/` folder involved at all. `theme/` is for when you also need to
+change the markup itself, covered next.
+
+## Writing a theme from scratch
+
+A theme only needs the two required files, so here's a genuinely minimal
+one - no Bootstrap/Tailwind, no dark mode, no search UI - to show exactly
+what's required versus what the built-in themes add on top. Save both as
+`theme/layout.bxm` and `theme/page.bxm` in your project - a project-level
+`theme/` folder is picked up automatically (as above), no `bxdocs.json`
+change needed:
+
+```bx
+<!-- theme/layout.bxm -->
+<bx:script>
+	function renderNav( required array nodes ) {
+		var html = "<ul>"
+		for ( var node in arguments.nodes ) {
+			html &= "<li>"
+			html &= len( node.url )
+				? '<a href="' & variables.basePath & node.url & '">' & encodeForHTML( node.title ) & '</a>'
+				: encodeForHTML( node.title )
+			if ( node.children.len() ) {
+				html &= renderNav( node.children )
+			}
+			html &= "</li>"
+		}
+		return html & "</ul>"
+	}
+</bx:script>
+<bx:output>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#</title>
+	<link rel="stylesheet" href="#variables.basePath#assets/theme/style.css">
+</head>
+<body>
+	<header><a href="#variables.basePath#">#encodeForHTML( variables.siteConfig.name )#</a></header>
+	<nav>#renderNav( variables.nav )#</nav>
+	<main>
+</bx:output>
+<bx:include template="#variables.themeDir#/page.bxm">
+<bx:output>
+	</main>
+</body>
+</html>
+</bx:output>
+```
+
+```bx
+<!-- theme/page.bxm -->
+<bx:output>
+<article>
+	<h1>#encodeForHTML( variables.page.title )#</h1>
+	#variables.page.contentHtml#
+</article>
+</bx:output>
+```
+
+That's a complete, working theme - `variables.page.contentHtml` is the
+already-converted markdown (syntax highlighting, admonitions, tabs, math
+and all), so there's nothing left to parse, only to lay out. From here,
+add whatever the built-in themes have that you actually want:
+`search.bxm` (only included when `bxdocs.json`'s `search` is `true` - see
+[Search](search.md)), a dark-mode toggle (copy the `x-data`/`x-init`
+Alpine.js pair off `resources/themes/bootstrap/layout.bxm`'s `<body>` tag
+and the matching `[data-theme="dark"]` CSS block), breadcrumbs/tags/prev-next
+links (`page.bxm` in any built-in theme shows the pattern - each is just an
+`if` around a small render function, all driven by fields already present
+on `variables.page`), or an `assets/` folder for your own CSS/JS, copied to
+`site/assets/theme/` automatically at build time.
