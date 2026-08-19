@@ -1,3 +1,13 @@
+/**
+ * cli.GhDeploy only covers guard clauses here, matching cli.Build's own
+ * spec (BuildSpec.bx) - a full successful run needs a real bx-markdown
+ * module activation (MarkdownRenderer.bx's hard dependency, see its own
+ * docblock), which this plain unit-test environment doesn't have. The
+ * actual git push mechanics are fully covered against real throwaway
+ * repositories in GhPagesDeployerSpec.bx instead, and real end-to-end
+ * build behavior (with an injectable fake markdown renderer) in
+ * BuildPipelineSpec.bx.
+ */
 class extends="testbox.system.BaseSpec" {
 
 	function run() {
@@ -15,16 +25,6 @@ class extends="testbox.system.BaseSpec" {
 					}
 				}
 			} );
-
-			private string function git( required array cmd, required string cwd ) {
-				var pb = createObject( "java", "java.lang.ProcessBuilder" ).init( arguments.cmd );
-				pb.directory( createObject( "java", "java.io.File" ).init( arguments.cwd ) );
-				pb.redirectErrorStream( true );
-				var process = pb.start();
-				var output = createObject( "java", "java.lang.String" ).init( process.getInputStream().readAllBytes(), "UTF-8" );
-				process.waitFor();
-				return output;
-			}
 
 			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
@@ -51,32 +51,6 @@ class extends="testbox.system.BaseSpec" {
 				expect( function() {
 					verb.run( { projectRoot : dir } );
 				} ).toThrow( "BxDocs.NotAGitRepo" );
-			} );
-
-			it( "builds then pushes to a custom --branch/--remote/--message", function() {
-				var remote = createTempDirectory( prefix = "bxdocs-cli-ghdeploy-remote-" );
-				tempDirs.append( remote );
-				git( [ "git", "init", "--bare", "--initial-branch=main", remote ], remote );
-
-				var dir = createTempDirectory( prefix = "bxdocs-cli-ghdeploy-project-" );
-				tempDirs.append( dir );
-				git( [ "git", "init", "--initial-branch=main", dir ], dir );
-				git( [ "git", "-C", dir, "config", "user.email", "test@example.com" ], dir );
-				git( [ "git", "-C", dir, "config", "user.name", "Test" ], dir );
-				directoryCreate( dir & "/docs", true, true );
-				fileWrite( dir & "/bxdocs.json", '{"name":"Test Site"}' );
-				fileWrite( dir & "/docs/index.md", "Home" );
-				git( [ "git", "-C", dir, "add", "-A" ], dir );
-				git( [ "git", "-C", dir, "commit", "-m", "initial" ], dir );
-				git( [ "git", "-C", dir, "remote", "add", "origin", remote ], dir );
-
-				var result = verb.run( { projectRoot : dir, branch : "pages", remote : "origin", message : "custom message" } );
-
-				expect( result.exitCode ).toBe( 0 );
-				expect( result.message ).toInclude( "origin/pages" );
-
-				var branches = git( [ "git", "-C", remote, "branch", "--list" ], remote );
-				expect( branches ).toInclude( "pages" );
 			} );
 
 		} );

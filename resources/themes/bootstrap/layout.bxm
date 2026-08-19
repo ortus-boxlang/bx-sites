@@ -53,10 +53,11 @@
 
 	function renderBrandMark() {
 		var logo = trim( variables.siteConfig.theme.logo ?: "" )
+		var name = encodeForHTML( variables.siteConfig.name )
 		if ( len( logo ) ) {
-			return '<img class="brand-logo" src="' & resolveAssetUrl( logo ) & '" alt="' & encodeForHTML( variables.siteConfig.name ) & '">'
+			return '<img class="brand-logo" src="' & resolveAssetUrl( logo ) & '" alt=""><span class="brand-name">' & name & '</span>'
 		}
-		return '⚡ ' & encodeForHTML( variables.siteConfig.name )
+		return '⚡ ' & name
 	}
 
 	function renderExtraCss( required array urls ) {

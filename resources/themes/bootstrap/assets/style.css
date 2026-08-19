@@ -95,12 +95,21 @@ body {
 }
 
 .brand-mark {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
 	color: #04121a;
 	font-weight: 700;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	min-width: 0;
+}
+
+.brand-name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .navbar-row {
@@ -145,8 +154,14 @@ body {
 
 .brand-logo {
 	height: 28px;
-	width: auto;
+	width: 28px;
 	display: block;
+	object-fit: contain;
+	padding: 3px;
+	border-radius: 50%;
+	background: rgba( 4, 18, 26, 0.4 );
+	box-shadow: 0 1px 2px rgba( 0, 0, 0, 0.25 );
+	flex-shrink: 0;
 }
 
 .content {
