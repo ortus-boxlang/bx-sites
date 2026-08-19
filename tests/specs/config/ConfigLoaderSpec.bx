@@ -318,6 +318,23 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxDocs.InvalidConfig" );
 			} );
 
+			it( "defaults [math] to false", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).math ).toBeFalse();
+			} );
+
+			it( "preserves a user-supplied [math]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","math":true}' );
+				expect( loader.load( dir ).math ).toBeTrue();
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [math] is not a boolean", function() {
+				var dir = newProjectDir( '{"name":"My Docs","math":"yes please"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
 		} );
 	}
 

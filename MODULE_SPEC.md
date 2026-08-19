@@ -59,12 +59,12 @@ site/                  # build output (generated)
 
 ## 4. Config file — bxdocs.json
 
-Site name, description, nav (auto-inferred from folder/file structure by default; an explicit `nav` array — inline or in a project's own `docs/nav.json` — overrides that inference entirely), theme name + theme options, base URL, search on/off, markdown-extension passthrough settings (table options, anchor links, YouTube transformer, code style — all sourced from bx-markdown's existing option set), and per-page frontmatter (`tags`/`icon`/`summary`/`ogImage`, on top of `title`/`order`/`hidden`/`description`).
+Site name, description, nav (auto-inferred from folder/file structure by default; an explicit `nav` array — inline or in a project's own `docs/nav.json` — overrides that inference entirely), theme name + theme options, base URL, search on/off, `mermaid`/`math` on/off, markdown-extension passthrough settings (table options, anchor links, YouTube transformer, code style — all sourced from bx-markdown's existing option set), and per-page frontmatter (`tags`/`icon`/`summary`/`ogImage`, on top of `title`/`order`/`hidden`/`description`).
 
 ## 5. Core pipeline
 
 1. **Loader** — walks `docs/`, reads `.md` files + frontmatter (`title`, `order`, `hidden`)
-2. **Parser** — delegates entirely to **bx-markdown** (`Markdown()` BIF / `bx:markdown` component) for markdown-to-HTML conversion, including admonitions (`!!! type "Title"`), footnotes and definition lists via bx-markdown's own native Flexmark extensions (`markdown.enableAdmonition`/`enableFootnotes`/`enableDefinitionLists`). No custom parsing on the bx-docs side.
+2. **Parser** — delegates entirely to **bx-markdown** (`Markdown()` BIF / `bx:markdown` component) for markdown-to-HTML conversion, including admonitions (`!!! type "Title"`), footnotes and definition lists via bx-markdown's own native Flexmark extensions (`markdown.enableAdmonition`/`enableFootnotes`/`enableDefinitionLists`). No custom parsing on the bx-docs side for those three. Content tabs (`=== "Title"`), math (`$...$`/`$$...$$`, KaTeX client-side), and fenced-code `hl_lines`/`linenums`/`title` annotations have no Flexmark extension to lean on, so bx-docs implements each as its own pre/post-processing pass around `Markdown()` instead (`TabsProcessor`/`MathProtector`/`CodeAnnotationProcessor`) — protect the source from Flexmark's own inline parsing before conversion, restore/apply against the rendered HTML after.
 3. **Nav builder** — folder/file structure → nav tree, frontmatter overrides applied
 4. **Theme renderer** — invokes the active theme's `.bxm` templates with page data + nav tree in scope
 5. **Search indexer** — builds a static JSON index (title, url, headings, truncated body text)
@@ -104,7 +104,8 @@ None currently blocking. Deferred to later phases:
 - Plugin hook system beyond themes (e.g. custom nav sources) - **done** for nav (see `nav`/`docs/nav.json`, section 4); bx-markdown also has a `markdownRegisterExtension()`/`markdownUnregisterExtension()` API for registering arbitrary Flexmark extensions, independent of bx-docs
 - Per-page tags/icon/summary and per-page/auto-generated social cards — **done**, see section 4 and `bxdocs.json`'s `generateOgImages` key
 - One-command GitHub Pages publish (`gh-deploy`) — **done**, see section 2's verb table
-- Content tabs, math (MathJax/KaTeX), i18n, a blog/tags-plugin-equivalent beyond the simple tags index, and self-hosting third-party CSS/JS (Bootstrap, highlight.js, lunr, Alpine, Mermaid still load from CDN at view time) remain deferred
+- Content tabs, math (KaTeX), and fenced-code `hl_lines`/`linenums`/`title` annotations — **done**, see section 5 step 2 and `bxdocs.json`'s `math` key
+- i18n, a blog/tags-plugin-equivalent beyond the simple tags index, and self-hosting third-party CSS/JS (Bootstrap, highlight.js, lunr, Alpine, Mermaid, KaTeX still load from CDN at view time) remain deferred
 
 ## 9. Phased task breakdown
 

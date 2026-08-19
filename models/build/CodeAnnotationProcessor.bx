@@ -1,0 +1,155 @@
+/**
+ * Extends fenced code blocks with mkdocs-style annotations in the info
+ * string - `hl_lines`, `linenums`, and `title`:
+ *
+ *   ```bx hl_lines="2 4-6" linenums="1" title="app.bx"
+ *   ...
+ *   ```
+ *
+ * bx-markdown/Flexmark only ever reads the first word of a fence's info
+ * string (the language, for its `language-xxx` class) - anything after it
+ * is passed through as literal text inside the `<code>` element rather
+ * than being understood, and this module cannot fork Flexmark to teach it
+ * these attributes. So, same two-phase shape as TabsProcessor.bx/
+ * MathProtector.bx:
+ *
+ *  1. `extractAndStrip()` runs BEFORE conversion - it reads each fence's
+ *     extra attributes, strips them back down to a bare `` ```language ``
+ *     so bx-markdown's own language-class handling is unaffected, and
+ *     records the parsed attributes in fence order (including an empty
+ *     struct for fences with no extra attributes, so array position stays
+ *     aligned with occurrence order).
+ *  2. `applyToHtml()` runs AFTER conversion - it walks every rendered
+ *     `<pre><code` in document order (one per fence, same order) and
+ *     stamps the matching annotation's data onto the `<pre>` tag as
+ *     `data-bxdocs-*` attributes for the client-side widget
+ *     (code-lines.js) to pick up.
+ */
+class {
+
+	variables.fencePattern = createObject( "java", "java.util.regex.Pattern" ).compile( "(?m)^(```+|~~~+)(\S*)(.*)$" )
+	variables.attrPattern  = createObject( "java", "java.util.regex.Pattern" ).compile( '(\w+)="([^"]*)"' )
+	variables.preCodePattern = createObject( "java", "java.util.regex.Pattern" ).compile( "<pre><code" )
+
+	/**
+	 * @markdown The raw markdown body text
+	 *
+	 * @return { markdown: string with fence attributes stripped, annotations: array (one entry per fence, in order; empty struct when a fence has no extra attributes) }
+	 */
+	struct function extractAndStrip( required string markdown ) {
+		var matcher = variables.fencePattern.matcher( arguments.markdown )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+		var annotations = []
+		var insideFence = false
+
+		while ( matcher.find() ) {
+			if ( insideFence ) {
+				insideFence = false
+				matcher.appendReplacement( buffer, quoteReplacement( matcher.group( 0 ) ) )
+				continue
+			}
+
+			insideFence = true
+			var lang = matcher.group( 2 )
+			var rest = trim( matcher.group( 3 ) )
+
+			if ( !len( rest ) ) {
+				annotations.append( {} )
+				matcher.appendReplacement( buffer, quoteReplacement( matcher.group( 0 ) ) )
+				continue
+			}
+
+			annotations.append( parseAttrs( rest ) )
+			matcher.appendReplacement( buffer, quoteReplacement( matcher.group( 1 ) & lang ) )
+		}
+		matcher.appendTail( buffer )
+
+		return { markdown : buffer.toString(), annotations : annotations }
+	}
+
+	/**
+	 * @html Already-rendered HTML (from Markdown() on extractAndStrip()'s output)
+	 * @annotations extractAndStrip()'s own `annotations` array
+	 *
+	 * @return html with data-bxdocs-* attributes stamped onto each annotated `<pre>` tag
+	 */
+	string function applyToHtml( required string html, required array annotations ) {
+		var matcher = variables.preCodePattern.matcher( arguments.html )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+		var idx = 0
+
+		while ( matcher.find() ) {
+			idx++
+			var annotation = ( idx <= arguments.annotations.len() ) ? arguments.annotations[ idx ] : {}
+			var attrs = ""
+
+			if ( !annotation.isEmpty() ) {
+				if ( ( annotation.hlLines ?: [] ).len() ) {
+					attrs &= ' data-bxdocs-hl-lines="' & annotation.hlLines.toList( "," ) & '"'
+				}
+				if ( annotation.showLineNumbers ?: false ) {
+					attrs &= ' data-bxdocs-start-line="' & annotation.startLine & '"'
+				}
+				if ( len( annotation.title ?: "" ) ) {
+					attrs &= ' data-bxdocs-title="' & encodeForHTML( annotation.title ) & '"'
+				}
+			}
+
+			matcher.appendReplacement( buffer, quoteReplacement( "<pre" & attrs & "><code" ) )
+		}
+		matcher.appendTail( buffer )
+
+		return buffer.toString()
+	}
+
+	/**
+	 * @rest The fence info string with the language token already removed, e.g. `hl_lines="2 4-6" linenums="1" title="app.bx"`
+	 */
+	private struct function parseAttrs( required string rest ) {
+		var raw = {}
+		var matcher = variables.attrPattern.matcher( arguments.rest )
+		while ( matcher.find() ) {
+			raw[ matcher.group( 1 ) ] = matcher.group( 2 )
+		}
+
+		var annotation = { hlLines : [], showLineNumbers : false, startLine : 1, title : trim( raw.title ?: "" ) }
+
+		if ( len( trim( raw.hl_lines ?: "" ) ) ) {
+			annotation.hlLines = expandLineRanges( raw.hl_lines )
+		}
+
+		if ( raw.keyExists( "linenums" ) ) {
+			annotation.showLineNumbers = true
+			annotation.startLine = val( trim( raw.linenums ) ) ? val( trim( raw.linenums ) ) : 1
+		}
+
+		return annotation
+	}
+
+	/**
+	 * @spec Space-separated line numbers and/or `A-B` ranges, e.g. `2 4-6`
+	 */
+	private array function expandLineRanges( required string spec ) {
+		var lines = []
+		for ( var token in listToArray( trim( arguments.spec ), " ", true ) ) {
+			if ( token.reFind( "^\d+-\d+$" ) ) {
+				var startNum = val( token.reReplace( "^(\d+)-(\d+)$", "\1", "one" ) )
+				var endNum = val( token.reReplace( "^(\d+)-(\d+)$", "\2", "one" ) )
+				for ( var n = startNum; n <= endNum; n++ ) {
+					lines.append( n )
+				}
+			} else if ( token.reFind( "^\d+$" ) ) {
+				lines.append( val( token ) )
+			}
+		}
+		return lines
+	}
+
+	/**
+	 * @text Literal text to safely pass through java.util.regex.Matcher#appendReplacement, which otherwise treats `$` and `\` as backreference syntax
+	 */
+	private string function quoteReplacement( required string text ) {
+		return createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( arguments.text )
+	}
+
+}

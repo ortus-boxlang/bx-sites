@@ -1,0 +1,72 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.MathProtector", function() {
+
+			beforeEach( function() {
+				variables.protector = new "models.build.MathProtector@bxdocs"();
+			} );
+
+			it( "leaves markdown with no math untouched", function() {
+				var md = "Just a paragraph with no formulas.";
+				var result = protector.protect( md );
+
+				expect( result.markdown ).toBe( md );
+				expect( result.formulas ).toBeStruct();
+				expect( result.formulas.isEmpty() ).toBeTrue();
+			} );
+
+			it( "replaces an inline formula with a token and restores the original text", function() {
+				var md = "Euler: $e^{i\pi}+1=0$ is famous.";
+				var protectedResult = protector.protect( md );
+
+				expect( protectedResult.markdown ).notToInclude( "$" );
+				expect( protectedResult.formulas.count() ).toBe( 1 );
+
+				var restored = protector.restore( "<p>" & protectedResult.markdown & "</p>", protectedResult.formulas );
+				expect( restored ).toBe( "<p>Euler: $e^{i\pi}+1=0$ is famous.</p>" );
+			} );
+
+			it( "replaces a block $$...$$ formula spanning multiple lines with a single token", function() {
+				var md = "Before." & char( 10 ) & char( 10 ) &
+					"$$" & char( 10 ) & "\int_0^1 x^2 dx" & char( 10 ) & "$$" &
+					char( 10 ) & char( 10 ) & "After.";
+
+				var protectedResult = protector.protect( md );
+				expect( protectedResult.formulas.count() ).toBe( 1 );
+
+				var restored = protector.restore( protectedResult.markdown, protectedResult.formulas );
+				expect( restored ).toBe( md );
+			} );
+
+			it( "does not treat currency amounts on the same line as a formula", function() {
+				var md = "Pay $5 now and $10 later.";
+				var result = protector.protect( md );
+
+				expect( result.formulas.isEmpty() ).toBeTrue();
+				expect( result.markdown ).toBe( md );
+			} );
+
+			it( "HTML-escapes the restored formula text", function() {
+				var md = "Compare: $a < b$ here.";
+				var protectedResult = protector.protect( md );
+				var restored = protector.restore( protectedResult.markdown, protectedResult.formulas );
+
+				expect( restored ).toInclude( "&lt;" );
+				expect( restored ).notToInclude( "$a < b$" );
+			} );
+
+			it( "protects multiple distinct formulas independently", function() {
+				var md = "First $a$ and second $b$ formula.";
+				var protectedResult = protector.protect( md );
+
+				expect( protectedResult.formulas.count() ).toBe( 2 );
+
+				var restored = protector.restore( protectedResult.markdown, protectedResult.formulas );
+				expect( restored ).toBe( md );
+			} );
+
+		} );
+	}
+
+}

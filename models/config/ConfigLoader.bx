@@ -25,6 +25,7 @@ class {
 		"footer"       : false,
 		"lastUpdated"  : false,
 		"mermaid"      : false,
+		"math"         : false,
 		"analytics"    : { "provider" : "", "id" : "" },
 		"ogImage"      : "",
 		"generateOgImages" : false,
@@ -168,6 +169,13 @@ class {
 			throw(
 				type    = "BxDocs.InvalidConfig",
 				message = "bxdocs.json [mermaid] must be a boolean"
+			)
+		}
+
+		if ( !isBoolean( arguments.config.math ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [math] must be a boolean"
 			)
 		}
 

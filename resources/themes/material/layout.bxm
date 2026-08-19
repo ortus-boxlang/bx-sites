@@ -89,6 +89,7 @@
 	variables.analyticsProvider = trim( variables.siteConfig.analytics.provider ?: "" )
 	variables.analyticsId = trim( variables.siteConfig.analytics.id ?: "" )
 	variables.mermaidEnabled = ( variables.siteConfig.mermaid ?: false ) ? true : false
+	variables.mathEnabled = ( variables.siteConfig.math ?: false ) ? true : false
 </bx:script>
 <bx:output><!doctype html>
 <html lang="en">
@@ -122,7 +123,9 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
 	<link rel="stylesheet" href="#variables.basePath#assets/theme/style.css">
 	#renderExtraCss( variables.siteConfig.extraCss ?: [] )#
-</bx:output><bx:if condition="#variables.analyticsProvider == 'google'#"><bx:output>
+</bx:output><bx:if condition="#variables.mathEnabled#"><bx:output>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</bx:output></bx:if><bx:if condition="#variables.analyticsProvider == 'google'#"><bx:output>
 	<script async src="https://www.googletagmanager.com/gtag/js?id=#encodeForHTML( variables.analyticsId )#"></script>
 	<script>
 		window.dataLayer = window.dataLayer || [];
@@ -176,11 +179,17 @@
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
 	<script src="#variables.basePath#assets/highlight-boxlang.js"></script>
 	<script>hljs.highlightAll();</script>
+	<script src="#variables.basePath#assets/code-lines.js"></script>
 	<script src="#variables.basePath#assets/copy-code.js" defer></script>
 	<script src="#variables.basePath#assets/admonition-collapse.js" defer></script>
+	<script src="#variables.basePath#assets/tabs.js" defer></script>
 </bx:output><bx:if condition="#variables.mermaidEnabled#"><bx:output>
 	<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 	<script src="#variables.basePath#assets/mermaid-init.js"></script>
+</bx:output></bx:if><bx:if condition="#variables.mathEnabled#"><bx:output>
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+	<script src="#variables.basePath#assets/math-init.js"></script>
 </bx:output></bx:if><bx:output>
 	#renderExtraJs( variables.siteConfig.extraJs ?: [] )#
 </body>

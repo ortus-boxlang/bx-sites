@@ -38,5 +38,5 @@ repository's own `docs/` folder - see
 - [Themes](guides/themes.md) - the built-in themes, and how to write your own
 - [Search](guides/search.md) - how the static search index works
 - [Deploying to GitHub Pages](guides/deployment.md) - the built-in GitHub Actions workflow
-- [Markdown Extensions](guides/markdown.md) - admonitions, footnotes, definition lists and Mermaid diagrams
+- [Markdown Extensions](guides/markdown.md) - admonitions, footnotes, definition lists, content tabs, math, code annotations and Mermaid diagrams
 - [Releases](releases/index.md) - versioning policy and what's new per release

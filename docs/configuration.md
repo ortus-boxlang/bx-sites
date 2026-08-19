@@ -360,8 +360,20 @@ every ` ```mermaid ` fenced code block as a diagram. See
 { "mermaid": true }
 ```
 
-Admonitions (note/warning/tip-style callout boxes) are always available in
-every page's markdown, no config needed - see
+## `math`
+
+`false` (the default) - no [KaTeX](https://katex.org/) shipped at all.
+`true` loads it client-side and typesets `$...$`/`$$...$$` written directly
+into a page's markdown. See
+[Markdown Extensions](guides/markdown.md#math) for the syntax.
+
+```json
+{ "math": true }
+```
+
+Admonitions (note/warning/tip-style callout boxes), content tabs, and
+fenced-code `hl_lines`/`linenums`/`title` annotations are always available
+in every page's markdown, no config needed - see
 [Markdown Extensions](guides/markdown.md#admonitions).
 
 ## Versioning

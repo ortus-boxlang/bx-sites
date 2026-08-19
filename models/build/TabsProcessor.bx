@@ -1,0 +1,149 @@
+/**
+ * Implements mkdocs-material-style content tabs:
+ *
+ *   === "Tab A"
+ *       Indented markdown content (4 spaces or a tab).
+ *
+ *   === "Tab B"
+ *       More content.
+ *
+ * Consecutive `=== "..."` blocks (separated by at most one blank line)
+ * form a single tab group. Flexmark (bx-markdown's underlying parser) has
+ * no native concept of this syntax and this module cannot fork it to add
+ * one, so this is a two-phase pre/post-processor around the normal
+ * `Markdown()` call instead:
+ *
+ *  1. `extract()` runs BEFORE conversion - it pulls every tab group out of
+ *     the raw markdown source and replaces it with a lone placeholder
+ *     `<div>` on its own line. A bare `<div ...></div>` at the start of a
+ *     line is recognized by CommonMark as an HTML block (type 6) and
+ *     passed through completely untouched until the next blank line, so
+ *     the placeholder survives `Markdown()` byte-for-byte.
+ *  2. `restore()` runs AFTER conversion - each tab's own dedented content
+ *     is itself rendered through the real markdown renderer (so nested
+ *     markdown, code fences, etc. all work inside a tab), assembled into
+ *     the final tab widget markup, and swapped in for its placeholder.
+ */
+class {
+
+	variables.tabHeaderPattern = "^===\s+""([^""]*)""\s*$"
+
+	/**
+	 * @markdown The raw markdown body text
+	 *
+	 * @return { markdown: string with tab groups replaced by placeholders, groups: array of { token, tabs: [ { title, content } ] } }
+	 */
+	struct function extract( required string markdown ) {
+		var normalized = arguments.markdown.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" )
+		var lines = listToArray( normalized, char( 10 ), true )
+		var outputLines = []
+		var groups = []
+		var i = 1
+
+		while ( i <= lines.len() ) {
+			var line = lines[ i ]
+			if ( !trim( line ).reFind( variables.tabHeaderPattern ) ) {
+				outputLines.append( line )
+				i++
+				continue
+			}
+
+			var tabs = []
+			while ( i <= lines.len() && trim( lines[ i ] ).reFind( variables.tabHeaderPattern ) ) {
+				var title = trim( lines[ i ] ).reReplace( variables.tabHeaderPattern, "\1", "one" )
+				i++
+
+				var contentLines = []
+				while ( i <= lines.len() && isTabBodyLine( lines[ i ] ) ) {
+					contentLines.append( dedentTabLine( lines[ i ] ) )
+					i++
+				}
+				while ( contentLines.len() && !len( trim( contentLines[ contentLines.len() ] ) ) ) {
+					contentLines.deleteAt( contentLines.len() )
+				}
+
+				tabs.append( { title : title, content : contentLines.toList( char( 10 ) ) } )
+
+				if (
+					i <= lines.len() && !len( trim( lines[ i ] ) )
+					&& i + 1 <= lines.len() && trim( lines[ i + 1 ] ).reFind( variables.tabHeaderPattern )
+				) {
+					i++
+				}
+			}
+
+			var token = "bxdocstabs" & replace( createUUID(), "-", "", "all" )
+			groups.append( { token : token, tabs : tabs } )
+			outputLines.append( "" )
+			outputLines.append( '<div class="bxdocs-raw-block" data-bxdocs-token="' & token & '"></div>' )
+			outputLines.append( "" )
+		}
+
+		return { markdown : outputLines.toList( char( 10 ) ), groups : groups }
+	}
+
+	/**
+	 * @html Already-rendered HTML (from Markdown() on extract()'s output)
+	 * @groups extract()'s own `groups` array
+	 * @renderer Any object exposing `toHtml( markdown, options = {} )`, used to render each tab's own content
+	 * @markdownOptions Passthrough options forwarded to the renderer for each tab's content, same as the surrounding page
+	 *
+	 * @return html with every tab group placeholder swapped for its rendered widget markup
+	 */
+	string function restore( required string html, required array groups, required any renderer, struct markdownOptions = {} ) {
+		var result = arguments.html
+		for ( var group in arguments.groups ) {
+			var placeholder = '<div class="bxdocs-raw-block" data-bxdocs-token="' & group.token & '"></div>'
+			result = result.replace( placeholder, renderGroup( group, arguments.renderer, arguments.markdownOptions ), "one" )
+		}
+		return result
+	}
+
+	/**
+	 * @line A raw source line, still at its original indentation
+	 */
+	private boolean function isTabBodyLine( required string line ) {
+		return !len( trim( arguments.line ) ) || arguments.line.reFind( "^(    |\t)" ) > 0
+	}
+
+	/**
+	 * @line A tab body line, prefixed with either a leading tab or (at least) 4 spaces
+	 */
+	private string function dedentTabLine( required string line ) {
+		if ( !len( trim( arguments.line ) ) ) {
+			return ""
+		}
+		if ( left( arguments.line, 1 ) == char( 9 ) ) {
+			return mid( arguments.line, 2, len( arguments.line ) )
+		}
+		return mid( arguments.line, 5, len( arguments.line ) )
+	}
+
+	/**
+	 * @group One entry from extract()'s own `groups` array
+	 */
+	private string function renderGroup( required struct group, required any renderer, required struct markdownOptions ) {
+		var navHtml = ""
+		var panelsHtml = ""
+		var idx = 0
+
+		for ( var tab in arguments.group.tabs ) {
+			idx++
+			var active = ( idx == 1 ) ? " bxdocs-tab-btn--active" : ""
+			var panelActive = ( idx == 1 ) ? " bxdocs-tab-panel--active" : ""
+
+			navHtml &= '<button type="button" class="bxdocs-tab-btn' & active & '" data-bxdocs-tab="' & idx & '">'
+				& encodeForHTML( tab.title ) & '</button>'
+
+			panelsHtml &= '<div class="bxdocs-tab-panel' & panelActive & '" data-bxdocs-tab="' & idx & '">'
+				& arguments.renderer.toHtml( tab.content, arguments.markdownOptions )
+				& '</div>'
+		}
+
+		return '<div class="bxdocs-tabs" data-bxdocs-tabgroup role="tablist">'
+			& '<div class="bxdocs-tabs__nav">' & navHtml & '</div>'
+			& '<div class="bxdocs-tabs__panels">' & panelsHtml & '</div>'
+			& '</div>'
+	}
+
+}

@@ -1,0 +1,68 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.CodeAnnotationProcessor", function() {
+
+			beforeEach( function() {
+				variables.processor = new "models.build.CodeAnnotationProcessor@bxdocs"();
+			} );
+
+			it( "leaves a plain fence with no extra attributes untouched and records an empty annotation", function() {
+				var md = "```bx" & char( 10 ) & "println( 1 )" & char( 10 ) & "```";
+				var result = processor.extractAndStrip( md );
+
+				expect( result.markdown ).toBe( md );
+				expect( result.annotations.len() ).toBe( 1 );
+				expect( result.annotations[ 1 ].isEmpty() ).toBeTrue();
+			} );
+
+			it( "strips hl_lines/linenums/title attributes back down to a bare language fence", function() {
+				var md = '```bx hl_lines="2" linenums="5" title="app.bx"' & char( 10 ) & "a" & char( 10 ) & "b" & char( 10 ) & "```";
+				var result = processor.extractAndStrip( md );
+
+				expect( result.markdown ).toStartWith( "```bx" & char( 10 ) );
+				expect( result.markdown ).notToInclude( "hl_lines" );
+				expect( result.annotations.len() ).toBe( 1 );
+
+				var annotation = result.annotations[ 1 ];
+				expect( annotation.hlLines ).toBe( [ 2 ] );
+				expect( annotation.showLineNumbers ).toBeTrue();
+				expect( annotation.startLine ).toBe( 5 );
+				expect( annotation.title ).toBe( "app.bx" );
+			} );
+
+			it( "expands a hl_lines range like 4-6 alongside discrete numbers", function() {
+				var md = '```bx hl_lines="2 4-6"' & char( 10 ) & "x" & char( 10 ) & "```";
+				var result = processor.extractAndStrip( md );
+
+				expect( result.annotations[ 1 ].hlLines ).toBe( [ 2, 4, 5, 6 ] );
+			} );
+
+			it( "tracks annotations in fence order across multiple fences, including untouched ones", function() {
+				var md = '```bx title="a.bx"' & char( 10 ) & "1" & char( 10 ) & "```" & char( 10 ) & char( 10 ) &
+					"```" & char( 10 ) & "plain" & char( 10 ) & "```" & char( 10 ) & char( 10 ) &
+					'```js linenums="1"' & char( 10 ) & "2" & char( 10 ) & "```";
+
+				var result = processor.extractAndStrip( md );
+
+				expect( result.annotations.len() ).toBe( 3 );
+				expect( result.annotations[ 1 ].title ).toBe( "a.bx" );
+				expect( result.annotations[ 2 ].isEmpty() ).toBeTrue();
+				expect( result.annotations[ 3 ].showLineNumbers ).toBeTrue();
+			} );
+
+			it( "stamps data-bxdocs-* attributes onto the matching <pre> in document order", function() {
+				var html = '<pre><code class="language-bx">a' & char( 10 ) & '</code></pre>' & char( 10 ) &
+					'<pre><code>plain' & char( 10 ) & '</code></pre>';
+				var annotations = [ { hlLines : [ 1 ], showLineNumbers : true, startLine : 3, title : "app.bx" }, {} ];
+
+				var result = processor.applyToHtml( html, annotations );
+
+				expect( result ).toInclude( '<pre data-bxdocs-hl-lines="1" data-bxdocs-start-line="3" data-bxdocs-title="app.bx"><code class="language-bx">' );
+				expect( result ).toInclude( '<pre><code>plain' );
+			} );
+
+		} );
+	}
+
+}
