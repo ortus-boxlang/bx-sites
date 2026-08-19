@@ -35,6 +35,8 @@
 	<link rel="stylesheet" href="/bx-docs/development/assets/theme/style.css">
 	
 
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+
 	<script>window.__BXDOCS_BASE_PATH__ = "/bx-docs/development/";</script>
 	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
 	<script src="/bx-docs/development/assets/search.js" defer></script>
@@ -68,7 +70,7 @@
 	<div class="container-fluid">
 		<div class="row">
 			<aside class="col-lg-3 col-xl-2 sidebar collapse d-lg-block" id="bxdocs-sidebar">
-				<ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/index.html">Home</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/getting-started/index.html">Getting Started</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/cli-reference/index.html">CLI Reference</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/configuration/index.html">Configuration</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/index.html">Guides</a><ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/themes/index.html">Themes</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/search/index.html">Search</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/deployment/index.html">Deploying to GitHub Pages</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/markdown/index.html">Markdown Extensions</a></li></ul></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/releases/index.html">Release Policy</a></li></ul>
+				<ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/index.html">Home</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/getting-started/index.html">Getting Started</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/cli-reference/index.html">CLI Reference</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/configuration/index.html">Configuration</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/index.html">Guides</a><ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/themes/index.html">Themes</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/search/index.html">Search</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/deployment/index.html">Deploying to GitHub Pages</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/markdown/index.html">Markdown Extensions</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/plugins/index.html">Plugins</a></li></ul></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/releases/index.html">Release Policy</a></li></ul>
 			</aside>
 			<main class="col-lg-9 col-xl-10 content">
 
@@ -76,7 +78,7 @@
 
 					<h1 class="page-title"><span class="page-icon">🚀</span> Getting Started</h1>
 					<p class="page-summary">Install the module, scaffold a project, and build your first site.</p>
-<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-setup">setup</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 1:30:17 AM</span></div>
+<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-setup">setup</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 4:28:10 AM</span></div>
 <nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#install">Install</a></li><li class="toc-level-2"><a href="#scaffold-a-project">Scaffold a project</a></li><li class="toc-level-2"><a href="#add-pages">Add pages</a></li><li class="toc-level-2"><a href="#build">Build</a></li><li class="toc-level-2"><a href="#serve-locally">Serve locally</a></li><li class="toc-level-2"><a href="#clean">Clean</a></li></ul></nav>
 					<h1 id="getting-started"><a href="#getting-started" id="getting-started" name="getting-started" class="anchor"></a>Getting Started</h1>
 <h2 id="install"><a href="#install" id="install" name="install" class="anchor"></a>Install</h2>
@@ -88,8 +90,23 @@ installed:</p>
 box install bx-markdown
 box install bx-esapi
 </code></pre>
+<p>Or, without CommandBox, BoxLang's own installer takes all three in one
+command:</p>
+<pre><code class="language-bash">install-bx-module bx-docs bx-markdown bx-esapi
+</code></pre>
+<p><code>box install</code>/<code>install-bx-module</code> reads <code>box.json</code>'s <code>boxlang.executable</code>
+and drops a <code>bxDocs</code> script on your <code>PATH</code> (in <code>~/.boxlang/bin</code>), so every
+command below works either as a short standalone command:</p>
+<pre><code class="language-bash">bxDocs &lt;verb&gt; [options]
+</code></pre>
+<p>or, everywhere BoxLang is available but that <code>PATH</code> shim isn't (a CI
+runner, a module registered by hand rather than installed) - both forms
+run the exact same thing:</p>
+<pre><code class="language-bash">boxlang module:bxdocs &lt;verb&gt; [options]
+</code></pre>
+<p>The rest of this guide uses the short form.</p>
 <h2 id="scaffold-a-project"><a href="#scaffold-a-project" id="scaffold-a-project" name="scaffold-a-project" class="anchor"></a>Scaffold a project</h2>
-<pre><code class="language-bash">boxlang module:bxDocs new my-docs
+<pre><code class="language-bash">bxDocs new my-docs
 cd my-docs
 </code></pre>
 <p>This creates:</p>
@@ -151,19 +168,19 @@ lists (<code>tags:</code> followed by indented <code>- item</code> lines), or <c
 scalars for a multi-line value - it's a small hand-rolled parser though, not
 full YAML, so nested objects/maps aren't supported.</p>
 <h2 id="build"><a href="#build" id="build" name="build" class="anchor"></a>Build</h2>
-<pre><code class="language-bash">boxlang module:bxDocs build
+<pre><code class="language-bash">bxDocs build
 </code></pre>
 <p>Renders every page in <code>docs/</code> into a static site in <code>site/</code>, ready to host
 anywhere that serves static files.</p>
 <h2 id="serve-locally"><a href="#serve-locally" id="serve-locally" name="serve-locally" class="anchor"></a>Serve locally</h2>
-<pre><code class="language-bash">boxlang module:bxDocs serve
+<pre><code class="language-bash">bxDocs serve
 </code></pre>
 <p>Builds the project, serves <code>site/</code> at <code>http://127.0.0.1:8080/</code>, and
 rebuilds automatically whenever you save a change under <code>docs/</code>,
 <code>bxdocs.json</code>, or a project-level <code>theme/</code> override - your browser reloads
 on its own. Pass <code>--port=3000</code> or <code>--host=0.0.0.0</code> to change how it binds.</p>
 <h2 id="clean"><a href="#clean" id="clean" name="clean" class="anchor"></a>Clean</h2>
-<pre><code class="language-bash">boxlang module:bxDocs clean
+<pre><code class="language-bash">bxDocs clean
 </code></pre>
 <p>Removes <code>site/</code> and any build cache, without touching your <code>docs/</code> source.</p>
 
@@ -197,11 +214,17 @@ on its own. Pass <code>--port=3000</code> or <code>--host=0.0.0.0</code> to chan
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
 	<script src="/bx-docs/development/assets/highlight-boxlang.js"></script>
 	<script>hljs.highlightAll();</script>
+	<script src="/bx-docs/development/assets/code-lines.js"></script>
 	<script src="/bx-docs/development/assets/copy-code.js" defer></script>
 	<script src="/bx-docs/development/assets/admonition-collapse.js" defer></script>
+	<script src="/bx-docs/development/assets/tabs.js" defer></script>
 
 	<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 	<script src="/bx-docs/development/assets/mermaid-init.js"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+	<script src="/bx-docs/development/assets/math-init.js"></script>
 
 	
 </body>

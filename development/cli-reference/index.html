@@ -35,6 +35,8 @@
 	<link rel="stylesheet" href="/bx-docs/development/assets/theme/style.css">
 	
 
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+
 	<script>window.__BXDOCS_BASE_PATH__ = "/bx-docs/development/";</script>
 	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
 	<script src="/bx-docs/development/assets/search.js" defer></script>
@@ -68,18 +70,25 @@
 	<div class="container-fluid">
 		<div class="row">
 			<aside class="col-lg-3 col-xl-2 sidebar collapse d-lg-block" id="bxdocs-sidebar">
-				<ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/index.html">Home</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/getting-started/index.html">Getting Started</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/cli-reference/index.html">CLI Reference</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/configuration/index.html">Configuration</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/index.html">Guides</a><ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/themes/index.html">Themes</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/search/index.html">Search</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/deployment/index.html">Deploying to GitHub Pages</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/markdown/index.html">Markdown Extensions</a></li></ul></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/releases/index.html">Release Policy</a></li></ul>
+				<ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/index.html">Home</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/getting-started/index.html">Getting Started</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/cli-reference/index.html">CLI Reference</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/configuration/index.html">Configuration</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/index.html">Guides</a><ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/themes/index.html">Themes</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/search/index.html">Search</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/deployment/index.html">Deploying to GitHub Pages</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/markdown/index.html">Markdown Extensions</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/plugins/index.html">Plugins</a></li></ul></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/releases/index.html">Release Policy</a></li></ul>
 			</aside>
 			<main class="col-lg-9 col-xl-10 content">
 
 				<article class="page-content">
 
 					<h1 class="page-title"><span class="page-icon">⌨️</span> CLI Reference</h1>
-					<p class="page-summary">Every boxlang module:bxDocs verb and its flags.</p>
-<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-reference">reference</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-cli">cli</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 1:30:17 AM</span></div>
+					<p class="page-summary">Every bxDocs verb and its flags.</p>
+<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-reference">reference</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-cli">cli</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 4:28:10 AM</span></div>
 <nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#global-options">Global options</a></li><li class="toc-level-2"><a href="#new">new</a></li><li class="toc-level-2"><a href="#build">build</a></li><li class="toc-level-2"><a href="#serve">serve</a></li><li class="toc-level-2"><a href="#search-index">search-index</a></li><li class="toc-level-2"><a href="#clean">clean</a></li><li class="toc-level-2"><a href="#gh-deploy">gh-deploy</a></li></ul></nav>
 					<h1 id="cli-reference"><a href="#cli-reference" id="cli-reference" name="cli-reference" class="anchor"></a>CLI Reference</h1>
-<pre><code class="language-bash">boxlang module:bxDocs &lt;verb&gt; [options]
+<pre><code class="language-bash">bxDocs &lt;verb&gt; [options]
+</code></pre>
+<p><code>box install bx-docs</code> drops a standalone <code>bxDocs</code> script on your <code>PATH</code>
+(via <code>box.json</code>'s <code>boxlang.executable</code>), so every verb below can be run
+either that short way, or as <code>boxlang module:bxdocs &lt;verb&gt;</code> - both run the
+exact same thing; use the longer form anywhere the <code>PATH</code> shim isn't set
+up (a CI runner, a module registered by hand):</p>
+<pre><code class="language-bash">boxlang module:bxdocs &lt;verb&gt; [options]
 </code></pre>
 <p>Every verb accepts <code>--projectRoot=&lt;path&gt;</code> (or a bare positional path) to
 target a project other than the current directory, and the two global
@@ -96,7 +105,7 @@ flags below can appear before any verb.</p>
 </table>
 <h2 id="new"><a href="#new" id="new" name="new" class="anchor"></a><code>new</code></h2>
 <p>Scaffold a docs project.</p>
-<pre><code class="language-bash">boxlang module:bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...]
+<pre><code class="language-bash">bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...]
 </code></pre>
 <ul>
 <li><code>--name</code> - the site name written into <code>bxdocs.json</code> (defaults to the target directory's name)</li>
@@ -107,22 +116,22 @@ flags below can appear before any verb.</p>
 <p>Render <code>docs/**.md</code> into a static site in <code>site/</code>. Also builds the search
 index (unless <code>search</code> is <code>false</code> in <code>bxdocs.json</code>) and copies theme +
 <code>docs/assets/**</code> into <code>site/</code>.</p>
-<pre><code class="language-bash">boxlang module:bxDocs build
+<pre><code class="language-bash">bxDocs build
 </code></pre>
 <h2 id="serve"><a href="#serve" id="serve" name="serve" class="anchor"></a><code>serve</code></h2>
 <p>Build and serve the site locally with live reload.</p>
-<pre><code class="language-bash">boxlang module:bxDocs serve [--port=8080] [--host=127.0.0.1]
+<pre><code class="language-bash">bxDocs serve [--port=8080] [--host=127.0.0.1]
 </code></pre>
 <p>Runs in the foreground until interrupted (Ctrl+C).</p>
 <h2 id="search-index"><a href="#search-index" id="search-index" name="search-index" class="anchor"></a><code>search-index</code></h2>
 <p>Rebuild <code>site/search-index.json</code> standalone, without re-rendering pages or
 copying assets. <code>build</code> already runs this same step automatically - this
 verb exists for when you only need to refresh the index.</p>
-<pre><code class="language-bash">boxlang module:bxDocs search-index
+<pre><code class="language-bash">bxDocs search-index
 </code></pre>
 <h2 id="clean"><a href="#clean" id="clean" name="clean" class="anchor"></a><code>clean</code></h2>
 <p>Remove <code>site/</code> and any build cache, leaving <code>docs/</code> and <code>bxdocs.json</code> alone.</p>
-<pre><code class="language-bash">boxlang module:bxDocs clean
+<pre><code class="language-bash">bxDocs clean
 </code></pre>
 <h2 id="gh-deploy"><a href="#gh-deploy" id="gh-deploy" name="gh-deploy" class="anchor"></a><code>gh-deploy</code></h2>
 <p>Builds the site, then force-pushes it to a <code>gh-pages</code>-style branch - one
@@ -130,7 +139,7 @@ commit per deploy, no accumulated history on that branch, matching mkdocs'
 own <code>mkdocs gh-deploy</code> convention. Requires the project to be a git
 repository with a configured remote; never touches your own current branch
 or working tree (it does the push from a throwaway <code>git worktree</code>).</p>
-<pre><code class="language-bash">boxlang module:bxDocs gh-deploy [--branch=gh-pages] [--remote=origin] [--message=&quot;...&quot;]
+<pre><code class="language-bash">bxDocs gh-deploy [--branch=gh-pages] [--remote=origin] [--message=&quot;...&quot;]
 </code></pre>
 <ul>
 <li><code>--branch</code> - defaults to <code>gh-pages</code></li>
@@ -170,11 +179,17 @@ or working tree (it does the push from a throwaway <code>git worktree</code>).</
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
 	<script src="/bx-docs/development/assets/highlight-boxlang.js"></script>
 	<script>hljs.highlightAll();</script>
+	<script src="/bx-docs/development/assets/code-lines.js"></script>
 	<script src="/bx-docs/development/assets/copy-code.js" defer></script>
 	<script src="/bx-docs/development/assets/admonition-collapse.js" defer></script>
+	<script src="/bx-docs/development/assets/tabs.js" defer></script>
 
 	<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 	<script src="/bx-docs/development/assets/mermaid-init.js"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+	<script src="/bx-docs/development/assets/math-init.js"></script>
 
 	
 </body>

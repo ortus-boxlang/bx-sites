@@ -35,6 +35,8 @@
 	<link rel="stylesheet" href="/bx-docs/development/assets/theme/style.css">
 	
 
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+
 	<script>window.__BXDOCS_BASE_PATH__ = "/bx-docs/development/";</script>
 	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
 	<script src="/bx-docs/development/assets/search.js" defer></script>
@@ -68,14 +70,14 @@
 	<div class="container-fluid">
 		<div class="row">
 			<aside class="col-lg-3 col-xl-2 sidebar collapse d-lg-block" id="bxdocs-sidebar">
-				<ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/index.html">Home</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/getting-started/index.html">Getting Started</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/cli-reference/index.html">CLI Reference</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/configuration/index.html">Configuration</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/index.html">Guides</a><ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/themes/index.html">Themes</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/search/index.html">Search</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/deployment/index.html">Deploying to GitHub Pages</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/markdown/index.html">Markdown Extensions</a></li></ul></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/releases/index.html">Release Policy</a></li></ul>
+				<ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/index.html">Home</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/getting-started/index.html">Getting Started</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/cli-reference/index.html">CLI Reference</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/configuration/index.html">Configuration</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/index.html">Guides</a><ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/themes/index.html">Themes</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/search/index.html">Search</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/deployment/index.html">Deploying to GitHub Pages</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/markdown/index.html">Markdown Extensions</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/plugins/index.html">Plugins</a></li></ul></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/releases/index.html">Release Policy</a></li></ul>
 			</aside>
 			<main class="col-lg-9 col-xl-10 content">
 
 				<article class="page-content">
 <nav class="breadcrumb-nav mb-3" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/bx-docs/development/guides/index.html">Guides</a></li><li class="breadcrumb-item active" aria-current="page">Themes</li></ol></nav>
 					<h1 class="page-title">Themes</h1>
-<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-themes">themes</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 1:30:17 AM</span></div>
+<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-themes">themes</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 4:28:10 AM</span></div>
 <nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#built-in">Built in</a></li><li class="toc-level-2"><a href="#the-themeprovider-contract">The ThemeProvider contract</a></li><li class="toc-level-2"><a href="#overriding-a-theme">Overriding a theme</a></li></ul></nav>
 					<h1 id="themes"><a href="#themes" id="themes" name="themes" class="anchor"></a>Themes</h1>
 <p>Themes are native BoxLang <code>.bxm</code> templates - there's no separate template
@@ -153,8 +155,12 @@ page's markdown, including collapsible variants - no config needed. See
 <a href="markdown.md#admonitions">Markdown Extensions</a>.</li>
 <li><strong>Footnotes and definition lists</strong>, opt-in via <code>bxdocs.json</code>'s <code>markdown</code>.
 See <a href="markdown.md#footnotes">Markdown Extensions</a>.</li>
+<li><strong>Content tabs</strong> and <strong>code line numbers/highlighted lines/titles</strong>, no
+config needed. See <a href="markdown.md#content-tabs">Markdown Extensions</a>.</li>
 <li><strong>Mermaid diagrams</strong>, opt-in via <code>bxdocs.json</code>'s <code>mermaid</code>. See
 <a href="markdown.md#diagrams">Markdown Extensions</a>.</li>
+<li><strong>Math</strong> (KaTeX), opt-in via <code>bxdocs.json</code>'s <code>math</code>. See
+<a href="markdown.md#math">Markdown Extensions</a>.</li>
 </ul>
 <p>Set which one a project uses in <code>bxdocs.json</code>:</p>
 <pre><code class="language-json">{ &quot;theme&quot;: { &quot;name&quot;: &quot;material&quot; } }
@@ -189,8 +195,12 @@ versioned, so a theme only needs to render a switcher when
 <code>variables.versions.len() gt 1</code>. The three built-in themes get their repo/social icons from
 a small shared SVG lookup, <code>&lt;bx:include template=&quot;#variables.moduleAssetsDir#/icons.bxm&quot;&gt;</code>
 (defines <code>bxdocsIcon( name )</code>, one of <code>github</code>, <code>twitter</code>/<code>x</code>, <code>rss</code>,
-<code>email</code>, <code>edit</code>, <code>clock</code>, falling back to a generic link glyph) - a custom
-theme can include it the same way, or supply its own icons entirely.</p>
+<code>youtube</code>, <code>linkedin</code>, <code>facebook</code>, <code>bluesky</code>, <code>threads</code>, <code>slack</code>,
+<code>patreon</code>, <code>email</code>, <code>edit</code>, <code>clock</code>, falling back to a generic link glyph)</p>
+<ul>
+<li>a custom
+theme can include it the same way, or supply its own icons entirely.</li>
+</ul>
 <p>A theme folder missing either required file fails fast with a clear
 <code>BxDocs.InvalidTheme</code> error at build time, rather than a confusing template
 error deep inside rendering.</p>
@@ -231,11 +241,17 @@ satisfies the contract above - the built-in themes under this module's own
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
 	<script src="/bx-docs/development/assets/highlight-boxlang.js"></script>
 	<script>hljs.highlightAll();</script>
+	<script src="/bx-docs/development/assets/code-lines.js"></script>
 	<script src="/bx-docs/development/assets/copy-code.js" defer></script>
 	<script src="/bx-docs/development/assets/admonition-collapse.js" defer></script>
+	<script src="/bx-docs/development/assets/tabs.js" defer></script>
 
 	<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 	<script src="/bx-docs/development/assets/mermaid-init.js"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+	<script src="/bx-docs/development/assets/math-init.js"></script>
 
 	
 </body>

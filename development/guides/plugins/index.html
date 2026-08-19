@@ -6,10 +6,10 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Guides - BX Docs</title>
+	<title>Plugins - BX Docs</title>
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="BX Docs">
-	<meta property="og:title" content="Guides">
+	<meta property="og:title" content="Plugins">
 
 	<meta name="description" content="Static documentation site generator for BoxLang, built on bx-markdown">
 	<meta property="og:description" content="Static documentation site generator for BoxLang, built on bx-markdown">
@@ -75,26 +75,108 @@
 			<main class="col-lg-9 col-xl-10 content">
 
 				<article class="page-content">
+<nav class="breadcrumb-nav mb-3" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/bx-docs/development/guides/index.html">Guides</a></li><li class="breadcrumb-item active" aria-current="page">Plugins</li></ol></nav>
+					<h1 class="page-title">Plugins</h1>
+<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-plugins">plugins</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/plugins.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 4:28:10 AM</span></div>
+<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#writing-a-plugin">Writing a plugin</a></li><li class="toc-level-2"><a href="#when-each-hook-fires">When each hook fires</a></li><li class="toc-level-2"><a href="#a-minimal-example">A minimal example</a></li><li class="toc-level-2"><a href="#errors">Errors</a></li></ul></nav>
+					<h1 id="plugins"><a href="#plugins" id="plugins" name="plugins" class="anchor"></a>Plugins</h1>
+<p>A BX Docs plugin is nothing more than another BoxLang module - its own
+<code>box.json</code> + <code>ModuleConfig.bx</code>, installed as a sibling of <code>bx-docs</code> in the
+same runtime (<code>box install</code> into the project, the same way <code>bx-markdown</code>/
+<code>bx-esapi</code> already are). No plugin API to import, no separate registry -
+BoxLang's own module system <em>is</em> the plugin system.</p>
+<p>Installing a module alone never activates it as a plugin, though - a
+project opts one in explicitly by BoxLang module name, via <code>bxdocs.json</code>'s
+<a href="../configuration.md#plugins"><code>plugins</code></a> array:</p>
+<pre><code class="language-json">{ &quot;plugins&quot;: [ &quot;myBxDocsPlugin&quot; ] }
+</code></pre>
+<h2 id="writing-a-plugin"><a href="#writing-a-plugin" id="writing-a-plugin" name="writing-a-plugin" class="anchor"></a>Writing a plugin</h2>
+<p>A plugin module needs exactly one thing beyond the usual <code>box.json</code>/
+<code>ModuleConfig.bx</code> a BoxLang module already has: a <code>models/BxDocsPlugin.bx</code>
+class. Every method on it is optional - implement only the hooks you need,
+BX Docs checks for each one before calling it:</p>
+<pre><code class="language-bx">// models/BxDocsPlugin.bx
+class {
 
-					<h1 class="page-title">Guides</h1>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/index.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 4:28:10 AM</span></div>
+	struct function onConfig( required struct config ) {
+		// Mutate/return the site config, right after bxdocs.json is loaded.
+		return arguments.config
+	}
 
-					<h1 id="guides"><a href="#guides" id="guides" name="guides" class="anchor"></a>Guides</h1>
+	string function onPageMarkdown( required string markdown, required struct page, required struct config ) {
+		// Mutate a page's raw markdown before conversion - the same
+		// pre-processing seam BX Docs' own content tabs/math/code
+		// annotations use internally (TabsProcessor.bx et al.).
+		return arguments.markdown
+	}
+
+	string function onPageHtml( required string html, required struct page, required struct config ) {
+		// Mutate a page's rendered HTML after conversion.
+		return arguments.html
+	}
+
+	array function onNav( required array nav, required struct config ) {
+		// Mutate the nav tree (NavBuilder.build()'s own shape: an array of
+		// { title, url, order, children } nodes).
+		return arguments.nav
+	}
+
+	void function onBuildComplete( required string siteDir, required struct config ) {
+		// Fires once, after everything is written to siteDir - no return value.
+	}
+
+}
+</code></pre>
+<p>Hooks run in <code>bxdocs.json</code>'s own <code>plugins</code> array order, and (except
+<code>onBuildComplete</code>) each one's return value replaces the value the next
+hook (or BX Docs itself) sees - a plugin only needs to return what it was
+given if it has nothing to change.</p>
+<p><code>onPageMarkdown</code>/<code>onPageHtml</code> run once per page, for every doc tree BX
+Docs builds (the main <code>docs/</code> tree and every <code>docs/versions/&lt;name&gt;/</code>
+tree). <code>onConfig</code>/<code>onNav</code>/<code>onBuildComplete</code> are also applied by the
+standalone <code>search-index</code> verb where relevant (<code>onConfig</code>, since it can
+change <code>markdown</code>/other settings the index build depends on).</p>
+<h2 id="when-each-hook-fires"><a href="#when-each-hook-fires" id="when-each-hook-fires" name="when-each-hook-fires" class="anchor"></a>When each hook fires</h2>
+<pre><code class="language-mermaid">sequenceDiagram
+    participant Build as build verb
+    participant Plugin as your plugin
+    Build-&gt;&gt;Plugin: onConfig(config)
+    Build-&gt;&gt;Build: build the nav tree
+    Build-&gt;&gt;Plugin: onNav(nav, config)
+    loop every page
+        Build-&gt;&gt;Plugin: onPageMarkdown(markdown, page, config)
+        Build-&gt;&gt;Build: Markdown() + built-in extensions
+        Build-&gt;&gt;Plugin: onPageHtml(html, page, config)
+    end
+    Build-&gt;&gt;Build: write site/
+    Build-&gt;&gt;Plugin: onBuildComplete(siteDir, config)
+</code></pre>
+<h2 id="a-minimal-example"><a href="#a-minimal-example" id="a-minimal-example" name="a-minimal-example" class="anchor"></a>A minimal example</h2>
+<p><code>examples/hello-plugin/</code> in this repo is a complete, working plugin
+module - <code>box install</code>-able as-is - that adds a <code>&lt;!-- rendered by hello-plugin --&gt;</code> comment to every page and appends a build-summary line
+to <code>site/hello-plugin.txt</code> once the build finishes. Use it as a starting
+skeleton, or read it for a worked example of the folder layout:</p>
+<pre><code>hello-plugin/
+├── box.json              # boxlang.moduleName is what bxdocs.json's [plugins] references
+├── ModuleConfig.bx        # a normal, otherwise-empty BoxLang module descriptor
+└── models/
+    └── BxDocsPlugin.bx    # onPageHtml() + onBuildComplete()
+</code></pre>
+<h2 id="errors"><a href="#errors" id="errors" name="errors" class="anchor"></a>Errors</h2>
 <ul>
-<li><a href="themes.md">Themes</a> - the built-in themes, and how to write your own</li>
-<li><a href="search.md">Search</a> - how the static search index works</li>
-<li><a href="deployment.md">Deploying to GitHub Pages</a> - the built-in GitHub Actions workflow</li>
-<li><a href="markdown.md">Markdown Extensions</a> - admonitions, footnotes, definition lists and Mermaid diagrams</li>
-<li><a href="plugins.md">Plugins</a> - extending BX Docs with a BoxLang module of your own</li>
+<li><code>BxDocs.PluginNotFound</code> - a name in <code>bxdocs.json</code>'s <code>plugins</code> array
+isn't an installed/activated BoxLang module.</li>
+<li><code>BxDocs.InvalidPlugin</code> - the module exists, but has no
+<code>models/BxDocsPlugin.bx</code> class.</li>
 </ul>
 
 				</article>
 
 				<nav class="page-nav d-flex justify-content-between" aria-label="Page navigation">
 
-					<a class="page-nav__prev" href="/bx-docs/development/configuration/index.html">&larr; Configuration</a>
+					<a class="page-nav__prev" href="/bx-docs/development/guides/markdown/index.html">&larr; Markdown Extensions</a>
 
-					<a class="page-nav__next" href="/bx-docs/development/guides/themes/index.html">Themes &rarr;</a>
+					<a class="page-nav__next" href="/bx-docs/development/releases/index.html">Release Policy &rarr;</a>
 
 				</nav>
 
