@@ -47,7 +47,7 @@ class {
 
 			html &= '<h2 id="tag-' & tagSlug( tag ) & '">' & encodeForHTML( tag ) & '</h2><ul>'
 			for ( var page in tagPages ) {
-				html &= '<li><a href="' & encodeForHTML( arguments.basePath & page.urlPath ) & '">' & encodeForHTML( page.title ) & '</a></li>'
+				html &= '<li><a href="' & arguments.basePath & page.urlPath & '">' & encodeForHTML( page.title ) & '</a></li>'
 			}
 			html &= '</ul>'
 		}
