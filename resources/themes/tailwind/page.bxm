@@ -67,7 +67,7 @@
 </bx:script>
 <bx:output>			<article class="rounded-lg bg-white p-8 shadow-sm ring-1 ring-slate-200">
 </bx:output><bx:if condition="#variables.page.breadcrumbs.len() gt 1#"><bx:output>#renderBreadcrumbs( variables.page.breadcrumbs )#</bx:output></bx:if><bx:output>
-				<h1 class="mb-6 border-b-4 border-[##FFF500] pb-2 text-2xl font-bold"></bx:output><bx:if condition="#len( variables.page.icon )#"><bx:output><span class="page-icon">#encodeForHTML( variables.page.icon )#</span> </bx:output></bx:if><bx:output>#encodeForHTML( variables.page.title )#</h1>
+				<h1 class="mb-6 border-b-4 border-[##FFF500] pb-2 text-2xl font-bold"></bx:output><bx:if condition="#len( variables.page.iconHtml )#"><bx:output><span class="page-icon">#variables.page.iconHtml#</span> </bx:output></bx:if><bx:output>#encodeForHTML( variables.page.title )#</h1>
 </bx:output><bx:if condition="#len( variables.page.summary )#"><bx:output>				<p class="mb-6 -mt-4 text-lg text-slate-500">#encodeForHTML( variables.page.summary )#</p>
 </bx:output></bx:if><bx:if condition="#variables.page.tags.len() gt 0#"><bx:output>#renderTags( variables.page.tags )#</bx:output></bx:if><bx:if condition="#len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl )#"><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:output></bx:if><bx:output>
 </bx:output><bx:if condition="#variables.page.toc.len() gt 0#"><bx:output>#renderToc( variables.page.toc )#</bx:output></bx:if><bx:output>

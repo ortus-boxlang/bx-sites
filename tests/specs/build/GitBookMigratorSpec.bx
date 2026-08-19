@@ -259,6 +259,47 @@ Real text after.' );
 				expect( converted ).toInclude( "Real text after." );
 			} );
 
+			it( "carries GitBook's own title/description/tags frontmatter into the migrated page's bx-docs frontmatter", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '---
+title: Real Title
+description: "A real description."
+tags:
+  - news
+  - beta
+---
+Body text.' );
+
+				migrator.migrate( sourceDir, docsDir );
+				var converted = fileRead( docsDir & "/page.md" );
+
+				expect( converted ).toInclude( "title: Real Title" );
+				expect( converted ).toInclude( "description: A real description." );
+				expect( converted ).toInclude( "tags: [news, beta]" );
+				expect( converted ).toInclude( "Body text." );
+			} );
+
+			it( "carries an icon field through opportunistically when GitBook frontmatter has one", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '---
+icon: rocket
+---
+Body.' );
+
+				migrator.migrate( sourceDir, docsDir );
+
+				expect( fileRead( docsDir & "/page.md" ) ).toInclude( "icon: rocket" );
+			} );
+
+			it( "writes no frontmatter block at all when the source page has none", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", "Just body text, no frontmatter." );
+
+				migrator.migrate( sourceDir, docsDir );
+
+				expect( fileRead( docsDir & "/page.md" ) ).notToInclude( "---" );
+			} );
+
 			it( "reports a warning and skips a SUMMARY.md entry whose file doesn't exist", function() {
 				fileWrite( sourceDir & "/SUMMARY.md", "* [Missing](missing.md)" );
 

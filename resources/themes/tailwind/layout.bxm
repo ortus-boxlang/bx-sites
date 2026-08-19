@@ -9,14 +9,14 @@
 		var html = "<ul class=""space-y-1" & ( arguments.nested ? " ml-4 mt-1" : "" ) & """>"
 		for ( var node in arguments.nodes ) {
 			if ( !len( node.url ) && node.children.len() && variables.navCollapsible ) {
-				html &= "<li><details class=""nav-section""" & ( variables.navExpandAll ? " open" : "" ) & "><summary class=""block px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400"">" & encodeForHTML( node.title ) & "</summary>" & renderNavList( node.children, true ) & "</details></li>"
+				html &= "<li><details class=""nav-section""" & ( variables.navExpandAll ? " open" : "" ) & "><summary class=""block px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400"">" & ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title ) & "</summary>" & renderNavList( node.children, true ) & "</details></li>"
 				continue
 			}
 			html &= "<li>"
 			if ( len( node.url ) ) {
-				html &= "<a class=""block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50"" href=""" & variables.basePath & node.url & """>" & encodeForHTML( node.title ) & "</a>"
+				html &= "<a class=""block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50"" href=""" & variables.basePath & node.url & """>" & ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title ) & "</a>"
 			} else {
-				html &= "<span class=""block px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400"">" & encodeForHTML( node.title ) & "</span>"
+				html &= "<span class=""block px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400"">" & ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title ) & "</span>"
 			}
 			if ( node.children.len() ) {
 				html &= renderNavList( node.children, true )

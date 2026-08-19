@@ -523,6 +523,22 @@ dd {
 	display: inline-block;
 }
 
+/* A named icon (icon: rocket / lucide:rocket / tabler:rocket / custom:name)
+   resolves to an inline SVG using currentColor fill/stroke, so it already
+   tracks the surrounding text color in both themes/light-dark modes with
+   no extra rule needed - this only handles sizing/alignment. */
+.bxdocs-icon {
+	width: 1em;
+	height: 1em;
+	vertical-align: -0.15em;
+	flex-shrink: 0;
+}
+
+.page-icon .bxdocs-icon {
+	width: 1.1em;
+	height: 1.1em;
+}
+
 .page-summary {
 	font-size: 1.15rem;
 	color: #6c757d;

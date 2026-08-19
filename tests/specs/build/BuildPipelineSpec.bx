@@ -125,6 +125,18 @@ class extends="testbox.system.BaseSpec" {
 				expect( homeHtml ).toInclude( '<span class="bxdocs-page-link__title">Setup</span>' );
 			} );
 
+			it( "resolves a named icon in both a page's own header and its nav entry", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "icon: rocket" & char( 10 ) & "---" & char( 10 ) & "Home" );
+
+				pipeline.build( root );
+				var html = fileRead( root & "/site/index.html" );
+
+				expect( html ).toInclude( '<span class="page-icon"><svg class="bxdocs-icon"' );
+				// Same resolved icon also appears a second time, in the sidebar nav entry for this page.
+				expect( reMatch( 'class="bxdocs-icon"', html ).len() ).toBeGTE( 2 );
+			} );
+
 			it( "writes a feed.xml alongside a page with an ::: updates block, only when baseURL is absolute", function() {
 				var root = newProject();
 				fileWrite(

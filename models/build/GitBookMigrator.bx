@@ -67,7 +67,7 @@ class {
 			var parsedFile = variables.frontmatterParser.parse( fileRead( sourcePath ) )
 			var linksRewritten = rewriteLinksInText( parsedFile.body )
 			var pageWarnings = []
-			var converted = convert( linksRewritten, pageWarnings )
+			var converted = serializeFrontmatter( parsedFile.frontmatter ) & convert( linksRewritten, pageWarnings )
 			for ( var w in pageWarnings ) {
 				warnings.append( "#sourceRelativePath#: #w#" )
 			}
@@ -168,6 +168,52 @@ class {
 		}
 
 		return { nav : root, pages : pages }
+	}
+
+	/**
+	 * Carries GitBook's own real, confirmed Git-Sync frontmatter fields
+	 * (`title`, `description`, `tags`) over into a bx-docs frontmatter
+	 * block, plus `icon` opportunistically - GitBook's own docs don't
+	 * confirm a page-icon field actually survives a Git-Sync export at
+	 * all, but FrontmatterParser.bx parses whatever key/value pairs are
+	 * genuinely present, so if one ever is (or a project's own export
+	 * tooling adds one by hand), it's carried through unchanged rather
+	 * than silently dropped like the rest of `frontmatter` already was
+	 * before this - now meaningful since bx-docs' own `icon` accepts a
+	 * named Phosphor/Lucide/Tabler icon, not just an emoji.
+	 *
+	 * @frontmatter FrontmatterParser.parse()'s own `frontmatter` struct
+	 *
+	 * @return A `---`-delimited bx-docs frontmatter block, or "" when none of the recognized fields are present
+	 */
+	private string function serializeFrontmatter( required struct frontmatter ) {
+		var lines = []
+
+		var title = trim( arguments.frontmatter.title ?: "" )
+		if ( len( title ) ) {
+			lines.append( "title: " & title )
+		}
+
+		var description = trim( arguments.frontmatter.description ?: "" )
+		if ( len( description ) ) {
+			lines.append( "description: " & description )
+		}
+
+		var tags = isArray( arguments.frontmatter.tags ?: "" ) ? arguments.frontmatter.tags : []
+		var tagNames = tags.map( tag => trim( tag ) ).filter( tag => len( tag ) )
+		if ( tagNames.len() ) {
+			lines.append( "tags: [" & tagNames.toList( ", " ) & "]" )
+		}
+
+		var icon = trim( arguments.frontmatter.icon ?: "" )
+		if ( len( icon ) ) {
+			lines.append( "icon: " & icon )
+		}
+
+		if ( !lines.len() ) {
+			return ""
+		}
+		return "---" & char( 10 ) & lines.toList( char( 10 ) ) & char( 10 ) & "---" & char( 10 ) & char( 10 )
 	}
 
 	/**

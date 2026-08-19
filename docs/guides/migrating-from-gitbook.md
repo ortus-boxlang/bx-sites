@@ -63,6 +63,7 @@ source export and run it again.
 |---|---|
 | `SUMMARY.md` | `docs/nav.json` ([nav override](../configuration.md#nav) format), nesting preserved |
 | `README.md` (any folder) | `index.md` - bx-docs' own folder-index convention |
+| A page's `title`/`description`/`tags` frontmatter | Carried over into the migrated file's own bx-docs frontmatter unchanged |
 | `.gitbook/assets/**` | `docs/assets/gitbook/**`, with every reference rewritten to match |
 | `{% hint style="..." %}` | `!!! type` - a native [admonition](markdown.md#admonitions) |
 | `{% tabs %}` / `{% tab title="..." %}` | `=== "Title"` - native [content tabs](markdown.md#content-tabs) |
@@ -92,6 +93,19 @@ a warning.
 A few smaller judgment calls are reported the same way: an unrecognized
 `hint` `style` (falls back to `note`), or a `column` `width` that isn't a
 plain CSS length/percentage (dropped rather than trusted verbatim).
+
+**Page icons aren't migrated automatically.** GitBook's own docs don't
+confirm that a page's icon assignment (set via its editor's icon picker)
+actually survives into a Git-Sync export at all - if a project's exported
+frontmatter genuinely has an `icon` field, `migrate` carries it through
+opportunistically, but don't expect it for most real exports. Set icons
+by hand afterward instead - either a page's own frontmatter, or a
+[`docs/nav.json` entry's own `icon`](../configuration.md#nav) - using a
+[named icon](themes.md#icons) from one of the three bundled libraries
+(no need to match GitBook's own Font-Awesome-based icons; pick whichever
+name looks right in [Phosphor](https://phosphoricons.com/),
+[Lucide](https://lucide.dev/icons/) or [Tabler](https://tabler.io/icons)'s
+own gallery).
 
 ## After migrating
 

@@ -30,6 +30,7 @@ class {
 	variables.pageLinkResolver = new "models.build.PageLinkResolver@bxdocs"()
 	variables.updatesFeedGenerator = new "models.build.UpdatesFeedGenerator@bxdocs"()
 	variables.pluginLoader = new "models.build.PluginLoader@bxdocs"()
+	variables.iconResolver = new "models.build.IconResolver@bxdocs"()
 	variables.pluginsOverride = []
 	variables.hasPluginsOverride = false
 
@@ -179,6 +180,7 @@ class {
 		var nav = variables.navBuilder.build( pages, arguments.navConfig )
 		nav = variables.pluginLoader.applyOnNav( arguments.plugins, nav, arguments.config )
 		var flatSequence = variables.navBuilder.flatten( nav )
+		assignNavIconHtml( nav, arguments.docsDir )
 
 		directoryCreate( arguments.outputDir, true, true )
 
@@ -190,6 +192,7 @@ class {
 		assignEditAndLastUpdated( pages, arguments.config, arguments.root, arguments.docsRelativePrefix )
 		assignOgImages( pages, arguments.config, arguments.outputDir )
 		assignMarkdownUrl( pages )
+		assignIconHtml( pages, arguments.docsDir )
 
 		for ( var page in pages ) {
 			var html = variables.themeRenderer.renderPage(
@@ -545,6 +548,39 @@ class {
 	private void function assignMarkdownUrl( required array pages ) {
 		for ( var page in arguments.pages ) {
 			page.markdownUrl = page.relativePath
+		}
+	}
+
+	/**
+	 * Resolves each page's own frontmatter `icon` into ready-to-embed HTML
+	 * (IconResolver.bx) - a theme's `page.bxm` renders `page.iconHtml`
+	 * directly next to the title, never touching `icon`/IconResolver.bx
+	 * itself.
+	 *
+	 * @pages Array of page structs (`icon` already set by DocsLoader.bx)
+	 * @docsDir Absolute path to this tree's own docs root - resolves a `custom:` icon against its `assets/icons/`
+	 */
+	private void function assignIconHtml( required array pages, required string docsDir ) {
+		for ( var page in arguments.pages ) {
+			page.iconHtml = variables.iconResolver.resolve( page.icon ?: "", arguments.docsDir )
+		}
+	}
+
+	/**
+	 * Resolves every nav node's own `icon` (NavBuilder.bx) into ready-to-embed
+	 * HTML, recursively - a theme's `layout.bxm` renders each node's own
+	 * `iconHtml` directly next to its title, never touching IconResolver.bx
+	 * itself. Mutates `nodes` in place.
+	 *
+	 * @nodes A nav tree (or subtree) from NavBuilder.build()
+	 * @docsDir Absolute path to this tree's own docs root - resolves a `custom:` icon against its `assets/icons/`
+	 */
+	private void function assignNavIconHtml( required array nodes, required string docsDir ) {
+		for ( var node in arguments.nodes ) {
+			node.iconHtml = variables.iconResolver.resolve( node.icon ?: "", arguments.docsDir )
+			if ( node.children.len() ) {
+				assignNavIconHtml( node.children, arguments.docsDir )
+			}
 		}
 	}
 
