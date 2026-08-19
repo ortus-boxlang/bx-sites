@@ -27,7 +27,6 @@
  */
 class {
 
-	variables.fencePattern = createObject( "java", "java.util.regex.Pattern" ).compile( "(?m)^(```+|~~~+)(\S*)(.*)$" )
 	variables.attrPattern  = createObject( "java", "java.util.regex.Pattern" ).compile( '(\w+)="([^"]*)"' )
 	variables.preCodePattern = createObject( "java", "java.util.regex.Pattern" ).compile( "<pre><code" )
 
@@ -35,39 +34,64 @@ class {
 	 * Reads and strips `hl_lines`/`linenums`/`title` off every fenced code
 	 * block's info string, leaving a bare `` ```language `` fence behind.
 	 *
+	 * A line-by-line scan, not a regex over the whole text - CommonMark
+	 * fences nest by marker length (a fence opened with 4+ backticks can
+	 * only be closed by a line of 4+ backticks; a 3-backtick line inside it
+	 * is just literal content, e.g. a doc page showing fence syntax as an
+	 * example), so this tracks the currently-open fence's own character and
+	 * length rather than toggling a plain in/out boolean on every fence-like
+	 * line - which would miscount (and desync annotations from the actual
+	 * rendered `<pre>` elements applyToHtml() later walks) the moment a page
+	 * nests a fence inside a longer one.
+	 *
 	 * @markdown The raw markdown body text
 	 *
 	 * @return { markdown: string with fence attributes stripped, annotations: array (one entry per fence, in order; empty struct when a fence has no extra attributes) }
 	 */
 	struct function extractAndStrip( required string markdown ) {
-		var matcher = variables.fencePattern.matcher( arguments.markdown )
-		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+		var normalized = arguments.markdown.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" )
+		var lines = listToArray( normalized, char( 10 ), true )
+		var outputLines = []
 		var annotations = []
-		var insideFence = false
+		var fenceChar = ""
+		var fenceLength = 0
 
-		while ( matcher.find() ) {
-			if ( insideFence ) {
-				insideFence = false
-				matcher.appendReplacement( buffer, quoteReplacement( matcher.group( 0 ) ) )
+		for ( var i = 1; i <= lines.len(); i++ ) {
+			var line = lines[ i ]
+			var trimmedLine = trim( line )
+
+			if ( fenceLength > 0 ) {
+				if ( trimmedLine.reFind( "^" & fenceChar & "{" & fenceLength & ",}$" ) ) {
+					fenceLength = 0
+					fenceChar = ""
+				}
+				outputLines.append( line )
 				continue
 			}
 
-			insideFence = true
-			var lang = matcher.group( 2 )
-			var rest = trim( matcher.group( 3 ) )
+			if ( !trimmedLine.reFind( "^(```+|~~~+)" ) ) {
+				outputLines.append( line )
+				continue
+			}
 
-			if ( !len( rest ) ) {
+			var marker = trimmedLine.reReplace( "^(```+|~~~+).*", "\1", "one" )
+			fenceChar = left( marker, 1 )
+			fenceLength = len( marker )
+
+			var rest = trim( mid( trimmedLine, fenceLength + 1, len( trimmedLine ) ) )
+			var lang = rest.reReplace( "^(\S*).*", "\1", "one" )
+			var attrs = trim( mid( rest, len( lang ) + 1, len( rest ) ) )
+
+			if ( len( attrs ) ) {
+				annotations.append( parseAttrs( attrs ) )
+				outputLines.append( marker & lang )
+			} else {
 				annotations.append( {} )
-				matcher.appendReplacement( buffer, quoteReplacement( matcher.group( 0 ) ) )
-				continue
+				outputLines.append( line )
 			}
-
-			annotations.append( parseAttrs( rest ) )
-			matcher.appendReplacement( buffer, quoteReplacement( matcher.group( 1 ) & lang ) )
 		}
-		matcher.appendTail( buffer )
 
-		return { markdown : buffer.toString(), annotations : annotations }
+		return { markdown : outputLines.toList( char( 10 ) ), annotations : annotations }
 	}
 
 	/**

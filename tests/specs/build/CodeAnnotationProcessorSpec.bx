@@ -51,6 +51,27 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.annotations[ 3 ].showLineNumbers ).toBeTrue();
 			} );
 
+			it( "treats a shorter fence nested inside a longer one as literal content, not a real fence (regression)", function() {
+				var md = '````markdown' & char( 10 ) &
+					'```bx hl_lines="2" title="add.bx"' & char( 10 ) &
+					'line1' & char( 10 ) &
+					'line2' & char( 10 ) &
+					'```' & char( 10 ) &
+					'````' & char( 10 ) & char( 10 ) &
+					'```bx hl_lines="2" title="add.bx"' & char( 10 ) &
+					'line1' & char( 10 ) &
+					'line2' & char( 10 ) &
+					'```';
+
+				var result = processor.extractAndStrip( md );
+
+				expect( result.annotations.len() ).toBe( 2 );
+				expect( result.annotations[ 1 ].isEmpty() ).toBeTrue();
+				expect( result.annotations[ 2 ].title ).toBe( "add.bx" );
+				expect( result.annotations[ 2 ].hlLines ).toBe( [ 2 ] );
+				expect( result.markdown ).toInclude( '```bx hl_lines="2" title="add.bx"' & char( 10 ) & 'line1' );
+			} );
+
 			it( "stamps data-bxdocs-* attributes onto the matching <pre> in document order", function() {
 				var html = '<pre><code class="language-bx">a' & char( 10 ) & '</code></pre>' & char( 10 ) &
 					'<pre><code>plain' & char( 10 ) & '</code></pre>';
