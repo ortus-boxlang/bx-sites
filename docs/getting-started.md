@@ -67,6 +67,11 @@ Pass `--theme=material` or `--theme=tailwind` to scaffold with a different
 default theme, and `--name="My Project Docs"` to set the site name up
 front - otherwise `new` derives it from the target directory name.
 
+Already have content in GitBook? `bxDocs migrate --source=/path/to/export`
+converts a GitBook export straight into `docs/` - see
+[Migrating from GitBook](guides/migrating-from-gitbook.md) - and you can
+skip ahead to [Build](#build).
+
 ## Add pages
 
 Every `.md` file under `docs/` becomes a page. Folder nesting becomes nav
