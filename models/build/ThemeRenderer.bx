@@ -115,6 +115,10 @@ class {
 	}
 
 	/**
+	 * Renders one page through its theme's `layout.bxm`/`page.bxm`,
+	 * defaulting `tags`/`icon`/`summary`/`ogImage` on `page` first if
+	 * frontmatter left any of them unset.
+	 *
 	 * @page A page struct with an added `contentHtml` key (the already-converted markdown body)
 	 * @nav The site's nav tree, from NavBuilder.build()
 	 * @config The site's bxdocs.json config

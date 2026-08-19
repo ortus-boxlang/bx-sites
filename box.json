@@ -50,7 +50,8 @@
         "build.gradle",
         "/src/**",
         "gradle/**",
-        "/examples/**"
+        "/examples/**",
+        "/apidocs/**"
     ],
     "installPaths":{
         "testbox":"testbox/"

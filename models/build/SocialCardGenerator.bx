@@ -13,6 +13,9 @@ class {
 	variables.barHeight = 14
 
 	/**
+	 * Renders a 1200x630 branded PNG social card via pure `java.awt`/
+	 * `javax.imageio` - no headless browser needed.
+	 *
 	 * @title The page (or site) title to render, word-wrapped to fit
 	 * @subtitle A smaller line under the title - typically the site name
 	 * @outputPath Absolute path to write the PNG to (parent directory must already exist)

@@ -32,6 +32,9 @@ class {
 	variables.preCodePattern = createObject( "java", "java.util.regex.Pattern" ).compile( "<pre><code" )
 
 	/**
+	 * Reads and strips `hl_lines`/`linenums`/`title` off every fenced code
+	 * block's info string, leaving a bare `` ```language `` fence behind.
+	 *
 	 * @markdown The raw markdown body text
 	 *
 	 * @return { markdown: string with fence attributes stripped, annotations: array (one entry per fence, in order; empty struct when a fence has no extra attributes) }
@@ -68,6 +71,9 @@ class {
 	}
 
 	/**
+	 * Stamps each annotation from extractAndStrip() back onto its matching
+	 * rendered `<pre>` tag, walked in the same document order as the fences.
+	 *
 	 * @html Already-rendered HTML (from Markdown() on extractAndStrip()'s output)
 	 * @annotations extractAndStrip()'s own `annotations` array
 	 *
@@ -103,6 +109,9 @@ class {
 	}
 
 	/**
+	 * Parses a fence's `key="value"` attributes into a normalized annotation
+	 * struct (`hlLines`, `showLineNumbers`, `startLine`, `title`).
+	 *
 	 * @rest The fence info string with the language token already removed, e.g. `hl_lines="2 4-6" linenums="1" title="app.bx"`
 	 */
 	private struct function parseAttrs( required string rest ) {
@@ -127,6 +136,8 @@ class {
 	}
 
 	/**
+	 * Expands an `hl_lines` spec into a flat array of individual line numbers.
+	 *
 	 * @spec Space-separated line numbers and/or `A-B` ranges, e.g. `2 4-6`
 	 */
 	private array function expandLineRanges( required string spec ) {
@@ -146,6 +157,8 @@ class {
 	}
 
 	/**
+	 * Escapes literal text for use as a `Matcher#appendReplacement` argument.
+	 *
 	 * @text Literal text to safely pass through java.util.regex.Matcher#appendReplacement, which otherwise treats `$` and `\` as backreference syntax
 	 */
 	private string function quoteReplacement( required string text ) {

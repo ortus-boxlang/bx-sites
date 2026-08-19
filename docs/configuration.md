@@ -23,7 +23,7 @@ Every project has one `bxdocs.json` at its root:
 	},
 	"search": true,
 	"nav": [],
-	"markdown": {},
+	"markdown": { "enableAdmonition": true },
 	"repo": {
 		"url": "",
 		"editUri": ""
@@ -31,13 +31,17 @@ Every project has one `bxdocs.json` at its root:
 	"social": [],
 	"footer": false,
 	"lastUpdated": false,
+	"mermaid": false,
+	"math": false,
 	"analytics": {
 		"provider": "",
 		"id": ""
 	},
 	"ogImage": "",
+	"generateOgImages": false,
 	"extraCss": [],
-	"extraJs": []
+	"extraJs": [],
+	"plugins": []
 }
 ```
 
@@ -96,11 +100,11 @@ non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
 - `theme.name` - one of the built-in themes (`bootstrap`, `material`,
   `tailwind`), or the name of a custom theme you provide via a `theme/`
   folder at the project root (see [Themes](guides/themes.md))
-- `theme.logo` - path/URL to an image shown in the header brand mark instead
-  of the default "⚡ &lt;site name&gt;" text - a relative path (e.g.
-  `"assets/logo.svg"`, resolved against `docs/assets/`) is prefixed with
-  `baseURL` like any other internal asset; an absolute URL is used as-is.
-  Left blank (the default), the header keeps the default text mark.
+- `theme.logo` - path/URL to an image shown next to the site name in the
+  header brand mark (in place of the default "⚡" glyph) - a relative path
+  (e.g. `"assets/logo.svg"`, resolved against `docs/assets/`) is prefixed
+  with `baseURL` like any other internal asset; an absolute URL is used
+  as-is. Left blank (the default), the header shows "⚡ &lt;site name&gt;".
 - `theme.favicon` - path/URL to a favicon, resolved the same way as
   `theme.logo`. Left blank (the default), no `<link rel="icon">` is
   rendered at all (falling back to the browser's own default behavior).

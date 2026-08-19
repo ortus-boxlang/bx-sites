@@ -29,6 +29,8 @@ class {
 	}
 
 	/**
+	 * Pulls every `h1`-`h6` heading's plain text out of a page's rendered HTML.
+	 *
 	 * @html Rendered page HTML (already-converted markdown)
 	 *
 	 * @return Array of heading text strings, in document order
@@ -57,6 +59,9 @@ class {
 	}
 
 	/**
+	 * Cuts `text` to `maxLength`, appending an ellipsis when it was
+	 * actually truncated.
+	 *
 	 * @text Plain text to truncate
 	 * @maxLength Maximum length before truncating with an ellipsis
 	 */

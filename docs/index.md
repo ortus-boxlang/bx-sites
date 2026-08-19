@@ -29,6 +29,8 @@ repository's own `docs/` folder - see
 - **Markdown handled by [bx-markdown](https://github.com/ortus-boxlang/bx-markdown).**
   BX Docs doesn't parse Markdown itself; it delegates to bx-markdown and
   forwards your own `bxdocs.json` options straight through to it.
+- **A plugin system built on BoxLang's own module system.** A plugin is
+  just another installed BoxLang module - no separate plugin API to learn.
 
 ## Where to go next
 

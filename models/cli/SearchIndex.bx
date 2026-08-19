@@ -6,6 +6,8 @@
 class {
 
 	/**
+	 * Dispatches the `search-index` verb to BuildPipeline.buildSearchIndex().
+	 *
 	 * @options { projectRoot (required, absolute path) }
 	 */
 	struct function run( struct options = {} ) {

@@ -7,6 +7,9 @@
 class {
 
 	/**
+	 * Dispatches the `serve` verb to DevServer.start(), blocking until
+	 * interrupted.
+	 *
 	 * @options { projectRoot (required, absolute path), port (default 8080), host (default 127.0.0.1) }
 	 */
 	struct function run( struct options = {} ) {

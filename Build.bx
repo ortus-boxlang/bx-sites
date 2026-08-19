@@ -17,7 +17,8 @@ class{
 			"tests",
 			"site",
 			"\.cache",
-			"examples"
+			"examples",
+			"apidocs"
 	    ];
 	    // Current working directories
 	    cwd = server.cli.executionPath & "/";
@@ -25,6 +26,14 @@ class{
 	    artifactsDir = static.cwd & "build/artifacts";
 	}
 
+	/**
+	 * CI/release entry point (`boxlang Build.bx --version=... --buildId=...`):
+	 * copies the module source to `build/module` (excluding dev-only files
+	 * per `excludes`), substitutes `@build.version@`/`@build.number@`
+	 * placeholders, and writes a build-id marker file.
+	 *
+	 * @args CLI args, parsed via `cliGetArgs()` (`--version`, `--buildId`, `--branch`)
+	 */
 	function main( args = [] ){
 		// Prep incoming arguments
 		var options = cliGetArgs().options;

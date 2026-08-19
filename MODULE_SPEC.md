@@ -63,6 +63,29 @@ Site name, description, nav (auto-inferred from folder/file structure by default
 
 ## 5. Core pipeline
 
+```mermaid
+flowchart TD
+    A["bxdocs.json"] --> B["ConfigLoader.load()"]
+    B --> C["PluginLoader.discover()\n+ onConfig"]
+    C --> D["DocsLoader.load()\nwalk docs/**.md"]
+    D --> E["NavBuilder.build()\n+ onNav"]
+    E --> F["convertMarkdown()\nper page, see below"]
+    F --> G["ThemeRenderer.renderPage()"]
+    G --> H["write site/*.html"]
+    H --> I["SearchIndexer, sitemap.xml,\nllms.txt, tags/, assets"]
+    I --> J["onBuildComplete"]
+```
+
+```mermaid
+flowchart LR
+    A["page.body\n(raw markdown)"] --> B["onPageMarkdown\n(plugins)"]
+    B --> C["TabsProcessor.extract()\nMathProtector.protect()\nCodeAnnotationProcessor.extractAndStrip()"]
+    C --> D["Markdown()\n(bx-markdown)"]
+    D --> E["CodeAnnotationProcessor.applyToHtml()\nMathProtector.restore()\nTabsProcessor.restore()"]
+    E --> F["onPageHtml\n(plugins)"]
+    F --> G["page.contentHtml"]
+```
+
 1. **Loader** — walks `docs/`, reads `.md` files + frontmatter (`title`, `order`, `hidden`)
 2. **Parser** — delegates entirely to **bx-markdown** (`Markdown()` BIF / `bx:markdown` component) for markdown-to-HTML conversion, including admonitions (`!!! type "Title"`), footnotes and definition lists via bx-markdown's own native Flexmark extensions (`markdown.enableAdmonition`/`enableFootnotes`/`enableDefinitionLists`). No custom parsing on the bx-docs side for those three. Content tabs (`=== "Title"`), math (`$...$`/`$$...$$`, KaTeX client-side), and fenced-code `hl_lines`/`linenums`/`title` annotations have no Flexmark extension to lean on, so bx-docs implements each as its own pre/post-processing pass around `Markdown()` instead (`TabsProcessor`/`MathProtector`/`CodeAnnotationProcessor`) — protect the source from Flexmark's own inline parsing before conversion, restore/apply against the rendered HTML after.
 3. **Nav builder** — folder/file structure → nav tree, frontmatter overrides applied

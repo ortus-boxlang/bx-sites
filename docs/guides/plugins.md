@@ -72,6 +72,24 @@ tree). `onConfig`/`onNav`/`onBuildComplete` are also applied by the
 standalone `search-index` verb where relevant (`onConfig`, since it can
 change `markdown`/other settings the index build depends on).
 
+## When each hook fires
+
+```mermaid
+sequenceDiagram
+    participant Build as build verb
+    participant Plugin as your plugin
+    Build->>Plugin: onConfig(config)
+    Build->>Build: build the nav tree
+    Build->>Plugin: onNav(nav, config)
+    loop every page
+        Build->>Plugin: onPageMarkdown(markdown, page, config)
+        Build->>Build: Markdown() + built-in extensions
+        Build->>Plugin: onPageHtml(html, page, config)
+    end
+    Build->>Build: write site/
+    Build->>Plugin: onBuildComplete(siteDir, config)
+```
+
 ## A minimal example
 
 `examples/hello-plugin/` in this repo is a complete, working plugin

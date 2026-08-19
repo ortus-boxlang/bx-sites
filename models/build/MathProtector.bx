@@ -28,6 +28,10 @@ class {
 	variables.inlinePattern = createObject( "java", "java.util.regex.Pattern" ).compile( "\$([^\s\$][^\$\n]*?[^\s\$]|[^\s\$])\$" )
 
 	/**
+	 * Replaces every `$...$`/`$$...$$` formula with a plain alphanumeric
+	 * token, so CommonMark's inline parsing can never mis-read a `_`/`*`
+	 * inside a formula as emphasis.
+	 *
 	 * @markdown The raw markdown body text
 	 *
 	 * @return { markdown: string with formulas replaced by placeholder tokens, formulas: { token: original delimited formula text } }
@@ -40,6 +44,9 @@ class {
 	}
 
 	/**
+	 * Swaps every placeholder token from protect() back for its original,
+	 * HTML-escaped formula text, for KaTeX to typeset client-side.
+	 *
 	 * @html Already-rendered HTML (from Markdown() on protect()'s output)
 	 * @formulas protect()'s own `formulas` struct
 	 *

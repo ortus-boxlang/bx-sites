@@ -8,6 +8,9 @@
 class {
 
 	/**
+	 * Lists `docs/versions/*` folders (module spec's versions-by-convention),
+	 * sorted newest-first by a natural version-number comparison.
+	 *
 	 * @docsDir Absolute path to the project's docs/ directory
 	 *
 	 * @return Version folder names directly under docs/versions/, newest first

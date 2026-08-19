@@ -55,6 +55,11 @@ class {
 	}
 
 	/**
+	 * Runs the full `build` verb end to end: load config -> resolve plugins
+	 * -> render the main doc tree and every `docs/versions/<name>/` tree ->
+	 * copy assets -> write 404/tags/sitemap.xml/llms.txt -> fire
+	 * `onBuildComplete`.
+	 *
 	 * @projectRoot Absolute path to the project root
 	 *
 	 * @return { siteDir, pageCount }
@@ -550,6 +555,9 @@ class {
 	}
 
 	/**
+	 * Builds the search index from already-converted pages and writes it to
+	 * `siteDir`.
+	 *
 	 * @pages Array of page structs with `contentHtml` already set
 	 * @siteDir Absolute path to the build output directory (must already exist)
 	 *
@@ -618,6 +626,9 @@ class {
 	}
 
 	/**
+	 * Strips a trailing slash so every path built from `projectRoot`
+	 * elsewhere in this class never ends up with a doubled `//`.
+	 *
 	 * @projectRoot A project root, trailing slash optional
 	 */
 	private string function normalizeRoot( required string projectRoot ) {

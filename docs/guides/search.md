@@ -16,15 +16,16 @@ service involved.
 
 1. At `build` time, `SearchIndexer` walks every non-hidden page and writes
    `site/search-index.json`: one entry per page with its `title`, `url`,
-   the text of every heading on the page, and a truncated plain-text copy
-   of its body (HTML tags stripped).
+   frontmatter `tags`, the text of every heading on the page, and a
+   truncated plain-text copy of its body (HTML tags stripped).
 2. Each theme's `search.bxm` partial renders a search box; `layout.bxm`
    only includes it (and the `lunr.js` + shared `search.js` scripts) when
    `bxdocs.json`'s `search` is `true`.
 3. In the browser, the shared `assets/search.js` widget fetches
-   `search-index.json` once, builds a `lunr` index from it (title weighted
-   highest, then headings, then body text), and re-searches it on every
-   keystroke - no network round-trip per query.
+   `search-index.json` once, builds a `lunr` index from it (`title`
+   weighted highest, then frontmatter `tags`, then `headings`, then plain
+   body text), and re-searches it on every keystroke - no network
+   round-trip per query.
 
 ## Keyboard shortcuts
 

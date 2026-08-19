@@ -17,6 +17,14 @@ Flexmark has no concept of at all - content tabs, math, and fenced-code
 bx-markdown's parser, each one works as a pre/post-processing pass around
 the normal markdown conversion instead - see the sections below.
 
+```mermaid
+flowchart LR
+    A["Raw markdown"] --> B["Pre-process:\nextract tabs, protect math,\nstrip code annotations"]
+    B --> C["Markdown()\n(bx-markdown)"]
+    C --> D["Post-process:\nrestore tabs, restore math,\napply code annotations"]
+    D --> E["Final page HTML"]
+```
+
 ## Admonitions
 
 A callout/note box - on by default, no `bxdocs.json` config needed:

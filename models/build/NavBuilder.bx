@@ -13,6 +13,9 @@
 class {
 
 	/**
+	 * Builds the nav tree - from an explicit `navConfig` when given,
+	 * otherwise inferred from `pages`' own folder/file structure.
+	 *
 	 * @pages The array of page structs from DocsLoader.load()
 	 * @navConfig An explicit nav tree to build from instead of inferring one
 	 * from folder structure - each entry is either a bare docs/-relative
@@ -69,6 +72,8 @@ class {
 	}
 
 	/**
+	 * Builds a nav tree from an explicit navConfig array, one node per entry.
+	 *
 	 * @navConfig The explicit nav tree - see build()'s docblock for its shape
 	 * @pagesByPath Every loaded page, indexed by lowercased relativePath
 	 */
@@ -81,6 +86,10 @@ class {
 	}
 
 	/**
+	 * Builds a single navConfig entry (and, recursively, its children) into
+	 * a nav node - a bare string entry is normalized to `{ path: entry }`
+	 * first.
+	 *
 	 * @entry A bare path string, or a `{ title, path, children }` object
 	 * @pagesByPath Every loaded page, indexed by lowercased relativePath
 	 */
@@ -108,6 +117,9 @@ class {
 	}
 
 	/**
+	 * Looks up a navConfig entry's `path` against the loaded pages, throwing
+	 * `BxDocs.InvalidConfig` when it references a page that doesn't exist.
+	 *
 	 * @path A docs/-relative nav entry path, e.g. `"guides/setup.md"`
 	 * @pagesByPath Every loaded page, indexed by lowercased relativePath
 	 */
@@ -123,6 +135,9 @@ class {
 	}
 
 	/**
+	 * Walks a page's folder path into the (struct-keyed, still-unsorted)
+	 * tree being built, creating group nodes for folders as needed.
+	 *
 	 * @root The synthetic root node (struct-keyed children map)
 	 * @page A single visible page struct
 	 */
@@ -198,6 +213,8 @@ class {
 	}
 
 	/**
+	 * flatten()'s own recursive depth-first walk.
+	 *
 	 * @nodes A nav tree (or subtree) to walk
 	 * @flat The accumulator array, appended to in place
 	 */

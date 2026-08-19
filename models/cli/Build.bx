@@ -6,6 +6,8 @@
 class {
 
 	/**
+	 * Dispatches the `build` verb to BuildPipeline.build().
+	 *
 	 * @options { projectRoot (required, absolute path) }
 	 */
 	struct function run( struct options = {} ) {

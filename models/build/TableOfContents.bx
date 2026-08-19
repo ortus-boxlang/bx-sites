@@ -10,6 +10,9 @@
 class {
 
 	/**
+	 * Builds the "On this page" table of contents from a page's own `h2`/
+	 * `h3` headings, skipping any heading with no anchor `id` to link to.
+	 *
 	 * @html Rendered page HTML (already-converted markdown)
 	 *
 	 * @return Array of { level (2 or 3), id, text }, in document order
@@ -21,6 +24,9 @@ class {
 	}
 
 	/**
+	 * Extracts one heading's level, anchor `id`, and inline-markup-stripped
+	 * text from its full matched HTML.
+	 *
 	 * @match One full `<h2 ...>...</h2>` / `<h3 ...>...</h3>` match
 	 */
 	private struct function parseHeading( required string match ) {

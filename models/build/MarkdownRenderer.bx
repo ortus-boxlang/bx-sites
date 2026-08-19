@@ -19,6 +19,8 @@
 class {
 
 	/**
+	 * Converts markdown to HTML via bx-markdown's `Markdown()` BIF.
+	 *
 	 * @markdown The raw markdown body text
 	 * @options Passthrough options (bx-markdown's own option set) merged into its module settings before conversion
 	 *

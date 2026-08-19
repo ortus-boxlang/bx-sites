@@ -29,6 +29,9 @@ class {
 	variables.tabHeaderPattern = "^===\s+""([^""]*)""\s*$"
 
 	/**
+	 * Pulls every `=== "Title"` tab group out of the raw markdown and
+	 * replaces it with a lone placeholder `<div>` on its own line.
+	 *
 	 * @markdown The raw markdown body text
 	 *
 	 * @return { markdown: string with tab groups replaced by placeholders, groups: array of { token, tabs: [ { title, content } ] } }
@@ -83,6 +86,9 @@ class {
 	}
 
 	/**
+	 * Renders each tab's own dedented content through the real markdown
+	 * renderer and swaps each placeholder for the assembled tab widget.
+	 *
 	 * @html Already-rendered HTML (from Markdown() on extract()'s output)
 	 * @groups extract()'s own `groups` array
 	 * @renderer Any object exposing `toHtml( markdown, options = {} )`, used to render each tab's own content
@@ -100,6 +106,9 @@ class {
 	}
 
 	/**
+	 * Whether `line` still belongs to the tab body currently being read -
+	 * blank, or indented by a leading tab or at least 4 spaces.
+	 *
 	 * @line A raw source line, still at its original indentation
 	 */
 	private boolean function isTabBodyLine( required string line ) {
@@ -107,6 +116,8 @@ class {
 	}
 
 	/**
+	 * Strips one tab body line's leading tab (or 4 spaces) of indentation.
+	 *
 	 * @line A tab body line, prefixed with either a leading tab or (at least) 4 spaces
 	 */
 	private string function dedentTabLine( required string line ) {
@@ -120,6 +131,9 @@ class {
 	}
 
 	/**
+	 * Assembles one tab group's nav buttons + panels markup, rendering each
+	 * tab's own content through `renderer`.
+	 *
 	 * @group One entry from extract()'s own `groups` array
 	 */
 	private string function renderGroup( required struct group, required any renderer, required struct markdownOptions ) {

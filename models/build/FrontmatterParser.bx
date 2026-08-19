@@ -10,6 +10,10 @@
 class {
 
 	/**
+	 * Splits a `---`-delimited frontmatter block off the top of `content`
+	 * and parses it; content with no (or an unterminated) frontmatter block
+	 * is returned unchanged as the body, with an empty frontmatter struct.
+	 *
 	 * @content The raw file content, frontmatter block included if present
 	 *
 	 * @return { frontmatter: struct, body: string }

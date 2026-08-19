@@ -16,6 +16,9 @@
 class {
 
 	/**
+	 * Dispatches the `gh-deploy` verb: validates config and git-repo status,
+	 * builds the site, then force-pushes it via GhPagesDeployer.deploy().
+	 *
 	 * @options { projectRoot (required, absolute path), branch, remote, message }
 	 */
 	struct function run( struct options = {} ) {
