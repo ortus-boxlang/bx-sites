@@ -78,8 +78,8 @@
 
 					<h1 class="page-title"><span class="page-icon">🚀</span> Getting Started</h1>
 					<p class="page-summary">Install the module, scaffold a project, and build your first site.</p>
-<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-setup">setup</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 3:46:02 PM</span></div>
-<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#install">Install</a></li><li class="toc-level-2"><a href="#scaffold-a-project">Scaffold a project</a></li><li class="toc-level-2"><a href="#add-pages">Add pages</a></li><li class="toc-level-2"><a href="#build">Build</a></li><li class="toc-level-2"><a href="#serve-locally">Serve locally</a></li><li class="toc-level-2"><a href="#clean">Clean</a></li></ul></nav>
+<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-setup">setup</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 4:19:41 PM</span></div>
+<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#install">Install</a></li><li class="toc-level-2"><a href="#scaffold-a-project">Scaffold a project</a></li><li class="toc-level-2"><a href="#add-pages">Add pages</a></li><li class="toc-level-3"><a href="#linking-between-pages">Linking between pages</a></li><li class="toc-level-2"><a href="#build">Build</a></li><li class="toc-level-2"><a href="#serve-locally">Serve locally</a></li><li class="toc-level-2"><a href="#clean">Clean</a></li></ul></nav>
 					<h1 id="getting-started"><a href="#getting-started" id="getting-started" name="getting-started" class="anchor"></a>Getting Started</h1>
 <h2 id="install"><a href="#install" id="install" name="install" class="anchor"></a>Install</h2>
 <p>BX Docs depends on <a href="https://github.com/ortus-boxlang/bx-markdown">bx-markdown</a>
@@ -129,7 +129,22 @@ nesting automatically:</p>
 │   └── deployment.md     -&gt; /guides/deployment/
 </code></pre>
 <p>(A large site can override this inferred order/grouping entirely with an
-explicit nav - see <a href="configuration.md#nav"><code>nav</code></a>.)</p>
+explicit nav - see <a href="/bx-docs/development/configuration/index.html#nav"><code>nav</code></a>.)</p>
+<h3 id="linking-between-pages"><a href="#linking-between-pages" id="linking-between-pages" name="linking-between-pages" class="anchor"></a>Linking between pages</h3>
+<p>Link to another page the normal mkdocs way - a file-relative path to its
+<code>.md</code> source, exactly as if the two files were sitting next to each other
+on disk (because they are):</p>
+<pre><code class="language-markdown">See [Deployment](guides/deployment.md) or, from that same guide,
+[back to Getting Started](../getting-started.md#add-pages).
+</code></pre>
+<p>BX Docs rewrites every such link to its built pretty-URL at build time
+(<code>guides/deployment.md</code> -&gt; <code>/guides/deployment/index.html</code>, anchors and
+query strings preserved), resolved against the <em>linking</em> page's own
+folder - <code>../</code> and sibling references work exactly like they would
+resolving any other relative path. This is also why the link keeps
+working if you read the file directly on GitHub instead of the built
+site: it's a real, valid relative path to a real file either way. Absolute
+URLs, <code>mailto:</code>, and links already starting with <code>/</code> are left untouched.</p>
 <p>Each page can start with a small frontmatter block:</p>
 <pre><code class="language-markdown">---
 title: Deployment
@@ -151,7 +166,7 @@ Your content here.
 <li><code>order</code> - controls sibling ordering in the nav (lower sorts first; omitted pages sort last, alphabetically)</li>
 <li><code>hidden</code> - <code>true</code> excludes the page from the nav (and from search) without excluding it from the build</li>
 <li><code>description</code> - this page's social-card/meta description (see
-<a href="configuration.md#ogimage"><code>ogImage</code></a>); falls back to the site-wide
+<a href="/bx-docs/development/configuration/index.html#ogimage"><code>ogImage</code></a>); falls back to the site-wide
 <code>description</code> in <code>bxdocs.json</code> when omitted</li>
 <li><code>tags</code> - an array of tags for this page, rendered as clickable badges
 under the title and collected into a site-wide <code>/tags/</code> index page
@@ -161,7 +176,7 @@ relevance for matching queries</li>
 <li><code>summary</code> - a one-line lead-in shown under the title (distinct from
 <code>description</code>, which is meta-tag-only and never rendered on the page itself)</li>
 <li><code>ogImage</code> - overrides this one page's social-card image - see
-<a href="configuration.md#ogimage"><code>ogImage</code></a></li>
+<a href="/bx-docs/development/configuration/index.html#ogimage"><code>ogImage</code></a></li>
 </ul>
 <p>Frontmatter values can be inline lists (<code>tags: [a, b, c]</code>), YAML-style block
 lists (<code>tags:</code> followed by indented <code>- item</code> lines), or <code>&gt;</code>/<code>|</code> block

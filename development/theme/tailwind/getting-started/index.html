@@ -73,8 +73,8 @@
 
 				<h1 class="mb-6 border-b-4 border-[#FFF500] pb-2 text-2xl font-bold"><span class="page-icon">🚀</span> Getting Started</h1>
 				<p class="mb-6 -mt-4 text-lg text-slate-500">Install the module, scaffold a project, and build your first site.</p>
-<div class="mb-4 flex flex-wrap gap-2"><a class="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700 hover:bg-cyan-100" href="/bx-docs/development/theme/tailwind/tags/index.html#tag-guides">guides</a><a class="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700 hover:bg-cyan-100" href="/bx-docs/development/theme/tailwind/tags/index.html#tag-setup">setup</a></div><div class="page-meta mb-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 3:46:02 PM</span></div>
-<nav class="mb-6 rounded border border-slate-200 bg-cyan-50/40 px-4 py-3 text-sm"><div class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">On this page</div><ul class="space-y-1"><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#install">Install</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#scaffold-a-project">Scaffold a project</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#add-pages">Add pages</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#build">Build</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#serve-locally">Serve locally</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#clean">Clean</a></li></ul></nav>
+<div class="mb-4 flex flex-wrap gap-2"><a class="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700 hover:bg-cyan-100" href="/bx-docs/development/theme/tailwind/tags/index.html#tag-guides">guides</a><a class="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700 hover:bg-cyan-100" href="/bx-docs/development/theme/tailwind/tags/index.html#tag-setup">setup</a></div><div class="page-meta mb-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 4:19:41 PM</span></div>
+<nav class="mb-6 rounded border border-slate-200 bg-cyan-50/40 px-4 py-3 text-sm"><div class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">On this page</div><ul class="space-y-1"><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#install">Install</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#scaffold-a-project">Scaffold a project</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#add-pages">Add pages</a></li><li class=" ml-4"><a class="text-slate-700 hover:text-cyan-700" href="#linking-between-pages">Linking between pages</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#build">Build</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#serve-locally">Serve locally</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#clean">Clean</a></li></ul></nav>
 				<div class="prose max-w-none">
 					<h1 id="getting-started"><a href="#getting-started" id="getting-started" name="getting-started" class="anchor"></a>Getting Started</h1>
 <h2 id="install"><a href="#install" id="install" name="install" class="anchor"></a>Install</h2>
@@ -125,7 +125,22 @@ nesting automatically:</p>
 │   └── deployment.md     -&gt; /guides/deployment/
 </code></pre>
 <p>(A large site can override this inferred order/grouping entirely with an
-explicit nav - see <a href="configuration.md#nav"><code>nav</code></a>.)</p>
+explicit nav - see <a href="/bx-docs/development/theme/tailwind/configuration/index.html#nav"><code>nav</code></a>.)</p>
+<h3 id="linking-between-pages"><a href="#linking-between-pages" id="linking-between-pages" name="linking-between-pages" class="anchor"></a>Linking between pages</h3>
+<p>Link to another page the normal mkdocs way - a file-relative path to its
+<code>.md</code> source, exactly as if the two files were sitting next to each other
+on disk (because they are):</p>
+<pre><code class="language-markdown">See [Deployment](guides/deployment.md) or, from that same guide,
+[back to Getting Started](../getting-started.md#add-pages).
+</code></pre>
+<p>BX Docs rewrites every such link to its built pretty-URL at build time
+(<code>guides/deployment.md</code> -&gt; <code>/guides/deployment/index.html</code>, anchors and
+query strings preserved), resolved against the <em>linking</em> page's own
+folder - <code>../</code> and sibling references work exactly like they would
+resolving any other relative path. This is also why the link keeps
+working if you read the file directly on GitHub instead of the built
+site: it's a real, valid relative path to a real file either way. Absolute
+URLs, <code>mailto:</code>, and links already starting with <code>/</code> are left untouched.</p>
 <p>Each page can start with a small frontmatter block:</p>
 <pre><code class="language-markdown">---
 title: Deployment
@@ -147,7 +162,7 @@ Your content here.
 <li><code>order</code> - controls sibling ordering in the nav (lower sorts first; omitted pages sort last, alphabetically)</li>
 <li><code>hidden</code> - <code>true</code> excludes the page from the nav (and from search) without excluding it from the build</li>
 <li><code>description</code> - this page's social-card/meta description (see
-<a href="configuration.md#ogimage"><code>ogImage</code></a>); falls back to the site-wide
+<a href="/bx-docs/development/theme/tailwind/configuration/index.html#ogimage"><code>ogImage</code></a>); falls back to the site-wide
 <code>description</code> in <code>bxdocs.json</code> when omitted</li>
 <li><code>tags</code> - an array of tags for this page, rendered as clickable badges
 under the title and collected into a site-wide <code>/tags/</code> index page
@@ -157,7 +172,7 @@ relevance for matching queries</li>
 <li><code>summary</code> - a one-line lead-in shown under the title (distinct from
 <code>description</code>, which is meta-tag-only and never rendered on the page itself)</li>
 <li><code>ogImage</code> - overrides this one page's social-card image - see
-<a href="configuration.md#ogimage"><code>ogImage</code></a></li>
+<a href="/bx-docs/development/theme/tailwind/configuration/index.html#ogimage"><code>ogImage</code></a></li>
 </ul>
 <p>Frontmatter values can be inline lists (<code>tags: [a, b, c]</code>), YAML-style block
 lists (<code>tags:</code> followed by indented <code>- item</code> lines), or <code>&gt;</code>/<code>|</code> block

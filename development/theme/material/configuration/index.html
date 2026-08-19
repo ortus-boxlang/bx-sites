@@ -72,7 +72,7 @@
 
 				<h1 class="md-title"><span class="page-icon">⚙️</span> Configuration</h1>
 				<p class="page-summary">Every bxdocs.json key, what it defaults to, and what it does.</p>
-<div class="page-tags"><a class="page-tag" href="/bx-docs/development/theme/material/tags/index.html#tag-reference">reference</a><a class="page-tag" href="/bx-docs/development/theme/material/tags/index.html#tag-configuration">configuration</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 3:46:02 PM</span></div>
+<div class="page-tags"><a class="page-tag" href="/bx-docs/development/theme/material/tags/index.html#tag-reference">reference</a><a class="page-tag" href="/bx-docs/development/theme/material/tags/index.html#tag-configuration">configuration</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 4:19:41 PM</span></div>
 <nav class="md-toc" aria-label="On this page"><div class="md-toc__title">On this page</div><ul><li class="md-toc__item md-toc__item--2"><a href="#name">name</a></li><li class="md-toc__item md-toc__item--2"><a href="#description">description</a></li><li class="md-toc__item md-toc__item--2"><a href="#baseurl">baseURL</a></li><li class="md-toc__item md-toc__item--2"><a href="#llmstxt">llms.txt</a></li><li class="md-toc__item md-toc__item--2"><a href="#sitemapxml">sitemap.xml</a></li><li class="md-toc__item md-toc__item--2"><a href="#theme">theme</a></li><li class="md-toc__item md-toc__item--2"><a href="#search">search</a></li><li class="md-toc__item md-toc__item--2"><a href="#nav">nav</a></li><li class="md-toc__item md-toc__item--2"><a href="#markdown">markdown</a></li><li class="md-toc__item md-toc__item--2"><a href="#repo">repo</a></li><li class="md-toc__item md-toc__item--2"><a href="#social">social</a></li><li class="md-toc__item md-toc__item--2"><a href="#footer">footer</a></li><li class="md-toc__item md-toc__item--2"><a href="#lastupdated">lastUpdated</a></li><li class="md-toc__item md-toc__item--2"><a href="#analytics">analytics</a></li><li class="md-toc__item md-toc__item--2"><a href="#ogimage">ogImage</a></li><li class="md-toc__item md-toc__item--3"><a href="#generateogimages">generateOgImages</a></li><li class="md-toc__item md-toc__item--2"><a href="#extracss--extrajs">extraCss / extraJs</a></li><li class="md-toc__item md-toc__item--2"><a href="#mermaid">mermaid</a></li><li class="md-toc__item md-toc__item--2"><a href="#math">math</a></li><li class="md-toc__item md-toc__item--2"><a href="#plugins">plugins</a></li><li class="md-toc__item md-toc__item--2"><a href="#versioning">Versioning</a></li></ul></nav>
 				<h1 id="configuration"><a href="#configuration" id="configuration" name="configuration" class="anchor"></a>Configuration</h1>
 <p>Every project has one <code>bxdocs.json</code> at its root:</p>
@@ -118,7 +118,7 @@ above. A partial <code>theme</code> object is merged one level deep, so
 <h2 id="description"><a href="#description" id="description" name="description" class="anchor"></a><code>description</code></h2>
 <p>An optional site description, used as the fallback <code>&lt;meta name=&quot;description&quot;&gt;</code>
 and <code>og:description</code> for any page that doesn't set its own <code>description</code>
-frontmatter (see <a href="getting-started.md#add-pages">Getting Started</a>).</p>
+frontmatter (see <a href="/bx-docs/development/theme/material/getting-started/index.html#add-pages">Getting Started</a>).</p>
 <h2 id="baseurl"><a href="#baseurl" id="baseurl" name="baseurl" class="anchor"></a><code>baseURL</code></h2>
 <p>Controls how every internal link, asset path and nav entry is prefixed, and
 doubles as the site's canonical URL for <code>sitemap.xml</code> and <code>llms.txt</code>.</p>
@@ -152,7 +152,7 @@ non-hidden page per the <a href="https://www.sitemaps.org/">sitemaps.org</a> pro
 <ul>
 <li><code>theme.name</code> - one of the built-in themes (<code>bootstrap</code>, <code>material</code>,
 <code>tailwind</code>), or the name of a custom theme you provide via a <code>theme/</code>
-folder at the project root (see <a href="guides/themes.md">Themes</a>)</li>
+folder at the project root (see <a href="/bx-docs/development/theme/material/guides/themes/index.html">Themes</a>)</li>
 <li><code>theme.logo</code> - path/URL to an image shown next to the site name in the
 header brand mark (in place of the default &quot;⚡&quot; glyph) - a relative path
 (e.g. <code>&quot;assets/logo.svg&quot;</code>, resolved against <code>docs/assets/</code>) is prefixed
@@ -192,7 +192,7 @@ every section collapsed.</p>
 <h2 id="search"><a href="#search" id="search" name="search" class="anchor"></a><code>search</code></h2>
 <p><code>true</code> (the default) builds a static search index and wires up the search
 box; <code>false</code> skips both entirely - no <code>search-index.json</code>, no search UI, no
-extra JS shipped. See <a href="guides/search.md">Search</a>.</p>
+extra JS shipped. See <a href="/bx-docs/development/theme/material/guides/search/index.html">Search</a>.</p>
 <h2 id="nav"><a href="#nav" id="nav" name="nav" class="anchor"></a><code>nav</code></h2>
 <p>By default, nav is inferred from <code>docs/</code>'s own folder/file structure (with
 <code>order</code>/<code>hidden</code> frontmatter) - fine for small sites, but a large one can
@@ -245,15 +245,15 @@ straight through - so this list can drift from bx-markdown's own as it
 evolves. Tables, <code>~~strikethrough~~</code>, <code>- [ ]</code> task-list checkboxes and the
 in-page table of contents are always on, with no toggle. The one exception
 is <code>enableAdmonition</code> - bx-markdown itself defaults it to <code>false</code>, but BX
-Docs defaults it to <code>true</code> (see the <a href="guides/markdown.md">Markdown Extensions guide</a>).</p>
+Docs defaults it to <code>true</code> (see the <a href="/bx-docs/development/theme/material/guides/markdown/index.html">Markdown Extensions guide</a>).</p>
 <table class="table">
 <thead>
 <tr><th>Key</th><th>Default</th><th>Effect</th></tr>
 </thead>
 <tbody>
-<tr><td><code>enableAdmonition</code></td><td><code>true</code> <em>(BX Docs default; bx-markdown's own default is <code>false</code>)</em></td><td><code>!!!</code>/<code>???</code>/<code>???+</code> callout blocks - see the <a href="guides/markdown.md#admonitions">Markdown Extensions guide</a></td></tr>
-<tr><td><code>enableFootnotes</code></td><td><code>false</code></td><td><code>[^label]</code> footnote references - see the <a href="guides/markdown.md#footnotes">Markdown Extensions guide</a></td></tr>
-<tr><td><code>enableDefinitionLists</code></td><td><code>false</code></td><td><code>Term\n: Definition</code> lists - see the <a href="guides/markdown.md#definition-lists">Markdown Extensions guide</a></td></tr>
+<tr><td><code>enableAdmonition</code></td><td><code>true</code> <em>(BX Docs default; bx-markdown's own default is <code>false</code>)</em></td><td><code>!!!</code>/<code>???</code>/<code>???+</code> callout blocks - see the <a href="/bx-docs/development/theme/material/guides/markdown/index.html#admonitions">Markdown Extensions guide</a></td></tr>
+<tr><td><code>enableFootnotes</code></td><td><code>false</code></td><td><code>[^label]</code> footnote references - see the <a href="/bx-docs/development/theme/material/guides/markdown/index.html#footnotes">Markdown Extensions guide</a></td></tr>
+<tr><td><code>enableDefinitionLists</code></td><td><code>false</code></td><td><code>Term\n: Definition</code> lists - see the <a href="/bx-docs/development/theme/material/guides/markdown/index.html#definition-lists">Markdown Extensions guide</a></td></tr>
 <tr><td><code>autoLinkUrls</code></td><td><code>true</code></td><td>Auto-links bare URLs and email addresses</td></tr>
 <tr><td><code>anchorLinks</code></td><td><code>true</code></td><td>Adds a clickable anchor link to every heading</td></tr>
 <tr><td><code>anchorSetId</code></td><td><code>true</code></td><td>Stamps an <code>id</code> attribute onto every heading</td></tr>
@@ -348,7 +348,7 @@ default) and <code>generateOgImages</code> off, no <code>og:image</code>/<code>t
 rendered.</p>
 <pre><code class="language-json">{ &quot;ogImage&quot;: &quot;assets/social-card.png&quot; }
 </code></pre>
-<p>A page's own frontmatter <code>ogImage</code> (see <a href="getting-started.md#add-pages">Getting Started</a>)
+<p>A page's own frontmatter <code>ogImage</code> (see <a href="/bx-docs/development/theme/material/getting-started/index.html#add-pages">Getting Started</a>)
 always wins over this site-wide default for that one page.</p>
 <h3 id="generateogimages"><a href="#generateogimages" id="generateogimages" name="generateogimages" class="anchor"></a><code>generateOgImages</code></h3>
 <p><code>false</code> (the default) - no per-page cards. <code>true</code> renders a real 1200x630
@@ -374,24 +374,24 @@ is used as-is). <code>extraJs</code> entries are loaded with <code>defer</code>.
 <p><code>false</code> (the default) - no <a href="https://mermaid.js.org/">Mermaid</a> diagram
 support shipped at all. <code>true</code> loads <code>mermaid.js</code> client-side and renders
 every <code>```mermaid</code> fenced code block as a diagram. See
-<a href="guides/markdown.md#diagrams">Markdown Extensions</a> for the syntax.</p>
+<a href="/bx-docs/development/theme/material/guides/markdown/index.html#diagrams">Markdown Extensions</a> for the syntax.</p>
 <pre><code class="language-json">{ &quot;mermaid&quot;: true }
 </code></pre>
 <h2 id="math"><a href="#math" id="math" name="math" class="anchor"></a><code>math</code></h2>
 <p><code>false</code> (the default) - no <a href="https://katex.org/">KaTeX</a> shipped at all.
 <code>true</code> loads it client-side and typesets <code>$...$</code>/<code>$$...$$</code> written directly
 into a page's markdown. See
-<a href="guides/markdown.md#math">Markdown Extensions</a> for the syntax.</p>
+<a href="/bx-docs/development/theme/material/guides/markdown/index.html#math">Markdown Extensions</a> for the syntax.</p>
 <pre><code class="language-json">{ &quot;math&quot;: true }
 </code></pre>
 <p>Admonitions (note/warning/tip-style callout boxes), content tabs, and
 fenced-code <code>hl_lines</code>/<code>linenums</code>/<code>title</code> annotations are always available
 in every page's markdown, no config needed - see
-<a href="guides/markdown.md#admonitions">Markdown Extensions</a>.</p>
+<a href="/bx-docs/development/theme/material/guides/markdown/index.html#admonitions">Markdown Extensions</a>.</p>
 <h2 id="plugins"><a href="#plugins" id="plugins" name="plugins" class="anchor"></a><code>plugins</code></h2>
 <p><code>[]</code> (the default) - an array of BoxLang module names to activate as
 plugins. Installing a plugin module (<code>box install</code>) never activates it on
-its own; it has to be named here too. See <a href="guides/plugins.md">Plugins</a>
+its own; it has to be named here too. See <a href="/bx-docs/development/theme/material/guides/plugins/index.html">Plugins</a>
 for how to write one.</p>
 <pre><code class="language-json">{ &quot;plugins&quot;: [ &quot;myBxDocsPlugin&quot; ] }
 </code></pre>

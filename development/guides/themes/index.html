@@ -77,7 +77,7 @@
 				<article class="page-content">
 <nav class="breadcrumb-nav mb-3" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/bx-docs/development/guides/index.html">Guides</a></li><li class="breadcrumb-item active" aria-current="page">Themes</li></ol></nav>
 					<h1 class="page-title">Themes</h1>
-<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-themes">themes</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 3:46:02 PM</span></div>
+<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-themes">themes</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 4:19:41 PM</span></div>
 <nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#built-in">Built in</a></li><li class="toc-level-2"><a href="#the-themeprovider-contract">The ThemeProvider contract</a></li><li class="toc-level-2"><a href="#customizing-colors-without-a-theme-override">Customizing colors without a theme override</a></li><li class="toc-level-2"><a href="#overriding-a-theme">Overriding a theme</a></li><li class="toc-level-2"><a href="#writing-a-theme-from-scratch">Writing a theme from scratch</a></li></ul></nav>
 					<h1 id="themes"><a href="#themes" id="themes" name="themes" class="anchor"></a>Themes</h1>
 <p>Themes are native BoxLang <code>.bxm</code> templates - there's no separate template
@@ -107,7 +107,7 @@ nav's own reading order.</li>
 plus a BoxLang grammar of its own (<code>```bx</code>/<code>```boxlang</code>/<code>```cfscript</code>),
 each with a <strong>copy button</strong> - shown on hover on devices that support it,
 always visible on touch devices (there's no hover to reveal it there). See
-<a href="markdown.md#code-blocks">Markdown Extensions</a>.</li>
+<a href="/bx-docs/development/guides/markdown/index.html#code-blocks">Markdown Extensions</a>.</li>
 <li><strong>Self-hosted webfonts</strong> - no <code>fonts.googleapis.com</code> request at view time.</li>
 <li><strong>A dark/light mode toggle</strong>, powered by <a href="https://alpinejs.dev/">Alpine.js</a>
 for reactivity. The visitor's choice is remembered in <code>localStorage</code>
@@ -119,48 +119,48 @@ own line - plus a collapsible sidebar nav (a hamburger toggle in
 <code>bootstrap</code>/<code>material</code>/<code>tailwind</code> alike).</li>
 <li><strong>Keyboard shortcuts</strong> in the search box: <code>/</code> focuses search from
 anywhere on the page, and <code>Escape</code> closes the results. See
-<a href="search.md">Search</a>.</li>
+<a href="/bx-docs/development/guides/search/index.html">Search</a>.</li>
 <li><strong>A repo link and &quot;Edit this page&quot;/&quot;Last updated&quot; line</strong>, when
 <code>bxdocs.json</code>'s <code>repo</code>/<code>lastUpdated</code> options are set. See
-<a href="../configuration.md#repo">Configuration</a>.</li>
+<a href="/bx-docs/development/configuration/index.html#repo">Configuration</a>.</li>
 <li><strong>An opt-in footer</strong> (copyright, <code>social</code> links, a &quot;Built with BX Docs&quot;
 credit) when <code>bxdocs.json</code>'s <code>footer</code> is <code>true</code>. See
-<a href="../configuration.md#footer">Configuration</a>.</li>
+<a href="/bx-docs/development/configuration/index.html#footer">Configuration</a>.</li>
 <li><strong>A version switcher</strong>, appearing automatically once a project has a
 <code>docs/versions/</code> folder with more than one version in it. See
-<a href="../configuration.md#versioning">Configuration</a>.</li>
+<a href="/bx-docs/development/configuration/index.html#versioning">Configuration</a>.</li>
 <li><strong>A themed <code>404.html</code></strong>, served automatically by most static hosts
 (including GitHub Pages) for any unmatched path.</li>
 <li><strong>A custom logo and favicon</strong>, when <code>bxdocs.json</code>'s <code>theme.logo</code>/
-<code>theme.favicon</code> are set. See <a href="../configuration.md#theme">Configuration</a>.</li>
+<code>theme.favicon</code> are set. See <a href="/bx-docs/development/configuration/index.html#theme">Configuration</a>.</li>
 <li><strong>A collapsible sidebar nav</strong>, opt-in via <code>theme.options.navCollapsible</code>.
-See <a href="../configuration.md#theme">Configuration</a>.</li>
+See <a href="/bx-docs/development/configuration/index.html#theme">Configuration</a>.</li>
 <li><strong>Google Analytics</strong>, when <code>bxdocs.json</code>'s <code>analytics</code> is configured. See
-<a href="../configuration.md#analytics">Configuration</a>.</li>
+<a href="/bx-docs/development/configuration/index.html#analytics">Configuration</a>.</li>
 <li><strong>Social share cards</strong> (Open Graph + Twitter Card meta tags), sourced
 from each page's <code>description</code> frontmatter (or the site-wide
 <code>description</code>) and its own <code>ogImage</code> (or the site-wide one) - optionally
 auto-generated per page via <code>bxdocs.json</code>'s <code>generateOgImages</code>. See
-<a href="../configuration.md#ogimage">Configuration</a>.</li>
+<a href="/bx-docs/development/configuration/index.html#ogimage">Configuration</a>.</li>
 <li><strong>Page tags, an icon and a summary line</strong>, all opt-in via a page's own
 frontmatter - tags render as badges linking into a site-wide <code>/tags/</code>
-index. See <a href="../getting-started.md#add-pages">Getting Started</a>.</li>
+index. See <a href="/bx-docs/development/getting-started/index.html#add-pages">Getting Started</a>.</li>
 <li><strong>An explicit nav override</strong>, in <code>bxdocs.json</code> or its own <code>docs/nav.json</code>,
 replacing folder-inference for large sites. See
-<a href="../configuration.md#nav">Configuration</a>.</li>
+<a href="/bx-docs/development/configuration/index.html#nav">Configuration</a>.</li>
 <li><strong>Extra CSS/JS</strong>, injected via <code>bxdocs.json</code>'s <code>extraCss</code>/<code>extraJs</code>. See
-<a href="../configuration.md#extracss--extrajs">Configuration</a>.</li>
+<a href="/bx-docs/development/configuration/index.html#extracss--extrajs">Configuration</a>.</li>
 <li><strong>Admonition (note/warning/tip/...) callout boxes</strong>, on by default in any
 page's markdown, including collapsible variants - no config needed. See
-<a href="markdown.md#admonitions">Markdown Extensions</a>.</li>
+<a href="/bx-docs/development/guides/markdown/index.html#admonitions">Markdown Extensions</a>.</li>
 <li><strong>Footnotes and definition lists</strong>, opt-in via <code>bxdocs.json</code>'s <code>markdown</code>.
-See <a href="markdown.md#footnotes">Markdown Extensions</a>.</li>
+See <a href="/bx-docs/development/guides/markdown/index.html#footnotes">Markdown Extensions</a>.</li>
 <li><strong>Content tabs</strong> and <strong>code line numbers/highlighted lines/titles</strong>, no
-config needed. See <a href="markdown.md#content-tabs">Markdown Extensions</a>.</li>
+config needed. See <a href="/bx-docs/development/guides/markdown/index.html#content-tabs">Markdown Extensions</a>.</li>
 <li><strong>Mermaid diagrams</strong>, opt-in via <code>bxdocs.json</code>'s <code>mermaid</code>. See
-<a href="markdown.md#diagrams">Markdown Extensions</a>.</li>
+<a href="/bx-docs/development/guides/markdown/index.html#diagrams">Markdown Extensions</a>.</li>
 <li><strong>Math</strong> (KaTeX), opt-in via <code>bxdocs.json</code>'s <code>math</code>. See
-<a href="markdown.md#math">Markdown Extensions</a>.</li>
+<a href="/bx-docs/development/guides/markdown/index.html#math">Markdown Extensions</a>.</li>
 </ul>
 <p>Set which one a project uses in <code>bxdocs.json</code>:</p>
 <pre><code class="language-json">{ &quot;theme&quot;: { &quot;name&quot;: &quot;material&quot; } }
@@ -180,7 +180,7 @@ so the theme still works when the site is served from a sub-path.</li>
 <code>variables.page.contentHtml</code> - the already-converted markdown.</li>
 <li><strong><code>search.bxm</code></strong> (optional) - the search box markup, included by
 <code>layout.bxm</code> only when <code>bxdocs.json</code>'s <code>search</code> is <code>true</code>. See
-<a href="search.md">Search</a>.</li>
+<a href="/bx-docs/development/guides/search/index.html">Search</a>.</li>
 <li><strong><code>assets/</code></strong> (optional) - theme CSS/JS, copied to <code>site/assets/theme/</code>
 at build time.</li>
 </ul>
@@ -208,7 +208,7 @@ error deep inside rendering.</p>
 <p>For a color/font tweak, forking a whole theme is overkill - each built-in
 theme reads its palette from a handful of CSS custom properties on <code>:root</code>,
 re-declared under <code>[data-theme=&quot;dark&quot;]</code> for dark mode. <code>bxdocs.json</code>'s
-<a href="../configuration.md#extracss--extrajs"><code>extraCss</code></a> loads <em>after</em> the
+<a href="/bx-docs/development/configuration/index.html#extracss--extrajs"><code>extraCss</code></a> loads <em>after</em> the
 theme's own stylesheet, so a same-specificity re-declaration in it wins
 without touching <code>resources/themes/</code> at all:</p>
 <pre><code class="language-json">{ &quot;extraCss&quot;: [ &quot;assets/brand.css&quot; ] }
@@ -349,7 +349,7 @@ already-converted markdown (syntax highlighting, admonitions, tabs, math
 and all), so there's nothing left to parse, only to lay out. From here,
 add whatever the built-in themes have that you actually want:
 <code>search.bxm</code> (only included when <code>bxdocs.json</code>'s <code>search</code> is <code>true</code> - see
-<a href="search.md">Search</a>), a dark-mode toggle (copy the <code>x-data</code>/<code>x-init</code>
+<a href="/bx-docs/development/guides/search/index.html">Search</a>), a dark-mode toggle (copy the <code>x-data</code>/<code>x-init</code>
 Alpine.js pair off <code>resources/themes/bootstrap/layout.bxm</code>'s <code>&lt;body&gt;</code> tag
 and the matching <code>[data-theme=&quot;dark&quot;]</code> CSS block), breadcrumbs/tags/prev-next
 links (<code>page.bxm</code> in any built-in theme shows the pattern - each is just an

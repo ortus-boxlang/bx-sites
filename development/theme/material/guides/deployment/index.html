@@ -71,7 +71,7 @@
 			<article class="md-card">
 <nav class="md-breadcrumb" aria-label="breadcrumb"><ol><li class="md-breadcrumb__item"><a href="/bx-docs/development/theme/material/guides/index.html">Guides</a></li><li class="md-breadcrumb__item md-breadcrumb__item--active" aria-current="page">Deploying to GitHub Pages</li></ol></nav>
 				<h1 class="md-title">Deploying to GitHub Pages</h1>
-<div class="page-tags"><a class="page-tag" href="/bx-docs/development/theme/material/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/theme/material/tags/index.html#tag-deployment">deployment</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 3:46:02 PM</span></div>
+<div class="page-tags"><a class="page-tag" href="/bx-docs/development/theme/material/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/theme/material/tags/index.html#tag-deployment">deployment</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 4:19:41 PM</span></div>
 <nav class="md-toc" aria-label="On this page"><div class="md-toc__title">On this page</div><ul><li class="md-toc__item md-toc__item--2"><a href="#what-it-does">What it does</a></li><li class="md-toc__item md-toc__item--2"><a href="#one-time-setup">One-time setup</a></li><li class="md-toc__item md-toc__item--2"><a href="#publishing-two-versions-at-once">Publishing two versions at once</a></li><li class="md-toc__item md-toc__item--2"><a href="#using-this-for-your-own-project">Using this for your own project</a></li><li class="md-toc__item md-toc__item--2"><a href="#serving-from-a-project-pages-sub-path">Serving from a project Pages sub-path</a></li></ul></nav>
 				<h1 id="deploying-to-github-pages"><a href="#deploying-to-github-pages" id="deploying-to-github-pages" name="deploying-to-github-pages" class="anchor"></a>Deploying to GitHub Pages</h1>
 <p><code>site/</code> is a plain static site - host it anywhere that serves static
@@ -80,7 +80,7 @@ files. This module ships a ready-to-use GitHub Actions workflow
 to GitHub Pages, with <code>main</code> and <code>development</code> published as two
 independently-live versions of the same site.</p>
 <p>For a simpler single-version project with no CI setup at all,
-<a href="../cli-reference.md#gh-deploy"><code>bxDocs gh-deploy</code></a> builds and pushes
+<a href="/bx-docs/development/theme/material/cli-reference/index.html#gh-deploy"><code>bxDocs gh-deploy</code></a> builds and pushes
 <code>site/</code> to a <code>gh-pages</code> branch in one command, run from your own machine
 whenever you want to publish - no workflow file needed. The rest of this
 guide covers the GitHub Actions workflow this repo itself uses, for
@@ -142,7 +142,7 @@ internal link, asset and nav entry gets the <code>/&lt;repo&gt;/</code> prefix i
 and so a real <code>sitemap.xml</code> gets generated too:</p>
 <pre><code class="language-json">{ &quot;baseURL&quot;: &quot;https://&lt;user&gt;.github.io/&lt;repo&gt;/&quot; }
 </code></pre>
-<p>See <a href="../configuration.md#baseurl">Configuration</a> for the full breakdown of
+<p>See <a href="/bx-docs/development/theme/material/configuration/index.html#baseurl">Configuration</a> for the full breakdown of
 what <code>baseURL</code> does. A <code>&lt;user&gt;.github.io</code> user site, or any custom domain
 mapped to the site root, can leave <code>baseURL</code> at its default (<code>/</code>).</p>
 
