@@ -23,6 +23,9 @@ class {
 	variables.tabsProcessor = new "models.build.TabsProcessor@bxdocs"()
 	variables.mathProtector = new "models.build.MathProtector@bxdocs"()
 	variables.codeAnnotationProcessor = new "models.build.CodeAnnotationProcessor@bxdocs"()
+	variables.pluginLoader = new "models.build.PluginLoader@bxdocs"()
+	variables.pluginsOverride = []
+	variables.hasPluginsOverride = false
 
 	/**
 	 * Swaps in a fake/test markdown renderer. The real one (MarkdownRenderer.bx)
@@ -37,6 +40,21 @@ class {
 	}
 
 	/**
+	 * Bypasses PluginLoader.discover() (real BoxLang module lookup - no
+	 * unit test of its own, see PluginLoader.bx's docblock) with an
+	 * already-resolved plugins list, so BuildPipelineSpec.bx can test the
+	 * pipeline's own onConfig/onPageMarkdown/onPageHtml/onNav/onBuildComplete
+	 * wiring against plain fake plugin objects without a real second
+	 * BoxLang module registered.
+	 *
+	 * @plugins PluginLoader.discover()'s own output shape: array of { name, instance }
+	 */
+	void function setPlugins( required array plugins ) {
+		variables.pluginsOverride = arguments.plugins
+		variables.hasPluginsOverride = true
+	}
+
+	/**
 	 * @projectRoot Absolute path to the project root
 	 *
 	 * @return { siteDir, pageCount }
@@ -44,6 +62,8 @@ class {
 	struct function build( required string projectRoot ) {
 		var root = normalizeRoot( arguments.projectRoot )
 		var config = variables.configLoader.load( root )
+		var plugins = resolvePlugins( config )
+		config = variables.pluginLoader.applyOnConfig( plugins, config )
 		var urls = variables.baseUrlResolver.resolve( config.baseURL )
 		var themeDir = variables.themeRenderer.resolveThemeDir( config.theme.name, root )
 		var siteDir = root & "/site"
@@ -57,7 +77,7 @@ class {
 		var versions = buildVersionsList( versionNames, urls.basePath )
 
 		var navConfig = resolveExplicitNav( root & "/docs", config.nav )
-		var mainResult = renderDocTree( root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", navConfig )
+		var mainResult = renderDocTree( root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, navConfig )
 		var allPages = duplicate( mainResult.pages )
 		copyAssets( root, themeDir, siteDir, config.search, config.mermaid, config.math )
 
@@ -72,7 +92,8 @@ class {
 				root,
 				versions,
 				versionName,
-				"versions/" & versionName & "/"
+				"versions/" & versionName & "/",
+				plugins
 			)
 			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
 			copyAssets( root, themeDir, versionOutputDir, config.search, config.mermaid, config.math )
@@ -87,7 +108,23 @@ class {
 
 		fileWrite( siteDir & "/llms.txt", variables.llmsTxtGenerator.build( allPages, config, urls.absolute, urls.basePath ) )
 
+		variables.pluginLoader.applyOnBuildComplete( plugins, siteDir, config )
+
 		return { siteDir : siteDir, pageCount : mainResult.pages.len() }
+	}
+
+	/**
+	 * Resolves this build's plugin list - PluginLoader.discover()'s real
+	 * BoxLang-module lookup against `config.plugins`, unless setPlugins()
+	 * already provided one (test seam - see its own docblock).
+	 *
+	 * @config The site's bxdocs.json config, already defaulted/validated
+	 */
+	private array function resolvePlugins( required struct config ) {
+		if ( variables.hasPluginsOverride ) {
+			return variables.pluginsOverride
+		}
+		return variables.pluginLoader.discover( arguments.config.plugins )
 	}
 
 	/**
@@ -106,6 +143,7 @@ class {
 	 * @versions Version switcher entries as `[ { label, url } ]`, shared by every tree so the switcher is consistent everywhere
 	 * @currentVersion Which `versions` entry this tree IS, for the switcher's own "selected" state
 	 * @docsRelativePrefix Empty for the main/"Latest" tree; `"versions/<name>/"` for a version tree - see assignEditAndLastUpdated()
+	 * @plugins resolvePlugins()'s own output, applied via onNav/onPageMarkdown/onPageHtml
 	 * @navConfig An explicit nav tree (NavBuilder.build()'s own `navConfig` shape) for this doc tree - empty (the default) infers nav from folder structure. Only ever non-empty for the main tree - see resolveExplicitNav()
 	 *
 	 * @return { pages, nav }
@@ -120,15 +158,17 @@ class {
 		required array versions,
 		required string currentVersion,
 		required string docsRelativePrefix,
+		required array plugins,
 		array navConfig = []
 	) {
 		var pages = variables.docsLoader.load( arguments.docsDir )
 		var nav = variables.navBuilder.build( pages, arguments.navConfig )
+		nav = variables.pluginLoader.applyOnNav( arguments.plugins, nav, arguments.config )
 		var flatSequence = variables.navBuilder.flatten( nav )
 
 		directoryCreate( arguments.outputDir, true, true )
 
-		convertMarkdown( pages, arguments.config )
+		convertMarkdown( pages, arguments.config, arguments.plugins )
 		assignTableOfContents( pages )
 		assignPrevNext( pages, flatSequence )
 		assignBreadcrumbs( pages, nav )
@@ -249,8 +289,11 @@ class {
 			return { skipped : true, indexPath : "", pageCount : 0 }
 		}
 
+		var plugins = resolvePlugins( config )
+		config = variables.pluginLoader.applyOnConfig( plugins, config )
+
 		var pages = variables.docsLoader.load( root & "/docs" )
-		convertMarkdown( pages, config )
+		convertMarkdown( pages, config, plugins )
 
 		var siteDir = root & "/site"
 		directoryCreate( siteDir, true, true )
@@ -280,9 +323,11 @@ class {
 	 * @pages Array of page structs from DocsLoader.load()
 	 * @config The site's bxdocs.json config
 	 */
-	private void function convertMarkdown( required array pages, required struct config ) {
+	private void function convertMarkdown( required array pages, required struct config, array plugins = [] ) {
 		for ( var page in arguments.pages ) {
-			var tabsExtracted = variables.tabsProcessor.extract( page.body )
+			var markdown = variables.pluginLoader.applyOnPageMarkdown( arguments.plugins, page.body, page, arguments.config )
+
+			var tabsExtracted = variables.tabsProcessor.extract( markdown )
 			var mathProtected = variables.mathProtector.protect( tabsExtracted.markdown )
 			var codeExtracted = variables.codeAnnotationProcessor.extractAndStrip( mathProtected.markdown )
 
@@ -290,6 +335,8 @@ class {
 			html = variables.codeAnnotationProcessor.applyToHtml( html, codeExtracted.annotations )
 			html = variables.mathProtector.restore( html, mathProtected.formulas )
 			html = variables.tabsProcessor.restore( html, tabsExtracted.groups, variables.markdownRenderer, arguments.config.markdown )
+
+			html = variables.pluginLoader.applyOnPageHtml( arguments.plugins, html, page, arguments.config )
 
 			page.contentHtml = html
 		}

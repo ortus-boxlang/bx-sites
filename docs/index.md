@@ -39,4 +39,5 @@ repository's own `docs/` folder - see
 - [Search](guides/search.md) - how the static search index works
 - [Deploying to GitHub Pages](guides/deployment.md) - the built-in GitHub Actions workflow
 - [Markdown Extensions](guides/markdown.md) - admonitions, footnotes, definition lists, content tabs, math, code annotations and Mermaid diagrams
+- [Plugins](guides/plugins.md) - extending BX Docs with a BoxLang module of your own
 - [Releases](releases/index.md) - versioning policy and what's new per release

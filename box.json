@@ -49,7 +49,8 @@
         "gradlew",
         "build.gradle",
         "/src/**",
-        "gradle/**"
+        "gradle/**",
+        "/examples/**"
     ],
     "installPaths":{
         "testbox":"testbox/"

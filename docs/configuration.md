@@ -376,6 +376,17 @@ fenced-code `hl_lines`/`linenums`/`title` annotations are always available
 in every page's markdown, no config needed - see
 [Markdown Extensions](guides/markdown.md#admonitions).
 
+## `plugins`
+
+`[]` (the default) - an array of BoxLang module names to activate as
+plugins. Installing a plugin module (`box install`) never activates it on
+its own; it has to be named here too. See [Plugins](guides/plugins.md)
+for how to write one.
+
+```json
+{ "plugins": [ "myBxDocsPlugin" ] }
+```
+
 ## Versioning
 
 Versioned docs are convention over configuration - there's no `bxdocs.json`

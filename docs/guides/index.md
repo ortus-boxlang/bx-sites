@@ -9,3 +9,4 @@ order: 5
 - [Search](search.md) - how the static search index works
 - [Deploying to GitHub Pages](deployment.md) - the built-in GitHub Actions workflow
 - [Markdown Extensions](markdown.md) - admonitions, footnotes, definition lists and Mermaid diagrams
+- [Plugins](plugins.md) - extending BX Docs with a BoxLang module of your own

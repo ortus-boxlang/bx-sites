@@ -1,0 +1,101 @@
+/**
+ * Only tests the applyOnX() hook-invocation methods, against plain fake
+ * plugin structs (a struct with a function value passes the same
+ * structKeyExists() duck-typing check a real plugin class instance does -
+ * no BoxLang class needed at all). discover() itself - the only part of
+ * PluginLoader.bx that touches the real module system - has no test here,
+ * same reason MarkdownRenderer.bx doesn't: a plain `testbox run` has no
+ * second BoxLang module registered to discover.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.PluginLoader", function() {
+
+			beforeEach( function() {
+				variables.loader = new "models.build.PluginLoader@bxdocs"();
+			} );
+
+			it( "applyOnConfig() returns config untouched when no plugin implements onConfig", function() {
+				var plugins = [ { name : "noop", instance : {} } ];
+				var result = loader.applyOnConfig( plugins, { name : "Test" } );
+
+				expect( result ).toBe( { name : "Test" } );
+			} );
+
+			it( "applyOnConfig() threads config through every plugin implementing onConfig, in array order", function() {
+				var plugins = [
+					{ name : "a", instance : { onConfig : function( required struct config ) {
+						arguments.config.order = ( arguments.config.order ?: "" ) & "a";
+						return arguments.config;
+					} } },
+					{ name : "b", instance : { onConfig : function( required struct config ) {
+						arguments.config.order = ( arguments.config.order ?: "" ) & "b";
+						return arguments.config;
+					} } }
+				];
+
+				var result = loader.applyOnConfig( plugins, { name : "Test" } );
+				expect( result.order ).toBe( "ab" );
+			} );
+
+			it( "applyOnPageMarkdown() passes the page and config through to the plugin", function() {
+				var seenPage = "";
+				var seenConfig = "";
+				var plugins = [ { name : "a", instance : { onPageMarkdown : function( required string markdown, required struct page, required struct config ) {
+					seenPage = arguments.page;
+					seenConfig = arguments.config;
+					return arguments.markdown & " appended";
+				} } } ];
+
+				var result = loader.applyOnPageMarkdown( plugins, "original", { title : "Page" }, { name : "Test" } );
+
+				expect( result ).toBe( "original appended" );
+				expect( seenPage.title ).toBe( "Page" );
+				expect( seenConfig.name ).toBe( "Test" );
+			} );
+
+			it( "applyOnPageHtml() threads html through every plugin implementing it", function() {
+				var plugins = [ { name : "a", instance : { onPageHtml : function( required string html, required struct page, required struct config ) {
+					return arguments.html & "<!-- a -->";
+				} } } ];
+
+				var result = loader.applyOnPageHtml( plugins, "<p>hi</p>", {}, {} );
+				expect( result ).toBe( "<p>hi</p><!-- a -->" );
+			} );
+
+			it( "applyOnNav() lets a plugin append to the nav tree", function() {
+				var plugins = [ { name : "a", instance : { onNav : function( required array nav, required struct config ) {
+					arguments.nav.append( { title : "Extra" } );
+					return arguments.nav;
+				} } } ];
+
+				var result = loader.applyOnNav( plugins, [ { title : "Existing" } ], {} );
+
+				expect( result.len() ).toBe( 2 );
+				expect( result[ 2 ].title ).toBe( "Extra" );
+			} );
+
+			it( "applyOnBuildComplete() calls every plugin implementing it, ignoring ones that don't", function() {
+				var calls = [];
+				var plugins = [
+					{ name : "a", instance : { onBuildComplete : function( required string siteDir, required struct config ) {
+						calls.append( arguments.siteDir );
+					} } },
+					{ name : "b", instance : {} }
+				];
+
+				loader.applyOnBuildComplete( plugins, "/tmp/site", {} );
+
+				expect( calls ).toBe( [ "/tmp/site" ] );
+			} );
+
+			it( "applyOnConfig() is a no-op over an empty plugins array", function() {
+				var result = loader.applyOnConfig( [], { name : "Test" } );
+				expect( result ).toBe( { name : "Test" } );
+			} );
+
+		} );
+	}
+
+}

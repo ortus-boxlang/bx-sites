@@ -30,7 +30,8 @@ class {
 		"ogImage"      : "",
 		"generateOgImages" : false,
 		"extraCss"     : [],
-		"extraJs"      : []
+		"extraJs"      : [],
+		"plugins"      : []
 	}
 
 	/**
@@ -286,6 +287,21 @@ class {
 						message = "bxdocs.json [#assetsKey#] entries must be non-empty strings"
 					)
 				}
+			}
+		}
+
+		if ( !isArray( arguments.config.plugins ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [plugins], when present, must be an array"
+			)
+		}
+		for ( var pluginName in arguments.config.plugins ) {
+			if ( !isSimpleValue( pluginName ) || !len( trim( pluginName ) ) ) {
+				throw(
+					type    = "BxDocs.InvalidConfig",
+					message = "bxdocs.json [plugins] entries must be non-empty strings (BoxLang module names)"
+				)
 			}
 		}
 

@@ -489,6 +489,53 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "runs a plugin's onConfig/onPageMarkdown/onPageHtml/onNav/onBuildComplete hooks in the pipeline, via the setPlugins() test seam", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				var fakePlugin = {
+					onConfig : function( required struct config ) {
+						arguments.config.pluginTouchedConfig = true;
+						return arguments.config;
+					},
+					onPageMarkdown : function( required string markdown, required struct page, required struct config ) {
+						return arguments.markdown & char( 10 ) & "Injected line.";
+					},
+					onPageHtml : function( required string html, required struct page, required struct config ) {
+						return arguments.html & "<!--plugin-html-->";
+					},
+					onNav : function( required array nav, required struct config ) {
+						arguments.nav.append( { title : "Plugin Page", url : "plugin.html", order : 0, children : [] } );
+						return arguments.nav;
+					},
+					onBuildComplete : function( required string siteDir, required struct config ) {
+						fileWrite( arguments.siteDir & "/plugin-marker.txt", "built" );
+					}
+				};
+				pipeline.setPlugins( [ { name : "fake", instance : fakePlugin } ] );
+
+				var result = pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "Injected line." );
+				expect( html ).toInclude( "<!--plugin-html-->" );
+				expect( html ).toInclude( "Plugin Page" );
+				expect( fileExists( root & "/site/plugin-marker.txt" ) ).toBeTrue();
+			} );
+
+			it( "throws BxDocs.PluginNotFound when bxdocs.json [plugins] names an uninstalled module, without the setPlugins() seam", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","plugins":["someUnknownModule"]}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				expect( function() {
+					pipeline.build( root );
+				} ).toThrow( "BxDocs.PluginNotFound" );
+			} );
+
 			it( "uses bxdocs.json's [nav] array as the nav tree, in its own order, instead of folder inference", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Home" );

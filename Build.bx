@@ -16,7 +16,8 @@ class{
 			"server-.*\.json",
 			"tests",
 			"site",
-			"\.cache"
+			"\.cache",
+			"examples"
 	    ];
 	    // Current working directories
 	    cwd = server.cli.executionPath & "/";
