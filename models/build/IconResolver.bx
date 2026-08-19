@@ -44,14 +44,26 @@ class {
 
 		var matcher = variables.refPattern.matcher( trimmed )
 		if ( !matcher.matches() ) {
-			return encodeForHTML( trimmed )
+			return textEscape( trimmed )
 		}
 
 		var library = isNull( matcher.group( 1 ) ) ? "phosphor" : lCase( matcher.group( 1 ) )
 		var name = lCase( matcher.group( 2 ) )
 		var svg = loadIcon( library, name, arguments.docsDir )
 
-		return len( svg ) ? svg : encodeForHTML( trimmed )
+		return len( svg ) ? svg : textEscape( trimmed )
+	}
+
+	/**
+	 * A minimal, HTML-text-content-safe escape for a literal emoji/typo'd
+	 * icon reference - `encodeForHTML()` also entity-escapes "safe"
+	 * characters like `:` and non-ASCII text (its exact range is
+	 * locale/JVM-dependent), which is both needlessly noisy here and
+	 * genuinely inconsistent across environments. Only `&`/`<`/`>` - the
+	 * characters that actually matter in HTML text content - are escaped.
+	 */
+	private string function textEscape( required string value ) {
+		return arguments.value.replace( "&", "&amp;", "all" ).replace( "<", "&lt;", "all" ).replace( ">", "&gt;", "all" )
 	}
 
 	/**
