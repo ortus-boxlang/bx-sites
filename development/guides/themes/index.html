@@ -70,15 +70,15 @@
 	<div class="container-fluid">
 		<div class="row">
 			<aside class="col-lg-3 col-xl-2 sidebar collapse d-lg-block" id="bxdocs-sidebar">
-				<ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/index.html">Home</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/getting-started/index.html">Getting Started</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/cli-reference/index.html">CLI Reference</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/configuration/index.html">Configuration</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/index.html">Guides</a><ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/themes/index.html">Themes</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/search/index.html">Search</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/deployment/index.html">Deploying to GitHub Pages</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/markdown/index.html">Markdown Extensions</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/plugins/index.html">Plugins</a></li></ul></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/releases/index.html">Release Policy</a></li></ul>
+				<ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/index.html">Home</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/getting-started/index.html">Getting Started</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/cli-reference/index.html">CLI Reference</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/configuration/index.html">Configuration</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/index.html">Guides</a><ul class="nav flex-column nav--nested"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/themes/index.html">Themes</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/search/index.html">Search</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/deployment/index.html">Deploying to GitHub Pages</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/markdown/index.html">Markdown Extensions</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/plugins/index.html">Plugins</a></li></ul></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/releases/index.html">Release Policy</a></li></ul>
 			</aside>
 			<main class="col-lg-9 col-xl-10 content">
 
 				<article class="page-content">
 <nav class="breadcrumb-nav mb-3" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/bx-docs/development/guides/index.html">Guides</a></li><li class="breadcrumb-item active" aria-current="page">Themes</li></ol></nav>
 					<h1 class="page-title">Themes</h1>
-<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-themes">themes</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 4:28:10 AM</span></div>
-<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#built-in">Built in</a></li><li class="toc-level-2"><a href="#the-themeprovider-contract">The ThemeProvider contract</a></li><li class="toc-level-2"><a href="#overriding-a-theme">Overriding a theme</a></li></ul></nav>
+<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-themes">themes</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 2:09:27 PM</span></div>
+<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#built-in">Built in</a></li><li class="toc-level-2"><a href="#the-themeprovider-contract">The ThemeProvider contract</a></li><li class="toc-level-2"><a href="#customizing-colors-without-a-theme-override">Customizing colors without a theme override</a></li><li class="toc-level-2"><a href="#overriding-a-theme">Overriding a theme</a></li><li class="toc-level-2"><a href="#writing-a-theme-from-scratch">Writing a theme from scratch</a></li></ul></nav>
 					<h1 id="themes"><a href="#themes" id="themes" name="themes" class="anchor"></a>Themes</h1>
 <p>Themes are native BoxLang <code>.bxm</code> templates - there's no separate template
 engine or build step involved.</p>
@@ -204,12 +204,158 @@ theme can include it the same way, or supply its own icons entirely.</li>
 <p>A theme folder missing either required file fails fast with a clear
 <code>BxDocs.InvalidTheme</code> error at build time, rather than a confusing template
 error deep inside rendering.</p>
+<h2 id="customizing-colors-without-a-theme-override"><a href="#customizing-colors-without-a-theme-override" id="customizing-colors-without-a-theme-override" name="customizing-colors-without-a-theme-override" class="anchor"></a>Customizing colors without a theme override</h2>
+<p>For a color/font tweak, forking a whole theme is overkill - each built-in
+theme reads its palette from a handful of CSS custom properties on <code>:root</code>,
+re-declared under <code>[data-theme=&quot;dark&quot;]</code> for dark mode. <code>bxdocs.json</code>'s
+<a href="../configuration.md#extracss--extrajs"><code>extraCss</code></a> loads <em>after</em> the
+theme's own stylesheet, so a same-specificity re-declaration in it wins
+without touching <code>resources/themes/</code> at all:</p>
+<pre><code class="language-json">{ &quot;extraCss&quot;: [ &quot;assets/brand.css&quot; ] }
+</code></pre>
+<pre><code class="language-css">/* docs/assets/brand.css - copied to site/assets/brand.css at build time */
+:root {
+	--bxdocs-gradient-start: #7C3AED;
+	--bxdocs-gradient-end: #DB2777;
+	--bxdocs-accent: #FBBF24;
+	--bxdocs-link: #7C3AED;
+	--bxdocs-link-hover: #9F5AF0;
+}
+
+[data-theme=&quot;dark&quot;] {
+	--bxdocs-link: #C4B5FD;
+	--bxdocs-link-hover: #DDD6FE;
+}
+</code></pre>
+<p>The <code>bootstrap</code> theme's own set (<code>resources/themes/bootstrap/assets/style.css</code>)
+is <code>--bxdocs-gradient-start</code>/<code>-end</code>, <code>--bxdocs-accent</code>, <code>--bxdocs-bg</code>,
+<code>--bxdocs-text</code>, <code>--bxdocs-sidebar-bg</code>, <code>--bxdocs-sidebar-text</code>,
+<code>--bxdocs-border</code>, <code>--bxdocs-link</code>, <code>--bxdocs-link-hover</code> and
+<code>--bxdocs-code-bg</code> - <code>material</code> and <code>tailwind</code> follow the same <code>--bxdocs-*</code>
+naming with their own small variations. Anything beyond color/font
+(layout, adding/removing chrome) needs a real override or a custom theme -
+see below.</p>
 <h2 id="overriding-a-theme"><a href="#overriding-a-theme" id="overriding-a-theme" name="overriding-a-theme" class="anchor"></a>Overriding a theme</h2>
 <p>Drop your own <code>layout.bxm</code> + <code>page.bxm</code> (and optionally <code>search.bxm</code> /
 <code>assets/</code>) into a <code>theme/</code> folder at your project root. BX Docs prefers a
 project-level <code>theme/</code> override over any built-in theme, as long as it
 satisfies the contract above - the built-in themes under this module's own
 <code>resources/themes/</code> are a good starting point to copy and adapt.</p>
+<p>A worked example - start from <code>bootstrap</code> and swap its brand palette and
+heading font for your own, keeping everything else (nav, search, dark mode,
+code highlighting, ...) exactly as it already works:</p>
+<pre><code class="language-markdown">my-project/
+├── bxdocs.json
+├── docs/
+└── theme/                    ← project-level override, checked before any built-in theme
+    ├── layout.bxm             ← copied from resources/themes/bootstrap/layout.bxm
+    ├── page.bxm                ← copied from resources/themes/bootstrap/page.bxm, unchanged
+    ├── search.bxm               ← copied unchanged
+    └── assets/
+        └── style.css              ← copied from bootstrap's assets/style.css, then edited
+</code></pre>
+<ol>
+<li>
+<p>Copy the three <code>.bxm</code> files and <code>assets/style.css</code> out of this module's
+<code>resources/themes/bootstrap/</code> into your project's <code>theme/</code>.</p>
+</li>
+<li>
+<p>Edit only what you need to change. To swap the brand palette and font,
+that's just the top of <code>theme/assets/style.css</code>:</p>
+<pre><code class="language-css">:root {
+	--bxdocs-gradient-start: #7C3AED;  /* was #00FF78 */
+	--bxdocs-gradient-end: #DB2777;    /* was #00DBFF */
+	--bxdocs-accent: #FBBF24;          /* was #FFF500 */
+}
+
+body {
+	font-family: &quot;Inter&quot;, system-ui, sans-serif;  /* was &quot;Poppins&quot; */
+}
+</code></pre>
+</li>
+<li>
+<p>Run <code>boxlang module:bxDocs build</code> (or <code>serve</code> while iterating) - BX Docs
+picks up <code>theme/</code> automatically, no <code>bxdocs.json</code> change needed (a
+project-level <code>theme/</code> folder always takes precedence over the built-in
+theme named in <code>theme.name</code>). Everything you didn't touch - nav
+rendering, search, the dark-mode toggle, code annotations - keeps
+working exactly as it did in the original <code>bootstrap</code> theme, since it's
+still the exact same <code>layout.bxm</code>/<code>page.bxm</code> markup underneath.</p>
+</li>
+</ol>
+<p>A project <code>theme/</code> folder is all-or-nothing, though - once BX Docs finds
+one, it's used instead of the built-in theme entirely, so it still needs
+its own <code>layout.bxm</code> + <code>page.bxm</code> even if all you changed is
+<code>assets/style.css</code> (a folder missing either fails fast with
+<code>BxDocs.InvalidTheme</code> rather than silently falling back). For a
+CSS-only/no-<code>.bxm</code> tweak, use <a href="#customizing-colors-without-a-theme-override"><code>extraCss</code></a>
+above instead - it layers on top of whichever theme <code>bxdocs.json</code> names,
+no <code>theme/</code> folder involved at all. <code>theme/</code> is for when you also need to
+change the markup itself, covered next.</p>
+<h2 id="writing-a-theme-from-scratch"><a href="#writing-a-theme-from-scratch" id="writing-a-theme-from-scratch" name="writing-a-theme-from-scratch" class="anchor"></a>Writing a theme from scratch</h2>
+<p>A theme only needs the two required files, so here's a genuinely minimal
+one - no Bootstrap/Tailwind, no dark mode, no search UI - to show exactly
+what's required versus what the built-in themes add on top. Save both as
+<code>theme/layout.bxm</code> and <code>theme/page.bxm</code> in your project - a project-level
+<code>theme/</code> folder is picked up automatically (as above), no <code>bxdocs.json</code>
+change needed:</p>
+<pre><code class="language-bx">&lt;!-- theme/layout.bxm --&gt;
+&lt;bx:script&gt;
+	function renderNav( required array nodes ) {
+		var html = &quot;&lt;ul&gt;&quot;
+		for ( var node in arguments.nodes ) {
+			html &amp;= &quot;&lt;li&gt;&quot;
+			html &amp;= len( node.url )
+				? '&lt;a href=&quot;' &amp; variables.basePath &amp; node.url &amp; '&quot;&gt;' &amp; encodeForHTML( node.title ) &amp; '&lt;/a&gt;'
+				: encodeForHTML( node.title )
+			if ( node.children.len() ) {
+				html &amp;= renderNav( node.children )
+			}
+			html &amp;= &quot;&lt;/li&gt;&quot;
+		}
+		return html &amp; &quot;&lt;/ul&gt;&quot;
+	}
+&lt;/bx:script&gt;
+&lt;bx:output&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+	&lt;meta charset=&quot;UTF-8&quot;&gt;
+	&lt;title&gt;#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#&lt;/title&gt;
+	&lt;link rel=&quot;stylesheet&quot; href=&quot;#variables.basePath#assets/theme/style.css&quot;&gt;
+&lt;/head&gt;
+&lt;body&gt;
+	&lt;header&gt;&lt;a href=&quot;#variables.basePath#&quot;&gt;#encodeForHTML( variables.siteConfig.name )#&lt;/a&gt;&lt;/header&gt;
+	&lt;nav&gt;#renderNav( variables.nav )#&lt;/nav&gt;
+	&lt;main&gt;
+&lt;/bx:output&gt;
+&lt;bx:include template=&quot;#variables.themeDir#/page.bxm&quot;&gt;
+&lt;bx:output&gt;
+	&lt;/main&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+&lt;/bx:output&gt;
+</code></pre>
+<pre><code class="language-bx">&lt;!-- theme/page.bxm --&gt;
+&lt;bx:output&gt;
+&lt;article&gt;
+	&lt;h1&gt;#encodeForHTML( variables.page.title )#&lt;/h1&gt;
+	#variables.page.contentHtml#
+&lt;/article&gt;
+&lt;/bx:output&gt;
+</code></pre>
+<p>That's a complete, working theme - <code>variables.page.contentHtml</code> is the
+already-converted markdown (syntax highlighting, admonitions, tabs, math
+and all), so there's nothing left to parse, only to lay out. From here,
+add whatever the built-in themes have that you actually want:
+<code>search.bxm</code> (only included when <code>bxdocs.json</code>'s <code>search</code> is <code>true</code> - see
+<a href="search.md">Search</a>), a dark-mode toggle (copy the <code>x-data</code>/<code>x-init</code>
+Alpine.js pair off <code>resources/themes/bootstrap/layout.bxm</code>'s <code>&lt;body&gt;</code> tag
+and the matching <code>[data-theme=&quot;dark&quot;]</code> CSS block), breadcrumbs/tags/prev-next
+links (<code>page.bxm</code> in any built-in theme shows the pattern - each is just an
+<code>if</code> around a small render function, all driven by fields already present
+on <code>variables.page</code>), or an <code>assets/</code> folder for your own CSS/JS, copied to
+<code>site/assets/theme/</code> automatically at build time.</p>
 
 				</article>
 

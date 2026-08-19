@@ -70,14 +70,14 @@
 	<div class="container-fluid">
 		<div class="row">
 			<aside class="col-lg-3 col-xl-2 sidebar collapse d-lg-block" id="bxdocs-sidebar">
-				<ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/index.html">Home</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/getting-started/index.html">Getting Started</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/cli-reference/index.html">CLI Reference</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/configuration/index.html">Configuration</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/index.html">Guides</a><ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/themes/index.html">Themes</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/search/index.html">Search</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/deployment/index.html">Deploying to GitHub Pages</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/markdown/index.html">Markdown Extensions</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/plugins/index.html">Plugins</a></li></ul></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/releases/index.html">Release Policy</a></li></ul>
+				<ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/index.html">Home</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/getting-started/index.html">Getting Started</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/cli-reference/index.html">CLI Reference</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/configuration/index.html">Configuration</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/index.html">Guides</a><ul class="nav flex-column nav--nested"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/themes/index.html">Themes</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/search/index.html">Search</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/deployment/index.html">Deploying to GitHub Pages</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/markdown/index.html">Markdown Extensions</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/guides/plugins/index.html">Plugins</a></li></ul></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/releases/index.html">Release Policy</a></li></ul>
 			</aside>
 			<main class="col-lg-9 col-xl-10 content">
 
 				<article class="page-content">
 <nav class="breadcrumb-nav mb-3" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/bx-docs/development/guides/index.html">Guides</a></li><li class="breadcrumb-item active" aria-current="page">Markdown Extensions</li></ol></nav>
 					<h1 class="page-title">Markdown Extensions</h1>
-<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-markdown">markdown</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/markdown.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 4:28:10 AM</span></div>
+<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-markdown">markdown</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/markdown.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 2:09:27 PM</span></div>
 <nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#admonitions">Admonitions</a></li><li class="toc-level-3"><a href="#collapsible-admonitions">Collapsible admonitions</a></li><li class="toc-level-2"><a href="#footnotes">Footnotes</a></li><li class="toc-level-2"><a href="#definition-lists">Definition Lists</a></li><li class="toc-level-2"><a href="#content-tabs">Content Tabs</a></li><li class="toc-level-2"><a href="#code-blocks">Code Blocks</a></li><li class="toc-level-3"><a href="#line-numbers-highlighted-lines-and-titles">Line numbers, highlighted lines, and titles</a></li><li class="toc-level-2"><a href="#diagrams">Diagrams</a></li><li class="toc-level-2"><a href="#math">Math</a></li><li class="toc-level-2"><a href="#plugin-extensions">Plugin extensions</a></li></ul></nav>
 					<svg xmlns="http://www.w3.org/2000/svg" class="adm-hidden">
 <symbol id="adm-note">
@@ -367,7 +367,7 @@ Second term
 behind a set of clickable tabs with <code>=== &quot;Title&quot;</code>, indented the same way an
 admonition body is (4 spaces or a tab):</p>
 <pre><code class="language-markdown">
-&lt;div class=&quot;bxdocs-raw-block&quot; data-bxdocs-token=&quot;bxdocstabs14d42be58a024af58ef2f1035801580b&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;bxdocs-raw-block&quot; data-bxdocs-token=&quot;bxdocstabs3ae90019822843168753797ee0a665ce&quot;&gt;&lt;/div&gt;
 
 </code></pre>
 <p>Which renders as:</p>
@@ -406,7 +406,7 @@ numeric function add( required numeric a, required numeric b ) {
 ```
 </code></pre>
 <p>Which renders as:</p>
-<pre><code class="language-bx">numeric function add( required numeric a, required numeric b ) {
+<pre data-bxdocs-hl-lines="2" data-bxdocs-start-line="1" data-bxdocs-title="add.bx"><code class="language-bx">numeric function add( required numeric a, required numeric b ) {
 	return a + b
 }
 </code></pre>
@@ -417,7 +417,7 @@ adds a small title bar above the block. No <code>bxdocs.json</code> config neede
 always available.</p>
 <h2 id="diagrams"><a href="#diagrams" id="diagrams" name="diagrams" class="anchor"></a>Diagrams</h2>
 <p>Opt-in via <code>bxdocs.json</code>'s <a href="../configuration.md#mermaid"><code>mermaid</code></a> key:</p>
-<pre data-bxdocs-hl-lines="2" data-bxdocs-start-line="1" data-bxdocs-title="add.bx"><code class="language-json">{ &quot;mermaid&quot;: true }
+<pre><code class="language-json">{ &quot;mermaid&quot;: true }
 </code></pre>
 <p>Once enabled, any <code>```mermaid</code> fenced code block renders as a live
 <a href="https://mermaid.js.org/">Mermaid</a> diagram instead of a code listing:</p>
