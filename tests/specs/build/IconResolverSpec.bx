@@ -43,6 +43,14 @@ class extends="testbox.system.BaseSpec" {
 				expect( svg ).toInclude( "bxdocs-icon" );
 			} );
 
+			it( "resolves a phosphor-duotone: reference, with its own two currentColor tones", function() {
+				var svg = resolver.resolve( "phosphor-duotone:rocket" );
+				expect( svg ).toInclude( "<svg" );
+				expect( svg ).toInclude( "bxdocs-icon" );
+				expect( svg ).toInclude( 'opacity="0.2"' );
+				expect( svg ).notToBe( resolver.resolve( "phosphor:rocket" ) );
+			} );
+
 			it( "different libraries resolve to different markup for the same icon name", function() {
 				expect( resolver.resolve( "lucide:rocket" ) ).notToBe( resolver.resolve( "tabler:rocket" ) );
 			} );
