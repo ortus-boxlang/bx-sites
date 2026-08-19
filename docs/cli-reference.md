@@ -101,3 +101,28 @@ bxDocs gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
 
 See [Deployment](guides/deployment.md) for the full GitHub Pages setup
 (enabling Pages for the branch, `baseURL`, etc.).
+
+## `migrate`
+
+Converts a GitBook export - a `SUMMARY.md` table of contents plus its
+`.md` files, GitBook's own on-disk sync format - into this project's
+`docs/` tree: `SUMMARY.md` becomes `docs/nav.json`, `{% block %}` syntax
+becomes its bx-docs equivalent (`::: name` directives, or the native
+`=== "Title"` tabs / `!!! type` admonition syntax where a closer match
+already exists - see [Markdown Extensions](guides/markdown.md#gitbook-style-blocks)),
+`README.md` files become `index.md`, and `.gitbook/assets/**` is copied to
+`docs/assets/gitbook/`.
+
+```bash
+bxDocs migrate --source=/path/to/gitbook-export
+```
+
+- `--source` (required) - path to the GitBook export's root directory (must contain `SUMMARY.md`)
+
+Prints a summary of pages converted and, when anything couldn't be
+auto-converted (an unsupported block like `{% prompt %}`, an unrecognized
+hint style, a column width that isn't a plain length), a list of exactly
+what needs a manual look - nothing is silently dropped, an unrecognized
+block is left in its original `{% %}` syntax in the migrated file instead.
+A destination file or `docs/nav.json` that already exists is overwritten
+(also reported), so review the migrated output before committing it.
