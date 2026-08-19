@@ -31,6 +31,9 @@ repository's own `docs/` folder - see
   forwards your own `bxdocs.json` options straight through to it.
 - **A plugin system built on BoxLang's own module system.** A plugin is
   just another installed BoxLang module - no separate plugin API to learn.
+- **Migrate straight from GitBook.** `bxDocs migrate --source=...`
+  converts a GitBook export - `SUMMARY.md`, its content blocks, its
+  assets - into a working bx-docs project in one command.
 
 ## Where to go next
 
@@ -42,4 +45,5 @@ repository's own `docs/` folder - see
 - [Deploying to GitHub Pages](guides/deployment.md) - the built-in GitHub Actions workflow
 - [Markdown Extensions](guides/markdown.md) - admonitions, footnotes, definition lists, content tabs, math, code annotations and Mermaid diagrams
 - [Plugins](guides/plugins.md) - extending BX Docs with a BoxLang module of your own
+- [Migrating from GitBook](guides/migrating-from-gitbook.md) - convert a GitBook export into a bx-docs project with one command
 - [Releases](releases/index.md) - versioning policy and what's new per release

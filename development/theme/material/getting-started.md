@@ -67,6 +67,11 @@ Pass `--theme=material` or `--theme=tailwind` to scaffold with a different
 default theme, and `--name="My Project Docs"` to set the site name up
 front - otherwise `new` derives it from the target directory name.
 
+Already have content in GitBook? `bxDocs migrate --source=/path/to/export`
+converts a GitBook export straight into `docs/` - see
+[Migrating from GitBook](guides/migrating-from-gitbook.md) - and you can
+skip ahead to [Build](#build).
+
 ## Add pages
 
 Every `.md` file under `docs/` becomes a page. Folder nesting becomes nav
@@ -145,7 +150,10 @@ Your content here.
   under the title and collected into a site-wide `/tags/` index page
   (only built at all once at least one page has tags); also boosts search
   relevance for matching queries
-- `icon` - a short emoji/text icon shown next to the page title
+- `icon` - shown next to the page title and its nav entry - a plain emoji, or
+  a named icon from a bundled library (`rocket`, `lucide:rocket`,
+  `tabler:rocket`, or a project's own `custom:my-icon`) - see
+  [Themes: Icons](guides/themes.md#icons)
 - `summary` - a one-line lead-in shown under the title (distinct from
   `description`, which is meta-tag-only and never rendered on the page itself)
 - `ogImage` - overrides this one page's social-card image - see

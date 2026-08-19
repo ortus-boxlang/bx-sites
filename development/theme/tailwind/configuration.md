@@ -152,11 +152,13 @@ linked from the nav (same as `hidden: true`). Each entry is either:
 - a bare docs/-relative path string, e.g. `"guides/setup.md"` - title comes
   from that page's own frontmatter/filename, same as folder-inference would
   give it
-- an object `{ "title", "path", "children" }` - `path` and `children` are
-  both optional; a `title`-only entry with no `path` is an unlinked group
-  heading (like a folder with no `index.md` today), and an explicit `title`
-  always overrides the linked page's own title in the nav (the page's real
-  `<h1>`/`<title>` is untouched - only the nav label changes)
+- an object `{ "title", "path", "icon", "children" }` - `path`, `icon` and
+  `children` are all optional; a `title`-only entry with no `path` is an
+  unlinked group heading (like a folder with no `index.md` today), and an
+  explicit `title`/`icon` always overrides the linked page's own
+  title/icon in the nav (the page's real `<h1>`/`<title>` is untouched -
+  only the nav label/icon changes) - see [Themes: Icons](guides/themes.md#icons)
+  for what an `icon` value can be
 
 ```json
 {

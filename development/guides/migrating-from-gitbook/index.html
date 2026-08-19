@@ -6,10 +6,10 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Page Not Found - BX Docs</title>
+	<title>Migrating from GitBook - BX Docs</title>
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="BX Docs">
-	<meta property="og:title" content="Page Not Found">
+	<meta property="og:title" content="Migrating from GitBook">
 
 	<meta name="description" content="Static documentation site generator for BoxLang, built on bx-markdown">
 	<meta property="og:description" content="Static documentation site generator for BoxLang, built on bx-markdown">
@@ -75,12 +75,117 @@
 			<main class="col-lg-9 col-xl-10 content">
 
 				<article class="page-content">
+<nav class="breadcrumb-nav mb-3" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/bx-docs/development/guides/index.html">Guides</a></li><li class="breadcrumb-item active" aria-current="page">Migrating from GitBook</li></ol></nav>
+					<h1 class="page-title">Migrating from GitBook</h1>
+<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-migration">migration</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-gitbook">gitbook</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/migrating-from-gitbook.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-docs/development/guides/migrating-from-gitbook.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 19, 2026, 10:08:44 PM</span></div>
+<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#getting-a-gitbook-export">Getting a GitBook export</a></li><li class="toc-level-2"><a href="#running-the-migration">Running the migration</a></li><li class="toc-level-2"><a href="#what-gets-converted-automatically">What gets converted automatically</a></li><li class="toc-level-2"><a href="#what-needs-a-manual-look">What needs a manual look</a></li><li class="toc-level-2"><a href="#after-migrating">After migrating</a></li></ul></nav>
+					<h1 id="migrating-from-gitbook"><a href="#migrating-from-gitbook" id="migrating-from-gitbook" name="migrating-from-gitbook" class="anchor"></a>Migrating from GitBook</h1>
+<p><code>bxDocs migrate</code> converts a GitBook export - a <code>SUMMARY.md</code> table of
+contents plus its <code>.md</code> files, GitBook's own on-disk sync format (the
+same one GitHub/Git Sync writes) - into a bx-docs <code>docs/</code> tree, in one
+command. Everything GitBook's content-block system supports maps onto
+something bx-docs already has (see <a href="/bx-docs/development/guides/markdown/index.html#gitbook-style-blocks">Markdown Extensions</a>),
+so the result isn't a rough draft - it's a working site.</p>
+<h2 id="getting-a-gitbook-export"><a href="#getting-a-gitbook-export" id="getting-a-gitbook-export" name="getting-a-gitbook-export" class="anchor"></a>Getting a GitBook export</h2>
+<p><code>bxDocs migrate</code> reads GitBook's own file layout directly, so any of
+these works as <code>--source</code>:</p>
+<ul>
+<li>A repository GitBook is Git-Synced to (Space settings → <strong>GitSync</strong>) -
+point <code>--source</code> at your local clone.</li>
+<li>GitBook's own <strong>Export → Markdown</strong> download, unzipped.</li>
+</ul>
+<p>Either way, <code>--source</code> should be the directory that directly contains
+<code>SUMMARY.md</code>.</p>
+<h2 id="running-the-migration"><a href="#running-the-migration" id="running-the-migration" name="running-the-migration" class="anchor"></a>Running the migration</h2>
+<pre><code class="language-bash"># 1. Scaffold a fresh bx-docs project (skip this if you already have one)
+bxDocs new my-docs
+cd my-docs
 
-					<h1 class="page-title">Page Not Found</h1>
+# 2. Migrate the GitBook export into it
+bxDocs migrate --source=/path/to/gitbook-export
 
+# 3. Build and look at the result
+bxDocs serve
+</code></pre>
+<p><code>migrate</code> prints how many pages it converted and, when something needed
+a judgment call, exactly what and where:</p>
+<pre><code>Migrated 14 page(s) from [/path/to/gitbook-export] into my-docs/docs/, wrote my-docs/docs/nav.json
 
-					<p>Sorry, that page doesn't exist. Try the search box, or head back to the homepage.</p>
+2 item(s) need a manual look:
+  - guides/advanced.md: Unsupported GitBook block [{% prompt %}] - left in its original syntax, needs manual conversion
+  - guides/layout.md: Column width=&quot;one-third&quot; is not a plain length/percentage - dropped, review manually
+</code></pre>
+<p>Nothing is ever silently dropped - a block this tool doesn't know how to
+convert is left in the migrated file in its original <code>{% %}</code> syntax, so
+the content is still there and still easy to find (search the migrated
+<code>docs/</code> tree for <code>{%</code> once you're done). Re-running <code>migrate</code> overwrites
+any file or <code>docs/nav.json</code> it wrote before, so it's safe to fix your
+source export and run it again.</p>
+<h2 id="what-gets-converted-automatically"><a href="#what-gets-converted-automatically" id="what-gets-converted-automatically" name="what-gets-converted-automatically" class="anchor"></a>What gets converted automatically</h2>
+<table class="table">
+<thead>
+<tr><th>GitBook</th><th>Becomes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>SUMMARY.md</code></td><td><code>docs/nav.json</code> (<a href="/bx-docs/development/configuration/index.html#nav">nav override</a> format), nesting preserved</td></tr>
+<tr><td><code>README.md</code> (any folder)</td><td><code>index.md</code> - bx-docs' own folder-index convention</td></tr>
+<tr><td>A page's <code>title</code>/<code>description</code>/<code>tags</code> frontmatter</td><td>Carried over into the migrated file's own bx-docs frontmatter unchanged</td></tr>
+<tr><td><code>.gitbook/assets/**</code></td><td><code>docs/assets/gitbook/**</code>, with every reference rewritten to match</td></tr>
+<tr><td><code>{% hint style=&quot;...&quot; %}</code></td><td><code>!!! type</code> - a native <a href="/bx-docs/development/guides/markdown/index.html#admonitions">admonition</a></td></tr>
+<tr><td><code>{% tabs %}</code> / <code>{% tab title=&quot;...&quot; %}</code></td><td><code>=== &quot;Title&quot;</code> - native <a href="/bx-docs/development/guides/markdown/index.html#content-tabs">content tabs</a></td></tr>
+<tr><td><code>{% cards %}</code> / <code>{% card %}</code></td><td><a href="/bx-docs/development/guides/markdown/index.html#cards"><code>::: cards</code> / <code>::: card</code></a></td></tr>
+<tr><td><code>{% columns %}</code> / <code>{% column width=&quot;...&quot; %}</code></td><td><a href="/bx-docs/development/guides/markdown/index.html#columns"><code>::: columns</code> / <code>::: column</code></a></td></tr>
+<tr><td><code>{% stepper %}</code> / <code>{% step %}</code></td><td><a href="/bx-docs/development/guides/markdown/index.html#stepper"><code>::: stepper</code> / <code>::: step</code></a> - title taken from the step's own first heading</td></tr>
+<tr><td><code>{% file src=&quot;...&quot; %}</code></td><td><a href="/bx-docs/development/guides/markdown/index.html#file"><code>::: file</code></a></td></tr>
+<tr><td><code>{% embed url=&quot;...&quot; %}</code></td><td><a href="/bx-docs/development/guides/markdown/index.html#embed"><code>::: embed</code></a></td></tr>
+<tr><td><code>{% content-ref url=&quot;...&quot; %}</code></td><td><a href="/bx-docs/development/guides/markdown/index.html#page-link"><code>::: page-link</code></a></td></tr>
+<tr><td><code>{% details %}</code> / <code>{% expand %}</code></td><td><a href="/bx-docs/development/guides/markdown/index.html#expandable"><code>::: expandable</code></a></td></tr>
+</tbody>
+</table>
+<p>A block shown as a literal fenced example in your GitBook content (rather
+than used for real) is correctly left alone, not misread as the real
+thing.</p>
+<h2 id="what-needs-a-manual-look"><a href="#what-needs-a-manual-look" id="what-needs-a-manual-look" name="what-needs-a-manual-look" class="anchor"></a>What needs a manual look</h2>
+<p>A handful of GitBook blocks have no bx-docs equivalent at all and are
+left in their original <code>{% %}</code> syntax rather than guessed at: <strong>Prompt</strong>
+(an AI-generation block - there's nothing to run it against once
+migrated), <strong>Conditional content</strong> (GitBook-account-based visibility, not
+a concept bx-docs has), and the <strong>Ask AI</strong> search bar. Anything else this
+tool doesn't recognize - a typo'd block, a GitBook feature added after
+this tool was written - gets the same treatment: left as-is, reported as
+a warning.</p>
+<p>A few smaller judgment calls are reported the same way: an unrecognized
+<code>hint</code> <code>style</code> (falls back to <code>note</code>), or a <code>column</code> <code>width</code> that isn't a
+plain CSS length/percentage (dropped rather than trusted verbatim).</p>
+<p><strong>Page icons aren't migrated automatically.</strong> GitBook's own docs don't
+confirm that a page's icon assignment (set via its editor's icon picker)
+actually survives into a Git-Sync export at all - if a project's exported
+frontmatter genuinely has an <code>icon</code> field, <code>migrate</code> carries it through
+opportunistically, but don't expect it for most real exports. Set icons
+by hand afterward instead - either a page's own frontmatter, or a
+<a href="/bx-docs/development/configuration/index.html#nav"><code>docs/nav.json</code> entry's own <code>icon</code></a> - using a
+<a href="/bx-docs/development/guides/themes/index.html#icons">named icon</a> from one of the three bundled libraries
+(no need to match GitBook's own Font-Awesome-based icons; pick whichever
+name looks right in <a href="https://phosphoricons.com/">Phosphor</a>,
+<a href="https://lucide.dev/icons/">Lucide</a> or <a href="https://tabler.io/icons">Tabler</a>'s
+own gallery).</p>
+<h2 id="after-migrating"><a href="#after-migrating" id="after-migrating" name="after-migrating" class="anchor"></a>After migrating</h2>
+<p>The migrated <code>docs/nav.json</code> is a plain <a href="/bx-docs/development/configuration/index.html#nav">nav override</a>
+file - edit it like any other, or delete it to fall back to bx-docs'
+own folder-structure-is-nav-structure convention. From here it's a normal
+bx-docs project: pick a <a href="/bx-docs/development/guides/themes/index.html">theme</a>, review
+<a href="/bx-docs/development/configuration/index.html"><code>bxdocs.json</code></a>, and <a href="/bx-docs/development/guides/deployment/index.html">deploy</a> when
+you're happy with it.</p>
+
 				</article>
+
+				<nav class="page-nav d-flex justify-content-between" aria-label="Page navigation">
+
+					<a class="page-nav__prev" href="/bx-docs/development/guides/plugins/index.html">&larr; Plugins</a>
+
+					<a class="page-nav__next" href="/bx-docs/development/releases/index.html">Release Policy &rarr;</a>
+
+				</nav>
 
 
 

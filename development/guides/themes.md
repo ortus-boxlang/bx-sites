@@ -97,6 +97,44 @@ Set which one a project uses in `bxdocs.json`:
 { "theme": { "name": "material" } }
 ```
 
+## Icons
+
+A page's own `icon` frontmatter (shown next to its title, and next to its
+entry in the sidebar nav) accepts either a plain emoji/short text - the
+original, still fully supported form - or a named icon from one of three
+self-hosted libraries, all MIT/ISC-licensed and bundled with this module
+(~8,700 icons combined, no CDN, nothing added to a built page's own
+weight beyond the handful of icons it actually uses - see IconResolver.bx):
+
+```markdown
+---
+icon: rocket
+---
+```
+
+```markdown
+---
+icon: lucide:rocket
+---
+```
+
+Bare `rocket` defaults to [Phosphor](https://phosphoricons.com/) (regular
+weight); prefix with `lucide:` for [Lucide](https://lucide.dev/icons/) or
+`tabler:` for [Tabler](https://tabler.io/icons) instead. Browse each
+site's own gallery for the exact name - it matches this module's own
+vendored filename exactly (lowercase, hyphenated, e.g. `book-open`,
+`arrow-up-right`).
+
+A project's own SVG works too - drop it at `docs/assets/icons/my-icon.svg`
+and reference it as `icon: custom:my-icon`.
+
+A [nav.json](../configuration.md#nav) entry can set its own `icon` too,
+overriding the target page's own frontmatter for that one entry:
+
+```json
+{ "title": "Guides", "path": "guides/index.md", "icon": "lucide:book-open" }
+```
+
 ## The `ThemeProvider` contract
 
 A theme is just a folder with:
