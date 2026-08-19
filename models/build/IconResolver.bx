@@ -2,18 +2,22 @@
  * Resolves an `icon` value (frontmatter `icon`, or a nav entry's own
  * `icon`) into safe, ready-to-embed HTML - either a literal emoji/short
  * text passed through HTML-escaped (the original, still-supported
- * behavior), or a named icon from one of four self-hosted libraries
- * (`resources/assets/icons/{phosphor,phosphor-duotone,lucide,tabler}/*.svg`,
- * vendored by `vendorIcons.mjs` - MIT/ISC licensed, ~10,200 icons
+ * behavior), or a named icon from one of eight self-hosted libraries
+ * (`resources/assets/icons/{phosphor,phosphor-thin,phosphor-light,
+ * phosphor-bold,phosphor-fill,phosphor-duotone,lucide,tabler}/*.svg`,
+ * vendored by `vendorIcons.mjs` - MIT/ISC licensed, ~16,200 icons
  * combined) inlined as raw SVG, or a project's own `docs/assets/icons/*.svg`.
  * (Font Awesome is deliberately not one of these - see vendorIcons.mjs's
  * own docblock for why.)
  *
  * A named icon is referenced as a bare lowercase-kebab-case name
- * (`icon: rocket`, defaulting to the `phosphor` library), or namespaced
- * as `library:name` (`icon: phosphor-duotone:rocket`, `icon: lucide:rocket`,
- * `icon: tabler:rocket`, `icon: custom:my-icon` for a project's own
- * `docs/assets/icons/my-icon.svg`). Only one SVG file is ever read per
+ * (`icon: rocket`, defaulting to the `phosphor` (regular weight)
+ * library), or namespaced as `library:name` - any of Phosphor's own six
+ * weights (`icon: phosphor-thin:rocket`, `phosphor-light:rocket`,
+ * `phosphor:rocket`, `phosphor-bold:rocket`, `phosphor-fill:rocket`,
+ * `phosphor-duotone:rocket`), `icon: lucide:rocket`, `icon: tabler:rocket`,
+ * or `icon: custom:my-icon` for a project's own
+ * `docs/assets/icons/my-icon.svg`. Only one SVG file is ever read per
  * distinct icon reference across a whole build (cached on this
  * instance), and only the icons a build actually references are ever
  * read at all - the vendored libraries themselves never ship to a
@@ -29,7 +33,16 @@
  */
 class {
 
-	variables.libraries = [ "phosphor", "phosphor-duotone", "lucide", "tabler" ]
+	variables.libraries = [
+		"phosphor",
+		"phosphor-thin",
+		"phosphor-light",
+		"phosphor-bold",
+		"phosphor-fill",
+		"phosphor-duotone",
+		"lucide",
+		"tabler"
+	]
 	variables.refPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '^(?:([a-z][a-z0-9-]*):)?([a-z][a-z0-9-]*)$' )
 	variables.cache = {}
 
