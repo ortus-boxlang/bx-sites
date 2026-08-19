@@ -1,0 +1,63 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.TagsIndexBuilder", function() {
+
+			beforeEach( function() {
+				variables.builder = new "models.build.TagsIndexBuilder@bxdocs"();
+			} );
+
+			private struct function page( string title, string urlPath, array tags = [], boolean hidden = false ) {
+				return { title : arguments.title, urlPath : arguments.urlPath, tags : arguments.tags, hidden : arguments.hidden };
+			}
+
+			it( "reports hasTags false and no content when no page has tags", function() {
+				var result = builder.build( [ page( "Home", "index.html" ) ], "/" );
+
+				expect( result.hasTags ).toBeFalse();
+				expect( result.contentHtml ).toBe( "" );
+			} );
+
+			it( "groups pages under each tag heading with a stable anchor id", function() {
+				var pages = [
+					page( "Guide A", "a/index.html", [ "cli", "guide" ] ),
+					page( "Guide B", "b/index.html", [ "cli" ] )
+				];
+
+				var result = builder.build( pages, "/" );
+
+				expect( result.hasTags ).toBeTrue();
+				expect( result.contentHtml ).toInclude( '<h2 id="tag-cli">cli</h2>' );
+				expect( result.contentHtml ).toInclude( '<h2 id="tag-guide">guide</h2>' );
+				expect( result.contentHtml ).toInclude( '<a href="/a/index.html">Guide A</a>' );
+				expect( result.contentHtml ).toInclude( '<a href="/b/index.html">Guide B</a>' );
+			} );
+
+			it( "slugs a multi-word tag into a hyphenated anchor id", function() {
+				var result = builder.build( [ page( "Guide", "guide/index.html", [ "Getting Started" ] ) ], "/" );
+
+				expect( result.contentHtml ).toInclude( '<h2 id="tag-getting-started">Getting Started</h2>' );
+			} );
+
+			it( "prefixes linked page urls with basePath", function() {
+				var result = builder.build( [ page( "Guide", "guide/index.html", [ "cli" ] ) ], "/my-docs/" );
+
+				expect( result.contentHtml ).toInclude( '<a href="/my-docs/guide/index.html">Guide</a>' );
+			} );
+
+			it( "excludes hidden pages from every tag they carry", function() {
+				var pages = [
+					page( "Visible", "v/index.html", [ "cli" ] ),
+					page( "Hidden", "h/index.html", [ "cli" ], true )
+				];
+
+				var result = builder.build( pages, "/" );
+
+				expect( result.contentHtml ).toInclude( "Visible" );
+				expect( result.contentHtml ).notToInclude( "Hidden" );
+			} );
+
+		} );
+	}
+
+}

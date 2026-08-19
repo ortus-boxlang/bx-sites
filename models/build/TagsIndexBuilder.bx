@@ -1,0 +1,65 @@
+/**
+ * Builds the `site/tags/index.html` page body - every frontmatter `tags`
+ * value collected across all pages, each with its own anchor and a list of
+ * every page carrying it. Mirrors the `##tag-<slug>` anchors each theme's
+ * `page.bxm` links its own tag badges to (see `tagSlug()` there - the same
+ * slugging rule, kept in sync by convention rather than a shared function,
+ * matching how this codebase already duplicates small per-theme render
+ * helpers rather than introducing a cross-theme dependency).
+ */
+class {
+
+	/**
+	 * @pages Array of page structs (DocsLoader.load() shape, `tags` included)
+	 * @basePath Root-relative base path ending with `/`, prefixed onto every linked page's `urlPath`
+	 *
+	 * @return { hasTags: boolean, contentHtml: string }
+	 */
+	struct function build( required array pages, required string basePath ) {
+		var byTag = {}
+
+		for ( var page in arguments.pages ) {
+			if ( page.hidden ) {
+				continue
+			}
+			for ( var tag in ( page.tags ?: [] ) ) {
+				if ( !isSimpleValue( tag ) || !len( trim( tag ) ) ) {
+					continue
+				}
+				if ( !byTag.keyExists( tag ) ) {
+					byTag[ tag ] = []
+				}
+				byTag[ tag ].append( page )
+			}
+		}
+
+		if ( byTag.isEmpty() ) {
+			return { hasTags : false, contentHtml : "" }
+		}
+
+		var tagNames = byTag.keyArray()
+		tagNames.sort( "textnocase" )
+
+		var html = ""
+		for ( var tag in tagNames ) {
+			var tagPages = byTag[ tag ]
+			tagPages.sort( ( a, b ) => compareNoCase( a.title, b.title ) )
+
+			html &= '<h2 id="tag-' & tagSlug( tag ) & '">' & encodeForHTML( tag ) & '</h2><ul>'
+			for ( var page in tagPages ) {
+				html &= '<li><a href="' & arguments.basePath & page.urlPath & '">' & encodeForHTML( page.title ) & '</a></li>'
+			}
+			html &= '</ul>'
+		}
+
+		return { hasTags : true, contentHtml : html }
+	}
+
+	/**
+	 * @tag The raw tag text
+	 */
+	private string function tagSlug( required string tag ) {
+		return lCase( trim( arguments.tag ) ).reReplace( "[^a-z0-9]+", "-", "all" ).reReplace( "(^-|-$)", "", "all" )
+	}
+
+}

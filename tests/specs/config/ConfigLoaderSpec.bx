@@ -102,6 +102,22 @@ class extends="testbox.system.BaseSpec" {
 				expect( config.markdown.enableAdmonition ).toBeFalse();
 			} );
 
+			it( "preserves a user-supplied [nav] array", function() {
+				var dir = newProjectDir( '{"name":"My Docs","nav":[{"title":"Home","path":"index.md"}]}' );
+				var config = loader.load( dir );
+
+				expect( config.nav ).toBeArray();
+				expect( config.nav.len() ).toBe( 1 );
+				expect( config.nav[ 1 ].title ).toBe( "Home" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [nav] is not an array", function() {
+				var dir = newProjectDir( '{"name":"My Docs","nav":{"title":"Home"}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
 			it( "throws BxDocs.InvalidConfig when [search] is not a boolean", function() {
 				var dir = newProjectDir( '{"name":"My Docs","search":"not-a-boolean-at-all"}' );
 				expect( function() {

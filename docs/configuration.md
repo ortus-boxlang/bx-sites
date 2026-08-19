@@ -1,6 +1,9 @@
 ---
 title: Configuration
 order: 4
+icon: ⚙️
+summary: Every bxdocs.json key, what it defaults to, and what it does.
+tags: [reference, configuration]
 ---
 
 # Configuration
@@ -132,9 +135,55 @@ extra JS shipped. See [Search](guides/search.md).
 
 ## `nav`
 
-Reserved for a hand-authored nav override. In v1, nav is always inferred
-from `docs/`'s own folder/file structure (with `order`/`hidden`
-frontmatter); this key is validated but not yet consumed.
+By default, nav is inferred from `docs/`'s own folder/file structure (with
+`order`/`hidden` frontmatter) - fine for small sites, but a large one can
+outgrow it: an explicit nav lets you title, group and order pages however
+you want, independent of where their files actually live.
+
+An empty array (the default) means "infer from folder structure". A
+non-empty array replaces that inference entirely - array order becomes nav
+order, and a page not referenced anywhere in it is still built, just not
+linked from the nav (same as `hidden: true`). Each entry is either:
+
+- a bare docs/-relative path string, e.g. `"guides/setup.md"` - title comes
+  from that page's own frontmatter/filename, same as folder-inference would
+  give it
+- an object `{ "title", "path", "children" }` - `path` and `children` are
+  both optional; a `title`-only entry with no `path` is an unlinked group
+  heading (like a folder with no `index.md` today), and an explicit `title`
+  always overrides the linked page's own title in the nav (the page's real
+  `<h1>`/`<title>` is untouched - only the nav label changes)
+
+```json
+{
+	"nav": [
+		"index.md",
+		{
+			"title": "Guides",
+			"children": [
+				{ "title": "Quick Start", "path": "guides/setup.md" },
+				"guides/deployment.md"
+			]
+		}
+	]
+}
+```
+
+For a nav large enough that it clutters `bxdocs.json`, move it to its own
+`docs/nav.json` file instead - same array shape, just as the whole file's
+top-level content:
+
+```json
+[
+	"index.md",
+	{ "title": "Guides", "children": [ "guides/setup.md" ] }
+]
+```
+
+`bxdocs.json`'s own `nav`, when non-empty, always wins over `docs/nav.json`.
+Only the main tree honors either - a `docs/versions/<name>/` tree always
+infers its nav from its own folder structure, even when the main tree has
+an explicit one.
 
 ## `markdown`
 
@@ -259,13 +308,31 @@ Wires up pageview analytics. Currently supports Google Analytics
 ## `ogImage`
 
 Path/URL to a default social-card image, rendered as `og:image` (and paired
-with a `twitter:card` of `summary_large_image`) on every page - resolved
-the same way as `theme.logo` (relative paths are prefixed with `baseURL`,
-absolute URLs are used as-is). Left blank (the default), no `og:image`/
-`twitter:card` tags are rendered.
+with a `twitter:card` of `summary_large_image`) on every page that doesn't
+override it - resolved the same way as `theme.logo` (relative paths are
+prefixed with `baseURL`, absolute URLs are used as-is). Left blank (the
+default) and `generateOgImages` off, no `og:image`/`twitter:card` tags are
+rendered.
 
 ```json
 { "ogImage": "assets/social-card.png" }
+```
+
+A page's own frontmatter `ogImage` (see [Getting Started](getting-started.md#add-pages))
+always wins over this site-wide default for that one page.
+
+### `generateOgImages`
+
+`false` (the default) - no per-page cards. `true` renders a real 1200x630
+PNG social card for every page that doesn't already have its own
+frontmatter `ogImage` - the page's title on the brand gradient, written to
+`site/assets/og/<page>.png` - instead of every page sharing one generic
+site-wide image. Pure `java.awt`/`javax.imageio` under the hood (part of
+any JVM BoxLang runs on), so this needs no headless browser, external
+service, or network access at build time.
+
+```json
+{ "generateOgImages": true }
 ```
 
 ## `extraCss` / `extraJs`

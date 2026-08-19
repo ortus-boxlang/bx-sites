@@ -53,10 +53,11 @@
 
 	function renderBrandMark() {
 		var logo = trim( variables.siteConfig.theme.logo ?: "" )
+		var name = encodeForHTML( variables.siteConfig.name )
 		if ( len( logo ) ) {
-			return '<img class="brand-logo" src="' & resolveAssetUrl( logo ) & '" alt="' & encodeForHTML( variables.siteConfig.name ) & '">'
+			return '<img class="brand-logo" src="' & resolveAssetUrl( logo ) & '" alt=""><span class="brand-name">' & name & '</span>'
 		}
-		return '⚡ ' & encodeForHTML( variables.siteConfig.name )
+		return '⚡ ' & name
 	}
 
 	function renderExtraCss( required array urls ) {
@@ -83,7 +84,7 @@
 	variables.navCollapsible = ( variables.siteConfig.theme.options.navCollapsible ?: false ) ? true : false
 	variables.navExpandAll = ( variables.siteConfig.theme.options.navExpandAll ?: true ) ? true : false
 	variables.faviconUrl = trim( variables.siteConfig.theme.favicon ?: "" )
-	variables.ogImageUrl = trim( variables.siteConfig.ogImage ?: "" )
+	variables.ogImageUrl = len( trim( variables.page.ogImage ?: "" ) ) ? trim( variables.page.ogImage ) : trim( variables.siteConfig.ogImage ?: "" )
 	variables.ogDescription = len( variables.page.description ?: "" ) ? variables.page.description : ( variables.siteConfig.description ?: "" )
 	variables.analyticsProvider = trim( variables.siteConfig.analytics.provider ?: "" )
 	variables.analyticsId = trim( variables.siteConfig.analytics.id ?: "" )
@@ -118,8 +119,6 @@
 			}
 		} )();
 	</script>
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
 	<link rel="stylesheet" href="#variables.basePath#assets/theme/style.css">
 	#renderExtraCss( variables.siteConfig.extraCss ?: [] )#
@@ -175,6 +174,7 @@
 	</footer>
 </bx:output></bx:if><bx:output>
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+	<script src="#variables.basePath#assets/highlight-boxlang.js"></script>
 	<script>hljs.highlightAll();</script>
 	<script src="#variables.basePath#assets/copy-code.js" defer></script>
 	<script src="#variables.basePath#assets/admonition-collapse.js" defer></script>

@@ -85,6 +85,15 @@ class extends="testbox.system.BaseSpec" {
 				expect( exitCode ).toBe( 1 );
 			} );
 
+			it( "dispatches `gh-deploy` and returns exit code 1 when the project isn't a git repo", function() {
+				var parent = newTempDir();
+				moduleConfig.main( [ "new", parent ] );
+
+				var exitCode = moduleConfig.main( [ "gh-deploy", parent ] );
+
+				expect( exitCode ).toBe( 1 );
+			} );
+
 			it( "strips matching surrounding quotes from a --key=`value` assignment, per BoxLang's own CLI convention", function() {
 				var parent = newTempDir();
 				var projectRoot = parent & "/site"

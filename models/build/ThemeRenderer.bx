@@ -12,12 +12,13 @@
  *   - `page.bxm` (required) - the article body; renders `variables.page.contentHtml`
  *     (the already-converted markdown, set by BuildPipeline before rendering).
  *     `variables.page.toc`, `.prevPage`, `.nextPage`, `.breadcrumbs`,
- *     `.editUrl`, `.lastUpdated` and `.description` are always present too
- *     (defaulted by `renderPage()` below if the caller didn't set them - the
- *     latter three are empty strings when `bxdocs.json`'s `repo.editUri`/
- *     `lastUpdated` aren't configured, or the page has no frontmatter
- *     `description`), so a theme's `page.bxm` never needs to guard their
- *     existence. `variables.basePath` (module spec section 4's `baseURL`,
+ *     `.editUrl`, `.lastUpdated`, `.description`, `.tags`, `.icon`,
+ *     `.summary` and `.ogImage` are always present too (defaulted by
+ *     `renderPage()` below if the caller didn't set them - empty
+ *     string/array when `bxdocs.json`'s `repo.editUri`/`lastUpdated` aren't
+ *     configured, or the page has no matching frontmatter key), so a
+ *     theme's `page.bxm` never needs to guard their existence.
+ *     `variables.basePath` (module spec section 4's `baseURL`,
  *     via BaseUrlResolver.bx) is always a root-relative path ending with
  *     `/` - every internal `href`/`src` a theme renders should be prefixed
  *     with it instead of a hardcoded `/`, so the site still works hosted
@@ -146,6 +147,18 @@ class {
 		}
 		if ( !variables.page.keyExists( "description" ) ) {
 			variables.page.description = ""
+		}
+		if ( !variables.page.keyExists( "tags" ) ) {
+			variables.page.tags = []
+		}
+		if ( !variables.page.keyExists( "icon" ) ) {
+			variables.page.icon = ""
+		}
+		if ( !variables.page.keyExists( "summary" ) ) {
+			variables.page.summary = ""
+		}
+		if ( !variables.page.keyExists( "ogImage" ) ) {
+			variables.page.ogImage = ""
 		}
 		variables.nav = arguments.nav
 		variables.siteConfig = arguments.config

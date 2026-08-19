@@ -1,0 +1,117 @@
+/**
+ * Backs the `gh-deploy` CLI verb - pushes an already-built `site/` to a
+ * `gh-pages`-style branch, the same one-commit-per-deploy convention mkdocs'
+ * own `mkdocs gh-deploy` (and the `ghp-import` tool it's built on) use: no
+ * accumulated history on that branch, just a force-pushed snapshot of the
+ * current site every time. Shells out to `git` (there's no BoxLang-native
+ * git binding, same as GitRevisionDate.bx) via a throwaway `git worktree`
+ * rather than touching the caller's own working tree/branch at all.
+ */
+class {
+
+	/**
+	 * @projectRoot Absolute path to the project root (must be a git repository)
+	 * @siteDir Absolute path to the already-built site (must exist - run `build` first)
+	 * @branch The branch to force-push the site to
+	 * @remote The git remote to push to
+	 * @message The commit message for the branch's single commit
+	 *
+	 * @return { branch, remote }
+	 */
+	struct function deploy( required string projectRoot, required string siteDir, string branch = "gh-pages", string remote = "origin", string message = "Deploy site via bxDocs gh-deploy" ) {
+		if ( !directoryExists( arguments.projectRoot & "/.git" ) ) {
+			throw(
+				type    = "BxDocs.NotAGitRepo",
+				message = "`gh-deploy` requires a git repository at [#arguments.projectRoot#] - run `git init` first"
+			)
+		}
+		if ( !directoryExists( arguments.siteDir ) ) {
+			throw(
+				type    = "BxDocs.SiteNotBuilt",
+				message = "No [#arguments.siteDir#] to deploy - run `build` first"
+			)
+		}
+
+		var worktreeDir = getTempDirectory().reReplace( "[\/]+$", "" ) & "/bxdocs-ghdeploy-" & createUUID()
+
+		try {
+			run( [ "git", "worktree", "add", "--detach", worktreeDir ], arguments.projectRoot )
+			// A local ref for `branch` from a previous deploy (if any) is
+			// disposable - it's already been pushed to the remote by then -
+			// and `checkout --orphan` refuses to reuse an existing branch name.
+			runAllowFailure( [ "git", "branch", "-D", arguments.branch ], worktreeDir )
+			run( [ "git", "checkout", "--orphan", arguments.branch ], worktreeDir )
+			runAllowFailure( [ "git", "rm", "-rf", "--quiet", "." ], worktreeDir )
+
+			for ( var entry in directoryList( worktreeDir, false, "name" ) ) {
+				if ( entry != ".git" ) {
+					var entryPath = worktreeDir & "/" & entry
+					directoryExists( entryPath ) ? directoryDelete( entryPath, true ) : fileDelete( entryPath )
+				}
+			}
+
+			directoryCopy( arguments.siteDir, worktreeDir, true )
+			fileWrite( worktreeDir & "/.nojekyll", "" )
+
+			run( [ "git", "add", "-A" ], worktreeDir )
+			run( [ "git", "commit", "-m", arguments.message ], worktreeDir )
+			run( [ "git", "push", arguments.remote, arguments.branch, "--force" ], worktreeDir )
+		} finally {
+			runAllowFailure( [ "git", "worktree", "remove", "--force", worktreeDir ], arguments.projectRoot )
+			if ( directoryExists( worktreeDir ) ) {
+				directoryDelete( worktreeDir, true )
+			}
+		}
+
+		return { branch : arguments.branch, remote : arguments.remote }
+	}
+
+	/**
+	 * Runs a command, throwing BxDocs.GhDeployFailed with its combined
+	 * stdout/stderr on a non-zero exit code.
+	 *
+	 * @cmd Full argv, `git` included as element 1
+	 * @cwd Working directory for the process
+	 */
+	private string function run( required array cmd, required string cwd ) {
+		var result = exec( arguments.cmd, arguments.cwd )
+		if ( result.exitCode != 0 ) {
+			throw(
+				type    = "BxDocs.GhDeployFailed",
+				message = "`#arguments.cmd.toList( ' ' )#` failed (exit #result.exitCode#): #result.output#"
+			)
+		}
+		return result.output
+	}
+
+	/**
+	 * Runs a command, ignoring its exit code entirely - for cleanup/best-effort
+	 * steps (e.g. `git rm -rf .` on a brand new orphan branch with nothing
+	 * tracked yet) where failure is expected and harmless.
+	 *
+	 * @cmd Full argv, `git` included as element 1
+	 * @cwd Working directory for the process
+	 */
+	private void function runAllowFailure( required array cmd, required string cwd ) {
+		exec( arguments.cmd, arguments.cwd )
+	}
+
+	/**
+	 * @cmd Full argv
+	 * @cwd Working directory for the process
+	 *
+	 * @return { exitCode, output }
+	 */
+	private struct function exec( required array cmd, required string cwd ) {
+		var pb = createObject( "java", "java.lang.ProcessBuilder" ).init( arguments.cmd )
+		pb.directory( createObject( "java", "java.io.File" ).init( arguments.cwd ) )
+		pb.redirectErrorStream( true )
+
+		var process = pb.start()
+		var output = createObject( "java", "java.lang.String" ).init( process.getInputStream().readAllBytes(), "UTF-8" )
+		var exitCode = process.waitFor()
+
+		return { exitCode : exitCode, output : trim( output ) }
+	}
+
+}

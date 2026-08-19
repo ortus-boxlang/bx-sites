@@ -37,6 +37,7 @@
 				idx = lunr( function () {
 					this.ref( "id" );
 					this.field( "title", { boost : 10 } );
+					this.field( "tags", { boost : 8 } );
 					this.field( "headings", { boost : 5 } );
 					this.field( "body" );
 
@@ -44,6 +45,7 @@
 						this.add( {
 							id       : i,
 							title    : doc.title,
+							tags     : ( doc.tags || [] ).join( " " ),
 							headings : ( doc.headings || [] ).join( " " ),
 							body     : doc.body
 						} );

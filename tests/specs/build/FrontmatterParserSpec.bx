@@ -60,6 +60,76 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.frontmatter.count() ).toBe( 1 );
 			} );
 
+			it( "parses an inline [a, b, c] list value", function() {
+				var content = "---" & char( 10 ) & 'tags: [cli, guide, "quoted tag"]' & char( 10 ) & "---" & char( 10 ) & "Body";
+				var result = parser.parse( content );
+
+				expect( result.frontmatter.tags ).toBeArray();
+				expect( result.frontmatter.tags ).toBe( [ "cli", "guide", "quoted tag" ] );
+			} );
+
+			it( "parses an empty inline [] list value", function() {
+				var content = "---" & char( 10 ) & "tags: []" & char( 10 ) & "---" & char( 10 ) & "Body";
+				var result = parser.parse( content );
+
+				expect( result.frontmatter.tags ).toBeArray();
+				expect( result.frontmatter.tags.len() ).toBe( 0 );
+			} );
+
+			it( "parses a block list of - item lines under a bare key:", function() {
+				var content = "---" & char( 10 ) &
+					"tags:" & char( 10 ) &
+					"  - cli" & char( 10 ) &
+					"  - guide" & char( 10 ) &
+					"title: After" & char( 10 ) &
+					"---" & char( 10 ) &
+					"Body";
+
+				var result = parser.parse( content );
+
+				expect( result.frontmatter.tags ).toBe( [ "cli", "guide" ] );
+				expect( result.frontmatter.title ).toBe( "After" );
+			} );
+
+			it( "treats a bare key: with no following - items as an empty string", function() {
+				var content = "---" & char( 10 ) &
+					"description:" & char( 10 ) &
+					"title: After" & char( 10 ) &
+					"---" & char( 10 ) &
+					"Body";
+
+				var result = parser.parse( content );
+
+				expect( result.frontmatter.description ).toBe( "" );
+				expect( result.frontmatter.title ).toBe( "After" );
+			} );
+
+			it( "joins a folded > block scalar with spaces", function() {
+				var content = "---" & char( 10 ) &
+					"description: >" & char( 10 ) &
+					"  This spans" & char( 10 ) &
+					"  multiple lines." & char( 10 ) &
+					"---" & char( 10 ) &
+					"Body";
+
+				var result = parser.parse( content );
+
+				expect( result.frontmatter.description ).toBe( "This spans multiple lines." );
+			} );
+
+			it( "joins a literal | block scalar with newlines", function() {
+				var content = "---" & char( 10 ) &
+					"description: |" & char( 10 ) &
+					"  Line one" & char( 10 ) &
+					"  Line two" & char( 10 ) &
+					"---" & char( 10 ) &
+					"Body";
+
+				var result = parser.parse( content );
+
+				expect( result.frontmatter.description ).toBe( "Line one" & char( 10 ) & "Line two" );
+			} );
+
 		} );
 	}
 

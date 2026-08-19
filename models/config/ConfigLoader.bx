@@ -27,6 +27,7 @@ class {
 		"mermaid"      : false,
 		"analytics"    : { "provider" : "", "id" : "" },
 		"ogImage"      : "",
+		"generateOgImages" : false,
 		"extraCss"     : [],
 		"extraJs"      : []
 	}
@@ -170,10 +171,10 @@ class {
 			)
 		}
 
-		if ( !isArray( arguments.config.nav ?: "" ) && !isStruct( arguments.config.nav ?: "" ) ) {
+		if ( !isArray( arguments.config.nav ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [nav], when present, must be an array or an object"
+				message = "bxdocs.json [nav], when present, must be an array"
 			)
 		}
 
@@ -252,6 +253,13 @@ class {
 			throw(
 				type    = "BxDocs.InvalidConfig",
 				message = "bxdocs.json [ogImage], when present, must be a string"
+			)
+		}
+
+		if ( !isBoolean( arguments.config.generateOgImages ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [generateOgImages], when present, must be a boolean"
 			)
 		}
 

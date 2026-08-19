@@ -1,0 +1,59 @@
+/**
+ * cli.GhDeploy only covers guard clauses here, matching cli.Build's own
+ * spec (BuildSpec.bx) - a full successful run needs a real bx-markdown
+ * module activation (MarkdownRenderer.bx's hard dependency, see its own
+ * docblock), which this plain unit-test environment doesn't have. The
+ * actual git push mechanics are fully covered against real throwaway
+ * repositories in GhPagesDeployerSpec.bx instead, and real end-to-end
+ * build behavior (with an injectable fake markdown renderer) in
+ * BuildPipelineSpec.bx.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.GhDeploy", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.GhDeploy@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "throws BxDocs.ConfigNotFound when the project has no bxdocs.json", function() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-ghdeploy-" );
+				tempDirs.append( dir );
+
+				expect( function() {
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxDocs.ConfigNotFound" );
+			} );
+
+			it( "throws BxDocs.NotAGitRepo when the project has no .git, even with a valid bxdocs.json", function() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-ghdeploy-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite( dir & "/bxdocs.json", '{"name":"Test Site"}' );
+				fileWrite( dir & "/docs/index.md", "Home" );
+
+				expect( function() {
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxDocs.NotAGitRepo" );
+			} );
+
+		} );
+	}
+
+}

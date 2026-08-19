@@ -109,6 +109,58 @@ class extends="testbox.system.BaseSpec" {
 				expect( nav[ 2 ].title ).toBe( "About" );
 			} );
 
+			it( "builds an explicit nav from a navConfig array of bare path strings, in array order", function() {
+				var pages = [
+					page( relativePath = "index.md", title = "Home", urlPath = "index.html" ),
+					page( relativePath = "about.md", title = "About" )
+				];
+
+				var nav = navBuilder.build( pages, [ "about.md", "index.md" ] );
+
+				expect( nav.len() ).toBe( 2 );
+				expect( nav[ 1 ].title ).toBe( "About" );
+				expect( nav[ 2 ].title ).toBe( "Home" );
+			} );
+
+			it( "builds an explicit nav from { title, path, children } objects, with an explicit title winning over the page's own", function() {
+				var pages = [
+					page( relativePath = "guides/setup.md", title = "Setup" )
+				];
+
+				var nav = navBuilder.build( pages, [
+					{ "title" : "Guides", "children" : [
+						{ "title" : "Getting Set Up", "path" : "guides/setup.md" }
+					] }
+				] );
+
+				expect( nav.len() ).toBe( 1 );
+				expect( nav[ 1 ].title ).toBe( "Guides" );
+				expect( nav[ 1 ].url ).toBe( "" );
+				expect( nav[ 1 ].children.len() ).toBe( 1 );
+				expect( nav[ 1 ].children[ 1 ].title ).toBe( "Getting Set Up" );
+				expect( nav[ 1 ].children[ 1 ].url ).toBe( pages[ 1 ].urlPath );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when a navConfig entry references a path that doesn't exist", function() {
+				var pages = [ page( relativePath = "index.md", title = "Home" ) ];
+
+				expect( function() {
+					navBuilder.build( pages, [ "does-not-exist.md" ] );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "leaves a page out of the nav entirely when navConfig doesn't reference it, without erroring", function() {
+				var pages = [
+					page( relativePath = "index.md", title = "Home" ),
+					page( relativePath = "orphan.md", title = "Orphan" )
+				];
+
+				var nav = navBuilder.build( pages, [ "index.md" ] );
+
+				expect( nav.len() ).toBe( 1 );
+				expect( nav[ 1 ].title ).toBe( "Home" );
+			} );
+
 			it( "flatten() returns an empty array for an empty nav", function() {
 				expect( navBuilder.flatten( [] ) ).toBeArray();
 				expect( navBuilder.flatten( [] ).len() ).toBe( 0 );

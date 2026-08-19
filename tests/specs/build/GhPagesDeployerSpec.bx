@@ -1,0 +1,130 @@
+/**
+ * Exercises GhPagesDeployer.bx against real, throwaway git repositories -
+ * a bare repo standing in for "origin", and a real working repo with an
+ * initial commit to deploy from. No mocking git itself; this class has no
+ * seam for that (same call as GitRevisionDate.bx makes).
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.GhPagesDeployer", function() {
+
+			beforeEach( function() {
+				variables.deployer = new "models.build.GhPagesDeployer@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function git( required array cmd, required string cwd ) {
+				var pb = createObject( "java", "java.lang.ProcessBuilder" ).init( arguments.cmd );
+				pb.directory( createObject( "java", "java.io.File" ).init( arguments.cwd ) );
+				pb.redirectErrorStream( true );
+				var process = pb.start();
+				var output = createObject( "java", "java.lang.String" ).init( process.getInputStream().readAllBytes(), "UTF-8" );
+				process.waitFor();
+				return output;
+			}
+
+			private string function newBareRemote() {
+				var dir = createTempDirectory( prefix = "bxdocs-ghdeploy-remote-" );
+				tempDirs.append( dir );
+				git( [ "git", "init", "--bare", "--initial-branch=main", dir ], dir );
+				return dir;
+			}
+
+			private string function newProjectRepo( required string remotePath ) {
+				var dir = createTempDirectory( prefix = "bxdocs-ghdeploy-project-" );
+				tempDirs.append( dir );
+				git( [ "git", "init", "--initial-branch=main", dir ], dir );
+				git( [ "git", "-C", dir, "config", "user.email", "test@example.com" ], dir );
+				git( [ "git", "-C", dir, "config", "user.name", "Test" ], dir );
+				fileWrite( dir & "/README.md", "hi" );
+				git( [ "git", "-C", dir, "add", "-A" ], dir );
+				git( [ "git", "-C", dir, "commit", "-m", "initial" ], dir );
+				git( [ "git", "-C", dir, "remote", "add", "origin", arguments.remotePath ], dir );
+				return dir;
+			}
+
+			it( "throws BxDocs.NotAGitRepo when projectRoot has no .git", function() {
+				var root = createTempDirectory( prefix = "bxdocs-ghdeploy-notgit-" );
+				tempDirs.append( root );
+				directoryCreate( root & "/site", true, true );
+				fileWrite( root & "/site/index.html", "hi" );
+
+				expect( function() {
+					deployer.deploy( root, root & "/site" );
+				} ).toThrow( "BxDocs.NotAGitRepo" );
+			} );
+
+			it( "throws BxDocs.SiteNotBuilt when siteDir doesn't exist", function() {
+				var remote = newBareRemote();
+				var root = newProjectRepo( remote );
+
+				expect( function() {
+					deployer.deploy( root, root & "/site" );
+				} ).toThrow( "BxDocs.SiteNotBuilt" );
+			} );
+
+			it( "force-pushes site/ as a single commit to the gh-pages branch, leaving the caller's own branch untouched", function() {
+				var remote = newBareRemote();
+				var root = newProjectRepo( remote );
+				directoryCreate( root & "/site/guides", true, true );
+				fileWrite( root & "/site/index.html", "<h1>Home</h1>" );
+				fileWrite( root & "/site/guides/index.html", "<h1>Guides</h1>" );
+
+				var result = deployer.deploy( root, root & "/site" );
+
+				expect( result.branch ).toBe( "gh-pages" );
+				expect( result.remote ).toBe( "origin" );
+
+				// The caller's own repo/branch is never touched.
+				var currentBranch = trim( git( [ "git", "-C", root, "branch", "--show-current" ], root ) );
+				expect( currentBranch ).toBe( "main" );
+				expect( directoryExists( root & "/site" ) ).toBeTrue();
+
+				// Verify by cloning the bare remote's gh-pages branch fresh.
+				var checkoutDir = createTempDirectory( prefix = "bxdocs-ghdeploy-checkout-" );
+				tempDirs.append( checkoutDir );
+				git( [ "git", "clone", "--branch", "gh-pages", remote, checkoutDir ], checkoutDir );
+
+				expect( fileExists( checkoutDir & "/index.html" ) ).toBeTrue();
+				expect( fileExists( checkoutDir & "/guides/index.html" ) ).toBeTrue();
+				expect( fileExists( checkoutDir & "/.nojekyll" ) ).toBeTrue();
+				expect( fileRead( checkoutDir & "/index.html" ) ).toBe( "<h1>Home</h1>" );
+
+				var logOutput = git( [ "git", "-C", checkoutDir, "log", "--oneline" ], checkoutDir );
+				expect( listLen( trim( logOutput ), char( 10 ) ) ).toBe( 1 );
+			} );
+
+			it( "replaces a previous deploy's content entirely rather than accumulating it", function() {
+				var remote = newBareRemote();
+				var root = newProjectRepo( remote );
+
+				directoryCreate( root & "/site", true, true );
+				fileWrite( root & "/site/old.html", "old page" );
+				deployer.deploy( root, root & "/site" );
+
+				directoryDelete( root & "/site", true );
+				directoryCreate( root & "/site", true, true );
+				fileWrite( root & "/site/new.html", "new page" );
+				deployer.deploy( root, root & "/site" );
+
+				var checkoutDir = createTempDirectory( prefix = "bxdocs-ghdeploy-checkout2-" );
+				tempDirs.append( checkoutDir );
+				git( [ "git", "clone", "--branch", "gh-pages", remote, checkoutDir ], checkoutDir );
+
+				expect( fileExists( checkoutDir & "/new.html" ) ).toBeTrue();
+				expect( fileExists( checkoutDir & "/old.html" ) ).toBeFalse();
+			} );
+
+		} );
+	}
+
+}

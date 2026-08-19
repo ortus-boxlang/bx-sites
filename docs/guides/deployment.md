@@ -1,6 +1,7 @@
 ---
 title: Deploying to GitHub Pages
 order: 3
+tags: [guides, deployment]
 ---
 
 # Deploying to GitHub Pages
@@ -10,6 +11,13 @@ files. This module ships a ready-to-use GitHub Actions workflow
 (`.github/workflows/pages.yml`) for the common case: publishing straight
 to GitHub Pages, with `main` and `development` published as two
 independently-live versions of the same site.
+
+For a simpler single-version project with no CI setup at all, [`boxlang
+module:bxDocs gh-deploy`](../cli-reference.md#gh-deploy) builds and pushes
+`site/` to a `gh-pages` branch in one command, run from your own machine
+whenever you want to publish - no workflow file needed. The rest of this
+guide covers the GitHub Actions workflow this repo itself uses, for
+automatic multi-version publishing on every push.
 
 ## What it does
 

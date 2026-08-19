@@ -37,11 +37,28 @@
 		html &= '</ul></nav>'
 		return html
 	}
+
+	function tagSlug( required string tag ) {
+		return lCase( trim( arguments.tag ) ).reReplace( "[^a-z0-9]+", "-", "all" ).reReplace( "(^-|-$)", "", "all" )
+	}
+
+	function renderTags( required array tags ) {
+		if ( !arguments.tags.len() ) {
+			return ""
+		}
+		var html = '<div class="page-tags">'
+		for ( var tag in arguments.tags ) {
+			html &= '<a class="page-tag" href="' & variables.basePath & 'tags/index.html##tag-' & tagSlug( tag ) & '">' & encodeForHTML( tag ) & '</a>'
+		}
+		html &= '</div>'
+		return html
+	}
 </bx:script>
 <bx:output>			<article class="md-card">
 </bx:output><bx:if condition="#variables.page.breadcrumbs.len() gt 1#"><bx:output>#renderBreadcrumbs( variables.page.breadcrumbs )#</bx:output></bx:if><bx:output>
-				<h1 class="md-title">#encodeForHTML( variables.page.title )#</h1>
-</bx:output><bx:if condition="#len( variables.page.editUrl ) or len( variables.page.lastUpdated )#"><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated )#</bx:output></bx:if><bx:output>
+				<h1 class="md-title"></bx:output><bx:if condition="#len( variables.page.icon )#"><bx:output><span class="page-icon">#encodeForHTML( variables.page.icon )#</span> </bx:output></bx:if><bx:output>#encodeForHTML( variables.page.title )#</h1>
+</bx:output><bx:if condition="#len( variables.page.summary )#"><bx:output>				<p class="page-summary">#encodeForHTML( variables.page.summary )#</p>
+</bx:output></bx:if><bx:if condition="#variables.page.tags.len() gt 0#"><bx:output>#renderTags( variables.page.tags )#</bx:output></bx:if><bx:if condition="#len( variables.page.editUrl ) or len( variables.page.lastUpdated )#"><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated )#</bx:output></bx:if><bx:output>
 </bx:output><bx:if condition="#variables.page.toc.len() gt 0#"><bx:output>#renderToc( variables.page.toc )#</bx:output></bx:if><bx:output>
 				#variables.page.contentHtml#
 			</article>

@@ -1,7 +1,11 @@
 /**
  * Splits a markdown file's raw content into frontmatter + body. This is
- * deliberately a small `key: value` block parser, not full YAML - module
- * spec section 5 only needs `title`, `order` and `hidden` out of it.
+ * deliberately a small line-oriented block parser, not full YAML - it
+ * understands `key: value` scalars, `key: [a, b, c]` inline lists,
+ * `key:` followed by indented `- item` block lists (both needed for
+ * frontmatter `tags`), and `>`/`|` YAML block scalars for a multi-line
+ * value (folded/literal, same convention bx-ai's own YamlFrontmatterParser
+ * uses for skill descriptions).
  */
 class {
 
@@ -31,26 +35,117 @@ class {
 		}
 
 		var frontmatter = {}
-		for ( var i = 2; i < closingIndex; i++ ) {
+		var i = 2
+		while ( i < closingIndex ) {
 			var trimmedLine = trim( lines[ i ] )
 			if ( !len( trimmedLine ) ) {
+				i++
 				continue
 			}
 			var colonPos = trimmedLine.find( ":" )
 			if ( !colonPos ) {
+				i++
 				continue
 			}
 			var key = trim( trimmedLine.left( colonPos - 1 ) )
-			var value = trim( trimmedLine.right( len( trimmedLine ) - colonPos ) )
-			frontmatter[ key ] = coerce( value )
+			var remainderLen = len( trimmedLine ) - colonPos
+			var value = remainderLen > 0 ? trim( trimmedLine.right( remainderLen ) ) : ""
+
+			if ( value == ">" || value == "|" ) {
+				var blockResult = readBlockScalar( lines, i + 1, closingIndex, value == ">" )
+				frontmatter[ key ] = blockResult.value
+				i = blockResult.nextIndex
+			} else if ( !len( value ) ) {
+				var listResult = readBlockList( lines, i + 1, closingIndex )
+				if ( listResult.items.len() ) {
+					frontmatter[ key ] = listResult.items
+					i = listResult.nextIndex
+				} else {
+					frontmatter[ key ] = ""
+					i++
+				}
+			} else if ( value.left( 1 ) == "[" && value.right( 1 ) == "]" ) {
+				frontmatter[ key ] = parseInlineList( value )
+				i++
+			} else {
+				frontmatter[ key ] = coerce( value )
+				i++
+			}
 		}
 
 		var bodyLines = []
-		for ( var i = closingIndex + 1; i <= lines.len(); i++ ) {
-			bodyLines.append( lines[ i ] )
+		for ( var j = closingIndex + 1; j <= lines.len(); j++ ) {
+			bodyLines.append( lines[ j ] )
 		}
 
 		return { frontmatter : frontmatter, body : bodyLines.toList( char( 10 ) ) }
+	}
+
+	/**
+	 * Reads a run of indented `- item` lines immediately following a `key:`
+	 * line with no inline value, e.g.:
+	 * ```
+	 * tags:
+	 *   - cli
+	 *   - guide
+	 * ```
+	 *
+	 * @lines All frontmatter-block lines
+	 * @startIndex The first line to check (immediately after the `key:` line)
+	 * @closingIndex The frontmatter block's closing `---` line index (exclusive upper bound)
+	 *
+	 * @return { items: array, nextIndex: numeric } - items is empty when startIndex isn't a `- ` line
+	 */
+	private struct function readBlockList( required array lines, required numeric startIndex, required numeric closingIndex ) {
+		var items = []
+		var i = arguments.startIndex
+		while ( i < arguments.closingIndex ) {
+			var trimmedLine = trim( arguments.lines[ i ] )
+			if ( !( trimmedLine.left( 1 ) == "-" && ( len( trimmedLine ) == 1 || trimmedLine.mid( 2, 1 ) == " " ) ) ) {
+				break
+			}
+			items.append( coerce( len( trimmedLine ) > 1 ? trim( trimmedLine.right( len( trimmedLine ) - 1 ) ) : "" ) )
+			i++
+		}
+		return { items : items, nextIndex : i }
+	}
+
+	/**
+	 * Parses a single-line inline list, e.g. `[icon, cli, "guide"]`.
+	 *
+	 * @value The full `[...]` value, brackets included
+	 */
+	private array function parseInlineList( required string value ) {
+		var inner = trim( arguments.value.mid( 2, len( arguments.value ) - 2 ) )
+		if ( !len( inner ) ) {
+			return []
+		}
+		return listToArray( inner, "," )
+			.map( item => coerce( trim( item ) ) )
+	}
+
+	/**
+	 * Reads a YAML block scalar's continuation lines (everything indented
+	 * under a `>`/`|` value line, up to the first non-indented/blank-at-top-level line).
+	 *
+	 * @lines All frontmatter-block lines
+	 * @startIndex The first continuation line to check
+	 * @closingIndex The frontmatter block's closing `---` line index (exclusive upper bound)
+	 * @folded true for `>` (join with spaces), false for `|` (join with newlines)
+	 *
+	 * @return { value: string, nextIndex: numeric }
+	 */
+	private struct function readBlockScalar( required array lines, required numeric startIndex, required numeric closingIndex, required boolean folded ) {
+		var blockLines = []
+		var i = arguments.startIndex
+		while ( i < arguments.closingIndex && ( !len( arguments.lines[ i ] ) || arguments.lines[ i ].left( 1 ) == " " || arguments.lines[ i ].left( 1 ) == char( 9 ) ) ) {
+			blockLines.append( trim( arguments.lines[ i ] ) )
+			i++
+		}
+		var value = arguments.folded
+			? blockLines.filter( l => len( l ) ).toList( " " )
+			: blockLines.toList( char( 10 ) )
+		return { value : value, nextIndex : i }
 	}
 
 	/**

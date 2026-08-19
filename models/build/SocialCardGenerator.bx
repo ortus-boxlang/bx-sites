@@ -1,0 +1,116 @@
+/**
+ * Renders a 1200x630 `og:image`/`twitter:card` social-card PNG per page at
+ * build time - pure `java.awt`/`javax.imageio` (both part of any JVM
+ * BoxLang runs on), no headless browser or external service involved.
+ * Used when `bxdocs.json`'s `generateOgImages` is on and a page has no
+ * explicit `ogImage` frontmatter/site-wide override of its own - see
+ * BuildPipeline.bx's `resolveOgImage()`.
+ */
+class {
+
+	variables.width = 1200
+	variables.height = 630
+	variables.barHeight = 14
+
+	/**
+	 * @title The page (or site) title to render, word-wrapped to fit
+	 * @subtitle A smaller line under the title - typically the site name
+	 * @outputPath Absolute path to write the PNG to (parent directory must already exist)
+	 */
+	void function generate( required string title, required string subtitle, required string outputPath ) {
+		createObject( "java", "java.lang.System" ).setProperty( "java.awt.headless", "true" )
+
+		var BufferedImage = createObject( "java", "java.awt.image.BufferedImage" )
+		var image = BufferedImage.init( variables.width, variables.height, BufferedImage.TYPE_INT_RGB )
+		var g = image.createGraphics()
+
+		var RenderingHints = createObject( "java", "java.awt.RenderingHints" )
+		g.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON )
+		g.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON )
+
+		var Color = createObject( "java", "java.awt.Color" )
+
+		g.setColor( Color.init( 20, 24, 28 ) )
+		g.fillRect( 0, 0, variables.width, variables.height )
+
+		var GradientPaint = createObject( "java", "java.awt.GradientPaint" )
+		var barY = variables.height - variables.barHeight
+		g.setPaint( GradientPaint.init(
+			0, javaCast( "float", barY ), Color.init( 0, 255, 120 ),
+			variables.width, javaCast( "float", barY ), Color.init( 0, 219, 255 )
+		) )
+		g.fillRect( 0, barY, variables.width, variables.barHeight )
+
+		var Font = createObject( "java", "java.awt.Font" )
+		var marginX = 90
+		var maxTextWidth = variables.width - ( marginX * 2 )
+
+		g.setColor( Color.WHITE )
+		g.setFont( Font.init( "SansSerif", Font.BOLD, 64 ) )
+		var titleLines = wrapText( g, arguments.title, maxTextWidth, 3 )
+		var lineHeight = 74
+		var titleY = 260
+		for ( var line in titleLines ) {
+			g.drawString( line, marginX, titleY )
+			titleY += lineHeight
+		}
+
+		g.setColor( Color.init( 169, 180, 189 ) )
+		g.setFont( Font.init( "SansSerif", Font.PLAIN, 30 ) )
+		g.drawString( arguments.subtitle, marginX, titleY + 20 )
+
+		g.dispose()
+
+		var ImageIO = createObject( "java", "javax.imageio.ImageIO" )
+		ImageIO.write( image, "png", createObject( "java", "java.io.File" ).init( arguments.outputPath ) )
+	}
+
+	/**
+	 * Greedy word-wrap against the Graphics2D context's currently-set font,
+	 * capped at `maxLines` - an over-long last line is truncated with an
+	 * ellipsis rather than overflowing the card.
+	 *
+	 * @g The Graphics2D context (its current font's metrics measure each line)
+	 * @text The text to wrap
+	 * @maxWidth Maximum pixel width per line
+	 * @maxLines Maximum number of lines before truncating with an ellipsis
+	 */
+	private array function wrapText( required any g, required string text, required numeric maxWidth, required numeric maxLines ) {
+		var metrics = arguments.g.getFontMetrics()
+		var words = listToArray( arguments.text, " ", false )
+		var lines = []
+		var current = ""
+		var truncated = false
+
+		for ( var i = 1; i <= words.len(); i++ ) {
+			var word = words[ i ]
+			var candidate = len( current ) ? current & " " & word : word
+			if ( metrics.stringWidth( candidate ) <= arguments.maxWidth || !len( current ) ) {
+				current = candidate
+			} else {
+				lines.append( current )
+				current = ""
+				if ( lines.len() == arguments.maxLines ) {
+					truncated = true
+					break
+				}
+				current = word
+			}
+		}
+		if ( len( current ) ) {
+			lines.append( current )
+		}
+
+		if ( truncated && lines.len() ) {
+			var lastIndex = lines.len()
+			var lastLine = lines[ lastIndex ]
+			while ( len( lastLine ) && metrics.stringWidth( lastLine & "…" ) > arguments.maxWidth ) {
+				lastLine = left( lastLine, len( lastLine ) - 1 )
+			}
+			lines[ lastIndex ] = trim( lastLine ) & "…"
+		}
+
+		return lines
+	}
+
+}

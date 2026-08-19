@@ -1,0 +1,52 @@
+/**
+ * `gh-deploy` CLI verb - builds the site, then force-pushes it to a
+ * `gh-pages`-style branch (GhPagesDeployer.bx). CLI-agnostic: takes an
+ * already-parsed options struct (see ModuleConfig.bx's main()), never
+ * touches raw argv or the current working directory itself.
+ *
+ * Validates the project's config and checks it's a git repository up
+ * front, before running a full build - GhPagesDeployer.bx would catch the
+ * git-repo case too, but only after the (potentially expensive) build
+ * already ran; failing fast here avoids that wasted work for the common
+ * "forgot to `git init`" case. Config validity is still checked first
+ * (via a direct ConfigLoader.bx call, same as build() does internally),
+ * so a project missing both bxdocs.json and .git reports the more
+ * fundamental problem.
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path), branch, remote, message }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxDocs.MissingProjectRoot", message = "`gh-deploy` requires a project root" )
+		}
+
+		new "models.config.ConfigLoader@bxdocs"().load( projectRoot )
+
+		if ( !directoryExists( projectRoot & "/.git" ) ) {
+			throw(
+				type    = "BxDocs.NotAGitRepo",
+				message = "`gh-deploy` requires a git repository at [#projectRoot#] - run `git init` first"
+			)
+		}
+
+		var branch = len( trim( arguments.options.branch ?: "" ) ) ? trim( arguments.options.branch ) : "gh-pages"
+		var remote = len( trim( arguments.options.remote ?: "" ) ) ? trim( arguments.options.remote ) : "origin"
+		var message = len( trim( arguments.options.message ?: "" ) ) ? trim( arguments.options.message ) : "Deploy site via bxDocs gh-deploy"
+
+		var pipeline = new "models.build.BuildPipeline@bxdocs"()
+		var buildResult = pipeline.build( projectRoot )
+
+		var deployer = new "models.build.GhPagesDeployer@bxdocs"()
+		var deployResult = deployer.deploy( projectRoot, buildResult.siteDir, branch, remote, message )
+
+		return {
+			exitCode : 0,
+			message  : "Built #buildResult.pageCount# page(s) and pushed to #deployResult.remote#/#deployResult.branch#"
+		}
+	}
+
+}

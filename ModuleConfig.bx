@@ -167,7 +167,8 @@ class {
 			"build"        : "models.cli.Build",
 			"serve"        : "models.cli.Serve",
 			"search-index" : "models.cli.SearchIndex",
-			"clean"        : "models.cli.Clean"
+			"clean"        : "models.cli.Clean",
+			"gh-deploy"    : "models.cli.GhDeploy"
 		}
 
 		var verbDescriptions = {
@@ -175,7 +176,8 @@ class {
 			"build"        : "Render docs/**.md into a static site in site/",
 			"serve"        : "Build and serve the site locally with live reload ([--port], [--host])",
 			"search-index" : "Rebuild the search index standalone",
-			"clean"        : "Remove site/ and any build cache"
+			"clean"        : "Remove site/ and any build cache",
+			"gh-deploy"    : "Build and force-push site/ to a gh-pages branch ([--branch], [--remote], [--message])"
 		}
 
 		var firstToken = arrayLen( arguments.args ) >= 1 ? arguments.args[ 1 ] : ""

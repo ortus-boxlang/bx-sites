@@ -1,6 +1,7 @@
 ---
 title: Search
 order: 2
+tags: [guides, search]
 ---
 
 # Search

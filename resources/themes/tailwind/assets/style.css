@@ -1,3 +1,28 @@
+/* Self-hosted Poppins (SIL Open Font License) - see resources/assets/fonts/. */
+@font-face {
+	font-family: "Poppins";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url( "../fonts/poppins-400.woff2" ) format( "woff2" );
+}
+
+@font-face {
+	font-family: "Poppins";
+	font-style: normal;
+	font-weight: 600;
+	font-display: swap;
+	src: url( "../fonts/poppins-600.woff2" ) format( "woff2" );
+}
+
+@font-face {
+	font-family: "Poppins";
+	font-style: normal;
+	font-weight: 700;
+	font-display: swap;
+	src: url( "../fonts/poppins-700.woff2" ) format( "woff2" );
+}
+
 /*
  * Small overrides layered on top of the Tailwind Play CDN's utility classes
  * (loaded inline in layout.bxm) - kept minimal since the theme is
@@ -41,10 +66,19 @@
 }
 
 .brand-mark {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	min-width: 0;
+}
+
+.brand-name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .nav-section > summary {
@@ -58,8 +92,14 @@
 
 .brand-logo {
 	height: 28px;
-	width: auto;
+	width: 28px;
 	display: block;
+	object-fit: contain;
+	padding: 3px;
+	border-radius: 50%;
+	background: rgba( 4, 18, 26, 0.4 );
+	box-shadow: 0 1px 2px rgba( 0, 0, 0, 0.25 );
+	flex-shrink: 0;
 }
 
 .navbar-controls {

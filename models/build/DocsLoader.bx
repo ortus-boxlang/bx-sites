@@ -11,7 +11,7 @@ class {
 	/**
 	 * @docsDir Absolute path to the project's docs/ directory
 	 *
-	 * @return Array of page structs, sorted by [order] then [title]: { relativePath, sourcePath, urlPath, title, description, order, hidden, body }
+	 * @return Array of page structs, sorted by [order] then [title]: { relativePath, sourcePath, urlPath, title, description, order, hidden, tags, icon, summary, ogImage, body }
 	 */
 	array function load( required string docsDir ) {
 		var dir = arguments.docsDir.reReplace( "[\/]+$", "" )
@@ -52,6 +52,10 @@ class {
 			description  : trim( fm.description ?: "" ),
 			order        : isNumeric( fm.order ?: "" ) ? val( fm.order ) : 999999,
 			hidden       : ( fm.hidden ?: false ) ? true : false,
+			tags         : isArray( fm.tags ?: "" ) ? fm.tags : [],
+			icon         : trim( fm.icon ?: "" ),
+			summary      : trim( fm.summary ?: "" ),
+			ogImage      : trim( fm.ogImage ?: "" ),
 			body         : parsed.body
 		}
 	}

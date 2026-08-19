@@ -46,6 +46,7 @@ boxlang module:bxDocs <verb> [options]
 | `serve` | Build + serve locally with live reload |
 | `search-index` | Rebuild the search index standalone (also runs automatically during `build`) |
 | `clean` | Remove `site/` and any cache |
+| `gh-deploy` | Build + force-push `site/` to a `gh-pages`-style branch |
 
 ## 3. Project structure
 
@@ -58,7 +59,7 @@ site/                  # build output (generated)
 
 ## 4. Config file — bxdocs.json
 
-Site name, description, nav (auto-inferred from folder/file structure, overridable), theme name + theme options, base URL, search on/off, markdown-extension passthrough settings (table options, anchor links, YouTube transformer, code style — all sourced from bx-markdown's existing option set).
+Site name, description, nav (auto-inferred from folder/file structure by default; an explicit `nav` array — inline or in a project's own `docs/nav.json` — overrides that inference entirely), theme name + theme options, base URL, search on/off, markdown-extension passthrough settings (table options, anchor links, YouTube transformer, code style — all sourced from bx-markdown's existing option set), and per-page frontmatter (`tags`/`icon`/`summary`/`ogImage`, on top of `title`/`order`/`hidden`/`description`).
 
 ## 5. Core pipeline
 
@@ -100,7 +101,10 @@ None currently blocking. Deferred to later phases:
 - Optional `bx-docs-search-meilisearch` add-on
 - Versioned docs (multiple doc sets / version switcher) — **done**, see section 5's `docs/versions/` convention
 - Admonitions, footnotes, definition lists and Mermaid diagrams — **done**, see section 5 step 2 and `bxdocs.json`'s `mermaid` key
-- Plugin hook system beyond themes (e.g. custom nav sources) - still deferred for bx-docs itself; bx-markdown now has a `markdownRegisterExtension()`/`markdownUnregisterExtension()` API for registering arbitrary Flexmark extensions, independent of bx-docs
+- Plugin hook system beyond themes (e.g. custom nav sources) - **done** for nav (see `nav`/`docs/nav.json`, section 4); bx-markdown also has a `markdownRegisterExtension()`/`markdownUnregisterExtension()` API for registering arbitrary Flexmark extensions, independent of bx-docs
+- Per-page tags/icon/summary and per-page/auto-generated social cards — **done**, see section 4 and `bxdocs.json`'s `generateOgImages` key
+- One-command GitHub Pages publish (`gh-deploy`) — **done**, see section 2's verb table
+- Content tabs, math (MathJax/KaTeX), i18n, a blog/tags-plugin-equivalent beyond the simple tags index, and self-hosting third-party CSS/JS (Bootstrap, highlight.js, lunr, Alpine, Mermaid still load from CDN at view time) remain deferred
 
 ## 9. Phased task breakdown
 

@@ -83,6 +83,39 @@ class extends="testbox.system.BaseSpec" {
 				expect( pages[ 1 ].hidden ).toBeFalse();
 			} );
 
+			it( "defaults tags/icon/summary/ogImage to empty when omitted", function() {
+				var dir = newDocsDir();
+				fileWrite( dir & "/plain.md", "No frontmatter" );
+
+				var pages = loader.load( dir );
+
+				expect( pages[ 1 ].tags ).toBeArray();
+				expect( pages[ 1 ].tags.len() ).toBe( 0 );
+				expect( pages[ 1 ].icon ).toBe( "" );
+				expect( pages[ 1 ].summary ).toBe( "" );
+				expect( pages[ 1 ].ogImage ).toBe( "" );
+			} );
+
+			it( "reads tags/icon/summary/ogImage from frontmatter", function() {
+				var dir = newDocsDir();
+				var content = "---" & char( 10 ) &
+					"title: Tagged Page" & char( 10 ) &
+					"tags: [cli, guide]" & char( 10 ) &
+					"icon: 🚀" & char( 10 ) &
+					"summary: A short lead-in." & char( 10 ) &
+					"ogImage: assets/tagged-card.png" & char( 10 ) &
+					"---" & char( 10 ) &
+					"Body";
+				fileWrite( dir & "/tagged.md", content );
+
+				var pages = loader.load( dir );
+
+				expect( pages[ 1 ].tags ).toBe( [ "cli", "guide" ] );
+				expect( pages[ 1 ].icon ).toBe( "🚀" );
+				expect( pages[ 1 ].summary ).toBe( "A short lead-in." );
+				expect( pages[ 1 ].ogImage ).toBe( "assets/tagged-card.png" );
+			} );
+
 			it( "excludes docs/assets/** from the loaded pages", function() {
 				var dir = newDocsDir();
 				directoryCreate( dir & "/assets", true, true );
