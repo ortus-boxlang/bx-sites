@@ -60,6 +60,23 @@ class extends="testbox.system.BaseSpec" {
 				expect( homeHtml ).toInclude( 'href="/index.html"' );
 			} );
 
+			it( "rewrites a page's own relative .md links (mkdocs' file-relative convention) to their built pretty-URLs", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", '<a href="guides/setup.md">Setup</a>' );
+				directoryCreate( root & "/docs/guides", true, true );
+				fileWrite( root & "/docs/guides/setup.md", '<a href="../index.md">Home</a> <a href="other.md##anchor">Other</a>' );
+				fileWrite( root & "/docs/guides/other.md", "Other page" );
+
+				pipeline.build( root );
+
+				var homeHtml = fileRead( root & "/site/index.html" );
+				expect( homeHtml ).toInclude( 'href="/guides/setup/index.html"' );
+
+				var setupHtml = fileRead( root & "/site/guides/setup/index.html" );
+				expect( setupHtml ).toInclude( 'href="/index.html"' );
+				expect( setupHtml ).toInclude( 'href="/guides/other/index.html##anchor"' );
+			} );
+
 			it( "passes bxdocs.json's markdown options through to the markdown renderer", function() {
 				var root = newProject();
 				fileWrite(
