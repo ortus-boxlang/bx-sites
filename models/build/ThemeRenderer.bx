@@ -35,7 +35,7 @@
  * versioned, so a theme only needs to render the switcher when
  * `variables.versions.len() gt 1`.
  *
- * `variables.locales` (`[ { code, label, url, dir } ]`, the default locale
+ * `variables.locales` (`[ { code, label, url, dir, flag } ]`, the default locale
  * first) and `variables.currentLocale` (the `code` being rendered right
  * now) back a language switcher for projects using the `docs/i18n/`
  * convention (LocalesDiscoverer.bx) the same way - a theme only needs to
@@ -138,7 +138,7 @@ class {
 	 * @basePath Root-relative base path ending with `/` (BaseUrlResolver's `basePath`) - defaults to `/`
 	 * @versions Version switcher entries as `[ { label, url } ]` ("Latest" first, then each discovered docs/versions/ folder) - empty when the project doesn't use versioning
 	 * @currentVersion The `label` (from `versions`) of the version being rendered right now - `"Latest"` for the default/unversioned build
-	 * @locales Language switcher entries as `[ { code, label, url, dir } ]` (default locale first, then each discovered docs/i18n/ folder) - empty when the project doesn't use i18n
+	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]` (default locale first, then each discovered docs/i18n/ folder) - empty when the project doesn't use i18n
 	 * @currentLocale The `code` (from `locales`) of the locale being rendered right now - the default locale's own code for an unlocalized build
 	 * @currentLocaleDir `"ltr"`/`"rtl"` - the current locale's own text direction, stamped onto `<html dir="...">`
 	 *

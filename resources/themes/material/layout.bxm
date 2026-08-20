@@ -1,4 +1,5 @@
 <bx:include template="#variables.moduleAssetsDir#/icons.bxm">
+<bx:include template="#variables.moduleAssetsDir#/locale-flags.bxm">
 <bx:script>
 	/**
 	 * Recursively renders a nav tree (module spec section 5, step 4) as a
@@ -45,13 +46,39 @@
 		return html
 	}
 
-	function renderLocaleSwitcher( required array locales, required string currentLocale ) {
-		var html = '<select class="locale-switcher" onchange="location.href=this.value" aria-label="Language">'
+	/**
+	 * A GitBook-style flag-icon dropdown - the trigger button shows the
+	 * current locale's own flag, opening a menu listing every locale by
+	 * its own flag + label. A locale's `flag` (bxdocs.json's own
+	 * `i18n.locales[].flag`) wins when set; bxdocsLocaleFlag() falls back
+	 * to a built-in language-code lookup otherwise (locale-flags.bxm).
+	 * Alpine (already loaded for the dark-mode toggle) drives open/close -
+	 * no new JS dependency.
+	 */
+	function renderLocaleDropdown( required array locales, required string currentLocale ) {
+		var current = locales[ 1 ]
 		for ( var l in arguments.locales ) {
-			var selected = l.code == arguments.currentLocale ? " selected" : ""
-			html &= '<option value="' & encodeForHTML( l.url ) & '"' & selected & '>' & encodeForHTML( l.label ) & '</option>'
+			if ( l.code == arguments.currentLocale ) {
+				current = l
+				break
+			}
 		}
-		html &= '</select>'
+		var currentFlag = len( current.flag ?: "" ) ? current.flag : bxdocsLocaleFlag( current.code )
+
+		var html = '<div class="locale-dropdown" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">'
+		html &= '<button type="button" class="locale-dropdown__trigger" @click="open = !open" aria-haspopup="true" :aria-expanded="open" aria-label="Language: ' & encodeForHTML( current.label ) & '">'
+		html &= '<span class="locale-dropdown__flag" aria-hidden="true">' & currentFlag & '</span>'
+		html &= '<span class="locale-dropdown__caret" aria-hidden="true">▾</span>'
+		html &= '</button>'
+		html &= '<ul class="locale-dropdown__menu" x-show="open" x-cloak role="menu">'
+		for ( var l in arguments.locales ) {
+			var flag = len( l.flag ?: "" ) ? l.flag : bxdocsLocaleFlag( l.code )
+			var active = l.code == arguments.currentLocale
+			html &= '<li role="none"><a role="menuitem" class="locale-dropdown__item' & ( active ? ' locale-dropdown__item--active' : '' ) & '" href="' & encodeForHTML( l.url ) & '">'
+			html &= '<span class="locale-dropdown__flag" aria-hidden="true">' & flag & '</span> ' & encodeForHTML( l.label )
+			html &= '</a></li>'
+		}
+		html &= '</ul></div>'
 		return html
 	}
 
@@ -159,7 +186,7 @@
 </bx:output><bx:if condition="#variables.versions.len() gt 1#"><bx:output>
 			#renderVersionSwitcher( variables.versions, variables.currentVersion )#
 </bx:output></bx:if><bx:if condition="#variables.locales.len() gt 1#"><bx:output>
-			#renderLocaleSwitcher( variables.locales, variables.currentLocale )#
+			#renderLocaleDropdown( variables.locales, variables.currentLocale )#
 </bx:output></bx:if><bx:if condition="#len( variables.repoUrl )#"><bx:output>
 			<a class="repo-link" href="#encodeForHTML( variables.repoUrl )#" target="_blank" rel="noopener noreferrer" aria-label="Repository" title="Repository">#bxdocsIcon( "github" )#</a>
 </bx:output></bx:if><bx:output>

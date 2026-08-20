@@ -394,6 +394,13 @@ class {
 				message = "bxdocs.json [#arguments.path#.strings], when present, must be an object"
 			)
 		}
+
+		if ( arguments.locale.keyExists( "flag" ) && !isSimpleValue( arguments.locale.flag ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [#arguments.path#.flag], when present, must be a string"
+			)
+		}
 	}
 
 	/**

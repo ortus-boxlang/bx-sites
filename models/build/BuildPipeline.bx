@@ -209,7 +209,7 @@ class {
 	 * @plugins resolvePlugins()'s own output, applied via onNav/onPageMarkdown/onPageHtml
 	 * @absoluteUrl The absolute site URL, ending with `/` (BaseUrlResolver's `absolute`), or "" if unknown - gates `::: updates` feed.xml generation, same as sitemap.xml
 	 * @navConfig An explicit nav tree (NavBuilder.build()'s own `navConfig` shape) for this doc tree - empty (the default) infers nav from folder structure. Non-empty for the main tree and every locale tree (a locale's nav always mirrors the default tree's own structure/navConfig - see mergeLocalePages()); always empty for a version tree, which infers its own - see resolveExplicitNav()
-	 * @locales Language switcher entries as `[ { code, label, url, dir } ]`, the default locale first - empty for a version tree (no locale switcher inside a versioned build in v1)
+	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]`, the default locale first - empty for a version tree (no locale switcher inside a versioned build in v1)
 	 * @currentLocale Which `locales` entry's `code` this tree IS, for the switcher's own "selected" state - "" for a version tree
 	 * @currentLocaleDir `"ltr"`/`"rtl"`, this tree's own locale direction - stamped onto `<html dir="...">`
 	 *
@@ -617,7 +617,7 @@ class {
 	 * @i18nConfig The site's bxdocs.json `i18n` struct
 	 * @basePath The main/default-locale build's own basePath
 	 *
-	 * @return Array of `{ code, label, url, dir }`, default locale first
+	 * @return Array of `{ code, label, url, dir, flag }`, default locale first
 	 */
 	private array function buildLocalesList( required array localeNames, required struct i18nConfig, required string basePath ) {
 		var defaultLocale = arguments.i18nConfig.defaultLocale
@@ -625,6 +625,7 @@ class {
 			code  : defaultLocale.code,
 			label : defaultLocale.label,
 			dir   : defaultLocale.dir ?: "ltr",
+			flag  : defaultLocale.flag ?: "",
 			url   : arguments.basePath
 		} ]
 		var addedCodes = [ lCase( defaultLocale.code ) ]
@@ -637,6 +638,7 @@ class {
 				code  : configured.code,
 				label : configured.label,
 				dir   : configured.dir ?: "ltr",
+				flag  : configured.flag ?: "",
 				url   : arguments.basePath & configured.code & "/"
 			} )
 			addedCodes.append( lCase( configured.code ) )
@@ -646,7 +648,7 @@ class {
 			if ( addedCodes.contains( lCase( localeName ) ) ) {
 				continue
 			}
-			locales.append( { code : localeName, label : localeName, dir : "ltr", url : arguments.basePath & localeName & "/" } )
+			locales.append( { code : localeName, label : localeName, dir : "ltr", flag : "", url : arguments.basePath & localeName & "/" } )
 		}
 
 		return locales
@@ -775,7 +777,7 @@ class {
 	 * @basePath Root-relative base path ending with `/`
 	 * @versions Version switcher entries as `[ { label, url } ]`
 	 * @currentVersion Always `"Latest"` - the 404 page is only ever written once, for the main site
-	 * @locales Language switcher entries as `[ { code, label, url, dir } ]` - not built per-locale in v1 (a 404 page's own "not found" message needs no translation to be useful), shown here only so the header renders the same everywhere
+	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]` - not built per-locale in v1 (a 404 page's own "not found" message needs no translation to be useful), shown here only so the header renders the same everywhere
 	 * @currentLocale The default locale's own code
 	 */
 	private void function write404Page( required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required string currentVersion, array locales = [], string currentLocale = "" ) {
@@ -810,7 +812,7 @@ class {
 	 * @siteDir Absolute path to the build output directory
 	 * @basePath Root-relative base path ending with `/`
 	 * @versions Version switcher entries as `[ { label, url } ]`
-	 * @locales Language switcher entries as `[ { code, label, url, dir } ]` - like version trees, a locale doesn't get its own tags page in v1; tag badges on every locale's own pages still link to the main site's one
+	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]` - like version trees, a locale doesn't get its own tags page in v1; tag badges on every locale's own pages still link to the main site's one
 	 * @currentLocale The default locale's own code
 	 */
 	private void function writeTagsPage( required array pages, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, array locales = [], string currentLocale = "" ) {
