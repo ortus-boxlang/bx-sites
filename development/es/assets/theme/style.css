@@ -260,13 +260,40 @@ body {
 	font-size: 0.9rem;
 }
 
-.nav-section > summary.nav-link {
-	cursor: pointer;
-	list-style: none;
+.sidebar .nav-link.active {
+	color: var( --bxdocs-link );
+	font-weight: 600;
 }
 
-.nav-section > summary.nav-link::-webkit-details-marker {
-	display: none;
+.nav-group-header {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.nav-group-header .nav-link,
+.nav-group-header .nav-link.disabled {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.nav-toggle {
+	flex: 0 0 auto;
+	background: transparent;
+	border: 0;
+	padding: 0.25rem 0.5rem;
+	color: var( --bxdocs-sidebar-text );
+	cursor: pointer;
+	line-height: 1;
+}
+
+.nav-toggle__icon {
+	display: inline-block;
+	transition: transform 0.15s ease;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle__icon {
+	transform: rotate( -180deg );
 }
 
 .brand-logo {

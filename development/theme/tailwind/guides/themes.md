@@ -62,8 +62,11 @@ page features:
   (including GitHub Pages) for any unmatched path.
 - **A custom logo and favicon**, when `bxdocs.json`'s `theme.logo`/
   `theme.favicon` are set. See [Configuration](../configuration.md#theme).
-- **A collapsible sidebar nav**, opt-in via `theme.options.navCollapsible`.
-  See [Configuration](../configuration.md#theme).
+- **A collapsible sidebar nav**, opt-in via `theme.options.navCollapsible` -
+  every section with children (linked or not) gets a toggle button instead
+  of always showing its children inline, and the section containing the
+  current page always starts open. See
+  [Configuration](../configuration.md#theme).
 - **Google Analytics**, when `bxdocs.json`'s `analytics` is configured. See
   [Configuration](../configuration.md#analytics).
 - **Social share cards** (Open Graph + Twitter Card meta tags), sourced

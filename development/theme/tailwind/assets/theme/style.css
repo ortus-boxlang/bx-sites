@@ -171,13 +171,23 @@
 	white-space: nowrap;
 }
 
-.nav-section > summary {
+.nav-toggle {
+	flex: 0 0 auto;
+	background: transparent;
+	border: 0;
+	padding: 0.25rem 0.5rem;
 	cursor: pointer;
-	list-style: none;
+	line-height: 1;
+	color: inherit;
 }
 
-.nav-section > summary::-webkit-details-marker {
-	display: none;
+.nav-toggle__icon {
+	display: inline-block;
+	transition: transform 0.15s ease;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle__icon {
+	transform: rotate( -180deg );
 }
 
 /* A named icon (icon: rocket / lucide:rocket / tabler:rocket / custom:name)
@@ -234,6 +244,11 @@
 
 [data-theme="dark"] #bxdocs-sidebar a {
 	color: #dce3ea !important;
+}
+
+[data-theme="dark"] #bxdocs-sidebar a.nav-link--active {
+	color: #5fd3e8 !important;
+	background: rgba( 0, 219, 255, 0.12 ) !important;
 }
 
 [data-theme="dark"] article,

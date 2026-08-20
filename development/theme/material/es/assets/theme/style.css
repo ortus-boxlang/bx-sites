@@ -152,13 +152,42 @@ body.md-body {
 	color: #6c757d;
 }
 
-.md-nav__section > summary.md-nav__heading {
-	cursor: pointer;
-	list-style: none;
+.md-nav__link--active {
+	color: var( --md-link );
+	font-weight: 600;
+	background: rgba( 0, 219, 255, 0.1 );
 }
 
-.md-nav__section > summary.md-nav__heading::-webkit-details-marker {
-	display: none;
+.md-nav__group-header {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.md-nav__group-header .md-nav__link,
+.md-nav__group-header .md-nav__heading {
+	flex: 1 1 auto;
+	min-width: 0;
+	padding-inline-end: 0;
+}
+
+.nav-toggle {
+	flex: 0 0 auto;
+	background: transparent;
+	border: 0;
+	padding: 0.25rem 0.75rem;
+	color: var( --md-ink );
+	cursor: pointer;
+	line-height: 1;
+}
+
+.nav-toggle__icon {
+	display: inline-block;
+	transition: transform 0.15s ease;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle__icon {
+	transform: rotate( -180deg );
 }
 
 .brand-logo {
