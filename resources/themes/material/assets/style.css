@@ -1275,11 +1275,19 @@ a.bxdocs-card:hover {
 	align-items: center;
 	gap: 1.5rem;
 	margin: 1.5rem 0 2.5rem;
+	/* A flex item's default min-width is "auto", which for a replaced
+	   element like <img> resolves to its own intrinsic width - overriding
+	   `width: 100%` below and refusing to shrink past it. Without this,
+	   Safari/iOS in particular renders the banner at its full 1800px
+	   intrinsic width on narrow viewports, overflowing off-screen instead
+	   of scaling down. */
+	min-width: 0;
 }
 
 .bxdocs-hero__banner {
 	display: block;
 	width: 100%;
+	max-width: 100%;
 	height: auto;
 	border-radius: 16px;
 	box-shadow: 0 10px 34px rgba( 0, 0, 0, 0.22 );
