@@ -428,6 +428,36 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "renders the 'On this page' TOC inline by default, and in its own sticky rail outside <main> when [theme.options.tocPosition] is 'sticky', across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = {
+					title       : "My Page",
+					contentHtml : "<p>Body</p>",
+					toc         : [
+						{ level : 2, id : "first-section", text : "First Section" },
+						{ level : 2, id : "second-section", text : "Second Section" }
+					]
+				};
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+
+					var topHtml = renderer.renderPage( page, nav, { name : "My Site" }, themeDir );
+					expect( topHtml ).toInclude( "On this page" );
+					expect( topHtml ).toInclude( "First Section" );
+					// inline (the default) renders before <main> ever closes
+					expect( topHtml.findNoCase( "First Section" ) ).toBeLT( topHtml.findNoCase( "</main>" ) );
+
+					var stickyConfig = { name : "My Site", theme : { options : { tocPosition : "sticky" } } };
+					var stickyHtml = renderer.renderPage( page, nav, stickyConfig, themeDir );
+					expect( stickyHtml ).toInclude( "First Section" );
+					// sticky renders after <main> closes, and only once (not duplicated inline too)
+					expect( stickyHtml.findNoCase( "First Section" ) ).toBeGT( stickyHtml.findNoCase( "</main>" ) );
+					expect( stickyHtml.reMatchNoCase( "First Section" ).len() ).toBe( 1 );
+				}
+			} );
+
 			it( "renders Open Graph and Twitter Card meta tags from page/site description and [ogImage], across every built-in theme", function() {
 				var root = newProjectRoot();
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];

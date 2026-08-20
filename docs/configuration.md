@@ -137,6 +137,18 @@ non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
     ```json
     { "theme": { "options": { "navCollapsible": true, "navExpandAll": false } } }
     ```
+  - `theme.options.tocPosition` - where a page's own "On this page" table of
+    contents renders. `"top"` (the default) renders it inline, at the top of
+    the article, same as today. `"sticky"` moves it into its own right-hand
+    column that stays in view while the article scrolls underneath it - the
+    same "On this page" list, just pinned, which helps on long pages. Only
+    shown on wide viewports (it's hidden below the point a 3-column layout
+    would get cramped); on narrower ones the TOC simply doesn't render at
+    all in `sticky` mode, rather than falling back to `top`.
+
+    ```json
+    { "theme": { "options": { "tocPosition": "sticky" } } }
+    ```
 
 ## `search`
 

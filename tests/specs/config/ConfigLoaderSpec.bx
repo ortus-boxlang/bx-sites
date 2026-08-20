@@ -243,6 +243,23 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxDocs.InvalidConfig" );
 			} );
 
+			it( "accepts [theme.options.tocPosition] of top or sticky, defaulting to top when absent", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).theme.options.tocPosition ?: "top" ).toBe( "top" );
+
+				for ( var position in [ "top", "sticky" ] ) {
+					var positionDir = newProjectDir( '{"name":"My Docs","theme":{"options":{"tocPosition":"' & position & '"}}}' );
+					expect( loader.load( positionDir ).theme.options.tocPosition ).toBe( position );
+				}
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [theme.options.tocPosition] isn't top or sticky", function() {
+				var dir = newProjectDir( '{"name":"My Docs","theme":{"options":{"tocPosition":"bottom"}}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
 			it( "preserves a user-supplied Google [analytics] block", function() {
 				var dir = newProjectDir( '{"name":"My Docs","analytics":{"provider":"google","id":"G-ABC123"}}' );
 				var config = loader.load( dir );

@@ -567,6 +567,23 @@ dd {
 	font-size: 0.9em;
 }
 
+/* `theme.options.tocPosition: "sticky"` renders the same .toc markup in its
+   own right-hand column instead of inline atop the article (page.bxm skips
+   its own inline render in that mode) - stays in view while the article
+   scrolls underneath it, the same way GitBook keeps its own "On this page"
+   list pinned on long pages. .brand-navbar isn't itself sticky, so `top`
+   only needs to clear the sidebar's own top padding, not a fixed header. */
+.toc-sidebar {
+	padding-top: 1.5rem;
+}
+
+.toc-sidebar .toc {
+	position: sticky;
+	top: 1.5rem;
+	max-height: calc( 100vh - 3rem );
+	overflow-y: auto;
+}
+
 .page-nav {
 	margin-top: 2rem;
 	padding-top: 1rem;

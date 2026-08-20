@@ -78,7 +78,7 @@
 					<h1 class="page-title"></bx:output><bx:if condition="#len( variables.page.iconHtml )#"><bx:output><span class="page-icon">#variables.page.iconHtml#</span> </bx:output></bx:if><bx:output>#encodeForHTML( variables.page.title )#</h1>
 </bx:output><bx:if condition="#len( variables.page.summary )#"><bx:output>					<p class="page-summary">#encodeForHTML( variables.page.summary )#</p>
 </bx:output></bx:if><bx:if condition="#variables.page.tags.len() gt 0#"><bx:output>#renderTags( variables.page.tags )#</bx:output></bx:if><bx:if condition="#len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl )#"><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:output></bx:if><bx:output>
-</bx:output><bx:if condition="#variables.page.toc.len() gt 0#"><bx:output>#renderToc( variables.page.toc )#</bx:output></bx:if><bx:output>
+</bx:output><bx:if condition="#variables.page.toc.len() gt 0 and variables.tocPosition == 'top'#"><bx:output>#renderToc( variables.page.toc )#</bx:output></bx:if><bx:output>
 					#variables.page.contentHtml#
 				</article>
 </bx:output><bx:if condition="#len( variables.page.prevPage.url ) or len( variables.page.nextPage.url )#"><bx:output>

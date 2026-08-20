@@ -157,6 +157,7 @@
 	variables.footerEnabled = ( variables.siteConfig.footer ?: false ) ? true : false
 	variables.navCollapsible = ( variables.siteConfig.theme.options.navCollapsible ?: false ) ? true : false
 	variables.navExpandAll = ( variables.siteConfig.theme.options.navExpandAll ?: true ) ? true : false
+	variables.tocPosition = variables.siteConfig.theme.options.tocPosition ?: "top"
 	variables.faviconUrl = trim( variables.siteConfig.theme.favicon ?: "" )
 	variables.ogImageUrl = len( trim( variables.page.ogImage ?: "" ) ) ? trim( variables.page.ogImage ) : trim( variables.siteConfig.ogImage ?: "" )
 	variables.ogDescription = len( variables.page.description ?: "" ) ? variables.page.description : ( variables.siteConfig.description ?: "" )
@@ -243,9 +244,14 @@
 			<aside class="col-lg-3 col-xl-2 sidebar collapse d-lg-block" id="bxdocs-sidebar">
 				#renderNavList( variables.nav )#
 			</aside>
-			<main class="col-lg-9 col-xl-10 content">
+			<main class="col-lg-9</bx:output><bx:if condition="#variables.tocPosition == 'sticky'#"><bx:output> col-xl-8</bx:output></bx:if><bx:if condition="#variables.tocPosition != 'sticky'#"><bx:output> col-xl-10</bx:output></bx:if><bx:output> content">
 </bx:output><bx:include template="#variables.themeDir#/page.bxm"><bx:output>
 			</main>
+</bx:output><bx:if condition="#variables.tocPosition == 'sticky' and variables.page.toc.len() gt 0#"><bx:output>
+			<aside class="col-xl-2 toc-sidebar d-none d-xl-block">
+				#renderToc( variables.page.toc )#
+			</aside>
+</bx:output></bx:if><bx:output>
 		</div>
 	</div>
 </bx:output><bx:if condition="#variables.footerEnabled#"><bx:output>
