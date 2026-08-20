@@ -38,6 +38,19 @@
 	/* Every header control shares this one height so the toolbar reads as
 	   a single aligned row instead of a mix of ad hoc paddings. */
 	--bxdocs-toolbar-h: 2.375rem;
+	--bxdocs-step-marker-bg: var( --bxdocs-accent );
+	--bxdocs-step-marker-text: #04121a;
+	--bxdocs-step-line: rgba( 0, 0, 0, 0.12 );
+	/* `::: step color="..."` (module spec's directive blocks) - a fixed
+	   bg/text contrast pair each, so they read the same regardless of
+	   light/dark mode (no [data-theme="dark"] override needed, unlike the
+	   theme-brand-driven marker/line tokens above). */
+	--bxdocs-step-success-bg: #16a34a;
+	--bxdocs-step-success-text: #ffffff;
+	--bxdocs-step-warning-bg: #f59e0b;
+	--bxdocs-step-warning-text: #1a1300;
+	--bxdocs-step-danger-bg: #dc2626;
+	--bxdocs-step-danger-text: #ffffff;
 }
 
 /* Near-black surface with a mint/teal accent, rather than the blue-gray
@@ -51,6 +64,7 @@
 	--md-link-hover: #6ee7b7;
 	--md-border: rgba( 255, 255, 255, 0.09 );
 	--md-code-bg: #0f1417;
+	--bxdocs-step-line: rgba( 255, 255, 255, 0.15 );
 }
 
 [x-cloak] {
@@ -1361,7 +1375,7 @@ a.bxdocs-card:hover {
 	top: 2rem;
 	bottom: 0;
 	width: 2px;
-	background: rgba( 0, 0, 0, 0.12 );
+	background: var( --bxdocs-step-line );
 }
 
 .bxdocs-step__marker {
@@ -1369,14 +1383,29 @@ a.bxdocs-card:hover {
 	width: 1.9rem;
 	height: 1.9rem;
 	border-radius: 50%;
-	background: var( --bxdocs-accent );
-	color: #04121a;
+	background: var( --bxdocs-step-marker-bg );
+	color: var( --bxdocs-step-marker-text );
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	font-weight: 700;
 	font-size: 0.85rem;
 	z-index: 1;
+}
+
+.bxdocs-step__marker--success {
+	background: var( --bxdocs-step-success-bg );
+	color: var( --bxdocs-step-success-text );
+}
+
+.bxdocs-step__marker--warning {
+	background: var( --bxdocs-step-warning-bg );
+	color: var( --bxdocs-step-warning-text );
+}
+
+.bxdocs-step__marker--danger {
+	background: var( --bxdocs-step-danger-bg );
+	color: var( --bxdocs-step-danger-text );
 }
 
 .bxdocs-step__content {
@@ -1510,10 +1539,6 @@ a.bxdocs-card:hover {
 [data-theme="dark"] .bxdocs-page-link,
 [data-theme="dark"] .bxdocs-update {
 	border-color: rgba( 255, 255, 255, 0.15 );
-}
-
-[data-theme="dark"] .bxdocs-step:not( :last-child )::before {
-	background: rgba( 255, 255, 255, 0.15 );
 }
 
 [data-theme="dark"] .bxdocs-embed {

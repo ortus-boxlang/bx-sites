@@ -25,6 +25,16 @@ class {
 	variables.iconResolver = new "models.build.IconResolver@bxdocs"()
 
 	/**
+	 * `::: step`'s own `color` attribute (renderStepper() below) - the
+	 * semantic marker palettes each built-in theme defines as
+	 * `--bxdocs-step-<color>-bg`/`-text` CSS custom properties (see
+	 * docs/guides/themes.md). Unset/unrecognized falls back to the default
+	 * unstyled marker, same as an unset/unrecognized `icon` falls back to
+	 * no icon - a typo never breaks the build, it just doesn't color the step.
+	 */
+	variables.stepColors = "success,warning,danger"
+
+	/**
 	 * Pulls every top-level `::: name ... :::` directive block out of the
 	 * raw markdown and replaces it with a lone placeholder `<div>` on its
 	 * own line. A directive nested inside another (e.g. `::: card` inside
@@ -303,7 +313,10 @@ class {
 
 	/**
 	 * `::: stepper` containing `::: step "Title"` children - a numbered,
-	 * connected sequence of steps.
+	 * connected sequence of steps. A step's own optional `color` attribute
+	 * (`success`/`warning`/`danger` - variables.stepColors) flags it with
+	 * one of the semantic marker palettes each built-in theme defines,
+	 * e.g. `::: step "Delete the old install" color="danger"`.
 	 */
 	private string function renderStepper( required struct block, required any renderer, required struct markdownOptions ) {
 		var children = this.extract( arguments.block.content ).blocks
@@ -314,9 +327,11 @@ class {
 			idx++
 			var attrs = parseAttrs( child.attrsRaw )
 			var title = trim( attrs.title ?: "" )
+			var color = lCase( trim( attrs.color ?: "" ) )
+			var markerClass = "bxdocs-step__marker" & ( listFindNoCase( variables.stepColors, color ) ? " bxdocs-step__marker--" & color : "" )
 
 			html &= '<div class="bxdocs-step">'
-				& '<div class="bxdocs-step__marker">' & idx & '</div>'
+				& '<div class="' & markerClass & '">' & idx & '</div>'
 				& '<div class="bxdocs-step__content">'
 			if ( len( title ) ) {
 				html &= '<div class="bxdocs-step__title">' & encodeForHTML( title ) & '</div>'
