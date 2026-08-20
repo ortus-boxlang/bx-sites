@@ -4,7 +4,7 @@
 	"baseURL": "https://ortus-boxlang.github.io/bx-docs/",
 	"theme": {
 		"name": "bootstrap",
-		"options": { "navCollapsible": true },
+		"options": { "navCollapsible": true, "tocPosition": "sticky" },
 		"logo": "assets/boxlang-icon-full.svg",
 		"favicon": "assets/boxlang-icon-full.svg"
 	},
