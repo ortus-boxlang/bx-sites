@@ -74,10 +74,18 @@ class{
 			"@build.version@",
 			variables.version
 		);
+		// On main, `--version` is the bare release version (e.g. "1.0.0") -
+		// stamp real build metadata onto it. On any other branch, `--version`
+		// already carries whatever suffix the caller wants baked in (release.yml
+		// passes "1.0.0-snapshot" for a development build) - there's no build
+		// number to add on top of that, so the leftover `+@build.number@`
+		// token is dropped entirely rather than replaced with another literal
+		// "-snapshot" (that used to double up into "1.0.0-snapshot-snapshot"
+		// whenever the caller's own version already ended in "-snapshot").
 		tokenReplace(
 			static.buildDir,
 			( variables.branch == "main" ? "@build.number@" : "+@build.number@" ),
-			( variables.branch == "main" ? variables.buildID : "-snapshot" )
+			( variables.branch == "main" ? variables.buildID : "" )
 		);
 
 		println( "📦 Compiling module..." )
