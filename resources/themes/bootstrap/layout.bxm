@@ -8,20 +8,37 @@
 	 * `nested` marks every level below the top one with `nav--nested` so
 	 * style.css can indent it - without that, a child `<ul>` shares the
 	 * exact same class as the top-level list and reads as one flat list.
+	 *
+	 * When `theme.options.navCollapsible` is on, any node with children (
+	 * whether it links to its own page or is a bare group heading) renders a
+	 * `.nav-toggle` button instead of always showing its children inline -
+	 * nav-toggle.js wires the click. `collapsed` marks a child `<ul>` as
+	 * starting hidden; the section containing the current page always
+	 * starts open regardless of `navExpandAll`, so navigating there never
+	 * hides the very link you're on.
 	 */
-	function renderNavList( required array nodes, boolean nested = false ) {
-		var html = "<ul class=""nav flex-column" & ( arguments.nested ? " nav--nested" : "" ) & """>"
+	function renderNavList( required array nodes, boolean nested = false, boolean collapsed = false ) {
+		var html = "<ul class=""nav flex-column" & ( arguments.nested ? " nav--nested" : "" ) & """" & ( arguments.collapsed ? " hidden" : "" ) & ">"
 		for ( var node in arguments.nodes ) {
-			if ( !len( node.url ) && node.children.len() && variables.navCollapsible ) {
-				html &= "<li class=""nav-item""><details class=""nav-section""" & ( variables.navExpandAll ? " open" : "" ) & "><summary class=""nav-link"">" & ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title ) & "</summary>" & renderNavList( node.children, true ) & "</details></li>"
+			var isActive = len( node.url ) && node.url == variables.page.urlPath
+			var linkClass = "nav-link" & ( isActive ? " active" : "" )
+			var labelHtml = ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title )
+			var linkOrSpan = len( node.url )
+				? "<a class=""" & linkClass & """ href=""" & variables.basePath & node.url & """>" & labelHtml & "</a>"
+				: "<span class=""nav-link disabled"">" & labelHtml & "</span>"
+
+			if ( node.children.len() && variables.navCollapsible ) {
+				var open = variables.navExpandAll || navContainsActive( node )
+				html &= "<li class=""nav-item nav-item--group"">"
+				html &= "<div class=""nav-group-header"">" & linkOrSpan
+				html &= "<button type=""button"" class=""nav-toggle"" aria-expanded=""" & ( open ? "true" : "false" ) & """ aria-label=""Toggle " & encodeForHTML( node.title ) & " section""><span class=""nav-toggle__icon"" aria-hidden=""true"">▾</span></button>"
+				html &= "</div>"
+				html &= renderNavList( node.children, true, !open )
+				html &= "</li>"
 				continue
 			}
-			html &= "<li class=""nav-item"">"
-			if ( len( node.url ) ) {
-				html &= "<a class=""nav-link"" href=""" & variables.basePath & node.url & """>" & ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title ) & "</a>"
-			} else {
-				html &= "<span class=""nav-link disabled"">" & ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title ) & "</span>"
-			}
+
+			html &= "<li class=""nav-item"">" & linkOrSpan
 			if ( node.children.len() ) {
 				html &= renderNavList( node.children, true )
 			}
@@ -29,6 +46,23 @@
 		}
 		html &= "</ul>"
 		return html
+	}
+
+	/**
+	 * True when `node` itself links to the current page, or any descendant
+	 * does - used to keep the active branch of a collapsible nav expanded
+	 * regardless of `navExpandAll`.
+	 */
+	boolean function navContainsActive( required struct node ) {
+		if ( len( arguments.node.url ) && arguments.node.url == variables.page.urlPath ) {
+			return true
+		}
+		for ( var child in arguments.node.children ) {
+			if ( navContainsActive( child ) ) {
+				return true
+			}
+		}
+		return false
 	}
 
 	function renderSocialLinks( required array links ) {
@@ -232,6 +266,7 @@
 	<script src="#variables.basePath#assets/code-lines.js"></script>
 	<script src="#variables.basePath#assets/copy-code.js" defer></script>
 	<script src="#variables.basePath#assets/admonition-collapse.js" defer></script>
+	<script src="#variables.basePath#assets/nav-toggle.js" defer></script>
 	<script src="#variables.basePath#assets/tabs.js" defer></script>
 </bx:output><bx:if condition="#variables.mermaidEnabled#"><bx:output>
 	<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
