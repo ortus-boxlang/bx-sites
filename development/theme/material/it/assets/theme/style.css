@@ -851,6 +851,111 @@ code:not( pre code ) {
 	border: 1px solid var( --md-border );
 }
 
+/* Markdown body content (`variables.page.contentHtml`, wrapped by page.bxm
+   in its own `.md-content-body` rather than styled bare inside `.md-card` -
+   the page's own title/summary/breadcrumbs/tags live there too, and would
+   collide with generic heading/paragraph rules otherwise). This theme loads
+   no CSS framework of its own, so - unlike bootstrap, which inherits
+   Bootstrap's Reboot typography for free - every heading/paragraph/list/
+   table/blockquote rule here is hand-rolled to match that same readability. */
+.md-content-body {
+	line-height: 1.7;
+}
+
+.md-content-body > :first-child {
+	margin-top: 0;
+}
+
+.md-content-body h1,
+.md-content-body h2,
+.md-content-body h3,
+.md-content-body h4,
+.md-content-body h5,
+.md-content-body h6 {
+	margin-top: 2rem;
+	margin-bottom: 0.75rem;
+	line-height: 1.3;
+	font-weight: 600;
+}
+
+.md-content-body h1 { font-size: 1.9rem; }
+.md-content-body h2 { font-size: 1.5rem; }
+.md-content-body h3 { font-size: 1.25rem; }
+.md-content-body h4 { font-size: 1.05rem; }
+
+.md-content-body p,
+.md-content-body ul,
+.md-content-body ol,
+.md-content-body table,
+.md-content-body blockquote,
+.md-content-body .bxdocs-code,
+.md-content-body pre {
+	margin: 0 0 1.25rem;
+}
+
+.md-content-body ul,
+.md-content-body ol {
+	padding-inline-start: 1.6rem;
+}
+
+.md-content-body li {
+	margin-bottom: 0.4rem;
+}
+
+.md-content-body li > ul,
+.md-content-body li > ol {
+	margin-top: 0.4rem;
+	margin-bottom: 0;
+}
+
+.md-content-body blockquote {
+	padding: 0.5rem 1.1rem;
+	border-inline-start: 4px solid var( --md-link );
+	color: var( --md-muted );
+}
+
+.md-content-body blockquote > :last-child {
+	margin-bottom: 0;
+}
+
+.md-content-body hr {
+	margin: 2rem 0;
+	border: 0;
+	border-top: 1px solid var( --md-border );
+}
+
+.md-content-body img {
+	max-width: 100%;
+	border-radius: 8px;
+}
+
+.md-content-body table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.95rem;
+}
+
+.md-content-body th,
+.md-content-body td {
+	padding: 0.6rem 0.9rem;
+	border: 1px solid var( --md-border );
+	text-align: left;
+	vertical-align: top;
+}
+
+.md-content-body th {
+	background: rgba( 0, 124, 145, 0.08 );
+	font-weight: 600;
+}
+
+.md-content-body tbody tr:nth-child( even ) {
+	background: rgba( 0, 0, 0, 0.02 );
+}
+
+[data-theme="dark"] .md-content-body tbody tr:nth-child( even ) {
+	background: rgba( 255, 255, 255, 0.03 );
+}
+
 @media ( max-width: 900px ) {
 	.md-nav-toggle {
 		display: inline-block;
