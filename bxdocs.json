@@ -6,7 +6,7 @@
 		"name": "bootstrap",
 		"options": { "navCollapsible": true },
 		"logo": "assets/boxlang-icon-full.svg",
-		"favicon": "assets/boxlang-icon-full.svg"
+		"favicon": "assets/favicon.png"
 	},
 	"search": true,
 	"nav": [],
