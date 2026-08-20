@@ -226,11 +226,31 @@ without touching `resources/themes/` at all:
 The `bootstrap` theme's own set (`resources/themes/bootstrap/assets/style.css`)
 is `--bxdocs-gradient-start`/`-end`, `--bxdocs-accent`, `--bxdocs-bg`,
 `--bxdocs-text`, `--bxdocs-sidebar-bg`, `--bxdocs-sidebar-text`,
-`--bxdocs-border`, `--bxdocs-link`, `--bxdocs-link-hover` and
-`--bxdocs-code-bg` - `material` and `tailwind` follow the same `--bxdocs-*`
-naming with their own small variations. Anything beyond color/font
-(layout, adding/removing chrome) needs a real override or a custom theme -
-see below.
+`--bxdocs-border`, `--bxdocs-link`, `--bxdocs-link-hover`,
+`--bxdocs-code-bg`, `--bxdocs-step-marker-bg`, `--bxdocs-step-marker-text`
+and `--bxdocs-step-line` - `material` and `tailwind` follow the same
+`--bxdocs-*` naming with their own small variations. Anything beyond
+color/font (layout, adding/removing chrome) needs a real override or a
+custom theme - see below.
+
+The last three back the [`::: stepper`/`::: step`](markdown.md#stepper) directive block -
+`--bxdocs-step-marker-bg`/`-text` are the numbered circle's background/text
+color (`bootstrap`/`material` default it to the theme's own
+`--bxdocs-accent`; `tailwind` uses a dedicated teal/mint pair since it
+doesn't have a single shared accent token), and `--bxdocs-step-line` is
+the connecting line between steps:
+
+```css
+:root {
+	--bxdocs-step-marker-bg: #7C3AED;
+	--bxdocs-step-marker-text: #fff;
+}
+
+[data-theme="dark"] {
+	--bxdocs-step-marker-bg: #C4B5FD;
+	--bxdocs-step-marker-text: #1b1f21;
+}
+```
 
 ## Overriding a theme
 

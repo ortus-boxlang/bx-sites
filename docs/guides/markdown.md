@@ -393,6 +393,9 @@ A numbered, connected sequence of steps:
 :::
 :::
 
+The numbered marker and connecting line are themeable independently of the
+rest of the palette - see [Customizing colors](themes.md#customizing-colors-without-a-theme-override).
+
 ### File
 
 A download card for a PDF, video, or any other project asset - `src` is

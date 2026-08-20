@@ -41,6 +41,9 @@
 	   single aligned row instead of a mix of Bootstrap's own form-control/
 	   form-select-sm defaults and this theme's own button padding. */
 	--bxdocs-toolbar-h: 2.375rem;
+	--bxdocs-step-marker-bg: var( --bxdocs-accent );
+	--bxdocs-step-marker-text: #04121a;
+	--bxdocs-step-line: rgba( 0, 0, 0, 0.12 );
 }
 
 /* Near-black surface with a mint/teal accent, rather than the blue-gray
@@ -55,6 +58,7 @@
 	--bxdocs-link: #34d399;
 	--bxdocs-link-hover: #6ee7b7;
 	--bxdocs-code-bg: #0f1417;
+	--bxdocs-step-line: rgba( 255, 255, 255, 0.15 );
 }
 
 [x-cloak] {
@@ -1133,7 +1137,7 @@ a.bxdocs-card:hover {
 	top: 2rem;
 	bottom: 0;
 	width: 2px;
-	background: rgba( 0, 0, 0, 0.12 );
+	background: var( --bxdocs-step-line );
 }
 
 .bxdocs-step__marker {
@@ -1141,8 +1145,8 @@ a.bxdocs-card:hover {
 	width: 1.9rem;
 	height: 1.9rem;
 	border-radius: 50%;
-	background: var( --bxdocs-accent );
-	color: #04121a;
+	background: var( --bxdocs-step-marker-bg );
+	color: var( --bxdocs-step-marker-text );
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -1282,10 +1286,6 @@ a.bxdocs-card:hover {
 [data-theme="dark"] .bxdocs-page-link,
 [data-theme="dark"] .bxdocs-update {
 	border-color: rgba( 255, 255, 255, 0.15 );
-}
-
-[data-theme="dark"] .bxdocs-step:not( :last-child )::before {
-	background: rgba( 255, 255, 255, 0.15 );
 }
 
 [data-theme="dark"] .bxdocs-embed {
