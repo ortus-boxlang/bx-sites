@@ -360,6 +360,81 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxDocs.InvalidConfig" );
 			} );
 
+			it( "defaults [i18n] to an English default locale and no other locales", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				var i18n = loader.load( dir ).i18n;
+				expect( i18n.defaultLocale ).toBe( { "code" : "en", "label" : "English" } );
+				expect( i18n.locales ).toBeArray();
+				expect( i18n.locales.len() ).toBe( 0 );
+			} );
+
+			it( "preserves a user-supplied [i18n.locales] array", function() {
+				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":[{"code":"es","label":"Español"},{"code":"ar","label":"العربية","dir":"rtl"}]}}' );
+				var locales = loader.load( dir ).i18n.locales;
+				expect( locales.len() ).toBe( 2 );
+				expect( locales[ 1 ].code ).toBe( "es" );
+				expect( locales[ 2 ].dir ).toBe( "rtl" );
+			} );
+
+			it( "preserves a user-supplied [i18n.defaultLocale]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","i18n":{"defaultLocale":{"code":"fr","label":"Français"}}}' );
+				expect( loader.load( dir ).i18n.defaultLocale ).toBe( { "code" : "fr", "label" : "Français" } );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [i18n] is not an object", function() {
+				var dir = newProjectDir( '{"name":"My Docs","i18n":"es"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [i18n.locales] is not an array", function() {
+				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":"es"}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when a locale entry is missing [code] or [label]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":[{"code":"es"}]}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when a locale [code] contains characters other than letters/digits/hyphens", function() {
+				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":[{"code":"es/../etc","label":"Bad"}]}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "accepts a BCP-47-shaped locale [code] with a region subtag", function() {
+				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":[{"code":"pt-BR","label":"Português"}]}}' );
+				expect( loader.load( dir ).i18n.locales[ 1 ].code ).toBe( "pt-BR" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when a locale [dir] isn't ltr or rtl", function() {
+				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":[{"code":"es","label":"Español","dir":"sideways"}]}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when two locales share the same code (case-insensitively)", function() {
+				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":[{"code":"es","label":"Español"},{"code":"ES","label":"Duplicate"}]}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when a locale reuses the default locale's own code", function() {
+				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":[{"code":"en","label":"Duplicate default"}]}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
 		} );
 	}
 

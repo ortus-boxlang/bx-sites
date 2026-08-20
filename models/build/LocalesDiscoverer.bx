@@ -1,0 +1,37 @@
+/**
+ * Discovers a project's translated locales "by convention" - any direct
+ * subfolder of `docs/i18n/` is a self-contained translation of the docs
+ * into that locale (its own nested pages, mirroring the main `docs/`
+ * tree's own structure page-for-page - see BuildPipeline.bx's
+ * `mergeLocalePages()`), with no config beyond just existing there.
+ * Projects that don't use i18n simply have no `docs/i18n/` folder, and
+ * this returns an empty array.
+ */
+class {
+
+	/**
+	 * Lists `docs/i18n/*` folders (module spec's locales-by-convention),
+	 * alphabetically - display order in the language switcher is driven by
+	 * `bxdocs.json`'s own `i18n.locales` array instead (BuildPipeline.bx's
+	 * `buildLocalesList()`), so this just needs to report what's on disk.
+	 *
+	 * @docsDir Absolute path to the project's docs/ directory
+	 *
+	 * @return Locale folder names directly under docs/i18n/, alphabetical
+	 */
+	array function discover( required string docsDir ) {
+		var i18nDir = arguments.docsDir.reReplace( "[\/]+$", "" ) & "/i18n"
+
+		if ( !directoryExists( i18nDir ) ) {
+			return []
+		}
+
+		var names = directoryList( i18nDir, false, "name" )
+			.filter( name => directoryExists( i18nDir & "/" & name ) )
+
+		names.sort( "textnocase" )
+
+		return names
+	}
+
+}

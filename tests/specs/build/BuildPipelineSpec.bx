@@ -963,6 +963,196 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( root & "/site/versions/README.md" ) ).toBeFalse();
 			} );
 
+			it( "builds each docs/i18n/<code>/ folder as its own tree under site/<code>/, using the translated content when it exists", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
+				);
+				fileWrite( root & "/docs/index.md", "Welcome home" );
+				directoryCreate( root & "/docs/i18n/es", true, true );
+				fileWrite( root & "/docs/i18n/es/index.md", "Bienvenido" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/es/index.html" ) ).toBeTrue();
+				var esHtml = fileRead( root & "/site/es/index.html" );
+				expect( esHtml ).toInclude( "<p>Bienvenido</p>" );
+				expect( esHtml ).notToInclude( "fallback-notice" );
+
+				var mainHtml = fileRead( root & "/site/index.html" );
+				expect( mainHtml ).toInclude( "<p>Welcome home</p>" );
+			} );
+
+			it( "falls back to the default locale's own content, flagged, for a page a locale hasn't translated yet", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
+				);
+				fileWrite( root & "/docs/index.md", "Welcome home" );
+				directoryCreate( root & "/docs/guides", true, true );
+				fileWrite( root & "/docs/guides/setup.md", "---" & char( 10 ) & "title: Setup" & char( 10 ) & "---" & char( 10 ) & "Setup body" );
+				directoryCreate( root & "/docs/i18n/es", true, true );
+				fileWrite( root & "/docs/i18n/es/index.md", "Bienvenido" );
+				// docs/i18n/es/guides/setup.md deliberately not created - Spanish
+				// hasn't translated this page yet
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/es/guides/setup/index.html" ) ).toBeTrue();
+				var esSetupHtml = fileRead( root & "/site/es/guides/setup/index.html" );
+				expect( esSetupHtml ).toInclude( "<p>Setup body</p>" );
+				expect( esSetupHtml ).toInclude( "fallback-notice" );
+				expect( esSetupHtml ).toInclude( "hasn't been translated yet" );
+			} );
+
+			it( "gives every locale the exact same nav shape as the default tree, translated titles included", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/guides", true, true );
+				fileWrite( root & "/docs/guides/setup.md", "---" & char( 10 ) & "title: Setup" & char( 10 ) & "---" & char( 10 ) & "Body" );
+				directoryCreate( root & "/docs/i18n/es/guides", true, true );
+				fileWrite( root & "/docs/i18n/es/index.md", "Inicio" );
+				fileWrite( root & "/docs/i18n/es/guides/setup.md", "---" & char( 10 ) & "title: Instalación" & char( 10 ) & "---" & char( 10 ) & "Cuerpo" );
+
+				pipeline.build( root );
+
+				var esHtml = fileRead( root & "/site/es/index.html" );
+				expect( esHtml ).toInclude( 'href="/es/guides/setup/index.html"' );
+				// encodeForHTML() entity-escapes accented characters (own
+				// choice, applied uniformly to every page title across every
+				// theme, well outside this feature's own scope) - "Instalación"
+				// safely renders as this in any browser, just not byte-identical.
+				expect( esHtml ).toInclude( ">Instalaci&oacute;n<" );
+			} );
+
+			it( "renders a language switcher with the current locale selected when docs/i18n/* exist, and none when there aren't any", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/i18n/es", true, true );
+				fileWrite( root & "/docs/i18n/es/index.md", "Inicio" );
+
+				pipeline.build( root );
+
+				var mainHtml = fileRead( root & "/site/index.html" );
+				expect( mainHtml ).toInclude( "locale-switcher" );
+				expect( mainHtml ).toInclude( ">English<" );
+				// encodeForHTML() entity-escapes accented characters - see the
+				// "gives every locale the exact same nav shape" test above.
+				expect( mainHtml ).toInclude( ">Espa&ntilde;ol<" );
+
+				var esHtml = fileRead( root & "/site/es/index.html" );
+				expect( esHtml ).toInclude( "locale-switcher" );
+
+				var monolingualRoot = newProject();
+				fileWrite( monolingualRoot & "/docs/index.md", "Home" );
+				pipeline.build( monolingualRoot );
+				expect( fileRead( monolingualRoot & "/site/index.html" ) ).notToInclude( "locale-switcher" );
+			} );
+
+			it( "stamps <html lang dir> for the default and every locale build, rtl included", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"ar","label":"العربية","dir":"rtl"}]}}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/i18n/ar", true, true );
+				fileWrite( root & "/docs/i18n/ar/index.md", "الرئيسية" );
+
+				pipeline.build( root );
+
+				expect( fileRead( root & "/site/index.html" ) ).toInclude( '<html lang="en" dir="ltr">' );
+				expect( fileRead( root & "/site/ar/index.html" ) ).toInclude( '<html lang="ar" dir="rtl">' );
+			} );
+
+			it( "points a translated page's editUrl at its own docs/i18n/<code>/ source, and a fallback page's at the default docs/ source", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"repo":{"url":"https://github.com/acme/docs","editUri":"edit/main/docs/"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/guides", true, true );
+				fileWrite( root & "/docs/guides/setup.md", "Setup body" );
+				directoryCreate( root & "/docs/i18n/es", true, true );
+				fileWrite( root & "/docs/i18n/es/index.md", "Inicio" );
+				// docs/i18n/es/guides/setup.md left untranslated on purpose
+
+				pipeline.build( root );
+
+				var esIndexHtml = fileRead( root & "/site/es/index.html" );
+				expect( esIndexHtml ).toInclude( "https://github.com/acme/docs/edit/main/docs/i18n/es/index.md" );
+
+				var esSetupHtml = fileRead( root & "/site/es/guides/setup/index.html" );
+				expect( esSetupHtml ).toInclude( "https://github.com/acme/docs/edit/main/docs/guides/setup.md" );
+			} );
+
+			it( "includes locale pages in sitemap.xml and llms.txt alongside the main tree", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"https://docs.example.com/","i18n":{"locales":[{"code":"es","label":"Español"}]}}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/i18n/es", true, true );
+				fileWrite( root & "/docs/i18n/es/index.md", "Inicio" );
+
+				pipeline.build( root );
+
+				var sitemap = fileRead( root & "/site/sitemap.xml" );
+				expect( sitemap ).toInclude( "<loc>https://docs.example.com/index.html</loc>" );
+				expect( sitemap ).toInclude( "<loc>https://docs.example.com/es/index.html</loc>" );
+
+				var llms = fileRead( root & "/site/llms.txt" );
+				expect( llms ).toInclude( "(https://docs.example.com/index.html)" );
+				expect( llms ).toInclude( "(https://docs.example.com/es/index.html)" );
+			} );
+
+			it( "never treats docs/i18n/** as part of the main tree's own pages", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/i18n/es", true, true );
+				fileWrite( root & "/docs/i18n/es/index.md", "Inicio" );
+
+				var result = pipeline.build( root );
+
+				expect( result.pageCount ).toBe( 1 );
+				expect( fileExists( root & "/site/i18n/es/index.html" ) ).toBeFalse();
+				expect( fileExists( root & "/site/index.md" ) ).toBeTrue();
+			} );
+
+			it( "keeps the version and language switchers mutually exclusive - neither shows up inside the other's own tree", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/versions/1.0", true, true );
+				fileWrite( root & "/docs/versions/1.0/index.md", "1.0 home" );
+				directoryCreate( root & "/docs/i18n/es", true, true );
+				fileWrite( root & "/docs/i18n/es/index.md", "Inicio" );
+
+				pipeline.build( root );
+
+				expect( fileRead( root & "/site/versions/1.0/index.html" ) ).notToInclude( "locale-switcher" );
+				expect( fileRead( root & "/site/es/index.html" ) ).notToInclude( "version-switcher" );
+			} );
+
 		} );
 	}
 

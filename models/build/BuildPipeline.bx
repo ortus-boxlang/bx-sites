@@ -18,6 +18,7 @@ class {
 	variables.markdownRenderer = new "models.build.MarkdownRenderer@bxdocs"()
 	variables.gitRevisionDate  = new "models.build.GitRevisionDate@bxdocs"()
 	variables.versionsDiscoverer = new "models.build.VersionsDiscoverer@bxdocs"()
+	variables.localesDiscoverer = new "models.build.LocalesDiscoverer@bxdocs"()
 	variables.tagsIndexBuilder = new "models.build.TagsIndexBuilder@bxdocs"()
 	variables.socialCardGenerator = new "models.build.SocialCardGenerator@bxdocs"()
 	variables.tabsProcessor = new "models.build.TabsProcessor@bxdocs"()
@@ -63,9 +64,18 @@ class {
 
 	/**
 	 * Runs the full `build` verb end to end: load config -> resolve plugins
-	 * -> render the main doc tree and every `docs/versions/<name>/` tree ->
-	 * copy assets -> write 404/tags/sitemap.xml/llms.txt -> fire
-	 * `onBuildComplete`.
+	 * -> render the main doc tree, every `docs/versions/<name>/` tree, and
+	 * every `docs/i18n/<code>/` tree -> copy assets -> write
+	 * 404/tags/sitemap.xml/llms.txt -> fire `onBuildComplete`.
+	 *
+	 * Versions and locales don't compose in v1 - a `docs/versions/<name>/`
+	 * tree is always rendered in the site's default locale only, with no
+	 * language switcher of its own (there's nothing for it to link to), and
+	 * a `docs/i18n/<code>/` tree never shows a version switcher either -
+	 * each secondary axis stays invisible inside the other's own tree,
+	 * rather than risk a version switch silently dropping a reader back
+	 * into the unlocalized default language, or a language switch landing
+	 * them outside the version they were reading.
 	 *
 	 * @projectRoot Absolute path to the project root
 	 *
@@ -88,14 +98,22 @@ class {
 		var versionNames = variables.versionsDiscoverer.discover( root & "/docs" )
 		var versions = buildVersionsList( versionNames, urls.basePath )
 
+		var localeNames = variables.localesDiscoverer.discover( root & "/docs" )
+		var locales = buildLocalesList( localeNames, config.i18n, urls.basePath )
+		var defaultLocaleCode = config.i18n.defaultLocale.code
+		var defaultLocaleDir = config.i18n.defaultLocale.dir ?: "ltr"
+
 		var navConfig = resolveExplicitNav( root & "/docs", config.nav )
-		var mainResult = renderDocTree( root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, navConfig )
+		var mainPages = variables.docsLoader.load( root & "/docs" )
+		var mainResult = renderDocTree( mainPages, root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, navConfig, locales, defaultLocaleCode, defaultLocaleDir )
 		var allPages = duplicate( mainResult.pages )
 		copyAssets( root, themeDir, siteDir, config.search, config.mermaid, config.math )
 
 		for ( var versionName in versionNames ) {
 			var versionOutputDir = siteDir & "/versions/" & versionName
+			var versionPages = variables.docsLoader.load( root & "/docs/versions/" & versionName )
 			var versionResult = renderDocTree(
+				versionPages,
 				root & "/docs/versions/" & versionName,
 				config,
 				themeDir,
@@ -112,8 +130,37 @@ class {
 			copyAssets( root, themeDir, versionOutputDir, config.search, config.mermaid, config.math )
 		}
 
-		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, "Latest" )
-		writeTagsPage( mainResult.pages, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions )
+		for ( var locale in locales ) {
+			if ( locale.code == defaultLocaleCode ) {
+				continue
+			}
+			var localeOutputDir = siteDir & "/" & locale.code
+			var localePages = variables.docsLoader.load( root & "/docs/i18n/" & locale.code )
+			var mergedPages = mergeLocalePages( mainPages, localePages, locale.code )
+			var localeResult = renderDocTree(
+				mergedPages,
+				root & "/docs",
+				config,
+				themeDir,
+				localeOutputDir,
+				urls.basePath & locale.code & "/",
+				root,
+				[],
+				"Latest",
+				"",
+				plugins,
+				urls.absolute,
+				navConfig,
+				locales,
+				locale.code,
+				locale.dir
+			)
+			allPages.append( prefixPageUrls( localeResult.pages, locale.code & "/" ), true )
+			copyAssets( root, themeDir, localeOutputDir, config.search, config.mermaid, config.math )
+		}
+
+		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, "Latest", locales, defaultLocaleCode )
+		writeTagsPage( mainResult.pages, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode )
 
 		if ( len( urls.absolute ) ) {
 			fileWrite( siteDir & "/sitemap.xml", variables.sitemapGenerator.build( allPages, urls.absolute ) )
@@ -141,28 +188,35 @@ class {
 	}
 
 	/**
-	 * Loads, renders and writes one self-contained doc tree - either the
-	 * project's own `docs/` (the "Latest"/default build), or one
-	 * `docs/versions/<name>/` folder (module spec's versions-by-convention:
-	 * VersionsDiscoverer.bx). Both are built the exact same way, just
-	 * rooted/output/base-pathed differently.
+	 * Renders and writes one self-contained doc tree from an already-loaded
+	 * `pages` array - the project's own `docs/` (the "Latest"/default
+	 * build), one `docs/versions/<name>/` folder (VersionsDiscoverer.bx), or
+	 * one `docs/i18n/<code>/` folder merged against the default tree
+	 * (LocalesDiscoverer.bx, mergeLocalePages()). All three are rendered the
+	 * exact same way, just pre-loaded/rooted/output/base-pathed differently
+	 * by the caller.
 	 *
-	 * @docsDir Absolute path to this tree's own docs root (`<root>/docs` or `<root>/docs/versions/<name>`)
+	 * @pages Already-loaded page structs for this tree - DocsLoader.load()'s own output for the main/version trees, or mergeLocalePages()'s output for a locale tree
+	 * @docsDir Absolute path this tree's `custom:` icons and `::: include` sources resolve against - always the project's own `<root>/docs` for a locale tree (translated pages don't need their own duplicated icon/include assets), `<root>/docs` or `<root>/docs/versions/<name>` otherwise
 	 * @config The site's bxdocs.json config
 	 * @themeDir Absolute path to the resolved theme folder
-	 * @outputDir Absolute path to write this tree's pages to (`site/` or `site/versions/<name>/`)
-	 * @basePath Root-relative base path ending with `/`, already namespaced under `versions/<name>/` for a version build
+	 * @outputDir Absolute path to write this tree's pages to (`site/`, `site/versions/<name>/`, or `site/<localeCode>/`)
+	 * @basePath Root-relative base path ending with `/`, already namespaced under `versions/<name>/`/`<localeCode>/` for a version/locale build
 	 * @root Absolute path to the project root - git's working directory for the `lastUpdated` lookup
 	 * @versions Version switcher entries as `[ { label, url } ]`, shared by every tree so the switcher is consistent everywhere
 	 * @currentVersion Which `versions` entry this tree IS, for the switcher's own "selected" state
-	 * @docsRelativePrefix Empty for the main/"Latest" tree; `"versions/<name>/"` for a version tree - see assignEditAndLastUpdated()
+	 * @docsRelativePrefix Empty for the main/"Latest"/a locale tree (see assignEditAndLastUpdated() - a locale tree's own pages each carry their own `sourceRelativePath` instead); `"versions/<name>/"` for a version tree
 	 * @plugins resolvePlugins()'s own output, applied via onNav/onPageMarkdown/onPageHtml
 	 * @absoluteUrl The absolute site URL, ending with `/` (BaseUrlResolver's `absolute`), or "" if unknown - gates `::: updates` feed.xml generation, same as sitemap.xml
-	 * @navConfig An explicit nav tree (NavBuilder.build()'s own `navConfig` shape) for this doc tree - empty (the default) infers nav from folder structure. Only ever non-empty for the main tree - see resolveExplicitNav()
+	 * @navConfig An explicit nav tree (NavBuilder.build()'s own `navConfig` shape) for this doc tree - empty (the default) infers nav from folder structure. Non-empty for the main tree and every locale tree (a locale's nav always mirrors the default tree's own structure/navConfig - see mergeLocalePages()); always empty for a version tree, which infers its own - see resolveExplicitNav()
+	 * @locales Language switcher entries as `[ { code, label, url, dir } ]`, the default locale first - empty for a version tree (no locale switcher inside a versioned build in v1)
+	 * @currentLocale Which `locales` entry's `code` this tree IS, for the switcher's own "selected" state - "" for a version tree
+	 * @currentLocaleDir `"ltr"`/`"rtl"`, this tree's own locale direction - stamped onto `<html dir="...">`
 	 *
 	 * @return { pages, nav }
 	 */
 	private struct function renderDocTree(
+		required array pages,
 		required string docsDir,
 		required struct config,
 		required string themeDir,
@@ -174,9 +228,19 @@ class {
 		required string docsRelativePrefix,
 		required array plugins,
 		required string absoluteUrl,
-		array navConfig = []
+		array navConfig = [],
+		array locales = [],
+		string currentLocale = "",
+		string currentLocaleDir = "ltr"
 	) {
-		var pages = variables.docsLoader.load( arguments.docsDir )
+		// Deep-copied rather than aliased - `pages` gets mutated in place
+		// below (contentHtml/toc/editUrl/ogImage/... added per tree), and the
+		// same page structs can be handed to more than one renderDocTree()
+		// call (mainPages feeds both the main tree's own render AND every
+		// locale tree's mergeLocalePages() fallback pages) - aliasing would
+		// let one tree's own computed fields (an og:image path written under
+		// its own outputDir, a basePath-specific contentHtml) leak into another.
+		var pages = duplicate( arguments.pages )
 		var nav = variables.navBuilder.build( pages, arguments.navConfig )
 		nav = variables.pluginLoader.applyOnNav( arguments.plugins, nav, arguments.config )
 		var flatSequence = variables.navBuilder.flatten( nav )
@@ -196,7 +260,8 @@ class {
 
 		for ( var page in pages ) {
 			var html = variables.themeRenderer.renderPage(
-				page, nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, arguments.currentVersion
+				page, nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, arguments.currentVersion,
+				arguments.locales, arguments.currentLocale, arguments.currentLocaleDir
 			)
 			var outputPath = arguments.outputDir & "/" & page.urlPath
 			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
@@ -471,7 +536,7 @@ class {
 	 * @pages Array of page structs with `relativePath` already set (DocsLoader.load())
 	 * @config The site's bxdocs.json config
 	 * @root Absolute path to the project root - git's working directory for the `lastUpdated` lookup
-	 * @docsRelativePrefix `page.relativePath` is relative to whichever docs tree was loaded (`docs/` or `docs/versions/<name>/`) - this is the bit in between, e.g. `"versions/1.0/"`, so the real `docs/`-relative path (for both the edit URL and the git lookup) can be rebuilt as `docsRelativePrefix & page.relativePath`. Empty for the main/"Latest" tree.
+	 * @docsRelativePrefix `page.relativePath` is relative to whichever docs tree was loaded (`docs/` or `docs/versions/<name>/`) - this is the bit in between, e.g. `"versions/1.0/"`, so the real `docs/`-relative path (for both the edit URL and the git lookup) can be rebuilt as `docsRelativePrefix & page.relativePath`. Empty for the main/"Latest" tree. Ignored for any page that carries its own `sourceRelativePath` instead (mergeLocalePages()'s own output) - a locale tree's pages don't all share one real physical prefix, since a translated page really lives under `docs/i18n/<code>/` while a fallback page really is the default tree's own file under plain `docs/`.
 	 */
 	private void function assignEditAndLastUpdated( required array pages, required struct config, required string root, string docsRelativePrefix = "" ) {
 		var repoUrl = trim( arguments.config.repo.url ?: "" )
@@ -479,12 +544,112 @@ class {
 		var canEdit = len( repoUrl ) && len( editUri )
 
 		for ( var page in arguments.pages ) {
-			var pathFromDocsRoot = arguments.docsRelativePrefix & page.relativePath
+			var pathFromDocsRoot = page.keyExists( "sourceRelativePath" ) ? page.sourceRelativePath : ( arguments.docsRelativePrefix & page.relativePath )
 			page.editUrl = canEdit ? buildEditUrl( repoUrl, editUri, pathFromDocsRoot ) : ""
 			page.lastUpdated = arguments.config.lastUpdated
 				? variables.gitRevisionDate.forFile( arguments.root, "docs/" & pathFromDocsRoot )
 				: ""
 		}
+	}
+
+	/**
+	 * Merges a locale's own translated pages onto the default tree's own
+	 * page set, structurally - the output always has exactly the default
+	 * tree's own pages, in its own order, matched by `relativePath` (a
+	 * translated `docs/i18n/es/guides/setup.md` and the default tree's own
+	 * `docs/guides/setup.md` both load with the identical `relativePath`
+	 * `"guides/setup.md"`, since DocsLoader.bx computes it relative to
+	 * whichever docsDir it was given - no rewriting needed to make them
+	 * match). This is what guarantees a locale's nav is always the exact
+	 * same shape as the default tree's - see renderDocTree()'s own docblock -
+	 * and what lets the language switcher always land on the same page
+	 * rather than that locale's homepage.
+	 *
+	 * A default-tree page with no translated counterpart is carried through
+	 * unchanged (its own title/body/icon/order - untranslated, but real
+	 * content, never a broken link) and stamped `isFallbackContent = true`
+	 * so a theme's `page.bxm` can show a "not yet translated" notice - the
+	 * fallback behavior this session settled on over an alternative of
+	 * omitting untranslated pages entirely.
+	 *
+	 * @defaultPages The default tree's own already-loaded pages (DocsLoader.load()'s output for `<root>/docs`)
+	 * @localePages This locale's own already-loaded pages (DocsLoader.load()'s output for `<root>/docs/i18n/<code>`)
+	 * @localeCode This locale's own code, for building each translated page's own `sourceRelativePath`
+	 *
+	 * @return Array of page structs, same shape/order as `defaultPages`, each additionally stamped `isFallbackContent` and `sourceRelativePath`
+	 */
+	private array function mergeLocalePages( required array defaultPages, required array localePages, required string localeCode ) {
+		var localesByPath = {}
+		for ( var localePage in arguments.localePages ) {
+			localesByPath[ lCase( localePage.relativePath ) ] = localePage
+		}
+
+		var merged = []
+		for ( var defaultPage in arguments.defaultPages ) {
+			var key = lCase( defaultPage.relativePath )
+
+			if ( localesByPath.keyExists( key ) ) {
+				var translated = duplicate( localesByPath[ key ] )
+				translated.isFallbackContent = false
+				translated.sourceRelativePath = "i18n/" & arguments.localeCode & "/" & translated.relativePath
+				merged.append( translated )
+			} else {
+				var fallback = duplicate( defaultPage )
+				fallback.isFallbackContent = true
+				fallback.sourceRelativePath = fallback.relativePath
+				merged.append( fallback )
+			}
+		}
+
+		return merged
+	}
+
+	/**
+	 * Builds the language switcher's own entries - the default locale first
+	 * (`bxdocs.json`'s `i18n.defaultLocale`, always the unprefixed `docs/`
+	 * tree), then one per discovered `docs/i18n/` folder that's actually
+	 * declared in `i18n.locales` (in the order declared there), then any
+	 * remaining discovered folder not declared in config at all (using its
+	 * bare code as its own label, alphabetically - graceful degradation
+	 * rather than silently dropping it from the switcher).
+	 *
+	 * @localeNames LocalesDiscoverer.discover()'s own output, alphabetical
+	 * @i18nConfig The site's bxdocs.json `i18n` struct
+	 * @basePath The main/default-locale build's own basePath
+	 *
+	 * @return Array of `{ code, label, url, dir }`, default locale first
+	 */
+	private array function buildLocalesList( required array localeNames, required struct i18nConfig, required string basePath ) {
+		var defaultLocale = arguments.i18nConfig.defaultLocale
+		var locales = [ {
+			code  : defaultLocale.code,
+			label : defaultLocale.label,
+			dir   : defaultLocale.dir ?: "ltr",
+			url   : arguments.basePath
+		} ]
+		var addedCodes = [ lCase( defaultLocale.code ) ]
+
+		for ( var configured in arguments.i18nConfig.locales ) {
+			if ( !arguments.localeNames.contains( configured.code ) ) {
+				continue
+			}
+			locales.append( {
+				code  : configured.code,
+				label : configured.label,
+				dir   : configured.dir ?: "ltr",
+				url   : arguments.basePath & configured.code & "/"
+			} )
+			addedCodes.append( lCase( configured.code ) )
+		}
+
+		for ( var localeName in arguments.localeNames ) {
+			if ( addedCodes.contains( lCase( localeName ) ) ) {
+				continue
+			}
+			locales.append( { code : localeName, label : localeName, dir : "ltr", url : arguments.basePath & localeName & "/" } )
+		}
+
+		return locales
 	}
 
 	/**
@@ -610,8 +775,10 @@ class {
 	 * @basePath Root-relative base path ending with `/`
 	 * @versions Version switcher entries as `[ { label, url } ]`
 	 * @currentVersion Always `"Latest"` - the 404 page is only ever written once, for the main site
+	 * @locales Language switcher entries as `[ { code, label, url, dir } ]` - not built per-locale in v1 (a 404 page's own "not found" message needs no translation to be useful), shown here only so the header renders the same everywhere
+	 * @currentLocale The default locale's own code
 	 */
-	private void function write404Page( required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required string currentVersion ) {
+	private void function write404Page( required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required string currentVersion, array locales = [], string currentLocale = "" ) {
 		var page = {
 			title       : "Page Not Found",
 			contentHtml : "<p>Sorry, that page doesn't exist. Try the search box, or head back to the homepage.</p>",
@@ -622,7 +789,8 @@ class {
 		}
 
 		var html = variables.themeRenderer.renderPage(
-			page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, arguments.currentVersion
+			page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, arguments.currentVersion,
+			arguments.locales, arguments.currentLocale
 		)
 		fileWrite( arguments.siteDir & "/404.html", html )
 	}
@@ -642,8 +810,10 @@ class {
 	 * @siteDir Absolute path to the build output directory
 	 * @basePath Root-relative base path ending with `/`
 	 * @versions Version switcher entries as `[ { label, url } ]`
+	 * @locales Language switcher entries as `[ { code, label, url, dir } ]` - like version trees, a locale doesn't get its own tags page in v1; tag badges on every locale's own pages still link to the main site's one
+	 * @currentLocale The default locale's own code
 	 */
-	private void function writeTagsPage( required array pages, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions ) {
+	private void function writeTagsPage( required array pages, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, array locales = [], string currentLocale = "" ) {
 		var built = variables.tagsIndexBuilder.build( arguments.pages, arguments.basePath )
 		if ( !built.hasTags ) {
 			return
@@ -659,7 +829,8 @@ class {
 		}
 
 		var html = variables.themeRenderer.renderPage(
-			page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, "Latest"
+			page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, "Latest",
+			arguments.locales, arguments.currentLocale
 		)
 		directoryCreate( arguments.siteDir & "/tags", true, true )
 		fileWrite( arguments.siteDir & "/tags/index.html", html )

@@ -98,7 +98,7 @@ body.md-body {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	margin-left: auto;
+	margin-inline-start: auto;
 	min-width: 0;
 }
 
@@ -121,7 +121,7 @@ body.md-body {
 }
 
 .md-nav--nested {
-	padding-left: 1rem;
+	padding-inline-start: 1rem;
 }
 
 .md-nav__item {
@@ -217,6 +217,29 @@ a:hover {
 	flex-shrink: 0;
 	width: auto;
 	max-width: 6.5rem;
+}
+
+.locale-switcher {
+	flex-shrink: 0;
+	width: auto;
+	max-width: 6.5rem;
+}
+
+.fallback-notice {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 0 0 1.25rem;
+	padding: 0.6rem 1rem;
+	border: 1px solid rgba( 255, 145, 0, 0.35 );
+	border-radius: 4px;
+	background: rgba( 255, 145, 0, 0.08 );
+	font-size: 0.9rem;
+}
+
+.fallback-notice svg {
+	flex: 0 0 auto;
+	color: #ff9100;
 }
 
 .theme-toggle:hover,
