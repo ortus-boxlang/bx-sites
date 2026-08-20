@@ -318,24 +318,27 @@ Add `open="true"` to start it expanded.
 
 A grid of link cards, each its own `::: card` inside a `::: cards`
 wrapper - `title`, `icon`, `image` and `href` are all optional (a card
-with no `href` renders as a plain, non-clickable card):
+with no `href` renders as a plain, non-clickable card). `icon` is resolved
+the same way frontmatter/nav `icon` values are - a plain emoji, or a named
+icon from a bundled library (`icon="phosphor-duotone:rocket-launch"`,
+`icon="lucide:rocket"`, ...) - see [Themes: Icons](themes.md#icons):
 
 ```markdown
 ::: cards
-::: card title="Getting Started" icon="🚀" href="../getting-started.md"
+::: card title="Getting Started" icon="phosphor-duotone:rocket-launch" href="../getting-started.md"
 Install, scaffold and build your first site.
 :::
-::: card title="Themes" icon="🎨" href="themes.md"
+::: card title="Themes" icon="phosphor-duotone:palette" href="themes.md"
 Customize a built-in theme or write your own.
 :::
 :::
 ```
 
 ::: cards
-::: card title="Getting Started" icon="🚀" href="../getting-started.md"
+::: card title="Getting Started" icon="phosphor-duotone:rocket-launch" href="../getting-started.md"
 Install, scaffold and build your first site.
 :::
-::: card title="Themes" icon="🎨" href="themes.md"
+::: card title="Themes" icon="phosphor-duotone:palette" href="themes.md"
 Customize a built-in theme or write your own.
 :::
 :::

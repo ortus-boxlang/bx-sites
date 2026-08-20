@@ -1248,6 +1248,7 @@ a.bxdocs-card:hover {
 .bxdocs-card__icon {
 	font-size: 1.75rem;
 	margin-bottom: 0.5rem;
+	color: var( --md-link );
 }
 
 .bxdocs-card__title {
@@ -1262,6 +1263,80 @@ a.bxdocs-card:hover {
 
 .bxdocs-card__body > :last-child {
 	margin-bottom: 0;
+}
+
+/* The homepage's own hero banner (docs/index.md) - CTA buttons alongside
+   the brand mark, in a soft brand-gradient-tinted panel. A generic
+   component like `.bxdocs-cards`, not homepage-specific markup, so any
+   page can use raw HTML like this for its own banner. */
+.bxdocs-hero {
+	display: flex;
+	align-items: center;
+	gap: 2rem;
+	margin: 1.5rem 0 2.5rem;
+	padding: 2rem;
+	border-radius: 20px;
+	border: 1px solid var( --md-border );
+	background: linear-gradient( 135deg, rgba( 0, 255, 120, 0.08 ), rgba( 0, 219, 255, 0.08 ) );
+}
+
+.bxdocs-hero__content {
+	flex: 1 1 320px;
+}
+
+.bxdocs-hero__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+}
+
+.bxdocs-hero__btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.65rem 1.4rem;
+	border-radius: 999px;
+	font-weight: 600;
+	text-decoration: none;
+	transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bxdocs-hero__btn:hover {
+	transform: translateY( -1px );
+	box-shadow: 0 4px 14px rgba( 0, 0, 0, 0.12 );
+}
+
+.bxdocs-hero__btn--primary {
+	background: linear-gradient( 90deg, var( --bxdocs-gradient-start ), var( --bxdocs-gradient-end ) );
+	color: #04121a;
+}
+
+.bxdocs-hero__btn--secondary {
+	border: 1px solid var( --md-border );
+	color: var( --md-ink );
+}
+
+.bxdocs-hero__art {
+	flex: 0 0 auto;
+	width: 200px;
+}
+
+.bxdocs-hero__art img {
+	display: block;
+	width: 100%;
+	height: auto;
+	filter: drop-shadow( 0 8px 24px rgba( 0, 0, 0, 0.12 ) );
+}
+
+@media ( max-width: 640px ) {
+	.bxdocs-hero {
+		flex-direction: column;
+		text-align: center;
+	}
+
+	.bxdocs-hero__actions {
+		justify-content: center;
+	}
 }
 
 .bxdocs-columns {
