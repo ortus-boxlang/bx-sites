@@ -1,5 +1,6 @@
-<bx:output><div class="bxdocs-search position-relative">
+<bx:if condition="#variables.searchProviderName eq 'algolia'#"><bx:output><div id="bxdocs-search-algolia" class="bxdocs-search-algolia"></div>
+</bx:output></bx:if><bx:if condition="#variables.searchProviderName eq 'local'#"><bx:output><div class="bxdocs-search position-relative">
 	<input type="search" id="bxdocs-search-input" class="form-control" placeholder="Search docs..." aria-label="Search">
 	<ul id="bxdocs-search-results" class="bxdocs-search-results list-unstyled"></ul>
 </div>
-</bx:output>
+</bx:output></bx:if>

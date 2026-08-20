@@ -1,0 +1,45 @@
+/**
+ * Names bx-docs' built-in search providers (module spec section 7) and
+ * which of them need the static lunr index BuildPipeline builds by default.
+ *
+ * `local` (the default, unchanged) is bx-docs' own fully static/client-side
+ * search - a `search-index.json` built at `build` time, searched with
+ * lunr.js in the browser, no server involved. `algolia` wires up Algolia
+ * DocSearch instead, which serves results from Algolia's own hosted index
+ * (populated by their crawler/API, not by bx-docs), so it has no use for
+ * `search-index.json` at all.
+ *
+ * A `searchProvider.provider` outside `getBuiltIn()` isn't an error -
+ * ConfigLoader only validates the two providers this module ships built-in
+ * UI for; anything else is assumed to be wired up by a project's own
+ * `theme/` override (ThemeRenderer's project-theme-wins resolution order),
+ * which can read `siteConfig.searchProvider` itself and render whatever
+ * search widget it wants. See docs/guides/search.md's "Other providers"
+ * section.
+ */
+class {
+
+	variables.builtIn = [ "local", "algolia" ]
+
+	/**
+	 * The search provider names this module ships built-in theme support for.
+	 */
+	array function getBuiltIn() {
+		return variables.builtIn
+	}
+
+	/**
+	 * Whether `provider` should get the static `search-index.json` built (and
+	 * the shared lunr widget copied/wired up) - true for `local` and for any
+	 * provider this module doesn't specifically know about (harmless, and
+	 * leaves the index available as a fallback for a custom theme that wants
+	 * it); false only for `algolia`, the one built-in provider that serves
+	 * results from its own hosted index instead.
+	 *
+	 * @provider bxdocs.json's `searchProvider.provider`
+	 */
+	boolean function usesLocalIndex( required string provider ) {
+		return lCase( trim( arguments.provider ) ) != "algolia"
+	}
+
+}

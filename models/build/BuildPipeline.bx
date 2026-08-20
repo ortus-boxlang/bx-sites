@@ -11,6 +11,7 @@ class {
 	variables.navBuilder       = new "models.build.NavBuilder@bxdocs"()
 	variables.themeRenderer    = new "models.build.ThemeRenderer@bxdocs"()
 	variables.searchIndexer    = new "models.build.SearchIndexer@bxdocs"()
+	variables.searchProviderRegistry = new "models.build.SearchProviderRegistry@bxdocs"()
 	variables.tableOfContents  = new "models.build.TableOfContents@bxdocs"()
 	variables.baseUrlResolver  = new "models.build.BaseUrlResolver@bxdocs"()
 	variables.sitemapGenerator = new "models.build.SitemapGenerator@bxdocs"()
@@ -107,7 +108,7 @@ class {
 		var mainPages = variables.docsLoader.load( root & "/docs" )
 		var mainResult = renderDocTree( mainPages, root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, navConfig, locales, defaultLocaleCode, defaultLocaleDir )
 		var allPages = duplicate( mainResult.pages )
-		copyAssets( root, themeDir, siteDir, config.search, config.mermaid, config.math )
+		copyAssets( root, themeDir, siteDir, searchNeedsLocalIndex( config ), config.mermaid, config.math )
 
 		for ( var versionName in versionNames ) {
 			var versionOutputDir = siteDir & "/versions/" & versionName
@@ -127,7 +128,7 @@ class {
 				urls.absolute
 			)
 			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
-			copyAssets( root, themeDir, versionOutputDir, config.search, config.mermaid, config.math )
+			copyAssets( root, themeDir, versionOutputDir, searchNeedsLocalIndex( config ), config.mermaid, config.math )
 		}
 
 		for ( var locale in locales ) {
@@ -156,7 +157,7 @@ class {
 				locale.dir
 			)
 			allPages.append( prefixPageUrls( localeResult.pages, locale.code & "/" ), true )
-			copyAssets( root, themeDir, localeOutputDir, config.search, config.mermaid, config.math )
+			copyAssets( root, themeDir, localeOutputDir, searchNeedsLocalIndex( config ), config.mermaid, config.math )
 		}
 
 		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, "Latest", locales, defaultLocaleCode )
@@ -275,7 +276,7 @@ class {
 
 		variables.markdownPublisher.publish( pages, arguments.outputDir )
 
-		if ( arguments.config.search ) {
+		if ( searchNeedsLocalIndex( arguments.config ) ) {
 			writeSearchIndex( pages, arguments.outputDir )
 		}
 
@@ -370,13 +371,13 @@ class {
 	 *
 	 * @projectRoot Absolute path to the project root
 	 *
-	 * @return { skipped (true when bxdocs.json's `search` is off), indexPath, pageCount }
+	 * @return { skipped (true when bxdocs.json's `search` is off, or its `searchProvider` doesn't use the local index - see SearchProviderRegistry.bx), indexPath, pageCount }
 	 */
 	struct function buildSearchIndex( required string projectRoot ) {
 		var root = normalizeRoot( arguments.projectRoot )
 		var config = variables.configLoader.load( root )
 
-		if ( !config.search ) {
+		if ( !searchNeedsLocalIndex( config ) ) {
 			return { skipped : true, indexPath : "", pageCount : 0 }
 		}
 
@@ -839,6 +840,21 @@ class {
 	}
 
 	/**
+	 * Whether this build should produce/copy bx-docs' own static search
+	 * index and lunr widget - `config.search` is the master on/off switch
+	 * (module spec section 7); `config.searchProvider.provider` then decides
+	 * whether the *local* index is actually needed (SearchProviderRegistry.bx) -
+	 * `false` only for `algolia`, which is fed from its own hosted index
+	 * instead of `search-index.json`.
+	 *
+	 * @config The site's bxdocs.json config, already defaulted/validated
+	 */
+	private boolean function searchNeedsLocalIndex( required struct config ) {
+		return arguments.config.search
+			&& variables.searchProviderRegistry.usesLocalIndex( arguments.config.searchProvider.provider )
+	}
+
+	/**
 	 * Builds the search index from already-converted pages and writes it to
 	 * `siteDir`.
 	 *
@@ -864,7 +880,7 @@ class {
 	 * @root Absolute path to the project root
 	 * @themeDir Absolute path to the resolved theme folder
 	 * @siteDir Absolute path to the build output directory
-	 * @searchEnabled Whether to copy the shared search.js widget
+	 * @searchEnabled Whether to copy the shared search.js/lunr widget - searchNeedsLocalIndex()'s own result, so this is only true for the `local` search provider (or one bx-docs doesn't otherwise know about), never `algolia`
 	 * @mermaidEnabled Whether to copy the shared mermaid-init.js widget
 	 * @mathEnabled Whether to copy the shared math-init.js (KaTeX auto-render) widget
 	 */

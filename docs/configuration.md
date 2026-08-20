@@ -22,6 +22,10 @@ Every project has one `bxdocs.json` at its root:
 		"favicon": ""
 	},
 	"search": true,
+	"searchProvider": {
+		"provider": "local",
+		"algolia": { "appId": "", "apiKey": "", "indexName": "", "insights": false }
+	},
 	"nav": [],
 	"markdown": { "enableAdmonition": true },
 	"repo": {
@@ -143,6 +147,34 @@ non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
 `true` (the default) builds a static search index and wires up the search
 box; `false` skips both entirely - no `search-index.json`, no search UI, no
 extra JS shipped. See [Search](guides/search.md).
+
+## `searchProvider`
+
+Which search UI `search: true` wires up:
+
+- `provider` - `"local"` (the default) is bx-docs' own static/client-side
+  search (`search-index.json` + lunr.js, see [Search](guides/search.md#local-the-default)).
+  `"algolia"` wires up [Algolia DocSearch](guides/search.md#algolia)
+  instead. Any other value is a project's own custom provider, wired up by
+  a `theme/` override - see [Search](guides/search.md#other-search-providers).
+- `algolia` - required when `provider` is `"algolia"`: `appId`, `apiKey`
+  (the *search-only* public API key, not an admin key) and `indexName`,
+  exactly as Algolia's own DocSearch client expects them. `insights`
+  (`false` by default) turns on DocSearch's click/conversion analytics.
+
+  ```json
+  {
+    "search": true,
+    "searchProvider": {
+      "provider": "algolia",
+      "algolia": {
+        "appId": "ABC123",
+        "apiKey": "a1b2c3d4e5f6...",
+        "indexName": "my-docs"
+      }
+    }
+  }
+  ```
 
 ## `nav`
 

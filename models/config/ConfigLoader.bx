@@ -18,6 +18,10 @@ class {
 		"baseURL"      : "/",
 		"theme"        : { "name" : "bootstrap", "options" : {}, "logo" : "", "favicon" : "" },
 		"search"       : true,
+		"searchProvider" : {
+			"provider" : "local",
+			"algolia"  : { "appId" : "", "apiKey" : "", "indexName" : "", "insights" : false }
+		},
 		"nav"          : [],
 		"markdown"     : { "enableAdmonition" : true },
 		"repo"         : { "url" : "", "editUri" : "" },
@@ -167,6 +171,8 @@ class {
 			)
 		}
 
+		validateSearchProvider( arguments.config.searchProvider ?: "" )
+
 		if ( !isBoolean( arguments.config.mermaid ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
@@ -309,6 +315,53 @@ class {
 		validateI18n( arguments.config.i18n ?: "" )
 
 		return arguments.config
+	}
+
+	/**
+	 * Validates `bxdocs.json`'s `searchProvider` block - which search UI
+	 * `search: true` wires up (module spec section 7). `local` (the
+	 * default, bx-docs' own static lunr search) needs no further settings.
+	 * `algolia` (Algolia DocSearch) requires its own `algolia.{appId,apiKey,
+	 * indexName}` - everything DocSearch's client itself requires to run.
+	 * Any other `provider` name isn't validated further here - it's a
+	 * project's own custom/plugin-supplied provider, wired up by a `theme/`
+	 * override rather than bx-docs core (see SearchProviderRegistry.bx).
+	 *
+	 * @searchProvider The merged config's own `searchProvider` value - `any`,
+	 * not `struct`, for the same reason validateI18n() takes `any` (see its
+	 * own docblock)
+	 */
+	private void function validateSearchProvider( required any searchProvider ) {
+		if ( !isStruct( arguments.searchProvider ) || !len( trim( arguments.searchProvider.provider ?: "" ) ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [searchProvider] must be an object with a non-empty [provider]"
+			)
+		}
+
+		if ( lCase( trim( arguments.searchProvider.provider ) ) != "algolia" ) {
+			return
+		}
+
+		var algolia = arguments.searchProvider.algolia ?: ""
+		if (
+			!isStruct( algolia )
+			|| !len( trim( algolia.appId ?: "" ) )
+			|| !len( trim( algolia.apiKey ?: "" ) )
+			|| !len( trim( algolia.indexName ?: "" ) )
+		) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [searchProvider.algolia] must be an object with non-empty [appId], [apiKey] and [indexName] when [searchProvider.provider] is ""algolia"""
+			)
+		}
+
+		if ( algolia.keyExists( "insights" ) && !isBoolean( algolia.insights ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [searchProvider.algolia.insights], when present, must be a boolean"
+			)
+		}
 	}
 
 	/**

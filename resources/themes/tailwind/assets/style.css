@@ -242,6 +242,11 @@
 	max-width: 260px;
 }
 
+.bxdocs-search-algolia {
+	display: flex;
+	align-items: center;
+}
+
 .repo-link svg,
 .social-link svg {
 	display: block;

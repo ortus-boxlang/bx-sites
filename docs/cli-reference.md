@@ -48,8 +48,9 @@ bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--descript
 ## `build`
 
 Render `docs/**.md` into a static site in `site/`. Also builds the search
-index (unless `search` is `false` in `bxdocs.json`) and copies theme +
-`docs/assets/**` into `site/`.
+index (unless `search` is `false` in `bxdocs.json`, or `searchProvider` is
+set to a provider - like `algolia` - that doesn't use it, see
+[Search](guides/search.md)) and copies theme + `docs/assets/**` into `site/`.
 
 ```bash
 bxDocs build

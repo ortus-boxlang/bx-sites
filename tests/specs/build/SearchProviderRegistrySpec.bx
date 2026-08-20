@@ -1,0 +1,38 @@
+/**
+ * Exercises SearchProviderRegistry.bx's own two small rules directly - the
+ * built-in provider name list and which providers need the local
+ * `search-index.json`/lunr widget (module spec section 7).
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.SearchProviderRegistry", function() {
+
+			beforeEach( function() {
+				variables.registry = new "models.build.SearchProviderRegistry@bxdocs"();
+			} );
+
+			it( "lists local and algolia as the built-in providers", function() {
+				expect( registry.getBuiltIn() ).toBe( [ "local", "algolia" ] );
+			} );
+
+			it( "uses the local index for the local provider", function() {
+				expect( registry.usesLocalIndex( "local" ) ).toBeTrue();
+			} );
+
+			it( "does not use the local index for algolia", function() {
+				expect( registry.usesLocalIndex( "algolia" ) ).toBeFalse();
+			} );
+
+			it( "is case-insensitive when checking for algolia", function() {
+				expect( registry.usesLocalIndex( "Algolia" ) ).toBeFalse();
+			} );
+
+			it( "defaults to using the local index for an unrecognized provider name", function() {
+				expect( registry.usesLocalIndex( "meilisearch" ) ).toBeTrue();
+			} );
+
+		} );
+	}
+
+}

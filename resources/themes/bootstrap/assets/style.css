@@ -348,6 +348,11 @@ a:hover {
 	max-width: 260px;
 }
 
+.bxdocs-search-algolia {
+	display: flex;
+	align-items: center;
+}
+
 .bxdocs-search-results {
 	display: none;
 	position: absolute;

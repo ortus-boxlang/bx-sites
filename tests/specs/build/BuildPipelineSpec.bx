@@ -305,6 +305,42 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( root & "/site/search-index.json" ) ).toBeFalse();
 			} );
 
+			it( "wires up Algolia DocSearch instead of the local index/widget when searchProvider.provider is algolia", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"search":true,"searchProvider":{"provider":"algolia","algolia":{"appId":"ABC123","apiKey":"secret","indexName":"my-docs"}}}'
+				);
+				fileWrite( root & "/docs/index.md", "Welcome home" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/search-index.json" ) ).toBeFalse();
+				expect( fileExists( root & "/site/assets/search.js" ) ).toBeFalse();
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).notToInclude( "bxdocs-search-input" );
+				expect( html ).notToInclude( "lunr" );
+				expect( html ).toInclude( "bxdocs-search-algolia" );
+				expect( html ).toInclude( "docsearch" );
+				expect( html ).toInclude( "ABC123" );
+				expect( html ).toInclude( "my-docs" );
+			} );
+
+			it( "buildSearchIndex() reports skipped without writing anything when searchProvider.provider is algolia", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"search":true,"searchProvider":{"provider":"algolia","algolia":{"appId":"ABC123","apiKey":"secret","indexName":"my-docs"}}}'
+				);
+				fileWrite( root & "/docs/index.md", "Welcome home" );
+
+				var result = pipeline.buildSearchIndex( root );
+
+				expect( result.skipped ).toBeTrue();
+				expect( fileExists( root & "/site/search-index.json" ) ).toBeFalse();
+			} );
+
 			it( "renders an in-page table of contents from the page's own headings", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", '<h2 id="install">Install</h2>' & char( 10 ) & '<h3 id="prereqs">Prereqs</h3>' );
