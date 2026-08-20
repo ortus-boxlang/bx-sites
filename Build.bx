@@ -89,9 +89,6 @@ class{
 			( variables.branch == "main" ? variables.buildID : "" )
 		);
 
-		println( "📦 Compiling module..." )
-		bx:execute name="boxlang" arguments="compile --source #static.buildDir# --target #static.buildDir# --includeStatic";
-
 		// zip up source
 		var destination = "#static.artifactsDir#/#variables.moduleSlug#-#variables.version#.zip";
 		println( "📦 Zipping code to [#destination#]..." )
