@@ -6,5 +6,10 @@ on:
 
 jobs:
   tests:
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
+      issues: read
     uses: ./.github/workflows/tests.yml
     secrets: inherit
