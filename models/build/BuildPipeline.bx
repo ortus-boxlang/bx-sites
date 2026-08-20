@@ -476,13 +476,18 @@ class {
 
 	/**
 	 * Adds a `toc` key (the "On this page" list, from TableOfContents.bx) to
-	 * every page, built from its already-converted `contentHtml`.
+	 * every page, built from its already-converted `contentHtml` - unless
+	 * the page's own frontmatter set `toc: false` (DocsLoader.bx's
+	 * `showToc`), in which case it's left empty, same as a page with fewer
+	 * than 2 headings already renders. A landing/hero page is the main use
+	 * case - it doesn't want a floating "On this page" box competing with
+	 * its own hero content.
 	 *
 	 * @pages Array of page structs with `contentHtml` already set
 	 */
 	private void function assignTableOfContents( required array pages ) {
 		for ( var page in arguments.pages ) {
-			page.toc = variables.tableOfContents.build( page.contentHtml )
+			page.toc = ( page.showToc ?: true ) ? variables.tableOfContents.build( page.contentHtml ) : []
 		}
 	}
 

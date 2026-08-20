@@ -22,6 +22,7 @@ class {
 	variables.openPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^:::\s*([a-zA-Z][\w-]*)\s*(.*)$" )
 	variables.attrPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(\w+)="([^"]*)"' )
 	variables.titlePattern = createObject( "java", "java.util.regex.Pattern" ).compile( '^"([^"]*)"\s*(.*)$' )
+	variables.iconResolver = new "models.build.IconResolver@bxdocs"()
 
 	/**
 	 * Pulls every top-level `::: name ... :::` directive block out of the
@@ -244,7 +245,9 @@ class {
 	/**
 	 * `::: cards` containing `::: card title="..." icon="..." href="..." image="..."`
 	 * children - a responsive grid of link cards. A card with no `href`
-	 * renders as a plain (non-clickable) card.
+	 * renders as a plain (non-clickable) card. `icon` is resolved the same
+	 * way frontmatter/nav `icon` values are (IconResolver.bx) - a plain
+	 * emoji, or a named icon (`icon="phosphor-duotone:rocket-launch"`).
 	 */
 	private string function renderCards( required struct block, required any renderer, required struct markdownOptions ) {
 		var children = this.extract( arguments.block.content ).blocks
@@ -260,7 +263,7 @@ class {
 			if ( len( trim( attrs.image ?: "" ) ) ) {
 				html &= '<img class="bxdocs-card__image" src="' & attrEscape( attrs.image ) & '" alt="">'
 			} else if ( len( trim( attrs.icon ?: "" ) ) ) {
-				html &= '<div class="bxdocs-card__icon">' & encodeForHTML( attrs.icon ) & '</div>'
+				html &= '<div class="bxdocs-card__icon">' & variables.iconResolver.resolve( attrs.icon ) & '</div>'
 			}
 			if ( len( trim( attrs.title ?: "" ) ) ) {
 				html &= '<div class="bxdocs-card__title">' & encodeForHTML( attrs.title ) & '</div>'

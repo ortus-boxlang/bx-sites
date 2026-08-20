@@ -72,6 +72,17 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( '<div class="bxdocs-card__title">Themes</div>' );
 			} );
 
+			it( "resolves a card's [icon] the same way frontmatter/nav icons are - a named icon renders as inline SVG", function() {
+				var md = "::: cards" & char( 10 ) &
+					'::: card title="Themes" icon="phosphor-duotone:palette"' & char( 10 ) & "Body." & char( 10 ) & ":::" & char( 10 ) &
+					":::";
+				var html = render( md );
+
+				expect( html ).toInclude( '<div class="bxdocs-card__icon"><svg' );
+				expect( html ).toInclude( 'class="bxdocs-icon"' );
+				expect( html ).notToInclude( "phosphor-duotone:palette" );
+			} );
+
 			it( "renders columns honoring a valid CSS width and ignoring an invalid one", function() {
 				var md = "::: columns" & char( 10 ) &
 					'::: column width="50%"' & char( 10 ) & "Left." & char( 10 ) & ":::" & char( 10 ) &

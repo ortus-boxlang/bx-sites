@@ -62,6 +62,7 @@ class {
 			description  : trim( fm.description ?: "" ),
 			order        : isNumeric( fm.order ?: "" ) ? val( fm.order ) : 999999,
 			hidden       : ( fm.hidden ?: false ) ? true : false,
+			showToc      : ( fm.toc ?: true ) ? true : false,
 			tags         : isArray( fm.tags ?: "" ) ? fm.tags : [],
 			icon         : trim( fm.icon ?: "" ),
 			summary      : trim( fm.summary ?: "" ),

@@ -116,6 +116,21 @@ class extends="testbox.system.BaseSpec" {
 				expect( pages[ 1 ].ogImage ).toBe( "assets/tagged-card.png" );
 			} );
 
+			it( "defaults showToc to true, and to false when frontmatter sets [toc] to false", function() {
+				var dir = newDocsDir();
+				fileWrite( dir & "/plain.md", "No frontmatter" );
+				fileWrite( dir & "/no-toc.md", "---" & char( 10 ) & "toc: false" & char( 10 ) & "---" & char( 10 ) & "Body" );
+
+				var pages = loader.load( dir );
+				var byPath = {};
+				for ( var page in pages ) {
+					byPath[ page.relativePath ] = page;
+				}
+
+				expect( byPath[ "plain.md" ].showToc ).toBeTrue();
+				expect( byPath[ "no-toc.md" ].showToc ).toBeFalse();
+			} );
+
 			it( "excludes docs/assets/** from the loaded pages", function() {
 				var dir = newDocsDir();
 				directoryCreate( dir & "/assets", true, true );
