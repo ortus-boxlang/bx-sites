@@ -48,6 +48,16 @@
 		return html
 	}
 
+	function renderLocaleSwitcher( required array locales, required string currentLocale ) {
+		var html = '<select class="locale-switcher form-select form-select-sm" onchange="location.href=this.value" aria-label="Language">'
+		for ( var l in arguments.locales ) {
+			var selected = l.code == arguments.currentLocale ? " selected" : ""
+			html &= '<option value="' & encodeForHTML( l.url ) & '"' & selected & '>' & encodeForHTML( l.label ) & '</option>'
+		}
+		html &= '</select>'
+		return html
+	}
+
 	// resolves a bxdocs.json asset path (logo/favicon/ogImage/extraCss/extraJs) - left
 	// alone when it's already an absolute URL, otherwise prefixed with basePath
 	function resolveAssetUrl( required string url ) {
@@ -95,7 +105,7 @@
 	variables.mathEnabled = ( variables.siteConfig.math ?: false ) ? true : false
 </bx:script>
 <bx:output><!doctype html>
-<html lang="en">
+<html lang="#encodeForHTML( variables.currentLocale.len() ? variables.currentLocale : 'en' )#" dir="#encodeForHTML( variables.currentLocaleDir )#">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -152,6 +162,8 @@
 </bx:output><bx:if condition="#variables.searchEnabled#"><bx:include template="#variables.themeDir#/search.bxm"></bx:if><bx:output>
 </bx:output><bx:if condition="#variables.versions.len() gt 1#"><bx:output>
 				#renderVersionSwitcher( variables.versions, variables.currentVersion )#
+</bx:output></bx:if><bx:if condition="#variables.locales.len() gt 1#"><bx:output>
+				#renderLocaleSwitcher( variables.locales, variables.currentLocale )#
 </bx:output></bx:if><bx:if condition="#len( variables.repoUrl )#"><bx:output>
 				<a class="repo-link" href="#encodeForHTML( variables.repoUrl )#" target="_blank" rel="noopener noreferrer" aria-label="Repository" title="Repository">#bxdocsIcon( "github" )#</a>
 </bx:output></bx:if><bx:output>

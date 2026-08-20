@@ -31,7 +31,8 @@ class {
 		"generateOgImages" : false,
 		"extraCss"     : [],
 		"extraJs"      : [],
-		"plugins"      : []
+		"plugins"      : [],
+		"i18n"         : { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] }
 	}
 
 	/**
@@ -305,7 +306,94 @@ class {
 			}
 		}
 
+		validateI18n( arguments.config.i18n ?: "" )
+
 		return arguments.config
+	}
+
+	/**
+	 * Validates `bxdocs.json`'s `i18n` block (module spec section 4) - the
+	 * `docs/i18n/<code>/` locale-folder convention's own display/routing
+	 * metadata. An empty `locales` array (the default) means the project
+	 * isn't multilingual at all - no `docs/i18n/` folder is required to
+	 * exist, and none of this is otherwise consulted.
+	 *
+	 * @i18n The merged config's own `i18n` value - `any`, not `struct`, so a
+	 * user-supplied non-struct value (mergeDefaults() only overwrites the
+	 * default wholesale when it isn't a struct - see its own docblock)
+	 * fails with a clean BxDocs.InvalidConfig below, rather than a raw
+	 * BoxLang type-mismatch error from the function signature itself.
+	 */
+	private void function validateI18n( required any i18n ) {
+		if ( !isStruct( arguments.i18n ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [i18n], when present, must be an object"
+			)
+		}
+
+		validateLocale( arguments.i18n.defaultLocale ?: "", "i18n.defaultLocale" )
+
+		if ( !isArray( arguments.i18n.locales ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [i18n.locales], when present, must be an array"
+			)
+		}
+
+		var seenCodes = [ lCase( arguments.i18n.defaultLocale.code ) ]
+		for ( var locale in arguments.i18n.locales ) {
+			validateLocale( locale, "i18n.locales" )
+			var code = lCase( trim( locale.code ) )
+			if ( seenCodes.contains( code ) ) {
+				throw(
+					type    = "BxDocs.InvalidConfig",
+					message = "bxdocs.json [i18n.locales] has a duplicate locale code [#locale.code#] (also used by [i18n.defaultLocale] or an earlier entry)"
+				)
+			}
+			seenCodes.append( code )
+		}
+	}
+
+	/**
+	 * Validates a single locale entry - `i18n.defaultLocale`, or one entry
+	 * of `i18n.locales`. `code` doubles as a `docs/i18n/<code>/` folder name
+	 * and a URL path segment, so it's restricted to letters/digits/hyphens
+	 * (BCP-47-shaped, e.g. `es`, `pt-BR`, `zh-Hans` - no `/`/`.` a path
+	 * could ever escape with).
+	 *
+	 * @locale The locale struct to validate
+	 * @path Where it lives in bxdocs.json, for the error message
+	 */
+	private void function validateLocale( required any locale, required string path ) {
+		if ( !isStruct( arguments.locale ) || !len( trim( arguments.locale.code ?: "" ) ) || !len( trim( arguments.locale.label ?: "" ) ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [#arguments.path#] must be an object with a non-empty [code] and [label]"
+			)
+		}
+
+		if ( !reFind( "^[A-Za-z][A-Za-z0-9\-]*$", trim( arguments.locale.code ) ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [#arguments.path#.code] [#arguments.locale.code#] must contain only letters, digits and hyphens"
+			)
+		}
+
+		var dir = arguments.locale.dir ?: "ltr"
+		if ( !listFindNoCase( "ltr,rtl", dir ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [#arguments.path#.dir], when present, must be one of: ltr, rtl"
+			)
+		}
+
+		if ( arguments.locale.keyExists( "strings" ) && !isStruct( arguments.locale.strings ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [#arguments.path#.strings], when present, must be an object"
+			)
+		}
 	}
 
 	/**

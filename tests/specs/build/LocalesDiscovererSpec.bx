@@ -1,0 +1,64 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.LocalesDiscoverer", function() {
+
+			beforeEach( function() {
+				variables.discoverer = new "models.build.LocalesDiscoverer@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newDocsDir() {
+				var dir = createTempDirectory( prefix = "bxdocs-localesdiscoverer-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "returns an empty array when docs/i18n/ doesn't exist", function() {
+				var docsDir = newDocsDir();
+
+				expect( discoverer.discover( docsDir ) ).toBeArray();
+				expect( discoverer.discover( docsDir ).len() ).toBe( 0 );
+			} );
+
+			it( "returns an empty array when docs/i18n/ exists but is empty", function() {
+				var docsDir = newDocsDir();
+				directoryCreate( docsDir & "/i18n", true, true );
+
+				expect( discoverer.discover( docsDir ).len() ).toBe( 0 );
+			} );
+
+			it( "lists each direct subfolder of docs/i18n/, ignoring loose files", function() {
+				var docsDir = newDocsDir();
+				directoryCreate( docsDir & "/i18n/es", true, true );
+				directoryCreate( docsDir & "/i18n/fr", true, true );
+				fileWrite( docsDir & "/i18n/readme.txt", "not a locale" );
+
+				var locales = discoverer.discover( docsDir );
+
+				expect( locales.len() ).toBe( 2 );
+				expect( locales ).toInclude( "es" );
+				expect( locales ).toInclude( "fr" );
+			} );
+
+			it( "sorts alphabetically", function() {
+				var docsDir = newDocsDir();
+				directoryCreate( docsDir & "/i18n/fr", true, true );
+				directoryCreate( docsDir & "/i18n/ar", true, true );
+				directoryCreate( docsDir & "/i18n/es", true, true );
+
+				expect( discoverer.discover( docsDir ) ).toBe( [ "ar", "es", "fr" ] );
+			} );
+
+		} );
+	}
+
+}

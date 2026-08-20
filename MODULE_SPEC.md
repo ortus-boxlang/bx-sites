@@ -60,7 +60,7 @@ site/                  # build output (generated)
 
 ## 4. Config file — bxdocs.json
 
-Site name, description, nav (auto-inferred from folder/file structure by default; an explicit `nav` array — inline or in a project's own `docs/nav.json` — overrides that inference entirely), theme name + theme options, base URL, search on/off, `mermaid`/`math` on/off, a `plugins` array of BoxLang module names to activate, markdown-extension passthrough settings (table options, anchor links, YouTube transformer, code style — all sourced from bx-markdown's existing option set), and per-page frontmatter (`tags`/`icon`/`summary`/`ogImage`, on top of `title`/`order`/`hidden`/`description`).
+Site name, description, nav (auto-inferred from folder/file structure by default; an explicit `nav` array — inline or in a project's own `docs/nav.json` — overrides that inference entirely), theme name + theme options, base URL, search on/off, `mermaid`/`math` on/off, a `plugins` array of BoxLang module names to activate, an `i18n` block (default-locale/locale display metadata for the `docs/i18n/<code>/` convention), markdown-extension passthrough settings (table options, anchor links, YouTube transformer, code style — all sourced from bx-markdown's existing option set), and per-page frontmatter (`tags`/`icon`/`summary`/`ogImage`, on top of `title`/`order`/`hidden`/`description`).
 
 ## 5. Core pipeline
 
@@ -130,7 +130,8 @@ None currently blocking. Deferred to later phases:
 - One-command GitHub Pages publish (`gh-deploy`) — **done**, see section 2's verb table
 - Content tabs, math (KaTeX), and fenced-code `hl_lines`/`linenums`/`title` annotations — **done**, see section 5 step 2 and `bxdocs.json`'s `math` key
 - General-purpose plugin system, based on BoxLang's own module system — **done**: a plugin is any BoxLang module exposing a `models/BxDocsPlugin.bx` class, opted in by module name via `bxdocs.json`'s `plugins` array (`PluginLoader.bx`). Five optional hooks — `onConfig`/`onPageMarkdown`/`onPageHtml`/`onNav`/`onBuildComplete` — cover the config, per-page markdown/HTML, nav tree, and post-build stages. See `docs/guides/plugins.md` and the worked example at `examples/hello-plugin/`
-- i18n, a blog/tags-plugin-equivalent beyond the simple tags index, and self-hosting third-party CSS/JS (Bootstrap, highlight.js, lunr, Alpine, Mermaid, KaTeX still load from CDN at view time) remain deferred
+- i18n (multi-language docs) — **done**, see `docs/i18n/<code>/` (LocalesDiscoverer.bx, mirroring the versions-by-convention pattern) and `bxdocs.json`'s `i18n` key. A locale not yet translating a given page falls back to the default locale's own content, flagged; nav always mirrors the default locale's own shape. Theme chrome strings (not page content) staying English-only regardless of locale, and versions/locales not composing, are documented v1 limits — see `docs/guides/i18n.md`
+- A blog/tags-plugin-equivalent beyond the simple tags index, and self-hosting third-party CSS/JS (Bootstrap, highlight.js, lunr, Alpine, Mermaid, KaTeX still load from CDN at view time) remain deferred
 
 ## 9. Phased task breakdown
 

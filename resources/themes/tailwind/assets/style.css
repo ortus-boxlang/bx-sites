@@ -61,6 +61,12 @@
 	max-width: 6.5rem;
 }
 
+.locale-switcher {
+	flex-shrink: 0;
+	width: auto;
+	max-width: 6.5rem;
+}
+
 .navbar-row {
 	flex-wrap: nowrap;
 }
@@ -122,7 +128,7 @@
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	margin-left: auto;
+	margin-inline-start: auto;
 	min-width: 0;
 }
 
