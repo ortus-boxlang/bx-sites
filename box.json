@@ -44,14 +44,12 @@
     },
     "ignore":[
         "**/.*",
-        "settings.gradle",
-        "gradlew.bat",
-        "gradlew",
-        "build.gradle",
-        "/src/**",
-        "gradle/**",
+        "/build/**",
+        "Build.bx",
+        "/tests/**",
         "/examples/**",
-        "/apidocs/**"
+        "/apidocs/**",
+        "/site/**"
     ],
     "installPaths":{
         "testbox":"testbox/"

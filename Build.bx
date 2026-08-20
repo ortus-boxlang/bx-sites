@@ -6,19 +6,20 @@ class{
 	property name="branch";
 
 	static {
-		// Source Excludes Not Added to final binary
+		// Source Excludes Not Added to final binary - matched against each
+		// top-level item's bare name (anchored), not the full/relative path.
 		excludes = [
 	        "^\..*",
-	        "build",
-	        "Build.bx",
-			"docker-compose.yml",
-	        "SetupTemplate.bx",
-			"server-.*\.json",
-			"tests",
-			"site",
-			"\.cache",
-			"examples",
-			"apidocs"
+	        "^build$",
+	        "^Build\.bx$",
+			"^docker-compose\.yml$",
+	        "^SetupTemplate\.bx$",
+			"^server-.*\.json$",
+			"^tests$",
+			"^site$",
+			"^\.cache$",
+			"^examples$",
+			"^apidocs$"
 	    ];
 	    // Current working directories
 	    cwd = server.cli.executionPath & "/";
@@ -88,9 +89,6 @@ class{
 			( variables.branch == "main" ? variables.buildID : "" )
 		);
 
-		println( "📦 Compiling module..." )
-		bx:execute name="boxlang" arguments="compile --target #static.buildDir#";
-
 		// zip up source
 		var destination = "#static.artifactsDir#/#variables.moduleSlug#-#variables.version#.zip";
 		println( "📦 Zipping code to [#destination#]..." )
@@ -98,6 +96,7 @@ class{
 			destination : destination,
 			format : "zip",
 			source : static.buildDir,
+			includeBaseFolder : false,
 			overwrite : true,
 			recurse : true
 		)
@@ -133,13 +132,8 @@ class{
 			false,
 			"path",
 			function( path ){
-	            var isExcluded = false
-	            static.excludes.each( ( item ) => {
-					if ( path.replaceNoCase( static.cwd, "", "all" ).reFindNoCase( item ) ) {
-	                    isExcluded = true
-	                }
-	            } )
-	            return !isExcluded
+				var name = getFileFromPath( path )
+				return !static.excludes.some( pattern => name.reFindNoCase( pattern ) )
 			}
 		).each( ( item ) => {
 			// Copy to target
