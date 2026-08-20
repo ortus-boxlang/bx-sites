@@ -107,6 +107,40 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( '<div class="bxdocs-step__title">Build</div>' );
 			} );
 
+			it( "flags a step with one of the semantic marker colors via its own [color] attribute", function() {
+				var md = "::: stepper" & char( 10 ) &
+					'::: step "Install" color="success"' & char( 10 ) & "Step one." & char( 10 ) & ":::" & char( 10 ) &
+					'::: step "Wipe data" color="danger"' & char( 10 ) & "Step two." & char( 10 ) & ":::" & char( 10 ) &
+					'::: step "Optional" color="warning"' & char( 10 ) & "Step three." & char( 10 ) & ":::" & char( 10 ) &
+					":::";
+				var html = render( md );
+
+				expect( html ).toInclude( '<div class="bxdocs-step__marker bxdocs-step__marker--success">1</div>' );
+				expect( html ).toInclude( '<div class="bxdocs-step__marker bxdocs-step__marker--danger">2</div>' );
+				expect( html ).toInclude( '<div class="bxdocs-step__marker bxdocs-step__marker--warning">3</div>' );
+			} );
+
+			it( "is case-insensitive on a step's [color] attribute", function() {
+				var md = "::: stepper" & char( 10 ) &
+					'::: step "Install" color="SUCCESS"' & char( 10 ) & "Step one." & char( 10 ) & ":::" & char( 10 ) &
+					":::";
+				var html = render( md );
+
+				expect( html ).toInclude( '<div class="bxdocs-step__marker bxdocs-step__marker--success">1</div>' );
+			} );
+
+			it( "falls back to the default marker for a step with no/unrecognized [color]", function() {
+				var md = "::: stepper" & char( 10 ) &
+					'::: step "Install"' & char( 10 ) & "Step one." & char( 10 ) & ":::" & char( 10 ) &
+					'::: step "Build" color="purple"' & char( 10 ) & "Step two." & char( 10 ) & ":::" & char( 10 ) &
+					":::";
+				var html = render( md );
+
+				expect( html ).toInclude( '<div class="bxdocs-step__marker">1</div>' );
+				expect( html ).toInclude( '<div class="bxdocs-step__marker">2</div>' );
+				expect( html ).notToInclude( "bxdocs-step__marker--purple" );
+			} );
+
 			it( "recurses into a directive nested inside another block's content", function() {
 				var md = '::: expandable "Outer"' & char( 10 ) &
 					"::: cards" & char( 10 ) &

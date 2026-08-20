@@ -44,6 +44,16 @@
 	--bxdocs-step-marker-bg: var( --bxdocs-accent );
 	--bxdocs-step-marker-text: #04121a;
 	--bxdocs-step-line: rgba( 0, 0, 0, 0.12 );
+	/* `::: step color="..."` (module spec's directive blocks) - a fixed
+	   bg/text contrast pair each, so they read the same regardless of
+	   light/dark mode (no [data-theme="dark"] override needed, unlike the
+	   theme-brand-driven marker/line tokens above). */
+	--bxdocs-step-success-bg: #16a34a;
+	--bxdocs-step-success-text: #ffffff;
+	--bxdocs-step-warning-bg: #f59e0b;
+	--bxdocs-step-warning-text: #1a1300;
+	--bxdocs-step-danger-bg: #dc2626;
+	--bxdocs-step-danger-text: #ffffff;
 }
 
 /* Near-black surface with a mint/teal accent, rather than the blue-gray
@@ -1153,6 +1163,21 @@ a.bxdocs-card:hover {
 	font-weight: 700;
 	font-size: 0.85rem;
 	z-index: 1;
+}
+
+.bxdocs-step__marker--success {
+	background: var( --bxdocs-step-success-bg );
+	color: var( --bxdocs-step-success-text );
+}
+
+.bxdocs-step__marker--warning {
+	background: var( --bxdocs-step-warning-bg );
+	color: var( --bxdocs-step-warning-text );
+}
+
+.bxdocs-step__marker--danger {
+	background: var( --bxdocs-step-danger-bg );
+	color: var( --bxdocs-step-danger-text );
 }
 
 .bxdocs-step__content {

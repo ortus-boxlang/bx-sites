@@ -227,23 +227,30 @@ The `bootstrap` theme's own set (`resources/themes/bootstrap/assets/style.css`)
 is `--bxdocs-gradient-start`/`-end`, `--bxdocs-accent`, `--bxdocs-bg`,
 `--bxdocs-text`, `--bxdocs-sidebar-bg`, `--bxdocs-sidebar-text`,
 `--bxdocs-border`, `--bxdocs-link`, `--bxdocs-link-hover`,
-`--bxdocs-code-bg`, `--bxdocs-step-marker-bg`, `--bxdocs-step-marker-text`
-and `--bxdocs-step-line` - `material` and `tailwind` follow the same
-`--bxdocs-*` naming with their own small variations. Anything beyond
-color/font (layout, adding/removing chrome) needs a real override or a
-custom theme - see below.
+`--bxdocs-code-bg`, `--bxdocs-step-marker-bg`, `--bxdocs-step-marker-text`,
+`--bxdocs-step-line`, `--bxdocs-step-success-bg`/`-text`,
+`--bxdocs-step-warning-bg`/`-text` and `--bxdocs-step-danger-bg`/`-text` -
+`material` and `tailwind` follow the same `--bxdocs-*` naming with their
+own small variations. Anything beyond color/font (layout, adding/removing
+chrome) needs a real override or a custom theme - see below.
 
-The last three back the [`::: stepper`/`::: step`](markdown.md#stepper) directive block -
-`--bxdocs-step-marker-bg`/`-text` are the numbered circle's background/text
-color (`bootstrap`/`material` default it to the theme's own
-`--bxdocs-accent`; `tailwind` uses a dedicated teal/mint pair since it
-doesn't have a single shared accent token), and `--bxdocs-step-line` is
-the connecting line between steps:
+The rest back the [`::: stepper`/`::: step`](markdown.md#stepper) directive
+block - `--bxdocs-step-marker-bg`/`-text` are the default numbered circle's
+background/text color (`bootstrap`/`material` default it to the theme's
+own `--bxdocs-accent`; `tailwind` uses a dedicated teal/mint pair since it
+doesn't have a single shared accent token), `--bxdocs-step-line` is the
+connecting line between steps, and the `-success`/`-warning`/`-danger`
+pairs back a step's own optional `color="..."` attribute - unlike the
+default marker, these three are the same fixed bg/text pair in both
+light and dark mode (a self-contained badge, not tied to the theme's own
+brand accent), so there's no `[data-theme="dark"]` override to redeclare:
 
 ```css
 :root {
 	--bxdocs-step-marker-bg: #7C3AED;
 	--bxdocs-step-marker-text: #fff;
+	--bxdocs-step-success-bg: #059669;
+	--bxdocs-step-success-text: #fff;
 }
 
 [data-theme="dark"] {

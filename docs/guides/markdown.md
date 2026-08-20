@@ -393,8 +393,39 @@ A numbered, connected sequence of steps:
 :::
 :::
 
-The numbered marker and connecting line are themeable independently of the
-rest of the palette - see [Customizing colors](themes.md#customizing-colors-without-a-theme-override).
+A step's own optional `color` attribute flags its marker with one of four
+semantic colors - the default (no `color`), `success`, `warning` or
+`danger` - independent of the step's position in the sequence:
+
+```markdown
+::: stepper
+::: step "Back up your data" color="success"
+Routine, safe to run any time.
+:::
+::: step "Optional: enable telemetry" color="warning"
+Skip this one if you're not sure.
+:::
+::: step "Delete the old install" color="danger"
+Irreversible - make sure the backup above finished first.
+:::
+:::
+```
+
+::: stepper
+::: step "Back up your data" color="success"
+Routine, safe to run any time.
+:::
+::: step "Optional: enable telemetry" color="warning"
+Skip this one if you're not sure.
+:::
+::: step "Delete the old install" color="danger"
+Irreversible - make sure the backup above finished first.
+:::
+:::
+
+The numbered marker, connecting line, and each of the three `color`
+palettes above are themeable independently of the rest of the site's
+palette, via CSS custom properties - see [Customizing colors](themes.md#customizing-colors-without-a-theme-override).
 
 ### File
 
