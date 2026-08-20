@@ -34,5 +34,13 @@
 	"mermaid": true,
 	"math": true,
 	"ogImage": "assets/og-image.png",
-	"extraJs": [ "assets/theme-switcher.js" ]
+	"extraJs": [ "assets/theme-switcher.js" ],
+	"i18n": {
+		"defaultLocale": { "code": "en", "label": "English" },
+		"locales": [
+			{ "code": "es", "label": "Español" },
+			{ "code": "it", "label": "Italiano" },
+			{ "code": "de", "label": "Deutsch" }
+		]
+	}
 }
