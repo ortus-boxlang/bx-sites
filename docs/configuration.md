@@ -404,13 +404,15 @@ convention - a locale builds automatically once its folder exists;
 `i18n` just supplies its display label/direction for the language
 switcher.
 
-- `i18n.defaultLocale` - `{ "code", "label" }` for the project's own
+- `i18n.defaultLocale` - `{ "code", "label", "flag" }` for the project's own
   regular `docs/` tree, defaulting to `{ "code": "en", "label": "English" }`.
   Only needs setting when your default locale isn't English.
-- `i18n.locales` - `[]` (the default) - an array of `{ "code", "label", "dir" }`
+- `i18n.locales` - `[]` (the default) - an array of `{ "code", "label", "dir", "flag" }`
   for every other locale. `code` doubles as the `docs/i18n/<code>/` folder
   name and the built URL prefix - letters/digits/hyphens only (`es`,
-  `pt-BR`, `zh-Hans`). `dir` is `"ltr"` (the default) or `"rtl"`.
+  `pt-BR`, `zh-Hans`). `dir` is `"ltr"` (the default) or `"rtl"`. `flag` is
+  an optional emoji override for the language switcher's flag icon - most
+  common codes already resolve to a sensible flag on their own.
 
 ```json
 {

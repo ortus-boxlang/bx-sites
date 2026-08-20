@@ -1044,19 +1044,22 @@ class extends="testbox.system.BaseSpec" {
 				pipeline.build( root );
 
 				var mainHtml = fileRead( root & "/site/index.html" );
-				expect( mainHtml ).toInclude( "locale-switcher" );
-				expect( mainHtml ).toInclude( ">English<" );
+				expect( mainHtml ).toInclude( "locale-dropdown" );
+				expect( mainHtml ).toInclude( "🇺🇸" );
+				expect( mainHtml ).toInclude( "English" );
+				expect( mainHtml ).toInclude( "🇪🇸" );
 				// encodeForHTML() entity-escapes accented characters - see the
 				// "gives every locale the exact same nav shape" test above.
-				expect( mainHtml ).toInclude( ">Espa&ntilde;ol<" );
+				expect( mainHtml ).toInclude( "Espa&ntilde;ol" );
 
 				var esHtml = fileRead( root & "/site/es/index.html" );
-				expect( esHtml ).toInclude( "locale-switcher" );
+				expect( esHtml ).toInclude( "locale-dropdown" );
+				expect( esHtml ).toInclude( "🇪🇸" );
 
 				var monolingualRoot = newProject();
 				fileWrite( monolingualRoot & "/docs/index.md", "Home" );
 				pipeline.build( monolingualRoot );
-				expect( fileRead( monolingualRoot & "/site/index.html" ) ).notToInclude( "locale-switcher" );
+				expect( fileRead( monolingualRoot & "/site/index.html" ) ).notToInclude( "locale-dropdown" );
 			} );
 
 			it( "stamps <html lang dir> for the default and every locale build, rtl included", function() {
@@ -1149,7 +1152,7 @@ class extends="testbox.system.BaseSpec" {
 
 				pipeline.build( root );
 
-				expect( fileRead( root & "/site/versions/1.0/index.html" ) ).notToInclude( "locale-switcher" );
+				expect( fileRead( root & "/site/versions/1.0/index.html" ) ).notToInclude( "locale-dropdown" );
 				expect( fileRead( root & "/site/es/index.html" ) ).notToInclude( "version-switcher" );
 			} );
 
