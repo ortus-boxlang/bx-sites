@@ -157,8 +157,8 @@ class extends="testbox.system.BaseSpec" {
 				expect( config.searchProvider.provider ).toBe( "meilisearch" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [searchProvider] has no [provider]", function() {
-				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{}}' );
+			it( "throws BxDocs.InvalidConfig when [searchProvider.provider] is blank", function() {
+				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":""}}' );
 				expect( function() {
 					loader.load( dir );
 				} ).toThrow( "BxDocs.InvalidConfig" );
@@ -179,7 +179,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "throws BxDocs.InvalidConfig when [searchProvider.algolia.insights] isn't a boolean", function() {
-				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":"algolia","algolia":{"appId":"A","apiKey":"B","indexName":"C","insights":"yes"}}}' );
+				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":"algolia","algolia":{"appId":"A","apiKey":"B","indexName":"C","insights":["not","a","boolean"]}}}' );
 				expect( function() {
 					loader.load( dir );
 				} ).toThrow( "BxDocs.InvalidConfig" );

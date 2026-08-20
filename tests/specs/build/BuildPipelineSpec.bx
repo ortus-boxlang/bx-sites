@@ -322,9 +322,13 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).notToInclude( "bxdocs-search-input" );
 				expect( html ).notToInclude( "lunr" );
 				expect( html ).toInclude( "bxdocs-search-algolia" );
-				expect( html ).toInclude( "docsearch" );
+				expect( html ).toInclude( "docsearch(" );
 				expect( html ).toInclude( "ABC123" );
-				expect( html ).toInclude( "my-docs" );
+				// encodeForJavaScript() hex-escapes non-alphanumerics for safe JS-string
+				// embedding - "my-docs" comes out as "my\x2Ddocs" in the rendered
+				// <script>, which the browser's own JS parser reads back as "my-docs"
+				// at runtime; asserting the raw substring "my-docs" here would be wrong.
+				expect( html ).toInclude( "my\x2Ddocs" );
 			} );
 
 			it( "buildSearchIndex() reports skipped without writing anything when searchProvider.provider is algolia", function() {
