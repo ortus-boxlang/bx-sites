@@ -375,13 +375,16 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
-			it( "renders collapsible <details>/<summary> nav sections only when [theme.options.navCollapsible] is true, across every built-in theme", function() {
+			it( "renders a .nav-toggle button per nav section only when [theme.options.navCollapsible] is true, across every built-in theme - for both a linkless group and a linked one", function() {
 				var root = newProjectRoot();
-				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var page = { title : "My Page", contentHtml : "<p>Body</p>", urlPath : "index.html" };
 				var nav = [
 					{ title : "My Page", url : "index.html", order : 1, children : [] },
 					{ title : "Guides", url : "", order : 2, children : [
 						{ title : "Setup", url : "guides/setup/index.html", order : 1, children : [] }
+					] },
+					{ title : "API", url : "api/index.html", order : 3, children : [
+						{ title : "Reference", url : "api/reference/index.html", order : 1, children : [] }
 					] }
 				];
 
@@ -389,13 +392,39 @@ class extends="testbox.system.BaseSpec" {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 
 					var flatHtml = renderer.renderPage( page, nav, { name : "My Site" }, themeDir );
-					expect( flatHtml ).notToInclude( "<details" );
+					expect( flatHtml ).notToInclude( 'class="nav-toggle"' );
 
 					var collapsibleConfig = { name : "My Site", theme : { options : { navCollapsible : true } } };
 					var collapsibleHtml = renderer.renderPage( page, nav, collapsibleConfig, themeDir );
-					expect( collapsibleHtml ).toInclude( "<details" );
-					expect( collapsibleHtml ).toInclude( "<summary" );
+					expect( collapsibleHtml ).toInclude( 'class="nav-toggle"' );
 					expect( collapsibleHtml ).toInclude( ">Guides<" );
+					expect( collapsibleHtml ).toInclude( ">API<" );
+				}
+			} );
+
+			it( "starts a collapsible section open when it contains the current page, even when [navExpandAll] is false, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = { title : "Setup", contentHtml : "<p>Body</p>", urlPath : "guides/setup/index.html" };
+				var nav = [
+					{ title : "My Page", url : "index.html", order : 1, children : [] },
+					{ title : "Guides", url : "", order : 2, children : [
+						{ title : "Setup", url : "guides/setup/index.html", order : 1, children : [] }
+					] },
+					{ title : "API", url : "api/index.html", order : 3, children : [
+						{ title : "Reference", url : "api/reference/index.html", order : 1, children : [] }
+					] }
+				];
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					var config = { name : "My Site", theme : { options : { navCollapsible : true, navExpandAll : false } } };
+					var html = renderer.renderPage( page, nav, config, themeDir );
+
+					// "Guides" contains the active page - stays open (aria-expanded="true", no `hidden` on its child <ul>)
+					expect( html ).toInclude( 'aria-expanded="true" aria-label="Toggle Guides section"' );
+
+					// "API" does not contain the active page and navExpandAll is false - stays collapsed
+					expect( html ).toInclude( 'aria-expanded="false" aria-label="Toggle API section"' );
 				}
 			} );
 
