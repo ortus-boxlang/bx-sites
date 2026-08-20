@@ -10,7 +10,15 @@
  *
  * Not a bx-docs feature - a project-specific `extraJs` file, wired up the
  * same way any project's own custom script would be (see the Themes guide,
- * "Customizing colors without a theme override").
+ * "Customizing colors without a theme override"). Rendered as an icon
+ * trigger + dropdown menu (reusing `.theme-toggle`'s own square button
+ * sizing, so it sits flush with the rest of the icon row) rather than a
+ * plain `<select>`, matching the header's own icon-first language - the
+ * same GitBook-style pattern the built-in locale switcher uses. Since this
+ * file has no access to the module's own theme stylesheets (it's
+ * project-only), its dropdown menu styling is self-contained: a small
+ * `<style>` tag injected once, keyed off the same `data-theme` attribute
+ * every built-in theme already sets on `<html>` for dark mode.
  *
  * `ROOT` is a placeholder - scripts/build-multi-theme.sh substitutes it
  * with the site's real root-relative base path (e.g. "/bx-docs/" or
@@ -22,9 +30,9 @@
 	var ROOT = "/bx-docs/development/";
 
 	var VARIANTS = [
-		{ key: "bootstrap", label: "Bootstrap (default)", prefix: "" },
-		{ key: "material", label: "Material", prefix: "theme/material/" },
-		{ key: "tailwind", label: "Tailwind", prefix: "theme/tailwind/" }
+		{ key: "bootstrap", label: "Bootstrap", prefix: "", dot: "#7952b3" },
+		{ key: "material", label: "Material", prefix: "theme/material/", dot: "#00dbff" },
+		{ key: "tailwind", label: "Tailwind", prefix: "theme/tailwind/", dot: "#38bdf8" }
 	];
 
 	function currentVariant() {
@@ -45,6 +53,29 @@
 		return ROOT + variant.prefix + rest + window.location.search + window.location.hash;
 	}
 
+	function injectStyle() {
+		if ( document.getElementById( "bxdocs-variant-switcher-style" ) ) {
+			return;
+		}
+		var style = document.createElement( "style" );
+		style.id = "bxdocs-variant-switcher-style";
+		style.textContent =
+			".bxdocs-variant-switcher{position:relative;display:inline-flex;}" +
+			".bxdocs-variant-menu{position:absolute;top:calc(100% + 0.35rem);right:0;z-index:1000;" +
+				"min-width:11rem;margin:0;padding:0.35rem;list-style:none;border-radius:8px;" +
+				"background:#ffffff;color:#212529;border:1px solid rgba(0,0,0,0.15);" +
+				"box-shadow:0 8px 24px rgba(0,0,0,0.18);}" +
+			"html[data-theme=\"dark\"] .bxdocs-variant-menu{background:#1b2027;color:#e6edf3;" +
+				"border-color:rgba(255,255,255,0.15);}" +
+			".bxdocs-variant-item{display:flex;align-items:center;gap:0.5rem;width:100%;" +
+				"padding:0.4rem 0.6rem;border:0;border-radius:6px;background:transparent;" +
+				"color:inherit;font-size:0.85rem;text-align:left;cursor:pointer;}" +
+			".bxdocs-variant-item:hover{background:rgba(128,128,128,0.15);}" +
+			".bxdocs-variant-item[aria-current=\"true\"]{font-weight:600;}" +
+			".bxdocs-variant-dot{width:0.6rem;height:0.6rem;border-radius:50%;flex:0 0 auto;}";
+		document.head.appendChild( style );
+	}
+
 	function init() {
 		// A placeholder left un-substituted (e.g. a normal `boxlang module:bxDocs
 		// build` run of this same project, outside the multi-theme script) means
@@ -63,28 +94,79 @@
 			return;
 		}
 
-		var select = document.createElement( "select" );
-		select.className = "bxdocs-theme-variant-switcher";
-		select.setAttribute( "aria-label", "Switch docs theme" );
-		select.style.cssText = "margin-left:0.5rem;padding:0.3rem 0.5rem;border-radius:6px;" +
-			"border:1px solid rgba(128,128,128,0.4);background:transparent;color:inherit;font-size:0.85rem;";
+		injectStyle();
+
+		var wrapper = document.createElement( "div" );
+		wrapper.className = "bxdocs-variant-switcher";
+
+		var trigger = document.createElement( "button" );
+		trigger.type = "button";
+		trigger.className = "theme-toggle";
+		trigger.setAttribute( "aria-haspopup", "true" );
+		trigger.setAttribute( "aria-expanded", "false" );
+		trigger.setAttribute( "aria-label", "Switch docs theme (current: " + current.variant.label + ")" );
+		trigger.textContent = "🎨"; // palette emoji - "pick a look", same emoji-icon language as the locale flags
+
+		var menu = document.createElement( "ul" );
+		menu.className = "bxdocs-variant-menu";
+		menu.setAttribute( "role", "menu" );
+		menu.hidden = true;
 
 		VARIANTS.forEach( function ( variant ) {
-			var option = document.createElement( "option" );
-			option.value = variant.key;
-			option.textContent = variant.label;
-			option.selected = variant.key === current.variant.key;
-			select.appendChild( option );
+			var li = document.createElement( "li" );
+			li.setAttribute( "role", "none" );
+
+			var item = document.createElement( "button" );
+			item.type = "button";
+			item.className = "bxdocs-variant-item";
+			item.setAttribute( "role", "menuitem" );
+			if ( variant.key === current.variant.key ) {
+				item.setAttribute( "aria-current", "true" );
+			}
+
+			var dot = document.createElement( "span" );
+			dot.className = "bxdocs-variant-dot";
+			dot.style.background = variant.dot;
+			dot.setAttribute( "aria-hidden", "true" );
+
+			item.appendChild( dot );
+			item.appendChild( document.createTextNode( variant.label + ( variant.key === "bootstrap" ? " (default)" : "" ) ) );
+
+			item.addEventListener( "click", function () {
+				window.location.href = targetUrl( variant, current.rest );
+			} );
+
+			li.appendChild( item );
+			menu.appendChild( li );
 		} );
 
-		select.addEventListener( "change", function () {
-			var chosen = VARIANTS.filter( function ( v ) {
-				return v.key === select.value;
-			} )[ 0 ];
-			window.location.href = targetUrl( chosen, current.rest );
+		function closeMenu() {
+			menu.hidden = true;
+			trigger.setAttribute( "aria-expanded", "false" );
+		}
+
+		trigger.addEventListener( "click", function ( event ) {
+			event.stopPropagation();
+			var open = !menu.hidden;
+			menu.hidden = open;
+			trigger.setAttribute( "aria-expanded", open ? "false" : "true" );
 		} );
 
-		toggle.parentNode.insertBefore( select, toggle.nextSibling );
+		document.addEventListener( "click", function ( event ) {
+			if ( !wrapper.contains( event.target ) ) {
+				closeMenu();
+			}
+		} );
+
+		document.addEventListener( "keydown", function ( event ) {
+			if ( event.key === "Escape" ) {
+				closeMenu();
+			}
+		} );
+
+		wrapper.appendChild( trigger );
+		wrapper.appendChild( menu );
+		toggle.parentNode.insertBefore( wrapper, toggle.nextSibling );
 	}
 
 	init();
