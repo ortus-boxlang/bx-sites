@@ -1,7 +1,7 @@
 ---
 title: CLI Reference
 order: 3
-icon: ⌨️
+icon: phosphor-duotone:terminal-window
 summary: Every bxDocs verb and its flags.
 tags: [reference, cli]
 ---

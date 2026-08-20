@@ -1,7 +1,7 @@
 ---
 title: Getting Started
 order: 2
-icon: 🚀
+icon: phosphor-duotone:rocket-launch
 summary: Install the module, scaffold a project, and build your first site.
 tags: [guides, setup]
 ---

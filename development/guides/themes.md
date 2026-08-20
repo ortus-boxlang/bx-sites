@@ -1,6 +1,7 @@
 ---
 title: Themes
 order: 1
+icon: phosphor-duotone:palette
 tags: [guides, themes]
 ---
 

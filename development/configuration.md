@@ -1,7 +1,7 @@
 ---
 title: Configuration
 order: 4
-icon: ⚙️
+icon: phosphor-duotone:gear-six
 summary: Every bxdocs.json key, what it defaults to, and what it does.
 tags: [reference, configuration]
 ---
@@ -136,6 +136,27 @@ non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
 
     ```json
     { "theme": { "options": { "navCollapsible": true, "navExpandAll": false } } }
+    ```
+  - `theme.options.tocPosition` - where a page's own "On this page" table of
+    contents renders. `"top"` (the default) renders it inline, at the top of
+    the article, same as today. `"sticky"` moves it into its own right-hand
+    column that stays in view while the article scrolls underneath it - the
+    same "On this page" list, just pinned, which helps on long pages. Only
+    shown on wide viewports (it's hidden below the point a 3-column layout
+    would get cramped); on narrower ones the TOC simply doesn't render at
+    all in `sticky` mode, rather than falling back to `top`.
+
+    ```json
+    { "theme": { "options": { "tocPosition": "sticky" } } }
+    ```
+  - `theme.options.pageMetaPosition` - where the edit-this-page/download-
+    markdown/last-updated row renders relative to a page's own content.
+    `"bottom"` (the default) renders it as a small footer note right before
+    the article ends. `"top"` renders it up near the title instead, the same
+    place it always rendered before this option existed.
+
+    ```json
+    { "theme": { "options": { "pageMetaPosition": "top" } } }
     ```
 
 ## `search`

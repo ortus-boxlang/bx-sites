@@ -1,6 +1,7 @@
 ---
 title: Migrating from GitBook
 order: 7
+icon: phosphor-duotone:swap
 tags: [guides, migration, gitbook]
 ---
 
