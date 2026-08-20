@@ -19,8 +19,9 @@
 		return html
 	}
 
-	function renderPageMeta( required string editUrl, required string lastUpdated, required string markdownUrl ) {
-		var html = '<div class="page-meta mb-4 flex flex-wrap items-center gap-4 text-xs text-slate-500">'
+	function renderPageMeta( required string editUrl, required string lastUpdated, required string markdownUrl, boolean isBottom = false ) {
+		var positionClass = arguments.isBottom ? "mt-8 border-t border-slate-200 pt-4" : "mb-4"
+		var html = '<div class="page-meta ' & positionClass & ' flex flex-wrap items-center gap-4 text-xs text-slate-500">'
 		if ( len( arguments.editUrl ) ) {
 			// A minimal attribute-safe escape, not encodeForHTML() - that also
 			// entity-escapes "safe" characters like "/" (its exact range is
@@ -76,13 +77,14 @@
 </bx:output><bx:if condition="#variables.page.isFallbackContent#"><bx:output>
 				<p class="fallback-notice mb-6 flex items-center gap-2 rounded border border-amber-300 bg-amber-50 px-4 py-2 text-sm text-amber-900">#bxdocsIcon( 'globe' )# This page hasn't been translated yet - showing the #encodeForHTML( defaultLocaleLabel() )# version.</p>
 </bx:output></bx:if><bx:if condition="#variables.page.breadcrumbs.len() gt 1#"><bx:output>#renderBreadcrumbs( variables.page.breadcrumbs )#</bx:output></bx:if><bx:output>
-				<h1 class="mb-6 border-b-4 border-[##FFF500] pb-2 text-2xl font-bold"></bx:output><bx:if condition="#len( variables.page.iconHtml )#"><bx:output><span class="page-icon">#variables.page.iconHtml#</span> </bx:output></bx:if><bx:output>#encodeForHTML( variables.page.title )#</h1>
+				<h1 class="relative mb-6 border-b-4 border-[##FFF500] pb-2 text-2xl font-bold" id="page-title"><a href="##page-title" id="page-title" class="anchor"></a></bx:output><bx:if condition="#len( variables.page.iconHtml )#"><bx:output><span class="page-icon">#variables.page.iconHtml#</span> </bx:output></bx:if><bx:output>#encodeForHTML( variables.page.title )#</h1>
 </bx:output><bx:if condition="#len( variables.page.summary )#"><bx:output>				<p class="mb-6 -mt-4 text-lg text-slate-500">#encodeForHTML( variables.page.summary )#</p>
-</bx:output></bx:if><bx:if condition="#variables.page.tags.len() gt 0#"><bx:output>#renderTags( variables.page.tags )#</bx:output></bx:if><bx:if condition="#len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl )#"><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:output></bx:if><bx:output>
-</bx:output><bx:if condition="#variables.page.toc.len() gt 0#"><bx:output>#renderToc( variables.page.toc )#</bx:output></bx:if><bx:output>
+</bx:output></bx:if><bx:if condition="#variables.page.tags.len() gt 0#"><bx:output>#renderTags( variables.page.tags )#</bx:output></bx:if><bx:if condition="#( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'top'#"><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:output></bx:if><bx:output>
+</bx:output><bx:if condition="#variables.page.toc.len() gt 0 and variables.tocPosition == 'top'#"><bx:output>#renderToc( variables.page.toc )#</bx:output></bx:if><bx:output>
 				<div class="prose max-w-none">
 					#variables.page.contentHtml#
 				</div>
+</bx:output><bx:if condition="#( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'bottom'#"><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl, true )#</bx:output></bx:if><bx:output>
 			</article>
 </bx:output><bx:if condition="#len( variables.page.prevPage.url ) or len( variables.page.nextPage.url )#"><bx:output>
 			<nav class="mt-8 flex justify-between border-t border-slate-200 pt-4 text-sm font-semibold" aria-label="Page navigation">

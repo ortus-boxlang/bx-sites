@@ -304,6 +304,46 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "renders the edit/last-updated page-meta row at the bottom of the article by default, and at the top when [theme.options.pageMetaPosition] is 'top', across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = {
+					title       : "My Page",
+					contentHtml : "<p>Body</p>",
+					editUrl     : "https://github.com/acme/docs/edit/main/docs/index.md"
+				};
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+
+					var bottomHtml = renderer.renderPage( page, nav, { name : "My Site" }, themeDir );
+					expect( bottomHtml.findNoCase( "Edit this page" ) ).toBeGT( bottomHtml.findNoCase( "<p>Body</p>" ) );
+
+					var topConfig = { name : "My Site", theme : { options : { pageMetaPosition : "top" } } };
+					var topHtml = renderer.renderPage( page, nav, topConfig, themeDir );
+					expect( topHtml.findNoCase( "Edit this page" ) ).toBeLT( topHtml.findNoCase( "<p>Body</p>" ) );
+				}
+			} );
+
+			it( "gives every h1/h2/h3 an .anchor permalink, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = {
+					title       : "My Page",
+					contentHtml : '<h2 id="a-heading"><a href="##a-heading" id="a-heading" class="anchor"></a>A Heading</h2><p>Body</p>'
+				};
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var config = { name : "My Site" };
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					var html = renderer.renderPage( page, nav, config, themeDir );
+
+					// the h1 (rendered by page.bxm, not markdown) gets its own hand-rolled anchor
+					expect( html ).toInclude( 'id="page-title"' );
+					expect( html.reMatchNoCase( 'class="anchor"' ).len() ).toBeGTE( 2 );
+				}
+			} );
+
 			it( "renders a version switcher with the current version selected when more than one version is passed, across every built-in theme", function() {
 				var root = newProjectRoot();
 				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
@@ -425,6 +465,36 @@ class extends="testbox.system.BaseSpec" {
 
 					// "API" does not contain the active page and navExpandAll is false - stays collapsed
 					expect( html ).toInclude( 'aria-expanded="false" aria-label="Toggle API section"' );
+				}
+			} );
+
+			it( "renders the 'On this page' TOC inline by default, and in its own sticky rail outside <main> when [theme.options.tocPosition] is 'sticky', across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = {
+					title       : "My Page",
+					contentHtml : "<p>Body</p>",
+					toc         : [
+						{ level : 2, id : "first-section", text : "First Section" },
+						{ level : 2, id : "second-section", text : "Second Section" }
+					]
+				};
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+
+					var topHtml = renderer.renderPage( page, nav, { name : "My Site" }, themeDir );
+					expect( topHtml ).toInclude( "On this page" );
+					expect( topHtml ).toInclude( "First Section" );
+					// inline (the default) renders before <main> ever closes
+					expect( topHtml.findNoCase( "First Section" ) ).toBeLT( topHtml.findNoCase( "</main>" ) );
+
+					var stickyConfig = { name : "My Site", theme : { options : { tocPosition : "sticky" } } };
+					var stickyHtml = renderer.renderPage( page, nav, stickyConfig, themeDir );
+					expect( stickyHtml ).toInclude( "First Section" );
+					// sticky renders after <main> closes, and only once (not duplicated inline too)
+					expect( stickyHtml.findNoCase( "First Section" ) ).toBeGT( stickyHtml.findNoCase( "</main>" ) );
+					expect( stickyHtml.reMatchNoCase( "First Section" ).len() ).toBe( 1 );
 				}
 			} );
 

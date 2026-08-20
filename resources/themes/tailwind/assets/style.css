@@ -200,6 +200,14 @@
 	transform: rotate( -180deg );
 }
 
+/* nav-toggle.js measures each list's own real height and transitions
+   max-height between 0 and that value (then "none" once open, so it's never
+   clipped by a stale measurement) - this is what actually makes it slide. */
+.nav-toggle-body {
+	overflow: hidden;
+	transition: max-height 0.25s ease;
+}
+
 /* A named icon (icon: rocket / lucide:rocket / tabler:rocket / custom:name)
    resolves to an inline SVG using currentColor fill/stroke, so it already
    tracks the surrounding text color in both themes/light-dark modes with
@@ -371,6 +379,42 @@
 .prose :where(h2, h3, h4) {
 	font-weight: 700;
 	margin-top: 1.5em;
+}
+
+/* Every h1/h2/h3 in the article gets a hover-reveal "#" permalink, for deep
+   links straight to a section - the h1's own `.anchor` is hand-rendered in
+   page.bxm (it's not part of the converted markdown body, and sits outside
+   `.prose`); h2/h3 get theirs for free from bx-markdown's own `anchorLinks`
+   setting (on by default), which already emits an empty
+   `<a class="anchor" id="...">` right before each heading's text - this
+   only adds the missing "#" glyph + hover. */
+article h1,
+article h2,
+article h3 {
+	position: relative;
+}
+
+article .anchor {
+	position: absolute;
+	left: -1.2em;
+	display: inline-flex;
+	align-items: center;
+	height: 1em;
+	color: rgb( 148 163 184 );
+	text-decoration: none;
+	opacity: 0;
+	transition: opacity 0.15s ease;
+}
+
+article .anchor::before {
+	content: "#";
+}
+
+article h1:hover .anchor,
+article h2:hover .anchor,
+article h3:hover .anchor,
+article .anchor:focus {
+	opacity: 1;
 }
 
 .adm-hidden {

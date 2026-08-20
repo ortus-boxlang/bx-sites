@@ -1,0 +1,35 @@
+[
+	"index.md",
+	{
+		"title": "Introduction",
+		"children": [
+			"getting-started.md",
+			"cli-reference.md"
+		]
+	},
+	{
+		"title": "Configuration & Reference",
+		"children": [
+			"configuration.md",
+			"releases/index.md"
+		]
+	},
+	{
+		"title": "Guides",
+		"children": [
+			"guides/index.md",
+			"guides/themes.md",
+			"guides/markdown.md",
+			"guides/search.md",
+			"guides/plugins.md",
+			"guides/i18n.md"
+		]
+	},
+	{
+		"title": "Migration & Deployment",
+		"children": [
+			"guides/deployment.md",
+			"guides/migrating-from-gitbook.md"
+		]
+	}
+]

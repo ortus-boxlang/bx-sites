@@ -1,6 +1,7 @@
 ---
 title: Guides
 order: 5
+icon: phosphor-duotone:book-open
 ---
 
 # Guides
