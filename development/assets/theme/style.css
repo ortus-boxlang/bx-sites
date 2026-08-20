@@ -29,6 +29,7 @@
 	--bxdocs-accent: #FFF500;
 	--bxdocs-bg: #fff;
 	--bxdocs-text: #212529;
+	--bxdocs-muted: #6c757d;
 	--bxdocs-sidebar-bg: #fff;
 	--bxdocs-sidebar-text: #04121a;
 	--bxdocs-border: rgba( 0, 0, 0, 0.1 );
@@ -42,15 +43,18 @@
 	--bxdocs-toolbar-h: 2.375rem;
 }
 
+/* Near-black surface with a mint/teal accent, rather than the blue-gray
+   "just inverted" dark mode this used to be - see docs/guides/theming.md. */
 [data-theme="dark"] {
-	--bxdocs-bg: #14181c;
-	--bxdocs-text: #e6edf3;
-	--bxdocs-sidebar-bg: #1b2027;
-	--bxdocs-sidebar-text: #dce3ea;
-	--bxdocs-border: rgba( 255, 255, 255, 0.12 );
-	--bxdocs-link: #5fd3e8;
-	--bxdocs-link-hover: #8ce3f2;
-	--bxdocs-code-bg: #1e242b;
+	--bxdocs-bg: #0a0d0f;
+	--bxdocs-text: #e7ecee;
+	--bxdocs-muted: #8b979c;
+	--bxdocs-sidebar-bg: #12171a;
+	--bxdocs-sidebar-text: #cfd8da;
+	--bxdocs-border: rgba( 255, 255, 255, 0.09 );
+	--bxdocs-link: #34d399;
+	--bxdocs-link-hover: #6ee7b7;
+	--bxdocs-code-bg: #0f1417;
 }
 
 [x-cloak] {
@@ -67,7 +71,7 @@ body {
 .repo-link {
 	background: transparent;
 	border: 1px solid rgba( 0, 0, 0, 0.2 );
-	border-radius: 6px;
+	border-radius: 10px;
 	font-size: 1.1rem;
 	line-height: 1;
 	height: var( --bxdocs-toolbar-h );
@@ -86,6 +90,18 @@ body {
 .repo-link:hover {
 	background: rgba( 0, 0, 0, 0.08 );
 	color: #04121a;
+}
+
+[data-theme="dark"] .theme-toggle,
+[data-theme="dark"] .repo-link {
+	border-color: var( --bxdocs-border );
+	color: var( --bxdocs-text );
+}
+
+[data-theme="dark"] .theme-toggle:hover,
+[data-theme="dark"] .repo-link:hover {
+	background: rgba( 255, 255, 255, 0.08 );
+	color: var( --bxdocs-text );
 }
 
 .bxdocs-search .form-control {
@@ -229,7 +245,7 @@ body {
 	margin: 0 0 1.25rem;
 	padding: 0.6rem 1rem;
 	border: 1px solid rgba( 255, 145, 0, 0.35 );
-	border-radius: 4px;
+	border-radius: 10px;
 	background: rgba( 255, 145, 0, 0.08 );
 	font-size: 0.9rem;
 }
@@ -249,7 +265,7 @@ body {
 }
 
 .sidebar .nav-link.disabled {
-	color: #6c757d;
+	color: var( --bxdocs-muted );
 	font-weight: 600;
 	text-transform: uppercase;
 	font-size: 0.8rem;
@@ -337,8 +353,8 @@ a:hover {
 	position: absolute;
 	z-index: 20;
 	background: var( --bxdocs-bg );
-	border: 1px solid rgba( 0, 0, 0, 0.15 );
-	border-radius: 4px;
+	border: 1px solid var( --bxdocs-border );
+	border-radius: 10px;
 	margin-top: 0.25rem;
 	max-height: 320px;
 	overflow-y: auto;
@@ -371,7 +387,7 @@ a:hover {
 	margin: 1.5rem 0;
 	border: 1px solid rgba( 68, 138, 255, 0.25 );
 	border-left: 4px solid #448aff;
-	border-radius: 4px;
+	border-radius: 10px;
 	background: rgba( 68, 138, 255, 0.06 );
 	overflow: hidden;
 }
@@ -476,7 +492,7 @@ a:hover {
 	padding-top: 1rem;
 	border-top: 1px solid var( --bxdocs-border );
 	font-size: 0.9rem;
-	color: #6c757d;
+	color: var( --bxdocs-muted );
 }
 
 .footnotes hr {
@@ -529,16 +545,20 @@ dd {
 
 .toc {
 	border: 1px solid var( --bxdocs-border );
-	border-radius: 6px;
+	border-radius: 12px;
 	padding: 0.75rem 1rem;
 	background: rgba( 0, 219, 255, 0.05 );
+}
+
+[data-theme="dark"] .toc {
+	background: rgba( 52, 211, 153, 0.05 );
 }
 
 .toc-title {
 	font-weight: 600;
 	text-transform: uppercase;
 	font-size: 0.75rem;
-	color: #6c757d;
+	color: var( --bxdocs-muted );
 	margin-bottom: 0.25rem;
 }
 
@@ -567,7 +587,7 @@ dd {
 	right: 0.5rem;
 	font-size: 0.75rem;
 	padding: 0.2rem 0.5rem;
-	border-radius: 4px;
+	border-radius: 8px;
 	border: 1px solid rgba( 255, 255, 255, 0.25 );
 	background: rgba( 255, 255, 255, 0.1 );
 	color: inherit;
@@ -593,6 +613,10 @@ dd {
 .repo-link svg,
 .social-link svg {
 	display: block;
+}
+
+.theme-toggle span {
+	display: inline-flex;
 }
 
 .bxdocs-footer {
@@ -637,7 +661,7 @@ dd {
 	gap: 1rem;
 	align-items: center;
 	font-size: 0.8rem;
-	color: #6c757d;
+	color: var( --bxdocs-muted );
 	margin-bottom: 1.5rem;
 }
 
@@ -680,7 +704,7 @@ dd {
 
 .page-summary {
 	font-size: 1.15rem;
-	color: #6c757d;
+	color: var( --bxdocs-muted );
 	margin-top: -0.5rem;
 	margin-bottom: 1.5rem;
 }
@@ -708,6 +732,25 @@ dd {
 	color: var( --bxdocs-link-hover );
 }
 
+[data-theme="dark"] .page-tag {
+	background: rgba( 52, 211, 153, 0.14 );
+}
+
+[data-theme="dark"] .page-tag:hover {
+	background: rgba( 52, 211, 153, 0.24 );
+}
+
+/* Inline `code` (as opposed to fenced ```code blocks```, handled by
+   .bxdocs-code above) renders as a small monospace label chip. */
+code:not( pre code ) {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 0.875em;
+	padding: 0.15em 0.45em;
+	border-radius: 6px;
+	background: var( --bxdocs-code-bg );
+	border: 1px solid var( --bxdocs-border );
+}
+
 @media ( max-width: 991.98px ) {
 	.sidebar {
 		box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.15 );
@@ -719,7 +762,7 @@ dd {
 .bxdocs-tabs {
 	margin: 1.5rem 0;
 	border: 1px solid rgba( 0, 0, 0, 0.12 );
-	border-radius: 6px;
+	border-radius: 12px;
 	overflow: hidden;
 }
 
@@ -782,7 +825,7 @@ dd {
 	background: rgba( 0, 0, 0, 0.06 );
 	border: 1px solid rgba( 0, 0, 0, 0.12 );
 	border-bottom: none;
-	border-radius: 0.5rem 0.5rem 0 0;
+	border-radius: 0.75rem 0.75rem 0 0;
 	padding: 0.4rem 0.9rem;
 	font-size: 0.8rem;
 	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -790,7 +833,7 @@ dd {
 }
 
 .bxdocs-code-title + pre {
-	border-radius: 0 0 0.5rem 0.5rem;
+	border-radius: 0 0 0.75rem 0.75rem;
 	margin-top: 0;
 }
 
@@ -832,7 +875,7 @@ dd {
 .bxdocs-expandable {
 	margin: 1rem 0;
 	border: 1px solid rgba( 0, 0, 0, 0.12 );
-	border-radius: 6px;
+	border-radius: 12px;
 	padding: 0.75rem 1rem;
 }
 
@@ -859,7 +902,7 @@ dd {
 .bxdocs-card {
 	display: block;
 	border: 1px solid rgba( 0, 0, 0, 0.12 );
-	border-radius: 8px;
+	border-radius: 14px;
 	padding: 1.25rem;
 	color: inherit;
 	text-decoration: none;
@@ -874,7 +917,7 @@ a.bxdocs-card:hover {
 .bxdocs-card__image {
 	display: block;
 	width: 100%;
-	border-radius: 6px;
+	border-radius: 10px;
 	margin-bottom: 0.75rem;
 }
 
@@ -968,7 +1011,7 @@ a.bxdocs-card:hover {
 	align-items: center;
 	gap: 0.5rem;
 	border: 1px solid rgba( 0, 0, 0, 0.12 );
-	border-radius: 6px;
+	border-radius: 10px;
 	padding: 0.5rem 0.9rem;
 	margin: 0.5rem 0;
 	color: inherit;
@@ -984,7 +1027,7 @@ a.bxdocs-card:hover {
 	position: relative;
 	margin: 1.5rem 0;
 	padding-top: 56.25%;
-	border-radius: 8px;
+	border-radius: 14px;
 	overflow: hidden;
 	background: rgba( 0, 0, 0, 0.06 );
 }
@@ -1013,7 +1056,7 @@ a.bxdocs-card:hover {
 	align-items: center;
 	gap: 0.75rem;
 	border: 1px solid rgba( 0, 0, 0, 0.12 );
-	border-radius: 8px;
+	border-radius: 14px;
 	padding: 0.9rem 1.1rem;
 	margin: 1rem 0;
 	color: inherit;
@@ -1092,7 +1135,8 @@ a.bxdocs-card:hover {
 }
 
 [data-theme="dark"] .bxdocs-update__tag {
-	background: rgba( 255, 255, 255, 0.08 );
+	background: rgba( 52, 211, 153, 0.12 );
+	color: #6ee7b7;
 }
 
 /* Image captions/alignment/framing - GitBook-compatible raw HTML
@@ -1108,7 +1152,7 @@ a.bxdocs-card:hover {
 .page-content figure img,
 .md-card figure img {
 	max-width: 100%;
-	border-radius: 6px;
+	border-radius: 10px;
 }
 
 .page-content figcaption,
@@ -1122,7 +1166,7 @@ a.bxdocs-card:hover {
 	display: inline-block;
 	padding: 0.5rem;
 	border: 1px solid rgba( 0, 0, 0, 0.12 );
-	border-radius: 8px;
+	border-radius: 12px;
 }
 
 [data-theme="dark"] [data-with-frame] {
@@ -1140,5 +1184,5 @@ a.bxdocs-card:hover {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	border-radius: 6px;
+	border-radius: 10px;
 }
