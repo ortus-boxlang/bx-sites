@@ -133,6 +133,7 @@ tags: [guides, deployment]
 icon: 🚀
 summary: Everything you need to publish a built site.
 ogImage: assets/deployment-card.png
+toc: true
 ---
 
 # Deployment
@@ -158,6 +159,10 @@ Your content here.
   `description`, which is meta-tag-only and never rendered on the page itself)
 - `ogImage` - overrides this one page's social-card image - see
   [`ogImage`](configuration.md#ogimage)
+- `toc` - `false` hides this page's own "On this page" table of contents,
+  even with 2+ headings (the usual trigger for it to render) - handy for a
+  landing/hero page that doesn't want a floating TOC competing with its own
+  content; defaults to `true`
 
 Frontmatter values can be inline lists (`tags: [a, b, c]`), YAML-style block
 lists (`tags:` followed by indented `- item` lines), or `>`/`|` block

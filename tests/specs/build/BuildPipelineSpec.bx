@@ -426,6 +426,20 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( 'href="##prereqs"' );
 			} );
 
+			it( "omits the table of contents when a page's own frontmatter sets [toc] to false", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/docs/index.md",
+					"---" & char( 10 ) & "toc: false" & char( 10 ) & "---" & char( 10 ) &
+						'<h2 id="install">Install</h2>' & char( 10 ) & '<h3 id="prereqs">Prereqs</h3>'
+				);
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).notToInclude( "On this page" );
+			} );
+
 			it( "links prev/next pages in nav reading order", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "title: Home" & char( 10 ) & "order: 1" & char( 10 ) & "---" & char( 10 ) & "Home body" );
