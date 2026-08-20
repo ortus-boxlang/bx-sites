@@ -18,6 +18,11 @@ class {
 		"baseURL"      : "/",
 		"theme"        : { "name" : "bootstrap", "options" : {}, "logo" : "", "favicon" : "" },
 		"search"       : true,
+		"searchProvider" : {
+			"provider" : "local",
+			"algolia"  : { "appId" : "", "apiKey" : "", "indexName" : "", "insights" : false },
+			"pagefind" : { "bin" : "pagefind", "options" : [] }
+		},
 		"nav"          : [],
 		"markdown"     : { "enableAdmonition" : true },
 		"repo"         : { "url" : "", "editUri" : "" },
@@ -183,6 +188,8 @@ class {
 			)
 		}
 
+		validateSearchProvider( arguments.config.searchProvider ?: "" )
+
 		if ( !isBoolean( arguments.config.mermaid ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
@@ -325,6 +332,92 @@ class {
 		validateI18n( arguments.config.i18n ?: "" )
 
 		return arguments.config
+	}
+
+	/**
+	 * Validates `bxdocs.json`'s `searchProvider` block - which search UI
+	 * `search: true` wires up (module spec section 7). `local` (the
+	 * default, bx-docs' own static lunr search) needs no further settings.
+	 * `algolia` (Algolia DocSearch) requires its own `algolia.{appId,apiKey,
+	 * indexName}` - everything DocSearch's client itself requires to run.
+	 * `pagefind` only validates its own `pagefind.{bin,options}` shape, if
+	 * present - both are optional (`SearchProviderRegistry`/ConfigLoader's
+	 * own defaults already cover the common case of `pagefind` being on
+	 * `PATH` with no extra flags). Any other `provider` name isn't validated
+	 * further here - it's a project's own custom/plugin-supplied provider,
+	 * wired up by a `theme/` override rather than bx-docs core (see
+	 * SearchProviderRegistry.bx).
+	 *
+	 * @searchProvider The merged config's own `searchProvider` value - `any`,
+	 * not `struct`, for the same reason validateI18n() takes `any` (see its
+	 * own docblock)
+	 */
+	private void function validateSearchProvider( required any searchProvider ) {
+		if ( !isStruct( arguments.searchProvider ) || !len( trim( arguments.searchProvider.provider ?: "" ) ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [searchProvider] must be an object with a non-empty [provider]"
+			)
+		}
+
+		var provider = lCase( trim( arguments.searchProvider.provider ) )
+
+		if ( provider == "algolia" ) {
+			var algolia = arguments.searchProvider.algolia ?: ""
+			if (
+				!isStruct( algolia )
+				|| !len( trim( algolia.appId ?: "" ) )
+				|| !len( trim( algolia.apiKey ?: "" ) )
+				|| !len( trim( algolia.indexName ?: "" ) )
+			) {
+				throw(
+					type    = "BxDocs.InvalidConfig",
+					message = "bxdocs.json [searchProvider.algolia] must be an object with non-empty [appId], [apiKey] and [indexName] when [searchProvider.provider] is ""algolia"""
+				)
+			}
+
+			if ( algolia.keyExists( "insights" ) && !isBoolean( algolia.insights ) ) {
+				throw(
+					type    = "BxDocs.InvalidConfig",
+					message = "bxdocs.json [searchProvider.algolia.insights], when present, must be a boolean"
+				)
+			}
+			return
+		}
+
+		if ( provider == "pagefind" ) {
+			var pagefind = arguments.searchProvider.pagefind ?: ""
+			if ( !isStruct( pagefind ) ) {
+				throw(
+					type    = "BxDocs.InvalidConfig",
+					message = "bxdocs.json [searchProvider.pagefind], when present, must be an object"
+				)
+			}
+
+			if ( pagefind.keyExists( "bin" ) && !len( trim( pagefind.bin ?: "" ) ) ) {
+				throw(
+					type    = "BxDocs.InvalidConfig",
+					message = "bxdocs.json [searchProvider.pagefind.bin], when present, must be a non-empty string"
+				)
+			}
+
+			if ( pagefind.keyExists( "options" ) ) {
+				if ( !isArray( pagefind.options ) ) {
+					throw(
+						type    = "BxDocs.InvalidConfig",
+						message = "bxdocs.json [searchProvider.pagefind.options], when present, must be an array"
+					)
+				}
+				for ( var option in pagefind.options ) {
+					if ( !isSimpleValue( option ) || !len( trim( option ) ) ) {
+						throw(
+							type    = "BxDocs.InvalidConfig",
+							message = "bxdocs.json [searchProvider.pagefind.options] entries must be non-empty strings"
+						)
+					}
+				}
+			}
+		}
 	}
 
 	/**

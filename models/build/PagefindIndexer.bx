@@ -1,0 +1,83 @@
+/**
+ * Backs the `pagefind` search provider (module spec section 7) - shells out
+ * to the `pagefind` CLI (there's no BoxLang-native binding, same as `git`
+ * in GitRevisionDate.bx/GhPagesDeployer.bx) to index an already-built
+ * `site/` after `build` writes it. Unlike GitRevisionDate.bx's `lastUpdated`
+ * lookup, this fails loud on error (same posture as GhPagesDeployer.bx's
+ * `gh-deploy`) rather than degrading silently - a project that opted into
+ * `searchProvider.provider: "pagefind"` has no search at all if this step
+ * doesn't run, so a build should fail rather than ship a broken search box.
+ *
+ * Pagefind writes its own static search bundle straight into
+ * `<siteDir>/pagefind/` (`pagefind-ui.js`/`.css` + the chunked index) - the
+ * built-in themes' `layout.bxm` load that bundle from there directly
+ * (self-hosted, no CDN involved), same as everything else this module
+ * writes to `site/`.
+ */
+class {
+
+	/**
+	 * Runs `pagefind --site <siteDir> [...options]` against an already-built
+	 * site directory.
+	 *
+	 * @siteDir Absolute path to the already-built site (must exist - run `build` first)
+	 * @bin The `pagefind` executable name/path - resolved against `PATH` when it's a bare name
+	 * @options Extra raw CLI arguments passed straight through to `pagefind` (bxdocs.json's `searchProvider.pagefind.options`)
+	 *
+	 * @return { output } - pagefind's own combined stdout/stderr, for callers that want to surface it
+	 */
+	struct function index( required string siteDir, string bin = "pagefind", array options = [] ) {
+		if ( !directoryExists( arguments.siteDir ) ) {
+			throw(
+				type    = "BxDocs.SiteNotBuilt",
+				message = "No [#arguments.siteDir#] to index with pagefind - run `build` first"
+			)
+		}
+
+		var cmd = [ arguments.bin, "--site", arguments.siteDir ]
+		cmd.append( arguments.options, true )
+
+		var result = exec( cmd, arguments.siteDir )
+		if ( result.exitCode != 0 ) {
+			throw(
+				type    = "BxDocs.PagefindFailed",
+				message = "`#cmd.toList( ' ' )#` failed (exit #result.exitCode#): #result.output#"
+			)
+		}
+
+		return { output : result.output }
+	}
+
+	/**
+	 * Runs a command via `java.lang.ProcessBuilder`, capturing its combined
+	 * stdout/stderr and exit code - the same pattern GhPagesDeployer.bx uses.
+	 * A missing binary (`pagefind` not installed/not on `PATH`) surfaces as a
+	 * `java.io.IOException` from `start()` itself, caught here and turned
+	 * into the same `BxDocs.PagefindFailed` shape with an install pointer,
+	 * rather than a raw Java stack trace.
+	 *
+	 * @cmd Full argv, the `pagefind` binary included as element 1
+	 * @cwd Working directory for the process
+	 *
+	 * @return { exitCode, output }
+	 */
+	private struct function exec( required array cmd, required string cwd ) {
+		try {
+			var pb = createObject( "java", "java.lang.ProcessBuilder" ).init( arguments.cmd )
+			pb.directory( createObject( "java", "java.io.File" ).init( arguments.cwd ) )
+			pb.redirectErrorStream( true )
+
+			var process = pb.start()
+			var output = createObject( "java", "java.lang.String" ).init( process.getInputStream().readAllBytes(), "UTF-8" )
+			var exitCode = process.waitFor()
+
+			return { exitCode : exitCode, output : trim( output ) }
+		} catch ( any e ) {
+			return {
+				exitCode : -1,
+				output   : "could not run [#arguments.cmd[ 1 ]#] (#e.message#) - is the pagefind CLI installed and on PATH? See https://pagefind.app/docs/installation/"
+			}
+		}
+	}
+
+}

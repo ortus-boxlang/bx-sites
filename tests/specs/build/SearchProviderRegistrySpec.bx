@@ -1,0 +1,52 @@
+/**
+ * Exercises SearchProviderRegistry.bx's own small rules directly - the
+ * built-in provider name list, which providers need the local
+ * `search-index.json`/lunr widget, and which need PagefindIndexer.bx run
+ * against the finished site (module spec section 7).
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.SearchProviderRegistry", function() {
+
+			beforeEach( function() {
+				variables.registry = new "models.build.SearchProviderRegistry@bxdocs"();
+			} );
+
+			it( "lists local, algolia and pagefind as the built-in providers", function() {
+				expect( registry.getBuiltIn() ).toBe( [ "local", "algolia", "pagefind" ] );
+			} );
+
+			it( "uses the local index for the local provider", function() {
+				expect( registry.usesLocalIndex( "local" ) ).toBeTrue();
+			} );
+
+			it( "does not use the local index for algolia or pagefind", function() {
+				expect( registry.usesLocalIndex( "algolia" ) ).toBeFalse();
+				expect( registry.usesLocalIndex( "pagefind" ) ).toBeFalse();
+			} );
+
+			it( "is case-insensitive when checking for algolia/pagefind", function() {
+				expect( registry.usesLocalIndex( "Algolia" ) ).toBeFalse();
+				expect( registry.usesLocalIndex( "Pagefind" ) ).toBeFalse();
+			} );
+
+			it( "defaults to using the local index for an unrecognized provider name", function() {
+				expect( registry.usesLocalIndex( "meilisearch" ) ).toBeTrue();
+			} );
+
+			it( "flags only pagefind as needing PagefindIndexer.bx run", function() {
+				expect( registry.usesPagefind( "pagefind" ) ).toBeTrue();
+				expect( registry.usesPagefind( "local" ) ).toBeFalse();
+				expect( registry.usesPagefind( "algolia" ) ).toBeFalse();
+				expect( registry.usesPagefind( "meilisearch" ) ).toBeFalse();
+			} );
+
+			it( "is case-insensitive when checking for pagefind", function() {
+				expect( registry.usesPagefind( "Pagefind" ) ).toBeTrue();
+			} );
+
+		} );
+	}
+
+}

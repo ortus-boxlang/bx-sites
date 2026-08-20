@@ -1,5 +1,8 @@
-<bx:output><div class="bxdocs-search md-search">
+<bx:if condition="#variables.searchProviderName eq 'algolia'#"><bx:output><div id="bxdocs-search-algolia" class="bxdocs-search-algolia"></div>
+</bx:output></bx:if><bx:if condition="#variables.searchProviderName eq 'pagefind'#"><bx:output><div id="bxdocs-search-pagefind" class="bxdocs-search-pagefind"></div>
+</bx:output></bx:if><bx:if condition="#variables.searchProviderName eq 'local'#"><bx:output><div class="bxdocs-search md-search">
 	<input type="search" id="bxdocs-search-input" class="md-search__input" placeholder="Search docs..." aria-label="Search">
+	<kbd class="bxdocs-search-kbd" aria-hidden="true">Ctrl K</kbd>
 	<ul id="bxdocs-search-results" class="bxdocs-search-results"></ul>
 </div>
-</bx:output>
+</bx:output></bx:if>

@@ -147,8 +147,12 @@
 		return html
 	}
 
-	// module spec section 7 - search is fully static/client-side and opt-out via bxdocs.json
+	// module spec section 7 - search is fully static/client-side (provider "local") by
+	// default, opt-out via bxdocs.json's `search`; `searchProvider.provider` picks a
+	// different provider ("algolia" built-in here, anything else left to a theme override)
 	variables.searchEnabled = ( variables.siteConfig.search ?: false ) ? true : false
+	variables.searchProviderName = lCase( trim( variables.siteConfig.searchProvider.provider ?: "local" ) )
+	variables.searchAlgolia = variables.siteConfig.searchProvider.algolia ?: {}
 	variables.repoUrl = trim( variables.siteConfig.repo.url ?: "" )
 	variables.socialLinks = variables.siteConfig.social ?: []
 	variables.footerEnabled = ( variables.siteConfig.footer ?: false ) ? true : false
@@ -207,10 +211,14 @@
 		gtag('js', new Date());
 		gtag('config', '#variables.analyticsId#');
 	</script>
-</bx:output></bx:if><bx:if condition="#variables.searchEnabled#"><bx:output>
+</bx:output></bx:if><bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'local'#"><bx:output>
 	<script>window.__BXDOCS_BASE_PATH__ = "#variables.basePath#";</script>
 	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
 	<script src="#variables.basePath#assets/search.js" defer></script>
+</bx:output></bx:if><bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'algolia'#"><bx:output>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+</bx:output></bx:if><bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'pagefind'#"><bx:output>
+	<link rel="stylesheet" href="#variables.basePath#pagefind/pagefind-ui.css">
 </bx:output></bx:if><bx:output>
 	<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
 </head>
@@ -272,6 +280,39 @@
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 	<script src="#variables.basePath#assets/math-init.js"></script>
+</bx:output></bx:if><bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'algolia'#"><bx:output>
+	<script src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>
+	<script>
+		document.addEventListener( "DOMContentLoaded", function () {
+			docsearch( {
+				container : "##bxdocs-search-algolia",
+				appId     : "#encodeForJavaScript( variables.searchAlgolia.appId ?: '' )#",
+				apiKey    : "#encodeForJavaScript( variables.searchAlgolia.apiKey ?: '' )#",
+				indexName : "#encodeForJavaScript( variables.searchAlgolia.indexName ?: '' )#",
+				insights  : #( variables.searchAlgolia.insights ?: false ) ? "true" : "false"#
+			} );
+		} );
+	</script>
+</bx:output></bx:if><bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'pagefind'#"><bx:output>
+	<script src="#variables.basePath#pagefind/pagefind-ui.js"></script>
+	<script>
+		document.addEventListener( "DOMContentLoaded", function () {
+			new PagefindUI( { element : "##bxdocs-search-pagefind", showSubResults : true } );
+
+			// Cmd/Ctrl+K - same convention as the local/algolia providers;
+			// PagefindUI doesn't bind this itself, so wire it up here.
+			document.addEventListener( "keydown", function ( evt ) {
+				if ( !( evt.ctrlKey || evt.metaKey ) || evt.key.toLowerCase() !== "k" ) {
+					return;
+				}
+				var input = document.querySelector( "##bxdocs-search-pagefind input" );
+				if ( input ) {
+					evt.preventDefault();
+					input.focus();
+				}
+			} );
+		} );
+	</script>
 </bx:output></bx:if><bx:output>
 	#renderExtraJs( variables.siteConfig.extraJs ?: [] )#
 </body>

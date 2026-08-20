@@ -112,17 +112,17 @@ flowchart LR
 
 `new` defaults to `bootstrap` unless `--theme` is passed.
 
-## 7. Search (v1, locked)
+## 7. Search
 
-- Fully static, client-side — matches mkdocs' default (lunr.js), no server dependency
-- Index built at `build` time → `site/search-index.json`
-- Each theme wires its own search UI against the shared index format
-- Meilisearch integration (bx-meilisearch) explicitly deferred to a future optional add-on, not v1 core
+- `"local"` (the default, v1-locked) — fully static, client-side, matches mkdocs' default (lunr.js), no server dependency. Index built at `build` time → `site/search-index.json`; each built-in theme wires its own search UI against the shared index format
+- `bxdocs.json`'s `searchProvider.provider` selects the active provider (`SearchProviderRegistry.bx`) — `"algolia"` (Algolia DocSearch, no local index needed) and `"pagefind"` ([Pagefind](https://pagefind.app/), indexed from the built `site/` via the external `pagefind` CLI — `PagefindIndexer.bx` shells out to it after `build`, same `java.lang.ProcessBuilder` pattern GitRevisionDate.bx/GhPagesDeployer.bx use for `git`) are both built-in; any other name is a project's own provider, wired up via a `theme/` override reading `siteConfig.searchProvider` itself — see `docs/guides/search.md`
+- Meilisearch integration (bx-meilisearch) as a first-class *built-in* provider (rather than a project's own theme override) explicitly deferred to a future optional add-on
 
 ## 8. Open items
 
 None currently blocking. Deferred to later phases:
-- Optional `bx-docs-search-meilisearch` add-on
+- Pluggable search providers beyond the default local/static one — **done**, see section 7: `searchProvider.provider` in `bxdocs.json`, `algolia` built-in, any other provider wired up by a project's own theme override
+- Optional `bx-docs-search-meilisearch` add-on (a first-class built-in Meilisearch provider, as opposed to a project wiring it up itself via the theme-override mechanism above)
 - Versioned docs (multiple doc sets / version switcher) — **done**, see section 5's `docs/versions/` convention
 - Admonitions, footnotes, definition lists and Mermaid diagrams — **done**, see section 5 step 2 and `bxdocs.json`'s `mermaid` key
 - Plugin hook system beyond themes (e.g. custom nav sources) - **done** for nav (see `nav`/`docs/nav.json`, section 4); bx-markdown also has a `markdownRegisterExtension()`/`markdownUnregisterExtension()` API for registering arbitrary Flexmark extensions, independent of bx-docs

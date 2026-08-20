@@ -1,0 +1,37 @@
+/**
+ * A deterministic stand-in for PagefindIndexer.bx, used to test
+ * BuildPipeline.bx's `pagefind` provider wiring without a live `pagefind`
+ * CLI installed - see PagefindIndexer.bx's own docblock for why the real
+ * one shells out to an external binary.
+ */
+class {
+
+	/**
+	 * Records every call so tests can assert what the pipeline actually
+	 * asked to be indexed (siteDir, bin, options), and optionally throws to
+	 * simulate a failed/missing `pagefind` binary.
+	 */
+	variables.calls = []
+	variables.failWith = ""
+
+	/**
+	 * @failWith When non-empty, index() throws BxDocs.PagefindFailed with this message instead of recording the call
+	 */
+	function init( string failWith = "" ) {
+		variables.failWith = arguments.failWith
+		return this
+	}
+
+	struct function index( required string siteDir, string bin = "pagefind", array options = [] ) {
+		if ( len( variables.failWith ) ) {
+			throw( type = "BxDocs.PagefindFailed", message = variables.failWith )
+		}
+		variables.calls.append( { siteDir : arguments.siteDir, bin : arguments.bin, options : arguments.options } )
+		return { output : "" }
+	}
+
+	array function getCalls() {
+		return variables.calls
+	}
+
+}
