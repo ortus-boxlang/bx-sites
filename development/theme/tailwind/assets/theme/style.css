@@ -78,6 +78,29 @@
 #bxdocs-search-input {
 	height: var( --bxdocs-toolbar-h );
 	box-sizing: border-box;
+	padding-right: 2.75rem;
+}
+
+.bxdocs-search-kbd {
+	position: absolute;
+	top: 50%;
+	right: 0.5rem;
+	transform: translateY( -50% );
+	pointer-events: none;
+	font-family: inherit;
+	font-size: 0.7rem;
+	line-height: 1.4;
+	padding: 0.05rem 0.35rem;
+	border-radius: 0.25rem;
+	border: 1px solid rgb( 203 213 225 );
+	background: rgb( 248 250 252 );
+	color: rgb( 100 116 139 );
+}
+
+[data-theme="dark"] .bxdocs-search-kbd {
+	border-color: rgba( 255, 255, 255, 0.15 );
+	background: rgba( 255, 255, 255, 0.08 );
+	color: rgb( 148 163 184 );
 }
 
 .version-switcher {
@@ -248,6 +271,12 @@
 	flex: 1 1 120px;
 	min-width: 70px;
 	max-width: 260px;
+}
+
+.bxdocs-search-algolia,
+.bxdocs-search-pagefind {
+	display: flex;
+	align-items: center;
 }
 
 .repo-link svg,

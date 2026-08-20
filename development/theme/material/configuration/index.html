@@ -51,6 +51,7 @@
 		<div class="md-header__controls">
 <div class="bxdocs-search md-search">
 	<input type="search" id="bxdocs-search-input" class="md-search__input" placeholder="Search docs..." aria-label="Search">
+	<kbd class="bxdocs-search-kbd" aria-hidden="true">Ctrl K</kbd>
 	<ul id="bxdocs-search-results" class="bxdocs-search-results"></ul>
 </div>
 
@@ -77,7 +78,7 @@
 				<h1 class="md-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxdocs-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M230.1,108.76,198.25,90.62c-.64-1.16-1.31-2.29-2-3.41l-.12-36A104.61,104.61,0,0,0,162,32L130,49.89c-1.34,0-2.69,0-4,0L94,32A104.58,104.58,0,0,0,59.89,51.25l-.16,36c-.7,1.12-1.37,2.26-2,3.41l-31.84,18.1a99.15,99.15,0,0,0,0,38.46l31.85,18.14c.64,1.16,1.31,2.29,2,3.41l.12,36A104.61,104.61,0,0,0,94,224l32-17.87c1.34,0,2.69,0,4,0L162,224a104.58,104.58,0,0,0,34.08-19.25l.16-36c.7-1.12,1.37-2.26,2-3.41l31.84-18.1A99.15,99.15,0,0,0,230.1,108.76ZM128,168a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z" opacity="0.2"/><path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm109.94-52.79a8,8,0,0,0-3.89-5.4l-29.83-17-.12-33.62a8,8,0,0,0-2.83-6.08,111.91,111.91,0,0,0-36.72-20.67,8,8,0,0,0-6.46.59L128,41.85,97.88,25a8,8,0,0,0-6.47-.6A111.92,111.92,0,0,0,54.73,45.15a8,8,0,0,0-2.83,6.07l-.15,33.65-29.83,17a8,8,0,0,0-3.89,5.4,106.47,106.47,0,0,0,0,41.56,8,8,0,0,0,3.89,5.4l29.83,17,.12,33.63a8,8,0,0,0,2.83,6.08,111.91,111.91,0,0,0,36.72,20.67,8,8,0,0,0,6.46-.59L128,214.15,158.12,231a7.91,7.91,0,0,0,3.9,1,8.09,8.09,0,0,0,2.57-.42,112.1,112.1,0,0,0,36.68-20.73,8,8,0,0,0,2.83-6.07l.15-33.65,29.83-17a8,8,0,0,0,3.89-5.4A106.47,106.47,0,0,0,237.94,107.21Zm-15,34.91-28.57,16.25a8,8,0,0,0-3,3c-.58,1-1.19,2.06-1.81,3.06a7.94,7.94,0,0,0-1.22,4.21l-.15,32.25a95.89,95.89,0,0,1-25.37,14.3L134,199.13a8,8,0,0,0-3.91-1h-.19c-1.21,0-2.43,0-3.64,0a8.1,8.1,0,0,0-4.1,1l-28.84,16.1A96,96,0,0,1,67.88,201l-.11-32.2a8,8,0,0,0-1.22-4.22c-.62-1-1.23-2-1.8-3.06a8.09,8.09,0,0,0-3-3.06l-28.6-16.29a90.49,90.49,0,0,1,0-28.26L61.67,97.63a8,8,0,0,0,3-3c.58-1,1.19-2.06,1.81-3.06a7.94,7.94,0,0,0,1.22-4.21l.15-32.25a95.89,95.89,0,0,1,25.37-14.3L122,56.87a8,8,0,0,0,4.1,1c1.21,0,2.43,0,3.64,0a8,8,0,0,0,4.1-1l28.84-16.1A96,96,0,0,1,188.12,55l.11,32.2a8,8,0,0,0,1.22,4.22c.62,1,1.23,2,1.8,3.06a8.09,8.09,0,0,0,3,3.06l28.6,16.29A90.49,90.49,0,0,1,222.9,142.12Z"/></svg></span> Configuration</h1>
 				<p class="page-summary">Every bxdocs.json key, what it defaults to, and what it does.</p>
 <div class="page-tags"><a class="page-tag" href="/bx-docs/development/theme/material/tags/index.html#tag-reference">reference</a><a class="page-tag" href="/bx-docs/development/theme/material/tags/index.html#tag-configuration">configuration</a></div>
-<nav class="md-toc" aria-label="On this page"><div class="md-toc__title">On this page</div><ul><li class="md-toc__item md-toc__item--2"><a href="#name">name</a></li><li class="md-toc__item md-toc__item--2"><a href="#description">description</a></li><li class="md-toc__item md-toc__item--2"><a href="#baseurl">baseURL</a></li><li class="md-toc__item md-toc__item--2"><a href="#llmstxt">llms.txt</a></li><li class="md-toc__item md-toc__item--2"><a href="#sitemapxml">sitemap.xml</a></li><li class="md-toc__item md-toc__item--2"><a href="#theme">theme</a></li><li class="md-toc__item md-toc__item--2"><a href="#search">search</a></li><li class="md-toc__item md-toc__item--2"><a href="#nav">nav</a></li><li class="md-toc__item md-toc__item--2"><a href="#markdown">markdown</a></li><li class="md-toc__item md-toc__item--2"><a href="#repo">repo</a></li><li class="md-toc__item md-toc__item--2"><a href="#social">social</a></li><li class="md-toc__item md-toc__item--2"><a href="#footer">footer</a></li><li class="md-toc__item md-toc__item--2"><a href="#lastupdated">lastUpdated</a></li><li class="md-toc__item md-toc__item--2"><a href="#analytics">analytics</a></li><li class="md-toc__item md-toc__item--2"><a href="#ogimage">ogImage</a></li><li class="md-toc__item md-toc__item--3"><a href="#generateogimages">generateOgImages</a></li><li class="md-toc__item md-toc__item--2"><a href="#extracss--extrajs">extraCss / extraJs</a></li><li class="md-toc__item md-toc__item--2"><a href="#mermaid">mermaid</a></li><li class="md-toc__item md-toc__item--2"><a href="#math">math</a></li><li class="md-toc__item md-toc__item--2"><a href="#plugins">plugins</a></li><li class="md-toc__item md-toc__item--2"><a href="#i18n">i18n</a></li><li class="md-toc__item md-toc__item--2"><a href="#versioning">Versioning</a></li></ul></nav>
+<nav class="md-toc" aria-label="On this page"><div class="md-toc__title">On this page</div><ul><li class="md-toc__item md-toc__item--2"><a href="#name">name</a></li><li class="md-toc__item md-toc__item--2"><a href="#description">description</a></li><li class="md-toc__item md-toc__item--2"><a href="#baseurl">baseURL</a></li><li class="md-toc__item md-toc__item--2"><a href="#llmstxt">llms.txt</a></li><li class="md-toc__item md-toc__item--2"><a href="#sitemapxml">sitemap.xml</a></li><li class="md-toc__item md-toc__item--2"><a href="#theme">theme</a></li><li class="md-toc__item md-toc__item--2"><a href="#search">search</a></li><li class="md-toc__item md-toc__item--2"><a href="#searchprovider">searchProvider</a></li><li class="md-toc__item md-toc__item--2"><a href="#nav">nav</a></li><li class="md-toc__item md-toc__item--2"><a href="#markdown">markdown</a></li><li class="md-toc__item md-toc__item--2"><a href="#repo">repo</a></li><li class="md-toc__item md-toc__item--2"><a href="#social">social</a></li><li class="md-toc__item md-toc__item--2"><a href="#footer">footer</a></li><li class="md-toc__item md-toc__item--2"><a href="#lastupdated">lastUpdated</a></li><li class="md-toc__item md-toc__item--2"><a href="#analytics">analytics</a></li><li class="md-toc__item md-toc__item--2"><a href="#ogimage">ogImage</a></li><li class="md-toc__item md-toc__item--3"><a href="#generateogimages">generateOgImages</a></li><li class="md-toc__item md-toc__item--2"><a href="#extracss--extrajs">extraCss / extraJs</a></li><li class="md-toc__item md-toc__item--2"><a href="#mermaid">mermaid</a></li><li class="md-toc__item md-toc__item--2"><a href="#math">math</a></li><li class="md-toc__item md-toc__item--2"><a href="#plugins">plugins</a></li><li class="md-toc__item md-toc__item--2"><a href="#i18n">i18n</a></li><li class="md-toc__item md-toc__item--2"><a href="#versioning">Versioning</a></li></ul></nav>
 				<div class="md-content-body">
 				<h1 id="configuration"><a href="#configuration" id="configuration" name="configuration" class="anchor"></a>Configuration</h1>
 <p>Every project has one <code>bxdocs.json</code> at its root:</p>
@@ -92,6 +93,10 @@
 		&quot;favicon&quot;: &quot;&quot;
 	},
 	&quot;search&quot;: true,
+	&quot;searchProvider&quot;: {
+		&quot;provider&quot;: &quot;local&quot;,
+		&quot;algolia&quot;: { &quot;appId&quot;: &quot;&quot;, &quot;apiKey&quot;: &quot;&quot;, &quot;indexName&quot;: &quot;&quot;, &quot;insights&quot;: false }
+	},
 	&quot;nav&quot;: [],
 	&quot;markdown&quot;: { &quot;enableAdmonition&quot;: true },
 	&quot;repo&quot;: {
@@ -226,6 +231,52 @@ place it always rendered before this option existed.</p>
 <p><code>true</code> (the default) builds a static search index and wires up the search
 box; <code>false</code> skips both entirely - no <code>search-index.json</code>, no search UI, no
 extra JS shipped. See <a href="/bx-docs/development/theme/material/guides/search/index.html">Search</a>.</p>
+<h2 id="searchprovider"><a href="#searchprovider" id="searchprovider" name="searchprovider" class="anchor"></a><code>searchProvider</code></h2>
+<p>Which search UI <code>search: true</code> wires up:</p>
+<ul>
+<li>
+<p><code>provider</code> - <code>&quot;local&quot;</code> (the default) is bx-docs' own static/client-side
+search (<code>search-index.json</code> + lunr.js, see <a href="/bx-docs/development/theme/material/guides/search/index.html#local-the-default">Search</a>).
+<code>&quot;algolia&quot;</code> wires up <a href="/bx-docs/development/theme/material/guides/search/index.html#algolia">Algolia DocSearch</a>
+instead, and <code>&quot;pagefind&quot;</code> wires up <a href="/bx-docs/development/theme/material/guides/search/index.html#pagefind">Pagefind</a>.
+Any other value is a project's own custom provider, wired up by a
+<code>theme/</code> override - see <a href="/bx-docs/development/theme/material/guides/search/index.html#other-search-providers">Search</a>.</p>
+</li>
+<li>
+<p><code>algolia</code> - required when <code>provider</code> is <code>&quot;algolia&quot;</code>: <code>appId</code>, <code>apiKey</code>
+(the <em>search-only</em> public API key, not an admin key) and <code>indexName</code>,
+exactly as Algolia's own DocSearch client expects them. <code>insights</code>
+(<code>false</code> by default) turns on DocSearch's click/conversion analytics.</p>
+<pre><code class="language-json">{
+  &quot;search&quot;: true,
+  &quot;searchProvider&quot;: {
+    &quot;provider&quot;: &quot;algolia&quot;,
+    &quot;algolia&quot;: {
+      &quot;appId&quot;: &quot;ABC123&quot;,
+      &quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
+      &quot;indexName&quot;: &quot;my-docs&quot;
+    }
+  }
+}
+</code></pre>
+</li>
+<li>
+<p><code>pagefind</code> - both keys optional when <code>provider</code> is <code>&quot;pagefind&quot;</code>: <code>bin</code>
+(default <code>&quot;pagefind&quot;</code>) is the CLI executable name/path, resolved against
+<code>PATH</code> when it's a bare name; <code>options</code> is an array of extra raw CLI
+flags passed straight through. The <code>pagefind</code> CLI itself must already be
+installed and on <code>PATH</code> - BX Docs shells out to it (like <code>git</code> for
+<code>lastUpdated</code>/<code>gh-deploy</code>), it doesn't install it for you.</p>
+<pre><code class="language-json">{
+  &quot;search&quot;: true,
+  &quot;searchProvider&quot;: {
+    &quot;provider&quot;: &quot;pagefind&quot;,
+    &quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
+  }
+}
+</code></pre>
+</li>
+</ul>
 <h2 id="nav"><a href="#nav" id="nav" name="nav" class="anchor"></a><code>nav</code></h2>
 <p>By default, nav is inferred from <code>docs/</code>'s own folder/file structure (with
 <code>order</code>/<code>hidden</code> frontmatter) - fine for small sites, but a large one can
@@ -494,7 +545,7 @@ under <code>docs/versions/</code> (not inside a subfolder) is ignored.</p>
 main site's.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-docs/development/theme/material/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 20, 2026, 10:08:17 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-docs/development/theme/material/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 20, 2026, 10:39:50 PM</span></div>
 			</article>
 
 			<nav class="md-page-nav" aria-label="Page navigation">

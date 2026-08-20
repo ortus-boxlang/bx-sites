@@ -52,6 +52,7 @@
 		<div class="navbar-controls">
 <div class="bxdocs-search relative">
 	<input type="search" id="bxdocs-search-input" class="w-full rounded border border-slate-300 px-3 py-1.5 text-sm" placeholder="Search docs..." aria-label="Search">
+	<kbd class="bxdocs-search-kbd" aria-hidden="true">Ctrl K</kbd>
 	<ul id="bxdocs-search-results" class="bxdocs-search-results absolute z-10 mt-1 w-full rounded border border-slate-200 bg-white shadow-lg"></ul>
 </div>
 
@@ -77,9 +78,14 @@
 
 				<h1 class="relative mb-6 border-b-4 border-[#FFF500] pb-2 text-2xl font-bold" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxdocs-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M192,112a80,80,0,1,1-80-80A80,80,0,0,1,192,112Z" opacity="0.2"/><path d="M229.66,218.34,179.6,168.28a88.21,88.21,0,1,0-11.32,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg></span> Search</h1>
 <div class="mb-4 flex flex-wrap gap-2"><a class="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700 hover:bg-cyan-100" href="/bx-docs/development/theme/tailwind/tags/index.html#tag-guides">guides</a><a class="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700 hover:bg-cyan-100" href="/bx-docs/development/theme/tailwind/tags/index.html#tag-search">search</a></div>
-<nav class="mb-6 rounded border border-slate-200 bg-cyan-50/40 px-4 py-3 text-sm"><div class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">On this page</div><ul class="space-y-1"><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#how-it-works">How it works</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#keyboard-shortcuts">Keyboard shortcuts</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#turning-it-off">Turning it off</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#rebuilding-just-the-index">Rebuilding just the index</a></li></ul></nav>
+<nav class="mb-6 rounded border border-slate-200 bg-cyan-50/40 px-4 py-3 text-sm"><div class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">On this page</div><ul class="space-y-1"><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#local-the-default">Local (the default)</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#how-it-works">How it works</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#keyboard-shortcuts">Keyboard shortcuts</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#turning-it-off">Turning it off</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#rebuilding-just-the-index">Rebuilding just the index</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#algolia">Algolia</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#pagefind">Pagefind</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#other-search-providers">Other search providers</a></li></ul></nav>
 				<div class="prose max-w-none">
 					<h1 id="search"><a href="#search" id="search" name="search" class="anchor"></a>Search</h1>
+<p>BX Docs ships one search provider by default and can be pointed at others
+via <code>bxdocs.json</code>'s <a href="/bx-docs/development/theme/tailwind/configuration/index.html#searchprovider"><code>searchProvider</code></a> -
+<code>search: true</code>/<code>false</code> stays the master on/off switch regardless of which
+provider is active.</p>
+<h2 id="local-the-default"><a href="#local-the-default" id="local-the-default" name="local-the-default" class="anchor"></a>Local (the default)</h2>
 <p>BX Docs' search is fully static and client-side - the same approach
 <a href="https://www.mkdocs.org/">mkdocs</a> uses by default: an index built once at
 <code>build</code> time, and <a href="https://lunrjs.com/">lunr.js</a> doing the actual searching
@@ -93,7 +99,9 @@ frontmatter <code>tags</code>, the text of every heading on the page, and a
 truncated plain-text copy of its body (HTML tags stripped).</li>
 <li>Each theme's <code>search.bxm</code> partial renders a search box; <code>layout.bxm</code>
 only includes it (and the <code>lunr.js</code> + shared <code>search.js</code> scripts) when
-<code>bxdocs.json</code>'s <code>search</code> is <code>true</code>.</li>
+<code>bxdocs.json</code>'s <code>search</code> is <code>true</code> and <code>searchProvider.provider</code> is
+<code>&quot;local&quot;</code> (the default - see <a href="#other-search-providers">Other providers</a>
+below for what changes with a different one).</li>
 <li>In the browser, the shared <code>assets/search.js</code> widget fetches
 <code>search-index.json</code> once, builds a <code>lunr</code> index from it (<code>title</code>
 weighted highest, then frontmatter <code>tags</code>, then <code>headings</code>, then plain
@@ -105,23 +113,130 @@ round-trip per query.</li>
 <li><strong><code>/</code></strong> focuses the search box from anywhere on the page (unless you're
 already typing in another field) - the same convention
 <a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a> uses.</li>
+<li><strong>Cmd/Ctrl+K</strong> also focuses it, from anywhere - including while typing in
+another field - the convention Algolia DocSearch, Pagefind, VitePress and
+Docusaurus all share. The search box shows a small <code>Ctrl K</code>/<code>⌘K</code> hint
+(platform-detected) so it's discoverable.</li>
 <li><strong><code>Escape</code></strong> closes the results dropdown and blurs the search box.</li>
 </ul>
+<p>Cmd/Ctrl+K works the same way for every provider - <code>local</code>'s own widget
+binds it directly, <code>algolia</code> gets it for free from DocSearch itself
+(<code>keyboardShortcuts</code> defaults to <code>true</code>), and <code>pagefind</code> gets it wired up
+by <code>layout.bxm</code> since <code>PagefindUI</code> doesn't bind it on its own.</p>
 <h2 id="turning-it-off"><a href="#turning-it-off" id="turning-it-off" name="turning-it-off" class="anchor"></a>Turning it off</h2>
 <pre><code class="language-json">{ &quot;search&quot;: false }
 </code></pre>
 <p>Skips building <code>search-index.json</code> entirely, and skips the search box, the
 <code>lunr.js</code> CDN script, and the shared <code>search.js</code> widget in every rendered
-page - a project with search off ships nothing search-related at all.</p>
+page - a project with search off ships nothing search-related at all. This
+is the master switch - it applies no matter which <code>searchProvider</code> is
+configured.</p>
 <h2 id="rebuilding-just-the-index"><a href="#rebuilding-just-the-index" id="rebuilding-just-the-index" name="rebuilding-just-the-index" class="anchor"></a>Rebuilding just the index</h2>
 <pre><code class="language-bash">bxDocs search-index
 </code></pre>
 <p>Useful if you only need to refresh <code>search-index.json</code> - <code>build</code> already
 does this as one of its own steps, so you don't need to run this
-separately after a normal build.</p>
+separately after a normal build. Only runs for providers that use the local
+index (<code>&quot;local&quot;</code>, and any provider bx-docs doesn't otherwise know about) -
+it's a no-op (<code>skipped: true</code>) when <code>searchProvider.provider</code> is <code>&quot;algolia&quot;</code>
+or <code>&quot;pagefind&quot;</code>, since neither ever uses it.</p>
+<h2 id="algolia"><a href="#algolia" id="algolia" name="algolia" class="anchor"></a>Algolia</h2>
+<p>Set <code>searchProvider.provider</code> to <code>&quot;algolia&quot;</code> to swap the search box for
+<a href="https://docsearch.algolia.com/">Algolia DocSearch</a> - the same
+crawler-hosted search mkdocs-material, VitePress, Starlight and Docusaurus
+all support:</p>
+<pre><code class="language-json">{
+	&quot;search&quot;: true,
+	&quot;searchProvider&quot;: {
+		&quot;provider&quot;: &quot;algolia&quot;,
+		&quot;algolia&quot;: {
+			&quot;appId&quot;: &quot;ABC123&quot;,
+			&quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
+			&quot;indexName&quot;: &quot;my-docs&quot;,
+			&quot;insights&quot;: false
+		}
+	}
+}
+</code></pre>
+<p><code>appId</code>, <code>apiKey</code> and <code>indexName</code> are required - <code>apiKey</code> is the
+<strong>search-only</strong> public API key DocSearch gives you (never an admin key; it's
+shipped straight into every rendered page). <code>insights</code> (<code>false</code> by default)
+turns on DocSearch's own click/conversion analytics.</p>
+<p>With <code>algolia</code> active:</p>
+<ul>
+<li>No <code>search-index.json</code> is built, and the shared <code>lunr.js</code>/<code>search.js</code>
+widget isn't shipped - Algolia serves results from its own hosted index,
+populated by <a href="https://docsearch.algolia.com/docs/what-is-docsearch/">DocSearch's crawler</a>
+or your own <a href="https://www.algolia.com/products/search-and-discovery/crawler/">Algolia Crawler</a>
+config, not by anything BX Docs writes at build time. You still need to
+register the site with DocSearch (or run your own crawler) separately -
+BX Docs only wires up the client widget.</li>
+<li>Each built-in theme instead renders an empty <code>#bxdocs-search-algolia</code>
+container, and <code>layout.bxm</code> loads <code>@docsearch/css</code>/<code>@docsearch/js</code> from
+jsDelivr and calls <code>docsearch({...})</code> against it - DocSearch renders its
+own search button and modal into that container.</li>
+</ul>
+<h2 id="pagefind"><a href="#pagefind" id="pagefind" name="pagefind" class="anchor"></a>Pagefind</h2>
+<p>Set <code>searchProvider.provider</code> to <code>&quot;pagefind&quot;</code> to swap the search box for
+<a href="https://pagefind.app/">Pagefind</a> - another fully static/no-server search
+engine, but indexed from the <em>built</em> <code>site/</code> HTML rather than crawled like
+Algolia:</p>
+<pre><code class="language-json">{
+	&quot;search&quot;: true,
+	&quot;searchProvider&quot;: {
+		&quot;provider&quot;: &quot;pagefind&quot;,
+		&quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
+	}
+}
+</code></pre>
+<p>Both <code>pagefind</code> keys are optional - <code>bin</code> (default <code>&quot;pagefind&quot;</code>) is the
+executable name/path, resolved against <code>PATH</code> when it's a bare name;
+<code>options</code> is an array of extra raw CLI flags passed straight through (e.g.
+<code>[&quot;--exclude-selectors&quot;, &quot;.no-index&quot;]</code>).</p>
+<p>With <code>pagefind</code> active:</p>
+<ul>
+<li><strong>The <code>pagefind</code> CLI must already be installed and on <code>PATH</code></strong> - BX Docs
+shells out to it (there's no BoxLang-native binding, the same reason
+<code>lastUpdated</code>/<code>gh-deploy</code> shell out to <code>git</code>), it doesn't install it for
+you. See <a href="https://pagefind.app/docs/installation/">Pagefind's installation docs</a>.
+Unlike <code>lastUpdated</code>, a missing/failing binary fails the <code>build</code> loudly
+(<code>BxDocs.PagefindFailed</code>) rather than degrading silently - shipping a
+site whose configured search provider doesn't work is worse than a
+failed build.</li>
+<li>Right after every doc tree (main + versions + locales) is written and
+<code>sitemap.xml</code>/<code>llms.txt</code> are generated, BX Docs runs
+<code>pagefind --site &lt;siteDir&gt; [...options]</code> against the <em>entire</em> built
+<code>site/</code> - so a multi-version/multi-locale site gets everything indexed
+in one pass, unlike bx-docs' own per-tree <code>search-index.json</code>. Pagefind
+writes its own bundle straight into <code>site/pagefind/</code> - self-hosted, no
+CDN involved.</li>
+<li>No <code>search-index.json</code> is built, and the shared <code>lunr.js</code>/<code>search.js</code>
+widget isn't shipped (same as <code>algolia</code>) - and <code>bxDocs search-index</code> is
+a no-op for the same reason (see above).</li>
+<li>Each built-in theme renders an empty <code>#bxdocs-search-pagefind</code>
+container, and <code>layout.bxm</code> loads <code>site/pagefind/pagefind-ui.{css,js}</code>
+and calls <code>new PagefindUI({...})</code> against it - Pagefind renders its own
+inline search box and results into that container.</li>
+</ul>
+<h2 id="other-search-providers"><a href="#other-search-providers" id="other-search-providers" name="other-search-providers" class="anchor"></a>Other search providers</h2>
+<p><code>searchProvider.provider</code> isn't limited to <code>&quot;local&quot;</code>/<code>&quot;algolia&quot;</code>/<code>&quot;pagefind&quot;</code> -
+any other value is accepted by <code>bxdocs.json</code> as-is (BX Docs' own config
+validation only checks the three providers above). There's no plugin hook
+for this one - the built-in themes simply render nothing for an
+unrecognized provider name, and wiring up a fourth search service
+(Meilisearch, Typesense, etc.) is a project-level
+<a href="/bx-docs/development/theme/tailwind/guides/themes/index.html#overriding-a-theme">theme override</a>: copy a built-in theme into
+your project's own <code>theme/</code> folder and add your provider's markup/scripts
+to its <code>layout.bxm</code>/<code>search.bxm</code>, reading <code>siteConfig.searchProvider</code> to
+decide when to render them - <code>searchProviderName eq &quot;...&quot;</code> branches for
+the mount point in <code>search.bxm</code>, matching branches in <code>layout.bxm</code> for its
+CSS/JS, and (if it isn't crawler-hosted like Algolia) whatever indexing
+step that product needs against <code>site/</code> after <code>build</code> - the same shape
+this module's own <code>layout.bxm</code>/<code>BuildPipeline.bx</code> already use for
+<code>algolia</code>/<code>pagefind</code>.</p>
 
 				</div>
-<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/bx-docs/development/theme/tailwind/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 20, 2026, 10:08:17 PM</span></div>
+<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/bx-docs/development/theme/tailwind/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 20, 2026, 10:39:50 PM</span></div>
 			</article>
 
 			<nav class="mt-8 flex justify-between border-t border-slate-200 pt-4 text-sm font-semibold" aria-label="Page navigation">

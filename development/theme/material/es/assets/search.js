@@ -9,6 +9,10 @@
  * `window.__BXDOCS_BASE_PATH__` (set inline by layout.bxm from
  * BaseUrlResolver's `basePath`) prefixes both the index fetch and every
  * result link, so search still works when a site is hosted from a sub-path.
+ *
+ * `/` and Cmd/Ctrl+K both focus the search box from anywhere on the page;
+ * a theme's `.bxdocs-search-kbd` badge (if it renders one) gets its text
+ * swapped to the platform-correct hint.
  */
 ( function () {
 	function basePath() {
@@ -129,6 +133,25 @@
 			evt.preventDefault();
 			input.focus();
 		} );
+
+		// Cmd/Ctrl+K - the convention every other doc-search widget (Algolia
+		// DocSearch, Pagefind, VitePress, Docusaurus, ...) uses; unlike "/"
+		// above it's meant to work everywhere, including while typing in
+		// another field, so there's no "already typing" guard here.
+		document.addEventListener( "keydown", function ( evt ) {
+			if ( !( evt.ctrlKey || evt.metaKey ) || evt.key.toLowerCase() !== "k" ) {
+				return;
+			}
+			evt.preventDefault();
+			input.focus();
+		} );
+
+		// Shows the platform-correct hint (⌘K on Mac, Ctrl K elsewhere) in the
+		// kbd badge search.bxm renders next to the input, if the theme has one.
+		var kbd = document.querySelector( ".bxdocs-search-kbd" );
+		if ( kbd && /Mac|iPod|iPhone|iPad/.test( window.navigator.platform || "" ) ) {
+			kbd.textContent = "⌘K";
+		}
 	}
 
 	if ( document.readyState === "loading" ) {
