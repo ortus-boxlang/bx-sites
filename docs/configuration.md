@@ -124,12 +124,15 @@ non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
     { "theme": { "options": { "colorMode": "dark" } } }
     ```
   - `theme.options.navCollapsible` - `false` (the default) renders every nav
-    section heading always expanded, as today. `true` renders each nav
-    section (a folder with no `index.md`) as a native `<details>`/`<summary>`
-    disclosure the visitor can collapse - no JS framework involved.
+    section always expanded, as today. `true` gives every section with
+    children a toggle button the visitor can click to collapse/expand it -
+    whether that section is a bare group heading (a folder with no
+    `index.md`) or links to its own page. The section containing the page
+    you're currently on always starts open, regardless of `navExpandAll`,
+    so navigating there never buries the very link you're on.
   - `theme.options.navExpandAll` - only relevant when `navCollapsible` is
     `true`. `true` (the default) starts every section open; `false` starts
-    every section collapsed.
+    every section collapsed, except the one containing the current page.
 
     ```json
     { "theme": { "options": { "navCollapsible": true, "navExpandAll": false } } }
@@ -164,12 +167,17 @@ linked from the nav (same as `hidden: true`). Each entry is either:
   only the nav label/icon changes) - see [Themes: Icons](guides/themes.md#icons)
   for what an `icon` value can be
 
+A `title`-only entry with `children` and no `path` is exactly a menu
+container/section label - a non-clickable heading that just groups its
+children, the same role GitBook's "MAIN COMPONENTS" plays in its own
+sidebar:
+
 ```json
 {
 	"nav": [
 		"index.md",
 		{
-			"title": "Guides",
+			"title": "Main Components",
 			"children": [
 				{ "title": "Quick Start", "path": "guides/setup.md" },
 				"guides/deployment.md"
@@ -178,6 +186,10 @@ linked from the nav (same as `hidden: true`). Each entry is either:
 	]
 }
 ```
+
+Give that same group entry a `path` instead and it becomes a normal linked
+section (its own landing page, plus children) rather than a bare label - both
+shapes nest under `theme.options.navCollapsible` the same way (see above).
 
 For a nav large enough that it clutters `bxdocs.json`, move it to its own
 `docs/nav.json` file instead - same array shape, just as the whole file's
@@ -404,13 +416,15 @@ convention - a locale builds automatically once its folder exists;
 `i18n` just supplies its display label/direction for the language
 switcher.
 
-- `i18n.defaultLocale` - `{ "code", "label" }` for the project's own
+- `i18n.defaultLocale` - `{ "code", "label", "flag" }` for the project's own
   regular `docs/` tree, defaulting to `{ "code": "en", "label": "English" }`.
   Only needs setting when your default locale isn't English.
-- `i18n.locales` - `[]` (the default) - an array of `{ "code", "label", "dir" }`
+- `i18n.locales` - `[]` (the default) - an array of `{ "code", "label", "dir", "flag" }`
   for every other locale. `code` doubles as the `docs/i18n/<code>/` folder
   name and the built URL prefix - letters/digits/hyphens only (`es`,
-  `pt-BR`, `zh-Hans`). `dir` is `"ltr"` (the default) or `"rtl"`.
+  `pt-BR`, `zh-Hans`). `dir` is `"ltr"` (the default) or `"rtl"`. `flag` is
+  an optional emoji override for the language switcher's flag icon - most
+  common codes already resolve to a sensible flag on their own.
 
 ```json
 {

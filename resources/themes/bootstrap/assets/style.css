@@ -36,6 +36,11 @@
 	--bxdocs-link: #0d7a8f;
 	--bxdocs-link-hover: #00a3bf;
 	--bxdocs-code-bg: #f6f8fa;
+	/* Every header control (search box, version/language switchers, theme
+	   toggle, repo link) shares this one height so the toolbar reads as a
+	   single aligned row instead of a mix of Bootstrap's own form-control/
+	   form-select-sm defaults and this theme's own button padding. */
+	--bxdocs-toolbar-h: 2.375rem;
 }
 
 /* Near-black surface with a mint/teal accent, rather than the blue-gray
@@ -69,12 +74,16 @@ body {
 	border-radius: 10px;
 	font-size: 1.1rem;
 	line-height: 1;
-	padding: 0.35rem 0.6rem;
+	height: var( --bxdocs-toolbar-h );
+	width: var( --bxdocs-toolbar-h );
+	padding: 0;
 	cursor: pointer;
 	flex-shrink: 0;
 	color: #04121a;
 	display: inline-flex;
 	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
 }
 
 .theme-toggle:hover,
@@ -95,10 +104,90 @@ body {
 	color: var( --bxdocs-text );
 }
 
+.bxdocs-search .form-control {
+	height: var( --bxdocs-toolbar-h );
+	box-sizing: border-box;
+}
+
 .version-switcher {
 	flex-shrink: 0;
 	width: auto;
 	max-width: 6.5rem;
+	height: var( --bxdocs-toolbar-h );
+	box-sizing: border-box;
+}
+
+.locale-dropdown {
+	position: relative;
+	flex-shrink: 0;
+}
+
+.locale-dropdown__trigger {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	height: var( --bxdocs-toolbar-h );
+	padding: 0 0.55rem;
+	box-sizing: border-box;
+	background: transparent;
+	border: 1px solid rgba( 0, 0, 0, 0.2 );
+	border-radius: 6px;
+	cursor: pointer;
+	color: #04121a;
+}
+
+.locale-dropdown__trigger:hover {
+	background: rgba( 0, 0, 0, 0.08 );
+}
+
+.locale-dropdown__flag {
+	font-size: 1.15rem;
+	line-height: 1;
+}
+
+.locale-dropdown__caret {
+	font-size: 0.7rem;
+	opacity: 0.7;
+}
+
+.locale-dropdown__menu {
+	position: absolute;
+	top: calc( 100% + 0.35rem );
+	right: 0;
+	z-index: 20;
+	margin: 0;
+	padding: 0.35rem;
+	list-style: none;
+	min-width: 11rem;
+	background: var( --bxdocs-bg );
+	color: var( --bxdocs-text );
+	border: 1px solid rgba( 0, 0, 0, 0.15 );
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.15 );
+}
+
+.locale-dropdown__item {
+	display: flex;
+	align-items: center;
+	gap: 0.55rem;
+	padding: 0.4rem 0.6rem;
+	border-radius: 6px;
+	color: var( --bxdocs-text );
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.locale-dropdown__item:hover {
+	background: rgba( 0, 219, 255, 0.15 );
+}
+
+.locale-dropdown__item--active {
+	font-weight: 600;
+	background: rgba( 0, 219, 255, 0.1 );
+}
+
+.locale-dropdown__item .locale-dropdown__flag {
+	font-size: 1.05rem;
 }
 
 .breadcrumb-nav .breadcrumb {
@@ -187,13 +276,40 @@ body {
 	font-size: 0.9rem;
 }
 
-.nav-section > summary.nav-link {
-	cursor: pointer;
-	list-style: none;
+.sidebar .nav-link.active {
+	color: var( --bxdocs-link );
+	font-weight: 600;
 }
 
-.nav-section > summary.nav-link::-webkit-details-marker {
-	display: none;
+.nav-group-header {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.nav-group-header .nav-link,
+.nav-group-header .nav-link.disabled {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.nav-toggle {
+	flex: 0 0 auto;
+	background: transparent;
+	border: 0;
+	padding: 0.25rem 0.5rem;
+	color: var( --bxdocs-sidebar-text );
+	cursor: pointer;
+	line-height: 1;
+}
+
+.nav-toggle__icon {
+	display: inline-block;
+	transition: transform 0.15s ease;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle__icon {
+	transform: rotate( -180deg );
 }
 
 .brand-logo {

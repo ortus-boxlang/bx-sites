@@ -1,4 +1,5 @@
 <bx:include template="#variables.moduleAssetsDir#/icons.bxm">
+<bx:include template="#variables.moduleAssetsDir#/locale-flags.bxm">
 <bx:script>
 	/**
 	 * Recursively renders a nav tree (module spec section 5, step 4) as a
@@ -7,20 +8,37 @@
 	 * `nested` marks every level below the top one with `nav--nested` so
 	 * style.css can indent it - without that, a child `<ul>` shares the
 	 * exact same class as the top-level list and reads as one flat list.
+	 *
+	 * When `theme.options.navCollapsible` is on, any node with children (
+	 * whether it links to its own page or is a bare group heading) renders a
+	 * `.nav-toggle` button instead of always showing its children inline -
+	 * nav-toggle.js wires the click. `collapsed` marks a child `<ul>` as
+	 * starting hidden; the section containing the current page always
+	 * starts open regardless of `navExpandAll`, so navigating there never
+	 * hides the very link you're on.
 	 */
-	function renderNavList( required array nodes, boolean nested = false ) {
-		var html = "<ul class=""nav flex-column" & ( arguments.nested ? " nav--nested" : "" ) & """>"
+	function renderNavList( required array nodes, boolean nested = false, boolean collapsed = false ) {
+		var html = "<ul class=""nav flex-column" & ( arguments.nested ? " nav--nested" : "" ) & """" & ( arguments.collapsed ? " hidden" : "" ) & ">"
 		for ( var node in arguments.nodes ) {
-			if ( !len( node.url ) && node.children.len() && variables.navCollapsible ) {
-				html &= "<li class=""nav-item""><details class=""nav-section""" & ( variables.navExpandAll ? " open" : "" ) & "><summary class=""nav-link"">" & ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title ) & "</summary>" & renderNavList( node.children, true ) & "</details></li>"
+			var isActive = len( node.url ) && node.url == variables.page.urlPath
+			var linkClass = "nav-link" & ( isActive ? " active" : "" )
+			var labelHtml = ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title )
+			var linkOrSpan = len( node.url )
+				? "<a class=""" & linkClass & """ href=""" & variables.basePath & node.url & """>" & labelHtml & "</a>"
+				: "<span class=""nav-link disabled"">" & labelHtml & "</span>"
+
+			if ( node.children.len() && variables.navCollapsible ) {
+				var open = variables.navExpandAll || navContainsActive( node )
+				html &= "<li class=""nav-item nav-item--group"">"
+				html &= "<div class=""nav-group-header"">" & linkOrSpan
+				html &= "<button type=""button"" class=""nav-toggle"" aria-expanded=""" & ( open ? "true" : "false" ) & """ aria-label=""Toggle " & encodeForHTML( node.title ) & " section""><span class=""nav-toggle__icon"" aria-hidden=""true"">▾</span></button>"
+				html &= "</div>"
+				html &= renderNavList( node.children, true, !open )
+				html &= "</li>"
 				continue
 			}
-			html &= "<li class=""nav-item"">"
-			if ( len( node.url ) ) {
-				html &= "<a class=""nav-link"" href=""" & variables.basePath & node.url & """>" & ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title ) & "</a>"
-			} else {
-				html &= "<span class=""nav-link disabled"">" & ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title ) & "</span>"
-			}
+
+			html &= "<li class=""nav-item"">" & linkOrSpan
 			if ( node.children.len() ) {
 				html &= renderNavList( node.children, true )
 			}
@@ -28,6 +46,23 @@
 		}
 		html &= "</ul>"
 		return html
+	}
+
+	/**
+	 * True when `node` itself links to the current page, or any descendant
+	 * does - used to keep the active branch of a collapsible nav expanded
+	 * regardless of `navExpandAll`.
+	 */
+	boolean function navContainsActive( required struct node ) {
+		if ( len( arguments.node.url ) && arguments.node.url == variables.page.urlPath ) {
+			return true
+		}
+		for ( var child in arguments.node.children ) {
+			if ( navContainsActive( child ) ) {
+				return true
+			}
+		}
+		return false
 	}
 
 	function renderSocialLinks( required array links ) {
@@ -48,13 +83,39 @@
 		return html
 	}
 
-	function renderLocaleSwitcher( required array locales, required string currentLocale ) {
-		var html = '<select class="locale-switcher form-select form-select-sm" onchange="location.href=this.value" aria-label="Language">'
+	/**
+	 * A GitBook-style flag-icon dropdown - the trigger button shows the
+	 * current locale's own flag, opening a menu listing every locale by
+	 * its own flag + label. A locale's `flag` (bxdocs.json's own
+	 * `i18n.locales[].flag`) wins when set; bxdocsLocaleFlag() falls back
+	 * to a built-in language-code lookup otherwise (locale-flags.bxm).
+	 * Alpine (already loaded for the dark-mode toggle) drives open/close -
+	 * no new JS dependency.
+	 */
+	function renderLocaleDropdown( required array locales, required string currentLocale ) {
+		var current = locales[ 1 ]
 		for ( var l in arguments.locales ) {
-			var selected = l.code == arguments.currentLocale ? " selected" : ""
-			html &= '<option value="' & encodeForHTML( l.url ) & '"' & selected & '>' & encodeForHTML( l.label ) & '</option>'
+			if ( l.code == arguments.currentLocale ) {
+				current = l
+				break
+			}
 		}
-		html &= '</select>'
+		var currentFlag = len( current.flag ?: "" ) ? current.flag : bxdocsLocaleFlag( current.code )
+
+		var html = '<div class="locale-dropdown" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">'
+		html &= '<button type="button" class="locale-dropdown__trigger" @click="open = !open" aria-haspopup="true" :aria-expanded="open" aria-label="Language: ' & encodeForHTML( current.label ) & '">'
+		html &= '<span class="locale-dropdown__flag" aria-hidden="true">' & currentFlag & '</span>'
+		html &= '<span class="locale-dropdown__caret" aria-hidden="true">▾</span>'
+		html &= '</button>'
+		html &= '<ul class="locale-dropdown__menu" x-show="open" x-cloak role="menu">'
+		for ( var l in arguments.locales ) {
+			var flag = len( l.flag ?: "" ) ? l.flag : bxdocsLocaleFlag( l.code )
+			var active = l.code == arguments.currentLocale
+			html &= '<li role="none"><a role="menuitem" class="locale-dropdown__item' & ( active ? ' locale-dropdown__item--active' : '' ) & '" href="' & encodeForHTML( l.url ) & '">'
+			html &= '<span class="locale-dropdown__flag" aria-hidden="true">' & flag & '</span> ' & encodeForHTML( l.label )
+			html &= '</a></li>'
+		}
+		html &= '</ul></div>'
 		return html
 	}
 
@@ -163,7 +224,7 @@
 </bx:output><bx:if condition="#variables.versions.len() gt 1#"><bx:output>
 				#renderVersionSwitcher( variables.versions, variables.currentVersion )#
 </bx:output></bx:if><bx:if condition="#variables.locales.len() gt 1#"><bx:output>
-				#renderLocaleSwitcher( variables.locales, variables.currentLocale )#
+				#renderLocaleDropdown( variables.locales, variables.currentLocale )#
 </bx:output></bx:if><bx:if condition="#len( variables.repoUrl )#"><bx:output>
 				<a class="repo-link" href="#encodeForHTML( variables.repoUrl )#" target="_blank" rel="noopener noreferrer" aria-label="Repository" title="Repository">#bxdocsIcon( "github" )#</a>
 </bx:output></bx:if><bx:output>
@@ -205,6 +266,7 @@
 	<script src="#variables.basePath#assets/code-lines.js"></script>
 	<script src="#variables.basePath#assets/copy-code.js" defer></script>
 	<script src="#variables.basePath#assets/admonition-collapse.js" defer></script>
+	<script src="#variables.basePath#assets/nav-toggle.js" defer></script>
 	<script src="#variables.basePath#assets/tabs.js" defer></script>
 </bx:output><bx:if condition="#variables.mermaidEnabled#"><bx:output>
 	<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>

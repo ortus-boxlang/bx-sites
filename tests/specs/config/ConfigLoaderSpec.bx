@@ -421,6 +421,18 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxDocs.InvalidConfig" );
 			} );
 
+			it( "preserves a user-supplied locale [flag] override", function() {
+				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":[{"code":"es","label":"Español","flag":"🇲🇽"}]}}' );
+				expect( loader.load( dir ).i18n.locales[ 1 ].flag ).toBe( "🇲🇽" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when a locale [flag] isn't a string", function() {
+				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":[{"code":"es","label":"Español","flag":["not","a","string"]}]}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
 			it( "throws BxDocs.InvalidConfig when two locales share the same code (case-insensitively)", function() {
 				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":[{"code":"es","label":"Español"},{"code":"ES","label":"Duplicate"}]}}' );
 				expect( function() {

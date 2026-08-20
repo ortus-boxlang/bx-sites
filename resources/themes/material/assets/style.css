@@ -35,6 +35,9 @@
 	--md-link-hover: #00a3bf;
 	--md-border: rgba( 0, 0, 0, 0.1 );
 	--md-code-bg: #f6f8fa;
+	/* Every header control shares this one height so the toolbar reads as
+	   a single aligned row instead of a mix of ad hoc paddings. */
+	--bxdocs-toolbar-h: 2.375rem;
 }
 
 /* Near-black surface with a mint/teal accent, rather than the blue-gray
@@ -159,13 +162,42 @@ body.md-body {
 	color: var( --md-muted );
 }
 
-.md-nav__section > summary.md-nav__heading {
-	cursor: pointer;
-	list-style: none;
+.md-nav__link--active {
+	color: var( --md-link );
+	font-weight: 600;
+	background: rgba( 0, 219, 255, 0.1 );
 }
 
-.md-nav__section > summary.md-nav__heading::-webkit-details-marker {
-	display: none;
+.md-nav__group-header {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.md-nav__group-header .md-nav__link,
+.md-nav__group-header .md-nav__heading {
+	flex: 1 1 auto;
+	min-width: 0;
+	padding-inline-end: 0;
+}
+
+.nav-toggle {
+	flex: 0 0 auto;
+	background: transparent;
+	border: 0;
+	padding: 0.25rem 0.75rem;
+	color: var( --md-ink );
+	cursor: pointer;
+	line-height: 1;
+}
+
+.nav-toggle__icon {
+	display: inline-block;
+	transition: transform 0.15s ease;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle__icon {
+	transform: rotate( -180deg );
 }
 
 .brand-logo {
@@ -215,12 +247,16 @@ a:hover {
 	border-radius: 10px;
 	font-size: 1.1rem;
 	line-height: 1;
-	padding: 0.35rem 0.6rem;
+	height: var( --bxdocs-toolbar-h );
+	width: var( --bxdocs-toolbar-h );
+	padding: 0;
 	cursor: pointer;
 	flex-shrink: 0;
 	color: #04121a;
 	display: inline-flex;
 	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
 }
 
 [data-theme="dark"] .theme-toggle,
@@ -239,12 +275,81 @@ a:hover {
 	flex-shrink: 0;
 	width: auto;
 	max-width: 6.5rem;
+	height: var( --bxdocs-toolbar-h );
+	box-sizing: border-box;
 }
 
-.locale-switcher {
+.locale-dropdown {
+	position: relative;
 	flex-shrink: 0;
-	width: auto;
-	max-width: 6.5rem;
+}
+
+.locale-dropdown__trigger {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	height: var( --bxdocs-toolbar-h );
+	padding: 0 0.55rem;
+	box-sizing: border-box;
+	background: rgba( 255, 255, 255, 0.85 );
+	border: none;
+	border-radius: 20px;
+	cursor: pointer;
+	color: #04121a;
+}
+
+.locale-dropdown__trigger:hover {
+	background: #ffffff;
+}
+
+.locale-dropdown__flag {
+	font-size: 1.15rem;
+	line-height: 1;
+}
+
+.locale-dropdown__caret {
+	font-size: 0.7rem;
+	opacity: 0.7;
+}
+
+.locale-dropdown__menu {
+	position: absolute;
+	top: calc( 100% + 0.35rem );
+	right: 0;
+	z-index: 20;
+	margin: 0;
+	padding: 0.35rem;
+	list-style: none;
+	min-width: 11rem;
+	background: var( --md-surface );
+	color: var( --md-ink );
+	border: 1px solid var( --md-border );
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.15 );
+}
+
+.locale-dropdown__item {
+	display: flex;
+	align-items: center;
+	gap: 0.55rem;
+	padding: 0.4rem 0.6rem;
+	border-radius: 6px;
+	color: var( --md-ink );
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.locale-dropdown__item:hover {
+	background: rgba( 0, 124, 145, 0.12 );
+}
+
+.locale-dropdown__item--active {
+	font-weight: 600;
+	background: rgba( 0, 124, 145, 0.08 );
+}
+
+.locale-dropdown__item .locale-dropdown__flag {
+	font-size: 1.05rem;
 }
 
 .fallback-notice {
@@ -301,11 +406,13 @@ a:hover {
 
 .md-search__input {
 	width: 100%;
-	padding: 0.4rem 0.75rem;
+	height: var( --bxdocs-toolbar-h );
+	padding: 0 0.75rem;
 	border: none;
 	border-radius: 20px;
 	background: rgba( 255, 255, 255, 0.85 );
 	color: #1b1f21;
+	box-sizing: border-box;
 }
 
 [data-theme="dark"] .md-search__input {
