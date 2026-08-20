@@ -277,11 +277,35 @@ without touching <code>resources/themes/</code> at all:</p>
 <p>The <code>bootstrap</code> theme's own set (<code>resources/themes/bootstrap/assets/style.css</code>)
 is <code>--bxdocs-gradient-start</code>/<code>-end</code>, <code>--bxdocs-accent</code>, <code>--bxdocs-bg</code>,
 <code>--bxdocs-text</code>, <code>--bxdocs-sidebar-bg</code>, <code>--bxdocs-sidebar-text</code>,
-<code>--bxdocs-border</code>, <code>--bxdocs-link</code>, <code>--bxdocs-link-hover</code> and
-<code>--bxdocs-code-bg</code> - <code>material</code> and <code>tailwind</code> follow the same <code>--bxdocs-*</code>
-naming with their own small variations. Anything beyond color/font
-(layout, adding/removing chrome) needs a real override or a custom theme -
-see below.</p>
+<code>--bxdocs-border</code>, <code>--bxdocs-link</code>, <code>--bxdocs-link-hover</code>,
+<code>--bxdocs-code-bg</code>, <code>--bxdocs-step-marker-bg</code>, <code>--bxdocs-step-marker-text</code>,
+<code>--bxdocs-step-line</code>, <code>--bxdocs-step-success-bg</code>/<code>-text</code>,
+<code>--bxdocs-step-warning-bg</code>/<code>-text</code> and <code>--bxdocs-step-danger-bg</code>/<code>-text</code> -
+<code>material</code> and <code>tailwind</code> follow the same <code>--bxdocs-*</code> naming with their
+own small variations. Anything beyond color/font (layout, adding/removing
+chrome) needs a real override or a custom theme - see below.</p>
+<p>The rest back the <a href="/bx-docs/development/theme/material/guides/markdown/index.html#stepper"><code>::: stepper</code>/<code>::: step</code></a> directive
+block - <code>--bxdocs-step-marker-bg</code>/<code>-text</code> are the default numbered circle's
+background/text color (<code>bootstrap</code>/<code>material</code> default it to the theme's
+own <code>--bxdocs-accent</code>; <code>tailwind</code> uses a dedicated teal/mint pair since it
+doesn't have a single shared accent token), <code>--bxdocs-step-line</code> is the
+connecting line between steps, and the <code>-success</code>/<code>-warning</code>/<code>-danger</code>
+pairs back a step's own optional <code>color=&quot;...&quot;</code> attribute - unlike the
+default marker, these three are the same fixed bg/text pair in both
+light and dark mode (a self-contained badge, not tied to the theme's own
+brand accent), so there's no <code>[data-theme=&quot;dark&quot;]</code> override to redeclare:</p>
+<pre><code class="language-css">:root {
+	--bxdocs-step-marker-bg: #7C3AED;
+	--bxdocs-step-marker-text: #fff;
+	--bxdocs-step-success-bg: #059669;
+	--bxdocs-step-success-text: #fff;
+}
+
+[data-theme=&quot;dark&quot;] {
+	--bxdocs-step-marker-bg: #C4B5FD;
+	--bxdocs-step-marker-text: #1b1f21;
+}
+</code></pre>
 <h2 id="overriding-a-theme"><a href="#overriding-a-theme" id="overriding-a-theme" name="overriding-a-theme" class="anchor"></a>Overriding a theme</h2>
 <p>Drop your own <code>layout.bxm</code> + <code>page.bxm</code> (and optionally <code>search.bxm</code> /
 <code>assets/</code>) into a <code>theme/</code> folder at your project root. BX Docs prefers a
@@ -405,7 +429,7 @@ on <code>variables.page</code>), or an <code>assets/</code> folder for your own 
 <code>site/assets/theme/</code> automatically at build time.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-docs/development/theme/material/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 20, 2026, 11:16:10 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-docs/development/theme/material/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 20, 2026, 11:47:58 PM</span></div>
 			</article>
 
 			<nav class="md-page-nav" aria-label="Page navigation">

@@ -35,6 +35,25 @@
 	/* Every header control shares this one height so the toolbar reads as
 	   a single aligned row instead of a mix of ad hoc utility paddings. */
 	--bxdocs-toolbar-h: 2.375rem;
+	--bxdocs-step-marker-bg: #0e7490;
+	--bxdocs-step-marker-text: #fff;
+	--bxdocs-step-line: rgba( 0, 0, 0, 0.12 );
+	/* `::: step color="..."` (module spec's directive blocks) - a fixed
+	   bg/text contrast pair each, so they read the same regardless of
+	   light/dark mode (unlike the marker/line tokens above, which have their
+	   own [data-theme="dark"] override below). */
+	--bxdocs-step-success-bg: #16a34a;
+	--bxdocs-step-success-text: #ffffff;
+	--bxdocs-step-warning-bg: #f59e0b;
+	--bxdocs-step-warning-text: #1a1300;
+	--bxdocs-step-danger-bg: #dc2626;
+	--bxdocs-step-danger-text: #ffffff;
+}
+
+[data-theme="dark"] {
+	--bxdocs-step-marker-bg: #34d399;
+	--bxdocs-step-marker-text: #0a0d0f;
+	--bxdocs-step-line: rgba( 255, 255, 255, 0.15 );
 }
 
 [x-cloak] {
@@ -946,7 +965,7 @@ a.bxdocs-card:hover {
 	top: 2rem;
 	bottom: 0;
 	width: 2px;
-	background: rgba( 0, 0, 0, 0.12 );
+	background: var( --bxdocs-step-line );
 }
 
 .bxdocs-step__marker {
@@ -954,8 +973,8 @@ a.bxdocs-card:hover {
 	width: 1.9rem;
 	height: 1.9rem;
 	border-radius: 50%;
-	background: #0e7490;
-	color: #fff;
+	background: var( --bxdocs-step-marker-bg );
+	color: var( --bxdocs-step-marker-text );
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -964,9 +983,19 @@ a.bxdocs-card:hover {
 	z-index: 1;
 }
 
-[data-theme="dark"] .bxdocs-step__marker {
-	background: #34d399;
-	color: #0a0d0f;
+.bxdocs-step__marker--success {
+	background: var( --bxdocs-step-success-bg );
+	color: var( --bxdocs-step-success-text );
+}
+
+.bxdocs-step__marker--warning {
+	background: var( --bxdocs-step-warning-bg );
+	color: var( --bxdocs-step-warning-text );
+}
+
+.bxdocs-step__marker--danger {
+	background: var( --bxdocs-step-danger-bg );
+	color: var( --bxdocs-step-danger-text );
 }
 
 .bxdocs-step__content {
@@ -1120,10 +1149,6 @@ a.bxdocs-card:hover {
 [data-theme="dark"] .theme-toggle,
 [data-theme="dark"] .repo-link {
 	color: #e7ecee !important;
-}
-
-[data-theme="dark"] .bxdocs-step:not( :last-child )::before {
-	background: rgba( 255, 255, 255, 0.15 );
 }
 
 [data-theme="dark"] .bxdocs-embed {
