@@ -19,12 +19,14 @@
 	function renderPageMeta( required string editUrl, required string lastUpdated, required string markdownUrl ) {
 		var html = '<div class="page-meta">'
 		if ( len( arguments.editUrl ) ) {
-			html &= '<a href="' & encodeForHTML( arguments.editUrl ) & '" target="_blank" rel="noopener noreferrer">' & bxdocsIcon( "edit" ) & ' Edit this page</a>'
-		}
-		if ( len( arguments.markdownUrl ) ) {
 			// A minimal attribute-safe escape, not encodeForHTML() - that also
 			// entity-escapes "safe" characters like "/" (its exact range is
 			// locale/JVM-dependent), needlessly noisy in a plain URL attribute.
+			var escapedEditUrl = arguments.editUrl.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
+			html &= '<a href="' & escapedEditUrl & '" target="_blank" rel="noopener noreferrer">' & bxdocsIcon( "edit" ) & ' Edit this page</a>'
+		}
+		if ( len( arguments.markdownUrl ) ) {
+			// Same reasoning as escapedEditUrl above.
 			var escapedMarkdownUrl = arguments.markdownUrl.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
 			html &= '<a href="' & variables.basePath & escapedMarkdownUrl & '" download>' & bxdocsIcon( "markdown" ) & ' Download Markdown</a>'
 		}
