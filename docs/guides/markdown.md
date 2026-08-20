@@ -1,6 +1,7 @@
 ---
 title: Markdown Extensions
 order: 4
+icon: phosphor-duotone:markdown-logo
 tags: [guides, markdown]
 ---
 

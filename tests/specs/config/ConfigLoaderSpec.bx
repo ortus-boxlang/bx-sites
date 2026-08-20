@@ -260,6 +260,23 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxDocs.InvalidConfig" );
 			} );
 
+			it( "accepts [theme.options.pageMetaPosition] of top or bottom, defaulting to bottom when absent", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).theme.options.pageMetaPosition ?: "bottom" ).toBe( "bottom" );
+
+				for ( var position in [ "top", "bottom" ] ) {
+					var positionDir = newProjectDir( '{"name":"My Docs","theme":{"options":{"pageMetaPosition":"' & position & '"}}}' );
+					expect( loader.load( positionDir ).theme.options.pageMetaPosition ).toBe( position );
+				}
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [theme.options.pageMetaPosition] isn't top or bottom", function() {
+				var dir = newProjectDir( '{"name":"My Docs","theme":{"options":{"pageMetaPosition":"middle"}}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
 			it( "preserves a user-supplied Google [analytics] block", function() {
 				var dir = newProjectDir( '{"name":"My Docs","analytics":{"provider":"google","id":"G-ABC123"}}' );
 				var config = loader.load( dir );

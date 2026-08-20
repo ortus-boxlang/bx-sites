@@ -1,7 +1,7 @@
 ---
 title: Configuration
 order: 4
-icon: ⚙️
+icon: phosphor-duotone:gear-six
 summary: Every bxdocs.json key, what it defaults to, and what it does.
 tags: [reference, configuration]
 ---
@@ -148,6 +148,15 @@ non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
 
     ```json
     { "theme": { "options": { "tocPosition": "sticky" } } }
+    ```
+  - `theme.options.pageMetaPosition` - where the edit-this-page/download-
+    markdown/last-updated row renders relative to a page's own content.
+    `"bottom"` (the default) renders it as a small footer note right before
+    the article ends. `"top"` renders it up near the title instead, the same
+    place it always rendered before this option existed.
+
+    ```json
+    { "theme": { "options": { "pageMetaPosition": "top" } } }
     ```
 
 ## `search`

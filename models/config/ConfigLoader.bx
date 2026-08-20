@@ -168,6 +168,14 @@ class {
 			)
 		}
 
+		var pageMetaPosition = theme.options.pageMetaPosition ?: "bottom"
+		if ( !listFindNoCase( "top,bottom", pageMetaPosition ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "bxdocs.json [theme.options.pageMetaPosition], when present, must be one of: top, bottom"
+			)
+		}
+
 		if ( !isBoolean( arguments.config.search ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",

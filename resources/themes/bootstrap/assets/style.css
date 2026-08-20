@@ -312,6 +312,14 @@ body {
 	transform: rotate( -180deg );
 }
 
+/* nav-toggle.js measures each list's own real height and transitions
+   max-height between 0 and that value (then "none" once open, so it's never
+   clipped by a stale measurement) - this is what actually makes it slide. */
+.nav-toggle-body {
+	overflow: hidden;
+	transition: max-height 0.25s ease;
+}
+
 .brand-logo {
 	height: 28px;
 	width: 28px;
@@ -340,6 +348,42 @@ a:hover {
 	border-bottom: 3px solid var( --bxdocs-accent );
 	padding-bottom: 0.5rem;
 	margin-bottom: 1.5rem;
+	position: relative;
+}
+
+/* Every h1/h2/h3 in the article gets a hover-reveal "#" permalink, for deep
+   links straight to a section - the h1's own `.anchor` is hand-rendered in
+   page.bxm (it's not part of the converted markdown body); h2/h3 get theirs
+   for free from bx-markdown's own `anchorLinks` setting (on by default),
+   which already emits an empty `<a class="anchor" id="...">` right before
+   each heading's text - this only adds the missing "#" glyph + hover. */
+.page-content h1,
+.page-content h2,
+.page-content h3 {
+	position: relative;
+}
+
+.page-content .anchor {
+	position: absolute;
+	left: -1.2em;
+	display: inline-flex;
+	align-items: center;
+	height: 1em;
+	color: var( --bxdocs-muted );
+	text-decoration: none;
+	opacity: 0;
+	transition: opacity 0.15s ease;
+}
+
+.page-content .anchor::before {
+	content: "#";
+}
+
+.page-content h1:hover .anchor,
+.page-content h2:hover .anchor,
+.page-content h3:hover .anchor,
+.page-content .anchor:focus {
+	opacity: 1;
 }
 
 .bxdocs-search {
@@ -680,6 +724,18 @@ dd {
 	font-size: 0.8rem;
 	color: var( --bxdocs-muted );
 	margin-bottom: 1.5rem;
+}
+
+/* `theme.options.pageMetaPosition: "bottom"` (the default) places this same
+   .page-meta block right before </article> instead - give it a top border +
+   spacing there instead of the bottom-margin it uses sitting up near the
+   title, so it reads as a footer note rather than crowding the content
+   above it. */
+.page-content > .page-meta:last-child {
+	margin-top: 2rem;
+	margin-bottom: 0;
+	padding-top: 1rem;
+	border-top: 1px solid var( --bxdocs-border );
 }
 
 .page-meta a {

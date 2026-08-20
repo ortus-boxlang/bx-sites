@@ -1,6 +1,7 @@
 ---
 title: Search
 order: 2
+icon: phosphor-duotone:magnifying-glass
 tags: [guides, search]
 ---
 
