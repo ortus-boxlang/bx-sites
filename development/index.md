@@ -7,14 +7,10 @@ toc: false
 ---
 
 <div class="bxdocs-hero">
-	<div class="bxdocs-hero__content">
-		<div class="bxdocs-hero__actions">
-			<a class="bxdocs-hero__btn bxdocs-hero__btn--primary" href="getting-started.md">Get Started</a>
-			<a class="bxdocs-hero__btn bxdocs-hero__btn--secondary" href="https://github.com/ortus-boxlang/bx-docs">View on GitHub</a>
-		</div>
-	</div>
-	<div class="bxdocs-hero__art">
-		<img src="assets/boxlang-icon-full.svg" alt="BoxLang">
+	<img class="bxdocs-hero__banner" src="assets/home-banner.jpg" alt="BX Docs - Write. Build. Publish Beautiful Docs. The official documentation engine for BoxLang. Markdown Powered, Beautiful Themes, Blazing Fast Search, Developer Focused.">
+	<div class="bxdocs-hero__actions">
+		<a class="bxdocs-hero__btn bxdocs-hero__btn--primary" href="getting-started.md">Get Started</a>
+		<a class="bxdocs-hero__btn bxdocs-hero__btn--secondary" href="https://github.com/ortus-boxlang/bx-docs">View on GitHub</a>
 	</div>
 </div>
 
