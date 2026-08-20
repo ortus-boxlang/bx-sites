@@ -40,7 +40,8 @@
 		"locales": [
 			{ "code": "es", "label": "Español" },
 			{ "code": "it", "label": "Italiano" },
-			{ "code": "de", "label": "Deutsch" }
+			{ "code": "de", "label": "Deutsch" },
+			{ "code": "ja", "label": "日本語" }
 		]
 	}
 }
