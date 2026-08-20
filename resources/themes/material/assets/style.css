@@ -606,6 +606,10 @@ dd {
 	display: block;
 }
 
+.theme-toggle span {
+	display: inline-flex;
+}
+
 .bxdocs-footer {
 	margin-top: 3rem;
 	border-top: 1px solid var( --md-border );

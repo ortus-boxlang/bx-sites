@@ -153,6 +153,10 @@
 	display: block;
 }
 
+.theme-toggle span {
+	display: inline-flex;
+}
+
 /* Near-black surface with a mint/teal accent, rather than the blue-gray
    "just inverted" dark mode this used to be - see docs/guides/theming.md. */
 [data-theme="dark"] body {

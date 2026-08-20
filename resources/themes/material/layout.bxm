@@ -164,8 +164,8 @@
 			<a class="repo-link" href="#encodeForHTML( variables.repoUrl )#" target="_blank" rel="noopener noreferrer" aria-label="Repository" title="Repository">#bxdocsIcon( "github" )#</a>
 </bx:output></bx:if><bx:output>
 			<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="Toggle dark mode">
-				<span x-show="!dark">&##127769;</span>
-				<span x-show="dark" x-cloak>&##9728;&##65039;</span>
+				<span x-show="!dark">#bxdocsIcon( "moon" )#</span>
+				<span x-show="dark" x-cloak>#bxdocsIcon( "sun" )#</span>
 			</button>
 		</div>
 	</header>
