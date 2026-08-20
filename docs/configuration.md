@@ -155,8 +155,9 @@ Which search UI `search: true` wires up:
 - `provider` - `"local"` (the default) is bx-docs' own static/client-side
   search (`search-index.json` + lunr.js, see [Search](guides/search.md#local-the-default)).
   `"algolia"` wires up [Algolia DocSearch](guides/search.md#algolia)
-  instead. Any other value is a project's own custom provider, wired up by
-  a `theme/` override - see [Search](guides/search.md#other-search-providers).
+  instead, and `"pagefind"` wires up [Pagefind](guides/search.md#pagefind).
+  Any other value is a project's own custom provider, wired up by a
+  `theme/` override - see [Search](guides/search.md#other-search-providers).
 - `algolia` - required when `provider` is `"algolia"`: `appId`, `apiKey`
   (the *search-only* public API key, not an admin key) and `indexName`,
   exactly as Algolia's own DocSearch client expects them. `insights`
@@ -172,6 +173,23 @@ Which search UI `search: true` wires up:
         "apiKey": "a1b2c3d4e5f6...",
         "indexName": "my-docs"
       }
+    }
+  }
+  ```
+
+- `pagefind` - both keys optional when `provider` is `"pagefind"`: `bin`
+  (default `"pagefind"`) is the CLI executable name/path, resolved against
+  `PATH` when it's a bare name; `options` is an array of extra raw CLI
+  flags passed straight through. The `pagefind` CLI itself must already be
+  installed and on `PATH` - BX Docs shells out to it (like `git` for
+  `lastUpdated`/`gh-deploy`), it doesn't install it for you.
+
+  ```json
+  {
+    "search": true,
+    "searchProvider": {
+      "provider": "pagefind",
+      "pagefind": { "bin": "pagefind", "options": [] }
     }
   }
   ```

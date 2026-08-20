@@ -41,7 +41,16 @@ service involved.
 - **`/`** focuses the search box from anywhere on the page (unless you're
   already typing in another field) - the same convention
   [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) uses.
+- **Cmd/Ctrl+K** also focuses it, from anywhere - including while typing in
+  another field - the convention Algolia DocSearch, Pagefind, VitePress and
+  Docusaurus all share. The search box shows a small `Ctrl K`/`⌘K` hint
+  (platform-detected) so it's discoverable.
 - **`Escape`** closes the results dropdown and blurs the search box.
+
+Cmd/Ctrl+K works the same way for every provider - `local`'s own widget
+binds it directly, `algolia` gets it for free from DocSearch itself
+(`keyboardShortcuts` defaults to `true`), and `pagefind` gets it wired up
+by `layout.bxm` since `PagefindUI` doesn't bind it on its own.
 
 ## Turning it off
 
@@ -65,8 +74,8 @@ Useful if you only need to refresh `search-index.json` - `build` already
 does this as one of its own steps, so you don't need to run this
 separately after a normal build. Only runs for providers that use the local
 index (`"local"`, and any provider bx-docs doesn't otherwise know about) -
-it's a no-op (`skipped: true`) when `searchProvider.provider` is `"algolia"`,
-since that index is never used.
+it's a no-op (`skipped: true`) when `searchProvider.provider` is `"algolia"`
+or `"pagefind"`, since neither ever uses it.
 
 ## Algolia
 
@@ -109,73 +118,67 @@ With `algolia` active:
   jsDelivr and calls `docsearch({...})` against it - DocSearch renders its
   own search button and modal into that container.
 
+## Pagefind
+
+Set `searchProvider.provider` to `"pagefind"` to swap the search box for
+[Pagefind](https://pagefind.app/) - another fully static/no-server search
+engine, but indexed from the *built* `site/` HTML rather than crawled like
+Algolia:
+
+```json
+{
+	"search": true,
+	"searchProvider": {
+		"provider": "pagefind",
+		"pagefind": { "bin": "pagefind", "options": [] }
+	}
+}
+```
+
+Both `pagefind` keys are optional - `bin` (default `"pagefind"`) is the
+executable name/path, resolved against `PATH` when it's a bare name;
+`options` is an array of extra raw CLI flags passed straight through (e.g.
+`["--exclude-selectors", ".no-index"]`).
+
+With `pagefind` active:
+
+- **The `pagefind` CLI must already be installed and on `PATH`** - BX Docs
+  shells out to it (there's no BoxLang-native binding, the same reason
+  `lastUpdated`/`gh-deploy` shell out to `git`), it doesn't install it for
+  you. See [Pagefind's installation docs](https://pagefind.app/docs/installation/).
+  Unlike `lastUpdated`, a missing/failing binary fails the `build` loudly
+  (`BxDocs.PagefindFailed`) rather than degrading silently - shipping a
+  site whose configured search provider doesn't work is worse than a
+  failed build.
+- Right after every doc tree (main + versions + locales) is written and
+  `sitemap.xml`/`llms.txt` are generated, BX Docs runs
+  `pagefind --site <siteDir> [...options]` against the *entire* built
+  `site/` - so a multi-version/multi-locale site gets everything indexed
+  in one pass, unlike bx-docs' own per-tree `search-index.json`. Pagefind
+  writes its own bundle straight into `site/pagefind/` - self-hosted, no
+  CDN involved.
+- No `search-index.json` is built, and the shared `lunr.js`/`search.js`
+  widget isn't shipped (same as `algolia`) - and `bxDocs search-index` is
+  a no-op for the same reason (see above).
+- Each built-in theme renders an empty `#bxdocs-search-pagefind`
+  container, and `layout.bxm` loads `site/pagefind/pagefind-ui.{css,js}`
+  and calls `new PagefindUI({...})` against it - Pagefind renders its own
+  inline search box and results into that container.
+
 ## Other search providers
 
-`searchProvider.provider` isn't limited to `"local"`/`"algolia"` - any other
-value is accepted by `bxdocs.json` as-is (BX Docs' own config validation
-only checks the two providers above). There's no plugin hook for this one -
-the built-in themes simply render nothing for an unrecognized provider
-name, and wiring up a third search service is a project-level
+`searchProvider.provider` isn't limited to `"local"`/`"algolia"`/`"pagefind"` -
+any other value is accepted by `bxdocs.json` as-is (BX Docs' own config
+validation only checks the three providers above). There's no plugin hook
+for this one - the built-in themes simply render nothing for an
+unrecognized provider name, and wiring up a fourth search service
+(Meilisearch, Typesense, etc.) is a project-level
 [theme override](themes.md#overriding-a-theme): copy a built-in theme into
 your project's own `theme/` folder and add your provider's markup/scripts
 to its `layout.bxm`/`search.bxm`, reading `siteConfig.searchProvider` to
-decide when to render them - the same way this module's own `layout.bxm`
-does for `algolia`.
-
-A worked example - adding [Pagefind](https://pagefind.app/) (another fully
-static/no-server search engine, indexed from the *built* `site/` output
-rather than crawled) alongside the built-in `local`/`algolia` providers,
-starting from the `bootstrap` theme:
-
-```json
-{ "search": true, "searchProvider": { "provider": "pagefind" } }
-```
-
-1. Copy `resources/themes/bootstrap/{layout.bxm,page.bxm,search.bxm}` and
-   `assets/` into your project's `theme/` folder (as in
-   [Overriding a theme](themes.md#overriding-a-theme)).
-2. In `theme/search.bxm`, add a branch for `"pagefind"` alongside the
-   existing `"algolia"`/`"local"` ones - an empty container Pagefind's own
-   UI script mounts into:
-
-   ```html
-   <bx:if condition="#variables.searchProviderName eq 'pagefind'#"><bx:output>
-   <div id="bxdocs-search-pagefind"></div>
-   </bx:output></bx:if>
-   ```
-
-3. In `theme/layout.bxm`, load Pagefind's UI bundle and mount it, right
-   alongside the existing `variables.searchProviderName eq 'algolia'`
-   blocks (one in `<head>` for the CSS, one near the bottom for the JS -
-   see how `layout.bxm` already does this for `algolia`):
-
-   ```html
-   <bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'pagefind'#"><bx:output>
-   <link rel="stylesheet" href="#variables.basePath#pagefind/pagefind-ui.css">
-   </bx:output></bx:if>
-   ```
-
-   ```html
-   <bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'pagefind'#"><bx:output>
-   <script src="#variables.basePath#pagefind/pagefind-ui.js"></script>
-   <script>
-   	window.addEventListener( "DOMContentLoaded", function () {
-   		new PagefindUI( { element : "##bxdocs-search-pagefind", showSubResults : true } );
-   	} );
-   </script>
-   </bx:output></bx:if>
-   ```
-
-4. After `bxDocs build`, run Pagefind's own indexer against the output
-   (its CLI ships as a standalone binary/npx package, not a bx-docs
-   dependency): `npx pagefind --site site` - this writes the
-   `site/pagefind/` bundle `pagefind-ui.js` fetches at request time. Wire
-   this into whatever builds/deploys the site (a second CI step after
-   `bxDocs build`, or a wrapper script), since BX Docs itself doesn't run
-   it.
-
-Any other static or hosted search product follows the same shape: a
-`searchProviderName eq "..."` branch in `search.bxm` for the mount point,
-matching branches in `layout.bxm` for its CSS/JS, and (if it isn't
-crawler-hosted like Algolia) whatever indexing step that product needs
-against `site/` after `build`.
+decide when to render them - `searchProviderName eq "..."` branches for
+the mount point in `search.bxm`, matching branches in `layout.bxm` for its
+CSS/JS, and (if it isn't crawler-hosted like Algolia) whatever indexing
+step that product needs against `site/` after `build` - the same shape
+this module's own `layout.bxm`/`BuildPipeline.bx` already use for
+`algolia`/`pagefind`.

@@ -115,7 +115,7 @@ flowchart LR
 ## 7. Search
 
 - `"local"` (the default, v1-locked) — fully static, client-side, matches mkdocs' default (lunr.js), no server dependency. Index built at `build` time → `site/search-index.json`; each built-in theme wires its own search UI against the shared index format
-- `bxdocs.json`'s `searchProvider.provider` selects the active provider (`SearchProviderRegistry.bx`) — `"algolia"` is built-in (Algolia DocSearch, no local index needed); any other name is a project's own provider, wired up via a `theme/` override reading `siteConfig.searchProvider` itself — see `docs/guides/search.md`
+- `bxdocs.json`'s `searchProvider.provider` selects the active provider (`SearchProviderRegistry.bx`) — `"algolia"` (Algolia DocSearch, no local index needed) and `"pagefind"` ([Pagefind](https://pagefind.app/), indexed from the built `site/` via the external `pagefind` CLI — `PagefindIndexer.bx` shells out to it after `build`, same `java.lang.ProcessBuilder` pattern GitRevisionDate.bx/GhPagesDeployer.bx use for `git`) are both built-in; any other name is a project's own provider, wired up via a `theme/` override reading `siteConfig.searchProvider` itself — see `docs/guides/search.md`
 - Meilisearch integration (bx-meilisearch) as a first-class *built-in* provider (rather than a project's own theme override) explicitly deferred to a future optional add-on
 
 ## 8. Open items

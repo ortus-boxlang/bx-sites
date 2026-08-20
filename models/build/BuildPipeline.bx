@@ -12,6 +12,7 @@ class {
 	variables.themeRenderer    = new "models.build.ThemeRenderer@bxdocs"()
 	variables.searchIndexer    = new "models.build.SearchIndexer@bxdocs"()
 	variables.searchProviderRegistry = new "models.build.SearchProviderRegistry@bxdocs"()
+	variables.pagefindIndexer  = new "models.build.PagefindIndexer@bxdocs"()
 	variables.tableOfContents  = new "models.build.TableOfContents@bxdocs"()
 	variables.baseUrlResolver  = new "models.build.BaseUrlResolver@bxdocs"()
 	variables.sitemapGenerator = new "models.build.SitemapGenerator@bxdocs"()
@@ -46,6 +47,18 @@ class {
 	 */
 	void function setMarkdownRenderer( required any renderer ) {
 		variables.markdownRenderer = arguments.renderer
+	}
+
+	/**
+	 * Swaps in a fake/test pagefind indexer. The real one (PagefindIndexer.bx)
+	 * shells out to the external `pagefind` CLI, which this pipeline's own
+	 * unit tests can't assume is installed - see PagefindIndexer.bx's own
+	 * docblock for why it fails loud rather than degrading silently.
+	 *
+	 * @indexer Any object exposing `index( siteDir, bin = "pagefind", options = [] )`
+	 */
+	void function setPagefindIndexer( required any indexer ) {
+		variables.pagefindIndexer = arguments.indexer
 	}
 
 	/**
@@ -168,6 +181,10 @@ class {
 		}
 
 		fileWrite( siteDir & "/llms.txt", variables.llmsTxtGenerator.build( allPages, config, urls.absolute, urls.basePath ) )
+
+		if ( config.search && variables.searchProviderRegistry.usesPagefind( config.searchProvider.provider ) ) {
+			variables.pagefindIndexer.index( siteDir, config.searchProvider.pagefind.bin, config.searchProvider.pagefind.options )
+		}
 
 		variables.pluginLoader.applyOnBuildComplete( plugins, siteDir, config )
 

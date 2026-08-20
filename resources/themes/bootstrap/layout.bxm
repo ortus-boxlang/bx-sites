@@ -152,7 +152,7 @@
 
 	// module spec section 7 - search is fully static/client-side (provider "local") by
 	// default, opt-out via bxdocs.json's `search`; `searchProvider.provider` picks a
-	// different provider ("algolia" built-in here, anything else left to a theme override)
+	// different provider ("algolia"/"pagefind" built-in here, anything else left to a theme override)
 	variables.searchEnabled = ( variables.siteConfig.search ?: false ) ? true : false
 	variables.searchProviderName = lCase( trim( variables.siteConfig.searchProvider.provider ?: "local" ) )
 	variables.searchAlgolia = variables.siteConfig.searchProvider.algolia ?: {}
@@ -218,6 +218,8 @@
 	<script src="#variables.basePath#assets/search.js" defer></script>
 </bx:output></bx:if><bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'algolia'#"><bx:output>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+</bx:output></bx:if><bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'pagefind'#"><bx:output>
+	<link rel="stylesheet" href="#variables.basePath#pagefind/pagefind-ui.css">
 </bx:output></bx:if><bx:output>
 	<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
 </head>
@@ -291,6 +293,26 @@
 				apiKey    : "#encodeForJavaScript( variables.searchAlgolia.apiKey ?: '' )#",
 				indexName : "#encodeForJavaScript( variables.searchAlgolia.indexName ?: '' )#",
 				insights  : #( variables.searchAlgolia.insights ?: false ) ? "true" : "false"#
+			} );
+		} );
+	</script>
+</bx:output></bx:if><bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'pagefind'#"><bx:output>
+	<script src="#variables.basePath#pagefind/pagefind-ui.js"></script>
+	<script>
+		document.addEventListener( "DOMContentLoaded", function () {
+			new PagefindUI( { element : "##bxdocs-search-pagefind", showSubResults : true } );
+
+			// Cmd/Ctrl+K - same convention as the local/algolia providers;
+			// PagefindUI doesn't bind this itself, so wire it up here.
+			document.addEventListener( "keydown", function ( evt ) {
+				if ( !( evt.ctrlKey || evt.metaKey ) || evt.key.toLowerCase() !== "k" ) {
+					return;
+				}
+				var input = document.querySelector( "##bxdocs-search-pagefind input" );
+				if ( input ) {
+					evt.preventDefault();
+					input.focus();
+				}
 			} );
 		} );
 	</script>

@@ -404,7 +404,8 @@ a:hover {
 	max-width: 260px;
 }
 
-.bxdocs-search-algolia {
+.bxdocs-search-algolia,
+.bxdocs-search-pagefind {
 	display: flex;
 	align-items: center;
 }
@@ -412,12 +413,28 @@ a:hover {
 .md-search__input {
 	width: 100%;
 	height: var( --bxdocs-toolbar-h );
-	padding: 0 0.75rem;
+	padding: 0 2.75rem 0 0.75rem;
 	border: none;
 	border-radius: 20px;
 	background: rgba( 255, 255, 255, 0.85 );
 	color: #1b1f21;
 	box-sizing: border-box;
+}
+
+.bxdocs-search-kbd {
+	position: absolute;
+	top: 50%;
+	right: 0.5rem;
+	transform: translateY( -50% );
+	pointer-events: none;
+	font-family: inherit;
+	font-size: 0.7rem;
+	line-height: 1.4;
+	padding: 0.05rem 0.35rem;
+	border-radius: 0.25rem;
+	border: 1px solid var( --md-border );
+	background: var( --md-code-bg );
+	color: var( --md-muted );
 }
 
 [data-theme="dark"] .md-search__input {

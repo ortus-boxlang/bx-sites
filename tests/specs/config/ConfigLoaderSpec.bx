@@ -134,6 +134,9 @@ class extends="testbox.system.BaseSpec" {
 				expect( config.searchProvider.algolia.apiKey ).toBe( "" );
 				expect( config.searchProvider.algolia.indexName ).toBe( "" );
 				expect( config.searchProvider.algolia.insights ).toBeFalse();
+				expect( config.searchProvider.pagefind.bin ).toBe( "pagefind" );
+				expect( config.searchProvider.pagefind.options ).toBeArray();
+				expect( config.searchProvider.pagefind.options.len() ).toBe( 0 );
 			} );
 
 			it( "preserves a user-supplied [searchProvider] of algolia with its own settings", function() {
@@ -177,6 +180,50 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "throws BxDocs.InvalidConfig when [searchProvider.algolia.insights] isn't a boolean", function() {
 				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":"algolia","algolia":{"appId":"A","apiKey":"B","indexName":"C","insights":"yes"}}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "allows [searchProvider.provider] pagefind with no [pagefind] settings at all", function() {
+				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":"pagefind"}}' );
+				var config = loader.load( dir );
+
+				expect( config.searchProvider.provider ).toBe( "pagefind" );
+				expect( config.searchProvider.pagefind.bin ).toBe( "pagefind" );
+			} );
+
+			it( "preserves a user-supplied [searchProvider.pagefind] bin and options", function() {
+				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":"pagefind","pagefind":{"bin":"/usr/local/bin/pagefind","options":["--exclude-selectors",".no-index"]}}}' );
+				var config = loader.load( dir );
+
+				expect( config.searchProvider.pagefind.bin ).toBe( "/usr/local/bin/pagefind" );
+				expect( config.searchProvider.pagefind.options ).toBe( [ "--exclude-selectors", ".no-index" ] );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [searchProvider.pagefind] is not an object", function() {
+				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":"pagefind","pagefind":"nope"}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [searchProvider.pagefind.bin] is blank", function() {
+				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":"pagefind","pagefind":{"bin":""}}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [searchProvider.pagefind.options] is not an array", function() {
+				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":"pagefind","pagefind":{"options":"--foo"}}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when a [searchProvider.pagefind.options] entry is empty", function() {
+				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":"pagefind","pagefind":{"options":[""]}}}' );
 				expect( function() {
 					loader.load( dir );
 				} ).toThrow( "BxDocs.InvalidConfig" );

@@ -107,6 +107,23 @@ body {
 .bxdocs-search .form-control {
 	height: var( --bxdocs-toolbar-h );
 	box-sizing: border-box;
+	padding-right: 2.75rem;
+}
+
+.bxdocs-search-kbd {
+	position: absolute;
+	top: 50%;
+	right: 0.5rem;
+	transform: translateY( -50% );
+	pointer-events: none;
+	font-family: inherit;
+	font-size: 0.7rem;
+	line-height: 1.4;
+	padding: 0.05rem 0.35rem;
+	border-radius: 0.25rem;
+	border: 1px solid var( --bxdocs-border );
+	background: var( --bxdocs-code-bg );
+	color: var( --bxdocs-muted );
 }
 
 .version-switcher {
@@ -348,7 +365,8 @@ a:hover {
 	max-width: 260px;
 }
 
-.bxdocs-search-algolia {
+.bxdocs-search-algolia,
+.bxdocs-search-pagefind {
 	display: flex;
 	align-items: center;
 }
