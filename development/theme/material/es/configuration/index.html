@@ -1,0 +1,547 @@
+
+
+
+<!doctype html>
+<html lang="es" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Configuraci&oacute;n - BX Docs</title>
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="BX Docs">
+	<meta property="og:title" content="Configuraci&oacute;n">
+
+	<meta name="description" content="Static documentation site generator for BoxLang, built on bx-markdown">
+	<meta property="og:description" content="Static documentation site generator for BoxLang, built on bx-markdown">
+
+	<meta property="og:image" content="/bx-docs/development/theme/material/es/assets/og-image.png">
+	<meta name="twitter:card" content="summary_large_image">
+
+	<link rel="icon" href="/bx-docs/development/theme/material/es/assets/boxlang-icon-full.svg">
+
+	<script>
+		( function () {
+			var configuredMode = "auto";
+			var stored = localStorage.getItem( "bxdocs-theme" );
+			var prefersDark = window.matchMedia( "(prefers-color-scheme: dark)" ).matches;
+			var wantsDark = stored ? stored === "dark" : ( configuredMode === "dark" || ( configuredMode === "auto" && prefersDark ) );
+			if ( wantsDark ) {
+				document.documentElement.setAttribute( "data-theme", "dark" );
+			}
+		} )();
+	</script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
+	<link rel="stylesheet" href="/bx-docs/development/theme/material/es/assets/theme/style.css">
+	
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+
+	<script>window.__BXDOCS_BASE_PATH__ = "/bx-docs/development/theme/material/es/";</script>
+	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
+	<script src="/bx-docs/development/theme/material/es/assets/search.js" defer></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+</head>
+<body class="md-body" x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxdocs-theme', v ? 'dark' : 'light' ) } )">
+	<header class="md-header">
+		<button class="md-nav-toggle" type="button" aria-controls="bxdocs-sidebar" aria-label="Toggle navigation" onclick="document.getElementById('bxdocs-sidebar').classList.toggle('md-sidebar--open')">☰</button>
+		<a class="md-header__brand" href="/bx-docs/development/theme/material/es/"><img class="brand-logo" src="/bx-docs/development/theme/material/es/assets/boxlang-icon-full.svg" alt=""><span class="brand-name">BX Docs</span></a>
+		<div class="md-header__controls">
+<div class="bxdocs-search md-search">
+	<input type="search" id="bxdocs-search-input" class="md-search__input" placeholder="Search docs..." aria-label="Search">
+	<ul id="bxdocs-search-results" class="bxdocs-search-results"></ul>
+</div>
+
+
+
+			<select class="locale-switcher" onchange="location.href=this.value" aria-label="Language"><option value="/bx-docs/development/theme/material/">English</option><option value="/bx-docs/development/theme/material/es/" selected>Espa&ntilde;ol</option><option value="/bx-docs/development/theme/material/it/">Italiano</option><option value="/bx-docs/development/theme/material/de/">Deutsch</option></select>
+
+			<a class="repo-link" href="https://github.com/ortus-boxlang/bx-docs" target="_blank" rel="noopener noreferrer" aria-label="Repository" title="Repository"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.083-.729.083-.729 1.205.084 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.303-5.467-1.332-5.467-5.93 0-1.31.468-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23A11.5 11.5 0 0 1 12 5.803c1.02.005 2.045.138 3.003.404 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.807 5.625-5.48 5.92.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 21.795 24 17.298 24 12c0-6.63-5.37-12-12-12"/></svg></a>
+
+			<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="Toggle dark mode">
+				<span x-show="!dark">&#127769;</span>
+				<span x-show="dark" x-cloak>&#9728;&#65039;</span>
+			</button>
+		</div>
+	</header>
+	<div class="md-layout">
+		<nav class="md-sidebar" id="bxdocs-sidebar" aria-label="Navigation">
+			<ul class="md-nav"><li class="md-nav__item"><a class="md-nav__link" href="/bx-docs/development/theme/material/es/index.html">Inicio</a></li><li class="md-nav__item"><a class="md-nav__link" href="/bx-docs/development/theme/material/es/getting-started/index.html">🚀 Primeros Pasos</a></li><li class="md-nav__item"><a class="md-nav__link" href="/bx-docs/development/theme/material/es/cli-reference/index.html">⌨️ Referencia de la CLI</a></li><li class="md-nav__item"><a class="md-nav__link" href="/bx-docs/development/theme/material/es/configuration/index.html">⚙️ Configuraci&oacute;n</a></li><li class="md-nav__item"><a class="md-nav__link" href="/bx-docs/development/theme/material/es/guides/index.html">Gu&iacute;as</a><ul class="md-nav md-nav--nested"><li class="md-nav__item"><a class="md-nav__link" href="/bx-docs/development/theme/material/es/guides/themes/index.html">Temas</a></li><li class="md-nav__item"><a class="md-nav__link" href="/bx-docs/development/theme/material/es/guides/search/index.html">B&uacute;squeda</a></li><li class="md-nav__item"><a class="md-nav__link" href="/bx-docs/development/theme/material/es/guides/deployment/index.html">Desplegar en GitHub Pages</a></li><li class="md-nav__item"><a class="md-nav__link" href="/bx-docs/development/theme/material/es/guides/markdown/index.html">Extensiones de Markdown</a></li><li class="md-nav__item"><a class="md-nav__link" href="/bx-docs/development/theme/material/es/guides/plugins/index.html">Plugins</a></li><li class="md-nav__item"><a class="md-nav__link" href="/bx-docs/development/theme/material/es/guides/migrating-from-gitbook/index.html">Migrar desde GitBook</a></li><li class="md-nav__item"><a class="md-nav__link" href="/bx-docs/development/theme/material/es/guides/i18n/index.html">Internacionalizaci&oacute;n (i18n)</a></li></ul></li><li class="md-nav__item"><a class="md-nav__link" href="/bx-docs/development/theme/material/es/releases/index.html">Pol&iacute;tica de Lanzamientos</a></li></ul>
+		</nav>
+		<main class="md-content">
+
+			<article class="md-card">
+
+				<h1 class="md-title"><span class="page-icon">⚙️</span> Configuraci&oacute;n</h1>
+				<p class="page-summary">Cada clave de bxdocs.json, su valor por defecto y qu&eacute; hace.</p>
+<div class="page-tags"><a class="page-tag" href="/bx-docs/development/theme/material/es/tags/index.html#tag-referencia">referencia</a><a class="page-tag" href="/bx-docs/development/theme/material/es/tags/index.html#tag-configuraci-n">configuraci&oacute;n</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/i18n/es/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-docs/development/theme/material/es/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 20, 2026, 1:00:24 AM</span></div>
+<nav class="md-toc" aria-label="On this page"><div class="md-toc__title">On this page</div><ul><li class="md-toc__item md-toc__item--2"><a href="#name">name</a></li><li class="md-toc__item md-toc__item--2"><a href="#description">description</a></li><li class="md-toc__item md-toc__item--2"><a href="#baseurl">baseURL</a></li><li class="md-toc__item md-toc__item--2"><a href="#llmstxt">llms.txt</a></li><li class="md-toc__item md-toc__item--2"><a href="#sitemapxml">sitemap.xml</a></li><li class="md-toc__item md-toc__item--2"><a href="#theme">theme</a></li><li class="md-toc__item md-toc__item--2"><a href="#search">search</a></li><li class="md-toc__item md-toc__item--2"><a href="#nav">nav</a></li><li class="md-toc__item md-toc__item--2"><a href="#markdown">markdown</a></li><li class="md-toc__item md-toc__item--2"><a href="#repo">repo</a></li><li class="md-toc__item md-toc__item--2"><a href="#social">social</a></li><li class="md-toc__item md-toc__item--2"><a href="#footer">footer</a></li><li class="md-toc__item md-toc__item--2"><a href="#lastupdated">lastUpdated</a></li><li class="md-toc__item md-toc__item--2"><a href="#analytics">analytics</a></li><li class="md-toc__item md-toc__item--2"><a href="#ogimage">ogImage</a></li><li class="md-toc__item md-toc__item--3"><a href="#generateogimages">generateOgImages</a></li><li class="md-toc__item md-toc__item--2"><a href="#extracss--extrajs">extraCss / extraJs</a></li><li class="md-toc__item md-toc__item--2"><a href="#mermaid">mermaid</a></li><li class="md-toc__item md-toc__item--2"><a href="#math">math</a></li><li class="md-toc__item md-toc__item--2"><a href="#plugins">plugins</a></li><li class="md-toc__item md-toc__item--2"><a href="#i18n">i18n</a></li><li class="md-toc__item md-toc__item--2"><a href="#versionado">Versionado</a></li></ul></nav>
+				<h1 id="configuración"><a href="#configuración" id="configuración" name="configuración" class="anchor"></a>Configuración</h1>
+<p>Cada proyecto tiene un único <code>bxdocs.json</code> en su raíz:</p>
+<pre><code class="language-json">{
+	&quot;name&quot;: &quot;My Docs&quot;,
+	&quot;description&quot;: &quot;&quot;,
+	&quot;baseURL&quot;: &quot;/&quot;,
+	&quot;theme&quot;: {
+		&quot;name&quot;: &quot;bootstrap&quot;,
+		&quot;options&quot;: {},
+		&quot;logo&quot;: &quot;&quot;,
+		&quot;favicon&quot;: &quot;&quot;
+	},
+	&quot;search&quot;: true,
+	&quot;nav&quot;: [],
+	&quot;markdown&quot;: { &quot;enableAdmonition&quot;: true },
+	&quot;repo&quot;: {
+		&quot;url&quot;: &quot;&quot;,
+		&quot;editUri&quot;: &quot;&quot;
+	},
+	&quot;social&quot;: [],
+	&quot;footer&quot;: false,
+	&quot;lastUpdated&quot;: false,
+	&quot;mermaid&quot;: false,
+	&quot;math&quot;: false,
+	&quot;analytics&quot;: {
+		&quot;provider&quot;: &quot;&quot;,
+		&quot;id&quot;: &quot;&quot;
+	},
+	&quot;ogImage&quot;: &quot;&quot;,
+	&quot;generateOgImages&quot;: false,
+	&quot;extraCss&quot;: [],
+	&quot;extraJs&quot;: [],
+	&quot;plugins&quot;: [],
+	&quot;i18n&quot;: {
+		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
+		&quot;locales&quot;: []
+	}
+}
+</code></pre>
+<p>Solo <code>name</code> es obligatorio - todo lo demás recurre a los valores por
+defecto mostrados arriba. Un objeto <code>theme</code> parcial se combina un nivel
+de profundidad, así que <code>{&quot;theme&quot;:{&quot;name&quot;:&quot;material&quot;}}</code> por sí solo
+conserva las <code>options</code> por defecto (vacías).</p>
+<h2 id="name"><a href="#name" id="name" name="name" class="anchor"></a><code>name</code></h2>
+<p>El nombre del sitio, mostrado en la marca de la cabecera y en los títulos
+de página. Obligatorio.</p>
+<h2 id="description"><a href="#description" id="description" name="description" class="anchor"></a><code>description</code></h2>
+<p>Una descripción de sitio opcional, usada como <code>&lt;meta name=&quot;description&quot;&gt;</code>
+y <code>og:description</code> de reserva para cualquier página que no defina su
+propio frontmatter <code>description</code> (consulta
+<a href="/bx-docs/development/theme/material/es/getting-started/index.html#add-pages">Primeros Pasos</a>).</p>
+<h2 id="baseurl"><a href="#baseurl" id="baseurl" name="baseurl" class="anchor"></a><code>baseURL</code></h2>
+<p>Controla cómo se antepone el prefijo a cada enlace interno, ruta de
+recurso y entrada de navegación, y también actúa como la URL canónica
+del sitio para <code>sitemap.xml</code> y <code>llms.txt</code>.</p>
+<ul>
+<li>Dejado en blanco o <code>&quot;/&quot;</code> (el valor por defecto) - los enlaces
+permanecen relativos a la raíz (<code>/page/</code>), y no se genera ni
+<code>sitemap.xml</code> ni un <code>llms.txt</code> con URL absoluta (no hay un dominio
+canónico a partir del cual construirlos).</li>
+<li>Una ruta simple, por ejemplo <code>&quot;my-docs&quot;</code> o <code>&quot;/my-docs/&quot;</code> - se asume que
+el sitio se sirve desde esa subruta, y cada enlace interno, entrada de
+navegación y recurso lleva ese prefijo (<code>/my-docs/page/</code>). Sigue sin
+generarse <code>sitemap.xml</code>, ya que todavía no hay un dominio absoluto.</li>
+<li>Una URL completa, por ejemplo <code>&quot;https://docs.example.com/&quot;</code> - la parte
+de la ruta (<code>/</code> aquí) se usa de la misma forma que lo haría una ruta
+simple, <strong>y</strong> <code>sitemap.xml</code> se escribe en el momento de la construcción
+con la URL absoluta de cada página no oculta bajo ese dominio.</li>
+</ul>
+<p><code>llms.txt</code> (consulta <a href="#llmstxt">más abajo</a>) siempre se escribe; simplemente
+prefiere una URL absoluta cuando <code>baseURL</code> la proporciona.</p>
+<h2 id="llmstxt"><a href="#llmstxt" id="llmstxt" name="llmstxt" class="anchor"></a><code>llms.txt</code></h2>
+<p>Cada construcción escribe un <code>llms.txt</code> en la raíz del sitio - un índice
+en Markdown simple de cada página no oculta, siguiendo la convención
+emergente de <a href="https://llmstxt.org">llms.txt</a> para ayudar a las
+herramientas basadas en LLM a navegar un sitio sin rastrear su HTML
+renderizado. No hay clave de configuración para esto; se genera
+automáticamente, usando una URL absoluta por enlace cuando <code>baseURL</code> es
+una URL completa, o una relativa a <code>basePath</code> en caso contrario.</p>
+<h2 id="sitemapxml"><a href="#sitemapxml" id="sitemapxml" name="sitemapxml" class="anchor"></a><code>sitemap.xml</code></h2>
+<p>Se escribe en la raíz del sitio, pero solo cuando <code>baseURL</code> es una URL
+completa (ver arriba) - un sitemap necesita un dominio absoluto para
+tener sentido. Enumera cada página no oculta según el protocolo de
+<a href="https://www.sitemaps.org/">sitemaps.org</a>.</p>
+<h2 id="theme"><a href="#theme" id="theme" name="theme" class="anchor"></a><code>theme</code></h2>
+<ul>
+<li><code>theme.name</code> - uno de los temas incorporados (<code>bootstrap</code>, <code>material</code>,
+<code>tailwind</code>), o el nombre de un tema personalizado que proporciones
+mediante una carpeta <code>theme/</code> en la raíz del proyecto (consulta
+<a href="/bx-docs/development/theme/material/es/guides/themes/index.html">Temas</a>)</li>
+<li><code>theme.logo</code> - ruta/URL a una imagen mostrada junto al nombre del sitio
+en la marca de la cabecera (en lugar del glifo &quot;⚡&quot; por defecto) - una
+ruta relativa (por ejemplo <code>&quot;assets/logo.svg&quot;</code>, resuelta contra
+<code>docs/assets/</code>) lleva el prefijo <code>baseURL</code> como cualquier otro recurso
+interno; una URL absoluta se usa tal cual. Dejado en blanco (el valor
+por defecto), la cabecera muestra &quot;⚡ &lt;nombre del sitio&gt;&quot;.</li>
+<li><code>theme.favicon</code> - ruta/URL a un favicon, resuelta de la misma forma que
+<code>theme.logo</code>. Dejado en blanco (el valor por defecto), no se renderiza
+ningún <code>&lt;link rel=&quot;icon&quot;&gt;</code> en absoluto (recurriendo al comportamiento
+por defecto propio del navegador).</li>
+<li><code>theme.options</code> - opciones específicas del tema, leídas por todos los
+temas incorporados:
+<ul>
+<li>
+<p><code>theme.options.colorMode</code> - <code>&quot;auto&quot;</code> (el valor por defecto), <code>&quot;light&quot;</code>
+o <code>&quot;dark&quot;</code>. Controla qué modo ve un visitante por primera vez antes de
+haber elegido uno propio mediante el interruptor claro/oscuro de la
+cabecera - <code>&quot;auto&quot;</code> sigue la preferencia de su sistema operativo,
+<code>&quot;light&quot;</code>/<code>&quot;dark&quot;</code> fija un valor por defecto. Una vez que un visitante
+activa el interruptor, su propia elección (guardada en <code>localStorage</code>)
+siempre prevalece en visitas posteriores, independientemente de este
+valor.</p>
+<pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;colorMode&quot;: &quot;dark&quot; } } }
+</code></pre>
+</li>
+<li>
+<p><code>theme.options.navCollapsible</code> - <code>false</code> (el valor por defecto)
+renderiza cada encabezado de sección de navegación siempre expandido,
+como hoy. <code>true</code> renderiza cada sección de navegación (una carpeta sin
+<code>index.md</code>) como un desplegable nativo <code>&lt;details&gt;</code>/<code>&lt;summary&gt;</code> que el
+visitante puede colapsar - sin ningún framework de JS involucrado.</p>
+</li>
+<li>
+<p><code>theme.options.navExpandAll</code> - solo relevante cuando <code>navCollapsible</code>
+es <code>true</code>. <code>true</code> (el valor por defecto) inicia cada sección abierta;
+<code>false</code> inicia cada sección colapsada.</p>
+<pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;navCollapsible&quot;: true, &quot;navExpandAll&quot;: false } } }
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="search"><a href="#search" id="search" name="search" class="anchor"></a><code>search</code></h2>
+<p><code>true</code> (el valor por defecto) construye un índice de búsqueda estático y
+conecta el cuadro de búsqueda; <code>false</code> omite ambos por completo - sin
+<code>search-index.json</code>, sin interfaz de búsqueda, sin JS adicional enviado.
+Consulta <a href="/bx-docs/development/theme/material/es/guides/search/index.html">Búsqueda</a>.</p>
+<h2 id="nav"><a href="#nav" id="nav" name="nav" class="anchor"></a><code>nav</code></h2>
+<p>Por defecto, la navegación se infiere de la propia estructura de
+carpetas/archivos de <code>docs/</code> (con el frontmatter <code>order</code>/<code>hidden</code>) - bien
+para sitios pequeños, pero uno grande puede superarla: una navegación
+explícita te permite titular, agrupar y ordenar las páginas como quieras,
+independientemente de dónde vivan realmente sus archivos.</p>
+<p>Un array vacío (el valor por defecto) significa &quot;inferir de la estructura
+de carpetas&quot;. Un array no vacío reemplaza esa inferencia por completo -
+el orden del array se convierte en el orden de la navegación, y una
+página no referenciada en ningún lugar de él igualmente se construye,
+solo que no se enlaza desde la navegación (igual que <code>hidden: true</code>).
+Cada entrada es o bien:</p>
+<ul>
+<li>una cadena con una ruta simple relativa a docs/, por ejemplo
+<code>&quot;guides/setup.md&quot;</code> - el título proviene del propio frontmatter/nombre
+de archivo de esa página, igual que daría la inferencia por carpetas</li>
+<li>un objeto <code>{ &quot;title&quot;, &quot;path&quot;, &quot;icon&quot;, &quot;children&quot; }</code> - <code>path</code>, <code>icon</code> y
+<code>children</code> son todos opcionales; una entrada solo con <code>title</code> y sin
+<code>path</code> es un encabezado de grupo sin enlace (como una carpeta sin
+<code>index.md</code> hoy en día), y un <code>title</code>/<code>icon</code> explícito siempre sobrescribe
+el título/icono propio de la página enlazada en la navegación (el
+<code>&lt;h1&gt;</code>/<code>&lt;title&gt;</code> real de la página queda intacto - solo cambia la
+etiqueta/icono de navegación) - consulta
+<a href="/bx-docs/development/theme/material/es/guides/themes/index.html#icons">Temas: Iconos</a> para lo que puede ser un valor
+de <code>icon</code></li>
+</ul>
+<pre><code class="language-json">{
+	&quot;nav&quot;: [
+		&quot;index.md&quot;,
+		{
+			&quot;title&quot;: &quot;Guides&quot;,
+			&quot;children&quot;: [
+				{ &quot;title&quot;: &quot;Quick Start&quot;, &quot;path&quot;: &quot;guides/setup.md&quot; },
+				&quot;guides/deployment.md&quot;
+			]
+		}
+	]
+}
+</code></pre>
+<p>Para una navegación lo bastante grande como para saturar <code>bxdocs.json</code>,
+muévela a su propio archivo <code>docs/nav.json</code> en su lugar - la misma forma
+de array, simplemente como el contenido de nivel superior de todo el
+archivo:</p>
+<pre><code class="language-json">[
+	&quot;index.md&quot;,
+	{ &quot;title&quot;: &quot;Guides&quot;, &quot;children&quot;: [ &quot;guides/setup.md&quot; ] }
+]
+</code></pre>
+<p>El propio <code>nav</code> de <code>bxdocs.json</code>, cuando no está vacío, siempre prevalece
+sobre <code>docs/nav.json</code>. Solo el árbol principal respeta cualquiera de los
+dos - un árbol <code>docs/versions/&lt;name&gt;/</code> siempre infiere su navegación de su
+propia estructura de carpetas, incluso cuando el árbol principal tiene una
+explícita.</p>
+<h2 id="markdown"><a href="#markdown" id="markdown" name="markdown" class="anchor"></a><code>markdown</code></h2>
+<p>Se reenvía tal cual a la propia configuración del módulo de
+<a href="https://github.com/ortus-boxlang/bx-markdown">bx-markdown</a> antes de
+renderizar cada página. BX Docs no redefine ni valida estas claves; lo que
+sea que pongas aquí es el propio conjunto de opciones de bx-markdown,
+directamente - así que esta lista puede divergir de la propia de
+bx-markdown a medida que evoluciona. Las tablas, <code>~~tachado~~</code>, las
+casillas de tarea <code>- [ ]</code> y la tabla de contenido en la página están
+siempre activas, sin interruptor. La única excepción es
+<code>enableAdmonition</code> - bx-markdown por sí mismo lo establece en <code>false</code> por
+defecto, pero BX Docs lo establece en <code>true</code> por defecto (consulta la
+<a href="/bx-docs/development/theme/material/es/guides/markdown/index.html">guía de Extensiones de Markdown</a>).</p>
+<table class="table">
+<thead>
+<tr><th>Clave</th><th>Valor por defecto</th><th>Efecto</th></tr>
+</thead>
+<tbody>
+<tr><td><code>enableAdmonition</code></td><td><code>true</code> <em>(valor por defecto de BX Docs; el propio valor por defecto de bx-markdown es <code>false</code>)</em></td><td>Bloques de aviso <code>!!!</code>/<code>???</code>/<code>???+</code> - consulta la <a href="/bx-docs/development/theme/material/es/guides/markdown/index.html#admonitions">guía de Extensiones de Markdown</a></td></tr>
+<tr><td><code>enableFootnotes</code></td><td><code>false</code></td><td>Referencias de nota al pie <code>[^label]</code> - consulta la <a href="/bx-docs/development/theme/material/es/guides/markdown/index.html#footnotes">guía de Extensiones de Markdown</a></td></tr>
+<tr><td><code>enableDefinitionLists</code></td><td><code>false</code></td><td>Listas <code>Term\n: Definition</code> - consulta la <a href="/bx-docs/development/theme/material/es/guides/markdown/index.html#definition-lists">guía de Extensiones de Markdown</a></td></tr>
+<tr><td><code>autoLinkUrls</code></td><td><code>true</code></td><td>Enlaza automáticamente URL y direcciones de correo sin formato</td></tr>
+<tr><td><code>anchorLinks</code></td><td><code>true</code></td><td>Añade un enlace de ancla clicable a cada encabezado</td></tr>
+<tr><td><code>anchorSetId</code></td><td><code>true</code></td><td>Estampa un atributo <code>id</code> en cada encabezado</td></tr>
+<tr><td><code>achorSetName</code> <em>(sic)</em></td><td><code>true</code></td><td>Estampa un atributo <code>name</code> en cada encabezado</td></tr>
+<tr><td><code>anchorWrapText</code></td><td><code>false</code></td><td>Envuelve todo el texto del encabezado en el enlace de ancla, en lugar de solo un marcador simple</td></tr>
+<tr><td><code>anchorClass</code></td><td><code>&quot;anchor&quot;</code></td><td>Clase CSS en el <code>&lt;a&gt;</code> de ancla</td></tr>
+<tr><td><code>anchorPrefix</code> / <code>anchorSuffix</code></td><td><code>&quot;&quot;</code></td><td>HTML sin procesar inyectado inmediatamente antes/después del texto del encabezado</td></tr>
+<tr><td><code>enableYouTubeTransformer</code></td><td><code>false</code></td><td>Incrusta automáticamente enlaces de YouTube sin formato como un reproductor</td></tr>
+<tr><td><code>codeStyleHTMLOpen</code> / <code>codeStyleHTMLClose</code></td><td><code>&quot;&lt;code&gt;&quot;</code> / <code>&quot;&lt;/code&gt;&quot;</code></td><td>HTML envolvente alrededor de los fragmentos de código en línea</td></tr>
+<tr><td><code>fencedCodeLanguageClassPrefix</code></td><td><code>&quot;language-&quot;</code></td><td>Prefijo de clase del que dependen el resaltador de sintaxis del lado del cliente de bx-docs (y Mermaid, ver abajo), por ejemplo <code>```js</code> -&gt; <code>class=&quot;language-js&quot;</code></td></tr>
+<tr><td><code>tableOptions.columnSpans</code></td><td><code>true</code></td><td>Respeta las celdas de tabla combinadas al estilo <code>colspan</code></td></tr>
+<tr><td><code>tableOptions.appendMissingColumns</code></td><td><code>true</code></td><td>Rellena una fila corta hasta el número de columnas del encabezado</td></tr>
+<tr><td><code>tableOptions.discardExtraColumns</code></td><td><code>true</code></td><td>Descarta celdas adicionales en una fila demasiado larga</td></tr>
+<tr><td><code>tableOptions.className</code></td><td><code>&quot;table&quot;</code></td><td>Clase CSS en cada <code>&lt;table&gt;</code> renderizada</td></tr>
+<tr><td><code>tableOptions.headerSeparationColumnMatch</code></td><td><code>true</code></td><td>Exige que la fila separadora <code>---</code> coincida con el número de columnas del encabezado</td></tr>
+</tbody>
+</table>
+<pre><code class="language-json">{
+	&quot;markdown&quot;: {
+		&quot;enableFootnotes&quot;: true,
+		&quot;enableDefinitionLists&quot;: true,
+		&quot;anchorLinks&quot;: false,
+		&quot;enableYouTubeTransformer&quot;: true
+	}
+}
+</code></pre>
+<h2 id="repo"><a href="#repo" id="repo" name="repo" class="anchor"></a><code>repo</code></h2>
+<p>Añade un enlace con icono de repositorio a la cabecera (los tres temas
+incorporados) y, cuando ambas claves están definidas, un enlace &quot;Edit this
+page&quot; en cada página.</p>
+<ul>
+<li><code>repo.url</code> - la URL de tu repositorio, por ejemplo
+<code>&quot;https://github.com/acme/docs&quot;</code>. Renderiza el enlace con icono de la
+cabecera por sí solo; déjalo en blanco para omitirlo por completo.</li>
+<li><code>repo.editUri</code> - el segmento de ruta entre la URL del repositorio y la
+ruta de origen propia de una página, por ejemplo <code>&quot;edit/main/docs/&quot;</code>
+(la propia convención de URL de &quot;editar&quot; de GitHub). Combinado con
+<code>repo.url</code> y la ruta de origen relativa a <code>docs/</code> de una página para
+construir su enlace de edición - por ejemplo, con el ejemplo anterior,
+<code>docs/guides/setup.md</code> obtiene
+<code>https://github.com/acme/docs/edit/main/docs/guides/setup.md</code>. También
+requiere <code>repo.url</code>; déjalo en blanco para omitir los enlaces de edición
+mientras sigues mostrando el icono de la cabecera.</li>
+</ul>
+<pre><code class="language-json">{ &quot;repo&quot;: { &quot;url&quot;: &quot;https://github.com/acme/docs&quot;, &quot;editUri&quot;: &quot;edit/main/docs/&quot; } }
+</code></pre>
+<h2 id="social"><a href="#social" id="social" name="social" class="anchor"></a><code>social</code></h2>
+<p>Un array de enlaces sociales/externos renderizados en el pie de página
+(consulta <a href="#footer"><code>footer</code></a> - no tiene efecto a menos que también esté
+activado). Cada entrada necesita una <code>url</code>; <code>icon</code> selecciona de un
+pequeño conjunto de iconos incorporado (<code>github</code>, <code>twitter</code>/<code>x</code>,
+<code>youtube</code>, <code>linkedin</code>, <code>facebook</code>, <code>bluesky</code>, <code>threads</code>, <code>slack</code>,
+<code>patreon</code>, <code>rss</code>, <code>email</code>, recurriendo a un glifo de enlace genérico para
+cualquier otra cosa), y <code>label</code> establece el nombre accesible/tooltip del
+enlace (por defecto <code>icon</code>, y luego <code>&quot;Link&quot;</code>).</p>
+<pre><code class="language-json">{
+	&quot;social&quot;: [
+		{ &quot;url&quot;: &quot;https://twitter.com/acme&quot;, &quot;icon&quot;: &quot;twitter&quot;, &quot;label&quot;: &quot;Twitter&quot; },
+		{ &quot;url&quot;: &quot;https://acme.com/rss.xml&quot;, &quot;icon&quot;: &quot;rss&quot;, &quot;label&quot;: &quot;RSS&quot; }
+	]
+}
+</code></pre>
+<h2 id="footer"><a href="#footer" id="footer" name="footer" class="anchor"></a><code>footer</code></h2>
+<p><code>false</code> (el valor por defecto) - sin pie de página en absoluto. <code>true</code>
+añade uno a cada página: una línea de copyright (<code>© &lt;year&gt; &lt;site name&gt;</code>),
+los enlaces <code>social</code> (si los hay), y un crédito &quot;Built with BX Docs&quot;.</p>
+<pre><code class="language-json">{ &quot;footer&quot;: true }
+</code></pre>
+<h2 id="lastupdated"><a href="#lastupdated" id="lastupdated" name="lastupdated" class="anchor"></a><code>lastUpdated</code></h2>
+<p><code>false</code> (el valor por defecto) - sin fecha de última actualización. <code>true</code>
+añade una línea &quot;Last updated&quot; junto al enlace de edición (o por sí sola,
+si <code>repo.editUri</code> no está definido), obtenida de <code>git log</code> sobre el propio
+archivo Markdown de cada página en el momento de la construcción. Se omite
+silenciosamente para una página de la que git no tiene historial - un
+<code>git init</code> reciente sin commits todavía, una construcción ejecutándose
+desde un zip descargado sin <code>.git</code> en absoluto, o git no estando instalado
+en la máquina de construcción - en lugar de romper la construcción.</p>
+<pre><code class="language-json">{ &quot;lastUpdated&quot;: true }
+</code></pre>
+<h2 id="analytics"><a href="#analytics" id="analytics" name="analytics" class="anchor"></a><code>analytics</code></h2>
+<p>Conecta el análisis de vistas de página. Actualmente solo admite Google
+Analytics (<code>gtag.js</code>):</p>
+<ul>
+<li><code>analytics.provider</code> - <code>&quot;google&quot;</code> para activarlo; dejado en blanco (el
+valor por defecto), no se envía ningún script de análisis en absoluto.</li>
+<li><code>analytics.id</code> - el ID de medición de Google Analytics (por ejemplo,
+<code>&quot;G-ABC123&quot;</code>). Obligatorio cuando <code>provider</code> es <code>&quot;google&quot;</code>.</li>
+</ul>
+<pre><code class="language-json">{ &quot;analytics&quot;: { &quot;provider&quot;: &quot;google&quot;, &quot;id&quot;: &quot;G-ABC123&quot; } }
+</code></pre>
+<h2 id="ogimage"><a href="#ogimage" id="ogimage" name="ogimage" class="anchor"></a><code>ogImage</code></h2>
+<p>Ruta/URL a una imagen de tarjeta social por defecto, renderizada como
+<code>og:image</code> (emparejada con un <code>twitter:card</code> de <code>summary_large_image</code>) en
+cada página que no la sobrescriba - resuelta de la misma forma que
+<code>theme.logo</code> (las rutas relativas llevan el prefijo <code>baseURL</code>, las URL
+absolutas se usan tal cual). Dejado en blanco (el valor por defecto) y
+con <code>generateOgImages</code> desactivado, no se renderiza ninguna etiqueta
+<code>og:image</code>/<code>twitter:card</code>.</p>
+<pre><code class="language-json">{ &quot;ogImage&quot;: &quot;assets/social-card.png&quot; }
+</code></pre>
+<p>El propio <code>ogImage</code> del frontmatter de una página (consulta
+<a href="/bx-docs/development/theme/material/es/getting-started/index.html#add-pages">Primeros Pasos</a>) siempre prevalece sobre
+este valor por defecto de todo el sitio para esa página en particular.</p>
+<h3 id="generateogimages"><a href="#generateogimages" id="generateogimages" name="generateogimages" class="anchor"></a><code>generateOgImages</code></h3>
+<p><code>false</code> (el valor por defecto) - sin tarjetas por página. <code>true</code> renderiza
+una tarjeta social PNG real de 1200x630 para cada página que aún no tenga
+su propio <code>ogImage</code> en el frontmatter - el título de la página sobre el
+degradado de marca, escrito en <code>site/assets/og/&lt;page&gt;.png</code> - en lugar de
+que cada página comparta una imagen genérica de todo el sitio. Puro
+<code>java.awt</code>/<code>javax.imageio</code> por debajo (parte de cualquier JVM en la que
+se ejecute BoxLang), así que esto no necesita navegador headless, servicio
+externo, ni acceso a red en el momento de la construcción.</p>
+<pre><code class="language-json">{ &quot;generateOgImages&quot;: true }
+</code></pre>
+<h2 id="extracss--extrajs"><a href="#extracss--extrajs" id="extracss--extrajs" name="extracss--extrajs" class="anchor"></a><code>extraCss</code> / <code>extraJs</code></h2>
+<p>Arrays de URL de hojas de estilo/scripts adicionales para incluir en cada
+página, añadidos después de los propios recursos del tema - cada entrada
+se resuelve de la misma forma que <code>theme.logo</code> (una ruta relativa lleva el
+prefijo <code>baseURL</code>; una URL absoluta se usa tal cual). Las entradas de
+<code>extraJs</code> se cargan con <code>defer</code>.</p>
+<pre><code class="language-json">{
+	&quot;extraCss&quot;: [ &quot;assets/custom.css&quot; ],
+	&quot;extraJs&quot;: [ &quot;assets/custom.js&quot; ]
+}
+</code></pre>
+<h2 id="mermaid"><a href="#mermaid" id="mermaid" name="mermaid" class="anchor"></a><code>mermaid</code></h2>
+<p><code>false</code> (el valor por defecto) - sin soporte de diagramas
+<a href="https://mermaid.js.org/">Mermaid</a> en absoluto. <code>true</code> carga <code>mermaid.js</code>
+del lado del cliente y renderiza cada bloque de código con fence
+<code>```mermaid</code> como un diagrama. Consulta
+<a href="/bx-docs/development/theme/material/es/guides/markdown/index.html#diagrams">Extensiones de Markdown</a> para la sintaxis.</p>
+<pre><code class="language-json">{ &quot;mermaid&quot;: true }
+</code></pre>
+<h2 id="math"><a href="#math" id="math" name="math" class="anchor"></a><code>math</code></h2>
+<p><code>false</code> (el valor por defecto) - sin <a href="https://katex.org/">KaTeX</a> en
+absoluto. <code>true</code> lo carga del lado del cliente y compone <code>$...$</code>/<code>$$...$$</code>
+escrito directamente en el markdown de una página. Consulta
+<a href="/bx-docs/development/theme/material/es/guides/markdown/index.html#math">Extensiones de Markdown</a> para la sintaxis.</p>
+<pre><code class="language-json">{ &quot;math&quot;: true }
+</code></pre>
+<p>Las admoniciones (cuadros de aviso al estilo nota/advertencia/consejo),
+las pestañas de contenido y las anotaciones de código con fence
+<code>hl_lines</code>/<code>linenums</code>/<code>title</code> están siempre disponibles en el markdown de
+cualquier página, sin necesidad de configuración - consulta
+<a href="/bx-docs/development/theme/material/es/guides/markdown/index.html#admonitions">Extensiones de Markdown</a>.</p>
+<h2 id="plugins"><a href="#plugins" id="plugins" name="plugins" class="anchor"></a><code>plugins</code></h2>
+<p><code>[]</code> (el valor por defecto) - un array de nombres de módulos de BoxLang
+para activar como plugins. Instalar un módulo de plugin (<code>box install</code>)
+nunca lo activa por sí solo; también tiene que nombrarse aquí. Consulta
+<a href="/bx-docs/development/theme/material/es/guides/plugins/index.html">Plugins</a> para saber cómo escribir uno.</p>
+<pre><code class="language-json">{ &quot;plugins&quot;: [ &quot;myBxDocsPlugin&quot; ] }
+</code></pre>
+<h2 id="i18n"><a href="#i18n" id="i18n" name="i18n" class="anchor"></a><code>i18n</code></h2>
+<p>Metadatos para la convención de carpetas de idioma
+<a href="/bx-docs/development/theme/material/es/guides/i18n/index.html"><code>docs/i18n/&lt;code&gt;/</code></a> - un idioma se construye
+automáticamente en cuanto su carpeta existe; <code>i18n</code> simplemente
+proporciona su etiqueta de visualización/dirección para el selector de
+idioma.</p>
+<ul>
+<li><code>i18n.defaultLocale</code> - <code>{ &quot;code&quot;, &quot;label&quot; }</code> para el propio árbol
+<code>docs/</code> regular del proyecto, con el valor por defecto
+<code>{ &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; }</code>. Solo hace falta definirlo cuando
+tu idioma predeterminado no es el inglés.</li>
+<li><code>i18n.locales</code> - <code>[]</code> (el valor por defecto) - un array de
+<code>{ &quot;code&quot;, &quot;label&quot;, &quot;dir&quot; }</code> para cada otro idioma. <code>code</code> cumple una
+doble función como nombre de la carpeta <code>docs/i18n/&lt;code&gt;/</code> y como
+prefijo de URL generado - solo letras/dígitos/guiones (<code>es</code>, <code>pt-BR</code>,
+<code>zh-Hans</code>). <code>dir</code> es <code>&quot;ltr&quot;</code> (el valor por defecto) o <code>&quot;rtl&quot;</code>.</li>
+</ul>
+<pre><code class="language-json">{
+	&quot;i18n&quot;: {
+		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
+		&quot;locales&quot;: [
+			{ &quot;code&quot;: &quot;es&quot;, &quot;label&quot;: &quot;Español&quot; },
+			{ &quot;code&quot;: &quot;ar&quot;, &quot;label&quot;: &quot;العربية&quot;, &quot;dir&quot;: &quot;rtl&quot; }
+		]
+	}
+}
+</code></pre>
+<p>Consulta <a href="/bx-docs/development/theme/material/es/guides/i18n/index.html">Internacionalización</a> para el panorama completo</p>
+<ul>
+<li>la reserva de páginas sin traducir, el selector de idioma y lo que
+todavía no está traducido.</li>
+</ul>
+<h2 id="versionado"><a href="#versionado" id="versionado" name="versionado" class="anchor"></a>Versionado</h2>
+<p>Los documentos versionados son cuestión de convención, no de
+configuración - no hay ninguna clave de <code>bxdocs.json</code> para ello. Añade
+una carpeta <code>docs/versions/</code>, y cada subcarpeta directa dentro de ella se
+construye como su propio árbol de documentos totalmente autocontenido,
+junto a tu <code>docs/</code> regular (que siempre se construye como &quot;Latest&quot;):</p>
+<pre><code>docs/
+├── index.md
+├── guides/
+└── versions/
+    ├── 1.0/
+    │   ├── index.md
+    │   └── guides/
+    └── 2.0/
+        ├── index.md
+        └── guides/
+</code></pre>
+<p>Cada carpeta de versión es un árbol normal con forma de <code>docs/</code> - su
+propio <code>index.md</code>, su propia navegación, sus propias páginas - construido
+en <code>site/versions/&lt;name&gt;/</code> con cada enlace interno prefijado en
+consecuencia, y compartiendo el único <code>bxdocs.json</code> de configuración/tema
+del proyecto. Los nombres de versión se ordenan de más reciente a más
+antiguo, numéricamente en lugar de alfabéticamente (de modo que <code>2.0</code> se
+ordena antes que <code>10.0</code>), y cada tema renderiza automáticamente un
+desplegable selector de versión en la cabecera en cuanto existe más de
+una versión - no hay nada que activar. Un archivo suelto colocado
+directamente bajo <code>docs/versions/</code> (no dentro de una subcarpeta) se
+ignora.</p>
+<p><code>sitemap.xml</code> y <code>llms.txt</code> incluyen las páginas de todas las versiones
+junto a las del sitio principal.</p>
+
+			</article>
+
+			<nav class="md-page-nav" aria-label="Page navigation">
+
+				<a class="md-page-nav__prev" href="/bx-docs/development/theme/material/es/cli-reference/index.html">&larr; Referencia de la CLI</a>
+
+				<a class="md-page-nav__next" href="/bx-docs/development/theme/material/es/guides/index.html">Gu&iacute;as &rarr;</a>
+
+			</nav>
+
+
+
+		</main>
+	</div>
+
+	<footer class="bxdocs-footer">
+		<div class="bxdocs-footer__inner">
+			<div class="bxdocs-footer__copy">&copy; 2026 BX Docs</div>
+
+			<div class="bxdocs-footer__social"><a class="social-link" href="https://github.com/ortus-boxlang/BoxLang" target="_blank" rel="noopener noreferrer" aria-label="BoxLang on GitHub" title="BoxLang on GitHub"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.083-.729.083-.729 1.205.084 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.303-5.467-1.332-5.467-5.93 0-1.31.468-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23A11.5 11.5 0 0 1 12 5.803c1.02.005 2.045.138 3.003.404 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.807 5.625-5.48 5.92.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 21.795 24 17.298 24 12c0-6.63-5.37-12-12-12"/></svg></a><a class="social-link" href="https://x.com/TryBoxLang" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" title="X (Twitter)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a class="social-link" href="https://www.youtube.com/@OrtusSolutions" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M23.498 6.186a3.02 3.02 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.02 3.02 0 0 0 .502 6.186 31.7 31.7 0 0 0 0 12a31.7 31.7 0 0 0 .502 5.814 3.02 3.02 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.02 3.02 0 0 0 2.122-2.136A31.7 31.7 0 0 0 24 12a31.7 31.7 0 0 0-.502-5.814ZM9.545 15.568V8.432L15.818 12l-6.273 3.568Z"/></svg></a><a class="social-link" href="https://www.linkedin.com/company/tryboxlang" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286ZM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124ZM7.119 20.452H3.554V9h3.565v11.452ZM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003Z"/></svg></a><a class="social-link" href="https://www.facebook.com/tryboxlang/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073Z"/></svg></a><a class="social-link" href="https://bsky.app/profile/boxlang.bsky.social" target="_blank" rel="noopener noreferrer" aria-label="Bluesky" title="Bluesky"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.203-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8Z"/></svg></a><a class="social-link" href="https://www.threads.com/@ortussolutions" target="_blank" rel="noopener noreferrer" aria-label="Threads" title="Threads"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.056 7.164 1.43 1.781 3.63 2.695 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.29a13.85 13.85 0 0 1 3.02.142c-.13-.808-.394-1.45-.789-1.916-.54-.635-1.362-.958-2.444-.964h-.032c-.87 0-2.045.24-2.798 1.376l-1.735-1.19c1.01-1.512 2.65-2.343 4.62-2.343h.036c3.294.021 5.259 2.028 5.459 5.55.114.048.227.098.34.15 1.574.734 2.727 1.846 3.334 3.215.845 1.906.923 5.011-1.646 7.44-1.877 1.778-4.153 2.581-7.379 2.605Zm1.176-11.916c-.184 0-.37.005-.556.016-1.392.08-2.26.71-2.211 1.605.05.943.976 1.38 1.866 1.334 1.427-.077 2.402-.965 2.652-2.874a8.19 8.19 0 0 0-1.751-.081Z"/></svg></a><a class="social-link" href="https://www.ortussolutions.com/community/slack" target="_blank" rel="noopener noreferrer" aria-label="Slack Community" title="Slack Community"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52ZM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313ZM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834ZM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312ZM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834ZM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312ZM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52ZM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313Z"/></svg></a><a class="social-link" href="https://www.patreon.com/ortussolutions" target="_blank" rel="noopener noreferrer" aria-label="Patreon" title="Patreon"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M0 .5v23h4.219V.5H0Zm15.211 0c-4.831 0-8.771 3.943-8.771 8.775 0 4.831 3.94 8.773 8.771 8.773 4.831 0 8.775-3.942 8.775-8.773S20.042.5 15.211.5Z"/></svg></a></div>
+
+			<div class="bxdocs-footer__credit">Built with <a href="https://github.com/ortus-boxlang/bx-docs" target="_blank" rel="noopener noreferrer">BX Docs</a></div>
+		</div>
+	</footer>
+
+	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+	<script src="/bx-docs/development/theme/material/es/assets/highlight-boxlang.js"></script>
+	<script>hljs.highlightAll();</script>
+	<script src="/bx-docs/development/theme/material/es/assets/code-lines.js"></script>
+	<script src="/bx-docs/development/theme/material/es/assets/copy-code.js" defer></script>
+	<script src="/bx-docs/development/theme/material/es/assets/admonition-collapse.js" defer></script>
+	<script src="/bx-docs/development/theme/material/es/assets/tabs.js" defer></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+	<script src="/bx-docs/development/theme/material/es/assets/mermaid-init.js"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+	<script src="/bx-docs/development/theme/material/es/assets/math-init.js"></script>
+
+	<script src="/bx-docs/development/theme/material/es/assets/theme-switcher.js" defer></script>
+</body>
+</html>
+

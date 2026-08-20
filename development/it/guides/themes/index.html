@@ -1,0 +1,486 @@
+
+
+
+<!doctype html>
+<html lang="it" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Temi - BX Docs</title>
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="BX Docs">
+	<meta property="og:title" content="Temi">
+
+	<meta name="description" content="Static documentation site generator for BoxLang, built on bx-markdown">
+	<meta property="og:description" content="Static documentation site generator for BoxLang, built on bx-markdown">
+
+	<meta property="og:image" content="/bx-docs/development/it/assets/og-image.png">
+	<meta name="twitter:card" content="summary_large_image">
+
+	<link rel="icon" href="/bx-docs/development/it/assets/boxlang-icon-full.svg">
+
+	<script>
+		( function () {
+			var configuredMode = "auto";
+			var stored = localStorage.getItem( "bxdocs-theme" );
+			var prefersDark = window.matchMedia( "(prefers-color-scheme: dark)" ).matches;
+			var wantsDark = stored ? stored === "dark" : ( configuredMode === "dark" || ( configuredMode === "auto" && prefersDark ) );
+			if ( wantsDark ) {
+				document.documentElement.setAttribute( "data-theme", "dark" );
+			}
+		} )();
+	</script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
+	<link rel="stylesheet" href="/bx-docs/development/it/assets/theme/style.css">
+	
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+
+	<script>window.__BXDOCS_BASE_PATH__ = "/bx-docs/development/it/";</script>
+	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
+	<script src="/bx-docs/development/it/assets/search.js" defer></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+</head>
+<body x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxdocs-theme', v ? 'dark' : 'light' ) } )">
+	<nav class="navbar navbar-expand-lg brand-navbar">
+		<div class="container-fluid navbar-row">
+			<a class="navbar-brand brand-mark" href="/bx-docs/development/it/"><img class="brand-logo" src="/bx-docs/development/it/assets/boxlang-icon-full.svg" alt=""><span class="brand-name">BX Docs</span></a>
+			<div class="navbar-controls">
+<div class="bxdocs-search position-relative">
+	<input type="search" id="bxdocs-search-input" class="form-control" placeholder="Search docs..." aria-label="Search">
+	<ul id="bxdocs-search-results" class="bxdocs-search-results list-unstyled"></ul>
+</div>
+
+
+
+				<select class="locale-switcher form-select form-select-sm" onchange="location.href=this.value" aria-label="Language"><option value="/bx-docs/development/">English</option><option value="/bx-docs/development/es/">Espa&ntilde;ol</option><option value="/bx-docs/development/it/" selected>Italiano</option><option value="/bx-docs/development/de/">Deutsch</option></select>
+
+				<a class="repo-link" href="https://github.com/ortus-boxlang/bx-docs" target="_blank" rel="noopener noreferrer" aria-label="Repository" title="Repository"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.083-.729.083-.729 1.205.084 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.303-5.467-1.332-5.467-5.93 0-1.31.468-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23A11.5 11.5 0 0 1 12 5.803c1.02.005 2.045.138 3.003.404 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.807 5.625-5.48 5.92.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 21.795 24 17.298 24 12c0-6.63-5.37-12-12-12"/></svg></a>
+
+				<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="Toggle dark mode">
+					<span x-show="!dark">&#127769;</span>
+					<span x-show="dark" x-cloak>&#9728;&#65039;</span>
+				</button>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bxdocs-sidebar" aria-controls="bxdocs-sidebar" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+			</div>
+		</div>
+	</nav>
+	<div class="container-fluid">
+		<div class="row">
+			<aside class="col-lg-3 col-xl-2 sidebar collapse d-lg-block" id="bxdocs-sidebar">
+				<ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/index.html">Home</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/getting-started/index.html">🚀 Per iniziare</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/cli-reference/index.html">⌨️ Riferimento CLI</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/configuration/index.html">⚙️ Configurazione</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/guides/index.html">Guide</a><ul class="nav flex-column nav--nested"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/guides/themes/index.html">Temi</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/guides/search/index.html">Ricerca</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/guides/deployment/index.html">Distribuire su GitHub Pages</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/guides/markdown/index.html">Estensioni Markdown</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/guides/plugins/index.html">Plugin</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/guides/migrating-from-gitbook/index.html">Migrare da GitBook</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/guides/i18n/index.html">Internazionalizzazione (i18n)</a></li></ul></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/releases/index.html">Politica di Release</a></li></ul>
+			</aside>
+			<main class="col-lg-9 col-xl-10 content">
+
+				<article class="page-content">
+<nav class="breadcrumb-nav mb-3" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/bx-docs/development/it/guides/index.html">Guide</a></li><li class="breadcrumb-item active" aria-current="page">Temi</li></ol></nav>
+					<h1 class="page-title">Temi</h1>
+<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/it/tags/index.html#tag-guide">guide</a><a class="page-tag" href="/bx-docs/development/it/tags/index.html#tag-temi">temi</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/i18n/it/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-docs/development/it/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 20, 2026, 1:00:24 AM</span></div>
+<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#integrati">Integrati</a></li><li class="toc-level-2"><a href="#icone">Icone</a></li><li class="toc-level-2"><a href="#il-contratto-themeprovider">Il contratto ThemeProvider</a></li><li class="toc-level-2"><a href="#personalizzare-i-colori-senza-sovrascrivere-un-tema">Personalizzare i colori senza sovrascrivere un tema</a></li><li class="toc-level-2"><a href="#sovrascrivere-un-tema">Sovrascrivere un tema</a></li><li class="toc-level-2"><a href="#scrivere-un-tema-da-zero">Scrivere un tema da zero</a></li></ul></nav>
+					<h1 id="temi"><a href="#temi" id="temi" name="temi" class="anchor"></a>Temi</h1>
+<p>I temi sono template nativi BoxLang <code>.bxm</code> - non c'è alcun motore di
+template separato o passaggio di build coinvolto.</p>
+<h2 id="integrati"><a href="#integrati" id="integrati" name="integrati" class="anchor"></a>Integrati</h2>
+<table class="table">
+<thead>
+<tr><th>Tema</th><th>Base</th><th>Note</th></tr>
+</thead>
+<tbody>
+<tr><td><code>bootstrap</code> (predefinito)</td><td><a href="https://getbootstrap.com/">Bootstrap 5</a> via CDN</td><td>Font Poppins, navbar con gradiente del brand</td></tr>
+<tr><td><code>material</code></td><td>CSS in stile Material scritto a mano</td><td>Layout a card, ombre di elevazione, font Roboto</td></tr>
+<tr><td><code>tailwind</code></td><td><a href="https://tailwindcss.com/">Tailwind Play CDN</a></td><td>Guidato da classi utility, nessun passaggio di build</td></tr>
+</tbody>
+</table>
+<p>Tutti e tre applicano la stessa palette del brand BoxLang: un gradiente
+<code>#00FF78 -&gt; #00DBFF</code> e un accento <code>#FFF500</code> - e tutti e tre includono lo
+stesso insieme di funzionalità di pagina:</p>
+<ul>
+<li><strong>Un sommario &quot;In questa pagina&quot; in pagina</strong>, generato dalle intestazioni
+<code>h2</code>/<code>h3</code> proprie di ogni pagina.</li>
+<li><strong>Breadcrumb</strong>, che mostrano la catena di antenati di una pagina quando è
+annidata più di un livello sotto un antenato collegato.</li>
+<li><strong>Link pagina precedente/successiva</strong> in fondo all'articolo, seguendo
+l'ordine di lettura della nav stessa.</li>
+<li><strong>Blocchi di codice con evidenziazione della sintassi</strong>, tramite
+<a href="https://highlightjs.org/">highlight.js</a> più una grammatica BoxLang
+propria (<code>```bx</code>/<code>```boxlang</code>/<code>```cfscript</code>), ciascuno con un
+<strong>pulsante di copia</strong> - mostrato al passaggio del mouse sui dispositivi
+che lo supportano, sempre visibile sui dispositivi touch (dove non c'è
+hover per rivelarlo). Vedi
+<a href="/bx-docs/development/it/guides/markdown/index.html#code-blocks">Estensioni Markdown</a>.</li>
+<li><strong>Webfont autoospitati</strong> - nessuna richiesta a <code>fonts.googleapis.com</code> al
+momento della visualizzazione.</li>
+<li><strong>Un interruttore modalità scura/chiara</strong>, alimentato da
+<a href="https://alpinejs.dev/">Alpine.js</a> per la reattività. La scelta del
+visitatore viene ricordata in <code>localStorage</code> (ricadendo sulla
+preferenza del suo sistema operativo), e applicata prima del primo
+rendering per evitare un lampo del tema sbagliato.</li>
+<li><strong>Un header responsivo</strong> che resta su una sola riga a qualsiasi
+larghezza - un viewport stretto restringe il box di ricerca invece di
+farlo andare a capo - più una nav laterale comprimibile (un interruttore
+a hamburger sia in <code>bootstrap</code>, sia in <code>material</code>, sia in <code>tailwind</code>).</li>
+<li><strong>Scorciatoie da tastiera</strong> nel box di ricerca: <code>/</code> porta il focus sulla
+ricerca da qualsiasi punto della pagina, e <code>Escape</code> chiude i risultati.
+Vedi <a href="/bx-docs/development/it/guides/search/index.html">Ricerca</a>.</li>
+<li><strong>Un link al repository e una riga &quot;Modifica questa pagina&quot;/&quot;Ultimo
+aggiornamento&quot;</strong>, quando le opzioni <code>repo</code>/<code>lastUpdated</code> di
+<code>bxdocs.json</code> sono impostate. Vedi
+<a href="/bx-docs/development/it/configuration/index.html#repo">Configurazione</a>.</li>
+<li><strong>Un link &quot;Scarica Markdown&quot;</strong>, accanto a &quot;Modifica questa pagina&quot; - il
+sorgente <code>.md</code> grezzo di ogni pagina viene pubblicato accanto al proprio
+HTML compilato (<code>guides/themes.md</code> si trova accanto a
+<code>guides/themes/index.html</code>), così una persona (o un LLM) può leggere la
+pagina come Markdown puro direttamente invece di analizzare l'HTML
+renderizzato. Sempre attivo, nessuna configurazione necessaria. Vedi
+<a href="/bx-docs/development/it/getting-started/index.html#downloading-a-page-as-markdown">Per iniziare</a>.</li>
+<li><strong>Un footer opzionale</strong> (copyright, link <code>social</code>, un credito &quot;Built
+with BX Docs&quot;) quando <code>footer</code> di <code>bxdocs.json</code> è <code>true</code>. Vedi
+<a href="/bx-docs/development/it/configuration/index.html#footer">Configurazione</a>.</li>
+<li><strong>Un selettore di versione</strong>, che appare automaticamente non appena un
+progetto ha una cartella <code>docs/versions/</code> con più di una versione al
+suo interno. Vedi <a href="/bx-docs/development/it/configuration/index.html#versioning">Configurazione</a>.</li>
+<li><strong>Un <code>404.html</code> con tema applicato</strong>, servito automaticamente dalla
+maggior parte degli host statici (incluso GitHub Pages) per qualsiasi
+percorso non corrispondente.</li>
+<li><strong>Un logo e una favicon personalizzati</strong>, quando <code>theme.logo</code>/
+<code>theme.favicon</code> di <code>bxdocs.json</code> sono impostati. Vedi
+<a href="/bx-docs/development/it/configuration/index.html#theme">Configurazione</a>.</li>
+<li><strong>Una nav laterale comprimibile</strong>, opzionale tramite
+<code>theme.options.navCollapsible</code>. Vedi
+<a href="/bx-docs/development/it/configuration/index.html#theme">Configurazione</a>.</li>
+<li><strong>Google Analytics</strong>, quando <code>analytics</code> di <code>bxdocs.json</code> è configurato.
+Vedi <a href="/bx-docs/development/it/configuration/index.html#analytics">Configurazione</a>.</li>
+<li><strong>Social share card</strong> (meta tag Open Graph + Twitter Card), ricavate
+dal frontmatter <code>description</code> di ogni pagina (o dalla <code>description</code> a
+livello di sito) e dal suo <code>ogImage</code> (o da quello a livello di sito) -
+generate automaticamente per pagina in modo opzionale tramite
+<code>generateOgImages</code> di <code>bxdocs.json</code>. Vedi
+<a href="/bx-docs/development/it/configuration/index.html#ogimage">Configurazione</a>.</li>
+<li><strong>Tag di pagina, un'icona e una riga di riepilogo</strong>, tutti opzionali
+tramite il frontmatter di una pagina - i tag vengono renderizzati come
+badge che collegano a un indice <code>/tags/</code> a livello di sito. Vedi
+<a href="/bx-docs/development/it/getting-started/index.html#add-pages">Per iniziare</a>.</li>
+<li><strong>Una nav esplicita in sostituzione</strong>, in <code>bxdocs.json</code> o nel proprio
+<code>docs/nav.json</code>, che sostituisce la deduzione dalle cartelle per siti di
+grandi dimensioni. Vedi <a href="/bx-docs/development/it/configuration/index.html#nav">Configurazione</a>.</li>
+<li><strong>CSS/JS extra</strong>, iniettati tramite <code>extraCss</code>/<code>extraJs</code> di
+<code>bxdocs.json</code>. Vedi
+<a href="/bx-docs/development/it/configuration/index.html#extracss--extrajs">Configurazione</a>.</li>
+<li><strong>Box di richiamo per ammonizioni (nota/avviso/suggerimento/...)</strong>,
+attivi di default nel markdown di qualsiasi pagina, incluse le varianti
+comprimibili - nessuna configurazione necessaria. Vedi
+<a href="/bx-docs/development/it/guides/markdown/index.html#admonitions">Estensioni Markdown</a>.</li>
+<li><strong>Note a piè di pagina e liste di definizioni</strong>, opzionali tramite
+<code>markdown</code> di <code>bxdocs.json</code>. Vedi
+<a href="/bx-docs/development/it/guides/markdown/index.html#footnotes">Estensioni Markdown</a>.</li>
+<li><strong>Schede di contenuto</strong> e <strong>numeri di riga/righe evidenziate/titoli del
+codice</strong>, nessuna configurazione necessaria. Vedi
+<a href="/bx-docs/development/it/guides/markdown/index.html#content-tabs">Estensioni Markdown</a>.</li>
+<li><strong>Diagrammi Mermaid</strong>, opzionali tramite <code>mermaid</code> di <code>bxdocs.json</code>.
+Vedi <a href="/bx-docs/development/it/guides/markdown/index.html#diagrams">Estensioni Markdown</a>.</li>
+<li><strong>Matematica</strong> (KaTeX), opzionale tramite <code>math</code> di <code>bxdocs.json</code>. Vedi
+<a href="/bx-docs/development/it/guides/markdown/index.html#math">Estensioni Markdown</a>.</li>
+</ul>
+<p>Imposta quale tema usa un progetto in <code>bxdocs.json</code>:</p>
+<pre><code class="language-json">{ &quot;theme&quot;: { &quot;name&quot;: &quot;material&quot; } }
+</code></pre>
+<h2 id="icone"><a href="#icone" id="icone" name="icone" class="anchor"></a>Icone</h2>
+<p>Il frontmatter <code>icon</code> di una pagina (mostrato accanto al suo titolo, e
+accanto alla sua voce nella nav laterale) accetta sia un'emoji/testo breve
+semplice - la forma originale, ancora pienamente supportata - sia
+un'icona con nome da una delle otto librerie autoospitate, tutte con
+licenza MIT/ISC e incluse in questo modulo (circa 16.200 icone
+combinate, nessuna CDN, nulla di aggiunto al peso di una pagina compilata
+oltre alla manciata di icone effettivamente usate - vedi IconResolver.bx):</p>
+<pre><code class="language-markdown">---
+icon: rocket
+---
+</code></pre>
+<pre><code class="language-markdown">---
+icon: lucide:rocket
+---
+</code></pre>
+<pre><code class="language-markdown">---
+icon: phosphor-bold:rocket
+---
+</code></pre>
+<p>Un semplice <code>rocket</code> ricade su <a href="https://phosphoricons.com/">Phosphor</a>,
+peso regolare. Phosphor include tutti e sei i suoi pesi, ciascuno con il
+proprio prefisso: <code>phosphor-thin:</code>, <code>phosphor-light:</code>, <code>phosphor:</code>
+(regolare, uguale al nome nudo), <code>phosphor-bold:</code>, <code>phosphor-fill:</code> e
+<code>phosphor-duotone:</code>. Usa il prefisso <code>lucide:</code> per
+<a href="https://lucide.dev/icons/">Lucide</a>, oppure <code>tabler:</code> per
+<a href="https://tabler.io/icons">Tabler</a>. Sfoglia la galleria di ciascun sito
+per il nome esatto - corrisponde esattamente al nome file incluso in
+questo modulo (minuscolo, con trattini, ad es. <code>book-open</code>,
+<code>arrow-up-right</code>; il sito di Phosphor mostra un selettore di peso -
+ciascuna delle sue sei opzioni lì corrisponde a uno dei sei prefissi
+<code>phosphor[-weight]:</code> di questo modulo).</p>
+<p>Font Awesome non è deliberatamente incluso tra queste - il suo stile
+Duotone (e la maggior parte del suo set di icone dalla v6 in poi) è
+disponibile solo con Pro, non disponibile con una licenza che questo
+modulo possa includere e ridistribuire gratuitamente.</p>
+<p>Anche un SVG del tuo progetto funziona - mettilo in
+<code>docs/assets/icons/my-icon.svg</code> e riferiscilo come <code>icon: custom:my-icon</code>.</p>
+<p>Una voce di <a href="/bx-docs/development/it/configuration/index.html#nav">nav.json</a> può impostare la propria
+<code>icon</code>, sovrascrivendo il frontmatter proprio della pagina di destinazione
+per quella singola voce:</p>
+<pre><code class="language-json">{ &quot;title&quot;: &quot;Guides&quot;, &quot;path&quot;: &quot;guides/index.md&quot;, &quot;icon&quot;: &quot;lucide:book-open&quot; }
+</code></pre>
+<h2 id="il-contratto-themeprovider"><a href="#il-contratto-themeprovider" id="il-contratto-themeprovider" name="il-contratto-themeprovider" class="anchor"></a>Il contratto <code>ThemeProvider</code></h2>
+<p>Un tema è semplicemente una cartella con:</p>
+<ul>
+<li><strong><code>layout.bxm</code></strong> (obbligatorio) - il guscio HTML esterno + la nav.
+Riceve <code>variables.page</code>, <code>variables.nav</code>, <code>variables.siteConfig</code>,
+<code>variables.themeDir</code> e <code>variables.basePath</code> nello scope, e include il
+file gemello <code>page.bxm</code> tramite <code>#variables.themeDir#/page.bxm</code>.
+<code>variables.basePath</code> è sempre un percorso relativo alla radice che
+termina con <code>/</code> (<code>/</code> di default, <code>/my-docs/</code> quando <code>baseURL</code> di
+<code>bxdocs.json</code> lo sovrascrive) - anteponilo a ogni <code>href</code>/<code>src</code> interno,
+invece di codificare un <code>/</code> iniziale fisso, così il tema continua a
+funzionare quando il sito viene servito da un sotto-percorso.</li>
+<li><strong><code>page.bxm</code></strong> (obbligatorio) - il corpo dell'articolo. Renderizza
+<code>variables.page.contentHtml</code> - il markdown già convertito.</li>
+<li><strong><code>search.bxm</code></strong> (opzionale) - il markup del box di ricerca, incluso da
+<code>layout.bxm</code> solo quando <code>search</code> di <code>bxdocs.json</code> è <code>true</code>. Vedi
+<a href="/bx-docs/development/it/guides/search/index.html">Ricerca</a>.</li>
+<li><strong><code>assets/</code></strong> (opzionale) - CSS/JS del tema, copiati in
+<code>site/assets/theme/</code> al momento del build.</li>
+</ul>
+<p><code>variables.page.editUrl</code>/<code>.lastUpdated</code> (stringhe vuote quando non
+configurati) e <code>variables.siteConfig.repo</code>/<code>.social</code>/<code>.footer</code> sono
+sempre disponibili anch'essi, a supporto delle funzionalità di link al
+repository/link di modifica/ultimo aggiornamento/footer sopra descritte -
+un tema personalizzato decide da sé se e come renderizzarli, come
+tutto il resto. <code>variables.versions</code> (<code>[ { label, url } ]</code>, con &quot;Latest&quot;
+per primo) e <code>variables.currentVersion</code> (l'etichetta <code>label</code> in fase di
+rendering in questo momento) sono a supporto del selettore di versione -
+vuoti/<code>&quot;Latest&quot;</code> per un progetto non versionato, quindi un tema deve
+renderizzare un selettore solo quando <code>variables.versions.len() gt 1</code>. I
+tre temi integrati ottengono le proprie icone repository/social da una
+piccola tabella SVG condivisa,
+<code>&lt;bx:include template=&quot;#variables.moduleAssetsDir#/icons.bxm&quot;&gt;</code>
+(definisce <code>bxdocsIcon( name )</code>, uno tra <code>github</code>, <code>twitter</code>/<code>x</code>, <code>rss</code>,
+<code>youtube</code>, <code>linkedin</code>, <code>facebook</code>, <code>bluesky</code>, <code>threads</code>, <code>slack</code>,
+<code>patreon</code>, <code>email</code>, <code>edit</code>, <code>clock</code>, con un glifo di link generico come
+ripiego) - un tema personalizzato può includerla nello stesso modo,
+oppure fornire le proprie icone del tutto.</p>
+<p>Una cartella tema a cui manca uno dei due file obbligatori fallisce
+subito con un chiaro errore <code>BxDocs.InvalidTheme</code> al momento del build,
+invece di un confuso errore di template nel profondo del rendering.</p>
+<h2 id="personalizzare-i-colori-senza-sovrascrivere-un-tema"><a href="#personalizzare-i-colori-senza-sovrascrivere-un-tema" id="personalizzare-i-colori-senza-sovrascrivere-un-tema" name="personalizzare-i-colori-senza-sovrascrivere-un-tema" class="anchor"></a>Personalizzare i colori senza sovrascrivere un tema</h2>
+<p>Per una piccola modifica di colore/font, forkare un intero tema è
+eccessivo - ogni tema integrato legge la propria palette da una manciata
+di proprietà CSS personalizzate su <code>:root</code>, ridichiarate sotto
+<code>[data-theme=&quot;dark&quot;]</code> per la modalità scura. L'
+<a href="/bx-docs/development/it/configuration/index.html#extracss--extrajs"><code>extraCss</code></a> di <code>bxdocs.json</code> si
+carica <em>dopo</em> il foglio di stile proprio del tema, quindi una
+ridichiarazione con la stessa specificità al suo interno vince senza
+toccare affatto <code>resources/themes/</code>:</p>
+<pre><code class="language-json">{ &quot;extraCss&quot;: [ &quot;assets/brand.css&quot; ] }
+</code></pre>
+<pre><code class="language-css">/* docs/assets/brand.css - copiato in site/assets/brand.css al momento del build */
+:root {
+	--bxdocs-gradient-start: #7C3AED;
+	--bxdocs-gradient-end: #DB2777;
+	--bxdocs-accent: #FBBF24;
+	--bxdocs-link: #7C3AED;
+	--bxdocs-link-hover: #9F5AF0;
+}
+
+[data-theme=&quot;dark&quot;] {
+	--bxdocs-link: #C4B5FD;
+	--bxdocs-link-hover: #DDD6FE;
+}
+</code></pre>
+<p>L'insieme proprio del tema <code>bootstrap</code>
+(<code>resources/themes/bootstrap/assets/style.css</code>) è composto da
+<code>--bxdocs-gradient-start</code>/<code>-end</code>, <code>--bxdocs-accent</code>, <code>--bxdocs-bg</code>,
+<code>--bxdocs-text</code>, <code>--bxdocs-sidebar-bg</code>, <code>--bxdocs-sidebar-text</code>,
+<code>--bxdocs-border</code>, <code>--bxdocs-link</code>, <code>--bxdocs-link-hover</code> e
+<code>--bxdocs-code-bg</code> - <code>material</code> e <code>tailwind</code> seguono la stessa
+denominazione <code>--bxdocs-*</code> con piccole variazioni proprie. Qualsiasi cosa
+oltre a colore/font (layout, aggiungere/rimuovere elementi di contorno)
+richiede una vera sovrascrittura o un tema personalizzato - vedi sotto.</p>
+<h2 id="sovrascrivere-un-tema"><a href="#sovrascrivere-un-tema" id="sovrascrivere-un-tema" name="sovrascrivere-un-tema" class="anchor"></a>Sovrascrivere un tema</h2>
+<p>Metti il tuo <code>layout.bxm</code> + <code>page.bxm</code> (e opzionalmente <code>search.bxm</code> /
+<code>assets/</code>) in una cartella <code>theme/</code> alla radice del tuo progetto. BX Docs
+preferisce una sovrascrittura <code>theme/</code> a livello di progetto rispetto a
+qualsiasi tema integrato, purché soddisfi il contratto sopra descritto -
+i temi integrati sotto <code>resources/themes/</code> proprio di questo modulo sono
+un buon punto di partenza da copiare e adattare.</p>
+<p>Un esempio pratico - parti da <code>bootstrap</code> e sostituisci la sua palette del
+brand e il font delle intestazioni con i tuoi, mantenendo tutto il resto
+(nav, ricerca, modalità scura, evidenziazione del codice, ...) esattamente
+come già funziona:</p>
+<pre><code class="language-markdown">my-project/
+├── bxdocs.json
+├── docs/
+└── theme/                    ← sovrascrittura a livello di progetto, verificata prima di qualsiasi tema integrato
+    ├── layout.bxm             ← copiato da resources/themes/bootstrap/layout.bxm
+    ├── page.bxm                ← copiato da resources/themes/bootstrap/page.bxm, invariato
+    ├── search.bxm               ← copiato invariato
+    └── assets/
+        └── style.css              ← copiato da assets/style.css di bootstrap, poi modificato
+</code></pre>
+<ol>
+<li>
+<p>Copia i tre file <code>.bxm</code> e <code>assets/style.css</code> da
+<code>resources/themes/bootstrap/</code> di questo modulo nel <code>theme/</code> del tuo
+progetto.</p>
+</li>
+<li>
+<p>Modifica solo ciò che serve cambiare. Per sostituire la palette del
+brand e il font, basta agire sulla parte iniziale di
+<code>theme/assets/style.css</code>:</p>
+<pre><code class="language-css">:root {
+	--bxdocs-gradient-start: #7C3AED;  /* era #00FF78 */
+	--bxdocs-gradient-end: #DB2777;    /* era #00DBFF */
+	--bxdocs-accent: #FBBF24;          /* era #FFF500 */
+}
+
+body {
+	font-family: &quot;Inter&quot;, system-ui, sans-serif;  /* era &quot;Poppins&quot; */
+}
+</code></pre>
+</li>
+<li>
+<p>Esegui <code>boxlang module:bxDocs build</code> (o <code>serve</code> mentre iteri) - BX
+Docs recepisce <code>theme/</code> automaticamente, nessuna modifica a
+<code>bxdocs.json</code> necessaria (una cartella <code>theme/</code> a livello di progetto
+ha sempre la precedenza sul tema integrato nominato in <code>theme.name</code>).
+Tutto ciò che non hai toccato - rendering della nav, ricerca,
+interruttore modalità scura, annotazioni del codice - continua a
+funzionare esattamente come nel tema <code>bootstrap</code> originale, dato che è
+sempre lo stesso identico markup <code>layout.bxm</code>/<code>page.bxm</code> sottostante.</p>
+</li>
+</ol>
+<p>Una cartella <code>theme/</code> di progetto è comunque tutto-o-niente - una volta
+che BX Docs ne trova una, viene usata al posto del tema integrato per
+intero, quindi necessita comunque del proprio <code>layout.bxm</code> + <code>page.bxm</code>
+anche se l'unica cosa cambiata è <code>assets/style.css</code> (una cartella priva
+di uno dei due file fallisce subito con <code>BxDocs.InvalidTheme</code> invece di
+ricadere silenziosamente su un altro tema). Per una modifica solo CSS
+senza <code>.bxm</code>, usa
+<a href="#customizing-colors-without-a-theme-override"><code>extraCss</code></a> come sopra
+invece - si sovrappone a qualunque tema <code>bxdocs.json</code> nomini, senza alcuna
+cartella <code>theme/</code> coinvolta. <code>theme/</code> serve per quando devi anche
+cambiare il markup stesso, argomento trattato di seguito.</p>
+<h2 id="scrivere-un-tema-da-zero"><a href="#scrivere-un-tema-da-zero" id="scrivere-un-tema-da-zero" name="scrivere-un-tema-da-zero" class="anchor"></a>Scrivere un tema da zero</h2>
+<p>Un tema necessita solo dei due file obbligatori, quindi ecco un esempio
+davvero minimale - niente Bootstrap/Tailwind, niente modalità scura,
+niente UI di ricerca - per mostrare esattamente cosa è richiesto rispetto
+a cosa aggiungono in più i temi integrati. Salva entrambi come
+<code>theme/layout.bxm</code> e <code>theme/page.bxm</code> nel tuo progetto - una cartella
+<code>theme/</code> a livello di progetto viene recepita automaticamente (come
+sopra), nessuna modifica a <code>bxdocs.json</code> necessaria:</p>
+<pre><code class="language-bx">&lt;!-- theme/layout.bxm --&gt;
+&lt;bx:script&gt;
+	function renderNav( required array nodes ) {
+		var html = &quot;&lt;ul&gt;&quot;
+		for ( var node in arguments.nodes ) {
+			html &amp;= &quot;&lt;li&gt;&quot;
+			html &amp;= len( node.url )
+				? '&lt;a href=&quot;' &amp; variables.basePath &amp; node.url &amp; '&quot;&gt;' &amp; encodeForHTML( node.title ) &amp; '&lt;/a&gt;'
+				: encodeForHTML( node.title )
+			if ( node.children.len() ) {
+				html &amp;= renderNav( node.children )
+			}
+			html &amp;= &quot;&lt;/li&gt;&quot;
+		}
+		return html &amp; &quot;&lt;/ul&gt;&quot;
+	}
+&lt;/bx:script&gt;
+&lt;bx:output&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+	&lt;meta charset=&quot;UTF-8&quot;&gt;
+	&lt;title&gt;#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#&lt;/title&gt;
+	&lt;link rel=&quot;stylesheet&quot; href=&quot;#variables.basePath#assets/theme/style.css&quot;&gt;
+&lt;/head&gt;
+&lt;body&gt;
+	&lt;header&gt;&lt;a href=&quot;#variables.basePath#&quot;&gt;#encodeForHTML( variables.siteConfig.name )#&lt;/a&gt;&lt;/header&gt;
+	&lt;nav&gt;#renderNav( variables.nav )#&lt;/nav&gt;
+	&lt;main&gt;
+&lt;/bx:output&gt;
+&lt;bx:include template=&quot;#variables.themeDir#/page.bxm&quot;&gt;
+&lt;bx:output&gt;
+	&lt;/main&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+&lt;/bx:output&gt;
+</code></pre>
+<pre><code class="language-bx">&lt;!-- theme/page.bxm --&gt;
+&lt;bx:output&gt;
+&lt;article&gt;
+	&lt;h1&gt;#encodeForHTML( variables.page.title )#&lt;/h1&gt;
+	#variables.page.contentHtml#
+&lt;/article&gt;
+&lt;/bx:output&gt;
+</code></pre>
+<p>Questo è un tema completo e funzionante -
+<code>variables.page.contentHtml</code> è il markdown già convertito (evidenziazione
+della sintassi, ammonizioni, schede, matematica e tutto il resto), quindi
+non c'è più nulla da analizzare, solo da impaginare. Da qui, aggiungi
+qualsiasi cosa dei temi integrati che vuoi davvero: <code>search.bxm</code> (incluso
+solo quando <code>search</code> di <code>bxdocs.json</code> è <code>true</code> - vedi <a href="/bx-docs/development/it/guides/search/index.html">Ricerca</a>),
+un interruttore modalità scura (copia la coppia <code>x-data</code>/<code>x-init</code> di
+Alpine.js dal tag <code>&lt;body&gt;</code> di <code>resources/themes/bootstrap/layout.bxm</code> e il
+blocco CSS <code>[data-theme=&quot;dark&quot;]</code> corrispondente), breadcrumb/tag/link
+pagina precedente-successiva (<code>page.bxm</code> in qualsiasi tema integrato
+mostra lo schema - ognuno è solo un <code>if</code> intorno a una piccola funzione di
+rendering, tutti guidati da campi già presenti su <code>variables.page</code>),
+oppure una cartella <code>assets/</code> per il tuo CSS/JS, copiata automaticamente
+in <code>site/assets/theme/</code> al momento del build.</p>
+
+				</article>
+
+				<nav class="page-nav d-flex justify-content-between" aria-label="Page navigation">
+
+					<a class="page-nav__prev" href="/bx-docs/development/it/guides/index.html">&larr; Guide</a>
+
+					<a class="page-nav__next" href="/bx-docs/development/it/guides/search/index.html">Ricerca &rarr;</a>
+
+				</nav>
+
+
+
+			</main>
+		</div>
+	</div>
+
+	<footer class="bxdocs-footer">
+		<div class="container-fluid bxdocs-footer__inner">
+			<div class="bxdocs-footer__copy">&copy; 2026 BX Docs</div>
+
+			<div class="bxdocs-footer__social"><a class="social-link" href="https://github.com/ortus-boxlang/BoxLang" target="_blank" rel="noopener noreferrer" aria-label="BoxLang on GitHub" title="BoxLang on GitHub"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.083-.729.083-.729 1.205.084 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.303-5.467-1.332-5.467-5.93 0-1.31.468-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23A11.5 11.5 0 0 1 12 5.803c1.02.005 2.045.138 3.003.404 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.807 5.625-5.48 5.92.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 21.795 24 17.298 24 12c0-6.63-5.37-12-12-12"/></svg></a><a class="social-link" href="https://x.com/TryBoxLang" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" title="X (Twitter)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a class="social-link" href="https://www.youtube.com/@OrtusSolutions" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M23.498 6.186a3.02 3.02 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.02 3.02 0 0 0 .502 6.186 31.7 31.7 0 0 0 0 12a31.7 31.7 0 0 0 .502 5.814 3.02 3.02 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.02 3.02 0 0 0 2.122-2.136A31.7 31.7 0 0 0 24 12a31.7 31.7 0 0 0-.502-5.814ZM9.545 15.568V8.432L15.818 12l-6.273 3.568Z"/></svg></a><a class="social-link" href="https://www.linkedin.com/company/tryboxlang" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286ZM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124ZM7.119 20.452H3.554V9h3.565v11.452ZM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003Z"/></svg></a><a class="social-link" href="https://www.facebook.com/tryboxlang/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073Z"/></svg></a><a class="social-link" href="https://bsky.app/profile/boxlang.bsky.social" target="_blank" rel="noopener noreferrer" aria-label="Bluesky" title="Bluesky"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.203-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8Z"/></svg></a><a class="social-link" href="https://www.threads.com/@ortussolutions" target="_blank" rel="noopener noreferrer" aria-label="Threads" title="Threads"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.056 7.164 1.43 1.781 3.63 2.695 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.29a13.85 13.85 0 0 1 3.02.142c-.13-.808-.394-1.45-.789-1.916-.54-.635-1.362-.958-2.444-.964h-.032c-.87 0-2.045.24-2.798 1.376l-1.735-1.19c1.01-1.512 2.65-2.343 4.62-2.343h.036c3.294.021 5.259 2.028 5.459 5.55.114.048.227.098.34.15 1.574.734 2.727 1.846 3.334 3.215.845 1.906.923 5.011-1.646 7.44-1.877 1.778-4.153 2.581-7.379 2.605Zm1.176-11.916c-.184 0-.37.005-.556.016-1.392.08-2.26.71-2.211 1.605.05.943.976 1.38 1.866 1.334 1.427-.077 2.402-.965 2.652-2.874a8.19 8.19 0 0 0-1.751-.081Z"/></svg></a><a class="social-link" href="https://www.ortussolutions.com/community/slack" target="_blank" rel="noopener noreferrer" aria-label="Slack Community" title="Slack Community"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52ZM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313ZM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834ZM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312ZM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834ZM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312ZM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52ZM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313Z"/></svg></a><a class="social-link" href="https://www.patreon.com/ortussolutions" target="_blank" rel="noopener noreferrer" aria-label="Patreon" title="Patreon"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M0 .5v23h4.219V.5H0Zm15.211 0c-4.831 0-8.771 3.943-8.771 8.775 0 4.831 3.94 8.773 8.771 8.773 4.831 0 8.775-3.942 8.775-8.773S20.042.5 15.211.5Z"/></svg></a></div>
+
+			<div class="bxdocs-footer__credit">Built with <a href="https://github.com/ortus-boxlang/bx-docs" target="_blank" rel="noopener noreferrer">BX Docs</a></div>
+		</div>
+	</footer>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+	<script src="/bx-docs/development/it/assets/highlight-boxlang.js"></script>
+	<script>hljs.highlightAll();</script>
+	<script src="/bx-docs/development/it/assets/code-lines.js"></script>
+	<script src="/bx-docs/development/it/assets/copy-code.js" defer></script>
+	<script src="/bx-docs/development/it/assets/admonition-collapse.js" defer></script>
+	<script src="/bx-docs/development/it/assets/tabs.js" defer></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+	<script src="/bx-docs/development/it/assets/mermaid-init.js"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+	<script src="/bx-docs/development/it/assets/math-init.js"></script>
+
+	<script src="/bx-docs/development/it/assets/theme-switcher.js" defer></script>
+</body>
+</html>
+

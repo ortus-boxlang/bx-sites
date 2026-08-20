@@ -1,0 +1,488 @@
+
+
+
+<!doctype html>
+<html lang="es" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Temas - BX Docs</title>
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="BX Docs">
+	<meta property="og:title" content="Temas">
+
+	<meta name="description" content="Static documentation site generator for BoxLang, built on bx-markdown">
+	<meta property="og:description" content="Static documentation site generator for BoxLang, built on bx-markdown">
+
+	<meta property="og:image" content="/bx-docs/development/theme/tailwind/es/assets/og-image.png">
+	<meta name="twitter:card" content="summary_large_image">
+
+	<link rel="icon" href="/bx-docs/development/theme/tailwind/es/assets/boxlang-icon-full.svg">
+
+	<script>
+		( function () {
+			var configuredMode = "auto";
+			var stored = localStorage.getItem( "bxdocs-theme" );
+			var prefersDark = window.matchMedia( "(prefers-color-scheme: dark)" ).matches;
+			var wantsDark = stored ? stored === "dark" : ( configuredMode === "dark" || ( configuredMode === "auto" && prefersDark ) );
+			if ( wantsDark ) {
+				document.documentElement.setAttribute( "data-theme", "dark" );
+			}
+		} )();
+	</script>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
+	<link rel="stylesheet" href="/bx-docs/development/theme/tailwind/es/assets/theme/style.css">
+	
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+
+	<script>window.__BXDOCS_BASE_PATH__ = "/bx-docs/development/theme/tailwind/es/";</script>
+	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
+	<script src="/bx-docs/development/theme/tailwind/es/assets/search.js" defer></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+</head>
+<body class="min-h-screen bg-slate-50 font-[Poppins,sans-serif] text-slate-900" x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxdocs-theme', v ? 'dark' : 'light' ) } )">
+	<header class="flex h-16 items-center gap-3 px-6 bg-gradient-to-r from-[#00FF78] to-[#00DBFF] shadow navbar-row">
+		<button type="button" class="text-xl md:hidden" aria-controls="bxdocs-sidebar" aria-label="Toggle navigation" onclick="document.getElementById('bxdocs-sidebar').classList.toggle('hidden')">☰</button>
+		<a class="text-lg font-bold text-slate-900 brand-mark" href="/bx-docs/development/theme/tailwind/es/"><img class="brand-logo" src="/bx-docs/development/theme/tailwind/es/assets/boxlang-icon-full.svg" alt=""><span class="brand-name">BX Docs</span></a>
+		<div class="navbar-controls">
+<div class="bxdocs-search relative">
+	<input type="search" id="bxdocs-search-input" class="w-full rounded border border-slate-300 px-3 py-1.5 text-sm" placeholder="Search docs..." aria-label="Search">
+	<ul id="bxdocs-search-results" class="bxdocs-search-results absolute z-10 mt-1 w-full rounded border border-slate-200 bg-white shadow-lg"></ul>
+</div>
+
+
+
+			<select class="locale-switcher rounded border border-slate-900/20 bg-transparent px-2 py-1 text-sm" onchange="location.href=this.value" aria-label="Language"><option value="/bx-docs/development/theme/tailwind/">English</option><option value="/bx-docs/development/theme/tailwind/es/" selected>Espa&ntilde;ol</option><option value="/bx-docs/development/theme/tailwind/it/">Italiano</option><option value="/bx-docs/development/theme/tailwind/de/">Deutsch</option></select>
+
+			<a class="repo-link" href="https://github.com/ortus-boxlang/bx-docs" target="_blank" rel="noopener noreferrer" aria-label="Repository" title="Repository"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.083-.729.083-.729 1.205.084 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.303-5.467-1.332-5.467-5.93 0-1.31.468-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23A11.5 11.5 0 0 1 12 5.803c1.02.005 2.045.138 3.003.404 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.807 5.625-5.48 5.92.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 21.795 24 17.298 24 12c0-6.63-5.37-12-12-12"/></svg></a>
+
+			<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="Toggle dark mode">
+				<span x-show="!dark">&#127769;</span>
+				<span x-show="dark" x-cloak>&#9728;&#65039;</span>
+			</button>
+		</div>
+	</header>
+	<div class="mx-auto flex max-w-6xl">
+		<nav id="bxdocs-sidebar" class="hidden w-64 shrink-0 p-4 md:block" aria-label="Navigation">
+			<ul class="space-y-1"><li><a class="block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50" href="/bx-docs/development/theme/tailwind/es/index.html">Inicio</a></li><li><a class="block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50" href="/bx-docs/development/theme/tailwind/es/getting-started/index.html">🚀 Primeros Pasos</a></li><li><a class="block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50" href="/bx-docs/development/theme/tailwind/es/cli-reference/index.html">⌨️ Referencia de la CLI</a></li><li><a class="block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50" href="/bx-docs/development/theme/tailwind/es/configuration/index.html">⚙️ Configuraci&oacute;n</a></li><li><a class="block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50" href="/bx-docs/development/theme/tailwind/es/guides/index.html">Gu&iacute;as</a><ul class="space-y-1 ms-4 mt-1"><li><a class="block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50" href="/bx-docs/development/theme/tailwind/es/guides/themes/index.html">Temas</a></li><li><a class="block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50" href="/bx-docs/development/theme/tailwind/es/guides/search/index.html">B&uacute;squeda</a></li><li><a class="block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50" href="/bx-docs/development/theme/tailwind/es/guides/deployment/index.html">Desplegar en GitHub Pages</a></li><li><a class="block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50" href="/bx-docs/development/theme/tailwind/es/guides/markdown/index.html">Extensiones de Markdown</a></li><li><a class="block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50" href="/bx-docs/development/theme/tailwind/es/guides/plugins/index.html">Plugins</a></li><li><a class="block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50" href="/bx-docs/development/theme/tailwind/es/guides/migrating-from-gitbook/index.html">Migrar desde GitBook</a></li><li><a class="block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50" href="/bx-docs/development/theme/tailwind/es/guides/i18n/index.html">Internacionalizaci&oacute;n (i18n)</a></li></ul></li><li><a class="block rounded px-3 py-1.5 text-sm text-slate-700 hover:bg-cyan-50" href="/bx-docs/development/theme/tailwind/es/releases/index.html">Pol&iacute;tica de Lanzamientos</a></li></ul>
+		</nav>
+		<main class="min-w-0 flex-1 p-8">
+
+			<article class="rounded-lg bg-white p-8 shadow-sm ring-1 ring-slate-200">
+<nav class="mb-4 text-sm text-slate-500" aria-label="breadcrumb"><ol class="flex flex-wrap items-center gap-1"><li><a class="hover:text-cyan-700" href="/bx-docs/development/theme/tailwind/es/guides/index.html">Gu&iacute;as</a></li><li aria-hidden="true">/</li><li class="font-semibold text-slate-700" aria-current="page">Temas</li></ol></nav>
+				<h1 class="mb-6 border-b-4 border-[#FFF500] pb-2 text-2xl font-bold">Temas</h1>
+<div class="mb-4 flex flex-wrap gap-2"><a class="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700 hover:bg-cyan-100" href="/bx-docs/development/theme/tailwind/es/tags/index.html#tag-gu-as">gu&iacute;as</a><a class="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700 hover:bg-cyan-100" href="/bx-docs/development/theme/tailwind/es/tags/index.html#tag-temas">temas</a></div><div class="page-meta mb-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/i18n/es/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/bx-docs/development/theme/tailwind/es/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 20, 2026, 1:00:24 AM</span></div>
+<nav class="mb-6 rounded border border-slate-200 bg-cyan-50/40 px-4 py-3 text-sm"><div class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">On this page</div><ul class="space-y-1"><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#incorporados">Incorporados</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#iconos">Iconos</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#el-contrato-de-themeprovider">El contrato de ThemeProvider</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#personalizar-colores-sin-sobrescribir-un-tema">Personalizar colores sin sobrescribir un tema</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#sobrescribir-un-tema">Sobrescribir un tema</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#escribir-un-tema-desde-cero">Escribir un tema desde cero</a></li></ul></nav>
+				<div class="prose max-w-none">
+					<h1 id="temas"><a href="#temas" id="temas" name="temas" class="anchor"></a>Temas</h1>
+<p>Los temas son plantillas <code>.bxm</code> nativas de BoxLang - no hay un motor de
+plantillas ni un paso de compilación separados involucrados.</p>
+<h2 id="incorporados"><a href="#incorporados" id="incorporados" name="incorporados" class="anchor"></a>Incorporados</h2>
+<table class="table">
+<thead>
+<tr><th>Tema</th><th>Base</th><th>Notas</th></tr>
+</thead>
+<tbody>
+<tr><td><code>bootstrap</code> (predeterminado)</td><td><a href="https://getbootstrap.com/">Bootstrap 5</a> vía CDN</td><td>Fuente Poppins, barra de navegación con degradado de marca</td></tr>
+<tr><td><code>material</code></td><td>CSS al estilo Material escrito a mano</td><td>Diseño de tarjetas, sombras de elevación, fuente Roboto</td></tr>
+<tr><td><code>tailwind</code></td><td><a href="https://tailwindcss.com/">Tailwind Play CDN</a></td><td>Basado en clases de utilidad, sin paso de compilación</td></tr>
+</tbody>
+</table>
+<p>Los tres aplican la misma paleta de marca de BoxLang: un degradado
+<code>#00FF78 -&gt; #00DBFF</code> y un acento <code>#FFF500</code> - y los tres incluyen el mismo
+conjunto de funciones de página:</p>
+<ul>
+<li><strong>Una tabla de contenido &quot;En esta página&quot;</strong>, generada a partir de los
+propios encabezados <code>h2</code>/<code>h3</code> de cada página.</li>
+<li><strong>Migas de pan</strong>, que muestran la cadena de ancestros de una página
+cuando está anidada más de un nivel bajo un ancestro enlazado.</li>
+<li><strong>Enlaces de página anterior/siguiente</strong> al final del artículo, siguiendo
+el propio orden de lectura de la navegación.</li>
+<li><strong>Bloques de código con resaltado de sintaxis</strong>, mediante
+<a href="https://highlightjs.org/">highlight.js</a> más una gramática de BoxLang
+propia (<code>```bx</code>/<code>```boxlang</code>/<code>```cfscript</code>), cada uno con un
+<strong>botón de copiar</strong> - mostrado al pasar el cursor en dispositivos que lo
+admiten, siempre visible en dispositivos táctiles (donde no hay hover
+para revelarlo). Consulta
+<a href="/bx-docs/development/theme/tailwind/es/guides/markdown/index.html#code-blocks">Extensiones de Markdown</a>.</li>
+<li><strong>Fuentes web autoalojadas</strong> - sin solicitudes a <code>fonts.googleapis.com</code>
+al momento de la visualización.</li>
+<li><strong>Un interruptor de modo claro/oscuro</strong>, impulsado por
+<a href="https://alpinejs.dev/">Alpine.js</a> para la reactividad. La elección del
+visitante se recuerda en <code>localStorage</code> (recurriendo a la preferencia de
+su sistema operativo), y se aplica antes del primer renderizado para
+evitar un destello del tema incorrecto.</li>
+<li><strong>Una cabecera responsiva</strong> que se mantiene en una sola fila en
+cualquier ancho - una ventana estrecha reduce el cuadro de búsqueda en
+lugar de envolverlo en su propia línea - además de una barra lateral de
+navegación colapsable (un interruptor de hamburguesa en <code>bootstrap</code>/
+<code>material</code>/<code>tailwind</code> por igual).</li>
+<li><strong>Atajos de teclado</strong> en el cuadro de búsqueda: <code>/</code> enfoca la búsqueda
+desde cualquier lugar de la página, y <code>Escape</code> cierra los resultados.
+Consulta <a href="/bx-docs/development/theme/tailwind/es/guides/search/index.html">Búsqueda</a>.</li>
+<li><strong>Un enlace al repositorio y una línea &quot;Edit this page&quot;/&quot;Last
+updated&quot;</strong>, cuando las opciones <code>repo</code>/<code>lastUpdated</code> de <code>bxdocs.json</code>
+están configuradas. Consulta <a href="/bx-docs/development/theme/tailwind/es/configuration/index.html#repo">Configuración</a>.</li>
+<li><strong>Un enlace &quot;Download Markdown&quot;</strong>, junto a &quot;Edit this page&quot; - la fuente
+<code>.md</code> en bruto de cada página se publica junto a su HTML construido
+(<code>guides/themes.md</code> situado junto a <code>guides/themes/index.html</code>), de modo
+que ella misma (o un LLM) pueda leer la página como Markdown simple
+directamente en lugar de analizar el HTML renderizado. Siempre activo,
+sin configuración necesaria. Consulta
+<a href="/bx-docs/development/theme/tailwind/es/getting-started/index.html#downloading-a-page-as-markdown">Primeros Pasos</a>.</li>
+<li><strong>Un pie de página opcional</strong> (copyright, enlaces <code>social</code>, un crédito
+&quot;Built with BX Docs&quot;) cuando el <code>footer</code> de <code>bxdocs.json</code> es <code>true</code>.
+Consulta <a href="/bx-docs/development/theme/tailwind/es/configuration/index.html#footer">Configuración</a>.</li>
+<li><strong>Un selector de versión</strong>, que aparece automáticamente en cuanto un
+proyecto tiene una carpeta <code>docs/versions/</code> con más de una versión en
+ella. Consulta <a href="/bx-docs/development/theme/tailwind/es/configuration/index.html#versioning">Configuración</a>.</li>
+<li><strong>Un <code>404.html</code> con el tema aplicado</strong>, servido automáticamente por la
+mayoría de los alojamientos estáticos (incluido GitHub Pages) para
+cualquier ruta sin coincidencia.</li>
+<li><strong>Un logo y favicon personalizados</strong>, cuando <code>theme.logo</code>/
+<code>theme.favicon</code> de <code>bxdocs.json</code> están configurados. Consulta
+<a href="/bx-docs/development/theme/tailwind/es/configuration/index.html#theme">Configuración</a>.</li>
+<li><strong>Una barra lateral de navegación colapsable</strong>, opcional mediante
+<code>theme.options.navCollapsible</code>. Consulta
+<a href="/bx-docs/development/theme/tailwind/es/configuration/index.html#theme">Configuración</a>.</li>
+<li><strong>Google Analytics</strong>, cuando <code>analytics</code> de <code>bxdocs.json</code> está
+configurado. Consulta <a href="/bx-docs/development/theme/tailwind/es/configuration/index.html#analytics">Configuración</a>.</li>
+<li><strong>Tarjetas para compartir en redes sociales</strong> (metaetiquetas Open Graph
+<ul>
+<li>Twitter Card), obtenidas del frontmatter <code>description</code> de cada página
+(o la <code>description</code> general del sitio) y su propio <code>ogImage</code> (o el
+general del sitio) - generadas automáticamente por página de forma
+opcional mediante <code>generateOgImages</code> de <code>bxdocs.json</code>. Consulta
+<a href="/bx-docs/development/theme/tailwind/es/configuration/index.html#ogimage">Configuración</a>.</li>
+</ul>
+</li>
+<li><strong>Etiquetas de página, un icono y una línea de resumen</strong>, todo opcional
+mediante el propio frontmatter de una página - las etiquetas se
+renderizan como insignias que enlazan a un índice <code>/tags/</code> de todo el
+sitio. Consulta <a href="/bx-docs/development/theme/tailwind/es/getting-started/index.html#add-pages">Primeros Pasos</a>.</li>
+<li><strong>Una navegación explícita personalizada</strong>, en <code>bxdocs.json</code> o en su
+propio <code>docs/nav.json</code>, que reemplaza la inferencia por carpetas en
+sitios grandes. Consulta <a href="/bx-docs/development/theme/tailwind/es/configuration/index.html#nav">Configuración</a>.</li>
+<li><strong>CSS/JS adicional</strong>, inyectado mediante <code>extraCss</code>/<code>extraJs</code> de
+<code>bxdocs.json</code>. Consulta
+<a href="/bx-docs/development/theme/tailwind/es/configuration/index.html#extracss--extrajs">Configuración</a>.</li>
+<li><strong>Cuadros de aviso (nota/advertencia/consejo/...)</strong>, activos por
+defecto en el markdown de cualquier página, incluidas variantes
+colapsables - sin configuración necesaria. Consulta
+<a href="/bx-docs/development/theme/tailwind/es/guides/markdown/index.html#admonitions">Extensiones de Markdown</a>.</li>
+<li><strong>Notas al pie y listas de definiciones</strong>, opcionales mediante
+<code>markdown</code> de <code>bxdocs.json</code>. Consulta
+<a href="/bx-docs/development/theme/tailwind/es/guides/markdown/index.html#footnotes">Extensiones de Markdown</a>.</li>
+<li><strong>Pestañas de contenido</strong> y <strong>números de línea de código/líneas
+resaltadas/títulos</strong>, sin configuración necesaria. Consulta
+<a href="/bx-docs/development/theme/tailwind/es/guides/markdown/index.html#content-tabs">Extensiones de Markdown</a>.</li>
+<li><strong>Diagramas Mermaid</strong>, opcionales mediante <code>mermaid</code> de <code>bxdocs.json</code>.
+Consulta <a href="/bx-docs/development/theme/tailwind/es/guides/markdown/index.html#diagrams">Extensiones de Markdown</a>.</li>
+<li><strong>Matemáticas</strong> (KaTeX), opcional mediante <code>math</code> de <code>bxdocs.json</code>.
+Consulta <a href="/bx-docs/development/theme/tailwind/es/guides/markdown/index.html#math">Extensiones de Markdown</a>.</li>
+</ul>
+<p>Define cuál usa un proyecto en <code>bxdocs.json</code>:</p>
+<pre><code class="language-json">{ &quot;theme&quot;: { &quot;name&quot;: &quot;material&quot; } }
+</code></pre>
+<h2 id="iconos"><a href="#iconos" id="iconos" name="iconos" class="anchor"></a>Iconos</h2>
+<p>El propio frontmatter <code>icon</code> de una página (mostrado junto a su título, y
+junto a su entrada en la barra lateral de navegación) acepta ya sea un
+emoji/texto corto simple - la forma original, todavía totalmente
+compatible - o un icono con nombre de una de las ocho bibliotecas
+autoalojadas, todas con licencia MIT/ISC e incluidas con este módulo
+(~16.200 iconos combinados, sin CDN, sin nada añadido al peso de una
+página construida más allá de los pocos iconos que realmente usa -
+consulta IconResolver.bx):</p>
+<pre><code class="language-markdown">---
+icon: rocket
+---
+</code></pre>
+<pre><code class="language-markdown">---
+icon: lucide:rocket
+---
+</code></pre>
+<pre><code class="language-markdown">---
+icon: phosphor-bold:rocket
+---
+</code></pre>
+<p>El <code>rocket</code> sin prefijo usa por defecto <a href="https://phosphoricons.com/">Phosphor</a>,
+peso regular. Phosphor incluye sus seis pesos propios, cada uno con su
+propio prefijo: <code>phosphor-thin:</code>, <code>phosphor-light:</code>, <code>phosphor:</code> (regular,
+igual que el nombre sin prefijo), <code>phosphor-bold:</code>, <code>phosphor-fill:</code> y
+<code>phosphor-duotone:</code>. Usa el prefijo <code>lucide:</code> para
+<a href="https://lucide.dev/icons/">Lucide</a>, o <code>tabler:</code> para
+<a href="https://tabler.io/icons">Tabler</a> en su lugar. Explora la propia galería
+de cada sitio para el nombre exacto - coincide exactamente con el propio
+nombre de archivo incluido en este módulo (minúsculas, con guiones, por
+ejemplo <code>book-open</code>, <code>arrow-up-right</code>; el propio sitio de Phosphor
+muestra un selector de peso - cada una de sus seis opciones allí es uno
+de los seis prefijos <code>phosphor[-weight]:</code> de este módulo).</p>
+<p>Font Awesome deliberadamente no es una de ellas - su estilo Duotone (y la
+mayor parte de su conjunto de iconos desde la v6 en adelante) es exclusivo
+de la versión Pro, no disponible bajo una licencia que este módulo pudiera
+incluir y redistribuir de forma gratuita.</p>
+<p>El propio SVG de un proyecto también funciona - colócalo en
+<code>docs/assets/icons/my-icon.svg</code> y referéncialo como <code>icon: custom:my-icon</code>.</p>
+<p>Una entrada de <a href="/bx-docs/development/theme/tailwind/es/configuration/index.html#nav">nav.json</a> también puede definir
+su propio <code>icon</code>, sobrescribiendo el propio frontmatter de la página de
+destino solo para esa entrada:</p>
+<pre><code class="language-json">{ &quot;title&quot;: &quot;Guides&quot;, &quot;path&quot;: &quot;guides/index.md&quot;, &quot;icon&quot;: &quot;lucide:book-open&quot; }
+</code></pre>
+<h2 id="el-contrato-de-themeprovider"><a href="#el-contrato-de-themeprovider" id="el-contrato-de-themeprovider" name="el-contrato-de-themeprovider" class="anchor"></a>El contrato de <code>ThemeProvider</code></h2>
+<p>Un tema es simplemente una carpeta con:</p>
+<ul>
+<li><strong><code>layout.bxm</code></strong> (obligatorio) - el shell HTML exterior + la
+navegación. Recibe <code>variables.page</code>, <code>variables.nav</code>,
+<code>variables.siteConfig</code>, <code>variables.themeDir</code> y <code>variables.basePath</code> en
+el ámbito, e incluye el <code>page.bxm</code> hermano mediante
+<code>#variables.themeDir#/page.bxm</code>. <code>variables.basePath</code> es siempre una
+ruta relativa a la raíz que termina en <code>/</code> (<code>/</code> por defecto,
+<code>/my-docs/</code> cuando el <code>baseURL</code> de <code>bxdocs.json</code> lo sobrescribe) -
+antepón ese prefijo a cada <code>href</code>/<code>src</code> interno, en lugar de codificar
+una <code>/</code> inicial de forma fija, para que el tema siga funcionando cuando
+el sitio se sirva desde una subruta.</li>
+<li><strong><code>page.bxm</code></strong> (obligatorio) - el cuerpo del artículo. Renderiza
+<code>variables.page.contentHtml</code> - el markdown ya convertido.</li>
+<li><strong><code>search.bxm</code></strong> (opcional) - el marcado del cuadro de búsqueda,
+incluido por <code>layout.bxm</code> solo cuando <code>search</code> de <code>bxdocs.json</code> es
+<code>true</code>. Consulta <a href="/bx-docs/development/theme/tailwind/es/guides/search/index.html">Búsqueda</a>.</li>
+<li><strong><code>assets/</code></strong> (opcional) - CSS/JS del tema, copiado a
+<code>site/assets/theme/</code> en el momento de la construcción.</li>
+</ul>
+<p><code>variables.page.editUrl</code>/<code>.lastUpdated</code> (cadenas vacías cuando no están
+configuradas) y <code>variables.siteConfig.repo</code>/<code>.social</code>/<code>.footer</code> también
+están siempre disponibles, dando soporte a las funciones de enlace al
+repositorio/enlace de edición/última actualización/pie de página
+mencionadas arriba - un tema personalizado decide por sí mismo si y cómo
+renderizarlas, igual que todo lo demás. <code>variables.versions</code>
+(<code>[ { label, url } ]</code>, con &quot;Latest&quot; primero) y
+<code>variables.currentVersion</code> (el <code>label</code> que se está renderizando en ese
+momento) dan soporte al selector de versión - vacío/<code>&quot;Latest&quot;</code> para un
+proyecto que no está versionado, así que un tema solo necesita renderizar
+un selector cuando <code>variables.versions.len() gt 1</code>. Los tres temas
+incorporados obtienen sus iconos de repositorio/redes sociales de una
+pequeña tabla de búsqueda SVG compartida,
+<code>&lt;bx:include template=&quot;#variables.moduleAssetsDir#/icons.bxm&quot;&gt;</code> (define
+<code>bxdocsIcon( name )</code>, uno de <code>github</code>, <code>twitter</code>/<code>x</code>, <code>rss</code>, <code>youtube</code>,
+<code>linkedin</code>, <code>facebook</code>, <code>bluesky</code>, <code>threads</code>, <code>slack</code>, <code>patreon</code>,
+<code>email</code>, <code>edit</code>, <code>clock</code>, recurriendo a un glifo de enlace genérico) - un
+tema personalizado puede incluirlo de la misma forma, o proporcionar sus
+propios iconos por completo.</p>
+<p>Una carpeta de tema a la que le falte cualquiera de los archivos
+obligatorios falla de inmediato con un error claro <code>BxDocs.InvalidTheme</code>
+en el momento de la construcción, en lugar de un confuso error de
+plantilla en lo profundo del renderizado.</p>
+<h2 id="personalizar-colores-sin-sobrescribir-un-tema"><a href="#personalizar-colores-sin-sobrescribir-un-tema" id="personalizar-colores-sin-sobrescribir-un-tema" name="personalizar-colores-sin-sobrescribir-un-tema" class="anchor"></a>Personalizar colores sin sobrescribir un tema</h2>
+<p>Para un ajuste de color/fuente, bifurcar todo un tema es excesivo - cada
+tema incorporado lee su paleta de un puñado de propiedades CSS
+personalizadas en <code>:root</code>, redeclaradas bajo <code>[data-theme=&quot;dark&quot;]</code> para
+el modo oscuro. El <a href="/bx-docs/development/theme/tailwind/es/configuration/index.html#extracss--extrajs"><code>extraCss</code></a>
+de <code>bxdocs.json</code> se carga <em>después</em> de la propia hoja de estilo del tema,
+así que una redeclaración con la misma especificidad en él gana sin
+tocar <code>resources/themes/</code> en absoluto:</p>
+<pre><code class="language-json">{ &quot;extraCss&quot;: [ &quot;assets/brand.css&quot; ] }
+</code></pre>
+<pre><code class="language-css">/* docs/assets/brand.css - copiado a site/assets/brand.css en el momento de la construcción */
+:root {
+	--bxdocs-gradient-start: #7C3AED;
+	--bxdocs-gradient-end: #DB2777;
+	--bxdocs-accent: #FBBF24;
+	--bxdocs-link: #7C3AED;
+	--bxdocs-link-hover: #9F5AF0;
+}
+
+[data-theme=&quot;dark&quot;] {
+	--bxdocs-link: #C4B5FD;
+	--bxdocs-link-hover: #DDD6FE;
+}
+</code></pre>
+<p>El propio conjunto del tema <code>bootstrap</code>
+(<code>resources/themes/bootstrap/assets/style.css</code>) es
+<code>--bxdocs-gradient-start</code>/<code>-end</code>, <code>--bxdocs-accent</code>, <code>--bxdocs-bg</code>,
+<code>--bxdocs-text</code>, <code>--bxdocs-sidebar-bg</code>, <code>--bxdocs-sidebar-text</code>,
+<code>--bxdocs-border</code>, <code>--bxdocs-link</code>, <code>--bxdocs-link-hover</code> y
+<code>--bxdocs-code-bg</code> - <code>material</code> y <code>tailwind</code> siguen la misma nomenclatura
+<code>--bxdocs-*</code> con sus propias pequeñas variaciones. Cualquier cosa más
+allá del color/fuente (diseño, añadir/quitar elementos de interfaz)
+necesita una sobrescritura real o un tema personalizado - ver abajo.</p>
+<h2 id="sobrescribir-un-tema"><a href="#sobrescribir-un-tema" id="sobrescribir-un-tema" name="sobrescribir-un-tema" class="anchor"></a>Sobrescribir un tema</h2>
+<p>Coloca tu propio <code>layout.bxm</code> + <code>page.bxm</code> (y opcionalmente <code>search.bxm</code> /
+<code>assets/</code>) en una carpeta <code>theme/</code> en la raíz de tu proyecto. BX Docs
+prefiere una sobrescritura <code>theme/</code> a nivel de proyecto sobre cualquier
+tema incorporado, siempre que satisfaga el contrato anterior - los temas
+incorporados bajo el propio <code>resources/themes/</code> de este módulo son un
+buen punto de partida para copiar y adaptar.</p>
+<p>Un ejemplo trabajado - partir de <code>bootstrap</code> e intercambiar su paleta de
+marca y su fuente de encabezados por las tuyas, manteniendo todo lo demás
+(navegación, búsqueda, modo oscuro, resaltado de código, ...) exactamente
+como ya funciona:</p>
+<pre><code class="language-markdown">my-project/
+├── bxdocs.json
+├── docs/
+└── theme/                    ← project-level override, checked before any built-in theme
+    ├── layout.bxm             ← copied from resources/themes/bootstrap/layout.bxm
+    ├── page.bxm                ← copied from resources/themes/bootstrap/page.bxm, unchanged
+    ├── search.bxm               ← copied unchanged
+    └── assets/
+        └── style.css              ← copied from bootstrap's assets/style.css, then edited
+</code></pre>
+<ol>
+<li>
+<p>Copia los tres archivos <code>.bxm</code> y <code>assets/style.css</code> desde
+<code>resources/themes/bootstrap/</code> de este módulo a <code>theme/</code> de tu proyecto.</p>
+</li>
+<li>
+<p>Edita solo lo que necesites cambiar. Para intercambiar la paleta de
+marca y la fuente, eso es solo la parte superior de
+<code>theme/assets/style.css</code>:</p>
+<pre><code class="language-css">:root {
+	--bxdocs-gradient-start: #7C3AED;  /* was #00FF78 */
+	--bxdocs-gradient-end: #DB2777;    /* was #00DBFF */
+	--bxdocs-accent: #FBBF24;          /* was #FFF500 */
+}
+
+body {
+	font-family: &quot;Inter&quot;, system-ui, sans-serif;  /* was &quot;Poppins&quot; */
+}
+</code></pre>
+</li>
+<li>
+<p>Ejecuta <code>boxlang module:bxDocs build</code> (o <code>serve</code> mientras iteras) - BX
+Docs recoge <code>theme/</code> automáticamente, sin necesidad de cambiar
+<code>bxdocs.json</code> (una carpeta <code>theme/</code> a nivel de proyecto siempre tiene
+precedencia sobre el tema incorporado nombrado en <code>theme.name</code>). Todo
+lo que no tocaste - el renderizado de la navegación, la búsqueda, el
+interruptor de modo oscuro, las anotaciones de código - sigue
+funcionando exactamente como lo hacía en el tema <code>bootstrap</code> original,
+ya que sigue siendo exactamente el mismo marcado <code>layout.bxm</code>/
+<code>page.bxm</code> por debajo.</p>
+</li>
+</ol>
+<p>Una carpeta <code>theme/</code> de proyecto es todo o nada, sin embargo - en cuanto
+BX Docs encuentra una, se usa en lugar del tema incorporado por completo,
+así que igual necesita su propio <code>layout.bxm</code> + <code>page.bxm</code> aunque lo
+único que hayas cambiado sea <code>assets/style.css</code> (una carpeta a la que le
+falte cualquiera de los dos falla de inmediato con <code>BxDocs.InvalidTheme</code>
+en lugar de recurrir silenciosamente al otro). Para un ajuste solo de
+CSS/sin <code>.bxm</code>, usa
+<a href="#customizing-colors-without-a-theme-override"><code>extraCss</code></a> en su lugar -
+se superpone a cualquier tema que nombre <code>bxdocs.json</code>, sin ninguna
+carpeta <code>theme/</code> involucrada en absoluto. <code>theme/</code> es para cuando también
+necesitas cambiar el propio marcado, que se cubre a continuación.</p>
+<h2 id="escribir-un-tema-desde-cero"><a href="#escribir-un-tema-desde-cero" id="escribir-un-tema-desde-cero" name="escribir-un-tema-desde-cero" class="anchor"></a>Escribir un tema desde cero</h2>
+<p>Un tema solo necesita los dos archivos obligatorios, así que aquí hay uno
+genuinamente mínimo - sin Bootstrap/Tailwind, sin modo oscuro, sin
+interfaz de búsqueda - para mostrar exactamente qué es obligatorio frente
+a lo que añaden los temas incorporados. Guarda ambos como
+<code>theme/layout.bxm</code> y <code>theme/page.bxm</code> en tu proyecto - una carpeta
+<code>theme/</code> a nivel de proyecto se recoge automáticamente (como arriba), sin
+necesidad de cambiar <code>bxdocs.json</code>:</p>
+<pre><code class="language-bx">&lt;!-- theme/layout.bxm --&gt;
+&lt;bx:script&gt;
+	function renderNav( required array nodes ) {
+		var html = &quot;&lt;ul&gt;&quot;
+		for ( var node in arguments.nodes ) {
+			html &amp;= &quot;&lt;li&gt;&quot;
+			html &amp;= len( node.url )
+				? '&lt;a href=&quot;' &amp; variables.basePath &amp; node.url &amp; '&quot;&gt;' &amp; encodeForHTML( node.title ) &amp; '&lt;/a&gt;'
+				: encodeForHTML( node.title )
+			if ( node.children.len() ) {
+				html &amp;= renderNav( node.children )
+			}
+			html &amp;= &quot;&lt;/li&gt;&quot;
+		}
+		return html &amp; &quot;&lt;/ul&gt;&quot;
+	}
+&lt;/bx:script&gt;
+&lt;bx:output&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+	&lt;meta charset=&quot;UTF-8&quot;&gt;
+	&lt;title&gt;#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#&lt;/title&gt;
+	&lt;link rel=&quot;stylesheet&quot; href=&quot;#variables.basePath#assets/theme/style.css&quot;&gt;
+&lt;/head&gt;
+&lt;body&gt;
+	&lt;header&gt;&lt;a href=&quot;#variables.basePath#&quot;&gt;#encodeForHTML( variables.siteConfig.name )#&lt;/a&gt;&lt;/header&gt;
+	&lt;nav&gt;#renderNav( variables.nav )#&lt;/nav&gt;
+	&lt;main&gt;
+&lt;/bx:output&gt;
+&lt;bx:include template=&quot;#variables.themeDir#/page.bxm&quot;&gt;
+&lt;bx:output&gt;
+	&lt;/main&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+&lt;/bx:output&gt;
+</code></pre>
+<pre><code class="language-bx">&lt;!-- theme/page.bxm --&gt;
+&lt;bx:output&gt;
+&lt;article&gt;
+	&lt;h1&gt;#encodeForHTML( variables.page.title )#&lt;/h1&gt;
+	#variables.page.contentHtml#
+&lt;/article&gt;
+&lt;/bx:output&gt;
+</code></pre>
+<p>Eso es un tema completo y funcional - <code>variables.page.contentHtml</code> es el
+markdown ya convertido (resaltado de sintaxis, admoniciones, pestañas,
+matemáticas y todo lo demás), así que no queda nada por analizar, solo
+por maquetar. A partir de aquí, añade lo que sea que tengan los temas
+incorporados que realmente quieras: <code>search.bxm</code> (incluido solo cuando
+<code>search</code> de <code>bxdocs.json</code> es <code>true</code> - consulta <a href="/bx-docs/development/theme/tailwind/es/guides/search/index.html">Búsqueda</a>),
+un interruptor de modo oscuro (copia el par <code>x-data</code>/<code>x-init</code> de
+Alpine.js de la etiqueta <code>&lt;body&gt;</code> de <code>resources/themes/bootstrap/layout.bxm</code>
+y el bloque CSS <code>[data-theme=&quot;dark&quot;]</code> correspondiente), migas de pan/
+etiquetas/enlaces anterior-siguiente (<code>page.bxm</code> en cualquier tema
+incorporado muestra el patrón - cada uno es solo un <code>if</code> alrededor de una
+pequeña función de renderizado, todas impulsadas por campos ya presentes
+en <code>variables.page</code>), o una carpeta <code>assets/</code> para tu propio CSS/JS,
+copiada a <code>site/assets/theme/</code> automáticamente en el momento de la
+construcción.</p>
+
+				</div>
+			</article>
+
+			<nav class="mt-8 flex justify-between border-t border-slate-200 pt-4 text-sm font-semibold" aria-label="Page navigation">
+
+				<a class="text-cyan-700 hover:text-cyan-900" href="/bx-docs/development/theme/tailwind/es/guides/index.html">&larr; Gu&iacute;as</a>
+
+				<a class="text-cyan-700 hover:text-cyan-900" href="/bx-docs/development/theme/tailwind/es/guides/search/index.html">B&uacute;squeda &rarr;</a>
+
+			</nav>
+
+
+
+		</main>
+	</div>
+
+	<footer class="bxdocs-footer">
+		<div class="bxdocs-footer__inner">
+			<div class="bxdocs-footer__copy">&copy; 2026 BX Docs</div>
+
+			<div class="bxdocs-footer__social"><a class="social-link" href="https://github.com/ortus-boxlang/BoxLang" target="_blank" rel="noopener noreferrer" aria-label="BoxLang on GitHub" title="BoxLang on GitHub"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.083-.729.083-.729 1.205.084 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.303-5.467-1.332-5.467-5.93 0-1.31.468-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23A11.5 11.5 0 0 1 12 5.803c1.02.005 2.045.138 3.003.404 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.807 5.625-5.48 5.92.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 21.795 24 17.298 24 12c0-6.63-5.37-12-12-12"/></svg></a><a class="social-link" href="https://x.com/TryBoxLang" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" title="X (Twitter)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a class="social-link" href="https://www.youtube.com/@OrtusSolutions" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M23.498 6.186a3.02 3.02 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.02 3.02 0 0 0 .502 6.186 31.7 31.7 0 0 0 0 12a31.7 31.7 0 0 0 .502 5.814 3.02 3.02 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.02 3.02 0 0 0 2.122-2.136A31.7 31.7 0 0 0 24 12a31.7 31.7 0 0 0-.502-5.814ZM9.545 15.568V8.432L15.818 12l-6.273 3.568Z"/></svg></a><a class="social-link" href="https://www.linkedin.com/company/tryboxlang" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286ZM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124ZM7.119 20.452H3.554V9h3.565v11.452ZM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003Z"/></svg></a><a class="social-link" href="https://www.facebook.com/tryboxlang/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073Z"/></svg></a><a class="social-link" href="https://bsky.app/profile/boxlang.bsky.social" target="_blank" rel="noopener noreferrer" aria-label="Bluesky" title="Bluesky"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.203-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8Z"/></svg></a><a class="social-link" href="https://www.threads.com/@ortussolutions" target="_blank" rel="noopener noreferrer" aria-label="Threads" title="Threads"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.056 7.164 1.43 1.781 3.63 2.695 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.29a13.85 13.85 0 0 1 3.02.142c-.13-.808-.394-1.45-.789-1.916-.54-.635-1.362-.958-2.444-.964h-.032c-.87 0-2.045.24-2.798 1.376l-1.735-1.19c1.01-1.512 2.65-2.343 4.62-2.343h.036c3.294.021 5.259 2.028 5.459 5.55.114.048.227.098.34.15 1.574.734 2.727 1.846 3.334 3.215.845 1.906.923 5.011-1.646 7.44-1.877 1.778-4.153 2.581-7.379 2.605Zm1.176-11.916c-.184 0-.37.005-.556.016-1.392.08-2.26.71-2.211 1.605.05.943.976 1.38 1.866 1.334 1.427-.077 2.402-.965 2.652-2.874a8.19 8.19 0 0 0-1.751-.081Z"/></svg></a><a class="social-link" href="https://www.ortussolutions.com/community/slack" target="_blank" rel="noopener noreferrer" aria-label="Slack Community" title="Slack Community"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52ZM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313ZM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834ZM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312ZM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834ZM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312ZM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52ZM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313Z"/></svg></a><a class="social-link" href="https://www.patreon.com/ortussolutions" target="_blank" rel="noopener noreferrer" aria-label="Patreon" title="Patreon"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M0 .5v23h4.219V.5H0Zm15.211 0c-4.831 0-8.771 3.943-8.771 8.775 0 4.831 3.94 8.773 8.771 8.773 4.831 0 8.775-3.942 8.775-8.773S20.042.5 15.211.5Z"/></svg></a></div>
+
+			<div class="bxdocs-footer__credit">Built with <a href="https://github.com/ortus-boxlang/bx-docs" target="_blank" rel="noopener noreferrer">BX Docs</a></div>
+		</div>
+	</footer>
+
+	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+	<script src="/bx-docs/development/theme/tailwind/es/assets/highlight-boxlang.js"></script>
+	<script>hljs.highlightAll();</script>
+	<script src="/bx-docs/development/theme/tailwind/es/assets/code-lines.js"></script>
+	<script src="/bx-docs/development/theme/tailwind/es/assets/copy-code.js" defer></script>
+	<script src="/bx-docs/development/theme/tailwind/es/assets/admonition-collapse.js" defer></script>
+	<script src="/bx-docs/development/theme/tailwind/es/assets/tabs.js" defer></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+	<script src="/bx-docs/development/theme/tailwind/es/assets/mermaid-init.js"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+	<script src="/bx-docs/development/theme/tailwind/es/assets/math-init.js"></script>
+
+	<script src="/bx-docs/development/theme/tailwind/es/assets/theme-switcher.js" defer></script>
+</body>
+</html>
+

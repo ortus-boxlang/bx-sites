@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel>
+	<title>BX Docs - Extensiones de Markdown</title>
+	<link>https://ortus-boxlang.github.io/bx-docs/development/theme/material/guides/markdown/index.html</link>
+	<description>Changelog updates for Extensiones de Markdown</description>
+	<item>
+		<title>2026-01-15</title>
+		<link>https://ortus-boxlang.github.io/bx-docs/development/theme/material/guides/markdown/index.html</link>
+		<guid isPermaLink="false">https://ortus-boxlang.github.io/bx-docs/development/theme/material/guides/markdown/index.html#2026-01-15-f038d7b965557a85bda2735a57d1b373</guid>
+		<pubDate>Thu, 15 Jan 2026 00:00:00 +0000</pubDate>
+		<category>feature</category>
+		<category>fix</category>
+		<description>&lt;p&gt;Se a&ntilde;adi&oacute; el modo oscuro y se corrigi&oacute; un error de alineaci&oacute;n en el pie de p&aacute;gina.&lt;/p&gt;
+</description>
+	</item>
+	<item>
+		<title>2026-01-01</title>
+		<link>https://ortus-boxlang.github.io/bx-docs/development/theme/material/guides/markdown/index.html</link>
+		<guid isPermaLink="false">https://ortus-boxlang.github.io/bx-docs/development/theme/material/guides/markdown/index.html#2026-01-01-2a3e17bdc8d45ed683e1c55f8994f49d</guid>
+		<pubDate>Thu, 01 Jan 2026 00:00:00 +0000</pubDate>
+		<description>&lt;p&gt;Lanzamiento inicial.&lt;/p&gt;
+</description>
+	</item>
+</channel></rss>

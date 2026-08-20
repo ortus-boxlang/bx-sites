@@ -41,7 +41,11 @@ Every project has one `bxdocs.json` at its root:
 	"generateOgImages": false,
 	"extraCss": [],
 	"extraJs": [],
-	"plugins": []
+	"plugins": [],
+	"i18n": {
+		"defaultLocale": { "code": "en", "label": "English" },
+		"locales": []
+	}
 }
 ```
 
@@ -392,6 +396,37 @@ for how to write one.
 ```json
 { "plugins": [ "myBxDocsPlugin" ] }
 ```
+
+## `i18n`
+
+Metadata for the [`docs/i18n/<code>/`](guides/i18n.md) locale-folder
+convention - a locale builds automatically once its folder exists;
+`i18n` just supplies its display label/direction for the language
+switcher.
+
+- `i18n.defaultLocale` - `{ "code", "label" }` for the project's own
+  regular `docs/` tree, defaulting to `{ "code": "en", "label": "English" }`.
+  Only needs setting when your default locale isn't English.
+- `i18n.locales` - `[]` (the default) - an array of `{ "code", "label", "dir" }`
+  for every other locale. `code` doubles as the `docs/i18n/<code>/` folder
+  name and the built URL prefix - letters/digits/hyphens only (`es`,
+  `pt-BR`, `zh-Hans`). `dir` is `"ltr"` (the default) or `"rtl"`.
+
+```json
+{
+	"i18n": {
+		"defaultLocale": { "code": "en", "label": "English" },
+		"locales": [
+			{ "code": "es", "label": "Español" },
+			{ "code": "ar", "label": "العربية", "dir": "rtl" }
+		]
+	}
+}
+```
+
+See [Internationalization](guides/i18n.md) for the full picture -
+untranslated-page fallback, the language switcher, and what isn't
+translated yet.
 
 ## Versioning
 

@@ -1,0 +1,683 @@
+
+
+
+<!doctype html>
+<html lang="it" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Estensioni Markdown - BX Docs</title>
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="BX Docs">
+	<meta property="og:title" content="Estensioni Markdown">
+
+	<meta name="description" content="Static documentation site generator for BoxLang, built on bx-markdown">
+	<meta property="og:description" content="Static documentation site generator for BoxLang, built on bx-markdown">
+
+	<meta property="og:image" content="/bx-docs/development/it/assets/og-image.png">
+	<meta name="twitter:card" content="summary_large_image">
+
+	<link rel="icon" href="/bx-docs/development/it/assets/boxlang-icon-full.svg">
+
+	<script>
+		( function () {
+			var configuredMode = "auto";
+			var stored = localStorage.getItem( "bxdocs-theme" );
+			var prefersDark = window.matchMedia( "(prefers-color-scheme: dark)" ).matches;
+			var wantsDark = stored ? stored === "dark" : ( configuredMode === "dark" || ( configuredMode === "auto" && prefersDark ) );
+			if ( wantsDark ) {
+				document.documentElement.setAttribute( "data-theme", "dark" );
+			}
+		} )();
+	</script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
+	<link rel="stylesheet" href="/bx-docs/development/it/assets/theme/style.css">
+	
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+
+	<script>window.__BXDOCS_BASE_PATH__ = "/bx-docs/development/it/";</script>
+	<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
+	<script src="/bx-docs/development/it/assets/search.js" defer></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+</head>
+<body x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxdocs-theme', v ? 'dark' : 'light' ) } )">
+	<nav class="navbar navbar-expand-lg brand-navbar">
+		<div class="container-fluid navbar-row">
+			<a class="navbar-brand brand-mark" href="/bx-docs/development/it/"><img class="brand-logo" src="/bx-docs/development/it/assets/boxlang-icon-full.svg" alt=""><span class="brand-name">BX Docs</span></a>
+			<div class="navbar-controls">
+<div class="bxdocs-search position-relative">
+	<input type="search" id="bxdocs-search-input" class="form-control" placeholder="Search docs..." aria-label="Search">
+	<ul id="bxdocs-search-results" class="bxdocs-search-results list-unstyled"></ul>
+</div>
+
+
+
+				<select class="locale-switcher form-select form-select-sm" onchange="location.href=this.value" aria-label="Language"><option value="/bx-docs/development/">English</option><option value="/bx-docs/development/es/">Espa&ntilde;ol</option><option value="/bx-docs/development/it/" selected>Italiano</option><option value="/bx-docs/development/de/">Deutsch</option></select>
+
+				<a class="repo-link" href="https://github.com/ortus-boxlang/bx-docs" target="_blank" rel="noopener noreferrer" aria-label="Repository" title="Repository"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.083-.729.083-.729 1.205.084 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.303-5.467-1.332-5.467-5.93 0-1.31.468-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23A11.5 11.5 0 0 1 12 5.803c1.02.005 2.045.138 3.003.404 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.807 5.625-5.48 5.92.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 21.795 24 17.298 24 12c0-6.63-5.37-12-12-12"/></svg></a>
+
+				<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="Toggle dark mode">
+					<span x-show="!dark">&#127769;</span>
+					<span x-show="dark" x-cloak>&#9728;&#65039;</span>
+				</button>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bxdocs-sidebar" aria-controls="bxdocs-sidebar" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+			</div>
+		</div>
+	</nav>
+	<div class="container-fluid">
+		<div class="row">
+			<aside class="col-lg-3 col-xl-2 sidebar collapse d-lg-block" id="bxdocs-sidebar">
+				<ul class="nav flex-column"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/index.html">Home</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/getting-started/index.html">🚀 Per iniziare</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/cli-reference/index.html">⌨️ Riferimento CLI</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/configuration/index.html">⚙️ Configurazione</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/guides/index.html">Guide</a><ul class="nav flex-column nav--nested"><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/guides/themes/index.html">Temi</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/guides/search/index.html">Ricerca</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/guides/deployment/index.html">Distribuire su GitHub Pages</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/guides/markdown/index.html">Estensioni Markdown</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/guides/plugins/index.html">Plugin</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/guides/migrating-from-gitbook/index.html">Migrare da GitBook</a></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/guides/i18n/index.html">Internazionalizzazione (i18n)</a></li></ul></li><li class="nav-item"><a class="nav-link" href="/bx-docs/development/it/releases/index.html">Politica di Release</a></li></ul>
+			</aside>
+			<main class="col-lg-9 col-xl-10 content">
+
+				<article class="page-content">
+<nav class="breadcrumb-nav mb-3" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/bx-docs/development/it/guides/index.html">Guide</a></li><li class="breadcrumb-item active" aria-current="page">Estensioni Markdown</li></ol></nav>
+					<h1 class="page-title">Estensioni Markdown</h1>
+<div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/it/tags/index.html#tag-guide">guide</a><a class="page-tag" href="/bx-docs/development/it/tags/index.html#tag-markdown">markdown</a></div><div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/i18n/it/guides/markdown.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-docs/development/it/guides/markdown.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 20, 2026, 1:00:24 AM</span></div>
+<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#ammonizioni">Ammonizioni</a></li><li class="toc-level-3"><a href="#ammonizioni-comprimibili">Ammonizioni comprimibili</a></li><li class="toc-level-2"><a href="#note-a-piè-di-pagina">Note a pi&egrave; di pagina</a></li><li class="toc-level-2"><a href="#liste-di-definizioni">Liste di definizioni</a></li><li class="toc-level-2"><a href="#schede-di-contenuto">Schede di contenuto</a></li><li class="toc-level-2"><a href="#blocchi-di-codice">Blocchi di codice</a></li><li class="toc-level-3"><a href="#numeri-di-riga-righe-evidenziate-e-titoli">Numeri di riga, righe evidenziate e titoli</a></li><li class="toc-level-2"><a href="#diagrammi">Diagrammi</a></li><li class="toc-level-2"><a href="#matematica">Matematica</a></li><li class="toc-level-2"><a href="#blocchi-in-stile-gitbook">Blocchi in stile GitBook</a></li><li class="toc-level-3"><a href="#espandibile">Espandibile</a></li><li class="toc-level-3"><a href="#card">Card</a></li><li class="toc-level-3"><a href="#colonne">Colonne</a></li><li class="toc-level-3"><a href="#stepper">Stepper</a></li><li class="toc-level-3"><a href="#file">File</a></li><li class="toc-level-3"><a href="#embed">Embed</a></li><li class="toc-level-3"><a href="#link-a-pagina">Link a pagina</a></li><li class="toc-level-3"><a href="#aggiornamenti-changelog">Aggiornamenti (changelog)</a></li><li class="toc-level-3"><a href="#contenuto-riutilizzabile-include">Contenuto riutilizzabile (include)</a></li><li class="toc-level-3"><a href="#immagini-didascalie-allineamento-e-cornici-images">Immagini: didascalie, allineamento e cornici {#images}</a></li><li class="toc-level-2"><a href="#estensioni-tramite-plugin">Estensioni tramite plugin</a></li></ul></nav>
+					<svg xmlns="http://www.w3.org/2000/svg" class="adm-hidden">
+<symbol id="adm-note">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<g fill="currentColor">
+<path d="m15.4 5h4.5v2.7h-4.5z" transform="matrix(-.7071 -.7071 .7071 -.7071 25.7188 23.288)"/>
+<path d="m13.9 7 3.1 3.1-9.5 9.6-3.5.3.3-3.5z"/>
+</g>
+</svg>
+</symbol>
+<symbol id="adm-fail">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="m6.5 4.8 5.4 5.2c.3.3.7.3 1 0l5.4-5.7c.3-.3.8-.3 1.1.1l1.4 1.9c.2.3.2.7-.1 1l-5.9 5c-.3.3-.3.8 0 1.1l5 4.8c.2.2.3.6.1.9l-.9 1.6c-.2.4-.8.5-1.1.2l-5.6-5.1c-.3-.2-.7-.2-1 0l-5.3 4.8c-.4.3-.9.2-1.1-.2l-.9-2.4c-.1-.3-.1-.6.2-.8l4.5-3.9c.3-.3.3-.8 0-1.1l-5-4.7c-.3-.3-.3-.7 0-1l1.8-1.8c.3-.2.7-.2 1 .1z" fill="currentColor"/>
+</svg>
+</symbol>
+<symbol id="adm-quote">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path fill="currentColor" d="m10.7 13.1c-.6.6-1.5 1.1-2.8 1.4-.3.1-.5 0-.9-.3-.3-.3-.5-.5-.5-.8 0-.1.1-.2.2-.2.3-.1.6-.4.8-1s.4-1.1.4-1.8c0-1.3-.5-2.2-1.5-2.6-.6-.2-.9-.7-.9-1.4 0-.2 0-.3.1-.4.1-.3.7-.7 1.6-1.2s1.6-.7 1.9-.6c.8.2 1.5.8 2.1 1.9.5 1.1.8 2.3.8 3.5 0 1.4-.4 2.6-1.3 3.5zm6.6 0c-.6.6-1.5 1.1-2.8 1.4-.3.1-.5 0-.9-.3-.3-.3-.5-.5-.5-.8 0-.1.1-.2.2-.2.3-.1.6-.4.8-1s.4-1.1.4-1.8c0-1.3-.5-2.2-1.5-2.6-.6-.3-.8-.7-.8-1.5 0-.2 0-.3.1-.4.1-.3.7-.7 1.6-1.2s1.6-.7 1.9-.6c.8.2 1.5.8 2.1 1.9s.9 2.2.9 3.4c-.2 1.6-.6 2.8-1.5 3.7z"/>
+</svg>
+</symbol>
+<symbol id="adm-bug">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<g fill="currentColor">
+<path d="m16.7 13.9-4.8-1.9-4.8 1.8v3.7l4.8 1.8 4.8-1.8zm-4.8 3.4-2-.8v-1.5l2-.8 2 .8v1.5z"/>
+<path d="m16.7 8.9-4.8-1.8-4.8 1.8v3.7l4.8 1.8 4.8-1.8zm-4.8 3.4-2-.8v-1.5l2-.8 2 .8v1.5z"/>
+<path d="m4.5 9.4v1.8h2l1.2-.9-1.2-.9z"/>
+<path d="m4.5 12.4v1.8h2l1.2-.9-1.2-.9z"/>
+<path d="m4.5 15.4v1.7h2l1.2-.8-1.2-.9z"/>
+<path d="m15 5 1.4 1-1.2 1.8-1.2.3-.2-1.2z"/>
+<path d="m8.8 5-1.4 1 1.2 1.8 1.2.2.3-1.2z"/>
+<path d="m19.5 9.4v1.8h-2.1l-1.2-.9 1.2-.9z"/>
+<path d="m19.5 12.4v1.8h-2.1l-1.2-.9 1.2-.9z"/>
+<path d="m19.5 15.4v1.7h-2.1l-1.2-.8 1.2-.9z"/>
+</g>
+</svg>
+</symbol>
+<symbol id="adm-success">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="m3.3 14.3 1.4-2.8c.2-.4.7-.5 1-.2l4.7 4.9c.3.3.7.2 1-.1l7.1-10.2c.2-.3.7-.4 1 0l1.9 2.4c.2.2.2.6 0 .8l-9.7 10.9c-.2.2-.6.3-.8.1l-7.5-5.1c-.2-.1-.3-.5-.1-.7z" fill="currentColor"/>
+</svg>
+</symbol>
+<symbol id="adm-faq">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="m20.4 12.2c0 4.5-3.7 8.2-8.2 8.2s-8.2-3.7-8.2-8.2 3.7-8.2 8.2-8.2 8.2 3.7 8.2 8.2zm-4.2-2.9c-.1-1.3-1-2.5-2.3-2.9-.8-.2-1.6-.1-2.4.1-.6.1-1.5.2-1.8.6-.4.5.2 1 .6 1.3.6.4 1.1-.1 1.8-.3s3-.7 2.4.8c-.5 1.1-2 1.9-3 2.6-.4.3-.9.6-1.2 1-.5.6.1 1 .7 1.4.4.3.9.2 1.2-.1.5-.5 1-.9 1.6-1.3 1.1-.7 2.5-1.6 2.4-3.2-.2-1.3 0 .7 0 0zm-2.8 6.8c-.3-.5-1.3-1.3-1.9-1.1-.4.1-.4.4-.5.8-.1.2-.4.6-.3.8.1.4 1.5 1.3 1.9 1 .1-.1.9-1.4.8-1.5 0-.1.1.1 0 0z" fill="currentColor"/>
+</svg>
+</symbol>
+<symbol id="adm-warning">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="m3.1 18.5 8.1-14c.4-.7 1.4-.7 1.8 0l8.1 14c.4.7-.1 1.6-.9 1.6h-16.1c-.9 0-1.4-.9-1-1.6zm10.6-4.3c0-.1 0-.2 0-.2v-4.6c0-.4 0-.6 0-.6-.1-.1-.3-.2-.7-.3s-.7-.1-1-.1c-.1 0-.2 0-.3 0-.3.1-.5.2-.5.4v4.2s-.1.1-.2.4-.1.4 0 .5c.3.2.7.4 1.2.6s.9.3 1.2.3h.2c.2 0 .3-.2.3-.5-.2 0-.2-.1-.2-.1zm-.8 1.4c-.5-.2-.9-.2-1.2-.2s-.4.1-.5.4v.9c0 .2 0 .3-.1.4-.1.2-.2.3-.1.4s.5.3 1.2.5c.6.2 1 .2 1.1.2.2 0 .4-.1.4-.3s.1-.4.1-.7c0-.1 0-.3.1-.7 0-.3 0-.5 0-.5-.2-.1-.5-.2-1-.4z" fill="currentColor"/>
+</svg>
+</symbol>
+<symbol id="adm-tip">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="m12.3 10c2.8-.7 4.2-3.8 2.1-7.4 8.1 3.2 7.5 18.1-2.6 18.4-8.1.2-9.8-11.4-4.4-14.8.2 3.3 2.8 4.3 4.9 3.8zm-3.2 5.8c.2 1.6 2.5 1.9 3.6 1.5 2.8-1 2.5-4 2.1-5.1-.8 1.4-1.3 1.7-2.2 2s-3.7-.7-3.5 1.6z" fill="currentColor"/>
+</svg>
+</symbol>
+<symbol id="adm-abstract">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<g fill="currentColor">
+<path d="m4.8 4.7h14.4v2.4h-14.4z"/>
+<path d="m4.8 8.7h14.4v2.4h-14.4z"/>
+<path d="m4.8 12.7h14.4v2.4h-14.4z"/>
+<path d="m4.8 16.7h7.2v2.4h-7.2z"/>
+</g>
+</svg>
+</symbol>
+<symbol id="adm-danger">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="m8.5 4h8.5l-4 8h3l-7.1 9.5 1.6-8.5h-1.5z" fill="currentColor"/>
+</svg>
+</symbol>
+<symbol id="adm-info">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="m20.5 11.8c0 4.5-3.7 8.2-8.2 8.2s-8.2-3.7-8.2-8.2 3.7-8.2 8.2-8.2 8.2 3.7 8.2 8.2zm-6.7 4c-.1-.1-.2-.2-.2-.3v-4.5c0-.1.1-.2.2-.4s.2-.3.2-.3 0-.1-.1-.1c-.1-.1-.5-.2-1.2-.4-.7-.1-1.2-.2-1.5-.2-.5 0-.7 0-.7.1s.1.3.2.6v4.7c0 .3-.1.5-.2.6-.2.2-.2.3-.2.3.1.1.5.3 1.2.4.6.1 1.2.2 1.6.2h.3c.4-.1.5-.2.5-.5.1 0 .1-.1-.1-.2zm-.9-8.6c-.7-.1-1.2-.2-1.5-.2-.2 0-.5.2-.7.4s-.3.4-.3.6c0 .1 0 .1.1.2s.6.2 1.5.4c1 .3 1.5.4 1.6.3.1 0 .2-.2.3-.5s.2-.5.2-.6v-.1c-.1-.1-.5-.3-1.2-.5z" fill="currentColor"/>
+</svg>
+</symbol>
+<symbol id="adm-example">
+<svg enable-background='new 0 0 24 24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+<g fill="currentColor">
+<path d='m8 5.2h13v2.4h-13z'/>
+<path d='m4.4 8.4c-.1 0-.2-.1-.2-.2v-2c-.1 0-.2 0-.2.1-.2.1-.4.1-.7.2 0 0 0 0-.1 0h-.1c-.1 0-.1-.1-.1-.2v-.8c0-.1.1-.2.1-.2.4-.1.7-.2.9-.4.2-.1.3-.3.4-.5 0-.1.1-.1.2-.1h.8c.1 0 .2.1.2.2v3.7c0 .1-.1.2-.2.2z'/>
+<path d='m8 10.8h13v2.4h-13z'/>
+<path d='m3 14.1c-.1 0-.1 0-.1-.1s-.1-.1 0-.2c0-.3.2-.6.4-.9s.5-.6 1-1c.3-.3.5-.4.5-.5.1-.1.1-.1.1-.2s0-.1-.1-.1c0 0-.1-.1-.2-.1s-.1 0-.2.1c0 0-.1.1-.1.3 0 .1-.1.2-.2.2 0 0-1-.1-1-.1-.1 0-.1 0-.1-.1 0 0 0-.1 0-.2 0-.3.1-.6.3-.8.1-.2.3-.3.5-.4.1 0 .4-.1.8-.1s.7 0 .9.1.4.2.6.4c.1.2.2.4.2.7s-.1.5-.2.7-.4.5-.8.7c-.1.1-.2.1-.2.2h1c.1 0 .2.1.2.2v.8c0 .1-.1.2-.2.2h-3.1z'/>
+<path d='m8 16.4h13v2.4h-13z'/>
+<path d='m4.5 19.7c-.4 0-.6 0-.9-.1-.2-.1-.4-.2-.6-.4 0-.2-.1-.4-.2-.7 0-.1 0-.1 0-.2s.1-.1.1-.1 1-.1 1-.1c.1 0 .2.1.2.2 0 .2.1.3.1.3s.1.1.2.1.1 0 .2-.1.1-.1.1-.3c0-.1 0-.2-.1-.3 0 0-.1-.1-.2-.1 0 0-.1 0-.3.1 0 0 0 0-.1 0h-.1c.1 0 .1-.1.1-.1v-.8-.1l-1-.2c-.1 0-.1 0-.1-.1 0 0 0-.1 0-.2.1-.2.2-.5.5-.7s.6-.3 1.1-.3.9.1 1.2.3c.2.3.3.5.3.9 0 .2 0 .3-.1.5 0 .1-.1.1-.1.2.1.1.3.2.4.4s.1.3.1.5-.1.5-.2.7-.3.4-.6.5c-.3.2-.6.2-1 .2zm-.1-2.7c.1 0 .1 0 .2-.1 0 0 .1-.1.1-.2s0-.1 0-.1 0 0-.1 0-.1 0-.2.1c0 0-.1.1-.1.3v.1c-.1-.2 0-.1.1-.1z'/>
+</g>
+</svg>
+</symbol>
+</svg>
+<h1 id="estensioni-markdown"><a href="#estensioni-markdown" id="estensioni-markdown" name="estensioni-markdown" class="anchor"></a>Estensioni Markdown</h1>
+<p>Oltre al Markdown standard, BX Docs attiva di default tre estensioni
+Flexmark native di bx-markdown - ammonizioni, note a piè di pagina e
+liste di definizioni - più un'integrazione con i diagrammi Mermaid tutta
+sua. Tutte e quattro sono configurabili tramite le
+<a href="/bx-docs/development/it/configuration/index.html#markdown">chiavi <code>markdown</code>/<code>mermaid</code> di <code>bxdocs.json</code></a>.</p>
+<p>Oltre a queste, BX Docs implementa altre tre estensioni proprie di cui
+Flexmark non ha alcun concetto - schede di contenuto, matematica, e
+annotazioni <code>hl_lines</code>/<code>linenums</code>/<code>title</code> sui blocchi di codice
+delimitati. Dato che bx-docs non può forkare il parser di bx-markdown,
+ognuna di queste funziona come un passaggio di pre/post-elaborazione
+intorno alla normale conversione del markdown - vedi le sezioni sotto.</p>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Raw markdown&quot;] --&gt; B[&quot;Pre-process:\nextract tabs, protect math,\nstrip code annotations&quot;]
+    B --&gt; C[&quot;Markdown()\n(bx-markdown)&quot;]
+    C --&gt; D[&quot;Post-process:\nrestore tabs, restore math,\napply code annotations&quot;]
+    D --&gt; E[&quot;Final page HTML&quot;]
+</code></pre>
+<h2 id="ammonizioni"><a href="#ammonizioni" id="ammonizioni" name="ammonizioni" class="anchor"></a>Ammonizioni</h2>
+<p>Un box di richiamo/nota - attivo di default, nessuna configurazione di
+<code>bxdocs.json</code> necessaria:</p>
+<pre><code class="language-markdown">!!! note &quot;Heads Up&quot;
+    This is an admonition. Its content is regular markdown - **bold**,
+    `code`, [links](../index.md) and lists all work exactly as normal.
+</code></pre>
+<p>Che viene renderizzato così:</p>
+<div class="adm-block adm-note">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-note" /></svg><span>Attenzione</span>
+</div>
+<div class="adm-body">
+<p>Questa è un'ammonizione. Il suo contenuto è markdown normale -
+<strong>grassetto</strong>, <code>code</code>, <a href="/bx-docs/development/it/index.html">link</a> e liste funzionano tutti
+esattamente come al solito.</p>
+</div>
+</div>
+<p>Il tipo (<code>note</code> sopra) diventa l'icona/colore del box e, se non fornisci
+un <code>&quot;Title&quot;</code> esplicito, viene usato invece il suo nome capitalizzato.
+Molti sinonimi comuni si risolvono negli stessi 12 tipi canonici, ognuno
+con il proprio colore d'accento:</p>
+<div class="adm-block adm-note">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-note" /></svg><span>note</span>
+</div>
+<div class="adm-body">
+<p>Blu - anche il ripiego per qualsiasi tipo non presente in questo elenco.</p>
+</div>
+</div>
+<div class="adm-block adm-abstract">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-abstract" /></svg><span>abstract / summary / tldr</span>
+</div>
+<div class="adm-body">
+<p>Azzurro chiaro.</p>
+</div>
+</div>
+<div class="adm-block adm-info">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-info" /></svg><span>info / todo</span>
+</div>
+<div class="adm-body">
+<p>Ciano.</p>
+</div>
+</div>
+<div class="adm-block adm-tip">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-tip" /></svg><span>tip / hint / important</span>
+</div>
+<div class="adm-body">
+<p>Verde acqua.</p>
+</div>
+</div>
+<div class="adm-block adm-success">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-success" /></svg><span>success / check / done</span>
+</div>
+<div class="adm-body">
+<p>Verde.</p>
+</div>
+</div>
+<div class="adm-block adm-faq">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-faq" /></svg><span>question / help / faq</span>
+</div>
+<div class="adm-body">
+<p>Verde lime.</p>
+</div>
+</div>
+<div class="adm-block adm-warning">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-warning" /></svg><span>warning / caution / attention</span>
+</div>
+<div class="adm-body">
+<p>Arancione.</p>
+</div>
+</div>
+<div class="adm-block adm-fail">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-fail" /></svg><span>failure / fail / missing</span>
+</div>
+<div class="adm-body">
+<p>Rosso chiaro.</p>
+</div>
+</div>
+<div class="adm-block adm-danger">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-danger" /></svg><span>danger / error</span>
+</div>
+<div class="adm-body">
+<p>Rosso.</p>
+</div>
+</div>
+<div class="adm-block adm-bug">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-bug" /></svg><span>bug</span>
+</div>
+<div class="adm-body">
+<p>Rosa.</p>
+</div>
+</div>
+<div class="adm-block adm-example">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-example" /></svg><span>example</span>
+</div>
+<div class="adm-body">
+<p>Viola.</p>
+</div>
+</div>
+<div class="adm-block adm-quote">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-quote" /></svg><span>quote / cite</span>
+</div>
+<div class="adm-body">
+<p>Grigio.</p>
+</div>
+</div>
+<p>Il corpo deve restare indentato di 4 spazi (o un tab); il blocco termina
+alla prima riga non indentata e non vuota. Le righe vuote vanno bene
+<em>dentro</em> il blocco - iniziano semplicemente un nuovo paragrafo, come
+ovunque altrove nel markdown.</p>
+<h3 id="ammonizioni-comprimibili"><a href="#ammonizioni-comprimibili" id="ammonizioni-comprimibili" name="ammonizioni-comprimibili" class="anchor"></a>Ammonizioni comprimibili</h3>
+<p>Anteponi al tipo <code>???</code> invece di <code>!!!</code> per rendere il blocco comprimibile</p>
+<ul>
+<li><code>???</code> inizia compresso, <code>???+</code> inizia aperto. In entrambi i casi
+l'intestazione è cliccabile per attivarlo/disattivarlo:</li>
+</ul>
+<pre><code class="language-markdown">??? tip &quot;Click to expand&quot;
+    This starts collapsed.
+
+???+ tip &quot;Click to collapse&quot;
+    This starts open.
+</code></pre>
+<div class="adm-block adm-tip adm-collapsed">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-tip" /></svg><span>Clicca per espandere</span>
+</div>
+<div class="adm-body">
+<p>Questo inizia compresso.</p>
+</div>
+</div>
+<div class="adm-block adm-tip adm-open">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-tip" /></svg><span>Clicca per comprimere</span>
+</div>
+<div class="adm-body">
+<p>Questo inizia aperto.</p>
+</div>
+</div>
+<p>Disattiva del tutto le ammonizioni con <code>{&quot;markdown&quot;:{&quot;enableAdmonition&quot;:false}}</code>.</p>
+<h2 id="note-a-piè-di-pagina"><a href="#note-a-piè-di-pagina" id="note-a-piè-di-pagina" name="note-a-piè-di-pagina" class="anchor"></a>Note a piè di pagina</h2>
+<p>Fai riferimento a una nota a piè di pagina in linea con <code>[^label]</code> e
+definiscine il testo in qualsiasi punto del documento con
+<code>[^label]: text</code>:</p>
+<pre><code class="language-markdown">Here's a claim that needs backing up[^1].
+
+[^1]: Here's the backup.
+</code></pre>
+<p>Ecco un'affermazione che ha bisogno di una conferma<sup id="fnref-1"><a class="footnote-ref" href="#fn-1">1</a></sup>.</p>
+<p>Le definizioni delle note a piè di pagina vengono raccolte e renderizzate
+come una lista numerata in fondo alla pagina, indipendentemente da dove
+nel sorgente siano state scritte. Disattivate di default - attivale con
+<code>{&quot;markdown&quot;:{&quot;enableFootnotes&quot;:true}}</code>.</p>
+<h2 id="liste-di-definizioni"><a href="#liste-di-definizioni" id="liste-di-definizioni" name="liste-di-definizioni" class="anchor"></a>Liste di definizioni</h2>
+<p>Una riga di termine seguita da una o più righe di descrizione <code>:</code>
+diventa una <code>&lt;dl&gt;</code>:</p>
+<pre><code class="language-markdown">Term
+:   Its definition.
+
+Second term
+:   First definition.
+:   Second definition.
+</code></pre>
+<dl>
+<dt>Termine</dt>
+<dd>La sua definizione.</dd>
+<dt>Secondo termine</dt>
+<dd>Prima definizione.</dd>
+<dd>Seconda definizione.</dd>
+</dl>
+<p>Disattivate di default - attivale con
+<code>{&quot;markdown&quot;:{&quot;enableDefinitionLists&quot;:true}}</code>.</p>
+<h2 id="schede-di-contenuto"><a href="#schede-di-contenuto" id="schede-di-contenuto" name="schede-di-contenuto" class="anchor"></a>Schede di contenuto</h2>
+<p>Raggruppa contenuti alternativi - linguaggi diversi, piattaforme diverse -
+dietro un insieme di schede cliccabili con <code>=== &quot;Title&quot;</code>, indentate allo
+stesso modo del corpo di un'ammonizione (4 spazi o un tab):</p>
+<pre><code class="language-markdown">=== &quot;Java&quot;
+    ```java
+    System.out.println( &quot;Hi&quot; );
+    ```
+
+=== &quot;BoxLang&quot;
+    ```bx
+    println( &quot;Hi&quot; )
+    ```
+</code></pre>
+<p>Che viene renderizzato così:</p>
+<div class="bxdocs-tabs" data-bxdocs-tabgroup role="tablist"><div class="bxdocs-tabs__nav"><button type="button" class="bxdocs-tab-btn bxdocs-tab-btn--active" data-bxdocs-tab="1">Java</button><button type="button" class="bxdocs-tab-btn" data-bxdocs-tab="2">BoxLang</button></div><div class="bxdocs-tabs__panels"><div class="bxdocs-tab-panel bxdocs-tab-panel--active" data-bxdocs-tab="1"><pre><code class="language-java">System.out.println( &quot;Hi&quot; );
+</code></pre>
+</div><div class="bxdocs-tab-panel" data-bxdocs-tab="2"><pre><code class="language-bx">println( &quot;Hi&quot; )
+</code></pre>
+</div></div></div>
+<p>Blocchi <code>=== &quot;...&quot;</code> consecutivi (separati al massimo da una riga vuota)
+formano un unico gruppo di schede; il contenuto di una scheda è markdown
+completo, quindi blocchi di codice, liste, ammonizioni, qualsiasi cosa
+scriveresti altrove. Nessuna configurazione di <code>bxdocs.json</code> necessaria -
+sempre attivo.</p>
+<h2 id="blocchi-di-codice"><a href="#blocchi-di-codice" id="blocchi-di-codice" name="blocchi-di-codice" class="anchor"></a>Blocchi di codice</h2>
+<p>I blocchi di codice delimitati vengono evidenziati lato client
+(highlight.js), nessuna configurazione necessaria - l'identificatore di
+linguaggio dopo l'apertura <code>```</code> seleziona la grammatica, ad es.
+<code>```json</code>. Oltre ai linguaggi già inclusi in highlight.js, BX Docs
+registra una propria grammatica BoxLang leggera sotto
+<code>bx</code>/<code>boxlang</code>/<code>bxs</code>/<code>bxm</code>/<code>cfscript</code>:</p>
+<pre><code class="language-bx">class {
+
+	numeric function add( required numeric a, required numeric b ) {
+		var result = a + b
+		var message = &quot;The sum is #result#&quot;
+		return result
+	}
+
+}
+</code></pre>
+<h3 id="numeri-di-riga-righe-evidenziate-e-titoli"><a href="#numeri-di-riga-righe-evidenziate-e-titoli" id="numeri-di-riga-righe-evidenziate-e-titoli" name="numeri-di-riga-righe-evidenziate-e-titoli" class="anchor"></a>Numeri di riga, righe evidenziate e titoli</h3>
+<p>Aggiungi <code>linenums</code>, <code>hl_lines</code> e/o <code>title</code> alla stringa info di un
+blocco delimitato - qualsiasi combinazione, tutti opzionali:</p>
+<pre><code class="language-markdown">```bx hl_lines=&quot;2&quot; linenums=&quot;1&quot; title=&quot;add.bx&quot;
+numeric function add( required numeric a, required numeric b ) {
+	return a + b
+}
+```
+</code></pre>
+<p>Che viene renderizzato così:</p>
+<pre><code class="language-bx">numeric function add( required numeric a, required numeric b ) {
+	return a + b
+}
+</code></pre>
+<p><code>linenums=&quot;N&quot;</code> fa iniziare il conteggio nel margine da <code>N</code>; <code>hl_lines</code>
+accetta numeri di riga e/o intervalli separati da spazi (<code>&quot;2 4-6&quot;</code>) da
+evidenziare, contati dall'inizio del blocco indipendentemente da dove
+parte <code>linenums</code>; <code>title</code> aggiunge una piccola barra del titolo sopra il
+blocco. Nessuna configurazione di <code>bxdocs.json</code> necessaria - sempre
+disponibile.</p>
+<h2 id="diagrammi"><a href="#diagrammi" id="diagrammi" name="diagrammi" class="anchor"></a>Diagrammi</h2>
+<p>Opzionale tramite la chiave <a href="/bx-docs/development/it/configuration/index.html#mermaid"><code>mermaid</code></a> di
+<code>bxdocs.json</code>:</p>
+<pre data-bxdocs-hl-lines="2" data-bxdocs-start-line="1" data-bxdocs-title="add.bx"><code class="language-json">{ &quot;mermaid&quot;: true }
+</code></pre>
+<p>Una volta attivato, qualsiasi blocco di codice delimitato <code>```mermaid</code>
+viene renderizzato come un diagramma <a href="https://mermaid.js.org/">Mermaid</a>
+dal vivo invece che come un listato di codice:</p>
+<pre><code class="language-mermaid">flowchart LR
+    A[docs/*.md] --&gt; B[bx-markdown]
+    B --&gt; C[Theme]
+    C --&gt; D[site/*.html]
+</code></pre>
+<p>Mermaid supporta diagrammi di flusso, diagrammi di sequenza, diagrammi di
+classe, diagrammi di Gantt e altro - vedi il
+<a href="https://mermaid.js.org/intro/syntax-reference.html">riferimento di sintassi ufficiale di Mermaid</a>
+per tutto ciò che può disegnare.</p>
+<h2 id="matematica"><a href="#matematica" id="matematica" name="matematica" class="anchor"></a>Matematica</h2>
+<p>Opzionale tramite la chiave <a href="/bx-docs/development/it/configuration/index.html#math"><code>math</code></a> di
+<code>bxdocs.json</code>:</p>
+<pre><code class="language-json">{ &quot;math&quot;: true }
+</code></pre>
+<p>Una volta attivato, <a href="https://katex.org/">KaTeX</a> compone <code>$...$</code> per la
+matematica in linea e <code>$$...$$</code> per un blocco centrato, entrambi scritti
+direttamente nel corpo del markdown:</p>
+<pre><code class="language-markdown">Euler's identity, $e^{i\pi} + 1 = 0$, relates five constants in one line.
+
+$$
+\int_0^1 x^2 \, dx = \frac{1}{3}
+$$
+</code></pre>
+<p>L'identità di Eulero, $e^{i\pi} + 1 = 0$, mette in relazione cinque
+costanti in un'unica riga.</p>
+<p>$$
+\int_0^1 x^2 \, dx = \frac{1}{3}
+$$</p>
+<p>Un <code>$</code> immediatamente preceduto o seguito da uno spazio viene lasciato
+intatto (così &quot;$5 e $10&quot; non viene scambiato per una formula) - la
+matematica composta sta sempre accostata a entrambi i delimitatori.</p>
+<h2 id="blocchi-in-stile-gitbook"><a href="#blocchi-in-stile-gitbook" id="blocchi-in-stile-gitbook" name="blocchi-in-stile-gitbook" class="anchor"></a>Blocchi in stile GitBook</h2>
+<p>Oltre a tutto quanto sopra, BX Docs supporta una famiglia di blocchi di
+contenuto in stile GitBook - utili di per sé, e il motivo per cui il
+contenuto di un sito GitBook è semplice da migrare: ognuno di questi
+corrisponde direttamente a un blocco GitBook dello stesso nome. Ognuno
+usa la stessa sintassi contenitore <code>::: name ... :::</code> (un <code>:::</code> nudo su
+una riga a sé chiude qualsiasi blocco attualmente aperto) - nessuna
+configurazione di <code>bxdocs.json</code> necessaria, sempre disponibile. Un
+blocco può essere annidato dentro un altro (un espandibile che contiene
+un gruppo di card, per esempio) - ognuno viene analizzato di nuovo per
+ulteriori blocchi al proprio interno.</p>
+<h3 id="espandibile"><a href="#espandibile" id="espandibile" name="espandibile" class="anchor"></a>Espandibile</h3>
+<p>Una sezione comprimibile semplice - nessuna icona/colore di richiamo, a
+differenza di un'ammonizione comprimibile (<code>???</code>, vedi
+<a href="#collapsible-admonitions">Ammonizioni comprimibili</a>):</p>
+<pre><code class="language-markdown">::: expandable &quot;Is this different from a collapsible admonition?&quot;
+Yes - this has no type/icon/color, just a plain expand/collapse section.
+Add `open=&quot;true&quot;` to start it expanded.
+:::
+</code></pre>
+<details class="bxdocs-expandable"><summary>&Egrave; diverso da un'ammonizione comprimibile?</summary><div class="bxdocs-expandable__body"><p>Sì - questa non ha tipo/icona/colore, solo una semplice sezione
+espandi/comprimi. Aggiungi <code>open=&quot;true&quot;</code> per farla iniziare espansa.</p>
+</div></details>
+<h3 id="card"><a href="#card" id="card" name="card" class="anchor"></a>Card</h3>
+<p>Una griglia di card di collegamento, ognuna un proprio <code>::: card</code> dentro
+un wrapper <code>::: cards</code> - <code>title</code>, <code>icon</code>, <code>image</code> e <code>href</code> sono tutti
+opzionali (una card senza <code>href</code> viene renderizzata come una card
+semplice, non cliccabile):</p>
+<pre><code class="language-markdown">::: cards
+::: card title=&quot;Getting Started&quot; icon=&quot;🚀&quot; href=&quot;../getting-started.md&quot;
+Install, scaffold and build your first site.
+:::
+::: card title=&quot;Themes&quot; icon=&quot;🎨&quot; href=&quot;themes.md&quot;
+Customize a built-in theme or write your own.
+:::
+:::
+</code></pre>
+<div class="bxdocs-cards"><a class="bxdocs-card" href="/bx-docs/development/it/getting-started/index.html"><div class="bxdocs-card__icon">🚀</div><div class="bxdocs-card__title">Per iniziare</div><div class="bxdocs-card__body"><p>Installa, genera lo scheletro e compila il tuo primo sito.</p>
+</div></a><a class="bxdocs-card" href="/bx-docs/development/it/guides/themes/index.html"><div class="bxdocs-card__icon">🎨</div><div class="bxdocs-card__title">Temi</div><div class="bxdocs-card__body"><p>Personalizza un tema integrato oppure scrivine uno tuo.</p>
+</div></a></div>
+<h3 id="colonne"><a href="#colonne" id="colonne" name="colonne" class="anchor"></a>Colonne</h3>
+<p>Un layout affiancato - <code>::: column</code> accetta un <code>width</code> opzionale (una
+lunghezza/percentuale CSS semplice, ad es. <code>&quot;40%&quot;</code>); le colonne senza una
+larghezza esplicita condividono la riga in parti uguali:</p>
+<pre><code class="language-markdown">::: columns
+::: column width=&quot;60%&quot;
+The wider column.
+:::
+::: column
+The narrower one.
+:::
+:::
+</code></pre>
+<div class="bxdocs-columns"><div class="bxdocs-column" style="--bxdocs-column-width:60%"><p>La colonna più larga.</p>
+</div><div class="bxdocs-column"><p>Quella più stretta.</p>
+</div></div>
+<h3 id="stepper"><a href="#stepper" id="stepper" name="stepper" class="anchor"></a>Stepper</h3>
+<p>Una sequenza numerata e collegata di passaggi:</p>
+<pre><code class="language-markdown">::: stepper
+::: step &quot;Install&quot;
+`install-bx-module bx-docs`
+:::
+::: step &quot;Scaffold&quot;
+`boxlang module:bxDocs new`
+:::
+:::
+</code></pre>
+<div class="bxdocs-stepper"><div class="bxdocs-step"><div class="bxdocs-step__marker">1</div><div class="bxdocs-step__content"><div class="bxdocs-step__title">Installazione</div><p><code>install-bx-module bx-docs</code></p>
+</div></div><div class="bxdocs-step"><div class="bxdocs-step__marker">2</div><div class="bxdocs-step__content"><div class="bxdocs-step__title">Scheletro del progetto</div><p><code>boxlang module:bxDocs new</code></p>
+</div></div></div>
+<h3 id="file"><a href="#file" id="file" name="file" class="anchor"></a>File</h3>
+<p>Una card di download per un PDF, un video, o qualsiasi altro asset di
+progetto - <code>src</code> viene risolto allo stesso modo in cui lo sono già
+<code>theme.logo</code>/<code>ogImage</code> del frontmatter (relativo a <code>docs/assets/</code>):</p>
+<pre><code class="language-markdown">::: file src=&quot;assets/spec.pdf&quot; title=&quot;API Specification&quot;
+:::
+</code></pre>
+<h3 id="embed"><a href="#embed" id="embed" name="embed" class="anchor"></a>Embed</h3>
+<p>Un embed responsivo in iframe per un provider riconosciuto - attualmente
+YouTube, Vimeo, CodePen, Spotify, Loom e Figma. Un URL da qualsiasi altra
+fonte ricade su una semplice card di link &quot;visita ↗&quot; invece di un iframe
+che si rifiuterebbe comunque di renderizzarsi (la maggior parte dei siti
+blocca l'essere incorniciata):</p>
+<pre><code class="language-markdown">::: embed url=&quot;https://www.youtube.com/watch?v=dQw4w9WgXcQ&quot; title=&quot;A demo&quot;
+:::
+</code></pre>
+<h3 id="link-a-pagina"><a href="#link-a-pagina" id="link-a-pagina" name="link-a-pagina" class="anchor"></a>Link a pagina</h3>
+<p>Una card di anteprima ricca che rimanda a un'altra pagina - <code>href</code> segue
+la stessa convenzione relativa al file di un normale
+<a href="#linking-between-pages">link a pagina</a>. A differenza di una card, il suo
+titolo/icona/riepilogo vengono ricavati automaticamente dal frontmatter
+proprio della pagina di destinazione, così resta sincronizzato se quella
+pagina viene rinominata o il suo riepilogo cambia:</p>
+<pre><code class="language-markdown">::: page-link href=&quot;../getting-started.md&quot;
+:::
+</code></pre>
+<a class="bxdocs-page-link" href="/bx-docs/development/it/getting-started/index.html" data-bxdocs-page-link><span class="bxdocs-page-link__icon">🚀</span><span class="bxdocs-page-link__text"><span class="bxdocs-page-link__title">Per iniziare</span><span class="bxdocs-page-link__summary">Installa il modulo, genera lo scheletro di un progetto e compila il tuo primo sito.</span></span></a>
+<h3 id="aggiornamenti-changelog"><a href="#aggiornamenti-changelog" id="aggiornamenti-changelog" name="aggiornamenti-changelog" class="anchor"></a>Aggiornamenti (changelog)</h3>
+<p>Una lista di changelog datata e taggabile - <code>::: update</code> accetta
+<code>date=&quot;YYYY-MM-DD&quot;</code> e un <code>tags</code> opzionale separato da virgole:</p>
+<pre><code class="language-markdown">::: updates
+::: update date=&quot;2026-01-15&quot; tags=&quot;feature,fix&quot;
+Added dark mode and fixed a footer alignment bug.
+:::
+::: update date=&quot;2026-01-01&quot;
+Initial release.
+:::
+:::
+</code></pre>
+<div class="bxdocs-updates"><div class="bxdocs-update"><div class="bxdocs-update__meta"><time class="bxdocs-update__date" datetime="2026-01-15">2026-01-15</time><span class="bxdocs-update__tag">funzionalit&agrave;</span><span class="bxdocs-update__tag">correzione</span></div><div class="bxdocs-update__body"><p>Aggiunta la modalità scura e corretto un bug di allineamento del footer.</p>
+</div></div><div class="bxdocs-update"><div class="bxdocs-update__meta"><time class="bxdocs-update__date" datetime="2026-01-01">2026-01-01</time></div><div class="bxdocs-update__body"><p>Prima release.</p>
+</div></div></div>
+<p>Una pagina con un blocco <code>::: updates</code> ottiene anche il proprio
+<code>feed.xml</code> (RSS 2.0) scritto accanto a sé una volta che <code>baseURL</code> di
+<code>bxdocs.json</code> è un URL completo - lo stesso requisito di <code>sitemap.xml</code> -
+così i lettori possono iscriversi solo al changelog di quella pagina.</p>
+<h3 id="contenuto-riutilizzabile-include"><a href="#contenuto-riutilizzabile-include" id="contenuto-riutilizzabile-include" name="contenuto-riutilizzabile-include" class="anchor"></a>Contenuto riutilizzabile (include)</h3>
+<p><code>::: include src=&quot;...&quot;</code> inserisce il Markdown grezzo di un altro file in
+quel punto - risolto in modo relativo alla cartella propria della pagina
+<em>che include</em>, la stessa convenzione di un normale link a pagina. A
+differenza di ogni blocco sopra, questo diventa vero contenuto di pagina
+(intestazioni, paragrafi, i propri blocchi annidati), non qualcosa
+avvolto in un widget - utile per un avviso/nota ripetuto su più pagine:</p>
+<pre><code class="language-markdown">::: include src=&quot;_shared/beta-notice.md&quot;
+</code></pre>
+<p>Un file incluso può a sua volta includerne un altro (una catena circolare
+genera <code>BxDocs.CircularInclude</code> al momento del build invece di
+ripetersi all'infinito).</p>
+<h3 id="immagini-didascalie-allineamento-e-cornici-images"><a href="#immagini-didascalie-allineamento-e-cornici-images" id="immagini-didascalie-allineamento-e-cornici-images" name="immagini-didascalie-allineamento-e-cornici-images" class="anchor"></a>Immagini: didascalie, allineamento e cornici {#images}</h3>
+<p>Una didascalia, una cornice, o una galleria multi-immagine sono tutte
+semplicemente HTML a livello di blocco - che bx-markdown/Flexmark lascia
+passare completamente intatto (la regola &quot;HTML block&quot; propria di
+CommonMark), quindi non serve alcuna sintassi specifica di bx-docs:</p>
+<pre><code class="language-markdown">&lt;figure&gt;
+  &lt;img src=&quot;../assets/screenshot.png&quot; alt=&quot;The build output&quot;&gt;
+  &lt;figcaption&gt;A freshly built site&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;div data-with-frame=&quot;true&quot;&gt;
+  &lt;img src=&quot;../assets/screenshot.png&quot; alt=&quot;Framed&quot;&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;bxdocs-gallery&quot;&gt;
+  &lt;img src=&quot;../assets/one.png&quot; alt=&quot;&quot;&gt;
+  &lt;img src=&quot;../assets/two.png&quot; alt=&quot;&quot;&gt;
+  &lt;img src=&quot;../assets/three.png&quot; alt=&quot;&quot;&gt;
+&lt;/div&gt;
+</code></pre>
+<h2 id="estensioni-tramite-plugin"><a href="#estensioni-tramite-plugin" id="estensioni-tramite-plugin" name="estensioni-tramite-plugin" class="anchor"></a>Estensioni tramite plugin</h2>
+<p>Ammonizioni, note a piè di pagina e liste di definizioni coprono i casi
+comuni, ma bx-markdown stesso non ha opinioni oltre a queste tre -
+qualsiasi altra estensione Flexmark può essere registrata direttamente
+contro di esso con <code>markdownRegisterExtension()</code>, indipendentemente da BX
+Docs. Vedi il readme proprio di bx-markdown per i dettagli.</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn-1">
+<p>Ecco la conferma.</p>
+<a href="#fnref-1" class="footnote-backref">&#8617;</a>
+</li>
+</ol>
+</div>
+
+				</article>
+
+				<nav class="page-nav d-flex justify-content-between" aria-label="Page navigation">
+
+					<a class="page-nav__prev" href="/bx-docs/development/it/guides/deployment/index.html">&larr; Distribuire su GitHub Pages</a>
+
+					<a class="page-nav__next" href="/bx-docs/development/it/guides/plugins/index.html">Plugin &rarr;</a>
+
+				</nav>
+
+
+
+			</main>
+		</div>
+	</div>
+
+	<footer class="bxdocs-footer">
+		<div class="container-fluid bxdocs-footer__inner">
+			<div class="bxdocs-footer__copy">&copy; 2026 BX Docs</div>
+
+			<div class="bxdocs-footer__social"><a class="social-link" href="https://github.com/ortus-boxlang/BoxLang" target="_blank" rel="noopener noreferrer" aria-label="BoxLang on GitHub" title="BoxLang on GitHub"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.083-.729.083-.729 1.205.084 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.303-5.467-1.332-5.467-5.93 0-1.31.468-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23A11.5 11.5 0 0 1 12 5.803c1.02.005 2.045.138 3.003.404 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.807 5.625-5.48 5.92.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 21.795 24 17.298 24 12c0-6.63-5.37-12-12-12"/></svg></a><a class="social-link" href="https://x.com/TryBoxLang" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" title="X (Twitter)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a class="social-link" href="https://www.youtube.com/@OrtusSolutions" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M23.498 6.186a3.02 3.02 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.02 3.02 0 0 0 .502 6.186 31.7 31.7 0 0 0 0 12a31.7 31.7 0 0 0 .502 5.814 3.02 3.02 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.02 3.02 0 0 0 2.122-2.136A31.7 31.7 0 0 0 24 12a31.7 31.7 0 0 0-.502-5.814ZM9.545 15.568V8.432L15.818 12l-6.273 3.568Z"/></svg></a><a class="social-link" href="https://www.linkedin.com/company/tryboxlang" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286ZM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124ZM7.119 20.452H3.554V9h3.565v11.452ZM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003Z"/></svg></a><a class="social-link" href="https://www.facebook.com/tryboxlang/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073Z"/></svg></a><a class="social-link" href="https://bsky.app/profile/boxlang.bsky.social" target="_blank" rel="noopener noreferrer" aria-label="Bluesky" title="Bluesky"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.203-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8Z"/></svg></a><a class="social-link" href="https://www.threads.com/@ortussolutions" target="_blank" rel="noopener noreferrer" aria-label="Threads" title="Threads"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.056 7.164 1.43 1.781 3.63 2.695 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.29a13.85 13.85 0 0 1 3.02.142c-.13-.808-.394-1.45-.789-1.916-.54-.635-1.362-.958-2.444-.964h-.032c-.87 0-2.045.24-2.798 1.376l-1.735-1.19c1.01-1.512 2.65-2.343 4.62-2.343h.036c3.294.021 5.259 2.028 5.459 5.55.114.048.227.098.34.15 1.574.734 2.727 1.846 3.334 3.215.845 1.906.923 5.011-1.646 7.44-1.877 1.778-4.153 2.581-7.379 2.605Zm1.176-11.916c-.184 0-.37.005-.556.016-1.392.08-2.26.71-2.211 1.605.05.943.976 1.38 1.866 1.334 1.427-.077 2.402-.965 2.652-2.874a8.19 8.19 0 0 0-1.751-.081Z"/></svg></a><a class="social-link" href="https://www.ortussolutions.com/community/slack" target="_blank" rel="noopener noreferrer" aria-label="Slack Community" title="Slack Community"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52ZM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313ZM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834ZM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312ZM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834ZM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312ZM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52ZM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313Z"/></svg></a><a class="social-link" href="https://www.patreon.com/ortussolutions" target="_blank" rel="noopener noreferrer" aria-label="Patreon" title="Patreon"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M0 .5v23h4.219V.5H0Zm15.211 0c-4.831 0-8.771 3.943-8.771 8.775 0 4.831 3.94 8.773 8.771 8.773 4.831 0 8.775-3.942 8.775-8.773S20.042.5 15.211.5Z"/></svg></a></div>
+
+			<div class="bxdocs-footer__credit">Built with <a href="https://github.com/ortus-boxlang/bx-docs" target="_blank" rel="noopener noreferrer">BX Docs</a></div>
+		</div>
+	</footer>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+	<script src="/bx-docs/development/it/assets/highlight-boxlang.js"></script>
+	<script>hljs.highlightAll();</script>
+	<script src="/bx-docs/development/it/assets/code-lines.js"></script>
+	<script src="/bx-docs/development/it/assets/copy-code.js" defer></script>
+	<script src="/bx-docs/development/it/assets/admonition-collapse.js" defer></script>
+	<script src="/bx-docs/development/it/assets/tabs.js" defer></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+	<script src="/bx-docs/development/it/assets/mermaid-init.js"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+	<script src="/bx-docs/development/it/assets/math-init.js"></script>
+
+	<script src="/bx-docs/development/it/assets/theme-switcher.js" defer></script>
+</body>
+</html>
+
