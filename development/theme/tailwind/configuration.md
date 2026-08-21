@@ -145,10 +145,12 @@ non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
     contents renders. `"top"` (the default) renders it inline, at the top of
     the article, same as today. `"sticky"` moves it into its own right-hand
     column that stays in view while the article scrolls underneath it - the
-    same "On this page" list, just pinned, which helps on long pages. Only
-    shown on wide viewports (it's hidden below the point a 3-column layout
-    would get cramped); on narrower ones the TOC simply doesn't render at
-    all in `sticky` mode, rather than falling back to `top`.
+    same "On this page" list, just pinned, which helps on long pages. The
+    pinned column only fits on wide viewports (it's hidden below the point a
+    3-column layout would get cramped); below that width `sticky` mode
+    renders the same list back inline instead, same as `top` would - the TOC
+    stays reachable at every viewport width, it just moves between an inline
+    box and a pinned rail depending on how much room there is.
 
     ```json
     { "theme": { "options": { "tocPosition": "sticky" } } }

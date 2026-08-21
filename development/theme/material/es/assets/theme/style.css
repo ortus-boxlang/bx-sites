@@ -241,10 +241,9 @@ body.md-body {
 }
 
 /* `theme.options.tocPosition: "sticky"` renders the same .toc markup here
-   instead of inline atop the article (page.bxm skips its own inline render
-   in that mode) - a 3rd flex child in .md-layout, hidden below a width
-   where it'd crowd the article. .md-header IS sticky (top: 0, 64px tall),
-   so `top` has to clear it, unlike bootstrap/tailwind's non-sticky header. */
+   as a 3rd flex child in .md-layout, hidden below a width where it'd crowd
+   the article. .md-header IS sticky (top: 0, 64px tall), so `top` has to
+   clear it, unlike bootstrap/tailwind's non-sticky header. */
 .md-toc-sidebar {
 	width: 220px;
 	flex-shrink: 0;
@@ -255,6 +254,16 @@ body.md-body {
 @media ( min-width: 1200px ) {
 	.md-toc-sidebar {
 		display: block;
+	}
+}
+
+/* Below 1200px the sidebar rail above has no room, so page.bxm renders the
+   same TOC inline atop the article instead (renderToc()'s own
+   `hideAtXl` param) - hidden again once the rail takes over, rather than
+   the TOC being inaccessible below that width. */
+@media ( min-width: 1200px ) {
+	.md-toc--mobile {
+		display: none;
 	}
 }
 
