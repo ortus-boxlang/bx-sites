@@ -547,3 +547,7 @@ under `docs/versions/` (not inside a subfolder) is ignored.
 
 `sitemap.xml` and `llms.txt` include every version's pages alongside the
 main site's.
+
+A version's docs can also be translated - see [i18n's own "Versioned and
+translated docs"](i18n.md#versioned-and-translated-docs) for the
+`docs/versions/<name>/i18n/<code>/` convention.
