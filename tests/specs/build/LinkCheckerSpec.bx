@@ -65,7 +65,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.brokenLinks[ 1 ].href ).toBe( "/missing.png" );
 			} );
 
-			it( "flags an img with no alt attribute at all, but not an img with alt=\"\"", function() {
+			it( 'flags an img with no alt attribute at all, but not an img with alt=""', function() {
 				var projectRoot = newProjectRoot();
 				writePage(
 					projectRoot,
