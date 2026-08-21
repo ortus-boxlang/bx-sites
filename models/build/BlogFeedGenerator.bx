@@ -1,0 +1,113 @@
+/**
+ * Builds an RSS 2.0 feed for the blog as a whole, or one category of it -
+ * the same "subscribe to updates" convention UpdatesFeedGenerator.bx
+ * already offers for a single page's `::: updates` block, generalized to
+ * every post BlogDiscoverer.bx loaded. Only meaningful with a real
+ * absolute site URL, same reasoning as SitemapGenerator.bx/
+ * UpdatesFeedGenerator.bx - RSS `<link>`/`<guid>` values must be absolute -
+ * so BuildPipeline.bx only calls this when BaseUrlResolver found one.
+ */
+class {
+
+	/**
+	 * Renders every post (or, with `categoryFilter`, just the posts in one
+	 * category) as an RSS 2.0 feed, newest first (BlogDiscoverer.load()'s
+	 * own order is already newest-first, so this never re-sorts).
+	 *
+	 * @posts BlogDiscoverer.load()'s own output, enriched by BlogBuilder.bx with `excerptText`/`resolvedAuthors`
+	 * @siteName The site's own name (the site config's `name`), used as the feed's channel title prefix
+	 * @siteUrl The absolute site URL, ending with `/` (BaseUrlResolver's `absolute`)
+	 * @basePath Root-relative base path ending with `/` (BaseUrlResolver's `basePath`)
+	 * @categoryFilter Restrict the feed to posts in this one category, and title/link it accordingly - "" (default) for the whole blog
+	 *
+	 * @return The rendered feed.xml content
+	 */
+	string function build( required array posts, required string siteName, required string siteUrl, required string basePath, string categoryFilter = "" ) {
+		var category = trim( arguments.categoryFilter )
+		var filtered = len( category )
+			? arguments.posts.filter( post => hasCategoryNoCase( post.categories ?: [], category ) )
+			: arguments.posts
+
+		var channelTitle = arguments.siteName & " Blog" & ( len( category ) ? " - " & category : "" )
+		var channelLink = arguments.siteUrl & arguments.basePath & "blog/" & ( len( category ) ? "category/" & slugify( category ) & "/" : "" )
+
+		var lines = [
+			'<?xml version="1.0" encoding="UTF-8"?>',
+			'<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel>',
+			"	<title>" & encodeForHTML( channelTitle ) & "</title>",
+			"	<link>" & attrEscape( channelLink ) & "</link>",
+			"	<description>" & encodeForHTML( "Blog posts from " & arguments.siteName ) & "</description>"
+		]
+
+		for ( var post in filtered ) {
+			var postUrl = arguments.siteUrl & arguments.basePath & post.urlPath.reReplaceNoCase( "index\.html$", "" )
+
+			lines.append( "	<item>" )
+			lines.append( "		<title>" & encodeForHTML( post.title ) & "</title>" )
+			lines.append( "		<link>" & attrEscape( postUrl ) & "</link>" )
+			lines.append( '		<guid isPermaLink="true">' & attrEscape( postUrl ) & "</guid>" )
+
+			if ( isDate( post.date ) ) {
+				lines.append( "		<pubDate>" & dateTimeFormat( post.date, "EEE, dd MMM yyyy" ) & " 00:00:00 +0000</pubDate>" )
+			}
+
+			for ( var author in ( post.resolvedAuthors ?: [] ) ) {
+				lines.append( "		<dc:creator>" & encodeForHTML( author.name ) & "</dc:creator>" )
+			}
+
+			for ( var postCategory in ( post.categories ?: [] ) ) {
+				lines.append( "		<category>" & encodeForHTML( postCategory ) & "</category>" )
+			}
+
+			var description = len( trim( post.excerptText ?: "" ) ) ? post.excerptText : ( len( trim( post.description ?: "" ) ) ? post.description : post.title )
+			lines.append( "		<description>" & encodeForHTML( description ) & "</description>" )
+
+			lines.append( "	</item>" )
+		}
+
+		lines.append( "</channel></rss>" )
+		lines.append( "" )
+
+		return lines.toList( char( 10 ) )
+	}
+
+	/**
+	 * Whether `categories` contains `category`, case-insensitively.
+	 *
+	 * @categories A post's own `categories` array
+	 * @category The category being filtered for
+	 */
+	private boolean function hasCategoryNoCase( required array categories, required string category ) {
+		for ( var c in arguments.categories ) {
+			if ( compareNoCase( c, arguments.category ) == 0 ) {
+				return true
+			}
+		}
+		return false
+	}
+
+	/**
+	 * Slugs a category name into its `blog/category/<slug>/` path segment -
+	 * kept in sync with BlogBuilder.bx's own identical slugify() by
+	 * convention rather than a shared function, the same duplication
+	 * TagsIndexBuilder.bx's own tagSlug() already accepts for the same reason.
+	 *
+	 * @category The raw category text
+	 */
+	private string function slugify( required string category ) {
+		return lCase( trim( arguments.category ) ).reReplace( "[^a-z0-9]+", "-", "all" ).reReplace( "(^-|-$)", "", "all" )
+	}
+
+	/**
+	 * A minimal, XML-text-safe escape for a `<link>`/`<guid>` URL value -
+	 * identical to UpdatesFeedGenerator.bx's own attrEscape() (kept as its
+	 * own small copy rather than a shared helper, same reasoning as
+	 * slugify() above).
+	 *
+	 * @value The raw URL value
+	 */
+	private string function attrEscape( required string value ) {
+		return arguments.value.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
+	}
+
+}

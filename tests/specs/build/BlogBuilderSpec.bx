@@ -1,0 +1,188 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.BlogBuilder", function() {
+
+			beforeEach( function() {
+				variables.builder = new "models.build.BlogBuilder@bxdocs"();
+			} );
+
+			private struct function newPost( struct overrides = {} ) {
+				var post = {
+					relativePath : "blog/posts/hello-world.md",
+					sourcePath   : "/tmp/hello-world.md",
+					slug         : "hello-world",
+					urlPath      : "blog/hello-world/index.html",
+					title        : "Hello World",
+					description  : "",
+					hidden       : false,
+					showToc      : true,
+					tags         : [],
+					icon         : "",
+					summary      : "",
+					ogImage      : "",
+					date         : "2026-01-01",
+					authors      : [],
+					categories   : [],
+					draft        : false,
+					image        : "",
+					contentHtml  : "<p>First paragraph.</p><p>Second paragraph.</p>"
+				};
+				for ( var key in arguments.overrides ) {
+					post[ key ] = arguments.overrides[ key ]
+				}
+				return post;
+			}
+
+			it( "returns one page per post, unchanged count, and a Blog index page even with zero posts", function() {
+				var result = builder.build( [], {}, 10, "/" );
+
+				expect( result.posts.len() ).toBe( 0 );
+				expect( result.indexPages.len() ).toBe( 1 );
+				expect( result.indexPages[ 1 ].title ).toBe( "Blog" );
+				expect( result.indexPages[ 1 ].urlPath ).toBe( "blog/index.html" );
+			} );
+
+			it( "prepends a featured-image/byline header onto the post's own contentHtml", function() {
+				var result = builder.build( [ newPost( { image : "assets/blog/cover.png" } ) ], {}, 10, "/" );
+
+				var html = result.posts[ 1 ].contentHtml;
+				expect( html ).toInclude( "assets/blog/cover.png" );
+				expect( html ).toInclude( "First paragraph." );
+				expect( html.find( "cover.png" ) ).toBeLT( html.find( "First paragraph." ) );
+			} );
+
+			it( "computes an excerpt from the <!-- more --> marker when present", function() {
+				var post = newPost( { contentHtml : "<p>Intro.</p><!-- more --><p>Rest of the post.</p>" } );
+
+				var result = builder.build( [ post ], {}, 10, "/" );
+
+				expect( result.posts[ 1 ].excerptText ).toInclude( "Intro." );
+				expect( result.posts[ 1 ].excerptText ).notToInclude( "Rest of the post" );
+			} );
+
+			it( "falls back to frontmatter summary for the excerpt when there's no marker", function() {
+				var post = newPost( { summary : "A hand-written summary." } );
+
+				var result = builder.build( [ post ], {}, 10, "/" );
+
+				expect( result.posts[ 1 ].excerptText ).toBe( "A hand-written summary." );
+			} );
+
+			it( "falls back to a truncated plain-text body for the excerpt when there's no marker or summary", function() {
+				var longBody = "<p>" & repeatString( "word ", 100 ) & "</p>";
+				var post = newPost( { contentHtml : longBody } );
+
+				var result = builder.build( [ post ], {}, 10, "/" );
+
+				expect( len( result.posts[ 1 ].excerptText ) ).toBeLTE( 221 );
+				expect( result.posts[ 1 ].excerptText ).toInclude( "…" );
+			} );
+
+			it( "defaults description/ogImage from the excerpt/featured image when frontmatter left them blank", function() {
+				var post = newPost( { summary : "A summary.", image : "assets/blog/cover.png" } );
+
+				var result = builder.build( [ post ], {}, 10, "/" );
+
+				expect( result.posts[ 1 ].description ).toBe( "A summary." );
+				expect( result.posts[ 1 ].ogImage ).toBe( "assets/blog/cover.png" );
+			} );
+
+			it( "preserves an explicit frontmatter description/ogImage instead of overriding them", function() {
+				var post = newPost( { description : "Explicit description.", ogImage : "assets/blog/social.png", image : "assets/blog/cover.png", summary : "A summary." } );
+
+				var result = builder.build( [ post ], {}, 10, "/" );
+
+				expect( result.posts[ 1 ].description ).toBe( "Explicit description." );
+				expect( result.posts[ 1 ].ogImage ).toBe( "assets/blog/social.png" );
+			} );
+
+			it( "sets ogType/publishedTime for SEO/social meta", function() {
+				var result = builder.build( [ newPost( { date : "2026-03-15" } ) ], {}, 10, "/" );
+
+				expect( result.posts[ 1 ].ogType ).toBe( "article" );
+				expect( result.posts[ 1 ].publishedTime ).toBe( "2026-03-15" );
+			} );
+
+			it( "assigns a Blog -> post breadcrumb and chronological prev/next", function() {
+				var newer = newPost( { slug : "newer", urlPath : "blog/newer/index.html", title : "Newer", date : "2026-02-01" } );
+				var older = newPost( { slug : "older", urlPath : "blog/older/index.html", title : "Older", date : "2026-01-01" } );
+
+				// BlogDiscoverer.load() would already hand these in newest-first order
+				var result = builder.build( [ newer, older ], {}, 10, "/" );
+
+				expect( result.posts[ 1 ].breadcrumbs[ 1 ].title ).toBe( "Blog" );
+				expect( result.posts[ 1 ].breadcrumbs[ 2 ].title ).toBe( "Newer" );
+				expect( result.posts[ 1 ].prevPage.url ).toBe( "" );
+				expect( result.posts[ 1 ].nextPage.url ).toBe( "blog/older/index.html" );
+				expect( result.posts[ 2 ].prevPage.url ).toBe( "blog/newer/index.html" );
+				expect( result.posts[ 2 ].nextPage.url ).toBe( "" );
+			} );
+
+			it( "every index page carries [hidden]: false so sitemap/llms.txt generators can read it safely", function() {
+				var result = builder.build( [ newPost( { categories : [ "Releases" ] } ) ], {}, 10, "/" );
+
+				for ( var indexPage in result.indexPages ) {
+					expect( indexPage.hidden ).toBeFalse();
+				}
+			} );
+
+			it( "paginates the blog list per postsPerPage, with page 2+ under blog/page/<n>/", function() {
+				var posts = [
+					newPost( { slug : "a", urlPath : "blog/a/index.html" } ),
+					newPost( { slug : "b", urlPath : "blog/b/index.html" } ),
+					newPost( { slug : "c", urlPath : "blog/c/index.html" } )
+				];
+
+				var result = builder.build( posts, {}, 2, "/" );
+
+				var blogPages = result.indexPages.filter( p => p.urlPath.findNoCase( "blog/category" ) == 0 && p.urlPath.findNoCase( "blog/authors" ) == 0 );
+				expect( blogPages.len() ).toBe( 2 );
+				expect( blogPages[ 1 ].urlPath ).toBe( "blog/index.html" );
+				expect( blogPages[ 2 ].urlPath ).toBe( "blog/page/2/index.html" );
+				expect( blogPages[ 2 ].title ).toInclude( "Page 2" );
+			} );
+
+			it( "builds one category index page per distinct category, url-slugged", function() {
+				var posts = [
+					newPost( { slug : "a", urlPath : "blog/a/index.html", categories : [ "Getting Started" ] } ),
+					newPost( { slug : "b", urlPath : "blog/b/index.html", categories : [ "Getting Started", "News" ] } )
+				];
+
+				var result = builder.build( posts, {}, 10, "/" );
+
+				var categoryPages = result.indexPages.filter( p => p.urlPath.findNoCase( "blog/category" ) > 0 );
+				var categoryUrls = categoryPages.map( p => p.urlPath );
+				expect( categoryUrls ).toInclude( "blog/category/getting-started/index.html" );
+				expect( categoryUrls ).toInclude( "blog/category/news/index.html" );
+			} );
+
+			it( "builds an author page only for an author actually referenced by a post, not every roster entry", function() {
+				var authors = {
+					"lmajano" : { name : "Luis Majano", title : "", bio : "", url : "", email : "", avatar : "", socials : {} },
+					"unused"  : { name : "Unused Author", title : "", bio : "", url : "", email : "", avatar : "", socials : {} }
+				};
+				var post = newPost( { authors : [ "lmajano" ] } );
+
+				var result = builder.build( [ post ], authors, 10, "/" );
+
+				var authorPages = result.indexPages.filter( p => p.urlPath.findNoCase( "blog/authors" ) > 0 );
+				expect( authorPages.len() ).toBe( 1 );
+				expect( authorPages[ 1 ].urlPath ).toBe( "blog/authors/lmajano/index.html" );
+				expect( authorPages[ 1 ].title ).toBe( "Luis Majano" );
+			} );
+
+			it( "an author with no matching roster entry gets a name-only byline and no author page", function() {
+				var post = newPost( { authors : [ "Guest Writer" ] } );
+
+				var result = builder.build( [ post ], {}, 10, "/" );
+
+				var authorPages = result.indexPages.filter( p => p.urlPath.findNoCase( "blog/authors" ) > 0 );
+				expect( authorPages.len() ).toBe( 0 );
+				expect( result.posts[ 1 ].resolvedAuthors[ 1 ].name ).toBe( "Guest Writer" );
+			} );
+
+		} );
+	}
+
+}

@@ -1,0 +1,58 @@
+name: "BX Docs"
+description: "Static documentation site generator for BoxLang, built on bx-markdown"
+baseURL: "https://ortus-boxlang.github.io/bx-docs/"
+theme:
+  name: bootstrap
+  options: { navCollapsible: true, tocPosition: sticky }
+  logo: "assets/boxlang-icon-full.svg"
+  favicon: "assets/favicon.png"
+search: true
+nav: []
+markdown:
+  enableFootnotes: true
+  enableDefinitionLists: true
+repo:
+  url: "https://github.com/ortus-boxlang/bx-docs"
+  editUri: "edit/main/docs/"
+social:
+  - url: "https://github.com/ortus-boxlang/BoxLang"
+    icon: github
+    label: "BoxLang on GitHub"
+  - url: "https://x.com/TryBoxLang"
+    icon: twitter
+    label: "X (Twitter)"
+  - url: "https://www.youtube.com/@OrtusSolutions"
+    icon: youtube
+    label: "YouTube"
+  - url: "https://www.linkedin.com/company/tryboxlang"
+    icon: linkedin
+    label: "LinkedIn"
+  - url: "https://www.facebook.com/tryboxlang/"
+    icon: facebook
+    label: "Facebook"
+  - url: "https://bsky.app/profile/boxlang.bsky.social"
+    icon: bluesky
+    label: "Bluesky"
+  - url: "https://www.threads.com/@ortussolutions"
+    icon: threads
+    label: "Threads"
+  - url: "https://www.ortussolutions.com/community/slack"
+    icon: slack
+    label: "Slack Community"
+  - url: "https://www.patreon.com/ortussolutions"
+    icon: patreon
+    label: "Patreon"
+footer: true
+lastUpdated: true
+mermaid: true
+math: true
+ogImage: "assets/og-image.png"
+extraJs:
+  - "assets/theme-switcher.js"
+i18n:
+  defaultLocale: { code: en, label: English }
+  locales:
+    - { code: es, label: Español }
+    - { code: it, label: Italiano }
+    - { code: de, label: Deutsch }
+    - { code: ja, label: 日本語 }

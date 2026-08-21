@@ -1,0 +1,520 @@
+/**
+ * Turns already-markdown-converted blog posts (BlogDiscoverer.bx's own
+ * output, run through BuildPipeline.bx's normal convertMarkdown()/
+ * assignTableOfContents()/etc. finishing steps first) into everything the
+ * blog itself needs: each post's own detail-page content (a featured-image/
+ * byline header prepended to its real body), plus every "index" page around
+ * it - `/blog/` (paginated), one `/blog/category/<slug>/` per category
+ * (paginated), and one `/blog/authors/<id>/` per author who has at least
+ * one post.
+ *
+ * Pure HTML-string generation - no file I/O. Every index page comes back as
+ * a minimal page struct (`title`/`description`/`contentHtml`/`urlPath`/
+ * `ogImage`/`tags`) in the exact shape write404Page()/writeTagsPage()
+ * already hand ThemeRenderer.renderPage() in BuildPipeline.bx - it fills in
+ * every other field (`toc`/`prevPage`/`breadcrumbs`/...) with sensible
+ * empty defaults, so no theme template needs to change at all; a post/list/
+ * category/author page renders through the exact same `page.bxm` every
+ * other page does.
+ */
+class {
+
+	variables.blogAuthorsLoader = new "models.build.BlogAuthorsLoader@bxdocs"()
+
+	/**
+	 * @posts BlogDiscoverer.load()'s own output, already markdown-converted (`contentHtml` set) - newest first
+	 * @authors BlogAuthorsLoader.load()'s own output
+	 * @postsPerPage bxdocs.json's `blog.postsPerPage`
+	 * @basePath Root-relative base path ending with `/` (BaseUrlResolver's `basePath`)
+	 *
+	 * @return { posts: array (same posts, enriched + detail-page-ready contentHtml), indexPages: array of synthetic page structs }
+	 */
+	struct function build( required array posts, required struct authors, required numeric postsPerPage, required string basePath ) {
+		var enrichedPosts = enrichPosts( arguments.posts, arguments.authors, arguments.basePath )
+
+		var indexPages = []
+		indexPages.append( buildListPages( enrichedPosts, "blog", "Blog", arguments.postsPerPage, arguments.basePath ), true )
+
+		for ( var category in distinctCategories( enrichedPosts ) ) {
+			var categoryPosts = enrichedPosts.filter( post => hasCategoryNoCase( post.categories ?: [], category ) )
+			indexPages.append( buildListPages( categoryPosts, "blog/category/" & slugify( category ), category, arguments.postsPerPage, arguments.basePath ), true )
+		}
+
+		for ( var authorId in distinctAuthorIds( enrichedPosts ) ) {
+			var authorPosts = enrichedPosts.filter( post => postHasAuthorId( post, authorId ) )
+			var author = arguments.authors[ authorId ]
+			indexPages.append( {
+				title       : author.name,
+				description : len( trim( author.bio ) ) ? author.bio : "Posts by " & author.name,
+				contentHtml : renderAuthorPageHtml( author, authorPosts, arguments.basePath ),
+				urlPath     : "blog/authors/" & authorId & "/index.html",
+				ogImage     : author.avatar,
+				tags        : [],
+				hidden      : false
+			} )
+		}
+
+		return { posts : enrichedPosts, indexPages : indexPages }
+	}
+
+	/**
+	 * Resolves each post's own authors, computes its excerpt/display date,
+	 * defaults its SEO description/og:image from its own content when the
+	 * frontmatter left them blank, assigns a simple chronological prev/next
+	 * and a `Blog -> post` breadcrumb, and prepends its own featured-image/
+	 * byline header onto its real body `contentHtml`.
+	 *
+	 * @posts BlogDiscoverer.load()'s own output, already markdown-converted
+	 * @authors BlogAuthorsLoader.load()'s own output
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	private array function enrichPosts( required array posts, required struct authors, required string basePath ) {
+		var enriched = []
+
+		for ( var i = 1; i <= arguments.posts.len(); i++ ) {
+			var post = duplicate( arguments.posts[ i ] )
+			post.resolvedAuthors = variables.blogAuthorsLoader.resolve( post.authors, arguments.authors )
+			post.dateDisplay = dateTimeFormat( post.date, "medium" )
+
+			var excerpt = computeExcerpt( post.contentHtml, post.summary )
+			post.excerptHtml = excerpt.html
+			post.excerptText = excerpt.text
+			if ( !len( trim( post.description ) ) ) {
+				post.description = excerpt.text
+			}
+			if ( !len( trim( post.ogImage ) ) ) {
+				post.ogImage = post.image
+			}
+
+			post.breadcrumbs = [ { title : "Blog", url : "blog/index.html" }, { title : post.title, url : post.urlPath } ]
+			post.prevPage = i > 1 ? { title : arguments.posts[ i - 1 ].title, url : arguments.posts[ i - 1 ].urlPath } : { title : "", url : "" }
+			post.nextPage = i < arguments.posts.len() ? { title : arguments.posts[ i + 1 ].title, url : arguments.posts[ i + 1 ].urlPath } : { title : "", url : "" }
+
+			// Backs a theme's own `og:type: article`/`article:published_time`/
+			// `article:author` meta tags (layout.bxm, all three built-in
+			// themes) - a plain doc page never sets these, so they default to
+			// "website"/empty there instead.
+			post.ogType = "article"
+			post.publishedTime = dateTimeFormat( post.date, "yyyy-mm-dd" )
+			post.articleAuthorUrls = []
+			for ( var author in post.resolvedAuthors ) {
+				if ( len( trim( author.url ?: "" ) ) ) {
+					post.articleAuthorUrls.append( author.url )
+				}
+			}
+
+			post.contentHtml = renderPostHeaderHtml( post, arguments.basePath ) & post.contentHtml
+
+			enriched.append( post )
+		}
+
+		return enriched
+	}
+
+	/**
+	 * Splits pagination items into page-sized chunks and renders one
+	 * synthetic list-page struct per chunk.
+	 *
+	 * @items The posts to paginate (already filtered to one category, or the whole blog)
+	 * @baseDir The URL path segment these pages live under - `"blog"`, or `"blog/category/<slug>"`
+	 * @title The list's own title - `"Blog"`, or the category name
+	 * @perPage bxdocs.json's `blog.postsPerPage`
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	private array function buildListPages( required array items, required string baseDir, required string title, required numeric perPage, required string basePath ) {
+		var chunks = paginate( arguments.items, arguments.perPage )
+		var pages = []
+
+		for ( var chunk in chunks ) {
+			pages.append( {
+				title       : chunk.pageNumber == 1 ? arguments.title : ( arguments.title & " (Page " & chunk.pageNumber & ")" ),
+				description : arguments.title == "Blog" ? "Blog posts" : ( "Blog posts in " & arguments.title ),
+				contentHtml : renderListContentHtml( chunk.items, arguments.baseDir, chunk.pageNumber, chunk.totalPages, arguments.basePath ),
+				urlPath     : pageUrlPath( arguments.baseDir, chunk.pageNumber ),
+				ogImage     : chunk.items.len() ? ( chunk.items[ 1 ].image ?: "" ) : "",
+				tags        : [],
+				hidden      : false
+			} )
+		}
+
+		return pages
+	}
+
+	/**
+	 * Splits `items` into `perPage`-sized chunks, at least one (possibly
+	 * empty) page even when `items` is empty.
+	 *
+	 * @items The full, already-ordered array to paginate
+	 * @perPage Items per page - coerced to at least 1
+	 */
+	private array function paginate( required array items, required numeric perPage ) {
+		var perPage = max( 1, int( arguments.perPage ) )
+		var total = arguments.items.len()
+		var pageCount = max( 1, ceiling( total / perPage ) )
+		var pages = []
+
+		for ( var i = 1; i <= pageCount; i++ ) {
+			var startIndex = ( i - 1 ) * perPage + 1
+			var endIndex = min( i * perPage, total )
+			var pageItems = startIndex <= total ? arguments.items.slice( startIndex, endIndex - startIndex + 1 ) : []
+			pages.append( { pageNumber : i, items : pageItems, totalPages : pageCount } )
+		}
+
+		return pages
+	}
+
+	/**
+	 * The URL path for one page of a paginated list - page 1 is the list's
+	 * own root (`blog/index.html`, `blog/category/<slug>/index.html`),
+	 * every later page moves under its own `page/<n>/` (`blog/page/2/index.html`).
+	 *
+	 * @baseDir The URL path segment this list lives under
+	 * @pageNumber 1-based page number
+	 */
+	private string function pageUrlPath( required string baseDir, required numeric pageNumber ) {
+		return arguments.pageNumber == 1
+			? ( arguments.baseDir & "/index.html" )
+			: ( arguments.baseDir & "/page/" & arguments.pageNumber & "/index.html" )
+	}
+
+	/**
+	 * Renders one page's worth of post cards plus a prev/next pager.
+	 *
+	 * @pagePosts This page's own slice of posts
+	 * @baseDir The URL path segment this list lives under - for the pager's own links
+	 * @pageNumber This page's own 1-based number
+	 * @totalPages How many pages this list has in total
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	private string function renderListContentHtml( required array pagePosts, required string baseDir, required numeric pageNumber, required numeric totalPages, required string basePath ) {
+		var html = ""
+
+		if ( !arguments.pagePosts.len() ) {
+			html &= "<p>No posts yet.</p>"
+		}
+
+		for ( var post in arguments.pagePosts ) {
+			html &= renderPostCard( post, arguments.basePath )
+		}
+
+		html &= renderPager( arguments.baseDir, arguments.pageNumber, arguments.totalPages, arguments.basePath )
+
+		return html
+	}
+
+	/**
+	 * Renders one post's summary card - featured image thumbnail (if set),
+	 * linked title, date/authors/categories meta line, excerpt, "Read more".
+	 *
+	 * @post One enriched post struct
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	private string function renderPostCard( required struct post, required string basePath ) {
+		var html = '<article class="blog-post-card">'
+
+		if ( len( trim( arguments.post.image ?: "" ) ) ) {
+			html &= '<a href="' & arguments.basePath & arguments.post.urlPath & '"><img src="' & resolveAssetUrl( arguments.post.image, arguments.basePath ) & '" alt="" style="max-width:100%;height:auto;"></a>'
+		}
+
+		html &= '<h2><a href="' & arguments.basePath & arguments.post.urlPath & '">' & encodeForHTML( arguments.post.title ) & '</a></h2>'
+		html &= '<p class="blog-post-meta">' & metaLine( arguments.post, arguments.basePath ) & '</p>'
+
+		if ( len( trim( arguments.post.excerptHtml ?: "" ) ) ) {
+			html &= arguments.post.excerptHtml
+		}
+
+		html &= '<p><a href="' & arguments.basePath & arguments.post.urlPath & '">Read more &rarr;</a></p>'
+		html &= '</article><hr>'
+
+		return html
+	}
+
+	/**
+	 * Renders one post's own detail-page header - featured image, then the
+	 * same meta line renderPostCard() uses - prepended onto its real
+	 * (already-converted) body `contentHtml`.
+	 *
+	 * @post One enriched post struct
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	private string function renderPostHeaderHtml( required struct post, required string basePath ) {
+		var html = ""
+
+		if ( len( trim( arguments.post.image ?: "" ) ) ) {
+			html &= '<img src="' & resolveAssetUrl( arguments.post.image, arguments.basePath ) & '" alt="" style="max-width:100%;height:auto;" class="blog-post-featured-image">'
+		}
+
+		html &= '<p class="blog-post-meta">' & metaLine( arguments.post, arguments.basePath ) & '</p>'
+
+		return html
+	}
+
+	/**
+	 * The date/authors/categories line shown on both a post card and a
+	 * post's own detail page - authors/categories link to their own pages
+	 * when one exists.
+	 *
+	 * @post One enriched post struct
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	private string function metaLine( required struct post, required string basePath ) {
+		var parts = []
+
+		if ( len( trim( arguments.post.dateDisplay ?: "" ) ) ) {
+			parts.append( encodeForHTML( arguments.post.dateDisplay ) )
+		}
+
+		var authorLinks = []
+		for ( var author in ( arguments.post.resolvedAuthors ?: [] ) ) {
+			authorLinks.append(
+				len( author.id )
+					? ( '<a href="' & arguments.basePath & 'blog/authors/' & author.id & '/index.html">' & encodeForHTML( author.name ) & '</a>' )
+					: encodeForHTML( author.name )
+			)
+		}
+		if ( authorLinks.len() ) {
+			parts.append( "by " & authorLinks.toList( ", " ) )
+		}
+
+		var categoryLinks = []
+		for ( var category in ( arguments.post.categories ?: [] ) ) {
+			categoryLinks.append( '<a href="' & arguments.basePath & 'blog/category/' & slugify( category ) & '/index.html">' & encodeForHTML( category ) & '</a>' )
+		}
+		if ( categoryLinks.len() ) {
+			parts.append( "in " & categoryLinks.toList( ", " ) )
+		}
+
+		return parts.toList( " &middot; " )
+	}
+
+	/**
+	 * Renders a "Newer posts"/"Older posts" pager - empty when there's only
+	 * one page.
+	 *
+	 * @baseDir The URL path segment this list lives under
+	 * @pageNumber This page's own 1-based number
+	 * @totalPages How many pages this list has in total
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	private string function renderPager( required string baseDir, required numeric pageNumber, required numeric totalPages, required string basePath ) {
+		if ( arguments.totalPages <= 1 ) {
+			return ""
+		}
+
+		var html = '<nav class="blog-pager" aria-label="Blog pagination">'
+		if ( arguments.pageNumber > 1 ) {
+			html &= '<a href="' & arguments.basePath & pageUrlPath( arguments.baseDir, arguments.pageNumber - 1 ) & '">&larr; Newer posts</a> '
+		}
+		if ( arguments.pageNumber < arguments.totalPages ) {
+			html &= '<a href="' & arguments.basePath & pageUrlPath( arguments.baseDir, arguments.pageNumber + 1 ) & '">Older posts &rarr;</a>'
+		}
+		html &= '</nav>'
+
+		return html
+	}
+
+	/**
+	 * Renders one author's `/blog/authors/<id>/` page - avatar, title, bio,
+	 * website/email/social links, then every one of their own posts as cards.
+	 *
+	 * @author One resolved author struct (BlogAuthorsLoader.load()'s own per-id shape)
+	 * @authorPosts This author's own posts, newest first
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	private string function renderAuthorPageHtml( required struct author, required array authorPosts, required string basePath ) {
+		var html = '<div class="blog-author-profile">'
+
+		if ( len( trim( arguments.author.avatar ?: "" ) ) ) {
+			html &= '<img src="' & resolveAssetUrl( arguments.author.avatar, arguments.basePath ) & '" alt="' & encodeForHTML( arguments.author.name ) & '" style="max-width:120px;border-radius:50%;">'
+		}
+		if ( len( trim( arguments.author.title ?: "" ) ) ) {
+			html &= '<p><em>' & encodeForHTML( arguments.author.title ) & '</em></p>'
+		}
+		if ( len( trim( arguments.author.bio ?: "" ) ) ) {
+			html &= '<p>' & encodeForHTML( arguments.author.bio ) & '</p>'
+		}
+
+		var links = []
+		if ( len( trim( arguments.author.url ?: "" ) ) ) {
+			links.append( '<a href="' & attrEscapeUrl( arguments.author.url ) & '">Website</a>' )
+		}
+		if ( len( trim( arguments.author.email ?: "" ) ) ) {
+			links.append( '<a href="mailto:' & attrEscapeUrl( arguments.author.email ) & '">Email</a>' )
+		}
+		for ( var socialName in ( arguments.author.socials ?: {} ) ) {
+			links.append( '<a href="' & attrEscapeUrl( arguments.author.socials[ socialName ] ) & '">' & encodeForHTML( socialName ) & '</a>' )
+		}
+		if ( links.len() ) {
+			html &= '<p>' & links.toList( " &middot; " ) & '</p>'
+		}
+
+		html &= '</div><h2>Posts</h2>'
+		for ( var post in arguments.authorPosts ) {
+			html &= renderPostCard( post, arguments.basePath )
+		}
+
+		return html
+	}
+
+	/**
+	 * Splits a post's own `contentHtml` at its first `<!-- more -->` marker
+	 * (GitBook/mkdocs-material's own excerpt convention - an HTML comment,
+	 * so it's invisible if left in the full post's own rendered page too, no
+	 * stripping needed there) into a excerpt `{ html, text }` pair; falls
+	 * back to frontmatter `summary` when there's no marker, then to a plain-text
+	 * truncation of the post's own body when there's no summary either.
+	 *
+	 * @contentHtml The post's own already-converted body HTML
+	 * @summary The post's own frontmatter `summary`, if any
+	 */
+	private struct function computeExcerpt( required string contentHtml, required string summary ) {
+		var markerPos = arguments.contentHtml.findNoCase( "<!-- more -->" )
+		if ( markerPos > 0 ) {
+			var html = left( arguments.contentHtml, markerPos - 1 )
+			return { html : html, text : stripTags( html ) }
+		}
+
+		if ( len( trim( arguments.summary ) ) ) {
+			return { html : '<p>' & encodeForHTML( arguments.summary ) & '</p>', text : arguments.summary }
+		}
+
+		var truncated = truncateText( stripTags( arguments.contentHtml ), 220 )
+		return { html : '<p>' & encodeForHTML( truncated ) & '</p>', text : truncated }
+	}
+
+	/**
+	 * A crude HTML-tag stripper for excerpt/description text - good enough
+	 * for "plain text summary of this HTML", not a real sanitizer.
+	 *
+	 * @html Rendered HTML
+	 */
+	private string function stripTags( required string html ) {
+		return trim( arguments.html.reReplace( "<[^>]+>", " ", "all" ).reReplace( "\s+", " ", "all" ) )
+	}
+
+	/**
+	 * Truncates plain text to at most `maxLength` characters, backing off to
+	 * the previous word boundary rather than cutting mid-word.
+	 *
+	 * @text Plain text (already HTML-tag-stripped)
+	 * @maxLength Maximum length before the trailing ellipsis
+	 */
+	private string function truncateText( required string text, required numeric maxLength ) {
+		if ( len( arguments.text ) <= arguments.maxLength ) {
+			return arguments.text
+		}
+		return left( arguments.text, arguments.maxLength ).reReplace( "\s+\S*$", "", "one" ) & "…"
+	}
+
+	/**
+	 * Every distinct category used across `posts`, alphabetical - a post's
+	 * `categories` list can repeat the same name with different casing
+	 * across posts; the first-seen casing wins.
+	 *
+	 * @posts Enriched posts
+	 */
+	private array function distinctCategories( required array posts ) {
+		var seen = {}
+		var categories = []
+		for ( var post in arguments.posts ) {
+			for ( var category in ( post.categories ?: [] ) ) {
+				var key = lCase( trim( category ) )
+				if ( !len( key ) || seen.keyExists( key ) ) {
+					continue
+				}
+				seen[ key ] = true
+				categories.append( category )
+			}
+		}
+		categories.sort( "textnocase" )
+		return categories
+	}
+
+	/**
+	 * Every distinct resolved author id referenced across `posts` (a
+	 * plain-string author with no matching authors.yml entry has no `id` -
+	 * skipped here, since it has no page of its own to build).
+	 *
+	 * @posts Enriched posts
+	 */
+	private array function distinctAuthorIds( required array posts ) {
+		var seen = {}
+		var ids = []
+		for ( var post in arguments.posts ) {
+			for ( var author in ( post.resolvedAuthors ?: [] ) ) {
+				if ( !len( author.id ) || seen.keyExists( lCase( author.id ) ) ) {
+					continue
+				}
+				seen[ lCase( author.id ) ] = true
+				ids.append( author.id )
+			}
+		}
+		return ids
+	}
+
+	/**
+	 * Whether `post` credits `authorId` among its own resolved authors.
+	 *
+	 * @post One enriched post struct
+	 * @authorId The author id being filtered for
+	 */
+	private boolean function postHasAuthorId( required struct post, required string authorId ) {
+		for ( var author in ( arguments.post.resolvedAuthors ?: [] ) ) {
+			if ( len( author.id ) && compareNoCase( author.id, arguments.authorId ) == 0 ) {
+				return true
+			}
+		}
+		return false
+	}
+
+	/**
+	 * Whether `categories` contains `category`, case-insensitively.
+	 *
+	 * @categories A post's own `categories` array
+	 * @category The category being filtered for
+	 */
+	private boolean function hasCategoryNoCase( required array categories, required string category ) {
+		for ( var c in arguments.categories ) {
+			if ( compareNoCase( c, arguments.category ) == 0 ) {
+				return true
+			}
+		}
+		return false
+	}
+
+	/**
+	 * Slugs a category name into its `blog/category/<slug>/` path segment -
+	 * kept in sync with BlogFeedGenerator.bx's own identical slugify() by
+	 * convention, the same duplication TagsIndexBuilder.bx's own tagSlug()
+	 * already accepts for the same reason.
+	 *
+	 * @category The raw category text
+	 */
+	private string function slugify( required string category ) {
+		return lCase( trim( arguments.category ) ).reReplace( "[^a-z0-9]+", "-", "all" ).reReplace( "(^-|-$)", "", "all" )
+	}
+
+	/**
+	 * Resolves a `docs/assets/`-relative image path against `basePath` -
+	 * left alone when it's already an absolute URL, identical to every
+	 * built-in theme's own `resolveAssetUrl()` in `layout.bxm`.
+	 *
+	 * @url The raw image path/URL
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	private string function resolveAssetUrl( required string url, required string basePath ) {
+		return arguments.url.reFindNoCase( "^[a-z][a-z0-9+.\-]*://" ) ? arguments.url : arguments.basePath & arguments.url
+	}
+
+	/**
+	 * A minimal, attribute-safe escape for an author-authored URL (website/
+	 * email/social link) - not encodeForHTML(), same reasoning as
+	 * UpdatesFeedGenerator.bx's own attrEscape().
+	 *
+	 * @value The raw URL/email value
+	 */
+	private string function attrEscapeUrl( required string value ) {
+		return arguments.value.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
+	}
+
+}

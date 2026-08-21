@@ -35,6 +35,10 @@ class {
 	variables.updatesFeedGenerator = new "models.build.UpdatesFeedGenerator@bxdocs"()
 	variables.pluginLoader = new "models.build.PluginLoader@bxdocs"()
 	variables.iconResolver = new "models.build.IconResolver@bxdocs"()
+	variables.blogDiscoverer = new "models.build.BlogDiscoverer@bxdocs"()
+	variables.blogAuthorsLoader = new "models.build.BlogAuthorsLoader@bxdocs"()
+	variables.blogBuilder = new "models.build.BlogBuilder@bxdocs"()
+	variables.blogFeedGenerator = new "models.build.BlogFeedGenerator@bxdocs"()
 	variables.pluginsOverride = []
 	variables.hasPluginsOverride = false
 
@@ -130,7 +134,16 @@ class {
 
 		var navConfig = resolveExplicitNav( root & "/docs", config.nav )
 		var mainPages = variables.docsLoader.load( root & "/docs" )
-		var mainResult = renderDocTree( mainPages, root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, navConfig, locales, defaultLocaleCode, defaultLocaleDir )
+		// Loaded (frontmatter parsed, not yet markdown-converted) up front,
+		// purely so the main tree's own nav can carry a "Blog" entry from
+		// its very first render - see renderDocTree()'s own blogNavUrl
+		// docblock. The full post-processing/rendering pass happens after
+		// the main tree (and every version/locale tree) is done, alongside
+		// the tags page/sitemap/llms.txt/search index, all of which fold
+		// blog posts in too.
+		var blogPosts = variables.blogDiscoverer.load( root & "/docs" )
+		var blogNavUrl = blogPosts.len() ? "blog/index.html" : ""
+		var mainResult = renderDocTree( mainPages, root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, navConfig, locales, defaultLocaleCode, defaultLocaleDir, blogNavUrl )
 		var allPages = duplicate( mainResult.pages )
 		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math )
 
@@ -223,8 +236,58 @@ class {
 			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math )
 		}
 
+		var tagsPages = mainResult.pages
+
+		if ( blogPosts.len() ) {
+			// A featured image (frontmatter `image`) becomes a post's own
+			// `og:image` when it hasn't set an explicit `ogImage` of its
+			// own - resolved here, before assignOgImages() below, so a real
+			// featured image always wins over an auto-generated text card
+			// (assignOgImages() only generates one when `page.ogImage` is
+			// still empty at the point it runs).
+			for ( var post in blogPosts ) {
+				if ( !len( trim( post.ogImage ) ) ) {
+					post.ogImage = post.image
+				}
+			}
+
+			convertMarkdown( blogPosts, config, plugins, urls.basePath, root & "/docs" )
+			assignTableOfContents( blogPosts )
+			assignEditAndLastUpdated( blogPosts, config, root, "" )
+			assignOgImages( blogPosts, config, siteDir )
+			assignMarkdownUrl( blogPosts )
+			assignIconHtml( blogPosts, root & "/docs" )
+
+			var blogAuthors = variables.blogAuthorsLoader.load( root & "/docs" )
+			var blogResult = variables.blogBuilder.build( blogPosts, blogAuthors, config.blog.postsPerPage, urls.basePath )
+
+			for ( var post in blogResult.posts ) {
+				writeRenderedPage( post, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir )
+			}
+			for ( var indexPage in blogResult.indexPages ) {
+				writeRenderedPage( indexPage, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir )
+			}
+
+			variables.markdownPublisher.publish( blogResult.posts, siteDir )
+
+			if ( len( urls.absolute ) && config.blog.feed ) {
+				directoryCreate( siteDir & "/blog", true, true )
+				fileWrite( siteDir & "/blog/feed.xml", variables.blogFeedGenerator.build( blogResult.posts, config.name, urls.absolute, urls.basePath ) )
+			}
+
+			tagsPages = duplicate( mainResult.pages )
+			tagsPages.append( blogResult.posts, true )
+
+			allPages.append( blogResult.posts, true )
+			allPages.append( blogResult.indexPages, true )
+
+			if ( searchNeedsLocalIndex( config ) ) {
+				writeSearchIndex( tagsPages, siteDir )
+			}
+		}
+
 		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, "Latest", locales, defaultLocaleCode )
-		writeTagsPage( mainResult.pages, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode )
+		writeTagsPage( tagsPages, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode )
 
 		if ( len( urls.absolute ) ) {
 			fileWrite( siteDir & "/sitemap.xml", variables.sitemapGenerator.build( allPages, urls.absolute ) )
@@ -281,6 +344,7 @@ class {
 	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]`, the default locale first - only the locales *this specific tree* has translations for (top-level `docs/i18n/<code>/` for the main tree, `docs/versions/<name>/i18n/<code>/` for a version tree and its own nested locale trees), so switching locale always stays within the current version
 	 * @currentLocale Which `locales` entry's `code` this tree IS, for the switcher's own "selected" state - the default locale's own code for the main tree and every version tree's own default-locale render (never "")
 	 * @currentLocaleDir `"ltr"`/`"rtl"`, this tree's own locale direction - stamped onto `<html dir="...">`
+	 * @blogNavUrl A synthetic "Blog" nav entry's own `url` (`"blog/index.html"`), appended to this tree's own nav when non-empty - "" (the default) adds nothing. Only ever passed for the main tree's own render (build()'s docblock) - a version/locale tree's nav stays exactly as its own folder structure infers, same as it already does for tags (no nav entry at all there either, see writeTagsPage()'s docblock)
 	 *
 	 * @return { pages, nav }
 	 */
@@ -300,7 +364,8 @@ class {
 		array navConfig = [],
 		array locales = [],
 		string currentLocale = "",
-		string currentLocaleDir = "ltr"
+		string currentLocaleDir = "ltr",
+		string blogNavUrl = ""
 	) {
 		// Deep-copied rather than aliased - `pages` gets mutated in place
 		// below (contentHtml/toc/editUrl/ogImage/... added per tree), and the
@@ -312,7 +377,15 @@ class {
 		var pages = duplicate( arguments.pages )
 		var nav = variables.navBuilder.build( pages, arguments.navConfig )
 		nav = variables.pluginLoader.applyOnNav( arguments.plugins, nav, arguments.config )
+		// Captured before the synthetic "Blog" nav node (if any) is appended
+		// below, so a regular page's own prev/next chain (assignPrevNext(),
+		// against this tree's own `pages` only) never jumps into the blog -
+		// blog posts get their own chronological prev/next instead
+		// (BlogBuilder.bx).
 		var flatSequence = variables.navBuilder.flatten( nav )
+		if ( len( arguments.blogNavUrl ) ) {
+			nav.append( { title : "Blog", url : arguments.blogNavUrl, order : 999999, icon : "lucide:newspaper", children : [] } )
+		}
 		assignNavIconHtml( nav, arguments.docsDir )
 
 		directoryCreate( arguments.outputDir, true, true )
@@ -846,6 +919,35 @@ class {
 		var base = arguments.repoUrl.reReplace( "[\/]+$", "" )
 		var uri = arguments.editUri.reReplace( "^[\/]+|[\/]+$", "", "all" )
 		return base & "/" & uri & "/" & arguments.relativePath
+	}
+
+	/**
+	 * Renders one already-content-ready page - a blog post, or one of its
+	 * synthetic list/category/author pages (BlogBuilder.bx's own output) -
+	 * through the active theme and writes it to `siteDir` at its own
+	 * `urlPath`. The same render-then-write shape renderDocTree()'s own
+	 * per-page loop uses for a normal doc tree, pulled out here since the
+	 * blog writes its pages outside that loop (build()'s own docblock).
+	 *
+	 * @page A page struct with `contentHtml`/`urlPath` already set
+	 * @nav The main tree's own nav (already carrying its "Blog" entry - renderDocTree()'s own blogNavUrl)
+	 * @config The site's config
+	 * @themeDir Absolute path to the resolved theme folder
+	 * @siteDir Absolute path to the build output directory
+	 * @basePath Root-relative base path ending with `/`
+	 * @versions Version switcher entries as `[ { label, url } ]`
+	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]`
+	 * @currentLocale The default locale's own code - the blog is main-tree-only in v1, not rendered per-locale
+	 * @currentLocaleDir The default locale's own direction
+	 */
+	private void function writeRenderedPage( required struct page, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required array locales, required string currentLocale, required string currentLocaleDir ) {
+		var html = variables.themeRenderer.renderPage(
+			arguments.page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, "Latest",
+			arguments.locales, arguments.currentLocale, arguments.currentLocaleDir
+		)
+		var outputPath = arguments.siteDir & "/" & arguments.page.urlPath
+		directoryCreate( getDirectoryFromPath( outputPath ), true, true )
+		fileWrite( outputPath, html )
 	}
 
 	/**

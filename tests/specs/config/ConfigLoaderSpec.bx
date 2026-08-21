@@ -36,6 +36,42 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxDocs.ConfigNotFound" );
 			} );
 
+			it( "loads bxdocs.yaml via the injected YAML renderer when there's no bxdocs.json", function() {
+				// FakeYamlRenderer.bx round-trips through JSON, not real
+				// YAML - real bx-yaml BIFs aren't safely callable in a bare
+				// unit test (YamlRenderer.bx's own docblock) - so the fixture
+				// below is JSON text saved with a .yaml extension, on
+				// purpose, matched by the same fake on the reading side.
+				var dir = createTempDirectory( prefix = "bxdocs-configloader-yaml-" );
+				tempDirs.append( dir );
+				fileWrite( dir & "/bxdocs.yaml", '{"name":"My Docs"}' );
+				loader.setYamlRenderer( new "tests.support.FakeYamlRenderer@bxdocs"() );
+
+				var config = loader.load( dir );
+
+				expect( config.name ).toBe( "My Docs" );
+				expect( config.theme.name ).toBe( "bootstrap" );
+			} );
+
+			it( "prefers bxdocs.yaml over bxdocs.json when both are present", function() {
+				var dir = newProjectDir( '{"name":"JSON Site"}' );
+				fileWrite( dir & "/bxdocs.yaml", '{"name":"YAML Site"}' );
+				loader.setYamlRenderer( new "tests.support.FakeYamlRenderer@bxdocs"() );
+
+				expect( loader.load( dir ).name ).toBe( "YAML Site" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig for malformed YAML", function() {
+				var dir = createTempDirectory( prefix = "bxdocs-configloader-badyaml-" );
+				tempDirs.append( dir );
+				fileWrite( dir & "/bxdocs.yaml", "{ not valid" );
+				loader.setYamlRenderer( new "tests.support.FakeYamlRenderer@bxdocs"() );
+
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
 			it( "throws BxDocs.InvalidConfig for malformed JSON", function() {
 				var dir = newProjectDir( "{ not valid json" );
 				expect( function() {
@@ -468,6 +504,50 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "throws BxDocs.InvalidConfig when [math] is not a boolean", function() {
 				var dir = newProjectDir( '{"name":"My Docs","math":"yes please"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "defaults [blog.postsPerPage] to 10 and [blog.feed] to true", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				var config = loader.load( dir );
+
+				expect( config.blog.postsPerPage ).toBe( 10 );
+				expect( config.blog.feed ).toBeTrue();
+			} );
+
+			it( "deep-merges a partial [blog] override, keeping the default feed", function() {
+				var dir = newProjectDir( '{"name":"My Docs","blog":{"postsPerPage":5}}' );
+				var config = loader.load( dir );
+
+				expect( config.blog.postsPerPage ).toBe( 5 );
+				expect( config.blog.feed ).toBeTrue();
+			} );
+
+			it( "preserves a user-supplied [blog.feed] of false", function() {
+				var dir = newProjectDir( '{"name":"My Docs","blog":{"feed":false}}' );
+				expect( loader.load( dir ).blog.feed ).toBeFalse();
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [blog] is not an object", function() {
+				var dir = newProjectDir( '{"name":"My Docs","blog":"nope"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidConfig" );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [blog.postsPerPage] is not a positive whole number", function() {
+				for ( var badValue in [ 0, -1, 1.5, "ten" ] ) {
+					var dir = newProjectDir( '{"name":"My Docs","blog":{"postsPerPage":' & ( isNumeric( badValue ) ? badValue : '"' & badValue & '"' ) & '}}' );
+					expect( function() {
+						loader.load( dir );
+					} ).toThrow( "BxDocs.InvalidConfig" );
+				}
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [blog.feed] is not a boolean", function() {
+				var dir = newProjectDir( '{"name":"My Docs","blog":{"feed":"yes please"}}' );
 				expect( function() {
 					loader.load( dir );
 				} ).toThrow( "BxDocs.InvalidConfig" );

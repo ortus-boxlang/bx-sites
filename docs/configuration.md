@@ -51,6 +51,9 @@ plugins: []
 i18n:
   defaultLocale: { code: en, label: English }
   locales: []
+blog:
+  postsPerPage: 10
+  feed: true
 ```
 
 The equivalent `bxdocs.json`, for a project that prefers it:
@@ -94,6 +97,10 @@ The equivalent `bxdocs.json`, for a project that prefers it:
 	"i18n": {
 		"defaultLocale": { "code": "en", "label": "English" },
 		"locales": []
+	},
+	"blog": {
+		"postsPerPage": 10,
+		"feed": true
 	}
 }
 ```
@@ -562,6 +569,24 @@ switcher.
 See [Internationalization](guides/i18n.md) for the full picture -
 untranslated-page fallback, the language switcher, and what isn't
 translated yet.
+
+## `blog`
+
+Options for the [blog](guides/blog.md) - itself a by-convention feature
+(`docs/blog/posts/`), no key here required to turn it on.
+
+- `blog.postsPerPage` - `10` (the default) - how many posts per page on
+  `/blog/` and every category page before it moves to `.../page/2/`.
+- `blog.feed` - `true` (the default) - whether `/blog/feed.xml` (RSS 2.0)
+  is written. Only meaningful with an absolute `baseURL`, same requirement
+  as `sitemap.xml`.
+
+```json
+{ "blog": { "postsPerPage": 10, "feed": true } }
+```
+
+See [Blog](guides/blog.md) for post/author frontmatter, categories,
+featured images, and SEO/social metadata.
 
 ## Versioning
 

@@ -122,6 +122,20 @@
 		return arguments.url.reFindNoCase( "^[a-z][a-z0-9+.\-]*://" ) ? arguments.url : variables.basePath & arguments.url
 	}
 
+	// A blog post (BlogBuilder.bx) sets `page.publishedTime`/`page.articleAuthorUrls`
+	// on top of the fields every page already has - a plain doc page leaves
+	// both unset, so this renders nothing for it.
+	function renderArticleMeta() {
+		if ( !len( trim( variables.page.publishedTime ?: "" ) ) ) {
+			return ""
+		}
+		var html = '<meta property="article:published_time" content="' & encodeForHTML( variables.page.publishedTime ) & '">'
+		for ( var authorUrl in ( variables.page.articleAuthorUrls ?: [] ) ) {
+			html &= '<meta property="article:author" content="' & encodeForHTML( authorUrl ) & '">'
+		}
+		return html
+	}
+
 	function renderBrandMark() {
 		var logo = trim( variables.siteConfig.theme.logo ?: "" )
 		var name = encodeForHTML( variables.siteConfig.name )
@@ -174,9 +188,10 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#</title>
-	<meta property="og:type" content="website">
+	<meta property="og:type" content="#encodeForHTML( len( trim( variables.page.ogType ?: '' ) ) ? variables.page.ogType : 'website' )#">
 	<meta property="og:site_name" content="#encodeForHTML( variables.siteConfig.name )#">
 	<meta property="og:title" content="#encodeForHTML( variables.page.title )#">
+	#renderArticleMeta()#
 </bx:output><bx:if condition="#len( variables.ogDescription )#"><bx:output>
 	<meta name="description" content="#encodeForHTML( variables.ogDescription )#">
 	<meta property="og:description" content="#encodeForHTML( variables.ogDescription )#">

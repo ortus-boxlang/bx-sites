@@ -26,6 +26,21 @@ class {
 	variables.configFileName = "bxdocs.yaml"
 
 	/**
+	 * Parses `bxdocs.yaml`/`.yml` - real bx-yaml BIFs by default, swappable
+	 * via setYamlRenderer() (YamlRenderer.bx's own docblock explains why).
+	 */
+	variables.yamlRenderer = new "models.build.YamlRenderer@bxdocs"()
+
+	/**
+	 * Swaps in a fake/test YAML renderer - see YamlRenderer.bx's docblock.
+	 *
+	 * @renderer Any object exposing `fromYaml( content )`
+	 */
+	void function setYamlRenderer( required any renderer ) {
+		variables.yamlRenderer = arguments.renderer
+	}
+
+	/**
 	 * Default site configuration, deep-merged with the user's site config.
 	 * Markdown passthrough options are otherwise left to bx-markdown's own
 	 * defaults - the one exception is `enableAdmonition`, which bx-docs
@@ -57,7 +72,8 @@ class {
 		"extraCss"     : [],
 		"extraJs"      : [],
 		"plugins"      : [],
-		"i18n"         : { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] }
+		"i18n"         : { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] },
+		"blog"         : { "postsPerPage" : 10, "feed" : true }
 	}
 
 	/**
@@ -89,7 +105,7 @@ class {
 
 		var parsed = ""
 		try {
-			parsed = isYaml ? yamlDeserialize( fileRead( configPath ) ) : jsonDeserialize( fileRead( configPath ) )
+			parsed = isYaml ? variables.yamlRenderer.fromYaml( fileRead( configPath ) ) : jsonDeserialize( fileRead( configPath ) )
 		} catch ( any e ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
@@ -365,8 +381,42 @@ class {
 		}
 
 		validateI18n( arguments.config.i18n ?: "" )
+		validateBlog( arguments.config.blog ?: "" )
 
 		return arguments.config
+	}
+
+	/**
+	 * Validates the site config's `blog` block - the `docs/blog/posts/`
+	 * by-convention feature's own display/pagination options. No `docs/blog/`
+	 * folder needs to exist for this to validate cleanly; it's only ever
+	 * consulted once BlogDiscoverer.bx finds at least one post.
+	 *
+	 * @blog The merged config's own `blog` value - `any`, not `struct`, for
+	 * the same reason validateI18n() takes `any` (see its own docblock)
+	 */
+	private void function validateBlog( required any blog ) {
+		if ( !isStruct( arguments.blog ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "#variables.configFileName# [blog], when present, must be an object"
+			)
+		}
+
+		var postsPerPage = arguments.blog.postsPerPage ?: 10
+		if ( !isNumeric( postsPerPage ) || val( postsPerPage ) < 1 || val( postsPerPage ) != int( val( postsPerPage ) ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "#variables.configFileName# [blog.postsPerPage], when present, must be a positive whole number"
+			)
+		}
+
+		if ( arguments.blog.keyExists( "feed" ) && !isBoolean( arguments.blog.feed ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "#variables.configFileName# [blog.feed], when present, must be a boolean"
+			)
+		}
 	}
 
 	/**

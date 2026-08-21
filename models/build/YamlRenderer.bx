@@ -1,0 +1,35 @@
+/**
+ * Reads/writes YAML via bx-yaml's `yamlDeserialize()`/`yamlSerialize()` BIFs -
+ * the same "delegate to a real module, don't hand-roll" approach
+ * MarkdownRenderer.bx already takes for markdown (its own docblock explains
+ * why in full).
+ *
+ * Has a hard runtime dependency on the bx-yaml module being activated
+ * (box.json declares it as a dependency) and so has no unit tests of its
+ * own - every caller (ConfigLoader.bx, MkdocsMigrator.bx,
+ * BlogAuthorsLoader.bx) takes this class behind a swappable seam for
+ * exactly that reason, the same shape BuildPipeline.bx's own
+ * `setMarkdownRenderer()` already established - see
+ * tests/support/FakeYamlRenderer.bx.
+ */
+class {
+
+	/**
+	 * Parses a YAML document into a BoxLang value (struct/array/scalar).
+	 *
+	 * @content Raw YAML text
+	 */
+	any function fromYaml( required string content ) {
+		return yamlDeserialize( arguments.content )
+	}
+
+	/**
+	 * Serializes a BoxLang value into YAML text.
+	 *
+	 * @value The struct/array/scalar to serialize
+	 */
+	string function toYaml( required any value ) {
+		return yamlSerialize( arguments.value )
+	}
+
+}

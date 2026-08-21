@@ -1,0 +1,107 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.BlogFeedGenerator", function() {
+
+			beforeEach( function() {
+				variables.generator = new "models.build.BlogFeedGenerator@bxdocs"();
+			} );
+
+			private struct function newPost( struct overrides = {} ) {
+				var post = {
+					title       : "Hello World",
+					urlPath     : "blog/hello-world/index.html",
+					date        : "2026-01-01",
+					categories  : [],
+					resolvedAuthors : [],
+					excerptText : "An excerpt.",
+					description : ""
+				};
+				for ( var key in arguments.overrides ) {
+					post[ key ] = arguments.overrides[ key ]
+				}
+				return post;
+			}
+
+			it( "renders a valid RSS 2.0 shell with the whole-blog channel title/link", function() {
+				var xml = generator.build( [], "BX Docs", "https://example.com/", "/" );
+
+				expect( xml ).toInclude( '<rss version="2.0"' );
+				expect( xml ).toInclude( "<title>BX Docs Blog</title>" );
+				expect( xml ).toInclude( "<link>https://example.com/blog/</link>" );
+			} );
+
+			it( "renders one <item> per post, with an absolute, extensionless link", function() {
+				var xml = generator.build( [ newPost() ], "BX Docs", "https://example.com/", "/" );
+
+				expect( xml ).toInclude( "<title>Hello World</title>" );
+				expect( xml ).toInclude( "<link>https://example.com/blog/hello-world/</link>" );
+				expect( xml ).toInclude( '<guid isPermaLink="true">https://example.com/blog/hello-world/</guid>' );
+			} );
+
+			it( "renders <pubDate> from the post's own date", function() {
+				var xml = generator.build( [ newPost( { date : "2026-03-15" } ) ], "BX Docs", "https://example.com/", "/" );
+
+				expect( xml ).toInclude( "15 Mar 2026" );
+			} );
+
+			it( "renders one <dc:creator> per resolved author", function() {
+				var post = newPost( { resolvedAuthors : [ { id : "lmajano", name : "Luis Majano" }, { id : "", name : "Guest" } ] } );
+
+				var xml = generator.build( [ post ], "BX Docs", "https://example.com/", "/" );
+
+				expect( xml ).toInclude( "<dc:creator>Luis Majano</dc:creator>" );
+				expect( xml ).toInclude( "<dc:creator>Guest</dc:creator>" );
+			} );
+
+			it( "renders one <category> per post category", function() {
+				var post = newPost( { categories : [ "Releases", "News" ] } );
+
+				var xml = generator.build( [ post ], "BX Docs", "https://example.com/", "/" );
+
+				expect( xml ).toInclude( "<category>Releases</category>" );
+				expect( xml ).toInclude( "<category>News</category>" );
+			} );
+
+			it( "uses excerptText for <description>, falling back to description then title", function() {
+				var withExcerpt = generator.build( [ newPost( { excerptText : "My excerpt" } ) ], "BX Docs", "https://example.com/", "/" );
+				expect( withExcerpt ).toInclude( "<description>My excerpt</description>" );
+
+				var withDescriptionOnly = generator.build( [ newPost( { excerptText : "", description : "My description" } ) ], "BX Docs", "https://example.com/", "/" );
+				expect( withDescriptionOnly ).toInclude( "<description>My description</description>" );
+
+				var withNeither = generator.build( [ newPost( { excerptText : "", description : "" } ) ], "BX Docs", "https://example.com/", "/" );
+				expect( withNeither ).toInclude( "<description>Hello World</description>" );
+			} );
+
+			it( "filters to one category and titles/links the feed accordingly", function() {
+				var releasePost = newPost( { title : "Release Post", categories : [ "Releases" ] } );
+				var newsPost = newPost( { title : "News Post", categories : [ "News" ] } );
+
+				var xml = generator.build( [ releasePost, newsPost ], "BX Docs", "https://example.com/", "/", "Releases" );
+
+				expect( xml ).toInclude( "<title>BX Docs Blog - Releases</title>" );
+				expect( xml ).toInclude( "<link>https://example.com/blog/category/releases/</link>" );
+				expect( xml ).toInclude( "Release Post" );
+				expect( xml ).notToInclude( "News Post" );
+			} );
+
+			it( "matches a category filter case-insensitively", function() {
+				var post = newPost( { categories : [ "releases" ] } );
+
+				var xml = generator.build( [ post ], "BX Docs", "https://example.com/", "/", "Releases" );
+
+				expect( xml ).toInclude( "Hello World" );
+			} );
+
+			it( "HTML-escapes a post's own title", function() {
+				var xml = generator.build( [ newPost( { title : "A & B" } ) ], "BX Docs", "https://example.com/", "/" );
+
+				expect( xml ).toInclude( "A &amp; B" );
+				expect( xml ).notToInclude( "<title>A & B</title>" );
+			} );
+
+		} );
+	}
+
+}

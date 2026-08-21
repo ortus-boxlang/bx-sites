@@ -1,0 +1,146 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.BlogDiscoverer", function() {
+
+			beforeEach( function() {
+				variables.discoverer = new "models.build.BlogDiscoverer@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newDocsDir() {
+				var dir = createTempDirectory( prefix = "bxdocs-blogdiscoverer-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			private function writePost( required string docsDir, required string fileName, required string content ) {
+				directoryCreate( arguments.docsDir & "/blog/posts", true, true );
+				fileWrite( arguments.docsDir & "/blog/posts/" & arguments.fileName, arguments.content );
+			}
+
+			it( "returns an empty array when docs/blog/posts/ doesn't exist", function() {
+				var dir = newDocsDir();
+				expect( discoverer.load( dir ) ).toBeArray();
+				expect( discoverer.load( dir ).len() ).toBe( 0 );
+			} );
+
+			it( "loads a post with its own relativePath/sourcePath/urlPath/slug", function() {
+				var dir = newDocsDir();
+				writePost( dir, "hello-world.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var posts = discoverer.load( dir );
+
+				expect( posts.len() ).toBe( 1 );
+				expect( posts[ 1 ].relativePath ).toBe( "blog/posts/hello-world.md" );
+				expect( posts[ 1 ].sourcePath ).toBe( dir & "/blog/posts/hello-world.md" );
+				expect( posts[ 1 ].slug ).toBe( "hello-world" );
+				expect( posts[ 1 ].urlPath ).toBe( "blog/hello-world/index.html" );
+				expect( posts[ 1 ].hidden ).toBeFalse();
+			} );
+
+			it( "derives the title from the filename when frontmatter has none", function() {
+				var dir = newDocsDir();
+				writePost( dir, "hello-world.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				expect( discoverer.load( dir )[ 1 ].title ).toBe( "Hello World" );
+			} );
+
+			it( "honors an explicit frontmatter title and slug", function() {
+				var dir = newDocsDir();
+				writePost( dir, "hello-world.md", "---" & char( 10 ) & "title: Hi There" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "slug: custom-slug" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var post = discoverer.load( dir )[ 1 ];
+				expect( post.title ).toBe( "Hi There" );
+				expect( post.slug ).toBe( "custom-slug" );
+				expect( post.urlPath ).toBe( "blog/custom-slug/index.html" );
+			} );
+
+			it( "throws BxDocs.InvalidBlogPost when frontmatter [date] is missing", function() {
+				var dir = newDocsDir();
+				writePost( dir, "no-date.md", "---" & char( 10 ) & "title: No Date" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				expect( function() {
+					discoverer.load( dir );
+				} ).toThrow( "BxDocs.InvalidBlogPost" );
+			} );
+
+			it( "throws BxDocs.InvalidBlogPost when frontmatter [date] isn't a valid date", function() {
+				var dir = newDocsDir();
+				writePost( dir, "bad-date.md", "---" & char( 10 ) & "date: not-a-date" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				expect( function() {
+					discoverer.load( dir );
+				} ).toThrow( "BxDocs.InvalidBlogPost" );
+			} );
+
+			it( "excludes a draft post by default", function() {
+				var dir = newDocsDir();
+				writePost( dir, "draft-post.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "draft: true" & char( 10 ) & "---" & char( 10 ) & "Body." );
+				writePost( dir, "real-post.md", "---" & char( 10 ) & "date: 2026-01-02" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var posts = discoverer.load( dir );
+
+				expect( posts.len() ).toBe( 1 );
+				expect( posts[ 1 ].slug ).toBe( "real-post" );
+			} );
+
+			it( "includes a draft post when includeDrafts is true", function() {
+				var dir = newDocsDir();
+				writePost( dir, "draft-post.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "draft: true" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				expect( discoverer.load( dir, true ).len() ).toBe( 1 );
+			} );
+
+			it( "sorts posts newest first by date", function() {
+				var dir = newDocsDir();
+				writePost( dir, "older.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "---" & char( 10 ) & "Body." );
+				writePost( dir, "newer.md", "---" & char( 10 ) & "date: 2026-06-01" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var posts = discoverer.load( dir );
+
+				expect( posts[ 1 ].slug ).toBe( "newer" );
+				expect( posts[ 2 ].slug ).toBe( "older" );
+			} );
+
+			it( "normalizes a single bare-string [authors]/[categories] into a one-item array", function() {
+				var dir = newDocsDir();
+				writePost( dir, "solo.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "authors: lmajano" & char( 10 ) & "categories: Releases" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var post = discoverer.load( dir )[ 1 ];
+				expect( post.authors ).toBe( [ "lmajano" ] );
+				expect( post.categories ).toBe( [ "Releases" ] );
+			} );
+
+			it( "preserves an inline-list [authors]/[categories]/[tags]", function() {
+				var dir = newDocsDir();
+				writePost( dir, "multi.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "authors: [lmajano, guest]" & char( 10 ) & "categories: [Releases, News]" & char( 10 ) & "tags: [boxlang, docs]" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var post = discoverer.load( dir )[ 1 ];
+				expect( post.authors ).toBe( [ "lmajano", "guest" ] );
+				expect( post.categories ).toBe( [ "Releases", "News" ] );
+				expect( post.tags ).toBe( [ "boxlang", "docs" ] );
+			} );
+
+			it( "throws BxDocs.DuplicateBlogSlug when two posts resolve to the same slug", function() {
+				var dir = newDocsDir();
+				writePost( dir, "one.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "slug: same" & char( 10 ) & "---" & char( 10 ) & "Body." );
+				writePost( dir, "two.md", "---" & char( 10 ) & "date: 2026-01-02" & char( 10 ) & "slug: same" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				expect( function() {
+					discoverer.load( dir );
+				} ).toThrow( "BxDocs.DuplicateBlogSlug" );
+			} );
+
+		} );
+	}
+
+}

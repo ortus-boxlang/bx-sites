@@ -51,7 +51,13 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "derives the site name from the target directory name when --name is omitted", function() {
 				var dir = newTargetDir();
-				verb.run( { projectRoot : dir } );
+				// format: "json" here (and in the two tests below) only to
+				// keep this test's own re-load through ConfigLoader on the
+				// core jsonDeserialize() path rather than real bx-yaml BIFs -
+				// unrelated to what this test is actually asserting (name/
+				// theme derivation, not config format); see YamlRenderer.bx's
+				// docblock.
+				verb.run( { projectRoot : dir, format : "json" } );
 
 				var config = new "models.config.ConfigLoader@bxdocs"().load( dir );
 				expect( config.name ).toBe( "my-docs" );
@@ -59,7 +65,7 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "honors an explicit --name", function() {
 				var dir = newTargetDir();
-				verb.run( { projectRoot : dir, name : "Custom Name" } );
+				verb.run( { projectRoot : dir, name : "Custom Name", format : "json" } );
 
 				var config = new "models.config.ConfigLoader@bxdocs"().load( dir );
 				expect( config.name ).toBe( "Custom Name" );
@@ -67,7 +73,7 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "honors an explicit --theme", function() {
 				var dir = newTargetDir();
-				verb.run( { projectRoot : dir, theme : "tailwind" } );
+				verb.run( { projectRoot : dir, theme : "tailwind", format : "json" } );
 
 				var config = new "models.config.ConfigLoader@bxdocs"().load( dir );
 				expect( config.theme.name ).toBe( "tailwind" );

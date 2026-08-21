@@ -72,7 +72,7 @@ Every verb accepts `--projectRoot=<path>` (or a bare positional path) to target 
 
 ## Documentation
 
-This repository documents itself with BX Docs - see `bxdocs.json` and `docs/` at the repo root, published at:
+This repository documents itself with BX Docs - see `bxdocs.yaml` and `docs/` at the repo root, published at:
 
 - **[ortus-boxlang.github.io/bx-docs](https://ortus-boxlang.github.io/bx-docs/)** - stable docs, built from `main`
 - **[ortus-boxlang.github.io/bx-docs/development](https://ortus-boxlang.github.io/bx-docs/development/)** - latest/unreleased docs, built from `development`
@@ -95,7 +95,7 @@ See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's d
 - `models` - the module's own source: `models/cli` (one dispatcher per `bxDocs` verb), `models/config` (site config loader/validator - `bxdocs.yaml`/`.yml`/`.json`), `models/build` (project scaffolding + the docs/nav/markdown/theme/search/sitemap build pipeline)
 - `resources/themes` - built-in themes (native BoxLang `.bxm` templates + assets): `bootstrap` (default), `material`, `tailwind` - all with the BoxLang brand palette, dark mode, breadcrumbs and code-copy buttons applied out of the box. A project can override any of them via its own `theme/` folder (same `layout.bxm` + `page.bxm` contract - see [Themes](docs/guides/themes.md))
 - `resources/assets` - module-wide shared client-side assets: the search widget (`search.js`) and the copy-code button (`copy-code.js`)
-- `docs` / `bxdocs.json` - this repository's own docs, built by BX Docs itself (`boxlang module:bxDocs build`)
+- `docs` / `bxdocs.yaml` - this repository's own docs, built by BX Docs itself (`boxlang module:bxDocs build`)
 - `tests/specs` - TestBox specs, one bundle per class under `models/`
 - `bifs`, `components`, `interceptors` - unused by this module today, kept for BoxLang module convention
 - `box.json` - package metadata used to publish to ForgeBox

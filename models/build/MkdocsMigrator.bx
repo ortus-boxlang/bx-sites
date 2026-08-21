@@ -33,6 +33,24 @@ class {
 	variables.yamlParser = new "models.build.MkdocsYamlParser@bxdocs"()
 
 	/**
+	 * Serializes the generated `bxdocs.yaml` - real bx-yaml BIFs by default,
+	 * swappable via setYamlRenderer() (YamlRenderer.bx's own docblock
+	 * explains why). Unrelated to `variables.yamlParser` above, which reads
+	 * the *source* `mkdocs.yml` via this module's own small hand-rolled
+	 * subset parser (MkdocsYamlParser.bx's own docblock).
+	 */
+	variables.yamlRenderer = new "models.build.YamlRenderer@bxdocs"()
+
+	/**
+	 * Swaps in a fake/test YAML renderer - see YamlRenderer.bx's docblock.
+	 *
+	 * @renderer Any object exposing `toYaml( value )`
+	 */
+	void function setYamlRenderer( required any renderer ) {
+		variables.yamlRenderer = arguments.renderer
+	}
+
+	/**
 	 * Extension names with a direct, always-on bx-markdown/bx-docs
 	 * equivalent - present in `markdown_extensions` needs no `bxdocs.yaml`
 	 * change and no warning (admonitions/footnotes/def_list are handled by
@@ -95,7 +113,7 @@ class {
 		if ( fileExists( configPath ) ) {
 			warnings.append( "bxdocs.yaml already existed and was overwritten by this migration" )
 		}
-		fileWrite( configPath, yamlSerialize( bxdocsConfig ) )
+		fileWrite( configPath, variables.yamlRenderer.toYaml( bxdocsConfig ) )
 
 		return {
 			pagesConverted  : copyResult.pagesConverted,
