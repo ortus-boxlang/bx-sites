@@ -205,7 +205,7 @@ class {
 		if ( !len( t ) ) {
 			return false
 		}
-		if ( t.left( 1 ) == chr( 35 ) ) {
+		if ( t.left( 1 ) == "##" ) {
 			return false
 		}
 		return !t.reFindNoCase( "^[a-z][a-z0-9+.\-]*:" )
@@ -225,7 +225,7 @@ class {
 	 */
 	private string function resolveTarget( required string target, required string pageDir, required string basePath ) {
 		var t = arguments.target
-		var hashPos = t.find( chr( 35 ) )
+		var hashPos = t.find( "##" )
 		if ( hashPos ) {
 			t = t.left( hashPos - 1 )
 		}
