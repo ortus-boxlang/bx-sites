@@ -53,7 +53,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          ./testbox/run --reporter=ANTJunit --verbose
+          ./testbox/run --reporter=ANTJunit --verbose --stream --show-failed-only=true
 
       - name: Upload Test Results
         if: always()
