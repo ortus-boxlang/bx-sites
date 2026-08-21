@@ -1297,6 +1297,44 @@ a.bxdocs-card:hover {
 	margin: 0.5rem 0;
 }
 
+.bxdocs-tryboxlang {
+	margin: 1.5rem 0;
+	border: 1px solid rgba( 0, 0, 0, 0.12 );
+	border-radius: 14px;
+	overflow: hidden;
+}
+
+.bxdocs-tryboxlang__title {
+	padding: 0.6rem 1rem;
+	font-size: 0.85rem;
+	font-weight: 600;
+	background: rgba( 0, 0, 0, 0.03 );
+	border-bottom: 1px solid rgba( 0, 0, 0, 0.12 );
+}
+
+.bxdocs-tryboxlang__frame {
+	display: block;
+	width: 100%;
+	border: 0;
+}
+
+.bxdocs-tryboxlang__footer {
+	padding: 0.5rem 1rem;
+	font-size: 0.85rem;
+	text-align: right;
+	background: rgba( 0, 0, 0, 0.03 );
+	border-top: 1px solid rgba( 0, 0, 0, 0.12 );
+}
+
+.bxdocs-tryboxlang__footer a {
+	color: var( --bxdocs-link );
+	text-decoration: none;
+}
+
+.bxdocs-tryboxlang__footer a:hover {
+	text-decoration: underline;
+}
+
 .bxdocs-page-link {
 	display: flex;
 	align-items: center;
@@ -1374,6 +1412,16 @@ a.bxdocs-card:hover {
 
 [data-theme="dark"] .bxdocs-embed {
 	background: rgba( 255, 255, 255, 0.06 );
+}
+
+[data-theme="dark"] .bxdocs-tryboxlang {
+	border-color: rgba( 255, 255, 255, 0.12 );
+}
+
+[data-theme="dark"] .bxdocs-tryboxlang__title,
+[data-theme="dark"] .bxdocs-tryboxlang__footer {
+	background: rgba( 255, 255, 255, 0.06 );
+	border-color: rgba( 255, 255, 255, 0.12 );
 }
 
 [data-theme="dark"] .bxdocs-update__tag {
