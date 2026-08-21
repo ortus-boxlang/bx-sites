@@ -3,12 +3,18 @@
  * output, run through BuildPipeline.bx's normal convertMarkdown()/
  * assignTableOfContents()/etc. finishing steps first) into everything the
  * blog itself needs: each post's own detail-page content (a featured-image/
- * byline header prepended to its real body), plus every "index" page around
- * it - `/blog/` (paginated, with a "Browse by year" archive links block when
- * posts span more than one year), one `/blog/category/<slug>/` per category
- * (paginated), one `/blog/archive/<year>/` per calendar year with at least
- * one post (paginated), and one `/blog/authors/<id>/` per author who has at
- * least one post.
+ * byline header prepended to its real body, plus a draft badge when the
+ * post is a draft - only ever present at all in `bxDocs serve`'s own
+ * preview build, see BuildPipeline.bx's own `includeDrafts`), plus every
+ * "index" page around it - `/blog/` (paginated, with "Browse by year"/
+ * "Browse by category" links blocks once posts span more than one
+ * year/category, and a link to `/blog/stats/`), one `/blog/category/<slug>/`
+ * per category (paginated), one `/blog/archive/<year>/` per calendar year
+ * with at least one post (paginated), one `/blog/authors/<id>/` per author
+ * who has at least one post, and `/blog/stats/` - a handful of aggregate
+ * "cool cards" (total posts/words, categories, contributors, longest post,
+ * most active category/author) computed purely from already-loaded posts,
+ * no separate analytics/tracking involved.
  *
  * Pure HTML-string generation - no file I/O. Every index page comes back as
  * a minimal page struct (`title`/`description`/`contentHtml`/`urlPath`/
@@ -16,12 +22,22 @@
  * already hand ThemeRenderer.renderPage() in BuildPipeline.bx - it fills in
  * every other field (`toc`/`prevPage`/`breadcrumbs`/...) with sensible
  * empty defaults, so no theme template needs to change at all; a post/list/
- * category/author page renders through the exact same `page.bxm` every
- * other page does.
+ * category/author/stats page renders through the exact same `page.bxm`
+ * every other page does.
  */
 class {
 
 	variables.blogAuthorsLoader = new "models.build.BlogAuthorsLoader@bxdocs"()
+
+	/**
+	 * Average adult silent-reading speed, in words per minute - the same
+	 * ballpark figure (200-238wpm) most reading-time estimates (Medium,
+	 * WordPress reading-time plugins, ...) use. Deliberately not
+	 * configurable in v1 - an estimate this rough doesn't need a config
+	 * knob, and picking a "wrong" constant is a lot less costly than the
+	 * config-surface creep of exposing it.
+	 */
+	variables.wordsPerMinute = 200
 
 	/**
 	 * @posts BlogDiscoverer.load()'s own output, already markdown-converted (`contentHtml` set) - newest first
@@ -29,33 +45,36 @@ class {
 	 * @postsPerPage bxdocs.json's `blog.postsPerPage`
 	 * @basePath Root-relative base path ending with `/` (BaseUrlResolver's `basePath`)
 	 *
-	 * @return { posts: array (same posts, enriched + detail-page-ready contentHtml), indexPages: array of synthetic page structs }
+	 * @return { posts: array (same posts, enriched + detail-page-ready contentHtml), indexPages: array of synthetic page structs, categories: array of { name, slug, count }, alphabetical - BuildPipeline.bx's own cue for which `/blog/category/<slug>/feed.xml` files to write }
 	 */
 	struct function build( required array posts, required struct authors, required numeric postsPerPage, required string basePath ) {
 		var enrichedPosts = enrichPosts( arguments.posts, arguments.authors, arguments.basePath )
+		var categories = categoryCounts( enrichedPosts )
+		var years = distinctYears( enrichedPosts )
+		var authorIds = distinctAuthorIds( enrichedPosts )
 
 		var indexPages = []
 
 		var mainListPages = buildListPages( enrichedPosts, "blog", "Blog", arguments.postsPerPage, arguments.basePath )
-		var archiveLinksHtml = renderArchiveLinksHtml( enrichedPosts, arguments.basePath )
-		if ( len( archiveLinksHtml ) ) {
+		var browseLinksHtml = renderArchiveLinksHtml( years, enrichedPosts, arguments.basePath ) & renderCategoryLinksHtml( categories, arguments.basePath ) & renderStatsLinkHtml( arguments.basePath )
+		if ( len( browseLinksHtml ) ) {
 			for ( var page in mainListPages ) {
-				page.contentHtml &= archiveLinksHtml
+				page.contentHtml &= browseLinksHtml
 			}
 		}
 		indexPages.append( mainListPages, true )
 
-		for ( var category in distinctCategories( enrichedPosts ) ) {
-			var categoryPosts = enrichedPosts.filter( post => hasCategoryNoCase( post.categories ?: [], category ) )
-			indexPages.append( buildListPages( categoryPosts, "blog/category/" & slugify( category ), category, arguments.postsPerPage, arguments.basePath ), true )
+		for ( var category in categories ) {
+			var categoryPosts = enrichedPosts.filter( post => hasCategoryNoCase( post.categories ?: [], category.name ) )
+			indexPages.append( buildListPages( categoryPosts, "blog/category/" & category.slug, category.name, arguments.postsPerPage, arguments.basePath ), true )
 		}
 
-		for ( var yr in distinctYears( enrichedPosts ) ) {
+		for ( var yr in years ) {
 			var yearPosts = enrichedPosts.filter( post => year( post.date ) == yr )
 			indexPages.append( buildListPages( yearPosts, "blog/archive/" & yr, "#yr#", arguments.postsPerPage, arguments.basePath ), true )
 		}
 
-		for ( var authorId in distinctAuthorIds( enrichedPosts ) ) {
+		for ( var authorId in authorIds ) {
 			var authorPosts = enrichedPosts.filter( post => postHasAuthorId( post, authorId ) )
 			var author = arguments.authors[ authorId ]
 			indexPages.append( {
@@ -69,15 +88,20 @@ class {
 			} )
 		}
 
-		return { posts : enrichedPosts, indexPages : indexPages }
+		indexPages.append( buildStatsPage( enrichedPosts, categories, years, authorIds, arguments.authors, arguments.basePath ) )
+
+		return { posts : enrichedPosts, indexPages : indexPages, categories : categories }
 	}
 
 	/**
-	 * Resolves each post's own authors, computes its excerpt/display date,
-	 * defaults its SEO description/og:image from its own content when the
-	 * frontmatter left them blank, assigns a simple chronological prev/next
-	 * and a `Blog -> post` breadcrumb, and prepends its own featured-image/
-	 * byline header onto its real body `contentHtml`.
+	 * Resolves each post's own authors, computes its excerpt/display date/
+	 * word count/reading time, defaults its SEO description/og:image from
+	 * its own content when the frontmatter left them blank, assigns a
+	 * simple chronological prev/next and a `Blog -> post` breadcrumb, and
+	 * prepends its own featured-image/byline header (plus a draft badge,
+	 * for a post whose frontmatter sets `draft: true` - only ever present
+	 * at all when the caller opted into drafts, see BlogDiscoverer.load()'s
+	 * own `includeDrafts`) onto its real body `contentHtml`.
 	 *
 	 * @posts BlogDiscoverer.load()'s own output, already markdown-converted
 	 * @authors BlogAuthorsLoader.load()'s own output
@@ -90,6 +114,9 @@ class {
 			var post = duplicate( arguments.posts[ i ] )
 			post.resolvedAuthors = variables.blogAuthorsLoader.resolve( post.authors, arguments.authors )
 			post.dateDisplay = dateTimeFormat( post.date, "medium" )
+
+			post.wordCount = countWords( stripTags( post.contentHtml ) )
+			post.readingTimeMinutes = max( 1, round( post.wordCount / variables.wordsPerMinute ) )
 
 			var excerpt = computeExcerpt( post.contentHtml, post.summary )
 			post.excerptHtml = excerpt.html
@@ -118,7 +145,7 @@ class {
 				}
 			}
 
-			post.contentHtml = renderPostHeaderHtml( post, arguments.basePath ) & post.contentHtml
+			post.contentHtml = renderDraftBadgeHtml( post ) & renderPostHeaderHtml( post, arguments.basePath ) & post.contentHtml
 
 			enriched.append( post )
 		}
@@ -225,7 +252,8 @@ class {
 	 * @basePath Root-relative base path ending with `/`
 	 */
 	private string function renderPostCard( required struct post, required string basePath ) {
-		var html = '<article class="blog-post-card">'
+		var html = '<article class="blog-post-card' & ( ( arguments.post.draft ?: false ) ? ' blog-post-card--draft' : '' ) & '">'
+		html &= renderDraftBadgeHtml( arguments.post )
 
 		if ( len( trim( arguments.post.image ?: "" ) ) ) {
 			html &= '<a href="' & arguments.basePath & arguments.post.urlPath & '"><img src="' & resolveAssetUrl( arguments.post.image, arguments.basePath ) & '" alt="" style="max-width:100%;height:auto;"></a>'
@@ -246,8 +274,11 @@ class {
 
 	/**
 	 * Renders one post's own detail-page header - featured image, then the
-	 * same meta line renderPostCard() uses - prepended onto its real
-	 * (already-converted) body `contentHtml`.
+	 * same meta line renderPostCard() uses. The draft badge (when one
+	 * applies) is prepended separately, one level up - see enrichPosts()'s
+	 * own contentHtml assembly - so it always sits above the featured image
+	 * on both the card and the detail page, not wedged between the image
+	 * and the meta line here.
 	 *
 	 * @post One enriched post struct
 	 * @basePath Root-relative base path ending with `/`
@@ -265,9 +296,26 @@ class {
 	}
 
 	/**
-	 * The date/authors/categories line shown on both a post card and a
-	 * post's own detail page - authors/categories link to their own pages
-	 * when one exists.
+	 * A "🚧 Draft" banner, shown only when `post.draft` is `true` - which,
+	 * since BlogDiscoverer.load() already filters drafts out of every real
+	 * build, only ever happens at all when the caller opted into drafts
+	 * (`bxDocs serve`'s own local preview - see BuildPipeline.bx's own
+	 * `includeDrafts`). "" (nothing rendered) for a published post, so this
+	 * is always safe to call unconditionally.
+	 *
+	 * @post One enriched post struct
+	 */
+	private string function renderDraftBadgeHtml( required struct post ) {
+		if ( !( arguments.post.draft ?: false ) ) {
+			return ""
+		}
+		return '<p class="blog-draft-badge">🚧 Draft - not included in a real <code>bxDocs build</code></p>'
+	}
+
+	/**
+	 * The date/reading-time/authors/categories line shown on both a post
+	 * card and a post's own detail page - authors/categories link to their
+	 * own pages when one exists.
 	 *
 	 * @post One enriched post struct
 	 * @basePath Root-relative base path ending with `/`
@@ -277,6 +325,10 @@ class {
 
 		if ( len( trim( arguments.post.dateDisplay ?: "" ) ) ) {
 			parts.append( encodeForHTML( arguments.post.dateDisplay ) )
+		}
+
+		if ( isNumeric( arguments.post.readingTimeMinutes ?: "" ) ) {
+			parts.append( arguments.post.readingTimeMinutes & " min read" )
 		}
 
 		var authorLinks = []
@@ -372,6 +424,110 @@ class {
 	}
 
 	/**
+	 * Builds `/blog/stats/` - a handful of aggregate "cool cards" about the
+	 * blog as a whole, computed purely from already-loaded posts (no
+	 * separate analytics/tracking involved, nothing persisted between
+	 * builds): total posts/words, average reading time, category/
+	 * contributor/year counts, and three "spotlight" cards (longest post,
+	 * most active category, most active author) each linked to the real
+	 * page it's about. Always built, even for a zero-post blog (every
+	 * number just reads 0) - the same "always render, never conditionally
+	 * skip the page itself" precedent the main `/blog/` list already sets.
+	 * Reuses the `.bxdocs-cards`/`.bxdocs-card` component the `::: cards`
+	 * directive block already styles in every built-in theme, rather than
+	 * inventing a separate stats-card component.
+	 *
+	 * @posts Enriched posts
+	 * @categories categoryCounts()'s own output
+	 * @years distinctYears()'s own output
+	 * @authorIds distinctAuthorIds()'s own output
+	 * @authors BlogAuthorsLoader.load()'s own output
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	private struct function buildStatsPage( required array posts, required array categories, required array years, required array authorIds, required struct authors, required string basePath ) {
+		var totalPosts = arguments.posts.len()
+		var totalWords = 0
+		for ( var post in arguments.posts ) {
+			totalWords += post.wordCount
+		}
+		var avgReadingTime = totalPosts ? round( totalWords / variables.wordsPerMinute / totalPosts ) : 0
+
+		var cards = []
+		cards.append( statCard( numberFormat( totalPosts, "9,999" ), totalPosts == 1 ? "Post" : "Posts" ) )
+		cards.append( statCard( numberFormat( totalWords, "9,999" ), "Words Written" ) )
+		cards.append( statCard( max( avgReadingTime, totalPosts ? 1 : 0 ) & " min", "Average Reading Time" ) )
+		cards.append( statCard( arguments.categories.len(), arguments.categories.len() == 1 ? "Category" : "Categories" ) )
+		cards.append( statCard( arguments.authorIds.len(), arguments.authorIds.len() == 1 ? "Contributor" : "Contributors" ) )
+		cards.append( statCard( arguments.years.len(), arguments.years.len() == 1 ? "Year Active" : "Years Active" ) )
+
+		if ( totalPosts ) {
+			var longest = arguments.posts[ 1 ]
+			for ( var post in arguments.posts ) {
+				if ( post.wordCount > longest.wordCount ) {
+					longest = post
+				}
+			}
+			cards.append( statCard( longest.title, longest.readingTimeMinutes & " min read - Longest Post", arguments.basePath & longest.urlPath ) )
+		}
+
+		if ( arguments.categories.len() ) {
+			var topCategory = arguments.categories[ 1 ]
+			for ( var category in arguments.categories ) {
+				if ( category.count > topCategory.count ) {
+					topCategory = category
+				}
+			}
+			cards.append( statCard( topCategory.name, topCategory.count & ( topCategory.count == 1 ? " post - Most Active Category" : " posts - Most Active Category" ), arguments.basePath & "blog/category/" & topCategory.slug & "/index.html" ) )
+		}
+
+		if ( arguments.authorIds.len() ) {
+			var topAuthorId = ""
+			var topAuthorCount = 0
+			for ( var authorId in arguments.authorIds ) {
+				var authorCount = arguments.posts.filter( post => postHasAuthorId( post, authorId ) ).len()
+				if ( authorCount > topAuthorCount ) {
+					topAuthorId = authorId
+					topAuthorCount = authorCount
+				}
+			}
+			if ( len( topAuthorId ) ) {
+				cards.append( statCard( arguments.authors[ topAuthorId ].name, topAuthorCount & ( topAuthorCount == 1 ? " post - Most Active Author" : " posts - Most Active Author" ), arguments.basePath & "blog/authors/" & topAuthorId & "/index.html" ) )
+			}
+		}
+
+		var cardsHtml = ""
+		for ( var card in cards ) {
+			cardsHtml &= card
+		}
+
+		return {
+			title       : "Blog Stats",
+			description : "Aggregate stats about the blog - " & totalPosts & " post" & ( totalPosts == 1 ? "" : "s" ) & " and counting.",
+			contentHtml : '<div class="bxdocs-cards">' & cardsHtml & "</div>",
+			urlPath     : "blog/stats/index.html",
+			ogImage     : "",
+			tags        : [],
+			hidden      : false
+		}
+	}
+
+	/**
+	 * Renders one `.bxdocs-card` for buildStatsPage() - a big `number`
+	 * over a `label`, optionally linked (an author/category/post
+	 * "spotlight" card) via `href`.
+	 *
+	 * @number The stat's own headline value - already formatted (numberFormat(), a plain count, or free text like a post title)
+	 * @label What the number is - plain text, HTML-escaped here
+	 * @href When non-empty, wraps the card in a link to the real page the stat is about - "" (the default) renders a plain, non-interactive card
+	 */
+	private string function statCard( required string number, required string label, string href = "" ) {
+		var body = '<div class="bxdocs-card__title">' & encodeForHTML( arguments.number ) & '</div><div class="bxdocs-card__body">' & encodeForHTML( arguments.label ) & "</div>"
+		return len( arguments.href )
+			? ( '<a class="bxdocs-card" href="' & attrEscapeUrl( arguments.href ) & '">' & body & "</a>" )
+			: ( '<div class="bxdocs-card">' & body & "</div>" )
+	}
+
+	/**
 	 * Splits a post's own `contentHtml` at its first `<!-- more -->` marker
 	 * (GitBook/mkdocs-material's own excerpt convention - an HTML comment,
 	 * so it's invisible if left in the full post's own rendered page too, no
@@ -422,6 +578,20 @@ class {
 	}
 
 	/**
+	 * A rough word count off already-tag-stripped plain text - splits on
+	 * whitespace runs, same "good enough for an estimate, not exact"
+	 * standard as stripTags()/computeExcerpt() above. Backs both
+	 * readingTimeMinutes (enrichPosts()) and the "Total Words"/"Longest
+	 * Post" stats cards (buildStatsPage()).
+	 *
+	 * @plainText Already HTML-tag-stripped text (stripTags()'s own output)
+	 */
+	private numeric function countWords( required string plainText ) {
+		var trimmed = trim( arguments.plainText )
+		return len( trimmed ) ? listLen( trimmed, " " ) : 0
+	}
+
+	/**
 	 * Every distinct calendar year `posts` has at least one post in,
 	 * newest first - backs the automatic `blog/archive/<year>/` pages, the
 	 * same by-convention shape as category pages (build()'s own loop).
@@ -452,17 +622,17 @@ class {
 	 * showing, the same reasoning renderPager() already skips a pager for
 	 * one page.
 	 *
+	 * @years distinctYears()'s own output - build()'s already-computed value, not recomputed here
 	 * @posts Enriched posts
 	 * @basePath Root-relative base path ending with `/`
 	 */
-	private string function renderArchiveLinksHtml( required array posts, required string basePath ) {
-		var years = distinctYears( arguments.posts )
-		if ( years.len() < 2 ) {
+	private string function renderArchiveLinksHtml( required array years, required array posts, required string basePath ) {
+		if ( arguments.years.len() < 2 ) {
 			return ""
 		}
 
 		var html = '<div class="blog-archive-links"><h2>Archive</h2><ul>'
-		for ( var yr in years ) {
+		for ( var yr in arguments.years ) {
 			var count = arguments.posts.filter( post => year( post.date ) == yr ).len()
 			html &= '<li><a href="' & arguments.basePath & "blog/archive/" & yr & '/index.html">' & yr & "</a> (" & count & ")</li>"
 		}
@@ -493,6 +663,63 @@ class {
 		}
 		categories.sort( "textnocase" )
 		return categories
+	}
+
+	/**
+	 * distinctCategories() plus, per category, its own url slug and post
+	 * count - build()'s single source of truth for both the "Browse by
+	 * category" links block and the per-category `/blog/category/<slug>/feed.xml`
+	 * files BuildPipeline.bx writes, so the two never drift out of sync
+	 * with each other or with the actual category pages built below them.
+	 *
+	 * @posts Enriched posts
+	 *
+	 * @return Array of { name, slug, count }, alphabetical by name
+	 */
+	private array function categoryCounts( required array posts ) {
+		var counts = []
+		for ( var category in distinctCategories( arguments.posts ) ) {
+			counts.append( {
+				name  : category,
+				slug  : slugify( category ),
+				count : arguments.posts.filter( post => hasCategoryNoCase( post.categories ?: [], category ) ).len()
+			} )
+		}
+		return counts
+	}
+
+	/**
+	 * A "Browse by category" links block, the same shape/placement as
+	 * renderArchiveLinksHtml() (main `/blog/` list page(s) only, "" when
+	 * there's only one category total).
+	 *
+	 * @categories categoryCounts()'s own output
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	private string function renderCategoryLinksHtml( required array categories, required string basePath ) {
+		if ( arguments.categories.len() < 2 ) {
+			return ""
+		}
+
+		var html = '<div class="blog-category-links"><h2>Categories</h2><ul>'
+		for ( var category in arguments.categories ) {
+			html &= '<li><a href="' & arguments.basePath & "blog/category/" & category.slug & '/index.html">' & encodeForHTML( category.name ) & "</a> (" & category.count & ")</li>"
+		}
+		html &= "</ul></div>"
+
+		return html
+	}
+
+	/**
+	 * A one-line link to `/blog/stats/` (buildStatsPage()), appended onto
+	 * the main `/blog/` list page(s) alongside the archive/category links
+	 * blocks - unlike those two, always rendered (there's always something
+	 * to show on the stats page, even a blog with zero posts).
+	 *
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	private string function renderStatsLinkHtml( required string basePath ) {
+		return '<p><a href="' & arguments.basePath & 'blog/stats/index.html">View blog stats &rarr;</a></p>'
 	}
 
 	/**

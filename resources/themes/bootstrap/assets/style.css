@@ -1576,3 +1576,45 @@ a.bxdocs-card:hover {
 	object-fit: cover;
 	border-radius: 10px;
 }
+
+/* Blog: draft preview badge (bxDocs serve only - see BuildPipeline.bx's
+   own includeDrafts), a "Browse by year"/"Browse by category" simple link
+   list on the main /blog/ list page, and the /blog/stats/ page's cards
+   (which reuse .bxdocs-cards/.bxdocs-card above - the ::: cards directive
+   block's own component - rather than a separate stats-card component). */
+.blog-draft-badge {
+	display: inline-block;
+	margin: 0 0 1rem;
+	padding: 0.35rem 0.85rem;
+	border-radius: 999px;
+	background: var( --bxdocs-step-warning-bg );
+	color: var( --bxdocs-step-warning-text );
+	font-size: 0.85rem;
+	font-weight: 600;
+}
+
+.blog-post-card--draft {
+	border: 1px dashed var( --bxdocs-step-warning-bg );
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+.blog-archive-links,
+.blog-category-links {
+	margin: 2rem 0;
+}
+
+.blog-archive-links h2,
+.blog-category-links h2 {
+	margin-bottom: 0.5rem;
+}
+
+.blog-archive-links ul,
+.blog-category-links ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 1.25rem;
+}

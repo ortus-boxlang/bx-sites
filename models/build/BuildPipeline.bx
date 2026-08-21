@@ -123,10 +123,11 @@ class {
 	 * translates (switching locale always stays on the current version).
 	 *
 	 * @projectRoot Absolute path to the project root
+	 * @includeDrafts Include blog posts whose frontmatter sets `draft: true` - `false` (the default) for a real build; DevServer.bx's own `bxDocs serve` passes `true` so a draft can be previewed locally (BlogBuilder.bx stamps a visible "🚧 Draft" badge on one whenever this is on) without it ever leaking into an actual `bxDocs build`
 	 *
 	 * @return { siteDir, pageCount }
 	 */
-	struct function build( required string projectRoot ) {
+	struct function build( required string projectRoot, boolean includeDrafts = false ) {
 		var root = normalizeRoot( arguments.projectRoot )
 		var config = variables.configLoader.load( root )
 		var plugins = resolvePlugins( config )
@@ -160,7 +161,7 @@ class {
 		// the main tree (and every version/locale tree) is done, alongside
 		// the tags page/sitemap/llms.txt/search index, all of which fold
 		// blog posts in too.
-		var blogPosts = variables.blogDiscoverer.load( root & "/docs" )
+		var blogPosts = variables.blogDiscoverer.load( root & "/docs", arguments.includeDrafts )
 		var blogNavUrl = blogPosts.len() ? "blog/index.html" : ""
 		var mainResult = renderDocTree( mainPages, root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, imageManifest, navConfig, locales, defaultLocaleCode, defaultLocaleDir, blogNavUrl )
 		var allPages = duplicate( mainResult.pages )
@@ -295,6 +296,12 @@ class {
 			if ( len( urls.absolute ) && config.blog.feed ) {
 				directoryCreate( siteDir & "/blog", true, true )
 				fileWrite( siteDir & "/blog/feed.xml", variables.blogFeedGenerator.build( blogResult.posts, config.name, urls.absolute, "", config.blog.feedLimit ) )
+
+				for ( var category in blogResult.categories ) {
+					var categoryFeedDir = siteDir & "/blog/category/" & category.slug
+					directoryCreate( categoryFeedDir, true, true )
+					fileWrite( categoryFeedDir & "/feed.xml", variables.blogFeedGenerator.build( blogResult.posts, config.name, urls.absolute, category.name, config.blog.feedLimit ) )
+				}
 			}
 
 			tagsPages = duplicate( mainResult.pages )

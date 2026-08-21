@@ -45,6 +45,17 @@ class extends="testbox.system.BaseSpec" {
 				expect( res.fileContent ).toInclude( "<p>Welcome home</p>" );
 			} );
 
+			it( "previews a draft blog post locally, with its draft badge, unlike a real bxDocs build", function() {
+				var root = newProject();
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				fileWrite( root & "/docs/blog/posts/draft-post.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "draft: true" & char( 10 ) & "---" & char( 10 ) & "Draft body." );
+
+				devServer.start( root, 0, "127.0.0.1" );
+
+				expect( fileExists( root & "/site/blog/draft-post/index.html" ) ).toBeTrue();
+				expect( fileRead( root & "/site/blog/draft-post/index.html" ) ).toInclude( "blog-draft-badge" );
+			} );
+
 			it( "injects a live-reload script into every built page", function() {
 				var root = newProject();
 				var started = devServer.start( root, 0, "127.0.0.1" );

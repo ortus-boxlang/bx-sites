@@ -509,13 +509,13 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxDocs.InvalidConfig" );
 			} );
 
-			it( "defaults [blog.postsPerPage] to 10, [blog.feed] to true, and [blog.feedLimit] to 20", function() {
+			it( "defaults [blog.postsPerPage] to 10, [blog.feed] to true, and [blog.feedLimit] to 25", function() {
 				var dir = newProjectDir( '{"name":"My Docs"}' );
 				var config = loader.load( dir );
 
 				expect( config.blog.postsPerPage ).toBe( 10 );
 				expect( config.blog.feed ).toBeTrue();
-				expect( config.blog.feedLimit ).toBe( 20 );
+				expect( config.blog.feedLimit ).toBe( 25 );
 			} );
 
 			it( "preserves a user-supplied [blog.feedLimit], including 0 for unlimited", function() {

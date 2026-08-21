@@ -101,11 +101,14 @@ class {
 	}
 
 	/**
-	 * Runs a full BuildPipeline.build(), re-injects the live-reload script,
-	 * and bumps `buildVersion` so polling clients pick up the change.
+	 * Runs a full BuildPipeline.build() - with blog drafts included, so a
+	 * post can be previewed locally before its `date` arrives or its
+	 * `draft: true` is lifted (BuildPipeline.build()'s own `includeDrafts`,
+	 * never on for a real `bxDocs build`) - re-injects the live-reload
+	 * script, and bumps `buildVersion` so polling clients pick up the change.
 	 */
 	private void function rebuild() {
-		variables.buildPipeline.build( variables.projectRoot )
+		variables.buildPipeline.build( variables.projectRoot, true )
 		injectLiveReload()
 		variables.fileFingerprint = currentFingerprint()
 		variables.buildVersion++

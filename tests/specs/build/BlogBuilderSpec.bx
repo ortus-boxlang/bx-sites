@@ -34,13 +34,18 @@ class extends="testbox.system.BaseSpec" {
 				return post;
 			}
 
-			it( "returns one page per post, unchanged count, and a Blog index page even with zero posts", function() {
+			it( "returns a Blog index page and a stats page even with zero posts, unchanged post count", function() {
 				var result = builder.build( [], {}, 10, "/" );
 
 				expect( result.posts.len() ).toBe( 0 );
-				expect( result.indexPages.len() ).toBe( 1 );
-				expect( result.indexPages[ 1 ].title ).toBe( "Blog" );
-				expect( result.indexPages[ 1 ].urlPath ).toBe( "blog/index.html" );
+				expect( result.categories ).toBeArray();
+				expect( result.categories.len() ).toBe( 0 );
+
+				var blogPage = result.indexPages.filter( p => p.urlPath == "blog/index.html" )[ 1 ];
+				expect( blogPage.title ).toBe( "Blog" );
+
+				var statsPage = result.indexPages.filter( p => p.urlPath == "blog/stats/index.html" )[ 1 ];
+				expect( statsPage.title ).toBe( "Blog Stats" );
 			} );
 
 			it( "prepends a featured-image/byline header onto the post's own contentHtml", function() {
@@ -136,7 +141,7 @@ class extends="testbox.system.BaseSpec" {
 
 				var result = builder.build( posts, {}, 2, "/" );
 
-				var blogPages = result.indexPages.filter( p => p.urlPath.findNoCase( "blog/category" ) == 0 && p.urlPath.findNoCase( "blog/authors" ) == 0 && p.urlPath.findNoCase( "blog/archive" ) == 0 );
+				var blogPages = result.indexPages.filter( p => p.urlPath.findNoCase( "blog/category" ) == 0 && p.urlPath.findNoCase( "blog/authors" ) == 0 && p.urlPath.findNoCase( "blog/archive" ) == 0 && p.urlPath.findNoCase( "blog/stats" ) == 0 );
 				expect( blogPages.len() ).toBe( 2 );
 				expect( blogPages[ 1 ].urlPath ).toBe( "blog/index.html" );
 				expect( blogPages[ 2 ].urlPath ).toBe( "blog/page/2/index.html" );
@@ -204,6 +209,87 @@ class extends="testbox.system.BaseSpec" {
 				var categoryUrls = categoryPages.map( p => p.urlPath );
 				expect( categoryUrls ).toInclude( "blog/category/getting-started/index.html" );
 				expect( categoryUrls ).toInclude( "blog/category/news/index.html" );
+			} );
+
+			it( "returns categories with their own slug/count, alphabetical", function() {
+				var posts = [
+					newPost( { slug : "a", urlPath : "blog/a/index.html", categories : [ "News" ] } ),
+					newPost( { slug : "b", urlPath : "blog/b/index.html", categories : [ "Getting Started", "News" ] } )
+				];
+
+				var result = builder.build( posts, {}, 10, "/" );
+
+				expect( result.categories.len() ).toBe( 2 );
+				expect( result.categories[ 1 ].name ).toBe( "Getting Started" );
+				expect( result.categories[ 1 ].slug ).toBe( "getting-started" );
+				expect( result.categories[ 1 ].count ).toBe( 1 );
+				expect( result.categories[ 2 ].name ).toBe( "News" );
+				expect( result.categories[ 2 ].count ).toBe( 2 );
+			} );
+
+			it( "adds a Browse-by-category links block to the main blog list only when posts span more than one category", function() {
+				var singleCategoryPosts = [ newPost( { slug : "a", urlPath : "blog/a/index.html", categories : [ "News" ] } ) ];
+				var singleResult = builder.build( singleCategoryPosts, {}, 10, "/" );
+				var singleBlogPage = singleResult.indexPages.filter( p => p.urlPath == "blog/index.html" )[ 1 ];
+				expect( singleBlogPage.contentHtml ).notToInclude( "blog-category-links" );
+
+				var multiCategoryPosts = [
+					newPost( { slug : "a", urlPath : "blog/a/index.html", categories : [ "News" ] } ),
+					newPost( { slug : "b", urlPath : "blog/b/index.html", categories : [ "Releases" ] } )
+				];
+				var multiResult = builder.build( multiCategoryPosts, {}, 10, "/" );
+				var multiBlogPage = multiResult.indexPages.filter( p => p.urlPath == "blog/index.html" )[ 1 ];
+				expect( multiBlogPage.contentHtml ).toInclude( "blog-category-links" );
+				expect( multiBlogPage.contentHtml ).toInclude( 'href="/blog/category/news/index.html"' );
+				expect( multiBlogPage.contentHtml ).toInclude( 'href="/blog/category/releases/index.html"' );
+			} );
+
+			it( "computes wordCount/readingTimeMinutes and shows it in the meta line", function() {
+				var post = newPost( { contentHtml : "<p>" & repeatString( "word ", 400 ) & "</p>" } );
+
+				var result = builder.build( [ post ], {}, 10, "/" );
+
+				expect( result.posts[ 1 ].wordCount ).toBe( 400 );
+				expect( result.posts[ 1 ].readingTimeMinutes ).toBe( 2 );
+				expect( result.posts[ 1 ].contentHtml ).toInclude( "2 min read" );
+			} );
+
+			it( "floors readingTimeMinutes at 1, even for a very short post", function() {
+				var post = newPost( { contentHtml : "<p>Short.</p>" } );
+
+				var result = builder.build( [ post ], {}, 10, "/" );
+
+				expect( result.posts[ 1 ].readingTimeMinutes ).toBe( 1 );
+				expect( result.posts[ 1 ].contentHtml ).toInclude( "1 min read" );
+			} );
+
+			it( "shows a draft badge on a draft post's own contentHtml and its card, but not on a published post", function() {
+				var posts = [
+					newPost( { slug : "draft-one", urlPath : "blog/draft-one/index.html", draft : true, date : "2026-02-01" } ),
+					newPost( { slug : "published", urlPath : "blog/published/index.html", draft : false, date : "2026-01-01" } )
+				];
+
+				var result = builder.build( posts, {}, 10, "/" );
+
+				expect( result.posts[ 1 ].contentHtml ).toInclude( "blog-draft-badge" );
+				expect( result.posts[ 2 ].contentHtml ).notToInclude( "blog-draft-badge" );
+
+				var blogPage = result.indexPages.filter( p => p.urlPath == "blog/index.html" )[ 1 ];
+				expect( blogPage.contentHtml ).toInclude( "blog-post-card--draft" );
+			} );
+
+			it( "builds a /blog/stats/ page with real aggregate numbers", function() {
+				var posts = [
+					newPost( { slug : "a", urlPath : "blog/a/index.html", date : "2026-06-01", categories : [ "Releases" ], contentHtml : "<p>" & repeatString( "word ", 200 ) & "</p>" } ),
+					newPost( { slug : "b", urlPath : "blog/b/index.html", date : "2025-01-01", categories : [ "Releases" ], contentHtml : "<p>Short.</p>" } )
+				];
+
+				var result = builder.build( posts, {}, 10, "/" );
+
+				var statsPage = result.indexPages.filter( p => p.urlPath == "blog/stats/index.html" )[ 1 ];
+				expect( statsPage.contentHtml ).toInclude( "bxdocs-cards" );
+				expect( statsPage.contentHtml ).toInclude( '>2</div><div class="bxdocs-card__body">Posts</div>' );
+				expect( statsPage.contentHtml ).toInclude( "Releases" );
 			} );
 
 			it( "builds an author page only for an author actually referenced by a post, not every roster entry", function() {

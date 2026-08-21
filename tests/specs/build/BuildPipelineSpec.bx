@@ -1556,6 +1556,87 @@ class extends="testbox.system.BaseSpec" {
 				expect( llms ).toInclude( "(https://docs.example.com/versions/1.0/es/index.html)" );
 			} );
 
+			it( "writes one blog/category/<slug>/feed.xml per category, filtered to just that category's own posts", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"https://docs.example.com/"}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				fileWrite( root & "/docs/blog/posts/release.md", "---" & char( 10 ) & "date: 2026-02-01" & char( 10 ) & "categories: [Releases]" & char( 10 ) & "---" & char( 10 ) & "Release post body." );
+				fileWrite( root & "/docs/blog/posts/news.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "categories: [News]" & char( 10 ) & "---" & char( 10 ) & "News post body." );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/blog/feed.xml" ) ).toBeTrue();
+				var mainFeed = fileRead( root & "/site/blog/feed.xml" );
+				expect( mainFeed ).toInclude( "Release post body" );
+				expect( mainFeed ).toInclude( "News post body" );
+
+				expect( fileExists( root & "/site/blog/category/releases/feed.xml" ) ).toBeTrue();
+				var releasesFeed = fileRead( root & "/site/blog/category/releases/feed.xml" );
+				expect( releasesFeed ).toInclude( "Release post body" );
+				expect( releasesFeed ).notToInclude( "News post body" );
+
+				expect( fileExists( root & "/site/blog/category/news/feed.xml" ) ).toBeTrue();
+				var newsFeed = fileRead( root & "/site/blog/category/news/feed.xml" );
+				expect( newsFeed ).toInclude( "News post body" );
+				expect( newsFeed ).notToInclude( "Release post body" );
+			} );
+
+			it( "excludes a draft blog post from a real build by default", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				fileWrite( root & "/docs/blog/posts/draft-post.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "draft: true" & char( 10 ) & "---" & char( 10 ) & "Draft body." );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/blog/draft-post/index.html" ) ).toBeFalse();
+			} );
+
+			it( "includes a draft blog post, with a visible draft badge, when includeDrafts is true", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				fileWrite( root & "/docs/blog/posts/draft-post.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "draft: true" & char( 10 ) & "---" & char( 10 ) & "Draft body." );
+
+				pipeline.build( root, true );
+
+				expect( fileExists( root & "/site/blog/draft-post/index.html" ) ).toBeTrue();
+				var html = fileRead( root & "/site/blog/draft-post/index.html" );
+				expect( html ).toInclude( "blog-draft-badge" );
+			} );
+
+			it( "publishes a blog post's own Markdown source, with a Download Markdown link on its built page", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				fileWrite( root & "/docs/blog/posts/hello-world.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "---" & char( 10 ) & "Hello world body." );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/blog/posts/hello-world.md" ) ).toBeTrue();
+				expect( fileRead( root & "/site/blog/posts/hello-world.md" ) ).toInclude( "Hello world body." );
+
+				var html = fileRead( root & "/site/blog/hello-world/index.html" );
+				expect( html ).toInclude( "Download Markdown" );
+				expect( html ).toInclude( 'href="/blog/posts/hello-world.md"' );
+			} );
+
+			it( "builds /blog/stats/index.html", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				fileWrite( root & "/docs/blog/posts/hello-world.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "---" & char( 10 ) & "Hello world body." );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/blog/stats/index.html" ) ).toBeTrue();
+				expect( fileRead( root & "/site/blog/stats/index.html" ) ).toInclude( "bxdocs-cards" );
+			} );
+
 		} );
 	}
 
