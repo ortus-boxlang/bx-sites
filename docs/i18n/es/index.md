@@ -34,10 +34,10 @@ Markdown en la propia carpeta `docs/` de este repositorio - consulta
 - **Un sistema de plugins construido sobre el propio sistema de módulos de
   BoxLang.** Un plugin es simplemente otro módulo de BoxLang instalado -
   no hay una API de plugins separada que aprender.
-- **Migra directamente desde GitBook.** `bxDocs migrate --source=...`
-  convierte una exportación de GitBook - `SUMMARY.md`, sus bloques de
-  contenido, sus recursos - en un proyecto bx-docs funcional con un solo
-  comando.
+- **Migra directamente desde GitBook o mkdocs.** `bxDocs migrate
+  --source=... --from=gitbook|mkdocs` convierte una exportación de
+  GitBook o un proyecto mkdocs existente en un proyecto bx-docs
+  funcional con un solo comando.
 
 ## A dónde ir a continuación
 
@@ -50,4 +50,5 @@ Markdown en la propia carpeta `docs/` de este repositorio - consulta
 - [Extensiones de Markdown](guides/markdown.md) - admoniciones, notas al pie, listas de definiciones, pestañas de contenido, matemáticas y anotaciones de código, y diagramas Mermaid
 - [Plugins](guides/plugins.md) - extiende BX Docs con tu propio módulo de BoxLang
 - [Migrar desde GitBook](guides/migrating-from-gitbook.md) - convierte una exportación de GitBook en un proyecto bx-docs con un solo comando
+- [Migrar desde mkdocs](guides/migrating-from-mkdocs.md) - convierte un proyecto mkdocs en un proyecto bx-docs con un solo comando
 - [Lanzamientos](releases/index.md) - política de versionado y novedades de cada versión
