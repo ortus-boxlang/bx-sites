@@ -78,7 +78,7 @@ class {
 		},
 		"plugins"      : [],
 		"i18n"         : { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] },
-		"blog"         : { "postsPerPage" : 10, "feed" : true }
+		"blog"         : { "postsPerPage" : 10, "feed" : true, "feedLimit" : 20 }
 	}
 
 	/**
@@ -453,6 +453,14 @@ class {
 			throw(
 				type    = "BxDocs.InvalidConfig",
 				message = "#variables.configFileName# [blog.feed], when present, must be a boolean"
+			)
+		}
+
+		var feedLimit = arguments.blog.feedLimit ?: 20
+		if ( !isNumeric( feedLimit ) || val( feedLimit ) < 0 || val( feedLimit ) != int( val( feedLimit ) ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "#variables.configFileName# [blog.feedLimit], when present, must be a whole number of 0 or more"
 			)
 		}
 	}

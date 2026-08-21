@@ -642,13 +642,19 @@ Options for the [blog](guides/blog.md) - itself a by-convention feature
 (`docs/blog/posts/`), no key here required to turn it on.
 
 - `blog.postsPerPage` - `10` (the default) - how many posts per page on
-  `/blog/` and every category page before it moves to `.../page/2/`.
+  `/blog/`, every category page, and every `/blog/archive/<year>/` page
+  before it moves to `.../page/2/`.
 - `blog.feed` - `true` (the default) - whether `/blog/feed.xml` (RSS 2.0)
   is written. Only meaningful with an absolute `baseURL`, same requirement
   as `sitemap.xml`.
+- `blog.feedLimit` - `20` (the default) - caps `/blog/feed.xml` to this
+  many most-recent posts. `0` means unlimited (every post, in full). Most
+  feed readers only care about what's new, so an unbounded feed on a blog
+  with hundreds of posts just wastes bandwidth on every poll - see
+  [Blog: Feed](guides/blog.md#feed).
 
 ```json
-{ "blog": { "postsPerPage": 10, "feed": true } }
+{ "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 20 } }
 ```
 
 See [Blog](guides/blog.md) for post/author frontmatter, categories,

@@ -136,11 +136,60 @@ class extends="testbox.system.BaseSpec" {
 
 				var result = builder.build( posts, {}, 2, "/" );
 
-				var blogPages = result.indexPages.filter( p => p.urlPath.findNoCase( "blog/category" ) == 0 && p.urlPath.findNoCase( "blog/authors" ) == 0 );
+				var blogPages = result.indexPages.filter( p => p.urlPath.findNoCase( "blog/category" ) == 0 && p.urlPath.findNoCase( "blog/authors" ) == 0 && p.urlPath.findNoCase( "blog/archive" ) == 0 );
 				expect( blogPages.len() ).toBe( 2 );
 				expect( blogPages[ 1 ].urlPath ).toBe( "blog/index.html" );
 				expect( blogPages[ 2 ].urlPath ).toBe( "blog/page/2/index.html" );
 				expect( blogPages[ 2 ].title ).toInclude( "Page 2" );
+			} );
+
+			it( "builds one archive index page per distinct calendar year, newest year first", function() {
+				var posts = [
+					newPost( { slug : "a", urlPath : "blog/a/index.html", date : "2026-06-01" } ),
+					newPost( { slug : "b", urlPath : "blog/b/index.html", date : "2025-03-01" } ),
+					newPost( { slug : "c", urlPath : "blog/c/index.html", date : "2025-01-01" } )
+				];
+
+				var result = builder.build( posts, {}, 10, "/" );
+
+				var archivePages = result.indexPages.filter( p => p.urlPath.findNoCase( "blog/archive" ) > 0 );
+				var archiveUrls = archivePages.map( p => p.urlPath );
+				expect( archiveUrls ).toInclude( "blog/archive/2026/index.html" );
+				expect( archiveUrls ).toInclude( "blog/archive/2025/index.html" );
+				expect( archivePages.filter( p => p.urlPath == "blog/archive/2026/index.html" )[ 1 ].title ).toBe( "2026" );
+			} );
+
+			it( "paginates a year archive independently, per postsPerPage", function() {
+				var posts = [
+					newPost( { slug : "a", urlPath : "blog/a/index.html", date : "2026-03-01" } ),
+					newPost( { slug : "b", urlPath : "blog/b/index.html", date : "2026-02-01" } ),
+					newPost( { slug : "c", urlPath : "blog/c/index.html", date : "2026-01-01" } )
+				];
+
+				var result = builder.build( posts, {}, 2, "/" );
+
+				var yearPages = result.indexPages.filter( p => p.urlPath.findNoCase( "blog/archive/2026" ) == 1 );
+				expect( yearPages.len() ).toBe( 2 );
+				var yearUrls = yearPages.map( p => p.urlPath );
+				expect( yearUrls ).toInclude( "blog/archive/2026/index.html" );
+				expect( yearUrls ).toInclude( "blog/archive/2026/page/2/index.html" );
+			} );
+
+			it( "adds a Browse-by-year archive links block to the main blog list only when posts span more than one year", function() {
+				var singleYearPosts = [ newPost( { slug : "a", urlPath : "blog/a/index.html", date : "2026-01-01" } ) ];
+				var singleYearResult = builder.build( singleYearPosts, {}, 10, "/" );
+				var singleYearBlogPage = singleYearResult.indexPages.filter( p => p.urlPath == "blog/index.html" )[ 1 ];
+				expect( singleYearBlogPage.contentHtml ).notToInclude( "blog-archive-links" );
+
+				var multiYearPosts = [
+					newPost( { slug : "a", urlPath : "blog/a/index.html", date : "2026-01-01" } ),
+					newPost( { slug : "b", urlPath : "blog/b/index.html", date : "2025-01-01" } )
+				];
+				var multiYearResult = builder.build( multiYearPosts, {}, 10, "/" );
+				var multiYearBlogPage = multiYearResult.indexPages.filter( p => p.urlPath == "blog/index.html" )[ 1 ];
+				expect( multiYearBlogPage.contentHtml ).toInclude( "blog-archive-links" );
+				expect( multiYearBlogPage.contentHtml ).toInclude( 'href="/blog/archive/2026/index.html"' );
+				expect( multiYearBlogPage.contentHtml ).toInclude( 'href="/blog/archive/2025/index.html"' );
 			} );
 
 			it( "builds one category index page per distinct category, url-slugged", function() {

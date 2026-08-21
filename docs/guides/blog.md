@@ -11,9 +11,9 @@ A blog is another by-convention feature, the same shape as
 [versions](../configuration.md#versioning)/[i18n](i18n.md) or the
 [tags index](../getting-started.md#add-pages) - drop posts under
 `docs/blog/posts/`, and BX Docs builds `/blog/` (paginated), a category page
-per category, an author page per author, and an RSS feed, with zero config
-required. A project with no `docs/blog/posts/` folder simply doesn't have a
-blog - nothing else changes.
+per category, a year archive page per calendar year, an author page per
+author, and an RSS feed, with zero config required. A project with no
+`docs/blog/posts/` folder simply doesn't have a blog - nothing else changes.
 
 ## Writing a post
 
@@ -108,30 +108,44 @@ automatically, no `avatar:` key needed. An explicit `avatar` in
 `authors.yml` (a URL or a `docs/assets/`-relative path) always overrides
 the by-convention lookup.
 
-## Categories, pagination, and the "Blog" nav entry
+## Categories, archives, pagination, and the "Blog" nav entry
 
 Every distinct `categories` value across all posts gets its own
-`/blog/category/<slug>/` page, listing just that category's own posts. The
-main `/blog/` list and every category page paginate identically -
-`blog.postsPerPage` in the site config controls how many posts per page
-(default `10`); page 2 onward moves to `.../page/2/`, `.../page/3/`, etc.
+`/blog/category/<slug>/` page, listing just that category's own posts.
+Every calendar year with at least one post also gets its own
+`/blog/archive/<year>/` page (`/blog/archive/2026/`, `/blog/archive/2025/`,
+...), derived entirely from each post's own `date` frontmatter - no folder
+structure or filename convention required, so where a post's `.md` file
+actually lives under `docs/blog/posts/` (flat, or split into your own
+subfolders for easier browsing while editing) never has to match its
+`date`. The main `/blog/` list gets a "Browse by year" links block, with a
+post count per year, automatically once posts span more than one year -
+one year alone isn't worth a links block, so it's left off.
+
+The main `/blog/` list, every category page, and every year archive page
+all paginate identically - `blog.postsPerPage` in the site config controls
+how many posts per page (default `10`); page 2 onward moves to
+`.../page/2/`, `.../page/3/`, etc.
 
 A single "Blog" entry is added to the main nav automatically, once
 `docs/blog/posts/` has at least one non-draft post - no `nav`/`docs/nav.json`
 change needed. Individual posts aren't added to the nav themselves (same as
 the tags index) - they're reachable from `/blog/`, their own category page,
-their author's page, search, and each other's prev/next links (posts
-chronologically adjacent to one another, independent of the regular nav's
-own prev/next chain).
+their own year archive, their author's page, search, and each other's
+prev/next links (posts chronologically adjacent to one another, independent
+of the regular nav's own prev/next chain).
 
 ## Feed
 
-`/blog/feed.xml` - a standard RSS 2.0 feed of every post, newest first,
-written whenever the site config resolves an absolute `baseURL` (same
-requirement as `sitemap.xml`) and `blog.feed` isn't set to `false`:
+`/blog/feed.xml` - a standard RSS 2.0 feed of the most recent posts, newest
+first, written whenever the site config resolves an absolute `baseURL`
+(same requirement as `sitemap.xml`) and `blog.feed` isn't set to `false`.
+Capped to `blog.feedLimit` posts (default `20`) - most feed readers only
+care about what's new, so an unbounded feed on a large blog just wastes
+bandwidth on every poll; set it to `0` for every post, uncapped:
 
 ```json
-{ "blog": { "postsPerPage": 10, "feed": true } }
+{ "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 20 } }
 ```
 
 ## SEO and social

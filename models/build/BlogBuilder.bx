@@ -4,9 +4,11 @@
  * assignTableOfContents()/etc. finishing steps first) into everything the
  * blog itself needs: each post's own detail-page content (a featured-image/
  * byline header prepended to its real body), plus every "index" page around
- * it - `/blog/` (paginated), one `/blog/category/<slug>/` per category
- * (paginated), and one `/blog/authors/<id>/` per author who has at least
- * one post.
+ * it - `/blog/` (paginated, with a "Browse by year" archive links block when
+ * posts span more than one year), one `/blog/category/<slug>/` per category
+ * (paginated), one `/blog/archive/<year>/` per calendar year with at least
+ * one post (paginated), and one `/blog/authors/<id>/` per author who has at
+ * least one post.
  *
  * Pure HTML-string generation - no file I/O. Every index page comes back as
  * a minimal page struct (`title`/`description`/`contentHtml`/`urlPath`/
@@ -33,11 +35,24 @@ class {
 		var enrichedPosts = enrichPosts( arguments.posts, arguments.authors, arguments.basePath )
 
 		var indexPages = []
-		indexPages.append( buildListPages( enrichedPosts, "blog", "Blog", arguments.postsPerPage, arguments.basePath ), true )
+
+		var mainListPages = buildListPages( enrichedPosts, "blog", "Blog", arguments.postsPerPage, arguments.basePath )
+		var archiveLinksHtml = renderArchiveLinksHtml( enrichedPosts, arguments.basePath )
+		if ( len( archiveLinksHtml ) ) {
+			for ( var page in mainListPages ) {
+				page.contentHtml &= archiveLinksHtml
+			}
+		}
+		indexPages.append( mainListPages, true )
 
 		for ( var category in distinctCategories( enrichedPosts ) ) {
 			var categoryPosts = enrichedPosts.filter( post => hasCategoryNoCase( post.categories ?: [], category ) )
 			indexPages.append( buildListPages( categoryPosts, "blog/category/" & slugify( category ), category, arguments.postsPerPage, arguments.basePath ), true )
+		}
+
+		for ( var yr in distinctYears( enrichedPosts ) ) {
+			var yearPosts = enrichedPosts.filter( post => year( post.date ) == yr )
+			indexPages.append( buildListPages( yearPosts, "blog/archive/" & yr, "#yr#", arguments.postsPerPage, arguments.basePath ), true )
 		}
 
 		for ( var authorId in distinctAuthorIds( enrichedPosts ) ) {
@@ -404,6 +419,56 @@ class {
 			return arguments.text
 		}
 		return left( arguments.text, arguments.maxLength ).reReplace( "\s+\S*$", "", "one" ) & "…"
+	}
+
+	/**
+	 * Every distinct calendar year `posts` has at least one post in,
+	 * newest first - backs the automatic `blog/archive/<year>/` pages, the
+	 * same by-convention shape as category pages (build()'s own loop).
+	 *
+	 * @posts Enriched posts
+	 */
+	private array function distinctYears( required array posts ) {
+		var seen = {}
+		var years = []
+		for ( var post in arguments.posts ) {
+			var yr = year( post.date )
+			if ( seen.keyExists( yr ) ) {
+				continue
+			}
+			seen[ yr ] = true
+			years.append( yr )
+		}
+		years.sort( ( a, b ) => b - a )
+		return years
+	}
+
+	/**
+	 * A "Browse by year" links block, one entry per distinct year with its
+	 * own post count, appended onto the main `/blog/` list page(s) only -
+	 * never onto a category or archive-year page itself, to avoid the same
+	 * block repeating on every one of them. "" (nothing rendered) when
+	 * there's only one year total - a single-entry archive list isn't worth
+	 * showing, the same reasoning renderPager() already skips a pager for
+	 * one page.
+	 *
+	 * @posts Enriched posts
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	private string function renderArchiveLinksHtml( required array posts, required string basePath ) {
+		var years = distinctYears( arguments.posts )
+		if ( years.len() < 2 ) {
+			return ""
+		}
+
+		var html = '<div class="blog-archive-links"><h2>Archive</h2><ul>'
+		for ( var yr in years ) {
+			var count = arguments.posts.filter( post => year( post.date ) == yr ).len()
+			html &= '<li><a href="' & arguments.basePath & "blog/archive/" & yr & '/index.html">' & yr & "</a> (" & count & ")</li>"
+		}
+		html &= "</ul></div>"
+
+		return html
 	}
 
 	/**

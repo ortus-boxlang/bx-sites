@@ -18,14 +18,19 @@ class {
 	 * @siteName The site's own name (the site config's `name`), used as the feed's channel title prefix
 	 * @siteUrl The absolute site URL, ending with `/` (BaseUrlResolver's `absolute` - already carries any sub-path, so it's the only prefix `post.urlPath` needs, the same convention SitemapGenerator.bx/UpdatesFeedGenerator.bx already use)
 	 * @categoryFilter Restrict the feed to posts in this one category, and title/link it accordingly - "" (default) for the whole blog
+	 * @limit Cap the feed to this many most-recent posts (after category filtering) - `0` (the default) means unlimited. `posts` is already newest-first, so this is a plain head-slice, no re-sorting
 	 *
 	 * @return The rendered feed.xml content
 	 */
-	string function build( required array posts, required string siteName, required string siteUrl, string categoryFilter = "" ) {
+	string function build( required array posts, required string siteName, required string siteUrl, string categoryFilter = "", numeric limit = 0 ) {
 		var category = trim( arguments.categoryFilter )
 		var filtered = len( category )
 			? arguments.posts.filter( post => hasCategoryNoCase( post.categories ?: [], category ) )
 			: arguments.posts
+
+		if ( arguments.limit > 0 && filtered.len() > arguments.limit ) {
+			filtered = filtered.slice( 1, arguments.limit )
+		}
 
 		var channelTitle = arguments.siteName & " Blog" & ( len( category ) ? " - " & category : "" )
 		var channelLink = arguments.siteUrl & "blog/" & ( len( category ) ? "category/" & slugify( category ) & "/" : "" )
