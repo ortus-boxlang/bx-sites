@@ -1,10 +1,30 @@
 /**
  * Extends fenced code blocks with mkdocs-style annotations in the info
- * string - `hl_lines`, `linenums`, and `title`:
+ * string - `hl_lines`, `linenums`, `title`, `frame`, `insert` and `delete`:
  *
  *   ```bx hl_lines="2 4-6" linenums="1" title="app.bx"
  *   ...
  *   ```
+ *
+ *   ```bash frame="terminal" title="user@boxlang"
+ *   ...
+ *   ```
+ *
+ *   ```bx title="add.bx" insert="3-4" delete="7"
+ *   ...
+ *   ```
+ *
+ * `frame="terminal"` swaps the plain title bar for a macOS-style window
+ * (three status dots, centered title) - the only other recognized value is
+ * the default, `"code"` (today's plain bar; naming it is pure symmetry,
+ * nothing needs to write it). `insert`/`delete` mark lines as added/removed
+ * - same space/range syntax `hl_lines` already uses - rendered as a tinted
+ * row plus a gutter marker. Spelled out in full deliberately, matching
+ * every other attribute here (`hl_lines` predates this convention) - not
+ * literal `+`/`-` line prefixes the way Expressive Code does it, since that
+ * would mean stripping them back out again for the existing copy button;
+ * keeping them as attributes leaves the fence's own content real,
+ * unmodified, copy-pasteable source.
  *
  * bx-markdown/Flexmark only ever reads the first word of a fence's info
  * string (the language, for its `language-xxx` class) - anything after it
@@ -133,6 +153,15 @@ class {
 				if ( len( annotation.title ?: "" ) ) {
 					attrs &= ' data-bxdocs-title="' & encodeForHTML( annotation.title ) & '"'
 				}
+				if ( ( annotation.frame ?: "" ) eq "terminal" ) {
+					attrs &= ' data-bxdocs-frame="terminal"'
+				}
+				if ( ( annotation.insertLines ?: [] ).len() ) {
+					attrs &= ' data-bxdocs-insert-lines="' & annotation.insertLines.toList( "," ) & '"'
+				}
+				if ( ( annotation.deleteLines ?: [] ).len() ) {
+					attrs &= ' data-bxdocs-delete-lines="' & annotation.deleteLines.toList( "," ) & '"'
+				}
 			}
 
 			matcher.appendReplacement( buffer, quoteReplacement( "<pre" & attrs & "><code" ) )
@@ -144,9 +173,10 @@ class {
 
 	/**
 	 * Parses a fence's `key="value"` attributes into a normalized annotation
-	 * struct (`hlLines`, `showLineNumbers`, `startLine`, `title`).
+	 * struct (`hlLines`, `showLineNumbers`, `startLine`, `title`, `frame`,
+	 * `insertLines`, `deleteLines`).
 	 *
-	 * @rest The fence info string with the language token already removed, e.g. `hl_lines="2 4-6" linenums="1" title="app.bx"`
+	 * @rest The fence info string with the language token already removed, e.g. `hl_lines="2 4-6" linenums="1" title="app.bx" frame="terminal" insert="3-4" delete="7"`
 	 */
 	private struct function parseAttrs( required string rest ) {
 		var raw = {}
@@ -155,7 +185,15 @@ class {
 			raw[ matcher.group( 1 ) ] = matcher.group( 2 )
 		}
 
-		var annotation = { hlLines : [], showLineNumbers : false, startLine : 1, title : trim( raw.title ?: "" ) }
+		var annotation = {
+			hlLines : [],
+			showLineNumbers : false,
+			startLine : 1,
+			title : trim( raw.title ?: "" ),
+			frame : trim( raw.frame ?: "" ),
+			insertLines : [],
+			deleteLines : []
+		}
 
 		if ( len( trim( raw.hl_lines ?: "" ) ) ) {
 			annotation.hlLines = expandLineRanges( raw.hl_lines )
@@ -164,6 +202,18 @@ class {
 		if ( raw.keyExists( "linenums" ) ) {
 			annotation.showLineNumbers = true
 			annotation.startLine = val( trim( raw.linenums ) ) ? val( trim( raw.linenums ) ) : 1
+		}
+
+		// Bracket notation, not `raw.insert`/`raw.delete` - `insert`/`delete`
+		// read fine as struct keys either way in practice, but bracket access
+		// sidesteps any ambiguity with `delete` as a CFML/BoxLang statement
+		// keyword rather than relying on it.
+		if ( len( trim( raw[ "insert" ] ?: "" ) ) ) {
+			annotation.insertLines = expandLineRanges( raw[ "insert" ] )
+		}
+
+		if ( len( trim( raw[ "delete" ] ?: "" ) ) ) {
+			annotation.deleteLines = expandLineRanges( raw[ "delete" ] )
 		}
 
 		return annotation
