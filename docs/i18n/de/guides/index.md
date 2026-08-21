@@ -12,3 +12,4 @@ order: 5
 - [Plugins](plugins.md) - BX Docs mit einem eigenen BoxLang-Modul erweitern
 - [Internationalisierung (i18n)](i18n.md) - deine Docs in andere Sprachen übersetzen
 - [Migration von GitBook](migrating-from-gitbook.md) - einen GitBook-Export mit einem Befehl in ein bx-docs-Projekt umwandeln
+- [Migration von mkdocs](migrating-from-mkdocs.md) - ein mkdocs-Projekt mit einem Befehl in ein bx-docs-Projekt umwandeln
