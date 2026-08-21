@@ -28,9 +28,10 @@ Markdown から静的なドキュメントサイトを生成する BoxLang モ�
   `bxdocs.json` のオプションをそのまま渡します。
 - **BoxLang 独自のモジュールシステムを基盤にしたプラグインシステム。**
   プラグインは単なる別の BoxLang モジュールであり、専用の Plugin API を学ぶ必要はありません。
-- **GitBook から直接移行。** `bxDocs migrate --source=...` コマンドで、
-  GitBook のエクスポート（`SUMMARY.md`、コンテンツブロック、アセット）を
-  一つのコマンドで動作する bx-docs プロジェクトに変換します。
+- **GitBook または mkdocs から直接移行。** `bxDocs migrate --source=...
+  --from=gitbook|mkdocs` コマンドで、既存の GitBook エクスポートまたは
+  mkdocs プロジェクトを、一つのコマンドで動作する bx-docs プロジェクトに
+  変換します。
 
 ## 次のステップ
 
@@ -43,4 +44,5 @@ Markdown から静的なドキュメントサイトを生成する BoxLang モ�
 - [Markdown 拡張機能](guides/markdown.md) - Admonition、脚注、定義リスト、コンテンツタブ、数式、コードアノテーション、Mermaid ダイアグラム
 - [プラグイン](guides/plugins.md) - 独自の BoxLang モジュールで BX Docs を拡張する
 - [GitBook からの移行](guides/migrating-from-gitbook.md) - GitBook エクスポートを一つのコマンドで bx-docs プロジェクトに変換する
+- [mkdocs からの移行](guides/migrating-from-mkdocs.md) - mkdocs プロジェクトを一つのコマンドで bx-docs プロジェクトに変換する
 - [リリース](releases/index.md) - バージョンポリシーと各リリースの新機能

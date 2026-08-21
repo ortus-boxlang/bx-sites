@@ -101,9 +101,9 @@ BX Docs 自身は Markdown を解析せず、bx-markdown に委譲し、
 <code>bxdocs.json</code> のオプションをそのまま渡します。</li>
 <li><strong>BoxLang 独自のモジュールシステムを基盤にしたプラグインシステム。</strong>
 プラグインは単なる別の BoxLang モジュールであり、専用の Plugin API を学ぶ必要はありません。</li>
-<li><strong>GitBook から直接移行。</strong> <code>bxDocs migrate --source=...</code> コマンドで、
-GitBook のエクスポート（<code>SUMMARY.md</code>、コンテンツブロック、アセット）を
-一つのコマンドで動作する bx-docs プロジェクトに変換します。</li>
+<li><strong>GitBook または mkdocs から直接移行。</strong> <code>bxDocs migrate --source=... --from=gitbook|mkdocs</code> コマンドで、既存の GitBook エクスポートまたは
+mkdocs プロジェクトを、一つのコマンドで動作する bx-docs プロジェクトに
+変換します。</li>
 </ul>
 <h2 id="次のステップ"><a href="#次のステップ" id="次のステップ" name="次のステップ" class="anchor"></a>次のステップ</h2>
 <ul>
@@ -116,11 +116,12 @@ GitBook のエクスポート（<code>SUMMARY.md</code>、コンテンツブロ�
 <li><a href="/bx-docs/development/theme/material/ja/guides/markdown/index.html">Markdown 拡張機能</a> - Admonition、脚注、定義リスト、コンテンツタブ、数式、コードアノテーション、Mermaid ダイアグラム</li>
 <li><a href="/bx-docs/development/theme/material/ja/guides/plugins/index.html">プラグイン</a> - 独自の BoxLang モジュールで BX Docs を拡張する</li>
 <li><a href="/bx-docs/development/theme/material/ja/guides/migrating-from-gitbook/index.html">GitBook からの移行</a> - GitBook エクスポートを一つのコマンドで bx-docs プロジェクトに変換する</li>
+<li><a href="/bx-docs/development/theme/material/ja/guides/migrating-from-mkdocs/index.html">mkdocs からの移行</a> - mkdocs プロジェクトを一つのコマンドで bx-docs プロジェクトに変換する</li>
 <li><a href="/bx-docs/development/theme/material/ja/releases/index.html">リリース</a> - バージョンポリシーと各リリースの新機能</li>
 </ul>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/i18n/ja/index.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-docs/development/theme/material/ja/index.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 21, 2026, 5:17:12 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/i18n/ja/index.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-docs/development/theme/material/ja/index.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 21, 2026, 5:52:15 PM</span></div>
 			</article>
 
 			<nav class="md-page-nav" aria-label="Page navigation">

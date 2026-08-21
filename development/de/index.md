@@ -34,9 +34,10 @@ Genau diese Seite wird von BX Docs gebaut, aus den Markdown-Dateien im
 - **Ein Plugin-System, das auf BoxLangs eigenem Modulsystem aufbaut.** Ein
   Plugin ist einfach ein weiteres installiertes BoxLang-Modul - keine
   separate Plugin-API zu lernen.
-- **Direkte Migration aus GitBook.** `bxDocs migrate --source=...`
-  wandelt einen GitBook-Export - `SUMMARY.md`, seine Inhaltsblöcke, seine
-  Assets - mit einem Befehl in ein funktionierendes bx-docs-Projekt um.
+- **Direkte Migration aus GitBook oder mkdocs.** `bxDocs migrate
+  --source=... --from=gitbook|mkdocs` wandelt einen bestehenden
+  GitBook-Export oder ein mkdocs-Projekt mit einem Befehl in ein
+  funktionierendes bx-docs-Projekt um.
 
 ## Wie geht es weiter
 
@@ -49,4 +50,5 @@ Genau diese Seite wird von BX Docs gebaut, aus den Markdown-Dateien im
 - [Markdown-Erweiterungen](guides/markdown.md) - Admonitions, Fußnoten, Definitionslisten, Content-Tabs, Mathematik, Code-Annotationen und Mermaid-Diagramme
 - [Plugins](guides/plugins.md) - BX Docs mit einem eigenen BoxLang-Modul erweitern
 - [Migration von GitBook](guides/migrating-from-gitbook.md) - einen GitBook-Export mit einem Befehl in ein bx-docs-Projekt umwandeln
+- [Migration von mkdocs](guides/migrating-from-mkdocs.md) - ein mkdocs-Projekt mit einem Befehl in ein bx-docs-Projekt umwandeln
 - [Releases](releases/index.md) - Versionierungsrichtlinie und Neuigkeiten pro Release

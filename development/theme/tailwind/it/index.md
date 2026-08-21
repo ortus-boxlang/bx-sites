@@ -34,10 +34,10 @@ cartella `docs/` di questo repository - vedi
 - **Un sistema di plugin costruito sul sistema di moduli di BoxLang.** Un
   plugin è semplicemente un altro modulo BoxLang installato - nessuna API
   di plugin separata da imparare.
-- **Migra direttamente da GitBook.** `bxDocs migrate --source=...`
-  converte un export di GitBook - `SUMMARY.md`, i suoi blocchi di
-  contenuto, i suoi asset - in un progetto bx-docs funzionante con un
-  unico comando.
+- **Migra direttamente da GitBook o mkdocs.** `bxDocs migrate
+  --source=... --from=gitbook|mkdocs` converte un export di GitBook o
+  un progetto mkdocs esistente in un progetto bx-docs funzionante con
+  un unico comando.
 
 ## Dove andare adesso
 
@@ -50,4 +50,5 @@ cartella `docs/` di questo repository - vedi
 - [Estensioni Markdown](guides/markdown.md) - ammonizioni, note a piè di pagina, liste di definizioni, schede di contenuto, matematica, annotazioni del codice e diagrammi Mermaid
 - [Plugin](guides/plugins.md) - estendere BX Docs con un tuo modulo BoxLang
 - [Migrare da GitBook](guides/migrating-from-gitbook.md) - convertire un export di GitBook in un progetto bx-docs con un solo comando
+- [Migrare da mkdocs](guides/migrating-from-mkdocs.md) - convertire un progetto mkdocs in un progetto bx-docs con un solo comando
 - [Release](releases/index.md) - politica di versionamento e novità di ogni release

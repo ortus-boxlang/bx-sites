@@ -38,9 +38,10 @@ A lunr.js-powered search box, wired against a search index built at
 A plugin is just another installed BoxLang module - no separate plugin API
 to learn.
 :::
-::: card title="Migrate straight from GitBook" icon="phosphor-duotone:swap" href="guides/migrating-from-gitbook.md"
-`bxDocs migrate --source=...` converts a GitBook export into a working
-bx-docs project in one command.
+::: card title="Migrate from GitBook or mkdocs" icon="phosphor-duotone:swap" href="guides/index.md"
+`bxDocs migrate --source=... --from=gitbook|mkdocs` converts an existing
+GitBook export or mkdocs project into a working bx-docs project in one
+command.
 :::
 :::
 
