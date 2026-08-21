@@ -79,18 +79,28 @@ class {
 
 	/**
 	 * Runs the full `build` verb end to end: load config -> resolve plugins
-	 * -> render the main doc tree, every `docs/versions/<name>/` tree, and
-	 * every `docs/i18n/<code>/` tree -> copy assets -> write
+	 * -> render the main doc tree, every `docs/versions/<name>/` tree (plus,
+	 * by the same by-convention rule one level down, every
+	 * `docs/versions/<name>/i18n/<code>/` tree composed onto it), and every
+	 * top-level `docs/i18n/<code>/` tree -> copy assets -> write
 	 * 404/tags/sitemap.xml/llms.txt -> fire `onBuildComplete`.
 	 *
-	 * Versions and locales don't compose in v1 - a `docs/versions/<name>/`
-	 * tree is always rendered in the site's default locale only, with no
-	 * language switcher of its own (there's nothing for it to link to), and
-	 * a `docs/i18n/<code>/` tree never shows a version switcher either -
-	 * each secondary axis stays invisible inside the other's own tree,
-	 * rather than risk a version switch silently dropping a reader back
-	 * into the unlocalized default language, or a language switch landing
-	 * them outside the version they were reading.
+	 * Versions and locales compose one level: a `docs/versions/<name>/`
+	 * tree's own default-locale render shows a language switcher too, listing
+	 * only the locales that version itself has translations for
+	 * (`docs/versions/<name>/i18n/<code>/`, discovered the same
+	 * by-convention way as the top-level `docs/i18n/<code>/` - see
+	 * LocalesDiscoverer.bx) - a version with no `i18n/` subfolder of its own
+	 * renders exactly as before, no switcher shown. Both switchers always
+	 * link to a tree's own homepage (never attempt to land on "the same page
+	 * in the other tree" - see renderVersionSwitcher()/renderLocaleDropdown()
+	 * in a theme's own layout.bxm), and each stays scoped to the axis it
+	 * belongs to: the version switcher on a
+	 * `versions/2.0/es/` page still lists every version (switching version
+	 * always drops back to that version's own default locale, never
+	 * assumes the target version has the same translation), while the
+	 * locale switcher there only lists locales *that version itself*
+	 * translates (switching locale always stays on the current version).
 	 *
 	 * @projectRoot Absolute path to the project root
 	 *
@@ -125,24 +135,63 @@ class {
 		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math )
 
 		for ( var versionName in versionNames ) {
+			var versionDocsDir = root & "/docs/versions/" & versionName
 			var versionOutputDir = siteDir & "/versions/" & versionName
-			var versionPages = variables.docsLoader.load( root & "/docs/versions/" & versionName )
+			var versionBasePath = urls.basePath & "versions/" & versionName & "/"
+			var versionPages = variables.docsLoader.load( versionDocsDir )
+
+			var versionLocaleNames = variables.localesDiscoverer.discover( versionDocsDir )
+			var versionLocales = buildLocalesList( versionLocaleNames, config.i18n, versionBasePath )
+
 			var versionResult = renderDocTree(
 				versionPages,
-				root & "/docs/versions/" & versionName,
+				versionDocsDir,
 				config,
 				themeDir,
 				versionOutputDir,
-				urls.basePath & "versions/" & versionName & "/",
+				versionBasePath,
 				root,
 				versions,
 				versionName,
 				"versions/" & versionName & "/",
 				plugins,
-				urls.absolute
+				urls.absolute,
+				[],
+				versionLocales,
+				defaultLocaleCode,
+				defaultLocaleDir
 			)
 			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
 			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math )
+
+			for ( var versionLocale in versionLocales ) {
+				if ( versionLocale.code == defaultLocaleCode ) {
+					continue
+				}
+				var versionLocaleOutputDir = versionOutputDir & "/" & versionLocale.code
+				var versionLocalePages = variables.docsLoader.load( versionDocsDir & "/i18n/" & versionLocale.code )
+				var mergedVersionLocalePages = mergeLocalePages( versionPages, versionLocalePages, versionLocale.code, "versions/" & versionName & "/" )
+				var versionLocaleResult = renderDocTree(
+					mergedVersionLocalePages,
+					versionDocsDir,
+					config,
+					themeDir,
+					versionLocaleOutputDir,
+					versionBasePath & versionLocale.code & "/",
+					root,
+					versions,
+					versionName,
+					"",
+					plugins,
+					urls.absolute,
+					[],
+					versionLocales,
+					versionLocale.code,
+					versionLocale.dir
+				)
+				allPages.append( prefixPageUrls( versionLocaleResult.pages, "versions/" & versionName & "/" & versionLocale.code & "/" ), true )
+				copyAssets( root, themeDir, versionLocaleOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math )
+			}
 		}
 
 		for ( var locale in locales ) {
@@ -209,27 +258,28 @@ class {
 	/**
 	 * Renders and writes one self-contained doc tree from an already-loaded
 	 * `pages` array - the project's own `docs/` (the "Latest"/default
-	 * build), one `docs/versions/<name>/` folder (VersionsDiscoverer.bx), or
-	 * one `docs/i18n/<code>/` folder merged against the default tree
-	 * (LocalesDiscoverer.bx, mergeLocalePages()). All three are rendered the
-	 * exact same way, just pre-loaded/rooted/output/base-pathed differently
-	 * by the caller.
+	 * build), one `docs/versions/<name>/` folder in its own default locale
+	 * (VersionsDiscoverer.bx), one top-level `docs/i18n/<code>/` folder
+	 * merged against the default tree, or one `docs/versions/<name>/i18n/<code>/`
+	 * folder merged against that version's own tree (LocalesDiscoverer.bx,
+	 * mergeLocalePages() either way). All four are rendered the exact same
+	 * way, just pre-loaded/rooted/output/base-pathed differently by the caller.
 	 *
-	 * @pages Already-loaded page structs for this tree - DocsLoader.load()'s own output for the main/version trees, or mergeLocalePages()'s output for a locale tree
-	 * @docsDir Absolute path this tree's `custom:` icons and `::: include` sources resolve against - always the project's own `<root>/docs` for a locale tree (translated pages don't need their own duplicated icon/include assets), `<root>/docs` or `<root>/docs/versions/<name>` otherwise
+	 * @pages Already-loaded page structs for this tree - DocsLoader.load()'s own output for the main/version trees, or mergeLocalePages()'s output for a locale (top-level or version-nested) tree
+	 * @docsDir Absolute path this tree's `custom:` icons and `::: include` sources resolve against - `<root>/docs` for the main tree and every top-level locale tree (translated pages don't need their own duplicated icon/include assets), `<root>/docs/versions/<name>` for a version tree and every locale tree nested under it
 	 * @config The site's bxdocs.json config
 	 * @themeDir Absolute path to the resolved theme folder
-	 * @outputDir Absolute path to write this tree's pages to (`site/`, `site/versions/<name>/`, or `site/<localeCode>/`)
-	 * @basePath Root-relative base path ending with `/`, already namespaced under `versions/<name>/`/`<localeCode>/` for a version/locale build
+	 * @outputDir Absolute path to write this tree's pages to (`site/`, `site/versions/<name>/`, `site/<localeCode>/`, or `site/versions/<name>/<localeCode>/`)
+	 * @basePath Root-relative base path ending with `/`, already namespaced under `versions/<name>/`/`<localeCode>/`/`versions/<name>/<localeCode>/` for a version/locale build
 	 * @root Absolute path to the project root - git's working directory for the `lastUpdated` lookup
 	 * @versions Version switcher entries as `[ { label, url } ]`, shared by every tree so the switcher is consistent everywhere
 	 * @currentVersion Which `versions` entry this tree IS, for the switcher's own "selected" state
-	 * @docsRelativePrefix Empty for the main/"Latest"/a locale tree (see assignEditAndLastUpdated() - a locale tree's own pages each carry their own `sourceRelativePath` instead); `"versions/<name>/"` for a version tree
+	 * @docsRelativePrefix Empty for the main/"Latest" tree or any locale tree (see assignEditAndLastUpdated() - a locale tree's own pages each carry their own `sourceRelativePath` instead, already namespaced under `versions/<name>/` by mergeLocalePages() when nested under a version); `"versions/<name>/"` for a version tree's own default-locale render
 	 * @plugins resolvePlugins()'s own output, applied via onNav/onPageMarkdown/onPageHtml
 	 * @absoluteUrl The absolute site URL, ending with `/` (BaseUrlResolver's `absolute`), or "" if unknown - gates `::: updates` feed.xml generation, same as sitemap.xml
-	 * @navConfig An explicit nav tree (NavBuilder.build()'s own `navConfig` shape) for this doc tree - empty (the default) infers nav from folder structure. Non-empty for the main tree and every locale tree (a locale's nav always mirrors the default tree's own structure/navConfig - see mergeLocalePages()); always empty for a version tree, which infers its own - see resolveExplicitNav()
-	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]`, the default locale first - empty for a version tree (no locale switcher inside a versioned build in v1)
-	 * @currentLocale Which `locales` entry's `code` this tree IS, for the switcher's own "selected" state - "" for a version tree
+	 * @navConfig An explicit nav tree (NavBuilder.build()'s own `navConfig` shape) for this doc tree - empty (the default) infers nav from folder structure. Non-empty for the main tree and every top-level locale tree (a locale's nav always mirrors its own default tree's structure/navConfig - see mergeLocalePages()); always empty for a version tree and any locale tree nested under it, which infer their own from that version's own folder structure - see resolveExplicitNav()
+	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]`, the default locale first - only the locales *this specific tree* has translations for (top-level `docs/i18n/<code>/` for the main tree, `docs/versions/<name>/i18n/<code>/` for a version tree and its own nested locale trees), so switching locale always stays within the current version
+	 * @currentLocale Which `locales` entry's `code` this tree IS, for the switcher's own "selected" state - the default locale's own code for the main tree and every version tree's own default-locale render (never "")
 	 * @currentLocaleDir `"ltr"`/`"rtl"`, this tree's own locale direction - stamped onto `<html dir="...">`
 	 *
 	 * @return { pages, nav }
@@ -604,13 +654,14 @@ class {
 	 * fallback behavior this session settled on over an alternative of
 	 * omitting untranslated pages entirely.
 	 *
-	 * @defaultPages The default tree's own already-loaded pages (DocsLoader.load()'s output for `<root>/docs`)
-	 * @localePages This locale's own already-loaded pages (DocsLoader.load()'s output for `<root>/docs/i18n/<code>`)
+	 * @defaultPages The default tree's own already-loaded pages (DocsLoader.load()'s output for `<root>/docs`, or - composing with a version - `<root>/docs/versions/<name>/`)
+	 * @localePages This locale's own already-loaded pages (DocsLoader.load()'s output for `<root>/docs/i18n/<code>`, or `<root>/docs/versions/<name>/i18n/<code>` when composing with a version)
 	 * @localeCode This locale's own code, for building each translated page's own `sourceRelativePath`
+	 * @docsRelativePrefix Prepended to every `sourceRelativePath`, `docs/`-relative - `""` (default) for the main tree, `"versions/<name>/"` when composing with a version, so edit-URL/last-updated lookups (assignEditAndLastUpdated()) resolve against the right source file either way
 	 *
 	 * @return Array of page structs, same shape/order as `defaultPages`, each additionally stamped `isFallbackContent` and `sourceRelativePath`
 	 */
-	private array function mergeLocalePages( required array defaultPages, required array localePages, required string localeCode ) {
+	private array function mergeLocalePages( required array defaultPages, required array localePages, required string localeCode, string docsRelativePrefix = "" ) {
 		var localesByPath = {}
 		for ( var localePage in arguments.localePages ) {
 			localesByPath[ lCase( localePage.relativePath ) ] = localePage
@@ -623,12 +674,12 @@ class {
 			if ( localesByPath.keyExists( key ) ) {
 				var translated = duplicate( localesByPath[ key ] )
 				translated.isFallbackContent = false
-				translated.sourceRelativePath = "i18n/" & arguments.localeCode & "/" & translated.relativePath
+				translated.sourceRelativePath = arguments.docsRelativePrefix & "i18n/" & arguments.localeCode & "/" & translated.relativePath
 				merged.append( translated )
 			} else {
 				var fallback = duplicate( defaultPage )
 				fallback.isFallbackContent = true
-				fallback.sourceRelativePath = fallback.relativePath
+				fallback.sourceRelativePath = arguments.docsRelativePrefix & fallback.relativePath
 				merged.append( fallback )
 			}
 		}
