@@ -38,6 +38,26 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.annotations[ 1 ].hlLines ).toBe( [ 2, 4, 5, 6 ] );
 			} );
 
+			it( "parses frame/insert/delete attributes alongside the existing trio", function() {
+				var md = '```bx title="add.bx" frame="terminal" insert="3-4" delete="7"' & char( 10 ) & "x" & char( 10 ) & "```";
+				var result = processor.extractAndStrip( md );
+
+				var annotation = result.annotations[ 1 ];
+				expect( annotation.frame ).toBe( "terminal" );
+				expect( annotation.insertLines ).toBe( [ 3, 4 ] );
+				expect( annotation.deleteLines ).toBe( [ 7 ] );
+			} );
+
+			it( "defaults frame to an empty string and insert/delete to empty arrays when absent", function() {
+				var md = '```bx hl_lines="1"' & char( 10 ) & "x" & char( 10 ) & "```";
+				var result = processor.extractAndStrip( md );
+
+				var annotation = result.annotations[ 1 ];
+				expect( annotation.frame ).toBe( "" );
+				expect( annotation.insertLines ).toBe( [] );
+				expect( annotation.deleteLines ).toBe( [] );
+			} );
+
 			it( "tracks annotations in fence order across multiple fences, including untouched ones", function() {
 				var md = '```bx title="a.bx"' & char( 10 ) & "1" & char( 10 ) & "```" & char( 10 ) & char( 10 ) &
 					"```" & char( 10 ) & "plain" & char( 10 ) & "```" & char( 10 ) & char( 10 ) &
@@ -113,6 +133,22 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( result ).toInclude( '<pre data-bxdocs-hl-lines="1" data-bxdocs-start-line="3" data-bxdocs-title="app.bx"><code class="language-bx">' );
 				expect( result ).toInclude( '<pre><code>plain' );
+			} );
+
+			it( "stamps data-bxdocs-frame only for frame=\"terminal\", and data-bxdocs-insert-lines/delete-lines when set", function() {
+				var html = '<pre><code>a' & char( 10 ) & '</code></pre>' & char( 10 ) &
+					'<pre><code>b' & char( 10 ) & '</code></pre>';
+				var annotations = [
+					{ hlLines : [], showLineNumbers : false, startLine : 1, title : "", frame : "terminal", insertLines : [ 3, 4 ], deleteLines : [ 7 ] },
+					{ hlLines : [], showLineNumbers : false, startLine : 1, title : "", frame : "code", insertLines : [], deleteLines : [] }
+				];
+
+				var result = processor.applyToHtml( html, annotations );
+
+				expect( result ).toInclude( '<pre data-bxdocs-frame="terminal" data-bxdocs-insert-lines="3,4" data-bxdocs-delete-lines="7"><code>a' );
+				// frame="code" is the plain-bar default - no data-bxdocs-frame at all, same as omitting it.
+				expect( result ).toInclude( '<pre><code>b' );
+				expect( result ).notToInclude( 'data-bxdocs-frame="code"' );
 			} );
 
 		} );
