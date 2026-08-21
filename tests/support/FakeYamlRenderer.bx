@@ -1,0 +1,21 @@
+/**
+ * A deterministic stand-in for YamlRenderer.bx, used to unit-test
+ * ConfigLoader.bx/MkdocsMigrator.bx/BlogAuthorsLoader.bx without a live
+ * bx-yaml module activation - see YamlRenderer.bx's docblock for why the
+ * real one can't be unit tested directly. Round-trips through JSON under
+ * the hood (a fake "YAML" string that only this class - and whatever test
+ * injected it on both the writing and reading side - ever needs to parse
+ * back), the same one-fake-covers-both-directions shape
+ * tests/support/FakeMarkdownRenderer.bx uses.
+ */
+class {
+
+	any function fromYaml( required string content ) {
+		return jsonDeserialize( arguments.content )
+	}
+
+	string function toYaml( required any value ) {
+		return jsonSerialize( arguments.value )
+	}
+
+}

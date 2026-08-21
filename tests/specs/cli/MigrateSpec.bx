@@ -97,9 +97,9 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( result.exitCode ).toBe( 0 );
 				expect( result.message ).toInclude( "Migrated 1 page(s)" );
-				expect( fileExists( projectRoot & "/bxdocs.json" ) ).toBeTrue();
+				expect( fileExists( projectRoot & "/bxdocs.yaml" ) ).toBeTrue();
 				expect( fileExists( projectRoot & "/docs/index.md" ) ).toBeTrue();
-				expect( jsonDeserialize( fileRead( projectRoot & "/bxdocs.json" ) ).name ).toBe( "My Docs" );
+				expect( yamlDeserialize( fileRead( projectRoot & "/bxdocs.yaml" ) ).name ).toBe( "My Docs" );
 			} );
 
 		} );

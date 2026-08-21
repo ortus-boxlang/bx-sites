@@ -1,0 +1,160 @@
+/**
+ * Loads a project's blog author roster "by convention" - `docs/blog/authors.yml`,
+ * one entry per author id, each a `{ name (required), title, bio, url, email,
+ * avatar, socials }` object. A project with no blog authors simply has no
+ * `docs/blog/authors.yml`, and load() returns an empty struct - a post can
+ * still list plain-string `authors` with no matching entry (resolve() falls
+ * back to a name-only byline rather than failing the build over a typo'd id).
+ *
+ * `avatar` is resolved by convention when a project doesn't set one
+ * explicitly: `docs/assets/blog/authors/<id>.{jpg,jpeg,png,webp,svg}`, the
+ * first extension found wins. An explicit `avatar` in authors.yml always
+ * overrides the by-convention lookup.
+ */
+class {
+
+	/**
+	 * Extensions checked, in order, when resolving an author's avatar by
+	 * convention.
+	 */
+	variables.avatarExtensions = [ "jpg", "jpeg", "png", "webp", "svg" ]
+
+	/**
+	 * Parses `docs/blog/authors.yml` - real bx-yaml BIFs by default,
+	 * swappable via setYamlRenderer() (YamlRenderer.bx's own docblock
+	 * explains why).
+	 */
+	variables.yamlRenderer = new "models.build.YamlRenderer@bxdocs"()
+
+	/**
+	 * Swaps in a fake/test YAML renderer - see YamlRenderer.bx's docblock.
+	 *
+	 * @renderer Any object exposing `fromYaml( content )`
+	 */
+	void function setYamlRenderer( required any renderer ) {
+		variables.yamlRenderer = arguments.renderer
+	}
+
+	/**
+	 * Loads and normalizes `docs/blog/authors.yml`.
+	 *
+	 * @docsDir Absolute path to the project's docs/ directory
+	 *
+	 * @return Struct keyed by author id: { name, title, bio, url, email, avatar, socials }
+	 */
+	struct function load( required string docsDir ) {
+		var dir = arguments.docsDir.reReplace( "[\/]+$", "" )
+		var authorsPath = dir & "/blog/authors.yml"
+
+		if ( !fileExists( authorsPath ) ) {
+			return {}
+		}
+
+		var parsed = ""
+		try {
+			parsed = variables.yamlRenderer.fromYaml( fileRead( authorsPath ) )
+		} catch ( any e ) {
+			throw(
+				type    = "BxDocs.InvalidBlogAuthors",
+				message = "blog/authors.yml is not valid YAML: #e.message#"
+			)
+		}
+
+		if ( !isStruct( parsed ) ) {
+			throw(
+				type    = "BxDocs.InvalidBlogAuthors",
+				message = "blog/authors.yml must contain a YAML object, one entry per author id"
+			)
+		}
+
+		var authors = {}
+		for ( var key in parsed ) {
+			authors[ key ] = normalize( key, parsed[ key ], dir )
+		}
+		return authors
+	}
+
+	/**
+	 * Resolves a post's own frontmatter `authors` list (author ids, or a
+	 * plain display name not present in the roster) into ready-to-render
+	 * byline entries.
+	 *
+	 * @authorIds A post's own `authors` array (BlogDiscoverer.bx's own output)
+	 * @authors load()'s own output
+	 *
+	 * @return Array of { id, name, title, bio, url, email, avatar, socials } - a plain/unmatched name gets every field but `name` empty
+	 */
+	array function resolve( required array authorIds, required struct authors ) {
+		var resolved = []
+		for ( var id in arguments.authorIds ) {
+			if ( arguments.authors.keyExists( id ) ) {
+				var author = arguments.authors[ id ]
+				resolved.append( {
+					id      : id,
+					name    : author.name,
+					title   : author.title,
+					bio     : author.bio,
+					url     : author.url,
+					email   : author.email,
+					avatar  : author.avatar,
+					socials : author.socials
+				} )
+			} else {
+				resolved.append( { id : "", name : id, title : "", bio : "", url : "", email : "", avatar : "", socials : {} } )
+			}
+		}
+		return resolved
+	}
+
+	/**
+	 * Validates/defaults one raw authors.yml entry.
+	 *
+	 * @key The author's own id (the YAML map key)
+	 * @raw The parsed entry - must be an object with a non-empty `name`
+	 * @docsDir Absolute path to the project's docs/ directory, for by-convention avatar resolution
+	 */
+	private struct function normalize( required string key, required any raw, required string docsDir ) {
+		if ( !isStruct( arguments.raw ) || !len( trim( arguments.raw.name ?: "" ) ) ) {
+			throw(
+				type    = "BxDocs.InvalidBlogAuthors",
+				message = "blog/authors.yml author [#arguments.key#] must be an object with a non-empty [name]"
+			)
+		}
+
+		return {
+			name    : trim( arguments.raw.name ),
+			title   : trim( arguments.raw.title ?: "" ),
+			bio     : trim( arguments.raw.bio ?: "" ),
+			url     : trim( arguments.raw.url ?: "" ),
+			email   : trim( arguments.raw.email ?: "" ),
+			avatar  : resolveAvatar( arguments.key, arguments.raw, arguments.docsDir ),
+			socials : isStruct( arguments.raw.socials ?: "" ) ? arguments.raw.socials : {}
+		}
+	}
+
+	/**
+	 * Resolves one author's avatar - their own explicit `avatar` when set,
+	 * else the first `docs/assets/blog/authors/<id>.<ext>` found on disk
+	 * (variables.avatarExtensions, in order), else "" (no avatar shown).
+	 *
+	 * @key The author's own id
+	 * @raw The parsed entry
+	 * @docsDir Absolute path to the project's docs/ directory
+	 */
+	private string function resolveAvatar( required string key, required struct raw, required string docsDir ) {
+		var explicit = trim( arguments.raw.avatar ?: "" )
+		if ( len( explicit ) ) {
+			return explicit
+		}
+
+		for ( var ext in variables.avatarExtensions ) {
+			var candidate = "assets/blog/authors/" & arguments.key & "." & ext
+			if ( fileExists( arguments.docsDir & "/" & candidate ) ) {
+				return candidate
+			}
+		}
+
+		return ""
+	}
+
+}

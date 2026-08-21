@@ -14,7 +14,7 @@ class {
 	 * Dispatches the `new` verb to ProjectScaffolder.scaffold(), after
 	 * validating `--theme` against the built-in theme names.
 	 *
-	 * @options { projectRoot (required, absolute path), name, theme (defaults to "bootstrap"), description }
+	 * @options { projectRoot (required, absolute path), name, theme (defaults to "bootstrap"), description, format ("yaml" default, or "json") }
 	 */
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
@@ -36,12 +36,14 @@ class {
 			name = segments.len() ? segments[ segments.len() ] : "bx-docs-site"
 		}
 
+		var format = trim( len( arguments.options.format ?: "" ) ? arguments.options.format : "yaml" )
+
 		var scaffolder = new "models.build.ProjectScaffolder@bxdocs"()
-		var result = scaffolder.scaffold( projectRoot, name, theme, arguments.options.description ?: "" )
+		var result = scaffolder.scaffold( projectRoot, name, theme, arguments.options.description ?: "", format )
 
 		return {
 			exitCode : 0,
-			message  : "Created new BX Docs project [#name#] at #result.projectRoot# (theme: #theme#)"
+			message  : "Created new BX Docs project [#name#] at #result.projectRoot# (theme: #theme#, config: #result.configPath.listLast( '/' )#)"
 		}
 	}
 

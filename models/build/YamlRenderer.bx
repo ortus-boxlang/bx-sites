@@ -1,0 +1,79 @@
+/**
+ * Reads/writes YAML via bx-yaml's `yamlDeserialize()`/`yamlSerialize()` BIFs -
+ * the same "delegate to a real module, don't hand-roll" approach
+ * MarkdownRenderer.bx already takes for markdown (its own docblock explains
+ * why in full).
+ *
+ * Has a hard runtime dependency on the bx-yaml module being activated
+ * (box.json declares it as a dependency) and so has no unit tests of its
+ * own - every caller (ConfigLoader.bx, MkdocsMigrator.bx,
+ * BlogAuthorsLoader.bx) takes this class behind a swappable seam for
+ * exactly that reason, the same shape BuildPipeline.bx's own
+ * `setMarkdownRenderer()` already established - see
+ * tests/support/FakeYamlRenderer.bx.
+ */
+class {
+
+	/**
+	 * Parses a YAML document into a BoxLang value (struct/array/scalar).
+	 *
+	 * @content Raw YAML text
+	 */
+	any function fromYaml( required string content ) {
+		return repairSequences( yamlDeserialize( arguments.content ) )
+	}
+
+	/**
+	 * Serializes a BoxLang value into YAML text.
+	 *
+	 * @value The struct/array/scalar to serialize
+	 */
+	string function toYaml( required any value ) {
+		return yamlSerialize( arguments.value )
+	}
+
+	/**
+	 * Works around a bx-yaml BoxLangConstructor bug: every YAML sequence it
+	 * parses comes back wrapped in one extra, spurious array layer. Its
+	 * `constructObject()` builds the sequence's true items correctly, then
+	 * hands that finished `List` to `Array.of( list )` - but `Array.of()`
+	 * only has an `Object...` overload, so Java never spreads a `List`
+	 * argument across it; the whole list becomes a single vararg instead.
+	 * The result: every array value we get back from `yamlDeserialize()` is
+	 * really a length-1 array whose one element *is* the real backing list
+	 * (itself just as wrapped, one level deeper, for a nested sequence) -
+	 * `social: [ {...}, {...} ]` (9 entries) arrives as a 1-item array
+	 * containing all 9. This walks the whole parsed tree and unwraps that
+	 * spurious layer everywhere it appears, so every other caller of this
+	 * class (ConfigLoader.bx/MkdocsMigrator.bx/BlogAuthorsLoader.bx) can
+	 * treat the result as the plain struct/array shape the YAML text
+	 * actually describes. Safe to drop once the upstream bug is fixed -
+	 * a correctly-shaped array (`.len() != 1`, or a length-1 array whose
+	 * one item isn't itself array-like) simply passes through unchanged.
+	 *
+	 * @value Any value straight out of `yamlDeserialize()` (or a nested piece of one, while recursing)
+	 */
+	private any function repairSequences( required any value ) {
+		if ( isStruct( arguments.value ) ) {
+			for ( var key in arguments.value ) {
+				arguments.value[ key ] = repairSequences( arguments.value[ key ] )
+			}
+			return arguments.value
+		}
+
+		if ( isArray( arguments.value ) ) {
+			var real = arguments.value.len() == 1 ? arguments.value[ 1 ] : arguments.value
+			if ( !isArray( real ) ) {
+				return arguments.value
+			}
+			var result = []
+			for ( var item in real ) {
+				result.append( repairSequences( item ) )
+			}
+			return result
+		}
+
+		return arguments.value
+	}
+
+}

@@ -15,6 +15,7 @@
 class {
 
 	variables.buildPipeline = new "models.build.BuildPipeline@bxdocs"()
+	variables.configLoader  = new "models.config.ConfigLoader@bxdocs"()
 	variables.projectRoot   = ""
 	variables.fileFingerprint = { count : 0, maxModified : 0 }
 	variables.buildVersion  = 0
@@ -134,11 +135,11 @@ class {
 	 * checkAndRebuild() can detect a change without re-reading file
 	 * contents.
 	 *
-	 * @return { count, maxModified } across bxdocs.json, docs/** and a project theme/ override, if present
+	 * @return { count, maxModified } across the site config (bxdocs.yaml/.yml/.json, whichever is present), docs/** and a project theme/ override, if present
 	 */
 	private struct function currentFingerprint() {
 		var paths = []
-		var configPath = variables.projectRoot & "/bxdocs.json"
+		var configPath = variables.configLoader.configPathFor( variables.projectRoot )
 		if ( fileExists( configPath ) ) {
 			paths.append( configPath )
 		}

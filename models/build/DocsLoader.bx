@@ -10,9 +10,9 @@ class {
 
 	/**
 	 * Walks every `.md` file under `docsDir` (excluding `docs/assets/**`,
-	 * `docs/versions/**` and `docs/i18n/**` - each is its own separately
-	 * loaded/built tree, not part of whichever tree `docsDir` itself is)
-	 * and loads each into a page struct.
+	 * `docs/versions/**`, `docs/i18n/**` and `docs/blog/**` - each is its own
+	 * separately loaded/built tree, not part of whichever tree `docsDir`
+	 * itself is) and loads each into a page struct.
 	 *
 	 * @docsDir Absolute path to the project's docs/ directory
 	 *
@@ -29,6 +29,7 @@ class {
 			.filter( path => !path.reReplace( dir, "", "one" ).reFindNoCase( "^[\/]assets[\/]" ) )
 			.filter( path => !path.reReplace( dir, "", "one" ).reFindNoCase( "^[\/]versions[\/]" ) )
 			.filter( path => !path.reReplace( dir, "", "one" ).reFindNoCase( "^[\/]i18n[\/]" ) )
+			.filter( path => !path.reReplace( dir, "", "one" ).reFindNoCase( "^[\/]blog[\/]" ) )
 			.map( path => loadFile( dir, path ) )
 
 		pages.sort( ( a, b ) => {

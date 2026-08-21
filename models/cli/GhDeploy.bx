@@ -10,7 +10,7 @@
  * already ran; failing fast here avoids that wasted work for the common
  * "forgot to `git init`" case. Config validity is still checked first
  * (via a direct ConfigLoader.bx call, same as build() does internally),
- * so a project missing both bxdocs.json and .git reports the more
+ * so a project missing both a site config and .git reports the more
  * fundamental problem.
  */
 class {

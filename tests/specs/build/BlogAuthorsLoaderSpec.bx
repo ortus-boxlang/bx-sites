@@ -1,0 +1,146 @@
+/**
+ * FakeYamlRenderer.bx is injected throughout - real bx-yaml BIFs aren't
+ * safely callable in a bare unit test (YamlRenderer.bx's own docblock), so
+ * every fixture below is written as the fake's own JSON-under-the-hood
+ * "YAML" and read back through the same fake.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.BlogAuthorsLoader", function() {
+
+			beforeEach( function() {
+				variables.loader = new "models.build.BlogAuthorsLoader@bxdocs"();
+				variables.loader.setYamlRenderer( new "tests.support.FakeYamlRenderer@bxdocs"() );
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newDocsDir() {
+				var dir = createTempDirectory( prefix = "bxdocs-blogauthors-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			private function writeAuthors( required string docsDir, required struct authors ) {
+				directoryCreate( arguments.docsDir & "/blog", true, true );
+				fileWrite( arguments.docsDir & "/blog/authors.yml", jsonSerialize( arguments.authors ) );
+			}
+
+			it( "returns an empty struct when docs/blog/authors.yml doesn't exist", function() {
+				var dir = newDocsDir();
+				expect( loader.load( dir ) ).toBeStruct();
+				expect( loader.load( dir ).isEmpty() ).toBeTrue();
+			} );
+
+			it( "loads and normalizes an author entry, defaulting optional fields to empty", function() {
+				var dir = newDocsDir();
+				writeAuthors( dir, { "lmajano" : { "name" : "Luis Majano" } } );
+
+				var authors = loader.load( dir );
+
+				expect( authors.lmajano.name ).toBe( "Luis Majano" );
+				expect( authors.lmajano.title ).toBe( "" );
+				expect( authors.lmajano.bio ).toBe( "" );
+				expect( authors.lmajano.url ).toBe( "" );
+				expect( authors.lmajano.email ).toBe( "" );
+				expect( authors.lmajano.socials ).toBeStruct();
+			} );
+
+			it( "preserves title/bio/url/email/socials when set", function() {
+				var dir = newDocsDir();
+				writeAuthors( dir, {
+					"lmajano" : {
+						"name" : "Luis Majano",
+						"title" : "CEO",
+						"bio" : "Founder of Ortus Solutions.",
+						"url" : "https://github.com/lmajano",
+						"email" : "lmajano@ortussolutions.com",
+						"socials" : { "github" : "https://github.com/lmajano" }
+					}
+				} );
+
+				var author = loader.load( dir ).lmajano;
+
+				expect( author.title ).toBe( "CEO" );
+				expect( author.bio ).toBe( "Founder of Ortus Solutions." );
+				expect( author.url ).toBe( "https://github.com/lmajano" );
+				expect( author.email ).toBe( "lmajano@ortussolutions.com" );
+				expect( author.socials.github ).toBe( "https://github.com/lmajano" );
+			} );
+
+			it( "throws BxDocs.InvalidBlogAuthors when the YAML root isn't an object", function() {
+				var dir = newDocsDir();
+				directoryCreate( dir & "/blog", true, true );
+				fileWrite( dir & "/blog/authors.yml", jsonSerialize( [ "not", "an", "object" ] ) );
+
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidBlogAuthors" );
+			} );
+
+			it( "throws BxDocs.InvalidBlogAuthors when an entry has no [name]", function() {
+				var dir = newDocsDir();
+				writeAuthors( dir, { "lmajano" : { "title" : "CEO" } } );
+
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxDocs.InvalidBlogAuthors" );
+			} );
+
+			it( "resolves an author's avatar by convention from docs/assets/blog/authors/<id>.<ext>", function() {
+				var dir = newDocsDir();
+				writeAuthors( dir, { "lmajano" : { "name" : "Luis Majano" } } );
+				directoryCreate( dir & "/assets/blog/authors", true, true );
+				fileWrite( dir & "/assets/blog/authors/lmajano.svg", "<svg></svg>" );
+
+				expect( loader.load( dir ).lmajano.avatar ).toBe( "assets/blog/authors/lmajano.svg" );
+			} );
+
+			it( "leaves avatar empty when no explicit one is set and no by-convention file exists", function() {
+				var dir = newDocsDir();
+				writeAuthors( dir, { "lmajano" : { "name" : "Luis Majano" } } );
+
+				expect( loader.load( dir ).lmajano.avatar ).toBe( "" );
+			} );
+
+			it( "prefers an explicit [avatar] over the by-convention lookup", function() {
+				var dir = newDocsDir();
+				writeAuthors( dir, { "lmajano" : { "name" : "Luis Majano", "avatar" : "https://example.com/avatar.png" } } );
+				directoryCreate( dir & "/assets/blog/authors", true, true );
+				fileWrite( dir & "/assets/blog/authors/lmajano.svg", "<svg></svg>" );
+
+				expect( loader.load( dir ).lmajano.avatar ).toBe( "https://example.com/avatar.png" );
+			} );
+
+			it( "resolve() maps known author ids to their full profile", function() {
+				var authors = { "lmajano" : { name : "Luis Majano", title : "CEO", bio : "", url : "", email : "", avatar : "", socials : {} } };
+
+				var resolved = loader.resolve( [ "lmajano" ], authors );
+
+				expect( resolved.len() ).toBe( 1 );
+				expect( resolved[ 1 ].id ).toBe( "lmajano" );
+				expect( resolved[ 1 ].name ).toBe( "Luis Majano" );
+				expect( resolved[ 1 ].title ).toBe( "CEO" );
+			} );
+
+			it( "resolve() falls back to a name-only entry for an id with no matching author", function() {
+				var resolved = loader.resolve( [ "Guest Writer" ], {} );
+
+				expect( resolved.len() ).toBe( 1 );
+				expect( resolved[ 1 ].id ).toBe( "" );
+				expect( resolved[ 1 ].name ).toBe( "Guest Writer" );
+				expect( resolved[ 1 ].url ).toBe( "" );
+			} );
+
+		} );
+	}
+
+}

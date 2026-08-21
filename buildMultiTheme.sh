@@ -6,21 +6,21 @@
 # the root plus `material`/`tailwind` living side by side under
 # theme/material/ and theme/tailwind/. Not a bx-docs product feature -
 # just this project using its own `build` verb three times with a
-# temporarily-patched bxdocs.json, the same way pages.yml already patches
+# temporarily-patched bxdocs.yaml, the same way pages.yml already patches
 # baseURL per branch.
 #
 # Usage: ./buildMultiTheme.sh [projectRoot]   (defaults to ".")
 #
 # Requires: boxlang (with this module registered so `module:bxDocs`
-# resolves), jq.
+# resolves), yq (mikefarah/yq - https://github.com/mikefarah/yq).
 
 set -euo pipefail
 
 PROJECT_ROOT="${1:-.}"
 cd "${PROJECT_ROOT}"
 
-if [[ ! -f "bxdocs.json" ]]; then
-	echo "error: no bxdocs.json in $(pwd) - run from (or pass) the bx-docs project root" >&2
+if [[ ! -f "bxdocs.yaml" ]]; then
+	echo "error: no bxdocs.yaml in $(pwd) - run from (or pass) the bx-docs project root" >&2
 	exit 1
 fi
 
@@ -29,11 +29,11 @@ SWITCHER_BACKUP="$(mktemp)"
 SCRATCH_DIR="$(mktemp -d)"
 SWITCHER_JS="docs/assets/theme-switcher.js"
 
-cp bxdocs.json "${CONFIG_BACKUP}"
+cp bxdocs.yaml "${CONFIG_BACKUP}"
 cp "${SWITCHER_JS}" "${SWITCHER_BACKUP}"
 
 cleanup() {
-	cp "${CONFIG_BACKUP}" bxdocs.json
+	cp "${CONFIG_BACKUP}" bxdocs.yaml
 	cp "${SWITCHER_BACKUP}" "${SWITCHER_JS}"
 	rm -f "${CONFIG_BACKUP}" "${SWITCHER_BACKUP}"
 	rm -rf "${SCRATCH_DIR}"
@@ -42,7 +42,7 @@ trap cleanup EXIT
 
 # Same basePath derivation as BaseUrlResolver.bx: strip scheme+host off a
 # full URL, otherwise use the value as-is (ensuring leading/trailing "/").
-BASE_URL="$(jq -r '.baseURL // "/"' bxdocs.json)"
+BASE_URL="$(yq -r '.baseURL // "/"' bxdocs.yaml)"
 if [[ "${BASE_URL}" =~ ^https?:// ]]; then
 	ROOT_PATH="$(echo "${BASE_URL}" | sed -E 's#^https?://[^/]+##')"
 	[[ -z "${ROOT_PATH}" ]] && ROOT_PATH="/"
@@ -79,15 +79,17 @@ build_variant() {
 	fi
 }
 
-# 1. bootstrap - the committed bxdocs.json, unmodified, at the site root.
+# 1. bootstrap - the committed bxdocs.yaml, unmodified, at the site root.
 build_variant "bootstrap"
 
 # 2 & 3. material/tailwind - same docs/, different theme + a baseURL
 # pointing at their own sub-path so their own internal links/assets
 # resolve correctly once nested under theme/<name>/.
 for name in material tailwind; do
-	jq --arg theme "${name}" --arg url "${BASE_URL_NO_SLASH}/theme/${name}/" \
-		'.theme.name = $theme | .baseURL = $url' "${CONFIG_BACKUP}" > bxdocs.json
+	export THEME="${name}"
+	export URL="${BASE_URL_NO_SLASH}/theme/${name}/"
+	yq eval '.theme.name = strenv(THEME) | .baseURL = strenv(URL)' "${CONFIG_BACKUP}" > bxdocs.yaml
+	unset THEME URL
 	build_variant "${name}"
 done
 

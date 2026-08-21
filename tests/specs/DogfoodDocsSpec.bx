@@ -1,5 +1,5 @@
 /**
- * Confirms this repository's own dogfooded `bxdocs.json` + `docs/` (module
+ * Confirms this repository's own dogfooded `bxdocs.yaml` + `docs/` (module
  * spec Phase 5 - "docs + examples for bx-docs itself") actually build
  * cleanly through the real pipeline, using the same fake markdown renderer
  * seam as BuildPipelineSpec.bx. Builds into a temp copy so it never leaves
@@ -8,13 +8,13 @@
 class extends="testbox.system.BaseSpec" {
 
 	function run() {
-		describe( "Dogfooded docs (this repo's own docs/ + bxdocs.json)", function() {
+		describe( "Dogfooded docs (this repo's own docs/ + bxdocs.yaml)", function() {
 
 			beforeEach( function() {
 				variables.repoRoot = getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]tests[\/]specs[\/]?$", "" )
 				variables.tempRoot = createTempDirectory( prefix = "bxdocs-dogfood-" )
 				directoryCopy( variables.repoRoot & "/docs", variables.tempRoot & "/docs", true )
-				fileCopy( variables.repoRoot & "/bxdocs.json", variables.tempRoot & "/bxdocs.json" )
+				fileCopy( variables.repoRoot & "/bxdocs.yaml", variables.tempRoot & "/bxdocs.yaml" )
 
 				variables.pipeline = new "models.build.BuildPipeline@bxdocs"()
 				variables.pipeline.setMarkdownRenderer( new "tests.support.FakeMarkdownRenderer@bxdocs"() )
@@ -26,7 +26,7 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
-			it( "loads and validates bxdocs.json", function() {
+			it( "loads and validates bxdocs.yaml", function() {
 				var config = new "models.config.ConfigLoader@bxdocs"().load( repoRoot )
 				expect( config.name ).toBe( "BX Docs" )
 				expect( config.theme.name ).toBe( "bootstrap" )

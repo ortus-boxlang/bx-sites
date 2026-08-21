@@ -1,18 +1,21 @@
 /**
  * Scaffolds a new bx-docs project skeleton - the `new` CLI verb's real
- * implementation: a `docs/` folder with a starter `index.md`, and a
- * `bxdocs.json` site config defaulted to the requested (or bootstrap)
- * theme (module spec sections 3, 4 and 6).
+ * implementation: a `docs/` folder with a starter `index.md`, and a site
+ * config defaulted to the requested (or bootstrap) theme (module spec
+ * sections 3, 4 and 6). `bxdocs.yaml` is the default/preferred format;
+ * `format: "json"` scaffolds a `bxdocs.json` instead, for a project that
+ * wants to stay on it - both are fully supported by ConfigLoader.bx.
  */
 class {
 
 	/**
-	 * Writes a starter `bxdocs.json` and `docs/index.md` for the `new` verb.
+	 * Writes a starter site config and `docs/index.md` for the `new` verb.
 	 *
-	 * @targetDir Absolute path to the new project directory (created if missing; refuses to run if it already contains a bxdocs.json)
-	 * @name The site name written into bxdocs.json
+	 * @targetDir Absolute path to the new project directory (created if missing; refuses to run if it already contains a bxdocs.yaml/.yml/.json)
+	 * @name The site name written into the config
 	 * @theme The built-in theme name to default the project to
 	 * @description Optional site description
+	 * @format `"yaml"` (default) or `"json"` - which config format to scaffold
 	 *
 	 * @return { projectRoot, configPath, indexPath }
 	 */
@@ -20,17 +23,29 @@ class {
 		required string targetDir,
 		required string name,
 		required string theme,
-		string description = ""
+		string description = "",
+		string format = "yaml"
 	) {
-		var dir = arguments.targetDir.reReplace( "[\/]+$", "" )
-		var configPath = dir & "/bxdocs.json"
-
-		if ( fileExists( configPath ) ) {
+		var format = lCase( trim( arguments.format ) )
+		if ( !listFindNoCase( "yaml,json", format ) ) {
 			throw(
-				type    = "BxDocs.ProjectAlreadyExists",
-				message = "[#dir#] already contains a bxdocs.json - refusing to overwrite an existing project"
+				type    = "BxDocs.InvalidFormat",
+				message = "Unknown config format [#arguments.format#] - must be one of: yaml, json"
 			)
 		}
+
+		var dir = arguments.targetDir.reReplace( "[\/]+$", "" )
+
+		for ( var existingName in [ "bxdocs.yaml", "bxdocs.yml", "bxdocs.json" ] ) {
+			if ( fileExists( dir & "/" & existingName ) ) {
+				throw(
+					type    = "BxDocs.ProjectAlreadyExists",
+					message = "[#dir#] already contains a #existingName# - refusing to overwrite an existing project"
+				)
+			}
+		}
+
+		var configPath = dir & "/bxdocs." & ( format == "yaml" ? "yaml" : "json" )
 
 		directoryCreate( path = dir, createPath = true, ignoreExists = true )
 		directoryCreate( path = dir & "/docs", createPath = true, ignoreExists = true )
@@ -39,13 +54,42 @@ class {
 		var indexPath = dir & "/docs/index.md"
 		fileWrite( indexPath, renderIndexMd( arguments.name ) )
 
-		fileWrite( configPath, renderConfig( arguments.name, arguments.theme, arguments.description ) )
+		var configSource = format == "yaml"
+			? renderConfigYaml( arguments.name, arguments.theme, arguments.description )
+			: renderConfigJson( arguments.name, arguments.theme, arguments.description )
+		fileWrite( configPath, configSource )
 
 		return {
 			projectRoot : dir,
 			configPath  : configPath,
 			indexPath   : indexPath
 		}
+	}
+
+	/**
+	 * Renders a starter `bxdocs.yaml`, quoting `name`/`description` so
+	 * special characters in either can't break the generated YAML.
+	 *
+	 * @name The site name
+	 * @theme The default theme name
+	 * @description The site description
+	 *
+	 * @return The rendered bxdocs.yaml source
+	 */
+	private string function renderConfigYaml( required string name, required string theme, required string description ) {
+		var lines = [
+			"name: #yamlScalar( arguments.name )#",
+			"description: #yamlScalar( arguments.description )#",
+			'baseURL: "/"',
+			"theme:",
+			"  name: #yamlScalar( arguments.theme )#",
+			"  options: {}",
+			"search: true",
+			"nav: []",
+			"markdown: {}",
+			""
+		]
+		return lines.toList( char( 10 ) )
 	}
 
 	/**
@@ -58,7 +102,7 @@ class {
 	 *
 	 * @return The rendered bxdocs.json source
 	 */
-	private string function renderConfig( required string name, required string theme, required string description ) {
+	private string function renderConfigJson( required string name, required string theme, required string description ) {
 		var lines = [
 			"{",
 			'	"name": "#jsonEscape( arguments.name )#",',
@@ -89,6 +133,24 @@ class {
 			.replace( char( 10 ), char( 92 ) & "n", "all" )
 			.replace( char( 13 ), char( 92 ) & "r", "all" )
 			.replace( char( 9 ), char( 92 ) & "t", "all" )
+	}
+
+	/**
+	 * Renders a plain string as a double-quoted YAML scalar - always
+	 * quoted (regardless of content) so an empty/blank/special-looking
+	 * value (`""`, `no`, `1.0`, `null`, ...) round-trips as a plain string
+	 * rather than YAML's own implicit-typing rules reinterpreting it.
+	 *
+	 * @value The raw value to render
+	 */
+	private string function yamlScalar( required string value ) {
+		var escaped = arguments.value
+			.replace( char( 92 ), char( 92 ) & char( 92 ), "all" )
+			.replace( '"', char( 92 ) & '"', "all" )
+			.replace( char( 10 ), char( 92 ) & "n", "all" )
+			.replace( char( 13 ), char( 92 ) & "r", "all" )
+			.replace( char( 9 ), char( 92 ) & "t", "all" )
+		return '"#escaped#"'
 	}
 
 	/**

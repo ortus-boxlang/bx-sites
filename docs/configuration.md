@@ -2,13 +2,61 @@
 title: Configuration
 order: 4
 icon: phosphor-duotone:gear-six
-summary: Every bxdocs.json key, what it defaults to, and what it does.
+summary: Every site config key, what it defaults to, and what it does.
 tags: [reference, configuration]
 ---
 
 # Configuration
 
-Every project has one `bxdocs.json` at its root:
+Every project has one site config at its root - `bxdocs.yaml` (or `.yml`),
+the default/preferred format, or `bxdocs.json` for a project that wants to
+stay on it. Both are fully supported and produce the exact same result;
+`bxDocs new` scaffolds `bxdocs.yaml` unless `--format=json` is passed (see
+[Getting Started](getting-started.md#config-file-format)). If a project
+somehow has more than one, `bxdocs.yaml` wins, then `bxdocs.yml`, then
+`bxdocs.json`.
+
+```yaml
+name: "My Docs"
+description: ""
+baseURL: "/"
+theme:
+  name: bootstrap
+  options: {}
+  logo: ""
+  favicon: ""
+search: true
+searchProvider:
+  provider: local
+  algolia: { appId: "", apiKey: "", indexName: "", insights: false }
+nav: []
+markdown:
+  enableAdmonition: true
+repo:
+  url: ""
+  editUri: ""
+social: []
+footer: false
+lastUpdated: false
+mermaid: false
+math: false
+analytics:
+  provider: ""
+  id: ""
+ogImage: ""
+generateOgImages: false
+extraCss: []
+extraJs: []
+plugins: []
+i18n:
+  defaultLocale: { code: en, label: English }
+  locales: []
+blog:
+  postsPerPage: 10
+  feed: true
+```
+
+The equivalent `bxdocs.json`, for a project that prefers it:
 
 ```json
 {
@@ -49,14 +97,20 @@ Every project has one `bxdocs.json` at its root:
 	"i18n": {
 		"defaultLocale": { "code": "en", "label": "English" },
 		"locales": []
+	},
+	"blog": {
+		"postsPerPage": 10,
+		"feed": true
 	}
 }
 ```
 
 Only `name` is required - everything else falls back to the defaults shown
 above. A partial `theme` object is merged one level deep, so
-`{"theme":{"name":"material"}}` alone still keeps the default (empty)
-`options`.
+`{theme: {name: material}}` alone still keeps the default (empty)
+`options`. Every key below is named/shaped identically in both formats -
+the rest of this page just shows JSON snippets for brevity, but every one
+of them reads the same in YAML.
 
 ## `name`
 
@@ -515,6 +569,24 @@ switcher.
 See [Internationalization](guides/i18n.md) for the full picture -
 untranslated-page fallback, the language switcher, and what isn't
 translated yet.
+
+## `blog`
+
+Options for the [blog](guides/blog.md) - itself a by-convention feature
+(`docs/blog/posts/`), no key here required to turn it on.
+
+- `blog.postsPerPage` - `10` (the default) - how many posts per page on
+  `/blog/` and every category page before it moves to `.../page/2/`.
+- `blog.feed` - `true` (the default) - whether `/blog/feed.xml` (RSS 2.0)
+  is written. Only meaningful with an absolute `baseURL`, same requirement
+  as `sitemap.xml`.
+
+```json
+{ "blog": { "postsPerPage": 10, "feed": true } }
+```
+
+See [Blog](guides/blog.md) for post/author frontmatter, categories,
+featured images, and SEO/social metadata.
 
 ## Versioning
 

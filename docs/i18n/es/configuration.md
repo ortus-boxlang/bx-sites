@@ -2,13 +2,59 @@
 title: Configuración
 order: 4
 icon: ⚙️
-summary: Cada clave de bxdocs.json, su valor por defecto y qué hace.
+summary: Cada clave de la configuración del sitio, su valor por defecto y qué hace.
 tags: [referencia, configuración]
 ---
 
 # Configuración
 
-Cada proyecto tiene un único `bxdocs.json` en su raíz:
+Cada proyecto tiene una configuración de sitio única en su raíz -
+`bxdocs.yaml` (o `.yml`), el formato por defecto y preferido, o
+`bxdocs.json` para un proyecto que prefiera quedarse con él. Ambos son
+totalmente compatibles y producen exactamente el mismo resultado;
+`bxDocs new` genera `bxdocs.yaml` a menos que se pase `--format=json`
+(consulta [Primeros Pasos](getting-started.md#formato-del-archivo-de-configuracion)).
+Si un proyecto de algún modo tiene más de uno, `bxdocs.yaml` prevalece,
+luego `bxdocs.yml`, luego `bxdocs.json`.
+
+```yaml
+name: "My Docs"
+description: ""
+baseURL: "/"
+theme:
+  name: bootstrap
+  options: {}
+  logo: ""
+  favicon: ""
+search: true
+searchProvider:
+  provider: local
+  algolia: { appId: "", apiKey: "", indexName: "", insights: false }
+nav: []
+markdown:
+  enableAdmonition: true
+repo:
+  url: ""
+  editUri: ""
+social: []
+footer: false
+lastUpdated: false
+mermaid: false
+math: false
+analytics:
+  provider: ""
+  id: ""
+ogImage: ""
+generateOgImages: false
+extraCss: []
+extraJs: []
+plugins: []
+i18n:
+  defaultLocale: { code: en, label: English }
+  locales: []
+```
+
+El `bxdocs.json` equivalente, para un proyecto que lo prefiera:
 
 ```json
 {
@@ -51,8 +97,11 @@ Cada proyecto tiene un único `bxdocs.json` en su raíz:
 
 Solo `name` es obligatorio - todo lo demás recurre a los valores por
 defecto mostrados arriba. Un objeto `theme` parcial se combina un nivel
-de profundidad, así que `{"theme":{"name":"material"}}` por sí solo
-conserva las `options` por defecto (vacías).
+de profundidad, así que `{theme: {name: material}}` por sí solo conserva
+las `options` por defecto (vacías). Cada clave de abajo se llama y tiene
+la misma forma en ambos formatos - el resto de esta página solo muestra
+fragmentos JSON por brevedad, pero cada uno de ellos se lee igual en
+YAML.
 
 ## `name`
 

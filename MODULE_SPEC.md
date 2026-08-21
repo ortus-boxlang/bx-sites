@@ -24,7 +24,8 @@ A BoxLang module that generates static documentation sites from Markdown, in the
     "executable": "bxDocs"
   },
   "dependencies": {
-    "bx-markdown": "*"
+    "bx-markdown": "*",
+    "bx-yaml": "*"
   }
 }
 ```
@@ -54,12 +55,12 @@ boxlang module:bxDocs <verb> [options]
 
 ```
 docs/                  # markdown source; folder nesting = nav structure
-bxdocs.json            # site config
+bxdocs.yaml            # site config (bxdocs.json also supported)
 theme/                 # optional project-level theme override
 site/                  # build output (generated)
 ```
 
-## 4. Config file — bxdocs.json
+## 4. Config file — bxdocs.yaml (or bxdocs.json)
 
 Site name, description, nav (auto-inferred from folder/file structure by default; an explicit `nav` array — inline or in a project's own `docs/nav.json` — overrides that inference entirely), theme name + theme options, base URL, search on/off, `mermaid`/`math` on/off, a `plugins` array of BoxLang module names to activate, an `i18n` block (default-locale/locale display metadata for the `docs/i18n/<code>/` convention), markdown-extension passthrough settings (table options, anchor links, YouTube transformer, code style — all sourced from bx-markdown's existing option set), and per-page frontmatter (`tags`/`icon`/`summary`/`ogImage`/`toc`, on top of `title`/`order`/`hidden`/`description`).
 
@@ -67,7 +68,7 @@ Site name, description, nav (auto-inferred from folder/file structure by default
 
 ```mermaid
 flowchart TD
-    A["bxdocs.json"] --> B["ConfigLoader.load()"]
+    A["bxdocs.yaml"] --> B["ConfigLoader.load()"]
     B --> C["PluginLoader.discover()\n+ onConfig"]
     C --> D["DocsLoader.load()\nwalk docs/**.md"]
     D --> E["NavBuilder.build()\n+ onNav"]
@@ -137,7 +138,7 @@ None currently blocking. Deferred to later phases:
 - CI-grade content quality gate (broken internal links/images, missing alt text, orphaned pages) — **done**, see section 2's verb table (`check`) and `docs/cli-reference.md`
 - A documented, first-class Alpine.js reactive primitive for page content (not just theme chrome) — **done**: every page already bundles Alpine.js (it drives the dark-mode toggle and language dropdown), so this was a documentation gap rather than a code one — see `docs/guides/interactivity.md`
 - Self-hosting third-party CSS/JS by default, for air-gapped/offline sites — **done** for Bootstrap's own CSS/JS, highlight.js, Alpine.js, and lunr.js: vendored under `resources/assets/vendor/` (`vendorAssets.mjs`, mirroring `vendorIcons.mjs`'s own pattern), copied into every built `site/assets/vendor/` by `BuildPipeline.bx`'s `copyAssets()`, and referenced locally instead of via CDN in every built-in theme's `layout.bxm`. Still CDN-loaded, only when a project opts into them: Mermaid/KaTeX (`mermaid`/`math`), Algolia search and Google Analytics (both inherently talk to a hosted API/endpoint regardless of vendoring), and the `tailwind` theme's own CDN-hosted JIT compiler (a live compiler, not a static file) — see `docs/guides/themes.md#air-gapped-offline-sites`
-- A blog/tags-plugin-equivalent beyond the simple tags index remains deferred
+- A blog beyond the simple tags index - **done**: `docs/blog/posts/` by-convention posts (BlogDiscoverer.bx), an optional `docs/blog/authors.yml` roster with by-convention avatar resolution (BlogAuthorsLoader.bx), paginated `/blog/`+category+author pages and a per-post featured-image/byline header (BlogBuilder.bx), and `/blog/feed.xml` (BlogFeedGenerator.bx) - see `docs/guides/blog.md`. Posts fold into the existing tags index/search index/sitemap/llms.txt unchanged; no new theme template contract - every blog page renders through the same `page.bxm` as everything else
 
 ## 9. Phased task breakdown
 

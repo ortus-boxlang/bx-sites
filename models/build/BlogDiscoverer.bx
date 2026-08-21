@@ -1,0 +1,166 @@
+/**
+ * Discovers a project's blog posts "by convention" - any `.md` file
+ * directly under `docs/blog/posts/` is a post, with no config beyond just
+ * existing there (mirrors VersionsDiscoverer.bx/LocalesDiscoverer.bx's own
+ * by-convention discovery). Projects that don't blog simply have no
+ * `docs/blog/posts/` folder, and this returns an empty array.
+ *
+ * Each loaded post is shaped as a superset of DocsLoader.bx's own page
+ * struct (`relativePath`/`sourcePath`/`urlPath`/`title`/`description`/
+ * `hidden`/`showToc`/`tags`/`icon`/`summary`/`ogImage`/`body`), so
+ * BuildPipeline.bx's existing per-page finishing steps (convertMarkdown(),
+ * assignTableOfContents(), assignEditAndLastUpdated(), assignOgImages(),
+ * assignMarkdownUrl(), assignIconHtml()) all work against a post unchanged -
+ * `relativePath` is deliberately the post's own real `docs/`-relative source
+ * path (`"blog/posts/<file>.md"`), so an edit URL/git-blame lookup/
+ * "Download Markdown" link/MarkdownPublisher.bx copy all resolve to the
+ * real file, exactly like a normal docs page - `urlPath` is independent of it, computed from the
+ * post's own slug instead, since a post's own pretty URL
+ * (`blog/<slug>/index.html`) intentionally doesn't mirror the `posts/`
+ * folder it's authored under.
+ */
+class {
+
+	variables.frontmatterParser = new "models.build.FrontmatterParser@bxdocs"()
+
+	/**
+	 * Loads every post under `docs/blog/posts/`, newest first by `date`. A
+	 * post with frontmatter `draft: true` is skipped unless `includeDrafts`
+	 * is `true` - no verb wires that in v1 (always `false` in a real build),
+	 * kept as a parameter so a future preview flag, or a test, can opt in
+	 * without a signature change.
+	 *
+	 * @docsDir Absolute path to the project's docs/ directory
+	 * @includeDrafts Include posts whose frontmatter sets `draft: true`
+	 *
+	 * @return Array of post structs, newest first: { relativePath, sourcePath, urlPath, slug, title, description, hidden, showToc, tags, icon, summary, ogImage, body, date, authors, categories, draft, image }
+	 */
+	array function load( required string docsDir, boolean includeDrafts = false ) {
+		var postsDir = arguments.docsDir.reReplace( "[\/]+$", "" ) & "/blog/posts"
+
+		if ( !directoryExists( postsDir ) ) {
+			return []
+		}
+
+		// Captured into a local - an arrow function's own `arguments` scope
+		// is its own (item/index/array, per array .filter()'s own callback
+		// signature), not load()'s, so `arguments.includeDrafts` inside the
+		// closure below would look up a key that was never there.
+		var includeDrafts = arguments.includeDrafts
+
+		var posts = directoryList( postsDir, false, "path", "*.md" )
+			.map( path => loadFile( postsDir, path ) )
+			.filter( post => includeDrafts || !post.draft )
+
+		assertUniqueSlugs( posts )
+
+		posts.sort( ( a, b ) => compare( b.date, a.date ) )
+
+		return posts
+	}
+
+	/**
+	 * Reads one post `.md` file, splits its frontmatter from its body, and
+	 * validates/derives its `date` and `slug`.
+	 *
+	 * @postsDir Absolute path to `docs/blog/posts/`
+	 * @filePath Absolute path to the post's own .md file
+	 */
+	private struct function loadFile( required string postsDir, required string filePath ) {
+		var fileName = getFileFromPath( arguments.filePath ).reReplaceNoCase( "\.md$", "" )
+		var parsed = variables.frontmatterParser.parse( fileRead( arguments.filePath ) )
+		var fm = parsed.frontmatter
+
+		var date = trim( fm.date ?: "" )
+		if ( !len( date ) || !isDate( date ) ) {
+			throw(
+				type    = "BxDocs.InvalidBlogPost",
+				message = "blog/posts/#fileName#.md is missing a required, valid frontmatter [date] (got [#date#])"
+			)
+		}
+
+		var slug = len( trim( fm.slug ?: "" ) ) ? slugify( fm.slug ) : slugify( fileName )
+
+		return {
+			relativePath : "blog/posts/" & fileName & ".md",
+			sourcePath   : arguments.filePath,
+			slug         : slug,
+			urlPath      : "blog/" & slug & "/index.html",
+			title        : len( trim( fm.title ?: "" ) ) ? fm.title : titleFromFileName( fileName ),
+			description  : trim( fm.description ?: "" ),
+			hidden       : false,
+			showToc      : ( fm.toc ?: true ) ? true : false,
+			tags         : toStringArray( fm.tags ?: "" ),
+			icon         : trim( fm.icon ?: "" ),
+			summary      : trim( fm.summary ?: "" ),
+			ogImage      : trim( fm.ogImage ?: "" ),
+			body         : parsed.body,
+			date         : date,
+			authors      : toStringArray( fm.authors ?: "" ),
+			categories   : toStringArray( fm.categories ?: "" ),
+			draft        : ( fm.draft ?: false ) ? true : false,
+			image        : trim( fm.image ?: "" )
+		}
+	}
+
+	/**
+	 * Normalizes a frontmatter value that's meant to be a list - an inline/
+	 * block YAML-style list parses as a real array already
+	 * (FrontmatterParser.bx); a single bare scalar (`authors: lmajano`) is
+	 * wrapped into a one-item array instead of being rejected, since both
+	 * are natural ways to write a single value in frontmatter.
+	 *
+	 * @value The raw frontmatter value (array, string, or absent)
+	 */
+	private array function toStringArray( required any value ) {
+		if ( isArray( arguments.value ) ) {
+			return arguments.value
+		}
+		return isSimpleValue( arguments.value ) && len( trim( arguments.value ) ) ? [ arguments.value ] : []
+	}
+
+	/**
+	 * Derives a fallback title from a post's filename when frontmatter has
+	 * none, same convention as DocsLoader.bx's own titleFromFileName().
+	 *
+	 * @fileName The post's own filename, without its `.md` extension
+	 */
+	private string function titleFromFileName( required string fileName ) {
+		return arguments.fileName
+			.reReplace( "[-_]", " ", "all" )
+			.reReplace( "\b(\w)", "\U\1", "all" )
+	}
+
+	/**
+	 * Slugs a title/filename/explicit frontmatter `slug` into a URL-safe
+	 * path segment - lowercase, non-alphanumeric runs collapsed to a single
+	 * hyphen, no leading/trailing hyphen.
+	 *
+	 * @value The raw text to slug
+	 */
+	private string function slugify( required string value ) {
+		return lCase( trim( arguments.value ) ).reReplace( "[^a-z0-9]+", "-", "all" ).reReplace( "(^-|-$)", "", "all" )
+	}
+
+	/**
+	 * Fails fast when two posts resolve to the same slug (and therefore the
+	 * same `blog/<slug>/` output URL) - one would otherwise silently
+	 * overwrite the other's built page.
+	 *
+	 * @posts Every loaded (post-draft-filter) post struct
+	 */
+	private void function assertUniqueSlugs( required array posts ) {
+		var seen = {}
+		for ( var post in arguments.posts ) {
+			var key = lCase( post.slug )
+			if ( seen.keyExists( key ) ) {
+				throw(
+					type    = "BxDocs.DuplicateBlogSlug",
+					message = "Two blog posts resolve to the same slug [#post.slug#] - #seen[ key ]# and #post.relativePath#. Set an explicit frontmatter [slug] on one of them."
+				)
+			}
+			seen[ key ] = post.relativePath
+		}
+	}
+
+}

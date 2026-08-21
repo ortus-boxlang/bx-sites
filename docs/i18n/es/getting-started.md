@@ -11,21 +11,23 @@ tags: [guías, configuración]
 ## Instalación
 
 BX Docs depende de [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
-para el renderizado de Markdown y de [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
-para la codificación HTML. Con [CommandBox](https://commandbox.ortusbooks.com/)
+para el renderizado de Markdown, de [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
+para la codificación HTML, y de [bx-yaml](https://github.com/ortus-boxlang/bx-yaml)
+para leer `bxdocs.yaml`. Con [CommandBox](https://commandbox.ortusbooks.com/)
 instalado:
 
 ```bash
 box install bx-docs
 box install bx-markdown
 box install bx-esapi
+box install bx-yaml
 ```
 
-O, sin CommandBox, el propio instalador de BoxLang toma los tres en un
+O, sin CommandBox, el propio instalador de BoxLang toma los cuatro en un
 solo comando:
 
 ```bash
-install-bx-module bx-docs bx-markdown bx-esapi
+install-bx-module bx-docs bx-markdown bx-esapi bx-yaml
 ```
 
 `box install`/`install-bx-module` lee `boxlang.executable` de `box.json`
@@ -60,13 +62,26 @@ my-docs/
 ├── docs/
 │   ├── assets/
 │   └── index.md
-└── bxdocs.json
+└── bxdocs.yaml
 ```
 
 Pasa `--theme=material` o `--theme=tailwind` para generar la estructura
 con un tema predeterminado diferente, y `--name="My Project Docs"` para
 establecer el nombre del sitio de antemano - de lo contrario `new` lo
 deriva del nombre del directorio de destino.
+
+### Formato del archivo de configuración
+
+`bxdocs.yaml` es el formato por defecto y preferido - es lo que `new`
+genera a menos que se indique lo contrario, y cada ejemplo de esta guía y
+de [Configuración](configuration.md) lo muestra primero. `bxdocs.json`
+también es totalmente compatible, para un proyecto que lo prefiera: pasa
+`--format=json` para generar uno en su lugar, o simplemente escríbelo o
+renómbralo tú mismo - ConfigLoader resuelve el que esté realmente
+presente entre `bxdocs.yaml`/`.yml`/`.json`, en ese orden, sin necesitar
+ninguna otra configuración para cambiar. Consulta
+[Configuración](configuration.md) para la referencia completa de claves
+en ambos formatos.
 
 ¿Ya tienes contenido en GitBook? `bxDocs migrate --source=/path/to/export`
 convierte una exportación de GitBook directamente en `docs/` - consulta
@@ -154,7 +169,8 @@ Your content here.
   sin excluirla de la construcción
 - `description` - la descripción de tarjeta social/meta de esta página
   (consulta [`ogImage`](configuration.md#ogimage)); recurre a la
-  `description` general del sitio en `bxdocs.json` cuando se omite
+  `description` general del sitio en la configuración del sitio cuando se
+  omite
 - `tags` - un array de etiquetas para esta página, renderizadas como
   insignias clicables debajo del título y recopiladas en una página de
   índice `/tags/` de todo el sitio (solo se construye una vez que al
@@ -194,9 +210,9 @@ bxDocs serve
 
 Construye el proyecto, sirve `site/` en `http://127.0.0.1:8080/`, y
 reconstruye automáticamente cada vez que guardas un cambio bajo `docs/`,
-`bxdocs.json`, o una sobrescritura de `theme/` a nivel de proyecto - tu
-navegador se recarga por sí solo. Pasa `--port=3000` o `--host=0.0.0.0`
-para cambiar cómo se enlaza.
+tu configuración de sitio `bxdocs.yaml`/`.json`, o una sobrescritura de
+`theme/` a nivel de proyecto - tu navegador se recarga por sí solo. Pasa
+`--port=3000` o `--host=0.0.0.0` para cambiar cómo se enlaza.
 
 ## Limpieza
 

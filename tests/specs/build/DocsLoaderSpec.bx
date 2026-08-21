@@ -155,6 +155,18 @@ class extends="testbox.system.BaseSpec" {
 				expect( pages[ 1 ].relativePath ).toBe( "real.md" );
 			} );
 
+			it( "excludes docs/blog/** from the loaded pages (BlogDiscoverer/BuildPipeline own that tree)", function() {
+				var dir = newDocsDir();
+				directoryCreate( dir & "/blog/posts", true, true );
+				fileWrite( dir & "/blog/posts/hello-world.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "---" & char( 10 ) & "Post body" );
+				fileWrite( dir & "/real.md", "Included" );
+
+				var pages = loader.load( dir );
+
+				expect( pages.len() ).toBe( 1 );
+				expect( pages[ 1 ].relativePath ).toBe( "real.md" );
+			} );
+
 			it( "sorts pages by order, then by title", function() {
 				var dir = newDocsDir();
 				fileWrite( dir & "/b.md", "---" & char( 10 ) & "title: B Page" & char( 10 ) & "order: 1" & char( 10 ) & "---" & char( 10 ) & "b" );

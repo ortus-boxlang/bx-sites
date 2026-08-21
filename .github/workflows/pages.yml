@@ -1,6 +1,6 @@
 name: Publish Docs
 
-# Builds this repository's own dogfooded docs (docs/ + bxdocs.json at the
+# Builds this repository's own dogfooded docs (docs/ + bxdocs.yaml at the
 # repo root - see readme.md) with bx-docs itself, and publishes site/ to
 # GitHub Pages - main publishes to the site root (stable), development
 # publishes to /development/ (latest), so both versions stay live at once.
@@ -20,7 +20,7 @@ on:
       - development
     paths:
       - "docs/**"
-      - "bxdocs.json"
+      - "bxdocs.yaml"
       - "resources/**"
       - "models/**"
       - "bifs/**"
@@ -54,7 +54,7 @@ jobs:
         uses: ortus-boxlang/setup-boxlang@1.4.0
         with:
           with-commandbox: true
-          modules: bx-markdown
+          modules: bx-markdown bx-yaml
 
       - name: Register this module so `module:bxDocs` resolves
         run: |
@@ -64,17 +64,22 @@ jobs:
           mkdir -p "${BOXLANG_HOME}/modules"
           ln -s "$(pwd)" "${BOXLANG_HOME}/modules/$(basename "$(pwd)")"
 
+      - name: Install yq
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+          sudo chmod +x /usr/bin/yq
+
       - name: Point baseURL and repo.editUri at this branch's own sub-path
         if: github.ref_name != 'main'
         run: |
-          # main's committed bxdocs.json already points baseURL/editUri at
+          # main's committed bxdocs.yaml already points baseURL/editUri at
           # the site root / main branch - every other branch publishes under
           # /<branch-name>/ and edits against its own branch instead, so
           # patch a throwaway copy of the config just for this build.
-          jq --arg url "https://ortus-boxlang.github.io/bx-docs/${{ github.ref_name }}/" \
-             --arg editUri "edit/${{ github.ref_name }}/docs/" \
-            '.baseURL = $url | .repo.editUri = $editUri' bxdocs.json > bxdocs.json.tmp
-          mv bxdocs.json.tmp bxdocs.json
+          export URL="https://ortus-boxlang.github.io/bx-docs/${{ github.ref_name }}/"
+          export EDIT_URI="edit/${{ github.ref_name }}/docs/"
+          yq eval '.baseURL = strenv(URL) | .repo.editUri = strenv(EDIT_URI)' bxdocs.yaml > bxdocs.yaml.tmp
+          mv bxdocs.yaml.tmp bxdocs.yaml
 
       - name: Build the site (bootstrap at the root, material/tailwind under theme/)
         run: ./buildMultiTheme.sh
