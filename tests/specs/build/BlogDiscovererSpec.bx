@@ -27,6 +27,12 @@ class extends="testbox.system.BaseSpec" {
 				fileWrite( arguments.docsDir & "/blog/posts/" & arguments.fileName, arguments.content );
 			}
 
+			private function writeNestedPost( required string docsDir, required string relativePath, required string content ) {
+				var fullPath = arguments.docsDir & "/blog/posts/" & arguments.relativePath;
+				directoryCreate( getDirectoryFromPath( fullPath ), true, true );
+				fileWrite( fullPath, arguments.content );
+			}
+
 			it( "returns an empty array when docs/blog/posts/ doesn't exist", function() {
 				var dir = newDocsDir();
 				expect( discoverer.load( dir ) ).toBeArray();
@@ -128,6 +134,48 @@ class extends="testbox.system.BaseSpec" {
 				expect( post.authors ).toBe( [ "lmajano", "guest" ] );
 				expect( post.categories ).toBe( [ "Releases", "News" ] );
 				expect( post.tags ).toBe( [ "boxlang", "docs" ] );
+			} );
+
+			it( "discovers a post filed under a subfolder, at any depth, with its real relativePath preserved", function() {
+				var dir = newDocsDir();
+				writeNestedPost( dir, "2026/nested-post.md", "---" & char( 10 ) & "date: 2026-03-01" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var posts = discoverer.load( dir );
+
+				expect( posts.len() ).toBe( 1 );
+				expect( posts[ 1 ].relativePath ).toBe( "blog/posts/2026/nested-post.md" );
+				expect( posts[ 1 ].sourcePath ).toBe( dir & "/blog/posts/2026/nested-post.md" );
+			} );
+
+			it( "keeps a nested post's slug/urlPath the bare filename, decoupled from its subfolder", function() {
+				var dir = newDocsDir();
+				writeNestedPost( dir, "2026/03/deeply-nested.md", "---" & char( 10 ) & "date: 2026-03-01" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var post = discoverer.load( dir )[ 1 ];
+
+				expect( post.slug ).toBe( "deeply-nested" );
+				expect( post.urlPath ).toBe( "blog/deeply-nested/index.html" );
+			} );
+
+			it( "sorts a nested post by its own frontmatter date, not by its folder name", function() {
+				var dir = newDocsDir();
+				writeNestedPost( dir, "2025/actually-newest.md", "---" & char( 10 ) & "date: 2026-06-01" & char( 10 ) & "---" & char( 10 ) & "Body." );
+				writeNestedPost( dir, "2026/actually-oldest.md", "---" & char( 10 ) & "date: 2025-01-01" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var posts = discoverer.load( dir );
+
+				expect( posts[ 1 ].slug ).toBe( "actually-newest" );
+				expect( posts[ 2 ].slug ).toBe( "actually-oldest" );
+			} );
+
+			it( "throws BxDocs.DuplicateBlogSlug when two posts in different subfolders resolve to the same slug", function() {
+				var dir = newDocsDir();
+				writeNestedPost( dir, "2025/same.md", "---" & char( 10 ) & "date: 2025-01-01" & char( 10 ) & "---" & char( 10 ) & "Body." );
+				writeNestedPost( dir, "2026/same.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				expect( function() {
+					discoverer.load( dir );
+				} ).toThrow( "BxDocs.DuplicateBlogSlug" );
 			} );
 
 			it( "throws BxDocs.DuplicateBlogSlug when two posts resolve to the same slug", function() {

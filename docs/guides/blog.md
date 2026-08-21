@@ -17,7 +17,27 @@ author, and an RSS feed, with zero config required. A project with no
 
 ## Writing a post
 
-Every `.md` file directly under `docs/blog/posts/` is a post:
+Every `.md` file under `docs/blog/posts/`, at any depth, is a post -
+subfolders are entirely optional and purely for your own editing
+convenience. A flat folder works fine for a handful of posts; once you're
+into the hundreds, filing posts under `docs/blog/posts/2026/` (or
+`docs/blog/posts/2026/03/`, or any scheme you like) keeps your editor's
+file tree browsable without renaming anything or touching a frontmatter
+date-prefix convention. None of it affects the built site - a post's sort
+order, its year archive, and its URL (`blog/<slug>/`) are all derived from
+frontmatter alone, never from where the file happens to live, so a post's
+folder and its actual `date` are always free to disagree:
+
+```
+docs/blog/posts/
+├── hello-world.md              (flat is fine too)
+├── 2026/
+│   ├── announcing-2-0.md
+│   └── 03/
+│       └── a-deep-dive.md
+```
+
+Frontmatter, for any post regardless of where it's filed:
 
 ```markdown
 ---
