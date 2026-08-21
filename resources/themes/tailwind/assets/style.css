@@ -253,8 +253,13 @@
 /* A named icon (icon: rocket / lucide:rocket / tabler:rocket / custom:name)
    resolves to an inline SVG using currentColor fill/stroke, so it already
    tracks the surrounding text color in both themes/light-dark modes with
-   no extra rule needed - this only handles sizing/alignment. */
+   no extra rule needed - this only handles sizing/alignment. `display:
+   inline-block` overrides the Tailwind CDN's own Preflight reset
+   (`svg{display:block}`), which otherwise drops the icon onto its own
+   line whenever it sits inline before text, like a page/nav title's
+   `.page-icon`/`.nav-icon` span. */
 .bxdocs-icon {
+	display: inline-block;
 	width: 1em;
 	height: 1em;
 	vertical-align: -0.15em;
@@ -422,11 +427,6 @@
 
 .bxdocs-footer__credit a {
 	font-weight: 600;
-}
-
-.prose :where(h2, h3, h4) {
-	font-weight: 700;
-	margin-top: 1.5em;
 }
 
 /* Every h1/h2/h3 in the article gets a hover-reveal "#" permalink, for deep
@@ -1390,11 +1390,31 @@ code:not( pre code ) {
 .prose h4,
 .prose h5,
 .prose h6 {
-	margin-top: 2rem;
-	margin-bottom: 0.75rem;
 	line-height: 1.3;
 	font-weight: 600;
 	color: #0f172a; /* slate-900 */
+}
+
+/* Scaled by level so a heading's own weight in the outline reads visually -
+   an h2 (a new major section) gets more air above it than an h4 tucked
+   inside one. `.prose > :first-child` above already zeroes this out for a
+   page whose body starts with a heading. */
+.prose h2 {
+	margin-top: 2.5rem;
+	margin-bottom: 1rem;
+}
+
+.prose h3 {
+	margin-top: 2rem;
+	margin-bottom: 0.75rem;
+}
+
+.prose h1,
+.prose h4,
+.prose h5,
+.prose h6 {
+	margin-top: 1.5rem;
+	margin-bottom: 0.5rem;
 }
 
 .prose h1 { font-size: 1.9rem; }
