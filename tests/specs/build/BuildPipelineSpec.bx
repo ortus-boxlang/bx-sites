@@ -703,6 +703,23 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).notToInclude( "data-bxdocs-token" );
 			} );
 
+			it( "converts a ```tryboxlang fenced block into a live try.boxlang.io iframe embed", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/docs/index.md",
+					'```tryboxlang title="Say Hi"' & char( 10 ) & 'println( "hi" )' & char( 10 ) & '```'
+				);
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( 'class="bxdocs-tryboxlang"' );
+				expect( html ).toInclude( '<div class="bxdocs-tryboxlang__title">Say Hi</div>' );
+				expect( html ).toInclude( 'src="https://try.boxlang.io/editor/index.bxm?ro=false&amp;code=' );
+				expect( html ).notToInclude( "data-bxdocs-token" );
+				expect( html ).notToInclude( "println" );
+			} );
+
 			it( "loads KaTeX and restores literal math formula text only when [math] is enabled, across every built-in theme", function() {
 				var expectedFormula = encodeForHTML( "$e^{i\pi}+1=0$" );
 

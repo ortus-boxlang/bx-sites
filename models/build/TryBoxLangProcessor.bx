@@ -1,0 +1,228 @@
+/**
+ * Turns a fenced code block tagged `tryboxlang` into a live, embedded
+ * try.boxlang.io editor iframe:
+ *
+ *   ```tryboxlang height="450" readonly="false" title="Closures"
+ *   user = { name: "Luis", getFullName: () => "Luis Majano" }
+ *   println( user.getFullName() )
+ *   ```
+ *
+ * try.boxlang.io's editor reads its starting source from a `code` query
+ * param - the raw BoxLang source, deflate-compressed (`java.util.zip.Deflater`,
+ * the same zlib stream `java.util.zip.Inflater` on the other end expects),
+ * base64-encoded, then URL-encoded (see `encodeCode()` below).
+ *
+ * Flexmark has no concept of this at all - like TabsProcessor.bx/
+ * DirectiveBlockProcessor.bx, this is a two-phase pre/post-processor
+ * around the normal `Markdown()` call:
+ *
+ *  1. `extract()` runs BEFORE conversion (and before every other bx-docs
+ *     pre-processor - see BuildPipeline.bx's `convertMarkdown()`) - it
+ *     pulls every `tryboxlang` fence's raw source out of the markdown
+ *     verbatim and replaces it with a lone placeholder `<div>` on its own
+ *     line, the same "bare `<div>` survives `Markdown()` untouched as an
+ *     HTML block" trick TabsProcessor.bx/DirectiveBlockProcessor.bx use.
+ *     Running first means the block's literal BoxLang source (which can
+ *     freely contain `$`, `=== "..."`, backtick fences shown as strings,
+ *     etc.) is never misread by MathProtector/TabsProcessor/
+ *     CodeAnnotationProcessor/DirectiveBlockProcessor as their own syntax.
+ *  2. `restore()` runs AFTER conversion - it swaps each placeholder for
+ *     the assembled iframe embed markup.
+ *
+ * Unlike TabsProcessor.bx/DirectiveBlockProcessor.bx (whose own trigger
+ * syntax is never itself a fence, so they can lean on the shared
+ * FenceTracker.bx to skip fence-protected lines), this processor's own
+ * trigger *is* a fence - `` ```tryboxlang ``. FenceTracker treats every
+ * fence generically, so it would report the opening `` ```tryboxlang ``
+ * line itself as "already fence-protected" the moment it saw the triple
+ * backtick, permanently masking the real trigger. So, same as
+ * CodeAnnotationProcessor.bx (whose trigger is also a fence, for the same
+ * reason), this tracks the currently-open fence's own character/length
+ * from scratch: while any fence (tryboxlang or not) is open, only a
+ * same-or-longer close marker of the same character ends it - a
+ * `` ```tryboxlang `` line "inside" a longer fence (e.g. this very guide,
+ * demonstrating the syntax as a literal example) is just that longer
+ * fence's own literal content, not a real trigger.
+ */
+class {
+
+	variables.attrPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(\w+)="([^"]*)"' )
+	variables.editorUrl = "https://try.boxlang.io/editor/index.bxm"
+
+	/**
+	 * Pulls every top-level `` ```tryboxlang `` fenced block out of the raw
+	 * markdown and replaces it with a lone placeholder `<div>` on its own
+	 * line.
+	 *
+	 * @markdown The raw markdown body text
+	 *
+	 * @return { markdown: string with tryboxlang fences replaced by placeholders, embeds: array of { token, code, attrsRaw } }
+	 */
+	struct function extract( required string markdown ) {
+		var normalized = arguments.markdown.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" )
+		var lines = listToArray( normalized, char( 10 ), true )
+		var outputLines = []
+		var embeds = []
+		var fenceChar = ""
+		var fenceLength = 0
+		var isTryBoxLang = false
+		var codeLines = []
+		var attrsRaw = ""
+
+		for ( var line in lines ) {
+			var trimmedLine = trim( line )
+			var tooIndented = line.reFind( "^(\t| {4,})" ) > 0
+
+			if ( fenceLength > 0 ) {
+				if ( !tooIndented && trimmedLine.reFind( "^" & fenceChar & "{" & fenceLength & ",}$" ) ) {
+					if ( isTryBoxLang ) {
+						var token = "bxdocstryboxlang" & replace( createUUID(), "-", "", "all" )
+						embeds.append( { token : token, code : codeLines.toList( char( 10 ) ), attrsRaw : attrsRaw } )
+						outputLines.append( "" )
+						outputLines.append( '<div class="bxdocs-raw-block" data-bxdocs-token="' & token & '"></div>' )
+						outputLines.append( "" )
+					} else {
+						outputLines.append( line )
+					}
+					fenceLength = 0
+					fenceChar = ""
+					isTryBoxLang = false
+					codeLines = []
+					continue
+				}
+
+				if ( isTryBoxLang ) {
+					codeLines.append( line )
+				} else {
+					outputLines.append( line )
+				}
+				continue
+			}
+
+			if ( tooIndented || !trimmedLine.reFind( "^(```+|~~~+)" ) ) {
+				outputLines.append( line )
+				continue
+			}
+
+			var marker = trimmedLine.reReplace( "^(```+|~~~+).*", "\1", "one" )
+			fenceChar = left( marker, 1 )
+			fenceLength = len( marker )
+
+			if ( trimmedLine.reFind( "^(```+|~~~+)tryboxlang(\s|$)" ) ) {
+				isTryBoxLang = true
+				attrsRaw = trim( trimmedLine.reReplace( "^(```+|~~~+)tryboxlang", "", "one" ) )
+			} else {
+				outputLines.append( line )
+			}
+		}
+
+		// An unclosed `tryboxlang` fence at EOF is dropped back in as plain
+		// text (its opening line, and every line captured so far) rather
+		// than silently eating the rest of the page - a typo'd/missing
+		// closing fence shouldn't swallow real content.
+		if ( isTryBoxLang ) {
+			outputLines.append( fenceChar.repeatString( fenceLength ) & "tryboxlang " & attrsRaw )
+			outputLines.append( codeLines )
+		}
+
+		return { markdown : outputLines.toList( char( 10 ) ), embeds : embeds }
+	}
+
+	/**
+	 * Swaps every `extract()` placeholder for its assembled try.boxlang.io
+	 * iframe embed markup.
+	 *
+	 * @html Already-rendered HTML (from Markdown() on extract()'s own output)
+	 * @embeds extract()'s own `embeds` array
+	 *
+	 * @return html with every tryboxlang placeholder swapped for its embed markup
+	 */
+	string function restore( required string html, required array embeds ) {
+		var result = arguments.html
+		for ( var embed in arguments.embeds ) {
+			var placeholder = '<div class="bxdocs-raw-block" data-bxdocs-token="' & embed.token & '"></div>'
+			result = result.replace( placeholder, renderEmbed( embed ), "one" )
+		}
+		return result
+	}
+
+	/**
+	 * Assembles one `tryboxlang` block's iframe embed markup.
+	 *
+	 * @embed One entry from extract()'s own `embeds` array
+	 */
+	private string function renderEmbed( required struct embed ) {
+		var attrs = parseAttrs( arguments.embed.attrsRaw )
+		var title = trim( attrs.title ?: "" )
+		var readonly = lCase( trim( attrs.readonly ?: attrs.ro ?: "false" ) ) == "true"
+		var heightRaw = trim( attrs.height ?: "" )
+		// A bare number is treated as pixels, same shorthand `linenums`/
+		// `hl_lines` attrs elsewhere in this codebase don't need but a CSS
+		// length would - anything else that isn't a plain CSS length is
+		// ignored in favor of the default, same guard renderColumns() uses.
+		var height = heightRaw.reFind( "^\d+$" )
+			? heightRaw & "px"
+			: ( heightRaw.reFind( "^\d+(\.\d+)?(px|rem|em|vh)$" ) ? heightRaw : "450px" )
+
+		var src = variables.editorUrl & "?ro=" & ( readonly ? "true" : "false" ) & "&code=" & encodeCode( arguments.embed.code )
+
+		var html = '<div class="bxdocs-tryboxlang">'
+		if ( len( title ) ) {
+			html &= '<div class="bxdocs-tryboxlang__title">' & encodeForHTML( title ) & '</div>'
+		}
+		html &= '<iframe class="bxdocs-tryboxlang__frame" style="height:' & height & '" src="' & attrEscape( src ) & '"'
+			& ' allow="fullscreen" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>'
+			& '<div class="bxdocs-tryboxlang__footer"><a href="' & attrEscape( src ) & '" target="_blank" rel="noopener noreferrer">'
+			& "Open in try.boxlang.io ↗</a></div>"
+			& '</div>'
+
+		return html
+	}
+
+	/**
+	 * Compresses `code` the way try.boxlang.io's own editor expects to find
+	 * it in its `code` query param - raw UTF-8 bytes, zlib-deflated
+	 * (`java.util.zip.Deflater`'s own default wrapped format, what
+	 * `java.util.zip.Inflater`/most `zlib.inflate()` implementations expect
+	 * on the other end), base64-encoded, then URL-encoded (base64's own
+	 * `+`/`/`/`=` characters aren't safe unescaped in a query string).
+	 *
+	 * @code Raw BoxLang source, as authored inside the fence
+	 */
+	private string function encodeCode( required string code ) {
+		var bytes = charsetDecode( arguments.code, "utf-8" )
+		var buffer = createObject( "java", "java.io.ByteArrayOutputStream" ).init()
+		var deflaterStream = createObject( "java", "java.util.zip.DeflaterOutputStream" )
+			.init( buffer, createObject( "java", "java.util.zip.Deflater" ).init() )
+		deflaterStream.write( bytes )
+		deflaterStream.close()
+
+		return urlEncodedFormat( binaryEncode( buffer.toByteArray(), "base64" ) )
+	}
+
+	/**
+	 * Parses a fence's info-string attributes (everything after the
+	 * `tryboxlang` language token) into `key="value"` pairs.
+	 *
+	 * @attrsRaw The raw attribute text, e.g. `height="450" readonly="false" title="Closures"`
+	 */
+	private struct function parseAttrs( required string attrsRaw ) {
+		var raw = {}
+		var matcher = variables.attrPattern.matcher( arguments.attrsRaw )
+		while ( matcher.find() ) {
+			raw[ matcher.group( 1 ) ] = matcher.group( 2 )
+		}
+		return raw
+	}
+
+	/**
+	 * A minimal, attribute-value-safe escape for the iframe `src`/link
+	 * `href` - only `&`/`"`/`<`, the characters that actually matter inside
+	 * a double-quoted HTML attribute, are escaped; `encodeForHTML()` would
+	 * also entity-escape `%` (the URL's own percent-encoding), corrupting it.
+	 */
+	private string function attrEscape( required string value ) {
+		return arguments.value.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
+	}
+
+}
