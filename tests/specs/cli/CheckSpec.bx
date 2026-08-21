@@ -1,0 +1,97 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.Check", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.Check@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-check-" );
+				tempDirs.append( dir );
+				fileWrite( dir & "/bxdocs.json", "{}" );
+				return dir;
+			}
+
+			private void function writePage( required string projectRoot, required string relativePath, required string html ) {
+				var path = arguments.projectRoot & "/site/" & arguments.relativePath;
+				var dir = getDirectoryFromPath( path );
+				if ( !directoryExists( dir ) ) {
+					directoryCreate( dir, true, true );
+				}
+				fileWrite( path, arguments.html );
+			}
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "throws BxDocs.SiteNotBuilt when there's no site/ directory", function() {
+				var projectRoot = newProjectRoot();
+
+				expect( function() {
+					verb.run( { projectRoot : projectRoot } );
+				} ).toThrow( "BxDocs.SiteNotBuilt" );
+			} );
+
+			it( "exits 0 with a clean report when there are no broken links or missing alt text", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", '<a href="/about.html">About</a>' );
+				writePage( projectRoot, "about.html", "About page." );
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toInclude( "No broken links" );
+			} );
+
+			it( "exits 1 and lists broken links when there are any", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", '<a href="/missing.html">Gone</a>' );
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.exitCode ).toBe( 1 );
+				expect( result.message ).toInclude( "broken link" );
+				expect( result.message ).toInclude( "/missing.html" );
+			} );
+
+			it( "exits 1 and lists images missing alt text when there are any", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", '<img src="/a.png">' );
+				writePage( projectRoot, "a.png", "" );
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.exitCode ).toBe( 1 );
+				expect( result.message ).toInclude( "missing alt text" );
+			} );
+
+			it( "exits 0 even when there are orphaned pages - informational only", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", "No links here." );
+				writePage( projectRoot, "lonely.html", "Nobody links to me." );
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toInclude( "not reachable from any nav" );
+				expect( result.message ).toInclude( "lonely.html" );
+			} );
+
+		} );
+	}
+
+}

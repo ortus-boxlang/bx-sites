@@ -1,0 +1,189 @@
+/**
+ * Exercises LinkChecker.bx directly against a temp project's already-built
+ * `site/` directory - no CLI dispatch involved (see CheckSpec.bx for that).
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.LinkChecker", function() {
+
+			beforeEach( function() {
+				variables.checker = new "models.build.LinkChecker@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot( string bxdocsJson = "{}" ) {
+				var dir = createTempDirectory( prefix = "bxdocs-check-" );
+				tempDirs.append( dir );
+				fileWrite( dir & "/bxdocs.json", arguments.bxdocsJson );
+				return dir;
+			}
+
+			private void function writePage( required string projectRoot, required string relativePath, required string html ) {
+				var path = arguments.projectRoot & "/site/" & arguments.relativePath;
+				var dir = getDirectoryFromPath( path );
+				if ( !directoryExists( dir ) ) {
+					directoryCreate( dir, true, true );
+				}
+				fileWrite( path, arguments.html );
+			}
+
+			it( "throws BxDocs.SiteNotBuilt when there's no site/ directory", function() {
+				var projectRoot = newProjectRoot();
+
+				expect( function() {
+					checker.check( projectRoot );
+				} ).toThrow( "BxDocs.SiteNotBuilt" );
+			} );
+
+			it( "reports a broken internal link and doesn't flag a working one", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", '<a href="/missing.html">Gone</a> <a href="/about.html">About</a>' );
+				writePage( projectRoot, "about.html", "About page." );
+
+				var result = checker.check( projectRoot );
+
+				expect( result.brokenLinks.len() ).toBe( 1 );
+				expect( result.brokenLinks[ 1 ].href ).toBe( "/missing.html" );
+			} );
+
+			it( "reports a broken image src", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", '<img src="/missing.png" alt="Missing">' );
+
+				var result = checker.check( projectRoot );
+
+				expect( result.brokenLinks.len() ).toBe( 1 );
+				expect( result.brokenLinks[ 1 ].href ).toBe( "/missing.png" );
+			} );
+
+			it( "flags an img with no alt attribute at all, but not an img with alt=\"\"", function() {
+				var projectRoot = newProjectRoot();
+				writePage(
+					projectRoot,
+					"index.html",
+					'<img src="/a.png"> <img src="/b.png" alt=""> <img src="/c.png" alt="Something">'
+				);
+				writePage( projectRoot, "a.png", "" );
+				writePage( projectRoot, "b.png", "" );
+				writePage( projectRoot, "c.png", "" );
+
+				var result = checker.check( projectRoot );
+
+				expect( result.missingAlt.len() ).toBe( 1 );
+				expect( result.missingAlt[ 1 ].src ).toBe( "/a.png" );
+			} );
+
+			it( "doesn't check external, mailto:, or bare-anchor links", function() {
+				var projectRoot = newProjectRoot();
+				writePage(
+					projectRoot,
+					"index.html",
+					'<a href="https://example.com/nope">Ext</a> <a href="mailto:x@example.com">Mail</a> <a href="#top">Top</a>'
+				);
+
+				var result = checker.check( projectRoot );
+
+				expect( result.brokenLinks.len() ).toBe( 0 );
+			} );
+
+			it( "resolves a relative link against the linking page's own directory", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "guides/index.html", '<a href="../about.html">About</a>' );
+				writePage( projectRoot, "about.html", "About page." );
+
+				var result = checker.check( projectRoot );
+
+				expect( result.brokenLinks.len() ).toBe( 0 );
+			} );
+
+			it( "resolves a root-relative link under a non-default baseURL sub-path", function() {
+				var projectRoot = newProjectRoot( '{"baseURL":"/my-docs/"}' );
+				writePage( projectRoot, "index.html", '<a href="/my-docs/about.html">About</a>' );
+				writePage( projectRoot, "about.html", "About page." );
+
+				var result = checker.check( projectRoot );
+
+				expect( result.brokenLinks.len() ).toBe( 0 );
+			} );
+
+			it( "treats a root-relative link to a directory as a link to its index.html", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", '<a href="/guides/">Guides</a>' );
+				writePage( projectRoot, "guides/index.html", "Guides." );
+
+				var result = checker.check( projectRoot );
+
+				expect( result.brokenLinks.len() ).toBe( 0 );
+			} );
+
+			it( "treats a page-relative link to a directory as a link to its index.html", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", '<a href="guides/">Guides</a>' );
+				writePage( projectRoot, "guides/index.html", "Guides." );
+
+				var result = checker.check( projectRoot );
+
+				expect( result.brokenLinks.len() ).toBe( 0 );
+			} );
+
+			it( "reports a page unreachable from the homepage as orphaned", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", "No links here." );
+				writePage( projectRoot, "lonely.html", "Nobody links to me." );
+
+				var result = checker.check( projectRoot );
+
+				expect( result.orphanedPages.toList( "," ) ).toInclude( "lonely.html" );
+			} );
+
+			it( "doesn't report a page reachable through a chain of links as orphaned", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", '<a href="/a.html">A</a>' );
+				writePage( projectRoot, "a.html", '<a href="/b.html">B</a>' );
+				writePage( projectRoot, "b.html", "Reached." );
+
+				var result = checker.check( projectRoot );
+
+				expect( result.orphanedPages.toList( "," ) ).notToInclude( "b.html" );
+			} );
+
+			it( "never reports 404.html or tags/index.html as orphaned", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", "Home." );
+				writePage( projectRoot, "404.html", "Not found." );
+				writePage( projectRoot, "tags/index.html", "Tags." );
+
+				var result = checker.check( projectRoot );
+
+				expect( result.orphanedPages.toList( "," ) ).notToInclude( "404.html" );
+				expect( result.orphanedPages.toList( "," ) ).notToInclude( "tags/index.html" );
+			} );
+
+			it( "treats each docs/versions/<name>/ and non-default docs/i18n/<code>/ index.html as its own reachability root", function() {
+				var projectRoot = newProjectRoot( '{"i18n":{"defaultLocale":{"code":"en","label":"English"},"locales":[{"code":"es","label":"Spanish"}]}}' );
+				directoryCreate( projectRoot & "/docs/versions/2.0", true, true );
+				directoryCreate( projectRoot & "/docs/i18n/es", true, true );
+
+				writePage( projectRoot, "index.html", "Home." );
+				writePage( projectRoot, "versions/2.0/index.html", "v2 home, no links out." );
+				writePage( projectRoot, "es/index.html", "Spanish home, no links out." );
+
+				var result = checker.check( projectRoot );
+
+				expect( result.orphanedPages.toList( "," ) ).notToInclude( "versions/2.0/index.html" );
+				expect( result.orphanedPages.toList( "," ) ).notToInclude( "es/index.html" );
+			} );
+
+		} );
+	}
+
+}

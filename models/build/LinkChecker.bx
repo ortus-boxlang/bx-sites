@@ -1,0 +1,285 @@
+/**
+ * Backs the `check` CLI verb (module spec section 2) - a CI-grade content
+ * quality gate over an already-built `site/`: broken internal links/images,
+ * `<img>` tags with no `alt` attribute at all, and pages that exist but
+ * aren't reachable from any tree's own homepage via its sidebar nav (every
+ * page in a tree renders that tree's own full nav, so one reachable page
+ * makes the whole tree reachable - see check()'s own docblock for what
+ * "reachable" means here).
+ *
+ * Deliberately internal-links-only, not external URLs - a real HTTP check
+ * against every external link is exactly the kind of slow, flaky-on-a-bad-day
+ * check that erodes trust in a CI gate; that's better left to a dedicated
+ * link-checking service/tool run as its own, separately-triaged job.
+ *
+ * No HTML parser dependency (this module has none) - the same
+ * regex-over-rendered-HTML approach CodeAnnotationProcessor.bx already
+ * uses, scoped to just `<a href="...">`/`<img src="..." alt="...">`.
+ */
+class {
+
+	variables.configLoader = new "models.config.ConfigLoader@bxdocs"()
+	variables.baseUrlResolver = new "models.build.BaseUrlResolver@bxdocs"()
+	variables.versionsDiscoverer = new "models.build.VersionsDiscoverer@bxdocs"()
+	variables.localesDiscoverer = new "models.build.LocalesDiscoverer@bxdocs"()
+
+	variables.tagPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "(?i)<(a|img)\b[^>]*>" )
+	variables.hrefPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(?i)\bhref\s*=\s*"([^"]*)"' )
+	variables.srcPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(?i)\bsrc\s*=\s*"([^"]*)"' )
+	variables.altPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(?i)\balt\s*=\s*"' )
+
+	/**
+	 * Site-relative paths always exempt from orphan reporting - written
+	 * directly by BuildPipeline.bx (write404Page()/writeTagsPage()), never
+	 * linked from any tree's own nav, by design.
+	 */
+	variables.exemptFromOrphanCheck = "404.html,tags/index.html"
+
+	/**
+	 * Checks an already-built `site/` for broken internal links/images,
+	 * `<img>` tags missing an `alt` attribute entirely (an empty `alt=""` -
+	 * the correct markup for a purely decorative image - is not flagged),
+	 * and orphaned pages.
+	 *
+	 * "Reachable" means: starting from the main site's own `index.html`,
+	 * every `docs/versions/<name>/`'s own `index.html`, and every non-default
+	 * `docs/i18n/<code>/`'s own `index.html` (each tree's own homepage - a
+	 * tree's full nav renders on every one of its own pages, so reaching any
+	 * single page in a tree reaches the whole tree), follow every `<a href>`
+	 * that resolves to a real file. Anything never reached this way is
+	 * reported as orphaned - informational only (never fails the check on
+	 * its own), since a page a project deliberately left out of its own nav
+	 * (frontmatter `hidden: true`) is *supposed* to only be reachable by a
+	 * direct link, which may live outside the site itself.
+	 *
+	 * @projectRoot Absolute path to the project root (must already have a built site/ - run `build` first)
+	 *
+	 * @return { brokenLinks: [ { page, href } ], missingAlt: [ { page, src } ], orphanedPages: [ page ] }
+	 */
+	struct function check( required string projectRoot ) {
+		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		var siteDir = root & "/site"
+
+		if ( !directoryExists( siteDir ) ) {
+			throw(
+				type    = "BxDocs.SiteNotBuilt",
+				message = "No [#siteDir#] to check - run `build` first"
+			)
+		}
+
+		var config = variables.configLoader.load( root )
+		var basePath = variables.baseUrlResolver.resolve( config.baseURL ).basePath
+
+		var htmlFiles = directoryList( siteDir, true, "path", "*.html" )
+		var brokenLinks = []
+		var missingAlt = []
+		var edges = {}
+
+		for ( var filePath in htmlFiles ) {
+			var pageRelative = toSiteRelative( filePath, siteDir )
+			var pageDir = getDirectoryFromPath( pageRelative ).reReplace( "[\/]$", "" )
+			if ( pageDir == "." ) {
+				pageDir = ""
+			}
+
+			var html = fileRead( filePath )
+			var tagMatcher = variables.tagPattern.matcher( html )
+			var linkedTargets = []
+
+			while ( tagMatcher.find() ) {
+				var tag = tagMatcher.group()
+				var isAnchor = compareNoCase( tagMatcher.group( 1 ), "a" ) == 0
+
+				var attrMatcher = ( isAnchor ? variables.hrefPattern : variables.srcPattern ).matcher( tag )
+				if ( !attrMatcher.find() ) {
+					continue
+				}
+				var target = attrMatcher.group( 1 )
+
+				if ( !isAnchor && !variables.altPattern.matcher( tag ).find() ) {
+					missingAlt.append( { page : pageRelative, src : target } )
+				}
+
+				if ( !isInternal( target ) ) {
+					continue
+				}
+
+				var resolved = resolveTarget( target, pageDir, basePath )
+				if ( !len( resolved ) ) {
+					continue
+				}
+
+				if ( !fileExists( siteDir & "/" & resolved ) ) {
+					brokenLinks.append( { page : pageRelative, href : target } )
+				} else if ( isAnchor ) {
+					linkedTargets.append( resolved )
+				}
+			}
+
+			edges[ pageRelative ] = linkedTargets
+		}
+
+		var allPages = htmlFiles.map( filePath => toSiteRelative( filePath, siteDir ) )
+		var reached = reachableFrom( roots( root, config ), edges )
+		var orphanedPages = allPages.filter( page =>
+			!reached.keyExists( page ) && !listFindNoCase( variables.exemptFromOrphanCheck, page )
+		)
+
+		return { brokenLinks : brokenLinks, missingAlt : missingAlt, orphanedPages : orphanedPages }
+	}
+
+	/**
+	 * Every tree's own homepage, site-relative - the main site's own
+	 * `index.html`, each `docs/versions/<name>/`'s, and each non-default
+	 * `docs/i18n/<code>/`'s.
+	 *
+	 * @root Absolute path to the project root
+	 * @config The project's already-loaded bxdocs.json (ConfigLoader.load()'s own return value)
+	 */
+	private array function roots( required string root, required struct config ) {
+		var docsDir = arguments.root & "/docs"
+		var roots = [ "index.html" ]
+
+		for ( var versionName in variables.versionsDiscoverer.discover( docsDir ) ) {
+			roots.append( "versions/" & versionName & "/index.html" )
+		}
+
+		var defaultLocaleCode = arguments.config.i18n.defaultLocale.code
+		for ( var localeCode in variables.localesDiscoverer.discover( docsDir ) ) {
+			if ( compareNoCase( localeCode, defaultLocaleCode ) != 0 ) {
+				roots.append( localeCode & "/index.html" )
+			}
+		}
+
+		return roots
+	}
+
+	/**
+	 * A breadth-first traversal of `edges` (site-relative page -> array of
+	 * site-relative pages it links to) starting from every entry in `roots`.
+	 *
+	 * @roots Site-relative starting pages
+	 * @edges Every page's own outbound internal `<a href>` targets
+	 *
+	 * @return A struct keyed by every reached site-relative page (struct used as a set - values are all `true`)
+	 */
+	private struct function reachableFrom( required array roots, required struct edges ) {
+		var reached = {}
+		var queue = duplicate( arguments.roots )
+
+		while ( queue.len() ) {
+			var current = queue[ 1 ]
+			queue.deleteAt( 1 )
+			if ( reached.keyExists( current ) ) {
+				continue
+			}
+			reached[ current ] = true
+			for ( var next in arguments.edges[ current ] ?: [] ) {
+				if ( !reached.keyExists( next ) ) {
+					queue.append( next )
+				}
+			}
+		}
+
+		return reached
+	}
+
+	/**
+	 * @target An `href`/`src` attribute value exactly as rendered
+	 *
+	 * @return false for an external URL (has its own scheme), a bare in-page anchor, mailto:/tel:/data:/javascript: - anything this checker doesn't resolve against the filesystem
+	 */
+	private boolean function isInternal( required string target ) {
+		var t = trim( arguments.target )
+		if ( !len( t ) ) {
+			return false
+		}
+		if ( t.left( 1 ) == chr( 35 ) ) {
+			return false
+		}
+		return !t.reFindNoCase( "^[a-z][a-z0-9+.\-]*:" )
+	}
+
+	/**
+	 * Resolves an internal `href`/`src` (root-relative, starting with
+	 * `basePath`, or relative to the linking page's own directory) to a
+	 * site-relative path - a bare directory (ends with `/`, or resolves to
+	 * one) implies its own `index.html`.
+	 *
+	 * @target An internal href/src (isInternal() already true)
+	 * @pageDir The linking page's own site-relative directory ("" for a root-level page)
+	 * @basePath BaseUrlResolver's own basePath, stripped from a root-relative target before resolving
+	 *
+	 * @return A site-relative path, or "" when target is empty after stripping its #fragment/?query
+	 */
+	private string function resolveTarget( required string target, required string pageDir, required string basePath ) {
+		var t = arguments.target
+		var hashPos = t.find( chr( 35 ) )
+		if ( hashPos ) {
+			t = t.left( hashPos - 1 )
+		}
+		var qPos = t.find( "?" )
+		if ( qPos ) {
+			t = t.left( qPos - 1 )
+		}
+		if ( !len( t ) ) {
+			return ""
+		}
+
+		var siteRelative = ""
+		if ( t.left( 1 ) == "/" ) {
+			siteRelative = t.left( len( arguments.basePath ) ) == arguments.basePath
+				? t.right( len( t ) - len( arguments.basePath ) )
+				: t.right( len( t ) - 1 )
+		} else {
+			var combined = ( len( arguments.pageDir ) ? arguments.pageDir & "/" : "" ) & t
+			siteRelative = normalizeRelativePath( combined )
+			// normalizeRelativePath()'s listToArray() drops a trailing empty
+			// segment, so a relative link to a directory (e.g. "guides/")
+			// loses the trailing slash the check below relies on - restore it.
+			if ( len( siteRelative ) && combined.right( 1 ) == "/" ) {
+				siteRelative &= "/"
+			}
+		}
+
+		if ( !len( siteRelative ) || siteRelative.right( 1 ) == "/" ) {
+			siteRelative &= "index.html"
+		}
+		return siteRelative
+	}
+
+	/**
+	 * Resolves `.`/`..` segments out of a site-relative path - plain
+	 * textual resolution, no filesystem access.
+	 *
+	 * @path A site-relative path, possibly containing `.`/`..` segments
+	 */
+	private string function normalizeRelativePath( required string path ) {
+		var segments = listToArray( arguments.path, "/" )
+		var resolved = []
+		for ( var segment in segments ) {
+			if ( segment == "." || !len( segment ) ) {
+				continue
+			}
+			if ( segment == ".." && resolved.len() ) {
+				resolved.deleteAt( resolved.len() )
+			} else if ( segment != ".." ) {
+				resolved.append( segment )
+			}
+		}
+		return resolved.toList( "/" )
+	}
+
+	/**
+	 * @filePath Absolute path to a file under siteDir
+	 * @siteDir Absolute path to the build output directory
+	 *
+	 * @return filePath relative to siteDir, no leading slash
+	 */
+	private string function toSiteRelative( required string filePath, required string siteDir ) {
+		return arguments.filePath
+			.reReplace( "^" & createObject( "java", "java.util.regex.Pattern" ).quote( arguments.siteDir ), "", "one" )
+			.reReplace( "^[\/]", "" )
+	}
+
+}

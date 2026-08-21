@@ -173,7 +173,8 @@ class {
 			"search-index" : "models.cli.SearchIndex",
 			"clean"        : "models.cli.Clean",
 			"gh-deploy"    : "models.cli.GhDeploy",
-			"migrate"      : "models.cli.Migrate"
+			"migrate"      : "models.cli.Migrate",
+			"check"        : "models.cli.Check"
 		}
 
 		var verbDescriptions = {
@@ -183,7 +184,8 @@ class {
 			"search-index" : "Rebuild the search index standalone",
 			"clean"        : "Remove site/ and any build cache",
 			"gh-deploy"    : "Build and force-push site/ to a gh-pages branch ([--branch], [--remote], [--message])",
-			"migrate"      : "Convert a GitBook export or mkdocs project into a bx-docs project (--source, required; [--from=gitbook|mkdocs])"
+			"migrate"      : "Convert a GitBook export or mkdocs project into a bx-docs project (--source, required; [--from=gitbook|mkdocs])",
+			"check"        : "CI-grade content check on a built site: broken links/images, missing alt text, orphaned pages"
 		}
 
 		var firstToken = arrayLen( arguments.args ) >= 1 ? arguments.args[ 1 ] : ""
