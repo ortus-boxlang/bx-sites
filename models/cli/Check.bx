@@ -1,0 +1,69 @@
+/**
+ * `check` CLI verb - a CI-grade content quality gate over an already-built
+ * `site/` (module spec section 2): broken internal links/images, `<img>`
+ * tags with no `alt` attribute at all, and orphaned pages. See
+ * LinkChecker.bx's own docblock for exactly what each of those means.
+ */
+class {
+
+	/**
+	 * Dispatches the `check` verb to LinkChecker.check() and formats its
+	 * result into a report. Exits non-zero when there are any broken
+	 * links/images or missing-alt images - those are real defects. Orphaned
+	 * pages are reported but never fail the check on their own (a page can
+	 * be deliberately nav-unreachable, e.g. frontmatter `hidden: true`).
+	 *
+	 * @options { projectRoot (required, absolute path) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxDocs.MissingProjectRoot", message = "`check` requires a project root" )
+		}
+
+		var checker = new "models.build.LinkChecker@bxdocs"()
+		var result = checker.check( projectRoot )
+
+		var failed = result.brokenLinks.len() || result.missingAlt.len()
+
+		return {
+			exitCode : failed ? 1 : 0,
+			message  : formatReport( result )
+		}
+	}
+
+	/**
+	 * @result LinkChecker.check()'s own return value
+	 */
+	private string function formatReport( required struct result ) {
+		var lines = []
+
+		if ( !arguments.result.brokenLinks.len() && !arguments.result.missingAlt.len() ) {
+			lines.append( "No broken links or missing alt text found." )
+		}
+
+		if ( arguments.result.brokenLinks.len() ) {
+			lines.append( "#arguments.result.brokenLinks.len()# broken link(s)/image(s):" )
+			for ( var item in arguments.result.brokenLinks ) {
+				lines.append( "  - #item.page#: #item.href#" )
+			}
+		}
+
+		if ( arguments.result.missingAlt.len() ) {
+			lines.append( "#arguments.result.missingAlt.len()# image(s) missing alt text:" )
+			for ( var item in arguments.result.missingAlt ) {
+				lines.append( "  - #item.page#: #item.src#" )
+			}
+		}
+
+		if ( arguments.result.orphanedPages.len() ) {
+			lines.append( "#arguments.result.orphanedPages.len()# page(s) not reachable from any nav (informational - not a failure):" )
+			for ( var page in arguments.result.orphanedPages ) {
+				lines.append( "  - #page#" )
+			}
+		}
+
+		return lines.toList( char( 10 ) )
+	}
+
+}
