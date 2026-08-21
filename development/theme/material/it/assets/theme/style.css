@@ -1054,10 +1054,30 @@ code:not( pre code ) {
 .md-content-body h4,
 .md-content-body h5,
 .md-content-body h6 {
-	margin-top: 2rem;
-	margin-bottom: 0.75rem;
 	line-height: 1.3;
 	font-weight: 600;
+}
+
+/* Scaled by level so a heading's own weight in the outline reads visually -
+   an h2 (a new major section) gets more air above it than an h4 tucked
+   inside one. `> :first-child` above already zeroes this out for a page
+   whose body starts with a heading. */
+.md-content-body h2 {
+	margin-top: 2.5rem;
+	margin-bottom: 1rem;
+}
+
+.md-content-body h3 {
+	margin-top: 2rem;
+	margin-bottom: 0.75rem;
+}
+
+.md-content-body h1,
+.md-content-body h4,
+.md-content-body h5,
+.md-content-body h6 {
+	margin-top: 1.5rem;
+	margin-bottom: 0.5rem;
 }
 
 .md-content-body h1 { font-size: 1.9rem; }

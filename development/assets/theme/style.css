@@ -394,6 +394,31 @@ a:hover {
 	position: relative;
 }
 
+/* Bootstrap's own reboot zeroes every heading's top margin and leaves only
+   `.5rem` below (`h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem}`) -
+   fine for UI chrome, far too tight for long-form article content where a
+   heading needs real separation from the prose above it. Only h2+ - the
+   page's own h1 is `.page-title`, styled (and spaced) separately above, and
+   always the article's own first child (breadcrumbs/summary/tags are all
+   optional, `.page-title` never is), so there's no "first heading in the
+   article" case to zero back out here. */
+.page-content h2 {
+	margin-top: 2.5rem;
+	margin-bottom: 1rem;
+}
+
+.page-content h3 {
+	margin-top: 2rem;
+	margin-bottom: 0.75rem;
+}
+
+.page-content h4,
+.page-content h5,
+.page-content h6 {
+	margin-top: 1.5rem;
+	margin-bottom: 0.5rem;
+}
+
 .page-content .anchor {
 	position: absolute;
 	left: -1.2em;
