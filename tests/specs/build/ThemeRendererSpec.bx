@@ -145,7 +145,7 @@ class extends="testbox.system.BaseSpec" {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var html = renderer.renderPage( page, nav, config, themeDir );
 
-					expect( html ).toInclude( "alpinejs" );
+					expect( html ).toInclude( "assets/vendor/alpine/cdn.min.js" );
 					expect( html ).toInclude( "theme-toggle" );
 					expect( html ).toInclude( "data-theme" );
 					expect( html ).toInclude( "assets/copy-code.js" );
