@@ -21,7 +21,7 @@
         "markdown"
     ],
     "boxlang":{
-        "minimumVersion":"1.0.0",
+        "minimumVersion":"1.6.0",
         "moduleName":"bxdocs",
         "executable":"bxDocs"
     },
@@ -35,7 +35,8 @@
     "dependencies":{
         "bx-markdown":"*",
         "bx-esapi":"*",
-        "bx-yaml":"*"
+        "bx-yaml":"*",
+        "bx-image":"*"
     },
     "devDependencies":{
         "commandbox-boxlang":"*",

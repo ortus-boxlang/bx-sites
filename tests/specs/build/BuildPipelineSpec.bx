@@ -201,6 +201,91 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( root & "/site/assets/logo.svg" ) ).toBeTrue();
 			} );
 
+			it( "builds the responsive-image manifest once from docs/assets/ and passes it to buildManifest() with the site's own assets.images config, via the setImageVariantGenerator() test seam", function() {
+				var root = newProject();
+				fileWrite( root & "/bxdocs.json", '{"name":"Test Site","assets":{"images":{"widths":[500,900]}}}' );
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/assets", true, true );
+
+				var fakeImages = new "tests.support.FakeImageVariantGenerator@bxdocs"();
+				pipeline.setImageVariantGenerator( fakeImages );
+
+				pipeline.build( root );
+
+				var calls = fakeImages.getBuildManifestCalls();
+				expect( calls.len() ).toBe( 1 );
+				expect( calls[ 1 ].docsAssetsDir ).toBe( root & "/docs/assets" );
+				// A project-set widths list survives the one-level-deeper default
+				// merge (ConfigLoader.bx's own mergeNestedAssetsImagesDefaults()),
+				// alongside the untouched formats/enabled defaults.
+				expect( calls[ 1 ].imagesConfig.widths ).toBe( [ 500, 900 ] );
+				expect( calls[ 1 ].imagesConfig.enabled ).toBeTrue();
+				expect( calls[ 1 ].imagesConfig.formats ).toBe( [ "original", "webp" ] );
+			} );
+
+			it( "rewrites a matched <img> into a <picture>, and copies its manifest variant files into site/assets/, via the setImageVariantGenerator() test seam", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", '<img src="assets/screenshot.png" alt="A screenshot">' );
+				directoryCreate( root & "/docs/assets", true, true );
+
+				var manifest = {
+					"assets/screenshot.png" : {
+						width : 1600, height : 900,
+						originalVariants : [ { width : 800, format : "png", fileName : "screenshot-800w.abc123.png" } ],
+						webpVariants : []
+					}
+				};
+				pipeline.setImageVariantGenerator( new "tests.support.FakeImageVariantGenerator@bxdocs"( manifest ) );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "<picture>" );
+				expect( html ).toInclude( "screenshot-800w.abc123.png" );
+				expect( fileExists( root & "/site/assets/screenshot-800w.abc123.png" ) ).toBeTrue();
+			} );
+
+			it( "bundles extraCss/extraJs into one fingerprinted file each by default, rendering a single <link>/<script> tag", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","extraCss":["assets/custom.css"],"extraJs":["assets/custom.js"]}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/assets", true, true );
+				fileWrite( root & "/docs/assets/custom.css", "body { color: red; }" );
+				fileWrite( root & "/docs/assets/custom.js", "console.log( 1 );" );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				// The raw per-file references are gone - one bundled <link>/<script> stands in for both.
+				expect( html ).notToInclude( "assets/custom.css" & char( 34 ) );
+				expect( html ).notToInclude( "assets/custom.js" & char( 34 ) );
+				expect( html ).toInclude( "assets/bundle." );
+
+				var bundledCssFiles = directoryList( root & "/site/assets", false, "name", "bundle.*.css" );
+				expect( bundledCssFiles.len() ).toBe( 1 );
+				var bundledJsFiles = directoryList( root & "/site/assets", false, "name", "bundle.*.js" );
+				expect( bundledJsFiles.len() ).toBe( 1 );
+			} );
+
+			it( "leaves extraCss/extraJs exactly as raw per-URL tags when assets.bundle is off", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","assets":{"bundle":false},"extraCss":["assets/custom.css"]}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/assets", true, true );
+				fileWrite( root & "/docs/assets/custom.css", "body { color: red; }" );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( 'href="/assets/custom.css"' );
+			} );
+
 			it( "excludes hidden pages from the nav but still builds them", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Home" );

@@ -35,6 +35,9 @@ class {
 	variables.updatesFeedGenerator = new "models.build.UpdatesFeedGenerator@bxdocs"()
 	variables.pluginLoader = new "models.build.PluginLoader@bxdocs"()
 	variables.iconResolver = new "models.build.IconResolver@bxdocs"()
+	variables.imageVariantGenerator = new "models.build.ImageVariantGenerator@bxdocs"()
+	variables.responsiveImageProcessor = new "models.build.ResponsiveImageProcessor@bxdocs"()
+	variables.assetBundler = new "models.build.AssetBundler@bxdocs"()
 	variables.blogDiscoverer = new "models.build.BlogDiscoverer@bxdocs"()
 	variables.blogAuthorsLoader = new "models.build.BlogAuthorsLoader@bxdocs"()
 	variables.blogBuilder = new "models.build.BlogBuilder@bxdocs"()
@@ -64,6 +67,19 @@ class {
 	 */
 	void function setPagefindIndexer( required any indexer ) {
 		variables.pagefindIndexer = arguments.indexer
+	}
+
+	/**
+	 * Swaps in a fake/test image variant generator. The real one
+	 * (ImageVariantGenerator.bx) calls bx-image's own `imageRead()`/
+	 * `.scaleToFit()`/`.write()`, which this pipeline's own unit tests
+	 * can't assume is installed - same reasoning as setMarkdownRenderer()/
+	 * setPagefindIndexer() above.
+	 *
+	 * @generator Any object exposing `buildManifest( docsAssetsDir, imagesConfig, cacheDir )` and `copyToOutput( manifest, outputAssetsDir )`
+	 */
+	void function setImageVariantGenerator( required any generator ) {
+		variables.imageVariantGenerator = arguments.generator
 	}
 
 	/**
@@ -115,6 +131,9 @@ class {
 		var config = variables.configLoader.load( root )
 		var plugins = resolvePlugins( config )
 		config = variables.pluginLoader.applyOnConfig( plugins, config )
+		var assetPipeline = applyAssetPipeline( config, root )
+		config = assetPipeline.config
+		var imageManifest = variables.imageVariantGenerator.buildManifest( root & "/docs/assets", config.assets.images, root & "/.cache/images" )
 		var urls = variables.baseUrlResolver.resolve( config.baseURL )
 		var themeDir = variables.themeRenderer.resolveThemeDir( config.theme.name, root )
 		var siteDir = root & "/site"
@@ -143,9 +162,9 @@ class {
 		// blog posts in too.
 		var blogPosts = variables.blogDiscoverer.load( root & "/docs" )
 		var blogNavUrl = blogPosts.len() ? "blog/index.html" : ""
-		var mainResult = renderDocTree( mainPages, root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, navConfig, locales, defaultLocaleCode, defaultLocaleDir, blogNavUrl )
+		var mainResult = renderDocTree( mainPages, root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, imageManifest, navConfig, locales, defaultLocaleCode, defaultLocaleDir, blogNavUrl )
 		var allPages = duplicate( mainResult.pages )
-		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math )
+		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 
 		for ( var versionName in versionNames ) {
 			var versionDocsDir = root & "/docs/versions/" & versionName
@@ -169,13 +188,14 @@ class {
 				"versions/" & versionName & "/",
 				plugins,
 				urls.absolute,
+				imageManifest,
 				[],
 				versionLocales,
 				defaultLocaleCode,
 				defaultLocaleDir
 			)
 			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
-			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math )
+			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 
 			for ( var versionLocale in versionLocales ) {
 				if ( versionLocale.code == defaultLocaleCode ) {
@@ -197,13 +217,14 @@ class {
 					"",
 					plugins,
 					urls.absolute,
+					imageManifest,
 					[],
 					versionLocales,
 					versionLocale.code,
 					versionLocale.dir
 				)
 				allPages.append( prefixPageUrls( versionLocaleResult.pages, "versions/" & versionName & "/" & versionLocale.code & "/" ), true )
-				copyAssets( root, themeDir, versionLocaleOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math )
+				copyAssets( root, themeDir, versionLocaleOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 			}
 		}
 
@@ -227,13 +248,14 @@ class {
 				"",
 				plugins,
 				urls.absolute,
+				imageManifest,
 				navConfig,
 				locales,
 				locale.code,
 				locale.dir
 			)
 			allPages.append( prefixPageUrls( localeResult.pages, locale.code & "/" ), true )
-			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math )
+			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 		}
 
 		var tagsPages = mainResult.pages
@@ -251,7 +273,7 @@ class {
 				}
 			}
 
-			convertMarkdown( blogPosts, config, plugins, urls.basePath, root & "/docs" )
+			convertMarkdown( blogPosts, config, plugins, urls.basePath, root & "/docs", imageManifest )
 			assignTableOfContents( blogPosts )
 			assignEditAndLastUpdated( blogPosts, config, root, "" )
 			assignOgImages( blogPosts, config, siteDir )
@@ -319,6 +341,43 @@ class {
 	}
 
 	/**
+	 * Bundles `extraCss`/`extraJs` into one fingerprinted file each
+	 * (AssetBundler.bx), when `bxdocs.json`'s `assets.bundle` is on (the
+	 * default) - rewriting `config.extraCss`/`extraJs` in place to a
+	 * single-entry array pointing at the bundle, so every theme's own
+	 * `layout.bxm` (`renderExtraCss()`/`renderExtraJs()`) needs no changes
+	 * at all - it already just loops whatever's in those two arrays.
+	 * Runs after plugins' own `onConfig` hook, so a plugin that mutates
+	 * `extraCss`/`extraJs` still gets bundled; left completely untouched
+	 * when `assets.bundle` is off, or when AssetBundler.bx itself declines
+	 * to bundle (an external URL in the list, or a named file that
+	 * doesn't exist - see its own docblock).
+	 *
+	 * @config The site's bxdocs.json config, already defaulted/validated and plugin-onConfig'd
+	 * @root Absolute path to the project root
+	 *
+	 * @return `{ config, cssBundle, jsBundle }` - `cssBundle`/`jsBundle` are AssetBundler.bundle()'s own return shape (empty `cachedPath`/`fileName` when nothing was bundled), threaded through to copyAssets() so the actual bundle file lands in every tree's own output alongside the rewritten `config.extraCss`/`extraJs` URL
+	 */
+	private struct function applyAssetPipeline( required struct config, required string root ) {
+		var emptyBundle = { bundleUrl : "", urls : [], cachedPath : "", fileName : "" }
+
+		if ( !arguments.config.assets.bundle ) {
+			return { config : arguments.config, cssBundle : emptyBundle, jsBundle : emptyBundle }
+		}
+
+		var docsDir = arguments.root & "/docs"
+		var cacheDir = arguments.root & "/.cache/assets"
+
+		var cssBundle = variables.assetBundler.bundleCss( arguments.config.extraCss, docsDir, cacheDir )
+		arguments.config.extraCss = len( cssBundle.bundleUrl ) ? [ cssBundle.bundleUrl ] : cssBundle.urls
+
+		var jsBundle = variables.assetBundler.bundleJs( arguments.config.extraJs, docsDir, cacheDir )
+		arguments.config.extraJs = len( jsBundle.bundleUrl ) ? [ jsBundle.bundleUrl ] : jsBundle.urls
+
+		return { config : arguments.config, cssBundle : cssBundle, jsBundle : jsBundle }
+	}
+
+	/**
 	 * Renders and writes one self-contained doc tree from an already-loaded
 	 * `pages` array - the project's own `docs/` (the "Latest"/default
 	 * build), one `docs/versions/<name>/` folder in its own default locale
@@ -340,6 +399,7 @@ class {
 	 * @docsRelativePrefix Empty for the main/"Latest" tree or any locale tree (see assignEditAndLastUpdated() - a locale tree's own pages each carry their own `sourceRelativePath` instead, already namespaced under `versions/<name>/` by mergeLocalePages() when nested under a version); `"versions/<name>/"` for a version tree's own default-locale render
 	 * @plugins resolvePlugins()'s own output, applied via onNav/onPageMarkdown/onPageHtml
 	 * @absoluteUrl The absolute site URL, ending with `/` (BaseUrlResolver's `absolute`), or "" if unknown - gates `::: updates` feed.xml generation, same as sitemap.xml
+	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output, built once per build() call (docs/assets/** is identical across every tree) - threaded through to convertMarkdown() for the `<img>` -> `<picture>` rewrite
 	 * @navConfig An explicit nav tree (NavBuilder.build()'s own `navConfig` shape) for this doc tree - empty (the default) infers nav from folder structure. Non-empty for the main tree and every top-level locale tree (a locale's nav always mirrors its own default tree's structure/navConfig - see mergeLocalePages()); always empty for a version tree and any locale tree nested under it, which infer their own from that version's own folder structure - see resolveExplicitNav()
 	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]`, the default locale first - only the locales *this specific tree* has translations for (top-level `docs/i18n/<code>/` for the main tree, `docs/versions/<name>/i18n/<code>/` for a version tree and its own nested locale trees), so switching locale always stays within the current version
 	 * @currentLocale Which `locales` entry's `code` this tree IS, for the switcher's own "selected" state - the default locale's own code for the main tree and every version tree's own default-locale render (never "")
@@ -361,6 +421,7 @@ class {
 		required string docsRelativePrefix,
 		required array plugins,
 		required string absoluteUrl,
+		required struct imageManifest,
 		array navConfig = [],
 		array locales = [],
 		string currentLocale = "",
@@ -390,7 +451,7 @@ class {
 
 		directoryCreate( arguments.outputDir, true, true )
 
-		convertMarkdown( pages, arguments.config, arguments.plugins, arguments.basePath, arguments.docsDir )
+		convertMarkdown( pages, arguments.config, arguments.plugins, arguments.basePath, arguments.docsDir, arguments.imageManifest )
 		variables.pageLinkResolver.resolve( pages, arguments.basePath )
 		assignTableOfContents( pages )
 		assignPrevNext( pages, flatSequence )
@@ -577,8 +638,9 @@ class {
 	 * @config The site's bxdocs.json config
 	 * @basePath Root-relative base path ending with `/` - relative `.md` links are re-rooted under it, same as every other internal link the theme renders
 	 * @docsDir Absolute path to this tree's own docs root - `::: include` paths are resolved against it
+	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - defaults to empty, which makes the `<img>` -> `<picture>` rewrite (ResponsiveImageProcessor.bx) a no-op; buildSearchIndex() relies on exactly that default, since the search index has no use for it
 	 */
-	private void function convertMarkdown( required array pages, required struct config, array plugins = [], string basePath = "/", string docsDir = "" ) {
+	private void function convertMarkdown( required array pages, required struct config, array plugins = [], string basePath = "/", string docsDir = "", struct imageManifest = {} ) {
 		for ( var page in arguments.pages ) {
 			var markdown = variables.pluginLoader.applyOnPageMarkdown( arguments.plugins, page.body, page, arguments.config )
 			markdown = variables.includeProcessor.process( markdown, arguments.docsDir, page.relativePath )
@@ -596,6 +658,7 @@ class {
 			html = variables.tabsProcessor.restore( html, tabsExtracted.groups, variables.markdownRenderer, arguments.config.markdown )
 			html = variables.tryBoxLangProcessor.restore( html, tryBoxLangExtracted.embeds )
 			html = variables.markdownLinkResolver.resolve( html, page.relativePath, arguments.basePath )
+			html = variables.responsiveImageProcessor.resolve( html, page.relativePath, arguments.basePath, arguments.imageManifest )
 
 			html = variables.pluginLoader.applyOnPageHtml( arguments.plugins, html, page, arguments.config )
 
@@ -1071,8 +1134,11 @@ class {
 	 * @searchEnabled Whether to copy the shared search.js/lunr widget - searchNeedsLocalIndex()'s own result, so this is only true for the `local` search provider (or one bx-docs doesn't otherwise know about), never `algolia`
 	 * @mermaidEnabled Whether to copy the shared mermaid-init.js widget
 	 * @mathEnabled Whether to copy the shared math-init.js (KaTeX auto-render) widget
+	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - its already-generated variant files get copied into this tree's own site.../assets/, right alongside the plain docs/assets/** copy below; empty (the default) copies nothing extra
+	 * @cssBundle AssetBundler.bundleCss()'s own output (via applyAssetPipeline()) - its cached bundle file gets copied into this tree's own site.../assets/ so the `<link>` config.extraCss now points at actually resolves; empty `cachedPath` (the default) copies nothing
+	 * @jsBundle AssetBundler.bundleJs()'s own output - same as cssBundle, for the `<script>` config.extraJs now points at
 	 */
-	private void function copyAssets( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false ) {
+	private void function copyAssets( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {} ) {
 		var themeAssetsDir = arguments.themeDir & "/assets"
 		if ( directoryExists( themeAssetsDir ) ) {
 			directoryCopy( themeAssetsDir, arguments.siteDir & "/assets/theme", true )
@@ -1110,6 +1176,17 @@ class {
 		var docsAssetsDir = arguments.root & "/docs/assets"
 		if ( directoryExists( docsAssetsDir ) ) {
 			directoryCopy( docsAssetsDir, arguments.siteDir & "/assets", true )
+		}
+
+		if ( !arguments.imageManifest.isEmpty() ) {
+			variables.imageVariantGenerator.copyToOutput( arguments.imageManifest, arguments.siteDir & "/assets" )
+		}
+
+		for ( var bundle in [ arguments.cssBundle, arguments.jsBundle ] ) {
+			var cachedPath = bundle.cachedPath ?: ""
+			if ( len( cachedPath ) ) {
+				fileCopy( cachedPath, arguments.siteDir & "/assets/" & bundle.fileName )
+			}
 		}
 	}
 

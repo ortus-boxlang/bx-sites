@@ -1,0 +1,183 @@
+/**
+ * Rewrites `<img src="...">` tags whose `src` resolves to a
+ * responsive-image-manifest entry (ImageVariantGenerator.bx's own output)
+ * into a `<picture>` element - a WebP `<source>` when WebP variants exist,
+ * plus the original format's own `srcset`/`sizes` on the fallback `<img>`
+ * when same-format variants exist. An `<img>` with no manifest hit (an
+ * SVG/GIF, an external URL, or the responsive pipeline being off) is left
+ * completely untouched.
+ *
+ * Resolves a relative `src` against the *linking page's own source
+ * directory* - the same file-relative convention MarkdownLinkResolver.bx
+ * already uses for `.md` page links (`../assets/screenshot.png` written
+ * relative to the authoring `.md` file, the same way it already works
+ * read directly on GitHub) - rather than the page's own *built output*
+ * directory, which a nested page's URL restructuring (`guides/setup.md`
+ * -> `guides/setup/index.html`) would otherwise get wrong. This is a
+ * post-processing pass over already-rendered HTML, the same shape as
+ * MarkdownLinkResolver.bx/CodeAnnotationProcessor.applyToHtml().
+ */
+class {
+
+	variables.imgTagPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "(?i)<img\b[^>]*>" )
+	variables.srcPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(?i)\bsrc\s*=\s*"([^"]*)"' )
+
+	/**
+	 * The fixed `sizes` attribute given to every rewritten `<img>` - bx-docs'
+	 * own article column tops out well under 800px on every built-in theme,
+	 * so this covers the common case without needing a per-image config
+	 * knob in v1.
+	 */
+	variables.sizesAttr = "(min-width: 800px) 800px, 100vw"
+
+	/**
+	 * Rewrites every eligible `<img>` in `html`.
+	 *
+	 * @html Already-rendered page HTML
+	 * @sourceRelativePath The current page's own docs/-relative source path (DocsLoader.bx's `relativePath`)
+	 * @basePath Root-relative base path ending with `/` (BaseUrlResolver's `basePath`)
+	 * @manifest ImageVariantGenerator.buildManifest()'s own output - empty when the responsive pipeline is off, in which case this is a no-op
+	 *
+	 * @return html with every manifest-matched `<img>` swapped for a `<picture>`
+	 */
+	string function resolve( required string html, required string sourceRelativePath, required string basePath, required struct manifest ) {
+		if ( arguments.manifest.isEmpty() ) {
+			return arguments.html
+		}
+
+		var currentDir = directoryOf( arguments.sourceRelativePath )
+		var matcher = variables.imgTagPattern.matcher( arguments.html )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+
+		while ( matcher.find() ) {
+			var replacement = rewriteTag( matcher.group(), currentDir, arguments.basePath, arguments.manifest )
+			matcher.appendReplacement( buffer, quoteReplacement( replacement ) )
+		}
+		matcher.appendTail( buffer )
+
+		return buffer.toString()
+	}
+
+	/**
+	 * @tag One complete `<img ...>` tag, exactly as rendered
+	 * @currentDir The current page's own docs/-relative directory (directoryOf())
+	 * @basePath Root-relative base path ending with `/`
+	 * @manifest ImageVariantGenerator.buildManifest()'s own output
+	 */
+	private string function rewriteTag( required string tag, required string currentDir, required string basePath, required struct manifest ) {
+		var srcMatcher = variables.srcPattern.matcher( arguments.tag )
+		if ( !srcMatcher.find() ) {
+			return arguments.tag
+		}
+
+		var src = srcMatcher.group( 1 )
+		if ( !isLocal( src ) ) {
+			return arguments.tag
+		}
+
+		var key = resolvePath( arguments.currentDir, src )
+		if ( !arguments.manifest.keyExists( key ) ) {
+			return arguments.tag
+		}
+
+		var entry = arguments.manifest[ key ]
+		if ( !entry.originalVariants.len() && !entry.webpVariants.len() ) {
+			return arguments.tag
+		}
+
+		// Preserve every other attribute (alt, class, id, loading, ...)
+		// exactly as authored - only the src="..." piece is stripped, then
+		// the new src/srcset/sizes are spliced in right after "<img".
+		var withoutSrc = variables.srcPattern.matcher( arguments.tag ).replaceFirst( "" )
+		var newAttrs = ' src="' & arguments.basePath & arguments.key & '"'
+		if ( entry.originalVariants.len() ) {
+			newAttrs &= ' srcset="' & buildSrcset( entry.originalVariants, key, arguments.basePath ) & '" sizes="' & variables.sizesAttr & '"'
+		}
+		var newImg = withoutSrc.reReplace( "^<img", "<img" & newAttrs, "one" )
+
+		var picture = "<picture>"
+		if ( entry.webpVariants.len() ) {
+			picture &= '<source type="image/webp" srcset="' & buildSrcset( entry.webpVariants, key, arguments.basePath ) & '">'
+		}
+		picture &= newImg & "</picture>"
+
+		return picture
+	}
+
+	/**
+	 * @return false for an external URL (has its own scheme, incl. `data:`), a root-relative (`/...`) path, or an empty src - only a bare file-relative path is a rewrite candidate, same scope MarkdownLinkResolver.bx's own `.md` link resolution has
+	 */
+	private boolean function isLocal( required string src ) {
+		var s = trim( arguments.src )
+		if ( !len( s ) ) {
+			return false
+		}
+		if ( left( s, 1 ) == "/" ) {
+			return false
+		}
+		return !s.reFindNoCase( "^[a-z][a-z0-9+.\-]*:" )
+	}
+
+	/**
+	 * Resolves a `.`/`..`/sibling-relative image path against the linking
+	 * page's own directory - standard filesystem-style segment resolution,
+	 * identical in shape to MarkdownLinkResolver.bx's own `resolvePath()`.
+	 *
+	 * @baseDir The linking page's own docs/-relative directory (directoryOf())
+	 * @relativePath The img's own src value
+	 */
+	private string function resolvePath( required string baseDir, required string relativePath ) {
+		var stack = []
+		for ( var segment in listToArray( arguments.baseDir & "/" & arguments.relativePath, "/", true ) ) {
+			if ( segment == "." || !len( segment ) ) {
+				continue
+			} else if ( segment == ".." ) {
+				if ( stack.len() ) {
+					stack.deleteAt( stack.len() )
+				}
+			} else {
+				stack.append( segment )
+			}
+		}
+		return stack.toList( "/" )
+	}
+
+	/**
+	 * @relativePath A docs/-relative path, e.g. "guides/themes.md"
+	 *
+	 * @return Its directory, e.g. "guides" - "" for a root-level page
+	 */
+	private string function directoryOf( required string relativePath ) {
+		var segments = listToArray( arguments.relativePath, "/", true )
+		segments.deleteAt( segments.len() )
+		return segments.toList( "/" )
+	}
+
+	/**
+	 * Builds one `srcset` attribute value from a manifest entry's own
+	 * variant list.
+	 *
+	 * @variants entry.originalVariants or entry.webpVariants
+	 * @key The manifest key this entry lives under, e.g. "assets/sub/screenshot.png" - its own directory is where every variant file for it was written (ImageVariantGenerator.copyToOutput())
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	private string function buildSrcset( required array variants, required string key, required string basePath ) {
+		var dir = directoryOf( arguments.key )
+		var parts = []
+		for ( var variant in arguments.variants ) {
+			var url = ( len( dir ) ? dir & "/" : "" ) & variant.fileName
+			parts.append( arguments.basePath & url & " " & variant.width & "w" )
+		}
+		return parts.toList( ", " )
+	}
+
+	/**
+	 * Escapes literal text for use as a `Matcher#appendReplacement` argument.
+	 *
+	 * @text Literal text to safely pass through java.util.regex.Matcher#appendReplacement, which otherwise treats `$` and `\` as backreference syntax
+	 */
+	private string function quoteReplacement( required string text ) {
+		return createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( arguments.text )
+	}
+
+}

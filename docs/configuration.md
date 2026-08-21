@@ -47,6 +47,10 @@ ogImage: ""
 generateOgImages: false
 extraCss: []
 extraJs: []
+assets:
+  fingerprint: true
+  bundle: true
+  images: { enabled: true, widths: [400, 800, 1200, 1600], formats: [original, webp] }
 plugins: []
 i18n:
   defaultLocale: { code: en, label: English }
@@ -93,6 +97,11 @@ The equivalent `bxdocs.json`, for a project that prefers it:
 	"generateOgImages": false,
 	"extraCss": [],
 	"extraJs": [],
+	"assets": {
+		"fingerprint": true,
+		"bundle": true,
+		"images": { "enabled": true, "widths": [400, 800, 1200, 1600], "formats": ["original", "webp"] }
+	},
 	"plugins": [],
 	"i18n": {
 		"defaultLocale": { "code": "en", "label": "English" },
@@ -498,6 +507,63 @@ is used as-is). `extraJs` entries are loaded with `defer`.
 	"extraJs": [ "assets/custom.js" ]
 }
 ```
+
+When `assets.bundle` is on (the default), a local `extraCss`/`extraJs`
+list like the one above is bundled into one fingerprinted file each,
+instead of one `<link>`/`<script>` tag per entry - see [`assets`](#assets)
+below.
+
+## `assets`
+
+```json
+{
+	"assets": {
+		"fingerprint": true,
+		"bundle": true,
+		"images": {
+			"enabled": true,
+			"widths": [ 400, 800, 1200, 1600 ],
+			"formats": [ "original", "webp" ]
+		}
+	}
+}
+```
+
+The asset pipeline - image resizing/WebP via
+[bx-image](https://github.com/ortus-boxlang/bx-image) (a required
+dependency, installed alongside bx-markdown/bx-esapi) and CSS/JS
+bundling. Everything here is on by default with reasonable settings - a
+fresh `bxDocs new` project needs to touch none of this. See
+[Responsive Images](guides/images.md) for the full picture, including
+what deliberately isn't covered (AVIF, animated GIFs, SVGs).
+
+- `assets.fingerprint` - `true` (the default). Content-hash-names every
+  generated image variant and CSS/JS bundle (e.g.
+  `screenshot-800w.a3f9c2e1.webp`, `bundle.a3f9c2e1.css`) so they can be
+  served with safe, far-future cache headers - a project's build changes
+  the file's own name only when its content actually changes. Does not
+  rename a project's own original files under `docs/assets/` - only
+  pipeline-generated output gets fingerprinted, so anything else that
+  references an asset by its plain filename (a `::: file` download card,
+  a raw markdown link) keeps working unchanged.
+- `assets.bundle` - `true` (the default). Concatenates `extraCss`/`extraJs`
+  into one fingerprinted file each - pure BoxLang/JVM, no Node/esbuild
+  toolchain. Falls back to today's exact per-URL `<link>`/`<script>`
+  behavior, untouched, the moment any entry in the list is an external
+  URL (a CDN link) or names a file that doesn't exist - see
+  [Responsive Images](guides/images.md#css-js-bundling).
+- `assets.images.enabled` - `true` (the default). Every eligible
+  `docs/assets/**` image (`.png`/`.jpg`/`.jpeg`) gets resized/WebP
+  variants generated via bx-image, and every matching `<img>` gets
+  rewritten into a `<picture>` with `srcset`. Set `false` to fall back
+  to plain, unprocessed image copying, exactly as before this feature
+  existed.
+- `assets.images.widths` - breakpoints to generate, in pixels. A width at
+  or above a given image's own width is skipped automatically for that
+  image - nothing is ever upscaled.
+- `assets.images.formats` - `"original"` keeps the source format as the
+  `<img>` fallback; `"webp"` adds a same-size `<source type="image/webp">`
+  variant. Both on by default.
 
 ## `mermaid`
 

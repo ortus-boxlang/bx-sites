@@ -10,6 +10,7 @@ icon: phosphor-duotone:book-open
 - [Search](search.md) - how the static search index works
 - [Deploying to GitHub Pages](deployment.md) - the built-in GitHub Actions workflow
 - [Markdown Extensions](markdown.md) - admonitions, footnotes, definition lists and Mermaid diagrams
+- [Responsive Images](images.md) - automatic resizing, WebP variants, and CSS/JS bundling, on by default
 - [Interactivity with Alpine.js](interactivity.md) - reactive content (copy buttons, live filters, and more) with no extra setup
 - [Plugins](plugins.md) - extending BX Docs with a BoxLang module of your own
 - [Internationalization (i18n)](i18n.md) - translating your docs into other languages

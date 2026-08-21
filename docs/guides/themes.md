@@ -100,6 +100,9 @@ page features:
 - **Content tabs**, **code line numbers/highlighted lines/titles**, and
   **diff markers/terminal-style frames** for code blocks, no config needed.
   See [Markdown Extensions](markdown.md#content-tabs).
+- **Responsive images** - resized + WebP variants and a `<picture>`
+  rewrite for every eligible `docs/assets/**` image, on by default. See
+  [Responsive Images](images.md).
 - **Mermaid diagrams**, opt-in via `bxdocs.json`'s `mermaid`. See
   [Markdown Extensions](markdown.md#diagrams).
 - **Math** (KaTeX), opt-in via `bxdocs.json`'s `math`. See

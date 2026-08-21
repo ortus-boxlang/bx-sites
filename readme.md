@@ -28,9 +28,10 @@ box install bx-docs
 box install bx-markdown
 box install bx-esapi
 box install bx-yaml
+box install bx-image
 
-# ...or, without CommandBox, BoxLang's own installer takes all four at once:
-# install-bx-module bx-docs bx-markdown bx-esapi bx-yaml
+# ...or, without CommandBox, BoxLang's own installer takes all five at once:
+# install-bx-module bx-docs bx-markdown bx-esapi bx-yaml bx-image
 
 # Scaffold a new docs project (docs/ + bxdocs.yaml)
 bxDocs new my-docs
@@ -62,8 +63,8 @@ boxlang module:bxdocs <verb> [options]
 | Verb | Purpose |
 |---|---|
 | `new` | Scaffold a docs project (`docs/` + `bxdocs.yaml`, defaulting to the `bootstrap` theme; `--format=json` for `bxdocs.json` instead) |
-| `build` | Render `docs/**.md` into a static site in `site/`, including the search index, `sitemap.xml`, `llms.txt` and assets. Needs bx-markdown, bx-esapi and bx-yaml installed |
-| `serve` | Build and serve the site locally with live reload (needs bx-markdown, bx-esapi and bx-yaml too) |
+| `build` | Render `docs/**.md` into a static site in `site/`, including the search index, `sitemap.xml`, `llms.txt` and assets. Needs bx-markdown, bx-esapi, bx-yaml and bx-image installed |
+| `serve` | Build and serve the site locally with live reload (needs bx-markdown, bx-esapi, bx-yaml and bx-image too) |
 | `search-index` | Rebuild `site/search-index.json` standalone (also runs automatically during `build`) |
 | `clean` | Remove `site/` and any build cache |
 | `migrate` | Convert a GitBook export (`SUMMARY.md` + `.md` files) into `docs/` + `nav.json` |
