@@ -1,0 +1,62 @@
+// Vendors the third-party CSS/JS every built-in theme needs under
+// resources/assets/vendor/ - BuildPipeline.bx's copyAssets() copies these
+// into every built site's own assets/vendor/, and each built-in theme's
+// layout.bxm references them by local path instead of a CDN URL, so a
+// generated site works with zero outbound network requests by default
+// (air-gapped/offline-friendly, module spec section 8).
+//
+// Only libraries that are (a) a single self-contained static file/pair of
+// files, no further sub-resources of their own, and (b) either always
+// loaded (Bootstrap, highlight.js, Alpine.js) or gated behind bx-docs'
+// own existing `local` search provider (lunr.js) are vendored this way.
+// KaTeX (ships its own font files), Mermaid (a multi-megabyte bundle),
+// the Tailwind theme's CDN JIT compiler, Google Analytics' gtag.js, and
+// Algolia DocSearch (inherently talks to Algolia's own hosted API) stay
+// CDN-loaded - see MODULE_SPEC.md section 8 for the reasoning on each.
+//
+// Re-run this after bumping any pinned version below (keep it in sync
+// with the version each theme's own layout.bxm expects) to refresh
+// resources/assets/vendor/:
+//
+//   npm install --no-save bootstrap@5.3.3 @highlightjs/cdn-assets@11.10.0 alpinejs@3.14.1 lunr@2.3.9
+//   node vendorAssets.mjs resources/assets/vendor
+
+import { copyFileSync, existsSync, mkdirSync } from "node:fs";
+import { join } from "node:path";
+
+const destRoot = process.argv[2];
+if (!destRoot) {
+	console.error("usage: node vendorAssets.mjs <dest-root>");
+	process.exit(1);
+}
+
+function vendor(label, destSubdir, files) {
+	const dest = join(destRoot, destSubdir);
+	mkdirSync(dest, { recursive: true });
+	let copied = 0;
+	for (const [source, destName] of files) {
+		if (!existsSync(source)) {
+			// Optional files (e.g. a .map with no source) are skipped, not fatal.
+			continue;
+		}
+		copyFileSync(source, join(dest, destName ?? source.split("/").pop()));
+		copied++;
+	}
+	console.log(`${label}: vendored ${copied} file(s) -> ${dest}`);
+}
+
+vendor("bootstrap", "bootstrap", [
+	["node_modules/bootstrap/dist/css/bootstrap.min.css"],
+	["node_modules/bootstrap/dist/css/bootstrap.min.css.map"],
+	["node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"],
+	["node_modules/bootstrap/dist/js/bootstrap.bundle.min.js.map"],
+]);
+
+vendor("highlight.js", "highlight", [
+	["node_modules/@highlightjs/cdn-assets/highlight.min.js"],
+	["node_modules/@highlightjs/cdn-assets/styles/github.min.css"],
+]);
+
+vendor("alpine.js", "alpine", [["node_modules/alpinejs/dist/cdn.min.js"]]);
+
+vendor("lunr", "lunr", [["node_modules/lunr/lunr.min.js"]]);

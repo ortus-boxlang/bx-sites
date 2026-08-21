@@ -122,7 +122,7 @@ class {
 		var mainPages = variables.docsLoader.load( root & "/docs" )
 		var mainResult = renderDocTree( mainPages, root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, navConfig, locales, defaultLocaleCode, defaultLocaleDir )
 		var allPages = duplicate( mainResult.pages )
-		copyAssets( root, themeDir, siteDir, searchNeedsLocalIndex( config ), config.mermaid, config.math )
+		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math )
 
 		for ( var versionName in versionNames ) {
 			var versionOutputDir = siteDir & "/versions/" & versionName
@@ -142,7 +142,7 @@ class {
 				urls.absolute
 			)
 			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
-			copyAssets( root, themeDir, versionOutputDir, searchNeedsLocalIndex( config ), config.mermaid, config.math )
+			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math )
 		}
 
 		for ( var locale in locales ) {
@@ -171,7 +171,7 @@ class {
 				locale.dir
 			)
 			allPages.append( prefixPageUrls( localeResult.pages, locale.code & "/" ), true )
-			copyAssets( root, themeDir, localeOutputDir, searchNeedsLocalIndex( config ), config.mermaid, config.math )
+			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math )
 		}
 
 		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, "Latest", locales, defaultLocaleCode )
@@ -905,17 +905,21 @@ class {
 	 * Copies theme assets to `site/assets/theme/`, this module's own shared
 	 * scripts (the search widget when search is enabled; the copy-code
 	 * button, tab widget, and code line-number/highlight widget
-	 * unconditionally), and a project's own `docs/assets/**` to
+	 * unconditionally), the vendored third-party CSS/JS every built site
+	 * needs with no CDN/internet access (module spec section 8 - highlight.js
+	 * and Alpine.js always, Bootstrap's own CSS/JS for the `bootstrap` theme,
+	 * lunr.js alongside search.js), and a project's own `docs/assets/**` to
 	 * `site/assets/` (module spec section 5, step 6).
 	 *
 	 * @root Absolute path to the project root
 	 * @themeDir Absolute path to the resolved theme folder
 	 * @siteDir Absolute path to the build output directory
+	 * @themeName bxdocs.json's `theme.name` - selects which vendored theme-specific assets (currently just Bootstrap's own CSS/JS) to copy
 	 * @searchEnabled Whether to copy the shared search.js/lunr widget - searchNeedsLocalIndex()'s own result, so this is only true for the `local` search provider (or one bx-docs doesn't otherwise know about), never `algolia`
 	 * @mermaidEnabled Whether to copy the shared mermaid-init.js widget
 	 * @mathEnabled Whether to copy the shared math-init.js (KaTeX auto-render) widget
 	 */
-	private void function copyAssets( required string root, required string themeDir, required string siteDir, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false ) {
+	private void function copyAssets( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false ) {
 		var themeAssetsDir = arguments.themeDir & "/assets"
 		if ( directoryExists( themeAssetsDir ) ) {
 			directoryCopy( themeAssetsDir, arguments.siteDir & "/assets/theme", true )
@@ -930,9 +934,16 @@ class {
 		fileCopy( moduleAssetsDir() & "/tabs.js", arguments.siteDir & "/assets/tabs.js" )
 		fileCopy( moduleAssetsDir() & "/code-lines.js", arguments.siteDir & "/assets/code-lines.js" )
 		directoryCopy( moduleAssetsDir() & "/fonts", arguments.siteDir & "/assets/fonts", true )
+		directoryCopy( moduleAssetsDir() & "/vendor/highlight", arguments.siteDir & "/assets/vendor/highlight", true )
+		directoryCopy( moduleAssetsDir() & "/vendor/alpine", arguments.siteDir & "/assets/vendor/alpine", true )
+
+		if ( arguments.themeName == "bootstrap" ) {
+			directoryCopy( moduleAssetsDir() & "/vendor/bootstrap", arguments.siteDir & "/assets/vendor/bootstrap", true )
+		}
 
 		if ( arguments.searchEnabled ) {
 			fileCopy( moduleAssetsDir() & "/search.js", arguments.siteDir & "/assets/search.js" )
+			directoryCopy( moduleAssetsDir() & "/vendor/lunr", arguments.siteDir & "/assets/vendor/lunr", true )
 		}
 
 		if ( arguments.mermaidEnabled ) {
