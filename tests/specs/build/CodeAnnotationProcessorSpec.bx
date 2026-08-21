@@ -135,7 +135,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( result ).toInclude( '<pre><code>plain' );
 			} );
 
-			it( "stamps data-bxdocs-frame only for frame=\"terminal\", and data-bxdocs-insert-lines/delete-lines when set", function() {
+			it( 'stamps data-bxdocs-frame only for frame="terminal", and data-bxdocs-insert-lines/delete-lines when set', function() {
 				var html = '<pre><code>a' & char( 10 ) & '</code></pre>' & char( 10 ) &
 					'<pre><code>b' & char( 10 ) & '</code></pre>';
 				var annotations = [
