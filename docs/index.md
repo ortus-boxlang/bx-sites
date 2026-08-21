@@ -2,7 +2,7 @@
 title: Home
 order: 1
 icon: phosphor-duotone:house
-summary: Point BX Docs at a docs/ folder. Get a fast, themeable, static site out - complete with search, i18n, and a markdown toolkit built for real documentation.
+summary: Point BX Docs at a docs/ folder. Get a fast, themeable static site out - documentation, a marketing site, a blog, or anything else Markdown can express - complete with search, i18n, and a markdown toolkit built for real content.
 toc: false
 ---
 
@@ -16,6 +16,11 @@ toc: false
 
 This very site is built by BX Docs, from the Markdown files in this
 repository's own `docs/` folder.
+
+BX Docs isn't only for reference documentation - it's a general-purpose
+**static site generator**. A marketing site, a blog, a knowledge base, a
+product site, a personal site: anything you can write in Markdown builds
+the same way, through the same themes, search, and i18n.
 
 ::: cards
 ::: card title="Markdown in, static HTML out" icon="phosphor-duotone:file-html"
@@ -99,3 +104,15 @@ The built-in GitHub Actions workflow.
 Versioning policy and what's new per release.
 :::
 :::
+
+## Need a hand building your site?
+
+BX Docs is free and open source - but if you'd rather have the team who
+builds it do the work, [Ortus Solutions](https://www.ortussolutions.com)
+offers professional services and consulting for documentation sites,
+migrations, and any other static site built with BX Docs.
+
+<div class="bxdocs-hero__actions">
+	<a class="bxdocs-hero__btn bxdocs-hero__btn--primary" href="mailto:consulting@ortussolutions.com">Email consulting@ortussolutions.com</a>
+	<a class="bxdocs-hero__btn bxdocs-hero__btn--secondary" href="services.md">Consulting & Professional Services</a>
+</div>
