@@ -83,13 +83,13 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "ignores full-line and trailing comments", function() {
-				var doc = parser.parse( "# a comment" & char( 10 ) & "site_name: My Docs # trailing comment" );
+				var doc = parser.parse( "## a comment" & char( 10 ) & "site_name: My Docs ## trailing comment" );
 				expect( doc.site_name ).toBe( "My Docs" );
 			} );
 
-			it( "does not treat a # inside a quoted value as a comment", function() {
-				var doc = parser.parse( 'site_name: "Docs # Not A Comment"' );
-				expect( doc.site_name ).toBe( "Docs # Not A Comment" );
+			it( "does not treat a ## inside a quoted value as a comment", function() {
+				var doc = parser.parse( 'site_name: "Docs ## Not A Comment"' );
+				expect( doc.site_name ).toBe( "Docs ## Not A Comment" );
 			} );
 
 			it( "skips blank lines", function() {
