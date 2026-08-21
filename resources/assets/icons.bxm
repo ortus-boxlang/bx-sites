@@ -38,4 +38,17 @@
 		var key = lcase( trim( arguments.name ) )
 		return icons[ key ] ?: icons[ "generic" ]
 	}
+
+	/**
+	 * A minimal, attribute-value-safe escape for an `href`/`src`/`value`
+	 * that must stay a literally path-parseable URL - `encodeForHTML()`
+	 * also entity-escapes "safe" characters like `/` when bx-esapi is
+	 * loaded (its exact range is locale/JVM-dependent), which would
+	 * silently mangle every theme's own version-switcher/locale-dropdown/
+	 * social-link URLs. Only `&`/`"`/`<` - the characters that actually
+	 * matter inside a double-quoted HTML attribute - are escaped.
+	 */
+	function bxdocsUrlAttr( required string value ) {
+		return arguments.value.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
+	}
 </bx:script>

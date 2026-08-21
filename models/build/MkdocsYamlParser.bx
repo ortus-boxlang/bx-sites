@@ -75,7 +75,7 @@ class {
 				continue
 			}
 			if ( ch == "##" ) {
-				return arguments.line.left( i - 1 )
+				return i == 1 ? "" : arguments.line.left( i - 1 )
 			}
 		}
 		return arguments.line

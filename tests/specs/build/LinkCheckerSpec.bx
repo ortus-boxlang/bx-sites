@@ -20,7 +20,7 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
-			private string function newProjectRoot( string bxdocsJson = "{}" ) {
+			private string function newProjectRoot( string bxdocsJson = '{"name":"Test Site","theme":{"name":"bootstrap"}}' ) {
 				var dir = createTempDirectory( prefix = "bxdocs-check-" );
 				tempDirs.append( dir );
 				fileWrite( dir & "/bxdocs.json", arguments.bxdocsJson );
@@ -106,7 +106,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "resolves a root-relative link under a non-default baseURL sub-path", function() {
-				var projectRoot = newProjectRoot( '{"baseURL":"/my-docs/"}' );
+				var projectRoot = newProjectRoot( '{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"/my-docs/"}' );
 				writePage( projectRoot, "index.html", '<a href="/my-docs/about.html">About</a>' );
 				writePage( projectRoot, "about.html", "About page." );
 
@@ -169,7 +169,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "treats each docs/versions/<name>/ and non-default docs/i18n/<code>/ index.html as its own reachability root", function() {
-				var projectRoot = newProjectRoot( '{"i18n":{"defaultLocale":{"code":"en","label":"English"},"locales":[{"code":"es","label":"Spanish"}]}}' );
+				var projectRoot = newProjectRoot( '{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"defaultLocale":{"code":"en","label":"English"},"locales":[{"code":"es","label":"Spanish"}]}}' );
 				directoryCreate( projectRoot & "/docs/versions/2.0", true, true );
 				directoryCreate( projectRoot & "/docs/i18n/es", true, true );
 
@@ -184,7 +184,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "treats a non-default docs/versions/<name>/i18n/<code>/ index.html as its own reachability root too", function() {
-				var projectRoot = newProjectRoot( '{"i18n":{"defaultLocale":{"code":"en","label":"English"},"locales":[{"code":"es","label":"Spanish"}]}}' );
+				var projectRoot = newProjectRoot( '{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"defaultLocale":{"code":"en","label":"English"},"locales":[{"code":"es","label":"Spanish"}]}}' );
 				directoryCreate( projectRoot & "/docs/versions/2.0/i18n/es", true, true );
 
 				writePage( projectRoot, "index.html", "Home." );

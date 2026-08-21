@@ -68,7 +68,7 @@
 	function renderSocialLinks( required array links ) {
 		var html = ""
 		for ( var link in arguments.links ) {
-			html &= '<a class="social-link" href="' & encodeForHTML( link.url ) & '" target="_blank" rel="noopener noreferrer" aria-label="' & encodeForHTML( link.label ?: link.icon ?: "Link" ) & '" title="' & encodeForHTML( link.label ?: link.icon ?: "Link" ) & '">' & bxdocsIcon( link.icon ?: "generic" ) & '</a>'
+			html &= '<a class="social-link" href="' & bxdocsUrlAttr( link.url ) & '" target="_blank" rel="noopener noreferrer" aria-label="' & encodeForHTML( link.label ?: link.icon ?: "Link" ) & '" title="' & encodeForHTML( link.label ?: link.icon ?: "Link" ) & '">' & bxdocsIcon( link.icon ?: "generic" ) & '</a>'
 		}
 		return html
 	}
@@ -77,7 +77,7 @@
 		var html = '<select class="version-switcher form-select form-select-sm" onchange="location.href=this.value" aria-label="Version">'
 		for ( var v in arguments.versions ) {
 			var selected = v.label == arguments.currentVersion ? " selected" : ""
-			html &= '<option value="' & encodeForHTML( v.url ) & '"' & selected & '>' & encodeForHTML( v.label ) & '</option>'
+			html &= '<option value="' & bxdocsUrlAttr( v.url ) & '"' & selected & '>' & encodeForHTML( v.label ) & '</option>'
 		}
 		html &= '</select>'
 		return html
@@ -111,7 +111,7 @@
 		for ( var l in arguments.locales ) {
 			var flag = len( l.flag ?: "" ) ? l.flag : bxdocsLocaleFlag( l.code )
 			var active = l.code == arguments.currentLocale
-			html &= '<li role="none"><a role="menuitem" class="locale-dropdown__item' & ( active ? ' locale-dropdown__item--active' : '' ) & '" href="' & encodeForHTML( l.url ) & '">'
+			html &= '<li role="none"><a role="menuitem" class="locale-dropdown__item' & ( active ? ' locale-dropdown__item--active' : '' ) & '" href="' & bxdocsUrlAttr( l.url ) & '">'
 			html &= '<span class="locale-dropdown__flag" aria-hidden="true">' & flag & '</span> ' & encodeForHTML( l.label )
 			html &= '</a></li>'
 		}
@@ -236,7 +236,7 @@
 </bx:output></bx:if><bx:if condition="#variables.locales.len() gt 1#"><bx:output>
 				#renderLocaleDropdown( variables.locales, variables.currentLocale )#
 </bx:output></bx:if><bx:if condition="#len( variables.repoUrl )#"><bx:output>
-				<a class="repo-link" href="#encodeForHTML( variables.repoUrl )#" target="_blank" rel="noopener noreferrer" aria-label="Repository" title="Repository">#bxdocsIcon( "github" )#</a>
+				<a class="repo-link" href="#bxdocsUrlAttr( variables.repoUrl )#" target="_blank" rel="noopener noreferrer" aria-label="Repository" title="Repository">#bxdocsIcon( "github" )#</a>
 </bx:output></bx:if><bx:output>
 				<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="Toggle dark mode">
 					<span x-show="!dark">#bxdocsIcon( "moon" )#</span>

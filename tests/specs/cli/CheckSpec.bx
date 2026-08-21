@@ -19,7 +19,7 @@ class extends="testbox.system.BaseSpec" {
 			private string function newProjectRoot() {
 				var dir = createTempDirectory( prefix = "bxdocs-cli-check-" );
 				tempDirs.append( dir );
-				fileWrite( dir & "/bxdocs.json", "{}" );
+				fileWrite( dir & "/bxdocs.json", '{"name":"Test Site","theme":{"name":"bootstrap"}}' );
 				return dir;
 			}
 
