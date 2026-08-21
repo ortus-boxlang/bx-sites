@@ -95,7 +95,7 @@ class {
 			// themes) - a plain doc page never sets these, so they default to
 			// "website"/empty there instead.
 			post.ogType = "article"
-			post.publishedTime = dateTimeFormat( post.date, "yyyy-mm-dd" )
+			post.publishedTime = dateTimeFormat( post.date, "yyyy-MM-dd" )
 			post.articleAuthorUrls = []
 			for ( var author in post.resolvedAuthors ) {
 				if ( len( trim( author.url ?: "" ) ) ) {

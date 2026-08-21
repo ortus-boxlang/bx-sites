@@ -42,9 +42,15 @@ class {
 			return []
 		}
 
+		// Captured into a local - an arrow function's own `arguments` scope
+		// is its own (item/index/array, per array .filter()'s own callback
+		// signature), not load()'s, so `arguments.includeDrafts` inside the
+		// closure below would look up a key that was never there.
+		var includeDrafts = arguments.includeDrafts
+
 		var posts = directoryList( postsDir, false, "path", "*.md" )
 			.map( path => loadFile( postsDir, path ) )
-			.filter( post => arguments.includeDrafts || !post.draft )
+			.filter( post => includeDrafts || !post.draft )
 
 		assertUniqueSlugs( posts )
 

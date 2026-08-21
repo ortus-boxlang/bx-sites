@@ -272,7 +272,7 @@ class {
 
 			if ( len( urls.absolute ) && config.blog.feed ) {
 				directoryCreate( siteDir & "/blog", true, true )
-				fileWrite( siteDir & "/blog/feed.xml", variables.blogFeedGenerator.build( blogResult.posts, config.name, urls.absolute, urls.basePath ) )
+				fileWrite( siteDir & "/blog/feed.xml", variables.blogFeedGenerator.build( blogResult.posts, config.name, urls.absolute ) )
 			}
 
 			tagsPages = duplicate( mainResult.pages )
