@@ -51,18 +51,18 @@ class {
 	 * @cacheDir Absolute path to this project's own `.cache/assets/` directory
 	 * @ext "css" or "js" - selects minifyCss()/cleanJs() below
 	 *
-	 * @return `{ bundleUrl: "assets/bundle.<hash>.<ext>", urls: [] }` when every entry was a local, readable file and got bundled; `{ bundleUrl: "", urls: <unchanged input> }` (today's exact behavior) when the list was empty, contained an external URL, or named a file that doesn't exist
+	 * @return `{ bundleUrl: "assets/bundle.<hash>.<ext>", urls: [], cachedPath, fileName }` when every entry was a local, readable file and got bundled - `cachedPath`/`fileName` are BuildPipeline.bx's own copyAssets() cue to copy the bundle into a tree's output; `{ bundleUrl: "", urls: <unchanged input>, cachedPath: "", fileName: "" }` (today's exact behavior otherwise) when the list was empty, contained an external URL, or named a file that doesn't exist
 	 */
 	private struct function bundle( required array urls, required string docsDir, required string cacheDir, required string ext ) {
 		if ( !arguments.urls.len() || hasExternalUrl( arguments.urls ) ) {
-			return { bundleUrl : "", urls : arguments.urls }
+			return { bundleUrl : "", urls : arguments.urls, cachedPath : "", fileName : "" }
 		}
 
 		var combined = ""
 		for ( var url in arguments.urls ) {
 			var filePath = arguments.docsDir & "/" & url
 			if ( !fileExists( filePath ) ) {
-				return { bundleUrl : "", urls : arguments.urls }
+				return { bundleUrl : "", urls : arguments.urls, cachedPath : "", fileName : "" }
 			}
 			combined &= fileRead( filePath ) & char( 10 )
 		}
