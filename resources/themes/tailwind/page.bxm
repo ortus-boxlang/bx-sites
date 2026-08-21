@@ -41,8 +41,13 @@
 		return html
 	}
 
-	function renderToc( required array toc ) {
-		var html = '<nav class="mb-6 rounded border border-slate-200 bg-cyan-50/40 px-4 py-3 text-sm">'
+	// @hideAtXl true for the sticky-position variant's own mobile/tablet
+	// fallback - the right-hand rail (layout.bxm's own "hidden ... xl:block")
+	// can't fit below xl, so this same box renders inline instead, hidden
+	// again once the rail takes over at xl+ via the same "xl:hidden"
+	// utility, rather than leaving the TOC inaccessible below xl.
+	function renderToc( required array toc, boolean hideAtXl = false ) {
+		var html = '<nav class="mb-6 rounded border border-slate-200 bg-cyan-50/40 px-4 py-3 text-sm' & ( arguments.hideAtXl ? ' xl:hidden' : '' ) & '">'
 		html &= '<div class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">On this page</div><ul class="space-y-1">'
 		for ( var item in arguments.toc ) {
 			var indent = item.level == 3 ? " ml-4" : ""
@@ -80,7 +85,7 @@
 				<h1 class="relative mb-6 border-b-4 border-[##FFF500] pb-2 text-2xl font-bold" id="page-title"><a href="##page-title" id="page-title" class="anchor"></a></bx:output><bx:if condition="#len( variables.page.iconHtml )#"><bx:output><span class="page-icon">#variables.page.iconHtml#</span> </bx:output></bx:if><bx:output>#encodeForHTML( variables.page.title )#</h1>
 </bx:output><bx:if condition="#len( variables.page.summary )#"><bx:output>				<p class="mb-6 -mt-4 text-lg text-slate-500">#encodeForHTML( variables.page.summary )#</p>
 </bx:output></bx:if><bx:if condition="#variables.page.tags.len() gt 0#"><bx:output>#renderTags( variables.page.tags )#</bx:output></bx:if><bx:if condition="#( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'top'#"><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:output></bx:if><bx:output>
-</bx:output><bx:if condition="#variables.page.toc.len() gt 0 and variables.tocPosition == 'top'#"><bx:output>#renderToc( variables.page.toc )#</bx:output></bx:if><bx:output>
+</bx:output><bx:if condition="#variables.page.toc.len() gt 0 and variables.tocPosition == 'top'#"><bx:output>#renderToc( variables.page.toc )#</bx:output></bx:if><bx:if condition="#variables.page.toc.len() gt 0 and variables.tocPosition == 'sticky'#"><bx:output>#renderToc( variables.page.toc, true )#</bx:output></bx:if><bx:output>
 				<div class="prose max-w-none">
 					#variables.page.contentHtml#
 				</div>
