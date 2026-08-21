@@ -130,8 +130,12 @@ class {
 
 	/**
 	 * Every tree's own homepage, site-relative - the main site's own
-	 * `index.html`, each `docs/versions/<name>/`'s, and each non-default
-	 * `docs/i18n/<code>/`'s.
+	 * `index.html`, each `docs/versions/<name>/`'s, each non-default
+	 * `docs/i18n/<code>/`'s, and each non-default
+	 * `docs/versions/<name>/i18n/<code>/`'s. Each is its own explicit root
+	 * (not left to be discovered by crawling a switcher's own link) so
+	 * `check` still finds every tree even against a project's own `theme/`
+	 * override that doesn't render one.
 	 *
 	 * @root Absolute path to the project root
 	 * @config The project's already-loaded bxdocs.json (ConfigLoader.load()'s own return value)
@@ -139,12 +143,19 @@ class {
 	private array function roots( required string root, required struct config ) {
 		var docsDir = arguments.root & "/docs"
 		var roots = [ "index.html" ]
+		var defaultLocaleCode = arguments.config.i18n.defaultLocale.code
 
 		for ( var versionName in variables.versionsDiscoverer.discover( docsDir ) ) {
-			roots.append( "versions/" & versionName & "/index.html" )
+			var versionPrefix = "versions/" & versionName & "/"
+			roots.append( versionPrefix & "index.html" )
+
+			for ( var versionLocaleCode in variables.localesDiscoverer.discover( arguments.root & "/docs/versions/" & versionName ) ) {
+				if ( compareNoCase( versionLocaleCode, defaultLocaleCode ) != 0 ) {
+					roots.append( versionPrefix & versionLocaleCode & "/index.html" )
+				}
+			}
 		}
 
-		var defaultLocaleCode = arguments.config.i18n.defaultLocale.code
 		for ( var localeCode in variables.localesDiscoverer.discover( docsDir ) ) {
 			if ( compareNoCase( localeCode, defaultLocaleCode ) != 0 ) {
 				roots.append( localeCode & "/index.html" )

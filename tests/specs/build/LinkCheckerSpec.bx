@@ -183,6 +183,19 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.orphanedPages.toList( "," ) ).notToInclude( "es/index.html" );
 			} );
 
+			it( "treats a non-default docs/versions/<name>/i18n/<code>/ index.html as its own reachability root too", function() {
+				var projectRoot = newProjectRoot( '{"i18n":{"defaultLocale":{"code":"en","label":"English"},"locales":[{"code":"es","label":"Spanish"}]}}' );
+				directoryCreate( projectRoot & "/docs/versions/2.0/i18n/es", true, true );
+
+				writePage( projectRoot, "index.html", "Home." );
+				writePage( projectRoot, "versions/2.0/index.html", "v2 home, no links out." );
+				writePage( projectRoot, "versions/2.0/es/index.html", "v2 Spanish home, no links out." );
+
+				var result = checker.check( projectRoot );
+
+				expect( result.orphanedPages.toList( "," ) ).notToInclude( "versions/2.0/es/index.html" );
+			} );
+
 		} );
 	}
 

@@ -1342,7 +1342,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( root & "/site/index.md" ) ).toBeTrue();
 			} );
 
-			it( "keeps the version and language switchers mutually exclusive - neither shows up inside the other's own tree", function() {
+			it( "doesn't show a language switcher inside a version with no i18n subfolder of its own, or a version switcher inside a top-level locale tree", function() {
 				var root = newProject();
 				fileWrite(
 					root & "/bxdocs.json",
@@ -1358,6 +1358,117 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( fileRead( root & "/site/versions/1.0/index.html" ) ).notToInclude( "locale-dropdown" );
 				expect( fileRead( root & "/site/es/index.html" ) ).notToInclude( "version-switcher" );
+			} );
+
+			it( "builds a docs/versions/<name>/i18n/<code>/ folder as its own tree under site/versions/<name>/<code>/, using the translated content when it exists", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/versions/1.0", true, true );
+				fileWrite( root & "/docs/versions/1.0/index.md", "1.0 home" );
+				directoryCreate( root & "/docs/versions/1.0/i18n/es", true, true );
+				fileWrite( root & "/docs/versions/1.0/i18n/es/index.md", "1.0 inicio" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/versions/1.0/es/index.html" ) ).toBeTrue();
+				expect( fileRead( root & "/site/versions/1.0/es/index.html" ) ).toInclude( "<p>1.0 inicio</p>" );
+				// The top-level default tree and version's own default-locale render are untouched.
+				expect( fileRead( root & "/site/versions/1.0/index.html" ) ).toInclude( "<p>1.0 home</p>" );
+			} );
+
+			it( "falls back to the version's own default-locale content, flagged, for a page that version's locale hasn't translated yet", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/versions/1.0/guides", true, true );
+				fileWrite( root & "/docs/versions/1.0/index.md", "1.0 home" );
+				fileWrite( root & "/docs/versions/1.0/guides/setup.md", "1.0 setup body" );
+				directoryCreate( root & "/docs/versions/1.0/i18n/es", true, true );
+				fileWrite( root & "/docs/versions/1.0/i18n/es/index.md", "1.0 inicio" );
+				// docs/versions/1.0/i18n/es/guides/setup.md deliberately not created
+
+				pipeline.build( root );
+
+				var setupHtml = fileRead( root & "/site/versions/1.0/es/guides/setup/index.html" );
+				expect( setupHtml ).toInclude( "<p>1.0 setup body</p>" );
+			} );
+
+			it( "shows a language switcher inside a version once that version has its own i18n subfolder, listing only that version's own locales", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"},{"code":"fr","label":"Français"}]}}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/versions/1.0", true, true );
+				fileWrite( root & "/docs/versions/1.0/index.md", "1.0 home" );
+				// Only "es" is translated for this version - "fr" exists site-wide but not here.
+				directoryCreate( root & "/docs/versions/1.0/i18n/es", true, true );
+				fileWrite( root & "/docs/versions/1.0/i18n/es/index.md", "1.0 inicio" );
+
+				pipeline.build( root );
+
+				var versionHomeHtml = fileRead( root & "/site/versions/1.0/index.html" );
+				expect( versionHomeHtml ).toInclude( "locale-dropdown" );
+				expect( versionHomeHtml ).toInclude( 'href="/versions/1.0/es/"' );
+				expect( versionHomeHtml ).notToInclude( 'href="/versions/1.0/fr/"' );
+
+				// Switching version from inside a version's own locale tree always
+				// lands on the target version's own default locale, never assumes
+				// it shares this version's translation.
+				var esHomeHtml = fileRead( root & "/site/versions/1.0/es/index.html" );
+				expect( esHomeHtml ).toInclude( 'value="/versions/1.0/"' );
+			} );
+
+			it( "points a version-nested translated page's editUrl at its own docs/versions/<name>/i18n/<code>/ source, and a fallback page's at that version's own docs/versions/<name>/ source", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"repo":{"url":"https://github.com/acme/docs","editUri":"edit/main/docs/"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/versions/1.0/guides", true, true );
+				fileWrite( root & "/docs/versions/1.0/index.md", "1.0 home" );
+				fileWrite( root & "/docs/versions/1.0/guides/setup.md", "1.0 setup body" );
+				directoryCreate( root & "/docs/versions/1.0/i18n/es", true, true );
+				fileWrite( root & "/docs/versions/1.0/i18n/es/index.md", "1.0 inicio" );
+				// docs/versions/1.0/i18n/es/guides/setup.md left untranslated on purpose
+
+				pipeline.build( root );
+
+				var esIndexHtml = fileRead( root & "/site/versions/1.0/es/index.html" );
+				expect( esIndexHtml ).toInclude( "https://github.com/acme/docs/edit/main/docs/versions/1.0/i18n/es/index.md" );
+
+				var esSetupHtml = fileRead( root & "/site/versions/1.0/es/guides/setup/index.html" );
+				expect( esSetupHtml ).toInclude( "https://github.com/acme/docs/edit/main/docs/versions/1.0/guides/setup.md" );
+			} );
+
+			it( "includes a version's own locale pages in sitemap.xml and llms.txt alongside everything else", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"https://docs.example.com/","i18n":{"locales":[{"code":"es","label":"Español"}]}}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/versions/1.0", true, true );
+				fileWrite( root & "/docs/versions/1.0/index.md", "1.0 home" );
+				directoryCreate( root & "/docs/versions/1.0/i18n/es", true, true );
+				fileWrite( root & "/docs/versions/1.0/i18n/es/index.md", "1.0 inicio" );
+
+				pipeline.build( root );
+
+				var sitemap = fileRead( root & "/site/sitemap.xml" );
+				expect( sitemap ).toInclude( "<loc>https://docs.example.com/versions/1.0/es/index.html</loc>" );
+
+				var llms = fileRead( root & "/site/llms.txt" );
+				expect( llms ).toInclude( "(https://docs.example.com/versions/1.0/es/index.html)" );
 			} );
 
 		} );
