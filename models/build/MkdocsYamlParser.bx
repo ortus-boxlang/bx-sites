@@ -74,7 +74,7 @@ class {
 				inQuote = ch
 				continue
 			}
-			if ( ch == "#" ) {
+			if ( ch == "##" ) {
 				return arguments.line.left( i - 1 )
 			}
 		}
@@ -143,8 +143,8 @@ class {
 
 	/**
 	 * Parses a run of `- item` entries at the same indentation into an
-	 * array. `- Title: value` (mkdocs' own `nav:` shorthand for "this list
-	 * item is itself a single-key map") is recognized the same way
+	 * array. `- Title: value` (mkdocs' own `nav:` shorthand for 'this list
+	 * item is itself a single-key map') is recognized the same way
 	 * parseMap() reads any other `key: value` line, nested children (a
 	 * sub-list under a nav group) included.
 	 *
