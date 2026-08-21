@@ -562,6 +562,9 @@ needed at all:
 </div>
 ```
 
+The same is true of `x-data`/`x-show`/`@click` and any other Alpine.js
+attribute - see [Interactivity with Alpine.js](interactivity.md).
+
 ## Plugin extensions
 
 Admonitions, footnotes and definition lists cover the common cases, but

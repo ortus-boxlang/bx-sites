@@ -10,6 +10,8 @@ icon: phosphor-duotone:book-open
 - [Search](search.md) - how the static search index works
 - [Deploying to GitHub Pages](deployment.md) - the built-in GitHub Actions workflow
 - [Markdown Extensions](markdown.md) - admonitions, footnotes, definition lists and Mermaid diagrams
+- [Interactivity with Alpine.js](interactivity.md) - reactive content (copy buttons, live filters, and more) with no extra setup
 - [Plugins](plugins.md) - extending BX Docs with a BoxLang module of your own
 - [Internationalization (i18n)](i18n.md) - translating your docs into other languages
 - [Migrating from GitBook](migrating-from-gitbook.md) - convert a GitBook export into a bx-docs project with one command
+- [Migrating from mkdocs](migrating-from-mkdocs.md) - convert an mkdocs project into a bx-docs project with one command
