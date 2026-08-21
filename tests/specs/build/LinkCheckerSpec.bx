@@ -87,7 +87,7 @@ class extends="testbox.system.BaseSpec" {
 				writePage(
 					projectRoot,
 					"index.html",
-					'<a href="https://example.com/nope">Ext</a> <a href="mailto:x@example.com">Mail</a> <a href="#top">Top</a>'
+					'<a href="https://example.com/nope">Ext</a> <a href="mailto:x@example.com">Mail</a> <a href="##top">Top</a>'
 				);
 
 				var result = checker.check( projectRoot );
