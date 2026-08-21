@@ -18,6 +18,11 @@ testbox/**
 tests/results/**
 .agents/skills/**
 
+# npm packages pulled in ad-hoc by vendorIcons.mjs/vendorAssets.mjs - their
+# own output (resources/assets/icons/, resources/assets/vendor/) is what
+# gets committed, never this
+/node_modules/
+
 # This module's own dogfooded docs build output (see docs/, bxdocs.json)
 /site/
 /.cache/

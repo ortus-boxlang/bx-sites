@@ -14,9 +14,18 @@ engine or build step involved.
 
 | Theme | Base | Notes |
 |---|---|---|
-| `bootstrap` (default) | [Bootstrap 5](https://getbootstrap.com/) via CDN | Poppins font, brand gradient navbar |
+| `bootstrap` (default) | [Bootstrap 5](https://getbootstrap.com/), vendored | Poppins font, brand gradient navbar |
 | `material` | Hand-rolled Material-style CSS | Card layout, elevation shadows, Roboto font |
 | `tailwind` | [Tailwind Play CDN](https://tailwindcss.com/) | Utility-class driven, no build step |
+
+Every built-in theme's own CSS/JS (Bootstrap's CSS/JS bundle, highlight.js,
+Alpine.js, lunr.js for the default `local` search provider) ships vendored
+with this module and is copied straight into every built `site/` - no CDN,
+no internet access needed to view a built site. The `tailwind` theme's own
+utility engine (a client-side JIT compiler, not a static stylesheet) and
+optional features you turn on yourself (`mermaid`, `math`, Algolia search,
+Google Analytics) still load from a CDN or a hosted API - see
+[Air-gapped/offline sites](#air-gapped-offline-sites) below.
 
 All three apply the same BoxLang brand palette: a `#00FF78 -> #00DBFF`
 gradient and a `#FFF500` accent - and all three ship with the same set of
@@ -100,6 +109,32 @@ Set which one a project uses in `bxdocs.json`:
 ```json
 { "theme": { "name": "material" } }
 ```
+
+## Air-gapped/offline sites
+
+A built site works with no internet access at all by default, for the
+`bootstrap` and `material` themes with the default `local` search
+provider: Bootstrap's own CSS/JS, highlight.js, Alpine.js, and lunr.js are
+all vendored with this module (`resources/assets/vendor/`) and copied
+straight into `site/assets/vendor/` at build time - no CDN `<script>`/
+`<link>` tag anywhere in the generated HTML for any of those.
+
+A few things still reach out to the network, only when you turn them on
+yourself:
+
+- The `tailwind` theme's own utility engine is a client-side JIT compiler
+  loaded from `cdn.tailwindcss.com` - it isn't a static stylesheet this
+  module can vendor the same way, so this theme isn't air-gapped-capable
+  yet.
+- `bxdocs.json`'s `mermaid`/`math` options load Mermaid/KaTeX from a CDN
+  when turned on.
+- `searchProvider.provider: "algolia"` and `analytics.provider: "google"`
+  inherently talk to a hosted API/tracking endpoint - vendoring the JS
+  file wouldn't remove that dependency.
+
+If your deployment target genuinely has zero internet access, stick to
+`bootstrap`/`material`, the default `local` search provider, and leave
+`mermaid`/`math`/Algolia/analytics off.
 
 ## Icons
 
