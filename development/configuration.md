@@ -148,9 +148,10 @@ non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
     same "On this page" list, just pinned, which helps on long pages. The
     pinned column only fits on wide viewports (it's hidden below the point a
     3-column layout would get cramped); below that width `sticky` mode
-    renders the same list back inline instead, same as `top` would - the TOC
-    stays reachable at every viewport width, it just moves between an inline
-    box and a pinned rail depending on how much room there is.
+    instead renders a collapsible "On this page" bar pinned to the top of
+    the viewport while scrolling - tap to expand the list, same treatment
+    VitePress/GitBook use on mobile - so the TOC stays reachable at every
+    viewport width, it just changes shape depending on how much room there is.
 
     ```json
     { "theme": { "options": { "tocPosition": "sticky" } } }

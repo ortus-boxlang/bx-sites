@@ -257,10 +257,66 @@ body.md-body {
 	}
 }
 
-/* Below 1200px the sidebar rail above has no room, so page.bxm renders the
-   same TOC inline atop the article instead (renderToc()'s own
-   `hideAtXl` param) - hidden again once the rail takes over, rather than
-   the TOC being inaccessible below that width. */
+/* Below 1200px the sidebar rail above has no room, so page.bxm renders a
+   collapsible bar pinned to the top of the viewport while scrolling
+   instead (renderToc()'s own `hideAtXl` param) - VitePress/GitBook's own
+   mobile "On this page" treatment - hidden again once the rail takes
+   over, rather than the TOC being inaccessible below that width. */
+.md-toc--mobile {
+	position: sticky;
+	top: 64px;
+	z-index: 15;
+	margin: 0 0 1.5rem;
+	border-radius: 12px;
+	background: var( --md-surface );
+	box-shadow: 0 1px 3px rgba( 0, 0, 0, 0.12 );
+}
+
+.md-toc--mobile[open] {
+	max-height: calc( 100vh - 64px - 1rem );
+	overflow-y: auto;
+}
+
+.md-toc--mobile__summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding: 0.6rem 1rem;
+	cursor: pointer;
+	font-weight: 600;
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	color: var( --md-muted );
+	list-style: none;
+}
+
+.md-toc--mobile__summary::-webkit-details-marker {
+	display: none;
+}
+
+.md-toc--mobile__summary::after {
+	content: "";
+	flex-shrink: 0;
+	width: 0.4em;
+	height: 0.4em;
+	border-right: 2px solid currentColor;
+	border-bottom: 2px solid currentColor;
+	transform: rotate( 45deg );
+	transition: transform 0.2s ease;
+}
+
+.md-toc--mobile[open] .md-toc--mobile__summary::after {
+	transform: rotate( -135deg );
+}
+
+.md-toc--mobile ul {
+	list-style: none;
+	margin: 0;
+	padding: 0 1rem 0.75rem;
+}
+
 @media ( min-width: 1200px ) {
 	.md-toc--mobile {
 		display: none;
