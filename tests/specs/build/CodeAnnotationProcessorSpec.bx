@@ -72,6 +72,38 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.markdown ).toInclude( '```bx hl_lines="2" title="add.bx"' & char( 10 ) & 'line1' );
 			} );
 
+			it( "treats a same-length fence nested inside another, indented as body content, as literal too (regression)", function() {
+				// Same shape as docs/guides/markdown.md's own "Content Tabs" section:
+				// a 3-backtick fence showing `=== "Title"` syntax as a literal example,
+				// itself containing a 4-space-indented nested 3-backtick fence - the
+				// same marker length as the outer one, so only the indentation (not
+				// the length) tells them apart.
+				var md = '```markdown' & char( 10 ) &
+					'=== "Java"' & char( 10 ) &
+					'    ```java' & char( 10 ) &
+					'    System.out.println( 1 );' & char( 10 ) &
+					'    ```' & char( 10 ) &
+					'```' & char( 10 ) & char( 10 ) &
+					'```bx hl_lines="2" title="add.bx"' & char( 10 ) &
+					'line1' & char( 10 ) &
+					'line2' & char( 10 ) &
+					'```';
+
+				var result = processor.extractAndStrip( md );
+
+				expect( result.annotations.len() ).toBe( 2 );
+				expect( result.annotations[ 1 ].isEmpty() ).toBeTrue();
+				expect( result.annotations[ 2 ].title ).toBe( "add.bx" );
+				expect( result.annotations[ 2 ].hlLines ).toBe( [ 2 ] );
+				// The real second fence's attrs are stripped back to a bare
+				// language fence (its own attrs now live in annotations[2]
+				// instead) - the indented nested example inside the first
+				// fence is untouched literal content throughout, per the
+				// `annotations[1]` isEmpty() check above.
+				expect( result.markdown ).toInclude( '```bx' & char( 10 ) & 'line1' & char( 10 ) & 'line2' );
+				expect( result.markdown ).notToInclude( "hl_lines" );
+			} );
+
 			it( "stamps data-bxdocs-* attributes onto the matching <pre> in document order", function() {
 				var html = '<pre><code class="language-bx">a' & char( 10 ) & '</code></pre>' & char( 10 ) &
 					'<pre><code>plain' & char( 10 ) & '</code></pre>';

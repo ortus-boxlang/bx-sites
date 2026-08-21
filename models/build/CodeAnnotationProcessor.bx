@@ -42,7 +42,16 @@ class {
 	 * length rather than toggling a plain in/out boolean on every fence-like
 	 * line - which would miscount (and desync annotations from the actual
 	 * rendered `<pre>` elements applyToHtml() later walks) the moment a page
-	 * nests a fence inside a longer one.
+	 * nests a fence inside a longer one. Marker length alone isn't quite
+	 * enough though - a page can also nest a fence of the *same* length
+	 * inside a longer one, indented as body content (e.g. a `=== "Title"`
+	 * tab example's own nested snippet, indented 4 spaces same as an
+	 * admonition body); an indented line's bare backticks would otherwise
+	 * still match the outer fence's own close pattern. So, same as
+	 * FenceTracker.bx (this can't reuse that class directly - it only
+	 * reports "skip or not", not the lang/attrs a real opener needs
+	 * parsed), a 4+ space/tab indent disqualifies a line from being a
+	 * delimiter for the *currently tracked* (unindented) fence at all.
 	 *
 	 * @markdown The raw markdown body text
 	 *
@@ -59,9 +68,10 @@ class {
 		for ( var i = 1; i <= lines.len(); i++ ) {
 			var line = lines[ i ]
 			var trimmedLine = trim( line )
+			var tooIndented = line.reFind( "^(\t| {4,})" ) > 0
 
 			if ( fenceLength > 0 ) {
-				if ( trimmedLine.reFind( "^" & fenceChar & "{" & fenceLength & ",}$" ) ) {
+				if ( !tooIndented && trimmedLine.reFind( "^" & fenceChar & "{" & fenceLength & ",}$" ) ) {
 					fenceLength = 0
 					fenceChar = ""
 				}
@@ -69,7 +79,7 @@ class {
 				continue
 			}
 
-			if ( !trimmedLine.reFind( "^(```+|~~~+)" ) ) {
+			if ( tooIndented || !trimmedLine.reFind( "^(```+|~~~+)" ) ) {
 				outputLines.append( line )
 				continue
 			}
