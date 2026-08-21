@@ -148,6 +148,59 @@ numeric function add( required numeric a, required numeric b ) {
 範囲（`"2 4-6"`）を受け取り、`linenums` がどこから始まるかに関係なくブロックの先頭からカウントします。
 `title` はブロックの上に小さなタイトルバーを追加します。設定不要 - 常に使用できます。
 
+### 差分マーカーとターミナル風フレーム
+
+`insert`/`delete` を追加すると、追加/削除された行を示せます（`hl_lines` と同じスペース区切りの
+行番号/範囲構文）。色付きの行と `+`/`–` のガターマーカーで表示されます:
+
+````markdown
+```bx title="add.bx" insert="3-4" delete="7"
+numeric function add( required numeric a, required numeric b ) {
+	var sum = a + b
+	var total = a + b
+	log.info( "computed sum", total )
+	return sum
+}
+```
+````
+
+省略せずに `insert`/`delete` と書きます（`ins`/`del` ではありません）。リテラルな `+`/`-` の行プレフィックス
+ではなく属性として扱うため、フェンスの内容は本物のコピー可能なソースコードのままです。`linenums` と組み合わせても
+問題なく、両方が有効な場合はガターマーカーが行番号の列を避けて右にずれます。
+
+`frame="terminal"` を追加すると、プレーンなタイトルバーの代わりに macOS 風のターミナルウィンドウ
+（3 つのステータスドット、中央揃えのタイトル）になります:
+
+````markdown
+```bash frame="terminal" title="user@boxlang"
+box install bx-docs
+```
+````
+
+`frame="code"` は今日のプレーンなバーを明示的に指定する名前です（デフォルトなので書く必要はありません）。
+`insert`/`delete` も `frame` も `bxdocs.json` の設定は不要です。`hl_lines`/`linenums`/`title` と同様です。
+
+#### 本物の git diff
+
+フェンスに `diff` を指定すると、実際の `git diff`/`git show` の出力をそのまま貼り付けられます - これは
+bx-docs 独自の構文ではなく、highlight.js 自身の `diff` グラマーが Unified diff 構文（`+`/`-`/`@@` 行）を
+自動的に認識しているだけです:
+
+````markdown
+```diff
+--- a/add.bx
++++ b/add.bx
+@@ -1,4 +1,5 @@
+ numeric function add( required numeric a, required numeric b ) {
+-	var sum = a + b
+-	return sum
++	var total = a + b
++	log.info( "computed", total )
++	return total
+ }
+```
+````
+
 ## ダイアグラム
 
 `bxdocs.json` の [`mermaid`](../configuration.md#mermaid) キーでオプトイン:

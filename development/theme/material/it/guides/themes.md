@@ -99,8 +99,9 @@ stesso insieme di funzionalità di pagina:
 - **Note a piè di pagina e liste di definizioni**, opzionali tramite
   `markdown` di `bxdocs.json`. Vedi
   [Estensioni Markdown](markdown.md#footnotes).
-- **Schede di contenuto** e **numeri di riga/righe evidenziate/titoli del
-  codice**, nessuna configurazione necessaria. Vedi
+- **Schede di contenuto**, **numeri di riga/righe evidenziate/titoli del
+  codice** e **indicatori di diff/cornici terminale** per i blocchi di
+  codice, nessuna configurazione necessaria. Vedi
   [Estensioni Markdown](markdown.md#content-tabs).
 - **Diagrammi Mermaid**, opzionali tramite `mermaid` di `bxdocs.json`.
   Vedi [Estensioni Markdown](markdown.md#diagrams).

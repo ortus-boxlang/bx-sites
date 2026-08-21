@@ -233,6 +233,96 @@ from the top of the block regardless of where `linenums` starts; `title`
 adds a small title bar above the block. No `bxdocs.json` config needed -
 always available.
 
+### Diff markers and terminal frames
+
+Add `insert`/`delete` to call out added/removed lines - the same
+space-separated line numbers/ranges `hl_lines` already takes - as a tinted
+row plus a `+`/`–` gutter marker:
+
+````markdown
+```bx title="add.bx" insert="3-4" delete="7"
+numeric function add( required numeric a, required numeric b ) {
+	var sum = a + b
+	var total = a + b
+	log.info( "computed sum", total )
+	return sum
+}
+```
+````
+
+Which renders as:
+
+```bx title="add.bx" insert="3-4" delete="7"
+numeric function add( required numeric a, required numeric b ) {
+	var sum = a + b
+	var total = a + b
+	log.info( "computed sum", total )
+	return sum
+}
+```
+
+Spelled out in full on purpose - not abbreviated to `ins`/`del` - and kept
+as attributes rather than literal `+`/`-` line prefixes the way some tools
+do it, so the fence's own content stays real, unmodified, copy-pasteable
+source; the existing copy button needs nothing stripped out of it.
+`insert`/`delete` stack cleanly with `linenums` - the gutter marker shifts
+over to clear the line-number column when both are on.
+
+Add `frame="terminal"` to swap the plain title bar for a macOS-style
+terminal window - three status dots, centered title - instead:
+
+````markdown
+```bash frame="terminal" title="user@boxlang"
+box install bx-docs
+```
+````
+
+Which renders as:
+
+```bash frame="terminal" title="user@boxlang"
+box install bx-docs
+```
+
+`frame="code"` is the explicit name for today's plain bar - the default;
+nothing needs to write it. Both `insert`/`delete` and `frame` need no
+`bxdocs.json` config, same as `hl_lines`/`linenums`/`title`.
+
+#### Real git diffs
+
+Tag a fence `diff` and paste real `git diff`/`git show` output straight in
+- this isn't bx-docs-specific syntax at all, just highlight.js's own `diff`
+grammar recognizing unified-diff syntax (`+`/`-`/`@@` lines) on its own:
+
+````markdown
+```diff
+--- a/add.bx
++++ b/add.bx
+@@ -1,4 +1,5 @@
+ numeric function add( required numeric a, required numeric b ) {
+-	var sum = a + b
+-	return sum
++	var total = a + b
++	log.info( "computed", total )
++	return total
+ }
+```
+````
+
+Which renders as:
+
+```diff
+--- a/add.bx
++++ b/add.bx
+@@ -1,4 +1,5 @@
+ numeric function add( required numeric a, required numeric b ) {
+-	var sum = a + b
+-	return sum
++	var total = a + b
++	log.info( "computed", total )
++	return total
+ }
+```
+
 ### Try it live (try.boxlang.io)
 
 Tag a fence `tryboxlang` instead of a language name and it renders as a

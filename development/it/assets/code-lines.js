@@ -1,6 +1,7 @@
 /**
- * Adds line numbers, highlighted lines, and an optional title bar to
- * fenced code blocks carrying `hl_lines`/`linenums`/`title` (see
+ * Adds line numbers, highlighted/inserted/deleted lines, and an optional
+ * title bar (plain or terminal-style) to fenced code blocks carrying
+ * `hl_lines`/`linenums`/`title`/`frame`/`insert`/`delete` (see
  * CodeAnnotationProcessor.bx, which stamps them onto the `<pre>` as
  * `data-bxdocs-*` attributes). Runs after highlight.js so a code block's
  * syntax-highlighting spans already exist in the DOM - splitting them
@@ -8,7 +9,7 @@
  * tree (a naive split of the text on "\n" would cut a span that spans
  * multiple lines, e.g. a multi-line comment or string token, in half).
  *
- * Only touches `<pre>` elements that actually carry one of the three
+ * Only touches `<pre>` elements that actually carry one of these
  * annotations - the vast majority of code blocks have none and are left
  * exactly as highlight.js rendered them.
  */
@@ -62,9 +63,13 @@
 	}
 
 	/**
+	 * Parses one of `data-bxdocs-hl-lines`/`-insert-lines`/`-delete-lines`
+	 * into a set of line numbers - all three share the same comma-separated
+	 * format CodeAnnotationProcessor.bx writes them in.
+	 *
 	 * @spec Comma-separated line numbers, e.g. "2,4,5,6"
 	 */
-	function parseHlLines( spec ) {
+	function parseLineSet( spec ) {
 		var set = {};
 		( spec || "" ).split( "," ).forEach( function ( token ) {
 			var n = parseInt( token, 10 );
@@ -97,7 +102,9 @@
 			window.hljs.highlightElement( code );
 		}
 
-		var hlLines = parseHlLines( pre.getAttribute( "data-bxdocs-hl-lines" ) );
+		var hlLines = parseLineSet( pre.getAttribute( "data-bxdocs-hl-lines" ) );
+		var insertLines = parseLineSet( pre.getAttribute( "data-bxdocs-insert-lines" ) );
+		var deleteLines = parseLineSet( pre.getAttribute( "data-bxdocs-delete-lines" ) );
 		var startLineAttr = pre.getAttribute( "data-bxdocs-start-line" );
 		var showNumbers = startLineAttr !== null;
 		var startLine = showNumbers ? ( parseInt( startLineAttr, 10 ) || 1 ) : 1;
@@ -119,6 +126,12 @@
 			if ( hlLines[ index + 1 ] ) {
 				lineEl.classList.add( "bxdocs-hl-line" );
 			}
+			if ( insertLines[ index + 1 ] ) {
+				lineEl.classList.add( "bxdocs-insert-line" );
+			}
+			if ( deleteLines[ index + 1 ] ) {
+				lineEl.classList.add( "bxdocs-delete-line" );
+			}
 			nodes.forEach( function ( node ) {
 				lineEl.appendChild( node );
 			} );
@@ -126,18 +139,41 @@
 		} );
 
 		var title = pre.getAttribute( "data-bxdocs-title" );
+		var isTerminal = pre.getAttribute( "data-bxdocs-frame" ) === "terminal";
 		var prevEl = pre.previousElementSibling;
 		var alreadyTitled = prevEl && prevEl.classList.contains( "bxdocs-code-title" );
-		if ( title && pre.parentNode && !alreadyTitled ) {
+		if ( ( title || isTerminal ) && pre.parentNode && !alreadyTitled ) {
 			var titleEl = document.createElement( "div" );
 			titleEl.className = "bxdocs-code-title";
-			titleEl.textContent = title;
+			if ( isTerminal ) {
+				// Three-dot window chrome + centered title, same macOS-terminal
+				// convention Expressive Code/VitePress use - built as real
+				// elements rather than textContent so the dots have somewhere
+				// to sit; title text is still `textContent`-assigned onto its
+				// own span, never string-concatenated into innerHTML.
+				titleEl.classList.add( "bxdocs-frame-terminal" );
+				var dots = document.createElement( "span" );
+				dots.className = "bxdocs-frame-dots";
+				for ( var i = 0; i < 3; i++ ) {
+					dots.appendChild( document.createElement( "span" ) );
+				}
+				titleEl.appendChild( dots );
+				var textEl = document.createElement( "span" );
+				textEl.className = "bxdocs-code-title__text";
+				textEl.textContent = title;
+				titleEl.appendChild( textEl );
+			} else {
+				titleEl.textContent = title;
+			}
 			pre.parentNode.insertBefore( titleEl, pre );
 		}
 	}
 
 	function init() {
-		document.querySelectorAll( "pre[data-bxdocs-hl-lines], pre[data-bxdocs-start-line], pre[data-bxdocs-title]" ).forEach( annotate );
+		document.querySelectorAll(
+			"pre[data-bxdocs-hl-lines], pre[data-bxdocs-start-line], pre[data-bxdocs-title], " +
+			"pre[data-bxdocs-frame], pre[data-bxdocs-insert-lines], pre[data-bxdocs-delete-lines]"
+		).forEach( annotate );
 	}
 
 	if ( document.readyState === "loading" ) {

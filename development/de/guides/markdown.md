@@ -241,6 +241,101 @@ davon, wo `linenums` beginnt; `title` fügt eine kleine Titelleiste über
 dem Block hinzu. Keine `bxdocs.json`-Konfiguration nötig - immer
 verfügbar.
 
+### Diff-Markierungen und Terminal-Rahmen
+
+Füge `insert`/`delete` hinzu, um hinzugefügte/entfernte Zeilen zu
+markieren - dieselben durch Leerzeichen getrennten Zeilennummern/Bereiche,
+die `hl_lines` bereits verwendet - als eingefärbte Zeile plus ein
+`+`/`–`-Gutter-Symbol:
+
+````markdown
+```bx title="add.bx" insert="3-4" delete="7"
+numeric function add( required numeric a, required numeric b ) {
+	var sum = a + b
+	var total = a + b
+	log.info( "computed sum", total )
+	return sum
+}
+```
+````
+
+Was so gerendert wird:
+
+```bx title="add.bx" insert="3-4" delete="7"
+numeric function add( required numeric a, required numeric b ) {
+	var sum = a + b
+	var total = a + b
+	log.info( "computed sum", total )
+	return sum
+}
+```
+
+Bewusst ausgeschrieben - nicht auf `ins`/`del` abgekürzt - und als
+Attribute statt als literale `+`/`-`-Zeilenpräfixe (wie es manche Tools
+machen), sodass der Inhalt des Fences echter, unveränderter,
+kopierbarer Quelltext bleibt; für die vorhandene Kopieren-Schaltfläche
+muss nichts entfernt werden. `insert`/`delete` lassen sich sauber mit
+`linenums` kombinieren - das Gutter-Symbol rückt nach rechts, um die
+Zeilennummern-Spalte freizuhalten, wenn beide aktiv sind.
+
+Füge `frame="terminal"` hinzu, um die einfache Titelleiste durch ein
+Terminal-Fenster im macOS-Stil zu ersetzen - drei Status-Punkte,
+zentrierter Titel:
+
+````markdown
+```bash frame="terminal" title="user@boxlang"
+box install bx-docs
+```
+````
+
+Was so gerendert wird:
+
+```bash frame="terminal" title="user@boxlang"
+box install bx-docs
+```
+
+`frame="code"` ist der explizite Name für die heutige einfache Leiste -
+der Standard; niemand muss ihn schreiben. Weder `insert`/`delete` noch
+`frame` benötigen `bxdocs.json`-Konfiguration, genau wie
+`hl_lines`/`linenums`/`title`.
+
+#### Echte Git-Diffs
+
+Markiere einen Fence als `diff` und füge echte `git diff`/`git
+show`-Ausgabe direkt ein - das ist keine bx-docs-spezifische Syntax,
+sondern einfach die eigene `diff`-Grammatik von highlight.js, die
+Unified-Diff-Syntax (`+`/`-`/`@@`-Zeilen) von selbst erkennt:
+
+````markdown
+```diff
+--- a/add.bx
++++ b/add.bx
+@@ -1,4 +1,5 @@
+ numeric function add( required numeric a, required numeric b ) {
+-	var sum = a + b
+-	return sum
++	var total = a + b
++	log.info( "computed", total )
++	return total
+ }
+```
+````
+
+Was so gerendert wird:
+
+```diff
+--- a/add.bx
++++ b/add.bx
+@@ -1,4 +1,5 @@
+ numeric function add( required numeric a, required numeric b ) {
+-	var sum = a + b
+-	return sum
++	var total = a + b
++	log.info( "computed", total )
++	return total
+ }
+```
+
 ## Diagramme
 
 Opt-in über den [`mermaid`](../configuration.md#mermaid)-Schlüssel von `bxdocs.json`:

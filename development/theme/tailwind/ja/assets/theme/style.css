@@ -735,7 +735,7 @@ dd {
 	background: rgba( 255, 255, 255, 0.04 );
 }
 
-/* Code fence annotations: hl_lines / linenums / title (see CodeAnnotationProcessor.bx) */
+/* Code fence annotations: hl_lines / linenums / title / frame / insert / delete (see CodeAnnotationProcessor.bx) */
 .bxdocs-code-title {
 	background: rgba( 0, 0, 0, 0.06 );
 	border: 1px solid rgba( 0, 0, 0, 0.12 );
@@ -746,6 +746,35 @@ dd {
 	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 	font-weight: 600;
 }
+
+/* frame="terminal" - macOS-style traffic-light chrome, title centered
+   instead of the plain bar's left-aligned text. */
+.bxdocs-code-title.bxdocs-frame-terminal {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+}
+
+.bxdocs-frame-dots {
+	position: absolute;
+	left: 0.9rem;
+	top: 50%;
+	transform: translateY( -50% );
+	display: flex;
+	gap: 0.4rem;
+}
+
+.bxdocs-frame-dots span {
+	display: block;
+	width: 0.62rem;
+	height: 0.62rem;
+	border-radius: 50%;
+}
+
+.bxdocs-frame-dots span:nth-child( 1 ) { background: #ff5f56; }
+.bxdocs-frame-dots span:nth-child( 2 ) { background: #ffbd2e; }
+.bxdocs-frame-dots span:nth-child( 3 ) { background: #27c93f; }
 
 .bxdocs-code-title + pre {
 	border-radius: 0 0 0.75rem 0.75rem;
@@ -777,6 +806,52 @@ dd {
 	background: rgba( 255, 213, 0, 0.18 );
 }
 
+/* insert="…" / delete="…" - a tinted row plus a gutter marker, independent
+   of the line-number gutter (data-line::before above) so both can be on at
+   once; the marker shifts right to clear the number column when they are. */
+.bxdocs-insert-line,
+.bxdocs-delete-line {
+	display: block;
+	position: relative;
+	padding-left: 1.6rem;
+}
+
+.bxdocs-code--numbered .bxdocs-insert-line,
+.bxdocs-code--numbered .bxdocs-delete-line {
+	padding-left: 0;
+}
+
+.bxdocs-insert-line {
+	background: rgba( 22, 163, 74, 0.16 );
+}
+
+.bxdocs-delete-line {
+	background: rgba( 220, 38, 38, 0.12 );
+}
+
+.bxdocs-insert-line::after,
+.bxdocs-delete-line::after {
+	position: absolute;
+	left: 0.35rem;
+	font-weight: 700;
+	user-select: none;
+}
+
+.bxdocs-code--numbered .bxdocs-insert-line::after,
+.bxdocs-code--numbered .bxdocs-delete-line::after {
+	left: 1.7rem;
+}
+
+.bxdocs-insert-line::after {
+	content: "+";
+	color: #16a34a;
+}
+
+.bxdocs-delete-line::after {
+	content: "\2013";
+	color: #dc2626;
+}
+
 [data-theme="dark"] .bxdocs-code-title {
 	background: rgba( 255, 255, 255, 0.06 );
 	border-color: rgba( 255, 255, 255, 0.15 );
@@ -784,6 +859,31 @@ dd {
 
 [data-theme="dark"] .bxdocs-hl-line {
 	background: rgba( 255, 213, 0, 0.12 );
+}
+
+[data-theme="dark"] .bxdocs-insert-line {
+	background: rgba( 22, 163, 74, 0.22 );
+}
+
+[data-theme="dark"] .bxdocs-delete-line {
+	background: rgba( 220, 38, 38, 0.18 );
+}
+
+/* A real ```diff fence isn't bx-docs' own markup - highlight.js's vendored
+   `diff` grammar recognizes unified-diff syntax on its own and emits
+   .hljs-addition/.hljs-deletion, styled by the vendored github.min.css
+   (loaded before this stylesheet, so this wins). That stylesheet only ever
+   defines GitHub's *light*-mode pastel pair for both classes, with no dark
+   counterpart - reusing the exact insert/delete tokens above instead of a
+   third, unrelated diff palette. */
+[data-theme="dark"] .hljs-addition {
+	background-color: rgba( 22, 163, 74, 0.22 );
+	color: #4ade9c;
+}
+
+[data-theme="dark"] .hljs-deletion {
+	background-color: rgba( 220, 38, 38, 0.18 );
+	color: #f87171;
 }
 
 /* GitBook-style ::: directive blocks (see DirectiveBlockProcessor.bx) */

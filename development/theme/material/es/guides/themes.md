@@ -99,8 +99,9 @@ conjunto de funciones de página:
 - **Notas al pie y listas de definiciones**, opcionales mediante
   `markdown` de `bxdocs.json`. Consulta
   [Extensiones de Markdown](markdown.md#footnotes).
-- **Pestañas de contenido** y **números de línea de código/líneas
-  resaltadas/títulos**, sin configuración necesaria. Consulta
+- **Pestañas de contenido**, **números de línea de código/líneas
+  resaltadas/títulos** y **marcadores de diff/marcos de terminal** para
+  bloques de código, sin configuración necesaria. Consulta
   [Extensiones de Markdown](markdown.md#content-tabs).
 - **Diagramas Mermaid**, opcionales mediante `mermaid` de `bxdocs.json`.
   Consulta [Extensiones de Markdown](markdown.md#diagrams).

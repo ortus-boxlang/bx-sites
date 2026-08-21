@@ -97,8 +97,9 @@ page features:
   [Markdown Extensions](markdown.md#admonitions).
 - **Footnotes and definition lists**, opt-in via `bxdocs.json`'s `markdown`.
   See [Markdown Extensions](markdown.md#footnotes).
-- **Content tabs** and **code line numbers/highlighted lines/titles**, no
-  config needed. See [Markdown Extensions](markdown.md#content-tabs).
+- **Content tabs**, **code line numbers/highlighted lines/titles**, and
+  **diff markers/terminal-style frames** for code blocks, no config needed.
+  See [Markdown Extensions](markdown.md#content-tabs).
 - **Mermaid diagrams**, opt-in via `bxdocs.json`'s `mermaid`. See
   [Markdown Extensions](markdown.md#diagrams).
 - **Math** (KaTeX), opt-in via `bxdocs.json`'s `math`. See

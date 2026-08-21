@@ -98,8 +98,9 @@ bringen denselben Satz an Seitenfunktionen mit:
 - **Fußnoten und Definitionslisten**, opt-in über `markdown` in
   `bxdocs.json`. Siehe
   [Markdown-Erweiterungen](markdown.md#footnotes).
-- **Content-Tabs** und **Code-Zeilennummern/hervorgehobene
-  Zeilen/Titel**, keine Konfiguration nötig. Siehe
+- **Content-Tabs**, **Code-Zeilennummern/hervorgehobene Zeilen/Titel**
+  und **Diff-Markierungen/Terminal-Rahmen** für Codeblöcke, keine
+  Konfiguration nötig. Siehe
   [Markdown-Erweiterungen](markdown.md#content-tabs).
 - **Mermaid-Diagramme**, opt-in über `mermaid` in `bxdocs.json`. Siehe
   [Markdown-Erweiterungen](markdown.md#diagrams).

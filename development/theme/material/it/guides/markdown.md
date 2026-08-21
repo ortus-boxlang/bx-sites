@@ -243,6 +243,100 @@ parte `linenums`; `title` aggiunge una piccola barra del titolo sopra il
 blocco. Nessuna configurazione di `bxdocs.json` necessaria - sempre
 disponibile.
 
+### Indicatori di diff e cornici terminale
+
+Aggiungi `insert`/`delete` per segnalare righe aggiunte/rimosse - gli
+stessi numeri di riga/intervalli separati da spazi che `hl_lines` già
+usa - come riga evidenziata più un indicatore nel margine `+`/`–`:
+
+````markdown
+```bx title="add.bx" insert="3-4" delete="7"
+numeric function add( required numeric a, required numeric b ) {
+	var sum = a + b
+	var total = a + b
+	log.info( "computed sum", total )
+	return sum
+}
+```
+````
+
+Che viene renderizzato così:
+
+```bx title="add.bx" insert="3-4" delete="7"
+numeric function add( required numeric a, required numeric b ) {
+	var sum = a + b
+	var total = a + b
+	log.info( "computed sum", total )
+	return sum
+}
+```
+
+Scritto per intero deliberatamente - non abbreviato in `ins`/`del` - e
+come attributi invece di prefissi letterali `+`/`-` sulle righe (come
+fanno alcuni strumenti), così il contenuto del blocco resta codice
+sorgente reale, non modificato e copiabile; non c'è nulla da rimuovere
+per il pulsante di copia già esistente. `insert`/`delete` si combinano
+bene con `linenums` - l'indicatore nel margine si sposta per lasciare
+libera la colonna dei numeri di riga quando entrambi sono attivi.
+
+Aggiungi `frame="terminal"` per sostituire la semplice barra del titolo
+con una finestra di terminale in stile macOS - tre pallini di stato,
+titolo centrato:
+
+````markdown
+```bash frame="terminal" title="user@boxlang"
+box install bx-docs
+```
+````
+
+Che viene renderizzato così:
+
+```bash frame="terminal" title="user@boxlang"
+box install bx-docs
+```
+
+`frame="code"` è il nome esplicito per la barra semplice di oggi - il
+valore predefinito; nessuno ha bisogno di scriverlo. Né `insert`/`delete`
+né `frame` richiedono configurazione in `bxdocs.json`, come
+`hl_lines`/`linenums`/`title`.
+
+#### Diff git reali
+
+Etichetta un blocco come `diff` e incolla direttamente l'output reale di
+`git diff`/`git show` - questa non è affatto sintassi specifica di
+bx-docs, è solo la grammatica `diff` di highlight.js che riconosce da
+sola la sintassi diff unificato (righe `+`/`-`/`@@`):
+
+````markdown
+```diff
+--- a/add.bx
++++ b/add.bx
+@@ -1,4 +1,5 @@
+ numeric function add( required numeric a, required numeric b ) {
+-	var sum = a + b
+-	return sum
++	var total = a + b
++	log.info( "computed", total )
++	return total
+ }
+```
+````
+
+Che viene renderizzato così:
+
+```diff
+--- a/add.bx
++++ b/add.bx
+@@ -1,4 +1,5 @@
+ numeric function add( required numeric a, required numeric b ) {
+-	var sum = a + b
+-	return sum
++	var total = a + b
++	log.info( "computed", total )
++	return total
+ }
+```
+
 ## Diagrammi
 
 Opzionale tramite la chiave [`mermaid`](../configuration.md#mermaid) di

@@ -83,7 +83,7 @@
 
 					<h1 class="page-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a>Markdown-Erweiterungen</h1>
 <div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/de/tags/index.html#tag-anleitungen">anleitungen</a><a class="page-tag" href="/bx-docs/development/de/tags/index.html#tag-markdown">markdown</a></div>
-<details class="bxdocs-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">On this page</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#admonitions">Admonitions</a></li><li class="toc-level-3"><a href="#einklappbare-admonitions">Einklappbare Admonitions</a></li><li class="toc-level-2"><a href="#fußnoten">Fu&szlig;noten</a></li><li class="toc-level-2"><a href="#definitionslisten">Definitionslisten</a></li><li class="toc-level-2"><a href="#content-tabs">Content-Tabs</a></li><li class="toc-level-2"><a href="#codeblöcke">Codebl&ouml;cke</a></li><li class="toc-level-3"><a href="#zeilennummern-hervorgehobene-zeilen-und-titel">Zeilennummern, hervorgehobene Zeilen und Titel</a></li><li class="toc-level-2"><a href="#diagramme">Diagramme</a></li><li class="toc-level-2"><a href="#mathematik">Mathematik</a></li><li class="toc-level-2"><a href="#gitbook-artige-blöcke">GitBook-artige Bl&ouml;cke</a></li><li class="toc-level-3"><a href="#expandable">Expandable</a></li><li class="toc-level-3"><a href="#cards">Cards</a></li><li class="toc-level-3"><a href="#columns">Columns</a></li><li class="toc-level-3"><a href="#stepper">Stepper</a></li><li class="toc-level-3"><a href="#file">File</a></li><li class="toc-level-3"><a href="#embed">Embed</a></li><li class="toc-level-3"><a href="#page-link">Page Link</a></li><li class="toc-level-3"><a href="#updates-changelog">Updates (Changelog)</a></li><li class="toc-level-3"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte (Includes)</a></li><li class="toc-level-3"><a href="#bilder-bildunterschriften-ausrichtung-und-rahmung-images">Bilder: Bildunterschriften, Ausrichtung und Rahmung {#images}</a></li><li class="toc-level-2"><a href="#plugin-erweiterungen">Plugin-Erweiterungen</a></li></ul></details>
+<details class="bxdocs-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">On this page</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#admonitions">Admonitions</a></li><li class="toc-level-3"><a href="#einklappbare-admonitions">Einklappbare Admonitions</a></li><li class="toc-level-2"><a href="#fußnoten">Fu&szlig;noten</a></li><li class="toc-level-2"><a href="#definitionslisten">Definitionslisten</a></li><li class="toc-level-2"><a href="#content-tabs">Content-Tabs</a></li><li class="toc-level-2"><a href="#codeblöcke">Codebl&ouml;cke</a></li><li class="toc-level-3"><a href="#zeilennummern-hervorgehobene-zeilen-und-titel">Zeilennummern, hervorgehobene Zeilen und Titel</a></li><li class="toc-level-3"><a href="#diff-markierungen-und-terminal-rahmen">Diff-Markierungen und Terminal-Rahmen</a></li><li class="toc-level-2"><a href="#diagramme">Diagramme</a></li><li class="toc-level-2"><a href="#mathematik">Mathematik</a></li><li class="toc-level-2"><a href="#gitbook-artige-blöcke">GitBook-artige Bl&ouml;cke</a></li><li class="toc-level-3"><a href="#expandable">Expandable</a></li><li class="toc-level-3"><a href="#cards">Cards</a></li><li class="toc-level-3"><a href="#columns">Columns</a></li><li class="toc-level-3"><a href="#stepper">Stepper</a></li><li class="toc-level-3"><a href="#file">File</a></li><li class="toc-level-3"><a href="#embed">Embed</a></li><li class="toc-level-3"><a href="#page-link">Page Link</a></li><li class="toc-level-3"><a href="#updates-changelog">Updates (Changelog)</a></li><li class="toc-level-3"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte (Includes)</a></li><li class="toc-level-3"><a href="#bilder-bildunterschriften-ausrichtung-und-rahmung-images">Bilder: Bildunterschriften, Ausrichtung und Rahmung {#images}</a></li><li class="toc-level-2"><a href="#plugin-erweiterungen">Plugin-Erweiterungen</a></li></ul></details>
 					<svg xmlns="http://www.w3.org/2000/svg" class="adm-hidden">
 <symbol id="adm-note">
 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -433,6 +433,78 @@ entgegen, um sie hervorzuheben, gezählt vom Anfang des Blocks unabhängig
 davon, wo <code>linenums</code> beginnt; <code>title</code> fügt eine kleine Titelleiste über
 dem Block hinzu. Keine <code>bxdocs.json</code>-Konfiguration nötig - immer
 verfügbar.</p>
+<h3 id="diff-markierungen-und-terminal-rahmen"><a href="#diff-markierungen-und-terminal-rahmen" id="diff-markierungen-und-terminal-rahmen" name="diff-markierungen-und-terminal-rahmen" class="anchor"></a>Diff-Markierungen und Terminal-Rahmen</h3>
+<p>Füge <code>insert</code>/<code>delete</code> hinzu, um hinzugefügte/entfernte Zeilen zu
+markieren - dieselben durch Leerzeichen getrennten Zeilennummern/Bereiche,
+die <code>hl_lines</code> bereits verwendet - als eingefärbte Zeile plus ein
+<code>+</code>/<code>–</code>-Gutter-Symbol:</p>
+<pre><code class="language-markdown">```bx title=&quot;add.bx&quot; insert=&quot;3-4&quot; delete=&quot;7&quot;
+numeric function add( required numeric a, required numeric b ) {
+	var sum = a + b
+	var total = a + b
+	log.info( &quot;computed sum&quot;, total )
+	return sum
+}
+```
+</code></pre>
+<p>Was so gerendert wird:</p>
+<pre data-bxdocs-title="add.bx" data-bxdocs-insert-lines="3,4" data-bxdocs-delete-lines="7"><code class="language-bx">numeric function add( required numeric a, required numeric b ) {
+	var sum = a + b
+	var total = a + b
+	log.info( &quot;computed sum&quot;, total )
+	return sum
+}
+</code></pre>
+<p>Bewusst ausgeschrieben - nicht auf <code>ins</code>/<code>del</code> abgekürzt - und als
+Attribute statt als literale <code>+</code>/<code>-</code>-Zeilenpräfixe (wie es manche Tools
+machen), sodass der Inhalt des Fences echter, unveränderter,
+kopierbarer Quelltext bleibt; für die vorhandene Kopieren-Schaltfläche
+muss nichts entfernt werden. <code>insert</code>/<code>delete</code> lassen sich sauber mit
+<code>linenums</code> kombinieren - das Gutter-Symbol rückt nach rechts, um die
+Zeilennummern-Spalte freizuhalten, wenn beide aktiv sind.</p>
+<p>Füge <code>frame=&quot;terminal&quot;</code> hinzu, um die einfache Titelleiste durch ein
+Terminal-Fenster im macOS-Stil zu ersetzen - drei Status-Punkte,
+zentrierter Titel:</p>
+<pre><code class="language-markdown">```bash frame=&quot;terminal&quot; title=&quot;user@boxlang&quot;
+box install bx-docs
+```
+</code></pre>
+<p>Was so gerendert wird:</p>
+<pre data-bxdocs-title="user@boxlang" data-bxdocs-frame="terminal"><code class="language-bash">box install bx-docs
+</code></pre>
+<p><code>frame=&quot;code&quot;</code> ist der explizite Name für die heutige einfache Leiste -
+der Standard; niemand muss ihn schreiben. Weder <code>insert</code>/<code>delete</code> noch
+<code>frame</code> benötigen <code>bxdocs.json</code>-Konfiguration, genau wie
+<code>hl_lines</code>/<code>linenums</code>/<code>title</code>.</p>
+<h4 id="echte-git-diffs"><a href="#echte-git-diffs" id="echte-git-diffs" name="echte-git-diffs" class="anchor"></a>Echte Git-Diffs</h4>
+<p>Markiere einen Fence als <code>diff</code> und füge echte <code>git diff</code>/<code>git show</code>-Ausgabe direkt ein - das ist keine bx-docs-spezifische Syntax,
+sondern einfach die eigene <code>diff</code>-Grammatik von highlight.js, die
+Unified-Diff-Syntax (<code>+</code>/<code>-</code>/<code>@@</code>-Zeilen) von selbst erkennt:</p>
+<pre><code class="language-markdown">```diff
+--- a/add.bx
++++ b/add.bx
+@@ -1,4 +1,5 @@
+ numeric function add( required numeric a, required numeric b ) {
+-	var sum = a + b
+-	return sum
++	var total = a + b
++	log.info( &quot;computed&quot;, total )
++	return total
+ }
+```
+</code></pre>
+<p>Was so gerendert wird:</p>
+<pre><code class="language-diff">--- a/add.bx
++++ b/add.bx
+@@ -1,4 +1,5 @@
+ numeric function add( required numeric a, required numeric b ) {
+-	var sum = a + b
+-	return sum
++	var total = a + b
++	log.info( &quot;computed&quot;, total )
++	return total
+ }
+</code></pre>
 <h2 id="diagramme"><a href="#diagramme" id="diagramme" name="diagramme" class="anchor"></a>Diagramme</h2>
 <p>Opt-in über den <a href="/bx-docs/development/de/configuration/index.html#mermaid"><code>mermaid</code></a>-Schlüssel von <code>bxdocs.json</code>:</p>
 <pre><code class="language-json">{ &quot;mermaid&quot;: true }
@@ -637,7 +709,7 @@ Details dazu in bx-markdowns eigenem Readme.</p>
 </ol>
 </div>
 
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/i18n/de/guides/markdown.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-docs/development/de/guides/markdown.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 21, 2026, 6:34:53 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/i18n/de/guides/markdown.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-docs/development/de/guides/markdown.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 21, 2026, 8:31:01 PM</span></div>
 				</article>
 
 				<nav class="page-nav d-flex justify-content-between" aria-label="Page navigation">
@@ -653,7 +725,7 @@ Details dazu in bx-markdowns eigenem Readme.</p>
 			</main>
 
 			<aside class="col-xl-2 toc-sidebar d-none d-xl-block">
-				<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#admonitions">Admonitions</a></li><li class="toc-level-3"><a href="#einklappbare-admonitions">Einklappbare Admonitions</a></li><li class="toc-level-2"><a href="#fußnoten">Fu&szlig;noten</a></li><li class="toc-level-2"><a href="#definitionslisten">Definitionslisten</a></li><li class="toc-level-2"><a href="#content-tabs">Content-Tabs</a></li><li class="toc-level-2"><a href="#codeblöcke">Codebl&ouml;cke</a></li><li class="toc-level-3"><a href="#zeilennummern-hervorgehobene-zeilen-und-titel">Zeilennummern, hervorgehobene Zeilen und Titel</a></li><li class="toc-level-2"><a href="#diagramme">Diagramme</a></li><li class="toc-level-2"><a href="#mathematik">Mathematik</a></li><li class="toc-level-2"><a href="#gitbook-artige-blöcke">GitBook-artige Bl&ouml;cke</a></li><li class="toc-level-3"><a href="#expandable">Expandable</a></li><li class="toc-level-3"><a href="#cards">Cards</a></li><li class="toc-level-3"><a href="#columns">Columns</a></li><li class="toc-level-3"><a href="#stepper">Stepper</a></li><li class="toc-level-3"><a href="#file">File</a></li><li class="toc-level-3"><a href="#embed">Embed</a></li><li class="toc-level-3"><a href="#page-link">Page Link</a></li><li class="toc-level-3"><a href="#updates-changelog">Updates (Changelog)</a></li><li class="toc-level-3"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte (Includes)</a></li><li class="toc-level-3"><a href="#bilder-bildunterschriften-ausrichtung-und-rahmung-images">Bilder: Bildunterschriften, Ausrichtung und Rahmung {#images}</a></li><li class="toc-level-2"><a href="#plugin-erweiterungen">Plugin-Erweiterungen</a></li></ul></nav>
+				<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#admonitions">Admonitions</a></li><li class="toc-level-3"><a href="#einklappbare-admonitions">Einklappbare Admonitions</a></li><li class="toc-level-2"><a href="#fußnoten">Fu&szlig;noten</a></li><li class="toc-level-2"><a href="#definitionslisten">Definitionslisten</a></li><li class="toc-level-2"><a href="#content-tabs">Content-Tabs</a></li><li class="toc-level-2"><a href="#codeblöcke">Codebl&ouml;cke</a></li><li class="toc-level-3"><a href="#zeilennummern-hervorgehobene-zeilen-und-titel">Zeilennummern, hervorgehobene Zeilen und Titel</a></li><li class="toc-level-3"><a href="#diff-markierungen-und-terminal-rahmen">Diff-Markierungen und Terminal-Rahmen</a></li><li class="toc-level-2"><a href="#diagramme">Diagramme</a></li><li class="toc-level-2"><a href="#mathematik">Mathematik</a></li><li class="toc-level-2"><a href="#gitbook-artige-blöcke">GitBook-artige Bl&ouml;cke</a></li><li class="toc-level-3"><a href="#expandable">Expandable</a></li><li class="toc-level-3"><a href="#cards">Cards</a></li><li class="toc-level-3"><a href="#columns">Columns</a></li><li class="toc-level-3"><a href="#stepper">Stepper</a></li><li class="toc-level-3"><a href="#file">File</a></li><li class="toc-level-3"><a href="#embed">Embed</a></li><li class="toc-level-3"><a href="#page-link">Page Link</a></li><li class="toc-level-3"><a href="#updates-changelog">Updates (Changelog)</a></li><li class="toc-level-3"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte (Includes)</a></li><li class="toc-level-3"><a href="#bilder-bildunterschriften-ausrichtung-und-rahmung-images">Bilder: Bildunterschriften, Ausrichtung und Rahmung {#images}</a></li><li class="toc-level-2"><a href="#plugin-erweiterungen">Plugin-Erweiterungen</a></li></ul></nav>
 			</aside>
 
 		</div>
