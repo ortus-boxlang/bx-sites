@@ -16,6 +16,7 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/guides/i18n/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/guides/migrating-from-mkdocs/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/guides/interactivity/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/guides/blog/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/es/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/es/guides/themes/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/es/getting-started/index.html</loc></url>
@@ -32,6 +33,7 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/es/guides/i18n/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/es/guides/migrating-from-mkdocs/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/es/guides/interactivity/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/es/guides/blog/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/it/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/it/guides/themes/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/it/getting-started/index.html</loc></url>
@@ -48,6 +50,7 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/it/guides/i18n/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/it/guides/migrating-from-mkdocs/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/it/guides/interactivity/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/it/guides/blog/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/de/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/de/guides/themes/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/de/getting-started/index.html</loc></url>
@@ -64,6 +67,7 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/de/guides/i18n/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/de/guides/migrating-from-mkdocs/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/de/guides/interactivity/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/de/guides/blog/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/ja/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/ja/guides/themes/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/ja/getting-started/index.html</loc></url>
@@ -80,4 +84,17 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/ja/guides/i18n/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/ja/guides/migrating-from-mkdocs/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/ja/guides/interactivity/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/ja/guides/blog/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/blog/migrate-from-gitbook-or-mkdocs-in-one-command/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/blog/never-lose-a-reader-versions-and-translations/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/blog/search-that-just-works/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/blog/pick-your-theme/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/blog/get-your-docs-live-in-10-minutes/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/blog/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/blog/category/getting-started/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/blog/category/migration/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/blog/category/search/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/blog/category/themes/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/blog/category/versioning---i18n/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-docs/development/blog/authors/lmajano/index.html</loc></url>
 </urlset>

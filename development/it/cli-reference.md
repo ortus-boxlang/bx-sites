@@ -40,18 +40,19 @@ qualsiasi verbo.
 Genera lo scheletro di un progetto di documentazione.
 
 ```bash
-bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...]
+bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...] [--format=yaml|json]
 ```
 
-- `--name` - il nome del sito scritto in `bxdocs.json` (per default, il nome della cartella di destinazione)
+- `--name` - il nome del sito scritto nella configurazione del sito (per default, il nome della cartella di destinazione)
 - `--theme` - il valore predefinito è `bootstrap`
-- `--description` - la descrizione del sito scritta in `bxdocs.json`
+- `--description` - la descrizione del sito scritta nella configurazione del sito
+- `--format` - `yaml` (predefinito, genera lo scheletro di `bxdocs.yaml`) oppure `json` (genera lo scheletro di `bxdocs.json`)
 
 ## `build`
 
 Genera `docs/**.md` in un sito statico dentro `site/`. Compila anche
-l'indice di ricerca (a meno che `search` non sia `false` in
-`bxdocs.json`) e copia il tema + `docs/assets/**` in `site/`.
+l'indice di ricerca (a meno che `search` non sia `false` nella
+configurazione del sito) e copia il tema + `docs/assets/**` in `site/`.
 
 ```bash
 bxDocs build
@@ -81,7 +82,7 @@ bxDocs search-index
 ## `clean`
 
 Rimuove `site/` e qualsiasi cache di compilazione, lasciando intatti
-`docs/` e `bxdocs.json`.
+`docs/` e la configurazione del sito.
 
 ```bash
 bxDocs clean

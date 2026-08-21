@@ -2,13 +2,59 @@
 title: Konfiguration
 order: 4
 icon: ⚙️
-summary: Jeder bxdocs.json-Schlüssel, sein Standardwert und was er bewirkt.
+summary: Jeder Konfigurationsschlüssel, sein Standardwert und was er bewirkt.
 tags: [referenz, konfiguration]
 ---
 
 # Konfiguration
 
-Jedes Projekt hat eine `bxdocs.json` in seinem Wurzelverzeichnis:
+Jedes Projekt hat eine Website-Konfiguration in seinem Wurzelverzeichnis -
+`bxdocs.yaml` (oder `.yml`), das Standard- und bevorzugte Format, oder
+`bxdocs.json` für ein Projekt, das dabei bleiben möchte. Beide werden
+vollständig unterstützt und liefern exakt dasselbe Ergebnis; `bxDocs new`
+erzeugt `bxdocs.yaml`, sofern nicht `--format=json` übergeben wird (siehe
+[Erste Schritte](getting-started.md#format-der-konfigurationsdatei)). Hat
+ein Projekt aus irgendeinem Grund mehr als eine, gewinnt `bxdocs.yaml`,
+dann `bxdocs.yml`, dann `bxdocs.json`.
+
+```yaml
+name: "My Docs"
+description: ""
+baseURL: "/"
+theme:
+  name: bootstrap
+  options: {}
+  logo: ""
+  favicon: ""
+search: true
+searchProvider:
+  provider: local
+  algolia: { appId: "", apiKey: "", indexName: "", insights: false }
+nav: []
+markdown:
+  enableAdmonition: true
+repo:
+  url: ""
+  editUri: ""
+social: []
+footer: false
+lastUpdated: false
+mermaid: false
+math: false
+analytics:
+  provider: ""
+  id: ""
+ogImage: ""
+generateOgImages: false
+extraCss: []
+extraJs: []
+plugins: []
+i18n:
+  defaultLocale: { code: en, label: English }
+  locales: []
+```
+
+Die äquivalente `bxdocs.json`, für ein Projekt, das sie bevorzugt:
 
 ```json
 {
@@ -52,7 +98,9 @@ Jedes Projekt hat eine `bxdocs.json` in seinem Wurzelverzeichnis:
 Nur `name` ist erforderlich - alles andere fällt auf die oben gezeigten
 Standardwerte zurück. Ein teilweise angegebenes `theme`-Objekt wird eine
 Ebene tief zusammengeführt, sodass `{"theme":{"name":"material"}}` allein
-weiterhin die Standard-(leeren)-`options` behält.
+weiterhin die Standard-(leeren)-`options` behält. Jeder Schlüssel heißt in
+beiden Formaten gleich und hat dieselbe Form; der Rest dieser Seite zeigt
+der Kürze halber nur JSON, liest sich in YAML aber genauso.
 
 ## `name`
 

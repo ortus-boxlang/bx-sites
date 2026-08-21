@@ -275,7 +275,7 @@ como ya funciona:
 
 ```markdown
 my-project/
-├── bxdocs.json
+├── bxdocs.yaml
 ├── docs/
 └── theme/                    ← project-level override, checked before any built-in theme
     ├── layout.bxm             ← copied from resources/themes/bootstrap/layout.bxm

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Get Your Docs Live in 10 Minutes">
+	<defs>
+		<linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#00FF78"/>
+			<stop offset="100%" stop-color="#00DBFF"/>
+		</linearGradient>
+	</defs>
+	<rect width="1200" height="630" fill="url(#g1)"/>
+	<circle cx="1080" cy="90" r="170" fill="#ffffff" opacity="0.10"/>
+	<circle cx="1150" cy="520" r="110" fill="#0B2B22" opacity="0.06"/>
+
+	<text x="80" y="120" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="24" font-weight="700" fill="#0B2B22" opacity="0.75" letter-spacing="2">BX DOCS &#183; GETTING STARTED</text>
+
+	<text x="76" y="260" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="72" font-weight="800" fill="#0B2B22">
+		<tspan x="76" dy="0">Get Your Docs Live</tspan>
+		<tspan x="76" dy="86">in 10 Minutes</tspan>
+	</text>
+
+	<g transform="translate(80,470)">
+		<rect x="0" y="0" width="230" height="52" rx="26" fill="#0B2B22" opacity="0.12"/>
+		<text x="24" y="34" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="22" font-weight="700" fill="#0B2B22">bxDocs new</text>
+	</g>
+
+	<text x="80" y="580" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="22" font-weight="600" fill="#0B2B22" opacity="0.8">Static docs, done right.</text>
+</svg>

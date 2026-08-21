@@ -36,17 +36,18 @@ boxlang module:bxdocs <verb> [options]
 docs プロジェクトをスキャフォールドします。
 
 ```bash
-bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...]
+bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...] [--format=yaml|json]
 ```
 
-- `--name` - `bxdocs.json` に書き込まれるサイト名（デフォルトはターゲットディレクトリ名）
+- `--name` - サイト設定に書き込まれるサイト名（デフォルトはターゲットディレクトリ名）
 - `--theme` - デフォルトは `bootstrap`
-- `--description` - `bxdocs.json` に書き込まれるサイトの説明
+- `--description` - サイト設定に書き込まれるサイトの説明
+- `--format` - `yaml`（デフォルト、`bxdocs.yaml` をスキャフォールド）または `json`（`bxdocs.json` をスキャフォールド）- [設定](configuration.md) を参照
 
 ## `build`
 
 `docs/**.md` を `site/` の静的サイトとしてレンダリングします。
-検索インデックスのビルド（`bxdocs.json` で `search` が `false` でない限り）と、
+検索インデックスのビルド（サイト設定で `search` が `false` でない限り）と、
 テーマ + `docs/assets/**` の `site/` へのコピーも行います。
 
 ```bash
@@ -75,7 +76,7 @@ bxDocs search-index
 
 ## `clean`
 
-`docs/` と `bxdocs.json` はそのままで、`site/` とビルドキャッシュを削除します。
+`docs/` とサイト設定はそのままで、`site/` とビルドキャッシュを削除します。
 
 ```bash
 bxDocs clean

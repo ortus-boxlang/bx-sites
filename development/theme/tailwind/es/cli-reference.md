@@ -40,18 +40,19 @@ opciones globales de abajo pueden aparecer antes de cualquier verbo.
 Crea la estructura de un proyecto de documentación.
 
 ```bash
-bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...]
+bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...] [--format=yaml|json]
 ```
 
-- `--name` - el nombre del sitio escrito en `bxdocs.json` (por defecto, el nombre del directorio de destino)
+- `--name` - el nombre del sitio escrito en la configuración del sitio (por defecto, el nombre del directorio de destino)
 - `--theme` - por defecto `bootstrap`
-- `--description` - la descripción del sitio escrita en `bxdocs.json`
+- `--description` - la descripción del sitio escrita en la configuración del sitio
+- `--format` - `yaml` (por defecto, genera `bxdocs.yaml`) o `json` (genera `bxdocs.json`) - consulta [Configuración](configuration.md)
 
 ## `build`
 
 Renderiza `docs/**.md` en un sitio estático en `site/`. También construye
-el índice de búsqueda (a menos que `search` sea `false` en
-`bxdocs.json`) y copia el tema + `docs/assets/**` en `site/`.
+el índice de búsqueda (a menos que `search` sea `false` en la
+configuración del sitio) y copia el tema + `docs/assets/**` en `site/`.
 
 ```bash
 bxDocs build
@@ -81,7 +82,7 @@ bxDocs search-index
 ## `clean`
 
 Elimina `site/` y cualquier caché de construcción, dejando intactos
-`docs/` y `bxdocs.json`.
+`docs/` y la configuración del sitio.
 
 ```bash
 bxDocs clean

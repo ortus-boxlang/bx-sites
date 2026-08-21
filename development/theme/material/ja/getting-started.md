@@ -11,19 +11,21 @@ tags: [guides, setup]
 ## インストール
 
 BX Docs は、Markdown レンダリングに [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)、
-HTML エンコードに [bx-esapi](https://github.com/ortus-boxlang/bx-esapi) が必要です。
+HTML エンコードに [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)、
+`bxdocs.yaml` の読み込みに [bx-yaml](https://github.com/ortus-boxlang/bx-yaml) が必要です。
 [CommandBox](https://commandbox.ortusbooks.com/) がインストール済みの場合:
 
 ```bash
 box install bx-docs
 box install bx-markdown
 box install bx-esapi
+box install bx-yaml
 ```
 
-CommandBox を使用しない場合、BoxLang 独自のインストーラーで 3 つをまとめてインストールできます:
+CommandBox を使用しない場合、BoxLang 独自のインストーラーで 4 つをまとめてインストールできます:
 
 ```bash
-install-bx-module bx-docs bx-markdown bx-esapi
+install-bx-module bx-docs bx-markdown bx-esapi bx-yaml
 ```
 
 `box install`/`install-bx-module` は `box.json` の `boxlang.executable` を参照し、
@@ -55,11 +57,21 @@ my-docs/
 ├── docs/
 │   ├── assets/
 │   └── index.md
-└── bxdocs.json
+└── bxdocs.yaml
 ```
 
 `--theme=material` や `--theme=tailwind` で別のテーマを指定でき、
 `--name="My Project Docs"` でサイト名を設定できます（省略時はディレクトリ名から導出されます）。
+
+### 設定ファイルの形式
+
+`bxdocs.yaml` はデフォルトかつ推奨の形式です。特に指定がない限り `new` はこの形式を
+スキャフォールドし、このガイドと [設定](configuration.md) の例もすべてまずこの形式で
+示されます。`bxdocs.json` も完全にサポートされており、そちらを好むプロジェクトでは
+`--format=json` を渡してスキャフォールドするか、自分で手書き/リネームするだけで構いません。
+ConfigLoader は `bxdocs.yaml`/`.yml`/`.json` のうち実際に存在するものをこの順序で解決するため、
+切り替えに他の設定は一切必要ありません。両方の形式の完全なキーリファレンスは
+[設定](configuration.md) を参照してください。
 
 GitBook のコンテンツがある場合は、`bxDocs migrate --source=/path/to/export` で
 GitBook エクスポートをそのまま `docs/` に変換できます。
@@ -143,7 +155,7 @@ bxDocs serve
 ```
 
 プロジェクトをビルドし、`http://127.0.0.1:8080/` で `site/` を配信します。
-`docs/`、`bxdocs.json`、またはプロジェクトレベルの `theme/` オーバーライドを保存するたびに自動的に再ビルドされ、ブラウザも自動的にリロードされます。
+`docs/`、`bxdocs.yaml`/`.json` のサイト設定、またはプロジェクトレベルの `theme/` オーバーライドを保存するたびに自動的に再ビルドされ、ブラウザも自動的にリロードされます。
 バインドの変更には `--port=3000` や `--host=0.0.0.0` を使用します。
 
 ## クリーン

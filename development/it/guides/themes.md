@@ -272,7 +272,7 @@ come già funziona:
 
 ```markdown
 my-project/
-├── bxdocs.json
+├── bxdocs.yaml
 ├── docs/
 └── theme/                    ← sovrascrittura a livello di progetto, verificata prima di qualsiasi tema integrato
     ├── layout.bxm             ← copiato da resources/themes/bootstrap/layout.bxm

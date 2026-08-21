@@ -40,18 +40,19 @@ stehen.
 Ein Docs-Projekt aufsetzen.
 
 ```bash
-bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...]
+bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...] [--format=yaml|json]
 ```
 
-- `--name` - der in `bxdocs.json` geschriebene Website-Name (Standard: der Name des Zielverzeichnisses)
+- `--name` - der in die Website-Konfiguration geschriebene Website-Name (Standard: der Name des Zielverzeichnisses)
 - `--theme` - Standard ist `bootstrap`
-- `--description` - die in `bxdocs.json` geschriebene Website-Beschreibung
+- `--description` - die in die Website-Konfiguration geschriebene Website-Beschreibung
+- `--format` - `yaml` (Standard, erzeugt `bxdocs.yaml`) oder `json` (erzeugt `bxdocs.json`) - siehe [Konfiguration](configuration.md)
 
 ## `build`
 
 Rendert `docs/**.md` zu einer statischen Website in `site/`. Baut
-außerdem den Suchindex (sofern `search` in `bxdocs.json` nicht `false`
-ist) und kopiert Theme + `docs/assets/**` nach `site/`.
+außerdem den Suchindex (sofern `search` in der Website-Konfiguration nicht
+`false` ist) und kopiert Theme + `docs/assets/**` nach `site/`.
 
 ```bash
 bxDocs build
@@ -80,8 +81,8 @@ bxDocs search-index
 
 ## `clean`
 
-Entfernt `site/` und jeglichen Build-Cache, lässt `docs/` und
-`bxdocs.json` unangetastet.
+Entfernt `site/` und jeglichen Build-Cache, lässt `docs/` und die
+Website-Konfiguration unangetastet.
 
 ```bash
 bxDocs clean

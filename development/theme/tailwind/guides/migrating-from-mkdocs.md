@@ -30,9 +30,9 @@ already valid bx-docs syntax.
 
 ## What gets converted automatically
 
-**`mkdocs.yml` → `bxdocs.json`:**
+**`mkdocs.yml` → `bxdocs.yaml`:**
 
-| mkdocs.yml | bxdocs.json |
+| mkdocs.yml | bxdocs.yaml |
 |---|---|
 | `site_name` | `name` |
 | `site_description` | `description` |
@@ -48,7 +48,7 @@ already valid bx-docs syntax.
 Every other `markdown_extensions` entry mkdocs-material's own syntax
 already covers natively - `admonition`, `pymdownx.tabbed`,
 `pymdownx.details`, `pymdownx.superfences`, `pymdownx.highlight`,
-`toc`, `attr_list`, and more - needs no `bxdocs.json` change at all;
+`toc`, `attr_list`, and more - needs no `bxdocs.yaml` change at all;
 bx-docs already behaves that way out of the box.
 
 **`nav:` → `docs/nav.json`:**
@@ -120,7 +120,7 @@ cd my-docs
 boxlang module:bxDocs serve
 ```
 
-`migrate` writes `bxdocs.json` and `docs/` itself - the `new` step above
+`migrate` writes `bxdocs.yaml` and `docs/` itself - the `new` step above
 is only there to get a project root with `docs/` ready to receive them;
 migrate creates `docs/` on its own too, so it's not strictly required.
 Review the command's own warnings, then `serve` to see the result before

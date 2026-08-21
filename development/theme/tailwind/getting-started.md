@@ -11,21 +11,23 @@ tags: [guides, setup]
 ## Install
 
 BX Docs depends on [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
-for Markdown rendering and [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
-for HTML-encoding. With [CommandBox](https://commandbox.ortusbooks.com/)
+for Markdown rendering, [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
+for HTML-encoding, and [bx-yaml](https://github.com/ortus-boxlang/bx-yaml)
+for reading `bxdocs.yaml`. With [CommandBox](https://commandbox.ortusbooks.com/)
 installed:
 
 ```bash
 box install bx-docs
 box install bx-markdown
 box install bx-esapi
+box install bx-yaml
 ```
 
-Or, without CommandBox, BoxLang's own installer takes all three in one
+Or, without CommandBox, BoxLang's own installer takes all four in one
 command:
 
 ```bash
-install-bx-module bx-docs bx-markdown bx-esapi
+install-bx-module bx-docs bx-markdown bx-esapi bx-yaml
 ```
 
 `box install`/`install-bx-module` reads `box.json`'s `boxlang.executable`
@@ -60,12 +62,24 @@ my-docs/
 ├── docs/
 │   ├── assets/
 │   └── index.md
-└── bxdocs.json
+└── bxdocs.yaml
 ```
 
 Pass `--theme=material` or `--theme=tailwind` to scaffold with a different
 default theme, and `--name="My Project Docs"` to set the site name up
 front - otherwise `new` derives it from the target directory name.
+
+### Config file format
+
+`bxdocs.yaml` is the default and preferred format - it's what `new`
+scaffolds unless told otherwise, and every example in this guide and in
+[Configuration](configuration.md) shows it first. `bxdocs.json` is fully
+supported too, for a project that prefers it: pass `--format=json` to
+scaffold one instead, or just hand-write/rename one yourself - ConfigLoader
+resolves whichever of `bxdocs.yaml`/`.yml`/`.json` is actually present, in
+that order, with no other config needed to switch. See
+[Configuration](configuration.md) for the full key reference in both
+formats.
 
 Already have content in GitBook? `bxDocs migrate --source=/path/to/export`
 converts a GitBook export straight into `docs/` - see
@@ -146,7 +160,7 @@ Your content here.
 - `hidden` - `true` excludes the page from the nav (and from search) without excluding it from the build
 - `description` - this page's social-card/meta description (see
   [`ogImage`](configuration.md#ogimage)); falls back to the site-wide
-  `description` in `bxdocs.json` when omitted
+  `description` in the site config when omitted
 - `tags` - an array of tags for this page, rendered as clickable badges
   under the title and collected into a site-wide `/tags/` index page
   (only built at all once at least one page has tags); also boosts search
@@ -185,9 +199,10 @@ bxDocs serve
 ```
 
 Builds the project, serves `site/` at `http://127.0.0.1:8080/`, and
-rebuilds automatically whenever you save a change under `docs/`,
-`bxdocs.json`, or a project-level `theme/` override - your browser reloads
-on its own. Pass `--port=3000` or `--host=0.0.0.0` to change how it binds.
+rebuilds automatically whenever you save a change under `docs/`, your
+`bxdocs.yaml`/`.json` site config, or a project-level `theme/` override -
+your browser reloads on its own. Pass `--port=3000` or `--host=0.0.0.0` to
+change how it binds.
 
 ## Clean
 

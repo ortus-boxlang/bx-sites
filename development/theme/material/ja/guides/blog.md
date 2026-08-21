@@ -1,0 +1,151 @@
+---
+title: Blog
+order: 10
+icon: lucide:newspaper
+tags: [guides, blog]
+---
+
+# Blog
+
+A blog is another by-convention feature, the same shape as
+[versions](../configuration.md#versioning)/[i18n](i18n.md) or the
+[tags index](../getting-started.md#add-pages) - drop posts under
+`docs/blog/posts/`, and BX Docs builds `/blog/` (paginated), a category page
+per category, an author page per author, and an RSS feed, with zero config
+required. A project with no `docs/blog/posts/` folder simply doesn't have a
+blog - nothing else changes.
+
+## Writing a post
+
+Every `.md` file directly under `docs/blog/posts/` is a post:
+
+```markdown
+---
+title: Announcing BoxLang 2.0
+date: 2026-08-15
+authors: [lmajano]
+categories: [Releases]
+tags: [boxlang, release]
+summary: A faster runtime, a smaller footprint, and a few surprises.
+image: assets/blog/boxlang-2-cover.png
+---
+
+A short intro paragraph or two.
+
+<!-- more -->
+
+The rest of the post - everything below the `<!-- more -->` marker is left
+out of the excerpt shown on `/blog/` and category pages, but still renders
+in full on the post's own page.
+```
+
+- `date` (required) - any BX Docs can parse (`2026-08-15`, or a full
+  date-time). Sets the post's own sort order (newest first) and its
+  `<pubDate>`/`article:published_time`.
+- `authors` - a list of ids matching [`docs/blog/authors.yml`](#authors)
+  entries, or a plain name with no matching entry (rendered as unlinked text
+  rather than failing the build - handy for a one-off guest post).
+- `categories` - a post's own taxonomy, each getting its own
+  `/blog/category/<slug>/` page (and its own `?category=`-filtered RSS
+  feed - see [Feed](#feed)). Unrelated to `tags`, below.
+- `tags` - the same site-wide `tags` frontmatter every other page already
+  has (see [Getting Started](../getting-started.md#add-pages)) - a post's
+  tags render as badges and fold into the main `/tags/` index alongside
+  every other tagged page.
+- `summary` - a one-line excerpt shown on `/blog/`/category pages and in
+  the RSS feed, used when a post has no `<!-- more -->` marker. Without
+  either, BX Docs falls back to a plain-text truncation of the post's own
+  body.
+- `image` - a featured image (a `docs/assets/`-relative path, or a full
+  URL) - shown at the top of the post and as a thumbnail on every list/
+  category card. Also becomes the post's own `og:image`/Twitter card unless
+  `ogImage` overrides it separately.
+- `slug` - overrides the URL segment (`/blog/<slug>/`) - derived from the
+  filename by default.
+- `draft: true` - excludes the post from the build entirely.
+
+Every other page-level frontmatter key already documented in
+[Getting Started](../getting-started.md#add-pages) (`icon`, `description`,
+`ogImage`, `toc`) works on a post too.
+
+## Featured images and other blog assets
+
+`docs/assets/blog/` is nothing special beyond an ordinary subfolder of
+`docs/assets/` (already copied to `site/assets/` wholesale) - it's just
+where this guide (and the by-convention author avatar lookup below) expects
+post covers/author photos to live, so a project's own `docs/assets/`
+doesn't get cluttered mixing blog images in with the rest of its diagrams
+and icons. Nothing enforces the location - any `docs/assets/**` path works
+in `image`/`avatar`.
+
+## Authors
+
+`docs/blog/authors.yml` is optional - one entry per author id, referenced
+by a post's own `authors` list:
+
+```yaml
+lmajano:
+  name: Luis Majano
+  title: CEO, Ortus Solutions
+  bio: >
+    Founder of Ortus Solutions and creator of ColdBox, WireBox, and
+    BoxLang. Building developer tools since 2005.
+  url: https://github.com/lmajano
+  email: lmajano@ortussolutions.com
+  socials:
+    github: https://github.com/lmajano
+    twitter: https://x.com/lmajano
+```
+
+Only `name` is required. Every author referenced by at least one post gets
+their own `/blog/authors/<id>/` page (bio, socials, every post they've
+written) - an author nobody's credited yet doesn't get a page, even if
+they're in the roster.
+
+**Avatar, by convention** - drop a file at
+`docs/assets/blog/authors/<id>.{jpg,jpeg,png,webp,svg}` and it's picked up
+automatically, no `avatar:` key needed. An explicit `avatar` in
+`authors.yml` (a URL or a `docs/assets/`-relative path) always overrides
+the by-convention lookup.
+
+## Categories, pagination, and the "Blog" nav entry
+
+Every distinct `categories` value across all posts gets its own
+`/blog/category/<slug>/` page, listing just that category's own posts. The
+main `/blog/` list and every category page paginate identically -
+`blog.postsPerPage` in the site config controls how many posts per page
+(default `10`); page 2 onward moves to `.../page/2/`, `.../page/3/`, etc.
+
+A single "Blog" entry is added to the main nav automatically, once
+`docs/blog/posts/` has at least one non-draft post - no `nav`/`docs/nav.json`
+change needed. Individual posts aren't added to the nav themselves (same as
+the tags index) - they're reachable from `/blog/`, their own category page,
+their author's page, search, and each other's prev/next links (posts
+chronologically adjacent to one another, independent of the regular nav's
+own prev/next chain).
+
+## Feed
+
+`/blog/feed.xml` - a standard RSS 2.0 feed of every post, newest first,
+written whenever the site config resolves an absolute `baseURL` (same
+requirement as `sitemap.xml`) and `blog.feed` isn't set to `false`:
+
+```json
+{ "blog": { "postsPerPage": 10, "feed": true } }
+```
+
+## SEO and social
+
+Every post already gets everything a normal page does (`<meta name="description">`,
+`og:description`, `og:image`+`twitter:card` when an image is set - see
+[Configuration: `ogImage`](../configuration.md#ogimage)) plus a few
+post-specific tags every built-in theme adds automatically: `og:type` is
+`"article"` instead of `"website"`, and `article:published_time`/
+`article:author` (one per credited author who has a `url` set in
+`authors.yml`) are included in the page `<head>`.
+
+## Search
+
+Posts are indexed into the same `search-index.json` every other page is
+(module spec section 7) - no separate blog search UI, the existing search
+box already finds posts alongside docs pages.
