@@ -2,13 +2,60 @@
 title: Configurazione
 order: 4
 icon: ⚙️
-summary: Ogni chiave di bxdocs.json, il suo valore predefinito e cosa fa.
+summary: Ogni chiave della configurazione del sito, il suo valore predefinito e cosa fa.
 tags: [riferimento, configurazione]
 ---
 
 # Configurazione
 
-Ogni progetto ha un unico `bxdocs.json` alla radice:
+Ogni progetto ha un'unica configurazione del sito alla radice -
+`bxdocs.yaml` (o `.yml`), il formato predefinito e preferito, oppure
+`bxdocs.json` per un progetto che desidera restare su di esso. Entrambi
+sono pienamente supportati e producono esattamente lo stesso risultato;
+`bxDocs new` genera lo scheletro di `bxdocs.yaml` a meno che non venga
+passato `--format=json` (vedi
+[Per iniziare](getting-started.md#formato-del-file-di-configurazione)). Se
+un progetto ne ha in qualche modo più di uno, vince `bxdocs.yaml`, poi
+`bxdocs.yml`, poi `bxdocs.json`.
+
+```yaml
+name: "My Docs"
+description: ""
+baseURL: "/"
+theme:
+  name: bootstrap
+  options: {}
+  logo: ""
+  favicon: ""
+search: true
+searchProvider:
+  provider: local
+  algolia: { appId: "", apiKey: "", indexName: "", insights: false }
+nav: []
+markdown:
+  enableAdmonition: true
+repo:
+  url: ""
+  editUri: ""
+social: []
+footer: false
+lastUpdated: false
+mermaid: false
+math: false
+analytics:
+  provider: ""
+  id: ""
+ogImage: ""
+generateOgImages: false
+extraCss: []
+extraJs: []
+plugins: []
+i18n:
+  defaultLocale: { code: en, label: English }
+  locales: []
+```
+
+L'equivalente `bxdocs.json`, per un progetto che lo preferisce:
 
 ```json
 {
@@ -22,6 +69,10 @@ Ogni progetto ha un unico `bxdocs.json` alla radice:
 		"favicon": ""
 	},
 	"search": true,
+	"searchProvider": {
+		"provider": "local",
+		"algolia": { "appId": "", "apiKey": "", "indexName": "", "insights": false }
+	},
 	"nav": [],
 	"markdown": { "enableAdmonition": true },
 	"repo": {
@@ -52,7 +103,9 @@ Ogni progetto ha un unico `bxdocs.json` alla radice:
 Solo `name` è obbligatorio - tutto il resto ricade sui valori predefiniti
 mostrati sopra. Un oggetto `theme` parziale viene unito con quello di
 default per un livello, quindi `{"theme":{"name":"material"}}` da solo
-mantiene comunque le `options` predefinite (vuote).
+mantiene comunque le `options` predefinite (vuote). Ogni chiave ha lo
+stesso nome e la stessa forma in entrambi i formati; il resto di questa
+pagina mostra solo JSON per brevità, ma si legge allo stesso modo in YAML.
 
 ## `name`
 

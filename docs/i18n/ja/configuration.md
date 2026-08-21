@@ -2,13 +2,58 @@
 title: 設定
 order: 4
 icon: ⚙️
-summary: bxdocs.json のすべてのキー、デフォルト値、および動作。
+summary: サイト設定のすべてのキー、デフォルト値、および動作。
 tags: [reference, configuration]
 ---
 
 # 設定
 
-すべてのプロジェクトはルートに 1 つの `bxdocs.json` を持ちます:
+すべてのプロジェクトはルートに 1 つのサイト設定ファイルを持ちます。デフォルトかつ推奨の形式である
+`bxdocs.yaml`（または `.yml`）を使うか、そのまま使い続けたいプロジェクト向けの `bxdocs.json` を
+使うかのいずれかです。どちらも完全にサポートされており、まったく同じ結果になります。
+`bxDocs new` は `--format=json` を指定しない限り `bxdocs.yaml` をスキャフォールドします
+（[はじめに](getting-started.md#config-file-format) を参照）。プロジェクトに何らかの理由で
+複数の設定ファイルが存在する場合は、`bxdocs.yaml` が優先され、次に `bxdocs.yml`、
+最後に `bxdocs.json` の順で使用されます。
+
+```yaml
+name: "My Docs"
+description: ""
+baseURL: "/"
+theme:
+  name: bootstrap
+  options: {}
+  logo: ""
+  favicon: ""
+search: true
+searchProvider:
+  provider: local
+  algolia: { appId: "", apiKey: "", indexName: "", insights: false }
+nav: []
+markdown:
+  enableAdmonition: true
+repo:
+  url: ""
+  editUri: ""
+social: []
+footer: false
+lastUpdated: false
+mermaid: false
+math: false
+analytics:
+  provider: ""
+  id: ""
+ogImage: ""
+generateOgImages: false
+extraCss: []
+extraJs: []
+plugins: []
+i18n:
+  defaultLocale: { code: en, label: English }
+  locales: []
+```
+
+そちらを好むプロジェクト向けの、同等の `bxdocs.json` は次のとおりです:
 
 ```json
 {
@@ -22,6 +67,10 @@ tags: [reference, configuration]
 		"favicon": ""
 	},
 	"search": true,
+	"searchProvider": {
+		"provider": "local",
+		"algolia": { "appId": "", "apiKey": "", "indexName": "", "insights": false }
+	},
 	"nav": [],
 	"markdown": { "enableAdmonition": true },
 	"repo": {
@@ -51,7 +100,9 @@ tags: [reference, configuration]
 
 必須なのは `name` のみで、それ以外はすべて上記のデフォルト値にフォールバックします。
 `theme` オブジェクトは 1 階層のみマージされます。`{"theme":{"name":"material"}}` だけでも
-デフォルトの（空の）`options` が保持されます。
+デフォルトの（空の）`options` が保持されます。以下の各キーはどちらの形式でも名前と構造が
+同じです。このページの残りの部分では簡潔さのために JSON のスニペットのみを示しますが、
+YAML でも同様に読み替えられます。
 
 ## `name`
 
