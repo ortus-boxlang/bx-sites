@@ -1,18 +1,20 @@
 /**
- * `migrate` CLI verb - converts a GitBook export into this project's
- * `docs/` tree (GitBookMigrator.bx). CLI-agnostic: takes an
- * already-parsed options struct (see ModuleConfig.bx's main()), never
- * touches raw argv or the current working directory itself.
+ * `migrate` CLI verb - converts a GitBook export or an mkdocs project into
+ * this project's own `docs/` tree (GitBookMigrator.bx / MkdocsMigrator.bx).
+ * CLI-agnostic: takes an already-parsed options struct (see
+ * ModuleConfig.bx's main()), never touches raw argv or the current working
+ * directory itself.
  */
 class {
 
 	/**
 	 * Dispatches the `migrate` verb: validates `--source` points at a real
-	 * directory, creates `docs/` if it doesn't exist yet, then hands off
-	 * to GitBookMigrator.migrate() and reports its own result (including
-	 * anything it couldn't auto-convert) as the verb's own message.
+	 * directory, then hands off to the migrator `--from` selects
+	 * (`gitbook`, the default, or `mkdocs`) and reports its own result
+	 * (including anything it couldn't auto-convert) as the verb's own
+	 * message.
 	 *
-	 * @options { projectRoot (required, absolute path), source (required, path to a GitBook export containing SUMMARY.md) }
+	 * @options { projectRoot (required, absolute path), source (required, path to a GitBook export containing SUMMARY.md, or an mkdocs project containing mkdocs.yml), from ("gitbook" (default) or "mkdocs") }
 	 */
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
@@ -24,30 +26,73 @@ class {
 		if ( !len( source ) ) {
 			throw(
 				type    = "BxDocs.MissingMigrateSource",
-				message = "`migrate` requires --source=<path> - a GitBook export directory containing SUMMARY.md"
+				message = "`migrate` requires --source=<path> - a GitBook export directory containing SUMMARY.md, or an mkdocs project containing mkdocs.yml (with --from=mkdocs)"
 			)
 		}
 		if ( !directoryExists( source ) ) {
 			throw( type = "BxDocs.MigrateSourceNotFound", message = "No directory at [#source#]" )
 		}
 
-		var docsDir = projectRoot & "/docs"
+		var from = lCase( trim( len( trim( arguments.options.from ?: "" ) ) ? arguments.options.from : "gitbook" ) )
+		if ( !listFindNoCase( "gitbook,mkdocs", from ) ) {
+			throw(
+				type    = "BxDocs.InvalidMigrateSource",
+				message = "`migrate` --from, when present, must be one of: gitbook, mkdocs (got [#from#])"
+			)
+		}
+
+		return from == "mkdocs" ? runMkdocs( source, projectRoot ) : runGitBook( source, projectRoot )
+	}
+
+	/**
+	 * @source The GitBook export directory (contains SUMMARY.md)
+	 * @projectRoot Absolute path to the target bx-docs project root
+	 */
+	private struct function runGitBook( required string source, required string projectRoot ) {
+		var docsDir = arguments.projectRoot & "/docs"
 		if ( !directoryExists( docsDir ) ) {
 			directoryCreate( docsDir, true, true )
 		}
 
 		var migrator = new "models.build.GitBookMigrator@bxdocs"()
-		var result = migrator.migrate( source, docsDir )
+		var result = migrator.migrate( arguments.source, docsDir )
 
-		var message = "Migrated #result.pagesConverted# page(s) from [#source#] into #docsDir#/, wrote #result.navPath#"
-		if ( result.warnings.len() ) {
-			message &= char( 10 ) & char( 10 ) & result.warnings.len() & " item(s) need a manual look:"
-			for ( var w in result.warnings ) {
-				message &= char( 10 ) & "  - " & w
+		var message = "Migrated #result.pagesConverted# page(s) from [#arguments.source#] into #docsDir#/, wrote #result.navPath#"
+		return { exitCode : 0, message : withWarnings( message, result.warnings ) }
+	}
+
+	/**
+	 * @source The mkdocs project directory (contains mkdocs.yml)
+	 * @projectRoot Absolute path to the target bx-docs project root
+	 */
+	private struct function runMkdocs( required string source, required string projectRoot ) {
+		var migrator = new "models.build.MkdocsMigrator@bxdocs"()
+		var result = migrator.migrate( arguments.source, arguments.projectRoot )
+
+		var message = "Migrated #result.pagesConverted# page(s) and #result.assetsConverted# asset(s) from [#arguments.source#] into #arguments.projectRoot#/docs/, wrote #result.configPath#"
+		if ( len( result.navPath ) ) {
+			message &= " and #result.navPath#"
+		}
+		return { exitCode : 0, message : withWarnings( message, result.warnings ) }
+	}
+
+	/**
+	 * Appends a migrator's own `warnings` array to its summary message, in
+	 * the same "N item(s) need a manual look" shape regardless of which
+	 * migrator produced them.
+	 *
+	 * @message The verb's own base summary line
+	 * @warnings A migrate() result's own `warnings` array
+	 */
+	private string function withWarnings( required string message, required array warnings ) {
+		var result = arguments.message
+		if ( arguments.warnings.len() ) {
+			result &= char( 10 ) & char( 10 ) & arguments.warnings.len() & " item(s) need a manual look:"
+			for ( var w in arguments.warnings ) {
+				result &= char( 10 ) & "  - " & w
 			}
 		}
-
-		return { exitCode : 0, message : message }
+		return result
 	}
 
 }

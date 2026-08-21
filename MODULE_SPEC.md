@@ -47,7 +47,7 @@ boxlang module:bxDocs <verb> [options]
 | `search-index` | Rebuild the search index standalone (also runs automatically during `build`) |
 | `clean` | Remove `site/` and any cache |
 | `gh-deploy` | Build + force-push `site/` to a `gh-pages`-style branch |
-| `migrate` | Convert a GitBook export (`SUMMARY.md` + `.md` files) into `docs/` + `nav.json` |
+| `migrate` | Convert a GitBook export (`SUMMARY.md` + `.md` files, default) or an mkdocs project (`mkdocs.yml`, `--from=mkdocs`) into a bx-docs project |
 
 ## 3. Project structure
 
