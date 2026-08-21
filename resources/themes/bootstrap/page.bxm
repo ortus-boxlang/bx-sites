@@ -37,8 +37,13 @@
 		return html
 	}
 
-	function renderToc( required array toc ) {
-		var html = '<nav class="toc mb-4" aria-label="On this page">'
+	// @hideAtXl true for the sticky-position variant's own mobile/tablet
+	// fallback - a right-hand rail can't fit below the xl breakpoint (see
+	// layout.bxm's own "d-none d-xl-block" on the sticky rail), so this
+	// same box renders inline instead, hidden again once the rail takes
+	// over at xl+, rather than leaving the TOC inaccessible below xl.
+	function renderToc( required array toc, boolean hideAtXl = false ) {
+		var html = '<nav class="toc mb-4' & ( arguments.hideAtXl ? ' d-xl-none' : '' ) & '" aria-label="On this page">'
 		html &= '<div class="toc-title">On this page</div><ul class="list-unstyled">'
 		for ( var item in arguments.toc ) {
 			html &= '<li class="toc-level-' & item.level & '"><a href="##' & item.id & '">' & encodeForHTML( item.text ) & '</a></li>'
@@ -78,7 +83,7 @@
 					<h1 class="page-title" id="page-title"><a href="##page-title" id="page-title" class="anchor"></a></bx:output><bx:if condition="#len( variables.page.iconHtml )#"><bx:output><span class="page-icon">#variables.page.iconHtml#</span> </bx:output></bx:if><bx:output>#encodeForHTML( variables.page.title )#</h1>
 </bx:output><bx:if condition="#len( variables.page.summary )#"><bx:output>					<p class="page-summary">#encodeForHTML( variables.page.summary )#</p>
 </bx:output></bx:if><bx:if condition="#variables.page.tags.len() gt 0#"><bx:output>#renderTags( variables.page.tags )#</bx:output></bx:if><bx:if condition="#( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'top'#"><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:output></bx:if><bx:output>
-</bx:output><bx:if condition="#variables.page.toc.len() gt 0 and variables.tocPosition == 'top'#"><bx:output>#renderToc( variables.page.toc )#</bx:output></bx:if><bx:output>
+</bx:output><bx:if condition="#variables.page.toc.len() gt 0 and variables.tocPosition == 'top'#"><bx:output>#renderToc( variables.page.toc )#</bx:output></bx:if><bx:if condition="#variables.page.toc.len() gt 0 and variables.tocPosition == 'sticky'#"><bx:output>#renderToc( variables.page.toc, true )#</bx:output></bx:if><bx:output>
 					#variables.page.contentHtml#
 </bx:output><bx:if condition="#( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'bottom'#"><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:output></bx:if><bx:output>
 				</article>

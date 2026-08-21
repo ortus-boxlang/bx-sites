@@ -468,7 +468,7 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
-			it( "renders the 'On this page' TOC inline by default, and in its own sticky rail outside <main> when [theme.options.tocPosition] is 'sticky', across every built-in theme", function() {
+			it( "renders the 'On this page' TOC inline by default, and both inline (hidden at xl, for mobile/tablet) and in its own sticky rail outside <main> (visible at xl+) when [theme.options.tocPosition] is 'sticky', across every built-in theme", function() {
 				var root = newProjectRoot();
 				var page = {
 					title       : "My Page",
@@ -491,10 +491,15 @@ class extends="testbox.system.BaseSpec" {
 
 					var stickyConfig = { name : "My Site", theme : { options : { tocPosition : "sticky" } } };
 					var stickyHtml = renderer.renderPage( page, nav, stickyConfig, themeDir );
-					expect( stickyHtml ).toInclude( "First Section" );
-					// sticky renders after <main> closes, and only once (not duplicated inline too)
-					expect( stickyHtml.findNoCase( "First Section" ) ).toBeGT( stickyHtml.findNoCase( "</main>" ) );
-					expect( stickyHtml.reMatchNoCase( "First Section" ).len() ).toBe( 1 );
+					var mainCloseAt = stickyHtml.findNoCase( "</main>" );
+					// sticky mode renders the TOC twice - once inline before <main>
+					// closes (a mobile/tablet fallback, hidden at the xl breakpoint,
+					// since the sticky rail has no room below that width), and once
+					// in the sticky rail after <main> closes (visible at xl+) - never
+					// zero copies, so the TOC stays reachable at every viewport width.
+					expect( stickyHtml.reMatchNoCase( "First Section" ).len() ).toBe( 2 );
+					expect( stickyHtml.findNoCase( "First Section" ) ).toBeLT( mainCloseAt );
+					expect( stickyHtml.findNoCase( "First Section", mainCloseAt ) ).toBeGT( mainCloseAt );
 				}
 			} );
 
