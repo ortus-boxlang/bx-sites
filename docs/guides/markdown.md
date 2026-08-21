@@ -233,6 +233,41 @@ from the top of the block regardless of where `linenums` starts; `title`
 adds a small title bar above the block. No `bxdocs.json` config needed -
 always available.
 
+### Try it live (try.boxlang.io)
+
+Tag a fence `tryboxlang` instead of a language name and it renders as a
+live, embedded [try.boxlang.io](https://try.boxlang.io) editor instead of a
+static code listing - readers can run and tinker with the example right on
+the page, no config needed:
+
+````markdown
+```tryboxlang title="Closures"
+user = { name: "Luis", getFullName: () => "Luis Majano" }
+println( user.getFullName() )
+```
+````
+
+Which renders as:
+
+```tryboxlang title="Closures"
+user = { name: "Luis", getFullName: () => "Luis Majano" }
+println( user.getFullName() )
+```
+
+Optional attributes, all on the same line as `tryboxlang`:
+
+| Attribute  | Default | Description                                             |
+| ---------- | ------- | -------------------------------------------------------- |
+| `title`    | none    | A small title bar above the embed                        |
+| `height`   | `450px` | Any CSS length (a bare number is treated as pixels)       |
+| `readonly` | `false` | `"true"` locks the editor to read-only                   |
+
+The fence's own content is the starting BoxLang source - it's compressed
+and passed to try.boxlang.io's editor via its own `code` URL parameter, the
+same way a "share" link from try.boxlang.io itself works, so opening the
+embed's "Open in try.boxlang.io ↗" link picks up right where the embed
+starts.
+
 ## Diagrams
 
 Opt-in via `bxdocs.json`'s [`mermaid`](../configuration.md#mermaid) key:

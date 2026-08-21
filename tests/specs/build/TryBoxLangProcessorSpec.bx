@@ -1,0 +1,128 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.TryBoxLangProcessor", function() {
+
+			beforeEach( function() {
+				variables.processor = new "models.build.TryBoxLangProcessor@bxdocs"();
+			} );
+
+			it( "leaves markdown with no tryboxlang blocks untouched", function() {
+				var md = "Just a paragraph." & char( 10 ) & char( 10 ) & "```bx" & char( 10 ) & "println( 1 )" & char( 10 ) & "```";
+				var result = processor.extract( md );
+
+				expect( result.markdown ).toBe( md );
+				expect( result.embeds ).toBeArray();
+				expect( result.embeds.len() ).toBe( 0 );
+			} );
+
+			it( "extracts a tryboxlang fence into a placeholder and records its code and attrs", function() {
+				var md = '```tryboxlang height="300" title="Closures"' & char( 10 ) &
+					"x = 1" & char( 10 ) &
+					"println( x )" & char( 10 ) &
+					"```";
+
+				var result = processor.extract( md );
+
+				expect( result.embeds.len() ).toBe( 1 );
+				var embed = result.embeds[ 1 ];
+				expect( embed.code ).toBe( "x = 1" & char( 10 ) & "println( x )" );
+				expect( embed.attrsRaw ).toBe( 'height="300" title="Closures"' );
+				expect( result.markdown ).toInclude( '<div class="bxdocs-raw-block" data-bxdocs-token="' & embed.token & '"></div>' );
+				expect( result.markdown ).notToInclude( "```tryboxlang" );
+				expect( result.markdown ).notToInclude( "x = 1" );
+			} );
+
+			it( "treats a tryboxlang fence shown inside a longer fence as literal content, not a real trigger (regression)", function() {
+				var md = '````markdown' & char( 10 ) &
+					'```tryboxlang' & char( 10 ) &
+					'println( 1 )' & char( 10 ) &
+					'```' & char( 10 ) &
+					'````';
+
+				var result = processor.extract( md );
+
+				expect( result.embeds.len() ).toBe( 0 );
+				expect( result.markdown ).toBe( md );
+			} );
+
+			it( "keeps two separate tryboxlang fences as two distinct embeds in order", function() {
+				var md = '```tryboxlang' & char( 10 ) & "a()" & char( 10 ) & "```" & char( 10 ) & char( 10 ) &
+					'```tryboxlang' & char( 10 ) & "b()" & char( 10 ) & "```";
+
+				var result = processor.extract( md );
+
+				expect( result.embeds.len() ).toBe( 2 );
+				expect( result.embeds[ 1 ].code ).toBe( "a()" );
+				expect( result.embeds[ 2 ].code ).toBe( "b()" );
+			} );
+
+			it( "restore() swaps the placeholder for an iframe pointed at try.boxlang.io, encoding the code so it decompresses back to the original source", function() {
+				var code = 'println( "hello" )';
+				var md = '```tryboxlang' & char( 10 ) & code & char( 10 ) & "```";
+				var extracted = processor.extract( md );
+				var html = "<p>before</p>" & char( 10 ) &
+					'<div class="bxdocs-raw-block" data-bxdocs-token="' & extracted.embeds[ 1 ].token & '"></div>' &
+					char( 10 ) & "<p>after</p>";
+
+				var restored = processor.restore( html, extracted.embeds );
+
+				expect( restored ).notToInclude( "data-bxdocs-token" );
+				expect( restored ).toInclude( "<p>before</p>" );
+				expect( restored ).toInclude( "<p>after</p>" );
+				expect( restored ).toInclude( '<div class="bxdocs-tryboxlang">' );
+				expect( restored ).toInclude( 'class="bxdocs-tryboxlang__frame"' );
+				expect( restored ).toInclude( 'src="https://try.boxlang.io/editor/index.bxm?ro=false&amp;code=' );
+
+				var encoded = restored.reReplace( ".*code=([^""]*)"".*", "\1", "one" );
+				expect( decodeTryBoxLangCode( encoded ) ).toBe( code );
+			} );
+
+			it( "restore() honors height/readonly/title attributes and falls back to defaults when omitted", function() {
+				var withAttrs = '```tryboxlang height="300" readonly="true" title="Closures"' & char( 10 ) & "a()" & char( 10 ) & "```";
+				var extractedWithAttrs = processor.extract( withAttrs );
+				var restoredWithAttrs = processor.restore(
+					'<div class="bxdocs-raw-block" data-bxdocs-token="' & extractedWithAttrs.embeds[ 1 ].token & '"></div>',
+					extractedWithAttrs.embeds
+				);
+
+				expect( restoredWithAttrs ).toInclude( 'style="height:300px"' );
+				expect( restoredWithAttrs ).toInclude( "ro=true" );
+				expect( restoredWithAttrs ).toInclude( '<div class="bxdocs-tryboxlang__title">Closures</div>' );
+
+				var bare = '```tryboxlang' & char( 10 ) & "a()" & char( 10 ) & "```";
+				var extractedBare = processor.extract( bare );
+				var restoredBare = processor.restore(
+					'<div class="bxdocs-raw-block" data-bxdocs-token="' & extractedBare.embeds[ 1 ].token & '"></div>',
+					extractedBare.embeds
+				);
+
+				expect( restoredBare ).toInclude( 'style="height:450px"' );
+				expect( restoredBare ).toInclude( "ro=false" );
+				expect( restoredBare ).notToInclude( "bxdocs-tryboxlang__title" );
+			} );
+
+			/**
+			 * Mirrors what try.boxlang.io's own editor does on the other end
+			 * of the `code` query param - url-decode, base64-decode,
+			 * zlib-inflate back to the original UTF-8 source - so this spec
+			 * verifies the actual bytes a browser would send, not just that
+			 * *some* string got produced.
+			 */
+			private string function decodeTryBoxLangCode( required string encoded ) {
+				var compressed = binaryDecode( urlDecode( arguments.encoded ), "base64" )
+				var bais = createObject( "java", "java.io.ByteArrayInputStream" ).init( compressed )
+				var inflaterStream = createObject( "java", "java.util.zip.InflaterInputStream" ).init( bais )
+				var outBaos = createObject( "java", "java.io.ByteArrayOutputStream" ).init()
+				var buf = repeatString( " ", 1024 ).getBytes()
+				var readCount = 0
+				while ( ( readCount = inflaterStream.read( buf ) ) != -1 ) {
+					outBaos.write( buf, 0, readCount )
+				}
+				return charsetEncode( outBaos.toByteArray(), "utf-8" )
+			}
+
+		} );
+	}
+
+}

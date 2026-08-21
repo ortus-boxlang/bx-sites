@@ -26,6 +26,7 @@ class {
 	variables.tabsProcessor = new "models.build.TabsProcessor@bxdocs"()
 	variables.mathProtector = new "models.build.MathProtector@bxdocs"()
 	variables.codeAnnotationProcessor = new "models.build.CodeAnnotationProcessor@bxdocs"()
+	variables.tryBoxLangProcessor = new "models.build.TryBoxLangProcessor@bxdocs"()
 	variables.markdownLinkResolver = new "models.build.MarkdownLinkResolver@bxdocs"()
 	variables.markdownPublisher = new "models.build.MarkdownPublisher@bxdocs"()
 	variables.includeProcessor = new "models.build.IncludeProcessor@bxdocs"()
@@ -434,6 +435,12 @@ class {
 	 * built-site-readable alike) into its built pretty-URL equivalent -
 	 * see MarkdownLinkResolver.bx.
 	 *
+	 * Also turns every `` ```tryboxlang `` fenced block into a live
+	 * try.boxlang.io editor embed (TryBoxLangProcessor.bx), extracted
+	 * first - before every other pre-processor below - so its literal
+	 * BoxLang source is never misread as tab/math/annotation/directive
+	 * syntax of its own.
+	 *
 	 * Also splices in any `::: include src="..."` reusable content
 	 * (IncludeProcessor.bx, run first - the only one of these that has to
 	 * become real page markdown rather than an HTML-wrapped block) and
@@ -453,7 +460,8 @@ class {
 			var markdown = variables.pluginLoader.applyOnPageMarkdown( arguments.plugins, page.body, page, arguments.config )
 			markdown = variables.includeProcessor.process( markdown, arguments.docsDir, page.relativePath )
 
-			var tabsExtracted = variables.tabsProcessor.extract( markdown )
+			var tryBoxLangExtracted = variables.tryBoxLangProcessor.extract( markdown )
+			var tabsExtracted = variables.tabsProcessor.extract( tryBoxLangExtracted.markdown )
 			var mathProtected = variables.mathProtector.protect( tabsExtracted.markdown )
 			var codeExtracted = variables.codeAnnotationProcessor.extractAndStrip( mathProtected.markdown )
 			var directivesExtracted = variables.directiveBlockProcessor.extract( codeExtracted.markdown )
@@ -463,6 +471,7 @@ class {
 			html = variables.codeAnnotationProcessor.applyToHtml( html, codeExtracted.annotations )
 			html = variables.mathProtector.restore( html, mathProtected.formulas )
 			html = variables.tabsProcessor.restore( html, tabsExtracted.groups, variables.markdownRenderer, arguments.config.markdown )
+			html = variables.tryBoxLangProcessor.restore( html, tryBoxLangExtracted.embeds )
 			html = variables.markdownLinkResolver.resolve( html, page.relativePath, arguments.basePath )
 
 			html = variables.pluginLoader.applyOnPageHtml( arguments.plugins, html, page, arguments.config )
