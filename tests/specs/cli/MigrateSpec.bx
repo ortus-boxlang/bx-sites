@@ -57,6 +57,51 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( projectRoot & "/docs/nav.json" ) ).toBeTrue();
 			} );
 
+			it( "defaults --from to gitbook when it's not passed", function() {
+				var projectRoot = createTempDirectory( prefix = "bxdocs-cli-migrate-project-" );
+				var source = createTempDirectory( prefix = "bxdocs-cli-migrate-source-" );
+				tempDirs.append( projectRoot );
+				tempDirs.append( source );
+
+				fileWrite( source & "/SUMMARY.md", "* [Home](README.md)" );
+				fileWrite( source & "/README.md", "Welcome." );
+
+				var result = verb.run( { projectRoot : projectRoot, source : source, from : "" } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( fileExists( projectRoot & "/docs/nav.json" ) ).toBeTrue();
+			} );
+
+			it( "throws BxDocs.InvalidMigrateSource when --from isn't gitbook or mkdocs", function() {
+				var projectRoot = createTempDirectory( prefix = "bxdocs-cli-migrate-project-" );
+				var source = createTempDirectory( prefix = "bxdocs-cli-migrate-source-" );
+				tempDirs.append( projectRoot );
+				tempDirs.append( source );
+
+				expect( function() {
+					verb.run( { projectRoot : projectRoot, source : source, from : "docusaurus" } );
+				} ).toThrow( "BxDocs.InvalidMigrateSource" );
+			} );
+
+			it( "migrates an mkdocs project into a complete bx-docs project when --from=mkdocs", function() {
+				var projectRoot = createTempDirectory( prefix = "bxdocs-cli-migrate-project-" );
+				var source = createTempDirectory( prefix = "bxdocs-cli-migrate-mkdocs-source-" );
+				tempDirs.append( projectRoot );
+				tempDirs.append( source );
+
+				directoryCreate( source & "/docs", true, true );
+				fileWrite( source & "/mkdocs.yml", "site_name: My Docs" );
+				fileWrite( source & "/docs/index.md", "Welcome." );
+
+				var result = verb.run( { projectRoot : projectRoot, source : source, from : "mkdocs" } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toInclude( "Migrated 1 page(s)" );
+				expect( fileExists( projectRoot & "/bxdocs.json" ) ).toBeTrue();
+				expect( fileExists( projectRoot & "/docs/index.md" ) ).toBeTrue();
+				expect( jsonDeserialize( fileRead( projectRoot & "/bxdocs.json" ) ).name ).toBe( "My Docs" );
+			} );
+
 		} );
 	}
 

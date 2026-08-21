@@ -107,25 +107,44 @@ See [Deployment](guides/deployment.md) for the full GitHub Pages setup
 
 ## `migrate`
 
-Converts a GitBook export - a `SUMMARY.md` table of contents plus its
-`.md` files, GitBook's own on-disk sync format - into this project's
-`docs/` tree: `SUMMARY.md` becomes `docs/nav.json`, `{% block %}` syntax
-becomes its bx-docs equivalent (`::: name` directives, or the native
-`=== "Title"` tabs / `!!! type` admonition syntax where a closer match
-already exists - see [Markdown Extensions](guides/markdown.md#gitbook-style-blocks)),
-`README.md` files become `index.md`, and `.gitbook/assets/**` is copied to
-`docs/assets/gitbook/`.
+Converts an existing docs project into this one - `--from` picks the
+source format, `gitbook` (the default) or `mkdocs`.
 
 ```bash
 bxDocs migrate --source=/path/to/gitbook-export
+bxDocs migrate --source=/path/to/mkdocs-project --from=mkdocs
 ```
 
-- `--source` (required) - path to the GitBook export's root directory (must contain `SUMMARY.md`)
+- `--source` (required) - path to the export/project's root directory (must contain `SUMMARY.md` for `gitbook`, `mkdocs.yml` for `mkdocs`)
+- `--from` - `gitbook` (default) or `mkdocs`
 
-Prints a summary of pages converted and, when anything couldn't be
-auto-converted (an unsupported block like `{% prompt %}`, an unrecognized
-hint style, a column width that isn't a plain length), a list of exactly
-what needs a manual look - nothing is silently dropped, an unrecognized
-block is left in its original `{% %}` syntax in the migrated file instead.
-A destination file or `docs/nav.json` that already exists is overwritten
+### `--from=gitbook` (default)
+
+A GitBook export - a `SUMMARY.md` table of contents plus its `.md` files,
+GitBook's own on-disk sync format - into this project's `docs/` tree:
+`SUMMARY.md` becomes `docs/nav.json`, `{% block %}` syntax becomes its
+bx-docs equivalent (`::: name` directives, or the native `=== "Title"`
+tabs / `!!! type` admonition syntax where a closer match already exists -
+see [Markdown Extensions](guides/markdown.md#gitbook-style-blocks)),
+`README.md` files become `index.md`, and `.gitbook/assets/**` is copied to
+`docs/assets/gitbook/`.
+
+### `--from=mkdocs`
+
+An mkdocs project - `mkdocs.yml` plus its `docs/` folder - into a
+complete bx-docs project: `mkdocs.yml` becomes `bxdocs.json` +
+`docs/nav.json`, and every page is copied across largely unchanged, since
+mkdocs-material's own admonition/tabs/math/code-annotation syntax already
+*is* bx-docs' own native syntax - see
+[Migrating from mkdocs](guides/migrating-from-mkdocs.md). Non-`.md` assets
+(images commonly sitting next to the page that uses them, mkdocs has no
+single asset-folder convention) are relocated to `docs/assets/mkdocs/` and
+their references rewritten.
+
+### Both
+
+Prints a summary of pages (and, for mkdocs, assets) converted and, when
+anything couldn't be auto-converted, a list of exactly what needs a
+manual look - nothing is silently dropped. A destination file,
+`bxdocs.json`, or `docs/nav.json` that already exists is overwritten
 (also reported), so review the migrated output before committing it.

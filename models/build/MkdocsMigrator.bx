@@ -1,0 +1,428 @@
+/**
+ * Converts an mkdocs project (an `mkdocs.yml` plus its `docs/` folder) into
+ * a bx-docs project - `mkdocs.yml` becomes `bxdocs.json` + `docs/nav.json`,
+ * and every `.md` page is copied across with its asset references rewritten.
+ *
+ * Unlike GitBookMigrator.bx, this is mostly a *config* translation, not a
+ * *content* one: mkdocs' own `docs/` folder already uses bx-docs' exact
+ * conventions - folder nesting = nav, `index.md` = folder home, relative
+ * `.md` page-to-page links (MarkdownLinkResolver.bx already resolves
+ * these). More importantly, mkdocs-material's own extended Markdown
+ * syntax - `!!! type "Title"` / `???`/`???+` collapsible admonitions
+ * (pymdownx.details), `=== "Title"` content tabs (pymdownx.tabbed),
+ * `$...$`/`$$...$$` math (pymdownx.arithmatex), and fenced-code
+ * `hl_lines`/`title` annotations (pymdownx.superfences) - is the exact
+ * same textual syntax bx-markdown's own Flexmark extensions and bx-docs'
+ * own pre/post-processors (TabsProcessor/MathProtector/
+ * CodeAnnotationProcessor) already implement, because bx-docs modeled
+ * itself on mkdocs-material to begin with (module spec, header). So page
+ * *bodies* are copied through byte-for-byte unchanged - only their
+ * asset (non-`.md`) references need rewriting, since mkdocs has no single
+ * `docs/assets/` convention of its own (images commonly sit next to the
+ * page that uses them) while bx-docs' asset pipeline only ever publishes
+ * `docs/assets/**`.
+ *
+ * Anything mkdocs-specific with no bx-docs equivalent - most
+ * `markdown_extensions`/`plugins`/`theme.features` entries, mkdocs-material's
+ * own color-palette config - is left out of the generated `bxdocs.json`
+ * and reported into `migrate()`'s own `warnings`, the same
+ * nothing-silently-dropped philosophy GitBookMigrator.bx already uses.
+ */
+class {
+
+	variables.yamlParser = new "models.build.MkdocsYamlParser@bxdocs"()
+
+	/**
+	 * Extension names with a direct, always-on bx-markdown/bx-docs
+	 * equivalent - present in `markdown_extensions` needs no `bxdocs.json`
+	 * change and no warning (admonitions/footnotes/def_list are handled by
+	 * their own explicit mapping below; these are the ones that are just
+	 * "already true, nothing to do").
+	 */
+	variables.noopExtensions = "toc,attr_list,md_in_html,tables,pymdownx.superfences,pymdownx.highlight,pymdownx.inlinehilite,pymdownx.snippets,pymdownx.tabbed,pymdownx.details,pymdownx.caret,pymdownx.mark,pymdownx.tilde,pymdownx.smartsymbols,pymdownx.keys"
+
+	/**
+	 * Migrates an mkdocs project at `sourceDir` into `projectRoot` - reads
+	 * `mkdocs.yml`, writes `projectRoot/bxdocs.json` and
+	 * `projectRoot/docs/nav.json`, and copies every page + asset from
+	 * mkdocs' own `docs_dir` (default `docs/`) into `projectRoot/docs/`.
+	 *
+	 * @sourceDir Absolute path to the mkdocs project's root (contains mkdocs.yml)
+	 * @projectRoot Absolute path to the target bx-docs project root
+	 *
+	 * @return { pagesConverted: numeric, assetsConverted: numeric, warnings: array of human-readable strings, configPath: string, navPath: string }
+	 */
+	struct function migrate( required string sourceDir, required string projectRoot ) {
+		var configSourcePath = arguments.sourceDir & "/mkdocs.yml"
+		if ( !fileExists( configSourcePath ) ) {
+			throw(
+				type    = "BxDocs.MigrateMissingMkdocsConfig",
+				message = "No mkdocs.yml found at [#arguments.sourceDir#] - mkdocs migration requires its site config file"
+			)
+		}
+
+		var mkdocsConfig = variables.yamlParser.parse( fileRead( configSourcePath ) )
+		var warnings = []
+
+		var mkdocsDocsDir = arguments.sourceDir & "/" & trim( len( trim( mkdocsConfig.docs_dir ?: "" ) ) ? mkdocsConfig.docs_dir : "docs" )
+		if ( !directoryExists( mkdocsDocsDir ) ) {
+			throw(
+				type    = "BxDocs.MigrateMissingDocsDir",
+				message = "No [#mkdocsDocsDir#] found - mkdocs migration requires the project's own docs_dir to exist"
+			)
+		}
+
+		var docsDir = arguments.projectRoot & "/docs"
+		if ( !directoryExists( docsDir ) ) {
+			directoryCreate( docsDir, true, true )
+		}
+
+		var copyResult = copyDocsTree( mkdocsDocsDir, docsDir, warnings )
+
+		var mkdocsNav = mkdocsConfig.nav ?: []
+		if ( isArray( mkdocsNav ) && mkdocsNav.len() ) {
+			var navPath = docsDir & "/nav.json"
+			if ( fileExists( navPath ) ) {
+				warnings.append( "docs/nav.json already existed and was overwritten by this migration" )
+			}
+			fileWrite( navPath, jsonSerialize( convertNav( mkdocsNav ) ) )
+		} else {
+			var navPath = ""
+		}
+
+		var bxdocsConfig = buildBxdocsConfig( mkdocsConfig, arguments.sourceDir, warnings )
+		var configPath = arguments.projectRoot & "/bxdocs.json"
+		if ( fileExists( configPath ) ) {
+			warnings.append( "bxdocs.json already existed and was overwritten by this migration" )
+		}
+		fileWrite( configPath, jsonSerialize( bxdocsConfig ) )
+
+		return {
+			pagesConverted  : copyResult.pagesConverted,
+			assetsConverted : copyResult.assetsConverted,
+			warnings        : warnings,
+			configPath      : configPath,
+			navPath         : navPath
+		}
+	}
+
+	/**
+	 * Translates the parsed `mkdocs.yml` struct into a `bxdocs.json` struct
+	 * - only the fields this converter has a confident, direct mapping
+	 * for; ConfigLoader.bx's own defaults cover everything else once this
+	 * is loaded normally by `build`.
+	 *
+	 * @mkdocsConfig MkdocsYamlParser.parse()'s own output
+	 * @sourceDir Absolute path to the mkdocs project root (for the site-name-fallback warning message)
+	 * @warnings Accumulator array, mutated in place
+	 */
+	private struct function buildBxdocsConfig( required struct mkdocsConfig, required string sourceDir, required array warnings ) {
+		var siteName = trim( arguments.mkdocsConfig.site_name ?: "" )
+		if ( !len( siteName ) ) {
+			siteName = listLast( arguments.sourceDir.reReplace( "[\/]+$", "" ), "/\" )
+			arguments.warnings.append( "mkdocs.yml has no [site_name] - defaulted bxdocs.json [name] to ""#siteName#""" )
+		}
+
+		var config = { "name" : siteName }
+
+		var description = trim( arguments.mkdocsConfig.site_description ?: "" )
+		if ( len( description ) ) {
+			config[ "description" ] = description
+		}
+
+		var siteUrl = trim( arguments.mkdocsConfig.site_url ?: "" )
+		if ( len( siteUrl ) ) {
+			config[ "baseURL" ] = siteUrl.right( 1 ) == "/" ? siteUrl : siteUrl & "/"
+		}
+
+		config[ "theme" ] = buildThemeConfig( arguments.mkdocsConfig, arguments.warnings )
+
+		var repoUrl = trim( arguments.mkdocsConfig.repo_url ?: "" )
+		if ( len( repoUrl ) ) {
+			config[ "repo" ] = { "url" : repoUrl, "editUri" : trim( arguments.mkdocsConfig.edit_uri ?: "" ) }
+		}
+
+		var extraCss = arguments.mkdocsConfig.extra_css ?: []
+		if ( isArray( extraCss ) && extraCss.len() ) {
+			config[ "extraCss" ] = extraCss
+		}
+		var extraJs = arguments.mkdocsConfig.extra_javascript ?: []
+		if ( isArray( extraJs ) && extraJs.len() ) {
+			config[ "extraJs" ] = extraJs
+		}
+
+		config[ "markdown" ] = buildMarkdownConfig( arguments.mkdocsConfig, arguments.warnings )
+		if ( markdownExtensionEnabled( arguments.mkdocsConfig, "pymdownx.arithmatex" ) ) {
+			config[ "math" ] = true
+		}
+
+		reportUnmappedExtensions( arguments.mkdocsConfig, arguments.warnings )
+		reportUnmappedPlugins( arguments.mkdocsConfig, arguments.warnings )
+
+		return config
+	}
+
+	/**
+	 * `theme.name: material` maps to bx-docs' own built-in `material` theme
+	 * (a genuine coincidence of naming, not a compatibility claim - the
+	 * two are visually similar but not identical); any other mkdocs theme
+	 * name (`mkdocs`, `readthedocs`, a custom one) falls back to bx-docs'
+	 * own `bootstrap` default, reported into `warnings` since the visual
+	 * result will differ.
+	 */
+	private struct function buildThemeConfig( required struct mkdocsConfig, required array warnings ) {
+		var mkdocsThemeName = lCase( trim( isStruct( arguments.mkdocsConfig.theme ?: "" ) ? ( arguments.mkdocsConfig.theme.name ?: "" ) : ( arguments.mkdocsConfig.theme ?: "" ) ) )
+		var bxdocsThemeName = "bootstrap"
+
+		if ( mkdocsThemeName == "material" ) {
+			bxdocsThemeName = "material"
+		} else if ( len( mkdocsThemeName ) && mkdocsThemeName != "mkdocs" && mkdocsThemeName != "readthedocs" ) {
+			arguments.warnings.append( "mkdocs.yml [theme.name] ""#mkdocsThemeName#"" has no bx-docs equivalent - defaulted to the ""bootstrap"" theme" )
+		}
+
+		return { "name" : bxdocsThemeName, "options" : {} }
+	}
+
+	/**
+	 * Maps the handful of `markdown_extensions` entries bx-docs' own
+	 * `markdown` config block has a direct switch for; every other
+	 * recognized-but-unmapped extension is a no-op (variables.noopExtensions -
+	 * bx-docs already behaves that way natively); anything else is
+	 * reported by reportUnmappedExtensions().
+	 */
+	private struct function buildMarkdownConfig( required struct mkdocsConfig, required array warnings ) {
+		var markdown = {}
+		if ( markdownExtensionEnabled( arguments.mkdocsConfig, "footnotes" ) ) {
+			markdown[ "enableFootnotes" ] = true
+		}
+		if ( markdownExtensionEnabled( arguments.mkdocsConfig, "def_list" ) ) {
+			markdown[ "enableDefinitionLists" ] = true
+		}
+		return markdown
+	}
+
+	/**
+	 * @extensionName A markdown_extensions entry name, e.g. "footnotes"
+	 *
+	 * @return true when mkdocs.yml's markdown_extensions list contains it, bare or with its own config block
+	 */
+	private boolean function markdownExtensionEnabled( required struct mkdocsConfig, required string extensionName ) {
+		var extensions = arguments.mkdocsConfig.markdown_extensions ?: []
+		if ( !isArray( extensions ) ) {
+			return false
+		}
+		for ( var entry in extensions ) {
+			var name = isStruct( entry ) ? entry.keyArray()[ 1 ] : entry
+			if ( compareNoCase( trim( name ), arguments.extensionName ) == 0 ) {
+				return true
+			}
+		}
+		return false
+	}
+
+	/**
+	 * Reports every `markdown_extensions` entry that's neither explicitly
+	 * mapped (buildMarkdownConfig()/the `math` check) nor a known no-op
+	 * (variables.noopExtensions) - mostly mkdocs-material-specific
+	 * extensions with no bx-docs concept at all (e.g. emoji shortcodes).
+	 */
+	private void function reportUnmappedExtensions( required struct mkdocsConfig, required array warnings ) {
+		var extensions = arguments.mkdocsConfig.markdown_extensions ?: []
+		if ( !isArray( extensions ) ) {
+			return
+		}
+		var mapped = "footnotes,def_list,admonition,pymdownx.arithmatex"
+		for ( var entry in extensions ) {
+			var name = trim( isStruct( entry ) ? entry.keyArray()[ 1 ] : entry )
+			if ( !listFindNoCase( mapped, name ) && !listFindNoCase( variables.noopExtensions, name ) ) {
+				arguments.warnings.append( "mkdocs.yml markdown_extensions entry ""#name#"" has no bx-docs equivalent - review docs/guides/markdown.md for what's natively supported" )
+			}
+		}
+	}
+
+	/**
+	 * Reports every `plugins` entry other than `search` (bx-docs' own
+	 * `local` search provider already covers that by default) - the rest
+	 * of the mkdocs plugin ecosystem has no bx-docs equivalent to map to.
+	 */
+	private void function reportUnmappedPlugins( required struct mkdocsConfig, required array warnings ) {
+		var plugins = arguments.mkdocsConfig.plugins ?: []
+		if ( !isArray( plugins ) ) {
+			return
+		}
+		for ( var entry in plugins ) {
+			var name = trim( isStruct( entry ) ? entry.keyArray()[ 1 ] : entry )
+			if ( !listFindNoCase( "search", name ) ) {
+				arguments.warnings.append( "mkdocs.yml plugins entry ""#name#"" has no bx-docs equivalent - if you need the same behavior, see docs/guides/plugins.md" )
+			}
+		}
+	}
+
+	/**
+	 * Converts mkdocs' own `nav:` shape (an array of bare path strings,
+	 * `{Title: path}` maps, or `{Title: [...nested...]}` group maps) into
+	 * NavBuilder.bx's own `navConfig` shape (`{title, path, children}`
+	 * nodes) - `docs/nav.json`'s documented override format.
+	 *
+	 * @mkdocsNav mkdocs.yml's own parsed `nav` array
+	 */
+	private array function convertNav( required array mkdocsNav ) {
+		return arguments.mkdocsNav.map( entry => convertNavEntry( entry ) )
+	}
+
+	private struct function convertNavEntry( required any entry ) {
+		if ( isSimpleValue( arguments.entry ) ) {
+			return { title : "", path : arguments.entry, children : [] }
+		}
+		var key = arguments.entry.keyArray()[ 1 ]
+		var value = arguments.entry[ key ]
+		if ( isArray( value ) ) {
+			return { title : key, path : "", children : convertNav( value ) }
+		}
+		return { title : key, path : value, children : [] }
+	}
+
+	/**
+	 * Copies mkdocs' own `docs_dir` tree into bx-docs' `docs/` - every
+	 * `.md` file with its asset references rewritten (rewriteAssetRefs()),
+	 * every other file relocated to `docs/assets/mkdocs/<same-relative-path>`
+	 * (bx-docs' asset pipeline only ever publishes `docs/assets/**`, and
+	 * mkdocs has no single asset-folder convention of its own to lean on).
+	 *
+	 * @mkdocsDocsDir Absolute path to the mkdocs project's own docs_dir
+	 * @docsDir Absolute path to the target project's docs/ directory
+	 * @warnings Accumulator array, mutated in place
+	 *
+	 * @return { pagesConverted: numeric, assetsConverted: numeric }
+	 */
+	private struct function copyDocsTree( required string mkdocsDocsDir, required string docsDir, required array warnings ) {
+		// directoryList()'s own default `type` isn't relied on here - filtered
+		// to files explicitly, the same seam DocsLoader.bx guards with its own
+		// "*.md" filter.
+		var allFiles = directoryList( arguments.mkdocsDocsDir, true, "path" ).filter( path => !directoryExists( path ) )
+		var pagesConverted = 0
+		var assetsConverted = 0
+
+		// Assets first, so every .md page's own rewriteAssetRefs() below can
+		// already tell "does this reference point at a file we're relocating".
+		for ( var sourcePath in allFiles ) {
+			var relativePath = sourcePath.reReplace( "^" & reEscape( arguments.mkdocsDocsDir ), "", "one" ).reReplace( "^[\/]", "" )
+			if ( relativePath.reFindNoCase( "\.md$" ) ) {
+				continue
+			}
+			var destPath = arguments.docsDir & "/assets/mkdocs/" & relativePath
+			var destDir = getDirectoryFromPath( destPath )
+			if ( len( destDir ) && !directoryExists( destDir ) ) {
+				directoryCreate( destDir, true, true )
+			}
+			fileCopy( sourcePath, destPath )
+			assetsConverted++
+		}
+
+		for ( var sourcePath in allFiles ) {
+			var relativePath = sourcePath.reReplace( "^" & reEscape( arguments.mkdocsDocsDir ), "", "one" ).reReplace( "^[\/]", "" )
+			if ( !relativePath.reFindNoCase( "\.md$" ) ) {
+				continue
+			}
+			var pageDir = getDirectoryFromPath( relativePath ).reReplace( "[\/]$", "" )
+			if ( pageDir == "." ) {
+				pageDir = ""
+			}
+			var converted = rewriteAssetRefs( fileRead( sourcePath ), pageDir, arguments.mkdocsDocsDir )
+
+			var destPath = arguments.docsDir & "/" & relativePath
+			var destDir = getDirectoryFromPath( destPath )
+			if ( len( destDir ) && !directoryExists( destDir ) ) {
+				directoryCreate( destDir, true, true )
+			}
+			if ( fileExists( destPath ) ) {
+				arguments.warnings.append( "#relativePath# already existed in docs/ and was overwritten by this migration" )
+			}
+			fileWrite( destPath, converted )
+			pagesConverted++
+		}
+
+		return { pagesConverted : pagesConverted, assetsConverted : assetsConverted }
+	}
+
+	/**
+	 * Rewrites every non-`.md` markdown link/image target in one page's
+	 * raw text that resolves (relative to the page's own directory, within
+	 * the *original* mkdocs docs_dir) to a real file - to the correct
+	 * relative path reaching that file's new `docs/assets/mkdocs/...`
+	 * location instead, accounting for the page's own nesting depth (the
+	 * same "author writes the right number of `../`" convention
+	 * docs/guides/markdown.md itself documents - computed here instead of
+	 * left to a human). A `.md` link, an absolute URL, or a reference that
+	 * doesn't resolve to a real file under docs_dir is left untouched.
+	 *
+	 * @text One page's raw markdown body
+	 * @pageDir The page's own docs_dir-relative directory ("" for a root-level page)
+	 * @mkdocsDocsDir Absolute path to the mkdocs project's own docs_dir, to resolve/verify a reference against
+	 */
+	private string function rewriteAssetRefs( required string text, required string pageDir, required string mkdocsDocsDir ) {
+		var pattern = createObject( "java", "java.util.regex.Pattern" ).compile( '\]\(([^)\s]+)(\s+"[^"]*")?\)' )
+		var matcher = pattern.matcher( arguments.text )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+
+		while ( matcher.find() ) {
+			var target = matcher.group( 1 )
+			var titlePart = isNull( matcher.group( 2 ) ) ? "" : matcher.group( 2 )
+			var rewritten = target
+
+			if ( !target.reFindNoCase( "\.md($|[##?])" ) && !target.reFindNoCase( "^[a-z][a-z0-9+.\-]*:" ) && target.left( 1 ) != "##" ) {
+				var docsRootRelative = normalizeRelativePath( len( arguments.pageDir ) ? arguments.pageDir & "/" & target : target )
+				if ( fileExists( arguments.mkdocsDocsDir & "/" & docsRootRelative ) ) {
+					var depth = len( arguments.pageDir ) ? listLen( arguments.pageDir, "/" ) : 0
+					rewritten = repeatString( "../", depth ) & "assets/mkdocs/" & docsRootRelative
+				}
+			}
+
+			matcher.appendReplacement( buffer, quoteReplacement( "](" & rewritten & titlePart & ")" ) )
+		}
+		matcher.appendTail( buffer )
+		return buffer.toString()
+	}
+
+	/**
+	 * Resolves `.`/`..` segments out of a docs_dir-relative path (a page
+	 * referencing `../shared/diagram.png` from two folders deep, say) -
+	 * plain textual resolution, no filesystem access.
+	 *
+	 * @path A docs_dir-relative path, possibly containing `.`/`..` segments
+	 */
+	private string function normalizeRelativePath( required string path ) {
+		var segments = listToArray( arguments.path, "/" )
+		var resolved = []
+		for ( var segment in segments ) {
+			if ( segment == "." || !len( segment ) ) {
+				continue
+			}
+			if ( segment == ".." && resolved.len() ) {
+				resolved.deleteAt( resolved.len() )
+			} else if ( segment != ".." ) {
+				resolved.append( segment )
+			}
+		}
+		return resolved.toList( "/" )
+	}
+
+	/**
+	 * @text Literal replacement text
+	 *
+	 * @return text, safe to pass as Matcher#appendReplacement's own replacement argument
+	 */
+	private string function quoteReplacement( required string text ) {
+		return createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( arguments.text )
+	}
+
+	/**
+	 * @text Literal text to embed in a regular expression
+	 *
+	 * @return text with every regex metacharacter escaped
+	 */
+	private string function reEscape( required string text ) {
+		return createObject( "java", "java.util.regex.Pattern" ).quote( arguments.text )
+	}
+
+}

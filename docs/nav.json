@@ -29,7 +29,8 @@
 		"title": "Migration & Deployment",
 		"children": [
 			"guides/deployment.md",
-			"guides/migrating-from-gitbook.md"
+			"guides/migrating-from-gitbook.md",
+			"guides/migrating-from-mkdocs.md"
 		]
 	}
 ]

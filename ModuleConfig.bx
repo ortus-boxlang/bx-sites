@@ -183,7 +183,7 @@ class {
 			"search-index" : "Rebuild the search index standalone",
 			"clean"        : "Remove site/ and any build cache",
 			"gh-deploy"    : "Build and force-push site/ to a gh-pages branch ([--branch], [--remote], [--message])",
-			"migrate"      : "Convert a GitBook export into docs/ + nav.json (--source, required)"
+			"migrate"      : "Convert a GitBook export or mkdocs project into a bx-docs project (--source, required; [--from=gitbook|mkdocs])"
 		}
 
 		var firstToken = arrayLen( arguments.args ) >= 1 ? arguments.args[ 1 ] : ""
