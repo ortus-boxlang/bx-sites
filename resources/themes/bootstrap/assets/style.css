@@ -643,17 +643,18 @@ dd {
 	margin-bottom: 0.25rem;
 }
 
-.toc .toc-level-3 {
+.toc .toc-level-3,
+.toc-mobile .toc-level-3 {
 	padding-left: 1rem;
 	font-size: 0.9em;
 }
 
-/* `theme.options.tocPosition: "sticky"` renders the same .toc markup in its
-   own right-hand column instead of inline atop the article (page.bxm skips
-   its own inline render in that mode) - stays in view while the article
-   scrolls underneath it, the same way GitBook keeps its own "On this page"
-   list pinned on long pages. .brand-navbar isn't itself sticky, so `top`
-   only needs to clear the sidebar's own top padding, not a fixed header. */
+/* `theme.options.tocPosition: "sticky"` renders the same TOC list in its
+   own right-hand column at xl+ instead of inline atop the article, stays
+   in view while the article scrolls underneath it, the same way GitBook
+   keeps its own "On this page" list pinned on long pages. .brand-navbar
+   isn't itself sticky, so `top` only needs to clear the sidebar's own top
+   padding, not a fixed header. */
 .toc-sidebar {
 	padding-top: 1.5rem;
 }
@@ -663,6 +664,64 @@ dd {
 	top: 1.5rem;
 	max-height: calc( 100vh - 3rem );
 	overflow-y: auto;
+}
+
+/* Below xl, the right-hand column above has no room, so this renders
+   instead - a collapsible bar pinned to the top of the viewport while
+   scrolling (VitePress/GitBook's own mobile "On this page" treatment),
+   rather than a static box that just scrolls away with the article. */
+.toc-mobile {
+	position: sticky;
+	top: 0;
+	z-index: 15;
+	margin: 0 0 1.5rem;
+	border: 1px solid var( --bxdocs-border );
+	border-radius: 12px;
+	background: var( --bxdocs-bg );
+}
+
+.toc-mobile[open] {
+	max-height: calc( 100vh - 2rem );
+	overflow-y: auto;
+}
+
+.toc-mobile__summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding: 0.6rem 1rem;
+	cursor: pointer;
+	font-weight: 600;
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	color: var( --bxdocs-muted );
+	list-style: none;
+}
+
+.toc-mobile__summary::-webkit-details-marker {
+	display: none;
+}
+
+.toc-mobile__summary::after {
+	content: "";
+	flex-shrink: 0;
+	width: 0.4em;
+	height: 0.4em;
+	border-right: 2px solid currentColor;
+	border-bottom: 2px solid currentColor;
+	transform: rotate( 45deg );
+	transition: transform 0.2s ease;
+}
+
+.toc-mobile[open] .toc-mobile__summary::after {
+	transform: rotate( -135deg );
+}
+
+.toc-mobile ul {
+	margin: 0;
+	padding: 0 1rem 0.75rem;
 }
 
 .page-nav {
