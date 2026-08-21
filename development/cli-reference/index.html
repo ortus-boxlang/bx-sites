@@ -84,7 +84,7 @@
 					<h1 class="page-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxdocs-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,56V200a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V56a8,8,0,0,1,8-8H216A8,8,0,0,1,224,56Z" opacity="0.2"/><path d="M128,128a8,8,0,0,1-3,6.25l-40,32a8,8,0,1,1-10-12.5L107.19,128,75,102.25a8,8,0,1,1,10-12.5l40,32A8,8,0,0,1,128,128Zm48,24H136a8,8,0,0,0,0,16h40a8,8,0,0,0,0-16Zm56-96V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56ZM216,200V56H40V200H216Z"/></svg></span> CLI Reference</h1>
 					<p class="page-summary">Every bxDocs verb and its flags.</p>
 <div class="page-tags mb-3"><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-reference">reference</a><a class="page-tag" href="/bx-docs/development/tags/index.html#tag-cli">cli</a></div>
-<details class="bxdocs-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">On this page</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#global-options">Global options</a></li><li class="toc-level-2"><a href="#new">new</a></li><li class="toc-level-2"><a href="#build">build</a></li><li class="toc-level-2"><a href="#serve">serve</a></li><li class="toc-level-2"><a href="#search-index">search-index</a></li><li class="toc-level-2"><a href="#clean">clean</a></li><li class="toc-level-2"><a href="#gh-deploy">gh-deploy</a></li><li class="toc-level-2"><a href="#migrate">migrate</a></li><li class="toc-level-3"><a href="#--fromgitbook-default">--from=gitbook (default)</a></li><li class="toc-level-3"><a href="#--frommkdocs">--from=mkdocs</a></li><li class="toc-level-3"><a href="#both">Both</a></li></ul></details>
+<details class="bxdocs-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">On this page</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#global-options">Global options</a></li><li class="toc-level-2"><a href="#new">new</a></li><li class="toc-level-2"><a href="#build">build</a></li><li class="toc-level-2"><a href="#serve">serve</a></li><li class="toc-level-2"><a href="#search-index">search-index</a></li><li class="toc-level-2"><a href="#clean">clean</a></li><li class="toc-level-2"><a href="#gh-deploy">gh-deploy</a></li><li class="toc-level-2"><a href="#migrate">migrate</a></li><li class="toc-level-3"><a href="#--fromgitbook-default">--from=gitbook (default)</a></li><li class="toc-level-3"><a href="#--frommkdocs">--from=mkdocs</a></li><li class="toc-level-3"><a href="#both">Both</a></li><li class="toc-level-2"><a href="#check">check</a></li></ul></details>
 					<h1 id="cli-reference"><a href="#cli-reference" id="cli-reference" name="cli-reference" class="anchor"></a>CLI Reference</h1>
 <pre><code class="language-bash">bxDocs &lt;verb&gt; [options]
 </code></pre>
@@ -191,8 +191,31 @@ anything couldn't be auto-converted, a list of exactly what needs a
 manual look - nothing is silently dropped. A destination file,
 <code>bxdocs.json</code>, or <code>docs/nav.json</code> that already exists is overwritten
 (also reported), so review the migrated output before committing it.</p>
+<h2 id="check"><a href="#check" id="check" name="check" class="anchor"></a><code>check</code></h2>
+<p>A CI-grade content quality gate over an already-built <code>site/</code> - run <code>build</code>
+first. Checks for:</p>
+<ul>
+<li><strong>Broken internal links/images</strong> - any <code>&lt;a href&gt;</code>/<code>&lt;img src&gt;</code> pointing at
+a page or asset that doesn't exist in <code>site/</code>. Fails the check.</li>
+<li><strong>Missing alt text</strong> - any <code>&lt;img&gt;</code> with no <code>alt</code> attribute at all. An
+empty <code>alt=&quot;&quot;</code> (the correct markup for a purely decorative image) is not
+flagged. Fails the check.</li>
+<li><strong>Orphaned pages</strong> - pages that exist in <code>site/</code> but aren't reachable by
+following links from any tree's own homepage (the main site's
+<code>index.html</code>, and each version's/locale's own). Informational only -
+never fails the check, since a page a project deliberately left out of
+its own nav (e.g. frontmatter <code>hidden: true</code>) is <em>supposed</em> to only be
+reachable by a direct link.</li>
+</ul>
+<pre><code class="language-bash">bxDocs build
+bxDocs check
+</code></pre>
+<p>Exits <code>1</code> when there are any broken links/images or missing-alt images,
+<code>0</code> otherwise (orphaned pages never affect the exit code). Deliberately
+internal-links-only - it does not make HTTP requests to check external
+URLs, which belongs in a dedicated link-checking tool run as its own job.</p>
 
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-docs/development/cli-reference.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 21, 2026, 4:13:01 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-docs/edit/development/docs/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-docs/development/cli-reference.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 21, 2026, 4:26:54 AM</span></div>
 				</article>
 
 				<nav class="page-nav d-flex justify-content-between" aria-label="Page navigation">
@@ -208,7 +231,7 @@ manual look - nothing is silently dropped. A destination file,
 			</main>
 
 			<aside class="col-xl-2 toc-sidebar d-none d-xl-block">
-				<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#global-options">Global options</a></li><li class="toc-level-2"><a href="#new">new</a></li><li class="toc-level-2"><a href="#build">build</a></li><li class="toc-level-2"><a href="#serve">serve</a></li><li class="toc-level-2"><a href="#search-index">search-index</a></li><li class="toc-level-2"><a href="#clean">clean</a></li><li class="toc-level-2"><a href="#gh-deploy">gh-deploy</a></li><li class="toc-level-2"><a href="#migrate">migrate</a></li><li class="toc-level-3"><a href="#--fromgitbook-default">--from=gitbook (default)</a></li><li class="toc-level-3"><a href="#--frommkdocs">--from=mkdocs</a></li><li class="toc-level-3"><a href="#both">Both</a></li></ul></nav>
+				<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#global-options">Global options</a></li><li class="toc-level-2"><a href="#new">new</a></li><li class="toc-level-2"><a href="#build">build</a></li><li class="toc-level-2"><a href="#serve">serve</a></li><li class="toc-level-2"><a href="#search-index">search-index</a></li><li class="toc-level-2"><a href="#clean">clean</a></li><li class="toc-level-2"><a href="#gh-deploy">gh-deploy</a></li><li class="toc-level-2"><a href="#migrate">migrate</a></li><li class="toc-level-3"><a href="#--fromgitbook-default">--from=gitbook (default)</a></li><li class="toc-level-3"><a href="#--frommkdocs">--from=mkdocs</a></li><li class="toc-level-3"><a href="#both">Both</a></li><li class="toc-level-2"><a href="#check">check</a></li></ul></nav>
 			</aside>
 
 		</div>

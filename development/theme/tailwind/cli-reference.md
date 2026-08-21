@@ -148,3 +148,30 @@ anything couldn't be auto-converted, a list of exactly what needs a
 manual look - nothing is silently dropped. A destination file,
 `bxdocs.json`, or `docs/nav.json` that already exists is overwritten
 (also reported), so review the migrated output before committing it.
+
+## `check`
+
+A CI-grade content quality gate over an already-built `site/` - run `build`
+first. Checks for:
+
+- **Broken internal links/images** - any `<a href>`/`<img src>` pointing at
+  a page or asset that doesn't exist in `site/`. Fails the check.
+- **Missing alt text** - any `<img>` with no `alt` attribute at all. An
+  empty `alt=""` (the correct markup for a purely decorative image) is not
+  flagged. Fails the check.
+- **Orphaned pages** - pages that exist in `site/` but aren't reachable by
+  following links from any tree's own homepage (the main site's
+  `index.html`, and each version's/locale's own). Informational only -
+  never fails the check, since a page a project deliberately left out of
+  its own nav (e.g. frontmatter `hidden: true`) is *supposed* to only be
+  reachable by a direct link.
+
+```bash
+bxDocs build
+bxDocs check
+```
+
+Exits `1` when there are any broken links/images or missing-alt images,
+`0` otherwise (orphaned pages never affect the exit code). Deliberately
+internal-links-only - it does not make HTTP requests to check external
+URLs, which belongs in a dedicated link-checking tool run as its own job.
