@@ -52,7 +52,7 @@
 		listHtml &= '</ul>'
 
 		if ( arguments.hideAtXl ) {
-			return '<details class="toc-mobile d-xl-none"><summary class="toc-mobile__summary">On this page</summary>' & listHtml & '</details>'
+			return '<details class="bxdocs-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">On this page</summary>' & listHtml & '</details>'
 		}
 
 		return '<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div>' & listHtml & '</nav>'

@@ -916,6 +916,7 @@ class {
 		fileCopy( moduleAssetsDir() & "/copy-code.js", arguments.siteDir & "/assets/copy-code.js" )
 		fileCopy( moduleAssetsDir() & "/admonition-collapse.js", arguments.siteDir & "/assets/admonition-collapse.js" )
 		fileCopy( moduleAssetsDir() & "/nav-toggle.js", arguments.siteDir & "/assets/nav-toggle.js" )
+		fileCopy( moduleAssetsDir() & "/toc-collapse.js", arguments.siteDir & "/assets/toc-collapse.js" )
 		fileCopy( moduleAssetsDir() & "/highlight-boxlang.js", arguments.siteDir & "/assets/highlight-boxlang.js" )
 		fileCopy( moduleAssetsDir() & "/tabs.js", arguments.siteDir & "/assets/tabs.js" )
 		fileCopy( moduleAssetsDir() & "/code-lines.js", arguments.siteDir & "/assets/code-lines.js" )
