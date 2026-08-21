@@ -89,7 +89,7 @@ class {
 		// exactly as authored - only the src="..." piece is stripped, then
 		// the new src/srcset/sizes are spliced in right after "<img".
 		var withoutSrc = variables.srcPattern.matcher( arguments.tag ).replaceFirst( "" )
-		var newAttrs = ' src="' & arguments.basePath & arguments.key & '"'
+		var newAttrs = ' src="' & arguments.basePath & key & '"'
 		if ( entry.originalVariants.len() ) {
 			newAttrs &= ' srcset="' & buildSrcset( entry.originalVariants, key, arguments.basePath ) & '" sizes="' & variables.sizesAttr & '"'
 		}
