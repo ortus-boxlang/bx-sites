@@ -39,17 +39,23 @@
 
 	// @hideAtXl true for the sticky-position variant's own mobile/tablet
 	// fallback - a right-hand rail can't fit below 1200px (see
-	// style.css's own `.md-toc-sidebar` breakpoint), so this same box
-	// renders inline instead, hidden again once the rail takes over,
-	// rather than leaving the TOC inaccessible below that width.
+	// style.css's own `.md-toc-sidebar` breakpoint), so this renders as a
+	// collapsible bar pinned to the top of the viewport while scrolling
+	// instead (VitePress/GitBook's own mobile "On this page" treatment) -
+	// hidden again once the rail takes over, rather than leaving the TOC
+	// inaccessible below that width.
 	function renderToc( required array toc, boolean hideAtXl = false ) {
-		var html = '<nav class="md-toc' & ( arguments.hideAtXl ? ' md-toc--mobile' : '' ) & '" aria-label="On this page">'
-		html &= '<div class="md-toc__title">On this page</div><ul>'
+		var listHtml = '<ul>'
 		for ( var item in arguments.toc ) {
-			html &= '<li class="md-toc__item md-toc__item--' & item.level & '"><a href="##' & item.id & '">' & encodeForHTML( item.text ) & '</a></li>'
+			listHtml &= '<li class="md-toc__item md-toc__item--' & item.level & '"><a href="##' & item.id & '">' & encodeForHTML( item.text ) & '</a></li>'
 		}
-		html &= '</ul></nav>'
-		return html
+		listHtml &= '</ul>'
+
+		if ( arguments.hideAtXl ) {
+			return '<details class="md-toc--mobile"><summary class="md-toc--mobile__summary">On this page</summary>' & listHtml & '</details>'
+		}
+
+		return '<nav class="md-toc" aria-label="On this page"><div class="md-toc__title">On this page</div>' & listHtml & '</nav>'
 	}
 
 	function tagSlug( required string tag ) {
