@@ -99,12 +99,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.message ).toInclude( "Migrated 1 page(s)" );
 				expect( fileExists( projectRoot & "/bxdocs.yaml" ) ).toBeTrue();
 				expect( fileExists( projectRoot & "/docs/index.md" ) ).toBeTrue();
-				// A format-agnostic substring check rather than parsing the
-				// written YAML back (real bx-yaml serialization, unseamed at
-				// this CLI-dispatch layer - Migrate.bx exposes no test seam
-				// of its own, same reasoning BuildSpec.bx already avoids
-				// exercising a real markdown conversion for).
-				expect( fileRead( projectRoot & "/bxdocs.yaml" ) ).toInclude( "My Docs" );
+				expect( yamlDeserialize( fileRead( projectRoot & "/bxdocs.yaml" ) ).name ).toBe( "My Docs" );
 			} );
 
 		} );

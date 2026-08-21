@@ -30,21 +30,22 @@
  */
 class {
 
-	variables.yamlParser = new "models.build.MkdocsYamlParser@bxdocs"()
-
 	/**
-	 * Serializes the generated `bxdocs.yaml` - real bx-yaml BIFs by default,
-	 * swappable via setYamlRenderer() (YamlRenderer.bx's own docblock
-	 * explains why). Unrelated to `variables.yamlParser` above, which reads
-	 * the *source* `mkdocs.yml` via this module's own small hand-rolled
-	 * subset parser (MkdocsYamlParser.bx's own docblock).
+	 * Reads the source `mkdocs.yml` and serializes the generated
+	 * `bxdocs.yaml` - real bx-yaml BIFs by default, swappable via
+	 * setYamlRenderer() (YamlRenderer.bx's own docblock explains why). A
+	 * full YAML parser handles anything a real `mkdocs.yml` can contain
+	 * (anchors, flow mappings, multi-doc streams, ...) that a hand-rolled
+	 * subset parser wouldn't - this module used to carry its own
+	 * (MkdocsYamlParser.bx, removed once bx-yaml became a dependency anyway
+	 * for `bxdocs.yaml` itself; no reason for two YAML readers in one module).
 	 */
 	variables.yamlRenderer = new "models.build.YamlRenderer@bxdocs"()
 
 	/**
 	 * Swaps in a fake/test YAML renderer - see YamlRenderer.bx's docblock.
 	 *
-	 * @renderer Any object exposing `toYaml( value )`
+	 * @renderer Any object exposing `fromYaml( content )`/`toYaml( value )`
 	 */
 	void function setYamlRenderer( required any renderer ) {
 		variables.yamlRenderer = arguments.renderer
@@ -79,7 +80,22 @@ class {
 			)
 		}
 
-		var mkdocsConfig = variables.yamlParser.parse( fileRead( configSourcePath ) )
+		var mkdocsConfig = ""
+		try {
+			mkdocsConfig = variables.yamlRenderer.fromYaml( fileRead( configSourcePath ) )
+		} catch ( any e ) {
+			throw(
+				type    = "BxDocs.InvalidMkdocsConfig",
+				message = "mkdocs.yml at [#configSourcePath#] is not valid YAML: #e.message#"
+			)
+		}
+		if ( !isStruct( mkdocsConfig ) ) {
+			throw(
+				type    = "BxDocs.InvalidMkdocsConfig",
+				message = "mkdocs.yml at [#configSourcePath#] must contain a YAML object"
+			)
+		}
+
 		var warnings = []
 
 		var mkdocsDocsDir = arguments.sourceDir & "/" & trim( len( trim( mkdocsConfig.docs_dir ?: "" ) ) ? mkdocsConfig.docs_dir : "docs" )
@@ -130,7 +146,7 @@ class {
 	 * for; ConfigLoader.bx's own defaults cover everything else once this
 	 * is loaded normally by `build`.
 	 *
-	 * @mkdocsConfig MkdocsYamlParser.parse()'s own output
+	 * @mkdocsConfig The parsed mkdocs.yml struct (variables.yamlRenderer.fromYaml()'s own output)
 	 * @sourceDir Absolute path to the mkdocs project root (for the site-name-fallback warning message)
 	 * @warnings Accumulator array, mutated in place
 	 */
