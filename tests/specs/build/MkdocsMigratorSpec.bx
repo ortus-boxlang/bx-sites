@@ -53,7 +53,7 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxDocs.MigrateMissingDocsDir" );
 			} );
 
-			it( "converts site_name/site_description/site_url/repo into bxdocs.json", function() {
+			it( "converts site_name/site_description/site_url/repo into bxdocs.yaml", function() {
 				var source = newMkdocsProject(
 					'site_name: My Docs' & char( 10 ) &
 					'site_description: A great project' & char( 10 ) &
@@ -66,7 +66,7 @@ class extends="testbox.system.BaseSpec" {
 
 				var result = migrator.migrate( source, projectRoot );
 
-				var config = jsonDeserialize( fileRead( result.configPath ) );
+				var config = yamlDeserialize( fileRead( result.configPath ) );
 				expect( config.name ).toBe( "My Docs" );
 				expect( config.description ).toBe( "A great project" );
 				expect( config.baseURL ).toBe( "https://example.com/docs/" );
@@ -80,12 +80,12 @@ class extends="testbox.system.BaseSpec" {
 				var materialSource = newMkdocsProject( "site_name: Docs" & char( 10 ) & "theme:" & char( 10 ) & "  name: material" );
 				fileWrite( materialSource & "/docs/index.md", "Home" );
 				var materialResult = migrator.migrate( materialSource, newProjectRoot() );
-				expect( jsonDeserialize( fileRead( materialResult.configPath ) ).theme.name ).toBe( "material" );
+				expect( yamlDeserialize( fileRead( materialResult.configPath ) ).theme.name ).toBe( "material" );
 
 				var customSource = newMkdocsProject( "site_name: Docs" & char( 10 ) & "theme:" & char( 10 ) & "  name: cinder" );
 				fileWrite( customSource & "/docs/index.md", "Home" );
 				var customResult = migrator.migrate( customSource, newProjectRoot() );
-				expect( jsonDeserialize( fileRead( customResult.configPath ) ).theme.name ).toBe( "bootstrap" );
+				expect( yamlDeserialize( fileRead( customResult.configPath ) ).theme.name ).toBe( "bootstrap" );
 				expect( customResult.warnings.len() ).toBeGT( 0 );
 			} );
 
@@ -100,7 +100,7 @@ class extends="testbox.system.BaseSpec" {
 				fileWrite( source & "/docs/index.md", "Home" );
 
 				var result = migrator.migrate( source, newProjectRoot() );
-				var config = jsonDeserialize( fileRead( result.configPath ) );
+				var config = yamlDeserialize( fileRead( result.configPath ) );
 
 				expect( config.markdown.enableFootnotes ).toBeTrue();
 				expect( config.markdown.enableDefinitionLists ).toBeTrue();
@@ -154,7 +154,7 @@ class extends="testbox.system.BaseSpec" {
 				fileWrite( source & "/docs/about.md", "About" );
 
 				var result = migrator.migrate( source, newProjectRoot() );
-				var nav = jsonDeserialize( fileRead( result.navPath ) );
+				var nav = yamlDeserialize( fileRead( result.navPath ) );
 
 				expect( nav.len() ).toBe( 3 );
 				expect( nav[ 1 ].title ).toBe( "Home" );
@@ -208,20 +208,20 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileRead( projectRoot & "/docs/index.md" ) ).toBe( body );
 			} );
 
-			it( "warns and overwrites when bxdocs.json/docs/nav.json already exist", function() {
+			it( "warns and overwrites when bxdocs.yaml/docs/nav.json already exist", function() {
 				var source = newMkdocsProject( "site_name: Docs" & char( 10 ) & "nav:" & char( 10 ) & "  - Home: index.md" );
 				fileWrite( source & "/docs/index.md", "Home" );
 
 				var projectRoot = newProjectRoot();
-				fileWrite( projectRoot & "/bxdocs.json", '{"name":"Old"}' );
+				fileWrite( projectRoot & "/bxdocs.yaml", 'name: "Old"' );
 				directoryCreate( projectRoot & "/docs", true, true );
 				fileWrite( projectRoot & "/docs/nav.json", "[]" );
 
 				var result = migrator.migrate( source, projectRoot );
 
-				expect( result.warnings.filter( w => w.findNoCase( "bxdocs.json already existed" ) > 0 ).len() ).toBe( 1 );
+				expect( result.warnings.filter( w => w.findNoCase( "bxdocs.yaml already existed" ) > 0 ).len() ).toBe( 1 );
 				expect( result.warnings.filter( w => w.findNoCase( "nav.json already existed" ) > 0 ).len() ).toBe( 1 );
-				expect( jsonDeserialize( fileRead( result.configPath ) ).name ).toBe( "Docs" );
+				expect( yamlDeserialize( fileRead( result.configPath ) ).name ).toBe( "Docs" );
 			} );
 
 			it( "defaults [name] to the source folder name and warns when mkdocs.yml has no site_name", function() {
@@ -230,7 +230,7 @@ class extends="testbox.system.BaseSpec" {
 
 				var result = migrator.migrate( source, newProjectRoot() );
 
-				expect( jsonDeserialize( fileRead( result.configPath ) ).name ).toBe( listLast( source, "/\" ) );
+				expect( yamlDeserialize( fileRead( result.configPath ) ).name ).toBe( listLast( source, "/\" ) );
 				expect( result.warnings.filter( w => w.findNoCase( "no [site_name]" ) > 0 ).len() ).toBe( 1 );
 			} );
 

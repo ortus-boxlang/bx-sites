@@ -34,7 +34,8 @@
     ],
     "dependencies":{
         "bx-markdown":"*",
-        "bx-esapi":"*"
+        "bx-esapi":"*",
+        "bx-yaml":"*"
     },
     "devDependencies":{
         "commandbox-boxlang":"*",

@@ -1,6 +1,6 @@
 /**
  * Converts an mkdocs project (an `mkdocs.yml` plus its `docs/` folder) into
- * a bx-docs project - `mkdocs.yml` becomes `bxdocs.json` + `docs/nav.json`,
+ * a bx-docs project - `mkdocs.yml` becomes `bxdocs.yaml` + `docs/nav.json`,
  * and every `.md` page is copied across with its asset references rewritten.
  *
  * Unlike GitBookMigrator.bx, this is mostly a *config* translation, not a
@@ -24,7 +24,7 @@
  *
  * Anything mkdocs-specific with no bx-docs equivalent - most
  * `markdown_extensions`/`plugins`/`theme.features` entries, mkdocs-material's
- * own color-palette config - is left out of the generated `bxdocs.json`
+ * own color-palette config - is left out of the generated `bxdocs.yaml`
  * and reported into `migrate()`'s own `warnings`, the same
  * nothing-silently-dropped philosophy GitBookMigrator.bx already uses.
  */
@@ -34,7 +34,7 @@ class {
 
 	/**
 	 * Extension names with a direct, always-on bx-markdown/bx-docs
-	 * equivalent - present in `markdown_extensions` needs no `bxdocs.json`
+	 * equivalent - present in `markdown_extensions` needs no `bxdocs.yaml`
 	 * change and no warning (admonitions/footnotes/def_list are handled by
 	 * their own explicit mapping below; these are the ones that are just
 	 * "already true, nothing to do").
@@ -43,7 +43,7 @@ class {
 
 	/**
 	 * Migrates an mkdocs project at `sourceDir` into `projectRoot` - reads
-	 * `mkdocs.yml`, writes `projectRoot/bxdocs.json` and
+	 * `mkdocs.yml`, writes `projectRoot/bxdocs.yaml` and
 	 * `projectRoot/docs/nav.json`, and copies every page + asset from
 	 * mkdocs' own `docs_dir` (default `docs/`) into `projectRoot/docs/`.
 	 *
@@ -91,11 +91,11 @@ class {
 		}
 
 		var bxdocsConfig = buildBxdocsConfig( mkdocsConfig, arguments.sourceDir, warnings )
-		var configPath = arguments.projectRoot & "/bxdocs.json"
+		var configPath = arguments.projectRoot & "/bxdocs.yaml"
 		if ( fileExists( configPath ) ) {
-			warnings.append( "bxdocs.json already existed and was overwritten by this migration" )
+			warnings.append( "bxdocs.yaml already existed and was overwritten by this migration" )
 		}
-		fileWrite( configPath, jsonSerialize( bxdocsConfig ) )
+		fileWrite( configPath, yamlSerialize( bxdocsConfig ) )
 
 		return {
 			pagesConverted  : copyResult.pagesConverted,
@@ -107,7 +107,7 @@ class {
 	}
 
 	/**
-	 * Translates the parsed `mkdocs.yml` struct into a `bxdocs.json` struct
+	 * Translates the parsed `mkdocs.yml` struct into a `bxdocs.yaml` struct
 	 * - only the fields this converter has a confident, direct mapping
 	 * for; ConfigLoader.bx's own defaults cover everything else once this
 	 * is loaded normally by `build`.
@@ -120,7 +120,7 @@ class {
 		var siteName = trim( arguments.mkdocsConfig.site_name ?: "" )
 		if ( !len( siteName ) ) {
 			siteName = listLast( arguments.sourceDir.reReplace( "[\/]+$", "" ), "/\" )
-			arguments.warnings.append( "mkdocs.yml has no [site_name] - defaulted bxdocs.json [name] to ""#siteName#""" )
+			arguments.warnings.append( "mkdocs.yml has no [site_name] - defaulted bxdocs.yaml [name] to ""#siteName#""" )
 		}
 
 		var config = { "name" : siteName }

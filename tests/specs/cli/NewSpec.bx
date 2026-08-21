@@ -28,13 +28,25 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxDocs.MissingProjectRoot" );
 			} );
 
-			it( "scaffolds a project defaulting to the bootstrap theme, returning exitCode 0", function() {
+			it( "scaffolds a project defaulting to the bootstrap theme and bxdocs.yaml, returning exitCode 0", function() {
 				var dir = newTargetDir();
 				var result = verb.run( { projectRoot : dir } );
 
 				expect( result.exitCode ).toBe( 0 );
-				expect( fileExists( dir & "/bxdocs.json" ) ).toBeTrue();
+				expect( fileExists( dir & "/bxdocs.yaml" ) ).toBeTrue();
+				expect( fileExists( dir & "/bxdocs.json" ) ).toBeFalse();
 				expect( result.message ).toInclude( "bootstrap" );
+			} );
+
+			it( "honors an explicit --format=json, scaffolding bxdocs.json instead", function() {
+				var dir = newTargetDir();
+				var result = verb.run( { projectRoot : dir, format : "json" } );
+
+				expect( fileExists( dir & "/bxdocs.json" ) ).toBeTrue();
+				expect( fileExists( dir & "/bxdocs.yaml" ) ).toBeFalse();
+
+				var config = new "models.config.ConfigLoader@bxdocs"().load( dir );
+				expect( config.theme.name ).toBe( "bootstrap" );
 			} );
 
 			it( "derives the site name from the target directory name when --name is omitted", function() {

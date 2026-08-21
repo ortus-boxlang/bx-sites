@@ -38,17 +38,18 @@ flags below can appear before any verb.
 Scaffold a docs project.
 
 ```bash
-bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...]
+bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...] [--format=yaml|json]
 ```
 
-- `--name` - the site name written into `bxdocs.json` (defaults to the target directory's name)
+- `--name` - the site name written into the site config (defaults to the target directory's name)
 - `--theme` - defaults to `bootstrap`
-- `--description` - the site description written into `bxdocs.json`
+- `--description` - the site description written into the site config
+- `--format` - `yaml` (default, scaffolds `bxdocs.yaml`) or `json` (scaffolds `bxdocs.json`) - see [Configuration](configuration.md)
 
 ## `build`
 
 Render `docs/**.md` into a static site in `site/`. Also builds the search
-index (unless `search` is `false` in `bxdocs.json`, or `searchProvider` is
+index (unless `search` is `false` in the site config, or `searchProvider` is
 set to a provider - like `algolia`/`pagefind` - that doesn't use it, see
 [Search](guides/search.md)), runs the `pagefind` CLI against the finished
 `site/` when `searchProvider.provider` is `"pagefind"`, and copies theme +
@@ -80,7 +81,7 @@ bxDocs search-index
 
 ## `clean`
 
-Remove `site/` and any build cache, leaving `docs/` and `bxdocs.json` alone.
+Remove `site/` and any build cache, leaving `docs/` and the site config alone.
 
 ```bash
 bxDocs clean
@@ -132,7 +133,7 @@ see [Markdown Extensions](guides/markdown.md#gitbook-style-blocks)),
 ### `--from=mkdocs`
 
 An mkdocs project - `mkdocs.yml` plus its `docs/` folder - into a
-complete bx-docs project: `mkdocs.yml` becomes `bxdocs.json` +
+complete bx-docs project: `mkdocs.yml` becomes `bxdocs.yaml` +
 `docs/nav.json`, and every page is copied across largely unchanged, since
 mkdocs-material's own admonition/tabs/math/code-annotation syntax already
 *is* bx-docs' own native syntax - see
@@ -146,7 +147,7 @@ their references rewritten.
 Prints a summary of pages (and, for mkdocs, assets) converted and, when
 anything couldn't be auto-converted, a list of exactly what needs a
 manual look - nothing is silently dropped. A destination file,
-`bxdocs.json`, or `docs/nav.json` that already exists is overwritten
+`bxdocs.yaml`, or `docs/nav.json` that already exists is overwritten
 (also reported), so review the migrated output before committing it.
 
 ## `check`

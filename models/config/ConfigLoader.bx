@@ -1,12 +1,32 @@
 /**
- * Reads, defaults, and validates a project's `bxdocs.json` site configuration
- * (module spec section 4). Pure struct in, struct out - no CLI/argv concerns,
- * so it is unit-testable directly against a temp project directory.
+ * Reads, defaults, and validates a project's site configuration (module spec
+ * section 4). `bxdocs.yaml` (or `.yml`) is the preferred/default format -
+ * `bxdocs.json` is still fully supported for existing projects, resolved in
+ * that order when more than one is present. Pure struct in, struct out - no
+ * CLI/argv concerns, so it is unit-testable directly against a temp project
+ * directory.
  */
 class {
 
 	/**
-	 * Default site configuration, deep-merged with the user's bxdocs.json.
+	 * The config file names this module recognizes, in resolution
+	 * preference order - the first one found on disk wins. `bxdocs.yaml`/
+	 * `.yml` are parsed via bx-yaml's `yamlDeserialize()`/`yamlDeserializeFile()`
+	 * BIFs, `bxdocs.json` via the built-in `jsonDeserialize()`.
+	 */
+	variables.configFileNames = [ "bxdocs.yaml", "bxdocs.yml", "bxdocs.json" ]
+
+	/**
+	 * The config file name in play for the current/last `load()` call - only
+	 * used to phrase validation error messages against whichever file the
+	 * project actually has. Defaults to the preferred name so a direct,
+	 * standalone `validate()` call (bypassing `load()` - not used by this
+	 * module itself, but a valid call shape) still produces a sensible message.
+	 */
+	variables.configFileName = "bxdocs.yaml"
+
+	/**
+	 * Default site configuration, deep-merged with the user's site config.
 	 * Markdown passthrough options are otherwise left to bx-markdown's own
 	 * defaults - the one exception is `enableAdmonition`, which bx-docs
 	 * itself defaults to `true` (admonition callout blocks have always been
@@ -46,8 +66,9 @@ class {
 	variables.builtInThemes = [ "bootstrap", "material", "tailwind" ]
 
 	/**
-	 * Reads and validates `<projectRoot>/bxdocs.json`, merging it over the
-	 * module's own defaults.
+	 * Reads and validates a project's site config - `<projectRoot>/bxdocs.yaml`
+	 * (or `.yml`/`.json`, whichever is actually present - see `configFileNames`),
+	 * merging it over the module's own defaults.
 	 *
 	 * @projectRoot Absolute path to the project root
 	 *
@@ -55,28 +76,31 @@ class {
 	 */
 	struct function load( required string projectRoot ) {
 		var configPath = configPathFor( arguments.projectRoot )
+		variables.configFileName = configPath.listLast( "/" )
 
 		if ( !fileExists( configPath ) ) {
 			throw(
 				type    = "BxDocs.ConfigNotFound",
-				message = "No bxdocs.json found at [#configPath#] - run `new` to scaffold a project first"
+				message = "No bxdocs.yaml (or bxdocs.json) found at [#arguments.projectRoot#] - run `new` to scaffold a project first"
 			)
 		}
 
+		var isYaml = variables.configFileName.endsWith( ".yaml" ) || variables.configFileName.endsWith( ".yml" )
+
 		var parsed = ""
 		try {
-			parsed = jsonDeserialize( fileRead( configPath ) )
+			parsed = isYaml ? yamlDeserialize( fileRead( configPath ) ) : jsonDeserialize( fileRead( configPath ) )
 		} catch ( any e ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json at [#configPath#] is not valid JSON: #e.message#"
+				message = "#variables.configFileName# at [#configPath#] is not valid #isYaml ? 'YAML' : 'JSON'#: #e.message#"
 			)
 		}
 
 		if ( !isStruct( parsed ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json at [#configPath#] must contain a JSON object"
+				message = "#variables.configFileName# at [#configPath#] must contain a #isYaml ? 'YAML' : 'JSON'# object"
 			)
 		}
 
@@ -84,21 +108,32 @@ class {
 	}
 
 	/**
-	 * The absolute path to a project's `bxdocs.json`, regardless of whether it exists yet.
+	 * The absolute path to a project's site config file - the first of
+	 * `configFileNames` found on disk under `projectRoot`, or the preferred
+	 * `bxdocs.yaml` path when none exist yet (a project with no config at all).
 	 *
 	 * @projectRoot Absolute path to the project root
 	 */
 	string function configPathFor( required string projectRoot ) {
-		return arguments.projectRoot.reReplace( "[\/]+$", "" ) & "/bxdocs.json"
+		var dir = arguments.projectRoot.reReplace( "[\/]+$", "" )
+
+		for ( var fileName in variables.configFileNames ) {
+			var candidate = dir & "/" & fileName
+			if ( fileExists( candidate ) ) {
+				return candidate
+			}
+		}
+
+		return dir & "/" & variables.configFileNames[ 1 ]
 	}
 
 	/**
-	 * Deep-merges a parsed bxdocs.json struct over the module defaults - a
+	 * Deep-merges a parsed site config struct over the module defaults - a
 	 * user-supplied key wins outright, a user-supplied struct key is merged
 	 * one level deep (so `{"theme":{"name":"material"}}` still keeps the
 	 * default empty `options`), everything else falls back to the default.
 	 *
-	 * @config The parsed bxdocs.json struct
+	 * @config The parsed site config struct
 	 *
 	 * @return The config struct with defaults applied
 	 */
@@ -129,7 +164,7 @@ class {
 		if ( !len( trim( arguments.config.name ?: "" ) ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json is missing a required [name] property"
+				message = "#variables.configFileName# is missing a required [name] property"
 			)
 		}
 
@@ -137,7 +172,7 @@ class {
 		if ( !isStruct( theme ) || !len( trim( theme.name ?: "" ) ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [theme] must be an object with a [name] property"
+				message = "#variables.configFileName# [theme] must be an object with a [name] property"
 			)
 		}
 
@@ -145,14 +180,14 @@ class {
 		if ( !listFindNoCase( "light,dark,auto", colorMode ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [theme.options.colorMode], when present, must be one of: light, dark, auto"
+				message = "#variables.configFileName# [theme.options.colorMode], when present, must be one of: light, dark, auto"
 			)
 		}
 
 		if ( !isSimpleValue( theme.logo ?: "" ) || !isSimpleValue( theme.favicon ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [theme.logo]/[theme.favicon], when present, must be strings"
+				message = "#variables.configFileName# [theme.logo]/[theme.favicon], when present, must be strings"
 			)
 		}
 
@@ -160,7 +195,7 @@ class {
 			if ( theme.options.keyExists( navFlag ) && !isBoolean( theme.options[ navFlag ] ) ) {
 				throw(
 					type    = "BxDocs.InvalidConfig",
-					message = "bxdocs.json [theme.options.#navFlag#], when present, must be a boolean"
+					message = "#variables.configFileName# [theme.options.#navFlag#], when present, must be a boolean"
 				)
 			}
 		}
@@ -169,7 +204,7 @@ class {
 		if ( !listFindNoCase( "top,sticky", tocPosition ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [theme.options.tocPosition], when present, must be one of: top, sticky"
+				message = "#variables.configFileName# [theme.options.tocPosition], when present, must be one of: top, sticky"
 			)
 		}
 
@@ -177,14 +212,14 @@ class {
 		if ( !listFindNoCase( "top,bottom", pageMetaPosition ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [theme.options.pageMetaPosition], when present, must be one of: top, bottom"
+				message = "#variables.configFileName# [theme.options.pageMetaPosition], when present, must be one of: top, bottom"
 			)
 		}
 
 		if ( !isBoolean( arguments.config.search ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [search] must be a boolean"
+				message = "#variables.configFileName# [search] must be a boolean"
 			)
 		}
 
@@ -193,28 +228,28 @@ class {
 		if ( !isBoolean( arguments.config.mermaid ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [mermaid] must be a boolean"
+				message = "#variables.configFileName# [mermaid] must be a boolean"
 			)
 		}
 
 		if ( !isBoolean( arguments.config.math ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [math] must be a boolean"
+				message = "#variables.configFileName# [math] must be a boolean"
 			)
 		}
 
 		if ( !isArray( arguments.config.nav ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [nav], when present, must be an array"
+				message = "#variables.configFileName# [nav], when present, must be an array"
 			)
 		}
 
 		if ( !isStruct( arguments.config.markdown ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [markdown], when present, must be an object"
+				message = "#variables.configFileName# [markdown], when present, must be an object"
 			)
 		}
 
@@ -222,21 +257,21 @@ class {
 		if ( !isStruct( repo ) || !isSimpleValue( repo.url ?: "" ) || !isSimpleValue( repo.editUri ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [repo], when present, must be an object with string [url]/[editUri]"
+				message = "#variables.configFileName# [repo], when present, must be an object with string [url]/[editUri]"
 			)
 		}
 
 		if ( !isArray( arguments.config.social ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [social], when present, must be an array"
+				message = "#variables.configFileName# [social], when present, must be an array"
 			)
 		}
 		for ( var link in arguments.config.social ) {
 			if ( !isStruct( link ) || !len( trim( link.url ?: "" ) ) ) {
 				throw(
 					type    = "BxDocs.InvalidConfig",
-					message = "bxdocs.json [social] entries must be objects with a non-empty [url]"
+					message = "#variables.configFileName# [social] entries must be objects with a non-empty [url]"
 				)
 			}
 		}
@@ -244,14 +279,14 @@ class {
 		if ( !isBoolean( arguments.config.footer ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [footer] must be a boolean"
+				message = "#variables.configFileName# [footer] must be a boolean"
 			)
 		}
 
 		if ( !isBoolean( arguments.config.lastUpdated ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [lastUpdated] must be a boolean"
+				message = "#variables.configFileName# [lastUpdated] must be a boolean"
 			)
 		}
 
@@ -259,40 +294,40 @@ class {
 		if ( !isStruct( analytics ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [analytics], when present, must be an object"
+				message = "#variables.configFileName# [analytics], when present, must be an object"
 			)
 		}
 		var analyticsProvider = trim( analytics.provider ?: "" )
 		if ( len( analyticsProvider ) && analyticsProvider != "google" ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [analytics.provider], when present, must be: google"
+				message = "#variables.configFileName# [analytics.provider], when present, must be: google"
 			)
 		}
 		if ( analyticsProvider == "google" && !len( trim( analytics.id ?: "" ) ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [analytics.id] is required when [analytics.provider] is set"
+				message = "#variables.configFileName# [analytics.id] is required when [analytics.provider] is set"
 			)
 		}
 		if ( len( analyticsProvider ) && !reFind( "^[A-Za-z0-9\-]+$", trim( analytics.id ?: "" ) ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [analytics.id] must contain only letters, numbers and hyphens"
+				message = "#variables.configFileName# [analytics.id] must contain only letters, numbers and hyphens"
 			)
 		}
 
 		if ( !isSimpleValue( arguments.config.ogImage ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [ogImage], when present, must be a string"
+				message = "#variables.configFileName# [ogImage], when present, must be a string"
 			)
 		}
 
 		if ( !isBoolean( arguments.config.generateOgImages ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [generateOgImages], when present, must be a boolean"
+				message = "#variables.configFileName# [generateOgImages], when present, must be a boolean"
 			)
 		}
 
@@ -301,14 +336,14 @@ class {
 			if ( !isArray( assetUrls ) ) {
 				throw(
 					type    = "BxDocs.InvalidConfig",
-					message = "bxdocs.json [#assetsKey#], when present, must be an array"
+					message = "#variables.configFileName# [#assetsKey#], when present, must be an array"
 				)
 			}
 			for ( var assetUrl in assetUrls ) {
 				if ( !isSimpleValue( assetUrl ) || !len( trim( assetUrl ) ) ) {
 					throw(
 						type    = "BxDocs.InvalidConfig",
-						message = "bxdocs.json [#assetsKey#] entries must be non-empty strings"
+						message = "#variables.configFileName# [#assetsKey#] entries must be non-empty strings"
 					)
 				}
 			}
@@ -317,14 +352,14 @@ class {
 		if ( !isArray( arguments.config.plugins ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [plugins], when present, must be an array"
+				message = "#variables.configFileName# [plugins], when present, must be an array"
 			)
 		}
 		for ( var pluginName in arguments.config.plugins ) {
 			if ( !isSimpleValue( pluginName ) || !len( trim( pluginName ) ) ) {
 				throw(
 					type    = "BxDocs.InvalidConfig",
-					message = "bxdocs.json [plugins] entries must be non-empty strings (BoxLang module names)"
+					message = "#variables.configFileName# [plugins] entries must be non-empty strings (BoxLang module names)"
 				)
 			}
 		}
@@ -335,7 +370,7 @@ class {
 	}
 
 	/**
-	 * Validates `bxdocs.json`'s `searchProvider` block - which search UI
+	 * Validates the site config's `searchProvider` block - which search UI
 	 * `search: true` wires up (module spec section 7). `local` (the
 	 * default, bx-docs' own static lunr search) needs no further settings.
 	 * `algolia` (Algolia DocSearch) requires its own `algolia.{appId,apiKey,
@@ -356,7 +391,7 @@ class {
 		if ( !isStruct( arguments.searchProvider ) || !len( trim( arguments.searchProvider.provider ?: "" ) ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [searchProvider] must be an object with a non-empty [provider]"
+				message = "#variables.configFileName# [searchProvider] must be an object with a non-empty [provider]"
 			)
 		}
 
@@ -372,14 +407,14 @@ class {
 			) {
 				throw(
 					type    = "BxDocs.InvalidConfig",
-					message = "bxdocs.json [searchProvider.algolia] must be an object with non-empty [appId], [apiKey] and [indexName] when [searchProvider.provider] is ""algolia"""
+					message = "#variables.configFileName# [searchProvider.algolia] must be an object with non-empty [appId], [apiKey] and [indexName] when [searchProvider.provider] is ""algolia"""
 				)
 			}
 
 			if ( algolia.keyExists( "insights" ) && !isBoolean( algolia.insights ) ) {
 				throw(
 					type    = "BxDocs.InvalidConfig",
-					message = "bxdocs.json [searchProvider.algolia.insights], when present, must be a boolean"
+					message = "#variables.configFileName# [searchProvider.algolia.insights], when present, must be a boolean"
 				)
 			}
 			return
@@ -390,14 +425,14 @@ class {
 			if ( !isStruct( pagefind ) ) {
 				throw(
 					type    = "BxDocs.InvalidConfig",
-					message = "bxdocs.json [searchProvider.pagefind], when present, must be an object"
+					message = "#variables.configFileName# [searchProvider.pagefind], when present, must be an object"
 				)
 			}
 
 			if ( pagefind.keyExists( "bin" ) && !len( trim( pagefind.bin ?: "" ) ) ) {
 				throw(
 					type    = "BxDocs.InvalidConfig",
-					message = "bxdocs.json [searchProvider.pagefind.bin], when present, must be a non-empty string"
+					message = "#variables.configFileName# [searchProvider.pagefind.bin], when present, must be a non-empty string"
 				)
 			}
 
@@ -405,14 +440,14 @@ class {
 				if ( !isArray( pagefind.options ) ) {
 					throw(
 						type    = "BxDocs.InvalidConfig",
-						message = "bxdocs.json [searchProvider.pagefind.options], when present, must be an array"
+						message = "#variables.configFileName# [searchProvider.pagefind.options], when present, must be an array"
 					)
 				}
 				for ( var option in pagefind.options ) {
 					if ( !isSimpleValue( option ) || !len( trim( option ) ) ) {
 						throw(
 							type    = "BxDocs.InvalidConfig",
-							message = "bxdocs.json [searchProvider.pagefind.options] entries must be non-empty strings"
+							message = "#variables.configFileName# [searchProvider.pagefind.options] entries must be non-empty strings"
 						)
 					}
 				}
@@ -421,7 +456,7 @@ class {
 	}
 
 	/**
-	 * Validates `bxdocs.json`'s `i18n` block (module spec section 4) - the
+	 * Validates the site config's `i18n` block (module spec section 4) - the
 	 * `docs/i18n/<code>/` locale-folder convention's own display/routing
 	 * metadata. An empty `locales` array (the default) means the project
 	 * isn't multilingual at all - no `docs/i18n/` folder is required to
@@ -437,7 +472,7 @@ class {
 		if ( !isStruct( arguments.i18n ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [i18n], when present, must be an object"
+				message = "#variables.configFileName# [i18n], when present, must be an object"
 			)
 		}
 
@@ -446,7 +481,7 @@ class {
 		if ( !isArray( arguments.i18n.locales ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [i18n.locales], when present, must be an array"
+				message = "#variables.configFileName# [i18n.locales], when present, must be an array"
 			)
 		}
 
@@ -457,7 +492,7 @@ class {
 			if ( seenCodes.contains( code ) ) {
 				throw(
 					type    = "BxDocs.InvalidConfig",
-					message = "bxdocs.json [i18n.locales] has a duplicate locale code [#locale.code#] (also used by [i18n.defaultLocale] or an earlier entry)"
+					message = "#variables.configFileName# [i18n.locales] has a duplicate locale code [#locale.code#] (also used by [i18n.defaultLocale] or an earlier entry)"
 				)
 			}
 			seenCodes.append( code )
@@ -472,20 +507,20 @@ class {
 	 * could ever escape with).
 	 *
 	 * @locale The locale struct to validate
-	 * @path Where it lives in bxdocs.json, for the error message
+	 * @path Where it lives in the site config, for the error message
 	 */
 	private void function validateLocale( required any locale, required string path ) {
 		if ( !isStruct( arguments.locale ) || !len( trim( arguments.locale.code ?: "" ) ) || !len( trim( arguments.locale.label ?: "" ) ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [#arguments.path#] must be an object with a non-empty [code] and [label]"
+				message = "#variables.configFileName# [#arguments.path#] must be an object with a non-empty [code] and [label]"
 			)
 		}
 
 		if ( !reFind( "^[A-Za-z][A-Za-z0-9\-]*$", trim( arguments.locale.code ) ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [#arguments.path#.code] [#arguments.locale.code#] must contain only letters, digits and hyphens"
+				message = "#variables.configFileName# [#arguments.path#.code] [#arguments.locale.code#] must contain only letters, digits and hyphens"
 			)
 		}
 
@@ -493,21 +528,21 @@ class {
 		if ( !listFindNoCase( "ltr,rtl", dir ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [#arguments.path#.dir], when present, must be one of: ltr, rtl"
+				message = "#variables.configFileName# [#arguments.path#.dir], when present, must be one of: ltr, rtl"
 			)
 		}
 
 		if ( arguments.locale.keyExists( "strings" ) && !isStruct( arguments.locale.strings ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [#arguments.path#.strings], when present, must be an object"
+				message = "#variables.configFileName# [#arguments.path#.strings], when present, must be an object"
 			)
 		}
 
 		if ( arguments.locale.keyExists( "flag" ) && !isSimpleValue( arguments.locale.flag ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "bxdocs.json [#arguments.path#.flag], when present, must be a string"
+				message = "#variables.configFileName# [#arguments.path#.flag], when present, must be a string"
 			)
 		}
 	}

@@ -27,11 +27,12 @@ Static documentation site generator for BoxLang, built on bx-markdown - in the s
 box install bx-docs
 box install bx-markdown
 box install bx-esapi
+box install bx-yaml
 
-# ...or, without CommandBox, BoxLang's own installer takes all three at once:
-# install-bx-module bx-docs bx-markdown bx-esapi
+# ...or, without CommandBox, BoxLang's own installer takes all four at once:
+# install-bx-module bx-docs bx-markdown bx-esapi bx-yaml
 
-# Scaffold a new docs project (docs/ + bxdocs.json)
+# Scaffold a new docs project (docs/ + bxdocs.yaml)
 bxDocs new my-docs
 cd my-docs
 
@@ -60,9 +61,9 @@ boxlang module:bxdocs <verb> [options]
 
 | Verb | Purpose |
 |---|---|
-| `new` | Scaffold a docs project (`docs/` + `bxdocs.json`, defaulting to the `bootstrap` theme) |
-| `build` | Render `docs/**.md` into a static site in `site/`, including the search index, `sitemap.xml`, `llms.txt` and assets. Needs bx-markdown and bx-esapi installed |
-| `serve` | Build and serve the site locally with live reload (needs bx-markdown and bx-esapi too) |
+| `new` | Scaffold a docs project (`docs/` + `bxdocs.yaml`, defaulting to the `bootstrap` theme; `--format=json` for `bxdocs.json` instead) |
+| `build` | Render `docs/**.md` into a static site in `site/`, including the search index, `sitemap.xml`, `llms.txt` and assets. Needs bx-markdown, bx-esapi and bx-yaml installed |
+| `serve` | Build and serve the site locally with live reload (needs bx-markdown, bx-esapi and bx-yaml too) |
 | `search-index` | Rebuild `site/search-index.json` standalone (also runs automatically during `build`) |
 | `clean` | Remove `site/` and any build cache |
 | `migrate` | Convert a GitBook export (`SUMMARY.md` + `.md` files) into `docs/` + `nav.json` |
@@ -82,7 +83,7 @@ Or read the source directly:
 
 - [Getting Started](docs/getting-started.md)
 - [CLI Reference](docs/cli-reference.md)
-- [Configuration](docs/configuration.md) - the full `bxdocs.json` reference
+- [Configuration](docs/configuration.md) - the full site config reference (`bxdocs.yaml`, the default, or `bxdocs.json`)
 - Guides: [Themes](docs/guides/themes.md) · [Search](docs/guides/search.md) · [Deploying to GitHub Pages](docs/guides/deployment.md) · [Migrating from GitBook](docs/guides/migrating-from-gitbook.md)
 - [Releases](docs/releases/index.md) - versioning policy and what's new per release
 
@@ -91,7 +92,7 @@ See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's d
 ## Directory Structure
 
 - `.github/workflows` - CI: tests (`tests.yml`), PR checks (`pr.yml`), snapshot/release builds (`snapshot.yml`, `release.yml`), and publishing this repo's own docs to GitHub Pages (`pages.yml`)
-- `models` - the module's own source: `models/cli` (one dispatcher per `bxDocs` verb), `models/config` (`bxdocs.json` loader/validator), `models/build` (project scaffolding + the docs/nav/markdown/theme/search/sitemap build pipeline)
+- `models` - the module's own source: `models/cli` (one dispatcher per `bxDocs` verb), `models/config` (site config loader/validator - `bxdocs.yaml`/`.yml`/`.json`), `models/build` (project scaffolding + the docs/nav/markdown/theme/search/sitemap build pipeline)
 - `resources/themes` - built-in themes (native BoxLang `.bxm` templates + assets): `bootstrap` (default), `material`, `tailwind` - all with the BoxLang brand palette, dark mode, breadcrumbs and code-copy buttons applied out of the box. A project can override any of them via its own `theme/` folder (same `layout.bxm` + `page.bxm` contract - see [Themes](docs/guides/themes.md))
 - `resources/assets` - module-wide shared client-side assets: the search widget (`search.js`) and the copy-code button (`copy-code.js`)
 - `docs` / `bxdocs.json` - this repository's own docs, built by BX Docs itself (`boxlang module:bxDocs build`)

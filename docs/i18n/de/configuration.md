@@ -2,7 +2,7 @@
 title: Konfiguration
 order: 4
 icon: ⚙️
-summary: Jeder bxdocs.json-Schlüssel, sein Standardwert und was er bewirkt.
+summary: Jeder Konfigurationsschlüssel, sein Standardwert und was er bewirkt.
 tags: [referenz, konfiguration]
 ---
 
