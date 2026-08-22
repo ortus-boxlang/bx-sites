@@ -17,7 +17,7 @@ Two of the fastest ways to lose a documentation reader: they land on docs for th
 
 There's no config key for this - just add a `docs/versions/` folder, and every direct subfolder inside it becomes its own fully self-contained doc tree, built alongside your regular `docs/` (which always builds as "Latest"):
 
-```
+```text title="docs/ with versions"
 docs/
 ├── index.md
 ├── guides/
@@ -36,7 +36,7 @@ Each version folder is a normal `docs/`-shaped tree, built into `site/versions/<
 
 Translated content lives in `docs/i18n/<code>/`, mirroring your regular `docs/` tree page-for-page:
 
-```
+```text title="docs/ with translations"
 docs/
 ├── index.md
 ├── guides/
@@ -52,7 +52,7 @@ docs/
 
 `<code>` becomes both the folder name and the built URL prefix (`docs/i18n/es/guides/setup.md` → `/es/guides/setup/`). Give each locale a display label - and, for a right-to-left language, its own direction - in your config:
 
-```json
+```json title="bxdocs.json" linenums="1"
 {
 	"i18n": {
 		"locales": [

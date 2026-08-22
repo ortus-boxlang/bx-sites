@@ -8,7 +8,7 @@ tags: [reference, cli]
 
 # CLI Reference
 
-```bash
+```bash title="Usage"
 bxDocs <verb> [options]
 ```
 
@@ -18,7 +18,7 @@ either that short way, or as `boxlang module:bxdocs <verb>` - both run the
 exact same thing; use the longer form anywhere the `PATH` shim isn't set
 up (a CI runner, a module registered by hand):
 
-```bash
+```bash title="Usage (no PATH shim)"
 boxlang module:bxdocs <verb> [options]
 ```
 
@@ -37,7 +37,7 @@ flags below can appear before any verb.
 
 Scaffold a docs project.
 
-```bash
+```bash title="Usage"
 bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...] [--format=yaml|json]
 ```
 
@@ -55,7 +55,7 @@ set to a provider - like `algolia`/`pagefind` - that doesn't use it, see
 `site/` when `searchProvider.provider` is `"pagefind"`, and copies theme +
 `docs/assets/**` into `site/`.
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxDocs build
 ```
 
@@ -63,7 +63,7 @@ bxDocs build
 
 Build and serve the site locally with live reload.
 
-```bash
+```bash title="Usage"
 bxDocs serve [--port=8080] [--host=127.0.0.1]
 ```
 
@@ -75,7 +75,7 @@ Rebuild `site/search-index.json` standalone, without re-rendering pages or
 copying assets. `build` already runs this same step automatically - this
 verb exists for when you only need to refresh the index.
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxDocs search-index
 ```
 
@@ -83,7 +83,7 @@ bxDocs search-index
 
 Remove `site/` and any build cache, leaving `docs/` and the site config alone.
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxDocs clean
 ```
 
@@ -95,7 +95,7 @@ own `mkdocs gh-deploy` convention. Requires the project to be a git
 repository with a configured remote; never touches your own current branch
 or working tree (it does the push from a throwaway `git worktree`).
 
-```bash
+```bash title="Usage"
 bxDocs gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
 ```
 
@@ -111,7 +111,7 @@ See [Deployment](guides/deployment.md) for the full GitHub Pages setup
 Converts an existing docs project into this one - `--from` picks the
 source format, `gitbook` (the default) or `mkdocs`.
 
-```bash
+```bash frame="terminal" title="Terminal" linenums="1"
 bxDocs migrate --source=/path/to/gitbook-export
 bxDocs migrate --source=/path/to/mkdocs-project --from=mkdocs
 ```
@@ -167,7 +167,7 @@ first. Checks for:
   its own nav (e.g. frontmatter `hidden: true`) is *supposed* to only be
   reachable by a direct link.
 
-```bash
+```bash frame="terminal" title="Terminal" linenums="1"
 bxDocs build
 bxDocs check
 ```

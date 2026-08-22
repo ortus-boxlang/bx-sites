@@ -17,7 +17,7 @@ reading `bxdocs.yaml`, and [bx-image](https://github.com/ortus-boxlang/bx-image)
 for the responsive-image pipeline (see [Responsive Images](guides/images.md)).
 With [CommandBox](https://commandbox.ortusbooks.com/) installed:
 
-```bash
+```bash frame="terminal" title="Terminal" linenums="1"
 box install bx-docs
 box install bx-markdown
 box install bx-esapi
@@ -28,7 +28,7 @@ box install bx-image
 Or, without CommandBox, BoxLang's own installer takes all five in one
 command:
 
-```bash
+```bash frame="terminal" title="Terminal"
 install-bx-module bx-docs bx-markdown bx-esapi bx-yaml bx-image
 ```
 
@@ -36,7 +36,7 @@ install-bx-module bx-docs bx-markdown bx-esapi bx-yaml bx-image
 and drops a `bxDocs` script on your `PATH` (in `~/.boxlang/bin`), so every
 command below works either as a short standalone command:
 
-```bash
+```bash title="Usage"
 bxDocs <verb> [options]
 ```
 
@@ -44,7 +44,7 @@ or, everywhere BoxLang is available but that `PATH` shim isn't (a CI
 runner, a module registered by hand rather than installed) - both forms
 run the exact same thing:
 
-```bash
+```bash title="Usage (no PATH shim)"
 boxlang module:bxdocs <verb> [options]
 ```
 
@@ -52,14 +52,14 @@ The rest of this guide uses the short form.
 
 ## Scaffold a project
 
-```bash
+```bash frame="terminal" title="Terminal" linenums="1"
 bxDocs new my-docs
 cd my-docs
 ```
 
 This creates:
 
-```
+```text title="Project structure"
 my-docs/
 ├── docs/
 │   ├── assets/
@@ -93,7 +93,7 @@ skip ahead to [Build](#build).
 Every `.md` file under `docs/` becomes a page. Folder nesting becomes nav
 nesting automatically:
 
-```
+```text title="docs/ → nav"
 docs/
 ├── index.md              -> /
 ├── guides/
@@ -110,7 +110,7 @@ Link to another page the normal mkdocs way - a file-relative path to its
 `.md` source, exactly as if the two files were sitting next to each other
 on disk (because they are):
 
-```markdown
+```markdown title="Example link"
 See [Deployment](guides/deployment.md) or, from that same guide,
 [back to Getting Started](../getting-started.md#add-pages).
 ```
@@ -139,7 +139,7 @@ a page's own relative links keep working read this way too.
 
 Each page can start with a small frontmatter block:
 
-```markdown
+```markdown title="docs/guides/deployment.md" linenums="1"
 ---
 title: Deployment
 order: 2
@@ -187,7 +187,7 @@ full YAML, so nested objects/maps aren't supported.
 
 ## Build
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxDocs build
 ```
 
@@ -196,7 +196,7 @@ anywhere that serves static files.
 
 ## Serve locally
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxDocs serve
 ```
 
@@ -208,7 +208,7 @@ change how it binds.
 
 ## Clean
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxDocs clean
 ```
 

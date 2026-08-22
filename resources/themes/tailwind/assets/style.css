@@ -745,6 +745,7 @@ dd {
 	font-size: 0.8rem;
 	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 	font-weight: 600;
+	margin-top: 2rem;
 }
 
 /* frame="terminal" - macOS-style traffic-light chrome, title centered
@@ -1427,9 +1428,19 @@ code:not( pre code ) {
 .prose ol,
 .prose table,
 .prose blockquote,
-.prose .bxdocs-code,
-.prose pre {
+.prose .bxdocs-code {
 	margin: 0 0 1.25rem;
+}
+
+.prose pre {
+	margin: 2rem 0;
+}
+
+/* Higher specificity than `.prose pre` above so a titled block's pre stays
+   flush against its title bar - the breathing room goes above the title
+   instead (see `.bxdocs-code-title` below). */
+.prose .bxdocs-code-title + pre {
+	margin-top: 0;
 }
 
 .prose ul,
