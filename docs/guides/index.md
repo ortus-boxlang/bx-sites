@@ -12,6 +12,7 @@ icon: phosphor-duotone:book-open
 - [Markdown Extensions](markdown.md) - admonitions, footnotes, definition lists and Mermaid diagrams
 - [Responsive Images](images.md) - automatic resizing, WebP variants, and CSS/JS bundling, on by default
 - [Interactivity with Alpine.js](interactivity.md) - reactive content (copy buttons, live filters, and more) with no extra setup
+- [Blog](blog.md) - a by-convention blog: posts, authors, categories, archives, RSS, and stats
 - [Plugins](plugins.md) - extending BX Docs with a BoxLang module of your own
 - [Internationalization (i18n)](i18n.md) - translating your docs into other languages
 - [Migrating from GitBook](migrating-from-gitbook.md) - convert a GitBook export into a bx-docs project with one command
