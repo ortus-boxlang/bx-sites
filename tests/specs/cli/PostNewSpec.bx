@@ -1,0 +1,62 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.PostNew", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.PostNew@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-postnew-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				return dir;
+			}
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( { title : "Test" } );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "throws BxDocs.MissingPostTitle when title is blank", function() {
+				expect( function() {
+					verb.run( { projectRoot : newProjectRoot() } );
+				} ).toThrow( "BxDocs.MissingPostTitle" );
+			} );
+
+			it( "exits 0 and creates the post, defaulting draft to true", function() {
+				var projectRoot = newProjectRoot();
+
+				var result = verb.run( { projectRoot : projectRoot, title : "My First Post" } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toInclude( "my-first-post" );
+				expect( result.message ).toInclude( "draft: true" );
+				expect( fileExists( projectRoot & "/docs/blog/posts/my-first-post.md" ) ).toBeTrue();
+			} );
+
+			it( "passes draft: false straight through and doesn't mention flipping a draft", function() {
+				var projectRoot = newProjectRoot();
+
+				var result = verb.run( { projectRoot : projectRoot, title : "Published Now", draft : false } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).notToInclude( "draft: true" );
+				expect( fileRead( projectRoot & "/docs/blog/posts/published-now.md" ) ).notToInclude( "draft: true" );
+			} );
+
+		} );
+	}
+
+}

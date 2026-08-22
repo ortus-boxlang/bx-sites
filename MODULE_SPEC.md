@@ -53,6 +53,19 @@ boxlang module:bxDocs <verb> [options]
 | `migrate` | Convert a GitBook export (`SUMMARY.md` + `.md` files, default) or an mkdocs project (`mkdocs.yml`, `--from=mkdocs`) into a bx-docs project |
 | `check` | CI-grade content check on a built `site/`: broken internal links/images, missing alt text, orphaned pages |
 | `stats` | Read-only summary report on a built `site/`: page/word counts, versions/locales, blog, tags, search index, site size |
+| `doctor` | Environment/config health check: JVM, `docs/`, config validity, required modules, theme override |
+| `post:new` | Scaffold a new blog post at `docs/blog/posts/<slug>.md` |
+| `version:new` | Snapshot `docs/` into a new `docs/versions/<name>/` |
+| `i18n:status` | Per-locale translation coverage report against the default tree |
+| `i18n:new` | Scaffold a new `docs/i18n/<code>/` locale |
+| `page:new` | Scaffold a single docs page at an arbitrary path |
+| `plugin:new` | Scaffold a plugin module skeleton, mirroring `examples/hello-plugin/` |
+| `theme:new` | Eject a built-in theme into project `theme/` for customizing |
+| `page:rename` | Move a docs page and rewrite every relative Markdown link that pointed at it |
+| `blog:drafts` | List every blog post whose frontmatter sets `draft: true` |
+| `blog:find` | Filter blog posts by author/category/tag/date range |
+| `search:query` | Query a built `search-index.json` and rank results, mirroring the client widget's field weighting |
+| `lint` | Pre-build content checks on raw `docs/` Markdown: heading level skips, blog posts missing a valid date |
 
 ## 3. Project structure
 

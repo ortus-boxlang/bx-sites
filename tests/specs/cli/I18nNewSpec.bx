@@ -1,0 +1,52 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.I18nNew", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.I18nNew@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-i18nnew-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite( dir & "/docs/index.md", "Home" );
+				return dir;
+			}
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( { code : "es" } );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "throws BxDocs.MissingLocaleCode when code is blank", function() {
+				expect( function() {
+					verb.run( { projectRoot : newProjectRoot() } );
+				} ).toThrow( "BxDocs.MissingLocaleCode" );
+			} );
+
+			it( "exits 0 and creates docs/i18n/<code>/", function() {
+				var projectRoot = newProjectRoot();
+
+				var result = verb.run( { projectRoot : projectRoot, code : "es" } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toInclude( "docs/i18n/es" );
+				expect( fileExists( projectRoot & "/docs/i18n/es/index.md" ) ).toBeTrue();
+			} );
+
+		} );
+	}
+
+}

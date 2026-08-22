@@ -1,0 +1,111 @@
+/**
+ * Backs the `post:new` CLI verb - scaffolds a new `docs/blog/posts/<slug>.md`
+ * with a starting frontmatter block (module spec's blog-by-convention
+ * shape - see docs/guides/blog.md), so writing a post doesn't start from a
+ * blank file.
+ */
+class {
+
+	/**
+	 * @docsDir Absolute path to the project's docs/ directory
+	 * @title The post's title - also the source of its slug, unless slug is given
+	 * @slug Overrides the derived-from-title slug
+	 * @date Overrides today's date (yyyy-MM-dd) - mainly a test seam
+	 * @authors Comma-separated author ids (docs/blog/authors.yml)
+	 * @categories Comma-separated categories
+	 * @tags Comma-separated tags
+	 * @draft Whether the post starts as a draft (excluded from a real build until flipped to false) - true by default
+	 *
+	 * @return { path, slug } - path is the absolute path to the new post file
+	 */
+	struct function scaffold(
+		required string docsDir,
+		required string title,
+		string slug = "",
+		string date = "",
+		string authors = "",
+		string categories = "",
+		string tags = "",
+		boolean draft = true
+	) {
+		var trimmedTitle = trim( arguments.title )
+		if ( !len( trimmedTitle ) ) {
+			throw( type = "BxDocs.MissingTitle", message = "`post:new` requires a title" )
+		}
+
+		var computedSlug = len( trim( arguments.slug ) ) ? computeSlug( arguments.slug ) : computeSlug( trimmedTitle )
+		var postsDir = arguments.docsDir.reReplace( "[\/]+$", "" ) & "/blog/posts"
+		var path = postsDir & "/" & computedSlug & ".md"
+
+		if ( fileExists( path ) ) {
+			throw( type = "BxDocs.PostAlreadyExists", message = "A post already exists at [#path#] - pick a different title/slug" )
+		}
+
+		directoryCreate( postsDir, true, true )
+
+		var effectiveDate = len( trim( arguments.date ) ) ? arguments.date : dateFormat( now(), "yyyy-MM-dd" )
+
+		var lines = [ "---" ]
+		lines.append( "title: " & trimmedTitle )
+		lines.append( "date: " & effectiveDate )
+		if ( len( trim( arguments.authors ) ) ) {
+			lines.append( "authors: [" & normalizeList( arguments.authors ) & "]" )
+		}
+		if ( len( trim( arguments.categories ) ) ) {
+			lines.append( "categories: [" & normalizeList( arguments.categories ) & "]" )
+		}
+		if ( len( trim( arguments.tags ) ) ) {
+			lines.append( "tags: [" & normalizeList( arguments.tags ) & "]" )
+		}
+		lines.append( "summary: " )
+		if ( arguments.draft ) {
+			lines.append( "draft: true" )
+		}
+		lines.append( "---" )
+		lines.append( "" )
+		lines.append( "Write your intro paragraph here." )
+		lines.append( "" )
+		lines.append( "<!-- more -->" )
+		lines.append( "" )
+		lines.append( "The rest of the post goes here." )
+		lines.append( "" )
+
+		fileWrite( path, lines.toList( char( 10 ) ) )
+
+		return { path : path, slug : computedSlug }
+	}
+
+	/**
+	 * Lowercases, replaces anything that isn't a letter/digit with a
+	 * hyphen, and trims leading/trailing hyphens - the same slugging rule
+	 * `New.bx`'s own project-name-to-folder derivation and this codebase's
+	 * other tagSlug()-style helpers already use.
+	 *
+	 * Deliberately not named `slugify` or `slug` - `slugify` is a real
+	 * BoxLang built-in BIF (doesn't trim trailing hyphens the way this
+	 * needs to) and `slug` collides with this class's own `slug` return
+	 * key/parameter name; either way, an unqualified same-named call
+	 * inside this class resolves to that BIF/local variable instead of
+	 * this method, silently producing the wrong (or no) result rather
+	 * than a compile error.
+	 *
+	 * @text Raw text (a title, or an explicit --slug override)
+	 */
+	private string function computeSlug( required string text ) {
+		return lCase( trim( arguments.text ) ).reReplace( "[^a-z0-9]+", "-", "all" ).reReplace( "(^-|-$)", "", "all" )
+	}
+
+	/**
+	 * Turns a comma-separated `--authors`/`--categories`/`--tags` CLI value
+	 * into a YAML inline-list body (`a, b, c`), trimming each entry.
+	 *
+	 * @list A comma-separated CLI option value
+	 */
+	private string function normalizeList( required string list ) {
+		return listToArray( arguments.list )
+			.map( item => trim( item ) )
+			.filter( item => len( item ) )
+			.toList( ", " )
+	}
+
+}

@@ -1,0 +1,305 @@
+/**
+ * Backs the `page:rename` CLI verb - moves a `docs/<from>.md` page to
+ * `docs/<to>.md` and rewrites every relative `.md` link (across every
+ * tree under `docs/` - the default tree, `docs/versions/**`,
+ * `docs/i18n/**` - a version/locale's own pages can link to each other
+ * the same file-relative way any other page does) that pointed at the
+ * old path so it points at the new one instead, the same file-relative
+ * link-rot problem MarkdownLinkResolver.bx already solves for the
+ * rendered-HTML side of things - this solves it for the raw Markdown
+ * source instead, since that's what a rename actually needs to fix.
+ *
+ * Only bare `[text](relative/path.md)`-style links are rewritten -
+ * absolute URLs, `mailto:`, and pure in-page anchors are left alone,
+ * same exclusions MarkdownLinkResolver.bx already applies.
+ */
+class {
+
+	variables.hrefPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '\]\(([^)]+)\)' )
+	variables.suffixPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^([^##?]*)([##?].*)?$" )
+
+	/**
+	 * @docsDir Absolute path to the project's docs/ directory
+	 * @from docs/-relative path to the existing page, e.g. "guides/old-name.md"
+	 * @to docs/-relative path to move it to, e.g. "guides/new-name.md"
+	 *
+	 * @return { path (the new absolute path), filesUpdated (count of OTHER files whose links were rewritten, the moved file itself not included) }
+	 */
+	struct function rename( required string docsDir, required string from, required string to ) {
+		var fromRelative = normalizeRelativePath( arguments.from, "BxDocs.MissingFromPath", "`page:rename` requires --from=<relative path>.md" )
+		var toRelative = normalizeRelativePath( arguments.to, "BxDocs.MissingToPath", "`page:rename` requires --to=<relative path>.md" )
+
+		if ( fromRelative == toRelative ) {
+			throw( type = "BxDocs.SamePagePath", message = "--from and --to are the same path" )
+		}
+
+		var trimmedDocsDir = arguments.docsDir.reReplace( "[\/]+$", "" )
+		var fromAbsolute = trimmedDocsDir & "/" & fromRelative
+		var toAbsolute = trimmedDocsDir & "/" & toRelative
+
+		if ( !fileExists( fromAbsolute ) ) {
+			throw( type = "BxDocs.PageNotFound", message = "No page at [#fromAbsolute#]" )
+		}
+		if ( fileExists( toAbsolute ) ) {
+			throw( type = "BxDocs.PageAlreadyExists", message = "A page already exists at [#toAbsolute#]" )
+		}
+
+		var toDir = getDirectoryFromPath( toAbsolute )
+		if ( !directoryExists( toDir ) ) {
+			directoryCreate( toDir, true, true )
+		}
+		fileMove( fromAbsolute, toAbsolute )
+
+		var filesUpdated = 0
+		var allMdFiles = directoryList( trimmedDocsDir, true, "path", "*.md" )
+			.filter( path => !toSiteRelative( path, trimmedDocsDir ).reFindNoCase( "^assets[\/]" ) )
+
+		for ( var filePath in allMdFiles ) {
+			var original = fileRead( filePath )
+			var rewritten = ""
+
+			if ( filePath == toAbsolute ) {
+				// The moved file's own relative links all need re-basing
+				// against its new directory - every link, not just ones
+				// that happen to point at the page that moved, since the
+				// file containing them is the one that changed location.
+				rewritten = rebaseLinks( original, directoryOf( fromRelative ), directoryOf( toRelative ) )
+			} else {
+				// Every other file keeps its own directory - only links
+				// that specifically point at the renamed page need
+				// retargeting.
+				var currentDir = directoryOf( toSiteRelative( filePath, trimmedDocsDir ) )
+				rewritten = retargetLinks( original, currentDir, fromRelative, toRelative )
+			}
+
+			if ( rewritten != original ) {
+				fileWrite( filePath, rewritten )
+				if ( filePath != toAbsolute ) {
+					filesUpdated++
+				}
+			}
+		}
+
+		return { path : toAbsolute, filesUpdated : filesUpdated }
+	}
+
+	/**
+	 * Strips a leading slash and validates non-blank + a `.md` suffix -
+	 * shared shape between --from/--to.
+	 *
+	 * @raw The raw --from/--to option value
+	 * @missingType Exception type to throw when blank
+	 * @missingMessage Exception message to throw when blank
+	 */
+	private string function normalizeRelativePath( required string raw, required string missingType, required string missingMessage ) {
+		var trimmed = trim( arguments.raw ).reReplace( "^[\/]+", "" )
+		if ( !len( trimmed ) ) {
+			throw( type = arguments.missingType, message = arguments.missingMessage )
+		}
+		if ( !trimmed.reFindNoCase( "\.md$" ) ) {
+			throw( type = "BxDocs.InvalidPagePath", message = "Path must end in .md (got [#trimmed#])" )
+		}
+		return trimmed
+	}
+
+	/**
+	 * Rewrites only the links inside a (non-moved) file that specifically
+	 * point at the renamed page, from `fromRelative` to `toRelative` -
+	 * every other link stays exactly as written, since neither the target
+	 * nor this file's own location changed.
+	 *
+	 * @markdownSource Raw markdown source being scanned
+	 * @currentDir The scanned file's own docs/-relative directory
+	 * @fromRelative The page's old docs/-relative path
+	 * @toRelative The page's new docs/-relative path
+	 */
+	private string function retargetLinks( required string markdownSource, required string currentDir, required string fromRelative, required string toRelative ) {
+		var matcher = variables.hrefPattern.matcher( arguments.markdownSource )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+
+		while ( matcher.find() ) {
+			var rewritten = retargetOneLink( matcher.group( 1 ), arguments.currentDir, arguments.fromRelative, arguments.toRelative )
+			matcher.appendReplacement( buffer, quoteReplacement( "](" & rewritten & ")" ) )
+		}
+		matcher.appendTail( buffer )
+
+		return buffer.toString()
+	}
+
+	/**
+	 * @href One markdown link target, exactly as written in the source
+	 * @currentDir The scanned file's own docs/-relative directory
+	 * @fromRelative The page's old docs/-relative path
+	 * @toRelative The page's new docs/-relative path
+	 */
+	private string function retargetOneLink( required string href, required string currentDir, required string fromRelative, required string toRelative ) {
+		var parsed = parseMdLink( arguments.href, arguments.currentDir )
+		if ( isNull( parsed ) || parsed.resolvedTarget != arguments.fromRelative ) {
+			return arguments.href
+		}
+
+		return relativeLink( arguments.currentDir, arguments.toRelative ) & parsed.suffix
+	}
+
+	/**
+	 * Rebases every relative `.md` link in the moved file itself - each
+	 * one was written (and still resolves correctly) against the file's
+	 * OLD directory, so every single one needs re-expressing against its
+	 * NEW directory to keep pointing at the exact same target, regardless
+	 * of whether that target happens to be a page that also got renamed.
+	 *
+	 * @markdownSource Raw markdown source being scanned - the moved file's own, post-move content
+	 * @oldDir The moved file's own docs/-relative directory before the move
+	 * @newDir The moved file's own docs/-relative directory after the move
+	 */
+	private string function rebaseLinks( required string markdownSource, required string oldDir, required string newDir ) {
+		var matcher = variables.hrefPattern.matcher( arguments.markdownSource )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+
+		while ( matcher.find() ) {
+			var rewritten = rebaseOneLink( matcher.group( 1 ), arguments.oldDir, arguments.newDir )
+			matcher.appendReplacement( buffer, quoteReplacement( "](" & rewritten & ")" ) )
+		}
+		matcher.appendTail( buffer )
+
+		return buffer.toString()
+	}
+
+	/**
+	 * @href One markdown link target, exactly as written in the source
+	 * @oldDir The moved file's own docs/-relative directory before the move
+	 * @newDir The moved file's own docs/-relative directory after the move
+	 */
+	private string function rebaseOneLink( required string href, required string oldDir, required string newDir ) {
+		var parsed = parseMdLink( arguments.href, arguments.oldDir )
+		if ( isNull( parsed ) ) {
+			return arguments.href
+		}
+
+		return relativeLink( arguments.newDir, parsed.resolvedTarget ) & parsed.suffix
+	}
+
+	/**
+	 * Shared parsing step for retargetOneLink()/rebaseOneLink() - decides
+	 * whether `href` is a rewritable relative `.md` link at all (skipping
+	 * absolute URLs, `mailto:`, pure in-page anchors, and anything not
+	 * ending in `.md`, same exclusions MarkdownLinkResolver.bx applies),
+	 * and if so resolves it against `baseDir`.
+	 *
+	 * @href One markdown link target, exactly as written in the source
+	 * @baseDir The docs/-relative directory to resolve a relative href against
+	 *
+	 * @return null when href isn't a rewritable relative .md link, else { resolvedTarget, suffix }
+	 */
+	private any function parseMdLink( required string href, required string baseDir ) {
+		if (
+			!len( trim( arguments.href ) )
+			|| arguments.href.reFindNoCase( "^[a-z][a-z0-9+.\-]*:" )
+			|| left( arguments.href, 1 ) == "/"
+			|| left( arguments.href, 1 ) == "##"
+		) {
+			return
+		}
+
+		var matcher = variables.suffixPattern.matcher( arguments.href )
+		if ( !matcher.matches() ) {
+			return
+		}
+
+		var path = matcher.group( 1 )
+		var suffix = isNull( matcher.group( 2 ) ) ? "" : matcher.group( 2 )
+
+		if ( !path.reFindNoCase( "\.md$" ) ) {
+			return
+		}
+
+		return { resolvedTarget : resolvePath( arguments.baseDir, path ), suffix : suffix }
+	}
+
+	/**
+	 * Same segment-stack resolution MarkdownLinkResolver.bx's own
+	 * resolvePath() uses - `.`/`..`/sibling-relative resolution against a
+	 * base directory.
+	 *
+	 * @baseDir A docs/-relative directory
+	 * @relativePath A link's own path portion (before any anchor/query string)
+	 */
+	private string function resolvePath( required string baseDir, required string relativePath ) {
+		var stack = []
+		for ( var segment in listToArray( arguments.baseDir & "/" & arguments.relativePath, "/", true ) ) {
+			if ( segment == "." || !len( segment ) ) {
+				continue
+			} else if ( segment == ".." ) {
+				if ( stack.len() ) {
+					stack.deleteAt( stack.len() )
+				}
+			} else {
+				stack.append( segment )
+			}
+		}
+		return stack.toList( "/" )
+	}
+
+	/**
+	 * The inverse of resolvePath() - given a docs/-relative directory and
+	 * a docs/-relative target path, builds the relative link text
+	 * (`../`-prefixed as needed) that reaches the target from that
+	 * directory, skipping the segments the two paths already share.
+	 *
+	 * @fromDir A docs/-relative directory (a page's own directoryOf())
+	 * @targetPath A docs/-relative file path
+	 */
+	private string function relativeLink( required string fromDir, required string targetPath ) {
+		var fromSegments = len( arguments.fromDir ) ? listToArray( arguments.fromDir, "/" ) : []
+		var targetSegments = listToArray( arguments.targetPath, "/" )
+
+		var common = 0
+		while (
+			common < fromSegments.len()
+			&& common < targetSegments.len() - 1
+			&& fromSegments[ common + 1 ] == targetSegments[ common + 1 ]
+		) {
+			common++
+		}
+
+		var upCount = fromSegments.len() - common
+		var relativeSegments = []
+		for ( var i = 1; i <= upCount; i++ ) {
+			relativeSegments.append( ".." )
+		}
+		for ( var i = common + 1; i <= targetSegments.len(); i++ ) {
+			relativeSegments.append( targetSegments[ i ] )
+		}
+
+		return relativeSegments.toList( "/" )
+	}
+
+	/**
+	 * @relativePath A docs/-relative path
+	 *
+	 * @return Its directory, "" for a root-level page
+	 */
+	private string function directoryOf( required string relativePath ) {
+		var segments = listToArray( arguments.relativePath, "/", true )
+		segments.deleteAt( segments.len() )
+		return segments.toList( "/" )
+	}
+
+	/**
+	 * @filePath Absolute path to a file under docsDir
+	 * @docsDir Absolute path to the project's docs/ directory
+	 */
+	private string function toSiteRelative( required string filePath, required string docsDir ) {
+		return arguments.filePath
+			.reReplace( "^" & createObject( "java", "java.util.regex.Pattern" ).quote( arguments.docsDir ), "", "one" )
+			.reReplace( "^[\/]", "" )
+	}
+
+	/**
+	 * @text Literal text to safely pass through java.util.regex.Matcher#appendReplacement
+	 */
+	private string function quoteReplacement( required string text ) {
+		return createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( arguments.text )
+	}
+
+}

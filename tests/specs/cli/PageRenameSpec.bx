@@ -1,0 +1,60 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.PageRename", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.PageRename@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-pagerename-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				return dir;
+			}
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( { from : "a.md", to : "b.md" } );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "throws BxDocs.MissingFromPath when from is blank", function() {
+				expect( function() {
+					verb.run( { projectRoot : newProjectRoot(), to : "b.md" } );
+				} ).toThrow( "BxDocs.MissingFromPath" );
+			} );
+
+			it( "throws BxDocs.MissingToPath when to is blank", function() {
+				expect( function() {
+					verb.run( { projectRoot : newProjectRoot(), from : "a.md" } );
+				} ).toThrow( "BxDocs.MissingToPath" );
+			} );
+
+			it( "exits 0 and moves the page, reporting how many other files were updated", function() {
+				var projectRoot = newProjectRoot();
+				fileWrite( projectRoot & "/docs/old.md", "## Old" );
+				fileWrite( projectRoot & "/docs/index.md", "See [old](old.md)." );
+
+				var result = verb.run( { projectRoot : projectRoot, from : "old.md", to : "new.md" } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( fileExists( projectRoot & "/docs/new.md" ) ).toBeTrue();
+				expect( fileRead( projectRoot & "/docs/index.md" ) ).toInclude( "[old](new.md)" );
+				expect( result.message ).toInclude( "1 other" );
+			} );
+
+		} );
+	}
+
+}

@@ -1,0 +1,99 @@
+/**
+ * `blog:find` CLI verb - filters blog posts by author/category/tag/date
+ * range without running a full `build`, for quickly answering "which
+ * posts did lmajano write" or "what did we publish last quarter" from the
+ * command line. Every filter is optional and independent - passing none
+ * lists every published post (mirrors BlogDiscoverer.bx's own
+ * `includeDrafts = false` default; pass `--drafts` to include drafts too).
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path), author, category, tag, since (date), until (date), drafts (boolean) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxDocs.MissingProjectRoot", message = "`blog:find` requires a project root" )
+		}
+
+		var author = trim( arguments.options.author ?: "" )
+		var category = trim( arguments.options.category ?: "" )
+		var tag = trim( arguments.options.tag ?: "" )
+		var since = trim( arguments.options.since ?: "" )
+		var until = trim( arguments.options.until ?: "" )
+		var includeDrafts = ( arguments.options.drafts ?: false ) ? true : false
+
+		if ( len( since ) && !isDate( since ) ) {
+			throw( type = "BxDocs.InvalidDate", message = "--since must be a valid date (got [#since#])" )
+		}
+		if ( len( until ) && !isDate( until ) ) {
+			throw( type = "BxDocs.InvalidDate", message = "--until must be a valid date (got [#until#])" )
+		}
+
+		var docsDir = projectRoot.reReplace( "[\/]+$", "" ) & "/docs"
+
+		var matches = new "models.build.BlogDiscoverer@bxdocs"()
+			.load( docsDir : docsDir, includeDrafts : includeDrafts )
+			.filter( post => matchesFilters( post, author, category, tag, since, until ) )
+
+		if ( !matches.len() ) {
+			return { exitCode : 0, message : "No matching posts" }
+		}
+
+		var lines = matches.map( post => "- #post.title# (#post.relativePath#, #post.date#)" )
+
+		return {
+			exitCode : 0,
+			message  : "#matches.len()# matching post(s):" & char( 10 ) & lines.toList( char( 10 ) )
+		}
+	}
+
+	/**
+	 * @post One loaded blog post struct (BlogDiscoverer.bx's own shape)
+	 * @author Case-insensitive exact match against any of the post's authors, or "" to skip
+	 * @category Case-insensitive exact match against any of the post's categories, or "" to skip
+	 * @tag Case-insensitive exact match against any of the post's tags, or "" to skip
+	 * @since Only posts on/after this date, or "" to skip
+	 * @until Only posts on/before this date, or "" to skip
+	 */
+	private boolean function matchesFilters(
+		required struct post,
+		required string author,
+		required string category,
+		required string tag,
+		required string since,
+		required string until
+	) {
+		if ( len( arguments.author ) && !containsCaseInsensitive( arguments.post.authors, arguments.author ) ) {
+			return false
+		}
+		if ( len( arguments.category ) && !containsCaseInsensitive( arguments.post.categories, arguments.category ) ) {
+			return false
+		}
+		if ( len( arguments.tag ) && !containsCaseInsensitive( arguments.post.tags, arguments.tag ) ) {
+			return false
+		}
+		if ( len( arguments.since ) && dateCompare( arguments.post.date, arguments.since ) < 0 ) {
+			return false
+		}
+		if ( len( arguments.until ) && dateCompare( arguments.post.date, arguments.until ) > 0 ) {
+			return false
+		}
+		return true
+	}
+
+	/**
+	 * @values An array of strings (a post's own authors/categories/tags)
+	 * @needle The value to look for, matched case-insensitively
+	 */
+	private boolean function containsCaseInsensitive( required array values, required string needle ) {
+		// Captured into a local - an arrow function's own `arguments` scope
+		// is its own (value/index/array, per array .some()'s own callback
+		// signature), not containsCaseInsensitive()'s, so `arguments.needle`
+		// inside the closure below would look up a key that was never there.
+		var target = lCase( arguments.needle )
+		return arguments.values.some( value => lCase( trim( value ) ) == target )
+	}
+
+}

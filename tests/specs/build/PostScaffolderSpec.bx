@@ -1,0 +1,97 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.PostScaffolder", function() {
+
+			beforeEach( function() {
+				variables.scaffolder = new "models.build.PostScaffolder@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newDocsDir() {
+				var dir = createTempDirectory( prefix = "bxdocs-postscaffolder-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "throws BxDocs.MissingTitle when title is blank", function() {
+				expect( function() {
+					scaffolder.scaffold( docsDir : newDocsDir(), title : "   " );
+				} ).toThrow( "BxDocs.MissingTitle" );
+			} );
+
+			it( "creates docs/blog/posts/<slug>.md with a slugified title", function() {
+				var docsDir = newDocsDir();
+
+				var result = scaffolder.scaffold( docsDir : docsDir, title : "Announcing BoxLang 3.0!" );
+
+				expect( result.slug ).toBe( "announcing-boxlang-3-0" );
+				expect( fileExists( result.path ) ).toBeTrue();
+				var content = fileRead( result.path );
+				expect( content ).toInclude( "title: Announcing BoxLang 3.0!" );
+				expect( content ).toInclude( "draft: true" );
+				expect( content ).toInclude( "<!-- more -->" );
+			} );
+
+			it( "honors an explicit slug override, itself slugified", function() {
+				var docsDir = newDocsDir();
+
+				var result = scaffolder.scaffold( docsDir : docsDir, title : "Hello", slug : "My Custom Slug!!!" );
+
+				expect( result.slug ).toBe( "my-custom-slug" );
+			} );
+
+			it( "writes authors/categories/tags as YAML inline lists only when provided", function() {
+				var docsDir = newDocsDir();
+
+				var result = scaffolder.scaffold(
+					docsDir    : docsDir,
+					title      : "Full Frontmatter",
+					authors    : "lmajano, jdoe",
+					categories : "Releases",
+					tags       : "boxlang, release"
+				);
+
+				var content = fileRead( result.path );
+				expect( content ).toInclude( "authors: [lmajano, jdoe]" );
+				expect( content ).toInclude( "categories: [Releases]" );
+				expect( content ).toInclude( "tags: [boxlang, release]" );
+			} );
+
+			it( "omits draft: true when draft is false", function() {
+				var docsDir = newDocsDir();
+
+				var result = scaffolder.scaffold( docsDir : docsDir, title : "Published Post", draft : false );
+
+				expect( fileRead( result.path ) ).notToInclude( "draft: true" );
+			} );
+
+			it( "uses an explicit date override instead of today", function() {
+				var docsDir = newDocsDir();
+
+				var result = scaffolder.scaffold( docsDir : docsDir, title : "Dated Post", date : "2020-01-01" );
+
+				expect( fileRead( result.path ) ).toInclude( "date: 2020-01-01" );
+			} );
+
+			it( "throws BxDocs.PostAlreadyExists rather than overwriting", function() {
+				var docsDir = newDocsDir();
+				scaffolder.scaffold( docsDir : docsDir, title : "Duplicate Post" );
+
+				expect( function() {
+					scaffolder.scaffold( docsDir : docsDir, title : "Duplicate Post" );
+				} ).toThrow( "BxDocs.PostAlreadyExists" );
+			} );
+
+		} );
+	}
+
+}

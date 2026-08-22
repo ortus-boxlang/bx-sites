@@ -1,0 +1,37 @@
+/**
+ * `blog:drafts` CLI verb - lists every blog post whose frontmatter sets
+ * `draft: true`, so an author can see what's still unpublished without
+ * having to grep `docs/blog/posts/` by hand. A real `build` always skips
+ * drafts (BlogDiscoverer.bx's own default `includeDrafts = false`) - this
+ * verb is the only place a draft's existence is surfaced.
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxDocs.MissingProjectRoot", message = "`blog:drafts` requires a project root" )
+		}
+
+		var docsDir = projectRoot.reReplace( "[\/]+$", "" ) & "/docs"
+
+		var drafts = new "models.build.BlogDiscoverer@bxdocs"()
+			.load( docsDir : docsDir, includeDrafts : true )
+			.filter( post => post.draft )
+
+		if ( !drafts.len() ) {
+			return { exitCode : 0, message : "No draft posts" }
+		}
+
+		var lines = drafts.map( post => "- #post.title# (#post.relativePath#, #post.date#)" )
+
+		return {
+			exitCode : 0,
+			message  : "#drafts.len()# draft post(s):" & char( 10 ) & lines.toList( char( 10 ) )
+		}
+	}
+
+}

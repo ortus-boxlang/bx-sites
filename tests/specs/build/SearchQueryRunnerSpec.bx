@@ -1,0 +1,103 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.SearchQueryRunner", function() {
+
+			beforeEach( function() {
+				variables.runner = new "models.build.SearchQueryRunner@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newSiteDir() {
+				var dir = createTempDirectory( prefix = "bxdocs-searchqueryrunner-" );
+				tempDirs.append( dir );
+				var siteDir = dir & "/site";
+				directoryCreate( siteDir, true, true );
+				return siteDir;
+			}
+
+			private void function seedIndex( required string siteDir ) {
+				var index = [
+					{ title : "Getting Started", url : "getting-started/index.html", headings : [ "Installation", "Quick Start" ], body : "Learn how to install BoxLang and get started quickly.", tags : [ "boxlang", "setup" ] },
+					{ title : "CLI Reference", url : "cli/index.html", headings : [ "Commands" ], body : "Every command the bx-docs CLI supports.", tags : [ "cli" ] },
+					{ title : "Advanced Config", url : "config/index.html", headings : [ "Themes", "Plugins" ], body : "Deep dive into advanced configuration options.", tags : [ "config" ] }
+				];
+				fileWrite( arguments.siteDir & "/search-index.json", jsonSerialize( index ) );
+			}
+
+			it( "throws BxDocs.SearchIndexNotBuilt when search-index.json doesn't exist", function() {
+				var dir = createTempDirectory( prefix = "bxdocs-searchqueryrunner-nofile-" );
+				tempDirs.append( dir );
+
+				expect( function() {
+					runner.run( siteDir : dir & "/site", query : "x" );
+				} ).toThrow( "BxDocs.SearchIndexNotBuilt" );
+			} );
+
+			it( "throws BxDocs.MissingQuery when query is blank", function() {
+				var siteDir = newSiteDir();
+				seedIndex( siteDir );
+
+				expect( function() {
+					runner.run( siteDir : siteDir, query : "   " );
+				} ).toThrow( "BxDocs.MissingQuery" );
+			} );
+
+			it( "matches a term against title, tags, headings, and body, weighted by field", function() {
+				var siteDir = newSiteDir();
+				seedIndex( siteDir );
+
+				var results = runner.run( siteDir : siteDir, query : "cli" );
+
+				expect( results.len() ).toBe( 1 );
+				expect( results[ 1 ].title ).toBe( "CLI Reference" );
+				expect( results[ 1 ].score ).toBeGT( 0 );
+			} );
+
+			it( "returns no results for a term matching nothing", function() {
+				var siteDir = newSiteDir();
+				seedIndex( siteDir );
+
+				var results = runner.run( siteDir : siteDir, query : "nonexistentterm" );
+
+				expect( results.len() ).toBe( 0 );
+			} );
+
+			it( "ranks a title match above a body-only match", function() {
+				var siteDir = newSiteDir();
+				fileWrite( siteDir & "/search-index.json", jsonSerialize( [
+					{ title : "Something Else", url : "a/index.html", headings : [], body : "mentions boxlang only in the body", tags : [] },
+					{ title : "BoxLang Guide", url : "b/index.html", headings : [], body : "a guide", tags : [] }
+				] ) );
+
+				var results = runner.run( siteDir : siteDir, query : "boxlang" );
+
+				expect( results.len() ).toBe( 2 );
+				expect( results[ 1 ].title ).toBe( "BoxLang Guide" );
+			} );
+
+			it( "caps results at the given limit", function() {
+				var siteDir = newSiteDir();
+				fileWrite( siteDir & "/search-index.json", jsonSerialize( [
+					{ title : "Config One", url : "a/index.html", headings : [], body : "config", tags : [] },
+					{ title : "Config Two", url : "b/index.html", headings : [], body : "config", tags : [] },
+					{ title : "Config Three", url : "c/index.html", headings : [], body : "config", tags : [] }
+				] ) );
+
+				var results = runner.run( siteDir : siteDir, query : "config", limit : 2 );
+
+				expect( results.len() ).toBe( 2 );
+			} );
+
+		} );
+	}
+
+}

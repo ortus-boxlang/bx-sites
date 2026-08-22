@@ -1,0 +1,76 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.VersionScaffolder", function() {
+
+			beforeEach( function() {
+				variables.scaffolder = new "models.build.VersionScaffolder@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newDocsDir() {
+				var dir = createTempDirectory( prefix = "bxdocs-versionscaffolder-" );
+				tempDirs.append( dir & "/docs" );
+				var docsDir = dir & "/docs";
+				directoryCreate( docsDir & "/guides", true, true );
+				fileWrite( docsDir & "/index.md", "Home" );
+				fileWrite( docsDir & "/guides/foo.md", "Foo guide" );
+				directoryCreate( docsDir & "/assets", true, true );
+				fileWrite( docsDir & "/assets/logo.png", "fake" );
+				directoryCreate( docsDir & "/blog/posts", true, true );
+				fileWrite( docsDir & "/blog/posts/hello.md", "A post" );
+				directoryCreate( docsDir & "/i18n/es", true, true );
+				fileWrite( docsDir & "/i18n/es/index.md", "Inicio" );
+				return docsDir;
+			}
+
+			it( "throws BxDocs.MissingVersionName when name is blank", function() {
+				expect( function() {
+					scaffolder.scaffold( docsDir : newDocsDir(), name : "  " );
+				} ).toThrow( "BxDocs.MissingVersionName" );
+			} );
+
+			it( "throws BxDocs.DocsDirNotFound when there's no docs/ directory", function() {
+				var dir = createTempDirectory( prefix = "bxdocs-versionscaffolder-nodocs-" );
+				tempDirs.append( dir );
+
+				expect( function() {
+					scaffolder.scaffold( docsDir : dir & "/docs", name : "2.0" );
+				} ).toThrow( "BxDocs.DocsDirNotFound" );
+			} );
+
+			it( "copies top-level pages/folders into docs/versions/<name>/, excluding assets/blog/i18n/versions", function() {
+				var docsDir = newDocsDir();
+
+				var result = scaffolder.scaffold( docsDir : docsDir, name : "2.0" );
+
+				expect( result.versionDir ).toBe( docsDir & "/versions/2.0" );
+				expect( fileExists( result.versionDir & "/index.md" ) ).toBeTrue();
+				expect( fileExists( result.versionDir & "/guides/foo.md" ) ).toBeTrue();
+				expect( directoryExists( result.versionDir & "/assets" ) ).toBeFalse();
+				expect( directoryExists( result.versionDir & "/blog" ) ).toBeFalse();
+				expect( directoryExists( result.versionDir & "/i18n" ) ).toBeFalse();
+				expect( result.copiedCount ).toBe( 2 );
+			} );
+
+			it( "throws BxDocs.VersionAlreadyExists rather than overwriting", function() {
+				var docsDir = newDocsDir();
+				scaffolder.scaffold( docsDir : docsDir, name : "2.0" );
+
+				expect( function() {
+					scaffolder.scaffold( docsDir : docsDir, name : "2.0" );
+				} ).toThrow( "BxDocs.VersionAlreadyExists" );
+			} );
+
+		} );
+	}
+
+}

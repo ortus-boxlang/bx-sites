@@ -1,0 +1,48 @@
+/**
+ * `i18n:status` CLI verb - thin dispatcher over I18nStatusBuilder.build().
+ * Always exits 0 - purely informational, same as `stats`.
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxDocs.MissingProjectRoot", message = "`i18n:status` requires a project root" )
+		}
+
+		var builder = new "models.build.I18nStatusBuilder@bxdocs"()
+		var result = builder.build( projectRoot & "/docs" )
+
+		return {
+			exitCode : 0,
+			message  : formatReport( result )
+		}
+	}
+
+	/**
+	 * @result I18nStatusBuilder.build()'s own return value
+	 */
+	private string function formatReport( required struct result ) {
+		var lines = []
+		lines.append( "Default locale: #arguments.result.defaultPageCount# page(s)" )
+
+		if ( !arguments.result.locales.len() ) {
+			lines.append( "No docs/i18n/ locales found." )
+			return lines.toList( char( 10 ) )
+		}
+
+		lines.append( "" )
+		for ( var locale in arguments.result.locales ) {
+			lines.append( "#locale.code#: #locale.translated#/#locale.total# translated (#locale.percent#%)" )
+			for ( var missingPath in locale.missingPaths ) {
+				lines.append( "  - missing: #missingPath#" )
+			}
+		}
+
+		return lines.toList( char( 10 ) )
+	}
+
+}

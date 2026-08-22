@@ -1,0 +1,78 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.Lint", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.Lint@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-lint-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				return dir;
+			}
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "exits 0 with no issues on a clean docs tree", function() {
+				var projectRoot = newProjectRoot();
+				fileWrite( projectRoot & "/docs/clean.md", "## Level Two
+
+### Level Three
+
+All good." );
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toBe( "No lint issues found." );
+			} );
+
+			it( "exits 1 and reports a heading level skip", function() {
+				var projectRoot = newProjectRoot();
+				fileWrite( projectRoot & "/docs/skippy.md", "## Level Two
+
+#### Level Four (skipped three)" );
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.exitCode ).toBe( 1 );
+				expect( result.message ).toInclude( "heading level skip" );
+				expect( result.message ).toInclude( "h2 -> h4" );
+			} );
+
+			it( "exits 1 and reports a blog post missing frontmatter date", function() {
+				var projectRoot = newProjectRoot();
+				var postsDir = projectRoot & "/docs/blog/posts";
+				directoryCreate( postsDir, true, true );
+				fileWrite( postsDir & "/no-date.md", "---
+title: No Date Post
+---
+Body" );
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.exitCode ).toBe( 1 );
+				expect( result.message ).toInclude( "blog post date issue" );
+				expect( result.message ).toInclude( "missing frontmatter [date]" );
+			} );
+
+		} );
+	}
+
+}

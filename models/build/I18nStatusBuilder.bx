@@ -1,0 +1,46 @@
+/**
+ * Backs the `i18n:status` CLI verb - a per-locale translation coverage
+ * report: how many of the default locale's own pages each
+ * `docs/i18n/<code>/` tree actually translates (has its own file at the
+ * same relative path) versus falls back to the default locale's content
+ * for (module spec/docs/guides/i18n.md's own documented fallback
+ * behavior - a locale missing a page isn't an error, just untranslated).
+ */
+class {
+
+	variables.docsLoader = new "models.build.DocsLoader@bxdocs"()
+	variables.localesDiscoverer = new "models.build.LocalesDiscoverer@bxdocs"()
+
+	/**
+	 * @docsDir Absolute path to the project's docs/ directory
+	 *
+	 * @return { defaultPageCount, locales: [ { code, translated, missing, total, percent, missingPaths } ] } - locales sorted alphabetically by code; empty locales array when there's no docs/i18n/ at all
+	 */
+	struct function build( required string docsDir ) {
+		var trimmedDocsDir = arguments.docsDir.reReplace( "[\/]+$", "" )
+		var defaultPages = variables.docsLoader.load( trimmedDocsDir )
+		var defaultRelativePaths = defaultPages.map( page => page.relativePath )
+
+		var localeCodes = variables.localesDiscoverer.discover( trimmedDocsDir )
+		var locales = []
+
+		for ( var code in localeCodes ) {
+			var localeDir = trimmedDocsDir & "/i18n/" & code
+			var missingPaths = defaultRelativePaths.filter( relativePath => !fileExists( localeDir & "/" & relativePath ) )
+			var total = defaultRelativePaths.len()
+			var translated = total - missingPaths.len()
+
+			locales.append( {
+				code         : code,
+				translated   : translated,
+				missing      : missingPaths.len(),
+				total        : total,
+				percent      : total ? round( translated / total * 100 ) : 100,
+				missingPaths : missingPaths
+			} )
+		}
+
+		return { defaultPageCount : defaultRelativePaths.len(), locales : locales }
+	}
+
+}

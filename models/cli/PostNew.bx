@@ -1,0 +1,41 @@
+/**
+ * `post:new` CLI verb - thin dispatcher over PostScaffolder.scaffold().
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path), title (required), slug, date, authors, categories, tags (all comma-separated where relevant), draft (defaults true - pass --draft=false to publish immediately) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxDocs.MissingProjectRoot", message = "`post:new` requires a project root" )
+		}
+
+		var title = trim( arguments.options.title ?: "" )
+		if ( !len( title ) ) {
+			throw( type = "BxDocs.MissingPostTitle", message = "`post:new` requires --title=<title>" )
+		}
+
+		var draftOption = arguments.options.draft ?: true
+		var draft = isBoolean( draftOption ) ? ( draftOption ? true : false ) : true
+
+		var scaffolder = new "models.build.PostScaffolder@bxdocs"()
+		var result = scaffolder.scaffold(
+			docsDir    : projectRoot & "/docs",
+			title      : title,
+			slug       : trim( arguments.options.slug ?: "" ),
+			date       : trim( arguments.options.date ?: "" ),
+			authors    : trim( arguments.options.authors ?: "" ),
+			categories : trim( arguments.options.categories ?: "" ),
+			tags       : trim( arguments.options.tags ?: "" ),
+			draft      : draft
+		)
+
+		return {
+			exitCode : 0,
+			message  : "Created new blog post [#result.slug#] at #result.path#" & ( draft ? " (draft: true - flip to false, or pass --draft=false next time, to publish)" : "" )
+		}
+	}
+
+}

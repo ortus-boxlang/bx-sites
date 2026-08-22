@@ -1,0 +1,117 @@
+/**
+ * Backs the `lint` CLI verb - a pre-build content quality pass over raw
+ * `docs/` Markdown source, distinct from `check` (LinkChecker.bx), which
+ * only inspects an already-built `site/`. Two checks:
+ *
+ *   - A heading level skip within one page's body (`##` straight to
+ *     `####`, with no `###` in between) - confusing document structure,
+ *     and bad for accessibility (screen readers rely on heading levels
+ *     nesting without gaps).
+ *   - A blog post with a missing/invalid frontmatter `date` -
+ *     BlogDiscoverer.bx itself throws on this the moment a real `build`
+ *     tries to load posts (`BxDocs.InvalidBlogPost`), so `lint` reads
+ *     `docs/blog/posts/**` frontmatter directly (bypassing
+ *     BlogDiscoverer.bx entirely) specifically so this shows up as a
+ *     lint finding instead of crashing the whole run.
+ */
+class {
+
+	variables.frontmatterParser = new "models.build.FrontmatterParser@bxdocs"()
+	variables.docsLoader = new "models.build.DocsLoader@bxdocs"()
+
+	/**
+	 * @docsDir Absolute path to the project's docs/ directory
+	 *
+	 * @return { headingSkips : [ { page, from, to, line } ], blogDateIssues : [ { page, issue } ] }
+	 */
+	struct function lint( required string docsDir ) {
+		var trimmedDocsDir = arguments.docsDir.reReplace( "[\/]+$", "" )
+
+		return {
+			headingSkips   : findHeadingSkips( trimmedDocsDir ),
+			blogDateIssues : findBlogDateIssues( trimmedDocsDir )
+		}
+	}
+
+	/**
+	 * @docsDir Absolute path to docs/, trailing slash already stripped
+	 */
+	private array function findHeadingSkips( required string docsDir ) {
+		var issues = []
+		for ( var page in variables.docsLoader.load( arguments.docsDir ) ) {
+			issues.append( headingSkipsInBody( page.relativePath, page.body ), true )
+		}
+		return issues
+	}
+
+	/**
+	 * Walks one page's raw Markdown body line by line, tracking the last
+	 * heading level seen (0 = none yet) and flagging any jump of more than
+	 * one level - lines inside a fenced code block (`` ``` `` / `~~~`,
+	 * CodeAnnotationProcessor.bx's own fence-marker regex) are skipped, so
+	 * a `#`-prefixed comment/shell-prompt line inside a code sample is
+	 * never mistaken for a heading.
+	 *
+	 * @relativePath The page's own docs/-relative path, for the reported finding
+	 * @body Raw Markdown source (pre-render)
+	 */
+	private array function headingSkipsInBody( required string relativePath, required string body ) {
+		var issues = []
+		var lastLevel = 0
+		var inFence = false
+
+		for ( var line in listToArray( arguments.body, char( 10 ), true ) ) {
+			var trimmedLine = trim( line )
+
+			if ( trimmedLine.reFind( "^(```+|~~~+)" ) ) {
+				inFence = !inFence
+				continue
+			}
+			if ( inFence ) {
+				continue
+			}
+
+			if ( !trimmedLine.reFindNoCase( "^##{1,6}[ \t]+\S" ) ) {
+				continue
+			}
+
+			var level = len( trimmedLine.reReplace( "^(##{1,6}).*", "\1", "one" ) )
+			if ( lastLevel > 0 && level > lastLevel + 1 ) {
+				issues.append( {
+					page : arguments.relativePath,
+					from : lastLevel,
+					to   : level,
+					line : trim( trimmedLine.reReplace( "^##{1,6}[ \t]+", "" ) )
+				} )
+			}
+			lastLevel = level
+		}
+
+		return issues
+	}
+
+	/**
+	 * @docsDir Absolute path to docs/, trailing slash already stripped
+	 */
+	private array function findBlogDateIssues( required string docsDir ) {
+		var postsDir = arguments.docsDir & "/blog/posts"
+		if ( !directoryExists( postsDir ) ) {
+			return []
+		}
+
+		var issues = []
+		for ( var filePath in directoryList( postsDir, true, "path", "*.md" ) ) {
+			var relativeToPostsDir = filePath.reReplace( postsDir, "", "one" ).reReplace( "^[\/]", "" )
+			var fm = variables.frontmatterParser.parse( fileRead( filePath ) ).frontmatter
+			var date = trim( fm.date ?: "" )
+
+			if ( !len( date ) ) {
+				issues.append( { page : "blog/posts/" & relativeToPostsDir, issue : "missing frontmatter [date]" } )
+			} else if ( !isDate( date ) ) {
+				issues.append( { page : "blog/posts/" & relativeToPostsDir, issue : "invalid frontmatter [date] (got [#date#])" } )
+			}
+		}
+		return issues
+	}
+
+}

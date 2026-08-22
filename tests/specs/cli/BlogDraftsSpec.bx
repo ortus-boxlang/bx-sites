@@ -1,0 +1,83 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.BlogDrafts", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.BlogDrafts@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-blogdrafts-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "reports no drafts when docs/blog/posts/ doesn't exist", function() {
+				var result = verb.run( { projectRoot : newProjectRoot() } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toBe( "No draft posts" );
+			} );
+
+			it( "reports no drafts when every post is published", function() {
+				var projectRoot = newProjectRoot();
+				var postsDir = projectRoot & "/docs/blog/posts";
+				directoryCreate( postsDir, true, true );
+				fileWrite( postsDir & "/published.md", "---
+title: Published Post
+date: 2026-01-02
+---
+Body" );
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toBe( "No draft posts" );
+			} );
+
+			it( "lists draft posts with title, path, and date, excluding published ones", function() {
+				var projectRoot = newProjectRoot();
+				var postsDir = projectRoot & "/docs/blog/posts";
+				directoryCreate( postsDir, true, true );
+				fileWrite( postsDir & "/draft-one.md", "---
+title: Draft One
+date: 2026-01-01
+draft: true
+---
+Body" );
+				fileWrite( postsDir & "/published.md", "---
+title: Published Post
+date: 2026-01-02
+---
+Body" );
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toInclude( "1 draft post(s)" );
+				expect( result.message ).toInclude( "Draft One" );
+				expect( result.message ).toInclude( "blog/posts/draft-one.md" );
+				expect( result.message ).toInclude( "2026-01-01" );
+				expect( result.message ).notToInclude( "Published Post" );
+			} );
+
+		} );
+	}
+
+}

@@ -1,0 +1,62 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.ThemeScaffolder", function() {
+
+			beforeEach( function() {
+				variables.scaffolder = new "models.build.ThemeScaffolder@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot() {
+				var dir = createTempDirectory( prefix = "bxdocs-themescaffolder-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "throws BxDocs.UnknownTheme for anything but bootstrap/material/tailwind", function() {
+				expect( function() {
+					scaffolder.scaffold( projectRoot : newProjectRoot(), theme : "foobar" );
+				} ).toThrow( "BxDocs.UnknownTheme" );
+			} );
+
+			it( "copies the named built-in theme's layout.bxm/page.bxm/assets into project theme/", function() {
+				var projectRoot = newProjectRoot();
+
+				var result = scaffolder.scaffold( projectRoot : projectRoot, theme : "bootstrap" );
+
+				expect( result.themeDir ).toBe( projectRoot & "/theme" );
+				expect( fileExists( result.themeDir & "/layout.bxm" ) ).toBeTrue();
+				expect( fileExists( result.themeDir & "/page.bxm" ) ).toBeTrue();
+				expect( directoryExists( result.themeDir & "/assets" ) ).toBeTrue();
+			} );
+
+			it( "is case-insensitive on the theme name", function() {
+				var projectRoot = newProjectRoot();
+
+				var result = scaffolder.scaffold( projectRoot : projectRoot, theme : "MATERIAL" );
+
+				expect( fileExists( result.themeDir & "/layout.bxm" ) ).toBeTrue();
+			} );
+
+			it( "throws BxDocs.ThemeOverrideExists rather than overwriting an existing theme/", function() {
+				var projectRoot = newProjectRoot();
+				scaffolder.scaffold( projectRoot : projectRoot, theme : "bootstrap" );
+
+				expect( function() {
+					scaffolder.scaffold( projectRoot : projectRoot, theme : "material" );
+				} ).toThrow( "BxDocs.ThemeOverrideExists" );
+			} );
+
+		} );
+	}
+
+}
