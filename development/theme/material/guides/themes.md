@@ -283,7 +283,7 @@ is `--bxdocs-gradient-start`/`-end`, `--bxdocs-accent`, `--bxdocs-bg`,
 own small variations. Anything beyond color/font (layout, adding/removing
 chrome) needs a real override or a custom theme - see below.
 
-The rest back the [`::: stepper`/`::: step`](markdown.md#stepper) directive
+The rest back the [`::: stepper`/`::: step`](content-blocks.md#stepper) directive
 block - `--bxdocs-step-marker-bg`/`-text` are the default numbered circle's
 background/text color (`bootstrap`/`material` default it to the theme's
 own `--bxdocs-accent`; `tailwind` uses a dedicated teal/mint pair since it

@@ -126,7 +126,7 @@ GitBook's own on-disk sync format - into this project's `docs/` tree:
 `SUMMARY.md` becomes `docs/nav.json`, `{% block %}` syntax becomes its
 bx-docs equivalent (`::: name` directives, or the native `=== "Title"`
 tabs / `!!! type` admonition syntax where a closer match already exists -
-see [Markdown Extensions](guides/markdown.md#gitbook-style-blocks)),
+see [Content Blocks](guides/content-blocks.md)),
 `README.md` files become `index.md`, and `.gitbook/assets/**` is copied to
 `docs/assets/gitbook/`.
 

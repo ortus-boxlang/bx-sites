@@ -14,20 +14,21 @@ to your own page content too, for free: no `bxdocs.json` setting to flip,
 no `extraJs` entry to add, no extra `<script>` tag to write in your
 markdown.
 
-Since [raw block-level HTML passes through untouched](markdown.md#images)
-in your markdown, you can drop Alpine's `x-data`/`x-show`/`@click`/etc.
-attributes straight onto any HTML block and it just works.
+Since [raw block-level HTML passes through
+untouched](images.md#captions-alignment-and-framing) in your markdown,
+you can drop Alpine's `x-data`/`x-show`/`@click`/etc. attributes
+straight onto any HTML block and it just works.
 
 ## Before reaching for Alpine
 
 Most "interactive" needs already have a purpose-built directive block that
 doesn't require writing any JS yourself - reach for these first:
 
-- A collapsible section → [Expandable](markdown.md#expandable) or a
+- A collapsible section → [Expandable](content-blocks.md#expandable) or a
   [collapsible admonition](markdown.md#collapsible-admonitions)
 - Grouped alternative content behind clickable tabs → [Content
   Tabs](markdown.md#content-tabs)
-- A numbered walkthrough → [Stepper](markdown.md#stepper)
+- A numbered walkthrough → [Stepper](content-blocks.md#stepper)
 
 Alpine is for the interactive content those don't cover - anything with
 its own client-side state.

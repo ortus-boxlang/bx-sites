@@ -46,6 +46,33 @@ say) still gets a full-size WebP re-encode when `"webp"` is in
 `assets.images.formats` - a real file-size win even with no responsive
 breakpoint to offer.
 
+## Captions, alignment and framing
+
+A caption, a frame, or a multi-image gallery are all just block-level
+HTML - which bx-markdown/Flexmark passes through completely untouched
+(CommonMark's own "HTML block" rule), so no bx-docs-specific syntax is
+needed at all:
+
+```markdown title="Example" linenums="1"
+<figure>
+  <img src="../assets/screenshot.png" alt="The build output">
+  <figcaption>A freshly built site</figcaption>
+</figure>
+
+<div data-with-frame="true">
+  <img src="../assets/screenshot.png" alt="Framed">
+</div>
+
+<div class="bxdocs-gallery">
+  <img src="../assets/one.png" alt="">
+  <img src="../assets/two.png" alt="">
+  <img src="../assets/three.png" alt="">
+</div>
+```
+
+The same is true of `x-data`/`x-show`/`@click` and any other Alpine.js
+attribute - see [Interactivity with Alpine.js](interactivity.md).
+
 ## What doesn't get resized
 
 - **SVGs** - already resolution-independent, copied through unchanged.
