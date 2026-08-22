@@ -46,6 +46,15 @@ jobs:
   build:
     name: Build & Publish (${{ github.ref_name }})
     runs-on: ubuntu-latest
+    env:
+      # bx-image's WebP write support (org.sejda.imageio:webp-imageio) is a
+      # JNI-backed native library that Java 21's own native-access
+      # restrictions silently block from loading without this flag - bx-image's
+      # own Gradle test suite sets the same JVM arg for the same reason
+      # (build.gradle's own `test { jvmArgs '--enable-native-access=ALL-UNNAMED' }`).
+      # Without it, ImageIO.write() just reports "No suitable ImageIO writer
+      # found for format: webp" instead of a clearer native-loading error.
+      JAVA_TOOL_OPTIONS: --enable-native-access=ALL-UNNAMED
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
