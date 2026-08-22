@@ -21,12 +21,6 @@ jobs:
     env:
       DB_USER: root
       DB_PASSWORD: root
-      # TestBox's own JSON result-serialization recurses once per test result
-      # rather than looping, so a growing suite (600+ specs) can overflow the
-      # JVM's default thread stack right after the last spec finishes, before
-      # tests/results/*.xml gets written - bump it well past what a
-      # comfortably larger suite would ever need.
-      JAVA_TOOL_OPTIONS: -Xss16m
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
@@ -59,7 +53,25 @@ jobs:
 
       - name: Run Tests
         run: |
-          ./testbox/run --reporter=ANTJunit --verbose
+          # TestBox's own runner always JSON-serializes the *entire* run's
+          # aggregated result memento in one call
+          # (system/runners/BoxLangRunner.bx), regardless of reporter - a
+          # fixed-size JVM thread stack makes that overflow once the whole
+          # suite gets large enough, right after the very last spec
+          # finishes and before any tests/results/*.xml gets written. This
+          # repo's suite crossed that threshold once the asset-pipeline
+          # PR's own new tests pushed the total past ~608. The ANTJunit
+          # reporter already writes one TEST-<package>.xml file per suite
+          # regardless of how many `run` invocations produce them, so
+          # splitting the suite across a few invocations - each with its
+          # own smaller memento to serialize - avoids the crash without
+          # dropping any coverage.
+          STATUS=0
+          ./testbox/run --directory=tests.specs.build --reporter=ANTJunit --verbose || STATUS=1
+          ./testbox/run --directory=tests.specs.cli --reporter=ANTJunit --verbose || STATUS=1
+          ./testbox/run --directory=tests.specs.config --reporter=ANTJunit --verbose || STATUS=1
+          ./testbox/run --bundles=tests.specs.DogfoodDocsSpec,tests.specs.ModuleConfigCliSpec --reporter=ANTJunit --verbose || STATUS=1
+          exit $STATUS
 
       - name: Upload Test Results
         if: always()
