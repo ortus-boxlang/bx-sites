@@ -1,16 +1,16 @@
 /**
- * Names bx-docs' built-in search providers (module spec section 7) and
+ * Names bx-sites' built-in search providers (module spec section 7) and
  * which of them need the static lunr index BuildPipeline builds by default.
  *
- * `local` (the default, unchanged) is bx-docs' own fully static/client-side
+ * `local` (the default, unchanged) is bx-sites' own fully static/client-side
  * search - a `search-index.json` built at `build` time, searched with
  * lunr.js in the browser, no server involved. `algolia` wires up Algolia
  * DocSearch instead, which serves results from Algolia's own hosted index
- * (populated by their crawler/API, not by bx-docs), so it has no use for
+ * (populated by their crawler/API, not by bx-sites), so it has no use for
  * `search-index.json` at all. `pagefind` is also fully static/no-server,
  * like `local`, but indexes the *built* `site/` HTML with the external
  * `pagefind` CLI (PagefindIndexer.bx) into its own self-hosted
- * `site/pagefind/` bundle, rather than bx-docs' own `search-index.json`/lunr.
+ * `site/pagefind/` bundle, rather than bx-sites' own `search-index.json`/lunr.
  *
  * A `searchProvider.provider` outside `getBuiltIn()` isn't an error -
  * ConfigLoader only validates the providers this module ships built-in UI
@@ -39,7 +39,7 @@ class {
 	 * each serve results from their own index instead (Algolia's hosted
 	 * index, Pagefind's own `site/pagefind/` bundle).
 	 *
-	 * @provider bxdocs.json's `searchProvider.provider`
+	 * @provider bxsites.json's `searchProvider.provider`
 	 */
 	boolean function usesLocalIndex( required string provider ) {
 		return !listFindNoCase( "algolia,pagefind", trim( arguments.provider ) )
@@ -49,7 +49,7 @@ class {
 	 * Whether `provider` needs PagefindIndexer.bx run against the finished
 	 * `site/` output at the end of `build` - true only for `pagefind` itself.
 	 *
-	 * @provider bxdocs.json's `searchProvider.provider`
+	 * @provider bxsites.json's `searchProvider.provider`
 	 */
 	boolean function usesPagefind( required string provider ) {
 		return lCase( trim( arguments.provider ) ) == "pagefind"

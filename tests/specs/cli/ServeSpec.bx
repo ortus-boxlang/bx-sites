@@ -10,13 +10,13 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.Serve", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.Serve@bxdocs"();
+				variables.verb = new "models.cli.Serve@bxsites"();
 			} );
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( {} );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
 		} );

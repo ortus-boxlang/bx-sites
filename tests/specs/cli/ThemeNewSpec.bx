@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.ThemeNew", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.ThemeNew@bxdocs"();
+				variables.verb = new "models.cli.ThemeNew@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,21 +17,21 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newProjectRoot() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-themenew-" );
+				var dir = createTempDirectory( prefix = "bxsites-cli-themenew-" );
 				tempDirs.append( dir );
 				return dir;
 			}
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( { theme : "bootstrap" } );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
-			it( "throws BxDocs.MissingThemeName when theme is blank", function() {
+			it( "throws BxSites.MissingThemeName when theme is blank", function() {
 				expect( function() {
 					verb.run( { projectRoot : newProjectRoot() } );
-				} ).toThrow( "BxDocs.MissingThemeName" );
+				} ).toThrow( "BxSites.MissingThemeName" );
 			} );
 
 			it( "exits 0 and copies the theme into project theme/", function() {

@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.PageLinkResolver", function() {
 
 			beforeEach( function() {
-				variables.resolver = new "models.build.PageLinkResolver@bxdocs"();
+				variables.resolver = new "models.build.PageLinkResolver@bxsites"();
 			} );
 
 			// encodeForHTML()'s exact escaping range for non-ASCII characters
@@ -28,7 +28,7 @@ class extends="testbox.system.BaseSpec" {
 				var pages = [
 					{
 						urlPath : "index.html",
-						contentHtml : '<a class="bxdocs-page-link" href="/guides/themes/index.html" data-bxdocs-page-link><span class="bxdocs-page-link__title">/guides/themes/index.html</span></a>'
+						contentHtml : '<a class="bxsites-page-link" href="/guides/themes/index.html" data-bxsites-page-link><span class="bxsites-page-link__title">/guides/themes/index.html</span></a>'
 					},
 					{ urlPath : "guides/themes/index.html", title : "Themes", icon : "🎨", summary : "Customize the look." }
 				];
@@ -36,16 +36,16 @@ class extends="testbox.system.BaseSpec" {
 				resolver.resolve( pages, "/" );
 				var decoded = htmlDecode( pages[ 1 ].contentHtml );
 
-				expect( decoded ).toInclude( '<span class="bxdocs-page-link__icon">🎨</span>' );
-				expect( decoded ).toInclude( '<span class="bxdocs-page-link__title">Themes</span>' );
-				expect( decoded ).toInclude( '<span class="bxdocs-page-link__summary">Customize the look.</span>' );
+				expect( decoded ).toInclude( '<span class="bxsites-page-link__icon">🎨</span>' );
+				expect( decoded ).toInclude( '<span class="bxsites-page-link__title">Themes</span>' );
+				expect( decoded ).toInclude( '<span class="bxsites-page-link__summary">Customize the look.</span>' );
 			} );
 
 			it( "resolves a named library icon (not just an emoji) into a real SVG, not the raw icon string as text", function() {
 				var pages = [
 					{
 						urlPath : "index.html",
-						contentHtml : '<a class="bxdocs-page-link" href="/getting-started/index.html" data-bxdocs-page-link><span class="bxdocs-page-link__title">/getting-started/index.html</span></a>'
+						contentHtml : '<a class="bxsites-page-link" href="/getting-started/index.html" data-bxsites-page-link><span class="bxsites-page-link__title">/getting-started/index.html</span></a>'
 					},
 					{ urlPath : "getting-started/index.html", title : "Getting Started", icon : "phosphor-duotone:rocket-launch", summary : "" }
 				];
@@ -53,25 +53,25 @@ class extends="testbox.system.BaseSpec" {
 				resolver.resolve( pages, "/" );
 
 				expect( pages[ 1 ].contentHtml ).notToInclude( "phosphor-duotone:rocket-launch" );
-				expect( pages[ 1 ].contentHtml ).toInclude( '<span class="bxdocs-page-link__icon"><svg' );
+				expect( pages[ 1 ].contentHtml ).toInclude( '<span class="bxsites-page-link__icon"><svg' );
 			} );
 
 			it( "falls back to a page's description when it has no summary", function() {
 				var pages = [
 					{
 						urlPath : "index.html",
-						contentHtml : '<a class="bxdocs-page-link" href="/guides/themes/index.html" data-bxdocs-page-link><span class="bxdocs-page-link__title">x</span></a>'
+						contentHtml : '<a class="bxsites-page-link" href="/guides/themes/index.html" data-bxsites-page-link><span class="bxsites-page-link__title">x</span></a>'
 					},
 					{ urlPath : "guides/themes/index.html", title : "Themes", icon : "", summary : "", description : "A description." }
 				];
 
 				resolver.resolve( pages, "/" );
 
-				expect( pages[ 1 ].contentHtml ).toInclude( '<span class="bxdocs-page-link__summary">A description.</span>' );
+				expect( pages[ 1 ].contentHtml ).toInclude( '<span class="bxsites-page-link__summary">A description.</span>' );
 			} );
 
 			it( "leaves a stub untouched when its href doesn't match any page (dead link)", function() {
-				var original = '<a class="bxdocs-page-link" href="/nowhere/index.html" data-bxdocs-page-link><span class="bxdocs-page-link__title">/nowhere/index.html</span></a>';
+				var original = '<a class="bxsites-page-link" href="/nowhere/index.html" data-bxsites-page-link><span class="bxsites-page-link__title">/nowhere/index.html</span></a>';
 				var pages = [ { urlPath : "index.html", contentHtml : original } ];
 
 				resolver.resolve( pages, "/" );
@@ -91,14 +91,14 @@ class extends="testbox.system.BaseSpec" {
 				var pages = [
 					{
 						urlPath : "index.html",
-						contentHtml : '<a class="bxdocs-page-link" href="/my-docs/guides/themes/index.html" data-bxdocs-page-link><span class="bxdocs-page-link__title">x</span></a>'
+						contentHtml : '<a class="bxsites-page-link" href="/my-docs/guides/themes/index.html" data-bxsites-page-link><span class="bxsites-page-link__title">x</span></a>'
 					},
 					{ urlPath : "guides/themes/index.html", title : "Themes" }
 				];
 
 				resolver.resolve( pages, "/my-docs/" );
 
-				expect( pages[ 1 ].contentHtml ).toInclude( '<span class="bxdocs-page-link__title">Themes</span>' );
+				expect( pages[ 1 ].contentHtml ).toInclude( '<span class="bxsites-page-link__title">Themes</span>' );
 			} );
 
 		} );

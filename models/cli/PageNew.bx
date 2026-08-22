@@ -9,15 +9,15 @@ class {
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
 		if ( !len( projectRoot ) ) {
-			throw( type = "BxDocs.MissingProjectRoot", message = "`page:new` requires a project root" )
+			throw( type = "BxSites.MissingProjectRoot", message = "`page:new` requires a project root" )
 		}
 
 		var path = trim( arguments.options.path ?: "" )
 		if ( !len( path ) ) {
-			throw( type = "BxDocs.MissingPagePath", message = "`page:new` requires --path=<relative path>.md" )
+			throw( type = "BxSites.MissingPagePath", message = "`page:new` requires --path=<relative path>.md" )
 		}
 
-		var scaffolder = new "models.build.PageScaffolder@bxdocs"()
+		var scaffolder = new "models.build.PageScaffolder@bxsites"()
 		var result = scaffolder.scaffold(
 			docsDir     : projectRoot & "/docs",
 			path        : path,

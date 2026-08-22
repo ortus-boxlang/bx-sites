@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.ResponsiveImageProcessor", function() {
 
 			beforeEach( function() {
-				variables.processor = new "models.build.ResponsiveImageProcessor@bxdocs"();
+				variables.processor = new "models.build.ResponsiveImageProcessor@bxsites"();
 			} );
 
 			private struct function entry( array originalVariants = [], array webpVariants = [] ) {

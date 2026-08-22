@@ -6,7 +6,7 @@
  */
 class {
 
-	variables.frontmatterParser = new "models.build.FrontmatterParser@bxdocs"()
+	variables.frontmatterParser = new "models.build.FrontmatterParser@bxsites"()
 
 	/**
 	 * Walks every `.md` file under `docsDir` (excluding `docs/assets/**`,
@@ -26,7 +26,7 @@ class {
 		var dir = arguments.docsDir.reReplace( "[\/]+$", "" )
 
 		if ( !directoryExists( dir ) ) {
-			throw( type = "BxDocs.DocsDirNotFound", message = "No docs/ directory found at [#dir#]" )
+			throw( type = "BxSites.DocsDirNotFound", message = "No docs/ directory found at [#dir#]" )
 		}
 
 		var pages = directoryList( dir, true, "path", "*.md" )

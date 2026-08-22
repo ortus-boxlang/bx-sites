@@ -14,7 +14,7 @@ GitHub-Actions-Workflow mit (`.github/workflows/pages.yml`) für den
 Website veröffentlicht werden.
 
 Für ein einfacheres Ein-Versionen-Projekt ganz ohne CI-Setup baut und
-pusht [`bxDocs gh-deploy`](../cli-reference.md#gh-deploy) `site/` mit
+pusht [`bxSites gh-deploy`](../cli-reference.md#gh-deploy) `site/` mit
 einem Befehl in einen `gh-pages`-Branch, ausgeführt von deiner eigenen
 Maschine, wann immer du veröffentlichen möchtest - keine Workflow-Datei
 nötig. Der Rest dieser Anleitung behandelt den GitHub-Actions-Workflow,
@@ -23,15 +23,15 @@ bei jedem Push verwendet.
 
 ## Was er tut
 
-Bei jedem Push nach `main` oder `development`, der `docs/`, `bxdocs.json`
+Bei jedem Push nach `main` oder `development`, der `docs/`, `bxsites.json`
 oder die eigene Quelle des Moduls (Theme-/Pipeline-Änderungen) berührt,
 macht der Workflow Folgendes:
 
 1. Installiert BoxLang + [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
-2. Registriert dieses Repo als Modul, damit `boxlang module:bxDocs build` aufgelöst werden kann
+2. Registriert dieses Repo als Modul, damit `boxlang module:bxSites build` aufgelöst werden kann
 3. Setzt auf jedem Branch außer `main` `baseURL` auf `.../<branch-name>/`
    nur für diesen einen Build (siehe [unten](#publishing-two-versions-at-once))
-4. Führt `boxlang module:bxDocs build` aus
+4. Führt `boxlang module:bxSites build` aus
 5. Pusht `site/` in den `gh-pages`-Branch - `main` in die Wurzel der
    Website, `development` nach `/development/` - ohne die jeweils andere
    Version anzurühren
@@ -67,10 +67,10 @@ Job jedes Branches pusht nur mit `keep_files: true` und seinem eigenen
 `destination_dir` nach `gh-pages`, sodass ein `development`-Deploy nie den
 Inhalt von `main` überschreibt und umgekehrt.
 
-Die eigene `bxdocs.json` von `main` sollte `baseURL` auf die Wurzel der
+Die eigene `bxsites.json` von `main` sollte `baseURL` auf die Wurzel der
 Website gesetzt haben (`https://<user>.github.io/<repo>/`); der Workflow
 überschreibt das für jeden anderen Branch zur Build-Zeit, sodass die
-`bxdocs.json` von `development` dafür keinen eigenen `baseURL`-Eintrag
+`bxsites.json` von `development` dafür keinen eigenen `baseURL`-Eintrag
 braucht.
 
 Um einen dritten Branch hinzuzufügen (z. B. eine `release/2.0`-Vorschau),
@@ -93,7 +93,7 @@ seinen passenden Deploy-Schritt.
 Eine GitHub-*Projekt*-Pages-Website (im Gegensatz zu einer
 `<user>.github.io`-*Benutzer*-Website) wird unter
 `https://<user>.github.io/<repo>/` ausgeliefert, nicht von der
-Domain-Wurzel. Setze `baseURL` in `bxdocs.json` auf diese vollständige
+Domain-Wurzel. Setze `baseURL` in `bxsites.json` auf diese vollständige
 URL, damit jeder interne Link, jedes Asset und jeder Navigationseintrag
 das nötige `/<repo>/`-Präfix bekommt - und damit auch eine echte
 `sitemap.xml` erzeugt wird:

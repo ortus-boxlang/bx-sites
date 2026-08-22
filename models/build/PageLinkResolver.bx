@@ -15,9 +15,9 @@
  */
 class {
 
-	variables.iconResolver = new "models.build.IconResolver@bxdocs"()
+	variables.iconResolver = new "models.build.IconResolver@bxsites"()
 	variables.stubPattern = createObject( "java", "java.util.regex.Pattern" ).compile(
-		'<a class="bxdocs-page-link" href="([^"]*)" data-bxdocs-page-link><span class="bxdocs-page-link__title">[^<]*</span></a>'
+		'<a class="bxsites-page-link" href="([^"]*)" data-bxsites-page-link><span class="bxsites-page-link__title">[^<]*</span></a>'
 	)
 
 	/**
@@ -37,7 +37,7 @@ class {
 		}
 
 		for ( var page in arguments.pages ) {
-			if ( !findNoCase( "data-bxdocs-page-link", page.contentHtml ?: "" ) ) {
+			if ( !findNoCase( "data-bxsites-page-link", page.contentHtml ?: "" ) ) {
 				continue
 			}
 
@@ -64,14 +64,14 @@ class {
 		var icon = trim( arguments.target.icon ?: "" )
 		var summary = len( trim( arguments.target.summary ?: "" ) ) ? trim( arguments.target.summary ) : trim( arguments.target.description ?: "" )
 
-		var html = '<a class="bxdocs-page-link" href="' & attrEscape( arguments.href ) & '" data-bxdocs-page-link>'
+		var html = '<a class="bxsites-page-link" href="' & attrEscape( arguments.href ) & '" data-bxsites-page-link>'
 		if ( len( icon ) ) {
-			html &= '<span class="bxdocs-page-link__icon">' & variables.iconResolver.resolve( icon ) & '</span>'
+			html &= '<span class="bxsites-page-link__icon">' & variables.iconResolver.resolve( icon ) & '</span>'
 		}
-		html &= '<span class="bxdocs-page-link__text">'
-			& '<span class="bxdocs-page-link__title">' & encodeForHTML( arguments.target.title ) & '</span>'
+		html &= '<span class="bxsites-page-link__text">'
+			& '<span class="bxsites-page-link__title">' & encodeForHTML( arguments.target.title ) & '</span>'
 		if ( len( summary ) ) {
-			html &= '<span class="bxdocs-page-link__summary">' & encodeForHTML( summary ) & '</span>'
+			html &= '<span class="bxsites-page-link__summary">' & encodeForHTML( summary ) & '</span>'
 		}
 		html &= '</span></a>'
 		return html

@@ -10,7 +10,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.SocialCardGenerator", function() {
 
 			beforeEach( function() {
-				variables.generator = new "models.build.SocialCardGenerator@bxdocs"();
+				variables.generator = new "models.build.SocialCardGenerator@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -23,7 +23,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private function newOutputPath() {
-				var dir = createTempDirectory( prefix = "bxdocs-socialcard-" );
+				var dir = createTempDirectory( prefix = "bxsites-socialcard-" );
 				tempDirs.append( dir );
 				return dir & "/card.png";
 			}

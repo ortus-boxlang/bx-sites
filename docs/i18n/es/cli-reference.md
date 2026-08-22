@@ -2,26 +2,26 @@
 title: Referencia de la CLI
 order: 3
 icon: phosphor-duotone:terminal-window
-summary: Cada verbo de bxDocs y sus opciones.
+summary: Cada verbo de bxSites y sus opciones.
 tags: [referencia, cli]
 ---
 
 # Referencia de la CLI
 
 ```bash
-bxDocs <verb> [options]
+bxSites <verb> [options]
 ```
 
-`box install bx-docs` coloca un script `bxDocs` independiente en tu
+`box install bx-sites` coloca un script `bxSites` independiente en tu
 `PATH` (mediante `boxlang.executable` de `box.json`), de modo que cada
 verbo de abajo puede ejecutarse tanto de esa forma corta, como en la
-forma `boxlang module:bxdocs <verb>` - ambas ejecutan exactamente lo
+forma `boxlang module:bxsites <verb>` - ambas ejecutan exactamente lo
 mismo; usa la forma más larga en cualquier lugar donde el atajo del
 `PATH` no esté configurado (un ejecutor de CI, un módulo registrado a
 mano):
 
 ```bash
-boxlang module:bxdocs <verb> [options]
+boxlang module:bxsites <verb> [options]
 ```
 
 Cada verbo acepta `--projectRoot=<path>` (o una ruta posicional simple)
@@ -40,13 +40,13 @@ opciones globales de abajo pueden aparecer antes de cualquier verbo.
 Crea la estructura de un proyecto de documentación.
 
 ```bash
-bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...] [--format=yaml|json]
+bxSites new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...] [--format=yaml|json]
 ```
 
 - `--name` - el nombre del sitio escrito en la configuración del sitio (por defecto, el nombre del directorio de destino)
 - `--theme` - por defecto `bootstrap`
 - `--description` - la descripción del sitio escrita en la configuración del sitio
-- `--format` - `yaml` (por defecto, genera `bxdocs.yaml`) o `json` (genera `bxdocs.json`) - consulta [Configuración](configuration.md)
+- `--format` - `yaml` (por defecto, genera `bxsites.yaml`) o `json` (genera `bxsites.json`) - consulta [Configuración](configuration.md)
 
 ## `build`
 
@@ -55,7 +55,7 @@ el índice de búsqueda (a menos que `search` sea `false` en la
 configuración del sitio) y copia el tema + `docs/assets/**` en `site/`.
 
 ```bash
-bxDocs build
+bxSites build
 ```
 
 ## `serve`
@@ -63,7 +63,7 @@ bxDocs build
 Construye y sirve el sitio localmente con recarga en vivo.
 
 ```bash
-bxDocs serve [--port=8080] [--host=127.0.0.1]
+bxSites serve [--port=8080] [--host=127.0.0.1]
 ```
 
 Se ejecuta en primer plano hasta que se interrumpe (Ctrl+C).
@@ -76,7 +76,7 @@ automáticamente - este verbo existe para cuando solo necesitas actualizar
 el índice.
 
 ```bash
-bxDocs search-index
+bxSites search-index
 ```
 
 ## `clean`
@@ -85,7 +85,7 @@ Elimina `site/` y cualquier caché de construcción, dejando intactos
 `docs/` y la configuración del sitio.
 
 ```bash
-bxDocs clean
+bxSites clean
 ```
 
 ## `gh-deploy`
@@ -98,12 +98,12 @@ nunca toca tu propia rama actual ni tu árbol de trabajo (hace el push
 desde un `git worktree` desechable).
 
 ```bash
-bxDocs gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
+bxSites gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
 ```
 
 - `--branch` - por defecto `gh-pages`
 - `--remote` - por defecto `origin`
-- `--message` - el mensaje del único commit de la rama, por defecto `"Deploy site via bxDocs gh-deploy"`
+- `--message` - el mensaje del único commit de la rama, por defecto `"Deploy site via bxSites gh-deploy"`
 
 Consulta [Despliegue](guides/deployment.md) para la configuración completa
 de GitHub Pages (activar Pages para la rama, `baseURL`, etc.).
@@ -114,7 +114,7 @@ Convierte una exportación de GitBook - una tabla de contenidos
 `SUMMARY.md` más sus archivos `.md`, el propio formato de sincronización
 en disco de GitBook - en el árbol `docs/` de este proyecto: `SUMMARY.md`
 se convierte en `docs/nav.json`, la sintaxis `{% block %}` se convierte en
-su equivalente de bx-docs (directivas `::: name`, o la sintaxis nativa de
+su equivalente de bx-sites (directivas `::: name`, o la sintaxis nativa de
 pestañas `=== "Title"` / admoniciones `!!! type` cuando ya existe una
 correspondencia más cercana - consulta
 [Extensiones de Markdown](guides/markdown.md#gitbook-style-blocks)), los
@@ -122,7 +122,7 @@ archivos `README.md` se convierten en `index.md`, y `.gitbook/assets/**`
 se copia a `docs/assets/gitbook/`.
 
 ```bash
-bxDocs migrate --source=/path/to/gitbook-export
+bxSites migrate --source=/path/to/gitbook-export
 ```
 
 - `--source` (obligatorio) - ruta al directorio raíz de la exportación de GitBook (debe contener `SUMMARY.md`)

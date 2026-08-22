@@ -1,16 +1,16 @@
 {
-    "name":"BX Docs",
+    "name":"BX Sites",
     "version":"1.0.0",
-    "location":"https://downloads.ortussolutions.com/ortussolutions/boxlang-modules/bx-docs/@build.version@/bx-docs-@build.version@.zip",
+    "location":"https://downloads.ortussolutions.com/ortussolutions/boxlang-modules/bx-sites/@build.version@/bx-sites-@build.version@.zip",
     "author":"Ortus Solutions",
-    "homepage":"https://github.com/ortus-boxlang/bx-docs",
-    "documentation":"https://github.com/ortus-boxlang/bx-docs",
+    "homepage":"https://github.com/ortus-boxlang/bx-sites",
+    "documentation":"https://github.com/ortus-boxlang/bx-sites",
     "repository":{
         "type":"git",
-        "URL":"https://github.com/ortus-boxlang/bx-docs"
+        "URL":"https://github.com/ortus-boxlang/bx-sites"
     },
     "bugs":"https://ortussolutions.atlassian.net/browse/BLMODULES",
-    "slug":"bx-docs",
+    "slug":"bx-sites",
     "shortDescription":"Static documentation site generator for BoxLang, built on bx-markdown",
     "type":"boxlang-modules",
     "keywords":[
@@ -22,8 +22,8 @@
     ],
     "boxlang":{
         "minimumVersion":"1.6.0",
-        "moduleName":"bxdocs",
-        "executable":"bxDocs"
+        "moduleName":"bxsites",
+        "executable":"bxSites"
     },
     "private":false,
     "license":[

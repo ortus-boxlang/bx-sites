@@ -6,42 +6,42 @@
  */
 class {
 
-	variables.configLoader     = new "models.config.ConfigLoader@bxdocs"()
-	variables.docsLoader       = new "models.build.DocsLoader@bxdocs"()
-	variables.navBuilder       = new "models.build.NavBuilder@bxdocs"()
-	variables.themeRenderer    = new "models.build.ThemeRenderer@bxdocs"()
-	variables.searchIndexer    = new "models.build.SearchIndexer@bxdocs"()
-	variables.searchProviderRegistry = new "models.build.SearchProviderRegistry@bxdocs"()
-	variables.pagefindIndexer  = new "models.build.PagefindIndexer@bxdocs"()
-	variables.tableOfContents  = new "models.build.TableOfContents@bxdocs"()
-	variables.baseUrlResolver  = new "models.build.BaseUrlResolver@bxdocs"()
-	variables.sitemapGenerator = new "models.build.SitemapGenerator@bxdocs"()
-	variables.llmsTxtGenerator = new "models.build.LlmsTxtGenerator@bxdocs"()
-	variables.markdownRenderer = new "models.build.MarkdownRenderer@bxdocs"()
-	variables.gitRevisionDate  = new "models.build.GitRevisionDate@bxdocs"()
-	variables.versionsDiscoverer = new "models.build.VersionsDiscoverer@bxdocs"()
-	variables.localesDiscoverer = new "models.build.LocalesDiscoverer@bxdocs"()
-	variables.tagsIndexBuilder = new "models.build.TagsIndexBuilder@bxdocs"()
-	variables.socialCardGenerator = new "models.build.SocialCardGenerator@bxdocs"()
-	variables.tabsProcessor = new "models.build.TabsProcessor@bxdocs"()
-	variables.mathProtector = new "models.build.MathProtector@bxdocs"()
-	variables.codeAnnotationProcessor = new "models.build.CodeAnnotationProcessor@bxdocs"()
-	variables.tryBoxLangProcessor = new "models.build.TryBoxLangProcessor@bxdocs"()
-	variables.markdownLinkResolver = new "models.build.MarkdownLinkResolver@bxdocs"()
-	variables.markdownPublisher = new "models.build.MarkdownPublisher@bxdocs"()
-	variables.includeProcessor = new "models.build.IncludeProcessor@bxdocs"()
-	variables.directiveBlockProcessor = new "models.build.DirectiveBlockProcessor@bxdocs"()
-	variables.pageLinkResolver = new "models.build.PageLinkResolver@bxdocs"()
-	variables.updatesFeedGenerator = new "models.build.UpdatesFeedGenerator@bxdocs"()
-	variables.pluginLoader = new "models.build.PluginLoader@bxdocs"()
-	variables.iconResolver = new "models.build.IconResolver@bxdocs"()
-	variables.imageVariantGenerator = new "models.build.ImageVariantGenerator@bxdocs"()
-	variables.responsiveImageProcessor = new "models.build.ResponsiveImageProcessor@bxdocs"()
-	variables.assetBundler = new "models.build.AssetBundler@bxdocs"()
-	variables.blogDiscoverer = new "models.build.BlogDiscoverer@bxdocs"()
-	variables.blogAuthorsLoader = new "models.build.BlogAuthorsLoader@bxdocs"()
-	variables.blogBuilder = new "models.build.BlogBuilder@bxdocs"()
-	variables.blogFeedGenerator = new "models.build.BlogFeedGenerator@bxdocs"()
+	variables.configLoader     = new "models.config.ConfigLoader@bxsites"()
+	variables.docsLoader       = new "models.build.DocsLoader@bxsites"()
+	variables.navBuilder       = new "models.build.NavBuilder@bxsites"()
+	variables.themeRenderer    = new "models.build.ThemeRenderer@bxsites"()
+	variables.searchIndexer    = new "models.build.SearchIndexer@bxsites"()
+	variables.searchProviderRegistry = new "models.build.SearchProviderRegistry@bxsites"()
+	variables.pagefindIndexer  = new "models.build.PagefindIndexer@bxsites"()
+	variables.tableOfContents  = new "models.build.TableOfContents@bxsites"()
+	variables.baseUrlResolver  = new "models.build.BaseUrlResolver@bxsites"()
+	variables.sitemapGenerator = new "models.build.SitemapGenerator@bxsites"()
+	variables.llmsTxtGenerator = new "models.build.LlmsTxtGenerator@bxsites"()
+	variables.markdownRenderer = new "models.build.MarkdownRenderer@bxsites"()
+	variables.gitRevisionDate  = new "models.build.GitRevisionDate@bxsites"()
+	variables.versionsDiscoverer = new "models.build.VersionsDiscoverer@bxsites"()
+	variables.localesDiscoverer = new "models.build.LocalesDiscoverer@bxsites"()
+	variables.tagsIndexBuilder = new "models.build.TagsIndexBuilder@bxsites"()
+	variables.socialCardGenerator = new "models.build.SocialCardGenerator@bxsites"()
+	variables.tabsProcessor = new "models.build.TabsProcessor@bxsites"()
+	variables.mathProtector = new "models.build.MathProtector@bxsites"()
+	variables.codeAnnotationProcessor = new "models.build.CodeAnnotationProcessor@bxsites"()
+	variables.tryBoxLangProcessor = new "models.build.TryBoxLangProcessor@bxsites"()
+	variables.markdownLinkResolver = new "models.build.MarkdownLinkResolver@bxsites"()
+	variables.markdownPublisher = new "models.build.MarkdownPublisher@bxsites"()
+	variables.includeProcessor = new "models.build.IncludeProcessor@bxsites"()
+	variables.directiveBlockProcessor = new "models.build.DirectiveBlockProcessor@bxsites"()
+	variables.pageLinkResolver = new "models.build.PageLinkResolver@bxsites"()
+	variables.updatesFeedGenerator = new "models.build.UpdatesFeedGenerator@bxsites"()
+	variables.pluginLoader = new "models.build.PluginLoader@bxsites"()
+	variables.iconResolver = new "models.build.IconResolver@bxsites"()
+	variables.imageVariantGenerator = new "models.build.ImageVariantGenerator@bxsites"()
+	variables.responsiveImageProcessor = new "models.build.ResponsiveImageProcessor@bxsites"()
+	variables.assetBundler = new "models.build.AssetBundler@bxsites"()
+	variables.blogDiscoverer = new "models.build.BlogDiscoverer@bxsites"()
+	variables.blogAuthorsLoader = new "models.build.BlogAuthorsLoader@bxsites"()
+	variables.blogBuilder = new "models.build.BlogBuilder@bxsites"()
+	variables.blogFeedGenerator = new "models.build.BlogFeedGenerator@bxsites"()
 	variables.pluginsOverride = []
 	variables.hasPluginsOverride = false
 
@@ -123,7 +123,7 @@ class {
 	 * translates (switching locale always stays on the current version).
 	 *
 	 * @projectRoot Absolute path to the project root
-	 * @includeDrafts Include blog posts whose frontmatter sets `draft: true` - `false` (the default) for a real build; DevServer.bx's own `bxDocs serve` passes `true` so a draft can be previewed locally (BlogBuilder.bx stamps a visible "🚧 Draft" badge on one whenever this is on) without it ever leaking into an actual `bxDocs build`
+	 * @includeDrafts Include blog posts whose frontmatter sets `draft: true` - `false` (the default) for a real build; DevServer.bx's own `bxSites serve` passes `true` so a draft can be previewed locally (BlogBuilder.bx stamps a visible "🚧 Draft" badge on one whenever this is on) without it ever leaking into an actual `bxSites build`
 	 *
 	 * @return { siteDir, pageCount }
 	 */
@@ -338,7 +338,7 @@ class {
 	 * BoxLang-module lookup against `config.plugins`, unless setPlugins()
 	 * already provided one (test seam - see its own docblock).
 	 *
-	 * @config The site's bxdocs.json config, already defaulted/validated
+	 * @config The site's bxsites.json config, already defaulted/validated
 	 */
 	private array function resolvePlugins( required struct config ) {
 		if ( variables.hasPluginsOverride ) {
@@ -349,7 +349,7 @@ class {
 
 	/**
 	 * Bundles `extraCss`/`extraJs` into one fingerprinted file each
-	 * (AssetBundler.bx), when `bxdocs.json`'s `assets.bundle` is on (the
+	 * (AssetBundler.bx), when `bxsites.json`'s `assets.bundle` is on (the
 	 * default) - rewriting `config.extraCss`/`extraJs` in place to a
 	 * single-entry array pointing at the bundle, so every theme's own
 	 * `layout.bxm` (`renderExtraCss()`/`renderExtraJs()`) needs no changes
@@ -360,7 +360,7 @@ class {
 	 * to bundle (an external URL in the list, or a named file that
 	 * doesn't exist - see its own docblock).
 	 *
-	 * @config The site's bxdocs.json config, already defaulted/validated and plugin-onConfig'd
+	 * @config The site's bxsites.json config, already defaulted/validated and plugin-onConfig'd
 	 * @root Absolute path to the project root
 	 *
 	 * @return `{ config, cssBundle, jsBundle }` - `cssBundle`/`jsBundle` are AssetBundler.bundle()'s own return shape (empty `cachedPath`/`fileName` when nothing was bundled), threaded through to copyAssets() so the actual bundle file lands in every tree's own output alongside the rewritten `config.extraCss`/`extraJs` URL
@@ -396,7 +396,7 @@ class {
 	 *
 	 * @pages Already-loaded page structs for this tree - DocsLoader.load()'s own output for the main/version trees, or mergeLocalePages()'s output for a locale (top-level or version-nested) tree
 	 * @docsDir Absolute path this tree's `custom:` icons and `::: include` sources resolve against - `<root>/docs` for the main tree and every top-level locale tree (translated pages don't need their own duplicated icon/include assets), `<root>/docs/versions/<name>` for a version tree and every locale tree nested under it
-	 * @config The site's bxdocs.json config
+	 * @config The site's bxsites.json config
 	 * @themeDir Absolute path to the resolved theme folder
 	 * @outputDir Absolute path to write this tree's pages to (`site/`, `site/versions/<name>/`, `site/<localeCode>/`, or `site/versions/<name>/<localeCode>/`)
 	 * @basePath Root-relative base path ending with `/`, already namespaced under `versions/<name>/`/`<localeCode>/`/`versions/<name>/<localeCode>/` for a version/locale build
@@ -503,7 +503,7 @@ class {
 	}
 
 	/**
-	 * Resolves the main tree's explicit nav override, if any - `bxdocs.json`'s
+	 * Resolves the main tree's explicit nav override, if any - `bxsites.json`'s
 	 * own `nav` array wins when non-empty (it can get large for a big site,
 	 * which is exactly why a project can move it out to its own file
 	 * instead); otherwise a `docs/nav.json` file, if present, is used;
@@ -513,7 +513,7 @@ class {
 	 * an explicit nav (see renderDocTree()'s docblock).
 	 *
 	 * @docsDir Absolute path to the main tree's own `docs/` directory
-	 * @configNav The site's bxdocs.json `nav` array (already validated to be an array by ConfigLoader.bx)
+	 * @configNav The site's bxsites.json `nav` array (already validated to be an array by ConfigLoader.bx)
 	 *
 	 * @return NavBuilder.build()'s `navConfig` shape - empty when neither source is set
 	 */
@@ -532,14 +532,14 @@ class {
 			parsed = jsonDeserialize( fileRead( navJsonPath ) )
 		} catch ( any e ) {
 			throw(
-				type    = "BxDocs.InvalidConfig",
+				type    = "BxSites.InvalidConfig",
 				message = "docs/nav.json is not valid JSON: #e.message#"
 			)
 		}
 
 		if ( !isArray( parsed ) ) {
 			throw(
-				type    = "BxDocs.InvalidConfig",
+				type    = "BxSites.InvalidConfig",
 				message = "docs/nav.json must contain a JSON array"
 			)
 		}
@@ -590,7 +590,7 @@ class {
 	 *
 	 * @projectRoot Absolute path to the project root
 	 *
-	 * @return { skipped (true when bxdocs.json's `search` is off, or its `searchProvider` doesn't use the local index - see SearchProviderRegistry.bx), indexPath, pageCount }
+	 * @return { skipped (true when bxsites.json's `search` is off, or its `searchProvider` doesn't use the local index - see SearchProviderRegistry.bx), indexPath, pageCount }
 	 */
 	struct function buildSearchIndex( required string projectRoot ) {
 		var root = normalizeRoot( arguments.projectRoot )
@@ -618,12 +618,12 @@ class {
 
 	/**
 	 * Converts every page's raw markdown body to HTML in place (adds a
-	 * `contentHtml` key to each page struct), applying bxdocs.json's
+	 * `contentHtml` key to each page struct), applying bxsites.json's
 	 * markdown passthrough options (bx-markdown's own `enableAdmonition`/
 	 * `enableFootnotes`/`enableDefinitionLists`/etc. settings included -
 	 * see ConfigLoader.bx's own default for `markdown.enableAdmonition`).
 	 *
-	 * Also runs three bx-docs-only extensions Flexmark itself has no
+	 * Also runs three bx-sites-only extensions Flexmark itself has no
 	 * concept of - content tabs, math spans, and fenced-code
 	 * `hl_lines`/`linenums`/`title` annotations - each as a pre-process
 	 * pass (protect the body from `Markdown()`'s own inline parsing) and a
@@ -652,7 +652,7 @@ class {
 	 * `renderDocTree()` to write that page's own `feed.xml`.
 	 *
 	 * @pages Array of page structs from DocsLoader.load()
-	 * @config The site's bxdocs.json config
+	 * @config The site's bxsites.json config
 	 * @basePath Root-relative base path ending with `/` - relative `.md` links are re-rooted under it, same as every other internal link the theme renders
 	 * @docsDir Absolute path to this tree's own docs root - `::: include` paths are resolved against it
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - defaults to empty, which makes the `<img>` -> `<picture>` rewrite (ResponsiveImageProcessor.bx) a no-op; buildSearchIndex() relies on exactly that default, since the search index has no use for it
@@ -765,12 +765,12 @@ class {
 
 	/**
 	 * Adds `editUrl` (a GitHub-style "edit this page" link, empty when
-	 * `bxdocs.json`'s `repo.url`/`repo.editUri` aren't both set) and
+	 * `bxsites.json`'s `repo.url`/`repo.editUri` aren't both set) and
 	 * `lastUpdated` (an ISO date-time from `git log`, empty unless
 	 * `lastUpdated` is turned on) to every page.
 	 *
 	 * @pages Array of page structs with `relativePath` already set (DocsLoader.load())
-	 * @config The site's bxdocs.json config
+	 * @config The site's bxsites.json config
 	 * @root Absolute path to the project root - git's working directory for the `lastUpdated` lookup
 	 * @docsRelativePrefix `page.relativePath` is relative to whichever docs tree was loaded (`docs/` or `docs/versions/<name>/`) - this is the bit in between, e.g. `"versions/1.0/"`, so the real `docs/`-relative path (for both the edit URL and the git lookup) can be rebuilt as `docsRelativePrefix & page.relativePath`. Empty for the main/"Latest" tree. Ignored for any page that carries its own `sourceRelativePath` instead (mergeLocalePages()'s own output) - a locale tree's pages don't all share one real physical prefix, since a translated page really lives under `docs/i18n/<code>/` while a fallback page really is the default tree's own file under plain `docs/`.
 	 */
@@ -843,7 +843,7 @@ class {
 
 	/**
 	 * Builds the language switcher's own entries - the default locale first
-	 * (`bxdocs.json`'s `i18n.defaultLocale`, always the unprefixed `docs/`
+	 * (`bxsites.json`'s `i18n.defaultLocale`, always the unprefixed `docs/`
 	 * tree), then one per discovered `docs/i18n/` folder that's actually
 	 * declared in `i18n.locales` (in the order declared there), then any
 	 * remaining discovered folder not declared in config at all (using its
@@ -851,7 +851,7 @@ class {
 	 * rather than silently dropping it from the switcher).
 	 *
 	 * @localeNames LocalesDiscoverer.discover()'s own output, alphabetical
-	 * @i18nConfig The site's bxdocs.json `i18n` struct
+	 * @i18nConfig The site's bxsites.json `i18n` struct
 	 * @basePath The main/default-locale build's own basePath
 	 *
 	 * @return Array of `{ code, label, url, dir, flag }`, default locale first
@@ -892,17 +892,17 @@ class {
 	}
 
 	/**
-	 * Fills in each page's own `og:image` when `bxdocs.json`'s `generateOgImages`
+	 * Fills in each page's own `og:image` when `bxsites.json`'s `generateOgImages`
 	 * is on - a page with its own frontmatter `ogImage` keeps that untouched
 	 * (it already wins); every other page gets a per-page social card
 	 * rendered by SocialCardGenerator.bx (its title + the site name) under
 	 * `<outputDir>/assets/og/`. A no-op entirely when `generateOgImages` is
 	 * off - `page.ogImage` then stays whatever DocsLoader.bx read from
 	 * frontmatter (usually empty), and layout.bxm's own `og:image` falls
-	 * back to `bxdocs.json`'s site-wide `ogImage` in that case.
+	 * back to `bxsites.json`'s site-wide `ogImage` in that case.
 	 *
 	 * @pages Array of page structs (already markdown-converted, titles final)
-	 * @config The site's bxdocs.json config
+	 * @config The site's bxsites.json config
 	 * @outputDir Absolute path this tree's pages are being written under (`site/` or `site/versions/<name>/`)
 	 */
 	private void function assignOgImages( required array pages, required struct config, required string outputDir ) {
@@ -992,8 +992,8 @@ class {
 	 * Joins a repo URL, an edit URI (e.g. `edit/main/docs/`) and a docs/-relative
 	 * page path into one URL, tolerating either side's leading/trailing slashes.
 	 *
-	 * @repoUrl bxdocs.json's `repo.url`, non-empty
-	 * @editUri bxdocs.json's `repo.editUri`, non-empty
+	 * @repoUrl bxsites.json's `repo.url`, non-empty
+	 * @editUri bxsites.json's `repo.editUri`, non-empty
 	 * @relativePath The page's docs/-relative source path, e.g. "guides/setup.md"
 	 */
 	private string function buildEditUrl( required string repoUrl, required string editUri, required string relativePath ) {
@@ -1037,7 +1037,7 @@ class {
 	 * static hosts) automatically serve for any unmatched path.
 	 *
 	 * @nav The site's nav tree
-	 * @config The site's bxdocs.json config
+	 * @config The site's bxsites.json config
 	 * @themeDir Absolute path to the resolved theme folder
 	 * @siteDir Absolute path to the build output directory
 	 * @basePath Root-relative base path ending with `/`
@@ -1073,7 +1073,7 @@ class {
 	 *
 	 * @pages The main tree's pages (already markdown-converted, `tags` included)
 	 * @nav The main tree's nav
-	 * @config The site's bxdocs.json config
+	 * @config The site's bxsites.json config
 	 * @themeDir Absolute path to the resolved theme folder
 	 * @siteDir Absolute path to the build output directory
 	 * @basePath Root-relative base path ending with `/`
@@ -1105,14 +1105,14 @@ class {
 	}
 
 	/**
-	 * Whether this build should produce/copy bx-docs' own static search
+	 * Whether this build should produce/copy bx-sites' own static search
 	 * index and lunr widget - `config.search` is the master on/off switch
 	 * (module spec section 7); `config.searchProvider.provider` then decides
 	 * whether the *local* index is actually needed (SearchProviderRegistry.bx) -
 	 * `false` only for `algolia`, which is fed from its own hosted index
 	 * instead of `search-index.json`.
 	 *
-	 * @config The site's bxdocs.json config, already defaulted/validated
+	 * @config The site's bxsites.json config, already defaulted/validated
 	 */
 	private boolean function searchNeedsLocalIndex( required struct config ) {
 		return arguments.config.search
@@ -1149,8 +1149,8 @@ class {
 	 * @root Absolute path to the project root
 	 * @themeDir Absolute path to the resolved theme folder
 	 * @siteDir Absolute path to the build output directory
-	 * @themeName bxdocs.json's `theme.name` - selects which vendored theme-specific assets (currently just Bootstrap's own CSS/JS) to copy
-	 * @searchEnabled Whether to copy the shared search.js/lunr widget - searchNeedsLocalIndex()'s own result, so this is only true for the `local` search provider (or one bx-docs doesn't otherwise know about), never `algolia`
+	 * @themeName bxsites.json's `theme.name` - selects which vendored theme-specific assets (currently just Bootstrap's own CSS/JS) to copy
+	 * @searchEnabled Whether to copy the shared search.js/lunr widget - searchNeedsLocalIndex()'s own result, so this is only true for the `local` search provider (or one bx-sites doesn't otherwise know about), never `algolia`
 	 * @mermaidEnabled Whether to copy the shared mermaid-init.js widget and the vendored mermaid.js bundle itself
 	 * @mathEnabled Whether to copy the shared math-init.js (KaTeX auto-render) widget
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - its already-generated variant files get copied into this tree's own site.../assets/, right alongside the plain docs/assets/** copy below; empty (the default) copies nothing extra

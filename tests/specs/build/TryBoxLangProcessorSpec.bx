@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.TryBoxLangProcessor", function() {
 
 			beforeEach( function() {
-				variables.processor = new "models.build.TryBoxLangProcessor@bxdocs"();
+				variables.processor = new "models.build.TryBoxLangProcessor@bxsites"();
 			} );
 
 			it( "leaves markdown with no tryboxlang blocks untouched", function() {
@@ -28,7 +28,7 @@ class extends="testbox.system.BaseSpec" {
 				var embed = result.embeds[ 1 ];
 				expect( embed.code ).toBe( "x = 1" & char( 10 ) & "println( x )" );
 				expect( embed.attrsRaw ).toBe( 'height="300" title="Closures"' );
-				expect( result.markdown ).toInclude( '<div class="bxdocs-raw-block" data-bxdocs-token="' & embed.token & '"></div>' );
+				expect( result.markdown ).toInclude( '<div class="bxsites-raw-block" data-bxsites-token="' & embed.token & '"></div>' );
 				expect( result.markdown ).notToInclude( "```tryboxlang" );
 				expect( result.markdown ).notToInclude( "x = 1" );
 			} );
@@ -62,16 +62,16 @@ class extends="testbox.system.BaseSpec" {
 				var md = '```tryboxlang' & char( 10 ) & code & char( 10 ) & "```";
 				var extracted = processor.extract( md );
 				var html = "<p>before</p>" & char( 10 ) &
-					'<div class="bxdocs-raw-block" data-bxdocs-token="' & extracted.embeds[ 1 ].token & '"></div>' &
+					'<div class="bxsites-raw-block" data-bxsites-token="' & extracted.embeds[ 1 ].token & '"></div>' &
 					char( 10 ) & "<p>after</p>";
 
 				var restored = processor.restore( html, extracted.embeds );
 
-				expect( restored ).notToInclude( "data-bxdocs-token" );
+				expect( restored ).notToInclude( "data-bxsites-token" );
 				expect( restored ).toInclude( "<p>before</p>" );
 				expect( restored ).toInclude( "<p>after</p>" );
-				expect( restored ).toInclude( '<div class="bxdocs-tryboxlang">' );
-				expect( restored ).toInclude( 'class="bxdocs-tryboxlang__frame"' );
+				expect( restored ).toInclude( '<div class="bxsites-tryboxlang">' );
+				expect( restored ).toInclude( 'class="bxsites-tryboxlang__frame"' );
 				expect( restored ).toInclude( 'src="https://try.boxlang.io/editor/index.bxm?ro=false&amp;code=' );
 
 				var encoded = restored.reReplace( ".*code=([^""]*)"".*", "\1", "one" );
@@ -82,24 +82,24 @@ class extends="testbox.system.BaseSpec" {
 				var withAttrs = '```tryboxlang height="300" readonly="true" title="Closures"' & char( 10 ) & "a()" & char( 10 ) & "```";
 				var extractedWithAttrs = processor.extract( withAttrs );
 				var restoredWithAttrs = processor.restore(
-					'<div class="bxdocs-raw-block" data-bxdocs-token="' & extractedWithAttrs.embeds[ 1 ].token & '"></div>',
+					'<div class="bxsites-raw-block" data-bxsites-token="' & extractedWithAttrs.embeds[ 1 ].token & '"></div>',
 					extractedWithAttrs.embeds
 				);
 
 				expect( restoredWithAttrs ).toInclude( 'style="height:300px"' );
 				expect( restoredWithAttrs ).toInclude( "ro=true" );
-				expect( restoredWithAttrs ).toInclude( '<div class="bxdocs-tryboxlang__title">Closures</div>' );
+				expect( restoredWithAttrs ).toInclude( '<div class="bxsites-tryboxlang__title">Closures</div>' );
 
 				var bare = '```tryboxlang' & char( 10 ) & "a()" & char( 10 ) & "```";
 				var extractedBare = processor.extract( bare );
 				var restoredBare = processor.restore(
-					'<div class="bxdocs-raw-block" data-bxdocs-token="' & extractedBare.embeds[ 1 ].token & '"></div>',
+					'<div class="bxsites-raw-block" data-bxsites-token="' & extractedBare.embeds[ 1 ].token & '"></div>',
 					extractedBare.embeds
 				);
 
 				expect( restoredBare ).toInclude( 'style="height:450px"' );
 				expect( restoredBare ).toInclude( "ro=false" );
-				expect( restoredBare ).notToInclude( "bxdocs-tryboxlang__title" );
+				expect( restoredBare ).notToInclude( "bxsites-tryboxlang__title" );
 			} );
 
 			/**

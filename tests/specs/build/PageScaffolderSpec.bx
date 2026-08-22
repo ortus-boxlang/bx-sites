@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.PageScaffolder", function() {
 
 			beforeEach( function() {
-				variables.scaffolder = new "models.build.PageScaffolder@bxdocs"();
+				variables.scaffolder = new "models.build.PageScaffolder@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,21 +17,21 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newDocsDir() {
-				var dir = createTempDirectory( prefix = "bxdocs-pagescaffolder-" );
+				var dir = createTempDirectory( prefix = "bxsites-pagescaffolder-" );
 				tempDirs.append( dir );
 				return dir & "/docs";
 			}
 
-			it( "throws BxDocs.MissingPagePath when path is blank", function() {
+			it( "throws BxSites.MissingPagePath when path is blank", function() {
 				expect( function() {
 					scaffolder.scaffold( docsDir : newDocsDir(), path : "  " );
-				} ).toThrow( "BxDocs.MissingPagePath" );
+				} ).toThrow( "BxSites.MissingPagePath" );
 			} );
 
-			it( "throws BxDocs.InvalidPagePath when path doesn't end in .md", function() {
+			it( "throws BxSites.InvalidPagePath when path doesn't end in .md", function() {
 				expect( function() {
 					scaffolder.scaffold( docsDir : newDocsDir(), path : "guides/foo.txt" );
-				} ).toThrow( "BxDocs.InvalidPagePath" );
+				} ).toThrow( "BxSites.InvalidPagePath" );
 			} );
 
 			it( "creates a nested page, creating parent folders as needed", function() {
@@ -74,13 +74,13 @@ class extends="testbox.system.BaseSpec" {
 				expect( content ).toInclude( "tags: [guides, new]" );
 			} );
 
-			it( "throws BxDocs.PageAlreadyExists rather than overwriting", function() {
+			it( "throws BxSites.PageAlreadyExists rather than overwriting", function() {
 				var docsDir = newDocsDir();
 				scaffolder.scaffold( docsDir : docsDir, path : "dup.md" );
 
 				expect( function() {
 					scaffolder.scaffold( docsDir : docsDir, path : "dup.md" );
-				} ).toThrow( "BxDocs.PageAlreadyExists" );
+				} ).toThrow( "BxSites.PageAlreadyExists" );
 			} );
 
 		} );

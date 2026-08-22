@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.BlogDiscoverer", function() {
 
 			beforeEach( function() {
-				variables.discoverer = new "models.build.BlogDiscoverer@bxdocs"();
+				variables.discoverer = new "models.build.BlogDiscoverer@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,7 +17,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private function newDocsDir() {
-				var dir = createTempDirectory( prefix = "bxdocs-blogdiscoverer-" );
+				var dir = createTempDirectory( prefix = "bxsites-blogdiscoverer-" );
 				tempDirs.append( dir );
 				return dir;
 			}
@@ -70,22 +70,22 @@ class extends="testbox.system.BaseSpec" {
 				expect( post.urlPath ).toBe( "blog/custom-slug/index.html" );
 			} );
 
-			it( "throws BxDocs.InvalidBlogPost when frontmatter [date] is missing", function() {
+			it( "throws BxSites.InvalidBlogPost when frontmatter [date] is missing", function() {
 				var dir = newDocsDir();
 				writePost( dir, "no-date.md", "---" & char( 10 ) & "title: No Date" & char( 10 ) & "---" & char( 10 ) & "Body." );
 
 				expect( function() {
 					discoverer.load( dir );
-				} ).toThrow( "BxDocs.InvalidBlogPost" );
+				} ).toThrow( "BxSites.InvalidBlogPost" );
 			} );
 
-			it( "throws BxDocs.InvalidBlogPost when frontmatter [date] isn't a valid date", function() {
+			it( "throws BxSites.InvalidBlogPost when frontmatter [date] isn't a valid date", function() {
 				var dir = newDocsDir();
 				writePost( dir, "bad-date.md", "---" & char( 10 ) & "date: not-a-date" & char( 10 ) & "---" & char( 10 ) & "Body." );
 
 				expect( function() {
 					discoverer.load( dir );
-				} ).toThrow( "BxDocs.InvalidBlogPost" );
+				} ).toThrow( "BxSites.InvalidBlogPost" );
 			} );
 
 			it( "excludes a draft post by default", function() {
@@ -168,24 +168,24 @@ class extends="testbox.system.BaseSpec" {
 				expect( posts[ 2 ].slug ).toBe( "actually-oldest" );
 			} );
 
-			it( "throws BxDocs.DuplicateBlogSlug when two posts in different subfolders resolve to the same slug", function() {
+			it( "throws BxSites.DuplicateBlogSlug when two posts in different subfolders resolve to the same slug", function() {
 				var dir = newDocsDir();
 				writeNestedPost( dir, "2025/same.md", "---" & char( 10 ) & "date: 2025-01-01" & char( 10 ) & "---" & char( 10 ) & "Body." );
 				writeNestedPost( dir, "2026/same.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "---" & char( 10 ) & "Body." );
 
 				expect( function() {
 					discoverer.load( dir );
-				} ).toThrow( "BxDocs.DuplicateBlogSlug" );
+				} ).toThrow( "BxSites.DuplicateBlogSlug" );
 			} );
 
-			it( "throws BxDocs.DuplicateBlogSlug when two posts resolve to the same slug", function() {
+			it( "throws BxSites.DuplicateBlogSlug when two posts resolve to the same slug", function() {
 				var dir = newDocsDir();
 				writePost( dir, "one.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "slug: same" & char( 10 ) & "---" & char( 10 ) & "Body." );
 				writePost( dir, "two.md", "---" & char( 10 ) & "date: 2026-01-02" & char( 10 ) & "slug: same" & char( 10 ) & "---" & char( 10 ) & "Body." );
 
 				expect( function() {
 					discoverer.load( dir );
-				} ).toThrow( "BxDocs.DuplicateBlogSlug" );
+				} ).toThrow( "BxSites.DuplicateBlogSlug" );
 			} );
 
 		} );

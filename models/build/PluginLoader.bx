@@ -1,12 +1,12 @@
 /**
- * Loads and invokes bx-docs plugins - the "plugin system based on BoxLang
+ * Loads and invokes bx-sites plugins - the "plugin system based on BoxLang
  * modules" from the module spec: a plugin is nothing more than another
- * BoxLang module, installed as a sibling of bx-docs in the same runtime's
+ * BoxLang module, installed as a sibling of bx-sites in the same runtime's
  * module registry (`box install` into the project, same as bx-markdown/
- * bx-esapi), that exposes a `models/BxDocsPlugin.bx` class. A project
- * opts a plugin in by BoxLang module name via `bxdocs.json`'s `plugins`
+ * bx-esapi), that exposes a `models/BxSitesPlugin.bx` class. A project
+ * opts a plugin in by BoxLang module name via `bxsites.json`'s `plugins`
  * array (module spec section 4) - installing a module alone never
- * activates it as a bx-docs plugin, same as mkdocs' own explicit
+ * activates it as a bx-sites plugin, same as mkdocs' own explicit
  * `plugins:` list.
  *
  * `discover()` is the only part of this class that touches the real
@@ -22,7 +22,7 @@
  * Every hook is optional - a plugin class implements only the ones it
  * cares about, checked with `structKeyExists()` (duck typing, the same
  * looseness BuildPipeline.bx already gives `setMarkdownRenderer()`), and
- * runs in `plugins` array order (bxdocs.json's own `plugins` array order):
+ * runs in `plugins` array order (bxsites.json's own `plugins` array order):
  *
  *   - `onConfig( config )` -> struct, right after ConfigLoader.load()
  *   - `onPageMarkdown( markdown, page, config )` -> string, before a page's Markdown() call
@@ -34,9 +34,9 @@ class {
 
 	/**
 	 * Resolves every opted-in plugin module name against the real BoxLang
-	 * module registry and instantiates its `models/BxDocsPlugin.bx`.
+	 * module registry and instantiates its `models/BxSitesPlugin.bx`.
 	 *
-	 * @pluginNames bxdocs.json's own `plugins` array - BoxLang module names
+	 * @pluginNames bxsites.json's own `plugins` array - BoxLang module names
 	 *
 	 * @return Array of { name, instance }, in the same order as pluginNames
 	 */
@@ -47,17 +47,17 @@ class {
 		for ( var name in arguments.pluginNames ) {
 			if ( !moduleService.hasModule( name ) ) {
 				throw(
-					type    = "BxDocs.PluginNotFound",
-					message = "bxdocs.json [plugins] references [#name#], but no BoxLang module with that name is installed/activated."
+					type    = "BxSites.PluginNotFound",
+					message = "bxsites.json [plugins] references [#name#], but no BoxLang module with that name is installed/activated."
 				)
 			}
 
 			try {
-				var instance = new "models.BxDocsPlugin@#name#"()
+				var instance = new "models.BxSitesPlugin@#name#"()
 			} catch ( any e ) {
 				throw(
-					type    = "BxDocs.InvalidPlugin",
-					message = "Module [#name#] is listed in bxdocs.json [plugins] but doesn't expose a models/BxDocsPlugin.bx class: #e.message#"
+					type    = "BxSites.InvalidPlugin",
+					message = "Module [#name#] is listed in bxsites.json [plugins] but doesn't expose a models/BxSitesPlugin.bx class: #e.message#"
 				)
 			}
 
@@ -72,7 +72,7 @@ class {
 	 * return value feeding the next.
 	 *
 	 * @plugins discover()'s own output (or a test-provided equivalent)
-	 * @config The site's bxdocs.json config, already defaulted/validated
+	 * @config The site's bxsites.json config, already defaulted/validated
 	 */
 	struct function applyOnConfig( required array plugins, required struct config ) {
 		var result = arguments.config
@@ -89,9 +89,9 @@ class {
 	 * return value feeding the next.
 	 *
 	 * @plugins discover()'s own output (or a test-provided equivalent)
-	 * @markdown A page's raw markdown body, already past bx-docs' own tabs/math/code-annotation pre-processing
+	 * @markdown A page's raw markdown body, already past bx-sites' own tabs/math/code-annotation pre-processing
 	 * @page The page struct (DocsLoader.load() shape)
-	 * @config The site's bxdocs.json config
+	 * @config The site's bxsites.json config
 	 */
 	string function applyOnPageMarkdown( required array plugins, required string markdown, required struct page, required struct config ) {
 		var result = arguments.markdown
@@ -108,9 +108,9 @@ class {
 	 * return value feeding the next.
 	 *
 	 * @plugins discover()'s own output (or a test-provided equivalent)
-	 * @html A page's rendered HTML, already past bx-docs' own tabs/math/code-annotation post-processing
+	 * @html A page's rendered HTML, already past bx-sites' own tabs/math/code-annotation post-processing
 	 * @page The page struct (DocsLoader.load() shape)
-	 * @config The site's bxdocs.json config
+	 * @config The site's bxsites.json config
 	 */
 	string function applyOnPageHtml( required array plugins, required string html, required struct page, required struct config ) {
 		var result = arguments.html
@@ -128,7 +128,7 @@ class {
 	 *
 	 * @plugins discover()'s own output (or a test-provided equivalent)
 	 * @nav NavBuilder.build()'s own nav tree
-	 * @config The site's bxdocs.json config
+	 * @config The site's bxsites.json config
 	 */
 	array function applyOnNav( required array plugins, required array nav, required struct config ) {
 		var result = arguments.nav
@@ -146,7 +146,7 @@ class {
 	 *
 	 * @plugins discover()'s own output (or a test-provided equivalent)
 	 * @siteDir Absolute path to the finished build output directory
-	 * @config The site's bxdocs.json config
+	 * @config The site's bxsites.json config
 	 */
 	void function applyOnBuildComplete( required array plugins, required string siteDir, required struct config ) {
 		for ( var plugin in arguments.plugins ) {

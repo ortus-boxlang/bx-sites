@@ -10,10 +10,10 @@ class {
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
 		if ( !len( projectRoot ) ) {
-			throw( type = "BxDocs.MissingProjectRoot", message = "`i18n:status` requires a project root" )
+			throw( type = "BxSites.MissingProjectRoot", message = "`i18n:status` requires a project root" )
 		}
 
-		var builder = new "models.build.I18nStatusBuilder@bxdocs"()
+		var builder = new "models.build.I18nStatusBuilder@bxsites"()
 		var result = builder.build( projectRoot & "/docs" )
 
 		return {

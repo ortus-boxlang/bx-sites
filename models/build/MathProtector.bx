@@ -45,7 +45,7 @@ class {
 		// uses for its own `=== "..."` syntax.
 		var normalized = arguments.markdown.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" )
 		var lines = listToArray( normalized, char( 10 ), true )
-		var tracker = new "models.build.FenceTracker@bxdocs"()
+		var tracker = new "models.build.FenceTracker@bxsites"()
 		var fenced = lines.map( line => tracker.consume( line ) )
 
 		var formulas = {}
@@ -117,7 +117,7 @@ class {
 	 * parsing as plain, unmangled text.
 	 */
 	private string function nextToken() {
-		return "bxdocsmath" & replace( createUUID(), "-", "", "all" )
+		return "bxsitesmath" & replace( createUUID(), "-", "", "all" )
 	}
 
 }

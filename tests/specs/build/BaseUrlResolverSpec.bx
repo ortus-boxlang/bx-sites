@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.BaseUrlResolver", function() {
 
 			beforeEach( function() {
-				variables.resolver = new "models.build.BaseUrlResolver@bxdocs"();
+				variables.resolver = new "models.build.BaseUrlResolver@bxsites"();
 			} );
 
 			it( "defaults blank baseURL to root", function() {

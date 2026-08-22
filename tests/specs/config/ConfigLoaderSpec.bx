@@ -1,5 +1,5 @@
 /**
- * Exercises the bxdocs.json loader/validator directly against temp project
+ * Exercises the bxsites.json loader/validator directly against temp project
  * directories - no CLI dispatch involved (see ModuleConfigCliSpec.bx for that).
  */
 class extends="testbox.system.BaseSpec" {
@@ -8,7 +8,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "config.ConfigLoader", function() {
 
 			beforeEach( function() {
-				variables.loader = new "models.config.ConfigLoader@bxdocs"();
+				variables.loader = new "models.config.ConfigLoader@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -21,31 +21,31 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private function newProjectDir( string configJson = "" ) {
-				var dir = createTempDirectory( prefix = "bxdocs-configloader-" );
+				var dir = createTempDirectory( prefix = "bxsites-configloader-" );
 				tempDirs.append( dir );
 				if ( len( arguments.configJson ) ) {
-					fileWrite( dir & "/bxdocs.json", arguments.configJson );
+					fileWrite( dir & "/bxsites.json", arguments.configJson );
 				}
 				return dir;
 			}
 
-			it( "throws BxDocs.ConfigNotFound when bxdocs.json is missing", function() {
+			it( "throws BxSites.ConfigNotFound when bxsites.json is missing", function() {
 				var dir = newProjectDir();
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.ConfigNotFound" );
+				} ).toThrow( "BxSites.ConfigNotFound" );
 			} );
 
-			it( "loads bxdocs.yaml via the injected YAML renderer when there's no bxdocs.json", function() {
+			it( "loads bxsites.yaml via the injected YAML renderer when there's no bxsites.json", function() {
 				// FakeYamlRenderer.bx round-trips through JSON, not real
 				// YAML - real bx-yaml BIFs aren't safely callable in a bare
 				// unit test (YamlRenderer.bx's own docblock) - so the fixture
 				// below is JSON text saved with a .yaml extension, on
 				// purpose, matched by the same fake on the reading side.
-				var dir = createTempDirectory( prefix = "bxdocs-configloader-yaml-" );
+				var dir = createTempDirectory( prefix = "bxsites-configloader-yaml-" );
 				tempDirs.append( dir );
-				fileWrite( dir & "/bxdocs.yaml", '{"name":"My Docs"}' );
-				loader.setYamlRenderer( new "tests.support.FakeYamlRenderer@bxdocs"() );
+				fileWrite( dir & "/bxsites.yaml", '{"name":"My Docs"}' );
+				loader.setYamlRenderer( new "tests.support.FakeYamlRenderer@bxsites"() );
 
 				var config = loader.load( dir );
 
@@ -53,37 +53,37 @@ class extends="testbox.system.BaseSpec" {
 				expect( config.theme.name ).toBe( "bootstrap" );
 			} );
 
-			it( "prefers bxdocs.yaml over bxdocs.json when both are present", function() {
+			it( "prefers bxsites.yaml over bxsites.json when both are present", function() {
 				var dir = newProjectDir( '{"name":"JSON Site"}' );
-				fileWrite( dir & "/bxdocs.yaml", '{"name":"YAML Site"}' );
-				loader.setYamlRenderer( new "tests.support.FakeYamlRenderer@bxdocs"() );
+				fileWrite( dir & "/bxsites.yaml", '{"name":"YAML Site"}' );
+				loader.setYamlRenderer( new "tests.support.FakeYamlRenderer@bxsites"() );
 
 				expect( loader.load( dir ).name ).toBe( "YAML Site" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig for malformed YAML", function() {
-				var dir = createTempDirectory( prefix = "bxdocs-configloader-badyaml-" );
+			it( "throws BxSites.InvalidConfig for malformed YAML", function() {
+				var dir = createTempDirectory( prefix = "bxsites-configloader-badyaml-" );
 				tempDirs.append( dir );
-				fileWrite( dir & "/bxdocs.yaml", "{ not valid" );
-				loader.setYamlRenderer( new "tests.support.FakeYamlRenderer@bxdocs"() );
+				fileWrite( dir & "/bxsites.yaml", "{ not valid" );
+				loader.setYamlRenderer( new "tests.support.FakeYamlRenderer@bxsites"() );
 
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig for malformed JSON", function() {
+			it( "throws BxSites.InvalidConfig for malformed JSON", function() {
 				var dir = newProjectDir( "{ not valid json" );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [name] is missing", function() {
+			it( "throws BxSites.InvalidConfig when [name] is missing", function() {
 				var dir = newProjectDir( '{"description":"no name here"}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "applies defaults for description, baseURL, theme, search, nav, markdown, repo, social, footer and lastUpdated", function() {
@@ -147,18 +147,18 @@ class extends="testbox.system.BaseSpec" {
 				expect( config.nav[ 1 ].title ).toBe( "Home" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [nav] is not an array", function() {
+			it( "throws BxSites.InvalidConfig when [nav] is not an array", function() {
 				var dir = newProjectDir( '{"name":"My Docs","nav":{"title":"Home"}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [search] is not a boolean", function() {
+			it( "throws BxSites.InvalidConfig when [search] is not a boolean", function() {
 				var dir = newProjectDir( '{"name":"My Docs","search":"not-a-boolean-at-all"}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "defaults [searchProvider] to the local provider", function() {
@@ -193,32 +193,32 @@ class extends="testbox.system.BaseSpec" {
 				expect( config.searchProvider.provider ).toBe( "meilisearch" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [searchProvider.provider] is blank", function() {
+			it( "throws BxSites.InvalidConfig when [searchProvider.provider] is blank", function() {
 				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":""}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [searchProvider] is not an object", function() {
+			it( "throws BxSites.InvalidConfig when [searchProvider] is not an object", function() {
 				var dir = newProjectDir( '{"name":"My Docs","searchProvider":"algolia"}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [searchProvider.provider] is algolia but [searchProvider.algolia] is missing required fields", function() {
+			it( "throws BxSites.InvalidConfig when [searchProvider.provider] is algolia but [searchProvider.algolia] is missing required fields", function() {
 				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":"algolia","algolia":{"appId":"ABC123"}}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [searchProvider.algolia.insights] isn't a boolean", function() {
+			it( "throws BxSites.InvalidConfig when [searchProvider.algolia.insights] isn't a boolean", function() {
 				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":"algolia","algolia":{"appId":"A","apiKey":"B","indexName":"C","insights":["not","a","boolean"]}}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "allows [searchProvider.provider] pagefind with no [pagefind] settings at all", function() {
@@ -237,39 +237,39 @@ class extends="testbox.system.BaseSpec" {
 				expect( config.searchProvider.pagefind.options ).toBe( [ "--exclude-selectors", ".no-index" ] );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [searchProvider.pagefind] is not an object", function() {
+			it( "throws BxSites.InvalidConfig when [searchProvider.pagefind] is not an object", function() {
 				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":"pagefind","pagefind":"nope"}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [searchProvider.pagefind.bin] is blank", function() {
+			it( "throws BxSites.InvalidConfig when [searchProvider.pagefind.bin] is blank", function() {
 				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":"pagefind","pagefind":{"bin":""}}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [searchProvider.pagefind.options] is not an array", function() {
+			it( "throws BxSites.InvalidConfig when [searchProvider.pagefind.options] is not an array", function() {
 				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":"pagefind","pagefind":{"options":"--foo"}}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when a [searchProvider.pagefind.options] entry is empty", function() {
+			it( "throws BxSites.InvalidConfig when a [searchProvider.pagefind.options] entry is empty", function() {
 				var dir = newProjectDir( '{"name":"My Docs","searchProvider":{"provider":"pagefind","pagefind":{"options":[""]}}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [theme.name] is explicitly blank", function() {
+			it( "throws BxSites.InvalidConfig when [theme.name] is explicitly blank", function() {
 				var dir = newProjectDir( '{"name":"My Docs","theme":{"name":"","options":{}}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "defaults [theme.name] to bootstrap when [theme] is present but has no [name] key at all", function() {
@@ -290,11 +290,11 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [theme.options.colorMode] isn't light, dark or auto", function() {
+			it( "throws BxSites.InvalidConfig when [theme.options.colorMode] isn't light, dark or auto", function() {
 				var dir = newProjectDir( '{"name":"My Docs","theme":{"options":{"colorMode":"purple"}}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "exposes the v1 built-in theme names", function() {
@@ -317,25 +317,25 @@ class extends="testbox.system.BaseSpec" {
 				expect( config.social[ 1 ].url ).toBe( "https://twitter.com/acme" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when a [social] entry has no [url]", function() {
+			it( "throws BxSites.InvalidConfig when a [social] entry has no [url]", function() {
 				var dir = newProjectDir( '{"name":"My Docs","social":[{"icon":"twitter"}]}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [footer] is not a boolean", function() {
+			it( "throws BxSites.InvalidConfig when [footer] is not a boolean", function() {
 				var dir = newProjectDir( '{"name":"My Docs","footer":"yes please"}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [lastUpdated] is not a boolean", function() {
+			it( "throws BxSites.InvalidConfig when [lastUpdated] is not a boolean", function() {
 				var dir = newProjectDir( '{"name":"My Docs","lastUpdated":"yes please"}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "applies defaults for [theme.logo], [theme.favicon], [analytics], [ogImage], [extraCss] and [extraJs]", function() {
@@ -361,11 +361,11 @@ class extends="testbox.system.BaseSpec" {
 				expect( config.theme.favicon ).toBe( "assets/favicon.ico" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [theme.logo] isn't a string", function() {
+			it( "throws BxSites.InvalidConfig when [theme.logo] isn't a string", function() {
 				var dir = newProjectDir( '{"name":"My Docs","theme":{"logo":["not","a","string"]}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "accepts boolean [theme.options.navCollapsible] and [theme.options.navExpandAll]", function() {
@@ -376,11 +376,11 @@ class extends="testbox.system.BaseSpec" {
 				expect( config.theme.options.navExpandAll ).toBeFalse();
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [theme.options.navCollapsible] isn't a boolean", function() {
+			it( "throws BxSites.InvalidConfig when [theme.options.navCollapsible] isn't a boolean", function() {
 				var dir = newProjectDir( '{"name":"My Docs","theme":{"options":{"navCollapsible":["not","a","boolean"]}}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "accepts [theme.options.tocPosition] of top or sticky, defaulting to top when absent", function() {
@@ -393,11 +393,11 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [theme.options.tocPosition] isn't top or sticky", function() {
+			it( "throws BxSites.InvalidConfig when [theme.options.tocPosition] isn't top or sticky", function() {
 				var dir = newProjectDir( '{"name":"My Docs","theme":{"options":{"tocPosition":"bottom"}}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "accepts [theme.options.pageMetaPosition] of top or bottom, defaulting to bottom when absent", function() {
@@ -410,11 +410,11 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [theme.options.pageMetaPosition] isn't top or bottom", function() {
+			it( "throws BxSites.InvalidConfig when [theme.options.pageMetaPosition] isn't top or bottom", function() {
 				var dir = newProjectDir( '{"name":"My Docs","theme":{"options":{"pageMetaPosition":"middle"}}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "preserves a user-supplied Google [analytics] block", function() {
@@ -425,25 +425,25 @@ class extends="testbox.system.BaseSpec" {
 				expect( config.analytics.id ).toBe( "G-ABC123" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [analytics.provider] isn't google", function() {
+			it( "throws BxSites.InvalidConfig when [analytics.provider] isn't google", function() {
 				var dir = newProjectDir( '{"name":"My Docs","analytics":{"provider":"plausible","id":"abc"}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [analytics.provider] is set without an [analytics.id]", function() {
+			it( "throws BxSites.InvalidConfig when [analytics.provider] is set without an [analytics.id]", function() {
 				var dir = newProjectDir( '{"name":"My Docs","analytics":{"provider":"google"}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [analytics.id] contains invalid characters", function() {
+			it( "throws BxSites.InvalidConfig when [analytics.id] contains invalid characters", function() {
 				var dir = newProjectDir( '{"name":"My Docs","analytics":{"provider":"google","id":"G-ABC 123!"}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "preserves a user-supplied [ogImage]", function() {
@@ -453,11 +453,11 @@ class extends="testbox.system.BaseSpec" {
 				expect( config.ogImage ).toBe( "assets/social-card.png" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [ogImage] isn't a string", function() {
+			it( "throws BxSites.InvalidConfig when [ogImage] isn't a string", function() {
 				var dir = newProjectDir( '{"name":"My Docs","ogImage":["not","a","string"]}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "preserves user-supplied [extraCss] and [extraJs] arrays", function() {
@@ -468,11 +468,11 @@ class extends="testbox.system.BaseSpec" {
 				expect( config.extraJs ).toBe( [ "assets/extra.js" ] );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when an [extraCss] entry is empty", function() {
+			it( "throws BxSites.InvalidConfig when an [extraCss] entry is empty", function() {
 				var dir = newProjectDir( '{"name":"My Docs","extraCss":[""]}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "defaults [mermaid] to false", function() {
@@ -485,11 +485,11 @@ class extends="testbox.system.BaseSpec" {
 				expect( loader.load( dir ).mermaid ).toBeTrue();
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [mermaid] is not a boolean", function() {
+			it( "throws BxSites.InvalidConfig when [mermaid] is not a boolean", function() {
 				var dir = newProjectDir( '{"name":"My Docs","mermaid":"yes please"}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "defaults [math] to false", function() {
@@ -502,11 +502,11 @@ class extends="testbox.system.BaseSpec" {
 				expect( loader.load( dir ).math ).toBeTrue();
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [math] is not a boolean", function() {
+			it( "throws BxSites.InvalidConfig when [math] is not a boolean", function() {
 				var dir = newProjectDir( '{"name":"My Docs","math":"yes please"}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "defaults [blog.postsPerPage] to 10, [blog.feed] to true, and [blog.feedLimit] to 25", function() {
@@ -526,12 +526,12 @@ class extends="testbox.system.BaseSpec" {
 				expect( loader.load( unlimitedDir ).blog.feedLimit ).toBe( 0 );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [blog.feedLimit] is not a whole number of 0 or more", function() {
+			it( "throws BxSites.InvalidConfig when [blog.feedLimit] is not a whole number of 0 or more", function() {
 				for ( var badValue in [ -1, 1.5, "ten" ] ) {
 					var dir = newProjectDir( '{"name":"My Docs","blog":{"feedLimit":' & ( isNumeric( badValue ) ? badValue : '"' & badValue & '"' ) & '}}' );
 					expect( function() {
 						loader.load( dir );
-					} ).toThrow( "BxDocs.InvalidConfig" );
+					} ).toThrow( "BxSites.InvalidConfig" );
 				}
 			} );
 
@@ -545,12 +545,12 @@ class extends="testbox.system.BaseSpec" {
 				expect( loader.load( dir ).assets.images.widths ).toBe( [ 480, 960 ] );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when an [assets.images.widths] entry is not a positive whole number", function() {
+			it( "throws BxSites.InvalidConfig when an [assets.images.widths] entry is not a positive whole number", function() {
 				for ( var badValue in [ 0, -400, 400.5 ] ) {
 					var dir = newProjectDir( '{"name":"My Docs","assets":{"images":{"widths":[' & badValue & ']}}}' );
 					expect( function() {
 						loader.load( dir );
-					} ).toThrow( "BxDocs.InvalidConfig" );
+					} ).toThrow( "BxSites.InvalidConfig" );
 				}
 			} );
 
@@ -567,27 +567,27 @@ class extends="testbox.system.BaseSpec" {
 				expect( loader.load( dir ).blog.feed ).toBeFalse();
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [blog] is not an object", function() {
+			it( "throws BxSites.InvalidConfig when [blog] is not an object", function() {
 				var dir = newProjectDir( '{"name":"My Docs","blog":"nope"}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [blog.postsPerPage] is not a positive whole number", function() {
+			it( "throws BxSites.InvalidConfig when [blog.postsPerPage] is not a positive whole number", function() {
 				for ( var badValue in [ 0, -1, 1.5, "ten" ] ) {
 					var dir = newProjectDir( '{"name":"My Docs","blog":{"postsPerPage":' & ( isNumeric( badValue ) ? badValue : '"' & badValue & '"' ) & '}}' );
 					expect( function() {
 						loader.load( dir );
-					} ).toThrow( "BxDocs.InvalidConfig" );
+					} ).toThrow( "BxSites.InvalidConfig" );
 				}
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [blog.feed] is not a boolean", function() {
+			it( "throws BxSites.InvalidConfig when [blog.feed] is not a boolean", function() {
 				var dir = newProjectDir( '{"name":"My Docs","blog":{"feed":"yes please"}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "defaults [plugins] to an empty array", function() {
@@ -601,18 +601,18 @@ class extends="testbox.system.BaseSpec" {
 				expect( loader.load( dir ).plugins ).toBe( [ "someBxModule" ] );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [plugins] is not an array", function() {
+			it( "throws BxSites.InvalidConfig when [plugins] is not an array", function() {
 				var dir = newProjectDir( '{"name":"My Docs","plugins":"someBxModule"}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when a [plugins] entry is an empty string", function() {
+			it( "throws BxSites.InvalidConfig when a [plugins] entry is an empty string", function() {
 				var dir = newProjectDir( '{"name":"My Docs","plugins":[""]}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "defaults [i18n] to an English default locale and no other locales", function() {
@@ -636,32 +636,32 @@ class extends="testbox.system.BaseSpec" {
 				expect( loader.load( dir ).i18n.defaultLocale ).toBe( { "code" : "fr", "label" : "Français" } );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [i18n] is not an object", function() {
+			it( "throws BxSites.InvalidConfig when [i18n] is not an object", function() {
 				var dir = newProjectDir( '{"name":"My Docs","i18n":"es"}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when [i18n.locales] is not an array", function() {
+			it( "throws BxSites.InvalidConfig when [i18n.locales] is not an array", function() {
 				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":"es"}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when a locale entry is missing [code] or [label]", function() {
+			it( "throws BxSites.InvalidConfig when a locale entry is missing [code] or [label]", function() {
 				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":[{"code":"es"}]}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when a locale [code] contains characters other than letters/digits/hyphens", function() {
+			it( "throws BxSites.InvalidConfig when a locale [code] contains characters other than letters/digits/hyphens", function() {
 				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":[{"code":"es/../etc","label":"Bad"}]}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "accepts a BCP-47-shaped locale [code] with a region subtag", function() {
@@ -669,11 +669,11 @@ class extends="testbox.system.BaseSpec" {
 				expect( loader.load( dir ).i18n.locales[ 1 ].code ).toBe( "pt-BR" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when a locale [dir] isn't ltr or rtl", function() {
+			it( "throws BxSites.InvalidConfig when a locale [dir] isn't ltr or rtl", function() {
 				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":[{"code":"es","label":"Español","dir":"sideways"}]}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "preserves a user-supplied locale [flag] override", function() {
@@ -681,25 +681,25 @@ class extends="testbox.system.BaseSpec" {
 				expect( loader.load( dir ).i18n.locales[ 1 ].flag ).toBe( "🇲🇽" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when a locale [flag] isn't a string", function() {
+			it( "throws BxSites.InvalidConfig when a locale [flag] isn't a string", function() {
 				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":[{"code":"es","label":"Español","flag":["not","a","string"]}]}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when two locales share the same code (case-insensitively)", function() {
+			it( "throws BxSites.InvalidConfig when two locales share the same code (case-insensitively)", function() {
 				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":[{"code":"es","label":"Español"},{"code":"ES","label":"Duplicate"}]}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig when a locale reuses the default locale's own code", function() {
+			it( "throws BxSites.InvalidConfig when a locale reuses the default locale's own code", function() {
 				var dir = newProjectDir( '{"name":"My Docs","i18n":{"locales":[{"code":"en","label":"Duplicate default"}]}}' );
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 		} );

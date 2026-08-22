@@ -3,7 +3,7 @@
  * title bar (plain or terminal-style) to fenced code blocks carrying
  * `hl_lines`/`linenums`/`title`/`frame`/`insert`/`delete` (see
  * CodeAnnotationProcessor.bx, which stamps them onto the `<pre>` as
- * `data-bxdocs-*` attributes). Runs after highlight.js so a code block's
+ * `data-bxsites-*` attributes). Runs after highlight.js so a code block's
  * syntax-highlighting spans already exist in the DOM - splitting them
  * into one wrapper per source line has to walk that existing element
  * tree (a naive split of the text on "\n" would cut a span that spans
@@ -63,7 +63,7 @@
 	}
 
 	/**
-	 * Parses one of `data-bxdocs-hl-lines`/`-insert-lines`/`-delete-lines`
+	 * Parses one of `data-bxsites-hl-lines`/`-insert-lines`/`-delete-lines`
 	 * into a set of line numbers - all three share the same comma-separated
 	 * format CodeAnnotationProcessor.bx writes them in.
 	 *
@@ -102,35 +102,35 @@
 			window.hljs.highlightElement( code );
 		}
 
-		var hlLines = parseLineSet( pre.getAttribute( "data-bxdocs-hl-lines" ) );
-		var insertLines = parseLineSet( pre.getAttribute( "data-bxdocs-insert-lines" ) );
-		var deleteLines = parseLineSet( pre.getAttribute( "data-bxdocs-delete-lines" ) );
-		var startLineAttr = pre.getAttribute( "data-bxdocs-start-line" );
+		var hlLines = parseLineSet( pre.getAttribute( "data-bxsites-hl-lines" ) );
+		var insertLines = parseLineSet( pre.getAttribute( "data-bxsites-insert-lines" ) );
+		var deleteLines = parseLineSet( pre.getAttribute( "data-bxsites-delete-lines" ) );
+		var startLineAttr = pre.getAttribute( "data-bxsites-start-line" );
 		var showNumbers = startLineAttr !== null;
 		var startLine = showNumbers ? ( parseInt( startLineAttr, 10 ) || 1 ) : 1;
 
 		var lines = splitIntoLines( code );
 		code.textContent = "";
-		code.classList.add( "bxdocs-code" );
+		code.classList.add( "bxsites-code" );
 		if ( showNumbers ) {
-			code.classList.add( "bxdocs-code--numbered" );
+			code.classList.add( "bxsites-code--numbered" );
 		}
 
 		lines.forEach( function ( nodes, index ) {
 			var lineNumber = startLine + index;
 			var lineEl = document.createElement( "span" );
-			lineEl.className = "bxdocs-code-line";
+			lineEl.className = "bxsites-code-line";
 			if ( showNumbers ) {
 				lineEl.setAttribute( "data-line", lineNumber );
 			}
 			if ( hlLines[ index + 1 ] ) {
-				lineEl.classList.add( "bxdocs-hl-line" );
+				lineEl.classList.add( "bxsites-hl-line" );
 			}
 			if ( insertLines[ index + 1 ] ) {
-				lineEl.classList.add( "bxdocs-insert-line" );
+				lineEl.classList.add( "bxsites-insert-line" );
 			}
 			if ( deleteLines[ index + 1 ] ) {
-				lineEl.classList.add( "bxdocs-delete-line" );
+				lineEl.classList.add( "bxsites-delete-line" );
 			}
 			nodes.forEach( function ( node ) {
 				lineEl.appendChild( node );
@@ -138,28 +138,28 @@
 			code.appendChild( lineEl );
 		} );
 
-		var title = pre.getAttribute( "data-bxdocs-title" );
-		var isTerminal = pre.getAttribute( "data-bxdocs-frame" ) === "terminal";
+		var title = pre.getAttribute( "data-bxsites-title" );
+		var isTerminal = pre.getAttribute( "data-bxsites-frame" ) === "terminal";
 		var prevEl = pre.previousElementSibling;
-		var alreadyTitled = prevEl && prevEl.classList.contains( "bxdocs-code-title" );
+		var alreadyTitled = prevEl && prevEl.classList.contains( "bxsites-code-title" );
 		if ( ( title || isTerminal ) && pre.parentNode && !alreadyTitled ) {
 			var titleEl = document.createElement( "div" );
-			titleEl.className = "bxdocs-code-title";
+			titleEl.className = "bxsites-code-title";
 			if ( isTerminal ) {
 				// Three-dot window chrome + centered title, same macOS-terminal
 				// convention Expressive Code/VitePress use - built as real
 				// elements rather than textContent so the dots have somewhere
 				// to sit; title text is still `textContent`-assigned onto its
 				// own span, never string-concatenated into innerHTML.
-				titleEl.classList.add( "bxdocs-frame-terminal" );
+				titleEl.classList.add( "bxsites-frame-terminal" );
 				var dots = document.createElement( "span" );
-				dots.className = "bxdocs-frame-dots";
+				dots.className = "bxsites-frame-dots";
 				for ( var i = 0; i < 3; i++ ) {
 					dots.appendChild( document.createElement( "span" ) );
 				}
 				titleEl.appendChild( dots );
 				var textEl = document.createElement( "span" );
-				textEl.className = "bxdocs-code-title__text";
+				textEl.className = "bxsites-code-title__text";
 				textEl.textContent = title;
 				titleEl.appendChild( textEl );
 			} else {
@@ -171,8 +171,8 @@
 
 	function init() {
 		document.querySelectorAll(
-			"pre[data-bxdocs-hl-lines], pre[data-bxdocs-start-line], pre[data-bxdocs-title], " +
-			"pre[data-bxdocs-frame], pre[data-bxdocs-insert-lines], pre[data-bxdocs-delete-lines]"
+			"pre[data-bxsites-hl-lines], pre[data-bxsites-start-line], pre[data-bxsites-title], " +
+			"pre[data-bxsites-frame], pre[data-bxsites-insert-lines], pre[data-bxsites-delete-lines]"
 		).forEach( annotate );
 	}
 

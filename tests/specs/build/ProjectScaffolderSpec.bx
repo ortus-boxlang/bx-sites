@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.ProjectScaffolder", function() {
 
 			beforeEach( function() {
-				variables.scaffolder = new "models.build.ProjectScaffolder@bxdocs"();
+				variables.scaffolder = new "models.build.ProjectScaffolder@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,23 +17,23 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private function newTargetDir() {
-				var parent = createTempDirectory( prefix = "bxdocs-scaffolder-" );
+				var parent = createTempDirectory( prefix = "bxsites-scaffolder-" );
 				tempDirs.append( parent );
 				return parent & "/my-site";
 			}
 
-			it( "creates docs/index.md and bxdocs.yaml by default", function() {
+			it( "creates docs/index.md and bxsites.yaml by default", function() {
 				var dir = newTargetDir();
 				var result = scaffolder.scaffold( dir, "My Site", "bootstrap" );
 
 				expect( fileExists( dir & "/docs/index.md" ) ).toBeTrue();
-				expect( fileExists( dir & "/bxdocs.yaml" ) ).toBeTrue();
+				expect( fileExists( dir & "/bxsites.yaml" ) ).toBeTrue();
 				expect( directoryExists( dir & "/docs/assets" ) ).toBeTrue();
 				expect( result.projectRoot ).toBe( dir );
-				expect( result.configPath ).toBe( dir & "/bxdocs.yaml" );
+				expect( result.configPath ).toBe( dir & "/bxsites.yaml" );
 			} );
 
-			it( "writes a bxdocs.yaml with the requested name/description/theme, and ConfigLoader resolves it as this project's config file", function() {
+			it( "writes a bxsites.yaml with the requested name/description/theme, and ConfigLoader resolves it as this project's config file", function() {
 				var dir = newTargetDir();
 				scaffolder.scaffold( dir, "My Site", "material", "A cool site" );
 
@@ -43,31 +43,31 @@ class extends="testbox.system.BaseSpec" {
 				// unit-level spec (BlogAuthorsLoaderSpec.bx/ConfigLoaderSpec.bx's
 				// own JSON-only fixtures make the same choice), so it stays
 				// this side of that boundary rather than exercising it.
-				var yaml = fileRead( dir & "/bxdocs.yaml" );
+				var yaml = fileRead( dir & "/bxsites.yaml" );
 				expect( yaml ).toInclude( "My Site" );
 				expect( yaml ).toInclude( "A cool site" );
 				expect( yaml ).toInclude( "material" );
-				expect( new "models.config.ConfigLoader@bxdocs"().configPathFor( dir ) ).toBe( dir & "/bxdocs.yaml" );
+				expect( new "models.config.ConfigLoader@bxsites"().configPathFor( dir ) ).toBe( dir & "/bxsites.yaml" );
 			} );
 
 			it( "escapes quotes in the site name/description so the YAML stays valid", function() {
 				var dir = newTargetDir();
 				scaffolder.scaffold( dir, 'Say "Hi"', "bootstrap", 'Quote: "hello"' );
 
-				var yaml = fileRead( dir & "/bxdocs.yaml" );
+				var yaml = fileRead( dir & "/bxsites.yaml" );
 				expect( yaml ).toInclude( 'name: "Say \"Hi\""' );
 				expect( yaml ).toInclude( 'description: "Quote: \"hello\""' );
 			} );
 
-			it( "scaffolds bxdocs.json instead when format is json", function() {
+			it( "scaffolds bxsites.json instead when format is json", function() {
 				var dir = newTargetDir();
 				var result = scaffolder.scaffold( dir, "My Site", "bootstrap", "", "json" );
 
-				expect( fileExists( dir & "/bxdocs.json" ) ).toBeTrue();
-				expect( fileExists( dir & "/bxdocs.yaml" ) ).toBeFalse();
-				expect( result.configPath ).toBe( dir & "/bxdocs.json" );
+				expect( fileExists( dir & "/bxsites.json" ) ).toBeTrue();
+				expect( fileExists( dir & "/bxsites.yaml" ) ).toBeFalse();
+				expect( result.configPath ).toBe( dir & "/bxsites.json" );
 
-				var config = new "models.config.ConfigLoader@bxdocs"().load( dir );
+				var config = new "models.config.ConfigLoader@bxsites"().load( dir );
 				expect( config.name ).toBe( "My Site" );
 			} );
 
@@ -75,34 +75,34 @@ class extends="testbox.system.BaseSpec" {
 				var dir = newTargetDir();
 				scaffolder.scaffold( dir, 'Say "Hi"', "bootstrap", 'Quote: "hello"', "json" );
 
-				var config = new "models.config.ConfigLoader@bxdocs"().load( dir );
+				var config = new "models.config.ConfigLoader@bxsites"().load( dir );
 				expect( config.name ).toBe( 'Say "Hi"' );
 				expect( config.description ).toBe( 'Quote: "hello"' );
 			} );
 
-			it( "throws BxDocs.InvalidFormat for an unknown format", function() {
+			it( "throws BxSites.InvalidFormat for an unknown format", function() {
 				var dir = newTargetDir();
 				expect( function() {
 					scaffolder.scaffold( dir, "My Site", "bootstrap", "", "toml" );
-				} ).toThrow( "BxDocs.InvalidFormat" );
+				} ).toThrow( "BxSites.InvalidFormat" );
 			} );
 
-			it( "refuses to overwrite a project that already has a bxdocs.yaml", function() {
+			it( "refuses to overwrite a project that already has a bxsites.yaml", function() {
 				var dir = newTargetDir();
 				scaffolder.scaffold( dir, "My Site", "bootstrap" );
 
 				expect( function() {
 					scaffolder.scaffold( dir, "My Site", "bootstrap" );
-				} ).toThrow( "BxDocs.ProjectAlreadyExists" );
+				} ).toThrow( "BxSites.ProjectAlreadyExists" );
 			} );
 
-			it( "refuses to scaffold bxdocs.yaml over a project that already has a bxdocs.json", function() {
+			it( "refuses to scaffold bxsites.yaml over a project that already has a bxsites.json", function() {
 				var dir = newTargetDir();
 				scaffolder.scaffold( dir, "My Site", "bootstrap", "", "json" );
 
 				expect( function() {
 					scaffolder.scaffold( dir, "My Site", "bootstrap" );
-				} ).toThrow( "BxDocs.ProjectAlreadyExists" );
+				} ).toThrow( "BxSites.ProjectAlreadyExists" );
 			} );
 
 		} );

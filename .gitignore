@@ -23,7 +23,7 @@ tests/results/**
 # gets committed, never this
 /node_modules/
 
-# This module's own dogfooded docs build output (see docs/, bxdocs.yaml)
+# This module's own dogfooded docs build output (see docs/, bxsites.yaml)
 /site/
 /.cache/
 

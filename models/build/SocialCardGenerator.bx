@@ -2,7 +2,7 @@
  * Renders a 1200x630 `og:image`/`twitter:card` social-card PNG per page at
  * build time - pure `java.awt`/`javax.imageio` (both part of any JVM
  * BoxLang runs on), no headless browser or external service involved.
- * Used when `bxdocs.json`'s `generateOgImages` is on and a page has no
+ * Used when `bxsites.json`'s `generateOgImages` is on and a page has no
  * explicit `ogImage` frontmatter/site-wide override of its own - see
  * BuildPipeline.bx's `resolveOgImage()`.
  */

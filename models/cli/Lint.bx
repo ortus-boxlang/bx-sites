@@ -13,11 +13,11 @@ class {
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
 		if ( !len( projectRoot ) ) {
-			throw( type = "BxDocs.MissingProjectRoot", message = "`lint` requires a project root" )
+			throw( type = "BxSites.MissingProjectRoot", message = "`lint` requires a project root" )
 		}
 
 		var docsDir = projectRoot.reReplace( "[\/]+$", "" ) & "/docs"
-		var result = new "models.build.ContentLinter@bxdocs"().lint( docsDir )
+		var result = new "models.build.ContentLinter@bxsites"().lint( docsDir )
 
 		var failed = result.headingSkips.len() || result.blogDateIssues.len()
 

@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.Build", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.Build@bxdocs"();
+				variables.verb = new "models.cli.Build@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -16,19 +16,19 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( {} );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
-			it( "throws BxDocs.ConfigNotFound when the project has no bxdocs.json", function() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-build-" );
+			it( "throws BxSites.ConfigNotFound when the project has no bxsites.json", function() {
+				var dir = createTempDirectory( prefix = "bxsites-cli-build-" );
 				tempDirs.append( dir );
 
 				expect( function() {
 					verb.run( { projectRoot : dir } );
-				} ).toThrow( "BxDocs.ConfigNotFound" );
+				} ).toThrow( "BxSites.ConfigNotFound" );
 			} );
 
 		} );

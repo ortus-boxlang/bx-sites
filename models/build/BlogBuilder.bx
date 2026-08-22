@@ -4,7 +4,7 @@
  * assignTableOfContents()/etc. finishing steps first) into everything the
  * blog itself needs: each post's own detail-page content (a featured-image/
  * byline header prepended to its real body, plus a draft badge when the
- * post is a draft - only ever present at all in `bxDocs serve`'s own
+ * post is a draft - only ever present at all in `bxSites serve`'s own
  * preview build, see BuildPipeline.bx's own `includeDrafts`), plus every
  * "index" page around it - `/blog/` (paginated, with "Browse by year"/
  * "Browse by category" links blocks once posts span more than one
@@ -27,9 +27,9 @@
  */
 class {
 
-	variables.blogAuthorsLoader = new "models.build.BlogAuthorsLoader@bxdocs"()
-	variables.responsiveImageProcessor = new "models.build.ResponsiveImageProcessor@bxdocs"()
-	variables.iconResolver = new "models.build.IconResolver@bxdocs"()
+	variables.blogAuthorsLoader = new "models.build.BlogAuthorsLoader@bxsites"()
+	variables.responsiveImageProcessor = new "models.build.ResponsiveImageProcessor@bxsites"()
+	variables.iconResolver = new "models.build.IconResolver@bxsites"()
 
 	/**
 	 * Average adult silent-reading speed, in words per minute - the same
@@ -44,7 +44,7 @@ class {
 	/**
 	 * @posts BlogDiscoverer.load()'s own output, already markdown-converted (`contentHtml` set) - newest first
 	 * @authors BlogAuthorsLoader.load()'s own output
-	 * @postsPerPage bxdocs.json's `blog.postsPerPage`
+	 * @postsPerPage bxsites.json's `blog.postsPerPage`
 	 * @basePath Root-relative base path ending with `/` (BaseUrlResolver's `basePath`)
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - "" (the default) makes every generated `<img>` here (a post's own featured image, its card thumbnail, an author's own avatar) a plain, unprocessed `<img>`, same as before this param existed. These images never pass through BuildPipeline.bx's own convertMarkdown()-time responsive-image rewrite at all (they don't exist yet at that point - BlogBuilder.bx generates them afterward), so ResponsiveImageProcessor.pictureTag() is called directly here instead
 	 *
@@ -164,7 +164,7 @@ class {
 	 * @items The posts to paginate (already filtered to one category, or the whole blog)
 	 * @baseDir The URL path segment these pages live under - `"blog"`, or `"blog/category/<slug>"`
 	 * @title The list's own title - `"Blog"`, or the category name
-	 * @perPage bxdocs.json's `blog.postsPerPage`
+	 * @perPage bxsites.json's `blog.postsPerPage`
 	 * @basePath Root-relative base path ending with `/`
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - see build()'s own docblock
 	 */
@@ -307,7 +307,7 @@ class {
 	 * A "🚧 Draft" banner, shown only when `post.draft` is `true` - which,
 	 * since BlogDiscoverer.load() already filters drafts out of every real
 	 * build, only ever happens at all when the caller opted into drafts
-	 * (`bxDocs serve`'s own local preview - see BuildPipeline.bx's own
+	 * (`bxSites serve`'s own local preview - see BuildPipeline.bx's own
 	 * `includeDrafts`). "" (nothing rendered) for a published post, so this
 	 * is always safe to call unconditionally.
 	 *
@@ -317,7 +317,7 @@ class {
 		if ( !( arguments.post.draft ?: false ) ) {
 			return ""
 		}
-		return '<p class="blog-draft-badge">🚧 Draft - not included in a real <code>bxDocs build</code></p>'
+		return '<p class="blog-draft-badge">🚧 Draft - not included in a real <code>bxSites build</code></p>'
 	}
 
 	/**
@@ -488,7 +488,7 @@ class {
 	 * page it's about. Always built, even for a zero-post blog (every
 	 * number just reads 0) - the same "always render, never conditionally
 	 * skip the page itself" precedent the main `/blog/` list already sets.
-	 * Reuses the `.bxdocs-cards`/`.bxdocs-card` component the `::: cards`
+	 * Reuses the `.bxsites-cards`/`.bxsites-card` component the `::: cards`
 	 * directive block already styles in every built-in theme, rather than
 	 * inventing a separate stats-card component.
 	 *
@@ -558,7 +558,7 @@ class {
 		return {
 			title       : "Blog Stats",
 			description : "Aggregate stats about the blog - " & totalPosts & " post" & ( totalPosts == 1 ? "" : "s" ) & " and counting.",
-			contentHtml : '<div class="bxdocs-cards">' & cardsHtml & "</div>",
+			contentHtml : '<div class="bxsites-cards">' & cardsHtml & "</div>",
 			urlPath     : "blog/stats/index.html",
 			ogImage     : "",
 			tags        : [],
@@ -567,7 +567,7 @@ class {
 	}
 
 	/**
-	 * Renders one `.bxdocs-card` for buildStatsPage() - a big `number`
+	 * Renders one `.bxsites-card` for buildStatsPage() - a big `number`
 	 * over a `label`, optionally linked (an author/category/post
 	 * "spotlight" card) via `href`.
 	 *
@@ -576,10 +576,10 @@ class {
 	 * @href When non-empty, wraps the card in a link to the real page the stat is about - "" (the default) renders a plain, non-interactive card
 	 */
 	private string function statCard( required string number, required string label, string href = "" ) {
-		var body = '<div class="bxdocs-card__title">' & encodeForHTML( arguments.number ) & '</div><div class="bxdocs-card__body">' & encodeForHTML( arguments.label ) & "</div>"
+		var body = '<div class="bxsites-card__title">' & encodeForHTML( arguments.number ) & '</div><div class="bxsites-card__body">' & encodeForHTML( arguments.label ) & "</div>"
 		return len( arguments.href )
-			? ( '<a class="bxdocs-card" href="' & attrEscapeUrl( arguments.href ) & '">' & body & "</a>" )
-			: ( '<div class="bxdocs-card">' & body & "</div>" )
+			? ( '<a class="bxsites-card" href="' & attrEscapeUrl( arguments.href ) & '">' & body & "</a>" )
+			: ( '<div class="bxsites-card">' & body & "</div>" )
 	}
 
 	/**

@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.SiteStatsBuilder", function() {
 
 			beforeEach( function() {
-				variables.builder = new "models.build.SiteStatsBuilder@bxdocs"();
+				variables.builder = new "models.build.SiteStatsBuilder@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -16,10 +16,10 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
-			private string function newProjectRoot( string bxdocsJson = '{"name":"Test Site","theme":{"name":"bootstrap"}}' ) {
-				var dir = createTempDirectory( prefix = "bxdocs-sitestats-" );
+			private string function newProjectRoot( string bxsitesJson = '{"name":"Test Site","theme":{"name":"bootstrap"}}' ) {
+				var dir = createTempDirectory( prefix = "bxsites-sitestats-" );
 				tempDirs.append( dir );
-				fileWrite( dir & "/bxdocs.json", arguments.bxdocsJson );
+				fileWrite( dir & "/bxsites.json", arguments.bxsitesJson );
 				return dir;
 			}
 
@@ -32,12 +32,12 @@ class extends="testbox.system.BaseSpec" {
 				fileWrite( path, arguments.html );
 			}
 
-			it( "throws BxDocs.SiteNotBuilt when there's no site/ directory", function() {
+			it( "throws BxSites.SiteNotBuilt when there's no site/ directory", function() {
 				var projectRoot = newProjectRoot();
 
 				expect( function() {
 					builder.build( projectRoot );
-				} ).toThrow( "BxDocs.SiteNotBuilt" );
+				} ).toThrow( "BxSites.SiteNotBuilt" );
 			} );
 
 			it( "counts pages and a rough word count, stripping tags", function() {

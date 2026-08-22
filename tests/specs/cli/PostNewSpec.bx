@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.PostNew", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.PostNew@bxdocs"();
+				variables.verb = new "models.cli.PostNew@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,22 +17,22 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newProjectRoot() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-postnew-" );
+				var dir = createTempDirectory( prefix = "bxsites-cli-postnew-" );
 				tempDirs.append( dir );
 				directoryCreate( dir & "/docs", true, true );
 				return dir;
 			}
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( { title : "Test" } );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
-			it( "throws BxDocs.MissingPostTitle when title is blank", function() {
+			it( "throws BxSites.MissingPostTitle when title is blank", function() {
 				expect( function() {
 					verb.run( { projectRoot : newProjectRoot() } );
-				} ).toThrow( "BxDocs.MissingPostTitle" );
+				} ).toThrow( "BxSites.MissingPostTitle" );
 			} );
 
 			it( "exits 0 and creates the post, defaulting draft to true", function() {

@@ -19,13 +19,13 @@ class {
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
 		if ( !len( projectRoot ) ) {
-			throw( type = "BxDocs.MissingProjectRoot", message = "`new` requires a target directory" )
+			throw( type = "BxSites.MissingProjectRoot", message = "`new` requires a target directory" )
 		}
 
 		var theme = trim( len( arguments.options.theme ?: "" ) ? arguments.options.theme : "bootstrap" )
 		if ( !variables.builtInThemes.contains( theme ) ) {
 			throw(
-				type    = "BxDocs.UnknownTheme",
+				type    = "BxSites.UnknownTheme",
 				message = "Unknown theme [#theme#] - must be one of [#variables.builtInThemes.toList( ', ' )#]"
 			)
 		}
@@ -33,17 +33,17 @@ class {
 		var name = trim( arguments.options.name ?: "" )
 		if ( !len( name ) ) {
 			var segments = listToArray( projectRoot.reReplace( "[\/]+$", "" ), "/" )
-			name = segments.len() ? segments[ segments.len() ] : "bx-docs-site"
+			name = segments.len() ? segments[ segments.len() ] : "bx-sites-site"
 		}
 
 		var format = trim( len( arguments.options.format ?: "" ) ? arguments.options.format : "yaml" )
 
-		var scaffolder = new "models.build.ProjectScaffolder@bxdocs"()
+		var scaffolder = new "models.build.ProjectScaffolder@bxsites"()
 		var result = scaffolder.scaffold( projectRoot, name, theme, arguments.options.description ?: "", format )
 
 		return {
 			exitCode : 0,
-			message  : "Created new BX Docs project [#name#] at #result.projectRoot# (theme: #theme#, config: #result.configPath.listLast( '/' )#)"
+			message  : "Created new BX Sites project [#name#] at #result.projectRoot# (theme: #theme#, config: #result.configPath.listLast( '/' )#)"
 		}
 	}
 

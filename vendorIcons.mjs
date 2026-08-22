@@ -1,5 +1,5 @@
 // Vendors the self-hosted icon libraries under resources/assets/icons/ -
-// bx-docs' own `icon:` frontmatter/nav-icon support (IconResolver.bx)
+// bx-sites' own `icon:` frontmatter/nav-icon support (IconResolver.bx)
 // reads one SVG file per icon straight off disk at build time and inlines
 // it into the page, so the *installed module* carries every icon in
 // every library/weight (many thousand small SVGs, tens of MB on disk)
@@ -41,7 +41,7 @@ function normalize(svg) {
 	return svg
 		.replace(/<!--[\s\S]*?-->/g, "")
 		// Only the outer <svg ...> tag's own width/height/class are
-		// presentational sizing IconResolver.bx's own `.bxdocs-icon` CSS
+		// presentational sizing IconResolver.bx's own `.bxsites-icon` CSS
 		// class replaces - stripping the same attributes wherever they
 		// appear (the previous global regex here) also hit inner shape
 		// elements like a calendar/archive icon's own <rect width="18"

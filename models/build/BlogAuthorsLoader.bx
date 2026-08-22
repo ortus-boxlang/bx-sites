@@ -24,7 +24,7 @@ class {
 	 * swappable via setYamlRenderer() (YamlRenderer.bx's own docblock
 	 * explains why).
 	 */
-	variables.yamlRenderer = new "models.build.YamlRenderer@bxdocs"()
+	variables.yamlRenderer = new "models.build.YamlRenderer@bxsites"()
 
 	/**
 	 * Swaps in a fake/test YAML renderer - see YamlRenderer.bx's docblock.
@@ -55,14 +55,14 @@ class {
 			parsed = variables.yamlRenderer.fromYaml( fileRead( authorsPath ) )
 		} catch ( any e ) {
 			throw(
-				type    = "BxDocs.InvalidBlogAuthors",
+				type    = "BxSites.InvalidBlogAuthors",
 				message = "blog/authors.yml is not valid YAML: #e.message#"
 			)
 		}
 
 		if ( !isStruct( parsed ) ) {
 			throw(
-				type    = "BxDocs.InvalidBlogAuthors",
+				type    = "BxSites.InvalidBlogAuthors",
 				message = "blog/authors.yml must contain a YAML object, one entry per author id"
 			)
 		}
@@ -116,7 +116,7 @@ class {
 	private struct function normalize( required string key, required any raw, required string docsDir ) {
 		if ( !isStruct( arguments.raw ) || !len( trim( arguments.raw.name ?: "" ) ) ) {
 			throw(
-				type    = "BxDocs.InvalidBlogAuthors",
+				type    = "BxSites.InvalidBlogAuthors",
 				message = "blog/authors.yml author [#arguments.key#] must be an object with a non-empty [name]"
 			)
 		}

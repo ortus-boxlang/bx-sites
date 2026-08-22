@@ -15,7 +15,7 @@
  *     `.editUrl`, `.lastUpdated`, `.description`, `.tags`, `.icon`,
  *     `.iconHtml`, `.summary`, `.ogImage` and `.urlPath` are always present too (defaulted by
  *     `renderPage()` below if the caller didn't set them - empty
- *     string/array when `bxdocs.json`'s `repo.editUri`/`lastUpdated` aren't
+ *     string/array when `bxsites.json`'s `repo.editUri`/`lastUpdated` aren't
  *     configured, or the page has no matching frontmatter key), so a
  *     theme's `page.bxm` never needs to guard their existence.
  *     `variables.basePath` (module spec section 4's `baseURL`,
@@ -25,7 +25,7 @@
  *     from a sub-path.
  *   - `search.bxm` (optional, not yet enforced - module spec section 7,
  *     deferred to Phase 4) - the search UI partial, included when
- *     `bxdocs.json`'s `search` is `true` (regardless of provider).
+ *     `bxsites.json`'s `search` is `true` (regardless of provider).
  *     `variables.siteConfig.searchProvider.provider` (defaulted to `"local"`
  *     by ConfigLoader.bx) tells it which UI to render - the built-in themes'
  *     own `search.bxm` render the local lunr search box for `"local"`, an
@@ -68,7 +68,7 @@ class {
 	 * section 3) if it satisfies the `ThemeProvider` contract, else this
 	 * module's built-in `resources/themes/<themeName>` (section 6).
 	 *
-	 * @themeName The configured theme name (bxdocs.json's `theme.name`)
+	 * @themeName The configured theme name (bxsites.json's `theme.name`)
 	 * @projectRoot Absolute path to the project root
 	 *
 	 * @return Absolute path to the resolved theme's own folder
@@ -85,7 +85,7 @@ class {
 		}
 
 		throw(
-			type    = "BxDocs.ThemeNotFound",
+			type    = "BxSites.ThemeNotFound",
 			message = "No theme found for [#arguments.themeName#] - looked in [#projectTheme#] and [#builtIn#]"
 		)
 	}
@@ -106,7 +106,7 @@ class {
 
 		if ( missing.len() ) {
 			throw(
-				type    = "BxDocs.InvalidTheme",
+				type    = "BxSites.InvalidTheme",
 				message = "Theme at [#dir#] is missing required file(s): #missing.toList( ', ' )#"
 			)
 		}
@@ -141,7 +141,7 @@ class {
 	 *
 	 * @page A page struct with an added `contentHtml` key (the already-converted markdown body)
 	 * @nav The site's nav tree, from NavBuilder.build()
-	 * @config The site's bxdocs.json config
+	 * @config The site's bxsites.json config
 	 * @themeDir Absolute path to the resolved theme folder (from resolveThemeDir())
 	 * @basePath Root-relative base path ending with `/` (BaseUrlResolver's `basePath`) - defaults to `/`
 	 * @versions Version switcher entries as `[ { label, url } ]` ("Latest" first, then each discovered docs/versions/ folder) - empty when the project doesn't use versioning

@@ -4,8 +4,8 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.BuildPipeline", function() {
 
 			beforeEach( function() {
-				variables.pipeline = new "models.build.BuildPipeline@bxdocs"();
-				variables.fakeMarkdown = new "tests.support.FakeMarkdownRenderer@bxdocs"();
+				variables.pipeline = new "models.build.BuildPipeline@bxsites"();
+				variables.fakeMarkdown = new "tests.support.FakeMarkdownRenderer@bxsites"();
 				pipeline.setMarkdownRenderer( fakeMarkdown );
 				variables.tempDirs = [];
 			} );
@@ -19,11 +19,11 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private function newProject( string themeName = "bootstrap" ) {
-				var dir = createTempDirectory( prefix = "bxdocs-buildpipeline-" );
+				var dir = createTempDirectory( prefix = "bxsites-buildpipeline-" );
 				tempDirs.append( dir );
 				directoryCreate( dir & "/docs", true, true );
 				fileWrite(
-					dir & "/bxdocs.json",
+					dir & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"' & themeName & '"}}'
 				);
 				return dir;
@@ -120,16 +120,16 @@ class extends="testbox.system.BaseSpec" {
 
 				var homeHtml = fileRead( root & "/site/index.html" );
 				expect( homeHtml ).toInclude( "Shared note." );
-				expect( homeHtml ).toInclude( '<details class="bxdocs-expandable">' );
+				expect( homeHtml ).toInclude( '<details class="bxsites-expandable">' );
 				expect( homeHtml ).toInclude( "<summary>FAQ</summary>" );
 				// The page-link stub got enriched with its target's real title.
-				expect( homeHtml ).toInclude( '<span class="bxdocs-page-link__title">Setup</span>' );
+				expect( homeHtml ).toInclude( '<span class="bxsites-page-link__title">Setup</span>' );
 			} );
 
 			it( "prefixes a ::: file block's own href with basePath, so it doesn't 404 under a non-root baseURL", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"my-docs"}'
 				);
 				fileWrite( root & "/docs/index.md", '::: file src="assets/spec.pdf"' & char( 10 ) & ":::" );
@@ -137,7 +137,7 @@ class extends="testbox.system.BaseSpec" {
 				pipeline.build( root );
 
 				var homeHtml = fileRead( root & "/site/index.html" );
-				expect( homeHtml ).toInclude( '<a class="bxdocs-file" href="/my-docs/assets/spec.pdf" download>' );
+				expect( homeHtml ).toInclude( '<a class="bxsites-file" href="/my-docs/assets/spec.pdf" download>' );
 			} );
 
 			it( "resolves a named icon in both a page's own header and its nav entry", function() {
@@ -147,9 +147,9 @@ class extends="testbox.system.BaseSpec" {
 				pipeline.build( root );
 				var html = fileRead( root & "/site/index.html" );
 
-				expect( html ).toInclude( '<span class="page-icon"><svg class="bxdocs-icon"' );
+				expect( html ).toInclude( '<span class="page-icon"><svg class="bxsites-icon"' );
 				// Same resolved icon also appears a second time, in the sidebar nav entry for this page.
-				expect( reMatch( 'class="bxdocs-icon"', html ).len() ).toBeGTE( 2 );
+				expect( reMatch( 'class="bxsites-icon"', html ).len() ).toBeGTE( 2 );
 			} );
 
 			it( "writes a feed.xml alongside a page with an ::: updates block, only when baseURL is absolute", function() {
@@ -166,7 +166,7 @@ class extends="testbox.system.BaseSpec" {
 				pipeline.build( root );
 				expect( fileExists( root & "/site/changelog/feed.xml" ) ).toBeFalse();
 
-				fileWrite( root & "/bxdocs.json", '{"name":"Test Site","baseURL":"https://example.com/","theme":{"name":"bootstrap"}}' );
+				fileWrite( root & "/bxsites.json", '{"name":"Test Site","baseURL":"https://example.com/","theme":{"name":"bootstrap"}}' );
 				pipeline.build( root );
 
 				expect( fileExists( root & "/site/changelog/feed.xml" ) ).toBeTrue();
@@ -175,10 +175,10 @@ class extends="testbox.system.BaseSpec" {
 				expect( feed ).toInclude( "Initial release." );
 			} );
 
-			it( "passes bxdocs.json's markdown options through to the markdown renderer", function() {
+			it( "passes bxsites.json's markdown options through to the markdown renderer", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"markdown":{"anchorLinks":false}}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -218,11 +218,11 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "builds the responsive-image manifest once from docs/assets/ and passes it to buildManifest() with the site's own assets.images config, via the setImageVariantGenerator() test seam", function() {
 				var root = newProject();
-				fileWrite( root & "/bxdocs.json", '{"name":"Test Site","assets":{"images":{"widths":[500,900]}}}' );
+				fileWrite( root & "/bxsites.json", '{"name":"Test Site","assets":{"images":{"widths":[500,900]}}}' );
 				fileWrite( root & "/docs/index.md", "Home" );
 				directoryCreate( root & "/docs/assets", true, true );
 
-				var fakeImages = new "tests.support.FakeImageVariantGenerator@bxdocs"();
+				var fakeImages = new "tests.support.FakeImageVariantGenerator@bxsites"();
 				pipeline.setImageVariantGenerator( fakeImages );
 
 				pipeline.build( root );
@@ -250,7 +250,7 @@ class extends="testbox.system.BaseSpec" {
 						webpVariants : []
 					}
 				};
-				pipeline.setImageVariantGenerator( new "tests.support.FakeImageVariantGenerator@bxdocs"( manifest ) );
+				pipeline.setImageVariantGenerator( new "tests.support.FakeImageVariantGenerator@bxsites"( manifest ) );
 
 				pipeline.build( root );
 
@@ -277,7 +277,7 @@ class extends="testbox.system.BaseSpec" {
 						webpVariants : []
 					}
 				};
-				pipeline.setImageVariantGenerator( new "tests.support.FakeImageVariantGenerator@bxdocs"( manifest ) );
+				pipeline.setImageVariantGenerator( new "tests.support.FakeImageVariantGenerator@bxsites"( manifest ) );
 
 				pipeline.build( root );
 
@@ -295,7 +295,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "bundles extraCss/extraJs into one fingerprinted file each by default, rendering a single <link>/<script> tag", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","extraCss":["assets/custom.css"],"extraJs":["assets/custom.js"]}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -320,7 +320,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "names the bundle assets/bundle.css, with no content-hash, when assets.fingerprint is off", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","assets":{"fingerprint":false},"extraCss":["assets/custom.css"]}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -337,7 +337,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "leaves extraCss/extraJs exactly as raw per-URL tags when assets.bundle is off", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","assets":{"bundle":false},"extraCss":["assets/custom.css"]}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -389,14 +389,14 @@ class extends="testbox.system.BaseSpec" {
 				expect( index[ 1 ].url ).toBe( "index.html" );
 
 				var html = fileRead( root & "/site/index.html" );
-				expect( html ).toInclude( "bxdocs-search-input" );
+				expect( html ).toInclude( "bxsites-search-input" );
 				expect( html ).toInclude( "lunr" );
 			} );
 
 			it( "skips the search index, search.js and search UI when search is disabled", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"search":false}'
 				);
 				fileWrite( root & "/docs/index.md", "Welcome home" );
@@ -407,7 +407,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( root & "/site/assets/search.js" ) ).toBeFalse();
 
 				var html = fileRead( root & "/site/index.html" );
-				expect( html ).notToInclude( "bxdocs-search-input" );
+				expect( html ).notToInclude( "bxsites-search-input" );
 				expect( html ).notToInclude( "lunr" );
 			} );
 
@@ -443,7 +443,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "buildSearchIndex() reports skipped without writing anything when search is disabled", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"search":false}'
 				);
 				fileWrite( root & "/docs/index.md", "Welcome home" );
@@ -457,7 +457,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "wires up Algolia DocSearch instead of the local index/widget when searchProvider.provider is algolia", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"search":true,"searchProvider":{"provider":"algolia","algolia":{"appId":"ABC123","apiKey":"secret","indexName":"my-docs"}}}'
 				);
 				fileWrite( root & "/docs/index.md", "Welcome home" );
@@ -468,9 +468,9 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( root & "/site/assets/search.js" ) ).toBeFalse();
 
 				var html = fileRead( root & "/site/index.html" );
-				expect( html ).notToInclude( "bxdocs-search-input" );
+				expect( html ).notToInclude( "bxsites-search-input" );
 				expect( html ).notToInclude( "lunr" );
-				expect( html ).toInclude( "bxdocs-search-algolia" );
+				expect( html ).toInclude( "bxsites-search-algolia" );
 				expect( html ).toInclude( "docsearch(" );
 				expect( html ).toInclude( "ABC123" );
 				// encodeForJavaScript() hex-escapes non-alphanumerics for safe JS-string
@@ -483,7 +483,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "buildSearchIndex() reports skipped without writing anything when searchProvider.provider is algolia", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"search":true,"searchProvider":{"provider":"algolia","algolia":{"appId":"ABC123","apiKey":"secret","indexName":"my-docs"}}}'
 				);
 				fileWrite( root & "/docs/index.md", "Welcome home" );
@@ -497,12 +497,12 @@ class extends="testbox.system.BaseSpec" {
 			it( "runs the pagefind indexer against the finished site/ when searchProvider.provider is pagefind, via the setPagefindIndexer() test seam", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"search":true,"searchProvider":{"provider":"pagefind","pagefind":{"bin":"/opt/pagefind","options":["--exclude-selectors",".no-index"]}}}'
 				);
 				fileWrite( root & "/docs/index.md", "Welcome home" );
 
-				var fakePagefind = new "tests.support.FakePagefindIndexer@bxdocs"();
+				var fakePagefind = new "tests.support.FakePagefindIndexer@bxsites"();
 				pipeline.setPagefindIndexer( fakePagefind );
 
 				pipeline.build( root );
@@ -511,7 +511,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( root & "/site/assets/search.js" ) ).toBeFalse();
 
 				var html = fileRead( root & "/site/index.html" );
-				expect( html ).toInclude( "bxdocs-search-pagefind" );
+				expect( html ).toInclude( "bxsites-search-pagefind" );
 				expect( html ).toInclude( "pagefind-ui.js" );
 
 				var calls = fakePagefind.getCalls();
@@ -525,7 +525,7 @@ class extends="testbox.system.BaseSpec" {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Welcome home" );
 
-				var fakePagefind = new "tests.support.FakePagefindIndexer@bxdocs"();
+				var fakePagefind = new "tests.support.FakePagefindIndexer@bxsites"();
 				pipeline.setPagefindIndexer( fakePagefind );
 
 				pipeline.build( root );
@@ -536,22 +536,22 @@ class extends="testbox.system.BaseSpec" {
 			it( "fails the build when the pagefind indexer fails", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"search":true,"searchProvider":{"provider":"pagefind"}}'
 				);
 				fileWrite( root & "/docs/index.md", "Welcome home" );
 
-				pipeline.setPagefindIndexer( new "tests.support.FakePagefindIndexer@bxdocs"( "pagefind: command not found" ) );
+				pipeline.setPagefindIndexer( new "tests.support.FakePagefindIndexer@bxsites"( "pagefind: command not found" ) );
 
 				expect( function() {
 					pipeline.build( root );
-				} ).toThrow( "BxDocs.PagefindFailed" );
+				} ).toThrow( "BxSites.PagefindFailed" );
 			} );
 
 			it( "buildSearchIndex() reports skipped without writing anything when searchProvider.provider is pagefind", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"search":true,"searchProvider":{"provider":"pagefind"}}'
 				);
 				fileWrite( root & "/docs/index.md", "Welcome home" );
@@ -622,20 +622,20 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "Test Site" );
 			} );
 
-			it( "throws BxDocs.ConfigNotFound when the project has no bxdocs.json", function() {
-				var root = createTempDirectory( prefix = "bxdocs-buildpipeline-noconfig-" );
+			it( "throws BxSites.ConfigNotFound when the project has no bxsites.json", function() {
+				var root = createTempDirectory( prefix = "bxsites-buildpipeline-noconfig-" );
 				tempDirs.append( root );
 				directoryCreate( root & "/docs", true, true );
 
 				expect( function() {
 					pipeline.build( root );
-				} ).toThrow( "BxDocs.ConfigNotFound" );
+				} ).toThrow( "BxSites.ConfigNotFound" );
 			} );
 
 			it( "prefixes every internal link with a path-only baseURL override", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"my-docs"}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -652,7 +652,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "writes sitemap.xml with absolute URLs only when baseURL is a full URL", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"https://docs.example.com/"}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -713,7 +713,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "copies the shared copy-code.js widget regardless of whether search is enabled", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"search":false}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -778,7 +778,7 @@ class extends="testbox.system.BaseSpec" {
 
 				var noSearchRoot = newProject();
 				fileWrite(
-					noSearchRoot & "/bxdocs.json",
+					noSearchRoot & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"search":false}'
 				);
 				fileWrite( noSearchRoot & "/docs/index.md", "Home" );
@@ -848,7 +848,7 @@ class extends="testbox.system.BaseSpec" {
 
 					var mermaidRoot = newProject( themeName );
 					fileWrite(
-						mermaidRoot & "/bxdocs.json",
+						mermaidRoot & "/bxsites.json",
 						'{"name":"Test Site","theme":{"name":"' & themeName & '"},"mermaid":true}'
 					);
 					fileWrite( mermaidRoot & "/docs/index.md", "Home" );
@@ -890,12 +890,12 @@ class extends="testbox.system.BaseSpec" {
 				pipeline.build( root );
 
 				var html = fileRead( root & "/site/index.html" );
-				expect( html ).toInclude( 'class="bxdocs-tabs" data-bxdocs-tabgroup' );
+				expect( html ).toInclude( 'class="bxsites-tabs" data-bxsites-tabgroup' );
 				expect( html ).toInclude( ">Java</button>" );
 				expect( html ).toInclude( ">BoxLang</button>" );
 				expect( html ).toInclude( "<p>hello java</p>" );
 				expect( html ).toInclude( "<p>hello bx</p>" );
-				expect( html ).notToInclude( "data-bxdocs-token" );
+				expect( html ).notToInclude( "data-bxsites-token" );
 			} );
 
 			it( "converts a ```tryboxlang fenced block into a live try.boxlang.io iframe embed", function() {
@@ -908,10 +908,10 @@ class extends="testbox.system.BaseSpec" {
 				pipeline.build( root );
 
 				var html = fileRead( root & "/site/index.html" );
-				expect( html ).toInclude( 'class="bxdocs-tryboxlang"' );
-				expect( html ).toInclude( '<div class="bxdocs-tryboxlang__title">Say Hi</div>' );
+				expect( html ).toInclude( 'class="bxsites-tryboxlang"' );
+				expect( html ).toInclude( '<div class="bxsites-tryboxlang__title">Say Hi</div>' );
 				expect( html ).toInclude( 'src="https://try.boxlang.io/editor/index.bxm?ro=false&amp;code=' );
-				expect( html ).notToInclude( "data-bxdocs-token" );
+				expect( html ).notToInclude( "data-bxsites-token" );
 				expect( html ).notToInclude( "println" );
 			} );
 
@@ -930,7 +930,7 @@ class extends="testbox.system.BaseSpec" {
 
 					var mathRoot = newProject( themeName );
 					fileWrite(
-						mathRoot & "/bxdocs.json",
+						mathRoot & "/bxsites.json",
 						'{"name":"Test Site","theme":{"name":"' & themeName & '"},"math":true}'
 					);
 					fileWrite( mathRoot & "/docs/index.md", 'Euler: $e^{i\pi}+1=0$ here.' );
@@ -979,25 +979,25 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( root & "/site/plugin-marker.txt" ) ).toBeTrue();
 			} );
 
-			it( "throws BxDocs.PluginNotFound when bxdocs.json [plugins] names an uninstalled module, without the setPlugins() seam", function() {
+			it( "throws BxSites.PluginNotFound when bxsites.json [plugins] names an uninstalled module, without the setPlugins() seam", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","plugins":["someUnknownModule"]}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
 
 				expect( function() {
 					pipeline.build( root );
-				} ).toThrow( "BxDocs.PluginNotFound" );
+				} ).toThrow( "BxSites.PluginNotFound" );
 			} );
 
-			it( "uses bxdocs.json's [nav] array as the nav tree, in its own order, instead of folder inference", function() {
+			it( "uses bxsites.json's [nav] array as the nav tree, in its own order, instead of folder inference", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Home" );
 				fileWrite( root & "/docs/about.md", "About" );
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"nav":[{"path":"about.md"},{"path":"index.md"}]}'
 				);
 
@@ -1008,7 +1008,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( html.findNoCase( ">About<" ) ).toBeLT( html.findNoCase( ">Index<" ) );
 			} );
 
-			it( "uses a docs/nav.json file as the nav tree when bxdocs.json's [nav] is empty", function() {
+			it( "uses a docs/nav.json file as the nav tree when bxsites.json's [nav] is empty", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Home" );
 				directoryCreate( root & "/docs/guides", true, true );
@@ -1025,14 +1025,14 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).notToInclude( ">Setup<" );
 			} );
 
-			it( "throws BxDocs.InvalidConfig for a docs/nav.json entry referencing a nonexistent page", function() {
+			it( "throws BxSites.InvalidConfig for a docs/nav.json entry referencing a nonexistent page", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Home" );
 				fileWrite( root & "/docs/nav.json", '["does-not-exist.md"]' );
 
 				expect( function() {
 					pipeline.build( root );
-				} ).toThrow( "BxDocs.InvalidConfig" );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "renders breadcrumbs for a nested page under a linked ancestor but not for a top-level page", function() {
@@ -1067,7 +1067,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "generates a per-page og:image PNG per page when [generateOgImages] is on", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"generateOgImages":true}'
 				);
 				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "title: Home" & char( 10 ) & "---" & char( 10 ) & "Welcome" );
@@ -1086,7 +1086,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "prefers a page's own frontmatter [ogImage] over auto-generating one", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"generateOgImages":true}'
 				);
 				fileWrite(
@@ -1104,7 +1104,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "renders a repo link when [repo.url] is configured, and none when it isn't", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"repo":{"url":"https://github.com/acme/docs"}}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1130,7 +1130,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "computes editUrl from [repo.url] + [repo.editUri] + the page's relative path", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"repo":{"url":"https://github.com/acme/docs","editUri":"edit/main/docs/"}}'
 				);
 				directoryCreate( root & "/docs/guides", true, true );
@@ -1149,7 +1149,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "omits the edit link when [repo.url] is set but [repo.editUri] isn't", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"repo":{"url":"https://github.com/acme/docs"}}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1163,7 +1163,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "renders a footer with social links and copyright only when [footer] is enabled", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"footer":true,"social":[{"url":"https://twitter.com/acme","icon":"twitter","label":"Twitter"}]}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1171,7 +1171,7 @@ class extends="testbox.system.BaseSpec" {
 				pipeline.build( root );
 
 				var html = fileRead( root & "/site/index.html" );
-				expect( html ).toInclude( "bxdocs-footer" );
+				expect( html ).toInclude( "bxsites-footer" );
 				expect( html ).toInclude( "social-link" );
 				expect( html ).toInclude( "twitter.com" );
 				expect( html ).toInclude( "Test Site" );
@@ -1184,7 +1184,7 @@ class extends="testbox.system.BaseSpec" {
 				pipeline.build( root );
 
 				var html = fileRead( root & "/site/index.html" );
-				expect( html ).notToInclude( "bxdocs-footer" );
+				expect( html ).notToInclude( "bxsites-footer" );
 			} );
 
 			it( "omits lastUpdated when the [lastUpdated] option is off (the default)", function() {
@@ -1267,7 +1267,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "computes editUrl and lastUpdated for a versioned page relative to its own docs/versions/<name>/ folder", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"repo":{"url":"https://github.com/acme/docs","editUri":"edit/main/docs/"}}'
 				);
 				fileWrite( root & "/docs/index.md", "Latest home" );
@@ -1285,7 +1285,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "includes version pages in sitemap.xml and llms.txt alongside the main tree", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"https://docs.example.com/"}'
 				);
 				fileWrite( root & "/docs/index.md", "Latest home" );
@@ -1322,7 +1322,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "builds each docs/i18n/<code>/ folder as its own tree under site/<code>/, using the translated content when it exists", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
 				);
 				fileWrite( root & "/docs/index.md", "Welcome home" );
@@ -1343,7 +1343,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "falls back to the default locale's own content, flagged, for a page a locale hasn't translated yet", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
 				);
 				fileWrite( root & "/docs/index.md", "Welcome home" );
@@ -1366,7 +1366,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "gives every locale the exact same nav shape as the default tree, translated titles included", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1390,7 +1390,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "renders a language switcher with the current locale selected when docs/i18n/* exist, and none when there aren't any", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1421,7 +1421,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "stamps <html lang dir> for the default and every locale build, rtl included", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"ar","label":"العربية","dir":"rtl"}]}}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1437,7 +1437,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "points a translated page's editUrl at its own docs/i18n/<code>/ source, and a fallback page's at the default docs/ source", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"repo":{"url":"https://github.com/acme/docs","editUri":"edit/main/docs/"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1459,7 +1459,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "includes locale pages in sitemap.xml and llms.txt alongside the main tree", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"https://docs.example.com/","i18n":{"locales":[{"code":"es","label":"Español"}]}}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1480,7 +1480,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "never treats docs/i18n/** as part of the main tree's own pages", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1497,7 +1497,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "doesn't show a language switcher inside a version with no i18n subfolder of its own, or a version switcher inside a top-level locale tree", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1515,7 +1515,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "builds a docs/versions/<name>/i18n/<code>/ folder as its own tree under site/versions/<name>/<code>/, using the translated content when it exists", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1535,7 +1535,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "falls back to the version's own default-locale content, flagged, for a page that version's locale hasn't translated yet", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1555,7 +1555,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "shows a language switcher inside a version once that version has its own i18n subfolder, listing only that version's own locales", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"locales":[{"code":"es","label":"Español"},{"code":"fr","label":"Français"}]}}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1582,7 +1582,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "points a version-nested translated page's editUrl at its own docs/versions/<name>/i18n/<code>/ source, and a fallback page's at that version's own docs/versions/<name>/ source", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"repo":{"url":"https://github.com/acme/docs","editUri":"edit/main/docs/"},"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1605,7 +1605,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "includes a version's own locale pages in sitemap.xml and llms.txt alongside everything else", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"https://docs.example.com/","i18n":{"locales":[{"code":"es","label":"Español"}]}}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1626,7 +1626,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "writes one blog/category/<slug>/feed.xml per category, filtered to just that category's own posts", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"https://docs.example.com/"}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1701,7 +1701,7 @@ class extends="testbox.system.BaseSpec" {
 				pipeline.build( root );
 
 				expect( fileExists( root & "/site/blog/stats/index.html" ) ).toBeTrue();
-				expect( fileRead( root & "/site/blog/stats/index.html" ) ).toInclude( "bxdocs-cards" );
+				expect( fileRead( root & "/site/blog/stats/index.html" ) ).toInclude( "bxsites-cards" );
 			} );
 
 			it( "auto-appends a ""Blog"" nav entry last, once there's at least one published post", function() {
@@ -1721,7 +1721,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "skips the auto-appended ""Blog"" nav entry when a custom nav already places one via an explicit url", function() {
 				var root = newProject();
 				fileWrite(
-					root & "/bxdocs.json",
+					root & "/bxsites.json",
 					'{"name":"Test Site","nav":[{"title":"Blog","url":"blog/index.html","icon":"lucide:newspaper"},{"path":"index.md"}]}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );

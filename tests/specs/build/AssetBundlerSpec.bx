@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.AssetBundler", function() {
 
 			beforeEach( function() {
-				variables.bundler = new "models.build.AssetBundler@bxdocs"();
+				variables.bundler = new "models.build.AssetBundler@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,7 +17,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private struct function newProject() {
-				var root = createTempDirectory( prefix = "bxdocs-assetbundler-" );
+				var root = createTempDirectory( prefix = "bxsites-assetbundler-" );
 				tempDirs.append( root );
 				var docsDir = root & "/docs"
 				var cacheDir = root & "/.cache/assets"

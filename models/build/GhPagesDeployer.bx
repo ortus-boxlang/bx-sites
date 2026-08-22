@@ -22,21 +22,21 @@ class {
 	 *
 	 * @return { branch, remote }
 	 */
-	struct function deploy( required string projectRoot, required string siteDir, string branch = "gh-pages", string remote = "origin", string message = "Deploy site via bxDocs gh-deploy" ) {
+	struct function deploy( required string projectRoot, required string siteDir, string branch = "gh-pages", string remote = "origin", string message = "Deploy site via bxSites gh-deploy" ) {
 		if ( !directoryExists( arguments.projectRoot & "/.git" ) ) {
 			throw(
-				type    = "BxDocs.NotAGitRepo",
+				type    = "BxSites.NotAGitRepo",
 				message = "`gh-deploy` requires a git repository at [#arguments.projectRoot#] - run `git init` first"
 			)
 		}
 		if ( !directoryExists( arguments.siteDir ) ) {
 			throw(
-				type    = "BxDocs.SiteNotBuilt",
+				type    = "BxSites.SiteNotBuilt",
 				message = "No [#arguments.siteDir#] to deploy - run `build` first"
 			)
 		}
 
-		var worktreeDir = getTempDirectory().reReplace( "[\/]+$", "" ) & "/bxdocs-ghdeploy-" & createUUID()
+		var worktreeDir = getTempDirectory().reReplace( "[\/]+$", "" ) & "/bxsites-ghdeploy-" & createUUID()
 
 		try {
 			run( [ "git", "worktree", "add", "--detach", worktreeDir ], arguments.projectRoot )
@@ -71,7 +71,7 @@ class {
 	}
 
 	/**
-	 * Runs a command, throwing BxDocs.GhDeployFailed with its combined
+	 * Runs a command, throwing BxSites.GhDeployFailed with its combined
 	 * stdout/stderr on a non-zero exit code.
 	 *
 	 * @cmd Full argv, `git` included as element 1
@@ -81,7 +81,7 @@ class {
 		var result = exec( arguments.cmd, arguments.cwd )
 		if ( result.exitCode != 0 ) {
 			throw(
-				type    = "BxDocs.GhDeployFailed",
+				type    = "BxSites.GhDeployFailed",
 				message = "`#arguments.cmd.toList( ' ' )#` failed (exit #result.exitCode#): #result.output#"
 			)
 		}

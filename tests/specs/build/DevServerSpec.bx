@@ -4,8 +4,8 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.DevServer", function() {
 
 			beforeEach( function() {
-				variables.devServer = new "models.build.DevServer@bxdocs"();
-				variables.fakeMarkdown = new "tests.support.FakeMarkdownRenderer@bxdocs"();
+				variables.devServer = new "models.build.DevServer@bxsites"();
+				variables.fakeMarkdown = new "tests.support.FakeMarkdownRenderer@bxsites"();
 				devServer.setMarkdownRenderer( fakeMarkdown );
 				variables.tempDirs = [];
 			} );
@@ -20,10 +20,10 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private function newProject() {
-				var dir = createTempDirectory( prefix = "bxdocs-devserver-" );
+				var dir = createTempDirectory( prefix = "bxsites-devserver-" );
 				tempDirs.append( dir );
 				directoryCreate( dir & "/docs", true, true );
-				fileWrite( dir & "/bxdocs.json", '{"name":"Test Site","theme":{"name":"bootstrap"}}' );
+				fileWrite( dir & "/bxsites.json", '{"name":"Test Site","theme":{"name":"bootstrap"}}' );
 				fileWrite( dir & "/docs/index.md", "Welcome home" );
 				return dir;
 			}
@@ -45,7 +45,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( res.fileContent ).toInclude( "<p>Welcome home</p>" );
 			} );
 
-			it( "previews a draft blog post locally, with its draft badge, unlike a real bxDocs build", function() {
+			it( "previews a draft blog post locally, with its draft badge, unlike a real bxSites build", function() {
 				var root = newProject();
 				directoryCreate( root & "/docs/blog/posts", true, true );
 				fileWrite( root & "/docs/blog/posts/draft-post.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "draft: true" & char( 10 ) & "---" & char( 10 ) & "Draft body." );
@@ -61,23 +61,23 @@ class extends="testbox.system.BaseSpec" {
 				var started = devServer.start( root, 0, "127.0.0.1" );
 
 				var res = get( started.url & "index.html" );
-				expect( res.fileContent ).toInclude( "__bxdocs-live-reload.js" );
+				expect( res.fileContent ).toInclude( "__bxsites-live-reload.js" );
 
-				var scriptRes = get( started.url & "__bxdocs-live-reload.js" );
+				var scriptRes = get( started.url & "__bxsites-live-reload.js" );
 				expect( scriptRes.status_code ).toBe( 200 );
-				expect( scriptRes.fileContent ).toInclude( "/__bxdocs/version" );
+				expect( scriptRes.fileContent ).toInclude( "/__bxsites/version" );
 			} );
 
-			it( "serves an incrementing build version at /__bxdocs/version", function() {
+			it( "serves an incrementing build version at /__bxsites/version", function() {
 				var root = newProject();
 				var started = devServer.start( root, 0, "127.0.0.1" );
 
-				var res = get( started.url & "__bxdocs/version" );
+				var res = get( started.url & "__bxsites/version" );
 				expect( trim( res.fileContent ) ).toBe( "1" );
 				expect( devServer.getBuildVersion() ).toBe( 1 );
 			} );
 
-			it( "checkAndRebuild() returns false when nothing under docs/ or bxdocs.json changed", function() {
+			it( "checkAndRebuild() returns false when nothing under docs/ or bxsites.json changed", function() {
 				var root = newProject();
 				devServer.start( root, 0, "127.0.0.1" );
 
@@ -100,13 +100,13 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "<p>Updated content</p>" );
 			} );
 
-			it( "checkAndRebuild() also reacts to a bxdocs.json change", function() {
+			it( "checkAndRebuild() also reacts to a bxsites.json change", function() {
 				var root = newProject();
 				devServer.start( root, 0, "127.0.0.1" );
 
-				fileWrite( root & "/bxdocs.json", '{"name":"Renamed Site","theme":{"name":"bootstrap"}}' );
+				fileWrite( root & "/bxsites.json", '{"name":"Renamed Site","theme":{"name":"bootstrap"}}' );
 				var futureMillis = createObject( "java", "java.lang.System" ).currentTimeMillis() + 5000;
-				createObject( "java", "java.io.File" ).init( root & "/bxdocs.json" ).setLastModified( javaCast( "long", futureMillis ) );
+				createObject( "java", "java.io.File" ).init( root & "/bxsites.json" ).setLastModified( javaCast( "long", futureMillis ) );
 
 				expect( devServer.checkAndRebuild() ).toBeTrue();
 

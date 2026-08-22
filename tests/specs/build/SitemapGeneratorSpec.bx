@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.SitemapGenerator", function() {
 
 			beforeEach( function() {
-				variables.generator = new "models.build.SitemapGenerator@bxdocs"();
+				variables.generator = new "models.build.SitemapGenerator@bxsites"();
 			} );
 
 			private struct function page( string urlPath, boolean hidden = false ) {

@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.MathProtector", function() {
 
 			beforeEach( function() {
-				variables.protector = new "models.build.MathProtector@bxdocs"();
+				variables.protector = new "models.build.MathProtector@bxsites"();
 			} );
 
 			it( "leaves markdown with no math untouched", function() {

@@ -42,7 +42,7 @@ class {
 	variables.sizesPatternSingle = createObject( "java", "java.util.regex.Pattern" ).compile( "(?i)(?<![\w-])sizes\s*=\s*'[^']*'\s*" )
 
 	/**
-	 * The fixed `sizes` attribute given to every rewritten `<img>` - bx-docs'
+	 * The fixed `sizes` attribute given to every rewritten `<img>` - bx-sites'
 	 * own article column tops out well under 800px on every built-in theme,
 	 * so this covers the common case without needing a per-image config
 	 * knob in v1.

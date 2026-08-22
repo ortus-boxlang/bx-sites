@@ -10,7 +10,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.GhPagesDeployer", function() {
 
 			beforeEach( function() {
-				variables.deployer = new "models.build.GhPagesDeployer@bxdocs"();
+				variables.deployer = new "models.build.GhPagesDeployer@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -33,14 +33,14 @@ class extends="testbox.system.BaseSpec" {
 			}
 
 			private string function newBareRemote() {
-				var dir = createTempDirectory( prefix = "bxdocs-ghdeploy-remote-" );
+				var dir = createTempDirectory( prefix = "bxsites-ghdeploy-remote-" );
 				tempDirs.append( dir );
 				git( [ "git", "init", "--bare", "--initial-branch=main", dir ], dir );
 				return dir;
 			}
 
 			private string function newProjectRepo( required string remotePath ) {
-				var dir = createTempDirectory( prefix = "bxdocs-ghdeploy-project-" );
+				var dir = createTempDirectory( prefix = "bxsites-ghdeploy-project-" );
 				tempDirs.append( dir );
 				git( [ "git", "init", "--initial-branch=main", dir ], dir );
 				git( [ "git", "-C", dir, "config", "user.email", "test@example.com" ], dir );
@@ -52,24 +52,24 @@ class extends="testbox.system.BaseSpec" {
 				return dir;
 			}
 
-			it( "throws BxDocs.NotAGitRepo when projectRoot has no .git", function() {
-				var root = createTempDirectory( prefix = "bxdocs-ghdeploy-notgit-" );
+			it( "throws BxSites.NotAGitRepo when projectRoot has no .git", function() {
+				var root = createTempDirectory( prefix = "bxsites-ghdeploy-notgit-" );
 				tempDirs.append( root );
 				directoryCreate( root & "/site", true, true );
 				fileWrite( root & "/site/index.html", "hi" );
 
 				expect( function() {
 					deployer.deploy( root, root & "/site" );
-				} ).toThrow( "BxDocs.NotAGitRepo" );
+				} ).toThrow( "BxSites.NotAGitRepo" );
 			} );
 
-			it( "throws BxDocs.SiteNotBuilt when siteDir doesn't exist", function() {
+			it( "throws BxSites.SiteNotBuilt when siteDir doesn't exist", function() {
 				var remote = newBareRemote();
 				var root = newProjectRepo( remote );
 
 				expect( function() {
 					deployer.deploy( root, root & "/site" );
-				} ).toThrow( "BxDocs.SiteNotBuilt" );
+				} ).toThrow( "BxSites.SiteNotBuilt" );
 			} );
 
 			it( "force-pushes site/ as a single commit to the gh-pages branch, leaving the caller's own branch untouched", function() {
@@ -90,7 +90,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( directoryExists( root & "/site" ) ).toBeTrue();
 
 				// Verify by cloning the bare remote's gh-pages branch fresh.
-				var checkoutDir = createTempDirectory( prefix = "bxdocs-ghdeploy-checkout-" );
+				var checkoutDir = createTempDirectory( prefix = "bxsites-ghdeploy-checkout-" );
 				tempDirs.append( checkoutDir );
 				git( [ "git", "clone", "--branch", "gh-pages", remote, checkoutDir ], checkoutDir );
 
@@ -116,7 +116,7 @@ class extends="testbox.system.BaseSpec" {
 				fileWrite( root & "/site/new.html", "new page" );
 				deployer.deploy( root, root & "/site" );
 
-				var checkoutDir = createTempDirectory( prefix = "bxdocs-ghdeploy-checkout2-" );
+				var checkoutDir = createTempDirectory( prefix = "bxsites-ghdeploy-checkout2-" );
 				tempDirs.append( checkoutDir );
 				git( [ "git", "clone", "--branch", "gh-pages", remote, checkoutDir ], checkoutDir );
 

@@ -14,7 +14,7 @@ class {
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
 		if ( !len( projectRoot ) ) {
-			throw( type = "BxDocs.MissingProjectRoot", message = "`blog:find` requires a project root" )
+			throw( type = "BxSites.MissingProjectRoot", message = "`blog:find` requires a project root" )
 		}
 
 		var author = trim( arguments.options.author ?: "" )
@@ -25,15 +25,15 @@ class {
 		var includeDrafts = ( arguments.options.drafts ?: false ) ? true : false
 
 		if ( len( since ) && !isDate( since ) ) {
-			throw( type = "BxDocs.InvalidDate", message = "--since must be a valid date (got [#since#])" )
+			throw( type = "BxSites.InvalidDate", message = "--since must be a valid date (got [#since#])" )
 		}
 		if ( len( until ) && !isDate( until ) ) {
-			throw( type = "BxDocs.InvalidDate", message = "--until must be a valid date (got [#until#])" )
+			throw( type = "BxSites.InvalidDate", message = "--until must be a valid date (got [#until#])" )
 		}
 
 		var docsDir = projectRoot.reReplace( "[\/]+$", "" ) & "/docs"
 
-		var matches = new "models.build.BlogDiscoverer@bxdocs"()
+		var matches = new "models.build.BlogDiscoverer@bxsites"()
 			.load( docsDir : docsDir, includeDrafts : includeDrafts )
 			.filter( post => matchesFilters( post, author, category, tag, since, until ) )
 

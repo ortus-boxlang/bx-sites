@@ -9,12 +9,12 @@ tags: [reference, configuration]
 # 設定
 
 すべてのプロジェクトはルートに 1 つのサイト設定ファイルを持ちます。デフォルトかつ推奨の形式である
-`bxdocs.yaml`（または `.yml`）を使うか、そのまま使い続けたいプロジェクト向けの `bxdocs.json` を
+`bxsites.yaml`（または `.yml`）を使うか、そのまま使い続けたいプロジェクト向けの `bxsites.json` を
 使うかのいずれかです。どちらも完全にサポートされており、まったく同じ結果になります。
-`bxDocs new` は `--format=json` を指定しない限り `bxdocs.yaml` をスキャフォールドします
+`bxSites new` は `--format=json` を指定しない限り `bxsites.yaml` をスキャフォールドします
 （[はじめに](getting-started.md#config-file-format) を参照）。プロジェクトに何らかの理由で
-複数の設定ファイルが存在する場合は、`bxdocs.yaml` が優先され、次に `bxdocs.yml`、
-最後に `bxdocs.json` の順で使用されます。
+複数の設定ファイルが存在する場合は、`bxsites.yaml` が優先され、次に `bxsites.yml`、
+最後に `bxsites.json` の順で使用されます。
 
 ```yaml
 name: "My Docs"
@@ -53,7 +53,7 @@ i18n:
   locales: []
 ```
 
-そちらを好むプロジェクト向けの、同等の `bxdocs.json` は次のとおりです:
+そちらを好むプロジェクト向けの、同等の `bxsites.json` は次のとおりです:
 
 ```json
 {
@@ -200,7 +200,7 @@ YAML でも同様に読み替えられます。
 }
 ```
 
-`bxdocs.json` が大きくなりすぎる場合は、`docs/nav.json` ファイルに移動できます。
+`bxsites.json` が大きくなりすぎる場合は、`docs/nav.json` ファイルに移動できます。
 
 ## `markdown`
 
@@ -209,7 +209,7 @@ YAML でも同様に読み替えられます。
 
 | キー | デフォルト | 効果 |
 |---|---|---|
-| `enableAdmonition` | `true` *（BX Docs デフォルト; bx-markdown 自体は `false`）* | `!!!`/`???`/`???+` コールアウトブロック |
+| `enableAdmonition` | `true` *（BX Sites デフォルト; bx-markdown 自体は `false`）* | `!!!`/`???`/`???+` コールアウトブロック |
 | `enableFootnotes` | `false` | `[^label]` 脚注参照 |
 | `enableDefinitionLists` | `false` | `Term\n:   Definition` リスト |
 | `autoLinkUrls` | `true` | 裸の URL とメールアドレスを自動リンク |
@@ -256,7 +256,7 @@ YAML でも同様に読み替えられます。
 ## `footer`
 
 `false`（デフォルト）- フッターなし。`true` にすると各ページにフッターが追加されます:
-著作権行（`© <year> <site name>`）、`social` リンク（あれば）、「BX Docs で構築」クレジット。
+著作権行（`© <year> <site name>`）、`social` リンク（あれば）、「BX Sites で構築」クレジット。
 
 ```json
 { "footer": true }
@@ -335,7 +335,7 @@ YAML でも同様に読み替えられます。
 インストールしただけでは有効化されません。ここに名前を記述する必要があります。
 
 ```json
-{ "plugins": [ "myBxDocsPlugin" ] }
+{ "plugins": [ "myBxSitesPlugin" ] }
 ```
 
 ## `i18n`
@@ -364,7 +364,7 @@ YAML でも同様に読み替えられます。
 
 ## バージョニング
 
-バージョン管理されたドキュメントは設定より規約を重視します。`bxdocs.json` に専用キーはありません。
+バージョン管理されたドキュメントは設定より規約を重視します。`bxsites.json` に専用キーはありません。
 `docs/versions/` フォルダを追加すると、その中の各直接サブフォルダが独立したドキュメントツリーとして
 ビルドされます:
 

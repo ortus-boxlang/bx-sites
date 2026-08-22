@@ -16,7 +16,7 @@
  * DirectiveBlockProcessor.bx, this is a two-phase pre/post-processor
  * around the normal `Markdown()` call:
  *
- *  1. `extract()` runs BEFORE conversion (and before every other bx-docs
+ *  1. `extract()` runs BEFORE conversion (and before every other bx-sites
  *     pre-processor - see BuildPipeline.bx's `convertMarkdown()`) - it
  *     pulls every `tryboxlang` fence's raw source out of the markdown
  *     verbatim and replaces it with a lone placeholder `<div>` on its own
@@ -76,10 +76,10 @@ class {
 			if ( fenceLength > 0 ) {
 				if ( !tooIndented && trimmedLine.reFind( "^" & fenceChar & "{" & fenceLength & ",}$" ) ) {
 					if ( isTryBoxLang ) {
-						var token = "bxdocstryboxlang" & replace( createUUID(), "-", "", "all" )
+						var token = "bxsitestryboxlang" & replace( createUUID(), "-", "", "all" )
 						embeds.append( { token : token, code : codeLines.toList( char( 10 ) ), attrsRaw : attrsRaw } )
 						outputLines.append( "" )
-						outputLines.append( '<div class="bxdocs-raw-block" data-bxdocs-token="' & token & '"></div>' )
+						outputLines.append( '<div class="bxsites-raw-block" data-bxsites-token="' & token & '"></div>' )
 						outputLines.append( "" )
 					} else {
 						outputLines.append( line )
@@ -140,7 +140,7 @@ class {
 	string function restore( required string html, required array embeds ) {
 		var result = arguments.html
 		for ( var embed in arguments.embeds ) {
-			var placeholder = '<div class="bxdocs-raw-block" data-bxdocs-token="' & embed.token & '"></div>'
+			var placeholder = '<div class="bxsites-raw-block" data-bxsites-token="' & embed.token & '"></div>'
 			result = result.replace( placeholder, renderEmbed( embed ), "one" )
 		}
 		return result
@@ -166,13 +166,13 @@ class {
 
 		var src = variables.editorUrl & "?ro=" & ( readonly ? "true" : "false" ) & "&code=" & encodeCode( arguments.embed.code )
 
-		var html = '<div class="bxdocs-tryboxlang">'
+		var html = '<div class="bxsites-tryboxlang">'
 		if ( len( title ) ) {
-			html &= '<div class="bxdocs-tryboxlang__title">' & encodeForHTML( title ) & '</div>'
+			html &= '<div class="bxsites-tryboxlang__title">' & encodeForHTML( title ) & '</div>'
 		}
-		html &= '<iframe class="bxdocs-tryboxlang__frame" style="height:' & height & '" src="' & attrEscape( src ) & '"'
+		html &= '<iframe class="bxsites-tryboxlang__frame" style="height:' & height & '" src="' & attrEscape( src ) & '"'
 			& ' allow="fullscreen" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>'
-			& '<div class="bxdocs-tryboxlang__footer"><a href="' & attrEscape( src ) & '" target="_blank" rel="noopener noreferrer">'
+			& '<div class="bxsites-tryboxlang__footer"><a href="' & attrEscape( src ) & '" target="_blank" rel="noopener noreferrer">'
 			& "Open in try.boxlang.io ↗</a></div>"
 			& '</div>'
 

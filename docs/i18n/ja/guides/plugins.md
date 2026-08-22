@@ -6,31 +6,31 @@ tags: [guides, plugins]
 
 # プラグイン
 
-BX Docs プラグインは単なる別の BoxLang モジュールです。`box.json` + `ModuleConfig.bx` を持ち、
-`bx-docs` と同じランタイムの兄弟としてインストールされます（`box install` でプロジェクトに追加、
+BX Sites プラグインは単なる別の BoxLang モジュールです。`box.json` + `ModuleConfig.bx` を持ち、
+`bx-sites` と同じランタイムの兄弟としてインストールされます（`box install` でプロジェクトに追加、
 `bx-markdown`/`bx-esapi` と同様）。インポートする Plugin API も、専用レジストリも不要です。
 BoxLang 独自のモジュールシステムが*そのまま*プラグインシステムになっています。
 
 ただし、モジュールをインストールしただけではプラグインとして有効化されません。
-プロジェクトが `bxdocs.json` の [`plugins`](../configuration.md#plugins) 配列に BoxLang モジュール名を
+プロジェクトが `bxsites.json` の [`plugins`](../configuration.md#plugins) 配列に BoxLang モジュール名を
 明示的に追加することでオプトインする必要があります:
 
 ```json
-{ "plugins": [ "myBxDocsPlugin" ] }
+{ "plugins": [ "myBxSitesPlugin" ] }
 ```
 
 ## プラグインの作成
 
-プラグインモジュールが通常の BoxLang モジュールに追加で必要なのは `models/BxDocsPlugin.bx` クラスだけです。
-すべてのメソッドはオプションです。必要なフックのみを実装してください。BX Docs は呼び出す前に
+プラグインモジュールが通常の BoxLang モジュールに追加で必要なのは `models/BxSitesPlugin.bx` クラスだけです。
+すべてのメソッドはオプションです。必要なフックのみを実装してください。BX Sites は呼び出す前に
 各フックの存在をチェックします:
 
 ```bx
-// models/BxDocsPlugin.bx
+// models/BxSitesPlugin.bx
 class {
 
 	struct function onConfig( required struct config ) {
-		// bxdocs.json が読み込まれた直後にサイト設定を変更/返す。
+		// bxsites.json が読み込まれた直後にサイト設定を変更/返す。
 		return arguments.config
 	}
 
@@ -56,8 +56,8 @@ class {
 }
 ```
 
-フックは `bxdocs.json` の `plugins` 配列の順序で実行され、各フックの戻り値（`onBuildComplete` 以外）が
-次のフック（または BX Docs 自体）が受け取る値を置き換えます。変更がない場合は受け取った値をそのまま
+フックは `bxsites.json` の `plugins` 配列の順序で実行され、各フックの戻り値（`onBuildComplete` 以外）が
+次のフック（または BX Sites 自体）が受け取る値を置き換えます。変更がない場合は受け取った値をそのまま
 返すだけで構いません。
 
 ## 最小限の例
@@ -69,14 +69,14 @@ class {
 
 ```
 hello-plugin/
-├── box.json              # boxlang.moduleName が bxdocs.json の [plugins] から参照される名前
+├── box.json              # boxlang.moduleName が bxsites.json の [plugins] から参照される名前
 ├── ModuleConfig.bx        # 通常の（そうでなければ空の）BoxLang モジュールディスクリプタ
 └── models/
-    └── BxDocsPlugin.bx    # onPageHtml() + onBuildComplete()
+    └── BxSitesPlugin.bx    # onPageHtml() + onBuildComplete()
 ```
 
 ## エラー
 
-- `BxDocs.PluginNotFound` - `bxdocs.json` の `plugins` 配列内の名前がインストール/有効化された
+- `BxSites.PluginNotFound` - `bxsites.json` の `plugins` 配列内の名前がインストール/有効化された
   BoxLang モジュールでない場合。
-- `BxDocs.InvalidPlugin` - モジュールは存在するが、`models/BxDocsPlugin.bx` クラスがない場合。
+- `BxSites.InvalidPlugin` - モジュールは存在するが、`models/BxSitesPlugin.bx` クラスがない場合。

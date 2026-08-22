@@ -68,7 +68,7 @@
 	function renderSocialLinks( required array links ) {
 		var html = ""
 		for ( var link in arguments.links ) {
-			html &= '<a class="social-link" href="' & bxdocsUrlAttr( link.url ) & '" target="_blank" rel="noopener noreferrer" aria-label="' & encodeForHTML( link.label ?: link.icon ?: "Link" ) & '" title="' & encodeForHTML( link.label ?: link.icon ?: "Link" ) & '">' & bxdocsIcon( link.icon ?: "generic" ) & '</a>'
+			html &= '<a class="social-link" href="' & bxsitesUrlAttr( link.url ) & '" target="_blank" rel="noopener noreferrer" aria-label="' & encodeForHTML( link.label ?: link.icon ?: "Link" ) & '" title="' & encodeForHTML( link.label ?: link.icon ?: "Link" ) & '">' & bxsitesIcon( link.icon ?: "generic" ) & '</a>'
 		}
 		return html
 	}
@@ -77,7 +77,7 @@
 		var html = '<select class="version-switcher form-select form-select-sm" onchange="location.href=this.value" aria-label="Version">'
 		for ( var v in arguments.versions ) {
 			var selected = v.label == arguments.currentVersion ? " selected" : ""
-			html &= '<option value="' & bxdocsUrlAttr( v.url ) & '"' & selected & '>' & encodeForHTML( v.label ) & '</option>'
+			html &= '<option value="' & bxsitesUrlAttr( v.url ) & '"' & selected & '>' & encodeForHTML( v.label ) & '</option>'
 		}
 		html &= '</select>'
 		return html
@@ -86,8 +86,8 @@
 	/**
 	 * A GitBook-style flag-icon dropdown - the trigger button shows the
 	 * current locale's own flag, opening a menu listing every locale by
-	 * its own flag + label. A locale's `flag` (bxdocs.json's own
-	 * `i18n.locales[].flag`) wins when set; bxdocsLocaleFlag() falls back
+	 * its own flag + label. A locale's `flag` (bxsites.json's own
+	 * `i18n.locales[].flag`) wins when set; bxsitesLocaleFlag() falls back
 	 * to a built-in language-code lookup otherwise (locale-flags.bxm).
 	 * Alpine (already loaded for the dark-mode toggle) drives open/close -
 	 * no new JS dependency.
@@ -100,7 +100,7 @@
 				break
 			}
 		}
-		var currentFlag = len( current.flag ?: "" ) ? current.flag : bxdocsLocaleFlag( current.code )
+		var currentFlag = len( current.flag ?: "" ) ? current.flag : bxsitesLocaleFlag( current.code )
 
 		var html = '<div class="locale-dropdown" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">'
 		html &= '<button type="button" class="locale-dropdown__trigger" @click="open = !open" aria-haspopup="true" :aria-expanded="open" aria-label="Language: ' & encodeForHTML( current.label ) & '">'
@@ -109,9 +109,9 @@
 		html &= '</button>'
 		html &= '<ul class="locale-dropdown__menu" x-show="open" x-cloak role="menu">'
 		for ( var l in arguments.locales ) {
-			var flag = len( l.flag ?: "" ) ? l.flag : bxdocsLocaleFlag( l.code )
+			var flag = len( l.flag ?: "" ) ? l.flag : bxsitesLocaleFlag( l.code )
 			var active = l.code == arguments.currentLocale
-			html &= '<li role="none"><a role="menuitem" class="locale-dropdown__item' & ( active ? ' locale-dropdown__item--active' : '' ) & '" href="' & bxdocsUrlAttr( l.url ) & '">'
+			html &= '<li role="none"><a role="menuitem" class="locale-dropdown__item' & ( active ? ' locale-dropdown__item--active' : '' ) & '" href="' & bxsitesUrlAttr( l.url ) & '">'
 			html &= '<span class="locale-dropdown__flag" aria-hidden="true">' & flag & '</span> ' & encodeForHTML( l.label )
 			html &= '</a></li>'
 		}
@@ -119,7 +119,7 @@
 		return html
 	}
 
-	// resolves a bxdocs.json asset path (logo/favicon/ogImage/extraCss/extraJs) - left
+	// resolves a bxsites.json asset path (logo/favicon/ogImage/extraCss/extraJs) - left
 	// alone when it's already an absolute URL, otherwise prefixed with basePath
 	function resolveAssetUrl( required string url ) {
 		return arguments.url.reFindNoCase( "^[a-z][a-z0-9+.\-]*://" ) ? arguments.url : variables.basePath & arguments.url
@@ -165,7 +165,7 @@
 	}
 
 	// module spec section 7 - search is fully static/client-side (provider "local") by
-	// default, opt-out via bxdocs.json's `search`; `searchProvider.provider` picks a
+	// default, opt-out via bxsites.json's `search`; `searchProvider.provider` picks a
 	// different provider ("algolia"/"pagefind" built-in here, anything else left to a theme override)
 	variables.searchEnabled = ( variables.siteConfig.search ?: false ) ? true : false
 	variables.searchProviderName = lCase( trim( variables.siteConfig.searchProvider.provider ?: "local" ) )
@@ -207,7 +207,7 @@
 	<script>
 		( function () {
 			var configuredMode = "#variables.siteConfig.theme.options.colorMode ?: 'auto'#";
-			var stored = localStorage.getItem( "bxdocs-theme" );
+			var stored = localStorage.getItem( "bxsites-theme" );
 			var prefersDark = window.matchMedia( "(prefers-color-scheme: dark)" ).matches;
 			var wantsDark = stored ? stored === "dark" : ( configuredMode === "dark" || ( configuredMode === "auto" && prefersDark ) );
 			if ( wantsDark ) {
@@ -230,7 +230,7 @@
 		gtag('config', '#variables.analyticsId#');
 	</script>
 </bx:output></bx:if><bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'local'#"><bx:output>
-	<script>window.__BXDOCS_BASE_PATH__ = "#variables.basePath#";</script>
+	<script>window.__BXSITES_BASE_PATH__ = "#variables.basePath#";</script>
 	<script src="#variables.basePath#assets/vendor/lunr/lunr.min.js"></script>
 	<script src="#variables.basePath#assets/search.js" defer></script>
 </bx:output></bx:if><bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'algolia'#"><bx:output>
@@ -240,7 +240,7 @@
 </bx:output></bx:if><bx:output>
 	<script src="#variables.basePath#assets/vendor/alpine/cdn.min.js" defer></script>
 </head>
-<body x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxdocs-theme', v ? 'dark' : 'light' ) } )">
+<body x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } )">
 	<nav class="navbar navbar-expand-lg brand-navbar">
 		<div class="container-fluid navbar-row">
 			<a class="navbar-brand brand-mark" href="#variables.basePath#">#renderBrandMark()#</a>
@@ -251,13 +251,13 @@
 </bx:output></bx:if><bx:if condition="#variables.locales.len() gt 1#"><bx:output>
 				#renderLocaleDropdown( variables.locales, variables.currentLocale )#
 </bx:output></bx:if><bx:if condition="#len( variables.repoUrl )#"><bx:output>
-				<a class="repo-link" href="#bxdocsUrlAttr( variables.repoUrl )#" target="_blank" rel="noopener noreferrer" aria-label="Repository" title="Repository">#bxdocsIcon( "github" )#</a>
+				<a class="repo-link" href="#bxsitesUrlAttr( variables.repoUrl )#" target="_blank" rel="noopener noreferrer" aria-label="Repository" title="Repository">#bxsitesIcon( "github" )#</a>
 </bx:output></bx:if><bx:output>
 				<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="Toggle dark mode">
-					<span x-show="!dark">#bxdocsIcon( "moon" )#</span>
-					<span x-show="dark" x-cloak>#bxdocsIcon( "sun" )#</span>
+					<span x-show="!dark">#bxsitesIcon( "moon" )#</span>
+					<span x-show="dark" x-cloak>#bxsitesIcon( "sun" )#</span>
 				</button>
-				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="##bxdocs-sidebar" aria-controls="bxdocs-sidebar" aria-label="Toggle navigation">
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="##bxsites-sidebar" aria-controls="bxsites-sidebar" aria-label="Toggle navigation">
 					<span class="navbar-toggler-icon"></span>
 				</button>
 			</div>
@@ -265,7 +265,7 @@
 	</nav>
 	<div class="container-fluid">
 		<div class="row">
-			<aside class="col-lg-3 col-xl-2 sidebar collapse d-lg-block" id="bxdocs-sidebar">
+			<aside class="col-lg-3 col-xl-2 sidebar collapse d-lg-block" id="bxsites-sidebar">
 				#renderNavList( variables.nav )#
 			</aside>
 			<main class="col-lg-9</bx:output><bx:if condition="#variables.tocPosition == 'sticky'#"><bx:output> col-xl-8</bx:output></bx:if><bx:if condition="#variables.tocPosition != 'sticky'#"><bx:output> col-xl-10</bx:output></bx:if><bx:output> content">
@@ -279,13 +279,13 @@
 		</div>
 	</div>
 </bx:output><bx:if condition="#variables.footerEnabled#"><bx:output>
-	<footer class="bxdocs-footer">
-		<div class="container-fluid bxdocs-footer__inner">
-			<div class="bxdocs-footer__copy">&copy; #year( now() )# #encodeForHTML( variables.siteConfig.name )#</div>
+	<footer class="bxsites-footer">
+		<div class="container-fluid bxsites-footer__inner">
+			<div class="bxsites-footer__copy">&copy; #year( now() )# #encodeForHTML( variables.siteConfig.name )#</div>
 </bx:output><bx:if condition="#variables.socialLinks.len() gt 0#"><bx:output>
-			<div class="bxdocs-footer__social">#renderSocialLinks( variables.socialLinks )#</div>
+			<div class="bxsites-footer__social">#renderSocialLinks( variables.socialLinks )#</div>
 </bx:output></bx:if><bx:output>
-			<div class="bxdocs-footer__credit">Built with <a href="https://github.com/ortus-boxlang/bx-docs" target="_blank" rel="noopener noreferrer">BX Docs</a></div>
+			<div class="bxsites-footer__credit">Built with <a href="https://github.com/ortus-boxlang/bx-sites" target="_blank" rel="noopener noreferrer">BX Sites</a></div>
 		</div>
 	</footer>
 </bx:output></bx:if><bx:output>
@@ -311,7 +311,7 @@
 	<script>
 		document.addEventListener( "DOMContentLoaded", function () {
 			docsearch( {
-				container : "##bxdocs-search-algolia",
+				container : "##bxsites-search-algolia",
 				appId     : "#encodeForJavaScript( variables.searchAlgolia.appId ?: '' )#",
 				apiKey    : "#encodeForJavaScript( variables.searchAlgolia.apiKey ?: '' )#",
 				indexName : "#encodeForJavaScript( variables.searchAlgolia.indexName ?: '' )#",
@@ -323,7 +323,7 @@
 	<script src="#variables.basePath#pagefind/pagefind-ui.js"></script>
 	<script>
 		document.addEventListener( "DOMContentLoaded", function () {
-			new PagefindUI( { element : "##bxdocs-search-pagefind", showSubResults : true } );
+			new PagefindUI( { element : "##bxsites-search-pagefind", showSubResults : true } );
 
 			// Cmd/Ctrl+K - same convention as the local/algolia providers;
 			// PagefindUI doesn't bind this itself, so wire it up here.
@@ -331,7 +331,7 @@
 				if ( !( evt.ctrlKey || evt.metaKey ) || evt.key.toLowerCase() !== "k" ) {
 					return;
 				}
-				var input = document.querySelector( "##bxdocs-search-pagefind input" );
+				var input = document.querySelector( "##bxsites-search-pagefind input" );
 				if ( input ) {
 					evt.preventDefault();
 					input.focus();

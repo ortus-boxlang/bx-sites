@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.PageRenamer", function() {
 
 			beforeEach( function() {
-				variables.renamer = new "models.build.PageRenamer@bxdocs"();
+				variables.renamer = new "models.build.PageRenamer@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,56 +17,56 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newDocsDir() {
-				var dir = createTempDirectory( prefix = "bxdocs-pagerenamer-" );
+				var dir = createTempDirectory( prefix = "bxsites-pagerenamer-" );
 				tempDirs.append( dir );
 				var docsDir = dir & "/docs";
 				directoryCreate( docsDir, true, true );
 				return docsDir;
 			}
 
-			it( "throws BxDocs.MissingFromPath when from is blank", function() {
+			it( "throws BxSites.MissingFromPath when from is blank", function() {
 				var docsDir = newDocsDir();
 				expect( function() {
 					renamer.rename( docsDir : docsDir, from : "", to : "x.md" );
-				} ).toThrow( "BxDocs.MissingFromPath" );
+				} ).toThrow( "BxSites.MissingFromPath" );
 			} );
 
-			it( "throws BxDocs.MissingToPath when to is blank", function() {
+			it( "throws BxSites.MissingToPath when to is blank", function() {
 				var docsDir = newDocsDir();
 				expect( function() {
 					renamer.rename( docsDir : docsDir, from : "a.md", to : "" );
-				} ).toThrow( "BxDocs.MissingToPath" );
+				} ).toThrow( "BxSites.MissingToPath" );
 			} );
 
-			it( "throws BxDocs.InvalidPagePath when from/to doesn't end in .md", function() {
+			it( "throws BxSites.InvalidPagePath when from/to doesn't end in .md", function() {
 				var docsDir = newDocsDir();
 				expect( function() {
 					renamer.rename( docsDir : docsDir, from : "a.txt", to : "b.md" );
-				} ).toThrow( "BxDocs.InvalidPagePath" );
+				} ).toThrow( "BxSites.InvalidPagePath" );
 			} );
 
-			it( "throws BxDocs.SamePagePath when from and to are identical", function() {
+			it( "throws BxSites.SamePagePath when from and to are identical", function() {
 				var docsDir = newDocsDir();
 				expect( function() {
 					renamer.rename( docsDir : docsDir, from : "a.md", to : "a.md" );
-				} ).toThrow( "BxDocs.SamePagePath" );
+				} ).toThrow( "BxSites.SamePagePath" );
 			} );
 
-			it( "throws BxDocs.PageNotFound when the source page doesn't exist", function() {
+			it( "throws BxSites.PageNotFound when the source page doesn't exist", function() {
 				var docsDir = newDocsDir();
 				expect( function() {
 					renamer.rename( docsDir : docsDir, from : "missing.md", to : "target.md" );
-				} ).toThrow( "BxDocs.PageNotFound" );
+				} ).toThrow( "BxSites.PageNotFound" );
 			} );
 
-			it( "throws BxDocs.PageAlreadyExists rather than overwriting the destination", function() {
+			it( "throws BxSites.PageAlreadyExists rather than overwriting the destination", function() {
 				var docsDir = newDocsDir();
 				fileWrite( docsDir & "/a.md", "a" );
 				fileWrite( docsDir & "/b.md", "b" );
 
 				expect( function() {
 					renamer.rename( docsDir : docsDir, from : "a.md", to : "b.md" );
-				} ).toThrow( "BxDocs.PageAlreadyExists" );
+				} ).toThrow( "BxSites.PageAlreadyExists" );
 			} );
 
 			it( "moves the file to the new path, creating parent directories as needed", function() {

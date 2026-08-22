@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.New", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.New@bxdocs"();
+				variables.verb = new "models.cli.New@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,35 +17,35 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private function newTargetDir() {
-				var parent = createTempDirectory( prefix = "bxdocs-cli-new-" );
+				var parent = createTempDirectory( prefix = "bxsites-cli-new-" );
 				tempDirs.append( parent );
 				return parent & "/my-docs";
 			}
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( {} );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
-			it( "scaffolds a project defaulting to the bootstrap theme and bxdocs.yaml, returning exitCode 0", function() {
+			it( "scaffolds a project defaulting to the bootstrap theme and bxsites.yaml, returning exitCode 0", function() {
 				var dir = newTargetDir();
 				var result = verb.run( { projectRoot : dir } );
 
 				expect( result.exitCode ).toBe( 0 );
-				expect( fileExists( dir & "/bxdocs.yaml" ) ).toBeTrue();
-				expect( fileExists( dir & "/bxdocs.json" ) ).toBeFalse();
+				expect( fileExists( dir & "/bxsites.yaml" ) ).toBeTrue();
+				expect( fileExists( dir & "/bxsites.json" ) ).toBeFalse();
 				expect( result.message ).toInclude( "bootstrap" );
 			} );
 
-			it( "honors an explicit --format=json, scaffolding bxdocs.json instead", function() {
+			it( "honors an explicit --format=json, scaffolding bxsites.json instead", function() {
 				var dir = newTargetDir();
 				var result = verb.run( { projectRoot : dir, format : "json" } );
 
-				expect( fileExists( dir & "/bxdocs.json" ) ).toBeTrue();
-				expect( fileExists( dir & "/bxdocs.yaml" ) ).toBeFalse();
+				expect( fileExists( dir & "/bxsites.json" ) ).toBeTrue();
+				expect( fileExists( dir & "/bxsites.yaml" ) ).toBeFalse();
 
-				var config = new "models.config.ConfigLoader@bxdocs"().load( dir );
+				var config = new "models.config.ConfigLoader@bxsites"().load( dir );
 				expect( config.theme.name ).toBe( "bootstrap" );
 			} );
 
@@ -59,7 +59,7 @@ class extends="testbox.system.BaseSpec" {
 				// docblock.
 				verb.run( { projectRoot : dir, format : "json" } );
 
-				var config = new "models.config.ConfigLoader@bxdocs"().load( dir );
+				var config = new "models.config.ConfigLoader@bxsites"().load( dir );
 				expect( config.name ).toBe( "my-docs" );
 			} );
 
@@ -67,7 +67,7 @@ class extends="testbox.system.BaseSpec" {
 				var dir = newTargetDir();
 				verb.run( { projectRoot : dir, name : "Custom Name", format : "json" } );
 
-				var config = new "models.config.ConfigLoader@bxdocs"().load( dir );
+				var config = new "models.config.ConfigLoader@bxsites"().load( dir );
 				expect( config.name ).toBe( "Custom Name" );
 			} );
 
@@ -75,15 +75,15 @@ class extends="testbox.system.BaseSpec" {
 				var dir = newTargetDir();
 				verb.run( { projectRoot : dir, theme : "tailwind", format : "json" } );
 
-				var config = new "models.config.ConfigLoader@bxdocs"().load( dir );
+				var config = new "models.config.ConfigLoader@bxsites"().load( dir );
 				expect( config.theme.name ).toBe( "tailwind" );
 			} );
 
-			it( "throws BxDocs.UnknownTheme for a theme outside the built-in set", function() {
+			it( "throws BxSites.UnknownTheme for a theme outside the built-in set", function() {
 				var dir = newTargetDir();
 				expect( function() {
 					verb.run( { projectRoot : dir, theme : "not-a-real-theme" } );
-				} ).toThrow( "BxDocs.UnknownTheme" );
+				} ).toThrow( "BxSites.UnknownTheme" );
 			} );
 
 		} );

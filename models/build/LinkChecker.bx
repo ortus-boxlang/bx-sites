@@ -18,10 +18,10 @@
  */
 class {
 
-	variables.configLoader = new "models.config.ConfigLoader@bxdocs"()
-	variables.baseUrlResolver = new "models.build.BaseUrlResolver@bxdocs"()
-	variables.versionsDiscoverer = new "models.build.VersionsDiscoverer@bxdocs"()
-	variables.localesDiscoverer = new "models.build.LocalesDiscoverer@bxdocs"()
+	variables.configLoader = new "models.config.ConfigLoader@bxsites"()
+	variables.baseUrlResolver = new "models.build.BaseUrlResolver@bxsites"()
+	variables.versionsDiscoverer = new "models.build.VersionsDiscoverer@bxsites"()
+	variables.localesDiscoverer = new "models.build.LocalesDiscoverer@bxsites"()
 
 	variables.tagPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "(?i)<(a|img)\b[^>]*>" )
 	variables.hrefPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(?i)\bhref\s*=\s*"([^"]*)"' )
@@ -62,7 +62,7 @@ class {
 
 		if ( !directoryExists( siteDir ) ) {
 			throw(
-				type    = "BxDocs.SiteNotBuilt",
+				type    = "BxSites.SiteNotBuilt",
 				message = "No [#siteDir#] to check - run `build` first"
 			)
 		}
@@ -138,7 +138,7 @@ class {
 	 * override that doesn't render one.
 	 *
 	 * @root Absolute path to the project root
-	 * @config The project's already-loaded bxdocs.json (ConfigLoader.load()'s own return value)
+	 * @config The project's already-loaded bxsites.json (ConfigLoader.load()'s own return value)
 	 */
 	private array function roots( required string root, required struct config ) {
 		var docsDir = arguments.root & "/docs"

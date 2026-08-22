@@ -10,7 +10,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.SearchProviderRegistry", function() {
 
 			beforeEach( function() {
-				variables.registry = new "models.build.SearchProviderRegistry@bxdocs"();
+				variables.registry = new "models.build.SearchProviderRegistry@bxsites"();
 			} );
 
 			it( "lists local, algolia and pagefind as the built-in providers", function() {

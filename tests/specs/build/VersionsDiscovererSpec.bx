@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.VersionsDiscoverer", function() {
 
 			beforeEach( function() {
-				variables.discoverer = new "models.build.VersionsDiscoverer@bxdocs"();
+				variables.discoverer = new "models.build.VersionsDiscoverer@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,7 +17,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private function newDocsDir() {
-				var dir = createTempDirectory( prefix = "bxdocs-versionsdiscoverer-" );
+				var dir = createTempDirectory( prefix = "bxsites-versionsdiscoverer-" );
 				tempDirs.append( dir );
 				return dir;
 			}

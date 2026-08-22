@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.ThemeScaffolder", function() {
 
 			beforeEach( function() {
-				variables.scaffolder = new "models.build.ThemeScaffolder@bxdocs"();
+				variables.scaffolder = new "models.build.ThemeScaffolder@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,15 +17,15 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newProjectRoot() {
-				var dir = createTempDirectory( prefix = "bxdocs-themescaffolder-" );
+				var dir = createTempDirectory( prefix = "bxsites-themescaffolder-" );
 				tempDirs.append( dir );
 				return dir;
 			}
 
-			it( "throws BxDocs.UnknownTheme for anything but bootstrap/material/tailwind", function() {
+			it( "throws BxSites.UnknownTheme for anything but bootstrap/material/tailwind", function() {
 				expect( function() {
 					scaffolder.scaffold( projectRoot : newProjectRoot(), theme : "foobar" );
-				} ).toThrow( "BxDocs.UnknownTheme" );
+				} ).toThrow( "BxSites.UnknownTheme" );
 			} );
 
 			it( "copies the named built-in theme's layout.bxm/page.bxm/assets into project theme/", function() {
@@ -47,13 +47,13 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( result.themeDir & "/layout.bxm" ) ).toBeTrue();
 			} );
 
-			it( "throws BxDocs.ThemeOverrideExists rather than overwriting an existing theme/", function() {
+			it( "throws BxSites.ThemeOverrideExists rather than overwriting an existing theme/", function() {
 				var projectRoot = newProjectRoot();
 				scaffolder.scaffold( projectRoot : projectRoot, theme : "bootstrap" );
 
 				expect( function() {
 					scaffolder.scaffold( projectRoot : projectRoot, theme : "material" );
-				} ).toThrow( "BxDocs.ThemeOverrideExists" );
+				} ).toThrow( "BxSites.ThemeOverrideExists" );
 			} );
 
 		} );

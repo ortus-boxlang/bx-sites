@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.Migrate", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.Migrate@bxdocs"();
+				variables.verb = new "models.cli.Migrate@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -16,33 +16,33 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( { source : "/tmp/wherever" } );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
-			it( "throws BxDocs.MissingMigrateSource when --source is blank", function() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-migrate-" );
+			it( "throws BxSites.MissingMigrateSource when --source is blank", function() {
+				var dir = createTempDirectory( prefix = "bxsites-cli-migrate-" );
 				tempDirs.append( dir );
 
 				expect( function() {
 					verb.run( { projectRoot : dir } );
-				} ).toThrow( "BxDocs.MissingMigrateSource" );
+				} ).toThrow( "BxSites.MissingMigrateSource" );
 			} );
 
-			it( "throws BxDocs.MigrateSourceNotFound when --source doesn't exist", function() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-migrate-" );
+			it( "throws BxSites.MigrateSourceNotFound when --source doesn't exist", function() {
+				var dir = createTempDirectory( prefix = "bxsites-cli-migrate-" );
 				tempDirs.append( dir );
 
 				expect( function() {
 					verb.run( { projectRoot : dir, source : dir & "/no-such-dir" } );
-				} ).toThrow( "BxDocs.MigrateSourceNotFound" );
+				} ).toThrow( "BxSites.MigrateSourceNotFound" );
 			} );
 
 			it( "migrates a GitBook export into the project's docs/ tree, creating docs/ if needed", function() {
-				var projectRoot = createTempDirectory( prefix = "bxdocs-cli-migrate-project-" );
-				var source = createTempDirectory( prefix = "bxdocs-cli-migrate-source-" );
+				var projectRoot = createTempDirectory( prefix = "bxsites-cli-migrate-project-" );
+				var source = createTempDirectory( prefix = "bxsites-cli-migrate-source-" );
 				tempDirs.append( projectRoot );
 				tempDirs.append( source );
 
@@ -58,8 +58,8 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "defaults --from to gitbook when it's not passed", function() {
-				var projectRoot = createTempDirectory( prefix = "bxdocs-cli-migrate-project-" );
-				var source = createTempDirectory( prefix = "bxdocs-cli-migrate-source-" );
+				var projectRoot = createTempDirectory( prefix = "bxsites-cli-migrate-project-" );
+				var source = createTempDirectory( prefix = "bxsites-cli-migrate-source-" );
 				tempDirs.append( projectRoot );
 				tempDirs.append( source );
 
@@ -72,20 +72,20 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( projectRoot & "/docs/nav.json" ) ).toBeTrue();
 			} );
 
-			it( "throws BxDocs.InvalidMigrateSource when --from isn't gitbook or mkdocs", function() {
-				var projectRoot = createTempDirectory( prefix = "bxdocs-cli-migrate-project-" );
-				var source = createTempDirectory( prefix = "bxdocs-cli-migrate-source-" );
+			it( "throws BxSites.InvalidMigrateSource when --from isn't gitbook or mkdocs", function() {
+				var projectRoot = createTempDirectory( prefix = "bxsites-cli-migrate-project-" );
+				var source = createTempDirectory( prefix = "bxsites-cli-migrate-source-" );
 				tempDirs.append( projectRoot );
 				tempDirs.append( source );
 
 				expect( function() {
 					verb.run( { projectRoot : projectRoot, source : source, from : "docusaurus" } );
-				} ).toThrow( "BxDocs.InvalidMigrateSource" );
+				} ).toThrow( "BxSites.InvalidMigrateSource" );
 			} );
 
-			it( "migrates an mkdocs project into a complete bx-docs project when --from=mkdocs", function() {
-				var projectRoot = createTempDirectory( prefix = "bxdocs-cli-migrate-project-" );
-				var source = createTempDirectory( prefix = "bxdocs-cli-migrate-mkdocs-source-" );
+			it( "migrates an mkdocs project into a complete bx-sites project when --from=mkdocs", function() {
+				var projectRoot = createTempDirectory( prefix = "bxsites-cli-migrate-project-" );
+				var source = createTempDirectory( prefix = "bxsites-cli-migrate-mkdocs-source-" );
 				tempDirs.append( projectRoot );
 				tempDirs.append( source );
 
@@ -97,9 +97,9 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( result.exitCode ).toBe( 0 );
 				expect( result.message ).toInclude( "Migrated 1 page(s)" );
-				expect( fileExists( projectRoot & "/bxdocs.yaml" ) ).toBeTrue();
+				expect( fileExists( projectRoot & "/bxsites.yaml" ) ).toBeTrue();
 				expect( fileExists( projectRoot & "/docs/index.md" ) ).toBeTrue();
-				expect( yamlDeserialize( fileRead( projectRoot & "/bxdocs.yaml" ) ).name ).toBe( "My Docs" );
+				expect( yamlDeserialize( fileRead( projectRoot & "/bxsites.yaml" ) ).name ).toBe( "My Docs" );
 			} );
 
 		} );

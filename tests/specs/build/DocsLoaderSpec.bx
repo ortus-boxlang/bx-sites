@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.DocsLoader", function() {
 
 			beforeEach( function() {
-				variables.loader = new "models.build.DocsLoader@bxdocs"();
+				variables.loader = new "models.build.DocsLoader@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,16 +17,16 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private function newDocsDir() {
-				var dir = createTempDirectory( prefix = "bxdocs-docsloader-" );
+				var dir = createTempDirectory( prefix = "bxsites-docsloader-" );
 				tempDirs.append( dir );
 				return dir;
 			}
 
-			it( "throws BxDocs.DocsDirNotFound when the docs/ directory is missing", function() {
+			it( "throws BxSites.DocsDirNotFound when the docs/ directory is missing", function() {
 				var dir = newDocsDir() & "/does-not-exist";
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.DocsDirNotFound" );
+				} ).toThrow( "BxSites.DocsDirNotFound" );
 			} );
 
 			it( "loads a flat .md file with frontmatter and a pretty urlPath", function() {

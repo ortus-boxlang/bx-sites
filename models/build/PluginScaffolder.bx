@@ -1,8 +1,8 @@
 /**
  * Backs the `plugin:new` CLI verb - scaffolds a standalone BoxLang module
- * skeleton implementing the bx-docs plugin contract (module spec's
+ * skeleton implementing the bx-sites plugin contract (module spec's
  * general-purpose plugin system, docs/guides/plugins.md): a `box.json`, a
- * minimal `ModuleConfig.bx`, and a `models/BxDocsPlugin.bx` with all five
+ * minimal `ModuleConfig.bx`, and a `models/BxSitesPlugin.bx` with all five
  * optional hooks stubbed out as comments - mirrors `examples/hello-plugin/`,
  * but as a real starting point rather than a worked demo.
  *
@@ -10,7 +10,7 @@
  * `docs/` tree, so this scaffolds a sibling directory (defaulting to
  * `<projectRoot>/<name>`) rather than anything under `docs/`. It still
  * needs `box install`-ing (or dropping into `boxlang_modules/`) and adding
- * to `bxdocs.json`'s own `plugins` array before bx-docs picks it up - see
+ * to `bxsites.json`'s own `plugins` array before bx-sites picks it up - see
  * docs/guides/plugins.md.
  */
 class {
@@ -24,12 +24,12 @@ class {
 	struct function scaffold( required string destDir, required string name ) {
 		var trimmedName = trim( arguments.name )
 		if ( !len( trimmedName ) ) {
-			throw( type = "BxDocs.MissingPluginName", message = "`plugin:new` requires --name=<plugin name>" )
+			throw( type = "BxSites.MissingPluginName", message = "`plugin:new` requires --name=<plugin name>" )
 		}
 
 		var trimmedDestDir = arguments.destDir.reReplace( "[\/]+$", "" )
 		if ( directoryExists( trimmedDestDir ) && directoryList( trimmedDestDir, false, "name" ).len() ) {
-			throw( type = "BxDocs.PluginDestExists", message = "[#trimmedDestDir#] already exists and isn't empty" )
+			throw( type = "BxSites.PluginDestExists", message = "[#trimmedDestDir#] already exists and isn't empty" )
 		}
 
 		var pluginSlug = computeSlug( trimmedName )
@@ -39,7 +39,7 @@ class {
 
 		fileWrite( trimmedDestDir & "/box.json", renderBoxJson( trimmedName, pluginSlug, moduleName ) )
 		fileWrite( trimmedDestDir & "/ModuleConfig.bx", renderModuleConfig( trimmedName ) )
-		fileWrite( trimmedDestDir & "/models/BxDocsPlugin.bx", renderPluginClass( trimmedName ) )
+		fileWrite( trimmedDestDir & "/models/BxSitesPlugin.bx", renderPluginClass( trimmedName ) )
 
 		return { destDir : trimmedDestDir, moduleName : moduleName }
 	}
@@ -55,9 +55,9 @@ class {
 			'    "name": "' & jsEscape( arguments.name ) & '",',
 			'    "version": "1.0.0",',
 			'    "slug": "' & arguments.slug & '",',
-			'    "shortDescription": "A bx-docs plugin - see docs/guides/plugins.md in your bx-docs project",',
+			'    "shortDescription": "A bx-sites plugin - see docs/guides/plugins.md in your bx-sites project",',
 			'    "type": "boxlang-modules",',
-			'    "keywords": [ "boxlang", "bxdocs-plugin" ],',
+			'    "keywords": [ "boxlang", "bxsites-plugin" ],',
 			'    "boxlang": {',
 			'        "minimumVersion": "1.0.0",',
 			'        "moduleName": "' & arguments.moduleName & '"',
@@ -75,7 +75,7 @@ class {
 	private string function renderModuleConfig( required string name ) {
 		var lines = [
 			"/**",
-			" * " & arguments.name & " - a bx-docs plugin.",
+			" * " & arguments.name & " - a bx-sites plugin.",
 			" */",
 			"class {",
 			"",
@@ -100,8 +100,8 @@ class {
 	private string function renderPluginClass( required string name ) {
 		var lines = [
 			"/**",
-			" * " & arguments.name & "'s bx-docs plugin hooks - see docs/guides/plugins.md",
-			" * in your bx-docs project for the full contract. Every hook below is",
+			" * " & arguments.name & "'s bx-sites plugin hooks - see docs/guides/plugins.md",
+			" * in your bx-sites project for the full contract. Every hook below is",
 			" * optional - uncomment and implement only the ones you need; an",
 			" * omitted hook is simply never called.",
 			" */",

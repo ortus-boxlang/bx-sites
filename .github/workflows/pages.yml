@@ -1,7 +1,7 @@
 name: Publish Docs
 
-# Builds this repository's own dogfooded docs (docs/ + bxdocs.yaml at the
-# repo root - see readme.md) with bx-docs itself, and publishes site/ to
+# Builds this repository's own dogfooded docs (docs/ + bxsites.yaml at the
+# repo root - see readme.md) with bx-sites itself, and publishes site/ to
 # GitHub Pages - main publishes to the site root (stable), development
 # publishes to /development/ (latest), so both versions stay live at once.
 # Each publish is itself a showcase of all three built-in themes -
@@ -20,7 +20,7 @@ on:
       - development
     paths:
       - "docs/**"
-      - "bxdocs.yaml"
+      - "bxsites.yaml"
       - "resources/**"
       - "models/**"
       - "bifs/**"
@@ -56,7 +56,7 @@ jobs:
           with-commandbox: true
           modules: bx-markdown bx-yaml bx-image
 
-      - name: Register this module so `module:bxDocs` resolves
+      - name: Register this module so `module:bxSites` resolves
         run: |
           # setup-boxlang points BOXLANG_HOME at ${GITHUB_WORKSPACE}/.boxlang
           # (already owned by the runner user) - that's where BoxLang actually
@@ -72,14 +72,14 @@ jobs:
       - name: Point baseURL and repo.editUri at this branch's own sub-path
         if: github.ref_name != 'main'
         run: |
-          # main's committed bxdocs.yaml already points baseURL/editUri at
+          # main's committed bxsites.yaml already points baseURL/editUri at
           # the site root / main branch - every other branch publishes under
           # /<branch-name>/ and edits against its own branch instead, so
           # patch a throwaway copy of the config just for this build.
-          export URL="https://ortus-boxlang.github.io/bx-docs/${{ github.ref_name }}/"
+          export URL="https://ortus-boxlang.github.io/bx-sites/${{ github.ref_name }}/"
           export EDIT_URI="edit/${{ github.ref_name }}/docs/"
-          yq eval '.baseURL = strenv(URL) | .repo.editUri = strenv(EDIT_URI)' bxdocs.yaml > bxdocs.yaml.tmp
-          mv bxdocs.yaml.tmp bxdocs.yaml
+          yq eval '.baseURL = strenv(URL) | .repo.editUri = strenv(EDIT_URI)' bxsites.yaml > bxsites.yaml.tmp
+          mv bxsites.yaml.tmp bxsites.yaml
 
       - name: Build the site (bootstrap at the root, material/tailwind under theme/)
         run: ./buildMultiTheme.sh

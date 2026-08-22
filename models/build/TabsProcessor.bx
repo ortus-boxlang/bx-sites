@@ -41,7 +41,7 @@ class {
 		var lines = listToArray( normalized, char( 10 ), true )
 		var outputLines = []
 		var groups = []
-		var tracker = new "models.build.FenceTracker@bxdocs"()
+		var tracker = new "models.build.FenceTracker@bxsites"()
 		var i = 1
 
 		while ( i <= lines.len() ) {
@@ -82,10 +82,10 @@ class {
 				}
 			}
 
-			var token = "bxdocstabs" & replace( createUUID(), "-", "", "all" )
+			var token = "bxsitestabs" & replace( createUUID(), "-", "", "all" )
 			groups.append( { token : token, tabs : tabs } )
 			outputLines.append( "" )
-			outputLines.append( '<div class="bxdocs-raw-block" data-bxdocs-token="' & token & '"></div>' )
+			outputLines.append( '<div class="bxsites-raw-block" data-bxsites-token="' & token & '"></div>' )
 			outputLines.append( "" )
 		}
 
@@ -106,7 +106,7 @@ class {
 	string function restore( required string html, required array groups, required any renderer, struct markdownOptions = {} ) {
 		var result = arguments.html
 		for ( var group in arguments.groups ) {
-			var placeholder = '<div class="bxdocs-raw-block" data-bxdocs-token="' & group.token & '"></div>'
+			var placeholder = '<div class="bxsites-raw-block" data-bxsites-token="' & group.token & '"></div>'
 			result = result.replace( placeholder, renderGroup( group, arguments.renderer, arguments.markdownOptions ), "one" )
 		}
 		return result
@@ -150,20 +150,20 @@ class {
 
 		for ( var tab in arguments.group.tabs ) {
 			idx++
-			var active = ( idx == 1 ) ? " bxdocs-tab-btn--active" : ""
-			var panelActive = ( idx == 1 ) ? " bxdocs-tab-panel--active" : ""
+			var active = ( idx == 1 ) ? " bxsites-tab-btn--active" : ""
+			var panelActive = ( idx == 1 ) ? " bxsites-tab-panel--active" : ""
 
-			navHtml &= '<button type="button" class="bxdocs-tab-btn' & active & '" data-bxdocs-tab="' & idx & '">'
+			navHtml &= '<button type="button" class="bxsites-tab-btn' & active & '" data-bxsites-tab="' & idx & '">'
 				& encodeForHTML( tab.title ) & '</button>'
 
-			panelsHtml &= '<div class="bxdocs-tab-panel' & panelActive & '" data-bxdocs-tab="' & idx & '">'
+			panelsHtml &= '<div class="bxsites-tab-panel' & panelActive & '" data-bxsites-tab="' & idx & '">'
 				& arguments.renderer.toHtml( tab.content, arguments.markdownOptions )
 				& '</div>'
 		}
 
-		return '<div class="bxdocs-tabs" data-bxdocs-tabgroup role="tablist">'
-			& '<div class="bxdocs-tabs__nav">' & navHtml & '</div>'
-			& '<div class="bxdocs-tabs__panels">' & panelsHtml & '</div>'
+		return '<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist">'
+			& '<div class="bxsites-tabs__nav">' & navHtml & '</div>'
+			& '<div class="bxsites-tabs__panels">' & panelsHtml & '</div>'
 			& '</div>'
 	}
 

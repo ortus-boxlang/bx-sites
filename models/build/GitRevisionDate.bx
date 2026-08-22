@@ -1,5 +1,5 @@
 /**
- * Looks up a file's last commit date via `git log`, backing bxdocs.json's
+ * Looks up a file's last commit date via `git log`, backing bxsites.json's
  * `lastUpdated` option. Shells out (there's no BoxLang-native git binding)
  * and fails soft everywhere - not a git repo, git not installed, an
  * untracked file, a build running from a downloaded zip with no `.git` at

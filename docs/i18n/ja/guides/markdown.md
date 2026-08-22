@@ -6,18 +6,18 @@ tags: [guides, markdown]
 
 # Markdown 拡張機能
 
-標準 Markdown に加えて、BX Docs はデフォルトで bx-markdown のネイティブ Flexmark 拡張機能を
-3 つ有効にします（Admonition、脚注、定義リスト）。さらに、BX Docs 独自の Mermaid ダイアグラム統合も提供します。
-これらはすべて [`bxdocs.json` の `markdown`/`mermaid` キー](../configuration.md#markdown) で設定できます。
+標準 Markdown に加えて、BX Sites はデフォルトで bx-markdown のネイティブ Flexmark 拡張機能を
+3 つ有効にします（Admonition、脚注、定義リスト）。さらに、BX Sites 独自の Mermaid ダイアグラム統合も提供します。
+これらはすべて [`bxsites.json` の `markdown`/`mermaid` キー](../configuration.md#markdown) で設定できます。
 
-BX Docs はさらに 3 つの独自拡張機能を実装しています（Flexmark には概念すらないもの）:
+BX Sites はさらに 3 つの独自拡張機能を実装しています（Flexmark には概念すらないもの）:
 コンテンツタブ、数式、フェンスコードの `hl_lines`/`linenums`/`title` アノテーション。
-bx-docs は bx-markdown のパーサーをフォークできないため、これらはそれぞれ
+bx-sites は bx-markdown のパーサーをフォークできないため、これらはそれぞれ
 通常の Markdown 変換の前後処理パスとして動作します。
 
 ## Admonition
 
-コールアウト/注意書きボックス - デフォルトで有効、`bxdocs.json` の設定不要:
+コールアウト/注意書きボックス - デフォルトで有効、`bxsites.json` の設定不要:
 
 ```markdown
 !!! note "ご注意"
@@ -112,13 +112,13 @@ bx-docs は bx-markdown のパーサーをフォークできないため、こ�
     ```
 ```
 
-`bxdocs.json` の設定不要 - 常に有効です。
+`bxsites.json` の設定不要 - 常に有効です。
 
 ## コードブロック
 
 フェンスコードブロックはクライアントサイドで構文ハイライトされます（highlight.js）。
 設定不要です。開き ` ``` ` の後の言語識別子でグラマーを選択します。
-BX Docs は `bx`/`boxlang`/`bxs`/`bxm`/`cfscript` で独自の軽量 BoxLang グラマーを登録しています:
+BX Sites は `bx`/`boxlang`/`bxs`/`bxm`/`cfscript` で独自の軽量 BoxLang グラマーを登録しています:
 
 ```bx
 class {
@@ -173,17 +173,17 @@ numeric function add( required numeric a, required numeric b ) {
 
 ````markdown
 ```bash frame="terminal" title="user@boxlang"
-box install bx-docs
+box install bx-sites
 ```
 ````
 
 `frame="code"` は今日のプレーンなバーを明示的に指定する名前です（デフォルトなので書く必要はありません）。
-`insert`/`delete` も `frame` も `bxdocs.json` の設定は不要です。`hl_lines`/`linenums`/`title` と同様です。
+`insert`/`delete` も `frame` も `bxsites.json` の設定は不要です。`hl_lines`/`linenums`/`title` と同様です。
 
 #### 本物の git diff
 
 フェンスに `diff` を指定すると、実際の `git diff`/`git show` の出力をそのまま貼り付けられます - これは
-bx-docs 独自の構文ではなく、highlight.js 自身の `diff` グラマーが Unified diff 構文（`+`/`-`/`@@` 行）を
+bx-sites 独自の構文ではなく、highlight.js 自身の `diff` グラマーが Unified diff 構文（`+`/`-`/`@@` 行）を
 自動的に認識しているだけです:
 
 ````markdown
@@ -203,7 +203,7 @@ bx-docs 独自の構文ではなく、highlight.js 自身の `diff` グラマー
 
 ## ダイアグラム
 
-`bxdocs.json` の [`mermaid`](../configuration.md#mermaid) キーでオプトイン:
+`bxsites.json` の [`mermaid`](../configuration.md#mermaid) キーでオプトイン:
 
 ```json
 { "mermaid": true }
@@ -223,7 +223,7 @@ Mermaid はフローチャート、シーケンス図、クラス図、ガント
 
 ## 数式
 
-`bxdocs.json` の [`math`](../configuration.md#math) キーでオプトイン:
+`bxsites.json` の [`math`](../configuration.md#math) キーでオプトイン:
 
 ```json
 { "math": true }
@@ -242,10 +242,10 @@ $$
 
 ## GitBook スタイルのブロック
 
-BX Docs は GitBook スタイルのコンテンツブロックもサポートしています。各ブロックは GitBook の
+BX Sites は GitBook スタイルのコンテンツブロックもサポートしています。各ブロックは GitBook の
 同名ブロックに直接対応しており、GitBook サイトのコンテンツを移行しやすくなっています。
 すべてのブロックは同じ `::: name ... :::` コンテナ構文を使用します。
-`bxdocs.json` の設定不要、常に使用できます。
+`bxsites.json` の設定不要、常に使用できます。
 
 ### 展開可能
 
@@ -293,10 +293,10 @@ BX Docs は GitBook スタイルのコンテンツブロックもサポートし
 ```markdown
 ::: stepper
 ::: step "インストール"
-`install-bx-module bx-docs`
+`install-bx-module bx-sites`
 :::
 ::: step "スキャフォールド"
-`boxlang module:bxDocs new`
+`boxlang module:bxSites new`
 :::
 :::
 ```

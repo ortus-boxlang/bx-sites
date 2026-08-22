@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.FenceTracker", function() {
 
 			beforeEach( function() {
-				variables.tracker = new "models.build.FenceTracker@bxdocs"();
+				variables.tracker = new "models.build.FenceTracker@bxsites"();
 			} );
 
 			it( "reports ordinary text as unprotected", function() {

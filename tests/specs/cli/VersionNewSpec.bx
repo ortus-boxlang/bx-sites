@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.VersionNew", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.VersionNew@bxdocs"();
+				variables.verb = new "models.cli.VersionNew@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,23 +17,23 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newProjectRoot() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-versionnew-" );
+				var dir = createTempDirectory( prefix = "bxsites-cli-versionnew-" );
 				tempDirs.append( dir );
 				directoryCreate( dir & "/docs", true, true );
 				fileWrite( dir & "/docs/index.md", "Home" );
 				return dir;
 			}
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( { name : "2.0" } );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
-			it( "throws BxDocs.MissingVersionName when name is blank", function() {
+			it( "throws BxSites.MissingVersionName when name is blank", function() {
 				expect( function() {
 					verb.run( { projectRoot : newProjectRoot() } );
-				} ).toThrow( "BxDocs.MissingVersionName" );
+				} ).toThrow( "BxSites.MissingVersionName" );
 			} );
 
 			it( "exits 0 and creates docs/versions/<name>/", function() {

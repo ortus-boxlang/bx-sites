@@ -13,7 +13,7 @@ class {
 	 *
 	 * @entries Array of `{ date, tags, contentHtml }`, in source order (DirectiveBlockProcessor's own `::: update` children, already markdown-rendered)
 	 * @page The page struct the `::: updates` block lives on (`title`/`urlPath` used)
-	 * @siteName The site's own name (bxdocs.json's `name`), used as the feed's channel title prefix
+	 * @siteName The site's own name (bxsites.json's `name`), used as the feed's channel title prefix
 	 * @siteUrl The absolute site URL, ending with `/` (BaseUrlResolver's `absolute`)
 	 *
 	 * @return The rendered feed.xml content

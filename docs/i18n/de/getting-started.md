@@ -10,14 +10,14 @@ tags: [anleitungen, einrichtung]
 
 ## Installation
 
-BX Docs benötigt [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
+BX Sites benötigt [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
 für das Rendern von Markdown, [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
 für die HTML-Kodierung und [bx-yaml](https://github.com/ortus-boxlang/bx-yaml)
-zum Lesen von `bxdocs.yaml`. Mit installiertem
+zum Lesen von `bxsites.yaml`. Mit installiertem
 [CommandBox](https://commandbox.ortusbooks.com/):
 
 ```bash
-box install bx-docs
+box install bx-sites
 box install bx-markdown
 box install bx-esapi
 box install bx-yaml
@@ -27,15 +27,15 @@ Oder, ohne CommandBox, installiert BoxLangs eigener Installer alle vier mit
 einem Befehl:
 
 ```bash
-install-bx-module bx-docs bx-markdown bx-esapi bx-yaml
+install-bx-module bx-sites bx-markdown bx-esapi bx-yaml
 ```
 
 `box install`/`install-bx-module` liest `boxlang.executable` aus `box.json`
-und legt ein `bxDocs`-Skript in deinem `PATH` ab (in `~/.boxlang/bin`), sodass
+und legt ein `bxSites`-Skript in deinem `PATH` ab (in `~/.boxlang/bin`), sodass
 jeder Befehl unten entweder als kurzer, eigenständiger Befehl funktioniert:
 
 ```bash
-bxDocs <verb> [options]
+bxSites <verb> [options]
 ```
 
 oder überall dort, wo BoxLang zwar verfügbar ist, dieser `PATH`-Shim aber
@@ -43,7 +43,7 @@ nicht (ein CI-Runner, ein von Hand statt per Installation registriertes
 Modul) - beide Formen führen genau dasselbe aus:
 
 ```bash
-boxlang module:bxdocs <verb> [options]
+boxlang module:bxsites <verb> [options]
 ```
 
 Der Rest dieser Anleitung verwendet die Kurzform.
@@ -51,7 +51,7 @@ Der Rest dieser Anleitung verwendet die Kurzform.
 ## Ein Projekt aufsetzen
 
 ```bash
-bxDocs new my-docs
+bxSites new my-docs
 cd my-docs
 ```
 
@@ -62,7 +62,7 @@ my-docs/
 ├── docs/
 │   ├── assets/
 │   └── index.md
-└── bxdocs.yaml
+└── bxsites.yaml
 ```
 
 Übergib `--theme=material` oder `--theme=tailwind`, um mit einem anderen
@@ -72,18 +72,18 @@ des Zielverzeichnisses ab.
 
 ### Format der Konfigurationsdatei
 
-`bxdocs.yaml` ist das Standard- und bevorzugte Format - es ist das, was `new`
+`bxsites.yaml` ist das Standard- und bevorzugte Format - es ist das, was `new`
 erzeugt, sofern nichts anderes angegeben wird, und jedes Beispiel in dieser
 Anleitung und in [Konfiguration](configuration.md) zeigt es zuerst.
-`bxdocs.json` wird ebenfalls vollständig unterstützt, für ein Projekt, das
+`bxsites.json` wird ebenfalls vollständig unterstützt, für ein Projekt, das
 es bevorzugt: übergib `--format=json`, um stattdessen eines zu erzeugen,
 oder schreibe/benenne eines einfach selbst von Hand um - der ConfigLoader
-löst auf, welche von `bxdocs.yaml`/`.yml`/`.json` tatsächlich vorhanden ist,
+löst auf, welche von `bxsites.yaml`/`.yml`/`.json` tatsächlich vorhanden ist,
 in dieser Reihenfolge, ohne dass etwas anderes konfiguriert werden muss, um
 zu wechseln. Siehe [Konfiguration](configuration.md) für die vollständige
 Schlüsselreferenz in beiden Formaten.
 
-Hast du bereits Inhalte in GitBook? `bxDocs migrate --source=/path/to/export`
+Hast du bereits Inhalte in GitBook? `bxSites migrate --source=/path/to/export`
 wandelt einen GitBook-Export direkt in `docs/` um - siehe
 [Migration von GitBook](guides/migrating-from-gitbook.md) - und du kannst
 direkt zu [Build](#build) springen.
@@ -116,7 +116,7 @@ See [Deployment](guides/deployment.md) or, from that same guide,
 [back to Getting Started](../getting-started.md#add-pages).
 ```
 
-BX Docs schreibt jeden solchen Link zur Build-Zeit auf seine gebaute
+BX Sites schreibt jeden solchen Link zur Build-Zeit auf seine gebaute
 Pretty-URL um (`guides/deployment.md` -> `/guides/deployment/index.html`,
 Anker und Query-Strings bleiben erhalten), aufgelöst relativ zum eigenen
 Ordner der *verlinkenden* Seite - `../`- und Geschwister-Referenzen
@@ -149,7 +149,7 @@ Jede Seite kann mit einem kleinen Frontmatter-Block beginnen:
 title: Deployment
 order: 2
 hidden: false
-description: How to deploy a built BX Docs site.
+description: How to deploy a built BX Sites site.
 tags: [guides, deployment]
 icon: 🚀
 summary: Everything you need to publish a built site.
@@ -192,7 +192,7 @@ unterstützt.
 ## Build
 
 ```bash
-bxDocs build
+bxSites build
 ```
 
 Rendert jede Seite in `docs/` zu einer statischen Website in `site/`, bereit
@@ -201,19 +201,19 @@ zum Hosten überall dort, wo statische Dateien ausgeliefert werden können.
 ## Lokal ausliefern
 
 ```bash
-bxDocs serve
+bxSites serve
 ```
 
 Baut das Projekt, liefert `site/` unter `http://127.0.0.1:8080/` aus und
 baut automatisch neu, sobald du eine Änderung unter `docs/`, deiner
-`bxdocs.yaml`/`.json`-Website-Konfiguration oder einem projektweiten
+`bxsites.yaml`/`.json`-Website-Konfiguration oder einem projektweiten
 `theme/`-Override speicherst - dein Browser lädt von selbst neu. Übergib `--port=3000` oder `--host=0.0.0.0`, um zu ändern,
 woran gebunden wird.
 
 ## Clean
 
 ```bash
-bxDocs clean
+bxSites clean
 ```
 
 Entfernt `site/` und jeglichen Build-Cache, ohne deine `docs/`-Quelle

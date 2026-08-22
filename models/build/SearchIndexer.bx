@@ -2,7 +2,7 @@
  * Builds the static search index (module spec section 5, step 5; section 7 -
  * "fully static, client-side, matches mkdocs' default (lunr.js)"). This
  * class only builds the JSON payload; BuildPipeline decides whether to call
- * it at all (bxdocs.json's `search` flag) and where to write the result.
+ * it at all (bxsites.json's `search` flag) and where to write the result.
  */
 class {
 

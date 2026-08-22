@@ -8,7 +8,7 @@
  * project is `ModuleService.getModuleSettings( "bxMarkdown" )` (bx-markdown's
  * own module registry key - its own `this.mapping`, not its box.json/ForgeBox
  * slug "bx-markdown"), mutated in place before each call, so that's what
- * this class does with a project's `bxdocs.json` `markdown` passthrough
+ * this class does with a project's `bxsites.json` `markdown` passthrough
  * options (module spec section 4).
  *
  * This class has a hard runtime dependency on the bx-markdown module being

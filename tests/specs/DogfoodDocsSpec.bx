@@ -1,6 +1,6 @@
 /**
- * Confirms this repository's own dogfooded `bxdocs.yaml` + `docs/` (module
- * spec Phase 5 - "docs + examples for bx-docs itself") actually build
+ * Confirms this repository's own dogfooded `bxsites.yaml` + `docs/` (module
+ * spec Phase 5 - "docs + examples for bx-sites itself") actually build
  * cleanly through the real pipeline, using the same fake markdown renderer
  * and fake image-variant-generator seams as BuildPipelineSpec.bx (neither
  * bx-markdown nor bx-image is installed in this module's own unit-test CI
@@ -10,17 +10,17 @@
 class extends="testbox.system.BaseSpec" {
 
 	function run() {
-		describe( "Dogfooded docs (this repo's own docs/ + bxdocs.yaml)", function() {
+		describe( "Dogfooded docs (this repo's own docs/ + bxsites.yaml)", function() {
 
 			beforeEach( function() {
 				variables.repoRoot = getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]tests[\/]specs[\/]?$", "" )
-				variables.tempRoot = createTempDirectory( prefix = "bxdocs-dogfood-" )
+				variables.tempRoot = createTempDirectory( prefix = "bxsites-dogfood-" )
 				directoryCopy( variables.repoRoot & "/docs", variables.tempRoot & "/docs", true )
-				fileCopy( variables.repoRoot & "/bxdocs.yaml", variables.tempRoot & "/bxdocs.yaml" )
+				fileCopy( variables.repoRoot & "/bxsites.yaml", variables.tempRoot & "/bxsites.yaml" )
 
-				variables.pipeline = new "models.build.BuildPipeline@bxdocs"()
-				variables.pipeline.setMarkdownRenderer( new "tests.support.FakeMarkdownRenderer@bxdocs"() )
-				variables.pipeline.setImageVariantGenerator( new "tests.support.FakeImageVariantGenerator@bxdocs"() )
+				variables.pipeline = new "models.build.BuildPipeline@bxsites"()
+				variables.pipeline.setMarkdownRenderer( new "tests.support.FakeMarkdownRenderer@bxsites"() )
+				variables.pipeline.setImageVariantGenerator( new "tests.support.FakeImageVariantGenerator@bxsites"() )
 			} );
 
 			afterEach( function() {
@@ -29,9 +29,9 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
-			it( "loads and validates bxdocs.yaml", function() {
-				var config = new "models.config.ConfigLoader@bxdocs"().load( repoRoot )
-				expect( config.name ).toBe( "BX Docs" )
+			it( "loads and validates bxsites.yaml", function() {
+				var config = new "models.config.ConfigLoader@bxsites"().load( repoRoot )
+				expect( config.name ).toBe( "BX Sites" )
 				expect( config.theme.name ).toBe( "bootstrap" )
 			} );
 
@@ -43,7 +43,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( tempRoot & "/site/getting-started/index.html" ) ).toBeTrue()
 				expect( fileExists( tempRoot & "/site/guides/themes/index.html" ) ).toBeTrue()
 
-				var nav = new "models.build.NavBuilder@bxdocs"().build( new "models.build.DocsLoader@bxdocs"().load( tempRoot & "/docs" ) )
+				var nav = new "models.build.NavBuilder@bxsites"().build( new "models.build.DocsLoader@bxsites"().load( tempRoot & "/docs" ) )
 				expect( nav.len() ).toBeGT( 0 )
 			} );
 

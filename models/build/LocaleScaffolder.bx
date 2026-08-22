@@ -16,17 +16,17 @@ class {
 	struct function scaffold( required string docsDir, required string code ) {
 		var trimmedCode = trim( arguments.code )
 		if ( !len( trimmedCode ) ) {
-			throw( type = "BxDocs.MissingLocaleCode", message = "`i18n:new` requires --code=<locale>" )
+			throw( type = "BxSites.MissingLocaleCode", message = "`i18n:new` requires --code=<locale>" )
 		}
 		if ( !trimmedCode.reFind( "^[a-zA-Z0-9-]+$" ) ) {
-			throw( type = "BxDocs.InvalidLocaleCode", message = "Locale code [#trimmedCode#] must be letters/digits/hyphens only" )
+			throw( type = "BxSites.InvalidLocaleCode", message = "Locale code [#trimmedCode#] must be letters/digits/hyphens only" )
 		}
 
 		var trimmedDocsDir = arguments.docsDir.reReplace( "[\/]+$", "" )
 		var localeDir = trimmedDocsDir & "/i18n/" & trimmedCode
 
 		if ( directoryExists( localeDir ) ) {
-			throw( type = "BxDocs.LocaleAlreadyExists", message = "docs/i18n/#trimmedCode# already exists" )
+			throw( type = "BxSites.LocaleAlreadyExists", message = "docs/i18n/#trimmedCode# already exists" )
 		}
 
 		directoryCreate( localeDir, true, true )

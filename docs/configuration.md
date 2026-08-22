@@ -8,15 +8,15 @@ tags: [reference, configuration]
 
 # Configuration
 
-Every project has one site config at its root - `bxdocs.yaml` (or `.yml`),
-the default/preferred format, or `bxdocs.json` for a project that wants to
+Every project has one site config at its root - `bxsites.yaml` (or `.yml`),
+the default/preferred format, or `bxsites.json` for a project that wants to
 stay on it. Both are fully supported and produce the exact same result;
-`bxDocs new` scaffolds `bxdocs.yaml` unless `--format=json` is passed (see
+`bxSites new` scaffolds `bxsites.yaml` unless `--format=json` is passed (see
 [Getting Started](getting-started.md#config-file-format)). If a project
-somehow has more than one, `bxdocs.yaml` wins, then `bxdocs.yml`, then
-`bxdocs.json`.
+somehow has more than one, `bxsites.yaml` wins, then `bxsites.yml`, then
+`bxsites.json`.
 
-```yaml title="bxdocs.yaml" linenums="1"
+```yaml title="bxsites.yaml" linenums="1"
 name: "My Docs"
 description: ""
 baseURL: "/"
@@ -60,9 +60,9 @@ blog:
   feed: true
 ```
 
-The equivalent `bxdocs.json`, for a project that prefers it:
+The equivalent `bxsites.json`, for a project that prefers it:
 
-```json title="bxdocs.json" linenums="1"
+```json title="bxsites.json" linenums="1"
 {
 	"name": "My Docs",
 	"description": "",
@@ -239,7 +239,7 @@ extra JS shipped. See [Search](guides/search.md).
 
 Which search UI `search: true` wires up:
 
-- `provider` - `"local"` (the default) is bx-docs' own static/client-side
+- `provider` - `"local"` (the default) is bx-sites' own static/client-side
   search (`search-index.json` + lunr.js, see [Search](guides/search.md#local-the-default)).
   `"algolia"` wires up [Algolia DocSearch](guides/search.md#algolia)
   instead, and `"pagefind"` wires up [Pagefind](guides/search.md#pagefind).
@@ -250,7 +250,7 @@ Which search UI `search: true` wires up:
   exactly as Algolia's own DocSearch client expects them. `insights`
   (`false` by default) turns on DocSearch's click/conversion analytics.
 
-  ```json title="bxdocs.json" linenums="1"
+  ```json title="bxsites.json" linenums="1"
   {
     "search": true,
     "searchProvider": {
@@ -268,10 +268,10 @@ Which search UI `search: true` wires up:
   (default `"pagefind"`) is the CLI executable name/path, resolved against
   `PATH` when it's a bare name; `options` is an array of extra raw CLI
   flags passed straight through. The `pagefind` CLI itself must already be
-  installed and on `PATH` - BX Docs shells out to it (like `git` for
+  installed and on `PATH` - BX Sites shells out to it (like `git` for
   `lastUpdated`/`gh-deploy`), it doesn't install it for you.
 
-  ```json title="bxdocs.json" linenums="1"
+  ```json title="bxsites.json" linenums="1"
   {
     "search": true,
     "searchProvider": {
@@ -309,7 +309,7 @@ container/section label - a non-clickable heading that just groups its
 children, the same role GitBook's "MAIN COMPONENTS" plays in its own
 sidebar:
 
-```json title="bxdocs.json" linenums="1"
+```json title="bxsites.json" linenums="1"
 {
 	"nav": [
 		"index.md",
@@ -328,7 +328,7 @@ Give that same group entry a `path` instead and it becomes a normal linked
 section (its own landing page, plus children) rather than a bare label - both
 shapes nest under `theme.options.navCollapsible` the same way (see above).
 
-For a nav large enough that it clutters `bxdocs.json`, move it to its own
+For a nav large enough that it clutters `bxsites.json`, move it to its own
 `docs/nav.json` file instead - same array shape, just as the whole file's
 top-level content:
 
@@ -339,7 +339,7 @@ top-level content:
 ]
 ```
 
-`bxdocs.json`'s own `nav`, when non-empty, always wins over `docs/nav.json`.
+`bxsites.json`'s own `nav`, when non-empty, always wins over `docs/nav.json`.
 Only the main tree honors either - a `docs/versions/<name>/` tree always
 infers its nav from its own folder structure, even when the main tree has
 an explicit one.
@@ -347,7 +347,7 @@ an explicit one.
 ## `markdown`
 
 Forwarded as-is to [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)'s
-own module settings before each page renders. BX Docs doesn't redefine or
+own module settings before each page renders. BX Sites doesn't redefine or
 validate these keys; whatever you put here is bx-markdown's own option set,
 straight through - so this list can drift from bx-markdown's own as it
 evolves. Tables, `~~strikethrough~~`, `- [ ]` task-list checkboxes and the
@@ -357,7 +357,7 @@ Docs defaults it to `true` (see the [Markdown Extensions guide](guides/markdown.
 
 | Key | Default | Effect |
 |---|---|---|
-| `enableAdmonition` | `true` *(BX Docs default; bx-markdown's own default is `false`)* | `!!!`/`???`/`???+` callout blocks - see the [Markdown Extensions guide](guides/markdown.md#admonitions) |
+| `enableAdmonition` | `true` *(BX Sites default; bx-markdown's own default is `false`)* | `!!!`/`???`/`???+` callout blocks - see the [Markdown Extensions guide](guides/markdown.md#admonitions) |
 | `enableFootnotes` | `false` | `[^label]` footnote references - see the [Markdown Extensions guide](guides/markdown.md#footnotes) |
 | `enableDefinitionLists` | `false` | `Term\n:   Definition` lists - see the [Markdown Extensions guide](guides/markdown.md#definition-lists) |
 | `autoLinkUrls` | `true` | Auto-links bare URLs and email addresses |
@@ -369,14 +369,14 @@ Docs defaults it to `true` (see the [Markdown Extensions guide](guides/markdown.
 | `anchorPrefix` / `anchorSuffix` | `""` | Raw HTML injected immediately before/after the heading text |
 | `enableYouTubeTransformer` | `false` | Auto-embeds bare YouTube links as a player |
 | `codeStyleHTMLOpen` / `codeStyleHTMLClose` | `"<code>"` / `"</code>"` | Wrapper HTML around inline code spans |
-| `fencedCodeLanguageClassPrefix` | `"language-"` | Class prefix bx-docs's client-side syntax highlighter (and Mermaid, see below) key off of, e.g. ` ```js ` -> `class="language-js"` |
+| `fencedCodeLanguageClassPrefix` | `"language-"` | Class prefix bx-sites's client-side syntax highlighter (and Mermaid, see below) key off of, e.g. ` ```js ` -> `class="language-js"` |
 | `tableOptions.columnSpans` | `true` | Honors `colspan`-style merged table cells |
 | `tableOptions.appendMissingColumns` | `true` | Pads a short row out to the header's column count |
 | `tableOptions.discardExtraColumns` | `true` | Drops extra cells in an over-long row |
 | `tableOptions.className` | `"table"` | CSS class on every rendered `<table>` |
 | `tableOptions.headerSeparationColumnMatch` | `true` | Requires the `---` separator row to match the header's column count |
 
-```json title="bxdocs.json" linenums="1"
+```json title="bxsites.json" linenums="1"
 {
 	"markdown": {
 		"enableFootnotes": true,
@@ -403,7 +403,7 @@ when both keys are set, an "Edit this page" link on every page.
   `repo.url` too; leave blank to omit edit links while still showing the
   header icon.
 
-```json title="bxdocs.json"
+```json title="bxsites.json"
 { "repo": { "url": "https://github.com/acme/docs", "editUri": "edit/main/docs/" } }
 ```
 
@@ -417,7 +417,7 @@ needs a `url`; `icon` selects from a small built-in icon set (`github`,
 for anything else), and `label` sets the link's accessible name/tooltip
 (defaults to `icon`, then `"Link"`).
 
-```json title="bxdocs.json" linenums="1"
+```json title="bxsites.json" linenums="1"
 {
 	"social": [
 		{ "url": "https://twitter.com/acme", "icon": "twitter", "label": "Twitter" },
@@ -430,9 +430,9 @@ for anything else), and `label` sets the link's accessible name/tooltip
 
 `false` (the default) - no footer at all. `true` adds one to every page:
 a copyright line (`© <year> <site name>`), the `social` links (if any),
-and a "Built with BX Docs" credit.
+and a "Built with BX Sites" credit.
 
-```json title="bxdocs.json"
+```json title="bxsites.json"
 { "footer": true }
 ```
 
@@ -446,7 +446,7 @@ with no commits yet, a build running from a downloaded zip with no `.git`
 at all, or git not being installed on the build machine - rather than
 breaking the build.
 
-```json title="bxdocs.json"
+```json title="bxsites.json"
 { "lastUpdated": true }
 ```
 
@@ -460,7 +460,7 @@ Wires up pageview analytics. Currently supports Google Analytics
 - `analytics.id` - the Google Analytics measurement ID (e.g. `"G-ABC123"`).
   Required when `provider` is `"google"`.
 
-```json title="bxdocs.json"
+```json title="bxsites.json"
 { "analytics": { "provider": "google", "id": "G-ABC123" } }
 ```
 
@@ -473,7 +473,7 @@ prefixed with `baseURL`, absolute URLs are used as-is). Left blank (the
 default) and `generateOgImages` off, no `og:image`/`twitter:card` tags are
 rendered.
 
-```json title="bxdocs.json"
+```json title="bxsites.json"
 { "ogImage": "assets/social-card.png" }
 ```
 
@@ -490,7 +490,7 @@ site-wide image. Pure `java.awt`/`javax.imageio` under the hood (part of
 any JVM BoxLang runs on), so this needs no headless browser, external
 service, or network access at build time.
 
-```json title="bxdocs.json"
+```json title="bxsites.json"
 { "generateOgImages": true }
 ```
 
@@ -501,7 +501,7 @@ after the theme's own assets - each entry is resolved the same way as
 `theme.logo` (a relative path is prefixed with `baseURL`; an absolute URL
 is used as-is). `extraJs` entries are loaded with `defer`.
 
-```json title="bxdocs.json" linenums="1"
+```json title="bxsites.json" linenums="1"
 {
 	"extraCss": [ "assets/custom.css" ],
 	"extraJs": [ "assets/custom.js" ]
@@ -515,7 +515,7 @@ below.
 
 ## `assets`
 
-```json title="bxdocs.json" linenums="1"
+```json title="bxsites.json" linenums="1"
 {
 	"assets": {
 		"fingerprint": true,
@@ -533,7 +533,7 @@ The asset pipeline - image resizing/WebP via
 [bx-image](https://github.com/ortus-boxlang/bx-image) (a required
 dependency, installed alongside bx-markdown/bx-esapi) and CSS/JS
 bundling. Everything here is on by default with reasonable settings - a
-fresh `bxDocs new` project needs to touch none of this. See
+fresh `bxSites new` project needs to touch none of this. See
 [Responsive Images](guides/images.md) for the full picture, including
 what deliberately isn't covered (AVIF, animated GIFs, SVGs).
 
@@ -572,7 +572,7 @@ support shipped at all. `true` loads `mermaid.js` client-side and renders
 every ` ```mermaid ` fenced code block as a diagram. See
 [Markdown Extensions](guides/markdown.md#diagrams) for the syntax.
 
-```json title="bxdocs.json"
+```json title="bxsites.json"
 { "mermaid": true }
 ```
 
@@ -583,7 +583,7 @@ every ` ```mermaid ` fenced code block as a diagram. See
 into a page's markdown. See
 [Markdown Extensions](guides/markdown.md#math) for the syntax.
 
-```json title="bxdocs.json"
+```json title="bxsites.json"
 { "math": true }
 ```
 
@@ -599,8 +599,8 @@ plugins. Installing a plugin module (`box install`) never activates it on
 its own; it has to be named here too. See [Plugins](guides/plugins.md)
 for how to write one.
 
-```json title="bxdocs.json"
-{ "plugins": [ "myBxDocsPlugin" ] }
+```json title="bxsites.json"
+{ "plugins": [ "myBxSitesPlugin" ] }
 ```
 
 ## `i18n`
@@ -620,7 +620,7 @@ switcher.
   an optional emoji override for the language switcher's flag icon - most
   common codes already resolve to a sensible flag on their own.
 
-```json title="bxdocs.json" linenums="1"
+```json title="bxsites.json" linenums="1"
 {
 	"i18n": {
 		"defaultLocale": { "code": "en", "label": "English" },
@@ -653,7 +653,7 @@ Options for the [blog](guides/blog.md) - itself a by-convention feature
   with hundreds of posts just wastes bandwidth on every poll - see
   [Blog: Feed](guides/blog.md#feed).
 
-```json title="bxdocs.json"
+```json title="bxsites.json"
 { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
 ```
 
@@ -662,7 +662,7 @@ featured images, and SEO/social metadata.
 
 ## Versioning
 
-Versioned docs are convention over configuration - there's no `bxdocs.json`
+Versioned docs are convention over configuration - there's no `bxsites.json`
 key for it. Add a `docs/versions/` folder, and each direct subfolder inside
 it is built as its own fully self-contained doc tree, alongside your
 regular `docs/` (which always builds as "Latest"):
@@ -683,7 +683,7 @@ docs/
 Each version folder is a normal `docs/`-shaped tree - its own `index.md`,
 its own nav, its own pages - built into `site/versions/<name>/` with every
 internal link prefixed accordingly, and sharing the project's single
-`bxdocs.json` config/theme. Version names sort newest-first, numerically
+`bxsites.json` config/theme. Version names sort newest-first, numerically
 rather than alphabetically (so `2.0` sorts before `10.0`), and every theme
 renders a version-switcher dropdown in the header automatically once more
 than one version exists - nothing to opt into. A loose file placed directly

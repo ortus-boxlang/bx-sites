@@ -6,18 +6,18 @@ tags: [guías, migración, gitbook]
 
 # Migrar desde GitBook
 
-`bxDocs migrate` convierte una exportación de GitBook - una tabla de
+`bxSites migrate` convierte una exportación de GitBook - una tabla de
 contenidos `SUMMARY.md` más sus archivos `.md`, el propio formato de
 sincronización en disco de GitBook (el mismo que escribe GitHub/Git
-Sync) - en un árbol `docs/` de bx-docs, en un solo comando. Todo lo que
+Sync) - en un árbol `docs/` de bx-sites, en un solo comando. Todo lo que
 admite el sistema de bloques de contenido de GitBook se corresponde con
-algo que bx-docs ya tiene (consulta
+algo que bx-sites ya tiene (consulta
 [Extensiones de Markdown](markdown.md#gitbook-style-blocks)), así que el
 resultado no es un borrador aproximado - es un sitio funcional.
 
 ## Obtener una exportación de GitBook
 
-`bxDocs migrate` lee directamente el propio formato de archivos de
+`bxSites migrate` lee directamente el propio formato de archivos de
 GitBook, así que cualquiera de estos funciona como `--source`:
 
 - Un repositorio al que GitBook está sincronizado por Git (configuración
@@ -30,15 +30,15 @@ directamente `SUMMARY.md`.
 ## Ejecutar la migración
 
 ```bash
-# 1. Scaffold a fresh bx-docs project (skip this if you already have one)
-bxDocs new my-docs
+# 1. Scaffold a fresh bx-sites project (skip this if you already have one)
+bxSites new my-docs
 cd my-docs
 
 # 2. Migrate the GitBook export into it
-bxDocs migrate --source=/path/to/gitbook-export
+bxSites migrate --source=/path/to/gitbook-export
 
 # 3. Build and look at the result
-bxDocs serve
+bxSites serve
 ```
 
 `migrate` imprime cuántas páginas convirtió y, cuando algo necesitó una
@@ -65,8 +65,8 @@ exportación de origen y volver a ejecutarlo.
 | GitBook | Se convierte en |
 |---|---|
 | `SUMMARY.md` | `docs/nav.json` (formato de [sobrescritura de nav](../configuration.md#nav)), conservando el anidamiento |
-| `README.md` (cualquier carpeta) | `index.md` - la propia convención de índice de carpeta de bx-docs |
-| El frontmatter `title`/`description`/`tags` de una página | Se traslada sin cambios al propio frontmatter de bx-docs del archivo migrado |
+| `README.md` (cualquier carpeta) | `index.md` - la propia convención de índice de carpeta de bx-sites |
+| El frontmatter `title`/`description`/`tags` de una página | Se traslada sin cambios al propio frontmatter de bx-sites del archivo migrado |
 | `.gitbook/assets/**` | `docs/assets/gitbook/**`, con cada referencia reescrita para que coincida |
 | `{% hint style="..." %}` | `!!! type` - una [admonición](markdown.md#admonitions) nativa |
 | `{% tabs %}` / `{% tab title="..." %}` | `=== "Title"` - [pestañas de contenido](markdown.md#content-tabs) nativas |
@@ -84,11 +84,11 @@ malinterpretarse como el bloque real.
 
 ## Qué necesita revisión manual
 
-Un puñado de bloques de GitBook no tiene ningún equivalente en bx-docs y
+Un puñado de bloques de GitBook no tiene ningún equivalente en bx-sites y
 se dejan en su sintaxis `{% %}` original en lugar de adivinarse:
 **Prompt** (un bloque de generación con IA - no hay nada contra lo que
 ejecutarlo una vez migrado), **Conditional content** (visibilidad basada
-en cuenta de GitBook, no es un concepto que tenga bx-docs), y la barra de
+en cuenta de GitBook, no es un concepto que tenga bx-sites), y la barra de
 búsqueda **Ask AI**. Cualquier otra cosa que esta herramienta no
 reconozca - un bloque con un error tipográfico, una función de GitBook
 añadida después de que se escribiera esta herramienta - recibe el mismo
@@ -120,7 +120,7 @@ mejor en la propia galería de [Phosphor](https://phosphoricons.com/)
 El `docs/nav.json` migrado es un archivo simple de
 [sobrescritura de nav](../configuration.md#nav) - edítalo como cualquier
 otro, o elimínalo para volver a la propia convención de
-estructura-de-carpetas-es-estructura-de-navegación de bx-docs. Desde aquí
-es un proyecto bx-docs normal: elige un [tema](themes.md), revisa
-[`bxdocs.json`](../configuration.md), y [despliega](deployment.md) cuando
+estructura-de-carpetas-es-estructura-de-navegación de bx-sites. Desde aquí
+es un proyecto bx-sites normal: elige un [tema](themes.md), revisa
+[`bxsites.json`](../configuration.md), y [despliega](deployment.md) cuando
 estés satisfecho con él.

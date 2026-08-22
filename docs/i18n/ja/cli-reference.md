@@ -2,23 +2,23 @@
 title: CLI リファレンス
 order: 3
 icon: phosphor-duotone:terminal-window
-summary: bxDocs のすべての動詞とフラグ。
+summary: bxSites のすべての動詞とフラグ。
 tags: [reference, cli]
 ---
 
 # CLI リファレンス
 
 ```bash
-bxDocs <verb> [options]
+bxSites <verb> [options]
 ```
 
-`box install bx-docs` を実行すると、スタンドアロンの `bxDocs` スクリプトが `PATH` に配置されます
+`box install bx-sites` を実行すると、スタンドアロンの `bxSites` スクリプトが `PATH` に配置されます
 （`box.json` の `boxlang.executable` 経由）。以下のすべての動詞は短縮形、または
-`boxlang module:bxdocs <verb>` のどちらの形式でも実行できます。
+`boxlang module:bxsites <verb>` のどちらの形式でも実行できます。
 `PATH` シムが設定されていない環境（CI ランナー、手動登録のモジュールなど）では長い形式を使用します:
 
 ```bash
-boxlang module:bxdocs <verb> [options]
+boxlang module:bxsites <verb> [options]
 ```
 
 すべての動詞は `--projectRoot=<path>`（または先頭の位置引数）で、カレントディレクトリ以外の
@@ -36,13 +36,13 @@ boxlang module:bxdocs <verb> [options]
 docs プロジェクトをスキャフォールドします。
 
 ```bash
-bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...] [--format=yaml|json]
+bxSites new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...] [--format=yaml|json]
 ```
 
 - `--name` - サイト設定に書き込まれるサイト名（デフォルトはターゲットディレクトリ名）
 - `--theme` - デフォルトは `bootstrap`
 - `--description` - サイト設定に書き込まれるサイトの説明
-- `--format` - `yaml`（デフォルト、`bxdocs.yaml` をスキャフォールド）または `json`（`bxdocs.json` をスキャフォールド）- [設定](configuration.md) を参照
+- `--format` - `yaml`（デフォルト、`bxsites.yaml` をスキャフォールド）または `json`（`bxsites.json` をスキャフォールド）- [設定](configuration.md) を参照
 
 ## `build`
 
@@ -51,7 +51,7 @@ bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--descript
 テーマ + `docs/assets/**` の `site/` へのコピーも行います。
 
 ```bash
-bxDocs build
+bxSites build
 ```
 
 ## `serve`
@@ -59,7 +59,7 @@ bxDocs build
 サイトをビルドし、ライブリロード付きでローカルで配信します。
 
 ```bash
-bxDocs serve [--port=8080] [--host=127.0.0.1]
+bxSites serve [--port=8080] [--host=127.0.0.1]
 ```
 
 Ctrl+C で中断するまでフォアグラウンドで実行されます。
@@ -71,7 +71,7 @@ Ctrl+C で中断するまでフォアグラウンドで実行されます。
 インデックスのみ更新したい場合に使用します。
 
 ```bash
-bxDocs search-index
+bxSites search-index
 ```
 
 ## `clean`
@@ -79,7 +79,7 @@ bxDocs search-index
 `docs/` とサイト設定はそのままで、`site/` とビルドキャッシュを削除します。
 
 ```bash
-bxDocs clean
+bxSites clean
 ```
 
 ## `gh-deploy`
@@ -91,12 +91,12 @@ git リポジトリである必要があります。現在のブランチや作�
 （プッシュは使い捨ての `git worktree` から行います）。
 
 ```bash
-bxDocs gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
+bxSites gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
 ```
 
 - `--branch` - デフォルトは `gh-pages`
 - `--remote` - デフォルトは `origin`
-- `--message` - ブランチの単一コミットメッセージ。デフォルトは `"Deploy site via bxDocs gh-deploy"`
+- `--message` - ブランチの単一コミットメッセージ。デフォルトは `"Deploy site via bxSites gh-deploy"`
 
 完全な GitHub Pages の設定（Pages のブランチ有効化、`baseURL` など）については
 [デプロイ](guides/deployment.md) をご覧ください。
@@ -105,12 +105,12 @@ bxDocs gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
 
 GitBook のエクスポート（`SUMMARY.md` の目次とその `.md` ファイル、GitBook 独自のオンディスク同期形式）を
 このプロジェクトの `docs/` ツリーに変換します。`SUMMARY.md` は `docs/nav.json` になり、
-`{% block %}` 構文は bx-docs の同等物（`::: name` ディレクティブ、または
+`{% block %}` 構文は bx-sites の同等物（`::: name` ディレクティブ、または
 より近い一致が既にある場合は `=== "Title"` タブ / `!!! type` admonition 構文）になります。
 `README.md` ファイルは `index.md` になり、`.gitbook/assets/**` は `docs/assets/gitbook/` にコピーされます。
 
 ```bash
-bxDocs migrate --source=/path/to/gitbook-export
+bxSites migrate --source=/path/to/gitbook-export
 ```
 
 - `--source`（必須）- GitBook エクスポートのルートディレクトリへのパス（`SUMMARY.md` を含む必要があります）

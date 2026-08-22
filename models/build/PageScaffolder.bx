@@ -28,17 +28,17 @@ class {
 	) {
 		var trimmedPath = trim( arguments.path ).reReplace( "^[\/]+", "" )
 		if ( !len( trimmedPath ) ) {
-			throw( type = "BxDocs.MissingPagePath", message = "`page:new` requires --path=<relative path>.md" )
+			throw( type = "BxSites.MissingPagePath", message = "`page:new` requires --path=<relative path>.md" )
 		}
 		if ( !trimmedPath.reFindNoCase( "\.md$" ) ) {
-			throw( type = "BxDocs.InvalidPagePath", message = "--path must end in .md (got [#trimmedPath#])" )
+			throw( type = "BxSites.InvalidPagePath", message = "--path must end in .md (got [#trimmedPath#])" )
 		}
 
 		var trimmedDocsDir = arguments.docsDir.reReplace( "[\/]+$", "" )
 		var fullPath = trimmedDocsDir & "/" & trimmedPath
 
 		if ( fileExists( fullPath ) ) {
-			throw( type = "BxDocs.PageAlreadyExists", message = "A page already exists at [#fullPath#]" )
+			throw( type = "BxSites.PageAlreadyExists", message = "A page already exists at [#fullPath#]" )
 		}
 
 		var pageDir = getDirectoryFromPath( fullPath )

@@ -15,7 +15,7 @@ class {
 	variables.failWith = ""
 
 	/**
-	 * @failWith When non-empty, index() throws BxDocs.PagefindFailed with this message instead of recording the call
+	 * @failWith When non-empty, index() throws BxSites.PagefindFailed with this message instead of recording the call
 	 */
 	function init( string failWith = "" ) {
 		variables.failWith = arguments.failWith
@@ -24,7 +24,7 @@ class {
 
 	struct function index( required string siteDir, string bin = "pagefind", array options = [] ) {
 		if ( len( variables.failWith ) ) {
-			throw( type = "BxDocs.PagefindFailed", message = variables.failWith )
+			throw( type = "BxSites.PagefindFailed", message = variables.failWith )
 		}
 		variables.calls.append( { siteDir : arguments.siteDir, bin : arguments.bin, options : arguments.options } )
 		return { output : "" }

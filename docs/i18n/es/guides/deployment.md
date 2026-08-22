@@ -15,7 +15,7 @@ independiente.
 
 Para un proyecto de una sola versión más simple sin ninguna configuración
 de CI,
-[`bxDocs gh-deploy`](../cli-reference.md#gh-deploy) construye y empuja
+[`bxSites gh-deploy`](../cli-reference.md#gh-deploy) construye y empuja
 `site/` a una rama `gh-pages` en un solo comando, ejecutado desde tu
 propia máquina siempre que quieras publicar - sin necesidad de un archivo
 de flujo de trabajo. El resto de esta guía cubre el flujo de trabajo de
@@ -24,16 +24,16 @@ automática multiversión en cada push.
 
 ## Qué hace
 
-En cada push a `main` o `development` que toque `docs/`, `bxdocs.json`, o
+En cada push a `main` o `development` que toque `docs/`, `bxsites.json`, o
 la propia fuente del módulo (cambios de tema/canalización), el flujo de
 trabajo:
 
 1. Instala BoxLang + [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
-2. Registra este repositorio como un módulo para que `boxlang module:bxDocs build` se resuelva
+2. Registra este repositorio como un módulo para que `boxlang module:bxSites build` se resuelva
 3. En cualquier rama que no sea `main`, apunta `baseURL` a
    `.../<branch-name>/` solo para esta construcción (consulta
    [más abajo](#publishing-two-versions-at-once))
-4. Ejecuta `boxlang module:bxDocs build`
+4. Ejecuta `boxlang module:bxSites build`
 5. Empuja `site/` a la rama `gh-pages` - `main` a la raíz del sitio,
    `development` a `/development/` - sin tocar la otra versión
 
@@ -69,10 +69,10 @@ trabajo de cada rama solo empuja a `gh-pages` con `keep_files: true` y su
 propio `destination_dir`, de modo que un despliegue de `development`
 nunca sobrescribe el contenido de `main` y viceversa.
 
-El propio `bxdocs.json` de `main` debería tener `baseURL` configurado a
+El propio `bxsites.json` de `main` debería tener `baseURL` configurado a
 la raíz del sitio (`https://<user>.github.io/<repo>/`); el flujo de
 trabajo lo sobrescribe para cualquier otra rama en el momento de la
-construcción, así que el `bxdocs.json` de `development` no necesita su
+construcción, así que el `bxsites.json` de `development` no necesita su
 propia entrada `baseURL` para que esto funcione.
 
 Para añadir una tercera rama (por ejemplo, una vista previa de
@@ -94,7 +94,7 @@ línea `modules:` si tu proyecto necesita algo más allá de
 
 Un sitio de GitHub *Project* Pages (a diferencia de un sitio *user*
 `<user>.github.io`) se sirve desde `https://<user>.github.io/<repo>/`, no
-desde la raíz del dominio. Configura `baseURL` en `bxdocs.json` con esa
+desde la raíz del dominio. Configura `baseURL` en `bxsites.json` con esa
 URL completa para que cada enlace interno, recurso y entrada de
 navegación obtenga el prefijo `/<repo>/` que necesita - y para que
 también se genere un `sitemap.xml` real:

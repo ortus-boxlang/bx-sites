@@ -35,7 +35,7 @@
 class {
 
 	variables.includePattern = createObject( "java", "java.util.regex.Pattern" ).compile( '^:::\s*include\s+src="([^"]*)"\s*$' )
-	variables.frontmatterParser = new "models.build.FrontmatterParser@bxdocs"()
+	variables.frontmatterParser = new "models.build.FrontmatterParser@bxsites"()
 
 	/**
 	 * Replaces every `::: include src="..."` line in `markdown` with that
@@ -54,7 +54,7 @@ class {
 		var lines = listToArray( normalized, char( 10 ), true )
 		var currentDir = directoryOf( arguments.currentRelativePath )
 		var outputLines = []
-		var tracker = new "models.build.FenceTracker@bxdocs"()
+		var tracker = new "models.build.FenceTracker@bxsites"()
 
 		for ( var line in lines ) {
 			// An `::: include ...` line shown inside a fenced code example
@@ -79,13 +79,13 @@ class {
 
 			if ( !fileExists( absolutePath ) ) {
 				throw(
-					type    = "BxDocs.IncludeNotFound",
+					type    = "BxSites.IncludeNotFound",
 					message = "::: include src=""#src#"" (from #arguments.currentRelativePath#) - no file at #resolvedRelativePath#"
 				)
 			}
 			if ( arguments.seen.findNoCase( absolutePath ) ) {
 				throw(
-					type    = "BxDocs.CircularInclude",
+					type    = "BxSites.CircularInclude",
 					message = "Circular ::: include chain: #arguments.seen.toList( ' -> ' )# -> #resolvedRelativePath#"
 				)
 			}

@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.MarkdownPublisher", function() {
 
 			beforeEach( function() {
-				variables.publisher = new "models.build.MarkdownPublisher@bxdocs"();
+				variables.publisher = new "models.build.MarkdownPublisher@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,8 +17,8 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "copies a page's source .md to outputDir at its own relativePath, byte for byte", function() {
-				var sourceDir = createTempDirectory( prefix = "bxdocs-mdpub-src-" );
-				var outputDir = createTempDirectory( prefix = "bxdocs-mdpub-out-" );
+				var sourceDir = createTempDirectory( prefix = "bxsites-mdpub-src-" );
+				var outputDir = createTempDirectory( prefix = "bxsites-mdpub-out-" );
 				tempDirs.append( sourceDir );
 				tempDirs.append( outputDir );
 
@@ -32,8 +32,8 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "creates nested directories for a page under a subfolder", function() {
-				var sourceDir = createTempDirectory( prefix = "bxdocs-mdpub-src-" );
-				var outputDir = createTempDirectory( prefix = "bxdocs-mdpub-out-" );
+				var sourceDir = createTempDirectory( prefix = "bxsites-mdpub-src-" );
+				var outputDir = createTempDirectory( prefix = "bxsites-mdpub-out-" );
 				tempDirs.append( sourceDir );
 				tempDirs.append( outputDir );
 
@@ -48,8 +48,8 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "publishes every page in the array", function() {
-				var sourceDir = createTempDirectory( prefix = "bxdocs-mdpub-src-" );
-				var outputDir = createTempDirectory( prefix = "bxdocs-mdpub-out-" );
+				var sourceDir = createTempDirectory( prefix = "bxsites-mdpub-src-" );
+				var outputDir = createTempDirectory( prefix = "bxsites-mdpub-out-" );
 				tempDirs.append( sourceDir );
 				tempDirs.append( outputDir );
 

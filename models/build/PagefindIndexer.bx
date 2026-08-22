@@ -22,14 +22,14 @@ class {
 	 *
 	 * @siteDir Absolute path to the already-built site (must exist - run `build` first)
 	 * @bin The `pagefind` executable name/path - resolved against `PATH` when it's a bare name
-	 * @options Extra raw CLI arguments passed straight through to `pagefind` (bxdocs.json's `searchProvider.pagefind.options`)
+	 * @options Extra raw CLI arguments passed straight through to `pagefind` (bxsites.json's `searchProvider.pagefind.options`)
 	 *
 	 * @return { output } - pagefind's own combined stdout/stderr, for callers that want to surface it
 	 */
 	struct function index( required string siteDir, string bin = "pagefind", array options = [] ) {
 		if ( !directoryExists( arguments.siteDir ) ) {
 			throw(
-				type    = "BxDocs.SiteNotBuilt",
+				type    = "BxSites.SiteNotBuilt",
 				message = "No [#arguments.siteDir#] to index with pagefind - run `build` first"
 			)
 		}
@@ -40,7 +40,7 @@ class {
 		var result = exec( cmd, arguments.siteDir )
 		if ( result.exitCode != 0 ) {
 			throw(
-				type    = "BxDocs.PagefindFailed",
+				type    = "BxSites.PagefindFailed",
 				message = "`#cmd.toList( ' ' )#` failed (exit #result.exitCode#): #result.output#"
 			)
 		}
@@ -53,7 +53,7 @@ class {
 	 * stdout/stderr and exit code - the same pattern GhPagesDeployer.bx uses.
 	 * A missing binary (`pagefind` not installed/not on `PATH`) surfaces as a
 	 * `java.io.IOException` from `start()` itself, caught here and turned
-	 * into the same `BxDocs.PagefindFailed` shape with an install pointer,
+	 * into the same `BxSites.PagefindFailed` shape with an install pointer,
 	 * rather than a raw Java stack trace.
 	 *
 	 * @cmd Full argv, the `pagefind` binary included as element 1

@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.I18nStatusBuilder", function() {
 
 			beforeEach( function() {
-				variables.builder = new "models.build.I18nStatusBuilder@bxdocs"();
+				variables.builder = new "models.build.I18nStatusBuilder@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,7 +17,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newDocsDir() {
-				var dir = createTempDirectory( prefix = "bxdocs-i18nstatusbuilder-" );
+				var dir = createTempDirectory( prefix = "bxsites-i18nstatusbuilder-" );
 				tempDirs.append( dir );
 				var docsDir = dir & "/docs";
 				directoryCreate( docsDir & "/guides", true, true );

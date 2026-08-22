@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.SearchQuery", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.SearchQuery@bxdocs"();
+				variables.verb = new "models.cli.SearchQuery@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,27 +17,27 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newProjectRoot() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-searchquery-" );
+				var dir = createTempDirectory( prefix = "bxsites-cli-searchquery-" );
 				tempDirs.append( dir );
 				return dir;
 			}
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( { query : "x" } );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
-			it( "throws BxDocs.MissingQuery when query is blank", function() {
+			it( "throws BxSites.MissingQuery when query is blank", function() {
 				expect( function() {
 					verb.run( { projectRoot : newProjectRoot() } );
-				} ).toThrow( "BxDocs.MissingQuery" );
+				} ).toThrow( "BxSites.MissingQuery" );
 			} );
 
-			it( "throws BxDocs.SearchIndexNotBuilt when site/search-index.json doesn't exist", function() {
+			it( "throws BxSites.SearchIndexNotBuilt when site/search-index.json doesn't exist", function() {
 				expect( function() {
 					verb.run( { projectRoot : newProjectRoot(), query : "x" } );
-				} ).toThrow( "BxDocs.SearchIndexNotBuilt" );
+				} ).toThrow( "BxSites.SearchIndexNotBuilt" );
 			} );
 
 			it( "exits 0 and lists matching results with scores", function() {

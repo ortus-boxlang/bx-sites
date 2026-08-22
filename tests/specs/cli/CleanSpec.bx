@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.Clean", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.Clean@bxdocs"();
+				variables.verb = new "models.cli.Clean@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,15 +17,15 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private function newProjectDir() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-clean-" );
+				var dir = createTempDirectory( prefix = "bxsites-cli-clean-" );
 				tempDirs.append( dir );
 				return dir;
 			}
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( {} );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
 			it( "removes site/ and .cache/ when present, and reports what it removed", function() {
@@ -42,16 +42,16 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.message ).toInclude( ".cache" );
 			} );
 
-			it( "leaves docs/ and bxdocs.json alone", function() {
+			it( "leaves docs/ and bxsites.json alone", function() {
 				var dir = newProjectDir();
 				directoryCreate( dir & "/docs", true, true );
-				fileWrite( dir & "/bxdocs.json", '{"name":"Keep Me"}' );
+				fileWrite( dir & "/bxsites.json", '{"name":"Keep Me"}' );
 				directoryCreate( dir & "/site", true, true );
 
 				verb.run( { projectRoot : dir } );
 
 				expect( directoryExists( dir & "/docs" ) ).toBeTrue();
-				expect( fileExists( dir & "/bxdocs.json" ) ).toBeTrue();
+				expect( fileExists( dir & "/bxsites.json" ) ).toBeTrue();
 			} );
 
 			it( "reports nothing to clean when there is no site/ or .cache/", function() {

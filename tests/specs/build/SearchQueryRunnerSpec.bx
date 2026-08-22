@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.SearchQueryRunner", function() {
 
 			beforeEach( function() {
-				variables.runner = new "models.build.SearchQueryRunner@bxdocs"();
+				variables.runner = new "models.build.SearchQueryRunner@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,7 +17,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newSiteDir() {
-				var dir = createTempDirectory( prefix = "bxdocs-searchqueryrunner-" );
+				var dir = createTempDirectory( prefix = "bxsites-searchqueryrunner-" );
 				tempDirs.append( dir );
 				var siteDir = dir & "/site";
 				directoryCreate( siteDir, true, true );
@@ -27,28 +27,28 @@ class extends="testbox.system.BaseSpec" {
 			private void function seedIndex( required string siteDir ) {
 				var index = [
 					{ title : "Getting Started", url : "getting-started/index.html", headings : [ "Installation", "Quick Start" ], body : "Learn how to install BoxLang and get started quickly.", tags : [ "boxlang", "setup" ] },
-					{ title : "CLI Reference", url : "cli/index.html", headings : [ "Commands" ], body : "Every command the bx-docs CLI supports.", tags : [ "cli" ] },
+					{ title : "CLI Reference", url : "cli/index.html", headings : [ "Commands" ], body : "Every command the bx-sites CLI supports.", tags : [ "cli" ] },
 					{ title : "Advanced Config", url : "config/index.html", headings : [ "Themes", "Plugins" ], body : "Deep dive into advanced configuration options.", tags : [ "config" ] }
 				];
 				fileWrite( arguments.siteDir & "/search-index.json", jsonSerialize( index ) );
 			}
 
-			it( "throws BxDocs.SearchIndexNotBuilt when search-index.json doesn't exist", function() {
-				var dir = createTempDirectory( prefix = "bxdocs-searchqueryrunner-nofile-" );
+			it( "throws BxSites.SearchIndexNotBuilt when search-index.json doesn't exist", function() {
+				var dir = createTempDirectory( prefix = "bxsites-searchqueryrunner-nofile-" );
 				tempDirs.append( dir );
 
 				expect( function() {
 					runner.run( siteDir : dir & "/site", query : "x" );
-				} ).toThrow( "BxDocs.SearchIndexNotBuilt" );
+				} ).toThrow( "BxSites.SearchIndexNotBuilt" );
 			} );
 
-			it( "throws BxDocs.MissingQuery when query is blank", function() {
+			it( "throws BxSites.MissingQuery when query is blank", function() {
 				var siteDir = newSiteDir();
 				seedIndex( siteDir );
 
 				expect( function() {
 					runner.run( siteDir : siteDir, query : "   " );
-				} ).toThrow( "BxDocs.MissingQuery" );
+				} ).toThrow( "BxSites.MissingQuery" );
 			} );
 
 			it( "matches a term against title, tags, headings, and body, weighted by field", function() {

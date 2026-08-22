@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.ThemeRenderer", function() {
 
 			beforeEach( function() {
-				variables.renderer = new "models.build.ThemeRenderer@bxdocs"();
+				variables.renderer = new "models.build.ThemeRenderer@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,7 +17,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private function newProjectRoot() {
-				var dir = createTempDirectory( prefix = "bxdocs-themerenderer-" );
+				var dir = createTempDirectory( prefix = "bxsites-themerenderer-" );
 				tempDirs.append( dir );
 				return dir;
 			}
@@ -29,11 +29,11 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( themeDir & "/page.bxm" ) ).toBeTrue();
 			} );
 
-			it( "throws BxDocs.ThemeNotFound for an unknown theme with no project override", function() {
+			it( "throws BxSites.ThemeNotFound for an unknown theme with no project override", function() {
 				var root = newProjectRoot();
 				expect( function() {
 					renderer.resolveThemeDir( "not-a-real-theme", root );
-				} ).toThrow( "BxDocs.ThemeNotFound" );
+				} ).toThrow( "BxSites.ThemeNotFound" );
 			} );
 
 			it( "prefers a project-level theme/ override that satisfies the ThemeProvider contract", function() {
@@ -47,14 +47,14 @@ class extends="testbox.system.BaseSpec" {
 				expect( themeDir ).toBe( root & "/theme" );
 			} );
 
-			it( "throws BxDocs.InvalidTheme when a project theme/ override is missing page.bxm", function() {
+			it( "throws BxSites.InvalidTheme when a project theme/ override is missing page.bxm", function() {
 				var root = newProjectRoot();
 				directoryCreate( root & "/theme", true, true );
 				fileWrite( root & "/theme/layout.bxm", "<bx:output>custom layout</bx:output>" );
 
 				expect( function() {
 					renderer.resolveThemeDir( "bootstrap", root );
-				} ).toThrow( "BxDocs.InvalidTheme" );
+				} ).toThrow( "BxSites.InvalidTheme" );
 			} );
 
 			it( "resolves each built-in theme (bootstrap, material, tailwind) with a valid ThemeProvider contract", function() {
@@ -152,7 +152,7 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
-			it( "embeds bxdocs.json's [theme.options.colorMode] as the pre-paint default, across every built-in theme", function() {
+			it( "embeds bxsites.json's [theme.options.colorMode] as the pre-paint default, across every built-in theme", function() {
 				var root = newProjectRoot();
 				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
@@ -174,7 +174,7 @@ class extends="testbox.system.BaseSpec" {
 				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
 				// one short, near-unique fragment lifted from each icon's own SVG path -
-				// confirms bxdocsIcon() resolved the real icon rather than falling back to "generic"
+				// confirms bxsitesIcon() resolved the real icon rather than falling back to "generic"
 				var iconFingerprints = {
 					"youtube"  : "31.7",
 					"linkedin" : "20.447 20.452",
@@ -240,7 +240,7 @@ class extends="testbox.system.BaseSpec" {
 
 					expect( html ).toInclude( "repo-link" );
 					expect( html ).toInclude( "github.com" );
-					expect( html ).toInclude( "bxdocs-footer" );
+					expect( html ).toInclude( "bxsites-footer" );
 					expect( html ).toInclude( "social-link" );
 					expect( html ).toInclude( "twitter.com" );
 				}
@@ -257,7 +257,7 @@ class extends="testbox.system.BaseSpec" {
 					var html = renderer.renderPage( page, nav, config, themeDir );
 
 					expect( html ).notToInclude( "repo-link" );
-					expect( html ).notToInclude( "bxdocs-footer" );
+					expect( html ).notToInclude( "bxsites-footer" );
 				}
 			} );
 

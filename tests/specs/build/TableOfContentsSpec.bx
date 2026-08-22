@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.TableOfContents", function() {
 
 			beforeEach( function() {
-				variables.toc = new "models.build.TableOfContents@bxdocs"();
+				variables.toc = new "models.build.TableOfContents@bxsites"();
 			} );
 
 			it( "returns an empty array when there are no h2/h3 headings", function() {
@@ -31,11 +31,11 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "strips inline markup (e.g. <code>) from the heading text", function() {
-				var html = '<h2 id="the-bxdocs-json-file">The <code>bxdocs.json</code> file</h2>';
+				var html = '<h2 id="the-bxsites-json-file">The <code>bxsites.json</code> file</h2>';
 
 				var result = toc.build( html );
 
-				expect( result[ 1 ].text ).toBe( "The bxdocs.json file" );
+				expect( result[ 1 ].text ).toBe( "The bxsites.json file" );
 			} );
 
 			it( "skips headings with no id (nothing to link to)", function() {

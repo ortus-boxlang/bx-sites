@@ -1,7 +1,7 @@
 /**
- * Minimal module descriptor - a bx-docs plugin needs nothing beyond what
+ * Minimal module descriptor - a bx-sites plugin needs nothing beyond what
  * every BoxLang module already needs: this file (so it registers/
- * activates), and models/BxDocsPlugin.bx (so bx-docs finds its hooks -
+ * activates), and models/BxSitesPlugin.bx (so bx-sites finds its hooks -
  * see docs/guides/plugins.md).
  */
 class {

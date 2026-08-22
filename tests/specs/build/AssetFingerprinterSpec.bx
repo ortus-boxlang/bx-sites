@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.AssetFingerprinter", function() {
 
 			beforeEach( function() {
-				variables.fingerprinter = new "models.build.AssetFingerprinter@bxdocs"();
+				variables.fingerprinter = new "models.build.AssetFingerprinter@bxsites"();
 			} );
 
 			it( "hashOf() returns an 8-character lowercase hex digest", function() {

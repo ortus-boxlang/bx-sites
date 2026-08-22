@@ -30,7 +30,7 @@ class {
 	) {
 		var trimmedTitle = trim( arguments.title )
 		if ( !len( trimmedTitle ) ) {
-			throw( type = "BxDocs.MissingTitle", message = "`post:new` requires a title" )
+			throw( type = "BxSites.MissingTitle", message = "`post:new` requires a title" )
 		}
 
 		var computedSlug = len( trim( arguments.slug ) ) ? computeSlug( arguments.slug ) : computeSlug( trimmedTitle )
@@ -38,7 +38,7 @@ class {
 		var path = postsDir & "/" & computedSlug & ".md"
 
 		if ( fileExists( path ) ) {
-			throw( type = "BxDocs.PostAlreadyExists", message = "A post already exists at [#path#] - pick a different title/slug" )
+			throw( type = "BxSites.PostAlreadyExists", message = "A post already exists at [#path#] - pick a different title/slug" )
 		}
 
 		directoryCreate( postsDir, true, true )
