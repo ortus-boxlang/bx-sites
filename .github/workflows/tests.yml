@@ -53,17 +53,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          # TestBox's own runner always JSON-serializes the entire run's
-          # aggregated result memento in one call
-          # (system/runners/BoxLangRunner.bx: `jsonSerialize( testResults
-          # .getMemento( includeDebugBuffer = true ) )`), which can
-          # overflow the JVM's default thread stack. Splitting the suite
-          # across several `run` invocations (tried previously here)
-          # didn't reliably help - some small subsets crashed too, so this
-          # isn't simply proportional to test count. --verbose feeds more
-          # into that same debug buffer, so drop it here to shrink what
-          # gets serialized.
-          ./testbox/run --reporter=ANTJunit
+          ./testbox/run --reporter=ANTJunit --verbose
 
       - name: Upload Test Results
         if: always()
