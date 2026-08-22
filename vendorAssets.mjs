@@ -7,18 +7,23 @@
 //
 // Only libraries that are (a) a single self-contained static file/pair of
 // files, no further sub-resources of their own, and (b) either always
-// loaded (Bootstrap, highlight.js, Alpine.js) or gated behind bx-docs'
-// own existing `local` search provider (lunr.js) are vendored this way.
-// KaTeX (ships its own font files), Mermaid (a multi-megabyte bundle),
-// the Tailwind theme's CDN JIT compiler, Google Analytics' gtag.js, and
-// Algolia DocSearch (inherently talks to Algolia's own hosted API) stay
-// CDN-loaded - see MODULE_SPEC.md section 8 for the reasoning on each.
+// loaded (Bootstrap, highlight.js, Alpine.js) or gated behind a project's
+// own opt-in (lunr.js behind the `local` search provider, Mermaid behind
+// `bxdocs.json`'s `mermaid`) are vendored this way. Mermaid's own UMD
+// bundle (mermaid.min.js) is otherwise self-contained - its one dynamic
+// import, `elk-api.js` (an alternate layout engine used by a handful of
+// diagram types), isn't vendored and still resolves against jsDelivr, the
+// one remaining CDN dependency for a project using Mermaid. KaTeX (ships
+// its own font files as separate resources), the Tailwind theme's CDN JIT
+// compiler, Google Analytics' gtag.js, and Algolia DocSearch (inherently
+// talks to Algolia's own hosted API) stay CDN-loaded - see MODULE_SPEC.md
+// section 8 for the reasoning on each.
 //
 // Re-run this after bumping any pinned version below (keep it in sync
 // with the version each theme's own layout.bxm expects) to refresh
 // resources/assets/vendor/:
 //
-//   npm install --no-save bootstrap@5.3.3 @highlightjs/cdn-assets@11.10.0 alpinejs@3.14.1 lunr@2.3.9
+//   npm install --no-save bootstrap@5.3.3 @highlightjs/cdn-assets@11.10.0 alpinejs@3.14.1 lunr@2.3.9 mermaid@10.9.1
 //   node vendorAssets.mjs resources/assets/vendor
 
 import { copyFileSync, existsSync, mkdirSync } from "node:fs";
@@ -60,3 +65,5 @@ vendor("highlight.js", "highlight", [
 vendor("alpine.js", "alpine", [["node_modules/alpinejs/dist/cdn.min.js"]]);
 
 vendor("lunr", "lunr", [["node_modules/lunr/lunr.min.js"]]);
+
+vendor("mermaid", "mermaid", [["node_modules/mermaid/dist/mermaid.min.js"]]);

@@ -1135,7 +1135,8 @@ class {
 	 * unconditionally), the vendored third-party CSS/JS every built site
 	 * needs with no CDN/internet access (module spec section 8 - highlight.js
 	 * and Alpine.js always, Bootstrap's own CSS/JS for the `bootstrap` theme,
-	 * lunr.js alongside search.js), and a project's own `docs/assets/**` to
+	 * lunr.js alongside search.js, mermaid.js alongside mermaid-init.js when
+	 * `mermaid` is on), and a project's own `docs/assets/**` to
 	 * `site/assets/` (module spec section 5, step 6).
 	 *
 	 * @root Absolute path to the project root
@@ -1143,7 +1144,7 @@ class {
 	 * @siteDir Absolute path to the build output directory
 	 * @themeName bxdocs.json's `theme.name` - selects which vendored theme-specific assets (currently just Bootstrap's own CSS/JS) to copy
 	 * @searchEnabled Whether to copy the shared search.js/lunr widget - searchNeedsLocalIndex()'s own result, so this is only true for the `local` search provider (or one bx-docs doesn't otherwise know about), never `algolia`
-	 * @mermaidEnabled Whether to copy the shared mermaid-init.js widget
+	 * @mermaidEnabled Whether to copy the shared mermaid-init.js widget and the vendored mermaid.js bundle itself
 	 * @mathEnabled Whether to copy the shared math-init.js (KaTeX auto-render) widget
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - its already-generated variant files get copied into this tree's own site.../assets/, right alongside the plain docs/assets/** copy below; empty (the default) copies nothing extra
 	 * @cssBundle AssetBundler.bundleCss()'s own output (via applyAssetPipeline()) - its cached bundle file gets copied into this tree's own site.../assets/ so the `<link>` config.extraCss now points at actually resolves; empty `cachedPath` (the default) copies nothing
@@ -1178,6 +1179,7 @@ class {
 
 		if ( arguments.mermaidEnabled ) {
 			fileCopy( moduleAssetsDir() & "/mermaid-init.js", arguments.siteDir & "/assets/mermaid-init.js" )
+			directoryCopy( moduleAssetsDir() & "/vendor/mermaid", arguments.siteDir & "/assets/vendor/mermaid", true )
 		}
 
 		if ( arguments.mathEnabled ) {

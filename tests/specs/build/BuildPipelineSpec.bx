@@ -820,7 +820,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "assets/toc-collapse.js" );
 			} );
 
-			it( "renders mermaid.js and its init script only when [mermaid] is enabled, across every built-in theme", function() {
+			it( "renders mermaid.js and its init script only when [mermaid] is enabled, across every built-in theme, vendored with no CDN reference", function() {
 				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
 					var root = newProject( themeName );
 					fileWrite( root & "/docs/index.md", "Home" );
@@ -829,6 +829,7 @@ class extends="testbox.system.BaseSpec" {
 					var offHtml = fileRead( root & "/site/index.html" );
 					expect( offHtml ).notToInclude( "mermaid" );
 					expect( fileExists( root & "/site/assets/mermaid-init.js" ) ).toBeFalse();
+					expect( fileExists( root & "/site/assets/vendor/mermaid/mermaid.min.js" ) ).toBeFalse();
 
 					var mermaidRoot = newProject( themeName );
 					fileWrite(
@@ -841,7 +842,9 @@ class extends="testbox.system.BaseSpec" {
 					var onHtml = fileRead( mermaidRoot & "/site/index.html" );
 					expect( onHtml ).toInclude( "mermaid.min.js" );
 					expect( onHtml ).toInclude( "assets/mermaid-init.js" );
+					expect( onHtml ).notToInclude( "cdn.jsdelivr.net/npm/mermaid" );
 					expect( fileExists( mermaidRoot & "/site/assets/mermaid-init.js" ) ).toBeTrue();
+					expect( fileExists( mermaidRoot & "/site/assets/vendor/mermaid/mermaid.min.js" ) ).toBeTrue();
 				}
 			} );
 
