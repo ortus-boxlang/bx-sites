@@ -670,6 +670,7 @@ class {
 
 			var html = variables.markdownRenderer.toHtml( directivesExtracted.markdown, arguments.config.markdown )
 			html = variables.directiveBlockProcessor.restore( html, directivesExtracted.blocks, variables.markdownRenderer, arguments.config.markdown )
+			html = variables.directiveBlockProcessor.resolveFileHrefs( html, arguments.basePath )
 			html = variables.codeAnnotationProcessor.applyToHtml( html, codeExtracted.annotations )
 			html = variables.mathProtector.restore( html, mathProtected.formulas )
 			html = variables.tabsProcessor.restore( html, tabsExtracted.groups, variables.markdownRenderer, arguments.config.markdown )

@@ -15,6 +15,7 @@
  */
 class {
 
+	variables.iconResolver = new "models.build.IconResolver@bxdocs"()
 	variables.stubPattern = createObject( "java", "java.util.regex.Pattern" ).compile(
 		'<a class="bxdocs-page-link" href="([^"]*)" data-bxdocs-page-link><span class="bxdocs-page-link__title">[^<]*</span></a>'
 	)
@@ -65,7 +66,7 @@ class {
 
 		var html = '<a class="bxdocs-page-link" href="' & attrEscape( arguments.href ) & '" data-bxdocs-page-link>'
 		if ( len( icon ) ) {
-			html &= '<span class="bxdocs-page-link__icon">' & encodeForHTML( icon ) & '</span>'
+			html &= '<span class="bxdocs-page-link__icon">' & variables.iconResolver.resolve( icon ) & '</span>'
 		}
 		html &= '<span class="bxdocs-page-link__text">'
 			& '<span class="bxdocs-page-link__title">' & encodeForHTML( arguments.target.title ) & '</span>'
