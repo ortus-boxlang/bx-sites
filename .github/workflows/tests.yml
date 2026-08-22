@@ -53,25 +53,17 @@ jobs:
 
       - name: Run Tests
         run: |
-          # TestBox's own runner always JSON-serializes the *entire* run's
+          # TestBox's own runner always JSON-serializes the entire run's
           # aggregated result memento in one call
-          # (system/runners/BoxLangRunner.bx), regardless of reporter - a
-          # fixed-size JVM thread stack makes that overflow once the whole
-          # suite gets large enough, right after the very last spec
-          # finishes and before any tests/results/*.xml gets written. This
-          # repo's suite crossed that threshold once the asset-pipeline
-          # PR's own new tests pushed the total past ~608. The ANTJunit
-          # reporter already writes one TEST-<package>.xml file per suite
-          # regardless of how many `run` invocations produce them, so
-          # splitting the suite across a few invocations - each with its
-          # own smaller memento to serialize - avoids the crash without
-          # dropping any coverage.
-          STATUS=0
-          ./testbox/run --directory=tests.specs.build --reporter=ANTJunit --verbose || STATUS=1
-          ./testbox/run --directory=tests.specs.cli --reporter=ANTJunit --verbose || STATUS=1
-          ./testbox/run --directory=tests.specs.config --reporter=ANTJunit --verbose || STATUS=1
-          ./testbox/run --bundles=tests.specs.DogfoodDocsSpec,tests.specs.ModuleConfigCliSpec --reporter=ANTJunit --verbose || STATUS=1
-          exit $STATUS
+          # (system/runners/BoxLangRunner.bx: `jsonSerialize( testResults
+          # .getMemento( includeDebugBuffer = true ) )`), which can
+          # overflow the JVM's default thread stack. Splitting the suite
+          # across several `run` invocations (tried previously here)
+          # didn't reliably help - some small subsets crashed too, so this
+          # isn't simply proportional to test count. --verbose feeds more
+          # into that same debug buffer, so drop it here to shrink what
+          # gets serialized.
+          ./testbox/run --reporter=ANTJunit
 
       - name: Upload Test Results
         if: always()
