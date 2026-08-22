@@ -31,9 +31,9 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "exits 0 with no issues on a clean docs tree", function() {
 				var projectRoot = newProjectRoot();
-				fileWrite( projectRoot & "/docs/clean.md", "## Level Two
+				fileWrite( projectRoot & "/docs/clean.md", "#### Level Two
 
-### Level Three
+###### Level Three
 
 All good." );
 
@@ -45,9 +45,9 @@ All good." );
 
 			it( "exits 1 and reports a heading level skip", function() {
 				var projectRoot = newProjectRoot();
-				fileWrite( projectRoot & "/docs/skippy.md", "## Level Two
+				fileWrite( projectRoot & "/docs/skippy.md", "#### Level Two
 
-#### Level Four (skipped three)" );
+######## Level Four (skipped three)" );
 
 				var result = verb.run( { projectRoot : projectRoot } );
 

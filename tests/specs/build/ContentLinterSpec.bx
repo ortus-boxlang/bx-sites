@@ -26,9 +26,9 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "reports no issues for a clean docs tree", function() {
 				var docsDir = newDocsDir();
-				fileWrite( docsDir & "/clean.md", "## Level Two
+				fileWrite( docsDir & "/clean.md", "#### Level Two
 
-### Level Three
+###### Level Three
 
 All good." );
 
@@ -40,9 +40,9 @@ All good." );
 
 			it( "flags a heading level skip within a page's body", function() {
 				var docsDir = newDocsDir();
-				fileWrite( docsDir & "/skippy.md", "## Level Two
+				fileWrite( docsDir & "/skippy.md", "#### Level Two
 
-#### Level Four (skipped three)" );
+######## Level Four (skipped three)" );
 
 				var result = linter.lint( docsDir );
 
@@ -54,13 +54,13 @@ All good." );
 
 			it( "ignores heading-looking lines inside a fenced code block", function() {
 				var docsDir = newDocsDir();
-				fileWrite( docsDir & "/withcode.md", "## Heading
+				fileWrite( docsDir & "/withcode.md", "#### Heading
 
 ```bash
-#### this is not a heading, just a shell comment
+######## this is not a heading, just a shell comment
 ```
 
-### Real Next Heading" );
+###### Real Next Heading" );
 
 				var result = linter.lint( docsDir );
 
