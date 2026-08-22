@@ -16,7 +16,7 @@ stay on it. Both are fully supported and produce the exact same result;
 somehow has more than one, `bxdocs.yaml` wins, then `bxdocs.yml`, then
 `bxdocs.json`.
 
-```yaml
+```yaml title="bxdocs.yaml" linenums="1"
 name: "My Docs"
 description: ""
 baseURL: "/"
@@ -47,6 +47,10 @@ ogImage: ""
 generateOgImages: false
 extraCss: []
 extraJs: []
+assets:
+  fingerprint: true
+  bundle: true
+  images: { enabled: true, widths: [400, 800, 1200, 1600], formats: [original, webp] }
 plugins: []
 i18n:
   defaultLocale: { code: en, label: English }
@@ -58,7 +62,7 @@ blog:
 
 The equivalent `bxdocs.json`, for a project that prefers it:
 
-```json
+```json title="bxdocs.json" linenums="1"
 {
 	"name": "My Docs",
 	"description": "",
@@ -93,6 +97,11 @@ The equivalent `bxdocs.json`, for a project that prefers it:
 	"generateOgImages": false,
 	"extraCss": [],
 	"extraJs": [],
+	"assets": {
+		"fingerprint": true,
+		"bundle": true,
+		"images": { "enabled": true, "widths": [400, 800, 1200, 1600], "formats": ["original", "webp"] }
+	},
 	"plugins": [],
 	"i18n": {
 		"defaultLocale": { "code": "en", "label": "English" },
@@ -241,7 +250,7 @@ Which search UI `search: true` wires up:
   exactly as Algolia's own DocSearch client expects them. `insights`
   (`false` by default) turns on DocSearch's click/conversion analytics.
 
-  ```json
+  ```json title="bxdocs.json" linenums="1"
   {
     "search": true,
     "searchProvider": {
@@ -262,7 +271,7 @@ Which search UI `search: true` wires up:
   installed and on `PATH` - BX Docs shells out to it (like `git` for
   `lastUpdated`/`gh-deploy`), it doesn't install it for you.
 
-  ```json
+  ```json title="bxdocs.json" linenums="1"
   {
     "search": true,
     "searchProvider": {
@@ -300,7 +309,7 @@ container/section label - a non-clickable heading that just groups its
 children, the same role GitBook's "MAIN COMPONENTS" plays in its own
 sidebar:
 
-```json
+```json title="bxdocs.json" linenums="1"
 {
 	"nav": [
 		"index.md",
@@ -323,7 +332,7 @@ For a nav large enough that it clutters `bxdocs.json`, move it to its own
 `docs/nav.json` file instead - same array shape, just as the whole file's
 top-level content:
 
-```json
+```json title="docs/nav.json" linenums="1"
 [
 	"index.md",
 	{ "title": "Guides", "children": [ "guides/setup.md" ] }
@@ -367,7 +376,7 @@ Docs defaults it to `true` (see the [Markdown Extensions guide](guides/markdown.
 | `tableOptions.className` | `"table"` | CSS class on every rendered `<table>` |
 | `tableOptions.headerSeparationColumnMatch` | `true` | Requires the `---` separator row to match the header's column count |
 
-```json
+```json title="bxdocs.json" linenums="1"
 {
 	"markdown": {
 		"enableFootnotes": true,
@@ -394,7 +403,7 @@ when both keys are set, an "Edit this page" link on every page.
   `repo.url` too; leave blank to omit edit links while still showing the
   header icon.
 
-```json
+```json title="bxdocs.json"
 { "repo": { "url": "https://github.com/acme/docs", "editUri": "edit/main/docs/" } }
 ```
 
@@ -408,7 +417,7 @@ needs a `url`; `icon` selects from a small built-in icon set (`github`,
 for anything else), and `label` sets the link's accessible name/tooltip
 (defaults to `icon`, then `"Link"`).
 
-```json
+```json title="bxdocs.json" linenums="1"
 {
 	"social": [
 		{ "url": "https://twitter.com/acme", "icon": "twitter", "label": "Twitter" },
@@ -423,7 +432,7 @@ for anything else), and `label` sets the link's accessible name/tooltip
 a copyright line (`© <year> <site name>`), the `social` links (if any),
 and a "Built with BX Docs" credit.
 
-```json
+```json title="bxdocs.json"
 { "footer": true }
 ```
 
@@ -437,7 +446,7 @@ with no commits yet, a build running from a downloaded zip with no `.git`
 at all, or git not being installed on the build machine - rather than
 breaking the build.
 
-```json
+```json title="bxdocs.json"
 { "lastUpdated": true }
 ```
 
@@ -451,7 +460,7 @@ Wires up pageview analytics. Currently supports Google Analytics
 - `analytics.id` - the Google Analytics measurement ID (e.g. `"G-ABC123"`).
   Required when `provider` is `"google"`.
 
-```json
+```json title="bxdocs.json"
 { "analytics": { "provider": "google", "id": "G-ABC123" } }
 ```
 
@@ -464,7 +473,7 @@ prefixed with `baseURL`, absolute URLs are used as-is). Left blank (the
 default) and `generateOgImages` off, no `og:image`/`twitter:card` tags are
 rendered.
 
-```json
+```json title="bxdocs.json"
 { "ogImage": "assets/social-card.png" }
 ```
 
@@ -481,7 +490,7 @@ site-wide image. Pure `java.awt`/`javax.imageio` under the hood (part of
 any JVM BoxLang runs on), so this needs no headless browser, external
 service, or network access at build time.
 
-```json
+```json title="bxdocs.json"
 { "generateOgImages": true }
 ```
 
@@ -492,12 +501,69 @@ after the theme's own assets - each entry is resolved the same way as
 `theme.logo` (a relative path is prefixed with `baseURL`; an absolute URL
 is used as-is). `extraJs` entries are loaded with `defer`.
 
-```json
+```json title="bxdocs.json" linenums="1"
 {
 	"extraCss": [ "assets/custom.css" ],
 	"extraJs": [ "assets/custom.js" ]
 }
 ```
+
+When `assets.bundle` is on (the default), a local `extraCss`/`extraJs`
+list like the one above is bundled into one fingerprinted file each,
+instead of one `<link>`/`<script>` tag per entry - see [`assets`](#assets)
+below.
+
+## `assets`
+
+```json title="bxdocs.json" linenums="1"
+{
+	"assets": {
+		"fingerprint": true,
+		"bundle": true,
+		"images": {
+			"enabled": true,
+			"widths": [ 400, 800, 1200, 1600 ],
+			"formats": [ "original", "webp" ]
+		}
+	}
+}
+```
+
+The asset pipeline - image resizing/WebP via
+[bx-image](https://github.com/ortus-boxlang/bx-image) (a required
+dependency, installed alongside bx-markdown/bx-esapi) and CSS/JS
+bundling. Everything here is on by default with reasonable settings - a
+fresh `bxDocs new` project needs to touch none of this. See
+[Responsive Images](guides/images.md) for the full picture, including
+what deliberately isn't covered (AVIF, animated GIFs, SVGs).
+
+- `assets.fingerprint` - `true` (the default). Content-hash-names every
+  generated image variant and CSS/JS bundle (e.g.
+  `screenshot-800w.a3f9c2e1.webp`, `bundle.a3f9c2e1.css`) so they can be
+  served with safe, far-future cache headers - a project's build changes
+  the file's own name only when its content actually changes. Does not
+  rename a project's own original files under `docs/assets/` - only
+  pipeline-generated output gets fingerprinted, so anything else that
+  references an asset by its plain filename (a `::: file` download card,
+  a raw markdown link) keeps working unchanged.
+- `assets.bundle` - `true` (the default). Concatenates `extraCss`/`extraJs`
+  into one fingerprinted file each - pure BoxLang/JVM, no Node/esbuild
+  toolchain. Falls back to today's exact per-URL `<link>`/`<script>`
+  behavior, untouched, the moment any entry in the list is an external
+  URL (a CDN link) or names a file that doesn't exist - see
+  [Responsive Images](guides/images.md#css-js-bundling).
+- `assets.images.enabled` - `true` (the default). Every eligible
+  `docs/assets/**` image (`.png`/`.jpg`/`.jpeg`) gets resized/WebP
+  variants generated via bx-image, and every matching `<img>` gets
+  rewritten into a `<picture>` with `srcset`. Set `false` to fall back
+  to plain, unprocessed image copying, exactly as before this feature
+  existed.
+- `assets.images.widths` - breakpoints to generate, in pixels. A width at
+  or above a given image's own width is skipped automatically for that
+  image - nothing is ever upscaled.
+- `assets.images.formats` - `"original"` keeps the source format as the
+  `<img>` fallback; `"webp"` adds a same-size `<source type="image/webp">`
+  variant. Both on by default.
 
 ## `mermaid`
 
@@ -506,7 +572,7 @@ support shipped at all. `true` loads `mermaid.js` client-side and renders
 every ` ```mermaid ` fenced code block as a diagram. See
 [Markdown Extensions](guides/markdown.md#diagrams) for the syntax.
 
-```json
+```json title="bxdocs.json"
 { "mermaid": true }
 ```
 
@@ -517,7 +583,7 @@ every ` ```mermaid ` fenced code block as a diagram. See
 into a page's markdown. See
 [Markdown Extensions](guides/markdown.md#math) for the syntax.
 
-```json
+```json title="bxdocs.json"
 { "math": true }
 ```
 
@@ -533,7 +599,7 @@ plugins. Installing a plugin module (`box install`) never activates it on
 its own; it has to be named here too. See [Plugins](guides/plugins.md)
 for how to write one.
 
-```json
+```json title="bxdocs.json"
 { "plugins": [ "myBxDocsPlugin" ] }
 ```
 
@@ -554,7 +620,7 @@ switcher.
   an optional emoji override for the language switcher's flag icon - most
   common codes already resolve to a sensible flag on their own.
 
-```json
+```json title="bxdocs.json" linenums="1"
 {
 	"i18n": {
 		"defaultLocale": { "code": "en", "label": "English" },
@@ -576,13 +642,19 @@ Options for the [blog](guides/blog.md) - itself a by-convention feature
 (`docs/blog/posts/`), no key here required to turn it on.
 
 - `blog.postsPerPage` - `10` (the default) - how many posts per page on
-  `/blog/` and every category page before it moves to `.../page/2/`.
+  `/blog/`, every category page, and every `/blog/archive/<year>/` page
+  before it moves to `.../page/2/`.
 - `blog.feed` - `true` (the default) - whether `/blog/feed.xml` (RSS 2.0)
   is written. Only meaningful with an absolute `baseURL`, same requirement
   as `sitemap.xml`.
+- `blog.feedLimit` - `25` (the default) - caps `/blog/feed.xml` to this
+  many most-recent posts. `0` means unlimited (every post, in full). Most
+  feed readers only care about what's new, so an unbounded feed on a blog
+  with hundreds of posts just wastes bandwidth on every poll - see
+  [Blog: Feed](guides/blog.md#feed).
 
-```json
-{ "blog": { "postsPerPage": 10, "feed": true } }
+```json title="bxdocs.json"
+{ "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
 ```
 
 See [Blog](guides/blog.md) for post/author frontmatter, categories,
@@ -595,7 +667,7 @@ key for it. Add a `docs/versions/` folder, and each direct subfolder inside
 it is built as its own fully self-contained doc tree, alongside your
 regular `docs/` (which always builds as "Latest"):
 
-```
+```text title="docs/ layout"
 docs/
 ├── index.md
 ├── guides/

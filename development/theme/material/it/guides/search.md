@@ -46,7 +46,7 @@ di ricerca esterno.
 ```
 
 Salta del tutto la compilazione di `search-index.json`, e salta il box di
-ricerca, lo script CDN di `lunr.js`, e il widget condiviso `search.js` in
+ricerca, lo script incluso `lunr.js`, e il widget condiviso `search.js` in
 ogni pagina renderizzata - un progetto con la ricerca disattivata non
 distribuisce assolutamente nulla legato alla ricerca.
 

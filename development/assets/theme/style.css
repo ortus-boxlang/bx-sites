@@ -761,6 +761,7 @@ dd {
 
 .bxdocs-pre {
 	position: relative;
+	margin: 2rem 0;
 }
 
 .bxdocs-copy-btn {
@@ -1024,6 +1025,7 @@ code:not( pre code ) {
 	font-size: 0.8rem;
 	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 	font-weight: 600;
+	margin-top: 2rem;
 }
 
 /* frame="terminal" - macOS-style traffic-light chrome, title centered
@@ -1600,4 +1602,85 @@ a.bxdocs-card:hover {
 	height: 100%;
 	object-fit: cover;
 	border-radius: 10px;
+}
+
+/* Blog: draft preview badge (bxDocs serve only - see BuildPipeline.bx's
+   own includeDrafts), a "Browse by year"/"Browse by category" simple link
+   list on the main /blog/ list page, and the /blog/stats/ page's cards
+   (which reuse .bxdocs-cards/.bxdocs-card above - the ::: cards directive
+   block's own component - rather than a separate stats-card component). */
+.blog-draft-badge {
+	display: inline-block;
+	margin: 0 0 1rem;
+	padding: 0.35rem 0.85rem;
+	border-radius: 999px;
+	background: var( --bxdocs-step-warning-bg );
+	color: var( --bxdocs-step-warning-text );
+	font-size: 0.85rem;
+	font-weight: 600;
+}
+
+.blog-post-card--draft {
+	border: 1px dashed var( --bxdocs-step-warning-bg );
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+.blog-archive-links,
+.blog-category-links {
+	margin: 2rem 0;
+}
+
+.blog-archive-links h2,
+.blog-category-links h2 {
+	margin-bottom: 0.5rem;
+}
+
+.blog-archive-links ul,
+.blog-category-links ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 1.25rem;
+}
+
+.blog-author-posts {
+	margin: 1rem 0 2rem;
+}
+
+.blog-author-search {
+	width: 100%;
+	max-width: 320px;
+	margin-bottom: 1rem;
+	padding: 0.4rem 0.75rem;
+	border: 1px solid var( --bxdocs-border );
+	border-radius: 6px;
+	background: var( --bxdocs-bg );
+	color: inherit;
+	font-size: 0.9rem;
+}
+
+.blog-author-posts-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.blog-author-posts-list li {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.5rem;
+	padding: 0.5rem 0;
+	border-bottom: 1px solid var( --bxdocs-border );
+}
+
+.blog-author-posts-list .blog-post-meta {
+	color: var( --bxdocs-muted );
+	font-size: 0.85rem;
 }

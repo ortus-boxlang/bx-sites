@@ -1,7 +1,7 @@
 ---
 title: Konfiguration
 order: 4
-icon: ⚙️
+icon: phosphor-duotone:gear-six
 summary: Jeder Konfigurationsschlüssel, sein Standardwert und was er bewirkt.
 tags: [referenz, konfiguration]
 ---

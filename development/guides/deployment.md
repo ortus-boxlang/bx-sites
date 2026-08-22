@@ -87,7 +87,7 @@ domain root. Set `baseURL` in `bxdocs.json` to that full URL so every
 internal link, asset and nav entry gets the `/<repo>/` prefix it needs -
 and so a real `sitemap.xml` gets generated too:
 
-```json
+```json title="bxdocs.json"
 { "baseURL": "https://<user>.github.io/<repo>/" }
 ```
 

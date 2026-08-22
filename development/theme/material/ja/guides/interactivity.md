@@ -37,7 +37,7 @@ its own client-side state.
 A common one: a button next to an install command that copies it and
 confirms the copy:
 
-```markdown
+```markdown title="Copy button" linenums="1"
 <div x-data="{ copied: false }">
   <button type="button" @click="navigator.clipboard.writeText( 'box install bx-docs' ); copied = true; setTimeout( () => copied = false, 1500 )">
     <span x-show="!copied">Copy install command</span>
@@ -57,7 +57,7 @@ confirms the copy:
 
 Filtering a list client-side, no server round-trip:
 
-```markdown
+```markdown title="Live filter" linenums="1"
 <div x-data="{ query: '' }">
   <input type="text" x-model="query" placeholder="Filter providers...">
   <ul>
@@ -77,7 +77,7 @@ re-evaluates on every keystroke.
 anything inside that element can read/write it, and `x-show`/`x-text`/
 `x-model`/`@click` (shorthand for `x-on:click`) all react to it changing:
 
-```markdown
+```markdown title="Example" linenums="1"
 <div x-data="{ count: 0 }">
   <button type="button" @click="count++">Clicked <span x-text="count"></span> times</button>
 </div>
@@ -91,9 +91,10 @@ full directive list (`x-if`, `x-for`, `x-transition`, and more).
 - **It's core, not optional.** The theme chrome (dark mode, language
   switcher) depends on Alpine, so it can't be turned off in `bxdocs.json`
   the way `mermaid`/`math` can.
-- **Version.** Currently `alpinejs@3.14.1`, loaded from the jsDelivr CDN -
-  check a theme's own `layout.bxm` for the exact `<script>` tag if you
-  need to know precisely what's loaded.
+- **Version.** Currently `alpinejs@3.14.1`, vendored with this module and
+  served from `site/assets/vendor/alpine/` - no CDN involved. Check a
+  theme's own `layout.bxm` for the exact `<script>` tag if you need to
+  know precisely what's loaded.
 - **Strict CSP.** Alpine's default build evaluates the JS expressions
   inside `x-data`/`@click` etc. directly, which needs `unsafe-eval` under
   a strict Content-Security-Policy. If your deployment can't allow that,

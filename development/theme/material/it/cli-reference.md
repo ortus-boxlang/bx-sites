@@ -1,7 +1,7 @@
 ---
 title: Riferimento CLI
 order: 3
-icon: ⌨️
+icon: phosphor-duotone:terminal-window
 summary: Ogni verbo di bxDocs e i suoi flag.
 tags: [riferimento, cli]
 ---

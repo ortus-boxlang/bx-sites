@@ -1,7 +1,7 @@
 ---
 title: 設定
 order: 4
-icon: ⚙️
+icon: phosphor-duotone:gear-six
 summary: サイト設定のすべてのキー、デフォルト値、および動作。
 tags: [reference, configuration]
 ---

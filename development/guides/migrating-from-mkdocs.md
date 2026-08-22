@@ -10,7 +10,7 @@ tags: [guides, migration, mkdocs]
 `bxDocs migrate --from=mkdocs` converts an mkdocs project - `mkdocs.yml`
 plus its `docs/` folder - into a complete bx-docs project, in one command:
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxDocs migrate --source=/path/to/mkdocs-project --from=mkdocs
 ```
 
@@ -53,7 +53,7 @@ bx-docs already behaves that way out of the box.
 
 **`nav:` → `docs/nav.json`:**
 
-```yaml
+```yaml title="mkdocs.yml" linenums="1"
 # mkdocs.yml
 nav:
   - Home: index.md
@@ -65,7 +65,7 @@ nav:
 
 becomes:
 
-```json
+```json title="docs/nav.json" linenums="1"
 [
   { "title": "Home", "path": "index.md", "children": [] },
   { "title": "Guide", "path": "", "children": [
@@ -113,7 +113,7 @@ dropped:
 
 ## Worked example
 
-```bash
+```bash frame="terminal" title="Terminal" linenums="1"
 boxlang module:bxDocs new --projectRoot=my-docs
 boxlang module:bxDocs migrate --projectRoot=my-docs --source=../my-mkdocs-project --from=mkdocs
 cd my-docs

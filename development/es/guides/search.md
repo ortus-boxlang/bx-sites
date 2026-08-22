@@ -46,9 +46,10 @@ externo involucrado.
 ```
 
 Omite la construcción de `search-index.json` por completo, y omite el
-cuadro de búsqueda, el script CDN de `lunr.js`, y el widget compartido
-`search.js` en cada página renderizada - un proyecto con la búsqueda
-desactivada no envía nada relacionado con búsqueda en absoluto.
+cuadro de búsqueda, el script incluido/autoalojado de `lunr.js`, y el
+widget compartido `search.js` en cada página renderizada - un proyecto
+con la búsqueda desactivada no envía nada relacionado con búsqueda en
+absoluto.
 
 ## Reconstruir solo el índice
 

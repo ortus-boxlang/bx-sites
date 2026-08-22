@@ -13,9 +13,20 @@ plantillas ni un paso de compilación separados involucrados.
 
 | Tema | Base | Notas |
 |---|---|---|
-| `bootstrap` (predeterminado) | [Bootstrap 5](https://getbootstrap.com/) vía CDN | Fuente Poppins, barra de navegación con degradado de marca |
+| `bootstrap` (predeterminado) | [Bootstrap 5](https://getbootstrap.com/), incluido localmente | Fuente Poppins, barra de navegación con degradado de marca |
 | `material` | CSS al estilo Material escrito a mano | Diseño de tarjetas, sombras de elevación, fuente Roboto |
 | `tailwind` | [Tailwind Play CDN](https://tailwindcss.com/) | Basado en clases de utilidad, sin paso de compilación |
+
+El propio CSS/JS de cada tema incorporado (el paquete CSS/JS de Bootstrap,
+highlight.js, Alpine.js, lunr.js para el proveedor de búsqueda `local`
+predeterminado, y Mermaid cuando `mermaid` está activado) se incluye con
+este módulo y se copia directamente en cada `site/` construido - sin CDN,
+sin necesidad de acceso a internet para ver un sitio construido. El
+propio motor de utilidades del tema `tailwind` (un compilador JIT del
+lado del cliente, no una hoja de estilo estática) y otras funciones
+opcionales que actives tú mismo (`math`, búsqueda de Algolia, Google
+Analytics) siguen cargándose desde un CDN o una API alojada - consulta
+[Sitios sin conexión a internet](#air-gapped-offline-sites) más abajo.
 
 Los tres aplican la misma paleta de marca de BoxLang: un degradado
 `#00FF78 -> #00DBFF` y un acento `#FFF500` - y los tres incluyen el mismo
@@ -113,6 +124,45 @@ Define cuál usa un proyecto en `bxdocs.json`:
 ```json
 { "theme": { "name": "material" } }
 ```
+
+## Sitios sin conexión a internet (air-gapped) {#air-gapped-offline-sites}
+
+Un sitio construido funciona sin ningún acceso a internet por defecto,
+para los temas `bootstrap` y `material` con el proveedor de búsqueda
+`local` predeterminado: el propio CSS/JS de Bootstrap, highlight.js,
+Alpine.js y lunr.js vienen todos incluidos con este módulo
+(`resources/assets/vendor/`) y se copian directamente en
+`site/assets/vendor/` en el momento de la construcción - sin ninguna
+etiqueta `<script>`/`<link>` a un CDN en ningún lugar del HTML generado
+para ninguno de ellos. Activar la clave `mermaid` de `bxdocs.json` incluye
+Mermaid de la misma forma - su paquete `mermaid.min.js` se copia en
+`site/assets/vendor/mermaid/` y cada tema incorporado lo carga desde ahí,
+de modo que los diagramas se siguen renderizando con cero solicitudes
+salientes.
+
+Todavía hay algunas cosas que se comunican con la red, solo cuando tú
+mismo las activas:
+
+- El propio motor de utilidades del tema `tailwind` es un compilador JIT
+  del lado del cliente cargado desde `cdn.tailwindcss.com` - no es una
+  hoja de estilo estática que este módulo pueda incluir de la misma
+  forma, así que este tema todavía no es apto para sitios sin conexión.
+- El propio motor de diseño de Mermaid carga de forma diferida un
+  fragmento adicional, `elk-api.js`, desde jsDelivr - pero solo para los
+  tipos de diagrama que optan por el algoritmo de diseño `elk`; el
+  `mermaid.min.js` incluido renderiza por sí solo cualquier otro tipo de
+  diagrama.
+- La opción `math` de `bxdocs.json` carga KaTeX (tanto su JS como sus
+  propios archivos de fuente) desde un CDN cuando está activada.
+- `searchProvider.provider: "algolia"` y `analytics.provider: "google"`
+  se comunican inherentemente con una API alojada/un endpoint de
+  seguimiento - incluir el archivo JS localmente no eliminaría esa
+  dependencia.
+
+Si tu entorno de despliegue realmente no tiene ningún acceso a internet,
+limítate a `bootstrap`/`material`, al proveedor de búsqueda `local`
+predeterminado, evita los diagramas Mermaid con diseño `elk` si `mermaid`
+está activado, y deja desactivados `math`/Algolia/Analytics.
 
 ## Iconos
 

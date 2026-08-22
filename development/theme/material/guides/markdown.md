@@ -30,7 +30,7 @@ flowchart LR
 
 A callout/note box - on by default, no `bxdocs.json` config needed:
 
-```markdown
+```markdown title="Example" linenums="1"
 !!! note "Heads Up"
     This is an admonition. Its content is regular markdown - **bold**,
     `code`, [links](../index.md) and lists all work exactly as normal.
@@ -93,7 +93,7 @@ Prefix the type with `???` instead of `!!!` to make the block collapsible -
 `???` starts collapsed, `???+` starts open. Either way the heading is
 clickable to toggle it:
 
-```markdown
+```markdown title="Example" linenums="1"
 ??? tip "Click to expand"
     This starts collapsed.
 
@@ -114,7 +114,7 @@ Turn admonitions off entirely with `{"markdown":{"enableAdmonition":false}}`.
 Reference a footnote inline with `[^label]` and define its text anywhere in
 the document with `[^label]: text`:
 
-```markdown
+```markdown title="Example" linenums="1"
 Here's a claim that needs backing up[^1].
 
 [^1]: Here's the backup.
@@ -133,7 +133,7 @@ default - turn it on with `{"markdown":{"enableFootnotes":true}}`.
 A term line followed by one or more `:   ` description lines becomes a
 `<dl>`:
 
-```markdown
+```markdown title="Example" linenums="1"
 Term
 :   Its definition.
 
@@ -157,7 +157,7 @@ Group alternative content - different languages, different platforms -
 behind a set of clickable tabs with `=== "Title"`, indented the same way an
 admonition body is (4 spaces or a tab):
 
-```markdown
+```markdown title="Example" linenums="1"
 === "Java"
     ```java
     System.out.println( "Hi" );
@@ -310,7 +310,7 @@ grammar recognizing unified-diff syntax (`+`/`-`/`@@` lines) on its own:
 
 Which renders as:
 
-```diff
+```diff title="git diff"
 --- a/add.bx
 +++ b/add.bx
 @@ -1,4 +1,5 @@
@@ -362,7 +362,7 @@ starts.
 
 Opt-in via `bxdocs.json`'s [`mermaid`](../configuration.md#mermaid) key:
 
-```json
+```json title="bxdocs.json"
 { "mermaid": true }
 ```
 
@@ -384,7 +384,7 @@ for everything it can draw.
 
 Opt-in via `bxdocs.json`'s [`math`](../configuration.md#math) key:
 
-```json
+```json title="bxdocs.json"
 { "math": true }
 ```
 
@@ -392,7 +392,7 @@ Once enabled, [KaTeX](https://katex.org/) typesets `$...$` for inline math
 and `$$...$$` for a centered block, both written straight into the markdown
 body:
 
-```markdown
+```markdown title="Example" linenums="1"
 Euler's identity, $e^{i\pi} + 1 = 0$, relates five constants in one line.
 
 $$
@@ -427,7 +427,7 @@ content.
 A plain collapsible section - no callout icon/color, unlike a collapsible
 admonition (`???`, see [Admonitions](#collapsible-admonitions)):
 
-```markdown
+```markdown title="Example" linenums="1"
 ::: expandable "Is this different from a collapsible admonition?"
 Yes - this has no type/icon/color, just a plain expand/collapse section.
 Add `open="true"` to start it expanded.
@@ -448,7 +448,7 @@ the same way frontmatter/nav `icon` values are - a plain emoji, or a named
 icon from a bundled library (`icon="phosphor-duotone:rocket-launch"`,
 `icon="lucide:rocket"`, ...) - see [Themes: Icons](themes.md#icons):
 
-```markdown
+```markdown title="Example" linenums="1"
 ::: cards
 ::: card title="Getting Started" icon="phosphor-duotone:rocket-launch" href="../getting-started.md"
 Install, scaffold and build your first site.
@@ -474,7 +474,7 @@ A side-by-side layout - `::: column` accepts an optional `width` (a plain
 CSS length/percentage, e.g. `"40%"`); columns with no explicit width
 share the row equally:
 
-```markdown
+```markdown title="Example" linenums="1"
 ::: columns
 ::: column width="60%"
 The wider column.
@@ -498,7 +498,7 @@ The narrower one.
 
 A numbered, connected sequence of steps:
 
-```markdown
+```markdown title="Example" linenums="1"
 ::: stepper
 ::: step "Install"
 `install-bx-module bx-docs`
@@ -522,7 +522,7 @@ A step's own optional `color` attribute flags its marker with one of four
 semantic colors - the default (no `color`), `success`, `warning` or
 `danger` - independent of the step's position in the sequence:
 
-```markdown
+```markdown title="Example" linenums="1"
 ::: stepper
 ::: step "Back up your data" color="success"
 Routine, safe to run any time.
@@ -558,7 +558,7 @@ A download card for a PDF, video, or any other project asset - `src` is
 resolved the same way `theme.logo`/frontmatter `ogImage` already are
 (relative to `docs/assets/`):
 
-```markdown
+```markdown title="Example" linenums="1"
 ::: file src="assets/spec.pdf" title="API Specification"
 :::
 ```
@@ -570,7 +570,7 @@ Vimeo, CodePen, Spotify, Loom and Figma. A URL from anywhere else falls
 back to a plain "visit ↗" link card instead of an iframe that would just
 refuse to render (most sites block being framed):
 
-```markdown
+```markdown title="Example" linenums="1"
 ::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
 :::
 ```
@@ -583,7 +583,7 @@ Unlike a card, its title/icon/summary are pulled automatically from the
 target page's own frontmatter, so it stays in sync if that page is
 renamed or its summary changes:
 
-```markdown
+```markdown title="Example" linenums="1"
 ::: page-link href="../getting-started.md"
 :::
 ```
@@ -596,7 +596,7 @@ renamed or its summary changes:
 A dated, taggable changelog list - `::: update` accepts `date="YYYY-MM-DD"`
 and an optional comma-separated `tags`:
 
-```markdown
+```markdown title="Example" linenums="1"
 ::: updates
 ::: update date="2026-01-15" tags="feature,fix"
 Added dark mode and fixed a footer alignment bug.
@@ -621,7 +621,7 @@ becomes real page content (headings, paragraphs, its own nested blocks),
 not something wrapped in a widget - useful for a warning/notice repeated
 across several pages:
 
-```markdown
+```markdown title="Example"
 ::: include src="_shared/beta-notice.md"
 ```
 
@@ -635,7 +635,7 @@ HTML - which bx-markdown/Flexmark passes through completely untouched
 (CommonMark's own "HTML block" rule), so no bx-docs-specific syntax is
 needed at all:
 
-```markdown
+```markdown title="Example" linenums="1"
 <figure>
   <img src="../assets/screenshot.png" alt="The build output">
   <figcaption>A freshly built site</figcaption>

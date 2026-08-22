@@ -1,7 +1,7 @@
 ---
 title: Per iniziare
 order: 2
-icon: 🚀
+icon: phosphor-duotone:rocket-launch
 summary: Installa il modulo, genera lo scheletro di un progetto e compila il tuo primo sito.
 tags: [guide, configurazione-iniziale]
 ---
