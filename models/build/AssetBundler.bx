@@ -27,22 +27,24 @@ class {
 	 * @urls bxdocs.json's own `extraCss` array
 	 * @docsDir Absolute path to the project's `docs/` directory - each entry resolves against it, same convention `theme.logo`/`ogImage` already use
 	 * @cacheDir Absolute path to this project's own `.cache/assets/` directory
+	 * @fingerprint `assets.fingerprint` - `true` (the default) content-hash-names the bundle; `false` names it plain `bundle.css`, rewritten (never cache-skipped) on every build
 	 *
 	 * @return { bundleUrl, urls } - see bundle()'s own docblock
 	 */
-	struct function bundleCss( required array urls, required string docsDir, required string cacheDir ) {
-		return bundle( arguments.urls, arguments.docsDir, arguments.cacheDir, "css" )
+	struct function bundleCss( required array urls, required string docsDir, required string cacheDir, boolean fingerprint = true ) {
+		return bundle( arguments.urls, arguments.docsDir, arguments.cacheDir, "css", arguments.fingerprint )
 	}
 
 	/**
 	 * @urls bxdocs.json's own `extraJs` array
 	 * @docsDir Absolute path to the project's `docs/` directory
 	 * @cacheDir Absolute path to this project's own `.cache/assets/` directory
+	 * @fingerprint `assets.fingerprint` - `true` (the default) content-hash-names the bundle; `false` names it plain `bundle.js`, rewritten (never cache-skipped) on every build
 	 *
 	 * @return { bundleUrl, urls } - see bundle()'s own docblock
 	 */
-	struct function bundleJs( required array urls, required string docsDir, required string cacheDir ) {
-		return bundle( arguments.urls, arguments.docsDir, arguments.cacheDir, "js" )
+	struct function bundleJs( required array urls, required string docsDir, required string cacheDir, boolean fingerprint = true ) {
+		return bundle( arguments.urls, arguments.docsDir, arguments.cacheDir, "js", arguments.fingerprint )
 	}
 
 	/**
@@ -50,30 +52,52 @@ class {
 	 * @docsDir Absolute path to the project's `docs/` directory
 	 * @cacheDir Absolute path to this project's own `.cache/assets/` directory
 	 * @ext "css" or "js" - selects minifyCss()/cleanJs() below
+	 * @fingerprint `assets.fingerprint` - see bundleCss()/bundleJs()'s own docblock
 	 *
-	 * @return `{ bundleUrl: "assets/bundle.<hash>.<ext>", urls: [], cachedPath, fileName }` when every entry was a local, readable file and got bundled - `cachedPath`/`fileName` are BuildPipeline.bx's own copyAssets() cue to copy the bundle into a tree's output; `{ bundleUrl: "", urls: <unchanged input>, cachedPath: "", fileName: "" }` (today's exact behavior otherwise) when the list was empty, contained an external URL, or named a file that doesn't exist
+	 * @return `{ bundleUrl: "assets/bundle[.<hash>].<ext>", urls: [], cachedPath, fileName }` when every entry was a local, readable file and got bundled - `cachedPath`/`fileName` are BuildPipeline.bx's own copyAssets() cue to copy the bundle into a tree's output; `{ bundleUrl: "", urls: <unchanged input>, cachedPath: "", fileName: "" }` (today's exact behavior otherwise) when the list was empty, contained an external URL, or named a file that doesn't exist
 	 */
-	private struct function bundle( required array urls, required string docsDir, required string cacheDir, required string ext ) {
+	private struct function bundle( required array urls, required string docsDir, required string cacheDir, required string ext, boolean fingerprint = true ) {
 		if ( !arguments.urls.len() || hasExternalUrl( arguments.urls ) ) {
 			return { bundleUrl : "", urls : arguments.urls, cachedPath : "", fileName : "" }
 		}
 
+		var canonicalDocsDir = createObject( "java", "java.io.File" ).init( arguments.docsDir ).getCanonicalPath()
+
 		var combined = ""
 		for ( var url in arguments.urls ) {
 			var filePath = arguments.docsDir & "/" & url
-			if ( !fileExists( filePath ) ) {
+			// A `../`-laden entry (accidental or otherwise) could otherwise
+			// walk outside docsDir and land its target's raw bytes in a
+			// publicly-served bundle - canonicalize and verify containment
+			// before ever reading it, falling back to today's exact
+			// per-URL behavior (same as a missing file) rather than bundle
+			// around it.
+			if ( !fileExists( filePath ) || !isWithinDirectory( filePath, canonicalDocsDir ) ) {
 				return { bundleUrl : "", urls : arguments.urls, cachedPath : "", fileName : "" }
 			}
 			combined &= fileRead( filePath ) & char( 10 )
+			if ( arguments.ext == "js" ) {
+				// A semicolon between every file, not just a newline - JS's
+				// own automatic-semicolon-insertion doesn't always fire at
+				// a line break, so a file missing its own trailing
+				// semicolon could otherwise merge into the next one as a
+				// single expression - a real behavior change, not just a
+				// cleanup.
+				combined &= ";" & char( 10 )
+			}
 		}
 
 		var cleaned = ( arguments.ext == "css" ) ? minifyCss( combined ) : cleanJs( combined )
-		var hash8 = variables.fingerprinter.hashOf( cleaned )
-		var fileName = variables.fingerprinter.fingerprint( "bundle." & arguments.ext, hash8 )
+		var fileName = arguments.fingerprint
+			? variables.fingerprinter.fingerprint( "bundle." & arguments.ext, variables.fingerprinter.hashOf( cleaned ) )
+			: ( "bundle." & arguments.ext )
 
 		directoryCreate( arguments.cacheDir, true, true )
 		var cachedPath = arguments.cacheDir & "/" & fileName
-		if ( !fileExists( cachedPath ) ) {
+		// Without a content-hash in the name, there's no filename-based
+		// signal that the content changed, so this always (re)writes rather
+		// than skipping when the (plain, unhashed) path already exists.
+		if ( !arguments.fingerprint || !fileExists( cachedPath ) ) {
 			fileWrite( cachedPath, cleaned )
 		}
 
@@ -92,6 +116,22 @@ class {
 			}
 		}
 		return false
+	}
+
+	/**
+	 * Whether `filePath` - once canonicalized (symlinks resolved, `..`
+	 * segments collapsed) - actually sits inside `canonicalDir`, rather
+	 * than merely being spelled as if it did. `docsDir & "/" & url` is
+	 * config-controlled (`extraCss`/`extraJs`), so an entry like
+	 * `"../../../etc/passwd"` would otherwise read and bundle a file
+	 * entirely outside the project's own `docs/`.
+	 *
+	 * @filePath The candidate file path, not yet canonicalized
+	 * @canonicalDir The already-canonicalized directory `filePath` must sit inside - getCanonicalPath()'s own output, computed once by the caller rather than per-entry
+	 */
+	private boolean function isWithinDirectory( required string filePath, required string canonicalDir ) {
+		var canonicalFile = createObject( "java", "java.io.File" ).init( arguments.filePath ).getCanonicalPath()
+		return canonicalFile == arguments.canonicalDir || canonicalFile.startsWith( arguments.canonicalDir & "/" )
 	}
 
 	/**

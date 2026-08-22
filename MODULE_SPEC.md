@@ -19,13 +19,15 @@ A BoxLang module that generates static documentation sites from Markdown, in the
   "type": "boxlang-modules",
   "shortDescription": "Static documentation site generator for BoxLang, built on bx-markdown",
   "boxlang": {
-    "minimumVersion": "1.0.0",
+    "minimumVersion": "1.6.0",
     "moduleName": "bxdocs",
     "executable": "bxDocs"
   },
   "dependencies": {
     "bx-markdown": "*",
-    "bx-yaml": "*"
+    "bx-esapi": "*",
+    "bx-yaml": "*",
+    "bx-image": "*"
   }
 }
 ```

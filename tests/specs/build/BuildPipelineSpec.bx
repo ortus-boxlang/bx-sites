@@ -245,6 +245,38 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( root & "/site/assets/screenshot-800w.abc123.png" ) ).toBeTrue();
 			} );
 
+			it( "rewrites a blog post's own featured-image header and its list-card thumbnail into a <picture>, via the same setImageVariantGenerator() test seam", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				directoryCreate( root & "/docs/assets/blog", true, true );
+				fileWrite(
+					root & "/docs/blog/posts/release.md",
+					"---" & char( 10 ) & "date: 2026-02-01" & char( 10 ) & "image: assets/blog/cover.png" & char( 10 ) & "---" & char( 10 ) & "Release post body."
+				);
+
+				var manifest = {
+					"assets/blog/cover.png" : {
+						width : 1600, height : 900,
+						originalVariants : [ { width : 800, format : "png", fileName : "cover-800w.abc123.png" } ],
+						webpVariants : []
+					}
+				};
+				pipeline.setImageVariantGenerator( new "tests.support.FakeImageVariantGenerator@bxdocs"( manifest ) );
+
+				pipeline.build( root );
+
+				var postHtml = fileRead( root & "/site/blog/release/index.html" );
+				expect( postHtml ).toInclude( "<picture>" );
+				expect( postHtml ).toInclude( "cover-800w.abc123.png" );
+
+				var listHtml = fileRead( root & "/site/blog/index.html" );
+				expect( listHtml ).toInclude( "<picture>" );
+				expect( listHtml ).toInclude( "cover-800w.abc123.png" );
+
+				expect( fileExists( root & "/site/assets/cover-800w.abc123.png" ) ).toBeTrue();
+			} );
+
 			it( "bundles extraCss/extraJs into one fingerprinted file each by default, rendering a single <link>/<script> tag", function() {
 				var root = newProject();
 				fileWrite(
@@ -268,6 +300,23 @@ class extends="testbox.system.BaseSpec" {
 				expect( bundledCssFiles.len() ).toBe( 1 );
 				var bundledJsFiles = directoryList( root & "/site/assets", false, "name", "bundle.*.js" );
 				expect( bundledJsFiles.len() ).toBe( 1 );
+			} );
+
+			it( "names the bundle assets/bundle.css, with no content-hash, when assets.fingerprint is off", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","assets":{"fingerprint":false},"extraCss":["assets/custom.css"]}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/assets", true, true );
+				fileWrite( root & "/docs/assets/custom.css", "body { color: red; }" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/assets/bundle.css" ) ).toBeTrue();
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( 'href="/assets/bundle.css"' );
 			} );
 
 			it( "leaves extraCss/extraJs exactly as raw per-URL tags when assets.bundle is off", function() {

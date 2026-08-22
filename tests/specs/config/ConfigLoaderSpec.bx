@@ -535,6 +535,25 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "defaults [assets.images.widths] to [400, 800, 1200, 1600]", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).assets.images.widths ).toBe( [ 400, 800, 1200, 1600 ] );
+			} );
+
+			it( "preserves a user-supplied [assets.images.widths] override", function() {
+				var dir = newProjectDir( '{"name":"My Docs","assets":{"images":{"widths":[480, 960]}}}' );
+				expect( loader.load( dir ).assets.images.widths ).toBe( [ 480, 960 ] );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when an [assets.images.widths] entry is not a positive whole number", function() {
+				for ( var badValue in [ 0, -400, 400.5 ] ) {
+					var dir = newProjectDir( '{"name":"My Docs","assets":{"images":{"widths":[' & badValue & ']}}}' );
+					expect( function() {
+						loader.load( dir );
+					} ).toThrow( "BxDocs.InvalidConfig" );
+				}
+			} );
+
 			it( "deep-merges a partial [blog] override, keeping the default feed", function() {
 				var dir = newProjectDir( '{"name":"My Docs","blog":{"postsPerPage":5}}' );
 				var config = loader.load( dir );

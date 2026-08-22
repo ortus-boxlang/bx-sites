@@ -17,11 +17,12 @@ class {
 		return this
 	}
 
-	struct function buildManifest( required string docsAssetsDir, required struct imagesConfig, required string cacheDir ) {
+	struct function buildManifest( required string docsAssetsDir, required struct imagesConfig, required string cacheDir, boolean fingerprint = true ) {
 		variables.buildManifestCalls.append( {
 			docsAssetsDir : arguments.docsAssetsDir,
 			imagesConfig  : arguments.imagesConfig,
-			cacheDir      : arguments.cacheDir
+			cacheDir      : arguments.cacheDir,
+			fingerprint   : arguments.fingerprint
 		} )
 		return variables.manifest
 	}

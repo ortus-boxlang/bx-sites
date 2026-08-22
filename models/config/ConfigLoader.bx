@@ -598,14 +598,14 @@ class {
 		if ( !isArray( images.widths ?: "" ) || !images.widths.len() ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
-				message = "#variables.configFileName# [assets.images.widths] must be a non-empty array of positive numbers"
+				message = "#variables.configFileName# [assets.images.widths] must be a non-empty array of positive whole-pixel numbers"
 			)
 		}
 		for ( var width in images.widths ) {
-			if ( !isNumeric( width ) || width <= 0 ) {
+			if ( !isNumeric( width ) || width <= 0 || width != int( width ) ) {
 				throw(
 					type    = "BxDocs.InvalidConfig",
-					message = "#variables.configFileName# [assets.images.widths] entries must all be positive numbers"
+					message = "#variables.configFileName# [assets.images.widths] entries must all be positive whole numbers - a fractional pixel width like 400.5 would produce an invalid ""400.5w"" srcset descriptor"
 				)
 			}
 		}

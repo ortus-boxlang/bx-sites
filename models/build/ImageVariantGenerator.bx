@@ -40,10 +40,11 @@ class {
 	 * @docsAssetsDir Absolute path to the project's `docs/assets/` directory
 	 * @imagesConfig bxdocs.json's own `assets.images` struct (`enabled`, `widths`, `formats`)
 	 * @cacheDir Absolute path to this project's own `.cache/images/` directory
+	 * @fingerprint `assets.fingerprint` - `true` (the default) content-hash-names every generated variant; `false` names one just `<name>-<width>w.<format>`, with no cache-busting hash. Either way, variants still cache correctly on disk (keyed internally by the *source* image's own hash, in its own cache subfolder - see buildEntry()) - this only controls what the public, generated filename looks like
 	 *
 	 * @return Struct keyed by docs-relative asset path (e.g. `"assets/screenshot.png"`), each `{ key, width, height, originalVariants: [ { width, format, fileName } ], webpVariants: [ ... ], cacheDir }`
 	 */
-	struct function buildManifest( required string docsAssetsDir, required struct imagesConfig, required string cacheDir ) {
+	struct function buildManifest( required string docsAssetsDir, required struct imagesConfig, required string cacheDir, boolean fingerprint = true ) {
 		var manifest = {}
 
 		if ( !arguments.imagesConfig.enabled || !directoryExists( arguments.docsAssetsDir ) ) {
@@ -56,7 +57,7 @@ class {
 
 		for ( var filePath in files ) {
 			var key = "assets/" & filePath.reReplace( dir, "", "one" ).reReplace( "^[\/]", "" )
-			manifest[ key ] = buildEntry( filePath, arguments.imagesConfig, arguments.cacheDir )
+			manifest[ key ] = buildEntry( filePath, arguments.imagesConfig, arguments.cacheDir, arguments.fingerprint )
 		}
 
 		return manifest
@@ -96,8 +97,9 @@ class {
 	 * @filePath Absolute path to the source image
 	 * @imagesConfig bxdocs.json's own `assets.images` struct
 	 * @cacheDir Absolute path to this project's own `.cache/images/` directory
+	 * @fingerprint `assets.fingerprint` - see buildManifest()'s own docblock
 	 */
-	private struct function buildEntry( required string filePath, required struct imagesConfig, required string cacheDir ) {
+	private struct function buildEntry( required string filePath, required struct imagesConfig, required string cacheDir, boolean fingerprint = true ) {
 		var hash8 = variables.fingerprinter.hashOf( fileReadBinary( arguments.filePath ) )
 		var baseName = getFileFromPath( arguments.filePath ).reReplace( "\.[^.]*$", "" )
 		var originalExt = arguments.filePath.reReplace( "^.*\.", "" )
@@ -108,13 +110,18 @@ class {
 
 		var qualifyingWidths = arguments.imagesConfig.widths.filter( w => w < originalWidth )
 
+		// The cache subfolder itself always stays keyed by the source's own
+		// hash, regardless of `fingerprint` - that's an internal cache
+		// lookup key, invisible to the built site, and unrelated to whether
+		// the *public* filename carries a hash (arguments.fingerprint,
+		// below).
 		var entryCacheDir = arguments.cacheDir & "/" & hash8
 		directoryCreate( entryCacheDir, true, true )
 
 		var originalVariants = []
 		if ( containsNoCase( arguments.imagesConfig.formats, "original" ) ) {
 			for ( var w in qualifyingWidths ) {
-				originalVariants.append( generateVariant( arguments.filePath, entryCacheDir, baseName, w, originalExt, hash8 ) )
+				originalVariants.append( generateVariant( arguments.filePath, entryCacheDir, baseName, w, originalExt, hash8, originalWidth, originalHeight, arguments.fingerprint ) )
 			}
 		}
 
@@ -123,7 +130,7 @@ class {
 			var webpWidths = duplicate( qualifyingWidths )
 			webpWidths.append( originalWidth )
 			for ( var w in webpWidths ) {
-				webpVariants.append( generateVariant( arguments.filePath, entryCacheDir, baseName, w, "webp", hash8 ) )
+				webpVariants.append( generateVariant( arguments.filePath, entryCacheDir, baseName, w, "webp", hash8, originalWidth, originalHeight, arguments.fingerprint ) )
 			}
 		}
 
@@ -143,18 +150,24 @@ class {
 	 * reused rather than re-decoded/re-encoded).
 	 *
 	 * @sourcePath Absolute path to the original source image
-	 * @cacheDir Absolute path to this source image's own cache subfolder (`.cache/images/<hash8>/`)
+	 * @cacheDir Absolute path to this source image's own cache subfolder (`.cache/images/<hash8>/`) - already isolated per source hash, so the cache lookup below stays correct regardless of `fingerprint`
 	 * @baseName The source file's own name, without extension
-	 * @width Target width in pixels - `imageRead().scaleToFit(width)` fits to this, maintaining aspect ratio
+	 * @width Target width in pixels - the variant is scaled to exactly this width, maintaining aspect ratio
 	 * @format Output format - the source's own extension, or `"webp"`
-	 * @hash8 The source file's own content-hash, folded into the variant's filename for a stable, cache-friendly name
+	 * @hash8 The source file's own content-hash - folded into the variant's public filename only when `fingerprint` is on
+	 * @originalWidth The source image's own probed width - `scaleToFit(w, h)` fits to the *longest* dimension of a `w x h` box, so a bare `scaleToFit(width)` (a `width x width` box) under-shoots the target width for a portrait source; passing an explicit height computed from this ratio keeps the width exact regardless of orientation
+	 * @originalHeight The source image's own probed height - see `originalWidth`
+	 * @fingerprint `assets.fingerprint` - see buildManifest()'s own docblock
 	 */
-	private struct function generateVariant( required string sourcePath, required string cacheDir, required string baseName, required numeric width, required string format, required string hash8 ) {
-		var fileName = arguments.baseName & "-" & arguments.width & "w." & arguments.hash8 & "." & lCase( arguments.format )
+	private struct function generateVariant( required string sourcePath, required string cacheDir, required string baseName, required numeric width, required string format, required string hash8, required numeric originalWidth, required numeric originalHeight, boolean fingerprint = true ) {
+		var fileName = arguments.fingerprint
+			? ( arguments.baseName & "-" & arguments.width & "w." & arguments.hash8 & "." & lCase( arguments.format ) )
+			: ( arguments.baseName & "-" & arguments.width & "w." & lCase( arguments.format ) )
 		var cachedPath = arguments.cacheDir & "/" & fileName
 
 		if ( !fileExists( cachedPath ) ) {
-			imageRead( arguments.sourcePath ).scaleToFit( arguments.width ).write( cachedPath )
+			var targetHeight = round( arguments.width * arguments.originalHeight / arguments.originalWidth )
+			imageRead( arguments.sourcePath ).scaleToFit( arguments.width, targetHeight ).write( cachedPath )
 		}
 
 		return { width : arguments.width, format : lCase( arguments.format ), fileName : fileName }

@@ -134,7 +134,7 @@ class {
 		config = variables.pluginLoader.applyOnConfig( plugins, config )
 		var assetPipeline = applyAssetPipeline( config, root )
 		config = assetPipeline.config
-		var imageManifest = variables.imageVariantGenerator.buildManifest( root & "/docs/assets", config.assets.images, root & "/.cache/images" )
+		var imageManifest = variables.imageVariantGenerator.buildManifest( root & "/docs/assets", config.assets.images, root & "/.cache/images", config.assets.fingerprint )
 		var urls = variables.baseUrlResolver.resolve( config.baseURL )
 		var themeDir = variables.themeRenderer.resolveThemeDir( config.theme.name, root )
 		var siteDir = root & "/site"
@@ -282,7 +282,7 @@ class {
 			assignIconHtml( blogPosts, root & "/docs" )
 
 			var blogAuthors = variables.blogAuthorsLoader.load( root & "/docs" )
-			var blogResult = variables.blogBuilder.build( blogPosts, blogAuthors, config.blog.postsPerPage, urls.basePath )
+			var blogResult = variables.blogBuilder.build( blogPosts, blogAuthors, config.blog.postsPerPage, urls.basePath, imageManifest )
 
 			for ( var post in blogResult.posts ) {
 				writeRenderedPage( post, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir )
@@ -375,10 +375,10 @@ class {
 		var docsDir = arguments.root & "/docs"
 		var cacheDir = arguments.root & "/.cache/assets"
 
-		var cssBundle = variables.assetBundler.bundleCss( arguments.config.extraCss, docsDir, cacheDir )
+		var cssBundle = variables.assetBundler.bundleCss( arguments.config.extraCss, docsDir, cacheDir, arguments.config.assets.fingerprint )
 		arguments.config.extraCss = len( cssBundle.bundleUrl ) ? [ cssBundle.bundleUrl ] : cssBundle.urls
 
-		var jsBundle = variables.assetBundler.bundleJs( arguments.config.extraJs, docsDir, cacheDir )
+		var jsBundle = variables.assetBundler.bundleJs( arguments.config.extraJs, docsDir, cacheDir, arguments.config.assets.fingerprint )
 		arguments.config.extraJs = len( jsBundle.bundleUrl ) ? [ jsBundle.bundleUrl ] : jsBundle.urls
 
 		return { config : arguments.config, cssBundle : cssBundle, jsBundle : jsBundle }

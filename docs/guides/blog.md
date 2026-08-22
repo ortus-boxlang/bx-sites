@@ -80,7 +80,10 @@ in full on the post's own page.
 - `image` - a featured image (a `docs/assets/`-relative path, or a full
   URL) - shown at the top of the post and as a thumbnail on every list/
   category card. Also becomes the post's own `og:image`/Twitter card unless
-  `ogImage` overrides it separately.
+  `ogImage` overrides it separately. A `docs/assets/`-relative image (and an
+  author's own `avatar`, below) gets the same responsive `<picture>`/
+  `srcset`/WebP treatment as any other image under `docs/assets/` - see
+  [Images](images.md).
 - `slug` - overrides the URL segment (`/blog/<slug>/`) - derived from the
   filename by default.
 - `draft: true` - excludes the post from a real `bxDocs build` entirely.

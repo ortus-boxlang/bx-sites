@@ -28,6 +28,7 @@
 class {
 
 	variables.blogAuthorsLoader = new "models.build.BlogAuthorsLoader@bxdocs"()
+	variables.responsiveImageProcessor = new "models.build.ResponsiveImageProcessor@bxdocs"()
 
 	/**
 	 * Average adult silent-reading speed, in words per minute - the same
@@ -44,18 +45,19 @@ class {
 	 * @authors BlogAuthorsLoader.load()'s own output
 	 * @postsPerPage bxdocs.json's `blog.postsPerPage`
 	 * @basePath Root-relative base path ending with `/` (BaseUrlResolver's `basePath`)
+	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - "" (the default) makes every generated `<img>` here (a post's own featured image, its card thumbnail, an author's own avatar) a plain, unprocessed `<img>`, same as before this param existed. These images never pass through BuildPipeline.bx's own convertMarkdown()-time responsive-image rewrite at all (they don't exist yet at that point - BlogBuilder.bx generates them afterward), so ResponsiveImageProcessor.pictureTag() is called directly here instead
 	 *
 	 * @return { posts: array (same posts, enriched + detail-page-ready contentHtml), indexPages: array of synthetic page structs, categories: array of { name, slug, count }, alphabetical - BuildPipeline.bx's own cue for which `/blog/category/<slug>/feed.xml` files to write }
 	 */
-	struct function build( required array posts, required struct authors, required numeric postsPerPage, required string basePath ) {
-		var enrichedPosts = enrichPosts( arguments.posts, arguments.authors, arguments.basePath )
+	struct function build( required array posts, required struct authors, required numeric postsPerPage, required string basePath, struct imageManifest = {} ) {
+		var enrichedPosts = enrichPosts( arguments.posts, arguments.authors, arguments.basePath, arguments.imageManifest )
 		var categories = categoryCounts( enrichedPosts )
 		var years = distinctYears( enrichedPosts )
 		var authorIds = distinctAuthorIds( enrichedPosts )
 
 		var indexPages = []
 
-		var mainListPages = buildListPages( enrichedPosts, "blog", "Blog", arguments.postsPerPage, arguments.basePath )
+		var mainListPages = buildListPages( enrichedPosts, "blog", "Blog", arguments.postsPerPage, arguments.basePath, arguments.imageManifest )
 		var browseLinksHtml = renderArchiveLinksHtml( years, enrichedPosts, arguments.basePath ) & renderCategoryLinksHtml( categories, arguments.basePath ) & renderStatsLinkHtml( arguments.basePath )
 		if ( len( browseLinksHtml ) ) {
 			for ( var page in mainListPages ) {
@@ -66,12 +68,12 @@ class {
 
 		for ( var category in categories ) {
 			var categoryPosts = enrichedPosts.filter( post => hasCategoryNoCase( post.categories ?: [], category.name ) )
-			indexPages.append( buildListPages( categoryPosts, "blog/category/" & category.slug, category.name, arguments.postsPerPage, arguments.basePath ), true )
+			indexPages.append( buildListPages( categoryPosts, "blog/category/" & category.slug, category.name, arguments.postsPerPage, arguments.basePath, arguments.imageManifest ), true )
 		}
 
 		for ( var yr in years ) {
 			var yearPosts = enrichedPosts.filter( post => year( post.date ) == yr )
-			indexPages.append( buildListPages( yearPosts, "blog/archive/" & yr, "#yr#", arguments.postsPerPage, arguments.basePath ), true )
+			indexPages.append( buildListPages( yearPosts, "blog/archive/" & yr, "#yr#", arguments.postsPerPage, arguments.basePath, arguments.imageManifest ), true )
 		}
 
 		for ( var authorId in authorIds ) {
@@ -80,7 +82,7 @@ class {
 			indexPages.append( {
 				title       : author.name,
 				description : len( trim( author.bio ) ) ? author.bio : "Posts by " & author.name,
-				contentHtml : renderAuthorPageHtml( author, authorPosts, arguments.basePath ),
+				contentHtml : renderAuthorPageHtml( author, authorPosts, arguments.basePath, arguments.imageManifest ),
 				urlPath     : "blog/authors/" & authorId & "/index.html",
 				ogImage     : author.avatar,
 				tags        : [],
@@ -106,8 +108,9 @@ class {
 	 * @posts BlogDiscoverer.load()'s own output, already markdown-converted
 	 * @authors BlogAuthorsLoader.load()'s own output
 	 * @basePath Root-relative base path ending with `/`
+	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - see build()'s own docblock
 	 */
-	private array function enrichPosts( required array posts, required struct authors, required string basePath ) {
+	private array function enrichPosts( required array posts, required struct authors, required string basePath, struct imageManifest = {} ) {
 		var enriched = []
 
 		for ( var i = 1; i <= arguments.posts.len(); i++ ) {
@@ -145,7 +148,7 @@ class {
 				}
 			}
 
-			post.contentHtml = renderDraftBadgeHtml( post ) & renderPostHeaderHtml( post, arguments.basePath ) & post.contentHtml
+			post.contentHtml = renderDraftBadgeHtml( post ) & renderPostHeaderHtml( post, arguments.basePath, arguments.imageManifest ) & post.contentHtml
 
 			enriched.append( post )
 		}
@@ -162,8 +165,9 @@ class {
 	 * @title The list's own title - `"Blog"`, or the category name
 	 * @perPage bxdocs.json's `blog.postsPerPage`
 	 * @basePath Root-relative base path ending with `/`
+	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - see build()'s own docblock
 	 */
-	private array function buildListPages( required array items, required string baseDir, required string title, required numeric perPage, required string basePath ) {
+	private array function buildListPages( required array items, required string baseDir, required string title, required numeric perPage, required string basePath, struct imageManifest = {} ) {
 		var chunks = paginate( arguments.items, arguments.perPage )
 		var pages = []
 
@@ -171,7 +175,7 @@ class {
 			pages.append( {
 				title       : chunk.pageNumber == 1 ? arguments.title : ( arguments.title & " (Page " & chunk.pageNumber & ")" ),
 				description : arguments.title == "Blog" ? "Blog posts" : ( "Blog posts in " & arguments.title ),
-				contentHtml : renderListContentHtml( chunk.items, arguments.baseDir, chunk.pageNumber, chunk.totalPages, arguments.basePath ),
+				contentHtml : renderListContentHtml( chunk.items, arguments.baseDir, chunk.pageNumber, chunk.totalPages, arguments.basePath, arguments.imageManifest ),
 				urlPath     : pageUrlPath( arguments.baseDir, chunk.pageNumber ),
 				ogImage     : chunk.items.len() ? ( chunk.items[ 1 ].image ?: "" ) : "",
 				tags        : [],
@@ -227,8 +231,9 @@ class {
 	 * @pageNumber This page's own 1-based number
 	 * @totalPages How many pages this list has in total
 	 * @basePath Root-relative base path ending with `/`
+	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - see build()'s own docblock
 	 */
-	private string function renderListContentHtml( required array pagePosts, required string baseDir, required numeric pageNumber, required numeric totalPages, required string basePath ) {
+	private string function renderListContentHtml( required array pagePosts, required string baseDir, required numeric pageNumber, required numeric totalPages, required string basePath, struct imageManifest = {} ) {
 		var html = ""
 
 		if ( !arguments.pagePosts.len() ) {
@@ -236,7 +241,7 @@ class {
 		}
 
 		for ( var post in arguments.pagePosts ) {
-			html &= renderPostCard( post, arguments.basePath )
+			html &= renderPostCard( post, arguments.basePath, arguments.imageManifest )
 		}
 
 		html &= renderPager( arguments.baseDir, arguments.pageNumber, arguments.totalPages, arguments.basePath )
@@ -250,13 +255,14 @@ class {
 	 *
 	 * @post One enriched post struct
 	 * @basePath Root-relative base path ending with `/`
+	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - see build()'s own docblock
 	 */
-	private string function renderPostCard( required struct post, required string basePath ) {
+	private string function renderPostCard( required struct post, required string basePath, struct imageManifest = {} ) {
 		var html = '<article class="blog-post-card' & ( ( arguments.post.draft ?: false ) ? ' blog-post-card--draft' : '' ) & '">'
 		html &= renderDraftBadgeHtml( arguments.post )
 
 		if ( len( trim( arguments.post.image ?: "" ) ) ) {
-			html &= '<a href="' & arguments.basePath & arguments.post.urlPath & '"><img src="' & resolveAssetUrl( arguments.post.image, arguments.basePath ) & '" alt="" style="max-width:100%;height:auto;"></a>'
+			html &= '<a href="' & arguments.basePath & arguments.post.urlPath & '">' & variables.responsiveImageProcessor.pictureTag( arguments.post.image, 'alt="" style="max-width:100%;height:auto;"', arguments.basePath, arguments.imageManifest ) & '</a>'
 		}
 
 		html &= '<h2><a href="' & arguments.basePath & arguments.post.urlPath & '">' & encodeForHTML( arguments.post.title ) & '</a></h2>'
@@ -282,12 +288,13 @@ class {
 	 *
 	 * @post One enriched post struct
 	 * @basePath Root-relative base path ending with `/`
+	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - see build()'s own docblock
 	 */
-	private string function renderPostHeaderHtml( required struct post, required string basePath ) {
+	private string function renderPostHeaderHtml( required struct post, required string basePath, struct imageManifest = {} ) {
 		var html = ""
 
 		if ( len( trim( arguments.post.image ?: "" ) ) ) {
-			html &= '<img src="' & resolveAssetUrl( arguments.post.image, arguments.basePath ) & '" alt="" style="max-width:100%;height:auto;" class="blog-post-featured-image">'
+			html &= variables.responsiveImageProcessor.pictureTag( arguments.post.image, 'alt="" style="max-width:100%;height:auto;" class="blog-post-featured-image"', arguments.basePath, arguments.imageManifest )
 		}
 
 		html &= '<p class="blog-post-meta">' & metaLine( arguments.post, arguments.basePath ) & '</p>'
@@ -387,12 +394,13 @@ class {
 	 * @author One resolved author struct (BlogAuthorsLoader.load()'s own per-id shape)
 	 * @authorPosts This author's own posts, newest first
 	 * @basePath Root-relative base path ending with `/`
+	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - see build()'s own docblock
 	 */
-	private string function renderAuthorPageHtml( required struct author, required array authorPosts, required string basePath ) {
+	private string function renderAuthorPageHtml( required struct author, required array authorPosts, required string basePath, struct imageManifest = {} ) {
 		var html = '<div class="blog-author-profile">'
 
 		if ( len( trim( arguments.author.avatar ?: "" ) ) ) {
-			html &= '<img src="' & resolveAssetUrl( arguments.author.avatar, arguments.basePath ) & '" alt="' & encodeForHTML( arguments.author.name ) & '" style="max-width:120px;border-radius:50%;">'
+			html &= variables.responsiveImageProcessor.pictureTag( arguments.author.avatar, 'alt="' & encodeForHTML( arguments.author.name ) & '" style="max-width:120px;border-radius:50%;"', arguments.basePath, arguments.imageManifest )
 		}
 		if ( len( trim( arguments.author.title ?: "" ) ) ) {
 			html &= '<p><em>' & encodeForHTML( arguments.author.title ) & '</em></p>'
@@ -417,7 +425,7 @@ class {
 
 		html &= '</div><h2>Posts</h2>'
 		for ( var post in arguments.authorPosts ) {
-			html &= renderPostCard( post, arguments.basePath )
+			html &= renderPostCard( post, arguments.basePath, arguments.imageManifest )
 		}
 
 		return html
@@ -784,18 +792,6 @@ class {
 	 */
 	private string function slugify( required string category ) {
 		return lCase( trim( arguments.category ) ).reReplace( "[^a-z0-9]+", "-", "all" ).reReplace( "(^-|-$)", "", "all" )
-	}
-
-	/**
-	 * Resolves a `docs/assets/`-relative image path against `basePath` -
-	 * left alone when it's already an absolute URL, identical to every
-	 * built-in theme's own `resolveAssetUrl()` in `layout.bxm`.
-	 *
-	 * @url The raw image path/URL
-	 * @basePath Root-relative base path ending with `/`
-	 */
-	private string function resolveAssetUrl( required string url, required string basePath ) {
-		return arguments.url.reFindNoCase( "^[a-z][a-z0-9+.\-]*://" ) ? arguments.url : arguments.basePath & arguments.url
 	}
 
 	/**

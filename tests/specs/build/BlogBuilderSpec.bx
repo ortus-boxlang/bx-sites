@@ -57,6 +57,53 @@ class extends="testbox.system.BaseSpec" {
 				expect( html.find( "cover.png" ) ).toBeLT( html.find( "First paragraph." ) );
 			} );
 
+			it( "renders a post's featured-image header and its own list-card thumbnail as a <picture> when the image has a manifest entry", function() {
+				var manifest = {
+					"assets/blog/cover.png" : {
+						width : 1600,
+						height : 900,
+						originalVariants : [ { width : 800, format : "png", fileName : "cover-800w.abc123.png" } ],
+						webpVariants : []
+					}
+				};
+
+				var result = builder.build( [ newPost( { image : "assets/blog/cover.png" } ) ], {}, 10, "/", manifest );
+
+				expect( result.posts[ 1 ].contentHtml ).toInclude( "<picture>" );
+				expect( result.posts[ 1 ].contentHtml ).toInclude( "cover-800w.abc123.png" );
+
+				var blogPage = result.indexPages.filter( p => p.urlPath == "blog/index.html" )[ 1 ];
+				expect( blogPage.contentHtml ).toInclude( "<picture>" );
+				expect( blogPage.contentHtml ).toInclude( "cover-800w.abc123.png" );
+			} );
+
+			it( "renders an author's avatar as a <picture> when the avatar has a manifest entry", function() {
+				var manifest = {
+					"assets/authors/lmajano.png" : {
+						width : 400,
+						height : 400,
+						originalVariants : [ { width : 200, format : "png", fileName : "lmajano-200w.abc123.png" } ],
+						webpVariants : []
+					}
+				};
+				var authors = {
+					"lmajano" : { name : "Luis Majano", title : "", bio : "", url : "", email : "", avatar : "assets/authors/lmajano.png", socials : {} }
+				};
+
+				var result = builder.build( [ newPost( { authors : [ "lmajano" ] } ) ], authors, 10, "/", manifest );
+
+				var authorPage = result.indexPages.filter( p => p.urlPath == "blog/authors/lmajano/index.html" )[ 1 ];
+				expect( authorPage.contentHtml ).toInclude( "<picture>" );
+				expect( authorPage.contentHtml ).toInclude( "lmajano-200w.abc123.png" );
+			} );
+
+			it( "falls back to a plain <img> for a post's featured image when imageManifest is omitted, unchanged from before", function() {
+				var result = builder.build( [ newPost( { image : "assets/blog/cover.png" } ) ], {}, 10, "/" );
+
+				expect( result.posts[ 1 ].contentHtml ).notToInclude( "<picture>" );
+				expect( result.posts[ 1 ].contentHtml ).toInclude( "assets/blog/cover.png" );
+			} );
+
 			it( "computes an excerpt from the <!-- more --> marker when present", function() {
 				var post = newPost( { contentHtml : "<p>Intro.</p><!-- more --><p>Rest of the post.</p>" } );
 

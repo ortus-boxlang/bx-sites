@@ -65,6 +65,17 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.urls ).toBe( urls );
 			} );
 
+			it( "falls back to today's exact per-URL behavior rather than reading a file outside docsDir via ../ traversal", function() {
+				var p = newProject();
+				fileWrite( p.root & "/secret.css", "body { background: url(/steal-me); }" );
+				var urls = [ "../secret.css" ];
+
+				var result = bundler.bundleCss( urls, p.docsDir, p.cacheDir );
+
+				expect( result.bundleUrl ).toBe( "" );
+				expect( result.urls ).toBe( urls );
+			} );
+
 			it( "falls back to today's exact per-URL behavior when a referenced file doesn't exist", function() {
 				var p = newProject();
 				var urls = [ "assets/does-not-exist.css" ];
@@ -100,6 +111,30 @@ class extends="testbox.system.BaseSpec" {
 				expect( bundledContent ).toInclude( "// a real comment, left alone" );
 				// 4 consecutive blank lines collapse down to 1.
 				expect( bundledContent ).notToInclude( char( 10 ) & char( 10 ) & char( 10 ) );
+			} );
+
+			it( "names the bundle plainly, with no content-hash, when fingerprint is false", function() {
+				var p = newProject();
+				fileWrite( p.docsDir & "/assets/a.css", "body { color: red; }" );
+
+				var result = bundler.bundleCss( [ "assets/a.css" ], p.docsDir, p.cacheDir, false );
+
+				expect( result.bundleUrl ).toBe( "assets/bundle.css" );
+				expect( result.fileName ).toBe( "bundle.css" );
+			} );
+
+			it( "inserts a statement-separating semicolon between concatenated JS files, even when a file omits its own trailing one", function() {
+				var p = newProject();
+				// No trailing semicolon on a.js - without a separator, ASI
+				// would merge it with b.js's own leading open-paren into a
+				// single broken expression.
+				fileWrite( p.docsDir & "/assets/a.js", "window.a = function() { return 1 }" );
+				fileWrite( p.docsDir & "/assets/b.js", "(function() { window.b = 2; })();" );
+
+				var result = bundler.bundleJs( [ "assets/a.js", "assets/b.js" ], p.docsDir, p.cacheDir );
+
+				var bundledContent = fileRead( result.cachedPath );
+				expect( bundledContent ).toInclude( "}" & char( 10 ) & ";" & char( 10 ) & "(function()" );
 			} );
 
 			it( "reuses the cached bundle file on a second call with identical content", function() {
