@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.LocalesDiscoverer", function() {
 
 			beforeEach( function() {
-				variables.discoverer = new "models.build.LocalesDiscoverer@bxdocs"();
+				variables.discoverer = new "models.build.LocalesDiscoverer@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,7 +17,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private function newDocsDir() {
-				var dir = createTempDirectory( prefix = "bxdocs-localesdiscoverer-" );
+				var dir = createTempDirectory( prefix = "bxsites-localesdiscoverer-" );
 				tempDirs.append( dir );
 				return dir;
 			}

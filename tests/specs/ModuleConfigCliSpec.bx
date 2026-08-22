@@ -9,7 +9,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "ModuleConfig CLI dispatch", function() {
 
 			beforeEach( function() {
-				variables.moduleConfig = new "ModuleConfig@bxdocs"();
+				variables.moduleConfig = new "ModuleConfig@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -22,7 +22,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private function newTempDir() {
-				var dir = createTempDirectory( prefix = "bxdocs-moduleconfig-cli-" );
+				var dir = createTempDirectory( prefix = "bxsites-moduleconfig-cli-" );
 				tempDirs.append( dir );
 				return dir;
 			}
@@ -53,7 +53,7 @@ class extends="testbox.system.BaseSpec" {
 				var exitCode = moduleConfig.main( [ "new", "--projectRoot=#projectRoot#" ] );
 
 				expect( exitCode ).toBe( 0 );
-				expect( fileExists( projectRoot & "/bxdocs.yaml" ) ).toBeTrue();
+				expect( fileExists( projectRoot & "/bxsites.yaml" ) ).toBeTrue();
 			} );
 
 			it( "dispatches `new` with the project root as a bare positional argument", function() {
@@ -63,7 +63,7 @@ class extends="testbox.system.BaseSpec" {
 				var exitCode = moduleConfig.main( [ "new", projectRoot ] );
 
 				expect( exitCode ).toBe( 0 );
-				expect( fileExists( projectRoot & "/bxdocs.yaml" ) ).toBeTrue();
+				expect( fileExists( projectRoot & "/bxsites.yaml" ) ).toBeTrue();
 			} );
 
 			it( "dispatches `clean` after `new` and removes site/", function() {
@@ -78,7 +78,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( directoryExists( projectRoot & "/site" ) ).toBeFalse();
 			} );
 
-			it( "returns exit code 1 when `build` runs against a project with no bxdocs.yaml", function() {
+			it( "returns exit code 1 when `build` runs against a project with no bxsites.yaml", function() {
 				var parent = newTempDir();
 				var exitCode = moduleConfig.main( [ "build", parent ] );
 
@@ -126,7 +126,7 @@ class extends="testbox.system.BaseSpec" {
 				] );
 
 				expect( exitCode ).toBe( 0 );
-				var configSource = fileRead( projectRoot & "/bxdocs.yaml" );
+				var configSource = fileRead( projectRoot & "/bxsites.yaml" );
 				expect( configSource ).toInclude( 'description: "Hello World, quoted!"' );
 			} );
 
@@ -139,7 +139,7 @@ class extends="testbox.system.BaseSpec" {
 				] );
 
 				expect( exitCode ).toBe( 0 );
-				expect( fileExists( projectRoot & "/bxdocs.yaml" ) ).toBeTrue();
+				expect( fileExists( projectRoot & "/bxsites.yaml" ) ).toBeTrue();
 			} );
 
 		} );

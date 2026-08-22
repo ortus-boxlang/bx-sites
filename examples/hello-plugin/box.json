@@ -1,14 +1,14 @@
 {
-    "name": "Hello BX Docs Plugin",
+    "name": "Hello BX Sites Plugin",
     "version": "1.0.0",
     "author": "Ortus Solutions",
-    "slug": "hello-bxdocs-plugin",
-    "shortDescription": "A minimal working example of a bx-docs plugin - see docs/guides/plugins.md",
+    "slug": "hello-bxsites-plugin",
+    "shortDescription": "A minimal working example of a bx-sites plugin - see docs/guides/plugins.md",
     "type": "boxlang-modules",
-    "keywords": [ "boxlang", "bxdocs-plugin" ],
+    "keywords": [ "boxlang", "bxsites-plugin" ],
     "boxlang": {
         "minimumVersion": "1.0.0",
-        "moduleName": "helloBxDocsPlugin"
+        "moduleName": "helloBxSitesPlugin"
     },
     "private": false,
     "license": [

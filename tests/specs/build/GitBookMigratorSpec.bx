@@ -4,9 +4,9 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.GitBookMigrator", function() {
 
 			beforeEach( function() {
-				variables.migrator = new "models.build.GitBookMigrator@bxdocs"();
-				variables.sourceDir = createTempDirectory( prefix = "bxdocs-gitbook-source-" );
-				variables.docsDir = createTempDirectory( prefix = "bxdocs-gitbook-docs-" );
+				variables.migrator = new "models.build.GitBookMigrator@bxsites"();
+				variables.sourceDir = createTempDirectory( prefix = "bxsites-gitbook-source-" );
+				variables.docsDir = createTempDirectory( prefix = "bxsites-gitbook-docs-" );
 			} );
 
 			afterEach( function() {
@@ -18,10 +18,10 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
-			it( "throws BxDocs.MigrateMissingSummary when the source has no SUMMARY.md", function() {
+			it( "throws BxSites.MigrateMissingSummary when the source has no SUMMARY.md", function() {
 				expect( function() {
 					migrator.migrate( sourceDir, docsDir );
-				} ).toThrow( "BxDocs.MigrateMissingSummary" );
+				} ).toThrow( "BxSites.MigrateMissingSummary" );
 			} );
 
 			it( "converts SUMMARY.md into a nested nav.json tree, renaming README.md to index.md", function() {
@@ -259,7 +259,7 @@ Real text after.' );
 				expect( converted ).toInclude( "Real text after." );
 			} );
 
-			it( "carries GitBook's own title/description/tags frontmatter into the migrated page's bx-docs frontmatter", function() {
+			it( "carries GitBook's own title/description/tags frontmatter into the migrated page's bx-sites frontmatter", function() {
 				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
 				fileWrite( sourceDir & "/page.md", '---
 title: Real Title

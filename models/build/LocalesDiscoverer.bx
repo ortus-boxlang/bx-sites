@@ -12,7 +12,7 @@ class {
 	/**
 	 * Lists `docs/i18n/*` folders (module spec's locales-by-convention),
 	 * alphabetically - display order in the language switcher is driven by
-	 * `bxdocs.json`'s own `i18n.locales` array instead (BuildPipeline.bx's
+	 * `bxsites.json`'s own `i18n.locales` array instead (BuildPipeline.bx's
 	 * `buildLocalesList()`), so this just needs to report what's on disk.
 	 *
 	 * @docsDir Absolute path to the project's docs/ directory

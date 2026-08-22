@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.TagsIndexBuilder", function() {
 
 			beforeEach( function() {
-				variables.builder = new "models.build.TagsIndexBuilder@bxdocs"();
+				variables.builder = new "models.build.TagsIndexBuilder@bxsites"();
 			} );
 
 			private struct function page( string title, string urlPath, array tags = [], boolean hidden = false ) {

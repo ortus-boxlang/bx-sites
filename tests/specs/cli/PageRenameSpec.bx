@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.PageRename", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.PageRename@bxdocs"();
+				variables.verb = new "models.cli.PageRename@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,28 +17,28 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newProjectRoot() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-pagerename-" );
+				var dir = createTempDirectory( prefix = "bxsites-cli-pagerename-" );
 				tempDirs.append( dir );
 				directoryCreate( dir & "/docs", true, true );
 				return dir;
 			}
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( { from : "a.md", to : "b.md" } );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
-			it( "throws BxDocs.MissingFromPath when from is blank", function() {
+			it( "throws BxSites.MissingFromPath when from is blank", function() {
 				expect( function() {
 					verb.run( { projectRoot : newProjectRoot(), to : "b.md" } );
-				} ).toThrow( "BxDocs.MissingFromPath" );
+				} ).toThrow( "BxSites.MissingFromPath" );
 			} );
 
-			it( "throws BxDocs.MissingToPath when to is blank", function() {
+			it( "throws BxSites.MissingToPath when to is blank", function() {
 				expect( function() {
 					verb.run( { projectRoot : newProjectRoot(), from : "a.md" } );
-				} ).toThrow( "BxDocs.MissingToPath" );
+				} ).toThrow( "BxSites.MissingToPath" );
 			} );
 
 			it( "exits 0 and moves the page, reporting how many other files were updated", function() {

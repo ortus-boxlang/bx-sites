@@ -12,7 +12,7 @@ class {
 	 * blockquote, and a markdown link per visible page.
 	 *
 	 * @pages Array of page structs from DocsLoader.load()
-	 * @config The site's bxdocs.json config
+	 * @config The site's bxsites.json config
 	 * @siteUrl The absolute site URL ending with `/` (BaseUrlResolver's `absolute`), or "" if unknown
 	 * @basePath The root-relative base path ending with `/` (BaseUrlResolver's `basePath`) - used when `siteUrl` is unknown
 	 *

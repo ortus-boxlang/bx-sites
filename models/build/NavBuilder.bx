@@ -6,7 +6,7 @@
  * no link of its own. Hidden pages are excluded entirely - they are still
  * built, just never linked from the nav.
  *
- * An explicit `navConfig` (bxdocs.json's own `nav` array, or a project's
+ * An explicit `navConfig` (bxsites.json's own `nav` array, or a project's
  * `docs/nav.json`) bypasses folder-inference entirely - see build()'s
  * docblock.
  */
@@ -146,7 +146,7 @@ class {
 
 	/**
 	 * Looks up a navConfig entry's `path` against the loaded pages, throwing
-	 * `BxDocs.InvalidConfig` when it references a page that doesn't exist.
+	 * `BxSites.InvalidConfig` when it references a page that doesn't exist.
 	 *
 	 * @path A docs/-relative nav entry path, e.g. `"guides/setup.md"`
 	 * @pagesByPath Every loaded page, indexed by lowercased relativePath
@@ -155,7 +155,7 @@ class {
 		var key = lCase( trim( arguments.path ) )
 		if ( !arguments.pagesByPath.keyExists( key ) ) {
 			throw(
-				type    = "BxDocs.InvalidConfig",
+				type    = "BxSites.InvalidConfig",
 				message = "nav entry references [#arguments.path#], which doesn't match any file under docs/"
 			)
 		}

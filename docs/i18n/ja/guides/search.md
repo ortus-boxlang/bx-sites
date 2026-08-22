@@ -6,7 +6,7 @@ tags: [guides, search]
 
 # 検索
 
-BX Docs の検索は完全に静的でクライアントサイドです。[mkdocs](https://www.mkdocs.org/)
+BX Sites の検索は完全に静的でクライアントサイドです。[mkdocs](https://www.mkdocs.org/)
 がデフォルトで使用するのと同じアプローチです: `build` 時に一度作成されるインデックスと、
 訪問者のブラウザで実際の検索を行う [lunr.js](https://lunrjs.com/) の組み合わせです。
 サーバー、データベース、外部検索サービスは一切不要です。
@@ -18,7 +18,7 @@ BX Docs の検索は完全に静的でクライアントサイドです。[mkdoc
    フロントマターの `tags`、ページ上のすべての見出しのテキスト、
    本文の切り詰めたプレーンテキストのコピー（HTML タグを除去）を 1 エントリとして格納します。
 2. 各テーマの `search.bxm` パーシャルが検索ボックスをレンダリングします。
-   `layout.bxm` は `bxdocs.json` の `search` が `true` の場合のみ
+   `layout.bxm` は `bxsites.json` の `search` が `true` の場合のみ
    これ（と `lunr.js` + 共有 `search.js` スクリプト）を含めます。
 3. ブラウザでは、共有の `assets/search.js` ウィジェットが `search-index.json` を
    一度取得し、`lunr` インデックスをビルドして（`title` を最高優先度として、
@@ -44,7 +44,7 @@ BX Docs の検索は完全に静的でクライアントサイドです。[mkdoc
 ## インデックスのみ再ビルド
 
 ```bash
-bxDocs search-index
+bxSites search-index
 ```
 
 `search-index.json` を更新するだけの場合に便利です。`build` はその手順の一つとして

@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.I18nStatus", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.I18nStatus@bxdocs"();
+				variables.verb = new "models.cli.I18nStatus@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,17 +17,17 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newProjectRoot() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-i18nstatus-" );
+				var dir = createTempDirectory( prefix = "bxsites-cli-i18nstatus-" );
 				tempDirs.append( dir );
 				directoryCreate( dir & "/docs", true, true );
 				fileWrite( dir & "/docs/index.md", "Home" );
 				return dir;
 			}
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( {} );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
 			it( "always exits 0 and reports no locales when there's no docs/i18n/", function() {

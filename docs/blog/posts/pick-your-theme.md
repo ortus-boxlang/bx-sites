@@ -5,11 +5,11 @@ authors: [lmajano]
 categories: [Getting Started, Themes]
 tags: [themes, bootstrap, material, tailwind, customization]
 summary: Bootstrap, Material, or Tailwind - all three ship the same feature set, so picking one is about look and feel, not tradeoffs.
-description: A tour of BX Docs' three built-in themes, how to switch between them, and how to override or customize one without forking it.
+description: A tour of BX Sites' three built-in themes, how to switch between them, and how to override or customize one without forking it.
 image: assets/blog/pick-your-theme-cover.svg
 ---
 
-One question I get a lot after someone runs `bxDocs new` for the first time: "which theme should I actually pick?" The honest answer is that it barely matters at the feature level - all three built-in themes ship the exact same set of capabilities. It's purely a question of which one matches your project's own visual identity.
+One question I get a lot after someone runs `bxSites new` for the first time: "which theme should I actually pick?" The honest answer is that it barely matters at the feature level - all three built-in themes ship the exact same set of capabilities. It's purely a question of which one matches your project's own visual identity.
 
 <!-- more -->
 
@@ -27,11 +27,11 @@ Every one of them ships with the same page furniture out of the box: an "On this
 
 One line in your config:
 
-```json title="bxdocs.json"
+```json title="bxsites.json"
 { "theme": { "name": "material" } }
 ```
 
-Rebuild (or let `bxDocs serve` pick it up automatically) and you're done. There's no content migration involved because a theme only ever touches how `variables.page.contentHtml` gets laid out - your Markdown doesn't change at all.
+Rebuild (or let `bxSites serve` pick it up automatically) and you're done. There's no content migration involved because a theme only ever touches how `variables.page.contentHtml` gets laid out - your Markdown doesn't change at all.
 
 ## A note on offline/air-gapped sites
 
@@ -41,16 +41,16 @@ If your deployment target has genuinely zero internet access, stick with `bootst
 
 For a color or font tweak, you don't need to fork a whole theme. Every built-in theme reads its palette off a handful of CSS custom properties on `:root`:
 
-```json title="bxdocs.json"
+```json title="bxsites.json"
 { "extraCss": ["assets/brand.css"] }
 ```
 
 ```css title="docs/assets/brand.css" linenums="1"
 /* docs/assets/brand.css */
 :root {
-	--bxdocs-gradient-start: #7C3AED;
-	--bxdocs-gradient-end: #DB2777;
-	--bxdocs-accent: #FBBF24;
+	--bxsites-gradient-start: #7C3AED;
+	--bxsites-gradient-end: #DB2777;
+	--bxsites-accent: #FBBF24;
 }
 ```
 
@@ -58,7 +58,7 @@ For a color or font tweak, you don't need to fork a whole theme. Every built-in 
 
 ## When you need real control
 
-If you need to change actual markup - not just color - copy a built-in theme's `layout.bxm`/`page.bxm`/`assets/` into a project-level `theme/` folder. BX Docs always prefers a project `theme/` override over the built-in one, as long as it satisfies the two required files (`layout.bxm` and `page.bxm`). It's genuinely the same files the built-in themes ship, just sitting in your own project where you can edit them freely.
+If you need to change actual markup - not just color - copy a built-in theme's `layout.bxm`/`page.bxm`/`assets/` into a project-level `theme/` folder. BX Sites always prefers a project `theme/` override over the built-in one, as long as it satisfies the two required files (`layout.bxm` and `page.bxm`). It's genuinely the same files the built-in themes ship, just sitting in your own project where you can edit them freely.
 
 I still default new projects to `bootstrap` almost every time - it's a safe, familiar baseline - but `material`'s card layout is a great fit for API-reference-heavy docs, and I've reached for `tailwind` more than once on smaller marketing-adjacent sites where I wanted full utility-class control.
 

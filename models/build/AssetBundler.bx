@@ -1,7 +1,7 @@
 /**
  * Concatenates a project's own local `extraCss`/`extraJs` files into one
  * fingerprinted bundle each - no Node/esbuild toolchain, pure BoxLang/JVM,
- * matching bx-docs' own zero-extra-dependency build story.
+ * matching bx-sites' own zero-extra-dependency build story.
  *
  * Deliberately conservative rather than a true minifier: a naive
  * comment-stripping regex is a well-known way to corrupt real JavaScript
@@ -20,11 +20,11 @@
  */
 class {
 
-	variables.fingerprinter = new "models.build.AssetFingerprinter@bxdocs"()
+	variables.fingerprinter = new "models.build.AssetFingerprinter@bxsites"()
 	variables.cssCommentPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "/\*[\s\S]*?\*/" )
 
 	/**
-	 * @urls bxdocs.json's own `extraCss` array
+	 * @urls bxsites.json's own `extraCss` array
 	 * @docsDir Absolute path to the project's `docs/` directory - each entry resolves against it, same convention `theme.logo`/`ogImage` already use
 	 * @cacheDir Absolute path to this project's own `.cache/assets/` directory
 	 * @fingerprint `assets.fingerprint` - `true` (the default) content-hash-names the bundle; `false` names it plain `bundle.css`, rewritten (never cache-skipped) on every build
@@ -36,7 +36,7 @@ class {
 	}
 
 	/**
-	 * @urls bxdocs.json's own `extraJs` array
+	 * @urls bxsites.json's own `extraJs` array
 	 * @docsDir Absolute path to the project's `docs/` directory
 	 * @cacheDir Absolute path to this project's own `.cache/assets/` directory
 	 * @fingerprint `assets.fingerprint` - `true` (the default) content-hash-names the bundle; `false` names it plain `bundle.js`, rewritten (never cache-skipped) on every build

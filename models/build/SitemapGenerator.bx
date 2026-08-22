@@ -2,7 +2,7 @@
  * Builds a standard XML sitemap (sitemaps.org protocol). Only meaningful
  * with a real absolute site URL - the protocol requires absolute `<loc>`
  * values - so BuildPipeline only calls this when `BaseUrlResolver` found
- * one (bxdocs.json's `baseURL` was a full `http(s)://` URL). Hidden pages
+ * one (bxsites.json's `baseURL` was a full `http(s)://` URL). Hidden pages
  * are excluded, same as the nav and search index.
  */
 class {

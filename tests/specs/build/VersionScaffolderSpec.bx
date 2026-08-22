@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.VersionScaffolder", function() {
 
 			beforeEach( function() {
-				variables.scaffolder = new "models.build.VersionScaffolder@bxdocs"();
+				variables.scaffolder = new "models.build.VersionScaffolder@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,7 +17,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newDocsDir() {
-				var dir = createTempDirectory( prefix = "bxdocs-versionscaffolder-" );
+				var dir = createTempDirectory( prefix = "bxsites-versionscaffolder-" );
 				tempDirs.append( dir & "/docs" );
 				var docsDir = dir & "/docs";
 				directoryCreate( docsDir & "/guides", true, true );
@@ -32,19 +32,19 @@ class extends="testbox.system.BaseSpec" {
 				return docsDir;
 			}
 
-			it( "throws BxDocs.MissingVersionName when name is blank", function() {
+			it( "throws BxSites.MissingVersionName when name is blank", function() {
 				expect( function() {
 					scaffolder.scaffold( docsDir : newDocsDir(), name : "  " );
-				} ).toThrow( "BxDocs.MissingVersionName" );
+				} ).toThrow( "BxSites.MissingVersionName" );
 			} );
 
-			it( "throws BxDocs.DocsDirNotFound when there's no docs/ directory", function() {
-				var dir = createTempDirectory( prefix = "bxdocs-versionscaffolder-nodocs-" );
+			it( "throws BxSites.DocsDirNotFound when there's no docs/ directory", function() {
+				var dir = createTempDirectory( prefix = "bxsites-versionscaffolder-nodocs-" );
 				tempDirs.append( dir );
 
 				expect( function() {
 					scaffolder.scaffold( docsDir : dir & "/docs", name : "2.0" );
-				} ).toThrow( "BxDocs.DocsDirNotFound" );
+				} ).toThrow( "BxSites.DocsDirNotFound" );
 			} );
 
 			it( "copies top-level pages/folders into docs/versions/<name>/, excluding assets/blog/i18n/versions", function() {
@@ -61,13 +61,13 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.copiedCount ).toBe( 2 );
 			} );
 
-			it( "throws BxDocs.VersionAlreadyExists rather than overwriting", function() {
+			it( "throws BxSites.VersionAlreadyExists rather than overwriting", function() {
 				var docsDir = newDocsDir();
 				scaffolder.scaffold( docsDir : docsDir, name : "2.0" );
 
 				expect( function() {
 					scaffolder.scaffold( docsDir : docsDir, name : "2.0" );
-				} ).toThrow( "BxDocs.VersionAlreadyExists" );
+				} ).toThrow( "BxSites.VersionAlreadyExists" );
 			} );
 
 		} );

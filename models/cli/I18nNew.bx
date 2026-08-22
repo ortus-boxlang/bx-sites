@@ -9,15 +9,15 @@ class {
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
 		if ( !len( projectRoot ) ) {
-			throw( type = "BxDocs.MissingProjectRoot", message = "`i18n:new` requires a project root" )
+			throw( type = "BxSites.MissingProjectRoot", message = "`i18n:new` requires a project root" )
 		}
 
 		var code = trim( arguments.options.code ?: "" )
 		if ( !len( code ) ) {
-			throw( type = "BxDocs.MissingLocaleCode", message = "`i18n:new` requires --code=<locale>" )
+			throw( type = "BxSites.MissingLocaleCode", message = "`i18n:new` requires --code=<locale>" )
 		}
 
-		var scaffolder = new "models.build.LocaleScaffolder@bxdocs"()
+		var scaffolder = new "models.build.LocaleScaffolder@bxsites"()
 		var result = scaffolder.scaffold( docsDir : projectRoot & "/docs", code : code )
 
 		return {

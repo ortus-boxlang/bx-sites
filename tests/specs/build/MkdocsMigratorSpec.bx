@@ -1,5 +1,5 @@
 /**
- * Exercises MkdocsMigrator.bx directly against temp mkdocs/bx-docs project
+ * Exercises MkdocsMigrator.bx directly against temp mkdocs/bx-sites project
  * directories - no CLI dispatch involved (see MigrateSpec.bx for that).
  *
  * Unlike ConfigLoaderSpec.bx/BlogAuthorsLoaderSpec.bx (FakeYamlRenderer.bx
@@ -15,7 +15,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.MkdocsMigrator", function() {
 
 			beforeEach( function() {
-				variables.migrator = new "models.build.MkdocsMigrator@bxdocs"();
+				variables.migrator = new "models.build.MkdocsMigrator@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -28,7 +28,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newMkdocsProject( string mkdocsYml = 'site_name: My Docs' ) {
-				var dir = createTempDirectory( prefix = "bxdocs-mkdocs-source-" );
+				var dir = createTempDirectory( prefix = "bxsites-mkdocs-source-" );
 				tempDirs.append( dir );
 				directoryCreate( dir & "/docs", true, true );
 				fileWrite( dir & "/mkdocs.yml", arguments.mkdocsYml );
@@ -36,51 +36,51 @@ class extends="testbox.system.BaseSpec" {
 			}
 
 			private string function newProjectRoot() {
-				var dir = createTempDirectory( prefix = "bxdocs-mkdocs-project-" );
+				var dir = createTempDirectory( prefix = "bxsites-mkdocs-project-" );
 				tempDirs.append( dir );
 				return dir;
 			}
 
-			it( "throws BxDocs.MigrateMissingMkdocsConfig when there's no mkdocs.yml", function() {
-				var source = createTempDirectory( prefix = "bxdocs-mkdocs-empty-" );
+			it( "throws BxSites.MigrateMissingMkdocsConfig when there's no mkdocs.yml", function() {
+				var source = createTempDirectory( prefix = "bxsites-mkdocs-empty-" );
 				tempDirs.append( source );
 
 				expect( function() {
 					migrator.migrate( source, newProjectRoot() );
-				} ).toThrow( "BxDocs.MigrateMissingMkdocsConfig" );
+				} ).toThrow( "BxSites.MigrateMissingMkdocsConfig" );
 			} );
 
-			it( "throws BxDocs.MigrateMissingDocsDir when mkdocs.yml's own docs_dir doesn't exist", function() {
-				var source = createTempDirectory( prefix = "bxdocs-mkdocs-nodocsdir-" );
+			it( "throws BxSites.MigrateMissingDocsDir when mkdocs.yml's own docs_dir doesn't exist", function() {
+				var source = createTempDirectory( prefix = "bxsites-mkdocs-nodocsdir-" );
 				tempDirs.append( source );
 				fileWrite( source & "/mkdocs.yml", "site_name: My Docs" );
 
 				expect( function() {
 					migrator.migrate( source, newProjectRoot() );
-				} ).toThrow( "BxDocs.MigrateMissingDocsDir" );
+				} ).toThrow( "BxSites.MigrateMissingDocsDir" );
 			} );
 
-			it( "throws BxDocs.InvalidMkdocsConfig for malformed YAML", function() {
-				var source = createTempDirectory( prefix = "bxdocs-mkdocs-badyaml-" );
+			it( "throws BxSites.InvalidMkdocsConfig for malformed YAML", function() {
+				var source = createTempDirectory( prefix = "bxsites-mkdocs-badyaml-" );
 				tempDirs.append( source );
 				fileWrite( source & "/mkdocs.yml", "site_name: [unclosed" );
 
 				expect( function() {
 					migrator.migrate( source, newProjectRoot() );
-				} ).toThrow( "BxDocs.InvalidMkdocsConfig" );
+				} ).toThrow( "BxSites.InvalidMkdocsConfig" );
 			} );
 
-			it( "throws BxDocs.InvalidMkdocsConfig when mkdocs.yml's root isn't an object", function() {
-				var source = createTempDirectory( prefix = "bxdocs-mkdocs-notobject-" );
+			it( "throws BxSites.InvalidMkdocsConfig when mkdocs.yml's root isn't an object", function() {
+				var source = createTempDirectory( prefix = "bxsites-mkdocs-notobject-" );
 				tempDirs.append( source );
 				fileWrite( source & "/mkdocs.yml", "- just" & char( 10 ) & "- a" & char( 10 ) & "- list" );
 
 				expect( function() {
 					migrator.migrate( source, newProjectRoot() );
-				} ).toThrow( "BxDocs.InvalidMkdocsConfig" );
+				} ).toThrow( "BxSites.InvalidMkdocsConfig" );
 			} );
 
-			it( "converts site_name/site_description/site_url/repo into bxdocs.yaml", function() {
+			it( "converts site_name/site_description/site_url/repo into bxsites.yaml", function() {
 				var source = newMkdocsProject(
 					'site_name: My Docs' & char( 10 ) &
 					'site_description: A great project' & char( 10 ) &
@@ -103,7 +103,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( projectRoot & "/docs/index.md" ) ).toBeTrue();
 			} );
 
-			it( "maps theme.name material to the bx-docs material theme, and falls back to bootstrap with a warning for anything else", function() {
+			it( "maps theme.name material to the bx-sites material theme, and falls back to bootstrap with a warning for anything else", function() {
 				var materialSource = newMkdocsProject( "site_name: Docs" & char( 10 ) & "theme:" & char( 10 ) & "  name: material" );
 				fileWrite( materialSource & "/docs/index.md", "Home" );
 				var materialResult = migrator.migrate( materialSource, newProjectRoot() );
@@ -222,7 +222,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( converted ).toInclude( "(##top)" );
 			} );
 
-			it( "copies admonition/tab/math syntax through completely unchanged - it's already bx-docs' own native syntax", function() {
+			it( "copies admonition/tab/math syntax through completely unchanged - it's already bx-sites' own native syntax", function() {
 				var source = newMkdocsProject();
 				var body = '!!! note "Heads up"' & char( 10 ) & "    Body text." & char( 10 ) & char( 10 ) &
 					'=== "Tab A"' & char( 10 ) & "    Content." & char( 10 ) & char( 10 ) &
@@ -235,18 +235,18 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileRead( projectRoot & "/docs/index.md" ) ).toBe( body );
 			} );
 
-			it( "warns and overwrites when bxdocs.yaml/docs/nav.json already exist", function() {
+			it( "warns and overwrites when bxsites.yaml/docs/nav.json already exist", function() {
 				var source = newMkdocsProject( "site_name: Docs" & char( 10 ) & "nav:" & char( 10 ) & "  - Home: index.md" );
 				fileWrite( source & "/docs/index.md", "Home" );
 
 				var projectRoot = newProjectRoot();
-				fileWrite( projectRoot & "/bxdocs.yaml", 'name: "Old"' );
+				fileWrite( projectRoot & "/bxsites.yaml", 'name: "Old"' );
 				directoryCreate( projectRoot & "/docs", true, true );
 				fileWrite( projectRoot & "/docs/nav.json", "[]" );
 
 				var result = migrator.migrate( source, projectRoot );
 
-				expect( result.warnings.filter( w => w.findNoCase( "bxdocs.yaml already existed" ) > 0 ).len() ).toBe( 1 );
+				expect( result.warnings.filter( w => w.findNoCase( "bxsites.yaml already existed" ) > 0 ).len() ).toBe( 1 );
 				expect( result.warnings.filter( w => w.findNoCase( "nav.json already existed" ) > 0 ).len() ).toBe( 1 );
 				expect( yamlDeserialize( fileRead( result.configPath ) ).name ).toBe( "Docs" );
 			} );

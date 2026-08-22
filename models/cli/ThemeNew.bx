@@ -9,20 +9,20 @@ class {
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
 		if ( !len( projectRoot ) ) {
-			throw( type = "BxDocs.MissingProjectRoot", message = "`theme:new` requires a project root" )
+			throw( type = "BxSites.MissingProjectRoot", message = "`theme:new` requires a project root" )
 		}
 
 		var theme = trim( arguments.options.theme ?: "" )
 		if ( !len( theme ) ) {
-			throw( type = "BxDocs.MissingThemeName", message = "`theme:new` requires --theme=<bootstrap|material|tailwind>" )
+			throw( type = "BxSites.MissingThemeName", message = "`theme:new` requires --theme=<bootstrap|material|tailwind>" )
 		}
 
-		var scaffolder = new "models.build.ThemeScaffolder@bxdocs"()
+		var scaffolder = new "models.build.ThemeScaffolder@bxsites"()
 		var result = scaffolder.scaffold( projectRoot : projectRoot, theme : theme )
 
 		return {
 			exitCode : 0,
-			message  : "Copied the #theme# theme into #result.themeDir# - edit it freely, BX Docs picks up a project-level theme/ automatically"
+			message  : "Copied the #theme# theme into #result.themeDir# - edit it freely, BX Sites picks up a project-level theme/ automatically"
 		}
 	}
 

@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.PluginScaffolder", function() {
 
 			beforeEach( function() {
-				variables.scaffolder = new "models.build.PluginScaffolder@bxdocs"();
+				variables.scaffolder = new "models.build.PluginScaffolder@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,18 +17,18 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newDestDir() {
-				var dir = createTempDirectory( prefix = "bxdocs-pluginscaffolder-" );
+				var dir = createTempDirectory( prefix = "bxsites-pluginscaffolder-" );
 				tempDirs.append( dir );
 				return dir & "/my-plugin";
 			}
 
-			it( "throws BxDocs.MissingPluginName when name is blank", function() {
+			it( "throws BxSites.MissingPluginName when name is blank", function() {
 				expect( function() {
 					scaffolder.scaffold( destDir : newDestDir(), name : "  " );
-				} ).toThrow( "BxDocs.MissingPluginName" );
+				} ).toThrow( "BxSites.MissingPluginName" );
 			} );
 
-			it( "scaffolds box.json, ModuleConfig.bx, and models/BxDocsPlugin.bx", function() {
+			it( "scaffolds box.json, ModuleConfig.bx, and models/BxSitesPlugin.bx", function() {
 				var destDir = newDestDir();
 
 				var result = scaffolder.scaffold( destDir : destDir, name : "My Analytics Plugin" );
@@ -37,7 +37,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.moduleName ).toBe( "myAnalyticsPlugin" );
 				expect( fileExists( destDir & "/box.json" ) ).toBeTrue();
 				expect( fileExists( destDir & "/ModuleConfig.bx" ) ).toBeTrue();
-				expect( fileExists( destDir & "/models/BxDocsPlugin.bx" ) ).toBeTrue();
+				expect( fileExists( destDir & "/models/BxSitesPlugin.bx" ) ).toBeTrue();
 
 				var boxJson = fileRead( destDir & "/box.json" );
 				expect( boxJson ).toInclude( '"slug": "my-analytics-plugin"' );
@@ -45,13 +45,13 @@ class extends="testbox.system.BaseSpec" {
 				expect( jsonDeserialize( boxJson ).name ).toBe( "My Analytics Plugin" );
 			} );
 
-			it( "throws BxDocs.PluginDestExists when the destination already exists and isn't empty", function() {
+			it( "throws BxSites.PluginDestExists when the destination already exists and isn't empty", function() {
 				var destDir = newDestDir();
 				scaffolder.scaffold( destDir : destDir, name : "My Plugin" );
 
 				expect( function() {
 					scaffolder.scaffold( destDir : destDir, name : "My Plugin" );
-				} ).toThrow( "BxDocs.PluginDestExists" );
+				} ).toThrow( "BxSites.PluginDestExists" );
 			} );
 
 		} );

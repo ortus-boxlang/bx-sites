@@ -114,7 +114,7 @@ class {
 	 * visible text (a page/nav title) right next to it.
 	 */
 	private string function addAttributes( required string svg ) {
-		return arguments.svg.reReplaceNoCase( "^<svg ", '<svg class="bxdocs-icon" aria-hidden="true" ', "one" )
+		return arguments.svg.reReplaceNoCase( "^<svg ", '<svg class="bxsites-icon" aria-hidden="true" ', "one" )
 	}
 
 	/**

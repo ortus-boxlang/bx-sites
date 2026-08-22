@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.CodeAnnotationProcessor", function() {
 
 			beforeEach( function() {
-				variables.processor = new "models.build.CodeAnnotationProcessor@bxdocs"();
+				variables.processor = new "models.build.CodeAnnotationProcessor@bxsites"();
 			} );
 
 			it( "leaves a plain fence with no extra attributes untouched and records an empty annotation", function() {
@@ -124,18 +124,18 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.markdown ).notToInclude( "hl_lines" );
 			} );
 
-			it( "stamps data-bxdocs-* attributes onto the matching <pre> in document order", function() {
+			it( "stamps data-bxsites-* attributes onto the matching <pre> in document order", function() {
 				var html = '<pre><code class="language-bx">a' & char( 10 ) & '</code></pre>' & char( 10 ) &
 					'<pre><code>plain' & char( 10 ) & '</code></pre>';
 				var annotations = [ { hlLines : [ 1 ], showLineNumbers : true, startLine : 3, title : "app.bx" }, {} ];
 
 				var result = processor.applyToHtml( html, annotations );
 
-				expect( result ).toInclude( '<pre data-bxdocs-hl-lines="1" data-bxdocs-start-line="3" data-bxdocs-title="app.bx"><code class="language-bx">' );
+				expect( result ).toInclude( '<pre data-bxsites-hl-lines="1" data-bxsites-start-line="3" data-bxsites-title="app.bx"><code class="language-bx">' );
 				expect( result ).toInclude( '<pre><code>plain' );
 			} );
 
-			it( 'stamps data-bxdocs-frame only for frame="terminal", and data-bxdocs-insert-lines/delete-lines when set', function() {
+			it( 'stamps data-bxsites-frame only for frame="terminal", and data-bxsites-insert-lines/delete-lines when set', function() {
 				var html = '<pre><code>a' & char( 10 ) & '</code></pre>' & char( 10 ) &
 					'<pre><code>b' & char( 10 ) & '</code></pre>';
 				var annotations = [
@@ -145,10 +145,10 @@ class extends="testbox.system.BaseSpec" {
 
 				var result = processor.applyToHtml( html, annotations );
 
-				expect( result ).toInclude( '<pre data-bxdocs-frame="terminal" data-bxdocs-insert-lines="3,4" data-bxdocs-delete-lines="7"><code>a' );
-				// frame="code" is the plain-bar default - no data-bxdocs-frame at all, same as omitting it.
+				expect( result ).toInclude( '<pre data-bxsites-frame="terminal" data-bxsites-insert-lines="3,4" data-bxsites-delete-lines="7"><code>a' );
+				// frame="code" is the plain-bar default - no data-bxsites-frame at all, same as omitting it.
 				expect( result ).toInclude( '<pre><code>b' );
-				expect( result ).notToInclude( 'data-bxdocs-frame="code"' );
+				expect( result ).notToInclude( 'data-bxsites-frame="code"' );
 			} );
 
 		} );

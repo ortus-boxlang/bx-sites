@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.PostScaffolder", function() {
 
 			beforeEach( function() {
-				variables.scaffolder = new "models.build.PostScaffolder@bxdocs"();
+				variables.scaffolder = new "models.build.PostScaffolder@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,15 +17,15 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newDocsDir() {
-				var dir = createTempDirectory( prefix = "bxdocs-postscaffolder-" );
+				var dir = createTempDirectory( prefix = "bxsites-postscaffolder-" );
 				tempDirs.append( dir );
 				return dir;
 			}
 
-			it( "throws BxDocs.MissingTitle when title is blank", function() {
+			it( "throws BxSites.MissingTitle when title is blank", function() {
 				expect( function() {
 					scaffolder.scaffold( docsDir : newDocsDir(), title : "   " );
-				} ).toThrow( "BxDocs.MissingTitle" );
+				} ).toThrow( "BxSites.MissingTitle" );
 			} );
 
 			it( "creates docs/blog/posts/<slug>.md with a slugified title", function() {
@@ -82,13 +82,13 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileRead( result.path ) ).toInclude( "date: 2020-01-01" );
 			} );
 
-			it( "throws BxDocs.PostAlreadyExists rather than overwriting", function() {
+			it( "throws BxSites.PostAlreadyExists rather than overwriting", function() {
 				var docsDir = newDocsDir();
 				scaffolder.scaffold( docsDir : docsDir, title : "Duplicate Post" );
 
 				expect( function() {
 					scaffolder.scaffold( docsDir : docsDir, title : "Duplicate Post" );
-				} ).toThrow( "BxDocs.PostAlreadyExists" );
+				} ).toThrow( "BxSites.PostAlreadyExists" );
 			} );
 
 		} );

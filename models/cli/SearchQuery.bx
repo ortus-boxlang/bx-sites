@@ -11,12 +11,12 @@ class {
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
 		if ( !len( projectRoot ) ) {
-			throw( type = "BxDocs.MissingProjectRoot", message = "`search:query` requires a project root" )
+			throw( type = "BxSites.MissingProjectRoot", message = "`search:query` requires a project root" )
 		}
 
 		var query = trim( arguments.options.query ?: "" )
 		if ( !len( query ) ) {
-			throw( type = "BxDocs.MissingQuery", message = "`search:query` requires --query=<terms>" )
+			throw( type = "BxSites.MissingQuery", message = "`search:query` requires --query=<terms>" )
 		}
 
 		var limit = val( arguments.options.limit ?: 10 )
@@ -25,7 +25,7 @@ class {
 		}
 
 		var siteDir = projectRoot.reReplace( "[\/]+$", "" ) & "/site"
-		var results = new "models.build.SearchQueryRunner@bxdocs"().run( siteDir : siteDir, query : query, limit : limit )
+		var results = new "models.build.SearchQueryRunner@bxsites"().run( siteDir : siteDir, query : query, limit : limit )
 
 		if ( !results.len() ) {
 			return { exitCode : 0, message : "No results for [#query#]" }

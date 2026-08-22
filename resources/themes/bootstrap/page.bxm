@@ -23,15 +23,15 @@
 			// entity-escapes "safe" characters like "/" (its exact range is
 			// locale/JVM-dependent), needlessly noisy in a plain URL attribute.
 			var escapedEditUrl = arguments.editUrl.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
-			html &= '<a href="' & escapedEditUrl & '" target="_blank" rel="noopener noreferrer">' & bxdocsIcon( "edit" ) & ' Edit this page</a>'
+			html &= '<a href="' & escapedEditUrl & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "edit" ) & ' Edit this page</a>'
 		}
 		if ( len( arguments.markdownUrl ) ) {
 			// Same reasoning as escapedEditUrl above.
 			var escapedMarkdownUrl = arguments.markdownUrl.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
-			html &= '<a href="' & variables.basePath & escapedMarkdownUrl & '" download>' & bxdocsIcon( "markdown" ) & ' Download Markdown</a>'
+			html &= '<a href="' & variables.basePath & escapedMarkdownUrl & '" download>' & bxsitesIcon( "markdown" ) & ' Download Markdown</a>'
 		}
 		if ( len( arguments.lastUpdated ) ) {
-			html &= '<span class="page-meta__item">' & bxdocsIcon( "clock" ) & ' Last updated ' & encodeForHTML( dateTimeFormat( arguments.lastUpdated, "medium" ) ) & '</span>'
+			html &= '<span class="page-meta__item">' & bxsitesIcon( "clock" ) & ' Last updated ' & encodeForHTML( dateTimeFormat( arguments.lastUpdated, "medium" ) ) & '</span>'
 		}
 		html &= '</div>'
 		return html
@@ -52,7 +52,7 @@
 		listHtml &= '</ul>'
 
 		if ( arguments.hideAtXl ) {
-			return '<details class="bxdocs-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">On this page</summary>' & listHtml & '</details>'
+			return '<details class="bxsites-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">On this page</summary>' & listHtml & '</details>'
 		}
 
 		return '<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div>' & listHtml & '</nav>'
@@ -84,7 +84,7 @@
 </bx:script>
 <bx:output>				<article class="page-content">
 </bx:output><bx:if condition="#variables.page.isFallbackContent#"><bx:output>
-					<p class="fallback-notice">#bxdocsIcon( 'globe' )# This page hasn't been translated yet - showing the #encodeForHTML( defaultLocaleLabel() )# version.</p>
+					<p class="fallback-notice">#bxsitesIcon( 'globe' )# This page hasn't been translated yet - showing the #encodeForHTML( defaultLocaleLabel() )# version.</p>
 </bx:output></bx:if><bx:if condition="#variables.page.breadcrumbs.len() gt 1#"><bx:output>#renderBreadcrumbs( variables.page.breadcrumbs )#</bx:output></bx:if><bx:output>
 					<h1 class="page-title" id="page-title"><a href="##page-title" id="page-title" class="anchor"></a></bx:output><bx:if condition="#len( variables.page.iconHtml )#"><bx:output><span class="page-icon">#variables.page.iconHtml#</span> </bx:output></bx:if><bx:output>#encodeForHTML( variables.page.title )#</h1>
 </bx:output><bx:if condition="#len( variables.page.summary )#"><bx:output>					<p class="page-summary">#encodeForHTML( variables.page.summary )#</p>

@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.SearchIndexer", function() {
 
 			beforeEach( function() {
-				variables.indexer = new "models.build.SearchIndexer@bxdocs"();
+				variables.indexer = new "models.build.SearchIndexer@bxsites"();
 			} );
 
 			private struct function page(

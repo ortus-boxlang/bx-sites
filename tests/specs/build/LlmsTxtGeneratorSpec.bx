@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.LlmsTxtGenerator", function() {
 
 			beforeEach( function() {
-				variables.generator = new "models.build.LlmsTxtGenerator@bxdocs"();
+				variables.generator = new "models.build.LlmsTxtGenerator@bxsites"();
 			} );
 
 			private struct function page( string title, string urlPath, boolean hidden = false ) {

@@ -14,7 +14,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.GhDeploy", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.GhDeploy@bxdocs"();
+				variables.verb = new "models.cli.GhDeploy@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -26,31 +26,31 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( {} );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
-			it( "throws BxDocs.ConfigNotFound when the project has no bxdocs.json", function() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-ghdeploy-" );
+			it( "throws BxSites.ConfigNotFound when the project has no bxsites.json", function() {
+				var dir = createTempDirectory( prefix = "bxsites-cli-ghdeploy-" );
 				tempDirs.append( dir );
 
 				expect( function() {
 					verb.run( { projectRoot : dir } );
-				} ).toThrow( "BxDocs.ConfigNotFound" );
+				} ).toThrow( "BxSites.ConfigNotFound" );
 			} );
 
-			it( "throws BxDocs.NotAGitRepo when the project has no .git, even with a valid bxdocs.json", function() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-ghdeploy-" );
+			it( "throws BxSites.NotAGitRepo when the project has no .git, even with a valid bxsites.json", function() {
+				var dir = createTempDirectory( prefix = "bxsites-cli-ghdeploy-" );
 				tempDirs.append( dir );
 				directoryCreate( dir & "/docs", true, true );
-				fileWrite( dir & "/bxdocs.json", '{"name":"Test Site"}' );
+				fileWrite( dir & "/bxsites.json", '{"name":"Test Site"}' );
 				fileWrite( dir & "/docs/index.md", "Home" );
 
 				expect( function() {
 					verb.run( { projectRoot : dir } );
-				} ).toThrow( "BxDocs.NotAGitRepo" );
+				} ).toThrow( "BxSites.NotAGitRepo" );
 			} );
 
 		} );

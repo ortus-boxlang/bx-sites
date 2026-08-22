@@ -4,8 +4,8 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.IncludeProcessor", function() {
 
 			beforeEach( function() {
-				variables.processor = new "models.build.IncludeProcessor@bxdocs"();
-				variables.docsDir = createTempDirectory( prefix = "bxdocs-include-" );
+				variables.processor = new "models.build.IncludeProcessor@bxsites"();
+				variables.docsDir = createTempDirectory( prefix = "bxsites-include-" );
 			} );
 
 			afterEach( function() {
@@ -84,20 +84,20 @@ class extends="testbox.system.BaseSpec" {
 				expect( result ).toInclude( "After." );
 			} );
 
-			it( "throws BxDocs.IncludeNotFound for a missing bare src (no includes/ folder at all)", function() {
+			it( "throws BxSites.IncludeNotFound for a missing bare src (no includes/ folder at all)", function() {
 				expect( function() {
 					processor.process( '::: include src="missing.md"', docsDir, "index.md" );
-				} ).toThrow( "BxDocs.IncludeNotFound" );
+				} ).toThrow( "BxSites.IncludeNotFound" );
 			} );
 
-			it( "throws BxDocs.CircularInclude for a two-file include cycle", function() {
+			it( "throws BxSites.CircularInclude for a two-file include cycle", function() {
 				directoryCreate( docsDir & "/includes", true, true );
 				fileWrite( docsDir & "/includes/a.md", '::: include src="b.md"' );
 				fileWrite( docsDir & "/includes/b.md", '::: include src="a.md"' );
 
 				expect( function() {
 					processor.process( '::: include src="a.md"', docsDir, "index.md" );
-				} ).toThrow( "BxDocs.CircularInclude" );
+				} ).toThrow( "BxSites.CircularInclude" );
 			} );
 
 		} );

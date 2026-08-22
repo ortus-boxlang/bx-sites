@@ -1,6 +1,6 @@
-name: "BX Docs"
+name: "BX Sites"
 description: "Static documentation site generator for BoxLang, built on bx-markdown"
-baseURL: "https://ortus-boxlang.github.io/bx-docs/"
+baseURL: "https://ortus-boxlang.github.io/bx-sites/"
 theme:
   name: bootstrap
   options: { navCollapsible: true, tocPosition: sticky }
@@ -12,7 +12,7 @@ markdown:
   enableFootnotes: true
   enableDefinitionLists: true
 repo:
-  url: "https://github.com/ortus-boxlang/bx-docs"
+  url: "https://github.com/ortus-boxlang/bx-sites"
   editUri: "edit/main/docs/"
 social:
   - url: "https://github.com/ortus-boxlang/BoxLang"

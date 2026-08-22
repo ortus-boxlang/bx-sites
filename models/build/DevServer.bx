@@ -4,7 +4,7 @@
  * `com.sun.net.httpserver.SimpleFileServer` (no external server binary or
  * compiled Java needed - just JDK interop, consistent with this module
  * staying BoxLang-first), and supports polling-based live reload: every
- * rebuilt page gets a small injected script that polls a `/__bxdocs/version`
+ * rebuilt page gets a small injected script that polls a `/__bxsites/version`
  * endpoint and reloads the browser when the served build version changes.
  *
  * `start()`/`stop()`/`checkAndRebuild()` are the real, independently
@@ -14,8 +14,8 @@
  */
 class {
 
-	variables.buildPipeline = new "models.build.BuildPipeline@bxdocs"()
-	variables.configLoader  = new "models.config.ConfigLoader@bxdocs"()
+	variables.buildPipeline = new "models.build.BuildPipeline@bxsites"()
+	variables.configLoader  = new "models.config.ConfigLoader@bxsites"()
 	variables.projectRoot   = ""
 	variables.fileFingerprint = { count : 0, maxModified : 0 }
 	variables.buildVersion  = 0
@@ -52,7 +52,7 @@ class {
 		var outputLevel = createObject( "java", "com.sun.net.httpserver.SimpleFileServer$OutputLevel" ).NONE
 
 		variables.httpServer = createObject( "java", "com.sun.net.httpserver.SimpleFileServer" ).createFileServer( addr, rootPath, outputLevel )
-		variables.httpServer.createContext( "/__bxdocs/version", versionHandler() )
+		variables.httpServer.createContext( "/__bxsites/version", versionHandler() )
 		variables.httpServer.start()
 		variables.started = true
 
@@ -75,7 +75,7 @@ class {
 	}
 
 	/**
-	 * Rebuilds the project if `docs/`, `bxdocs.json` or a project `theme/`
+	 * Rebuilds the project if `docs/`, `bxsites.json` or a project `theme/`
 	 * override changed since the last build, bumping the version the
 	 * live-reload poller compares against. Cheap to call repeatedly - the
 	 * CLI verb's own watch loop is expected to call this every second or so
@@ -94,7 +94,7 @@ class {
 
 	/**
 	 * The live-reload poller's current version number, exposed for tests -
-	 * the same value the `/__bxdocs/version` endpoint serves.
+	 * the same value the `/__bxsites/version` endpoint serves.
 	 */
 	numeric function getBuildVersion() {
 		return variables.buildVersion
@@ -104,7 +104,7 @@ class {
 	 * Runs a full BuildPipeline.build() - with blog drafts included, so a
 	 * post can be previewed locally before its `date` arrives or its
 	 * `draft: true` is lifted (BuildPipeline.build()'s own `includeDrafts`,
-	 * never on for a real `bxDocs build`) - re-injects the live-reload
+	 * never on for a real `bxSites build`) - re-injects the live-reload
 	 * script, and bumps `buildVersion` so polling clients pick up the change.
 	 */
 	private void function rebuild() {
@@ -116,15 +116,15 @@ class {
 
 	/**
 	 * Appends the live-reload poller script to every built page and writes
-	 * the poller script itself to `site/__bxdocs-live-reload.js` - both
+	 * the poller script itself to `site/__bxsites-live-reload.js` - both
 	 * wiped and rewritten on every rebuild, since BuildPipeline.build()
 	 * deletes and recreates `site/` wholesale each time.
 	 */
 	private void function injectLiveReload() {
 		var siteDir = variables.projectRoot & "/site"
-		fileWrite( siteDir & "/__bxdocs-live-reload.js", liveReloadScript() )
+		fileWrite( siteDir & "/__bxsites-live-reload.js", liveReloadScript() )
 
-		var scriptTag = '<script src="/__bxdocs-live-reload.js"></script></body>'
+		var scriptTag = '<script src="/__bxsites-live-reload.js"></script></body>'
 		for ( var path in directoryList( siteDir, true, "path", "*.html" ) ) {
 			var html = fileRead( path )
 			if ( html.findNoCase( "</body>" ) ) {
@@ -138,7 +138,7 @@ class {
 	 * checkAndRebuild() can detect a change without re-reading file
 	 * contents.
 	 *
-	 * @return { count, maxModified } across the site config (bxdocs.yaml/.yml/.json, whichever is present), docs/** and a project theme/ override, if present
+	 * @return { count, maxModified } across the site config (bxsites.yaml/.yml/.json, whichever is present), docs/** and a project theme/ override, if present
 	 */
 	private struct function currentFingerprint() {
 		var paths = []
@@ -182,7 +182,7 @@ class {
 	}
 
 	/**
-	 * Builds the client-side poller script - polls `/__bxdocs/version` and
+	 * Builds the client-side poller script - polls `/__bxsites/version` and
 	 * reloads the page the first time the version number changes.
 	 */
 	private string function liveReloadScript() {
@@ -190,7 +190,7 @@ class {
 			"(function () {",
 			"	var lastVersion = null;",
 			"	setInterval( function () {",
-			'		fetch( "/__bxdocs/version", { cache : "no-store" } )',
+			'		fetch( "/__bxsites/version", { cache : "no-store" } )',
 			"			.then( function ( res ) { return res.text(); } )",
 			"			.then( function ( version ) {",
 			"				if ( lastVersion === null ) {",

@@ -4,14 +4,14 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.MarkdownLinkResolver", function() {
 
 			beforeEach( function() {
-				variables.resolver = new "models.build.MarkdownLinkResolver@bxdocs"();
+				variables.resolver = new "models.build.MarkdownLinkResolver@bxsites"();
 			} );
 
 			it( "resolves a root-level page's sibling .md link to its pretty-URL", function() {
 				var html = '<a href="getting-started.md">Getting Started</a>';
-				var result = variables.resolver.resolve( html, "index.md", "/bx-docs/" );
+				var result = variables.resolver.resolve( html, "index.md", "/bx-sites/" );
 
-				expect( result ).toInclude( 'href="/bx-docs/getting-started/index.html"' );
+				expect( result ).toInclude( 'href="/bx-sites/getting-started/index.html"' );
 			} );
 
 			it( "resolves a same-folder sibling link, accounting for the linking page's own added URL depth", function() {
@@ -19,23 +19,23 @@ class extends="testbox.system.BaseSpec" {
 				// guides/<name>/index.html, so the correct link is a sibling of
 				// guides/themes/index.html, not nested under it.
 				var html = '<a href="search.md">Search</a>';
-				var result = variables.resolver.resolve( html, "guides/themes.md", "/bx-docs/" );
+				var result = variables.resolver.resolve( html, "guides/themes.md", "/bx-sites/" );
 
-				expect( result ).toInclude( 'href="/bx-docs/guides/search/index.html"' );
+				expect( result ).toInclude( 'href="/bx-sites/guides/search/index.html"' );
 			} );
 
 			it( "resolves a parent-relative ../ link with an anchor preserved", function() {
 				var html = '<a href="../configuration.md##repo">Configuration</a>';
-				var result = variables.resolver.resolve( html, "guides/themes.md", "/bx-docs/" );
+				var result = variables.resolver.resolve( html, "guides/themes.md", "/bx-sites/" );
 
-				expect( result ).toInclude( 'href="/bx-docs/configuration/index.html##repo"' );
+				expect( result ).toInclude( 'href="/bx-sites/configuration/index.html##repo"' );
 			} );
 
 			it( "maps a linked index.md to its folder's own index.html, not a nested index/ folder", function() {
 				var html = '<a href="../index.md">Home</a>';
-				var result = variables.resolver.resolve( html, "guides/themes.md", "/bx-docs/" );
+				var result = variables.resolver.resolve( html, "guides/themes.md", "/bx-sites/" );
 
-				expect( result ).toInclude( 'href="/bx-docs/index.html"' );
+				expect( result ).toInclude( 'href="/bx-sites/index.html"' );
 			} );
 
 			it( "leaves absolute URLs, mailto links, root-relative paths and pure anchors untouched", function() {
@@ -44,14 +44,14 @@ class extends="testbox.system.BaseSpec" {
 					'<a href="/already/rooted/index.html">C</a>' &
 					'<a href="##section">D</a>';
 
-				var result = variables.resolver.resolve( html, "guides/themes.md", "/bx-docs/" );
+				var result = variables.resolver.resolve( html, "guides/themes.md", "/bx-sites/" );
 
 				expect( result ).toBe( html );
 			} );
 
 			it( "leaves a non-.md relative href untouched", function() {
 				var html = '<a href="../assets/logo.svg">Logo</a>';
-				var result = variables.resolver.resolve( html, "guides/themes.md", "/bx-docs/" );
+				var result = variables.resolver.resolve( html, "guides/themes.md", "/bx-sites/" );
 
 				expect( result ).toInclude( 'href="../assets/logo.svg"' );
 			} );

@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.LocaleScaffolder", function() {
 
 			beforeEach( function() {
-				variables.scaffolder = new "models.build.LocaleScaffolder@bxdocs"();
+				variables.scaffolder = new "models.build.LocaleScaffolder@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,7 +17,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newDocsDir( boolean withIndex = true ) {
-				var dir = createTempDirectory( prefix = "bxdocs-localescaffolder-" );
+				var dir = createTempDirectory( prefix = "bxsites-localescaffolder-" );
 				tempDirs.append( dir );
 				var docsDir = dir & "/docs";
 				directoryCreate( docsDir, true, true );
@@ -27,16 +27,16 @@ class extends="testbox.system.BaseSpec" {
 				return docsDir;
 			}
 
-			it( "throws BxDocs.MissingLocaleCode when code is blank", function() {
+			it( "throws BxSites.MissingLocaleCode when code is blank", function() {
 				expect( function() {
 					scaffolder.scaffold( docsDir : newDocsDir(), code : "  " );
-				} ).toThrow( "BxDocs.MissingLocaleCode" );
+				} ).toThrow( "BxSites.MissingLocaleCode" );
 			} );
 
-			it( "throws BxDocs.InvalidLocaleCode for anything but letters/digits/hyphens", function() {
+			it( "throws BxSites.InvalidLocaleCode for anything but letters/digits/hyphens", function() {
 				expect( function() {
 					scaffolder.scaffold( docsDir : newDocsDir(), code : "en_US!" );
-				} ).toThrow( "BxDocs.InvalidLocaleCode" );
+				} ).toThrow( "BxSites.InvalidLocaleCode" );
 			} );
 
 			it( "creates docs/i18n/<code>/ seeded with a copy of the default index.md", function() {
@@ -66,13 +66,13 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( result.localeDir & "/index.md" ) ).toBeFalse();
 			} );
 
-			it( "throws BxDocs.LocaleAlreadyExists rather than overwriting", function() {
+			it( "throws BxSites.LocaleAlreadyExists rather than overwriting", function() {
 				var docsDir = newDocsDir();
 				scaffolder.scaffold( docsDir : docsDir, code : "es" );
 
 				expect( function() {
 					scaffolder.scaffold( docsDir : docsDir, code : "es" );
-				} ).toThrow( "BxDocs.LocaleAlreadyExists" );
+				} ).toThrow( "BxSites.LocaleAlreadyExists" );
 			} );
 
 		} );

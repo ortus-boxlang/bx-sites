@@ -22,13 +22,13 @@ class {
 	variables.openPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^:::\s*([a-zA-Z][\w-]*)\s*(.*)$" )
 	variables.attrPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(\w+)="([^"]*)"' )
 	variables.titlePattern = createObject( "java", "java.util.regex.Pattern" ).compile( '^"([^"]*)"\s*(.*)$' )
-	variables.fileHrefPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(<a class="bxdocs-file" href=")([^"]*)(")' )
-	variables.iconResolver = new "models.build.IconResolver@bxdocs"()
+	variables.fileHrefPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(<a class="bxsites-file" href=")([^"]*)(")' )
+	variables.iconResolver = new "models.build.IconResolver@bxsites"()
 
 	/**
 	 * `::: step`'s own `color` attribute (renderStepper() below) - the
 	 * semantic marker palettes each built-in theme defines as
-	 * `--bxdocs-step-<color>-bg`/`-text` CSS custom properties (see
+	 * `--bxsites-step-<color>-bg`/`-text` CSS custom properties (see
 	 * docs/guides/themes.md). Unset/unrecognized falls back to the default
 	 * unstyled marker, same as an unset/unrecognized `icon` falls back to
 	 * no icon - a typo never breaks the build, it just doesn't color the step.
@@ -53,7 +53,7 @@ class {
 		var outputLines = []
 		var blocks = []
 		var stack = []
-		var tracker = new "models.build.FenceTracker@bxdocs"()
+		var tracker = new "models.build.FenceTracker@bxsites"()
 
 		for ( var line in lines ) {
 			var trimmedLine = trim( line )
@@ -80,10 +80,10 @@ class {
 				var content = frame.lines.toList( char( 10 ) )
 
 				if ( !stack.len() ) {
-					var token = "bxdocsdirective" & replace( createUUID(), "-", "", "all" )
+					var token = "bxsitesdirective" & replace( createUUID(), "-", "", "all" )
 					blocks.append( { token : token, type : frame.type, attrsRaw : frame.attrsRaw, content : content } )
 					outputLines.append( "" )
-					outputLines.append( '<div class="bxdocs-raw-block" data-bxdocs-token="' & token & '"></div>' )
+					outputLines.append( '<div class="bxsites-raw-block" data-bxsites-token="' & token & '"></div>' )
 					outputLines.append( "" )
 				} else {
 					var parent = stack[ stack.len() ]
@@ -115,10 +115,10 @@ class {
 			stack.deleteAt( stack.len() )
 			var content = frame.lines.toList( char( 10 ) )
 			if ( !stack.len() ) {
-				var token = "bxdocsdirective" & replace( createUUID(), "-", "", "all" )
+				var token = "bxsitesdirective" & replace( createUUID(), "-", "", "all" )
 				blocks.append( { token : token, type : frame.type, attrsRaw : frame.attrsRaw, content : content } )
 				outputLines.append( "" )
-				outputLines.append( '<div class="bxdocs-raw-block" data-bxdocs-token="' & token & '"></div>' )
+				outputLines.append( '<div class="bxsites-raw-block" data-bxsites-token="' & token & '"></div>' )
 				outputLines.append( "" )
 			} else {
 				var parent = stack[ stack.len() ]
@@ -144,7 +144,7 @@ class {
 	string function restore( required string html, required array blocks, required any renderer, struct markdownOptions = {} ) {
 		var result = arguments.html
 		for ( var block in arguments.blocks ) {
-			var placeholder = '<div class="bxdocs-raw-block" data-bxdocs-token="' & block.token & '"></div>'
+			var placeholder = '<div class="bxsites-raw-block" data-bxsites-token="' & block.token & '"></div>'
 			result = result.replace( placeholder, renderBlock( block, arguments.renderer, arguments.markdownOptions ), "one" )
 		}
 		return result
@@ -198,7 +198,7 @@ class {
 			case "link-preview":
 				return renderLinkPreview( attrs )
 			default:
-				return '<div class="bxdocs-directive-unknown">' & renderNested( block.content, renderer, markdownOptions ) & '</div>'
+				return '<div class="bxsites-directive-unknown">' & renderNested( block.content, renderer, markdownOptions ) & '</div>'
 		}
 	}
 
@@ -250,8 +250,8 @@ class {
 	private string function renderExpandable( required struct block, required struct attrs, required any renderer, required struct markdownOptions ) {
 		var title = trim( arguments.attrs.title ?: "" )
 		var openAttr = ( arguments.attrs.open ?: "" ) == "true" ? " open" : ""
-		return '<details class="bxdocs-expandable"' & openAttr & '><summary>' & encodeForHTML( title )
-			& '</summary><div class="bxdocs-expandable__body">' & renderNested( arguments.block.content, arguments.renderer, arguments.markdownOptions )
+		return '<details class="bxsites-expandable"' & openAttr & '><summary>' & encodeForHTML( title )
+			& '</summary><div class="bxsites-expandable__body">' & renderNested( arguments.block.content, arguments.renderer, arguments.markdownOptions )
 			& '</div></details>'
 	}
 
@@ -264,7 +264,7 @@ class {
 	 */
 	private string function renderCards( required struct block, required any renderer, required struct markdownOptions ) {
 		var children = this.extract( arguments.block.content ).blocks
-		var html = '<div class="bxdocs-cards">'
+		var html = '<div class="bxsites-cards">'
 
 		for ( var child in children ) {
 			var attrs = parseAttrs( child.attrsRaw )
@@ -272,17 +272,17 @@ class {
 			var tag = len( href ) ? "a" : "div"
 			var hrefAttr = len( href ) ? ' href="' & attrEscape( href ) & '"' : ""
 
-			html &= "<" & tag & ' class="bxdocs-card"' & hrefAttr & ">"
+			html &= "<" & tag & ' class="bxsites-card"' & hrefAttr & ">"
 			if ( len( trim( attrs.image ?: "" ) ) ) {
-				html &= '<img class="bxdocs-card__image" src="' & attrEscape( attrs.image ) & '" alt="">'
+				html &= '<img class="bxsites-card__image" src="' & attrEscape( attrs.image ) & '" alt="">'
 			} else if ( len( trim( attrs.icon ?: "" ) ) ) {
-				html &= '<div class="bxdocs-card__icon">' & variables.iconResolver.resolve( attrs.icon ) & '</div>'
+				html &= '<div class="bxsites-card__icon">' & variables.iconResolver.resolve( attrs.icon ) & '</div>'
 			}
 			if ( len( trim( attrs.title ?: "" ) ) ) {
-				html &= '<div class="bxdocs-card__title">' & encodeForHTML( attrs.title ) & '</div>'
+				html &= '<div class="bxsites-card__title">' & encodeForHTML( attrs.title ) & '</div>'
 			}
 			if ( len( trim( child.content ) ) ) {
-				html &= '<div class="bxdocs-card__body">' & renderNested( child.content, arguments.renderer, arguments.markdownOptions ) & '</div>'
+				html &= '<div class="bxsites-card__body">' & renderNested( child.content, arguments.renderer, arguments.markdownOptions ) & '</div>'
 			}
 			html &= "</" & tag & ">"
 		}
@@ -297,7 +297,7 @@ class {
 	 */
 	private string function renderColumns( required struct block, required any renderer, required struct markdownOptions ) {
 		var children = this.extract( arguments.block.content ).blocks
-		var html = '<div class="bxdocs-columns">'
+		var html = '<div class="bxsites-columns">'
 
 		for ( var child in children ) {
 			var attrs = parseAttrs( child.attrsRaw )
@@ -306,9 +306,9 @@ class {
 			// anything else is silently ignored rather than trusted verbatim into
 			// a style="" attribute.
 			var styleAttr = width.reFind( "^\d+(\.\d+)?(%|px|rem|em)$" )
-				? ' style="--bxdocs-column-width:' & width & '"'
+				? ' style="--bxsites-column-width:' & width & '"'
 				: ""
-			html &= '<div class="bxdocs-column"' & styleAttr & '>' & renderNested( child.content, arguments.renderer, arguments.markdownOptions ) & '</div>'
+			html &= '<div class="bxsites-column"' & styleAttr & '>' & renderNested( child.content, arguments.renderer, arguments.markdownOptions ) & '</div>'
 		}
 
 		return html & "</div>"
@@ -323,7 +323,7 @@ class {
 	 */
 	private string function renderStepper( required struct block, required any renderer, required struct markdownOptions ) {
 		var children = this.extract( arguments.block.content ).blocks
-		var html = '<div class="bxdocs-stepper">'
+		var html = '<div class="bxsites-stepper">'
 		var idx = 0
 
 		for ( var child in children ) {
@@ -331,13 +331,13 @@ class {
 			var attrs = parseAttrs( child.attrsRaw )
 			var title = trim( attrs.title ?: "" )
 			var color = lCase( trim( attrs.color ?: "" ) )
-			var markerClass = "bxdocs-step__marker" & ( listFindNoCase( variables.stepColors, color ) ? " bxdocs-step__marker--" & color : "" )
+			var markerClass = "bxsites-step__marker" & ( listFindNoCase( variables.stepColors, color ) ? " bxsites-step__marker--" & color : "" )
 
-			html &= '<div class="bxdocs-step">'
+			html &= '<div class="bxsites-step">'
 				& '<div class="' & markerClass & '">' & idx & '</div>'
-				& '<div class="bxdocs-step__content">'
+				& '<div class="bxsites-step__content">'
 			if ( len( title ) ) {
-				html &= '<div class="bxdocs-step__title">' & encodeForHTML( title ) & '</div>'
+				html &= '<div class="bxsites-step__title">' & encodeForHTML( title ) & '</div>'
 			}
 			html &= renderNested( child.content, arguments.renderer, arguments.markdownOptions )
 				& '</div></div>'
@@ -355,25 +355,25 @@ class {
 	 */
 	private string function renderUpdates( required struct block, required any renderer, required struct markdownOptions ) {
 		var children = this.extract( arguments.block.content ).blocks
-		var html = '<div class="bxdocs-updates">'
+		var html = '<div class="bxsites-updates">'
 
 		for ( var child in children ) {
 			var attrs = parseAttrs( child.attrsRaw )
 			var date = trim( attrs.date ?: "" )
 			var tags = listToArray( trim( attrs.tags ?: "" ), "," ).map( tag => trim( tag ) ).filter( tag => len( tag ) )
 
-			html &= '<div class="bxdocs-update">'
+			html &= '<div class="bxsites-update">'
 			if ( len( date ) || tags.len() ) {
-				html &= '<div class="bxdocs-update__meta">'
+				html &= '<div class="bxsites-update__meta">'
 				if ( len( date ) ) {
-					html &= '<time class="bxdocs-update__date" datetime="' & encodeForHTML( date ) & '">' & encodeForHTML( date ) & '</time>'
+					html &= '<time class="bxsites-update__date" datetime="' & encodeForHTML( date ) & '">' & encodeForHTML( date ) & '</time>'
 				}
 				for ( var tag in tags ) {
-					html &= '<span class="bxdocs-update__tag">' & encodeForHTML( tag ) & '</span>'
+					html &= '<span class="bxsites-update__tag">' & encodeForHTML( tag ) & '</span>'
 				}
 				html &= '</div>'
 			}
-			html &= '<div class="bxdocs-update__body">' & renderNested( child.content, arguments.renderer, arguments.markdownOptions ) & '</div>'
+			html &= '<div class="bxsites-update__body">' & renderNested( child.content, arguments.renderer, arguments.markdownOptions ) & '</div>'
 				& '</div>'
 		}
 
@@ -393,12 +393,12 @@ class {
 	private string function renderFile( required struct attrs ) {
 		var src = trim( arguments.attrs.src ?: "" )
 		if ( !len( src ) ) {
-			return '<div class="bxdocs-file bxdocs-file--invalid">::: file - missing required src="..."</div>'
+			return '<div class="bxsites-file bxsites-file--invalid">::: file - missing required src="..."</div>'
 		}
 		var title = len( trim( arguments.attrs.title ?: "" ) ) ? trim( arguments.attrs.title ) : listLast( src, "/" )
-		return '<a class="bxdocs-file" href="' & attrEscape( src ) & '" download>'
-			& '<span class="bxdocs-file__icon" aria-hidden="true">📎</span>'
-			& '<span class="bxdocs-file__title">' & encodeForHTML( title ) & '</span>'
+		return '<a class="bxsites-file" href="' & attrEscape( src ) & '" download>'
+			& '<span class="bxsites-file__icon" aria-hidden="true">📎</span>'
+			& '<span class="bxsites-file__title">' & encodeForHTML( title ) & '</span>'
 			& '</a>'
 	}
 
@@ -411,20 +411,20 @@ class {
 	private string function renderEmbed( required struct attrs ) {
 		var url = trim( arguments.attrs.url ?: "" )
 		if ( !len( url ) ) {
-			return '<div class="bxdocs-embed bxdocs-embed--invalid">::: embed - missing required url="..."</div>'
+			return '<div class="bxsites-embed bxsites-embed--invalid">::: embed - missing required url="..."</div>'
 		}
 		var title = trim( arguments.attrs.title ?: "" )
 		var embedUrl = resolveEmbedUrl( url )
 
 		if ( !len( embedUrl ) ) {
-			return '<a class="bxdocs-embed-fallback" href="' & attrEscape( url ) & '" target="_blank" rel="noopener noreferrer">'
+			return '<a class="bxsites-embed-fallback" href="' & attrEscape( url ) & '" target="_blank" rel="noopener noreferrer">'
 				& ( len( title ) ? encodeForHTML( title ) : encodeForHTML( url ) ) & ' ↗</a>'
 		}
 
-		var html = '<div class="bxdocs-embed"><iframe src="' & attrEscape( embedUrl ) & '" loading="lazy" allowfullscreen'
+		var html = '<div class="bxsites-embed"><iframe src="' & attrEscape( embedUrl ) & '" loading="lazy" allowfullscreen'
 			& ' referrerpolicy="strict-origin-when-cross-origin"></iframe></div>'
 		if ( len( title ) ) {
-			html &= '<div class="bxdocs-embed__caption">' & encodeForHTML( title ) & '</div>'
+			html &= '<div class="bxsites-embed__caption">' & encodeForHTML( title ) & '</div>'
 		}
 		return html
 	}
@@ -466,7 +466,7 @@ class {
 		}
 
 		if ( arguments.url.reFindNoCase( "figma\.com/(file|design)/" ) ) {
-			return "https://www.figma.com/embed?embed_host=bxdocs&url=" & urlEncodedFormat( arguments.url )
+			return "https://www.figma.com/embed?embed_host=bxsites&url=" & urlEncodedFormat( arguments.url )
 		}
 
 		return ""
@@ -488,24 +488,24 @@ class {
 	private string function renderLinkPreview( required struct attrs ) {
 		var url = trim( arguments.attrs.url ?: "" )
 		if ( !len( url ) ) {
-			return '<div class="bxdocs-link-preview bxdocs-link-preview--invalid">::: link-preview - missing required url="..."</div>'
+			return '<div class="bxsites-link-preview bxsites-link-preview--invalid">::: link-preview - missing required url="..."</div>'
 		}
 		var title = len( trim( arguments.attrs.title ?: "" ) ) ? trim( arguments.attrs.title ) : url
 		var description = trim( arguments.attrs.description ?: "" )
 		var image = trim( arguments.attrs.image ?: "" )
 		var domain = linkPreviewDomain( url )
 
-		var html = '<a class="bxdocs-link-preview" href="' & attrEscape( url ) & '" target="_blank" rel="noopener noreferrer">'
+		var html = '<a class="bxsites-link-preview" href="' & attrEscape( url ) & '" target="_blank" rel="noopener noreferrer">'
 		if ( len( image ) ) {
-			html &= '<div class="bxdocs-link-preview__image"><img src="' & attrEscape( image ) & '" alt=""></div>'
+			html &= '<div class="bxsites-link-preview__image"><img src="' & attrEscape( image ) & '" alt=""></div>'
 		}
-		html &= '<div class="bxdocs-link-preview__text">'
-			& '<div class="bxdocs-link-preview__title">' & encodeForHTML( title ) & '</div>'
+		html &= '<div class="bxsites-link-preview__text">'
+			& '<div class="bxsites-link-preview__title">' & encodeForHTML( title ) & '</div>'
 		if ( len( description ) ) {
-			html &= '<div class="bxdocs-link-preview__description">' & encodeForHTML( description ) & '</div>'
+			html &= '<div class="bxsites-link-preview__description">' & encodeForHTML( description ) & '</div>'
 		}
 		if ( len( domain ) ) {
-			html &= '<div class="bxdocs-link-preview__domain">' & encodeForHTML( domain ) & '</div>'
+			html &= '<div class="bxsites-link-preview__domain">' & encodeForHTML( domain ) & '</div>'
 		}
 		html &= '</div></a>'
 		return html
@@ -559,7 +559,7 @@ class {
 	}
 
 	/**
-	 * Prefixes every `.bxdocs-file` download link's own `href` with
+	 * Prefixes every `.bxsites-file` download link's own `href` with
 	 * `basePath` - the "root-anchored `docs/assets/`" resolution
 	 * `renderFile()`'s own docblock promises, done here instead of inside
 	 * `restore()` since only the caller (BuildPipeline.bx's `convertMarkdown()`)
@@ -602,7 +602,7 @@ class {
 	 * own markdown in isolation, so it can't know that page's title/icon/
 	 * summary here - it emits a stub the theme can style immediately (the
 	 * link itself works even with no further processing) and stamps
-	 * `data-bxdocs-page-link` on it; PageLinkResolver.bx (run once, after
+	 * `data-bxsites-page-link` on it; PageLinkResolver.bx (run once, after
 	 * every page in the tree is loaded - the same shape as
 	 * `assignPrevNext()`/`assignBreadcrumbs()` in BuildPipeline.bx) finds
 	 * these stubs across all rendered pages and fills each in with its
@@ -615,10 +615,10 @@ class {
 	private string function renderPageLinkStub( required struct attrs ) {
 		var href = trim( arguments.attrs.href ?: "" )
 		if ( !len( href ) ) {
-			return '<div class="bxdocs-page-link bxdocs-page-link--invalid">::: page-link - missing required href="..."</div>'
+			return '<div class="bxsites-page-link bxsites-page-link--invalid">::: page-link - missing required href="..."</div>'
 		}
-		return '<a class="bxdocs-page-link" href="' & attrEscape( href ) & '" data-bxdocs-page-link>'
-			& '<span class="bxdocs-page-link__title">' & encodeForHTML( href ) & '</span>'
+		return '<a class="bxsites-page-link" href="' & attrEscape( href ) & '" data-bxsites-page-link>'
+			& '<span class="bxsites-page-link__title">' & encodeForHTML( href ) & '</span>'
 			& '</a>'
 	}
 

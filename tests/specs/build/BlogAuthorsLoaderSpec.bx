@@ -10,8 +10,8 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.BlogAuthorsLoader", function() {
 
 			beforeEach( function() {
-				variables.loader = new "models.build.BlogAuthorsLoader@bxdocs"();
-				variables.loader.setYamlRenderer( new "tests.support.FakeYamlRenderer@bxdocs"() );
+				variables.loader = new "models.build.BlogAuthorsLoader@bxsites"();
+				variables.loader.setYamlRenderer( new "tests.support.FakeYamlRenderer@bxsites"() );
 				variables.tempDirs = [];
 			} );
 
@@ -24,7 +24,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private function newDocsDir() {
-				var dir = createTempDirectory( prefix = "bxdocs-blogauthors-" );
+				var dir = createTempDirectory( prefix = "bxsites-blogauthors-" );
 				tempDirs.append( dir );
 				return dir;
 			}
@@ -76,23 +76,23 @@ class extends="testbox.system.BaseSpec" {
 				expect( author.socials.github ).toBe( "https://github.com/lmajano" );
 			} );
 
-			it( "throws BxDocs.InvalidBlogAuthors when the YAML root isn't an object", function() {
+			it( "throws BxSites.InvalidBlogAuthors when the YAML root isn't an object", function() {
 				var dir = newDocsDir();
 				directoryCreate( dir & "/blog", true, true );
 				fileWrite( dir & "/blog/authors.yml", jsonSerialize( [ "not", "an", "object" ] ) );
 
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidBlogAuthors" );
+				} ).toThrow( "BxSites.InvalidBlogAuthors" );
 			} );
 
-			it( "throws BxDocs.InvalidBlogAuthors when an entry has no [name]", function() {
+			it( "throws BxSites.InvalidBlogAuthors when an entry has no [name]", function() {
 				var dir = newDocsDir();
 				writeAuthors( dir, { "lmajano" : { "title" : "CEO" } } );
 
 				expect( function() {
 					loader.load( dir );
-				} ).toThrow( "BxDocs.InvalidBlogAuthors" );
+				} ).toThrow( "BxSites.InvalidBlogAuthors" );
 			} );
 
 			it( "resolves an author's avatar by convention from docs/assets/blog/authors/<id>.<ext>", function() {

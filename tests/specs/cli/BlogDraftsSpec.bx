@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.BlogDrafts", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.BlogDrafts@bxdocs"();
+				variables.verb = new "models.cli.BlogDrafts@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,15 +17,15 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newProjectRoot() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-blogdrafts-" );
+				var dir = createTempDirectory( prefix = "bxsites-cli-blogdrafts-" );
 				tempDirs.append( dir );
 				return dir;
 			}
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( {} );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
 			it( "reports no drafts when docs/blog/posts/ doesn't exist", function() {

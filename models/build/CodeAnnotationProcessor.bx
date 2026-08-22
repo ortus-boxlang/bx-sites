@@ -42,7 +42,7 @@
  *  2. `applyToHtml()` runs AFTER conversion - it walks every rendered
  *     `<pre><code` in document order (one per fence, same order) and
  *     stamps the matching annotation's data onto the `<pre>` tag as
- *     `data-bxdocs-*` attributes for the client-side widget
+ *     `data-bxsites-*` attributes for the client-side widget
  *     (code-lines.js) to pick up.
  */
 class {
@@ -131,7 +131,7 @@ class {
 	 * @html Already-rendered HTML (from Markdown() on extractAndStrip()'s output)
 	 * @annotations extractAndStrip()'s own `annotations` array
 	 *
-	 * @return html with data-bxdocs-* attributes stamped onto each annotated `<pre>` tag
+	 * @return html with data-bxsites-* attributes stamped onto each annotated `<pre>` tag
 	 */
 	string function applyToHtml( required string html, required array annotations ) {
 		var matcher = variables.preCodePattern.matcher( arguments.html )
@@ -145,22 +145,22 @@ class {
 
 			if ( !annotation.isEmpty() ) {
 				if ( ( annotation.hlLines ?: [] ).len() ) {
-					attrs &= ' data-bxdocs-hl-lines="' & annotation.hlLines.toList( "," ) & '"'
+					attrs &= ' data-bxsites-hl-lines="' & annotation.hlLines.toList( "," ) & '"'
 				}
 				if ( annotation.showLineNumbers ?: false ) {
-					attrs &= ' data-bxdocs-start-line="' & annotation.startLine & '"'
+					attrs &= ' data-bxsites-start-line="' & annotation.startLine & '"'
 				}
 				if ( len( annotation.title ?: "" ) ) {
-					attrs &= ' data-bxdocs-title="' & encodeForHTML( annotation.title ) & '"'
+					attrs &= ' data-bxsites-title="' & encodeForHTML( annotation.title ) & '"'
 				}
 				if ( ( annotation.frame ?: "" ) eq "terminal" ) {
-					attrs &= ' data-bxdocs-frame="terminal"'
+					attrs &= ' data-bxsites-frame="terminal"'
 				}
 				if ( ( annotation.insertLines ?: [] ).len() ) {
-					attrs &= ' data-bxdocs-insert-lines="' & annotation.insertLines.toList( "," ) & '"'
+					attrs &= ' data-bxsites-insert-lines="' & annotation.insertLines.toList( "," ) & '"'
 				}
 				if ( ( annotation.deleteLines ?: [] ).len() ) {
-					attrs &= ' data-bxdocs-delete-lines="' & annotation.deleteLines.toList( "," ) & '"'
+					attrs &= ' data-bxsites-delete-lines="' & annotation.deleteLines.toList( "," ) & '"'
 				}
 			}
 

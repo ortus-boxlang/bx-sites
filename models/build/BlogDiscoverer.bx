@@ -34,7 +34,7 @@
  */
 class {
 
-	variables.frontmatterParser = new "models.build.FrontmatterParser@bxdocs"()
+	variables.frontmatterParser = new "models.build.FrontmatterParser@bxsites"()
 
 	/**
 	 * Loads every post under `docs/blog/posts/`, at any subfolder depth
@@ -93,7 +93,7 @@ class {
 		var date = trim( fm.date ?: "" )
 		if ( !len( date ) || !isDate( date ) ) {
 			throw(
-				type    = "BxDocs.InvalidBlogPost",
+				type    = "BxSites.InvalidBlogPost",
 				message = "blog/posts/#relativeToPostsDir# is missing a required, valid frontmatter [date] (got [#date#])"
 			)
 		}
@@ -174,7 +174,7 @@ class {
 			var key = lCase( post.slug )
 			if ( seen.keyExists( key ) ) {
 				throw(
-					type    = "BxDocs.DuplicateBlogSlug",
+					type    = "BxSites.DuplicateBlogSlug",
 					message = "Two blog posts resolve to the same slug [#post.slug#] - #seen[ key ]# and #post.relativePath#. Set an explicit frontmatter [slug] on one of them."
 				)
 			}

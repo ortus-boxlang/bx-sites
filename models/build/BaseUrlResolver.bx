@@ -1,5 +1,5 @@
 /**
- * Resolves bxdocs.json's `baseURL` into the two things the rest of the
+ * Resolves bxsites.json's `baseURL` into the two things the rest of the
  * pipeline needs (module spec section 4, previously reserved/unused):
  *
  * - `basePath` - always a root-relative path starting and ending with `/`
@@ -16,11 +16,11 @@
 class {
 
 	/**
-	 * Splits bxdocs.json's `baseURL` into a root-relative `basePath` (used
+	 * Splits bxsites.json's `baseURL` into a root-relative `basePath` (used
 	 * for every internal link) and, when `baseURL` is a full URL, an
 	 * `absolute` site URL (used only where an absolute URL is required).
 	 *
-	 * @baseURL The raw bxdocs.json `baseURL` value
+	 * @baseURL The raw bxsites.json `baseURL` value
 	 *
 	 * @return { basePath, absolute }
 	 */

@@ -7,10 +7,10 @@ tags: [guides, alpine, interactivity]
 
 # Interactivity with Alpine.js
 
-Every page built by BX Docs already loads [Alpine.js](https://alpinejs.dev/)
+Every page built by BX Sites already loads [Alpine.js](https://alpinejs.dev/)
 - it's what powers the built-in dark-mode toggle and language dropdown in
 each of the three built-in themes. That same Alpine instance is available
-to your own page content too, for free: no `bxdocs.json` setting to flip,
+to your own page content too, for free: no `bxsites.json` setting to flip,
 no `extraJs` entry to add, no extra `<script>` tag to write in your
 markdown.
 
@@ -40,7 +40,7 @@ confirms the copy:
 
 ```markdown title="Copy button" linenums="1"
 <div x-data="{ copied: false }">
-  <button type="button" @click="navigator.clipboard.writeText( 'box install bx-docs' ); copied = true; setTimeout( () => copied = false, 1500 )">
+  <button type="button" @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
     <span x-show="!copied">Copy install command</span>
     <span x-show="copied" x-cloak>Copied!</span>
   </button>
@@ -48,7 +48,7 @@ confirms the copy:
 ```
 
 <div x-data="{ copied: false }">
-  <button type="button" class="btn btn-sm btn-outline-secondary" @click="navigator.clipboard.writeText( 'box install bx-docs' ); copied = true; setTimeout( () => copied = false, 1500 )">
+  <button type="button" class="btn btn-sm btn-outline-secondary" @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
     <span x-show="!copied">Copy install command</span>
     <span x-show="copied" x-cloak>Copied!</span>
   </button>
@@ -90,7 +90,7 @@ full directive list (`x-if`, `x-for`, `x-transition`, and more).
 ## Things to know
 
 - **It's core, not optional.** The theme chrome (dark mode, language
-  switcher) depends on Alpine, so it can't be turned off in `bxdocs.json`
+  switcher) depends on Alpine, so it can't be turned off in `bxsites.json`
   the way `mermaid`/`math` can.
 - **Version.** Currently `alpinejs@3.14.1`, vendored with this module and
   served from `site/assets/vendor/alpine/` - no CDN involved. Check a

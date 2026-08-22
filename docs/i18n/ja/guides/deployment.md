@@ -12,21 +12,21 @@ tags: [guides, deployment]
 同じサイトの独立して稼働する 2 つのバージョンとして公開されます。
 
 CI の設定がまったくないよりシンプルな単一バージョンのプロジェクトには、
-[`bxDocs gh-deploy`](../cli-reference.md#gh-deploy) で `site/` を `gh-pages` ブランチに
+[`bxSites gh-deploy`](../cli-reference.md#gh-deploy) で `site/` を `gh-pages` ブランチに
 一つのコマンドでビルドして Push できます（公開したいときに自分のマシンから実行するだけで、
 ワークフローファイルも不要です）。このガイドの残りは、このリポジトリ自体が使用している
 GitHub Actions ワークフロー（毎回の Push で自動マルチバージョン公開）について説明します。
 
 ## 動作内容
 
-`docs/`、`bxdocs.json`、またはモジュール自体のソース（テーマ/パイプラインの変更）に
+`docs/`、`bxsites.json`、またはモジュール自体のソース（テーマ/パイプラインの変更）に
 触れる `main` または `development` へのすべての Push で、ワークフローが:
 
 1. BoxLang + [bx-markdown](https://github.com/ortus-boxlang/bx-markdown) をインストール
-2. このリポジトリをモジュールとして登録して `boxlang module:bxDocs build` を解決
+2. このリポジトリをモジュールとして登録して `boxlang module:bxSites build` を解決
 3. `main` 以外のブランチでは、このビルドのみ `baseURL` を `.../<branch-name>/` に設定
    （[以下を参照](#publishing-two-versions-at-once)）
-4. `boxlang module:bxDocs build` を実行
+4. `boxlang module:bxSites build` を実行
 5. `site/` を `gh-pages` ブランチに Push（`main` はサイトルート、`development` は `/development/`）、
    もう一方のバージョンには触れません
 
@@ -68,7 +68,7 @@ Actions タブから手動トリガー（`workflow_dispatch`）でも利用可�
 
 GitHub の *プロジェクト* Pages サイト（*ユーザー* サイトとは異なり）は
 `https://<user>.github.io/<repo>/` から配信されます（ドメインルートではありません）。
-`bxdocs.json` の `baseURL` をその完全な URL に設定して、すべての内部リンク、アセット、
+`bxsites.json` の `baseURL` をその完全な URL に設定して、すべての内部リンク、アセット、
 ナビゲーションエントリに必要な `/<repo>/` プレフィックスが付くようにしてください。
 また、実際の `sitemap.xml` も生成されます:
 

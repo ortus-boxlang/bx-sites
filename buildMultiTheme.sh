@@ -4,14 +4,14 @@
 # docs/ three times - once per built-in theme - and assembles the results
 # into a single site/ tree, so the deployed site shows off `bootstrap` at
 # the root plus `material`/`tailwind` living side by side under
-# theme/material/ and theme/tailwind/. Not a bx-docs product feature -
+# theme/material/ and theme/tailwind/. Not a bx-sites product feature -
 # just this project using its own `build` verb three times with a
-# temporarily-patched bxdocs.yaml, the same way pages.yml already patches
+# temporarily-patched bxsites.yaml, the same way pages.yml already patches
 # baseURL per branch.
 #
 # Usage: ./buildMultiTheme.sh [projectRoot]   (defaults to ".")
 #
-# Requires: boxlang (with this module registered so `module:bxDocs`
+# Requires: boxlang (with this module registered so `module:bxSites`
 # resolves), yq (mikefarah/yq - https://github.com/mikefarah/yq).
 
 set -euo pipefail
@@ -19,8 +19,8 @@ set -euo pipefail
 PROJECT_ROOT="${1:-.}"
 cd "${PROJECT_ROOT}"
 
-if [[ ! -f "bxdocs.yaml" ]]; then
-	echo "error: no bxdocs.yaml in $(pwd) - run from (or pass) the bx-docs project root" >&2
+if [[ ! -f "bxsites.yaml" ]]; then
+	echo "error: no bxsites.yaml in $(pwd) - run from (or pass) the bx-sites project root" >&2
 	exit 1
 fi
 
@@ -29,11 +29,11 @@ SWITCHER_BACKUP="$(mktemp)"
 SCRATCH_DIR="$(mktemp -d)"
 SWITCHER_JS="docs/assets/theme-switcher.js"
 
-cp bxdocs.yaml "${CONFIG_BACKUP}"
+cp bxsites.yaml "${CONFIG_BACKUP}"
 cp "${SWITCHER_JS}" "${SWITCHER_BACKUP}"
 
 cleanup() {
-	cp "${CONFIG_BACKUP}" bxdocs.yaml
+	cp "${CONFIG_BACKUP}" bxsites.yaml
 	cp "${SWITCHER_BACKUP}" "${SWITCHER_JS}"
 	rm -f "${CONFIG_BACKUP}" "${SWITCHER_BACKUP}"
 	rm -rf "${SCRATCH_DIR}"
@@ -42,7 +42,7 @@ trap cleanup EXIT
 
 # Same basePath derivation as BaseUrlResolver.bx: strip scheme+host off a
 # full URL, otherwise use the value as-is (ensuring leading/trailing "/").
-BASE_URL="$(yq -r '.baseURL // "/"' bxdocs.yaml)"
+BASE_URL="$(yq -r '.baseURL // "/"' bxsites.yaml)"
 if [[ "${BASE_URL}" =~ ^https?:// ]]; then
 	ROOT_PATH="$(echo "${BASE_URL}" | sed -E 's#^https?://[^/]+##')"
 	[[ -z "${ROOT_PATH}" ]] && ROOT_PATH="/"
@@ -60,13 +60,13 @@ echo "Multi-theme build - site root: ${ROOT_PATH}"
 # theme-switcher.js is identical across all three builds (ROOT_PATH is the
 # site's true root, not any one variant's own sub-path), so substitute it
 # once, before any of the three builds run.
-sed -i "s#__BXDOCS_ROOT__#${ROOT_PATH}#g" "${SWITCHER_JS}"
+sed -i "s#__BXSITES_ROOT__#${ROOT_PATH}#g" "${SWITCHER_JS}"
 
 build_variant() {
 	local name="$1"
 	echo "==> Building [${name}]"
 	rm -rf site
-	boxlang module:bxDocs build
+	boxlang module:bxSites build
 	if [[ ! -d site ]]; then
 		echo "error: build for [${name}] produced no site/ directory" >&2
 		exit 1
@@ -79,7 +79,7 @@ build_variant() {
 	fi
 }
 
-# 1. bootstrap - the committed bxdocs.yaml, unmodified, at the site root.
+# 1. bootstrap - the committed bxsites.yaml, unmodified, at the site root.
 build_variant "bootstrap"
 
 # 2 & 3. material/tailwind - same docs/, different theme + a baseURL
@@ -88,7 +88,7 @@ build_variant "bootstrap"
 for name in material tailwind; do
 	export THEME="${name}"
 	export URL="${BASE_URL_NO_SLASH}/theme/${name}/"
-	yq eval '.theme.name = strenv(THEME) | .baseURL = strenv(URL)' "${CONFIG_BACKUP}" > bxdocs.yaml
+	yq eval '.theme.name = strenv(THEME) | .baseURL = strenv(URL)' "${CONFIG_BACKUP}" > bxsites.yaml
 	unset THEME URL
 	build_variant "${name}"
 done

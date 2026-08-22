@@ -4,8 +4,8 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.DirectiveBlockProcessor", function() {
 
 			beforeEach( function() {
-				variables.processor = new "models.build.DirectiveBlockProcessor@bxdocs"();
-				variables.renderer = new "tests.support.FakeMarkdownRenderer@bxdocs"();
+				variables.processor = new "models.build.DirectiveBlockProcessor@bxsites"();
+				variables.renderer = new "tests.support.FakeMarkdownRenderer@bxsites"();
 			} );
 
 			private string function render( required string markdown ) {
@@ -41,7 +41,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "renders an expandable as a <details>/<summary>, closed by default", function() {
 				var html = render( '::: expandable "FAQ"' & char( 10 ) & "Body text." & char( 10 ) & ":::" );
 
-				expect( html ).toInclude( '<details class="bxdocs-expandable">' );
+				expect( html ).toInclude( '<details class="bxsites-expandable">' );
 				expect( html ).toInclude( "<summary>FAQ</summary>" );
 				expect( html ).toInclude( "Body text." );
 				expect( html ).notToInclude( " open>" );
@@ -50,7 +50,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "opens an expandable by default when open=""true""", function() {
 				var html = render( '::: expandable "FAQ" open="true"' & char( 10 ) & "Body." & char( 10 ) & ":::" );
 
-				expect( html ).toInclude( '<details class="bxdocs-expandable" open>' );
+				expect( html ).toInclude( '<details class="bxsites-expandable" open>' );
 			} );
 
 			it( "renders a cards group with nested card children, each with title/icon/href/body", function() {
@@ -62,14 +62,14 @@ class extends="testbox.system.BaseSpec" {
 					":::";
 				var html = render( md );
 
-				expect( html ).toInclude( '<div class="bxdocs-cards">' );
-				expect( html ).toInclude( '<a class="bxdocs-card" href="getting-started.md">' );
-				expect( html ).toInclude( '<div class="bxdocs-card__icon">🚀</div>' );
-				expect( html ).toInclude( '<div class="bxdocs-card__title">Getting Started</div>' );
+				expect( html ).toInclude( '<div class="bxsites-cards">' );
+				expect( html ).toInclude( '<a class="bxsites-card" href="getting-started.md">' );
+				expect( html ).toInclude( '<div class="bxsites-card__icon">🚀</div>' );
+				expect( html ).toInclude( '<div class="bxsites-card__title">Getting Started</div>' );
 				expect( html ).toInclude( "Install and scaffold." );
 				// A card with no href renders as a plain <div>, not a link.
-				expect( html ).toInclude( '<div class="bxdocs-card">' );
-				expect( html ).toInclude( '<div class="bxdocs-card__title">Themes</div>' );
+				expect( html ).toInclude( '<div class="bxsites-card">' );
+				expect( html ).toInclude( '<div class="bxsites-card__title">Themes</div>' );
 			} );
 
 			it( "resolves a card's [icon] the same way frontmatter/nav icons are - a named icon renders as inline SVG", function() {
@@ -78,8 +78,8 @@ class extends="testbox.system.BaseSpec" {
 					":::";
 				var html = render( md );
 
-				expect( html ).toInclude( '<div class="bxdocs-card__icon"><svg' );
-				expect( html ).toInclude( 'class="bxdocs-icon"' );
+				expect( html ).toInclude( '<div class="bxsites-card__icon"><svg' );
+				expect( html ).toInclude( 'class="bxsites-icon"' );
 				expect( html ).notToInclude( "phosphor-duotone:palette" );
 			} );
 
@@ -90,7 +90,7 @@ class extends="testbox.system.BaseSpec" {
 					":::";
 				var html = render( md );
 
-				expect( html ).toInclude( 'style="--bxdocs-column-width:50%"' );
+				expect( html ).toInclude( 'style="--bxsites-column-width:50%"' );
 				expect( html ).notToInclude( "javascript:" );
 			} );
 
@@ -101,10 +101,10 @@ class extends="testbox.system.BaseSpec" {
 					":::";
 				var html = render( md );
 
-				expect( html ).toInclude( '<div class="bxdocs-step__marker">1</div>' );
-				expect( html ).toInclude( '<div class="bxdocs-step__title">Install</div>' );
-				expect( html ).toInclude( '<div class="bxdocs-step__marker">2</div>' );
-				expect( html ).toInclude( '<div class="bxdocs-step__title">Build</div>' );
+				expect( html ).toInclude( '<div class="bxsites-step__marker">1</div>' );
+				expect( html ).toInclude( '<div class="bxsites-step__title">Install</div>' );
+				expect( html ).toInclude( '<div class="bxsites-step__marker">2</div>' );
+				expect( html ).toInclude( '<div class="bxsites-step__title">Build</div>' );
 			} );
 
 			it( "flags a step with one of the semantic marker colors via its own [color] attribute", function() {
@@ -115,9 +115,9 @@ class extends="testbox.system.BaseSpec" {
 					":::";
 				var html = render( md );
 
-				expect( html ).toInclude( '<div class="bxdocs-step__marker bxdocs-step__marker--success">1</div>' );
-				expect( html ).toInclude( '<div class="bxdocs-step__marker bxdocs-step__marker--danger">2</div>' );
-				expect( html ).toInclude( '<div class="bxdocs-step__marker bxdocs-step__marker--warning">3</div>' );
+				expect( html ).toInclude( '<div class="bxsites-step__marker bxsites-step__marker--success">1</div>' );
+				expect( html ).toInclude( '<div class="bxsites-step__marker bxsites-step__marker--danger">2</div>' );
+				expect( html ).toInclude( '<div class="bxsites-step__marker bxsites-step__marker--warning">3</div>' );
 			} );
 
 			it( "is case-insensitive on a step's [color] attribute", function() {
@@ -126,7 +126,7 @@ class extends="testbox.system.BaseSpec" {
 					":::";
 				var html = render( md );
 
-				expect( html ).toInclude( '<div class="bxdocs-step__marker bxdocs-step__marker--success">1</div>' );
+				expect( html ).toInclude( '<div class="bxsites-step__marker bxsites-step__marker--success">1</div>' );
 			} );
 
 			it( "falls back to the default marker for a step with no/unrecognized [color]", function() {
@@ -136,9 +136,9 @@ class extends="testbox.system.BaseSpec" {
 					":::";
 				var html = render( md );
 
-				expect( html ).toInclude( '<div class="bxdocs-step__marker">1</div>' );
-				expect( html ).toInclude( '<div class="bxdocs-step__marker">2</div>' );
-				expect( html ).notToInclude( "bxdocs-step__marker--purple" );
+				expect( html ).toInclude( '<div class="bxsites-step__marker">1</div>' );
+				expect( html ).toInclude( '<div class="bxsites-step__marker">2</div>' );
+				expect( html ).notToInclude( "bxsites-step__marker--purple" );
 			} );
 
 			it( "recurses into a directive nested inside another block's content", function() {
@@ -150,14 +150,14 @@ class extends="testbox.system.BaseSpec" {
 				var html = render( md );
 
 				expect( html ).toInclude( "<summary>Outer</summary>" );
-				expect( html ).toInclude( '<div class="bxdocs-cards">' );
-				expect( html ).toInclude( '<div class="bxdocs-card__title">Inner</div>' );
+				expect( html ).toInclude( '<div class="bxsites-cards">' );
+				expect( html ).toInclude( '<div class="bxsites-card__title">Inner</div>' );
 			} );
 
 			it( "renders a file block as a download link, falling back to the filename when no title is given", function() {
 				var html = render( '::: file src="assets/spec.pdf"' & char( 10 ) & ":::" );
 
-				expect( html ).toInclude( '<a class="bxdocs-file" href="assets/spec.pdf" download>' );
+				expect( html ).toInclude( '<a class="bxsites-file" href="assets/spec.pdf" download>' );
 				expect( html ).toInclude( "spec.pdf" );
 			} );
 
@@ -166,7 +166,7 @@ class extends="testbox.system.BaseSpec" {
 
 				var resolved = processor.resolveFileHrefs( html, "/guides/content-blocks/" );
 
-				expect( resolved ).toInclude( '<a class="bxdocs-file" href="/guides/content-blocks/assets/spec.pdf" download>' );
+				expect( resolved ).toInclude( '<a class="bxsites-file" href="/guides/content-blocks/assets/spec.pdf" download>' );
 			} );
 
 			it( "resolveFileHrefs() leaves an already root-relative or absolute file href untouched", function() {
@@ -181,46 +181,46 @@ class extends="testbox.system.BaseSpec" {
 				var html = render( '::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="Demo"' & char( 10 ) & ":::" );
 
 				expect( html ).toInclude( 'src="https://www.youtube.com/embed/dQw4w9WgXcQ"' );
-				expect( html ).toInclude( '<div class="bxdocs-embed__caption">Demo</div>' );
+				expect( html ).toInclude( '<div class="bxsites-embed__caption">Demo</div>' );
 			} );
 
 			it( "falls back to a plain link card for an unrecognized embed provider", function() {
 				var html = render( '::: embed url="https://example.com/random-page"' & char( 10 ) & ":::" );
 
-				expect( html ).toInclude( '<a class="bxdocs-embed-fallback" href="https://example.com/random-page"' );
+				expect( html ).toInclude( '<a class="bxsites-embed-fallback" href="https://example.com/random-page"' );
 				expect( html ).notToInclude( "<iframe" );
 			} );
 
 			it( "renders a page-link as a plain stub anchor - enrichment is PageLinkResolver's job", function() {
 				var html = render( '::: page-link href="guides/themes.md"' & char( 10 ) & ":::" );
 
-				expect( html ).toInclude( '<a class="bxdocs-page-link" href="guides/themes.md" data-bxdocs-page-link>' );
+				expect( html ).toInclude( '<a class="bxsites-page-link" href="guides/themes.md" data-bxsites-page-link>' );
 			} );
 
 			it( "renders a link-preview card for an external URL with title/description/image/domain", function() {
 				var md = '::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic JVM language." image="https://boxlang.io/og.png"' & char( 10 ) & ":::";
 				var html = render( md );
 
-				expect( html ).toInclude( '<a class="bxdocs-link-preview" href="https://boxlang.io" target="_blank" rel="noopener noreferrer">' );
+				expect( html ).toInclude( '<a class="bxsites-link-preview" href="https://boxlang.io" target="_blank" rel="noopener noreferrer">' );
 				expect( html ).toInclude( '<img src="https://boxlang.io/og.png" alt="">' );
-				expect( html ).toInclude( '<div class="bxdocs-link-preview__title">BoxLang</div>' );
-				expect( html ).toInclude( '<div class="bxdocs-link-preview__description">A dynamic JVM language.</div>' );
-				expect( html ).toInclude( '<div class="bxdocs-link-preview__domain">boxlang.io</div>' );
+				expect( html ).toInclude( '<div class="bxsites-link-preview__title">BoxLang</div>' );
+				expect( html ).toInclude( '<div class="bxsites-link-preview__description">A dynamic JVM language.</div>' );
+				expect( html ).toInclude( '<div class="bxsites-link-preview__domain">boxlang.io</div>' );
 			} );
 
 			it( "falls back to the bare url as a link-preview's title when none is given, and omits optional parts", function() {
 				var html = render( '::: link-preview url="https://example.com/some/page"' & char( 10 ) & ":::" );
 
 				expect( html ).toInclude( 'href="https://example.com/some/page"' );
-				expect( html ).notToInclude( "bxdocs-link-preview__image" );
-				expect( html ).notToInclude( "bxdocs-link-preview__description" );
-				expect( html ).toInclude( '<div class="bxdocs-link-preview__domain">example.com</div>' );
+				expect( html ).notToInclude( "bxsites-link-preview__image" );
+				expect( html ).notToInclude( "bxsites-link-preview__description" );
+				expect( html ).toInclude( '<div class="bxsites-link-preview__domain">example.com</div>' );
 			} );
 
 			it( "renders an invalid-block message when a link-preview is missing its required url", function() {
 				var html = render( "::: link-preview" & char( 10 ) & ":::" );
 
-				expect( html ).toInclude( "bxdocs-link-preview--invalid" );
+				expect( html ).toInclude( "bxsites-link-preview--invalid" );
 			} );
 
 			it( "renders updates entries with date, tags and body, most-recent-first order left to the caller", function() {
@@ -230,9 +230,9 @@ class extends="testbox.system.BaseSpec" {
 					":::";
 				var html = render( md );
 
-				expect( html ).toInclude( '<time class="bxdocs-update__date" datetime="2026-01-15">2026-01-15</time>' );
-				expect( html ).toInclude( '<span class="bxdocs-update__tag">feature</span>' );
-				expect( html ).toInclude( '<span class="bxdocs-update__tag">fix</span>' );
+				expect( html ).toInclude( '<time class="bxsites-update__date" datetime="2026-01-15">2026-01-15</time>' );
+				expect( html ).toInclude( '<span class="bxsites-update__tag">feature</span>' );
+				expect( html ).toInclude( '<span class="bxsites-update__tag">fix</span>' );
 				expect( html ).toInclude( "Added dark mode." );
 				expect( html ).toInclude( "Initial release." );
 			} );

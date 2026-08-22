@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.Lint", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.Lint@bxdocs"();
+				variables.verb = new "models.cli.Lint@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,16 +17,16 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newProjectRoot() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-lint-" );
+				var dir = createTempDirectory( prefix = "bxsites-cli-lint-" );
 				tempDirs.append( dir );
 				directoryCreate( dir & "/docs", true, true );
 				return dir;
 			}
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( {} );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
 			it( "exits 0 with no issues on a clean docs tree", function() {

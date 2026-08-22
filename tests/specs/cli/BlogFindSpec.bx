@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.BlogFind", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.BlogFind@bxdocs"();
+				variables.verb = new "models.cli.BlogFind@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,7 +17,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newProjectRoot() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-blogfind-" );
+				var dir = createTempDirectory( prefix = "bxsites-cli-blogfind-" );
 				tempDirs.append( dir );
 				return dir;
 			}
@@ -50,17 +50,17 @@ draft: true
 Body" );
 			}
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( {} );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
-			it( "throws BxDocs.InvalidDate when since/until isn't a valid date", function() {
+			it( "throws BxSites.InvalidDate when since/until isn't a valid date", function() {
 				var projectRoot = newProjectRoot();
 				expect( function() {
 					verb.run( { projectRoot : projectRoot, since : "not-a-date" } );
-				} ).toThrow( "BxDocs.InvalidDate" );
+				} ).toThrow( "BxSites.InvalidDate" );
 			} );
 
 			it( "reports no matches when nothing satisfies the filter", function() {

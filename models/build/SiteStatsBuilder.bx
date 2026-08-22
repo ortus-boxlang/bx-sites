@@ -13,9 +13,9 @@
  */
 class {
 
-	variables.configLoader = new "models.config.ConfigLoader@bxdocs"()
-	variables.versionsDiscoverer = new "models.build.VersionsDiscoverer@bxdocs"()
-	variables.localesDiscoverer = new "models.build.LocalesDiscoverer@bxdocs"()
+	variables.configLoader = new "models.config.ConfigLoader@bxsites"()
+	variables.versionsDiscoverer = new "models.build.VersionsDiscoverer@bxsites"()
+	variables.localesDiscoverer = new "models.build.LocalesDiscoverer@bxsites"()
 
 	/**
 	 * Blog URL segments that are structural (category/archive/author pages,
@@ -36,7 +36,7 @@ class {
 
 		if ( !directoryExists( siteDir ) ) {
 			throw(
-				type    = "BxDocs.SiteNotBuilt",
+				type    = "BxSites.SiteNotBuilt",
 				message = "No [#siteDir#] to report on - run `build` first"
 			)
 		}
@@ -120,7 +120,7 @@ class {
 	 * Counts actual posts/categories/authors/year-archives straight off
 	 * `site/blog/`'s own folder shape - no re-parsing of `docs/blog/posts/`
 	 * frontmatter needed, since the built output already reflects exactly
-	 * what a real `bxDocs build` published (drafts excluded).
+	 * what a real `bxSites build` published (drafts excluded).
 	 *
 	 * @siteDir Absolute path to the built `site/`
 	 */

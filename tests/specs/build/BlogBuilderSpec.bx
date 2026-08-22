@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.BlogBuilder", function() {
 
 			beforeEach( function() {
-				variables.builder = new "models.build.BlogBuilder@bxdocs"();
+				variables.builder = new "models.build.BlogBuilder@bxsites"();
 			} );
 
 			private struct function newPost( struct overrides = {} ) {
@@ -334,8 +334,8 @@ class extends="testbox.system.BaseSpec" {
 				var result = builder.build( posts, {}, 10, "/" );
 
 				var statsPage = result.indexPages.filter( p => p.urlPath == "blog/stats/index.html" )[ 1 ];
-				expect( statsPage.contentHtml ).toInclude( "bxdocs-cards" );
-				expect( statsPage.contentHtml ).toInclude( '>2</div><div class="bxdocs-card__body">Posts</div>' );
+				expect( statsPage.contentHtml ).toInclude( "bxsites-cards" );
+				expect( statsPage.contentHtml ).toInclude( '>2</div><div class="bxsites-card__body">Posts</div>' );
 				expect( statsPage.contentHtml ).toInclude( "Releases" );
 			} );
 

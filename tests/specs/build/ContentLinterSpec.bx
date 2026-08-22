@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.ContentLinter", function() {
 
 			beforeEach( function() {
-				variables.linter = new "models.build.ContentLinter@bxdocs"();
+				variables.linter = new "models.build.ContentLinter@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,7 +17,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newDocsDir() {
-				var dir = createTempDirectory( prefix = "bxdocs-contentlinter-" );
+				var dir = createTempDirectory( prefix = "bxsites-contentlinter-" );
 				tempDirs.append( dir );
 				var docsDir = dir & "/docs";
 				directoryCreate( docsDir, true, true );

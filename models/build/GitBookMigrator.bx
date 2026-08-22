@@ -1,16 +1,16 @@
 /**
  * Converts a GitBook export (a `SUMMARY.md` table of contents plus its
  * referenced `.md` files, GitBook's own on-disk sync format - see
- * https://gitbook.com/docs/create-content/blocks) into a bx-docs `docs/`
+ * https://gitbook.com/docs/create-content/blocks) into a bx-sites `docs/`
  * tree: `SUMMARY.md` becomes `docs/nav.json` (NavBuilder.bx's own
  * documented override format), each `{% block %}...{% endblock %}` becomes
- * its bx-docs equivalent (DirectiveBlockProcessor.bx's `::: name`
+ * its bx-sites equivalent (DirectiveBlockProcessor.bx's `::: name`
  * directives, or the native `=== "Title"` tabs / `!!! type` admonition
  * syntax where a closer match already exists), `README.md` files become
- * `index.md` (bx-docs' own folder-index convention - NavBuilder.bx), and
+ * `index.md` (bx-sites' own folder-index convention - NavBuilder.bx), and
  * `.gitbook/assets/**` is copied to `docs/assets/gitbook/`.
  *
- * A handful of GitBook blocks have no bx-docs equivalent at all (Prompt,
+ * A handful of GitBook blocks have no bx-sites equivalent at all (Prompt,
  * Conditional content, the Ask-AI search bar) and, along with anything
  * this converter doesn't recognize, are left in their original `{% %}`
  * syntax rather than silently dropped - every such spot, plus every
@@ -21,7 +21,7 @@
  */
 class {
 
-	variables.frontmatterParser = new "models.build.FrontmatterParser@bxdocs"()
+	variables.frontmatterParser = new "models.build.FrontmatterParser@bxsites"()
 
 	variables.summaryHeadingPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '^(##{1,6})\s+(.*)$' )
 	variables.summaryItemPattern    = createObject( "java", "java.util.regex.Pattern" ).compile( '^(\s*)[-*+]\s+\[([^\]]*)\]\(([^)]+)\)\s*$' )
@@ -48,7 +48,7 @@ class {
 		var summaryPath = arguments.sourceDir & "/SUMMARY.md"
 		if ( !fileExists( summaryPath ) ) {
 			throw(
-				type    = "BxDocs.MigrateMissingSummary",
+				type    = "BxSites.MigrateMissingSummary",
 				message = "No SUMMARY.md found at [#arguments.sourceDir#] - GitBook migration requires its table-of-contents file"
 			)
 		}
@@ -97,7 +97,7 @@ class {
 	}
 
 	/**
-	 * Parses a GitBook `SUMMARY.md` into a bx-docs `nav.json` tree
+	 * Parses a GitBook `SUMMARY.md` into a bx-sites `nav.json` tree
 	 * (NavBuilder.bx's own `navConfig` shape: `{ title, path, children }`)
 	 * plus the flat, de-duplicated list of docs/-relative `.md` paths it
 	 * references, in encounter order.
@@ -172,19 +172,19 @@ class {
 
 	/**
 	 * Carries GitBook's own real, confirmed Git-Sync frontmatter fields
-	 * (`title`, `description`, `tags`) over into a bx-docs frontmatter
+	 * (`title`, `description`, `tags`) over into a bx-sites frontmatter
 	 * block, plus `icon` opportunistically - GitBook's own docs don't
 	 * confirm a page-icon field actually survives a Git-Sync export at
 	 * all, but FrontmatterParser.bx parses whatever key/value pairs are
 	 * genuinely present, so if one ever is (or a project's own export
 	 * tooling adds one by hand), it's carried through unchanged rather
 	 * than silently dropped like the rest of `frontmatter` already was
-	 * before this - now meaningful since bx-docs' own `icon` accepts a
+	 * before this - now meaningful since bx-sites' own `icon` accepts a
 	 * named Phosphor/Lucide/Tabler icon, not just an emoji.
 	 *
 	 * @frontmatter FrontmatterParser.parse()'s own `frontmatter` struct
 	 *
-	 * @return A `---`-delimited bx-docs frontmatter block, or "" when none of the recognized fields are present
+	 * @return A `---`-delimited bx-sites frontmatter block, or "" when none of the recognized fields are present
 	 */
 	private string function serializeFrontmatter( required struct frontmatter ) {
 		var lines = []
@@ -219,7 +219,7 @@ class {
 	/**
 	 * @sourceRelativePath A GitBook-export-relative `.md` path
 	 *
-	 * @return The same path with a trailing `README.md` segment (case-insensitive) renamed to `index.md` - bx-docs' own folder-index convention (NavBuilder.bx)
+	 * @return The same path with a trailing `README.md` segment (case-insensitive) renamed to `index.md` - bx-sites' own folder-index convention (NavBuilder.bx)
 	 */
 	private string function destPathFor( required string sourceRelativePath ) {
 		var segments = listToArray( arguments.sourceRelativePath, "/", true )
@@ -232,7 +232,7 @@ class {
 
 	/**
 	 * Converts one page's already frontmatter-stripped, link-rewritten
-	 * GitBook markdown body into bx-docs markdown - splits it into
+	 * GitBook markdown body into bx-sites markdown - splits it into
 	 * text/block segments (splitBlocks()) and renders each in order.
 	 *
 	 * @markdown Raw GitBook markdown body text
@@ -260,7 +260,7 @@ class {
 	private array function splitBlocks( required string text ) {
 		var normalized = arguments.text.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" )
 		var lines = listToArray( normalized, char( 10 ), true )
-		var tracker = new "models.build.FenceTracker@bxdocs"()
+		var tracker = new "models.build.FenceTracker@bxsites"()
 		var rootSegments = []
 		var rootBuffer = []
 		var stack = []
@@ -347,7 +347,7 @@ class {
 	}
 
 	/**
-	 * Dispatches one block segment to its own bx-docs equivalent. A
+	 * Dispatches one block segment to its own bx-sites equivalent. A
 	 * child-only tag (`tab`/`card`/`column`/`step`) found outside its
 	 * expected group wrapper, and any tag this converter doesn't
 	 * recognize at all (`prompt`, `conditional-content`, `ai-chat`, or

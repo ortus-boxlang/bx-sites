@@ -13,7 +13,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.PluginLoader", function() {
 
 			beforeEach( function() {
-				variables.loader = new "models.build.PluginLoader@bxdocs"();
+				variables.loader = new "models.build.PluginLoader@bxsites"();
 			} );
 
 			it( "applyOnConfig() returns config untouched when no plugin implements onConfig", function() {

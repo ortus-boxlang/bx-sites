@@ -1,15 +1,15 @@
 /**
- * A minimal, working bx-docs plugin - see ../../../docs/guides/plugins.md.
+ * A minimal, working bx-sites plugin - see ../../../docs/guides/plugins.md.
  * Implements two of the five optional hooks; the other three
  * (onConfig/onPageMarkdown/onNav) are simply omitted, which is exactly
- * how BX Docs expects a plugin that doesn't need them to look.
+ * how BX Sites expects a plugin that doesn't need them to look.
  */
 class {
 
 	/**
-	 * @html A page's rendered HTML, already past bx-docs' own tabs/math/code-annotation post-processing
+	 * @html A page's rendered HTML, already past bx-sites' own tabs/math/code-annotation post-processing
 	 * @page The page struct (title, urlPath, tags, etc.)
-	 * @config The site's bxdocs.json config
+	 * @config The site's bxsites.json config
 	 */
 	string function onPageHtml( required string html, required struct page, required struct config ) {
 		return arguments.html & char( 10 ) & "<!-- rendered by hello-plugin -->"
@@ -17,7 +17,7 @@ class {
 
 	/**
 	 * @siteDir Absolute path to the finished build output directory
-	 * @config The site's bxdocs.json config
+	 * @config The site's bxsites.json config
 	 */
 	void function onBuildComplete( required string siteDir, required struct config ) {
 		fileWrite(

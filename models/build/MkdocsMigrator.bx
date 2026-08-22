@@ -1,10 +1,10 @@
 /**
  * Converts an mkdocs project (an `mkdocs.yml` plus its `docs/` folder) into
- * a bx-docs project - `mkdocs.yml` becomes `bxdocs.yaml` + `docs/nav.json`,
+ * a bx-sites project - `mkdocs.yml` becomes `bxsites.yaml` + `docs/nav.json`,
  * and every `.md` page is copied across with its asset references rewritten.
  *
  * Unlike GitBookMigrator.bx, this is mostly a *config* translation, not a
- * *content* one: mkdocs' own `docs/` folder already uses bx-docs' exact
+ * *content* one: mkdocs' own `docs/` folder already uses bx-sites' exact
  * conventions - folder nesting = nav, `index.md` = folder home, relative
  * `.md` page-to-page links (MarkdownLinkResolver.bx already resolves
  * these). More importantly, mkdocs-material's own extended Markdown
@@ -12,19 +12,19 @@
  * (pymdownx.details), `=== "Title"` content tabs (pymdownx.tabbed),
  * `$...$`/`$$...$$` math (pymdownx.arithmatex), and fenced-code
  * `hl_lines`/`title` annotations (pymdownx.superfences) - is the exact
- * same textual syntax bx-markdown's own Flexmark extensions and bx-docs'
+ * same textual syntax bx-markdown's own Flexmark extensions and bx-sites'
  * own pre/post-processors (TabsProcessor/MathProtector/
- * CodeAnnotationProcessor) already implement, because bx-docs modeled
+ * CodeAnnotationProcessor) already implement, because bx-sites modeled
  * itself on mkdocs-material to begin with (module spec, header). So page
  * *bodies* are copied through byte-for-byte unchanged - only their
  * asset (non-`.md`) references need rewriting, since mkdocs has no single
  * `docs/assets/` convention of its own (images commonly sit next to the
- * page that uses them) while bx-docs' asset pipeline only ever publishes
+ * page that uses them) while bx-sites' asset pipeline only ever publishes
  * `docs/assets/**`.
  *
- * Anything mkdocs-specific with no bx-docs equivalent - most
+ * Anything mkdocs-specific with no bx-sites equivalent - most
  * `markdown_extensions`/`plugins`/`theme.features` entries, mkdocs-material's
- * own color-palette config - is left out of the generated `bxdocs.yaml`
+ * own color-palette config - is left out of the generated `bxsites.yaml`
  * and reported into `migrate()`'s own `warnings`, the same
  * nothing-silently-dropped philosophy GitBookMigrator.bx already uses.
  */
@@ -32,15 +32,15 @@ class {
 
 	/**
 	 * Reads the source `mkdocs.yml` and serializes the generated
-	 * `bxdocs.yaml` - real bx-yaml BIFs by default, swappable via
+	 * `bxsites.yaml` - real bx-yaml BIFs by default, swappable via
 	 * setYamlRenderer() (YamlRenderer.bx's own docblock explains why). A
 	 * full YAML parser handles anything a real `mkdocs.yml` can contain
 	 * (anchors, flow mappings, multi-doc streams, ...) that a hand-rolled
 	 * subset parser wouldn't - this module used to carry its own
 	 * (MkdocsYamlParser.bx, removed once bx-yaml became a dependency anyway
-	 * for `bxdocs.yaml` itself; no reason for two YAML readers in one module).
+	 * for `bxsites.yaml` itself; no reason for two YAML readers in one module).
 	 */
-	variables.yamlRenderer = new "models.build.YamlRenderer@bxdocs"()
+	variables.yamlRenderer = new "models.build.YamlRenderer@bxsites"()
 
 	/**
 	 * Swaps in a fake/test YAML renderer - see YamlRenderer.bx's docblock.
@@ -52,8 +52,8 @@ class {
 	}
 
 	/**
-	 * Extension names with a direct, always-on bx-markdown/bx-docs
-	 * equivalent - present in `markdown_extensions` needs no `bxdocs.yaml`
+	 * Extension names with a direct, always-on bx-markdown/bx-sites
+	 * equivalent - present in `markdown_extensions` needs no `bxsites.yaml`
 	 * change and no warning (admonitions/footnotes/def_list are handled by
 	 * their own explicit mapping below; these are the ones that are just
 	 * "already true, nothing to do").
@@ -62,12 +62,12 @@ class {
 
 	/**
 	 * Migrates an mkdocs project at `sourceDir` into `projectRoot` - reads
-	 * `mkdocs.yml`, writes `projectRoot/bxdocs.yaml` and
+	 * `mkdocs.yml`, writes `projectRoot/bxsites.yaml` and
 	 * `projectRoot/docs/nav.json`, and copies every page + asset from
 	 * mkdocs' own `docs_dir` (default `docs/`) into `projectRoot/docs/`.
 	 *
 	 * @sourceDir Absolute path to the mkdocs project's root (contains mkdocs.yml)
-	 * @projectRoot Absolute path to the target bx-docs project root
+	 * @projectRoot Absolute path to the target bx-sites project root
 	 *
 	 * @return { pagesConverted: numeric, assetsConverted: numeric, warnings: array of human-readable strings, configPath: string, navPath: string }
 	 */
@@ -75,7 +75,7 @@ class {
 		var configSourcePath = arguments.sourceDir & "/mkdocs.yml"
 		if ( !fileExists( configSourcePath ) ) {
 			throw(
-				type    = "BxDocs.MigrateMissingMkdocsConfig",
+				type    = "BxSites.MigrateMissingMkdocsConfig",
 				message = "No mkdocs.yml found at [#arguments.sourceDir#] - mkdocs migration requires its site config file"
 			)
 		}
@@ -85,13 +85,13 @@ class {
 			mkdocsConfig = variables.yamlRenderer.fromYaml( fileRead( configSourcePath ) )
 		} catch ( any e ) {
 			throw(
-				type    = "BxDocs.InvalidMkdocsConfig",
+				type    = "BxSites.InvalidMkdocsConfig",
 				message = "mkdocs.yml at [#configSourcePath#] is not valid YAML: #e.message#"
 			)
 		}
 		if ( !isStruct( mkdocsConfig ) ) {
 			throw(
-				type    = "BxDocs.InvalidMkdocsConfig",
+				type    = "BxSites.InvalidMkdocsConfig",
 				message = "mkdocs.yml at [#configSourcePath#] must contain a YAML object"
 			)
 		}
@@ -101,7 +101,7 @@ class {
 		var mkdocsDocsDir = arguments.sourceDir & "/" & trim( len( trim( mkdocsConfig.docs_dir ?: "" ) ) ? mkdocsConfig.docs_dir : "docs" )
 		if ( !directoryExists( mkdocsDocsDir ) ) {
 			throw(
-				type    = "BxDocs.MigrateMissingDocsDir",
+				type    = "BxSites.MigrateMissingDocsDir",
 				message = "No [#mkdocsDocsDir#] found - mkdocs migration requires the project's own docs_dir to exist"
 			)
 		}
@@ -124,12 +124,12 @@ class {
 			var navPath = ""
 		}
 
-		var bxdocsConfig = buildBxdocsConfig( mkdocsConfig, arguments.sourceDir, warnings )
-		var configPath = arguments.projectRoot & "/bxdocs.yaml"
+		var bxsitesConfig = buildBxsitesConfig( mkdocsConfig, arguments.sourceDir, warnings )
+		var configPath = arguments.projectRoot & "/bxsites.yaml"
 		if ( fileExists( configPath ) ) {
-			warnings.append( "bxdocs.yaml already existed and was overwritten by this migration" )
+			warnings.append( "bxsites.yaml already existed and was overwritten by this migration" )
 		}
-		fileWrite( configPath, variables.yamlRenderer.toYaml( bxdocsConfig ) )
+		fileWrite( configPath, variables.yamlRenderer.toYaml( bxsitesConfig ) )
 
 		return {
 			pagesConverted  : copyResult.pagesConverted,
@@ -141,7 +141,7 @@ class {
 	}
 
 	/**
-	 * Translates the parsed `mkdocs.yml` struct into a `bxdocs.yaml` struct
+	 * Translates the parsed `mkdocs.yml` struct into a `bxsites.yaml` struct
 	 * - only the fields this converter has a confident, direct mapping
 	 * for; ConfigLoader.bx's own defaults cover everything else once this
 	 * is loaded normally by `build`.
@@ -150,11 +150,11 @@ class {
 	 * @sourceDir Absolute path to the mkdocs project root (for the site-name-fallback warning message)
 	 * @warnings Accumulator array, mutated in place
 	 */
-	private struct function buildBxdocsConfig( required struct mkdocsConfig, required string sourceDir, required array warnings ) {
+	private struct function buildBxsitesConfig( required struct mkdocsConfig, required string sourceDir, required array warnings ) {
 		var siteName = trim( arguments.mkdocsConfig.site_name ?: "" )
 		if ( !len( siteName ) ) {
 			siteName = listLast( arguments.sourceDir.reReplace( "[\/]+$", "" ), "/\" )
-			arguments.warnings.append( "mkdocs.yml has no [site_name] - defaulted bxdocs.yaml [name] to ""#siteName#""" )
+			arguments.warnings.append( "mkdocs.yml has no [site_name] - defaulted bxsites.yaml [name] to ""#siteName#""" )
 		}
 
 		var config = { "name" : siteName }
@@ -197,31 +197,31 @@ class {
 	}
 
 	/**
-	 * `theme.name: material` maps to bx-docs' own built-in `material` theme
+	 * `theme.name: material` maps to bx-sites' own built-in `material` theme
 	 * (a genuine coincidence of naming, not a compatibility claim - the
 	 * two are visually similar but not identical); any other mkdocs theme
-	 * name (`mkdocs`, `readthedocs`, a custom one) falls back to bx-docs'
+	 * name (`mkdocs`, `readthedocs`, a custom one) falls back to bx-sites'
 	 * own `bootstrap` default, reported into `warnings` since the visual
 	 * result will differ.
 	 */
 	private struct function buildThemeConfig( required struct mkdocsConfig, required array warnings ) {
 		var mkdocsThemeName = lCase( trim( isStruct( arguments.mkdocsConfig.theme ?: "" ) ? ( arguments.mkdocsConfig.theme.name ?: "" ) : ( arguments.mkdocsConfig.theme ?: "" ) ) )
-		var bxdocsThemeName = "bootstrap"
+		var bxsitesThemeName = "bootstrap"
 
 		if ( mkdocsThemeName == "material" ) {
-			bxdocsThemeName = "material"
+			bxsitesThemeName = "material"
 		} else if ( len( mkdocsThemeName ) && mkdocsThemeName != "mkdocs" && mkdocsThemeName != "readthedocs" ) {
-			arguments.warnings.append( "mkdocs.yml [theme.name] ""#mkdocsThemeName#"" has no bx-docs equivalent - defaulted to the ""bootstrap"" theme" )
+			arguments.warnings.append( "mkdocs.yml [theme.name] ""#mkdocsThemeName#"" has no bx-sites equivalent - defaulted to the ""bootstrap"" theme" )
 		}
 
-		return { "name" : bxdocsThemeName, "options" : {} }
+		return { "name" : bxsitesThemeName, "options" : {} }
 	}
 
 	/**
-	 * Maps the handful of `markdown_extensions` entries bx-docs' own
+	 * Maps the handful of `markdown_extensions` entries bx-sites' own
 	 * `markdown` config block has a direct switch for; every other
 	 * recognized-but-unmapped extension is a no-op (variables.noopExtensions -
-	 * bx-docs already behaves that way natively); anything else is
+	 * bx-sites already behaves that way natively); anything else is
 	 * reported by reportUnmappedExtensions().
 	 */
 	private struct function buildMarkdownConfig( required struct mkdocsConfig, required array warnings ) {
@@ -258,7 +258,7 @@ class {
 	 * Reports every `markdown_extensions` entry that's neither explicitly
 	 * mapped (buildMarkdownConfig()/the `math` check) nor a known no-op
 	 * (variables.noopExtensions) - mostly mkdocs-material-specific
-	 * extensions with no bx-docs concept at all (e.g. emoji shortcodes).
+	 * extensions with no bx-sites concept at all (e.g. emoji shortcodes).
 	 */
 	private void function reportUnmappedExtensions( required struct mkdocsConfig, required array warnings ) {
 		var extensions = arguments.mkdocsConfig.markdown_extensions ?: []
@@ -269,15 +269,15 @@ class {
 		for ( var entry in extensions ) {
 			var name = trim( isStruct( entry ) ? entry.keyArray()[ 1 ] : entry )
 			if ( !listFindNoCase( mapped, name ) && !listFindNoCase( variables.noopExtensions, name ) ) {
-				arguments.warnings.append( "mkdocs.yml markdown_extensions entry ""#name#"" has no bx-docs equivalent - review docs/guides/markdown.md for what's natively supported" )
+				arguments.warnings.append( "mkdocs.yml markdown_extensions entry ""#name#"" has no bx-sites equivalent - review docs/guides/markdown.md for what's natively supported" )
 			}
 		}
 	}
 
 	/**
-	 * Reports every `plugins` entry other than `search` (bx-docs' own
+	 * Reports every `plugins` entry other than `search` (bx-sites' own
 	 * `local` search provider already covers that by default) - the rest
-	 * of the mkdocs plugin ecosystem has no bx-docs equivalent to map to.
+	 * of the mkdocs plugin ecosystem has no bx-sites equivalent to map to.
 	 */
 	private void function reportUnmappedPlugins( required struct mkdocsConfig, required array warnings ) {
 		var plugins = arguments.mkdocsConfig.plugins ?: []
@@ -287,7 +287,7 @@ class {
 		for ( var entry in plugins ) {
 			var name = trim( isStruct( entry ) ? entry.keyArray()[ 1 ] : entry )
 			if ( !listFindNoCase( "search", name ) ) {
-				arguments.warnings.append( "mkdocs.yml plugins entry ""#name#"" has no bx-docs equivalent - if you need the same behavior, see docs/guides/plugins.md" )
+				arguments.warnings.append( "mkdocs.yml plugins entry ""#name#"" has no bx-sites equivalent - if you need the same behavior, see docs/guides/plugins.md" )
 			}
 		}
 	}
@@ -317,10 +317,10 @@ class {
 	}
 
 	/**
-	 * Copies mkdocs' own `docs_dir` tree into bx-docs' `docs/` - every
+	 * Copies mkdocs' own `docs_dir` tree into bx-sites' `docs/` - every
 	 * `.md` file with its asset references rewritten (rewriteAssetRefs()),
 	 * every other file relocated to `docs/assets/mkdocs/<same-relative-path>`
-	 * (bx-docs' asset pipeline only ever publishes `docs/assets/**`, and
+	 * (bx-sites' asset pipeline only ever publishes `docs/assets/**`, and
 	 * mkdocs has no single asset-folder convention of its own to lean on).
 	 *
 	 * @mkdocsDocsDir Absolute path to the mkdocs project's own docs_dir

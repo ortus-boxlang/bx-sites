@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.PluginNew", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.PluginNew@bxdocs"();
+				variables.verb = new "models.cli.PluginNew@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,21 +17,21 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newProjectRoot() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-pluginnew-" );
+				var dir = createTempDirectory( prefix = "bxsites-cli-pluginnew-" );
 				tempDirs.append( dir );
 				return dir;
 			}
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( { name : "My Plugin" } );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
-			it( "throws BxDocs.MissingPluginName when name is blank", function() {
+			it( "throws BxSites.MissingPluginName when name is blank", function() {
 				expect( function() {
 					verb.run( { projectRoot : newProjectRoot() } );
-				} ).toThrow( "BxDocs.MissingPluginName" );
+				} ).toThrow( "BxSites.MissingPluginName" );
 			} );
 
 			it( "defaults the destination to <projectRoot>/<name> and exits 0", function() {

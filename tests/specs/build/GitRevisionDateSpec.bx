@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.GitRevisionDate", function() {
 
 			beforeEach( function() {
-				variables.service = new "models.build.GitRevisionDate@bxdocs"();
+				variables.service = new "models.build.GitRevisionDate@bxsites"();
 				variables.repoRoot = getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]tests[\/]specs[\/]build[\/]?$", "" );
 			} );
 
@@ -22,7 +22,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "returns an empty string (never throws) when projectRoot isn't a git repo at all", function() {
-				var tempDir = createTempDirectory( prefix = "bxdocs-gitrevisiondate-" );
+				var tempDir = createTempDirectory( prefix = "bxsites-gitrevisiondate-" );
 
 				var result = service.forFile( tempDir, "whatever.md" );
 

@@ -6,16 +6,16 @@ tags: [guides, migration, gitbook]
 
 # GitBook からの移行
 
-`bxDocs migrate` は GitBook のエクスポート（`SUMMARY.md` の目次とその `.md` ファイル、
+`bxSites migrate` は GitBook のエクスポート（`SUMMARY.md` の目次とその `.md` ファイル、
 GitBook 独自のオンディスク同期形式（GitHub/Git Sync が書き込むのと同じもの））を
-bx-docs の `docs/` ツリーに一つのコマンドで変換します。GitBook のコンテンツブロックシステムが
-サポートするすべてのものが bx-docs が既に持っているものにマッピングされます
+bx-sites の `docs/` ツリーに一つのコマンドで変換します。GitBook のコンテンツブロックシステムが
+サポートするすべてのものが bx-sites が既に持っているものにマッピングされます
 （[Markdown 拡張機能](markdown.md#gitbook-style-blocks) を参照）ので、
 粗削りなドラフトではなく、動作するサイトが出来上がります。
 
 ## GitBook エクスポートの取得
 
-`bxDocs migrate` は GitBook 独自のファイルレイアウトを直接読み込むため、
+`bxSites migrate` は GitBook 独自のファイルレイアウトを直接読み込むため、
 以下のいずれかが `--source` として使用できます:
 
 - GitBook が Git 同期しているリポジトリ（Space 設定 → **GitSync**）-
@@ -27,15 +27,15 @@ bx-docs の `docs/` ツリーに一つのコマンドで変換します。GitBoo
 ## 移行の実行
 
 ```bash
-# 1. 新しい bx-docs プロジェクトをスキャフォールド（既にある場合はスキップ）
-bxDocs new my-docs
+# 1. 新しい bx-sites プロジェクトをスキャフォールド（既にある場合はスキップ）
+bxSites new my-docs
 cd my-docs
 
 # 2. GitBook エクスポートを移行
-bxDocs migrate --source=/path/to/gitbook-export
+bxSites migrate --source=/path/to/gitbook-export
 
 # 3. ビルドして結果を確認
-bxDocs serve
+bxSites serve
 ```
 
 `migrate` は変換されたページ数を出力し、判断が必要だった箇所の詳細も正確に報告します:
@@ -57,8 +57,8 @@ Migrated 14 page(s) from [/path/to/gitbook-export] into my-docs/docs/, wrote my-
 | GitBook | 変換先 |
 |---|---|
 | `SUMMARY.md` | `docs/nav.json`（[nav オーバーライド](../configuration.md#nav) 形式）、ネストを維持 |
-| `README.md`（任意のフォルダ） | `index.md` - bx-docs 独自のフォルダインデックス規約 |
-| ページの `title`/`description`/`tags` フロントマター | 移行済みファイルの bx-docs フロントマターにそのまま引き継がれます |
+| `README.md`（任意のフォルダ） | `index.md` - bx-sites 独自のフォルダインデックス規約 |
+| ページの `title`/`description`/`tags` フロントマター | 移行済みファイルの bx-sites フロントマターにそのまま引き継がれます |
 | `.gitbook/assets/**` | `docs/assets/gitbook/**`（すべての参照を書き換え） |
 | `{% hint style="..." %}` | `!!! type` - ネイティブ [Admonition](markdown.md#admonitions) |
 | `{% tabs %}` / `{% tab title="..." %}` | `=== "Title"` - ネイティブ [コンテンツタブ](markdown.md#content-tabs) |

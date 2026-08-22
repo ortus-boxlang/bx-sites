@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.FrontmatterParser", function() {
 
 			beforeEach( function() {
-				variables.parser = new "models.build.FrontmatterParser@bxdocs"();
+				variables.parser = new "models.build.FrontmatterParser@bxsites"();
 			} );
 
 			it( "returns the whole content as body when there is no frontmatter block", function() {

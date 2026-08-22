@@ -1,5 +1,5 @@
 /**
- * Dogfooding-only widget for bx-docs' own deployed docs site: this repo's
+ * Dogfooding-only widget for bx-sites' own deployed docs site: this repo's
  * `docs/` tree is built three times (see scripts/build-multi-theme.sh) -
  * once per built-in theme - and assembled into one deployment, with
  * `bootstrap` at the site root and `material`/`tailwind` living under
@@ -8,7 +8,7 @@
  * three themes) so a visitor can jump straight to the same page in another
  * theme instead of starting over from that variant's own home page.
  *
- * Not a bx-docs feature - a project-specific `extraJs` file, wired up the
+ * Not a bx-sites feature - a project-specific `extraJs` file, wired up the
  * same way any project's own custom script would be (see the Themes guide,
  * "Customizing colors without a theme override"). Rendered as an icon
  * trigger + dropdown menu (reusing `.theme-toggle`'s own square button
@@ -21,13 +21,13 @@
  * every built-in theme already sets on `<html>` for dark mode.
  *
  * `ROOT` is a placeholder - scripts/build-multi-theme.sh substitutes it
- * with the site's real root-relative base path (e.g. "/bx-docs/" or
- * "/bx-docs/development/") before each of the three builds, since that
+ * with the site's real root-relative base path (e.g. "/bx-sites/" or
+ * "/bx-sites/development/") before each of the three builds, since that
  * root is identical across all three variants and only known at build
- * time from bxdocs.json's own `baseURL`.
+ * time from bxsites.json's own `baseURL`.
  */
 ( function () {
-	var ROOT = "__BXDOCS_ROOT__";
+	var ROOT = "__BXSITES_ROOT__";
 
 	var VARIANTS = [
 		{ key: "bootstrap", label: "Bootstrap", prefix: "", dot: "#7952b3" },
@@ -54,33 +54,33 @@
 	}
 
 	function injectStyle() {
-		if ( document.getElementById( "bxdocs-variant-switcher-style" ) ) {
+		if ( document.getElementById( "bxsites-variant-switcher-style" ) ) {
 			return;
 		}
 		var style = document.createElement( "style" );
-		style.id = "bxdocs-variant-switcher-style";
+		style.id = "bxsites-variant-switcher-style";
 		style.textContent =
-			".bxdocs-variant-switcher{position:relative;display:inline-flex;}" +
-			".bxdocs-variant-menu{position:absolute;top:calc(100% + 0.35rem);right:0;z-index:1000;" +
+			".bxsites-variant-switcher{position:relative;display:inline-flex;}" +
+			".bxsites-variant-menu{position:absolute;top:calc(100% + 0.35rem);right:0;z-index:1000;" +
 				"min-width:11rem;margin:0;padding:0.35rem;list-style:none;border-radius:8px;" +
 				"background:#ffffff;color:#212529;border:1px solid rgba(0,0,0,0.15);" +
 				"box-shadow:0 8px 24px rgba(0,0,0,0.18);}" +
-			"html[data-theme=\"dark\"] .bxdocs-variant-menu{background:#1b2027;color:#e6edf3;" +
+			"html[data-theme=\"dark\"] .bxsites-variant-menu{background:#1b2027;color:#e6edf3;" +
 				"border-color:rgba(255,255,255,0.15);}" +
-			".bxdocs-variant-item{display:flex;align-items:center;gap:0.5rem;width:100%;" +
+			".bxsites-variant-item{display:flex;align-items:center;gap:0.5rem;width:100%;" +
 				"padding:0.4rem 0.6rem;border:0;border-radius:6px;background:transparent;" +
 				"color:inherit;font-size:0.85rem;text-align:left;cursor:pointer;}" +
-			".bxdocs-variant-item:hover{background:rgba(128,128,128,0.15);}" +
-			".bxdocs-variant-item[aria-current=\"true\"]{font-weight:600;}" +
-			".bxdocs-variant-dot{width:0.6rem;height:0.6rem;border-radius:50%;flex:0 0 auto;}";
+			".bxsites-variant-item:hover{background:rgba(128,128,128,0.15);}" +
+			".bxsites-variant-item[aria-current=\"true\"]{font-weight:600;}" +
+			".bxsites-variant-dot{width:0.6rem;height:0.6rem;border-radius:50%;flex:0 0 auto;}";
 		document.head.appendChild( style );
 	}
 
 	function init() {
-		// A placeholder left un-substituted (e.g. a normal `boxlang module:bxDocs
+		// A placeholder left un-substituted (e.g. a normal `boxlang module:bxSites
 		// build` run of this same project, outside the multi-theme script) means
 		// there's only one variant on this deployment - nothing to switch to.
-		if ( ROOT.indexOf( "BXDOCS_ROOT" ) !== -1 ) {
+		if ( ROOT.indexOf( "BXSITES_ROOT" ) !== -1 ) {
 			return;
 		}
 
@@ -97,7 +97,7 @@
 		injectStyle();
 
 		var wrapper = document.createElement( "div" );
-		wrapper.className = "bxdocs-variant-switcher";
+		wrapper.className = "bxsites-variant-switcher";
 
 		var trigger = document.createElement( "button" );
 		trigger.type = "button";
@@ -113,7 +113,7 @@
 		trigger.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M200.77,53.89A103.27,103.27,0,0,0,128,24h-1.07A104,104,0,0,0,24,128c0,43,26.58,79.06,69.36,94.17A32,32,0,0,0,136,192a16,16,0,0,1,16-16h46.21a31.81,31.81,0,0,0,31.2-24.88,104.43,104.43,0,0,0,2.59-24A103.28,103.28,0,0,0,200.77,53.89Zm13,93.71A15.89,15.89,0,0,1,198.21,160H152a32,32,0,0,0-32,32,16,16,0,0,1-21.31,15.07C62.49,194.3,40,164,40,128a88,88,0,0,1,87.09-88h.9a88.35,88.35,0,0,1,88,87.25A88.86,88.86,0,0,1,213.81,147.6ZM140,76a12,12,0,1,1-12-12A12,12,0,0,1,140,76ZM96,100A12,12,0,1,1,84,88,12,12,0,0,1,96,100Zm0,56a12,12,0,1,1-12-12A12,12,0,0,1,96,156Zm88-56a12,12,0,1,1-12-12A12,12,0,0,1,184,100Z"/></svg>';
 
 		var menu = document.createElement( "ul" );
-		menu.className = "bxdocs-variant-menu";
+		menu.className = "bxsites-variant-menu";
 		menu.setAttribute( "role", "menu" );
 		menu.hidden = true;
 
@@ -123,14 +123,14 @@
 
 			var item = document.createElement( "button" );
 			item.type = "button";
-			item.className = "bxdocs-variant-item";
+			item.className = "bxsites-variant-item";
 			item.setAttribute( "role", "menuitem" );
 			if ( variant.key === current.variant.key ) {
 				item.setAttribute( "aria-current", "true" );
 			}
 
 			var dot = document.createElement( "span" );
-			dot.className = "bxdocs-variant-dot";
+			dot.className = "bxsites-variant-dot";
 			dot.style.background = variant.dot;
 			dot.setAttribute( "aria-hidden", "true" );
 

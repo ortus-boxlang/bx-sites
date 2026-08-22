@@ -31,18 +31,18 @@ class {
 	struct function scaffold( required string docsDir, required string name ) {
 		var trimmedName = trim( arguments.name )
 		if ( !len( trimmedName ) ) {
-			throw( type = "BxDocs.MissingVersionName", message = "`version:new` requires --name=<version>" )
+			throw( type = "BxSites.MissingVersionName", message = "`version:new` requires --name=<version>" )
 		}
 
 		var trimmedDocsDir = arguments.docsDir.reReplace( "[\/]+$", "" )
 		var versionDir = trimmedDocsDir & "/versions/" & trimmedName
 
 		if ( directoryExists( versionDir ) ) {
-			throw( type = "BxDocs.VersionAlreadyExists", message = "docs/versions/#trimmedName# already exists" )
+			throw( type = "BxSites.VersionAlreadyExists", message = "docs/versions/#trimmedName# already exists" )
 		}
 
 		if ( !directoryExists( trimmedDocsDir ) ) {
-			throw( type = "BxDocs.DocsDirNotFound", message = "No docs/ directory found at [#trimmedDocsDir#]" )
+			throw( type = "BxSites.DocsDirNotFound", message = "No docs/ directory found at [#trimmedDocsDir#]" )
 		}
 
 		directoryCreate( versionDir, true, true )

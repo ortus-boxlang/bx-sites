@@ -15,13 +15,13 @@ class {
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
 		if ( !len( projectRoot ) ) {
-			throw( type = "BxDocs.MissingProjectRoot", message = "`serve` requires a project root" )
+			throw( type = "BxSites.MissingProjectRoot", message = "`serve` requires a project root" )
 		}
 
 		var port = isNumeric( arguments.options.port ?: "" ) ? val( arguments.options.port ) : 8080
 		var host = len( trim( arguments.options.host ?: "" ) ) ? arguments.options.host : "127.0.0.1"
 
-		var devServer = new "models.build.DevServer@bxdocs"()
+		var devServer = new "models.build.DevServer@bxsites"()
 		var started = devServer.start( projectRoot, port, host )
 
 		println( "Serving #projectRoot# at #started.url# (Ctrl+C to stop)" )

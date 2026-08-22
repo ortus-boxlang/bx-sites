@@ -5,7 +5,7 @@
 	 * exposes that path at render time), the same convention icons.bxm
 	 * already uses for the shared repo/social icon lookup.
 	 *
-	 * A locale's own `bxdocs.json` `i18n.locales[].flag` (a literal emoji)
+	 * A locale's own `bxsites.json` `i18n.locales[].flag` (a literal emoji)
 	 * always wins when set; this is only the fallback for the common case
 	 * of a locale `code` (`es`, `pt-BR`, `zh-Hans`) that maps onto one
 	 * obvious, uncontroversial flag. A `code` with no obvious flag (a
@@ -14,7 +14,7 @@
 	 * guessing - the same "always render *something*" philosophy
 	 * IconResolver.bx's own fallback already follows.
 	 */
-	function bxdocsLocaleFlag( required string code ) {
+	function bxsitesLocaleFlag( required string code ) {
 		var flags = {
 			"en" : "🇺🇸", "es" : "🇪🇸", "fr" : "🇫🇷", "de" : "🇩🇪", "it" : "🇮🇹",
 			"pt" : "🇵🇹", "pt-br" : "🇧🇷", "nl" : "🇳🇱", "ru" : "🇷🇺", "uk" : "🇺🇦",

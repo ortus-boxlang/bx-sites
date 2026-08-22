@@ -9,13 +9,13 @@ tags: [referencia, configuración]
 # Configuración
 
 Cada proyecto tiene una configuración de sitio única en su raíz -
-`bxdocs.yaml` (o `.yml`), el formato por defecto y preferido, o
-`bxdocs.json` para un proyecto que prefiera quedarse con él. Ambos son
+`bxsites.yaml` (o `.yml`), el formato por defecto y preferido, o
+`bxsites.json` para un proyecto que prefiera quedarse con él. Ambos son
 totalmente compatibles y producen exactamente el mismo resultado;
-`bxDocs new` genera `bxdocs.yaml` a menos que se pase `--format=json`
+`bxSites new` genera `bxsites.yaml` a menos que se pase `--format=json`
 (consulta [Primeros Pasos](getting-started.md#formato-del-archivo-de-configuracion)).
-Si un proyecto de algún modo tiene más de uno, `bxdocs.yaml` prevalece,
-luego `bxdocs.yml`, luego `bxdocs.json`.
+Si un proyecto de algún modo tiene más de uno, `bxsites.yaml` prevalece,
+luego `bxsites.yml`, luego `bxsites.json`.
 
 ```yaml
 name: "My Docs"
@@ -54,7 +54,7 @@ i18n:
   locales: []
 ```
 
-El `bxdocs.json` equivalente, para un proyecto que lo prefiera:
+El `bxsites.json` equivalente, para un proyecto que lo prefiera:
 
 ```json
 {
@@ -247,7 +247,7 @@ Cada entrada es o bien:
 }
 ```
 
-Para una navegación lo bastante grande como para saturar `bxdocs.json`,
+Para una navegación lo bastante grande como para saturar `bxsites.json`,
 muévela a su propio archivo `docs/nav.json` en su lugar - la misma forma
 de array, simplemente como el contenido de nivel superior de todo el
 archivo:
@@ -259,7 +259,7 @@ archivo:
 ]
 ```
 
-El propio `nav` de `bxdocs.json`, cuando no está vacío, siempre prevalece
+El propio `nav` de `bxsites.json`, cuando no está vacío, siempre prevalece
 sobre `docs/nav.json`. Solo el árbol principal respeta cualquiera de los
 dos - un árbol `docs/versions/<name>/` siempre infiere su navegación de su
 propia estructura de carpetas, incluso cuando el árbol principal tiene una
@@ -269,19 +269,19 @@ explícita.
 
 Se reenvía tal cual a la propia configuración del módulo de
 [bx-markdown](https://github.com/ortus-boxlang/bx-markdown) antes de
-renderizar cada página. BX Docs no redefine ni valida estas claves; lo que
+renderizar cada página. BX Sites no redefine ni valida estas claves; lo que
 sea que pongas aquí es el propio conjunto de opciones de bx-markdown,
 directamente - así que esta lista puede divergir de la propia de
 bx-markdown a medida que evoluciona. Las tablas, `~~tachado~~`, las
 casillas de tarea `- [ ]` y la tabla de contenido en la página están
 siempre activas, sin interruptor. La única excepción es
 `enableAdmonition` - bx-markdown por sí mismo lo establece en `false` por
-defecto, pero BX Docs lo establece en `true` por defecto (consulta la
+defecto, pero BX Sites lo establece en `true` por defecto (consulta la
 [guía de Extensiones de Markdown](guides/markdown.md)).
 
 | Clave | Valor por defecto | Efecto |
 |---|---|---|
-| `enableAdmonition` | `true` *(valor por defecto de BX Docs; el propio valor por defecto de bx-markdown es `false`)* | Bloques de aviso `!!!`/`???`/`???+` - consulta la [guía de Extensiones de Markdown](guides/markdown.md#admonitions) |
+| `enableAdmonition` | `true` *(valor por defecto de BX Sites; el propio valor por defecto de bx-markdown es `false`)* | Bloques de aviso `!!!`/`???`/`???+` - consulta la [guía de Extensiones de Markdown](guides/markdown.md#admonitions) |
 | `enableFootnotes` | `false` | Referencias de nota al pie `[^label]` - consulta la [guía de Extensiones de Markdown](guides/markdown.md#footnotes) |
 | `enableDefinitionLists` | `false` | Listas `Term\n:   Definition` - consulta la [guía de Extensiones de Markdown](guides/markdown.md#definition-lists) |
 | `autoLinkUrls` | `true` | Enlaza automáticamente URL y direcciones de correo sin formato |
@@ -293,7 +293,7 @@ defecto, pero BX Docs lo establece en `true` por defecto (consulta la
 | `anchorPrefix` / `anchorSuffix` | `""` | HTML sin procesar inyectado inmediatamente antes/después del texto del encabezado |
 | `enableYouTubeTransformer` | `false` | Incrusta automáticamente enlaces de YouTube sin formato como un reproductor |
 | `codeStyleHTMLOpen` / `codeStyleHTMLClose` | `"<code>"` / `"</code>"` | HTML envolvente alrededor de los fragmentos de código en línea |
-| `fencedCodeLanguageClassPrefix` | `"language-"` | Prefijo de clase del que dependen el resaltador de sintaxis del lado del cliente de bx-docs (y Mermaid, ver abajo), por ejemplo ` ```js ` -> `class="language-js"` |
+| `fencedCodeLanguageClassPrefix` | `"language-"` | Prefijo de clase del que dependen el resaltador de sintaxis del lado del cliente de bx-sites (y Mermaid, ver abajo), por ejemplo ` ```js ` -> `class="language-js"` |
 | `tableOptions.columnSpans` | `true` | Respeta las celdas de tabla combinadas al estilo `colspan` |
 | `tableOptions.appendMissingColumns` | `true` | Rellena una fila corta hasta el número de columnas del encabezado |
 | `tableOptions.discardExtraColumns` | `true` | Descarta celdas adicionales en una fila demasiado larga |
@@ -358,7 +358,7 @@ enlace (por defecto `icon`, y luego `"Link"`).
 
 `false` (el valor por defecto) - sin pie de página en absoluto. `true`
 añade uno a cada página: una línea de copyright (`© <year> <site name>`),
-los enlaces `social` (si los hay), y un crédito "Built with BX Docs".
+los enlaces `social` (si los hay), y un crédito "Built with BX Sites".
 
 ```json
 { "footer": true }
@@ -478,7 +478,7 @@ nunca lo activa por sí solo; también tiene que nombrarse aquí. Consulta
 [Plugins](guides/plugins.md) para saber cómo escribir uno.
 
 ```json
-{ "plugins": [ "myBxDocsPlugin" ] }
+{ "plugins": [ "myBxSitesPlugin" ] }
 ```
 
 ## `i18n`
@@ -518,7 +518,7 @@ todavía no está traducido.
 ## Versionado
 
 Los documentos versionados son cuestión de convención, no de
-configuración - no hay ninguna clave de `bxdocs.json` para ello. Añade
+configuración - no hay ninguna clave de `bxsites.json` para ello. Añade
 una carpeta `docs/versions/`, y cada subcarpeta directa dentro de ella se
 construye como su propio árbol de documentos totalmente autocontenido,
 junto a tu `docs/` regular (que siempre se construye como "Latest"):
@@ -539,7 +539,7 @@ docs/
 Cada carpeta de versión es un árbol normal con forma de `docs/` - su
 propio `index.md`, su propia navegación, sus propias páginas - construido
 en `site/versions/<name>/` con cada enlace interno prefijado en
-consecuencia, y compartiendo el único `bxdocs.json` de configuración/tema
+consecuencia, y compartiendo el único `bxsites.json` de configuración/tema
 del proyecto. Los nombres de versión se ordenan de más reciente a más
 antiguo, numéricamente en lugar de alfabéticamente (de modo que `2.0` se
 ordena antes que `10.0`), y cada tema renderiza automáticamente un

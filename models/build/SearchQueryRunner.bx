@@ -29,7 +29,7 @@ class {
 		var indexPath = arguments.siteDir.reReplace( "[\/]+$", "" ) & "/search-index.json"
 		if ( !fileExists( indexPath ) ) {
 			throw(
-				type    = "BxDocs.SearchIndexNotBuilt",
+				type    = "BxSites.SearchIndexNotBuilt",
 				message = "No [#indexPath#] to search - run `search-index` (or `build`) first"
 			)
 		}
@@ -39,7 +39,7 @@ class {
 			.filter( term => len( term ) )
 
 		if ( !terms.len() ) {
-			throw( type = "BxDocs.MissingQuery", message = "`search:query` requires a non-blank --query" )
+			throw( type = "BxSites.MissingQuery", message = "`search:query` requires a non-blank --query" )
 		}
 
 		var docs = jsonDeserialize( fileRead( indexPath ) )

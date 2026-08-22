@@ -9,7 +9,7 @@
 // files, no further sub-resources of their own, and (b) either always
 // loaded (Bootstrap, highlight.js, Alpine.js) or gated behind a project's
 // own opt-in (lunr.js behind the `local` search provider, Mermaid behind
-// `bxdocs.json`'s `mermaid`) are vendored this way. Mermaid's own UMD
+// `bxsites.json`'s `mermaid`) are vendored this way. Mermaid's own UMD
 // bundle (mermaid.min.js) is otherwise self-contained - its one dynamic
 // import, `elk-api.js` (an alternate layout engine used by a handful of
 // diagram types), isn't vendored and still resolves against jsDelivr, the

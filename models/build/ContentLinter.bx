@@ -9,15 +9,15 @@
  *     nesting without gaps).
  *   - A blog post with a missing/invalid frontmatter `date` -
  *     BlogDiscoverer.bx itself throws on this the moment a real `build`
- *     tries to load posts (`BxDocs.InvalidBlogPost`), so `lint` reads
+ *     tries to load posts (`BxSites.InvalidBlogPost`), so `lint` reads
  *     `docs/blog/posts/**` frontmatter directly (bypassing
  *     BlogDiscoverer.bx entirely) specifically so this shows up as a
  *     lint finding instead of crashing the whole run.
  */
 class {
 
-	variables.frontmatterParser = new "models.build.FrontmatterParser@bxdocs"()
-	variables.docsLoader = new "models.build.DocsLoader@bxdocs"()
+	variables.frontmatterParser = new "models.build.FrontmatterParser@bxsites"()
+	variables.docsLoader = new "models.build.DocsLoader@bxsites"()
 
 	/**
 	 * @docsDir Absolute path to the project's docs/ directory

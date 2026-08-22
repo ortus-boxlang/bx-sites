@@ -26,11 +26,11 @@ class {
 	 * @return { path (the new absolute path), filesUpdated (count of OTHER files whose links were rewritten, the moved file itself not included) }
 	 */
 	struct function rename( required string docsDir, required string from, required string to ) {
-		var fromRelative = normalizeRelativePath( arguments.from, "BxDocs.MissingFromPath", "`page:rename` requires --from=<relative path>.md" )
-		var toRelative = normalizeRelativePath( arguments.to, "BxDocs.MissingToPath", "`page:rename` requires --to=<relative path>.md" )
+		var fromRelative = normalizeRelativePath( arguments.from, "BxSites.MissingFromPath", "`page:rename` requires --from=<relative path>.md" )
+		var toRelative = normalizeRelativePath( arguments.to, "BxSites.MissingToPath", "`page:rename` requires --to=<relative path>.md" )
 
 		if ( fromRelative == toRelative ) {
-			throw( type = "BxDocs.SamePagePath", message = "--from and --to are the same path" )
+			throw( type = "BxSites.SamePagePath", message = "--from and --to are the same path" )
 		}
 
 		var trimmedDocsDir = arguments.docsDir.reReplace( "[\/]+$", "" )
@@ -38,10 +38,10 @@ class {
 		var toAbsolute = trimmedDocsDir & "/" & toRelative
 
 		if ( !fileExists( fromAbsolute ) ) {
-			throw( type = "BxDocs.PageNotFound", message = "No page at [#fromAbsolute#]" )
+			throw( type = "BxSites.PageNotFound", message = "No page at [#fromAbsolute#]" )
 		}
 		if ( fileExists( toAbsolute ) ) {
-			throw( type = "BxDocs.PageAlreadyExists", message = "A page already exists at [#toAbsolute#]" )
+			throw( type = "BxSites.PageAlreadyExists", message = "A page already exists at [#toAbsolute#]" )
 		}
 
 		var toDir = getDirectoryFromPath( toAbsolute )
@@ -97,7 +97,7 @@ class {
 			throw( type = arguments.missingType, message = arguments.missingMessage )
 		}
 		if ( !trimmed.reFindNoCase( "\.md$" ) ) {
-			throw( type = "BxDocs.InvalidPagePath", message = "Path must end in .md (got [#trimmed#])" )
+			throw( type = "BxSites.InvalidPagePath", message = "Path must end in .md (got [#trimmed#])" )
 		}
 		return trimmed
 	}

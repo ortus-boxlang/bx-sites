@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "cli.Stats", function() {
 
 			beforeEach( function() {
-				variables.verb = new "models.cli.Stats@bxdocs"();
+				variables.verb = new "models.cli.Stats@bxsites"();
 				variables.tempDirs = [];
 			} );
 
@@ -17,9 +17,9 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			private string function newProjectRoot() {
-				var dir = createTempDirectory( prefix = "bxdocs-cli-stats-" );
+				var dir = createTempDirectory( prefix = "bxsites-cli-stats-" );
 				tempDirs.append( dir );
-				fileWrite( dir & "/bxdocs.json", '{"name":"Test Site","theme":{"name":"bootstrap"}}' );
+				fileWrite( dir & "/bxsites.json", '{"name":"Test Site","theme":{"name":"bootstrap"}}' );
 				return dir;
 			}
 
@@ -32,18 +32,18 @@ class extends="testbox.system.BaseSpec" {
 				fileWrite( path, arguments.html );
 			}
 
-			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( function() {
 					verb.run( {} );
-				} ).toThrow( "BxDocs.MissingProjectRoot" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
 
-			it( "throws BxDocs.SiteNotBuilt when there's no site/ directory", function() {
+			it( "throws BxSites.SiteNotBuilt when there's no site/ directory", function() {
 				var projectRoot = newProjectRoot();
 
 				expect( function() {
 					verb.run( { projectRoot : projectRoot } );
-				} ).toThrow( "BxDocs.SiteNotBuilt" );
+				} ).toThrow( "BxSites.SiteNotBuilt" );
 			} );
 
 			it( "always exits 0 and reports page/word counts", function() {

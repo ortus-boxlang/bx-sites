@@ -45,7 +45,7 @@ class {
 	 * The BoxLang mapping for your module.  All BoxLang modules are registered with an internal
 	 * mapping prefix of : bxModules.{this.mapping}, /bxmodules/{this.mapping}. Ex: bxModules.test, /bxmodules/test
 	 */
-	this.mapping = "bxdocs";
+	this.mapping = "bxsites";
 
 	/**
 	 * Who built the module
@@ -131,11 +131,11 @@ class {
 	 * --------------------------------------------------------------------------
 	 * CLI Entry Point
 	 * --------------------------------------------------------------------------
-	 * Every BoxLang module may declare `main( args )`; `boxlang module:bxdocs
-	 * <verb> ...` invokes it directly - as does the standalone `bxDocs`
+	 * Every BoxLang module may declare `main( args )`; `boxlang module:bxsites
+	 * <verb> ...` invokes it directly - as does the standalone `bxSites`
 	 * script `box install`/`install-bx-module` drops on PATH (`box.json`'s
 	 * `boxlang.executable`), which is just a one-line wrapper around the
-	 * same `boxlang module:bxdocs "$@"` call. Either way `args` contains
+	 * same `boxlang module:bxsites "$@"` call. Either way `args` contains
 	 * ONLY the arguments after the verb dispatch token - the module name
 	 * itself is never included, so args[1] = the verb, args[2..] = the
 	 * verb's own flags/positional args.
@@ -164,7 +164,7 @@ class {
 		// Relative to this file's OWN location (the module root) - BoxLang
 		// resolves a bare dotted path like "models.cli.New" relative to the
 		// module root only from the file the runtime directly invokes as the
-		// module's main() (this one). Nested classes must use the "Class@bxdocs"
+		// module's main() (this one). Nested classes must use the "Class@bxsites"
 		// suffix form instead when referencing each other.
 		var verbs = {
 			"new"          : "models.cli.New",
@@ -198,7 +198,7 @@ class {
 			"search-index" : "Rebuild the search index standalone",
 			"clean"        : "Remove site/ and any build cache",
 			"gh-deploy"    : "Build and force-push site/ to a gh-pages branch ([--branch], [--remote], [--message])",
-			"migrate"      : "Convert a GitBook export or mkdocs project into a bx-docs project (--source, required; [--from=gitbook|mkdocs])",
+			"migrate"      : "Convert a GitBook export or mkdocs project into a bx-sites project (--source, required; [--from=gitbook|mkdocs])",
 			"check"        : "CI-grade content check on a built site: broken links/images, missing alt text, orphaned pages",
 			"stats"        : "Report page/word counts, versions/locales, blog, tags, search index, and site size for a built site",
 			"doctor"       : "Check the project/environment for common problems (modules, config, theme override)",
@@ -219,7 +219,7 @@ class {
 		var firstToken = arrayLen( arguments.args ) >= 1 ? arguments.args[ 1 ] : ""
 
 		if ( firstToken == "--version" || firstToken == "-v" ) {
-			println( "bxDocs v#this.version#" )
+			println( "bxSites v#this.version#" )
 			return 0
 		}
 
@@ -272,10 +272,10 @@ class {
 	 * @verbDescriptions Struct mapping verb name -> one-line help text
 	 */
 	private void function printUsage( required struct verbs, required struct verbDescriptions ) {
-		println( "bxDocs v#this.version# - #this.description#" )
+		println( "bxSites v#this.version# - #this.description#" )
 		println( "" )
-		println( "Usage: bxDocs <verb> [options]" )
-		println( "   or: boxlang module:bxdocs <verb> [options]" )
+		println( "Usage: bxSites <verb> [options]" )
+		println( "   or: boxlang module:bxsites <verb> [options]" )
 		println( "" )
 
 		for ( var verbName in arguments.verbs.keyArray().sort( "textnocase" ) ) {

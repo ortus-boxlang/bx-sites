@@ -4,8 +4,8 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.TabsProcessor", function() {
 
 			beforeEach( function() {
-				variables.processor = new "models.build.TabsProcessor@bxdocs"();
-				variables.fakeRenderer = new "tests.support.FakeMarkdownRenderer@bxdocs"();
+				variables.processor = new "models.build.TabsProcessor@bxsites"();
+				variables.fakeRenderer = new "tests.support.FakeMarkdownRenderer@bxsites"();
 			} );
 
 			it( "leaves markdown with no tab blocks untouched", function() {
@@ -35,7 +35,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( group.tabs[ 2 ].title ).toBe( "BoxLang" );
 				expect( group.tabs[ 2 ].content ).toBe( "println( 1 )" );
 
-				expect( result.markdown ).toInclude( '<div class="bxdocs-raw-block" data-bxdocs-token="' & group.token & '"></div>' );
+				expect( result.markdown ).toInclude( '<div class="bxsites-raw-block" data-bxsites-token="' & group.token & '"></div>' );
 				expect( result.markdown ).notToInclude( "===" );
 			} );
 
@@ -74,15 +74,15 @@ class extends="testbox.system.BaseSpec" {
 					'=== "BoxLang"' & char( 10 ) & "    hello bx";
 				var extracted = processor.extract( md );
 				var html = "<p>before</p>" & char( 10 ) &
-					'<div class="bxdocs-raw-block" data-bxdocs-token="' & extracted.groups[ 1 ].token & '"></div>' &
+					'<div class="bxsites-raw-block" data-bxsites-token="' & extracted.groups[ 1 ].token & '"></div>' &
 					char( 10 ) & "<p>after</p>";
 
 				var restored = processor.restore( html, extracted.groups, fakeRenderer );
 
-				expect( restored ).notToInclude( "data-bxdocs-token" );
-				expect( restored ).toInclude( '<div class="bxdocs-tabs" data-bxdocs-tabgroup role="tablist">' );
-				expect( restored ).toInclude( '<button type="button" class="bxdocs-tab-btn bxdocs-tab-btn--active" data-bxdocs-tab="1">Java</button>' );
-				expect( restored ).toInclude( '<button type="button" class="bxdocs-tab-btn" data-bxdocs-tab="2">BoxLang</button>' );
+				expect( restored ).notToInclude( "data-bxsites-token" );
+				expect( restored ).toInclude( '<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist">' );
+				expect( restored ).toInclude( '<button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">Java</button>' );
+				expect( restored ).toInclude( '<button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">BoxLang</button>' );
 				expect( restored ).toInclude( "<p>hello java</p>" );
 				expect( restored ).toInclude( "<p>hello bx</p>" );
 				expect( restored ).toInclude( "<p>before</p>" );
@@ -92,12 +92,12 @@ class extends="testbox.system.BaseSpec" {
 			it( "marks only the first tab panel/button active", function() {
 				var md = '=== "A"' & char( 10 ) & "    a" & char( 10 ) & char( 10 ) & '=== "B"' & char( 10 ) & "    b";
 				var extracted = processor.extract( md );
-				var html = '<div class="bxdocs-raw-block" data-bxdocs-token="' & extracted.groups[ 1 ].token & '"></div>';
+				var html = '<div class="bxsites-raw-block" data-bxsites-token="' & extracted.groups[ 1 ].token & '"></div>';
 
 				var restored = processor.restore( html, extracted.groups, fakeRenderer );
 
-				expect( restored ).toInclude( 'class="bxdocs-tab-panel bxdocs-tab-panel--active" data-bxdocs-tab="1"' );
-				expect( restored ).toInclude( 'class="bxdocs-tab-panel" data-bxdocs-tab="2"' );
+				expect( restored ).toInclude( 'class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"' );
+				expect( restored ).toInclude( 'class="bxsites-tab-panel" data-bxsites-tab="2"' );
 			} );
 
 		} );

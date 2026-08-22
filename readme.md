@@ -1,4 +1,4 @@
-# ⚡︎ BX Docs
+# ⚡︎ BX Sites
 
 ```
 |:------------------------------------------------------:|
@@ -16,7 +16,7 @@
 
 <p>&nbsp;</p>
 
-Static documentation site generator for BoxLang, built on bx-markdown - in the spirit of [mkdocs](https://www.mkdocs.org/): write Markdown in `docs/`, get a themed, searchable static site out. Already on GitBook? `bxDocs migrate --source=...` converts an export straight into a bx-docs project - see [Migrating from GitBook](docs/guides/migrating-from-gitbook.md).
+Static documentation site generator for BoxLang, built on bx-markdown - in the spirit of [mkdocs](https://www.mkdocs.org/): write Markdown in `docs/`, get a themed, searchable static site out. Already on GitBook? `bxSites migrate --source=...` converts an export straight into a bx-sites project - see [Migrating from GitBook](docs/guides/migrating-from-gitbook.md).
 
 ----
 
@@ -24,45 +24,45 @@ Static documentation site generator for BoxLang, built on bx-markdown - in the s
 
 ```bash
 # Install this module and its dependencies, via CommandBox
-box install bx-docs
+box install bx-sites
 box install bx-markdown
 box install bx-esapi
 box install bx-yaml
 box install bx-image
 
 # ...or, without CommandBox, BoxLang's own installer takes all five at once:
-# install-bx-module bx-docs bx-markdown bx-esapi bx-yaml bx-image
+# install-bx-module bx-sites bx-markdown bx-esapi bx-yaml bx-image
 
-# Scaffold a new docs project (docs/ + bxdocs.yaml)
-bxDocs new my-docs
+# Scaffold a new docs project (docs/ + bxsites.yaml)
+bxSites new my-docs
 cd my-docs
 
 # Build the static site to site/
-bxDocs build
+bxSites build
 
 # Or build and serve locally with live reload while you write
-bxDocs serve
+bxSites serve
 ```
 
 See [Getting Started](docs/getting-started.md) for the full walkthrough.
 
 ## Usage
 
-`box install` drops a standalone `bxDocs` script on your `PATH` (via
+`box install` drops a standalone `bxSites` script on your `PATH` (via
 `box.json`'s `boxlang.executable`), so every verb can be run either that
-short way, or as `boxlang module:bxdocs <verb>` - both run the exact same
+short way, or as `boxlang module:bxsites <verb>` - both run the exact same
 thing; use the longer form anywhere the `PATH` shim isn't set up (a CI
 runner, a module registered by hand):
 
 ```bash
-bxDocs <verb> [options]
+bxSites <verb> [options]
 # or, equivalently:
-boxlang module:bxdocs <verb> [options]
+boxlang module:bxsites <verb> [options]
 ```
 
 | Verb | Purpose |
 |---|---|
-| `new` | Scaffold a docs project (`docs/` + `bxdocs.yaml`, defaulting to the `bootstrap` theme; `--format=json` for `bxdocs.json` instead) |
+| `new` | Scaffold a docs project (`docs/` + `bxsites.yaml`, defaulting to the `bootstrap` theme; `--format=json` for `bxsites.json` instead) |
 | `build` | Render `docs/**.md` into a static site in `site/`, including the search index, `sitemap.xml`, `llms.txt` and assets. Needs bx-markdown, bx-esapi, bx-yaml and bx-image installed |
 | `serve` | Build and serve the site locally with live reload (needs bx-markdown, bx-esapi, bx-yaml and bx-image too) |
 | `search-index` | Rebuild `site/search-index.json` standalone (also runs automatically during `build`) |
@@ -83,14 +83,14 @@ boxlang module:bxdocs <verb> [options]
 | `search:query` | Query a built `search-index.json` and rank results |
 | `lint` | Pre-build content checks: heading level skips, blog posts missing a valid date |
 
-Every verb accepts `--projectRoot=<path>` (or a bare positional path) to target a project other than the current directory. Run `bxDocs --help` for full usage.
+Every verb accepts `--projectRoot=<path>` (or a bare positional path) to target a project other than the current directory. Run `bxSites --help` for full usage.
 
 ## Documentation
 
-This repository documents itself with BX Docs - see `bxdocs.yaml` and `docs/` at the repo root, published at:
+This repository documents itself with BX Sites - see `bxsites.yaml` and `docs/` at the repo root, published at:
 
-- **[ortus-boxlang.github.io/bx-docs](https://ortus-boxlang.github.io/bx-docs/)** - stable docs, built from `main`
-- **[ortus-boxlang.github.io/bx-docs/development](https://ortus-boxlang.github.io/bx-docs/development/)** - latest/unreleased docs, built from `development`
+- **[ortus-boxlang.github.io/bx-sites](https://ortus-boxlang.github.io/bx-sites/)** - stable docs, built from `main`
+- **[ortus-boxlang.github.io/bx-sites/development](https://ortus-boxlang.github.io/bx-sites/development/)** - latest/unreleased docs, built from `development`
 
 Both are built with all three built-in themes side by side (`bootstrap` at the root, `material`/`tailwind` under `theme/material/`/`theme/tailwind/`) via `buildMultiTheme.sh` - use the switcher next to the dark-mode toggle to flip between them on any page.
 
@@ -98,7 +98,7 @@ Or read the source directly:
 
 - [Getting Started](docs/getting-started.md)
 - [CLI Reference](docs/cli-reference.md)
-- [Configuration](docs/configuration.md) - the full site config reference (`bxdocs.yaml`, the default, or `bxdocs.json`)
+- [Configuration](docs/configuration.md) - the full site config reference (`bxsites.yaml`, the default, or `bxsites.json`)
 - Guides: [Themes](docs/guides/themes.md) · [Search](docs/guides/search.md) · [Deploying to GitHub Pages](docs/guides/deployment.md) · [Migrating from GitBook](docs/guides/migrating-from-gitbook.md)
 - [Releases](docs/releases/index.md) - versioning policy and what's new per release
 
@@ -107,10 +107,10 @@ See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's d
 ## Directory Structure
 
 - `.github/workflows` - CI: tests (`tests.yml`), PR checks (`pr.yml`), snapshot/release builds (`snapshot.yml`, `release.yml`), and publishing this repo's own docs to GitHub Pages (`pages.yml`)
-- `models` - the module's own source: `models/cli` (one dispatcher per `bxDocs` verb), `models/config` (site config loader/validator - `bxdocs.yaml`/`.yml`/`.json`), `models/build` (project scaffolding + the docs/nav/markdown/theme/search/sitemap build pipeline)
+- `models` - the module's own source: `models/cli` (one dispatcher per `bxSites` verb), `models/config` (site config loader/validator - `bxsites.yaml`/`.yml`/`.json`), `models/build` (project scaffolding + the docs/nav/markdown/theme/search/sitemap build pipeline)
 - `resources/themes` - built-in themes (native BoxLang `.bxm` templates + assets): `bootstrap` (default), `material`, `tailwind` - all with the BoxLang brand palette, dark mode, breadcrumbs and code-copy buttons applied out of the box. A project can override any of them via its own `theme/` folder (same `layout.bxm` + `page.bxm` contract - see [Themes](docs/guides/themes.md))
 - `resources/assets` - module-wide shared client-side assets: the search widget (`search.js`) and the copy-code button (`copy-code.js`)
-- `docs` / `bxdocs.yaml` - this repository's own docs, built by BX Docs itself (`boxlang module:bxDocs build`)
+- `docs` / `bxsites.yaml` - this repository's own docs, built by BX Sites itself (`boxlang module:bxSites build`)
 - `tests/specs` - TestBox specs, one bundle per class under `models/`
 - `bifs`, `components`, `interceptors` - unused by this module today, kept for BoxLang module convention
 - `box.json` - package metadata used to publish to ForgeBox
@@ -133,7 +133,7 @@ boxlang Build.bx --version=1.1.0
 ## Running Tests
 
 1. With CommandBox installed, install TestBox: `box install`
-2. Register the module so BoxLang can resolve its `bxdocs.*` source classes: symlink this repo into your BoxLang home's `modules/` folder - that's `~/.boxlang/modules` unless `$BOXLANG_HOME` is set to something else (CI pins it to the checkout's own `.boxlang/`, per `.github/workflows/tests.yml`):
+2. Register the module so BoxLang can resolve its `bxsites.*` source classes: symlink this repo into your BoxLang home's `modules/` folder - that's `~/.boxlang/modules` unless `$BOXLANG_HOME` is set to something else (CI pins it to the checkout's own `.boxlang/`, per `.github/workflows/tests.yml`):
    ```bash
    mkdir -p "${BOXLANG_HOME:-$HOME/.boxlang}/modules"
    ln -s "$(pwd)" "${BOXLANG_HOME:-$HOME/.boxlang}/modules/$(basename "$(pwd)")"

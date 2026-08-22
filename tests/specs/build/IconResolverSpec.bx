@@ -4,7 +4,7 @@ class extends="testbox.system.BaseSpec" {
 		describe( "build.IconResolver", function() {
 
 			beforeEach( function() {
-				variables.resolver = new "models.build.IconResolver@bxdocs"();
+				variables.resolver = new "models.build.IconResolver@bxsites"();
 			} );
 
 			it( "returns an empty string for a blank value", function() {
@@ -23,7 +23,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "resolves a bare name against the default (phosphor) library", function() {
 				var svg = resolver.resolve( "rocket" );
 				expect( svg ).toInclude( "<svg" );
-				expect( svg ).toInclude( "bxdocs-icon" );
+				expect( svg ).toInclude( "bxsites-icon" );
 				expect( svg ).toInclude( "viewBox" );
 			} );
 
@@ -34,19 +34,19 @@ class extends="testbox.system.BaseSpec" {
 			it( "resolves a lucide: reference", function() {
 				var svg = resolver.resolve( "lucide:rocket" );
 				expect( svg ).toInclude( "<svg" );
-				expect( svg ).toInclude( "bxdocs-icon" );
+				expect( svg ).toInclude( "bxsites-icon" );
 			} );
 
 			it( "resolves a tabler: reference", function() {
 				var svg = resolver.resolve( "tabler:rocket" );
 				expect( svg ).toInclude( "<svg" );
-				expect( svg ).toInclude( "bxdocs-icon" );
+				expect( svg ).toInclude( "bxsites-icon" );
 			} );
 
 			it( "resolves a phosphor-duotone: reference, with its own two currentColor tones", function() {
 				var svg = resolver.resolve( "phosphor-duotone:rocket" );
 				expect( svg ).toInclude( "<svg" );
-				expect( svg ).toInclude( "bxdocs-icon" );
+				expect( svg ).toInclude( "bxsites-icon" );
 				expect( svg ).toInclude( 'opacity="0.2"' );
 				expect( svg ).notToBe( resolver.resolve( "phosphor:rocket" ) );
 			} );
@@ -57,7 +57,7 @@ class extends="testbox.system.BaseSpec" {
 				for ( var weight in weights ) {
 					var svg = resolver.resolve( weight & ":rocket" );
 					expect( svg ).toInclude( "<svg" );
-					expect( svg ).toInclude( "bxdocs-icon" );
+					expect( svg ).toInclude( "bxsites-icon" );
 					expect( seen.keyExists( svg ) ).toBeFalse( "#weight# produced markup identical to another weight" );
 					seen[ svg ] = true;
 				}
@@ -76,13 +76,13 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "resolves a custom: icon from the project's own docs/assets/icons/", function() {
-				var docsDir = createTempDirectory( prefix = "bxdocs-iconresolver-" );
+				var docsDir = createTempDirectory( prefix = "bxsites-iconresolver-" );
 				directoryCreate( docsDir & "/assets/icons", true, true );
 				fileWrite( docsDir & "/assets/icons/my-icon.svg", '<svg viewBox="0 0 24 24"><path d="M0 0h24v24H0z"/></svg>' );
 
 				var svg = resolver.resolve( "custom:my-icon", docsDir );
 
-				expect( svg ).toInclude( "bxdocs-icon" );
+				expect( svg ).toInclude( "bxsites-icon" );
 				expect( svg ).toInclude( 'd="M0 0h24v24H0z"' );
 
 				directoryDelete( docsDir, true );
@@ -91,7 +91,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "falls back to literal text for a custom: icon when no docsDir is given, or the file doesn't exist", function() {
 				expect( resolver.resolve( "custom:my-icon" ) ).toBe( "custom:my-icon" );
 
-				var docsDir = createTempDirectory( prefix = "bxdocs-iconresolver-" );
+				var docsDir = createTempDirectory( prefix = "bxsites-iconresolver-" );
 				expect( resolver.resolve( "custom:missing", docsDir ) ).toBe( "custom:missing" );
 				directoryDelete( docsDir, true );
 			} );
