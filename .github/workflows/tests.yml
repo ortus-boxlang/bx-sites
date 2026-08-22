@@ -21,6 +21,12 @@ jobs:
     env:
       DB_USER: root
       DB_PASSWORD: root
+      # TestBox's own JSON result-serialization recurses once per test result
+      # rather than looping, so a growing suite (600+ specs) can overflow the
+      # JVM's default thread stack right after the last spec finishes, before
+      # tests/results/*.xml gets written - bump it well past what a
+      # comfortably larger suite would ever need.
+      JAVA_TOOL_OPTIONS: -Xss16m
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
