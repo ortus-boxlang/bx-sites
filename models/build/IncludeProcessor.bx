@@ -1,5 +1,5 @@
 /**
- * Reusable content - `::: include src="guides/_shared/warning.md"` splices
+ * Reusable content - `::: include src="../includes/warning.md"` splices
  * another file's raw Markdown in place, resolved file-relative to the
  * *including* page's own directory (same convention as an ordinary
  * relative page link - see MarkdownLinkResolver.bx). Unlike every other
@@ -13,6 +13,15 @@
  *
  * A self-closing line, not a `:::` ... `:::` pair - there's no body to
  * close, so `::: include ...` is complete on one line.
+ *
+ * `docs/includes/**` (and the same folder inside any version/locale tree -
+ * `docs/versions/<name>/includes/**`, `docs/i18n/<code>/includes/**`) is the
+ * reserved convention for where a partial itself should live - DocsLoader.bx
+ * excludes it from every tree's own page walk the same way it already
+ * excludes `assets/`/`versions/`/`i18n/`/`blog/`, so a partial is never built
+ * as a standalone page and never appears in nav/search/sitemap/tags. Nothing
+ * about `src` resolution itself is special-cased - `includes/` is reached the
+ * same ordinary file-relative way any sibling directory would be.
  */
 class {
 

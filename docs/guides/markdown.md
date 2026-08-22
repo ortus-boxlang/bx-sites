@@ -622,8 +622,18 @@ not something wrapped in a widget - useful for a warning/notice repeated
 across several pages:
 
 ```markdown title="Example"
-::: include src="_shared/beta-notice.md"
+::: include src="../includes/beta-notice.md"
 ```
+
+Put a partial itself under `docs/includes/` (or `docs/versions/<name>/includes/`,
+`docs/i18n/<code>/includes/` inside a version/locale tree) - the same
+reserved-folder convention as `assets/`/`versions/`/`i18n/`/`blog/`. A file
+under `includes/` is never built as its own page and never appears in
+nav/search/sitemap/tags - it only exists to be spliced into other pages via
+`::: include`. Nothing else about it is special: it's still Markdown, still
+resolved file-relatively, so a page one level down would reach it as
+`../includes/beta-notice.md`, one two levels down as `../../includes/beta-notice.md`,
+and so on.
 
 An included file can itself include another (a circular chain throws
 `BxDocs.CircularInclude` at build time rather than looping forever).
