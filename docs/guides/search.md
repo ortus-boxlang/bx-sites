@@ -60,8 +60,9 @@ by `layout.bxm` since `PagefindUI` doesn't bind it on its own.
 ```
 
 Skips building `search-index.json` entirely, and skips the search box, the
-`lunr.js` CDN script, and the shared `search.js` widget in every rendered
-page - a project with search off ships nothing search-related at all. This
+vendored `lunr.js` script, and the shared `search.js` widget in every
+rendered page - a project with search off ships nothing search-related at
+all. This
 is the master switch - it applies no matter which `searchProvider` is
 configured.
 
