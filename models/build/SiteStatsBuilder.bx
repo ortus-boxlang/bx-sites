@@ -147,8 +147,12 @@ class {
 		if ( !directoryExists( arguments.dir ) ) {
 			return 0
 		}
-		return directoryList( arguments.dir, false, "name" )
-			.filter( name => directoryExists( arguments.dir & "/" & name ) )
+		// A closure doesn't capture the enclosing function's `arguments`
+		// scope the way it does a local `var` - resolve to a local first
+		// (same convention VersionsDiscoverer.bx/LocalesDiscoverer.bx use).
+		var targetDir = arguments.dir
+		return directoryList( targetDir, false, "name" )
+			.filter( name => directoryExists( targetDir & "/" & name ) )
 			.len()
 	}
 
@@ -181,7 +185,7 @@ class {
 		var raw = fileRead( indexPath )
 		return {
 			enabled       : true,
-			entryCount    : deserializeJSON( raw ).len(),
+			entryCount    : jsonDeserialize( raw ).len(),
 			fileSizeBytes : createObject( "java", "java.io.File" ).init( indexPath ).length()
 		}
 	}
