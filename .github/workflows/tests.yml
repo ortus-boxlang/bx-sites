@@ -54,10 +54,12 @@ jobs:
       - name: Run Tests
         run: |
           # --stream prints each bundle/suite/spec result live as it
-          # completes, instead of only the final aggregate report - if a
-          # deep/malformed error object (not just "too many results") is
-          # what's actually breaking the final jsonSerialize() call, this
-          # should surface which spec it's attached to.
+          # completes, instead of only the final aggregate report - kept on
+          # since it's what surfaced a real compile error (an unescaped `#`
+          # in a ResponsiveImageProcessor.bx string literal, masked by a
+          # StackOverflowError in TestBox's own JSON serialization of the
+          # resulting giant cascaded-parse-error message) that the default,
+          # end-of-run-only report never showed at all.
           ./testbox/run --reporter=ANTJunit --verbose --stream
 
       - name: Upload Test Results

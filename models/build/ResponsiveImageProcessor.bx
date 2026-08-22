@@ -148,7 +148,7 @@ class {
 		// carried onto the generated variant URLs below - the responsive
 		// pipeline's own content-hash fingerprinting already supersedes
 		// whatever manual cache-busting a query string was doing.
-		var src = srcMatcher.group( 1 ).reReplace( "[?#].*$", "" )
+		var src = srcMatcher.group( 1 ).reReplace( "[?##].*$", "" )
 		if ( !isLocal( src ) ) {
 			return arguments.tag
 		}
