@@ -41,6 +41,21 @@ class extends="testbox.system.BaseSpec" {
 				expect( decoded ).toInclude( '<span class="bxdocs-page-link__summary">Customize the look.</span>' );
 			} );
 
+			it( "resolves a named library icon (not just an emoji) into a real SVG, not the raw icon string as text", function() {
+				var pages = [
+					{
+						urlPath : "index.html",
+						contentHtml : '<a class="bxdocs-page-link" href="/getting-started/index.html" data-bxdocs-page-link><span class="bxdocs-page-link__title">/getting-started/index.html</span></a>'
+					},
+					{ urlPath : "getting-started/index.html", title : "Getting Started", icon : "phosphor-duotone:rocket-launch", summary : "" }
+				];
+
+				resolver.resolve( pages, "/" );
+
+				expect( pages[ 1 ].contentHtml ).notToInclude( "phosphor-duotone:rocket-launch" );
+				expect( pages[ 1 ].contentHtml ).toInclude( '<span class="bxdocs-page-link__icon"><svg' );
+			} );
+
 			it( "falls back to a page's description when it has no summary", function() {
 				var pages = [
 					{

@@ -161,6 +161,22 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "spec.pdf" );
 			} );
 
+			it( "resolveFileHrefs() prefixes a bare file href with basePath, so a nested page's download link doesn't 404", function() {
+				var html = render( '::: file src="assets/spec.pdf"' & char( 10 ) & ":::" );
+
+				var resolved = processor.resolveFileHrefs( html, "/guides/content-blocks/" );
+
+				expect( resolved ).toInclude( '<a class="bxdocs-file" href="/guides/content-blocks/assets/spec.pdf" download>' );
+			} );
+
+			it( "resolveFileHrefs() leaves an already root-relative or absolute file href untouched", function() {
+				var rootRelative = render( '::: file src="/downloads/spec.pdf"' & char( 10 ) & ":::" );
+				var absolute = render( '::: file src="https://example.com/spec.pdf"' & char( 10 ) & ":::" );
+
+				expect( processor.resolveFileHrefs( rootRelative, "/guides/content-blocks/" ) ).toInclude( 'href="/downloads/spec.pdf"' );
+				expect( processor.resolveFileHrefs( absolute, "/guides/content-blocks/" ) ).toInclude( 'href="https://example.com/spec.pdf"' );
+			} );
+
 			it( "resolves a YouTube embed URL to its iframe embed form", function() {
 				var html = render( '::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="Demo"' & char( 10 ) & ":::" );
 
@@ -179,6 +195,32 @@ class extends="testbox.system.BaseSpec" {
 				var html = render( '::: page-link href="guides/themes.md"' & char( 10 ) & ":::" );
 
 				expect( html ).toInclude( '<a class="bxdocs-page-link" href="guides/themes.md" data-bxdocs-page-link>' );
+			} );
+
+			it( "renders a link-preview card for an external URL with title/description/image/domain", function() {
+				var md = '::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic JVM language." image="https://boxlang.io/og.png"' & char( 10 ) & ":::";
+				var html = render( md );
+
+				expect( html ).toInclude( '<a class="bxdocs-link-preview" href="https://boxlang.io" target="_blank" rel="noopener noreferrer">' );
+				expect( html ).toInclude( '<img src="https://boxlang.io/og.png" alt="">' );
+				expect( html ).toInclude( '<div class="bxdocs-link-preview__title">BoxLang</div>' );
+				expect( html ).toInclude( '<div class="bxdocs-link-preview__description">A dynamic JVM language.</div>' );
+				expect( html ).toInclude( '<div class="bxdocs-link-preview__domain">boxlang.io</div>' );
+			} );
+
+			it( "falls back to the bare url as a link-preview's title when none is given, and omits optional parts", function() {
+				var html = render( '::: link-preview url="https://example.com/some/page"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( 'href="https://example.com/some/page"' );
+				expect( html ).notToInclude( "bxdocs-link-preview__image" );
+				expect( html ).notToInclude( "bxdocs-link-preview__description" );
+				expect( html ).toInclude( '<div class="bxdocs-link-preview__domain">example.com</div>' );
+			} );
+
+			it( "renders an invalid-block message when a link-preview is missing its required url", function() {
+				var html = render( "::: link-preview" & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( "bxdocs-link-preview--invalid" );
 			} );
 
 			it( "renders updates entries with date, tags and body, most-recent-first order left to the caller", function() {

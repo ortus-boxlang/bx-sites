@@ -2,8 +2,8 @@
  * A generic `::: name attr="value" ...` ... `:::` container-block syntax -
  * the shared foundation for every GitBook-style block Flexmark has no
  * native concept of: expandable, cards/card, columns/column,
- * stepper/step, updates/update, file, embed, and page-link (see each
- * block's own `render*()` docblock below). Nests arbitrarily deep (a
+ * stepper/step, updates/update, file, embed, page-link, and link-preview
+ * (see each block's own `render*()` docblock below). Nests arbitrarily deep (a
  * `::: cards` block's own content is itself re-scanned for `::: card`
  * children, recursively) using the same two-phase pre/post-processing
  * shape as TabsProcessor.bx - `extract()` runs before `Markdown()`,
@@ -22,6 +22,7 @@ class {
 	variables.openPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^:::\s*([a-zA-Z][\w-]*)\s*(.*)$" )
 	variables.attrPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(\w+)="([^"]*)"' )
 	variables.titlePattern = createObject( "java", "java.util.regex.Pattern" ).compile( '^"([^"]*)"\s*(.*)$' )
+	variables.fileHrefPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(<a class="bxdocs-file" href=")([^"]*)(")' )
 	variables.iconResolver = new "models.build.IconResolver@bxdocs"()
 
 	/**
@@ -194,6 +195,8 @@ class {
 				return renderEmbed( attrs )
 			case "page-link":
 				return renderPageLinkStub( attrs )
+			case "link-preview":
+				return renderLinkPreview( attrs )
 			default:
 				return '<div class="bxdocs-directive-unknown">' & renderNested( block.content, renderer, markdownOptions ) & '</div>'
 		}
@@ -382,8 +385,10 @@ class {
 	 * card for a PDF, video, or any other project asset. `src` is resolved
 	 * relative to `docs/assets/` the same way `theme.logo`/frontmatter
 	 * `ogImage` already are - left as-authored here and prefixed with
-	 * `basePath` at render time, not at extraction time (this processor
-	 * has no `basePath` in scope; see MarkdownRenderer.bx's own callers).
+	 * `basePath` afterwards by `resolveFileHrefs()` below, not here (this
+	 * processor has no `basePath` in scope during `restore()`; only
+	 * BuildPipeline.bx's `convertMarkdown()`, which calls `resolveFileHrefs()`
+	 * right after `restore()`, does).
 	 */
 	private string function renderFile( required struct attrs ) {
 		var src = trim( arguments.attrs.src ?: "" )
@@ -468,6 +473,63 @@ class {
 	}
 
 	/**
+	 * `::: link-preview url="https://..." title="..." description="..." image="..."` -
+	 * a rich preview card for an *external* URL. Unlike `::: page-link`
+	 * (which enriches itself from another page's own frontmatter, found
+	 * only once every page in the tree has loaded - see
+	 * PageLinkResolver.bx), everything here comes straight from the
+	 * directive's own attributes and renders in one pass - there's no
+	 * build-time fetch of the target URL's own metadata (no outbound HTTP
+	 * request during a build, ever, the same reasoning LinkChecker.bx's
+	 * own docblock gives for staying internal-links-only): `title` falls
+	 * back to the bare `url` when omitted; `description` and `image` are
+	 * both optional.
+	 */
+	private string function renderLinkPreview( required struct attrs ) {
+		var url = trim( arguments.attrs.url ?: "" )
+		if ( !len( url ) ) {
+			return '<div class="bxdocs-link-preview bxdocs-link-preview--invalid">::: link-preview - missing required url="..."</div>'
+		}
+		var title = len( trim( arguments.attrs.title ?: "" ) ) ? trim( arguments.attrs.title ) : url
+		var description = trim( arguments.attrs.description ?: "" )
+		var image = trim( arguments.attrs.image ?: "" )
+		var domain = linkPreviewDomain( url )
+
+		var html = '<a class="bxdocs-link-preview" href="' & attrEscape( url ) & '" target="_blank" rel="noopener noreferrer">'
+		if ( len( image ) ) {
+			html &= '<div class="bxdocs-link-preview__image"><img src="' & attrEscape( image ) & '" alt=""></div>'
+		}
+		html &= '<div class="bxdocs-link-preview__text">'
+			& '<div class="bxdocs-link-preview__title">' & encodeForHTML( title ) & '</div>'
+		if ( len( description ) ) {
+			html &= '<div class="bxdocs-link-preview__description">' & encodeForHTML( description ) & '</div>'
+		}
+		if ( len( domain ) ) {
+			html &= '<div class="bxdocs-link-preview__domain">' & encodeForHTML( domain ) & '</div>'
+		}
+		html &= '</div></a>'
+		return html
+	}
+
+	/**
+	 * Derives a clean "example.com"-style caption from a full URL for a
+	 * link-preview card, stripping a leading "www." the same way most
+	 * real link-preview widgets do since it's redundant to show - "" for
+	 * anything that isn't a recognizable `http(s)://host/...` URL (a bare
+	 * domain with no scheme, say), rather than showing the whole raw
+	 * value as if it were just a host.
+	 *
+	 * @url The link-preview's own `url` attribute
+	 */
+	private string function linkPreviewDomain( required string url ) {
+		var host = arguments.url.reReplaceNoCase( "^https?://([^/]+).*", "\1", "one" )
+		if ( host == arguments.url ) {
+			return ""
+		}
+		return host.reReplaceNoCase( "^www\.", "", "one" )
+	}
+
+	/**
 	 * Extracts `::: update` entries from one already-extracted `::: updates`
 	 * block (see `extract()`'s own `blocks` array) - used by BuildPipeline
 	 * to build that page's own `feed.xml` (UpdatesFeedGenerator.bx),
@@ -494,6 +556,44 @@ class {
 		}
 
 		return entries
+	}
+
+	/**
+	 * Prefixes every `.bxdocs-file` download link's own `href` with
+	 * `basePath` - the "root-anchored `docs/assets/`" resolution
+	 * `renderFile()`'s own docblock promises, done here instead of inside
+	 * `restore()` since only the caller (BuildPipeline.bx's `convertMarkdown()`)
+	 * has `basePath` in scope. An href that's already an absolute URL (has
+	 * its own scheme) or already root-relative (starts with `/`) is left
+	 * untouched - the same scope ResponsiveImageProcessor.bx's own
+	 * asset-path resolution has.
+	 *
+	 * @html Already-rendered page HTML (this class's own `restore()` output)
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	string function resolveFileHrefs( required string html, required string basePath ) {
+		var matcher = variables.fileHrefPattern.matcher( arguments.html )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+
+		while ( matcher.find() ) {
+			var href = matcher.group( 2 )
+			var resolved = isLocalAssetPath( href ) ? arguments.basePath & href : href
+			matcher.appendReplacement( buffer, createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( matcher.group( 1 ) & resolved & matcher.group( 3 ) ) )
+		}
+		matcher.appendTail( buffer )
+
+		return buffer.toString()
+	}
+
+	/**
+	 * @return false for an external URL (has its own scheme), a root-relative (`/...`) path, or an empty href - only a bare file-relative path is a rewrite candidate
+	 */
+	private boolean function isLocalAssetPath( required string href ) {
+		var h = trim( arguments.href )
+		if ( !len( h ) || left( h, 1 ) == "/" ) {
+			return false
+		}
+		return !h.reFindNoCase( "^[a-z][a-z0-9+.\-]*:" )
 	}
 
 	/**

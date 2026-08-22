@@ -126,6 +126,20 @@ class extends="testbox.system.BaseSpec" {
 				expect( homeHtml ).toInclude( '<span class="bxdocs-page-link__title">Setup</span>' );
 			} );
 
+			it( "prefixes a ::: file block's own href with basePath, so it doesn't 404 under a non-root baseURL", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"my-docs"}'
+				);
+				fileWrite( root & "/docs/index.md", '::: file src="assets/spec.pdf"' & char( 10 ) & ":::" );
+
+				pipeline.build( root );
+
+				var homeHtml = fileRead( root & "/site/index.html" );
+				expect( homeHtml ).toInclude( '<a class="bxdocs-file" href="/my-docs/assets/spec.pdf" download>' );
+			} );
+
 			it( "resolves a named icon in both a page's own header and its nav entry", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "icon: rocket" & char( 10 ) & "---" & char( 10 ) & "Home" );
