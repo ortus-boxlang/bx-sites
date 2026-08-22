@@ -14,22 +14,39 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
-			it( "splices a sibling file's raw markdown in place", function() {
-				fileWrite( docsDir & "/note.md", "Shared note." );
+			it( "resolves a bare src against the tree's own includes/ folder", function() {
+				directoryCreate( docsDir & "/includes", true, true );
+				fileWrite( docsDir & "/includes/note.md", "Shared note." );
 				var result = processor.process( '::: include src="note.md"', docsDir, "index.md" );
 
 				expect( result ).toBe( "Shared note." );
 			} );
 
-			it( "resolves src relative to the including page's own directory", function() {
+			it( "resolves a bare src against includes/ regardless of how deeply nested the including page is", function() {
+				directoryCreate( docsDir & "/includes", true, true );
+				fileWrite( docsDir & "/includes/note.md", "Shared note." );
+				var result = processor.process( '::: include src="note.md"', docsDir, "guides/deep/setup.md" );
+
+				expect( result ).toBe( "Shared note." );
+			} );
+
+			it( "resolves a bare src with its own subpath against includes/", function() {
+				directoryCreate( docsDir & "/includes/legal", true, true );
+				fileWrite( docsDir & "/includes/legal/terms.md", "Terms note." );
+				var result = processor.process( '::: include src="legal/terms.md"', docsDir, "guides/setup.md" );
+
+				expect( result ).toBe( "Terms note." );
+			} );
+
+			it( "resolves an explicit ./ src relative to the including page's own directory instead of includes/", function() {
 				directoryCreate( docsDir & "/guides/_shared", true, true );
 				fileWrite( docsDir & "/guides/_shared/note.md", "Nested note." );
-				var result = processor.process( '::: include src="_shared/note.md"', docsDir, "guides/setup.md" );
+				var result = processor.process( '::: include src="./_shared/note.md"', docsDir, "guides/setup.md" );
 
 				expect( result ).toBe( "Nested note." );
 			} );
 
-			it( "resolves a ../ src against the including page's directory", function() {
+			it( "resolves an explicit ../ src against the including page's directory", function() {
 				directoryCreate( docsDir & "/guides", true, true );
 				fileWrite( docsDir & "/shared.md", "Top-level shared." );
 				var result = processor.process( '::: include src="../shared.md"', docsDir, "guides/setup.md" );
@@ -38,7 +55,8 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "strips frontmatter off the included file before splicing", function() {
-				fileWrite( docsDir & "/note.md", "---" & char( 10 ) & "title: Note" & char( 10 ) & "---" & char( 10 ) & "Body only." );
+				directoryCreate( docsDir & "/includes", true, true );
+				fileWrite( docsDir & "/includes/note.md", "---" & char( 10 ) & "title: Note" & char( 10 ) & "---" & char( 10 ) & "Body only." );
 				var result = processor.process( '::: include src="note.md"', docsDir, "index.md" );
 
 				expect( result ).notToInclude( "title: Note" );
@@ -46,8 +64,9 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "expands an include recursively - an included file can itself include another", function() {
+				directoryCreate( docsDir & "/includes", true, true );
 				fileWrite( docsDir & "/a.md", 'A:' & char( 10 ) & '::: include src="b.md"' );
-				fileWrite( docsDir & "/b.md", "B content." );
+				fileWrite( docsDir & "/includes/b.md", "B content." );
 				var result = processor.process( fileRead( docsDir & "/a.md" ), docsDir, "a.md" );
 
 				expect( result ).toInclude( "A:" );
@@ -55,7 +74,8 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "leaves surrounding content untouched around the spliced-in text", function() {
-				fileWrite( docsDir & "/note.md", "Middle." );
+				directoryCreate( docsDir & "/includes", true, true );
+				fileWrite( docsDir & "/includes/note.md", "Middle." );
 				var md = "Before." & char( 10 ) & '::: include src="note.md"' & char( 10 ) & "After.";
 				var result = processor.process( md, docsDir, "index.md" );
 
@@ -64,18 +84,19 @@ class extends="testbox.system.BaseSpec" {
 				expect( result ).toInclude( "After." );
 			} );
 
-			it( "throws BxDocs.IncludeNotFound for a missing src file", function() {
+			it( "throws BxDocs.IncludeNotFound for a missing bare src (no includes/ folder at all)", function() {
 				expect( function() {
 					processor.process( '::: include src="missing.md"', docsDir, "index.md" );
 				} ).toThrow( "BxDocs.IncludeNotFound" );
 			} );
 
 			it( "throws BxDocs.CircularInclude for a two-file include cycle", function() {
-				fileWrite( docsDir & "/a.md", '::: include src="b.md"' );
-				fileWrite( docsDir & "/b.md", '::: include src="a.md"' );
+				directoryCreate( docsDir & "/includes", true, true );
+				fileWrite( docsDir & "/includes/a.md", '::: include src="b.md"' );
+				fileWrite( docsDir & "/includes/b.md", '::: include src="a.md"' );
 
 				expect( function() {
-					processor.process( fileRead( docsDir & "/a.md" ), docsDir, "a.md" );
+					processor.process( '::: include src="a.md"', docsDir, "index.md" );
 				} ).toThrow( "BxDocs.CircularInclude" );
 			} );
 

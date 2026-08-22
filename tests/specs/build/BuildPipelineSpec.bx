@@ -100,7 +100,8 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "wires includes, directive blocks and page-link enrichment together end to end", function() {
 				var root = newProject();
-				fileWrite( root & "/docs/_shared.md", "Shared note." );
+				directoryCreate( root & "/docs/includes", true, true );
+				fileWrite( root & "/docs/includes/_shared.md", "Shared note." );
 				fileWrite(
 					root & "/docs/index.md",
 					'::: include src="_shared.md"' & char( 10 ) &
