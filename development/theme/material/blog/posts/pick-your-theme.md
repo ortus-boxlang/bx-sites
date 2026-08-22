@@ -27,7 +27,7 @@ Every one of them ships with the same page furniture out of the box: an "On this
 
 One line in your config:
 
-```json
+```json title="bxdocs.json"
 { "theme": { "name": "material" } }
 ```
 
@@ -41,11 +41,11 @@ If your deployment target has genuinely zero internet access, stick with `bootst
 
 For a color or font tweak, you don't need to fork a whole theme. Every built-in theme reads its palette off a handful of CSS custom properties on `:root`:
 
-```json
+```json title="bxdocs.json"
 { "extraCss": ["assets/brand.css"] }
 ```
 
-```css
+```css title="docs/assets/brand.css" linenums="1"
 /* docs/assets/brand.css */
 :root {
 	--bxdocs-gradient-start: #7C3AED;

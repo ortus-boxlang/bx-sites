@@ -23,7 +23,7 @@ You get keyboard shortcuts for free too: `/` focuses the search box from anywher
 
 If you only need to refresh the index without a full rebuild:
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxDocs search-index
 ```
 
@@ -31,7 +31,7 @@ though in practice `build` already runs this as one of its own steps.
 
 ## Turning it off
 
-```json
+```json title="bxdocs.json"
 { "search": false }
 ```
 
@@ -41,7 +41,7 @@ Skips building the index entirely, and skips shipping the search box, the `lunr.
 
 For most docs sites, lunr's relevance ranking is genuinely good. But if you're running a large site and want crawler-hosted, typo-tolerant search, swap providers instead of fighting the default:
 
-```json
+```json title="bxdocs.json" linenums="1"
 {
 	"search": true,
 	"searchProvider": {
@@ -59,7 +59,7 @@ With Algolia active, no `search-index.json` is built at all - Algolia serves res
 
 Prefer something that indexes your *built* HTML rather than a crawler hitting your live site? [Pagefind](https://pagefind.app/) is the other built-in option:
 
-```json
+```json title="bxdocs.json" linenums="1"
 {
 	"search": true,
 	"searchProvider": { "provider": "pagefind" }
