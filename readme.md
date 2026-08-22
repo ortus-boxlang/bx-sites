@@ -23,15 +23,11 @@ Static documentation site generator for BoxLang, built on bx-markdown - in the s
 ## Quick Start
 
 ```bash
-# Install this module and its dependencies, via CommandBox
-box install bx-sites
-box install bx-markdown
-box install bx-esapi
-box install bx-yaml
-box install bx-image
+# OS Binary
+install-bx-module bx-sites
 
-# ...or, without CommandBox, BoxLang's own installer takes all five at once:
-# install-bx-module bx-sites bx-markdown bx-esapi bx-yaml bx-image
+# CommandBox
+box install bx-sites
 
 # Scaffold a new docs project (docs/ + bxsites.yaml)
 bxSites new my-docs

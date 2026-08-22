@@ -15,19 +15,14 @@ I've written a lot of documentation tools over the years, and the thing I keep c
 
 ## Install
 
-BX Sites is a BoxLang module, so it installs the same way any other BoxLang module does. With [CommandBox](https://commandbox.ortusbooks.com/) installed:
-
-```bash frame="terminal" title="Terminal" linenums="1"
-box install bx-sites
-box install bx-markdown
-box install bx-esapi
-box install bx-yaml
-```
-
-`bx-markdown` handles Markdown rendering, `bx-esapi` handles HTML-encoding, and `bx-yaml` reads your `bxsites.yaml`. If you'd rather skip CommandBox entirely, BoxLang's own installer grabs all four in a single command:
+BX Sites is a BoxLang module, so it installs the same way any other BoxLang module does. Its dependencies (`bx-markdown` for Markdown rendering, `bx-esapi` for HTML-encoding, `bx-yaml` for reading your `bxsites.yaml`, and `bx-image` for the responsive-image pipeline) are all installed automatically as `box.json` dependencies, so installing `bx-sites` itself is the only command needed:
 
 ```bash frame="terminal" title="Terminal"
-install-bx-module bx-sites bx-markdown bx-esapi bx-yaml
+# OS Binary
+install-bx-module bx-sites
+
+# CommandBox
+box install bx-sites
 ```
 
 Either path drops a `bxSites` script on your `PATH`, so every command from here on is just `bxSites <verb> [options]`.
