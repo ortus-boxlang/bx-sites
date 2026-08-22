@@ -1,0 +1,161 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.SiteStatsBuilder", function() {
+
+			beforeEach( function() {
+				variables.builder = new "models.build.SiteStatsBuilder@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot( string bxdocsJson = '{"name":"Test Site","theme":{"name":"bootstrap"}}' ) {
+				var dir = createTempDirectory( prefix = "bxdocs-sitestats-" );
+				tempDirs.append( dir );
+				fileWrite( dir & "/bxdocs.json", arguments.bxdocsJson );
+				return dir;
+			}
+
+			private void function writePage( required string projectRoot, required string relativePath, required string html ) {
+				var path = arguments.projectRoot & "/site/" & arguments.relativePath;
+				var dir = getDirectoryFromPath( path );
+				if ( !directoryExists( dir ) ) {
+					directoryCreate( dir, true, true );
+				}
+				fileWrite( path, arguments.html );
+			}
+
+			it( "throws BxDocs.SiteNotBuilt when there's no site/ directory", function() {
+				var projectRoot = newProjectRoot();
+
+				expect( function() {
+					builder.build( projectRoot );
+				} ).toThrow( "BxDocs.SiteNotBuilt" );
+			} );
+
+			it( "counts pages and a rough word count, stripping tags", function() {
+				var projectRoot = newProjectRoot();
+				// Tag-stripping turns each tag into a space, so "Home" (inside
+				// <h1>) and "One two three four five." both count - 6 words.
+				writePage( projectRoot, "index.html", "<h1>Home</h1><p>One two three four five.</p>" );
+				// "Six seven." - 2 words.
+				writePage( projectRoot, "about.html", "<p>Six seven.</p>" );
+
+				var stats = builder.build( projectRoot );
+
+				expect( stats.pageCount ).toBe( 2 );
+				expect( stats.wordCount ).toBe( 8 );
+				expect( stats.avgWordsPerPage ).toBe( 4 );
+			} );
+
+			it( "buckets pages into main/version/locale trees", function() {
+				var projectRoot = newProjectRoot( '{"name":"Test Site","theme":{"name":"bootstrap"},"i18n":{"defaultLocale":{"code":"en","label":"English"},"locales":[{"code":"es","label":"Spanish"}]}}' );
+				directoryCreate( projectRoot & "/docs/versions/2.0", true, true );
+				directoryCreate( projectRoot & "/docs/i18n/es", true, true );
+
+				writePage( projectRoot, "index.html", "Home" );
+				writePage( projectRoot, "versions/2.0/index.html", "v2 home" );
+				writePage( projectRoot, "es/index.html", "Spanish home" );
+
+				var stats = builder.build( projectRoot );
+
+				expect( stats.pageCount ).toBe( 3 );
+				expect( stats.versions.toList( "," ) ).toBe( "2.0" );
+				expect( stats.locales.toList( "," ) ).toBe( "es" );
+
+				var byLabel = {};
+				for ( var tree in stats.treeBreakdown ) {
+					byLabel[ tree.label ] = tree.pageCount;
+				}
+				expect( byLabel[ "main" ] ).toBe( 1 );
+				expect( byLabel[ "version:2.0" ] ).toBe( 1 );
+				expect( byLabel[ "locale:es" ] ).toBe( 1 );
+			} );
+
+			it( "reports blog: false when there's no site/blog/", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", "Home" );
+
+				var stats = builder.build( projectRoot );
+
+				expect( stats.blog.present ).toBeFalse();
+				expect( stats.blog.posts ).toBe( 0 );
+			} );
+
+			it( "counts posts/categories/authors/years off site/blog/'s own folder shape", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", "Home" );
+				writePage( projectRoot, "blog/index.html", "Blog list" );
+				writePage( projectRoot, "blog/hello-world/index.html", "A post" );
+				writePage( projectRoot, "blog/another-post/index.html", "Another post" );
+				writePage( projectRoot, "blog/category/releases/index.html", "Category" );
+				writePage( projectRoot, "blog/authors/lmajano/index.html", "Author" );
+				writePage( projectRoot, "blog/archive/2026/index.html", "Year" );
+				writePage( projectRoot, "blog/stats/index.html", "Stats" );
+
+				var stats = builder.build( projectRoot );
+
+				expect( stats.blog.present ).toBeTrue();
+				expect( stats.blog.posts ).toBe( 2 );
+				expect( stats.blog.categories ).toBe( 1 );
+				expect( stats.blog.authors ).toBe( 1 );
+				expect( stats.blog.years ).toBe( 1 );
+			} );
+
+			it( "counts distinct tags off site/tags/index.html's own anchors", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", "Home" );
+				writePage( projectRoot, "tags/index.html", '<h2 id="tag-boxlang">boxlang</h2><ul><li>x</li></ul><h2 id="tag-release">release</h2>' );
+
+				var stats = builder.build( projectRoot );
+
+				expect( stats.tagCount ).toBe( 2 );
+			} );
+
+			it( "reports the search index disabled when there's no search-index.json", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", "Home" );
+
+				var stats = builder.build( projectRoot );
+
+				expect( stats.searchIndex.enabled ).toBeFalse();
+				expect( stats.searchIndex.entryCount ).toBe( 0 );
+			} );
+
+			it( "counts search-index.json entries and its file size when present", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", "Home" );
+				fileWrite(
+					projectRoot & "/site/search-index.json",
+					'[{"title":"Home","url":"index.html","headings":[],"body":"Home","tags":[]},{"title":"About","url":"about.html","headings":[],"body":"About","tags":[]}]'
+				);
+
+				var stats = builder.build( projectRoot );
+
+				expect( stats.searchIndex.enabled ).toBeTrue();
+				expect( stats.searchIndex.entryCount ).toBe( 2 );
+				expect( stats.searchIndex.fileSizeBytes ).toBeGT( 0 );
+			} );
+
+			it( "reports the built site's own total file count and size on disk", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", "Home" );
+				writePage( projectRoot, "assets/style.css", "body{}" );
+
+				var stats = builder.build( projectRoot );
+
+				expect( stats.siteFileCount ).toBe( 2 );
+				expect( stats.siteSizeBytes ).toBeGT( 0 );
+			} );
+
+		} );
+	}
+
+}

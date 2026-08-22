@@ -1,0 +1,90 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.Stats", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.Stats@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-stats-" );
+				tempDirs.append( dir );
+				fileWrite( dir & "/bxdocs.json", '{"name":"Test Site","theme":{"name":"bootstrap"}}' );
+				return dir;
+			}
+
+			private void function writePage( required string projectRoot, required string relativePath, required string html ) {
+				var path = arguments.projectRoot & "/site/" & arguments.relativePath;
+				var dir = getDirectoryFromPath( path );
+				if ( !directoryExists( dir ) ) {
+					directoryCreate( dir, true, true );
+				}
+				fileWrite( path, arguments.html );
+			}
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "throws BxDocs.SiteNotBuilt when there's no site/ directory", function() {
+				var projectRoot = newProjectRoot();
+
+				expect( function() {
+					verb.run( { projectRoot : projectRoot } );
+				} ).toThrow( "BxDocs.SiteNotBuilt" );
+			} );
+
+			it( "always exits 0 and reports page/word counts", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", "<h1>Home</h1><p>Five whole words here.</p>" );
+				writePage( projectRoot, "about.html", "<p>About page.</p>" );
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toInclude( "Pages:   2" );
+				expect( result.message ).toInclude( "Words:" );
+			} );
+
+			it( "reports [no blog]/[no search index] when neither is present", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", "Home" );
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.message ).toInclude( "Blog: none" );
+				expect( result.message ).toInclude( "Search index: none" );
+			} );
+
+			it( "reports blog/tags/search index stats when present", function() {
+				var projectRoot = newProjectRoot();
+				writePage( projectRoot, "index.html", "Home" );
+				writePage( projectRoot, "blog/hello-world/index.html", "A post" );
+				writePage( projectRoot, "blog/category/releases/index.html", "Category" );
+				writePage( projectRoot, "blog/authors/lmajano/index.html", "Author" );
+				writePage( projectRoot, "tags/index.html", '<h2 id="tag-boxlang">boxlang</h2><h2 id="tag-release">release</h2>' );
+				fileWrite( projectRoot & "/site/search-index.json", '[{"title":"Home","url":"index.html","headings":[],"body":"Home","tags":[]}]' );
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.message ).toInclude( "Blog: 1 post(s), 1 category, 1 author(s)" );
+				expect( result.message ).toInclude( "Tags: 2 distinct" );
+				expect( result.message ).toInclude( "Search index: 1 entries" );
+			} );
+
+		} );
+	}
+
+}

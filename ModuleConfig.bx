@@ -174,7 +174,8 @@ class {
 			"clean"        : "models.cli.Clean",
 			"gh-deploy"    : "models.cli.GhDeploy",
 			"migrate"      : "models.cli.Migrate",
-			"check"        : "models.cli.Check"
+			"check"        : "models.cli.Check",
+			"stats"        : "models.cli.Stats"
 		}
 
 		var verbDescriptions = {
@@ -185,7 +186,8 @@ class {
 			"clean"        : "Remove site/ and any build cache",
 			"gh-deploy"    : "Build and force-push site/ to a gh-pages branch ([--branch], [--remote], [--message])",
 			"migrate"      : "Convert a GitBook export or mkdocs project into a bx-docs project (--source, required; [--from=gitbook|mkdocs])",
-			"check"        : "CI-grade content check on a built site: broken links/images, missing alt text, orphaned pages"
+			"check"        : "CI-grade content check on a built site: broken links/images, missing alt text, orphaned pages",
+			"stats"        : "Report page/word counts, versions/locales, blog, tags, search index, and site size for a built site"
 		}
 
 		var firstToken = arrayLen( arguments.args ) >= 1 ? arguments.args[ 1 ] : ""
