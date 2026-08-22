@@ -85,14 +85,12 @@
 					<img src="/bx-sites/development/theme/tailwind/assets/blog/get-your-docs-live-in-10-minutes-cover.svg" alt="" style="max-width:100%;height:auto;" class="blog-post-featured-image"><p class="blog-post-meta">Jul 1, 2026, 12:00:00 AM &middot; 2 min read &middot; by <a href="/bx-sites/development/theme/tailwind/blog/authors/lmajano/index.html">Luis Majano</a> &middot; in <a href="/bx-sites/development/theme/tailwind/blog/category/getting-started/index.html">Getting Started</a></p><p>I've written a lot of documentation tools over the years, and the thing I keep coming back to with BX Sites is how little ceremony is involved in going from nothing to a real, browsable static site. No config wizard, no plugin marketplace to shop through first - just a folder of Markdown and one command.</p>
 <!-- more -->
 <h2 id="install"><a href="#install" id="install" name="install" class="anchor"></a>Install</h2>
-<p>BX Sites is a BoxLang module, so it installs the same way any other BoxLang module does. With <a href="https://commandbox.ortusbooks.com/">CommandBox</a> installed:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">box install bx-sites
-box install bx-markdown
-box install bx-esapi
-box install bx-yaml
-</code></pre>
-<p><code>bx-markdown</code> handles Markdown rendering, <code>bx-esapi</code> handles HTML-encoding, and <code>bx-yaml</code> reads your <code>bxsites.yaml</code>. If you'd rather skip CommandBox entirely, BoxLang's own installer grabs all four in a single command:</p>
-<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">install-bx-module bx-sites bx-markdown bx-esapi bx-yaml
+<p>BX Sites is a BoxLang module, so it installs the same way any other BoxLang module does. Its dependencies (<code>bx-markdown</code> for Markdown rendering, <code>bx-esapi</code> for HTML-encoding, <code>bx-yaml</code> for reading your <code>bxsites.yaml</code>, and <code>bx-image</code> for the responsive-image pipeline) are all installed automatically as <code>box.json</code> dependencies, so installing <code>bx-sites</code> itself is the only command needed:</p>
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash"># OS Binary
+install-bx-module bx-sites
+
+# CommandBox
+box install bx-sites
 </code></pre>
 <p>Either path drops a <code>bxSites</code> script on your <code>PATH</code>, so every command from here on is just <code>bxSites &lt;verb&gt; [options]</code>.</p>
 <h2 id="scaffold-a-project"><a href="#scaffold-a-project" id="scaffold-a-project" name="scaffold-a-project" class="anchor"></a>Scaffold a project</h2>
@@ -124,7 +122,7 @@ cd my-docs
 <p>Which part of this took you the longest the first time - install, or picking your first page structure? I'd genuinely like to know.</p>
 
 				</div>
-<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/blog/posts/get-your-docs-live-in-10-minutes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/bx-sites/development/theme/tailwind/blog/posts/get-your-docs-live-in-10-minutes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 22, 2026, 11:01:26 PM</span></div>
+<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/blog/posts/get-your-docs-live-in-10-minutes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/bx-sites/development/theme/tailwind/blog/posts/get-your-docs-live-in-10-minutes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 22, 2026, 11:28:01 PM</span></div>
 			</article>
 
 			<nav class="mt-8 flex justify-between border-t border-slate-200 pt-4 text-sm font-semibold" aria-label="Page navigation">

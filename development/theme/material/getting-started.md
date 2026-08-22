@@ -14,25 +14,22 @@ BX Sites depends on [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
 for Markdown rendering, [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
 for HTML-encoding, [bx-yaml](https://github.com/ortus-boxlang/bx-yaml) for
 reading `bxsites.yaml`, and [bx-image](https://github.com/ortus-boxlang/bx-image)
-for the responsive-image pipeline (see [Responsive Images](guides/images.md)).
-With [CommandBox](https://commandbox.ortusbooks.com/) installed:
-
-```bash frame="terminal" title="Terminal" linenums="1"
-box install bx-sites
-box install bx-markdown
-box install bx-esapi
-box install bx-yaml
-box install bx-image
-```
-
-Or, without CommandBox, BoxLang's own installer takes all five in one
-command:
+for the responsive-image pipeline (see [Responsive Images](guides/images.md)) -
+all four are installed automatically as `box.json` dependencies, so
+installing `bx-sites` itself is the only command needed, either via
+BoxLang's own OS binary installer:
 
 ```bash frame="terminal" title="Terminal"
-install-bx-module bx-sites bx-markdown bx-esapi bx-yaml bx-image
+install-bx-module bx-sites
 ```
 
-`box install`/`install-bx-module` reads `box.json`'s `boxlang.executable`
+or via [CommandBox](https://commandbox.ortusbooks.com/):
+
+```bash frame="terminal" title="Terminal"
+box install bx-sites
+```
+
+Either one reads `box.json`'s `boxlang.executable`
 and drops a `bxSites` script on your `PATH` (in `~/.boxlang/bin`), so every
 command below works either as a short standalone command:
 
