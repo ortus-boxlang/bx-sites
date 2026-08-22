@@ -1,0 +1,92 @@
+/**
+ * `stats` CLI verb - a read-only summary report of an already-built
+ * `site/`: page/word counts, versions/locales, the blog (if any), the
+ * tags index, the search index, and the built site's own footprint on
+ * disk. Purely informational - unlike `check`, it never fails (exit
+ * code is always `0`), since there's nothing here to gate a build on.
+ */
+class {
+
+	/**
+	 * Dispatches the `stats` verb to SiteStatsBuilder.build() and formats
+	 * its result into a report.
+	 *
+	 * @options { projectRoot (required, absolute path) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxDocs.MissingProjectRoot", message = "`stats` requires a project root" )
+		}
+
+		var builder = new "models.build.SiteStatsBuilder@bxdocs"()
+		var stats = builder.build( projectRoot )
+
+		return {
+			exitCode : 0,
+			message  : formatReport( stats )
+		}
+	}
+
+	/**
+	 * @stats SiteStatsBuilder.build()'s own return value
+	 */
+	private string function formatReport( required struct stats ) {
+		var lines = []
+
+		lines.append( "Pages:   #numberFormat( arguments.stats.pageCount, '9,999' )#" )
+		lines.append( "Words:   #numberFormat( arguments.stats.wordCount, '9,999' )# (avg #numberFormat( arguments.stats.avgWordsPerPage, '9,999' )#/page)" )
+
+		if ( arguments.stats.treeBreakdown.len() > 1 ) {
+			lines.append( "" )
+			lines.append( "By tree:" )
+			for ( var tree in arguments.stats.treeBreakdown ) {
+				lines.append( "  - #tree.label#: #numberFormat( tree.pageCount, '9,999' )# page(s)" )
+			}
+		}
+
+		lines.append( "" )
+		lines.append( "Versions: #arguments.stats.versions.len() ? arguments.stats.versions.toList( ', ' ) : 'none'#" )
+		lines.append( "Locales:  #arguments.stats.locales.len() ? arguments.stats.locales.toList( ', ' ) : 'none (default only)'#" )
+
+		lines.append( "" )
+		if ( arguments.stats.blog.present ) {
+			var categoryWord = arguments.stats.blog.categories == 1 ? "category" : "categories"
+				lines.append(
+					"Blog: " & arguments.stats.blog.posts & " post(s), " &
+					arguments.stats.blog.categories & " " & categoryWord & ", " &
+					arguments.stats.blog.authors & " author(s), " &
+					arguments.stats.blog.years & " year(s) active"
+				)
+		} else {
+			lines.append( "Blog: none (no docs/blog/posts/)" )
+		}
+
+		lines.append( "Tags: #arguments.stats.tagCount# distinct" )
+
+		if ( arguments.stats.searchIndex.enabled ) {
+			lines.append( "Search index: #numberFormat( arguments.stats.searchIndex.entryCount, '9,999' )# entries (#formatBytes( arguments.stats.searchIndex.fileSizeBytes )#)" )
+		} else {
+			lines.append( "Search index: none (search disabled, or a non-local provider)" )
+		}
+
+		lines.append( "" )
+		lines.append( "Site output: #numberFormat( arguments.stats.siteFileCount, '9,999' )# file(s), #formatBytes( arguments.stats.siteSizeBytes )#" )
+
+		return lines.toList( char( 10 ) )
+	}
+
+	/**
+	 * @bytes A byte count
+	 */
+	private string function formatBytes( required numeric bytes ) {
+		if ( arguments.bytes >= 1024 * 1024 ) {
+			return numberFormat( arguments.bytes / ( 1024 * 1024 ), "9,999.0" ) & " MB"
+		}
+		if ( arguments.bytes >= 1024 ) {
+			return numberFormat( arguments.bytes / 1024, "9,999.0" ) & " KB"
+		}
+		return arguments.bytes & " B"
+	}
+
+}
