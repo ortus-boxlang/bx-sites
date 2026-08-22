@@ -15,7 +15,7 @@ The single biggest thing standing between a team and switching docs tools is alm
 
 ## From a GitBook export
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxDocs migrate --source=/path/to/gitbook-export
 ```
 
@@ -34,7 +34,7 @@ bxDocs migrate --source=/path/to/gitbook-export
 
 Nothing is silently dropped. A block it doesn't recognize - GitBook's AI-generation **Prompt** block, account-based conditional content, the **Ask AI** search bar - is left in its original `{% %}` syntax and reported as a warning, so the content survives even when the conversion doesn't:
 
-```
+```text title="migrate output"
 Migrated 14 page(s) from [/path/to/gitbook-export] into my-docs/docs/, wrote my-docs/docs/nav.json
 
 2 item(s) need a manual look:
@@ -45,7 +45,7 @@ Re-running it overwrites whatever it wrote before, so fixing your source export 
 
 ## From an mkdocs project
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxDocs migrate --source=/path/to/mkdocs-project --from=mkdocs
 ```
 

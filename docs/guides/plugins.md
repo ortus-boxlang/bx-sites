@@ -17,7 +17,7 @@ Installing a module alone never activates it as a plugin, though - a
 project opts one in explicitly by BoxLang module name, via `bxdocs.json`'s
 [`plugins`](../configuration.md#plugins) array:
 
-```json
+```json title="bxdocs.json"
 { "plugins": [ "myBxDocsPlugin" ] }
 ```
 
@@ -28,7 +28,7 @@ A plugin module needs exactly one thing beyond the usual `box.json`/
 class. Every method on it is optional - implement only the hooks you need,
 BX Docs checks for each one before calling it:
 
-```bx
+```bx title="models/BxDocsPlugin.bx" linenums="1"
 // models/BxDocsPlugin.bx
 class {
 
@@ -99,7 +99,7 @@ hello-plugin -->` comment to every page and appends a build-summary line
 to `site/hello-plugin.txt` once the build finishes. Use it as a starting
 skeleton, or read it for a worked example of the folder layout:
 
-```
+```text title="hello-plugin/ layout"
 hello-plugin/
 ├── box.json              # boxlang.moduleName is what bxdocs.json's [plugins] references
 ├── ModuleConfig.bx        # a normal, otherwise-empty BoxLang module descriptor

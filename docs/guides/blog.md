@@ -29,7 +29,7 @@ order, its year archive, and its URL (`blog/<slug>/`) are all derived from
 frontmatter alone, never from where the file happens to live, so a post's
 folder and its actual `date` are always free to disagree:
 
-```
+```text title="Project structure"
 docs/blog/posts/
 ├── hello-world.md              (flat is fine too)
 ├── 2026/
@@ -40,7 +40,7 @@ docs/blog/posts/
 
 Frontmatter, for any post regardless of where it's filed:
 
-```markdown
+```markdown title="docs/blog/posts/announcing-2-0.md" linenums="1"
 ---
 title: Announcing BoxLang 2.0
 date: 2026-08-15
@@ -111,7 +111,7 @@ in `image`/`avatar`.
 `docs/blog/authors.yml` is optional - one entry per author id, referenced
 by a post's own `authors` list:
 
-```yaml
+```yaml title="docs/blog/authors.yml" linenums="1"
 lmajano:
   name: Luis Majano
   title: CEO, Ortus Solutions
@@ -164,7 +164,7 @@ it somewhere specific instead, add your own entry with an explicit `url`
 a `docs/` page) to your `nav` array or `docs/nav.json` - doing so suppresses
 the auto-appended one entirely, so there's never a duplicate:
 
-```json
+```json title="bxdocs.json" linenums="1"
 { "nav": [
   { "path": "index.md" },
   { "title": "Blog", "url": "blog/index.html", "icon": "lucide:newspaper" },
@@ -194,7 +194,7 @@ Every category also gets its own filtered feed at
 unbounded feed on a large blog just wastes bandwidth on every poll; set it
 to `0` for every post, uncapped:
 
-```json
+```json title="bxdocs.json"
 { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
 ```
 
