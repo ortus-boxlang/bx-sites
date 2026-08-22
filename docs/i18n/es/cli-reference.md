@@ -1,7 +1,7 @@
 ---
 title: Referencia de la CLI
 order: 3
-icon: ⌨️
+icon: phosphor-duotone:terminal-window
 summary: Cada verbo de bxDocs y sus opciones.
 tags: [referencia, cli]
 ---

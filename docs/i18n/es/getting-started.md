@@ -1,7 +1,7 @@
 ---
 title: Primeros Pasos
 order: 2
-icon: 🚀
+icon: phosphor-duotone:rocket-launch
 summary: Instala el módulo, crea un proyecto y construye tu primer sitio.
 tags: [guías, configuración]
 ---

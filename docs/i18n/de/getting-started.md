@@ -1,7 +1,7 @@
 ---
 title: Erste Schritte
 order: 2
-icon: 🚀
+icon: phosphor-duotone:rocket-launch
 summary: Installiere das Modul, erstelle ein Projekt und baue deine erste Website.
 tags: [anleitungen, einrichtung]
 ---

@@ -462,7 +462,7 @@ class {
 		// key that was never there.
 		var blogNavUrl = arguments.blogNavUrl
 		if ( len( blogNavUrl ) && !flatSequence.filter( n => n.url == blogNavUrl ).len() ) {
-			nav.append( { title : "Blog", url : blogNavUrl, order : 999999, icon : "lucide:newspaper", children : [] } )
+			nav.append( { title : "Blog", url : blogNavUrl, order : 999999, icon : "phosphor-duotone:newspaper", children : [] } )
 		}
 		assignNavIconHtml( nav, arguments.docsDir )
 

@@ -1,7 +1,7 @@
 ---
 title: Configuración
 order: 4
-icon: ⚙️
+icon: phosphor-duotone:gear-six
 summary: Cada clave de la configuración del sitio, su valor por defecto y qué hace.
 tags: [referencia, configuración]
 ---
