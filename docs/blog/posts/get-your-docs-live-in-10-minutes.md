@@ -17,7 +17,7 @@ I've written a lot of documentation tools over the years, and the thing I keep c
 
 BX Docs is a BoxLang module, so it installs the same way any other BoxLang module does. With [CommandBox](https://commandbox.ortusbooks.com/) installed:
 
-```bash
+```bash frame="terminal" title="Terminal" linenums="1"
 box install bx-docs
 box install bx-markdown
 box install bx-esapi
@@ -26,7 +26,7 @@ box install bx-yaml
 
 `bx-markdown` handles Markdown rendering, `bx-esapi` handles HTML-encoding, and `bx-yaml` reads your `bxdocs.yaml`. If you'd rather skip CommandBox entirely, BoxLang's own installer grabs all four in a single command:
 
-```bash
+```bash frame="terminal" title="Terminal"
 install-bx-module bx-docs bx-markdown bx-esapi bx-yaml
 ```
 
@@ -34,7 +34,7 @@ Either path drops a `bxDocs` script on your `PATH`, so every command from here o
 
 ## Scaffold a project
 
-```bash
+```bash frame="terminal" title="Terminal" linenums="1"
 bxDocs new my-docs
 cd my-docs
 ```
@@ -45,7 +45,7 @@ That's it - you now have a `docs/index.md` and a `bxdocs.yaml` sitting next to i
 
 Every `.md` file under `docs/` becomes a page, and folder nesting becomes nav nesting automatically - no separate nav config to maintain for a normal-sized project:
 
-```
+```text title="Project structure"
 docs/
 ├── index.md              -> /
 ├── guides/
@@ -55,7 +55,7 @@ docs/
 
 Link between pages the way you'd expect if the files were just sitting next to each other on disk, because they are:
 
-```markdown
+```markdown title="Example link"
 See [Deployment](guides/deployment.md) for the full picture.
 ```
 
@@ -65,13 +65,13 @@ A page can carry a small frontmatter block up top - `title`, `order`, `tags`, `i
 
 ## Build and serve
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxDocs build
 ```
 
 renders everything in `docs/` into `site/`, ready to host anywhere that serves static files. While you're actively writing:
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxDocs serve
 ```
 

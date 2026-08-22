@@ -44,9 +44,9 @@ Server, keine Datenbank und keinen externen Suchdienst.
 ```
 
 Überspringt den Aufbau von `search-index.json` vollständig und
-überspringt die Suchbox, das `lunr.js`-CDN-Skript sowie das gemeinsame
-`search.js`-Widget auf jeder gerenderten Seite - ein Projekt mit
-deaktivierter Suche liefert überhaupt nichts Suchbezogenes aus.
+überspringt die Suchbox, das vendorierte `lunr.js`-Skript sowie das
+gemeinsame `search.js`-Widget auf jeder gerenderten Seite - ein Projekt
+mit deaktivierter Suche liefert überhaupt nichts Suchbezogenes aus.
 
 ## Nur den Index neu aufbauen
 

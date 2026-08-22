@@ -289,7 +289,7 @@
 	<script src="#variables.basePath#assets/toc-collapse.js" defer></script>
 	<script src="#variables.basePath#assets/tabs.js" defer></script>
 </bx:output><bx:if condition="#variables.mermaidEnabled#"><bx:output>
-	<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+	<script src="#variables.basePath#assets/vendor/mermaid/mermaid.min.js"></script>
 	<script src="#variables.basePath#assets/mermaid-init.js"></script>
 </bx:output></bx:if><bx:if condition="#variables.mathEnabled#"><bx:output>
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>

@@ -13,9 +13,19 @@ tags: [guides, themes]
 
 | テーマ | ベース | 備考 |
 |---|---|---|
-| `bootstrap`（デフォルト） | [Bootstrap 5](https://getbootstrap.com/)（CDN 経由） | Poppins フォント、ブランドグラデーション navbar |
+| `bootstrap`（デフォルト） | [Bootstrap 5](https://getbootstrap.com/)（バンドル同梱） | Poppins フォント、ブランドグラデーション navbar |
 | `material` | 手作りの Material スタイル CSS | カードレイアウト、エレベーションシャドウ、Roboto フォント |
 | `tailwind` | [Tailwind Play CDN](https://tailwindcss.com/) | ユーティリティクラス駆動、ビルドステップ不要 |
+
+各組み込みテーマ自身の CSS/JS（Bootstrap の CSS/JS バンドル、highlight.js、Alpine.js、
+デフォルトの `local` 検索プロバイダー用の lunr.js、および `mermaid` を有効にした場合の
+Mermaid）は、このモジュールに同梱（バンドル）された状態で出荷され、ビルドされた `site/`
+にそのままコピーされます - ビルド済みサイトの閲覧に CDN もインターネットアクセスも
+一切不要です。`tailwind` テーマ自身のユーティリティエンジン（静的なスタイルシートでは
+なく、クライアントサイドの JIT コンパイラ）と、自分で有効にしたその他のオプション機能
+（`math`、Algolia 検索、Google Analytics）は、依然として CDN やホスト型 API から読み込
+まれます - 詳細は下記の
+[エアギャップ/オフラインサイト](#air-gapped-offline-sites) を参照してください。
 
 すべて同じ BoxLang ブランドパレット（`#00FF78 → #00DBFF` グラデーションと `#FFF500` アクセント）を使用し、
 以下の同じページ機能を搭載しています:
@@ -44,6 +54,40 @@ tags: [guides, themes]
 ```json
 { "theme": { "name": "material" } }
 ```
+
+## エアギャップ/オフラインサイト {#air-gapped-offline-sites}
+
+ビルドされたサイトは、`bootstrap` と `material` テーマをデフォルトの `local` 検索
+プロバイダーと組み合わせた場合、デフォルトでインターネットアクセスが一切なくても
+動作します。Bootstrap 自身の CSS/JS、highlight.js、Alpine.js、lunr.js はすべて
+このモジュールに同梱されており（`resources/assets/vendor/`）、ビルド時に
+`site/assets/vendor/` へそのままコピーされます - 生成される HTML のどこにも、
+これらのための CDN の `<script>`/`<link>` タグは一切含まれません。`bxdocs.json`
+の `mermaid` キーを有効にすると、Mermaid も同様に同梱され、`mermaid.min.js`
+バンドルが `site/assets/vendor/mermaid/` にコピーされて、組み込みのすべての
+テーマがそこから読み込むため、図表も外部への通信なしで描画されます。
+
+ただし、自分で有効にした場合に限り、いくつかの機能はまだネットワークに
+アクセスします:
+
+- `tailwind` テーマ自身のユーティリティエンジンは、`cdn.tailwindcss.com` から
+  読み込まれるクライアントサイドの JIT コンパイラです - 静的なスタイルシートでは
+  ないため、このモジュールが同様の方法で同梱することができず、このテーマは
+  今のところエアギャップ環境には対応していません。
+- Mermaid 自身のレイアウトエンジンは、追加のチャンクである `elk-api.js` を
+  jsDelivr から遅延読み込みしますが、これは `elk` レイアウトアルゴリズムを
+  使用するダイアグラムタイプに限られます。同梱された `mermaid.min.js` は、
+  それ以外のすべてのダイアグラムタイプを完全に単独でレンダリングします。
+- `bxdocs.json` の `math` オプションを有効にすると、KaTeX（JS 本体とその独自
+  フォントファイルの両方）を CDN から読み込みます。
+- `searchProvider.provider: "algolia"` と `analytics.provider: "google"` は、
+  その性質上ホスト型の API／トラッキングエンドポイントと通信します - JS
+  ファイルを同梱しても、この依存関係はなくなりません。
+
+デプロイ先が本当に一切インターネットにアクセスできない環境である場合は、
+`bootstrap`/`material` とデフォルトの `local` 検索プロバイダーを使い、
+`mermaid` を有効にしている場合は `elk` レイアウトの Mermaid ダイアグラムを
+避け、`math`/Algolia/analytics はオフのままにしてください。
 
 ## アイコン
 

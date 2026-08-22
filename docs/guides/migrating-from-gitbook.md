@@ -28,7 +28,7 @@ Either way, `--source` should be the directory that directly contains
 
 ## Running the migration
 
-```bash
+```bash frame="terminal" title="Terminal" linenums="1"
 # 1. Scaffold a fresh bx-docs project (skip this if you already have one)
 bxDocs new my-docs
 cd my-docs
@@ -43,7 +43,7 @@ bxDocs serve
 `migrate` prints how many pages it converted and, when something needed
 a judgment call, exactly what and where:
 
-```
+```text title="migrate output"
 Migrated 14 page(s) from [/path/to/gitbook-export] into my-docs/docs/, wrote my-docs/docs/nav.json
 
 2 item(s) need a manual look:

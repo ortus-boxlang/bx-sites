@@ -39,6 +39,15 @@ palette, and all overridable with your own theme.
 A lunr.js-powered search box, wired against a search index built at
 `build` time - no server dependency.
 :::
+::: card title="A blog, out of the box" icon="lucide:newspaper" href="guides/blog.md"
+Drop posts under `docs/blog/posts/` and get authors, categories, year
+archives, RSS feeds, and per-post featured images - zero config required.
+:::
+::: card title="Fast, air-gapped by default" icon="phosphor-duotone:wifi-slash" href="guides/themes.md#air-gapped-offline-sites"
+Fingerprinted CSS/JS bundling and responsive images out of the box, plus
+Bootstrap, highlight.js, Alpine.js, lunr.js and (opt-in) Mermaid all
+vendored - a built site needs zero outbound requests by default.
+:::
 ::: card title="A real plugin system" icon="phosphor-duotone:puzzle-piece" href="guides/plugins.md"
 A plugin is just another installed BoxLang module - no separate plugin API
 to learn.
@@ -96,6 +105,12 @@ The full `bxdocs.json` reference.
 :::
 ::: card title="Markdown Extensions" icon="phosphor-duotone:markdown-logo" href="guides/markdown.md"
 Admonitions, tabs, cards, callouts, math and Mermaid diagrams.
+:::
+::: card title="Blog" icon="lucide:newspaper" href="guides/blog.md"
+Posts, authors, categories, archives, RSS, drafts, and a stats page.
+:::
+::: card title="Responsive Images & Asset Pipeline" icon="phosphor-duotone:image" href="guides/images.md"
+Automatic image resizing/WebP, and fingerprinted CSS/JS bundling.
 :::
 ::: card title="Deploying to GitHub Pages" icon="phosphor-duotone:cloud-arrow-up" href="guides/deployment.md"
 The built-in GitHub Actions workflow.

@@ -19,12 +19,13 @@ engine or build step involved.
 | `tailwind` | [Tailwind Play CDN](https://tailwindcss.com/) | Utility-class driven, no build step |
 
 Every built-in theme's own CSS/JS (Bootstrap's CSS/JS bundle, highlight.js,
-Alpine.js, lunr.js for the default `local` search provider) ships vendored
-with this module and is copied straight into every built `site/` - no CDN,
-no internet access needed to view a built site. The `tailwind` theme's own
-utility engine (a client-side JIT compiler, not a static stylesheet) and
-optional features you turn on yourself (`mermaid`, `math`, Algolia search,
-Google Analytics) still load from a CDN or a hosted API - see
+Alpine.js, lunr.js for the default `local` search provider, and Mermaid
+when `mermaid` is turned on) ships vendored with this module and is
+copied straight into every built `site/` - no CDN, no internet access
+needed to view a built site. The `tailwind` theme's own utility engine (a
+client-side JIT compiler, not a static stylesheet) and other optional
+features you turn on yourself (`math`, Algolia search, Google Analytics)
+still load from a CDN or a hosted API - see
 [Air-gapped/offline sites](#air-gapped-offline-sites) below.
 
 All three apply the same BoxLang brand palette: a `#00FF78 -> #00DBFF`
@@ -110,7 +111,7 @@ page features:
 
 Set which one a project uses in `bxdocs.json`:
 
-```json
+```json title="bxdocs.json"
 { "theme": { "name": "material" } }
 ```
 
@@ -121,7 +122,11 @@ A built site works with no internet access at all by default, for the
 provider: Bootstrap's own CSS/JS, highlight.js, Alpine.js, and lunr.js are
 all vendored with this module (`resources/assets/vendor/`) and copied
 straight into `site/assets/vendor/` at build time - no CDN `<script>`/
-`<link>` tag anywhere in the generated HTML for any of those.
+`<link>` tag anywhere in the generated HTML for any of those. Turning on
+`bxdocs.json`'s `mermaid` key vendors Mermaid the same way - its
+`mermaid.min.js` bundle is copied into `site/assets/vendor/mermaid/` and
+every built-in theme loads it from there, so diagrams still render with
+zero outbound requests.
 
 A few things still reach out to the network, only when you turn them on
 yourself:
@@ -130,15 +135,20 @@ yourself:
   loaded from `cdn.tailwindcss.com` - it isn't a static stylesheet this
   module can vendor the same way, so this theme isn't air-gapped-capable
   yet.
-- `bxdocs.json`'s `mermaid`/`math` options load Mermaid/KaTeX from a CDN
-  when turned on.
+- Mermaid's own layout engine lazy-loads one extra chunk, `elk-api.js`,
+  from jsDelivr - but only for diagram types that opt into the `elk`
+  layout algorithm; the vendored `mermaid.min.js` renders every other
+  diagram type entirely on its own.
+- `bxdocs.json`'s `math` option loads KaTeX (both its JS and its own font
+  files) from a CDN when turned on.
 - `searchProvider.provider: "algolia"` and `analytics.provider: "google"`
   inherently talk to a hosted API/tracking endpoint - vendoring the JS
   file wouldn't remove that dependency.
 
 If your deployment target genuinely has zero internet access, stick to
-`bootstrap`/`material`, the default `local` search provider, and leave
-`mermaid`/`math`/Algolia/analytics off.
+`bootstrap`/`material`, the default `local` search provider, avoid
+`elk`-layout Mermaid diagrams if `mermaid` is on, and leave `math`/Algolia/
+analytics off.
 
 ## Icons
 
@@ -149,19 +159,19 @@ self-hosted libraries, all MIT/ISC-licensed and bundled with this module
 (~16,200 icons combined, no CDN, nothing added to a built page's own
 weight beyond the handful of icons it actually uses - see IconResolver.bx):
 
-```markdown
+```markdown title="Frontmatter"
 ---
 icon: rocket
 ---
 ```
 
-```markdown
+```markdown title="Frontmatter"
 ---
 icon: lucide:rocket
 ---
 ```
 
-```markdown
+```markdown title="Frontmatter"
 ---
 icon: phosphor-bold:rocket
 ---
@@ -189,7 +199,7 @@ and reference it as `icon: custom:my-icon`.
 A [nav.json](../configuration.md#nav) entry can set its own `icon` too,
 overriding the target page's own frontmatter for that one entry:
 
-```json
+```json title="docs/nav.json"
 { "title": "Guides", "path": "guides/index.md", "icon": "lucide:book-open" }
 ```
 
@@ -242,11 +252,11 @@ re-declared under `[data-theme="dark"]` for dark mode. `bxdocs.json`'s
 theme's own stylesheet, so a same-specificity re-declaration in it wins
 without touching `resources/themes/` at all:
 
-```json
+```json title="bxdocs.json"
 { "extraCss": [ "assets/brand.css" ] }
 ```
 
-```css
+```css title="docs/assets/brand.css" linenums="1"
 /* docs/assets/brand.css - copied to site/assets/brand.css at build time */
 :root {
 	--bxdocs-gradient-start: #7C3AED;
@@ -284,7 +294,7 @@ default marker, these three are the same fixed bg/text pair in both
 light and dark mode (a self-contained badge, not tied to the theme's own
 brand accent), so there's no `[data-theme="dark"]` override to redeclare:
 
-```css
+```css title="docs/assets/brand.css" linenums="1"
 :root {
 	--bxdocs-step-marker-bg: #7C3AED;
 	--bxdocs-step-marker-text: #fff;
@@ -310,7 +320,7 @@ A worked example - start from `bootstrap` and swap its brand palette and
 heading font for your own, keeping everything else (nav, search, dark mode,
 code highlighting, ...) exactly as it already works:
 
-```markdown
+```text title="Project structure"
 my-project/
 ├── bxdocs.yaml
 ├── docs/
@@ -327,7 +337,7 @@ my-project/
 2. Edit only what you need to change. To swap the brand palette and font,
    that's just the top of `theme/assets/style.css`:
 
-   ```css
+   ```css title="theme/assets/style.css" linenums="1"
    :root {
    	--bxdocs-gradient-start: #7C3AED;  /* was #00FF78 */
    	--bxdocs-gradient-end: #DB2777;    /* was #00DBFF */
@@ -366,7 +376,7 @@ what's required versus what the built-in themes add on top. Save both as
 `theme/` folder is picked up automatically (as above), no `bxdocs.json`
 change needed:
 
-```bx
+```bx title="theme/layout.bxm" linenums="1"
 <!-- theme/layout.bxm -->
 <bx:script>
 	function renderNav( required array nodes ) {
@@ -405,7 +415,7 @@ change needed:
 </bx:output>
 ```
 
-```bx
+```bx title="theme/page.bxm" linenums="1"
 <!-- theme/page.bxm -->
 <bx:output>
 <article>

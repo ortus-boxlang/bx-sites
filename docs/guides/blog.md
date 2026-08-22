@@ -29,7 +29,7 @@ order, its year archive, and its URL (`blog/<slug>/`) are all derived from
 frontmatter alone, never from where the file happens to live, so a post's
 folder and its actual `date` are always free to disagree:
 
-```
+```text title="Project structure"
 docs/blog/posts/
 ├── hello-world.md              (flat is fine too)
 ├── 2026/
@@ -40,7 +40,7 @@ docs/blog/posts/
 
 Frontmatter, for any post regardless of where it's filed:
 
-```markdown
+```markdown title="docs/blog/posts/announcing-2-0.md" linenums="1"
 ---
 title: Announcing BoxLang 2.0
 date: 2026-08-15
@@ -111,7 +111,7 @@ in `image`/`avatar`.
 `docs/blog/authors.yml` is optional - one entry per author id, referenced
 by a post's own `authors` list:
 
-```yaml
+```yaml title="docs/blog/authors.yml" linenums="1"
 lmajano:
   name: Luis Majano
   title: CEO, Ortus Solutions
@@ -164,7 +164,7 @@ it somewhere specific instead, add your own entry with an explicit `url`
 a `docs/` page) to your `nav` array or `docs/nav.json` - doing so suppresses
 the auto-appended one entirely, so there's never a duplicate:
 
-```json
+```json title="bxdocs.json" linenums="1"
 { "nav": [
   { "path": "index.md" },
   { "title": "Blog", "url": "blog/index.html", "icon": "lucide:newspaper" },
@@ -194,7 +194,7 @@ Every category also gets its own filtered feed at
 unbounded feed on a large blog just wastes bandwidth on every poll; set it
 to `0` for every post, uncapped:
 
-```json
+```json title="bxdocs.json"
 { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
 ```
 
@@ -236,3 +236,48 @@ post-specific tags every built-in theme adds automatically: `og:type` is
 Posts are indexed into the same `search-index.json` every other page is
 (module spec section 7) - no separate blog search UI, the existing search
 box already finds posts alongside docs pages.
+
+## Customizing the blog's appearance
+
+There's no separate "blog theme" to write - every blog page (the main
+`/blog/` list, a category/archive/author page, `/blog/stats/`, and each
+post's own detail page) renders through the exact same `layout.bxm`/
+`page.bxm` as any other page in your site, so a blog automatically looks
+like the rest of your docs, and any theme override you've already made
+(see [Themes](themes.md#overriding-a-theme)) applies to it unchanged, with
+no extra wiring.
+
+The blog-specific markup itself (post cards, the date/author/reading-time
+meta line, the pager, an author's profile block, the "Browse by year"/
+"Browse by category" link lists) is built as plain HTML with a handful of
+fixed class names, then dropped into `page.contentHtml` just like a
+converted Markdown page:
+
+| Class | Where it shows up |
+|---|---|
+| `blog-post-card` / `blog-post-card--draft` | Each post's card on `/blog/`, a category page, or an archive page |
+| `blog-post-meta` | The date/author/reading-time line, on a card and on a post's own page |
+| `blog-post-featured-image` | A post's `image` frontmatter, on its own detail page |
+| `blog-draft-badge` | The "🚧 Draft" banner (`bxDocs serve` only) |
+| `blog-pager` | Prev/next pagination links on a paginated list |
+| `blog-author-profile` | An author's bio/socials block on their `/blog/authors/<id>/` page |
+| `blog-archive-links` / `blog-category-links` | The "Browse by year"/"Browse by category" link blocks on `/blog/` |
+
+Two ways to restyle it, same as any other page:
+
+- **A quick visual tweak** - target these classes from your own
+  [`extraCss`](../configuration.md#extracss--extrajs), the same way you'd
+  [customize a theme's colors](themes.md#customizing-colors-without-a-theme-override).
+  A built-in theme's own rules for these classes live in its
+  `assets/style.css` (e.g. `resources/themes/bootstrap/assets/style.css`)
+  if you want a starting point to override.
+- **Structural changes** - since blog pages share `layout.bxm`/`page.bxm`
+  with everything else, [overriding a theme](themes.md#overriding-a-theme)
+  (or [writing one from scratch](themes.md#writing-a-theme-from-scratch))
+  changes the blog's chrome (header, nav, footer, article wrapper) right
+  along with every other page - there's no separate blog template to copy.
+
+What you can't do is swap out the post-card/pager/author-profile markup
+itself for your own - it's generated once by `BlogBuilder.bx`, not read
+from a template file in `theme/`, so restyling it with CSS (above) is the
+supported path rather than a per-component override.

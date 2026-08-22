@@ -13,9 +13,20 @@ Template-Engine oder einen eigenen Build-Schritt.
 
 | Theme | Basis | Hinweise |
 |---|---|---|
-| `bootstrap` (Standard) | [Bootstrap 5](https://getbootstrap.com/) via CDN | Poppins-Schriftart, Navbar mit Marken-Gradient |
+| `bootstrap` (Standard) | [Bootstrap 5](https://getbootstrap.com/), vendoriert | Poppins-Schriftart, Navbar mit Marken-Gradient |
 | `material` | Handgefertigtes Material-artiges CSS | Card-Layout, Elevation-Schatten, Roboto-Schriftart |
 | `tailwind` | [Tailwind Play CDN](https://tailwindcss.com/) | Utility-Class-getrieben, kein Build-Schritt |
+
+Das eigene CSS/JS jedes integrierten Themes (Bootstraps CSS/JS-Bundle,
+highlight.js, Alpine.js, lunr.js für den standardmäßigen `local`-Suchanbieter,
+und Mermaid, wenn `mermaid` aktiviert ist) wird vendoriert mit diesem Modul
+ausgeliefert und direkt in jede gebaute `site/` kopiert - kein CDN, kein
+Internetzugang nötig, um eine gebaute Website anzusehen. Die eigene
+Utility-Engine des `tailwind`-Themes (ein clientseitiger JIT-Compiler, kein
+statisches Stylesheet) und andere optionale Funktionen, die du selbst
+aktivierst (`math`, Algolia-Suche, Google Analytics), laden weiterhin von
+einem CDN oder einer gehosteten API - siehe
+[Air-gapped/Offline-Websites](#air-gapped-offline-sites) unten.
 
 Alle drei verwenden dieselbe BoxLang-Markenpalette: einen
 `#00FF78 -> #00DBFF`-Gradient und einen `#FFF500`-Akzent - und alle drei
@@ -112,6 +123,42 @@ Lege in `bxdocs.json` fest, welches Theme ein Projekt verwendet:
 ```json
 { "theme": { "name": "material" } }
 ```
+
+## Air-gapped/Offline-Websites {#air-gapped-offline-sites}
+
+Eine gebaute Website funktioniert standardmäßig völlig ohne Internetzugang,
+für die Themes `bootstrap` und `material` mit dem standardmäßigen
+`local`-Suchanbieter: Bootstraps eigenes CSS/JS, highlight.js, Alpine.js und
+lunr.js sind alle mit diesem Modul vendoriert (`resources/assets/vendor/`)
+und werden zur Build-Zeit direkt nach `site/assets/vendor/` kopiert -
+nirgends im erzeugten HTML taucht dafür ein CDN-`<script>`-/`<link>`-Tag
+auf. Aktivierst du den Schlüssel `mermaid` in `bxdocs.json`, wird Mermaid
+auf dieselbe Weise vendoriert - sein `mermaid.min.js`-Bundle wird nach
+`site/assets/vendor/mermaid/` kopiert, und jedes integrierte Theme lädt es
+von dort, sodass Diagramme weiterhin ganz ohne ausgehende Anfragen
+gerendert werden.
+
+Ein paar Dinge greifen weiterhin nach außen ins Netzwerk, aber nur, wenn
+du sie selbst aktivierst:
+
+- Die eigene Utility-Engine des `tailwind`-Themes ist ein clientseitiger
+  JIT-Compiler, geladen von `cdn.tailwindcss.com` - kein statisches
+  Stylesheet, das dieses Modul auf dieselbe Weise vendorieren könnte,
+  daher ist dieses Theme (noch) nicht air-gapped-fähig.
+- Mermaids eigene Layout-Engine lädt bei Bedarf einen zusätzlichen Chunk
+  nach, `elk-api.js`, von jsDelivr - aber nur für Diagrammtypen, die den
+  `elk`-Layout-Algorithmus verwenden; das vendorierte `mermaid.min.js`
+  rendert jeden anderen Diagrammtyp vollständig eigenständig.
+- Die Option `math` in `bxdocs.json` lädt KaTeX (sowohl dessen JS als auch
+  die eigenen Font-Dateien) von einem CDN, wenn sie aktiviert ist.
+- `searchProvider.provider: "algolia"` und `analytics.provider: "google"`
+  sprechen naturgemäß mit einer gehosteten API/einem Tracking-Endpunkt -
+  das Vendorieren der JS-Datei würde diese Abhängigkeit nicht beseitigen.
+
+Wenn dein Einsatzziel wirklich null Internetzugang hat, bleib bei
+`bootstrap`/`material`, dem standardmäßigen `local`-Suchanbieter, vermeide
+`elk`-Layout-Mermaid-Diagramme, falls `mermaid` aktiviert ist, und lass
+`math`/Algolia/Analytics aus.
 
 ## Icons
 
