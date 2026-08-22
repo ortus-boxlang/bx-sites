@@ -29,6 +29,7 @@ class {
 
 	variables.blogAuthorsLoader = new "models.build.BlogAuthorsLoader@bxdocs"()
 	variables.responsiveImageProcessor = new "models.build.ResponsiveImageProcessor@bxdocs"()
+	variables.iconResolver = new "models.build.IconResolver@bxdocs"()
 
 	/**
 	 * Average adult silent-reading speed, in words per minute - the same
@@ -451,16 +452,19 @@ class {
 	 */
 	private string function renderAuthorPostsListHtml( required array posts, required string basePath ) {
 		if ( !arguments.posts.len() ) {
-			return "<h2>Posts</h2><p>No posts yet.</p>"
+			return '<h2>' & variables.iconResolver.resolve( "lucide:newspaper" ) & ' Posts</h2><p>No posts yet.</p>'
 		}
+
+		var calendarIcon = variables.iconResolver.resolve( "lucide:calendar" )
+		var clockIcon = variables.iconResolver.resolve( "lucide:clock" )
 
 		var items = ""
 		for ( var post in arguments.posts ) {
 			var searchKey = encodeForJavaScript( lCase( post.title ) )
-			items &= '<li x-show="!q || ' & "'" & searchKey & "'" & '.includes( q.toLowerCase() )"><a href="' & arguments.basePath & post.urlPath & '">' & encodeForHTML( post.title ) & '</a> <span class="blog-post-meta">' & post.dateDisplay & ' &middot; ' & post.readingTimeMinutes & ' min read</span></li>'
+			items &= '<li x-show="!q || ' & "'" & searchKey & "'" & '.includes( q.toLowerCase() )"><a href="' & arguments.basePath & post.urlPath & '">' & encodeForHTML( post.title ) & '</a> <span class="blog-post-meta">' & calendarIcon & ' ' & post.dateDisplay & ' &middot; ' & clockIcon & ' ' & post.readingTimeMinutes & ' min read</span></li>'
 		}
 
-		var html = '<h2>Posts</h2>'
+		var html = '<h2>' & variables.iconResolver.resolve( "lucide:newspaper" ) & ' Posts</h2>'
 		html &= '<div class="blog-author-posts" x-data="{ q: '''' }">'
 		html &= '<input type="search" class="blog-author-search" x-model="q" placeholder="Search posts by title..." aria-label="Search posts by title">'
 		html &= '<ul class="blog-author-posts-list">' & items & '</ul>'
@@ -677,7 +681,7 @@ class {
 			return ""
 		}
 
-		var html = '<div class="blog-archive-links"><h2>Archive</h2><ul>'
+		var html = '<div class="blog-archive-links"><h2>' & variables.iconResolver.resolve( "lucide:archive" ) & ' Archive</h2><ul>'
 		for ( var yr in arguments.years ) {
 			var count = arguments.posts.filter( post => year( post.date ) == yr ).len()
 			html &= '<li><a href="' & arguments.basePath & "blog/archive/" & yr & '/index.html">' & yr & "</a> (" & count & ")</li>"
@@ -747,7 +751,7 @@ class {
 			return ""
 		}
 
-		var html = '<div class="blog-category-links"><h2>Categories</h2><ul>'
+		var html = '<div class="blog-category-links"><h2>' & variables.iconResolver.resolve( "lucide:tags" ) & ' Categories</h2><ul>'
 		for ( var category in arguments.categories ) {
 			html &= '<li><a href="' & arguments.basePath & "blog/category/" & category.slug & '/index.html">' & encodeForHTML( category.name ) & "</a> (" & category.count & ")</li>"
 		}
@@ -765,7 +769,7 @@ class {
 	 * @basePath Root-relative base path ending with `/`
 	 */
 	private string function renderStatsLinkHtml( required string basePath ) {
-		return '<p><a href="' & arguments.basePath & 'blog/stats/index.html">View blog stats &rarr;</a></p>'
+		return '<p><a href="' & arguments.basePath & 'blog/stats/index.html">' & variables.iconResolver.resolve( "lucide:bar-chart-2" ) & ' View blog stats &rarr;</a></p>'
 	}
 
 	/**
