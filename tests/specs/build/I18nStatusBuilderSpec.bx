@@ -1,0 +1,68 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.I18nStatusBuilder", function() {
+
+			beforeEach( function() {
+				variables.builder = new "models.build.I18nStatusBuilder@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newDocsDir() {
+				var dir = createTempDirectory( prefix = "bxdocs-i18nstatusbuilder-" );
+				tempDirs.append( dir );
+				var docsDir = dir & "/docs";
+				directoryCreate( docsDir & "/guides", true, true );
+				fileWrite( docsDir & "/index.md", "Home" );
+				fileWrite( docsDir & "/guides/foo.md", "Foo" );
+				fileWrite( docsDir & "/guides/bar.md", "Bar" );
+				return docsDir;
+			}
+
+			it( "reports an empty locales array when there's no docs/i18n/ at all", function() {
+				var docsDir = newDocsDir();
+
+				var result = builder.build( docsDir );
+
+				expect( result.defaultPageCount ).toBe( 3 );
+				expect( result.locales ).toBeArray();
+				expect( result.locales.len() ).toBe( 0 );
+			} );
+
+			it( "reports translated/missing counts per locale, against the default tree's own pages", function() {
+				var docsDir = newDocsDir();
+				directoryCreate( docsDir & "/i18n/es/guides", true, true );
+				fileWrite( docsDir & "/i18n/es/index.md", "Inicio" );
+				fileWrite( docsDir & "/i18n/es/guides/foo.md", "Foo ES" );
+				directoryCreate( docsDir & "/i18n/ar", true, true );
+
+				var result = builder.build( docsDir );
+
+				var byCode = {};
+				for ( var locale in result.locales ) {
+					byCode[ locale.code ] = locale;
+				}
+
+				expect( byCode[ "es" ].translated ).toBe( 2 );
+				expect( byCode[ "es" ].total ).toBe( 3 );
+				expect( byCode[ "es" ].missing ).toBe( 1 );
+				expect( byCode[ "es" ].missingPaths.toList( "," ) ).toBe( "guides/bar.md" );
+				expect( byCode[ "es" ].percent ).toBe( 67 );
+
+				expect( byCode[ "ar" ].translated ).toBe( 0 );
+				expect( byCode[ "ar" ].missing ).toBe( 3 );
+				expect( byCode[ "ar" ].percent ).toBe( 0 );
+			} );
+
+		} );
+	}
+
+}

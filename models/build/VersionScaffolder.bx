@@ -1,0 +1,69 @@
+/**
+ * Backs the `version:new` CLI verb - cuts a new `docs/versions/<name>/`
+ * tree by copying the current default docs/ tree's own pages into it (a
+ * version tree is loaded entirely independently - see BuildPipeline.bx's
+ * own `versionDocsDir` - so it needs its own complete, self-contained
+ * copy of every page, `nav.json` included). `docs/assets/**` is
+ * deliberately never copied - every tree's own asset copy always pulls
+ * from the top-level `docs/assets/`, shared across every version/locale
+ * (BuildPipeline.bx's `copyAssets()`), so duplicating it here would just
+ * be dead weight. `docs/i18n/**` and `docs/blog/**` are separate trees of
+ * their own too, not part of "the current docs", so those are excluded
+ * as well - a version wanting its own translations/blog can add
+ * `docs/versions/<name>/i18n/<code>/` itself afterwards (module spec's
+ * own versions-x-locales convention), same as any other version would.
+ */
+class {
+
+	/**
+	 * Top-level `docs/` entries never copied into a new version tree -
+	 * each is its own separately-loaded tree already (or, for `assets`,
+	 * deliberately shared rather than duplicated).
+	 */
+	variables.excludedTopLevelNames = "assets,versions,i18n,blog"
+
+	/**
+	 * @docsDir Absolute path to the project's docs/ directory
+	 * @name The new version's folder name (e.g. "2.0")
+	 *
+	 * @return { versionDir, copiedCount }
+	 */
+	struct function scaffold( required string docsDir, required string name ) {
+		var trimmedName = trim( arguments.name )
+		if ( !len( trimmedName ) ) {
+			throw( type = "BxDocs.MissingVersionName", message = "`version:new` requires --name=<version>" )
+		}
+
+		var trimmedDocsDir = arguments.docsDir.reReplace( "[\/]+$", "" )
+		var versionDir = trimmedDocsDir & "/versions/" & trimmedName
+
+		if ( directoryExists( versionDir ) ) {
+			throw( type = "BxDocs.VersionAlreadyExists", message = "docs/versions/#trimmedName# already exists" )
+		}
+
+		if ( !directoryExists( trimmedDocsDir ) ) {
+			throw( type = "BxDocs.DocsDirNotFound", message = "No docs/ directory found at [#trimmedDocsDir#]" )
+		}
+
+		directoryCreate( versionDir, true, true )
+
+		var topLevelEntries = directoryList( trimmedDocsDir, false, "name" )
+			.filter( entryName => !listFindNoCase( variables.excludedTopLevelNames, entryName ) )
+
+		var copiedCount = 0
+		for ( var entryName in topLevelEntries ) {
+			var sourcePath = trimmedDocsDir & "/" & entryName
+			var destPath = versionDir & "/" & entryName
+			if ( directoryExists( sourcePath ) ) {
+				directoryCopy( sourcePath, destPath, true )
+				copiedCount += directoryList( destPath, true, "path" ).filter( path => !directoryExists( path ) ).len()
+			} else {
+				fileCopy( sourcePath, destPath )
+				copiedCount++
+			}
+		}
+
+		return { versionDir : versionDir, copiedCount : copiedCount }
+	}
+
+}

@@ -1,0 +1,89 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.PageScaffolder", function() {
+
+			beforeEach( function() {
+				variables.scaffolder = new "models.build.PageScaffolder@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newDocsDir() {
+				var dir = createTempDirectory( prefix = "bxdocs-pagescaffolder-" );
+				tempDirs.append( dir );
+				return dir & "/docs";
+			}
+
+			it( "throws BxDocs.MissingPagePath when path is blank", function() {
+				expect( function() {
+					scaffolder.scaffold( docsDir : newDocsDir(), path : "  " );
+				} ).toThrow( "BxDocs.MissingPagePath" );
+			} );
+
+			it( "throws BxDocs.InvalidPagePath when path doesn't end in .md", function() {
+				expect( function() {
+					scaffolder.scaffold( docsDir : newDocsDir(), path : "guides/foo.txt" );
+				} ).toThrow( "BxDocs.InvalidPagePath" );
+			} );
+
+			it( "creates a nested page, creating parent folders as needed", function() {
+				var docsDir = newDocsDir();
+
+				var result = scaffolder.scaffold( docsDir : docsDir, path : "guides/my-new-guide.md", title : "My New Guide" );
+
+				expect( result.path ).toBe( docsDir & "/guides/my-new-guide.md" );
+				expect( fileExists( result.path ) ).toBeTrue();
+				expect( fileRead( result.path ) ).toInclude( "title: My New Guide" );
+			} );
+
+			it( "writes no frontmatter block at all when nothing is given, falling back to a derived heading", function() {
+				var docsDir = newDocsDir();
+
+				var result = scaffolder.scaffold( docsDir : docsDir, path : "getting-started-fast.md" );
+
+				var content = fileRead( result.path );
+				expect( content ).notToInclude( "---" );
+				expect( content ).toInclude( "Getting Started Fast" );
+			} );
+
+			it( "writes icon/description/tags/order only when given", function() {
+				var docsDir = newDocsDir();
+
+				var result = scaffolder.scaffold(
+					docsDir     : docsDir,
+					path        : "full.md",
+					title       : "Full Page",
+					description : "A full example",
+					icon        : "rocket",
+					tags        : "guides, new",
+					order       : "5"
+				);
+
+				var content = fileRead( result.path );
+				expect( content ).toInclude( "description: A full example" );
+				expect( content ).toInclude( "icon: rocket" );
+				expect( content ).toInclude( "order: 5" );
+				expect( content ).toInclude( "tags: [guides, new]" );
+			} );
+
+			it( "throws BxDocs.PageAlreadyExists rather than overwriting", function() {
+				var docsDir = newDocsDir();
+				scaffolder.scaffold( docsDir : docsDir, path : "dup.md" );
+
+				expect( function() {
+					scaffolder.scaffold( docsDir : docsDir, path : "dup.md" );
+				} ).toThrow( "BxDocs.PageAlreadyExists" );
+			} );
+
+		} );
+	}
+
+}

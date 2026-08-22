@@ -1,0 +1,93 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.Doctor", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.Doctor@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot( string bxdocsJson = '{"name":"Test Site","theme":{"name":"bootstrap"}}' ) {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-doctor-" );
+				tempDirs.append( dir );
+				fileWrite( dir & "/bxdocs.json", arguments.bxdocsJson );
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite( dir & "/docs/index.md", "Home" );
+				return dir;
+			}
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "exits 0 with a clean project", function() {
+				var projectRoot = newProjectRoot();
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toInclude( "docs/" );
+				expect( result.message ).toInclude( "Config" );
+				expect( result.message ).toInclude( "Modules" );
+			} );
+
+			it( "exits 1 and reports missing docs/ when there's no docs directory", function() {
+				var projectRoot = createTempDirectory( prefix = "bxdocs-cli-doctor-" );
+				tempDirs.append( projectRoot );
+				fileWrite( projectRoot & "/bxdocs.json", '{"name":"Test Site","theme":{"name":"bootstrap"}}' );
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.exitCode ).toBe( 1 );
+				expect( result.message ).toInclude( "no docs/ directory" );
+			} );
+
+			it( "exits 1 and reports an invalid bxdocs.json", function() {
+				var projectRoot = createTempDirectory( prefix = "bxdocs-cli-doctor-" );
+				tempDirs.append( projectRoot );
+				fileWrite( projectRoot & "/bxdocs.json", "{not valid json" );
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.exitCode ).toBe( 1 );
+				expect( result.message ).toInclude( "not valid JSON" );
+			} );
+
+			it( "exits 1 when a project theme/ override is missing a required file", function() {
+				var projectRoot = newProjectRoot();
+				directoryCreate( projectRoot & "/theme", true, true );
+				fileWrite( projectRoot & "/theme/layout.bxm", "<html></html>" );
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.exitCode ).toBe( 1 );
+				expect( result.message ).toInclude( "missing required page.bxm" );
+			} );
+
+			it( "exits 0 when a project theme/ override has both required files", function() {
+				var projectRoot = newProjectRoot();
+				directoryCreate( projectRoot & "/theme", true, true );
+				fileWrite( projectRoot & "/theme/layout.bxm", "<html></html>" );
+				fileWrite( projectRoot & "/theme/page.bxm", "<article></article>" );
+
+				var result = verb.run( { projectRoot : projectRoot } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toInclude( "layout.bxm + page.bxm present" );
+			} );
+
+		} );
+	}
+
+}

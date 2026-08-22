@@ -1,0 +1,101 @@
+/**
+ * `doctor` CLI verb - a one-shot environment/config health check: is
+ * `docs/` present, does `bxdocs.json`/`.yaml` actually parse and validate,
+ * are the required BoxLang modules (bx-markdown/bx-esapi/bx-yaml/bx-image)
+ * installed/activated, and (if present) does a project-level `theme/`
+ * override satisfy the two-required-file `ThemeProvider` contract.
+ * Nothing here mutates a project - purely diagnostic, the same "run this
+ * before filing a bug report" idea as `flutter doctor`/`brew doctor`.
+ */
+class {
+
+	/**
+	 * Every required BoxLang module, keyed by its own registered mapping
+	 * name (confirmed against the real installed modules - each module
+	 * declares its own `this.mapping` in its own ModuleConfig.bx, which
+	 * isn't necessarily its box.json/ForgeBox slug; see MarkdownRenderer.bx's
+	 * own docblock for the same caveat) to the human-readable slug used in
+	 * `box install`/`install-bx-module`.
+	 */
+	variables.requiredModules = {
+		"bxMarkdown" : "bx-markdown",
+		"esapi"      : "bx-esapi",
+		"yaml"       : "bx-yaml",
+		"image"      : "bx-image"
+	}
+
+	/**
+	 * @options { projectRoot (required, absolute path) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxDocs.MissingProjectRoot", message = "`doctor` requires a project root" )
+		}
+
+		var root = projectRoot.reReplace( "[\/]+$", "" )
+		var checks = []
+		var failed = false
+
+		checks.append( { label : "JVM", ok : true, detail : createObject( "java", "java.lang.System" ).getProperty( "java.version" ) } )
+
+		var docsDir = root & "/docs"
+		if ( directoryExists( docsDir ) ) {
+			checks.append( { label : "docs/", ok : true, detail : "found at " & docsDir } )
+		} else {
+			checks.append( { label : "docs/", ok : false, detail : "no docs/ directory at " & docsDir } )
+			failed = true
+		}
+
+		try {
+			var config = new "models.config.ConfigLoader@bxdocs"().load( root )
+			checks.append( { label : "Config", ok : true, detail : "valid (" & ( config.name ?: "" ) & ", theme: " & config.theme.name & ")" } )
+		} catch ( any e ) {
+			checks.append( { label : "Config", ok : false, detail : e.message } )
+			failed = true
+			config = {}
+		}
+
+		var moduleService = getBoxRuntime().getModuleService() // getBoxRuntime() is itself a real BoxLang BIF returning this exact singleton
+		var missingModules = []
+		for ( var mappingName in variables.requiredModules ) {
+			if ( !moduleService.hasModule( mappingName ) ) {
+				missingModules.append( variables.requiredModules[ mappingName ] )
+			}
+		}
+		if ( missingModules.len() ) {
+			checks.append( { label : "Modules", ok : false, detail : "missing: " & missingModules.toList( ", " ) & " - run `install-bx-module " & missingModules.toList( " " ) & "`" } )
+			failed = true
+		} else {
+			checks.append( { label : "Modules", ok : true, detail : "bx-markdown, bx-esapi, bx-yaml, bx-image all present" } )
+		}
+
+		var themeDir = root & "/theme"
+		if ( directoryExists( themeDir ) ) {
+			var missingThemeFiles = [ "layout.bxm", "page.bxm" ].filter( name => !fileExists( themeDir & "/" & name ) )
+			if ( missingThemeFiles.len() ) {
+				checks.append( { label : "theme/ override", ok : false, detail : "missing required " & missingThemeFiles.toList( ", " ) } )
+				failed = true
+			} else {
+				checks.append( { label : "theme/ override", ok : true, detail : "layout.bxm + page.bxm present" } )
+			}
+		}
+
+		return {
+			exitCode : failed ? 1 : 0,
+			message  : formatReport( checks )
+		}
+	}
+
+	/**
+	 * @checks Array of { label, ok, detail }
+	 */
+	private string function formatReport( required array checks ) {
+		var lines = []
+		for ( var check in arguments.checks ) {
+			lines.append( ( check.ok ? "✅" : "❌" ) & " " & check.label.lJustify( 16 ) & " " & check.detail )
+		}
+		return lines.toList( char( 10 ) )
+	}
+
+}

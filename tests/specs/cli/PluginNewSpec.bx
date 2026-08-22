@@ -1,0 +1,59 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.PluginNew", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.PluginNew@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-pluginnew-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( { name : "My Plugin" } );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "throws BxDocs.MissingPluginName when name is blank", function() {
+				expect( function() {
+					verb.run( { projectRoot : newProjectRoot() } );
+				} ).toThrow( "BxDocs.MissingPluginName" );
+			} );
+
+			it( "defaults the destination to <projectRoot>/<name> and exits 0", function() {
+				var projectRoot = newProjectRoot();
+
+				var result = verb.run( { projectRoot : projectRoot, name : "My Plugin" } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( fileExists( projectRoot & "/My Plugin/box.json" ) ).toBeTrue();
+			} );
+
+			it( "honors an explicit --dest override", function() {
+				var projectRoot = newProjectRoot();
+				var customDest = projectRoot & "/somewhere-else";
+
+				var result = verb.run( { projectRoot : projectRoot, name : "My Plugin", dest : customDest } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( fileExists( customDest & "/box.json" ) ).toBeTrue();
+			} );
+
+		} );
+	}
+
+}

@@ -175,7 +175,20 @@ class {
 			"gh-deploy"    : "models.cli.GhDeploy",
 			"migrate"      : "models.cli.Migrate",
 			"check"        : "models.cli.Check",
-			"stats"        : "models.cli.Stats"
+			"stats"        : "models.cli.Stats",
+			"doctor"       : "models.cli.Doctor",
+			"post:new"     : "models.cli.PostNew",
+			"version:new"  : "models.cli.VersionNew",
+			"i18n:status"  : "models.cli.I18nStatus",
+			"i18n:new"     : "models.cli.I18nNew",
+			"page:new"     : "models.cli.PageNew",
+			"plugin:new"   : "models.cli.PluginNew",
+			"theme:new"    : "models.cli.ThemeNew",
+			"page:rename"  : "models.cli.PageRename",
+			"blog:drafts"  : "models.cli.BlogDrafts",
+			"blog:find"    : "models.cli.BlogFind",
+			"search:query" : "models.cli.SearchQuery",
+			"lint"         : "models.cli.Lint"
 		}
 
 		var verbDescriptions = {
@@ -187,7 +200,20 @@ class {
 			"gh-deploy"    : "Build and force-push site/ to a gh-pages branch ([--branch], [--remote], [--message])",
 			"migrate"      : "Convert a GitBook export or mkdocs project into a bx-docs project (--source, required; [--from=gitbook|mkdocs])",
 			"check"        : "CI-grade content check on a built site: broken links/images, missing alt text, orphaned pages",
-			"stats"        : "Report page/word counts, versions/locales, blog, tags, search index, and site size for a built site"
+			"stats"        : "Report page/word counts, versions/locales, blog, tags, search index, and site size for a built site",
+			"doctor"       : "Check the project/environment for common problems (modules, config, theme override)",
+			"post:new"     : "Scaffold a new blog post (--title, required; [--slug], [--date], [--authors], [--categories], [--tags], [--draft])",
+			"version:new"  : "Snapshot docs/ into a new docs/versions/<name>/ (--name, required)",
+			"i18n:status"  : "Report per-locale translation coverage against the default tree",
+			"i18n:new"     : "Scaffold a new docs/i18n/<code>/ locale (--code, required)",
+			"page:new"     : "Scaffold a single docs page at an arbitrary path (--path, required; [--title], [--description], [--icon], [--tags], [--order])",
+			"plugin:new"   : "Scaffold a plugin module skeleton (--name, required; [--dest])",
+			"theme:new"    : "Eject a built-in theme into project theme/ for customizing (--theme, required)",
+			"page:rename"  : "Move a docs page and rewrite every relative link that pointed at it (--from, required; --to, required)",
+			"blog:drafts"  : "List every blog post whose frontmatter sets draft: true",
+			"blog:find"    : "Filter blog posts ([--author], [--category], [--tag], [--since], [--until], [--drafts])",
+			"search:query" : "Query a built search-index.json and rank results (--query, required; [--limit])",
+			"lint"         : "Pre-build content checks: heading level skips, blog posts missing a valid date"
 		}
 
 		var firstToken = arrayLen( arguments.args ) >= 1 ? arguments.args[ 1 ] : ""

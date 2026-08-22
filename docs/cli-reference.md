@@ -203,3 +203,202 @@ bxDocs stats
 
 Always exits `0` - purely informational, nothing here is a pass/fail gate
 (that's `check`'s job).
+
+## `doctor`
+
+A one-shot environment/config health check - the "run this before filing a
+bug report" verb. Checks the JVM version, that `docs/` exists, that
+`bxdocs.json`/`.yaml` actually parses and validates, that the required
+BoxLang modules (`bx-markdown`, `bx-esapi`, `bx-yaml`, `bx-image`) are
+installed and activated, and - if a project-level `theme/` override
+exists - that it satisfies the two-required-file `layout.bxm`/`page.bxm`
+contract.
+
+```bash frame="terminal" title="Terminal"
+bxDocs doctor
+```
+
+Exits `1` if any check fails, `0` otherwise. Nothing here mutates a
+project - purely diagnostic.
+
+## `post:new`
+
+Scaffold a new blog post at `docs/blog/posts/<slug>.md`.
+
+```bash title="Usage"
+bxDocs post:new --title="My New Post" [--slug=...] [--date=...] [--authors=...] [--categories=...] [--tags=...] [--draft]
+```
+
+- `--title` (required) - also becomes the post's frontmatter `title`
+- `--slug` - defaults to a slugified `--title`
+- `--date` - defaults to today (`yyyy-MM-dd`)
+- `--authors`, `--categories`, `--tags` - comma-separated
+- `--draft` - defaults to `true` (pass `--!draft` to publish immediately)
+
+See [Blog](guides/blog.md) for the full frontmatter reference.
+
+## `version:new`
+
+Snapshot the current `docs/` tree into `docs/versions/<name>/`, excluding
+`assets/`, `versions/`, `i18n/`, and `blog/` (each is its own separately
+loaded tree, not part of the snapshot).
+
+```bash title="Usage"
+bxDocs version:new --name=1.0
+```
+
+- `--name` (required) - the version folder/label, e.g. `1.0`
+
+See [Configuration's "Versioning" section](configuration.md#versioning).
+
+## `i18n:status`
+
+Reports per-locale translation coverage - for every configured locale,
+how many of the default tree's pages exist (at the same relative path)
+under `docs/i18n/<code>/`, and which ones are still missing.
+
+```bash frame="terminal" title="Terminal"
+bxDocs i18n:status
+```
+
+Always exits `0` - purely informational.
+
+## `i18n:new`
+
+Scaffold a new `docs/i18n/<code>/` locale folder, seeding an `index.md`
+copied from the default locale's own `index.md` when one exists.
+
+```bash title="Usage"
+bxDocs i18n:new --code=es
+```
+
+- `--code` (required) - the locale code, e.g. `es`, `fr`, `pt-BR`
+
+See [Internationalization](guides/i18n.md) for wiring the new locale into
+`bxdocs.json`'s `i18n.locales`.
+
+## `page:new`
+
+Scaffold a single docs page at an arbitrary path under `docs/`, with the
+requested frontmatter already filled in.
+
+```bash title="Usage"
+bxDocs page:new --path=guides/setup.md [--title=...] [--description=...] [--icon=...] [--tags=...] [--order=...]
+```
+
+- `--path` (required) - `docs/`-relative, must end in `.md`
+- `--title`, `--description`, `--icon`, `--order` - written into frontmatter
+- `--tags` - comma-separated
+
+## `plugin:new`
+
+Scaffold a plugin module skeleton (`box.json`, `ModuleConfig.bx`, a
+`models/BxDocsPlugin.bx` with every hook stubbed out) mirroring
+`examples/hello-plugin/`.
+
+```bash title="Usage"
+bxDocs plugin:new --name=my-analytics-plugin [--dest=...]
+```
+
+- `--name` (required) - the plugin's module name/slug
+- `--dest` - defaults to `<projectRoot>/<name>`
+
+See [Plugins](guides/plugins.md) for the hook reference and how to wire the
+finished plugin into `bxdocs.json`'s `plugins` array.
+
+## `theme:new`
+
+Eject one of the built-in themes (`bootstrap`, `material`, `tailwind`) into
+the project's own `theme/` folder for customizing, matching mkdocs'
+`--theme` eject workflow.
+
+```bash title="Usage"
+bxDocs theme:new --theme=material
+```
+
+- `--theme` (required) - `bootstrap`, `material`, or `tailwind`
+
+Fails rather than overwriting an existing `theme/`. See
+[Themes](guides/themes.md) for the override contract (`layout.bxm` +
+`page.bxm`).
+
+## `page:rename`
+
+Move a docs page from one path to another, rewriting every relative
+Markdown link across `docs/**` that pointed at the old path - the same
+file-relative link-rot problem the built HTML side already solves
+(`check`), applied to raw Markdown source at rename time instead.
+
+```bash title="Usage"
+bxDocs page:rename --from=guides/old-name.md --to=guides/new-name.md
+```
+
+- `--from` (required) - the page's current `docs/`-relative path
+- `--to` (required) - its new `docs/`-relative path
+
+Only bare `[text](relative/path.md)`-style links are rewritten - absolute
+URLs, `mailto:`, and pure in-page anchors are left alone. `docs/assets/**`
+is never scanned.
+
+## `blog:drafts`
+
+Lists every blog post whose frontmatter sets `draft: true` - `build`
+always skips drafts, so this is the only place their existence is
+surfaced.
+
+```bash frame="terminal" title="Terminal"
+bxDocs blog:drafts
+```
+
+Always exits `0`.
+
+## `blog:find`
+
+Filters blog posts by author/category/tag/date range, without running a
+full `build`.
+
+```bash title="Usage"
+bxDocs blog:find [--author=...] [--category=...] [--tag=...] [--since=...] [--until=...] [--drafts]
+```
+
+- `--author`, `--category`, `--tag` - case-insensitive exact match against any of the post's own values
+- `--since`, `--until` - a date; only posts on/after `--since` and/or on/before `--until` match
+- `--drafts` - include draft posts too (excluded by default)
+
+Every filter is optional and independent - passing none lists every
+published post.
+
+## `search:query`
+
+Runs a keyword query against an already-built `site/search-index.json` -
+run `build` or `search-index` first. Ranks results using the same
+relative field weighting the client-side search widget uses (title,
+then tags, then headings, then body), so you can sanity-check what a
+real visitor's search would surface without opening a browser.
+
+```bash title="Usage"
+bxDocs search:query --query="getting started" [--limit=10]
+```
+
+- `--query` (required) - space-separated search terms
+- `--limit` - maximum results to return, defaults to `10`
+
+## `lint`
+
+A pre-build content quality pass over raw `docs/` Markdown source,
+distinct from `check` (which only inspects an already-built `site/`).
+Checks for:
+
+- **Heading level skips** - a page body jumping straight from `##` to
+  `####` with no `###` in between (confusing structure, and bad for
+  accessibility). Lines inside a fenced code block are never mistaken for
+  headings.
+- **Blog post date issues** - a `docs/blog/posts/**` post with a
+  missing or invalid frontmatter `date` (`build` itself throws on this the
+  moment it loads posts - `lint` surfaces it as a finding instead).
+
+```bash frame="terminal" title="Terminal"
+bxDocs lint
+```
+
+Exits `1` when either check finds anything, `0` otherwise.

@@ -69,6 +69,19 @@ boxlang module:bxdocs <verb> [options]
 | `clean` | Remove `site/` and any build cache |
 | `migrate` | Convert a GitBook export (`SUMMARY.md` + `.md` files) into `docs/` + `nav.json` |
 | `stats` | Read-only summary report on a built `site/`: page/word counts, versions/locales, blog, tags, search index, site size |
+| `doctor` | Environment/config health check: JVM, `docs/`, config validity, required modules, theme override |
+| `post:new` | Scaffold a new blog post at `docs/blog/posts/<slug>.md` |
+| `version:new` | Snapshot `docs/` into a new `docs/versions/<name>/` |
+| `i18n:status` | Per-locale translation coverage report against the default tree |
+| `i18n:new` | Scaffold a new `docs/i18n/<code>/` locale |
+| `page:new` | Scaffold a single docs page at an arbitrary path |
+| `plugin:new` | Scaffold a plugin module skeleton |
+| `theme:new` | Eject a built-in theme into project `theme/` for customizing |
+| `page:rename` | Move a docs page and rewrite every relative link that pointed at it |
+| `blog:drafts` | List every blog post whose frontmatter sets `draft: true` |
+| `blog:find` | Filter blog posts by author/category/tag/date range |
+| `search:query` | Query a built `search-index.json` and rank results |
+| `lint` | Pre-build content checks: heading level skips, blog posts missing a valid date |
 
 Every verb accepts `--projectRoot=<path>` (or a bare positional path) to target a project other than the current directory. Run `bxDocs --help` for full usage.
 

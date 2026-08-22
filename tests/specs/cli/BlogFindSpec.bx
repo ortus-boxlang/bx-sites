@@ -1,0 +1,124 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.BlogFind", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.BlogFind@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-blogfind-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			private void function seedPosts( required string projectRoot ) {
+				var postsDir = arguments.projectRoot & "/docs/blog/posts";
+				directoryCreate( postsDir, true, true );
+				fileWrite( postsDir & "/a.md", "---
+title: Post A
+date: 2026-01-01
+authors: lmajano
+categories: [engineering]
+tags: [boxlang, cli]
+---
+Body" );
+				fileWrite( postsDir & "/b.md", "---
+title: Post B
+date: 2026-02-01
+authors: [someone-else]
+categories: [marketing]
+tags: [launch]
+---
+Body" );
+				fileWrite( postsDir & "/c-draft.md", "---
+title: Draft C
+date: 2026-03-01
+authors: lmajano
+draft: true
+---
+Body" );
+			}
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "throws BxDocs.InvalidDate when since/until isn't a valid date", function() {
+				var projectRoot = newProjectRoot();
+				expect( function() {
+					verb.run( { projectRoot : projectRoot, since : "not-a-date" } );
+				} ).toThrow( "BxDocs.InvalidDate" );
+			} );
+
+			it( "reports no matches when nothing satisfies the filter", function() {
+				var projectRoot = newProjectRoot();
+				seedPosts( projectRoot );
+
+				var result = verb.run( { projectRoot : projectRoot, category : "nonexistent" } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toBe( "No matching posts" );
+			} );
+
+			it( "filters by author, case-insensitively", function() {
+				var projectRoot = newProjectRoot();
+				seedPosts( projectRoot );
+
+				var result = verb.run( { projectRoot : projectRoot, author : "LMAJANO" } );
+
+				expect( result.message ).toInclude( "1 matching post(s)" );
+				expect( result.message ).toInclude( "Post A" );
+			} );
+
+			it( "filters by tag", function() {
+				var projectRoot = newProjectRoot();
+				seedPosts( projectRoot );
+
+				var result = verb.run( { projectRoot : projectRoot, tag : "cli" } );
+
+				expect( result.message ).toInclude( "Post A" );
+				expect( result.message ).notToInclude( "Post B" );
+			} );
+
+			it( "filters by since/until date range", function() {
+				var projectRoot = newProjectRoot();
+				seedPosts( projectRoot );
+
+				var sinceResult = verb.run( { projectRoot : projectRoot, since : "2026-01-15" } );
+				expect( sinceResult.message ).toInclude( "Post B" );
+				expect( sinceResult.message ).notToInclude( "Post A" );
+
+				var untilResult = verb.run( { projectRoot : projectRoot, until : "2026-01-15" } );
+				expect( untilResult.message ).toInclude( "Post A" );
+				expect( untilResult.message ).notToInclude( "Post B" );
+			} );
+
+			it( "excludes drafts unless --drafts is passed", function() {
+				var projectRoot = newProjectRoot();
+				seedPosts( projectRoot );
+
+				var withoutDrafts = verb.run( { projectRoot : projectRoot, author : "lmajano" } );
+				expect( withoutDrafts.message ).notToInclude( "Draft C" );
+
+				var withDrafts = verb.run( { projectRoot : projectRoot, author : "lmajano", drafts : true } );
+				expect( withDrafts.message ).toInclude( "Draft C" );
+				expect( withDrafts.message ).toInclude( "2 matching post(s)" );
+			} );
+
+		} );
+	}
+
+}

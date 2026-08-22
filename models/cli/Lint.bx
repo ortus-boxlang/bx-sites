@@ -1,0 +1,57 @@
+/**
+ * `lint` CLI verb - a pre-build content quality pass over raw `docs/`
+ * Markdown source (ContentLinter.bx), distinct from `check`, which only
+ * inspects an already-built `site/` (LinkChecker.bx). Exits non-zero when
+ * either check finds anything, so it's CI-gate-able the same way `check`
+ * is.
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxDocs.MissingProjectRoot", message = "`lint` requires a project root" )
+		}
+
+		var docsDir = projectRoot.reReplace( "[\/]+$", "" ) & "/docs"
+		var result = new "models.build.ContentLinter@bxdocs"().lint( docsDir )
+
+		var failed = result.headingSkips.len() || result.blogDateIssues.len()
+
+		return {
+			exitCode : failed ? 1 : 0,
+			message  : formatReport( result )
+		}
+	}
+
+	/**
+	 * @result ContentLinter.lint()'s own return value
+	 */
+	private string function formatReport( required struct result ) {
+		var lines = []
+
+		if ( !arguments.result.headingSkips.len() && !arguments.result.blogDateIssues.len() ) {
+			lines.append( "No lint issues found." )
+		}
+
+		if ( arguments.result.headingSkips.len() ) {
+			lines.append( "#arguments.result.headingSkips.len()# heading level skip(s):" )
+			for ( var issue in arguments.result.headingSkips ) {
+				lines.append( "  - #issue.page#: h#issue.from# -> h#issue.to# (""#issue.line#"")" )
+			}
+		}
+
+		if ( arguments.result.blogDateIssues.len() ) {
+			lines.append( "#arguments.result.blogDateIssues.len()# blog post date issue(s):" )
+			for ( var issue in arguments.result.blogDateIssues ) {
+				lines.append( "  - #issue.page#: #issue.issue#" )
+			}
+		}
+
+		return lines.toList( char( 10 ) )
+	}
+
+}

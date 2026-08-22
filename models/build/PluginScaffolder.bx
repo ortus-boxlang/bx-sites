@@ -1,0 +1,156 @@
+/**
+ * Backs the `plugin:new` CLI verb - scaffolds a standalone BoxLang module
+ * skeleton implementing the bx-docs plugin contract (module spec's
+ * general-purpose plugin system, docs/guides/plugins.md): a `box.json`, a
+ * minimal `ModuleConfig.bx`, and a `models/BxDocsPlugin.bx` with all five
+ * optional hooks stubbed out as comments - mirrors `examples/hello-plugin/`,
+ * but as a real starting point rather than a worked demo.
+ *
+ * A plugin is a separate BoxLang module, not part of a docs project's own
+ * `docs/` tree, so this scaffolds a sibling directory (defaulting to
+ * `<projectRoot>/<name>`) rather than anything under `docs/`. It still
+ * needs `box install`-ing (or dropping into `boxlang_modules/`) and adding
+ * to `bxdocs.json`'s own `plugins` array before bx-docs picks it up - see
+ * docs/guides/plugins.md.
+ */
+class {
+
+	/**
+	 * @destDir Absolute path the plugin module should be scaffolded into (does not need to exist yet)
+	 * @name Human-readable plugin name, e.g. "My Analytics Plugin"
+	 *
+	 * @return { destDir, moduleName }
+	 */
+	struct function scaffold( required string destDir, required string name ) {
+		var trimmedName = trim( arguments.name )
+		if ( !len( trimmedName ) ) {
+			throw( type = "BxDocs.MissingPluginName", message = "`plugin:new` requires --name=<plugin name>" )
+		}
+
+		var trimmedDestDir = arguments.destDir.reReplace( "[\/]+$", "" )
+		if ( directoryExists( trimmedDestDir ) && directoryList( trimmedDestDir, false, "name" ).len() ) {
+			throw( type = "BxDocs.PluginDestExists", message = "[#trimmedDestDir#] already exists and isn't empty" )
+		}
+
+		var pluginSlug = computeSlug( trimmedName )
+		var moduleName = camelCase( pluginSlug )
+
+		directoryCreate( trimmedDestDir & "/models", true, true )
+
+		fileWrite( trimmedDestDir & "/box.json", renderBoxJson( trimmedName, pluginSlug, moduleName ) )
+		fileWrite( trimmedDestDir & "/ModuleConfig.bx", renderModuleConfig( trimmedName ) )
+		fileWrite( trimmedDestDir & "/models/BxDocsPlugin.bx", renderPluginClass( trimmedName ) )
+
+		return { destDir : trimmedDestDir, moduleName : moduleName }
+	}
+
+	/**
+	 * @name The plugin's own display name
+	 * @slug The kebab-case ForgeBox-style slug
+	 * @moduleName The camelCase BoxLang module registry name
+	 */
+	private string function renderBoxJson( required string name, required string slug, required string moduleName ) {
+		var lines = [
+			"{",
+			'    "name": "' & jsEscape( arguments.name ) & '",',
+			'    "version": "1.0.0",',
+			'    "slug": "' & arguments.slug & '",',
+			'    "shortDescription": "A bx-docs plugin - see docs/guides/plugins.md in your bx-docs project",',
+			'    "type": "boxlang-modules",',
+			'    "keywords": [ "boxlang", "bxdocs-plugin" ],',
+			'    "boxlang": {',
+			'        "minimumVersion": "1.0.0",',
+			'        "moduleName": "' & arguments.moduleName & '"',
+			"    },",
+			'    "private": false',
+			"}",
+			""
+		]
+		return lines.toList( char( 10 ) )
+	}
+
+	/**
+	 * @name The plugin's own display name, used as ModuleConfig.bx's this.author-adjacent doc comment only
+	 */
+	private string function renderModuleConfig( required string name ) {
+		var lines = [
+			"/**",
+			" * " & arguments.name & " - a bx-docs plugin.",
+			" */",
+			"class {",
+			"",
+			'	this.version = "1.0.0";',
+			"",
+			"	function configure() {",
+			"		settings = {};",
+			"	}",
+			"",
+			"	function onLoad() {",
+			"	}",
+			"",
+			"}",
+			""
+		]
+		return lines.toList( char( 10 ) )
+	}
+
+	/**
+	 * @name The plugin's own display name, used only in the file's own doc comment
+	 */
+	private string function renderPluginClass( required string name ) {
+		var lines = [
+			"/**",
+			" * " & arguments.name & "'s bx-docs plugin hooks - see docs/guides/plugins.md",
+			" * in your bx-docs project for the full contract. Every hook below is",
+			" * optional - uncomment and implement only the ones you need; an",
+			" * omitted hook is simply never called.",
+			" */",
+			"class {",
+			"",
+			"	/*",
+			"	string function onConfig( required struct config ) {",
+			"		return arguments.config",
+			"	}",
+			"",
+			"	string function onPageMarkdown( required string markdown, required struct page, required struct config ) {",
+			"		return arguments.markdown",
+			"	}",
+			"",
+			"	string function onPageHtml( required string html, required struct page, required struct config ) {",
+			"		return arguments.html",
+			"	}",
+			"",
+			"	array function onNav( required array nav, required struct config ) {",
+			"		return arguments.nav",
+			"	}",
+			"",
+			"	void function onBuildComplete( required string siteDir, required struct config ) {",
+			"	}",
+			"	*/",
+			"",
+			"}",
+			""
+		]
+		return lines.toList( char( 10 ) )
+	}
+
+	/**
+	 * Deliberately not named `slugify` - that's a real BoxLang built-in
+	 * BIF (doesn't trim trailing hyphens the way this needs to), and an
+	 * unqualified same-named call inside this class would silently
+	 * resolve to it instead of this method.
+	 *
+	 * @text Raw text to slugify
+	 */
+	private string function computeSlug( required string text ) {
+		return lCase( trim( arguments.text ) ).reReplace( "[^a-z0-9]+", "-", "all" ).reReplace( "(^-|-$)", "", "all" )
+	}
+
+	/**
+	 * @text Text to safely embed inside a double-quoted JSON string value
+	 */
+	private string function jsEscape( required string text ) {
+		return arguments.text.replace( '"', '\"', "all" )
+	}
+
+}

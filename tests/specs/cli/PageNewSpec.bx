@@ -1,0 +1,50 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.PageNew", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.PageNew@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-pagenew-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				return dir;
+			}
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( { path : "foo.md" } );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "throws BxDocs.MissingPagePath when path is blank", function() {
+				expect( function() {
+					verb.run( { projectRoot : newProjectRoot() } );
+				} ).toThrow( "BxDocs.MissingPagePath" );
+			} );
+
+			it( "exits 0 and creates the page", function() {
+				var projectRoot = newProjectRoot();
+
+				var result = verb.run( { projectRoot : projectRoot, path : "guides/foo.md", title : "Foo" } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( fileExists( projectRoot & "/docs/guides/foo.md" ) ).toBeTrue();
+			} );
+
+		} );
+	}
+
+}

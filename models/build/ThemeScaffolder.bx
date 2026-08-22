@@ -1,0 +1,52 @@
+/**
+ * Backs the `theme:new` CLI verb - automates the manual copy-paste
+ * docs/guides/themes.md's own "Overriding a theme" section documents:
+ * copies one of this module's built-in themes
+ * (`resources/themes/<name>/`) into a project's own `theme/` folder, so
+ * BX Docs picks it up automatically (a project-level `theme/` always
+ * takes precedence over the built-in theme named in `theme.name` - see
+ * ThemeRenderer.bx) with nothing left to edit by hand except the copied
+ * files themselves.
+ */
+class {
+
+	variables.builtInThemes = [ "bootstrap", "material", "tailwind" ]
+
+	/**
+	 * @projectRoot Absolute path to the project root
+	 * @theme Which built-in theme to copy - "bootstrap", "material", or "tailwind"
+	 *
+	 * @return { themeDir }
+	 */
+	struct function scaffold( required string projectRoot, required string theme ) {
+		var trimmedTheme = lCase( trim( arguments.theme ) )
+		if ( !variables.builtInThemes.contains( trimmedTheme ) ) {
+			throw(
+				type    = "BxDocs.UnknownTheme",
+				message = "Unknown theme [#trimmedTheme#] - must be one of [#variables.builtInThemes.toList( ', ' )#]"
+			)
+		}
+
+		var trimmedProjectRoot = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		var themeDir = trimmedProjectRoot & "/theme"
+
+		if ( directoryExists( themeDir ) ) {
+			throw( type = "BxDocs.ThemeOverrideExists", message = "[#themeDir#] already exists - remove it first, or edit it directly" )
+		}
+
+		directoryCopy( moduleThemesDir() & "/" & trimmedTheme, themeDir, true )
+
+		return { themeDir : themeDir }
+	}
+
+	/**
+	 * This module's own `resources/themes/` directory, reached the same
+	 * way BuildPipeline.bx's own moduleAssetsDir() locates
+	 * `resources/assets/` - relative to this file's own on-disk location,
+	 * not the project being scaffolded into.
+	 */
+	private string function moduleThemesDir() {
+		return getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]models[\/]build[\/]?$", "" ) & "/resources/themes"
+	}
+
+}

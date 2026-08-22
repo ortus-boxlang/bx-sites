@@ -1,0 +1,60 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.PluginScaffolder", function() {
+
+			beforeEach( function() {
+				variables.scaffolder = new "models.build.PluginScaffolder@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newDestDir() {
+				var dir = createTempDirectory( prefix = "bxdocs-pluginscaffolder-" );
+				tempDirs.append( dir );
+				return dir & "/my-plugin";
+			}
+
+			it( "throws BxDocs.MissingPluginName when name is blank", function() {
+				expect( function() {
+					scaffolder.scaffold( destDir : newDestDir(), name : "  " );
+				} ).toThrow( "BxDocs.MissingPluginName" );
+			} );
+
+			it( "scaffolds box.json, ModuleConfig.bx, and models/BxDocsPlugin.bx", function() {
+				var destDir = newDestDir();
+
+				var result = scaffolder.scaffold( destDir : destDir, name : "My Analytics Plugin" );
+
+				expect( result.destDir ).toBe( destDir );
+				expect( result.moduleName ).toBe( "myAnalyticsPlugin" );
+				expect( fileExists( destDir & "/box.json" ) ).toBeTrue();
+				expect( fileExists( destDir & "/ModuleConfig.bx" ) ).toBeTrue();
+				expect( fileExists( destDir & "/models/BxDocsPlugin.bx" ) ).toBeTrue();
+
+				var boxJson = fileRead( destDir & "/box.json" );
+				expect( boxJson ).toInclude( '"slug": "my-analytics-plugin"' );
+				expect( boxJson ).toInclude( '"moduleName": "myAnalyticsPlugin"' );
+				expect( jsonDeserialize( boxJson ).name ).toBe( "My Analytics Plugin" );
+			} );
+
+			it( "throws BxDocs.PluginDestExists when the destination already exists and isn't empty", function() {
+				var destDir = newDestDir();
+				scaffolder.scaffold( destDir : destDir, name : "My Plugin" );
+
+				expect( function() {
+					scaffolder.scaffold( destDir : destDir, name : "My Plugin" );
+				} ).toThrow( "BxDocs.PluginDestExists" );
+			} );
+
+		} );
+	}
+
+}

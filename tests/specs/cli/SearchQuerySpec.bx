@@ -1,0 +1,75 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.SearchQuery", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.SearchQuery@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-searchquery-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( { query : "x" } );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "throws BxDocs.MissingQuery when query is blank", function() {
+				expect( function() {
+					verb.run( { projectRoot : newProjectRoot() } );
+				} ).toThrow( "BxDocs.MissingQuery" );
+			} );
+
+			it( "throws BxDocs.SearchIndexNotBuilt when site/search-index.json doesn't exist", function() {
+				expect( function() {
+					verb.run( { projectRoot : newProjectRoot(), query : "x" } );
+				} ).toThrow( "BxDocs.SearchIndexNotBuilt" );
+			} );
+
+			it( "exits 0 and lists matching results with scores", function() {
+				var projectRoot = newProjectRoot();
+				var siteDir = projectRoot & "/site";
+				directoryCreate( siteDir, true, true );
+				fileWrite( siteDir & "/search-index.json", jsonSerialize( [
+					{ title : "CLI Reference", url : "cli/index.html", headings : [], body : "Every command.", tags : [ "cli" ] }
+				] ) );
+
+				var result = verb.run( { projectRoot : projectRoot, query : "cli" } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toInclude( "CLI Reference" );
+				expect( result.message ).toInclude( "score:" );
+			} );
+
+			it( "reports no results for a non-matching query", function() {
+				var projectRoot = newProjectRoot();
+				var siteDir = projectRoot & "/site";
+				directoryCreate( siteDir, true, true );
+				fileWrite( siteDir & "/search-index.json", jsonSerialize( [
+					{ title : "CLI Reference", url : "cli/index.html", headings : [], body : "Every command.", tags : [ "cli" ] }
+				] ) );
+
+				var result = verb.run( { projectRoot : projectRoot, query : "nonexistentterm" } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toBe( "No results for [nonexistentterm]" );
+			} );
+
+		} );
+	}
+
+}

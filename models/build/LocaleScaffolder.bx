@@ -1,0 +1,43 @@
+/**
+ * Backs the `i18n:new` CLI verb - scaffolds a new `docs/i18n/<code>/`
+ * locale folder (module spec's i18n-by-convention shape - see
+ * docs/guides/i18n.md), seeded with a copy of the default locale's own
+ * `index.md` so the new locale has at least one real page to translate
+ * and build immediately, rather than starting from an empty tree.
+ */
+class {
+
+	/**
+	 * @docsDir Absolute path to the project's docs/ directory
+	 * @code The new locale's code (folder name and built URL prefix) - letters/digits/hyphens only, e.g. "es", "pt-BR"
+	 *
+	 * @return { localeDir, seededIndex (boolean - whether docs/index.md existed and was copied in) }
+	 */
+	struct function scaffold( required string docsDir, required string code ) {
+		var trimmedCode = trim( arguments.code )
+		if ( !len( trimmedCode ) ) {
+			throw( type = "BxDocs.MissingLocaleCode", message = "`i18n:new` requires --code=<locale>" )
+		}
+		if ( !trimmedCode.reFind( "^[a-zA-Z0-9-]+$" ) ) {
+			throw( type = "BxDocs.InvalidLocaleCode", message = "Locale code [#trimmedCode#] must be letters/digits/hyphens only" )
+		}
+
+		var trimmedDocsDir = arguments.docsDir.reReplace( "[\/]+$", "" )
+		var localeDir = trimmedDocsDir & "/i18n/" & trimmedCode
+
+		if ( directoryExists( localeDir ) ) {
+			throw( type = "BxDocs.LocaleAlreadyExists", message = "docs/i18n/#trimmedCode# already exists" )
+		}
+
+		directoryCreate( localeDir, true, true )
+
+		var defaultIndexPath = trimmedDocsDir & "/index.md"
+		var seededIndex = fileExists( defaultIndexPath )
+		if ( seededIndex ) {
+			fileCopy( defaultIndexPath, localeDir & "/index.md" )
+		}
+
+		return { localeDir : localeDir, seededIndex : seededIndex }
+	}
+
+}

@@ -1,0 +1,52 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.VersionNew", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.VersionNew@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot() {
+				var dir = createTempDirectory( prefix = "bxdocs-cli-versionnew-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite( dir & "/docs/index.md", "Home" );
+				return dir;
+			}
+
+			it( "throws BxDocs.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( { name : "2.0" } );
+				} ).toThrow( "BxDocs.MissingProjectRoot" );
+			} );
+
+			it( "throws BxDocs.MissingVersionName when name is blank", function() {
+				expect( function() {
+					verb.run( { projectRoot : newProjectRoot() } );
+				} ).toThrow( "BxDocs.MissingVersionName" );
+			} );
+
+			it( "exits 0 and creates docs/versions/<name>/", function() {
+				var projectRoot = newProjectRoot();
+
+				var result = verb.run( { projectRoot : projectRoot, name : "2.0" } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toInclude( "docs/versions/2.0" );
+				expect( fileExists( projectRoot & "/docs/versions/2.0/index.md" ) ).toBeTrue();
+			} );
+
+		} );
+	}
+
+}

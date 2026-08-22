@@ -1,0 +1,42 @@
+/**
+ * `search:query` CLI verb - thin dispatcher over SearchQueryRunner.run().
+ * Sanity-checks what a real visitor's search would surface, straight from
+ * the command line, against an already-built `site/search-index.json`.
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path), query (required), limit (optional, default 10) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxDocs.MissingProjectRoot", message = "`search:query` requires a project root" )
+		}
+
+		var query = trim( arguments.options.query ?: "" )
+		if ( !len( query ) ) {
+			throw( type = "BxDocs.MissingQuery", message = "`search:query` requires --query=<terms>" )
+		}
+
+		var limit = val( arguments.options.limit ?: 10 )
+		if ( limit <= 0 ) {
+			limit = 10
+		}
+
+		var siteDir = projectRoot.reReplace( "[\/]+$", "" ) & "/site"
+		var results = new "models.build.SearchQueryRunner@bxdocs"().run( siteDir : siteDir, query : query, limit : limit )
+
+		if ( !results.len() ) {
+			return { exitCode : 0, message : "No results for [#query#]" }
+		}
+
+		var lines = results.map( result => "- #result.title# (#result.url#) [score: #result.score#]" )
+
+		return {
+			exitCode : 0,
+			message  : "#results.len()# result(s) for [#query#]:" & char( 10 ) & lines.toList( char( 10 ) )
+		}
+	}
+
+}

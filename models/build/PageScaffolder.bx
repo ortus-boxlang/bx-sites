@@ -1,0 +1,109 @@
+/**
+ * Backs the `page:new` CLI verb - scaffolds a single `docs/<path>.md` page
+ * with an optional frontmatter block, at whatever nested location its own
+ * path implies (folder nesting = nav nesting, module spec section 3/5) -
+ * parent folders are created as needed, no separate nav config to touch.
+ */
+class {
+
+	/**
+	 * @docsDir Absolute path to the project's docs/ directory
+	 * @path docs/-relative path to the new page, e.g. "guides/my-new-guide.md" - must end in .md
+	 * @title Frontmatter `title` - omitted entirely when blank, same as any hand-written page (DocsLoader.bx falls back to a filename-derived title)
+	 * @description Frontmatter `description`
+	 * @icon Frontmatter `icon`
+	 * @tags Comma-separated frontmatter `tags`
+	 * @order Frontmatter `order` (a whole number) - blank leaves it unset (falls back to the default sort-last behavior)
+	 *
+	 * @return { path } - absolute path to the new page file
+	 */
+	struct function scaffold(
+		required string docsDir,
+		required string path,
+		string title = "",
+		string description = "",
+		string icon = "",
+		string tags = "",
+		string order = ""
+	) {
+		var trimmedPath = trim( arguments.path ).reReplace( "^[\/]+", "" )
+		if ( !len( trimmedPath ) ) {
+			throw( type = "BxDocs.MissingPagePath", message = "`page:new` requires --path=<relative path>.md" )
+		}
+		if ( !trimmedPath.reFindNoCase( "\.md$" ) ) {
+			throw( type = "BxDocs.InvalidPagePath", message = "--path must end in .md (got [#trimmedPath#])" )
+		}
+
+		var trimmedDocsDir = arguments.docsDir.reReplace( "[\/]+$", "" )
+		var fullPath = trimmedDocsDir & "/" & trimmedPath
+
+		if ( fileExists( fullPath ) ) {
+			throw( type = "BxDocs.PageAlreadyExists", message = "A page already exists at [#fullPath#]" )
+		}
+
+		var pageDir = getDirectoryFromPath( fullPath )
+		if ( !directoryExists( pageDir ) ) {
+			directoryCreate( pageDir, true, true )
+		}
+
+		var frontmatterLines = []
+		if ( len( trim( arguments.title ) ) ) {
+			frontmatterLines.append( "title: " & trim( arguments.title ) )
+		}
+		if ( len( trim( arguments.description ) ) ) {
+			frontmatterLines.append( "description: " & trim( arguments.description ) )
+		}
+		if ( len( trim( arguments.icon ) ) ) {
+			frontmatterLines.append( "icon: " & trim( arguments.icon ) )
+		}
+		if ( isNumeric( trim( arguments.order ) ) ) {
+			frontmatterLines.append( "order: " & trim( arguments.order ) )
+		}
+		if ( len( trim( arguments.tags ) ) ) {
+			frontmatterLines.append( "tags: [" & normalizeList( arguments.tags ) & "]" )
+		}
+
+		var lines = []
+		if ( frontmatterLines.len() ) {
+			lines.append( "---" )
+			lines.addAll( frontmatterLines )
+			lines.append( "---" )
+			lines.append( "" )
+		}
+		lines.append( "## " & ( len( trim( arguments.title ) ) ? trim( arguments.title ) : titleFromFileName( trimmedPath ) ) )
+		lines.append( "" )
+		lines.append( "Write your content here." )
+		lines.append( "" )
+
+		fileWrite( fullPath, lines.toList( char( 10 ) ) )
+
+		return { path : fullPath }
+	}
+
+	/**
+	 * Mirrors DocsLoader.bx's own titleFromFileName() exactly - only used
+	 * for the page's own opening `# Heading`, never written into
+	 * frontmatter (an explicit --title is; a derived one is left for
+	 * DocsLoader to compute the same way at build time).
+	 *
+	 * @relativePath A docs/-relative .md path
+	 */
+	private string function titleFromFileName( required string relativePath ) {
+		var segments = listToArray( arguments.relativePath, "/" )
+		var baseName = segments[ segments.len() ].reReplaceNoCase( "\.md$", "" )
+		return baseName
+			.reReplace( "[-_]", " ", "all" )
+			.reReplace( "\b(\w)", "\U\1", "all" )
+	}
+
+	/**
+	 * @list A comma-separated CLI option value
+	 */
+	private string function normalizeList( required string list ) {
+		return listToArray( arguments.list )
+			.map( item => trim( item ) )
+			.filter( item => len( item ) )
+			.toList( ", " )
+	}
+
+}

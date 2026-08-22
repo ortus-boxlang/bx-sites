@@ -1,0 +1,81 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.LocaleScaffolder", function() {
+
+			beforeEach( function() {
+				variables.scaffolder = new "models.build.LocaleScaffolder@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newDocsDir( boolean withIndex = true ) {
+				var dir = createTempDirectory( prefix = "bxdocs-localescaffolder-" );
+				tempDirs.append( dir );
+				var docsDir = dir & "/docs";
+				directoryCreate( docsDir, true, true );
+				if ( arguments.withIndex ) {
+					fileWrite( docsDir & "/index.md", "Home" );
+				}
+				return docsDir;
+			}
+
+			it( "throws BxDocs.MissingLocaleCode when code is blank", function() {
+				expect( function() {
+					scaffolder.scaffold( docsDir : newDocsDir(), code : "  " );
+				} ).toThrow( "BxDocs.MissingLocaleCode" );
+			} );
+
+			it( "throws BxDocs.InvalidLocaleCode for anything but letters/digits/hyphens", function() {
+				expect( function() {
+					scaffolder.scaffold( docsDir : newDocsDir(), code : "en_US!" );
+				} ).toThrow( "BxDocs.InvalidLocaleCode" );
+			} );
+
+			it( "creates docs/i18n/<code>/ seeded with a copy of the default index.md", function() {
+				var docsDir = newDocsDir();
+
+				var result = scaffolder.scaffold( docsDir : docsDir, code : "es" );
+
+				expect( result.localeDir ).toBe( docsDir & "/i18n/es" );
+				expect( result.seededIndex ).toBeTrue();
+				expect( fileExists( result.localeDir & "/index.md" ) ).toBeTrue();
+			} );
+
+			it( "accepts a BCP-47-shaped code with a region subtag", function() {
+				var docsDir = newDocsDir();
+
+				var result = scaffolder.scaffold( docsDir : docsDir, code : "pt-BR" );
+
+				expect( result.localeDir ).toBe( docsDir & "/i18n/pt-BR" );
+			} );
+
+			it( "reports seededIndex: false when there's no default docs/index.md", function() {
+				var docsDir = newDocsDir( withIndex = false );
+
+				var result = scaffolder.scaffold( docsDir : docsDir, code : "es" );
+
+				expect( result.seededIndex ).toBeFalse();
+				expect( fileExists( result.localeDir & "/index.md" ) ).toBeFalse();
+			} );
+
+			it( "throws BxDocs.LocaleAlreadyExists rather than overwriting", function() {
+				var docsDir = newDocsDir();
+				scaffolder.scaffold( docsDir : docsDir, code : "es" );
+
+				expect( function() {
+					scaffolder.scaffold( docsDir : docsDir, code : "es" );
+				} ).toThrow( "BxDocs.LocaleAlreadyExists" );
+			} );
+
+		} );
+	}
+
+}

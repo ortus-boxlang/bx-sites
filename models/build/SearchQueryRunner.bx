@@ -1,0 +1,86 @@
+/**
+ * Backs the `search:query` CLI verb - runs a keyword query against an
+ * already-built `site/search-index.json` (SearchIndexer.bx's own output)
+ * and ranks results, so a query can be sanity-checked from the command
+ * line without opening a browser. Mirrors the relative field weighting
+ * the real client-side widget uses (resources/assets/search.js's own
+ * lunr.js field boosts: title 10, tags 8, headings 5, body 1) with a
+ * simple per-term substring match instead of lunr's full tokenizing/
+ * stemming index - close enough to sanity-check ranking, not a
+ * replacement for the real widget.
+ */
+class {
+
+	variables.fieldWeights = {
+		title    : 10,
+		tags     : 8,
+		headings : 5,
+		body     : 1
+	}
+
+	/**
+	 * @siteDir Absolute path to the project's site/ build output
+	 * @query Raw search query, split into whitespace-separated terms
+	 * @limit Maximum number of results to return
+	 *
+	 * @return Array of { title, url, score }, highest score first, capped at `limit`
+	 */
+	array function run( required string siteDir, required string query, numeric limit = 10 ) {
+		var indexPath = arguments.siteDir.reReplace( "[\/]+$", "" ) & "/search-index.json"
+		if ( !fileExists( indexPath ) ) {
+			throw(
+				type    = "BxDocs.SearchIndexNotBuilt",
+				message = "No [#indexPath#] to search - run `search-index` (or `build`) first"
+			)
+		}
+
+		var terms = listToArray( trim( arguments.query ), " ", true )
+			.map( term => lCase( term ) )
+			.filter( term => len( term ) )
+
+		if ( !terms.len() ) {
+			throw( type = "BxDocs.MissingQuery", message = "`search:query` requires a non-blank --query" )
+		}
+
+		var docs = jsonDeserialize( fileRead( indexPath ) )
+
+		return docs
+			.map( doc => { return { title : doc.title, url : doc.url, score : scoreDoc( doc, terms ) } } )
+			.filter( result => result.score > 0 )
+			.sort( ( a, b ) => b.score - a.score )
+			.slice( 1, arguments.limit )
+	}
+
+	/**
+	 * Sums this doc's weighted score across every query term - a term
+	 * matching in more than one field (e.g. both title and body) counts
+	 * for each field it's found in, same as lunr's own per-field scoring.
+	 *
+	 * @doc One search-index.json entry: { title, url, headings, body, tags }
+	 * @terms Lowercased, non-blank query terms
+	 */
+	private numeric function scoreDoc( required struct doc, required array terms ) {
+		var titleText = lCase( arguments.doc.title ?: "" )
+		var tagsText = lCase( arrayToList( arguments.doc.tags ?: [], " " ) )
+		var headingsText = lCase( arrayToList( arguments.doc.headings ?: [], " " ) )
+		var bodyText = lCase( arguments.doc.body ?: "" )
+
+		var score = 0
+		for ( var term in arguments.terms ) {
+			if ( titleText.contains( term ) ) {
+				score += variables.fieldWeights.title
+			}
+			if ( tagsText.contains( term ) ) {
+				score += variables.fieldWeights.tags
+			}
+			if ( headingsText.contains( term ) ) {
+				score += variables.fieldWeights.headings
+			}
+			if ( bodyText.contains( term ) ) {
+				score += variables.fieldWeights.body
+			}
+		}
+		return score
+	}
+
+}
