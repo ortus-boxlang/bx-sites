@@ -73,7 +73,10 @@ Runs in the foreground until interrupted (Ctrl+C).
 
 Rebuild `site/search-index.json` standalone, without re-rendering pages or
 copying assets. `build` already runs this same step automatically - this
-verb exists for when you only need to refresh the index.
+verb exists for when you only need to refresh the index. Only ever covers
+the main `docs/` tree, even on a project with `docs/versions/`/`docs/i18n/`
+- a real `build` writes each tree's own scoped index instead (see
+[Versioning](guides/versioning.md#whats-out-of-scope-for-now)).
 
 ```bash frame="terminal" title="Terminal"
 bxSites search-index

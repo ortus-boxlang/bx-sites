@@ -663,35 +663,9 @@ featured images, and SEO/social metadata.
 ## Versioning
 
 Versioned docs are convention over configuration - there's no `bxsites.json`
-key for it. Add a `docs/versions/` folder, and each direct subfolder inside
-it is built as its own fully self-contained doc tree, alongside your
-regular `docs/` (which always builds as "Latest"):
-
-```text title="docs/ layout"
-docs/
-├── index.md
-├── guides/
-└── versions/
-    ├── 1.0/
-    │   ├── index.md
-    │   └── guides/
-    └── 2.0/
-        ├── index.md
-        └── guides/
-```
-
-Each version folder is a normal `docs/`-shaped tree - its own `index.md`,
-its own nav, its own pages - built into `site/versions/<name>/` with every
-internal link prefixed accordingly, and sharing the project's single
-`bxsites.json` config/theme. Version names sort newest-first, numerically
-rather than alphabetically (so `2.0` sorts before `10.0`), and every theme
-renders a version-switcher dropdown in the header automatically once more
-than one version exists - nothing to opt into. A loose file placed directly
-under `docs/versions/` (not inside a subfolder) is ignored.
-
-`sitemap.xml` and `llms.txt` include every version's pages alongside the
-main site's.
-
-A version's docs can also be translated - see [i18n's own "Versioned and
-translated docs"](i18n.md#versioned-and-translated-docs) for the
-`docs/versions/<name>/i18n/<code>/` convention.
+key for it. Add a `docs/versions/<name>/` folder and it builds automatically
+as its own doc tree, with a version switcher every theme renders for free
+once more than one version exists. See [Versioning](guides/versioning.md)
+for the full picture - cutting a new version with `version:new`, how
+versions sort and build, and what's out of scope (per-tree search
+scoping, no deprecated/EOL flag).
