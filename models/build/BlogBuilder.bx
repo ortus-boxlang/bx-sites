@@ -460,8 +460,13 @@ class {
 
 		var items = ""
 		for ( var post in arguments.posts ) {
-			var searchKey = encodeForJavaScript( lCase( post.title ) )
-			items &= '<li x-show="!q || ' & "'" & searchKey & "'" & '.includes( q.toLowerCase() )"><a href="' & arguments.basePath & post.urlPath & '">' & encodeForHTML( post.title ) & '</a> <span class="blog-post-meta">' & calendarIcon & ' ' & post.dateDisplay & ' &middot; ' & clockIcon & ' ' & post.readingTimeMinutes & ' min read</span></li>'
+			// The searchable title lives in a plain `data-title` attribute
+			// (HTML-attribute-escaped, same as the link text right next to
+			// it), read by Alpine via $el.dataset - simpler and more
+			// robust than inlining an escaped JS string literal into the
+			// x-show expression itself, which would need a second,
+			// JS-specific escaping pass on top of the HTML-attribute one.
+			items &= '<li data-title="' & encodeForHTML( lCase( post.title ) ) & '" x-show="!q || $el.dataset.title.includes( q.toLowerCase() )"><a href="' & arguments.basePath & post.urlPath & '">' & encodeForHTML( post.title ) & '</a> <span class="blog-post-meta">' & calendarIcon & ' ' & post.dateDisplay & ' &middot; ' & clockIcon & ' ' & post.readingTimeMinutes & ' min read</span></li>'
 		}
 
 		var html = '<h2>' & variables.iconResolver.resolve( "phosphor-duotone:newspaper" ) & ' Posts</h2>'
