@@ -158,11 +158,25 @@ how many posts per page (default `10`); page 2 onward moves to
 
 A single "Blog" entry is added to the main nav automatically, once
 `docs/blog/posts/` has at least one non-draft post - no `nav`/`docs/nav.json`
-change needed. Individual posts aren't added to the nav themselves (same as
-the tags index) - they're reachable from `/blog/`, their own category page,
-their own year archive, their author's page, search, and each other's
-prev/next links (posts chronologically adjacent to one another, independent
-of the regular nav's own prev/next chain).
+change needed. By default it's appended last, after everything else. To put
+it somewhere specific instead, add your own entry with an explicit `url`
+(bypasses the usual `path`-must-match-a-real-page rule, since the blog isn't
+a `docs/` page) to your `nav` array or `docs/nav.json` - doing so suppresses
+the auto-appended one entirely, so there's never a duplicate:
+
+```json
+{ "nav": [
+  { "path": "index.md" },
+  { "title": "Blog", "url": "blog/index.html", "icon": "lucide:newspaper" },
+  { "path": "about.md" }
+] }
+```
+
+Individual posts aren't added to the nav themselves (same as the tags
+index) - they're reachable from `/blog/`, their own category page, their
+own year archive, their author's page, search, and each other's prev/next
+links (posts chronologically adjacent to one another, independent of the
+regular nav's own prev/next chain).
 
 Every post's own meta line (on its card and its detail page) also shows an
 estimated reading time next to the date - a rough word-count / 200wpm

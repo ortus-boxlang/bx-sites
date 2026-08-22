@@ -1686,6 +1686,39 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileRead( root & "/site/blog/stats/index.html" ) ).toInclude( "bxdocs-cards" );
 			} );
 
+			it( "auto-appends a ""Blog"" nav entry last, once there's at least one published post", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				fileWrite( root & "/docs/about.md", "About" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				fileWrite( root & "/docs/blog/posts/hello-world.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "---" & char( 10 ) & "Hello world body." );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( 'href="/blog/index.html">Blog</a>' );
+				expect( html.findNoCase( ">About<" ) ).toBeLT( html.findNoCase( ">Blog<" ) );
+			} );
+
+			it( "skips the auto-appended ""Blog"" nav entry when a custom nav already places one via an explicit url", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","nav":[{"title":"Blog","url":"blog/index.html","icon":"lucide:newspaper"},{"path":"index.md"}]}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				fileWrite( root & "/docs/blog/posts/hello-world.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "---" & char( 10 ) & "Hello world body." );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				// Only one "Blog" nav link - the author's own, placed first -
+				// not a second one auto-appended after it.
+				expect( html.findNoCase( ">Blog<" ) ).toBeLT( html.findNoCase( ">Home<" ) );
+				expect( html.reMatch( 'href="/blog/index\.html">Blog</a>' ).len() ).toBe( 1 );
+			} );
+
 		} );
 	}
 

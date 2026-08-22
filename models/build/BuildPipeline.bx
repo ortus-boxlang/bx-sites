@@ -451,7 +451,11 @@ class {
 		// blog posts get their own chronological prev/next instead
 		// (BlogBuilder.bx).
 		var flatSequence = variables.navBuilder.flatten( nav )
-		if ( len( arguments.blogNavUrl ) ) {
+		// Skip the synthetic node when the nav (folder-inferred, or a
+		// custom nav/docs/nav.json) already carries its own entry
+		// pointing at the blog index - the author placed/titled/iconed
+		// it deliberately, so respect that instead of adding a duplicate.
+		if ( len( arguments.blogNavUrl ) && !flatSequence.filter( n => n.url == arguments.blogNavUrl ).len() ) {
 			nav.append( { title : "Blog", url : arguments.blogNavUrl, order : 999999, icon : "lucide:newspaper", children : [] } )
 		}
 		assignNavIconHtml( nav, arguments.docsDir )

@@ -170,6 +170,30 @@ class extends="testbox.system.BaseSpec" {
 				expect( nav[ 2 ].icon ).toBe( "tabler:wand" );
 			} );
 
+			it( "builds a navConfig entry from an explicit url, skipping path resolution entirely, for a synthetic non-docs destination", function() {
+				var pages = [ page( relativePath = "index.md", title = "Home" ) ];
+
+				var nav = navBuilder.build( pages, [
+					"index.md",
+					{ "title" : "Blog", "url" : "blog/index.html", "icon" : "lucide:newspaper" }
+				] );
+
+				expect( nav.len() ).toBe( 2 );
+				expect( nav[ 2 ].title ).toBe( "Blog" );
+				expect( nav[ 2 ].url ).toBe( "blog/index.html" );
+				expect( nav[ 2 ].icon ).toBe( "lucide:newspaper" );
+			} );
+
+			it( "prefers an explicit url over path when a navConfig entry sets both", function() {
+				var pages = [ page( relativePath = "about.md", title = "About" ) ];
+
+				var nav = navBuilder.build( pages, [
+					{ "title" : "Elsewhere", "path" : "about.md", "url" : "blog/index.html" }
+				] );
+
+				expect( nav[ 1 ].url ).toBe( "blog/index.html" );
+			} );
+
 			it( "throws BxDocs.InvalidConfig when a navConfig entry references a path that doesn't exist", function() {
 				var pages = [ page( relativePath = "index.md", title = "Home" ) ];
 
