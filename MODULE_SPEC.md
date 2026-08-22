@@ -52,6 +52,7 @@ boxlang module:bxDocs <verb> [options]
 | `gh-deploy` | Build + force-push `site/` to a `gh-pages`-style branch |
 | `migrate` | Convert a GitBook export (`SUMMARY.md` + `.md` files, default) or an mkdocs project (`mkdocs.yml`, `--from=mkdocs`) into a bx-docs project |
 | `check` | CI-grade content check on a built `site/`: broken internal links/images, missing alt text, orphaned pages |
+| `stats` | Read-only summary report on a built `site/`: page/word counts, versions/locales, blog, tags, search index, site size |
 
 ## 3. Project structure
 

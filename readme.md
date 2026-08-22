@@ -68,6 +68,7 @@ boxlang module:bxdocs <verb> [options]
 | `search-index` | Rebuild `site/search-index.json` standalone (also runs automatically during `build`) |
 | `clean` | Remove `site/` and any build cache |
 | `migrate` | Convert a GitBook export (`SUMMARY.md` + `.md` files) into `docs/` + `nav.json` |
+| `stats` | Read-only summary report on a built `site/`: page/word counts, versions/locales, blog, tags, search index, site size |
 
 Every verb accepts `--projectRoot=<path>` (or a bare positional path) to target a project other than the current directory. Run `bxDocs --help` for full usage.
 

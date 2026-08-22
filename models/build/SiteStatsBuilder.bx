@@ -1,0 +1,222 @@
+/**
+ * Backs the `stats` CLI verb - a read-only summary of an already-built
+ * `site/`: page/word counts (overall and per tree), versions/locales,
+ * the blog (if any), the tags index, the search index, and the built
+ * site's own footprint on disk. Purely descriptive - unlike `check`, it
+ * never fails a build; there's nothing here to gate CI on.
+ *
+ * Same "no HTML parser dependency" approach as LinkChecker.bx - plain
+ * regex over the already-rendered HTML - and the same "rough estimate,
+ * not exact" standard as BlogBuilder.bx's own word count/reading time
+ * (see its countWords() docblock): good enough for a summary, not a
+ * precision tool.
+ */
+class {
+
+	variables.configLoader = new "models.config.ConfigLoader@bxdocs"()
+	variables.versionsDiscoverer = new "models.build.VersionsDiscoverer@bxdocs"()
+	variables.localesDiscoverer = new "models.build.LocalesDiscoverer@bxdocs"()
+
+	/**
+	 * Blog URL segments that are structural (category/archive/author pages,
+	 * pagination), not a post's own slug folder - excluded when counting
+	 * actual posts under `site/blog/`.
+	 */
+	variables.blogStructuralDirs = "category,archive,authors,stats,page"
+
+	/**
+	 * @projectRoot Absolute path to the project root (must already have a built site/ - run `build` first)
+	 *
+	 * @return { pageCount, wordCount, avgWordsPerPage, treeBreakdown: [ { label, pageCount } ], versions: [ names ], locales: [ codes ], blog: { present, posts, categories, authors, years }, tagCount, searchIndex: { enabled, entryCount, fileSizeBytes }, siteFileCount, siteSizeBytes }
+	 */
+	struct function build( required string projectRoot ) {
+		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		var siteDir = root & "/site"
+		var docsDir = root & "/docs"
+
+		if ( !directoryExists( siteDir ) ) {
+			throw(
+				type    = "BxDocs.SiteNotBuilt",
+				message = "No [#siteDir#] to report on - run `build` first"
+			)
+		}
+
+		var config = variables.configLoader.load( root )
+		var defaultLocaleCode = config.i18n.defaultLocale.code
+
+		var versions = variables.versionsDiscoverer.discover( docsDir )
+		var locales = variables.localesDiscoverer.discover( docsDir )
+			.filter( code => compareNoCase( code, defaultLocaleCode ) != 0 )
+
+		var htmlFiles = directoryList( siteDir, true, "path", "*.html" )
+		var pageCount = htmlFiles.len()
+		var wordCount = 0
+		var treeCounts = {}
+
+		for ( var filePath in htmlFiles ) {
+			wordCount += countWords( stripTags( fileRead( filePath ) ) )
+
+			var relative = toSiteRelative( filePath, siteDir )
+			var treeLabel = treeLabelFor( relative, versions, locales )
+			treeCounts[ treeLabel ] = ( treeCounts[ treeLabel ] ?: 0 ) + 1
+		}
+
+		var treeBreakdown = treeCounts.keyArray().sort( "textnocase" ).map( label => {
+			return { label : label, pageCount : treeCounts[ label ] }
+		} )
+
+		var allFiles = directoryList( siteDir, true, "path" )
+		var siteSizeBytes = 0
+		for ( var filePath in allFiles ) {
+			siteSizeBytes += createObject( "java", "java.io.File" ).init( filePath ).length()
+		}
+
+		return {
+			pageCount       : pageCount,
+			wordCount       : wordCount,
+			avgWordsPerPage : pageCount ? round( wordCount / pageCount ) : 0,
+			treeBreakdown   : treeBreakdown,
+			versions        : versions,
+			locales         : locales,
+			blog            : blogStats( siteDir ),
+			tagCount        : distinctTagCount( siteDir ),
+			searchIndex     : searchIndexStats( siteDir ),
+			siteFileCount   : allFiles.len(),
+			siteSizeBytes   : siteSizeBytes
+		}
+	}
+
+	/**
+	 * Buckets one built page's site-relative path into "main", a
+	 * `version:<name>` (any `versions/<name>/...` path, including that
+	 * version's own locale subfolders - lumped into the version rather
+	 * than broken out a level further), or a `locale:<code>` (a top-level
+	 * non-default locale's own `<code>/...` path).
+	 *
+	 * @relative Site-relative path (toSiteRelative()'s own output)
+	 * @versions VersionsDiscoverer.discover()'s own output
+	 * @locales LocalesDiscoverer.discover()'s output, already filtered to non-default
+	 */
+	private string function treeLabelFor( required string relative, required array versions, required array locales ) {
+		for ( var versionName in arguments.versions ) {
+			var prefix = "versions/" & versionName
+			if ( arguments.relative == prefix || arguments.relative.startsWith( prefix & "/" ) ) {
+				return "version:" & versionName
+			}
+		}
+		for ( var localeCode in arguments.locales ) {
+			if ( arguments.relative == localeCode || arguments.relative.startsWith( localeCode & "/" ) ) {
+				return "locale:" & localeCode
+			}
+		}
+		return "main"
+	}
+
+	/**
+	 * Counts actual posts/categories/authors/year-archives straight off
+	 * `site/blog/`'s own folder shape - no re-parsing of `docs/blog/posts/`
+	 * frontmatter needed, since the built output already reflects exactly
+	 * what a real `bxDocs build` published (drafts excluded).
+	 *
+	 * @siteDir Absolute path to the built `site/`
+	 */
+	private struct function blogStats( required string siteDir ) {
+		var blogDir = arguments.siteDir & "/blog"
+		if ( !directoryExists( blogDir ) ) {
+			return { present : false, posts : 0, categories : 0, authors : 0, years : 0 }
+		}
+
+		var topLevel = directoryList( blogDir, false, "name" )
+			.filter( name => directoryExists( blogDir & "/" & name ) )
+
+		var posts = topLevel.filter( name => !listFindNoCase( variables.blogStructuralDirs, name ) )
+
+		return {
+			present    : true,
+			posts      : posts.len(),
+			categories : countSubfolders( blogDir & "/category" ),
+			authors    : countSubfolders( blogDir & "/authors" ),
+			years      : countSubfolders( blogDir & "/archive" )
+		}
+	}
+
+	/**
+	 * @dir Absolute path - may not exist
+	 */
+	private numeric function countSubfolders( required string dir ) {
+		if ( !directoryExists( arguments.dir ) ) {
+			return 0
+		}
+		return directoryList( arguments.dir, false, "name" )
+			.filter( name => directoryExists( arguments.dir & "/" & name ) )
+			.len()
+	}
+
+	/**
+	 * Distinct tag count off `site/tags/index.html` - TagsIndexBuilder.bx
+	 * gives each distinct tag its own `<h2 id="tag-...">` anchor, so
+	 * counting those is equivalent to counting distinct tags without
+	 * re-collecting `tags` frontmatter across every page ourselves.
+	 *
+	 * @siteDir Absolute path to the built `site/`
+	 */
+	private numeric function distinctTagCount( required string siteDir ) {
+		var tagsPage = arguments.siteDir & "/tags/index.html"
+		if ( !fileExists( tagsPage ) ) {
+			return 0
+		}
+		return reMatch( '<h2 id="tag-', fileRead( tagsPage ) ).len()
+	}
+
+	/**
+	 * @siteDir Absolute path to the built `site/`
+	 *
+	 * @return { enabled, entryCount, fileSizeBytes } - `enabled: false` when search is off or the active provider isn't the local/static one (no `search-index.json` is written either way - see BuildPipeline.bx's searchNeedsLocalIndex())
+	 */
+	private struct function searchIndexStats( required string siteDir ) {
+		var indexPath = arguments.siteDir & "/search-index.json"
+		if ( !fileExists( indexPath ) ) {
+			return { enabled : false, entryCount : 0, fileSizeBytes : 0 }
+		}
+		var raw = fileRead( indexPath )
+		return {
+			enabled       : true,
+			entryCount    : deserializeJSON( raw ).len(),
+			fileSizeBytes : createObject( "java", "java.io.File" ).init( indexPath ).length()
+		}
+	}
+
+	/**
+	 * Same approach as LinkChecker.bx's own toSiteRelative() - strips the
+	 * absolute `siteDir` prefix (regex-escaped, since a Windows path's own
+	 * backslashes/drive letter would otherwise need special handling) and
+	 * any leading slash left behind.
+	 *
+	 * @filePath Absolute path to a file under siteDir
+	 * @siteDir Absolute path to the built `site/`
+	 */
+	private string function toSiteRelative( required string filePath, required string siteDir ) {
+		return arguments.filePath
+			.reReplace( "^" & createObject( "java", "java.util.regex.Pattern" ).quote( arguments.siteDir ), "", "one" )
+			.reReplace( "^[\/]", "" )
+	}
+
+	/**
+	 * A crude HTML-tag stripper, good enough for a word-count estimate -
+	 * same standard as BlogBuilder.bx's own stripTags().
+	 *
+	 * @html Rendered HTML
+	 */
+	private string function stripTags( required string html ) {
+		return trim( arguments.html.reReplace( "<[^>]+>", " ", "all" ).reReplace( "\s+", " ", "all" ) )
+	}
+
+	/**
+	 * @plainText Already HTML-tag-stripped text
+	 */
+	private numeric function countWords( required string plainText ) {
+		var trimmed = trim( arguments.plainText )
+		return len( trimmed ) ? listLen( trimmed, " " ) : 0
+	}
+
+}

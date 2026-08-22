@@ -176,3 +176,30 @@ Exits `1` when there are any broken links/images or missing-alt images,
 `0` otherwise (orphaned pages never affect the exit code). Deliberately
 internal-links-only - it does not make HTTP requests to check external
 URLs, which belongs in a dedicated link-checking tool run as its own job.
+
+## `stats`
+
+A read-only summary report of an already-built `site/` - run `build`
+first. Reports:
+
+- **Pages and words** - total page count and a rough word count (tags
+  stripped, same "good enough for an estimate" standard as the blog's own
+  reading-time figure), plus a per-tree breakdown once there's more than
+  one tree (a version, or a non-default locale).
+- **Versions and locales** - names of every `docs/versions/`/non-default
+  `docs/i18n/` folder.
+- **Blog** - post/category/author/year-active counts, straight off
+  `site/blog/`'s own folder shape (so it always matches what was actually
+  published, drafts excluded) - `none` when there's no blog.
+- **Tags** - the number of distinct tags across the whole site.
+- **Search index** - entry count and file size of `search-index.json`, or
+  `none` when search is off or a non-local provider is active.
+- **Site output** - total file count and on-disk size of the built `site/`.
+
+```bash
+bxDocs build
+bxDocs stats
+```
+
+Always exits `0` - purely informational, nothing here is a pass/fail gate
+(that's `check`'s job).
