@@ -6,7 +6,7 @@ tags: [guide, ricerca]
 
 # Ricerca
 
-La ricerca di BX Docs è completamente statica e lato client - lo stesso
+La ricerca di BX Sites è completamente statica e lato client - lo stesso
 approccio che usa [mkdocs](https://www.mkdocs.org/) di default: un
 indice costruito una sola volta al momento del `build`, e
 [lunr.js](https://lunrjs.com/) che effettua la ricerca vera e propria nel
@@ -22,7 +22,7 @@ di ricerca esterno.
    suo corpo (con i tag HTML rimossi).
 2. Il parziale `search.bxm` di ogni tema renderizza un box di ricerca;
    `layout.bxm` lo include (insieme agli script `lunr.js` + `search.js`
-   condiviso) solo quando `search` di `bxdocs.json` è `true`.
+   condiviso) solo quando `search` di `bxsites.json` è `true`.
 3. Nel browser, il widget condiviso `assets/search.js` recupera
    `search-index.json` una sola volta, costruisce a partire da esso un
    indice `lunr` (con `title` pesato di più, poi i `tags` del
@@ -53,7 +53,7 @@ distribuisce assolutamente nulla legato alla ricerca.
 ## Ricompilare solo l'indice
 
 ```bash
-bxDocs search-index
+bxSites search-index
 ```
 
 Utile se serve solo aggiornare `search-index.json` - `build` esegue già

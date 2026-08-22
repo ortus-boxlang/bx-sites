@@ -10,15 +10,15 @@ tags: [guides, setup]
 
 ## Install
 
-BX Docs depends on [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
+BX Sites depends on [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
 for Markdown rendering, [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
 for HTML-encoding, [bx-yaml](https://github.com/ortus-boxlang/bx-yaml) for
-reading `bxdocs.yaml`, and [bx-image](https://github.com/ortus-boxlang/bx-image)
+reading `bxsites.yaml`, and [bx-image](https://github.com/ortus-boxlang/bx-image)
 for the responsive-image pipeline (see [Responsive Images](guides/images.md)).
 With [CommandBox](https://commandbox.ortusbooks.com/) installed:
 
 ```bash frame="terminal" title="Terminal" linenums="1"
-box install bx-docs
+box install bx-sites
 box install bx-markdown
 box install bx-esapi
 box install bx-yaml
@@ -29,15 +29,15 @@ Or, without CommandBox, BoxLang's own installer takes all five in one
 command:
 
 ```bash frame="terminal" title="Terminal"
-install-bx-module bx-docs bx-markdown bx-esapi bx-yaml bx-image
+install-bx-module bx-sites bx-markdown bx-esapi bx-yaml bx-image
 ```
 
 `box install`/`install-bx-module` reads `box.json`'s `boxlang.executable`
-and drops a `bxDocs` script on your `PATH` (in `~/.boxlang/bin`), so every
+and drops a `bxSites` script on your `PATH` (in `~/.boxlang/bin`), so every
 command below works either as a short standalone command:
 
 ```bash title="Usage"
-bxDocs <verb> [options]
+bxSites <verb> [options]
 ```
 
 or, everywhere BoxLang is available but that `PATH` shim isn't (a CI
@@ -45,7 +45,7 @@ runner, a module registered by hand rather than installed) - both forms
 run the exact same thing:
 
 ```bash title="Usage (no PATH shim)"
-boxlang module:bxdocs <verb> [options]
+boxlang module:bxsites <verb> [options]
 ```
 
 The rest of this guide uses the short form.
@@ -53,7 +53,7 @@ The rest of this guide uses the short form.
 ## Scaffold a project
 
 ```bash frame="terminal" title="Terminal" linenums="1"
-bxDocs new my-docs
+bxSites new my-docs
 cd my-docs
 ```
 
@@ -64,7 +64,7 @@ my-docs/
 ├── docs/
 │   ├── assets/
 │   └── index.md
-└── bxdocs.yaml
+└── bxsites.yaml
 ```
 
 Pass `--theme=material` or `--theme=tailwind` to scaffold with a different
@@ -73,17 +73,17 @@ front - otherwise `new` derives it from the target directory name.
 
 ### Config file format
 
-`bxdocs.yaml` is the default and preferred format - it's what `new`
+`bxsites.yaml` is the default and preferred format - it's what `new`
 scaffolds unless told otherwise, and every example in this guide and in
-[Configuration](configuration.md) shows it first. `bxdocs.json` is fully
+[Configuration](configuration.md) shows it first. `bxsites.json` is fully
 supported too, for a project that prefers it: pass `--format=json` to
 scaffold one instead, or just hand-write/rename one yourself - ConfigLoader
-resolves whichever of `bxdocs.yaml`/`.yml`/`.json` is actually present, in
+resolves whichever of `bxsites.yaml`/`.yml`/`.json` is actually present, in
 that order, with no other config needed to switch. See
 [Configuration](configuration.md) for the full key reference in both
 formats.
 
-Already have content in GitBook? `bxDocs migrate --source=/path/to/export`
+Already have content in GitBook? `bxSites migrate --source=/path/to/export`
 converts a GitBook export straight into `docs/` - see
 [Migrating from GitBook](guides/migrating-from-gitbook.md) - and you can
 skip ahead to [Build](#build).
@@ -115,7 +115,7 @@ See [Deployment](guides/deployment.md) or, from that same guide,
 [back to Getting Started](../getting-started.md#add-pages).
 ```
 
-BX Docs rewrites every such link to its built pretty-URL at build time
+BX Sites rewrites every such link to its built pretty-URL at build time
 (`guides/deployment.md` -> `/guides/deployment/index.html`, anchors and
 query strings preserved), resolved against the *linking* page's own
 folder - `../` and sibling references work exactly like they would
@@ -144,7 +144,7 @@ Each page can start with a small frontmatter block:
 title: Deployment
 order: 2
 hidden: false
-description: How to deploy a built BX Docs site.
+description: How to deploy a built BX Sites site.
 tags: [guides, deployment]
 icon: 🚀
 summary: Everything you need to publish a built site.
@@ -188,7 +188,7 @@ full YAML, so nested objects/maps aren't supported.
 ## Build
 
 ```bash frame="terminal" title="Terminal"
-bxDocs build
+bxSites build
 ```
 
 Renders every page in `docs/` into a static site in `site/`, ready to host
@@ -197,19 +197,19 @@ anywhere that serves static files.
 ## Serve locally
 
 ```bash frame="terminal" title="Terminal"
-bxDocs serve
+bxSites serve
 ```
 
 Builds the project, serves `site/` at `http://127.0.0.1:8080/`, and
 rebuilds automatically whenever you save a change under `docs/`, your
-`bxdocs.yaml`/`.json` site config, or a project-level `theme/` override -
+`bxsites.yaml`/`.json` site config, or a project-level `theme/` override -
 your browser reloads on its own. Pass `--port=3000` or `--host=0.0.0.0` to
 change how it binds.
 
 ## Clean
 
 ```bash frame="terminal" title="Terminal"
-bxDocs clean
+bxSites clean
 ```
 
 Removes `site/` and any build cache, without touching your `docs/` source.

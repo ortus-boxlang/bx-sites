@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel>
-	<title>BX Docs Blog - Versioning &amp; i18n</title>
-	<link>https://ortus-boxlang.github.io/bx-docs/development/theme/tailwind/blog/category/versioning---i18n/</link>
-	<description>Blog posts from BX Docs</description>
+	<title>BX Sites Blog - Versioning &amp; i18n</title>
+	<link>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/blog/category/versioning---i18n/</link>
+	<description>Blog posts from BX Sites</description>
 	<item>
 		<title>Never Lose a Reader: Versions and Translations</title>
-		<link>https://ortus-boxlang.github.io/bx-docs/development/theme/tailwind/blog/never-lose-a-reader-versions-and-translations/</link>
-		<guid isPermaLink="true">https://ortus-boxlang.github.io/bx-docs/development/theme/tailwind/blog/never-lose-a-reader-versions-and-translations/</guid>
+		<link>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/blog/never-lose-a-reader-versions-and-translations/</link>
+		<guid isPermaLink="true">https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/blog/never-lose-a-reader-versions-and-translations/</guid>
 		<pubDate>Tue, 04 Aug 2026 00:00:00 +0000</pubDate>
 		<dc:creator>Luis Majano</dc:creator>
 		<category>Versioning &amp; i18n</category>
-		<description>Two of the fastest ways to lose a documentation reader: they land on docs for the wrong version of your software, or they land on a page in a language they don't read well and there's no obvious way out. BX Docs handles both the same way it handles most things - a folder convention, no config flag to remember to flip.</description>
+		<description>Two of the fastest ways to lose a documentation reader: they land on docs for the wrong version of your software, or they land on a page in a language they don't read well and there's no obvious way out. BX Sites handles both the same way it handles most things - a folder convention, no config flag to remember to flip.</description>
 	</item>
 </channel></rss>

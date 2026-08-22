@@ -6,18 +6,18 @@ tags: [guide, migrazione, gitbook]
 
 # Migrare da GitBook
 
-`bxDocs migrate` converte un export di GitBook - un sommario
+`bxSites migrate` converte un export di GitBook - un sommario
 `SUMMARY.md` più i suoi file `.md`, il formato di sincronizzazione su
 disco proprio di GitBook (lo stesso scritto da GitHub/Git Sync) - in un
-albero `docs/` di bx-docs, con un solo comando. Tutto ciò che il sistema
+albero `docs/` di bx-sites, con un solo comando. Tutto ciò che il sistema
 di blocchi di contenuto di GitBook supporta corrisponde a qualcosa che
-bx-docs ha già (vedi
+bx-sites ha già (vedi
 [Estensioni Markdown](markdown.md#gitbook-style-blocks)), quindi il
 risultato non è una bozza approssimativa - è un sito funzionante.
 
 ## Ottenere un export di GitBook
 
-`bxDocs migrate` legge direttamente la struttura di file propria di
+`bxSites migrate` legge direttamente la struttura di file propria di
 GitBook, quindi ognuna delle seguenti opzioni funziona come `--source`:
 
 - Un repository a cui GitBook è sincronizzato via Git (impostazioni dello
@@ -30,15 +30,15 @@ direttamente `SUMMARY.md`.
 ## Eseguire la migrazione
 
 ```bash
-# 1. Scaffold a fresh bx-docs project (skip this if you already have one)
-bxDocs new my-docs
+# 1. Scaffold a fresh bx-sites project (skip this if you already have one)
+bxSites new my-docs
 cd my-docs
 
 # 2. Migrate the GitBook export into it
-bxDocs migrate --source=/path/to/gitbook-export
+bxSites migrate --source=/path/to/gitbook-export
 
 # 3. Build and look at the result
-bxDocs serve
+bxSites serve
 ```
 
 `migrate` stampa quante pagine ha convertito e, quando qualcosa ha
@@ -65,8 +65,8 @@ eseguirlo di nuovo.
 | GitBook | Diventa |
 |---|---|
 | `SUMMARY.md` | `docs/nav.json` (formato [nav esplicita](../configuration.md#nav)), annidamento preservato |
-| `README.md` (in qualsiasi cartella) | `index.md` - la convenzione di indice di cartella propria di bx-docs |
-| Il frontmatter `title`/`description`/`tags` di una pagina | Riportato invariato nel frontmatter bx-docs del file migrato |
+| `README.md` (in qualsiasi cartella) | `index.md` - la convenzione di indice di cartella propria di bx-sites |
+| Il frontmatter `title`/`description`/`tags` di una pagina | Riportato invariato nel frontmatter bx-sites del file migrato |
 | `.gitbook/assets/**` | `docs/assets/gitbook/**`, con ogni riferimento riscritto di conseguenza |
 | `{% hint style="..." %}` | `!!! type` - un'[ammonizione](markdown.md#admonitions) nativa |
 | `{% tabs %}` / `{% tab title="..." %}` | `=== "Title"` - [schede di contenuto](markdown.md#content-tabs) native |
@@ -84,11 +84,11 @@ stare, non frainteso per quello reale.
 
 ## Cosa richiede un controllo manuale
 
-Alcuni blocchi di GitBook non hanno alcun equivalente in bx-docs e
+Alcuni blocchi di GitBook non hanno alcun equivalente in bx-sites e
 vengono lasciati nella propria sintassi originale `{% %}` invece di
 essere indovinati: **Prompt** (un blocco di generazione AI - non c'è
 nulla contro cui eseguirlo una volta migrato), **Contenuto condizionale**
-(visibilità basata sull'account GitBook, un concetto che bx-docs non ha),
+(visibilità basata sull'account GitBook, un concetto che bx-sites non ha),
 e la barra di ricerca **Ask AI**. Qualsiasi altra cosa che questo
 strumento non riconosce - un blocco con un errore di battitura, una
 funzionalità di GitBook aggiunta dopo la scrittura di questo strumento -
@@ -120,7 +120,7 @@ proprie di GitBook; scegli qualunque nome sembri adatto nella galleria di
 Il `docs/nav.json` migrato è un normale file di
 [nav esplicita](../configuration.md#nav) - modificalo come qualsiasi
 altro, oppure eliminalo per ricadere sulla convenzione propria di
-bx-docs secondo cui la struttura delle cartelle è la struttura di
-navigazione. Da qui in poi è un normale progetto bx-docs: scegli un
-[tema](themes.md), rivedi [`bxdocs.json`](../configuration.md), e
+bx-sites secondo cui la struttura delle cartelle è la struttura di
+navigazione. Da qui in poi è un normale progetto bx-sites: scegli un
+[tema](themes.md), rivedi [`bxsites.json`](../configuration.md), e
 [distribuisci](deployment.md) quando ne sei soddisfatto.

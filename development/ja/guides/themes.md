@@ -40,16 +40,16 @@ Mermaid）は、このモジュールに同梱（バンドル）された状態�
   `localStorage` に記憶されます。
 - **レスポンシブヘッダー** - あらゆる幅で 1 行に収まります。折りたたみ可能なサイドバーナビ付き。
 - **検索ボックスのキーボードショートカット** - `/` で検索にフォーカス、`Escape` で閉じます。
-- **リポジトリリンクと「このページを編集」/「最終更新」行** - `bxdocs.json` の `repo`/`lastUpdated` オプション設定時。
+- **リポジトリリンクと「このページを編集」/「最終更新」行** - `bxsites.json` の `repo`/`lastUpdated` オプション設定時。
 - **「Markdown をダウンロード」リンク** - 「このページを編集」の横に表示。設定不要、常に有効。
-- **オプトインのフッター** - 著作権、`social` リンク、「BX Docs で構築」クレジット。
+- **オプトインのフッター** - 著作権、`social` リンク、「BX Sites で構築」クレジット。
 - **バージョンスイッチャー** - `docs/versions/` フォルダに複数のバージョンがある場合に自動表示。
 - **テーマ化された `404.html`** - ほとんどの静的ホスト（GitHub Pages を含む）で自動的に提供。
-- **カスタムロゴとファビコン** - `bxdocs.json` の `theme.logo`/`theme.favicon` 設定時。
+- **カスタムロゴとファビコン** - `bxsites.json` の `theme.logo`/`theme.favicon` 設定時。
 - **折りたたみ可能なサイドバーナビ** - `theme.options.navCollapsible` でオプトイン。
-- **Google Analytics** - `bxdocs.json` の `analytics` 設定時。
+- **Google Analytics** - `bxsites.json` の `analytics` 設定時。
 
-`bxdocs.json` で使用するテーマを設定します:
+`bxsites.json` で使用するテーマを設定します:
 
 ```json
 { "theme": { "name": "material" } }
@@ -62,7 +62,7 @@ Mermaid）は、このモジュールに同梱（バンドル）された状態�
 動作します。Bootstrap 自身の CSS/JS、highlight.js、Alpine.js、lunr.js はすべて
 このモジュールに同梱されており（`resources/assets/vendor/`）、ビルド時に
 `site/assets/vendor/` へそのままコピーされます - 生成される HTML のどこにも、
-これらのための CDN の `<script>`/`<link>` タグは一切含まれません。`bxdocs.json`
+これらのための CDN の `<script>`/`<link>` タグは一切含まれません。`bxsites.json`
 の `mermaid` キーを有効にすると、Mermaid も同様に同梱され、`mermaid.min.js`
 バンドルが `site/assets/vendor/mermaid/` にコピーされて、組み込みのすべての
 テーマがそこから読み込むため、図表も外部への通信なしで描画されます。
@@ -78,7 +78,7 @@ Mermaid）は、このモジュールに同梱（バンドル）された状態�
   jsDelivr から遅延読み込みしますが、これは `elk` レイアウトアルゴリズムを
   使用するダイアグラムタイプに限られます。同梱された `mermaid.min.js` は、
   それ以外のすべてのダイアグラムタイプを完全に単独でレンダリングします。
-- `bxdocs.json` の `math` オプションを有効にすると、KaTeX（JS 本体とその独自
+- `bxsites.json` の `math` オプションを有効にすると、KaTeX（JS 本体とその独自
   フォントファイルの両方）を CDN から読み込みます。
 - `searchProvider.provider: "algolia"` と `analytics.provider: "google"` は、
   その性質上ホスト型の API／トラッキングエンドポイントと通信します - JS
@@ -122,14 +122,14 @@ Phosphor は 6 つのウェイトすべてを独自プレフィックスで提�
 
 - **`layout.bxm`**（必須）- 外側の HTML シェル + ナビゲーション。
 - **`page.bxm`**（必須）- 記事本文。`variables.page.contentHtml` をレンダリングします。
-- **`search.bxm`**（省略可）- 検索ボックスのマークアップ。`bxdocs.json` の `search` が `true` の場合のみ含まれます。
+- **`search.bxm`**（省略可）- 検索ボックスのマークアップ。`bxsites.json` の `search` が `true` の場合のみ含まれます。
 - **`assets/`**（省略可）- テーマの CSS/JS。ビルド時に `site/assets/theme/` にコピーされます。
 
 テーマフォルダに必須ファイルのいずれかが欠けている場合、テンプレートエラーが深部から出るのではなく、
-ビルド時に明確な `BxDocs.InvalidTheme` エラーで即座に失敗します。
+ビルド時に明確な `BxSites.InvalidTheme` エラーで即座に失敗します。
 
 ## テーマオーバーライドなしの色のカスタマイズ
 
 色やフォントの微調整には、テーマ全体をフォークするのは過剰です。各組み込みテーマは
-`:root` 上の少数の CSS カスタムプロパティからパレットを読み込みます。`bxdocs.json` の
+`:root` 上の少数の CSS カスタムプロパティからパレットを読み込みます。`bxsites.json` の
 `extraCss` でそれらを上書きするだけで済みます。

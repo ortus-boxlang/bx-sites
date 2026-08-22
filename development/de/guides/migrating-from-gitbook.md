@@ -6,18 +6,18 @@ tags: [anleitungen, migration, gitbook]
 
 # Migration von GitBook
 
-`bxDocs migrate` wandelt einen GitBook-Export - ein
+`bxSites migrate` wandelt einen GitBook-Export - ein
 `SUMMARY.md`-Inhaltsverzeichnis plus dessen `.md`-Dateien, GitBooks
 eigenes Sync-Format auf der Festplatte (dasselbe, das GitHub/Git Sync
-schreibt) - mit einem Befehl in einen bx-docs-`docs/`-Baum um. Alles, was
+schreibt) - mit einem Befehl in einen bx-sites-`docs/`-Baum um. Alles, was
 GitBooks Content-Block-System unterstützt, bildet auf etwas ab, das
-bx-docs bereits hat (siehe
+bx-sites bereits hat (siehe
 [Markdown-Erweiterungen](markdown.md#gitbook-style-blocks)), das Ergebnis
 ist also kein grober Entwurf - es ist eine funktionierende Website.
 
 ## Einen GitBook-Export beschaffen
 
-`bxDocs migrate` liest GitBooks eigenes Dateilayout direkt, sodass jedes
+`bxSites migrate` liest GitBooks eigenes Dateilayout direkt, sodass jedes
 der folgenden als `--source` funktioniert:
 
 - Ein Repository, mit dem GitBook per Git-Sync verbunden ist
@@ -31,15 +31,15 @@ enthält.
 ## Die Migration ausführen
 
 ```bash
-# 1. Scaffold a fresh bx-docs project (skip this if you already have one)
-bxDocs new my-docs
+# 1. Scaffold a fresh bx-sites project (skip this if you already have one)
+bxSites new my-docs
 cd my-docs
 
 # 2. Migrate the GitBook export into it
-bxDocs migrate --source=/path/to/gitbook-export
+bxSites migrate --source=/path/to/gitbook-export
 
 # 3. Build and look at the result
-bxDocs serve
+bxSites serve
 ```
 
 `migrate` gibt aus, wie viele Seiten konvertiert wurden, und, wenn etwas
@@ -67,8 +67,8 @@ auszuführen.
 | GitBook | Wird zu |
 |---|---|
 | `SUMMARY.md` | `docs/nav.json` ([Nav-Override](../configuration.md#nav)-Format), Verschachtelung bleibt erhalten |
-| `README.md` (beliebiger Ordner) | `index.md` - bx-docs' eigene Ordner-Index-Konvention |
-| Die `title`/`description`/`tags`-Frontmatter einer Seite | Unverändert in die eigene bx-docs-Frontmatter der migrierten Datei übernommen |
+| `README.md` (beliebiger Ordner) | `index.md` - bx-sites' eigene Ordner-Index-Konvention |
+| Die `title`/`description`/`tags`-Frontmatter einer Seite | Unverändert in die eigene bx-sites-Frontmatter der migrierten Datei übernommen |
 | `.gitbook/assets/**` | `docs/assets/gitbook/**`, mit jeder Referenz entsprechend umgeschrieben |
 | `{% hint style="..." %}` | `!!! type` - eine native [Admonition](markdown.md#admonitions) |
 | `{% tabs %}` / `{% tab title="..." %}` | `=== "Title"` - native [Content-Tabs](markdown.md#content-tabs) |
@@ -86,11 +86,11 @@ wird korrekt in Ruhe gelassen und nicht als der echte Block missverstanden.
 
 ## Was einen manuellen Blick braucht
 
-Eine Handvoll GitBook-Blöcke hat überhaupt keine bx-docs-Entsprechung und
+Eine Handvoll GitBook-Blöcke hat überhaupt keine bx-sites-Entsprechung und
 wird in ihrer ursprünglichen `{% %}`-Syntax belassen, statt geraten zu
 werden: **Prompt** (ein KI-Generierungsblock - es gibt nichts, wogegen man
 ihn nach der Migration ausführen könnte), **bedingter Inhalt**
-(GitBook-Konto-basierte Sichtbarkeit, kein Konzept, das bx-docs hat), und
+(GitBook-Konto-basierte Sichtbarkeit, kein Konzept, das bx-sites hat), und
 die **Ask-AI**-Suchleiste. Alles andere, das dieses Tool nicht erkennt -
 ein vertippter Block, eine GitBook-Funktion, die nach der Entstehung
 dieses Tools hinzugefügt wurde - erhält dieselbe Behandlung: unverändert
@@ -120,8 +120,8 @@ seiner sechs Stärken - [Lucide](https://lucide.dev/icons/) oder
 
 Die migrierte `docs/nav.json` ist eine reine
 [Nav-Override](../configuration.md#nav)-Datei - bearbeite sie wie jede
-andere, oder lösche sie, um auf bx-docs' eigene Konvention
+andere, oder lösche sie, um auf bx-sites' eigene Konvention
 Ordnerstruktur-ist-Navigationsstruktur zurückzufallen. Von hier an ist es
-ein normales bx-docs-Projekt: wähle ein [Theme](themes.md), überprüfe
-[`bxdocs.json`](../configuration.md) und [deploye](deployment.md), sobald
+ein normales bx-sites-Projekt: wähle ein [Theme](themes.md), überprüfe
+[`bxsites.json`](../configuration.md) und [deploye](deployment.md), sobald
 du zufrieden bist.

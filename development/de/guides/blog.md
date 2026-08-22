@@ -10,7 +10,7 @@ tags: [guides, blog]
 A blog is another by-convention feature, the same shape as
 [versions](../configuration.md#versioning)/[i18n](i18n.md) or the
 [tags index](../getting-started.md#add-pages) - drop posts under
-`docs/blog/posts/`, and BX Docs builds `/blog/` (paginated), a category page
+`docs/blog/posts/`, and BX Sites builds `/blog/` (paginated), a category page
 per category, a year archive page per calendar year, an author page per
 author, an RSS feed per category plus one for the whole blog, and a
 `/blog/stats/` page, with zero config required. A project with no
@@ -60,7 +60,7 @@ out of the excerpt shown on `/blog/` and category pages, but still renders
 in full on the post's own page.
 ```
 
-- `date` (required) - any BX Docs can parse (`2026-08-15`, or a full
+- `date` (required) - any BX Sites can parse (`2026-08-15`, or a full
   date-time). Sets the post's own sort order (newest first) and its
   `<pubDate>`/`article:published_time`.
 - `authors` - a list of ids matching [`docs/blog/authors.yml`](#authors)
@@ -75,7 +75,7 @@ in full on the post's own page.
   every other tagged page.
 - `summary` - a one-line excerpt shown on `/blog/`/category pages and in
   the RSS feed, used when a post has no `<!-- more -->` marker. Without
-  either, BX Docs falls back to a plain-text truncation of the post's own
+  either, BX Sites falls back to a plain-text truncation of the post's own
   body.
 - `image` - a featured image (a `docs/assets/`-relative path, or a full
   URL) - shown at the top of the post and as a thumbnail on every list/
@@ -86,8 +86,8 @@ in full on the post's own page.
   [Images](images.md).
 - `slug` - overrides the URL segment (`/blog/<slug>/`) - derived from the
   filename by default.
-- `draft: true` - excludes the post from a real `bxDocs build` entirely.
-  `bxDocs serve` previews it anyway (with a visible "🚧 Draft" banner on the
+- `draft: true` - excludes the post from a real `bxSites build` entirely.
+  `bxSites serve` previews it anyway (with a visible "🚧 Draft" banner on the
   post itself and a dashed-border card wherever it's listed), so you can
   proofread a draft locally before it's ready - see
   [Previewing drafts](#previewing-drafts).
@@ -164,7 +164,7 @@ it somewhere specific instead, add your own entry with an explicit `url`
 a `docs/` page) to your `nav` array or `docs/nav.json` - doing so suppresses
 the auto-appended one entirely, so there's never a duplicate:
 
-```json title="bxdocs.json" linenums="1"
+```json title="bxsites.json" linenums="1"
 { "nav": [
   { "path": "index.md" },
   { "title": "Blog", "url": "blog/index.html", "icon": "lucide:newspaper" },
@@ -194,20 +194,20 @@ Every category also gets its own filtered feed at
 unbounded feed on a large blog just wastes bandwidth on every poll; set it
 to `0` for every post, uncapped:
 
-```json title="bxdocs.json"
+```json title="bxsites.json"
 { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
 ```
 
 ## Previewing drafts
 
-`draft: true` keeps a post out of a real `bxDocs build` entirely - but
-`bxDocs serve` includes it anyway, so you can read through a draft (and
+`draft: true` keeps a post out of a real `bxSites build` entirely - but
+`bxSites serve` includes it anyway, so you can read through a draft (and
 click every link, check the featured image, see how it lists on `/blog/`)
 before it's ready. A previewed draft always carries a visible "🚧 Draft"
 banner - on its own detail page, and as a dashed-border card wherever it's
 listed (the main `/blog/` list, its own category/archive/author pages) -
 so there's never any ambiguity about what's actually published. Stop
-`bxDocs serve` and run `bxDocs build` and the same draft is gone, exactly
+`bxSites serve` and run `bxSites build` and the same draft is gone, exactly
 as if it didn't exist.
 
 ## Stats
@@ -258,7 +258,7 @@ converted Markdown page:
 | `blog-post-card` / `blog-post-card--draft` | Each post's card on `/blog/`, a category page, or an archive page |
 | `blog-post-meta` | The date/author/reading-time line, on a card and on a post's own page |
 | `blog-post-featured-image` | A post's `image` frontmatter, on its own detail page |
-| `blog-draft-badge` | The "🚧 Draft" banner (`bxDocs serve` only) |
+| `blog-draft-badge` | The "🚧 Draft" banner (`bxSites serve` only) |
 | `blog-pager` | Prev/next pagination links on a paginated list |
 | `blog-author-profile` | An author's bio/socials block on their `/blog/authors/<id>/` page |
 | `blog-archive-links` / `blog-category-links` | The "Browse by year"/"Browse by category" link blocks on `/blog/` |

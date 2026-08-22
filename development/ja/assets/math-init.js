@@ -2,7 +2,7 @@
  * Typesets LaTeX math left in the page text by MathProtector.bx
  * (`$...$` inline, `$$...$$` block) using KaTeX's auto-render extension,
  * loaded from its CDN alongside this file (see layout.bxm, gated on
- * bxdocs.json's `math` flag). Only included in the build when math is
+ * bxsites.json's `math` flag). Only included in the build when math is
  * enabled - see BuildPipeline.bx's copyAssets().
  */
 ( function () {

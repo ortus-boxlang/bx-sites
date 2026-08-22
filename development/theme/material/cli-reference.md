@@ -2,24 +2,24 @@
 title: CLI Reference
 order: 3
 icon: phosphor-duotone:terminal-window
-summary: Every bxDocs verb and its flags.
+summary: Every bxSites verb and its flags.
 tags: [reference, cli]
 ---
 
 # CLI Reference
 
 ```bash title="Usage"
-bxDocs <verb> [options]
+bxSites <verb> [options]
 ```
 
-`box install bx-docs` drops a standalone `bxDocs` script on your `PATH`
+`box install bx-sites` drops a standalone `bxSites` script on your `PATH`
 (via `box.json`'s `boxlang.executable`), so every verb below can be run
-either that short way, or as `boxlang module:bxdocs <verb>` - both run the
+either that short way, or as `boxlang module:bxsites <verb>` - both run the
 exact same thing; use the longer form anywhere the `PATH` shim isn't set
 up (a CI runner, a module registered by hand):
 
 ```bash title="Usage (no PATH shim)"
-boxlang module:bxdocs <verb> [options]
+boxlang module:bxsites <verb> [options]
 ```
 
 Every verb accepts `--projectRoot=<path>` (or a bare positional path) to
@@ -38,13 +38,13 @@ flags below can appear before any verb.
 Scaffold a docs project.
 
 ```bash title="Usage"
-bxDocs new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...] [--format=yaml|json]
+bxSites new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...] [--format=yaml|json]
 ```
 
 - `--name` - the site name written into the site config (defaults to the target directory's name)
 - `--theme` - defaults to `bootstrap`
 - `--description` - the site description written into the site config
-- `--format` - `yaml` (default, scaffolds `bxdocs.yaml`) or `json` (scaffolds `bxdocs.json`) - see [Configuration](configuration.md)
+- `--format` - `yaml` (default, scaffolds `bxsites.yaml`) or `json` (scaffolds `bxsites.json`) - see [Configuration](configuration.md)
 
 ## `build`
 
@@ -56,7 +56,7 @@ set to a provider - like `algolia`/`pagefind` - that doesn't use it, see
 `docs/assets/**` into `site/`.
 
 ```bash frame="terminal" title="Terminal"
-bxDocs build
+bxSites build
 ```
 
 ## `serve`
@@ -64,7 +64,7 @@ bxDocs build
 Build and serve the site locally with live reload.
 
 ```bash title="Usage"
-bxDocs serve [--port=8080] [--host=127.0.0.1]
+bxSites serve [--port=8080] [--host=127.0.0.1]
 ```
 
 Runs in the foreground until interrupted (Ctrl+C).
@@ -76,7 +76,7 @@ copying assets. `build` already runs this same step automatically - this
 verb exists for when you only need to refresh the index.
 
 ```bash frame="terminal" title="Terminal"
-bxDocs search-index
+bxSites search-index
 ```
 
 ## `clean`
@@ -84,7 +84,7 @@ bxDocs search-index
 Remove `site/` and any build cache, leaving `docs/` and the site config alone.
 
 ```bash frame="terminal" title="Terminal"
-bxDocs clean
+bxSites clean
 ```
 
 ## `gh-deploy`
@@ -96,12 +96,12 @@ repository with a configured remote; never touches your own current branch
 or working tree (it does the push from a throwaway `git worktree`).
 
 ```bash title="Usage"
-bxDocs gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
+bxSites gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
 ```
 
 - `--branch` - defaults to `gh-pages`
 - `--remote` - defaults to `origin`
-- `--message` - the branch's single commit message, defaults to `"Deploy site via bxDocs gh-deploy"`
+- `--message` - the branch's single commit message, defaults to `"Deploy site via bxSites gh-deploy"`
 
 See [Deployment](guides/deployment.md) for the full GitHub Pages setup
 (enabling Pages for the branch, `baseURL`, etc.).
@@ -112,8 +112,8 @@ Converts an existing docs project into this one - `--from` picks the
 source format, `gitbook` (the default) or `mkdocs`.
 
 ```bash frame="terminal" title="Terminal" linenums="1"
-bxDocs migrate --source=/path/to/gitbook-export
-bxDocs migrate --source=/path/to/mkdocs-project --from=mkdocs
+bxSites migrate --source=/path/to/gitbook-export
+bxSites migrate --source=/path/to/mkdocs-project --from=mkdocs
 ```
 
 - `--source` (required) - path to the export/project's root directory (must contain `SUMMARY.md` for `gitbook`, `mkdocs.yml` for `mkdocs`)
@@ -124,7 +124,7 @@ bxDocs migrate --source=/path/to/mkdocs-project --from=mkdocs
 A GitBook export - a `SUMMARY.md` table of contents plus its `.md` files,
 GitBook's own on-disk sync format - into this project's `docs/` tree:
 `SUMMARY.md` becomes `docs/nav.json`, `{% block %}` syntax becomes its
-bx-docs equivalent (`::: name` directives, or the native `=== "Title"`
+bx-sites equivalent (`::: name` directives, or the native `=== "Title"`
 tabs / `!!! type` admonition syntax where a closer match already exists -
 see [Content Blocks](guides/content-blocks.md)),
 `README.md` files become `index.md`, and `.gitbook/assets/**` is copied to
@@ -133,10 +133,10 @@ see [Content Blocks](guides/content-blocks.md)),
 ### `--from=mkdocs`
 
 An mkdocs project - `mkdocs.yml` plus its `docs/` folder - into a
-complete bx-docs project: `mkdocs.yml` becomes `bxdocs.yaml` +
+complete bx-sites project: `mkdocs.yml` becomes `bxsites.yaml` +
 `docs/nav.json`, and every page is copied across largely unchanged, since
 mkdocs-material's own admonition/tabs/math/code-annotation syntax already
-*is* bx-docs' own native syntax - see
+*is* bx-sites' own native syntax - see
 [Migrating from mkdocs](guides/migrating-from-mkdocs.md). Non-`.md` assets
 (images commonly sitting next to the page that uses them, mkdocs has no
 single asset-folder convention) are relocated to `docs/assets/mkdocs/` and
@@ -147,7 +147,7 @@ their references rewritten.
 Prints a summary of pages (and, for mkdocs, assets) converted and, when
 anything couldn't be auto-converted, a list of exactly what needs a
 manual look - nothing is silently dropped. A destination file,
-`bxdocs.yaml`, or `docs/nav.json` that already exists is overwritten
+`bxsites.yaml`, or `docs/nav.json` that already exists is overwritten
 (also reported), so review the migrated output before committing it.
 
 ## `check`
@@ -168,8 +168,8 @@ first. Checks for:
   reachable by a direct link.
 
 ```bash frame="terminal" title="Terminal" linenums="1"
-bxDocs build
-bxDocs check
+bxSites build
+bxSites check
 ```
 
 Exits `1` when there are any broken links/images or missing-alt images,
@@ -197,8 +197,8 @@ first. Reports:
 - **Site output** - total file count and on-disk size of the built `site/`.
 
 ```bash
-bxDocs build
-bxDocs stats
+bxSites build
+bxSites stats
 ```
 
 Always exits `0` - purely informational, nothing here is a pass/fail gate
@@ -208,14 +208,14 @@ Always exits `0` - purely informational, nothing here is a pass/fail gate
 
 A one-shot environment/config health check - the "run this before filing a
 bug report" verb. Checks the JVM version, that `docs/` exists, that
-`bxdocs.json`/`.yaml` actually parses and validates, that the required
+`bxsites.json`/`.yaml` actually parses and validates, that the required
 BoxLang modules (`bx-markdown`, `bx-esapi`, `bx-yaml`, `bx-image`) are
 installed and activated, and - if a project-level `theme/` override
 exists - that it satisfies the two-required-file `layout.bxm`/`page.bxm`
 contract.
 
 ```bash frame="terminal" title="Terminal"
-bxDocs doctor
+bxSites doctor
 ```
 
 Exits `1` if any check fails, `0` otherwise. Nothing here mutates a
@@ -226,7 +226,7 @@ project - purely diagnostic.
 Scaffold a new blog post at `docs/blog/posts/<slug>.md`.
 
 ```bash title="Usage"
-bxDocs post:new --title="My New Post" [--slug=...] [--date=...] [--authors=...] [--categories=...] [--tags=...] [--draft]
+bxSites post:new --title="My New Post" [--slug=...] [--date=...] [--authors=...] [--categories=...] [--tags=...] [--draft]
 ```
 
 - `--title` (required) - also becomes the post's frontmatter `title`
@@ -244,7 +244,7 @@ Snapshot the current `docs/` tree into `docs/versions/<name>/`, excluding
 loaded tree, not part of the snapshot).
 
 ```bash title="Usage"
-bxDocs version:new --name=1.0
+bxSites version:new --name=1.0
 ```
 
 - `--name` (required) - the version folder/label, e.g. `1.0`
@@ -258,7 +258,7 @@ how many of the default tree's pages exist (at the same relative path)
 under `docs/i18n/<code>/`, and which ones are still missing.
 
 ```bash frame="terminal" title="Terminal"
-bxDocs i18n:status
+bxSites i18n:status
 ```
 
 Always exits `0` - purely informational.
@@ -269,13 +269,13 @@ Scaffold a new `docs/i18n/<code>/` locale folder, seeding an `index.md`
 copied from the default locale's own `index.md` when one exists.
 
 ```bash title="Usage"
-bxDocs i18n:new --code=es
+bxSites i18n:new --code=es
 ```
 
 - `--code` (required) - the locale code, e.g. `es`, `fr`, `pt-BR`
 
 See [Internationalization](guides/i18n.md) for wiring the new locale into
-`bxdocs.json`'s `i18n.locales`.
+`bxsites.json`'s `i18n.locales`.
 
 ## `page:new`
 
@@ -283,7 +283,7 @@ Scaffold a single docs page at an arbitrary path under `docs/`, with the
 requested frontmatter already filled in.
 
 ```bash title="Usage"
-bxDocs page:new --path=guides/setup.md [--title=...] [--description=...] [--icon=...] [--tags=...] [--order=...]
+bxSites page:new --path=guides/setup.md [--title=...] [--description=...] [--icon=...] [--tags=...] [--order=...]
 ```
 
 - `--path` (required) - `docs/`-relative, must end in `.md`
@@ -293,18 +293,18 @@ bxDocs page:new --path=guides/setup.md [--title=...] [--description=...] [--icon
 ## `plugin:new`
 
 Scaffold a plugin module skeleton (`box.json`, `ModuleConfig.bx`, a
-`models/BxDocsPlugin.bx` with every hook stubbed out) mirroring
+`models/BxSitesPlugin.bx` with every hook stubbed out) mirroring
 `examples/hello-plugin/`.
 
 ```bash title="Usage"
-bxDocs plugin:new --name=my-analytics-plugin [--dest=...]
+bxSites plugin:new --name=my-analytics-plugin [--dest=...]
 ```
 
 - `--name` (required) - the plugin's module name/slug
 - `--dest` - defaults to `<projectRoot>/<name>`
 
 See [Plugins](guides/plugins.md) for the hook reference and how to wire the
-finished plugin into `bxdocs.json`'s `plugins` array.
+finished plugin into `bxsites.json`'s `plugins` array.
 
 ## `theme:new`
 
@@ -313,7 +313,7 @@ the project's own `theme/` folder for customizing, matching mkdocs'
 `--theme` eject workflow.
 
 ```bash title="Usage"
-bxDocs theme:new --theme=material
+bxSites theme:new --theme=material
 ```
 
 - `--theme` (required) - `bootstrap`, `material`, or `tailwind`
@@ -330,7 +330,7 @@ file-relative link-rot problem the built HTML side already solves
 (`check`), applied to raw Markdown source at rename time instead.
 
 ```bash title="Usage"
-bxDocs page:rename --from=guides/old-name.md --to=guides/new-name.md
+bxSites page:rename --from=guides/old-name.md --to=guides/new-name.md
 ```
 
 - `--from` (required) - the page's current `docs/`-relative path
@@ -347,7 +347,7 @@ always skips drafts, so this is the only place their existence is
 surfaced.
 
 ```bash frame="terminal" title="Terminal"
-bxDocs blog:drafts
+bxSites blog:drafts
 ```
 
 Always exits `0`.
@@ -358,7 +358,7 @@ Filters blog posts by author/category/tag/date range, without running a
 full `build`.
 
 ```bash title="Usage"
-bxDocs blog:find [--author=...] [--category=...] [--tag=...] [--since=...] [--until=...] [--drafts]
+bxSites blog:find [--author=...] [--category=...] [--tag=...] [--since=...] [--until=...] [--drafts]
 ```
 
 - `--author`, `--category`, `--tag` - case-insensitive exact match against any of the post's own values
@@ -377,7 +377,7 @@ then tags, then headings, then body), so you can sanity-check what a
 real visitor's search would surface without opening a browser.
 
 ```bash title="Usage"
-bxDocs search:query --query="getting started" [--limit=10]
+bxSites search:query --query="getting started" [--limit=10]
 ```
 
 - `--query` (required) - space-separated search terms
@@ -398,7 +398,7 @@ Checks for:
   moment it loads posts - `lint` surfaces it as a finding instead).
 
 ```bash frame="terminal" title="Terminal"
-bxDocs lint
+bxSites lint
 ```
 
 Exits `1` when either check finds anything, `0` otherwise.

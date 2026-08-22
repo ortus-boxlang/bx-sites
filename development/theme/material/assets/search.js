@@ -1,27 +1,27 @@
 /**
- * Shared client-side search widget for bx-docs' built-in themes - fully
+ * Shared client-side search widget for bx-sites' built-in themes - fully
  * static, no server dependency, matching mkdocs' own default search
  * (lunr.js) per module spec section 7. Every theme's own search.bxm partial
- * just renders the markup (an #bxdocs-search-input + #bxdocs-search-results
+ * just renders the markup (an #bxsites-search-input + #bxsites-search-results
  * pair); this one script wires all of them the same way against the shared
  * search-index.json format built by SearchIndexer.bx.
  *
- * `window.__BXDOCS_BASE_PATH__` (set inline by layout.bxm from
+ * `window.__BXSITES_BASE_PATH__` (set inline by layout.bxm from
  * BaseUrlResolver's `basePath`) prefixes both the index fetch and every
  * result link, so search still works when a site is hosted from a sub-path.
  *
  * `/` and Cmd/Ctrl+K both focus the search box from anywhere on the page;
- * a theme's `.bxdocs-search-kbd` badge (if it renders one) gets its text
+ * a theme's `.bxsites-search-kbd` badge (if it renders one) gets its text
  * swapped to the platform-correct hint.
  */
 ( function () {
 	function basePath() {
-		return window.__BXDOCS_BASE_PATH__ || "/";
+		return window.__BXSITES_BASE_PATH__ || "/";
 	}
 
 	function init() {
-		var input = document.getElementById( "bxdocs-search-input" );
-		var results = document.getElementById( "bxdocs-search-results" );
+		var input = document.getElementById( "bxsites-search-input" );
+		var results = document.getElementById( "bxsites-search-results" );
 		if ( !input || !results ) {
 			return;
 		}
@@ -63,7 +63,7 @@
 
 		function closeResults() {
 			results.innerHTML = "";
-			results.classList.remove( "bxdocs-search-open" );
+			results.classList.remove( "bxsites-search-open" );
 		}
 
 		input.addEventListener( "input", function () {
@@ -84,10 +84,10 @@
 
 			if ( !hits.length ) {
 				var empty = document.createElement( "li" );
-				empty.className = "bxdocs-search-empty";
+				empty.className = "bxsites-search-empty";
 				empty.textContent = "No results found.";
 				results.appendChild( empty );
-				results.classList.add( "bxdocs-search-open" );
+				results.classList.add( "bxsites-search-open" );
 				return;
 			}
 
@@ -104,7 +104,7 @@
 				results.appendChild( li );
 			} );
 
-			results.classList.add( "bxdocs-search-open" );
+			results.classList.add( "bxsites-search-open" );
 		} );
 
 		input.addEventListener( "keydown", function ( evt ) {
@@ -148,7 +148,7 @@
 
 		// Shows the platform-correct hint (⌘K on Mac, Ctrl K elsewhere) in the
 		// kbd badge search.bxm renders next to the input, if the theme has one.
-		var kbd = document.querySelector( ".bxdocs-search-kbd" );
+		var kbd = document.querySelector( ".bxsites-search-kbd" );
 		if ( kbd && /Mac|iPod|iPhone|iPad/.test( window.navigator.platform || "" ) ) {
 			kbd.textContent = "⌘K";
 		}

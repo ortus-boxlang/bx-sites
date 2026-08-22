@@ -7,14 +7,14 @@ tags: [guides, markdown]
 
 # Markdown Extensions
 
-Beyond standard Markdown, BX Docs turns on three of bx-markdown's native
+Beyond standard Markdown, BX Sites turns on three of bx-markdown's native
 Flexmark extensions by default - admonitions, footnotes and definition lists
 - plus a Mermaid diagram integration of its own. All four are configurable
-via [`bxdocs.json`'s `markdown`/`mermaid` keys](../configuration.md#markdown).
+via [`bxsites.json`'s `markdown`/`mermaid` keys](../configuration.md#markdown).
 
-On top of those, BX Docs implements three more extensions of its own that
+On top of those, BX Sites implements three more extensions of its own that
 Flexmark has no concept of at all - content tabs, math, and fenced-code
-`hl_lines`/`linenums`/`title` annotations. Since bx-docs can't fork
+`hl_lines`/`linenums`/`title` annotations. Since bx-sites can't fork
 bx-markdown's parser, each one works as a pre/post-processing pass around
 the normal markdown conversion instead - see the sections below.
 
@@ -28,7 +28,7 @@ flowchart LR
 
 ## Admonitions
 
-A callout/note box - on by default, no `bxdocs.json` config needed:
+A callout/note box - on by default, no `bxsites.json` config needed:
 
 ```markdown title="Example" linenums="1"
 !!! note "Heads Up"
@@ -183,7 +183,7 @@ Which renders as:
 
 Consecutive `=== "..."` blocks (separated by at most one blank line) form a
 single tab group; a tab's own content is full markdown, so code fences,
-lists, admonitions, whatever you'd write anywhere else. No `bxdocs.json`
+lists, admonitions, whatever you'd write anywhere else. No `bxsites.json`
 config needed - always on.
 
 ## Code Blocks
@@ -191,7 +191,7 @@ config needed - always on.
 Fenced code blocks are syntax-highlighted client-side (highlight.js), no
 config needed - the language identifier after the opening ` ``` ` selects
 the grammar, e.g. ` ```json `. On top of highlight.js's own bundled
-languages, BX Docs registers its own lightweight BoxLang grammar under
+languages, BX Sites registers its own lightweight BoxLang grammar under
 `bx`/`boxlang`/`bxs`/`bxm`/`cfscript`:
 
 ```bx
@@ -230,7 +230,7 @@ numeric function add( required numeric a, required numeric b ) {
 `linenums="N"` starts the gutter counting at `N`; `hl_lines` takes
 space-separated line numbers and/or ranges (`"2 4-6"`) to highlight, counted
 from the top of the block regardless of where `linenums` starts; `title`
-adds a small title bar above the block. No `bxdocs.json` config needed -
+adds a small title bar above the block. No `bxsites.json` config needed -
 always available.
 
 ### Diff markers and terminal frames
@@ -273,24 +273,24 @@ terminal window - three status dots, centered title - instead:
 
 ````markdown
 ```bash frame="terminal" title="user@boxlang"
-box install bx-docs
+box install bx-sites
 ```
 ````
 
 Which renders as:
 
 ```bash frame="terminal" title="user@boxlang"
-box install bx-docs
+box install bx-sites
 ```
 
 `frame="code"` is the explicit name for today's plain bar - the default;
 nothing needs to write it. Both `insert`/`delete` and `frame` need no
-`bxdocs.json` config, same as `hl_lines`/`linenums`/`title`.
+`bxsites.json` config, same as `hl_lines`/`linenums`/`title`.
 
 #### Real git diffs
 
 Tag a fence `diff` and paste real `git diff`/`git show` output straight in
-- this isn't bx-docs-specific syntax at all, just highlight.js's own `diff`
+- this isn't bx-sites-specific syntax at all, just highlight.js's own `diff`
 grammar recognizing unified-diff syntax (`+`/`-`/`@@` lines) on its own:
 
 ````markdown
@@ -360,9 +360,9 @@ starts.
 
 ## Diagrams
 
-Opt-in via `bxdocs.json`'s [`mermaid`](../configuration.md#mermaid) key:
+Opt-in via `bxsites.json`'s [`mermaid`](../configuration.md#mermaid) key:
 
-```json title="bxdocs.json"
+```json title="bxsites.json"
 { "mermaid": true }
 ```
 
@@ -382,9 +382,9 @@ for everything it can draw.
 
 ## Math
 
-Opt-in via `bxdocs.json`'s [`math`](../configuration.md#math) key:
+Opt-in via `bxsites.json`'s [`math`](../configuration.md#math) key:
 
-```json title="bxdocs.json"
+```json title="bxsites.json"
 { "math": true }
 ```
 
@@ -417,11 +417,11 @@ block, and reusable content includes.
 
 See [Responsive Images](images.md#captions-alignment-and-framing) for
 captions, alignment and framing (plain block-level HTML - no
-bx-docs-specific syntax needed at all).
+bx-sites-specific syntax needed at all).
 
 ## Plugin extensions
 
 Admonitions, footnotes and definition lists cover the common cases, but
 bx-markdown itself has no opinion beyond those three - any other Flexmark
 extension can be registered directly against it with `markdownRegisterExtension()`,
-independent of BX Docs. See bx-markdown's own readme for details.
+independent of BX Sites. See bx-markdown's own readme for details.

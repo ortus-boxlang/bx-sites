@@ -8,7 +8,7 @@
  * change alongside the browser's own default navigation.
  */
 ( function () {
-	document.querySelectorAll( ".bxdocs-toc-mobile a" ).forEach( function ( link ) {
+	document.querySelectorAll( ".bxsites-toc-mobile a" ).forEach( function ( link ) {
 		link.addEventListener( "click", function () {
 			var details = link.closest( "details" )
 			if ( details ) {

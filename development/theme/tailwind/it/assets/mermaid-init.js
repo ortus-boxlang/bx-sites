@@ -2,7 +2,7 @@
  * Converts bx-markdown's fenced ```mermaid code blocks (rendered as plain
  * <pre><code class="language-mermaid">) into mermaid.js's own expected
  * <div class="mermaid"> container, then renders them - shared across all
- * built-in themes, only loaded when bxdocs.json's `mermaid` is true.
+ * built-in themes, only loaded when bxsites.json's `mermaid` is true.
  */
 ( function () {
 	function init() {

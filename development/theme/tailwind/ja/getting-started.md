@@ -10,13 +10,13 @@ tags: [guides, setup]
 
 ## インストール
 
-BX Docs は、Markdown レンダリングに [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)、
+BX Sites は、Markdown レンダリングに [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)、
 HTML エンコードに [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)、
-`bxdocs.yaml` の読み込みに [bx-yaml](https://github.com/ortus-boxlang/bx-yaml) が必要です。
+`bxsites.yaml` の読み込みに [bx-yaml](https://github.com/ortus-boxlang/bx-yaml) が必要です。
 [CommandBox](https://commandbox.ortusbooks.com/) がインストール済みの場合:
 
 ```bash
-box install bx-docs
+box install bx-sites
 box install bx-markdown
 box install bx-esapi
 box install bx-yaml
@@ -25,20 +25,20 @@ box install bx-yaml
 CommandBox を使用しない場合、BoxLang 独自のインストーラーで 4 つをまとめてインストールできます:
 
 ```bash
-install-bx-module bx-docs bx-markdown bx-esapi bx-yaml
+install-bx-module bx-sites bx-markdown bx-esapi bx-yaml
 ```
 
 `box install`/`install-bx-module` は `box.json` の `boxlang.executable` を参照し、
-`~/.boxlang/bin` に `bxDocs` スクリプトを配置します。これにより、以下のコマンドがいずれの形式でも実行できます:
+`~/.boxlang/bin` に `bxSites` スクリプトを配置します。これにより、以下のコマンドがいずれの形式でも実行できます:
 
 ```bash
-bxDocs <verb> [options]
+bxSites <verb> [options]
 ```
 
 または、BoxLang は使えるが `PATH` のシムが設定されていない環境（CI ランナー、手動登録のモジュールなど）では:
 
 ```bash
-boxlang module:bxdocs <verb> [options]
+boxlang module:bxsites <verb> [options]
 ```
 
 このガイドでは短縮形を使用します。
@@ -46,7 +46,7 @@ boxlang module:bxdocs <verb> [options]
 ## プロジェクトのスキャフォールド
 
 ```bash
-bxDocs new my-docs
+bxSites new my-docs
 cd my-docs
 ```
 
@@ -57,7 +57,7 @@ my-docs/
 ├── docs/
 │   ├── assets/
 │   └── index.md
-└── bxdocs.yaml
+└── bxsites.yaml
 ```
 
 `--theme=material` や `--theme=tailwind` で別のテーマを指定でき、
@@ -65,15 +65,15 @@ my-docs/
 
 ### 設定ファイルの形式
 
-`bxdocs.yaml` はデフォルトかつ推奨の形式です。特に指定がない限り `new` はこの形式を
+`bxsites.yaml` はデフォルトかつ推奨の形式です。特に指定がない限り `new` はこの形式を
 スキャフォールドし、このガイドと [設定](configuration.md) の例もすべてまずこの形式で
-示されます。`bxdocs.json` も完全にサポートされており、そちらを好むプロジェクトでは
+示されます。`bxsites.json` も完全にサポートされており、そちらを好むプロジェクトでは
 `--format=json` を渡してスキャフォールドするか、自分で手書き/リネームするだけで構いません。
-ConfigLoader は `bxdocs.yaml`/`.yml`/`.json` のうち実際に存在するものをこの順序で解決するため、
+ConfigLoader は `bxsites.yaml`/`.yml`/`.json` のうち実際に存在するものをこの順序で解決するため、
 切り替えに他の設定は一切必要ありません。両方の形式の完全なキーリファレンスは
 [設定](configuration.md) を参照してください。
 
-GitBook のコンテンツがある場合は、`bxDocs migrate --source=/path/to/export` で
+GitBook のコンテンツがある場合は、`bxSites migrate --source=/path/to/export` で
 GitBook エクスポートをそのまま `docs/` に変換できます。
 詳しくは [GitBook からの移行](guides/migrating-from-gitbook.md) をご覧ください。
 
@@ -101,7 +101,7 @@ docs/
 [はじめに](../getting-started.md#add-pages) に戻ることができます。
 ```
 
-BX Docs はビルド時にすべてのリンクをキレイな URL に書き換えます
+BX Sites はビルド時にすべてのリンクをキレイな URL に書き換えます
 （`guides/deployment.md` → `/guides/deployment/index.html`、アンカーとクエリ文字列を保持）。
 絶対 URL、`mailto:`、`/` で始まるリンクはそのまま保持されます。
 
@@ -119,7 +119,7 @@ BX Docs はビルド時にすべてのリンクをキレイな URL に書き換�
 title: デプロイ
 order: 2
 hidden: false
-description: ビルドした BX Docs サイトのデプロイ方法。
+description: ビルドした BX Sites サイトのデプロイ方法。
 tags: [guides, deployment]
 icon: 🚀
 summary: サイトを公開するために必要なすべてのこと。
@@ -143,7 +143,7 @@ ogImage: assets/deployment-card.png
 ## ビルド
 
 ```bash
-bxDocs build
+bxSites build
 ```
 
 `docs/` のすべてのページを `site/` の静的サイトとしてレンダリングします。静的ファイルを配信できる場所であればどこにでもホストできます。
@@ -151,17 +151,17 @@ bxDocs build
 ## ローカルで配信
 
 ```bash
-bxDocs serve
+bxSites serve
 ```
 
 プロジェクトをビルドし、`http://127.0.0.1:8080/` で `site/` を配信します。
-`docs/`、`bxdocs.yaml`/`.json` のサイト設定、またはプロジェクトレベルの `theme/` オーバーライドを保存するたびに自動的に再ビルドされ、ブラウザも自動的にリロードされます。
+`docs/`、`bxsites.yaml`/`.json` のサイト設定、またはプロジェクトレベルの `theme/` オーバーライドを保存するたびに自動的に再ビルドされ、ブラウザも自動的にリロードされます。
 バインドの変更には `--port=3000` や `--host=0.0.0.0` を使用します。
 
 ## クリーン
 
 ```bash
-bxDocs clean
+bxSites clean
 ```
 
 `docs/` ソースを変更せずに `site/` とビルドキャッシュを削除します。

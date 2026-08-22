@@ -18,7 +18,7 @@
 
 	<g transform="translate(80,340)">
 		<rect x="0" y="0" width="430" height="56" rx="10" fill="#0B2B22" opacity="0.14"/>
-		<text x="22" y="36" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="24" font-weight="700" fill="#0B2B22">bxDocs migrate --from=gitbook</text>
+		<text x="22" y="36" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="24" font-weight="700" fill="#0B2B22">bxSites migrate --from=gitbook</text>
 	</g>
 
 	<text x="80" y="580" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="22" font-weight="600" fill="#0B2B22" opacity="0.8">One command. Nothing silently dropped.</text>

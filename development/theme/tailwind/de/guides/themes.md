@@ -61,7 +61,7 @@ bringen denselben Satz an Seitenfunktionen mit:
   [Suche](search.md).
 - **Ein Repo-Link und eine "Diese Seite bearbeiten"-/"Zuletzt
   aktualisiert"-Zeile**, wenn die Optionen `repo`/`lastUpdated` in
-  `bxdocs.json` gesetzt sind. Siehe
+  `bxsites.json` gesetzt sind. Siehe
   [Konfiguration](../configuration.md#repo).
 - **Ein "Markdown herunterladen"-Link**, neben "Diese Seite bearbeiten" -
   die rohe `.md`-Quelle jeder Seite wird zusammen mit ihrem gebauten HTML
@@ -71,7 +71,7 @@ bringen denselben Satz an Seitenfunktionen mit:
   aktiv, keine Konfiguration nötig. Siehe
   [Erste Schritte](../getting-started.md#downloading-a-page-as-markdown).
 - **Eine optionale Fußzeile** (Copyright, `social`-Links, ein "Built with
-  BX Docs"-Hinweis), wenn `footer` in `bxdocs.json` `true` ist. Siehe
+  BX Sites"-Hinweis), wenn `footer` in `bxsites.json` `true` ist. Siehe
   [Konfiguration](../configuration.md#footer).
 - **Ein Versionsumschalter**, der automatisch erscheint, sobald ein
   Projekt einen `docs/versions/`-Ordner mit mehr als einer Version hat.
@@ -80,45 +80,45 @@ bringen denselben Satz an Seitenfunktionen mit:
   meisten statischen Hosts (einschließlich GitHub Pages) für jeden nicht
   gefundenen Pfad.
 - **Ein eigenes Logo und Favicon**, wenn `theme.logo`/`theme.favicon` in
-  `bxdocs.json` gesetzt sind. Siehe
+  `bxsites.json` gesetzt sind. Siehe
   [Konfiguration](../configuration.md#theme).
 - **Eine einklappbare Sidebar-Navigation**, opt-in über
   `theme.options.navCollapsible`. Siehe
   [Konfiguration](../configuration.md#theme).
-- **Google Analytics**, wenn `analytics` in `bxdocs.json` konfiguriert
+- **Google Analytics**, wenn `analytics` in `bxsites.json` konfiguriert
   ist. Siehe [Konfiguration](../configuration.md#analytics).
 - **Social-Share-Cards** (Open-Graph- + Twitter-Card-Meta-Tags), erzeugt
   aus der `description`-Frontmatter jeder Seite (oder der websiteweiten
   `description`) und ihrem eigenen `ogImage` (oder dem websiteweiten) -
   optional automatisch pro Seite erzeugt über `generateOgImages` in
-  `bxdocs.json`. Siehe [Konfiguration](../configuration.md#ogimage).
+  `bxsites.json`. Siehe [Konfiguration](../configuration.md#ogimage).
 - **Seiten-Tags, ein Icon und eine Zusammenfassungszeile**, alle opt-in
   über die eigene Frontmatter einer Seite - Tags werden als Badges
   gerendert, die zu einem websiteweiten `/tags/`-Index verlinken. Siehe
   [Erste Schritte](../getting-started.md#add-pages).
-- **Eine explizite Navigations-Überschreibung**, in `bxdocs.json` oder der
+- **Eine explizite Navigations-Überschreibung**, in `bxsites.json` oder der
   eigenen `docs/nav.json`, die die Ordner-Ableitung für große Websites
   ersetzt. Siehe [Konfiguration](../configuration.md#nav).
 - **Zusätzliches CSS/JS**, eingebunden über `extraCss`/`extraJs` in
-  `bxdocs.json`. Siehe
+  `bxsites.json`. Siehe
   [Konfiguration](../configuration.md#extracss--extrajs).
 - **Admonition-Callout-Boxen** (Hinweis/Warnung/Tipp/...), standardmäßig
   im Markdown jeder Seite aktiv, einschließlich einklappbarer Varianten -
   keine Konfiguration nötig. Siehe
   [Markdown-Erweiterungen](markdown.md#admonitions).
 - **Fußnoten und Definitionslisten**, opt-in über `markdown` in
-  `bxdocs.json`. Siehe
+  `bxsites.json`. Siehe
   [Markdown-Erweiterungen](markdown.md#footnotes).
 - **Content-Tabs**, **Code-Zeilennummern/hervorgehobene Zeilen/Titel**
   und **Diff-Markierungen/Terminal-Rahmen** für Codeblöcke, keine
   Konfiguration nötig. Siehe
   [Markdown-Erweiterungen](markdown.md#content-tabs).
-- **Mermaid-Diagramme**, opt-in über `mermaid` in `bxdocs.json`. Siehe
+- **Mermaid-Diagramme**, opt-in über `mermaid` in `bxsites.json`. Siehe
   [Markdown-Erweiterungen](markdown.md#diagrams).
-- **Mathematik** (KaTeX), opt-in über `math` in `bxdocs.json`. Siehe
+- **Mathematik** (KaTeX), opt-in über `math` in `bxsites.json`. Siehe
   [Markdown-Erweiterungen](markdown.md#math).
 
-Lege in `bxdocs.json` fest, welches Theme ein Projekt verwendet:
+Lege in `bxsites.json` fest, welches Theme ein Projekt verwendet:
 
 ```json
 { "theme": { "name": "material" } }
@@ -132,7 +132,7 @@ für die Themes `bootstrap` und `material` mit dem standardmäßigen
 lunr.js sind alle mit diesem Modul vendoriert (`resources/assets/vendor/`)
 und werden zur Build-Zeit direkt nach `site/assets/vendor/` kopiert -
 nirgends im erzeugten HTML taucht dafür ein CDN-`<script>`-/`<link>`-Tag
-auf. Aktivierst du den Schlüssel `mermaid` in `bxdocs.json`, wird Mermaid
+auf. Aktivierst du den Schlüssel `mermaid` in `bxsites.json`, wird Mermaid
 auf dieselbe Weise vendoriert - sein `mermaid.min.js`-Bundle wird nach
 `site/assets/vendor/mermaid/` kopiert, und jedes integrierte Theme lädt es
 von dort, sodass Diagramme weiterhin ganz ohne ausgehende Anfragen
@@ -149,7 +149,7 @@ du sie selbst aktivierst:
   nach, `elk-api.js`, von jsDelivr - aber nur für Diagrammtypen, die den
   `elk`-Layout-Algorithmus verwenden; das vendorierte `mermaid.min.js`
   rendert jeden anderen Diagrammtyp vollständig eigenständig.
-- Die Option `math` in `bxdocs.json` lädt KaTeX (sowohl dessen JS als auch
+- Die Option `math` in `bxsites.json` lädt KaTeX (sowohl dessen JS als auch
   die eigenen Font-Dateien) von einem CDN, wenn sie aktiviert ist.
 - `searchProvider.provider: "algolia"` und `analytics.provider: "google"`
   sprechen naturgemäß mit einer gehosteten API/einem Tracking-Endpunkt -
@@ -228,14 +228,14 @@ Ein Theme ist einfach ein Ordner mit:
   `variables.themeDir` und `variables.basePath` im Scope, und bindet das
   benachbarte `page.bxm` über `#variables.themeDir#/page.bxm` ein.
   `variables.basePath` ist immer ein root-relativer, auf `/` endender Pfad
-  (standardmäßig `/`, `/my-docs/`, wenn `baseURL` in `bxdocs.json` das
+  (standardmäßig `/`, `/my-docs/`, wenn `baseURL` in `bxsites.json` das
   überschreibt) - stelle diesen jedem internen `href`/`src` voran, statt
   ein führendes `/` fest zu codieren, damit das Theme auch funktioniert,
   wenn die Website aus einem Unterpfad ausgeliefert wird.
 - **`page.bxm`** (erforderlich) - der Artikelinhalt. Rendert
   `variables.page.contentHtml` - das bereits konvertierte Markdown.
 - **`search.bxm`** (optional) - das Markup der Suchbox, von `layout.bxm`
-  nur eingebunden, wenn `search` in `bxdocs.json` `true` ist. Siehe
+  nur eingebunden, wenn `search` in `bxsites.json` `true` ist. Siehe
   [Suche](search.md).
 - **`assets/`** (optional) - Theme-CSS/JS, zur Build-Zeit nach
   `site/assets/theme/` kopiert.
@@ -252,14 +252,14 @@ sodass ein Theme nur dann einen Umschalter rendern muss, wenn
 `variables.versions.len() gt 1`. Die drei integrierten Themes beziehen
 ihre Repo-/Social-Icons aus einem kleinen gemeinsamen SVG-Lookup,
 `<bx:include template="#variables.moduleAssetsDir#/icons.bxm">`
-(definiert `bxdocsIcon( name )`, eines von `github`, `twitter`/`x`, `rss`,
+(definiert `bxsitesIcon( name )`, eines von `github`, `twitter`/`x`, `rss`,
 `youtube`, `linkedin`, `facebook`, `bluesky`, `threads`, `slack`,
 `patreon`, `email`, `edit`, `clock`, mit einem generischen Link-Symbol als
 Fallback) - ein eigenes Theme kann das auf dieselbe Weise einbinden, oder
 seine Icons vollständig selbst bereitstellen.
 
 Ein Theme-Ordner, dem eine der beiden erforderlichen Dateien fehlt,
-schlägt sofort mit einem klaren `BxDocs.InvalidTheme`-Fehler zur Build-Zeit
+schlägt sofort mit einem klaren `BxSites.InvalidTheme`-Fehler zur Build-Zeit
 fehl, statt mit einem verwirrenden Template-Fehler tief im Rendering.
 
 ## Farben anpassen, ohne ein Theme zu überschreiben
@@ -268,7 +268,7 @@ Für eine kleine Farb-/Schriftanpassung ist ein ganzes Theme zu forken
 Overkill - jedes integrierte Theme liest seine Palette aus einer Handvoll
 CSS-Custom-Properties auf `:root`, erneut deklariert unter
 `[data-theme="dark"]` für den Dunkelmodus. Das
-[`extraCss`](../configuration.md#extracss--extrajs) von `bxdocs.json` wird
+[`extraCss`](../configuration.md#extracss--extrajs) von `bxsites.json` wird
 *nach* dem eigenen Stylesheet des Themes geladen, sodass eine erneute
 Deklaration mit gleicher Spezifität darin gewinnt, ohne `resources/themes/`
 überhaupt anzurühren:
@@ -280,26 +280,26 @@ Deklaration mit gleicher Spezifität darin gewinnt, ohne `resources/themes/`
 ```css
 /* docs/assets/brand.css - copied to site/assets/brand.css at build time */
 :root {
-	--bxdocs-gradient-start: #7C3AED;
-	--bxdocs-gradient-end: #DB2777;
-	--bxdocs-accent: #FBBF24;
-	--bxdocs-link: #7C3AED;
-	--bxdocs-link-hover: #9F5AF0;
+	--bxsites-gradient-start: #7C3AED;
+	--bxsites-gradient-end: #DB2777;
+	--bxsites-accent: #FBBF24;
+	--bxsites-link: #7C3AED;
+	--bxsites-link-hover: #9F5AF0;
 }
 
 [data-theme="dark"] {
-	--bxdocs-link: #C4B5FD;
-	--bxdocs-link-hover: #DDD6FE;
+	--bxsites-link: #C4B5FD;
+	--bxsites-link-hover: #DDD6FE;
 }
 ```
 
 Das eigene Set des `bootstrap`-Themes
 (`resources/themes/bootstrap/assets/style.css`) besteht aus
-`--bxdocs-gradient-start`/`-end`, `--bxdocs-accent`, `--bxdocs-bg`,
-`--bxdocs-text`, `--bxdocs-sidebar-bg`, `--bxdocs-sidebar-text`,
-`--bxdocs-border`, `--bxdocs-link`, `--bxdocs-link-hover` und
-`--bxdocs-code-bg` - `material` und `tailwind` folgen derselben
-`--bxdocs-*`-Namensgebung mit ihren eigenen kleinen Abweichungen. Alles
+`--bxsites-gradient-start`/`-end`, `--bxsites-accent`, `--bxsites-bg`,
+`--bxsites-text`, `--bxsites-sidebar-bg`, `--bxsites-sidebar-text`,
+`--bxsites-border`, `--bxsites-link`, `--bxsites-link-hover` und
+`--bxsites-code-bg` - `material` und `tailwind` folgen derselben
+`--bxsites-*`-Namensgebung mit ihren eigenen kleinen Abweichungen. Alles
 über Farbe/Schriftart hinaus (Layout, Chrome hinzufügen/entfernen)
 braucht eine echte Überschreibung oder ein eigenes Theme - siehe unten.
 
@@ -307,7 +307,7 @@ braucht eine echte Überschreibung oder ein eigenes Theme - siehe unten.
 
 Lege deine eigenen `layout.bxm` + `page.bxm` (und optional `search.bxm` /
 `assets/`) in einen `theme/`-Ordner im Wurzelverzeichnis deines Projekts.
-BX Docs bevorzugt eine projektweite `theme/`-Überschreibung gegenüber
+BX Sites bevorzugt eine projektweite `theme/`-Überschreibung gegenüber
 jedem integrierten Theme, solange sie den obigen Vertrag erfüllt - die
 integrierten Themes unter `resources/themes/` dieses Moduls sind ein
 guter Ausgangspunkt zum Kopieren und Anpassen.
@@ -319,7 +319,7 @@ genau so weiterläuft, wie es bereits funktioniert:
 
 ```markdown
 my-project/
-├── bxdocs.yaml
+├── bxsites.yaml
 ├── docs/
 └── theme/                    ← project-level override, checked before any built-in theme
     ├── layout.bxm             ← copied from resources/themes/bootstrap/layout.bxm
@@ -338,9 +338,9 @@ my-project/
 
    ```css
    :root {
-   	--bxdocs-gradient-start: #7C3AED;  /* was #00FF78 */
-   	--bxdocs-gradient-end: #DB2777;    /* was #00DBFF */
-   	--bxdocs-accent: #FBBF24;          /* was #FFF500 */
+   	--bxsites-gradient-start: #7C3AED;  /* was #00FF78 */
+   	--bxsites-gradient-end: #DB2777;    /* was #00DBFF */
+   	--bxsites-accent: #FBBF24;          /* was #FFF500 */
    }
 
    body {
@@ -348,9 +348,9 @@ my-project/
    }
    ```
 
-3. Führe `boxlang module:bxDocs build` aus (oder `serve` während der
-   Iteration) - BX Docs übernimmt `theme/` automatisch, keine Änderung an
-   `bxdocs.json` nötig (ein projektweiter `theme/`-Ordner hat immer
+3. Führe `boxlang module:bxSites build` aus (oder `serve` während der
+   Iteration) - BX Sites übernimmt `theme/` automatisch, keine Änderung an
+   `bxsites.json` nötig (ein projektweiter `theme/`-Ordner hat immer
    Vorrang vor dem im `theme.name` genannten integrierten Theme). Alles,
    was du nicht angefasst hast - Navigations-Rendering, Suche, der
    Dunkelmodus-Umschalter, Code-Annotationen - funktioniert genau so
@@ -359,14 +359,14 @@ my-project/
    ist.
 
 Ein projektweiter `theme/`-Ordner ist allerdings alles-oder-nichts -
-sobald BX Docs einen findet, wird er anstelle des integrierten Themes
+sobald BX Sites einen findet, wird er anstelle des integrierten Themes
 vollständig verwendet, braucht also trotzdem seine eigenen `layout.bxm` +
 `page.bxm`, selbst wenn du nur `assets/style.css` geändert hast (ein
 Ordner, dem eine der beiden fehlt, schlägt sofort mit
-`BxDocs.InvalidTheme` fehl, statt stillschweigend zurückzufallen). Für
+`BxSites.InvalidTheme` fehl, statt stillschweigend zurückzufallen). Für
 eine reine CSS-Anpassung ohne `.bxm`, nutze stattdessen
 [`extraCss`](#customizing-colors-without-a-theme-override) von oben - es
-legt sich über das Theme, das `bxdocs.json` benennt, ganz ohne
+legt sich über das Theme, das `bxsites.json` benennt, ganz ohne
 `theme/`-Ordner. `theme/` ist für den Fall, dass du auch das Markup
 selbst ändern musst, siehe als Nächstes.
 
@@ -378,7 +378,7 @@ keine Such-UI - um genau zu zeigen, was erforderlich ist im Vergleich zu
 dem, was die integrierten Themes zusätzlich bieten. Speichere beide als
 `theme/layout.bxm` und `theme/page.bxm` in deinem Projekt - ein
 projektweiter `theme/`-Ordner wird automatisch übernommen (wie oben),
-keine Änderung an `bxdocs.json` nötig:
+keine Änderung an `bxsites.json` nötig:
 
 ```bx
 <!-- theme/layout.bxm -->
@@ -434,7 +434,7 @@ Das ist ein vollständiges, funktionierendes Theme -
 (Syntax-Hervorhebung, Admonitions, Tabs, Mathematik und alles), es bleibt
 also nichts mehr zu parsen, nur noch zu layouten. Von hier aus füge
 hinzu, was die integrierten Themes haben und du tatsächlich willst:
-`search.bxm` (nur eingebunden, wenn `search` in `bxdocs.json` `true` ist
+`search.bxm` (nur eingebunden, wenn `search` in `bxsites.json` `true` ist
 - siehe [Suche](search.md)), einen Dunkelmodus-Umschalter (kopiere das
 `x-data`/`x-init`-Alpine.js-Paar vom `<body>`-Tag von
 `resources/themes/bootstrap/layout.bxm` und den passenden

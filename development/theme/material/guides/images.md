@@ -50,7 +50,7 @@ breakpoint to offer.
 
 A caption, a frame, or a multi-image gallery are all just block-level
 HTML - which bx-markdown/Flexmark passes through completely untouched
-(CommonMark's own "HTML block" rule), so no bx-docs-specific syntax is
+(CommonMark's own "HTML block" rule), so no bx-sites-specific syntax is
 needed at all:
 
 ```markdown title="Example" linenums="1"
@@ -63,7 +63,7 @@ needed at all:
   <img src="../assets/screenshot.png" alt="Framed">
 </div>
 
-<div class="bxdocs-gallery">
+<div class="bxsites-gallery">
   <img src="../assets/one.png" alt="">
   <img src="../assets/two.png" alt="">
   <img src="../assets/three.png" alt="">
@@ -94,7 +94,7 @@ adds AVIF upstream.
 
 ## Turning it off
 
-```json title="bxdocs.json"
+```json title="bxsites.json"
 { "assets": { "images": { "enabled": false } } }
 ```
 
@@ -103,7 +103,7 @@ every image was handled before this feature existed.
 
 ## Choosing your own breakpoints
 
-```json title="bxdocs.json" linenums="1"
+```json title="bxsites.json" linenums="1"
 {
 	"assets": {
 		"images": {
@@ -126,7 +126,7 @@ every `assets.images` key.
 `extraCss`/`extraJs` get bundled the same way, on by default
 (`assets.bundle`):
 
-```json title="bxdocs.json" linenums="1"
+```json title="bxsites.json" linenums="1"
 {
 	"extraCss": [ "assets/a.css", "assets/b.css" ],
 	"extraJs": [ "assets/app.js" ]
@@ -149,7 +149,7 @@ project file. One external URL (a CDN link) mixed in falls the whole
 list back to today's exact per-URL behavior, rather than risk silently
 reordering a CSS cascade a project depended on:
 
-```json title="bxdocs.json"
+```json title="bxsites.json"
 { "extraCss": [ "assets/custom.css", "https://cdn.example.com/lib.css" ] }
 ```
 
@@ -168,9 +168,9 @@ gets fingerprinted, so a `::: file` download card or a raw link to an
 image by its own filename keeps working exactly as it always has.
 
 Every generated variant is cached on disk under a project's own
-`.cache/images/` (removed by [`bxDocs clean`](../cli-reference.md#clean),
+`.cache/images/` (removed by [`bxSites clean`](../cli-reference.md#clean),
 alongside `site/`) - keyed by the *source* image's own content hash, so
 re-running `build` (once per version/locale tree, all sharing the same
-`docs/assets/`) or `bxDocs serve` after an unrelated edit doesn't
+`docs/assets/`) or `bxSites serve` after an unrelated edit doesn't
 re-decode/re-resize/re-encode every screenshot in the project, only ones
 that actually changed.

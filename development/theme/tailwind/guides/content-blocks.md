@@ -7,13 +7,13 @@ tags: [guides, markdown, gitbook]
 
 # Content Blocks
 
-On top of everything in [Markdown Extensions](markdown.md), BX Docs
+On top of everything in [Markdown Extensions](markdown.md), BX Sites
 supports a family of GitBook-style content blocks - handy on its own,
 and the reason a GitBook site's content is straightforward to migrate:
 each of these maps directly to a GitBook block of the same name. Every
 one uses the same `::: name ... :::` container syntax (a bare `:::` on
 its own line closes whichever block is currently open) - no
-`bxdocs.json` config needed, always available. A block can nest inside
+`bxsites.json` config needed, always available. A block can nest inside
 another (an expandable containing a cards group, for instance) - each
 is scanned again for further blocks inside its own content.
 
@@ -97,20 +97,20 @@ A numbered, connected sequence of steps:
 ```markdown title="Example" linenums="1"
 ::: stepper
 ::: step "Install"
-`install-bx-module bx-docs`
+`install-bx-module bx-sites`
 :::
 ::: step "Scaffold"
-`boxlang module:bxDocs new`
+`boxlang module:bxSites new`
 :::
 :::
 ```
 
 ::: stepper
 ::: step "Install"
-`install-bx-module bx-docs`
+`install-bx-module bx-sites`
 :::
 ::: step "Scaffold"
-`boxlang module:bxDocs new`
+`boxlang module:bxSites new`
 :::
 :::
 
@@ -239,7 +239,7 @@ Initial release.
 :::
 
 A page with an `::: updates` block also gets its own `feed.xml` (RSS 2.0)
-written alongside it once `bxdocs.json`'s `baseURL` is a full URL - same
+written alongside it once `bxsites.json`'s `baseURL` is a full URL - same
 requirement as `sitemap.xml` - so readers can subscribe to just that
 page's changelog.
 
@@ -297,4 +297,4 @@ under `docs/versions/2.0/` resolves a bare `src` against
 with the main tree's `docs/includes/`.
 
 An included file can itself include another (a circular chain throws
-`BxDocs.CircularInclude` at build time rather than looping forever).
+`BxSites.CircularInclude` at build time rather than looping forever).

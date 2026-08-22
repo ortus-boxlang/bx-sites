@@ -7,16 +7,16 @@ tags: [guides, migration, gitbook]
 
 # Migrating from GitBook
 
-`bxDocs migrate` converts a GitBook export - a `SUMMARY.md` table of
+`bxSites migrate` converts a GitBook export - a `SUMMARY.md` table of
 contents plus its `.md` files, GitBook's own on-disk sync format (the
-same one GitHub/Git Sync writes) - into a bx-docs `docs/` tree, in one
+same one GitHub/Git Sync writes) - into a bx-sites `docs/` tree, in one
 command. Everything GitBook's content-block system supports maps onto
-something bx-docs already has (see [Content Blocks](content-blocks.md)),
+something bx-sites already has (see [Content Blocks](content-blocks.md)),
 so the result isn't a rough draft - it's a working site.
 
 ## Getting a GitBook export
 
-`bxDocs migrate` reads GitBook's own file layout directly, so any of
+`bxSites migrate` reads GitBook's own file layout directly, so any of
 these works as `--source`:
 
 - A repository GitBook is Git-Synced to (Space settings → **GitSync**) -
@@ -29,15 +29,15 @@ Either way, `--source` should be the directory that directly contains
 ## Running the migration
 
 ```bash frame="terminal" title="Terminal" linenums="1"
-# 1. Scaffold a fresh bx-docs project (skip this if you already have one)
-bxDocs new my-docs
+# 1. Scaffold a fresh bx-sites project (skip this if you already have one)
+bxSites new my-docs
 cd my-docs
 
 # 2. Migrate the GitBook export into it
-bxDocs migrate --source=/path/to/gitbook-export
+bxSites migrate --source=/path/to/gitbook-export
 
 # 3. Build and look at the result
-bxDocs serve
+bxSites serve
 ```
 
 `migrate` prints how many pages it converted and, when something needed
@@ -63,8 +63,8 @@ source export and run it again.
 | GitBook | Becomes |
 |---|---|
 | `SUMMARY.md` | `docs/nav.json` ([nav override](../configuration.md#nav) format), nesting preserved |
-| `README.md` (any folder) | `index.md` - bx-docs' own folder-index convention |
-| A page's `title`/`description`/`tags` frontmatter | Carried over into the migrated file's own bx-docs frontmatter unchanged |
+| `README.md` (any folder) | `index.md` - bx-sites' own folder-index convention |
+| A page's `title`/`description`/`tags` frontmatter | Carried over into the migrated file's own bx-sites frontmatter unchanged |
 | `.gitbook/assets/**` | `docs/assets/gitbook/**`, with every reference rewritten to match |
 | `{% hint style="..." %}` | `!!! type` - a native [admonition](markdown.md#admonitions) |
 | `{% tabs %}` / `{% tab title="..." %}` | `=== "Title"` - native [content tabs](markdown.md#content-tabs) |
@@ -82,11 +82,11 @@ thing.
 
 ## What needs a manual look
 
-A handful of GitBook blocks have no bx-docs equivalent at all and are
+A handful of GitBook blocks have no bx-sites equivalent at all and are
 left in their original `{% %}` syntax rather than guessed at: **Prompt**
 (an AI-generation block - there's nothing to run it against once
 migrated), **Conditional content** (GitBook-account-based visibility, not
-a concept bx-docs has), and the **Ask AI** search bar. Anything else this
+a concept bx-sites has), and the **Ask AI** search bar. Anything else this
 tool doesn't recognize - a typo'd block, a GitBook feature added after
 this tool was written - gets the same treatment: left as-is, reported as
 a warning.
@@ -111,8 +111,8 @@ six weights - [Lucide](https://lucide.dev/icons/) or
 ## After migrating
 
 The migrated `docs/nav.json` is a plain [nav override](../configuration.md#nav)
-file - edit it like any other, or delete it to fall back to bx-docs'
+file - edit it like any other, or delete it to fall back to bx-sites'
 own folder-structure-is-nav-structure convention. From here it's a normal
-bx-docs project: pick a [theme](themes.md), review
-[`bxdocs.json`](../configuration.md), and [deploy](deployment.md) when
+bx-sites project: pick a [theme](themes.md), review
+[`bxsites.json`](../configuration.md), and [deploy](deployment.md) when
 you're happy with it.

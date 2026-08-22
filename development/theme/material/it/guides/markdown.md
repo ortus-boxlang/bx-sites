@@ -6,16 +6,16 @@ tags: [guide, markdown]
 
 # Estensioni Markdown
 
-Oltre al Markdown standard, BX Docs attiva di default tre estensioni
+Oltre al Markdown standard, BX Sites attiva di default tre estensioni
 Flexmark native di bx-markdown - ammonizioni, note a piè di pagina e
 liste di definizioni - più un'integrazione con i diagrammi Mermaid tutta
 sua. Tutte e quattro sono configurabili tramite le
-[chiavi `markdown`/`mermaid` di `bxdocs.json`](../configuration.md#markdown).
+[chiavi `markdown`/`mermaid` di `bxsites.json`](../configuration.md#markdown).
 
-Oltre a queste, BX Docs implementa altre tre estensioni proprie di cui
+Oltre a queste, BX Sites implementa altre tre estensioni proprie di cui
 Flexmark non ha alcun concetto - schede di contenuto, matematica, e
 annotazioni `hl_lines`/`linenums`/`title` sui blocchi di codice
-delimitati. Dato che bx-docs non può forkare il parser di bx-markdown,
+delimitati. Dato che bx-sites non può forkare il parser di bx-markdown,
 ognuna di queste funziona come un passaggio di pre/post-elaborazione
 intorno alla normale conversione del markdown - vedi le sezioni sotto.
 
@@ -30,7 +30,7 @@ flowchart LR
 ## Ammonizioni
 
 Un box di richiamo/nota - attivo di default, nessuna configurazione di
-`bxdocs.json` necessaria:
+`bxsites.json` necessaria:
 
 ```markdown
 !!! note "Heads Up"
@@ -191,7 +191,7 @@ Che viene renderizzato così:
 Blocchi `=== "..."` consecutivi (separati al massimo da una riga vuota)
 formano un unico gruppo di schede; il contenuto di una scheda è markdown
 completo, quindi blocchi di codice, liste, ammonizioni, qualsiasi cosa
-scriveresti altrove. Nessuna configurazione di `bxdocs.json` necessaria -
+scriveresti altrove. Nessuna configurazione di `bxsites.json` necessaria -
 sempre attivo.
 
 ## Blocchi di codice
@@ -199,7 +199,7 @@ sempre attivo.
 I blocchi di codice delimitati vengono evidenziati lato client
 (highlight.js), nessuna configurazione necessaria - l'identificatore di
 linguaggio dopo l'apertura ` ``` ` seleziona la grammatica, ad es.
-` ```json `. Oltre ai linguaggi già inclusi in highlight.js, BX Docs
+` ```json `. Oltre ai linguaggi già inclusi in highlight.js, BX Sites
 registra una propria grammatica BoxLang leggera sotto
 `bx`/`boxlang`/`bxs`/`bxm`/`cfscript`:
 
@@ -240,7 +240,7 @@ numeric function add( required numeric a, required numeric b ) {
 accetta numeri di riga e/o intervalli separati da spazi (`"2 4-6"`) da
 evidenziare, contati dall'inizio del blocco indipendentemente da dove
 parte `linenums`; `title` aggiunge una piccola barra del titolo sopra il
-blocco. Nessuna configurazione di `bxdocs.json` necessaria - sempre
+blocco. Nessuna configurazione di `bxsites.json` necessaria - sempre
 disponibile.
 
 ### Indicatori di diff e cornici terminale
@@ -285,26 +285,26 @@ titolo centrato:
 
 ````markdown
 ```bash frame="terminal" title="user@boxlang"
-box install bx-docs
+box install bx-sites
 ```
 ````
 
 Che viene renderizzato così:
 
 ```bash frame="terminal" title="user@boxlang"
-box install bx-docs
+box install bx-sites
 ```
 
 `frame="code"` è il nome esplicito per la barra semplice di oggi - il
 valore predefinito; nessuno ha bisogno di scriverlo. Né `insert`/`delete`
-né `frame` richiedono configurazione in `bxdocs.json`, come
+né `frame` richiedono configurazione in `bxsites.json`, come
 `hl_lines`/`linenums`/`title`.
 
 #### Diff git reali
 
 Etichetta un blocco come `diff` e incolla direttamente l'output reale di
 `git diff`/`git show` - questa non è affatto sintassi specifica di
-bx-docs, è solo la grammatica `diff` di highlight.js che riconosce da
+bx-sites, è solo la grammatica `diff` di highlight.js che riconosce da
 sola la sintassi diff unificato (righe `+`/`-`/`@@`):
 
 ````markdown
@@ -340,7 +340,7 @@ Che viene renderizzato così:
 ## Diagrammi
 
 Opzionale tramite la chiave [`mermaid`](../configuration.md#mermaid) di
-`bxdocs.json`:
+`bxsites.json`:
 
 ```json
 { "mermaid": true }
@@ -365,7 +365,7 @@ per tutto ciò che può disegnare.
 ## Matematica
 
 Opzionale tramite la chiave [`math`](../configuration.md#math) di
-`bxdocs.json`:
+`bxsites.json`:
 
 ```json
 { "math": true }
@@ -396,13 +396,13 @@ matematica composta sta sempre accostata a entrambi i delimitatori.
 
 ## Blocchi in stile GitBook
 
-Oltre a tutto quanto sopra, BX Docs supporta una famiglia di blocchi di
+Oltre a tutto quanto sopra, BX Sites supporta una famiglia di blocchi di
 contenuto in stile GitBook - utili di per sé, e il motivo per cui il
 contenuto di un sito GitBook è semplice da migrare: ognuno di questi
 corrisponde direttamente a un blocco GitBook dello stesso nome. Ognuno
 usa la stessa sintassi contenitore `::: name ... :::` (un `:::` nudo su
 una riga a sé chiude qualsiasi blocco attualmente aperto) - nessuna
-configurazione di `bxdocs.json` necessaria, sempre disponibile. Un
+configurazione di `bxsites.json` necessaria, sempre disponibile. Un
 blocco può essere annidato dentro un altro (un espandibile che contiene
 un gruppo di card, per esempio) - ognuno viene analizzato di nuovo per
 ulteriori blocchi al proprio interno.
@@ -485,20 +485,20 @@ Una sequenza numerata e collegata di passaggi:
 ```markdown
 ::: stepper
 ::: step "Install"
-`install-bx-module bx-docs`
+`install-bx-module bx-sites`
 :::
 ::: step "Scaffold"
-`boxlang module:bxDocs new`
+`boxlang module:bxSites new`
 :::
 :::
 ```
 
 ::: stepper
 ::: step "Installazione"
-`install-bx-module bx-docs`
+`install-bx-module bx-sites`
 :::
 ::: step "Scheletro del progetto"
-`boxlang module:bxDocs new`
+`boxlang module:bxSites new`
 :::
 :::
 
@@ -570,7 +570,7 @@ Prima release.
 
 Una pagina con un blocco `::: updates` ottiene anche il proprio
 `feed.xml` (RSS 2.0) scritto accanto a sé una volta che `baseURL` di
-`bxdocs.json` è un URL completo - lo stesso requisito di `sitemap.xml` -
+`bxsites.json` è un URL completo - lo stesso requisito di `sitemap.xml` -
 così i lettori possono iscriversi solo al changelog di quella pagina.
 
 ### Contenuto riutilizzabile (include)
@@ -587,7 +587,7 @@ avvolto in un widget - utile per un avviso/nota ripetuto su più pagine:
 ```
 
 Un file incluso può a sua volta includerne un altro (una catena circolare
-genera `BxDocs.CircularInclude` al momento del build invece di
+genera `BxSites.CircularInclude` al momento del build invece di
 ripetersi all'infinito).
 
 ### Immagini: didascalie, allineamento e cornici {#images}
@@ -595,7 +595,7 @@ ripetersi all'infinito).
 Una didascalia, una cornice, o una galleria multi-immagine sono tutte
 semplicemente HTML a livello di blocco - che bx-markdown/Flexmark lascia
 passare completamente intatto (la regola "HTML block" propria di
-CommonMark), quindi non serve alcuna sintassi specifica di bx-docs:
+CommonMark), quindi non serve alcuna sintassi specifica di bx-sites:
 
 ```markdown
 <figure>
@@ -607,7 +607,7 @@ CommonMark), quindi non serve alcuna sintassi specifica di bx-docs:
   <img src="../assets/screenshot.png" alt="Framed">
 </div>
 
-<div class="bxdocs-gallery">
+<div class="bxsites-gallery">
   <img src="../assets/one.png" alt="">
   <img src="../assets/two.png" alt="">
   <img src="../assets/three.png" alt="">

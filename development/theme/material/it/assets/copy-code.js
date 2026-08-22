@@ -6,7 +6,7 @@
 ( function () {
 	function init() {
 		document.querySelectorAll( "pre" ).forEach( function ( pre ) {
-			if ( pre.querySelector( ".bxdocs-copy-btn" ) ) {
+			if ( pre.querySelector( ".bxsites-copy-btn" ) ) {
 				return;
 			}
 			var code = pre.querySelector( "code" );
@@ -14,11 +14,11 @@
 				return;
 			}
 
-			pre.classList.add( "bxdocs-pre" );
+			pre.classList.add( "bxsites-pre" );
 
 			var button = document.createElement( "button" );
 			button.type = "button";
-			button.className = "bxdocs-copy-btn";
+			button.className = "bxsites-copy-btn";
 			button.textContent = "Copy";
 			button.setAttribute( "aria-label", "Copy code to clipboard" );
 

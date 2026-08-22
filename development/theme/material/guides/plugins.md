@@ -7,39 +7,39 @@ tags: [guides, plugins]
 
 # Plugins
 
-A BX Docs plugin is nothing more than another BoxLang module - its own
-`box.json` + `ModuleConfig.bx`, installed as a sibling of `bx-docs` in the
+A BX Sites plugin is nothing more than another BoxLang module - its own
+`box.json` + `ModuleConfig.bx`, installed as a sibling of `bx-sites` in the
 same runtime (`box install` into the project, the same way `bx-markdown`/
 `bx-esapi` already are). No plugin API to import, no separate registry -
 BoxLang's own module system *is* the plugin system.
 
 Installing a module alone never activates it as a plugin, though - a
-project opts one in explicitly by BoxLang module name, via `bxdocs.json`'s
+project opts one in explicitly by BoxLang module name, via `bxsites.json`'s
 [`plugins`](../configuration.md#plugins) array:
 
-```json title="bxdocs.json"
-{ "plugins": [ "myBxDocsPlugin" ] }
+```json title="bxsites.json"
+{ "plugins": [ "myBxSitesPlugin" ] }
 ```
 
 ## Writing a plugin
 
 A plugin module needs exactly one thing beyond the usual `box.json`/
-`ModuleConfig.bx` a BoxLang module already has: a `models/BxDocsPlugin.bx`
+`ModuleConfig.bx` a BoxLang module already has: a `models/BxSitesPlugin.bx`
 class. Every method on it is optional - implement only the hooks you need,
-BX Docs checks for each one before calling it:
+BX Sites checks for each one before calling it:
 
-```bx title="models/BxDocsPlugin.bx" linenums="1"
-// models/BxDocsPlugin.bx
+```bx title="models/BxSitesPlugin.bx" linenums="1"
+// models/BxSitesPlugin.bx
 class {
 
 	struct function onConfig( required struct config ) {
-		// Mutate/return the site config, right after bxdocs.json is loaded.
+		// Mutate/return the site config, right after bxsites.json is loaded.
 		return arguments.config
 	}
 
 	string function onPageMarkdown( required string markdown, required struct page, required struct config ) {
 		// Mutate a page's raw markdown before conversion - the same
-		// pre-processing seam BX Docs' own content tabs/math/code
+		// pre-processing seam BX Sites' own content tabs/math/code
 		// annotations use internally (TabsProcessor.bx et al.).
 		return arguments.markdown
 	}
@@ -62,9 +62,9 @@ class {
 }
 ```
 
-Hooks run in `bxdocs.json`'s own `plugins` array order, and (except
+Hooks run in `bxsites.json`'s own `plugins` array order, and (except
 `onBuildComplete`) each one's return value replaces the value the next
-hook (or BX Docs itself) sees - a plugin only needs to return what it was
+hook (or BX Sites itself) sees - a plugin only needs to return what it was
 given if it has nothing to change.
 
 `onPageMarkdown`/`onPageHtml` run once per page, for every doc tree BX
@@ -101,15 +101,15 @@ skeleton, or read it for a worked example of the folder layout:
 
 ```text title="hello-plugin/ layout"
 hello-plugin/
-├── box.json              # boxlang.moduleName is what bxdocs.json's [plugins] references
+├── box.json              # boxlang.moduleName is what bxsites.json's [plugins] references
 ├── ModuleConfig.bx        # a normal, otherwise-empty BoxLang module descriptor
 └── models/
-    └── BxDocsPlugin.bx    # onPageHtml() + onBuildComplete()
+    └── BxSitesPlugin.bx    # onPageHtml() + onBuildComplete()
 ```
 
 ## Errors
 
-- `BxDocs.PluginNotFound` - a name in `bxdocs.json`'s `plugins` array
+- `BxSites.PluginNotFound` - a name in `bxsites.json`'s `plugins` array
   isn't an installed/activated BoxLang module.
-- `BxDocs.InvalidPlugin` - the module exists, but has no
-  `models/BxDocsPlugin.bx` class.
+- `BxSites.InvalidPlugin` - the module exists, but has no
+  `models/BxSitesPlugin.bx` class.
