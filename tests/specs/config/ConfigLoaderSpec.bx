@@ -509,12 +509,49 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxDocs.InvalidConfig" );
 			} );
 
-			it( "defaults [blog.postsPerPage] to 10 and [blog.feed] to true", function() {
+			it( "defaults [blog.postsPerPage] to 10, [blog.feed] to true, and [blog.feedLimit] to 25", function() {
 				var dir = newProjectDir( '{"name":"My Docs"}' );
 				var config = loader.load( dir );
 
 				expect( config.blog.postsPerPage ).toBe( 10 );
 				expect( config.blog.feed ).toBeTrue();
+				expect( config.blog.feedLimit ).toBe( 25 );
+			} );
+
+			it( "preserves a user-supplied [blog.feedLimit], including 0 for unlimited", function() {
+				var dir = newProjectDir( '{"name":"My Docs","blog":{"feedLimit":50}}' );
+				expect( loader.load( dir ).blog.feedLimit ).toBe( 50 );
+
+				var unlimitedDir = newProjectDir( '{"name":"My Docs","blog":{"feedLimit":0}}' );
+				expect( loader.load( unlimitedDir ).blog.feedLimit ).toBe( 0 );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when [blog.feedLimit] is not a whole number of 0 or more", function() {
+				for ( var badValue in [ -1, 1.5, "ten" ] ) {
+					var dir = newProjectDir( '{"name":"My Docs","blog":{"feedLimit":' & ( isNumeric( badValue ) ? badValue : '"' & badValue & '"' ) & '}}' );
+					expect( function() {
+						loader.load( dir );
+					} ).toThrow( "BxDocs.InvalidConfig" );
+				}
+			} );
+
+			it( "defaults [assets.images.widths] to [400, 800, 1200, 1600]", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).assets.images.widths ).toBe( [ 400, 800, 1200, 1600 ] );
+			} );
+
+			it( "preserves a user-supplied [assets.images.widths] override", function() {
+				var dir = newProjectDir( '{"name":"My Docs","assets":{"images":{"widths":[480, 960]}}}' );
+				expect( loader.load( dir ).assets.images.widths ).toBe( [ 480, 960 ] );
+			} );
+
+			it( "throws BxDocs.InvalidConfig when an [assets.images.widths] entry is not a positive whole number", function() {
+				for ( var badValue in [ 0, -400, 400.5 ] ) {
+					var dir = newProjectDir( '{"name":"My Docs","assets":{"images":{"widths":[' & badValue & ']}}}' );
+					expect( function() {
+						loader.load( dir );
+					} ).toThrow( "BxDocs.InvalidConfig" );
+				}
 			} );
 
 			it( "deep-merges a partial [blog] override, keeping the default feed", function() {

@@ -94,6 +94,46 @@ class extends="testbox.system.BaseSpec" {
 				expect( xml ).toInclude( "Hello World" );
 			} );
 
+			it( "caps the feed to the N most-recent posts when limit is set", function() {
+				var posts = [
+					newPost( { title : "Newest", urlPath : "blog/newest/index.html", date : "2026-03-01" } ),
+					newPost( { title : "Middle", urlPath : "blog/middle/index.html", date : "2026-02-01" } ),
+					newPost( { title : "Oldest", urlPath : "blog/oldest/index.html", date : "2026-01-01" } )
+				];
+
+				var xml = generator.build( posts, "BX Docs", "https://example.com/", "", 2 );
+
+				expect( xml ).toInclude( "Newest" );
+				expect( xml ).toInclude( "Middle" );
+				expect( xml ).notToInclude( "Oldest" );
+			} );
+
+			it( "limit of 0 (the default) leaves the feed unlimited", function() {
+				var posts = [
+					newPost( { title : "A", urlPath : "blog/a/index.html" } ),
+					newPost( { title : "B", urlPath : "blog/b/index.html" } )
+				];
+
+				var xml = generator.build( posts, "BX Docs", "https://example.com/" );
+
+				expect( xml ).toInclude( "A" );
+				expect( xml ).toInclude( "B" );
+			} );
+
+			it( "applies limit after category filtering, not before", function() {
+				var posts = [
+					newPost( { title : "Release A", urlPath : "blog/a/index.html", date : "2026-02-01", categories : [ "Releases" ] } ),
+					newPost( { title : "News A", urlPath : "blog/b/index.html", date : "2026-01-15", categories : [ "News" ] } ),
+					newPost( { title : "Release B", urlPath : "blog/c/index.html", date : "2026-01-01", categories : [ "Releases" ] } )
+				];
+
+				var xml = generator.build( posts, "BX Docs", "https://example.com/", "Releases", 1 );
+
+				expect( xml ).toInclude( "Release A" );
+				expect( xml ).notToInclude( "Release B" );
+				expect( xml ).notToInclude( "News A" );
+			} );
+
 			it( "HTML-escapes a post's own title", function() {
 				var xml = generator.build( [ newPost( { title : "A & B" } ) ], "BX Docs", "https://example.com/" );
 

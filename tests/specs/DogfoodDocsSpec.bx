@@ -2,8 +2,10 @@
  * Confirms this repository's own dogfooded `bxdocs.yaml` + `docs/` (module
  * spec Phase 5 - "docs + examples for bx-docs itself") actually build
  * cleanly through the real pipeline, using the same fake markdown renderer
- * seam as BuildPipelineSpec.bx. Builds into a temp copy so it never leaves
- * a stray `site/` in the working tree.
+ * and fake image-variant-generator seams as BuildPipelineSpec.bx (neither
+ * bx-markdown nor bx-image is installed in this module's own unit-test CI
+ * job - see .github/workflows/tests.yml). Builds into a temp copy so it
+ * never leaves a stray `site/` in the working tree.
  */
 class extends="testbox.system.BaseSpec" {
 
@@ -18,6 +20,7 @@ class extends="testbox.system.BaseSpec" {
 
 				variables.pipeline = new "models.build.BuildPipeline@bxdocs"()
 				variables.pipeline.setMarkdownRenderer( new "tests.support.FakeMarkdownRenderer@bxdocs"() )
+				variables.pipeline.setImageVariantGenerator( new "tests.support.FakeImageVariantGenerator@bxdocs"() )
 			} );
 
 			afterEach( function() {

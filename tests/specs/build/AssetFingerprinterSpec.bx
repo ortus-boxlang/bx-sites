@@ -1,0 +1,61 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.AssetFingerprinter", function() {
+
+			beforeEach( function() {
+				variables.fingerprinter = new "models.build.AssetFingerprinter@bxdocs"();
+			} );
+
+			it( "hashOf() returns an 8-character lowercase hex digest", function() {
+				var digest = fingerprinter.hashOf( "hello world" );
+
+				expect( digest.len() ).toBe( 8 );
+				expect( digest.reFind( "^[0-9a-f]{8}$" ) > 0 ).toBeTrue();
+			} );
+
+			it( "hashOf() is deterministic - identical content always hashes the same", function() {
+				var a = fingerprinter.hashOf( "the exact same content" );
+				var b = fingerprinter.hashOf( "the exact same content" );
+
+				expect( a ).toBe( b );
+			} );
+
+			it( "hashOf() gives different content a different digest", function() {
+				var a = fingerprinter.hashOf( "content A" );
+				var b = fingerprinter.hashOf( "content B" );
+
+				expect( a ).notToBe( b );
+			} );
+
+			it( "hashOf() accepts binary content the same way it accepts a string", function() {
+				var bytes = charsetDecode( "some binary-ish content", "utf-8" );
+
+				var digest = fingerprinter.hashOf( bytes );
+
+				expect( digest.len() ).toBe( 8 );
+				expect( digest.reFind( "^[0-9a-f]{8}$" ) > 0 ).toBeTrue();
+			} );
+
+			it( "fingerprint() splices the hash in right before the extension", function() {
+				var result = fingerprinter.fingerprint( "bundle.css", "a3f9c2e1" );
+
+				expect( result ).toBe( "bundle.a3f9c2e1.css" );
+			} );
+
+			it( "fingerprint() handles a filename with no extension by appending the hash", function() {
+				var result = fingerprinter.fingerprint( "Makefile", "a3f9c2e1" );
+
+				expect( result ).toBe( "Makefile.a3f9c2e1" );
+			} );
+
+			it( "fingerprint() only splits on the last dot, for a filename with more than one", function() {
+				var result = fingerprinter.fingerprint( "screenshot-400w.png", "a3f9c2e1" );
+
+				expect( result ).toBe( "screenshot-400w.a3f9c2e1.png" );
+			} );
+
+		} );
+	}
+
+}

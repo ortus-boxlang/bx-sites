@@ -20,15 +20,22 @@ class {
 	 * @navConfig An explicit nav tree to build from instead of inferring one
 	 * from folder structure - each entry is either a bare docs/-relative
 	 * path string (`"guides/setup.md"`, title/order/icon taken from that
-	 * page), or an object `{ "title", "path", "icon", "children" }` (`path`,
-	 * `icon` and `children` all optional - a `title`-only, path-less entry
-	 * is an unlinked group heading, exactly like a folder with no
-	 * `index.md` today). An explicit `icon` overrides the target page's
-	 * own frontmatter `icon` (IconResolver.bx resolves either); omitted
-	 * falls back to the page's own. Array position sets nav order; pages
-	 * not referenced anywhere in `navConfig` are still built, just not
-	 * linked from the nav (same as a `hidden` page). Empty (the default)
-	 * means "infer from folder structure".
+	 * page), or an object `{ "title", "path", "url", "icon", "children" }`
+	 * (`path`, `url`, `icon` and `children` all optional - a `title`-only,
+	 * path-less/url-less entry is an unlinked group heading, exactly like a
+	 * folder with no `index.md` today). An explicit `url` is used verbatim
+	 * and skips `path` resolution entirely - for a synthetic, non-docs
+	 * destination like the auto-generated "Blog" entry
+	 * (`{ "title": "Blog", "url": "blog/index.html" }`, which also
+	 * suppresses BuildPipeline.bx's own auto-appended one, letting an
+	 * author place it anywhere instead of always last); `title`/`icon` must
+	 * be given explicitly too since there's no target page to infer them
+	 * from. An explicit `icon` overrides the target page's own frontmatter
+	 * `icon` (IconResolver.bx resolves either); omitted falls back to the
+	 * page's own. Array position sets nav order; pages not referenced
+	 * anywhere in `navConfig` are still built, just not linked from the nav
+	 * (same as a `hidden` page). Empty (the default) means "infer from
+	 * folder structure".
 	 *
 	 * @return Array of nav nodes, sorted (unless navConfig is given, which is already author-ordered): { title, url, order, icon, children }
 	 */
@@ -101,8 +108,15 @@ class {
 			return buildConfigNode( { "path" : arguments.entry }, arguments.pagesByPath )
 		}
 
+		// An explicit `url` (a synthetic, non-docs destination like the
+		// blog index) is used verbatim and skips `path` resolution
+		// entirely, so it never has to match a real docs/ page the way
+		// `path` does - e.g. { "title": "Blog", "url": "blog/index.html" }
+		// to place the auto-generated "Blog" nav entry (BuildPipeline.bx's
+		// own blogNavUrl) somewhere other than the end of the nav.
+		var explicitUrl = trim( arguments.entry.url ?: "" )
 		var path = trim( arguments.entry.path ?: "" )
-		var page = len( path ) ? resolveConfigPage( path, arguments.pagesByPath ) : javacast( "null", "" )
+		var page = ( len( path ) && !len( explicitUrl ) ) ? resolveConfigPage( path, arguments.pagesByPath ) : javacast( "null", "" )
 
 		var children = []
 		if ( isArray( arguments.entry.children ?: "" ) ) {
@@ -121,7 +135,13 @@ class {
 			icon = page.icon ?: ""
 		}
 
-		return { title : title, url : isNull( page ) ? "" : page.urlPath, order : 0, icon : icon, children : children }
+		return {
+			title : title,
+			url   : len( explicitUrl ) ? explicitUrl : ( isNull( page ) ? "" : page.urlPath ),
+			order : 0,
+			icon  : icon,
+			children : children
+		}
 	}
 
 	/**

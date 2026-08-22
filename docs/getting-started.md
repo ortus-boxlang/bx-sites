@@ -12,22 +12,24 @@ tags: [guides, setup]
 
 BX Docs depends on [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
 for Markdown rendering, [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
-for HTML-encoding, and [bx-yaml](https://github.com/ortus-boxlang/bx-yaml)
-for reading `bxdocs.yaml`. With [CommandBox](https://commandbox.ortusbooks.com/)
-installed:
+for HTML-encoding, [bx-yaml](https://github.com/ortus-boxlang/bx-yaml) for
+reading `bxdocs.yaml`, and [bx-image](https://github.com/ortus-boxlang/bx-image)
+for the responsive-image pipeline (see [Responsive Images](guides/images.md)).
+With [CommandBox](https://commandbox.ortusbooks.com/) installed:
 
 ```bash
 box install bx-docs
 box install bx-markdown
 box install bx-esapi
 box install bx-yaml
+box install bx-image
 ```
 
-Or, without CommandBox, BoxLang's own installer takes all four in one
+Or, without CommandBox, BoxLang's own installer takes all five in one
 command:
 
 ```bash
-install-bx-module bx-docs bx-markdown bx-esapi bx-yaml
+install-bx-module bx-docs bx-markdown bx-esapi bx-yaml bx-image
 ```
 
 `box install`/`install-bx-module` reads `box.json`'s `boxlang.executable`

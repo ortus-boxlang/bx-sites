@@ -71,9 +71,14 @@ class {
 		"generateOgImages" : false,
 		"extraCss"     : [],
 		"extraJs"      : [],
+		"assets"       : {
+			"fingerprint" : true,
+			"bundle"      : true,
+			"images"      : { "enabled" : true, "widths" : [ 400, 800, 1200, 1600 ], "formats" : [ "original", "webp" ] }
+		},
 		"plugins"      : [],
 		"i18n"         : { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] },
-		"blog"         : { "postsPerPage" : 10, "feed" : true }
+		"blog"         : { "postsPerPage" : 10, "feed" : true, "feedLimit" : 25 }
 	}
 
 	/**
@@ -120,7 +125,38 @@ class {
 			)
 		}
 
-		return validate( mergeDefaults( parsed ) )
+		return validate( mergeNestedAssetsImagesDefaults( mergeDefaults( parsed ), parsed ) )
+	}
+
+	/**
+	 * `mergeDefaults()` only merges one level deep (see its own docblock) -
+	 * fine everywhere else, since every other nested struct's own default
+	 * is empty (`theme.options`, `searchProvider.algolia`, ...) and so has
+	 * nothing to lose by being replaced wholesale. `assets.images` is the
+	 * one exception - a real, populated default two levels down
+	 * (`enabled`/`widths`/`formats`) - so a project writing just
+	 * `{"assets":{"images":{"widths":[...]}}}` would otherwise silently
+	 * lose `enabled`/`formats`'s own defaults entirely, rather than only
+	 * overriding `widths`. This patches exactly that one struct back in,
+	 * one level further than mergeDefaults() itself goes.
+	 *
+	 * @merged mergeDefaults()'s own output
+	 * @rawConfig The original parsed bxdocs.json, before any defaulting
+	 */
+	private struct function mergeNestedAssetsImagesDefaults( required struct merged, required struct rawConfig ) {
+		var rawAssets = arguments.rawConfig.assets ?: {}
+		var rawImages = isStruct( rawAssets ) ? ( rawAssets.images ?: {} ) : {}
+
+		if ( isStruct( rawImages ) ) {
+			var defaultImages = variables.defaults.assets.images
+			for ( var key in defaultImages ) {
+				if ( !rawImages.keyExists( key ) ) {
+					arguments.merged.assets.images[ key ] = defaultImages[ key ]
+				}
+			}
+		}
+
+		return arguments.merged
 	}
 
 	/**
@@ -365,6 +401,8 @@ class {
 			}
 		}
 
+		validateAssets( arguments.config.assets ?: "" )
+
 		if ( !isArray( arguments.config.plugins ?: "" ) ) {
 			throw(
 				type    = "BxDocs.InvalidConfig",
@@ -415,6 +453,14 @@ class {
 			throw(
 				type    = "BxDocs.InvalidConfig",
 				message = "#variables.configFileName# [blog.feed], when present, must be a boolean"
+			)
+		}
+
+		var feedLimit = arguments.blog.feedLimit ?: 25
+		if ( !isNumeric( feedLimit ) || val( feedLimit ) < 0 || val( feedLimit ) != int( val( feedLimit ) ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "#variables.configFileName# [blog.feedLimit], when present, must be a whole number of 0 or more"
 			)
 		}
 	}
@@ -501,6 +547,81 @@ class {
 						)
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * Validates the site config's `assets` block - fingerprinting/bundling
+	 * on/off, and the `images` sub-block driving the responsive-image
+	 * pipeline (ImageVariantGenerator.bx).
+	 *
+	 * @assets The merged config's own `assets` value - `any`, not `struct`, for the same reason validateI18n() takes `any` (see its own docblock)
+	 */
+	private void function validateAssets( required any assets ) {
+		if ( !isStruct( arguments.assets ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "#variables.configFileName# [assets], when present, must be an object"
+			)
+		}
+
+		if ( !isBoolean( arguments.assets.fingerprint ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "#variables.configFileName# [assets.fingerprint] must be a boolean"
+			)
+		}
+
+		if ( !isBoolean( arguments.assets.bundle ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "#variables.configFileName# [assets.bundle] must be a boolean"
+			)
+		}
+
+		var images = arguments.assets.images ?: ""
+		if ( !isStruct( images ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "#variables.configFileName# [assets.images] must be an object"
+			)
+		}
+
+		if ( !isBoolean( images.enabled ?: "" ) ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "#variables.configFileName# [assets.images.enabled] must be a boolean"
+			)
+		}
+
+		if ( !isArray( images.widths ?: "" ) || !images.widths.len() ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "#variables.configFileName# [assets.images.widths] must be a non-empty array of positive whole-pixel numbers"
+			)
+		}
+		for ( var width in images.widths ) {
+			if ( !isNumeric( width ) || width <= 0 || width != int( width ) ) {
+				throw(
+					type    = "BxDocs.InvalidConfig",
+					message = "#variables.configFileName# [assets.images.widths] entries must all be positive whole numbers - a fractional pixel width like 400.5 would produce an invalid ""400.5w"" srcset descriptor"
+				)
+			}
+		}
+
+		if ( !isArray( images.formats ?: "" ) || !images.formats.len() ) {
+			throw(
+				type    = "BxDocs.InvalidConfig",
+				message = "#variables.configFileName# [assets.images.formats] must be a non-empty array"
+			)
+		}
+		for ( var format in images.formats ) {
+			if ( !isSimpleValue( format ) || !listFindNoCase( "original,webp", format ) ) {
+				throw(
+					type    = "BxDocs.InvalidConfig",
+					message = "#variables.configFileName# [assets.images.formats] entries must each be one of: original, webp"
+				)
 			}
 		}
 	}

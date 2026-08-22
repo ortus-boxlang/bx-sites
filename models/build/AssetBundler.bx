@@ -1,0 +1,161 @@
+/**
+ * Concatenates a project's own local `extraCss`/`extraJs` files into one
+ * fingerprinted bundle each - no Node/esbuild toolchain, pure BoxLang/JVM,
+ * matching bx-docs' own zero-extra-dependency build story.
+ *
+ * Deliberately conservative rather than a true minifier: a naive
+ * comment-stripping regex is a well-known way to corrupt real JavaScript
+ * (a `//` inside a string like `"http://example.com"` is not a comment,
+ * and a hand-rolled regex has no idea) - so JS only ever gets safe,
+ * structural whitespace cleanup, never comment removal. CSS is lower-risk
+ * (no `//`-in-a-URL ambiguity) so `/* *\/`-style comments are stripped
+ * too. A real tokenizing minifier (a vendored Java library) is a
+ * reasonable later upgrade if this isn't enough - see changelog.md.
+ *
+ * Bundling only ever activates when *every* entry in the list is a local
+ * project file - one external/absolute URL mixed in (a CDN link) falls
+ * the whole list back to today's exact per-URL `<link>`/`<script>`
+ * behavior, rather than attempting to bundle around it and risk silently
+ * reordering a CSS cascade a project depended on.
+ */
+class {
+
+	variables.fingerprinter = new "models.build.AssetFingerprinter@bxdocs"()
+	variables.cssCommentPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "/\*[\s\S]*?\*/" )
+
+	/**
+	 * @urls bxdocs.json's own `extraCss` array
+	 * @docsDir Absolute path to the project's `docs/` directory - each entry resolves against it, same convention `theme.logo`/`ogImage` already use
+	 * @cacheDir Absolute path to this project's own `.cache/assets/` directory
+	 * @fingerprint `assets.fingerprint` - `true` (the default) content-hash-names the bundle; `false` names it plain `bundle.css`, rewritten (never cache-skipped) on every build
+	 *
+	 * @return { bundleUrl, urls } - see bundle()'s own docblock
+	 */
+	struct function bundleCss( required array urls, required string docsDir, required string cacheDir, boolean fingerprint = true ) {
+		return bundle( arguments.urls, arguments.docsDir, arguments.cacheDir, "css", arguments.fingerprint )
+	}
+
+	/**
+	 * @urls bxdocs.json's own `extraJs` array
+	 * @docsDir Absolute path to the project's `docs/` directory
+	 * @cacheDir Absolute path to this project's own `.cache/assets/` directory
+	 * @fingerprint `assets.fingerprint` - `true` (the default) content-hash-names the bundle; `false` names it plain `bundle.js`, rewritten (never cache-skipped) on every build
+	 *
+	 * @return { bundleUrl, urls } - see bundle()'s own docblock
+	 */
+	struct function bundleJs( required array urls, required string docsDir, required string cacheDir, boolean fingerprint = true ) {
+		return bundle( arguments.urls, arguments.docsDir, arguments.cacheDir, "js", arguments.fingerprint )
+	}
+
+	/**
+	 * @urls The raw extraCss/extraJs array
+	 * @docsDir Absolute path to the project's `docs/` directory
+	 * @cacheDir Absolute path to this project's own `.cache/assets/` directory
+	 * @ext "css" or "js" - selects minifyCss()/cleanJs() below
+	 * @fingerprint `assets.fingerprint` - see bundleCss()/bundleJs()'s own docblock
+	 *
+	 * @return `{ bundleUrl: "assets/bundle[.<hash>].<ext>", urls: [], cachedPath, fileName }` when every entry was a local, readable file and got bundled - `cachedPath`/`fileName` are BuildPipeline.bx's own copyAssets() cue to copy the bundle into a tree's output; `{ bundleUrl: "", urls: <unchanged input>, cachedPath: "", fileName: "" }` (today's exact behavior otherwise) when the list was empty, contained an external URL, or named a file that doesn't exist
+	 */
+	private struct function bundle( required array urls, required string docsDir, required string cacheDir, required string ext, boolean fingerprint = true ) {
+		if ( !arguments.urls.len() || hasExternalUrl( arguments.urls ) ) {
+			return { bundleUrl : "", urls : arguments.urls, cachedPath : "", fileName : "" }
+		}
+
+		var canonicalDocsDir = createObject( "java", "java.io.File" ).init( arguments.docsDir ).getCanonicalPath()
+
+		var combined = ""
+		for ( var url in arguments.urls ) {
+			var filePath = arguments.docsDir & "/" & url
+			// A `../`-laden entry (accidental or otherwise) could otherwise
+			// walk outside docsDir and land its target's raw bytes in a
+			// publicly-served bundle - canonicalize and verify containment
+			// before ever reading it, falling back to today's exact
+			// per-URL behavior (same as a missing file) rather than bundle
+			// around it.
+			if ( !fileExists( filePath ) || !isWithinDirectory( filePath, canonicalDocsDir ) ) {
+				return { bundleUrl : "", urls : arguments.urls, cachedPath : "", fileName : "" }
+			}
+			combined &= fileRead( filePath ) & char( 10 )
+			if ( arguments.ext == "js" ) {
+				// A semicolon between every file, not just a newline - JS's
+				// own automatic-semicolon-insertion doesn't always fire at
+				// a line break, so a file missing its own trailing
+				// semicolon could otherwise merge into the next one as a
+				// single expression - a real behavior change, not just a
+				// cleanup.
+				combined &= ";" & char( 10 )
+			}
+		}
+
+		var cleaned = ( arguments.ext == "css" ) ? minifyCss( combined ) : cleanJs( combined )
+		var fileName = arguments.fingerprint
+			? variables.fingerprinter.fingerprint( "bundle." & arguments.ext, variables.fingerprinter.hashOf( cleaned ) )
+			: ( "bundle." & arguments.ext )
+
+		directoryCreate( arguments.cacheDir, true, true )
+		var cachedPath = arguments.cacheDir & "/" & fileName
+		// Without a content-hash in the name, there's no filename-based
+		// signal that the content changed, so this always (re)writes rather
+		// than skipping when the (plain, unhashed) path already exists.
+		if ( !arguments.fingerprint || !fileExists( cachedPath ) ) {
+			fileWrite( cachedPath, cleaned )
+		}
+
+		return { bundleUrl : "assets/" & fileName, urls : [], cachedPath : cachedPath, fileName : fileName }
+	}
+
+	/**
+	 * @urls extraCss/extraJs entries
+	 *
+	 * @return true if any entry has its own URL scheme (http://, https://, ...) - the same "is this external" test BaseUrlResolver/layout.bxm's own resolveAssetUrl() already use elsewhere
+	 */
+	private boolean function hasExternalUrl( required array urls ) {
+		for ( var url in arguments.urls ) {
+			if ( url.reFindNoCase( "^[a-z][a-z0-9+.\-]*:" ) ) {
+				return true
+			}
+		}
+		return false
+	}
+
+	/**
+	 * Whether `filePath` - once canonicalized (symlinks resolved, `..`
+	 * segments collapsed) - actually sits inside `canonicalDir`, rather
+	 * than merely being spelled as if it did. `docsDir & "/" & url` is
+	 * config-controlled (`extraCss`/`extraJs`), so an entry like
+	 * `"../../../etc/passwd"` would otherwise read and bundle a file
+	 * entirely outside the project's own `docs/`.
+	 *
+	 * @filePath The candidate file path, not yet canonicalized
+	 * @canonicalDir The already-canonicalized directory `filePath` must sit inside - getCanonicalPath()'s own output, computed once by the caller rather than per-entry
+	 */
+	private boolean function isWithinDirectory( required string filePath, required string canonicalDir ) {
+		var canonicalFile = createObject( "java", "java.io.File" ).init( arguments.filePath ).getCanonicalPath()
+		return canonicalFile == arguments.canonicalDir || canonicalFile.startsWith( arguments.canonicalDir & "/" )
+	}
+
+	/**
+	 * Strips `/* *\/`-style comments and collapses whitespace runs to a
+	 * single space.
+	 *
+	 * @css Concatenated CSS content
+	 */
+	private string function minifyCss( required string css ) {
+		var noComments = variables.cssCommentPattern.matcher( arguments.css ).replaceAll( "" )
+		return trim( noComments.reReplace( "[\s]+", " ", "all" ) )
+	}
+
+	/**
+	 * Deliberately does *not* strip comments (see this class's own
+	 * docblock) - only collapses runs of 3+ blank lines down to one and
+	 * trims trailing whitespace per line, safe cleanup that can't change
+	 * what the script does.
+	 *
+	 * @js Concatenated JS content
+	 */
+	private string function cleanJs( required string js ) {
+		var trimmedLines = arguments.js.reReplace( "[ \t]+(\r?\n)", "\1", "all" )
+		return trim( trimmedLines.reReplace( "(\r?\n[ \t]*){3,}", char( 10 ) & char( 10 ), "all" ) )
+	}
+
+}

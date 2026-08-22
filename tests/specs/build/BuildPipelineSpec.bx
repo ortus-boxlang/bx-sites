@@ -201,6 +201,140 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( root & "/site/assets/logo.svg" ) ).toBeTrue();
 			} );
 
+			it( "builds the responsive-image manifest once from docs/assets/ and passes it to buildManifest() with the site's own assets.images config, via the setImageVariantGenerator() test seam", function() {
+				var root = newProject();
+				fileWrite( root & "/bxdocs.json", '{"name":"Test Site","assets":{"images":{"widths":[500,900]}}}' );
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/assets", true, true );
+
+				var fakeImages = new "tests.support.FakeImageVariantGenerator@bxdocs"();
+				pipeline.setImageVariantGenerator( fakeImages );
+
+				pipeline.build( root );
+
+				var calls = fakeImages.getBuildManifestCalls();
+				expect( calls.len() ).toBe( 1 );
+				expect( calls[ 1 ].docsAssetsDir ).toBe( root & "/docs/assets" );
+				// A project-set widths list survives the one-level-deeper default
+				// merge (ConfigLoader.bx's own mergeNestedAssetsImagesDefaults()),
+				// alongside the untouched formats/enabled defaults.
+				expect( calls[ 1 ].imagesConfig.widths ).toBe( [ 500, 900 ] );
+				expect( calls[ 1 ].imagesConfig.enabled ).toBeTrue();
+				expect( calls[ 1 ].imagesConfig.formats ).toBe( [ "original", "webp" ] );
+			} );
+
+			it( "rewrites a matched <img> into a <picture>, and copies its manifest variant files into site/assets/, via the setImageVariantGenerator() test seam", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", '<img src="assets/screenshot.png" alt="A screenshot">' );
+				directoryCreate( root & "/docs/assets", true, true );
+
+				var manifest = {
+					"assets/screenshot.png" : {
+						width : 1600, height : 900,
+						originalVariants : [ { width : 800, format : "png", fileName : "screenshot-800w.abc123.png" } ],
+						webpVariants : []
+					}
+				};
+				pipeline.setImageVariantGenerator( new "tests.support.FakeImageVariantGenerator@bxdocs"( manifest ) );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "<picture>" );
+				expect( html ).toInclude( "screenshot-800w.abc123.png" );
+				expect( fileExists( root & "/site/assets/screenshot-800w.abc123.png" ) ).toBeTrue();
+			} );
+
+			it( "rewrites a blog post's own featured-image header and its list-card thumbnail into a <picture>, via the same setImageVariantGenerator() test seam", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				directoryCreate( root & "/docs/assets/blog", true, true );
+				fileWrite(
+					root & "/docs/blog/posts/release.md",
+					"---" & char( 10 ) & "date: 2026-02-01" & char( 10 ) & "image: assets/blog/cover.png" & char( 10 ) & "---" & char( 10 ) & "Release post body."
+				);
+
+				var manifest = {
+					"assets/blog/cover.png" : {
+						width : 1600, height : 900,
+						originalVariants : [ { width : 800, format : "png", fileName : "cover-800w.abc123.png" } ],
+						webpVariants : []
+					}
+				};
+				pipeline.setImageVariantGenerator( new "tests.support.FakeImageVariantGenerator@bxdocs"( manifest ) );
+
+				pipeline.build( root );
+
+				var postHtml = fileRead( root & "/site/blog/release/index.html" );
+				expect( postHtml ).toInclude( "<picture>" );
+				expect( postHtml ).toInclude( "cover-800w.abc123.png" );
+
+				var listHtml = fileRead( root & "/site/blog/index.html" );
+				expect( listHtml ).toInclude( "<picture>" );
+				expect( listHtml ).toInclude( "cover-800w.abc123.png" );
+
+				expect( fileExists( root & "/site/assets/cover-800w.abc123.png" ) ).toBeTrue();
+			} );
+
+			it( "bundles extraCss/extraJs into one fingerprinted file each by default, rendering a single <link>/<script> tag", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","extraCss":["assets/custom.css"],"extraJs":["assets/custom.js"]}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/assets", true, true );
+				fileWrite( root & "/docs/assets/custom.css", "body { color: red; }" );
+				fileWrite( root & "/docs/assets/custom.js", "console.log( 1 );" );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				// The raw per-file references are gone - one bundled <link>/<script> stands in for both.
+				expect( html ).notToInclude( "assets/custom.css" & char( 34 ) );
+				expect( html ).notToInclude( "assets/custom.js" & char( 34 ) );
+				expect( html ).toInclude( "assets/bundle." );
+
+				var bundledCssFiles = directoryList( root & "/site/assets", false, "name", "bundle.*.css" );
+				expect( bundledCssFiles.len() ).toBe( 1 );
+				var bundledJsFiles = directoryList( root & "/site/assets", false, "name", "bundle.*.js" );
+				expect( bundledJsFiles.len() ).toBe( 1 );
+			} );
+
+			it( "names the bundle assets/bundle.css, with no content-hash, when assets.fingerprint is off", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","assets":{"fingerprint":false},"extraCss":["assets/custom.css"]}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/assets", true, true );
+				fileWrite( root & "/docs/assets/custom.css", "body { color: red; }" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/assets/bundle.css" ) ).toBeTrue();
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( 'href="/assets/bundle.css"' );
+			} );
+
+			it( "leaves extraCss/extraJs exactly as raw per-URL tags when assets.bundle is off", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","assets":{"bundle":false},"extraCss":["assets/custom.css"]}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/assets", true, true );
+				fileWrite( root & "/docs/assets/custom.css", "body { color: red; }" );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( 'href="/assets/custom.css"' );
+			} );
+
 			it( "excludes hidden pages from the nav but still builds them", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Home" );
@@ -1469,6 +1603,120 @@ class extends="testbox.system.BaseSpec" {
 
 				var llms = fileRead( root & "/site/llms.txt" );
 				expect( llms ).toInclude( "(https://docs.example.com/versions/1.0/es/index.html)" );
+			} );
+
+			it( "writes one blog/category/<slug>/feed.xml per category, filtered to just that category's own posts", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"https://docs.example.com/"}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				fileWrite( root & "/docs/blog/posts/release.md", "---" & char( 10 ) & "date: 2026-02-01" & char( 10 ) & "categories: [Releases]" & char( 10 ) & "---" & char( 10 ) & "Release post body." );
+				fileWrite( root & "/docs/blog/posts/news.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "categories: [News]" & char( 10 ) & "---" & char( 10 ) & "News post body." );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/blog/feed.xml" ) ).toBeTrue();
+				var mainFeed = fileRead( root & "/site/blog/feed.xml" );
+				expect( mainFeed ).toInclude( "Release post body" );
+				expect( mainFeed ).toInclude( "News post body" );
+
+				expect( fileExists( root & "/site/blog/category/releases/feed.xml" ) ).toBeTrue();
+				var releasesFeed = fileRead( root & "/site/blog/category/releases/feed.xml" );
+				expect( releasesFeed ).toInclude( "Release post body" );
+				expect( releasesFeed ).notToInclude( "News post body" );
+
+				expect( fileExists( root & "/site/blog/category/news/feed.xml" ) ).toBeTrue();
+				var newsFeed = fileRead( root & "/site/blog/category/news/feed.xml" );
+				expect( newsFeed ).toInclude( "News post body" );
+				expect( newsFeed ).notToInclude( "Release post body" );
+			} );
+
+			it( "excludes a draft blog post from a real build by default", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				fileWrite( root & "/docs/blog/posts/draft-post.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "draft: true" & char( 10 ) & "---" & char( 10 ) & "Draft body." );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/blog/draft-post/index.html" ) ).toBeFalse();
+			} );
+
+			it( "includes a draft blog post, with a visible draft badge, when includeDrafts is true", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				fileWrite( root & "/docs/blog/posts/draft-post.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "draft: true" & char( 10 ) & "---" & char( 10 ) & "Draft body." );
+
+				pipeline.build( root, true );
+
+				expect( fileExists( root & "/site/blog/draft-post/index.html" ) ).toBeTrue();
+				var html = fileRead( root & "/site/blog/draft-post/index.html" );
+				expect( html ).toInclude( "blog-draft-badge" );
+			} );
+
+			it( "publishes a blog post's own Markdown source, with a Download Markdown link on its built page", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				fileWrite( root & "/docs/blog/posts/hello-world.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "---" & char( 10 ) & "Hello world body." );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/blog/posts/hello-world.md" ) ).toBeTrue();
+				expect( fileRead( root & "/site/blog/posts/hello-world.md" ) ).toInclude( "Hello world body." );
+
+				var html = fileRead( root & "/site/blog/hello-world/index.html" );
+				expect( html ).toInclude( "Download Markdown" );
+				expect( html ).toInclude( 'href="/blog/posts/hello-world.md"' );
+			} );
+
+			it( "builds /blog/stats/index.html", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				fileWrite( root & "/docs/blog/posts/hello-world.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "---" & char( 10 ) & "Hello world body." );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/blog/stats/index.html" ) ).toBeTrue();
+				expect( fileRead( root & "/site/blog/stats/index.html" ) ).toInclude( "bxdocs-cards" );
+			} );
+
+			it( "auto-appends a ""Blog"" nav entry last, once there's at least one published post", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				fileWrite( root & "/docs/about.md", "About" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				fileWrite( root & "/docs/blog/posts/hello-world.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "---" & char( 10 ) & "Hello world body." );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( 'href="/blog/index.html">Blog</a>' );
+				expect( html.findNoCase( ">About<" ) ).toBeLT( html.findNoCase( ">Blog<" ) );
+			} );
+
+			it( "skips the auto-appended ""Blog"" nav entry when a custom nav already places one via an explicit url", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxdocs.json",
+					'{"name":"Test Site","nav":[{"title":"Blog","url":"blog/index.html","icon":"lucide:newspaper"},{"path":"index.md"}]}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				fileWrite( root & "/docs/blog/posts/hello-world.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "---" & char( 10 ) & "Hello world body." );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				// Only one "Blog" nav link - the author's own, placed first -
+				// not a second one auto-appended after it.
+				expect( html.findNoCase( ">Blog<" ) ).toBeLT( html.findNoCase( ">Home<" ) );
+				expect( html.reMatch( 'href="/blog/index\.html">Blog</a>' ).len() ).toBe( 1 );
 			} );
 
 		} );

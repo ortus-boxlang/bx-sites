@@ -1,0 +1,58 @@
+/**
+ * A deterministic stand-in for ImageVariantGenerator.bx, used to test
+ * BuildPipeline.bx's responsive-image wiring without a live bx-image
+ * module installed - see ImageVariantGenerator.bx's own docblock for why
+ * the real one can't be unit tested directly (it calls bx-image's own
+ * `imageRead()`/`.scaleToFit()`/`.write()`).
+ */
+class {
+
+	/**
+	 * @manifest The canned manifest buildManifest() always returns, regardless of its own arguments - shaped exactly like the real ImageVariantGenerator.buildManifest()'s own output
+	 */
+	function init( struct manifest = {} ) {
+		variables.manifest = arguments.manifest
+		variables.buildManifestCalls = []
+		variables.copyToOutputCalls = []
+		return this
+	}
+
+	struct function buildManifest( required string docsAssetsDir, required struct imagesConfig, required string cacheDir, boolean fingerprint = true ) {
+		variables.buildManifestCalls.append( {
+			docsAssetsDir : arguments.docsAssetsDir,
+			imagesConfig  : arguments.imagesConfig,
+			cacheDir      : arguments.cacheDir,
+			fingerprint   : arguments.fingerprint
+		} )
+		return variables.manifest
+	}
+
+	/**
+	 * Writes a small placeholder file for every variant in `manifest` - not
+	 * real image bytes, just enough for a test to assert the pipeline
+	 * actually copied *something* to the right place.
+	 */
+	void function copyToOutput( required struct manifest, required string outputAssetsDir ) {
+		variables.copyToOutputCalls.append( { manifest : arguments.manifest, outputAssetsDir : arguments.outputAssetsDir } )
+
+		for ( var key in arguments.manifest ) {
+			var entry = arguments.manifest[ key ]
+			directoryCreate( arguments.outputAssetsDir, true, true )
+			for ( var variant in ( entry.originalVariants ?: [] ) ) {
+				fileWrite( arguments.outputAssetsDir & "/" & variant.fileName, "fake-variant-bytes" )
+			}
+			for ( var variant in ( entry.webpVariants ?: [] ) ) {
+				fileWrite( arguments.outputAssetsDir & "/" & variant.fileName, "fake-variant-bytes" )
+			}
+		}
+	}
+
+	array function getBuildManifestCalls() {
+		return variables.buildManifestCalls
+	}
+
+	array function getCopyToOutputCalls() {
+		return variables.copyToOutputCalls
+	}
+
+}

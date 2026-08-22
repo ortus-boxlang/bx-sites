@@ -1,0 +1,224 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.ResponsiveImageProcessor", function() {
+
+			beforeEach( function() {
+				variables.processor = new "models.build.ResponsiveImageProcessor@bxdocs"();
+			} );
+
+			private struct function entry( array originalVariants = [], array webpVariants = [] ) {
+				return { width : 1600, height : 900, originalVariants : arguments.originalVariants, webpVariants : arguments.webpVariants };
+			}
+
+			it( "leaves html untouched when the manifest is empty", function() {
+				var html = '<img src="assets/screenshot.png" alt="A screenshot">';
+
+				var result = processor.resolve( html, "index.md", "/", {} );
+
+				expect( result ).toBe( html );
+			} );
+
+			it( "leaves an <img> untouched when its src has no manifest entry", function() {
+				var html = '<img src="assets/unprocessed.svg" alt="Logo">';
+				var manifest = { "assets/screenshot.png" : entry( [ { width : 800, format : "png", fileName : "screenshot-800w.abc123.png" } ] ) };
+
+				var result = processor.resolve( html, "index.md", "/", manifest );
+
+				expect( result ).toBe( html );
+			} );
+
+			it( "leaves an <img> untouched when its manifest entry has no variants at all (image too small to qualify)", function() {
+				var html = '<img src="assets/tiny.png" alt="Tiny">';
+				var manifest = { "assets/tiny.png" : entry() };
+
+				var result = processor.resolve( html, "index.md", "/", manifest );
+
+				expect( result ).toBe( html );
+			} );
+
+			it( "leaves an external or root-relative <img> src untouched even if it would otherwise resolve to a manifest key", function() {
+				var manifest = { "assets/screenshot.png" : entry( [ { width : 800, format : "png", fileName : "screenshot-800w.abc123.png" } ] ) };
+
+				var external = '<img src="https://example.com/assets/screenshot.png" alt="External">';
+				expect( processor.resolve( external, "index.md", "/", manifest ) ).toBe( external );
+
+				var rootRelative = '<img src="/assets/screenshot.png" alt="Root relative">';
+				expect( processor.resolve( rootRelative, "index.md", "/", manifest ) ).toBe( rootRelative );
+			} );
+
+			it( "rewrites a matched <img> into a <picture> with only an img srcset when there are no webp variants", function() {
+				var html = '<img src="assets/screenshot.png" alt="A screenshot" class="shadow">';
+				var manifest = {
+					"assets/screenshot.png" : entry( [
+						{ width : 400, format : "png", fileName : "screenshot-400w.abc123.png" },
+						{ width : 800, format : "png", fileName : "screenshot-800w.abc123.png" }
+					] )
+				};
+
+				var result = processor.resolve( html, "index.md", "/", manifest );
+
+				expect( result ).toStartWith( "<picture>" );
+				expect( result ).toEndWith( "</picture>" );
+				expect( result ).notToInclude( "image/webp" );
+				expect( result ).toInclude( 'src="/assets/screenshot.png"' );
+				expect( result ).toInclude( 'srcset="/assets/screenshot-400w.abc123.png 400w, /assets/screenshot-800w.abc123.png 800w"' );
+				expect( result ).toInclude( 'sizes="(min-width: 800px) 800px, 100vw"' );
+				// Other original attributes survive untouched.
+				expect( result ).toInclude( 'alt="A screenshot"' );
+				expect( result ).toInclude( 'class="shadow"' );
+			} );
+
+			it( "adds a webp <source> when webp variants exist, ahead of the fallback <img>", function() {
+				var html = '<img src="assets/screenshot.png" alt="A screenshot">';
+				var manifest = {
+					"assets/screenshot.png" : entry(
+						[],
+						[ { width : 1600, format : "webp", fileName : "screenshot-1600w.abc123.webp" } ]
+					)
+				};
+
+				var result = processor.resolve( html, "index.md", "/", manifest );
+
+				expect( result ).toInclude( '<source type="image/webp" srcset="/assets/screenshot-1600w.abc123.webp 1600w" sizes="(min-width: 800px) 800px, 100vw">' );
+				expect( result.find( "<source" ) < result.find( "<img" ) ).toBeTrue();
+				// No same-format variants - the fallback <img> tag itself (not the
+				// <source> above it) keeps its plain src, no srcset of its own.
+				var imgTag = result.reReplace( "^.*(<img[^>]*>).*$", "\1", "one" );
+				expect( imgTag ).notToInclude( "srcset" );
+				expect( imgTag ).toInclude( 'src="/assets/screenshot.png"' );
+			} );
+
+			it( "resolves a nested page's relative src against its own docs-relative directory, not the site output directory", function() {
+				var html = '<img src="../assets/screenshot.png" alt="A screenshot">';
+				var manifest = { "assets/screenshot.png" : entry( [ { width : 800, format : "png", fileName : "screenshot-800w.abc123.png" } ] ) };
+
+				// "guides/setup.md" -> directory "guides" -> "../assets/screenshot.png" resolves to "assets/screenshot.png"
+				var result = processor.resolve( html, "guides/setup.md", "/", manifest );
+
+				expect( result ).toInclude( 'src="/assets/screenshot.png"' );
+				expect( result ).toInclude( "screenshot-800w.abc123.png" );
+			} );
+
+			it( "prefixes every rewritten URL with a non-root basePath", function() {
+				var html = '<img src="assets/screenshot.png" alt="A screenshot">';
+				var manifest = { "assets/screenshot.png" : entry( [ { width : 800, format : "png", fileName : "screenshot-800w.abc123.png" } ] ) };
+
+				var result = processor.resolve( html, "index.md", "/my-docs/", manifest );
+
+				expect( result ).toInclude( 'src="/my-docs/assets/screenshot.png"' );
+				expect( result ).toInclude( "/my-docs/assets/screenshot-800w.abc123.png" );
+			} );
+
+			it( "rewrites variant URLs under the same subdirectory as the original, for a nested asset", function() {
+				var html = '<img src="assets/sub/screenshot.png" alt="Nested">';
+				var manifest = { "assets/sub/screenshot.png" : entry( [ { width : 800, format : "png", fileName : "screenshot-800w.abc123.png" } ] ) };
+
+				var result = processor.resolve( html, "index.md", "/", manifest );
+
+				expect( result ).toInclude( "/assets/sub/screenshot-800w.abc123.png" );
+			} );
+
+			it( "never mistakes a lazy-loading data-src attribute for the real src", function() {
+				var html = '<img data-src="assets/screenshot.png" alt="Lazy" class="lazyload">';
+				var manifest = { "assets/screenshot.png" : entry( [ { width : 800, format : "png", fileName : "screenshot-800w.abc123.png" } ] ) };
+
+				var result = processor.resolve( html, "index.md", "/", manifest );
+
+				expect( result ).toBe( html );
+			} );
+
+			it( "rewrites a matched <img> written with single-quoted attributes", function() {
+				var html = "<img src='assets/screenshot.png' alt='A screenshot'>";
+				var manifest = { "assets/screenshot.png" : entry( [ { width : 800, format : "png", fileName : "screenshot-800w.abc123.png" } ] ) };
+
+				var result = processor.resolve( html, "index.md", "/", manifest );
+
+				expect( result ).toStartWith( "<picture>" );
+				expect( result ).toInclude( 'src="/assets/screenshot.png"' );
+				expect( result ).toInclude( "screenshot-800w.abc123.png" );
+				expect( result ).toInclude( "alt='A screenshot'" );
+			} );
+
+			it( "rewrites a matched <IMG> tag regardless of case", function() {
+				var html = '<IMG SRC="assets/screenshot.png" ALT="A screenshot">';
+				var manifest = { "assets/screenshot.png" : entry( [ { width : 800, format : "png", fileName : "screenshot-800w.abc123.png" } ] ) };
+
+				var result = processor.resolve( html, "index.md", "/", manifest );
+
+				expect( result ).toStartWith( "<picture>" );
+				expect( result ).toInclude( 'src="/assets/screenshot.png"' );
+				expect( result ).toInclude( "screenshot-800w.abc123.png" );
+			} );
+
+			it( "strips an existing hand-authored srcset/sizes rather than leaving a duplicate alongside the generated ones", function() {
+				var html = '<img src="assets/screenshot.png" srcset="assets/screenshot.png 1x" sizes="50vw" alt="A screenshot">';
+				var manifest = { "assets/screenshot.png" : entry( [ { width : 800, format : "png", fileName : "screenshot-800w.abc123.png" } ] ) };
+
+				var result = processor.resolve( html, "index.md", "/", manifest );
+
+				var imgTag = result.reReplace( "^.*(<img[^>]*>).*$", "\1", "one" );
+				expect( imgTag.reMatch( "srcset" ).len() ).toBe( 1 );
+				expect( imgTag.reMatch( "sizes" ).len() ).toBe( 1 );
+				expect( imgTag ).notToInclude( "50vw" );
+				expect( imgTag ).toInclude( "screenshot-800w.abc123.png" );
+			} );
+
+			it( "drops a query string/fragment from src before resolving it against the manifest", function() {
+				var html = '<img src="assets/screenshot.png?v=1" alt="A screenshot">';
+				var manifest = { "assets/screenshot.png" : entry( [ { width : 800, format : "png", fileName : "screenshot-800w.abc123.png" } ] ) };
+
+				var result = processor.resolve( html, "index.md", "/", manifest );
+
+				expect( result ).toStartWith( "<picture>" );
+				expect( result ).toInclude( 'src="/assets/screenshot.png"' );
+				expect( result ).notToInclude( "?v=1" );
+			} );
+
+			it( "rewrites more than one eligible <img> in the same page", function() {
+				var html = '<img src="assets/a.png" alt="A"><p>text</p><img src="assets/b.png" alt="B">';
+				var manifest = {
+					"assets/a.png" : entry( [ { width : 800, format : "png", fileName : "a-800w.aaa111.png" } ] ),
+					"assets/b.png" : entry( [ { width : 800, format : "png", fileName : "b-800w.bbb222.png" } ] )
+				};
+
+				var result = processor.resolve( html, "index.md", "/", manifest );
+
+				expect( result ).toInclude( "a-800w.aaa111.png" );
+				expect( result ).toInclude( "b-800w.bbb222.png" );
+				expect( result ).toInclude( "<p>text</p>" );
+			} );
+
+			it( "pictureTag() builds a <picture> from a bare docs/assets/-relative path, for markup generated outside a normal page body (e.g. BlogBuilder.bx)", function() {
+				var manifest = { "assets/blog/cover.png" : entry( [ { width : 800, format : "png", fileName : "cover-800w.abc123.png" } ] ) };
+
+				var result = processor.pictureTag( "assets/blog/cover.png", 'alt="" class="blog-post-featured-image"', "/", manifest );
+
+				expect( result ).toStartWith( "<picture>" );
+				expect( result ).toInclude( 'src="/assets/blog/cover.png"' );
+				expect( result ).toInclude( "cover-800w.abc123.png" );
+				expect( result ).toInclude( 'class="blog-post-featured-image"' );
+			} );
+
+			it( "pictureTag() falls back to a plain <img> when the path has no manifest entry", function() {
+				var result = processor.pictureTag( "assets/blog/no-manifest-hit.png", 'alt="X"', "/", {} );
+
+				expect( result ).toStartWith( "<img " );
+				expect( result ).notToInclude( "<picture>" );
+				expect( result ).toInclude( 'src="/assets/blog/no-manifest-hit.png"' );
+			} );
+
+			it( "pictureTag() leaves a full external URL untouched, unprefixed by basePath", function() {
+				var result = processor.pictureTag( "https://example.com/avatar.png", 'alt="X"', "/my-docs/", {} );
+
+				expect( result ).toBe( '<img src="https://example.com/avatar.png" alt="X">' );
+			} );
+
+			it( "pictureTag() returns an empty string for an empty path", function() {
+				expect( processor.pictureTag( "", 'alt="X"', "/", {} ) ).toBe( "" );
+			} );
+
+		} );
+	}
+
+}

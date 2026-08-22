@@ -1,0 +1,153 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.AssetBundler", function() {
+
+			beforeEach( function() {
+				variables.bundler = new "models.build.AssetBundler@bxdocs"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private struct function newProject() {
+				var root = createTempDirectory( prefix = "bxdocs-assetbundler-" );
+				tempDirs.append( root );
+				var docsDir = root & "/docs"
+				var cacheDir = root & "/.cache/assets"
+				directoryCreate( docsDir & "/assets", true, true );
+				return { root : root, docsDir : docsDir, cacheDir : cacheDir };
+			}
+
+			it( "bundles local CSS files, in order, into one fingerprinted output", function() {
+				var p = newProject();
+				fileWrite( p.docsDir & "/assets/a.css", "body { color: red; }" );
+				fileWrite( p.docsDir & "/assets/b.css", "a { color: blue; }" );
+
+				var result = bundler.bundleCss( [ "assets/a.css", "assets/b.css" ], p.docsDir, p.cacheDir );
+
+				expect( result.bundleUrl ).notToBe( "" );
+				expect( result.bundleUrl ).toInclude( "assets/bundle." );
+				expect( result.urls ).toBe( [] );
+
+				var bundledContent = fileRead( result.cachedPath );
+				expect( bundledContent ).toInclude( "color: red" );
+				expect( bundledContent ).toInclude( "color: blue" );
+				// "a.css" was listed first - its content should come first too.
+				expect( bundledContent.find( "red" ) < bundledContent.find( "blue" ) ).toBeTrue();
+			} );
+
+			it( "strips CSS comments and collapses whitespace", function() {
+				var p = newProject();
+				fileWrite( p.docsDir & "/assets/a.css", "/* a comment */ body {" & char( 10 ) & "  color: red;" & char( 10 ) & "}" );
+
+				var result = bundler.bundleCss( [ "assets/a.css" ], p.docsDir, p.cacheDir );
+
+				var bundledContent = fileRead( result.cachedPath );
+				expect( bundledContent ).notToInclude( "a comment" );
+				expect( bundledContent ).notToInclude( char( 10 ) );
+			} );
+
+			it( "falls back to today's exact per-URL behavior when any entry is an external URL", function() {
+				var p = newProject();
+				fileWrite( p.docsDir & "/assets/a.css", "body { color: red; }" );
+				var urls = [ "assets/a.css", "https://cdn.example.com/lib.css" ];
+
+				var result = bundler.bundleCss( urls, p.docsDir, p.cacheDir );
+
+				expect( result.bundleUrl ).toBe( "" );
+				expect( result.urls ).toBe( urls );
+			} );
+
+			it( "falls back to today's exact per-URL behavior rather than reading a file outside docsDir via ../ traversal", function() {
+				var p = newProject();
+				fileWrite( p.root & "/secret.css", "body { background: url(/steal-me); }" );
+				var urls = [ "../secret.css" ];
+
+				var result = bundler.bundleCss( urls, p.docsDir, p.cacheDir );
+
+				expect( result.bundleUrl ).toBe( "" );
+				expect( result.urls ).toBe( urls );
+			} );
+
+			it( "falls back to today's exact per-URL behavior when a referenced file doesn't exist", function() {
+				var p = newProject();
+				var urls = [ "assets/does-not-exist.css" ];
+
+				var result = bundler.bundleCss( urls, p.docsDir, p.cacheDir );
+
+				expect( result.bundleUrl ).toBe( "" );
+				expect( result.urls ).toBe( urls );
+			} );
+
+			it( "returns no bundle for an empty urls array", function() {
+				var p = newProject();
+
+				var result = bundler.bundleCss( [], p.docsDir, p.cacheDir );
+
+				expect( result.bundleUrl ).toBe( "" );
+				expect( result.urls ).toBe( [] );
+			} );
+
+			it( "bundles JS without stripping comments or collapsing lines - only trims trailing whitespace and extra blank lines", function() {
+				var p = newProject();
+				var js = 'var url = "http://example.com"; // a real comment, left alone' & char( 10 ) &
+					char( 10 ) & char( 10 ) & char( 10 ) &
+					"console.log( url );  " & char( 10 );
+				fileWrite( p.docsDir & "/assets/a.js", js );
+
+				var result = bundler.bundleJs( [ "assets/a.js" ], p.docsDir, p.cacheDir );
+
+				var bundledContent = fileRead( result.cachedPath );
+				// The "//" inside the URL string must survive untouched - a naive
+				// comment stripper would have corrupted it.
+				expect( bundledContent ).toInclude( '"http://example.com"' );
+				expect( bundledContent ).toInclude( "// a real comment, left alone" );
+				// 4 consecutive blank lines collapse down to 1.
+				expect( bundledContent ).notToInclude( char( 10 ) & char( 10 ) & char( 10 ) );
+			} );
+
+			it( "names the bundle plainly, with no content-hash, when fingerprint is false", function() {
+				var p = newProject();
+				fileWrite( p.docsDir & "/assets/a.css", "body { color: red; }" );
+
+				var result = bundler.bundleCss( [ "assets/a.css" ], p.docsDir, p.cacheDir, false );
+
+				expect( result.bundleUrl ).toBe( "assets/bundle.css" );
+				expect( result.fileName ).toBe( "bundle.css" );
+			} );
+
+			it( "inserts a statement-separating semicolon between concatenated JS files, even when a file omits its own trailing one", function() {
+				var p = newProject();
+				// No trailing semicolon on a.js - without a separator, ASI
+				// would merge it with b.js's own leading open-paren into a
+				// single broken expression.
+				fileWrite( p.docsDir & "/assets/a.js", "window.a = function() { return 1 }" );
+				fileWrite( p.docsDir & "/assets/b.js", "(function() { window.b = 2; })();" );
+
+				var result = bundler.bundleJs( [ "assets/a.js", "assets/b.js" ], p.docsDir, p.cacheDir );
+
+				var bundledContent = fileRead( result.cachedPath );
+				expect( bundledContent ).toInclude( "}" & char( 10 ) & ";" & char( 10 ) & "(function()" );
+			} );
+
+			it( "reuses the cached bundle file on a second call with identical content", function() {
+				var p = newProject();
+				fileWrite( p.docsDir & "/assets/a.css", "body { color: red; }" );
+
+				var first = bundler.bundleCss( [ "assets/a.css" ], p.docsDir, p.cacheDir );
+				var second = bundler.bundleCss( [ "assets/a.css" ], p.docsDir, p.cacheDir );
+
+				expect( first.bundleUrl ).toBe( second.bundleUrl );
+			} );
+
+		} );
+	}
+
+}

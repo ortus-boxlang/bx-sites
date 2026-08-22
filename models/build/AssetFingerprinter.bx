@@ -1,0 +1,49 @@
+/**
+ * Content-hash fingerprinting, shared by the image variant pipeline
+ * (ImageVariantGenerator.bx) and the CSS/JS bundler (AssetBundler.bx) - not
+ * an image-specific concern, so it lives on its own rather than inside
+ * either.
+ *
+ * A fingerprint is always derived from the *generated output's own* bytes
+ * (a resized image variant, a bundled/minified stylesheet) - never a
+ * project's original source file, which keeps its own plain filename
+ * untouched for anything else that might reference it directly (a
+ * `::: file src="assets/x.png"` download card, a raw markdown link) - see
+ * docs/guides/images.md's "What doesn't get renamed" section.
+ */
+class {
+
+	/**
+	 * An 8-character lowercase hex digest of `content` - short enough to
+	 * stay out of the way in a filename, long enough that two different
+	 * assets colliding is not a practical concern for a docs site's own
+	 * asset count. Accepts either binary (an image's own raw bytes, via
+	 * `fileReadBinary()`) or a string (bundled CSS/JS text) - `hash()`
+	 * itself handles either directly, so this stays a thin pass-through
+	 * rather than forcing every caller through its own charset conversion.
+	 *
+	 * @content Binary or string content to hash
+	 */
+	string function hashOf( required any content ) {
+		return lCase( left( hash( arguments.content, "MD5" ), 8 ) )
+	}
+
+	/**
+	 * Splices an 8-char hash into a filename right before its extension -
+	 * `"bundle.css"` + `"a3f9c2e1"` -> `"bundle.a3f9c2e1.css"`. A filename
+	 * with no extension gets the hash appended instead.
+	 *
+	 * @fileName A bare filename (no directory), e.g. "bundle.css" or "screenshot-400w.png"
+	 * @hash8 hashOf()'s own output
+	 */
+	string function fingerprint( required string fileName, required string hash8 ) {
+		var dotPos = arguments.fileName.reFind( "\.[^.\/]*$" )
+		if ( !dotPos ) {
+			return arguments.fileName & "." & arguments.hash8
+		}
+		var base = left( arguments.fileName, dotPos - 1 )
+		var ext = mid( arguments.fileName, dotPos, len( arguments.fileName ) )
+		return base & "." & arguments.hash8 & ext
+	}
+
+}

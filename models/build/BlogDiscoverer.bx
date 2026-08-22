@@ -1,9 +1,20 @@
 /**
  * Discovers a project's blog posts "by convention" - any `.md` file
- * directly under `docs/blog/posts/` is a post, with no config beyond just
- * existing there (mirrors VersionsDiscoverer.bx/LocalesDiscoverer.bx's own
- * by-convention discovery). Projects that don't blog simply have no
- * `docs/blog/posts/` folder, and this returns an empty array.
+ * anywhere under `docs/blog/posts/`, at any depth, is a post, with no
+ * config beyond just existing there (mirrors VersionsDiscoverer.bx/
+ * LocalesDiscoverer.bx's own by-convention discovery). Projects that don't
+ * blog simply have no `docs/blog/posts/` folder, and this returns an empty
+ * array.
+ *
+ * Subfolders under `docs/blog/posts/` (`posts/2026/`, `posts/2026/03/`, or
+ * any scheme a project likes) are purely an authoring convenience for
+ * keeping a large flat folder browsable while editing - nothing here reads
+ * them for anything. A post's sort order, its year archive
+ * (`blog/archive/<year>/` - see BlogBuilder.bx), and its URL are all
+ * derived from frontmatter (`date`, `slug`/filename) alone, so a post's
+ * folder and its actual `date` are free to disagree without breaking
+ * anything - there's never a need to refile a post if its year "changes"
+ * (a draft written in December, published in January, say).
  *
  * Each loaded post is shaped as a superset of DocsLoader.bx's own page
  * struct (`relativePath`/`sourcePath`/`urlPath`/`title`/`description`/
@@ -12,23 +23,26 @@
  * assignTableOfContents(), assignEditAndLastUpdated(), assignOgImages(),
  * assignMarkdownUrl(), assignIconHtml()) all work against a post unchanged -
  * `relativePath` is deliberately the post's own real `docs/`-relative source
- * path (`"blog/posts/<file>.md"`), so an edit URL/git-blame lookup/
- * "Download Markdown" link/MarkdownPublisher.bx copy all resolve to the
- * real file, exactly like a normal docs page - `urlPath` is independent of it, computed from the
- * post's own slug instead, since a post's own pretty URL
- * (`blog/<slug>/index.html`) intentionally doesn't mirror the `posts/`
- * folder it's authored under.
+ * path (`"blog/posts/<file>.md"`, or `"blog/posts/2026/<file>.md"` when
+ * filed under a subfolder), so an edit URL/git-blame lookup/"Download
+ * Markdown" link/MarkdownPublisher.bx copy all resolve to the real file,
+ * exactly like a normal docs page - `urlPath` is independent of it, computed
+ * from the post's own slug instead (its own bare filename by default,
+ * regardless of which subfolder it's authored under - see slugify()),
+ * since a post's own pretty URL (`blog/<slug>/index.html`) intentionally
+ * doesn't mirror the `posts/` folder structure at all.
  */
 class {
 
 	variables.frontmatterParser = new "models.build.FrontmatterParser@bxdocs"()
 
 	/**
-	 * Loads every post under `docs/blog/posts/`, newest first by `date`. A
-	 * post with frontmatter `draft: true` is skipped unless `includeDrafts`
-	 * is `true` - no verb wires that in v1 (always `false` in a real build),
-	 * kept as a parameter so a future preview flag, or a test, can opt in
-	 * without a signature change.
+	 * Loads every post under `docs/blog/posts/`, at any subfolder depth
+	 * (this class's own docblock), newest first by `date`. A post with
+	 * frontmatter `draft: true` is skipped unless `includeDrafts` is `true`
+	 * - no verb wires that in v1 (always `false` in a real build), kept as
+	 * a parameter so a future preview flag, or a test, can opt in without a
+	 * signature change.
 	 *
 	 * @docsDir Absolute path to the project's docs/ directory
 	 * @includeDrafts Include posts whose frontmatter sets `draft: true`
@@ -48,7 +62,7 @@ class {
 		// closure below would look up a key that was never there.
 		var includeDrafts = arguments.includeDrafts
 
-		var posts = directoryList( postsDir, false, "path", "*.md" )
+		var posts = directoryList( postsDir, true, "path", "*.md" )
 			.map( path => loadFile( postsDir, path ) )
 			.filter( post => includeDrafts || !post.draft )
 
@@ -64,9 +78,14 @@ class {
 	 * validates/derives its `date` and `slug`.
 	 *
 	 * @postsDir Absolute path to `docs/blog/posts/`
-	 * @filePath Absolute path to the post's own .md file
+	 * @filePath Absolute path to the post's own .md file, at any subfolder depth under postsDir
 	 */
 	private struct function loadFile( required string postsDir, required string filePath ) {
+		// The file's own path relative to postsDir, subfolder segments
+		// (if any) included - e.g. "hello-world.md", or "2026/hello-world.md"
+		// when authored under a subfolder. Same reReplace-the-base-dir-off
+		// idiom DocsLoader.bx's own relativePath uses.
+		var relativeToPostsDir = arguments.filePath.reReplace( arguments.postsDir, "", "one" ).reReplace( "^[\/]", "" )
 		var fileName = getFileFromPath( arguments.filePath ).reReplaceNoCase( "\.md$", "" )
 		var parsed = variables.frontmatterParser.parse( fileRead( arguments.filePath ) )
 		var fm = parsed.frontmatter
@@ -75,14 +94,14 @@ class {
 		if ( !len( date ) || !isDate( date ) ) {
 			throw(
 				type    = "BxDocs.InvalidBlogPost",
-				message = "blog/posts/#fileName#.md is missing a required, valid frontmatter [date] (got [#date#])"
+				message = "blog/posts/#relativeToPostsDir# is missing a required, valid frontmatter [date] (got [#date#])"
 			)
 		}
 
 		var slug = len( trim( fm.slug ?: "" ) ) ? slugify( fm.slug ) : slugify( fileName )
 
 		return {
-			relativePath : "blog/posts/" & fileName & ".md",
+			relativePath : "blog/posts/" & relativeToPostsDir,
 			sourcePath   : arguments.filePath,
 			slug         : slug,
 			urlPath      : "blog/" & slug & "/index.html",

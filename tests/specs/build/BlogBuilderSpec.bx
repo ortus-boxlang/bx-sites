@@ -34,13 +34,18 @@ class extends="testbox.system.BaseSpec" {
 				return post;
 			}
 
-			it( "returns one page per post, unchanged count, and a Blog index page even with zero posts", function() {
+			it( "returns a Blog index page and a stats page even with zero posts, unchanged post count", function() {
 				var result = builder.build( [], {}, 10, "/" );
 
 				expect( result.posts.len() ).toBe( 0 );
-				expect( result.indexPages.len() ).toBe( 1 );
-				expect( result.indexPages[ 1 ].title ).toBe( "Blog" );
-				expect( result.indexPages[ 1 ].urlPath ).toBe( "blog/index.html" );
+				expect( result.categories ).toBeArray();
+				expect( result.categories.len() ).toBe( 0 );
+
+				var blogPage = result.indexPages.filter( p => p.urlPath == "blog/index.html" )[ 1 ];
+				expect( blogPage.title ).toBe( "Blog" );
+
+				var statsPage = result.indexPages.filter( p => p.urlPath == "blog/stats/index.html" )[ 1 ];
+				expect( statsPage.title ).toBe( "Blog Stats" );
 			} );
 
 			it( "prepends a featured-image/byline header onto the post's own contentHtml", function() {
@@ -50,6 +55,53 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "assets/blog/cover.png" );
 				expect( html ).toInclude( "First paragraph." );
 				expect( html.find( "cover.png" ) ).toBeLT( html.find( "First paragraph." ) );
+			} );
+
+			it( "renders a post's featured-image header and its own list-card thumbnail as a <picture> when the image has a manifest entry", function() {
+				var manifest = {
+					"assets/blog/cover.png" : {
+						width : 1600,
+						height : 900,
+						originalVariants : [ { width : 800, format : "png", fileName : "cover-800w.abc123.png" } ],
+						webpVariants : []
+					}
+				};
+
+				var result = builder.build( [ newPost( { image : "assets/blog/cover.png" } ) ], {}, 10, "/", manifest );
+
+				expect( result.posts[ 1 ].contentHtml ).toInclude( "<picture>" );
+				expect( result.posts[ 1 ].contentHtml ).toInclude( "cover-800w.abc123.png" );
+
+				var blogPage = result.indexPages.filter( p => p.urlPath == "blog/index.html" )[ 1 ];
+				expect( blogPage.contentHtml ).toInclude( "<picture>" );
+				expect( blogPage.contentHtml ).toInclude( "cover-800w.abc123.png" );
+			} );
+
+			it( "renders an author's avatar as a <picture> when the avatar has a manifest entry", function() {
+				var manifest = {
+					"assets/authors/lmajano.png" : {
+						width : 400,
+						height : 400,
+						originalVariants : [ { width : 200, format : "png", fileName : "lmajano-200w.abc123.png" } ],
+						webpVariants : []
+					}
+				};
+				var authors = {
+					"lmajano" : { name : "Luis Majano", title : "", bio : "", url : "", email : "", avatar : "assets/authors/lmajano.png", socials : {} }
+				};
+
+				var result = builder.build( [ newPost( { authors : [ "lmajano" ] } ) ], authors, 10, "/", manifest );
+
+				var authorPage = result.indexPages.filter( p => p.urlPath == "blog/authors/lmajano/index.html" )[ 1 ];
+				expect( authorPage.contentHtml ).toInclude( "<picture>" );
+				expect( authorPage.contentHtml ).toInclude( "lmajano-200w.abc123.png" );
+			} );
+
+			it( "falls back to a plain <img> for a post's featured image when imageManifest is omitted, unchanged from before", function() {
+				var result = builder.build( [ newPost( { image : "assets/blog/cover.png" } ) ], {}, 10, "/" );
+
+				expect( result.posts[ 1 ].contentHtml ).notToInclude( "<picture>" );
+				expect( result.posts[ 1 ].contentHtml ).toInclude( "assets/blog/cover.png" );
 			} );
 
 			it( "computes an excerpt from the <!-- more --> marker when present", function() {
@@ -136,11 +188,60 @@ class extends="testbox.system.BaseSpec" {
 
 				var result = builder.build( posts, {}, 2, "/" );
 
-				var blogPages = result.indexPages.filter( p => p.urlPath.findNoCase( "blog/category" ) == 0 && p.urlPath.findNoCase( "blog/authors" ) == 0 );
+				var blogPages = result.indexPages.filter( p => p.urlPath.findNoCase( "blog/category" ) == 0 && p.urlPath.findNoCase( "blog/authors" ) == 0 && p.urlPath.findNoCase( "blog/archive" ) == 0 && p.urlPath.findNoCase( "blog/stats" ) == 0 );
 				expect( blogPages.len() ).toBe( 2 );
 				expect( blogPages[ 1 ].urlPath ).toBe( "blog/index.html" );
 				expect( blogPages[ 2 ].urlPath ).toBe( "blog/page/2/index.html" );
 				expect( blogPages[ 2 ].title ).toInclude( "Page 2" );
+			} );
+
+			it( "builds one archive index page per distinct calendar year, newest year first", function() {
+				var posts = [
+					newPost( { slug : "a", urlPath : "blog/a/index.html", date : "2026-06-01" } ),
+					newPost( { slug : "b", urlPath : "blog/b/index.html", date : "2025-03-01" } ),
+					newPost( { slug : "c", urlPath : "blog/c/index.html", date : "2025-01-01" } )
+				];
+
+				var result = builder.build( posts, {}, 10, "/" );
+
+				var archivePages = result.indexPages.filter( p => p.urlPath.findNoCase( "blog/archive" ) > 0 );
+				var archiveUrls = archivePages.map( p => p.urlPath );
+				expect( archiveUrls ).toInclude( "blog/archive/2026/index.html" );
+				expect( archiveUrls ).toInclude( "blog/archive/2025/index.html" );
+				expect( archivePages.filter( p => p.urlPath == "blog/archive/2026/index.html" )[ 1 ].title ).toBe( "2026" );
+			} );
+
+			it( "paginates a year archive independently, per postsPerPage", function() {
+				var posts = [
+					newPost( { slug : "a", urlPath : "blog/a/index.html", date : "2026-03-01" } ),
+					newPost( { slug : "b", urlPath : "blog/b/index.html", date : "2026-02-01" } ),
+					newPost( { slug : "c", urlPath : "blog/c/index.html", date : "2026-01-01" } )
+				];
+
+				var result = builder.build( posts, {}, 2, "/" );
+
+				var yearPages = result.indexPages.filter( p => p.urlPath.findNoCase( "blog/archive/2026" ) == 1 );
+				expect( yearPages.len() ).toBe( 2 );
+				var yearUrls = yearPages.map( p => p.urlPath );
+				expect( yearUrls ).toInclude( "blog/archive/2026/index.html" );
+				expect( yearUrls ).toInclude( "blog/archive/2026/page/2/index.html" );
+			} );
+
+			it( "adds a Browse-by-year archive links block to the main blog list only when posts span more than one year", function() {
+				var singleYearPosts = [ newPost( { slug : "a", urlPath : "blog/a/index.html", date : "2026-01-01" } ) ];
+				var singleYearResult = builder.build( singleYearPosts, {}, 10, "/" );
+				var singleYearBlogPage = singleYearResult.indexPages.filter( p => p.urlPath == "blog/index.html" )[ 1 ];
+				expect( singleYearBlogPage.contentHtml ).notToInclude( "blog-archive-links" );
+
+				var multiYearPosts = [
+					newPost( { slug : "a", urlPath : "blog/a/index.html", date : "2026-01-01" } ),
+					newPost( { slug : "b", urlPath : "blog/b/index.html", date : "2025-01-01" } )
+				];
+				var multiYearResult = builder.build( multiYearPosts, {}, 10, "/" );
+				var multiYearBlogPage = multiYearResult.indexPages.filter( p => p.urlPath == "blog/index.html" )[ 1 ];
+				expect( multiYearBlogPage.contentHtml ).toInclude( "blog-archive-links" );
+				expect( multiYearBlogPage.contentHtml ).toInclude( 'href="/blog/archive/2026/index.html"' );
+				expect( multiYearBlogPage.contentHtml ).toInclude( 'href="/blog/archive/2025/index.html"' );
 			} );
 
 			it( "builds one category index page per distinct category, url-slugged", function() {
@@ -155,6 +256,87 @@ class extends="testbox.system.BaseSpec" {
 				var categoryUrls = categoryPages.map( p => p.urlPath );
 				expect( categoryUrls ).toInclude( "blog/category/getting-started/index.html" );
 				expect( categoryUrls ).toInclude( "blog/category/news/index.html" );
+			} );
+
+			it( "returns categories with their own slug/count, alphabetical", function() {
+				var posts = [
+					newPost( { slug : "a", urlPath : "blog/a/index.html", categories : [ "News" ] } ),
+					newPost( { slug : "b", urlPath : "blog/b/index.html", categories : [ "Getting Started", "News" ] } )
+				];
+
+				var result = builder.build( posts, {}, 10, "/" );
+
+				expect( result.categories.len() ).toBe( 2 );
+				expect( result.categories[ 1 ].name ).toBe( "Getting Started" );
+				expect( result.categories[ 1 ].slug ).toBe( "getting-started" );
+				expect( result.categories[ 1 ].count ).toBe( 1 );
+				expect( result.categories[ 2 ].name ).toBe( "News" );
+				expect( result.categories[ 2 ].count ).toBe( 2 );
+			} );
+
+			it( "adds a Browse-by-category links block to the main blog list only when posts span more than one category", function() {
+				var singleCategoryPosts = [ newPost( { slug : "a", urlPath : "blog/a/index.html", categories : [ "News" ] } ) ];
+				var singleResult = builder.build( singleCategoryPosts, {}, 10, "/" );
+				var singleBlogPage = singleResult.indexPages.filter( p => p.urlPath == "blog/index.html" )[ 1 ];
+				expect( singleBlogPage.contentHtml ).notToInclude( "blog-category-links" );
+
+				var multiCategoryPosts = [
+					newPost( { slug : "a", urlPath : "blog/a/index.html", categories : [ "News" ] } ),
+					newPost( { slug : "b", urlPath : "blog/b/index.html", categories : [ "Releases" ] } )
+				];
+				var multiResult = builder.build( multiCategoryPosts, {}, 10, "/" );
+				var multiBlogPage = multiResult.indexPages.filter( p => p.urlPath == "blog/index.html" )[ 1 ];
+				expect( multiBlogPage.contentHtml ).toInclude( "blog-category-links" );
+				expect( multiBlogPage.contentHtml ).toInclude( 'href="/blog/category/news/index.html"' );
+				expect( multiBlogPage.contentHtml ).toInclude( 'href="/blog/category/releases/index.html"' );
+			} );
+
+			it( "computes wordCount/readingTimeMinutes and shows it in the meta line", function() {
+				var post = newPost( { contentHtml : "<p>" & repeatString( "word ", 400 ) & "</p>" } );
+
+				var result = builder.build( [ post ], {}, 10, "/" );
+
+				expect( result.posts[ 1 ].wordCount ).toBe( 400 );
+				expect( result.posts[ 1 ].readingTimeMinutes ).toBe( 2 );
+				expect( result.posts[ 1 ].contentHtml ).toInclude( "2 min read" );
+			} );
+
+			it( "floors readingTimeMinutes at 1, even for a very short post", function() {
+				var post = newPost( { contentHtml : "<p>Short.</p>" } );
+
+				var result = builder.build( [ post ], {}, 10, "/" );
+
+				expect( result.posts[ 1 ].readingTimeMinutes ).toBe( 1 );
+				expect( result.posts[ 1 ].contentHtml ).toInclude( "1 min read" );
+			} );
+
+			it( "shows a draft badge on a draft post's own contentHtml and its card, but not on a published post", function() {
+				var posts = [
+					newPost( { slug : "draft-one", urlPath : "blog/draft-one/index.html", draft : true, date : "2026-02-01" } ),
+					newPost( { slug : "published", urlPath : "blog/published/index.html", draft : false, date : "2026-01-01" } )
+				];
+
+				var result = builder.build( posts, {}, 10, "/" );
+
+				expect( result.posts[ 1 ].contentHtml ).toInclude( "blog-draft-badge" );
+				expect( result.posts[ 2 ].contentHtml ).notToInclude( "blog-draft-badge" );
+
+				var blogPage = result.indexPages.filter( p => p.urlPath == "blog/index.html" )[ 1 ];
+				expect( blogPage.contentHtml ).toInclude( "blog-post-card--draft" );
+			} );
+
+			it( "builds a /blog/stats/ page with real aggregate numbers", function() {
+				var posts = [
+					newPost( { slug : "a", urlPath : "blog/a/index.html", date : "2026-06-01", categories : [ "Releases" ], contentHtml : "<p>" & repeatString( "word ", 200 ) & "</p>" } ),
+					newPost( { slug : "b", urlPath : "blog/b/index.html", date : "2025-01-01", categories : [ "Releases" ], contentHtml : "<p>Short.</p>" } )
+				];
+
+				var result = builder.build( posts, {}, 10, "/" );
+
+				var statsPage = result.indexPages.filter( p => p.urlPath == "blog/stats/index.html" )[ 1 ];
+				expect( statsPage.contentHtml ).toInclude( "bxdocs-cards" );
+				expect( statsPage.contentHtml ).toInclude( '>2</div><div class="bxdocs-card__body">Posts</div>' );
+				expect( statsPage.contentHtml ).toInclude( "Releases" );
 			} );
 
 			it( "builds an author page only for an author actually referenced by a post, not every roster entry", function() {
