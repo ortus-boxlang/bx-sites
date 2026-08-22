@@ -1,6 +1,7 @@
 ---
 title: Temi
 order: 1
+icon: phosphor-duotone:palette
 tags: [guide, temi]
 ---
 

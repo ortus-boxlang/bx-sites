@@ -1,6 +1,7 @@
 ---
 title: Themes
 order: 1
+icon: phosphor-duotone:palette
 tags: [anleitungen, themes]
 ---
 
@@ -262,7 +263,7 @@ Ein Theme-Ordner, dem eine der beiden erforderlichen Dateien fehlt,
 schlägt sofort mit einem klaren `BxSites.InvalidTheme`-Fehler zur Build-Zeit
 fehl, statt mit einem verwirrenden Template-Fehler tief im Rendering.
 
-## Farben anpassen, ohne ein Theme zu überschreiben
+## Farben anpassen, ohne ein Theme zu überschreiben {#customizing-colors-without-a-theme-override}
 
 Für eine kleine Farb-/Schriftanpassung ist ein ganzes Theme zu forken
 Overkill - jedes integrierte Theme liest seine Palette aus einer Handvoll
@@ -303,7 +304,7 @@ Das eigene Set des `bootstrap`-Themes
 über Farbe/Schriftart hinaus (Layout, Chrome hinzufügen/entfernen)
 braucht eine echte Überschreibung oder ein eigenes Theme - siehe unten.
 
-## Ein Theme überschreiben
+## Ein Theme überschreiben {#overriding-a-theme}
 
 Lege deine eigenen `layout.bxm` + `page.bxm` (und optional `search.bxm` /
 `assets/`) in einen `theme/`-Ordner im Wurzelverzeichnis deines Projekts.
@@ -370,7 +371,7 @@ legt sich über das Theme, das `bxsites.json` benennt, ganz ohne
 `theme/`-Ordner. `theme/` ist für den Fall, dass du auch das Markup
 selbst ändern musst, siehe als Nächstes.
 
-## Ein Theme von Grund auf schreiben
+## Ein Theme von Grund auf schreiben {#writing-a-theme-from-scratch}
 
 Ein Theme braucht nur die beiden erforderlichen Dateien, hier also ein
 wirklich minimales Beispiel - kein Bootstrap/Tailwind, kein Dunkelmodus,

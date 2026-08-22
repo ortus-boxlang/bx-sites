@@ -1,6 +1,7 @@
 ---
 title: Release-Richtlinie
 order: 6
+icon: phosphor-duotone:tag
 ---
 
 # Release-Richtlinie

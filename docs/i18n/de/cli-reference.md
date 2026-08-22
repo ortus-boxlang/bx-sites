@@ -73,7 +73,10 @@ Läuft im Vordergrund, bis es unterbrochen wird (Strg+C).
 Baut `site/search-index.json` eigenständig neu, ohne Seiten neu zu
 rendern oder Assets zu kopieren. `build` führt diesen Schritt bereits
 automatisch mit aus - dieses Verb existiert für den Fall, dass du nur den
-Index auffrischen musst.
+Index auffrischen musst. Deckt immer nur den Haupt-`docs/`-Baum ab, auch
+bei einem Projekt mit `docs/versions/`/`docs/i18n/` - ein echter `build`
+schreibt stattdessen den eigenen, begrenzten Index jedes Baums (siehe
+[Versionierung](guides/versioning.md#whats-out-of-scope-for-now)).
 
 ```bash
 bxSites search-index
@@ -118,7 +121,7 @@ in den `docs/`-Baum dieses Projekts um: `SUMMARY.md` wird zu
 (`::: name`-Direktiven, oder die native `=== "Title"`-Tab- bzw.
 `!!! type`-Admonition-Syntax, wo bereits eine treffendere Entsprechung
 existiert - siehe
-[Markdown-Erweiterungen](guides/markdown.md#gitbook-style-blocks)),
+[Content-Blöcke](guides/content-blocks.md)),
 `README.md`-Dateien werden zu `index.md`, und `.gitbook/assets/**` wird
 nach `docs/assets/gitbook/` kopiert.
 

@@ -508,37 +508,13 @@ Siehe [Internationalisierung](guides/i18n.md) für das vollständige Bild -
 Fallback bei nicht übersetzten Seiten, den Sprachumschalter und was noch
 nicht übersetzt wird.
 
-## Versionierung
+## Versionierung {#versioning}
 
-Versionierte Docs sind Konvention statt Konfiguration - dafür gibt es
-keinen `bxsites.json`-Schlüssel. Füge einen `docs/versions/`-Ordner hinzu,
-und jeder direkte Unterordner darin wird als eigener, vollständig
-in sich geschlossener Doc-Baum gebaut, neben deinem regulären `docs/`
-(das immer als "Latest" gebaut wird):
-
-```
-docs/
-├── index.md
-├── guides/
-└── versions/
-    ├── 1.0/
-    │   ├── index.md
-    │   └── guides/
-    └── 2.0/
-        ├── index.md
-        └── guides/
-```
-
-Jeder Versionsordner ist ein normal `docs/`-förmiger Baum - eigene
-`index.md`, eigene Navigation, eigene Seiten - gebaut nach
-`site/versions/<name>/`, mit jedem internen Link entsprechend
-vorangestellt, und teilt sich die einzige `bxsites.json`-Konfiguration/das
-Theme des Projekts. Versionsnamen sortieren neuestes zuerst, numerisch
-statt alphabetisch (sodass `2.0` vor `10.0` sortiert), und jedes Theme
-rendert automatisch ein Versions-Dropdown in der Kopfzeile, sobald mehr
-als eine Version existiert - nichts, wozu man sich anmelden müsste. Eine
-lose Datei direkt unter `docs/versions/` (nicht in einem Unterordner)
-wird ignoriert.
-
-`sitemap.xml` und `llms.txt` enthalten die Seiten jeder Version neben
-denen der Hauptwebsite.
+Versionierte Docs sind Convention over Configuration - dafür gibt es
+keinen `bxsites.json`-Schlüssel. Füge einen `docs/versions/<name>/`-Ordner
+hinzu, und er wird automatisch als eigener Doc-Baum gebaut, mit einem
+Versionsumschalter, den jedes Theme kostenlos rendert, sobald mehr als
+eine Version existiert. Siehe [Versionierung](guides/versioning.md) für
+das vollständige Bild - eine neue Version mit `version:new` anlegen, wie
+Versionen sortieren und bauen, und was außen vor bleibt (Suche pro Baum
+begrenzt, kein Deprecated-/EOL-Flag).

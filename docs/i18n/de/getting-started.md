@@ -8,7 +8,7 @@ tags: [anleitungen, einrichtung]
 
 # Erste Schritte
 
-## Installation
+## Installation {#install}
 
 BX Sites benötigt [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
 für das Rendern von Markdown, [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
@@ -88,7 +88,7 @@ wandelt einen GitBook-Export direkt in `docs/` um - siehe
 [Migration von GitBook](guides/migrating-from-gitbook.md) - und du kannst
 direkt zu [Build](#build) springen.
 
-## Seiten hinzufügen
+## Seiten hinzufügen {#add-pages}
 
 Jede `.md`-Datei unter `docs/` wird zu einer Seite. Ordnerverschachtelung wird
 automatisch zu Navigationsverschachtelung:
@@ -105,7 +105,7 @@ docs/
 vollständig durch eine explizite Navigation ersetzen - siehe
 [`nav`](configuration.md#nav).)
 
-### Zwischen Seiten verlinken
+### Zwischen Seiten verlinken {#linking-between-pages}
 
 Verlinke eine andere Seite auf die übliche mkdocs-Art - ein dateirelativer
 Pfad zu ihrer `.md`-Quelldatei, genau als lägen die beiden Dateien
@@ -127,7 +127,7 @@ oder so ein echter, gültiger relativer Pfad zu einer echten Datei.
 Absolute URLs, `mailto:` sowie Links, die bereits mit `/` beginnen, bleiben
 unangetastet.
 
-### Eine Seite als Markdown herunterladen
+### Eine Seite als Markdown herunterladen {#downloading-a-page-as-markdown}
 
 Zu jeder gebauten Seite wird auch ihre ursprüngliche `.md`-Quelldatei direkt
 mit veröffentlicht - `docs/guides/deployment.md` landet als
@@ -136,7 +136,7 @@ mit veröffentlicht - `docs/guides/deployment.md` landet als
 auf der Seite selbst, neben "Diese Seite bearbeiten". Keine Konfiguration
 nötig, immer aktiv.
 
-Das folgt derselben Motivation wie [`llms.txt`](../configuration.md#llmstxt) -
+Das folgt derselben Motivation wie [`llms.txt`](configuration.md#llmstxt) -
 ein Mensch (oder eine KI) kann die rohe Markdown-Quelle einer Seite direkt
 abrufen, statt gerendertes HTML zu scrapen - und da der gesamte
 `docs/`-Baum 1:1 gespiegelt wird, funktionieren auch die relativen Links
