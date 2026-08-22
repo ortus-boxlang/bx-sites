@@ -30,6 +30,11 @@ class {
 
 	variables.fingerprinter = new "models.build.AssetFingerprinter@bxdocs"()
 	variables.eligiblePattern = createObject( "java", "java.util.regex.Pattern" ).compile( "(?i)\.(png|jpe?g)$" )
+	// Flips true the first time WebP encoding fails (e.g. no ImageIO WebP
+	// writer registered in this environment) - see buildEntry()'s own webp
+	// loop. Persists for this instance's whole lifetime (one build), so a
+	// missing encoder is only ever attempted, warned about and skipped once.
+	variables.webpUnavailable = false
 
 	/**
 	 * Walks `docsAssetsDir` for eligible images and builds a manifest of
@@ -126,11 +131,23 @@ class {
 		}
 
 		var webpVariants = []
-		if ( containsNoCase( arguments.imagesConfig.formats, "webp" ) ) {
+		if ( containsNoCase( arguments.imagesConfig.formats, "webp" ) && !variables.webpUnavailable ) {
 			var webpWidths = duplicate( qualifyingWidths )
 			webpWidths.append( originalWidth )
 			for ( var w in webpWidths ) {
-				webpVariants.append( generateVariant( arguments.filePath, entryCacheDir, baseName, w, "webp", hash8, originalWidth, originalHeight, arguments.fingerprint ) )
+				try {
+					webpVariants.append( generateVariant( arguments.filePath, entryCacheDir, baseName, w, "webp", hash8, originalWidth, originalHeight, arguments.fingerprint ) )
+				} catch ( any e ) {
+					// A missing WebP ImageIO writer (no native encoder
+					// registered in this JVM/environment) would fail
+					// identically for every remaining width/image in this
+					// build - warn once and fall back to original-format-only
+					// variants instead of failing the whole build over one
+					// optional format.
+					variables.webpUnavailable = true
+					println( "warning: skipping WebP image variants for the rest of this build - #e.message#" )
+					break
+				}
 			}
 		}
 

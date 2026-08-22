@@ -1,7 +1,7 @@
 ---
 title: Blog
 order: 10
-icon: lucide:newspaper
+icon: phosphor-duotone:newspaper
 tags: [guides, blog]
 ---
 

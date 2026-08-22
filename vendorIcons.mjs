@@ -40,7 +40,14 @@ if (!destRoot) {
 function normalize(svg) {
 	return svg
 		.replace(/<!--[\s\S]*?-->/g, "")
-		.replace(/\s+(width|height|class)="[^"]*"/g, "")
+		// Only the outer <svg ...> tag's own width/height/class are
+		// presentational sizing IconResolver.bx's own `.bxdocs-icon` CSS
+		// class replaces - stripping the same attributes wherever they
+		// appear (the previous global regex here) also hit inner shape
+		// elements like a calendar/archive icon's own <rect width="18"
+		// height="18" .../>, where width/height are load-bearing geometry,
+		// not styling - collapsing those shapes to zero size.
+		.replace(/<svg\b[^>]*>/, (tag) => tag.replace(/\s+(width|height|class)="[^"]*"/g, ""))
 		.replace(/\s+/g, " ")
 		.replace(/>\s+</g, "><")
 		.replace(/\s+\/>/g, "/>")

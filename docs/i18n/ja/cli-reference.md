@@ -1,7 +1,7 @@
 ---
 title: CLI リファレンス
 order: 3
-icon: ⌨️
+icon: phosphor-duotone:terminal-window
 summary: bxDocs のすべての動詞とフラグ。
 tags: [reference, cli]
 ---
