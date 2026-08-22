@@ -55,7 +55,7 @@ by `layout.bxm` since `PagefindUI` doesn't bind it on its own.
 
 ## Turning it off
 
-```json
+```json title="bxdocs.json"
 { "search": false }
 ```
 
@@ -67,7 +67,7 @@ configured.
 
 ## Rebuilding just the index
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxDocs search-index
 ```
 
@@ -85,7 +85,7 @@ Set `searchProvider.provider` to `"algolia"` to swap the search box for
 crawler-hosted search mkdocs-material, VitePress, Starlight and Docusaurus
 all support:
 
-```json
+```json title="bxdocs.json" linenums="1"
 {
 	"search": true,
 	"searchProvider": {
@@ -126,7 +126,7 @@ Set `searchProvider.provider` to `"pagefind"` to swap the search box for
 engine, but indexed from the *built* `site/` HTML rather than crawled like
 Algolia:
 
-```json
+```json title="bxdocs.json" linenums="1"
 {
 	"search": true,
 	"searchProvider": {

@@ -110,7 +110,7 @@ page features:
 
 Set which one a project uses in `bxdocs.json`:
 
-```json
+```json title="bxdocs.json"
 { "theme": { "name": "material" } }
 ```
 
@@ -149,19 +149,19 @@ self-hosted libraries, all MIT/ISC-licensed and bundled with this module
 (~16,200 icons combined, no CDN, nothing added to a built page's own
 weight beyond the handful of icons it actually uses - see IconResolver.bx):
 
-```markdown
+```markdown title="Frontmatter"
 ---
 icon: rocket
 ---
 ```
 
-```markdown
+```markdown title="Frontmatter"
 ---
 icon: lucide:rocket
 ---
 ```
 
-```markdown
+```markdown title="Frontmatter"
 ---
 icon: phosphor-bold:rocket
 ---
@@ -189,7 +189,7 @@ and reference it as `icon: custom:my-icon`.
 A [nav.json](../configuration.md#nav) entry can set its own `icon` too,
 overriding the target page's own frontmatter for that one entry:
 
-```json
+```json title="docs/nav.json"
 { "title": "Guides", "path": "guides/index.md", "icon": "lucide:book-open" }
 ```
 
@@ -242,11 +242,11 @@ re-declared under `[data-theme="dark"]` for dark mode. `bxdocs.json`'s
 theme's own stylesheet, so a same-specificity re-declaration in it wins
 without touching `resources/themes/` at all:
 
-```json
+```json title="bxdocs.json"
 { "extraCss": [ "assets/brand.css" ] }
 ```
 
-```css
+```css title="docs/assets/brand.css" linenums="1"
 /* docs/assets/brand.css - copied to site/assets/brand.css at build time */
 :root {
 	--bxdocs-gradient-start: #7C3AED;
@@ -284,7 +284,7 @@ default marker, these three are the same fixed bg/text pair in both
 light and dark mode (a self-contained badge, not tied to the theme's own
 brand accent), so there's no `[data-theme="dark"]` override to redeclare:
 
-```css
+```css title="docs/assets/brand.css" linenums="1"
 :root {
 	--bxdocs-step-marker-bg: #7C3AED;
 	--bxdocs-step-marker-text: #fff;
@@ -310,7 +310,7 @@ A worked example - start from `bootstrap` and swap its brand palette and
 heading font for your own, keeping everything else (nav, search, dark mode,
 code highlighting, ...) exactly as it already works:
 
-```markdown
+```text title="Project structure"
 my-project/
 ├── bxdocs.yaml
 ├── docs/
@@ -327,7 +327,7 @@ my-project/
 2. Edit only what you need to change. To swap the brand palette and font,
    that's just the top of `theme/assets/style.css`:
 
-   ```css
+   ```css title="theme/assets/style.css" linenums="1"
    :root {
    	--bxdocs-gradient-start: #7C3AED;  /* was #00FF78 */
    	--bxdocs-gradient-end: #DB2777;    /* was #00DBFF */
@@ -366,7 +366,7 @@ what's required versus what the built-in themes add on top. Save both as
 `theme/` folder is picked up automatically (as above), no `bxdocs.json`
 change needed:
 
-```bx
+```bx title="theme/layout.bxm" linenums="1"
 <!-- theme/layout.bxm -->
 <bx:script>
 	function renderNav( required array nodes ) {
@@ -405,7 +405,7 @@ change needed:
 </bx:output>
 ```
 
-```bx
+```bx title="theme/page.bxm" linenums="1"
 <!-- theme/page.bxm -->
 <bx:output>
 <article>

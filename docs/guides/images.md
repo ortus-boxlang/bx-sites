@@ -20,7 +20,7 @@ dependency alongside bx-markdown/bx-esapi/bx-yaml (see
 Write an image the normal way - Markdown syntax or raw HTML, file-relative
 to the page just like a [page link](markdown.md) already works:
 
-```markdown
+```markdown title="Example"
 ![A freshly built site](../assets/screenshot.png)
 ```
 
@@ -28,7 +28,7 @@ At build time, `screenshot.png` gets resized down to every configured
 width narrower than its own (never upscaled), plus a same-size WebP
 re-encode, and the built page gets:
 
-```html
+```html title="Rendered output" linenums="1"
 <picture>
 	<source type="image/webp" srcset="/assets/screenshot-400w.a3f9c2e1.webp 400w, /assets/screenshot-800w.a3f9c2e1.webp 800w, ...">
 	<img src="/assets/screenshot.png" srcset="/assets/screenshot-400w.a3f9c2e1.png 400w, /assets/screenshot-800w.a3f9c2e1.png 800w, ..." sizes="(min-width: 800px) 800px, 100vw" alt="A freshly built site">
@@ -67,7 +67,7 @@ adds AVIF upstream.
 
 ## Turning it off
 
-```json
+```json title="bxdocs.json"
 { "assets": { "images": { "enabled": false } } }
 ```
 
@@ -76,7 +76,7 @@ every image was handled before this feature existed.
 
 ## Choosing your own breakpoints
 
-```json
+```json title="bxdocs.json" linenums="1"
 {
 	"assets": {
 		"images": {
@@ -99,7 +99,7 @@ every `assets.images` key.
 `extraCss`/`extraJs` get bundled the same way, on by default
 (`assets.bundle`):
 
-```json
+```json title="bxdocs.json" linenums="1"
 {
 	"extraCss": [ "assets/a.css", "assets/b.css" ],
 	"extraJs": [ "assets/app.js" ]
@@ -122,7 +122,7 @@ project file. One external URL (a CDN link) mixed in falls the whole
 list back to today's exact per-URL behavior, rather than risk silently
 reordering a CSS cascade a project depended on:
 
-```json
+```json title="bxdocs.json"
 { "extraCss": [ "assets/custom.css", "https://cdn.example.com/lib.css" ] }
 ```
 

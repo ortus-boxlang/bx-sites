@@ -37,7 +37,7 @@ its own client-side state.
 A common one: a button next to an install command that copies it and
 confirms the copy:
 
-```markdown
+```markdown title="Copy button" linenums="1"
 <div x-data="{ copied: false }">
   <button type="button" @click="navigator.clipboard.writeText( 'box install bx-docs' ); copied = true; setTimeout( () => copied = false, 1500 )">
     <span x-show="!copied">Copy install command</span>
@@ -57,7 +57,7 @@ confirms the copy:
 
 Filtering a list client-side, no server round-trip:
 
-```markdown
+```markdown title="Live filter" linenums="1"
 <div x-data="{ query: '' }">
   <input type="text" x-model="query" placeholder="Filter providers...">
   <ul>
@@ -77,7 +77,7 @@ re-evaluates on every keystroke.
 anything inside that element can read/write it, and `x-show`/`x-text`/
 `x-model`/`@click` (shorthand for `x-on:click`) all react to it changing:
 
-```markdown
+```markdown title="Example" linenums="1"
 <div x-data="{ count: 0 }">
   <button type="button" @click="count++">Clicked <span x-text="count"></span> times</button>
 </div>
