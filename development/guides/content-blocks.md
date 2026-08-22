@@ -159,6 +159,9 @@ resolved the same way `theme.logo`/frontmatter `ogImage` already are
 :::
 ```
 
+::: file src="assets/og-image.png" title="Site Preview Image"
+:::
+
 ## Embed
 
 A responsive iframe embed for a recognized provider - currently YouTube,
@@ -170,6 +173,9 @@ refuse to render (most sites block being framed):
 ::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
 :::
 ```
+
+::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
+:::
 
 ## Page link
 
@@ -187,6 +193,26 @@ renamed or its summary changes:
 ::: page-link href="../getting-started.md"
 :::
 
+## Link preview
+
+A rich preview card for an *external* URL - the same card shape as
+`::: page-link`, but for a link that isn't one of this site's own pages, so
+there's no page to pull a title/summary from automatically. Every field
+comes from the directive's own attributes: only `url` is required, `title`
+falls back to the bare URL when omitted, and `description`/`image` are both
+optional. There's no build-time fetch of the target URL to auto-fill these
+- the same reasoning that keeps [`check`](../cli-reference.md#check) internal-links-only
+applies here too, so a slow or unreachable third-party site never affects
+build time:
+
+```markdown title="Example" linenums="1"
+::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
+:::
+```
+
+::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
+:::
+
 ## Updates (changelog)
 
 A dated, taggable changelog list - `::: update` accepts `date="YYYY-MM-DD"`
@@ -202,6 +228,15 @@ Initial release.
 :::
 :::
 ```
+
+::: updates
+::: update date="2026-01-15" tags="feature,fix"
+Added dark mode and fixed a footer alignment bug.
+:::
+::: update date="2026-01-01"
+Initial release.
+:::
+:::
 
 A page with an `::: updates` block also gets its own `feed.xml` (RSS 2.0)
 written alongside it once `bxdocs.json`'s `baseURL` is a full URL - same
