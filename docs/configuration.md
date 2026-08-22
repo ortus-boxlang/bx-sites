@@ -187,7 +187,7 @@ non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
     Once a visitor toggles the switch, their own choice (stored in
     `localStorage`) always wins on later visits, regardless of this setting.
 
-    ```json title="bxdocs.json"
+    ```json
     { "theme": { "options": { "colorMode": "dark" } } }
     ```
   - `theme.options.navCollapsible` - `false` (the default) renders every nav
@@ -201,7 +201,7 @@ non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
     `true`. `true` (the default) starts every section open; `false` starts
     every section collapsed, except the one containing the current page.
 
-    ```json title="bxdocs.json"
+    ```json
     { "theme": { "options": { "navCollapsible": true, "navExpandAll": false } } }
     ```
   - `theme.options.tocPosition` - where a page's own "On this page" table of
@@ -216,7 +216,7 @@ non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
     VitePress/GitBook use on mobile - so the TOC stays reachable at every
     viewport width, it just changes shape depending on how much room there is.
 
-    ```json title="bxdocs.json"
+    ```json
     { "theme": { "options": { "tocPosition": "sticky" } } }
     ```
   - `theme.options.pageMetaPosition` - where the edit-this-page/download-
@@ -225,7 +225,7 @@ non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
     the article ends. `"top"` renders it up near the title instead, the same
     place it always rendered before this option existed.
 
-    ```json title="bxdocs.json"
+    ```json
     { "theme": { "options": { "pageMetaPosition": "top" } } }
     ```
 

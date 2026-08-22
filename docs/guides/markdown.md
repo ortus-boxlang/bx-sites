@@ -172,12 +172,12 @@ admonition body is (4 spaces or a tab):
 Which renders as:
 
 === "Java"
-    ```java title="Hi.java"
+    ```java
     System.out.println( "Hi" );
     ```
 
 === "BoxLang"
-    ```bx title="Hi.bx"
+    ```bx
     println( "Hi" )
     ```
 
