@@ -65,7 +65,11 @@ class {
 			return { label : label, pageCount : treeCounts[ label ] }
 		} )
 
+		// Unfiltered directoryList() returns subdirectory paths alongside
+		// file paths - filter those out, same convention MkdocsMigrator.bx
+		// already uses for this exact "files only" need.
 		var allFiles = directoryList( siteDir, true, "path" )
+			.filter( path => !directoryExists( path ) )
 		var siteSizeBytes = 0
 		for ( var filePath in allFiles ) {
 			siteSizeBytes += createObject( "java", "java.io.File" ).init( filePath ).length()
