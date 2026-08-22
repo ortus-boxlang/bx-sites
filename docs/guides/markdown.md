@@ -618,29 +618,52 @@ page's changelog.
 point. Unlike every block above, this becomes real page content
 (headings, paragraphs, its own nested blocks), not something wrapped in
 a widget - useful for a warning/notice repeated across several pages.
-Put the partial itself under `docs/includes/` (or
-`docs/versions/<name>/includes/`, `docs/i18n/<code>/includes/` inside a
-version/locale tree) - the same reserved-folder convention as
-`assets/`/`versions/`/`i18n/`/`blog/`. A file under `includes/` is never
-built as its own page and never appears in nav/search/sitemap/tags - it
-only exists to be spliced into other pages:
+Put the partial itself under `docs/includes/` - the same reserved-folder
+convention as `assets/`/`versions/`/`i18n/`/`blog/`. A file under
+`includes/` is never built as its own page and never appears in
+nav/search/sitemap/tags - it only exists to be spliced into other pages:
 
-```markdown title="Example"
-::: include src="beta-notice.md"
+```text title="docs/ layout"
+docs/
+├── index.md
+├── includes/
+│   ├── beta-notice.md
+│   └── legal/
+│       └── terms.md
+└── guides/
+    └── deep/
+        └── setup.md
 ```
 
 A **bare** `src` (no leading `./` or `../`) always resolves against the
 current tree's own `docs/includes/`, no matter how deeply nested the
-including page is - a page three folders deep still just writes
-`src="beta-notice.md"`, same as a page at the root. Prefix `src` with
-`./` or `../` instead to reach a page-adjacent fragment that isn't
-meant to live in the centralized `includes/` folder - that form
-resolves file-relative to the *including* page's own directory, the
-same convention as an ordinary page link:
+including page is - `guides/deep/setup.md` above reaches the same file
+`index.md` does, both with the exact same `src`:
 
-```markdown title="Page-adjacent instead of centralized"
-::: include src="./local-note.md"
+```markdown title="From either index.md or guides/deep/setup.md"
+::: include src="beta-notice.md"
 ```
+
+A bare `src` can also point into a subfolder of `includes/` itself:
+
+```markdown title="Example"
+::: include src="legal/terms.md"
+```
+
+Prefix `src` with `./` or `../` instead to reach a page-adjacent
+fragment that isn't meant to live in the centralized `includes/`
+folder - that form resolves file-relative to the *including* page's own
+directory, the same convention as an ordinary page link:
+
+```markdown title="From guides/deep/setup.md, one level up instead of centralized"
+::: include src="../local-note.md"
+```
+
+A version/locale tree gets its own `includes/` the same way - a page
+under `docs/versions/2.0/` resolves a bare `src` against
+`docs/versions/2.0/includes/`, and one under `docs/i18n/es/` against
+`docs/i18n/es/includes/` - each tree's partials are its own, not shared
+with the main tree's `docs/includes/`.
 
 An included file can itself include another (a circular chain throws
 `BxDocs.CircularInclude` at build time rather than looping forever).
