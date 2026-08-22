@@ -239,9 +239,16 @@ class {
 
 		var siteRelative = ""
 		if ( t.left( 1 ) == "/" ) {
-			siteRelative = t.left( len( arguments.basePath ) ) == arguments.basePath
-				? t.right( len( t ) - len( arguments.basePath ) )
-				: t.right( len( t ) - 1 )
+			// A link to exactly the bare basePath (or, in the non-matching
+			// branch, exactly "/") leaves nothing to strip - right()'s own
+			// count argument rejects 0 outright ("Count cannot be zero"),
+			// so that exact-match case is handled directly rather than
+			// computing a right() call whose count would be 0.
+			if ( t.left( len( arguments.basePath ) ) == arguments.basePath ) {
+				siteRelative = len( t ) > len( arguments.basePath ) ? t.right( len( t ) - len( arguments.basePath ) ) : ""
+			} else {
+				siteRelative = len( t ) > 1 ? t.right( len( t ) - 1 ) : ""
+			}
 		} else {
 			var combined = ( len( arguments.pageDir ) ? arguments.pageDir & "/" : "" ) & t
 			siteRelative = normalizeRelativePath( combined )

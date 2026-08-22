@@ -55,6 +55,15 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.brokenLinks[ 1 ].href ).toBe( "/missing.html" );
 			} );
 
+			it( "doesn't throw on a link to exactly the bare basePath itself", function() {
+				var projectRoot = newProjectRoot( '{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"https://example.github.io/bx-docs/"}' );
+				writePage( projectRoot, "index.html", '<a href="/bx-docs/">Home</a>' );
+
+				var result = checker.check( projectRoot );
+
+				expect( result.brokenLinks.len() ).toBe( 0 );
+			} );
+
 			it( "reports a broken image src", function() {
 				var projectRoot = newProjectRoot();
 				writePage( projectRoot, "index.html", '<img src="/missing.png" alt="Missing">' );

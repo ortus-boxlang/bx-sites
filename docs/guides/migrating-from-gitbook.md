@@ -11,7 +11,7 @@ tags: [guides, migration, gitbook]
 contents plus its `.md` files, GitBook's own on-disk sync format (the
 same one GitHub/Git Sync writes) - into a bx-docs `docs/` tree, in one
 command. Everything GitBook's content-block system supports maps onto
-something bx-docs already has (see [Markdown Extensions](markdown.md#gitbook-style-blocks)),
+something bx-docs already has (see [Content Blocks](content-blocks.md)),
 so the result isn't a rough draft - it's a working site.
 
 ## Getting a GitBook export
@@ -68,13 +68,13 @@ source export and run it again.
 | `.gitbook/assets/**` | `docs/assets/gitbook/**`, with every reference rewritten to match |
 | `{% hint style="..." %}` | `!!! type` - a native [admonition](markdown.md#admonitions) |
 | `{% tabs %}` / `{% tab title="..." %}` | `=== "Title"` - native [content tabs](markdown.md#content-tabs) |
-| `{% cards %}` / `{% card %}` | [`::: cards` / `::: card`](markdown.md#cards) |
-| `{% columns %}` / `{% column width="..." %}` | [`::: columns` / `::: column`](markdown.md#columns) |
-| `{% stepper %}` / `{% step %}` | [`::: stepper` / `::: step`](markdown.md#stepper) - title taken from the step's own first heading |
-| `{% file src="..." %}` | [`::: file`](markdown.md#file) |
-| `{% embed url="..." %}` | [`::: embed`](markdown.md#embed) |
-| `{% content-ref url="..." %}` | [`::: page-link`](markdown.md#page-link) |
-| `{% details %}` / `{% expand %}` | [`::: expandable`](markdown.md#expandable) |
+| `{% cards %}` / `{% card %}` | [`::: cards` / `::: card`](content-blocks.md#cards) |
+| `{% columns %}` / `{% column width="..." %}` | [`::: columns` / `::: column`](content-blocks.md#columns) |
+| `{% stepper %}` / `{% step %}` | [`::: stepper` / `::: step`](content-blocks.md#stepper) - title taken from the step's own first heading |
+| `{% file src="..." %}` | [`::: file`](content-blocks.md#file) |
+| `{% embed url="..." %}` | [`::: embed`](content-blocks.md#embed) |
+| `{% content-ref url="..." %}` | [`::: page-link`](content-blocks.md#page-link) |
+| `{% details %}` / `{% expand %}` | [`::: expandable`](content-blocks.md#expandable) |
 
 A block shown as a literal fenced example in your GitBook content (rather
 than used for real) is correctly left alone, not misread as the real
