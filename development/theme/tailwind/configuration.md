@@ -389,7 +389,7 @@ Docs defaults it to `true` (see the [Markdown Extensions guide](guides/markdown.
 
 ## `repo`
 
-Adds a repository icon link to the header (all three built-in themes) and,
+Adds a repository icon link to the header (every built-in theme) and,
 when both keys are set, an "Edit this page" link on every page.
 
 - `repo.url` - your repo's URL, e.g. `"https://github.com/acme/docs"`.

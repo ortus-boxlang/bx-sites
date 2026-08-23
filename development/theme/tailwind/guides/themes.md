@@ -17,6 +17,20 @@ engine or build step involved.
 | `bootstrap` (default) | [Bootstrap 5](https://getbootstrap.com/), vendored | Poppins font, brand gradient navbar |
 | `material` | Hand-rolled Material-style CSS | Card layout, elevation shadows, Roboto font |
 | `tailwind` | [Tailwind Play CDN](https://tailwindcss.com/) | Utility-class driven, no build step |
+| `docsy` | Hand-rolled CSS, forked from `material` | Read the Docs/Docsy-inspired navy-blue reference-manual look |
+| `slate` | Hand-rolled CSS, forked from `material` | Stripe/Slate-inspired - a permanently dark sidebar regardless of light/dark mode |
+| `docusaurus` | Hand-rolled CSS, forked from `material` | Docusaurus-inspired bold full-width colored navbar, rounded cards |
+| `justthedocs` | Hand-rolled CSS, forked from `material` | Just the Docs-inspired minimalism - search box lives at the top of the sidebar |
+| `vuepress` | Hand-rolled CSS, forked from `material` | VuePress-inspired green accent, soft rounded corners |
+| `gitbook` | Hand-rolled CSS, forked from `material` | GitBook-inspired centered reading column, serif headings |
+| `notion` | Hand-rolled CSS, forked from `material` | Notion-inspired borderless sidebar, near-grayscale UI, generous whitespace |
+
+The seven `material`-forked themes above reuse `material`'s exact BoxLang
+templates (layout.bxm/page.bxm/search.bxm) unchanged except for a scoped
+CSS-class-prefix rename - only `assets/style.css` (and, for `justthedocs`,
+one relocated `<bx:include>` line moving the search box into the sidebar)
+differs, so they inherit the same full feature set and the same
+air-gapped-capable behavior `material` already has.
 
 Every built-in theme's own CSS/JS (Bootstrap's CSS/JS bundle, highlight.js,
 Alpine.js, lunr.js for the default `local` search provider, and Mermaid
@@ -28,9 +42,12 @@ features you turn on yourself (`math`, Algolia search, Google Analytics)
 still load from a CDN or a hosted API - see
 [Air-gapped/offline sites](#air-gapped-offline-sites) below.
 
-All three apply the same BoxLang brand palette: a `#00FF78 -> #00DBFF`
-gradient and a `#FFF500` accent - and all three ship with the same set of
-page features:
+`bootstrap`, `material` and `tailwind` apply the same BoxLang brand
+palette (a `#00FF78 -> #00DBFF` gradient and a `#FFF500` accent); the
+seven gallery themes below them each use their own distinct palette
+instead, inspired by whichever platform they borrow their look from - see
+the table above. Every one of the ten ships the same set of page features
+regardless of palette:
 
 - **An in-page "On this page" table of contents**, generated from each
   page's own `h2`/`h3` headings.
@@ -115,14 +132,40 @@ Set which one a project uses in `bxsites.json`:
 { "theme": { "name": "material" } }
 ```
 
+## Installing a published theme
+
+A theme published to ForgeBox installs with nothing but the `bxSites`
+binary itself - no `box`/CommandBox needed:
+
+```bash title="Usage"
+bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
+```
+
+This downloads the package's zip and extracts it into
+`themes/bx-sites-theme-blog1/` at the project root, validating it
+satisfies the `ThemeProvider` contract below before finishing. A project
+can carry several installed themes side by side this way and switch
+between them purely by name:
+
+```json title="bxsites.json"
+{ "theme": { "name": "bx-sites-theme-blog1" } }
+```
+
+A theme needs no BoxLang module/class-loader involvement at all (unlike a
+plugin) - it's pure files, so there's no separate activation step the way
+`install:plugin` has; setting `theme.name` is the only wiring needed. See
+[`install:theme`](../cli-reference.md#installtheme) in the CLI reference.
+
 ## Air-gapped/offline sites
 
-A built site works with no internet access at all by default, for the
-`bootstrap` and `material` themes with the default `local` search
-provider: Bootstrap's own CSS/JS, highlight.js, Alpine.js, and lunr.js are
-all vendored with this module (`resources/assets/vendor/`) and copied
-straight into `site/assets/vendor/` at build time - no CDN `<script>`/
-`<link>` tag anywhere in the generated HTML for any of those. Turning on
+A built site works with no internet access at all by default, for
+`bootstrap`, `material`, and the seven `material`-forked themes (`docsy`,
+`slate`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook`, `notion`) with
+the default `local` search provider: Bootstrap's own CSS/JS, highlight.js,
+Alpine.js, and lunr.js are all vendored with this module
+(`resources/assets/vendor/`) and copied straight into
+`site/assets/vendor/` at build time - no CDN `<script>`/`<link>` tag
+anywhere in the generated HTML for any of those. Turning on
 `bxsites.json`'s `mermaid` key vendors Mermaid the same way - its
 `mermaid.min.js` bundle is copied into `site/assets/vendor/mermaid/` and
 every built-in theme loads it from there, so diagrams still render with
@@ -146,9 +189,9 @@ yourself:
   file wouldn't remove that dependency.
 
 If your deployment target genuinely has zero internet access, stick to
-`bootstrap`/`material`, the default `local` search provider, avoid
-`elk`-layout Mermaid diagrams if `mermaid` is on, and leave `math`/Algolia/
-analytics off.
+`bootstrap`/`material`/one of the seven `material`-forked themes, the
+default `local` search provider, avoid `elk`-layout Mermaid diagrams if
+`mermaid` is on, and leave `math`/Algolia/analytics off.
 
 ## Icons
 
@@ -231,7 +274,7 @@ everything else. `variables.versions` (`[ { label, url } ]`, "Latest"
 first) and `variables.currentVersion` (the `label` being rendered right
 now) back the version switcher - empty/`"Latest"` for a project that isn't
 versioned, so a theme only needs to render a switcher when
-`variables.versions.len() gt 1`. The three built-in themes get their repo/social icons from
+`variables.versions.len() gt 1`. Every built-in theme gets its repo/social icons from
 a small shared SVG lookup, `<bx:include template="#variables.moduleAssetsDir#/icons.bxm">`
 (defines `bxsitesIcon( name )`, one of `github`, `twitter`/`x`, `rss`,
 `youtube`, `linkedin`, `facebook`, `bluesky`, `threads`, `slack`,
@@ -278,10 +321,20 @@ is `--bxsites-gradient-start`/`-end`, `--bxsites-accent`, `--bxsites-bg`,
 `--bxsites-border`, `--bxsites-link`, `--bxsites-link-hover`,
 `--bxsites-code-bg`, `--bxsites-step-marker-bg`, `--bxsites-step-marker-text`,
 `--bxsites-step-line`, `--bxsites-step-success-bg`/`-text`,
-`--bxsites-step-warning-bg`/`-text` and `--bxsites-step-danger-bg`/`-text` -
-`material` and `tailwind` follow the same `--bxsites-*` naming with their
-own small variations. Anything beyond color/font (layout, adding/removing
-chrome) needs a real override or a custom theme - see below.
+`--bxsites-step-warning-bg`/`-text` and `--bxsites-step-danger-bg`/`-text`.
+Every built-in theme guarantees `--bxsites-gradient-start`/`-end`,
+`--bxsites-accent` and the `--bxsites-step-*` set under those exact names,
+so `extraCss` can always retarget the brand color/stepper accents
+regardless of theme - but only `bootstrap`, `slate` and `notion` also
+expose `--bxsites-bg`/`-text`/`-sidebar-bg`/`-sidebar-text`/`-border`/`-link`/`-link-hover`/`-code-bg`
+under those names (`justthedocs` aliases all but the two `-sidebar-*` ones
+the same way). Every other built-in theme (`material`, `tailwind`,
+`docsy`, `docusaurus`, `vuepress`, `gitbook`) uses its own internal
+custom-property names for that second group instead (e.g. material's own
+`assets/style.css` uses `--md-bg`/`--md-ink`/`--md-link`/...) - open that
+theme's own `assets/style.css` to find its real names before overriding
+one of those via `extraCss`. Anything beyond color/font (layout,
+adding/removing chrome) needs a real override or a custom theme - see below.
 
 The rest back the [`::: stepper`/`::: step`](content-blocks.md#stepper) directive
 block - `--bxsites-step-marker-bg`/`-text` are the default numbered circle's
@@ -335,9 +388,12 @@ resize/replace `bxsites-hero__banner`'s own image via a `docs/assets/`-relative
 
 Drop your own `layout.bxm` + `page.bxm` (and optionally `search.bxm` /
 `assets/`) into a `theme/` folder at your project root. BX Sites prefers a
-project-level `theme/` override over any built-in theme, as long as it
-satisfies the contract above - the built-in themes under this module's own
-`resources/themes/` are a good starting point to copy and adapt.
+project-level `theme/` override over both an installed `themes/<name>/`
+theme and any built-in theme, as long as it satisfies the contract below -
+the built-in themes under this module's own `resources/themes/` are a good
+starting point to copy and adapt. Full resolution order: `theme/` (this
+section) -> `themes/theme.name/` (an [installed theme](#installing-a-published-theme),
+if `theme.name` matches one) -> a built-in theme named `theme.name`.
 
 A worked example - start from `bootstrap` and swap its brand palette and
 heading font for your own, keeping everything else (nav, search, dark mode,

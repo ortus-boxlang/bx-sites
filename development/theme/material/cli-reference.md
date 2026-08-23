@@ -42,7 +42,7 @@ instead - see [Getting Started](getting-started.md#add-pages) for the
 Scaffold a docs project.
 
 ```bash title="Usage"
-bxSites new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...] [--format=yaml|json]
+bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|json]
 ```
 
 - `--name` - the site name written into the site config (defaults to the target directory's name)
@@ -313,21 +313,57 @@ bxSites plugin:new --name=my-analytics-plugin [--dest=...]
 See [Plugins](guides/plugins.md) for the hook reference and how to wire the
 finished plugin into `bxsites.json`'s `plugins` array.
 
+## `install:plugin`
+
+Download a published plugin from ForgeBox and drop it straight into the
+project's own `boxlang_modules/` - BoxLang's own auto-loaded local-module
+convention, so nothing beyond the `bxSites` binary itself is needed (no
+`box`/CommandBox involved).
+
+```bash title="Usage"
+bxSites install:plugin --name=bx-sites-plugin-analytics [--version=1.2.0]
+```
+
+- `--name` (required) - the ForgeBox slug to install
+- `--version` - a specific version; omit for the latest
+
+Prints the module's real registered mapping name once loaded - add that
+name to `bxsites.json`'s `plugins` array to activate it (installing alone
+never activates a plugin - see [Plugins](guides/plugins.md)).
+
 ## `theme:new`
 
-Eject one of the built-in themes (`bootstrap`, `material`, `tailwind`) into
-the project's own `theme/` folder for customizing, matching mkdocs'
-`--theme` eject workflow.
+Eject one of the built-in themes into the project's own `theme/` folder
+for customizing, matching mkdocs' `--theme` eject workflow.
 
 ```bash title="Usage"
 bxSites theme:new --theme=material
 ```
 
-- `--theme` (required) - `bootstrap`, `material`, or `tailwind`
+- `--theme` (required) - `bootstrap`, `material`, `tailwind`, `docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook`, or `notion` - see [Themes](guides/themes.md#built-in)
 
 Fails rather than overwriting an existing `theme/`. See
 [Themes](guides/themes.md) for the override contract (`layout.bxm` +
 `page.bxm`).
+
+## `install:theme`
+
+Download a published theme from ForgeBox into the project's own
+`themes/<name>/` - nothing but the `bxSites` binary needed, same as
+`install:plugin`.
+
+```bash title="Usage"
+bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
+```
+
+- `--name` (required) - the ForgeBox slug to install
+- `--version` - a specific version; omit for the latest
+
+Validates the downloaded package against the `ThemeProvider` contract
+(`layout.bxm` + `page.bxm`) before finishing, so a broken package fails at
+install time rather than at the next `build`. Set `bxsites.json`'s
+`theme.name` to the installed name to use it - see
+[Themes](guides/themes.md#installing-a-published-theme).
 
 ## `page:rename`
 

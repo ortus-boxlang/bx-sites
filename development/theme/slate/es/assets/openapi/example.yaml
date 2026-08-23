@@ -1,0 +1,114 @@
+openapi: 3.0.3
+info:
+  title: Bookshelf API
+  description: >-
+    A tiny example API, hand-authored for BX Sites' own `::: openapi` docs
+    (see [Content Blocks](../../guides/content-blocks.md#openapi--swagger)) -
+    not a real, deployed service.
+  version: "1.0.0"
+servers:
+  - url: https://api.example.com/v1
+tags:
+  - name: books
+    description: Manage a personal book collection
+paths:
+  /books:
+    get:
+      tags: [books]
+      summary: List books
+      description: Returns every book in the collection, newest first.
+      parameters:
+        - name: tag
+          in: query
+          description: Filter to books carrying this tag
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A list of books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book"
+    post:
+      tags: [books]
+      summary: Add a book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewBook"
+      responses:
+        "201":
+          description: The book was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "400":
+          description: The request body was invalid
+  /books/{bookId}:
+    get:
+      tags: [books]
+      summary: Get a single book
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The requested book
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "404":
+          description: No book with that id
+    delete:
+      tags: [books]
+      summary: Remove a book
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: The book was removed
+        "404":
+          description: No book with that id
+components:
+  schemas:
+    NewBook:
+      type: object
+      required: [title, author]
+      properties:
+        title:
+          type: string
+          example: The Hobbit
+        author:
+          type: string
+          example: J.R.R. Tolkien
+        tags:
+          type: array
+          items:
+            type: string
+          example: [fantasy, classic]
+    Book:
+      allOf:
+        - $ref: "#/components/schemas/NewBook"
+        - type: object
+          properties:
+            id:
+              type: string
+              example: "b_9f2c1a"
+            addedAt:
+              type: string
+              format: date-time

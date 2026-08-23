@@ -80,7 +80,7 @@
 
 				<h1 class="md-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M204,168a28,28,0,0,0,12-2.69V208a8,8,0,0,1-8,8H64a8,8,0,0,1-8-8V165.31a28,28,0,1,1,0-50.62V72a8,8,0,0,1,8-8h46.69a28,28,0,1,1,50.61,0H208a8,8,0,0,1,8,8v42.69A28,28,0,1,0,204,168Z" opacity="0.2"/><path d="M220.27,158.54a8,8,0,0,0-7.7-.46,20,20,0,1,1,0-36.16A8,8,0,0,0,224,114.69V72a16,16,0,0,0-16-16H171.78a35.36,35.36,0,0,0,.22-4,36.15,36.15,0,0,0-11.36-26.25,36,36,0,0,0-60.55,23.63,36.56,36.56,0,0,0,.14,6.62H64A16,16,0,0,0,48,72v32.22a35.36,35.36,0,0,0-4-.22,36.12,36.12,0,0,0-26.24,11.36,35.7,35.7,0,0,0-9.69,27,36.08,36.08,0,0,0,33.31,33.6,36.56,36.56,0,0,0,6.62-.14V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V165.31A8,8,0,0,0,220.27,158.54ZM208,208H64V165.31a8,8,0,0,0-11.43-7.23,20,20,0,1,1,0-36.16A8,8,0,0,0,64,114.69V72h46.69a8,8,0,0,0,7.23-11.43,20,20,0,1,1,36.16,0A8,8,0,0,0,161.31,72H208v32.23a35.68,35.68,0,0,0-6.62-.14A36,36,0,0,0,204,176a35.36,35.36,0,0,0,4-.22Z"/></svg></span> Plugins</h1>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/material/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-sites/development/theme/material/tags/index.html#tag-plugins">plugins</a></div>
-<details class="bxsites-toc-mobile md-toc--mobile"><summary class="md-toc--mobile__summary">On this page</summary><ul><li class="md-toc__item md-toc__item--2"><a href="#writing-a-plugin">Writing a plugin</a></li><li class="md-toc__item md-toc__item--2"><a href="#when-each-hook-fires">When each hook fires</a></li><li class="md-toc__item md-toc__item--2"><a href="#a-minimal-example">A minimal example</a></li><li class="md-toc__item md-toc__item--2"><a href="#errors">Errors</a></li></ul></details>
+<details class="bxsites-toc-mobile md-toc--mobile"><summary class="md-toc--mobile__summary">On this page</summary><ul><li class="md-toc__item md-toc__item--2"><a href="#installing-a-published-plugin">Installing a published plugin</a></li><li class="md-toc__item md-toc__item--2"><a href="#writing-a-plugin">Writing a plugin</a></li><li class="md-toc__item md-toc__item--2"><a href="#when-each-hook-fires">When each hook fires</a></li><li class="md-toc__item md-toc__item--2"><a href="#a-minimal-example">A minimal example</a></li><li class="md-toc__item md-toc__item--2"><a href="#errors">Errors</a></li></ul></details>
 				<div class="md-content-body">
 				<h1 id="plugins"><a href="#plugins" id="plugins" name="plugins" class="anchor"></a>Plugins</h1>
 <p>A BX Sites plugin is nothing more than another BoxLang module - its own
@@ -93,6 +93,22 @@ project opts one in explicitly by BoxLang module name, via <code>bxsites.json</c
 <a href="/bx-sites/development/theme/material/configuration/index.html#plugins"><code>plugins</code></a> array:</p>
 <pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;plugins&quot;: [ &quot;myBxSitesPlugin&quot; ] }
 </code></pre>
+<h2 id="installing-a-published-plugin"><a href="#installing-a-published-plugin" id="installing-a-published-plugin" name="installing-a-published-plugin" class="anchor"></a>Installing a published plugin</h2>
+<p>A plugin published to ForgeBox installs with nothing but the <code>bxSites</code>
+binary itself - no <code>box</code>/CommandBox needed:</p>
+<pre data-bxsites-title="Usage"><code class="language-bash">bxSites install:plugin --name=bx-sites-plugin-analytics [--version=1.2.0]
+</code></pre>
+<p>This downloads the package's zip from ForgeBox and extracts it into
+<code>boxlang_modules/bx-sites-plugin-analytics/</code> at the project root -
+BoxLang's own auto-loaded local-module convention (any module folder
+there is picked up the same way a project-local <code>node_modules/</code> is for
+npm), so it's active in the running BoxLang module registry with no
+<code>BOXLANG_HOME</code>/global install step at all. <code>install:plugin</code> loads it into
+the runtime immediately and prints back its real registered module
+mapping name (which, per the note below, isn't always the same as the
+ForgeBox slug) - add <em>that</em> name to <code>bxsites.json</code>'s <code>plugins</code> array to
+activate it, same as any other installed module. See
+<a href="/bx-sites/development/theme/material/cli-reference/index.html#installplugin"><code>install:plugin</code></a> in the CLI reference.</p>
 <h2 id="writing-a-plugin"><a href="#writing-a-plugin" id="writing-a-plugin" name="writing-a-plugin" class="anchor"></a>Writing a plugin</h2>
 <p>A plugin module needs exactly one thing beyond the usual <code>box.json</code>/
 <code>ModuleConfig.bx</code> a BoxLang module already has: a <code>models/BxSitesPlugin.bx</code>
@@ -174,7 +190,7 @@ isn't an installed/activated BoxLang module.</li>
 </ul>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/plugins.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/material/guides/plugins.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 8:29:19 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/plugins.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/material/guides/plugins.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 10:25:19 PM</span></div>
 			</article>
 
 			<nav class="md-page-nav" aria-label="Page navigation">
@@ -190,7 +206,7 @@ isn't an installed/activated BoxLang module.</li>
 		</main>
 
 		<aside class="md-toc-sidebar">
-			<nav class="md-toc" aria-label="On this page"><div class="md-toc__title">On this page</div><ul><li class="md-toc__item md-toc__item--2"><a href="#writing-a-plugin">Writing a plugin</a></li><li class="md-toc__item md-toc__item--2"><a href="#when-each-hook-fires">When each hook fires</a></li><li class="md-toc__item md-toc__item--2"><a href="#a-minimal-example">A minimal example</a></li><li class="md-toc__item md-toc__item--2"><a href="#errors">Errors</a></li></ul></nav>
+			<nav class="md-toc" aria-label="On this page"><div class="md-toc__title">On this page</div><ul><li class="md-toc__item md-toc__item--2"><a href="#installing-a-published-plugin">Installing a published plugin</a></li><li class="md-toc__item md-toc__item--2"><a href="#writing-a-plugin">Writing a plugin</a></li><li class="md-toc__item md-toc__item--2"><a href="#when-each-hook-fires">When each hook fires</a></li><li class="md-toc__item md-toc__item--2"><a href="#a-minimal-example">A minimal example</a></li><li class="md-toc__item md-toc__item--2"><a href="#errors">Errors</a></li></ul></nav>
 		</aside>
 
 	</div>
@@ -225,7 +241,7 @@ isn't an installed/activated BoxLang module.</li>
 	<script src="/bx-sites/development/theme/material/assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
 	<script src="/bx-sites/development/theme/material/assets/openapi-init.js"></script>
 
-	<script src="/bx-sites/development/theme/material/assets/bundle.2cdc90bf.js" defer></script>
+	<script src="/bx-sites/development/theme/material/assets/bundle.ac30f15c.js" defer></script>
 </body>
 </html>
 

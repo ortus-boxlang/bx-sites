@@ -9,7 +9,7 @@ tags: [guides, alpine, interactivity]
 
 Every page built by BX Sites already loads [Alpine.js](https://alpinejs.dev/)
 - it's what powers the built-in dark-mode toggle and language dropdown in
-each of the three built-in themes. That same Alpine instance is available
+every built-in theme. That same Alpine instance is available
 to your own page content too, for free: no `bxsites.json` setting to flip,
 no `extraJs` entry to add, no extra `<script>` tag to write in your
 markdown.

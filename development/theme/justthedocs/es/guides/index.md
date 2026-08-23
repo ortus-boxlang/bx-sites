@@ -1,0 +1,21 @@
+---
+title: Guías
+order: 5
+icon: phosphor-duotone:book-open
+---
+
+# Guías
+
+- [Temas](themes.md) - los temas incorporados y cómo escribir el tuyo propio
+- [Búsqueda](search.md) - cómo funciona el índice de búsqueda estático
+- [Desplegar en GitHub Pages](deployment.md) - el flujo de trabajo de GitHub Actions incorporado
+- [Extensiones de Markdown](markdown.md) - admoniciones, notas al pie, listas de definiciones y diagramas Mermaid
+- [Bloques de Contenido](content-blocks.md) - bloques al estilo GitBook: expandibles, tarjetas, columnas, un stepper, y contenido reutilizable incluible
+- [Imágenes Responsivas](images.md) - redimensionado automático, variantes WebP, y empaquetado de CSS/JS, activo por defecto
+- [Interactividad con Alpine.js](interactivity.md) - contenido reactivo (botones de copiar, filtros en vivo, y más) sin configuración adicional
+- [Blog](blog.md) - un blog por convención: entradas, autores, categorías, archivos, RSS, y estadísticas
+- [Plugins](plugins.md) - extiende BX Sites con tu propio módulo de BoxLang
+- [Versionado](versioning.md) - crea una instantánea de la documentación de un lanzamiento y obtén un selector de versión gratis
+- [Internacionalización (i18n)](i18n.md) - traduce tus documentos a otros idiomas
+- [Migrar desde GitBook](migrating-from-gitbook.md) - convierte una exportación de GitBook en un proyecto bx-sites con un solo comando
+- [Migrar desde mkdocs](migrating-from-mkdocs.md) - convierte un proyecto mkdocs en un proyecto bx-sites con un solo comando

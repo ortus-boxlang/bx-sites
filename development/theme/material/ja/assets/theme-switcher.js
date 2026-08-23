@@ -1,11 +1,11 @@
 /**
  * Dogfooding-only widget for bx-sites' own deployed docs site: this repo's
- * `docs/` tree is built three times (see scripts/build-multi-theme.sh) -
- * once per built-in theme - and assembled into one deployment, with
- * `bootstrap` at the site root and `material`/`tailwind` living under
- * `theme/material/`/`theme/tailwind/`. This drops a variant switcher next
- * to the header's dark-mode toggle (present, with the same class, in all
- * three themes) so a visitor can jump straight to the same page in another
+ * `docs/` tree is built ten times (see buildMultiTheme.sh) - once per
+ * built-in theme - and assembled into one deployment, with `bootstrap` at
+ * the site root and every other theme living under `theme/<name>/` - this
+ * doubles as the theme gallery. This drops a variant switcher next
+ * to the header's dark-mode toggle (present, with the same class, in every
+ * theme) so a visitor can jump straight to the same page in another
  * theme instead of starting over from that variant's own home page.
  *
  * Not a bx-sites feature - a project-specific `extraJs` file, wired up the
@@ -20,10 +20,10 @@
  * `<style>` tag injected once, keyed off the same `data-theme` attribute
  * every built-in theme already sets on `<html>` for dark mode.
  *
- * `ROOT` is a placeholder - scripts/build-multi-theme.sh substitutes it
+ * `ROOT` is a placeholder - buildMultiTheme.sh substitutes it
  * with the site's real root-relative base path (e.g. "/bx-sites/" or
- * "/bx-sites/development/") before each of the three builds, since that
- * root is identical across all three variants and only known at build
+ * "/bx-sites/development/") before each of the ten builds, since that
+ * root is identical across every variant and only known at build
  * time from bxsites.json's own `baseURL`.
  */
 ( function () {
@@ -32,7 +32,14 @@
 	var VARIANTS = [
 		{ key: "bootstrap", label: "Bootstrap", prefix: "", dot: "#7952b3" },
 		{ key: "material", label: "Material", prefix: "theme/material/", dot: "#00dbff" },
-		{ key: "tailwind", label: "Tailwind", prefix: "theme/tailwind/", dot: "#38bdf8" }
+		{ key: "tailwind", label: "Tailwind", prefix: "theme/tailwind/", dot: "#38bdf8" },
+		{ key: "docsy", label: "Docsy", prefix: "theme/docsy/", dot: "#4fa8d8" },
+		{ key: "slate", label: "Slate", prefix: "theme/slate/", dot: "#2ed3b7" },
+		{ key: "docusaurus", label: "Docusaurus", prefix: "theme/docusaurus/", dot: "#2fbf8f" },
+		{ key: "justthedocs", label: "Just the Docs", prefix: "theme/justthedocs/", dot: "#4f46e5" },
+		{ key: "vuepress", label: "VuePress", prefix: "theme/vuepress/", dot: "#ffb454" },
+		{ key: "gitbook", label: "GitBook", prefix: "theme/gitbook/", dot: "#3b82f6" },
+		{ key: "notion", label: "Notion", prefix: "theme/notion/", dot: "#2f2f2c" }
 	];
 
 	function currentVariant() {

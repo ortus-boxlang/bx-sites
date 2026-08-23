@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel>
+	<title>BX Sites Blog - Search</title>
+	<link>https://ortus-boxlang.github.io/bx-sites/development/theme/notion/blog/category/search/</link>
+	<description>Blog posts from BX Sites</description>
+	<item>
+		<title>Search That Just Works</title>
+		<link>https://ortus-boxlang.github.io/bx-sites/development/theme/notion/blog/search-that-just-works/</link>
+		<guid isPermaLink="true">https://ortus-boxlang.github.io/bx-sites/development/theme/notion/blog/search-that-just-works/</guid>
+		<pubDate>Fri, 24 Jul 2026 00:00:00 +0000</pubDate>
+		<dc:creator>Luis Majano</dc:creator>
+		<category>Search</category>
+		<description>Search is one of those features that either quietly works or loudly doesn't, and for a static docs site it's easy to end up with the latter - no server to query, so search either gets bolted on as a third-party widget or skipped entirely. BX Sites takes the same approach mkdocs does by default: fully static, fully client-side, no server or external service required.</description>
+	</item>
+</channel></rss>
