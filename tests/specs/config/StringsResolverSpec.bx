@@ -1,0 +1,95 @@
+/**
+ * Exercises StringsResolver.bx directly - the theme-chrome UI strings
+ * (search placeholder, "On this page," the 404 page, ...) resolution
+ * ThemeRenderer.bx's renderPage() and BuildPipeline.bx's write404Page()/
+ * writeTagsPage() both go through instead of the previously-hardcoded
+ * English text.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "config.StringsResolver", function() {
+
+			beforeEach( function() {
+				variables.resolver = new "models.config.StringsResolver@bxsites"();
+				variables.i18nConfig = {
+					"defaultLocale" : { "code" : "en", "label" : "English" },
+					"locales" : [
+						{ "code" : "de", "label" : "Deutsch" },
+						{ "code" : "fr", "label" : "Français" }
+					]
+				};
+			} );
+
+			it( "falls back to English defaults for an unlocalized build", function() {
+				var result = resolver.resolve( "", i18nConfig );
+
+				expect( result.onThisPage ).toBe( "On this page" );
+				expect( result.searchPlaceholder ).toBe( "Search docs..." );
+			} );
+
+			it( "resolves a built-in translation with no project override", function() {
+				var result = resolver.resolve( "de", i18nConfig );
+
+				expect( result.onThisPage ).toBe( "Auf dieser Seite" );
+				expect( result.notFoundTitle ).toBe( "Seite nicht gefunden" );
+			} );
+
+			it( "falls back to English for a locale with no built-in translation", function() {
+				var result = resolver.resolve( "fr", i18nConfig );
+
+				expect( result.onThisPage ).toBe( "On this page" );
+			} );
+
+			it( "matches a locale code case-insensitively", function() {
+				var result = resolver.resolve( "DE", i18nConfig );
+
+				expect( result.onThisPage ).toBe( "Auf dieser Seite" );
+			} );
+
+			it( "merges a project override over a built-in translation, key by key", function() {
+				var configWithOverride = {
+					"defaultLocale" : { "code" : "en", "label" : "English" },
+					"locales" : [
+						{ "code" : "de", "label" : "Deutsch", "strings" : { "onThisPage" : "Custom DE Override" } }
+					]
+				};
+
+				var result = resolver.resolve( "de", configWithOverride );
+
+				expect( result.onThisPage ).toBe( "Custom DE Override" );
+				expect( result.notFoundTitle ).toBe( "Seite nicht gefunden" );
+			} );
+
+			it( "applies a project override on defaultLocale itself", function() {
+				var configWithDefaultOverride = {
+					"defaultLocale" : { "code" : "en", "label" : "English", "strings" : { "searchPlaceholder" : "Find stuff..." } },
+					"locales" : []
+				};
+
+				var result = resolver.resolve( "en", configWithDefaultOverride );
+
+				expect( result.searchPlaceholder ).toBe( "Find stuff..." );
+			} );
+
+			it( "substitutes a {placeholder} token via format()", function() {
+				expect( resolver.format( "Toggle {title} section", { "title" : "Guides" } ) ).toBe( "Toggle Guides section" );
+				expect( resolver.format( "Language: {label}", { "label" : "Deutsch" } ) ).toBe( "Language: Deutsch" );
+			} );
+
+			it( "ships every default key translated for de/es/it/ja", function() {
+				var defaultKeys = structKeyArray( resolver.resolve( "", i18nConfig ) );
+
+				for ( var localeCode in [ "de", "es", "it", "ja" ] ) {
+					var translated = resolver.resolve( localeCode, i18nConfig );
+					for ( var key in defaultKeys ) {
+						expect( translated.keyExists( key ) ).toBeTrue( "#localeCode# is missing key [#key#]" );
+						expect( len( trim( translated[ key ] ) ) ).toBeTrue( "#localeCode#'s [#key#] is empty" );
+					}
+				}
+			} );
+
+		} );
+	}
+
+}

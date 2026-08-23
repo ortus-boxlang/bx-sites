@@ -1,0 +1,210 @@
+/**
+ * Resolves the theme "chrome" strings (search placeholder, dark-mode
+ * toggle, "On this page", edit/download page-meta links, the 404 page,
+ * the tags page title, the untranslated-fallback notice, ...) for
+ * whichever locale a tree is currently being rendered in - the small,
+ * fixed set of UI strings every built-in theme's own `layout.bxm`/`page.bxm`
+ * renders on every page, previously hardcoded in English regardless of
+ * `bxsites.json`'s `i18n` config (a documented v1 limit - see
+ * docs/guides/i18n.md).
+ *
+ * Three-layer resolution, later layers winning: this class's own English
+ * `defaults`, then a built-in translation for the locale's own code (if
+ * this module ships one - currently `de`/`es`/`it`/`ja`, the same four
+ * this repo's own docs are dogfooded in), then a project's own override
+ * (`bxsites.json`'s `i18n.defaultLocale.strings`/`i18n.locales[].strings` -
+ * ConfigLoader.bx already validates it's a struct when present, but never
+ * consumed it before now). A project targeting a locale with no built-in
+ * translation shipped here still gets fully working chrome - just in
+ * English - by only ever supplying its own override for the keys it cares
+ * about; unset keys keep falling back to the English default.
+ *
+ * Explicitly out of scope: blog chrome ("Categories", "Archive", "Read
+ * more", "N min read", ...) and locale-aware date formatting
+ * (`lastUpdated`'s own value, as opposed to its label) - both stay
+ * English-only for now, the same kind of documented v1 limit this class
+ * itself replaces for the rest of the theme chrome.
+ */
+class {
+
+	/**
+	 * The English default for every theme-chrome string this class knows
+	 * about - the fallback whenever a locale has no built-in translation
+	 * and no project override either.
+	 */
+	variables.defaults = {
+		"searchPlaceholder"    : "Search docs...",
+		"searchAriaLabel"      : "Search",
+		"searchNoResults"      : "No results found.",
+		"toggleDarkMode"       : "Toggle dark mode",
+		"toggleNavigation"     : "Toggle navigation",
+		"toggleSection"        : "Toggle {title} section",
+		"repository"           : "Repository",
+		"version"              : "Version",
+		"language"             : "Language: {label}",
+		"onThisPage"           : "On this page",
+		"editThisPage"         : "Edit this page",
+		"downloadMarkdown"     : "Download Markdown",
+		"lastUpdated"          : "Last updated",
+		"notTranslatedNotice"  : "This page hasn't been translated yet - showing the {locale} version.",
+		"notFoundTitle"        : "Page Not Found",
+		"notFoundBody"         : "Sorry, that page doesn't exist. Try the search box, or head back to the homepage.",
+		"tagsTitle"            : "Tags",
+		"pageNavigation"       : "Page navigation"
+	}
+
+	/**
+	 * Built-in translations for the locales this module ships one for -
+	 * every key from `defaults` above, translated. Keyed lowercase; looked
+	 * up case-insensitively in `resolve()`.
+	 */
+	variables.builtIn = {
+		"de" : {
+			"searchPlaceholder"   : "Dokumentation durchsuchen...",
+			"searchAriaLabel"     : "Suche",
+			"searchNoResults"     : "Keine Ergebnisse gefunden.",
+			"toggleDarkMode"      : "Dunkelmodus umschalten",
+			"toggleNavigation"    : "Navigation umschalten",
+			"toggleSection"       : "Abschnitt „{title}“ umschalten",
+			"repository"          : "Repository",
+			"version"             : "Version",
+			"language"            : "Sprache: {label}",
+			"onThisPage"          : "Auf dieser Seite",
+			"editThisPage"        : "Diese Seite bearbeiten",
+			"downloadMarkdown"    : "Markdown herunterladen",
+			"lastUpdated"         : "Zuletzt aktualisiert",
+			"notTranslatedNotice" : "Diese Seite wurde noch nicht übersetzt - es wird die {locale}-Version angezeigt.",
+			"notFoundTitle"       : "Seite nicht gefunden",
+			"notFoundBody"        : "Diese Seite existiert leider nicht. Nutze die Suche oder kehre zur Startseite zurück.",
+			"tagsTitle"           : "Tags",
+			"pageNavigation"      : "Seitennavigation"
+		},
+		"es" : {
+			"searchPlaceholder"   : "Buscar en la documentación...",
+			"searchAriaLabel"     : "Buscar",
+			"searchNoResults"     : "No se encontraron resultados.",
+			"toggleDarkMode"      : "Alternar modo oscuro",
+			"toggleNavigation"    : "Alternar navegación",
+			"toggleSection"       : "Alternar sección {title}",
+			"repository"          : "Repositorio",
+			"version"             : "Versión",
+			"language"            : "Idioma: {label}",
+			"onThisPage"          : "En esta página",
+			"editThisPage"        : "Editar esta página",
+			"downloadMarkdown"    : "Descargar Markdown",
+			"lastUpdated"         : "Última actualización",
+			"notTranslatedNotice" : "Esta página aún no se ha traducido - se muestra la versión en {locale}.",
+			"notFoundTitle"       : "Página no encontrada",
+			"notFoundBody"        : "Lo sentimos, esa página no existe. Prueba el buscador o vuelve a la página de inicio.",
+			"tagsTitle"           : "Etiquetas",
+			"pageNavigation"      : "Navegación de página"
+		},
+		"it" : {
+			"searchPlaceholder"   : "Cerca nella documentazione...",
+			"searchAriaLabel"     : "Cerca",
+			"searchNoResults"     : "Nessun risultato trovato.",
+			"toggleDarkMode"      : "Attiva/disattiva modalità scura",
+			"toggleNavigation"    : "Attiva/disattiva navigazione",
+			"toggleSection"       : "Attiva/disattiva sezione {title}",
+			"repository"          : "Repository",
+			"version"             : "Versione",
+			"language"            : "Lingua: {label}",
+			"onThisPage"          : "In questa pagina",
+			"editThisPage"        : "Modifica questa pagina",
+			"downloadMarkdown"    : "Scarica Markdown",
+			"lastUpdated"         : "Ultimo aggiornamento",
+			"notTranslatedNotice" : "Questa pagina non è ancora stata tradotta - viene mostrata la versione in {locale}.",
+			"notFoundTitle"       : "Pagina non trovata",
+			"notFoundBody"        : "Questa pagina non esiste. Prova la ricerca oppure torna alla home page.",
+			"tagsTitle"           : "Tag",
+			"pageNavigation"      : "Navigazione della pagina"
+		},
+		"ja" : {
+			"searchPlaceholder"   : "ドキュメントを検索...",
+			"searchAriaLabel"     : "検索",
+			"searchNoResults"     : "該当する結果が見つかりませんでした。",
+			"toggleDarkMode"      : "ダークモードの切り替え",
+			"toggleNavigation"    : "ナビゲーションの切り替え",
+			"toggleSection"       : "「{title}」セクションの切り替え",
+			"repository"          : "リポジトリ",
+			"version"             : "バージョン",
+			"language"            : "言語: {label}",
+			"onThisPage"          : "このページの内容",
+			"editThisPage"        : "このページを編集",
+			"downloadMarkdown"    : "Markdownをダウンロード",
+			"lastUpdated"         : "最終更新",
+			"notTranslatedNotice" : "このページはまだ翻訳されていません - {locale}版を表示しています。",
+			"notFoundTitle"       : "ページが見つかりません",
+			"notFoundBody"        : "そのページは存在しません。検索を試すか、ホームページに戻ってください。",
+			"tagsTitle"           : "タグ",
+			"pageNavigation"      : "ページナビゲーション"
+		}
+	}
+
+	/**
+	 * Resolves the full chrome-strings struct for one locale.
+	 *
+	 * @localeCode The locale being rendered right now (ThemeRenderer.renderPage()'s
+	 * own `currentLocale`) - "" (an unlocalized/single-language build) falls
+	 * back to `i18nConfig.defaultLocale.code`
+	 * @i18nConfig The site's bxsites.json `i18n` struct (already defaulted/validated
+	 * by ConfigLoader.bx) - only its own `defaultLocale.strings`/`locales[].strings`
+	 * overrides are read here
+	 *
+	 * @return A struct with every key from `defaults` above, English unless a
+	 * built-in translation and/or a project override supplies one
+	 */
+	struct function resolve( required string localeCode, required struct i18nConfig ) {
+		var code = len( trim( arguments.localeCode ) ) ? arguments.localeCode : arguments.i18nConfig.defaultLocale.code
+		var merged = duplicate( variables.defaults )
+
+		var builtInTranslation = variables.builtIn[ lCase( trim( code ) ) ] ?: {}
+		for ( var key in builtInTranslation ) {
+			merged[ key ] = builtInTranslation[ key ]
+		}
+
+		var override = localeOverride( code, arguments.i18nConfig )
+		for ( var key in override ) {
+			merged[ key ] = override[ key ]
+		}
+
+		return merged
+	}
+
+	/**
+	 * A resolved string's own `{placeholder}` tokens, filled in with real
+	 * per-render values (a nav section's own title, the current locale's
+	 * own label, ...) - plain `{key}` substitution, no i18n pluralization/
+	 * ordering logic, since every string here only ever carries at most one.
+	 *
+	 * @template One of `resolve()`'s own output values, e.g. `"Toggle {title} section"`
+	 * @replacements e.g. `{ title : "Guides" }`
+	 */
+	string function format( required string template, struct replacements = {} ) {
+		var result = arguments.template
+		for ( var key in arguments.replacements ) {
+			result = result.replace( "{" & key & "}", arguments.replacements[ key ], "all" )
+		}
+		return result
+	}
+
+	/**
+	 * @code The locale code to look up (matched case-insensitively against
+	 * both `i18nConfig.defaultLocale.code` and each `i18nConfig.locales[].code`)
+	 * @i18nConfig The site's bxsites.json `i18n` struct
+	 *
+	 * @return That locale's own `strings` override struct, or `{}` if it has none (or isn't found at all - an unrecognized code is simply not overridden, still resolving to the English/built-in defaults above)
+	 */
+	private struct function localeOverride( required string code, required struct i18nConfig ) {
+		if ( compareNoCase( arguments.i18nConfig.defaultLocale.code, arguments.code ) == 0 ) {
+			return arguments.i18nConfig.defaultLocale.strings ?: {}
+		}
+		for ( var locale in arguments.i18nConfig.locales ) {
+			if ( compareNoCase( locale.code, arguments.code ) == 0 ) {
+				return locale.strings ?: {}
+			}
+		}
+		return {}
+	}
+
+}
