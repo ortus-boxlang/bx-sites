@@ -101,7 +101,7 @@ GitBook サイトのコンテンツを簡単に移行できる理由でもあり
 `install-bx-module bx-sites`
 :::
 ::: step "スキャフォールド"
-`boxlang module:bxSites new`
+`bxSites new`
 :::
 :::
 ```
@@ -111,7 +111,7 @@ GitBook サイトのコンテンツを簡単に移行できる理由でもあり
 `install-bx-module bx-sites`
 :::
 ::: step "スキャフォールド"
-`boxlang module:bxSites new`
+`bxSites new`
 :::
 :::
 

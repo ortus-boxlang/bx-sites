@@ -117,10 +117,10 @@ nav:
 ## 実例
 
 ```bash frame="terminal" title="Terminal" linenums="1"
-boxlang module:bxSites new --projectRoot=my-docs
-boxlang module:bxSites migrate --projectRoot=my-docs --source=../my-mkdocs-project --from=mkdocs
+bxSites new --projectRoot=my-docs
+bxSites migrate --projectRoot=my-docs --source=../my-mkdocs-project --from=mkdocs
 cd my-docs
-boxlang module:bxSites serve
+bxSites serve
 ```
 
 `migrate` は `bxsites.yaml` と `docs/` 自体を書き込みます - 上記の `new`

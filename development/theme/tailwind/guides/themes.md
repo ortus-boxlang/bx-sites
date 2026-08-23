@@ -372,7 +372,7 @@ my-project/
    }
    ```
 
-3. Run `boxlang module:bxSites build` (or `serve` while iterating) - BX Sites
+3. Run `bxSites build` (or `serve` while iterating) - BX Sites
    picks up `theme/` automatically, no `bxsites.json` change needed (a
    project-level `theme/` folder always takes precedence over the built-in
    theme named in `theme.name`). Everything you didn't touch - nav

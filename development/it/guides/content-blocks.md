@@ -104,7 +104,7 @@ Una sequenza numerata e collegata di passaggi:
 `install-bx-module bx-sites`
 :::
 ::: step "Scaffold"
-`boxlang module:bxSites new`
+`bxSites new`
 :::
 :::
 ```
@@ -114,7 +114,7 @@ Una sequenza numerata e collegata di passaggi:
 `install-bx-module bx-sites`
 :::
 ::: step "Scheletro del progetto"
-`boxlang module:bxSites new`
+`bxSites new`
 :::
 :::
 

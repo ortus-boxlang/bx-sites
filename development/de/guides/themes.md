@@ -349,7 +349,7 @@ my-project/
    }
    ```
 
-3. Führe `boxlang module:bxSites build` aus (oder `serve` während der
+3. Führe `bxSites build` aus (oder `serve` während der
    Iteration) - BX Sites übernimmt `theme/` automatisch, keine Änderung an
    `bxsites.json` nötig (ein projektweiter `theme/`-Ordner hat immer
    Vorrang vor dem im `theme.name` genannten integrierten Theme). Alles,

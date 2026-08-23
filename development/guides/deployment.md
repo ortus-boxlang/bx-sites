@@ -26,10 +26,10 @@ On every push to `main` or `development` that touches `docs/`, `bxsites.json`,
 or the module's own source (theme/pipeline changes), the workflow:
 
 1. Installs BoxLang + [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
-2. Registers this repo as a module so `boxlang module:bxSites build` resolves
+2. Registers this repo as a module so `boxlang bxSites build` resolves
 3. On any branch but `main`, points `baseURL` at `.../<branch-name>/` for
    just this build (see [below](#publishing-two-versions-at-once))
-4. Runs `boxlang module:bxSites build`
+4. Runs `boxlang bxSites build`
 5. Pushes `site/` to the `gh-pages` branch - `main` to the site root,
    `development` to `/development/` - without touching the other version
 

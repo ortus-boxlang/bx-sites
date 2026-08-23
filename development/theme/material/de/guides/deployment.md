@@ -29,10 +29,10 @@ oder die eigene Quelle des Moduls (Theme-/Pipeline-Änderungen) berührt,
 macht der Workflow Folgendes:
 
 1. Installiert BoxLang + [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
-2. Registriert dieses Repo als Modul, damit `boxlang module:bxSites build` aufgelöst werden kann
+2. Registriert dieses Repo als Modul, damit `boxlang bxSites build` aufgelöst werden kann
 3. Setzt auf jedem Branch außer `main` `baseURL` auf `.../<branch-name>/`
    nur für diesen einen Build (siehe [unten](#publishing-two-versions-at-once))
-4. Führt `boxlang module:bxSites build` aus
+4. Führt `boxlang bxSites build` aus
 5. Pusht `site/` in den `gh-pages`-Branch - `main` in die Wurzel der
    Website, `development` nach `/development/` - ohne die jeweils andere
    Version anzurühren

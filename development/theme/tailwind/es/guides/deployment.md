@@ -30,11 +30,11 @@ la propia fuente del módulo (cambios de tema/canalización), el flujo de
 trabajo:
 
 1. Instala BoxLang + [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
-2. Registra este repositorio como un módulo para que `boxlang module:bxSites build` se resuelva
+2. Registra este repositorio como un módulo para que `boxlang bxSites build` se resuelva
 3. En cualquier rama que no sea `main`, apunta `baseURL` a
    `.../<branch-name>/` solo para esta construcción (consulta
    [más abajo](#publishing-two-versions-at-once))
-4. Ejecuta `boxlang module:bxSites build`
+4. Ejecuta `boxlang bxSites build`
 5. Empuja `site/` a la rama `gh-pages` - `main` a la raíz del sitio,
    `development` a `/development/` - sin tocar la otra versión
 

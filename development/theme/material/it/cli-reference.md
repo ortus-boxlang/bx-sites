@@ -15,12 +15,12 @@ bxSites <verbo> [opzioni]
 `box install bx-sites` crea uno script `bxSites` autonomo sul tuo `PATH`
 (tramite `boxlang.executable` di `box.json`), quindi ogni verbo qui sotto
 può essere eseguito sia in quella forma breve, sia come
-`boxlang module:bxsites <verbo>` - entrambe eseguono esattamente la stessa
+`boxlang bxSites <verbo>` - entrambe eseguono esattamente la stessa
 cosa; usa la forma più lunga ovunque lo shim sul `PATH` non sia impostato
 (un runner di CI, un modulo registrato a mano):
 
 ```bash
-boxlang module:bxsites <verbo> [opzioni]
+boxlang bxSites <verbo> [opzioni]
 ```
 
 Ogni verbo accetta `--projectRoot=<percorso>` (oppure un percorso

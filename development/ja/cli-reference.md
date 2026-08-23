@@ -14,11 +14,11 @@ bxSites <verb> [options]
 
 `box install bx-sites` を実行すると、スタンドアロンの `bxSites` スクリプトが `PATH` に配置されます
 （`box.json` の `boxlang.executable` 経由）。以下のすべての動詞は短縮形、または
-`boxlang module:bxsites <verb>` のどちらの形式でも実行できます。
+`boxlang bxSites <verb>` のどちらの形式でも実行できます。
 `PATH` シムが設定されていない環境（CI ランナー、手動登録のモジュールなど）では長い形式を使用します:
 
 ```bash
-boxlang module:bxsites <verb> [options]
+boxlang bxSites <verb> [options]
 ```
 
 すべての動詞は `--projectRoot=<path>`（または先頭の位置引数）で、カレントディレクトリ以外の

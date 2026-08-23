@@ -43,7 +43,7 @@ como, en cualquier lugar donde BoxLang esté disponible pero ese atajo del
 de instalado) - ambas formas ejecutan exactamente lo mismo:
 
 ```bash
-boxlang module:bxsites <verb> [options]
+boxlang bxSites <verb> [options]
 ```
 
 El resto de esta guía usa la forma corta.

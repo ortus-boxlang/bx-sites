@@ -69,10 +69,10 @@ screenshot, the real thing:
 `install-bx-module bx-sites`
 :::
 ::: step "Scaffold"
-`boxlang module:bxSites new`
+`bxSites new`
 :::
 ::: step "Build & serve"
-`boxlang module:bxSites serve`
+`bxSites serve`
 :::
 :::
 

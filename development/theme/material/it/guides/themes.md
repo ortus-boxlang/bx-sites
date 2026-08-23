@@ -352,7 +352,7 @@ my-project/
    }
    ```
 
-3. Esegui `boxlang module:bxSites build` (o `serve` mentre iteri) - BX
+3. Esegui `bxSites build` (o `serve` mentre iteri) - BX
    Docs recepisce `theme/` automaticamente, nessuna modifica a
    `bxsites.json` necessaria (una cartella `theme/` a livello di progetto
    ha sempre la precedenza sul tema integrato nominato in `theme.name`).
