@@ -48,10 +48,15 @@ class extends="testbox.system.BaseSpec" {
 				return zipPath;
 			}
 
-			private any function fakeForgeBoxClient( required string fixtureZipPath, string version = "1.0.0" ) {
+			private any function fakeForgeBoxClient( required string fixtureZipPath, string resolvedVersion = "1.0.0" ) {
 				return {
 					resolve : function( required string slug, string version = "" ) {
-						return { name : arguments.slug, version : version, location : "https://downloads.example.com/" & arguments.slug & ".zip" };
+						// `resolvedVersion` (not `arguments.version`) - a closure's own
+						// parameter of the same name shadows the enclosing scope's,
+						// so referencing `version` here would silently return
+						// whatever the real caller passed in (often "") instead of
+						// this fake's own fixed test version.
+						return { name : arguments.slug, version : resolvedVersion, location : "https://downloads.example.com/" & arguments.slug & ".zip" };
 					},
 					download : function( required string url, required string destZipPath ) {
 						directoryCreate( getDirectoryFromPath( arguments.destZipPath ), true, true );
