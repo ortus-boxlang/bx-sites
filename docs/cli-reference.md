@@ -402,6 +402,11 @@ Only bare `[text](relative/path.md)`-style links are rewritten - absolute
 URLs, `mailto:`, and pure in-page anchors are left alone. `docs/assets/**`
 is never scanned.
 
+Also stamps the moved page's own frontmatter `redirect_from` with its old
+URL, so a build ([Redirects](guides/redirects.md)) keeps answering for it
+instead of letting the rename 404 every outside link this project doesn't
+control the source of.
+
 ## `blog:drafts`
 
 Lists every blog post whose frontmatter sets `draft: true` - `build`

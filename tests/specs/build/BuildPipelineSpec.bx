@@ -648,6 +648,41 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "Test Site" );
 			} );
 
+			it( "writes a redirect stub for a page's own frontmatter redirect_from", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/guides", true, true );
+				fileWrite(
+					root & "/docs/guides/new-setup.md",
+					"---" & char( 10 ) & "title: New Setup" & char( 10 ) & "redirect_from: [guides/old-setup]" & char( 10 ) & "---" & char( 10 ) & "Setup body"
+				);
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/guides/old-setup/index.html" ) ).toBeTrue();
+				var html = fileRead( root & "/site/guides/old-setup/index.html" );
+				expect( html ).toInclude( "/guides/new-setup/index.html" );
+				expect( html ).toInclude( 'http-equiv="refresh"' );
+			} );
+
+			it( "writes a redirect stub for a bxsites.json [redirects] entry, resolved against basePath", function() {
+				var root = createTempDirectory( prefix = "bxsites-buildpipeline-redirects-" );
+				tempDirs.append( root );
+				directoryCreate( root & "/docs", true, true );
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","baseURL":"/my-site/","redirects":[{"from":"legacy","to":"guides/setup/"}]}'
+				);
+				directoryCreate( root & "/docs/guides", true, true );
+				fileWrite( root & "/docs/index.md", "Home" );
+				fileWrite( root & "/docs/guides/setup.md", "Setup body" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/legacy/index.html" ) ).toBeTrue();
+				expect( fileRead( root & "/site/legacy/index.html" ) ).toInclude( "/my-site/guides/setup/" );
+			} );
+
 			it( "throws BxSites.ConfigNotFound when the project has no bxsites.json", function() {
 				var root = createTempDirectory( prefix = "bxsites-buildpipeline-noconfig-" );
 				tempDirs.append( root );
@@ -1417,7 +1452,11 @@ class extends="testbox.system.BaseSpec" {
 				var esSetupHtml = fileRead( root & "/site/es/guides/setup/index.html" );
 				expect( esSetupHtml ).toInclude( "<p>Setup body</p>" );
 				expect( esSetupHtml ).toInclude( "fallback-notice" );
-				expect( esSetupHtml ).toInclude( "hasn't been translated yet" );
+				// "es" ships a built-in chrome translation (StringsResolver.bx) -
+				// the notice itself renders in Spanish, not the English default.
+				// (encodeForHTML() entity-escapes the accented characters, so this
+				// checks an accent-free substring of the Spanish text instead.)
+				expect( esSetupHtml ).toInclude( "no se ha traducido" );
 			} );
 
 			it( "gives every locale the exact same nav shape as the default tree, translated titles included", function() {

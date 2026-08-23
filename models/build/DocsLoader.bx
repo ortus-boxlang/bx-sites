@@ -20,7 +20,7 @@ class {
 	 *
 	 * @docsDir Absolute path to the project's docs/ directory
 	 *
-	 * @return Array of page structs, sorted by [order] then [title]: { relativePath, sourcePath, urlPath, title, description, order, hidden, tags, icon, summary, ogImage, body }
+	 * @return Array of page structs, sorted by [order] then [title]: { relativePath, sourcePath, urlPath, title, description, order, hidden, tags, redirectFrom, icon, summary, ogImage, body }
 	 */
 	array function load( required string docsDir ) {
 		var dir = arguments.docsDir.reReplace( "[\/]+$", "" )
@@ -70,6 +70,7 @@ class {
 			hidden       : ( fm.hidden ?: false ) ? true : false,
 			showToc      : ( fm.toc ?: true ) ? true : false,
 			tags         : isArray( fm.tags ?: "" ) ? fm.tags : [],
+			redirectFrom : isArray( fm.redirect_from ?: "" ) ? fm.redirect_from : [],
 			icon         : trim( fm.icon ?: "" ),
 			summary      : trim( fm.summary ?: "" ),
 			ogImage      : trim( fm.ogImage ?: "" ),

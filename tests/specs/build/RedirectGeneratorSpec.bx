@@ -1,0 +1,146 @@
+/**
+ * Exercises RedirectGenerator.bx directly - the static HTML redirect
+ * stubs (`<meta http-equiv="refresh">` + `<link rel="canonical">`)
+ * written for a page's own frontmatter `redirect_from` and, for the main
+ * tree only, `bxsites.json`'s own top-level `redirects` array.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.RedirectGenerator", function() {
+
+			beforeEach( function() {
+				variables.generator = new "models.build.RedirectGenerator@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newSiteDir() {
+				var dir = createTempDirectory( prefix = "bxsites-redirectgen-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			private struct function makePage( required string urlPath, array redirectFrom = [] ) {
+				return { urlPath : arguments.urlPath, redirectFrom : arguments.redirectFrom };
+			}
+
+			it( "writes a stub for a page's own redirect_from entry, targeting basePath + the page's urlPath", function() {
+				var siteDir = newSiteDir();
+				var pages = [ makePage( "guides/new-setup/index.html", [ "guides/old-setup" ] ) ];
+
+				var result = generator.write( pages, siteDir, "/" );
+
+				expect( result.count ).toBe( 1 );
+				expect( fileExists( siteDir & "/guides/old-setup/index.html" ) ).toBeTrue();
+				var content = fileRead( siteDir & "/guides/old-setup/index.html" );
+				expect( content ).toInclude( "/guides/new-setup/index.html" );
+				expect( content ).toInclude( 'http-equiv="refresh"' );
+				expect( content ).toInclude( 'rel="canonical"' );
+			} );
+
+			it( "writes one stub per redirect_from entry when a page has several", function() {
+				var siteDir = newSiteDir();
+				var pages = [ makePage( "guides/new-setup/index.html", [ "guides/old-setup", "old/setup-alt" ] ) ];
+
+				var result = generator.write( pages, siteDir, "/" );
+
+				expect( result.count ).toBe( 2 );
+				expect( fileExists( siteDir & "/guides/old-setup/index.html" ) ).toBeTrue();
+				expect( fileExists( siteDir & "/old/setup-alt/index.html" ) ).toBeTrue();
+			} );
+
+			it( "resolves a config-level redirect's [to] as basePath-relative", function() {
+				var siteDir = newSiteDir();
+				var pages = [ makePage( "guides/setup/index.html" ) ];
+				var configRedirects = [ { "from" : "legacy/setup", "to" : "guides/setup/" } ];
+
+				var result = generator.write( pages, siteDir, "/docs-site/", configRedirects );
+
+				expect( result.count ).toBe( 1 );
+				expect( fileRead( siteDir & "/legacy/setup/index.html" ) ).toInclude( "/docs-site/guides/setup/" );
+			} );
+
+			it( "leaves a config-level redirect's [to] untouched when it's already an absolute URL", function() {
+				var siteDir = newSiteDir();
+				var configRedirects = [ { "from" : "old-domain", "to" : "https://example.com/moved" } ];
+
+				generator.write( [], siteDir, "/", configRedirects );
+
+				expect( fileRead( siteDir & "/old-domain/index.html" ) ).toInclude( "https://example.com/moved" );
+			} );
+
+			it( "throws BxSites.RedirectConflict when a redirect's [from] collides with a real page", function() {
+				var siteDir = newSiteDir();
+				var pages = [
+					makePage( "guides/new-setup/index.html", [ "guides/existing-page" ] ),
+					makePage( "guides/existing-page/index.html" )
+				];
+
+				expect( function() {
+					generator.write( pages, siteDir, "/" );
+				} ).toThrow( "BxSites.RedirectConflict" );
+			} );
+
+			it( "throws BxSites.RedirectConflict when two redirects target the same [from] path", function() {
+				var siteDir = newSiteDir();
+				var pages = [
+					makePage( "guides/a/index.html", [ "guides/shared-old" ] ),
+					makePage( "guides/b/index.html", [ "guides/shared-old" ] )
+				];
+
+				expect( function() {
+					generator.write( pages, siteDir, "/" );
+				} ).toThrow( "BxSites.RedirectConflict" );
+			} );
+
+			it( "throws BxSites.InvalidRedirect when a redirect_from entry walks outside this tree's own siteDir", function() {
+				var siteDir = newSiteDir();
+				var pages = [ makePage( "guides/new-setup/index.html", [ "../../../../tmp/evil" ] ) ];
+
+				expect( function() {
+					generator.write( pages, siteDir, "/" );
+				} ).toThrow( "BxSites.InvalidRedirect" );
+			} );
+
+			it( "throws BxSites.RedirectConflict rather than overwriting content already on disk (e.g. from an already-built locale tree)", function() {
+				var siteDir = newSiteDir();
+				directoryCreate( siteDir & "/de", true, true );
+				fileWrite( siteDir & "/de/index.html", "existing locale content" );
+				var configRedirects = [ { "from" : "de", "to" : "guides/setup/" } ];
+
+				expect( function() {
+					generator.write( [], siteDir, "/", configRedirects );
+				} ).toThrow( "BxSites.RedirectConflict" );
+				expect( fileRead( siteDir & "/de/index.html" ) ).toBe( "existing locale content" );
+			} );
+
+			it( "throws BxSites.InvalidRedirect for a blank redirect_from entry", function() {
+				var siteDir = newSiteDir();
+				var pages = [ makePage( "guides/a/index.html", [ "   " ] ) ];
+
+				expect( function() {
+					generator.write( pages, siteDir, "/" );
+				} ).toThrow( "BxSites.InvalidRedirect" );
+			} );
+
+			it( "returns a count of 0 and writes nothing when there's nothing to redirect", function() {
+				var siteDir = newSiteDir();
+				var pages = [ makePage( "index.html" ) ];
+
+				var result = generator.write( pages, siteDir, "/" );
+
+				expect( result.count ).toBe( 0 );
+			} );
+
+		} );
+	}
+
+}

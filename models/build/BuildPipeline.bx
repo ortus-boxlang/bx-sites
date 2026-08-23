@@ -8,6 +8,7 @@ class {
 
 	variables.configLoader     = new "models.config.ConfigLoader@bxsites"()
 	variables.sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
+	variables.stringsResolver  = new "models.config.StringsResolver@bxsites"()
 	variables.docsLoader       = new "models.build.DocsLoader@bxsites"()
 	variables.navBuilder       = new "models.build.NavBuilder@bxsites"()
 	variables.themeRenderer    = new "models.build.ThemeRenderer@bxsites"()
@@ -23,6 +24,7 @@ class {
 	variables.versionsDiscoverer = new "models.build.VersionsDiscoverer@bxsites"()
 	variables.localesDiscoverer = new "models.build.LocalesDiscoverer@bxsites"()
 	variables.tagsIndexBuilder = new "models.build.TagsIndexBuilder@bxsites"()
+	variables.redirectGenerator = new "models.build.RedirectGenerator@bxsites"()
 	variables.socialCardGenerator = new "models.build.SocialCardGenerator@bxsites"()
 	variables.tabsProcessor = new "models.build.TabsProcessor@bxsites"()
 	variables.mathProtector = new "models.build.MathProtector@bxsites"()
@@ -200,6 +202,7 @@ class {
 			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
 			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 			writeTagsPage( versionResult.pages, versionResult.nav, config, themeDir, versionOutputDir, versionBasePath, versions, versionLocales, defaultLocaleCode )
+			variables.redirectGenerator.write( versionResult.pages, versionOutputDir, versionBasePath )
 
 			for ( var versionLocale in versionLocales ) {
 				if ( versionLocale.code == defaultLocaleCode ) {
@@ -230,6 +233,7 @@ class {
 				allPages.append( prefixPageUrls( versionLocaleResult.pages, "versions/" & versionName & "/" & versionLocale.code & "/" ), true )
 				copyAssets( root, themeDir, versionLocaleOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 				writeTagsPage( versionLocaleResult.pages, versionLocaleResult.nav, config, themeDir, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/", versions, versionLocales, versionLocale.code )
+				variables.redirectGenerator.write( versionLocaleResult.pages, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/" )
 			}
 		}
 
@@ -262,6 +266,7 @@ class {
 			allPages.append( prefixPageUrls( localeResult.pages, locale.code & "/" ), true )
 			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 			writeTagsPage( localeResult.pages, localeResult.nav, config, themeDir, localeOutputDir, urls.basePath & locale.code & "/", versions, locales, locale.code )
+			variables.redirectGenerator.write( localeResult.pages, localeOutputDir, urls.basePath & locale.code & "/" )
 		}
 
 		var tagsPages = mainResult.pages
@@ -322,6 +327,7 @@ class {
 
 		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, "Latest", locales, defaultLocaleCode )
 		writeTagsPage( tagsPages, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode )
+		variables.redirectGenerator.write( mainResult.pages, siteDir, urls.basePath, config.redirects )
 
 		if ( len( urls.absolute ) ) {
 			fileWrite( siteDir & "/sitemap.xml", variables.sitemapGenerator.build( allPages, urls.absolute ) )
@@ -1053,13 +1059,14 @@ class {
 	 * @basePath Root-relative base path ending with `/`
 	 * @versions Version switcher entries as `[ { label, url } ]`
 	 * @currentVersion Always `"Latest"` - the 404 page is only ever written once, for the main site
-	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]` - not built per-locale in v1 (a 404 page's own "not found" message needs no translation to be useful), shown here only so the header renders the same everywhere
+	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]` - not built per-locale in v1 (a single 404.html is all a static host serves for any unmatched path, regardless of which locale subtree the reader was in), shown here only so the header renders the same everywhere
 	 * @currentLocale The default locale's own code
 	 */
 	private void function write404Page( required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required string currentVersion, array locales = [], string currentLocale = "" ) {
+		var strings = variables.stringsResolver.resolve( arguments.currentLocale, arguments.config.i18n )
 		var page = {
-			title       : "Page Not Found",
-			contentHtml : "<p>Sorry, that page doesn't exist. Try the search box, or head back to the homepage.</p>",
+			title       : strings.notFoundTitle,
+			contentHtml : "<p>" & encodeForHTML( strings.notFoundBody ) & "</p>",
 			toc         : [],
 			prevPage    : { title : "", url : "" },
 			nextPage    : { title : "", url : "" },
@@ -1105,8 +1112,9 @@ class {
 			return
 		}
 
+		var strings = variables.stringsResolver.resolve( arguments.currentLocale, arguments.config.i18n )
 		var page = {
-			title       : "Tags",
+			title       : strings.tagsTitle,
 			contentHtml : built.contentHtml,
 			toc         : [],
 			prevPage    : { title : "", url : "" },
