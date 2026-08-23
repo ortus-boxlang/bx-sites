@@ -184,6 +184,44 @@ blocca l'essere incorniciata):
 ::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="Una demo"
 :::
 
+## OpenAPI / Swagger
+
+Un widget interattivo [Swagger UI](https://swagger.io/tools/swagger-ui/)
+per una specifica OpenAPI/Swagger - `src` viene risolto nello stesso modo,
+relativo a `docs/assets/`, in cui viene risolto `src` di `::: file`. Sia le
+specifiche JSON che YAML funzionano; Swagger UI le analizza entrambe
+interamente lato client - da nessuna parte in questo modulo avviene
+un'analisi OpenAPI lato server. Richiede che `openapi` di `bxsites.json`
+([`openapi`](../configuration.md#openapi)) sia impostato su `true` - se
+non lo è, questo segnaposto viene renderizzato ma resta inerte (il JS/CSS
+proprio di Swagger UI non viene mai copiato in `site/`, quindi la build di
+qualsiasi altro progetto resta piccola esattamente come prima di questa
+funzionalità):
+
+```markdown title="Esempio" linenums="1"
+::: openapi src="assets/openapi/example.yaml" title="Bookshelf API"
+:::
+```
+
+::: openapi src="assets/openapi/example.yaml" title="Bookshelf API"
+:::
+
+Il widget qui sopra è proprio questa pagina, dal vivo, che renderizza la
+piccola specifica di esempio che questa guida fornisce in
+`docs/assets/openapi/example.yaml` - aprila nel tuo progetto sotto
+`docs/assets/` (oppure punta `src` verso la tua specifica già esistente)
+per vedere lo stesso risultato con la tua API.
+
+Viene incluso (vendorizzato) solo il layout base proprio di
+`SwaggerUIBundle` - senza la topbar/barra "Explore" che permetterebbe di
+digitare una specifica diversa (un blocco `::: openapi` deve mostrare
+sempre l'unica specifica a cui il suo autore lo ha puntato), quindi ogni
+operazione, con i relativi schemi di richiesta/risposta, e "Try it out"
+(che chiama il `servers[0].url` proprio della specifica direttamente dal
+browser di chi visita la pagina - assicurati che quel server consenta CORS
+da dove sono ospitati i tuoi docs) vengono renderizzati direttamente dalla
+tua specifica esistente, senza bisogno di riscrivere nulla.
+
 ## Link a pagina
 
 Una card di anteprima ricca che rimanda a un'altra pagina - `href` segue

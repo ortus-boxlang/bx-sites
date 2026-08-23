@@ -40,6 +40,8 @@
 
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 
+	<link rel="stylesheet" href="/bx-sites/development/es/assets/vendor/swagger-ui/swagger-ui.css">
+
 	<script>window.__BXSITES_BASE_PATH__ = "/bx-sites/development/es/";</script>
 	<script src="/bx-sites/development/es/assets/vendor/lunr/lunr.min.js"></script>
 	<script src="/bx-sites/development/es/assets/search.js" defer></script>
@@ -85,7 +87,7 @@
 					<h1 class="page-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M112,56v48a8,8,0,0,1-8,8H56a8,8,0,0,1-8-8V56a8,8,0,0,1,8-8h48A8,8,0,0,1,112,56Zm88-8H152a8,8,0,0,0-8,8v48a8,8,0,0,0,8,8h48a8,8,0,0,0,8-8V56A8,8,0,0,0,200,48Zm-96,96H56a8,8,0,0,0-8,8v48a8,8,0,0,0,8,8h48a8,8,0,0,0,8-8V152A8,8,0,0,0,104,144Zm96,0H152a8,8,0,0,0-8,8v48a8,8,0,0,0,8,8h48a8,8,0,0,0,8-8V152A8,8,0,0,0,200,144Z" opacity="0.2"/><path d="M200,136H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,200,136Zm0,64H152V152h48v48ZM104,40H56A16,16,0,0,0,40,56v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,104,40Zm0,64H56V56h48v48Zm96-64H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,200,40Zm0,64H152V56h48v48Zm-96,32H56a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,104,136Zm0,64H56V152h48v48Z"/></svg></span> Bloques de Contenido</h1>
 					<p class="page-summary">Cuadr&iacute;culas de tarjetas, columnas, un stepper, tarjetas de archivo/incrustaci&oacute;n/vista previa, un registro de cambios y contenido reutilizable.</p>
 <div class="page-tags mb-3"><a class="page-tag" href="/bx-sites/development/es/tags/index.html#tag-guías">gu&iacute;as</a><a class="page-tag" href="/bx-sites/development/es/tags/index.html#tag-markdown">markdown</a><a class="page-tag" href="/bx-sites/development/es/tags/index.html#tag-gitbook">gitbook</a></div>
-<details class="bxsites-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">On this page</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#expandible">Expandible</a></li><li class="toc-level-2"><a href="#tarjetas">Tarjetas</a></li><li class="toc-level-2"><a href="#columnas">Columnas</a></li><li class="toc-level-2"><a href="#stepper">Stepper</a></li><li class="toc-level-2"><a href="#archivo">Archivo</a></li><li class="toc-level-2"><a href="#incrustación">Incrustaci&oacute;n</a></li><li class="toc-level-2"><a href="#enlace-de-página">Enlace de p&aacute;gina</a></li><li class="toc-level-2"><a href="#vista-previa-de-enlace">Vista previa de enlace</a></li><li class="toc-level-2"><a href="#novedades-registro-de-cambios">Novedades (registro de cambios)</a></li><li class="toc-level-2"><a href="#contenido-reutilizable-inclusiones">Contenido reutilizable (inclusiones)</a></li></ul></details>
+<details class="bxsites-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">On this page</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#expandible">Expandible</a></li><li class="toc-level-2"><a href="#tarjetas">Tarjetas</a></li><li class="toc-level-2"><a href="#columnas">Columnas</a></li><li class="toc-level-2"><a href="#stepper">Stepper</a></li><li class="toc-level-2"><a href="#archivo">Archivo</a></li><li class="toc-level-2"><a href="#incrustación">Incrustaci&oacute;n</a></li><li class="toc-level-2"><a href="#openapi--swagger">OpenAPI / Swagger</a></li><li class="toc-level-2"><a href="#enlace-de-página">Enlace de p&aacute;gina</a></li><li class="toc-level-2"><a href="#vista-previa-de-enlace">Vista previa de enlace</a></li><li class="toc-level-2"><a href="#novedades-registro-de-cambios">Novedades (registro de cambios)</a></li><li class="toc-level-2"><a href="#contenido-reutilizable-inclusiones">Contenido reutilizable (inclusiones)</a></li></ul></details>
 					<h1 id="bloques-de-contenido"><a href="#bloques-de-contenido" id="bloques-de-contenido" name="bloques-de-contenido" class="anchor"></a>Bloques de Contenido</h1>
 <p>Además de todo lo que hay en <a href="/bx-sites/development/es/guides/markdown/index.html">Extensiones de Markdown</a>, BX
 Sites admite una familia de bloques de contenido al estilo GitBook -
@@ -203,6 +205,37 @@ de los sitios bloquean ser incrustados en un frame):</p>
 :::
 </code></pre>
 <div class="bxsites-embed"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><div class="bxsites-embed__caption">Una demostraci&oacute;n</div>
+<h2 id="openapi--swagger"><a href="#openapi--swagger" id="openapi--swagger" name="openapi--swagger" class="anchor"></a>OpenAPI / Swagger</h2>
+<p>Un widget interactivo de <a href="https://swagger.io/tools/swagger-ui/">Swagger UI</a>
+para una especificación OpenAPI/Swagger - <code>src</code> se resuelve del mismo modo,
+relativo a <code>docs/assets/</code>, que el <code>src</code> de <code>::: file</code>. Tanto las
+especificaciones JSON como YAML funcionan; Swagger UI analiza ambas
+enteramente del lado del cliente - en ningún lugar de este módulo ocurre
+un análisis de OpenAPI en el servidor. Requiere que
+<a href="/bx-sites/development/es/configuration/index.html#openapi"><code>openapi</code></a> de <code>bxsites.json</code> esté en <code>true</code> -
+si no lo está, este marcador de posición se renderiza pero permanece
+inerte (el propio JS/CSS de Swagger UI nunca se copia a <code>site/</code>, así que
+el build de cualquier otro proyecto sigue siendo tan pequeño como antes de
+esta funcionalidad):</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="Ejemplo"><code class="language-markdown">::: openapi src=&quot;assets/openapi/example.yaml&quot; title=&quot;Bookshelf API&quot;
+:::
+</code></pre>
+<div class="bxsites-openapi" data-openapi-src="/bx-sites/development/es/assets/openapi/example.yaml"><div class="bxsites-openapi__title">Bookshelf API</div></div>
+<p>El widget de arriba es esta misma página, en vivo, renderizando la pequeña
+especificación de ejemplo que esta guía incluye en
+<code>docs/assets/openapi/example.yaml</code> - ábrela en tu propio proyecto bajo
+<code>docs/assets/</code> (o apunta <code>src</code> a tu propia especificación ya existente)
+para ver lo mismo con tu propia API.</p>
+<p>Solo se incluye (vendorizado) el layout base propio de <code>SwaggerUIBundle</code> -
+sin la barra superior/&quot;Explore&quot; que permitiría a alguien escribir una
+especificación distinta (un bloque <code>::: openapi</code> debe mostrar siempre la
+única especificación a la que su autor lo apuntó), así que cada
+operación, junto con sus esquemas de solicitud/respuesta, y &quot;Try it out&quot;
+(que llama al <code>servers[0].url</code> propio de la especificación directamente
+desde el navegador de quien visita la página - asegúrate de que ese
+servidor permita CORS desde donde esté alojada tu documentación) se
+renderizan directamente desde tu especificación existente, sin necesidad
+de reescribir nada.</p>
 <h2 id="enlace-de-página"><a href="#enlace-de-página" id="enlace-de-página" name="enlace-de-página" class="anchor"></a>Enlace de página</h2>
 <p>Una tarjeta de vista previa enriquecida que enlaza a otra página - <code>href</code>
 sigue la misma convención relativa a archivos que un
@@ -301,7 +334,7 @@ se comparten con el <code>docs/includes/</code> del árbol principal.</p>
 lanza <code>BxSites.CircularInclude</code> en el momento de la construcción en
 lugar de entrar en un bucle infinito).</p>
 
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/content-blocks.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/es/guides/content-blocks.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 2:17:28 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/content-blocks.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/es/guides/content-blocks.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 8:29:19 PM</span></div>
 				</article>
 
 				<nav class="page-nav d-flex justify-content-between" aria-label="Page navigation">
@@ -317,7 +350,7 @@ lugar de entrar en un bucle infinito).</p>
 			</main>
 
 			<aside class="col-xl-2 toc-sidebar d-none d-xl-block">
-				<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#expandible">Expandible</a></li><li class="toc-level-2"><a href="#tarjetas">Tarjetas</a></li><li class="toc-level-2"><a href="#columnas">Columnas</a></li><li class="toc-level-2"><a href="#stepper">Stepper</a></li><li class="toc-level-2"><a href="#archivo">Archivo</a></li><li class="toc-level-2"><a href="#incrustación">Incrustaci&oacute;n</a></li><li class="toc-level-2"><a href="#enlace-de-página">Enlace de p&aacute;gina</a></li><li class="toc-level-2"><a href="#vista-previa-de-enlace">Vista previa de enlace</a></li><li class="toc-level-2"><a href="#novedades-registro-de-cambios">Novedades (registro de cambios)</a></li><li class="toc-level-2"><a href="#contenido-reutilizable-inclusiones">Contenido reutilizable (inclusiones)</a></li></ul></nav>
+				<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#expandible">Expandible</a></li><li class="toc-level-2"><a href="#tarjetas">Tarjetas</a></li><li class="toc-level-2"><a href="#columnas">Columnas</a></li><li class="toc-level-2"><a href="#stepper">Stepper</a></li><li class="toc-level-2"><a href="#archivo">Archivo</a></li><li class="toc-level-2"><a href="#incrustación">Incrustaci&oacute;n</a></li><li class="toc-level-2"><a href="#openapi--swagger">OpenAPI / Swagger</a></li><li class="toc-level-2"><a href="#enlace-de-página">Enlace de p&aacute;gina</a></li><li class="toc-level-2"><a href="#vista-previa-de-enlace">Vista previa de enlace</a></li><li class="toc-level-2"><a href="#novedades-registro-de-cambios">Novedades (registro de cambios)</a></li><li class="toc-level-2"><a href="#contenido-reutilizable-inclusiones">Contenido reutilizable (inclusiones)</a></li></ul></nav>
 			</aside>
 
 		</div>
@@ -350,6 +383,9 @@ lugar de entrar en un bucle infinito).</p>
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 	<script src="/bx-sites/development/es/assets/math-init.js"></script>
+
+	<script src="/bx-sites/development/es/assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
+	<script src="/bx-sites/development/es/assets/openapi-init.js"></script>
 
 	<script src="/bx-sites/development/es/assets/bundle.2cdc90bf.js" defer></script>
 </body>

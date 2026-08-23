@@ -592,6 +592,18 @@ fenced-code `hl_lines`/`linenums`/`title` annotations are always available
 in every page's markdown, no config needed - see
 [Markdown Extensions](guides/markdown.md#admonitions).
 
+## `openapi`
+
+`false` (the default) - no [Swagger UI](https://swagger.io/tools/swagger-ui/)
+shipped at all. `true` loads it client-side and renders every
+`::: openapi src="..."` content block as an interactive widget for the
+referenced OpenAPI/Swagger spec (JSON or YAML). See
+[Content Blocks](guides/content-blocks.md#openapi--swagger) for the syntax.
+
+```json title="bxsites.json"
+{ "openapi": true }
+```
+
 ## `plugins`
 
 `[]` (the default) - an array of BoxLang module names to activate as

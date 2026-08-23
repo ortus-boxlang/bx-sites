@@ -470,6 +470,20 @@ las pestañas de contenido y las anotaciones de código con fence
 cualquier página, sin necesidad de configuración - consulta
 [Extensiones de Markdown](guides/markdown.md#admonitions).
 
+## `openapi`
+
+`false` (el valor por defecto) - sin
+[Swagger UI](https://swagger.io/tools/swagger-ui/) en absoluto. `true` lo
+carga del lado del cliente y renderiza cada bloque de contenido
+`::: openapi src="..."` como un widget interactivo para la especificación
+OpenAPI/Swagger referenciada (JSON o YAML). Consulta
+[Bloques de contenido](guides/content-blocks.md#openapi--swagger) para la
+sintaxis.
+
+```json title="bxsites.json"
+{ "openapi": true }
+```
+
 ## `plugins`
 
 `[]` (el valor por defecto) - un array de nombres de módulos de BoxLang

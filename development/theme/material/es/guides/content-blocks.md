@@ -185,6 +185,45 @@ de los sitios bloquean ser incrustados en un frame):
 ::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="Una demostración"
 :::
 
+## OpenAPI / Swagger
+
+Un widget interactivo de [Swagger UI](https://swagger.io/tools/swagger-ui/)
+para una especificación OpenAPI/Swagger - `src` se resuelve del mismo modo,
+relativo a `docs/assets/`, que el `src` de `::: file`. Tanto las
+especificaciones JSON como YAML funcionan; Swagger UI analiza ambas
+enteramente del lado del cliente - en ningún lugar de este módulo ocurre
+un análisis de OpenAPI en el servidor. Requiere que
+[`openapi`](../configuration.md#openapi) de `bxsites.json` esté en `true` -
+si no lo está, este marcador de posición se renderiza pero permanece
+inerte (el propio JS/CSS de Swagger UI nunca se copia a `site/`, así que
+el build de cualquier otro proyecto sigue siendo tan pequeño como antes de
+esta funcionalidad):
+
+```markdown title="Ejemplo" linenums="1"
+::: openapi src="assets/openapi/example.yaml" title="Bookshelf API"
+:::
+```
+
+::: openapi src="assets/openapi/example.yaml" title="Bookshelf API"
+:::
+
+El widget de arriba es esta misma página, en vivo, renderizando la pequeña
+especificación de ejemplo que esta guía incluye en
+`docs/assets/openapi/example.yaml` - ábrela en tu propio proyecto bajo
+`docs/assets/` (o apunta `src` a tu propia especificación ya existente)
+para ver lo mismo con tu propia API.
+
+Solo se incluye (vendorizado) el layout base propio de `SwaggerUIBundle` -
+sin la barra superior/"Explore" que permitiría a alguien escribir una
+especificación distinta (un bloque `::: openapi` debe mostrar siempre la
+única especificación a la que su autor lo apuntó), así que cada
+operación, junto con sus esquemas de solicitud/respuesta, y "Try it out"
+(que llama al `servers[0].url` propio de la especificación directamente
+desde el navegador de quien visita la página - asegúrate de que ese
+servidor permita CORS desde donde esté alojada tu documentación) se
+renderizan directamente desde tu especificación existente, sin necesidad
+de reescribir nada.
+
 ## Enlace de página
 
 Una tarjeta de vista previa enriquecida que enlaza a otra página - `href`

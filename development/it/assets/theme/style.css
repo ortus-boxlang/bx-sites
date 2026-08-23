@@ -1462,6 +1462,28 @@ a.bxsites-card:hover {
 	text-decoration: underline;
 }
 
+.bxsites-openapi {
+	margin: 1.5rem 0;
+	border: 1px solid rgba( 0, 0, 0, 0.12 );
+	border-radius: 14px;
+	padding: 1rem;
+	background: #ffffff;
+	color: #3b4151;
+}
+
+.bxsites-openapi__title {
+	margin-bottom: 0.75rem;
+	font-weight: 600;
+	color: inherit;
+}
+
+.bxsites-openapi--invalid {
+	background: none;
+	border: 0;
+	padding: 0;
+	color: inherit;
+}
+
 .bxsites-page-link {
 	display: flex;
 	align-items: center;
@@ -1601,6 +1623,10 @@ a.bxsites-card:hover {
 }
 
 [data-theme="dark"] .bxsites-tryboxlang {
+	border-color: rgba( 255, 255, 255, 0.12 );
+}
+
+[data-theme="dark"] .bxsites-openapi {
 	border-color: rgba( 255, 255, 255, 0.12 );
 }
 

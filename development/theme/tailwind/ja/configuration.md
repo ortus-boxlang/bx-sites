@@ -329,6 +329,20 @@ YAML でも同様に読み替えられます。
 { "math": true }
 ```
 
+## `openapi`
+
+`false`（デフォルト）- [Swagger UI](https://swagger.io/tools/swagger-ui/)
+は一切読み込まれません。`true` にするとクライアントサイドで読み込まれ、
+`::: openapi src="..."` コンテンツブロックを参照先の OpenAPI/Swagger 仕様
+（JSON または YAML）に対するインタラクティブなウィジェットとしてレンダリ
+ングします。構文については
+[コンテンツブロック](guides/content-blocks.md#openapi--swagger) を参照して
+ください。
+
+```json title="bxsites.json"
+{ "openapi": true }
+```
+
 ## `plugins`
 
 `[]`（デフォルト）- プラグインとして有効化する BoxLang モジュール名の配列。

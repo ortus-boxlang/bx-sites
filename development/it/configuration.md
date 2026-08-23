@@ -585,6 +585,20 @@ blocchi di codice delimitati sono sempre disponibili nel markdown di ogni
 pagina, senza bisogno di configurazione - vedi
 [Estensioni Markdown](guides/markdown.md#admonitions).
 
+## `openapi`
+
+`false` (il valore predefinito) - nessun
+[Swagger UI](https://swagger.io/tools/swagger-ui/) distribuito. `true` lo
+carica lato client e renderizza ogni blocco di contenuto
+`::: openapi src="..."` come widget interattivo per la specifica
+OpenAPI/Swagger referenziata (JSON o YAML). Vedi
+[Blocchi di contenuto](guides/content-blocks.md#openapi--swagger) per la
+sintassi.
+
+```json title="bxsites.json"
+{ "openapi": true }
+```
+
 ## `plugins`
 
 `[]` (il valore predefinito) - un array di nomi di moduli BoxLang da

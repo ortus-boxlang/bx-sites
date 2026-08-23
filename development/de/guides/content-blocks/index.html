@@ -40,6 +40,8 @@
 
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 
+	<link rel="stylesheet" href="/bx-sites/development/de/assets/vendor/swagger-ui/swagger-ui.css">
+
 	<script>window.__BXSITES_BASE_PATH__ = "/bx-sites/development/de/";</script>
 	<script src="/bx-sites/development/de/assets/vendor/lunr/lunr.min.js"></script>
 	<script src="/bx-sites/development/de/assets/search.js" defer></script>
@@ -84,7 +86,7 @@
 
 					<h1 class="page-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M112,56v48a8,8,0,0,1-8,8H56a8,8,0,0,1-8-8V56a8,8,0,0,1,8-8h48A8,8,0,0,1,112,56Zm88-8H152a8,8,0,0,0-8,8v48a8,8,0,0,0,8,8h48a8,8,0,0,0,8-8V56A8,8,0,0,0,200,48Zm-96,96H56a8,8,0,0,0-8,8v48a8,8,0,0,0,8,8h48a8,8,0,0,0,8-8V152A8,8,0,0,0,104,144Zm96,0H152a8,8,0,0,0-8,8v48a8,8,0,0,0,8,8h48a8,8,0,0,0,8-8V152A8,8,0,0,0,200,144Z" opacity="0.2"/><path d="M200,136H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,200,136Zm0,64H152V152h48v48ZM104,40H56A16,16,0,0,0,40,56v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,104,40Zm0,64H56V56h48v48Zm96-64H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,200,40Zm0,64H152V56h48v48Zm-96,32H56a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,104,136Zm0,64H56V152h48v48Z"/></svg></span> Content-Bl&ouml;cke</h1>
 <div class="page-tags mb-3"><a class="page-tag" href="/bx-sites/development/de/tags/index.html#tag-anleitungen">anleitungen</a><a class="page-tag" href="/bx-sites/development/de/tags/index.html#tag-markdown">markdown</a><a class="page-tag" href="/bx-sites/development/de/tags/index.html#tag-gitbook">gitbook</a></div>
-<details class="bxsites-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">On this page</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#expandable">Expandable</a></li><li class="toc-level-2"><a href="#cards">Cards</a></li><li class="toc-level-2"><a href="#columns">Columns</a></li><li class="toc-level-2"><a href="#stepper">Stepper</a></li><li class="toc-level-2"><a href="#file">File</a></li><li class="toc-level-2"><a href="#embed">Embed</a></li><li class="toc-level-2"><a href="#page-link">Page Link</a></li><li class="toc-level-2"><a href="#link-preview">Link Preview</a></li><li class="toc-level-2"><a href="#updates-changelog">Updates (Changelog)</a></li><li class="toc-level-2"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte (Includes)</a></li></ul></details>
+<details class="bxsites-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">On this page</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#expandable">Expandable</a></li><li class="toc-level-2"><a href="#cards">Cards</a></li><li class="toc-level-2"><a href="#columns">Columns</a></li><li class="toc-level-2"><a href="#stepper">Stepper</a></li><li class="toc-level-2"><a href="#file">File</a></li><li class="toc-level-2"><a href="#embed">Embed</a></li><li class="toc-level-2"><a href="#openapi--swagger">OpenAPI / Swagger</a></li><li class="toc-level-2"><a href="#page-link">Page Link</a></li><li class="toc-level-2"><a href="#link-preview">Link Preview</a></li><li class="toc-level-2"><a href="#updates-changelog">Updates (Changelog)</a></li><li class="toc-level-2"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte (Includes)</a></li></ul></details>
 					<h1 id="content-blöcke"><a href="#content-blöcke" id="content-blöcke" name="content-blöcke" class="anchor"></a>Content-Blöcke</h1>
 <p>Zusätzlich zu allem in <a href="/bx-sites/development/de/guides/markdown/index.html">Markdown-Erweiterungen</a> unterstützt
 BX Sites eine Familie von GitBook-artigen Content-Blöcken - für sich
@@ -202,6 +204,36 @@ blockieren das Einbetten in Frames):</p>
 :::
 </code></pre>
 <div class="bxsites-embed"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><div class="bxsites-embed__caption">A demo</div>
+<h2 id="openapi--swagger"><a href="#openapi--swagger" id="openapi--swagger" name="openapi--swagger" class="anchor"></a>OpenAPI / Swagger</h2>
+<p>Ein interaktives <a href="https://swagger.io/tools/swagger-ui/">Swagger-UI</a>-Widget
+für eine OpenAPI-/Swagger-Spezifikation - <code>src</code> wird auf dieselbe, relativ
+zu <code>docs/assets/</code> aufgelöste Weise interpretiert wie das <code>src</code> von
+<code>::: file</code>. Sowohl JSON- als auch YAML-Spezifikationen funktionieren;
+Swagger UI parst beide vollständig clientseitig - nirgendwo in diesem
+Modul findet eine serverseitige OpenAPI-Verarbeitung statt. Erfordert,
+dass <code>bxsites.json</code>s <a href="/bx-sites/development/de/configuration/index.html#openapi"><code>openapi</code></a> auf <code>true</code>
+gesetzt ist - ist das nicht der Fall, wird dieser Platzhalter zwar
+gerendert, bleibt aber inaktiv (Swagger UIs eigenes JS/CSS wird dann
+überhaupt nicht nach <code>site/</code> kopiert, sodass der Build jedes anderen
+Projekts genauso klein bleibt wie vor diesem Feature):</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="Beispiel"><code class="language-markdown">::: openapi src=&quot;assets/openapi/example.yaml&quot; title=&quot;Bookshelf API&quot;
+:::
+</code></pre>
+<div class="bxsites-openapi" data-openapi-src="/bx-sites/development/de/assets/openapi/example.yaml"><div class="bxsites-openapi__title">Bookshelf API</div></div>
+<p>Das Widget oben ist genau diese Seite, live, und rendert die kleine
+Beispielspezifikation, die dieser Guide unter
+<code>docs/assets/openapi/example.yaml</code> mitliefert - öffne sie im eigenen
+Projekt unter <code>docs/assets/</code> (oder richte <code>src</code> auf die bereits vorhandene
+eigene Spezifikation), um dasselbe mit der eigenen API zu sehen.</p>
+<p>Vendort ist nur <code>SwaggerUIBundle</code>s eigenes Basis-Layout - keine
+Topbar/&quot;Explore&quot;-Leiste, über die eine andere Spezifikation eingetippt
+werden könnte (ein <code>::: openapi</code>-Block soll immer genau die eine
+Spezifikation zeigen, auf die seine Autorin ihn gerichtet hat), sodass
+jede Operation samt ihrer Request-/Response-Schemas und &quot;Try it out&quot; (das
+die eigene <code>servers[0].url</code> der Spezifikation direkt aus dem Browser der
+Besucherin aufruft - dort muss CORS für den Docs-Host erlaubt sein) direkt
+aus der bestehenden Spezifikation gerendert wird, ohne dass etwas
+umgeschrieben werden muss.</p>
 <h2 id="page-link"><a href="#page-link" id="page-link" name="page-link" class="anchor"></a>Page Link</h2>
 <p>Eine ausführliche Vorschau-Card, die zu einer anderen Seite verlinkt -
 <code>href</code> folgt derselben dateirelativen Konvention wie ein gewöhnlicher
@@ -299,7 +331,7 @@ zirkuläre Kette wirft zur Build-Zeit <code>BxSites.CircularInclude</code>, stat
 endlos zu laufen).
 </content></p>
 
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/content-blocks.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/de/guides/content-blocks.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 2:17:28 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/content-blocks.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/de/guides/content-blocks.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 8:29:19 PM</span></div>
 				</article>
 
 				<nav class="page-nav d-flex justify-content-between" aria-label="Page navigation">
@@ -315,7 +347,7 @@ endlos zu laufen).
 			</main>
 
 			<aside class="col-xl-2 toc-sidebar d-none d-xl-block">
-				<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#expandable">Expandable</a></li><li class="toc-level-2"><a href="#cards">Cards</a></li><li class="toc-level-2"><a href="#columns">Columns</a></li><li class="toc-level-2"><a href="#stepper">Stepper</a></li><li class="toc-level-2"><a href="#file">File</a></li><li class="toc-level-2"><a href="#embed">Embed</a></li><li class="toc-level-2"><a href="#page-link">Page Link</a></li><li class="toc-level-2"><a href="#link-preview">Link Preview</a></li><li class="toc-level-2"><a href="#updates-changelog">Updates (Changelog)</a></li><li class="toc-level-2"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte (Includes)</a></li></ul></nav>
+				<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#expandable">Expandable</a></li><li class="toc-level-2"><a href="#cards">Cards</a></li><li class="toc-level-2"><a href="#columns">Columns</a></li><li class="toc-level-2"><a href="#stepper">Stepper</a></li><li class="toc-level-2"><a href="#file">File</a></li><li class="toc-level-2"><a href="#embed">Embed</a></li><li class="toc-level-2"><a href="#openapi--swagger">OpenAPI / Swagger</a></li><li class="toc-level-2"><a href="#page-link">Page Link</a></li><li class="toc-level-2"><a href="#link-preview">Link Preview</a></li><li class="toc-level-2"><a href="#updates-changelog">Updates (Changelog)</a></li><li class="toc-level-2"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte (Includes)</a></li></ul></nav>
 			</aside>
 
 		</div>
@@ -348,6 +380,9 @@ endlos zu laufen).
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 	<script src="/bx-sites/development/de/assets/math-init.js"></script>
+
+	<script src="/bx-sites/development/de/assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
+	<script src="/bx-sites/development/de/assets/openapi-init.js"></script>
 
 	<script src="/bx-sites/development/de/assets/bundle.2cdc90bf.js" defer></script>
 </body>
