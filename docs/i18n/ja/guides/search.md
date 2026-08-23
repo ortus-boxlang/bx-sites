@@ -1,7 +1,7 @@
 ---
 title: 検索
 order: 2
-tags: [guides, search]
+tags: [ガイド, 検索]
 ---
 
 # 検索

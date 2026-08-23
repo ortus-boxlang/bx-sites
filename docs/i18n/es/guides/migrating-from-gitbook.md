@@ -1,6 +1,7 @@
 ---
 title: Migrar desde GitBook
 order: 7
+icon: phosphor-duotone:swap
 tags: [guías, migración, gitbook]
 ---
 
@@ -12,7 +13,7 @@ sincronización en disco de GitBook (el mismo que escribe GitHub/Git
 Sync) - en un árbol `docs/` de bx-sites, en un solo comando. Todo lo que
 admite el sistema de bloques de contenido de GitBook se corresponde con
 algo que bx-sites ya tiene (consulta
-[Extensiones de Markdown](markdown.md#gitbook-style-blocks)), así que el
+[Bloques de Contenido](content-blocks.md)), así que el
 resultado no es un borrador aproximado - es un sitio funcional.
 
 ## Obtener una exportación de GitBook
@@ -68,15 +69,15 @@ exportación de origen y volver a ejecutarlo.
 | `README.md` (cualquier carpeta) | `index.md` - la propia convención de índice de carpeta de bx-sites |
 | El frontmatter `title`/`description`/`tags` de una página | Se traslada sin cambios al propio frontmatter de bx-sites del archivo migrado |
 | `.gitbook/assets/**` | `docs/assets/gitbook/**`, con cada referencia reescrita para que coincida |
-| `{% hint style="..." %}` | `!!! type` - una [admonición](markdown.md#admonitions) nativa |
-| `{% tabs %}` / `{% tab title="..." %}` | `=== "Title"` - [pestañas de contenido](markdown.md#content-tabs) nativas |
-| `{% cards %}` / `{% card %}` | [`::: cards` / `::: card`](markdown.md#cards) |
-| `{% columns %}` / `{% column width="..." %}` | [`::: columns` / `::: column`](markdown.md#columns) |
-| `{% stepper %}` / `{% step %}` | [`::: stepper` / `::: step`](markdown.md#stepper) - el título se toma del propio primer encabezado del paso |
-| `{% file src="..." %}` | [`::: file`](markdown.md#file) |
-| `{% embed url="..." %}` | [`::: embed`](markdown.md#embed) |
-| `{% content-ref url="..." %}` | [`::: page-link`](markdown.md#page-link) |
-| `{% details %}` / `{% expand %}` | [`::: expandable`](markdown.md#expandable) |
+| `{% hint style="..." %}` | `!!! type` - una [admonición](markdown.md#admoniciones) nativa |
+| `{% tabs %}` / `{% tab title="..." %}` | `=== "Title"` - [pestañas de contenido](markdown.md#pestañas-de-contenido) nativas |
+| `{% cards %}` / `{% card %}` | [`::: cards` / `::: card`](content-blocks.md#tarjetas) |
+| `{% columns %}` / `{% column width="..." %}` | [`::: columns` / `::: column`](content-blocks.md#columnas) |
+| `{% stepper %}` / `{% step %}` | [`::: stepper` / `::: step`](content-blocks.md#stepper) - el título se toma del propio primer encabezado del paso |
+| `{% file src="..." %}` | [`::: file`](content-blocks.md#archivo) |
+| `{% embed url="..." %}` | [`::: embed`](content-blocks.md#incrustación) |
+| `{% content-ref url="..." %}` | [`::: page-link`](content-blocks.md#enlace-de-página) |
+| `{% details %}` / `{% expand %}` | [`::: expandable`](content-blocks.md#expandible) |
 
 Un bloque mostrado como un ejemplo literal en fence en tu contenido de
 GitBook (en lugar de usarse de verdad) se deja correctamente intacto, sin
@@ -108,7 +109,7 @@ frontmatter exportado de un proyecto realmente tiene un campo `icon`,
 mayoría de las exportaciones reales. Establece los iconos a mano después
 en su lugar - ya sea el propio frontmatter de una página, o el
 [propio `icon` de una entrada de `docs/nav.json`](../configuration.md#nav)
-- usando un [icono con nombre](themes.md#icons) de una de las ocho
+- usando un [icono con nombre](themes.md#iconos) de una de las ocho
 bibliotecas incluidas (sin necesidad de hacer coincidir los propios
 iconos basados en Font Awesome de GitBook; elige el nombre que se vea
 mejor en la propia galería de [Phosphor](https://phosphoricons.com/)

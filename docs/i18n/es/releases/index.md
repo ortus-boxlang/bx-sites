@@ -1,6 +1,7 @@
 ---
 title: Política de Lanzamientos
 order: 6
+icon: phosphor-duotone:tag
 ---
 
 # Política de Lanzamientos

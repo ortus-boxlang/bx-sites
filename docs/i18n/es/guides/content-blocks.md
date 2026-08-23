@@ -1,0 +1,321 @@
+---
+title: Bloques de Contenido
+order: 4.5
+icon: phosphor-duotone:squares-four
+summary: Cuadrículas de tarjetas, columnas, un stepper, tarjetas de archivo/incrustación/vista previa, un registro de cambios y contenido reutilizable.
+tags: [guías, markdown, gitbook]
+---
+
+# Bloques de Contenido
+
+Además de todo lo que hay en [Extensiones de Markdown](markdown.md), BX
+Sites admite una familia de bloques de contenido al estilo GitBook -
+útiles por sí mismos, y la razón por la que el contenido de un sitio de
+GitBook es sencillo de migrar: cada uno de estos se corresponde
+directamente con un bloque de GitBook del mismo nombre. Cada uno usa la
+misma sintaxis de contenedor `::: name ... :::` (un `:::` solo en su
+propia línea cierra el bloque que esté abierto en ese momento) - sin
+necesidad de configuración en `bxsites.json`, siempre disponible. Un
+bloque puede anidarse dentro de otro (un expandible que contiene un
+grupo de tarjetas, por ejemplo) - cada uno se vuelve a analizar en busca
+de más bloques dentro de su propio contenido.
+
+## Expandible
+
+Una sección colapsable simple - sin icono/color de aviso, a diferencia de
+una admonición colapsable (`???`, consulta
+[Admoniciones](markdown.md#admoniciones-colapsables)):
+
+```markdown title="Example" linenums="1"
+::: expandable "Is this different from a collapsible admonition?"
+Yes - this has no type/icon/color, just a plain expand/collapse section.
+Add `open="true"` to start it expanded.
+:::
+```
+
+::: expandable "¿Es esto diferente de una admonición colapsable?"
+Sí - esto no tiene tipo/icono/color, solo una sección simple de
+expandir/colapsar. Añade `open="true"` para que empiece expandida.
+:::
+
+## Tarjetas
+
+Una cuadrícula de tarjetas de enlace, cada una su propia `::: card`
+dentro de un envoltorio `::: cards` - `title`, `icon`, `image` y `href`
+son todos opcionales (una tarjeta sin `href` se renderiza como una
+tarjeta simple, no clicable). `icon` se resuelve de la misma forma que
+los valores `icon` de frontmatter/nav - un emoji sencillo, o un icono con
+nombre de una biblioteca incluida (`icon="phosphor-duotone:rocket-launch"`,
+`icon="lucide:rocket"`, ...) - consulta [Temas: Iconos](themes.md#iconos):
+
+```markdown title="Example" linenums="1"
+::: cards
+::: card title="Getting Started" icon="phosphor-duotone:rocket-launch" href="../getting-started.md"
+Install, scaffold and build your first site.
+:::
+::: card title="Themes" icon="phosphor-duotone:palette" href="themes.md"
+Customize a built-in theme or write your own.
+:::
+:::
+```
+
+::: cards
+::: card title="Primeros Pasos" icon="phosphor-duotone:rocket-launch" href="../getting-started.md"
+Instala, crea la estructura y construye tu primer sitio.
+:::
+::: card title="Temas" icon="phosphor-duotone:palette" href="themes.md"
+Personaliza un tema incorporado o escribe el tuyo propio.
+:::
+:::
+
+## Columnas
+
+Un diseño lado a lado - `::: column` acepta un `width` opcional (una
+longitud/porcentaje CSS simple, por ejemplo `"40%"`); las columnas sin un
+ancho explícito comparten la fila equitativamente:
+
+```markdown title="Example" linenums="1"
+::: columns
+::: column width="60%"
+The wider column.
+:::
+::: column
+The narrower one.
+:::
+:::
+```
+
+::: columns
+::: column width="60%"
+La columna más ancha.
+:::
+::: column
+La más estrecha.
+:::
+:::
+
+## Stepper
+
+Una secuencia numerada y conectada de pasos:
+
+```markdown title="Example" linenums="1"
+::: stepper
+::: step "Install"
+`install-bx-module bx-sites`
+:::
+::: step "Scaffold"
+`boxlang module:bxSites new`
+:::
+:::
+```
+
+::: stepper
+::: step "Instalar"
+`install-bx-module bx-sites`
+:::
+::: step "Crear estructura"
+`boxlang module:bxSites new`
+:::
+:::
+
+El atributo `color` opcional de un paso marca su indicador con uno de
+cuatro colores semánticos - el predeterminado (sin `color`), `success`,
+`warning` o `danger` - independientemente de la posición del paso en la
+secuencia:
+
+```markdown title="Example" linenums="1"
+::: stepper
+::: step "Back up your data" color="success"
+Routine, safe to run any time.
+:::
+::: step "Optional: enable telemetry" color="warning"
+Skip this one if you're not sure.
+:::
+::: step "Delete the old install" color="danger"
+Irreversible - make sure the backup above finished first.
+:::
+:::
+```
+
+::: stepper
+::: step "Respalda tus datos" color="success"
+Rutinario, seguro de ejecutar en cualquier momento.
+:::
+::: step "Opcional: activar telemetría" color="warning"
+Omite este paso si no estás seguro.
+:::
+::: step "Elimina la instalación anterior" color="danger"
+Irreversible - asegúrate de que el respaldo anterior haya terminado primero.
+:::
+:::
+
+El indicador numerado, la línea de conexión y cada una de las tres
+paletas de `color` de arriba se pueden personalizar de forma
+independiente al resto de la paleta del sitio, mediante propiedades CSS
+personalizadas - consulta
+[Personalizar colores](themes.md#personalizar-colores-sin-sobrescribir-un-tema).
+
+## Archivo
+
+Una tarjeta de descarga para un PDF, video, o cualquier otro recurso del
+proyecto - `src` se resuelve de la misma forma que ya lo hacen
+`theme.logo`/el `ogImage` del frontmatter (relativo a `docs/assets/`):
+
+```markdown title="Example" linenums="1"
+::: file src="assets/spec.pdf" title="API Specification"
+:::
+```
+
+::: file src="assets/og-image.png" title="Imagen de vista previa del sitio"
+:::
+
+## Incrustación
+
+Una incrustación de iframe responsiva para un proveedor reconocido -
+actualmente YouTube, Vimeo, CodePen, Spotify, Loom y Figma. Una URL de
+cualquier otro lugar recurre a una simple tarjeta de enlace "visit ↗" en
+lugar de un iframe que simplemente se negaría a renderizarse (la mayoría
+de los sitios bloquean ser incrustados en un frame):
+
+```markdown title="Example" linenums="1"
+::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
+:::
+```
+
+::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="Una demostración"
+:::
+
+## Enlace de página
+
+Una tarjeta de vista previa enriquecida que enlaza a otra página - `href`
+sigue la misma convención relativa a archivos que un
+[enlace de página](../getting-started.md#enlazar-entre-páginas)
+ordinario. A diferencia de una tarjeta, su título/icono/resumen se
+extraen automáticamente del propio frontmatter de la página de destino,
+así que se mantiene sincronizado si esa página se renombra o cambia su
+resumen:
+
+```markdown title="Example" linenums="1"
+::: page-link href="../getting-started.md"
+:::
+```
+
+::: page-link href="../getting-started.md"
+:::
+
+## Vista previa de enlace
+
+Una tarjeta de vista previa enriquecida para una URL *externa* - la
+misma forma de tarjeta que `::: page-link`, pero para un enlace que no
+es una de las propias páginas de este sitio, así que no hay ninguna
+página de la que extraer automáticamente un título/resumen. Cada campo
+proviene de los propios atributos de la directiva: solo `url` es
+obligatorio, `title` recurre a la URL desnuda cuando se omite, y
+`description`/`image` son ambos opcionales. No hay ninguna obtención en
+el momento de la construcción de la URL de destino para autocompletar
+estos campos - el mismo razonamiento que mantiene a
+[`check`](../cli-reference.md) limitado solo a enlaces internos se
+aplica también aquí, de modo que un sitio de terceros lento o
+inalcanzable nunca afecta al tiempo de construcción:
+
+```markdown title="Example" linenums="1"
+::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
+:::
+```
+
+::: link-preview url="https://boxlang.io" title="BoxLang" description="Un lenguaje JVM dinámico y multiparadigma." image="https://boxlang.io/og.png"
+:::
+
+## Novedades (registro de cambios)
+
+Una lista de registro de cambios con fecha y etiquetable - `::: update`
+acepta `date="YYYY-MM-DD"` y unas `tags` opcionales separadas por comas:
+
+```markdown title="Example" linenums="1"
+::: updates
+::: update date="2026-01-15" tags="feature,fix"
+Added dark mode and fixed a footer alignment bug.
+:::
+::: update date="2026-01-01"
+Initial release.
+:::
+:::
+```
+
+::: updates
+::: update date="2026-01-15" tags="feature,fix"
+Se añadió el modo oscuro y se corrigió un error de alineación en el pie
+de página.
+:::
+::: update date="2026-01-01"
+Lanzamiento inicial.
+:::
+:::
+
+Una página con un bloque `::: updates` también obtiene su propio
+`feed.xml` (RSS 2.0) escrito junto a ella en cuanto `baseURL` de
+`bxsites.json` es una URL completa - el mismo requisito que
+`sitemap.xml` - de modo que los lectores puedan suscribirse solo al
+registro de cambios de esa página.
+
+## Contenido reutilizable (inclusiones)
+
+`::: include src="..."` empalma el Markdown en bruto de otro archivo en
+ese punto. A diferencia de todos los bloques anteriores, esto se
+convierte en contenido de página real (encabezados, párrafos, sus
+propios bloques anidados), no algo envuelto en un widget - útil para una
+advertencia/aviso repetido en varias páginas. Coloca el propio parcial
+bajo `docs/includes/` - la misma convención de carpeta reservada que
+`assets/`/`versions/`/`i18n/`/`blog/`. Un archivo bajo `includes/` nunca
+se construye como su propia página y nunca aparece en la
+navegación/búsqueda/sitemap/etiquetas - solo existe para empalmarse en
+otras páginas:
+
+```text title="Estructura de docs/"
+docs/
+├── index.md
+├── includes/
+│   ├── beta-notice.md
+│   └── legal/
+│       └── terms.md
+└── guides/
+    └── deep/
+        └── setup.md
+```
+
+Un `src` **simple** (sin `./` ni `../` iniciales) siempre se resuelve
+contra el propio `docs/includes/` del árbol actual, sin importar cuán
+anidada esté la página que lo incluye - `guides/deep/setup.md` de arriba
+llega al mismo archivo que `index.md`, ambos con exactamente el mismo
+`src`:
+
+```markdown title="Desde index.md o desde guides/deep/setup.md, indistintamente"
+::: include src="beta-notice.md"
+```
+
+Un `src` simple también puede apuntar a una subcarpeta del propio
+`includes/`:
+
+```markdown title="Example"
+::: include src="legal/terms.md"
+```
+
+Antepón `./` o `../` a `src` en su lugar para llegar a un fragmento
+adyacente a la página que no está pensado para vivir en el `includes/`
+centralizado - esa forma se resuelve relativa al archivo, respecto a la
+propia carpeta de la página *que incluye*, la misma convención que un
+enlace de página ordinario:
+
+```markdown title="Desde guides/deep/setup.md, un nivel arriba en lugar de centralizado"
+::: include src="../local-note.md"
+```
+
+Un árbol de versión/idioma obtiene su propio `includes/` de la misma
+forma - una página bajo `docs/versions/2.0/` resuelve un `src` simple
+contra `docs/versions/2.0/includes/`, y una bajo `docs/i18n/es/` contra
+`docs/i18n/es/includes/` - los parciales de cada árbol son propios, no
+se comparten con el `docs/includes/` del árbol principal.
+
+Un archivo incluido puede a su vez incluir otro (una cadena circular
+lanza `BxSites.CircularInclude` en el momento de la construcción en
+lugar de entrar en un bucle infinito).

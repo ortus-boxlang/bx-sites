@@ -1,35 +1,54 @@
 ---
 title: Markdown 拡張機能
 order: 4
-tags: [guides, markdown]
+tags: [ガイド, markdown]
 ---
 
 # Markdown 拡張機能
 
-標準 Markdown に加えて、BX Sites はデフォルトで bx-markdown のネイティブ Flexmark 拡張機能を
-3 つ有効にします（Admonition、脚注、定義リスト）。さらに、BX Sites 独自の Mermaid ダイアグラム統合も提供します。
-これらはすべて [`bxsites.json` の `markdown`/`mermaid` キー](../configuration.md#markdown) で設定できます。
+標準 Markdown に加えて、BX Sites は bx-markdown のネイティブ Flexmark 拡張機能を
+デフォルトで 3 つ有効にします - Admonition、脚注、定義リストです - さらに独自の
+Mermaid ダイアグラム統合も備えています。この 4 つはすべて
+[`bxsites.json` の `markdown`/`mermaid` キー](../configuration.md#markdown)
+から設定できます。
 
-BX Sites はさらに 3 つの独自拡張機能を実装しています（Flexmark には概念すらないもの）:
-コンテンツタブ、数式、フェンスコードの `hl_lines`/`linenums`/`title` アノテーション。
-bx-sites は bx-markdown のパーサーをフォークできないため、これらはそれぞれ
-通常の Markdown 変換の前後処理パスとして動作します。
+これらに加えて、BX Sites は Flexmark がまったく概念すら持たない、独自の拡張機能を
+さらに 3 つ実装しています - コンテンツタブ、数式、そしてフェンスコードの
+`hl_lines`/`linenums`/`title` アノテーションです。bx-sites は bx-markdown の
+パーサーをフォークできないため、それぞれが通常の Markdown 変換の前後に
+挟まる前処理/後処理パスとして動作します - 詳細は下記の各セクションを参照してください。
+
+```mermaid
+flowchart LR
+    A["生の Markdown"] --> B["前処理:\nタブの抽出、数式の保護、\nコードアノテーションの除去"]
+    B --> C["Markdown()\n(bx-markdown)"]
+    C --> D["後処理:\nタブの復元、数式の復元、\nコードアノテーションの適用"]
+    D --> E["最終ページ HTML"]
+```
 
 ## Admonition
 
-コールアウト/注意書きボックス - デフォルトで有効、`bxsites.json` の設定不要:
+コールアウト/注意書きボックス - デフォルトで有効、`bxsites.json` の設定は不要です:
 
-```markdown
+```markdown title="Example" linenums="1"
 !!! note "ご注意"
-    これは Admonition です。**太字**、`コード`、[リンク](../index.md)、
-    リストなど、通常の Markdown がすべて使えます。
+    これは Admonition です。内容は通常の Markdown です - **太字**、
+    `コード`、[リンク](../index.md)、リストなど、すべて普段どおりに使えます。
 ```
 
-`note` のような型がボックスのアイコン/色になり、明示的な `"タイトル"` を指定しない場合は
-その型の名前が大文字化されたものが使われます。多くの同義語が 12 の標準型に解決されます:
+次のようにレンダリングされます:
+
+!!! note "ご注意"
+    これは Admonition です。内容は通常の Markdown です - **太字**、
+    `コード`、[リンク](../index.md)、リストなど、すべて普段どおりに使えます。
+
+型（上記の `note`）がボックスのアイコン/色になり、明示的な `"タイトル"` を
+指定しない場合はその型自身の名前が大文字化されたものが使われます。多くの
+一般的な同義語が、それぞれ独自のアクセントカラーを持つ同じ 12 の標準型に
+解決されます:
 
 !!! note "note"
-    青 - このリストにない型のフォールバック。
+    青 - このリストにない型のフォールバックでもあります。
 
 !!! abstract "abstract / summary / tldr"
     薄い青。
@@ -43,21 +62,39 @@ bx-sites は bx-markdown のパーサーをフォークできないため、こ�
 !!! success "success / check / done"
     緑。
 
+!!! faq "question / help / faq"
+    ライム。
+
 !!! warning "warning / caution / attention"
     オレンジ。
+
+!!! fail "failure / fail / missing"
+    薄い赤。
 
 !!! danger "danger / error"
     赤。
 
+!!! bug "bug"
+    ピンク。
+
+!!! example "example"
+    紫。
+
+!!! quote "quote / cite"
+    グレー。
+
 本文は 4 スペース（またはタブ）でインデントしたままにする必要があります。
-空行はブロック内で使用できます（段落の区切りとして機能します）。
+インデントされておらず、かつ空行でもない最初の行でブロックが終了します。
+空行はブロック*内*では問題ありません - Markdown の他の場所とまったく同じく、
+単に新しい段落が始まるだけです。
 
 ### 折りたたみ可能な Admonition
 
-型の前に `???` を付けると折りたたみ可能なブロックになります（`???` は折りたたまれた状態で、
-`???+` は展開された状態で開始します）。見出しをクリックして切り替えられます:
+`!!!` の代わりに型の前に `???` を付けると折りたたみ可能なブロックになります -
+`???` は折りたたまれた状態で始まり、`???+` は展開された状態で始まります。
+どちらの場合も見出しをクリックして切り替えられます:
 
-```markdown
+```markdown title="Example" linenums="1"
 ??? tip "クリックして展開"
     これは折りたたまれた状態で始まります。
 
@@ -65,26 +102,38 @@ bx-sites は bx-markdown のパーサーをフォークできないため、こ�
     これは展開された状態で始まります。
 ```
 
+??? tip "クリックして展開"
+    これは折りたたまれた状態で始まります。
+
+???+ tip "クリックして折りたたむ"
+    これは展開された状態で始まります。
+
 `{"markdown":{"enableAdmonition":false}}` で Admonition を完全に無効にできます。
 
 ## 脚注
 
-`[^label]` でインライン脚注を参照し、`[^label]: text` でどこにでもテキストを定義します:
+`[^label]` でインライン脚注を参照し、`[^label]: text` でドキュメント内の
+どこにでもそのテキストを定義できます:
 
-```markdown
+```markdown title="Example" linenums="1"
 これは裏付けが必要な主張です[^1]。
 
 [^1]: これがその裏付けです。
 ```
 
-脚注の定義はソース内のどこに書かれていても、ページの下部に番号付きリストとして集められてレンダリングされます。
-デフォルトでは無効です。`{"markdown":{"enableFootnotes":true}}` で有効にします。
+これは裏付けが必要な主張です[^1]。
+
+[^1]: これがその裏付けです。
+
+脚注の定義は、ソース内のどこに書かれていても、ページ下部に番号付きリストとして
+集められてレンダリングされます。デフォルトでは無効です -
+`{"markdown":{"enableFootnotes":true}}` で有効にします。
 
 ## 定義リスト
 
 用語行とそれに続く 1 つ以上の `:   ` 説明行が `<dl>` になります:
 
-```markdown
+```markdown title="Example" linenums="1"
 用語
 :   その定義。
 
@@ -93,14 +142,23 @@ bx-sites は bx-markdown のパーサーをフォークできないため、こ�
 :   2 番目の定義。
 ```
 
-デフォルトでは無効です。`{"markdown":{"enableDefinitionLists":true}}` で有効にします。
+用語
+:   その定義。
+
+2 番目の用語
+:   最初の定義。
+:   2 番目の定義。
+
+デフォルトでは無効です - `{"markdown":{"enableDefinitionLists":true}}` で
+有効にします。
 
 ## コンテンツタブ
 
-異なる言語やプラットフォームの代替コンテンツを、クリック可能なタブでグループ化します。
-`=== "タイトル"` を使って、Admonition の本文と同じようにインデントします（4 スペースまたはタブ）:
+異なる言語やプラットフォームの代替コンテンツを、クリック可能な一連のタブに
+まとめます。`=== "タイトル"` を使い、Admonition の本文と同じ方法で
+インデントします（4 スペースまたはタブ）:
 
-```markdown
+```markdown title="Example" linenums="1"
 === "Java"
     ```java
     System.out.println( "Hi" );
@@ -112,13 +170,30 @@ bx-sites は bx-markdown のパーサーをフォークできないため、こ�
     ```
 ```
 
-`bxsites.json` の設定不要 - 常に有効です。
+次のようにレンダリングされます:
+
+=== "Java"
+    ```java
+    System.out.println( "Hi" );
+    ```
+
+=== "BoxLang"
+    ```bx
+    println( "Hi" )
+    ```
+
+連続した `=== "..."` ブロック（間に空行が最大 1 行まで）は 1 つのタブ
+グループを形成します。タブ自身の内容は完全な Markdown です - コードフェンス、
+リスト、Admonition など、他のどこにでも書けるものが使えます。`bxsites.json`
+の設定は不要 - 常に有効です。
 
 ## コードブロック
 
-フェンスコードブロックはクライアントサイドで構文ハイライトされます（highlight.js）。
-設定不要です。開き ` ``` ` の後の言語識別子でグラマーを選択します。
-BX Sites は `bx`/`boxlang`/`bxs`/`bxm`/`cfscript` で独自の軽量 BoxLang グラマーを登録しています:
+フェンスコードブロックはクライアントサイドで構文ハイライトされます
+（highlight.js）。設定は不要です - 開きの ` ``` ` の後の言語識別子でグラマーが
+選択されます（例: ` ```json `）。highlight.js 自身が同梱する言語に加えて、
+BX Sites は `bx`/`boxlang`/`bxs`/`bxm`/`cfscript` 用に独自の軽量な BoxLang
+グラマーを登録しています:
 
 ```bx
 class {
@@ -134,7 +209,8 @@ class {
 
 ### 行番号、ハイライト行、タイトル
 
-フェンスの情報文字列に `linenums`、`hl_lines`、`title` を追加します（任意の組み合わせ、すべて省略可）:
+フェンスの情報文字列に `linenums`、`hl_lines`、`title` を追加します
+（任意の組み合わせで、すべて省略可能です）:
 
 ````markdown
 ```bx hl_lines="2" linenums="1" title="add.bx"
@@ -144,14 +220,25 @@ numeric function add( required numeric a, required numeric b ) {
 ```
 ````
 
-`linenums="N"` は `N` からガターのカウントを開始します。`hl_lines` はスペース区切りの行番号と
-範囲（`"2 4-6"`）を受け取り、`linenums` がどこから始まるかに関係なくブロックの先頭からカウントします。
-`title` はブロックの上に小さなタイトルバーを追加します。設定不要 - 常に使用できます。
+次のようにレンダリングされます:
 
-### 差分マーカーとターミナル風フレーム
+```bx hl_lines="2" linenums="1" title="add.bx"
+numeric function add( required numeric a, required numeric b ) {
+	return a + b
+}
+```
 
-`insert`/`delete` を追加すると、追加/削除された行を示せます（`hl_lines` と同じスペース区切りの
-行番号/範囲構文）。色付きの行と `+`/`–` のガターマーカーで表示されます:
+`linenums="N"` はガターのカウントを `N` から開始します。`hl_lines` は
+スペース区切りの行番号や範囲（`"2 4-6"`）を受け取ってハイライトし、
+`linenums` がどこから始まるかに関係なく、ブロックの先頭からカウントします。
+`title` はブロックの上に小さなタイトルバーを追加します。`bxsites.json`
+の設定は不要 - 常に使用できます。
+
+### 差分マーカーとターミナルフレーム
+
+`insert`/`delete` を追加すると、追加/削除された行を示せます - `hl_lines`
+がすでに使っているのと同じ、スペース区切りの行番号/範囲構文です - 色付きの
+行と `+`/`–` のガターマーカーとして表示されます:
 
 ````markdown
 ```bx title="add.bx" insert="3-4" delete="7"
@@ -164,12 +251,27 @@ numeric function add( required numeric a, required numeric b ) {
 ```
 ````
 
-省略せずに `insert`/`delete` と書きます（`ins`/`del` ではありません）。リテラルな `+`/`-` の行プレフィックス
-ではなく属性として扱うため、フェンスの内容は本物のコピー可能なソースコードのままです。`linenums` と組み合わせても
-問題なく、両方が有効な場合はガターマーカーが行番号の列を避けて右にずれます。
+次のようにレンダリングされます:
 
-`frame="terminal"` を追加すると、プレーンなタイトルバーの代わりに macOS 風のターミナルウィンドウ
-（3 つのステータスドット、中央揃えのタイトル）になります:
+```bx title="add.bx" insert="3-4" delete="7"
+numeric function add( required numeric a, required numeric b ) {
+	var sum = a + b
+	var total = a + b
+	log.info( "computed sum", total )
+	return sum
+}
+```
+
+意図的に省略せず書きます（`ins`/`del` ではありません）。一部のツールがやる
+ようなリテラルな `+`/`-` の行プレフィックスではなく属性として扱うため、
+フェンス自身の内容は本物の、無加工でコピー＆ペースト可能なソースコードの
+ままです - 既存のコピーボタンから何かを取り除く必要もありません。
+`insert`/`delete` は `linenums` ときれいに積み重なります - 両方が有効な
+場合、ガターマーカーは行番号の列を避けて右にずれます。
+
+`frame="terminal"` を追加すると、プレーンなタイトルバーの代わりに macOS
+風のターミナルウィンドウ（3 つのステータスドット、中央揃えのタイトル）に
+なります:
 
 ````markdown
 ```bash frame="terminal" title="user@boxlang"
@@ -177,13 +279,22 @@ box install bx-sites
 ```
 ````
 
-`frame="code"` は今日のプレーンなバーを明示的に指定する名前です（デフォルトなので書く必要はありません）。
-`insert`/`delete` も `frame` も `bxsites.json` の設定は不要です。`hl_lines`/`linenums`/`title` と同様です。
+次のようにレンダリングされます:
+
+```bash frame="terminal" title="user@boxlang"
+box install bx-sites
+```
+
+`frame="code"` は、今日のデフォルトであるプレーンなバーを明示的に指定する
+名前です - デフォルトなので書く必要はありません。`insert`/`delete` も
+`frame` も、`hl_lines`/`linenums`/`title` と同様に `bxsites.json` の設定は
+不要です。
 
 #### 本物の git diff
 
-フェンスに `diff` を指定すると、実際の `git diff`/`git show` の出力をそのまま貼り付けられます - これは
-bx-sites 独自の構文ではなく、highlight.js 自身の `diff` グラマーが Unified diff 構文（`+`/`-`/`@@` 行）を
+フェンスに `diff` を指定すると、実際の `git diff`/`git show` の出力を
+そのまま貼り付けられます - これは bx-sites 独自の構文ではまったくなく、
+highlight.js 自身の `diff` グラマーが Unified diff 構文（`+`/`-`/`@@` 行）を
 自動的に認識しているだけです:
 
 ````markdown
@@ -201,16 +312,67 @@ bx-sites 独自の構文ではなく、highlight.js 自身の `diff` グラマ�
 ```
 ````
 
+次のようにレンダリングされます:
+
+```diff title="git diff"
+--- a/add.bx
++++ b/add.bx
+@@ -1,4 +1,5 @@
+ numeric function add( required numeric a, required numeric b ) {
+-	var sum = a + b
+-	return sum
++	var total = a + b
++	log.info( "computed", total )
++	return total
+ }
+```
+
+### ライブで試す（try.boxlang.io）
+
+言語名の代わりにフェンスに `tryboxlang` を指定すると、静的なコードリストの
+代わりに、ライブの埋め込み [try.boxlang.io](https://try.boxlang.io) エディタ
+としてレンダリングされます - 読者はページ上でそのままサンプルを実行し、
+自由にいじれます。設定は不要です:
+
+````markdown
+```tryboxlang title="クロージャ"
+user = { name: "Luis", getFullName: () => "Luis Majano" }
+println( user.getFullName() )
+```
+````
+
+次のようにレンダリングされます:
+
+```tryboxlang title="クロージャ"
+user = { name: "Luis", getFullName: () => "Luis Majano" }
+println( user.getFullName() )
+```
+
+任意の属性（すべて `tryboxlang` と同じ行に記述します）:
+
+| 属性 | デフォルト | 説明 |
+| ---------- | ------- | -------------------------------------------------------- |
+| `title`    | なし    | 埋め込みの上に表示される小さなタイトルバー |
+| `height`   | `450px` | 任意の CSS 長さ（裸の数値はピクセルとして扱われます） |
+| `readonly` | `false` | `"true"` でエディタを読み取り専用にロックします |
+
+フェンス自体の内容が、エディタの起点となる BoxLang ソースになります -
+これは圧縮され、try.boxlang.io 自身の `code` URL パラメータ経由でエディタに
+渡されます。これは try.boxlang.io 自体の「シェア」リンクと同じ仕組みなので、
+埋め込みの「Open in try.boxlang.io ↗」リンクを開くと、埋め込みが始まった
+箇所からそのまま続けられます。
+
 ## ダイアグラム
 
 `bxsites.json` の [`mermaid`](../configuration.md#mermaid) キーでオプトイン:
 
-```json
+```json title="bxsites.json"
 { "mermaid": true }
 ```
 
-有効にすると、` ```mermaid ` フェンスコードブロックがコードリストではなく
-[Mermaid](https://mermaid.js.org/) のライブダイアグラムとしてレンダリングされます:
+有効にすると、` ```mermaid ` フェンスコードブロックはコードリストの代わりに
+[Mermaid](https://mermaid.js.org/) のライブダイアグラムとしてレンダリング
+されます:
 
 ```mermaid
 flowchart LR
@@ -219,135 +381,55 @@ flowchart LR
     C --> D[site/*.html]
 ```
 
-Mermaid はフローチャート、シーケンス図、クラス図、ガントチャートなど多くのダイアグラムをサポートします。
+Mermaid はフローチャート、シーケンス図、クラス図、ガントチャートなど、
+多くの種類のダイアグラムをサポートしています。描画できる内容の全体像は
+[Mermaid 独自の構文リファレンス](https://mermaid.js.org/intro/syntax-reference.html)
+を参照してください。
 
 ## 数式
 
 `bxsites.json` の [`math`](../configuration.md#math) キーでオプトイン:
 
-```json
+```json title="bxsites.json"
 { "math": true }
 ```
 
 有効にすると、[KaTeX](https://katex.org/) がインライン数式には `$...$`、
-センタリングされたブロックには `$$...$$` を組版します:
+中央揃えのブロックには `$$...$$` を組版します。どちらも Markdown 本文に
+直接書きます:
 
-```markdown
-オイラーの等式 $e^{i\pi} + 1 = 0$ は 5 つの定数を一行で結びつけます。
+```markdown title="Example" linenums="1"
+オイラーの等式 $e^{i\pi} + 1 = 0$ は、5 つの定数を一行で結びつけます。
 
 $$
 \int_0^1 x^2 \, dx = \frac{1}{3}
 $$
 ```
 
-## GitBook スタイルのブロック
+オイラーの等式 $e^{i\pi} + 1 = 0$ は、5 つの定数を一行で結びつけます。
 
-BX Sites は GitBook スタイルのコンテンツブロックもサポートしています。各ブロックは GitBook の
-同名ブロックに直接対応しており、GitBook サイトのコンテンツを移行しやすくなっています。
-すべてのブロックは同じ `::: name ... :::` コンテナ構文を使用します。
-`bxsites.json` の設定不要、常に使用できます。
+$$
+\int_0^1 x^2 \, dx = \frac{1}{3}
+$$
 
-### 展開可能
+前後にすぐ空白が続く/先行する `$` はそのまま扱われます（そのため
+「$5 and $10」が数式と誤読されることはありません）- 組版される数式は
+常に両方の区切り記号にぴったりと接しています。
 
-```markdown
-::: expandable "これは折りたたみ可能な Admonition と違いますか？"
-はい - これにはタイプ/アイコン/色がなく、単なるプレーンな展開/折りたたみセクションです。
-`open="true"` を追加すると展開された状態で開始します。
-:::
-```
+上記のすべてに加えて、GitBook スタイルの `::: name ... :::` ブロック群
+（展開可能セクション、カード、列、ステッパー、ファイル/埋め込み/
+ページリンクカード、更新履歴（changelog）ブロック、再利用可能な
+コンテンツインクルード）については [コンテンツブロック](content-blocks.md)
+を参照してください。
 
-### カード
+キャプション、配置、フレーミング（プレーンなブロックレベル HTML であり、
+bx-sites 独自の構文は一切不要です）については
+[レスポンシブ画像](images.md#キャプション配置フレーミング) を参照して
+ください。
 
-リンクカードのグリッド。各カードは `::: cards` ラッパー内の独自の `::: card`:
+## プラグイン拡張
 
-```markdown
-::: cards
-::: card title="はじめに" icon="🚀" href="../getting-started.md"
-インストール、スキャフォールド、最初のサイトのビルド。
-:::
-::: card title="テーマ" icon="🎨" href="themes.md"
-組み込みテーマのカスタマイズまたは独自テーマの作成。
-:::
-:::
-```
-
-### 列
-
-横並びレイアウト。`::: column` はオプションの `width`（プレーンな CSS の長さ/パーセンテージ）を受け取ります:
-
-```markdown
-::: columns
-::: column width="60%"
-広い方の列。
-:::
-::: column
-狭い方の列。
-:::
-:::
-```
-
-### ステッパー
-
-番号付きの連続したステップ:
-
-```markdown
-::: stepper
-::: step "インストール"
-`install-bx-module bx-sites`
-:::
-::: step "スキャフォールド"
-`boxlang module:bxSites new`
-:::
-:::
-```
-
-### ファイル
-
-PDF、動画、その他のプロジェクトアセットのダウンロードカード:
-
-```markdown
-::: file src="assets/spec.pdf" title="API 仕様"
-:::
-```
-
-### 埋め込み
-
-認識されたプロバイダーのレスポンシブ iframe 埋め込み（YouTube、Vimeo、CodePen、Spotify、Loom、Figma）:
-
-```markdown
-::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="デモ"
-:::
-```
-
-### ページリンク
-
-別のページへのリッチプレビューカード。タイトル/アイコン/サマリはターゲットページのフロントマターから
-自動的に取得されます:
-
-```markdown
-::: page-link href="../getting-started.md"
-:::
-```
-
-### 更新履歴（changelog）
-
-日付とタグ付きの変更ログリスト:
-
-```markdown
-::: updates
-::: update date="2026-01-15" tags="feature,fix"
-ダークモードを追加し、フッターの整列バグを修正しました。
-:::
-::: update date="2026-01-01"
-初回リリース。
-:::
-:::
-```
-
-### 再利用可能なコンテンツ（インクルード）
-
-`::: include src="..."` は別のファイルの生の Markdown をその場所に挿入します:
-
-```markdown
-::: include src="_shared/beta-notice.md"
-```
+Admonition、脚注、定義リストは一般的なユースケースをカバーしますが、
+bx-markdown 自体はこの 3 つ以外について特に意見を持ちません - その他の
+Flexmark 拡張機能は、BX Sites とは独立に `markdownRegisterExtension()` を
+使って直接登録できます。詳細は bx-markdown 自身の readme を参照してください。

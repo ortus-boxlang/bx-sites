@@ -1,6 +1,7 @@
 ---
 title: Desplegar en GitHub Pages
 order: 3
+icon: phosphor-duotone:cloud-arrow-up
 tags: [guías, despliegue]
 ---
 
