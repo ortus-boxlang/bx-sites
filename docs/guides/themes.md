@@ -327,12 +327,13 @@ Every built-in theme guarantees `--bxsites-gradient-start`/`-end`,
 so `extraCss` can always retarget the brand color/stepper accents
 regardless of theme - but only `bootstrap`, `slate` and `notion` also
 expose `--bxsites-bg`/`-text`/`-sidebar-bg`/`-sidebar-text`/`-border`/`-link`/`-link-hover`/`-code-bg`
-under those names. Every other built-in theme (`material`, `tailwind`,
-`docsy`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook`) uses its own
-internal custom-property names for that second group instead (e.g.
-material's own `assets/style.css` uses `--md-bg`/`--md-ink`/`--md-link`/...) -
-open that theme's own `assets/style.css` to find its real names before
-overriding one of those via `extraCss`. Anything beyond color/font (layout,
+under those names (`justthedocs` aliases all but the two `-sidebar-*` ones
+the same way). Every other built-in theme (`material`, `tailwind`,
+`docsy`, `docusaurus`, `vuepress`, `gitbook`) uses its own internal
+custom-property names for that second group instead (e.g. material's own
+`assets/style.css` uses `--md-bg`/`--md-ink`/`--md-link`/...) - open that
+theme's own `assets/style.css` to find its real names before overriding
+one of those via `extraCss`. Anything beyond color/font (layout,
 adding/removing chrome) needs a real override or a custom theme - see below.
 
 The rest back the [`::: stepper`/`::: step`](content-blocks.md#stepper) directive

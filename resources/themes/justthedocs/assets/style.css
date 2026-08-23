@@ -19,6 +19,17 @@
 	--md-link-hover: #3730A3;
 	--md-border: rgba( 15, 23, 42, 0.09 );
 	--md-code-bg: #f6f7fb;
+	/* Aliases of the --md-* tokens above, under the --bxsites- names used by
+	   a couple of shared blog components (blog-author-search etc.) and by
+	   docs/guides/themes.md's own extraCss example - kept in sync with the
+	   --md-* values rather than duplicated. */
+	--bxsites-bg: var( --md-bg );
+	--bxsites-text: var( --md-ink );
+	--bxsites-border: var( --md-border );
+	--bxsites-muted: var( --md-muted );
+	--bxsites-link: var( --md-link );
+	--bxsites-link-hover: var( --md-link-hover );
+	--bxsites-code-bg: var( --md-code-bg );
 	/* Every header control shares this one height so the toolbar reads as
 	   a single aligned row instead of a mix of ad hoc paddings. */
 	--bxsites-toolbar-h: 2.375rem;
@@ -799,14 +810,10 @@ dd {
 
 .jtd-toc {
 	border: 1px solid var( --md-border );
-	border-radius: 12px;
-	padding: 0.75rem 1rem;
-	background: rgba( 0, 219, 255, 0.05 );
-	margin-bottom: 1.5rem;
-}
-
-[data-theme="dark"] .jtd-toc {
-	background: rgba( 52, 211, 153, 0.05 );
+	border-radius: 8px;
+	padding: 1rem 1.25rem;
+	background: var( --md-code-bg );
+	margin-bottom: 2rem;
 }
 
 .jtd-toc__title {
@@ -998,7 +1005,7 @@ dd {
 	display: inline-block;
 	padding: 0.2rem 0.7rem;
 	border-radius: 999px;
-	background: rgba( 0, 219, 255, 0.12 );
+	background: rgba( 79, 70, 229, 0.1 );
 	color: var( --md-link );
 	font-size: 0.8rem;
 	font-weight: 600;
@@ -1006,16 +1013,16 @@ dd {
 }
 
 .page-tag:hover {
-	background: rgba( 0, 219, 255, 0.22 );
+	background: rgba( 79, 70, 229, 0.18 );
 	color: var( --md-link-hover );
 }
 
 [data-theme="dark"] .page-tag {
-	background: rgba( 52, 211, 153, 0.14 );
+	background: rgba( 129, 140, 248, 0.16 );
 }
 
 [data-theme="dark"] .page-tag:hover {
-	background: rgba( 52, 211, 153, 0.24 );
+	background: rgba( 129, 140, 248, 0.26 );
 }
 
 /* Inline `code` (as opposed to fenced ```code blocks```, handled by
@@ -1037,7 +1044,7 @@ code:not( pre code ) {
    Bootstrap's Reboot typography for free - every heading/paragraph/list/
    table/blockquote rule here is hand-rolled to match that same readability. */
 .jtd-content-body {
-	line-height: 1.7;
+	line-height: 1.75;
 }
 
 .jtd-content-body > :first-child {
@@ -1057,23 +1064,24 @@ code:not( pre code ) {
 /* Scaled by level so a heading's own weight in the outline reads visually -
    an h2 (a new major section) gets more air above it than an h4 tucked
    inside one. `> :first-child` above already zeroes this out for a page
-   whose body starts with a heading. */
+   whose body starts with a heading. Generous top margins are deliberate -
+   extra air between sections is one of this theme's main visual cues. */
 .jtd-content-body h2 {
-	margin-top: 2.5rem;
-	margin-bottom: 1rem;
+	margin-top: 3rem;
+	margin-bottom: 1.1rem;
 }
 
 .jtd-content-body h3 {
-	margin-top: 2rem;
-	margin-bottom: 0.75rem;
+	margin-top: 2.25rem;
+	margin-bottom: 0.85rem;
 }
 
 .jtd-content-body h1,
 .jtd-content-body h4,
 .jtd-content-body h5,
 .jtd-content-body h6 {
-	margin-top: 1.5rem;
-	margin-bottom: 0.5rem;
+	margin-top: 1.75rem;
+	margin-bottom: 0.6rem;
 }
 
 .jtd-content-body h1 { font-size: 1.9rem; }
@@ -1088,7 +1096,7 @@ code:not( pre code ) {
 .jtd-content-body blockquote,
 .jtd-content-body .bxsites-code,
 .jtd-content-body pre {
-	margin: 0 0 1.25rem;
+	margin: 0 0 1.4rem;
 }
 
 .jtd-content-body ul,
@@ -1142,7 +1150,7 @@ code:not( pre code ) {
 }
 
 .jtd-content-body th {
-	background: rgba( 0, 124, 145, 0.08 );
+	background: var( --md-code-bg );
 	font-weight: 600;
 }
 
@@ -1167,7 +1175,7 @@ code:not( pre code ) {
 		right: 0;
 		bottom: 0;
 		width: auto;
-		background: var( --md-bg );
+		background: var( --md-sidebar-bg );
 		overflow-y: auto;
 		z-index: 9;
 	}
@@ -1421,17 +1429,16 @@ code:not( pre code ) {
 
 .bxsites-card {
 	display: block;
-	border: 1px solid rgba( 0, 0, 0, 0.12 );
-	border-radius: 14px;
-	padding: 1.25rem;
+	border: 1px solid var( --md-border );
+	border-radius: 10px;
+	padding: 1.5rem;
 	color: inherit;
 	text-decoration: none;
-	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+	transition: border-color 0.15s ease;
 }
 
 a.bxsites-card:hover {
 	border-color: var( --md-link );
-	box-shadow: 0 2px 10px rgba( 0, 0, 0, 0.08 );
 }
 
 .bxsites-card__image {
@@ -1485,8 +1492,8 @@ a.bxsites-card:hover {
 	width: 100%;
 	max-width: 100%;
 	height: auto;
-	border-radius: 16px;
-	box-shadow: 0 10px 34px rgba( 0, 0, 0, 0.22 );
+	border-radius: 10px;
+	border: 1px solid var( --md-border );
 }
 
 .bxsites-hero__actions {
@@ -1500,26 +1507,31 @@ a.bxsites-card:hover {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.4rem;
-	padding: 0.65rem 1.4rem;
-	border-radius: 999px;
+	padding: 0.7rem 1.5rem;
+	border-radius: 8px;
 	font-weight: 600;
 	text-decoration: none;
-	transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.bxsites-hero__btn:hover {
-	transform: translateY( -1px );
-	box-shadow: 0 4px 14px rgba( 0, 0, 0, 0.12 );
+	border: 1px solid transparent;
+	transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .bxsites-hero__btn--primary {
-	background: linear-gradient( 90deg, var( --bxsites-gradient-start ), var( --bxsites-gradient-end ) );
-	color: #04121a;
+	background: var( --bxsites-accent );
+	color: #ffffff;
+}
+
+.bxsites-hero__btn--primary:hover {
+	background: var( --md-link-hover );
 }
 
 .bxsites-hero__btn--secondary {
 	border: 1px solid var( --md-border );
 	color: var( --md-ink );
+}
+
+.bxsites-hero__btn--secondary:hover {
+	border-color: var( --md-link );
+	color: var( --md-link );
 }
 
 .bxsites-columns {
@@ -1745,17 +1757,16 @@ a.bxsites-card:hover {
 	display: flex;
 	align-items: stretch;
 	border: 1px solid rgba( 0, 0, 0, 0.12 );
-	border-radius: 14px;
+	border-radius: 10px;
 	overflow: hidden;
 	margin: 1rem 0;
 	color: inherit;
 	text-decoration: none;
-	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+	transition: border-color 0.15s ease;
 }
 
 .bxsites-link-preview:hover {
 	border-color: var( --md-link );
-	box-shadow: 0 2px 10px rgba( 0, 0, 0, 0.08 );
 }
 
 .bxsites-link-preview__image {
@@ -1861,8 +1872,8 @@ a.bxsites-card:hover {
 }
 
 [data-theme="dark"] .bxsites-update__tag {
-	background: rgba( 52, 211, 153, 0.12 );
-	color: #6ee7b7;
+	background: rgba( 129, 140, 248, 0.16 );
+	color: #C7D2FE;
 }
 
 /* Image captions/alignment/framing - GitBook-compatible raw HTML
