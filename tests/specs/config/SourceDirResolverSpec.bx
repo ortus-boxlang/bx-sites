@@ -1,0 +1,79 @@
+/**
+ * Exercises SourceDirResolver.bx directly against temp project directories -
+ * the docs/-or-src/ source folder detection BuildPipeline.bx and every
+ * scaffolding CLI verb now goes through instead of hardcoding `root & "/docs"`.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "config.SourceDirResolver", function() {
+
+			beforeEach( function() {
+				variables.resolver = new "models.config.SourceDirResolver@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			it( "resolves to docs/ when only docs/ exists", function() {
+				var dir = createTempDirectory( prefix = "bxsites-sourcedir-docs-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+
+				expect( resolver.name( dir ) ).toBe( "docs" );
+				expect( resolver.resolve( dir ) ).toBe( dir & "/docs" );
+			} );
+
+			it( "resolves to src/ when only src/ exists", function() {
+				var dir = createTempDirectory( prefix = "bxsites-sourcedir-src-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/src", true, true );
+
+				expect( resolver.name( dir ) ).toBe( "src" );
+				expect( resolver.resolve( dir ) ).toBe( dir & "/src" );
+			} );
+
+			it( "prefers docs/ over src/ when both exist", function() {
+				var dir = createTempDirectory( prefix = "bxsites-sourcedir-both-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				directoryCreate( dir & "/src", true, true );
+
+				expect( resolver.name( dir ) ).toBe( "docs" );
+			} );
+
+			it( "defaults to docs/ when neither exists yet", function() {
+				var dir = createTempDirectory( prefix = "bxsites-sourcedir-neither-" );
+				tempDirs.append( dir );
+
+				expect( resolver.name( dir ) ).toBe( "docs" );
+				expect( resolver.resolve( dir ) ).toBe( dir & "/docs" );
+			} );
+
+			it( "never resolves to site/, even when only site/ exists", function() {
+				var dir = createTempDirectory( prefix = "bxsites-sourcedir-siteonly-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/site", true, true );
+
+				expect( resolver.name( dir ) ).toBe( "docs" );
+				expect( resolver.resolve( dir ) ).toBe( dir & "/docs" );
+			} );
+
+			it( "tolerates a trailing slash on projectRoot", function() {
+				var dir = createTempDirectory( prefix = "bxsites-sourcedir-trailing-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/src", true, true );
+
+				expect( resolver.resolve( dir & "/" ) ).toBe( dir & "/src" );
+			} );
+
+		} );
+	}
+
+}

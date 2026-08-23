@@ -41,6 +41,7 @@ class {
 	 * for `bxsites.yaml` itself; no reason for two YAML readers in one module).
 	 */
 	variables.yamlRenderer = new "models.build.YamlRenderer@bxsites"()
+	variables.sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
 
 	/**
 	 * Swaps in a fake/test YAML renderer - see YamlRenderer.bx's docblock.
@@ -106,7 +107,7 @@ class {
 			)
 		}
 
-		var docsDir = arguments.projectRoot & "/docs"
+		var docsDir = variables.sourceDirResolver.resolve( arguments.projectRoot )
 		if ( !directoryExists( docsDir ) ) {
 			directoryCreate( docsDir, true, true )
 		}
@@ -117,7 +118,7 @@ class {
 		if ( isArray( mkdocsNav ) && mkdocsNav.len() ) {
 			var navPath = docsDir & "/nav.json"
 			if ( fileExists( navPath ) ) {
-				warnings.append( "docs/nav.json already existed and was overwritten by this migration" )
+				warnings.append( variables.sourceDirResolver.name( arguments.projectRoot ) & "/nav.json already existed and was overwritten by this migration" )
 			}
 			fileWrite( navPath, jsonSerialize( convertNav( mkdocsNav ) ) )
 		} else {

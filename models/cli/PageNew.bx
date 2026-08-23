@@ -19,7 +19,7 @@ class {
 
 		var scaffolder = new "models.build.PageScaffolder@bxsites"()
 		var result = scaffolder.scaffold(
-			docsDir     : projectRoot & "/docs",
+			docsDir     : new "models.config.SourceDirResolver@bxsites"().resolve( projectRoot ),
 			path        : path,
 			title       : trim( arguments.options.title ?: "" ),
 			description : trim( arguments.options.description ?: "" ),

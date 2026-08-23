@@ -16,6 +16,7 @@ class {
 
 	variables.buildPipeline = new "models.build.BuildPipeline@bxsites"()
 	variables.configLoader  = new "models.config.ConfigLoader@bxsites"()
+	variables.sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
 	variables.projectRoot   = ""
 	variables.fileFingerprint = { count : 0, maxModified : 0 }
 	variables.buildVersion  = 0
@@ -75,8 +76,8 @@ class {
 	}
 
 	/**
-	 * Rebuilds the project if `docs/`, `bxsites.json` or a project `theme/`
-	 * override changed since the last build, bumping the version the
+	 * Rebuilds the project if `docs/` (or `src/`), `bxsites.json` or a project
+	 * `theme/` override changed since the last build, bumping the version the
 	 * live-reload poller compares against. Cheap to call repeatedly - the
 	 * CLI verb's own watch loop is expected to call this every second or so
 	 * while `serve` is running in the foreground.
@@ -146,8 +147,9 @@ class {
 		if ( fileExists( configPath ) ) {
 			paths.append( configPath )
 		}
-		if ( directoryExists( variables.projectRoot & "/docs" ) ) {
-			paths.addAll( directoryList( variables.projectRoot & "/docs", true, "path" ) )
+		var docsDir = variables.sourceDirResolver.resolve( variables.projectRoot )
+		if ( directoryExists( docsDir ) ) {
+			paths.addAll( directoryList( docsDir, true, "path" ) )
 		}
 		if ( directoryExists( variables.projectRoot & "/theme" ) ) {
 			paths.addAll( directoryList( variables.projectRoot & "/theme", true, "path" ) )

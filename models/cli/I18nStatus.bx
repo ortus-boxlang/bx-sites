@@ -13,24 +13,26 @@ class {
 			throw( type = "BxSites.MissingProjectRoot", message = "`i18n:status` requires a project root" )
 		}
 
+		var sourceDirName = new "models.config.SourceDirResolver@bxsites"().name( projectRoot )
 		var builder = new "models.build.I18nStatusBuilder@bxsites"()
-		var result = builder.build( projectRoot & "/docs" )
+		var result = builder.build( projectRoot & "/" & sourceDirName )
 
 		return {
 			exitCode : 0,
-			message  : formatReport( result )
+			message  : formatReport( result, sourceDirName )
 		}
 	}
 
 	/**
 	 * @result I18nStatusBuilder.build()'s own return value
+	 * @sourceDirName This project's resolved source folder name ("docs" or "src")
 	 */
-	private string function formatReport( required struct result ) {
+	private string function formatReport( required struct result, required string sourceDirName ) {
 		var lines = []
 		lines.append( "Default locale: #arguments.result.defaultPageCount# page(s)" )
 
 		if ( !arguments.result.locales.len() ) {
-			lines.append( "No docs/i18n/ locales found." )
+			lines.append( "No #arguments.sourceDirName#/i18n/ locales found." )
 			return lines.toList( char( 10 ) )
 		}
 

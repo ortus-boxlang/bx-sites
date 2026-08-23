@@ -49,7 +49,7 @@ class {
 	 * @projectRoot Absolute path to the target bx-sites project root
 	 */
 	private struct function runGitBook( required string source, required string projectRoot ) {
-		var docsDir = arguments.projectRoot & "/docs"
+		var docsDir = new "models.config.SourceDirResolver@bxsites"().resolve( arguments.projectRoot )
 		if ( !directoryExists( docsDir ) ) {
 			directoryCreate( docsDir, true, true )
 		}
@@ -68,8 +68,9 @@ class {
 	private struct function runMkdocs( required string source, required string projectRoot ) {
 		var migrator = new "models.build.MkdocsMigrator@bxsites"()
 		var result = migrator.migrate( arguments.source, arguments.projectRoot )
+		var sourceDirName = new "models.config.SourceDirResolver@bxsites"().name( arguments.projectRoot )
 
-		var message = "Migrated #result.pagesConverted# page(s) and #result.assetsConverted# asset(s) from [#arguments.source#] into #arguments.projectRoot#/docs/, wrote #result.configPath#"
+		var message = "Migrated #result.pagesConverted# page(s) and #result.assetsConverted# asset(s) from [#arguments.source#] into #arguments.projectRoot#/#sourceDirName#/, wrote #result.configPath#"
 		if ( len( result.navPath ) ) {
 			message &= " and #result.navPath#"
 		}
