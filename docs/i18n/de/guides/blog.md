@@ -10,7 +10,7 @@ tags: [anleitungen, blog]
 Ein Blog ist eine weitere Convention-over-Configuration-Funktion, in
 derselben Form wie
 [Versionen](versioning.md)/[i18n](i18n.md) oder der
-[Tags-Index](../getting-started.md#add-pages) - lege Beiträge unter
+[Tags-Index](../getting-started.md#seiten-hinzufügen) - lege Beiträge unter
 `docs/blog/posts/` ab, und BX Sites baut `/blog/` (paginiert), eine
 Kategorie-Seite pro Kategorie, eine Jahresarchiv-Seite pro Kalenderjahr,
 eine Autoren-Seite pro Autor, einen RSS-Feed pro Kategorie plus einen für
@@ -79,7 +79,7 @@ in full on the post's own page.
   `/blog/category/<slug>/feed.xml`-RSS-Feed - siehe [Feed](#feed)).
   Unabhängig von `tags` unten.
 - `tags` - dieselbe websiteweite `tags`-Frontmatter, die jede andere
-  Seite bereits hat (siehe [Erste Schritte](../getting-started.md#add-pages))
+  Seite bereits hat (siehe [Erste Schritte](../getting-started.md#seiten-hinzufügen))
   - die Tags eines Beitrags werden als Badges gerendert und fließen in
   den Haupt-`/tags/`-Index ein, zusammen mit jeder anderen getaggten
   Seite.
@@ -102,10 +102,10 @@ in full on the post's own page.
   sichtbaren "🚧 Entwurf"-Banner auf dem Beitrag selbst und einer Card
   mit gestricheltem Rand überall, wo er gelistet wird), sodass du einen
   Entwurf lokal Korrektur lesen kannst, bevor er fertig ist - siehe
-  [Entwürfe ansehen](#previewing-drafts).
+  [Entwürfe ansehen](#entwürfe-ansehen).
 
 Jeder andere Seiten-Frontmatter-Schlüssel, der bereits in
-[Erste Schritte](../getting-started.md#add-pages) dokumentiert ist
+[Erste Schritte](../getting-started.md#seiten-hinzufügen) dokumentiert ist
 (`icon`, `description`, `ogImage`, `toc`), funktioniert auch auf einem
 Beitrag.
 
@@ -225,7 +225,7 @@ für jeden Beitrag, unbegrenzt:
 { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
 ```
 
-## Entwürfe ansehen {#previewing-drafts}
+## Entwürfe ansehen
 
 `draft: true` hält einen Beitrag vollständig aus einem echten
 `bxSites build` heraus - aber `bxSites serve` bindet ihn trotzdem ein,
@@ -278,7 +278,7 @@ Hauptliste `/blog/`, eine Kategorie-/Archiv-/Autoren-Seite,
 genau dasselbe `layout.bxm`/`page.bxm` wie jede andere Seite deiner
 Website, sodass ein Blog automatisch wie der Rest deiner Docs aussieht,
 und jede Theme-Überschreibung, die du bereits vorgenommen hast (siehe
-[Themes](themes.md#overriding-a-theme)), unverändert darauf angewendet
+[Themes](themes.md#ein-theme-überschreiben)), unverändert darauf angewendet
 wird, ohne zusätzlichen Verdrahtungsaufwand.
 
 Das blog-spezifische Markup selbst (Beitrags-Cards, die
@@ -303,15 +303,15 @@ Zwei Wege, es umzugestalten, genau wie bei jeder anderen Seite:
 - **Eine schnelle visuelle Anpassung** - ziele mit deinem eigenen
   [`extraCss`](../configuration.md#extracss--extrajs) auf diese Klassen,
   genauso wie du
-  [die Farben eines Themes anpasst](themes.md#customizing-colors-without-a-theme-override).
+  [die Farben eines Themes anpasst](themes.md#farben-anpassen-ohne-ein-theme-zu-überschreiben).
   Die eigenen Regeln eines integrierten Themes für diese Klassen liegen
   in seiner `assets/style.css` (z. B.
   `resources/themes/bootstrap/assets/style.css`), wenn du einen
   Ausgangspunkt zum Überschreiben brauchst.
 - **Strukturelle Änderungen** - da Blog-Seiten `layout.bxm`/`page.bxm`
   mit allem anderen teilen, ändert das
-  [Überschreiben eines Themes](themes.md#overriding-a-theme) (oder das
-  [Schreiben eines von Grund auf](themes.md#writing-a-theme-from-scratch))
+  [Überschreiben eines Themes](themes.md#ein-theme-überschreiben) (oder das
+  [Schreiben eines von Grund auf](themes.md#ein-theme-von-grund-auf-schreiben))
   das Chrome des Blogs (Header, Nav, Footer, Artikel-Wrapper) gleich mit
   jeder anderen Seite - es gibt keine separate Blog-Vorlage zu kopieren.
 

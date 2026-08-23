@@ -27,7 +27,7 @@ Utility-Engine des `tailwind`-Themes (ein clientseitiger JIT-Compiler, kein
 statisches Stylesheet) und andere optionale Funktionen, die du selbst
 aktivierst (`math`, Algolia-Suche, Google Analytics), laden weiterhin von
 einem CDN oder einer gehosteten API - siehe
-[Air-gapped/Offline-Websites](#air-gapped-offline-sites) unten.
+[Air-gapped/Offline-Websites](#air-gappedoffline-websites) unten.
 
 Alle drei verwenden dieselbe BoxLang-Markenpalette: einen
 `#00FF78 -> #00DBFF`-Gradient und einen `#FFF500`-Akzent - und alle drei
@@ -44,7 +44,7 @@ bringen denselben Satz an Seitenfunktionen mit:
   jeweils mit einem **Kopieren-Button** - bei Hover sichtbar auf Geräten,
   die das unterstützen, auf Touch-Geräten immer sichtbar (dort gibt es
   kein Hover, um ihn einzublenden). Siehe
-  [Markdown-Erweiterungen](markdown.md#code-blocks).
+  [Markdown-Erweiterungen](markdown.md#codeblöcke).
 - **Selbst gehostete Webfonts** - keine Anfrage an `fonts.googleapis.com`
   zur Anzeigezeit.
 - **Ein Dunkel-/Hell-Modus-Umschalter**, angetrieben von
@@ -70,13 +70,13 @@ bringen denselben Satz an Seitenfunktionen mit:
   `guides/themes/index.html`), sodass sie (oder eine KI) die Seite direkt
   als reines Markdown lesen kann, statt gerendertes HTML zu parsen. Immer
   aktiv, keine Konfiguration nötig. Siehe
-  [Erste Schritte](../getting-started.md#downloading-a-page-as-markdown).
+  [Erste Schritte](../getting-started.md#eine-seite-als-markdown-herunterladen).
 - **Eine optionale Fußzeile** (Copyright, `social`-Links, ein "Built with
   BX Sites"-Hinweis), wenn `footer` in `bxsites.json` `true` ist. Siehe
   [Konfiguration](../configuration.md#footer).
 - **Ein Versionsumschalter**, der automatisch erscheint, sobald ein
   Projekt einen `docs/versions/`-Ordner mit mehr als einer Version hat.
-  Siehe [Konfiguration](../configuration.md#versioning).
+  Siehe [Konfiguration](../configuration.md#versionierung).
 - **Eine themenspezifische `404.html`**, automatisch ausgeliefert von den
   meisten statischen Hosts (einschließlich GitHub Pages) für jeden nicht
   gefundenen Pfad.
@@ -96,7 +96,7 @@ bringen denselben Satz an Seitenfunktionen mit:
 - **Seiten-Tags, ein Icon und eine Zusammenfassungszeile**, alle opt-in
   über die eigene Frontmatter einer Seite - Tags werden als Badges
   gerendert, die zu einem websiteweiten `/tags/`-Index verlinken. Siehe
-  [Erste Schritte](../getting-started.md#add-pages).
+  [Erste Schritte](../getting-started.md#seiten-hinzufügen).
 - **Eine explizite Navigations-Überschreibung**, in `bxsites.json` oder der
   eigenen `docs/nav.json`, die die Ordner-Ableitung für große Websites
   ersetzt. Siehe [Konfiguration](../configuration.md#nav).
@@ -109,15 +109,15 @@ bringen denselben Satz an Seitenfunktionen mit:
   [Markdown-Erweiterungen](markdown.md#admonitions).
 - **Fußnoten und Definitionslisten**, opt-in über `markdown` in
   `bxsites.json`. Siehe
-  [Markdown-Erweiterungen](markdown.md#footnotes).
+  [Markdown-Erweiterungen](markdown.md#fußnoten).
 - **Content-Tabs**, **Code-Zeilennummern/hervorgehobene Zeilen/Titel**
   und **Diff-Markierungen/Terminal-Rahmen** für Codeblöcke, keine
   Konfiguration nötig. Siehe
   [Markdown-Erweiterungen](markdown.md#content-tabs).
 - **Mermaid-Diagramme**, opt-in über `mermaid` in `bxsites.json`. Siehe
-  [Markdown-Erweiterungen](markdown.md#diagrams).
+  [Markdown-Erweiterungen](markdown.md#diagramme).
 - **Mathematik** (KaTeX), opt-in über `math` in `bxsites.json`. Siehe
-  [Markdown-Erweiterungen](markdown.md#math).
+  [Markdown-Erweiterungen](markdown.md#mathematik).
 
 Lege in `bxsites.json` fest, welches Theme ein Projekt verwendet:
 
@@ -125,7 +125,7 @@ Lege in `bxsites.json` fest, welches Theme ein Projekt verwendet:
 { "theme": { "name": "material" } }
 ```
 
-## Air-gapped/Offline-Websites {#air-gapped-offline-sites}
+## Air-gapped/Offline-Websites
 
 Eine gebaute Website funktioniert standardmäßig völlig ohne Internetzugang,
 für die Themes `bootstrap` und `material` mit dem standardmäßigen
@@ -263,7 +263,7 @@ Ein Theme-Ordner, dem eine der beiden erforderlichen Dateien fehlt,
 schlägt sofort mit einem klaren `BxSites.InvalidTheme`-Fehler zur Build-Zeit
 fehl, statt mit einem verwirrenden Template-Fehler tief im Rendering.
 
-## Farben anpassen, ohne ein Theme zu überschreiben {#customizing-colors-without-a-theme-override}
+## Farben anpassen, ohne ein Theme zu überschreiben
 
 Für eine kleine Farb-/Schriftanpassung ist ein ganzes Theme zu forken
 Overkill - jedes integrierte Theme liest seine Palette aus einer Handvoll
@@ -304,7 +304,7 @@ Das eigene Set des `bootstrap`-Themes
 über Farbe/Schriftart hinaus (Layout, Chrome hinzufügen/entfernen)
 braucht eine echte Überschreibung oder ein eigenes Theme - siehe unten.
 
-## Ein Theme überschreiben {#overriding-a-theme}
+## Ein Theme überschreiben
 
 Lege deine eigenen `layout.bxm` + `page.bxm` (und optional `search.bxm` /
 `assets/`) in einen `theme/`-Ordner im Wurzelverzeichnis deines Projekts.
@@ -366,12 +366,12 @@ vollständig verwendet, braucht also trotzdem seine eigenen `layout.bxm` +
 Ordner, dem eine der beiden fehlt, schlägt sofort mit
 `BxSites.InvalidTheme` fehl, statt stillschweigend zurückzufallen). Für
 eine reine CSS-Anpassung ohne `.bxm`, nutze stattdessen
-[`extraCss`](#customizing-colors-without-a-theme-override) von oben - es
+[`extraCss`](#farben-anpassen-ohne-ein-theme-zu-überschreiben) von oben - es
 legt sich über das Theme, das `bxsites.json` benennt, ganz ohne
 `theme/`-Ordner. `theme/` ist für den Fall, dass du auch das Markup
 selbst ändern musst, siehe als Nächstes.
 
-## Ein Theme von Grund auf schreiben {#writing-a-theme-from-scratch}
+## Ein Theme von Grund auf schreiben
 
 Ein Theme braucht nur die beiden erforderlichen Dateien, hier also ein
 wirklich minimales Beispiel - kein Bootstrap/Tailwind, kein Dunkelmodus,

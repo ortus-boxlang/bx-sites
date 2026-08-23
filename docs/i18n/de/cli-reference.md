@@ -76,7 +76,7 @@ automatisch mit aus - dieses Verb existiert für den Fall, dass du nur den
 Index auffrischen musst. Deckt immer nur den Haupt-`docs/`-Baum ab, auch
 bei einem Projekt mit `docs/versions/`/`docs/i18n/` - ein echter `build`
 schreibt stattdessen den eigenen, begrenzten Index jedes Baums (siehe
-[Versionierung](guides/versioning.md#whats-out-of-scope-for-now)).
+[Versionierung](guides/versioning.md#was-vorerst-außen-vor-bleibt)).
 
 ```bash
 bxSites search-index

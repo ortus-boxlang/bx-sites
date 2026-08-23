@@ -92,7 +92,7 @@ Block endet bei der ersten nicht eingerückten, nicht leeren Zeile. Leere
 Zeilen sind *innerhalb* des Blocks kein Problem - sie beginnen einfach
 einen neuen Absatz, genau wie überall sonst im Markdown.
 
-### Einklappbare Admonitions {#collapsible-admonitions}
+### Einklappbare Admonitions
 
 Stelle dem Typ `???` statt `!!!` voran, um den Block einklappbar zu
 machen - `???` startet eingeklappt, `???+` startet ausgeklappt. So oder so
@@ -114,7 +114,7 @@ ist die Überschrift klickbar, um umzuschalten:
 
 Schalte Admonitions mit `{"markdown":{"enableAdmonition":false}}` ganz aus.
 
-## Fußnoten {#footnotes}
+## Fußnoten
 
 Verweise inline auf eine Fußnote mit `[^label]` und definiere ihren Text
 irgendwo im Dokument mit `[^label]: text`:
@@ -134,7 +134,7 @@ der Seite gerendert, unabhängig davon, wo in der Quelle sie geschrieben
 wurden. Standardmäßig aus - schalte es mit
 `{"markdown":{"enableFootnotes":true}}` ein.
 
-## Definitionslisten {#definition-lists}
+## Definitionslisten
 
 Eine Begriffszeile, gefolgt von einer oder mehreren `:   `-Beschreibungszeilen,
 wird zu einem `<dl>`:
@@ -195,7 +195,7 @@ vollständiges Markdown, also Code-Fences, Listen, Admonitions - alles, was
 du auch sonst irgendwo schreiben würdest. Keine `bxsites.json`-Konfiguration
 nötig - immer aktiv.
 
-## Codeblöcke {#code-blocks}
+## Codeblöcke
 
 Fenced Codeblöcke werden clientseitig syntax-hervorgehoben
 (highlight.js), keine Konfiguration nötig - die Sprachkennung nach dem
@@ -375,7 +375,7 @@ try.boxlang.io selbst funktioniert, sodass das Öffnen des
 "Open in try.boxlang.io ↗"-Links des Embeds genau dort weitermacht, wo
 das Embed beginnt.
 
-## Diagramme {#diagrams}
+## Diagramme
 
 Opt-in über den [`mermaid`](../configuration.md#mermaid)-Schlüssel von `bxsites.json`:
 
@@ -399,7 +399,7 @@ Gantt-Diagramme und mehr - siehe
 [Mermaids eigene Syntax-Referenz](https://mermaid.js.org/intro/syntax-reference.html)
 für alles, was es zeichnen kann.
 
-## Mathematik {#math}
+## Mathematik
 
 Opt-in über den [`math`](../configuration.md#math)-Schlüssel von `bxsites.json`:
 
@@ -435,7 +435,7 @@ GitBook-artigen `::: name ... :::`-Blöcken zusätzlich zu allem oben -
 Expandables, Cards, Columns, ein Stepper, File-/Embed-/Page-Link-Cards,
 ein Changelog-Block und wiederverwendbare Content-Includes.
 
-Siehe [Responsive Bilder](images.md#captions-alignment-and-framing) für
+Siehe [Responsive Bilder](images.md#bildunterschriften-ausrichtung-und-rahmung) für
 Bildunterschriften, Ausrichtung und Rahmung (reines block-level HTML -
 dafür ist überhaupt keine bx-sites-spezifische Syntax nötig).
 

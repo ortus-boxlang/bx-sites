@@ -16,7 +16,7 @@ Verfügung: keine `bxsites.json`-Einstellung zum Umlegen, kein
 deinem Markdown zu schreiben.
 
 Da [rohes block-level HTML unverändert durchgereicht
-wird](images.md#captions-alignment-and-framing) in deinem Markdown,
+wird](images.md#bildunterschriften-ausrichtung-und-rahmung) in deinem Markdown,
 kannst du Alpines `x-data`/`x-show`/`@click`/etc.-Attribute direkt auf
 jeden HTML-Block legen, und es funktioniert einfach.
 
@@ -27,7 +27,7 @@ zweckgebauten Direktiv-Block, für den du selbst kein JS schreiben musst
 - greif zuerst zu diesen:
 
 - Ein einklappbarer Bereich → [Expandable](content-blocks.md#expandable)
-  oder eine [einklappbare Admonition](markdown.md#collapsible-admonitions)
+  oder eine [einklappbare Admonition](markdown.md#einklappbare-admonitions)
 - Gruppierter alternativer Inhalt hinter klickbaren Tabs →
   [Content-Tabs](markdown.md#content-tabs)
 - Eine nummerierte Schritt-für-Schritt-Anleitung →

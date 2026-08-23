@@ -80,13 +80,13 @@ crawlbarer/verlinkbarer Teil der Website, kein verstecktes Archiv.
 ## Zusammenspiel mit i18n
 
 Eine Version kann ebenfalls übersetzt werden - siehe
-["Versionierte und übersetzte Docs"](i18n.md#versioned-and-translated-docs)
+["Versionierte und übersetzte Docs"](i18n.md#versionierte-und-übersetzte-docs)
 im eigenen i18n-Kapitel für die Konvention
 `docs/versions/<name>/i18n/<code>/`, die die eigene Struktur einer
 Version genauso spiegelt, wie das oberste `docs/i18n/<code>/`
 `docs/` selbst spiegelt.
 
-## Was (vorerst) außen vor bleibt {#whats-out-of-scope-for-now}
+## Was (vorerst) außen vor bleibt
 
 - **Die Suche ist pro Baum begrenzt, nicht über Versionen hinweg
   vereinheitlicht.** Der standardmäßige `local`-Suchanbieter schreibt

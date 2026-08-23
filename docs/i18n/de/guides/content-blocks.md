@@ -23,7 +23,7 @@ eigenen Inhalt durchsucht.
 
 Ein einfacher einklappbarer Bereich - kein Callout-Icon/keine Farbe, im
 Gegensatz zu einer einklappbaren Admonition (`???`, siehe
-[Admonitions](markdown.md#collapsible-admonitions)):
+[Admonitions](markdown.md#einklappbare-admonitions)):
 
 ```markdown title="Beispiel" linenums="1"
 ::: expandable "Is this different from a collapsible admonition?"
@@ -152,7 +152,7 @@ Unumkehrbar - stelle sicher, dass die Sicherung oben abgeschlossen ist.
 Der nummerierte Marker, die Verbindungslinie und jede der drei
 `color`-Paletten oben lassen sich unabhängig von der restlichen Palette
 der Website themen, über CSS-Custom-Properties - siehe
-[Farben anpassen](themes.md#customizing-colors-without-a-theme-override).
+[Farben anpassen](themes.md#farben-anpassen-ohne-ein-theme-zu-überschreiben).
 
 ## File
 
@@ -188,7 +188,7 @@ blockieren das Einbetten in Frames):
 
 Eine ausführliche Vorschau-Card, die zu einer anderen Seite verlinkt -
 `href` folgt derselben dateirelativen Konvention wie ein gewöhnlicher
-[Seiten-Link](../getting-started.md#linking-between-pages). Anders als
+[Seiten-Link](../getting-started.md#zwischen-seiten-verlinken). Anders als
 eine Card werden Titel/Icon/Zusammenfassung automatisch aus der eigenen
 Frontmatter der Zielseite gezogen, sodass sie synchron bleibt, wenn
 diese Seite umbenannt wird oder sich ihre Zusammenfassung ändert:

@@ -8,7 +8,7 @@ tags: [anleitungen, einrichtung]
 
 # Erste Schritte
 
-## Installation {#install}
+## Installation
 
 BX Sites benötigt [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
 für das Rendern von Markdown, [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
@@ -88,7 +88,7 @@ wandelt einen GitBook-Export direkt in `docs/` um - siehe
 [Migration von GitBook](guides/migrating-from-gitbook.md) - und du kannst
 direkt zu [Build](#build) springen.
 
-## Seiten hinzufügen {#add-pages}
+## Seiten hinzufügen
 
 Jede `.md`-Datei unter `docs/` wird zu einer Seite. Ordnerverschachtelung wird
 automatisch zu Navigationsverschachtelung:
@@ -105,7 +105,7 @@ docs/
 vollständig durch eine explizite Navigation ersetzen - siehe
 [`nav`](configuration.md#nav).)
 
-### Zwischen Seiten verlinken {#linking-between-pages}
+### Zwischen Seiten verlinken
 
 Verlinke eine andere Seite auf die übliche mkdocs-Art - ein dateirelativer
 Pfad zu ihrer `.md`-Quelldatei, genau als lägen die beiden Dateien
@@ -113,7 +113,7 @@ nebeneinander auf der Festplatte (denn genau das tun sie):
 
 ```markdown
 See [Deployment](guides/deployment.md) or, from that same guide,
-[back to Getting Started](../getting-started.md#add-pages).
+[back to Getting Started](../getting-started.md#seiten-hinzufügen).
 ```
 
 BX Sites schreibt jeden solchen Link zur Build-Zeit auf seine gebaute
@@ -127,7 +127,7 @@ oder so ein echter, gültiger relativer Pfad zu einer echten Datei.
 Absolute URLs, `mailto:` sowie Links, die bereits mit `/` beginnen, bleiben
 unangetastet.
 
-### Eine Seite als Markdown herunterladen {#downloading-a-page-as-markdown}
+### Eine Seite als Markdown herunterladen
 
 Zu jeder gebauten Seite wird auch ihre ursprüngliche `.md`-Quelldatei direkt
 mit veröffentlicht - `docs/guides/deployment.md` landet als

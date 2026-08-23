@@ -13,7 +13,7 @@ Seiten wird in ein responsives `<picture>` umgeschrieben - keine neue
 Markdown-Syntax, keine Konfiguration nötig, um es zu aktivieren. Es baut
 auf [bx-image](https://github.com/ortus-boxlang/bx-image) auf, einer
 erforderlichen Abhängigkeit neben bx-markdown/bx-esapi/bx-yaml (siehe
-[Erste Schritte](../getting-started.md#install)).
+[Erste Schritte](../getting-started.md#installation)).
 
 ## Wie es funktioniert
 
@@ -48,7 +48,7 @@ ein kleines Icon), erhält trotzdem eine WebP-Neucodierung in voller
 Größe, wenn `"webp"` in `assets.images.formats` steht - ein echter
 Dateigrößen-Gewinn, auch ganz ohne responsiven Breakpoint.
 
-## Bildunterschriften, Ausrichtung und Rahmung {#captions-alignment-and-framing}
+## Bildunterschriften, Ausrichtung und Rahmung
 
 Eine Bildunterschrift, ein Rahmen oder eine Mehrbild-Galerie sind alle
 einfach block-level HTML - das bx-markdown/Flexmark vollständig

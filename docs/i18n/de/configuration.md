@@ -112,7 +112,7 @@ Erforderlich.
 Eine optionale Website-Beschreibung, verwendet als Fallback für
 `<meta name="description">` und `og:description` für jede Seite, die keine
 eigene `description`-Frontmatter setzt (siehe
-[Erste Schritte](getting-started.md#add-pages)).
+[Erste Schritte](getting-started.md#seiten-hinzufügen)).
 
 ## `baseURL`
 
@@ -279,8 +279,8 @@ standardmäßig auf `true` (siehe die
 | Schlüssel | Standard | Wirkung |
 |---|---|---|
 | `enableAdmonition` | `true` *(BX-Sites-Standard; bx-markdowns eigener Standard ist `false`)* | `!!!`/`???`/`???+`-Callout-Blöcke - siehe die [Markdown-Erweiterungen-Anleitung](guides/markdown.md#admonitions) |
-| `enableFootnotes` | `false` | `[^label]`-Fußnotenverweise - siehe die [Markdown-Erweiterungen-Anleitung](guides/markdown.md#footnotes) |
-| `enableDefinitionLists` | `false` | `Term\n:   Definition`-Listen - siehe die [Markdown-Erweiterungen-Anleitung](guides/markdown.md#definition-lists) |
+| `enableFootnotes` | `false` | `[^label]`-Fußnotenverweise - siehe die [Markdown-Erweiterungen-Anleitung](guides/markdown.md#fußnoten) |
+| `enableDefinitionLists` | `false` | `Term\n:   Definition`-Listen - siehe die [Markdown-Erweiterungen-Anleitung](guides/markdown.md#definitionslisten) |
 | `autoLinkUrls` | `true` | Verlinkt nackte URLs und E-Mail-Adressen automatisch |
 | `anchorLinks` | `true` | Fügt jeder Überschrift einen klickbaren Anker-Link hinzu |
 | `anchorSetId` | `true` | Setzt ein `id`-Attribut auf jede Überschrift |
@@ -403,7 +403,7 @@ deaktiviert, werden gar keine `og:image`/`twitter:card`-Tags gerendert.
 ```
 
 Die eigene `ogImage`-Frontmatter einer Seite (siehe
-[Erste Schritte](getting-started.md#add-pages)) gewinnt für diese eine
+[Erste Schritte](getting-started.md#seiten-hinzufügen)) gewinnt für diese eine
 Seite immer gegenüber diesem websiteweiten Standard.
 
 ### `generateOgImages`
@@ -442,7 +442,7 @@ verwendet). `extraJs`-Einträge werden mit `defer` geladen.
 [Mermaid](https://mermaid.js.org/)-Diagrammunterstützung ausgeliefert.
 `true` lädt `mermaid.js` clientseitig und rendert jeden mit ` ```mermaid `
 eingezäunten Codeblock als Diagramm. Siehe
-[Markdown-Erweiterungen](guides/markdown.md#diagrams) für die Syntax.
+[Markdown-Erweiterungen](guides/markdown.md#diagramme) für die Syntax.
 
 ```json
 { "mermaid": true }
@@ -452,7 +452,7 @@ eingezäunten Codeblock als Diagramm. Siehe
 
 `false` (Standard) - kein [KaTeX](https://katex.org/) ausgeliefert. `true`
 lädt es clientseitig und setzt `$...$`/`$$...$$` direkt aus dem Markdown
-einer Seite. Siehe [Markdown-Erweiterungen](guides/markdown.md#math) für
+einer Seite. Siehe [Markdown-Erweiterungen](guides/markdown.md#mathematik) für
 die Syntax.
 
 ```json
@@ -508,7 +508,7 @@ Siehe [Internationalisierung](guides/i18n.md) für das vollständige Bild -
 Fallback bei nicht übersetzten Seiten, den Sprachumschalter und was noch
 nicht übersetzt wird.
 
-## Versionierung {#versioning}
+## Versionierung
 
 Versionierte Docs sind Convention over Configuration - dafür gibt es
 keinen `bxsites.json`-Schlüssel. Füge einen `docs/versions/<name>/`-Ordner

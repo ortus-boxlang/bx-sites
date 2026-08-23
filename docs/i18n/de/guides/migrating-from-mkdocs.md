@@ -117,7 +117,7 @@ stillschweigend verworfen:
   [Plugins](plugins.md)
 - die eigene Farb-/Schriftanpassung von `mkdocs.yml`
   (`theme.palette`/`theme.font`) hat keine direkte Entsprechung - siehe
-  [Farben anpassen](themes.md#customizing-colors-without-a-theme-override),
+  [Farben anpassen](themes.md#farben-anpassen-ohne-ein-theme-zu-überschreiben),
   sobald die Migration abgeschlossen ist
 - ein `theme.name` außer `material` (fällt auf `bootstrap` zurück)
 
