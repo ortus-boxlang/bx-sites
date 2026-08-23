@@ -23,15 +23,15 @@
 			// entity-escapes "safe" characters like "/" (its exact range is
 			// locale/JVM-dependent), needlessly noisy in a plain URL attribute.
 			var escapedEditUrl = arguments.editUrl.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
-			html &= '<a href="' & escapedEditUrl & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "edit" ) & ' Edit this page</a>'
+			html &= '<a href="' & escapedEditUrl & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "edit" ) & ' ' & encodeForHTML( variables.strings.editThisPage ) & '</a>'
 		}
 		if ( len( arguments.markdownUrl ) ) {
 			// Same reasoning as escapedEditUrl above.
 			var escapedMarkdownUrl = arguments.markdownUrl.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
-			html &= '<a href="' & variables.basePath & escapedMarkdownUrl & '" download>' & bxsitesIcon( "markdown" ) & ' Download Markdown</a>'
+			html &= '<a href="' & variables.basePath & escapedMarkdownUrl & '" download>' & bxsitesIcon( "markdown" ) & ' ' & encodeForHTML( variables.strings.downloadMarkdown ) & '</a>'
 		}
 		if ( len( arguments.lastUpdated ) ) {
-			html &= '<span class="page-meta__item">' & bxsitesIcon( "clock" ) & ' Last updated ' & encodeForHTML( dateTimeFormat( arguments.lastUpdated, "medium" ) ) & '</span>'
+			html &= '<span class="page-meta__item">' & bxsitesIcon( "clock" ) & ' ' & encodeForHTML( variables.strings.lastUpdated ) & ' ' & encodeForHTML( dateTimeFormat( arguments.lastUpdated, "medium" ) ) & '</span>'
 		}
 		html &= '</div>'
 		return html
@@ -52,10 +52,10 @@
 		listHtml &= '</ul>'
 
 		if ( arguments.hideAtXl ) {
-			return '<details class="bxsites-toc-mobile vp-toc--mobile"><summary class="vp-toc--mobile__summary">On this page</summary>' & listHtml & '</details>'
+			return '<details class="bxsites-toc-mobile vp-toc--mobile"><summary class="vp-toc--mobile__summary">' & encodeForHTML( variables.strings.onThisPage ) & '</summary>' & listHtml & '</details>'
 		}
 
-		return '<nav class="vp-toc" aria-label="On this page"><div class="vp-toc__title">On this page</div>' & listHtml & '</nav>'
+		return '<nav class="vp-toc" aria-label="' & encodeForHTML( variables.strings.onThisPage ) & '"><div class="vp-toc__title">' & encodeForHTML( variables.strings.onThisPage ) & '</div>' & listHtml & '</nav>'
 	}
 
 	function tagSlug( required string tag ) {
@@ -82,7 +82,7 @@
 </bx:script>
 <bx:output>			<article class="vp-card">
 </bx:output><bx:if condition="#variables.page.isFallbackContent#"><bx:output>
-				<p class="fallback-notice">#bxsitesIcon( 'globe' )# This page hasn't been translated yet - showing the #encodeForHTML( defaultLocaleLabel() )# version.</p>
+				<p class="fallback-notice">#bxsitesIcon( 'globe' )# #encodeForHTML( variables.stringsResolver.format( variables.strings.notTranslatedNotice, { "locale" : defaultLocaleLabel() } ) )#</p>
 </bx:output></bx:if><bx:if condition="#variables.page.breadcrumbs.len() gt 1#"><bx:output>#renderBreadcrumbs( variables.page.breadcrumbs )#</bx:output></bx:if><bx:output>
 				<h1 class="vp-title" id="page-title"><a href="##page-title" id="page-title" class="anchor"></a></bx:output><bx:if condition="#len( variables.page.iconHtml )#"><bx:output><span class="page-icon">#variables.page.iconHtml#</span> </bx:output></bx:if><bx:output>#encodeForHTML( variables.page.title )#</h1>
 </bx:output><bx:if condition="#len( variables.page.summary )#"><bx:output>				<p class="page-summary">#encodeForHTML( variables.page.summary )#</p>
@@ -94,7 +94,7 @@
 </bx:output><bx:if condition="#( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'bottom'#"><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:output></bx:if><bx:output>
 			</article>
 </bx:output><bx:if condition="#len( variables.page.prevPage.url ) or len( variables.page.nextPage.url )#"><bx:output>
-			<nav class="vp-page-nav" aria-label="Page navigation">
+			<nav class="vp-page-nav" aria-label="#encodeForHTML( variables.strings.pageNavigation )#">
 </bx:output><bx:if condition="#len( variables.page.prevPage.url )#"><bx:output>
 				<a class="vp-page-nav__prev" href="#variables.basePath##variables.page.prevPage.url#">&larr; #encodeForHTML( variables.page.prevPage.title )#</a>
 </bx:output></bx:if><bx:if condition="#!len( variables.page.prevPage.url )#"><bx:output>
