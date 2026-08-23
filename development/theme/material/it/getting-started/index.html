@@ -81,7 +81,17 @@
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/material/it/tags/index.html#tag-guide">guide</a><a class="page-tag" href="/bx-sites/development/theme/material/it/tags/index.html#tag-configurazione-iniziale">configurazione-iniziale</a></div>
 <details class="bxsites-toc-mobile md-toc--mobile"><summary class="md-toc--mobile__summary">On this page</summary><ul><li class="md-toc__item md-toc__item--2"><a href="#installazione">Installazione</a></li><li class="md-toc__item md-toc__item--2"><a href="#generare-lo-scheletro-di-un-progetto">Generare lo scheletro di un progetto</a></li><li class="md-toc__item md-toc__item--3"><a href="#formato-del-file-di-configurazione">Formato del file di configurazione</a></li><li class="md-toc__item md-toc__item--2"><a href="#aggiungere-pagine">Aggiungere pagine</a></li><li class="md-toc__item md-toc__item--3"><a href="#collegare-le-pagine-tra-loro">Collegare le pagine tra loro</a></li><li class="md-toc__item md-toc__item--3"><a href="#scaricare-una-pagina-come-markdown">Scaricare una pagina come Markdown</a></li><li class="md-toc__item md-toc__item--2"><a href="#compilazione">Compilazione</a></li><li class="md-toc__item md-toc__item--2"><a href="#servire-in-locale">Servire in locale</a></li><li class="md-toc__item md-toc__item--2"><a href="#pulizia">Pulizia</a></li></ul></details>
 				<div class="md-content-body">
-				<h1 id="per-iniziare"><a href="#per-iniziare" id="per-iniziare" name="per-iniziare" class="anchor"></a>Per iniziare</h1>
+				<svg xmlns="http://www.w3.org/2000/svg" class="adm-hidden">
+<symbol id="adm-note">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<g fill="currentColor">
+<path d="m15.4 5h4.5v2.7h-4.5z" transform="matrix(-.7071 -.7071 .7071 -.7071 25.7188 23.288)"/>
+<path d="m13.9 7 3.1 3.1-9.5 9.6-3.5.3.3-3.5z"/>
+</g>
+</svg>
+</symbol>
+</svg>
+<h1 id="per-iniziare"><a href="#per-iniziare" id="per-iniziare" name="per-iniziare" class="anchor"></a>Per iniziare</h1>
 <h2 id="installazione"><a href="#installazione" id="installazione" name="installazione" class="anchor"></a>Installazione</h2>
 <p>BX Sites dipende da <a href="https://github.com/ortus-boxlang/bx-markdown">bx-markdown</a>
 per il rendering del Markdown, da <a href="https://github.com/ortus-boxlang/bx-esapi">bx-esapi</a>
@@ -141,6 +151,21 @@ direttamente a <a href="#build">Compilazione</a>.</p>
 <h2 id="aggiungere-pagine"><a href="#aggiungere-pagine" id="aggiungere-pagine" name="aggiungere-pagine" class="anchor"></a>Aggiungere pagine</h2>
 <p>Ogni file <code>.md</code> sotto <code>docs/</code> diventa una pagina. L'annidamento delle
 cartelle diventa automaticamente annidamento nella navigazione:</p>
+<div class="adm-block adm-note">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-note" /></svg><span>docs/ o src/</span>
+</div>
+<div class="adm-body">
+<p><code>docs/</code> è ciò che <code>new</code> genera e ciò che usa ogni esempio in questa
+guida, ma un progetto che nello spirito non è davvero &quot;docs&quot; (un sito
+marketing, un portfolio) può usare <code>src/</code> al suo posto, senza nessun
+altro cambiamento: ogni verbo (<code>build</code>, <code>serve</code>, <code>check</code>, <code>lint</code>,
+<code>page:new</code>, ...) cerca prima <code>docs/</code> e ripiega su <code>src/</code> quando è
+quello che esiste davvero. L'output della build finisce comunque
+sempre in <code>site/</code> - i due non entrano mai in conflitto, dato che
+<code>site/</code> stesso non è mai un nome valido per la cartella sorgente.</p>
+</div>
+</div>
 <pre><code>docs/
 ├── index.md              -&gt; /
 ├── guides/
@@ -245,7 +270,7 @@ si aggancia.</p>
 sorgente <code>docs/</code>.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/material/it/getting-started.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 1:37:32 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/material/it/getting-started.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 2:17:28 AM</span></div>
 			</article>
 
 			<nav class="md-page-nav" aria-label="Page navigation">

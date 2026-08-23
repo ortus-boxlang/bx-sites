@@ -82,7 +82,17 @@
 <div class="mb-4 flex flex-wrap gap-2"><a class="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700 hover:bg-cyan-100" href="/bx-sites/development/theme/tailwind/de/tags/index.html#tag-anleitungen">anleitungen</a><a class="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700 hover:bg-cyan-100" href="/bx-sites/development/theme/tailwind/de/tags/index.html#tag-einrichtung">einrichtung</a></div>
 <details class="bxsites-toc-mobile group sticky top-0 z-10 mb-6 max-h-screen overflow-y-auto rounded border border-slate-200 bg-cyan-50/95 text-sm backdrop-blur xl:hidden"><summary class="flex list-none items-center justify-between gap-2 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">On this page<span class="h-1.5 w-1.5 shrink-0 rotate-45 border-b-2 border-r-2 border-current transition-transform group-open:-rotate-[135deg]"></span></summary><div class="px-4 pb-3"><ul class="space-y-1"><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#installation">Installation</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#ein-projekt-aufsetzen">Ein Projekt aufsetzen</a></li><li class=" ml-4"><a class="text-slate-700 hover:text-cyan-700" href="#format-der-konfigurationsdatei">Format der Konfigurationsdatei</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#seiten-hinzufügen">Seiten hinzuf&uuml;gen</a></li><li class=" ml-4"><a class="text-slate-700 hover:text-cyan-700" href="#zwischen-seiten-verlinken">Zwischen Seiten verlinken</a></li><li class=" ml-4"><a class="text-slate-700 hover:text-cyan-700" href="#eine-seite-als-markdown-herunterladen">Eine Seite als Markdown herunterladen</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#build">Build</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#lokal-ausliefern">Lokal ausliefern</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#clean">Clean</a></li></ul></div></details>
 				<div class="prose max-w-none">
-					<h1 id="erste-schritte"><a href="#erste-schritte" id="erste-schritte" name="erste-schritte" class="anchor"></a>Erste Schritte</h1>
+					<svg xmlns="http://www.w3.org/2000/svg" class="adm-hidden">
+<symbol id="adm-note">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<g fill="currentColor">
+<path d="m15.4 5h4.5v2.7h-4.5z" transform="matrix(-.7071 -.7071 .7071 -.7071 25.7188 23.288)"/>
+<path d="m13.9 7 3.1 3.1-9.5 9.6-3.5.3.3-3.5z"/>
+</g>
+</svg>
+</symbol>
+</svg>
+<h1 id="erste-schritte"><a href="#erste-schritte" id="erste-schritte" name="erste-schritte" class="anchor"></a>Erste Schritte</h1>
 <h2 id="installation"><a href="#installation" id="installation" name="installation" class="anchor"></a>Installation</h2>
 <p>BX Sites benötigt <a href="https://github.com/ortus-boxlang/bx-markdown">bx-markdown</a>
 für das Rendern von Markdown, <a href="https://github.com/ortus-boxlang/bx-esapi">bx-esapi</a>
@@ -142,6 +152,21 @@ direkt zu <a href="#build">Build</a> springen.</p>
 <h2 id="seiten-hinzufügen"><a href="#seiten-hinzufügen" id="seiten-hinzufügen" name="seiten-hinzufügen" class="anchor"></a>Seiten hinzufügen</h2>
 <p>Jede <code>.md</code>-Datei unter <code>docs/</code> wird zu einer Seite. Ordnerverschachtelung wird
 automatisch zu Navigationsverschachtelung:</p>
+<div class="adm-block adm-note">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-note" /></svg><span>docs/ oder src/</span>
+</div>
+<div class="adm-body">
+<p><code>docs/</code> ist das, was <code>new</code> erzeugt und was jedes Beispiel hier
+verwendet - aber ein Projekt, das inhaltlich gar nicht &quot;docs&quot; ist (eine
+Marketing-Seite, ein Portfolio), kann stattdessen <code>src/</code> verwenden, ganz
+ohne weitere Änderungen: jeder Befehl (<code>build</code>, <code>serve</code>, <code>check</code>,
+<code>lint</code>, <code>page:new</code>, ...) sucht zuerst nach <code>docs/</code> und weicht auf
+<code>src/</code> aus, falls das tatsächlich existiert. Das Build-Ergebnis landet
+in jedem Fall in <code>site/</code> - beide kollidieren nie, da <code>site/</code> selbst
+niemals ein gültiger Name für den Quellordner ist.</p>
+</div>
+</div>
 <pre><code>docs/
 ├── index.md              -&gt; /
 ├── guides/
@@ -244,7 +269,7 @@ woran gebunden wird.</p>
 anzurühren.</p>
 
 				</div>
-<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/bx-sites/development/theme/tailwind/de/getting-started.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 1:37:32 AM</span></div>
+<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/bx-sites/development/theme/tailwind/de/getting-started.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 2:17:28 AM</span></div>
 			</article>
 
 			<nav class="mt-8 flex justify-between border-t border-slate-200 pt-4 text-sm font-semibold" aria-label="Page navigation">

@@ -26,6 +26,10 @@ Every verb accepts `--projectRoot=<path>` (or a bare positional path) to
 target a project other than the current directory, and the two global
 flags below can appear before any verb.
 
+Every `docs/` mentioned below applies equally to a project using `src/`
+instead - see [Getting Started](getting-started.md#add-pages) for the
+`docs/`-or-`src/` convention. `new` always scaffolds `docs/`.
+
 ## Global options
 
 | Flag | Description |

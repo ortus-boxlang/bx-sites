@@ -81,7 +81,17 @@
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/material/ja/tags/index.html#tag-ガイド">ガイド</a><a class="page-tag" href="/bx-sites/development/theme/material/ja/tags/index.html#tag-セットアップ">セットアップ</a></div>
 <details class="bxsites-toc-mobile md-toc--mobile"><summary class="md-toc--mobile__summary">On this page</summary><ul><li class="md-toc__item md-toc__item--2"><a href="#インストール">インストール</a></li><li class="md-toc__item md-toc__item--2"><a href="#プロジェクトのスキャフォールド">プロジェクトのスキャフォールド</a></li><li class="md-toc__item md-toc__item--3"><a href="#設定ファイルの形式">設定ファイルの形式</a></li><li class="md-toc__item md-toc__item--2"><a href="#ページの追加">ページの追加</a></li><li class="md-toc__item md-toc__item--3"><a href="#ページ間のリンク">ページ間のリンク</a></li><li class="md-toc__item md-toc__item--3"><a href="#markdown-としてページをダウンロード">Markdown としてページをダウンロード</a></li><li class="md-toc__item md-toc__item--2"><a href="#ビルド">ビルド</a></li><li class="md-toc__item md-toc__item--2"><a href="#ローカルで配信">ローカルで配信</a></li><li class="md-toc__item md-toc__item--2"><a href="#クリーン">クリーン</a></li></ul></details>
 				<div class="md-content-body">
-				<h1 id="はじめに"><a href="#はじめに" id="はじめに" name="はじめに" class="anchor"></a>はじめに</h1>
+				<svg xmlns="http://www.w3.org/2000/svg" class="adm-hidden">
+<symbol id="adm-note">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<g fill="currentColor">
+<path d="m15.4 5h4.5v2.7h-4.5z" transform="matrix(-.7071 -.7071 .7071 -.7071 25.7188 23.288)"/>
+<path d="m13.9 7 3.1 3.1-9.5 9.6-3.5.3.3-3.5z"/>
+</g>
+</svg>
+</symbol>
+</svg>
+<h1 id="はじめに"><a href="#はじめに" id="はじめに" name="はじめに" class="anchor"></a>はじめに</h1>
 <h2 id="インストール"><a href="#インストール" id="インストール" name="インストール" class="anchor"></a>インストール</h2>
 <p>BX Sites は、Markdown レンダリングに <a href="https://github.com/ortus-boxlang/bx-markdown">bx-markdown</a>、
 HTML エンコードに <a href="https://github.com/ortus-boxlang/bx-esapi">bx-esapi</a>、
@@ -129,6 +139,21 @@ GitBook エクスポートをそのまま <code>docs/</code> に変換できま�
 詳しくは <a href="/bx-sites/development/theme/material/ja/guides/migrating-from-gitbook/index.html">GitBook からの移行</a> をご覧ください。</p>
 <h2 id="ページの追加"><a href="#ページの追加" id="ページの追加" name="ページの追加" class="anchor"></a>ページの追加</h2>
 <p><code>docs/</code> 配下のすべての <code>.md</code> ファイルがページになります。フォルダのネストがそのままナビゲーションのネストになります:</p>
+<div class="adm-block adm-note">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-note" /></svg><span>docs/ または src/</span>
+</div>
+<div class="adm-body">
+<p><code>docs/</code> は <code>new</code> が生成し、このガイドのすべての例で使われているものですが、
+「docs」というより一般的なサイト(マーケティングサイトやポートフォリオなど)
+には、代わりに <code>src/</code> を使うこともできます - 他に何も変更する必要はありません。
+<code>build</code>、<code>serve</code>、<code>check</code>、<code>lint</code>、<code>page:new</code> などすべてのコマンドが、
+まず <code>docs/</code> を探し、実際に存在するのが <code>src/</code> であればそちらにフォールバック
+します。ビルド出力はどちらの場合でも常に <code>site/</code> に置かれます - <code>site/</code> 自体が
+ソースフォルダ名として有効になることは決してないため、両者が衝突することは
+ありません。</p>
+</div>
+</div>
 <pre><code>docs/
 ├── index.md              -&gt; /
 ├── guides/
@@ -192,7 +217,7 @@ ogImage: assets/deployment-card.png
 <p><code>docs/</code> ソースを変更せずに <code>site/</code> とビルドキャッシュを削除します。</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/ja/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/material/ja/getting-started.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 1:37:32 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/ja/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/material/ja/getting-started.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 2:17:28 AM</span></div>
 			</article>
 
 			<nav class="md-page-nav" aria-label="Page navigation">
