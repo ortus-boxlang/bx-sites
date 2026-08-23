@@ -46,6 +46,7 @@ footer: true
 lastUpdated: true
 mermaid: true
 math: true
+openapi: true
 ogImage: "assets/og-image.png"
 extraJs:
   - "assets/theme-switcher.js"

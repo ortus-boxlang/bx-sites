@@ -35,7 +35,7 @@ jobs:
         uses: ortus-boxlang/setup-boxlang@1.4.0
         with:
           with-commandbox: true
-          modules: bx-esapi bx-yaml
+          modules: bx-esapi bx-yaml bx-markdown bx-image
 
       - name: Check BoxLang Version
         run: boxlang --version
@@ -51,7 +51,7 @@ jobs:
           mkdir -p "${BOXLANG_HOME}/modules"
           ln -s "$(pwd)" "${BOXLANG_HOME}/modules/$(basename "$(pwd)")"
 
-      - name: Run Tests
+      - name: Run Tests (streamed)
         run: |
           # --stream prints each bundle/suite/spec result live as it
           # completes, instead of only the final aggregate report - kept on
@@ -60,7 +60,31 @@ jobs:
           # StackOverflowError in TestBox's own JSON serialization of the
           # resulting giant cascaded-parse-error message) that the default,
           # end-of-run-only report never showed at all.
-          ./testbox/run --reporter=ANTJunit --verbose --stream
+          #
+          # BoxLangRunner.bx unconditionally forces its own reporter to
+          # "text" whenever --stream is set (see its own shouldStream
+          # branch), discarding whatever --reporter was actually requested -
+          # so this streamed run can never itself produce real JUnit XML;
+          # that's what the second, non-streamed run below is for.
+          ./testbox/run --verbose --stream
+
+      - name: Run Tests (JUnit report)
+        run: |
+          ./testbox/run --reporter=ANTJunit --verbose
+          # BoxLang's TestBox runner never sets a nonzero process exit code
+          # based on spec failures - the shell step above "succeeds" even
+          # when specs failed, the same silent-green gap that let a real
+          # regression (a stale test assertion) ship unnoticed for a while.
+          # Fail this step explicitly by summing every generated JUnit XML
+          # file's own `failures`/`errors` attributes (ANTJUnitReporter.cfc's
+          # own <testsuite> shape).
+          failures=$(grep -ohE 'failures="[0-9]+"' tests/results/*.xml | grep -oE '[0-9]+' | awk '{s+=$1} END {print s+0}')
+          errors=$(grep -ohE 'errors="[0-9]+"' tests/results/*.xml | grep -oE '[0-9]+' | awk '{s+=$1} END {print s+0}')
+          echo "Failures: ${failures}, Errors: ${errors}"
+          if [ "${failures}" -gt 0 ] || [ "${errors}" -gt 0 ]; then
+            echo "::error::${failures} failing / ${errors} erroring spec(s) - see the streamed run above for exactly which ones"
+            exit 1
+          fi
 
       - name: Upload Test Results
         if: always()

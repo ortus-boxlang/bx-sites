@@ -177,6 +177,41 @@ class extends="testbox.system.BaseSpec" {
 				expect( processor.resolveFileHrefs( absolute, "/guides/content-blocks/" ) ).toInclude( 'href="https://example.com/spec.pdf"' );
 			} );
 
+			it( "renders an openapi block as a placeholder div carrying its src and optional title", function() {
+				var html = render( '::: openapi src="assets/openapi/example.yaml" title="Example API"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( '<div class="bxsites-openapi" data-openapi-src="assets/openapi/example.yaml">' );
+				expect( html ).toInclude( '<div class="bxsites-openapi__title">Example API</div>' );
+			} );
+
+			it( "renders an openapi block with no title as a bare placeholder div", function() {
+				var html = render( '::: openapi src="assets/openapi/example.yaml"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( '<div class="bxsites-openapi" data-openapi-src="assets/openapi/example.yaml"></div>' );
+			} );
+
+			it( "renders an invalid-block message when an openapi block is missing its required src", function() {
+				var html = render( '::: openapi title="No src"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( "missing required src" );
+			} );
+
+			it( "resolveOpenApiSrcs() prefixes a bare openapi src with basePath, so the widget fetches the right spec from a nested page", function() {
+				var html = render( '::: openapi src="assets/openapi/example.yaml"' & char( 10 ) & ":::" );
+
+				var resolved = processor.resolveOpenApiSrcs( html, "/guides/content-blocks/" );
+
+				expect( resolved ).toInclude( 'data-openapi-src="/guides/content-blocks/assets/openapi/example.yaml"' );
+			} );
+
+			it( "resolveOpenApiSrcs() leaves an already root-relative or absolute openapi src untouched", function() {
+				var rootRelative = render( '::: openapi src="/specs/example.yaml"' & char( 10 ) & ":::" );
+				var absolute = render( '::: openapi src="https://example.com/spec.yaml"' & char( 10 ) & ":::" );
+
+				expect( processor.resolveOpenApiSrcs( rootRelative, "/guides/content-blocks/" ) ).toInclude( 'data-openapi-src="/specs/example.yaml"' );
+				expect( processor.resolveOpenApiSrcs( absolute, "/guides/content-blocks/" ) ).toInclude( 'data-openapi-src="https://example.com/spec.yaml"' );
+			} );
+
 			it( "resolves a YouTube embed URL to its iframe embed form", function() {
 				var html = render( '::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="Demo"' & char( 10 ) & ":::" );
 

@@ -177,6 +177,38 @@ refuse to render (most sites block being framed):
 ::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
 :::
 
+## OpenAPI / Swagger
+
+An interactive [Swagger UI](https://swagger.io/tools/swagger-ui/) widget for
+an OpenAPI/Swagger spec - `src` is resolved the same `docs/assets/`-relative
+way `::: file`'s own `src` is. Both JSON and YAML specs work; Swagger UI
+parses either entirely client-side; no OpenAPI parsing happens anywhere in
+this module. Requires `bxsites.json`'s [`openapi`](../configuration.md#openapi)
+set to `true` - unset, this placeholder renders but stays inert (Swagger
+UI's own JS/CSS is never copied into `site/` at all, keeping every other
+project's build exactly as small as before this feature existed):
+
+```markdown title="Example" linenums="1"
+::: openapi src="assets/openapi/example.yaml" title="Bookshelf API"
+:::
+```
+
+::: openapi src="assets/openapi/example.yaml" title="Bookshelf API"
+:::
+
+The widget above is this exact page, live, rendering the small example spec
+this guide ships at `docs/assets/openapi/example.yaml` - open it in your
+own project's `docs/assets/` (or point `src` at wherever your own spec
+already lives) to see it with your own API instead.
+
+Only `SwaggerUIBundle`'s own base layout is vendored - no topbar/"Explore"
+bar letting a reader type in a *different* spec (a `::: openapi` block is
+meant to always show the one spec its author pointed it at), so every
+operation, its request/response schemas, and "Try it out" (which calls the
+spec's own `servers[0].url` directly from the visitor's browser - make
+sure that server allows CORS from wherever your docs are hosted) render
+straight from your existing spec with no rewriting needed.
+
 ## Page link
 
 A rich preview card linking to another page - `href` follows the same

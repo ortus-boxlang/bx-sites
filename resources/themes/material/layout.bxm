@@ -181,6 +181,7 @@
 	variables.analyticsId = trim( variables.siteConfig.analytics.id ?: "" )
 	variables.mermaidEnabled = ( variables.siteConfig.mermaid ?: false ) ? true : false
 	variables.mathEnabled = ( variables.siteConfig.math ?: false ) ? true : false
+	variables.openapiEnabled = ( variables.siteConfig.openapi ?: false ) ? true : false
 </bx:script>
 <bx:output><!doctype html>
 <html lang="#encodeForHTML( variables.currentLocale.len() ? variables.currentLocale : 'en' )#" dir="#encodeForHTML( variables.currentLocaleDir )#">
@@ -217,6 +218,8 @@
 	#renderExtraCss( variables.siteConfig.extraCss ?: [] )#
 </bx:output><bx:if condition="#variables.mathEnabled#"><bx:output>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</bx:output></bx:if><bx:if condition="#variables.openapiEnabled#"><bx:output>
+	<link rel="stylesheet" href="#variables.basePath#assets/vendor/swagger-ui/swagger-ui.css">
 </bx:output></bx:if><bx:if condition="#variables.analyticsProvider == 'google'#"><bx:output>
 	<script async src="https://www.googletagmanager.com/gtag/js?id=#encodeForHTML( variables.analyticsId )#"></script>
 	<script>
@@ -295,6 +298,9 @@
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 	<script src="#variables.basePath#assets/math-init.js"></script>
+</bx:output></bx:if><bx:if condition="#variables.openapiEnabled#"><bx:output>
+	<script src="#variables.basePath#assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
+	<script src="#variables.basePath#assets/openapi-init.js"></script>
 </bx:output></bx:if><bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'algolia'#"><bx:output>
 	<script src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>
 	<script>
