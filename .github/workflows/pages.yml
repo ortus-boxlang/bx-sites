@@ -53,7 +53,6 @@ jobs:
       - name: Setup BoxLang
         uses: ortus-boxlang/setup-boxlang@1.4.0
         with:
-          with-commandbox: true
           modules: bx-markdown bx-yaml bx-image
 
       - name: Register this module so `bxSites` resolves

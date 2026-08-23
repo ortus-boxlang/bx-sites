@@ -26,6 +26,21 @@
 # edits still show up in the preview build the same way they did when
 # every build ran in place, one at a time.
 #
+# Each variant moves its own site/ output into its final destination
+# (site/ for bootstrap, site/theme/<name>/ for everything else) and
+# removes its own worktree the moment ITS OWN build finishes, rather
+# than every worktree + site output sitting on disk until all ten are
+# done and one big pass moves/removes them at the very end - with ten
+# full repo checkouts (worktrees) plus ten full site outputs, keeping
+# all of them alive simultaneously nearly doubles peak disk usage for
+# no reason, and on a standard-size GitHub-hosted runner that's the
+# difference between comfortably fitting and a variant silently losing
+# a write partway through (still exiting 0, since not every failure
+# mode surfaces as a nonzero exit) - which is exactly what an
+# `mv: cannot stat '.../bootstrap/site/*': No such file or directory`
+# at the very end, after every variant already logged its own "Built",
+# looks like from the outside.
+#
 # Usage: ./buildMultiTheme.sh [projectRoot]   (defaults to ".")
 # Env:   BXSITES_BUILD_JOBS - max concurrent theme builds (default: nproc)
 #
@@ -56,6 +71,11 @@ SWITCHER_JS="docs/assets/theme-switcher.js"
 mkdir -p "${LOG_DIR}"
 cp "${SWITCHER_JS}" "${SWITCHER_BACKUP}"
 
+# Each variant already removes its own worktree the moment it finishes
+# successfully (see build_variant() below) - this is only a catch-all for
+# one that failed or got interrupted partway through (set -e stops that
+# variant's own { } block before it reaches its own worktree removal),
+# so nothing borrowed from `git worktree add` is ever left behind.
 cleanup() {
 	cp "${SWITCHER_BACKUP}" "${SWITCHER_JS}" 2>/dev/null || true
 	rm -f "${SWITCHER_BACKUP}"
@@ -91,9 +111,17 @@ echo "Multi-theme build - site root: ${ROOT_PATH} - up to ${MAX_JOBS} theme(s) a
 # once, before any of the ten builds run.
 sed -i "s#__BXSITES_ROOT__#${ROOT_PATH}#g" "${SWITCHER_JS}"
 
-# Builds one theme variant in its own git worktree, writing progress/errors
-# to its own log file rather than interleaving with the other concurrent
-# builds' own output.
+# Created up front, not by the first variant to finish - bootstrap's own
+# move (below) merges into an already-existing site/, and every other
+# variant's move target is a fresh site/theme/<name>/ under an
+# already-existing site/theme/.
+rm -rf site
+mkdir -p site/theme
+
+# Builds one theme variant in its own git worktree, moves its own output
+# straight into its final destination, and removes its own worktree -
+# all before returning - writing progress/errors to its own log file
+# rather than interleaving with the other concurrent builds' own output.
 build_variant() {
 	local name="$1"
 	local variantRoot="${SCRATCH_DIR}/build/${name}"
@@ -112,6 +140,19 @@ build_variant() {
 		rm -rf "${variantRoot}/docs"
 		ln -s "${PROJECT_ROOT}/docs" "${variantRoot}/docs"
 
+		# The worktree's own checked-out bxsites.yaml is whatever's
+		# actually committed - never pages.yml's own throwaway,
+		# uncommitted per-branch patch (baseURL/repo.editUri pointed at
+		# this branch's own sub-path) done to PROJECT_ROOT's copy just
+		# before this script runs, since `git worktree add` only ever
+		# sees committed state. Copying PROJECT_ROOT's own copy over
+		# first - the same one this script's own BASE_URL/ROOT_PATH
+		# were themselves derived from, above - means every variant,
+		# bootstrap included, starts from the config this build was
+		# actually asked for rather than silently falling back to
+		# whatever's plain-committed (main's own root baseURL).
+		cp "${PROJECT_ROOT}/bxsites.yaml" "${variantRoot}/bxsites.yaml"
+
 		if [[ "${name}" != "bootstrap" ]]; then
 			THEME="${name}" URL="${BASE_URL_NO_SLASH}/theme/${name}/" \
 				yq eval -i '.theme.name = strenv(THEME) | .baseURL = strenv(URL)' "${variantRoot}/bxsites.yaml"
@@ -119,10 +160,24 @@ build_variant() {
 
 		boxlang bxSites build --projectRoot="${variantRoot}"
 
-		if [[ ! -d "${variantRoot}/site" ]]; then
-			echo "error: build for [${name}] produced no site/ directory" >&2
+		# Not just `-d` - an existing but empty site/ (a build that quietly
+		# wrote nothing, e.g. because it ran out of disk mid-write without
+		# that surfacing as a nonzero exit) must fail loudly here, tied to
+		# this variant's own name/log, rather than as a cryptic glob-not-
+		# matched error somewhere else once every variant's own "Built" has
+		# already printed.
+		if [[ ! -d "${variantRoot}/site" ]] || [[ -z "$(ls -A "${variantRoot}/site" 2>/dev/null)" ]]; then
+			echo "error: build for [${name}] produced no site/ output" >&2
 			exit 1
 		fi
+
+		if [[ "${name}" == "bootstrap" ]]; then
+			mv "${variantRoot}/site"/* "${PROJECT_ROOT}/site/"
+		else
+			mv "${variantRoot}/site" "${PROJECT_ROOT}/site/theme/${name}"
+		fi
+
+		git worktree remove --force "${variantRoot}"
 	} > "${log}" 2>&1
 
 	echo "==> Built [${name}]"
@@ -158,13 +213,5 @@ if [[ "${#fail_names[@]}" -gt 0 ]]; then
 	done
 	exit 1
 fi
-
-rm -rf site
-mkdir -p site/theme
-mv "${SCRATCH_DIR}/build/bootstrap/site"/* site/
-for name in "${THEMES[@]}"; do
-	[[ "${name}" == "bootstrap" ]] && continue
-	mv "${SCRATCH_DIR}/build/${name}/site" "site/theme/${name}"
-done
 
 echo "Done - bootstrap at site/, every other theme at site/theme/<name>/"
