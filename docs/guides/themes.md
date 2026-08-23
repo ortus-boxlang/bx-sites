@@ -115,6 +115,30 @@ Set which one a project uses in `bxsites.json`:
 { "theme": { "name": "material" } }
 ```
 
+## Installing a published theme
+
+A theme published to ForgeBox installs with nothing but the `bxSites`
+binary itself - no `box`/CommandBox needed:
+
+```bash title="Usage"
+bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
+```
+
+This downloads the package's zip and extracts it into
+`themes/bx-sites-theme-blog1/` at the project root, validating it
+satisfies the `ThemeProvider` contract below before finishing. A project
+can carry several installed themes side by side this way and switch
+between them purely by name:
+
+```json title="bxsites.json"
+{ "theme": { "name": "bx-sites-theme-blog1" } }
+```
+
+A theme needs no BoxLang module/class-loader involvement at all (unlike a
+plugin) - it's pure files, so there's no separate activation step the way
+`install:plugin` has; setting `theme.name` is the only wiring needed. See
+[`install:theme`](../cli-reference.md#installtheme) in the CLI reference.
+
 ## Air-gapped/offline sites
 
 A built site works with no internet access at all by default, for the
@@ -335,9 +359,12 @@ resize/replace `bxsites-hero__banner`'s own image via a `docs/assets/`-relative
 
 Drop your own `layout.bxm` + `page.bxm` (and optionally `search.bxm` /
 `assets/`) into a `theme/` folder at your project root. BX Sites prefers a
-project-level `theme/` override over any built-in theme, as long as it
-satisfies the contract above - the built-in themes under this module's own
-`resources/themes/` are a good starting point to copy and adapt.
+project-level `theme/` override over both an installed `themes/<name>/`
+theme and any built-in theme, as long as it satisfies the contract below -
+the built-in themes under this module's own `resources/themes/` are a good
+starting point to copy and adapt. Full resolution order: `theme/` (this
+section) -> `themes/theme.name/` (an [installed theme](#installing-a-published-theme),
+if `theme.name` matches one) -> a built-in theme named `theme.name`.
 
 A worked example - start from `bootstrap` and swap its brand palette and
 heading font for your own, keeping everything else (nav, search, dark mode,

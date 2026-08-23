@@ -347,6 +347,25 @@ Fails rather than overwriting an existing `theme/`. See
 [Themes](guides/themes.md) for the override contract (`layout.bxm` +
 `page.bxm`).
 
+## `install:theme`
+
+Download a published theme from ForgeBox into the project's own
+`themes/<name>/` - nothing but the `bxSites` binary needed, same as
+`install:plugin`.
+
+```bash title="Usage"
+bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
+```
+
+- `--name` (required) - the ForgeBox slug to install
+- `--version` - a specific version; omit for the latest
+
+Validates the downloaded package against the `ThemeProvider` contract
+(`layout.bxm` + `page.bxm`) before finishing, so a broken package fails at
+install time rather than at the next `build`. Set `bxsites.json`'s
+`theme.name` to the installed name to use it - see
+[Themes](guides/themes.md#installing-a-published-theme).
+
 ## `page:rename`
 
 Move a docs page from one path to another, rewriting every relative

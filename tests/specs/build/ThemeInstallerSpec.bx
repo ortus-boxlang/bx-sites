@@ -1,0 +1,129 @@
+/**
+ * Exercises ThemeInstaller.install() against a fake ForgeBoxClient (built
+ * via compress()'d fixture zips on disk - no live network call) and real
+ * filesystem extraction. Unlike PluginInstaller.bx, nothing here touches
+ * the running BoxRuntime - a theme is pure files - so the whole flow is
+ * unit-testable end to end.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.ThemeInstaller", function() {
+
+			beforeEach( function() {
+				variables.installer = new "models.build.ThemeInstaller@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newTempDir( required string prefix ) {
+				var dir = createTempDirectory( prefix = arguments.prefix );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			/**
+			 * Builds a throwaway theme folder and compresses it into a zip
+			 * fixture - `flat` mirrors `theme:new`'s own layout (no
+			 * wrapping folder); `!flat` mirrors a GitHub "Download ZIP"
+			 * style archive. `valid` controls whether page.bxm is included
+			 * at all, for exercising the ThemeProvider validation.
+			 */
+			private string function buildFixtureZip( required boolean flat, boolean valid = true ) {
+				var themeDir = newTempDir( "bxsites-fixture-theme-" );
+				fileWrite( themeDir & "/layout.bxm", "<bx:output>layout</bx:output>" );
+				if ( arguments.valid ) {
+					fileWrite( themeDir & "/page.bxm", "<bx:output>page</bx:output>" );
+				}
+
+				var zipPath = newTempDir( "bxsites-fixture-zip-" ) & "/theme.zip";
+				compress( format : "zip", source : themeDir, destination : zipPath, includeBaseFolder : !arguments.flat, overwrite : true );
+				return zipPath;
+			}
+
+			private any function fakeForgeBoxClient( required string fixtureZipPath, string version = "1.0.0" ) {
+				return {
+					resolve : function( required string slug, string version = "" ) {
+						return { name : arguments.slug, version : version, location : "https://downloads.example.com/" & arguments.slug & ".zip" };
+					},
+					download : function( required string url, required string destZipPath ) {
+						directoryCreate( getDirectoryFromPath( arguments.destZipPath ), true, true );
+						fileCopy( fixtureZipPath, arguments.destZipPath );
+					}
+				};
+			}
+
+			it( "targetDir() resolves to <projectRoot>/themes/<name>", function() {
+				expect( installer.targetDir( "/projects/my-docs", "blog1" ) ).toBe( "/projects/my-docs/themes/blog1" );
+			} );
+
+			it( "install() extracts a flat theme zip directly into themes/<name>/", function() {
+				var projectRoot = newTempDir( "bxsites-install-theme-project-" );
+				installer.setForgeBoxClient( fakeForgeBoxClient( buildFixtureZip( true ) ) );
+
+				var result = installer.install( projectRoot, "blog1", "" );
+
+				expect( result.name ).toBe( "blog1" );
+				expect( result.version ).toBe( "1.0.0" );
+				expect( result.installDir ).toBe( projectRoot & "/themes/blog1" );
+				expect( fileExists( result.installDir & "/layout.bxm" ) ).toBeTrue();
+				expect( fileExists( result.installDir & "/page.bxm" ) ).toBeTrue();
+			} );
+
+			it( "install() hoists a single wrapping subfolder up to the theme root", function() {
+				var projectRoot = newTempDir( "bxsites-install-theme-project-" );
+				installer.setForgeBoxClient( fakeForgeBoxClient( buildFixtureZip( false ) ) );
+
+				var result = installer.install( projectRoot, "blog1", "" );
+
+				expect( fileExists( result.installDir & "/layout.bxm" ) ).toBeTrue();
+				expect( fileExists( result.installDir & "/page.bxm" ) ).toBeTrue();
+			} );
+
+			it( "install() replaces a previous install of the same name rather than merging into it", function() {
+				var projectRoot = newTempDir( "bxsites-install-theme-project-" );
+				installer.setForgeBoxClient( fakeForgeBoxClient( buildFixtureZip( true ) ) );
+				installer.install( projectRoot, "blog1", "" );
+
+				var staleDir = projectRoot & "/themes/blog1";
+				fileWrite( staleDir & "/stale.txt", "should be gone" );
+
+				installer.install( projectRoot, "blog1", "" );
+
+				expect( fileExists( staleDir & "/stale.txt" ) ).toBeFalse();
+				expect( fileExists( staleDir & "/layout.bxm" ) ).toBeTrue();
+			} );
+
+			it( "throws BxSites.InvalidTheme when the extracted package is missing page.bxm", function() {
+				var projectRoot = newTempDir( "bxsites-install-theme-project-" );
+				installer.setForgeBoxClient( fakeForgeBoxClient( buildFixtureZip( flat = true, valid = false ) ) );
+
+				expect( function() {
+					installer.install( projectRoot, "broken-theme", "" );
+				} ).toThrow( "BxSites.InvalidTheme" );
+			} );
+
+			it( "propagates a ForgeBoxClient resolve() failure", function() {
+				var projectRoot = newTempDir( "bxsites-install-theme-project-" );
+				installer.setForgeBoxClient( {
+					resolve : function( required string slug, string version = "" ) {
+						throw( type = "BxSites.ForgeBoxEntryNotFound", message = "no such entry" );
+					}
+				} );
+
+				expect( function() {
+					installer.install( projectRoot, "does-not-exist", "" );
+				} ).toThrow( "BxSites.ForgeBoxEntryNotFound" );
+			} );
+
+		} );
+	}
+
+}

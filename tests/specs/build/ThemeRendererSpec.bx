@@ -57,6 +57,53 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.InvalidTheme" );
 			} );
 
+			it( "resolves a themes/<name>/ installed theme (install:theme's own target) when there's no project theme/ override", function() {
+				var root = newProjectRoot();
+				directoryCreate( root & "/themes/blog1", true, true );
+				fileWrite( root & "/themes/blog1/layout.bxm", "<bx:output>installed layout</bx:output>" );
+				fileWrite( root & "/themes/blog1/page.bxm", "<bx:output>installed page</bx:output>" );
+
+				var themeDir = renderer.resolveThemeDir( "blog1", root );
+
+				expect( themeDir ).toBe( root & "/themes/blog1" );
+			} );
+
+			it( "prefers a project theme/ override over a same-named themes/<name>/ installed theme", function() {
+				var root = newProjectRoot();
+				directoryCreate( root & "/theme", true, true );
+				fileWrite( root & "/theme/layout.bxm", "<bx:output>override layout</bx:output>" );
+				fileWrite( root & "/theme/page.bxm", "<bx:output>override page</bx:output>" );
+				directoryCreate( root & "/themes/blog1", true, true );
+				fileWrite( root & "/themes/blog1/layout.bxm", "<bx:output>installed layout</bx:output>" );
+				fileWrite( root & "/themes/blog1/page.bxm", "<bx:output>installed page</bx:output>" );
+
+				var themeDir = renderer.resolveThemeDir( "blog1", root );
+
+				expect( themeDir ).toBe( root & "/theme" );
+			} );
+
+			it( "falls back to a built-in theme when no themes/<name>/ installed theme matches that name", function() {
+				var root = newProjectRoot();
+				directoryCreate( root & "/themes/blog1", true, true );
+				fileWrite( root & "/themes/blog1/layout.bxm", "<bx:output>installed layout</bx:output>" );
+				fileWrite( root & "/themes/blog1/page.bxm", "<bx:output>installed page</bx:output>" );
+
+				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+
+				expect( themeDir ).notToBe( root & "/themes/blog1" );
+				expect( fileExists( themeDir & "/layout.bxm" ) ).toBeTrue();
+			} );
+
+			it( "throws BxSites.InvalidTheme when a themes/<name>/ installed theme is missing page.bxm", function() {
+				var root = newProjectRoot();
+				directoryCreate( root & "/themes/blog1", true, true );
+				fileWrite( root & "/themes/blog1/layout.bxm", "<bx:output>installed layout</bx:output>" );
+
+				expect( function() {
+					renderer.resolveThemeDir( "blog1", root );
+				} ).toThrow( "BxSites.InvalidTheme" );
+			} );
+
 			it( "resolves each built-in theme (bootstrap, material, tailwind) with a valid ThemeProvider contract", function() {
 				var root = newProjectRoot();
 				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
