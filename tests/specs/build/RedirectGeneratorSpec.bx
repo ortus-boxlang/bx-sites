@@ -101,6 +101,27 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.RedirectConflict" );
 			} );
 
+			it( "throws BxSites.InvalidRedirect when a redirect_from entry walks outside this tree's own siteDir", function() {
+				var siteDir = newSiteDir();
+				var pages = [ makePage( "guides/new-setup/index.html", [ "../../../../tmp/evil" ] ) ];
+
+				expect( function() {
+					generator.write( pages, siteDir, "/" );
+				} ).toThrow( "BxSites.InvalidRedirect" );
+			} );
+
+			it( "throws BxSites.RedirectConflict rather than overwriting content already on disk (e.g. from an already-built locale tree)", function() {
+				var siteDir = newSiteDir();
+				directoryCreate( siteDir & "/de", true, true );
+				fileWrite( siteDir & "/de/index.html", "existing locale content" );
+				var configRedirects = [ { "from" : "de", "to" : "guides/setup/" } ];
+
+				expect( function() {
+					generator.write( [], siteDir, "/", configRedirects );
+				} ).toThrow( "BxSites.RedirectConflict" );
+				expect( fileRead( siteDir & "/de/index.html" ) ).toBe( "existing locale content" );
+			} );
+
 			it( "throws BxSites.InvalidRedirect for a blank redirect_from entry", function() {
 				var siteDir = newSiteDir();
 				var pages = [ makePage( "guides/a/index.html", [ "   " ] ) ];

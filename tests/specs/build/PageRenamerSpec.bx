@@ -179,6 +179,30 @@ class extends="testbox.system.BaseSpec" {
 				expect( content ).toInclude( "guides/plain" );
 			} );
 
+			it( "doesn't duplicate a block-list redirect_from entry that already matches the old path", function() {
+				var docsDir = newDocsDir();
+				directoryCreate( docsDir & "/guides", true, true );
+				fileWrite( docsDir & "/guides/mid-setup.md", "---" & char( 10 ) & "title: Mid" & char( 10 ) & "redirect_from:" & char( 10 ) & "  - guides/mid-setup" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var result = renamer.rename( docsDir : docsDir, from : "guides/mid-setup.md", to : "guides/final-setup.md" );
+
+				var content = fileRead( result.path );
+				var firstIndex = content.find( "guides/mid-setup" );
+				var secondIndex = content.find( "guides/mid-setup", firstIndex + 1 );
+				expect( firstIndex > 0 ).toBeTrue();
+				expect( secondIndex ).toBe( 0 );
+			} );
+
+			it( "doesn't duplicate an inline redirect_from entry that already matches the old path", function() {
+				var docsDir = newDocsDir();
+				directoryCreate( docsDir & "/guides", true, true );
+				fileWrite( docsDir & "/guides/a.md", "---" & char( 10 ) & "title: A" & char( 10 ) & "redirect_from: [guides/a]" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var result = renamer.rename( docsDir : docsDir, from : "guides/a.md", to : "guides/b.md" );
+
+				expect( fileRead( result.path ) ).toInclude( "redirect_from: [guides/a]" );
+			} );
+
 			it( "doesn't stamp redirect_from when renaming the tree's own root index.md", function() {
 				var docsDir = newDocsDir();
 				fileWrite( docsDir & "/index.md", "---" & char( 10 ) & "title: Home" & char( 10 ) & "---" & char( 10 ) & "Body." );

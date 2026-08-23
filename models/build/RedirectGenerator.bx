@@ -67,8 +67,32 @@ class {
 			seen[ entry.from ] = true
 		}
 
+		var canonicalSiteDir = createObject( "java", "java.io.File" ).init( arguments.siteDir ).getCanonicalPath()
+
 		for ( var entry in toWrite ) {
 			var outputPath = arguments.siteDir & "/" & entry.from
+			// A `redirect_from`/`redirects.from` entry containing `..` could
+			// otherwise walk outside this tree's own siteDir - canonicalize
+			// and verify containment before ever writing, the same
+			// containment check AssetBundler.bx's own bundle() already
+			// applies to `extraCss`/`extraJs` entries.
+			if ( !isWithinDirectory( outputPath, canonicalSiteDir ) ) {
+				throw(
+					type    = "BxSites.InvalidRedirect",
+					message = "A redirect's own [from] path [#entry.from#] resolves outside this tree's own output directory"
+				)
+			}
+			// A config-level redirect's own [from] could otherwise name a
+			// path already built by another tree (e.g. a locale prefix like
+			// "de/..." - every version/locale tree finishes building before
+			// the main tree's own redirects are written) - refuse to
+			// overwrite it rather than silently clobbering real content.
+			if ( fileExists( outputPath ) || directoryExists( outputPath ) ) {
+				throw(
+					type    = "BxSites.RedirectConflict",
+					message = "A redirect's own [from] path [#entry.from#] already exists on disk at [#outputPath#]"
+				)
+			}
 			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
 			fileWrite( outputPath, renderStub( entry.to ) )
 		}
@@ -91,6 +115,20 @@ class {
 			throw( type = "BxSites.InvalidRedirect", message = "A redirect's [from]/[redirect_from] entry can't be empty" )
 		}
 		return trimmed & "/index.html"
+	}
+
+	/**
+	 * Whether `filePath` - once canonicalized (symlinks resolved, `..`
+	 * segments collapsed) - actually sits inside `canonicalDir`, rather than
+	 * merely being spelled as if it did - same containment check
+	 * AssetBundler.bx's own `isWithinDirectory()` already applies.
+	 *
+	 * @filePath The candidate file path, not yet canonicalized
+	 * @canonicalDir The already-canonicalized directory `filePath` must sit inside
+	 */
+	private boolean function isWithinDirectory( required string filePath, required string canonicalDir ) {
+		var canonicalFile = createObject( "java", "java.io.File" ).init( arguments.filePath ).getCanonicalPath()
+		return canonicalFile == arguments.canonicalDir || canonicalFile.startsWith( arguments.canonicalDir & "/" )
 	}
 
 	/**

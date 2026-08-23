@@ -359,16 +359,31 @@ class {
 		}
 
 		if ( redirectFromLineIndex ) {
+			// `oldSegment` captured into a local first - an arrow closure's own
+			// `arguments` scope is its own (item/index/array), not this
+			// function's, so `arguments.oldSegment` inside .some() below would
+			// look up a key that was never there.
+			var oldSegment = arguments.oldSegment
 			var valuePart = trim( lines[ redirectFromLineIndex ].reReplaceNoCase( "^redirect_from\s*:", "" ) )
 			if ( len( valuePart ) && valuePart.left( 1 ) == "[" && valuePart.right( 1 ) == "]" ) {
 				var inner = trim( valuePart.mid( 2, len( valuePart ) - 2 ) )
-				lines[ redirectFromLineIndex ] = "redirect_from: [" & ( len( inner ) ? inner & ", " & arguments.oldSegment : arguments.oldSegment ) & "]"
+				var items = len( inner ) ? listToArray( inner, "," ).map( item => trim( item ) ) : []
+				if ( !items.some( item => compareNoCase( item, oldSegment ) == 0 ) ) {
+					lines[ redirectFromLineIndex ] = "redirect_from: [" & ( len( inner ) ? inner & ", " & arguments.oldSegment : arguments.oldSegment ) & "]"
+				}
 			} else {
 				var insertAt = redirectFromLineIndex + 1
+				var alreadyPresent = false
 				while ( insertAt < closingIndex && trim( lines[ insertAt ] ).left( 1 ) == "-" ) {
+					var existingItem = trim( trim( lines[ insertAt ] ).right( len( trim( lines[ insertAt ] ) ) - 1 ) )
+					if ( compareNoCase( existingItem, oldSegment ) == 0 ) {
+						alreadyPresent = true
+					}
 					insertAt++
 				}
-				lines.insertAt( insertAt, "  - " & arguments.oldSegment )
+				if ( !alreadyPresent ) {
+					lines.insertAt( insertAt, "  - " & arguments.oldSegment )
+				}
 			}
 		} else {
 			lines.insertAt( closingIndex, "  - " & arguments.oldSegment )
