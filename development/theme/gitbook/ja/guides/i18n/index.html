@@ -80,7 +80,7 @@
 
 				<h1 class="gb-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a>国際化（i18n）</h1>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/gitbook/ja/tags/index.html#tag-ガイド">ガイド</a><a class="page-tag" href="/bx-sites/development/theme/gitbook/ja/tags/index.html#tag-i18n">i18n</a></div>
-<details class="bxsites-toc-mobile gb-toc--mobile"><summary class="gb-toc--mobile__summary">On this page</summary><ul><li class="gb-toc__item gb-toc__item--2"><a href="#ロケールの追加">ロケールの追加</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#ビルドされる内容">ビルドされる内容</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#未翻訳のページ">未翻訳のページ</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#言語スイッチャー">言語スイッチャー</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#バージョンとロケールを組み合わせたドキュメント">バージョンとロケールを組み合わせたドキュメント</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#現在対象外の機能">現在対象外の機能</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#カスタムアイコンとインクルード">カスタムアイコンとインクルード</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#seo">SEO</a></li></ul></details>
+<details class="bxsites-toc-mobile gb-toc--mobile"><summary class="gb-toc--mobile__summary">On this page</summary><ul><li class="gb-toc__item gb-toc__item--2"><a href="#ロケールの追加">ロケールの追加</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#ビルドされる内容">ビルドされる内容</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#未翻訳のページ">未翻訳のページ</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#言語スイッチャー">言語スイッチャー</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#バージョンとロケールを組み合わせたドキュメント">バージョンとロケールを組み合わせたドキュメント</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#テーマのクロームui-文字列">テーマのクローム（UI 文字列）</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#現在対象外の機能">現在対象外の機能</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#カスタムアイコンとインクルード">カスタムアイコンとインクルード</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#seo">SEO</a></li></ul></details>
 				<div class="gb-content-body">
 				<h1 id="国際化i18n"><a href="#国際化i18n" id="国際化i18n" name="国際化i18n" class="anchor"></a>国際化（i18n）</h1>
 <p>ドキュメントを他の言語に翻訳し、それぞれが独自の URL プレフィックス、
@@ -169,12 +169,59 @@
 と常にそのバージョン自身のデフォルトロケールに戻り（対象バージョンが同じ翻訳を
 持っているとは想定しません）、ロケールを切り替えると常に現在のバージョンに
 留まります。</p>
+<h2 id="テーマのクロームui-文字列"><a href="#テーマのクロームui-文字列" id="テーマのクロームui-文字列" name="テーマのクロームui-文字列" class="anchor"></a>テーマのクローム（UI 文字列）</h2>
+<p>各組み込みテーマを取り囲む UI テキスト全体 - 検索プレースホルダー、
+「このページの内容」、「このページを編集」、「最終更新」、404 ページ、
+タグページのタイトル、そして「まだ翻訳されていません」という通知自体も、
+自分のページコンテンツだけでなく、ロケールごとに翻訳されるようになりました。</p>
+<p>4 つのロケールには標準で組み込みの翻訳が付属しています: <code>de</code>、<code>es</code>、<code>it</code>、
+<code>ja</code>。これらのロケールコードのいずれかをビルドすると、設定不要で自動的に
+完全に翻訳されたテーマクロームが得られます。それ以外のロケールコード
+（または表現を変えたいページ）は英語にフォールバックします -
+<code>bxsites.json</code> のそのロケール自身のエントリに独自の <code>strings</code> を追加して、
+気になるキーだけを上書きしてください:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
+	&quot;i18n&quot;: {
+		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
+		&quot;locales&quot;: [
+			{
+				&quot;code&quot;: &quot;fr&quot;,
+				&quot;label&quot;: &quot;Français&quot;,
+				&quot;strings&quot;: {
+					&quot;searchPlaceholder&quot;: &quot;Rechercher dans la documentation...&quot;,
+					&quot;onThisPage&quot;: &quot;Sur cette page&quot;
+				}
+			},
+			{
+				&quot;code&quot;: &quot;es&quot;,
+				&quot;label&quot;: &quot;Español&quot;,
+				&quot;strings&quot;: { &quot;toggleDarkMode&quot;: &quot;Cambiar a modo nocturno&quot; }
+			}
+		]
+	}
+}
+</code></pre>
+<p>（<code>es</code> のような）組み込み翻訳を持つロケールでも、同じ方法で個々のキーを
+上書きできます - 自分自身の <code>strings</code> は、組み込み翻訳にも英語のデフォルト
+値にも常に優先されます。<code>defaultLocale</code> 自身も独自の <code>strings</code> を持つこと
+ができ、デフォルトロケールが英語ではなく、英語のデフォルト値にフォール
+バックする代わりに独自のクローム表現を使いたいプロジェクトのために使えます。</p>
+<p>上書き可能なキーの全リスト: <code>searchPlaceholder</code>、<code>searchAriaLabel</code>、
+<code>searchNoResults</code>、<code>toggleDarkMode</code>、<code>toggleNavigation</code>、<code>toggleSection</code>
+（プレースホルダー <code>{title}</code>）、<code>repository</code>、<code>version</code>、<code>language</code>
+（プレースホルダー <code>{label}</code>）、<code>onThisPage</code>、<code>editThisPage</code>、
+<code>downloadMarkdown</code>、<code>lastUpdated</code>、<code>notTranslatedNotice</code>
+（プレースホルダー <code>{locale}</code>）、<code>notFoundTitle</code>、<code>notFoundBody</code>、
+<code>tagsTitle</code>、そして <code>pageNavigation</code>。</p>
 <h2 id="現在対象外の機能"><a href="#現在対象外の機能" id="現在対象外の機能" name="現在対象外の機能" class="anchor"></a>現在対象外の機能</h2>
 <ul>
-<li><strong>テーマのクロームは英語のまま。</strong> 「このページを編集」、「最終更新」、
-検索プレースホルダーなどの UI 文字列はまだロケールごとに翻訳されていません。
-自身のページコンテンツの読書体験は完全に翻訳されますが、周囲のテーマの
-装備はまだです。</li>
+<li><strong>ブログのクロームは英語のまま。</strong> ブログサブシステム自身の UI 文字列
+（「Categories」、「Archive」、「Read more」、「N min read」など）は、
+上記の <code>strings</code> オーバーライドではまだカバーされていません - カバー
+されるのはテーマクロームの残りの部分のみです。</li>
+<li><strong><code>lastUpdated</code> 自身の日付の値はロケールに対応していません。</strong> ラベルは
+翻訳されますが、日付/時刻の値自体はロケールに関係なく同じ形式のまま
+フォーマットされます。</li>
 <li><strong>RTL レイアウトのミラーリングはベースライン。</strong> <code>dir=&quot;rtl&quot;</code> は正しく設定されますが、
 一部の装飾的な詳細（Admonition のアクセントバーの側面など）はまだ反転しません。</li>
 <li><strong>自動翻訳なし。</strong> <code>docs/i18n/&lt;code&gt;/</code> の各ファイルは他の Markdown ページと同様に
@@ -189,7 +236,7 @@
 <code>sitemap.xml</code> と <code>llms.txt</code> に含まれます。</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/ja/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/gitbook/ja/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 10:25:19 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/ja/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/gitbook/ja/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 11:29:46 PM</span></div>
 			</article>
 
 			<nav class="gb-page-nav" aria-label="Page navigation">
@@ -205,7 +252,7 @@
 		</main>
 
 		<aside class="gb-toc-sidebar">
-			<nav class="gb-toc" aria-label="On this page"><div class="gb-toc__title">On this page</div><ul><li class="gb-toc__item gb-toc__item--2"><a href="#ロケールの追加">ロケールの追加</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#ビルドされる内容">ビルドされる内容</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#未翻訳のページ">未翻訳のページ</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#言語スイッチャー">言語スイッチャー</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#バージョンとロケールを組み合わせたドキュメント">バージョンとロケールを組み合わせたドキュメント</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#現在対象外の機能">現在対象外の機能</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#カスタムアイコンとインクルード">カスタムアイコンとインクルード</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#seo">SEO</a></li></ul></nav>
+			<nav class="gb-toc" aria-label="On this page"><div class="gb-toc__title">On this page</div><ul><li class="gb-toc__item gb-toc__item--2"><a href="#ロケールの追加">ロケールの追加</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#ビルドされる内容">ビルドされる内容</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#未翻訳のページ">未翻訳のページ</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#言語スイッチャー">言語スイッチャー</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#バージョンとロケールを組み合わせたドキュメント">バージョンとロケールを組み合わせたドキュメント</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#テーマのクロームui-文字列">テーマのクローム（UI 文字列）</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#現在対象外の機能">現在対象外の機能</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#カスタムアイコンとインクルード">カスタムアイコンとインクルード</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#seo">SEO</a></li></ul></nav>
 		</aside>
 
 	</div>

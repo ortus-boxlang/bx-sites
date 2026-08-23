@@ -80,7 +80,7 @@
 
 				<h1 class="jtd-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,184H144l40-80ZM96,127.56h0A95.78,95.78,0,0,0,128,56H64A95.78,95.78,0,0,0,96,127.56Z" opacity="0.2"/><path d="M247.15,212.42l-56-112a8,8,0,0,0-14.31,0l-21.71,43.43A88,88,0,0,1,108,126.93,103.65,103.65,0,0,0,135.69,64H160a8,8,0,0,0,0-16H104V32a8,8,0,0,0-16,0V48H32a8,8,0,0,0,0,16h87.63A87.7,87.7,0,0,1,96,116.35a87.74,87.74,0,0,1-19-31,8,8,0,1,0-15.08,5.34A103.63,103.63,0,0,0,84,127a87.55,87.55,0,0,1-52,17,8,8,0,0,0,0,16,103.46,103.46,0,0,0,64-22.08,104.18,104.18,0,0,0,51.44,21.31l-26.6,53.19a8,8,0,0,0,14.31,7.16L148.94,192h70.11l13.79,27.58A8,8,0,0,0,240,224a8,8,0,0,0,7.15-11.58ZM156.94,176,184,121.89,211.05,176Z"/></svg></span> Internazionalizzazione (i18n)</h1>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/justthedocs/it/tags/index.html#tag-guide">guide</a><a class="page-tag" href="/bx-sites/development/theme/justthedocs/it/tags/index.html#tag-i18n">i18n</a></div>
-<details class="bxsites-toc-mobile jtd-toc--mobile"><summary class="jtd-toc--mobile__summary">On this page</summary><ul><li class="jtd-toc__item jtd-toc__item--2"><a href="#aggiungere-una-locale">Aggiungere una locale</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#cosa-viene-compilato">Cosa viene compilato</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#pagine-non-tradotte">Pagine non tradotte</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#il-selettore-di-lingua">Il selettore di lingua</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#documenti-versionati-e-tradotti">Documenti versionati e tradotti</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#cosa-è-fuori-scopo-per-ora">Cosa &egrave; fuori scopo (per ora)</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#icone-e-include-personalizzati">Icone e include personalizzati</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#seo">SEO</a></li></ul></details>
+<details class="bxsites-toc-mobile jtd-toc--mobile"><summary class="jtd-toc--mobile__summary">On this page</summary><ul><li class="jtd-toc__item jtd-toc__item--2"><a href="#aggiungere-una-locale">Aggiungere una locale</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#cosa-viene-compilato">Cosa viene compilato</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#pagine-non-tradotte">Pagine non tradotte</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#il-selettore-di-lingua">Il selettore di lingua</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#documenti-versionati-e-tradotti">Documenti versionati e tradotti</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#interfaccia-del-tema-stringhe-ui">Interfaccia del tema (stringhe UI)</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#cosa-è-fuori-scopo-per-ora">Cosa &egrave; fuori scopo (per ora)</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#icone-e-include-personalizzati">Icone e include personalizzati</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#seo">SEO</a></li></ul></details>
 				<div class="jtd-content-body">
 				<h1 id="internazionalizzazione-i18n"><a href="#internazionalizzazione-i18n" id="internazionalizzazione-i18n" name="internazionalizzazione-i18n" class="anchor"></a>Internazionalizzazione (i18n)</h1>
 <p>Traduci la tua documentazione in altre lingue, ognuna con il proprio
@@ -194,13 +194,64 @@ questo esistesse, nessun selettore mostrato. Cambiare versione ricade
 sempre sulla locale predefinita propria di quella versione (non
 presuppone mai che la versione di destinazione abbia la stessa
 traduzione); cambiare locale resta sempre sulla versione corrente.</p>
+<h2 id="interfaccia-del-tema-stringhe-ui"><a href="#interfaccia-del-tema-stringhe-ui" id="interfaccia-del-tema-stringhe-ui" name="interfaccia-del-tema-stringhe-ui" class="anchor"></a>Interfaccia del tema (stringhe UI)</h2>
+<p>Tutto il testo dell'interfaccia che circonda ogni tema integrato - il
+placeholder della ricerca, &quot;In questa pagina,&quot; &quot;Modifica questa pagina,&quot;
+&quot;Ultimo aggiornamento,&quot; la pagina 404, il titolo della pagina dei tag, e
+lo stesso avviso &quot;non ancora tradotta&quot; - viene ora tradotto anche per
+locale, non solo il contenuto delle tue pagine.</p>
+<p>Quattro locale includono di serie una traduzione integrata: <code>de</code>, <code>es</code>,
+<code>it</code> e <code>ja</code>. Compilando uno di questi codici locale ottieni
+automaticamente un'interfaccia completamente tradotta, nulla da
+configurare. Qualsiasi altro codice locale (o una pagina che preferisci
+formulare diversamente) ricade sull'inglese - sovrascrivi solo le chiavi
+che ti interessano con i tuoi <code>strings</code> sulla voce di quella locale in
+<code>bxsites.json</code>:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
+	&quot;i18n&quot;: {
+		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
+		&quot;locales&quot;: [
+			{
+				&quot;code&quot;: &quot;fr&quot;,
+				&quot;label&quot;: &quot;Français&quot;,
+				&quot;strings&quot;: {
+					&quot;searchPlaceholder&quot;: &quot;Rechercher dans la documentation...&quot;,
+					&quot;onThisPage&quot;: &quot;Sur cette page&quot;
+				}
+			},
+			{
+				&quot;code&quot;: &quot;es&quot;,
+				&quot;label&quot;: &quot;Español&quot;,
+				&quot;strings&quot;: { &quot;toggleDarkMode&quot;: &quot;Cambiar a modo nocturno&quot; }
+			}
+		]
+	}
+}
+</code></pre>
+<p>Una locale con traduzione integrata (come <code>es</code> sopra) può comunque
+sovrascrivere chiavi singole allo stesso modo - i tuoi <code>strings</code>
+prevalgono sempre sia sulla traduzione integrata sia sul valore
+predefinito in inglese. Anche <code>defaultLocale</code> stessa può avere propri
+<code>strings</code>, per un progetto la cui locale predefinita non è l'inglese e
+che desidera una propria formulazione dell'interfaccia invece di ricadere
+sul valore predefinito in inglese.</p>
+<p>L'insieme completo delle chiavi sovrascrivibili: <code>searchPlaceholder</code>,
+<code>searchAriaLabel</code>, <code>searchNoResults</code>, <code>toggleDarkMode</code>,
+<code>toggleNavigation</code>, <code>toggleSection</code> (segnaposto <code>{title}</code>), <code>repository</code>,
+<code>version</code>, <code>language</code> (segnaposto <code>{label}</code>), <code>onThisPage</code>,
+<code>editThisPage</code>, <code>downloadMarkdown</code>, <code>lastUpdated</code>, <code>notTranslatedNotice</code>
+(segnaposto <code>{locale}</code>), <code>notFoundTitle</code>, <code>notFoundBody</code>, <code>tagsTitle</code> e
+<code>pageNavigation</code>.</p>
 <h2 id="cosa-è-fuori-scopo-per-ora"><a href="#cosa-è-fuori-scopo-per-ora" id="cosa-è-fuori-scopo-per-ora" name="cosa-è-fuori-scopo-per-ora" class="anchor"></a>Cosa è fuori scopo (per ora)</h2>
 <ul>
-<li><strong>Gli elementi di contorno del tema restano in inglese.</strong> &quot;Edit this
-page,&quot; &quot;Last updated,&quot; il placeholder della ricerca, e stringhe di UI
-simili non sono ancora tradotte per locale - solo il contenuto delle
-tue pagine lo è. L'esperienza di lettura effettiva di una locale è
-completamente tradotta; gli elementi di contorno del tema no.</li>
+<li><strong>Gli elementi di contorno del blog restano in inglese.</strong> Le stringhe
+UI proprie del sottosistema blog (&quot;Categories,&quot; &quot;Archive,&quot; &quot;Read
+more,&quot; &quot;N min read,&quot; ...) non sono ancora coperte dall'override di
+<code>strings</code> sopra - solo il resto degli elementi di contorno del tema lo
+è.</li>
+<li><strong>Il valore data di <code>lastUpdated</code> non dipende dalla locale.</strong> La sua
+etichetta viene tradotta; il valore data/ora stesso continua a essere
+formattato allo stesso modo indipendentemente dalla locale.</li>
 <li><strong>Lo specchiamento del layout RTL è di base, non pixel-perfect.</strong>
 <code>dir=&quot;rtl&quot;</code> viene impostato correttamente, e la barra laterale/header
 vengono effettivamente specchiati, ma alcuni dettagli decorativi (il
@@ -222,7 +273,7 @@ insieme a quelle della locale predefinita, allo stesso modo in cui lo
 sono le pagine <a href="/bx-sites/development/theme/justthedocs/it/configuration/index.html#versioning">versionate</a>.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/justthedocs/it/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 10:25:19 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/justthedocs/it/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 11:29:46 PM</span></div>
 			</article>
 
 			<nav class="jtd-page-nav" aria-label="Page navigation">
@@ -238,7 +289,7 @@ sono le pagine <a href="/bx-sites/development/theme/justthedocs/it/configuration
 		</main>
 
 		<aside class="jtd-toc-sidebar">
-			<nav class="jtd-toc" aria-label="On this page"><div class="jtd-toc__title">On this page</div><ul><li class="jtd-toc__item jtd-toc__item--2"><a href="#aggiungere-una-locale">Aggiungere una locale</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#cosa-viene-compilato">Cosa viene compilato</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#pagine-non-tradotte">Pagine non tradotte</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#il-selettore-di-lingua">Il selettore di lingua</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#documenti-versionati-e-tradotti">Documenti versionati e tradotti</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#cosa-è-fuori-scopo-per-ora">Cosa &egrave; fuori scopo (per ora)</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#icone-e-include-personalizzati">Icone e include personalizzati</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#seo">SEO</a></li></ul></nav>
+			<nav class="jtd-toc" aria-label="On this page"><div class="jtd-toc__title">On this page</div><ul><li class="jtd-toc__item jtd-toc__item--2"><a href="#aggiungere-una-locale">Aggiungere una locale</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#cosa-viene-compilato">Cosa viene compilato</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#pagine-non-tradotte">Pagine non tradotte</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#il-selettore-di-lingua">Il selettore di lingua</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#documenti-versionati-e-tradotti">Documenti versionati e tradotti</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#interfaccia-del-tema-stringhe-ui">Interfaccia del tema (stringhe UI)</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#cosa-è-fuori-scopo-per-ora">Cosa &egrave; fuori scopo (per ora)</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#icone-e-include-personalizzati">Icone e include personalizzati</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#seo">SEO</a></li></ul></nav>
 		</aside>
 
 	</div>

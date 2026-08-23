@@ -202,6 +202,29 @@ YAML でも同様に読み替えられます。
 
 `bxsites.json` が大きくなりすぎる場合は、`docs/nav.json` ファイルに移動できます。
 
+## `redirects`
+
+`[]`（デフォルト）- サイト全体の古い URL の `from`/`to` リダイレクトで、
+メインツリーにのみ適用されます:
+
+```json title="bxsites.json" linenums="1"
+{
+	"redirects": [
+		{ "from": "old-guide", "to": "guides/new-guide/" }
+	]
+}
+```
+
+- `redirects[].from` - 静的なリダイレクトスタブが書き込まれる古いプリティ
+  URL セグメント（先頭/末尾のスラッシュなし、拡張子なし）
+- `redirects[].to` - ルート相対パス（`baseURL` に対して解決されます）
+  または完全な `https://` URL
+
+ページ自身のフロントマターの `redirect_from` は、ページ単位・ツリー単位の
+代替手段です（バージョン/ロケールツリー内でも機能します）- `page:rename`
+がどのように自動的に追加するかを含む全体像については
+[リダイレクト](guides/redirects.md) を参照してください。
+
 ## `markdown`
 
 [bx-markdown](https://github.com/ortus-boxlang/bx-markdown) 独自のモジュール設定として
@@ -358,9 +381,14 @@ YAML でも同様に読み替えられます。
 ロケールはフォルダが存在すれば自動的にビルドされます。`i18n` は言語スイッチャーの
 表示ラベル/方向を提供するだけです。
 
-- `i18n.defaultLocale` - プロジェクト自身の通常の `docs/` ツリーの `{ "code", "label", "flag" }`。
+- `i18n.defaultLocale` - プロジェクト自身の通常の `docs/` ツリーの `{ "code", "label", "flag", "strings" }`。
   デフォルトは `{ "code": "en", "label": "English" }`。
-- `i18n.locales` - `[]`（デフォルト）- 他のすべてのロケールの `{ "code", "label", "dir", "flag" }` の配列。
+- `i18n.locales` - `[]`（デフォルト）- 他のすべてのロケールの `{ "code", "label", "dir", "flag", "strings" }` の配列。
+  `strings` はそのロケール自身のテーマクローム UI 文字列（検索プレースホルダー、
+  「このページの内容」など）を上書きします - キーの全リストは
+  [国際化](guides/i18n.md#テーマのクロームui-文字列) を参照してください。
+  `de`/`es`/`it`/`ja` にはすでに組み込みの翻訳が付属しているため、`strings` は
+  特定のキーを上書きするか、別のロケールを追加する場合にのみ必要です。
 
 ```json
 {

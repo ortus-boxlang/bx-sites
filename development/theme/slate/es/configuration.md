@@ -265,6 +265,30 @@ dos - un árbol `docs/versions/<name>/` siempre infiere su navegación de su
 propia estructura de carpetas, incluso cuando el árbol principal tiene una
 explícita.
 
+## `redirects`
+
+`[]` (el valor por defecto) - redirecciones de URL antiguas `from`/`to`
+para todo el sitio, aplicadas solo al árbol principal:
+
+```json title="bxsites.json" linenums="1"
+{
+	"redirects": [
+		{ "from": "old-guide", "to": "guides/new-guide/" }
+	]
+}
+```
+
+- `redirects[].from` - el segmento de URL antiguo (sin barra inicial/final,
+  sin extensión) donde se escribe una redirección estática
+- `redirects[].to` - una ruta relativa a la raíz (resuelta contra
+  `baseURL`) o una URL `https://` completa
+
+El propio `redirect_from` de una página en su frontmatter es la
+alternativa por página y por árbol (funciona también dentro de un árbol
+de versión/idioma) - consulta [Redirecciones](guides/redirects.md) para
+el panorama completo, incluyendo cómo `page:rename` lo añade
+automáticamente.
+
 ## `markdown`
 
 Se reenvía tal cual a la propia configuración del módulo de
@@ -503,15 +527,21 @@ automáticamente en cuanto su carpeta existe; `i18n` simplemente
 proporciona su etiqueta de visualización/dirección para el selector de
 idioma.
 
-- `i18n.defaultLocale` - `{ "code", "label" }` para el propio árbol
-  `docs/` regular del proyecto, con el valor por defecto
+- `i18n.defaultLocale` - `{ "code", "label", "strings" }` para el propio
+  árbol `docs/` regular del proyecto, con el valor por defecto
   `{ "code": "en", "label": "English" }`. Solo hace falta definirlo cuando
   tu idioma predeterminado no es el inglés.
 - `i18n.locales` - `[]` (el valor por defecto) - un array de
-  `{ "code", "label", "dir" }` para cada otro idioma. `code` cumple una
-  doble función como nombre de la carpeta `docs/i18n/<code>/` y como
-  prefijo de URL generado - solo letras/dígitos/guiones (`es`, `pt-BR`,
-  `zh-Hans`). `dir` es `"ltr"` (el valor por defecto) o `"rtl"`.
+  `{ "code", "label", "dir", "strings" }` para cada otro idioma. `code`
+  cumple una doble función como nombre de la carpeta `docs/i18n/<code>/`
+  y como prefijo de URL generado - solo letras/dígitos/guiones (`es`,
+  `pt-BR`, `zh-Hans`). `dir` es `"ltr"` (el valor por defecto) o `"rtl"`.
+  `strings` sobrescribe las cadenas de UI de la interfaz del tema propias
+  de ese idioma (marcador de posición de búsqueda, "En esta página," ...)
+  - consulta [Internacionalización](guides/i18n.md#interfaz-del-tema-cadenas-de-ui)
+  para la lista completa de claves; `de`/`es`/`it`/`ja` ya incluyen una
+  traducción integrada, así que `strings` solo hace falta para
+  sobrescribir una clave o añadir otro idioma.
 
 ```json
 {

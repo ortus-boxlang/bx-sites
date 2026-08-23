@@ -262,6 +262,31 @@ beiden - ein `docs/versions/<name>/`-Baum leitet seine Navigation immer aus
 seiner eigenen Ordnerstruktur ab, selbst wenn der Hauptbaum eine explizite
 Navigation hat.
 
+## `redirects`
+
+`[]` (Standard) - websiteweite `from`/`to`-Weiterleitungen für alte URLs,
+nur auf den Hauptbaum angewendet:
+
+```json title="bxsites.json" linenums="1"
+{
+	"redirects": [
+		{ "from": "old-guide", "to": "guides/new-guide/" }
+	]
+}
+```
+
+- `redirects[].from` - das alte hübsche URL-Segment, an dem eine
+  statische Weiterleitungs-Stub-Datei geschrieben wird (kein
+  führender/abschließender Schrägstrich, keine Dateiendung)
+- `redirects[].to` - ein root-relativer Pfad (aufgelöst gegen `baseURL`)
+  oder eine vollständige `https://`-URL
+
+Die eigene Frontmatter `redirect_from` einer Seite ist die
+Alternative pro Seite/pro Baum (funktioniert auch innerhalb eines
+Versions-/Locale-Baums) - siehe [Weiterleitungen](guides/redirects.md)
+für das vollständige Bild, einschließlich wie `page:rename` sie
+automatisch setzt.
+
 ## `markdown`
 
 Wird unverändert an [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)s
@@ -494,15 +519,21 @@ Metadaten für die Locale-Ordner-Konvention
 gebaut, sobald ihr Ordner existiert; `i18n` liefert nur ihr
 Anzeige-Label/ihre Schreibrichtung für den Sprachumschalter.
 
-- `i18n.defaultLocale` - `{ "code", "label" }` für den eigenen regulären
-  `docs/`-Baum des Projekts, standardmäßig
+- `i18n.defaultLocale` - `{ "code", "label", "strings" }` für den eigenen
+  regulären `docs/`-Baum des Projekts, standardmäßig
   `{ "code": "en", "label": "English" }`. Muss nur gesetzt werden, wenn
   deine Standard-Locale nicht Englisch ist.
 - `i18n.locales` - `[]` (Standard) - ein Array aus
-  `{ "code", "label", "dir" }` für jede andere Locale. `code` dient
-  zugleich als Ordnername in `docs/i18n/<code>/` und als gebautes
+  `{ "code", "label", "dir", "strings" }` für jede andere Locale. `code`
+  dient zugleich als Ordnername in `docs/i18n/<code>/` und als gebautes
   URL-Präfix - nur Buchstaben/Ziffern/Bindestriche (`es`, `pt-BR`,
-  `zh-Hans`). `dir` ist `"ltr"` (Standard) oder `"rtl"`.
+  `zh-Hans`). `dir` ist `"ltr"` (Standard) oder `"rtl"`. `strings`
+  überschreibt die eigenen Theme-Chrome-UI-Texte dieser Locale
+  (Suchplatzhalter, "Auf dieser Seite", ...) - siehe
+  [Internationalisierung](guides/i18n.md#theme-chrome-ui-texte) für die
+  vollständige Liste der Schlüssel; `de`/`es`/`it`/`ja` bringen bereits
+  eine eingebaute Übersetzung mit, `strings` wird also nur zum
+  Überschreiben eines Schlüssels oder für eine weitere Locale gebraucht.
 
 ```json
 {

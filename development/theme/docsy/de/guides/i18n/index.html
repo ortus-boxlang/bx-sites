@@ -80,7 +80,7 @@
 
 				<h1 class="docsy-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,184H144l40-80ZM96,127.56h0A95.78,95.78,0,0,0,128,56H64A95.78,95.78,0,0,0,96,127.56Z" opacity="0.2"/><path d="M247.15,212.42l-56-112a8,8,0,0,0-14.31,0l-21.71,43.43A88,88,0,0,1,108,126.93,103.65,103.65,0,0,0,135.69,64H160a8,8,0,0,0,0-16H104V32a8,8,0,0,0-16,0V48H32a8,8,0,0,0,0,16h87.63A87.7,87.7,0,0,1,96,116.35a87.74,87.74,0,0,1-19-31,8,8,0,1,0-15.08,5.34A103.63,103.63,0,0,0,84,127a87.55,87.55,0,0,1-52,17,8,8,0,0,0,0,16,103.46,103.46,0,0,0,64-22.08,104.18,104.18,0,0,0,51.44,21.31l-26.6,53.19a8,8,0,0,0,14.31,7.16L148.94,192h70.11l13.79,27.58A8,8,0,0,0,240,224a8,8,0,0,0,7.15-11.58ZM156.94,176,184,121.89,211.05,176Z"/></svg></span> Internationalisierung (i18n)</h1>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/docsy/de/tags/index.html#tag-anleitungen">anleitungen</a><a class="page-tag" href="/bx-sites/development/theme/docsy/de/tags/index.html#tag-i18n">i18n</a></div>
-<details class="bxsites-toc-mobile docsy-toc--mobile"><summary class="docsy-toc--mobile__summary">On this page</summary><ul><li class="docsy-toc__item docsy-toc__item--2"><a href="#eine-locale-hinzufügen">Eine Locale hinzuf&uuml;gen</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#was-gebaut-wird">Was gebaut wird</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#nicht-übersetzte-seiten">Nicht &uuml;bersetzte Seiten</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#der-sprachumschalter">Der Sprachumschalter</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#versionierte-und-übersetzte-docs">Versionierte und &uuml;bersetzte Docs</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#was-vorerst-außen-vor-bleibt">Was (vorerst) au&szlig;en vor bleibt</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#eigene-icons-und-includes">Eigene Icons und Includes</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#seo">SEO</a></li></ul></details>
+<details class="bxsites-toc-mobile docsy-toc--mobile"><summary class="docsy-toc--mobile__summary">On this page</summary><ul><li class="docsy-toc__item docsy-toc__item--2"><a href="#eine-locale-hinzufügen">Eine Locale hinzuf&uuml;gen</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#was-gebaut-wird">Was gebaut wird</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#nicht-übersetzte-seiten">Nicht &uuml;bersetzte Seiten</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#der-sprachumschalter">Der Sprachumschalter</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#versionierte-und-übersetzte-docs">Versionierte und &uuml;bersetzte Docs</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#theme-chrome-ui-texte">Theme-Chrome (UI-Texte)</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#was-vorerst-außen-vor-bleibt">Was (vorerst) au&szlig;en vor bleibt</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#eigene-icons-und-includes">Eigene Icons und Includes</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#seo">SEO</a></li></ul></details>
 				<div class="docsy-content-body">
 				<h1 id="internationalisierung-i18n"><a href="#internationalisierung-i18n" id="internationalisierung-i18n" name="internationalisierung-i18n" class="anchor"></a>Internationalisierung (i18n)</h1>
 <p>Übersetze deine Docs in andere Sprachen, jede mit ihrem eigenen
@@ -181,13 +181,63 @@ gezeigt. Ein Versionswechsel fällt immer auf die eigene Standard-Locale
 dieser Version zurück (nimmt nie an, dass die Zielversion dieselbe
 Übersetzung hat); ein Locale-Wechsel bleibt immer auf der aktuellen
 Version.</p>
+<h2 id="theme-chrome-ui-texte"><a href="#theme-chrome-ui-texte" id="theme-chrome-ui-texte" name="theme-chrome-ui-texte" class="anchor"></a>Theme-Chrome (UI-Texte)</h2>
+<p>Der gesamte umgebende UI-Text jedes eingebauten Themes - der
+Suchplatzhalter, &quot;Auf dieser Seite&quot;, &quot;Diese Seite bearbeiten&quot;, &quot;Zuletzt
+aktualisiert&quot;, die 404-Seite, der Titel der Tags-Seite und der Hinweis
+&quot;noch nicht übersetzt&quot; selbst - wird jetzt auch pro Locale übersetzt,
+nicht nur dein eigener Seiteninhalt.</p>
+<p>Vier Locales bringen von Haus aus eine eingebaute Übersetzung mit: <code>de</code>,
+<code>es</code>, <code>it</code> und <code>ja</code>. Baust du einen dieser Locale-Codes, erhältst du
+automatisch vollständig übersetztes Theme-Chrome - nichts zu
+konfigurieren. Jeder andere Locale-Code (oder eine Seite, die du lieber
+anders formulieren möchtest) fällt auf Englisch zurück - überschreibe nur
+die Schlüssel, die dich interessieren, mit deinen eigenen <code>strings</code> im
+jeweiligen Locale-Eintrag in <code>bxsites.json</code>:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
+	&quot;i18n&quot;: {
+		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
+		&quot;locales&quot;: [
+			{
+				&quot;code&quot;: &quot;fr&quot;,
+				&quot;label&quot;: &quot;Français&quot;,
+				&quot;strings&quot;: {
+					&quot;searchPlaceholder&quot;: &quot;Rechercher dans la documentation...&quot;,
+					&quot;onThisPage&quot;: &quot;Sur cette page&quot;
+				}
+			},
+			{
+				&quot;code&quot;: &quot;es&quot;,
+				&quot;label&quot;: &quot;Español&quot;,
+				&quot;strings&quot;: { &quot;toggleDarkMode&quot;: &quot;Cambiar a modo nocturno&quot; }
+			}
+		]
+	}
+}
+</code></pre>
+<p>Eine Locale mit eingebauter Übersetzung (wie <code>es</code> oben) kann trotzdem
+einzelne Schlüssel genauso überschreiben - deine eigenen <code>strings</code>
+gewinnen immer sowohl gegen die eingebaute Übersetzung als auch gegen den
+englischen Standardwert. Auch <code>defaultLocale</code> selbst kann eigene
+<code>strings</code> tragen, für ein Projekt, dessen Standard-Locale nicht Englisch
+ist und das eigene Chrome-Formulierungen möchte, statt auf den englischen
+Standardwert zurückzufallen.</p>
+<p>Die vollständige Liste überschreibbarer Schlüssel: <code>searchPlaceholder</code>,
+<code>searchAriaLabel</code>, <code>searchNoResults</code>, <code>toggleDarkMode</code>,
+<code>toggleNavigation</code>, <code>toggleSection</code> (Platzhalter <code>{title}</code>),
+<code>repository</code>, <code>version</code>, <code>language</code> (Platzhalter <code>{label}</code>), <code>onThisPage</code>,
+<code>editThisPage</code>, <code>downloadMarkdown</code>, <code>lastUpdated</code>, <code>notTranslatedNotice</code>
+(Platzhalter <code>{locale}</code>), <code>notFoundTitle</code>, <code>notFoundBody</code>, <code>tagsTitle</code> und
+<code>pageNavigation</code>.</p>
 <h2 id="was-vorerst-außen-vor-bleibt"><a href="#was-vorerst-außen-vor-bleibt" id="was-vorerst-außen-vor-bleibt" name="was-vorerst-außen-vor-bleibt" class="anchor"></a>Was (vorerst) außen vor bleibt</h2>
 <ul>
-<li><strong>Theme-Chrome bleibt auf Englisch.</strong> &quot;Edit this page&quot;, &quot;Last updated&quot;,
-der Suchplatzhalter und ähnliche UI-Texte werden noch nicht pro Locale
-übersetzt - nur dein eigener Seiteninhalt wird es. Die eigentliche
-Leseerfahrung einer Locale ist vollständig übersetzt; das umgebende
-Theme-Beiwerk nicht.</li>
+<li><strong>Blog-Chrome bleibt auf Englisch.</strong> Die eigenen UI-Texte des
+Blog-Subsystems (&quot;Categories&quot;, &quot;Archive&quot;, &quot;Read more&quot;, &quot;N min read&quot;,
+...) werden vom <code>strings</code>-Override oben noch nicht erfasst - nur der
+Rest des Theme-Chromes ist es.</li>
+<li><strong>Der Datumswert von <code>lastUpdated</code> ist nicht locale-abhängig.</strong> Sein
+Label wird übersetzt; der Datums-/Uhrzeitwert selbst wird unabhängig
+von der Locale weiterhin gleich formatiert.</li>
 <li><strong>Die RTL-Layout-Spiegelung ist grundlegend, nicht pixelgenau.</strong>
 <code>dir=&quot;rtl&quot;</code> wird korrekt gesetzt, und Sidebar/Kopfzeile spiegeln sich
 tatsächlich, aber ein paar dekorative Details (etwa die Seite des
@@ -207,7 +257,7 @@ genutzte Assets, nichts, was ein Übersetzer pro Locale duplizieren müsste.</p>
 <a href="/bx-sites/development/theme/docsy/de/configuration/index.html#versionierung">versionierte</a> Seiten sind.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/docsy/de/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 10:25:19 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/docsy/de/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 11:29:46 PM</span></div>
 			</article>
 
 			<nav class="docsy-page-nav" aria-label="Page navigation">
@@ -223,7 +273,7 @@ genutzte Assets, nichts, was ein Übersetzer pro Locale duplizieren müsste.</p>
 		</main>
 
 		<aside class="docsy-toc-sidebar">
-			<nav class="docsy-toc" aria-label="On this page"><div class="docsy-toc__title">On this page</div><ul><li class="docsy-toc__item docsy-toc__item--2"><a href="#eine-locale-hinzufügen">Eine Locale hinzuf&uuml;gen</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#was-gebaut-wird">Was gebaut wird</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#nicht-übersetzte-seiten">Nicht &uuml;bersetzte Seiten</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#der-sprachumschalter">Der Sprachumschalter</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#versionierte-und-übersetzte-docs">Versionierte und &uuml;bersetzte Docs</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#was-vorerst-außen-vor-bleibt">Was (vorerst) au&szlig;en vor bleibt</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#eigene-icons-und-includes">Eigene Icons und Includes</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#seo">SEO</a></li></ul></nav>
+			<nav class="docsy-toc" aria-label="On this page"><div class="docsy-toc__title">On this page</div><ul><li class="docsy-toc__item docsy-toc__item--2"><a href="#eine-locale-hinzufügen">Eine Locale hinzuf&uuml;gen</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#was-gebaut-wird">Was gebaut wird</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#nicht-übersetzte-seiten">Nicht &uuml;bersetzte Seiten</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#der-sprachumschalter">Der Sprachumschalter</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#versionierte-und-übersetzte-docs">Versionierte und &uuml;bersetzte Docs</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#theme-chrome-ui-texte">Theme-Chrome (UI-Texte)</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#was-vorerst-außen-vor-bleibt">Was (vorerst) au&szlig;en vor bleibt</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#eigene-icons-und-includes">Eigene Icons und Includes</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#seo">SEO</a></li></ul></nav>
 		</aside>
 
 	</div>

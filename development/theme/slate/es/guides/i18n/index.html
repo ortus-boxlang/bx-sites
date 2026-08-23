@@ -80,7 +80,7 @@
 
 				<h1 class="slate-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,184H144l40-80ZM96,127.56h0A95.78,95.78,0,0,0,128,56H64A95.78,95.78,0,0,0,96,127.56Z" opacity="0.2"/><path d="M247.15,212.42l-56-112a8,8,0,0,0-14.31,0l-21.71,43.43A88,88,0,0,1,108,126.93,103.65,103.65,0,0,0,135.69,64H160a8,8,0,0,0,0-16H104V32a8,8,0,0,0-16,0V48H32a8,8,0,0,0,0,16h87.63A87.7,87.7,0,0,1,96,116.35a87.74,87.74,0,0,1-19-31,8,8,0,1,0-15.08,5.34A103.63,103.63,0,0,0,84,127a87.55,87.55,0,0,1-52,17,8,8,0,0,0,0,16,103.46,103.46,0,0,0,64-22.08,104.18,104.18,0,0,0,51.44,21.31l-26.6,53.19a8,8,0,0,0,14.31,7.16L148.94,192h70.11l13.79,27.58A8,8,0,0,0,240,224a8,8,0,0,0,7.15-11.58ZM156.94,176,184,121.89,211.05,176Z"/></svg></span> Internacionalizaci&oacute;n (i18n)</h1>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/slate/es/tags/index.html#tag-guías">gu&iacute;as</a><a class="page-tag" href="/bx-sites/development/theme/slate/es/tags/index.html#tag-i18n">i18n</a></div>
-<details class="bxsites-toc-mobile slate-toc--mobile"><summary class="slate-toc--mobile__summary">On this page</summary><ul><li class="slate-toc__item slate-toc__item--2"><a href="#añadir-un-idioma">A&ntilde;adir un idioma</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#qué-se-construye">Qu&eacute; se construye</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#páginas-sin-traducir">P&aacute;ginas sin traducir</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#el-selector-de-idioma">El selector de idioma</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#docs-versionados-y-traducidos">Docs versionados y traducidos</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#qué-queda-fuera-de-alcance-por-ahora">Qu&eacute; queda fuera de alcance (por ahora)</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#iconos-personalizados-e-inclusiones">Iconos personalizados e inclusiones</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#seo">SEO</a></li></ul></details>
+<details class="bxsites-toc-mobile slate-toc--mobile"><summary class="slate-toc--mobile__summary">On this page</summary><ul><li class="slate-toc__item slate-toc__item--2"><a href="#añadir-un-idioma">A&ntilde;adir un idioma</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#qué-se-construye">Qu&eacute; se construye</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#páginas-sin-traducir">P&aacute;ginas sin traducir</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#el-selector-de-idioma">El selector de idioma</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#docs-versionados-y-traducidos">Docs versionados y traducidos</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#interfaz-del-tema-cadenas-de-ui">Interfaz del tema (cadenas de UI)</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#qué-queda-fuera-de-alcance-por-ahora">Qu&eacute; queda fuera de alcance (por ahora)</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#iconos-personalizados-e-inclusiones">Iconos personalizados e inclusiones</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#seo">SEO</a></li></ul></details>
 				<div class="slate-content-body">
 				<h1 id="internacionalización-i18n"><a href="#internacionalización-i18n" id="internacionalización-i18n" name="internacionalización-i18n" class="anchor"></a>Internacionalización (i18n)</h1>
 <p>Traduce tus documentos a otros idiomas, cada uno con su propio prefijo de
@@ -192,14 +192,63 @@ sin selector mostrado. Cambiar de versión siempre vuelve al propio
 idioma predeterminado de esa versión (nunca asume que la versión de
 destino tiene la misma traducción); cambiar de idioma siempre se
 mantiene en la versión actual.</p>
+<h2 id="interfaz-del-tema-cadenas-de-ui"><a href="#interfaz-del-tema-cadenas-de-ui" id="interfaz-del-tema-cadenas-de-ui" name="interfaz-del-tema-cadenas-de-ui" class="anchor"></a>Interfaz del tema (cadenas de UI)</h2>
+<p>Todo el texto de interfaz que rodea cada tema integrado - el marcador de
+posición de búsqueda, &quot;En esta página,&quot; &quot;Editar esta página,&quot; &quot;Última
+actualización,&quot; la página 404, el título de la página de etiquetas, y el
+propio aviso de &quot;aún no traducida&quot; - también se traduce por idioma, no
+solo el contenido de tu propia página.</p>
+<p>Cuatro idiomas incluyen una traducción integrada de fábrica: <code>de</code>, <code>es</code>,
+<code>it</code> y <code>ja</code>. Construir cualquiera de esos códigos de idioma obtiene
+automáticamente una interfaz completamente traducida, nada que
+configurar. Cualquier otro código de idioma (o una página que prefieras
+redactar de otra forma) recurre al inglés - sobrescribe solo las claves
+que te importen con tus propios <code>strings</code> en la entrada de ese idioma en
+<code>bxsites.json</code>:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
+	&quot;i18n&quot;: {
+		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
+		&quot;locales&quot;: [
+			{
+				&quot;code&quot;: &quot;fr&quot;,
+				&quot;label&quot;: &quot;Français&quot;,
+				&quot;strings&quot;: {
+					&quot;searchPlaceholder&quot;: &quot;Rechercher dans la documentation...&quot;,
+					&quot;onThisPage&quot;: &quot;Sur cette page&quot;
+				}
+			},
+			{
+				&quot;code&quot;: &quot;es&quot;,
+				&quot;label&quot;: &quot;Español&quot;,
+				&quot;strings&quot;: { &quot;toggleDarkMode&quot;: &quot;Cambiar a modo nocturno&quot; }
+			}
+		]
+	}
+}
+</code></pre>
+<p>Un idioma con traducción integrada (como <code>es</code> arriba) puede seguir
+sobrescribiendo claves individuales de la misma forma - tus propios
+<code>strings</code> siempre ganan tanto a la traducción integrada como al valor
+predeterminado en inglés. El propio <code>defaultLocale</code> también puede llevar
+sus propios <code>strings</code>, para un proyecto cuyo idioma predeterminado no sea
+el inglés y que quiera su propia redacción de interfaz en lugar de
+recurrir al valor predeterminado en inglés.</p>
+<p>El conjunto completo de claves sobrescribibles: <code>searchPlaceholder</code>,
+<code>searchAriaLabel</code>, <code>searchNoResults</code>, <code>toggleDarkMode</code>,
+<code>toggleNavigation</code>, <code>toggleSection</code> (marcador <code>{title}</code>), <code>repository</code>,
+<code>version</code>, <code>language</code> (marcador <code>{label}</code>), <code>onThisPage</code>, <code>editThisPage</code>,
+<code>downloadMarkdown</code>, <code>lastUpdated</code>, <code>notTranslatedNotice</code> (marcador
+<code>{locale}</code>), <code>notFoundTitle</code>, <code>notFoundBody</code>, <code>tagsTitle</code> y
+<code>pageNavigation</code>.</p>
 <h2 id="qué-queda-fuera-de-alcance-por-ahora"><a href="#qué-queda-fuera-de-alcance-por-ahora" id="qué-queda-fuera-de-alcance-por-ahora" name="qué-queda-fuera-de-alcance-por-ahora" class="anchor"></a>Qué queda fuera de alcance (por ahora)</h2>
 <ul>
-<li><strong>La interfaz del tema permanece en inglés.</strong> &quot;Edit this page,&quot; &quot;Last
-updated,&quot; el marcador de posición de búsqueda, y cadenas de interfaz
-similares todavía no se traducen por idioma - solo se traduce el
-contenido de tu propia página. La experiencia de lectura real de un
-idioma está completamente traducida; el mobiliario circundante del
-tema no lo está.</li>
+<li><strong>La interfaz del blog permanece en inglés.</strong> Las propias cadenas de UI
+del subsistema de blog (&quot;Categories,&quot; &quot;Archive,&quot; &quot;Read more,&quot; &quot;N min
+read,&quot; ...) todavía no están cubiertas por el override de <code>strings</code> de
+arriba - solo lo está el resto de la interfaz del tema.</li>
+<li><strong>El valor de fecha de <code>lastUpdated</code> no depende del idioma.</strong> Su
+etiqueta se traduce; el propio valor de fecha/hora se sigue formateando
+igual sin importar el idioma.</li>
 <li><strong>El espejado de diseño RTL es básico, no pixel-perfecto.</strong> <code>dir=&quot;rtl&quot;</code>
 se establece correctamente, y la barra lateral/cabecera se reflejan de
 verdad, pero algunos detalles decorativos (el lado de la barra de
@@ -219,7 +268,7 @@ junto a las del propio idioma predeterminado, de la misma forma que lo
 hacen las páginas <a href="/bx-sites/development/theme/slate/es/configuration/index.html#versionado">versionadas</a>.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/slate/es/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 10:25:19 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/slate/es/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 11:29:46 PM</span></div>
 			</article>
 
 			<nav class="slate-page-nav" aria-label="Page navigation">
@@ -235,7 +284,7 @@ hacen las páginas <a href="/bx-sites/development/theme/slate/es/configuration/i
 		</main>
 
 		<aside class="slate-toc-sidebar">
-			<nav class="slate-toc" aria-label="On this page"><div class="slate-toc__title">On this page</div><ul><li class="slate-toc__item slate-toc__item--2"><a href="#añadir-un-idioma">A&ntilde;adir un idioma</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#qué-se-construye">Qu&eacute; se construye</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#páginas-sin-traducir">P&aacute;ginas sin traducir</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#el-selector-de-idioma">El selector de idioma</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#docs-versionados-y-traducidos">Docs versionados y traducidos</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#qué-queda-fuera-de-alcance-por-ahora">Qu&eacute; queda fuera de alcance (por ahora)</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#iconos-personalizados-e-inclusiones">Iconos personalizados e inclusiones</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#seo">SEO</a></li></ul></nav>
+			<nav class="slate-toc" aria-label="On this page"><div class="slate-toc__title">On this page</div><ul><li class="slate-toc__item slate-toc__item--2"><a href="#añadir-un-idioma">A&ntilde;adir un idioma</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#qué-se-construye">Qu&eacute; se construye</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#páginas-sin-traducir">P&aacute;ginas sin traducir</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#el-selector-de-idioma">El selector de idioma</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#docs-versionados-y-traducidos">Docs versionados y traducidos</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#interfaz-del-tema-cadenas-de-ui">Interfaz del tema (cadenas de UI)</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#qué-queda-fuera-de-alcance-por-ahora">Qu&eacute; queda fuera de alcance (por ahora)</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#iconos-personalizados-e-inclusiones">Iconos personalizados e inclusiones</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#seo">SEO</a></li></ul></nav>
 		</aside>
 
 	</div>

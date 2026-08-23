@@ -80,7 +80,7 @@
 
 				<h1 class="ntn-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,184H144l40-80ZM96,127.56h0A95.78,95.78,0,0,0,128,56H64A95.78,95.78,0,0,0,96,127.56Z" opacity="0.2"/><path d="M247.15,212.42l-56-112a8,8,0,0,0-14.31,0l-21.71,43.43A88,88,0,0,1,108,126.93,103.65,103.65,0,0,0,135.69,64H160a8,8,0,0,0,0-16H104V32a8,8,0,0,0-16,0V48H32a8,8,0,0,0,0,16h87.63A87.7,87.7,0,0,1,96,116.35a87.74,87.74,0,0,1-19-31,8,8,0,1,0-15.08,5.34A103.63,103.63,0,0,0,84,127a87.55,87.55,0,0,1-52,17,8,8,0,0,0,0,16,103.46,103.46,0,0,0,64-22.08,104.18,104.18,0,0,0,51.44,21.31l-26.6,53.19a8,8,0,0,0,14.31,7.16L148.94,192h70.11l13.79,27.58A8,8,0,0,0,240,224a8,8,0,0,0,7.15-11.58ZM156.94,176,184,121.89,211.05,176Z"/></svg></span> Internationalization (i18n)</h1>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/notion/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-sites/development/theme/notion/tags/index.html#tag-i18n">i18n</a></div>
-<details class="bxsites-toc-mobile ntn-toc--mobile"><summary class="ntn-toc--mobile__summary">On this page</summary><ul><li class="ntn-toc__item ntn-toc__item--2"><a href="#adding-a-locale">Adding a locale</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#what-gets-built">What gets built</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#untranslated-pages">Untranslated pages</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#the-language-switcher">The language switcher</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#versioned-and-translated-docs">Versioned and translated docs</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#whats-out-of-scope-for-now">What's out of scope (for now)</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#custom-icons-and-includes">Custom icons and includes</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#seo">SEO</a></li></ul></details>
+<details class="bxsites-toc-mobile ntn-toc--mobile"><summary class="ntn-toc--mobile__summary">On this page</summary><ul><li class="ntn-toc__item ntn-toc__item--2"><a href="#adding-a-locale">Adding a locale</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#what-gets-built">What gets built</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#untranslated-pages">Untranslated pages</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#the-language-switcher">The language switcher</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#versioned-and-translated-docs">Versioned and translated docs</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#theme-chrome-ui-strings">Theme chrome (UI strings)</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#whats-out-of-scope-for-now">What's out of scope (for now)</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#custom-icons-and-includes">Custom icons and includes</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#seo">SEO</a></li></ul></details>
 				<div class="ntn-content-body">
 				<h1 id="internationalization-i18n"><a href="#internationalization-i18n" id="internationalization-i18n" name="internationalization-i18n" class="anchor"></a>Internationalization (i18n)</h1>
 <p>Translate your docs into other languages, each getting its own URL prefix,
@@ -182,12 +182,59 @@ locales <em>that version itself</em> has translations for - a version with no
 existed, no switcher shown. Switching version always drops back to that
 version's own default locale (never assumes the target version has the
 same translation); switching locale always stays on the current version.</p>
+<h2 id="theme-chrome-ui-strings"><a href="#theme-chrome-ui-strings" id="theme-chrome-ui-strings" name="theme-chrome-ui-strings" class="anchor"></a>Theme chrome (UI strings)</h2>
+<p>Every built-in theme's own surrounding UI text - the search placeholder,
+&quot;On this page,&quot; &quot;Edit this page,&quot; &quot;Last updated,&quot; the 404 page, the tags
+page title, and the &quot;hasn't been translated yet&quot; notice itself - is
+translated per locale too, not just your own page content.</p>
+<p>Four locales ship a built-in translation out of the box: <code>de</code>, <code>es</code>, <code>it</code>,
+and <code>ja</code>. Building any of those locale codes gets fully translated chrome
+automatically, nothing to configure. Any other locale code (or a page you'd
+rather word differently) falls back to English - override just the keys
+you care about with your own <code>strings</code> on that locale's own entry in
+<code>bxsites.json</code>:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
+	&quot;i18n&quot;: {
+		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
+		&quot;locales&quot;: [
+			{
+				&quot;code&quot;: &quot;fr&quot;,
+				&quot;label&quot;: &quot;Français&quot;,
+				&quot;strings&quot;: {
+					&quot;searchPlaceholder&quot;: &quot;Rechercher dans la documentation...&quot;,
+					&quot;onThisPage&quot;: &quot;Sur cette page&quot;
+				}
+			},
+			{
+				&quot;code&quot;: &quot;es&quot;,
+				&quot;label&quot;: &quot;Español&quot;,
+				&quot;strings&quot;: { &quot;toggleDarkMode&quot;: &quot;Cambiar a modo nocturno&quot; }
+			}
+		]
+	}
+}
+</code></pre>
+<p>A locale with a built-in translation (like <code>es</code> above) can still override
+individual keys the same way - your own <code>strings</code> always wins over both
+the built-in translation and the English default. <code>defaultLocale</code> itself
+can carry its own <code>strings</code> too, for a project whose default locale isn't
+English and wants its own chrome wording rather than falling back to the
+English default.</p>
+<p>The full set of overridable keys: <code>searchPlaceholder</code>, <code>searchAriaLabel</code>,
+<code>searchNoResults</code>, <code>toggleDarkMode</code>, <code>toggleNavigation</code>, <code>toggleSection</code>
+(<code>{title}</code> placeholder), <code>repository</code>, <code>version</code>, <code>language</code> (<code>{label}</code>
+placeholder), <code>onThisPage</code>, <code>editThisPage</code>, <code>downloadMarkdown</code>,
+<code>lastUpdated</code>, <code>notTranslatedNotice</code> (<code>{locale}</code> placeholder),
+<code>notFoundTitle</code>, <code>notFoundBody</code>, <code>tagsTitle</code>, and <code>pageNavigation</code>.</p>
 <h2 id="whats-out-of-scope-for-now"><a href="#whats-out-of-scope-for-now" id="whats-out-of-scope-for-now" name="whats-out-of-scope-for-now" class="anchor"></a>What's out of scope (for now)</h2>
 <ul>
-<li><strong>Theme chrome stays in English.</strong> &quot;Edit this page,&quot; &quot;Last updated,&quot;
-the search placeholder, and similar UI strings aren't translated per
-locale yet - only your own page content is. A locale's actual reading
-experience is fully translated; the surrounding theme furniture isn't.</li>
+<li><strong>Blog chrome stays in English.</strong> The blog subsystem's own UI strings
+(&quot;Categories,&quot; &quot;Archive,&quot; &quot;Read more,&quot; &quot;N min read,&quot; ...) aren't covered
+by the <code>strings</code> override above yet - only the rest of the theme chrome
+is.</li>
+<li><strong><code>lastUpdated</code>'s own date value isn't locale-aware.</strong> Its label
+translates; the date/time value itself is still formatted the same way
+regardless of locale.</li>
 <li><strong>RTL layout mirroring is baseline, not pixel-perfect.</strong> <code>dir=&quot;rtl&quot;</code> is
 set correctly, and the sidebar/header genuinely mirror, but a few
 decorative details (an admonition's accent-bar side, for instance)
@@ -207,7 +254,7 @@ alongside the default locale's own, the same way <a href="/bx-sites/development/
 pages are.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/notion/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 10:25:19 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/notion/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 23, 2026, 11:29:46 PM</span></div>
 			</article>
 
 			<nav class="ntn-page-nav" aria-label="Page navigation">
@@ -223,7 +270,7 @@ pages are.</p>
 		</main>
 
 		<aside class="ntn-toc-sidebar">
-			<nav class="ntn-toc" aria-label="On this page"><div class="ntn-toc__title">On this page</div><ul><li class="ntn-toc__item ntn-toc__item--2"><a href="#adding-a-locale">Adding a locale</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#what-gets-built">What gets built</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#untranslated-pages">Untranslated pages</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#the-language-switcher">The language switcher</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#versioned-and-translated-docs">Versioned and translated docs</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#whats-out-of-scope-for-now">What's out of scope (for now)</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#custom-icons-and-includes">Custom icons and includes</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#seo">SEO</a></li></ul></nav>
+			<nav class="ntn-toc" aria-label="On this page"><div class="ntn-toc__title">On this page</div><ul><li class="ntn-toc__item ntn-toc__item--2"><a href="#adding-a-locale">Adding a locale</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#what-gets-built">What gets built</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#untranslated-pages">Untranslated pages</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#the-language-switcher">The language switcher</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#versioned-and-translated-docs">Versioned and translated docs</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#theme-chrome-ui-strings">Theme chrome (UI strings)</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#whats-out-of-scope-for-now">What's out of scope (for now)</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#custom-icons-and-includes">Custom icons and includes</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#seo">SEO</a></li></ul></nav>
 		</aside>
 
 	</div>
