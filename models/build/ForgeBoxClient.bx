@@ -1,0 +1,141 @@
+/**
+ * Thin client for ForgeBox's public REST API (`https://www.forgebox.io/api/v1`,
+ * documented at commandbox.ortusbooks.com) - resolves a package slug
+ * (optionally pinned to a version) to its downloadable zip `location`, and
+ * downloads that zip to a local path. Backs `install:plugin`/`install:theme`
+ * so both need nothing but the `bxSites` binary itself - no CommandBox/`box`
+ * binary involved, same "just the bxSites binary" goal as everything else
+ * this module does.
+ *
+ * `resolve()`/`download()` both touch the real network and have no unit
+ * test of their own, the same reason PluginLoader.bx's `discover()` and
+ * GhPagesDeployer.bx's `git` calls don't - there's no seam to fake a live
+ * HTTP call through, and a test suite shouldn't depend on a real external
+ * service being reachable. `buildEntryUrl()`/`parseEntryResponse()` are the
+ * pure halves of that same logic (URL shape, response-JSON shape) and are
+ * fully unit tested against fake JSON bodies - see ForgeBoxClientSpec.bx.
+ * `PluginInstaller`/`ThemeInstaller` inject a fake implementation of this
+ * whole class (`setForgeBoxClient()` on each) to exercise their own
+ * download-and-extract logic without a live network call either.
+ */
+class {
+
+	/**
+	 * The ForgeBox REST API base URL - overridable via `setBaseUrl()` for a
+	 * private ForgeBox Enterprise instance, or a test double.
+	 */
+	variables.baseUrl = "https://www.forgebox.io/api/v1"
+
+	/**
+	 * @baseUrl A ForgeBox-API-compatible base URL, trailing slash optional
+	 */
+	void function setBaseUrl( required string baseUrl ) {
+		variables.baseUrl = arguments.baseUrl.reReplace( "[\/]+$", "" )
+	}
+
+	/**
+	 * The ForgeBox `entry` endpoint URL for a slug - `GET /entry/{slug}` for
+	 * the latest version, `GET /entry/{slug}/{version}` for a specific one
+	 * (mirrors the `box install slug@version` form CommandBox itself
+	 * documents).
+	 *
+	 * @slug The ForgeBox package slug
+	 * @version A specific version, or "" for latest
+	 */
+	string function buildEntryUrl( required string slug, string version = "" ) {
+		var url = variables.baseUrl & "/entry/" & arguments.slug
+		return len( trim( arguments.version ) ) ? ( url & "/" & trim( arguments.version ) ) : url
+	}
+
+	/**
+	 * Parses a ForgeBox `entry` endpoint's JSON body into
+	 * `{ name, version, location }` - the three fields `PluginInstaller`/
+	 * `ThemeInstaller` need. ForgeBox nests the resolved download URL either
+	 * directly on the entry (a specific-version lookup) or under its own
+	 * `version` sub-struct (a "latest" lookup) - this checks both shapes
+	 * rather than assuming one.
+	 *
+	 * @slug The slug that was requested - only used to phrase error messages
+	 * @body The raw JSON response body
+	 *
+	 * @return { name, version, location }
+	 */
+	struct function parseEntryResponse( required string slug, required string body ) {
+		var parsed = ""
+		try {
+			parsed = jsonDeserialize( arguments.body )
+		} catch ( any e ) {
+			throw(
+				type    = "BxSites.ForgeBoxInvalidResponse",
+				message = "ForgeBox returned a non-JSON response for [#arguments.slug#]: #left( arguments.body, 200 )#"
+			)
+		}
+
+		if ( !isStruct( parsed ) || !isStruct( parsed.data ?: "" ) ) {
+			throw(
+				type    = "BxSites.ForgeBoxEntryNotFound",
+				message = "ForgeBox has no entry for [#arguments.slug#]"
+			)
+		}
+
+		var data = parsed.data
+		var versionBlock = isStruct( data.version ?: "" ) ? data.version : {}
+		var location = trim( data.location ?: ( versionBlock.location ?: "" ) )
+		var version  = trim( isSimpleValue( data.version ?: "" ) ? data.version : ( versionBlock.version ?: "" ) )
+
+		if ( !len( location ) ) {
+			throw(
+				type    = "BxSites.ForgeBoxEntryNotFound",
+				message = "ForgeBox entry [#arguments.slug#] has no downloadable [location]"
+			)
+		}
+
+		return { name : data.slug ?: ( data.name ?: arguments.slug ), version : version, location : location }
+	}
+
+	/**
+	 * Resolves a slug (+ optional version) against the real ForgeBox API.
+	 *
+	 * @slug The ForgeBox package slug
+	 * @version A specific version, or "" for latest
+	 *
+	 * @return { name, version, location }
+	 */
+	struct function resolve( required string slug, string version = "" ) {
+		var url = buildEntryUrl( arguments.slug, arguments.version )
+
+		bx:http url="#url#" method="GET" throwOnError="false" result="local.response";
+
+		if ( local.response.statusCode != 200 ) {
+			throw(
+				type    = "BxSites.ForgeBoxEntryNotFound",
+				message = "ForgeBox lookup for [#arguments.slug#] failed (#local.response.statusCode#) - #trim( local.response.statusText ?: '' )#"
+			)
+		}
+
+		return parseEntryResponse( arguments.slug, local.response.fileContent )
+	}
+
+	/**
+	 * Downloads a zip from `url` to `destZipPath`, creating its parent
+	 * directory if needed.
+	 *
+	 * @url The zip's download URL (an entry's own resolved `location`)
+	 * @destZipPath Absolute path (file name included) to save it to
+	 */
+	void function download( required string url, required string destZipPath ) {
+		var destDir  = getDirectoryFromPath( arguments.destZipPath )
+		var destFile = arguments.destZipPath.listLast( "/" )
+		directoryCreate( destDir, true, true )
+
+		bx:http url="#arguments.url#" method="GET" getAsBinary="yes" throwOnError="false" path="#destDir#" file="#destFile#" result="local.response";
+
+		if ( local.response.statusCode != 200 ) {
+			throw(
+				type    = "BxSites.ForgeBoxDownloadFailed",
+				message = "Downloading [#arguments.url#] failed (#local.response.statusCode#)"
+			)
+		}
+	}
+
+}

@@ -4,11 +4,11 @@ name: Publish Docs
 # repo root - see readme.md) with bx-sites itself, and publishes site/ to
 # GitHub Pages - main publishes to the site root (stable), development
 # publishes to /development/ (latest), so both versions stay live at once.
-# Each publish is itself a showcase of all three built-in themes -
-# buildMultiTheme.sh builds docs/ three times and assembles bootstrap at
-# the root plus material/tailwind under theme/material/ and
-# theme/tailwind/, with a switcher (docs/assets/theme-switcher.js) to jump
-# between them from any page.
+# Each publish is itself a showcase of all ten built-in themes (the theme
+# gallery) - buildMultiTheme.sh builds docs/ ten times and assembles
+# bootstrap at the root plus every other theme under theme/<name>/, with a
+# switcher (docs/assets/theme-switcher.js) to jump between them from any
+# page.
 # Requires GitHub Pages enabled for this repository with its source set to
 # "Deploy from a branch" -> gh-pages -> / (root) (Settings -> Pages -> Source).
 # gh-pages is created automatically by the first successful run below.
@@ -81,7 +81,7 @@ jobs:
           yq eval '.baseURL = strenv(URL) | .repo.editUri = strenv(EDIT_URI)' bxsites.yaml > bxsites.yaml.tmp
           mv bxsites.yaml.tmp bxsites.yaml
 
-      - name: Build the site (bootstrap at the root, material/tailwind under theme/)
+      - name: Build the site (bootstrap at the root, every other theme under theme/)
         run: ./buildMultiTheme.sh
 
       - name: Deploy main to the site root

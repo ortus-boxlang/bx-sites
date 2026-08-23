@@ -1,0 +1,181 @@
+/**
+ * Backs the `install:plugin` CLI verb - downloads a plugin module's zip
+ * from ForgeBox and extracts it into the project's own `boxlang_modules/`,
+ * BoxLang's own documented convention for a local CLI app's auto-loaded
+ * modules (see "Modules" under Getting Started > Installation in the
+ * BoxLang docs) - no `BOXLANG_HOME`/global install involved. It then loads
+ * the module into the *running* runtime immediately via
+ * `ModuleService.loadModule()`, so the same `bxSites install:plugin`
+ * invocation can report back the module's real registered mapping name
+ * (its own `this.mapping`, which Doctor.bx's own docblock already flags as
+ * not necessarily the same as its ForgeBox slug - `bx-markdown` registers
+ * as `bxMarkdown`) without requiring a restart.
+ *
+ * Installing a module here never activates it as a bx-sites *plugin* -
+ * that's still a project's own explicit opt-in via bxsites.yaml's
+ * `plugins` array (PluginLoader.bx, docs/guides/plugins.md); this only
+ * gets the module onto disk and into the runtime's module registry, the
+ * same "install ≠ activate" split `plugin:new`'s own closing message
+ * already documents.
+ */
+class {
+
+	/**
+	 * The ForgeBox client used to resolve/download packages - swappable via
+	 * `setForgeBoxClient()`, the same seam ConfigLoader.setYamlRenderer()
+	 * gives (see its own docblock), so `downloadAndExtract()` is fully
+	 * unit-testable without a live network call: a fake client's
+	 * `download()` just copies a local fixture zip instead of making a real
+	 * HTTP request. See PluginInstallerSpec.bx.
+	 */
+	variables.forgeBoxClient = new "models.build.ForgeBoxClient@bxsites"()
+
+	/**
+	 * @client Any object exposing `resolve( slug, version )` -> `{ name, version, location }` and `download( url, destZipPath )`
+	 */
+	void function setForgeBoxClient( required any client ) {
+		variables.forgeBoxClient = arguments.client
+	}
+
+	/**
+	 * Where a plugin named `slug` lands under a project root - BoxLang's own
+	 * `boxlang_modules/<name>/` convention.
+	 *
+	 * @projectRoot Absolute path to the project root
+	 * @slug The ForgeBox package slug
+	 */
+	string function targetDir( required string projectRoot, required string slug ) {
+		return arguments.projectRoot.reReplace( "[\/]+$", "" ) & "/boxlang_modules/" & arguments.slug
+	}
+
+	/**
+	 * Resolves + downloads + extracts a plugin module into
+	 * `<projectRoot>/boxlang_modules/<slug>/` - the network/ForgeBox half of
+	 * `install()`, split out so it's unit-testable with a fake
+	 * ForgeBoxClient (this class's own docblock). A previous install of the
+	 * same slug is replaced outright, same "no accumulated cruft" idea
+	 * GhPagesDeployer.bx's own orphan-branch approach uses.
+	 *
+	 * @projectRoot Absolute path to the project root
+	 * @slug The ForgeBox package slug to install
+	 * @version A specific version to install, or "" for latest
+	 *
+	 * @return { slug, version, installDir }
+	 */
+	struct function downloadAndExtract( required string projectRoot, required string slug, string version = "" ) {
+		var entry = variables.forgeBoxClient.resolve( arguments.slug, arguments.version )
+		var dir = targetDir( arguments.projectRoot, arguments.slug )
+
+		if ( directoryExists( dir ) ) {
+			directoryDelete( dir, true )
+		}
+		directoryCreate( dir, true, true )
+
+		var tempZip = getTempDirectory().reReplace( "[\/]+$", "" ) & "/bxsites-install-plugin-" & createUUID() & ".zip"
+		try {
+			variables.forgeBoxClient.download( entry.location, tempZip )
+			extract( source = tempZip, destination = dir, format = "zip", overwrite = true )
+		} finally {
+			if ( fileExists( tempZip ) ) {
+				fileDelete( tempZip )
+			}
+		}
+
+		return { slug : arguments.slug, version : entry.version, installDir : flattenIfSingleSubfolder( dir ) }
+	}
+
+	/**
+	 * A package zip built by this module's own packaging convention
+	 * (Build.bx) extracts flat - `box.json`/`ModuleConfig.bx` directly under
+	 * the destination. Some zips (a GitHub "Download ZIP", for one) instead
+	 * wrap everything in a single top-level folder. When extraction produced
+	 * exactly one subfolder and neither marker file is present at the top,
+	 * assume that shape and hoist the subfolder's own contents up -
+	 * `ModuleService.loadModule()` needs `dir` to directly contain
+	 * `box.json`/`ModuleConfig.bx`, not a folder containing them.
+	 *
+	 * @dir The freshly-extracted target directory
+	 */
+	private string function flattenIfSingleSubfolder( required string dir ) {
+		if ( fileExists( arguments.dir & "/box.json" ) || fileExists( arguments.dir & "/ModuleConfig.bx" ) ) {
+			return arguments.dir
+		}
+
+		var entries = directoryList( arguments.dir, false, "name" )
+		if ( entries.len() != 1 || !directoryExists( arguments.dir & "/" & entries[ 1 ] ) ) {
+			return arguments.dir
+		}
+
+		var nested = arguments.dir & "/" & entries[ 1 ]
+		for ( var entryName in directoryList( nested, false, "name" ) ) {
+			var from = nested & "/" & entryName
+			var to   = arguments.dir & "/" & entryName
+			directoryExists( from ) ? directoryMove( from, to ) : fileMove( from, to )
+		}
+		directoryDelete( nested, true )
+
+		return arguments.dir
+	}
+
+	/**
+	 * Loads a freshly-extracted module into the *running* runtime and
+	 * reports back its real registered mapping name, by matching the
+	 * extracted `installDir` against `ModuleService.getModuleList()`'s own
+	 * registry (a flat, name-addressable view of every loaded module - see
+	 * BoxLang's "Module Inception" docs) rather than re-parsing the
+	 * extracted `box.json` by hand.
+	 *
+	 * The real-system-touching half of `install()`, with no unit test of
+	 * its own for the same reason PluginLoader.discover() doesn't have one
+	 * (this class's own docblock, and PluginLoader.bx's).
+	 *
+	 * @installDir Absolute path to the extracted module (downloadAndExtract()'s own installDir)
+	 *
+	 * @return The module's registered mapping name
+	 */
+	string function activateInRuntime( required string installDir ) {
+		var moduleService = getBoxRuntime().getModuleService()
+		moduleService.loadModule( arguments.installDir )
+
+		var normalizedInstallDir = arguments.installDir.reReplace( "[\/]+$", "" )
+		var registry = moduleService.getModuleList()
+
+		for ( var mappingName in registry ) {
+			var record = registry[ mappingName ]
+			var recordPath = isStruct( record )
+				? ( record.physicalPath ?: record.modulePath ?: record.path ?: record.directoryPath ?: "" )
+				: ""
+			if ( len( recordPath ) && recordPath.reReplace( "[\/]+$", "" ) == normalizedInstallDir ) {
+				return mappingName
+			}
+		}
+
+		throw(
+			type    = "BxSites.PluginActivationFailed",
+			message = "Module at [#arguments.installDir#] was extracted, but couldn't be confirmed in the runtime's module registry after loadModule() - check its mapping name in bxsites.yaml manually (see box.json's [boxlang.moduleName])"
+		)
+	}
+
+	/**
+	 * Full `install:plugin` flow: download + extract + activate.
+	 *
+	 * @projectRoot Absolute path to the project root
+	 * @slug The ForgeBox package slug to install
+	 * @version A specific version to install, or "" for latest
+	 *
+	 * @return { slug, version, installDir, mappingName }
+	 */
+	struct function install( required string projectRoot, required string slug, string version = "" ) {
+		var extracted = downloadAndExtract( arguments.projectRoot, arguments.slug, arguments.version )
+		extracted.mappingName = activateInRuntime( extracted.installDir )
+		return extracted
+	}
+
+	/**
+	 * The running BoxRuntime singleton, reached the same way PluginLoader.bx/MarkdownRenderer.bx do.
+	 */
+	private any function getBoxRuntime() {
+		return createObject( "java", "ortus.boxlang.runtime.BoxRuntime" ).getInstance()
+	}
+
+}

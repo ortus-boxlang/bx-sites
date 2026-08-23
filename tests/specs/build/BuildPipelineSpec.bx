@@ -778,7 +778,12 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "self-hosts the theme's webfonts under site/assets/fonts, with no fonts.googleapis.com reference anywhere in the page", function() {
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				// Only the themes that actually ship an @font-face - bootstrap/
+				// material/tailwind, and gitbook (its serif headings). The other
+				// six new themes (docsy/slate/docusaurus/justthedocs/vuepress/
+				// notion) are deliberately system-font-only - no @font-face at
+				// all - see each one's own assets/style.css docblock.
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "gitbook" ] ) {
 					var root = newProject( themeName );
 					fileWrite( root & "/docs/index.md", "Home" );
 
@@ -798,7 +803,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "vendors highlight.js and Alpine.js for every theme, and Bootstrap's own CSS/JS only for the bootstrap theme, with no CDN reference in the built page", function() {
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var root = newProject( themeName );
 					fileWrite( root & "/docs/index.md", "Home" );
 
@@ -888,7 +893,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "renders mermaid.js and its init script only when [mermaid] is enabled, across every built-in theme, vendored with no CDN reference", function() {
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var root = newProject( themeName );
 					fileWrite( root & "/docs/index.md", "Home" );
 					pipeline.build( root );
@@ -970,7 +975,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "loads KaTeX and restores literal math formula text only when [math] is enabled, across every built-in theme", function() {
 				var expectedFormula = encodeForHTML( "$e^{i\pi}+1=0$" );
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var root = newProject( themeName );
 					fileWrite( root & "/docs/index.md", 'Euler: $e^{i\pi}+1=0$ here.' );
 					pipeline.build( root );

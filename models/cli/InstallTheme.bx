@@ -1,0 +1,32 @@
+/**
+ * `install:theme` CLI verb - thin dispatcher over ThemeInstaller.install().
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path), name (required - the ForgeBox slug), version (optional - a specific version, defaults to latest) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxSites.MissingProjectRoot", message = "`install:theme` requires a project root" )
+		}
+
+		var name = trim( arguments.options.name ?: "" )
+		if ( !len( name ) ) {
+			throw( type = "BxSites.MissingThemeName", message = "`install:theme` requires --name=<ForgeBox slug>" )
+		}
+
+		var version = trim( arguments.options.version ?: "" )
+
+		var installer = new "models.build.ThemeInstaller@bxsites"()
+		var result = installer.install( projectRoot : projectRoot, name : name, version : version )
+		var versionSuffix = len( result.version ) ? ( "@" & result.version ) : ""
+
+		return {
+			exitCode : 0,
+			message  : 'Installed [#result.name##versionSuffix#] into themes/#result.name#/ - set bxsites.yaml''s [theme.name] to "#result.name#" to use it'
+		}
+	}
+
+}

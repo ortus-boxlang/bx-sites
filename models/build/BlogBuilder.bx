@@ -137,8 +137,8 @@ class {
 			post.nextPage = i < arguments.posts.len() ? { title : arguments.posts[ i + 1 ].title, url : arguments.posts[ i + 1 ].urlPath } : { title : "", url : "" }
 
 			// Backs a theme's own `og:type: article`/`article:published_time`/
-			// `article:author` meta tags (layout.bxm, all three built-in
-			// themes) - a plain doc page never sets these, so they default to
+			// `article:author` meta tags (layout.bxm, every built-in theme) -
+			// a plain doc page never sets these, so they default to
 			// "website"/empty there instead.
 			post.ogType = "article"
 			post.publishedTime = dateTimeFormat( post.date, "yyyy-MM-dd" )

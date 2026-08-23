@@ -10,11 +10,11 @@
  */
 class {
 
-	variables.builtInThemes = [ "bootstrap", "material", "tailwind" ]
+	variables.builtInThemes = [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ]
 
 	/**
 	 * @projectRoot Absolute path to the project root
-	 * @theme Which built-in theme to copy - "bootstrap", "material", or "tailwind"
+	 * @theme Which built-in theme to copy - see ThemeScaffolder.bx's own `builtInThemes`/docs/guides/themes.md for the full list
 	 *
 	 * @return { themeDir }
 	 */
