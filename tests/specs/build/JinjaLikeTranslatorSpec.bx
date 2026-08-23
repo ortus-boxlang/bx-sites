@@ -1,0 +1,121 @@
+/**
+ * Exercises JinjaLikeTranslator.bx's translate() end to end - pure input
+ * (template source + a variable map) to output (.bxm content + warnings),
+ * no filesystem/network involved, so every construct it recognizes (and
+ * every one it deliberately doesn't) is covered directly.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.JinjaLikeTranslator", function() {
+
+			beforeEach( function() {
+				variables.translator = new "models.build.JinjaLikeTranslator@bxsites"();
+				variables.map = { "page.title" : "variables.page.title", "nav" : "variables.nav" };
+			} );
+
+			it( "passes plain HTML through untouched when there's nothing to translate", function() {
+				var result = translator.translate( "<h1>Hello</h1>", map );
+				expect( result.output ).toBe( "<h1>Hello</h1>" );
+				expect( result.warnings ).toBeEmpty();
+			} );
+
+			it( "translates a mapped {{ expr }} into a #...# output", function() {
+				var result = translator.translate( "<h1>{{ page.title }}</h1>", map );
+				expect( result.output ).toBe( "<h1>#variables.page.title#</h1>" );
+				expect( result.warnings ).toBeEmpty();
+			} );
+
+			it( "leaves an unmapped {{ expr }} as a TODO comment and warns", function() {
+				var result = translator.translate( "{{ page.author }}", map );
+				expect( result.output ).toInclude( "<!--- TODO:" );
+				expect( result.output ).toInclude( "page.author" );
+				expect( result.warnings.len() ).toBe( 1 );
+			} );
+
+			it( "leaves a filtered {{ expr | filter }} as a TODO comment and warns, even when the base is mapped", function() {
+				var result = translator.translate( "{{ page.title | upper }}", map );
+				expect( result.output ).toInclude( "<!--- TODO:" );
+				expect( result.output ).notToInclude( "variables.page.title" );
+				expect( result.warnings.len() ).toBe( 1 );
+			} );
+
+			it( "translates {% if %}/{% endif %} into <bx:if>/</bx:if>, substituting mapped variables in the condition", function() {
+				var result = translator.translate( "{% if page.title %}Hi{% endif %}", map );
+				expect( result.output ).toBe( '<bx:if condition="#variables.page.title#">Hi</bx:if>' );
+				expect( result.warnings ).toBeEmpty();
+			} );
+
+			it( "translates a full if/elif/else/endif chain", function() {
+				var source = "{% if page.title %}A{% elif nav %}B{% else %}C{% endif %}";
+				var result = translator.translate( source, map );
+				expect( result.output ).toBe( '<bx:if condition="#variables.page.title#">A<bx:elseif condition="#variables.nav#">B<bx:else>C</bx:if>' );
+			} );
+
+			it( "also accepts Liquid's elsif spelling", function() {
+				var result = translator.translate( "{% if page.title %}A{% elsif nav %}B{% endif %}", map );
+				expect( result.output ).toInclude( "<bx:elseif" );
+			} );
+
+			it( "translates {% for x in list %}/{% endfor %} into <bx:loop array=... item=...>", function() {
+				var result = translator.translate( "{% for item in nav %}{{ page.title }}{% endfor %}", map );
+				expect( result.output ).toBe( '<bx:loop array="#variables.nav#" item="item">#variables.page.title#</bx:loop>' );
+				expect( result.warnings ).toBeEmpty();
+			} );
+
+			it( "drops {# comment #} entirely, with no output and no warning", function() {
+				var result = translator.translate( "before{# a jinja comment #}after", map );
+				expect( result.output ).toBe( "beforeafter" );
+				expect( result.warnings ).toBeEmpty();
+			} );
+
+			it( "leaves an unsupported tag (e.g. Jinja2 {% extends %}) as a TODO comment and warns", function() {
+				var result = translator.translate( '{% extends "base.html" %}', map );
+				expect( result.output ).toInclude( "<!--- TODO:" );
+				expect( result.output ).toInclude( "extends" );
+				expect( result.warnings.len() ).toBe( 1 );
+			} );
+
+			it( "flags (but still emits) a condition that references an unmapped variable", function() {
+				var result = translator.translate( "{% if page.author %}Hi{% endif %}", map );
+				expect( result.output ).toInclude( "<bx:if" );
+				expect( result.output ).toInclude( "</bx:if>" );
+				expect( result.warnings.len() ).toBe( 1 );
+				expect( result.warnings[ 1 ] ).toInclude( "page.author" );
+			} );
+
+			it( "warns (but still closes) when {% endfor %} closes a mismatched {% if %}", function() {
+				var result = translator.translate( "{% if page.title %}Hi{% endfor %}", map );
+				expect( result.output ).toInclude( "</bx:loop>" );
+				expect( result.warnings.len() ).toBe( 1 );
+				expect( result.warnings[ 1 ] ).toInclude( "endfor" );
+			} );
+
+			it( "warns on an unclosed {% if %} at the end of the source", function() {
+				var result = translator.translate( "{% if page.title %}Hi", map );
+				var found = false;
+				for ( var w in result.warnings ) {
+					found = found || w.findNoCase( "Unclosed" ) > 0;
+				}
+				expect( found ).toBeTrue();
+			} );
+
+			it( "handles two tags with no literal text between them", function() {
+				var result = translator.translate( "{{ page.title }}{{ nav }}", map );
+				expect( result.output ).toBe( "#variables.page.title##variables.nav#" );
+			} );
+
+			it( "handles a source that's nothing but a tag, with no surrounding literal text", function() {
+				var result = translator.translate( "{{ page.title }}", map );
+				expect( result.output ).toBe( "#variables.page.title#" );
+			} );
+
+			it( "handles Jinja2's whitespace-trim markers ({%- -%}/{{- -}})", function() {
+				var result = translator.translate( "{%- if page.title -%}Hi{%- endif -%}", map );
+				expect( result.output ).toBe( '<bx:if condition="#variables.page.title#">Hi</bx:if>' );
+			} );
+
+		} );
+	}
+
+}

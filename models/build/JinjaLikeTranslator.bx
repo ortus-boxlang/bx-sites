@@ -1,0 +1,252 @@
+/**
+ * Backs `theme:import --source=mkdocs|jekyll` (ThemeImporter.bx) - a
+ * best-effort, mechanical translator from the Jinja2 (MkDocs)/Liquid
+ * (Jekyll) template family into a bx-sites `.bxm` fragment. Jinja2 and
+ * Liquid share close enough syntax for the common subset this handles
+ * (`{{ expr }}` output, `{% if/elif/else/endif %}`, `{% for x in list
+ * %}`/`{% endfor %}`, `{# comment #}`) that one translator serves both,
+ * parametrized only by a per-ecosystem variable-name mapping table
+ * (ThemeImporter.bx's own `variableMap`).
+ *
+ * This is deliberately NOT a real Jinja2/Liquid parser - filters
+ * (`{{ page.title | upper }}`), template inheritance (`{% extends %}`/
+ * `{% block %}`), includes, macros, and any variable reference with no
+ * entry in `variableMap` are left untouched inside a
+ * `<!--- TODO: ... --->` marker rather than guessed at, matching the
+ * "best-effort scaffold, not a lossless converter" framing docs/guides/
+ * theme-import.md documents. `if`/`for` control-flow *structure* is
+ * always translated into valid `<bx:if>`/`<bx:loop>` tags even when a
+ * *condition* inside one references an unmapped variable - only the
+ * condition's own correctness is flagged (as a warning, not a TODO
+ * block), since leaving the surrounding structure broken would be worse
+ * than a best-effort condition a human still needs to check.
+ */
+class {
+
+	/**
+	 * Matches, in one pass: group 1 = `{{ ... }}` output expression,
+	 * group 2 = `{% ... %}` tag body, group 3 = `{# ... #}` comment body.
+	 * The optional leading/trailing `-` (Jinja2/Liquid's whitespace-trim
+	 * markers, e.g. `{%- if x -%}`) is matched but not captured.
+	 */
+	variables.tokenPattern = createObject( "java", "java.util.regex.Pattern" ).compile(
+		"\{\{-?\s*([\s\S]*?)\s*-?\}\}|\{%-?\s*([\s\S]*?)\s*-?%\}|\{#([\s\S]*?)#\}"
+	)
+
+	/**
+	 * Matches a `for X in LIST` tag body - group 1 = the loop item name,
+	 * group 2 = the list expression. `for`/`in` are real Jinja2/Liquid
+	 * keywords, always lowercase in practice - no case-insensitive flag
+	 * needed (unlike `if`/`elif`/`else` below, matched case-insensitively
+	 * only out of harmless extra caution).
+	 */
+	variables.forPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^for\s+(\w+)\s+in\s+([\s\S]+)$" )
+
+	/**
+	 * Matches a dotted identifier (`page.title`, `site.github.owner`, ...)
+	 * - used by translateCondition() to find references the substitution
+	 * pass didn't recognize. Requires at least one dot, so a bare
+	 * single-word reference (`draft`) is never flagged either way - a
+	 * known, deliberate gap in the warning heuristic (see
+	 * translateCondition()'s own docblock), not in the translation itself.
+	 */
+	variables.dottedIdentifierPattern = createObject( "java", "java.util.regex.Pattern" ).compile(
+		"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+"
+	)
+
+	/**
+	 * Translates one Jinja2/Liquid template file's source into a bx-sites
+	 * `.bxm` fragment.
+	 *
+	 * @source The raw Jinja2/Liquid template source
+	 * @variableMap Exact dotted-path -> bx-sites expression, e.g. `{ "page.title" : "variables.page.title" }` - no fuzzy/partial matching, an unmapped path is always left as a TODO marker
+	 *
+	 * @return { output: the translated .bxm content, warnings: array of human-readable strings, one per construct that needs a manual look }
+	 */
+	struct function translate( required string source, required struct variableMap ) {
+		var warnings = []
+		var blockStack = [] // stack of "if" / "for", tracking which closing tag an "end..." should become
+		var matcher = variables.tokenPattern.matcher( arguments.source )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+		var lastEnd = 0
+
+		while ( matcher.find() ) {
+			// Guarded rather than calling mid() unconditionally - two
+			// adjacent matches with nothing literal between them (e.g.
+			// `{{ a }}{{ b }}`) would otherwise call mid() with a zero
+			// count, which isn't confirmed safe across BoxLang versions.
+			if ( matcher.start() > lastEnd ) {
+				buffer.append( arguments.source.mid( lastEnd + 1, matcher.start() - lastEnd ) )
+			}
+			lastEnd = matcher.end()
+
+			if ( matcher.start( 1 ) != -1 ) {
+				buffer.append( translateOutput( matcher.group( 1 ), arguments.variableMap, warnings ) )
+			} else if ( matcher.start( 2 ) != -1 ) {
+				buffer.append( translateTag( matcher.group( 2 ), arguments.variableMap, blockStack, warnings ) )
+			} else {
+				// {# ... #} - a comment, dropped entirely (no BoxLang
+				// output equivalent needed, same as it renders nothing
+				// in Jinja2/Liquid either).
+			}
+		}
+		if ( lastEnd < len( arguments.source ) ) {
+			buffer.append( arguments.source.mid( lastEnd + 1, len( arguments.source ) - lastEnd ) )
+		}
+
+		if ( blockStack.len() ) {
+			warnings.append( "Unclosed {% " & blockStack[ blockStack.len() ] & " %} - the source template may use a construct (a macro, a custom tag) this translator doesn't track; check the generated .bxm's tag nesting by hand." )
+		}
+
+		return { output : buffer.toString(), warnings : warnings }
+	}
+
+	/**
+	 * Translates a single `{{ expr }}` output expression.
+	 *
+	 * @expr The raw expression, trimmed
+	 * @variableMap See translate()'s own docblock
+	 * @warnings Accumulator array, mutated in place
+	 */
+	private string function translateOutput( required string expr, required struct variableMap, required array warnings ) {
+		var trimmed = trim( arguments.expr )
+
+		if ( trimmed.find( "|" ) ) {
+			arguments.warnings.append( "Filter not translated - {{ " & trimmed & " }} left as a TODO marker; port the filter chain by hand." )
+			return todoComment( "{{ " & trimmed & " }}" )
+		}
+
+		if ( arguments.variableMap.keyExists( trimmed ) ) {
+			return "#" & arguments.variableMap[ trimmed ] & "#"
+		}
+
+		arguments.warnings.append( "No mapping for {{ " & trimmed & " }} - left as a TODO marker." )
+		return todoComment( "{{ " & trimmed & " }}" )
+	}
+
+	/**
+	 * Translates a single `{% ... %}` tag body - `if`/`elif`/`elsif`/
+	 * `else`/`endif`, `for ... in ...`/`endfor` become real `<bx:if>`/
+	 * `<bx:loop>` structure (pushed/popped on `blockStack`); anything else
+	 * (`include`, `extends`, `block`, `comment`, `assign`, a custom tag,
+	 * ...) is left as a TODO marker - this translator only recognizes the
+	 * control-flow subset, not the full Jinja2/Liquid tag vocabulary.
+	 *
+	 * @tag The raw tag body (without the surrounding `{%`/`%}`), trimmed
+	 * @variableMap See translate()'s own docblock
+	 * @blockStack Mutated in place - "if"/"for" pushed on open, popped on close
+	 * @warnings Accumulator array, mutated in place
+	 */
+	private string function translateTag( required string tag, required struct variableMap, required array blockStack, required array warnings ) {
+		var trimmed = trim( arguments.tag )
+
+		if ( trimmed.reFindNoCase( "^if\s+" ) ) {
+			arguments.blockStack.append( "if" )
+			return '<bx:if condition="#' & translateCondition( trimmed.reReplaceNoCase( "^if\s+", "" ), arguments.variableMap, arguments.warnings ) & '#">'
+		}
+
+		if ( trimmed.reFindNoCase( "^(elif|elsif)\s+" ) ) {
+			return '<bx:elseif condition="#' & translateCondition( trimmed.reReplaceNoCase( "^(elif|elsif)\s+", "" ), arguments.variableMap, arguments.warnings ) & '#">'
+		}
+
+		if ( trimmed.reFindNoCase( "^else$" ) ) {
+			return "<bx:else>"
+		}
+
+		if ( trimmed.reFindNoCase( "^endif$" ) ) {
+			popExpected( arguments.blockStack, "if", arguments.warnings )
+			return "</bx:if>"
+		}
+
+		var forMatcher = variables.forPattern.matcher( trimmed )
+		if ( forMatcher.matches() ) {
+			arguments.blockStack.append( "for" )
+			var itemName = forMatcher.group( 1 )
+			var listExpr = forMatcher.group( 2 )
+			return '<bx:loop array="#' & translateCondition( listExpr, arguments.variableMap, arguments.warnings ) & '#" item="' & itemName & '">'
+		}
+
+		if ( trimmed.reFindNoCase( "^endfor$" ) ) {
+			popExpected( arguments.blockStack, "for", arguments.warnings )
+			return "</bx:loop>"
+		}
+
+		arguments.warnings.append( "Unsupported tag {% " & trimmed & " %} - left as a TODO marker." )
+		return todoComment( "{% " & trimmed & " %}" )
+	}
+
+	/**
+	 * Substitutes every exact `variableMap` key found as a whole word/dotted-path
+	 * token inside a boolean condition (an `if`/`elif` condition, or a
+	 * `for ... in LIST` list expression) - unlike translateOutput(), a
+	 * condition can combine several references with `and`/`or`/`==`/... so
+	 * this can't just look up the whole string as one key. Anything left
+	 * over that still looks like an unmapped dotted identifier (or a `|`
+	 * filter) adds a warning, but the condition is still emitted - a
+	 * best-effort translation, not a TODO block, since blocking the whole
+	 * `if`/`for` would leave its body's own markup with no valid wrapping
+	 * tag.
+	 *
+	 * The leftover-reference check scans the *original* condition's own
+	 * dotted identifiers against `variableMap`, not the post-substitution
+	 * result - a successfully-translated value (e.g. `variables.page.title`)
+	 * is itself a dotted identifier, so checking the substituted result
+	 * would flag every single successful translation as "still unmapped".
+	 *
+	 * @condition The raw condition/list-expression text
+	 * @variableMap See translate()'s own docblock
+	 * @warnings Accumulator array, mutated in place
+	 */
+	private string function translateCondition( required string condition, required struct variableMap, required array warnings ) {
+		var result = arguments.condition
+		for ( var path in arguments.variableMap ) {
+			var pattern = "\b" & path.replace( ".", "\.", "all" ) & "\b"
+			result = result.reReplace( pattern, arguments.variableMap[ path ], "all" )
+		}
+
+		var identifierMatcher = variables.dottedIdentifierPattern.matcher( arguments.condition )
+		var hasUnmapped = false
+		while ( identifierMatcher.find() ) {
+			if ( !arguments.variableMap.keyExists( identifierMatcher.group() ) ) {
+				hasUnmapped = true
+			}
+		}
+
+		if ( hasUnmapped || arguments.condition.find( "|" ) ) {
+			arguments.warnings.append( "Condition may still reference an unmapped variable/filter - verify by hand: " & trim( arguments.condition ) )
+		}
+
+		return result
+	}
+
+	/**
+	 * Pops `blockStack` and warns (rather than throwing) if the popped
+	 * frame isn't `expectedKind` or the stack was already empty - a
+	 * mismatch means the source template used a construct this translator
+	 * doesn't track (a macro, a custom tag pair), not that the whole file
+	 * failed to translate.
+	 *
+	 * @blockStack Mutated in place
+	 * @expectedKind "if" or "for"
+	 * @warnings Accumulator array, mutated in place
+	 */
+	private void function popExpected( required array blockStack, required string expectedKind, required array warnings ) {
+		if ( !arguments.blockStack.len() ) {
+			arguments.warnings.append( "Unexpected {% end" & arguments.expectedKind & " %} with no matching open tag - check the generated .bxm's tag nesting by hand." )
+			return
+		}
+		var popped = arguments.blockStack[ arguments.blockStack.len() ]
+		arguments.blockStack.deleteAt( arguments.blockStack.len() )
+		if ( popped != arguments.expectedKind ) {
+			arguments.warnings.append( "{% end" & arguments.expectedKind & " %} closed a {% " & popped & " %} instead - check the generated .bxm's tag nesting by hand." )
+		}
+	}
+
+	/**
+	 * @original The original template syntax, for a human to find and port by hand
+	 */
+	private string function todoComment( required string original ) {
+		return "<!--- TODO: " & arguments.original.replace( "--", "&#45;&#45;", "all" ) & " --->"
+	}
+
+}
