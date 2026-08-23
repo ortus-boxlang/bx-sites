@@ -104,9 +104,9 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.InvalidTheme" );
 			} );
 
-			it( "resolves each built-in theme (bootstrap, material, tailwind) with a valid ThemeProvider contract", function() {
+			it( "resolves every built-in theme with a valid ThemeProvider contract", function() {
 				var root = newProjectRoot();
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					expect( fileExists( themeDir & "/layout.bxm" ) ).toBeTrue();
 					expect( fileExists( themeDir & "/page.bxm" ) ).toBeTrue();
@@ -146,7 +146,7 @@ class extends="testbox.system.BaseSpec" {
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
 				var config = { name : "My Site" };
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var html = renderer.renderPage( page, nav, config, themeDir );
 
@@ -188,7 +188,7 @@ class extends="testbox.system.BaseSpec" {
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
 				var config = { name : "My Site" };
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var html = renderer.renderPage( page, nav, config, themeDir );
 
@@ -204,7 +204,7 @@ class extends="testbox.system.BaseSpec" {
 				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 
 					var autoHtml = renderer.renderPage( page, nav, { name : "My Site" }, themeDir );
@@ -237,7 +237,7 @@ class extends="testbox.system.BaseSpec" {
 					footer : true
 				};
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var html = renderer.renderPage( page, nav, config, themeDir );
 
@@ -281,7 +281,7 @@ class extends="testbox.system.BaseSpec" {
 					footer : true
 				};
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var html = renderer.renderPage( page, nav, config, themeDir );
 
@@ -299,7 +299,7 @@ class extends="testbox.system.BaseSpec" {
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
 				var config = { name : "My Site" };
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var html = renderer.renderPage( page, nav, config, themeDir );
 
@@ -318,7 +318,7 @@ class extends="testbox.system.BaseSpec" {
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
 				var config = { name : "My Site" };
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var html = renderer.renderPage( page, nav, config, themeDir );
 
@@ -334,7 +334,7 @@ class extends="testbox.system.BaseSpec" {
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
 				var config = { name : "My Site" };
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var html = renderer.renderPage( page, nav, config, themeDir );
 
@@ -343,7 +343,7 @@ class extends="testbox.system.BaseSpec" {
 				}
 
 				var pageWithoutMarkdown = { title : "My Page", contentHtml : "<p>Body</p>" };
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var html = renderer.renderPage( pageWithoutMarkdown, nav, config, themeDir );
 
@@ -360,7 +360,7 @@ class extends="testbox.system.BaseSpec" {
 				};
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 
 					var bottomHtml = renderer.renderPage( page, nav, { name : "My Site" }, themeDir );
@@ -381,7 +381,7 @@ class extends="testbox.system.BaseSpec" {
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
 				var config = { name : "My Site" };
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var html = renderer.renderPage( page, nav, config, themeDir );
 
@@ -401,7 +401,7 @@ class extends="testbox.system.BaseSpec" {
 					{ label : "1.0", url : "/versions/1.0/" }
 				];
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var html = renderer.renderPage( page, nav, config, themeDir, "/", versions, "1.0" );
 
@@ -418,7 +418,7 @@ class extends="testbox.system.BaseSpec" {
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
 				var config = { name : "My Site" };
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 
 					expect( renderer.renderPage( page, nav, config, themeDir ) ).notToInclude( "version-switcher" );
@@ -433,7 +433,7 @@ class extends="testbox.system.BaseSpec" {
 				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 
 					var defaultHtml = renderer.renderPage( page, nav, { name : "My Site" }, themeDir );
@@ -451,7 +451,7 @@ class extends="testbox.system.BaseSpec" {
 				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 
 					expect( renderer.renderPage( page, nav, { name : "My Site" }, themeDir ) ).notToInclude( 'rel="icon"' );
@@ -475,7 +475,7 @@ class extends="testbox.system.BaseSpec" {
 					] }
 				];
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 
 					var flatHtml = renderer.renderPage( page, nav, { name : "My Site" }, themeDir );
@@ -502,7 +502,7 @@ class extends="testbox.system.BaseSpec" {
 					] }
 				];
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var config = { name : "My Site", theme : { options : { navCollapsible : true, navExpandAll : false } } };
 					var html = renderer.renderPage( page, nav, config, themeDir );
@@ -527,7 +527,7 @@ class extends="testbox.system.BaseSpec" {
 				};
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 
 					var topHtml = renderer.renderPage( page, nav, { name : "My Site" }, themeDir );
@@ -563,7 +563,7 @@ class extends="testbox.system.BaseSpec" {
 					ogImage : "assets/social-card.png"
 				};
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var html = renderer.renderPage( page, nav, config, themeDir );
 
@@ -582,7 +582,7 @@ class extends="testbox.system.BaseSpec" {
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
 				var config = { name : "My Site" };
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var html = renderer.renderPage( page, nav, config, themeDir );
 
@@ -596,7 +596,7 @@ class extends="testbox.system.BaseSpec" {
 				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 
 					expect( renderer.renderPage( page, nav, { name : "My Site" }, themeDir ) ).notToInclude( "googletagmanager" );
@@ -618,7 +618,7 @@ class extends="testbox.system.BaseSpec" {
 					extraJs  : [ "assets/extra.js" ]
 				};
 
-				for ( var themeName in [ "bootstrap", "material", "tailwind" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var themeDir = renderer.resolveThemeDir( themeName, root );
 					var html = renderer.renderPage( page, nav, config, themeDir );
 

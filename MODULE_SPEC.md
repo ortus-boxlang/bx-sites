@@ -142,6 +142,25 @@ flowchart LR
 
 `new` defaults to `bootstrap` unless `--theme` is passed.
 
+### Built-in themes — gallery expansion (post-v1)
+
+Seven more built-in themes, bringing the total to ten, so this repo's own
+dogfooded docs (`buildMultiTheme.sh`) double as a theme gallery: `docsy`
+(Read the Docs/Docsy-inspired), `slate` (Stripe/Slate-inspired, permanently
+dark sidebar), `docusaurus` (Docusaurus-inspired), `justthedocs` (Just the
+Docs-inspired), `vuepress` (VuePress-inspired), `gitbook` (GitBook-inspired,
+also thematically apt given `migrate --from=gitbook`), and `notion`
+(Notion-inspired). All seven are forked from `material`
+(`resources/themes/material/`) rather than written from scratch: the exact
+same `layout.bxm`/`page.bxm`/`search.bxm` scripting logic, only a scoped
+CSS-class-prefix rename plus a from-the-ground-up `assets/style.css`
+restyle (and, for `justthedocs` only, one relocated `<bx:include>` line
+moving the search box from the header into the sidebar). This inherits
+`material`'s exact variable wiring/feature coverage rather than
+re-deriving it seven times, and keeps every one of the seven
+air-gapped-capable the same way `material` already is (system font stacks
+only, no external font/CDN `<link>`). See `docs/guides/themes.md#built-in`.
+
 ## 7. Search
 
 - `"local"` (the default, v1-locked) — fully static, client-side, matches mkdocs' default (lunr.js), no server dependency. Index built at `build` time → `site/search-index.json`; each built-in theme wires its own search UI against the shared index format

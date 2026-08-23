@@ -298,7 +298,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "exposes the v1 built-in theme names", function() {
-				expect( loader.getBuiltInThemes() ).toBe( [ "bootstrap", "material", "tailwind" ] );
+				expect( loader.getBuiltInThemes() ).toBe( [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] );
 			} );
 
 			it( "deep-merges a partial [repo] override, keeping the default empty editUri", function() {

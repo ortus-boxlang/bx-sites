@@ -90,7 +90,7 @@ This repository documents itself with BX Sites - see `bxsites.yaml` and `docs/` 
 - **[ortus-boxlang.github.io/bx-sites](https://ortus-boxlang.github.io/bx-sites/)** - stable docs, built from `main`
 - **[ortus-boxlang.github.io/bx-sites/development](https://ortus-boxlang.github.io/bx-sites/development/)** - latest/unreleased docs, built from `development`
 
-Both are built with all three built-in themes side by side (`bootstrap` at the root, `material`/`tailwind` under `theme/material/`/`theme/tailwind/`) via `buildMultiTheme.sh` - use the switcher next to the dark-mode toggle to flip between them on any page.
+Both are built with all ten built-in themes side by side (`bootstrap` at the root, every other theme under `theme/<name>/`) via `buildMultiTheme.sh` - this doubles as a theme gallery - use the switcher next to the dark-mode toggle to flip between them on any page.
 
 Or read the source directly:
 
@@ -106,7 +106,7 @@ See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's d
 
 - `.github/workflows` - CI: tests (`tests.yml`), PR checks (`pr.yml`), snapshot/release builds (`snapshot.yml`, `release.yml`), and publishing this repo's own docs to GitHub Pages (`pages.yml`)
 - `models` - the module's own source: `models/cli` (one dispatcher per `bxSites` verb), `models/config` (site config loader/validator - `bxsites.yaml`/`.yml`/`.json`), `models/build` (project scaffolding + the docs/nav/markdown/theme/search/sitemap build pipeline)
-- `resources/themes` - built-in themes (native BoxLang `.bxm` templates + assets): `bootstrap` (default), `material`, `tailwind` - all with the BoxLang brand palette, dark mode, breadcrumbs and code-copy buttons applied out of the box. A project can override any of them via its own `theme/` folder (same `layout.bxm` + `page.bxm` contract - see [Themes](docs/guides/themes.md))
+- `resources/themes` - built-in themes (native BoxLang `.bxm` templates + assets), ten in total: `bootstrap` (default), `material`, `tailwind`, plus seven `material`-forked themes (`docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook`, `notion`) - all with the BoxLang brand palette, dark mode, breadcrumbs and code-copy buttons applied out of the box. A project can override any of them via its own `theme/` folder (same `layout.bxm` + `page.bxm` contract - see [Themes](docs/guides/themes.md))
 - `resources/assets` - module-wide shared client-side assets: the search widget (`search.js`) and the copy-code button (`copy-code.js`)
 - `docs` / `bxsites.yaml` - this repository's own docs, built by BX Sites itself (`boxlang bxSites build`)
 - `tests/specs` - TestBox specs, one bundle per class under `models/`

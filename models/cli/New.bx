@@ -8,7 +8,7 @@ class {
 	/**
 	 * The theme names this module ships built-in support for (module spec section 6).
 	 */
-	variables.builtInThemes = [ "bootstrap", "material", "tailwind" ]
+	variables.builtInThemes = [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ]
 
 	/**
 	 * Dispatches the `new` verb to ProjectScaffolder.scaffold(), after
