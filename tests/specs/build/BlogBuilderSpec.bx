@@ -104,6 +104,15 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.posts[ 1 ].contentHtml ).toInclude( "assets/blog/cover.png" );
 			} );
 
+			it( "gives a post's own featured-image header and its list-card thumbnail their own themeable classes, for rounded-corner styling", function() {
+				var result = builder.build( [ newPost( { image : "assets/blog/cover.png" } ) ], {}, 10, "/" );
+
+				expect( result.posts[ 1 ].contentHtml ).toInclude( 'class="blog-post-featured-image"' );
+
+				var blogPage = result.indexPages.filter( p => p.urlPath == "blog/index.html" )[ 1 ];
+				expect( blogPage.contentHtml ).toInclude( 'class="blog-post-card-image"' );
+			} );
+
 			it( "computes an excerpt from the <!-- more --> marker when present", function() {
 				var post = newPost( { contentHtml : "<p>Intro.</p><!-- more --><p>Rest of the post.</p>" } );
 
