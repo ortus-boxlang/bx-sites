@@ -1,0 +1,161 @@
+/**
+ * Exercises ThemeImporter.import() against real temp directories and a
+ * fake translator (isolating this class's own file-discovery/copy logic
+ * from JinjaLikeTranslator.bx/GoTemplateTranslator.bx, which have their
+ * own dedicated specs).
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.ThemeImporter", function() {
+
+			beforeEach( function() {
+				variables.importer = new "models.build.ThemeImporter@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newTempDir( required string prefix ) {
+				var dir = createTempDirectory( prefix = arguments.prefix );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			/**
+			 * A fake translator: uppercases the source and returns one
+			 * fixed warning, so tests can assert on both without any real
+			 * template-syntax translation involved.
+			 */
+			private any function fakeTranslator() {
+				return {
+					translate : function( required string source, required struct variableMap ) {
+						return { output : uCase( arguments.source ), warnings : [ "fake warning" ] };
+					}
+				};
+			}
+
+			it( "translates the first matching layout/content candidate and copies matching asset folders", function() {
+				var sourceDir = newTempDir( "bxsites-import-source-" );
+				fileWrite( sourceDir & "/base.html", "layout source" );
+				fileWrite( sourceDir & "/main.html", "content source" );
+				directoryCreate( sourceDir & "/css", true, true );
+				fileWrite( sourceDir & "/css/style.css", "body{}" );
+
+				var destDir = newTempDir( "bxsites-import-dest-" ) & "/blog1";
+				var result = importer.import(
+					sourceThemeDir : sourceDir,
+					destDir : destDir,
+					layoutCandidates : [ "base.html" ],
+					contentCandidates : [ "main.html" ],
+					assetDirNames : [ "css", "js" ],
+					translator : fakeTranslator(),
+					variableMap : {}
+				);
+
+				expect( result.layoutFile ).toBe( sourceDir & "/base.html" );
+				expect( result.contentFile ).toBe( sourceDir & "/main.html" );
+				expect( fileRead( destDir & "/layout.bxm" ) ).toBe( "LAYOUT SOURCE" );
+				expect( fileRead( destDir & "/page.bxm" ) ).toBe( "CONTENT SOURCE" );
+				expect( result.assetsCopied ).toBe( [ "css" ] );
+				expect( fileExists( destDir & "/assets/css/style.css" ) ).toBeTrue();
+				expect( directoryExists( destDir & "/assets/js" ) ).toBeFalse();
+			} );
+
+			it( "falls through to the second candidate when the first doesn't exist", function() {
+				var sourceDir = newTempDir( "bxsites-import-source-" );
+				fileWrite( sourceDir & "/default.html", "layout source" );
+
+				var destDir = newTempDir( "bxsites-import-dest-" ) & "/blog1";
+				var result = importer.import(
+					sourceThemeDir : sourceDir,
+					destDir : destDir,
+					layoutCandidates : [ "_layouts/default.html", "default.html" ],
+					contentCandidates : [ "_layouts/page.html" ],
+					assetDirNames : [],
+					translator : fakeTranslator(),
+					variableMap : {}
+				);
+
+				expect( result.layoutFile ).toBe( sourceDir & "/default.html" );
+			} );
+
+			it( "warns (doesn't throw) when no layout/content candidate exists, and doesn't create that file", function() {
+				var sourceDir = newTempDir( "bxsites-import-source-" );
+				var destDir = newTempDir( "bxsites-import-dest-" ) & "/blog1";
+
+				var result = importer.import(
+					sourceThemeDir : sourceDir,
+					destDir : destDir,
+					layoutCandidates : [ "base.html" ],
+					contentCandidates : [ "main.html" ],
+					assetDirNames : [],
+					translator : fakeTranslator(),
+					variableMap : {}
+				);
+
+				expect( result.layoutFile ).toBe( "" );
+				expect( result.contentFile ).toBe( "" );
+				expect( fileExists( destDir & "/layout.bxm" ) ).toBeFalse();
+				expect( fileExists( destDir & "/page.bxm" ) ).toBeFalse();
+
+				var sawLayoutWarning = false;
+				var sawContentWarning = false;
+				for ( var w in result.warnings ) {
+					sawLayoutWarning = sawLayoutWarning || w.findNoCase( "layout.bxm" ) > 0;
+					sawContentWarning = sawContentWarning || w.findNoCase( "page.bxm" ) > 0;
+				}
+				expect( sawLayoutWarning ).toBeTrue();
+				expect( sawContentWarning ).toBeTrue();
+			} );
+
+			it( "merges the translator's own warnings into the report, prefixed with which destination file they came from", function() {
+				var sourceDir = newTempDir( "bxsites-import-source-" );
+				fileWrite( sourceDir & "/base.html", "x" );
+
+				var destDir = newTempDir( "bxsites-import-dest-" ) & "/blog1";
+				var result = importer.import(
+					sourceThemeDir : sourceDir,
+					destDir : destDir,
+					layoutCandidates : [ "base.html" ],
+					contentCandidates : [],
+					assetDirNames : [],
+					translator : fakeTranslator(),
+					variableMap : {}
+				);
+
+				expect( result.warnings.len() ).toBeGT( 0 );
+				var found = false;
+				for ( var w in result.warnings ) {
+					found = found || ( w.findNoCase( "layout.bxm" ) > 0 && w.findNoCase( "fake warning" ) > 0 );
+				}
+				expect( found ).toBeTrue();
+			} );
+
+			it( "creates destDir even when it doesn't exist yet", function() {
+				var sourceDir = newTempDir( "bxsites-import-source-" );
+				var destDir = newTempDir( "bxsites-import-dest-" ) & "/nested/blog1";
+
+				importer.import(
+					sourceThemeDir : sourceDir,
+					destDir : destDir,
+					layoutCandidates : [],
+					contentCandidates : [],
+					assetDirNames : [],
+					translator : fakeTranslator(),
+					variableMap : {}
+				);
+
+				expect( directoryExists( destDir ) ).toBeTrue();
+			} );
+
+		} );
+	}
+
+}

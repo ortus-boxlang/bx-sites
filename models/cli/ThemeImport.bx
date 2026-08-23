@@ -1,0 +1,182 @@
+/**
+ * `theme:import` CLI verb - best-effort conversion of a theme from
+ * another static-site-generator ecosystem into a bx-sites theme scaffold
+ * under `themes/<name>/`, dispatching to ThemeImporter.bx with the
+ * matching ecosystem's own layout/content candidate filenames, asset
+ * folder names, variable-name map, and translator
+ * (JinjaLikeTranslator.bx for `mkdocs`/`jekyll`'s shared Jinja2/Liquid
+ * family, GoTemplateTranslator.bx for `hugo`'s Go templates). See
+ * docs/guides/theme-import.md.
+ *
+ * Re-running against the same `--name` is safe/idempotent - `layout.bxm`/
+ * `page.bxm` are overwritten and asset folders merged in, not blocked by
+ * an already-exists guard, since re-importing to retry after fixing the
+ * source (or after editing the variable map) is a normal part of this
+ * workflow, unlike `install:theme`'s ForgeBox download (where a stale
+ * previous install should always be replaced outright, not merged into).
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path), source (required - "mkdocs", "jekyll", or "hugo"), path (required - absolute path to the source theme's own root folder), name (required - the destination name under themes/<name>/) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxSites.MissingProjectRoot", message = "`theme:import` requires a project root" )
+		}
+
+		var source = lCase( trim( arguments.options.source ?: "" ) )
+		if ( !listFindNoCase( "mkdocs,jekyll,hugo", source ) ) {
+			throw( type = "BxSites.UnknownThemeImportSource", message = "`theme:import` requires --source=mkdocs|jekyll|hugo" )
+		}
+
+		var sourcePath = trim( arguments.options.path ?: "" )
+		if ( !len( sourcePath ) || !directoryExists( sourcePath ) ) {
+			throw( type = "BxSites.MissingThemeImportPath", message = "`theme:import` requires --path=<source theme directory> (must exist)" )
+		}
+
+		var name = trim( arguments.options.name ?: "" )
+		if ( !len( name ) ) {
+			throw( type = "BxSites.MissingThemeName", message = "`theme:import` requires --name=<destination theme name>" )
+		}
+
+		var config = ecosystemConfig( source )
+		var destDir = projectRoot.reReplace( "[\/]+$", "" ) & "/themes/" & name
+
+		var importer = new "models.build.ThemeImporter@bxsites"()
+		var result = importer.import(
+			sourceThemeDir : sourcePath.reReplace( "[\/]+$", "" ),
+			destDir        : destDir,
+			layoutCandidates  : config.layoutCandidates,
+			contentCandidates : config.contentCandidates,
+			assetDirNames     : config.assetDirNames,
+			translator        : config.translator,
+			variableMap       : config.variableMap
+		)
+
+		return { exitCode : 0, message : formatReport( name, destDir, result ) }
+	}
+
+	/**
+	 * @source One of "mkdocs"/"jekyll"/"hugo" - already validated by run()
+	 */
+	private struct function ecosystemConfig( required string source ) {
+		if ( arguments.source == "mkdocs" ) {
+			return mkdocsConfig()
+		}
+		if ( arguments.source == "jekyll" ) {
+			return jekyllConfig()
+		}
+		return hugoConfig()
+	}
+
+	/**
+	 * MkDocs' own default theme shape (and mkdocs-material's, close
+	 * enough for the same candidate filenames): `base.html` is the outer
+	 * shell, `main.html`/`content.html` the block MkDocs' own themes
+	 * override for the article body. Jinja2 syntax, translated by
+	 * JinjaLikeTranslator.bx.
+	 */
+	private struct function mkdocsConfig() {
+		return {
+			layoutCandidates  : [ "base.html" ],
+			contentCandidates : [ "main.html", "content.html" ],
+			assetDirNames     : [ "css", "js", "img", "assets", "static", "fonts" ],
+			translator        : new "models.build.JinjaLikeTranslator@bxsites"(),
+			variableMap       : {
+				"page.title"             : "variables.page.title",
+				"page.content"           : "variables.page.contentHtml",
+				"page.meta.description"  : "variables.page.description",
+				"page.canonical_url"     : "variables.page.urlPath",
+				"config.site_name"       : "variables.siteConfig.name",
+				"config.site_description": "variables.siteConfig.description",
+				"config.repo_url"        : "variables.siteConfig.repo.url",
+				"config.site_url"        : "variables.basePath",
+				"nav"                    : "variables.nav",
+				"base_url"               : "variables.basePath"
+			}
+		}
+	}
+
+	/**
+	 * Jekyll's own by-convention layout shape: `_layouts/default.html` is
+	 * the outer shell, `_layouts/page.html` the plain-page body layout.
+	 * Liquid syntax, close enough to Jinja2 for the same
+	 * JinjaLikeTranslator.bx (see its own docblock).
+	 */
+	private struct function jekyllConfig() {
+		return {
+			layoutCandidates  : [ "_layouts/default.html", "default.html" ],
+			contentCandidates : [ "_layouts/page.html", "page.html" ],
+			assetDirNames     : [ "assets", "css", "js", "images", "_sass" ],
+			translator        : new "models.build.JinjaLikeTranslator@bxsites"(),
+			variableMap       : {
+				"page.title"                  : "variables.page.title",
+				"content"                     : "variables.page.contentHtml",
+				"page.description"            : "variables.page.description",
+				"page.excerpt"                : "variables.page.summary",
+				"site.title"                  : "variables.siteConfig.name",
+				"site.description"            : "variables.siteConfig.description",
+				"site.baseurl"                : "variables.basePath",
+				"site.url"                    : "variables.basePath",
+				"site.github.repository_url"  : "variables.siteConfig.repo.url"
+			}
+		}
+	}
+
+	/**
+	 * Hugo's own by-convention layout shape: `layouts/_default/baseof.html`
+	 * is the outer shell (`{{ block ... }}` inheritance - always left as a
+	 * TODO marker by GoTemplateTranslator.bx, since there's no bx-sites
+	 * equivalent), `layouts/_default/single.html` the single-page body
+	 * layout. Go template syntax, translated by GoTemplateTranslator.bx.
+	 */
+	private struct function hugoConfig() {
+		return {
+			layoutCandidates  : [ "layouts/_default/baseof.html", "_default/baseof.html", "baseof.html" ],
+			contentCandidates : [ "layouts/_default/single.html", "_default/single.html", "single.html" ],
+			assetDirNames     : [ "static", "assets" ],
+			translator        : new "models.build.GoTemplateTranslator@bxsites"(),
+			variableMap       : {
+				".Title"                  : "variables.page.title",
+				".Content"                : "variables.page.contentHtml",
+				".Description"            : "variables.page.description",
+				".Summary"                : "variables.page.summary",
+				".Permalink"              : "variables.page.urlPath",
+				".Site.Title"             : "variables.siteConfig.name",
+				".Site.Params.description": "variables.siteConfig.description",
+				".Site.BaseURL"           : "variables.basePath"
+			}
+		}
+	}
+
+	/**
+	 * @name The destination theme name (themes/<name>/)
+	 * @destDir Absolute path the scaffold was written to
+	 * @result ThemeImporter.import()'s own return shape
+	 */
+	private string function formatReport( required string name, required string destDir, required struct result ) {
+		var lines = [ "Imported into themes/#arguments.name#/ (#arguments.destDir#)" ]
+		lines.append( len( arguments.result.layoutFile ) ? "  layout.bxm <- #arguments.result.layoutFile#" : "  layout.bxm - NOT created (no source template found)" )
+		lines.append( len( arguments.result.contentFile ) ? "  page.bxm   <- #arguments.result.contentFile#" : "  page.bxm   - NOT created (no source template found)" )
+
+		if ( arguments.result.assetsCopied.len() ) {
+			lines.append( "  assets copied: #arguments.result.assetsCopied.toList( ', ' )#" )
+		}
+
+		if ( arguments.result.warnings.len() ) {
+			lines.append( "" )
+			lines.append( "#arguments.result.warnings.len()# item(s) need a manual look:" )
+			for ( var warning in arguments.result.warnings ) {
+				lines.append( "  - #warning#" )
+			}
+		}
+
+		lines.append( "" )
+		lines.append( 'Set bxsites.yaml''s [theme.name] to "#arguments.name#" to use it once you''ve finished porting.' )
+
+		return lines.toList( char( 10 ) )
+	}
+
+}

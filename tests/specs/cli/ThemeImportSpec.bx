@@ -1,0 +1,140 @@
+/**
+ * Unlike install:plugin/install:theme (which need a live ForgeBox
+ * network call), theme:import is pure file translation - no external
+ * dependency at all - so this spec covers the real end-to-end flow, not
+ * just guard clauses.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.ThemeImport", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.ThemeImport@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newTempDir( required string prefix ) {
+				var dir = createTempDirectory( prefix = arguments.prefix );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			/**
+			 * Wraps `inner` in a pair of literal `#` characters, via
+			 * char(35) - a literal `'#variables.page.title#'` would try
+			 * to evaluate `variables.page.title` as a real expression
+			 * (throwing, since no such variable exists in this spec's own
+			 * scope) instead of comparing against the literal text - see
+			 * JinjaLikeTranslator.bx's own `variables.hash` docblock.
+			 */
+			private string function h( required string inner ) {
+				return char( 35 ) & arguments.inner & char( 35 )
+			}
+
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( { source : "mkdocs", path : newTempDir( "bxsites-themeimport-" ), name : "blog1" } );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
+			} );
+
+			it( "throws BxSites.UnknownThemeImportSource for anything but mkdocs/jekyll/hugo", function() {
+				expect( function() {
+					verb.run( { projectRoot : newTempDir( "bxsites-themeimport-" ), source : "eleventy", path : newTempDir( "bxsites-themeimport-" ), name : "blog1" } );
+				} ).toThrow( "BxSites.UnknownThemeImportSource" );
+			} );
+
+			it( "throws BxSites.MissingThemeImportPath when path is blank or doesn't exist", function() {
+				var root = newTempDir( "bxsites-themeimport-" );
+				expect( function() {
+					verb.run( { projectRoot : root, source : "mkdocs", name : "blog1" } );
+				} ).toThrow( "BxSites.MissingThemeImportPath" );
+				expect( function() {
+					verb.run( { projectRoot : root, source : "mkdocs", path : root & "/does-not-exist", name : "blog1" } );
+				} ).toThrow( "BxSites.MissingThemeImportPath" );
+			} );
+
+			it( "throws BxSites.MissingThemeName when name is blank", function() {
+				expect( function() {
+					verb.run( { projectRoot : newTempDir( "bxsites-themeimport-" ), source : "mkdocs", path : newTempDir( "bxsites-themeimport-" ) } );
+				} ).toThrow( "BxSites.MissingThemeName" );
+			} );
+
+			it( "converts a minimal MkDocs theme end to end into themes/<name>/", function() {
+				var root = newTempDir( "bxsites-themeimport-project-" );
+				var sourceTheme = newTempDir( "bxsites-themeimport-mkdocs-" );
+				fileWrite( sourceTheme & "/base.html", '<html><body><h1>{{ config.site_name }}</h1>{% block content %}{{ page.content }}{% endblock %}</body></html>' );
+				fileWrite( sourceTheme & "/main.html", '<article>{% if page.title %}<h2>{{ page.title }}</h2>{% endif %}</article>' );
+				directoryCreate( sourceTheme & "/css", true, true );
+				fileWrite( sourceTheme & "/css/style.css", "body{color:red}" );
+
+				var result = verb.run( { projectRoot : root, source : "mkdocs", path : sourceTheme, name : "mkblog" } );
+
+				expect( result.exitCode ).toBe( 0 );
+
+				var destDir = root & "/themes/mkblog";
+				expect( fileExists( destDir & "/layout.bxm" ) ).toBeTrue();
+				expect( fileExists( destDir & "/page.bxm" ) ).toBeTrue();
+				expect( fileExists( destDir & "/assets/css/style.css" ) ).toBeTrue();
+
+				var layout = fileRead( destDir & "/layout.bxm" );
+				expect( layout ).toInclude( h( "variables.siteConfig.name" ) );
+				expect( layout ).toInclude( h( "variables.page.contentHtml" ) );
+				// {% block %}/{% endblock %} has no bx-sites equivalent (Jinja2
+				// template inheritance) - left as TODO markers, not guessed at.
+				expect( layout ).toInclude( "<!--- TODO:" );
+
+				var page = fileRead( destDir & "/page.bxm" );
+				expect( page ).toInclude( '<bx:if condition="' & h( "variables.page.title" ) & '">' );
+				expect( page ).toInclude( h( "variables.page.title" ) );
+
+				expect( result.message ).toInclude( "mkblog" );
+				expect( result.message ).toInclude( "assets copied: css" );
+			} );
+
+			it( "converts a minimal Hugo theme end to end, substituting an unmapped condition with a safe placeholder", function() {
+				var root = newTempDir( "bxsites-themeimport-project-" );
+				var sourceTheme = newTempDir( "bxsites-themeimport-hugo-" );
+				directoryCreate( sourceTheme & "/layouts/_default", true, true );
+				fileWrite( sourceTheme & "/layouts/_default/baseof.html", '<html><body>{{ .Site.Title }}</body></html>' );
+				fileWrite( sourceTheme & "/layouts/_default/single.html", '{{ if .Draft }}<span>Draft</span>{{ end }}<h1>{{ .Title }}</h1>' );
+
+				var result = verb.run( { projectRoot : root, source : "hugo", path : sourceTheme, name : "hugoblog" } );
+
+				expect( result.exitCode ).toBe( 0 );
+
+				var destDir = root & "/themes/hugoblog";
+				var layout = fileRead( destDir & "/layout.bxm" );
+				expect( layout ).toInclude( h( "variables.siteConfig.name" ) );
+
+				var page = fileRead( destDir & "/page.bxm" );
+				expect( page ).notToInclude( ".Draft" );
+				expect( page ).toInclude( '<bx:if condition="' & h( "false" ) & '">' );
+				expect( page ).toInclude( h( "variables.page.title" ) );
+
+				expect( result.message ).toInclude( "item(s) need a manual look" );
+			} );
+
+			it( "reports missing layout/content without throwing when the source theme matches no known filename", function() {
+				var root = newTempDir( "bxsites-themeimport-project-" );
+				var sourceTheme = newTempDir( "bxsites-themeimport-empty-" );
+
+				var result = verb.run( { projectRoot : root, source : "jekyll", path : sourceTheme, name : "emptytheme" } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( result.message ).toInclude( "NOT created" );
+				expect( fileExists( root & "/themes/emptytheme/layout.bxm" ) ).toBeFalse();
+			} );
+
+		} );
+	}
+
+}

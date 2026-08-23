@@ -1,0 +1,276 @@
+/**
+ * Backs `theme:import --source=hugo` (ThemeImporter.bx) - a best-effort,
+ * mechanical translator from Go templates (Hugo's own templating
+ * language) into a bx-sites `.bxm` fragment. Same "best-effort scaffold,
+ * not a lossless converter" framing as JinjaLikeTranslator.bx (see its
+ * own docblock, and docs/guides/theme-import.md), adapted for Go
+ * templates' real structural differences from the Jinja2/Liquid family:
+ *
+ *   - Every construct lives inside one delimiter, `{{ ... }}` - there's
+ *     no separate `{% ... %}` tag form. Fields are dot-prefixed
+ *     (`.Title`, `.Site.Params.description`), not bare (`page.title`).
+ *   - `{{ end }}` closes *whichever* block is currently open (`if` or
+ *     `range`) - Go doesn't spell out which kind it's closing the way
+ *     `{% endif %}`/`{% endfor %}` do, so this translator just pops
+ *     whatever's on top of its own tracked block stack rather than
+ *     verifying a match.
+ *   - `{{ range .Pages }}` rebinds `.` to each item for its body, with no
+ *     named loop variable in the common case - `<bx:loop>` needs an
+ *     explicit `item` name, so every `range` gets a synthetic `item` name
+ *     and a standing warning that a bare `.Field` reference *inside* the
+ *     loop body means the range item's own field in Go, which this
+ *     translator has no way to automatically retarget to `item.Field`.
+ *   - `{{ with .X }}` rebinds `.` to `.X` for its body too (like `range`,
+ *     but without a loop) - there's no bx-sites equivalent for a context
+ *     rebind at all, so `with` is deliberately left untranslated (a TODO
+ *     marker) rather than emitted as a structurally-valid but
+ *     semantically-wrong `<bx:if>`.
+ */
+class {
+
+	/**
+	 * Matches, in one pass: group 1 = a `{{/* ... *\/}}` comment body
+	 * (dropped entirely), group 2 = any other `{{ ... }}` content. Must
+	 * try the comment form first - it's a strict subset of the generic
+	 * `{{ ... }}` shape, so matching generically first would swallow a
+	 * comment as if it were a plain (untranslatable) expression instead
+	 * of recognizing and dropping it. The optional leading/trailing `-`
+	 * (Go templates' own whitespace-trim markers, e.g. `{{- if .X -}}`)
+	 * is matched but not captured.
+	 */
+	variables.tokenPattern = createObject( "java", "java.util.regex.Pattern" ).compile(
+		"\{\{-?\s*/\*([\s\S]*?)\*/\s*-?\}\}|\{\{-?\s*([\s\S]*?)\s*-?\}\}"
+	)
+
+	/**
+	 * Matches a condition/list-expression this translator is willing to
+	 * attempt field substitution on: a single dotted field path
+	 * (`.Title`, `.Site.Params.description`), the whole string, nothing
+	 * else. Go's conditionals are otherwise written as prefix function
+	 * calls (`and .A .B`, `eq .Type "post"`, `gt .Weight 10`), which have
+	 * no BoxLang infix equivalent at all - substituting just the `.Field`
+	 * tokens inside one of those would still leave `and false false`-shaped
+	 * text with no valid BoxLang meaning, worse than a clean placeholder
+	 * (see translateExpr()'s own docblock).
+	 */
+	variables.singleFieldPattern = createObject( "java", "java.util.regex.Pattern" ).compile(
+		"^\.[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*$"
+	)
+
+	/**
+	 * The literal `#` character, built via char() rather than written as
+	 * a bare `#` inside a string literal - see JinjaLikeTranslator.bx's
+	 * own `variables.hash` docblock for why.
+	 */
+	variables.hash = char( 35 )
+
+	/**
+	 * Translates one Hugo (Go template) source file into a bx-sites `.bxm` fragment.
+	 *
+	 * @source The raw Go template source
+	 * @variableMap Exact dot-prefixed path -> bx-sites expression, e.g. `{ ".Title" : "variables.page.title" }` - no fuzzy/partial matching, an unmapped path is always left as a TODO marker
+	 *
+	 * @return { output: the translated .bxm content, warnings: array of human-readable strings, one per construct that needs a manual look }
+	 */
+	struct function translate( required string source, required struct variableMap ) {
+		var warnings = []
+		var blockStack = [] // stack of "if" / "range", tracking what a generic {{ end }} should become
+		var matcher = variables.tokenPattern.matcher( arguments.source )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+		var lastEnd = 0
+
+		while ( matcher.find() ) {
+			if ( matcher.start() > lastEnd ) {
+				buffer.append( arguments.source.mid( lastEnd + 1, matcher.start() - lastEnd ) )
+			}
+			lastEnd = matcher.end()
+
+			if ( matcher.start( 1 ) != -1 ) {
+				// {{/* comment */}} - dropped entirely, same as Jinja2's {# #}.
+			} else {
+				buffer.append( translateTag( matcher.group( 2 ), arguments.variableMap, blockStack, warnings ) )
+			}
+		}
+		if ( lastEnd < len( arguments.source ) ) {
+			buffer.append( arguments.source.mid( lastEnd + 1, len( arguments.source ) - lastEnd ) )
+		}
+
+		if ( blockStack.len() ) {
+			warnings.append( "Unclosed {{ " & blockStack[ blockStack.len() ] & " }} - the source template may use a construct (a `with`, a custom function) this translator doesn't track; check the generated .bxm's tag nesting by hand." )
+		}
+
+		return { output : buffer.toString(), warnings : warnings }
+	}
+
+	/**
+	 * Translates the content of one `{{ ... }}` (comment form already
+	 * handled by translate() itself) - `if`/`else if`/`else`, `range`,
+	 * and a generic `end` become real `<bx:if>`/`<bx:loop>` structure;
+	 * `with` and anything else this translator doesn't specifically
+	 * recognize (a custom function call, a `define`/`template`/`block`
+	 * directive, `$var := ...` assignment) is left as a TODO marker.
+	 * A bare expression (no leading keyword) is treated as output.
+	 *
+	 * @tag The raw `{{ ... }}` content, not yet trimmed
+	 * @variableMap See translate()'s own docblock
+	 * @blockStack Mutated in place - "if"/"range" pushed on open, popped on a generic {{ end }}
+	 * @warnings Accumulator array, mutated in place
+	 */
+	private string function translateTag( required string tag, required struct variableMap, required array blockStack, required array warnings ) {
+		var trimmed = trim( arguments.tag )
+
+		if ( trimmed.reFindNoCase( "^if\s+" ) ) {
+			arguments.blockStack.append( "if" )
+			return '<bx:if condition="' & variables.hash & translateExpr( trimmed.reReplaceNoCase( "^if\s+", "" ), arguments.variableMap, arguments.warnings, false, "false" ) & variables.hash & '">'
+		}
+
+		if ( trimmed.reFindNoCase( "^else\s+if\s+" ) ) {
+			return '<bx:elseif condition="' & variables.hash & translateExpr( trimmed.reReplaceNoCase( "^else\s+if\s+", "" ), arguments.variableMap, arguments.warnings, false, "false" ) & variables.hash & '">'
+		}
+
+		if ( trimmed.reFindNoCase( "^else$" ) ) {
+			return "<bx:else>"
+		}
+
+		if ( trimmed.reFindNoCase( "^range\s+" ) ) {
+			arguments.blockStack.append( "range" )
+			var listExpr = trimmed.reReplaceNoCase( "^range\s+", "" )
+			arguments.warnings.append( "{{ range " & listExpr & " }} translated to <bx:loop item=""item""> - Go templates rebind a bare .Field inside a range body to the loop item itself, which this translator can't automatically retarget to item.Field; review the loop body by hand." )
+			return '<bx:loop array="' & variables.hash & translateExpr( listExpr, arguments.variableMap, arguments.warnings, false, "[]" ) & variables.hash & '" item="item">'
+		}
+
+		if ( trimmed.reFindNoCase( "^with\s+" ) ) {
+			arguments.warnings.append( "{{ with " & trimmed.reReplaceNoCase( "^with\s+", "" ) & " }} left as a TODO marker - Go's `with` rebinds . to a new context for its body, which has no bx-sites equivalent; port this block's logic by hand." )
+			return todoComment( "{{ " & trimmed & " }}" )
+		}
+
+		if ( trimmed.reFindNoCase( "^end$" ) ) {
+			return closeBlock( arguments.blockStack, arguments.warnings )
+		}
+
+		return translateExpr( trimmed, arguments.variableMap, arguments.warnings, true )
+	}
+
+	/**
+	 * Translates a Go template expression - either a full `{{ expr }}`
+	 * output (when `asOutput` is true, wrapping the result as `#...#` or
+	 * a TODO marker) or a bare condition/list-expression to embed inside
+	 * an already-open `<bx:if>`/`<bx:loop>` tag (when false, returning
+	 * the substituted text with no wrapping and no TODO short-circuit -
+	 * an `if`/`range` block's own structure must stay valid even when its
+	 * condition references something unmapped, same reasoning
+	 * JinjaLikeTranslator.translateCondition() documents).
+	 *
+	 * A pipeline filter (`{{ .Title | upper }}`) is never translated
+	 * either way - always left as a TODO marker/flagged, since a
+	 * pipeline's real semantics vary too much to guess at.
+	 *
+	 * A bare Go field reference (`.Draft`) is not valid BoxLang syntax on
+	 * its own - a leading `.` with nothing before it can't parse as an
+	 * expression at all, unlike an unmapped Jinja2/Liquid bare word
+	 * (`page.author`), which is at worst an undefined-variable *runtime*
+	 * error (see JinjaLikeTranslator.translateCondition()'s own
+	 * docblock). Left in place inside a generated `condition="#...#"`, an
+	 * unmapped `.Field` would fail the whole *file's* compile, not just
+	 * misbehave on the one page that hits it - so in embedded mode, any
+	 * leftover unmapped `.Field` reference is replaced with `placeholder`
+	 * (a syntactically-safe stand-in for the embedded expression's own
+	 * context - `"false"` for a boolean condition, `"[]"` for a loop's
+	 * list expression) rather than left as literal, uncompilable text.
+	 *
+	 * Field substitution is only attempted at all when the (optionally
+	 * `not `-prefixed) expression is a single dotted field path, the
+	 * whole string - `variables.singleFieldPattern`'s own docblock
+	 * explains why anything past that (Go's prefix-function-call
+	 * conditionals) is placeholder'd wholesale instead of partially
+	 * substituted, which would still leave invalid BoxLang syntax behind.
+	 *
+	 * @expr The raw expression text
+	 * @variableMap See translate()'s own docblock
+	 * @warnings Accumulator array, mutated in place
+	 * @asOutput Whether this is a top-level `{{ expr }}` output (wraps/TODO-shortcircuits) or an embedded condition (substitutes, replacing anything still unmapped with `placeholder`)
+	 * @placeholder The syntactically-safe value substituted for an unmapped `.Field` reference in embedded mode - ignored when `asOutput` is true
+	 */
+	private string function translateExpr( required string expr, required struct variableMap, required array warnings, boolean asOutput = false, string placeholder = "false" ) {
+		var trimmed = trim( arguments.expr )
+
+		if ( arguments.asOutput ) {
+			if ( trimmed.find( "|" ) ) {
+				arguments.warnings.append( "Pipeline not translated - {{ " & trimmed & " }} left as a TODO marker; port the pipeline by hand." )
+				return todoComment( "{{ " & trimmed & " }}" )
+			}
+			if ( arguments.variableMap.keyExists( trimmed ) ) {
+				return variables.hash & arguments.variableMap[ trimmed ] & variables.hash
+			}
+			arguments.warnings.append( "No mapping for {{ " & trimmed & " }} - left as a TODO marker." )
+			return todoComment( "{{ " & trimmed & " }}" )
+		}
+
+		if ( trimmed.find( "|" ) ) {
+			arguments.warnings.append( "Pipeline not translated - substituted [" & arguments.placeholder & "] so the file still compiles; verify by hand: " & trimmed )
+			return arguments.placeholder
+		}
+
+		var negated = trimmed.reFindNoCase( "^not\s+" ) > 0
+		var field = negated ? trimmed.reReplaceNoCase( "^not\s+", "" ) : trimmed
+
+		if ( !variables.singleFieldPattern.matcher( field ).matches() ) {
+			arguments.warnings.append( "Condition/list-expression not translated (not a single field reference - likely a Go prefix function call like `and`/`or`/`eq`, which has no BoxLang infix equivalent) - substituted [" & arguments.placeholder & "] so the file still compiles; verify by hand: " & trimmed )
+			return arguments.placeholder
+		}
+
+		var value = arguments.variableMap.keyExists( field )
+			? arguments.variableMap[ field ]
+			: substituteUnmapped( field, arguments.placeholder, arguments.warnings )
+
+		return negated ? ( "not " & value ) : value
+	}
+
+	/**
+	 * `field` (a single dotted path already confirmed unmapped by the
+	 * caller) has no bx-sites equivalent - warns and returns `placeholder`
+	 * as-is, the same syntactically-safe stand-in translateExpr()'s own
+	 * docblock explains.
+	 *
+	 * @field The unmapped dotted field path
+	 * @placeholder The value to substitute
+	 * @warnings Accumulator array, mutated in place
+	 */
+	private string function substituteUnmapped( required string field, required string placeholder, required array warnings ) {
+		arguments.warnings.append( "No mapping for [" & arguments.field & "] - substituted [" & arguments.placeholder & "] so the file still compiles; verify by hand: " & arguments.field )
+		return arguments.placeholder
+	}
+
+	/**
+	 * Pops `blockStack` for a generic `{{ end }}` and returns the
+	 * matching closing tag - `</bx:if>` for a popped `"if"`, `</bx:loop>`
+	 * for a popped `"range"`. An empty stack (an `{{ end }}` with nothing
+	 * open - `with` doesn't push, so this also fires for an `{{ end }}`
+	 * that was really closing an untranslated `with`) warns and emits a
+	 * TODO marker instead of guessing at a closing tag.
+	 *
+	 * @blockStack Mutated in place
+	 * @warnings Accumulator array, mutated in place
+	 */
+	private string function closeBlock( required array blockStack, required array warnings ) {
+		if ( !arguments.blockStack.len() ) {
+			arguments.warnings.append( "{{ end }} with no tracked open {{ if }}/{{ range }} - probably closing an untranslated {{ with }} (see its own TODO marker above) - left as a TODO marker." )
+			return todoComment( "{{ end }}" )
+		}
+
+		var popped = arguments.blockStack[ arguments.blockStack.len() ]
+		arguments.blockStack.deleteAt( arguments.blockStack.len() )
+		return popped == "range" ? "</bx:loop>" : "</bx:if>"
+	}
+
+	/**
+	 * No escaping needed for a literal `--` in `original` - see
+	 * JinjaLikeTranslator.todoComment()'s own docblock.
+	 *
+	 * @original The original template syntax, for a human to find and port by hand
+	 */
+	private string function todoComment( required string original ) {
+		return "<!--- TODO: " & arguments.original & " --->"
+	}
+
+}
