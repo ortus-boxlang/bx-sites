@@ -93,6 +93,16 @@ direttamente a [Compilazione](#build).
 Ogni file `.md` sotto `docs/` diventa una pagina. L'annidamento delle
 cartelle diventa automaticamente annidamento nella navigazione:
 
+!!! note "docs/ o src/"
+    `docs/` è ciò che `new` genera e ciò che usa ogni esempio in questa
+    guida, ma un progetto che nello spirito non è davvero "docs" (un sito
+    marketing, un portfolio) può usare `src/` al suo posto, senza nessun
+    altro cambiamento: ogni verbo (`build`, `serve`, `check`, `lint`,
+    `page:new`, ...) cerca prima `docs/` e ripiega su `src/` quando è
+    quello che esiste davvero. L'output della build finisce comunque
+    sempre in `site/` - i due non entrano mai in conflitto, dato che
+    `site/` stesso non è mai un nome valido per la cartella sorgente.
+
 ```
 docs/
 ├── index.md              -> /
