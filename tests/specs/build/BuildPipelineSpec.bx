@@ -710,6 +710,32 @@ class extends="testbox.system.BaseSpec" {
 				expect( homeHtml ).toInclude( 'href="/tags/index.html##tag-cli"' );
 			} );
 
+			it( "writes each locale's own tags/index.html, scoped to that locale's own tagged pages, not the main site's", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/docs/index.md",
+					"---" & char( 10 ) & "title: Home" & char( 10 ) & "tags: [cli, guide]" & char( 10 ) & "---" & char( 10 ) & "Welcome"
+				);
+				directoryCreate( root & "/docs/i18n/es", true, true );
+				fileWrite(
+					root & "/docs/i18n/es/index.md",
+					"---" & char( 10 ) & "title: Inicio" & char( 10 ) & "tags: [guía]" & char( 10 ) & "---" & char( 10 ) & "Bienvenido"
+				);
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/es/tags/index.html" ) ).toBeTrue();
+				var esTagsHtml = fileRead( root & "/site/es/tags/index.html" );
+				// encodeForHTML()'s exact escaping range for accented characters
+				// is environment-dependent - only the `id` attribute (never
+				// HTML-escaped) is asserted on, not the escaped visible heading text.
+				expect( esTagsHtml ).toInclude( '<h2 id="tag-guía">' );
+				expect( esTagsHtml ).toInclude( '<a href="/es/index.html">Inicio</a>' );
+
+				var esHomeHtml = fileRead( root & "/site/es/index.html" );
+				expect( esHomeHtml ).toInclude( 'href="/es/tags/index.html##tag-guía"' );
+			} );
+
 			it( "copies the shared copy-code.js widget regardless of whether search is enabled", function() {
 				var root = newProject();
 				fileWrite(

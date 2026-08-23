@@ -59,7 +59,8 @@
 	}
 
 	function tagSlug( required string tag ) {
-		return lCase( trim( arguments.tag ) ).reReplace( "[^a-z0-9]+", "-", "all" ).reReplace( "(^-|-$)", "", "all" )
+		var slug = createObject( "java", "java.util.regex.Pattern" ).compile( "[^\p{L}\p{N}]+" ).matcher( lCase( trim( arguments.tag ) ) ).replaceAll( "-" )
+		return slug.reReplace( "(^-|-$)", "", "all" )
 	}
 
 	function renderTags( required array tags ) {

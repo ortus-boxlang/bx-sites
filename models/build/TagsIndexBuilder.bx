@@ -60,12 +60,20 @@ class {
 
 	/**
 	 * Slugs a tag into its anchor id - matches `page.bxm`'s own `tagSlug()`
-	 * in every built-in theme (kept in sync by convention).
+	 * in every built-in theme (kept in sync by convention). Uses a Java
+	 * `\p{L}\p{N}` (any-language letter/digit) regex rather than BoxLang's
+	 * own `reReplace()` with a plain `a-z0-9` class - the latter strips
+	 * every non-ASCII character outright, so an accented tag (Spanish
+	 * "Configuración") loses just its accents (still produces a slug,
+	 * "configuraci-n") while a non-Latin one (Japanese "ガイド") strips to
+	 * nothing at all - every such tag on a page collides onto the same
+	 * empty `##tag-` anchor.
 	 *
 	 * @tag The raw tag text
 	 */
 	private string function tagSlug( required string tag ) {
-		return lCase( trim( arguments.tag ) ).reReplace( "[^a-z0-9]+", "-", "all" ).reReplace( "(^-|-$)", "", "all" )
+		var slug = createObject( "java", "java.util.regex.Pattern" ).compile( "[^\p{L}\p{N}]+" ).matcher( lCase( trim( arguments.tag ) ) ).replaceAll( "-" )
+		return slug.reReplace( "(^-|-$)", "", "all" )
 	}
 
 }

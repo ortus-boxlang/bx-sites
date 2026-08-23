@@ -197,6 +197,7 @@ class {
 			)
 			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
 			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
+			writeTagsPage( versionResult.pages, versionResult.nav, config, themeDir, versionOutputDir, versionBasePath, versions, versionLocales, defaultLocaleCode )
 
 			for ( var versionLocale in versionLocales ) {
 				if ( versionLocale.code == defaultLocaleCode ) {
@@ -226,6 +227,7 @@ class {
 				)
 				allPages.append( prefixPageUrls( versionLocaleResult.pages, "versions/" & versionName & "/" & versionLocale.code & "/" ), true )
 				copyAssets( root, themeDir, versionLocaleOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
+				writeTagsPage( versionLocaleResult.pages, versionLocaleResult.nav, config, themeDir, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/", versions, versionLocales, versionLocale.code )
 			}
 		}
 
@@ -257,6 +259,7 @@ class {
 			)
 			allPages.append( prefixPageUrls( localeResult.pages, locale.code & "/" ), true )
 			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
+			writeTagsPage( localeResult.pages, localeResult.nav, config, themeDir, localeOutputDir, urls.basePath & locale.code & "/", versions, locales, locale.code )
 		}
 
 		var tagsPages = mainResult.pages
@@ -1064,22 +1067,30 @@ class {
 	}
 
 	/**
-	 * Writes `site/tags/index.html` - every frontmatter `tags` value used
-	 * anywhere in the main tree, each with a `##tag-<slug>` anchor and a list
-	 * of every page carrying it (TagsIndexBuilder.bx). Skipped entirely when
-	 * no page uses `tags` - no empty page for projects not using the feature.
-	 * Version trees don't get their own tags page; tag badges on a version's
-	 * pages still link to the main site's one.
+	 * Writes `<siteDir>/tags/index.html` - every frontmatter `tags` value
+	 * used anywhere in *this one tree*, each with a `##tag-<slug>` anchor
+	 * and a list of every page (in this tree) carrying it
+	 * (TagsIndexBuilder.bx). Skipped entirely when no page in this tree
+	 * uses `tags` - no empty page for a tree not using the feature.
 	 *
-	 * @pages The main tree's pages (already markdown-converted, `tags` included)
-	 * @nav The main tree's nav
+	 * Called once per tree - main, each version, each locale, each
+	 * version×locale - the same shape as `writeSearchIndex()`/`copyAssets()`
+	 * already are, since a page's own `page.bxm` tag badge always links to
+	 * `<its own basePath>tags/index.html`: without a tags page at that
+	 * exact path, every tag badge on every version/locale page would 404
+	 * (or, if pointed cross-tree at the main site's own tags page instead,
+	 * bounce a locale's reader into an all-English index rather than one
+	 * scoped to their own tree's own pages/language).
+	 *
+	 * @pages This tree's own pages (already markdown-converted, `tags` included)
+	 * @nav This tree's own nav
 	 * @config The site's bxsites.json config
 	 * @themeDir Absolute path to the resolved theme folder
-	 * @siteDir Absolute path to the build output directory
-	 * @basePath Root-relative base path ending with `/`
+	 * @siteDir Absolute path to this tree's own build output directory
+	 * @basePath This tree's own root-relative base path ending with `/`
 	 * @versions Version switcher entries as `[ { label, url } ]`
-	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]` - like version trees, a locale doesn't get its own tags page in v1; tag badges on every locale's own pages still link to the main site's one
-	 * @currentLocale The default locale's own code
+	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]` - only the locales *this tree* itself has, same scoping renderDocTree()'s own `locales` param already uses
+	 * @currentLocale This tree's own current locale code (the default locale's own code for the main tree and every version's own default-locale render, never "")
 	 */
 	private void function writeTagsPage( required array pages, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, array locales = [], string currentLocale = "" ) {
 		var built = variables.tagsIndexBuilder.build( arguments.pages, arguments.basePath )
