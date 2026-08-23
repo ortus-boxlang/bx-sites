@@ -1,57 +1,57 @@
 ---
-title: Consulting & Professional Services
+title: コンサルティングとプロフェッショナルサービス
 order: 6
 icon: phosphor-duotone:handshake
-summary: Need help building, migrating, or maintaining a BX Sites site? Ortus Solutions offers professional services and consulting for documentation sites and static sites of any kind.
-tags: [services, consulting]
+summary: BX Sites サイトの構築、移行、保守にお困りですか？ Ortus Solutions は、あらゆる種類のドキュメントサイトや静的サイトに向けたプロフェッショナルサービスとコンサルティングを提供しています。
+tags: [サービス, コンサルティング]
 ---
 
-# Consulting & Professional Services
+# コンサルティングとプロフェッショナルサービス
 
-BX Sites is free, open source, and built to be used without anyone's help -
-but if you'd rather have the team who builds it do the work,
-[Ortus Solutions](https://www.ortussolutions.com) offers professional
-services and consulting around it. That covers documentation sites, but
-also any other **static site**: BX Sites is a general-purpose static site
-generator, not just a docs tool, and our services cover it the same way.
+BX Sites は無料のオープンソースで、誰の手も借りずに使えるように作られています -
+とはいえ、開発チーム自身に作業を任せたいという場合には、
+[Ortus Solutions](https://www.ortussolutions.com) がプロフェッショナルサービスと
+コンサルティングを提供しています。対象はドキュメントサイトだけでなく、
+**あらゆる静的サイト**に及びます。BX Sites はドキュメントツールに限定されない汎用の
+静的サイトジェネレーターであり、私たちのサービスも同様にそれをカバーします。
 
 <div class="bxsites-hero__actions">
-	<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="mailto:consulting@ortussolutions.com">Email consulting@ortussolutions.com</a>
-	<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://www.ortussolutions.com/services">View All Ortus Services</a>
+	<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="mailto:consulting@ortussolutions.com">consulting@ortussolutions.com にメール</a>
+	<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://www.ortussolutions.com/services">Ortus の全サービスを見る</a>
 </div>
 
-## What we can help with
+## サポートできること
 
 ::: cards
-::: card title="Docs & static site builds" icon="phosphor-duotone:buildings"
-A documentation site, a marketing site, a blog, or any other static site -
-designed, built, and deployed with BX Sites from the ground up.
+::: card title="ドキュメント & 静的サイト構築" icon="phosphor-duotone:buildings"
+ドキュメントサイト、マーケティングサイト、ブログ、その他あらゆる静的サイトを、
+ゼロから BX Sites で設計・構築・デプロイします。
 :::
-::: card title="Migrations" icon="phosphor-duotone:swap" href="guides/index.md"
-Moving an existing GitBook or mkdocs project - or another docs/static-site
-tool entirely - over to BX Sites, content and structure intact.
+::: card title="移行" icon="phosphor-duotone:swap" href="guides/index.md"
+既存の GitBook や mkdocs プロジェクト、あるいは他のドキュメント/静的サイトツール
+全般から BX Sites へ、コンテンツと構造をそのまま移行します。
 :::
-::: card title="Custom themes & plugins" icon="phosphor-duotone:palette" href="guides/themes.md"
-A theme that matches your brand, or a BoxLang module plugin for a workflow
-BX Sites doesn't cover out of the box.
+::: card title="カスタムテーマ & プラグイン" icon="phosphor-duotone:palette" href="guides/themes.md"
+ブランドに合わせたテーマ、または BX Sites が標準でカバーしないワークフロー向けの
+BoxLang モジュールプラグインを作成します。
 :::
-::: card title="Training & support" icon="phosphor-duotone:graduation-cap"
-Get your team up to speed on BX Sites, BoxLang, and the wider Ortus
-ecosystem, or set up ongoing support for a site already in production.
+::: card title="トレーニング & サポート" icon="phosphor-duotone:graduation-cap"
+チームに BX Sites、BoxLang、そして Ortus エコシステム全体を習得してもらう、
+あるいは本番稼働中のサイトに向けた継続的なサポート体制を整えます。
 :::
 :::
 
-## Why Ortus Solutions
+## なぜ Ortus Solutions なのか
 
-Ortus Solutions builds and maintains BoxLang, BX Sites, and the rest of the
-BoxLang ecosystem - nobody knows this tooling better than the people who
-wrote it. Professional services with us aren't limited to BX Sites, either:
-see the full range, from staff augmentation to production support, at
-[ortussolutions.com/services](https://www.ortussolutions.com/services).
+Ortus Solutions は BoxLang、BX Sites、そして BoxLang エコシステムの他のすべてを
+構築・保守しています - このツール群を作った本人たち以上に詳しい人間はいません。
+Ortus とのプロフェッショナルサービスは BX Sites だけに限りません。スタッフの増員支援
+から本番運用サポートまで、全サービスの詳細は
+[ortussolutions.com/services](https://www.ortussolutions.com/services) をご覧ください。
 
 ::: cards
-::: card title="Get in touch" icon="phosphor-duotone:envelope-simple" href="mailto:consulting@ortussolutions.com"
-Email **consulting@ortussolutions.com** to talk about your project - what
-you're building, your timeline, and where you'd like a hand.
+::: card title="お問い合わせ" icon="phosphor-duotone:envelope-simple" href="mailto:consulting@ortussolutions.com"
+**consulting@ortussolutions.com** にメールで、構築中のもの、スケジュール、
+どこで手を貸してほしいかをお聞かせください。
 :::
 :::

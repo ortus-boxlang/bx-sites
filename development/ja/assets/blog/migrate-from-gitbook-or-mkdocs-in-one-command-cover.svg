@@ -9,7 +9,7 @@
 	<circle cx="1080" cy="90" r="170" fill="#ffffff" opacity="0.10"/>
 	<circle cx="1150" cy="520" r="110" fill="#0B2B22" opacity="0.06"/>
 
-	<text x="80" y="120" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="24" font-weight="700" fill="#0B2B22" opacity="0.75" letter-spacing="2">BX DOCS &#183; MIGRATION</text>
+	<text x="80" y="120" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="24" font-weight="700" fill="#0B2B22" opacity="0.75" letter-spacing="2">BX SITES &#183; MIGRATION</text>
 
 	<text x="76" y="230" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="56" font-weight="800" fill="#0B2B22">
 		<tspan x="76" dy="0">Migrate From GitBook</tspan>

@@ -1,6 +1,7 @@
 ---
 title: Migration von GitBook
 order: 7
+icon: phosphor-duotone:swap
 tags: [anleitungen, migration, gitbook]
 ---
 
@@ -11,9 +12,9 @@ tags: [anleitungen, migration, gitbook]
 eigenes Sync-Format auf der Festplatte (dasselbe, das GitHub/Git Sync
 schreibt) - mit einem Befehl in einen bx-sites-`docs/`-Baum um. Alles, was
 GitBooks Content-Block-System unterstützt, bildet auf etwas ab, das
-bx-sites bereits hat (siehe
-[Markdown-Erweiterungen](markdown.md#gitbook-style-blocks)), das Ergebnis
-ist also kein grober Entwurf - es ist eine funktionierende Website.
+bx-sites bereits hat (siehe [Content-Blöcke](content-blocks.md)), das
+Ergebnis ist also kein grober Entwurf - es ist eine funktionierende
+Website.
 
 ## Einen GitBook-Export beschaffen
 
@@ -72,13 +73,13 @@ auszuführen.
 | `.gitbook/assets/**` | `docs/assets/gitbook/**`, mit jeder Referenz entsprechend umgeschrieben |
 | `{% hint style="..." %}` | `!!! type` - eine native [Admonition](markdown.md#admonitions) |
 | `{% tabs %}` / `{% tab title="..." %}` | `=== "Title"` - native [Content-Tabs](markdown.md#content-tabs) |
-| `{% cards %}` / `{% card %}` | [`::: cards` / `::: card`](markdown.md#cards) |
-| `{% columns %}` / `{% column width="..." %}` | [`::: columns` / `::: column`](markdown.md#columns) |
-| `{% stepper %}` / `{% step %}` | [`::: stepper` / `::: step`](markdown.md#stepper) - Titel wird aus der eigenen ersten Überschrift des Schritts übernommen |
-| `{% file src="..." %}` | [`::: file`](markdown.md#file) |
-| `{% embed url="..." %}` | [`::: embed`](markdown.md#embed) |
-| `{% content-ref url="..." %}` | [`::: page-link`](markdown.md#page-link) |
-| `{% details %}` / `{% expand %}` | [`::: expandable`](markdown.md#expandable) |
+| `{% cards %}` / `{% card %}` | [`::: cards` / `::: card`](content-blocks.md#cards) |
+| `{% columns %}` / `{% column width="..." %}` | [`::: columns` / `::: column`](content-blocks.md#columns) |
+| `{% stepper %}` / `{% step %}` | [`::: stepper` / `::: step`](content-blocks.md#stepper) - Titel wird aus der eigenen ersten Überschrift des Schritts übernommen |
+| `{% file src="..." %}` | [`::: file`](content-blocks.md#file) |
+| `{% embed url="..." %}` | [`::: embed`](content-blocks.md#embed) |
+| `{% content-ref url="..." %}` | [`::: page-link`](content-blocks.md#page-link) |
+| `{% details %}` / `{% expand %}` | [`::: expandable`](content-blocks.md#expandable) |
 
 Ein Block, der in deinem GitBook-Inhalt als reines Beispiel in einem
 Fenced-Code-Block gezeigt wird (statt tatsächlich verwendet zu werden),

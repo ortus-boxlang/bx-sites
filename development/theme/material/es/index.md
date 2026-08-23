@@ -1,6 +1,7 @@
 ---
 title: Inicio
 order: 1
+icon: phosphor-duotone:house
 ---
 
 # BX Sites

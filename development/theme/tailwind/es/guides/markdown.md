@@ -1,6 +1,7 @@
 ---
 title: Extensiones de Markdown
 order: 4
+icon: phosphor-duotone:markdown-logo
 tags: [guías, markdown]
 ---
 
@@ -33,7 +34,7 @@ flowchart LR
 Un cuadro de aviso/nota - activo por defecto, sin necesidad de
 configuración en `bxsites.json`:
 
-```markdown
+```markdown title="Example" linenums="1"
 !!! note "Heads Up"
     This is an admonition. Its content is regular markdown - **bold**,
     `code`, [links](../index.md) and lists all work exactly as normal.
@@ -98,7 +99,7 @@ Antepón `???` en lugar de `!!!` al tipo para hacer el bloque colapsable -
 `???` empieza colapsado, `???+` empieza abierto. En cualquier caso, el
 encabezado se puede pulsar para alternarlo:
 
-```markdown
+```markdown title="Example" linenums="1"
 ??? tip "Click to expand"
     This starts collapsed.
 
@@ -120,7 +121,7 @@ Desactiva las admoniciones por completo con
 Haz referencia a una nota al pie en línea con `[^label]` y define su
 texto en cualquier parte del documento con `[^label]: text`:
 
-```markdown
+```markdown title="Example" linenums="1"
 Here's a claim that needs backing up[^1].
 
 [^1]: Here's the backup.
@@ -140,7 +141,7 @@ estén escritas. Desactivadas por defecto - actívalas con
 Una línea de término seguida de una o más líneas de descripción `:   ` se
 convierte en un `<dl>`:
 
-```markdown
+```markdown title="Example" linenums="1"
 Term
 :   Its definition.
 
@@ -166,7 +167,7 @@ plataformas - detrás de un conjunto de pestañas clicables con
 `=== "Title"`, sangradas de la misma forma que el cuerpo de una
 admonición (4 espacios o un tabulador):
 
-```markdown
+```markdown title="Example" linenums="1"
 === "Java"
     ```java
     System.out.println( "Hi" );
@@ -327,7 +328,7 @@ reconociendo por sí sola la sintaxis de diff unificado (líneas
 
 Lo que se renderiza como:
 
-```diff
+```diff title="git diff"
 --- a/add.bx
 +++ b/add.bx
 @@ -1,4 +1,5 @@
@@ -340,12 +341,49 @@ Lo que se renderiza como:
  }
 ```
 
+### Pruébalo en vivo (try.boxlang.io)
+
+Etiqueta un fence como `tryboxlang` en lugar de un nombre de lenguaje y se
+renderiza como un editor de [try.boxlang.io](https://try.boxlang.io)
+incrustado en vivo, en lugar de un listado de código estático - los
+lectores pueden ejecutar y experimentar con el ejemplo directamente en la
+página, sin necesidad de configuración:
+
+````markdown
+```tryboxlang title="Closures"
+user = { name: "Luis", getFullName: () => "Luis Majano" }
+println( user.getFullName() )
+```
+````
+
+Lo que se renderiza como:
+
+```tryboxlang title="Closures"
+user = { name: "Luis", getFullName: () => "Luis Majano" }
+println( user.getFullName() )
+```
+
+Atributos opcionales, todos en la misma línea que `tryboxlang`:
+
+| Atributo   | Por defecto | Descripción                                              |
+| ---------- | ----------- | --------------------------------------------------------- |
+| `title`    | ninguno     | Una pequeña barra de título encima de la incrustación      |
+| `height`   | `450px`     | Cualquier longitud CSS (un número simple se trata como píxeles) |
+| `readonly` | `false`     | `"true"` bloquea el editor en modo de solo lectura         |
+
+El contenido propio del fence es el código fuente inicial de BoxLang - se
+comprime y se pasa al editor de try.boxlang.io mediante su propio
+parámetro de URL `code`, de la misma forma que ya funciona un enlace
+"share" del propio try.boxlang.io, así que abrir el enlace "Open in
+try.boxlang.io ↗" de la incrustación retoma exactamente donde empieza
+esta.
+
 ## Diagramas
 
 Opcional mediante la clave
 [`mermaid`](../configuration.md#mermaid) de `bxsites.json`:
 
-```json
+```json title="bxsites.json"
 { "mermaid": true }
 ```
 
@@ -370,7 +408,7 @@ para todo lo que puede dibujar.
 Opcional mediante la clave [`math`](../configuration.md#math) de
 `bxsites.json`:
 
-```json
+```json title="bxsites.json"
 { "math": true }
 ```
 
@@ -378,7 +416,7 @@ Una vez activado, [KaTeX](https://katex.org/) compone `$...$` para
 matemáticas en línea y `$$...$$` para un bloque centrado, ambos escritos
 directamente en el cuerpo del markdown:
 
-```markdown
+```markdown title="Example" linenums="1"
 Euler's identity, $e^{i\pi} + 1 = 0$, relates five constants in one line.
 
 $$
@@ -398,228 +436,15 @@ tal cual (para que "$5 y $10" no se interprete erróneamente como una
 fórmula) - las matemáticas compuestas siempre se sitúan pegadas a ambos
 delimitadores.
 
-## Bloques al estilo GitBook
+Consulta [Bloques de Contenido](content-blocks.md) para una familia de
+bloques `::: name ... :::` al estilo GitBook por encima de todo lo
+anterior - expandibles, tarjetas, columnas, un stepper, tarjetas de
+archivo/incrustación/enlace de página, un bloque de registro de cambios,
+y contenido reutilizable incluible.
 
-Además de todo lo anterior, BX Sites admite una familia de bloques de
-contenido al estilo GitBook - útiles por sí mismos, y la razón por la que
-el contenido de un sitio de GitBook es sencillo de migrar: cada uno de
-estos se corresponde directamente con un bloque de GitBook del mismo
-nombre. Cada uno usa la misma sintaxis de contenedor `::: name ... :::`
-(un `:::` solo en su propia línea cierra el bloque que esté abierto en
-ese momento) - sin necesidad de configuración en `bxsites.json`, siempre
-disponible. Un bloque puede anidarse dentro de otro (un expandible que
-contiene un grupo de tarjetas, por ejemplo) - cada uno se vuelve a
-analizar en busca de más bloques dentro de su propio contenido.
-
-### Expandible
-
-Una sección colapsable simple - sin icono/color de aviso, a diferencia de
-una admonición colapsable (`???`, consulta
-[Admoniciones](#collapsible-admonitions)):
-
-```markdown
-::: expandable "Is this different from a collapsible admonition?"
-Yes - this has no type/icon/color, just a plain expand/collapse section.
-Add `open="true"` to start it expanded.
-:::
-```
-
-::: expandable "¿Es esto diferente de una admonición colapsable?"
-Sí - esto no tiene tipo/icono/color, solo una sección simple de
-expandir/colapsar. Añade `open="true"` para que empiece expandida.
-:::
-
-### Tarjetas
-
-Una cuadrícula de tarjetas de enlace, cada una su propia `::: card`
-dentro de un envoltorio `::: cards` - `title`, `icon`, `image` y `href`
-son todos opcionales (una tarjeta sin `href` se renderiza como una
-tarjeta simple, no clicable):
-
-```markdown
-::: cards
-::: card title="Getting Started" icon="🚀" href="../getting-started.md"
-Install, scaffold and build your first site.
-:::
-::: card title="Themes" icon="🎨" href="themes.md"
-Customize a built-in theme or write your own.
-:::
-:::
-```
-
-::: cards
-::: card title="Primeros Pasos" icon="🚀" href="../getting-started.md"
-Instala, crea la estructura y construye tu primer sitio.
-:::
-::: card title="Temas" icon="🎨" href="themes.md"
-Personaliza un tema incorporado o escribe el tuyo propio.
-:::
-:::
-
-### Columnas
-
-Un diseño lado a lado - `::: column` acepta un `width` opcional (una
-longitud/porcentaje CSS simple, por ejemplo `"40%"`); las columnas sin un
-ancho explícito comparten la fila equitativamente:
-
-```markdown
-::: columns
-::: column width="60%"
-The wider column.
-:::
-::: column
-The narrower one.
-:::
-:::
-```
-
-::: columns
-::: column width="60%"
-La columna más ancha.
-:::
-::: column
-La más estrecha.
-:::
-:::
-
-### Stepper (secuencia de pasos)
-
-Una secuencia numerada y conectada de pasos:
-
-```markdown
-::: stepper
-::: step "Install"
-`install-bx-module bx-sites`
-:::
-::: step "Scaffold"
-`boxlang module:bxSites new`
-:::
-:::
-```
-
-::: stepper
-::: step "Instalar"
-`install-bx-module bx-sites`
-:::
-::: step "Crear estructura"
-`boxlang module:bxSites new`
-:::
-:::
-
-### Archivo
-
-Una tarjeta de descarga para un PDF, video, o cualquier otro recurso del
-proyecto - `src` se resuelve de la misma forma que ya lo hacen
-`theme.logo`/el `ogImage` del frontmatter (relativo a `docs/assets/`):
-
-```markdown
-::: file src="assets/spec.pdf" title="API Specification"
-:::
-```
-
-### Incrustación
-
-Una incrustación de iframe responsiva para un proveedor reconocido -
-actualmente YouTube, Vimeo, CodePen, Spotify, Loom y Figma. Una URL de
-cualquier otro lugar recurre a una simple tarjeta de enlace "visit ↗" en
-lugar de un iframe que simplemente se negaría a renderizarse (la mayoría
-de los sitios bloquean ser incrustados en un frame):
-
-```markdown
-::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
-:::
-```
-
-### Enlace de página
-
-Una tarjeta de vista previa enriquecida que enlaza a otra página - `href`
-sigue la misma convención relativa a archivos que un
-[enlace de página](#linking-between-pages) ordinario. A diferencia de una
-tarjeta, su título/icono/resumen se extraen automáticamente del propio
-frontmatter de la página de destino, así que se mantiene sincronizado si
-esa página se renombra o cambia su resumen:
-
-```markdown
-::: page-link href="../getting-started.md"
-:::
-```
-
-::: page-link href="../getting-started.md"
-:::
-
-### Novedades (registro de cambios)
-
-Una lista de registro de cambios con fecha y etiquetable - `::: update`
-acepta `date="YYYY-MM-DD"` y unas `tags` opcionales separadas por comas:
-
-```markdown
-::: updates
-::: update date="2026-01-15" tags="feature,fix"
-Added dark mode and fixed a footer alignment bug.
-:::
-::: update date="2026-01-01"
-Initial release.
-:::
-:::
-```
-
-::: updates
-::: update date="2026-01-15" tags="feature,fix"
-Se añadió el modo oscuro y se corrigió un error de alineación en el pie de página.
-:::
-::: update date="2026-01-01"
-Lanzamiento inicial.
-:::
-:::
-
-Una página con un bloque `::: updates` también obtiene su propio
-`feed.xml` (RSS 2.0) escrito junto a ella en cuanto `baseURL` de
-`bxsites.json` es una URL completa - el mismo requisito que
-`sitemap.xml` - de modo que los lectores puedan suscribirse solo al
-registro de cambios de esa página.
-
-### Contenido reutilizable (inclusiones)
-
-`::: include src="..."` empalma el Markdown en bruto de otro archivo en
-ese punto - resuelto relativo al archivo, respecto a la propia carpeta de
-la página *que incluye*, la misma convención que un enlace de página
-ordinario. A diferencia de todos los bloques anteriores, esto se
-convierte en contenido de página real (encabezados, párrafos, sus propios
-bloques anidados), no algo envuelto en un widget - útil para una
-advertencia/aviso repetido en varias páginas:
-
-```markdown
-::: include src="_shared/beta-notice.md"
-```
-
-Un archivo incluido puede a su vez incluir otro (una cadena circular
-lanza `BxSites.CircularInclude` en el momento de la construcción en lugar
-de entrar en un bucle infinito).
-
-### Imágenes: leyendas, alineación y marcos {#images}
-
-Una leyenda, un marco, o una galería de varias imágenes son todos
-simplemente HTML a nivel de bloque - que bx-markdown/Flexmark deja pasar
-completamente intacto (la propia regla de "bloque HTML" de CommonMark),
-así que no se necesita ninguna sintaxis específica de bx-sites en
-absoluto:
-
-```markdown
-<figure>
-  <img src="../assets/screenshot.png" alt="The build output">
-  <figcaption>A freshly built site</figcaption>
-</figure>
-
-<div data-with-frame="true">
-  <img src="../assets/screenshot.png" alt="Framed">
-</div>
-
-<div class="bxsites-gallery">
-  <img src="../assets/one.png" alt="">
-  <img src="../assets/two.png" alt="">
-  <img src="../assets/three.png" alt="">
-</div>
-```
+Consulta [Imágenes Responsivas](images.md#leyendas-alineación-y-marcos)
+para leyendas, alineación y marcos (HTML simple a nivel de bloque - sin
+necesidad de ninguna sintaxis específica de bx-sites en absoluto).
 
 ## Extensiones de plugins
 

@@ -117,7 +117,7 @@ se convierte en `docs/nav.json`, la sintaxis `{% block %}` se convierte en
 su equivalente de bx-sites (directivas `::: name`, o la sintaxis nativa de
 pestañas `=== "Title"` / admoniciones `!!! type` cuando ya existe una
 correspondencia más cercana - consulta
-[Extensiones de Markdown](guides/markdown.md#gitbook-style-blocks)), los
+[Bloques de Contenido](guides/content-blocks.md)), los
 archivos `README.md` se convierten en `index.md`, y `.gitbook/assets/**`
 se copia a `docs/assets/gitbook/`.
 

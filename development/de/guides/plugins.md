@@ -1,6 +1,7 @@
 ---
 title: Plugins
 order: 6
+icon: phosphor-duotone:puzzle-piece
 tags: [anleitungen, plugins]
 ---
 

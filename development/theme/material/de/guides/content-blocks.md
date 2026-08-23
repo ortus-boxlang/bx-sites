@@ -1,50 +1,54 @@
 ---
-title: Content Blocks
+title: Content-Blöcke
 order: 4.5
 icon: phosphor-duotone:squares-four
-tags: [guides, markdown, gitbook]
+tags: [anleitungen, markdown, gitbook]
 ---
 
-# Content Blocks
+# Content-Blöcke
 
-On top of everything in [Markdown Extensions](markdown.md), BX Sites
-supports a family of GitBook-style content blocks - handy on its own,
-and the reason a GitBook site's content is straightforward to migrate:
-each of these maps directly to a GitBook block of the same name. Every
-one uses the same `::: name ... :::` container syntax (a bare `:::` on
-its own line closes whichever block is currently open) - no
-`bxsites.json` config needed, always available. A block can nest inside
-another (an expandable containing a cards group, for instance) - each
-is scanned again for further blocks inside its own content.
+Zusätzlich zu allem in [Markdown-Erweiterungen](markdown.md) unterstützt
+BX Sites eine Familie von GitBook-artigen Content-Blöcken - für sich
+genommen praktisch, und der Grund, warum sich der Inhalt einer
+GitBook-Website unkompliziert migrieren lässt: jeder dieser Blöcke
+bildet direkt auf einen gleichnamigen GitBook-Block ab. Jeder verwendet
+dieselbe Container-Syntax `::: name ... :::` (ein einzelnes `:::` in
+seiner eigenen Zeile schließt den jeweils gerade offenen Block) - keine
+`bxsites.json`-Konfiguration nötig, immer verfügbar. Ein Block kann in
+einem anderen verschachtelt sein (etwa ein Expandable mit einer
+Cards-Gruppe darin) - jeder wird erneut nach weiteren Blöcken in seinem
+eigenen Inhalt durchsucht.
 
 ## Expandable
 
-A plain collapsible section - no callout icon/color, unlike a
-collapsible admonition (`???`, see
-[Admonitions](markdown.md#collapsible-admonitions)):
+Ein einfacher einklappbarer Bereich - kein Callout-Icon/keine Farbe, im
+Gegensatz zu einer einklappbaren Admonition (`???`, siehe
+[Admonitions](markdown.md#einklappbare-admonitions)):
 
-```markdown title="Example" linenums="1"
+```markdown title="Beispiel" linenums="1"
 ::: expandable "Is this different from a collapsible admonition?"
 Yes - this has no type/icon/color, just a plain expand/collapse section.
 Add `open="true"` to start it expanded.
 :::
 ```
 
-::: expandable "Is this different from a collapsible admonition?"
-Yes - this has no type/icon/color, just a plain expand/collapse section.
-Add `open="true"` to start it expanded.
+::: expandable "Unterscheidet sich das von einer einklappbaren Admonition?"
+Ja - dies hat kein Typ/Icon/Farbe, nur einen einfachen
+Auf-/Zuklapp-Bereich. Füge `open="true"` hinzu, um ihn ausgeklappt zu
+starten.
 :::
 
 ## Cards
 
-A grid of link cards, each its own `::: card` inside a `::: cards`
-wrapper - `title`, `icon`, `image` and `href` are all optional (a card
-with no `href` renders as a plain, non-clickable card). `icon` is resolved
-the same way frontmatter/nav `icon` values are - a plain emoji, or a named
-icon from a bundled library (`icon="phosphor-duotone:rocket-launch"`,
-`icon="lucide:rocket"`, ...) - see [Themes: Icons](themes.md#icons):
+Ein Raster aus Link-Cards, jede ihr eigenes `::: card` innerhalb eines
+`::: cards`-Wrappers - `title`, `icon`, `image` und `href` sind alle
+optional (eine Card ohne `href` wird als schlichte, nicht klickbare Card
+gerendert). `icon` wird auf dieselbe Weise aufgelöst wie
+Frontmatter-/Nav-`icon`-Werte - ein reines Emoji, oder ein benanntes
+Icon aus einer mitgelieferten Bibliothek (`icon="phosphor-duotone:rocket-launch"`,
+`icon="lucide:rocket"`, ...) - siehe [Themes: Icons](themes.md#icons):
 
-```markdown title="Example" linenums="1"
+```markdown title="Beispiel" linenums="1"
 ::: cards
 ::: card title="Getting Started" icon="phosphor-duotone:rocket-launch" href="../getting-started.md"
 Install, scaffold and build your first site.
@@ -56,21 +60,21 @@ Customize a built-in theme or write your own.
 ```
 
 ::: cards
-::: card title="Getting Started" icon="phosphor-duotone:rocket-launch" href="../getting-started.md"
-Install, scaffold and build your first site.
+::: card title="Erste Schritte" icon="phosphor-duotone:rocket-launch" href="../getting-started.md"
+Installiere, erstelle und baue deine erste Website.
 :::
 ::: card title="Themes" icon="phosphor-duotone:palette" href="themes.md"
-Customize a built-in theme or write your own.
+Passe ein integriertes Theme an oder schreibe dein eigenes.
 :::
 :::
 
 ## Columns
 
-A side-by-side layout - `::: column` accepts an optional `width` (a plain
-CSS length/percentage, e.g. `"40%"`); columns with no explicit width
-share the row equally:
+Ein nebeneinanderliegendes Layout - `::: column` akzeptiert ein
+optionales `width` (eine reine CSS-Länge/-Prozentangabe, z. B. `"40%"`);
+Spalten ohne explizite Breite teilen sich die Reihe gleichmäßig:
 
-```markdown title="Example" linenums="1"
+```markdown title="Beispiel" linenums="1"
 ::: columns
 ::: column width="60%"
 The wider column.
@@ -83,18 +87,18 @@ The narrower one.
 
 ::: columns
 ::: column width="60%"
-The wider column.
+Die breitere Spalte.
 :::
 ::: column
-The narrower one.
+Die schmalere.
 :::
 :::
 
 ## Stepper
 
-A numbered, connected sequence of steps:
+Eine nummerierte, verbundene Abfolge von Schritten:
 
-```markdown title="Example" linenums="1"
+```markdown title="Beispiel" linenums="1"
 ::: stepper
 ::: step "Install"
 `install-bx-module bx-sites`
@@ -106,19 +110,20 @@ A numbered, connected sequence of steps:
 ```
 
 ::: stepper
-::: step "Install"
+::: step "Installieren"
 `install-bx-module bx-sites`
 :::
-::: step "Scaffold"
+::: step "Aufsetzen"
 `boxlang module:bxSites new`
 :::
 :::
 
-A step's own optional `color` attribute flags its marker with one of four
-semantic colors - the default (no `color`), `success`, `warning` or
-`danger` - independent of the step's position in the sequence:
+Das eigene, optionale `color`-Attribut eines Schritts markiert seinen
+Marker mit einer von vier semantischen Farben - dem Standard (kein
+`color`), `success`, `warning` oder `danger` - unabhängig von der
+Position des Schritts in der Abfolge:
 
-```markdown title="Example" linenums="1"
+```markdown title="Beispiel" linenums="1"
 ::: stepper
 ::: step "Back up your data" color="success"
 Routine, safe to run any time.
@@ -133,28 +138,29 @@ Irreversible - make sure the backup above finished first.
 ```
 
 ::: stepper
-::: step "Back up your data" color="success"
-Routine, safe to run any time.
+::: step "Daten sichern" color="success"
+Routineaufgabe, jederzeit sicher auszuführen.
 :::
-::: step "Optional: enable telemetry" color="warning"
-Skip this one if you're not sure.
+::: step "Optional: Telemetrie aktivieren" color="warning"
+Überspringe diesen Schritt, wenn du dir nicht sicher bist.
 :::
-::: step "Delete the old install" color="danger"
-Irreversible - make sure the backup above finished first.
+::: step "Alte Installation löschen" color="danger"
+Unumkehrbar - stelle sicher, dass die Sicherung oben abgeschlossen ist.
 :::
 :::
 
-The numbered marker, connecting line, and each of the three `color`
-palettes above are themeable independently of the rest of the site's
-palette, via CSS custom properties - see [Customizing colors](themes.md#customizing-colors-without-a-theme-override).
+Der nummerierte Marker, die Verbindungslinie und jede der drei
+`color`-Paletten oben lassen sich unabhängig von der restlichen Palette
+der Website themen, über CSS-Custom-Properties - siehe
+[Farben anpassen](themes.md#farben-anpassen-ohne-ein-theme-zu-überschreiben).
 
 ## File
 
-A download card for a PDF, video, or any other project asset - `src` is
-resolved the same way `theme.logo`/frontmatter `ogImage` already are
-(relative to `docs/assets/`):
+Eine Download-Card für ein PDF, ein Video oder ein beliebiges anderes
+Projekt-Asset - `src` wird auf dieselbe Weise aufgelöst wie
+`theme.logo`/die Frontmatter-`ogImage` (relativ zu `docs/assets/`):
 
-```markdown title="Example" linenums="1"
+```markdown title="Beispiel" linenums="1"
 ::: file src="assets/spec.pdf" title="API Specification"
 :::
 ```
@@ -164,12 +170,13 @@ resolved the same way `theme.logo`/frontmatter `ogImage` already are
 
 ## Embed
 
-A responsive iframe embed for a recognized provider - currently YouTube,
-Vimeo, CodePen, Spotify, Loom and Figma. A URL from anywhere else falls
-back to a plain "visit ↗" link card instead of an iframe that would just
-refuse to render (most sites block being framed):
+Ein responsives iframe-Embed für einen erkannten Anbieter - derzeit
+YouTube, Vimeo, CodePen, Spotify, Loom und Figma. Eine URL von woanders
+fällt stattdessen auf eine schlichte "visit ↗"-Link-Card zurück, statt
+auf ein iframe, das ohnehin nicht rendern würde (die meisten Websites
+blockieren das Einbetten in Frames):
 
-```markdown title="Example" linenums="1"
+```markdown title="Beispiel" linenums="1"
 ::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
 :::
 ```
@@ -177,15 +184,16 @@ refuse to render (most sites block being framed):
 ::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
 :::
 
-## Page link
+## Page Link
 
-A rich preview card linking to another page - `href` follows the same
-file-relative convention as an ordinary [page link](../getting-started.md#linking-between-pages).
-Unlike a card, its title/icon/summary are pulled automatically from the
-target page's own frontmatter, so it stays in sync if that page is
-renamed or its summary changes:
+Eine ausführliche Vorschau-Card, die zu einer anderen Seite verlinkt -
+`href` folgt derselben dateirelativen Konvention wie ein gewöhnlicher
+[Seiten-Link](../getting-started.md#zwischen-seiten-verlinken). Anders als
+eine Card werden Titel/Icon/Zusammenfassung automatisch aus der eigenen
+Frontmatter der Zielseite gezogen, sodass sie synchron bleibt, wenn
+diese Seite umbenannt wird oder sich ihre Zusammenfassung ändert:
 
-```markdown title="Example" linenums="1"
+```markdown title="Beispiel" linenums="1"
 ::: page-link href="../getting-started.md"
 :::
 ```
@@ -193,19 +201,21 @@ renamed or its summary changes:
 ::: page-link href="../getting-started.md"
 :::
 
-## Link preview
+## Link Preview
 
-A rich preview card for an *external* URL - the same card shape as
-`::: page-link`, but for a link that isn't one of this site's own pages, so
-there's no page to pull a title/summary from automatically. Every field
-comes from the directive's own attributes: only `url` is required, `title`
-falls back to the bare URL when omitted, and `description`/`image` are both
-optional. There's no build-time fetch of the target URL to auto-fill these
-- the same reasoning that keeps [`check`](../cli-reference.md#check) internal-links-only
-applies here too, so a slow or unreachable third-party site never affects
-build time:
+Eine ausführliche Vorschau-Card für eine *externe* URL - dieselbe
+Card-Form wie `::: page-link`, aber für einen Link, der keine der
+eigenen Seiten dieser Website ist, es also keine Seite gibt, aus der
+sich Titel/Zusammenfassung automatisch ziehen ließen. Jedes Feld kommt
+aus den eigenen Attributen der Direktive: nur `url` ist erforderlich,
+`title` fällt, wenn weggelassen, auf die reine URL zurück, und
+`description`/`image` sind beide optional. Es gibt keinen
+Build-Zeit-Abruf der Ziel-URL, um diese automatisch zu befüllen -
+dieselbe Überlegung, die [`check`](../cli-reference.md#check) auf
+interne Links beschränkt, gilt auch hier, sodass eine langsame oder
+nicht erreichbare externe Website die Build-Zeit niemals beeinflusst:
 
-```markdown title="Example" linenums="1"
+```markdown title="Beispiel" linenums="1"
 ::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
 :::
 ```
@@ -213,12 +223,12 @@ build time:
 ::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
 :::
 
-## Updates (changelog)
+## Updates (Changelog)
 
-A dated, taggable changelog list - `::: update` accepts `date="YYYY-MM-DD"`
-and an optional comma-separated `tags`:
+Eine datierte, taggbare Changelog-Liste - `::: update` akzeptiert
+`date="YYYY-MM-DD"` und optional durch Kommas getrennte `tags`:
 
-```markdown title="Example" linenums="1"
+```markdown title="Beispiel" linenums="1"
 ::: updates
 ::: update date="2026-01-15" tags="feature,fix"
 Added dark mode and fixed a footer alignment bug.
@@ -231,30 +241,33 @@ Initial release.
 
 ::: updates
 ::: update date="2026-01-15" tags="feature,fix"
-Added dark mode and fixed a footer alignment bug.
+Dunkelmodus hinzugefügt und einen Ausrichtungsfehler in der Fußzeile behoben.
 :::
 ::: update date="2026-01-01"
-Initial release.
+Erstveröffentlichung.
 :::
 :::
 
-A page with an `::: updates` block also gets its own `feed.xml` (RSS 2.0)
-written alongside it once `bxsites.json`'s `baseURL` is a full URL - same
-requirement as `sitemap.xml` - so readers can subscribe to just that
-page's changelog.
+Eine Seite mit einem `::: updates`-Block erhält außerdem ihre eigene
+`feed.xml` (RSS 2.0), die daneben geschrieben wird, sobald `baseURL` in
+`bxsites.json` eine vollständige URL ist - dieselbe Voraussetzung wie
+bei `sitemap.xml` - sodass Leser genau den Changelog dieser einen Seite
+abonnieren können.
 
-## Reusable content (includes)
+## Wiederverwendbare Inhalte (Includes)
 
-`::: include src="..."` splices another file's raw Markdown in at that
-point. Unlike every block above, this becomes real page content
-(headings, paragraphs, its own nested blocks), not something wrapped in
-a widget - useful for a warning/notice repeated across several pages.
-Put the partial itself under `docs/includes/` - the same reserved-folder
-convention as `assets/`/`versions/`/`i18n/`/`blog/`. A file under
-`includes/` is never built as its own page and never appears in
-nav/search/sitemap/tags - it only exists to be spliced into other pages:
+`::: include src="..."` fügt an dieser Stelle das rohe Markdown einer
+anderen Datei ein. Anders als jeder Block oben wird daraus echter
+Seiteninhalt (Überschriften, Absätze, seine eigenen verschachtelten
+Blöcke), nicht etwas, das in ein Widget verpackt wird - nützlich für
+einen Warn-/Hinweistext, der sich über mehrere Seiten wiederholt. Lege
+das Partial selbst unter `docs/includes/` ab - dieselbe reservierte
+Ordner-Konvention wie `assets/`/`versions/`/`i18n/`/`blog/`. Eine Datei
+unter `includes/` wird nie als eigene Seite gebaut und erscheint nie in
+Navigation/Suche/Sitemap/Tags - sie existiert nur, um in andere Seiten
+eingefügt zu werden:
 
-```text title="docs/ layout"
+```text title="docs/-Layout"
 docs/
 ├── index.md
 ├── includes/
@@ -266,35 +279,41 @@ docs/
         └── setup.md
 ```
 
-A **bare** `src` (no leading `./` or `../`) always resolves against the
-current tree's own `docs/includes/`, no matter how deeply nested the
-including page is - `guides/deep/setup.md` above reaches the same file
-`index.md` does, both with the exact same `src`:
+Ein **bloßer** `src` (ohne führendes `./` oder `../`) wird immer gegen
+das eigene `docs/includes/` des aktuellen Baums aufgelöst, egal wie tief
+die einbindende Seite selbst verschachtelt ist - `guides/deep/setup.md`
+oben erreicht dieselbe Datei wie `index.md`, beide mit exakt demselben
+`src`:
 
-```markdown title="From either index.md or guides/deep/setup.md"
+```markdown title="Aus index.md oder guides/deep/setup.md"
 ::: include src="beta-notice.md"
 ```
 
-A bare `src` can also point into a subfolder of `includes/` itself:
+Ein bloßer `src` kann auch in einen Unterordner von `includes/` selbst
+zeigen:
 
-```markdown title="Example"
+```markdown title="Beispiel"
 ::: include src="legal/terms.md"
 ```
 
-Prefix `src` with `./` or `../` instead to reach a page-adjacent
-fragment that isn't meant to live in the centralized `includes/`
-folder - that form resolves file-relative to the *including* page's own
-directory, the same convention as an ordinary page link:
+Stelle stattdessen `./` oder `../` vor `src`, um ein seitennahes
+Fragment zu erreichen, das nicht im zentralen `includes/`-Ordner leben
+soll - diese Form löst dateirelativ zum eigenen Verzeichnis der
+*einbindenden* Seite auf, dieselbe Konvention wie ein gewöhnlicher
+Seiten-Link:
 
-```markdown title="From guides/deep/setup.md, one level up instead of centralized"
+```markdown title="Aus guides/deep/setup.md, eine Ebene höher statt zentralisiert"
 ::: include src="../local-note.md"
 ```
 
-A version/locale tree gets its own `includes/` the same way - a page
-under `docs/versions/2.0/` resolves a bare `src` against
-`docs/versions/2.0/includes/`, and one under `docs/i18n/es/` against
-`docs/i18n/es/includes/` - each tree's partials are its own, not shared
-with the main tree's `docs/includes/`.
+Ein Versions-/Locale-Baum erhält sein eigenes `includes/` auf dieselbe
+Weise - eine Seite unter `docs/versions/2.0/` löst einen bloßen `src`
+gegen `docs/versions/2.0/includes/` auf, und eine unter
+`docs/i18n/es/` gegen `docs/i18n/es/includes/` - die Partials jedes
+Baums gehören ihm selbst, sie werden nicht mit dem `docs/includes/` des
+Hauptbaums geteilt.
 
-An included file can itself include another (a circular chain throws
-`BxSites.CircularInclude` at build time rather than looping forever).
+Eine eingebundene Datei kann selbst eine weitere einbinden (eine
+zirkuläre Kette wirft zur Build-Zeit `BxSites.CircularInclude`, statt
+endlos zu laufen).
+</content>

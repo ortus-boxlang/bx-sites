@@ -1685,6 +1685,11 @@ a.bxsites-card:hover {
 	padding: 1rem;
 }
 
+.blog-post-card-image,
+.blog-post-featured-image {
+	border-radius: 10px;
+}
+
 .blog-archive-links,
 .blog-category-links {
 	margin: 2rem 0;

@@ -1,57 +1,61 @@
 ---
-title: Consulting & Professional Services
+title: Consulenza e Servizi Professionali
 order: 6
 icon: phosphor-duotone:handshake
-summary: Need help building, migrating, or maintaining a BX Sites site? Ortus Solutions offers professional services and consulting for documentation sites and static sites of any kind.
-tags: [services, consulting]
+summary: Hai bisogno di aiuto per costruire, migrare o mantenere un sito BX Sites? Ortus Solutions offre servizi professionali e consulenza per siti di documentazione e siti statici di ogni tipo.
+tags: [servizi, consulenza]
 ---
 
-# Consulting & Professional Services
+# Consulenza e Servizi Professionali
 
-BX Sites is free, open source, and built to be used without anyone's help -
-but if you'd rather have the team who builds it do the work,
-[Ortus Solutions](https://www.ortussolutions.com) offers professional
-services and consulting around it. That covers documentation sites, but
-also any other **static site**: BX Sites is a general-purpose static site
-generator, not just a docs tool, and our services cover it the same way.
+BX Sites è gratuito, open source, e pensato per essere usato senza l'aiuto
+di nessuno - ma se preferisci far fare il lavoro al team che lo costruisce,
+[Ortus Solutions](https://www.ortussolutions.com) offre servizi
+professionali e consulenza dedicati. Questo copre i siti di documentazione,
+ma anche qualsiasi altro **sito statico**: BX Sites è un generatore di siti
+statici general-purpose, non solo uno strumento per la documentazione, e i
+nostri servizi lo coprono allo stesso modo.
 
 <div class="bxsites-hero__actions">
-	<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="mailto:consulting@ortussolutions.com">Email consulting@ortussolutions.com</a>
-	<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://www.ortussolutions.com/services">View All Ortus Services</a>
+	<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="mailto:consulting@ortussolutions.com">Scrivi a consulting@ortussolutions.com</a>
+	<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://www.ortussolutions.com/services">Vedi tutti i servizi Ortus</a>
 </div>
 
-## What we can help with
+## In cosa possiamo aiutarti
 
 ::: cards
-::: card title="Docs & static site builds" icon="phosphor-duotone:buildings"
-A documentation site, a marketing site, a blog, or any other static site -
-designed, built, and deployed with BX Sites from the ground up.
+::: card title="Siti di documentazione e siti statici" icon="phosphor-duotone:buildings"
+Un sito di documentazione, un sito marketing, un blog, o qualsiasi altro
+sito statico - progettato, costruito e distribuito con BX Sites da zero.
 :::
-::: card title="Migrations" icon="phosphor-duotone:swap" href="guides/index.md"
-Moving an existing GitBook or mkdocs project - or another docs/static-site
-tool entirely - over to BX Sites, content and structure intact.
+::: card title="Migrazioni" icon="phosphor-duotone:swap" href="guides/index.md"
+Spostare un progetto GitBook o mkdocs esistente - o un altro strumento per
+documentazione/siti statici - su BX Sites, con contenuto e struttura
+intatti.
 :::
-::: card title="Custom themes & plugins" icon="phosphor-duotone:palette" href="guides/themes.md"
-A theme that matches your brand, or a BoxLang module plugin for a workflow
-BX Sites doesn't cover out of the box.
+::: card title="Temi e plugin personalizzati" icon="phosphor-duotone:palette" href="guides/themes.md"
+Un tema che rispecchia il tuo brand, oppure un plugin modulo BoxLang per un
+workflow che BX Sites non copre già di serie.
 :::
-::: card title="Training & support" icon="phosphor-duotone:graduation-cap"
-Get your team up to speed on BX Sites, BoxLang, and the wider Ortus
-ecosystem, or set up ongoing support for a site already in production.
+::: card title="Formazione e supporto" icon="phosphor-duotone:graduation-cap"
+Porta il tuo team al passo su BX Sites, BoxLang e il resto dell'ecosistema
+Ortus, oppure attiva un supporto continuativo per un sito già in
+produzione.
 :::
 :::
 
-## Why Ortus Solutions
+## Perché Ortus Solutions
 
-Ortus Solutions builds and maintains BoxLang, BX Sites, and the rest of the
-BoxLang ecosystem - nobody knows this tooling better than the people who
-wrote it. Professional services with us aren't limited to BX Sites, either:
-see the full range, from staff augmentation to production support, at
+Ortus Solutions costruisce e mantiene BoxLang, BX Sites e il resto
+dell'ecosistema BoxLang - nessuno conosce questi strumenti meglio di chi li
+ha scritti. I servizi professionali con noi non si limitano a BX Sites,
+inoltre: scopri l'intera gamma, dallo staff augmentation al supporto in
+produzione, su
 [ortussolutions.com/services](https://www.ortussolutions.com/services).
 
 ::: cards
-::: card title="Get in touch" icon="phosphor-duotone:envelope-simple" href="mailto:consulting@ortussolutions.com"
-Email **consulting@ortussolutions.com** to talk about your project - what
-you're building, your timeline, and where you'd like a hand.
+::: card title="Contattaci" icon="phosphor-duotone:envelope-simple" href="mailto:consulting@ortussolutions.com"
+Scrivi a **consulting@ortussolutions.com** per parlare del tuo progetto -
+cosa stai costruendo, i tuoi tempi, e dove vorresti una mano.
 :::
 :::

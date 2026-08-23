@@ -1,6 +1,7 @@
 ---
 title: Migrare da GitBook
 order: 7
+icon: phosphor-duotone:swap
 tags: [guide, migrazione, gitbook]
 ---
 
@@ -11,9 +12,8 @@ tags: [guide, migrazione, gitbook]
 disco proprio di GitBook (lo stesso scritto da GitHub/Git Sync) - in un
 albero `docs/` di bx-sites, con un solo comando. Tutto ciò che il sistema
 di blocchi di contenuto di GitBook supporta corrisponde a qualcosa che
-bx-sites ha già (vedi
-[Estensioni Markdown](markdown.md#gitbook-style-blocks)), quindi il
-risultato non è una bozza approssimativa - è un sito funzionante.
+bx-sites ha già (vedi [Blocchi di contenuto](content-blocks.md)), quindi
+il risultato non è una bozza approssimativa - è un sito funzionante.
 
 ## Ottenere un export di GitBook
 
@@ -70,13 +70,13 @@ eseguirlo di nuovo.
 | `.gitbook/assets/**` | `docs/assets/gitbook/**`, con ogni riferimento riscritto di conseguenza |
 | `{% hint style="..." %}` | `!!! type` - un'[ammonizione](markdown.md#admonitions) nativa |
 | `{% tabs %}` / `{% tab title="..." %}` | `=== "Title"` - [schede di contenuto](markdown.md#content-tabs) native |
-| `{% cards %}` / `{% card %}` | [`::: cards` / `::: card`](markdown.md#cards) |
-| `{% columns %}` / `{% column width="..." %}` | [`::: columns` / `::: column`](markdown.md#columns) |
-| `{% stepper %}` / `{% step %}` | [`::: stepper` / `::: step`](markdown.md#stepper) - titolo ricavato dalla prima intestazione del passo stesso |
-| `{% file src="..." %}` | [`::: file`](markdown.md#file) |
-| `{% embed url="..." %}` | [`::: embed`](markdown.md#embed) |
-| `{% content-ref url="..." %}` | [`::: page-link`](markdown.md#page-link) |
-| `{% details %}` / `{% expand %}` | [`::: expandable`](markdown.md#expandable) |
+| `{% cards %}` / `{% card %}` | [`::: cards` / `::: card`](content-blocks.md#cards) |
+| `{% columns %}` / `{% column width="..." %}` | [`::: columns` / `::: column`](content-blocks.md#columns) |
+| `{% stepper %}` / `{% step %}` | [`::: stepper` / `::: step`](content-blocks.md#stepper) - titolo ricavato dalla prima intestazione del passo stesso |
+| `{% file src="..." %}` | [`::: file`](content-blocks.md#file) |
+| `{% embed url="..." %}` | [`::: embed`](content-blocks.md#embed) |
+| `{% content-ref url="..." %}` | [`::: page-link`](content-blocks.md#page-link) |
+| `{% details %}` / `{% expand %}` | [`::: expandable`](content-blocks.md#expandable) |
 
 Un blocco mostrato come esempio letterale delimitato nel tuo contenuto
 GitBook (invece di essere usato per davvero) viene correttamente lasciato

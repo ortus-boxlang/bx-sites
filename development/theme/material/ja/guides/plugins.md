@@ -1,7 +1,7 @@
 ---
 title: プラグイン
 order: 6
-tags: [guides, plugins]
+tags: [ガイド, プラグイン]
 ---
 
 # プラグイン

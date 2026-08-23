@@ -180,7 +180,7 @@ Your content here.
   la navegación - un emoji sencillo, o un icono con nombre de una
   biblioteca incluida (`rocket`, `lucide:rocket`, `tabler:rocket`, o el
   `custom:my-icon` propio de un proyecto) - consulta
-  [Temas: Iconos](guides/themes.md#icons)
+  [Temas: Iconos](guides/themes.md#iconos)
 - `summary` - una frase introductoria de una línea mostrada debajo del
   título (distinta de `description`, que es solo para la etiqueta meta y
   nunca se renderiza en la propia página)

@@ -1,6 +1,7 @@
 ---
 title: Startseite
 order: 1
+icon: phosphor-duotone:house
 ---
 
 # BX Sites
@@ -48,7 +49,14 @@ Genau diese Seite wird von BX Sites gebaut, aus den Markdown-Dateien im
 - [Suche](guides/search.md) - wie der statische Suchindex funktioniert
 - [Deployment auf GitHub Pages](guides/deployment.md) - der integrierte GitHub-Actions-Workflow
 - [Markdown-Erweiterungen](guides/markdown.md) - Admonitions, Fußnoten, Definitionslisten, Content-Tabs, Mathematik, Code-Annotationen und Mermaid-Diagramme
+- [Content-Blöcke](guides/content-blocks.md) - GitBook-artige Blöcke: Expandables, Cards, Columns, ein Stepper und wiederverwendbare Content-Includes
+- [Responsive Bilder](guides/images.md) - automatische Skalierung, WebP-Varianten und CSS-/JS-Bundling, standardmäßig aktiv
+- [Interaktivität mit Alpine.js](guides/interactivity.md) - reaktiver Inhalt ganz ohne zusätzliches Setup
+- [Blog](guides/blog.md) - ein Convention-over-Configuration-Blog: Beiträge, Autoren, Kategorien, Archive, RSS und Statistiken
 - [Plugins](guides/plugins.md) - BX Sites mit einem eigenen BoxLang-Modul erweitern
+- [Versionierung](guides/versioning.md) - die Docs einer Version einfrieren und kostenlos einen Versionsumschalter erhalten
+- [Internationalisierung (i18n)](guides/i18n.md) - deine Docs in andere Sprachen übersetzen
 - [Migration von GitBook](guides/migrating-from-gitbook.md) - einen GitBook-Export mit einem Befehl in ein bx-sites-Projekt umwandeln
 - [Migration von mkdocs](guides/migrating-from-mkdocs.md) - ein mkdocs-Projekt mit einem Befehl in ein bx-sites-Projekt umwandeln
+- [Beratung & Professionelle Dienstleistungen](services.md) - Docs- und Static-Site-Beratung von Ortus Solutions
 - [Releases](releases/index.md) - Versionierungsrichtlinie und Neuigkeiten pro Release

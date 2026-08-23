@@ -1,6 +1,7 @@
 ---
 title: Temi
 order: 1
+icon: phosphor-duotone:palette
 tags: [guide, temi]
 ---
 
@@ -26,7 +27,7 @@ compilato. Il motore di utility proprio del tema `tailwind` (un
 compilatore JIT lato client, non un foglio di stile statico) e altre
 funzionalità opzionali che attivi tu stesso (`math`, ricerca Algolia,
 Google Analytics) continuano a caricarsi da una CDN o da un'API ospitata -
-vedi [Siti air-gapped/offline](#air-gapped-offline-sites) più sotto.
+vedi [Siti air-gapped/offline](#siti-air-gappedoffline) più sotto.
 
 Tutti e tre applicano la stessa palette del brand BoxLang: un gradiente
 `#00FF78 -> #00DBFF` e un accento `#FFF500` - e tutti e tre includono lo
@@ -125,7 +126,7 @@ Imposta quale tema usa un progetto in `bxsites.json`:
 { "theme": { "name": "material" } }
 ```
 
-## Siti air-gapped/offline {#air-gapped-offline-sites}
+## Siti air-gapped/offline
 
 Un sito compilato funziona senza alcun accesso a internet per
 impostazione predefinita, per i temi `bootstrap` e `material` con il

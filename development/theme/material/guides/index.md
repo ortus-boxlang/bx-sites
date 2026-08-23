@@ -15,6 +15,7 @@ icon: phosphor-duotone:book-open
 - [Interactivity with Alpine.js](interactivity.md) - reactive content (copy buttons, live filters, and more) with no extra setup
 - [Blog](blog.md) - a by-convention blog: posts, authors, categories, archives, RSS, and stats
 - [Plugins](plugins.md) - extending BX Sites with a BoxLang module of your own
+- [Versioning](versioning.md) - snapshot a release's docs and get a version switcher for free
 - [Internationalization (i18n)](i18n.md) - translating your docs into other languages
 - [Migrating from GitBook](migrating-from-gitbook.md) - convert a GitBook export into a bx-sites project with one command
 - [Migrating from mkdocs](migrating-from-mkdocs.md) - convert an mkdocs project into a bx-sites project with one command

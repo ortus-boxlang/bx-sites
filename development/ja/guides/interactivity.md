@@ -1,105 +1,107 @@
 ---
-title: Interactivity with Alpine.js
+title: Alpine.js によるインタラクティビティ
 order: 9
-icon: phosphor-duotone:lightning
-tags: [guides, alpine, interactivity]
+tags: [ガイド, Alpine, インタラクティビティ]
 ---
 
-# Interactivity with Alpine.js
+# Alpine.js によるインタラクティビティ
 
-Every page built by BX Sites already loads [Alpine.js](https://alpinejs.dev/)
-- it's what powers the built-in dark-mode toggle and language dropdown in
-each of the three built-in themes. That same Alpine instance is available
-to your own page content too, for free: no `bxsites.json` setting to flip,
-no `extraJs` entry to add, no extra `<script>` tag to write in your
-markdown.
+BX Sites がビルドするすべてのページは、すでに [Alpine.js](https://alpinejs.dev/)
+を読み込んでいます - 3 つの組み込みテーマそれぞれで、ダーク/ライトモード切替と
+言語ドロップダウンを動かしているのがこれです。同じ Alpine インスタンスは、
+あなた自身のページコンテンツからも無料で使えます。`bxsites.json` で切り替える
+設定も、追加する `extraJs` エントリも、Markdown に書く追加の `<script>` タグも
+必要ありません。
 
-Since [raw block-level HTML passes through
-untouched](images.md#captions-alignment-and-framing) in your markdown,
-you can drop Alpine's `x-data`/`x-show`/`@click`/etc. attributes
-straight onto any HTML block and it just works.
+Markdown 内の[生のブロックレベル HTML はそのまま通過する](images.md#キャプション配置フレーミング)
+ため、Alpine の `x-data`/`x-show`/`@click` などの属性を、そのままどの HTML
+ブロックにも書くだけで動作します。
 
-## Before reaching for Alpine
+## Alpine に手を伸ばす前に
 
-Most "interactive" needs already have a purpose-built directive block that
-doesn't require writing any JS yourself - reach for these first:
+「インタラクティブ」に見えるニーズの多くは、自分で JS を書かなくても済む
+専用のディレクティブブロックがすでに用意されています - まずはこちらを検討して
+ください:
 
-- A collapsible section → [Expandable](content-blocks.md#expandable) or a
-  [collapsible admonition](markdown.md#collapsible-admonitions)
-- Grouped alternative content behind clickable tabs → [Content
-  Tabs](markdown.md#content-tabs)
-- A numbered walkthrough → [Stepper](content-blocks.md#stepper)
+- 折りたたみ可能なセクション →
+  [展開可能](content-blocks.md#展開可能) または
+  [折りたたみ可能な Admonition](markdown.md#折りたたみ可能な-admonition)
+- クリック可能なタブの背後にグループ化された代替コンテンツ →
+  [コンテンツタブ](markdown.md#コンテンツタブ)
+- 番号付きの手順ウォークスルー →
+  [ステッパー](content-blocks.md#ステッパー)
 
-Alpine is for the interactive content those don't cover - anything with
-its own client-side state.
+Alpine は、これらがカバーしない - 独自のクライアントサイド状態を持つ -
+インタラクティブなコンテンツのためのものです。
 
-## A copy-to-clipboard button
+## コピー・トゥ・クリップボードボタン
 
-A common one: a button next to an install command that copies it and
-confirms the copy:
+よくある例: インストールコマンドの横にあり、それをコピーしてコピー完了を
+確認するボタンです:
 
 ```markdown title="Copy button" linenums="1"
 <div x-data="{ copied: false }">
   <button type="button" @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
-    <span x-show="!copied">Copy install command</span>
-    <span x-show="copied" x-cloak>Copied!</span>
+    <span x-show="!copied">インストールコマンドをコピー</span>
+    <span x-show="copied" x-cloak>コピーしました！</span>
   </button>
 </div>
 ```
 
 <div x-data="{ copied: false }">
   <button type="button" class="btn btn-sm btn-outline-secondary" @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
-    <span x-show="!copied">Copy install command</span>
-    <span x-show="copied" x-cloak>Copied!</span>
+    <span x-show="!copied">インストールコマンドをコピー</span>
+    <span x-show="copied" x-cloak>コピーしました！</span>
   </button>
 </div>
 
-## A live filter
+## ライブフィルタ
 
-Filtering a list client-side, no server round-trip:
+サーバーへの往復なしで、クライアントサイドでリストをフィルタリングします:
 
 ```markdown title="Live filter" linenums="1"
 <div x-data="{ query: '' }">
-  <input type="text" x-model="query" placeholder="Filter providers...">
+  <input type="text" x-model="query" placeholder="プロバイダーを絞り込み...">
   <ul>
-    <li x-show="'local'.includes( query.toLowerCase() )">local (static index, no server)</li>
-    <li x-show="'algolia'.includes( query.toLowerCase() )">algolia (hosted DocSearch)</li>
-    <li x-show="'pagefind'.includes( query.toLowerCase() )">pagefind (indexed at build time)</li>
+    <li x-show="'local'.includes( query.toLowerCase() )">local（静的インデックス、サーバー不要）</li>
+    <li x-show="'algolia'.includes( query.toLowerCase() )">algolia（ホスト型 DocSearch）</li>
+    <li x-show="'pagefind'.includes( query.toLowerCase() )">pagefind（ビルド時にインデックス化）</li>
   </ul>
 </div>
 ```
 
-`x-model` binds the input's value to Alpine state; each `<li>`'s `x-show`
-re-evaluates on every keystroke.
+`x-model` は入力値を Alpine の状態にバインドします。各 `<li>` の `x-show` は
+キー入力のたびに再評価されます。
 
-## `x-data` fundamentals, if you're new to Alpine
+## `x-data` の基本（Alpine が初めての方向け）
 
-`x-data` declares a scope's own reactive state as a plain JS object;
-anything inside that element can read/write it, and `x-show`/`x-text`/
-`x-model`/`@click` (shorthand for `x-on:click`) all react to it changing:
+`x-data` は、スコープ自身のリアクティブな状態をプレーンな JS オブジェクトとして
+宣言します。その要素の内側にあるものはすべてそれを読み書きでき、
+`x-show`/`x-text`/`x-model`/`@click`（`x-on:click` の省略形）はいずれも、
+状態の変化に反応します:
 
 ```markdown title="Example" linenums="1"
 <div x-data="{ count: 0 }">
-  <button type="button" @click="count++">Clicked <span x-text="count"></span> times</button>
+  <button type="button" @click="count++">クリック <span x-text="count"></span> 回</button>
 </div>
 ```
 
-See [Alpine's own documentation](https://alpinejs.dev/start-here) for the
-full directive list (`x-if`, `x-for`, `x-transition`, and more).
+完全なディレクティブ一覧（`x-if`、`x-for`、`x-transition` など）については
+[Alpine 自身のドキュメント](https://alpinejs.dev/start-here) を参照してください。
 
-## Things to know
+## 知っておくべきこと
 
-- **It's core, not optional.** The theme chrome (dark mode, language
-  switcher) depends on Alpine, so it can't be turned off in `bxsites.json`
-  the way `mermaid`/`math` can.
-- **Version.** Currently `alpinejs@3.14.1`, vendored with this module and
-  served from `site/assets/vendor/alpine/` - no CDN involved. Check a
-  theme's own `layout.bxm` for the exact `<script>` tag if you need to
-  know precisely what's loaded.
-- **Strict CSP.** Alpine's default build evaluates the JS expressions
-  inside `x-data`/`@click` etc. directly, which needs `unsafe-eval` under
-  a strict Content-Security-Policy. If your deployment can't allow that,
-  don't rely on Alpine in your page content.
-- **Keep it light.** A docs page should stay fast and simple - small,
-  self-contained widgets (a copy button, a filter, a toggle) are a good
-  fit; a full client-side app isn't what this is for.
+- **これはコアであり、オプションではありません。** テーマのクロム（ダーク
+  モード、言語スイッチャー）は Alpine に依存しているため、`mermaid`/`math`
+  のように `bxsites.json` でオフにすることはできません。
+- **バージョン。** 現在は `alpinejs@3.14.1` で、このモジュールに同梱され
+  `site/assets/vendor/alpine/` から配信されます - CDN は関与しません。
+  正確に何が読み込まれているか知りたい場合は、テーマ自身の `layout.bxm`
+  内の実際の `<script>` タグを確認してください。
+- **厳格な CSP。** Alpine のデフォルトビルドは `x-data`/`@click` などの内側の
+  JS 式を直接評価するため、厳格な Content-Security-Policy の下では
+  `unsafe-eval` が必要です。デプロイ先でそれが許可できない場合、ページ
+  コンテンツで Alpine に頼らないでください。
+- **軽量に保つ。** ドキュメントページは高速でシンプルであるべきです -
+  小さく自己完結したウィジェット（コピーボタン、フィルタ、トグル）は
+  適していますが、フルのクライアントサイドアプリのためのものではありません。

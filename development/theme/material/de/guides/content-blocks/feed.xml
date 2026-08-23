@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"><channel>
-	<title>BX Sites - Content Blocks</title>
+	<title>BX Sites - Content-Bl&ouml;cke</title>
 	<link>https://ortus-boxlang.github.io/bx-sites/development/theme/material/guides/content-blocks/index.html</link>
-	<description>Changelog updates for Content Blocks</description>
+	<description>Changelog updates for Content-Bl&ouml;cke</description>
 	<item>
 		<title>2026-01-15</title>
 		<link>https://ortus-boxlang.github.io/bx-sites/development/theme/material/guides/content-blocks/index.html</link>
-		<guid isPermaLink="false">https://ortus-boxlang.github.io/bx-sites/development/theme/material/guides/content-blocks/index.html#2026-01-15-37fd424399606f5f714d91d3f4f56302</guid>
+		<guid isPermaLink="false">https://ortus-boxlang.github.io/bx-sites/development/theme/material/guides/content-blocks/index.html#2026-01-15-75171a95c167f4ed2af0102c6dcd0282</guid>
 		<pubDate>Thu, 15 Jan 2026 00:00:00 +0000</pubDate>
 		<category>feature</category>
 		<category>fix</category>
-		<description>&lt;p&gt;Added dark mode and fixed a footer alignment bug.&lt;/p&gt;
+		<description>&lt;p&gt;Dunkelmodus hinzugef&uuml;gt und einen Ausrichtungsfehler in der Fu&szlig;zeile behoben.&lt;/p&gt;
 </description>
 	</item>
 	<item>
 		<title>2026-01-01</title>
 		<link>https://ortus-boxlang.github.io/bx-sites/development/theme/material/guides/content-blocks/index.html</link>
-		<guid isPermaLink="false">https://ortus-boxlang.github.io/bx-sites/development/theme/material/guides/content-blocks/index.html#2026-01-01-e141d9bf63ffda6e69d01b64ad6b5006</guid>
+		<guid isPermaLink="false">https://ortus-boxlang.github.io/bx-sites/development/theme/material/guides/content-blocks/index.html#2026-01-01-ff6f391aef33abcf6745be450603c3df</guid>
 		<pubDate>Thu, 01 Jan 2026 00:00:00 +0000</pubDate>
-		<description>&lt;p&gt;Initial release.&lt;/p&gt;
+		<description>&lt;p&gt;Erstver&ouml;ffentlichung.&lt;/p&gt;
 </description>
 	</item>
 </channel></rss>

@@ -117,7 +117,7 @@ nell'albero `docs/` di questo progetto: `SUMMARY.md` diventa
 in bx-sites (direttive `::: name`, oppure la sintassi nativa `=== "Title"`
 per le schede / `!!! type` per le ammonizioni dove esiste già una
 corrispondenza più stretta - vedi
-[Estensioni Markdown](guides/markdown.md#gitbook-style-blocks)), i file
+[Blocchi di contenuto](guides/content-blocks.md)), i file
 `README.md` diventano `index.md`, e `.gitbook/assets/**` viene copiato in
 `docs/assets/gitbook/`.
 
@@ -136,3 +136,33 @@ blocco non riconosciuto viene lasciato nella propria sintassi originale
 `{% %}` nel file migrato. Un file di destinazione o un `docs/nav.json`
 già esistenti vengono sovrascritti (anche questo segnalato), quindi
 rivedi l'output migrato prima di fare il commit.
+
+## `check`
+
+Un controllo di qualità del contenuto di livello CI su un `site/` già
+compilato - esegui prima `build`. Verifica:
+
+- **Link/immagini interni rotti** - qualsiasi `<a href>`/`<img src>` che
+  punta a una pagina o un asset che non esiste in `site/`. Fa fallire il
+  controllo.
+- **Testo alternativo mancante** - qualsiasi `<img>` senza alcun
+  attributo `alt`. Un `alt=""` vuoto (il markup corretto per un'immagine
+  puramente decorativa) non viene segnalato. Fa fallire il controllo.
+- **Pagine orfane** - pagine che esistono in `site/` ma non sono
+  raggiungibili seguendo i link dalla home page propria di qualsiasi
+  albero (l'`index.html` del sito principale, e quello proprio di ogni
+  versione/locale). Solo informativo - non fa mai fallire il controllo,
+  dato che una pagina che un progetto ha deliberatamente lasciato fuori
+  dalla propria nav (ad es. frontmatter `hidden: true`) *deve* essere
+  raggiungibile solo tramite un link diretto.
+
+```bash
+bxSites build
+bxSites check
+```
+
+Esce con `1` quando ci sono link/immagini rotti o immagini senza alt,
+`0` altrimenti (le pagine orfane non influiscono mai sul codice di
+uscita). Deliberatamente limitato ai soli link interni - non effettua
+richieste HTTP per verificare URL esterni, cosa che spetta a uno
+strumento dedicato di controllo link eseguito come proprio job separato.

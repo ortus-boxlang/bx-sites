@@ -2,32 +2,35 @@
 title: Blog
 order: 10
 icon: phosphor-duotone:newspaper
-tags: [guides, blog]
+tags: [guías, blog]
 ---
 
 # Blog
 
-A blog is another by-convention feature, the same shape as
-[versions](../configuration.md#versioning)/[i18n](i18n.md) or the
-[tags index](../getting-started.md#add-pages) - drop posts under
-`docs/blog/posts/`, and BX Sites builds `/blog/` (paginated), a category page
-per category, a year archive page per calendar year, an author page per
-author, an RSS feed per category plus one for the whole blog, and a
-`/blog/stats/` page, with zero config required. A project with no
-`docs/blog/posts/` folder simply doesn't have a blog - nothing else changes.
+Un blog es otra función por convención, con la misma forma que
+[versiones](../configuration.md#versionado)/[i18n](i18n.md) o el
+[índice de etiquetas](../getting-started.md#añadir-páginas) - coloca entradas
+bajo `docs/blog/posts/`, y BX Sites construye `/blog/` (paginado), una
+página de categoría por categoría, una página de archivo por año
+calendario, una página de autor por autor, un feed RSS por categoría más
+uno para todo el blog, y una página `/blog/stats/`, sin necesidad de
+configuración. Un proyecto sin carpeta `docs/blog/posts/` simplemente no
+tiene blog - nada más cambia.
 
-## Writing a post
+## Escribir una entrada
 
-Every `.md` file under `docs/blog/posts/`, at any depth, is a post -
-subfolders are entirely optional and purely for your own editing
-convenience. A flat folder works fine for a handful of posts; once you're
-into the hundreds, filing posts under `docs/blog/posts/2026/` (or
-`docs/blog/posts/2026/03/`, or any scheme you like) keeps your editor's
-file tree browsable without renaming anything or touching a frontmatter
-date-prefix convention. None of it affects the built site - a post's sort
-order, its year archive, and its URL (`blog/<slug>/`) are all derived from
-frontmatter alone, never from where the file happens to live, so a post's
-folder and its actual `date` are always free to disagree:
+Cada archivo `.md` bajo `docs/blog/posts/`, a cualquier profundidad, es
+una entrada - las subcarpetas son totalmente opcionales y puramente para
+tu propia comodidad al editar. Una carpeta plana funciona bien para un
+puñado de entradas; una vez que llegas a los cientos, archivar las
+entradas bajo `docs/blog/posts/2026/` (o `docs/blog/posts/2026/03/`, o
+cualquier esquema que prefieras) mantiene navegable el árbol de archivos
+de tu editor sin renombrar nada ni tocar ninguna convención de prefijo de
+fecha en el frontmatter. Nada de esto afecta al sitio construido - el
+orden de una entrada, su archivo de año, y su URL (`blog/<slug>/`) se
+derivan únicamente del frontmatter, nunca de dónde resulte estar el
+archivo, así que la carpeta de una entrada y su `date` real siempre
+pueden no coincidir:
 
 ```text title="Project structure"
 docs/blog/posts/
@@ -38,7 +41,7 @@ docs/blog/posts/
 │       └── a-deep-dive.md
 ```
 
-Frontmatter, for any post regardless of where it's filed:
+Frontmatter, para cualquier entrada sin importar dónde esté archivada:
 
 ```markdown title="docs/blog/posts/announcing-2-0.md" linenums="1"
 ---
@@ -60,56 +63,65 @@ out of the excerpt shown on `/blog/` and category pages, but still renders
 in full on the post's own page.
 ```
 
-- `date` (required) - any BX Sites can parse (`2026-08-15`, or a full
-  date-time). Sets the post's own sort order (newest first) and its
+- `date` (obligatorio) - cualquier fecha que BX Sites pueda analizar
+  (`2026-08-15`, o una fecha-hora completa). Establece el propio orden
+  de la entrada (más reciente primero) y su
   `<pubDate>`/`article:published_time`.
-- `authors` - a list of ids matching [`docs/blog/authors.yml`](#authors)
-  entries, or a plain name with no matching entry (rendered as unlinked text
-  rather than failing the build - handy for a one-off guest post).
-- `categories` - a post's own taxonomy, each getting its own
-  `/blog/category/<slug>/` page (and its own `/blog/category/<slug>/feed.xml`
-  RSS feed - see [Feed](#feed)). Unrelated to `tags`, below.
-- `tags` - the same site-wide `tags` frontmatter every other page already
-  has (see [Getting Started](../getting-started.md#add-pages)) - a post's
-  tags render as badges and fold into the main `/tags/` index alongside
-  every other tagged page.
-- `summary` - a one-line excerpt shown on `/blog/`/category pages and in
-  the RSS feed, used when a post has no `<!-- more -->` marker. Without
-  either, BX Sites falls back to a plain-text truncation of the post's own
-  body.
-- `image` - a featured image (a `docs/assets/`-relative path, or a full
-  URL) - shown at the top of the post and as a thumbnail on every list/
-  category card. Also becomes the post's own `og:image`/Twitter card unless
-  `ogImage` overrides it separately. A `docs/assets/`-relative image (and an
-  author's own `avatar`, below) gets the same responsive `<picture>`/
-  `srcset`/WebP treatment as any other image under `docs/assets/` - see
-  [Images](images.md).
-- `slug` - overrides the URL segment (`/blog/<slug>/`) - derived from the
-  filename by default.
-- `draft: true` - excludes the post from a real `bxSites build` entirely.
-  `bxSites serve` previews it anyway (with a visible "🚧 Draft" banner on the
-  post itself and a dashed-border card wherever it's listed), so you can
-  proofread a draft locally before it's ready - see
-  [Previewing drafts](#previewing-drafts).
+- `authors` - una lista de ids que coincidan con entradas de
+  [`docs/blog/authors.yml`](#authors), o un nombre simple sin ninguna
+  entrada coincidente (renderizado como texto sin enlazar en lugar de
+  hacer fallar la construcción - útil para una entrada de invitado
+  puntual).
+- `categories` - la propia taxonomía de una entrada, cada una con su
+  propia página `/blog/category/<slug>/` (y su propio feed RSS
+  `/blog/category/<slug>/feed.xml` - consulta [Feed](#feed)). Sin
+  relación con `tags`, más abajo.
+- `tags` - el mismo frontmatter `tags` de todo el sitio que ya tiene
+  cualquier otra página (consulta
+  [Primeros Pasos](../getting-started.md#añadir-páginas)) - las etiquetas de
+  una entrada se renderizan como insignias y se incorporan al índice
+  principal `/tags/` junto a cualquier otra página etiquetada.
+- `summary` - un extracto de una línea mostrado en `/blog/`/páginas de
+  categoría y en el feed RSS, usado cuando una entrada no tiene marcador
+  `<!-- more -->`. Sin ninguno de los dos, BX Sites recurre a una
+  truncación en texto plano del propio cuerpo de la entrada.
+- `image` - una imagen destacada (una ruta relativa a `docs/assets/`, o
+  una URL completa) - mostrada en la parte superior de la entrada y como
+  miniatura en cada tarjeta de lista/categoría. También se convierte en
+  el propio `og:image`/tarjeta de Twitter de la entrada a menos que
+  `ogImage` lo sobrescriba por separado. Una imagen relativa a
+  `docs/assets/` (y el propio `avatar` de un autor, más abajo) obtiene el
+  mismo tratamiento responsivo de `<picture>`/`srcset`/WebP que
+  cualquier otra imagen bajo `docs/assets/` - consulta
+  [Imágenes](images.md).
+- `slug` - sobrescribe el segmento de URL (`/blog/<slug>/`) - derivado
+  del nombre de archivo por defecto.
+- `draft: true` - excluye la entrada por completo de un `bxSites build`
+  real. `bxSites serve` la muestra en vista previa de todos modos (con un
+  banner visible "🚧 Draft" en la propia entrada y una tarjeta con borde
+  discontinuo en cualquier lugar donde aparezca listada), para que
+  puedas corregir una entrada en borrador localmente antes de que esté
+  lista - consulta [Vista previa de borradores](#previewing-drafts).
 
-Every other page-level frontmatter key already documented in
-[Getting Started](../getting-started.md#add-pages) (`icon`, `description`,
-`ogImage`, `toc`) works on a post too.
+Cualquier otra clave de frontmatter a nivel de página ya documentada en
+[Primeros Pasos](../getting-started.md#añadir-páginas) (`icon`, `description`,
+`ogImage`, `toc`) funciona también en una entrada.
 
-## Featured images and other blog assets
+## Imágenes destacadas y otros recursos del blog
 
-`docs/assets/blog/` is nothing special beyond an ordinary subfolder of
-`docs/assets/` (already copied to `site/assets/` wholesale) - it's just
-where this guide (and the by-convention author avatar lookup below) expects
-post covers/author photos to live, so a project's own `docs/assets/`
-doesn't get cluttered mixing blog images in with the rest of its diagrams
-and icons. Nothing enforces the location - any `docs/assets/**` path works
-in `image`/`avatar`.
+`docs/assets/blog/` no tiene nada de especial más allá de ser una
+subcarpeta ordinaria de `docs/assets/` (ya copiada en su totalidad a
+`site/assets/`) - es simplemente donde esta guía (y la búsqueda por
+convención de avatar de autor de más abajo) espera que vivan las
+portadas de entradas/fotos de autor, para que los propios
+`docs/assets/` de un proyecto no se saturen mezclando imágenes de blog
+con el resto de sus diagramas e iconos. Nada obliga a usar esa
+ubicación - cualquier ruta `docs/assets/**` funciona en `image`/`avatar`.
 
-## Authors
+## Autores
 
-`docs/blog/authors.yml` is optional - one entry per author id, referenced
-by a post's own `authors` list:
+`docs/blog/authors.yml` es opcional - una entrada por id de autor,
+referenciada por la propia lista `authors` de una entrada:
 
 ```yaml title="docs/blog/authors.yml" linenums="1"
 lmajano:
@@ -125,44 +137,51 @@ lmajano:
     twitter: https://x.com/lmajano
 ```
 
-Only `name` is required. Every author referenced by at least one post gets
-their own `/blog/authors/<id>/` page (bio, socials, every post they've
-written) - an author nobody's credited yet doesn't get a page, even if
-they're in the roster.
+Solo `name` es obligatorio. Cada autor referenciado por al menos una
+entrada obtiene su propia página `/blog/authors/<id>/` (biografía,
+redes sociales, cada entrada que haya escrito) - un autor a quien
+todavía no se le haya acreditado ninguna entrada no obtiene página,
+aunque figure en la lista.
 
-**Avatar, by convention** - drop a file at
-`docs/assets/blog/authors/<id>.{jpg,jpeg,png,webp,svg}` and it's picked up
-automatically, no `avatar:` key needed. An explicit `avatar` in
-`authors.yml` (a URL or a `docs/assets/`-relative path) always overrides
-the by-convention lookup.
+**Avatar, por convención** - coloca un archivo en
+`docs/assets/blog/authors/<id>.{jpg,jpeg,png,webp,svg}` y se recoge
+automáticamente, sin necesidad de una clave `avatar:`. Un `avatar`
+explícito en `authors.yml` (una URL o una ruta relativa a
+`docs/assets/`) siempre sobrescribe la búsqueda por convención.
 
-## Categories, archives, pagination, and the "Blog" nav entry
+## Categorías, archivos, paginación y la entrada de nav "Blog"
 
-Every distinct `categories` value across all posts gets its own
-`/blog/category/<slug>/` page, listing just that category's own posts.
-Every calendar year with at least one post also gets its own
-`/blog/archive/<year>/` page (`/blog/archive/2026/`, `/blog/archive/2025/`,
-...), derived entirely from each post's own `date` frontmatter - no folder
-structure or filename convention required, so where a post's `.md` file
-actually lives under `docs/blog/posts/` (flat, or split into your own
-subfolders for easier browsing while editing) never has to match its
-`date`. The main `/blog/` list gets "Browse by year"/"Browse by category"
-links blocks, each with a post count per year/category, automatically once
-posts span more than one year/category - a single year or category alone
-isn't worth a links block, so it's left off either way.
+Cada valor distinto de `categories` entre todas las entradas obtiene su
+propia página `/blog/category/<slug>/`, listando solo las entradas de
+esa categoría. Cada año calendario con al menos una entrada también
+obtiene su propia página `/blog/archive/<year>/`
+(`/blog/archive/2026/`, `/blog/archive/2025/`, ...), derivada
+íntegramente del propio frontmatter `date` de cada entrada - sin
+necesidad de ninguna estructura de carpetas ni convención de nombre de
+archivo, así que dónde vive realmente el archivo `.md` de una entrada
+bajo `docs/blog/posts/` (plano, o dividido en tus propias subcarpetas
+para facilitar la navegación mientras editas) nunca tiene que coincidir
+con su `date`. La lista principal `/blog/` obtiene bloques de enlaces
+"Browse by year"/"Browse by category", cada uno con un recuento de
+entradas por año/categoría, automáticamente en cuanto las entradas
+abarcan más de un año/categoría - un único año o categoría por sí solo
+no justifica un bloque de enlaces, así que se omite en cualquier caso.
 
-The main `/blog/` list, every category page, and every year archive page
-all paginate identically - `blog.postsPerPage` in the site config controls
-how many posts per page (default `10`); page 2 onward moves to
-`.../page/2/`, `.../page/3/`, etc.
+La lista principal `/blog/`, cada página de categoría, y cada página de
+archivo por año paginan de forma idéntica - `blog.postsPerPage` en la
+configuración del sitio controla cuántas entradas hay por página (por
+defecto `10`); a partir de la página 2 se pasa a `.../page/2/`,
+`.../page/3/`, etc.
 
-A single "Blog" entry is added to the main nav automatically, once
-`docs/blog/posts/` has at least one non-draft post - no `nav`/`docs/nav.json`
-change needed. By default it's appended last, after everything else. To put
-it somewhere specific instead, add your own entry with an explicit `url`
-(bypasses the usual `path`-must-match-a-real-page rule, since the blog isn't
-a `docs/` page) to your `nav` array or `docs/nav.json` - doing so suppresses
-the auto-appended one entirely, so there's never a duplicate:
+Se añade automáticamente una única entrada "Blog" a la nav principal, en
+cuanto `docs/blog/posts/` tiene al menos una entrada que no sea
+borrador - sin necesidad de ningún cambio en `nav`/`docs/nav.json`. Por
+defecto se añade al final, después de todo lo demás. Para colocarla en
+un lugar específico en su lugar, añade tu propia entrada con una `url`
+explícita (evita la regla habitual de que `path` debe coincidir con una
+página real, ya que el blog no es una página de `docs/`) a tu array
+`nav` o a `docs/nav.json` - hacerlo suprime por completo la entrada
+añadida automáticamente, así que nunca hay una duplicada:
 
 ```json title="bxsites.json" linenums="1"
 { "nav": [
@@ -172,112 +191,130 @@ the auto-appended one entirely, so there's never a duplicate:
 ] }
 ```
 
-Individual posts aren't added to the nav themselves (same as the tags
-index) - they're reachable from `/blog/`, their own category page, their
-own year archive, their author's page, search, and each other's prev/next
-links (posts chronologically adjacent to one another, independent of the
-regular nav's own prev/next chain).
+Las entradas individuales no se añaden a la nav por sí mismas (igual que
+el índice de etiquetas) - son accesibles desde `/blog/`, su propia
+página de categoría, su propio archivo por año, la página de su autor,
+la búsqueda, y los enlaces de anterior/siguiente entre ellas (entradas
+adyacentes cronológicamente entre sí, independientes de la propia cadena
+de anterior/siguiente de la nav regular).
 
-Every post's own meta line (on its card and its detail page) also shows an
-estimated reading time next to the date - a rough word-count / 200wpm
-estimate, the same ballpark figure most reading-time features use, not
-configurable.
+La propia línea de metadatos de cada entrada (en su tarjeta y en su
+página de detalle) también muestra un tiempo de lectura estimado junto
+a la fecha - una estimación aproximada de recuento de palabras / 200
+ppm, la misma cifra que usan la mayoría de las funciones de tiempo de
+lectura, no configurable.
 
 ## Feed
 
-`/blog/feed.xml` - a standard RSS 2.0 feed of the most recent posts, newest
-first, written whenever the site config resolves an absolute `baseURL`
-(same requirement as `sitemap.xml`) and `blog.feed` isn't set to `false`.
-Every category also gets its own filtered feed at
-`/blog/category/<slug>/feed.xml`. Both are capped to `blog.feedLimit` posts
-(default `25`) - most feed readers only care about what's new, so an
-unbounded feed on a large blog just wastes bandwidth on every poll; set it
-to `0` for every post, uncapped:
+`/blog/feed.xml` - un feed RSS 2.0 estándar de las entradas más
+recientes, más nuevas primero, escrito siempre que la configuración del
+sitio resuelva un `baseURL` absoluto (el mismo requisito que
+`sitemap.xml`) y `blog.feed` no esté establecido en `false`. Cada
+categoría también obtiene su propio feed filtrado en
+`/blog/category/<slug>/feed.xml`. Ambos están limitados a
+`blog.feedLimit` entradas (por defecto `25`) - la mayoría de los
+lectores de feeds solo se preocupan por lo que es nuevo, así que un feed
+sin límite en un blog grande simplemente desperdicia ancho de banda en
+cada sondeo; establécelo en `0` para no tener límite:
 
 ```json title="bxsites.json"
 { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
 ```
 
-## Previewing drafts
+## Vista previa de borradores
 
-`draft: true` keeps a post out of a real `bxSites build` entirely - but
-`bxSites serve` includes it anyway, so you can read through a draft (and
-click every link, check the featured image, see how it lists on `/blog/`)
-before it's ready. A previewed draft always carries a visible "🚧 Draft"
-banner - on its own detail page, and as a dashed-border card wherever it's
-listed (the main `/blog/` list, its own category/archive/author pages) -
-so there's never any ambiguity about what's actually published. Stop
-`bxSites serve` and run `bxSites build` and the same draft is gone, exactly
-as if it didn't exist.
+`draft: true` mantiene una entrada por completo fuera de un `bxSites
+build` real - pero `bxSites serve` la incluye de todos modos, para que
+puedas leer un borrador completo (y hacer clic en cada enlace, comprobar
+la imagen destacada, ver cómo se lista en `/blog/`) antes de que esté
+lista. Un borrador en vista previa siempre lleva un banner visible
+"🚧 Draft" - en su propia página de detalle, y como una tarjeta con
+borde discontinuo en cualquier lugar donde esté listado (la lista
+principal `/blog/`, sus propias páginas de categoría/archivo/autor) -
+así que nunca hay ambigüedad sobre qué está realmente publicado. Detén
+`bxSites serve` y ejecuta `bxSites build` y el mismo borrador desaparece,
+exactamente como si no existiera.
 
-## Stats
+## Estadísticas
 
-`/blog/stats/` - a handful of aggregate cards about the blog as a whole:
-total posts, total words written, average reading time, category/
-contributor/year counts, and three "spotlight" cards (longest post, most
-active category, most active author) each linked to the real page they're
-about. Computed purely from the posts already loaded for this build - no
-separate analytics, no tracking, nothing persisted between builds - and
-always built, even for a brand-new blog with zero posts yet. Linked from
-the bottom of the main `/blog/` list.
+`/blog/stats/` - un puñado de tarjetas agregadas sobre el blog en su
+conjunto: total de entradas, total de palabras escritas, tiempo de
+lectura promedio, recuentos de categorías/colaboradores/años, y tres
+tarjetas "destacadas" (entrada más larga, categoría más activa, autor
+más activo) cada una enlazada a la página real de la que trata.
+Calculado puramente a partir de las entradas ya cargadas para esta
+construcción - sin analítica separada, sin seguimiento, nada persistido
+entre construcciones - y siempre construido, incluso para un blog
+completamente nuevo sin entradas todavía. Enlazado desde la parte
+inferior de la lista principal `/blog/`.
 
-## SEO and social
+## SEO y redes sociales
 
-Every post already gets everything a normal page does (`<meta name="description">`,
-`og:description`, `og:image`+`twitter:card` when an image is set - see
-[Configuration: `ogImage`](../configuration.md#ogimage)) plus a few
-post-specific tags every built-in theme adds automatically: `og:type` is
-`"article"` instead of `"website"`, and `article:published_time`/
-`article:author` (one per credited author who has a `url` set in
-`authors.yml`) are included in the page `<head>`.
+Cada entrada ya obtiene todo lo que obtiene una página normal
+(`<meta name="description">`, `og:description`, `og:image`+
+`twitter:card` cuando hay una imagen establecida - consulta
+[Configuración: `ogImage`](../configuration.md#ogimage)) más algunas
+etiquetas específicas de entradas que cada tema incorporado añade
+automáticamente: `og:type` es `"article"` en lugar de `"website"`, y
+`article:published_time`/`article:author` (uno por cada autor
+acreditado que tenga un `url` establecido en `authors.yml`) se incluyen
+en el `<head>` de la página.
 
-## Search
+## Búsqueda
 
-Posts are indexed into the same `search-index.json` every other page is
-(module spec section 7) - no separate blog search UI, the existing search
-box already finds posts alongside docs pages.
+Las entradas se indexan en el mismo `search-index.json` que cualquier
+otra página (sección 7 de la especificación del módulo) - sin ninguna
+interfaz de búsqueda de blog separada, el cuadro de búsqueda ya
+existente encuentra entradas junto a las páginas de documentación.
 
-## Customizing the blog's appearance
+## Personalizar la apariencia del blog
 
-There's no separate "blog theme" to write - every blog page (the main
-`/blog/` list, a category/archive/author page, `/blog/stats/`, and each
-post's own detail page) renders through the exact same `layout.bxm`/
-`page.bxm` as any other page in your site, so a blog automatically looks
-like the rest of your docs, and any theme override you've already made
-(see [Themes](themes.md#overriding-a-theme)) applies to it unchanged, with
-no extra wiring.
+No hay ningún "tema de blog" separado que escribir - cada página del
+blog (la lista principal `/blog/`, una página de categoría/archivo/
+autor, `/blog/stats/`, y la propia página de detalle de cada entrada) se
+renderiza a través del mismo `layout.bxm`/`page.bxm` que cualquier otra
+página de tu sitio, así que un blog automáticamente se ve como el resto
+de tu documentación, y cualquier sobrescritura de tema que ya hayas
+hecho (consulta [Temas](themes.md#sobrescribir-un-tema)) se le aplica sin
+cambios, sin ningún cableado adicional.
 
-The blog-specific markup itself (post cards, the date/author/reading-time
-meta line, the pager, an author's profile block, the "Browse by year"/
-"Browse by category" link lists) is built as plain HTML with a handful of
-fixed class names, then dropped into `page.contentHtml` just like a
-converted Markdown page:
+El propio marcado específico del blog (tarjetas de entrada, la línea de
+metadatos de fecha/autor/tiempo de lectura, el paginador, el bloque de
+perfil de un autor, las listas de enlaces "Browse by year"/"Browse by
+category") se construye como HTML simple con un puñado de nombres de
+clase fijos, y luego se inserta en `page.contentHtml` igual que una
+página de Markdown convertida:
 
-| Class | Where it shows up |
+| Clase | Dónde aparece |
 |---|---|
-| `blog-post-card` / `blog-post-card--draft` | Each post's card on `/blog/`, a category page, or an archive page |
-| `blog-post-meta` | The date/author/reading-time line, on a card and on a post's own page |
-| `blog-post-featured-image` | A post's `image` frontmatter, on its own detail page |
-| `blog-draft-badge` | The "🚧 Draft" banner (`bxSites serve` only) |
-| `blog-pager` | Prev/next pagination links on a paginated list |
-| `blog-author-profile` | An author's bio/socials block on their `/blog/authors/<id>/` page |
-| `blog-archive-links` / `blog-category-links` | The "Browse by year"/"Browse by category" link blocks on `/blog/` |
+| `blog-post-card` / `blog-post-card--draft` | La tarjeta de cada entrada en `/blog/`, una página de categoría, o una página de archivo |
+| `blog-post-meta` | La línea de fecha/autor/tiempo de lectura, en una tarjeta y en la propia página de una entrada |
+| `blog-post-featured-image` | El `image` del frontmatter de una entrada, en su propia página de detalle |
+| `blog-draft-badge` | El banner "🚧 Draft" (solo con `bxSites serve`) |
+| `blog-pager` | Enlaces de paginación anterior/siguiente en una lista paginada |
+| `blog-author-profile` | El bloque de biografía/redes sociales de un autor en su página `/blog/authors/<id>/` |
+| `blog-archive-links` / `blog-category-links` | Los bloques de enlaces "Browse by year"/"Browse by category" en `/blog/` |
 
-Two ways to restyle it, same as any other page:
+Dos formas de darle un nuevo estilo, igual que cualquier otra página:
 
-- **A quick visual tweak** - target these classes from your own
-  [`extraCss`](../configuration.md#extracss--extrajs), the same way you'd
-  [customize a theme's colors](themes.md#customizing-colors-without-a-theme-override).
-  A built-in theme's own rules for these classes live in its
-  `assets/style.css` (e.g. `resources/themes/bootstrap/assets/style.css`)
-  if you want a starting point to override.
-- **Structural changes** - since blog pages share `layout.bxm`/`page.bxm`
-  with everything else, [overriding a theme](themes.md#overriding-a-theme)
-  (or [writing one from scratch](themes.md#writing-a-theme-from-scratch))
-  changes the blog's chrome (header, nav, footer, article wrapper) right
-  along with every other page - there's no separate blog template to copy.
+- **Un ajuste visual rápido** - apunta a estas clases desde tu propio
+  [`extraCss`](../configuration.md#extracss--extrajs), de la misma forma
+  que
+  [personalizarías los colores de un tema](themes.md#personalizar-colores-sin-sobrescribir-un-tema).
+  Las propias reglas de un tema incorporado para estas clases viven en
+  su `assets/style.css` (por ejemplo
+  `resources/themes/bootstrap/assets/style.css`) si quieres un punto de
+  partida para sobrescribir.
+- **Cambios estructurales** - dado que las páginas de blog comparten
+  `layout.bxm`/`page.bxm` con todo lo demás,
+  [sobrescribir un tema](themes.md#sobrescribir-un-tema) (o
+  [escribir uno desde cero](themes.md#escribir-un-tema-desde-cero))
+  cambia el armazón del blog (cabecera, nav, pie de página, envoltorio
+  del artículo) junto con cualquier otra página - no hay ninguna
+  plantilla de blog separada que copiar.
 
-What you can't do is swap out the post-card/pager/author-profile markup
-itself for your own - it's generated once by `BlogBuilder.bx`, not read
-from a template file in `theme/`, so restyling it with CSS (above) is the
-supported path rather than a per-component override.
+Lo que no puedes hacer es sustituir tú mismo el propio marcado de
+tarjeta de entrada/paginador/perfil de autor por el tuyo - se genera una
+sola vez mediante `BlogBuilder.bx`, no se lee de un archivo de plantilla
+en `theme/`, así que darle un nuevo estilo con CSS (arriba) es la vía
+compatible en lugar de una sobrescritura por componente.

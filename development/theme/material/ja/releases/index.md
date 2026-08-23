@@ -1,6 +1,7 @@
 ---
 title: リリースポリシー
 order: 6
+icon: phosphor-duotone:tag
 ---
 
 # リリースポリシー

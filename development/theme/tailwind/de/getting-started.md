@@ -113,7 +113,7 @@ nebeneinander auf der Festplatte (denn genau das tun sie):
 
 ```markdown
 See [Deployment](guides/deployment.md) or, from that same guide,
-[back to Getting Started](../getting-started.md#add-pages).
+[back to Getting Started](../getting-started.md#seiten-hinzufügen).
 ```
 
 BX Sites schreibt jeden solchen Link zur Build-Zeit auf seine gebaute
@@ -136,7 +136,7 @@ mit veröffentlicht - `docs/guides/deployment.md` landet als
 auf der Seite selbst, neben "Diese Seite bearbeiten". Keine Konfiguration
 nötig, immer aktiv.
 
-Das folgt derselben Motivation wie [`llms.txt`](../configuration.md#llmstxt) -
+Das folgt derselben Motivation wie [`llms.txt`](configuration.md#llmstxt) -
 ein Mensch (oder eine KI) kann die rohe Markdown-Quelle einer Seite direkt
 abrufen, statt gerendertes HTML zu scrapen - und da der gesamte
 `docs/`-Baum 1:1 gespiegelt wird, funktionieren auch die relativen Links

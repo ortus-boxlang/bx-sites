@@ -1,6 +1,7 @@
 ---
 title: Distribuire su GitHub Pages
 order: 3
+icon: phosphor-duotone:cloud-arrow-up
 tags: [guide, distribuzione]
 ---
 

@@ -308,6 +308,29 @@ brand accent), so there's no `[data-theme="dark"]` override to redeclare:
 }
 ```
 
+## Homepage hero banner
+
+Every built-in theme ships CSS for a full-width homepage banner with a
+headline image and call-to-action buttons - this very site's own
+`docs/index.md` uses it. There's no directive block or config for it, just
+plain HTML any page can drop in (a homepage is just a normal page, `order: 1`
+or otherwise first in nav):
+
+```markdown title="docs/index.md"
+<div class="bxsites-hero">
+	<img class="bxsites-hero__banner" src="assets/home-banner.jpg" alt="...">
+	<div class="bxsites-hero__actions">
+		<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="getting-started.md">Get Started</a>
+		<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://github.com/your/repo">View on GitHub</a>
+	</div>
+</div>
+```
+
+`bxsites-hero__btn--primary`/`--secondary` are the same two accent styles
+every theme already uses elsewhere - swap, drop, or add buttons freely, and
+resize/replace `bxsites-hero__banner`'s own image via a `docs/assets/`-relative
+`src` the same way any other image resolves.
+
 ## Overriding a theme
 
 Drop your own `layout.bxm` + `page.bxm` (and optionally `search.bxm` /

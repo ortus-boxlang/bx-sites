@@ -1,189 +1,193 @@
 ---
-title: Content Blocks
+title: コンテンツブロック
 order: 4.5
 icon: phosphor-duotone:squares-four
-tags: [guides, markdown, gitbook]
+tags: [ガイド, markdown, GitBook]
 ---
 
-# Content Blocks
+# コンテンツブロック
 
-On top of everything in [Markdown Extensions](markdown.md), BX Sites
-supports a family of GitBook-style content blocks - handy on its own,
-and the reason a GitBook site's content is straightforward to migrate:
-each of these maps directly to a GitBook block of the same name. Every
-one uses the same `::: name ... :::` container syntax (a bare `:::` on
-its own line closes whichever block is currently open) - no
-`bxsites.json` config needed, always available. A block can nest inside
-another (an expandable containing a cards group, for instance) - each
-is scanned again for further blocks inside its own content.
+[Markdown 拡張機能](markdown.md) のすべてに加えて、BX Sites は GitBook
+スタイルのコンテンツブロック群をサポートしています - それ自体便利であるだけでなく、
+GitBook サイトのコンテンツを簡単に移行できる理由でもあります。それぞれが
+同名の GitBook ブロックに直接対応しています。すべて同じ `::: name ... :::`
+コンテナ構文を使い（単独の行にある裸の `:::` が、現在開いているブロックを
+閉じます）、`bxsites.json` の設定は不要で、常に使用できます。ブロックは
+別のブロックの中にネストできます（例えば、カードグループを含む展開可能
+セクションなど）- それぞれが自身のコンテンツの中でさらにブロックがないか
+再スキャンされます。
 
-## Expandable
+## 展開可能
 
-A plain collapsible section - no callout icon/color, unlike a
-collapsible admonition (`???`, see
-[Admonitions](markdown.md#collapsible-admonitions)):
+コールアウトのアイコン/色を持たない、プレーンな折りたたみ可能セクションです -
+折りたたみ可能な Admonition（`???`、[Admonition](markdown.md#折りたたみ可能な-admonition)
+を参照）とは異なります:
 
 ```markdown title="Example" linenums="1"
-::: expandable "Is this different from a collapsible admonition?"
-Yes - this has no type/icon/color, just a plain expand/collapse section.
-Add `open="true"` to start it expanded.
+::: expandable "これは折りたたみ可能な Admonition と違いますか？"
+はい - これにはタイプ/アイコン/色がなく、単なるプレーンな展開/折りたたみ
+セクションです。`open="true"` を追加すると展開された状態で開始します。
 :::
 ```
 
-::: expandable "Is this different from a collapsible admonition?"
-Yes - this has no type/icon/color, just a plain expand/collapse section.
-Add `open="true"` to start it expanded.
+::: expandable "これは折りたたみ可能な Admonition と違いますか？"
+はい - これにはタイプ/アイコン/色がなく、単なるプレーンな展開/折りたたみ
+セクションです。`open="true"` を追加すると展開された状態で開始します。
 :::
 
-## Cards
+## カード
 
-A grid of link cards, each its own `::: card` inside a `::: cards`
-wrapper - `title`, `icon`, `image` and `href` are all optional (a card
-with no `href` renders as a plain, non-clickable card). `icon` is resolved
-the same way frontmatter/nav `icon` values are - a plain emoji, or a named
-icon from a bundled library (`icon="phosphor-duotone:rocket-launch"`,
-`icon="lucide:rocket"`, ...) - see [Themes: Icons](themes.md#icons):
+リンクカードのグリッドで、それぞれが `::: cards` ラッパーの中の独自の
+`::: card` です - `title`、`icon`、`image`、`href` はすべて任意です
+（`href` のないカードは、クリックできないプレーンなカードとしてレンダリング
+されます）。`icon` はフロントマター/ナビの `icon` 値と同じ方法で解決されます -
+プレーンな絵文字、または同梱ライブラリの名前付きアイコン
+（`icon="phosphor-duotone:rocket-launch"`、`icon="lucide:rocket"` など）
+です - [テーマ: アイコン](themes.md#アイコン) を参照してください:
 
 ```markdown title="Example" linenums="1"
 ::: cards
-::: card title="Getting Started" icon="phosphor-duotone:rocket-launch" href="../getting-started.md"
-Install, scaffold and build your first site.
+::: card title="はじめに" icon="phosphor-duotone:rocket-launch" href="../getting-started.md"
+インストール、スキャフォールド、最初のサイトのビルド。
 :::
-::: card title="Themes" icon="phosphor-duotone:palette" href="themes.md"
-Customize a built-in theme or write your own.
+::: card title="テーマ" icon="phosphor-duotone:palette" href="themes.md"
+組み込みテーマのカスタマイズ、または独自テーマの作成。
 :::
 :::
 ```
 
 ::: cards
-::: card title="Getting Started" icon="phosphor-duotone:rocket-launch" href="../getting-started.md"
-Install, scaffold and build your first site.
+::: card title="はじめに" icon="phosphor-duotone:rocket-launch" href="../getting-started.md"
+インストール、スキャフォールド、最初のサイトのビルド。
 :::
-::: card title="Themes" icon="phosphor-duotone:palette" href="themes.md"
-Customize a built-in theme or write your own.
+::: card title="テーマ" icon="phosphor-duotone:palette" href="themes.md"
+組み込みテーマのカスタマイズ、または独自テーマの作成。
 :::
 :::
 
-## Columns
+## 列
 
-A side-by-side layout - `::: column` accepts an optional `width` (a plain
-CSS length/percentage, e.g. `"40%"`); columns with no explicit width
-share the row equally:
+横並びのレイアウトです - `::: column` は任意の `width`（プレーンな CSS の
+長さ/パーセンテージ、例えば `"40%"`）を受け付けます。明示的な幅を持たない
+列は、行を均等に分け合います:
 
 ```markdown title="Example" linenums="1"
 ::: columns
 ::: column width="60%"
-The wider column.
+広い方の列。
 :::
 ::: column
-The narrower one.
+狭い方の列。
 :::
 :::
 ```
 
 ::: columns
 ::: column width="60%"
-The wider column.
+広い方の列。
 :::
 ::: column
-The narrower one.
+狭い方の列。
 :::
 :::
 
-## Stepper
+## ステッパー
 
-A numbered, connected sequence of steps:
+番号付きで連結されたステップの連続です:
 
 ```markdown title="Example" linenums="1"
 ::: stepper
-::: step "Install"
+::: step "インストール"
 `install-bx-module bx-sites`
 :::
-::: step "Scaffold"
+::: step "スキャフォールド"
 `boxlang module:bxSites new`
 :::
 :::
 ```
 
 ::: stepper
-::: step "Install"
+::: step "インストール"
 `install-bx-module bx-sites`
 :::
-::: step "Scaffold"
+::: step "スキャフォールド"
 `boxlang module:bxSites new`
 :::
 :::
 
-A step's own optional `color` attribute flags its marker with one of four
-semantic colors - the default (no `color`), `success`, `warning` or
-`danger` - independent of the step's position in the sequence:
+ステップ自身が持つ任意の `color` 属性は、そのマーカーに 4 色のうちいずれか
+1 つの意味的な色を付けます - デフォルト（`color` なし）、`success`、
+`warning`、`danger` です - シーケンス内でのステップの位置とは独立しています:
 
 ```markdown title="Example" linenums="1"
 ::: stepper
-::: step "Back up your data" color="success"
-Routine, safe to run any time.
+::: step "データをバックアップ" color="success"
+定型作業で、いつ実行しても安全です。
 :::
-::: step "Optional: enable telemetry" color="warning"
-Skip this one if you're not sure.
+::: step "任意: テレメトリを有効化" color="warning"
+確信が持てない場合はスキップしてください。
 :::
-::: step "Delete the old install" color="danger"
-Irreversible - make sure the backup above finished first.
+::: step "旧インストールを削除" color="danger"
+元に戻せません - 上のバックアップが完了していることを必ず確認してください。
 :::
 :::
 ```
 
 ::: stepper
-::: step "Back up your data" color="success"
-Routine, safe to run any time.
+::: step "データをバックアップ" color="success"
+定型作業で、いつ実行しても安全です。
 :::
-::: step "Optional: enable telemetry" color="warning"
-Skip this one if you're not sure.
+::: step "任意: テレメトリを有効化" color="warning"
+確信が持てない場合はスキップしてください。
 :::
-::: step "Delete the old install" color="danger"
-Irreversible - make sure the backup above finished first.
+::: step "旧インストールを削除" color="danger"
+元に戻せません - 上のバックアップが完了していることを必ず確認してください。
 :::
 :::
 
-The numbered marker, connecting line, and each of the three `color`
-palettes above are themeable independently of the rest of the site's
-palette, via CSS custom properties - see [Customizing colors](themes.md#customizing-colors-without-a-theme-override).
+番号付きマーカー、接続線、そして上記 3 つの `color` パレットは、いずれも
+サイトの他の部分のパレットとは独立して、CSS カスタムプロパティで
+テーマ化できます -
+[色のカスタマイズ](themes.md#テーマオーバーライドなしの色のカスタマイズ)
+を参照してください。
 
-## File
+## ファイル
 
-A download card for a PDF, video, or any other project asset - `src` is
-resolved the same way `theme.logo`/frontmatter `ogImage` already are
-(relative to `docs/assets/`):
+PDF、動画、その他のプロジェクトアセット向けのダウンロードカードです -
+`src` は `theme.logo`/フロントマターの `ogImage` がすでに解決されているのと
+同じ方法で解決されます（`docs/assets/` からの相対パス）:
 
 ```markdown title="Example" linenums="1"
-::: file src="assets/spec.pdf" title="API Specification"
+::: file src="assets/spec.pdf" title="API 仕様"
 :::
 ```
 
-::: file src="assets/og-image.png" title="Site Preview Image"
+::: file src="assets/og-image.png" title="サイトプレビュー画像"
 :::
 
-## Embed
+## 埋め込み
 
-A responsive iframe embed for a recognized provider - currently YouTube,
-Vimeo, CodePen, Spotify, Loom and Figma. A URL from anywhere else falls
-back to a plain "visit ↗" link card instead of an iframe that would just
-refuse to render (most sites block being framed):
+認識されたプロバイダー向けのレスポンシブ iframe 埋め込みです - 現時点では
+YouTube、Vimeo、CodePen、Spotify、Loom、Figma に対応しています。それ以外の
+URL は、どのみちレンダリングを拒否する iframe（ほとんどのサイトはフレーム
+表示をブロックします）の代わりに、プレーンな「訪問 ↗」リンクカードに
+フォールバックします:
 
 ```markdown title="Example" linenums="1"
-::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
+::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="デモ"
 :::
 ```
 
-::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
+::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="デモ"
 :::
 
-## Page link
+## ページリンク
 
-A rich preview card linking to another page - `href` follows the same
-file-relative convention as an ordinary [page link](../getting-started.md#linking-between-pages).
-Unlike a card, its title/icon/summary are pulled automatically from the
-target page's own frontmatter, so it stays in sync if that page is
-renamed or its summary changes:
+別のページへのリッチなプレビューカードです - `href` は通常の
+[ページリンク](../getting-started.md#ページ間のリンク) と同じ、
+ファイル相対の規約に従います。カードとは異なり、タイトル/アイコン/サマリは
+ターゲットページ自身のフロントマターから自動的に取得されるため、そのページが
+リネームされたりサマリが変更されたりしても同期が保たれます:
 
 ```markdown title="Example" linenums="1"
 ::: page-link href="../getting-started.md"
@@ -193,68 +197,69 @@ renamed or its summary changes:
 ::: page-link href="../getting-started.md"
 :::
 
-## Link preview
+## リンクプレビュー
 
-A rich preview card for an *external* URL - the same card shape as
-`::: page-link`, but for a link that isn't one of this site's own pages, so
-there's no page to pull a title/summary from automatically. Every field
-comes from the directive's own attributes: only `url` is required, `title`
-falls back to the bare URL when omitted, and `description`/`image` are both
-optional. There's no build-time fetch of the target URL to auto-fill these
-- the same reasoning that keeps [`check`](../cli-reference.md#check) internal-links-only
-applies here too, so a slow or unreachable third-party site never affects
-build time:
+*外部* URL 向けのリッチなプレビューカードです - `::: page-link` と同じ
+カード形状ですが、このサイト自身のページではないリンクのためのもので、
+タイトル/サマリを自動取得できるページがありません。すべてのフィールドは
+ディレクティブ自身の属性から取得されます: 必須なのは `url` だけで、`title`
+を省略すると裸の URL にフォールバックし、`description`/`image` はどちらも
+任意です。これらを自動入力するためのビルド時のターゲット URL フェッチは
+ありません - [`check`](../cli-reference.md) を内部リンクのみに
+限定しているのと同じ理由がここにも当てはまり、遅い/到達不能なサードパーティ
+サイトがビルド時間に影響することは決してありません:
 
 ```markdown title="Example" linenums="1"
-::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
+::: link-preview url="https://boxlang.io" title="BoxLang" description="動的でマルチパラダイムな JVM 言語。" image="https://boxlang.io/og.png"
 :::
 ```
 
-::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
+::: link-preview url="https://boxlang.io" title="BoxLang" description="動的でマルチパラダイムな JVM 言語。" image="https://boxlang.io/og.png"
 :::
 
-## Updates (changelog)
+## 更新履歴（changelog）
 
-A dated, taggable changelog list - `::: update` accepts `date="YYYY-MM-DD"`
-and an optional comma-separated `tags`:
+日付とタグ付けが可能な変更履歴リストです - `::: update` は
+`date="YYYY-MM-DD"` と、任意のカンマ区切りの `tags` を受け付けます:
 
 ```markdown title="Example" linenums="1"
 ::: updates
 ::: update date="2026-01-15" tags="feature,fix"
-Added dark mode and fixed a footer alignment bug.
+ダークモードを追加し、フッターの整列バグを修正しました。
 :::
 ::: update date="2026-01-01"
-Initial release.
+初回リリース。
 :::
 :::
 ```
 
 ::: updates
 ::: update date="2026-01-15" tags="feature,fix"
-Added dark mode and fixed a footer alignment bug.
+ダークモードを追加し、フッターの整列バグを修正しました。
 :::
 ::: update date="2026-01-01"
-Initial release.
+初回リリース。
 :::
 :::
 
-A page with an `::: updates` block also gets its own `feed.xml` (RSS 2.0)
-written alongside it once `bxsites.json`'s `baseURL` is a full URL - same
-requirement as `sitemap.xml` - so readers can subscribe to just that
-page's changelog.
+`::: updates` ブロックを持つページは、`bxsites.json` の `baseURL` が完全な
+URL である場合（`sitemap.xml` と同じ要件です）、その隣に独自の `feed.xml`
+（RSS 2.0）も書き出されます - そのため、読者はそのページの更新履歴だけを
+購読できます。
 
-## Reusable content (includes)
+## 再利用可能なコンテンツ（インクルード）
 
-`::: include src="..."` splices another file's raw Markdown in at that
-point. Unlike every block above, this becomes real page content
-(headings, paragraphs, its own nested blocks), not something wrapped in
-a widget - useful for a warning/notice repeated across several pages.
-Put the partial itself under `docs/includes/` - the same reserved-folder
-convention as `assets/`/`versions/`/`i18n/`/`blog/`. A file under
-`includes/` is never built as its own page and never appears in
-nav/search/sitemap/tags - it only exists to be spliced into other pages:
+`::: include src="..."` は、別のファイルの生の Markdown をその場所に
+挿入します。上記のすべてのブロックとは異なり、これはウィジェットに包まれた
+何かではなく、本物のページコンテンツ（見出し、段落、自身のネストした
+ブロック）になります - 複数のページで繰り返される警告/告知に便利です。
+パーシャル自体は `docs/includes/` の下に置いてください - `assets/`/
+`versions/`/`i18n/`/`blog/` と同じ予約済みフォルダの規約です。`includes/`
+配下のファイルは、決してそれ自体のページとしてビルドされず、ナビ/検索/
+サイトマップ/タグにも一切現れません - 他のページに挿入されるためだけに
+存在します:
 
-```text title="docs/ layout"
+```text title="docs/ のレイアウト"
 docs/
 ├── index.md
 ├── includes/
@@ -266,35 +271,37 @@ docs/
         └── setup.md
 ```
 
-A **bare** `src` (no leading `./` or `../`) always resolves against the
-current tree's own `docs/includes/`, no matter how deeply nested the
-including page is - `guides/deep/setup.md` above reaches the same file
-`index.md` does, both with the exact same `src`:
+**裸の** `src`（先頭に `./` や `../` がないもの）は、インクルードする側の
+ページがどれだけ深くネストしていても、常に現在のツリー自身の
+`docs/includes/` に対して解決されます - 上記の `guides/deep/setup.md` は、
+`index.md` とまったく同じ `src` で、まったく同じファイルに到達します:
 
-```markdown title="From either index.md or guides/deep/setup.md"
+```markdown title="index.md または guides/deep/setup.md のどちらからでも"
 ::: include src="beta-notice.md"
 ```
 
-A bare `src` can also point into a subfolder of `includes/` itself:
+裸の `src` は `includes/` 自身のサブフォルダを指すこともできます:
 
 ```markdown title="Example"
 ::: include src="legal/terms.md"
 ```
 
-Prefix `src` with `./` or `../` instead to reach a page-adjacent
-fragment that isn't meant to live in the centralized `includes/`
-folder - that form resolves file-relative to the *including* page's own
-directory, the same convention as an ordinary page link:
+代わりに `src` の前に `./` や `../` を付けると、集約された `includes/`
+フォルダに置くつもりのない、ページに隣接するフラグメントに到達できます -
+この形式は、通常のページリンクと同じ規約で、*インクルードする側*のページ
+自身のディレクトリからのファイル相対で解決されます:
 
-```markdown title="From guides/deep/setup.md, one level up instead of centralized"
+```markdown title="guides/deep/setup.md から、集約フォルダではなく 1 階層上"
 ::: include src="../local-note.md"
 ```
 
-A version/locale tree gets its own `includes/` the same way - a page
-under `docs/versions/2.0/` resolves a bare `src` against
-`docs/versions/2.0/includes/`, and one under `docs/i18n/es/` against
-`docs/i18n/es/includes/` - each tree's partials are its own, not shared
-with the main tree's `docs/includes/`.
+バージョン/ロケールのツリーも同じ方法で独自の `includes/` を持ちます -
+`docs/versions/2.0/` 配下のページは、裸の `src` を
+`docs/versions/2.0/includes/` に対して解決し、`docs/i18n/es/` 配下の
+ページは `docs/i18n/es/includes/` に対して解決します - それぞれのツリーの
+パーシャルは独自のものであり、メインツリーの `docs/includes/` とは
+共有されません。
 
-An included file can itself include another (a circular chain throws
-`BxSites.CircularInclude` at build time rather than looping forever).
+インクルードされたファイルは、さらに別のファイルをインクルードできます
+（循環参照はビルド時に永久ループする代わりに `BxSites.CircularInclude`
+を送出します）。

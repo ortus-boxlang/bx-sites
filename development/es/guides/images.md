@@ -1,32 +1,34 @@
 ---
-title: Responsive Images
+title: Imágenes Responsivas
 order: 5
 icon: phosphor-duotone:image
-tags: [guides, images, performance]
+tags: [guías, imágenes, rendimiento]
 ---
 
-# Responsive Images
+# Imágenes Responsivas
 
-Every eligible image under `docs/assets/` gets resized/WebP variants
-generated automatically, and every matching `<img>` in your pages gets
-rewritten into a responsive `<picture>` - no new Markdown syntax, no
-config needed to turn it on. It's built on
-[bx-image](https://github.com/ortus-boxlang/bx-image), a required
-dependency alongside bx-markdown/bx-esapi/bx-yaml (see
-[Getting Started](../getting-started.md#install)).
+Toda imagen elegible bajo `docs/assets/` obtiene variantes redimensionadas/
+WebP generadas automáticamente, y cada `<img>` coincidente en tus páginas
+se reescribe como un `<picture>` responsivo - sin sintaxis nueva de
+Markdown, sin necesidad de configuración para activarlo. Está construido
+sobre [bx-image](https://github.com/ortus-boxlang/bx-image), una
+dependencia obligatoria junto a bx-markdown/bx-esapi/bx-yaml (consulta
+[Primeros Pasos](../getting-started.md#instalación)).
 
-## How it works
+## Cómo funciona
 
-Write an image the normal way - Markdown syntax or raw HTML, file-relative
-to the page just like a [page link](markdown.md) already works:
+Escribe una imagen de la forma habitual - sintaxis de Markdown o HTML en
+bruto, relativa al archivo respecto a la página igual que ya funciona un
+[enlace de página](markdown.md):
 
 ```markdown title="Example"
 ![A freshly built site](../assets/screenshot.png)
 ```
 
-At build time, `screenshot.png` gets resized down to every configured
-width narrower than its own (never upscaled), plus a same-size WebP
-re-encode, and the built page gets:
+En el momento de la construcción, `screenshot.png` se redimensiona hacia
+abajo a cada ancho configurado más estrecho que el suyo propio (nunca se
+amplía), más una recodificación WebP del mismo tamaño, y la página
+construida obtiene:
 
 ```html title="Rendered output" linenums="1"
 <picture>
@@ -35,23 +37,25 @@ re-encode, and the built page gets:
 </picture>
 ```
 
-A browser picks the smallest variant that satisfies `sizes`, in WebP when
-it supports the format, falling back to the plain original `src` (still
-served exactly as before) otherwise. Every other attribute you wrote -
-`alt`, `class`, anything else - is carried over onto the rewritten `<img>`
-untouched.
+Un navegador elige la variante más pequeña que satisfaga `sizes`, en WebP
+cuando admite el formato, recurriendo al `src` original sin procesar
+(servido exactamente igual que antes) en caso contrario. Cualquier otro
+atributo que hayas escrito - `alt`, `class`, cualquier otra cosa - se
+traslada sin cambios al `<img>` reescrito.
 
-An image with no configured width narrower than its own (a small icon,
-say) still gets a full-size WebP re-encode when `"webp"` is in
-`assets.images.formats` - a real file-size win even with no responsive
-breakpoint to offer.
+Una imagen sin ningún ancho configurado más estrecho que el suyo propio
+(un icono pequeño, por ejemplo) igualmente obtiene una recodificación
+WebP a tamaño completo cuando `"webp"` está en `assets.images.formats` -
+una reducción real de tamaño de archivo incluso sin ningún punto de
+ruptura responsivo que ofrecer.
 
-## Captions, alignment and framing
+## Leyendas, alineación y marcos
 
-A caption, a frame, or a multi-image gallery are all just block-level
-HTML - which bx-markdown/Flexmark passes through completely untouched
-(CommonMark's own "HTML block" rule), so no bx-sites-specific syntax is
-needed at all:
+Una leyenda, un marco, o una galería de varias imágenes son todos
+simplemente HTML a nivel de bloque - que bx-markdown/Flexmark deja pasar
+completamente intacto (la propia regla de "bloque HTML" de CommonMark),
+así que no se necesita ninguna sintaxis específica de bx-sites en
+absoluto:
 
 ```markdown title="Example" linenums="1"
 <figure>
@@ -70,38 +74,40 @@ needed at all:
 </div>
 ```
 
-The same is true of `x-data`/`x-show`/`@click` and any other Alpine.js
-attribute - see [Interactivity with Alpine.js](interactivity.md).
+Lo mismo aplica a `x-data`/`x-show`/`@click` y a cualquier otro atributo
+de Alpine.js - consulta
+[Interactividad con Alpine.js](interactivity.md).
 
-## What doesn't get resized
+## Lo que no se redimensiona
 
-- **SVGs** - already resolution-independent, copied through unchanged.
-- **Animated GIFs** - bx-image's resize path is frame-unaware; resizing
-  one would flatten it to a single frame. Copied through unchanged,
-  exactly as before this feature existed.
-- **Anything outside `docs/assets/`** - a remote image URL
-  (`<img src="https://...">`) is left completely untouched, the same way
-  [`extraCss`/`extraJs`](../configuration.md#extracss--extrajs) already
-  treat an absolute URL as "used as-is."
-- **An image already narrower than every configured width** - nothing to
-  generate; the plain `<img>` renders exactly as it did before, unless
-  `"webp"` is enabled (see above).
+- **SVG** - ya independientes de la resolución, se copian sin cambios.
+- **GIF animados** - la ruta de redimensionado de bx-image no distingue
+  fotogramas; redimensionar uno lo aplanaría a un solo fotograma. Se
+  copian sin cambios, exactamente igual que antes de que existiera esta
+  función.
+- **Cualquier cosa fuera de `docs/assets/`** - una URL de imagen remota
+  (`<img src="https://...">`) se deja completamente intacta, de la misma
+  forma que [`extraCss`/`extraJs`](../configuration.md#extracss--extrajs)
+  ya tratan una URL absoluta como "se usa tal cual".
+- **Una imagen ya más estrecha que cualquier ancho configurado** - no hay
+  nada que generar; el `<img>` simple se renderiza exactamente igual que
+  antes, a menos que `"webp"` esté activado (consulta arriba).
 
-There's also no AVIF support yet - bx-image doesn't write that format as
-of this writing. WebP alone still gets most of the size win, with far
-broader tooling/browser support; this is worth revisiting if bx-image
-adds AVIF upstream.
+Tampoco hay todavía soporte para AVIF - bx-image no escribe ese formato
+a día de hoy. Solo WebP ya consigue la mayor parte de la reducción de
+tamaño, con un soporte de herramientas/navegadores mucho más amplio; vale
+la pena revisar esto si bx-image añade AVIF en el futuro.
 
-## Turning it off
+## Desactivarlo
 
 ```json title="bxsites.json"
 { "assets": { "images": { "enabled": false } } }
 ```
 
-Falls back to plain, unprocessed `docs/assets/**` copying - exactly how
-every image was handled before this feature existed.
+Recurre a la copia simple y sin procesar de `docs/assets/**` - exactamente
+como se manejaba cada imagen antes de que existiera esta función.
 
-## Choosing your own breakpoints
+## Elegir tus propios puntos de ruptura
 
 ```json title="bxsites.json" linenums="1"
 {
@@ -114,17 +120,18 @@ every image was handled before this feature existed.
 }
 ```
 
-`widths` defaults to `[400, 800, 1200, 1600]`; `formats` defaults to
-`["original", "webp"]` - drop `"original"` to skip generating resized
-copies in the source format at all (still keeping the plain, full-size
-original as the `<img>` fallback), or drop `"webp"` to skip the WebP
-`<source>` entirely. See [Configuration](../configuration.md#assets) for
-every `assets.images` key.
+`widths` por defecto es `[400, 800, 1200, 1600]`; `formats` por defecto
+es `["original", "webp"]` - elimina `"original"` para omitir por
+completo la generación de copias redimensionadas en el formato de origen
+(conservando aun así el original simple a tamaño completo como
+alternativa del `<img>`), o elimina `"webp"` para omitir por completo el
+`<source>` de WebP. Consulta [Configuración](../configuration.md#assets)
+para cada clave de `assets.images`.
 
-## CSS/JS bundling
+## Empaquetado de CSS/JS
 
-`extraCss`/`extraJs` get bundled the same way, on by default
-(`assets.bundle`):
+`extraCss`/`extraJs` se empaquetan de la misma forma, activado por
+defecto (`assets.bundle`):
 
 ```json title="bxsites.json" linenums="1"
 {
@@ -133,44 +140,51 @@ every `assets.images` key.
 }
 ```
 
-builds one fingerprinted `assets/bundle.<hash>.css` (in the order
-listed) and one `assets/bundle.<hash>.js`, instead of one `<link>`/
-`<script>` tag per entry. CSS gets its comments stripped and whitespace
-collapsed; JS deliberately only gets safe, structural whitespace
-cleanup - never comment stripping, since a naive regex has no way to
-tell a `//` inside a string (`"http://example.com"`) from a real
-comment, and getting that wrong would silently corrupt a project's own
-script. This is bundling and light cleanup, not a true minifier - a
-vendored Java minification library is a reasonable later upgrade if
-this isn't enough.
+construye un `assets/bundle.<hash>.css` con huella digital único (en el
+orden indicado) y un `assets/bundle.<hash>.js`, en lugar de una etiqueta
+`<link>`/`<script>` por entrada. El CSS obtiene sus comentarios
+eliminados y los espacios en blanco colapsados; el JS deliberadamente
+solo obtiene una limpieza segura y estructural de espacios en blanco -
+nunca eliminación de comentarios, ya que una expresión regular ingenua
+no tiene forma de distinguir un `//` dentro de una cadena
+(`"http://example.com"`) de un comentario real, y equivocarse en eso
+corrompería silenciosamente el propio script de un proyecto. Esto es
+empaquetado y limpieza ligera, no un verdadero minificador - una
+biblioteca de minificación de Java incluida es una mejora razonable a
+futuro si esto no resulta suficiente.
 
-Bundling only ever activates when *every* entry in the list is a local
-project file. One external URL (a CDN link) mixed in falls the whole
-list back to today's exact per-URL behavior, rather than risk silently
-reordering a CSS cascade a project depended on:
+El empaquetado solo se activa cuando *cada* entrada de la lista es un
+archivo local del proyecto. Una URL externa (un enlace de CDN) mezclada
+en la lista hace que toda ella recurra al comportamiento actual exacto
+por URL, en lugar de arriesgarse a reordenar silenciosamente una cascada
+CSS de la que dependía un proyecto:
 
 ```json title="bxsites.json"
 { "extraCss": [ "assets/custom.css", "https://cdn.example.com/lib.css" ] }
 ```
 
-renders two separate `<link>` tags, unbundled, exactly as before this
-feature existed.
+renderiza dos etiquetas `<link>` separadas, sin empaquetar, exactamente
+igual que antes de que existiera esta función.
 
-## Fingerprinting and caching
+## Huella digital y caché
 
-Every generated image variant and CSS/JS bundle is content-hash-named
-(`assets.fingerprint`, on by default) - a build only ever changes a
-variant's own filename when its source content actually changes, which
-is what makes a far-future `Cache-Control` header safe to set on a
-static host. A project's own original files under `docs/assets/` keep
-their plain names untouched either way - only pipeline-generated output
-gets fingerprinted, so a `::: file` download card or a raw link to an
-image by its own filename keeps working exactly as it always has.
+Cada variante de imagen generada y cada paquete de CSS/JS tiene un
+nombre con huella digital de contenido (`assets.fingerprint`, activado
+por defecto) - una construcción solo cambia el propio nombre de archivo
+de una variante cuando su contenido de origen realmente cambia, que es
+lo que hace seguro establecer una cabecera `Cache-Control` de futuro
+lejano en un alojamiento estático. Los archivos originales propios de un
+proyecto bajo `docs/assets/` mantienen sus nombres simples sin cambios
+en cualquier caso - solo la salida generada por el pipeline obtiene
+huella digital, así que una tarjeta de descarga `::: file` o un enlace
+en bruto a una imagen por su propio nombre de archivo sigue funcionando
+exactamente igual que siempre.
 
-Every generated variant is cached on disk under a project's own
-`.cache/images/` (removed by [`bxSites clean`](../cli-reference.md#clean),
-alongside `site/`) - keyed by the *source* image's own content hash, so
-re-running `build` (once per version/locale tree, all sharing the same
-`docs/assets/`) or `bxSites serve` after an unrelated edit doesn't
-re-decode/re-resize/re-encode every screenshot in the project, only ones
-that actually changed.
+Cada variante generada se almacena en caché en disco bajo el propio
+`.cache/images/` de un proyecto (eliminado por
+[`bxSites clean`](../cli-reference.md#clean), junto a `site/`) - indexada
+por el propio hash de contenido de la imagen *de origen*, así que volver
+a ejecutar `build` (una vez por árbol de versión/idioma, todos
+compartiendo el mismo `docs/assets/`) o `bxSites serve` después de una
+edición sin relación no vuelve a decodificar/redimensionar/recodificar
+cada captura de pantalla del proyecto, solo las que realmente cambiaron.

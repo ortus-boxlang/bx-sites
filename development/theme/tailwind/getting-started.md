@@ -129,7 +129,7 @@ alongside it - `docs/guides/deployment.md` ends up copied to
 `site/guides/deployment/index.html` - with a "Download Markdown" link on
 the page itself, next to "Edit this page". No config needed, always on.
 
-This is the same motivation as [`llms.txt`](../configuration.md#llmstxt) -
+This is the same motivation as [`llms.txt`](configuration.md#llmstxt) -
 a person (or an LLM) can fetch a page's raw Markdown directly instead of
 scraping rendered HTML - and since the whole `docs/` tree is mirrored 1:1,
 a page's own relative links keep working read this way too.

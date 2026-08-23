@@ -1,44 +1,45 @@
 ---
-title: Interactivity with Alpine.js
+title: Interattività con Alpine.js
 order: 9
 icon: phosphor-duotone:lightning
-tags: [guides, alpine, interactivity]
+tags: [guide, alpine, interattività]
 ---
 
-# Interactivity with Alpine.js
+# Interattività con Alpine.js
 
-Every page built by BX Sites already loads [Alpine.js](https://alpinejs.dev/)
-- it's what powers the built-in dark-mode toggle and language dropdown in
-each of the three built-in themes. That same Alpine instance is available
-to your own page content too, for free: no `bxsites.json` setting to flip,
-no `extraJs` entry to add, no extra `<script>` tag to write in your
-markdown.
+Ogni pagina compilata da BX Sites carica già [Alpine.js](https://alpinejs.dev/)
+- è ciò che alimenta l'interruttore modalità scura integrato e il menu a
+discesa della lingua in ognuno dei tre temi integrati. Quella stessa
+istanza Alpine è disponibile gratuitamente anche per il contenuto delle
+tue pagine: nessuna impostazione di `bxsites.json` da attivare, nessuna
+voce `extraJs` da aggiungere, nessun tag `<script>` extra da scrivere nel
+tuo markdown.
 
-Since [raw block-level HTML passes through
-untouched](images.md#captions-alignment-and-framing) in your markdown,
-you can drop Alpine's `x-data`/`x-show`/`@click`/etc. attributes
-straight onto any HTML block and it just works.
+Dato che l'[HTML grezzo a livello di blocco passa intatto](images.md#captions-alignment-and-framing)
+nel tuo markdown, puoi mettere gli attributi `x-data`/`x-show`/`@click`/ecc.
+di Alpine direttamente su qualsiasi blocco HTML e funziona senza altro.
 
-## Before reaching for Alpine
+## Prima di ricorrere ad Alpine
 
-Most "interactive" needs already have a purpose-built directive block that
-doesn't require writing any JS yourself - reach for these first:
+La maggior parte delle esigenze "interattive" ha già un blocco a direttiva
+pensato apposta che non richiede di scrivere alcun JS in prima persona -
+ricorri prima a questi:
 
-- A collapsible section → [Expandable](content-blocks.md#expandable) or a
-  [collapsible admonition](markdown.md#collapsible-admonitions)
-- Grouped alternative content behind clickable tabs → [Content
-  Tabs](markdown.md#content-tabs)
-- A numbered walkthrough → [Stepper](content-blocks.md#stepper)
+- Una sezione comprimibile → [Espandibile](content-blocks.md#expandable)
+  oppure un'[ammonizione comprimibile](markdown.md#collapsible-admonitions)
+- Contenuto alternativo raggruppato dietro schede cliccabili →
+  [Schede di contenuto](markdown.md#content-tabs)
+- Un percorso guidato numerato → [Stepper](content-blocks.md#stepper)
 
-Alpine is for the interactive content those don't cover - anything with
-its own client-side state.
+Alpine serve per il contenuto interattivo che questi non coprono -
+qualsiasi cosa con un proprio stato lato client.
 
-## A copy-to-clipboard button
+## Un pulsante copia-negli-appunti
 
-A common one: a button next to an install command that copies it and
-confirms the copy:
+Un caso comune: un pulsante accanto a un comando di installazione che lo
+copia e conferma la copia:
 
-```markdown title="Copy button" linenums="1"
+```markdown title="Pulsante di copia" linenums="1"
 <div x-data="{ copied: false }">
   <button type="button" @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
     <span x-show="!copied">Copy install command</span>
@@ -49,16 +50,16 @@ confirms the copy:
 
 <div x-data="{ copied: false }">
   <button type="button" class="btn btn-sm btn-outline-secondary" @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
-    <span x-show="!copied">Copy install command</span>
-    <span x-show="copied" x-cloak>Copied!</span>
+    <span x-show="!copied">Copia il comando di installazione</span>
+    <span x-show="copied" x-cloak>Copiato!</span>
   </button>
 </div>
 
-## A live filter
+## Un filtro dal vivo
 
-Filtering a list client-side, no server round-trip:
+Filtrare una lista lato client, senza andata e ritorno verso il server:
 
-```markdown title="Live filter" linenums="1"
+```markdown title="Filtro dal vivo" linenums="1"
 <div x-data="{ query: '' }">
   <input type="text" x-model="query" placeholder="Filter providers...">
   <ul>
@@ -69,37 +70,42 @@ Filtering a list client-side, no server round-trip:
 </div>
 ```
 
-`x-model` binds the input's value to Alpine state; each `<li>`'s `x-show`
-re-evaluates on every keystroke.
+`x-model` collega il valore dell'input allo stato Alpine; l'`x-show` di
+ogni `<li>` viene rivalutato a ogni tasto premuto.
 
-## `x-data` fundamentals, if you're new to Alpine
+## Le basi di `x-data`, se sei nuovo ad Alpine
 
-`x-data` declares a scope's own reactive state as a plain JS object;
-anything inside that element can read/write it, and `x-show`/`x-text`/
-`x-model`/`@click` (shorthand for `x-on:click`) all react to it changing:
+`x-data` dichiara lo stato reattivo proprio di uno scope come un semplice
+oggetto JS; qualsiasi cosa dentro quell'elemento può leggerlo/scriverlo, e
+`x-show`/`x-text`/`x-model`/`@click` (forma abbreviata di `x-on:click`)
+reagiscono tutti al suo cambiamento:
 
-```markdown title="Example" linenums="1"
+```markdown title="Esempio" linenums="1"
 <div x-data="{ count: 0 }">
   <button type="button" @click="count++">Clicked <span x-text="count"></span> times</button>
 </div>
 ```
 
-See [Alpine's own documentation](https://alpinejs.dev/start-here) for the
-full directive list (`x-if`, `x-for`, `x-transition`, and more).
+Vedi la [documentazione ufficiale di Alpine](https://alpinejs.dev/start-here)
+per l'elenco completo delle direttive (`x-if`, `x-for`, `x-transition`, e
+altre).
 
-## Things to know
+## Cose da sapere
 
-- **It's core, not optional.** The theme chrome (dark mode, language
-  switcher) depends on Alpine, so it can't be turned off in `bxsites.json`
-  the way `mermaid`/`math` can.
-- **Version.** Currently `alpinejs@3.14.1`, vendored with this module and
-  served from `site/assets/vendor/alpine/` - no CDN involved. Check a
-  theme's own `layout.bxm` for the exact `<script>` tag if you need to
-  know precisely what's loaded.
-- **Strict CSP.** Alpine's default build evaluates the JS expressions
-  inside `x-data`/`@click` etc. directly, which needs `unsafe-eval` under
-  a strict Content-Security-Policy. If your deployment can't allow that,
-  don't rely on Alpine in your page content.
-- **Keep it light.** A docs page should stay fast and simple - small,
-  self-contained widgets (a copy button, a filter, a toggle) are a good
-  fit; a full client-side app isn't what this is for.
+- **È fondamentale, non opzionale.** Gli elementi di contorno del tema
+  (modalità scura, cambio lingua) dipendono da Alpine, quindi non può
+  essere disattivato in `bxsites.json` come invece si può fare per
+  `mermaid`/`math`.
+- **Versione.** Attualmente `alpinejs@3.14.1`, incluso con questo modulo
+  e servito da `site/assets/vendor/alpine/` - nessuna CDN coinvolta.
+  Controlla il `layout.bxm` proprio di un tema per il tag `<script>` esatto
+  se ti serve sapere con precisione cosa viene caricato.
+- **CSP rigida.** La build predefinita di Alpine valuta le espressioni JS
+  dentro `x-data`/`@click` ecc. direttamente, il che richiede
+  `unsafe-eval` sotto una Content-Security-Policy rigida. Se la tua
+  distribuzione non può permetterlo, non affidarti ad Alpine nel
+  contenuto delle tue pagine.
+- **Tienilo leggero.** Una pagina di documentazione dovrebbe restare
+  veloce e semplice - piccoli widget autonomi (un pulsante di copia, un
+  filtro, un interruttore) sono adatti; una vera applicazione lato client
+  non è ciò per cui questo esiste.

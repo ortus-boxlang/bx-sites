@@ -1,6 +1,7 @@
 ---
 title: Temas
 order: 1
+icon: phosphor-duotone:palette
 tags: [guías, temas]
 ---
 
@@ -26,7 +27,7 @@ propio motor de utilidades del tema `tailwind` (un compilador JIT del
 lado del cliente, no una hoja de estilo estática) y otras funciones
 opcionales que actives tú mismo (`math`, búsqueda de Algolia, Google
 Analytics) siguen cargándose desde un CDN o una API alojada - consulta
-[Sitios sin conexión a internet](#air-gapped-offline-sites) más abajo.
+[Sitios sin conexión a internet](#sitios-sin-conexión-a-internet-air-gapped) más abajo.
 
 Los tres aplican la misma paleta de marca de BoxLang: un degradado
 `#00FF78 -> #00DBFF` y un acento `#FFF500` - y los tres incluyen el mismo
@@ -44,7 +45,7 @@ conjunto de funciones de página:
   **botón de copiar** - mostrado al pasar el cursor en dispositivos que lo
   admiten, siempre visible en dispositivos táctiles (donde no hay hover
   para revelarlo). Consulta
-  [Extensiones de Markdown](markdown.md#code-blocks).
+  [Extensiones de Markdown](markdown.md#bloques-de-código).
 - **Fuentes web autoalojadas** - sin solicitudes a `fonts.googleapis.com`
   al momento de la visualización.
 - **Un interruptor de modo claro/oscuro**, impulsado por
@@ -69,13 +70,13 @@ conjunto de funciones de página:
   que ella misma (o un LLM) pueda leer la página como Markdown simple
   directamente en lugar de analizar el HTML renderizado. Siempre activo,
   sin configuración necesaria. Consulta
-  [Primeros Pasos](../getting-started.md#downloading-a-page-as-markdown).
+  [Primeros Pasos](../getting-started.md#descargar-una-página-como-markdown).
 - **Un pie de página opcional** (copyright, enlaces `social`, un crédito
   "Built with BX Sites") cuando el `footer` de `bxsites.json` es `true`.
   Consulta [Configuración](../configuration.md#footer).
 - **Un selector de versión**, que aparece automáticamente en cuanto un
   proyecto tiene una carpeta `docs/versions/` con más de una versión en
-  ella. Consulta [Configuración](../configuration.md#versioning).
+  ella. Consulta [Configuración](../configuration.md#versionado).
 - **Un `404.html` con el tema aplicado**, servido automáticamente por la
   mayoría de los alojamientos estáticos (incluido GitHub Pages) para
   cualquier ruta sin coincidencia.
@@ -96,7 +97,7 @@ conjunto de funciones de página:
 - **Etiquetas de página, un icono y una línea de resumen**, todo opcional
   mediante el propio frontmatter de una página - las etiquetas se
   renderizan como insignias que enlazan a un índice `/tags/` de todo el
-  sitio. Consulta [Primeros Pasos](../getting-started.md#add-pages).
+  sitio. Consulta [Primeros Pasos](../getting-started.md#añadir-páginas).
 - **Una navegación explícita personalizada**, en `bxsites.json` o en su
   propio `docs/nav.json`, que reemplaza la inferencia por carpetas en
   sitios grandes. Consulta [Configuración](../configuration.md#nav).
@@ -106,18 +107,18 @@ conjunto de funciones de página:
 - **Cuadros de aviso (nota/advertencia/consejo/...)**, activos por
   defecto en el markdown de cualquier página, incluidas variantes
   colapsables - sin configuración necesaria. Consulta
-  [Extensiones de Markdown](markdown.md#admonitions).
+  [Extensiones de Markdown](markdown.md#admoniciones).
 - **Notas al pie y listas de definiciones**, opcionales mediante
   `markdown` de `bxsites.json`. Consulta
-  [Extensiones de Markdown](markdown.md#footnotes).
+  [Extensiones de Markdown](markdown.md#notas-al-pie).
 - **Pestañas de contenido**, **números de línea de código/líneas
   resaltadas/títulos** y **marcadores de diff/marcos de terminal** para
   bloques de código, sin configuración necesaria. Consulta
-  [Extensiones de Markdown](markdown.md#content-tabs).
+  [Extensiones de Markdown](markdown.md#pestañas-de-contenido).
 - **Diagramas Mermaid**, opcionales mediante `mermaid` de `bxsites.json`.
-  Consulta [Extensiones de Markdown](markdown.md#diagrams).
+  Consulta [Extensiones de Markdown](markdown.md#diagramas).
 - **Matemáticas** (KaTeX), opcional mediante `math` de `bxsites.json`.
-  Consulta [Extensiones de Markdown](markdown.md#math).
+  Consulta [Extensiones de Markdown](markdown.md#matemáticas).
 
 Define cuál usa un proyecto en `bxsites.json`:
 
@@ -125,7 +126,7 @@ Define cuál usa un proyecto en `bxsites.json`:
 { "theme": { "name": "material" } }
 ```
 
-## Sitios sin conexión a internet (air-gapped) {#air-gapped-offline-sites}
+## Sitios sin conexión a internet (air-gapped)
 
 Un sitio construido funciona sin ningún acceso a internet por defecto,
 para los temas `bootstrap` y `material` con el proveedor de búsqueda

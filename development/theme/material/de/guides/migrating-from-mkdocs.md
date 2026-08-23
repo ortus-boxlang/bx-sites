@@ -1,34 +1,37 @@
 ---
-title: Migrating from mkdocs
+title: Migration von mkdocs
 order: 8
 icon: phosphor-duotone:swap
-tags: [guides, migration, mkdocs]
+tags: [anleitungen, migration, mkdocs]
 ---
 
-# Migrating from mkdocs
+# Migration von mkdocs
 
-`bxSites migrate --from=mkdocs` converts an mkdocs project - `mkdocs.yml`
-plus its `docs/` folder - into a complete bx-sites project, in one command:
+`bxSites migrate --from=mkdocs` wandelt ein mkdocs-Projekt - `mkdocs.yml`
+plus dessen `docs/`-Ordner - mit einem Befehl in ein vollständiges
+bx-sites-Projekt um:
 
 ```bash frame="terminal" title="Terminal"
 bxSites migrate --source=/path/to/mkdocs-project --from=mkdocs
 ```
 
-- `--source` (required) - the mkdocs project's root directory (must contain `mkdocs.yml`)
+- `--source` (erforderlich) - das Wurzelverzeichnis des mkdocs-Projekts (muss `mkdocs.yml` enthalten)
 
-Unlike [migrating from GitBook](migrating-from-gitbook.md), this is mostly
-a *config* translation, not a *content* one. mkdocs' own `docs/` folder
-already uses bx-sites' exact conventions - folder nesting is nav structure,
-`index.md` is a folder's own home page, and relative `.md` links between
-pages just work. More to the point: mkdocs-material's own extended
-Markdown syntax is the *same textual syntax* bx-sites already speaks,
-because bx-sites modeled itself on mkdocs-material to begin with (see
-[Markdown Extensions](markdown.md)). So page bodies are copied across
-byte-for-byte unchanged - nothing here needs to rewrite `!!! note`
-admonitions, `=== "Tab"` content tabs, or `$x^2$` math, because they're
-already valid bx-sites syntax.
+Anders als die [Migration von GitBook](migrating-from-gitbook.md) ist
+dies größtenteils eine *Konfigurations*-Übersetzung, keine
+*Inhalts*-Übersetzung. Der eigene `docs/`-Ordner von mkdocs verwendet
+bereits genau die Konventionen von bx-sites - Ordnerverschachtelung ist
+Navigationsstruktur, `index.md` ist die eigene Startseite eines Ordners,
+und relative `.md`-Links zwischen Seiten funktionieren einfach. Genauer
+gesagt: die eigene erweiterte Markdown-Syntax von mkdocs-material ist
+*dieselbe textuelle Syntax*, die bx-sites bereits spricht, weil sich
+bx-sites von Anfang an an mkdocs-material orientiert hat (siehe
+[Markdown-Erweiterungen](markdown.md)). Seiteninhalte werden also
+Byte für Byte unverändert übernommen - nichts hier muss
+`!!! note`-Admonitions, `=== "Tab"`-Content-Tabs oder `$x^2$`-Mathematik
+umschreiben, weil sie bereits gültige bx-sites-Syntax sind.
 
-## What gets converted automatically
+## Was automatisch konvertiert wird
 
 **`mkdocs.yml` → `bxsites.yaml`:**
 
@@ -38,18 +41,18 @@ already valid bx-sites syntax.
 | `site_description` | `description` |
 | `site_url` | `baseURL` |
 | `theme.name: material` | `theme.name: "material"` |
-| any other `theme.name` | `theme.name: "bootstrap"` (bx-sites' own default) - reported as a warning, since the visual result differs |
+| jedes andere `theme.name` | `theme.name: "bootstrap"` (der eigene Standard von bx-sites) - als Warnung gemeldet, da sich das visuelle Ergebnis unterscheidet |
 | `repo_url` / `edit_uri` | `repo.url` / `repo.editUri` |
 | `extra_css` / `extra_javascript` | `extraCss` / `extraJs` |
 | `markdown_extensions: [footnotes]` | `markdown.enableFootnotes: true` |
 | `markdown_extensions: [def_list]` | `markdown.enableDefinitionLists: true` |
 | `markdown_extensions: [pymdownx.arithmatex]` | `math: true` |
 
-Every other `markdown_extensions` entry mkdocs-material's own syntax
-already covers natively - `admonition`, `pymdownx.tabbed`,
-`pymdownx.details`, `pymdownx.superfences`, `pymdownx.highlight`,
-`toc`, `attr_list`, and more - needs no `bxsites.yaml` change at all;
-bx-sites already behaves that way out of the box.
+Jeder andere `markdown_extensions`-Eintrag, den die eigene Syntax von
+mkdocs-material bereits nativ abdeckt - `admonition`, `pymdownx.tabbed`,
+`pymdownx.details`, `pymdownx.superfences`, `pymdownx.highlight`, `toc`,
+`attr_list` und mehr - braucht überhaupt keine `bxsites.yaml`-Änderung;
+bx-sites verhält sich bereits von Haus aus so.
 
 **`nav:` → `docs/nav.json`:**
 
@@ -63,7 +66,7 @@ nav:
   - About: about.md
 ```
 
-becomes:
+wird zu:
 
 ```json title="docs/nav.json" linenums="1"
 [
@@ -76,42 +79,49 @@ becomes:
 ]
 ```
 
-- a bare path entry (`- about.md`, no explicit title) converts too - its
-  title comes from the migrated page's own frontmatter/first-heading, the
-  same as any bx-sites `docs/nav.json` entry with no `title` set
-- see [Configuration: `nav`](../configuration.md#nav) for the full format
+- ein bloßer Pfad-Eintrag (`- about.md`, ohne expliziten Titel) wird
+  ebenfalls konvertiert - sein Titel stammt aus der eigenen Frontmatter/
+  ersten Überschrift der migrierten Seite, genau wie bei jedem
+  bx-sites-`docs/nav.json`-Eintrag ohne gesetztes `title`
+- siehe [Konfiguration: `nav`](../configuration.md#nav) für das
+  vollständige Format
 
-**Pages and assets:**
+**Seiten und Assets:**
 
-- every `.md` file is copied to the same path under `docs/`, unchanged
-- every *other* file (images, PDFs, ...) is relocated to
-  `docs/assets/mkdocs/<same-relative-path>` - bx-sites' own asset pipeline
-  only ever publishes `docs/assets/**`, and mkdocs has no single
-  asset-folder convention of its own the way GitBook's `.gitbook/assets/`
-  is, so images are commonly scattered next to the pages that use them
-- every reference to a relocated asset - `![diagram](img/diagram.png)`,
-  say - is rewritten to the correct relative path reaching its new
-  location, accounting for how deep the linking page itself sits (the
-  same "author writes the right number of `../`" convention any bx-sites
-  project already uses - computed for you here instead of left to a
-  find-and-replace)
+- jede `.md`-Datei wird unverändert an denselben Pfad unter `docs/`
+  kopiert
+- jede *andere* Datei (Bilder, PDFs, ...) wird nach
+  `docs/assets/mkdocs/<derselbe-relative-Pfad>` verschoben - die eigene
+  Asset-Pipeline von bx-sites veröffentlicht ausschließlich
+  `docs/assets/**`, und mkdocs hat keine einzelne
+  Asset-Ordner-Konvention, wie es GitBooks `.gitbook/assets/` ist,
+  sodass Bilder häufig verstreut neben den Seiten liegen, die sie
+  verwenden
+- jede Referenz auf ein verschobenes Asset - `![diagram](img/diagram.png)`,
+  etwa - wird auf den korrekten relativen Pfad zu seinem neuen Ort
+  umgeschrieben, unter Berücksichtigung dessen, wie tief die
+  verlinkende Seite selbst liegt (dieselbe Konvention "der Autor
+  schreibt die richtige Anzahl von `../`", die jedes bx-sites-Projekt
+  bereits verwendet - hier für dich berechnet, statt einem
+  Suchen-und-Ersetzen überlassen)
 
-## What needs a manual look
+## Was einen manuellen Blick braucht
 
-Reported as warnings in the command's own output, nothing is silently
-dropped:
+Als Warnungen in der eigenen Ausgabe des Befehls gemeldet, nichts wird
+stillschweigend verworfen:
 
-- an mkdocs `markdown_extensions`/`plugins` entry with no bx-sites
-  equivalent (mkdocs-material's own emoji shortcodes, a third-party
-  plugin like `awesome-pages` or `git-revision-date`) - if you need the
-  same behavior, see [Plugins](plugins.md)
-- `mkdocs.yml`'s own color/font customization
-  (`theme.palette`/`theme.font`) has no direct equivalent - see
-  [Customizing colors](themes.md#customizing-colors-without-a-theme-override)
-  once the migration is done
-- a `theme.name` other than `material` (defaulted to `bootstrap`)
+- ein mkdocs-`markdown_extensions`-/`plugins`-Eintrag ohne
+  bx-sites-Entsprechung (die eigenen Emoji-Shortcodes von
+  mkdocs-material, ein Drittanbieter-Plugin wie `awesome-pages` oder
+  `git-revision-date`) - wenn du dasselbe Verhalten brauchst, siehe
+  [Plugins](plugins.md)
+- die eigene Farb-/Schriftanpassung von `mkdocs.yml`
+  (`theme.palette`/`theme.font`) hat keine direkte Entsprechung - siehe
+  [Farben anpassen](themes.md#farben-anpassen-ohne-ein-theme-zu-überschreiben),
+  sobald die Migration abgeschlossen ist
+- ein `theme.name` außer `material` (fällt auf `bootstrap` zurück)
 
-## Worked example
+## Durchgearbeitetes Beispiel
 
 ```bash frame="terminal" title="Terminal" linenums="1"
 boxlang module:bxSites new --projectRoot=my-docs
@@ -120,8 +130,10 @@ cd my-docs
 boxlang module:bxSites serve
 ```
 
-`migrate` writes `bxsites.yaml` and `docs/` itself - the `new` step above
-is only there to get a project root with `docs/` ready to receive them;
-migrate creates `docs/` on its own too, so it's not strictly required.
-Review the command's own warnings, then `serve` to see the result before
-committing it.
+`migrate` schreibt `bxsites.yaml` und `docs/` selbst - der `new`-Schritt
+oben dient nur dazu, ein Projekt-Wurzelverzeichnis mit `docs/`
+bereitzustellen, das bereit ist, sie zu empfangen; `migrate` erstellt
+`docs/` auch selbst, es ist also nicht zwingend erforderlich. Überprüfe
+die eigenen Warnungen des Befehls, dann `serve`, um das Ergebnis zu
+sehen, bevor du es committest.
+</content>
