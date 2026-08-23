@@ -263,7 +263,7 @@ class {
 		html &= renderDraftBadgeHtml( arguments.post )
 
 		if ( len( trim( arguments.post.image ?: "" ) ) ) {
-			html &= '<a href="' & arguments.basePath & arguments.post.urlPath & '">' & variables.responsiveImageProcessor.pictureTag( arguments.post.image, 'alt="" style="max-width:100%;height:auto;"', arguments.basePath, arguments.imageManifest ) & '</a>'
+			html &= '<a href="' & arguments.basePath & arguments.post.urlPath & '">' & variables.responsiveImageProcessor.pictureTag( arguments.post.image, 'alt="" style="max-width:100%;height:auto;" class="blog-post-card-image"', arguments.basePath, arguments.imageManifest ) & '</a>'
 		}
 
 		html &= '<h2><a href="' & arguments.basePath & arguments.post.urlPath & '">' & encodeForHTML( arguments.post.title ) & '</a></h2>'

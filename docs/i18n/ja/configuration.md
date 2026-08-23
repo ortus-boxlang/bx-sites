@@ -3,7 +3,7 @@ title: 設定
 order: 4
 icon: phosphor-duotone:gear-six
 summary: サイト設定のすべてのキー、デフォルト値、および動作。
-tags: [reference, configuration]
+tags: [リファレンス, 設定]
 ---
 
 # 設定
@@ -12,7 +12,7 @@ tags: [reference, configuration]
 `bxsites.yaml`（または `.yml`）を使うか、そのまま使い続けたいプロジェクト向けの `bxsites.json` を
 使うかのいずれかです。どちらも完全にサポートされており、まったく同じ結果になります。
 `bxSites new` は `--format=json` を指定しない限り `bxsites.yaml` をスキャフォールドします
-（[はじめに](getting-started.md#config-file-format) を参照）。プロジェクトに何らかの理由で
+（[はじめに](getting-started.md#設定ファイルの形式) を参照）。プロジェクトに何らかの理由で
 複数の設定ファイルが存在する場合は、`bxsites.yaml` が優先され、次に `bxsites.yml`、
 最後に `bxsites.json` の順で使用されます。
 
@@ -112,7 +112,7 @@ YAML でも同様に読み替えられます。
 
 サイトの説明（省略可）。独自の `description` フロントマターを持たないページの
 フォールバック `<meta name="description">` および `og:description` として使用されます
-（[はじめに](getting-started.md#add-pages) を参照）。
+（[はじめに](getting-started.md#ページの追加) を参照）。
 
 ## `baseURL`
 

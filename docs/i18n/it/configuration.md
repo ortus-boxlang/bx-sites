@@ -207,6 +207,56 @@ attiva il box di ricerca; `false` salta entrambi del tutto - nessun
 `search-index.json`, nessuna UI di ricerca, nessun JS extra distribuito.
 Vedi [Ricerca](guides/search.md).
 
+## `searchProvider`
+
+Quale UI di ricerca `search: true` attiva:
+
+- `provider` - `"local"` (il valore predefinito) è la ricerca
+  statica/lato client propria di bx-sites (`search-index.json` + lunr.js,
+  vedi [Ricerca](guides/search.md#local-the-default)). `"algolia"` attiva
+  invece [Algolia DocSearch](guides/search.md#algolia), e `"pagefind"`
+  attiva [Pagefind](guides/search.md#pagefind). Qualsiasi altro valore è un
+  provider personalizzato del progetto, collegato tramite una
+  sovrascrittura `theme/` - vedi
+  [Ricerca](guides/search.md#other-search-providers).
+- `algolia` - obbligatorio quando `provider` è `"algolia"`: `appId`,
+  `apiKey` (la chiave API pubblica *solo per la ricerca*, non una chiave
+  da amministratore) e `indexName`, esattamente come li richiede il
+  client DocSearch di Algolia stesso. `insights` (`false` di default)
+  attiva l'analytics di click/conversione proprio di DocSearch.
+
+  ```json title="bxsites.json" linenums="1"
+  {
+    "search": true,
+    "searchProvider": {
+      "provider": "algolia",
+      "algolia": {
+        "appId": "ABC123",
+        "apiKey": "a1b2c3d4e5f6...",
+        "indexName": "my-docs"
+      }
+    }
+  }
+  ```
+
+- `pagefind` - entrambe le chiavi opzionali quando `provider` è
+  `"pagefind"`: `bin` (predefinito `"pagefind"`) è il nome/percorso
+  dell'eseguibile CLI, risolto rispetto a `PATH` quando è un nome nudo;
+  `options` è un array di flag CLI grezzi extra passati direttamente. La
+  CLI `pagefind` stessa deve essere già installata e su `PATH` - BX Sites
+  ci esegue uno shell out (come `git` per `lastUpdated`/`gh-deploy`), non
+  la installa al posto tuo.
+
+  ```json title="bxsites.json" linenums="1"
+  {
+    "search": true,
+    "searchProvider": {
+      "provider": "pagefind",
+      "pagefind": { "bin": "pagefind", "options": [] }
+    }
+  }
+  ```
+
 ## `nav`
 
 Per impostazione predefinita, la nav viene dedotta dalla struttura stessa
@@ -442,6 +492,69 @@ vengono caricate con `defer`.
 	"extraJs": [ "assets/custom.js" ]
 }
 ```
+
+Quando `assets.bundle` è attivo (il valore predefinito), un elenco locale
+di `extraCss`/`extraJs` come quello sopra viene raggruppato in un unico
+file con impronta digitale ciascuno, invece di un tag `<link>`/`<script>`
+per ogni voce - vedi [`assets`](#assets) sotto.
+
+## `assets`
+
+```json title="bxsites.json" linenums="1"
+{
+	"assets": {
+		"fingerprint": true,
+		"bundle": true,
+		"images": {
+			"enabled": true,
+			"widths": [ 400, 800, 1200, 1600 ],
+			"formats": [ "original", "webp" ]
+		}
+	}
+}
+```
+
+La pipeline degli asset - ridimensionamento immagini/WebP tramite
+[bx-image](https://github.com/ortus-boxlang/bx-image) (una dipendenza
+obbligatoria, installata insieme a bx-markdown/bx-esapi) e bundling
+CSS/JS. Tutto qui è attivo di default con impostazioni ragionevoli - un
+progetto appena generato con `bxSites new` non deve toccare nulla di
+questo. Vedi [Immagini Responsive](guides/images.md) per il quadro
+completo, incluso ciò che deliberatamente non è coperto (AVIF, GIF
+animate, SVG).
+
+- `assets.fingerprint` - `true` (il valore predefinito). Assegna un nome
+  basato sull'hash del contenuto a ogni variante di immagine generata e a
+  ogni bundle CSS/JS (ad es. `screenshot-800w.a3f9c2e1.webp`,
+  `bundle.a3f9c2e1.css`) così possono essere serviti con header di cache
+  sicuri a lunghissima scadenza - un build cambia il nome proprio del
+  file solo quando il suo contenuto cambia davvero. Non rinomina i file
+  originali di un progetto sotto `docs/assets/` - solo l'output generato
+  dalla pipeline ottiene l'impronta digitale, quindi qualsiasi altra cosa
+  che fa riferimento a un asset con il proprio nome file semplice (una
+  card di download `::: file`, un link markdown grezzo) continua a
+  funzionare senza modifiche.
+- `assets.bundle` - `true` (il valore predefinito). Concatena
+  `extraCss`/`extraJs` in un unico file con impronta digitale ciascuno -
+  puro BoxLang/JVM, nessuna toolchain Node/esbuild. Ricade sull'esatto
+  comportamento odierno per-URL con `<link>`/`<script>`, senza modifiche,
+  nel momento in cui una qualsiasi voce dell'elenco è un URL esterno (un
+  link CDN) o nomina un file che non esiste - vedi
+  [Immagini Responsive](guides/images.md#css-js-bundling).
+- `assets.images.enabled` - `true` (il valore predefinito). Ogni immagine
+  idonea sotto `docs/assets/**` (`.png`/`.jpg`/`.jpeg`) ottiene varianti
+  ridimensionate/WebP generate tramite bx-image, e ogni `<img>`
+  corrispondente viene riscritto in un `<picture>` con `srcset`. Imposta
+  `false` per ricadere sulla semplice copia non elaborata delle immagini,
+  esattamente come prima che questa funzionalità esistesse.
+- `assets.images.widths` - i breakpoint da generare, in pixel. Una
+  larghezza pari o superiore a quella propria di una data immagine viene
+  saltata automaticamente per quell'immagine - niente viene mai
+  ingrandito.
+- `assets.images.formats` - `"original"` mantiene il formato sorgente
+  come ripiego dell'`<img>`; `"webp"` aggiunge una variante
+  `<source type="image/webp">` alla stessa dimensione. Entrambi attivi di
+  default.
 
 ## `mermaid`
 

@@ -39,6 +39,22 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.contentHtml ).toInclude( '<h2 id="tag-getting-started">Getting Started</h2>' );
 			} );
 
+			it( "preserves accented/non-Latin letters in a tag's own slug instead of stripping them to nothing", function() {
+				// encodeForHTML()'s exact escaping range for non-ASCII text is
+				// environment-dependent (see htmlDecode()'s own use elsewhere in
+				// this suite) - only the `id` attribute (never HTML-escaped) is
+				// asserted on here, not the escaped visible heading text.
+				var pages = [
+					page( "Página", "es/index.html", [ "Configuración" ] ),
+					page( "ページ", "ja/index.html", [ "ガイド" ] )
+				];
+
+				var result = builder.build( pages, "/" );
+
+				expect( result.contentHtml ).toInclude( '<h2 id="tag-configuración">' );
+				expect( result.contentHtml ).toInclude( '<h2 id="tag-ガイド">' );
+			} );
+
 			it( "prefixes linked page urls with basePath", function() {
 				var result = builder.build( [ page( "Guide", "guide/index.html", [ "cli" ] ) ], "/my-docs/" );
 

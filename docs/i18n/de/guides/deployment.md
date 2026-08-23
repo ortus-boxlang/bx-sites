@@ -1,6 +1,7 @@
 ---
 title: Deployment auf GitHub Pages
 order: 3
+icon: phosphor-duotone:cloud-arrow-up
 tags: [anleitungen, deployment]
 ---
 

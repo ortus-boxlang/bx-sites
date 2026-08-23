@@ -3,7 +3,7 @@ title: はじめに
 order: 2
 icon: phosphor-duotone:rocket-launch
 summary: モジュールをインストールし、プロジェクトをスキャフォールドして、最初のサイトをビルドします。
-tags: [guides, setup]
+tags: [ガイド, セットアップ]
 ---
 
 # はじめに
@@ -98,7 +98,7 @@ docs/
 
 ```markdown
 [デプロイ](guides/deployment.md) を参照するか、そのガイドから
-[はじめに](../getting-started.md#add-pages) に戻ることができます。
+[はじめに](../getting-started.md#ページの追加) に戻ることができます。
 ```
 
 BX Sites はビルド時にすべてのリンクをキレイな URL に書き換えます
@@ -120,7 +120,7 @@ title: デプロイ
 order: 2
 hidden: false
 description: ビルドした BX Sites サイトのデプロイ方法。
-tags: [guides, deployment]
+tags: [ガイド, デプロイ]
 icon: 🚀
 summary: サイトを公開するために必要なすべてのこと。
 ogImage: assets/deployment-card.png
