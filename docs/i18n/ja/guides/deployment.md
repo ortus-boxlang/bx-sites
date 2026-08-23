@@ -23,10 +23,10 @@ GitHub Actions ワークフロー（毎回の Push で自動マルチバージ�
 触れる `main` または `development` へのすべての Push で、ワークフローが:
 
 1. BoxLang + [bx-markdown](https://github.com/ortus-boxlang/bx-markdown) をインストール
-2. このリポジトリをモジュールとして登録して `boxlang module:bxSites build` を解決
+2. このリポジトリをモジュールとして登録して `boxlang bxSites build` を解決
 3. `main` 以外のブランチでは、このビルドのみ `baseURL` を `.../<branch-name>/` に設定
    （[以下を参照](#2-つのバージョンを同時に公開)）
-4. `boxlang module:bxSites build` を実行
+4. `boxlang bxSites build` を実行
 5. `site/` を `gh-pages` ブランチに Push（`main` はサイトルート、`development` は `/development/`）、
    もう一方のバージョンには触れません
 

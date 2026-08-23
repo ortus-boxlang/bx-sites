@@ -11,7 +11,7 @@
 #
 # Usage: ./buildMultiTheme.sh [projectRoot]   (defaults to ".")
 #
-# Requires: boxlang (with this module registered so `module:bxSites`
+# Requires: boxlang (with this module registered so `bxSites`
 # resolves), yq (mikefarah/yq - https://github.com/mikefarah/yq).
 
 set -euo pipefail
@@ -66,7 +66,7 @@ build_variant() {
 	local name="$1"
 	echo "==> Building [${name}]"
 	rm -rf site
-	boxlang module:bxSites build
+	boxlang bxSites build
 	if [[ ! -d site ]]; then
 		echo "error: build for [${name}] produced no site/ directory" >&2
 		exit 1

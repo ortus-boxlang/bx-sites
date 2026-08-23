@@ -38,7 +38,7 @@ bxSites <verb> [options]
 または、BoxLang は使えるが `PATH` のシムが設定されていない環境（CI ランナー、手動登録のモジュールなど）では:
 
 ```bash
-boxlang module:bxsites <verb> [options]
+boxlang bxSites <verb> [options]
 ```
 
 このガイドでは短縮形を使用します。

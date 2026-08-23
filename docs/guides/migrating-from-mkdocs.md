@@ -114,10 +114,10 @@ dropped:
 ## Worked example
 
 ```bash frame="terminal" title="Terminal" linenums="1"
-boxlang module:bxSites new --projectRoot=my-docs
-boxlang module:bxSites migrate --projectRoot=my-docs --source=../my-mkdocs-project --from=mkdocs
+bxSites new --projectRoot=my-docs
+bxSites migrate --projectRoot=my-docs --source=../my-mkdocs-project --from=mkdocs
 cd my-docs
-boxlang module:bxSites serve
+bxSites serve
 ```
 
 `migrate` writes `bxsites.yaml` and `docs/` itself - the `new` step above

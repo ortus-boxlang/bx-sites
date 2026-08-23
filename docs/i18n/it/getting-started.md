@@ -43,7 +43,7 @@ sia, ovunque BoxLang sia disponibile ma quello shim sul `PATH` non lo sia
 entrambe le forme eseguono esattamente la stessa cosa:
 
 ```bash
-boxlang module:bxsites <verbo> [opzioni]
+boxlang bxSites <verbo> [opzioni]
 ```
 
 Il resto di questa guida usa la forma breve.

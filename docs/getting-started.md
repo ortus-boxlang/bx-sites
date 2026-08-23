@@ -42,7 +42,7 @@ runner, a module registered by hand rather than installed) - both forms
 run the exact same thing:
 
 ```bash title="Usage (no PATH shim)"
-boxlang module:bxsites <verb> [options]
+boxlang bxSites <verb> [options]
 ```
 
 The rest of this guide uses the short form.

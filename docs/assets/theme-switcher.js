@@ -77,7 +77,7 @@
 	}
 
 	function init() {
-		// A placeholder left un-substituted (e.g. a normal `boxlang module:bxSites
+		// A placeholder left un-substituted (e.g. a normal `boxlang bxSites
 		// build` run of this same project, outside the multi-theme script) means
 		// there's only one variant on this deployment - nothing to switch to.
 		if ( ROOT.indexOf( "BXSITES_ROOT" ) !== -1 ) {

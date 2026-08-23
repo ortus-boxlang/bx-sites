@@ -27,11 +27,11 @@ A ogni push su `main` o `development` che tocca `docs/`, `bxsites.json`, o
 il sorgente stesso del modulo (modifiche a tema/pipeline), il workflow:
 
 1. Installa BoxLang + [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
-2. Registra questo repository come modulo così che `boxlang module:bxSites build` si risolva
+2. Registra questo repository come modulo così che `boxlang bxSites build` si risolva
 3. Su qualsiasi branch diverso da `main`, punta `baseURL` a
    `.../<nome-branch>/` solo per questo build (vedi
    [sotto](#publishing-two-versions-at-once))
-4. Esegue `boxlang module:bxSites build`
+4. Esegue `boxlang bxSites build`
 5. Invia `site/` al branch `gh-pages` - `main` alla radice del sito,
    `development` a `/development/` - senza toccare l'altra versione
 

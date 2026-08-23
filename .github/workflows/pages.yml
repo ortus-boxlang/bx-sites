@@ -56,7 +56,7 @@ jobs:
           with-commandbox: true
           modules: bx-markdown bx-yaml bx-image
 
-      - name: Register this module so `module:bxSites` resolves
+      - name: Register this module so `bxSites` resolves
         run: |
           # setup-boxlang points BOXLANG_HOME at ${GITHUB_WORKSPACE}/.boxlang
           # (already owned by the runner user) - that's where BoxLang actually
