@@ -72,6 +72,7 @@ boxlang bxSites <verb> [options]
 | `i18n:new` | Scaffold a new `docs/i18n/<code>/` locale |
 | `page:new` | Scaffold a single docs page at an arbitrary path |
 | `plugin:new` | Scaffold a plugin module skeleton |
+| `install:plugin` | Download a plugin from ForgeBox into project-local `boxlang_modules/` |
 | `theme:new` | Eject a built-in theme into project `theme/` for customizing |
 | `page:rename` | Move a docs page and rewrite every relative link that pointed at it |
 | `blog:drafts` | List every blog post whose frontmatter sets `draft: true` |

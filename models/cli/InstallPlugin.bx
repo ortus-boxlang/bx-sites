@@ -1,0 +1,32 @@
+/**
+ * `install:plugin` CLI verb - thin dispatcher over PluginInstaller.install().
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path), name (required - the ForgeBox slug), version (optional - a specific version, defaults to latest) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxSites.MissingProjectRoot", message = "`install:plugin` requires a project root" )
+		}
+
+		var name = trim( arguments.options.name ?: "" )
+		if ( !len( name ) ) {
+			throw( type = "BxSites.MissingPluginName", message = "`install:plugin` requires --name=<ForgeBox slug>" )
+		}
+
+		var version = trim( arguments.options.version ?: "" )
+
+		var installer = new "models.build.PluginInstaller@bxsites"()
+		var result = installer.install( projectRoot : projectRoot, slug : name, version : version )
+		var versionSuffix = len( result.version ) ? ( "@" & result.version ) : ""
+
+		return {
+			exitCode : 0,
+			message  : 'Installed [#result.slug##versionSuffix#] into boxlang_modules/#result.slug#/ and loaded it as module [#result.mappingName#] - add "#result.mappingName#" to bxsites.yaml''s [plugins] array to activate it'
+		}
+	}
+
+}

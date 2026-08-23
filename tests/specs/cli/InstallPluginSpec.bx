@@ -1,0 +1,47 @@
+/**
+ * cli.InstallPlugin only covers guard clauses here, matching cli.GhDeploy's
+ * own spec (GhDeploySpec.bx) - a successful run needs a live ForgeBox
+ * network call (PluginInstaller.bx's own ForgeBoxClient), which this plain
+ * unit-test environment doesn't have. The download/extract mechanics are
+ * fully covered against a fake ForgeBoxClient in PluginInstallerSpec.bx.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.InstallPlugin", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.InstallPlugin@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newProjectRoot() {
+				var dir = createTempDirectory( prefix = "bxsites-cli-installplugin-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( { name : "bx-sites-plugin-foo" } );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
+			} );
+
+			it( "throws BxSites.MissingPluginName when name is blank", function() {
+				expect( function() {
+					verb.run( { projectRoot : newProjectRoot() } );
+				} ).toThrow( "BxSites.MissingPluginName" );
+			} );
+
+		} );
+	}
+
+}

@@ -313,6 +313,24 @@ bxSites plugin:new --name=my-analytics-plugin [--dest=...]
 See [Plugins](guides/plugins.md) for the hook reference and how to wire the
 finished plugin into `bxsites.json`'s `plugins` array.
 
+## `install:plugin`
+
+Download a published plugin from ForgeBox and drop it straight into the
+project's own `boxlang_modules/` - BoxLang's own auto-loaded local-module
+convention, so nothing beyond the `bxSites` binary itself is needed (no
+`box`/CommandBox involved).
+
+```bash title="Usage"
+bxSites install:plugin --name=bx-sites-plugin-analytics [--version=1.2.0]
+```
+
+- `--name` (required) - the ForgeBox slug to install
+- `--version` - a specific version; omit for the latest
+
+Prints the module's real registered mapping name once loaded - add that
+name to `bxsites.json`'s `plugins` array to activate it (installing alone
+never activates a plugin - see [Plugins](guides/plugins.md)).
+
 ## `theme:new`
 
 Eject one of the built-in themes (`bootstrap`, `material`, `tailwind`) into

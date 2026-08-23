@@ -1,0 +1,130 @@
+/**
+ * Exercises targetDir() and downloadAndExtract() against a fake
+ * ForgeBoxClient (built via compress()'d fixture zips on disk - no live
+ * network call) and real filesystem extraction. activateInRuntime()/
+ * install() touch the real running BoxRuntime's module registry and have
+ * no test here, same reason PluginLoader.bx's discover() doesn't (see its
+ * own docblock, and PluginInstaller.bx's).
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.PluginInstaller", function() {
+
+			beforeEach( function() {
+				variables.installer = new "models.build.PluginInstaller@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newTempDir( required string prefix ) {
+				var dir = createTempDirectory( prefix = arguments.prefix );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			/**
+			 * Builds a throwaway module folder (box.json + ModuleConfig.bx)
+			 * and compresses it into a zip fixture - `flat` mirrors this
+			 * module's own Build.bx packaging (no wrapping folder); `!flat`
+			 * mirrors a GitHub "Download ZIP" style archive.
+			 */
+			private string function buildFixtureZip( required boolean flat ) {
+				var moduleDir = newTempDir( "bxsites-fixture-module-" );
+				fileWrite( moduleDir & "/box.json", '{"name":"fixture"}' );
+				fileWrite( moduleDir & "/ModuleConfig.bx", "class { this.mapping = \"fixture\"; }" );
+
+				var zipPath = newTempDir( "bxsites-fixture-zip-" ) & "/fixture.zip";
+				compress( format : "zip", source : moduleDir, destination : zipPath, includeBaseFolder : !arguments.flat, overwrite : true );
+				return zipPath;
+			}
+
+			/**
+			 * A fake ForgeBoxClient: resolve() returns a canned entry,
+			 * download() just copies the local fixture zip to destZipPath -
+			 * no network involved.
+			 */
+			private any function fakeForgeBoxClient( required string fixtureZipPath, string version = "1.0.0" ) {
+				return {
+					resolve : function( required string slug, string version = "" ) {
+						return { name : arguments.slug, version : version, location : "https://downloads.example.com/" & arguments.slug & ".zip" };
+					},
+					download : function( required string url, required string destZipPath ) {
+						directoryCreate( getDirectoryFromPath( arguments.destZipPath ), true, true );
+						fileCopy( fixtureZipPath, arguments.destZipPath );
+					}
+				};
+			}
+
+			it( "targetDir() resolves to <projectRoot>/boxlang_modules/<slug>", function() {
+				expect( installer.targetDir( "/projects/my-docs", "bx-sites-theme-blog1" ) ).toBe( "/projects/my-docs/boxlang_modules/bx-sites-theme-blog1" );
+			} );
+
+			it( "targetDir() strips a trailing slash off projectRoot", function() {
+				expect( installer.targetDir( "/projects/my-docs/", "my-plugin" ) ).toBe( "/projects/my-docs/boxlang_modules/my-plugin" );
+			} );
+
+			it( "downloadAndExtract() extracts a flat zip directly into boxlang_modules/<slug>/", function() {
+				var projectRoot = newTempDir( "bxsites-install-project-" );
+				installer.setForgeBoxClient( fakeForgeBoxClient( buildFixtureZip( true ) ) );
+
+				var result = installer.downloadAndExtract( projectRoot, "my-plugin", "" );
+
+				expect( result.slug ).toBe( "my-plugin" );
+				expect( result.version ).toBe( "1.0.0" );
+				expect( result.installDir ).toBe( projectRoot & "/boxlang_modules/my-plugin" );
+				expect( fileExists( result.installDir & "/box.json" ) ).toBeTrue();
+				expect( fileExists( result.installDir & "/ModuleConfig.bx" ) ).toBeTrue();
+			} );
+
+			it( "downloadAndExtract() hoists a single wrapping subfolder up to the module root", function() {
+				var projectRoot = newTempDir( "bxsites-install-project-" );
+				installer.setForgeBoxClient( fakeForgeBoxClient( buildFixtureZip( false ) ) );
+
+				var result = installer.downloadAndExtract( projectRoot, "my-plugin", "" );
+
+				expect( fileExists( result.installDir & "/box.json" ) ).toBeTrue();
+				expect( fileExists( result.installDir & "/ModuleConfig.bx" ) ).toBeTrue();
+				// No leftover nested folder from the wrapped zip.
+				var entries = directoryList( result.installDir, false, "name" );
+				expect( entries.len() ).toBe( 2 );
+			} );
+
+			it( "downloadAndExtract() replaces a previous install of the same slug rather than merging into it", function() {
+				var projectRoot = newTempDir( "bxsites-install-project-" );
+				installer.setForgeBoxClient( fakeForgeBoxClient( buildFixtureZip( true ) ) );
+				installer.downloadAndExtract( projectRoot, "my-plugin", "" );
+
+				var staleDir = projectRoot & "/boxlang_modules/my-plugin";
+				fileWrite( staleDir & "/stale.txt", "should be gone" );
+
+				installer.downloadAndExtract( projectRoot, "my-plugin", "" );
+
+				expect( fileExists( staleDir & "/stale.txt" ) ).toBeFalse();
+				expect( fileExists( staleDir & "/box.json" ) ).toBeTrue();
+			} );
+
+			it( "downloadAndExtract() propagates a ForgeBoxClient resolve() failure", function() {
+				var projectRoot = newTempDir( "bxsites-install-project-" );
+				installer.setForgeBoxClient( {
+					resolve : function( required string slug, string version = "" ) {
+						throw( type = "BxSites.ForgeBoxEntryNotFound", message = "no such entry" );
+					}
+				} );
+
+				expect( function() {
+					installer.downloadAndExtract( projectRoot, "does-not-exist", "" );
+				} ).toThrow( "BxSites.ForgeBoxEntryNotFound" );
+			} );
+
+		} );
+	}
+
+}
