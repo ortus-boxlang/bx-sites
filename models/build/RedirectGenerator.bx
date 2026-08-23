@@ -1,0 +1,130 @@
+/**
+ * Writes a static HTML redirect stub for every old URL a page still needs
+ * to answer for, so a moved/renamed page's old bookmarked/indexed URL
+ * still lands on the right place instead of 404ing - no server-side
+ * rewrite rule needed, since a static host has nowhere to run one.
+ *
+ * Two sources feed it, both optional:
+ *   - A page's own frontmatter `redirect_from` (an array of old pretty-URL
+ *     segments) - scoped to whichever tree that page belongs to, since
+ *     `write()` is called once per tree (main, each version, each locale,
+ *     each version's own locale) the same shape `writeTagsPage()`/
+ *     `writeSearchIndex()` already are, and a page's own `redirectFrom`
+ *     travels with it into whichever tree it was loaded for.
+ *   - `bxsites.json`'s own top-level `redirects` array (`{ "from", "to" }`)
+ *     - only ever passed for the main tree (BuildPipeline.bx's own
+ *     `configRedirects` argument defaults to `[]` for every other tree),
+ *     since a bare `to` is a root-relative path only unambiguous at the
+ *     site root - a version/locale tree wanting the same old-URL mapping
+ *     needs its own page-level `redirect_from` instead.
+ *
+ * A stub is deliberately bare - no theme, no chrome, just a 0-delay
+ * `<meta http-equiv="refresh">` for the browser and a `<link rel="canonical">`
+ * for a crawler, the same shape Jekyll's/Hugo's own redirect features use.
+ */
+class {
+
+	/**
+	 * @pages This tree's own pages (already loaded) - both the source of
+	 * `redirectFrom` entries and the collision check against a real page
+	 * already built at that same path
+	 * @siteDir Absolute path to this tree's own build output directory
+	 * @basePath This tree's own root-relative base path ending with `/`
+	 * @configRedirects `bxsites.json`'s own `redirects` array - only ever passed for the main tree (see this class's own docblock)
+	 *
+	 * @return { count } - how many redirect stubs were written
+	 */
+	struct function write( required array pages, required string siteDir, required string basePath, array configRedirects = [] ) {
+		var realPaths = {}
+		for ( var page in arguments.pages ) {
+			realPaths[ page.urlPath ] = true
+		}
+
+		var toWrite = []
+		for ( var page in arguments.pages ) {
+			for ( var oldPath in page.redirectFrom ) {
+				toWrite.append( { from : normalizeRedirectPath( oldPath ), to : arguments.basePath & page.urlPath } )
+			}
+		}
+		for ( var redirect in arguments.configRedirects ) {
+			toWrite.append( { from : normalizeRedirectPath( redirect.from ), to : resolveTarget( redirect.to, arguments.basePath ) } )
+		}
+
+		var seen = {}
+		for ( var entry in toWrite ) {
+			if ( realPaths.keyExists( entry.from ) ) {
+				throw(
+					type    = "BxSites.RedirectConflict",
+					message = "A redirect's own [from] path [#entry.from#] collides with a real page already built at that path"
+				)
+			}
+			if ( seen.keyExists( entry.from ) ) {
+				throw(
+					type    = "BxSites.RedirectConflict",
+					message = "Two redirects both target the same [from] path [#entry.from#]"
+				)
+			}
+			seen[ entry.from ] = true
+		}
+
+		for ( var entry in toWrite ) {
+			var outputPath = arguments.siteDir & "/" & entry.from
+			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
+			fileWrite( outputPath, renderStub( entry.to ) )
+		}
+
+		return { count : toWrite.len() }
+	}
+
+	/**
+	 * A `redirect_from`/`redirects.from` value is a pretty-URL segment - no
+	 * leading/trailing slash, no extension, same shape a page's own
+	 * docs/-relative path takes minus the `.md` - "guides/old-setup"
+	 * becomes `guides/old-setup/index.html`, mirroring DocsLoader.bx's own
+	 * `urlPathFor()`.
+	 *
+	 * @relativePath The raw `redirect_from`/`redirects.from` entry
+	 */
+	private string function normalizeRedirectPath( required string relativePath ) {
+		var trimmed = trim( arguments.relativePath ).reReplace( "^[\/]+", "" ).reReplace( "[\/]+$", "" )
+		if ( !len( trimmed ) ) {
+			throw( type = "BxSites.InvalidRedirect", message = "A redirect's [from]/[redirect_from] entry can't be empty" )
+		}
+		return trimmed & "/index.html"
+	}
+
+	/**
+	 * `redirects.to` resolves the same way a theme's own `resolveAssetUrl()`
+	 * resolves `theme.logo`/`ogImage` - left alone when it's already an
+	 * absolute URL (a redirect to an entirely different site), otherwise
+	 * treated as root-relative and prefixed with this tree's own `basePath`.
+	 *
+	 * @to The raw `redirects.to` entry
+	 * @basePath This tree's own root-relative base path ending with `/`
+	 */
+	private string function resolveTarget( required string to, required string basePath ) {
+		return arguments.to.reFindNoCase( "^[a-z][a-z0-9+.\-]*://" ) ? arguments.to : arguments.basePath & arguments.to.reReplace( "^[\/]+", "" )
+	}
+
+	/**
+	 * @target The href to redirect to - already basePath-resolved (or a full absolute URL)
+	 */
+	private string function renderStub( required string target ) {
+		// A minimal attribute-safe escape, not encodeForHTML() - that also
+		// entity-escapes "safe" characters like "/" (its exact range is
+		// locale/JVM-dependent), needlessly noisy in a plain URL attribute -
+		// same reasoning page.bxm's own renderPageMeta() already applies to
+		// editUrl/markdownUrl.
+		var escaped = arguments.target.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
+		var lines = [
+			"<!DOCTYPE html>",
+			'<html><head><meta charset="UTF-8">',
+			'<meta http-equiv="refresh" content="0; url=' & escaped & '">',
+			'<link rel="canonical" href="' & escaped & '">',
+			"<title>Redirecting&hellip;</title></head>",
+			'<body><p>This page has moved. If you are not redirected automatically, <a href="' & escaped & '">follow this link</a>.</p></body></html>'
+		]
+		return lines.toList( char( 10 ) )
+	}
+
+}

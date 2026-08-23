@@ -83,7 +83,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( pages[ 1 ].hidden ).toBeFalse();
 			} );
 
-			it( "defaults tags/icon/summary/ogImage to empty when omitted", function() {
+			it( "defaults tags/icon/summary/ogImage/redirectFrom to empty when omitted", function() {
 				var dir = newDocsDir();
 				fileWrite( dir & "/plain.md", "No frontmatter" );
 
@@ -94,9 +94,11 @@ class extends="testbox.system.BaseSpec" {
 				expect( pages[ 1 ].icon ).toBe( "" );
 				expect( pages[ 1 ].summary ).toBe( "" );
 				expect( pages[ 1 ].ogImage ).toBe( "" );
+				expect( pages[ 1 ].redirectFrom ).toBeArray();
+				expect( pages[ 1 ].redirectFrom.len() ).toBe( 0 );
 			} );
 
-			it( "reads tags/icon/summary/ogImage from frontmatter", function() {
+			it( "reads tags/icon/summary/ogImage/redirect_from from frontmatter", function() {
 				var dir = newDocsDir();
 				var content = "---" & char( 10 ) &
 					"title: Tagged Page" & char( 10 ) &
@@ -104,6 +106,7 @@ class extends="testbox.system.BaseSpec" {
 					"icon: 🚀" & char( 10 ) &
 					"summary: A short lead-in." & char( 10 ) &
 					"ogImage: assets/tagged-card.png" & char( 10 ) &
+					"redirect_from: [old-tagged, guides/legacy-tagged]" & char( 10 ) &
 					"---" & char( 10 ) &
 					"Body";
 				fileWrite( dir & "/tagged.md", content );
@@ -114,6 +117,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( pages[ 1 ].icon ).toBe( "🚀" );
 				expect( pages[ 1 ].summary ).toBe( "A short lead-in." );
 				expect( pages[ 1 ].ogImage ).toBe( "assets/tagged-card.png" );
+				expect( pages[ 1 ].redirectFrom ).toBe( [ "old-tagged", "guides/legacy-tagged" ] );
 			} );
 
 			it( "defaults showToc to true, and to false when frontmatter sets [toc] to false", function() {

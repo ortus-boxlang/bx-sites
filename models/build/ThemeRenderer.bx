@@ -64,6 +64,13 @@ class {
 	variables.requiredFiles = [ "layout.bxm", "page.bxm" ]
 
 	/**
+	 * Resolves the theme-chrome UI strings (search placeholder, "On this
+	 * page", the 404 page, ...) for the locale being rendered right now -
+	 * see StringsResolver.bx's own docblock.
+	 */
+	variables.stringsResolver = new "models.config.StringsResolver@bxsites"()
+
+	/**
 	 * Resolution order: a project-level `theme/` override (module spec
 	 * section 3) if it satisfies the `ThemeProvider` contract, else this
 	 * module's built-in `resources/themes/<themeName>` (section 6).
@@ -209,6 +216,7 @@ class {
 		variables.locales = arguments.locales
 		variables.currentLocale = arguments.currentLocale
 		variables.currentLocaleDir = listFindNoCase( "ltr,rtl", arguments.currentLocaleDir ) ? arguments.currentLocaleDir : "ltr"
+		variables.strings = variables.stringsResolver.resolve( variables.currentLocale, arguments.config.i18n )
 
 		var html = ""
 		bx:savecontent variable="html" {

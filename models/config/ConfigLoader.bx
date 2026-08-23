@@ -78,6 +78,7 @@ class {
 			"images"      : { "enabled" : true, "widths" : [ 400, 800, 1200, 1600 ], "formats" : [ "original", "webp" ] }
 		},
 		"plugins"      : [],
+		"redirects"    : [],
 		"i18n"         : { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] },
 		"blog"         : { "postsPerPage" : 10, "feed" : true, "feedLimit" : 25 }
 	}
@@ -428,8 +429,37 @@ class {
 
 		validateI18n( arguments.config.i18n ?: "" )
 		validateBlog( arguments.config.blog ?: "" )
+		validateRedirects( arguments.config.redirects ?: "" )
 
 		return arguments.config
+	}
+
+	/**
+	 * Validates the site config's own `redirects` array - explicit
+	 * `{ "from", "to" }` old-URL -> new-URL mappings, only ever applied to
+	 * the main site tree by RedirectGenerator.bx (see its own docblock for
+	 * why). A page's own frontmatter `redirect_from` is the per-page,
+	 * per-tree alternative and needs no config-side validation of its own -
+	 * DocsLoader.bx already only ever produces an array there.
+	 *
+	 * @redirects The merged config's own `redirects` value - `any`, not
+	 * `array`, for the same reason validateI18n() takes `any` (see its own docblock)
+	 */
+	private void function validateRedirects( required any redirects ) {
+		if ( !isArray( arguments.redirects ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [redirects], when present, must be an array"
+			)
+		}
+		for ( var redirect in arguments.redirects ) {
+			if ( !isStruct( redirect ) || !len( trim( redirect.from ?: "" ) ) || !len( trim( redirect.to ?: "" ) ) ) {
+				throw(
+					type    = "BxSites.InvalidConfig",
+					message = "#variables.configFileName# [redirects] entries must be objects with non-empty [from]/[to] strings"
+				)
+			}
+		}
 	}
 
 	/**

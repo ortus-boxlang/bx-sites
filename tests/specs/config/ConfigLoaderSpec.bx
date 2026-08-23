@@ -632,6 +632,41 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
+			it( "defaults [redirects] to an empty array", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).redirects ).toBeArray();
+				expect( loader.load( dir ).redirects.len() ).toBe( 0 );
+			} );
+
+			it( "preserves a user-supplied [redirects] array of from/to pairs", function() {
+				var dir = newProjectDir( '{"name":"My Docs","redirects":[{"from":"old","to":"new/"}]}' );
+				var redirects = loader.load( dir ).redirects;
+				expect( redirects.len() ).toBe( 1 );
+				expect( redirects[ 1 ].from ).toBe( "old" );
+				expect( redirects[ 1 ].to ).toBe( "new/" );
+			} );
+
+			it( "throws BxSites.InvalidConfig when [redirects] is not an array", function() {
+				var dir = newProjectDir( '{"name":"My Docs","redirects":"nope"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
+			it( "throws BxSites.InvalidConfig when a [redirects] entry is missing [from]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","redirects":[{"to":"new/"}]}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
+			it( "throws BxSites.InvalidConfig when a [redirects] entry is missing [to]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","redirects":[{"from":"old"}]}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
 			it( "defaults [i18n] to an English default locale and no other locales", function() {
 				var dir = newProjectDir( '{"name":"My Docs"}' );
 				var i18n = loader.load( dir ).i18n;

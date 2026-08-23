@@ -132,6 +132,62 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileRead( docsDir & "/assets/readme.md" ) ).toInclude( "[link](../guides.md)" );
 			} );
 
+			it( "stamps a new redirect_from key onto a moved page's own frontmatter", function() {
+				var docsDir = newDocsDir();
+				directoryCreate( docsDir & "/guides", true, true );
+				fileWrite( docsDir & "/guides/old-setup.md", "---" & char( 10 ) & "title: Old Setup" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var result = renamer.rename( docsDir : docsDir, from : "guides/old-setup.md", to : "guides/new-setup.md" );
+
+				var content = fileRead( result.path );
+				expect( content ).toInclude( "redirect_from:" );
+				expect( content ).toInclude( "guides/old-setup" );
+				expect( content ).toInclude( "title: Old Setup" );
+			} );
+
+			it( "appends to an existing block-list redirect_from instead of replacing it", function() {
+				var docsDir = newDocsDir();
+				directoryCreate( docsDir & "/guides", true, true );
+				fileWrite( docsDir & "/guides/mid-setup.md", "---" & char( 10 ) & "title: Mid" & char( 10 ) & "redirect_from:" & char( 10 ) & "  - guides/original-setup" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var result = renamer.rename( docsDir : docsDir, from : "guides/mid-setup.md", to : "guides/final-setup.md" );
+
+				var content = fileRead( result.path );
+				expect( content ).toInclude( "guides/original-setup" );
+				expect( content ).toInclude( "guides/mid-setup" );
+			} );
+
+			it( "merges into an existing inline redirect_from list", function() {
+				var docsDir = newDocsDir();
+				directoryCreate( docsDir & "/guides", true, true );
+				fileWrite( docsDir & "/guides/a.md", "---" & char( 10 ) & "title: A" & char( 10 ) & "redirect_from: [old-a]" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var result = renamer.rename( docsDir : docsDir, from : "guides/a.md", to : "guides/b.md" );
+
+				expect( fileRead( result.path ) ).toInclude( "redirect_from: [old-a, guides/a]" );
+			} );
+
+			it( "adds a frontmatter block when the moved page had none", function() {
+				var docsDir = newDocsDir();
+				directoryCreate( docsDir & "/guides", true, true );
+				fileWrite( docsDir & "/guides/plain.md", "## Just a heading" & char( 10 ) & "Body text." );
+
+				var result = renamer.rename( docsDir : docsDir, from : "guides/plain.md", to : "guides/renamed-plain.md" );
+
+				var content = fileRead( result.path );
+				expect( content ).toInclude( "redirect_from:" );
+				expect( content ).toInclude( "guides/plain" );
+			} );
+
+			it( "doesn't stamp redirect_from when renaming the tree's own root index.md", function() {
+				var docsDir = newDocsDir();
+				fileWrite( docsDir & "/index.md", "---" & char( 10 ) & "title: Home" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var result = renamer.rename( docsDir : docsDir, from : "index.md", to : "welcome.md" );
+
+				expect( fileRead( result.path ) ).notToInclude( "redirect_from" );
+			} );
+
 		} );
 	}
 

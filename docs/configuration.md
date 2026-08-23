@@ -344,6 +344,29 @@ Only the main tree honors either - a `docs/versions/<name>/` tree always
 infers its nav from its own folder structure, even when the main tree has
 an explicit one.
 
+## `redirects`
+
+`[]` (the default) - site-wide `from`/`to` old-URL redirects, only ever
+applied to the main tree:
+
+```json title="bxsites.json" linenums="1"
+{
+	"redirects": [
+		{ "from": "old-guide", "to": "guides/new-guide/" }
+	]
+}
+```
+
+- `redirects[].from` - the old pretty-URL segment a static redirect stub
+  gets written at (no leading/trailing slash, no extension)
+- `redirects[].to` - a root-relative path (resolved against `baseURL`) or
+  a full `https://` URL
+
+A page's own frontmatter `redirect_from` is the per-page, per-tree
+alternative (works inside a version/locale tree too) - see
+[Redirects](guides/redirects.md) for the full picture, including how
+`page:rename` stamps it on automatically.
+
 ## `markdown`
 
 Forwarded as-is to [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)'s
@@ -622,15 +645,20 @@ convention - a locale builds automatically once its folder exists;
 `i18n` just supplies its display label/direction for the language
 switcher.
 
-- `i18n.defaultLocale` - `{ "code", "label", "flag" }` for the project's own
-  regular `docs/` tree, defaulting to `{ "code": "en", "label": "English" }`.
+- `i18n.defaultLocale` - `{ "code", "label", "flag", "strings" }` for the
+  project's own regular `docs/` tree, defaulting to `{ "code": "en", "label": "English" }`.
   Only needs setting when your default locale isn't English.
-- `i18n.locales` - `[]` (the default) - an array of `{ "code", "label", "dir", "flag" }`
+- `i18n.locales` - `[]` (the default) - an array of `{ "code", "label", "dir", "flag", "strings" }`
   for every other locale. `code` doubles as the `docs/i18n/<code>/` folder
   name and the built URL prefix - letters/digits/hyphens only (`es`,
   `pt-BR`, `zh-Hans`). `dir` is `"ltr"` (the default) or `"rtl"`. `flag` is
   an optional emoji override for the language switcher's flag icon - most
-  common codes already resolve to a sensible flag on their own.
+  common codes already resolve to a sensible flag on their own. `strings`
+  overrides that locale's own theme-chrome UI text (search placeholder,
+  "On this page," the 404 page, ...) - see
+  [Internationalization](guides/i18n.md#theme-chrome-ui-strings) for the
+  full key list; `de`/`es`/`it`/`ja` already ship a built-in translation,
+  so `strings` is only needed to override a key or add another locale.
 
 ```json title="bxsites.json" linenums="1"
 {

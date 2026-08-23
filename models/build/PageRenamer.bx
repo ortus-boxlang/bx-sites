@@ -12,6 +12,13 @@
  * Only bare `[text](relative/path.md)`-style links are rewritten -
  * absolute URLs, `mailto:`, and pure in-page anchors are left alone,
  * same exclusions MarkdownLinkResolver.bx already applies.
+ *
+ * Also auto-stamps the moved page's own frontmatter `redirect_from` with
+ * its old pretty-URL segment, so the old URL a search engine/bookmark
+ * still has for it keeps working (RedirectGenerator.bx) instead of a
+ * rename silently 404ing every inbound link this project doesn't control
+ * the source of - only the file-relative links within `docs/**` itself,
+ * which every one of the loop above already found and fixed.
  */
 class {
 
@@ -64,6 +71,7 @@ class {
 				// that happen to point at the page that moved, since the
 				// file containing them is the one that changed location.
 				rewritten = rebaseLinks( original, directoryOf( fromRelative ), directoryOf( toRelative ) )
+				rewritten = stampRedirectFrom( rewritten, toRedirectSegment( fromRelative ) )
 			} else {
 				// Every other file keeps its own directory - only links
 				// that specifically point at the renamed page need
@@ -283,6 +291,91 @@ class {
 		var segments = listToArray( arguments.relativePath, "/", true )
 		segments.deleteAt( segments.len() )
 		return segments.toList( "/" )
+	}
+
+	/**
+	 * A page's own docs/-relative source path, as the pretty-URL segment
+	 * `redirect_from` (and RedirectGenerator.bx) expect - the same
+	 * transform DocsLoader.bx's own `urlPathFor()` applies, minus the
+	 * `/index.html` file-output wrapping: "guides/old-setup.md" becomes
+	 * "guides/old-setup", "guides/index.md" becomes "guides" (the folder's
+	 * own URL, no bare trailing "index").
+	 *
+	 * @relativePath A docs/-relative `.md` path
+	 *
+	 * @return The pretty-URL segment, or "" for the project root's own `index.md` (nothing meaningful to redirect from)
+	 */
+	private string function toRedirectSegment( required string relativePath ) {
+		var segments = listToArray( arguments.relativePath, "/" )
+		var baseName = segments[ segments.len() ].reReplaceNoCase( "\.md$", "" )
+		if ( compareNoCase( baseName, "index" ) == 0 ) {
+			segments.deleteAt( segments.len() )
+		} else {
+			segments[ segments.len() ] = baseName
+		}
+		return segments.toList( "/" )
+	}
+
+	/**
+	 * Adds `oldSegment` to the moved file's own frontmatter `redirect_from`
+	 * - appending to an existing list (inline `[a, b]` or block `- item`
+	 * form, whichever the page already used) if one is already there,
+	 * otherwise adding a new `redirect_from:` key, otherwise (a page with
+	 * no frontmatter block at all yet) adding one. A no-op for "" (the
+	 * project root's own `index.md` - toRedirectSegment()'s own empty
+	 * case), since there's no old URL worth remembering there.
+	 *
+	 * @content The moved file's own raw content, post-link-rebase
+	 * @oldSegment toRedirectSegment()'s own output for the page's old path
+	 */
+	private string function stampRedirectFrom( required string content, required string oldSegment ) {
+		if ( !len( arguments.oldSegment ) ) {
+			return arguments.content
+		}
+
+		var lines = listToArray( arguments.content.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" ), char( 10 ), true )
+
+		if ( !lines.len() || trim( lines[ 1 ] ) != "---" ) {
+			return "---" & char( 10 ) & "redirect_from:" & char( 10 ) & "  - " & arguments.oldSegment & char( 10 ) & "---" & char( 10 ) & arguments.content
+		}
+
+		var closingIndex = 0
+		for ( var i = 2; i <= lines.len(); i++ ) {
+			if ( trim( lines[ i ] ) == "---" ) {
+				closingIndex = i
+				break
+			}
+		}
+		if ( !closingIndex ) {
+			return "---" & char( 10 ) & "redirect_from:" & char( 10 ) & "  - " & arguments.oldSegment & char( 10 ) & "---" & char( 10 ) & arguments.content
+		}
+
+		var redirectFromLineIndex = 0
+		for ( var i = 2; i < closingIndex; i++ ) {
+			if ( trim( lines[ i ] ).reFindNoCase( "^redirect_from\s*:" ) ) {
+				redirectFromLineIndex = i
+				break
+			}
+		}
+
+		if ( redirectFromLineIndex ) {
+			var valuePart = trim( lines[ redirectFromLineIndex ].reReplaceNoCase( "^redirect_from\s*:", "" ) )
+			if ( len( valuePart ) && valuePart.left( 1 ) == "[" && valuePart.right( 1 ) == "]" ) {
+				var inner = trim( valuePart.mid( 2, len( valuePart ) - 2 ) )
+				lines[ redirectFromLineIndex ] = "redirect_from: [" & ( len( inner ) ? inner & ", " & arguments.oldSegment : arguments.oldSegment ) & "]"
+			} else {
+				var insertAt = redirectFromLineIndex + 1
+				while ( insertAt < closingIndex && trim( lines[ insertAt ] ).left( 1 ) == "-" ) {
+					insertAt++
+				}
+				lines.insertAt( insertAt, "  - " & arguments.oldSegment )
+			}
+		} else {
+			lines.insertAt( closingIndex, "  - " & arguments.oldSegment )
+			lines.insertAt( closingIndex, "redirect_from:" )
+		}
+
+		return lines.toList( char( 10 ) )
 	}
 
 	/**
