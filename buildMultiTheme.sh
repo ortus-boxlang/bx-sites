@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
 # Dogfooding-only build script for this repo's own docs site: builds
-# docs/ three times - once per built-in theme - and assembles the results
+# docs/ ten times - once per built-in theme - and assembles the results
 # into a single site/ tree, so the deployed site shows off `bootstrap` at
-# the root plus `material`/`tailwind` living side by side under
-# theme/material/ and theme/tailwind/. Not a bx-sites product feature -
-# just this project using its own `build` verb three times with a
-# temporarily-patched bxsites.yaml, the same way pages.yml already patches
-# baseURL per branch.
+# the root plus every other built-in theme living side by side under
+# theme/<name>/ - this repo's own docs double as the theme gallery. Not a
+# bx-sites product feature - just this project using its own `build` verb
+# ten times with a temporarily-patched bxsites.yaml, the same way pages.yml
+# already patches baseURL per branch.
 #
 # Usage: ./buildMultiTheme.sh [projectRoot]   (defaults to ".")
 #
@@ -82,10 +82,10 @@ build_variant() {
 # 1. bootstrap - the committed bxsites.yaml, unmodified, at the site root.
 build_variant "bootstrap"
 
-# 2 & 3. material/tailwind - same docs/, different theme + a baseURL
-# pointing at their own sub-path so their own internal links/assets
+# 2-10. Every other built-in theme - same docs/, different theme + a
+# baseURL pointing at their own sub-path so their own internal links/assets
 # resolve correctly once nested under theme/<name>/.
-for name in material tailwind; do
+for name in material tailwind docsy slate docusaurus justthedocs vuepress gitbook notion; do
 	export THEME="${name}"
 	export URL="${BASE_URL_NO_SLASH}/theme/${name}/"
 	yq eval '.theme.name = strenv(THEME) | .baseURL = strenv(URL)' "${CONFIG_BACKUP}" > bxsites.yaml
@@ -96,4 +96,4 @@ done
 rm -rf site
 mv "${SCRATCH_DIR}/root" site
 
-echo "Done - bootstrap at site/, material at site/theme/material/, tailwind at site/theme/tailwind/"
+echo "Done - bootstrap at site/, every other theme at site/theme/<name>/"

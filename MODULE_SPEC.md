@@ -60,7 +60,9 @@ boxlang bxSites <verb> [options]
 | `i18n:new` | Scaffold a new `docs/i18n/<code>/` locale |
 | `page:new` | Scaffold a single docs page at an arbitrary path |
 | `plugin:new` | Scaffold a plugin module skeleton, mirroring `examples/hello-plugin/` |
+| `install:plugin` | Download a plugin from ForgeBox into project-local `boxlang_modules/`, load it into the running runtime, and report its registered mapping name |
 | `theme:new` | Eject a built-in theme into project `theme/` for customizing |
+| `install:theme` | Download a theme from ForgeBox into project-local `themes/<name>/`, validating the `ThemeProvider` contract |
 | `page:rename` | Move a docs page and rewrite every relative Markdown link that pointed at it |
 | `blog:drafts` | List every blog post whose frontmatter sets `draft: true` |
 | `blog:find` | Filter blog posts by author/category/tag/date range |
@@ -126,6 +128,7 @@ flowchart LR
 - Themes are native **BoxLang `.bxm` templates** — no separate template engine
 - `ThemeProvider` contract: each theme folder provides `layout.bxm`, `page.bxm`, `search.bxm` (or search partial), `assets/` (css/js)
 - Built-in themes ship in module `resources/themes/`; custom/project themes resolved relative to project root and referenced by name/path in `bxsites.json`
+- Resolution order (`ThemeRenderer.resolveThemeDir()`): a project-level `theme/` override (all-or-nothing, wins outright) → a `themes/<theme.name>/` installed theme (`install:theme`/`ThemeInstaller.bx` — a ForgeBox package extracted project-locally, letting a project carry several installed themes side by side and switch purely by `theme.name`) → a built-in theme under `resources/themes/<theme.name>`
 
 ### Built-in themes (v1)
 
@@ -138,6 +141,25 @@ flowchart LR
 - **`tailwind`** — Tailwind-based, same brand palette applied
 
 `new` defaults to `bootstrap` unless `--theme` is passed.
+
+### Built-in themes — gallery expansion (post-v1)
+
+Seven more built-in themes, bringing the total to ten, so this repo's own
+dogfooded docs (`buildMultiTheme.sh`) double as a theme gallery: `docsy`
+(Read the Docs/Docsy-inspired), `slate` (Stripe/Slate-inspired, permanently
+dark sidebar), `docusaurus` (Docusaurus-inspired), `justthedocs` (Just the
+Docs-inspired), `vuepress` (VuePress-inspired), `gitbook` (GitBook-inspired,
+also thematically apt given `migrate --from=gitbook`), and `notion`
+(Notion-inspired). All seven are forked from `material`
+(`resources/themes/material/`) rather than written from scratch: the exact
+same `layout.bxm`/`page.bxm`/`search.bxm` scripting logic, only a scoped
+CSS-class-prefix rename plus a from-the-ground-up `assets/style.css`
+restyle (and, for `justthedocs` only, one relocated `<bx:include>` line
+moving the search box from the header into the sidebar). This inherits
+`material`'s exact variable wiring/feature coverage rather than
+re-deriving it seven times, and keeps every one of the seven
+air-gapped-capable the same way `material` already is (system font stacks
+only, no external font/CDN `<link>`). See `docs/guides/themes.md#built-in`.
 
 ## 7. Search
 
@@ -158,6 +180,7 @@ None currently blocking. Deferred to later phases:
 - Content tabs, math (KaTeX), and fenced-code `hl_lines`/`linenums`/`title` annotations — **done**, see section 5 step 2 and `bxsites.json`'s `math` key
 - Live embedded try.boxlang.io playgrounds via a `` ```tryboxlang `` fence — **done**, see section 5 step 2 (`TryBoxLangProcessor`) and `docs/guides/markdown.md`'s "Try it live" section
 - General-purpose plugin system, based on BoxLang's own module system — **done**: a plugin is any BoxLang module exposing a `models/BxSitesPlugin.bx` class, opted in by module name via `bxsites.json`'s `plugins` array (`PluginLoader.bx`). Five optional hooks — `onConfig`/`onPageMarkdown`/`onPageHtml`/`onNav`/`onBuildComplete` — cover the config, per-page markdown/HTML, nav tree, and post-build stages. See `docs/guides/plugins.md` and the worked example at `examples/hello-plugin/`
+- Plugin/theme distribution via ForgeBox — **done** for plugins, in progress for themes: `install:plugin` (`ForgeBoxClient.bx` + `PluginInstaller.bx`) resolves a package by ForgeBox slug (`GET {baseUrl}/entry/{slug}[/{version}]`), downloads its zip, and extracts it into **project-local** `boxlang_modules/<slug>/` — BoxLang's own documented auto-loaded-modules convention for a local CLI app, deliberately *not* a global `BOXLANG_HOME`/machine-wide install, so two bx-sites projects on one machine never fight over the same plugin version. `PluginInstaller.activateInRuntime()` loads the freshly-extracted module into the *running* runtime via `ModuleService.loadModule()` and reads its real registered mapping name back off `ModuleService.getModuleList()`'s own registry (not by re-parsing the extracted `box.json` by hand), since a module's ForgeBox slug and its BoxLang mapping name aren't always the same (`bx-markdown` → `bxMarkdown`; see Doctor.bx's own docblock). Installing a module still never activates it as a bx-sites plugin on its own — that's still `bxsites.json`'s own explicit `plugins` array, per the existing "install ≠ activate" rule. `install:theme` (`ThemeInstaller.bx`) is the themes-side equivalent — **done**: resolve+download+extract into project-local `themes/<name>/` (section 6's resolution order), validated against the `ThemeProvider` contract at install time rather than at the next `build`. No BoxLang module/class-loader involvement at all, unlike a plugin — a theme is pure files, so there's no separate activation step; setting `bxsites.json`'s `theme.name` to the installed name is the only wiring needed.
 - i18n (multi-language docs) — **done**, see `docs/i18n/<code>/` (LocalesDiscoverer.bx, mirroring the versions-by-convention pattern) and `bxsites.json`'s `i18n` key. A locale not yet translating a given page falls back to the default locale's own content, flagged; nav always mirrors the default locale's own shape. Theme chrome strings (not page content) staying English-only regardless of locale is a documented v1 limit — see `docs/guides/i18n.md`
 - Versions × locales composing — **done**: a `docs/versions/<name>/i18n/<code>/` folder (same by-convention rule one level down) composes onto that version's own tree, so a version's own default-locale build gets a language switcher listing only the locales that version itself translates, and switching version always drops back to that version's own default locale rather than assuming a shared translation — see `docs/guides/i18n.md`'s "Versioned and translated docs" section
 - CI-grade content quality gate (broken internal links/images, missing alt text, orphaned pages) — **done**, see section 2's verb table (`check`) and `docs/cli-reference.md`

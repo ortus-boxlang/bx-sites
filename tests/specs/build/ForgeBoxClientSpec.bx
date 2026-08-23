@@ -1,0 +1,85 @@
+/**
+ * Only tests the pure halves of ForgeBoxClient.bx - buildEntryUrl()'s URL
+ * shape and parseEntryResponse()'s JSON-body parsing - against fake input.
+ * resolve()/download() touch the real ForgeBox API and have no test here,
+ * same reason PluginLoader.bx's discover() doesn't (see its own docblock).
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.ForgeBoxClient", function() {
+
+			beforeEach( function() {
+				variables.client = new "models.build.ForgeBoxClient@bxsites"();
+			} );
+
+			describe( "buildEntryUrl()", function() {
+
+				it( "points at /entry/<slug> for the latest version", function() {
+					expect( client.buildEntryUrl( "bx-sites-theme-blog1" ) ).toBe( "https://www.forgebox.io/api/v1/entry/bx-sites-theme-blog1" );
+				} );
+
+				it( "appends /<version> when a specific version is requested", function() {
+					expect( client.buildEntryUrl( "bx-sites-theme-blog1", "1.2.0" ) ).toBe( "https://www.forgebox.io/api/v1/entry/bx-sites-theme-blog1/1.2.0" );
+				} );
+
+				it( "honors a custom base URL from setBaseUrl()", function() {
+					client.setBaseUrl( "https://forgebox.example.com/api/v1/" );
+					expect( client.buildEntryUrl( "my-plugin" ) ).toBe( "https://forgebox.example.com/api/v1/entry/my-plugin" );
+				} );
+
+			} );
+
+			describe( "parseEntryResponse()", function() {
+
+				it( "reads name/version/location off a top-level entry shape", function() {
+					var body = '{"data":{"slug":"my-plugin","version":"2.0.0","location":"https://downloads.example.com/my-plugin-2.0.0.zip"}}';
+
+					var result = client.parseEntryResponse( "my-plugin", body );
+
+					expect( result.name ).toBe( "my-plugin" );
+					expect( result.version ).toBe( "2.0.0" );
+					expect( result.location ).toBe( "https://downloads.example.com/my-plugin-2.0.0.zip" );
+				} );
+
+				it( "reads location/version off a nested version sub-struct shape", function() {
+					var body = '{"data":{"slug":"my-plugin","version":{"version":"1.5.0","location":"https://downloads.example.com/my-plugin-1.5.0.zip"}}}';
+
+					var result = client.parseEntryResponse( "my-plugin", body );
+
+					expect( result.version ).toBe( "1.5.0" );
+					expect( result.location ).toBe( "https://downloads.example.com/my-plugin-1.5.0.zip" );
+				} );
+
+				it( "falls back to the requested slug when the entry has no [slug]/[name]", function() {
+					var body = '{"data":{"version":"1.0.0","location":"https://downloads.example.com/x.zip"}}';
+
+					var result = client.parseEntryResponse( "my-plugin", body );
+
+					expect( result.name ).toBe( "my-plugin" );
+				} );
+
+				it( "throws BxSites.ForgeBoxInvalidResponse on non-JSON bodies", function() {
+					expect( function() {
+						client.parseEntryResponse( "my-plugin", "<html>not json</html>" );
+					} ).toThrow( "BxSites.ForgeBoxInvalidResponse" );
+				} );
+
+				it( "throws BxSites.ForgeBoxEntryNotFound when the response has no [data]", function() {
+					expect( function() {
+						client.parseEntryResponse( "my-plugin", '{"error":true,"messages":["not found"]}' );
+					} ).toThrow( "BxSites.ForgeBoxEntryNotFound" );
+				} );
+
+				it( "throws BxSites.ForgeBoxEntryNotFound when the entry has no [location]", function() {
+					expect( function() {
+						client.parseEntryResponse( "my-plugin", '{"data":{"slug":"my-plugin","version":"1.0.0"}}' );
+					} ).toThrow( "BxSites.ForgeBoxEntryNotFound" );
+				} );
+
+			} );
+
+		} );
+	}
+
+}

@@ -1,0 +1,142 @@
+/**
+ * Backs the `install:theme` CLI verb - downloads a theme's zip from
+ * ForgeBox and extracts it into the project's own `themes/<name>/`
+ * (module spec section 6's third theme-resolution tier, between a
+ * project-level `theme/` override and the built-in themes -
+ * `ThemeRenderer.resolveThemeDir()`). A theme needs no code loading at
+ * all (no BoxLang module/class-loader involvement, unlike
+ * PluginInstaller.bx) - it's pure files, so installing one is nothing more
+ * than "download, extract, validate the ThemeProvider contract". Once
+ * installed, a project switches to it just by setting `bxsites.json`'s
+ * `theme.name` to the installed folder's own name - no separate activation
+ * step, unlike a plugin.
+ */
+class {
+
+	/**
+	 * The `ThemeProvider` contract's required files - same list
+	 * ThemeRenderer.bx's own `requiredFiles` checks, duplicated here rather
+	 * than shared so this class stays a standalone, independently testable
+	 * unit (same reasoning PluginInstaller.bx keeps its own
+	 * `getBoxRuntime()` wrapper instead of reaching into a sibling class).
+	 */
+	variables.requiredFiles = [ "layout.bxm", "page.bxm" ]
+
+	/**
+	 * The ForgeBox client used to resolve/download packages - swappable via
+	 * `setForgeBoxClient()`, the same seam PluginInstaller.bx gives (see its
+	 * own docblock), so `downloadAndExtract()` is fully unit-testable
+	 * without a live network call. See ThemeInstallerSpec.bx.
+	 */
+	variables.forgeBoxClient = new "models.build.ForgeBoxClient@bxsites"()
+
+	/**
+	 * @client Any object exposing `resolve( slug, version )` -> `{ name, version, location }` and `download( url, destZipPath )`
+	 */
+	void function setForgeBoxClient( required any client ) {
+		variables.forgeBoxClient = arguments.client
+	}
+
+	/**
+	 * Where a theme named `name` lands under a project root.
+	 *
+	 * @projectRoot Absolute path to the project root
+	 * @name The theme's own name (the ForgeBox slug, and the value a project later sets `theme.name` to)
+	 */
+	string function targetDir( required string projectRoot, required string name ) {
+		return arguments.projectRoot.reReplace( "[\/]+$", "" ) & "/themes/" & arguments.name
+	}
+
+	/**
+	 * Full `install:theme` flow: resolve + download + extract into
+	 * `<projectRoot>/themes/<name>/`, hoist a single wrapping subfolder the
+	 * same way PluginInstaller.bx does (a GitHub "Download ZIP" shape), then
+	 * validate the result satisfies the `ThemeProvider` contract so a bad
+	 * package fails loudly at install time rather than at the next `build`.
+	 * A previous install of the same name is replaced outright.
+	 *
+	 * @projectRoot Absolute path to the project root
+	 * @name The ForgeBox slug to install
+	 * @version A specific version to install, or "" for latest
+	 *
+	 * @return { name, version, installDir }
+	 */
+	struct function install( required string projectRoot, required string name, string version = "" ) {
+		var entry = variables.forgeBoxClient.resolve( arguments.name, arguments.version )
+		var dir = targetDir( arguments.projectRoot, arguments.name )
+
+		if ( directoryExists( dir ) ) {
+			directoryDelete( dir, true )
+		}
+		directoryCreate( dir, true, true )
+
+		var tempZip = getTempDirectory().reReplace( "[\/]+$", "" ) & "/bxsites-install-theme-" & createUUID() & ".zip"
+		try {
+			variables.forgeBoxClient.download( entry.location, tempZip )
+			extract( source = tempZip, destination = dir, format = "zip", overwrite = true )
+		} finally {
+			if ( fileExists( tempZip ) ) {
+				fileDelete( tempZip )
+			}
+		}
+
+		var installDir = flattenIfSingleSubfolder( dir )
+		assertThemeProvider( installDir )
+
+		return { name : arguments.name, version : entry.version, installDir : installDir }
+	}
+
+	/**
+	 * Same "hoist a single wrapping subfolder" logic PluginInstaller.bx
+	 * uses - a theme zip built by `theme:new`/this module's own packaging
+	 * convention extracts flat (`layout.bxm` directly under the
+	 * destination); a "Download ZIP"-style archive wraps everything in one
+	 * top-level folder instead.
+	 *
+	 * @dir The freshly-extracted target directory
+	 */
+	private string function flattenIfSingleSubfolder( required string dir ) {
+		if ( fileExists( arguments.dir & "/layout.bxm" ) ) {
+			return arguments.dir
+		}
+
+		var entries = directoryList( arguments.dir, false, "name" )
+		if ( entries.len() != 1 || !directoryExists( arguments.dir & "/" & entries[ 1 ] ) ) {
+			return arguments.dir
+		}
+
+		var nested = arguments.dir & "/" & entries[ 1 ]
+		for ( var entryName in directoryList( nested, false, "name" ) ) {
+			var from = nested & "/" & entryName
+			var to   = arguments.dir & "/" & entryName
+			directoryExists( from ) ? directoryMove( from, to ) : fileMove( from, to )
+		}
+		directoryDelete( nested, true )
+
+		return arguments.dir
+	}
+
+	/**
+	 * Validates the extracted theme satisfies the `ThemeProvider` contract
+	 * (module spec section 6) - same required-file check
+	 * `ThemeRenderer.resolveThemeDir()` runs on every resolved theme, run
+	 * here too so a broken package is caught at install time.
+	 *
+	 * @dir Absolute path to the extracted (and already-flattened) theme folder
+	 */
+	private void function assertThemeProvider( required string dir ) {
+		// Captured into a local before the filter() closure below - an
+		// arrow function's own `arguments` scope shadows the enclosing
+		// function's, so `arguments.dir` inside it would resolve to
+		// nothing (see BuildPipeline.bx's own history of this exact bug).
+		var dir = arguments.dir
+		var missing = variables.requiredFiles.filter( fileName => !fileExists( dir & "/" & fileName ) )
+		if ( missing.len() ) {
+			throw(
+				type    = "BxSites.InvalidTheme",
+				message = "Theme at [#dir#] is missing required file(s): #missing.toList( ', ' )#"
+			)
+		}
+	}
+
+}

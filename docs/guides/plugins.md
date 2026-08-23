@@ -21,6 +21,27 @@ project opts one in explicitly by BoxLang module name, via `bxsites.json`'s
 { "plugins": [ "myBxSitesPlugin" ] }
 ```
 
+## Installing a published plugin
+
+A plugin published to ForgeBox installs with nothing but the `bxSites`
+binary itself - no `box`/CommandBox needed:
+
+```bash title="Usage"
+bxSites install:plugin --name=bx-sites-plugin-analytics [--version=1.2.0]
+```
+
+This downloads the package's zip from ForgeBox and extracts it into
+`boxlang_modules/bx-sites-plugin-analytics/` at the project root -
+BoxLang's own auto-loaded local-module convention (any module folder
+there is picked up the same way a project-local `node_modules/` is for
+npm), so it's active in the running BoxLang module registry with no
+`BOXLANG_HOME`/global install step at all. `install:plugin` loads it into
+the runtime immediately and prints back its real registered module
+mapping name (which, per the note below, isn't always the same as the
+ForgeBox slug) - add *that* name to `bxsites.json`'s `plugins` array to
+activate it, same as any other installed module. See
+[`install:plugin`](../cli-reference.md#installplugin) in the CLI reference.
+
 ## Writing a plugin
 
 A plugin module needs exactly one thing beyond the usual `box.json`/

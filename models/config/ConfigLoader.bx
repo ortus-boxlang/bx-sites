@@ -86,7 +86,7 @@ class {
 	/**
 	 * The theme names shipped by this module in v1 (module spec section 6).
 	 */
-	variables.builtInThemes = [ "bootstrap", "material", "tailwind" ]
+	variables.builtInThemes = [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ]
 
 	/**
 	 * Reads and validates a project's site config - `<projectRoot>/bxsites.yaml`

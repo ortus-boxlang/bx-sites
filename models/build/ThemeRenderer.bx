@@ -71,9 +71,16 @@ class {
 	variables.stringsResolver = new "models.config.StringsResolver@bxsites"()
 
 	/**
-	 * Resolution order: a project-level `theme/` override (module spec
-	 * section 3) if it satisfies the `ThemeProvider` contract, else this
-	 * module's built-in `resources/themes/<themeName>` (section 6).
+	 * Resolution order:
+	 *   1. A project-level `theme/` override (module spec section 3), if it
+	 *      satisfies the `ThemeProvider` contract - an all-or-nothing
+	 *      override, wins outright over everything else.
+	 *   2. `themes/<themeName>/` - a theme `install:theme` downloaded from
+	 *      ForgeBox (ThemeInstaller.bx), letting a project carry several
+	 *      installed themes side by side and switch between them purely by
+	 *      name.
+	 *   3. This module's own built-in `resources/themes/<themeName>`
+	 *      (section 6).
 	 *
 	 * @themeName The configured theme name (bxsites.json's `theme.name`)
 	 * @projectRoot Absolute path to the project root
@@ -81,9 +88,16 @@ class {
 	 * @return Absolute path to the resolved theme's own folder
 	 */
 	string function resolveThemeDir( required string themeName, required string projectRoot ) {
-		var projectTheme = arguments.projectRoot.reReplace( "[\/]+$", "" ) & "/theme"
+		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+
+		var projectTheme = root & "/theme"
 		if ( directoryExists( projectTheme ) ) {
 			return assertThemeProvider( projectTheme )
+		}
+
+		var installedTheme = root & "/themes/" & arguments.themeName
+		if ( directoryExists( installedTheme ) ) {
+			return assertThemeProvider( installedTheme )
 		}
 
 		var builtIn = builtInThemesDir() & "/" & arguments.themeName
@@ -93,7 +107,7 @@ class {
 
 		throw(
 			type    = "BxSites.ThemeNotFound",
-			message = "No theme found for [#arguments.themeName#] - looked in [#projectTheme#] and [#builtIn#]"
+			message = "No theme found for [#arguments.themeName#] - looked in [#projectTheme#], [#installedTheme#] and [#builtIn#]"
 		)
 	}
 
