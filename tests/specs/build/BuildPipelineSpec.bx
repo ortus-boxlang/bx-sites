@@ -1447,7 +1447,11 @@ class extends="testbox.system.BaseSpec" {
 				var esSetupHtml = fileRead( root & "/site/es/guides/setup/index.html" );
 				expect( esSetupHtml ).toInclude( "<p>Setup body</p>" );
 				expect( esSetupHtml ).toInclude( "fallback-notice" );
-				expect( esSetupHtml ).toInclude( "hasn't been translated yet" );
+				// "es" ships a built-in chrome translation (StringsResolver.bx) -
+				// the notice itself renders in Spanish, not the English default.
+				// (encodeForHTML() entity-escapes the accented characters, so this
+				// checks an accent-free substring of the Spanish text instead.)
+				expect( esSetupHtml ).toInclude( "no se ha traducido" );
 			} );
 
 			it( "gives every locale the exact same nav shape as the default tree, translated titles included", function() {

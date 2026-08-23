@@ -216,7 +216,7 @@ class {
 		variables.locales = arguments.locales
 		variables.currentLocale = arguments.currentLocale
 		variables.currentLocaleDir = listFindNoCase( "ltr,rtl", arguments.currentLocaleDir ) ? arguments.currentLocaleDir : "ltr"
-		variables.strings = variables.stringsResolver.resolve( variables.currentLocale, arguments.config.i18n )
+		variables.strings = variables.stringsResolver.resolve( variables.currentLocale, arguments.config.i18n ?: { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] } )
 
 		var html = ""
 		bx:savecontent variable="html" {
