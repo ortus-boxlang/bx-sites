@@ -43,7 +43,7 @@ nicht (ein CI-Runner, ein von Hand statt per Installation registriertes
 Modul) - beide Formen führen genau dasselbe aus:
 
 ```bash
-boxlang module:bxsites <verb> [options]
+boxlang bxSites <verb> [options]
 ```
 
 Der Rest dieser Anleitung verwendet die Kurzform.

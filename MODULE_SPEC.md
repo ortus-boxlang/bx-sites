@@ -35,7 +35,7 @@ A BoxLang module that generates static documentation sites from Markdown, in the
 ## 2. Invocation
 
 ```
-boxlang module:bxSites <verb> [options]
+boxlang bxSites <verb> [options]
 ```
 
 `ModuleConfig.bx` implements `main(args)` following the same verb-dispatch pattern as bx-agents: parsed CLI options (`--flag`, `--flag=value`, `--no-flag`, short forms), `resolveProjectRoot()` precedence (`--projectRoot` > first positional > cwd), one dispatcher class per verb under `models/cli/`.

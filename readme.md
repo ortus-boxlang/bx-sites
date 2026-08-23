@@ -46,14 +46,14 @@ See [Getting Started](docs/getting-started.md) for the full walkthrough.
 
 `box install` drops a standalone `bxSites` script on your `PATH` (via
 `box.json`'s `boxlang.executable`), so every verb can be run either that
-short way, or as `boxlang module:bxsites <verb>` - both run the exact same
+short way, or as `boxlang bxSites <verb>` - both run the exact same
 thing; use the longer form anywhere the `PATH` shim isn't set up (a CI
 runner, a module registered by hand):
 
 ```bash
 bxSites <verb> [options]
 # or, equivalently:
-boxlang module:bxsites <verb> [options]
+boxlang bxSites <verb> [options]
 ```
 
 | Verb | Purpose |
@@ -106,7 +106,7 @@ See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's d
 - `models` - the module's own source: `models/cli` (one dispatcher per `bxSites` verb), `models/config` (site config loader/validator - `bxsites.yaml`/`.yml`/`.json`), `models/build` (project scaffolding + the docs/nav/markdown/theme/search/sitemap build pipeline)
 - `resources/themes` - built-in themes (native BoxLang `.bxm` templates + assets): `bootstrap` (default), `material`, `tailwind` - all with the BoxLang brand palette, dark mode, breadcrumbs and code-copy buttons applied out of the box. A project can override any of them via its own `theme/` folder (same `layout.bxm` + `page.bxm` contract - see [Themes](docs/guides/themes.md))
 - `resources/assets` - module-wide shared client-side assets: the search widget (`search.js`) and the copy-code button (`copy-code.js`)
-- `docs` / `bxsites.yaml` - this repository's own docs, built by BX Sites itself (`boxlang module:bxSites build`)
+- `docs` / `bxsites.yaml` - this repository's own docs, built by BX Sites itself (`boxlang bxSites build`)
 - `tests/specs` - TestBox specs, one bundle per class under `models/`
 - `bifs`, `components`, `interceptors` - unused by this module today, kept for BoxLang module convention
 - `box.json` - package metadata used to publish to ForgeBox

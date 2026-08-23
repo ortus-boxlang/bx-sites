@@ -131,11 +131,11 @@ class {
 	 * --------------------------------------------------------------------------
 	 * CLI Entry Point
 	 * --------------------------------------------------------------------------
-	 * Every BoxLang module may declare `main( args )`; `boxlang module:bxsites
+	 * Every BoxLang module may declare `main( args )`; `boxlang bxSites
 	 * <verb> ...` invokes it directly - as does the standalone `bxSites`
 	 * script `box install`/`install-bx-module` drops on PATH (`box.json`'s
 	 * `boxlang.executable`), which is just a one-line wrapper around the
-	 * same `boxlang module:bxsites "$@"` call. Either way `args` contains
+	 * same `boxlang bxSites "$@"` call. Either way `args` contains
 	 * ONLY the arguments after the verb dispatch token - the module name
 	 * itself is never included, so args[1] = the verb, args[2..] = the
 	 * verb's own flags/positional args.
@@ -275,7 +275,7 @@ class {
 		println( "bxSites v#this.version# - #this.description#" )
 		println( "" )
 		println( "Usage: bxSites <verb> [options]" )
-		println( "   or: boxlang module:bxsites <verb> [options]" )
+		println( "   or: boxlang bxSites <verb> [options]" )
 		println( "" )
 
 		for ( var verbName in arguments.verbs.keyArray().sort( "textnocase" ) ) {

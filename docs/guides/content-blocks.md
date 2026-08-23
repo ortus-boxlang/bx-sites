@@ -100,7 +100,7 @@ A numbered, connected sequence of steps:
 `install-bx-module bx-sites`
 :::
 ::: step "Scaffold"
-`boxlang module:bxSites new`
+`bxSites new`
 :::
 :::
 ```
@@ -110,7 +110,7 @@ A numbered, connected sequence of steps:
 `install-bx-module bx-sites`
 :::
 ::: step "Scaffold"
-`boxlang module:bxSites new`
+`bxSites new`
 :::
 :::
 
