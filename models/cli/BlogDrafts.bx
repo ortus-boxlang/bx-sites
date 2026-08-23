@@ -16,7 +16,7 @@ class {
 			throw( type = "BxSites.MissingProjectRoot", message = "`blog:drafts` requires a project root" )
 		}
 
-		var docsDir = projectRoot.reReplace( "[\/]+$", "" ) & "/docs"
+		var docsDir = new "models.config.SourceDirResolver@bxsites"().resolve( projectRoot )
 
 		var drafts = new "models.build.BlogDiscoverer@bxsites"()
 			.load( docsDir : docsDir, includeDrafts : true )

@@ -44,6 +44,32 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "<p>Welcome home</p>" );
 			} );
 
+			it( "builds from src/ instead of docs/ when only src/ exists, still writing to site/", function() {
+				var root = createTempDirectory( prefix = "bxsites-buildpipeline-src-" );
+				tempDirs.append( root );
+				directoryCreate( root & "/src", true, true );
+				fileWrite( root & "/bxsites.json", '{"name":"Test Site"}' );
+				fileWrite( root & "/src/index.md", "Welcome from src" );
+
+				var result = pipeline.build( root );
+
+				expect( result.pageCount ).toBe( 1 );
+				expect( result.siteDir ).toBe( root & "/site" );
+				expect( fileExists( root & "/site/index.html" ) ).toBeTrue();
+				expect( fileRead( root & "/site/index.html" ) ).toInclude( "<p>Welcome from src</p>" );
+			} );
+
+			it( "prefers docs/ over src/ when a project somehow has both", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "From docs" );
+				directoryCreate( root & "/src", true, true );
+				fileWrite( root & "/src/index.md", "From src" );
+
+				pipeline.build( root );
+
+				expect( fileRead( root & "/site/index.html" ) ).toInclude( "<p>From docs</p>" );
+			} );
+
 			it( "publishes every page's raw .md source alongside its built HTML, and links to it from the page", function() {
 				var root = newProject();
 				var markdown = "---" & char( 10 ) & "title: Setup" & char( 10 ) & "---" & char( 10 ) & "Setup body";

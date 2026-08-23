@@ -23,7 +23,7 @@ class {
 		}
 
 		var renamer = new "models.build.PageRenamer@bxsites"()
-		var result = renamer.rename( docsDir : projectRoot & "/docs", from : from, to : to )
+		var result = renamer.rename( docsDir : new "models.config.SourceDirResolver@bxsites"().resolve( projectRoot ), from : from, to : to )
 
 		return {
 			exitCode : 0,

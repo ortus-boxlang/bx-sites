@@ -7,6 +7,7 @@
 class {
 
 	variables.configLoader     = new "models.config.ConfigLoader@bxsites"()
+	variables.sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
 	variables.docsLoader       = new "models.build.DocsLoader@bxsites"()
 	variables.navBuilder       = new "models.build.NavBuilder@bxsites"()
 	variables.themeRenderer    = new "models.build.ThemeRenderer@bxsites"()
@@ -132,9 +133,10 @@ class {
 		var config = variables.configLoader.load( root )
 		var plugins = resolvePlugins( config )
 		config = variables.pluginLoader.applyOnConfig( plugins, config )
-		var assetPipeline = applyAssetPipeline( config, root )
+		var docsDir = variables.sourceDirResolver.resolve( root )
+		var assetPipeline = applyAssetPipeline( config, root, docsDir )
 		config = assetPipeline.config
-		var imageManifest = variables.imageVariantGenerator.buildManifest( root & "/docs/assets", config.assets.images, root & "/.cache/images", config.assets.fingerprint )
+		var imageManifest = variables.imageVariantGenerator.buildManifest( docsDir & "/assets", config.assets.images, root & "/.cache/images", config.assets.fingerprint )
 		var urls = variables.baseUrlResolver.resolve( config.baseURL )
 		var themeDir = variables.themeRenderer.resolveThemeDir( config.theme.name, root )
 		var siteDir = root & "/site"
@@ -144,16 +146,16 @@ class {
 		}
 		directoryCreate( siteDir, true, true )
 
-		var versionNames = variables.versionsDiscoverer.discover( root & "/docs" )
+		var versionNames = variables.versionsDiscoverer.discover( docsDir )
 		var versions = buildVersionsList( versionNames, urls.basePath )
 
-		var localeNames = variables.localesDiscoverer.discover( root & "/docs" )
+		var localeNames = variables.localesDiscoverer.discover( docsDir )
 		var locales = buildLocalesList( localeNames, config.i18n, urls.basePath )
 		var defaultLocaleCode = config.i18n.defaultLocale.code
 		var defaultLocaleDir = config.i18n.defaultLocale.dir ?: "ltr"
 
-		var navConfig = resolveExplicitNav( root & "/docs", config.nav )
-		var mainPages = variables.docsLoader.load( root & "/docs" )
+		var navConfig = resolveExplicitNav( docsDir, config.nav )
+		var mainPages = variables.docsLoader.load( docsDir )
 		// Loaded (frontmatter parsed, not yet markdown-converted) up front,
 		// purely so the main tree's own nav can carry a "Blog" entry from
 		// its very first render - see renderDocTree()'s own blogNavUrl
@@ -161,14 +163,14 @@ class {
 		// the main tree (and every version/locale tree) is done, alongside
 		// the tags page/sitemap/llms.txt/search index, all of which fold
 		// blog posts in too.
-		var blogPosts = variables.blogDiscoverer.load( root & "/docs", arguments.includeDrafts )
+		var blogPosts = variables.blogDiscoverer.load( docsDir, arguments.includeDrafts )
 		var blogNavUrl = blogPosts.len() ? "blog/index.html" : ""
-		var mainResult = renderDocTree( mainPages, root & "/docs", config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, imageManifest, navConfig, locales, defaultLocaleCode, defaultLocaleDir, blogNavUrl )
+		var mainResult = renderDocTree( mainPages, docsDir, config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, imageManifest, navConfig, locales, defaultLocaleCode, defaultLocaleDir, blogNavUrl )
 		var allPages = duplicate( mainResult.pages )
 		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 
 		for ( var versionName in versionNames ) {
-			var versionDocsDir = root & "/docs/versions/" & versionName
+			var versionDocsDir = docsDir & "/versions/" & versionName
 			var versionOutputDir = siteDir & "/versions/" & versionName
 			var versionBasePath = urls.basePath & "versions/" & versionName & "/"
 			var versionPages = variables.docsLoader.load( versionDocsDir )
@@ -236,11 +238,11 @@ class {
 				continue
 			}
 			var localeOutputDir = siteDir & "/" & locale.code
-			var localePages = variables.docsLoader.load( root & "/docs/i18n/" & locale.code )
+			var localePages = variables.docsLoader.load( docsDir & "/i18n/" & locale.code )
 			var mergedPages = mergeLocalePages( mainPages, localePages, locale.code )
 			var localeResult = renderDocTree(
 				mergedPages,
-				root & "/docs",
+				docsDir,
 				config,
 				themeDir,
 				localeOutputDir,
@@ -277,14 +279,14 @@ class {
 				}
 			}
 
-			convertMarkdown( blogPosts, config, plugins, urls.basePath, root & "/docs", imageManifest )
+			convertMarkdown( blogPosts, config, plugins, urls.basePath, docsDir, imageManifest )
 			assignTableOfContents( blogPosts )
 			assignEditAndLastUpdated( blogPosts, config, root, "" )
 			assignOgImages( blogPosts, config, siteDir )
 			assignMarkdownUrl( blogPosts )
-			assignIconHtml( blogPosts, root & "/docs" )
+			assignIconHtml( blogPosts, docsDir )
 
-			var blogAuthors = variables.blogAuthorsLoader.load( root & "/docs" )
+			var blogAuthors = variables.blogAuthorsLoader.load( docsDir )
 			var blogResult = variables.blogBuilder.build( blogPosts, blogAuthors, config.blog.postsPerPage, urls.basePath, imageManifest )
 
 			for ( var post in blogResult.posts ) {
@@ -365,17 +367,18 @@ class {
 	 *
 	 * @config The site's bxsites.json config, already defaulted/validated and plugin-onConfig'd
 	 * @root Absolute path to the project root
+	 * @docsDir Absolute path to this project's resolved source content folder (SourceDirResolver.bx - `docs/` or `src/`)
 	 *
 	 * @return `{ config, cssBundle, jsBundle }` - `cssBundle`/`jsBundle` are AssetBundler.bundle()'s own return shape (empty `cachedPath`/`fileName` when nothing was bundled), threaded through to copyAssets() so the actual bundle file lands in every tree's own output alongside the rewritten `config.extraCss`/`extraJs` URL
 	 */
-	private struct function applyAssetPipeline( required struct config, required string root ) {
+	private struct function applyAssetPipeline( required struct config, required string root, required string docsDir ) {
 		var emptyBundle = { bundleUrl : "", urls : [], cachedPath : "", fileName : "" }
 
 		if ( !arguments.config.assets.bundle ) {
 			return { config : arguments.config, cssBundle : emptyBundle, jsBundle : emptyBundle }
 		}
 
-		var docsDir = arguments.root & "/docs"
+		var docsDir = arguments.docsDir
 		var cacheDir = arguments.root & "/.cache/assets"
 
 		var cssBundle = variables.assetBundler.bundleCss( arguments.config.extraCss, docsDir, cacheDir, arguments.config.assets.fingerprint )
@@ -606,8 +609,9 @@ class {
 		var plugins = resolvePlugins( config )
 		config = variables.pluginLoader.applyOnConfig( plugins, config )
 
-		var pages = variables.docsLoader.load( root & "/docs" )
-		convertMarkdown( pages, config, plugins, "/", root & "/docs" )
+		var docsDir = variables.sourceDirResolver.resolve( root )
+		var pages = variables.docsLoader.load( docsDir )
+		convertMarkdown( pages, config, plugins, "/", docsDir )
 
 		var siteDir = root & "/site"
 		directoryCreate( siteDir, true, true )
@@ -782,11 +786,13 @@ class {
 		var editUri = trim( arguments.config.repo.editUri ?: "" )
 		var canEdit = len( repoUrl ) && len( editUri )
 
+		var sourceDirName = variables.sourceDirResolver.name( arguments.root )
+
 		for ( var page in arguments.pages ) {
 			var pathFromDocsRoot = page.keyExists( "sourceRelativePath" ) ? page.sourceRelativePath : ( arguments.docsRelativePrefix & page.relativePath )
 			page.editUrl = canEdit ? buildEditUrl( repoUrl, editUri, pathFromDocsRoot ) : ""
 			page.lastUpdated = arguments.config.lastUpdated
-				? variables.gitRevisionDate.forFile( arguments.root, "docs/" & pathFromDocsRoot )
+				? variables.gitRevisionDate.forFile( arguments.root, sourceDirName & "/" & pathFromDocsRoot )
 				: ""
 		}
 	}
@@ -1204,7 +1210,7 @@ class {
 			fileCopy( moduleAssetsDir() & "/math-init.js", arguments.siteDir & "/assets/math-init.js" )
 		}
 
-		var docsAssetsDir = arguments.root & "/docs/assets"
+		var docsAssetsDir = variables.sourceDirResolver.resolve( arguments.root ) & "/assets"
 		if ( directoryExists( docsAssetsDir ) ) {
 			directoryCopy( docsAssetsDir, arguments.siteDir & "/assets", true )
 		}

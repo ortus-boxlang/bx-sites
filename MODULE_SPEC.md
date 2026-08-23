@@ -53,7 +53,7 @@ boxlang bxSites <verb> [options]
 | `migrate` | Convert a GitBook export (`SUMMARY.md` + `.md` files, default) or an mkdocs project (`mkdocs.yml`, `--from=mkdocs`) into a bx-sites project |
 | `check` | CI-grade content check on a built `site/`: broken internal links/images, missing alt text, orphaned pages |
 | `stats` | Read-only summary report on a built `site/`: page/word counts, versions/locales, blog, tags, search index, site size |
-| `doctor` | Environment/config health check: JVM, `docs/`, config validity, required modules, theme override |
+| `doctor` | Environment/config health check: JVM, `docs/` (or `src/`), config validity, required modules, theme override |
 | `post:new` | Scaffold a new blog post at `docs/blog/posts/<slug>.md` |
 | `version:new` | Snapshot `docs/` into a new `docs/versions/<name>/` |
 | `i18n:status` | Per-locale translation coverage report against the default tree |
@@ -75,6 +75,15 @@ bxsites.yaml            # site config (bxsites.json also supported)
 theme/                 # optional project-level theme override
 site/                  # build output (generated)
 ```
+
+The source folder can also be named `src/` instead of `docs/` -
+`SourceDirResolver.bx` auto-detects whichever actually exists at the
+project root (`docs/` wins when a project somehow has both, for backward
+compatibility). `new` always scaffolds `docs/`; `src/` is only ever a
+"bring your own existing folder" option. Every reference to `docs/`
+throughout this spec and the rest of the docs applies equally to a
+project using `src/` instead. `site/` is never itself a valid
+source-folder name — it's deleted and rewritten on every build.
 
 ## 4. Config file — bxsites.yaml (or bxsites.json)
 

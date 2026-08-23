@@ -90,6 +90,15 @@ skip ahead to [Build](#build).
 Every `.md` file under `docs/` becomes a page. Folder nesting becomes nav
 nesting automatically:
 
+!!! note "docs/ or src/"
+    `docs/` is what `new` scaffolds and what every example here uses, but a
+    project that isn't really "docs" in spirit - a marketing site, a
+    portfolio - can use `src/` instead, with zero other changes: every verb
+    (`build`, `serve`, `check`, `lint`, `page:new`, ...) looks for `docs/`
+    first and falls back to `src/` when that's what actually exists. Build
+    output always lands in `site/` either way - the two never collide, since
+    `site/` is never itself a valid source-folder name.
+
 ```text title="docs/ → nav"
 docs/
 ├── index.md              -> /

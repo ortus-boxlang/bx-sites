@@ -17,12 +17,13 @@ class {
 			throw( type = "BxSites.MissingVersionName", message = "`version:new` requires --name=<version>" )
 		}
 
+		var sourceDirName = new "models.config.SourceDirResolver@bxsites"().name( projectRoot )
 		var scaffolder = new "models.build.VersionScaffolder@bxsites"()
-		var result = scaffolder.scaffold( docsDir : projectRoot & "/docs", name : name )
+		var result = scaffolder.scaffold( docsDir : projectRoot & "/" & sourceDirName, name : name )
 
 		return {
 			exitCode : 0,
-			message  : "Created docs/versions/#name# (#result.copiedCount# file(s) copied from the current default docs) at #result.versionDir#"
+			message  : "Created #sourceDirName#/versions/#name# (#result.copiedCount# file(s) copied from the current default #sourceDirName#) at #result.versionDir#"
 		}
 	}
 

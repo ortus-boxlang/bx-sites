@@ -17,12 +17,13 @@ class {
 			throw( type = "BxSites.MissingLocaleCode", message = "`i18n:new` requires --code=<locale>" )
 		}
 
+		var sourceDirName = new "models.config.SourceDirResolver@bxsites"().name( projectRoot )
 		var scaffolder = new "models.build.LocaleScaffolder@bxsites"()
-		var result = scaffolder.scaffold( docsDir : projectRoot & "/docs", code : code )
+		var result = scaffolder.scaffold( docsDir : projectRoot & "/" & sourceDirName, code : code )
 
 		return {
 			exitCode : 0,
-			message  : "Created docs/i18n/#code# at #result.localeDir#" & ( result.seededIndex ? " (seeded with a copy of the default index.md - translate it, then build)" : " (no default docs/index.md to seed from - add pages yourself)" )
+			message  : "Created #sourceDirName#/i18n/#code# at #result.localeDir#" & ( result.seededIndex ? " (seeded with a copy of the default index.md - translate it, then build)" : " (no default #sourceDirName#/index.md to seed from - add pages yourself)" )
 		}
 	}
 

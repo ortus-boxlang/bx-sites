@@ -16,7 +16,7 @@ class {
 			throw( type = "BxSites.MissingProjectRoot", message = "`lint` requires a project root" )
 		}
 
-		var docsDir = projectRoot.reReplace( "[\/]+$", "" ) & "/docs"
+		var docsDir = new "models.config.SourceDirResolver@bxsites"().resolve( projectRoot )
 		var result = new "models.build.ContentLinter@bxsites"().lint( docsDir )
 
 		var failed = result.headingSkips.len() || result.blogDateIssues.len()

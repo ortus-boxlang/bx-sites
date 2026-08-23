@@ -1,6 +1,6 @@
 /**
  * `doctor` CLI verb - a one-shot environment/config health check: is
- * `docs/` present, does `bxsites.json`/`.yaml` actually parse and validate,
+ * `docs/` (or `src/`) present, does `bxsites.json`/`.yaml` actually parse and validate,
  * are the required BoxLang modules (bx-markdown/bx-esapi/bx-yaml/bx-image)
  * installed/activated, and (if present) does a project-level `theme/`
  * override satisfy the two-required-file `ThemeProvider` contract.
@@ -39,11 +39,13 @@ class {
 
 		checks.append( { label : "JVM", ok : true, detail : createObject( "java", "java.lang.System" ).getProperty( "java.version" ) } )
 
-		var docsDir = root & "/docs"
+		var sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
+		var sourceDirName = sourceDirResolver.name( root )
+		var docsDir = sourceDirResolver.resolve( root )
 		if ( directoryExists( docsDir ) ) {
-			checks.append( { label : "docs/", ok : true, detail : "found at " & docsDir } )
+			checks.append( { label : sourceDirName & "/", ok : true, detail : "found at " & docsDir } )
 		} else {
-			checks.append( { label : "docs/", ok : false, detail : "no docs/ directory at " & docsDir } )
+			checks.append( { label : "docs/ or src/", ok : false, detail : "no docs/ or src/ directory at " & root } )
 			failed = true
 		}
 

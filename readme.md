@@ -16,7 +16,7 @@
 
 <p>&nbsp;</p>
 
-Static documentation site generator for BoxLang, built on bx-markdown - in the spirit of [mkdocs](https://www.mkdocs.org/): write Markdown in `docs/`, get a themed, searchable static site out. Already on GitBook? `bxSites migrate --source=...` converts an export straight into a bx-sites project - see [Migrating from GitBook](docs/guides/migrating-from-gitbook.md).
+Static documentation site generator for BoxLang, built on bx-markdown - in the spirit of [mkdocs](https://www.mkdocs.org/): write Markdown in `docs/` (or `src/`, if that reads better for your project), get a themed, searchable static site out. Already on GitBook? `bxSites migrate --source=...` converts an export straight into a bx-sites project - see [Migrating from GitBook](docs/guides/migrating-from-gitbook.md).
 
 ----
 
@@ -65,7 +65,7 @@ boxlang bxSites <verb> [options]
 | `clean` | Remove `site/` and any build cache |
 | `migrate` | Convert a GitBook export (`SUMMARY.md` + `.md` files) into `docs/` + `nav.json` |
 | `stats` | Read-only summary report on a built `site/`: page/word counts, versions/locales, blog, tags, search index, site size |
-| `doctor` | Environment/config health check: JVM, `docs/`, config validity, required modules, theme override |
+| `doctor` | Environment/config health check: JVM, `docs/` (or `src/`), config validity, required modules, theme override |
 | `post:new` | Scaffold a new blog post at `docs/blog/posts/<slug>.md` |
 | `version:new` | Snapshot `docs/` into a new `docs/versions/<name>/` |
 | `i18n:status` | Per-locale translation coverage report against the default tree |

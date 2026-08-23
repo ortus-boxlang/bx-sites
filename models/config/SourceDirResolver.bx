@@ -1,0 +1,61 @@
+/**
+ * Resolves a project's content source folder - `docs/` (the original,
+ * still-default convention) or `src/` (a neutral alternative name that
+ * reads naturally for a project that thinks of itself as a general
+ * "site" rather than "docs"). Whichever actually exists on disk wins;
+ * `docs/` is checked first, so an existing project with both a
+ * leftover `src/` folder (unrelated to bx-sites - a mixed-language repo's
+ * own source tree, say) and a real `docs/` keeps working exactly as
+ * before, with zero behavior change.
+ *
+ * Deliberately does NOT touch the build *output* folder name - `site/`
+ * stays `site/` unconditionally, regardless of which source name was
+ * detected. `site/` is BuildPipeline.bx's own hardcoded output directory
+ * (deleted and rewritten on every build), so letting it double as a
+ * valid *source* name too would make a build delete its own source
+ * content - this resolver only ever recognizes `docs/`/`src/`, never
+ * `site/`.
+ *
+ * A brand-new project with neither folder yet (the moment right before
+ * `new`/`migrate` scaffolds one) resolves to `docs/` - the long-standing
+ * default - so error messages and scaffolding both keep pointing at the
+ * familiar name until a project actually opts into `src/` by creating it.
+ */
+class {
+
+	/**
+	 * Recognized source-folder names, in resolution preference order.
+	 */
+	variables.candidateNames = [ "docs", "src" ]
+
+	/**
+	 * The bare folder name (`"docs"` or `"src"`) this project's source
+	 * content actually lives under - whichever of `candidateNames` exists
+	 * on disk first, or `"docs"` (the default) when neither does yet.
+	 *
+	 * @projectRoot Absolute path to the project root
+	 */
+	string function name( required string projectRoot ) {
+		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+
+		for ( var candidate in variables.candidateNames ) {
+			if ( directoryExists( root & "/" & candidate ) ) {
+				return candidate
+			}
+		}
+
+		return variables.candidateNames[ 1 ]
+	}
+
+	/**
+	 * The absolute path to this project's source content folder - `name()`'s
+	 * result joined back onto `projectRoot`.
+	 *
+	 * @projectRoot Absolute path to the project root
+	 */
+	string function resolve( required string projectRoot ) {
+		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		return root & "/" & name( root )
+	}
+
+}
