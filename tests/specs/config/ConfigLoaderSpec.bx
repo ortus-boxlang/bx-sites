@@ -509,6 +509,23 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
+			it( "defaults [openapi] to false", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).openapi ).toBeFalse();
+			} );
+
+			it( "preserves a user-supplied [openapi]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","openapi":true}' );
+				expect( loader.load( dir ).openapi ).toBeTrue();
+			} );
+
+			it( "throws BxSites.InvalidConfig when [openapi] is not a boolean", function() {
+				var dir = newProjectDir( '{"name":"My Docs","openapi":"yes please"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
 			it( "defaults [blog.postsPerPage] to 10, [blog.feed] to true, and [blog.feedLimit] to 25", function() {
 				var dir = newProjectDir( '{"name":"My Docs"}' );
 				var config = loader.load( dir );

@@ -167,7 +167,7 @@ class {
 		var blogNavUrl = blogPosts.len() ? "blog/index.html" : ""
 		var mainResult = renderDocTree( mainPages, docsDir, config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, imageManifest, navConfig, locales, defaultLocaleCode, defaultLocaleDir, blogNavUrl )
 		var allPages = duplicate( mainResult.pages )
-		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
+		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 
 		for ( var versionName in versionNames ) {
 			var versionDocsDir = docsDir & "/versions/" & versionName
@@ -198,7 +198,7 @@ class {
 				defaultLocaleDir
 			)
 			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
-			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
+			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 			writeTagsPage( versionResult.pages, versionResult.nav, config, themeDir, versionOutputDir, versionBasePath, versions, versionLocales, defaultLocaleCode )
 
 			for ( var versionLocale in versionLocales ) {
@@ -228,7 +228,7 @@ class {
 					versionLocale.dir
 				)
 				allPages.append( prefixPageUrls( versionLocaleResult.pages, "versions/" & versionName & "/" & versionLocale.code & "/" ), true )
-				copyAssets( root, themeDir, versionLocaleOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
+				copyAssets( root, themeDir, versionLocaleOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 				writeTagsPage( versionLocaleResult.pages, versionLocaleResult.nav, config, themeDir, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/", versions, versionLocales, versionLocale.code )
 			}
 		}
@@ -260,7 +260,7 @@ class {
 				locale.dir
 			)
 			allPages.append( prefixPageUrls( localeResult.pages, locale.code & "/" ), true )
-			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
+			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 			writeTagsPage( localeResult.pages, localeResult.nav, config, themeDir, localeOutputDir, urls.basePath & locale.code & "/", versions, locales, locale.code )
 		}
 
@@ -678,6 +678,7 @@ class {
 			var html = variables.markdownRenderer.toHtml( directivesExtracted.markdown, arguments.config.markdown )
 			html = variables.directiveBlockProcessor.restore( html, directivesExtracted.blocks, variables.markdownRenderer, arguments.config.markdown )
 			html = variables.directiveBlockProcessor.resolveFileHrefs( html, arguments.basePath )
+			html = variables.directiveBlockProcessor.resolveOpenApiSrcs( html, arguments.basePath )
 			html = variables.codeAnnotationProcessor.applyToHtml( html, codeExtracted.annotations )
 			html = variables.mathProtector.restore( html, mathProtected.formulas )
 			html = variables.tabsProcessor.restore( html, tabsExtracted.groups, variables.markdownRenderer, arguments.config.markdown )
@@ -1160,8 +1161,9 @@ class {
 	 * needs with no CDN/internet access (module spec section 8 - highlight.js
 	 * and Alpine.js always, Bootstrap's own CSS/JS for the `bootstrap` theme,
 	 * lunr.js alongside search.js, mermaid.js alongside mermaid-init.js when
-	 * `mermaid` is on), and a project's own `docs/assets/**` to
-	 * `site/assets/` (module spec section 5, step 6).
+	 * `mermaid` is on, Swagger UI alongside openapi-init.js when `openapi`
+	 * is on), and a project's own `docs/assets/**` to `site/assets/`
+	 * (module spec section 5, step 6).
 	 *
 	 * @root Absolute path to the project root
 	 * @themeDir Absolute path to the resolved theme folder
@@ -1170,11 +1172,12 @@ class {
 	 * @searchEnabled Whether to copy the shared search.js/lunr widget - searchNeedsLocalIndex()'s own result, so this is only true for the `local` search provider (or one bx-sites doesn't otherwise know about), never `algolia`
 	 * @mermaidEnabled Whether to copy the shared mermaid-init.js widget and the vendored mermaid.js bundle itself
 	 * @mathEnabled Whether to copy the shared math-init.js (KaTeX auto-render) widget
+	 * @openapiEnabled Whether to copy the shared openapi-init.js widget and the vendored Swagger UI bundle/CSS - only ever needed by a project actually using a `::: openapi` block (DirectiveBlockProcessor.bx)
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - its already-generated variant files get copied into this tree's own site.../assets/, right alongside the plain docs/assets/** copy below; empty (the default) copies nothing extra
 	 * @cssBundle AssetBundler.bundleCss()'s own output (via applyAssetPipeline()) - its cached bundle file gets copied into this tree's own site.../assets/ so the `<link>` config.extraCss now points at actually resolves; empty `cachedPath` (the default) copies nothing
 	 * @jsBundle AssetBundler.bundleJs()'s own output - same as cssBundle, for the `<script>` config.extraJs now points at
 	 */
-	private void function copyAssets( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {} ) {
+	private void function copyAssets( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {} ) {
 		var themeAssetsDir = arguments.themeDir & "/assets"
 		if ( directoryExists( themeAssetsDir ) ) {
 			directoryCopy( themeAssetsDir, arguments.siteDir & "/assets/theme", true )
@@ -1208,6 +1211,11 @@ class {
 
 		if ( arguments.mathEnabled ) {
 			fileCopy( moduleAssetsDir() & "/math-init.js", arguments.siteDir & "/assets/math-init.js" )
+		}
+
+		if ( arguments.openapiEnabled ) {
+			fileCopy( moduleAssetsDir() & "/openapi-init.js", arguments.siteDir & "/assets/openapi-init.js" )
+			directoryCopy( moduleAssetsDir() & "/vendor/swagger-ui", arguments.siteDir & "/assets/vendor/swagger-ui", true )
 		}
 
 		var docsAssetsDir = variables.sourceDirResolver.resolve( arguments.root ) & "/assets"

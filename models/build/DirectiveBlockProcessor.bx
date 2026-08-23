@@ -23,6 +23,7 @@ class {
 	variables.attrPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(\w+)="([^"]*)"' )
 	variables.titlePattern = createObject( "java", "java.util.regex.Pattern" ).compile( '^"([^"]*)"\s*(.*)$' )
 	variables.fileHrefPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(<a class="bxsites-file" href=")([^"]*)(")' )
+	variables.openApiSrcPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(<div class="bxsites-openapi" data-openapi-src=")([^"]*)("[^>]*>)' )
 	variables.iconResolver = new "models.build.IconResolver@bxsites"()
 
 	/**
@@ -191,6 +192,8 @@ class {
 				return renderUpdates( block, renderer, markdownOptions )
 			case "file":
 				return renderFile( attrs )
+			case "openapi":
+				return renderOpenApi( attrs )
 			case "embed":
 				return renderEmbed( attrs )
 			case "page-link":
@@ -403,6 +406,33 @@ class {
 	}
 
 	/**
+	 * `::: openapi src="assets/openapi/spec.yaml" title="My API"` - an
+	 * interactive Swagger UI widget rendering an OpenAPI/Swagger spec
+	 * (JSON or YAML - Swagger UI parses either client-side, no server-side
+	 * parsing happens anywhere in this module). `src` is resolved the same
+	 * `docs/assets/`-relative way `::: file`'s own `src` is - left
+	 * as-authored here and prefixed with `basePath` afterwards by
+	 * `resolveOpenApiSrcs()` below, same reasoning as `renderFile()`'s own
+	 * docblock. Requires `bxsites.json`'s `openapi: true` - unset, the
+	 * required Swagger UI JS/CSS is never copied into `site/` at all
+	 * (BuildPipeline.bx's `copyAssets()`), the same opt-in-only shape
+	 * `mermaid`/`math` already use, so this placeholder renders but stays
+	 * inert (no widget mounts) on a project that hasn't turned it on.
+	 */
+	private string function renderOpenApi( required struct attrs ) {
+		var src = trim( arguments.attrs.src ?: "" )
+		if ( !len( src ) ) {
+			return '<div class="bxsites-openapi bxsites-openapi--invalid">::: openapi - missing required src="..."</div>'
+		}
+		var title = trim( arguments.attrs.title ?: "" )
+		var html = ""
+		if ( len( title ) ) {
+			html &= '<div class="bxsites-openapi__title">' & encodeForHTML( title ) & '</div>'
+		}
+		return '<div class="bxsites-openapi" data-openapi-src="' & attrEscape( src ) & '">' & html & '</div>'
+	}
+
+	/**
 	 * `::: embed url="https://..." title="Caption"` - a responsive iframe
 	 * embed for a recognized provider (YouTube, Vimeo, CodePen, Spotify,
 	 * Loom, Figma); an unrecognized URL falls back to a plain link card
@@ -578,6 +608,28 @@ class {
 		while ( matcher.find() ) {
 			var href = matcher.group( 2 )
 			var resolved = isLocalAssetPath( href ) ? arguments.basePath & href : href
+			matcher.appendReplacement( buffer, createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( matcher.group( 1 ) & resolved & matcher.group( 3 ) ) )
+		}
+		matcher.appendTail( buffer )
+
+		return buffer.toString()
+	}
+
+	/**
+	 * Prefixes every `::: openapi` block's own `data-openapi-src` with
+	 * `basePath` - same reasoning and same "only BuildPipeline.bx has
+	 * `basePath` in scope" split as `resolveFileHrefs()` above.
+	 *
+	 * @html Already-rendered page HTML (this class's own `restore()` output)
+	 * @basePath Root-relative base path ending with `/`
+	 */
+	string function resolveOpenApiSrcs( required string html, required string basePath ) {
+		var matcher = variables.openApiSrcPattern.matcher( arguments.html )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+
+		while ( matcher.find() ) {
+			var src = matcher.group( 2 )
+			var resolved = isLocalAssetPath( src ) ? arguments.basePath & src : src
 			matcher.appendReplacement( buffer, createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( matcher.group( 1 ) & resolved & matcher.group( 3 ) ) )
 		}
 		matcher.appendTail( buffer )
