@@ -50,7 +50,7 @@ class extends="testbox.system.BaseSpec" {
 				var result = verb.run( { projectRoot : projectRoot } );
 
 				expect( result.exitCode ).toBe( 1 );
-				expect( result.message ).toInclude( "no docs/ directory" );
+				expect( result.message ).toInclude( "no docs/ or src/ directory" );
 			} );
 
 			it( "exits 1 and reports an invalid bxsites.json", function() {
