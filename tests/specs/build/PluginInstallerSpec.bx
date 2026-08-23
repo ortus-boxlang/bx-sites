@@ -39,7 +39,7 @@ class extends="testbox.system.BaseSpec" {
 			private string function buildFixtureZip( required boolean flat ) {
 				var moduleDir = newTempDir( "bxsites-fixture-module-" );
 				fileWrite( moduleDir & "/box.json", '{"name":"fixture"}' );
-				fileWrite( moduleDir & "/ModuleConfig.bx", "class { this.mapping = \"fixture\"; }" );
+				fileWrite( moduleDir & "/ModuleConfig.bx", "class { this.mapping = 'fixture'; }" );
 
 				var zipPath = newTempDir( "bxsites-fixture-zip-" ) & "/fixture.zip";
 				compress( format : "zip", source : moduleDir, destination : zipPath, includeBaseFolder : !arguments.flat, overwrite : true );
