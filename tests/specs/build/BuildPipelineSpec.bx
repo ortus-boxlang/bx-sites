@@ -1766,8 +1766,15 @@ class extends="testbox.system.BaseSpec" {
 				pipeline.build( root );
 
 				var html = fileRead( root & "/site/index.html" );
-				expect( html ).toInclude( 'href="/blog/index.html">Blog</a>' );
-				expect( html.findNoCase( ">About<" ) ).toBeLT( html.findNoCase( ">Blog<" ) );
+				// The auto-appended entry's own icon (phosphor-duotone:newspaper)
+				// resolves to inline SVG markup, then a space, before the "Blog"
+				// text - assert on "Blog</a>" (the text-to-close-tag boundary)
+				// rather than an exact ">Blog<"/href-adjacent substring, so this
+				// doesn't re-break the next time a nav icon (or lack of one, or
+				// its own markup) changes what sits before the label.
+				expect( html ).toInclude( 'href="/blog/index.html"' );
+				expect( html.findNoCase( 'href="/blog/index.html"' ) ).toBeLT( html.findNoCase( "Blog</a>" ) );
+				expect( html.findNoCase( ">About<" ) ).toBeLT( html.findNoCase( "Blog</a>" ) );
 			} );
 
 			it( "skips the auto-appended ""Blog"" nav entry when a custom nav already places one via an explicit url", function() {
@@ -1783,10 +1790,20 @@ class extends="testbox.system.BaseSpec" {
 				pipeline.build( root );
 
 				var html = fileRead( root & "/site/index.html" );
-				// Only one "Blog" nav link - the author's own, placed first -
-				// not a second one auto-appended after it.
-				expect( html.findNoCase( ">Blog<" ) ).toBeLT( html.findNoCase( ">Home<" ) );
-				expect( html.reMatch( 'href="/blog/index\.html">Blog</a>' ).len() ).toBe( 1 );
+				// Scoped to the sidebar nav's own <ul> - the page's prev/next
+				// page-nav (bottom of page) also legitimately links to
+				// blog/index.html here (it's the flattened nav's previous
+				// entry), so counting hrefs across the whole page would see 2
+				// even when the sidebar itself has exactly one, correctly.
+				var sidebarStart = html.findNoCase( '<ul class="nav flex-column">' );
+				var sidebarEnd = html.findNoCase( "</ul>", sidebarStart );
+				var sidebarHtml = html.mid( sidebarStart, sidebarEnd - sidebarStart + 5 );
+				// index.md has no frontmatter title here, so DocsLoader falls
+				// back to "Index" (the filename-derived default), not "Home"
+				// (the file's own plain-text body content) - only one "Blog"
+				// nav link in the sidebar, the author's own, placed before it.
+				expect( sidebarHtml.findNoCase( "Blog</a>" ) ).toBeLT( sidebarHtml.findNoCase( ">Index<" ) );
+				expect( sidebarHtml.reMatch( 'href="/blog/index\.html"' ).len() ).toBe( 1 );
 			} );
 
 		} );
