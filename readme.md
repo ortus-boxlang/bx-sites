@@ -75,6 +75,7 @@ boxlang bxSites <verb> [options]
 | `install:plugin` | Download a plugin from ForgeBox into project-local `boxlang_modules/` |
 | `theme:new` | Eject a built-in theme into project `theme/` for customizing |
 | `install:theme` | Download a theme from ForgeBox into project-local `themes/<name>/` |
+| `theme:import` | Best-effort convert a mkdocs/jekyll/hugo theme's own template files into a `themes/<name>/` scaffold |
 | `page:rename` | Move a docs page and rewrite every relative link that pointed at it |
 | `blog:drafts` | List every blog post whose frontmatter sets `draft: true` |
 | `blog:find` | Filter blog posts by author/category/tag/date range |

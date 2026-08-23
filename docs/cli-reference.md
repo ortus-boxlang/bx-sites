@@ -365,6 +365,25 @@ install time rather than at the next `build`. Set `bxsites.json`'s
 `theme.name` to the installed name to use it - see
 [Themes](guides/themes.md#installing-a-published-theme).
 
+## `theme:import`
+
+Best-effort conversion of a theme from another static site generator's
+ecosystem (`mkdocs`/`jekyll`/`hugo`) into a bx-sites theme scaffold under
+`themes/<name>/` - a starting point, not a lossless one-command port.
+
+```bash title="Usage"
+bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
+```
+
+- `--source` (required) - `mkdocs`, `jekyll`, or `hugo`
+- `--path` (required) - the source theme's own root folder
+- `--name` (required) - the destination name, written to `themes/<name>/`
+
+Safe to re-run against the same `--name` - `layout.bxm`/`page.bxm` are
+overwritten and any newly-found asset folders merged in. See
+[Importing a theme](guides/theme-import.md) for exactly what does and
+doesn't get translated, and what to check afterward.
+
 ## `page:rename`
 
 Move a docs page from one path to another, rewriting every relative

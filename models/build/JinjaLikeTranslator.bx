@@ -24,13 +24,30 @@
 class {
 
 	/**
+	 * The literal `#` character, built via char() rather than written as
+	 * a bare `#` inside a string literal - BoxLang string literals (in
+	 * either quote style) treat `#...#` as interpolation, and this class
+	 * needs a genuinely literal `#` in several places: building the regex
+	 * pattern just below (a literal `#` delimiting a Jinja2 comment,
+	 * `{# ... #}`, would otherwise pair up with the very next `#`
+	 * character in the same string and have everything between them
+	 * parsed as an interpolated *expression* - `([\s\S]*?)` isn't valid
+	 * BoxLang, so that alone would fail to compile), and the `#value#`
+	 * output syntax this class generates as literal text, not something
+	 * meant to be interpolated itself. char(35) sidesteps the whole
+	 * question of exactly when/how a bare `#` needs doubling (`##`)
+	 * inside a given quote style - see AGENTS.md's own BoxLang Gotchas.
+	 */
+	variables.hash = char( 35 )
+
+	/**
 	 * Matches, in one pass: group 1 = `{{ ... }}` output expression,
 	 * group 2 = `{% ... %}` tag body, group 3 = `{# ... #}` comment body.
 	 * The optional leading/trailing `-` (Jinja2/Liquid's whitespace-trim
 	 * markers, e.g. `{%- if x -%}`) is matched but not captured.
 	 */
 	variables.tokenPattern = createObject( "java", "java.util.regex.Pattern" ).compile(
-		"\{\{-?\s*([\s\S]*?)\s*-?\}\}|\{%-?\s*([\s\S]*?)\s*-?%\}|\{#([\s\S]*?)#\}"
+		"\{\{-?\s*([\s\S]*?)\s*-?\}\}|\{%-?\s*([\s\S]*?)\s*-?%\}|\{" & variables.hash & "([\s\S]*?)" & variables.hash & "\}"
 	)
 
 	/**
@@ -117,7 +134,7 @@ class {
 		}
 
 		if ( arguments.variableMap.keyExists( trimmed ) ) {
-			return "#" & arguments.variableMap[ trimmed ] & "#"
+			return variables.hash & arguments.variableMap[ trimmed ] & variables.hash
 		}
 
 		arguments.warnings.append( "No mapping for {{ " & trimmed & " }} - left as a TODO marker." )
@@ -142,11 +159,11 @@ class {
 
 		if ( trimmed.reFindNoCase( "^if\s+" ) ) {
 			arguments.blockStack.append( "if" )
-			return '<bx:if condition="#' & translateCondition( trimmed.reReplaceNoCase( "^if\s+", "" ), arguments.variableMap, arguments.warnings ) & '#">'
+			return '<bx:if condition="' & variables.hash & translateCondition( trimmed.reReplaceNoCase( "^if\s+", "" ), arguments.variableMap, arguments.warnings ) & variables.hash & '">'
 		}
 
 		if ( trimmed.reFindNoCase( "^(elif|elsif)\s+" ) ) {
-			return '<bx:elseif condition="#' & translateCondition( trimmed.reReplaceNoCase( "^(elif|elsif)\s+", "" ), arguments.variableMap, arguments.warnings ) & '#">'
+			return '<bx:elseif condition="' & variables.hash & translateCondition( trimmed.reReplaceNoCase( "^(elif|elsif)\s+", "" ), arguments.variableMap, arguments.warnings ) & variables.hash & '">'
 		}
 
 		if ( trimmed.reFindNoCase( "^else$" ) ) {
@@ -163,7 +180,7 @@ class {
 			arguments.blockStack.append( "for" )
 			var itemName = forMatcher.group( 1 )
 			var listExpr = forMatcher.group( 2 )
-			return '<bx:loop array="#' & translateCondition( listExpr, arguments.variableMap, arguments.warnings ) & '#" item="' & itemName & '">'
+			return '<bx:loop array="' & variables.hash & translateCondition( listExpr, arguments.variableMap, arguments.warnings ) & variables.hash & '" item="' & itemName & '">'
 		}
 
 		if ( trimmed.reFindNoCase( "^endfor$" ) ) {
@@ -243,10 +260,17 @@ class {
 	}
 
 	/**
+	 * No escaping needed for a literal `--` in `original` - BoxLang's own
+	 * `<!--- --->` comment tags track *nesting* by matching the specific
+	 * three-dash delimiter sequences, not by reacting to a bare `--`
+	 * inside the comment body, so only a literal `--->` in the source
+	 * template's own syntax could prematurely close this comment (not a
+	 * realistic risk for Jinja2/Liquid syntax).
+	 *
 	 * @original The original template syntax, for a human to find and port by hand
 	 */
 	private string function todoComment( required string original ) {
-		return "<!--- TODO: " & arguments.original.replace( "--", "&#45;&#45;", "all" ) & " --->"
+		return "<!--- TODO: " & arguments.original & " --->"
 	}
 
 }

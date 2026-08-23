@@ -1,0 +1,166 @@
+/**
+ * Exercises GoTemplateTranslator.bx's translate() end to end - pure input
+ * (template source + a variable map) to output (.bxm content + warnings),
+ * no filesystem/network involved.
+ *
+ * Expected-value strings below build a literal `#value#` substring via
+ * h() (char(35) concatenation) rather than writing `#value#` directly in
+ * a string literal - see JinjaLikeTranslatorSpec.bx's own top docblock
+ * for why (BoxLang interpolates `#...#` in string literals regardless of
+ * quote style, so a literal `'#variables.page.title#'` would try to
+ * evaluate `variables.page.title` as a real expression instead of
+ * comparing against the literal text).
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.GoTemplateTranslator", function() {
+
+			beforeEach( function() {
+				variables.translator = new "models.build.GoTemplateTranslator@bxsites"();
+				variables.map = { ".Title" : "variables.page.title", ".Site.Title" : "variables.siteConfig.name" };
+			} );
+
+			it( "passes plain HTML through untouched when there's nothing to translate", function() {
+				var result = translator.translate( "<h1>Hello</h1>", map );
+				expect( result.output ).toBe( "<h1>Hello</h1>" );
+				expect( result.warnings ).toBeEmpty();
+			} );
+
+			it( "translates a mapped {{ .Field }} into a hash-delimited output", function() {
+				var result = translator.translate( "<h1>{{ .Title }}</h1>", map );
+				expect( result.output ).toBe( "<h1>" & h( "variables.page.title" ) & "</h1>" );
+				expect( result.warnings ).toBeEmpty();
+			} );
+
+			it( "doesn't let a shorter mapped key clobber a longer dotted path it's a suffix of", function() {
+				var result = translator.translate( "{{ .Site.Title }}", map );
+				expect( result.output ).toBe( h( "variables.siteConfig.name" ) );
+			} );
+
+			it( "leaves an unmapped {{ .Field }} output as a TODO comment and warns", function() {
+				var result = translator.translate( "{{ .Author }}", map );
+				expect( result.output ).toInclude( "<!--- TODO:" );
+				expect( result.output ).toInclude( ".Author" );
+				expect( result.warnings.len() ).toBe( 1 );
+			} );
+
+			it( "leaves a piped {{ .Field | filter }} output as a TODO comment and warns", function() {
+				var result = translator.translate( "{{ .Title | upper }}", map );
+				expect( result.output ).toInclude( "<!--- TODO:" );
+				expect( result.output ).notToInclude( "variables.page.title" );
+				expect( result.warnings.len() ).toBe( 1 );
+			} );
+
+			it( "translates {{ if }}/{{ end }} into <bx:if>/</bx:if>, substituting mapped fields in the condition", function() {
+				var result = translator.translate( "{{ if .Title }}Hi{{ end }}", map );
+				expect( result.output ).toBe( '<bx:if condition="' & h( "variables.page.title" ) & '">Hi</bx:if>' );
+				expect( result.warnings ).toBeEmpty();
+			} );
+
+			it( "translates a full if/else if/else chain", function() {
+				var source = "{{ if .Title }}A{{ else if .Site.Title }}B{{ else }}C{{ end }}";
+				var result = translator.translate( source, map );
+				var expected = '<bx:if condition="' & h( "variables.page.title" ) & '">A<bx:elseif condition="' & h( "variables.siteConfig.name" ) & '">B<bx:else>C</bx:if>';
+				expect( result.output ).toBe( expected );
+			} );
+
+			it( "translates {{ range }}/{{ end }} into <bx:loop array=... item=""item"">, and warns about the . rebind it can't replicate", function() {
+				var result = translator.translate( "{{ range .Site.Title }}{{ .Title }}{{ end }}", map );
+				var expected = '<bx:loop array="' & h( "variables.siteConfig.name" ) & '" item="item">' & h( "variables.page.title" ) & '</bx:loop>';
+				expect( result.output ).toBe( expected );
+				expect( result.warnings.len() ).toBe( 1 );
+				expect( result.warnings[ 1 ] ).toInclude( "range" );
+			} );
+
+			it( "drops a {{/* comment */}} entirely, with no output and no warning", function() {
+				var result = translator.translate( "before{{/* a go comment */}}after", map );
+				expect( result.output ).toBe( "beforeafter" );
+				expect( result.warnings ).toBeEmpty();
+			} );
+
+			it( "leaves {{ with }} as a TODO marker rather than a semantically-wrong <bx:if>, and warns", function() {
+				var result = translator.translate( "{{ with .Title }}Hi{{ end }}", map );
+				expect( result.output ).toInclude( "<!--- TODO:" );
+				expect( result.output ).toInclude( "with" );
+				// The {{ end }} closing the untranslated {{ with }} has nothing
+				// on the block stack to pop (with never pushes), so it's also
+				// left as a TODO marker rather than guessing at a closing tag.
+				expect( result.output ).toInclude( "<!--- TODO: {{ end }} --->" );
+				expect( result.warnings.len() ).toBe( 2 );
+			} );
+
+			it( "substitutes an unmapped .Field inside a condition with a syntactically-safe placeholder rather than leaving invalid syntax", function() {
+				var result = translator.translate( "{{ if .Draft }}Hi{{ end }}", map );
+				// A bare `.Draft` embedded raw inside a hash-delimited output
+				// isn't valid BoxLang - it must never appear literally in the
+				// output.
+				expect( result.output ).notToInclude( ".Draft" );
+				expect( result.output ).toBe( '<bx:if condition="' & h( "false" ) & '">Hi</bx:if>' );
+				expect( result.warnings.len() ).toBe( 1 );
+				expect( result.warnings[ 1 ] ).toInclude( ".Draft" );
+			} );
+
+			it( "uses an empty-array placeholder (not false) for an unmapped range list-expression", function() {
+				var result = translator.translate( "{{ range .Pages }}x{{ end }}", map );
+				expect( result.output ).toInclude( 'array="' & h( "[]" ) & '"' );
+			} );
+
+			it( "translates a mapped `not .Field` condition into BoxLang's own `not` keyword", function() {
+				var result = translator.translate( "{{ if not .Title }}Hi{{ end }}", map );
+				expect( result.output ).toBe( '<bx:if condition="' & h( "not variables.page.title" ) & '">Hi</bx:if>' );
+				expect( result.warnings ).toBeEmpty();
+			} );
+
+			it( "placeholders a Go prefix-function-call condition wholesale rather than partially substituting it", function() {
+				// `and`/`or`/`eq`/... are Go's own prefix-call operators
+				// (`and .A .B`, not an infix `.A and .B`) - BoxLang has no
+				// equivalent bare-word-call syntax, so substituting just the
+				// .Field tokens inside one would still leave invalid BoxLang
+				// text (e.g. "and false false"); the whole condition is
+				// placeholder'd instead.
+				var result = translator.translate( '{{ if eq .Title "home" }}Hi{{ end }}', map );
+				expect( result.output ).notToInclude( ".Title" );
+				expect( result.output ).notToInclude( "eq" );
+				expect( result.output ).toBe( '<bx:if condition="' & h( "false" ) & '">Hi</bx:if>' );
+				expect( result.warnings.len() ).toBe( 1 );
+				expect( result.warnings[ 1 ] ).toInclude( "prefix function call" );
+			} );
+
+			it( "warns on an unclosed {{ if }} at the end of the source", function() {
+				var result = translator.translate( "{{ if .Title }}Hi", map );
+				var found = false;
+				for ( var w in result.warnings ) {
+					found = found || w.findNoCase( "Unclosed" ) > 0;
+				}
+				expect( found ).toBeTrue();
+			} );
+
+			it( "leaves an unsupported directive (e.g. {{ define }}) as a TODO comment and warns", function() {
+				var result = translator.translate( '{{ define "partial" }}x{{ end }}', map );
+				expect( result.output ).toInclude( "<!--- TODO:" );
+				expect( result.output ).toInclude( "define" );
+			} );
+
+			it( "handles two tags with no literal text between them", function() {
+				var result = translator.translate( "{{ .Title }}{{ .Site.Title }}", map );
+				expect( result.output ).toBe( h( "variables.page.title" ) & h( "variables.siteConfig.name" ) );
+			} );
+
+			it( "handles Go's whitespace-trim markers ({{- -}})", function() {
+				var result = translator.translate( "{{- if .Title -}}Hi{{- end -}}", map );
+				expect( result.output ).toBe( '<bx:if condition="' & h( "variables.page.title" ) & '">Hi</bx:if>' );
+			} );
+
+		} );
+	}
+
+	/**
+	 * Wraps `inner` in a pair of literal `#` characters, via char(35) - see
+	 * this file's own top docblock.
+	 */
+	private string function h( required string inner ) {
+		return char( 35 ) & arguments.inner & char( 35 )
+	}
+
+}

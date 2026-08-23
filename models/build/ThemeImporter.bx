@@ -1,0 +1,100 @@
+/**
+ * Backs the `theme:import` CLI verb - the generic engine behind
+ * converting a theme from another static-site-generator ecosystem
+ * (MkDocs/Jekyll/Hugo) into a bx-sites theme scaffold. Ecosystem-specific
+ * knowledge (which filenames are the layout/content templates, which
+ * folders hold static assets, the variable-name mapping table, which
+ * translator class to run) lives entirely in the caller (ThemeImport.bx's
+ * own per-ecosystem config structs) - this class only knows how to: find
+ * the first candidate filename that exists, run it through a translator,
+ * write the result, and copy asset folders across verbatim.
+ *
+ * A genuinely best-effort scaffold, not a lossless converter - see
+ * JinjaLikeTranslator.bx/GoTemplateTranslator.bx's own docblocks and
+ * docs/guides/theme-import.md. `import()` never throws on a missing
+ * layout/content file; it reports the gap in its own `warnings` instead,
+ * since a partial scaffold (assets copied, one of the two required files
+ * missing) is still useful to hand a human to finish by hand.
+ */
+class {
+
+	/**
+	 * @sourceThemeDir Absolute path to the source theme's own root folder
+	 * @destDir Absolute path to write the bx-sites scaffold into (created if it doesn't exist)
+	 * @layoutCandidates Filenames (relative to sourceThemeDir), checked in order - the first that exists becomes layout.bxm
+	 * @contentCandidates Same, for page.bxm
+	 * @assetDirNames Folder names (relative to sourceThemeDir) copied verbatim into destDir/assets/<name>/ when present
+	 * @translator Any object exposing `translate( source, variableMap )` -> `{ output, warnings }` (JinjaLikeTranslator.bx or GoTemplateTranslator.bx)
+	 * @variableMap Passed straight through to the translator - see either translator's own docblock
+	 *
+	 * @return { layoutFile, contentFile (source paths actually used, "" if none found), assetsCopied (array of the assetDirNames that existed), warnings (array of strings - translator warnings plus this class's own "nothing found" ones) }
+	 */
+	struct function import(
+		required string sourceThemeDir,
+		required string destDir,
+		required array layoutCandidates,
+		required array contentCandidates,
+		required array assetDirNames,
+		required any translator,
+		required struct variableMap
+	) {
+		var root = arguments.sourceThemeDir.reReplace( "[\/]+$", "" )
+		var dest = arguments.destDir.reReplace( "[\/]+$", "" )
+		directoryCreate( dest, true, true )
+
+		var report = { layoutFile : "", contentFile : "", assetsCopied : [], warnings : [] }
+
+		convertOne( root, dest, "layout.bxm", arguments.layoutCandidates, arguments.translator, arguments.variableMap, report, "layoutFile" )
+		convertOne( root, dest, "page.bxm", arguments.contentCandidates, arguments.translator, arguments.variableMap, report, "contentFile" )
+
+		for ( var assetDirName in arguments.assetDirNames ) {
+			var sourceAssetDir = root & "/" & assetDirName
+			if ( directoryExists( sourceAssetDir ) ) {
+				directoryCopy( sourceAssetDir, dest & "/assets/" & assetDirName, true )
+				report.assetsCopied.append( assetDirName )
+			}
+		}
+
+		return report
+	}
+
+	/**
+	 * Finds the first of `candidates` that exists under `sourceRoot`,
+	 * translates it, and writes it to `destRoot/destFileName` - or, if
+	 * none exist, records a warning on `report` instead of writing
+	 * anything. `report`/its `reportKey` (`"layoutFile"`/`"contentFile"`)
+	 * are mutated in place.
+	 */
+	private void function convertOne(
+		required string sourceRoot,
+		required string destRoot,
+		required string destFileName,
+		required array candidates,
+		required any translator,
+		required struct variableMap,
+		required struct report,
+		required string reportKey
+	) {
+		var sourcePath = ""
+		for ( var candidate in arguments.candidates ) {
+			var candidatePath = arguments.sourceRoot & "/" & candidate
+			if ( fileExists( candidatePath ) ) {
+				sourcePath = candidatePath
+				break
+			}
+		}
+
+		if ( !len( sourcePath ) ) {
+			arguments.report.warnings.append( "No " & arguments.destFileName & " source found (looked for: " & arguments.candidates.toList( ", " ) & ") - " & arguments.destFileName & " not created; write one by hand, or copy+adapt one of this module's own built-in themes (resources/themes/material/) as a starting point." )
+			return
+		}
+
+		var translated = arguments.translator.translate( fileRead( sourcePath ), arguments.variableMap )
+		fileWrite( arguments.destRoot & "/" & arguments.destFileName, translated.output )
+		arguments.report[ arguments.reportKey ] = sourcePath
+		for ( var warning in translated.warnings ) {
+			arguments.report.warnings.append( "[" & arguments.destFileName & "] " & warning )
+		}
+	}
+
+}
