@@ -365,10 +365,10 @@ println( user.getFullName() )
 
 ## ダイアグラム
 
-`bxsites.json` の [`mermaid`](../configuration.md#mermaid) キーでオプトイン:
+`bxsites.yaml` の [`mermaid`](../configuration.md#mermaid) キーでオプトイン:
 
-```json title="bxsites.json"
-{ "mermaid": true }
+```yaml title="bxsites.yaml"
+mermaid: true
 ```
 
 有効にすると、` ```mermaid ` フェンスコードブロックはコードリストの代わりに
@@ -389,10 +389,10 @@ Mermaid はフローチャート、シーケンス図、クラス図、ガント
 
 ## 数式
 
-`bxsites.json` の [`math`](../configuration.md#math) キーでオプトイン:
+`bxsites.yaml` の [`math`](../configuration.md#math) キーでオプトイン:
 
-```json title="bxsites.json"
-{ "math": true }
+```yaml title="bxsites.yaml"
+math: true
 ```
 
 有効にすると、[KaTeX](https://katex.org/) がインライン数式には `$...$`、

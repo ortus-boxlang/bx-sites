@@ -95,13 +95,13 @@ línea `modules:` si tu proyecto necesita algo más allá de
 
 Un sitio de GitHub *Project* Pages (a diferencia de un sitio *user*
 `<user>.github.io`) se sirve desde `https://<user>.github.io/<repo>/`, no
-desde la raíz del dominio. Configura `baseURL` en `bxsites.json` con esa
+desde la raíz del dominio. Configura `baseURL` en `bxsites.yaml` con esa
 URL completa para que cada enlace interno, recurso y entrada de
 navegación obtenga el prefijo `/<repo>/` que necesita - y para que
 también se genere un `sitemap.xml` real:
 
-```json
-{ "baseURL": "https://<user>.github.io/<repo>/" }
+```yaml title="bxsites.yaml"
+baseURL: "https://<user>.github.io/<repo>/"
 ```
 
 Consulta [Configuración](../configuration.md#baseurl) para el desglose

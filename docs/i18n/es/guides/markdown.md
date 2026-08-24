@@ -11,7 +11,7 @@ Más allá del Markdown estándar, BX Sites activa por defecto tres de las
 extensiones nativas de Flexmark de bx-markdown - admoniciones, notas al
 pie y listas de definiciones - más una integración de diagramas Mermaid
 propia. Las cuatro son configurables mediante
-[las claves `markdown`/`mermaid` de `bxsites.json`](../configuration.md#markdown).
+[las claves `markdown`/`mermaid` de `bxsites.yaml`](../configuration.md#markdown).
 
 Además de esas, BX Sites implementa tres extensiones propias más de las
 que Flexmark no tiene ningún concepto en absoluto - pestañas de

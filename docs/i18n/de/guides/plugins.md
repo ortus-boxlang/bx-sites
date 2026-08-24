@@ -16,10 +16,10 @@ Modulsystem *ist* das Plugin-System.
 
 Ein Modul allein zu installieren aktiviert es allerdings nie als Plugin -
 ein Projekt bindet eines explizit über den BoxLang-Modulnamen im Array
-[`plugins`](../configuration.md#plugins) von `bxsites.json` ein:
+[`plugins`](../configuration.md#plugins) von `bxsites.yaml` ein:
 
-```json title="bxsites.json"
-{ "plugins": [ "myBxSitesPlugin" ] }
+```yaml title="bxsites.yaml"
+plugins: [ myBxSitesPlugin ]
 ```
 
 ## Ein veröffentlichtes Plugin installieren
@@ -41,7 +41,7 @@ BoxLang-Modul-Registry aktiv ist. `install:plugin` lädt es sofort in die
 Laufzeitumgebung und gibt seinen echten registrierten
 Modul-Mapping-Namen zurück (der, laut dem Hinweis unten, nicht immer
 mit dem ForgeBox-Slug übereinstimmt) - füge *diesen* Namen zum
-`plugins`-Array von `bxsites.json` hinzu, um es zu aktivieren, genau wie
+`plugins`-Array von `bxsites.yaml` hinzu, um es zu aktivieren, genau wie
 bei jedem anderen installierten Modul. Siehe
 [`install:plugin`](../cli-reference.md#installplugin) in der
 CLI-Referenz.
