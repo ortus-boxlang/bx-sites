@@ -232,7 +232,7 @@ superamento/fallimento (quello è compito di `check`).
 Un controllo di salute dell'ambiente/configurazione in un solo passaggio
 - il verbo "esegui questo prima di aprire una segnalazione di bug".
 Verifica la versione della JVM, che `docs/` esista, che
-`bxsites.json`/`.yaml` venga effettivamente analizzato e validato, che i
+`bxsites.yaml`/`.json` venga effettivamente analizzato e validato, che i
 moduli BoxLang richiesti (`bx-markdown`, `bx-esapi`, `bx-yaml`,
 `bx-image`) siano installati e attivati e - se esiste una sovrascrittura
 `theme/` a livello di progetto - che soddisfi il contratto dei due file
@@ -300,7 +300,7 @@ bxSites i18n:new --code=es
 - `--code` (obbligatorio) - il codice della locale, ad es. `es`, `fr`, `pt-BR`
 
 Vedi [Internazionalizzazione](guides/i18n.md) per collegare la nuova
-locale a `i18n.locales` di `bxsites.json`.
+locale a `i18n.locales` di `bxsites.yaml`.
 
 ## `page:new`
 
@@ -329,7 +329,7 @@ bxSites plugin:new --name=my-analytics-plugin [--dest=...]
 - `--dest` - il valore predefinito è `<projectRoot>/<name>`
 
 Vedi [Plugin](guides/plugins.md) per il riferimento degli hook e come
-collegare il plugin finito all'array `plugins` di `bxsites.json`.
+collegare il plugin finito all'array `plugins` di `bxsites.yaml`.
 
 ## `install:plugin`
 
@@ -347,7 +347,7 @@ bxSites install:plugin --name=bx-sites-plugin-analytics [--version=1.2.0]
 - `--version` - una versione specifica; ometti per l'ultima
 
 Stampa il vero nome di mapping del modulo registrato una volta caricato -
-aggiungi quel nome all'array `plugins` di `bxsites.json` per attivarlo
+aggiungi quel nome all'array `plugins` di `bxsites.yaml` per attivarlo
 (l'installazione da sola non attiva mai un plugin - vedi
 [Plugin](guides/plugins.md)).
 
@@ -383,7 +383,7 @@ bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
 Valida il pacchetto scaricato rispetto al contratto `ThemeProvider`
 (`layout.bxm` + `page.bxm`) prima di terminare, così un pacchetto rotto
 fallisce al momento dell'installazione invece che alla prossima `build`.
-Imposta `theme.name` di `bxsites.json` sul nome installato per usarlo -
+Imposta `theme.name` di `bxsites.yaml` sul nome installato per usarlo -
 vedi [Temi](guides/themes.md#installare-un-tema-pubblicato).
 
 ## `theme:import`

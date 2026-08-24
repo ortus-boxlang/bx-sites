@@ -24,7 +24,7 @@ bei jedem Push verwendet.
 
 ## Was er tut
 
-Bei jedem Push nach `main` oder `development`, der `docs/`, `bxsites.json`
+Bei jedem Push nach `main` oder `development`, der `docs/`, `bxsites.yaml`
 oder die eigene Quelle des Moduls (Theme-/Pipeline-Änderungen) berührt,
 macht der Workflow Folgendes:
 
@@ -68,10 +68,10 @@ Job jedes Branches pusht nur mit `keep_files: true` und seinem eigenen
 `destination_dir` nach `gh-pages`, sodass ein `development`-Deploy nie den
 Inhalt von `main` überschreibt und umgekehrt.
 
-Die eigene `bxsites.json` von `main` sollte `baseURL` auf die Wurzel der
+Die eigene `bxsites.yaml` von `main` sollte `baseURL` auf die Wurzel der
 Website gesetzt haben (`https://<user>.github.io/<repo>/`); der Workflow
 überschreibt das für jeden anderen Branch zur Build-Zeit, sodass die
-`bxsites.json` von `development` dafür keinen eigenen `baseURL`-Eintrag
+`bxsites.yaml` von `development` dafür keinen eigenen `baseURL`-Eintrag
 braucht.
 
 Um einen dritten Branch hinzuzufügen (z. B. eine `release/2.0`-Vorschau),
@@ -94,13 +94,13 @@ seinen passenden Deploy-Schritt.
 Eine GitHub-*Projekt*-Pages-Website (im Gegensatz zu einer
 `<user>.github.io`-*Benutzer*-Website) wird unter
 `https://<user>.github.io/<repo>/` ausgeliefert, nicht von der
-Domain-Wurzel. Setze `baseURL` in `bxsites.json` auf diese vollständige
+Domain-Wurzel. Setze `baseURL` in `bxsites.yaml` auf diese vollständige
 URL, damit jeder interne Link, jedes Asset und jeder Navigationseintrag
 das nötige `/<repo>/`-Präfix bekommt - und damit auch eine echte
 `sitemap.xml` erzeugt wird:
 
-```json
-{ "baseURL": "https://<user>.github.io/<repo>/" }
+```yaml title="bxsites.yaml"
+baseURL: "https://<user>.github.io/<repo>/"
 ```
 
 Siehe [Konfiguration](../configuration.md#baseurl) für die vollständige

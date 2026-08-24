@@ -98,8 +98,8 @@ vale la pena rivederlo se bx-image aggiunge AVIF a monte.
 
 ## Disattivarlo
 
-```json title="bxsites.json"
-{ "assets": { "images": { "enabled": false } } }
+```yaml title="bxsites.yaml"
+assets: { images: { enabled: false } }
 ```
 
 Ricade sulla semplice copia non elaborata di `docs/assets/**` - esattamente
@@ -107,15 +107,11 @@ come veniva gestita ogni immagine prima che questa funzionalità esistesse.
 
 ## Scegliere i propri breakpoint
 
-```json title="bxsites.json" linenums="1"
-{
-	"assets": {
-		"images": {
-			"widths": [ 480, 960, 1440 ],
-			"formats": [ "webp" ]
-		}
-	}
-}
+```yaml title="bxsites.yaml" linenums="1"
+assets:
+  images:
+    widths: [ 480, 960, 1440 ]
+    formats: [ webp ]
 ```
 
 `widths` ha come predefinito `[400, 800, 1200, 1600]`; `formats` ha come
@@ -131,11 +127,9 @@ WebP. Vedi [Configurazione](../configuration.md#assets) per ogni chiave
 `extraCss`/`extraJs` vengono raggruppati allo stesso modo, attivo di
 default (`assets.bundle`):
 
-```json title="bxsites.json" linenums="1"
-{
-	"extraCss": [ "assets/a.css", "assets/b.css" ],
-	"extraJs": [ "assets/app.js" ]
-}
+```yaml title="bxsites.yaml" linenums="1"
+extraCss: [ assets/a.css, assets/b.css ]
+extraJs: [ assets/app.js ]
 ```
 
 compila un unico `assets/bundle.<hash>.css` con impronta digitale
@@ -156,8 +150,8 @@ ricadere l'intero elenco sull'esatto comportamento odierno per-URL,
 invece di rischiare di riordinare silenziosamente una cascata CSS da cui
 un progetto dipendeva:
 
-```json title="bxsites.json"
-{ "extraCss": [ "assets/custom.css", "https://cdn.example.com/lib.css" ] }
+```yaml title="bxsites.yaml"
+extraCss: [ assets/custom.css, "https://cdn.example.com/lib.css" ]
 ```
 
 renderizza due tag `<link>` separati, non raggruppati, esattamente come

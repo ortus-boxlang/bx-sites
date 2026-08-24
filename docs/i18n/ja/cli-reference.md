@@ -202,7 +202,7 @@ bxSites stats
 ## `doctor`
 
 環境/設定のヘルスチェックをワンショットで行う動詞です - 「バグ報告の前にまずこれを実行する」
-ための動詞です。JVM のバージョン、`docs/` が存在すること、`bxsites.json`/`.yaml` が実際に
+ための動詞です。JVM のバージョン、`docs/` が存在すること、`bxsites.yaml`/`.json` が実際に
 パースでき検証できること、必要な BoxLang モジュール（`bx-markdown`、`bx-esapi`、`bx-yaml`、
 `bx-image`）がインストールされ有効化されていること、そして - プロジェクトレベルの `theme/`
 オーバーライドが存在する場合は - それが `layout.bxm`/`page.bxm` の2ファイル必須の契約を
@@ -268,7 +268,7 @@ bxSites i18n:new --code=es
 
 - `--code`（必須）- ロケールコード。例: `es`、`fr`、`pt-BR`
 
-新しいロケールを `bxsites.json` の `i18n.locales` に組み込む方法は
+新しいロケールを `bxsites.yaml` の `i18n.locales` に組み込む方法は
 [国際化](guides/i18n.md) を参照してください。
 
 ## `page:new`
@@ -296,7 +296,7 @@ bxSites plugin:new --name=my-analytics-plugin [--dest=...]
 - `--name`（必須）- プラグインのモジュール名/スラグ
 - `--dest` - デフォルトは `<projectRoot>/<name>`
 
-フックのリファレンスと、完成したプラグインを `bxsites.json` の `plugins` 配列に組み込む方法は
+フックのリファレンスと、完成したプラグインを `bxsites.yaml` の `plugins` 配列に組み込む方法は
 [プラグイン](guides/plugins.md) を参照してください。
 
 ## `install:plugin`
@@ -313,7 +313,7 @@ bxSites install:plugin --name=bx-sites-plugin-analytics [--version=1.2.0]
 - `--version` - 特定のバージョン。省略時は最新版
 
 読み込まれたモジュールの実際に登録されたマッピング名を出力します - この名前を
-`bxsites.json` の `plugins` 配列に追加してプラグインを有効化してください
+`bxsites.yaml` の `plugins` 配列に追加してプラグインを有効化してください
 （インストールしただけではプラグインは有効化されません - [プラグイン](guides/plugins.md) を参照）。
 
 ## `theme:new`
@@ -346,7 +346,7 @@ bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
 
 完了する前に、ダウンロードしたパッケージを `ThemeProvider` 契約（`layout.bxm` + `page.bxm`）
 に照らして検証します。そのため壊れたパッケージはインストール時点で失敗し、次の `build` まで
-持ち越されることはありません。インストールしたテーマを使用するには `bxsites.json` の
+持ち越されることはありません。インストールしたテーマを使用するには `bxsites.yaml` の
 `theme.name` にインストール名を設定してください -
 [テーマ](guides/themes.md#installing-a-published-theme) を参照。
 

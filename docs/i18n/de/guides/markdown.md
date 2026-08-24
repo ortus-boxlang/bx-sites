@@ -10,7 +10,7 @@ tags: [anleitungen, markdown]
 Über Standard-Markdown hinaus aktiviert BX Sites standardmäßig drei der
 nativen Flexmark-Erweiterungen von bx-markdown - Admonitions, Fußnoten und
 Definitionslisten - sowie eine eigene Mermaid-Diagramm-Integration. Alle
-vier sind über [die Schlüssel `markdown`/`mermaid` von `bxsites.json`](../configuration.md#markdown)
+vier sind über [die Schlüssel `markdown`/`mermaid` von `bxsites.yaml`](../configuration.md#markdown)
 konfigurierbar.
 
 Zusätzlich implementiert BX Sites drei weitere eigene Erweiterungen, von
@@ -31,7 +31,7 @@ flowchart LR
 ## Admonitions
 
 Eine Callout-/Hinweisbox - standardmäßig aktiv, keine
-`bxsites.json`-Konfiguration nötig:
+`bxsites.yaml`-Konfiguration nötig:
 
 ```markdown title="Beispiel" linenums="1"
 !!! note "Heads Up"
@@ -192,7 +192,7 @@ Was so gerendert wird:
 Aufeinanderfolgende `=== "..."`-Blöcke (durch höchstens eine Leerzeile
 getrennt) bilden eine einzige Tab-Gruppe; der Inhalt eines Tabs ist
 vollständiges Markdown, also Code-Fences, Listen, Admonitions - alles, was
-du auch sonst irgendwo schreiben würdest. Keine `bxsites.json`-Konfiguration
+du auch sonst irgendwo schreiben würdest. Keine `bxsites.yaml`-Konfiguration
 nötig - immer aktiv.
 
 ## Codeblöcke
@@ -240,7 +240,7 @@ numeric function add( required numeric a, required numeric b ) {
 durch Leerzeichen getrennte Zeilennummern und/oder Bereiche (`"2 4-6"`)
 entgegen, um sie hervorzuheben, gezählt vom Anfang des Blocks unabhängig
 davon, wo `linenums` beginnt; `title` fügt eine kleine Titelleiste über
-dem Block hinzu. Keine `bxsites.json`-Konfiguration nötig - immer
+dem Block hinzu. Keine `bxsites.yaml`-Konfiguration nötig - immer
 verfügbar.
 
 ### Diff-Markierungen und Terminal-Rahmen
@@ -298,7 +298,7 @@ box install bx-sites
 
 `frame="code"` ist der explizite Name für die heutige einfache Leiste -
 der Standard; niemand muss ihn schreiben. Weder `insert`/`delete` noch
-`frame` benötigen `bxsites.json`-Konfiguration, genau wie
+`frame` benötigen `bxsites.yaml`-Konfiguration, genau wie
 `hl_lines`/`linenums`/`title`.
 
 #### Echte Git-Diffs
@@ -377,10 +377,10 @@ das Embed beginnt.
 
 ## Diagramme
 
-Opt-in über den [`mermaid`](../configuration.md#mermaid)-Schlüssel von `bxsites.json`:
+Opt-in über den [`mermaid`](../configuration.md#mermaid)-Schlüssel von `bxsites.yaml`:
 
-```json title="bxsites.json"
-{ "mermaid": true }
+```yaml title="bxsites.yaml"
+mermaid: true
 ```
 
 Einmal aktiviert, wird jeder ` ```mermaid `-Fenced-Codeblock als
@@ -401,10 +401,10 @@ für alles, was es zeichnen kann.
 
 ## Mathematik
 
-Opt-in über den [`math`](../configuration.md#math)-Schlüssel von `bxsites.json`:
+Opt-in über den [`math`](../configuration.md#math)-Schlüssel von `bxsites.yaml`:
 
-```json title="bxsites.json"
-{ "math": true }
+```yaml title="bxsites.yaml"
+math: true
 ```
 
 Einmal aktiviert, setzt [KaTeX](https://katex.org/) `$...$` für Inline-Mathematik

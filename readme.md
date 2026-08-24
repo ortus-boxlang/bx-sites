@@ -22,6 +22,13 @@ Static documentation site generator for BoxLang, built on bx-markdown - in the s
 
 ## Quick Start
 
+Needs the [BoxLang](https://boxlang.io) runtime installed first - either
+the quick installer (`curl -fsSL https://install.boxlang.io/ | bash`) or
+[BVM](https://boxlang.ortusbooks.com/getting-started/installation/boxlang-version-manager-bvm)
+(`curl -fsSL https://install-bvm.boxlang.io/ | bash`). See
+[Getting Started](docs/getting-started.md#prerequisite-install-boxlang) for
+details.
+
 ```bash
 # OS Binary
 install-bx-module bx-sites
