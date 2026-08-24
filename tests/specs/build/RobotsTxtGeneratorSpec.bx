@@ -26,7 +26,7 @@ class extends="testbox.system.BaseSpec" {
 				var content = generator.build( "https://example.com/", false );
 
 				expect( content ).toInclude( "Disallow: /" );
-				expect( content ).notToInclude( "Allow: /" );
+				expect( content ).notToInclude( char( 10 ) & "Allow: /" );
 				expect( content ).notToInclude( "Sitemap:" );
 			} );
 
@@ -52,7 +52,7 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( content ).toInclude( "Disallow: /internal/" );
 				expect( content ).toInclude( "Sitemap: https://custom.example.com/sitemap.xml" );
-				expect( content ).notToInclude( "Allow: /" );
+				expect( content ).notToInclude( char( 10 ) & "Allow: /" );
 
 				directoryDelete( docsDir, true );
 			} );
