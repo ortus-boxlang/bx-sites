@@ -1,13 +1,14 @@
 ---
 title: Alpine.js によるインタラクティビティ
 order: 9
+icon: phosphor-duotone:lightning
 tags: [ガイド, Alpine, インタラクティビティ]
 ---
 
 # Alpine.js によるインタラクティビティ
 
 BX Sites がビルドするすべてのページは、すでに [Alpine.js](https://alpinejs.dev/)
-を読み込んでいます - 3 つの組み込みテーマそれぞれで、ダーク/ライトモード切替と
+を読み込んでいます - すべての組み込みテーマで、ダーク/ライトモード切替と
 言語ドロップダウンを動かしているのがこれです。同じ Alpine インスタンスは、
 あなた自身のページコンテンツからも無料で使えます。`bxsites.json` で切り替える
 設定も、追加する `extraJs` エントリも、Markdown に書く追加の `<script>` タグも

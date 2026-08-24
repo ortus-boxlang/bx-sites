@@ -31,7 +31,7 @@ enthält.
 
 ## Die Migration ausführen
 
-```bash
+```bash frame="terminal" title="Terminal" linenums="1"
 # 1. Scaffold a fresh bx-sites project (skip this if you already have one)
 bxSites new my-docs
 cd my-docs
@@ -46,7 +46,7 @@ bxSites serve
 `migrate` gibt aus, wie viele Seiten konvertiert wurden, und, wenn etwas
 eine Ermessensentscheidung erforderte, genau was und wo:
 
-```
+```text title="migrate output"
 Migrated 14 page(s) from [/path/to/gitbook-export] into my-docs/docs/, wrote my-docs/docs/nav.json
 
 2 item(s) need a manual look:

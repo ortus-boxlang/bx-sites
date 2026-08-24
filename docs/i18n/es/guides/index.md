@@ -15,6 +15,7 @@ icon: phosphor-duotone:book-open
 - [Interactividad con Alpine.js](interactivity.md) - contenido reactivo (botones de copiar, filtros en vivo, y más) sin configuración adicional
 - [Blog](blog.md) - un blog por convención: entradas, autores, categorías, archivos, RSS, y estadísticas
 - [Plugins](plugins.md) - extiende BX Sites con tu propio módulo de BoxLang
+- [Importar un tema](theme-import.md) - convierte de mejor esfuerzo un tema de mkdocs/jekyll/hugo en un tema bx-sites
 - [Versionado](versioning.md) - crea una instantánea de la documentación de un lanzamiento y obtén un selector de versión gratis
 - [Internacionalización (i18n)](i18n.md) - traduce tus documentos a otros idiomas
 - [Migrar desde GitBook](migrating-from-gitbook.md) - convierte una exportación de GitBook en un proyecto bx-sites con un solo comando
