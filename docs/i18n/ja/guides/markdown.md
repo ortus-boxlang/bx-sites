@@ -10,7 +10,7 @@ tags: [ガイド, markdown]
 標準 Markdown に加えて、BX Sites は bx-markdown のネイティブ Flexmark 拡張機能を
 デフォルトで 3 つ有効にします - Admonition、脚注、定義リストです - さらに独自の
 Mermaid ダイアグラム統合も備えています。この 4 つはすべて
-[`bxsites.json` の `markdown`/`mermaid` キー](../configuration.md#markdown)
+[`bxsites.yaml` の `markdown`/`mermaid` キー](../configuration.md#markdown)
 から設定できます。
 
 これらに加えて、BX Sites は Flexmark がまったく概念すら持たない、独自の拡張機能を
@@ -29,7 +29,7 @@ flowchart LR
 
 ## Admonition
 
-コールアウト/注意書きボックス - デフォルトで有効、`bxsites.json` の設定は不要です:
+コールアウト/注意書きボックス - デフォルトで有効、`bxsites.yaml` の設定は不要です:
 
 ```markdown title="Example" linenums="1"
 !!! note "ご注意"
@@ -185,7 +185,7 @@ flowchart LR
 
 連続した `=== "..."` ブロック（間に空行が最大 1 行まで）は 1 つのタブ
 グループを形成します。タブ自身の内容は完全な Markdown です - コードフェンス、
-リスト、Admonition など、他のどこにでも書けるものが使えます。`bxsites.json`
+リスト、Admonition など、他のどこにでも書けるものが使えます。`bxsites.yaml`
 の設定は不要 - 常に有効です。
 
 ## コードブロック
@@ -232,7 +232,7 @@ numeric function add( required numeric a, required numeric b ) {
 `linenums="N"` はガターのカウントを `N` から開始します。`hl_lines` は
 スペース区切りの行番号や範囲（`"2 4-6"`）を受け取ってハイライトし、
 `linenums` がどこから始まるかに関係なく、ブロックの先頭からカウントします。
-`title` はブロックの上に小さなタイトルバーを追加します。`bxsites.json`
+`title` はブロックの上に小さなタイトルバーを追加します。`bxsites.yaml`
 の設定は不要 - 常に使用できます。
 
 ### 差分マーカーとターミナルフレーム
@@ -288,7 +288,7 @@ box install bx-sites
 
 `frame="code"` は、今日のデフォルトであるプレーンなバーを明示的に指定する
 名前です - デフォルトなので書く必要はありません。`insert`/`delete` も
-`frame` も、`hl_lines`/`linenums`/`title` と同様に `bxsites.json` の設定は
+`frame` も、`hl_lines`/`linenums`/`title` と同様に `bxsites.yaml` の設定は
 不要です。
 
 #### 本物の git diff

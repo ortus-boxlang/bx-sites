@@ -105,7 +105,8 @@ mostrati sopra. Un oggetto `theme` parziale viene unito con quello di
 default per un livello, quindi `{"theme":{"name":"material"}}` da solo
 mantiene comunque le `options` predefinite (vuote). Ogni chiave ha lo
 stesso nome e la stessa forma in entrambi i formati; il resto di questa
-pagina mostra solo JSON per brevità, ma si legge allo stesso modo in YAML.
+pagina mostra solo snippet YAML, secondo il formato predefinito proprio di
+`bxSites new`, ma ognuno di essi si legge allo stesso modo in JSON.
 
 ## `name`
 
@@ -184,8 +185,8 @@ senso. Elenca ogni pagina non nascosta secondo il protocollo
     (memorizzata in `localStorage`) prevale sempre nelle visite
     successive, indipendentemente da questa impostazione.
 
-    ```json
-    { "theme": { "options": { "colorMode": "dark" } } }
+    ```yaml
+    theme: { options: { colorMode: dark } }
     ```
   - `theme.options.navCollapsible` - `false` (il valore predefinito)
     mostra ogni intestazione di sezione della nav sempre espansa, come
@@ -196,8 +197,8 @@ senso. Elenca ogni pagina non nascosta secondo il protocollo
     è `true`. `true` (il valore predefinito) avvia ogni sezione aperta;
     `false` avvia ogni sezione compressa.
 
-    ```json
-    { "theme": { "options": { "navCollapsible": true, "navExpandAll": false } } }
+    ```yaml
+    theme: { options: { navCollapsible: true, navExpandAll: false } }
     ```
 
 ## `search`
@@ -225,18 +226,14 @@ Quale UI di ricerca `search: true` attiva:
   client DocSearch di Algolia stesso. `insights` (`false` di default)
   attiva l'analytics di click/conversione proprio di DocSearch.
 
-  ```json title="bxsites.json" linenums="1"
-  {
-    "search": true,
-    "searchProvider": {
-      "provider": "algolia",
-      "algolia": {
-        "appId": "ABC123",
-        "apiKey": "a1b2c3d4e5f6...",
-        "indexName": "my-docs"
-      }
-    }
-  }
+  ```yaml title="bxsites.yaml" linenums="1"
+  search: true
+  searchProvider:
+    provider: algolia
+    algolia:
+      appId: ABC123
+      apiKey: a1b2c3d4e5f6...
+      indexName: my-docs
   ```
 
 - `pagefind` - entrambe le chiavi opzionali quando `provider` è
@@ -247,14 +244,11 @@ Quale UI di ricerca `search: true` attiva:
   ci esegue uno shell out (come `git` per `lastUpdated`/`gh-deploy`), non
   la installa al posto tuo.
 
-  ```json title="bxsites.json" linenums="1"
-  {
-    "search": true,
-    "searchProvider": {
-      "provider": "pagefind",
-      "pagefind": { "bin": "pagefind", "options": [] }
-    }
-  }
+  ```yaml title="bxsites.yaml" linenums="1"
+  search: true
+  searchProvider:
+    provider: pagefind
+    pagefind: { bin: pagefind, options: [] }
   ```
 
 ## `nav`
@@ -285,22 +279,17 @@ seguenti:
   nav) - vedi [Temi: Icone](guides/themes.md#icons) per cosa può essere un
   valore `icon`
 
-```json
-{
-	"nav": [
-		"index.md",
-		{
-			"title": "Guides",
-			"children": [
-				{ "title": "Quick Start", "path": "guides/setup.md" },
-				"guides/deployment.md"
-			]
-		}
-	]
-}
+```yaml title="bxsites.yaml" linenums="1"
+nav:
+  - index.md
+  - title: Guides
+    children:
+      - title: Quick Start
+        path: guides/setup.md
+      - guides/deployment.md
 ```
 
-Per una nav abbastanza grande da appesantire `bxsites.json`, spostala nel
+Per una nav abbastanza grande da appesantire `bxsites.yaml`, spostala nel
 proprio file `docs/nav.json` - stessa forma di array, solo come contenuto
 principale dell'intero file:
 
@@ -311,7 +300,7 @@ principale dell'intero file:
 ]
 ```
 
-Il `nav` proprio di `bxsites.json`, quando non vuoto, prevale sempre su
+Il `nav` proprio di `bxsites.yaml`, quando non vuoto, prevale sempre su
 `docs/nav.json`. Solo l'albero principale rispetta l'uno o l'altro - un
 albero `docs/versions/<name>/` deduce sempre la propria nav dalla propria
 struttura di cartelle, anche quando l'albero principale ne ha una
@@ -322,12 +311,10 @@ esplicita.
 `[]` (il valore predefinito) - redirect `from`/`to` per URL vecchi validi
 per tutto il sito, applicati solo all'albero principale:
 
-```json title="bxsites.json" linenums="1"
-{
-	"redirects": [
-		{ "from": "old-guide", "to": "guides/new-guide/" }
-	]
-}
+```yaml title="bxsites.yaml" linenums="1"
+redirects:
+  - from: old-guide
+    to: guides/new-guide/
 ```
 
 - `redirects[].from` - il vecchio segmento URL (senza slash
@@ -376,15 +363,12 @@ ma BX Sites lo imposta a `true` di default (vedi la
 | `tableOptions.className` | `"table"` | Classe CSS su ogni `<table>` renderizzata |
 | `tableOptions.headerSeparationColumnMatch` | `true` | Richiede che la riga separatore `---` corrisponda al numero di colonne dell'intestazione |
 
-```json
-{
-	"markdown": {
-		"enableFootnotes": true,
-		"enableDefinitionLists": true,
-		"anchorLinks": false,
-		"enableYouTubeTransformer": true
-	}
-}
+```yaml title="bxsites.yaml" linenums="1"
+markdown:
+  enableFootnotes: true
+  enableDefinitionLists: true
+  anchorLinks: false
+  enableYouTubeTransformer: true
 ```
 
 ## `repo`
@@ -405,8 +389,8 @@ temi integrati) e, quando entrambe le chiavi sono impostate, un link
   Richiede anche `repo.url`; lascialo vuoto per omettere i link di
   modifica pur mostrando l'icona nell'header.
 
-```json
-{ "repo": { "url": "https://github.com/acme/docs", "editUri": "edit/main/docs/" } }
+```yaml title="bxsites.yaml"
+repo: { url: "https://github.com/acme/docs", editUri: "edit/main/docs/" }
 ```
 
 ## `social`
@@ -420,13 +404,10 @@ un glifo di link generico come ripiego per qualsiasi altra cosa), e
 `label` imposta il nome accessibile/tooltip del link (predefinito su
 `icon`, poi `"Link"`).
 
-```json
-{
-	"social": [
-		{ "url": "https://twitter.com/acme", "icon": "twitter", "label": "Twitter" },
-		{ "url": "https://acme.com/rss.xml", "icon": "rss", "label": "RSS" }
-	]
-}
+```yaml title="bxsites.yaml" linenums="1"
+social:
+  - { url: "https://twitter.com/acme", icon: twitter, label: Twitter }
+  - { url: "https://acme.com/rss.xml", icon: rss, label: RSS }
 ```
 
 ## `footer`
@@ -435,8 +416,8 @@ un glifo di link generico come ripiego per qualsiasi altra cosa), e
 ogni pagina: una riga di copyright (`© <anno> <nome del sito>`), i link
 `social` (se presenti), e un credito "Built with BX Sites".
 
-```json
-{ "footer": true }
+```yaml title="bxsites.yaml"
+footer: true
 ```
 
 ## `lastUpdated`
@@ -450,8 +431,8 @@ appena fatto senza ancora commit, un build eseguito da uno zip scaricato
 senza alcun `.git`, oppure git non installato sulla macchina di build -
 piuttosto che interrompere il build.
 
-```json
-{ "lastUpdated": true }
+```yaml title="bxsites.yaml"
+lastUpdated: true
 ```
 
 ## `analytics`
@@ -464,8 +445,8 @@ solo Google Analytics (`gtag.js`):
 - `analytics.id` - l'ID di misurazione di Google Analytics (ad es.
   `"G-ABC123"`). Obbligatorio quando `provider` è `"google"`.
 
-```json
-{ "analytics": { "provider": "google", "id": "G-ABC123" } }
+```yaml title="bxsites.yaml"
+analytics: { provider: google, id: "G-ABC123" }
 ```
 
 ## `ogImage`
@@ -478,8 +459,8 @@ con `baseURL`, gli URL assoluti vengono usati così come sono). Lasciato
 vuoto (il valore predefinito) e con `generateOgImages` disattivato, non
 viene renderizzato alcun tag `og:image`/`twitter:card`.
 
-```json
-{ "ogImage": "assets/social-card.png" }
+```yaml title="bxsites.yaml"
+ogImage: assets/social-card.png
 ```
 
 Un `ogImage` proprio del frontmatter di una pagina (vedi
@@ -498,8 +479,8 @@ un'unica immagine generica a livello di sito. Solo `java.awt`/
 BoxLang), quindi non serve alcun browser headless, servizio esterno, o
 accesso alla rete al momento del build.
 
-```json
-{ "generateOgImages": true }
+```yaml title="bxsites.yaml"
+generateOgImages: true
 ```
 
 ## `extraCss` / `extraJs`
@@ -510,11 +491,9 @@ stesso modo di `theme.logo` (un percorso relativo viene prefissato con
 `baseURL`; un URL assoluto viene usato così com'è). Le voci di `extraJs`
 vengono caricate con `defer`.
 
-```json
-{
-	"extraCss": [ "assets/custom.css" ],
-	"extraJs": [ "assets/custom.js" ]
-}
+```yaml title="bxsites.yaml" linenums="1"
+extraCss: [ assets/custom.css ]
+extraJs: [ assets/custom.js ]
 ```
 
 Quando `assets.bundle` è attivo (il valore predefinito), un elenco locale
@@ -524,18 +503,14 @@ per ogni voce - vedi [`assets`](#assets) sotto.
 
 ## `assets`
 
-```json title="bxsites.json" linenums="1"
-{
-	"assets": {
-		"fingerprint": true,
-		"bundle": true,
-		"images": {
-			"enabled": true,
-			"widths": [ 400, 800, 1200, 1600 ],
-			"formats": [ "original", "webp" ]
-		}
-	}
-}
+```yaml title="bxsites.yaml" linenums="1"
+assets:
+  fingerprint: true
+  bundle: true
+  images:
+    enabled: true
+    widths: [ 400, 800, 1200, 1600 ]
+    formats: [ original, webp ]
 ```
 
 La pipeline degli asset - ridimensionamento immagini/WebP tramite
@@ -588,8 +563,8 @@ animate, SVG).
 ` ```mermaid ` come un diagramma. Vedi
 [Estensioni Markdown](guides/markdown.md#diagrams) per la sintassi.
 
-```json
-{ "mermaid": true }
+```yaml title="bxsites.yaml"
+mermaid: true
 ```
 
 ## `math`
@@ -599,8 +574,8 @@ distribuito. `true` lo carica lato client e compone `$...$`/`$$...$$`
 scritti direttamente nel markdown di una pagina. Vedi
 [Estensioni Markdown](guides/markdown.md#math) per la sintassi.
 
-```json
-{ "math": true }
+```yaml title="bxsites.yaml"
+math: true
 ```
 
 Le ammonizioni (box di richiamo in stile nota/avviso/suggerimento), le
@@ -619,8 +594,8 @@ OpenAPI/Swagger referenziata (JSON o YAML). Vedi
 [Blocchi di contenuto](guides/content-blocks.md#openapi--swagger) per la
 sintassi.
 
-```json title="bxsites.json"
-{ "openapi": true }
+```yaml title="bxsites.yaml"
+openapi: true
 ```
 
 ## `plugins`
@@ -630,8 +605,8 @@ attivare come plugin. Installare un modulo plugin (`box install`) non lo
 attiva mai da solo; deve essere nominato anche qui. Vedi
 [Plugin](guides/plugins.md) per come scriverne uno.
 
-```json
-{ "plugins": [ "myBxSitesPlugin" ] }
+```yaml title="bxsites.yaml"
+plugins: [ myBxSitesPlugin ]
 ```
 
 ## `i18n`
@@ -658,16 +633,12 @@ lingua.
   una traduzione integrata, quindi `strings` serve solo per sovrascrivere
   una chiave o aggiungere un'altra locale.
 
-```json
-{
-	"i18n": {
-		"defaultLocale": { "code": "en", "label": "English" },
-		"locales": [
-			{ "code": "es", "label": "Español" },
-			{ "code": "ar", "label": "العربية", "dir": "rtl" }
-		]
-	}
-}
+```yaml title="bxsites.yaml" linenums="1"
+i18n:
+  defaultLocale: { code: en, label: English }
+  locales:
+    - { code: es, label: Español }
+    - { code: ar, label: العربية, dir: rtl }
 ```
 
 Vedi [Internazionalizzazione](guides/i18n.md) per il quadro completo -
@@ -677,7 +648,7 @@ il fallback per le pagine non tradotte, il selettore di lingua, e cosa non
 ## Versionamento
 
 I documenti versionati sono convenzione più che configurazione - non c'è
-una chiave di `bxsites.json` per questo. Aggiungi una cartella
+una chiave di `bxsites.yaml` per questo. Aggiungi una cartella
 `docs/versions/`, e ogni sottocartella diretta al suo interno viene
 compilata come un proprio albero di documenti completamente
 autonomo, accanto al tuo `docs/` regolare (che si compila sempre come
@@ -699,7 +670,7 @@ docs/
 Ogni cartella di versione è un albero normale a forma di `docs/` - il
 proprio `index.md`, la propria nav, le proprie pagine - compilato in
 `site/versions/<name>/` con ogni link interno prefissato di conseguenza,
-e condividendo l'unico `bxsites.json` di configurazione/tema del progetto.
+e condividendo l'unico `bxsites.yaml` di configurazione/tema del progetto.
 I nomi delle versioni si ordinano dal più recente, numericamente
 piuttosto che alfabeticamente (quindi `2.0` si ordina prima di `10.0`), e
 ogni tema renderizza automaticamente un menu a discesa per il cambio

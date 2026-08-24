@@ -25,7 +25,7 @@ automática multiversión en cada push.
 
 ## Qué hace
 
-En cada push a `main` o `development` que toque `docs/`, `bxsites.json`, o
+En cada push a `main` o `development` que toque `docs/`, `bxsites.yaml`, o
 la propia fuente del módulo (cambios de tema/canalización), el flujo de
 trabajo:
 
@@ -70,10 +70,10 @@ trabajo de cada rama solo empuja a `gh-pages` con `keep_files: true` y su
 propio `destination_dir`, de modo que un despliegue de `development`
 nunca sobrescribe el contenido de `main` y viceversa.
 
-El propio `bxsites.json` de `main` debería tener `baseURL` configurado a
+El propio `bxsites.yaml` de `main` debería tener `baseURL` configurado a
 la raíz del sitio (`https://<user>.github.io/<repo>/`); el flujo de
 trabajo lo sobrescribe para cualquier otra rama en el momento de la
-construcción, así que el `bxsites.json` de `development` no necesita su
+construcción, así que el `bxsites.yaml` de `development` no necesita su
 propia entrada `baseURL` para que esto funcione.
 
 Para añadir una tercera rama (por ejemplo, una vista previa de
