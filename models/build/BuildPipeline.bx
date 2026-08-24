@@ -348,7 +348,7 @@ class {
 			fileWrite( siteDir & "/sitemap.xml", variables.sitemapGenerator.build( allPages, urls.absolute ) )
 		}
 
-		fileWrite( siteDir & "/robots.txt", variables.robotsTxtGenerator.build( urls.absolute, config.robots ) )
+		fileWrite( siteDir & "/robots.txt", variables.robotsTxtGenerator.resolve( docsDir, urls.absolute, config.robots ) )
 
 		fileWrite( siteDir & "/llms.txt", variables.llmsTxtGenerator.build( allPages, config, urls.absolute, urls.basePath ) )
 

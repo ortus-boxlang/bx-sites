@@ -189,6 +189,13 @@ unless you want to change its default, permissive behavior:
   [Deployment](guides/deployment.md#restricting-who-can-reach-your-site) if you actually need to restrict who
   can reach it at all.
 
+Need more than the on/off toggle - specific disallowed paths, multiple
+`Sitemap:` lines, a `Crawl-delay`, per-user-agent rules? Drop your own
+`robots.txt` right next to `index.md` (`docs/robots.txt`, or `src/robots.txt`
+for a `src/`-based project - see [`docs/` or `src/`](getting-started.md#add-pages))
+and it's copied through byte-for-byte instead of the generated one, on every
+build - the `robots` key above is ignored entirely once this file exists.
+
 ## `theme`
 
 - `theme.name` - one of the built-in themes (`bootstrap`, `material`,
