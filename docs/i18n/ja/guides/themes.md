@@ -65,7 +65,7 @@ Mermaid）は、このモジュールに同梱（バンドル）された状態�
   サイドバーナビ（`bootstrap`/`material`/`tailwind` いずれもハンバーガートグル）付き。
 - **検索ボックスのキーボードショートカット** - `/` でページのどこからでも検索にフォーカスし、
   `Escape` で結果を閉じます。[検索](search.md) を参照してください。
-- **リポジトリリンクと「このページを編集」/「最終更新」行** - `bxsites.json` の
+- **リポジトリリンクと「このページを編集」/「最終更新」行** - `bxsites.yaml` の
   `repo`/`lastUpdated` オプションが設定されている場合。[設定](../configuration.md#repo)
   を参照してください。
 - **「Markdown をダウンロード」リンク** - 「このページを編集」の隣に表示されます -
@@ -75,18 +75,18 @@ Mermaid）は、このモジュールに同梱（バンドル）された状態�
   直接読めます。設定不要で常に有効です。
   [はじめに](../getting-started.md#markdown-としてページをダウンロード) を参照してください。
 - **オプトインのフッター**（著作権、`social` リンク、「Built with BX Sites」クレジット）-
-  `bxsites.json` の `footer` が `true` の場合。[設定](../configuration.md#footer) を参照してください。
+  `bxsites.yaml` の `footer` が `true` の場合。[設定](../configuration.md#footer) を参照してください。
 - **バージョンスイッチャー** - プロジェクトが複数バージョンを含む `docs/versions/` フォルダを
   持つと自動的に表示されます。[設定](../configuration.md#versioning) を参照してください。
 - **テーマ化された `404.html`** - ほとんどの静的ホスト（GitHub Pages を含む）で、
   一致しないパスに対して自動的に提供されます。
-- **カスタムロゴとファビコン** - `bxsites.json` の `theme.logo`/`theme.favicon` が
+- **カスタムロゴとファビコン** - `bxsites.yaml` の `theme.logo`/`theme.favicon` が
   設定されている場合。[設定](../configuration.md#theme) を参照してください。
 - **折りたたみ可能なサイドバーナビ** - `theme.options.navCollapsible` でオプトイン -
   子要素を持つすべてのセクション（リンク付き/なしを問わず）が、常にインラインで
   子要素を表示する代わりにトグルボタンを持つようになり、現在のページを含むセクションは
   常に開いた状態で始まります。[設定](../configuration.md#theme) を参照してください。
-- **Google Analytics** - `bxsites.json` の `analytics` が設定されている場合。
+- **Google Analytics** - `bxsites.yaml` の `analytics` が設定されている場合。
   [設定](../configuration.md#analytics) を参照してください。
 - **ソーシャルシェアカード**（Open Graph + Twitter Card メタタグ）- 各ページの
   `description` フロントマター（またはサイト全体の `description`）と、それ自身の

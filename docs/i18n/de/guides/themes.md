@@ -81,7 +81,7 @@ bringt unabhängig von der Palette denselben Satz an Seitenfunktionen mit:
   [Suche](search.md).
 - **Ein Repo-Link und eine "Diese Seite bearbeiten"-/"Zuletzt
   aktualisiert"-Zeile**, wenn die Optionen `repo`/`lastUpdated` in
-  `bxsites.json` gesetzt sind. Siehe
+  `bxsites.yaml` gesetzt sind. Siehe
   [Konfiguration](../configuration.md#repo).
 - **Ein "Markdown herunterladen"-Link**, neben "Diese Seite bearbeiten" -
   die rohe `.md`-Quelle jeder Seite wird zusammen mit ihrem gebauten HTML
@@ -91,7 +91,7 @@ bringt unabhängig von der Palette denselben Satz an Seitenfunktionen mit:
   aktiv, keine Konfiguration nötig. Siehe
   [Erste Schritte](../getting-started.md#eine-seite-als-markdown-herunterladen).
 - **Eine optionale Fußzeile** (Copyright, `social`-Links, ein "Built with
-  BX Sites"-Hinweis), wenn `footer` in `bxsites.json` `true` ist. Siehe
+  BX Sites"-Hinweis), wenn `footer` in `bxsites.yaml` `true` ist. Siehe
   [Konfiguration](../configuration.md#footer).
 - **Ein Versionsumschalter**, der automatisch erscheint, sobald ein
   Projekt einen `docs/versions/`-Ordner mit mehr als einer Version hat.
@@ -100,7 +100,7 @@ bringt unabhängig von der Palette denselben Satz an Seitenfunktionen mit:
   meisten statischen Hosts (einschließlich GitHub Pages) für jeden nicht
   gefundenen Pfad.
 - **Ein eigenes Logo und Favicon**, wenn `theme.logo`/`theme.favicon` in
-  `bxsites.json` gesetzt sind. Siehe
+  `bxsites.yaml` gesetzt sind. Siehe
   [Konfiguration](../configuration.md#theme).
 - **Eine einklappbare Sidebar-Navigation**, opt-in über
   `theme.options.navCollapsible` - jeder Abschnitt mit Kindern (verlinkt
@@ -108,43 +108,43 @@ bringt unabhängig von der Palette denselben Satz an Seitenfunktionen mit:
   inline anzuzeigen, und der Abschnitt, der die aktuelle Seite enthält,
   startet immer geöffnet. Siehe
   [Konfiguration](../configuration.md#theme).
-- **Google Analytics**, wenn `analytics` in `bxsites.json` konfiguriert
+- **Google Analytics**, wenn `analytics` in `bxsites.yaml` konfiguriert
   ist. Siehe [Konfiguration](../configuration.md#analytics).
 - **Social-Share-Cards** (Open-Graph- + Twitter-Card-Meta-Tags), erzeugt
   aus der `description`-Frontmatter jeder Seite (oder der websiteweiten
   `description`) und ihrem eigenen `ogImage` (oder dem websiteweiten) -
   optional automatisch pro Seite erzeugt über `generateOgImages` in
-  `bxsites.json`. Siehe [Konfiguration](../configuration.md#ogimage).
+  `bxsites.yaml`. Siehe [Konfiguration](../configuration.md#ogimage).
 - **Seiten-Tags, ein Icon und eine Zusammenfassungszeile**, alle opt-in
   über die eigene Frontmatter einer Seite - Tags werden als Badges
   gerendert, die zu einem websiteweiten `/tags/`-Index verlinken. Siehe
   [Erste Schritte](../getting-started.md#seiten-hinzufügen).
-- **Eine explizite Navigations-Überschreibung**, in `bxsites.json` oder der
+- **Eine explizite Navigations-Überschreibung**, in `bxsites.yaml` oder der
   eigenen `docs/nav.json`, die die Ordner-Ableitung für große Websites
   ersetzt. Siehe [Konfiguration](../configuration.md#nav).
 - **Zusätzliches CSS/JS**, eingebunden über `extraCss`/`extraJs` in
-  `bxsites.json`. Siehe
+  `bxsites.yaml`. Siehe
   [Konfiguration](../configuration.md#extracss--extrajs).
 - **Admonition-Callout-Boxen** (Hinweis/Warnung/Tipp/...), standardmäßig
   im Markdown jeder Seite aktiv, einschließlich einklappbarer Varianten -
   keine Konfiguration nötig. Siehe
   [Markdown-Erweiterungen](markdown.md#admonitions).
 - **Fußnoten und Definitionslisten**, opt-in über `markdown` in
-  `bxsites.json`. Siehe
+  `bxsites.yaml`. Siehe
   [Markdown-Erweiterungen](markdown.md#fußnoten).
 - **Content-Tabs**, **Code-Zeilennummern/hervorgehobene Zeilen/Titel**
   und **Diff-Markierungen/Terminal-Rahmen** für Codeblöcke, keine
   Konfiguration nötig. Siehe
   [Markdown-Erweiterungen](markdown.md#content-tabs).
-- **Mermaid-Diagramme**, opt-in über `mermaid` in `bxsites.json`. Siehe
+- **Mermaid-Diagramme**, opt-in über `mermaid` in `bxsites.yaml`. Siehe
   [Markdown-Erweiterungen](markdown.md#diagramme).
-- **Mathematik** (KaTeX), opt-in über `math` in `bxsites.json`. Siehe
+- **Mathematik** (KaTeX), opt-in über `math` in `bxsites.yaml`. Siehe
   [Markdown-Erweiterungen](markdown.md#mathematik).
 
-Lege in `bxsites.json` fest, welches Theme ein Projekt verwendet:
+Lege in `bxsites.yaml` fest, welches Theme ein Projekt verwendet:
 
-```json title="bxsites.json"
-{ "theme": { "name": "material" } }
+```yaml title="bxsites.yaml"
+theme: { name: material }
 ```
 
 ## Ein veröffentlichtes Theme installieren

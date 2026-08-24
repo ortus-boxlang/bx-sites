@@ -17,10 +17,10 @@ sistema de plugins.
 Sin embargo, instalar un módulo por sí solo nunca lo activa como plugin -
 un proyecto lo habilita explícitamente por nombre de módulo de BoxLang,
 mediante el array [`plugins`](../configuration.md#plugins) de
-`bxsites.json`:
+`bxsites.yaml`:
 
-```json
-{ "plugins": [ "myBxSitesPlugin" ] }
+```yaml title="bxsites.yaml"
+plugins: [ myBxSitesPlugin ]
 ```
 
 ## Instalar un plugin publicado
@@ -42,7 +42,7 @@ registro de módulos de BoxLang en ejecución sin necesidad de
 lo carga en el runtime de inmediato e imprime de vuelta el nombre real de
 mapeo del módulo registrado (que, según la nota de abajo, no siempre
 coincide con el slug de ForgeBox) - añade *ese* nombre al array `plugins`
-de `bxsites.json` para activarlo, igual que con cualquier otro módulo
+de `bxsites.yaml` para activarlo, igual que con cualquier otro módulo
 instalado. Consulta
 [`install:plugin`](../cli-reference.md#installplugin) en la referencia de
 la CLI.
