@@ -212,6 +212,14 @@ class extends="testbox.system.BaseSpec" {
 				expect( processor.resolveOpenApiSrcs( absolute, "/guides/content-blocks/" ) ).toInclude( 'data-openapi-src="https://example.com/spec.yaml"' );
 			} );
 
+			it( "resolveOpenApiSrcs() also prefixes an operation-scoped block's own src, despite its extra bxsites-openapi--operation class", function() {
+				var html = render( '::: openapi src="assets/openapi/example.yaml" operation="GET /books"' & char( 10 ) & ":::" );
+
+				var resolved = processor.resolveOpenApiSrcs( html, "/guides/content-blocks/" );
+
+				expect( resolved ).toInclude( 'data-openapi-src="/guides/content-blocks/assets/openapi/example.yaml"' );
+			} );
+
 			it( "resolves a YouTube embed URL to its iframe embed form", function() {
 				var html = render( '::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="Demo"' & char( 10 ) & ":::" );
 
@@ -292,6 +300,58 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( html ).toInclude( "<summary>Oops, forgot to close</summary>" );
 				expect( html ).toInclude( "Still here." );
+			} );
+
+			it( "renders a ::: conditional block tagged with its own key/value", function() {
+				var html = render( '::: conditional key="plan" value="pro"' & char( 10 ) & "Pro-only body." & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( 'class="bxsites-conditional"' );
+				expect( html ).toInclude( 'data-bxsites-key="plan"' );
+				expect( html ).toInclude( 'data-bxsites-value="pro"' );
+				expect( html ).toInclude( "Pro-only body." );
+			} );
+
+			it( "renders a ::: conditional error placeholder when key or value is missing", function() {
+				var html = render( '::: conditional key="plan"' & char( 10 ) & "x" & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( "bxsites-conditional--invalid" );
+			} );
+
+			it( "renders a ::: audience-switcher with one button per option", function() {
+				var html = render( '::: audience-switcher key="plan" options="free:Free,pro:Pro"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( 'data-bxsites-key="plan"' );
+				expect( html.reMatch( 'data-bxsites-value="free"' ).len() ).toBe( 1 );
+				expect( html.reMatch( 'data-bxsites-value="pro"' ).len() ).toBe( 1 );
+				expect( html ).toInclude( ">Free<" );
+				expect( html ).toInclude( ">Pro<" );
+			} );
+
+			it( "renders a ::: audience-switcher error placeholder when key or options is missing", function() {
+				var html = render( "::: audience-switcher" & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( "bxsites-audience-switcher--invalid" );
+			} );
+
+			it( "renders ::: openapi with an operation attribute scoped to one method+path", function() {
+				var html = render( '::: openapi src="assets/openapi/spec.yaml" operation="POST /users"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( "bxsites-openapi--operation" );
+				expect( html ).toInclude( 'data-openapi-operation="post /users"' );
+			} );
+
+			it( "renders an ::: openapi invalid placeholder when operation isn't METHOD /path", function() {
+				var html = render( '::: openapi src="assets/openapi/spec.yaml" operation="nope"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( "bxsites-openapi--invalid" );
+			} );
+
+			it( "still renders plain ::: openapi with no operation attribute unaffected", function() {
+				var html = render( '::: openapi src="assets/openapi/spec.yaml"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( 'data-openapi-src="assets/openapi/spec.yaml"' );
+				expect( html ).notToInclude( "data-openapi-operation" );
+				expect( html ).notToInclude( "bxsites-openapi--operation" );
 			} );
 
 		} );

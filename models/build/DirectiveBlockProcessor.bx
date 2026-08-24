@@ -23,7 +23,11 @@ class {
 	variables.attrPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(\w+)="([^"]*)"' )
 	variables.titlePattern = createObject( "java", "java.util.regex.Pattern" ).compile( '^"([^"]*)"\s*(.*)$' )
 	variables.fileHrefPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(<a class="bxsites-file" href=")([^"]*)(")' )
-	variables.openApiSrcPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(<div class="bxsites-openapi" data-openapi-src=")([^"]*)("[^>]*>)' )
+	// `[^"]*` (not a literal `"bxsites-openapi"`) after the class name so
+	// this still matches an `operation="..."` block's own extra
+	// `bxsites-openapi--operation` class (renderOpenApi()'s own docblock).
+	variables.openApiSrcPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(<div class="bxsites-openapi[^"]*" data-openapi-src=")([^"]*)("[^>]*>)' )
+	variables.openApiOperationPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^(\S+)\s+(/\S*)$" )
 	variables.iconResolver = new "models.build.IconResolver@bxsites"()
 
 	/**
@@ -200,6 +204,10 @@ class {
 				return renderPageLinkStub( attrs )
 			case "link-preview":
 				return renderLinkPreview( attrs )
+			case "conditional":
+				return renderConditional( block, attrs, renderer, markdownOptions )
+			case "audience-switcher":
+				return renderAudienceSwitcher( attrs )
 			default:
 				return '<div class="bxsites-directive-unknown">' & renderNested( block.content, renderer, markdownOptions ) & '</div>'
 		}
@@ -256,6 +264,71 @@ class {
 		return '<details class="bxsites-expandable"' & openAttr & '><summary>' & encodeForHTML( title )
 			& '</summary><div class="bxsites-expandable__body">' & renderNested( arguments.block.content, arguments.renderer, arguments.markdownOptions )
 			& '</div></details>'
+	}
+
+	/**
+	 * `::: conditional key="plan" value="pro"` ... `:::` - shows this block
+	 * only to a reader whose own stored preference for `key` matches
+	 * `value`, e.g. a tutorial showing "pro"-only instructions inline
+	 * without sending the reader to a separate page. Unlike GitBook's own
+	 * adaptive content (server-evaluated visitor claims/cookies - this
+	 * module has no server, no visitor identity at all), the "preference"
+	 * here is purely reader-chosen and stored in their own browser
+	 * (`localStorage`, via `conditional-content-init.js`'s own
+	 * `window.bxSitesSetPreference( key, value )`) - a project wires that up
+	 * however it likes (its own theme override, a `::: audience-switcher`
+	 * block, a link with `?plan=pro` - `conditional-content-init.js` also
+	 * reads the URL's own query string once on load and stores whatever it
+	 * finds there). Every variant renders in the HTML regardless - hidden
+	 * client-side, not omitted - so a reader with JS disabled (or a search
+	 * crawler) still sees every variant rather than none.
+	 *
+	 * @required key The preference name this block is keyed on, e.g. "plan"
+	 * @required value The one value of `key` this block should show for, e.g. "pro"
+	 */
+	private string function renderConditional( required struct block, required struct attrs, required any renderer, required struct markdownOptions ) {
+		var key = trim( arguments.attrs.key ?: "" )
+		var value = trim( arguments.attrs.value ?: "" )
+		if ( !len( key ) || !len( value ) ) {
+			return '<div class="bxsites-conditional bxsites-conditional--invalid">::: conditional - requires both key="..." and value="..."</div>'
+		}
+		return '<div class="bxsites-conditional" data-bxsites-key="' & attrEscape( key ) & '" data-bxsites-value="' & attrEscape( value ) & '">'
+			& renderNested( arguments.block.content, arguments.renderer, arguments.markdownOptions )
+			& '</div>'
+	}
+
+	/**
+	 * `::: audience-switcher key="plan" options="free:Free,pro:Pro"` - an
+	 * optional, ready-made reader control for `::: conditional`'s own `key`:
+	 * one button per `value:Label` pair in `options`, calling
+	 * `window.bxSitesSetPreference( key, value )` on click
+	 * (`conditional-content-init.js`) so every `::: conditional key="plan"`
+	 * block on the page updates immediately, and the choice is remembered
+	 * on every later page too. Entirely optional - a project can just as
+	 * well drive `bxSitesSetPreference()` from its own theme override
+	 * instead.
+	 *
+	 * @required key The preference name to switch, matching `::: conditional`'s own `key`
+	 * @required options Comma-separated `value:Label` pairs, e.g. "free:Free,pro:Pro"
+	 */
+	private string function renderAudienceSwitcher( required struct attrs ) {
+		var key = trim( arguments.attrs.key ?: "" )
+		var optionsRaw = trim( arguments.attrs.options ?: "" )
+		if ( !len( key ) || !len( optionsRaw ) ) {
+			return '<div class="bxsites-audience-switcher bxsites-audience-switcher--invalid">::: audience-switcher - requires both key="..." and options="value:Label,..."</div>'
+		}
+
+		var buttons = ""
+		for ( var pair in listToArray( optionsRaw, "," ) ) {
+			var value = trim( listFirst( pair, ":" ) )
+			var label = listLen( pair, ":" ) > 1 ? trim( listRest( pair, ":" ) ) : value
+			if ( !len( value ) ) {
+				continue
+			}
+			buttons &= '<button type="button" class="bxsites-audience-switcher__option" data-bxsites-value="' & attrEscape( value ) & '">' & encodeForHTML( label ) & '</button>'
+		}
+
+		return '<div class="bxsites-audience-switcher" data-bxsites-key="' & attrEscape( key ) & '">' & buttons & '</div>'
 	}
 
 	/**
@@ -418,18 +491,56 @@ class {
 	 * (BuildPipeline.bx's `copyAssets()`), the same opt-in-only shape
 	 * `mermaid`/`math` already use, so this placeholder renders but stays
 	 * inert (no widget mounts) on a project that hasn't turned it on.
+	 *
+	 * An optional `operation="METHOD /path"` (e.g. `"POST /users"`) drops
+	 * just that one endpoint inline into a regular page - a tutorial can
+	 * show a single relevant operation without sending the reader to the
+	 * full reference. Still the same one spec, same client-side-only
+	 * Swagger UI render as the full-spec block above; `openapi-init.js`
+	 * mounts the identical widget, then hides every other operation and
+	 * auto-expands the matching one by reading Swagger UI's own rendered
+	 * DOM (`.opblock-summary-path`'s `data-path` + the `opblock-<method>`
+	 * class) - no OpenAPI parsing on our side, same as the full block.
 	 */
 	private string function renderOpenApi( required struct attrs ) {
 		var src = trim( arguments.attrs.src ?: "" )
 		if ( !len( src ) ) {
 			return '<div class="bxsites-openapi bxsites-openapi--invalid">::: openapi - missing required src="..."</div>'
 		}
+
+		var operation = trim( arguments.attrs.operation ?: "" )
+		var operationAttr = ""
+		if ( len( operation ) ) {
+			var parsed = parseOpenApiOperation( operation )
+			if ( isNull( parsed ) ) {
+				return '<div class="bxsites-openapi bxsites-openapi--invalid">::: openapi - operation="' & encodeForHTML( operation ) & '" must look like "METHOD /path", e.g. "POST /users"</div>'
+			}
+			operationAttr = ' data-openapi-operation="' & attrEscape( parsed.method & " " & parsed.path ) & '"'
+		}
+
 		var title = trim( arguments.attrs.title ?: "" )
 		var html = ""
 		if ( len( title ) ) {
 			html &= '<div class="bxsites-openapi__title">' & encodeForHTML( title ) & '</div>'
 		}
-		return '<div class="bxsites-openapi" data-openapi-src="' & attrEscape( src ) & '">' & html & '</div>'
+		return '<div class="bxsites-openapi' & ( len( operation ) ? " bxsites-openapi--operation" : "" ) & '" data-openapi-src="' & attrEscape( src ) & '"' & operationAttr & '>' & html & '</div>'
+	}
+
+	/**
+	 * @operation The raw `operation="..."` attribute value
+	 *
+	 * @return { method (lowercased, e.g. "post"), path (as-authored, e.g. "/users") } or null when it doesn't look like "METHOD /path"
+	 */
+	private any function parseOpenApiOperation( required string operation ) {
+		var matcher = variables.openApiOperationPattern.matcher( trim( arguments.operation ) )
+		if ( !matcher.matches() ) {
+			return
+		}
+		var method = lCase( matcher.group( 1 ) )
+		if ( !listFindNoCase( "get,post,put,delete,patch,options,head", method ) ) {
+			return
+		}
+		return { method : method, path : matcher.group( 2 ) }
 	}
 
 	/**

@@ -193,7 +193,9 @@
 	<meta property="og:site_name" content="#encodeForHTML( variables.siteConfig.name )#">
 	<meta property="og:title" content="#encodeForHTML( variables.page.title )#">
 	#renderArticleMeta()#
-</bx:output><bx:if condition="#len( variables.ogDescription )#"><bx:output>
+</bx:output><bx:if condition="#len( variables.page.canonicalUrl )#"><bx:output>
+	<link rel="canonical" href="#encodeForHTML( variables.page.canonicalUrl )#">
+</bx:output></bx:if><bx:if condition="#len( variables.ogDescription )#"><bx:output>
 	<meta name="description" content="#encodeForHTML( variables.ogDescription )#">
 	<meta property="og:description" content="#encodeForHTML( variables.ogDescription )#">
 </bx:output></bx:if><bx:if condition="#len( variables.ogImageUrl )#"><bx:output>
@@ -292,6 +294,7 @@
 	<script src="#variables.basePath#assets/nav-toggle.js" defer></script>
 	<script src="#variables.basePath#assets/toc-collapse.js" defer></script>
 	<script src="#variables.basePath#assets/tabs.js" defer></script>
+	<script src="#variables.basePath#assets/conditional-content-init.js" defer></script>
 </bx:output><bx:if condition="#variables.mermaidEnabled#"><bx:output>
 	<script src="#variables.basePath#assets/vendor/mermaid/mermaid.min.js"></script>
 	<script src="#variables.basePath#assets/mermaid-init.js"></script>

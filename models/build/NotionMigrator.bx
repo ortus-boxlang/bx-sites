@@ -1,0 +1,337 @@
+/**
+ * Converts a Notion "Export as Markdown & CSV" archive (a `.zip`, or an
+ * already-extracted folder) into a bx-sites project's `docs/` tree.
+ *
+ * Notion's own export has two quirks nothing else this module migrates
+ * from has: every page and sub-page folder is suffixed with a space and a
+ * 32-character hex id (`Getting Started 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d.md`,
+ * disambiguating two same-titled pages the reader never sees), and every
+ * page's own title is repeated as a literal leading `# Heading` rather
+ * than carried in frontmatter. This migrator strips that id suffix and
+ * slugifies every remaining path segment (`stripNotionId()`/`slugify()`)
+ * for the output filename, promotes each page's own leading `# Heading`
+ * into a real `title` frontmatter field instead of leaving it as a
+ * duplicate first line, and rewrites every link/image target (which
+ * Notion writes URL-encoded, still pointing at the *original* id-suffixed
+ * names) to match. Non-`.md` files are relocated to
+ * `docs/assets/imported/<same-relative-path>`, the same reasoning
+ * MarkdownZipMigrator.bx/MkdocsMigrator.bx already use.
+ */
+class {
+
+	variables.sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
+	variables.idSuffixPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^(.*?)\s+[0-9a-fA-F]{32}$" )
+
+	/**
+	 * @source Absolute path to either a Notion export `.zip`, or an already-extracted export folder
+	 * @projectRoot Absolute path to the target bx-sites project root
+	 *
+	 * @return { pagesConverted: numeric, assetsConverted: numeric, warnings: array of human-readable strings }
+	 */
+	struct function migrate( required string source, required string projectRoot ) {
+		var docsDir = variables.sourceDirResolver.resolve( arguments.projectRoot )
+		if ( !directoryExists( docsDir ) ) {
+			directoryCreate( docsDir, true, true )
+		}
+
+		var isZip = fileExists( arguments.source ) && arguments.source.reFindNoCase( "\.zip$" )
+		if ( !isZip && !directoryExists( arguments.source ) ) {
+			throw(
+				type    = "BxSites.MigrateSourceNotFound",
+				message = "No .zip file or directory found at [#arguments.source#] - a Notion migration requires either a Notion export .zip or an already-extracted export folder"
+			)
+		}
+
+		var tempDir = ""
+		try {
+			var extractedRoot = arguments.source
+			if ( isZip ) {
+				tempDir = getTempDirectory().reReplace( "[\/]+$", "" ) & "/bxsites-notion-" & createUUID()
+				directoryCreate( tempDir, true, true )
+				extract( source = arguments.source, destination = tempDir, format = "zip", overwrite = true )
+				extractedRoot = unwrapSingleFolder( tempDir )
+			}
+
+			if ( !directoryList( extractedRoot, true, "path", "*.md" ).len() ) {
+				throw(
+					type    = "BxSites.MigrateNoMarkdownFound",
+					message = "No .md files found inside [#arguments.source#]"
+				)
+			}
+
+			var warnings = []
+			var pathMap = buildPathMap( extractedRoot )
+			var copyResult = copyDocsTree( extractedRoot, docsDir, pathMap, warnings )
+
+			return {
+				pagesConverted  : copyResult.pagesConverted,
+				assetsConverted : copyResult.assetsConverted,
+				warnings        : warnings
+			}
+		} finally {
+			if ( len( tempDir ) && directoryExists( tempDir ) ) {
+				directoryDelete( tempDir, true )
+			}
+		}
+	}
+
+	/**
+	 * Descends into a lone top-level subfolder, up to 3 levels deep - the
+	 * common "the zip wraps everything in one export-name folder" shape,
+	 * same as MarkdownZipMigrator.bx's own `unwrapSingleFolder()`.
+	 */
+	private string function unwrapSingleFolder( required string dir ) {
+		var current = arguments.dir
+		for ( var i = 1; i <= 3; i++ ) {
+			var entries = directoryList( current, false, "path" )
+			if ( entries.len() != 1 || !directoryExists( entries[ 1 ] ) ) {
+				break
+			}
+			current = entries[ 1 ]
+		}
+		return current
+	}
+
+	/**
+	 * Strips a Notion id suffix from one path segment (file or folder
+	 * name, extension already removed) - "Getting Started 1a2b3c...6d"
+	 * becomes "Getting Started"; a segment with no id suffix is returned
+	 * unchanged.
+	 *
+	 * @segment One path segment, without its file extension
+	 */
+	private string function stripNotionId( required string segment ) {
+		var matcher = variables.idSuffixPattern.matcher( arguments.segment )
+		return matcher.matches() ? matcher.group( 1 ) : arguments.segment
+	}
+
+	/**
+	 * @text Free text (a Notion page/folder title, id already stripped)
+	 *
+	 * @return A lowercase, hyphen-separated slug safe as a file/folder name
+	 */
+	private string function slugify( required string text ) {
+		var slug = lCase( trim( arguments.text ) )
+			.reReplace( "[^a-z0-9]+", "-", "all" )
+			.reReplace( "^-+|-+$", "", "all" )
+		return len( slug ) ? slug : "page"
+	}
+
+	/**
+	 * Builds a map from every file's own export-root-relative path (as it
+	 * actually appears on disk, id suffix and all) to its cleaned,
+	 * slugified equivalent - computed once up front so link rewriting
+	 * below can look up "where did this reference's target end up",
+	 * rather than trying to slugify a link target on the fly (a link's own
+	 * text doesn't always exactly match the target file's name after
+	 * Notion's own URL-encoding).
+	 *
+	 * @root Absolute path to the (already unwrapped) extracted export root
+	 *
+	 * @return { originalRelativePath : finalDocsRelativePath } - a `.md` entry's own value is its cleaned path as-is (it stays in docs/ directly); any other entry's value is prefixed with `assets/imported/` (copyDocsTree()'s own relocation target), so a link rewritten from this map always points at wherever the file actually ends up
+	 */
+	private struct function buildPathMap( required string root ) {
+		var map = {}
+		var allFiles = directoryList( arguments.root, true, "path" ).filter( path => !directoryExists( path ) )
+		for ( var sourcePath in allFiles ) {
+			var relativePath = sourcePath.reReplace( "^" & reEscape( arguments.root ), "", "one" ).reReplace( "^[\/]", "" )
+			var cleaned = cleanRelativePath( relativePath )
+			map[ relativePath ] = relativePath.reFindNoCase( "\.md$" ) ? cleaned : ( "assets/imported/" & cleaned )
+		}
+		return map
+	}
+
+	/**
+	 * Cleans every segment of a relative path - each folder name and the
+	 * file's own base name gets `stripNotionId()` + `slugify()`; the
+	 * extension is preserved as-is.
+	 *
+	 * @relativePath An export-root-relative path, id suffixes and all
+	 */
+	private string function cleanRelativePath( required string relativePath ) {
+		var segments = listToArray( arguments.relativePath, "/" )
+		var lastIndex = segments.len()
+		var ext = segments[ lastIndex ].reFindNoCase( "\.[a-z0-9]+$" ) ? segments[ lastIndex ].reReplace( "^.*(\.[a-zA-Z0-9]+)$", "\1" ) : ""
+		var baseName = len( ext ) ? segments[ lastIndex ].reReplace( "\.[a-zA-Z0-9]+$", "" ) : segments[ lastIndex ]
+
+		var cleaned = segments.map( ( segment, index ) => {
+			if ( index == lastIndex ) {
+				return slugify( stripNotionId( baseName ) ) & ext
+			}
+			return slugify( stripNotionId( segment ) )
+		} )
+
+		return cleaned.toList( "/" )
+	}
+
+	/**
+	 * Copies every file into `docsDir` at its cleaned path (`pathMap`),
+	 * rewriting every `.md` page's own leading title and internal
+	 * links/images (rewriteContent()) - assets relocated to
+	 * `docsDir/assets/imported/...`, same reasoning MarkdownZipMigrator.bx
+	 * already uses.
+	 *
+	 * @sourceRoot Absolute path to the (already unwrapped) extracted export root
+	 * @docsDir Absolute path to the target project's docs/ directory
+	 * @pathMap buildPathMap()'s own output
+	 * @warnings Accumulator array, mutated in place
+	 *
+	 * @return { pagesConverted: numeric, assetsConverted: numeric }
+	 */
+	private struct function copyDocsTree( required string sourceRoot, required string docsDir, required struct pathMap, required array warnings ) {
+		var pagesConverted = 0
+		var assetsConverted = 0
+
+		for ( var relativePath in arguments.pathMap ) {
+			if ( relativePath.reFindNoCase( "\.md$" ) ) {
+				continue
+			}
+			var destPath = arguments.docsDir & "/" & arguments.pathMap[ relativePath ]
+			var destDir = getDirectoryFromPath( destPath )
+			if ( len( destDir ) && !directoryExists( destDir ) ) {
+				directoryCreate( destDir, true, true )
+			}
+			fileCopy( arguments.sourceRoot & "/" & relativePath, destPath )
+			assetsConverted++
+		}
+
+		for ( var relativePath in arguments.pathMap ) {
+			if ( !relativePath.reFindNoCase( "\.md$" ) ) {
+				continue
+			}
+			var cleanedRelativePath = arguments.pathMap[ relativePath ]
+			var pageDir = getDirectoryFromPath( relativePath ).reReplace( "[\/]$", "" )
+			if ( pageDir == "." ) {
+				pageDir = ""
+			}
+			var depth = len( getDirectoryFromPath( cleanedRelativePath ).reReplace( "[\/]$", "" ) ) ? listLen( getDirectoryFromPath( cleanedRelativePath ), "/" ) : 0
+
+			var converted = rewriteContent( fileRead( arguments.sourceRoot & "/" & relativePath ), pageDir, depth, arguments.pathMap )
+
+			var destPath = arguments.docsDir & "/" & cleanedRelativePath
+			var destDir = getDirectoryFromPath( destPath )
+			if ( len( destDir ) && !directoryExists( destDir ) ) {
+				directoryCreate( destDir, true, true )
+			}
+			if ( fileExists( destPath ) ) {
+				arguments.warnings.append( "#cleanedRelativePath# already existed in docs/ and was overwritten by this migration" )
+			}
+			fileWrite( destPath, converted )
+			pagesConverted++
+		}
+
+		return { pagesConverted : pagesConverted, assetsConverted : assetsConverted }
+	}
+
+	/**
+	 * Strips one page's own leading `# Heading` (Notion's own stand-in for
+	 * a real title) into a `title` frontmatter field instead, then
+	 * rewrites every markdown link/image target - URL-decoded, resolved
+	 * against the page's own original (id-suffixed) directory, looked up
+	 * in `pathMap` - to the correct relative path reaching that target's
+	 * new, cleaned location. A target that isn't in `pathMap` (an external
+	 * URL, a same-page anchor) is left untouched.
+	 *
+	 * @text One page's raw exported markdown
+	 * @originalPageDir The page's own *original* (id-suffixed) export-relative directory ("" for a root-level page)
+	 * @newDepth The page's own *cleaned* output nesting depth (how many `../` reach docs/ from it)
+	 * @pathMap buildPathMap()'s own output
+	 */
+	private string function rewriteContent( required string text, required string originalPageDir, required numeric newDepth, required struct pathMap ) {
+		var lines = listToArray( arguments.text, char( 10 ), true )
+		var title = ""
+		if ( lines.len() && lines[ 1 ].reFindNoCase( "^##\s+\S" ) ) {
+			title = trim( lines[ 1 ].reReplace( "^##\s+", "" ) )
+			lines.deleteAt( 1 )
+			// Drop one immediately-following blank line too, so the body
+			// doesn't start with an orphaned empty line where the title used to be.
+			if ( lines.len() && !len( trim( lines[ 1 ] ) ) ) {
+				lines.deleteAt( 1 )
+			}
+		}
+
+		var body = lines.toList( char( 10 ) )
+		var pattern = createObject( "java", "java.util.regex.Pattern" ).compile( '\]\(([^)\s]+)(\s+"[^"]*")?\)' )
+		var matcher = pattern.matcher( body )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+
+		while ( matcher.find() ) {
+			var target = matcher.group( 1 )
+			var titlePart = isNull( matcher.group( 2 ) ) ? "" : matcher.group( 2 )
+			var rewritten = target
+
+			if ( !target.reFindNoCase( "^[a-z][a-z0-9+.\-]*:" ) && target.left( 1 ) != "##" ) {
+				var decoded = urlDecode( target )
+				var rootRelative = normalizeRelativePath( len( arguments.originalPageDir ) ? arguments.originalPageDir & "/" & decoded : decoded )
+				if ( arguments.pathMap.keyExists( rootRelative ) ) {
+					rewritten = repeatString( "../", arguments.newDepth ) & arguments.pathMap[ rootRelative ]
+				}
+			}
+
+			matcher.appendReplacement( buffer, quoteReplacement( "](" & rewritten & titlePart & ")" ) )
+		}
+		matcher.appendTail( buffer )
+
+		return serializeFrontmatter( title ) & buffer.toString()
+	}
+
+	/**
+	 * @title A page's own extracted title, "" if none was found
+	 *
+	 * @return A `---`-delimited bx-sites frontmatter block, or "" when title is blank
+	 */
+	private string function serializeFrontmatter( required string title ) {
+		if ( !len( arguments.title ) ) {
+			return ""
+		}
+		return "---" & char( 10 ) & "title: " & arguments.title & char( 10 ) & "---" & char( 10 ) & char( 10 )
+	}
+
+	/**
+	 * @value A URL-encoded string (Notion's own markdown link targets)
+	 */
+	private string function urlDecode( required string value ) {
+		return createObject( "java", "java.net.URLDecoder" ).decode( arguments.value, "UTF-8" )
+	}
+
+	/**
+	 * Resolves `.`/`..` segments out of an export-root-relative path -
+	 * plain textual resolution, no filesystem access.
+	 *
+	 * @path An export-root-relative path, possibly containing `.`/`..` segments
+	 */
+	private string function normalizeRelativePath( required string path ) {
+		var segments = listToArray( arguments.path, "/" )
+		var resolved = []
+		for ( var segment in segments ) {
+			if ( segment == "." || !len( segment ) ) {
+				continue
+			}
+			if ( segment == ".." && resolved.len() ) {
+				resolved.deleteAt( resolved.len() )
+			} else if ( segment != ".." ) {
+				resolved.append( segment )
+			}
+		}
+		return resolved.toList( "/" )
+	}
+
+	/**
+	 * @text Literal replacement text
+	 *
+	 * @return text, safe to pass as Matcher#appendReplacement's own replacement argument
+	 */
+	private string function quoteReplacement( required string text ) {
+		return createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( arguments.text )
+	}
+
+	/**
+	 * @text Literal text to embed in a regular expression
+	 *
+	 * @return text with every regex metacharacter escaped
+	 */
+	private string function reEscape( required string text ) {
+		return createObject( "java", "java.util.regex.Pattern" ).quote( arguments.text )
+	}
+
+}

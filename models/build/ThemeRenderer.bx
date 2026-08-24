@@ -220,6 +220,9 @@ class {
 		if ( !variables.page.keyExists( "urlPath" ) ) {
 			variables.page.urlPath = ""
 		}
+		if ( !variables.page.keyExists( "canonicalUrl" ) ) {
+			variables.page.canonicalUrl = ""
+		}
 		variables.nav = arguments.nav
 		variables.siteConfig = arguments.config
 		variables.themeDir = arguments.themeDir

@@ -526,6 +526,23 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
+			it( "defaults [robots] to true", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).robots ).toBeTrue();
+			} );
+
+			it( "preserves a user-supplied [robots]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","robots":false}' );
+				expect( loader.load( dir ).robots ).toBeFalse();
+			} );
+
+			it( "throws BxSites.InvalidConfig when [robots] is not a boolean", function() {
+				var dir = newProjectDir( '{"name":"My Docs","robots":"yes please"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
 			it( "defaults [blog.postsPerPage] to 10, [blog.feed] to true, and [blog.feedLimit] to 25", function() {
 				var dir = newProjectDir( '{"name":"My Docs"}' );
 				var config = loader.load( dir );

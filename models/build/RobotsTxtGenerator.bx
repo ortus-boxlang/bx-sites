@@ -1,0 +1,34 @@
+/**
+ * Builds a standard `robots.txt` - permissive by default (every crawler
+ * allowed, pointed at `sitemap.xml` when an absolute site URL is known,
+ * same gating `SitemapGenerator.bx` already uses), or fully closed when a
+ * project sets `bxsites.json`'s `robots: false` - the common "don't index
+ * this staging/internal deploy at all" need, distinct from a single
+ * page's own `hidden: true` (which only ever means "not linked from nav/
+ * search/sitemap," never "actively tell crawlers to stay out").
+ */
+class {
+
+	/**
+	 * @siteUrl The absolute site URL, ending with `/` (BaseUrlResolver's `absolute`), or "" if unknown - omits the `Sitemap:` line, same as sitemap.xml itself is skipped without one
+	 * @allowed `bxsites.json`'s `robots` - `true` (the default) allows every crawler; `false` disallows everything
+	 *
+	 * @return The rendered robots.txt content
+	 */
+	string function build( required string siteUrl, boolean allowed = true ) {
+		var lines = [
+			"User-agent: *",
+			arguments.allowed ? "Allow: /" : "Disallow: /"
+		]
+
+		if ( arguments.allowed && len( arguments.siteUrl ) ) {
+			lines.append( "" )
+			lines.append( "Sitemap: " & arguments.siteUrl & "sitemap.xml" )
+		}
+
+		lines.append( "" )
+
+		return lines.toList( char( 10 ) )
+	}
+
+}

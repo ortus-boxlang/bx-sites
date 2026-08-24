@@ -1884,6 +1884,54 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileRead( root & "/site/index.html" ) ).toInclude( "Renamed Site" );
 			} );
 
+			it( "gives every page a correct <link rel=\"canonical\"> when baseURL is a full URL, scoped to its own tree", function() {
+				var root = newTempDirWithConfig( '{"name":"Test Site","baseURL":"https://example.com/docs/","theme":{"name":"bootstrap"},"i18n":{"defaultLocale":{"code":"en","label":"English"},"locales":[{"code":"de","label":"Deutsch"}]}}' );
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/i18n/de", true, true );
+				fileWrite( root & "/docs/i18n/de/index.md", "Startseite" );
+
+				pipeline.build( root );
+
+				// encodeForHTML()'s exact escaping range for "safe" characters
+				// like ":"/"/" is environment-dependent (locale/JVM-charset-driven) -
+				// decoded before comparing, same reasoning
+				// DirectiveBlockProcessorSpec.bx's own htmlDecode() uses.
+				expect( htmlDecode( fileRead( root & "/site/index.html" ) ) ).toInclude( '<link rel="canonical" href="https://example.com/docs/index.html">' );
+				expect( htmlDecode( fileRead( root & "/site/de/index.html" ) ) ).toInclude( '<link rel="canonical" href="https://example.com/docs/de/index.html">' );
+			} );
+
+			it( "omits <link rel=\"canonical\"> entirely when baseURL has no absolute domain", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				expect( fileRead( root & "/site/index.html" ) ).notToInclude( "rel=\"canonical\"" );
+			} );
+
+			private string function newTempDirWithConfig( required string configJson ) {
+				var dir = createTempDirectory( prefix = "bxsites-buildpipeline-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite( dir & "/bxsites.json", arguments.configJson );
+				return dir;
+			}
+
+			// Same helper DirectiveBlockProcessorSpec.bx already carries -
+			// see its own docblock for why this decodes rather than pinning
+			// one particular escaped form.
+			private string function htmlDecode( required string text ) {
+				var matcher = createObject( "java", "java.util.regex.Pattern" ).compile( '&##x([0-9a-fA-F]+);' ).matcher( arguments.text )
+				var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+				while ( matcher.find() ) {
+					var codepoint = createObject( "java", "java.lang.Integer" ).parseInt( matcher.group( 1 ), 16 )
+					var chars = createObject( "java", "java.lang.String" ).valueOf( createObject( "java", "java.lang.Character" ).toChars( codepoint ) )
+					matcher.appendReplacement( buffer, createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( chars ) )
+				}
+				matcher.appendTail( buffer )
+				return buffer.toString()
+			}
+
 		} );
 	}
 

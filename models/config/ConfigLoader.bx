@@ -67,6 +67,7 @@ class {
 		"mermaid"      : false,
 		"math"         : false,
 		"openapi"      : false,
+		"robots"       : true,
 		"analytics"    : { "provider" : "", "id" : "" },
 		"ogImage"      : "",
 		"generateOgImages" : false,
@@ -297,6 +298,13 @@ class {
 			throw(
 				type    = "BxSites.InvalidConfig",
 				message = "#variables.configFileName# [openapi] must be a boolean"
+			)
+		}
+
+		if ( !isBoolean( arguments.config.robots ?: "" ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [robots] must be a boolean"
 			)
 		}
 

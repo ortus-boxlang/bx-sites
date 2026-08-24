@@ -134,19 +134,24 @@ frontmatter (see [Getting Started](getting-started.md#add-pages)).
 ## `baseURL`
 
 Controls how every internal link, asset path and nav entry is prefixed, and
-doubles as the site's canonical URL for `sitemap.xml` and `llms.txt`.
+doubles as the site's canonical URL for `sitemap.xml`, `robots.txt`,
+`llms.txt`, and every page's own `<link rel="canonical">` tag.
 
 - Left blank or `"/"` (the default) - links stay root-relative (`/page/`),
-  and neither `sitemap.xml` nor an absolute-URL `llms.txt` is generated
+  and neither `sitemap.xml`, a `Sitemap:` line in `robots.txt`, an
+  absolute-URL `llms.txt`, nor a `<link rel="canonical">` tag is generated
   (there's no canonical domain to build them from).
 - A bare path, e.g. `"my-docs"` or `"/my-docs/"` - the site is assumed to be
   served from that sub-path, and every internal link, nav entry and asset
-  is prefixed with it (`/my-docs/page/`). Still no `sitemap.xml`, since
-  there's still no absolute domain.
+  is prefixed with it (`/my-docs/page/`). Still no `sitemap.xml`/canonical
+  tags, since there's still no absolute domain.
 - A full URL, e.g. `"https://docs.example.com/"` - the path portion
   (`/` here) is used the same way a bare path would be, **and**
   `sitemap.xml` is written at build time with every non-hidden page's
-  absolute URL under that domain.
+  absolute URL under that domain, `robots.txt` gains a `Sitemap:` line
+  pointing at it, and every page gets its own correct
+  `<link rel="canonical">` (a version/locale tree's own page still points
+  at *that tree's own* URL, not the main site's).
 
 `llms.txt` (see [below](#llmstxt)) is always written; it just prefers an
 absolute URL when `baseURL` provides one.
@@ -165,6 +170,24 @@ for this; it's generated automatically, using an absolute URL per link when
 Written at the site root, but only when `baseURL` is a full URL (see
 above) - a sitemap needs an absolute domain to be meaningful. Lists every
 non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
+
+## `robots.txt`
+
+Every build writes a `robots.txt` to the site root - no config key needed
+unless you want to change its default, permissive behavior:
+
+```json title="bxsites.json"
+{ "robots": false }
+```
+
+- `true` (the default) - `Allow: /` for every crawler, plus a `Sitemap:`
+  line pointing at `sitemap.xml` when `baseURL` is a full URL (see above).
+- `false` - `Disallow: /` for every crawler instead, and no `Sitemap:`
+  line - the common "don't index this staging/internal deploy at all" need.
+  This is a *crawler* opt-out only, not access control - the site is still
+  fully reachable by anyone with the URL; see
+  [Deployment](guides/deployment.md#restricting-who-can-reach-your-site) if you actually need to restrict who
+  can reach it at all.
 
 ## `theme`
 
