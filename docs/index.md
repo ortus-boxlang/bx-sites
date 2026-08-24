@@ -53,6 +53,16 @@ vendored - a built site needs zero outbound requests by default.
 A plugin is just another installed BoxLang module - no separate plugin API
 to learn.
 :::
+::: card title="Plugins & themes, published on ForgeBox" icon="phosphor-duotone:package" href="guides/plugins.md#installing-a-published-plugin"
+`install:plugin` and `install:theme` download a published package straight
+into your project - browse `bxsites-plugins` and `bxsites-themes` on
+ForgeBox.
+:::
+::: card title="Import an existing theme" icon="phosphor-duotone:arrows-left-right" href="guides/theme-import.md"
+`theme:import --source=mkdocs|jekyll|hugo` converts another generator's own
+theme templates into a bx-sites scaffold to build on, instead of starting
+from scratch.
+:::
 ::: card title="Migrate from GitBook or mkdocs" icon="phosphor-duotone:swap" href="guides/index.md"
 `bxSites migrate --source=... --from=gitbook|mkdocs` converts an existing
 GitBook export or mkdocs project into a working bx-sites project in one
