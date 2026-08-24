@@ -146,7 +146,9 @@ flowchart LR
 ### Built-in themes — gallery expansion (post-v1)
 
 Seven more built-in themes, bringing the total to ten, so this repo's own
-dogfooded docs (`buildMultiTheme.sh`) double as a theme gallery: `docsy`
+dogfooded docs double as a theme gallery (built as ten parallel jobs in
+`.github/workflows/pages.yml`; `buildMultiTheme.sh` reproduces the same
+gallery layout for a local preview): `docsy`
 (Read the Docs/Docsy-inspired), `slate` (Stripe/Slate-inspired, permanently
 dark sidebar), `docusaurus` (Docusaurus-inspired), `justthedocs` (Just the
 Docs-inspired), `vuepress` (VuePress-inspired), `gitbook` (GitBook-inspired,

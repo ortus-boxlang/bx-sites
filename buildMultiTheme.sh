@@ -1,30 +1,49 @@
 #!/usr/bin/env bash
 #
-# Dogfooding-only build script for this repo's own docs site: builds
-# docs/ once per built-in theme (10, as of the theme gallery expansion)
-# and assembles the results into a single site/ tree, so the deployed
-# site shows off `bootstrap` at the root plus every other built-in theme
-# living side by side under theme/<name>/ - this repo's own docs double
-# as the theme gallery. Not a bx-sites product feature - just this
-# project using its own `build` verb, the same way pages.yml already
-# patches baseURL per branch.
+# LOCAL PREVIEW ONLY - not used by CI. `pages.yml`'s own "Publish Docs"
+# deploy builds the ten-theme gallery as ten separate GitHub Actions
+# matrix jobs instead (real OS-level parallelism, one runner per theme,
+# no shared disk/working tree to juggle) - see that workflow's own
+# top-of-file comment. This script exists purely so a contributor can
+# reproduce the same "bootstrap at the root, every other theme under
+# theme/<name>/" gallery layout locally, in one `./buildMultiTheme.sh`
+# call, without needing to push and wait on ten CI jobs just to preview
+# a docs change against every built-in theme at once.
+#
+# Builds docs/ once per built-in theme (10, as of the theme gallery
+# expansion) and assembles the results into a single site/ tree. Not a
+# bx-sites product feature - just this project using its own `build`
+# verb, once per theme.
 #
 # The 10 builds run CONCURRENTLY (capped at BXSITES_BUILD_JOBS, default
 # nproc) rather than one at a time - going from 3 themes to 10 made the
-# old fully-sequential version too slow. Each variant builds in its own
-# throwaway `git worktree` rather than all ten fighting over the same
-# bxsites.yaml/site/ - `git worktree add --detach` (the same technique
-# GhPagesDeployer.bx already uses for its own throwaway gh-deploy
-# checkout) gives every variant a real, independent working directory
-# that still shares the main repo's object database, so `git log`
-# (bxsites.yaml's `lastUpdated` option, resolved per file by
-# GitRevisionDate.bx) keeps resolving file history correctly - a plain
-# directory copy, or a docs/ symlink with no real .git context behind
-# it, would silently break that instead. Each worktree's own
-# checked-out docs/ (frozen at HEAD) is immediately swapped for a live
-# symlink back to the real docs/ working tree, so uncommitted local
-# edits still show up in the preview build the same way they did when
-# every build ran in place, one at a time.
+# old fully-sequential version too slow for a quick local preview loop.
+# Each variant builds in its own throwaway `git worktree` rather than
+# all ten fighting over the same bxsites.yaml/site/ (or worse, over the
+# one real working tree a contributor is actively editing) -
+# `git worktree add --detach` (the same technique GhPagesDeployer.bx
+# already uses for its own throwaway gh-deploy checkout) gives every
+# variant a real, independent working directory that still shares the
+# main repo's object database, so `git log` (bxsites.yaml's
+# `lastUpdated` option, resolved per file by GitRevisionDate.bx) keeps
+# resolving file history correctly - a plain directory copy, or a
+# docs/ symlink with no real .git context behind it, would silently
+# break that instead. Each worktree's own checked-out docs/ (frozen at
+# HEAD) is immediately swapped for a live symlink back to the real
+# docs/ working tree, so uncommitted local edits still show up in the
+# preview build the same way they did when every build ran in place,
+# one at a time.
+#
+# Each variant moves its own site/ output into its final destination
+# (site/ for bootstrap, site/theme/<name>/ for everything else) and
+# removes its own worktree the moment ITS OWN build finishes, rather
+# than every worktree + site output sitting on disk until all ten are
+# done and one big pass moves/removes them at the very end - keeps
+# peak disk usage capped at BXSITES_BUILD_JOBS variants' worth instead
+# of all ten, and means a build that quietly writes nothing (still
+# exiting 0 - see ModuleConfig.bx's own top-level try/catch) fails
+# loudly, attributed to that one theme's own name/log, rather than
+# surfacing later as an unattributed error.
 #
 # Usage: ./buildMultiTheme.sh [projectRoot]   (defaults to ".")
 # Env:   BXSITES_BUILD_JOBS - max concurrent theme builds (default: nproc)
@@ -56,6 +75,11 @@ SWITCHER_JS="docs/assets/theme-switcher.js"
 mkdir -p "${LOG_DIR}"
 cp "${SWITCHER_JS}" "${SWITCHER_BACKUP}"
 
+# Each variant already removes its own worktree the moment it finishes
+# successfully (see build_variant() below) - this is only a catch-all for
+# one that failed or got interrupted partway through (set -e stops that
+# variant's own { } block before it reaches its own worktree removal),
+# so nothing borrowed from `git worktree add` is ever left behind.
 cleanup() {
 	cp "${SWITCHER_BACKUP}" "${SWITCHER_JS}" 2>/dev/null || true
 	rm -f "${SWITCHER_BACKUP}"
@@ -91,9 +115,17 @@ echo "Multi-theme build - site root: ${ROOT_PATH} - up to ${MAX_JOBS} theme(s) a
 # once, before any of the ten builds run.
 sed -i "s#__BXSITES_ROOT__#${ROOT_PATH}#g" "${SWITCHER_JS}"
 
-# Builds one theme variant in its own git worktree, writing progress/errors
-# to its own log file rather than interleaving with the other concurrent
-# builds' own output.
+# Created up front, not by the first variant to finish - bootstrap's own
+# move (below) merges into an already-existing site/, and every other
+# variant's move target is a fresh site/theme/<name>/ under an
+# already-existing site/theme/.
+rm -rf site
+mkdir -p site/theme
+
+# Builds one theme variant in its own git worktree, moves its own output
+# straight into its final destination, and removes its own worktree -
+# all before returning - writing progress/errors to its own log file
+# rather than interleaving with the other concurrent builds' own output.
 build_variant() {
 	local name="$1"
 	local variantRoot="${SCRATCH_DIR}/build/${name}"
@@ -112,6 +144,19 @@ build_variant() {
 		rm -rf "${variantRoot}/docs"
 		ln -s "${PROJECT_ROOT}/docs" "${variantRoot}/docs"
 
+		# The worktree's own checked-out bxsites.yaml is whatever's
+		# actually committed - never pages.yml's own throwaway,
+		# uncommitted per-branch patch (baseURL/repo.editUri pointed at
+		# this branch's own sub-path) done to PROJECT_ROOT's copy just
+		# before this script runs, since `git worktree add` only ever
+		# sees committed state. Copying PROJECT_ROOT's own copy over
+		# first - the same one this script's own BASE_URL/ROOT_PATH
+		# were themselves derived from, above - means every variant,
+		# bootstrap included, starts from the config this build was
+		# actually asked for rather than silently falling back to
+		# whatever's plain-committed (main's own root baseURL).
+		cp "${PROJECT_ROOT}/bxsites.yaml" "${variantRoot}/bxsites.yaml"
+
 		if [[ "${name}" != "bootstrap" ]]; then
 			THEME="${name}" URL="${BASE_URL_NO_SLASH}/theme/${name}/" \
 				yq eval -i '.theme.name = strenv(THEME) | .baseURL = strenv(URL)' "${variantRoot}/bxsites.yaml"
@@ -119,10 +164,24 @@ build_variant() {
 
 		boxlang bxSites build --projectRoot="${variantRoot}"
 
-		if [[ ! -d "${variantRoot}/site" ]]; then
-			echo "error: build for [${name}] produced no site/ directory" >&2
+		# Not just `-d` - an existing but empty site/ (a build that quietly
+		# wrote nothing, e.g. because it ran out of disk mid-write without
+		# that surfacing as a nonzero exit) must fail loudly here, tied to
+		# this variant's own name/log, rather than as a cryptic glob-not-
+		# matched error somewhere else once every variant's own "Built" has
+		# already printed.
+		if [[ ! -d "${variantRoot}/site" ]] || [[ -z "$(ls -A "${variantRoot}/site" 2>/dev/null)" ]]; then
+			echo "error: build for [${name}] produced no site/ output" >&2
 			exit 1
 		fi
+
+		if [[ "${name}" == "bootstrap" ]]; then
+			mv "${variantRoot}/site"/* "${PROJECT_ROOT}/site/"
+		else
+			mv "${variantRoot}/site" "${PROJECT_ROOT}/site/theme/${name}"
+		fi
+
+		git worktree remove --force "${variantRoot}"
 	} > "${log}" 2>&1
 
 	echo "==> Built [${name}]"
@@ -158,13 +217,5 @@ if [[ "${#fail_names[@]}" -gt 0 ]]; then
 	done
 	exit 1
 fi
-
-rm -rf site
-mkdir -p site/theme
-mv "${SCRATCH_DIR}/build/bootstrap/site"/* site/
-for name in "${THEMES[@]}"; do
-	[[ "${name}" == "bootstrap" ]] && continue
-	mv "${SCRATCH_DIR}/build/${name}/site" "site/theme/${name}"
-done
 
 echo "Done - bootstrap at site/, every other theme at site/theme/<name>/"
