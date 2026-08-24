@@ -2,17 +2,17 @@
 title: コンサルティングとプロフェッショナルサービス
 order: 6
 icon: phosphor-duotone:handshake
-summary: BX Sites サイトの構築、移行、保守にお困りですか？ Ortus Solutions は、あらゆる種類のドキュメントサイトや静的サイトに向けたプロフェッショナルサービスとコンサルティングを提供しています。
+summary: BxSites サイトの構築、移行、保守にお困りですか？ Ortus Solutions は、あらゆる種類のドキュメントサイトや静的サイトに向けたプロフェッショナルサービスとコンサルティングを提供しています。
 tags: [サービス, コンサルティング]
 ---
 
 # コンサルティングとプロフェッショナルサービス
 
-BX Sites は無料のオープンソースで、誰の手も借りずに使えるように作られています -
+BxSites は無料のオープンソースで、誰の手も借りずに使えるように作られています -
 とはいえ、開発チーム自身に作業を任せたいという場合には、
 [Ortus Solutions](https://www.ortussolutions.com) がプロフェッショナルサービスと
 コンサルティングを提供しています。対象はドキュメントサイトだけでなく、
-**あらゆる静的サイト**に及びます。BX Sites はドキュメントツールに限定されない汎用の
+**あらゆる静的サイト**に及びます。BxSites はドキュメントツールに限定されない汎用の
 静的サイトジェネレーターであり、私たちのサービスも同様にそれをカバーします。
 
 <div class="bxsites-hero__actions">
@@ -25,27 +25,27 @@ BX Sites は無料のオープンソースで、誰の手も借りずに使え�
 ::: cards
 ::: card title="ドキュメント & 静的サイト構築" icon="phosphor-duotone:buildings"
 ドキュメントサイト、マーケティングサイト、ブログ、その他あらゆる静的サイトを、
-ゼロから BX Sites で設計・構築・デプロイします。
+ゼロから BxSites で設計・構築・デプロイします。
 :::
 ::: card title="移行" icon="phosphor-duotone:swap" href="guides/index.md"
 既存の GitBook や mkdocs プロジェクト、あるいは他のドキュメント/静的サイトツール
-全般から BX Sites へ、コンテンツと構造をそのまま移行します。
+全般から BxSites へ、コンテンツと構造をそのまま移行します。
 :::
 ::: card title="カスタムテーマ & プラグイン" icon="phosphor-duotone:palette" href="guides/themes.md"
-ブランドに合わせたテーマ、または BX Sites が標準でカバーしないワークフロー向けの
+ブランドに合わせたテーマ、または BxSites が標準でカバーしないワークフロー向けの
 BoxLang モジュールプラグインを作成します。
 :::
 ::: card title="トレーニング & サポート" icon="phosphor-duotone:graduation-cap"
-チームに BX Sites、BoxLang、そして Ortus エコシステム全体を習得してもらう、
+チームに BxSites、BoxLang、そして Ortus エコシステム全体を習得してもらう、
 あるいは本番稼働中のサイトに向けた継続的なサポート体制を整えます。
 :::
 :::
 
 ## なぜ Ortus Solutions なのか
 
-Ortus Solutions は BoxLang、BX Sites、そして BoxLang エコシステムの他のすべてを
+Ortus Solutions は BoxLang、BxSites、そして BoxLang エコシステムの他のすべてを
 構築・保守しています - このツール群を作った本人たち以上に詳しい人間はいません。
-Ortus とのプロフェッショナルサービスは BX Sites だけに限りません。スタッフの増員支援
+Ortus とのプロフェッショナルサービスは BxSites だけに限りません。スタッフの増員支援
 から本番運用サポートまで、全サービスの詳細は
 [ortussolutions.com/services](https://www.ortussolutions.com/services) をご覧ください。
 

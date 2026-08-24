@@ -74,7 +74,7 @@ Mermaid）は、このモジュールに同梱（バンドル）された状態�
   レンダリング済みの HTML を解析する代わりに、プレーンな Markdown としてページを
   直接読めます。設定不要で常に有効です。
   [はじめに](../getting-started.md#markdown-としてページをダウンロード) を参照してください。
-- **オプトインのフッター**（著作権、`social` リンク、「Built with BX Sites」クレジット）-
+- **オプトインのフッター**（著作権、`social` リンク、「Built with BxSites」クレジット）-
   `bxsites.yaml` の `footer` が `true` の場合。[設定](../configuration.md#footer) を参照してください。
 - **バージョンスイッチャー** - プロジェクトが複数バージョンを含む `docs/versions/` フォルダを
   持つと自動的に表示されます。[設定](../configuration.md#versioning) を参照してください。
@@ -383,7 +383,7 @@ CSS を同梱しています - このサイト自身の `docs/index.md` もこ�
 ## テーマのオーバーライド
 
 自分の `layout.bxm` + `page.bxm`（オプションで `search.bxm`/`assets/`）を、
-プロジェクトルートの `theme/` フォルダに配置します。BX Sites は、下記の契約を
+プロジェクトルートの `theme/` フォルダに配置します。BxSites は、下記の契約を
 満たしている限り、インストール済みの `themes/<name>/` テーマとどの組み込みテーマ
 よりも、プロジェクトレベルの `theme/` オーバーライドを優先します -
 このモジュール自身の `resources/themes/` にある組み込みテーマは、コピーして
@@ -425,14 +425,14 @@ my-project/
    }
    ```
 
-3. `bxSites build`（反復作業中は `serve`）を実行します - BX Sites は `theme/` を
+3. `bxSites build`（反復作業中は `serve`）を実行します - BxSites は `theme/` を
    自動的に検出するため、`bxsites.yaml` の変更は不要です（プロジェクトレベルの
    `theme/` フォルダは常に `theme.name` で指定された組み込みテーマより優先されます）。
    触れなかった部分 - ナビのレンダリング、検索、ダークモードトグル、コード
    アノテーション - は、元の `bootstrap` テーマとまったく同じように動作し続けます。
    その裏側にあるのは、まったく同じ `layout.bxm`/`page.bxm` のマークアップだからです。
 
-ただし、プロジェクトの `theme/` フォルダはオール・オア・ナッシングです - BX Sites が
+ただし、プロジェクトの `theme/` フォルダはオール・オア・ナッシングです - BxSites が
 1つでも見つけると、組み込みテーマの代わりに完全にそちらが使われます。そのため、
 変更したのが `assets/style.css` だけであっても、独自の `layout.bxm` + `page.bxm` は
 必要です（どちらかが欠けているフォルダは、黙ってフォールバックするのではなく

@@ -276,7 +276,7 @@ Quale UI di ricerca `search: true` attiva:
   `"pagefind"`: `bin` (predefinito `"pagefind"`) è il nome/percorso
   dell'eseguibile CLI, risolto rispetto a `PATH` quando è un nome nudo;
   `options` è un array di flag CLI grezzi extra passati direttamente. La
-  CLI `pagefind` stessa deve essere già installata e su `PATH` - BX Sites
+  CLI `pagefind` stessa deve essere già installata e su `PATH` - BxSites
   ci esegue uno shell out (come `git` per `lastUpdated`/`gh-deploy`), non
   la installa al posto tuo.
 
@@ -368,19 +368,19 @@ quadro completo, incluso come `page:rename` lo aggiunge automaticamente.
 
 Inoltrato così com'è alle opzioni del modulo
 [bx-markdown](https://github.com/ortus-boxlang/bx-markdown) prima della
-compilazione di ogni pagina. BX Sites non ridefinisce né valida queste
+compilazione di ogni pagina. BxSites non ridefinisce né valida queste
 chiavi; qualunque cosa metti qui è il set di opzioni proprio di
 bx-markdown, passato direttamente - quindi questo elenco può divergere da
 quello di bx-markdown man mano che si evolve. Tabelle, `~~barrato~~`,
 checkbox `- [ ]` per le liste di attività e il sommario in pagina sono
 sempre attivi, senza alcun interruttore. L'unica eccezione è
 `enableAdmonition` - bx-markdown stesso lo imposta a `false` di default,
-ma BX Sites lo imposta a `true` di default (vedi la
+ma BxSites lo imposta a `true` di default (vedi la
 [guida alle Estensioni Markdown](guides/markdown.md)).
 
 | Chiave | Predefinito | Effetto |
 |---|---|---|
-| `enableAdmonition` | `true` *(predefinito di BX Sites; il predefinito di bx-markdown è `false`)* | Blocchi di richiamo `!!!`/`???`/`???+` - vedi la [guida alle Estensioni Markdown](guides/markdown.md#admonitions) |
+| `enableAdmonition` | `true` *(predefinito di BxSites; il predefinito di bx-markdown è `false`)* | Blocchi di richiamo `!!!`/`???`/`???+` - vedi la [guida alle Estensioni Markdown](guides/markdown.md#admonitions) |
 | `enableFootnotes` | `false` | Riferimenti a note a piè di pagina `[^label]` - vedi la [guida alle Estensioni Markdown](guides/markdown.md#footnotes) |
 | `enableDefinitionLists` | `false` | Liste `Term\n:   Definition` - vedi la [guida alle Estensioni Markdown](guides/markdown.md#definition-lists) |
 | `autoLinkUrls` | `true` | Collega automaticamente URL e indirizzi email nudi |
@@ -450,7 +450,7 @@ social:
 
 `false` (il valore predefinito) - nessun footer. `true` ne aggiunge uno a
 ogni pagina: una riga di copyright (`© <anno> <nome del sito>`), i link
-`social` (se presenti), e un credito "Built with BX Sites".
+`social` (se presenti), e un credito "Built with BxSites".
 
 ```yaml title="bxsites.yaml"
 footer: true

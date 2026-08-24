@@ -8,11 +8,11 @@ tags: [dienstleistungen, beratung]
 
 # Beratung & Professionelle Dienstleistungen
 
-BX Sites ist kostenlos, quelloffen und so gebaut, dass es ganz ohne fremde
+BxSites ist kostenlos, quelloffen und so gebaut, dass es ganz ohne fremde
 Hilfe genutzt werden kann - aber wenn du lieber das Team, das es baut, die
 Arbeit machen lässt, bietet [Ortus Solutions](https://www.ortussolutions.com)
 professionelle Dienstleistungen und Beratung rund um das Modul an. Das deckt
-Docs-Websites ab, aber auch jede andere **statische Website**: BX Sites ist
+Docs-Websites ab, aber auch jede andere **statische Website**: BxSites ist
 ein universeller Static-Site-Generator, kein reines Docs-Tool, und unsere
 Dienstleistungen decken es entsprechend ab.
 
@@ -26,20 +26,20 @@ Dienstleistungen decken es entsprechend ab.
 ::: cards
 ::: card title="Docs- & Static-Site-Builds" icon="phosphor-duotone:buildings"
 Eine Docs-Website, eine Marketing-Website, ein Blog oder jede andere
-statische Website - von Grund auf mit BX Sites entworfen, gebaut und
+statische Website - von Grund auf mit BxSites entworfen, gebaut und
 deployt.
 :::
 ::: card title="Migrationen" icon="phosphor-duotone:swap" href="guides/index.md"
 Der Umzug eines bestehenden GitBook- oder mkdocs-Projekts - oder eines
-ganz anderen Docs-/Static-Site-Tools - zu BX Sites, mit intaktem Inhalt
+ganz anderen Docs-/Static-Site-Tools - zu BxSites, mit intaktem Inhalt
 und intakter Struktur.
 :::
 ::: card title="Eigene Themes & Plugins" icon="phosphor-duotone:palette" href="guides/themes.md"
 Ein Theme, das zu deiner Marke passt, oder ein BoxLang-Modul-Plugin für
-einen Workflow, den BX Sites nicht bereits von Haus aus abdeckt.
+einen Workflow, den BxSites nicht bereits von Haus aus abdeckt.
 :::
 ::: card title="Schulung & Support" icon="phosphor-duotone:graduation-cap"
-Bring dein Team auf den aktuellen Stand zu BX Sites, BoxLang und dem
+Bring dein Team auf den aktuellen Stand zu BxSites, BoxLang und dem
 größeren Ortus-Ökosystem, oder richte laufenden Support für eine bereits
 produktive Website ein.
 :::
@@ -47,10 +47,10 @@ produktive Website ein.
 
 ## Warum Ortus Solutions
 
-Ortus Solutions baut und pflegt BoxLang, BX Sites und den Rest des
+Ortus Solutions baut und pflegt BoxLang, BxSites und den Rest des
 BoxLang-Ökosystems - niemand kennt dieses Tooling besser als die Leute,
 die es geschrieben haben. Professionelle Dienstleistungen bei uns sind
-außerdem nicht auf BX Sites beschränkt: das ganze Spektrum, von
+außerdem nicht auf BxSites beschränkt: das ganze Spektrum, von
 Personalunterstützung bis Produktions-Support, findest du unter
 [ortussolutions.com/services](https://www.ortussolutions.com/services).
 

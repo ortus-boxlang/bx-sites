@@ -11,7 +11,7 @@ Ein Blog ist eine weitere Convention-over-Configuration-Funktion, in
 derselben Form wie
 [Versionen](versioning.md)/[i18n](i18n.md) oder der
 [Tags-Index](../getting-started.md#seiten-hinzufügen) - lege Beiträge unter
-`docs/blog/posts/` ab, und BX Sites baut `/blog/` (paginiert), eine
+`docs/blog/posts/` ab, und BxSites baut `/blog/` (paginiert), eine
 Kategorie-Seite pro Kategorie, eine Jahresarchiv-Seite pro Kalenderjahr,
 eine Autoren-Seite pro Autor, einen RSS-Feed pro Kategorie plus einen für
 den gesamten Blog, und eine `/blog/stats/`-Seite - ganz ohne
@@ -65,7 +65,7 @@ out of the excerpt shown on `/blog/` and category pages, but still renders
 in full on the post's own page.
 ```
 
-- `date` (erforderlich) - alles, was BX Sites parsen kann (`2026-08-15`,
+- `date` (erforderlich) - alles, was BxSites parsen kann (`2026-08-15`,
   oder ein vollständiges Datum mit Uhrzeit). Legt die eigene
   Sortierreihenfolge des Beitrags fest (neueste zuerst) sowie sein
   `<pubDate>`/`article:published_time`.
@@ -85,7 +85,7 @@ in full on the post's own page.
   Seite.
 - `summary` - ein einzeiliger Auszug, gezeigt auf `/blog/`/
   Kategorie-Seiten und im RSS-Feed, verwendet, wenn ein Beitrag keine
-  `<!-- more -->`-Markierung hat. Ohne beides fällt BX Sites auf eine
+  `<!-- more -->`-Markierung hat. Ohne beides fällt BxSites auf eine
   reine Klartext-Kürzung des eigenen Textkörpers des Beitrags zurück.
 - `image` - ein Beitragsbild (ein zu `docs/assets/`-relativer Pfad, oder
   eine vollständige URL) - gezeigt oben im Beitrag und als Thumbnail auf
