@@ -128,6 +128,8 @@ See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's d
 
 `Build.bx` packages this module for distribution to ForgeBox: it produces a zip in `build/` containing everything needed to run the module (`box.json`, `ModuleConfig.bx`, and the rest of the module's own files).
 
+It also produces a second, self-contained artifact - `build/artifacts/bx-sites-<version>-with-deps.zip` - that additionally bundles every runtime dependency from `box.json`'s `dependencies` block (`bx-markdown`, `bx-esapi`, `bx-yaml`, `bx-image`) inside a `modules/` folder alongside the module itself, using BoxLang's [module inception](https://boxlang.ortusbooks.com/boxlang-framework/module-development/module-inception): a module's own `modules/` folder is discovered and activated before the module itself, so this artifact needs nothing pre-installed to run standalone - just drop it into a `modules/` (or `boxlang_modules/`) folder on its own. The primary `bx-sites-<version>.zip` artifact - and the `box forgebox publish` step, which publishes from `build/module` - are unaffected; the bundled dependencies only ever land in the `-with-deps` artifact, built from a separate `build/module-with-deps` copy.
+
 ```bash
 boxlang Build.bx --version=1.1.0
 ```
