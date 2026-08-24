@@ -222,6 +222,29 @@ Besucherin aufruft - dort muss CORS für den Docs-Host erlaubt sein) direkt
 aus der bestehenden Spezifikation gerendert wird, ohne dass etwas
 umgeschrieben werden muss.
 
+### Eine einzelne Operation inline
+
+Füge `operation="METHOD /path"` hinzu, um genau diesen einen Endpunkt in
+eine gewöhnliche Seite einzubetten - praktisch mitten in einem Tutorial,
+ohne die Leserin erst zur vollständigen Referenz zu schicken:
+
+```markdown title="Beispiel" linenums="1"
+::: openapi src="assets/openapi/example.yaml" operation="GET /books"
+:::
+```
+
+::: openapi src="assets/openapi/example.yaml" operation="GET /books"
+:::
+
+Immer noch genau dasselbe Swagger-UI-Widget wie der vollständige Block
+oben (dieselbe Spezifikation, dasselbe rein clientseitige Rendering -
+auch `operation` löst niemals eine OpenAPI-Verarbeitung auf unserer
+Seite aus); jede andere Operation wird einfach ausgeblendet und diese
+eine automatisch aufgeklappt, indem Swagger UIs eigenes, bereits
+gerendertes Markup ausgelesen wird. Die Methode in `operation` ist
+Groß-/Kleinschreibung egal; ihr Pfad muss exakt dem eigenen Pfad der
+Spezifikation entsprechen (samt `{param}`-Platzhaltern).
+
 ## Page Link
 
 Eine ausführliche Vorschau-Card, die zu einer anderen Seite verlinkt -
@@ -354,3 +377,56 @@ Hauptbaums geteilt.
 Eine eingebundene Datei kann selbst eine weitere einbinden (eine
 zirkuläre Kette wirft zur Build-Zeit `BxSites.CircularInclude`, statt
 endlos zu laufen).
+
+## Conditional content
+
+Zeigt eine von mehreren Varianten eines Blocks, je nach der eigenen Wahl
+der Leserin - "Free" vs. "Pro"-Anleitung auf derselben Seite, zum
+Beispiel. Das hier ist eine vollständig statische Website ohne jede Art
+von Besucher-Identität, also gibt es, anders als bei einer Plattform mit
+echtem Backend, kein serverseitig ausgewertetes "wer ist diese Leserin" -
+die Leserin trifft die Wahl selbst, und ihre Wahl wird einfach im eigenen
+Browser (`localStorage`) gemerkt, auch für jede spätere Seite:
+
+```markdown title="Beispiel" linenums="1"
+::: audience-switcher key="plan" options="free:Free,pro:Pro"
+:::
+
+::: conditional key="plan" value="free"
+The Free plan includes basic search.
+:::
+
+::: conditional key="plan" value="pro"
+The Pro plan adds AI-assisted search and unlimited team seats.
+:::
+```
+
+::: audience-switcher key="plan" options="free:Free,pro:Pro"
+:::
+
+::: conditional key="plan" value="free"
+The Free plan includes basic search.
+:::
+
+::: conditional key="plan" value="pro"
+The Pro plan adds AI-assisted search and unlimited team seats.
+:::
+
+`::: conditional key="..." value="..."` kennzeichnet eine Variante; `key`
+ist der jeweilige Präferenzname, auf den umgeschaltet wird (`"plan"`
+oben, es könnte aber genauso gut `"os"`, `"language"`, was auch immer
+sein), und `value` ist die eine Einstellung, für die dieser bestimmte
+Block angezeigt werden soll. Jede Variante wird immer im HTML gerendert
+- clientseitig nur versteckt, niemals weggelassen - sodass eine Leserin
+mit deaktiviertem JavaScript (oder ein Such-Crawler) weiterhin jede
+Variante sieht statt keine.
+
+`::: audience-switcher key="..." options="value:Label,value:Label,..."`
+ist ein optionales, fertiges Steuerelement - eine Schaltfläche pro
+Option, die sofort jeden `::: conditional`-Block mit demselben `key`
+umschaltet, überall auf der Seite. Du brauchst es überhaupt nicht: ein
+Link, der auf `?plan=pro` endet, setzt beim Laden automatisch dieselbe
+Präferenz (praktisch, um einen direkten Link zu "der Pro-Version dieser
+Seite" zu teilen), und das eigene Theme-Override eines Projekts kann
+stattdessen direkt `window.bxSitesSetPreference( key, value )` aufrufen,
+um es von einer eigenen UI aus zu steuern.

@@ -134,16 +134,22 @@ blog:
 ## `baseURL`
 
 すべての内部リンク、アセットパス、ナビゲーションエントリのプレフィックスの付け方を制御し、
-`sitemap.xml` と `llms.txt` のサイト正規 URL としても機能します。
+`sitemap.xml`、`robots.txt`、`llms.txt`、そして各ページ自身の
+`<link rel="canonical">` タグのためのサイト正規 URL としても機能します。
 
-- 空白または `"/"`（デフォルト）- リンクはルート相対のまま（`/page/`）で、`sitemap.xml` も
-  絶対 URL の `llms.txt` も生成されません（それらを構築するための正規ドメインがないため）。
+- 空白または `"/"`（デフォルト）- リンクはルート相対のまま（`/page/`）で、`sitemap.xml` も、
+  `robots.txt` 内の `Sitemap:` 行も、絶対 URL の `llms.txt` も、
+  `<link rel="canonical">` タグも生成されません（それらを構築するための正規ドメインが
+  ないため）。
 - パスのみ（例: `"my-docs"` や `"/my-docs/"`）- サイトがそのサブパスから配信されると見なされ、
   すべての内部リンク、ナビゲーションエントリ、アセットにそのプレフィックスが付きます
-  （`/my-docs/page/`）。この場合も絶対ドメインがないため `sitemap.xml` は生成されません。
+  （`/my-docs/page/`）。この場合も絶対ドメインがないため `sitemap.xml`/正規タグは
+  生成されません。
 - 完全な URL（例: `"https://docs.example.com/"`）- パス部分（ここでは `/`）がベアパスと
   同様に使用され、**さらに** ビルド時にそのドメイン配下の非隠しページすべての絶対 URL を
-  含む `sitemap.xml` が書き出されます。
+  含む `sitemap.xml` が書き出され、`robots.txt` にそれを指す `Sitemap:` 行が追加され、
+  各ページには正しい `<link rel="canonical">` が付きます（バージョン/ロケールツリー自身の
+  ページは、メインサイトのではなく *そのツリー自身の* URL を指し続けます）。
 
 `llms.txt`（[下記](#llmstxt) 参照）は常に書き出されます - `baseURL` が絶対 URL を
 提供する場合はそちらが優先して使われるだけです。
@@ -163,6 +169,32 @@ blog:
 サイトマップが意味を持つには絶対ドメインが必要だからです。
 [sitemaps.org](https://www.sitemaps.org/) プロトコルに従って、すべての非隠しページを
 列挙します。
+
+## `robots.txt`
+
+すべてのビルドで、サイトルートに `robots.txt` が書き出されます - デフォルトの許可的な
+動作を変更したい場合を除き、設定キーは不要です:
+
+```json title="bxsites.json"
+{ "robots": false }
+```
+
+- `true`（デフォルト）- すべてのクローラーに対して `Allow: /`、さらに `baseURL` が
+  完全な URL の場合は `sitemap.xml` を指す `Sitemap:` 行が追加されます（上記参照）。
+- `false` - 代わりにすべてのクローラーに対して `Disallow: /` となり、`Sitemap:` 行も
+  付きません - 「このステージング/内部デプロイをまったくインデックスさせたくない」
+  というよくあるニーズに対応します。これはあくまで *クローラー* のオプトアウトであり、
+  アクセス制御ではありません - URL を知っている人には引き続きサイト全体が到達可能です。
+  本当にアクセス自体を制限する必要がある場合は
+  [デプロイ](guides/deployment.md#サイトへのアクセスを制限する) を参照してください。
+
+オン/オフの切り替え以上のもの - 特定の disallow パス、複数の `Sitemap:` 行、
+`Crawl-delay`、ユーザーエージェントごとのルールなど - が必要な場合は、独自の
+`robots.txt` を `index.md` のすぐ隣に置いてください（`docs/robots.txt`、または
+`src/` ベースのプロジェクトでは `src/robots.txt` -
+[`docs/` または `src/`](getting-started.md#ページの追加) を参照）。生成されたものの
+代わりにバイト単位でそのままコピーされ、ビルドのたびに使われます - このファイルが
+存在する時点で、上記の `robots` キーは完全に無視されます。
 
 ## `theme`
 
@@ -239,11 +271,11 @@ blog:
 `search: true` がどの検索 UI を接続するかを制御します:
 
 - `provider` - `"local"`（デフォルト）は bx-sites 独自の静的/クライアントサイド検索
-  （`search-index.json` + lunr.js、[検索](guides/search.md#local-the-default) 参照）です。
+  （`search-index.json` + lunr.js、[検索](guides/search.md#localデフォルト) 参照）です。
   `"algolia"` は代わりに [Algolia DocSearch](guides/search.md#algolia) を、`"pagefind"`
   は [Pagefind](guides/search.md#pagefind) を接続します。それ以外の値は、`theme/`
   オーバーライドによって配線されるプロジェクト独自のカスタムプロバイダです -
-  [検索](guides/search.md#other-search-providers) を参照してください。
+  [検索](guides/search.md#その他の検索プロバイダー) を参照してください。
 - `algolia` - `provider` が `"algolia"` の場合に必須: `appId`、`apiKey`
   （*検索専用* の公開 API キーで、管理キーではありません）、`indexName` を、
   Algolia 自身の DocSearch クライアントが期待する形式そのままで指定します。

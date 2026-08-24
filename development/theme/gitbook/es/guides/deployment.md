@@ -108,3 +108,33 @@ Consulta [Configuración](../configuration.md#baseurl) para el desglose
 completo de qué hace `baseURL`. Un sitio de usuario `<user>.github.io`, o
 cualquier dominio personalizado asignado a la raíz del sitio, puede dejar
 `baseURL` en su valor por defecto (`/`).
+
+## Restringir quién puede acceder a tu sitio
+
+Aquí no hay control de acceso incorporado - bx-sites solo produce un
+`site/` estático simple, y un archivo estático no tiene ningún concepto
+de "quién lo está pidiendo". El [`robots: false`](../configuration.md#robotstxt)
+de `bxsites.json` le dice a los rastreadores bien portados que no indexen
+una construcción (útil para un despliegue de staging/vista previa que no
+quieres que aparezca en los resultados de búsqueda), pero es una petición
+educada, no un candado - la URL sigue funcionando para cualquiera que la
+tenga. Si de verdad necesitas restringir el acceso, eso tiene que suceder
+delante de los archivos estáticos, en el propio host que los sirve -
+algunas opciones habituales, adecuadas para sitios estáticos:
+
+- **Cloudflare Pages/Access** - coloca el sitio desplegado detrás de una
+  política de [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)
+  (lista blanca de correos, SSO, o un PIN de un solo uso), sin necesidad
+  de código de aplicación.
+- **Netlify** - [protección con contraseña](https://docs.netlify.com/manage/security/secure-access-to-sites/site-protection/)
+  incorporada, por sitio o por despliegue, solo desde los ajustes del
+  sitio.
+- **Un pequeño proxy inverso** (cualquier host) - HTTP Basic Auth delante
+  de los archivos estáticos (una regla al estilo `.htpasswd`, o un
+  Cloudflare Worker/Netlify Edge Function de un solo archivo) es
+  suficiente para "mantener fuera a los motores de búsqueda y a
+  cualquiera al azar", aunque no es una identidad real por usuario como
+  la que tendría una aplicación con inicio de sesión.
+
+Nada de esto son funciones de bx-sites - son ajustes a nivel de host que
+activas dondequiera que termine sirviéndose `site/`.

@@ -209,6 +209,27 @@ spec's own `servers[0].url` directly from the visitor's browser - make
 sure that server allows CORS from wherever your docs are hosted) render
 straight from your existing spec with no rewriting needed.
 
+### One operation inline
+
+Add `operation="METHOD /path"` to drop just that one endpoint into a
+regular page - handy mid-tutorial, without sending the reader off to the
+full reference:
+
+```markdown title="Example" linenums="1"
+::: openapi src="assets/openapi/example.yaml" operation="GET /books"
+:::
+```
+
+::: openapi src="assets/openapi/example.yaml" operation="GET /books"
+:::
+
+Still the exact same Swagger UI widget as the full block above (same spec,
+same client-side-only rendering - `operation` never triggers any OpenAPI
+parsing on our side either); every other operation is simply hidden and
+this one auto-expanded, by reading Swagger UI's own already-rendered
+markup. `operation`'s method is case-insensitive; its path must match the
+spec's own path exactly (`{param}` placeholders and all).
+
 ## Page link
 
 A rich preview card linking to another page - `href` follows the same
@@ -330,3 +351,53 @@ with the main tree's `docs/includes/`.
 
 An included file can itself include another (a circular chain throws
 `BxSites.CircularInclude` at build time rather than looping forever).
+
+## Conditional content
+
+Shows one of several variants of a block based on a reader's own choice -
+"Free" vs. "Pro" instructions on the same page, say. This is a fully
+static site with no visitor identity of any kind, so unlike a platform
+with a real backend, there's no server-evaluated "who is this reader" -
+the reader picks for themself, and their choice is simply remembered in
+their own browser (`localStorage`) for every later page too:
+
+```markdown title="Example" linenums="1"
+::: audience-switcher key="plan" options="free:Free,pro:Pro"
+:::
+
+::: conditional key="plan" value="free"
+The Free plan includes basic search.
+:::
+
+::: conditional key="plan" value="pro"
+The Pro plan adds AI-assisted search and unlimited team seats.
+:::
+```
+
+::: audience-switcher key="plan" options="free:Free,pro:Pro"
+:::
+
+::: conditional key="plan" value="free"
+The Free plan includes basic search.
+:::
+
+::: conditional key="plan" value="pro"
+The Pro plan adds AI-assisted search and unlimited team seats.
+:::
+
+`::: conditional key="..." value="..."` marks one variant; `key` is
+whatever preference name you're switching on (`"plan"` above, but it
+could just as well be `"os"`, `"language"`, anything), and `value` is the
+one setting this particular block should show for. Every variant always
+renders in the HTML - hidden client-side, never omitted - so a reader with
+JavaScript disabled (or a search crawler) still sees every variant rather
+than none.
+
+`::: audience-switcher key="..." options="value:Label,value:Label,..."` is
+an optional, ready-made control - one button per option, switching every
+`::: conditional` block sharing that same `key` immediately, anywhere on
+the page. You don't need it at all: a link ending in `?plan=pro` sets the
+same preference automatically on load (handy for sharing a direct link to
+"the Pro version of this page"), and a project's own theme override can
+call `window.bxSitesSetPreference( key, value )` directly to drive it from
+custom UI instead.

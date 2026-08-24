@@ -14,6 +14,8 @@
 	<meta property="og:title" content="Ricerca">
 	
 
+	<link rel="canonical" href="https&#x3a;&#x2f;&#x2f;ortus-boxlang.github.io&#x2f;bx-sites&#x2f;development&#x2f;it&#x2f;guides&#x2f;search&#x2f;index.html">
+
 	<meta name="description" content="Static documentation site generator for BoxLang, built on bx-markdown">
 	<meta property="og:description" content="Static documentation site generator for BoxLang, built on bx-markdown">
 
@@ -122,23 +124,32 @@ ogni query.</li>
 </ol>
 <h2 id="scorciatoie-da-tastiera"><a href="#scorciatoie-da-tastiera" id="scorciatoie-da-tastiera" name="scorciatoie-da-tastiera" class="anchor"></a>Scorciatoie da tastiera</h2>
 <ul>
-<li><strong><code>/</code></strong> porta il focus sul box di ricerca da qualsiasi punto della
-pagina (a meno che tu non stia già digitando in un altro campo) - la
-stessa convenzione usata da
-<a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a>.</li>
-<li><strong>Cmd/Ctrl+K</strong> porta anch'esso il focus, da qualsiasi punto - anche
-mentre stai digitando in un altro campo - la convenzione che
-condividono Algolia DocSearch, Pagefind, VitePress e Docusaurus. Il box
+<li><strong><code>/</code></strong> porta il focus sul box di ricerca nella barra laterale da
+qualsiasi punto della pagina (a meno che tu non stia già digitando in
+un altro campo) - la stessa convenzione usata da
+<a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a>. Il box
 di ricerca mostra un piccolo suggerimento <code>Ctrl K</code>/<code>⌘K</code> (rilevato in
-base alla piattaforma) così è scopribile.</li>
-<li><strong><code>Escape</code></strong> chiude il menu a discesa dei risultati e toglie il focus
-dal box di ricerca.</li>
+base alla piattaforma) così la scorciatoia qui sotto è scopribile.</li>
+<li><strong>Cmd/Ctrl+K</strong> apre invece un overlay separato in stile
+command-palette - una modale centrata su uno sfondo oscurato, costruita
+interamente in JS (nessuna modifica ai template del tema necessaria) e
+condivisa da ogni tema integrato. Le frecce Su/Giù spostano
+l'evidenziazione tra i risultati, <strong>Invio</strong> apre quello evidenziato, ed
+<strong>Escape</strong> (oppure un clic sullo sfondo) la chiude - la stessa
+convenzione &quot;Quick Find&quot;/⌘K che condividono Algolia DocSearch,
+Pagefind, VitePress, Docusaurus e GitBook.</li>
+<li><strong><code>Escape</code></strong> chiude anche il menu a discesa dei risultati proprio del
+box nella barra laterale e gli toglie il focus, indipendentemente
+dalla palette qui sopra.</li>
 </ul>
-<p>Cmd/Ctrl+K funziona allo stesso modo per ogni provider - il widget
-proprio di <code>local</code> lo collega direttamente, <code>algolia</code> lo ottiene
-gratuitamente da DocSearch stesso (<code>keyboardShortcuts</code> predefinito a
-<code>true</code>), e <code>pagefind</code> lo ottiene collegato da <code>layout.bxm</code> dato che
-<code>PagefindUI</code> non lo collega da sé.</p>
+<p>La palette riutilizza esattamente lo stesso indice <code>lunr</code> già costruito
+dal widget della barra laterale, invece di recuperare di nuovo
+<code>search-index.json</code> - disponibile solo per <code>local</code> (il predefinito);
+<code>algolia</code> ottiene il proprio Cmd+K gratuitamente da DocSearch stesso
+(<code>keyboardShortcuts</code> predefinito a <code>true</code>), e <code>pagefind</code> ottiene Cmd+K
+collegato da <code>layout.bxm</code> per portare il focus sul proprio <code>PagefindUI</code>,
+dato che quella libreria non lo collega da sé - nessuno dei due apre la
+palette propria di questo modulo.</p>
 <h2 id="disattivarla"><a href="#disattivarla" id="disattivarla" name="disattivarla" class="anchor"></a>Disattivarla</h2>
 <pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">search: false
 </code></pre>
@@ -255,7 +266,7 @@ passaggio di indicizzazione richieda quel prodotto contro <code>site/</code> dop
 <code>build</code> - la stessa forma che già usano il <code>layout.bxm</code>/<code>BuildPipeline.bx</code>
 propri di questo modulo per <code>algolia</code>/<code>pagefind</code>.</p>
 
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/it/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 6&#x3a;24&#x3a;25 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/it/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 7&#x3a;07&#x3a;17 PM</span></div>
 				</article>
 
 				<nav class="page-nav d-flex justify-content-between" aria-label="Navigazione della pagina">
@@ -297,6 +308,7 @@ propri di questo modulo per <code>algolia</code>/<code>pagefind</code>.</p>
 	<script src="/bx-sites/development/it/assets/nav-toggle.js" defer></script>
 	<script src="/bx-sites/development/it/assets/toc-collapse.js" defer></script>
 	<script src="/bx-sites/development/it/assets/tabs.js" defer></script>
+	<script src="/bx-sites/development/it/assets/conditional-content-init.js" defer></script>
 
 	<script src="/bx-sites/development/it/assets/vendor/mermaid/mermaid.min.js"></script>
 	<script src="/bx-sites/development/it/assets/mermaid-init.js"></script>

@@ -108,3 +108,34 @@ Aufschlüsselung dessen, was `baseURL` bewirkt. Eine
 `<user>.github.io`-Benutzer-Website, oder jede eigene Domain, die auf die
 Wurzel der Website zeigt, kann `baseURL` bei seinem Standardwert (`/`)
 belassen.
+
+## Zugriff auf deine Website einschränken
+
+Eine eingebaute Zugriffskontrolle gibt es hier nicht - bx-sites erzeugt
+immer nur ein schlichtes statisches `site/`, und eine statische Datei hat
+kein Konzept von "wer fragt hier gerade an". Das
+[`robots: false`](../configuration.md#robotstxt) von `bxsites.json` sagt
+wohlerzogenen Crawlern, ein Build nicht zu indexieren (nützlich für ein
+Staging-/Vorschau-Deploy, das nicht in Suchergebnissen auftauchen soll),
+aber das ist eine höfliche Bitte, kein Schloss - die URL funktioniert
+weiterhin für jeden, der sie hat. Musst du den Zugriff tatsächlich
+sperren, muss das vor den statischen Dateien passieren, bei welchem Host
+auch immer sie ausliefert - ein paar gängige, für statische Websites
+geeignete Optionen:
+
+- **Cloudflare Pages/Access** - stelle die veröffentlichte Website hinter
+  eine
+  [Cloudflare-Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)-Richtlinie
+  (E-Mail-Allowlist, SSO oder eine Einmal-PIN) - ohne eigenen
+  Anwendungscode.
+- **Netlify** - eingebauter
+  [Passwortschutz](https://docs.netlify.com/manage/security/secure-access-to-sites/site-protection/)
+  pro Website oder pro Deploy, allein aus den Website-Einstellungen heraus.
+- **Ein kleiner Reverse-Proxy** (beliebiger Host) - HTTP-Basic-Auth vor den
+  statischen Dateien (eine `.htpasswd`-artige Regel, oder ein
+  Ein-Datei-Cloudflare-Worker/Netlify-Edge-Function) reicht, um Suchmaschinen
+  und Zufallsbesucher fernzuhalten, auch wenn das keine echte
+  Pro-Benutzer-Identität ist, wie sie eine eingeloggte Anwendung hätte.
+
+Nichts davon sind bx-sites-Funktionen - es sind Host-Einstellungen, die du
+dort einschaltest, wo `site/` am Ende ausgeliefert wird.

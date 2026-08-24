@@ -94,3 +94,31 @@ baseURL: "https://<user>.github.io/<repo>/"
 See [Configuration](../configuration.md#baseurl) for the full breakdown of
 what `baseURL` does. A `<user>.github.io` user site, or any custom domain
 mapped to the site root, can leave `baseURL` at its default (`/`).
+
+## Restricting who can reach your site
+
+There's no built-in access control here - bx-sites only ever produces a
+plain static `site/`, and a static file has no concept of "who's asking."
+`bxsites.json`'s [`robots: false`](../configuration.md#robotstxt) tells
+well-behaved crawlers not to index a build (useful for a staging/preview
+deploy you don't want turning up in search results), but it's a polite
+request, not a lock - the URL still works for anyone who has it. If you
+actually need to gate access, that has to happen in front of the static
+files, at whichever host is serving them - a few common, static-friendly
+options:
+
+- **Cloudflare Pages/Access** - put the deployed site behind a
+  [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)
+  policy (email allowlist, SSO, or a one-time PIN), no application code
+  needed.
+- **Netlify** - built-in
+  [password protection](https://docs.netlify.com/manage/security/secure-access-to-sites/site-protection/)
+  per site or per deploy, from the site settings alone.
+- **A tiny reverse-proxy** (any host) - HTTP Basic Auth in front of the
+  static files (an `.htpasswd`-style rule, or a one-file
+  Cloudflare Worker/Netlify Edge Function) is enough for "keep search
+  engines and randoms out," though it's not real per-user identity the way
+  a signed-in app would have.
+
+None of these are bx-sites features - they're host-level settings you turn
+on wherever `site/` ends up being served.

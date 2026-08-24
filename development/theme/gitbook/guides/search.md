@@ -39,19 +39,28 @@ service involved.
 
 ## Keyboard shortcuts
 
-- **`/`** focuses the search box from anywhere on the page (unless you're
-  already typing in another field) - the same convention
-  [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) uses.
-- **Cmd/Ctrl+K** also focuses it, from anywhere - including while typing in
-  another field - the convention Algolia DocSearch, Pagefind, VitePress and
-  Docusaurus all share. The search box shows a small `Ctrl K`/`⌘K` hint
-  (platform-detected) so it's discoverable.
-- **`Escape`** closes the results dropdown and blurs the search box.
+- **`/`** focuses the sidebar search box from anywhere on the page (unless
+  you're already typing in another field) - the same convention
+  [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) uses. The
+  search box shows a small `Ctrl K`/`⌘K` hint (platform-detected) so the
+  shortcut below is discoverable.
+- **Cmd/Ctrl+K** opens a separate command-palette-style overlay instead - a
+  centered modal over a backdrop, built entirely in JS (no theme template
+  changes needed) and shared across every built-in theme. Arrow Up/Down
+  move a highlight across results, **Enter** navigates to the highlighted
+  one, and **Escape** (or clicking the backdrop) closes it - the same
+  "Quick Find"/⌘K convention Algolia DocSearch, Pagefind, VitePress,
+  Docusaurus and GitBook all share.
+- **`Escape`** also closes the sidebar box's own results dropdown and
+  blurs it, independent of the palette above.
 
-Cmd/Ctrl+K works the same way for every provider - `local`'s own widget
-binds it directly, `algolia` gets it for free from DocSearch itself
-(`keyboardShortcuts` defaults to `true`), and `pagefind` gets it wired up
-by `layout.bxm` since `PagefindUI` doesn't bind it on its own.
+The palette reuses the exact same already-built `lunr` index the sidebar
+widget itself builds, rather than fetching `search-index.json` a second
+time - only ever available for `local` (the default provider); `algolia`
+gets its own Cmd+K for free from DocSearch itself (`keyboardShortcuts`
+defaults to `true`), and `pagefind` gets Cmd+K wired up by `layout.bxm`
+to focus its own `PagefindUI`, since that library doesn't bind it on its
+own - neither opens this module's own palette.
 
 ## Turning it off
 

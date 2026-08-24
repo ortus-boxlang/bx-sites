@@ -14,6 +14,8 @@
 	<meta property="og:title" content="Search">
 	
 
+	<link rel="canonical" href="https&#x3a;&#x2f;&#x2f;ortus-boxlang.github.io&#x2f;bx-sites&#x2f;development&#x2f;theme&#x2f;gitbook&#x2f;guides&#x2f;search&#x2f;index.html">
+
 	<meta name="description" content="Static documentation site generator for BoxLang, built on bx-markdown">
 	<meta property="og:description" content="Static documentation site generator for BoxLang, built on bx-markdown">
 
@@ -113,19 +115,28 @@ round-trip per query.</li>
 </ol>
 <h2 id="keyboard-shortcuts"><a href="#keyboard-shortcuts" id="keyboard-shortcuts" name="keyboard-shortcuts" class="anchor"></a>Keyboard shortcuts</h2>
 <ul>
-<li><strong><code>/</code></strong> focuses the search box from anywhere on the page (unless you're
-already typing in another field) - the same convention
-<a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a> uses.</li>
-<li><strong>Cmd/Ctrl+K</strong> also focuses it, from anywhere - including while typing in
-another field - the convention Algolia DocSearch, Pagefind, VitePress and
-Docusaurus all share. The search box shows a small <code>Ctrl K</code>/<code>⌘K</code> hint
-(platform-detected) so it's discoverable.</li>
-<li><strong><code>Escape</code></strong> closes the results dropdown and blurs the search box.</li>
+<li><strong><code>/</code></strong> focuses the sidebar search box from anywhere on the page (unless
+you're already typing in another field) - the same convention
+<a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a> uses. The
+search box shows a small <code>Ctrl K</code>/<code>⌘K</code> hint (platform-detected) so the
+shortcut below is discoverable.</li>
+<li><strong>Cmd/Ctrl+K</strong> opens a separate command-palette-style overlay instead - a
+centered modal over a backdrop, built entirely in JS (no theme template
+changes needed) and shared across every built-in theme. Arrow Up/Down
+move a highlight across results, <strong>Enter</strong> navigates to the highlighted
+one, and <strong>Escape</strong> (or clicking the backdrop) closes it - the same
+&quot;Quick Find&quot;/⌘K convention Algolia DocSearch, Pagefind, VitePress,
+Docusaurus and GitBook all share.</li>
+<li><strong><code>Escape</code></strong> also closes the sidebar box's own results dropdown and
+blurs it, independent of the palette above.</li>
 </ul>
-<p>Cmd/Ctrl+K works the same way for every provider - <code>local</code>'s own widget
-binds it directly, <code>algolia</code> gets it for free from DocSearch itself
-(<code>keyboardShortcuts</code> defaults to <code>true</code>), and <code>pagefind</code> gets it wired up
-by <code>layout.bxm</code> since <code>PagefindUI</code> doesn't bind it on its own.</p>
+<p>The palette reuses the exact same already-built <code>lunr</code> index the sidebar
+widget itself builds, rather than fetching <code>search-index.json</code> a second
+time - only ever available for <code>local</code> (the default provider); <code>algolia</code>
+gets its own Cmd+K for free from DocSearch itself (<code>keyboardShortcuts</code>
+defaults to <code>true</code>), and <code>pagefind</code> gets Cmd+K wired up by <code>layout.bxm</code>
+to focus its own <code>PagefindUI</code>, since that library doesn't bind it on its
+own - neither opens this module's own palette.</p>
 <h2 id="turning-it-off"><a href="#turning-it-off" id="turning-it-off" name="turning-it-off" class="anchor"></a>Turning it off</h2>
 <pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">search: false
 </code></pre>
@@ -233,7 +244,7 @@ this module's own <code>layout.bxm</code>/<code>BuildPipeline.bx</code> already 
 <code>algolia</code>/<code>pagefind</code>.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/gitbook/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 6&#x3a;24&#x3a;25 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/gitbook/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 7&#x3a;07&#x3a;17 PM</span></div>
 			</article>
 
 			<nav class="gb-page-nav" aria-label="Page navigation">
@@ -273,6 +284,7 @@ this module's own <code>layout.bxm</code>/<code>BuildPipeline.bx</code> already 
 	<script src="/bx-sites/development/theme/gitbook/assets/nav-toggle.js" defer></script>
 	<script src="/bx-sites/development/theme/gitbook/assets/toc-collapse.js" defer></script>
 	<script src="/bx-sites/development/theme/gitbook/assets/tabs.js" defer></script>
+	<script src="/bx-sites/development/theme/gitbook/assets/conditional-content-init.js" defer></script>
 
 	<script src="/bx-sites/development/theme/gitbook/assets/vendor/mermaid/mermaid.min.js"></script>
 	<script src="/bx-sites/development/theme/gitbook/assets/mermaid-init.js"></script>

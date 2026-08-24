@@ -14,6 +14,8 @@
 	<meta property="og:title" content="Content-Bl&ouml;cke">
 	
 
+	<link rel="canonical" href="https&#x3a;&#x2f;&#x2f;ortus-boxlang.github.io&#x2f;bx-sites&#x2f;development&#x2f;de&#x2f;guides&#x2f;content-blocks&#x2f;index.html">
+
 	<meta name="description" content="Static documentation site generator for BoxLang, built on bx-markdown">
 	<meta property="og:description" content="Static documentation site generator for BoxLang, built on bx-markdown">
 
@@ -87,7 +89,7 @@
 
 					<h1 class="page-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M112,56v48a8,8,0,0,1-8,8H56a8,8,0,0,1-8-8V56a8,8,0,0,1,8-8h48A8,8,0,0,1,112,56Zm88-8H152a8,8,0,0,0-8,8v48a8,8,0,0,0,8,8h48a8,8,0,0,0,8-8V56A8,8,0,0,0,200,48Zm-96,96H56a8,8,0,0,0-8,8v48a8,8,0,0,0,8,8h48a8,8,0,0,0,8-8V152A8,8,0,0,0,104,144Zm96,0H152a8,8,0,0,0-8,8v48a8,8,0,0,0,8,8h48a8,8,0,0,0,8-8V152A8,8,0,0,0,200,144Z" opacity="0.2"/><path d="M200,136H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,200,136Zm0,64H152V152h48v48ZM104,40H56A16,16,0,0,0,40,56v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,104,40Zm0,64H56V56h48v48Zm96-64H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,200,40Zm0,64H152V56h48v48Zm-96,32H56a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,104,136Zm0,64H56V152h48v48Z"/></svg></span> Content-Bl&ouml;cke</h1>
 <div class="page-tags mb-3"><a class="page-tag" href="/bx-sites/development/de/tags/index.html#tag-anleitungen">anleitungen</a><a class="page-tag" href="/bx-sites/development/de/tags/index.html#tag-markdown">markdown</a><a class="page-tag" href="/bx-sites/development/de/tags/index.html#tag-gitbook">gitbook</a></div>
-<details class="bxsites-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">Auf dieser Seite</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#expandable">Expandable</a></li><li class="toc-level-2"><a href="#cards">Cards</a></li><li class="toc-level-2"><a href="#columns">Columns</a></li><li class="toc-level-2"><a href="#stepper">Stepper</a></li><li class="toc-level-2"><a href="#file">File</a></li><li class="toc-level-2"><a href="#embed">Embed</a></li><li class="toc-level-2"><a href="#openapi--swagger">OpenAPI &#x2f; Swagger</a></li><li class="toc-level-2"><a href="#page-link">Page Link</a></li><li class="toc-level-2"><a href="#link-preview">Link Preview</a></li><li class="toc-level-2"><a href="#updates-changelog">Updates &#x28;Changelog&#x29;</a></li><li class="toc-level-2"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte &#x28;Includes&#x29;</a></li></ul></details>
+<details class="bxsites-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">Auf dieser Seite</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#expandable">Expandable</a></li><li class="toc-level-2"><a href="#cards">Cards</a></li><li class="toc-level-2"><a href="#columns">Columns</a></li><li class="toc-level-2"><a href="#stepper">Stepper</a></li><li class="toc-level-2"><a href="#file">File</a></li><li class="toc-level-2"><a href="#embed">Embed</a></li><li class="toc-level-2"><a href="#openapi--swagger">OpenAPI &#x2f; Swagger</a></li><li class="toc-level-3"><a href="#eine-einzelne-operation-inline">Eine einzelne Operation inline</a></li><li class="toc-level-2"><a href="#page-link">Page Link</a></li><li class="toc-level-2"><a href="#link-preview">Link Preview</a></li><li class="toc-level-2"><a href="#updates-changelog">Updates &#x28;Changelog&#x29;</a></li><li class="toc-level-2"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte &#x28;Includes&#x29;</a></li><li class="toc-level-2"><a href="#conditional-content">Conditional content</a></li></ul></details>
 					<h1 id="content-blöcke"><a href="#content-blöcke" id="content-blöcke" name="content-blöcke" class="anchor"></a>Content-Blöcke</h1>
 <p>Zusätzlich zu allem in <a href="/bx-sites/development/de/guides/markdown/index.html">Markdown-Erweiterungen</a> unterstützt
 BX Sites eine Familie von GitBook-artigen Content-Blöcken - für sich
@@ -235,6 +237,22 @@ die eigene <code>servers[0].url</code> der Spezifikation direkt aus dem Browser 
 Besucherin aufruft - dort muss CORS für den Docs-Host erlaubt sein) direkt
 aus der bestehenden Spezifikation gerendert wird, ohne dass etwas
 umgeschrieben werden muss.</p>
+<h3 id="eine-einzelne-operation-inline"><a href="#eine-einzelne-operation-inline" id="eine-einzelne-operation-inline" name="eine-einzelne-operation-inline" class="anchor"></a>Eine einzelne Operation inline</h3>
+<p>Füge <code>operation=&quot;METHOD /path&quot;</code> hinzu, um genau diesen einen Endpunkt in
+eine gewöhnliche Seite einzubetten - praktisch mitten in einem Tutorial,
+ohne die Leserin erst zur vollständigen Referenz zu schicken:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="Beispiel"><code class="language-markdown">::: openapi src=&quot;assets/openapi/example.yaml&quot; operation=&quot;GET /books&quot;
+:::
+</code></pre>
+<div class="bxsites-openapi bxsites-openapi--operation" data-openapi-src="/bx-sites/development/de/assets/openapi/example.yaml" data-openapi-operation="get /books"></div>
+<p>Immer noch genau dasselbe Swagger-UI-Widget wie der vollständige Block
+oben (dieselbe Spezifikation, dasselbe rein clientseitige Rendering -
+auch <code>operation</code> löst niemals eine OpenAPI-Verarbeitung auf unserer
+Seite aus); jede andere Operation wird einfach ausgeblendet und diese
+eine automatisch aufgeklappt, indem Swagger UIs eigenes, bereits
+gerendertes Markup ausgelesen wird. Die Methode in <code>operation</code> ist
+Groß-/Kleinschreibung egal; ihr Pfad muss exakt dem eigenen Pfad der
+Spezifikation entsprechen (samt <code>{param}</code>-Platzhaltern).</p>
 <h2 id="page-link"><a href="#page-link" id="page-link" name="page-link" class="anchor"></a>Page Link</h2>
 <p>Eine ausführliche Vorschau-Card, die zu einer anderen Seite verlinkt -
 <code>href</code> folgt derselben dateirelativen Konvention wie ein gewöhnlicher
@@ -330,8 +348,51 @@ Hauptbaums geteilt.</p>
 <p>Eine eingebundene Datei kann selbst eine weitere einbinden (eine
 zirkuläre Kette wirft zur Build-Zeit <code>BxSites.CircularInclude</code>, statt
 endlos zu laufen).</p>
+<h2 id="conditional-content"><a href="#conditional-content" id="conditional-content" name="conditional-content" class="anchor"></a>Conditional content</h2>
+<p>Zeigt eine von mehreren Varianten eines Blocks, je nach der eigenen Wahl
+der Leserin - &quot;Free&quot; vs. &quot;Pro&quot;-Anleitung auf derselben Seite, zum
+Beispiel. Das hier ist eine vollständig statische Website ohne jede Art
+von Besucher-Identität, also gibt es, anders als bei einer Plattform mit
+echtem Backend, kein serverseitig ausgewertetes &quot;wer ist diese Leserin&quot; -
+die Leserin trifft die Wahl selbst, und ihre Wahl wird einfach im eigenen
+Browser (<code>localStorage</code>) gemerkt, auch für jede spätere Seite:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="Beispiel"><code class="language-markdown">::: audience-switcher key=&quot;plan&quot; options=&quot;free:Free,pro:Pro&quot;
+:::
 
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/content-blocks.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/de/guides/content-blocks.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 6&#x3a;24&#x3a;25 PM</span></div>
+::: conditional key=&quot;plan&quot; value=&quot;free&quot;
+The Free plan includes basic search.
+:::
+
+::: conditional key=&quot;plan&quot; value=&quot;pro&quot;
+The Pro plan adds AI-assisted search and unlimited team seats.
+:::
+</code></pre>
+<div class="bxsites-audience-switcher" data-bxsites-key="plan"><button type="button" class="bxsites-audience-switcher__option" data-bxsites-value="free">Free</button><button type="button" class="bxsites-audience-switcher__option" data-bxsites-value="pro">Pro</button></div>
+<div class="bxsites-conditional" data-bxsites-key="plan" data-bxsites-value="free"><p>The Free plan includes basic search.</p>
+</div>
+<div class="bxsites-conditional" data-bxsites-key="plan" data-bxsites-value="pro"><p>The Pro plan adds AI-assisted search and unlimited team seats.</p>
+</div>
+<p><code>::: conditional key=&quot;...&quot; value=&quot;...&quot;</code> kennzeichnet eine Variante; <code>key</code>
+ist der jeweilige Präferenzname, auf den umgeschaltet wird (<code>&quot;plan&quot;</code>
+oben, es könnte aber genauso gut <code>&quot;os&quot;</code>, <code>&quot;language&quot;</code>, was auch immer
+sein), und <code>value</code> ist die eine Einstellung, für die dieser bestimmte
+Block angezeigt werden soll. Jede Variante wird immer im HTML gerendert</p>
+<ul>
+<li>clientseitig nur versteckt, niemals weggelassen - sodass eine Leserin
+mit deaktiviertem JavaScript (oder ein Such-Crawler) weiterhin jede
+Variante sieht statt keine.</li>
+</ul>
+<p><code>::: audience-switcher key=&quot;...&quot; options=&quot;value:Label,value:Label,...&quot;</code>
+ist ein optionales, fertiges Steuerelement - eine Schaltfläche pro
+Option, die sofort jeden <code>::: conditional</code>-Block mit demselben <code>key</code>
+umschaltet, überall auf der Seite. Du brauchst es überhaupt nicht: ein
+Link, der auf <code>?plan=pro</code> endet, setzt beim Laden automatisch dieselbe
+Präferenz (praktisch, um einen direkten Link zu &quot;der Pro-Version dieser
+Seite&quot; zu teilen), und das eigene Theme-Override eines Projekts kann
+stattdessen direkt <code>window.bxSitesSetPreference( key, value )</code> aufrufen,
+um es von einer eigenen UI aus zu steuern.</p>
+
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/content-blocks.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/de/guides/content-blocks.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 7&#x3a;07&#x3a;17 PM</span></div>
 				</article>
 
 				<nav class="page-nav d-flex justify-content-between" aria-label="Seitennavigation">
@@ -347,7 +408,7 @@ endlos zu laufen).</p>
 			</main>
 
 			<aside class="col-xl-2 toc-sidebar d-none d-xl-block">
-				<nav class="toc mb-4" aria-label="Auf dieser Seite"><div class="toc-title">Auf dieser Seite</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#expandable">Expandable</a></li><li class="toc-level-2"><a href="#cards">Cards</a></li><li class="toc-level-2"><a href="#columns">Columns</a></li><li class="toc-level-2"><a href="#stepper">Stepper</a></li><li class="toc-level-2"><a href="#file">File</a></li><li class="toc-level-2"><a href="#embed">Embed</a></li><li class="toc-level-2"><a href="#openapi--swagger">OpenAPI &#x2f; Swagger</a></li><li class="toc-level-2"><a href="#page-link">Page Link</a></li><li class="toc-level-2"><a href="#link-preview">Link Preview</a></li><li class="toc-level-2"><a href="#updates-changelog">Updates &#x28;Changelog&#x29;</a></li><li class="toc-level-2"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte &#x28;Includes&#x29;</a></li></ul></nav>
+				<nav class="toc mb-4" aria-label="Auf dieser Seite"><div class="toc-title">Auf dieser Seite</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#expandable">Expandable</a></li><li class="toc-level-2"><a href="#cards">Cards</a></li><li class="toc-level-2"><a href="#columns">Columns</a></li><li class="toc-level-2"><a href="#stepper">Stepper</a></li><li class="toc-level-2"><a href="#file">File</a></li><li class="toc-level-2"><a href="#embed">Embed</a></li><li class="toc-level-2"><a href="#openapi--swagger">OpenAPI &#x2f; Swagger</a></li><li class="toc-level-3"><a href="#eine-einzelne-operation-inline">Eine einzelne Operation inline</a></li><li class="toc-level-2"><a href="#page-link">Page Link</a></li><li class="toc-level-2"><a href="#link-preview">Link Preview</a></li><li class="toc-level-2"><a href="#updates-changelog">Updates &#x28;Changelog&#x29;</a></li><li class="toc-level-2"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte &#x28;Includes&#x29;</a></li><li class="toc-level-2"><a href="#conditional-content">Conditional content</a></li></ul></nav>
 			</aside>
 
 		</div>
@@ -373,6 +434,7 @@ endlos zu laufen).</p>
 	<script src="/bx-sites/development/de/assets/nav-toggle.js" defer></script>
 	<script src="/bx-sites/development/de/assets/toc-collapse.js" defer></script>
 	<script src="/bx-sites/development/de/assets/tabs.js" defer></script>
+	<script src="/bx-sites/development/de/assets/conditional-content-init.js" defer></script>
 
 	<script src="/bx-sites/development/de/assets/vendor/mermaid/mermaid.min.js"></script>
 	<script src="/bx-sites/development/de/assets/mermaid-init.js"></script>

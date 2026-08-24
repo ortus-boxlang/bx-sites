@@ -43,23 +43,32 @@ di ricerca esterno.
 
 ## Scorciatoie da tastiera
 
-- **`/`** porta il focus sul box di ricerca da qualsiasi punto della
-  pagina (a meno che tu non stia già digitando in un altro campo) - la
-  stessa convenzione usata da
-  [mkdocs-material](https://squidfunk.github.io/mkdocs-material/).
-- **Cmd/Ctrl+K** porta anch'esso il focus, da qualsiasi punto - anche
-  mentre stai digitando in un altro campo - la convenzione che
-  condividono Algolia DocSearch, Pagefind, VitePress e Docusaurus. Il box
+- **`/`** porta il focus sul box di ricerca nella barra laterale da
+  qualsiasi punto della pagina (a meno che tu non stia già digitando in
+  un altro campo) - la stessa convenzione usata da
+  [mkdocs-material](https://squidfunk.github.io/mkdocs-material/). Il box
   di ricerca mostra un piccolo suggerimento `Ctrl K`/`⌘K` (rilevato in
-  base alla piattaforma) così è scopribile.
-- **`Escape`** chiude il menu a discesa dei risultati e toglie il focus
-  dal box di ricerca.
+  base alla piattaforma) così la scorciatoia qui sotto è scopribile.
+- **Cmd/Ctrl+K** apre invece un overlay separato in stile
+  command-palette - una modale centrata su uno sfondo oscurato, costruita
+  interamente in JS (nessuna modifica ai template del tema necessaria) e
+  condivisa da ogni tema integrato. Le frecce Su/Giù spostano
+  l'evidenziazione tra i risultati, **Invio** apre quello evidenziato, ed
+  **Escape** (oppure un clic sullo sfondo) la chiude - la stessa
+  convenzione "Quick Find"/⌘K che condividono Algolia DocSearch,
+  Pagefind, VitePress, Docusaurus e GitBook.
+- **`Escape`** chiude anche il menu a discesa dei risultati proprio del
+  box nella barra laterale e gli toglie il focus, indipendentemente
+  dalla palette qui sopra.
 
-Cmd/Ctrl+K funziona allo stesso modo per ogni provider - il widget
-proprio di `local` lo collega direttamente, `algolia` lo ottiene
-gratuitamente da DocSearch stesso (`keyboardShortcuts` predefinito a
-`true`), e `pagefind` lo ottiene collegato da `layout.bxm` dato che
-`PagefindUI` non lo collega da sé.
+La palette riutilizza esattamente lo stesso indice `lunr` già costruito
+dal widget della barra laterale, invece di recuperare di nuovo
+`search-index.json` - disponibile solo per `local` (il predefinito);
+`algolia` ottiene il proprio Cmd+K gratuitamente da DocSearch stesso
+(`keyboardShortcuts` predefinito a `true`), e `pagefind` ottiene Cmd+K
+collegato da `layout.bxm` per portare il focus sul proprio `PagefindUI`,
+dato che quella libreria non lo collega da sé - nessuno dei due apre la
+palette propria di questo modulo.
 
 ## Disattivarla
 

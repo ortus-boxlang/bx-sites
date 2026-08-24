@@ -103,3 +103,32 @@ Vedi [Configurazione](../configuration.md#baseurl) per il quadro completo
 di cosa fa `baseURL`. Un sito utente `<user>.github.io`, o qualsiasi
 dominio personalizzato mappato sulla radice del sito, può lasciare
 `baseURL` al suo valore predefinito (`/`).
+
+## Limitare chi può raggiungere il tuo sito
+
+Qui non c'è alcun controllo degli accessi integrato - bx-sites produce
+sempre e soltanto un semplice `site/` statico, e un file statico non ha
+alcun concetto di "chi sta chiedendo". Il `robots: false` di
+[`bxsites.json`](../configuration.md#robotstxt) dice ai crawler ben
+educati di non indicizzare un build (utile per un deploy di
+staging/anteprima che non vuoi veder comparire nei risultati di ricerca),
+ma è una richiesta cortese, non un lucchetto - l'URL continua a
+funzionare per chiunque lo abbia. Se hai davvero bisogno di limitare
+l'accesso, questo deve avvenire davanti ai file statici, a qualunque host
+li stia servendo - alcune opzioni comuni, adatte a siti statici:
+
+- **Cloudflare Pages/Access** - metti il sito distribuito dietro una
+  policy [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)
+  (lista email consentite, SSO, o un PIN monouso), senza bisogno di
+  codice applicativo.
+- **Netlify** - [protezione con password](https://docs.netlify.com/manage/security/secure-access-to-sites/site-protection/)
+  integrata, per sito o per singolo deploy, dalle sole impostazioni del
+  sito.
+- **Un piccolo reverse-proxy** (qualsiasi host) - l'HTTP Basic Auth
+  davanti ai file statici (una regola in stile `.htpasswd`, oppure una
+  Cloudflare Worker/Netlify Edge Function di un solo file) basta per
+  "tenere fuori i motori di ricerca e i visitatori a caso", anche se non
+  è una vera identità per-utente come l'avrebbe un'app con login.
+
+Nessuna di queste è una funzionalità di bx-sites - sono impostazioni a
+livello di host, che attivi ovunque finisca per essere servito `site/`.

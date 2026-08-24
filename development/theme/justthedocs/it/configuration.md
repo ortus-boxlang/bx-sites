@@ -122,24 +122,60 @@ propria `description` nel frontmatter (vedi [Per iniziare](getting-started.md#ad
 ## `baseURL`
 
 Controlla come viene prefissato ogni link interno, percorso di asset e voce
-di nav, e funge anche da URL canonico del sito per `sitemap.xml` e
-`llms.txt`.
+di nav, e funge anche da URL canonico del sito per `sitemap.xml`,
+`robots.txt`, `llms.txt` e per il tag `<link rel="canonical">` di ogni
+pagina.
 
 - Lasciato vuoto o `"/"` (il valore predefinito) - i link restano relativi
-  alla radice (`/page/`), e non viene generato né `sitemap.xml` né un
-  `llms.txt` con URL assoluti (non c'è un dominio canonico da cui
+  alla radice (`/page/`), e non viene generato né `sitemap.xml`, né una
+  riga `Sitemap:` in `robots.txt`, né un `llms.txt` con URL assoluti, né un
+  tag `<link rel="canonical">` (non c'è un dominio canonico da cui
   costruirli).
 - Un percorso semplice, ad es. `"my-docs"` o `"/my-docs/"` - si assume che
   il sito venga servito da quel sotto-percorso, e ogni link interno, voce
   di nav e asset viene prefissato con esso (`/my-docs/page/`). Ancora
-  nessun `sitemap.xml`, dato che manca comunque un dominio assoluto.
+  nessun `sitemap.xml`/tag canonici, dato che manca comunque un dominio
+  assoluto.
 - Un URL completo, ad es. `"https://docs.example.com/"` - la parte del
   percorso (qui `/`) viene usata allo stesso modo di un percorso semplice,
   **e** `sitemap.xml` viene scritto al momento del `build` con l'URL
-  assoluto di ogni pagina non nascosta sotto quel dominio.
+  assoluto di ogni pagina non nascosta sotto quel dominio, `robots.txt`
+  guadagna una riga `Sitemap:` che vi punta, e ogni pagina ottiene il
+  proprio `<link rel="canonical">` corretto (la pagina di un albero di
+  versione/locale punta comunque all'URL *di quello stesso albero*, non a
+  quello del sito principale).
 
 `llms.txt` (vedi [sotto](#llmstxt)) viene sempre scritto; preferisce
 semplicemente un URL assoluto quando `baseURL` ne fornisce uno.
+
+## `robots.txt`
+
+Ogni build scrive un `robots.txt` alla radice del sito - nessuna chiave di
+configurazione necessaria, a meno che tu non voglia cambiarne il
+comportamento predefinito, permissivo:
+
+```json title="bxsites.json"
+{ "robots": false }
+```
+
+- `true` (il valore predefinito) - `Allow: /` per ogni crawler, più una
+  riga `Sitemap:` che punta a `sitemap.xml` quando `baseURL` è un URL
+  completo (vedi sopra).
+- `false` - `Disallow: /` per ogni crawler al suo posto, e nessuna riga
+  `Sitemap:` - la comune esigenza di "non indicizzare affatto questo
+  deploy di staging/interno". Questa è solo un'esclusione per i
+  *crawler*, non un controllo degli accessi - il sito resta comunque
+  pienamente raggiungibile da chiunque ne abbia l'URL; vedi
+  [Distribuzione](guides/deployment.md#limitare-chi-può-raggiungere-il-tuo-sito)
+  se hai davvero bisogno di limitare chi può raggiungerlo.
+
+Ti serve più del semplice interruttore on/off - percorsi specifici da
+escludere, più righe `Sitemap:`, un `Crawl-delay`, regole per singolo
+user-agent? Metti il tuo `robots.txt` proprio accanto a `index.md`
+(`docs/robots.txt`, o `src/robots.txt` per un progetto basato su `src/` -
+vedi [`docs/` o `src/`](getting-started.md#aggiungere-pagine)) e viene copiato
+byte per byte al posto di quello generato, a ogni build - la chiave
+`robots` sopra viene del tutto ignorata una volta che questo file esiste.
 
 ## `llms.txt`
 

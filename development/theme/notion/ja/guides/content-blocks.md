@@ -218,6 +218,28 @@ OpenAPI/Swagger 仕様に対するインタラクティブな
 からの CORS を許可していることを確認してください）は、何も書き換えること
 なく既存の仕様からそのままレンダリングされます。
 
+### エンドポイント1件をインライン表示
+
+`operation="METHOD /path"` を追加すると、そのエンドポイント1件だけを通常の
+ページ内にそのまま配置できます - チュートリアルの途中で、読者を完全な
+リファレンスへ送り出すことなく使えて便利です:
+
+```markdown title="Example" linenums="1"
+::: openapi src="assets/openapi/example.yaml" operation="GET /books"
+:::
+```
+
+::: openapi src="assets/openapi/example.yaml" operation="GET /books"
+:::
+
+上のフルブロックとまったく同じ Swagger UI ウィジェットです（同じ仕様、
+同じくクライアント側のみのレンダリング - `operation` もこちら側で
+OpenAPI パースを一切トリガーしません）。Swagger UI 自身がすでにレンダリング
+済みのマークアップを読み取ることで、他のすべてのオペレーションは単に
+非表示にされ、このオペレーションだけが自動的に展開されます。`operation`
+のメソッドは大文字小文字を区別しませんが、パスは仕様自身のパス
+（`{param}` プレースホルダーも含めて）と完全に一致する必要があります。
+
 ## ページリンク
 
 別のページへのリッチなプレビューカードです - `href` は通常の
@@ -342,3 +364,54 @@ docs/
 インクルードされたファイルは、さらに別のファイルをインクルードできます
 （循環参照はビルド時に永久ループする代わりに `BxSites.CircularInclude`
 を送出します）。
+
+## 条件付きコンテンツ
+
+読者自身の選択に基づいて、ブロックのいくつかのバリアントのうち1つを表示します -
+例えば同じページ上の「Free」向けと「Pro」向けの手順を切り替えるような場合です。
+これは訪問者の識別情報を一切持たない完全な静的サイトなので、本物のバックエンドを
+持つプラットフォームとは違い、サーバー側で評価される「この読者は誰か」という
+ものはありません - 読者自身が選択し、その選択は自分自身のブラウザ
+（`localStorage`）に記憶され、以降のすべてのページにも引き継がれます:
+
+```markdown title="Example" linenums="1"
+::: audience-switcher key="plan" options="free:Free,pro:Pro"
+:::
+
+::: conditional key="plan" value="free"
+The Free plan includes basic search.
+:::
+
+::: conditional key="plan" value="pro"
+The Pro plan adds AI-assisted search and unlimited team seats.
+:::
+```
+
+::: audience-switcher key="plan" options="free:Free,pro:Pro"
+:::
+
+::: conditional key="plan" value="free"
+The Free plan includes basic search.
+:::
+
+::: conditional key="plan" value="pro"
+The Pro plan adds AI-assisted search and unlimited team seats.
+:::
+
+`::: conditional key="..." value="..."` は1つのバリアントを示します。`key` は
+切り替えの対象となる任意の設定名です（上記の `"plan"` はもちろん、
+`"os"`、`"language"`、何でも構いません）。そして `value` は、このブロックが
+どの設定のときに表示されるべきかを指定します。すべてのバリアントは常に
+HTML 内にレンダリングされます - クライアント側で非表示にされるだけで、
+決して省略されません - そのため、JavaScript を無効にしている読者
+（あるいは検索クローラー）にも、どれも表示されないのではなく、すべての
+バリアントが見えます。
+
+`::: audience-switcher key="..." options="value:Label,value:Label,..."` は
+任意の、すぐに使える既製のコントロールです - 選択肢ごとに1つのボタンがあり、
+ページ上のどこにあっても同じ `key` を共有するすべての `::: conditional`
+ブロックを即座に切り替えます。これは必須ではありません: `?plan=pro` で
+終わるリンクは読み込み時に自動的に同じ設定をセットします（「このページの
+Pro 版」への直接リンクを共有するのに便利です）。また、プロジェクト自身の
+テーマオーバーライドから `window.bxSitesSetPreference( key, value )` を
+直接呼び出して、独自の UI から制御することもできます。

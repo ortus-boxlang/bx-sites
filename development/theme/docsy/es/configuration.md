@@ -119,20 +119,28 @@ propio frontmatter `description` (consulta
 
 Controla cómo se antepone el prefijo a cada enlace interno, ruta de
 recurso y entrada de navegación, y también actúa como la URL canónica
-del sitio para `sitemap.xml` y `llms.txt`.
+del sitio para `sitemap.xml`, `robots.txt`, `llms.txt`, y la propia
+etiqueta `<link rel="canonical">` de cada página.
 
 - Dejado en blanco o `"/"` (el valor por defecto) - los enlaces
   permanecen relativos a la raíz (`/page/`), y no se genera ni
-  `sitemap.xml` ni un `llms.txt` con URL absoluta (no hay un dominio
-  canónico a partir del cual construirlos).
+  `sitemap.xml`, ni una línea `Sitemap:` en `robots.txt`, ni un
+  `llms.txt` con URL absoluta, ni una etiqueta
+  `<link rel="canonical">` (no hay un dominio canónico a partir del
+  cual construirlos).
 - Una ruta simple, por ejemplo `"my-docs"` o `"/my-docs/"` - se asume que
   el sitio se sirve desde esa subruta, y cada enlace interno, entrada de
-  navegación y recurso lleva ese prefijo (`/my-docs/page/`). Sigue sin
-  generarse `sitemap.xml`, ya que todavía no hay un dominio absoluto.
+  navegación y recurso lleva ese prefijo (`/my-docs/page/`). Siguen sin
+  generarse `sitemap.xml`/etiquetas canónicas, ya que todavía no hay un
+  dominio absoluto.
 - Una URL completa, por ejemplo `"https://docs.example.com/"` - la parte
   de la ruta (`/` aquí) se usa de la misma forma que lo haría una ruta
   simple, **y** `sitemap.xml` se escribe en el momento de la construcción
-  con la URL absoluta de cada página no oculta bajo ese dominio.
+  con la URL absoluta de cada página no oculta bajo ese dominio,
+  `robots.txt` obtiene una línea `Sitemap:` que apunta a él, y cada
+  página obtiene su propia `<link rel="canonical">` correcta (la propia
+  página de un árbol de versión/idioma sigue apuntando a la URL *de ese
+  mismo árbol*, no a la del sitio principal).
 
 `llms.txt` (consulta [más abajo](#llmstxt)) siempre se escribe; simplemente
 prefiere una URL absoluta cuando `baseURL` la proporciona.
@@ -153,6 +161,36 @@ Se escribe en la raíz del sitio, pero solo cuando `baseURL` es una URL
 completa (ver arriba) - un sitemap necesita un dominio absoluto para
 tener sentido. Enumera cada página no oculta según el protocolo de
 [sitemaps.org](https://www.sitemaps.org/).
+
+## `robots.txt`
+
+Cada construcción escribe un `robots.txt` en la raíz del sitio - no hace
+falta ninguna clave de configuración a menos que quieras cambiar su
+comportamiento por defecto, permisivo:
+
+```json title="bxsites.json"
+{ "robots": false }
+```
+
+- `true` (el valor por defecto) - `Allow: /` para cada rastreador, además
+  de una línea `Sitemap:` que apunta a `sitemap.xml` cuando `baseURL` es
+  una URL completa (ver arriba).
+- `false` - `Disallow: /` para cada rastreador en su lugar, y sin línea
+  `Sitemap:` - la necesidad habitual de "no indexes en absoluto este
+  despliegue de staging/interno". Esto es solo una exclusión de
+  *rastreadores*, no un control de acceso - el sitio sigue siendo
+  totalmente alcanzable por cualquiera que tenga la URL; consulta
+  [Despliegue](guides/deployment.md#restringir-quién-puede-acceder-a-tu-sitio)
+  si de verdad necesitas restringir quién puede acceder a él.
+
+¿Necesitas más que el simple interruptor de activar/desactivar - rutas
+específicas no permitidas, varias líneas `Sitemap:`, un `Crawl-delay`,
+reglas por agente de usuario? Coloca tu propio `robots.txt` justo al lado
+de `index.md` (`docs/robots.txt`, o `src/robots.txt` para un proyecto
+basado en `src/` - consulta
+[`docs/` o `src/`](getting-started.md#añadir-páginas)) y se copia tal
+cual, byte a byte, en lugar del generado, en cada construcción - la clave
+`robots` de arriba se ignora por completo en cuanto existe este archivo.
 
 ## `theme`
 

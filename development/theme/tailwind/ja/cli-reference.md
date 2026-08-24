@@ -112,16 +112,18 @@ bxSites gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
 
 ## `migrate`
 
-既存の docs プロジェクトをこの形式に変換します - `--from` で変換元の形式を指定します。
-デフォルトは `gitbook`、もう一つは `mkdocs` です。
+既存の docs プロジェクトをこの形式に変換します - `--from` で変換元の形式を指定します:
+`gitbook`（デフォルト）、`mkdocs`、`markdown-zip`、または `notion` です。
 
 ```bash frame="terminal" title="Terminal" linenums="1"
 bxSites migrate --source=/path/to/gitbook-export
 bxSites migrate --source=/path/to/mkdocs-project --from=mkdocs
+bxSites migrate --source=/path/to/export.zip --from=markdown-zip
+bxSites migrate --source=/path/to/notion-export --from=notion
 ```
 
-- `--source`（必須）- エクスポート/プロジェクトのルートディレクトリへのパス（`gitbook` の場合は `SUMMARY.md`、`mkdocs` の場合は `mkdocs.yml` を含む必要があります）
-- `--from` - `gitbook`（デフォルト）または `mkdocs`
+- `--source`（必須）- エクスポート/プロジェクトのルートディレクトリへのパス（`gitbook` の場合は `SUMMARY.md`、`mkdocs` の場合は `mkdocs.yml` を含む必要があります）、または `.zip` ファイル（`markdown-zip`；`notion` は `.zip` または展開済みのフォルダのどちらも受け付けます）
+- `--from` - `gitbook`（デフォルト）、`mkdocs`、`markdown-zip`、または `notion`
 
 ### `--from=gitbook`（デフォルト）
 
@@ -142,12 +144,38 @@ mkdocs プロジェクト（`mkdocs.yml` とその `docs/` フォルダ）を完
 アセット（画像は通常それを使うページの隣に置かれており、mkdocs には単一のアセットフォルダの
 慣習がありません）は `docs/assets/mkdocs/` に再配置され、その参照も書き換えられます。
 
-### 両方に共通
+### `--from=markdown-zip`
 
-変換されたページ数（mkdocs の場合はアセット数も）のサマリと、自動変換できなかったものが
-あればその詳細リストを出力します - 何も黙って破棄されることはありません。すでに存在する
-変換先ファイル、`bxsites.yaml`、または `docs/nav.json` は上書きされます（これも報告されます）。
-移行済みの出力をコミットする前に確認してください。
+Markdown ファイルのプレーンな `.zip` です - フォルダ自身のネストがすでに bx-sites 自身の
+ナビゲーション規約 *そのもの* であり、ページ間の相対 `.md` リンクもすでに bx-sites が
+期待するとおりに解決されるため、翻訳すべき独自のエクスポート形式は存在しません。
+ほぼそのままのコピーです: `.md` 以外のすべてのファイル（画像など）は
+`docs/assets/imported/` に再配置され、それを参照している各ページ自身の参照もそれに
+合わせて書き換えられます。`bxsites.yaml`/`docs/nav.json` は書き出されません -
+プレーンな zip はサイト名やナビゲーション構造を独自に持たないため、変換すべきものが
+ないからです。
+
+### `--from=notion`
+
+Notion の「Export as Markdown & CSV」アーカイブ（`.zip`、または展開済みのフォルダ）です -
+ここで変換元にできる他のどの形式にもない、Notion 独自の2つの癖を処理します:
+すべてのページ/サブページフォルダには、スペースと32文字の id が付加されており
+（同名ページを区別するためのもので、人が読むことは想定されていません）、
+ページのタイトルはフロントマターではなく、先頭の文字どおりの `# Heading` として
+繰り返されています。どちらもクリーンアップされます: id サフィックスは取り除かれ、
+残った名前は出力ファイル名としてスラグ化され、先頭の見出しは重複した1行目ではなく
+本物の `title` フロントマターフィールドになり、（Notion が URL エンコードして書き出し、
+依然として元の id 付きの名前を指している）すべてのリンク/画像のターゲットが
+それに合わせて書き換えられます。`.md` 以外のファイルは、上記の `markdown-zip` と
+同様に `docs/assets/imported/` に再配置されます。
+
+### 4つすべてに共通
+
+変換されたページ数（mkdocs/markdown-zip/notion の場合はアセット数も）のサマリと、
+自動変換できなかったものがあればその詳細リストを出力します - 何も黙って破棄される
+ことはありません。すでに存在する変換先ファイル、`bxsites.yaml`、または
+`docs/nav.json` は上書きされます（これも報告されます）。移行済みの出力を
+コミットする前に確認してください。
 
 ## `check`
 

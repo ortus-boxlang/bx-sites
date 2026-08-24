@@ -42,23 +42,34 @@ externen Suchdienst.
 
 ## Tastaturkürzel
 
-- **`/`** fokussiert die Suchbox von überall auf der Seite (außer du
-  tippst bereits in ein anderes Feld) - dieselbe Konvention, die
+- **`/`** fokussiert die Suchbox in der Seitenleiste von überall auf der
+  Seite (außer du tippst bereits in ein anderes Feld) - dieselbe
+  Konvention, die
   [mkdocs-material](https://squidfunk.github.io/mkdocs-material/)
-  verwendet.
-- **Cmd/Ctrl+K** fokussiert sie ebenfalls, von überall aus - auch
-  während du in einem anderen Feld tippst - die Konvention, die Algolia
-  DocSearch, Pagefind, VitePress und Docusaurus alle teilen. Die Suchbox
-  zeigt einen kleinen `Ctrl K`/`⌘K`-Hinweis (plattformerkannt), damit es
-  auffindbar ist.
-- **`Escape`** schließt das Ergebnis-Dropdown und entfernt den Fokus von
-  der Suchbox.
+  verwendet. Die Suchbox zeigt einen kleinen `Ctrl K`/`⌘K`-Hinweis
+  (plattformerkannt), damit das Tastenkürzel unten auffindbar ist.
+- **Cmd/Ctrl+K** öffnet stattdessen ein eigenständiges,
+  Command-Palette-artiges Overlay - ein zentriertes Modal über einem
+  Hintergrund, vollständig in JS gebaut (keine Theme-Template-Änderungen
+  nötig) und von jedem integrierten Theme gemeinsam genutzt. Pfeil-hoch/
+  -runter bewegt eine Hervorhebung über die Ergebnisse, **Enter**
+  navigiert zum hervorgehobenen Ergebnis, und **Escape** (oder ein Klick
+  auf den Hintergrund) schließt es - dieselbe "Quick Find"/⌘K-Konvention,
+  die Algolia DocSearch, Pagefind, VitePress, Docusaurus und GitBook alle
+  teilen.
+- **`Escape`** schließt außerdem das eigene Ergebnis-Dropdown der
+  Seitenleisten-Box und entfernt deren Fokus, unabhängig von der Palette
+  oben.
 
-Cmd/Ctrl+K funktioniert bei jedem Provider auf dieselbe Weise - `local`s
-eigenes Widget bindet es direkt, `algolia` erhält es kostenlos von
-DocSearch selbst (`keyboardShortcuts` ist standardmäßig `true`), und
-`pagefind` bekommt es von `layout.bxm` verdrahtet, da `PagefindUI` es
-nicht von selbst bindet.
+Die Palette nutzt exakt denselben, bereits aufgebauten `lunr`-Index
+weiter, den auch das Seitenleisten-Widget selbst baut, statt
+`search-index.json` ein zweites Mal abzurufen - nur je für `local` (den
+Standard-Provider) verfügbar; `algolia` erhält sein eigenes Cmd+K
+kostenlos von DocSearch selbst (`keyboardShortcuts` ist standardmäßig
+`true`), und `pagefind` bekommt Cmd+K von `layout.bxm` verdrahtet, um
+seine eigene `PagefindUI` zu fokussieren, da diese Bibliothek es nicht
+von selbst bindet - keiner der beiden öffnet die eigene Palette dieses
+Moduls.
 
 ## Ausschalten
 

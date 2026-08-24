@@ -14,6 +14,8 @@
 	<meta property="og:title" content="Deployment auf GitHub Pages">
 	
 
+	<link rel="canonical" href="https&#x3a;&#x2f;&#x2f;ortus-boxlang.github.io&#x2f;bx-sites&#x2f;development&#x2f;theme&#x2f;gitbook&#x2f;de&#x2f;guides&#x2f;deployment&#x2f;index.html">
+
 	<meta name="description" content="Static documentation site generator for BoxLang, built on bx-markdown">
 	<meta property="og:description" content="Static documentation site generator for BoxLang, built on bx-markdown">
 
@@ -81,7 +83,7 @@
 
 				<h1 class="gb-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,128a80,80,0,0,1-80,80H72A56,56,0,1,1,85.92,97.74l0,.1A80,80,0,0,1,240,128Z" opacity="0.2"/><path d="M178.34,165.66,160,147.31V208a8,8,0,0,1-16,0V147.31l-18.34,18.35a8,8,0,0,1-11.32-11.32l32-32a8,8,0,0,1,11.32,0l32,32a8,8,0,0,1-11.32,11.32ZM160,40A88.08,88.08,0,0,0,81.29,88.68,64,64,0,1,0,72,216h40a8,8,0,0,0,0-16H72a48,48,0,0,1,0-96c1.1,0,2.2,0,3.29.12A88,88,0,0,0,72,128a8,8,0,0,0,16,0,72,72,0,1,1,100.8,66,8,8,0,0,0,3.2,15.34,7.9,7.9,0,0,0,3.2-.68A88,88,0,0,0,160,40Z"/></svg></span> Deployment auf GitHub Pages</h1>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/gitbook/de/tags/index.html#tag-anleitungen">anleitungen</a><a class="page-tag" href="/bx-sites/development/theme/gitbook/de/tags/index.html#tag-deployment">deployment</a></div>
-<details class="bxsites-toc-mobile gb-toc--mobile"><summary class="gb-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="gb-toc__item gb-toc__item--2"><a href="#was-er-tut">Was er tut</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#einmalige-einrichtung">Einmalige Einrichtung</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#zwei-versionen-gleichzeitig-veröffentlichen">Zwei Versionen gleichzeitig ver&ouml;ffentlichen</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#für-dein-eigenes-projekt-verwenden">F&uuml;r dein eigenes Projekt verwenden</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#aus-einem-projekt-pages-unterpfad-ausliefern">Aus einem Projekt-Pages-Unterpfad ausliefern</a></li></ul></details>
+<details class="bxsites-toc-mobile gb-toc--mobile"><summary class="gb-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="gb-toc__item gb-toc__item--2"><a href="#was-er-tut">Was er tut</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#einmalige-einrichtung">Einmalige Einrichtung</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#zwei-versionen-gleichzeitig-veröffentlichen">Zwei Versionen gleichzeitig ver&ouml;ffentlichen</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#für-dein-eigenes-projekt-verwenden">F&uuml;r dein eigenes Projekt verwenden</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#aus-einem-projekt-pages-unterpfad-ausliefern">Aus einem Projekt-Pages-Unterpfad ausliefern</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#zugriff-auf-deine-website-einschränken">Zugriff auf deine Website einschr&auml;nken</a></li></ul></details>
 				<div class="gb-content-body">
 				<h1 id="deployment-auf-github-pages"><a href="#deployment-auf-github-pages" id="deployment-auf-github-pages" name="deployment-auf-github-pages" class="anchor"></a>Deployment auf GitHub Pages</h1>
 <p><code>site/</code> ist eine reine statische Website - hoste sie überall, wo statische
@@ -169,9 +171,38 @@ Aufschlüsselung dessen, was <code>baseURL</code> bewirkt. Eine
 <code>&lt;user&gt;.github.io</code>-Benutzer-Website, oder jede eigene Domain, die auf die
 Wurzel der Website zeigt, kann <code>baseURL</code> bei seinem Standardwert (<code>/</code>)
 belassen.</p>
+<h2 id="zugriff-auf-deine-website-einschränken"><a href="#zugriff-auf-deine-website-einschränken" id="zugriff-auf-deine-website-einschränken" name="zugriff-auf-deine-website-einschränken" class="anchor"></a>Zugriff auf deine Website einschränken</h2>
+<p>Eine eingebaute Zugriffskontrolle gibt es hier nicht - bx-sites erzeugt
+immer nur ein schlichtes statisches <code>site/</code>, und eine statische Datei hat
+kein Konzept von &quot;wer fragt hier gerade an&quot;. Das
+<a href="/bx-sites/development/theme/gitbook/de/configuration/index.html#robotstxt"><code>robots: false</code></a> von <code>bxsites.json</code> sagt
+wohlerzogenen Crawlern, ein Build nicht zu indexieren (nützlich für ein
+Staging-/Vorschau-Deploy, das nicht in Suchergebnissen auftauchen soll),
+aber das ist eine höfliche Bitte, kein Schloss - die URL funktioniert
+weiterhin für jeden, der sie hat. Musst du den Zugriff tatsächlich
+sperren, muss das vor den statischen Dateien passieren, bei welchem Host
+auch immer sie ausliefert - ein paar gängige, für statische Websites
+geeignete Optionen:</p>
+<ul>
+<li><strong>Cloudflare Pages/Access</strong> - stelle die veröffentlichte Website hinter
+eine
+<a href="https://developers.cloudflare.com/cloudflare-one/policies/access/">Cloudflare-Access</a>-Richtlinie
+(E-Mail-Allowlist, SSO oder eine Einmal-PIN) - ohne eigenen
+Anwendungscode.</li>
+<li><strong>Netlify</strong> - eingebauter
+<a href="https://docs.netlify.com/manage/security/secure-access-to-sites/site-protection/">Passwortschutz</a>
+pro Website oder pro Deploy, allein aus den Website-Einstellungen heraus.</li>
+<li><strong>Ein kleiner Reverse-Proxy</strong> (beliebiger Host) - HTTP-Basic-Auth vor den
+statischen Dateien (eine <code>.htpasswd</code>-artige Regel, oder ein
+Ein-Datei-Cloudflare-Worker/Netlify-Edge-Function) reicht, um Suchmaschinen
+und Zufallsbesucher fernzuhalten, auch wenn das keine echte
+Pro-Benutzer-Identität ist, wie sie eine eingeloggte Anwendung hätte.</li>
+</ul>
+<p>Nichts davon sind bx-sites-Funktionen - es sind Host-Einstellungen, die du
+dort einschaltest, wo <code>site/</code> am Ende ausgeliefert wird.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/gitbook/de/guides/deployment.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 6&#x3a;24&#x3a;25 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/gitbook/de/guides/deployment.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 7&#x3a;07&#x3a;17 PM</span></div>
 			</article>
 
 			<nav class="gb-page-nav" aria-label="Seitennavigation">
@@ -187,7 +218,7 @@ belassen.</p>
 		</main>
 
 		<aside class="gb-toc-sidebar">
-			<nav class="gb-toc" aria-label="Auf dieser Seite"><div class="gb-toc__title">Auf dieser Seite</div><ul><li class="gb-toc__item gb-toc__item--2"><a href="#was-er-tut">Was er tut</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#einmalige-einrichtung">Einmalige Einrichtung</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#zwei-versionen-gleichzeitig-veröffentlichen">Zwei Versionen gleichzeitig ver&ouml;ffentlichen</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#für-dein-eigenes-projekt-verwenden">F&uuml;r dein eigenes Projekt verwenden</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#aus-einem-projekt-pages-unterpfad-ausliefern">Aus einem Projekt-Pages-Unterpfad ausliefern</a></li></ul></nav>
+			<nav class="gb-toc" aria-label="Auf dieser Seite"><div class="gb-toc__title">Auf dieser Seite</div><ul><li class="gb-toc__item gb-toc__item--2"><a href="#was-er-tut">Was er tut</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#einmalige-einrichtung">Einmalige Einrichtung</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#zwei-versionen-gleichzeitig-veröffentlichen">Zwei Versionen gleichzeitig ver&ouml;ffentlichen</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#für-dein-eigenes-projekt-verwenden">F&uuml;r dein eigenes Projekt verwenden</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#aus-einem-projekt-pages-unterpfad-ausliefern">Aus einem Projekt-Pages-Unterpfad ausliefern</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#zugriff-auf-deine-website-einschränken">Zugriff auf deine Website einschr&auml;nken</a></li></ul></nav>
 		</aside>
 
 	</div>
@@ -211,6 +242,7 @@ belassen.</p>
 	<script src="/bx-sites/development/theme/gitbook/de/assets/nav-toggle.js" defer></script>
 	<script src="/bx-sites/development/theme/gitbook/de/assets/toc-collapse.js" defer></script>
 	<script src="/bx-sites/development/theme/gitbook/de/assets/tabs.js" defer></script>
+	<script src="/bx-sites/development/theme/gitbook/de/assets/conditional-content-init.js" defer></script>
 
 	<script src="/bx-sites/development/theme/gitbook/de/assets/vendor/mermaid/mermaid.min.js"></script>
 	<script src="/bx-sites/development/theme/gitbook/de/assets/mermaid-init.js"></script>

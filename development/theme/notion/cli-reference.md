@@ -119,15 +119,17 @@ See [Deployment](guides/deployment.md) for the full GitHub Pages setup
 ## `migrate`
 
 Converts an existing docs project into this one - `--from` picks the
-source format, `gitbook` (the default) or `mkdocs`.
+source format: `gitbook` (the default), `mkdocs`, `markdown-zip`, or `notion`.
 
 ```bash frame="terminal" title="Terminal" linenums="1"
 bxSites migrate --source=/path/to/gitbook-export
 bxSites migrate --source=/path/to/mkdocs-project --from=mkdocs
+bxSites migrate --source=/path/to/export.zip --from=markdown-zip
+bxSites migrate --source=/path/to/notion-export --from=notion
 ```
 
-- `--source` (required) - path to the export/project's root directory (must contain `SUMMARY.md` for `gitbook`, `mkdocs.yml` for `mkdocs`)
-- `--from` - `gitbook` (default) or `mkdocs`
+- `--source` (required) - path to the export/project's root directory (`SUMMARY.md` for `gitbook`, `mkdocs.yml` for `mkdocs`), or a `.zip` file (`markdown-zip`; `notion` accepts either a `.zip` or an already-extracted folder)
+- `--from` - `gitbook` (default), `mkdocs`, `markdown-zip`, or `notion`
 
 ### `--from=gitbook` (default)
 
@@ -152,13 +154,40 @@ mkdocs-material's own admonition/tabs/math/code-annotation syntax already
 single asset-folder convention) are relocated to `docs/assets/mkdocs/` and
 their references rewritten.
 
-### Both
+### `--from=markdown-zip`
 
-Prints a summary of pages (and, for mkdocs, assets) converted and, when
-anything couldn't be auto-converted, a list of exactly what needs a
-manual look - nothing is silently dropped. A destination file,
-`bxsites.yaml`, or `docs/nav.json` that already exists is overwritten
-(also reported), so review the migrated output before committing it.
+A plain `.zip` of Markdown files - no proprietary export format to
+translate, since a folder's own nesting already *is* bx-sites' own nav
+convention and a page-to-page relative `.md` link already resolves the
+way bx-sites expects. Mostly a straight copy: every non-`.md` file (an
+image, say) is relocated to `docs/assets/imported/` and every page's own
+reference to it rewritten to match. No `bxsites.yaml`/`docs/nav.json` is
+written - a plain zip carries no site name or nav structure of its own to
+translate.
+
+### `--from=notion`
+
+A Notion "Export as Markdown & CSV" archive (a `.zip`, or an
+already-extracted folder) - handles Notion's own two quirks nothing else
+here migrates from has: every page/sub-page folder is suffixed with a
+space and a 32-character id (disambiguating same-titled pages, never
+meant to be read), and a page's title is repeated as a literal leading
+`# Heading` rather than carried in frontmatter. Both are cleaned up: the
+id suffix is stripped and the remaining name slugified for the output
+filename, the leading heading becomes a real `title` frontmatter field
+instead of a duplicate first line, and every link/image target (which
+Notion writes URL-encoded, still pointing at the original id-suffixed
+names) is rewritten to match. Non-`.md` files are relocated to
+`docs/assets/imported/`, same as `markdown-zip` above.
+
+### All four
+
+Prints a summary of pages (and, for mkdocs/markdown-zip/notion, assets)
+converted and, when anything couldn't be auto-converted, a list of
+exactly what needs a manual look - nothing is silently dropped. A
+destination file, `bxsites.yaml`, or `docs/nav.json` that already exists
+is overwritten (also reported), so review the migrated output before
+committing it.
 
 ## `check`
 

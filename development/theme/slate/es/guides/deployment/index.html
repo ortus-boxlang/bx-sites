@@ -14,6 +14,8 @@
 	<meta property="og:title" content="Desplegar en GitHub Pages">
 	
 
+	<link rel="canonical" href="https&#x3a;&#x2f;&#x2f;ortus-boxlang.github.io&#x2f;bx-sites&#x2f;development&#x2f;theme&#x2f;slate&#x2f;es&#x2f;guides&#x2f;deployment&#x2f;index.html">
+
 	<meta name="description" content="Static documentation site generator for BoxLang, built on bx-markdown">
 	<meta property="og:description" content="Static documentation site generator for BoxLang, built on bx-markdown">
 
@@ -81,7 +83,7 @@
 
 				<h1 class="slate-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,128a80,80,0,0,1-80,80H72A56,56,0,1,1,85.92,97.74l0,.1A80,80,0,0,1,240,128Z" opacity="0.2"/><path d="M178.34,165.66,160,147.31V208a8,8,0,0,1-16,0V147.31l-18.34,18.35a8,8,0,0,1-11.32-11.32l32-32a8,8,0,0,1,11.32,0l32,32a8,8,0,0,1-11.32,11.32ZM160,40A88.08,88.08,0,0,0,81.29,88.68,64,64,0,1,0,72,216h40a8,8,0,0,0,0-16H72a48,48,0,0,1,0-96c1.1,0,2.2,0,3.29.12A88,88,0,0,0,72,128a8,8,0,0,0,16,0,72,72,0,1,1,100.8,66,8,8,0,0,0,3.2,15.34,7.9,7.9,0,0,0,3.2-.68A88,88,0,0,0,160,40Z"/></svg></span> Desplegar en GitHub Pages</h1>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/slate/es/tags/index.html#tag-guías">gu&iacute;as</a><a class="page-tag" href="/bx-sites/development/theme/slate/es/tags/index.html#tag-despliegue">despliegue</a></div>
-<details class="bxsites-toc-mobile slate-toc--mobile"><summary class="slate-toc--mobile__summary">En esta p&aacute;gina</summary><ul><li class="slate-toc__item slate-toc__item--2"><a href="#qué-hace">Qu&eacute; hace</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#configuración-inicial">Configuraci&oacute;n inicial</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#publicar-dos-versiones-a-la-vez">Publicar dos versiones a la vez</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#usar-esto-para-tu-propio-proyecto">Usar esto para tu propio proyecto</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#servir-desde-una-subruta-de-pages-de-proyecto">Servir desde una subruta de Pages de proyecto</a></li></ul></details>
+<details class="bxsites-toc-mobile slate-toc--mobile"><summary class="slate-toc--mobile__summary">En esta p&aacute;gina</summary><ul><li class="slate-toc__item slate-toc__item--2"><a href="#qué-hace">Qu&eacute; hace</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#configuración-inicial">Configuraci&oacute;n inicial</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#publicar-dos-versiones-a-la-vez">Publicar dos versiones a la vez</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#usar-esto-para-tu-propio-proyecto">Usar esto para tu propio proyecto</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#servir-desde-una-subruta-de-pages-de-proyecto">Servir desde una subruta de Pages de proyecto</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#restringir-quién-puede-acceder-a-tu-sitio">Restringir qui&eacute;n puede acceder a tu sitio</a></li></ul></details>
 				<div class="slate-content-body">
 				<h1 id="desplegar-en-github-pages"><a href="#desplegar-en-github-pages" id="desplegar-en-github-pages" name="desplegar-en-github-pages" class="anchor"></a>Desplegar en GitHub Pages</h1>
 <p><code>site/</code> es un sitio estático simple - aloja donde sea que sirva archivos
@@ -169,9 +171,37 @@ también se genere un <code>sitemap.xml</code> real:</p>
 completo de qué hace <code>baseURL</code>. Un sitio de usuario <code>&lt;user&gt;.github.io</code>, o
 cualquier dominio personalizado asignado a la raíz del sitio, puede dejar
 <code>baseURL</code> en su valor por defecto (<code>/</code>).</p>
+<h2 id="restringir-quién-puede-acceder-a-tu-sitio"><a href="#restringir-quién-puede-acceder-a-tu-sitio" id="restringir-quién-puede-acceder-a-tu-sitio" name="restringir-quién-puede-acceder-a-tu-sitio" class="anchor"></a>Restringir quién puede acceder a tu sitio</h2>
+<p>Aquí no hay control de acceso incorporado - bx-sites solo produce un
+<code>site/</code> estático simple, y un archivo estático no tiene ningún concepto
+de &quot;quién lo está pidiendo&quot;. El <a href="/bx-sites/development/theme/slate/es/configuration/index.html#robotstxt"><code>robots: false</code></a>
+de <code>bxsites.json</code> le dice a los rastreadores bien portados que no indexen
+una construcción (útil para un despliegue de staging/vista previa que no
+quieres que aparezca en los resultados de búsqueda), pero es una petición
+educada, no un candado - la URL sigue funcionando para cualquiera que la
+tenga. Si de verdad necesitas restringir el acceso, eso tiene que suceder
+delante de los archivos estáticos, en el propio host que los sirve -
+algunas opciones habituales, adecuadas para sitios estáticos:</p>
+<ul>
+<li><strong>Cloudflare Pages/Access</strong> - coloca el sitio desplegado detrás de una
+política de <a href="https://developers.cloudflare.com/cloudflare-one/policies/access/">Cloudflare Access</a>
+(lista blanca de correos, SSO, o un PIN de un solo uso), sin necesidad
+de código de aplicación.</li>
+<li><strong>Netlify</strong> - <a href="https://docs.netlify.com/manage/security/secure-access-to-sites/site-protection/">protección con contraseña</a>
+incorporada, por sitio o por despliegue, solo desde los ajustes del
+sitio.</li>
+<li><strong>Un pequeño proxy inverso</strong> (cualquier host) - HTTP Basic Auth delante
+de los archivos estáticos (una regla al estilo <code>.htpasswd</code>, o un
+Cloudflare Worker/Netlify Edge Function de un solo archivo) es
+suficiente para &quot;mantener fuera a los motores de búsqueda y a
+cualquiera al azar&quot;, aunque no es una identidad real por usuario como
+la que tendría una aplicación con inicio de sesión.</li>
+</ul>
+<p>Nada de esto son funciones de bx-sites - son ajustes a nivel de host que
+activas dondequiera que termine sirviéndose <code>site/</code>.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/slate/es/guides/deployment.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 24, 2026, 6&#x3a;24&#x3a;25 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/slate/es/guides/deployment.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 24, 2026, 7&#x3a;07&#x3a;17 PM</span></div>
 			</article>
 
 			<nav class="slate-page-nav" aria-label="Navegaci&oacute;n de p&aacute;gina">
@@ -187,7 +217,7 @@ cualquier dominio personalizado asignado a la raíz del sitio, puede dejar
 		</main>
 
 		<aside class="slate-toc-sidebar">
-			<nav class="slate-toc" aria-label="En esta p&aacute;gina"><div class="slate-toc__title">En esta p&aacute;gina</div><ul><li class="slate-toc__item slate-toc__item--2"><a href="#qué-hace">Qu&eacute; hace</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#configuración-inicial">Configuraci&oacute;n inicial</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#publicar-dos-versiones-a-la-vez">Publicar dos versiones a la vez</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#usar-esto-para-tu-propio-proyecto">Usar esto para tu propio proyecto</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#servir-desde-una-subruta-de-pages-de-proyecto">Servir desde una subruta de Pages de proyecto</a></li></ul></nav>
+			<nav class="slate-toc" aria-label="En esta p&aacute;gina"><div class="slate-toc__title">En esta p&aacute;gina</div><ul><li class="slate-toc__item slate-toc__item--2"><a href="#qué-hace">Qu&eacute; hace</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#configuración-inicial">Configuraci&oacute;n inicial</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#publicar-dos-versiones-a-la-vez">Publicar dos versiones a la vez</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#usar-esto-para-tu-propio-proyecto">Usar esto para tu propio proyecto</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#servir-desde-una-subruta-de-pages-de-proyecto">Servir desde una subruta de Pages de proyecto</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#restringir-quién-puede-acceder-a-tu-sitio">Restringir qui&eacute;n puede acceder a tu sitio</a></li></ul></nav>
 		</aside>
 
 	</div>
@@ -211,6 +241,7 @@ cualquier dominio personalizado asignado a la raíz del sitio, puede dejar
 	<script src="/bx-sites/development/theme/slate/es/assets/nav-toggle.js" defer></script>
 	<script src="/bx-sites/development/theme/slate/es/assets/toc-collapse.js" defer></script>
 	<script src="/bx-sites/development/theme/slate/es/assets/tabs.js" defer></script>
+	<script src="/bx-sites/development/theme/slate/es/assets/conditional-content-init.js" defer></script>
 
 	<script src="/bx-sites/development/theme/slate/es/assets/vendor/mermaid/mermaid.min.js"></script>
 	<script src="/bx-sites/development/theme/slate/es/assets/mermaid-init.js"></script>

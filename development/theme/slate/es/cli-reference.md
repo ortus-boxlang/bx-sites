@@ -122,15 +122,18 @@ de GitHub Pages (activar Pages para la rama, `baseURL`, etc.).
 ## `migrate`
 
 Convierte un proyecto de documentación existente en este - `--from`
-elige el formato de origen, `gitbook` (el predeterminado) o `mkdocs`.
+elige el formato de origen: `gitbook` (el predeterminado), `mkdocs`,
+`markdown-zip`, o `notion`.
 
 ```bash frame="terminal" title="Terminal" linenums="1"
 bxSites migrate --source=/path/to/gitbook-export
 bxSites migrate --source=/path/to/mkdocs-project --from=mkdocs
+bxSites migrate --source=/path/to/export.zip --from=markdown-zip
+bxSites migrate --source=/path/to/notion-export --from=notion
 ```
 
-- `--source` (obligatorio) - ruta al directorio raíz de la exportación/proyecto (debe contener `SUMMARY.md` para `gitbook`, `mkdocs.yml` para `mkdocs`)
-- `--from` - `gitbook` (predeterminado) o `mkdocs`
+- `--source` (obligatorio) - ruta al directorio raíz de la exportación/proyecto (`SUMMARY.md` para `gitbook`, `mkdocs.yml` para `mkdocs`), o un archivo `.zip` (`markdown-zip`; `notion` acepta tanto un `.zip` como una carpeta ya extraída)
+- `--from` - `gitbook` (predeterminado), `mkdocs`, `markdown-zip`, o `notion`
 
 ### `--from=gitbook` (predeterminado)
 
@@ -158,13 +161,44 @@ página que las usa, mkdocs no tiene una única convención de carpeta de
 recursos) se reubican en `docs/assets/mkdocs/` y sus referencias se
 reescriben.
 
-### Ambos
+### `--from=markdown-zip`
 
-Imprime un resumen de las páginas (y, para mkdocs, los recursos)
-convertidos y, cuando algo no pudo convertirse automáticamente, una lista
-de exactamente qué necesita revisión manual - nada se descarta
-silenciosamente. Un archivo de destino, `bxsites.yaml`, o
-`docs/nav.json` que ya exista se sobrescribe (también se informa), así
+Un `.zip` simple de archivos Markdown - sin ningún formato de
+exportación propietario que traducir, ya que el propio anidamiento de
+una carpeta ya *es* la propia convención de navegación de bx-sites y un
+enlace `.md` relativo de página a página ya se resuelve de la forma que
+bx-sites espera. Mayormente una copia directa: cada archivo que no es
+`.md` (una imagen, digamos) se reubica en `docs/assets/imported/` y la
+propia referencia de cada página a él se reescribe en consecuencia. No
+se escribe ningún `bxsites.yaml`/`docs/nav.json` - un zip simple no
+lleva consigo ningún nombre de sitio ni estructura de navegación propios
+que traducir.
+
+### `--from=notion`
+
+Un archivo de exportación de Notion "Export as Markdown & CSV" (un
+`.zip`, o una carpeta ya extraída) - maneja las dos peculiaridades
+propias de Notion que ninguna otra migración de aquí tiene que resolver:
+cada carpeta de página/subpágina lleva como sufijo un espacio y un id de
+32 caracteres (para distinguir páginas con el mismo título, nunca pensado
+para leerse), y el título de una página se repite como un `# Heading`
+literal al principio en lugar de llevarse en el frontmatter. Ambas cosas
+se limpian: el sufijo del id se elimina y el nombre restante se
+convierte en slug para el nombre del archivo de salida, el encabezado
+inicial se convierte en un campo `title` real del frontmatter en lugar
+de una primera línea duplicada, y cada destino de enlace/imagen (que
+Notion escribe codificado como URL, apuntando todavía a los nombres
+originales con sufijo de id) se reescribe en consecuencia. Los archivos
+que no son `.md` se reubican en `docs/assets/imported/`, igual que
+`markdown-zip` arriba.
+
+### Los cuatro
+
+Imprime un resumen de las páginas (y, para mkdocs/markdown-zip/notion,
+los recursos) convertidos y, cuando algo no pudo convertirse
+automáticamente, una lista de exactamente qué necesita revisión manual -
+nada se descarta silenciosamente. Un archivo de destino, `bxsites.yaml`,
+o `docs/nav.json` que ya exista se sobrescribe (también se informa), así
 que revisa la salida migrada antes de confirmarla.
 
 ## `check`

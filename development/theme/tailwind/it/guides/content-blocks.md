@@ -222,6 +222,29 @@ browser di chi visita la pagina - assicurati che quel server consenta CORS
 da dove sono ospitati i tuoi docs) vengono renderizzati direttamente dalla
 tua specifica esistente, senza bisogno di riscrivere nulla.
 
+### Una singola operazione inline
+
+Aggiungi `operation="METODO /percorso"` per inserire in una pagina
+normale solo quell'unico endpoint - comodo a metà di un tutorial, senza
+dover mandare il lettore fino al riferimento completo:
+
+```markdown title="Esempio" linenums="1"
+::: openapi src="assets/openapi/example.yaml" operation="GET /books"
+:::
+```
+
+::: openapi src="assets/openapi/example.yaml" operation="GET /books"
+:::
+
+Esattamente lo stesso widget Swagger UI del blocco completo qui sopra
+(stessa specifica, stesso rendering solo lato client - anche `operation`
+non innesca mai alcuna analisi OpenAPI dal nostro lato); ogni altra
+operazione viene semplicemente nascosta e questa espansa
+automaticamente, leggendo il markup già renderizzato dallo stesso
+Swagger UI. Il metodo di `operation` non distingue maiuscole/minuscole;
+il suo percorso deve corrispondere esattamente al percorso della
+specifica (segnaposto `{param}` compresi).
+
 ## Link a pagina
 
 Una card di anteprima ricca che rimanda a un'altra pagina - `href` segue
@@ -352,3 +375,57 @@ propri, non condivisi con il `docs/includes/` dell'albero principale.
 Un file incluso può a sua volta includerne un altro (una catena
 circolare genera `BxSites.CircularInclude` al momento del build invece
 di ripetersi all'infinito).
+
+## Contenuto condizionale
+
+Mostra una tra più varianti di un blocco in base a una scelta fatta dal
+lettore stesso - istruzioni "Free" contro "Pro" nella stessa pagina, ad
+esempio. Questo è un sito interamente statico senza alcuna identità del
+visitatore, quindi a differenza di una piattaforma con un vero backend,
+non c'è un "chi è questo lettore" valutato lato server - è il lettore
+stesso a scegliere, e la sua scelta viene semplicemente ricordata nel
+proprio browser (`localStorage`) anche per ogni pagina successiva:
+
+```markdown title="Esempio" linenums="1"
+::: audience-switcher key="plan" options="free:Free,pro:Pro"
+:::
+
+::: conditional key="plan" value="free"
+The Free plan includes basic search.
+:::
+
+::: conditional key="plan" value="pro"
+The Pro plan adds AI-assisted search and unlimited team seats.
+:::
+```
+
+::: audience-switcher key="plan" options="free:Free,pro:Pro"
+:::
+
+::: conditional key="plan" value="free"
+The Free plan includes basic search.
+:::
+
+::: conditional key="plan" value="pro"
+The Pro plan adds AI-assisted search and unlimited team seats.
+:::
+
+`::: conditional key="..." value="..."` segna una variante; `key` è
+qualsiasi nome di preferenza tu stia usando per commutare (`"plan"` qui
+sopra, ma potrebbe altrettanto bene essere `"os"`, `"language"`,
+qualsiasi cosa), e `value` è l'impostazione per cui questo particolare
+blocco deve essere mostrato. Ogni variante viene sempre renderizzata
+nell'HTML - nascosta lato client, mai omessa - così un lettore con
+JavaScript disattivato (o un crawler di ricerca) vede comunque ogni
+variante invece di nessuna.
+
+`::: audience-switcher key="..." options="valore:Etichetta,valore:Etichetta,..."`
+è un controllo opzionale, già pronto all'uso - un pulsante per ogni
+opzione, che commuta immediatamente ogni blocco `::: conditional` che
+condivide quella stessa `key`, ovunque nella pagina. Non ti serve affatto:
+un link che termina con `?plan=pro` imposta automaticamente la stessa
+preferenza al caricamento (comodo per condividere un link diretto verso
+"la versione Pro di questa pagina"), e una sovrascrittura di tema propria
+di un progetto può chiamare direttamente
+`window.bxSitesSetPreference( key, value )` per pilotarla da
+un'interfaccia personalizzata invece.

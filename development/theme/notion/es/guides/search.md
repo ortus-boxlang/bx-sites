@@ -43,22 +43,33 @@ externo involucrado.
 
 ## Atajos de teclado
 
-- **`/`** enfoca el cuadro de búsqueda desde cualquier lugar de la página
-  (a menos que ya estés escribiendo en otro campo) - la misma convención
-  que usa [mkdocs-material](https://squidfunk.github.io/mkdocs-material/).
-- **Cmd/Ctrl+K** también lo enfoca, desde cualquier lugar - incluso
-  mientras escribes en otro campo - la convención que comparten Algolia
-  DocSearch, Pagefind, VitePress y Docusaurus. El cuadro de búsqueda
-  muestra una pequeña pista `Ctrl K`/`⌘K` (detectada según la
-  plataforma) para que sea descubrible.
-- **`Escape`** cierra el desplegable de resultados y quita el foco del
-  cuadro de búsqueda.
+- **`/`** enfoca el cuadro de búsqueda de la barra lateral desde
+  cualquier lugar de la página (a menos que ya estés escribiendo en otro
+  campo) - la misma convención que usa
+  [mkdocs-material](https://squidfunk.github.io/mkdocs-material/). El
+  cuadro de búsqueda muestra una pequeña pista `Ctrl K`/`⌘K` (detectada
+  según la plataforma) para que el atajo de abajo sea descubrible.
+- **Cmd/Ctrl+K** en su lugar abre una superposición aparte, al estilo
+  paleta de comandos - una ventana modal centrada sobre un fondo
+  oscurecido, construida enteramente en JS (sin necesidad de cambios en
+  las plantillas de tema) y compartida por todos los temas incorporados.
+  Las flechas arriba/abajo mueven un resaltado entre los resultados,
+  **Enter** navega hasta el resultado resaltado, y **Escape** (o hacer
+  clic en el fondo oscurecido) la cierra - la misma convención de
+  "Búsqueda rápida"/⌘K que comparten Algolia DocSearch, Pagefind,
+  VitePress, Docusaurus y GitBook.
+- **`Escape`** también cierra el propio desplegable de resultados del
+  cuadro de la barra lateral y le quita el foco, de forma independiente
+  a la paleta de arriba.
 
-Cmd/Ctrl+K funciona de la misma forma para cada proveedor - el propio
-widget de `local` lo vincula directamente, `algolia` lo obtiene gratis
-del propio DocSearch (`keyboardShortcuts` es `true` por defecto), y
-`pagefind` lo obtiene conectado por `layout.bxm`, ya que `PagefindUI` no
-lo vincula por sí mismo.
+La paleta reutiliza exactamente el mismo índice `lunr` ya construido que
+construye el propio widget de la barra lateral, en lugar de obtener
+`search-index.json` una segunda vez - solo está disponible para `local`
+(el proveedor por defecto); `algolia` obtiene su propio Cmd+K gratis del
+propio DocSearch (`keyboardShortcuts` es `true` por defecto), y
+`pagefind` obtiene Cmd+K conectado por `layout.bxm` para enfocar su
+propio `PagefindUI`, ya que esa biblioteca no lo vincula por sí misma -
+ninguno de los dos abre la propia paleta de este módulo.
 
 ## Desactivarla
 

@@ -139,21 +139,27 @@ eigene `description`-Frontmatter setzt (siehe
 
 Steuert, wie jeder interne Link, Asset-Pfad und Navigationseintrag
 vorangestellt wird, und dient zugleich als kanonische URL der Website für
-`sitemap.xml` und `llms.txt`.
+`sitemap.xml`, `robots.txt`, `llms.txt` und das eigene
+`<link rel="canonical">`-Tag jeder Seite.
 
 - Leer gelassen oder `"/"` (Standard) - Links bleiben root-relativ
-  (`/page/`), und weder `sitemap.xml` noch eine `llms.txt` mit absoluten
-  URLs wird erzeugt (es gibt keine kanonische Domain, aus der sie gebaut
-  werden könnten).
+  (`/page/`), und weder `sitemap.xml`, eine `Sitemap:`-Zeile in
+  `robots.txt`, eine `llms.txt` mit absoluten URLs, noch ein
+  `<link rel="canonical">`-Tag wird erzeugt (es gibt keine kanonische
+  Domain, aus der sie gebaut werden könnten).
 - Ein reiner Pfad, z. B. `"my-docs"` oder `"/my-docs/"` - es wird
   angenommen, dass die Website unter diesem Unterpfad ausgeliefert wird,
   und jeder interne Link, Navigationseintrag und jedes Asset wird damit
-  vorangestellt (`/my-docs/page/`). Immer noch keine `sitemap.xml`, da es
-  weiterhin keine absolute Domain gibt.
+  vorangestellt (`/my-docs/page/`). Immer noch keine `sitemap.xml`/
+  Canonical-Tags, da es weiterhin keine absolute Domain gibt.
 - Eine vollständige URL, z. B. `"https://docs.example.com/"` - der
   Pfadanteil (hier `/`) wird genauso verwendet wie ein reiner Pfad, **und**
   `sitemap.xml` wird zur Build-Zeit mit der absoluten URL jeder nicht
-  versteckten Seite unter dieser Domain geschrieben.
+  versteckten Seite unter dieser Domain geschrieben, `robots.txt` erhält
+  eine `Sitemap:`-Zeile, die darauf zeigt, und jede Seite bekommt ihr
+  eigenes korrektes `<link rel="canonical">` (die eigene Seite eines
+  Versions-/Locale-Baums zeigt weiterhin auf *die URL dieses Baums selbst*,
+  nicht auf die der Haupt-Website).
 
 `llms.txt` (siehe [unten](#llmstxt)) wird immer geschrieben; sie bevorzugt
 lediglich eine absolute URL, wenn `baseURL` eine solche liefert.
@@ -174,6 +180,37 @@ Wird in der Wurzel der Website geschrieben, aber nur, wenn `baseURL` eine
 vollständige URL ist (siehe oben) - eine Sitemap braucht eine absolute
 Domain, um sinnvoll zu sein. Listet jede nicht versteckte Seite gemäß dem
 [sitemaps.org](https://www.sitemaps.org/)-Protokoll auf.
+
+## `robots.txt`
+
+Jeder Build schreibt eine `robots.txt` in die Wurzel der Website - kein
+Konfigurationsschlüssel nötig, es sei denn, du möchtest ihr standardmäßig
+erlaubendes Verhalten ändern:
+
+```json title="bxsites.json"
+{ "robots": false }
+```
+
+- `true` (Standard) - `Allow: /` für jeden Crawler, plus eine
+  `Sitemap:`-Zeile, die auf `sitemap.xml` zeigt, wenn `baseURL` eine
+  vollständige URL ist (siehe oben).
+- `false` - stattdessen `Disallow: /` für jeden Crawler, und keine
+  `Sitemap:`-Zeile - der übliche Bedarf "dieses Staging-/internes Deploy
+  überhaupt nicht indexieren lassen". Das ist nur ein *Crawler*-Opt-out,
+  keine Zugriffskontrolle - die Website bleibt für jeden, der die URL hat,
+  weiterhin vollständig erreichbar; siehe
+  [Deployment](guides/deployment.md#zugriff-auf-deine-website-einschränken),
+  falls du tatsächlich einschränken musst, wer überhaupt darauf zugreifen
+  kann.
+
+Brauchst du mehr als den Ein-/Aus-Schalter - bestimmte gesperrte Pfade,
+mehrere `Sitemap:`-Zeilen, ein `Crawl-delay`, Regeln pro User-Agent? Lege
+deine eigene `robots.txt` direkt neben `index.md` ab (`docs/robots.txt`,
+oder `src/robots.txt` für ein `src/`-basiertes Projekt - siehe
+[`docs/` oder `src/`](getting-started.md#seiten-hinzufügen)), und sie wird
+byte-für-byte durchgereicht statt der generierten, bei jedem Build - der
+`robots`-Schlüssel oben wird vollständig ignoriert, sobald diese Datei
+existiert.
 
 ## `theme`
 
