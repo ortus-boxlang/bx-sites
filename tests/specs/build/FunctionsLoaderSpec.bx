@@ -79,6 +79,50 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.InvalidFunctions" );
 			} );
 
+			it( "throws BxSites.InvalidFunctions when a function name collides with a reserved supporting variable", function() {
+				var dir = newDocsDir();
+				fileWrite( dir & "/functions.bxs", 'function page() { return "oops" }' );
+
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidFunctions" );
+			} );
+
+			it( "is safely repeatable on the same instance - an unchanged function survives a second load()", function() {
+				// Regression test: load() used to leave its own newly-included
+				// keys sitting in `variables` forever, so a second call on the
+				// same instance (BuildPipeline's own long-lived singleton,
+				// reused across every `bxSites serve` rebuild) would treat an
+				// unchanged function as "not new" and silently drop it.
+				var dir = newDocsDir();
+				fileWrite( dir & "/functions.bxs", 'function $greet( name ) { return "Hi " & arguments.name }' );
+				var first = loader.load( dir );
+				expect( first.keyExists( "$greet" ) ).toBeTrue();
+
+				fileWrite(
+					dir & "/functions.bxs",
+					'function $greet( name ) { return "Yo " & arguments.name }' & char( 10 ) &
+					'function $newone( name ) { return "New " & arguments.name }'
+				);
+				var second = loader.load( dir );
+				expect( second.keyExists( "$greet" ) ).toBeTrue();
+				expect( second[ "$greet" ]( "B" ) ).toBe( "Yo B" );
+				expect( second.keyExists( "$newone" ) ).toBeTrue();
+			} );
+
+			it( "leaves the instance usable after a load() that throws", function() {
+				var dir = newDocsDir();
+				fileWrite( dir & "/functions.bxs", 'function page() { return "oops" }' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidFunctions" );
+
+				var otherDir = newDocsDir();
+				fileWrite( otherDir & "/functions.bxs", 'function $greet( name ) { return "Hi " & arguments.name }' );
+				var result = loader.load( otherDir );
+				expect( result.keyExists( "$greet" ) ).toBeTrue();
+			} );
+
 		} );
 	}
 

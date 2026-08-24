@@ -55,7 +55,6 @@ class {
 	// actually writes.
 	variables.inlineCodePattern = createObject( "java", "java.util.regex.Pattern" ).compile( "(`+)(?:(?!\1)[^\n])*?\1" )
 	variables.matcherHelper = createObject( "java", "java.util.regex.Matcher" )
-	variables.functionScope = new "models.build.FunctionScope@bxsites"()
 
 	/**
 	 * Resolves every `{{ }}` expression in `markdown`.
@@ -206,23 +205,30 @@ class {
 
 		var args = parseArgs( arguments.rawArgs, arguments.vars, arguments.context )
 
-		// Routed through a disposable FunctionScope.bx instance, not called
-		// as a bare local variable holding a detached function value - see
-		// FunctionScope.bx's own docblock for why a magic function invoked
-		// the latter way loses the ability to bare-call a sibling function
-		// from the same functions.bxs (a private helper, or another
-		// `$`-prefixed one), and why binding onto *this* class's own
-		// `variables` scope directly would risk a project's own function
-		// name silently overwriting one of this class's real methods.
+		// A fresh FunctionScope.bx instance every call, not a single
+		// persistent one reused across calls - see FunctionScope.bx's own
+		// docblock for why a magic function invoked as a bare local
+		// variable holding a detached function value loses the ability to
+		// bare-call a sibling function from the same functions.bxs (a
+		// private helper, or another `$`-prefixed one), and why binding
+		// onto *this* class's own `variables` scope directly would risk a
+		// project's own function name silently overwriting one of this
+		// class's real methods. A shared instance would additionally risk
+		// one call's own `page`/`nav`/functions leaking into the next
+		// call's resolution whenever the next call's own bind() doesn't
+		// happen to overwrite every key the previous one set - a fresh
+		// instance every time removes that risk entirely, at the cost of
+		// one small extra allocation per `{{ $name(...) }}` call.
 		// `functionContext` (siteConfig/page/nav/etc.) is bound the same
 		// way, right alongside the functions themselves, so a magic
 		// function's own body can read them bare too - the same
 		// "supporting variables" a theme .bxm override already has in
 		// scope (ThemeRenderer.bx), just bound here instead of relying on
 		// this class's own `variables` scope already happening to have them.
-		variables.functionScope.bind( arguments.functionContext )
-		variables.functionScope.bind( arguments.functions )
-		var result = variables.functionScope.call( arguments.name, args )
+		var functionScope = new "models.build.FunctionScope@bxsites"()
+		functionScope.bind( arguments.functionContext )
+		functionScope.bind( arguments.functions )
+		var result = functionScope.call( arguments.name, args )
 		return "#result#"
 	}
 

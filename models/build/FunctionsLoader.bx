@@ -26,7 +26,15 @@
  * keys immediately before the include, then diffing after, isolates
  * exactly the new functions `functions.bxs` just contributed - dropping
  * this class's own `load()` method itself (always present before and
- * after), the only thing filtered out.
+ * after), the only thing filtered out. Every one of those new keys is
+ * deleted back out of `variables` before `load()` returns (in a
+ * `finally`, so it happens even when validation below throws) - without
+ * that cleanup, a second `load()` call on the *same* instance (this
+ * class is a long-lived singleton on `BuildPipeline`, reused across every
+ * `bxSites serve` rebuild) would see the first call's own leftover keys
+ * already sitting in `before`, silently treating an unchanged function
+ * across a real functions.bxs edit as "not new" and dropping it from the
+ * result entirely - `load()` needs to be safely repeatable on one instance.
  *
  * `load()` deliberately returns *every* function `functions.bxs` declares,
  * `$`-prefixed or not, rather than dropping the plain ones - a bare-name
@@ -39,6 +47,14 @@
  * its own file's private helpers once it's actually invoked - dropping the
  * plain ones here would silently break that for every consumer.
  *
+ * Also validates that no returned function name collides with one of the
+ * fixed "supporting variables" every consumer already binds alongside
+ * these functions (`page`/`nav`/`siteConfig`/etc. - see
+ * docs/guides/variables-and-functions.md's "Reserved names" section) -
+ * `ThemeRenderer.bx` binds every loaded function directly into its own
+ * live rendering scope, so a same-named private helper would otherwise
+ * silently overwrite real page/site context instead of failing loudly.
+ *
  * A project with no `functions.bxs` simply has no magic functions -
  * `load()` returns an empty struct, same "opt-in by presence" shape as
  * BlogAuthorsLoader.bx's `authors.yml`.
@@ -46,9 +62,25 @@
 class {
 
 	/**
+	 * The "supporting variables" every consumer of this class's own output
+	 * binds alongside the loaded functions (ThemeRenderer.bx's own
+	 * rendering scope; VariablesProcessor.bx's `functionContext` param) -
+	 * a `functions.bxs` function reusing one of these names would silently
+	 * shadow real page/site context instead of failing loudly, so `load()`
+	 * rejects it outright instead.
+	 */
+	variables.reservedNames = [
+		"page", "nav", "siteConfig", "themeDir", "basePath", "moduleAssetsDir",
+		"versions", "currentVersion", "locales", "currentLocale", "currentLocaleDir",
+		"strings", "requiredFiles", "stringsResolver"
+	]
+
+	/**
 	 * Loads `docs/functions.bxs` (or `src/functions.bxs`, whichever the
 	 * caller resolved) - every function it declares, `$`-prefixed or not
 	 * (see this class's own docblock for why the plain ones are kept too).
+	 * Safe to call more than once on the same instance (see this class's
+	 * own docblock) - each call leaves `variables` exactly as it found it.
 	 *
 	 * @docsDir Absolute path to the project's (or version/locale tree's own) docs/ directory
 	 *
@@ -73,15 +105,31 @@ class {
 		}
 
 		var fns = {}
+		var newKeys = []
 		for ( var key in variables ) {
-			if (
-				!before.contains( key )
-				&& ( isCustomFunction( variables[ key ] ) || isClosure( variables[ key ] ) )
-			) {
-				fns[ key ] = variables[ key ]
+			if ( !before.contains( key ) ) {
+				newKeys.append( key )
+				if ( isCustomFunction( variables[ key ] ) || isClosure( variables[ key ] ) ) {
+					fns[ key ] = variables[ key ]
+				}
 			}
 		}
-		return fns
+
+		try {
+			for ( var reserved in variables.reservedNames ) {
+				if ( fns.keyExists( reserved ) ) {
+					throw(
+						type    : "BxSites.InvalidFunctions",
+						message : "functions.bxs at [#functionsPath#] declares a function named [#reserved#], which collides with one of the built-in supporting variables every magic function already has access to - see docs/guides/variables-and-functions.md's ""Reserved names"" section"
+					)
+				}
+			}
+			return fns
+		} finally {
+			for ( var newKey in newKeys ) {
+				structDelete( variables, newKey )
+			}
+		}
 	}
 
 }

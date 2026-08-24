@@ -245,10 +245,16 @@ class {
 		variables.currentLocaleDir = listFindNoCase( "ltr,rtl", arguments.currentLocaleDir ) ? arguments.currentLocaleDir : "ltr"
 		variables.strings = variables.stringsResolver.resolve( variables.currentLocale, arguments.config.i18n ?: { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] } )
 
-		// Binds each `$`-prefixed magic function (FunctionsLoader.bx) directly
+		// Binds each loaded function (FunctionsLoader.bx - `$`-prefixed magic
+		// functions and their own private, non-`$` helpers alike) directly
 		// into this instance's own `variables` scope, so `layout.bxm`/`page.bxm`
 		// (or a project's own `theme/` override) can call `$name(...)` bare,
 		// exactly like they already read `variables.page`/`variables.siteConfig`.
+		// Safe to overwrite unconditionally - FunctionsLoader.load() itself
+		// already rejects a function name that collides with one of this
+		// method's own reserved context keys (`page`/`nav`/`siteConfig`/etc. -
+		// see its own `reservedNames`), so nothing loaded here can ever
+		// silently shadow real page/site context.
 		for ( var fnName in arguments.functions ) {
 			variables[ fnName ] = arguments.functions[ fnName ]
 		}
