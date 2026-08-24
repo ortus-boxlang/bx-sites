@@ -1884,7 +1884,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileRead( root & "/site/index.html" ) ).toInclude( "Renamed Site" );
 			} );
 
-			it( "gives every page a correct <link rel=\"canonical\"> when baseURL is a full URL, scoped to its own tree", function() {
+			it( 'gives every page a correct <link rel="canonical"> when baseURL is a full URL, scoped to its own tree', function() {
 				var root = newTempDirWithConfig( '{"name":"Test Site","baseURL":"https://example.com/docs/","theme":{"name":"bootstrap"},"i18n":{"defaultLocale":{"code":"en","label":"English"},"locales":[{"code":"de","label":"Deutsch"}]}}' );
 				fileWrite( root & "/docs/index.md", "Home" );
 				directoryCreate( root & "/docs/i18n/de", true, true );
@@ -1900,13 +1900,13 @@ class extends="testbox.system.BaseSpec" {
 				expect( htmlDecode( fileRead( root & "/site/de/index.html" ) ) ).toInclude( '<link rel="canonical" href="https://example.com/docs/de/index.html">' );
 			} );
 
-			it( "omits <link rel=\"canonical\"> entirely when baseURL has no absolute domain", function() {
+			it( 'omits <link rel="canonical"> entirely when baseURL has no absolute domain', function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Home" );
 
 				pipeline.build( root );
 
-				expect( fileRead( root & "/site/index.html" ) ).notToInclude( "rel=\"canonical\"" );
+				expect( fileRead( root & "/site/index.html" ) ).notToInclude( 'rel="canonical"' );
 			} );
 
 			private string function newTempDirWithConfig( required string configJson ) {
