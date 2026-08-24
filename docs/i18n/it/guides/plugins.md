@@ -7,7 +7,7 @@ tags: [guide, plugin]
 
 # Plugin
 
-Un plugin di BX Sites non è altro che un altro modulo BoxLang - il proprio
+Un plugin di BxSites non è altro che un altro modulo BoxLang - il proprio
 `box.json` + `ModuleConfig.bx`, installato come fratello di `bx-sites`
 nello stesso runtime (`box install` nel progetto, allo stesso modo in cui
 lo sono già `bx-markdown`/`bx-esapi`). Nessuna API di plugin da
@@ -53,7 +53,7 @@ CLI.
 Un modulo plugin necessita esattamente di una cosa oltre al normale
 `box.json`/`ModuleConfig.bx` che già ha qualsiasi modulo BoxLang: una
 classe `models/BxSitesPlugin.bx`. Ogni metodo su di essa è opzionale -
-implementa solo gli hook di cui hai bisogno, BX Sites verifica la presenza
+implementa solo gli hook di cui hai bisogno, BxSites verifica la presenza
 di ciascuno prima di chiamarlo:
 
 ```bx
@@ -67,7 +67,7 @@ class {
 
 	string function onPageMarkdown( required string markdown, required struct page, required struct config ) {
 		// Mutate a page's raw markdown before conversion - the same
-		// pre-processing seam BX Sites' own content tabs/math/code
+		// pre-processing seam BxSites' own content tabs/math/code
 		// annotations use internally (TabsProcessor.bx et al.).
 		return arguments.markdown
 	}
@@ -92,12 +92,12 @@ class {
 
 Gli hook girano nell'ordine dell'array `plugins` proprio di
 `bxsites.yaml`, e (tranne `onBuildComplete`) il valore di ritorno di
-ognuno sostituisce il valore che vede l'hook successivo (o BX Sites
+ognuno sostituisce il valore che vede l'hook successivo (o BxSites
 stesso) - un plugin deve restituire ciò che ha ricevuto solo se non ha
 nulla da cambiare.
 
 `onPageMarkdown`/`onPageHtml` girano una volta per pagina, per ogni
-albero di documenti che BX Sites compila (l'albero `docs/` principale e
+albero di documenti che BxSites compila (l'albero `docs/` principale e
 ogni albero `docs/versions/<name>/`). `onConfig`/`onNav`/
 `onBuildComplete` vengono applicati anche dal verbo autonomo
 `search-index` dove è rilevante (`onConfig`, dato che può cambiare

@@ -90,7 +90,7 @@ conjunto de funciones de página:
   sin configuración necesaria. Consulta
   [Primeros Pasos](../getting-started.md#descargar-una-página-como-markdown).
 - **Un pie de página opcional** (copyright, enlaces `social`, un crédito
-  "Built with BX Sites") cuando el `footer` de `bxsites.yaml` es `true`.
+  "Built with BxSites") cuando el `footer` de `bxsites.yaml` es `true`.
   Consulta [Configuración](../configuration.md#footer).
 - **Un selector de versión**, que aparece automáticamente en cuanto un
   proyecto tiene una carpeta `docs/versions/` con más de una versión en
@@ -437,7 +437,7 @@ misma forma en que se resuelve cualquier otra imagen.
 ## Sobrescribir un tema
 
 Coloca tu propio `layout.bxm` + `page.bxm` (y opcionalmente `search.bxm` /
-`assets/`) en una carpeta `theme/` en la raíz de tu proyecto. BX Sites
+`assets/`) en una carpeta `theme/` en la raíz de tu proyecto. BxSites
 prefiere una sobrescritura `theme/` a nivel de proyecto tanto sobre un
 tema instalado en `themes/<name>/` como sobre cualquier tema incorporado,
 siempre que satisfaga el contrato anterior - los temas
@@ -493,7 +493,7 @@ my-project/
    `page.bxm` por debajo.
 
 Una carpeta `theme/` de proyecto es todo o nada, sin embargo - en cuanto
-BX Sites encuentra una, se usa en lugar del tema incorporado por completo,
+BxSites encuentra una, se usa en lugar del tema incorporado por completo,
 así que igual necesita su propio `layout.bxm` + `page.bxm` aunque lo
 único que hayas cambiado sea `assets/style.css` (una carpeta a la que le
 falte cualquiera de los dos falla de inmediato con `BxSites.InvalidTheme`

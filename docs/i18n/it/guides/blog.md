@@ -10,7 +10,7 @@ tags: [guide, blog]
 Un blog è un'altra funzionalità per convenzione, con la stessa forma di
 [versioni](../configuration.md#versionamento)/[i18n](i18n.md) o
 dell'[indice dei tag](../getting-started.md#add-pages) - metti i post
-sotto `docs/blog/posts/`, e BX Sites compila `/blog/` (paginato), una
+sotto `docs/blog/posts/`, e BxSites compila `/blog/` (paginato), una
 pagina categoria per ogni categoria, una pagina archivio per ogni anno
 solare, una pagina autore per ogni autore, un feed RSS per categoria più
 uno per l'intero blog, e una pagina `/blog/stats/`, senza alcuna
@@ -63,7 +63,7 @@ out of the excerpt shown on `/blog/` and category pages, but still renders
 in full on the post's own page.
 ```
 
-- `date` (obbligatorio) - qualsiasi formato che BX Sites sa interpretare
+- `date` (obbligatorio) - qualsiasi formato che BxSites sa interpretare
   (`2026-08-15`, o una data-ora completa). Determina l'ordine proprio del
   post (più recente per primo) e il suo
   `<pubDate>`/`article:published_time`.
@@ -81,7 +81,7 @@ in full on the post's own page.
   nell'indice principale `/tags/` insieme a ogni altra pagina taggata.
 - `summary` - un estratto di una riga mostrato su `/blog/`/le pagine
   categoria e nel feed RSS, usato quando un post non ha un marcatore
-  `<!-- more -->`. Senza nessuno dei due, BX Sites ricade su un
+  `<!-- more -->`. Senza nessuno dei due, BxSites ricade su un
   troncamento in testo semplice del corpo stesso del post.
 - `image` - un'immagine in evidenza (un percorso relativo a
   `docs/assets/`, o un URL completo) - mostrata in cima al post e come

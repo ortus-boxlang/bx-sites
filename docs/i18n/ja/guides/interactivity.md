@@ -7,7 +7,7 @@ tags: [ガイド, Alpine, インタラクティビティ]
 
 # Alpine.js によるインタラクティビティ
 
-BX Sites がビルドするすべてのページは、すでに [Alpine.js](https://alpinejs.dev/)
+BxSites がビルドするすべてのページは、すでに [Alpine.js](https://alpinejs.dev/)
 を読み込んでいます - すべての組み込みテーマで、ダーク/ライトモード切替と
 言語ドロップダウンを動かしているのがこれです。同じ Alpine インスタンスは、
 あなた自身のページコンテンツからも無料で使えます。`bxsites.yaml` で切り替える

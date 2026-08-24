@@ -7,7 +7,7 @@ tags: [guides, alpine, interactivity]
 
 # Interactivity with Alpine.js
 
-Every page built by BX Sites already loads [Alpine.js](https://alpinejs.dev/)
+Every page built by BxSites already loads [Alpine.js](https://alpinejs.dev/)
 - it's what powers the built-in dark-mode toggle and language dropdown in
 every built-in theme. That same Alpine instance is available
 to your own page content too, for free: no `bxsites.yaml` setting to flip,
