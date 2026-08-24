@@ -9,6 +9,11 @@
  * `window.__BXSITES_BASE_PATH__` (set inline by layout.bxm from
  * BaseUrlResolver's `basePath`) prefixes both the index fetch and every
  * result link, so search still works when a site is hosted from a sub-path.
+ * `window.__BXSITES_SEARCH_NO_RESULTS__` (set inline by layout.bxm from
+ * StringsResolver's own resolved `searchNoResults`) is this locale's own
+ * "no results" text, same reasoning - a static asset shared by every theme
+ * can't itself resolve per-locale strings, so the page that includes it hands
+ * the already-resolved value over.
  *
  * `/` and Cmd/Ctrl+K both focus the search box from anywhere on the page;
  * a theme's `.bxsites-search-kbd` badge (if it renders one) gets its text
@@ -17,6 +22,10 @@
 ( function () {
 	function basePath() {
 		return window.__BXSITES_BASE_PATH__ || "/";
+	}
+
+	function noResultsText() {
+		return window.__BXSITES_SEARCH_NO_RESULTS__ || "No results found.";
 	}
 
 	function init() {
@@ -85,7 +94,7 @@
 			if ( !hits.length ) {
 				var empty = document.createElement( "li" );
 				empty.className = "bxsites-search-empty";
-				empty.textContent = "No results found.";
+				empty.textContent = noResultsText();
 				results.appendChild( empty );
 				results.classList.add( "bxsites-search-open" );
 				return;

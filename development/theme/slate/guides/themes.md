@@ -156,6 +156,11 @@ plugin) - it's pure files, so there's no separate activation step the way
 `install:plugin` has; setting `theme.name` is the only wiring needed. See
 [`install:theme`](../cli-reference.md#installtheme) in the CLI reference.
 
+Starting from a theme built for a different static site generator
+instead? See [Importing a theme](theme-import.md) - `theme:import`
+mechanically converts an mkdocs/jekyll/hugo theme's own template files
+into a best-effort `themes/<name>/` scaffold.
+
 ## Air-gapped/offline sites
 
 A built site works with no internet access at all by default, for

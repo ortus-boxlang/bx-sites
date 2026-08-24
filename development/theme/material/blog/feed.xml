@@ -11,16 +11,16 @@
 		<dc:creator>Luis Majano</dc:creator>
 		<category>Migration</category>
 		<category>Getting Started</category>
-		<description>The single biggest thing standing between a team and switching docs tools is almost never the tool itself - it's the migration. Nobody wants to hand-convert three hundred Markdown files and their nav structure. bxSites migrate exists specifically to remove that excuse, for the two sources I hear about most: GitBook and mkdocs.</description>
+		<description>The single biggest thing standing between a team and switching docs tools is almost never the tool itself - it&#x27;s the migration. Nobody wants to hand-convert three hundred Markdown files and their nav structure. bxSites migrate exists specifically to remove that excuse, for the two sources I hear about most&#x3a; GitBook and mkdocs.</description>
 	</item>
 	<item>
-		<title>Never Lose a Reader: Versions and Translations</title>
+		<title>Never Lose a Reader&#x3a; Versions and Translations</title>
 		<link>https://ortus-boxlang.github.io/bx-sites/development/theme/material/blog/never-lose-a-reader-versions-and-translations/</link>
 		<guid isPermaLink="true">https://ortus-boxlang.github.io/bx-sites/development/theme/material/blog/never-lose-a-reader-versions-and-translations/</guid>
 		<pubDate>Tue, 04 Aug 2026 00:00:00 +0000</pubDate>
 		<dc:creator>Luis Majano</dc:creator>
 		<category>Versioning &amp; i18n</category>
-		<description>Two of the fastest ways to lose a documentation reader: they land on docs for the wrong version of your software, or they land on a page in a language they don't read well and there's no obvious way out. BX Sites handles both the same way it handles most things - a folder convention, no config flag to remember to flip.</description>
+		<description>Two of the fastest ways to lose a documentation reader&#x3a; they land on docs for the wrong version of your software, or they land on a page in a language they don&#x27;t read well and there&#x27;s no obvious way out. BX Sites handles both the same way it handles most things - a folder convention, no config flag to remember to flip.</description>
 	</item>
 	<item>
 		<title>Search That Just Works</title>
@@ -29,7 +29,7 @@
 		<pubDate>Fri, 24 Jul 2026 00:00:00 +0000</pubDate>
 		<dc:creator>Luis Majano</dc:creator>
 		<category>Search</category>
-		<description>Search is one of those features that either quietly works or loudly doesn't, and for a static docs site it's easy to end up with the latter - no server to query, so search either gets bolted on as a third-party widget or skipped entirely. BX Sites takes the same approach mkdocs does by default: fully static, fully client-side, no server or external service required.</description>
+		<description>Search is one of those features that either quietly works or loudly doesn&#x27;t, and for a static docs site it&#x27;s easy to end up with the latter - no server to query, so search either gets bolted on as a third-party widget or skipped entirely. BX Sites takes the same approach mkdocs does by default&#x3a; fully static, fully client-side, no server or external service required.</description>
 	</item>
 	<item>
 		<title>Pick Your Theme</title>
@@ -39,7 +39,7 @@
 		<dc:creator>Luis Majano</dc:creator>
 		<category>Getting Started</category>
 		<category>Themes</category>
-		<description>One question I get a lot after someone runs bxSites new for the first time: &amp;quot;which theme should I actually pick?&amp;quot; The honest answer is that it barely matters at the feature level - all three built-in themes ship the exact same set of capabilities. It's purely a question of which one matches your project's own visual identity.</description>
+		<description>One question I get a lot after someone runs bxSites new for the first time&#x3a; &amp;quot&#x3b;which theme should I actually pick&#x3f;&amp;quot&#x3b; The honest answer is that it barely matters at the feature level - all three built-in themes ship the exact same set of capabilities. It&#x27;s purely a question of which one matches your project&#x27;s own visual identity.</description>
 	</item>
 	<item>
 		<title>Get Your Docs Live in 10 Minutes</title>
@@ -48,6 +48,6 @@
 		<pubDate>Wed, 01 Jul 2026 00:00:00 +0000</pubDate>
 		<dc:creator>Luis Majano</dc:creator>
 		<category>Getting Started</category>
-		<description>I've written a lot of documentation tools over the years, and the thing I keep coming back to with BX Sites is how little ceremony is involved in going from nothing to a real, browsable static site. No config wizard, no plugin marketplace to shop through first - just a folder of Markdown and one command.</description>
+		<description>I&#x27;ve written a lot of documentation tools over the years, and the thing I keep coming back to with BX Sites is how little ceremony is involved in going from nothing to a real, browsable static site. No config wizard, no plugin marketplace to shop through first - just a folder of Markdown and one command.</description>
 	</item>
 </channel></rss>

@@ -4,12 +4,12 @@
 	<link>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/blog/category/versioning---i18n/</link>
 	<description>Blog posts from BX Sites</description>
 	<item>
-		<title>Never Lose a Reader: Versions and Translations</title>
+		<title>Never Lose a Reader&#x3a; Versions and Translations</title>
 		<link>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/blog/never-lose-a-reader-versions-and-translations/</link>
 		<guid isPermaLink="true">https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/blog/never-lose-a-reader-versions-and-translations/</guid>
 		<pubDate>Tue, 04 Aug 2026 00:00:00 +0000</pubDate>
 		<dc:creator>Luis Majano</dc:creator>
 		<category>Versioning &amp; i18n</category>
-		<description>Two of the fastest ways to lose a documentation reader: they land on docs for the wrong version of your software, or they land on a page in a language they don't read well and there's no obvious way out. BX Sites handles both the same way it handles most things - a folder convention, no config flag to remember to flip.</description>
+		<description>Two of the fastest ways to lose a documentation reader&#x3a; they land on docs for the wrong version of your software, or they land on a page in a language they don&#x27;t read well and there&#x27;s no obvious way out. BX Sites handles both the same way it handles most things - a folder convention, no config flag to remember to flip.</description>
 	</item>
 </channel></rss>

@@ -317,6 +317,30 @@ albero `docs/versions/<name>/` deduce sempre la propria nav dalla propria
 struttura di cartelle, anche quando l'albero principale ne ha una
 esplicita.
 
+## `redirects`
+
+`[]` (il valore predefinito) - redirect `from`/`to` per URL vecchi validi
+per tutto il sito, applicati solo all'albero principale:
+
+```json title="bxsites.json" linenums="1"
+{
+	"redirects": [
+		{ "from": "old-guide", "to": "guides/new-guide/" }
+	]
+}
+```
+
+- `redirects[].from` - il vecchio segmento URL (senza slash
+  iniziale/finale, senza estensione) su cui viene scritto uno stub di
+  redirect statico
+- `redirects[].to` - un percorso relativo alla radice (risolto rispetto a
+  `baseURL`) oppure un URL `https://` completo
+
+Il proprio `redirect_from` nel frontmatter di una pagina è l'alternativa
+per pagina/per albero (funziona anche dentro un albero di
+versione/locale) - consulta [Redirect](guides/redirects.md) per il
+quadro completo, incluso come `page:rename` lo aggiunge automaticamente.
+
 ## `markdown`
 
 Inoltrato così com'è alle opzioni del modulo
@@ -618,15 +642,21 @@ automaticamente una volta che la sua cartella esiste; `i18n` fornisce
 solo la sua etichetta di visualizzazione/direzione per il selettore di
 lingua.
 
-- `i18n.defaultLocale` - `{ "code", "label" }` per l'albero `docs/`
-  regolare del progetto, con valore predefinito
+- `i18n.defaultLocale` - `{ "code", "label", "strings" }` per l'albero
+  `docs/` regolare del progetto, con valore predefinito
   `{ "code": "en", "label": "English" }`. Va impostato solo quando la tua
   locale predefinita non è l'inglese.
 - `i18n.locales` - `[]` (il valore predefinito) - un array di
-  `{ "code", "label", "dir" }` per ogni altra locale. `code` funge sia da
-  nome della cartella `docs/i18n/<code>/` sia da prefisso dell'URL
-  compilato - solo lettere/cifre/trattini (`es`, `pt-BR`, `zh-Hans`).
-  `dir` è `"ltr"` (il valore predefinito) oppure `"rtl"`.
+  `{ "code", "label", "dir", "strings" }` per ogni altra locale. `code`
+  funge sia da nome della cartella `docs/i18n/<code>/` sia da prefisso
+  dell'URL compilato - solo lettere/cifre/trattini (`es`, `pt-BR`,
+  `zh-Hans`). `dir` è `"ltr"` (il valore predefinito) oppure `"rtl"`.
+  `strings` sovrascrive le stringhe UI dell'interfaccia del tema proprie
+  di quella locale (placeholder della ricerca, "In questa pagina," ...) -
+  consulta [Internazionalizzazione](guides/i18n.md#interfaccia-del-tema-stringhe-ui)
+  per l'elenco completo delle chiavi; `de`/`es`/`it`/`ja` includono già
+  una traduzione integrata, quindi `strings` serve solo per sovrascrivere
+  una chiave o aggiungere un'altra locale.
 
 ```json
 {
