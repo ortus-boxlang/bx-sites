@@ -162,8 +162,8 @@ Abschluss geprüft wird, ob es den `ThemeProvider`-Vertrag unten erfüllt.
 Ein Projekt kann auf diese Weise mehrere installierte Themes
 nebeneinander vorhalten und rein per Name zwischen ihnen wechseln:
 
-```json title="bxsites.json"
-{ "theme": { "name": "bx-sites-theme-blog1" } }
+```yaml title="bxsites.yaml"
+theme: { name: bx-sites-theme-blog1 }
 ```
 
 Ein Theme braucht überhaupt keine BoxLang-Modul-/Klassenlader-Beteiligung
@@ -188,7 +188,7 @@ Bootstraps eigenes CSS/JS, highlight.js, Alpine.js und
 lunr.js sind alle mit diesem Modul vendoriert (`resources/assets/vendor/`)
 und werden zur Build-Zeit direkt nach `site/assets/vendor/` kopiert -
 nirgends im erzeugten HTML taucht dafür ein CDN-`<script>`-/`<link>`-Tag
-auf. Aktivierst du den Schlüssel `mermaid` in `bxsites.json`, wird Mermaid
+auf. Aktivierst du den Schlüssel `mermaid` in `bxsites.yaml`, wird Mermaid
 auf dieselbe Weise vendoriert - sein `mermaid.min.js`-Bundle wird nach
 `site/assets/vendor/mermaid/` kopiert, und jedes integrierte Theme lädt es
 von dort, sodass Diagramme weiterhin ganz ohne ausgehende Anfragen
@@ -205,7 +205,7 @@ du sie selbst aktivierst:
   nach, `elk-api.js`, von jsDelivr - aber nur für Diagrammtypen, die den
   `elk`-Layout-Algorithmus verwenden; das vendorierte `mermaid.min.js`
   rendert jeden anderen Diagrammtyp vollständig eigenständig.
-- Die Option `math` in `bxsites.json` lädt KaTeX (sowohl dessen JS als auch
+- Die Option `math` in `bxsites.yaml` lädt KaTeX (sowohl dessen JS als auch
   die eigenen Font-Dateien) von einem CDN, wenn sie aktiviert ist.
 - `searchProvider.provider: "algolia"` und `analytics.provider: "google"`
   sprechen naturgemäß mit einer gehosteten API/einem Tracking-Endpunkt -
@@ -285,14 +285,14 @@ Ein Theme ist einfach ein Ordner mit:
   `variables.themeDir` und `variables.basePath` im Scope, und bindet das
   benachbarte `page.bxm` über `#variables.themeDir#/page.bxm` ein.
   `variables.basePath` ist immer ein root-relativer, auf `/` endender Pfad
-  (standardmäßig `/`, `/my-docs/`, wenn `baseURL` in `bxsites.json` das
+  (standardmäßig `/`, `/my-docs/`, wenn `baseURL` in `bxsites.yaml` das
   überschreibt) - stelle diesen jedem internen `href`/`src` voran, statt
   ein führendes `/` fest zu codieren, damit das Theme auch funktioniert,
   wenn die Website aus einem Unterpfad ausgeliefert wird.
 - **`page.bxm`** (erforderlich) - der Artikelinhalt. Rendert
   `variables.page.contentHtml` - das bereits konvertierte Markdown.
 - **`search.bxm`** (optional) - das Markup der Suchbox, von `layout.bxm`
-  nur eingebunden, wenn `search` in `bxsites.json` `true` ist. Siehe
+  nur eingebunden, wenn `search` in `bxsites.yaml` `true` ist. Siehe
   [Suche](search.md).
 - **`assets/`** (optional) - Theme-CSS/JS, zur Build-Zeit nach
   `site/assets/theme/` kopiert.
@@ -325,13 +325,13 @@ Für eine kleine Farb-/Schriftanpassung ist ein ganzes Theme zu forken
 Overkill - jedes integrierte Theme liest seine Palette aus einer Handvoll
 CSS-Custom-Properties auf `:root`, erneut deklariert unter
 `[data-theme="dark"]` für den Dunkelmodus. Das
-[`extraCss`](../configuration.md#extracss--extrajs) von `bxsites.json` wird
+[`extraCss`](../configuration.md#extracss--extrajs) von `bxsites.yaml` wird
 *nach* dem eigenen Stylesheet des Themes geladen, sodass eine erneute
 Deklaration mit gleicher Spezifität darin gewinnt, ohne `resources/themes/`
 überhaupt anzurühren:
 
-```json title="bxsites.json"
-{ "extraCss": [ "assets/brand.css" ] }
+```yaml title="bxsites.yaml"
+extraCss: [ assets/brand.css ]
 ```
 
 ```css title="docs/assets/brand.css" linenums="1"
@@ -481,7 +481,7 @@ my-project/
 
 3. Führe `bxSites build` aus (oder `serve` während der
    Iteration) - BX Sites übernimmt `theme/` automatisch, keine Änderung an
-   `bxsites.json` nötig (ein projektweiter `theme/`-Ordner hat immer
+   `bxsites.yaml` nötig (ein projektweiter `theme/`-Ordner hat immer
    Vorrang vor dem im `theme.name` genannten integrierten Theme). Alles,
    was du nicht angefasst hast - Navigations-Rendering, Suche, der
    Dunkelmodus-Umschalter, Code-Annotationen - funktioniert genau so
@@ -497,7 +497,7 @@ Ordner, dem eine der beiden fehlt, schlägt sofort mit
 `BxSites.InvalidTheme` fehl, statt stillschweigend zurückzufallen). Für
 eine reine CSS-Anpassung ohne `.bxm`, nutze stattdessen
 [`extraCss`](#farben-anpassen-ohne-ein-theme-zu-überschreiben) von oben - es
-legt sich über das Theme, das `bxsites.json` benennt, ganz ohne
+legt sich über das Theme, das `bxsites.yaml` benennt, ganz ohne
 `theme/`-Ordner. `theme/` ist für den Fall, dass du auch das Markup
 selbst ändern musst, siehe als Nächstes.
 
@@ -509,7 +509,7 @@ keine Such-UI - um genau zu zeigen, was erforderlich ist im Vergleich zu
 dem, was die integrierten Themes zusätzlich bieten. Speichere beide als
 `theme/layout.bxm` und `theme/page.bxm` in deinem Projekt - ein
 projektweiter `theme/`-Ordner wird automatisch übernommen (wie oben),
-keine Änderung an `bxsites.json` nötig:
+keine Änderung an `bxsites.yaml` nötig:
 
 ```bx title="theme/layout.bxm" linenums="1"
 <!-- theme/layout.bxm -->
@@ -565,7 +565,7 @@ Das ist ein vollständiges, funktionierendes Theme -
 (Syntax-Hervorhebung, Admonitions, Tabs, Mathematik und alles), es bleibt
 also nichts mehr zu parsen, nur noch zu layouten. Von hier aus füge
 hinzu, was die integrierten Themes haben und du tatsächlich willst:
-`search.bxm` (nur eingebunden, wenn `search` in `bxsites.json` `true` ist
+`search.bxm` (nur eingebunden, wenn `search` in `bxsites.yaml` `true` ist
 - siehe [Suche](search.md)), einen Dunkelmodus-Umschalter (kopiere das
 `x-data`/`x-init`-Alpine.js-Paar vom `<body>`-Tag von
 `resources/themes/bootstrap/layout.bxm` und den passenden

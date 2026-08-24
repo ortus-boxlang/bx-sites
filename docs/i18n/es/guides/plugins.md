@@ -60,7 +60,7 @@ de llamarlo:
 class {
 
 	struct function onConfig( required struct config ) {
-		// Mutate/return the site config, right after bxsites.json is loaded.
+		// Mutate/return the site config, right after bxsites.yaml is loaded.
 		return arguments.config
 	}
 
@@ -90,7 +90,7 @@ class {
 ```
 
 Los hooks se ejecutan en el orden propio del array `plugins` de
-`bxsites.json`, y (excepto `onBuildComplete`) el valor de retorno de cada
+`bxsites.yaml`, y (excepto `onBuildComplete`) el valor de retorno de cada
 uno reemplaza el valor que ve el siguiente hook (o el propio BX Sites) -
 un plugin solo necesita devolver lo que recibió si no tiene nada que
 cambiar.
@@ -131,7 +131,7 @@ un ejemplo trabajado de la estructura de carpetas:
 
 ```
 hello-plugin/
-├── box.json              # boxlang.moduleName is what bxsites.json's [plugins] references
+├── box.json              # boxlang.moduleName is what bxsites.yaml's [plugins] references
 ├── ModuleConfig.bx        # a normal, otherwise-empty BoxLang module descriptor
 └── models/
     └── BxSitesPlugin.bx    # onPageHtml() + onBuildComplete()
@@ -140,6 +140,6 @@ hello-plugin/
 ## Errores
 
 - `BxSites.PluginNotFound` - un nombre en el array `plugins` de
-  `bxsites.json` no es un módulo de BoxLang instalado/activado.
+  `bxsites.yaml` no es un módulo de BoxLang instalado/activado.
 - `BxSites.InvalidPlugin` - el módulo existe, pero no tiene una clase
   `models/BxSitesPlugin.bx`.
