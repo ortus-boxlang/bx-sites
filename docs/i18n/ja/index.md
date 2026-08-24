@@ -54,6 +54,16 @@ RSS フィード・投稿ごとのアイキャッチ画像が設定不要で手�
 プラグインは単なる別の BoxLang モジュールです - 専用の Plugin API を学ぶ
 必要はありません。
 :::
+::: card title="ForgeBox で公開されるプラグイン & テーマ" icon="phosphor-duotone:package" href="guides/plugins.md#公開済みプラグインのインストール"
+`install:plugin` と `install:theme` は、公開済みパッケージをプロジェクトに
+直接ダウンロードします - ForgeBox の `bxsites-plugins` と `bxsites-themes`
+から探せます。
+:::
+::: card title="既存のテーマをインポート" icon="phosphor-duotone:arrows-left-right" href="guides/theme-import.md"
+`theme:import --source=mkdocs|jekyll|hugo` は、他のジェネレーター自身の
+テーマテンプレートを bx-sites のスキャフォールドに変換します - ゼロから
+書き直す代わりに、そこから作り込めます。
+:::
 ::: card title="GitBook または mkdocs から移行" icon="phosphor-duotone:swap" href="guides/index.md"
 `bxSites migrate --source=... --from=gitbook|mkdocs` コマンドで、既存の
 GitBook エクスポートまたは mkdocs プロジェクトを、一つのコマンドで動作する

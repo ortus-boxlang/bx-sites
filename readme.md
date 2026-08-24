@@ -16,7 +16,9 @@
 
 <p>&nbsp;</p>
 
-Static documentation site generator for BoxLang, built on bx-markdown - in the spirit of [mkdocs](https://www.mkdocs.org/): write Markdown in `docs/` (or `src/`, if that reads better for your project), get a themed, searchable static site out. Already on GitBook? `bxSites migrate --source=...` converts an export straight into a bx-sites project - see [Migrating from GitBook](docs/guides/migrating-from-gitbook.md).
+Write your content in Markdown. BX Sites turns it into a complete, themed, searchable website - ready to deploy.
+
+It's a general-purpose static site generator, not just for documentation - docs, a blog, a marketing site, a knowledge base, anything Markdown can express, all built the same way, with the same themes, search and i18n. Built in BoxLang on top of [bx-markdown](https://github.com/ortus-boxlang/bx-markdown), in the spirit of [mkdocs](https://www.mkdocs.org/): point it at a `docs/` folder (or `src/`, if that reads better for your project) and get a themed, searchable static site out. Already on GitBook or mkdocs? `bxSites migrate --source=...` converts an existing export/project straight into a bx-sites one - see [Migrating from GitBook](docs/guides/migrating-from-gitbook.md) or [Migrating from mkdocs](docs/guides/migrating-from-mkdocs.md).
 
 ----
 
@@ -70,7 +72,7 @@ boxlang bxSites <verb> [options]
 | `serve` | Build and serve the site locally with live reload (needs bx-markdown, bx-esapi, bx-yaml and bx-image too) |
 | `search-index` | Rebuild `site/search-index.json` standalone (also runs automatically during `build`) |
 | `clean` | Remove `site/` and any build cache |
-| `migrate` | Convert a GitBook export (`SUMMARY.md` + `.md` files) into `docs/` + `nav.json` |
+| `migrate` | Convert an existing GitBook export or mkdocs project into `docs/` + `nav.json` (`--from=gitbook`, the default, or `--from=mkdocs`) |
 | `stats` | Read-only summary report on a built `site/`: page/word counts, versions/locales, blog, tags, search index, site size |
 | `doctor` | Environment/config health check: JVM, `docs/` (or `src/`), config validity, required modules, theme override |
 | `post:new` | Scaffold a new blog post at `docs/blog/posts/<slug>.md` |
