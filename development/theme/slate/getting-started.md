@@ -235,8 +235,11 @@ bxSites serve
 Builds the project, serves `site/` at `http://127.0.0.1:8080/`, and
 rebuilds automatically whenever you save a change under `docs/`, your
 `bxsites.yaml`/`.json` site config, or a project-level `theme/` override -
-your browser reloads on its own. Pass `--port=3000` or `--host=0.0.0.0` to
-change how it binds.
+your browser reloads on its own. Reacts to the save itself (a native
+BoxLang file watcher, not a poll loop) and only reconverts the page(s) you
+actually changed, reusing everything else from the last build - so saving
+one page stays fast even on a large site. Pass `--port=3000` or
+`--host=0.0.0.0` to change how it binds.
 
 ## Clean
 
