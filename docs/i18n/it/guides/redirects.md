@@ -74,7 +74,7 @@ pagina.
 
 ## `page:rename` lo imposta per te
 
-Rinominare/spostare una pagina con `page:rename` aggiunge automaticamente
+Rinominare/spostare una pagina con [`page:rename`](../cli-reference.md#pagerename) aggiunge automaticamente
 il suo vecchio percorso al proprio `redirect_from` della pagina spostata
 - oltre a riscrivere ogni link Markdown relativo che vi puntava, anche il
 vecchio URL stesso continua a funzionare:
