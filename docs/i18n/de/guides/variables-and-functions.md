@@ -127,6 +127,53 @@ aufrufen, ganz ohne Präfix - auf dieselbe Weise, wie es bereits
 <p class="build-banner">#$shout( 'built with boxlang' )#</p>
 ```
 
+### Kontextvariablen
+
+Der eigene Rumpf jeder magischen Funktion kann außerdem einen festen Satz
+von "unterstützenden Variablen" lesen - bar, ganz ohne benötigtes Argument -
+unabhängig davon, ob sie aus `{{ }}` in Markdown oder bar aus einem
+Theme-Override aufgerufen wird:
+
+| Variable | Was sie ist |
+|---|---|
+| `siteConfig` | Die eigene `bxsites.yaml`-Konfiguration der Site (bereits mit Standardwerten versehen/validiert) |
+| `page` | Die aktuelle Seite (siehe den Hinweis unten - nicht jedes Feld ist schon befüllt, wenn sie aus Markdown aufgerufen wird) |
+| `nav` | Der eigene Navigationsbaum dieses Baums |
+| `basePath` | Root-relativer Basispfad, endet mit `/` |
+| `versions` | Einträge des Versionsumschalters - `[ { label, url } ]` |
+| `currentVersion` | Welcher `versions`-Eintrag gerade gerendert wird |
+| `locales` | Einträge des Sprachumschalters - `[ { code, label, url, dir, flag } ]` |
+| `currentLocale` | Der Code welchen `locales`-Eintrags gerade gerendert wird |
+| `currentLocaleDir` | `"ltr"`/`"rtl"` für die aktuelle Locale |
+
+```bx title="docs/functions.bxs"
+function $sitename() {
+	return siteConfig.name
+}
+
+function $pagetitle() {
+	return page.title
+}
+```
+
+```markdown title="docs/index.md"
+Site: {{ $sitename() }}
+Page: {{ $pagetitle() }}
+```
+
+**`page` ist an beiden Stellen nicht gleich vollständig.** Aus Markdown
+aufgerufen, ist `page` das eigene Struct dieser konkreten Seite *wie von der
+Festplatte geladen* - `title`/`description`/`tags`/`icon`/`summary`/
+`ogImage`/`urlPath`/`relativePath`/`body`/etc. sind bereits vorhanden, aber
+die Felder, die erst bekannt sind, sobald jede Seite im Baum fertig
+konvertiert wurde - `toc`, `prevPage`/`nextPage`, `breadcrumbs`,
+`editUrl`/`lastUpdated`, `iconHtml`, `markdownUrl`, `canonicalUrl` -
+existieren darauf noch nicht. Bar aus `page.bxm` aufgerufen, ist `page` das
+vollständig angereicherte Struct, all das eingeschlossen. Jede andere
+unterstützende Variable (`siteConfig`, `nav`, `basePath`, `versions`,
+`currentVersion`, `locales`, `currentLocale`, `currentLocaleDir`) ist an
+beiden Stellen identisch.
+
 ### Argumentsyntax
 
 Die Argumente eines magischen Funktionsaufrufs sind einfache, durch Kommas
@@ -145,10 +192,10 @@ Ein `{{ }}`, das innerhalb eines eingezäunten Codeblocks angezeigt wird (drei
 oder mehr Backticks, wie jedes Beispiel auf dieser Seite), bleibt völlig
 unangetastet, statt aufgelöst zu werden - dieselbe Konvention, die dieses
 Modul bereits für `$...$`-Mathematik und `=== "Tab"`-Content-Tabs verwendet.
-Ein `` `{{ example }}` `` innerhalb von *Inline*-Code ist jedoch nicht durch
-den Zaun geschützt - musst du die Syntax also inline statt in einem
-vollständigen Codeblock zeigen, bevorzuge einen Namen, der nicht auch eine
-echte Variable/Funktion in deinem eigenen Projekt ist.
+Anders als bei diesen beiden ist ein `{{ }}` auch innerhalb von
+*Inline*-Code geschützt (`` `{{ example }}` ``, mit einfachen oder doppelten
+Backticks) - jeder Aufzählungspunkt oben, der `` `{{ $discount(20) }}` ``
+inline zeigt, ist ein echtes, funktionierendes Beispiel dafür.
 
 Ein `{{ }}`, dessen Inhalt weder wie ein Variablenpfad noch wie ein
 `$name(...)`-Aufruf aussieht - etwa die eigene `{{ }}`-Syntax einer anderen

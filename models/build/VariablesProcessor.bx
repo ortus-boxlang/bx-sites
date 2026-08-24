@@ -19,12 +19,19 @@
  * to become real markdown source rather than something reversed after
  * `Markdown()` runs), fence-aware via FenceTracker.bx so a `{{ ... }}`
  * shown inside a fenced code block (e.g. this very guide, demonstrating
- * the syntax) is left completely untouched rather than resolved. A `{{ }}`
- * span is also never matched across a fenced *inline* code span
- * (`` `{{ example }}` ``) or a line break - deliberately narrow, so a
- * project showing this syntax in inline code needs to fence it in a code
- * block instead (the same existing convention `$...$` math/`=== "Tab"`
- * content-tabs authors already follow - see MathProtector.bx/TabsProcessor.bx).
+ * the syntax) is left completely untouched rather than resolved. Unlike
+ * MathProtector.bx/TabsProcessor.bx (whose own `$...$`/`=== "Tab"` syntax
+ * is only fence-protected, never inline-protected - harmless for them,
+ * since neither ever throws on an unrecognized match), a `{{ }}` shown in
+ * an *inline* code span (`` `{{ example }}` ``, single or double
+ * backticks) is masked out too (maskInlineCode()) before the token search
+ * runs - this class's own fail-fast behavior on an unresolved-but-
+ * recognized-shape token means an inline documentation example needs the
+ * same protection a fenced block already gets, not just a "prefer an
+ * unambiguous name" convention to remember. Best-effort CommonMark inline-
+ * span matching (matched backtick-run lengths), not a full parser - good
+ * enough for the spans real documentation actually writes, including this
+ * very guide's own inline examples.
  *
  * A `{{ }}` whose inner text matches neither shape (an unrelated
  * curly-brace use, e.g. a page discussing some other templating engine's
@@ -38,6 +45,15 @@ class {
 	variables.tokenPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "\{\{[ \t]*([^\n\{\}]+?)[ \t]*\}\}" )
 	variables.identifierPathPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$" )
 	variables.functionCallPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^(\$[A-Za-z_][A-Za-z0-9_]*)\((.*)\)$" )
+	// Matches one CommonMark inline code span - a run of one or more
+	// backticks, opening and closing (the closing run must be the exact
+	// same length - `` `single` `` vs ``` ``needs-a-`-inside`` ```) - so a
+	// `{{ }}` shown as a *literal, inline* documentation example (like
+	// this very guide's own "Argument syntax" list) is never mistaken for
+	// a real expression. Best-effort, not a full CommonMark inline-parser:
+	// good enough for the single/double-backtick spans real documentation
+	// actually writes.
+	variables.inlineCodePattern = createObject( "java", "java.util.regex.Pattern" ).compile( "(`+)(?:(?!\1)[^\n])*?\1" )
 	variables.matcherHelper = createObject( "java", "java.util.regex.Matcher" )
 	variables.functionScope = new "models.build.FunctionScope@bxsites"()
 
@@ -48,10 +64,11 @@ class {
 	 * @vars The site config's own `variables` block (ConfigLoader.bx) - dotted-path lookup target
 	 * @functions FunctionsLoader.load()'s own output - `$`-prefixed callable magic functions
 	 * @context The including page's own docs/-relative path, for error messages only (e.g. "guides/setup.md")
+	 * @functionContext The "supporting variables" bound bare into a magic function's own body - `siteConfig`/`page`/`nav`/`basePath`/`versions`/`currentVersion`/`locales`/`currentLocale`/`currentLocaleDir` (BuildPipeline.bx's own `convertMarkdown()` docblock has the exact shape) - the same names/values a `theme/` `.bxm` override already has bare in scope, so a magic function reads them identically regardless of where it's called from. See docs/guides/variables-and-functions.md's "Context variables" section
 	 *
 	 * @return markdown with every recognized `{{ }}` expression replaced by its resolved value
 	 */
-	string function resolve( required string markdown, struct vars = {}, struct functions = {}, string context = "" ) {
+	string function resolve( required string markdown, struct vars = {}, struct functions = {}, string context = "", struct functionContext = {} ) {
 		var normalized = arguments.markdown.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" )
 		var lines = listToArray( normalized, char( 10 ), true )
 		var tracker = new "models.build.FenceTracker@bxsites"()
@@ -72,7 +89,7 @@ class {
 				i++
 			}
 
-			var resolvedRun = resolveRun( runLines.toList( char( 10 ) ), arguments.vars, arguments.functions, arguments.context )
+			var resolvedRun = resolveRun( runLines.toList( char( 10 ) ), arguments.vars, arguments.functions, arguments.context, arguments.functionContext )
 			for ( var outLine in listToArray( resolvedRun, char( 10 ), true ) ) {
 				outputLines.append( outLine )
 			}
@@ -82,21 +99,71 @@ class {
 	}
 
 	/**
-	 * Resolves every `{{ }}` token in one fence-free run of text.
+	 * Resolves every `{{ }}` token in one fence-free run of text - except
+	 * one shown inside an *inline* code span (`` `{{ example }}` ``),
+	 * which is masked out first (maskInlineCode()) so the token search
+	 * below never finds it: a `{{ }}` example inline in prose, not a real
+	 * expression, is exactly as untouched as one inside a fenced code
+	 * block.
 	 */
-	private string function resolveRun( required string text, required struct vars, required struct functions, required string context ) {
-		var matcher = variables.tokenPattern.matcher( arguments.text )
+	private string function resolveRun( required string text, required struct vars, required struct functions, required string context, required struct functionContext ) {
+		var masked = maskInlineCode( arguments.text )
+		var matcher = variables.tokenPattern.matcher( masked )
 		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+		var lastEnd = 1
 
 		while ( matcher.find() ) {
-			var expr = trim( matcher.group( 1 ) )
-			var resolved = resolveExpression( expr, arguments.vars, arguments.functions, arguments.context )
-			var replacement = resolved.matched ? resolved.value : matcher.group()
-			matcher.appendReplacement( buffer, variables.matcherHelper.quoteReplacement( replacement ) )
+			// Positions read off `matcher` (matched against `masked`) but
+			// the actual text substituted always comes from `arguments.text`
+			// (the original, unmasked source) - masking only ever changes
+			// which spans the token search is allowed to find, never the
+			// content a real match resolves to.
+			var matchStart = matcher.start() + 1
+			var matchEnd = matcher.end() + 1
+			var groupStart = matcher.start( 1 ) + 1
+			var groupEnd = matcher.end( 1 ) + 1
+
+			buffer.append( mid( arguments.text, lastEnd, matchStart - lastEnd ) )
+
+			var expr = trim( mid( arguments.text, groupStart, groupEnd - groupStart ) )
+			var resolved = resolveExpression( expr, arguments.vars, arguments.functions, arguments.context, arguments.functionContext )
+			var replacement = resolved.matched ? resolved.value : mid( arguments.text, matchStart, matchEnd - matchStart )
+			buffer.append( replacement )
+
+			lastEnd = matchEnd
 		}
-		matcher.appendTail( buffer )
+		buffer.append( mid( arguments.text, lastEnd, len( arguments.text ) - lastEnd + 1 ) )
 
 		return buffer.toString()
+	}
+
+	/**
+	 * Replaces every CommonMark inline code span in `text` with a
+	 * same-length run of a filler character (never `{`/`}`, so it can
+	 * never form a new, spurious `{{ }}` shape of its own) - masking out
+	 * the position of every `` `...` ``/``` ``...`` ``` span so
+	 * `resolveRun()`'s own token search, run against this masked copy,
+	 * never matches inside one, while every position/length stays
+	 * identical to the original text (so the same offsets read back
+	 * correctly against `arguments.text` in resolveRun()). Applied
+	 * per-line - an inline code span is never expected to cross a line
+	 * break in practice.
+	 */
+	private string function maskInlineCode( required string text ) {
+		var lines = listToArray( arguments.text, char( 10 ), true )
+		var maskedLines = []
+
+		for ( var line in lines ) {
+			var matcher = variables.inlineCodePattern.matcher( line )
+			var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+			while ( matcher.find() ) {
+				matcher.appendReplacement( buffer, variables.matcherHelper.quoteReplacement( repeatString( "x", len( matcher.group() ) ) ) )
+			}
+			matcher.appendTail( buffer )
+			maskedLines.append( buffer.toString() )
+		}
+
+		return maskedLines.toList( char( 10 ) )
 	}
 
 	/**
@@ -105,10 +172,10 @@ class {
 	 * otherwise `{ matched: true, value: string }` - throws on a recognized
 	 * shape that fails to resolve (unknown variable/function).
 	 */
-	private struct function resolveExpression( required string expr, required struct vars, required struct functions, required string context ) {
+	private struct function resolveExpression( required string expr, required struct vars, required struct functions, required string context, required struct functionContext ) {
 		var callMatcher = variables.functionCallPattern.matcher( arguments.expr )
 		if ( callMatcher.matches() ) {
-			return { matched : true, value : resolveFunctionCall( callMatcher.group( 1 ), callMatcher.group( 2 ), arguments.vars, arguments.functions, arguments.context ) }
+			return { matched : true, value : resolveFunctionCall( callMatcher.group( 1 ), callMatcher.group( 2 ), arguments.vars, arguments.functions, arguments.context, arguments.functionContext ) }
 		}
 
 		if ( variables.identifierPathPattern.matcher( arguments.expr ).matches() ) {
@@ -129,7 +196,7 @@ class {
 	 * @name The matched `$name` call target, dollar sign included
 	 * @rawArgs The call's raw, unparsed argument list text (may be empty)
 	 */
-	private string function resolveFunctionCall( required string name, required string rawArgs, required struct vars, required struct functions, required string context ) {
+	private string function resolveFunctionCall( required string name, required string rawArgs, required struct vars, required struct functions, required string context, required struct functionContext ) {
 		if ( !arguments.functions.keyExists( arguments.name ) ) {
 			throw(
 				type    : "BxSites.UnknownFunction",
@@ -147,6 +214,13 @@ class {
 		// `$`-prefixed one), and why binding onto *this* class's own
 		// `variables` scope directly would risk a project's own function
 		// name silently overwriting one of this class's real methods.
+		// `functionContext` (siteConfig/page/nav/etc.) is bound the same
+		// way, right alongside the functions themselves, so a magic
+		// function's own body can read them bare too - the same
+		// "supporting variables" a theme .bxm override already has in
+		// scope (ThemeRenderer.bx), just bound here instead of relying on
+		// this class's own `variables` scope already happening to have them.
+		variables.functionScope.bind( arguments.functionContext )
 		variables.functionScope.bind( arguments.functions )
 		var result = variables.functionScope.call( arguments.name, args )
 		return "#result#"

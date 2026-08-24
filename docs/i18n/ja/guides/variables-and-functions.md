@@ -120,6 +120,50 @@ function $price( amount ) {
 <p class="build-banner">#$shout( 'built with boxlang' )#</p>
 ```
 
+### コンテキスト変数
+
+マジック関数自身の本体もまた、固定された「サポート変数」のセットを - 引数なしで
+裸のまま - 読み取ることができます。Markdown の `{{ }}` から呼び出された場合でも、
+テーマオーバーライドから裸のまま呼び出された場合でも、これは同じです:
+
+| 変数 | それが何か |
+|---|---|
+| `siteConfig` | サイト自身の `bxsites.yaml` 設定（すでにデフォルト適用/検証済み） |
+| `page` | 現在のページ（下記の注記を参照 - Markdown から呼び出された場合、まだすべてのフィールドが埋まっているわけではありません） |
+| `nav` | このツリー自身のナビゲーションツリー |
+| `basePath` | ルート相対のベースパス。`/` で終わります |
+| `versions` | バージョン切り替えのエントリ - `[ { label, url } ]` |
+| `currentVersion` | 現在レンダリングされているのが `versions` のどのエントリか |
+| `locales` | 言語切り替えのエントリ - `[ { code, label, url, dir, flag } ]` |
+| `currentLocale` | 現在レンダリングされているのが `locales` のどのエントリのコードか |
+| `currentLocaleDir` | 現在のロケールに対する `"ltr"`/`"rtl"` |
+
+```bx title="docs/functions.bxs"
+function $sitename() {
+	return siteConfig.name
+}
+
+function $pagetitle() {
+	return page.title
+}
+```
+
+```markdown title="docs/index.md"
+Site: {{ $sitename() }}
+Page: {{ $pagetitle() }}
+```
+
+**`page` はどちらの場所でも同じように完全というわけではありません。** Markdown から
+呼び出された場合、`page` はこの特定のページ自身の構造体で、*ディスクから読み込まれた
+ままの状態*です - `title`/`description`/`tags`/`icon`/`summary`/`ogImage`/`urlPath`/
+`relativePath`/`body` などはすでに存在していますが、ツリー内のすべてのページの
+変換が完了して初めて分かるフィールド - `toc`、`prevPage`/`nextPage`、`breadcrumbs`、
+`editUrl`/`lastUpdated`、`iconHtml`、`markdownUrl`、`canonicalUrl` - はまだ存在しません。
+`page.bxm` から裸のまま呼び出された場合、`page` はそれらすべてを含む、完全に拡充された
+構造体です。それ以外のサポート変数（`siteConfig`、`nav`、`basePath`、`versions`、
+`currentVersion`、`locales`、`currentLocale`、`currentLocaleDir`）はどちらの場所でも
+同一です。
+
 ### 引数の構文
 
 マジック関数呼び出しの引数は、単純なカンマ区切りのリテラルまたは変数参照です -
@@ -135,10 +179,10 @@ function $price( amount ) {
 フェンス付きコードブロック（3つ以上のバックティック、このページのすべての例と同様）
 の中に書かれた `{{ }}` は、解決されることなく完全にそのまま残されます - これは
 このモジュールがすでに `$...$` の数式や `=== "Tab"` のコンテンツタブに対して
-採用しているのと同じ規約です。ただし *インライン* コードで示された `` `{{ example }}` ``
-はフェンスによる保護を受けないため、フルのコードブロックではなくインラインで構文を
-示す必要がある場合は、自分のプロジェクトで実際の変数/関数名にもなっていない名前を
-選ぶことをお勧めします。
+採用しているのと同じ規約です。この2つとは異なり、*インライン* コード
+（`` `{{ example }}` ``、シングルまたはダブルのバックティック）で示された `{{ }}` も
+同様に保護されます - 上記の各箇条書きでインラインで示されている
+`` `{{ $discount(20) }}` `` は、実際に動作する本物の実例です。
 
 変数パスにも `$name(...)` 呼び出しにも見えない中身を持つ `{{ }}` - 例えば、地の文で
 示された別のテンプレートエンジン自身の `{{ }}` 構文など - は、エラーとして扱われずに

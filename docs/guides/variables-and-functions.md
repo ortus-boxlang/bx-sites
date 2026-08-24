@@ -122,6 +122,51 @@ prefix at all - the same way it already reads `variables.page`/
 <p class="build-banner">#$shout( 'built with boxlang' )#</p>
 ```
 
+### Context variables
+
+Every magic function's own body can also read a fixed set of "supporting
+variables" - bare, with no argument needed - regardless of whether it's
+called from `{{ }}` in Markdown or bare from a theme override:
+
+| Variable | What it is |
+|---|---|
+| `siteConfig` | The site's own `bxsites.yaml` config (already defaulted/validated) |
+| `page` | The current page (see the note below - not every field is populated yet when called from Markdown) |
+| `nav` | This tree's own nav tree |
+| `basePath` | Root-relative base path, ending with `/` |
+| `versions` | Version switcher entries - `[ { label, url } ]` |
+| `currentVersion` | Which `versions` entry is being rendered right now |
+| `locales` | Language switcher entries - `[ { code, label, url, dir, flag } ]` |
+| `currentLocale` | Which `locales` entry's code is being rendered right now |
+| `currentLocaleDir` | `"ltr"`/`"rtl"` for the current locale |
+
+```bx title="docs/functions.bxs"
+function $sitename() {
+	return siteConfig.name
+}
+
+function $pagetitle() {
+	return page.title
+}
+```
+
+```markdown title="docs/index.md"
+Site: {{ $sitename() }}
+Page: {{ $pagetitle() }}
+```
+
+**`page` isn't equally complete in both places.** Called from Markdown,
+`page` is this specific page's own struct *as loaded from disk* -
+`title`/`description`/`tags`/`icon`/`summary`/`ogImage`/`urlPath`/
+`relativePath`/`body`/etc. are already there, but the fields only known
+once every page in the tree has finished converting - `toc`,
+`prevPage`/`nextPage`, `breadcrumbs`, `editUrl`/`lastUpdated`, `iconHtml`,
+`markdownUrl`, `canonicalUrl` - don't exist on it yet. Called bare from
+`page.bxm`, `page` is the fully-enriched struct, all of those included.
+Every other supporting variable (`siteConfig`, `nav`, `basePath`,
+`versions`, `currentVersion`, `locales`, `currentLocale`,
+`currentLocaleDir`) is identical in both places.
+
 ### Argument syntax
 
 A magic function call's arguments are simple, comma-separated literals or
@@ -138,10 +183,10 @@ first version:
 A `{{ }}` shown inside a fenced code block (three backticks or more, like
 every example on this page) is left completely untouched rather than
 resolved - the same convention this module already uses for `$...$` math
-and `=== "Tab"` content tabs. A `` `{{ example }}` `` shown in *inline*
-code isn't fence-protected, though, so if you need to show the syntax
-inline rather than in a full code block, prefer a name that isn't also a
-real variable/function in your own project.
+and `=== "Tab"` content tabs. Unlike those two, a `{{ }}` shown in *inline*
+code (`` `{{ example }}` ``, single or double backticks) is protected too -
+every bullet point above showing `` `{{ $discount(20) }}` `` inline is a
+real, working example of that.
 
 A `{{ }}` whose contents don't look like either a variable path or a
 `$name(...)` call - some other templating engine's own `{{ }}` syntax

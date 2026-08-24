@@ -129,6 +129,53 @@ legge `variables.page`/`variables.siteConfig`:
 <p class="build-banner">#$shout( 'built with boxlang' )#</p>
 ```
 
+### Variabili di contesto
+
+Il corpo di ogni funzione magica può anche leggere un insieme fisso di
+"variabili di supporto" - allo stato puro, senza bisogno di alcun
+argomento - a prescindere dal fatto che venga richiamata da `{{ }}` nel
+Markdown oppure allo stato puro da una sovrascrittura di tema:
+
+| Variabile | Cos'è |
+|---|---|
+| `siteConfig` | La configurazione `bxsites.yaml` propria del sito (già impostata sui valori predefiniti/validata) |
+| `page` | La pagina corrente (vedi la nota sotto - non tutti i campi sono già popolati quando viene richiamata dal Markdown) |
+| `nav` | L'albero di navigazione proprio di questo albero |
+| `basePath` | Il percorso base relativo alla radice, che termina con `/` |
+| `versions` | Le voci del selettore di versione - `[ { label, url } ]` |
+| `currentVersion` | Quale voce di `versions` viene renderizzata in questo momento |
+| `locales` | Le voci del selettore di lingua - `[ { code, label, url, dir, flag } ]` |
+| `currentLocale` | Il codice di quale voce di `locales` viene renderizzato in questo momento |
+| `currentLocaleDir` | `"ltr"`/`"rtl"` per il locale corrente |
+
+```bx title="docs/functions.bxs"
+function $sitename() {
+	return siteConfig.name
+}
+
+function $pagetitle() {
+	return page.title
+}
+```
+
+```markdown title="docs/index.md"
+Site: {{ $sitename() }}
+Page: {{ $pagetitle() }}
+```
+
+**`page` non è ugualmente completa in entrambi i casi.** Se richiamata dal
+Markdown, `page` è lo struct proprio di questa specifica pagina *così come
+caricato da disco* - `title`/`description`/`tags`/`icon`/`summary`/
+`ogImage`/`urlPath`/`relativePath`/`body`/ecc. sono già presenti, ma i
+campi noti solo dopo che ogni pagina dell'albero ha terminato la
+conversione - `toc`, `prevPage`/`nextPage`, `breadcrumbs`,
+`editUrl`/`lastUpdated`, `iconHtml`, `markdownUrl`, `canonicalUrl` - non
+esistono ancora su di essa. Se richiamata allo stato puro da `page.bxm`,
+`page` è invece lo struct completamente arricchito, con tutti questi
+campi inclusi. Ogni altra variabile di supporto (`siteConfig`, `nav`,
+`basePath`, `versions`, `currentVersion`, `locales`, `currentLocale`,
+`currentLocaleDir`) è identica in entrambi i casi.
+
 ### Sintassi degli argomenti
 
 Gli argomenti di una chiamata a funzione magica sono semplici letterali o
@@ -148,11 +195,11 @@ Un `{{ }}` mostrato dentro un blocco di codice delimitato (tre o più
 backtick, come ogni esempio in questa pagina) viene lasciato del tutto
 intatto invece di essere risolto - la stessa convenzione che questo
 modulo usa già per la matematica `$...$` e per le schede di contenuto
-`=== "Tab"`. Un `` `{{ example }}` `` mostrato in codice *inline*, però,
-non è protetto dal blocco delimitato, quindi se hai bisogno di mostrare
-la sintassi inline invece che in un blocco di codice completo, preferisci
-un nome che non sia anche una vera variabile/funzione nel tuo stesso
-progetto.
+`=== "Tab"`. A differenza di queste due, un `{{ }}` mostrato in codice
+*inline* (`` `{{ example }}` ``, con singolo o doppio backtick) è
+protetto anch'esso - ogni punto elenco più sopra che mostra
+`` `{{ $discount(20) }}` `` inline è un esempio reale e funzionante di
+questo.
 
 Un `{{ }}` il cui contenuto non assomiglia né a un percorso di variabile
 né a una chiamata `$name(...)` - la sintassi `{{ }}` propria di un altro

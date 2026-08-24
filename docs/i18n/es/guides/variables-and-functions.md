@@ -129,6 +129,53 @@ puede llamarla sin prefijo, exactamente de la misma forma en que ya lee
 <p class="build-banner">#$shout( 'built with boxlang' )#</p>
 ```
 
+### Variables de contexto
+
+El propio cuerpo de cada función mágica también puede leer un conjunto
+fijo de "variables de soporte" - sin prefijo, sin necesidad de ningún
+argumento - sin importar si se invoca desde `{{ }}` en Markdown o sin
+prefijo desde una sobrescritura de tema:
+
+| Variable | Qué es |
+|---|---|
+| `siteConfig` | La propia configuración `bxsites.yaml` del sitio (ya con valores por defecto/validada) |
+| `page` | La página actual (consulta la nota más abajo - no todos los campos están todavía completos cuando se llama desde Markdown) |
+| `nav` | El propio árbol de navegación de este árbol |
+| `basePath` | Ruta base relativa a la raíz, terminada en `/` |
+| `versions` | Entradas del selector de versiones - `[ { label, url } ]` |
+| `currentVersion` | Qué entrada de `versions` se está renderizando en este momento |
+| `locales` | Entradas del selector de idioma - `[ { code, label, url, dir, flag } ]` |
+| `currentLocale` | El código de qué entrada de `locales` se está renderizando en este momento |
+| `currentLocaleDir` | `"ltr"`/`"rtl"` para el idioma actual |
+
+```bx title="docs/functions.bxs"
+function $sitename() {
+	return siteConfig.name
+}
+
+function $pagetitle() {
+	return page.title
+}
+```
+
+```markdown title="docs/index.md"
+Site: {{ $sitename() }}
+Page: {{ $pagetitle() }}
+```
+
+**`page` no está igual de completa en ambos lugares.** Llamada desde
+Markdown, `page` es el propio struct de esta página en concreto *tal como
+se cargó desde disco* - `title`/`description`/`tags`/`icon`/`summary`/
+`ogImage`/`urlPath`/`relativePath`/`body`/etc. ya están ahí, pero los
+campos que solo se conocen una vez que todas las páginas del árbol han
+terminado de convertirse - `toc`, `prevPage`/`nextPage`, `breadcrumbs`,
+`editUrl`/`lastUpdated`, `iconHtml`, `markdownUrl`, `canonicalUrl` - todavía
+no existen en ella. Llamada sin prefijo desde `page.bxm`, `page` es el
+struct totalmente enriquecido, con todos esos incluidos. Cualquier otra
+variable de soporte (`siteConfig`, `nav`, `basePath`, `versions`,
+`currentVersion`, `locales`, `currentLocale`, `currentLocaleDir`) es
+idéntica en ambos lugares.
+
 ### Sintaxis de los argumentos
 
 Los argumentos de una llamada a función mágica son literales o
@@ -146,11 +193,11 @@ Un `{{ }}` mostrado dentro de un bloque de código con fence (tres
 comillas invertidas o más, como todos los ejemplos de esta página) se
 deja completamente intacto en lugar de resolverse - la misma convención
 que este módulo ya usa para las matemáticas `$...$` y el contenido de
-pestañas `=== "Tab"`. Sin embargo, un `` `{{ example }}` `` mostrado en
-código *en línea* no está protegido por el fence, así que si necesitas
-mostrar la sintaxis en línea en lugar de en un bloque de código completo,
-prefiere un nombre que no sea también una variable/función real en tu
-propio proyecto.
+pestañas `=== "Tab"`. A diferencia de esos dos casos, un `{{ }}`
+mostrado en código *en línea* (`` `{{ example }}` ``, con comillas
+invertidas simples o dobles) también está protegido - cada punto de la
+lista anterior que muestra `` `{{ $discount(20) }}` `` en línea es un
+ejemplo real y funcional de ello.
 
 Un `{{ }}` cuyo contenido no se parezca ni a una ruta de variable ni a
 una llamada `$name(...)` - la propia sintaxis `{{ }}` de otro motor de

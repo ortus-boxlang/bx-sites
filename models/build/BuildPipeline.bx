@@ -311,7 +311,10 @@ class {
 				}
 			}
 
-			convertMarkdown( blogPosts, config, plugins, urls.basePath, docsDir, imageManifest, functions )
+			convertMarkdown(
+				blogPosts, config, plugins, urls.basePath, docsDir, imageManifest, functions,
+				mainResult.nav, versions, "Latest", locales, defaultLocaleCode, defaultLocaleDir
+			)
 			assignTableOfContents( blogPosts )
 			assignEditAndLastUpdated( blogPosts, config, root, "" )
 			assignOgImages( blogPosts, config, siteDir )
@@ -513,7 +516,10 @@ class {
 
 		directoryCreate( arguments.outputDir, true, true )
 
-		convertMarkdown( pages, arguments.config, arguments.plugins, arguments.basePath, arguments.docsDir, arguments.imageManifest, arguments.functions )
+		convertMarkdown(
+			pages, arguments.config, arguments.plugins, arguments.basePath, arguments.docsDir, arguments.imageManifest, arguments.functions,
+			nav, arguments.versions, arguments.currentVersion, arguments.locales, arguments.currentLocale, arguments.currentLocaleDir
+		)
 		variables.pageLinkResolver.resolve( pages, arguments.basePath )
 		assignTableOfContents( pages )
 		assignPrevNext( pages, flatSequence )
@@ -705,6 +711,12 @@ class {
 	 * @docsDir Absolute path to this tree's own docs root - `::: include` paths are resolved against it
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - defaults to empty, which makes the `<img>` -> `<picture>` rewrite (ResponsiveImageProcessor.bx) a no-op; buildSearchIndex() relies on exactly that default, since the search index has no use for it
 	 * @functions FunctionsLoader.load()'s own output (module spec section 8) - defaults to empty, which makes every `{{ $name(...) }}` call fail with `BxSites.UnknownFunction` (there's nothing to call), same "just doesn't resolve" shape `{{ }}` variable lookups already have against an empty `config.variables`
+	 * @nav This tree's own nav tree (NavBuilder.build()'s own output) - one of the "supporting variables" a magic function reads bare, alongside `page`/`siteConfig`/etc. (see below)
+	 * @versions Version switcher entries, same shape/meaning as ThemeRenderer.renderPage()'s own `versions` param - another supporting variable
+	 * @currentVersion Supporting variable - see ThemeRenderer.renderPage()'s own `currentVersion` param
+	 * @locales Supporting variable - see ThemeRenderer.renderPage()'s own `locales` param
+	 * @currentLocale Supporting variable - see ThemeRenderer.renderPage()'s own `currentLocale` param
+	 * @currentLocaleDir Supporting variable - see ThemeRenderer.renderPage()'s own `currentLocaleDir` param
 	 *
 	 * Also resolves every `{{ }}` expression (VariablesProcessor.bx) -
 	 * `{{ dotted.path }}` against `config.variables`, `{{ $name(...) }}`
@@ -712,8 +724,28 @@ class {
 	 * included partial's own `{{ }}` expressions resolve too, and before
 	 * every other pre-processor below, so the substituted text is ordinary
 	 * markdown source by the time tabs/math/code-annotations/directives see it.
+	 *
+	 * A magic function's own body can also bare-reference a fixed set of
+	 * "supporting variables" - `siteConfig` (this tree's `config`), `page`
+	 * (this specific page - see below for what's/isn't populated on it yet
+	 * at this point), `nav`, `basePath`, `versions`, `currentVersion`,
+	 * `locales`, `currentLocale`, `currentLocaleDir` - the same names (and,
+	 * `page` aside, the same values) a theme's own `.bxm` override already
+	 * has bare in scope (ThemeRenderer.bx), so a magic function reads them
+	 * identically regardless of which of the two places calls it. `page`
+	 * itself is this loop's own in-progress page struct (DocsLoader.bx's
+	 * own shape - `title`/`description`/`tags`/`icon`/`summary`/`ogImage`/
+	 * `urlPath`/`relativePath`/`sourcePath`/`body`/etc. are already there),
+	 * but not yet enriched with the fields only knowable after every page
+	 * in this tree has been converted - `toc`, `prevPage`/`nextPage`,
+	 * `breadcrumbs`, `editUrl`/`lastUpdated`, `iconHtml`, `markdownUrl`,
+	 * `canonicalUrl` don't exist on it yet here (renderDocTree()'s own
+	 * assignXxx() calls add those after this method returns) - by the time
+	 * the very same magic function runs again from `page.bxm`, `page` is
+	 * the fully-enriched struct instead. See
+	 * docs/guides/variables-and-functions.md's "Context variables" section.
 	 */
-	private void function convertMarkdown( required array pages, required struct config, array plugins = [], string basePath = "/", string docsDir = "", struct imageManifest = {}, struct functions = {} ) {
+	private void function convertMarkdown( required array pages, required struct config, array plugins = [], string basePath = "/", string docsDir = "", struct imageManifest = {}, struct functions = {}, array nav = [], array versions = [], string currentVersion = "Latest", array locales = [], string currentLocale = "", string currentLocaleDir = "ltr" ) {
 		for ( var page in arguments.pages ) {
 			// A page's own conversion is a pure function of its source file plus
 			// this tree's config/plugins/imageManifest, none of which change
@@ -737,7 +769,18 @@ class {
 
 			var markdown = variables.pluginLoader.applyOnPageMarkdown( arguments.plugins, page.body, page, arguments.config )
 			markdown = variables.includeProcessor.process( markdown, arguments.docsDir, page.relativePath )
-			markdown = variables.variablesProcessor.resolve( markdown, arguments.config.variables ?: {}, arguments.functions, page.relativePath )
+			var functionContext = {
+				siteConfig       : arguments.config,
+				page             : page,
+				nav              : arguments.nav,
+				basePath         : arguments.basePath,
+				versions         : arguments.versions,
+				currentVersion   : arguments.currentVersion,
+				locales          : arguments.locales,
+				currentLocale    : arguments.currentLocale,
+				currentLocaleDir : arguments.currentLocaleDir
+			}
+			markdown = variables.variablesProcessor.resolve( markdown, arguments.config.variables ?: {}, arguments.functions, page.relativePath, functionContext )
 
 			var tryBoxLangExtracted = variables.tryBoxLangProcessor.extract( markdown )
 			var tabsExtracted = variables.tabsProcessor.extract( tryBoxLangExtracted.markdown )

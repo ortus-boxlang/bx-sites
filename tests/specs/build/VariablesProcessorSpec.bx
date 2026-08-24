@@ -38,6 +38,30 @@ class extends="testbox.system.BaseSpec" {
 				expect( result ).toBe( "Stable/success/3" );
 			} );
 
+			it( "lets a magic function bare-reference the shared siteConfig/page/nav context", function() {
+				// Named top-level declarations, not closure literals - same
+				// reasoning as the sibling-call tests below: only a named
+				// declaration resolves a bare reference dynamically against
+				// whatever scope actually invokes it.
+				function $sitename() {
+					return siteConfig.name;
+				}
+				function $pagetitle() {
+					return page.title;
+				}
+				function $navcount() {
+					return nav.len();
+				}
+				var fns = { "$sitename" : $sitename, "$pagetitle" : $pagetitle, "$navcount" : $navcount };
+				var functionContext = {
+					siteConfig : { name : "My Docs" },
+					page       : { title : "Home" },
+					nav        : [ { title : "Home" }, { title : "Guides" } ]
+				};
+				var result = processor.resolve( "{{ $sitename() }} / {{ $pagetitle() }} / {{ $navcount() }}", {}, fns, "", functionContext );
+				expect( result ).toBe( "My Docs / Home / 2" );
+			} );
+
 			it( "lets a magic function call a private, non-$-prefixed helper from the same functions.bxs", function() {
 				// Named top-level function declarations, not closure
 				// literals assigned as struct values - a real functions.bxs
@@ -83,6 +107,22 @@ class extends="testbox.system.BaseSpec" {
 				var md = "Text." & char( 10 ) & "```" & char( 10 ) & "{{ company }}" & char( 10 ) & "```";
 				var result = processor.resolve( md, { "company" : "Ortus" } );
 				expect( result ).toBe( md );
+			} );
+
+			it( "leaves a {{ }} shown inside inline code untouched, even when it looks like a real call", function() {
+				// A doc page listing this syntax inline (not in a fenced
+				// block) must not have the fail-fast UnknownFunction/
+				// UnknownVariable behavior misfire on its own examples.
+				var fns = { "$greet" : function( name ) { return "Hi " & arguments.name } };
+				var md = "- Numbers: `{{ $discount(20) }}`" & char( 10 ) & "- Strings: `{{ $greet('World') }}`";
+				var result = processor.resolve( md, {}, fns );
+				expect( result ).toBe( md );
+			} );
+
+			it( "still resolves real prose {{ }} on the same line as an inline-code example", function() {
+				var md = "Real: {{ company }} and inline `{{ company }}` example";
+				var result = processor.resolve( md, { "company" : "Ortus" } );
+				expect( result ).toBe( "Real: Ortus and inline `{{ company }}` example" );
 			} );
 
 			it( "leaves a {{ }} whose contents match neither shape untouched", function() {
