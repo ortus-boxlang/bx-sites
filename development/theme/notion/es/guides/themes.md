@@ -147,7 +147,10 @@ theme: { name: material }
 ## Instalar un tema publicado
 
 Un tema publicado en ForgeBox se instala sin nada más que el propio
-binario `bxSites` - no hace falta `box`/CommandBox:
+binario `bxSites` - no hace falta `box`/CommandBox. Explora lo ya
+publicado bajo la categoría
+[`bxsites-themes`](https://www.forgebox.io/type/bxsites-themes) en
+ForgeBox:
 
 ```bash title="Uso"
 bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]

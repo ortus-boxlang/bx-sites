@@ -23,7 +23,9 @@ plugins: [ myBxSitesPlugin ]
 ## 公開済みプラグインのインストール
 
 ForgeBox に公開されたプラグインは、`bxSites` バイナリ自体だけでインストールできます -
-`box`/CommandBox は不要です:
+`box`/CommandBox は不要です。すでに公開されているパッケージは、ForgeBox の
+[`bxsites-plugins`](https://www.forgebox.io/type/bxsites-plugins) カテゴリーから
+探せます:
 
 ```bash title="Usage"
 bxSites install:plugin --name=bx-sites-plugin-analytics [--version=1.2.0]

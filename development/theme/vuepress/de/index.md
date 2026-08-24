@@ -56,6 +56,16 @@ Anfragen.
 Ein Plugin ist einfach ein weiteres installiertes BoxLang-Modul - keine
 separate Plugin-API zu lernen.
 :::
+::: card title="Plugins & Themes, veröffentlicht auf ForgeBox" icon="phosphor-duotone:package" href="guides/plugins.md#ein-veröffentlichtes-plugin-installieren"
+`install:plugin` und `install:theme` laden ein veröffentlichtes Paket
+direkt in dein Projekt herunter - durchsuche `bxsites-plugins` und
+`bxsites-themes` auf ForgeBox.
+:::
+::: card title="Ein bestehendes Theme importieren" icon="phosphor-duotone:arrows-left-right" href="guides/theme-import.md"
+`theme:import --source=mkdocs|jekyll|hugo` wandelt die eigenen
+Theme-Templates eines anderen Generators in ein bx-sites-Gerüst um, auf
+dem du aufbauen kannst - statt bei null anzufangen.
+:::
 ::: card title="Migration von GitBook oder mkdocs" icon="phosphor-duotone:swap" href="guides/index.md"
 `bxSites migrate --source=... --from=gitbook|mkdocs` wandelt einen
 bestehenden GitBook-Export oder ein mkdocs-Projekt mit einem Befehl in ein

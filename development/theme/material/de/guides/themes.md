@@ -150,7 +150,10 @@ theme: { name: material }
 ## Ein veröffentlichtes Theme installieren
 
 Ein auf ForgeBox veröffentlichtes Theme installiert sich mit nichts
-weiter als der `bxSites`-Binary selbst - kein `box`/CommandBox nötig:
+weiter als der `bxSites`-Binary selbst - kein `box`/CommandBox nötig.
+Durchsuche die bereits veröffentlichten Pakete unter der Kategorie
+[`bxsites-themes`](https://www.forgebox.io/type/bxsites-themes) auf
+ForgeBox:
 
 ```bash title="Usage"
 bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]

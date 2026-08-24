@@ -56,6 +56,16 @@ in uscita per default.
 Un plugin è semplicemente un altro modulo BoxLang installato - nessuna
 API di plugin separata da imparare.
 :::
+::: card title="Plugin e temi, pubblicati su ForgeBox" icon="phosphor-duotone:package" href="guides/plugins.md#installare-un-plugin-pubblicato"
+`install:plugin` e `install:theme` scaricano un pacchetto pubblicato
+direttamente nel tuo progetto - sfoglia `bxsites-plugins` e
+`bxsites-themes` su ForgeBox.
+:::
+::: card title="Importa un tema esistente" icon="phosphor-duotone:arrows-left-right" href="guides/theme-import.md"
+`theme:import --source=mkdocs|jekyll|hugo` converte i template di un tema
+di un altro generatore in uno scaffold bx-sites su cui costruire, invece
+di ripartire da zero.
+:::
 ::: card title="Migra da GitBook o mkdocs" icon="phosphor-duotone:swap" href="guides/index.md"
 `bxSites migrate --source=... --from=gitbook|mkdocs` converte un export
 di GitBook o un progetto mkdocs esistente in un progetto bx-sites

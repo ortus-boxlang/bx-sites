@@ -125,7 +125,9 @@ theme: { name: material }
 ## 公開済みテーマのインストール
 
 ForgeBox に公開されたテーマは、`bxSites` バイナリ自体だけでインストールできます -
-`box`/CommandBox は不要です:
+`box`/CommandBox は不要です。すでに公開されているパッケージは、ForgeBox の
+[`bxsites-themes`](https://www.forgebox.io/type/bxsites-themes) カテゴリーから
+探せます:
 
 ```bash title="Usage"
 bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]

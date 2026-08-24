@@ -25,7 +25,10 @@ plugins: [ myBxSitesPlugin ]
 ## Installare un plugin pubblicato
 
 Un plugin pubblicato su ForgeBox si installa con nient'altro che il
-binario `bxSites` stesso - non serve `box`/CommandBox:
+binario `bxSites` stesso - non serve `box`/CommandBox. Sfoglia i pacchetti
+già pubblicati nella categoria
+[`bxsites-plugins`](https://www.forgebox.io/type/bxsites-plugins) su
+ForgeBox:
 
 ```bash
 bxSites install:plugin --name=bx-sites-plugin-analytics [--version=1.2.0]
