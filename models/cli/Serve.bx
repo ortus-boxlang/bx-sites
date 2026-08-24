@@ -1,8 +1,10 @@
 /**
  * `serve` CLI verb - builds the project, serves `site/` locally, and
- * watches for changes with live reload (module spec section 2). Runs in the
- * foreground until interrupted (Ctrl+C) - see DevServer.bx for the actual
- * server/rebuild-detection logic this only drives.
+ * watches for changes with live reload (module spec section 2), reacting
+ * to a change via BoxLang's own native `watcherNew()`/`schedulerNew()`
+ * rather than polling. Runs in the foreground until interrupted (Ctrl+C) -
+ * see DevServer.bx for the actual server/watch/rebuild logic this only
+ * drives.
  */
 class {
 
@@ -23,13 +25,13 @@ class {
 
 		var devServer = new "models.build.DevServer@bxsites"()
 		var started = devServer.start( projectRoot, port, host )
+		devServer.startWatching()
 
 		println( "Serving #projectRoot# at #started.url# (Ctrl+C to stop)" )
 
 		try {
 			while ( true ) {
 				sleep( 1000 )
-				devServer.checkAndRebuild()
 			}
 		} finally {
 			devServer.stop()

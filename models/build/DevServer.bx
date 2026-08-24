@@ -11,6 +11,21 @@
  * testable surface. The "watch forever" loop itself belongs to the CLI verb
  * (Serve.bx), since blocking there - not here - is what keeps this class
  * testable without hanging a test run.
+ *
+ * `startWatching()`/`stopWatching()` are Serve.bx's own real watch-mode
+ * seam - a BoxLang native `watcherNew()` (module docs: "Directory & File
+ * Watchers") on `docs/`, `bxsites.json`/`.yaml`/`.yml` and a project
+ * `theme/` override reacts to a change almost immediately instead of
+ * Serve.bx's own old 1-second `checkAndRebuild()` poll loop, and
+ * BuildPipeline.bx's own per-page content cache (see convertMarkdown()'s
+ * docblock) turns a single-page edit's own rebuild into reconverting just
+ * that one page rather than every page in every tree. A watcher event only
+ * ever marks state dirty; a small native `schedulerNew()` task (its own
+ * `withNoOverlaps()`) is what actually calls rebuild() on a short fixed
+ * cadence, so a burst of rapid saves - an editor's own atomic-write dance,
+ * a find-and-replace across several files - collapses into exactly one
+ * rebuild rather than one per file, and a rebuild already in flight is
+ * never overlapped by another.
  */
 class {
 
@@ -21,6 +36,13 @@ class {
 	variables.fileFingerprint = { count : 0, maxModified : 0 }
 	variables.buildVersion  = 0
 	variables.started       = false
+	variables.watching      = false
+	variables.hasWatcher    = false
+	variables.dirty         = false
+	variables.needsCacheClear = false
+	variables.watchedDocsDir = ""
+	variables.configPath    = ""
+	variables.lastConfigMtime = 0
 
 	/**
 	 * Swaps in a fake/test markdown renderer, forwarded straight to the
@@ -66,13 +88,136 @@ class {
 	}
 
 	/**
-	 * Stops the file server. Safe to call even if `start()` was never called.
+	 * Stops the file server, and native watching if it was started. Safe to
+	 * call even if `start()`/`startWatching()` were never called.
 	 */
 	void function stop() {
+		stopWatching()
 		if ( variables.started ) {
 			variables.httpServer.stop( javaCast( "int", 0 ) )
 			variables.started = false
 		}
+	}
+
+	/**
+	 * Starts native watching of `docs/` (or `src/`), `bxsites.json`/`.yaml`/
+	 * `.yml` and a project `theme/` override (whichever exist), reacting to
+	 * a real filesystem change instead of Serve.bx's own old 1-second
+	 * `checkAndRebuild()` poll loop - see this class's own docblock. Safe to
+	 * call more than once; a later call replaces the running watcher/scheduler.
+	 */
+	void function startWatching() {
+		stopWatching()
+
+		var docsDir = variables.sourceDirResolver.resolve( variables.projectRoot )
+		var themeDir = variables.projectRoot & "/theme"
+
+		// watcherNew() only ever registers directories, never a single file
+		// (bxsites.json/.yaml/.yml) - and site/ itself can never safely be
+		// watched, recursively or not, since rebuild() writes there itself
+		// (a self-triggering rebuild loop) - so the config file gets a
+		// plain, near-free mtime check instead, from the scheduler's own
+		// tick below, same as docs/ and theme/ get a real native watch.
+		variables.configPath = variables.configLoader.configPathFor( variables.projectRoot )
+		variables.lastConfigMtime = fileExists( variables.configPath ) ? createObject( "java", "java.io.File" ).init( variables.configPath ).lastModified() : 0
+
+		var watchPaths = []
+		if ( directoryExists( docsDir ) ) {
+			watchPaths.append( docsDir )
+		}
+		if ( directoryExists( themeDir ) ) {
+			watchPaths.append( themeDir )
+		}
+
+		variables.watchedDocsDir = docsDir
+		variables.dirty = false
+		variables.needsCacheClear = false
+
+		var watcherName = "bxsites-serve-" & hash( variables.projectRoot )
+		variables.hasWatcher = watchPaths.len() > 0
+		if ( variables.hasWatcher ) {
+			variables.watcher = watcherNew(
+				name       : watcherName,
+				paths      : watchPaths,
+				listener   : ( event ) => onWatchEvent( event ),
+				recursive  : true,
+				debounce   : 250,
+				atomicWrites : true
+			).start()
+		}
+
+		variables.scheduler = schedulerNew( name : watcherName & "-scheduler" )
+		variables.scheduler.task( "rebuild-if-dirty" ).call( () => onSchedulerTick() ).every( 300, "milliseconds" ).withNoOverlaps()
+		variables.scheduler.startup()
+
+		variables.watching = true
+	}
+
+	/**
+	 * Stops native watching. Safe to call even if `startWatching()` was
+	 * never called, or has already been stopped.
+	 */
+	void function stopWatching() {
+		if ( variables.watching ) {
+			if ( variables.hasWatcher ) {
+				variables.watcher.stop( javaCast( "boolean", true ) )
+				variables.hasWatcher = false
+			}
+			variables.scheduler.shutdown()
+			variables.watching = false
+		}
+	}
+
+	/**
+	 * `startWatching()`'s own watcher listener - never rebuilds directly
+	 * (a burst of rapid saves would otherwise trigger one rebuild per
+	 * event); only records that *something* changed, and - unless the
+	 * change was a single page's own markdown under docs/ (BuildPipeline.bx's
+	 * per-page content cache already handles that case correctly on its
+	 * own via that file's own changed mtime) - that the dev cache needs a
+	 * full clear, since a theme change isn't reflected in any one page's
+	 * own source mtime. `onSchedulerTick()` is what actually rebuilds.
+	 *
+	 * @event { kind, path } - see BoxLang's own watcherNew() docs
+	 */
+	private void function onWatchEvent( required struct event ) {
+		var path = arguments.event.path ?: ""
+		var isPageEdit = len( path ) && path.startsWith( variables.watchedDocsDir ) && path.reFindNoCase( "\.md$" )
+		if ( !isPageEdit ) {
+			variables.needsCacheClear = true
+		}
+		variables.dirty = true
+	}
+
+	/**
+	 * `startWatching()`'s own scheduled task - runs on a short fixed
+	 * cadence (rather than once per watcher event) so several rapid
+	 * changes collapse into exactly one rebuild; its own `withNoOverlaps()`
+	 * skips a tick entirely rather than starting a second rebuild while one
+	 * is already in flight. Also carries the config file's own plain mtime
+	 * check (see startWatching()'s own docblock for why that file can't
+	 * just be handed to watcherNew() directly).
+	 */
+	private void function onSchedulerTick() {
+		if ( len( variables.configPath ) && fileExists( variables.configPath ) ) {
+			var configMtime = createObject( "java", "java.io.File" ).init( variables.configPath ).lastModified()
+			if ( configMtime != variables.lastConfigMtime ) {
+				variables.lastConfigMtime = configMtime
+				variables.needsCacheClear = true
+				variables.dirty = true
+			}
+		}
+
+		if ( !variables.dirty ) {
+			return
+		}
+		variables.dirty = false
+		var shouldClearCache = variables.needsCacheClear
+		variables.needsCacheClear = false
+		if ( shouldClearCache ) {
+			variables.buildPipeline.clearDevCache()
+		}
+		rebuild()
 	}
 
 	/**

@@ -6,6 +6,8 @@
  */
 class {
 
+	variables.entryCache = new "models.build.BuildCache@bxsites"()
+
 	/**
 	 * Hidden pages are excluded, matching NavBuilder's own treatment of them
 	 * - a page that isn't linked from the nav shouldn't be searchable either.
@@ -17,15 +19,53 @@ class {
 	array function build( required array pages ) {
 		return arguments.pages
 			.filter( page => !page.hidden )
-			.map( page => {
-				return {
-					title    : page.title,
-					url      : page.urlPath,
-					headings : extractHeadings( page.contentHtml ),
-					body     : truncate( stripTags( page.contentHtml ), 400 ),
-					tags     : page.tags ?: []
-				}
-			} )
+			.map( page => buildEntry( page ) )
+	}
+
+	/**
+	 * Builds one page's own search-index entry, reusing a cached entry
+	 * (keyed by the page's own `sourcePath` + last-modified time) rather
+	 * than re-extracting headings/stripping tags when that source file
+	 * hasn't changed since the last time this same SearchIndexer instance
+	 * built an entry for it - a plain one-shot `bxSites build`/`search-index`
+	 * CLI run constructs a fresh SearchIndexer (and so a fresh, empty
+	 * cache) every time, so this only actually saves work across
+	 * DevServer.bx's own repeated in-process rebuild() calls, the same
+	 * shape BuildPipeline.bx's own page-content cache already uses.
+	 *
+	 * @page A page struct with `contentHtml`/`sourcePath` already set
+	 */
+	private struct function buildEntry( required struct page ) {
+		var sourcePath = arguments.page.sourcePath ?: ""
+		var mtime = len( sourcePath ) ? createObject( "java", "java.io.File" ).init( sourcePath ).lastModified() : 0
+		var cached = len( sourcePath ) ? variables.entryCache.get( sourcePath, mtime ) : {}
+		if ( !cached.isEmpty() ) {
+			return cached
+		}
+
+		var entry = {
+			title    : arguments.page.title,
+			url      : arguments.page.urlPath,
+			headings : extractHeadings( arguments.page.contentHtml ),
+			body     : truncate( stripTags( arguments.page.contentHtml ), 400 ),
+			tags     : arguments.page.tags ?: []
+		}
+
+		if ( len( sourcePath ) ) {
+			variables.entryCache.set( sourcePath, mtime, entry )
+		}
+
+		return entry
+	}
+
+	/**
+	 * Discards every cached entry - BuildPipeline.bx's own clearDevCache()
+	 * calls this alongside its own page-content cache's clear(), for a
+	 * change a per-page mtime check can't detect (bxsites.json, a theme
+	 * override, a plugin).
+	 */
+	void function clearCache() {
+		variables.entryCache.clear()
 	}
 
 	/**
