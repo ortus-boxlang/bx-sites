@@ -5,11 +5,11 @@ authors: [lmajano]
 categories: [Getting Started, Themes]
 tags: [themes, bootstrap, material, tailwind, customization]
 summary: Ten built-in themes, all sharing the same feature set, so picking one is about look and feel, not tradeoffs.
-description: A tour of BX Sites' ten built-in themes - the original three plus a seven-theme gallery expansion - how to switch between them, and how to override or customize one without forking it.
+description: A tour of BxSites' ten built-in themes - the original three plus a seven-theme gallery expansion - how to switch between them, and how to override or customize one without forking it.
 image: assets/blog/pick-your-theme-cover.svg
 ---
 
-**Update:** this post originally covered the three themes BX Sites launched with. The lineup has since grown into a full ten-theme gallery - the table and advice below now cover all ten.
+**Update:** this post originally covered the three themes BxSites launched with. The lineup has since grown into a full ten-theme gallery - the table and advice below now cover all ten.
 
 One question I get a lot after someone runs `bxSites new` for the first time: "which theme should I actually pick?" The honest answer is that it barely matters at the feature level - all ten built-in themes ship the exact same set of capabilities. It's purely a question of which one matches your project's own visual identity.
 
@@ -69,7 +69,7 @@ extraCss: [ assets/brand.css ]
 
 ## When you need real control
 
-If you need to change actual markup - not just color - copy a built-in theme's `layout.bxm`/`page.bxm`/`assets/` into a project-level `theme/` folder. BX Sites always prefers a project `theme/` override over the built-in one, as long as it satisfies the two required files (`layout.bxm` and `page.bxm`). It's genuinely the same files the built-in themes ship, just sitting in your own project where you can edit them freely.
+If you need to change actual markup - not just color - copy a built-in theme's `layout.bxm`/`page.bxm`/`assets/` into a project-level `theme/` folder. BxSites always prefers a project `theme/` override over the built-in one, as long as it satisfies the two required files (`layout.bxm` and `page.bxm`). It's genuinely the same files the built-in themes ship, just sitting in your own project where you can edit them freely.
 
 I still default new projects to `bootstrap` almost every time - it's a safe, familiar baseline - but `material`'s card layout is a great fit for API-reference-heavy docs, and I've reached for `tailwind` more than once on smaller marketing-adjacent sites where I wanted full utility-class control. Since the gallery grew, I've also been reaching for `slate` on anything that wants a permanently-dark sidebar without fighting the light/dark toggle, and `gitbook` when a project's tone is closer to a book than a reference manual.
 

@@ -170,7 +170,7 @@ als reines Markdown lesen kann, statt gerendertes HTML zu parsen. Immer
 aktiv, keine Konfiguration nötig. Siehe
 <a href="/bx-sites/development/theme/vuepress/de/getting-started/index.html#eine-seite-als-markdown-herunterladen">Erste Schritte</a>.</li>
 <li><strong>Eine optionale Fußzeile</strong> (Copyright, <code>social</code>-Links, ein &quot;Built with
-BX Sites&quot;-Hinweis), wenn <code>footer</code> in <code>bxsites.yaml</code> <code>true</code> ist. Siehe
+BxSites&quot;-Hinweis), wenn <code>footer</code> in <code>bxsites.yaml</code> <code>true</code> ist. Siehe
 <a href="/bx-sites/development/theme/vuepress/de/configuration/index.html#footer">Konfiguration</a>.</li>
 <li><strong>Ein Versionsumschalter</strong>, der automatisch erscheint, sobald ein
 Projekt einen <code>docs/versions/</code>-Ordner mit mehr als einer Version hat.
@@ -469,7 +469,7 @@ aufgelöst wird.</p>
 <h2 id="ein-theme-überschreiben"><a href="#ein-theme-überschreiben" id="ein-theme-überschreiben" name="ein-theme-überschreiben" class="anchor"></a>Ein Theme überschreiben</h2>
 <p>Lege deine eigenen <code>layout.bxm</code> + <code>page.bxm</code> (und optional <code>search.bxm</code> /
 <code>assets/</code>) in einen <code>theme/</code>-Ordner im Wurzelverzeichnis deines Projekts.
-BX Sites bevorzugt eine projektweite <code>theme/</code>-Überschreibung sowohl
+BxSites bevorzugt eine projektweite <code>theme/</code>-Überschreibung sowohl
 gegenüber einem installierten <code>themes/&lt;name&gt;/</code>-Theme als auch gegenüber
 jedem integrierten Theme, solange sie den obigen Vertrag erfüllt - die
 integrierten Themes unter <code>resources/themes/</code> dieses Moduls sind ein
@@ -512,7 +512,7 @@ Schriftart zu tauschen, genügt der obere Teil von
 </code></pre>
 <ol start="3">
 <li>Führe <code>bxSites build</code> aus (oder <code>serve</code> während der
-Iteration) - BX Sites übernimmt <code>theme/</code> automatisch, keine Änderung an
+Iteration) - BxSites übernimmt <code>theme/</code> automatisch, keine Änderung an
 <code>bxsites.yaml</code> nötig (ein projektweiter <code>theme/</code>-Ordner hat immer
 Vorrang vor dem im <code>theme.name</code> genannten integrierten Theme). Alles,
 was du nicht angefasst hast - Navigations-Rendering, Suche, der
@@ -522,7 +522,7 @@ es darunter immer noch genau dasselbe <code>layout.bxm</code>/<code>page.bxm</co
 ist.</li>
 </ol>
 <p>Ein projektweiter <code>theme/</code>-Ordner ist allerdings alles-oder-nichts -
-sobald BX Sites einen findet, wird er anstelle des integrierten Themes
+sobald BxSites einen findet, wird er anstelle des integrierten Themes
 vollständig verwendet, braucht also trotzdem seine eigenen <code>layout.bxm</code> +
 <code>page.bxm</code>, selbst wenn du nur <code>assets/style.css</code> geändert hast (ein
 Ordner, dem eine der beiden fehlt, schlägt sofort mit
@@ -604,7 +604,7 @@ für dein eigenes CSS/JS, automatisch zur Build-Zeit nach
 </ul>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/vuepress/de/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 7&#x3a;07&#x3a;17 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/vuepress/de/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 7&#x3a;35&#x3a;11 PM</span></div>
 			</article>
 
 			<nav class="vp-page-nav" aria-label="Seitennavigation">

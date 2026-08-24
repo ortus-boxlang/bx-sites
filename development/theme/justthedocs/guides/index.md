@@ -14,7 +14,7 @@ icon: phosphor-duotone:book-open
 - [Responsive Images](images.md) - automatic resizing, WebP variants, and CSS/JS bundling, on by default
 - [Interactivity with Alpine.js](interactivity.md) - reactive content (copy buttons, live filters, and more) with no extra setup
 - [Blog](blog.md) - a by-convention blog: posts, authors, categories, archives, RSS, and stats
-- [Plugins](plugins.md) - extending BX Sites with a BoxLang module of your own
+- [Plugins](plugins.md) - extending BxSites with a BoxLang module of your own
 - [Importing a theme](theme-import.md) - best-effort convert an mkdocs/jekyll/hugo theme into a bx-sites theme
 - [Versioning](versioning.md) - snapshot a release's docs and get a version switcher for free
 - [Internationalization (i18n)](i18n.md) - translating your docs into other languages

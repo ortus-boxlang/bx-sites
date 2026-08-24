@@ -6,7 +6,7 @@ icon: phosphor-duotone:tag
 
 # リリースポリシー
 
-BX Sites は[セマンティックバージョニング](https://semver.org/)に従っています。
+BxSites は[セマンティックバージョニング](https://semver.org/)に従っています。
 [`box.json`](https://github.com/ortus-boxlang/bx-sites/blob/development/box.json)
 のバージョンが、すべてのリリースで [ForgeBox](https://forgebox.io/) に公開され、
 リポジトリにタグが付けられます。

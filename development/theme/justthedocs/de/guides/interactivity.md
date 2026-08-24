@@ -7,7 +7,7 @@ tags: [anleitungen, alpine, interaktivitat]
 
 # Interaktivität mit Alpine.js
 
-Jede von BX Sites gebaute Seite lädt bereits [Alpine.js](https://alpinejs.dev/)
+Jede von BxSites gebaute Seite lädt bereits [Alpine.js](https://alpinejs.dev/)
 - es treibt den eingebauten Dunkelmodus-Umschalter und das
 Sprachdropdown in jedem integrierten Theme an. Genau dieselbe
 Alpine-Instanz steht auch deinem eigenen Seiteninhalt kostenlos zur

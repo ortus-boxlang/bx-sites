@@ -2,22 +2,22 @@
 title: Home
 order: 1
 icon: phosphor-duotone:house
-summary: Point BX Sites at a docs/ folder. Get a fast, themeable static site out - documentation, a marketing site, a blog, or anything else Markdown can express - complete with search, i18n, and a markdown toolkit built for real content.
+summary: Point BxSites at a docs/ folder. Get a fast, themeable static site out - documentation, a marketing site, a blog, or anything else Markdown can express - complete with search, i18n, and a markdown toolkit built for real content.
 toc: false
 ---
 
 <div class="bxsites-hero">
-	<img class="bxsites-hero__banner" src="assets/home-banner.jpg" alt="BX Sites - Write. Build. Publish Beautiful Docs. The official documentation engine for BoxLang. Markdown Powered, Beautiful Themes, Blazing Fast Search, Developer Focused.">
+	<img class="bxsites-hero__banner" src="assets/home-banner.jpg" alt="BxSites - Write. Build. Publish Beautiful Docs. The official documentation engine for BoxLang. Markdown Powered, Beautiful Themes, Blazing Fast Search, Developer Focused.">
 	<div class="bxsites-hero__actions">
 		<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="getting-started.md">Get Started</a>
 		<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://github.com/ortus-boxlang/bx-sites">View on GitHub</a>
 	</div>
 </div>
 
-This very site is built by BX Sites, from the Markdown files in this
+This very site is built by BxSites, from the Markdown files in this
 repository's own `docs/` folder.
 
-BX Sites isn't only for reference documentation - it's a general-purpose
+BxSites isn't only for reference documentation - it's a general-purpose
 **static site generator**. A marketing site, a blog, a knowledge base, a
 product site, a personal site: anything you can write in Markdown builds
 the same way, through the same themes, search, and i18n.
@@ -72,7 +72,7 @@ command.
 
 ## See it, don't just read about it
 
-BX Sites' own Markdown toolkit, in action right here on the homepage - not a
+BxSites' own Markdown toolkit, in action right here on the homepage - not a
 screenshot, the real thing:
 
 ::: stepper
@@ -133,10 +133,10 @@ Versioning policy and what's new per release.
 
 ## Need a hand building your site?
 
-BX Sites is free and open source - but if you'd rather have the team who
+BxSites is free and open source - but if you'd rather have the team who
 builds it do the work, [Ortus Solutions](https://www.ortussolutions.com)
 offers professional services and consulting for documentation sites,
-migrations, and any other static site built with BX Sites.
+migrations, and any other static site built with BxSites.
 
 <div class="bxsites-hero__actions">
 	<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="mailto:consulting@ortussolutions.com">Email consulting@ortussolutions.com</a>

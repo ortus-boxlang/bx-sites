@@ -294,7 +294,7 @@ Which search UI `search: true` wires up:
   (default `"pagefind"`) is the CLI executable name/path, resolved against
   `PATH` when it's a bare name; `options` is an array of extra raw CLI
   flags passed straight through. The `pagefind` CLI itself must already be
-  installed and on `PATH` - BX Sites shells out to it (like `git` for
+  installed and on `PATH` - BxSites shells out to it (like `git` for
   `lastUpdated`/`gh-deploy`), it doesn't install it for you.
 
   ```yaml title="bxsites.yaml" linenums="1"
@@ -386,7 +386,7 @@ alternative (works inside a version/locale tree too) - see
 ## `markdown`
 
 Forwarded as-is to [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)'s
-own module settings before each page renders. BX Sites doesn't redefine or
+own module settings before each page renders. BxSites doesn't redefine or
 validate these keys; whatever you put here is bx-markdown's own option set,
 straight through - so this list can drift from bx-markdown's own as it
 evolves. Tables, `~~strikethrough~~`, `- [ ]` task-list checkboxes and the
@@ -396,7 +396,7 @@ Docs defaults it to `true` (see the [Markdown Extensions guide](guides/markdown.
 
 | Key | Default | Effect |
 |---|---|---|
-| `enableAdmonition` | `true` *(BX Sites default; bx-markdown's own default is `false`)* | `!!!`/`???`/`???+` callout blocks - see the [Markdown Extensions guide](guides/markdown.md#admonitions) |
+| `enableAdmonition` | `true` *(BxSites default; bx-markdown's own default is `false`)* | `!!!`/`???`/`???+` callout blocks - see the [Markdown Extensions guide](guides/markdown.md#admonitions) |
 | `enableFootnotes` | `false` | `[^label]` footnote references - see the [Markdown Extensions guide](guides/markdown.md#footnotes) |
 | `enableDefinitionLists` | `false` | `Term\n:   Definition` lists - see the [Markdown Extensions guide](guides/markdown.md#definition-lists) |
 | `autoLinkUrls` | `true` | Auto-links bare URLs and email addresses |
@@ -463,7 +463,7 @@ social:
 
 `false` (the default) - no footer at all. `true` adds one to every page:
 a copyright line (`© <year> <site name>`), the `social` links (if any),
-and a "Built with BX Sites" credit.
+and a "Built with BxSites" credit.
 
 ```yaml title="bxsites.yaml"
 footer: true

@@ -7,7 +7,7 @@ tags: [guide, markdown, gitbook]
 
 # Blocchi di contenuto
 
-Oltre a tutto quanto in [Estensioni Markdown](markdown.md), BX Sites
+Oltre a tutto quanto in [Estensioni Markdown](markdown.md), BxSites
 supporta una famiglia di blocchi di contenuto in stile GitBook - utili di
 per sé, e il motivo per cui il contenuto di un sito GitBook è semplice da
 migrare: ognuno di questi corrisponde direttamente a un blocco GitBook

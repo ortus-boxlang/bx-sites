@@ -7,7 +7,7 @@ tags: [guías, plugins]
 
 # Plugins
 
-Un plugin de BX Sites no es más que otro módulo de BoxLang - su propio
+Un plugin de BxSites no es más que otro módulo de BoxLang - su propio
 `box.json` + `ModuleConfig.bx`, instalado como hermano de `bx-sites` en el
 mismo runtime (`box install` en el proyecto, de la misma forma que ya lo
 están `bx-markdown`/`bx-esapi`). Sin API de plugins que importar, sin
@@ -55,7 +55,7 @@ la CLI.
 Un módulo de plugin necesita exactamente una cosa más allá del habitual
 `box.json`/`ModuleConfig.bx` que ya tiene cualquier módulo de BoxLang:
 una clase `models/BxSitesPlugin.bx`. Cada método en ella es opcional -
-implementa solo los hooks que necesites, BX Sites verifica cada uno antes
+implementa solo los hooks que necesites, BxSites verifica cada uno antes
 de llamarlo:
 
 ```bx
@@ -69,7 +69,7 @@ class {
 
 	string function onPageMarkdown( required string markdown, required struct page, required struct config ) {
 		// Mutate a page's raw markdown before conversion - the same
-		// pre-processing seam BX Sites' own content tabs/math/code
+		// pre-processing seam BxSites' own content tabs/math/code
 		// annotations use internally (TabsProcessor.bx et al.).
 		return arguments.markdown
 	}
@@ -94,12 +94,12 @@ class {
 
 Los hooks se ejecutan en el orden propio del array `plugins` de
 `bxsites.yaml`, y (excepto `onBuildComplete`) el valor de retorno de cada
-uno reemplaza el valor que ve el siguiente hook (o el propio BX Sites) -
+uno reemplaza el valor que ve el siguiente hook (o el propio BxSites) -
 un plugin solo necesita devolver lo que recibió si no tiene nada que
 cambiar.
 
 `onPageMarkdown`/`onPageHtml` se ejecutan una vez por página, para cada
-árbol de documentos que construye BX Sites (el árbol `docs/` principal y
+árbol de documentos que construye BxSites (el árbol `docs/` principal y
 cada árbol `docs/versions/<name>/`). `onConfig`/`onNav`/`onBuildComplete`
 también se aplican mediante el verbo independiente `search-index` donde
 sea relevante (`onConfig`, ya que puede cambiar `markdown`/otras

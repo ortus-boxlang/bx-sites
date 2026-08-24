@@ -413,19 +413,19 @@ automáticamente.
 
 Se reenvía tal cual a la propia configuración del módulo de
 [bx-markdown](https://github.com/ortus-boxlang/bx-markdown) antes de
-renderizar cada página. BX Sites no redefine ni valida estas claves; lo que
+renderizar cada página. BxSites no redefine ni valida estas claves; lo que
 sea que pongas aquí es el propio conjunto de opciones de bx-markdown,
 directamente - así que esta lista puede divergir de la propia de
 bx-markdown a medida que evoluciona. Las tablas, `~~tachado~~`, las
 casillas de tarea `- [ ]` y la tabla de contenido en la página están
 siempre activas, sin interruptor. La única excepción es
 `enableAdmonition` - bx-markdown por sí mismo lo establece en `false` por
-defecto, pero BX Sites lo establece en `true` por defecto (consulta la
+defecto, pero BxSites lo establece en `true` por defecto (consulta la
 [guía de Extensiones de Markdown](guides/markdown.md)).
 
 | Clave | Valor por defecto | Efecto |
 |---|---|---|
-| `enableAdmonition` | `true` *(valor por defecto de BX Sites; el propio valor por defecto de bx-markdown es `false`)* | Bloques de aviso `!!!`/`???`/`???+` - consulta la [guía de Extensiones de Markdown](guides/markdown.md#admoniciones) |
+| `enableAdmonition` | `true` *(valor por defecto de BxSites; el propio valor por defecto de bx-markdown es `false`)* | Bloques de aviso `!!!`/`???`/`???+` - consulta la [guía de Extensiones de Markdown](guides/markdown.md#admoniciones) |
 | `enableFootnotes` | `false` | Referencias de nota al pie `[^label]` - consulta la [guía de Extensiones de Markdown](guides/markdown.md#notas-al-pie) |
 | `enableDefinitionLists` | `false` | Listas `Term\n:   Definition` - consulta la [guía de Extensiones de Markdown](guides/markdown.md#listas-de-definiciones) |
 | `autoLinkUrls` | `true` | Enlaza automáticamente URL y direcciones de correo sin formato |
@@ -496,7 +496,7 @@ social:
 
 `false` (el valor por defecto) - sin pie de página en absoluto. `true`
 añade uno a cada página: una línea de copyright (`© <year> <site name>`),
-los enlaces `social` (si los hay), y un crédito "Built with BX Sites".
+los enlaces `social` (si los hay), y un crédito "Built with BxSites".
 
 ```yaml title="bxsites.yaml"
 footer: true

@@ -80,7 +80,7 @@ regardless of palette:
   sitting next to `guides/themes/index.html`), so it (or an LLM) can read
   the page as plain Markdown directly instead of parsing rendered HTML.
   Always on, no config needed. See [Getting Started](../getting-started.md#downloading-a-page-as-markdown).
-- **An opt-in footer** (copyright, `social` links, a "Built with BX Sites"
+- **An opt-in footer** (copyright, `social` links, a "Built with BxSites"
   credit) when `bxsites.yaml`'s `footer` is `true`. See
   [Configuration](../configuration.md#footer).
 - **A version switcher**, appearing automatically once a project has a
@@ -394,7 +394,7 @@ resize/replace `bxsites-hero__banner`'s own image via a `docs/assets/`-relative
 ## Overriding a theme
 
 Drop your own `layout.bxm` + `page.bxm` (and optionally `search.bxm` /
-`assets/`) into a `theme/` folder at your project root. BX Sites prefers a
+`assets/`) into a `theme/` folder at your project root. BxSites prefers a
 project-level `theme/` override over both an installed `themes/<name>/`
 theme and any built-in theme, as long as it satisfies the contract below -
 the built-in themes under this module's own `resources/themes/` are a good
@@ -435,7 +435,7 @@ my-project/
    }
    ```
 
-3. Run `bxSites build` (or `serve` while iterating) - BX Sites
+3. Run `bxSites build` (or `serve` while iterating) - BxSites
    picks up `theme/` automatically, no `bxsites.yaml` change needed (a
    project-level `theme/` folder always takes precedence over the built-in
    theme named in `theme.name`). Everything you didn't touch - nav
@@ -443,7 +443,7 @@ my-project/
    working exactly as it did in the original `bootstrap` theme, since it's
    still the exact same `layout.bxm`/`page.bxm` markup underneath.
 
-A project `theme/` folder is all-or-nothing, though - once BX Sites finds
+A project `theme/` folder is all-or-nothing, though - once BxSites finds
 one, it's used instead of the built-in theme entirely, so it still needs
 its own `layout.bxm` + `page.bxm` even if all you changed is
 `assets/style.css` (a folder missing either fails fast with

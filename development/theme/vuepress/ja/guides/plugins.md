@@ -7,7 +7,7 @@ tags: [ガイド, プラグイン]
 
 # プラグイン
 
-BX Sites プラグインは単なる別の BoxLang モジュールです。`box.json` + `ModuleConfig.bx` を持ち、
+BxSites プラグインは単なる別の BoxLang モジュールです。`box.json` + `ModuleConfig.bx` を持ち、
 `bx-sites` と同じランタイムの兄弟としてインストールされます（`box install` でプロジェクトに追加、
 `bx-markdown`/`bx-esapi` と同様）。インポートする Plugin API も、専用レジストリも不要です。
 BoxLang 独自のモジュールシステムが*そのまま*プラグインシステムになっています。
@@ -46,7 +46,7 @@ BoxLang モジュールレジストリで有効になります。`install:plugin
 ## プラグインの作成
 
 プラグインモジュールが通常の BoxLang モジュールに追加で必要なのは `models/BxSitesPlugin.bx` クラスだけです。
-すべてのメソッドはオプションです。必要なフックのみを実装してください。BX Sites は呼び出す前に
+すべてのメソッドはオプションです。必要なフックのみを実装してください。BxSites は呼び出す前に
 各フックの存在をチェックします:
 
 ```bx title="models/BxSitesPlugin.bx" linenums="1"
@@ -81,10 +81,10 @@ class {
 ```
 
 フックは `bxsites.yaml` の `plugins` 配列の順序で実行され、各フックの戻り値（`onBuildComplete` 以外）が
-次のフック（または BX Sites 自体）が受け取る値を置き換えます。変更がない場合は受け取った値をそのまま
+次のフック（または BxSites 自体）が受け取る値を置き換えます。変更がない場合は受け取った値をそのまま
 返すだけで構いません。
 
-`onPageMarkdown`/`onPageHtml` は、BX Docs がビルドするすべての docs ツリー
+`onPageMarkdown`/`onPageHtml` は、BxSites がビルドするすべての docs ツリー
 （メインの `docs/` ツリーと各 `docs/versions/<name>/` ツリー）について、
 ページごとに一度実行されます。`onConfig`/`onNav`/`onBuildComplete` は、
 関係する場合はスタンドアロンの `search-index` 動詞にも適用されます

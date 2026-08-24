@@ -91,7 +91,7 @@ bringt unabhängig von der Palette denselben Satz an Seitenfunktionen mit:
   aktiv, keine Konfiguration nötig. Siehe
   [Erste Schritte](../getting-started.md#eine-seite-als-markdown-herunterladen).
 - **Eine optionale Fußzeile** (Copyright, `social`-Links, ein "Built with
-  BX Sites"-Hinweis), wenn `footer` in `bxsites.yaml` `true` ist. Siehe
+  BxSites"-Hinweis), wenn `footer` in `bxsites.yaml` `true` ist. Siehe
   [Konfiguration](../configuration.md#footer).
 - **Ein Versionsumschalter**, der automatisch erscheint, sobald ein
   Projekt einen `docs/versions/`-Ordner mit mehr als einer Version hat.
@@ -436,7 +436,7 @@ aufgelöst wird.
 
 Lege deine eigenen `layout.bxm` + `page.bxm` (und optional `search.bxm` /
 `assets/`) in einen `theme/`-Ordner im Wurzelverzeichnis deines Projekts.
-BX Sites bevorzugt eine projektweite `theme/`-Überschreibung sowohl
+BxSites bevorzugt eine projektweite `theme/`-Überschreibung sowohl
 gegenüber einem installierten `themes/<name>/`-Theme als auch gegenüber
 jedem integrierten Theme, solange sie den obigen Vertrag erfüllt - die
 integrierten Themes unter `resources/themes/` dieses Moduls sind ein
@@ -483,7 +483,7 @@ my-project/
    ```
 
 3. Führe `bxSites build` aus (oder `serve` während der
-   Iteration) - BX Sites übernimmt `theme/` automatisch, keine Änderung an
+   Iteration) - BxSites übernimmt `theme/` automatisch, keine Änderung an
    `bxsites.yaml` nötig (ein projektweiter `theme/`-Ordner hat immer
    Vorrang vor dem im `theme.name` genannten integrierten Theme). Alles,
    was du nicht angefasst hast - Navigations-Rendering, Suche, der
@@ -493,7 +493,7 @@ my-project/
    ist.
 
 Ein projektweiter `theme/`-Ordner ist allerdings alles-oder-nichts -
-sobald BX Sites einen findet, wird er anstelle des integrierten Themes
+sobald BxSites einen findet, wird er anstelle des integrierten Themes
 vollständig verwendet, braucht also trotzdem seine eigenen `layout.bxm` +
 `page.bxm`, selbst wenn du nur `assets/style.css` geändert hast (ein
 Ordner, dem eine der beiden fehlt, schlägt sofort mit

@@ -7,7 +7,7 @@ tags: [guías, alpine, interactividad]
 
 # Interactividad con Alpine.js
 
-Cada página construida por BX Sites ya carga [Alpine.js](https://alpinejs.dev/)
+Cada página construida por BxSites ya carga [Alpine.js](https://alpinejs.dev/)
 - es lo que impulsa el interruptor de modo oscuro y el desplegable de
 idioma incorporados en todos los temas incluidos. Esa misma
 instancia de Alpine también está disponible para el contenido de tus

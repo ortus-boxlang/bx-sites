@@ -7,7 +7,7 @@ tags: [ガイド, markdown, GitBook]
 
 # コンテンツブロック
 
-[Markdown 拡張機能](markdown.md) のすべてに加えて、BX Sites は GitBook
+[Markdown 拡張機能](markdown.md) のすべてに加えて、BxSites は GitBook
 スタイルのコンテンツブロック群をサポートしています - それ自体便利であるだけでなく、
 GitBook サイトのコンテンツを簡単に移行できる理由でもあります。それぞれが
 同名の GitBook ブロックに直接対応しています。すべて同じ `::: name ... :::`

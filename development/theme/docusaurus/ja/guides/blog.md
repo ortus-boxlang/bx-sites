@@ -9,7 +9,7 @@ tags: [ガイド, ブログ]
 
 ブログもまた、[バージョン](../configuration.md#バージョニング)/[i18n](i18n.md) や
 [タグ索引](../getting-started.md#ページの追加) と同じ形の、規約ベースの機能です -
-`docs/blog/posts/` の下に投稿を置くだけで、BX Sites は `/blog/`
+`docs/blog/posts/` の下に投稿を置くだけで、BxSites は `/blog/`
 （ページネーション付き）、カテゴリごとのページ、暦年ごとのアーカイブページ、
 著者ごとのページ、カテゴリごとの RSS フィードとブログ全体用のフィード、
 そして `/blog/stats/` ページを、設定ゼロで構築します。`docs/blog/posts/`
@@ -60,7 +60,7 @@ out of the excerpt shown on `/blog/` and category pages, but still renders
 in full on the post's own page.
 ```
 
-- `date`（必須）- BX Sites が解析できる任意の形式（`2026-08-15`、または完全な
+- `date`（必須）- BxSites が解析できる任意の形式（`2026-08-15`、または完全な
   日時）。投稿自身の並び順（新しい順）と `<pubDate>`/`article:published_time`
   を決めます。
 - `authors` - [`docs/blog/authors.yml`](#著者) のエントリに対応する id の
@@ -75,7 +75,7 @@ in full on the post's own page.
   並んでメインの `/tags/` 索引に統合されます。
 - `summary` - `/blog/`/カテゴリページと RSS フィードに表示される一行の抜粋。
   投稿に `<!-- more -->` マーカーがない場合に使われます。どちらもない場合、
-  BX Sites は投稿本文のプレーンテキストの切り詰めにフォールバックします。
+  BxSites は投稿本文のプレーンテキストの切り詰めにフォールバックします。
 - `image` - フィーチャー画像（`docs/assets/` 相対パス、または完全な URL）-
   投稿の先頭と、すべてのリスト/カテゴリカードのサムネイルとして表示されます。
   `ogImage` が個別に上書きしない限り、投稿自身の `og:image`/Twitter カードにも

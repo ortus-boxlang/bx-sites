@@ -4,18 +4,18 @@ date: 2026-07-01
 authors: [lmajano]
 categories: [Getting Started]
 tags: [getting-started, cli, install, boxlang]
-summary: Install BX Sites, scaffold a project, add a page, and have a real static site built and served locally before your coffee gets cold.
-description: A walkthrough of installing BX Sites, scaffolding a new project with bxSites new, adding your first page, and building/serving it locally.
+summary: Install BxSites, scaffold a project, add a page, and have a real static site built and served locally before your coffee gets cold.
+description: A walkthrough of installing BxSites, scaffolding a new project with bxSites new, adding your first page, and building/serving it locally.
 image: assets/blog/get-your-docs-live-in-10-minutes-cover.svg
 ---
 
-I've written a lot of documentation tools over the years, and the thing I keep coming back to with BX Sites is how little ceremony is involved in going from nothing to a real, browsable static site. No config wizard, no plugin marketplace to shop through first - just a folder of Markdown and one command.
+I've written a lot of documentation tools over the years, and the thing I keep coming back to with BxSites is how little ceremony is involved in going from nothing to a real, browsable static site. No config wizard, no plugin marketplace to shop through first - just a folder of Markdown and one command.
 
 <!-- more -->
 
 ## Install
 
-BX Sites is a BoxLang module, so it installs the same way any other BoxLang module does. Its dependencies (`bx-markdown` for Markdown rendering, `bx-esapi` for HTML-encoding, `bx-yaml` for reading your `bxsites.yaml`, and `bx-image` for the responsive-image pipeline) are all installed automatically as `box.json` dependencies, so installing `bx-sites` itself is the only command needed:
+BxSites is a BoxLang module, so it installs the same way any other BoxLang module does. Its dependencies (`bx-markdown` for Markdown rendering, `bx-esapi` for HTML-encoding, `bx-yaml` for reading your `bxsites.yaml`, and `bx-image` for the responsive-image pipeline) are all installed automatically as `box.json` dependencies, so installing `bx-sites` itself is the only command needed:
 
 ```bash frame="terminal" title="Terminal"
 # OS Binary
@@ -54,9 +54,9 @@ Link between pages the way you'd expect if the files were just sitting next to e
 See [Deployment](guides/deployment.md) for the full picture.
 ```
 
-BX Sites rewrites that at build time into the real built URL, resolved relative to the *linking* page's own folder. It also means the link still works if someone reads the raw file on GitHub instead of the built site - it's a genuinely valid relative path either way.
+BxSites rewrites that at build time into the real built URL, resolved relative to the *linking* page's own folder. It also means the link still works if someone reads the raw file on GitHub instead of the built site - it's a genuinely valid relative path either way.
 
-A page can carry a small frontmatter block up top - `title`, `order`, `tags`, `icon`, `summary`, and a few others - all optional. Skip it entirely and BX Sites derives a sensible title from the filename.
+A page can carry a small frontmatter block up top - `title`, `order`, `tags`, `icon`, `summary`, and a few others - all optional. Skip it entirely and BxSites derives a sensible title from the filename.
 
 ## Build and serve
 

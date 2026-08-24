@@ -2,17 +2,17 @@
 title: Consulenza e Servizi Professionali
 order: 6
 icon: phosphor-duotone:handshake
-summary: Hai bisogno di aiuto per costruire, migrare o mantenere un sito BX Sites? Ortus Solutions offre servizi professionali e consulenza per siti di documentazione e siti statici di ogni tipo.
+summary: Hai bisogno di aiuto per costruire, migrare o mantenere un sito BxSites? Ortus Solutions offre servizi professionali e consulenza per siti di documentazione e siti statici di ogni tipo.
 tags: [servizi, consulenza]
 ---
 
 # Consulenza e Servizi Professionali
 
-BX Sites è gratuito, open source, e pensato per essere usato senza l'aiuto
+BxSites è gratuito, open source, e pensato per essere usato senza l'aiuto
 di nessuno - ma se preferisci far fare il lavoro al team che lo costruisce,
 [Ortus Solutions](https://www.ortussolutions.com) offre servizi
 professionali e consulenza dedicati. Questo copre i siti di documentazione,
-ma anche qualsiasi altro **sito statico**: BX Sites è un generatore di siti
+ma anche qualsiasi altro **sito statico**: BxSites è un generatore di siti
 statici general-purpose, non solo uno strumento per la documentazione, e i
 nostri servizi lo coprono allo stesso modo.
 
@@ -26,19 +26,19 @@ nostri servizi lo coprono allo stesso modo.
 ::: cards
 ::: card title="Siti di documentazione e siti statici" icon="phosphor-duotone:buildings"
 Un sito di documentazione, un sito marketing, un blog, o qualsiasi altro
-sito statico - progettato, costruito e distribuito con BX Sites da zero.
+sito statico - progettato, costruito e distribuito con BxSites da zero.
 :::
 ::: card title="Migrazioni" icon="phosphor-duotone:swap" href="guides/index.md"
 Spostare un progetto GitBook o mkdocs esistente - o un altro strumento per
-documentazione/siti statici - su BX Sites, con contenuto e struttura
+documentazione/siti statici - su BxSites, con contenuto e struttura
 intatti.
 :::
 ::: card title="Temi e plugin personalizzati" icon="phosphor-duotone:palette" href="guides/themes.md"
 Un tema che rispecchia il tuo brand, oppure un plugin modulo BoxLang per un
-workflow che BX Sites non copre già di serie.
+workflow che BxSites non copre già di serie.
 :::
 ::: card title="Formazione e supporto" icon="phosphor-duotone:graduation-cap"
-Porta il tuo team al passo su BX Sites, BoxLang e il resto dell'ecosistema
+Porta il tuo team al passo su BxSites, BoxLang e il resto dell'ecosistema
 Ortus, oppure attiva un supporto continuativo per un sito già in
 produzione.
 :::
@@ -46,9 +46,9 @@ produzione.
 
 ## Perché Ortus Solutions
 
-Ortus Solutions costruisce e mantiene BoxLang, BX Sites e il resto
+Ortus Solutions costruisce e mantiene BoxLang, BxSites e il resto
 dell'ecosistema BoxLang - nessuno conosce questi strumenti meglio di chi li
-ha scritti. I servizi professionali con noi non si limitano a BX Sites,
+ha scritti. I servizi professionali con noi non si limitano a BxSites,
 inoltre: scopri l'intera gamma, dallo staff augmentation al supporto in
 produzione, su
 [ortussolutions.com/services](https://www.ortussolutions.com/services).

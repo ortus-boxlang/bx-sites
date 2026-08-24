@@ -296,7 +296,7 @@ blog:
   `bin`（デフォルトは `"pagefind"`）は CLI 実行ファイルの名前/パスで、単純な名前の
   場合は `PATH` を基準に解決されます。`options` はそのまま渡される追加の生の CLI
   フラグの配列です。`pagefind` CLI 自体は事前にインストールされ `PATH` 上にある
-  必要があります - BX Sites は（`lastUpdated`/`gh-deploy` の `git` と同様に）
+  必要があります - BxSites は（`lastUpdated`/`gh-deploy` の `git` と同様に）
   これを呼び出すだけで、代わりにインストールすることはありません。
 
   ```yaml title="bxsites.yaml" linenums="1"
@@ -385,17 +385,17 @@ redirects:
 ## `markdown`
 
 各ページがレンダリングされる前に、[bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
-独自のモジュール設定としてそのまま転送されます。BX Sites はこれらのキーを再定義したり
+独自のモジュール設定としてそのまま転送されます。BxSites はこれらのキーを再定義したり
 検証したりしません。ここに書いたものはそのまま bx-markdown 自身のオプションセットに
 なるため、このリストは bx-markdown 自体の進化とともにずれていく可能性があります。
 テーブル、`~~取り消し線~~`、`- [ ]` タスクリストのチェックボックス、ページ内目次は
 常に有効で、トグルはありません。唯一の例外は `enableAdmonition` です - bx-markdown
-自体のデフォルトは `false` ですが、BX Docs のデフォルトは `true` です
+自体のデフォルトは `false` ですが、BxSites のデフォルトは `true` です
 （[Markdown 拡張ガイド](guides/markdown.md) を参照）。
 
 | キー | デフォルト | 効果 |
 |---|---|---|
-| `enableAdmonition` | `true` *（BX Sites のデフォルト。bx-markdown 自体のデフォルトは `false`）* | `!!!`/`???`/`???+` コールアウトブロック - [Markdown 拡張ガイド](guides/markdown.md#admonitions) を参照 |
+| `enableAdmonition` | `true` *（BxSites のデフォルト。bx-markdown 自体のデフォルトは `false`）* | `!!!`/`???`/`???+` コールアウトブロック - [Markdown 拡張ガイド](guides/markdown.md#admonitions) を参照 |
 | `enableFootnotes` | `false` | `[^label]` 脚注参照 - [Markdown 拡張ガイド](guides/markdown.md#footnotes) を参照 |
 | `enableDefinitionLists` | `false` | `Term\n:   Definition` リスト - [Markdown 拡張ガイド](guides/markdown.md#definition-lists) を参照 |
 | `autoLinkUrls` | `true` | 裸の URL とメールアドレスを自動リンク |
@@ -459,7 +459,7 @@ social:
 
 `false`（デフォルト）- フッターは一切ありません。`true` にすると各ページにフッターが
 追加されます: 著作権行（`© <year> <site name>`）、`social` リンク（あれば）、
-「Built with BX Sites」のクレジット。
+「Built with BxSites」のクレジット。
 
 ```yaml title="bxsites.yaml"
 footer: true

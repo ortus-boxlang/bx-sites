@@ -87,12 +87,12 @@
 <details class="bxsites-toc-mobile group sticky top-0 z-10 mb-6 max-h-screen overflow-y-auto rounded border border-slate-200 bg-cyan-50/95 text-sm backdrop-blur xl:hidden"><summary class="flex list-none items-center justify-between gap-2 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">On this page<span class="h-1.5 w-1.5 shrink-0 rotate-45 border-b-2 border-r-2 border-current transition-transform group-open:-rotate-[135deg]"></span></summary><div class="px-4 pb-3"><ul class="space-y-1"><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#local-the-default">Local &#x28;the default&#x29;</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#how-it-works">How it works</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#keyboard-shortcuts">Keyboard shortcuts</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#turning-it-off">Turning it off</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#rebuilding-just-the-index">Rebuilding just the index</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#algolia">Algolia</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#pagefind">Pagefind</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#other-search-providers">Other search providers</a></li></ul></div></details>
 				<div class="prose max-w-none">
 					<h1 id="search"><a href="#search" id="search" name="search" class="anchor"></a>Search</h1>
-<p>BX Sites ships one search provider by default and can be pointed at others
+<p>BxSites ships one search provider by default and can be pointed at others
 via <code>bxsites.yaml</code>'s <a href="/bx-sites/development/theme/tailwind/configuration/index.html#searchprovider"><code>searchProvider</code></a> -
 <code>search: true</code>/<code>false</code> stays the master on/off switch regardless of which
 provider is active.</p>
 <h2 id="local-the-default"><a href="#local-the-default" id="local-the-default" name="local-the-default" class="anchor"></a>Local (the default)</h2>
-<p>BX Sites' search is fully static and client-side - the same approach
+<p>BxSites' search is fully static and client-side - the same approach
 <a href="https://www.mkdocs.org/">mkdocs</a> uses by default: an index built once at
 <code>build</code> time, and <a href="https://lunrjs.com/">lunr.js</a> doing the actual searching
 in the visitor's browser. There's no server, database, or external search
@@ -180,9 +180,9 @@ turns on DocSearch's own click/conversion analytics.</p>
 widget isn't shipped - Algolia serves results from its own hosted index,
 populated by <a href="https://docsearch.algolia.com/docs/what-is-docsearch/">DocSearch's crawler</a>
 or your own <a href="https://www.algolia.com/products/search-and-discovery/crawler/">Algolia Crawler</a>
-config, not by anything BX Sites writes at build time. You still need to
+config, not by anything BxSites writes at build time. You still need to
 register the site with DocSearch (or run your own crawler) separately -
-BX Sites only wires up the client widget.</li>
+BxSites only wires up the client widget.</li>
 <li>Each built-in theme instead renders an empty <code>#bxsites-search-algolia</code>
 container, and <code>layout.bxm</code> loads <code>@docsearch/css</code>/<code>@docsearch/js</code> from
 jsDelivr and calls <code>docsearch({...})</code> against it - DocSearch renders its
@@ -204,7 +204,7 @@ executable name/path, resolved against <code>PATH</code> when it's a bare name;
 <code>[&quot;--exclude-selectors&quot;, &quot;.no-index&quot;]</code>).</p>
 <p>With <code>pagefind</code> active:</p>
 <ul>
-<li><strong>The <code>pagefind</code> CLI must already be installed and on <code>PATH</code></strong> - BX Sites
+<li><strong>The <code>pagefind</code> CLI must already be installed and on <code>PATH</code></strong> - BxSites
 shells out to it (there's no BoxLang-native binding, the same reason
 <code>lastUpdated</code>/<code>gh-deploy</code> shell out to <code>git</code>), it doesn't install it for
 you. See <a href="https://pagefind.app/docs/installation/">Pagefind's installation docs</a>.
@@ -213,7 +213,7 @@ Unlike <code>lastUpdated</code>, a missing/failing binary fails the <code>build<
 site whose configured search provider doesn't work is worse than a
 failed build.</li>
 <li>Right after every doc tree (main + versions + locales) is written and
-<code>sitemap.xml</code>/<code>llms.txt</code> are generated, BX Sites runs
+<code>sitemap.xml</code>/<code>llms.txt</code> are generated, BxSites runs
 <code>pagefind --site &lt;siteDir&gt; [...options]</code> against the <em>entire</em> built
 <code>site/</code> - so a multi-version/multi-locale site gets everything indexed
 in one pass, unlike bx-sites' own per-tree <code>search-index.json</code>. Pagefind
@@ -229,7 +229,7 @@ inline search box and results into that container.</li>
 </ul>
 <h2 id="other-search-providers"><a href="#other-search-providers" id="other-search-providers" name="other-search-providers" class="anchor"></a>Other search providers</h2>
 <p><code>searchProvider.provider</code> isn't limited to <code>&quot;local&quot;</code>/<code>&quot;algolia&quot;</code>/<code>&quot;pagefind&quot;</code> -
-any other value is accepted by <code>bxsites.yaml</code> as-is (BX Sites' own config
+any other value is accepted by <code>bxsites.yaml</code> as-is (BxSites' own config
 validation only checks the three providers above). There's no plugin hook
 for this one - the built-in themes simply render nothing for an
 unrecognized provider name, and wiring up a fourth search service
@@ -245,7 +245,7 @@ this module's own <code>layout.bxm</code>/<code>BuildPipeline.bx</code> already 
 <code>algolia</code>/<code>pagefind</code>.</p>
 
 				</div>
-<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/bx-sites/development/theme/tailwind/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 7&#x3a;07&#x3a;17 PM</span></div>
+<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/bx-sites/development/theme/tailwind/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 7&#x3a;35&#x3a;11 PM</span></div>
 			</article>
 
 			<nav class="mt-8 flex justify-between border-t border-slate-200 pt-4 text-sm font-semibold" aria-label="Page navigation">

@@ -7,7 +7,7 @@ toc: false
 ---
 
 <div class="bxsites-hero">
-	<img class="bxsites-hero__banner" src="assets/home-banner.jpg" alt="BX Sites - Write. Build. Publish Beautiful Docs. The official documentation engine for BoxLang. Markdown Powered, Beautiful Themes, Blazing Fast Search, Developer Focused.">
+	<img class="bxsites-hero__banner" src="assets/home-banner.jpg" alt="BxSites - Write. Build. Publish Beautiful Docs. The official documentation engine for BoxLang. Markdown Powered, Beautiful Themes, Blazing Fast Search, Developer Focused.">
 	<div class="bxsites-hero__actions">
 		<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="getting-started.md">はじめに</a>
 		<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://github.com/ortus-boxlang/bx-sites">GitHub で見る</a>
@@ -15,9 +15,9 @@ toc: false
 </div>
 
 このサイト自体も、このリポジトリの `docs/` フォルダ内の Markdown ファイルから
-BX Sites によってビルドされています。
+BxSites によってビルドされています。
 
-BX Sites はリファレンスドキュメント専用ではなく、汎用の
+BxSites はリファレンスドキュメント専用ではなく、汎用の
 **静的サイトジェネレーター**です。マーケティングサイト、ブログ、ナレッジベース、
 プロダクトサイト、個人サイト - Markdown で書けるものなら何でも、同じテーマ、
 同じ検索、同じ i18n を通して同じようにビルドされます。
@@ -73,7 +73,7 @@ bx-sites プロジェクトに変換します。
 
 ## 読むだけでなく、実際に見てみる
 
-BX Sites 自身の Markdown ツールキットが、まさにこのホームページ上で動いています -
+BxSites 自身の Markdown ツールキットが、まさにこのホームページ上で動いています -
 スクリーンショットではなく、本物です:
 
 ::: stepper
@@ -134,9 +134,9 @@ Admonition、タブ、カード、コールアウト、数式、Mermaid ダイ�
 
 ## サイト構築の手伝いが必要ですか?
 
-BX Sites は無料でオープンソースです - ですが、開発チーム自身に作業を
+BxSites は無料でオープンソースです - ですが、開発チーム自身に作業を
 任せたい場合は、[Ortus Solutions](https://www.ortussolutions.com) が
-ドキュメントサイト、移行、その他 BX Sites で構築されたあらゆる静的サイトに
+ドキュメントサイト、移行、その他 BxSites で構築されたあらゆる静的サイトに
 関するプロフェッショナルサービス・コンサルティングを提供しています。
 
 <div class="bxsites-hero__actions">

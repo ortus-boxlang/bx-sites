@@ -7,12 +7,12 @@ tags: [guides, markdown]
 
 # Markdown Extensions
 
-Beyond standard Markdown, BX Sites turns on three of bx-markdown's native
+Beyond standard Markdown, BxSites turns on three of bx-markdown's native
 Flexmark extensions by default - admonitions, footnotes and definition lists
 - plus a Mermaid diagram integration of its own. All four are configurable
 via [`bxsites.yaml`'s `markdown`/`mermaid` keys](../configuration.md#markdown).
 
-On top of those, BX Sites implements three more extensions of its own that
+On top of those, BxSites implements three more extensions of its own that
 Flexmark has no concept of at all - content tabs, math, and fenced-code
 `hl_lines`/`linenums`/`title` annotations. Since bx-sites can't fork
 bx-markdown's parser, each one works as a pre/post-processing pass around
@@ -191,7 +191,7 @@ config needed - always on.
 Fenced code blocks are syntax-highlighted client-side (highlight.js), no
 config needed - the language identifier after the opening ` ``` ` selects
 the grammar, e.g. ` ```json `. On top of highlight.js's own bundled
-languages, BX Sites registers its own lightweight BoxLang grammar under
+languages, BxSites registers its own lightweight BoxLang grammar under
 `bx`/`boxlang`/`bxs`/`bxm`/`cfscript`:
 
 ```bx
@@ -424,4 +424,4 @@ bx-sites-specific syntax needed at all).
 Admonitions, footnotes and definition lists cover the common cases, but
 bx-markdown itself has no opinion beyond those three - any other Flexmark
 extension can be registered directly against it with `markdownRegisterExtension()`,
-independent of BX Sites. See bx-markdown's own readme for details.
+independent of BxSites. See bx-markdown's own readme for details.

@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Bookshelf API
   description: >-
-    A tiny example API, hand-authored for BX Sites' own `::: openapi` docs
+    A tiny example API, hand-authored for BxSites' own `::: openapi` docs
     (see [Content Blocks](../../guides/content-blocks.md#openapi--swagger)) -
     not a real, deployed service.
   version: "1.0.0"

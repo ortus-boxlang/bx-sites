@@ -7,14 +7,14 @@ tags: [guides, search]
 
 # Search
 
-BX Sites ships one search provider by default and can be pointed at others
+BxSites ships one search provider by default and can be pointed at others
 via `bxsites.yaml`'s [`searchProvider`](../configuration.md#searchprovider) -
 `search: true`/`false` stays the master on/off switch regardless of which
 provider is active.
 
 ## Local (the default)
 
-BX Sites' search is fully static and client-side - the same approach
+BxSites' search is fully static and client-side - the same approach
 [mkdocs](https://www.mkdocs.org/) uses by default: an index built once at
 `build` time, and [lunr.js](https://lunrjs.com/) doing the actual searching
 in the visitor's browser. There's no server, database, or external search
@@ -117,9 +117,9 @@ With `algolia` active:
   widget isn't shipped - Algolia serves results from its own hosted index,
   populated by [DocSearch's crawler](https://docsearch.algolia.com/docs/what-is-docsearch/)
   or your own [Algolia Crawler](https://www.algolia.com/products/search-and-discovery/crawler/)
-  config, not by anything BX Sites writes at build time. You still need to
+  config, not by anything BxSites writes at build time. You still need to
   register the site with DocSearch (or run your own crawler) separately -
-  BX Sites only wires up the client widget.
+  BxSites only wires up the client widget.
 - Each built-in theme instead renders an empty `#bxsites-search-algolia`
   container, and `layout.bxm` loads `@docsearch/css`/`@docsearch/js` from
   jsDelivr and calls `docsearch({...})` against it - DocSearch renders its
@@ -146,7 +146,7 @@ executable name/path, resolved against `PATH` when it's a bare name;
 
 With `pagefind` active:
 
-- **The `pagefind` CLI must already be installed and on `PATH`** - BX Sites
+- **The `pagefind` CLI must already be installed and on `PATH`** - BxSites
   shells out to it (there's no BoxLang-native binding, the same reason
   `lastUpdated`/`gh-deploy` shell out to `git`), it doesn't install it for
   you. See [Pagefind's installation docs](https://pagefind.app/docs/installation/).
@@ -155,7 +155,7 @@ With `pagefind` active:
   site whose configured search provider doesn't work is worse than a
   failed build.
 - Right after every doc tree (main + versions + locales) is written and
-  `sitemap.xml`/`llms.txt` are generated, BX Sites runs
+  `sitemap.xml`/`llms.txt` are generated, BxSites runs
   `pagefind --site <siteDir> [...options]` against the *entire* built
   `site/` - so a multi-version/multi-locale site gets everything indexed
   in one pass, unlike bx-sites' own per-tree `search-index.json`. Pagefind
@@ -172,7 +172,7 @@ With `pagefind` active:
 ## Other search providers
 
 `searchProvider.provider` isn't limited to `"local"`/`"algolia"`/`"pagefind"` -
-any other value is accepted by `bxsites.yaml` as-is (BX Sites' own config
+any other value is accepted by `bxsites.yaml` as-is (BxSites' own config
 validation only checks the three providers above). There's no plugin hook
 for this one - the built-in themes simply render nothing for an
 unrecognized provider name, and wiring up a fourth search service

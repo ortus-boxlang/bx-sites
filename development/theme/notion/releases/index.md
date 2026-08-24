@@ -6,7 +6,7 @@ icon: phosphor-duotone:tag
 
 # Release Policy
 
-BX Sites follows [Semantic Versioning](https://semver.org/) - the version in
+BxSites follows [Semantic Versioning](https://semver.org/) - the version in
 [`box.json`](https://github.com/ortus-boxlang/bx-sites/blob/development/box.json)
 is what gets published to [ForgeBox](https://forgebox.io/) and tagged in the
 repo for every release.

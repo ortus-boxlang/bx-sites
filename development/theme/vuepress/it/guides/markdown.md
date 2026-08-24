@@ -7,13 +7,13 @@ tags: [guide, markdown]
 
 # Estensioni Markdown
 
-Oltre al Markdown standard, BX Sites attiva di default tre estensioni
+Oltre al Markdown standard, BxSites attiva di default tre estensioni
 Flexmark native di bx-markdown - ammonizioni, note a piè di pagina e
 liste di definizioni - più un'integrazione con i diagrammi Mermaid tutta
 sua. Tutte e quattro sono configurabili tramite le
 [chiavi `markdown`/`mermaid` di `bxsites.yaml`](../configuration.md#markdown).
 
-Oltre a queste, BX Sites implementa altre tre estensioni proprie di cui
+Oltre a queste, BxSites implementa altre tre estensioni proprie di cui
 Flexmark non ha alcun concetto - schede di contenuto, matematica, e
 annotazioni `hl_lines`/`linenums`/`title` sui blocchi di codice delimitati.
 Dato che bx-sites non può forkare il parser di bx-markdown, ognuna di
@@ -200,7 +200,7 @@ sempre attivo.
 I blocchi di codice delimitati vengono evidenziati lato client
 (highlight.js), nessuna configurazione necessaria - l'identificatore di
 linguaggio dopo l'apertura ` ``` ` seleziona la grammatica, ad es.
-` ```json `. Oltre ai linguaggi già inclusi in highlight.js, BX Sites
+` ```json `. Oltre ai linguaggi già inclusi in highlight.js, BxSites
 registra una propria grammatica BoxLang leggera sotto
 `bx`/`boxlang`/`bxs`/`bxm`/`cfscript`:
 

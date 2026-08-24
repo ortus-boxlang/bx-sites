@@ -86,12 +86,12 @@
 <details class="bxsites-toc-mobile gb-toc--mobile"><summary class="gb-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="gb-toc__item gb-toc__item--2"><a href="#local-der-standard">Local &#x28;der Standard&#x29;</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#wie-es-funktioniert">Wie es funktioniert</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#tastaturkürzel">Tastaturk&uuml;rzel</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#ausschalten">Ausschalten</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#nur-den-index-neu-aufbauen">Nur den Index neu aufbauen</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#algolia">Algolia</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#pagefind">Pagefind</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#andere-suchprovider">Andere Suchprovider</a></li></ul></details>
 				<div class="gb-content-body">
 				<h1 id="suche"><a href="#suche" id="suche" name="suche" class="anchor"></a>Suche</h1>
-<p>BX Sites liefert standardmäßig einen Suchprovider mit und lässt sich über
+<p>BxSites liefert standardmäßig einen Suchprovider mit und lässt sich über
 <a href="/bx-sites/development/theme/gitbook/de/configuration/index.html#searchprovider"><code>searchProvider</code></a> in <code>bxsites.yaml</code>
 auf andere ausrichten - <code>search: true</code>/<code>false</code> bleibt dabei der zentrale
 An-/Aus-Schalter, unabhängig davon, welcher Provider aktiv ist.</p>
 <h2 id="local-der-standard"><a href="#local-der-standard" id="local-der-standard" name="local-der-standard" class="anchor"></a>Local (der Standard)</h2>
-<p>Die Suche von BX Sites ist vollständig statisch und clientseitig -
+<p>Die Suche von BxSites ist vollständig statisch und clientseitig -
 derselbe Ansatz, den <a href="https://www.mkdocs.org/">mkdocs</a> standardmäßig
 verwendet: ein einmal zur <code>build</code>-Zeit erstellter Index, und
 <a href="https://lunrjs.com/">lunr.js</a> übernimmt die eigentliche Suche im Browser
@@ -195,9 +195,9 @@ Ergebnisse aus seinem eigenen gehosteten Index, befüllt vom
 <a href="https://docsearch.algolia.com/docs/what-is-docsearch/">DocSearch-Crawler</a>
 oder deiner eigenen
 <a href="https://www.algolia.com/products/search-and-discovery/crawler/">Algolia-Crawler</a>-Konfiguration,
-nicht von irgendetwas, das BX Sites zur Build-Zeit schreibt. Du musst
+nicht von irgendetwas, das BxSites zur Build-Zeit schreibt. Du musst
 die Website trotzdem separat bei DocSearch registrieren (oder deinen
-eigenen Crawler betreiben) - BX Sites verdrahtet nur das Client-Widget.</li>
+eigenen Crawler betreiben) - BxSites verdrahtet nur das Client-Widget.</li>
 <li>Jedes integrierte Theme rendert stattdessen einen leeren
 <code>#bxsites-search-algolia</code>-Container, und <code>layout.bxm</code> lädt
 <code>@docsearch/css</code>/<code>@docsearch/js</code> von jsDelivr und ruft <code>docsearch({...})</code>
@@ -222,7 +222,7 @@ direkt durchgereicht werden (z. B.
 <p>Mit aktivem <code>pagefind</code>:</p>
 <ul>
 <li><strong>Die <code>pagefind</code>-CLI muss bereits installiert und im <code>PATH</code> vorhanden
-sein</strong> - BX Sites ruft sie extern auf (es gibt keine
+sein</strong> - BxSites ruft sie extern auf (es gibt keine
 BoxLang-native Anbindung, derselbe Grund, aus dem
 <code>lastUpdated</code>/<code>gh-deploy</code> <code>git</code> extern aufrufen), es installiert sie
 nicht für dich. Siehe
@@ -254,7 +254,7 @@ Ergebnisse in diesen Container.</li>
 <p><code>searchProvider.provider</code> ist nicht auf
 <code>&quot;local&quot;</code>/<code>&quot;algolia&quot;</code>/<code>&quot;pagefind&quot;</code> beschränkt - jeder andere Wert wird
 von <code>bxsites.yaml</code> unverändert akzeptiert (die eigene
-Konfigurationsvalidierung von BX Sites prüft nur die drei oben genannten
+Konfigurationsvalidierung von BxSites prüft nur die drei oben genannten
 Provider). Dafür gibt es keinen Plugin-Hook - die integrierten Themes
 rendern für einen nicht erkannten Providernamen einfach nichts, und das
 Verdrahten eines vierten Suchdienstes (Meilisearch, Typesense usw.) ist
@@ -272,7 +272,7 @@ braucht - dieselbe Form, die das <code>layout.bxm</code>/<code>BuildPipeline.bx<
 Moduls bereits für <code>algolia</code>/<code>pagefind</code> verwendet.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/gitbook/de/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 7&#x3a;07&#x3a;17 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/gitbook/de/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 7&#x3a;35&#x3a;11 PM</span></div>
 			</article>
 
 			<nav class="gb-page-nav" aria-label="Seitennavigation">

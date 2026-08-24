@@ -335,7 +335,7 @@ attiva l'analytics di click/conversione proprio di DocSearch.</li>
 <code>&quot;pagefind&quot;</code>: <code>bin</code> (predefinito <code>&quot;pagefind&quot;</code>) è il nome/percorso
 dell'eseguibile CLI, risolto rispetto a <code>PATH</code> quando è un nome nudo;
 <code>options</code> è un array di flag CLI grezzi extra passati direttamente. La
-CLI <code>pagefind</code> stessa deve essere già installata e su <code>PATH</code> - BX Sites
+CLI <code>pagefind</code> stessa deve essere già installata e su <code>PATH</code> - BxSites
 ci esegue uno shell out (come <code>git</code> per <code>lastUpdated</code>/<code>gh-deploy</code>), non
 la installa al posto tuo.</li>
 </ul>
@@ -412,21 +412,21 @@ quadro completo, incluso come <code>page:rename</code> lo aggiunge automaticamen
 <h2 id="markdown"><a href="#markdown" id="markdown" name="markdown" class="anchor"></a><code>markdown</code></h2>
 <p>Inoltrato così com'è alle opzioni del modulo
 <a href="https://github.com/ortus-boxlang/bx-markdown">bx-markdown</a> prima della
-compilazione di ogni pagina. BX Sites non ridefinisce né valida queste
+compilazione di ogni pagina. BxSites non ridefinisce né valida queste
 chiavi; qualunque cosa metti qui è il set di opzioni proprio di
 bx-markdown, passato direttamente - quindi questo elenco può divergere da
 quello di bx-markdown man mano che si evolve. Tabelle, <code>~~barrato~~</code>,
 checkbox <code>- [ ]</code> per le liste di attività e il sommario in pagina sono
 sempre attivi, senza alcun interruttore. L'unica eccezione è
 <code>enableAdmonition</code> - bx-markdown stesso lo imposta a <code>false</code> di default,
-ma BX Sites lo imposta a <code>true</code> di default (vedi la
+ma BxSites lo imposta a <code>true</code> di default (vedi la
 <a href="/bx-sites/development/theme/docusaurus/it/guides/markdown/index.html">guida alle Estensioni Markdown</a>).</p>
 <table class="table">
 <thead>
 <tr><th>Chiave</th><th>Predefinito</th><th>Effetto</th></tr>
 </thead>
 <tbody>
-<tr><td><code>enableAdmonition</code></td><td><code>true</code> <em>(predefinito di BX Sites; il predefinito di bx-markdown è <code>false</code>)</em></td><td>Blocchi di richiamo <code>!!!</code>/<code>???</code>/<code>???+</code> - vedi la <a href="/bx-sites/development/theme/docusaurus/it/guides/markdown/index.html#admonitions">guida alle Estensioni Markdown</a></td></tr>
+<tr><td><code>enableAdmonition</code></td><td><code>true</code> <em>(predefinito di BxSites; il predefinito di bx-markdown è <code>false</code>)</em></td><td>Blocchi di richiamo <code>!!!</code>/<code>???</code>/<code>???+</code> - vedi la <a href="/bx-sites/development/theme/docusaurus/it/guides/markdown/index.html#admonitions">guida alle Estensioni Markdown</a></td></tr>
 <tr><td><code>enableFootnotes</code></td><td><code>false</code></td><td>Riferimenti a note a piè di pagina <code>[^label]</code> - vedi la <a href="/bx-sites/development/theme/docusaurus/it/guides/markdown/index.html#footnotes">guida alle Estensioni Markdown</a></td></tr>
 <tr><td><code>enableDefinitionLists</code></td><td><code>false</code></td><td>Liste <code>Term\n: Definition</code> - vedi la <a href="/bx-sites/development/theme/docusaurus/it/guides/markdown/index.html#definition-lists">guida alle Estensioni Markdown</a></td></tr>
 <tr><td><code>autoLinkUrls</code></td><td><code>true</code></td><td>Collega automaticamente URL e indirizzi email nudi</td></tr>
@@ -487,7 +487,7 @@ un glifo di link generico come ripiego per qualsiasi altra cosa), e
 <h2 id="footer"><a href="#footer" id="footer" name="footer" class="anchor"></a><code>footer</code></h2>
 <p><code>false</code> (il valore predefinito) - nessun footer. <code>true</code> ne aggiunge uno a
 ogni pagina: una riga di copyright (<code>© &lt;anno&gt; &lt;nome del sito&gt;</code>), i link
-<code>social</code> (se presenti), e un credito &quot;Built with BX Sites&quot;.</p>
+<code>social</code> (se presenti), e un credito &quot;Built with BxSites&quot;.</p>
 <pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">footer: true
 </code></pre>
 <h2 id="lastupdated"><a href="#lastupdated" id="lastupdated" name="lastupdated" class="anchor"></a><code>lastUpdated</code></h2>
@@ -702,7 +702,7 @@ attivare esplicitamente. Un file sciolto posizionato direttamente sotto
 quelle del sito principale.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/docusaurus/it/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 7&#x3a;07&#x3a;17 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/docusaurus/it/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 7&#x3a;35&#x3a;11 PM</span></div>
 			</article>
 
 			<nav class="dsrs-page-nav" aria-label="Navigazione della pagina">

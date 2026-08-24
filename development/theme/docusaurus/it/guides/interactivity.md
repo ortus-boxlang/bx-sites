@@ -7,7 +7,7 @@ tags: [guide, alpine, interattività]
 
 # Interattività con Alpine.js
 
-Ogni pagina compilata da BX Sites carica già [Alpine.js](https://alpinejs.dev/)
+Ogni pagina compilata da BxSites carica già [Alpine.js](https://alpinejs.dev/)
 - è ciò che alimenta l'interruttore modalità scura integrato e il menu a
 discesa della lingua in ogni tema integrato. Quella stessa
 istanza Alpine è disponibile gratuitamente anche per il contenuto delle

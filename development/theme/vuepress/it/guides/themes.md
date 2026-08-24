@@ -90,7 +90,7 @@ di funzionalità di pagina indipendentemente dalla palette:
   renderizzato. Sempre attivo, nessuna configurazione necessaria. Vedi
   [Per iniziare](../getting-started.md#downloading-a-page-as-markdown).
 - **Un footer opzionale** (copyright, link `social`, un credito "Built
-  with BX Sites") quando `footer` di `bxsites.yaml` è `true`. Vedi
+  with BxSites") quando `footer` di `bxsites.yaml` è `true`. Vedi
   [Configurazione](../configuration.md#footer).
 - **Un selettore di versione**, che appare automaticamente non appena un
   progetto ha una cartella `docs/versions/` con più di una versione al
@@ -434,7 +434,7 @@ stesso modo in cui si risolve qualsiasi altra immagine.
 ## Sovrascrivere un tema
 
 Metti il tuo `layout.bxm` + `page.bxm` (e opzionalmente `search.bxm` /
-`assets/`) in una cartella `theme/` alla radice del tuo progetto. BX Sites
+`assets/`) in una cartella `theme/` alla radice del tuo progetto. BxSites
 preferisce una sovrascrittura `theme/` a livello di progetto sia rispetto
 a un tema `themes/<name>/` installato sia rispetto a qualsiasi tema
 integrato, purché soddisfi il contratto sopra descritto - i temi
@@ -490,7 +490,7 @@ my-project/
    sempre lo stesso identico markup `layout.bxm`/`page.bxm` sottostante.
 
 Una cartella `theme/` di progetto è comunque tutto-o-niente - una volta
-che BX Sites ne trova una, viene usata al posto del tema integrato per
+che BxSites ne trova una, viene usata al posto del tema integrato per
 intero, quindi necessita comunque del proprio `layout.bxm` + `page.bxm`
 anche se l'unica cosa cambiata è `assets/style.css` (una cartella priva
 di uno dei due file fallisce subito con `BxSites.InvalidTheme` invece di

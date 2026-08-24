@@ -7,7 +7,7 @@ tags: [guides, plugins]
 
 # Plugins
 
-A BX Sites plugin is nothing more than another BoxLang module - its own
+A BxSites plugin is nothing more than another BoxLang module - its own
 `box.json` + `ModuleConfig.bx`, installed as a sibling of `bx-sites` in the
 same runtime (`box install` into the project, the same way `bx-markdown`/
 `bx-esapi` already are). No plugin API to import, no separate registry -
@@ -49,7 +49,7 @@ activate it, same as any other installed module. See
 A plugin module needs exactly one thing beyond the usual `box.json`/
 `ModuleConfig.bx` a BoxLang module already has: a `models/BxSitesPlugin.bx`
 class. Every method on it is optional - implement only the hooks you need,
-BX Sites checks for each one before calling it:
+BxSites checks for each one before calling it:
 
 ```bx title="models/BxSitesPlugin.bx" linenums="1"
 // models/BxSitesPlugin.bx
@@ -62,7 +62,7 @@ class {
 
 	string function onPageMarkdown( required string markdown, required struct page, required struct config ) {
 		// Mutate a page's raw markdown before conversion - the same
-		// pre-processing seam BX Sites' own content tabs/math/code
+		// pre-processing seam BxSites' own content tabs/math/code
 		// annotations use internally (TabsProcessor.bx et al.).
 		return arguments.markdown
 	}
@@ -87,7 +87,7 @@ class {
 
 Hooks run in `bxsites.yaml`'s own `plugins` array order, and (except
 `onBuildComplete`) each one's return value replaces the value the next
-hook (or BX Sites itself) sees - a plugin only needs to return what it was
+hook (or BxSites itself) sees - a plugin only needs to return what it was
 given if it has nothing to change.
 
 `onPageMarkdown`/`onPageHtml` run once per page, for every doc tree BX

@@ -330,7 +330,7 @@ Welche Such-UI `search: true` verdrahtet:
   aufgelöst gegen `PATH`, wenn es ein reiner Name ist; `options` ist ein
   Array zusätzlicher, roher CLI-Flags, die direkt durchgereicht werden.
   Die `pagefind`-CLI selbst muss bereits installiert und im `PATH`
-  vorhanden sein - BX Sites ruft sie extern auf (wie `git` für
+  vorhanden sein - BxSites ruft sie extern auf (wie `git` für
   `lastUpdated`/`gh-deploy`), es installiert sie nicht für dich.
 
   ```yaml title="bxsites.yaml" linenums="1"
@@ -430,13 +430,13 @@ automatisch setzt.
 
 Wird unverändert an [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)s
 eigene Modul-Einstellungen weitergereicht, bevor jede Seite gerendert
-wird. BX Sites definiert oder validiert diese Schlüssel nicht neu; was auch
+wird. BxSites definiert oder validiert diese Schlüssel nicht neu; was auch
 immer du hier einträgst, ist direkt bx-markdowns eigenes Optionsset - diese
 Liste kann sich also im Lauf der Zeit von bx-markdowns eigener
 unterscheiden. Tabellen, `~~Durchgestrichen~~`, `- [ ]`-Task-List-Checkboxen
 und das Inhaltsverzeichnis innerhalb der Seite sind immer aktiv, ohne
 Umschaltmöglichkeit. Die eine Ausnahme ist `enableAdmonition` - bx-markdown
-selbst setzt es standardmäßig auf `false`, aber BX Sites setzt es
+selbst setzt es standardmäßig auf `false`, aber BxSites setzt es
 standardmäßig auf `true` (siehe die
 [Markdown-Erweiterungen-Anleitung](guides/markdown.md)).
 
@@ -512,7 +512,7 @@ social:
 
 `false` (Standard) - überhaupt keine Fußzeile. `true` fügt jeder Seite eine
 hinzu: eine Copyright-Zeile (`© <Jahr> <Website-Name>`), die `social`-Links
-(falls vorhanden) und einen "Built with BX Sites"-Hinweis.
+(falls vorhanden) und einen "Built with BxSites"-Hinweis.
 
 ```yaml title="bxsites.yaml"
 footer: true

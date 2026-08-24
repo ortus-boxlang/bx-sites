@@ -86,7 +86,7 @@
 <details class="bxsites-toc-mobile vp-toc--mobile"><summary class="vp-toc--mobile__summary">In questa pagina</summary><ul><li class="vp-toc__item vp-toc__item--2"><a href="#installare-un-plugin-pubblicato">Installare un plugin pubblicato</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#scrivere-un-plugin">Scrivere un plugin</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#quando-scatta-ogni-hook">Quando scatta ogni hook</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#un-esempio-minimale">Un esempio minimale</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#errori">Errori</a></li></ul></details>
 				<div class="vp-content-body">
 				<h1 id="plugin"><a href="#plugin" id="plugin" name="plugin" class="anchor"></a>Plugin</h1>
-<p>Un plugin di BX Sites non è altro che un altro modulo BoxLang - il proprio
+<p>Un plugin di BxSites non è altro che un altro modulo BoxLang - il proprio
 <code>box.json</code> + <code>ModuleConfig.bx</code>, installato come fratello di <code>bx-sites</code>
 nello stesso runtime (<code>box install</code> nel progetto, allo stesso modo in cui
 lo sono già <code>bx-markdown</code>/<code>bx-esapi</code>). Nessuna API di plugin da
@@ -122,7 +122,7 @@ CLI.</p>
 <p>Un modulo plugin necessita esattamente di una cosa oltre al normale
 <code>box.json</code>/<code>ModuleConfig.bx</code> che già ha qualsiasi modulo BoxLang: una
 classe <code>models/BxSitesPlugin.bx</code>. Ogni metodo su di essa è opzionale -
-implementa solo gli hook di cui hai bisogno, BX Sites verifica la presenza
+implementa solo gli hook di cui hai bisogno, BxSites verifica la presenza
 di ciascuno prima di chiamarlo:</p>
 <pre><code class="language-bx">// models/BxSitesPlugin.bx
 class {
@@ -134,7 +134,7 @@ class {
 
 	string function onPageMarkdown( required string markdown, required struct page, required struct config ) {
 		// Mutate a page's raw markdown before conversion - the same
-		// pre-processing seam BX Sites' own content tabs/math/code
+		// pre-processing seam BxSites' own content tabs/math/code
 		// annotations use internally (TabsProcessor.bx et al.).
 		return arguments.markdown
 	}
@@ -158,11 +158,11 @@ class {
 </code></pre>
 <p>Gli hook girano nell'ordine dell'array <code>plugins</code> proprio di
 <code>bxsites.yaml</code>, e (tranne <code>onBuildComplete</code>) il valore di ritorno di
-ognuno sostituisce il valore che vede l'hook successivo (o BX Sites
+ognuno sostituisce il valore che vede l'hook successivo (o BxSites
 stesso) - un plugin deve restituire ciò che ha ricevuto solo se non ha
 nulla da cambiare.</p>
 <p><code>onPageMarkdown</code>/<code>onPageHtml</code> girano una volta per pagina, per ogni
-albero di documenti che BX Sites compila (l'albero <code>docs/</code> principale e
+albero di documenti che BxSites compila (l'albero <code>docs/</code> principale e
 ogni albero <code>docs/versions/&lt;name&gt;/</code>). <code>onConfig</code>/<code>onNav</code>/
 <code>onBuildComplete</code> vengono applicati anche dal verbo autonomo
 <code>search-index</code> dove è rilevante (<code>onConfig</code>, dato che può cambiare
@@ -205,7 +205,7 @@ leggilo come esempio pratico della struttura delle cartelle:</p>
 </ul>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/plugins.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/vuepress/it/guides/plugins.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 7&#x3a;07&#x3a;17 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/plugins.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/vuepress/it/guides/plugins.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 7&#x3a;35&#x3a;11 PM</span></div>
 			</article>
 
 			<nav class="vp-page-nav" aria-label="Navigazione della pagina">

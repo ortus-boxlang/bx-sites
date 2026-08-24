@@ -2,22 +2,22 @@
 title: Inicio
 order: 1
 icon: phosphor-duotone:house
-summary: Apunta BX Sites a una carpeta docs/. Obtén un sitio estático rápido y personalizable - documentación, un sitio de marketing, un blog o cualquier otra cosa que Markdown pueda expresar - completo con búsqueda, i18n y un conjunto de herramientas Markdown pensado para contenido real.
+summary: Apunta BxSites a una carpeta docs/. Obtén un sitio estático rápido y personalizable - documentación, un sitio de marketing, un blog o cualquier otra cosa que Markdown pueda expresar - completo con búsqueda, i18n y un conjunto de herramientas Markdown pensado para contenido real.
 toc: false
 ---
 
 <div class="bxsites-hero">
-	<img class="bxsites-hero__banner" src="assets/home-banner.jpg" alt="BX Sites - Escribe. Construye. Publica documentación hermosa. El motor de documentación oficial de BoxLang. Impulsado por Markdown, temas hermosos, búsqueda ultrarrápida, enfocado en desarrolladores.">
+	<img class="bxsites-hero__banner" src="assets/home-banner.jpg" alt="BxSites - Escribe. Construye. Publica documentación hermosa. El motor de documentación oficial de BoxLang. Impulsado por Markdown, temas hermosos, búsqueda ultrarrápida, enfocado en desarrolladores.">
 	<div class="bxsites-hero__actions">
 		<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="getting-started.md">Comenzar</a>
 		<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://github.com/ortus-boxlang/bx-sites">Ver en GitHub</a>
 	</div>
 </div>
 
-Este mismo sitio está construido con BX Sites, a partir de los archivos
+Este mismo sitio está construido con BxSites, a partir de los archivos
 Markdown en la propia carpeta `docs/` de este repositorio.
 
-BX Sites no es solo para documentación de referencia - es un
+BxSites no es solo para documentación de referencia - es un
 **generador de sitios estáticos** de propósito general. Un sitio de
 marketing, un blog, una base de conocimiento, un sitio de producto, un sitio
 personal: todo lo que puedas escribir en Markdown se construye de la misma
@@ -75,7 +75,7 @@ bx-sites funcional con un solo comando.
 
 ## Míralo, no solo leas sobre ello
 
-El propio conjunto de herramientas Markdown de BX Sites, en acción aquí
+El propio conjunto de herramientas Markdown de BxSites, en acción aquí
 mismo en la página de inicio - no es una captura de pantalla, es lo real:
 
 ::: stepper
@@ -140,10 +140,10 @@ Política de versionado y novedades de cada lanzamiento.
 
 ## ¿Necesitas ayuda para construir tu sitio?
 
-BX Sites es libre y de código abierto - pero si prefieres que el equipo
+BxSites es libre y de código abierto - pero si prefieres que el equipo
 que lo construye haga el trabajo, [Ortus Solutions](https://www.ortussolutions.com)
 ofrece servicios profesionales y consultoría para sitios de documentación,
-migraciones y cualquier otro sitio estático construido con BX Sites.
+migraciones y cualquier otro sitio estático construido con BxSites.
 
 <div class="bxsites-hero__actions">
 	<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="mailto:consulting@ortussolutions.com">Escribe a consulting@ortussolutions.com</a>

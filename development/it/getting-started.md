@@ -38,7 +38,7 @@ comandi BVM, sono trattati nella
 
 ## Installazione
 
-BX Sites dipende da [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
+BxSites dipende da [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
 per il rendering del Markdown, da [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
 per la codifica HTML, da [bx-yaml](https://github.com/ortus-boxlang/bx-yaml)
 per leggere `bxsites.yaml`, e da [bx-image](https://github.com/ortus-boxlang/bx-image)
@@ -155,7 +155,7 @@ Vedi [Distribuzione](guides/deployment.md) oppure, da quella stessa
 guida, [torna a Per iniziare](../getting-started.md#add-pages).
 ```
 
-BX Sites riscrive ogni link di questo tipo nel suo URL "pulito" già
+BxSites riscrive ogni link di questo tipo nel suo URL "pulito" già
 compilato al momento del `build` (`guides/deployment.md` ->
 `/guides/deployment/index.html`, con ancore e query string preservate),
 risolto rispetto alla cartella della pagina *che contiene il link* - `../`
@@ -188,7 +188,7 @@ Ogni pagina può iniziare con un piccolo blocco di frontmatter:
 title: Deployment
 order: 2
 hidden: false
-description: How to deploy a built BX Sites site.
+description: How to deploy a built BxSites site.
 tags: [guides, deployment]
 icon: 🚀
 summary: Everything you need to publish a built site.

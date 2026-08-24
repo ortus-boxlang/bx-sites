@@ -36,7 +36,7 @@ covered in
 
 ## Install
 
-BX Sites depends on [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
+BxSites depends on [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
 for Markdown rendering, [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
 for HTML-encoding, [bx-yaml](https://github.com/ortus-boxlang/bx-yaml) for
 reading `bxsites.yaml`, and [bx-image](https://github.com/ortus-boxlang/bx-image)
@@ -147,7 +147,7 @@ See [Deployment](guides/deployment.md) or, from that same guide,
 [back to Getting Started](../getting-started.md#add-pages).
 ```
 
-BX Sites rewrites every such link to its built pretty-URL at build time
+BxSites rewrites every such link to its built pretty-URL at build time
 (`guides/deployment.md` -> `/guides/deployment/index.html`, anchors and
 query strings preserved), resolved against the *linking* page's own
 folder - `../` and sibling references work exactly like they would
@@ -176,7 +176,7 @@ Each page can start with a small frontmatter block:
 title: Deployment
 order: 2
 hidden: false
-description: How to deploy a built BX Sites site.
+description: How to deploy a built BxSites site.
 tags: [guides, deployment]
 icon: 🚀
 summary: Everything you need to publish a built site.

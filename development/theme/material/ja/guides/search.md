@@ -7,14 +7,14 @@ tags: [ガイド, 検索]
 
 # 検索
 
-BX Sites はデフォルトで1つの検索プロバイダーを同梱しており、`bxsites.yaml` の
+BxSites はデフォルトで1つの検索プロバイダーを同梱しており、`bxsites.yaml` の
 [`searchProvider`](../configuration.md#searchprovider) で他のプロバイダーに
 切り替えることもできます - どのプロバイダーが有効であっても、`search: true`/`false`
 がマスターのオン/オフスイッチであり続けます。
 
 ## Local（デフォルト）
 
-BX Sites の検索は完全に静的でクライアントサイドです。[mkdocs](https://www.mkdocs.org/)
+BxSites の検索は完全に静的でクライアントサイドです。[mkdocs](https://www.mkdocs.org/)
 がデフォルトで使用するのと同じアプローチです: `build` 時に一度作成されるインデックスと、
 訪問者のブラウザで実際の検索を行う [lunr.js](https://lunrjs.com/) の組み合わせです。
 サーバー、データベース、外部検索サービスは一切不要です。
@@ -110,13 +110,13 @@ searchProvider:
 `algolia` が有効な場合:
 
 - `search-index.json` はビルドされず、共有の `lunr.js`/`search.js` ウィジェットも
-  出荷されません - Algolia は、BX Sites がビルド時に書き出す何かからではなく、
+  出荷されません - Algolia は、BxSites がビルド時に書き出す何かからではなく、
   [DocSearch のクローラー](https://docsearch.algolia.com/docs/what-is-docsearch/)
   や自身の
   [Algolia Crawler](https://www.algolia.com/products/search-and-discovery/crawler/)
   設定によって投入された、自身がホストするインデックスから結果を提供します。
   サイトを DocSearch に個別に登録する（または自身でクローラーを実行する）必要が
-  依然としてあります - BX Sites はクライアントウィジェットを配線するだけです。
+  依然としてあります - BxSites はクライアントウィジェットを配線するだけです。
 - 各組み込みテーマは代わりに空の `#bxsites-search-algolia` コンテナをレンダリングし、
   `layout.bxm` が jsDelivr から `@docsearch/css`/`@docsearch/js` を読み込んで
   それに対して `docsearch({...})` を呼び出します - DocSearch がそのコンテナに
@@ -144,7 +144,7 @@ searchProvider:
 `pagefind` が有効な場合:
 
 - **`pagefind` CLI 自体は事前にインストールされ `PATH` 上にある必要があります** -
-  BX Sites はこれを呼び出すだけです（BoxLang ネイティブのバインディングはなく、
+  BxSites はこれを呼び出すだけです（BoxLang ネイティブのバインディングはなく、
   `lastUpdated`/`gh-deploy` が `git` を呼び出すのと同じ理由です）。代わりに
   インストールすることはありません。
   [Pagefind のインストールドキュメント](https://pagefind.app/docs/installation/)
@@ -153,7 +153,7 @@ searchProvider:
   （`BxSites.PagefindFailed`）- 設定された検索プロバイダーが機能しないサイトを
   出荷することは、ビルドが失敗するより悪いことだからです。
 - すべてのドキュメントツリー（メイン + バージョン + ロケール）が書き出され、
-  `sitemap.xml`/`llms.txt` が生成された直後に、BX Sites は *ビルド済みの*
+  `sitemap.xml`/`llms.txt` が生成された直後に、BxSites は *ビルド済みの*
   `site/` 全体に対して `pagefind --site <siteDir> [...options]` を実行します -
   そのため、マルチバージョン/マルチロケールサイトでも、bx-sites 自身のツリー
   ごとの `search-index.json` とは異なり、すべてが一度のパスでインデックス
@@ -170,7 +170,7 @@ searchProvider:
 ## その他の検索プロバイダー
 
 `searchProvider.provider` は `"local"`/`"algolia"`/`"pagefind"` に限定されません -
-それ以外の値も `bxsites.yaml` にそのまま受け入れられます（BX Sites 自身の設定
+それ以外の値も `bxsites.yaml` にそのまま受け入れられます（BxSites 自身の設定
 検証は上記の3つのプロバイダーのみをチェックします）。これにはプラグインフックは
 ありません - 組み込みテーマは、認識されないプロバイダー名に対して単に何も
 レンダリングしません。4つ目の検索サービス（Meilisearch、Typesense など）を

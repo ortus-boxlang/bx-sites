@@ -8,7 +8,7 @@ tags: [anleitungen, markdown, gitbook]
 # Content-Blöcke
 
 Zusätzlich zu allem in [Markdown-Erweiterungen](markdown.md) unterstützt
-BX Sites eine Familie von GitBook-artigen Content-Blöcken - für sich
+BxSites eine Familie von GitBook-artigen Content-Blöcken - für sich
 genommen praktisch, und der Grund, warum sich der Inhalt einer
 GitBook-Website unkompliziert migrieren lässt: jeder dieser Blöcke
 bildet direkt auf einen gleichnamigen GitBook-Block ab. Jeder verwendet

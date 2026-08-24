@@ -7,7 +7,7 @@ tags: [guides, markdown, gitbook]
 
 # Content Blocks
 
-On top of everything in [Markdown Extensions](markdown.md), BX Sites
+On top of everything in [Markdown Extensions](markdown.md), BxSites
 supports a family of GitBook-style content blocks - handy on its own,
 and the reason a GitBook site's content is straightforward to migrate:
 each of these maps directly to a GitBook block of the same name. Every

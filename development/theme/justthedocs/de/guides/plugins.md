@@ -54,7 +54,7 @@ CLI-Referenz.
 Ein Plugin-Modul braucht genau eine Sache zusätzlich zu der üblichen
 `box.json`/`ModuleConfig.bx`, die ein BoxLang-Modul bereits hat: eine
 Klasse `models/BxSitesPlugin.bx`. Jede Methode darauf ist optional -
-implementiere nur die Hooks, die du brauchst, BX Sites prüft vor jedem
+implementiere nur die Hooks, die du brauchst, BxSites prüft vor jedem
 Aufruf, ob sie existiert:
 
 ```bx title="models/BxSitesPlugin.bx" linenums="1"
@@ -68,7 +68,7 @@ class {
 
 	string function onPageMarkdown( required string markdown, required struct page, required struct config ) {
 		// Mutate a page's raw markdown before conversion - the same
-		// pre-processing seam BX Sites' own content tabs/math/code
+		// pre-processing seam BxSites' own content tabs/math/code
 		// annotations use internally (TabsProcessor.bx et al.).
 		return arguments.markdown
 	}
@@ -93,12 +93,12 @@ class {
 
 Hooks laufen in der Reihenfolge, in der sie im eigenen `plugins`-Array
 von `bxsites.yaml` stehen, und (außer bei `onBuildComplete`) ersetzt der
-Rückgabewert jedes Hooks das, was der nächste Hook (oder BX Sites selbst)
+Rückgabewert jedes Hooks das, was der nächste Hook (oder BxSites selbst)
 sieht - ein Plugin muss nur das zurückgeben, was es erhalten hat, wenn es
 nichts zu ändern hat.
 
 `onPageMarkdown`/`onPageHtml` laufen einmal pro Seite, für jeden Doc-Baum,
-den BX Sites baut (den Haupt-`docs/`-Baum und jeden
+den BxSites baut (den Haupt-`docs/`-Baum und jeden
 `docs/versions/<name>/`-Baum). `onConfig`/`onNav`/`onBuildComplete`
 werden, wo relevant, auch vom eigenständigen `search-index`-Verb
 angewendet (`onConfig`, da es `markdown`/andere Einstellungen ändern

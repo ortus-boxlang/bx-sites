@@ -7,14 +7,14 @@ tags: [guide, ricerca]
 
 # Ricerca
 
-BX Sites distribuisce un provider di ricerca di default e può essere
+BxSites distribuisce un provider di ricerca di default e può essere
 puntato su altri tramite [`searchProvider`](../configuration.md#searchprovider)
 di `bxsites.yaml` - `search: true`/`false` resta l'interruttore master
 on/off indipendentemente da quale provider è attivo.
 
 ## Locale (il predefinito)
 
-La ricerca di BX Sites è completamente statica e lato client - lo stesso
+La ricerca di BxSites è completamente statica e lato client - lo stesso
 approccio che usa [mkdocs](https://www.mkdocs.org/) di default: un
 indice costruito una sola volta al momento del `build`, e
 [lunr.js](https://lunrjs.com/) che effettua la ricerca vera e propria nel
@@ -128,9 +128,9 @@ Con `algolia` attivo:
   dal proprio indice ospitato, popolato dal
   [crawler di DocSearch](https://docsearch.algolia.com/docs/what-is-docsearch/)
   o dal tuo stesso [Algolia Crawler](https://www.algolia.com/products/search-and-discovery/crawler/),
-  non da qualcosa che BX Sites scrive al momento del build. Devi comunque
+  non da qualcosa che BxSites scrive al momento del build. Devi comunque
   registrare il sito con DocSearch (o eseguire il tuo crawler)
-  separatamente - BX Sites collega solo il widget client.
+  separatamente - BxSites collega solo il widget client.
 - Ogni tema integrato renderizza invece un contenitore vuoto
   `#bxsites-search-algolia`, e `layout.bxm` carica `@docsearch/css`/
   `@docsearch/js` da jsDelivr e chiama `docsearch({...})` contro di esso -
@@ -189,7 +189,7 @@ Con `pagefind` attivo:
 
 `searchProvider.provider` non è limitato a `"local"`/`"algolia"`/
 `"pagefind"` - qualsiasi altro valore viene accettato da `bxsites.yaml`
-così com'è (la validazione della configurazione propria di BX Sites
+così com'è (la validazione della configurazione propria di BxSites
 controlla solo i tre provider sopra). Non c'è alcun hook plugin per
 questo caso - i temi integrati semplicemente non renderizzano nulla per
 un nome di provider non riconosciuto, e collegare un quarto servizio di
