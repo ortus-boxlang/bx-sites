@@ -5,10 +5,19 @@ name: Publish Docs
 # GitHub Pages - main publishes to the site root (stable), development
 # publishes to /development/ (latest), so both versions stay live at once.
 # Each publish is itself a showcase of all ten built-in themes (the theme
-# gallery) - buildMultiTheme.sh builds docs/ ten times and assembles
-# bootstrap at the root plus every other theme under theme/<name>/, with a
-# switcher (docs/assets/theme-switcher.js) to jump between them from any
-# page.
+# gallery) - bootstrap at the root, every other theme under theme/<name>/,
+# with a switcher (docs/assets/theme-switcher.js) to jump between them from
+# any page.
+#
+# The ten themes build as ten separate matrix jobs, each on its own runner -
+# real OS-level parallelism, no shared disk/BOXLANG_HOME/working tree
+# between them (this repo previously ran all ten concurrently inside one
+# job via a single `buildMultiTheme.sh` script juggling `git worktree` +
+# bash job control on one runner; that script still exists for local
+# preview - see its own docblock - but no longer runs in CI). Each job
+# uploads its own site/ as an artifact; `assemble-and-deploy` downloads all
+# ten, assembles them into one site/ tree, and deploys it.
+#
 # Requires GitHub Pages enabled for this repository with its source set to
 # "Deploy from a branch" -> gh-pages -> / (root) (Settings -> Pages -> Source).
 # gh-pages is created automatically by the first successful run below.
@@ -27,7 +36,6 @@ on:
       - "components/**"
       - "interceptors/**"
       - "ModuleConfig.bx"
-      - "buildMultiTheme.sh"
       - ".github/workflows/pages.yml"
 
   # Manual Trigger
@@ -44,8 +52,12 @@ concurrency:
 
 jobs:
   build:
-    name: Build & Publish (${{ github.ref_name }})
+    name: Build [${{ matrix.theme }}] (${{ github.ref_name }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        theme: [bootstrap, material, tailwind, docsy, slate, docusaurus, justthedocs, vuepress, gitbook, notion]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -74,14 +86,84 @@ jobs:
           # main's committed bxsites.yaml already points baseURL/editUri at
           # the site root / main branch - every other branch publishes under
           # /<branch-name>/ and edits against its own branch instead, so
-          # patch a throwaway copy of the config just for this build.
+          # patch this job's own checkout of the config just for this build
+          # (each matrix job gets its own independent checkout, so this
+          # never has to be undone or shared with any other job).
           export URL="https://ortus-boxlang.github.io/bx-sites/${{ github.ref_name }}/"
           export EDIT_URI="edit/${{ github.ref_name }}/docs/"
-          yq eval '.baseURL = strenv(URL) | .repo.editUri = strenv(EDIT_URI)' bxsites.yaml > bxsites.yaml.tmp
-          mv bxsites.yaml.tmp bxsites.yaml
+          yq eval -i '.baseURL = strenv(URL) | .repo.editUri = strenv(EDIT_URI)' bxsites.yaml
 
-      - name: Build the site (bootstrap at the root, every other theme under theme/)
-        run: ./buildMultiTheme.sh
+      - name: Point theme-switcher.js at this build's own site root
+        run: |
+          # Same basePath derivation as BaseUrlResolver.bx: strip
+          # scheme+host off a full URL, otherwise use the value as-is
+          # (ensuring leading/trailing "/"). Always the *site's* own root,
+          # not this variant's own theme/<name>/ sub-path - the switcher
+          # needs to know where the gallery itself starts from, the same
+          # on every one of the ten variants.
+          BASE_URL="$(yq -r '.baseURL // "/"' bxsites.yaml)"
+          if [[ "${BASE_URL}" =~ ^https?:// ]]; then
+            ROOT_PATH="$(echo "${BASE_URL}" | sed -E 's#^https?://[^/]+##')"
+            [[ -z "${ROOT_PATH}" ]] && ROOT_PATH="/"
+          else
+            ROOT_PATH="${BASE_URL}"
+            [[ "${ROOT_PATH}" != /* ]] && ROOT_PATH="/${ROOT_PATH}"
+            [[ "${ROOT_PATH}" != */ ]] && ROOT_PATH="${ROOT_PATH}/"
+          fi
+          sed -i "s#__BXSITES_ROOT__#${ROOT_PATH}#g" docs/assets/theme-switcher.js
+
+      - name: Point this variant at its own theme + sub-path
+        if: matrix.theme != 'bootstrap'
+        run: |
+          # bootstrap publishes at the site root with whatever theme.name
+          # is already committed - every other variant instead builds
+          # under theme/<name>/ as that theme.
+          BASE_URL="$(yq -r '.baseURL // "/"' bxsites.yaml)"
+          export THEME="${{ matrix.theme }}"
+          export URL="${BASE_URL%/}/theme/${THEME}/"
+          yq eval -i '.theme.name = strenv(THEME) | .baseURL = strenv(URL)' bxsites.yaml
+
+      - name: Build the site
+        run: boxlang bxSites build
+
+      - name: Verify the build actually produced output
+        run: |
+          # `boxlang bxSites <verb>`'s own exit code doesn't reliably
+          # propagate a real internal crash (ModuleConfig.bx's top-level
+          # try/catch swallows it) - an empty/missing site/ here is a real
+          # build failure even though the step above exited 0.
+          if [[ ! -d site ]] || [[ -z "$(ls -A site 2>/dev/null)" ]]; then
+            echo "::error::build for [${{ matrix.theme }}] produced no site/ output"
+            exit 1
+          fi
+
+      - name: Upload this theme's site/ output
+        uses: actions/upload-artifact@v7
+        with:
+          name: site-${{ matrix.theme }}
+          path: site
+          if-no-files-found: error
+
+  assemble-and-deploy:
+    name: Assemble & Deploy (${{ github.ref_name }})
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download every theme's site/ output
+        uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+
+      - name: Assemble bootstrap at the root, every other theme under theme/<name>/
+        run: |
+          mkdir -p site/theme
+          mv artifacts/site-bootstrap/* site/
+          for dir in artifacts/site-*/; do
+            name="$(basename "${dir}")"
+            name="${name#site-}"
+            [[ "${name}" == "bootstrap" ]] && continue
+            mv "${dir}" "site/theme/${name}"
+          done
 
       - name: Deploy main to the site root
         if: github.ref_name == 'main'

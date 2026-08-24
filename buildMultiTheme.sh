@@ -1,45 +1,49 @@
 #!/usr/bin/env bash
 #
-# Dogfooding-only build script for this repo's own docs site: builds
-# docs/ once per built-in theme (10, as of the theme gallery expansion)
-# and assembles the results into a single site/ tree, so the deployed
-# site shows off `bootstrap` at the root plus every other built-in theme
-# living side by side under theme/<name>/ - this repo's own docs double
-# as the theme gallery. Not a bx-sites product feature - just this
-# project using its own `build` verb, the same way pages.yml already
-# patches baseURL per branch.
+# LOCAL PREVIEW ONLY - not used by CI. `pages.yml`'s own "Publish Docs"
+# deploy builds the ten-theme gallery as ten separate GitHub Actions
+# matrix jobs instead (real OS-level parallelism, one runner per theme,
+# no shared disk/working tree to juggle) - see that workflow's own
+# top-of-file comment. This script exists purely so a contributor can
+# reproduce the same "bootstrap at the root, every other theme under
+# theme/<name>/" gallery layout locally, in one `./buildMultiTheme.sh`
+# call, without needing to push and wait on ten CI jobs just to preview
+# a docs change against every built-in theme at once.
+#
+# Builds docs/ once per built-in theme (10, as of the theme gallery
+# expansion) and assembles the results into a single site/ tree. Not a
+# bx-sites product feature - just this project using its own `build`
+# verb, once per theme.
 #
 # The 10 builds run CONCURRENTLY (capped at BXSITES_BUILD_JOBS, default
 # nproc) rather than one at a time - going from 3 themes to 10 made the
-# old fully-sequential version too slow. Each variant builds in its own
-# throwaway `git worktree` rather than all ten fighting over the same
-# bxsites.yaml/site/ - `git worktree add --detach` (the same technique
-# GhPagesDeployer.bx already uses for its own throwaway gh-deploy
-# checkout) gives every variant a real, independent working directory
-# that still shares the main repo's object database, so `git log`
-# (bxsites.yaml's `lastUpdated` option, resolved per file by
-# GitRevisionDate.bx) keeps resolving file history correctly - a plain
-# directory copy, or a docs/ symlink with no real .git context behind
-# it, would silently break that instead. Each worktree's own
-# checked-out docs/ (frozen at HEAD) is immediately swapped for a live
-# symlink back to the real docs/ working tree, so uncommitted local
-# edits still show up in the preview build the same way they did when
-# every build ran in place, one at a time.
+# old fully-sequential version too slow for a quick local preview loop.
+# Each variant builds in its own throwaway `git worktree` rather than
+# all ten fighting over the same bxsites.yaml/site/ (or worse, over the
+# one real working tree a contributor is actively editing) -
+# `git worktree add --detach` (the same technique GhPagesDeployer.bx
+# already uses for its own throwaway gh-deploy checkout) gives every
+# variant a real, independent working directory that still shares the
+# main repo's object database, so `git log` (bxsites.yaml's
+# `lastUpdated` option, resolved per file by GitRevisionDate.bx) keeps
+# resolving file history correctly - a plain directory copy, or a
+# docs/ symlink with no real .git context behind it, would silently
+# break that instead. Each worktree's own checked-out docs/ (frozen at
+# HEAD) is immediately swapped for a live symlink back to the real
+# docs/ working tree, so uncommitted local edits still show up in the
+# preview build the same way they did when every build ran in place,
+# one at a time.
 #
 # Each variant moves its own site/ output into its final destination
 # (site/ for bootstrap, site/theme/<name>/ for everything else) and
 # removes its own worktree the moment ITS OWN build finishes, rather
 # than every worktree + site output sitting on disk until all ten are
-# done and one big pass moves/removes them at the very end - with ten
-# full repo checkouts (worktrees) plus ten full site outputs, keeping
-# all of them alive simultaneously nearly doubles peak disk usage for
-# no reason, and on a standard-size GitHub-hosted runner that's the
-# difference between comfortably fitting and a variant silently losing
-# a write partway through (still exiting 0, since not every failure
-# mode surfaces as a nonzero exit) - which is exactly what an
-# `mv: cannot stat '.../bootstrap/site/*': No such file or directory`
-# at the very end, after every variant already logged its own "Built",
-# looks like from the outside.
+# done and one big pass moves/removes them at the very end - keeps
+# peak disk usage capped at BXSITES_BUILD_JOBS variants' worth instead
+# of all ten, and means a build that quietly writes nothing (still
+# exiting 0 - see ModuleConfig.bx's own top-level try/catch) fails
+# loudly, attributed to that one theme's own name/log, rather than
+# surfacing later as an unattributed error.
 #
 # Usage: ./buildMultiTheme.sh [projectRoot]   (defaults to ".")
 # Env:   BXSITES_BUILD_JOBS - max concurrent theme builds (default: nproc)
