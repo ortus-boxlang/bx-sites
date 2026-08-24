@@ -87,7 +87,7 @@
 
 					<h1 class="page-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,112l-33.62,37.35a8,8,0,0,1-5.94,2.65H40a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H200.44a8,8,0,0,1,5.94,2.65Z" opacity="0.2"/><path d="M246,106.65,212.33,69.3A16,16,0,0,0,200.44,64H136V32a8,8,0,0,0-16,0V64H40A16,16,0,0,0,24,80v64a16,16,0,0,0,16,16h80v64a8,8,0,0,0,16,0V160h64.44a16,16,0,0,0,11.89-5.3L246,117.35A8,8,0,0,0,246,106.65ZM200.44,144H40V80H200.44l28.8,32Z"/></svg></span> Redirects</h1>
 <div class="page-tags mb-3"><a class="page-tag" href="/bx-sites/development/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-sites/development/tags/index.html#tag-redirects">redirects</a></div>
-<details class="bxsites-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">On this page</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#per-page-frontmatter-redirect-from">Per-page&#x3a; frontmatter redirect_from</a></li><li class="toc-level-2"><a href="#site-wide-bxsitesjson-redirects">Site-wide&#x3a; bxsites.json redirects</a></li><li class="toc-level-2"><a href="#pagerename-stamps-this-for-you">page&#x3a;rename stamps this for you</a></li><li class="toc-level-2"><a href="#conflicts">Conflicts</a></li><li class="toc-level-2"><a href="#whats-out-of-scope-for-now">What&#x27;s out of scope &#x28;for now&#x29;</a></li></ul></details>
+<details class="bxsites-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">On this page</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#per-page-frontmatter-redirect-from">Per-page&#x3a; frontmatter redirect_from</a></li><li class="toc-level-2"><a href="#site-wide-bxsitesyaml-redirects">Site-wide&#x3a; bxsites.yaml redirects</a></li><li class="toc-level-2"><a href="#pagerename-stamps-this-for-you">page&#x3a;rename stamps this for you</a></li><li class="toc-level-2"><a href="#conflicts">Conflicts</a></li><li class="toc-level-2"><a href="#whats-out-of-scope-for-now">What&#x27;s out of scope &#x28;for now&#x29;</a></li></ul></details>
 					<h1 id="redirects"><a href="#redirects" id="redirects" name="redirects" class="anchor"></a>Redirects</h1>
 <p>Keep an old URL working after you move, rename, or restructure a page -
 a static HTML stub gets written at the old path, so a search engine's
@@ -114,16 +114,15 @@ a version's own page redirects within that version
 (<code>site/versions/2.0/old-path/</code>), a locale's own translated page redirects
 within that locale (<code>site/es/old-path/</code>), exactly the same way the page's
 own real URL already is. There's nothing extra to configure per tree.</p>
-<h2 id="site-wide-bxsitesjson-redirects"><a href="#site-wide-bxsitesjson-redirects" id="site-wide-bxsitesjson-redirects" name="site-wide-bxsitesjson-redirects" class="anchor"></a>Site-wide: <code>bxsites.json</code> <code>redirects</code></h2>
+<h2 id="site-wide-bxsitesyaml-redirects"><a href="#site-wide-bxsitesyaml-redirects" id="site-wide-bxsitesyaml-redirects" name="site-wide-bxsitesyaml-redirects" class="anchor"></a>Site-wide: <code>bxsites.yaml</code> <code>redirects</code></h2>
 <p>For an old URL that never belonged to a specific page - a restructured
 section, an old domain's path, anything not naturally a single page's own
 &quot;old name&quot; - list an explicit <code>from</code>/<code>to</code> pair instead:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;redirects&quot;: [
-		{ &quot;from&quot;: &quot;old-guide&quot;, &quot;to&quot;: &quot;guides/new-guide/&quot; },
-		{ &quot;from&quot;: &quot;moved-to-another-site&quot;, &quot;to&quot;: &quot;https://example.com/docs&quot; }
-	]
-}
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">redirects:
+  - from: old-guide
+    to: guides/new-guide/
+  - from: moved-to-another-site
+    to: https://example.com/docs
 </code></pre>
 <ul>
 <li><code>from</code> - the old pretty-URL segment, same shape as <code>redirect_from</code> above</li>
@@ -161,7 +160,7 @@ post needs its own <code>redirects</code> config entry instead.</li>
 there's no <code>guides/old/*</code> catch-all.</li>
 </ul>
 
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/redirects.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/guides/redirects.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/redirects.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/guides/redirects.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 				</article>
 
 
@@ -169,7 +168,7 @@ there's no <code>guides/old/*</code> catch-all.</li>
 			</main>
 
 			<aside class="col-xl-2 toc-sidebar d-none d-xl-block">
-				<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#per-page-frontmatter-redirect-from">Per-page&#x3a; frontmatter redirect_from</a></li><li class="toc-level-2"><a href="#site-wide-bxsitesjson-redirects">Site-wide&#x3a; bxsites.json redirects</a></li><li class="toc-level-2"><a href="#pagerename-stamps-this-for-you">page&#x3a;rename stamps this for you</a></li><li class="toc-level-2"><a href="#conflicts">Conflicts</a></li><li class="toc-level-2"><a href="#whats-out-of-scope-for-now">What&#x27;s out of scope &#x28;for now&#x29;</a></li></ul></nav>
+				<nav class="toc mb-4" aria-label="On this page"><div class="toc-title">On this page</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#per-page-frontmatter-redirect-from">Per-page&#x3a; frontmatter redirect_from</a></li><li class="toc-level-2"><a href="#site-wide-bxsitesyaml-redirects">Site-wide&#x3a; bxsites.yaml redirects</a></li><li class="toc-level-2"><a href="#pagerename-stamps-this-for-you">page&#x3a;rename stamps this for you</a></li><li class="toc-level-2"><a href="#conflicts">Conflicts</a></li><li class="toc-level-2"><a href="#whats-out-of-scope-for-now">What&#x27;s out of scope &#x28;for now&#x29;</a></li></ul></nav>
 			</aside>
 
 		</div>

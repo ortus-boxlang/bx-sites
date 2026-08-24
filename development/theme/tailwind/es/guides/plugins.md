@@ -17,10 +17,10 @@ sistema de plugins.
 Sin embargo, instalar un módulo por sí solo nunca lo activa como plugin -
 un proyecto lo habilita explícitamente por nombre de módulo de BoxLang,
 mediante el array [`plugins`](../configuration.md#plugins) de
-`bxsites.json`:
+`bxsites.yaml`:
 
-```json
-{ "plugins": [ "myBxSitesPlugin" ] }
+```yaml title="bxsites.yaml"
+plugins: [ myBxSitesPlugin ]
 ```
 
 ## Instalar un plugin publicado
@@ -42,7 +42,7 @@ registro de módulos de BoxLang en ejecución sin necesidad de
 lo carga en el runtime de inmediato e imprime de vuelta el nombre real de
 mapeo del módulo registrado (que, según la nota de abajo, no siempre
 coincide con el slug de ForgeBox) - añade *ese* nombre al array `plugins`
-de `bxsites.json` para activarlo, igual que con cualquier otro módulo
+de `bxsites.yaml` para activarlo, igual que con cualquier otro módulo
 instalado. Consulta
 [`install:plugin`](../cli-reference.md#installplugin) en la referencia de
 la CLI.
@@ -60,7 +60,7 @@ de llamarlo:
 class {
 
 	struct function onConfig( required struct config ) {
-		// Mutate/return the site config, right after bxsites.json is loaded.
+		// Mutate/return the site config, right after bxsites.yaml is loaded.
 		return arguments.config
 	}
 
@@ -90,7 +90,7 @@ class {
 ```
 
 Los hooks se ejecutan en el orden propio del array `plugins` de
-`bxsites.json`, y (excepto `onBuildComplete`) el valor de retorno de cada
+`bxsites.yaml`, y (excepto `onBuildComplete`) el valor de retorno de cada
 uno reemplaza el valor que ve el siguiente hook (o el propio BX Sites) -
 un plugin solo necesita devolver lo que recibió si no tiene nada que
 cambiar.
@@ -131,7 +131,7 @@ un ejemplo trabajado de la estructura de carpetas:
 
 ```
 hello-plugin/
-├── box.json              # boxlang.moduleName is what bxsites.json's [plugins] references
+├── box.json              # boxlang.moduleName is what bxsites.yaml's [plugins] references
 ├── ModuleConfig.bx        # a normal, otherwise-empty BoxLang module descriptor
 └── models/
     └── BxSitesPlugin.bx    # onPageHtml() + onBuildComplete()
@@ -140,6 +140,6 @@ hello-plugin/
 ## Errores
 
 - `BxSites.PluginNotFound` - un nombre en el array `plugins` de
-  `bxsites.json` no es un módulo de BoxLang instalado/activado.
+  `bxsites.yaml` no es un módulo de BoxLang instalado/activado.
 - `BxSites.InvalidPlugin` - el módulo existe, pero no tiene una clase
   `models/BxSitesPlugin.bx`.

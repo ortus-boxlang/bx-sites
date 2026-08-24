@@ -164,12 +164,13 @@ it somewhere specific instead, add your own entry with an explicit `url`
 a `docs/` page) to your `nav` array or `docs/nav.json` - doing so suppresses
 the auto-appended one entirely, so there's never a duplicate:
 
-```json title="bxsites.json" linenums="1"
-{ "nav": [
-  { "path": "index.md" },
-  { "title": "Blog", "url": "blog/index.html", "icon": "lucide:newspaper" },
-  { "path": "about.md" }
-] }
+```yaml title="bxsites.yaml" linenums="1"
+nav:
+  - path: index.md
+  - title: Blog
+    url: blog/index.html
+    icon: lucide:newspaper
+  - path: about.md
 ```
 
 Individual posts aren't added to the nav themselves (same as the tags
@@ -194,8 +195,8 @@ Every category also gets its own filtered feed at
 unbounded feed on a large blog just wastes bandwidth on every poll; set it
 to `0` for every post, uncapped:
 
-```json title="bxsites.json"
-{ "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
+```yaml title="bxsites.yaml"
+blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
 ```
 
 ## Previewing drafts

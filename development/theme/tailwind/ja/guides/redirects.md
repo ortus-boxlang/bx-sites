@@ -41,19 +41,18 @@ redirect_from:
 の本当の URL がすでにそうしているのとまったく同じです。ツリーごとに
 追加で設定するものは何もありません。
 
-## サイト全体: `bxsites.json` の `redirects`
+## サイト全体: `bxsites.yaml` の `redirects`
 
 特定のページに属したことがない古い URL - 再構成されたセクション、古い
 ドメインのパス、単一ページ自身の「古い名前」として自然ではない何か -
 の場合は、代わりに明示的な `from`/`to` のペアを列挙します:
 
-```json title="bxsites.json" linenums="1"
-{
-	"redirects": [
-		{ "from": "old-guide", "to": "guides/new-guide/" },
-		{ "from": "moved-to-another-site", "to": "https://example.com/docs" }
-	]
-}
+```yaml title="bxsites.yaml" linenums="1"
+redirects:
+  - from: old-guide
+    to: guides/new-guide/
+  - from: moved-to-another-site
+    to: https://example.com/docs
 ```
 
 - `from` - 上記の `redirect_from` と同じ形式の古いプリティ URL セグメント

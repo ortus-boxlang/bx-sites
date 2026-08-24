@@ -96,7 +96,7 @@ whenever you want to publish - no workflow file needed. The rest of this
 guide covers the GitHub Actions workflow this repo itself uses, for
 automatic multi-version publishing on every push.</p>
 <h2 id="what-it-does"><a href="#what-it-does" id="what-it-does" name="what-it-does" class="anchor"></a>What it does</h2>
-<p>On every push to <code>main</code> or <code>development</code> that touches <code>docs/</code>, <code>bxsites.json</code>,
+<p>On every push to <code>main</code> or <code>development</code> that touches <code>docs/</code>, <code>bxsites.yaml</code>,
 or the module's own source (theme/pipeline changes), the workflow:</p>
 <ol>
 <li>Installs BoxLang + <a href="https://github.com/ortus-boxlang/bx-markdown">bx-markdown</a></li>
@@ -130,9 +130,9 @@ latest, unreleased docs. Both stay live simultaneously: each branch's job
 only pushes to <code>gh-pages</code> with <code>keep_files: true</code> and its own
 <code>destination_dir</code>, so a <code>development</code> deploy never overwrites <code>main</code>'s
 content and vice versa.</p>
-<p><code>main</code>'s own <code>bxsites.json</code> should have <code>baseURL</code> set to the site root
+<p><code>main</code>'s own <code>bxsites.yaml</code> should have <code>baseURL</code> set to the site root
 (<code>https://&lt;user&gt;.github.io/&lt;repo&gt;/</code>); the workflow overrides it for every
-other branch at build time, so <code>development</code>'s <code>bxsites.json</code> doesn't need
+other branch at build time, so <code>development</code>'s <code>bxsites.yaml</code> doesn't need
 its own <code>baseURL</code> entry for this to work.</p>
 <p>To add a third branch (e.g. a <code>release/2.0</code> preview), add it to the <code>on.push.branches</code>
 list and give it its own <code>if: github.ref_name == '...'</code> deploy step with
@@ -147,17 +147,17 @@ don't need from <code>on.push.branches</code> and its matching deploy step.</p>
 <h2 id="serving-from-a-project-pages-sub-path"><a href="#serving-from-a-project-pages-sub-path" id="serving-from-a-project-pages-sub-path" name="serving-from-a-project-pages-sub-path" class="anchor"></a>Serving from a project Pages sub-path</h2>
 <p>A GitHub <em>project</em> Pages site (as opposed to a <code>&lt;user&gt;.github.io</code> <em>user</em>
 site) is served from <code>https://&lt;user&gt;.github.io/&lt;repo&gt;/</code>, not from the
-domain root. Set <code>baseURL</code> in <code>bxsites.json</code> to that full URL so every
+domain root. Set <code>baseURL</code> in <code>bxsites.yaml</code> to that full URL so every
 internal link, asset and nav entry gets the <code>/&lt;repo&gt;/</code> prefix it needs -
 and so a real <code>sitemap.xml</code> gets generated too:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;baseURL&quot;: &quot;https://&lt;user&gt;.github.io/&lt;repo&gt;/&quot; }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">baseURL: &quot;https://&lt;user&gt;.github.io/&lt;repo&gt;/&quot;
 </code></pre>
 <p>See <a href="/bx-sites/development/theme/notion/configuration/index.html#baseurl">Configuration</a> for the full breakdown of
 what <code>baseURL</code> does. A <code>&lt;user&gt;.github.io</code> user site, or any custom domain
 mapped to the site root, can leave <code>baseURL</code> at its default (<code>/</code>).</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/notion/guides/deployment.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/notion/guides/deployment.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="ntn-page-nav" aria-label="Page navigation">

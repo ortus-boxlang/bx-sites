@@ -73,7 +73,7 @@ regardless of palette:
   anywhere on the page, and `Escape` closes the results. See
   [Search](search.md).
 - **A repo link and "Edit this page"/"Last updated" line**, when
-  `bxsites.json`'s `repo`/`lastUpdated` options are set. See
+  `bxsites.yaml`'s `repo`/`lastUpdated` options are set. See
   [Configuration](../configuration.md#repo).
 - **A "Download Markdown" link**, next to "Edit this page" - every page's
   raw `.md` source is published alongside its built HTML (`guides/themes.md`
@@ -81,39 +81,39 @@ regardless of palette:
   the page as plain Markdown directly instead of parsing rendered HTML.
   Always on, no config needed. See [Getting Started](../getting-started.md#downloading-a-page-as-markdown).
 - **An opt-in footer** (copyright, `social` links, a "Built with BX Sites"
-  credit) when `bxsites.json`'s `footer` is `true`. See
+  credit) when `bxsites.yaml`'s `footer` is `true`. See
   [Configuration](../configuration.md#footer).
 - **A version switcher**, appearing automatically once a project has a
   `docs/versions/` folder with more than one version in it. See
   [Configuration](../configuration.md#versioning).
 - **A themed `404.html`**, served automatically by most static hosts
   (including GitHub Pages) for any unmatched path.
-- **A custom logo and favicon**, when `bxsites.json`'s `theme.logo`/
+- **A custom logo and favicon**, when `bxsites.yaml`'s `theme.logo`/
   `theme.favicon` are set. See [Configuration](../configuration.md#theme).
 - **A collapsible sidebar nav**, opt-in via `theme.options.navCollapsible` -
   every section with children (linked or not) gets a toggle button instead
   of always showing its children inline, and the section containing the
   current page always starts open. See
   [Configuration](../configuration.md#theme).
-- **Google Analytics**, when `bxsites.json`'s `analytics` is configured. See
+- **Google Analytics**, when `bxsites.yaml`'s `analytics` is configured. See
   [Configuration](../configuration.md#analytics).
 - **Social share cards** (Open Graph + Twitter Card meta tags), sourced
   from each page's `description` frontmatter (or the site-wide
   `description`) and its own `ogImage` (or the site-wide one) - optionally
-  auto-generated per page via `bxsites.json`'s `generateOgImages`. See
+  auto-generated per page via `bxsites.yaml`'s `generateOgImages`. See
   [Configuration](../configuration.md#ogimage).
 - **Page tags, an icon and a summary line**, all opt-in via a page's own
   frontmatter - tags render as badges linking into a site-wide `/tags/`
   index. See [Getting Started](../getting-started.md#add-pages).
-- **An explicit nav override**, in `bxsites.json` or its own `docs/nav.json`,
+- **An explicit nav override**, in `bxsites.yaml` or its own `docs/nav.json`,
   replacing folder-inference for large sites. See
   [Configuration](../configuration.md#nav).
-- **Extra CSS/JS**, injected via `bxsites.json`'s `extraCss`/`extraJs`. See
+- **Extra CSS/JS**, injected via `bxsites.yaml`'s `extraCss`/`extraJs`. See
   [Configuration](../configuration.md#extracss--extrajs).
 - **Admonition (note/warning/tip/...) callout boxes**, on by default in any
   page's markdown, including collapsible variants - no config needed. See
   [Markdown Extensions](markdown.md#admonitions).
-- **Footnotes and definition lists**, opt-in via `bxsites.json`'s `markdown`.
+- **Footnotes and definition lists**, opt-in via `bxsites.yaml`'s `markdown`.
   See [Markdown Extensions](markdown.md#footnotes).
 - **Content tabs**, **code line numbers/highlighted lines/titles**, and
   **diff markers/terminal-style frames** for code blocks, no config needed.
@@ -121,15 +121,15 @@ regardless of palette:
 - **Responsive images** - resized + WebP variants and a `<picture>`
   rewrite for every eligible `docs/assets/**` image, on by default. See
   [Responsive Images](images.md).
-- **Mermaid diagrams**, opt-in via `bxsites.json`'s `mermaid`. See
+- **Mermaid diagrams**, opt-in via `bxsites.yaml`'s `mermaid`. See
   [Markdown Extensions](markdown.md#diagrams).
-- **Math** (KaTeX), opt-in via `bxsites.json`'s `math`. See
+- **Math** (KaTeX), opt-in via `bxsites.yaml`'s `math`. See
   [Markdown Extensions](markdown.md#math).
 
-Set which one a project uses in `bxsites.json`:
+Set which one a project uses in `bxsites.yaml`:
 
-```json title="bxsites.json"
-{ "theme": { "name": "material" } }
+```yaml title="bxsites.yaml"
+theme: { name: material }
 ```
 
 ## Installing a published theme
@@ -147,8 +147,8 @@ satisfies the `ThemeProvider` contract below before finishing. A project
 can carry several installed themes side by side this way and switch
 between them purely by name:
 
-```json title="bxsites.json"
-{ "theme": { "name": "bx-sites-theme-blog1" } }
+```yaml title="bxsites.yaml"
+theme: { name: bx-sites-theme-blog1 }
 ```
 
 A theme needs no BoxLang module/class-loader involvement at all (unlike a
@@ -171,7 +171,7 @@ Alpine.js, and lunr.js are all vendored with this module
 (`resources/assets/vendor/`) and copied straight into
 `site/assets/vendor/` at build time - no CDN `<script>`/`<link>` tag
 anywhere in the generated HTML for any of those. Turning on
-`bxsites.json`'s `mermaid` key vendors Mermaid the same way - its
+`bxsites.yaml`'s `mermaid` key vendors Mermaid the same way - its
 `mermaid.min.js` bundle is copied into `site/assets/vendor/mermaid/` and
 every built-in theme loads it from there, so diagrams still render with
 zero outbound requests.
@@ -187,7 +187,7 @@ yourself:
   from jsDelivr - but only for diagram types that opt into the `elk`
   layout algorithm; the vendored `mermaid.min.js` renders every other
   diagram type entirely on its own.
-- `bxsites.json`'s `math` option loads KaTeX (both its JS and its own font
+- `bxsites.yaml`'s `math` option loads KaTeX (both its JS and its own font
   files) from a CDN when turned on.
 - `searchProvider.provider: "algolia"` and `analytics.provider: "google"`
   inherently talk to a hosted API/tracking endpoint - vendoring the JS
@@ -260,13 +260,13 @@ A theme is just a folder with:
   `variables.themeDir` and `variables.basePath` in scope, and includes the
   sibling `page.bxm` via `#variables.themeDir#/page.bxm`.
   `variables.basePath` is always a root-relative path ending in `/` (`/` by
-  default, `/my-docs/` when `bxsites.json`'s `baseURL` overrides it) - prefix
+  default, `/my-docs/` when `bxsites.yaml`'s `baseURL` overrides it) - prefix
   every internal `href`/`src` with it, rather than hardcoding a leading `/`,
   so the theme still works when the site is served from a sub-path.
 - **`page.bxm`** (required) - the article body. Renders
   `variables.page.contentHtml` - the already-converted markdown.
 - **`search.bxm`** (optional) - the search box markup, included by
-  `layout.bxm` only when `bxsites.json`'s `search` is `true`. See
+  `layout.bxm` only when `bxsites.yaml`'s `search` is `true`. See
   [Search](search.md).
 - **`assets/`** (optional) - theme CSS/JS, copied to `site/assets/theme/`
   at build time.
@@ -295,13 +295,13 @@ error deep inside rendering.
 
 For a color/font tweak, forking a whole theme is overkill - each built-in
 theme reads its palette from a handful of CSS custom properties on `:root`,
-re-declared under `[data-theme="dark"]` for dark mode. `bxsites.json`'s
+re-declared under `[data-theme="dark"]` for dark mode. `bxsites.yaml`'s
 [`extraCss`](../configuration.md#extracss--extrajs) loads *after* the
 theme's own stylesheet, so a same-specificity re-declaration in it wins
 without touching `resources/themes/` at all:
 
-```json title="bxsites.json"
-{ "extraCss": [ "assets/brand.css" ] }
+```yaml title="bxsites.yaml"
+extraCss: [ assets/brand.css ]
 ```
 
 ```css title="docs/assets/brand.css" linenums="1"
@@ -434,7 +434,7 @@ my-project/
    ```
 
 3. Run `bxSites build` (or `serve` while iterating) - BX Sites
-   picks up `theme/` automatically, no `bxsites.json` change needed (a
+   picks up `theme/` automatically, no `bxsites.yaml` change needed (a
    project-level `theme/` folder always takes precedence over the built-in
    theme named in `theme.name`). Everything you didn't touch - nav
    rendering, search, the dark-mode toggle, code annotations - keeps
@@ -447,7 +447,7 @@ its own `layout.bxm` + `page.bxm` even if all you changed is
 `assets/style.css` (a folder missing either fails fast with
 `BxSites.InvalidTheme` rather than silently falling back). For a
 CSS-only/no-`.bxm` tweak, use [`extraCss`](#customizing-colors-without-a-theme-override)
-above instead - it layers on top of whichever theme `bxsites.json` names,
+above instead - it layers on top of whichever theme `bxsites.yaml` names,
 no `theme/` folder involved at all. `theme/` is for when you also need to
 change the markup itself, covered next.
 
@@ -457,7 +457,7 @@ A theme only needs the two required files, so here's a genuinely minimal
 one - no Bootstrap/Tailwind, no dark mode, no search UI - to show exactly
 what's required versus what the built-in themes add on top. Save both as
 `theme/layout.bxm` and `theme/page.bxm` in your project - a project-level
-`theme/` folder is picked up automatically (as above), no `bxsites.json`
+`theme/` folder is picked up automatically (as above), no `bxsites.yaml`
 change needed:
 
 ```bx title="theme/layout.bxm" linenums="1"
@@ -513,7 +513,7 @@ That's a complete, working theme - `variables.page.contentHtml` is the
 already-converted markdown (syntax highlighting, admonitions, tabs, math
 and all), so there's nothing left to parse, only to lay out. From here,
 add whatever the built-in themes have that you actually want:
-`search.bxm` (only included when `bxsites.json`'s `search` is `true` - see
+`search.bxm` (only included when `bxsites.yaml`'s `search` is `true` - see
 [Search](search.md)), a dark-mode toggle (copy the `x-data`/`x-init`
 Alpine.js pair off `resources/themes/bootstrap/layout.bxm`'s `<body>` tag
 and the matching `[data-theme="dark"]` CSS block), breadcrumbs/tags/prev-next

@@ -102,7 +102,7 @@ nessun file di workflow necessario. Il resto di questa guida copre il
 workflow GitHub Actions usato da questo stesso repository, per la
 pubblicazione automatica multi-versione a ogni push.</p>
 <h2 id="cosa-fa"><a href="#cosa-fa" id="cosa-fa" name="cosa-fa" class="anchor"></a>Cosa fa</h2>
-<p>A ogni push su <code>main</code> o <code>development</code> che tocca <code>docs/</code>, <code>bxsites.json</code>, o
+<p>A ogni push su <code>main</code> o <code>development</code> che tocca <code>docs/</code>, <code>bxsites.yaml</code>, o
 il sorgente stesso del modulo (modifiche a tema/pipeline), il workflow:</p>
 <ol>
 <li>Installa BoxLang + <a href="https://github.com/ortus-boxlang/bx-markdown">bx-markdown</a></li>
@@ -139,10 +139,10 @@ recente, non ancora rilasciata. Entrambe restano live simultaneamente:
 il job di ciascun branch effettua il push su <code>gh-pages</code> solo con
 <code>keep_files: true</code> e la propria <code>destination_dir</code>, quindi un deploy di
 <code>development</code> non sovrascrive mai il contenuto di <code>main</code> e viceversa.</p>
-<p>Il <code>bxsites.json</code> proprio di <code>main</code> dovrebbe avere <code>baseURL</code> impostato
+<p>Il <code>bxsites.yaml</code> proprio di <code>main</code> dovrebbe avere <code>baseURL</code> impostato
 sulla radice del sito (<code>https://&lt;user&gt;.github.io/&lt;repo&gt;/</code>); il workflow
 lo sovrascrive per ogni altro branch al momento del build, quindi il
-<code>bxsites.json</code> di <code>development</code> non ha bisogno di una propria voce
+<code>bxsites.yaml</code> di <code>development</code> non ha bisogno di una propria voce
 <code>baseURL</code> perché tutto funzioni.</p>
 <p>Per aggiungere un terzo branch (ad es. un'anteprima <code>release/2.0</code>),
 aggiungilo all'elenco <code>on.push.branches</code> e dagli un proprio passo di
@@ -160,17 +160,17 @@ relativo passo di deploy.</p>
 <p>Un sito GitHub Pages di <em>progetto</em> (a differenza di un sito <em>utente</em>
 <code>&lt;user&gt;.github.io</code>) viene servito da
 <code>https://&lt;user&gt;.github.io/&lt;repo&gt;/</code>, non dalla radice del dominio. Imposta
-<code>baseURL</code> in <code>bxsites.json</code> su quell'URL completo così che ogni link
+<code>baseURL</code> in <code>bxsites.yaml</code> su quell'URL completo così che ogni link
 interno, asset e voce di nav ottenga il prefisso <code>/&lt;repo&gt;/</code> di cui ha
 bisogno - e così che venga generato anche un vero <code>sitemap.xml</code>:</p>
-<pre><code class="language-json">{ &quot;baseURL&quot;: &quot;https://&lt;user&gt;.github.io/&lt;repo&gt;/&quot; }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">baseURL: &quot;https://&lt;user&gt;.github.io/&lt;repo&gt;/&quot;
 </code></pre>
 <p>Vedi <a href="/bx-sites/development/it/configuration/index.html#baseurl">Configurazione</a> per il quadro completo
 di cosa fa <code>baseURL</code>. Un sito utente <code>&lt;user&gt;.github.io</code>, o qualsiasi
 dominio personalizzato mappato sulla radice del sito, può lasciare
 <code>baseURL</code> al suo valore predefinito (<code>/</code>).</p>
 
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/it/guides/deployment.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/it/guides/deployment.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 				</article>
 
 				<nav class="page-nav d-flex justify-content-between" aria-label="Navigazione della pagina">

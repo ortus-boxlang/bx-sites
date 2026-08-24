@@ -43,20 +43,19 @@ una locale reindirizza all'interno di quella locale
 (`site/es/old-path/`), esattamente come già fa il vero URL proprio della
 pagina. Non c'è nulla di extra da configurare per albero.
 
-## A livello di sito: `bxsites.json` `redirects`
+## A livello di sito: `bxsites.yaml` `redirects`
 
 Per un vecchio URL che non è mai appartenuto a una pagina specifica - una
 sezione ristrutturata, il percorso di un vecchio dominio, qualsiasi cosa
 non sia naturalmente il proprio "vecchio nome" di una singola pagina -
 elenca invece una coppia esplicita `from`/`to`:
 
-```json title="bxsites.json" linenums="1"
-{
-	"redirects": [
-		{ "from": "old-guide", "to": "guides/new-guide/" },
-		{ "from": "moved-to-another-site", "to": "https://example.com/docs" }
-	]
-}
+```yaml title="bxsites.yaml" linenums="1"
+redirects:
+  - from: old-guide
+    to: guides/new-guide/
+  - from: moved-to-another-site
+    to: https://example.com/docs
 ```
 
 - `from` - il vecchio segmento URL "pretty", stessa forma di

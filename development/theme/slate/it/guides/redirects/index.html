@@ -81,7 +81,7 @@
 
 				<h1 class="slate-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,112l-33.62,37.35a8,8,0,0,1-5.94,2.65H40a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H200.44a8,8,0,0,1,5.94,2.65Z" opacity="0.2"/><path d="M246,106.65,212.33,69.3A16,16,0,0,0,200.44,64H136V32a8,8,0,0,0-16,0V64H40A16,16,0,0,0,24,80v64a16,16,0,0,0,16,16h80v64a8,8,0,0,0,16,0V160h64.44a16,16,0,0,0,11.89-5.3L246,117.35A8,8,0,0,0,246,106.65ZM200.44,144H40V80H200.44l28.8,32Z"/></svg></span> Redirect</h1>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/slate/it/tags/index.html#tag-guide">guide</a><a class="page-tag" href="/bx-sites/development/theme/slate/it/tags/index.html#tag-redirect">redirect</a></div>
-<details class="bxsites-toc-mobile slate-toc--mobile"><summary class="slate-toc--mobile__summary">In questa pagina</summary><ul><li class="slate-toc__item slate-toc__item--2"><a href="#per-pagina-frontmatter-redirect-from">Per pagina&#x3a; frontmatter redirect_from</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#a-livello-di-sito-bxsitesjson-redirects">A livello di sito&#x3a; bxsites.json redirects</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#pagerename-lo-imposta-per-te">page&#x3a;rename lo imposta per te</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#conflitti">Conflitti</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#cosa-è-fuori-scopo-per-ora">Cosa &egrave; fuori scopo &#x28;per ora&#x29;</a></li></ul></details>
+<details class="bxsites-toc-mobile slate-toc--mobile"><summary class="slate-toc--mobile__summary">In questa pagina</summary><ul><li class="slate-toc__item slate-toc__item--2"><a href="#per-pagina-frontmatter-redirect-from">Per pagina&#x3a; frontmatter redirect_from</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#a-livello-di-sito-bxsitesyaml-redirects">A livello di sito&#x3a; bxsites.yaml redirects</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#pagerename-lo-imposta-per-te">page&#x3a;rename lo imposta per te</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#conflitti">Conflitti</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#cosa-è-fuori-scopo-per-ora">Cosa &egrave; fuori scopo &#x28;per ora&#x29;</a></li></ul></details>
 				<div class="slate-content-body">
 				<h1 id="redirect"><a href="#redirect" id="redirect" name="redirect" class="anchor"></a>Redirect</h1>
 <p>Mantieni funzionante un vecchio URL dopo aver spostato, rinominato o
@@ -113,17 +113,16 @@ versione (<code>site/versions/2.0/old-path/</code>), la pagina tradotta propria 
 una locale reindirizza all'interno di quella locale
 (<code>site/es/old-path/</code>), esattamente come già fa il vero URL proprio della
 pagina. Non c'è nulla di extra da configurare per albero.</p>
-<h2 id="a-livello-di-sito-bxsitesjson-redirects"><a href="#a-livello-di-sito-bxsitesjson-redirects" id="a-livello-di-sito-bxsitesjson-redirects" name="a-livello-di-sito-bxsitesjson-redirects" class="anchor"></a>A livello di sito: <code>bxsites.json</code> <code>redirects</code></h2>
+<h2 id="a-livello-di-sito-bxsitesyaml-redirects"><a href="#a-livello-di-sito-bxsitesyaml-redirects" id="a-livello-di-sito-bxsitesyaml-redirects" name="a-livello-di-sito-bxsitesyaml-redirects" class="anchor"></a>A livello di sito: <code>bxsites.yaml</code> <code>redirects</code></h2>
 <p>Per un vecchio URL che non è mai appartenuto a una pagina specifica - una
 sezione ristrutturata, il percorso di un vecchio dominio, qualsiasi cosa
 non sia naturalmente il proprio &quot;vecchio nome&quot; di una singola pagina -
 elenca invece una coppia esplicita <code>from</code>/<code>to</code>:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;redirects&quot;: [
-		{ &quot;from&quot;: &quot;old-guide&quot;, &quot;to&quot;: &quot;guides/new-guide/&quot; },
-		{ &quot;from&quot;: &quot;moved-to-another-site&quot;, &quot;to&quot;: &quot;https://example.com/docs&quot; }
-	]
-}
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">redirects:
+  - from: old-guide
+    to: guides/new-guide/
+  - from: moved-to-another-site
+    to: https://example.com/docs
 </code></pre>
 <ul>
 <li><code>from</code> - il vecchio segmento URL &quot;pretty&quot;, stessa forma di
@@ -170,7 +169,7 @@ percorso esatto - non esiste un catch-all <code>guides/old/*</code>.</li>
 </ul>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/redirects.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/slate/it/guides/redirects.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/redirects.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/slate/it/guides/redirects.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 
@@ -178,7 +177,7 @@ percorso esatto - non esiste un catch-all <code>guides/old/*</code>.</li>
 		</main>
 
 		<aside class="slate-toc-sidebar">
-			<nav class="slate-toc" aria-label="In questa pagina"><div class="slate-toc__title">In questa pagina</div><ul><li class="slate-toc__item slate-toc__item--2"><a href="#per-pagina-frontmatter-redirect-from">Per pagina&#x3a; frontmatter redirect_from</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#a-livello-di-sito-bxsitesjson-redirects">A livello di sito&#x3a; bxsites.json redirects</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#pagerename-lo-imposta-per-te">page&#x3a;rename lo imposta per te</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#conflitti">Conflitti</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#cosa-è-fuori-scopo-per-ora">Cosa &egrave; fuori scopo &#x28;per ora&#x29;</a></li></ul></nav>
+			<nav class="slate-toc" aria-label="In questa pagina"><div class="slate-toc__title">In questa pagina</div><ul><li class="slate-toc__item slate-toc__item--2"><a href="#per-pagina-frontmatter-redirect-from">Per pagina&#x3a; frontmatter redirect_from</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#a-livello-di-sito-bxsitesyaml-redirects">A livello di sito&#x3a; bxsites.yaml redirects</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#pagerename-lo-imposta-per-te">page&#x3a;rename lo imposta per te</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#conflitti">Conflitti</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#cosa-è-fuori-scopo-per-ora">Cosa &egrave; fuori scopo &#x28;per ora&#x29;</a></li></ul></nav>
 		</aside>
 
 	</div>

@@ -13,11 +13,11 @@ BX Sites プラグインは単なる別の BoxLang モジュールです。`box.
 BoxLang 独自のモジュールシステムが*そのまま*プラグインシステムになっています。
 
 ただし、モジュールをインストールしただけではプラグインとして有効化されません。
-プロジェクトが `bxsites.json` の [`plugins`](../configuration.md#plugins) 配列に BoxLang モジュール名を
+プロジェクトが `bxsites.yaml` の [`plugins`](../configuration.md#plugins) 配列に BoxLang モジュール名を
 明示的に追加することでオプトインする必要があります:
 
-```json
-{ "plugins": [ "myBxSitesPlugin" ] }
+```yaml title="bxsites.yaml"
+plugins: [ myBxSitesPlugin ]
 ```
 
 ## 公開済みプラグインのインストール
@@ -38,7 +38,7 @@ BoxLang モジュールレジストリで有効になります。`install:plugin
 即座にランタイムに読み込み、実際に登録されたモジュールのマッピング名
 （下記の注記のとおり、これは必ずしも ForgeBox のスラグと同じとは限りません）
 を出力します - 他のインストール済みモジュールと同様に、*その* 名前を
-`bxsites.json` の `plugins` 配列に追加して有効化してください。CLI リファレンスの
+`bxsites.yaml` の `plugins` 配列に追加して有効化してください。CLI リファレンスの
 [`install:plugin`](../cli-reference.md#installplugin) を参照してください。
 
 ## プラグインの作成
@@ -52,7 +52,7 @@ BoxLang モジュールレジストリで有効になります。`install:plugin
 class {
 
 	struct function onConfig( required struct config ) {
-		// bxsites.json が読み込まれた直後にサイト設定を変更/返す。
+		// bxsites.yaml が読み込まれた直後にサイト設定を変更/返す。
 		return arguments.config
 	}
 
@@ -78,7 +78,7 @@ class {
 }
 ```
 
-フックは `bxsites.json` の `plugins` 配列の順序で実行され、各フックの戻り値（`onBuildComplete` 以外）が
+フックは `bxsites.yaml` の `plugins` 配列の順序で実行され、各フックの戻り値（`onBuildComplete` 以外）が
 次のフック（または BX Sites 自体）が受け取る値を置き換えます。変更がない場合は受け取った値をそのまま
 返すだけで構いません。
 
@@ -116,7 +116,7 @@ sequenceDiagram
 
 ```text title="hello-plugin/ layout"
 hello-plugin/
-├── box.json              # boxlang.moduleName が bxsites.json の [plugins] から参照される名前
+├── box.json              # boxlang.moduleName が bxsites.yaml の [plugins] から参照される名前
 ├── ModuleConfig.bx        # 通常の（そうでなければ空の）BoxLang モジュールディスクリプタ
 └── models/
     └── BxSitesPlugin.bx    # onPageHtml() + onBuildComplete()
@@ -124,6 +124,6 @@ hello-plugin/
 
 ## エラー
 
-- `BxSites.PluginNotFound` - `bxsites.json` の `plugins` 配列内の名前がインストール/有効化された
+- `BxSites.PluginNotFound` - `bxsites.yaml` の `plugins` 配列内の名前がインストール/有効化された
   BoxLang モジュールでない場合。
 - `BxSites.InvalidPlugin` - モジュールは存在するが、`models/BxSitesPlugin.bx` クラスがない場合。

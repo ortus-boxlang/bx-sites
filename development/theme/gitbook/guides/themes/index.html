@@ -150,7 +150,7 @@ own line - plus a collapsible sidebar nav (a hamburger toggle in
 anywhere on the page, and <code>Escape</code> closes the results. See
 <a href="/bx-sites/development/theme/gitbook/guides/search/index.html">Search</a>.</li>
 <li><strong>A repo link and &quot;Edit this page&quot;/&quot;Last updated&quot; line</strong>, when
-<code>bxsites.json</code>'s <code>repo</code>/<code>lastUpdated</code> options are set. See
+<code>bxsites.yaml</code>'s <code>repo</code>/<code>lastUpdated</code> options are set. See
 <a href="/bx-sites/development/theme/gitbook/configuration/index.html#repo">Configuration</a>.</li>
 <li><strong>A &quot;Download Markdown&quot; link</strong>, next to &quot;Edit this page&quot; - every page's
 raw <code>.md</code> source is published alongside its built HTML (<code>guides/themes.md</code>
@@ -158,39 +158,39 @@ sitting next to <code>guides/themes/index.html</code>), so it (or an LLM) can re
 the page as plain Markdown directly instead of parsing rendered HTML.
 Always on, no config needed. See <a href="/bx-sites/development/theme/gitbook/getting-started/index.html#downloading-a-page-as-markdown">Getting Started</a>.</li>
 <li><strong>An opt-in footer</strong> (copyright, <code>social</code> links, a &quot;Built with BX Sites&quot;
-credit) when <code>bxsites.json</code>'s <code>footer</code> is <code>true</code>. See
+credit) when <code>bxsites.yaml</code>'s <code>footer</code> is <code>true</code>. See
 <a href="/bx-sites/development/theme/gitbook/configuration/index.html#footer">Configuration</a>.</li>
 <li><strong>A version switcher</strong>, appearing automatically once a project has a
 <code>docs/versions/</code> folder with more than one version in it. See
 <a href="/bx-sites/development/theme/gitbook/configuration/index.html#versioning">Configuration</a>.</li>
 <li><strong>A themed <code>404.html</code></strong>, served automatically by most static hosts
 (including GitHub Pages) for any unmatched path.</li>
-<li><strong>A custom logo and favicon</strong>, when <code>bxsites.json</code>'s <code>theme.logo</code>/
+<li><strong>A custom logo and favicon</strong>, when <code>bxsites.yaml</code>'s <code>theme.logo</code>/
 <code>theme.favicon</code> are set. See <a href="/bx-sites/development/theme/gitbook/configuration/index.html#theme">Configuration</a>.</li>
 <li><strong>A collapsible sidebar nav</strong>, opt-in via <code>theme.options.navCollapsible</code> -
 every section with children (linked or not) gets a toggle button instead
 of always showing its children inline, and the section containing the
 current page always starts open. See
 <a href="/bx-sites/development/theme/gitbook/configuration/index.html#theme">Configuration</a>.</li>
-<li><strong>Google Analytics</strong>, when <code>bxsites.json</code>'s <code>analytics</code> is configured. See
+<li><strong>Google Analytics</strong>, when <code>bxsites.yaml</code>'s <code>analytics</code> is configured. See
 <a href="/bx-sites/development/theme/gitbook/configuration/index.html#analytics">Configuration</a>.</li>
 <li><strong>Social share cards</strong> (Open Graph + Twitter Card meta tags), sourced
 from each page's <code>description</code> frontmatter (or the site-wide
 <code>description</code>) and its own <code>ogImage</code> (or the site-wide one) - optionally
-auto-generated per page via <code>bxsites.json</code>'s <code>generateOgImages</code>. See
+auto-generated per page via <code>bxsites.yaml</code>'s <code>generateOgImages</code>. See
 <a href="/bx-sites/development/theme/gitbook/configuration/index.html#ogimage">Configuration</a>.</li>
 <li><strong>Page tags, an icon and a summary line</strong>, all opt-in via a page's own
 frontmatter - tags render as badges linking into a site-wide <code>/tags/</code>
 index. See <a href="/bx-sites/development/theme/gitbook/getting-started/index.html#add-pages">Getting Started</a>.</li>
-<li><strong>An explicit nav override</strong>, in <code>bxsites.json</code> or its own <code>docs/nav.json</code>,
+<li><strong>An explicit nav override</strong>, in <code>bxsites.yaml</code> or its own <code>docs/nav.json</code>,
 replacing folder-inference for large sites. See
 <a href="/bx-sites/development/theme/gitbook/configuration/index.html#nav">Configuration</a>.</li>
-<li><strong>Extra CSS/JS</strong>, injected via <code>bxsites.json</code>'s <code>extraCss</code>/<code>extraJs</code>. See
+<li><strong>Extra CSS/JS</strong>, injected via <code>bxsites.yaml</code>'s <code>extraCss</code>/<code>extraJs</code>. See
 <a href="/bx-sites/development/theme/gitbook/configuration/index.html#extracss--extrajs">Configuration</a>.</li>
 <li><strong>Admonition (note/warning/tip/...) callout boxes</strong>, on by default in any
 page's markdown, including collapsible variants - no config needed. See
 <a href="/bx-sites/development/theme/gitbook/guides/markdown/index.html#admonitions">Markdown Extensions</a>.</li>
-<li><strong>Footnotes and definition lists</strong>, opt-in via <code>bxsites.json</code>'s <code>markdown</code>.
+<li><strong>Footnotes and definition lists</strong>, opt-in via <code>bxsites.yaml</code>'s <code>markdown</code>.
 See <a href="/bx-sites/development/theme/gitbook/guides/markdown/index.html#footnotes">Markdown Extensions</a>.</li>
 <li><strong>Content tabs</strong>, <strong>code line numbers/highlighted lines/titles</strong>, and
 <strong>diff markers/terminal-style frames</strong> for code blocks, no config needed.
@@ -198,13 +198,13 @@ See <a href="/bx-sites/development/theme/gitbook/guides/markdown/index.html#cont
 <li><strong>Responsive images</strong> - resized + WebP variants and a <code>&lt;picture&gt;</code>
 rewrite for every eligible <code>docs/assets/**</code> image, on by default. See
 <a href="/bx-sites/development/theme/gitbook/guides/images/index.html">Responsive Images</a>.</li>
-<li><strong>Mermaid diagrams</strong>, opt-in via <code>bxsites.json</code>'s <code>mermaid</code>. See
+<li><strong>Mermaid diagrams</strong>, opt-in via <code>bxsites.yaml</code>'s <code>mermaid</code>. See
 <a href="/bx-sites/development/theme/gitbook/guides/markdown/index.html#diagrams">Markdown Extensions</a>.</li>
-<li><strong>Math</strong> (KaTeX), opt-in via <code>bxsites.json</code>'s <code>math</code>. See
+<li><strong>Math</strong> (KaTeX), opt-in via <code>bxsites.yaml</code>'s <code>math</code>. See
 <a href="/bx-sites/development/theme/gitbook/guides/markdown/index.html#math">Markdown Extensions</a>.</li>
 </ul>
-<p>Set which one a project uses in <code>bxsites.json</code>:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;theme&quot;: { &quot;name&quot;: &quot;material&quot; } }
+<p>Set which one a project uses in <code>bxsites.yaml</code>:</p>
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">theme: { name: material }
 </code></pre>
 <h2 id="installing-a-published-theme"><a href="#installing-a-published-theme" id="installing-a-published-theme" name="installing-a-published-theme" class="anchor"></a>Installing a published theme</h2>
 <p>A theme published to ForgeBox installs with nothing but the <code>bxSites</code>
@@ -216,7 +216,7 @@ binary itself - no <code>box</code>/CommandBox needed:</p>
 satisfies the <code>ThemeProvider</code> contract below before finishing. A project
 can carry several installed themes side by side this way and switch
 between them purely by name:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;theme&quot;: { &quot;name&quot;: &quot;bx-sites-theme-blog1&quot; } }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">theme: { name: bx-sites-theme-blog1 }
 </code></pre>
 <p>A theme needs no BoxLang module/class-loader involvement at all (unlike a
 plugin) - it's pure files, so there's no separate activation step the way
@@ -235,7 +235,7 @@ Alpine.js, and lunr.js are all vendored with this module
 (<code>resources/assets/vendor/</code>) and copied straight into
 <code>site/assets/vendor/</code> at build time - no CDN <code>&lt;script&gt;</code>/<code>&lt;link&gt;</code> tag
 anywhere in the generated HTML for any of those. Turning on
-<code>bxsites.json</code>'s <code>mermaid</code> key vendors Mermaid the same way - its
+<code>bxsites.yaml</code>'s <code>mermaid</code> key vendors Mermaid the same way - its
 <code>mermaid.min.js</code> bundle is copied into <code>site/assets/vendor/mermaid/</code> and
 every built-in theme loads it from there, so diagrams still render with
 zero outbound requests.</p>
@@ -250,7 +250,7 @@ yet.</li>
 from jsDelivr - but only for diagram types that opt into the <code>elk</code>
 layout algorithm; the vendored <code>mermaid.min.js</code> renders every other
 diagram type entirely on its own.</li>
-<li><code>bxsites.json</code>'s <code>math</code> option loads KaTeX (both its JS and its own font
+<li><code>bxsites.yaml</code>'s <code>math</code> option loads KaTeX (both its JS and its own font
 files) from a CDN when turned on.</li>
 <li><code>searchProvider.provider: &quot;algolia&quot;</code> and <code>analytics.provider: &quot;google&quot;</code>
 inherently talk to a hosted API/tracking endpoint - vendoring the JS
@@ -307,13 +307,13 @@ overriding the target page's own frontmatter for that one entry:</p>
 <code>variables.themeDir</code> and <code>variables.basePath</code> in scope, and includes the
 sibling <code>page.bxm</code> via <code>#variables.themeDir#/page.bxm</code>.
 <code>variables.basePath</code> is always a root-relative path ending in <code>/</code> (<code>/</code> by
-default, <code>/my-docs/</code> when <code>bxsites.json</code>'s <code>baseURL</code> overrides it) - prefix
+default, <code>/my-docs/</code> when <code>bxsites.yaml</code>'s <code>baseURL</code> overrides it) - prefix
 every internal <code>href</code>/<code>src</code> with it, rather than hardcoding a leading <code>/</code>,
 so the theme still works when the site is served from a sub-path.</li>
 <li><strong><code>page.bxm</code></strong> (required) - the article body. Renders
 <code>variables.page.contentHtml</code> - the already-converted markdown.</li>
 <li><strong><code>search.bxm</code></strong> (optional) - the search box markup, included by
-<code>layout.bxm</code> only when <code>bxsites.json</code>'s <code>search</code> is <code>true</code>. See
+<code>layout.bxm</code> only when <code>bxsites.yaml</code>'s <code>search</code> is <code>true</code>. See
 <a href="/bx-sites/development/theme/gitbook/guides/search/index.html">Search</a>.</li>
 <li><strong><code>assets/</code></strong> (optional) - theme CSS/JS, copied to <code>site/assets/theme/</code>
 at build time.</li>
@@ -341,11 +341,11 @@ error deep inside rendering.</p>
 <h2 id="customizing-colors-without-a-theme-override"><a href="#customizing-colors-without-a-theme-override" id="customizing-colors-without-a-theme-override" name="customizing-colors-without-a-theme-override" class="anchor"></a>Customizing colors without a theme override</h2>
 <p>For a color/font tweak, forking a whole theme is overkill - each built-in
 theme reads its palette from a handful of CSS custom properties on <code>:root</code>,
-re-declared under <code>[data-theme=&quot;dark&quot;]</code> for dark mode. <code>bxsites.json</code>'s
+re-declared under <code>[data-theme=&quot;dark&quot;]</code> for dark mode. <code>bxsites.yaml</code>'s
 <a href="/bx-sites/development/theme/gitbook/configuration/index.html#extracss--extrajs"><code>extraCss</code></a> loads <em>after</em> the
 theme's own stylesheet, so a same-specificity re-declaration in it wins
 without touching <code>resources/themes/</code> at all:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;extraCss&quot;: [ &quot;assets/brand.css&quot; ] }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">extraCss: [ assets/brand.css ]
 </code></pre>
 <pre data-bxsites-start-line="1" data-bxsites-title="docs&#x2f;assets&#x2f;brand.css"><code class="language-css">/* docs/assets/brand.css - copied to site/assets/brand.css at build time */
 :root {
@@ -461,7 +461,7 @@ that's just the top of <code>theme/assets/style.css</code>:</li>
 </code></pre>
 <ol start="3">
 <li>Run <code>bxSites build</code> (or <code>serve</code> while iterating) - BX Sites
-picks up <code>theme/</code> automatically, no <code>bxsites.json</code> change needed (a
+picks up <code>theme/</code> automatically, no <code>bxsites.yaml</code> change needed (a
 project-level <code>theme/</code> folder always takes precedence over the built-in
 theme named in <code>theme.name</code>). Everything you didn't touch - nav
 rendering, search, the dark-mode toggle, code annotations - keeps
@@ -474,7 +474,7 @@ its own <code>layout.bxm</code> + <code>page.bxm</code> even if all you changed 
 <code>assets/style.css</code> (a folder missing either fails fast with
 <code>BxSites.InvalidTheme</code> rather than silently falling back). For a
 CSS-only/no-<code>.bxm</code> tweak, use <a href="#customizing-colors-without-a-theme-override"><code>extraCss</code></a>
-above instead - it layers on top of whichever theme <code>bxsites.json</code> names,
+above instead - it layers on top of whichever theme <code>bxsites.yaml</code> names,
 no <code>theme/</code> folder involved at all. <code>theme/</code> is for when you also need to
 change the markup itself, covered next.</p>
 <h2 id="writing-a-theme-from-scratch"><a href="#writing-a-theme-from-scratch" id="writing-a-theme-from-scratch" name="writing-a-theme-from-scratch" class="anchor"></a>Writing a theme from scratch</h2>
@@ -482,7 +482,7 @@ change the markup itself, covered next.</p>
 one - no Bootstrap/Tailwind, no dark mode, no search UI - to show exactly
 what's required versus what the built-in themes add on top. Save both as
 <code>theme/layout.bxm</code> and <code>theme/page.bxm</code> in your project - a project-level
-<code>theme/</code> folder is picked up automatically (as above), no <code>bxsites.json</code>
+<code>theme/</code> folder is picked up automatically (as above), no <code>bxsites.yaml</code>
 change needed:</p>
 <pre data-bxsites-start-line="1" data-bxsites-title="theme&#x2f;layout.bxm"><code class="language-bx">&lt;!-- theme/layout.bxm --&gt;
 &lt;bx:script&gt;
@@ -533,7 +533,7 @@ change needed:</p>
 already-converted markdown (syntax highlighting, admonitions, tabs, math
 and all), so there's nothing left to parse, only to lay out. From here,
 add whatever the built-in themes have that you actually want:
-<code>search.bxm</code> (only included when <code>bxsites.json</code>'s <code>search</code> is <code>true</code> - see
+<code>search.bxm</code> (only included when <code>bxsites.yaml</code>'s <code>search</code> is <code>true</code> - see
 <a href="/bx-sites/development/theme/gitbook/guides/search/index.html">Search</a>), a dark-mode toggle (copy the <code>x-data</code>/<code>x-init</code>
 Alpine.js pair off <code>resources/themes/bootstrap/layout.bxm</code>'s <code>&lt;body&gt;</code> tag
 and the matching <code>[data-theme=&quot;dark&quot;]</code> CSS block), breadcrumbs/tags/prev-next
@@ -543,7 +543,7 @@ on <code>variables.page</code>), or an <code>assets/</code> folder for your own 
 <code>site/assets/theme/</code> automatically at build time.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/gitbook/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/gitbook/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="gb-page-nav" aria-label="Page navigation">

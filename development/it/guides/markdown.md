@@ -11,7 +11,7 @@ Oltre al Markdown standard, BX Sites attiva di default tre estensioni
 Flexmark native di bx-markdown - ammonizioni, note a piè di pagina e
 liste di definizioni - più un'integrazione con i diagrammi Mermaid tutta
 sua. Tutte e quattro sono configurabili tramite le
-[chiavi `markdown`/`mermaid` di `bxsites.json`](../configuration.md#markdown).
+[chiavi `markdown`/`mermaid` di `bxsites.yaml`](../configuration.md#markdown).
 
 Oltre a queste, BX Sites implementa altre tre estensioni proprie di cui
 Flexmark non ha alcun concetto - schede di contenuto, matematica, e
@@ -31,7 +31,7 @@ flowchart LR
 ## Ammonizioni
 
 Un box di richiamo/nota - attivo di default, nessuna configurazione di
-`bxsites.json` necessaria:
+`bxsites.yaml` necessaria:
 
 ```markdown title="Esempio" linenums="1"
 !!! note "Heads Up"
@@ -192,7 +192,7 @@ Che viene renderizzato così:
 Blocchi `=== "..."` consecutivi (separati al massimo da una riga vuota)
 formano un unico gruppo di schede; il contenuto di una scheda è markdown
 completo, quindi blocchi di codice, liste, ammonizioni, qualsiasi cosa
-scriveresti altrove. Nessuna configurazione di `bxsites.json` necessaria -
+scriveresti altrove. Nessuna configurazione di `bxsites.yaml` necessaria -
 sempre attivo.
 
 ## Blocchi di codice
@@ -241,7 +241,7 @@ numeric function add( required numeric a, required numeric b ) {
 accetta numeri di riga e/o intervalli separati da spazi (`"2 4-6"`) da
 evidenziare, contati dall'inizio del blocco indipendentemente da dove
 parte `linenums`; `title` aggiunge una piccola barra del titolo sopra il
-blocco. Nessuna configurazione di `bxsites.json` necessaria - sempre
+blocco. Nessuna configurazione di `bxsites.yaml` necessaria - sempre
 disponibile.
 
 ### Indicatori di diff e cornici terminale
@@ -298,7 +298,7 @@ box install bx-sites
 
 `frame="code"` è il nome esplicito per la barra semplice di oggi - il
 valore predefinito; nessuno ha bisogno di scriverlo. Né `insert`/`delete`
-né `frame` richiedono configurazione in `bxsites.json`, come
+né `frame` richiedono configurazione in `bxsites.yaml`, come
 `hl_lines`/`linenums`/`title`.
 
 #### Diff git reali
@@ -377,10 +377,10 @@ try.boxlang.io ↗" dell'embed riprende esattamente da dove parte l'embed.
 ## Diagrammi
 
 Opzionale tramite la chiave [`mermaid`](../configuration.md#mermaid) di
-`bxsites.json`:
+`bxsites.yaml`:
 
-```json title="bxsites.json"
-{ "mermaid": true }
+```yaml title="bxsites.yaml"
+mermaid: true
 ```
 
 Una volta attivato, qualsiasi blocco di codice delimitato ` ```mermaid `
@@ -402,10 +402,10 @@ per tutto ciò che può disegnare.
 ## Matematica
 
 Opzionale tramite la chiave [`math`](../configuration.md#math) di
-`bxsites.json`:
+`bxsites.yaml`:
 
-```json title="bxsites.json"
-{ "math": true }
+```yaml title="bxsites.yaml"
+math: true
 ```
 
 Una volta attivato, [KaTeX](https://katex.org/) compone `$...$` per la

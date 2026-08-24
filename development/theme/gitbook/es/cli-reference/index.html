@@ -264,7 +264,7 @@ compuerta de aprobado/fallido (ese es el trabajo de <code>check</code>).</p>
 <h2 id="doctor"><a href="#doctor" id="doctor" name="doctor" class="anchor"></a><code>doctor</code></h2>
 <p>Una verificación puntual de salud de entorno/configuración - el verbo
 &quot;ejecuta esto antes de reportar un error&quot;. Verifica la versión de la JVM,
-que <code>docs/</code> exista, que <code>bxsites.json</code>/<code>.yaml</code> realmente analice y valide,
+que <code>docs/</code> exista, que <code>bxsites.yaml</code>/<code>.json</code> realmente analice y valide,
 que los módulos de BoxLang requeridos (<code>bx-markdown</code>, <code>bx-esapi</code>,
 <code>bx-yaml</code>, <code>bx-image</code>) estén instalados y activados, y - si existe una
 sobrescritura <code>theme/</code> a nivel de proyecto - que satisfaga el contrato de
@@ -312,7 +312,7 @@ cuando existe uno.</p>
 <li><code>--code</code> (obligatorio) - el código del idioma, por ejemplo <code>es</code>, <code>fr</code>, <code>pt-BR</code></li>
 </ul>
 <p>Consulta <a href="/bx-sites/development/theme/gitbook/es/guides/i18n/index.html">Internacionalización</a> para conectar el nuevo
-idioma en el <code>i18n.locales</code> de <code>bxsites.json</code>.</p>
+idioma en el <code>i18n.locales</code> de <code>bxsites.yaml</code>.</p>
 <h2 id="pagenew"><a href="#pagenew" id="pagenew" name="pagenew" class="anchor"></a><code>page:new</code></h2>
 <p>Genera una única página de documentación en una ruta arbitraria bajo
 <code>docs/</code>, con el frontmatter solicitado ya completado.</p>
@@ -334,7 +334,7 @@ esbozado) siguiendo el patrón de <code>examples/hello-plugin/</code>.</p>
 <li><code>--dest</code> - por defecto, <code>&lt;projectRoot&gt;/&lt;name&gt;</code></li>
 </ul>
 <p>Consulta <a href="/bx-sites/development/theme/gitbook/es/guides/plugins/index.html">Plugins</a> para la referencia de hooks y cómo
-conectar el plugin terminado en el array <code>plugins</code> de <code>bxsites.json</code>.</p>
+conectar el plugin terminado en el array <code>plugins</code> de <code>bxsites.yaml</code>.</p>
 <h2 id="installplugin"><a href="#installplugin" id="installplugin" name="installplugin" class="anchor"></a><code>install:plugin</code></h2>
 <p>Descarga un plugin publicado desde ForgeBox y lo coloca directamente en
 el propio <code>boxlang_modules/</code> del proyecto - la propia convención de
@@ -347,7 +347,7 @@ más allá del propio binario <code>bxSites</code> (no interviene <code>box</cod
 <li><code>--version</code> - una versión específica; omite para la más reciente</li>
 </ul>
 <p>Imprime de vuelta el nombre de mapeo real del módulo registrado en cuanto
-se carga - añade ese nombre al array <code>plugins</code> de <code>bxsites.json</code> para
+se carga - añade ese nombre al array <code>plugins</code> de <code>bxsites.yaml</code> para
 activarlo (instalar por sí solo nunca activa un plugin - consulta
 <a href="/bx-sites/development/theme/gitbook/es/guides/plugins/index.html">Plugins</a>).</p>
 <h2 id="themenew"><a href="#themenew" id="themenew" name="themenew" class="anchor"></a><code>theme:new</code></h2>
@@ -377,7 +377,7 @@ proyecto - nada más que el binario <code>bxSites</code> necesario, igual que
 <p>Valida el paquete descargado contra el contrato <code>ThemeProvider</code>
 (<code>layout.bxm</code> + <code>page.bxm</code>) antes de terminar, así que un paquete roto
 falla en el momento de la instalación en lugar de en la siguiente
-<code>build</code>. Configura el <code>theme.name</code> de <code>bxsites.json</code> con el nombre
+<code>build</code>. Configura el <code>theme.name</code> de <code>bxsites.yaml</code> con el nombre
 instalado para usarlo - consulta
 <a href="/bx-sites/development/theme/gitbook/es/guides/themes/index.html#instalar-un-tema-publicado">Temas</a>.</p>
 <h2 id="themeimport"><a href="#themeimport" id="themeimport" name="themeimport" class="anchor"></a><code>theme:import</code></h2>
@@ -470,7 +470,7 @@ las entradas - <code>lint</code> lo muestra como un hallazgo en su lugar).</li>
 <code>0</code> en caso contrario.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/gitbook/es/cli-reference.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/gitbook/es/cli-reference.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="gb-page-nav" aria-label="Navegaci&oacute;n de p&aacute;gina">

@@ -171,8 +171,7 @@ defecto mostrados arriba. Un objeto <code>theme</code> parcial se combina un niv
 de profundidad, así que <code>{theme: {name: material}}</code> por sí solo conserva
 las <code>options</code> por defecto (vacías). Cada clave de abajo se llama y tiene
 la misma forma en ambos formatos - el resto de esta página solo muestra
-fragmentos JSON por brevedad, pero cada uno de ellos se lee igual en
-YAML.</p>
+fragmentos YAML, siguiendo el formato por defecto propio de <code>bxSites new</code>, pero cada uno de ellos se lee igual en JSON.</p>
 <h2 id="name"><a href="#name" id="name" name="name" class="anchor"></a><code>name</code></h2>
 <p>El nombre del sitio, mostrado en la marca de la cabecera y en los títulos
 de página. Obligatorio.</p>
@@ -242,7 +241,7 @@ cabecera - <code>&quot;auto&quot;</code> sigue la preferencia de su sistema oper
 activa el interruptor, su propia elección (guardada en <code>localStorage</code>)
 siempre prevalece en visitas posteriores, independientemente de este
 valor.</p>
-<pre data-bxsites-start-line="1"><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;colorMode&quot;: &quot;dark&quot; } } }
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">theme: { options: { colorMode: dark } }
 </code></pre>
 </li>
 <li>
@@ -261,7 +260,7 @@ entierra el propio enlace en el que te encuentras.</p>
 es <code>true</code>. <code>true</code> (el valor por defecto) inicia cada sección abierta;
 <code>false</code> inicia cada sección colapsada, excepto la que contiene la
 página actual.</p>
-<pre data-bxsites-start-line="1"><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;navCollapsible&quot;: true, &quot;navExpandAll&quot;: false } } }
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">theme: { options: { navCollapsible: true, navExpandAll: false } }
 </code></pre>
 </li>
 <li>
@@ -280,7 +279,7 @@ expandir la lista, el mismo tratamiento que usan VitePress/GitBook en
 móvil - así que la tabla de contenido sigue siendo accesible en
 cualquier ancho de viewport, solo cambia de forma según el espacio
 disponible.</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;tocPosition&quot;: &quot;sticky&quot; } } }
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">theme: { options: { tocPosition: sticky } }
 </code></pre>
 </li>
 <li>
@@ -291,7 +290,7 @@ por defecto) la renderiza como una pequeña nota de pie justo antes de
 que termine el artículo. <code>&quot;top&quot;</code> la renderiza en su lugar cerca del
 título, el mismo lugar donde siempre se renderizaba antes de que
 existiera esta opción.</p>
-<pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;pageMetaPosition&quot;: &quot;top&quot; } } }
+<pre><code class="language-yaml">theme: { options: { pageMetaPosition: top } }
 </code></pre>
 </li>
 </ul>
@@ -320,17 +319,13 @@ administrador) e <code>indexName</code>, exactamente como los espera el propio
 cliente DocSearch de Algolia. <code>insights</code> (<code>false</code> por defecto) activa la
 analítica de clics/conversión de DocSearch.</li>
 </ul>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">  {
-    &quot;search&quot;: true,
-    &quot;searchProvider&quot;: {
-      &quot;provider&quot;: &quot;algolia&quot;,
-      &quot;algolia&quot;: {
-        &quot;appId&quot;: &quot;ABC123&quot;,
-        &quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
-        &quot;indexName&quot;: &quot;my-docs&quot;
-      }
-    }
-  }
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">  search: true
+  searchProvider:
+    provider: algolia
+    algolia:
+      appId: ABC123
+      apiKey: a1b2c3d4e5f6...
+      indexName: my-docs
 </code></pre>
 <ul>
 <li><code>pagefind</code> - ambas claves opcionales cuando <code>provider</code> es <code>&quot;pagefind&quot;</code>:
@@ -341,13 +336,10 @@ propia CLI de <code>pagefind</code> debe estar ya instalada y en el <code>PATH</
 Sites la invoca externamente (como hace con <code>git</code> para
 <code>lastUpdated</code>/<code>gh-deploy</code>), no la instala por ti.</li>
 </ul>
-<pre><code class="language-json">  {
-    &quot;search&quot;: true,
-    &quot;searchProvider&quot;: {
-      &quot;provider&quot;: &quot;pagefind&quot;,
-      &quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
-    }
-  }
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">  search: true
+  searchProvider:
+    provider: pagefind
+    pagefind: { bin: pagefind, options: [] }
 </code></pre>
 <h2 id="nav"><a href="#nav" id="nav" name="nav" class="anchor"></a><code>nav</code></h2>
 <p>Por defecto, la navegación se infiere de la propia estructura de
@@ -379,33 +371,28 @@ de <code>icon</code></li>
 una etiqueta contenedora/de sección de menú - un encabezado no clicable
 que simplemente agrupa a sus hijos, el mismo papel que cumple
 &quot;MAIN COMPONENTS&quot; en la propia barra lateral de GitBook:</p>
-<pre><code class="language-json">{
-	&quot;nav&quot;: [
-		&quot;index.md&quot;,
-		{
-			&quot;title&quot;: &quot;Main Components&quot;,
-			&quot;children&quot;: [
-				{ &quot;title&quot;: &quot;Quick Start&quot;, &quot;path&quot;: &quot;guides/setup.md&quot; },
-				&quot;guides/deployment.md&quot;
-			]
-		}
-	]
-}
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">nav:
+  - index.md
+  - title: Main Components
+    children:
+      - title: Quick Start
+        path: guides/setup.md
+      - guides/deployment.md
 </code></pre>
 <p>Dale a esa misma entrada de grupo un <code>path</code> en su lugar y se convierte en
 una sección enlazada normal (con su propia página de aterrizaje, más
 hijos) en lugar de una etiqueta simple - ambas formas se anidan bajo
 <code>theme.options.navCollapsible</code> de la misma manera (consulta arriba).</p>
-<p>Para una navegación lo bastante grande como para saturar <code>bxsites.json</code>,
+<p>Para una navegación lo bastante grande como para saturar <code>bxsites.yaml</code>,
 muévela a su propio archivo <code>docs/nav.json</code> en su lugar - la misma forma
 de array, simplemente como el contenido de nivel superior de todo el
 archivo:</p>
-<pre><code class="language-json">[
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-json">[
 	&quot;index.md&quot;,
 	{ &quot;title&quot;: &quot;Guides&quot;, &quot;children&quot;: [ &quot;guides/setup.md&quot; ] }
 ]
 </code></pre>
-<p>El propio <code>nav</code> de <code>bxsites.json</code>, cuando no está vacío, siempre prevalece
+<p>El propio <code>nav</code> de <code>bxsites.yaml</code>, cuando no está vacío, siempre prevalece
 sobre <code>docs/nav.json</code>. Solo el árbol principal respeta cualquiera de los
 dos - un árbol <code>docs/versions/&lt;name&gt;/</code> siempre infiere su navegación de su
 propia estructura de carpetas, incluso cuando el árbol principal tiene una
@@ -413,11 +400,9 @@ explícita.</p>
 <h2 id="redirects"><a href="#redirects" id="redirects" name="redirects" class="anchor"></a><code>redirects</code></h2>
 <p><code>[]</code> (el valor por defecto) - redirecciones de URL antiguas <code>from</code>/<code>to</code>
 para todo el sitio, aplicadas solo al árbol principal:</p>
-<pre><code class="language-json">{
-	&quot;redirects&quot;: [
-		{ &quot;from&quot;: &quot;old-guide&quot;, &quot;to&quot;: &quot;guides/new-guide/&quot; }
-	]
-}
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">redirects:
+  - from: old-guide
+    to: guides/new-guide/
 </code></pre>
 <ul>
 <li><code>redirects[].from</code> - el segmento de URL antiguo (sin barra inicial/final,
@@ -467,14 +452,11 @@ defecto, pero BX Sites lo establece en <code>true</code> por defecto (consulta l
 <tr><td><code>tableOptions.headerSeparationColumnMatch</code></td><td><code>true</code></td><td>Exige que la fila separadora <code>---</code> coincida con el número de columnas del encabezado</td></tr>
 </tbody>
 </table>
-<pre><code class="language-json">{
-	&quot;markdown&quot;: {
-		&quot;enableFootnotes&quot;: true,
-		&quot;enableDefinitionLists&quot;: true,
-		&quot;anchorLinks&quot;: false,
-		&quot;enableYouTubeTransformer&quot;: true
-	}
-}
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">markdown:
+  enableFootnotes: true
+  enableDefinitionLists: true
+  anchorLinks: false
+  enableYouTubeTransformer: true
 </code></pre>
 <h2 id="repo"><a href="#repo" id="repo" name="repo" class="anchor"></a><code>repo</code></h2>
 <p>Añade un enlace con icono de repositorio a la cabecera (todos los temas
@@ -494,7 +476,7 @@ construir su enlace de edición - por ejemplo, con el ejemplo anterior,
 requiere <code>repo.url</code>; déjalo en blanco para omitir los enlaces de edición
 mientras sigues mostrando el icono de la cabecera.</li>
 </ul>
-<pre><code class="language-json">{ &quot;repo&quot;: { &quot;url&quot;: &quot;https://github.com/acme/docs&quot;, &quot;editUri&quot;: &quot;edit/main/docs/&quot; } }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">repo: { url: &quot;https://github.com/acme/docs&quot;, editUri: &quot;edit/main/docs/&quot; }
 </code></pre>
 <h2 id="social"><a href="#social" id="social" name="social" class="anchor"></a><code>social</code></h2>
 <p>Un array de enlaces sociales/externos renderizados en el pie de página
@@ -505,18 +487,15 @@ pequeño conjunto de iconos incorporado (<code>github</code>, <code>twitter</cod
 <code>patreon</code>, <code>rss</code>, <code>email</code>, recurriendo a un glifo de enlace genérico para
 cualquier otra cosa), y <code>label</code> establece el nombre accesible/tooltip del
 enlace (por defecto <code>icon</code>, y luego <code>&quot;Link&quot;</code>).</p>
-<pre><code class="language-json">{
-	&quot;social&quot;: [
-		{ &quot;url&quot;: &quot;https://twitter.com/acme&quot;, &quot;icon&quot;: &quot;twitter&quot;, &quot;label&quot;: &quot;Twitter&quot; },
-		{ &quot;url&quot;: &quot;https://acme.com/rss.xml&quot;, &quot;icon&quot;: &quot;rss&quot;, &quot;label&quot;: &quot;RSS&quot; }
-	]
-}
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">social:
+  - { url: &quot;https://twitter.com/acme&quot;, icon: twitter, label: Twitter }
+  - { url: &quot;https://acme.com/rss.xml&quot;, icon: rss, label: RSS }
 </code></pre>
 <h2 id="footer"><a href="#footer" id="footer" name="footer" class="anchor"></a><code>footer</code></h2>
 <p><code>false</code> (el valor por defecto) - sin pie de página en absoluto. <code>true</code>
 añade uno a cada página: una línea de copyright (<code>© &lt;year&gt; &lt;site name&gt;</code>),
 los enlaces <code>social</code> (si los hay), y un crédito &quot;Built with BX Sites&quot;.</p>
-<pre><code class="language-json">{ &quot;footer&quot;: true }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">footer: true
 </code></pre>
 <h2 id="lastupdated"><a href="#lastupdated" id="lastupdated" name="lastupdated" class="anchor"></a><code>lastUpdated</code></h2>
 <p><code>false</code> (el valor por defecto) - sin fecha de última actualización. <code>true</code>
@@ -527,7 +506,7 @@ silenciosamente para una página de la que git no tiene historial - un
 <code>git init</code> reciente sin commits todavía, una construcción ejecutándose
 desde un zip descargado sin <code>.git</code> en absoluto, o git no estando instalado
 en la máquina de construcción - en lugar de romper la construcción.</p>
-<pre><code class="language-json">{ &quot;lastUpdated&quot;: true }
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">lastUpdated: true
 </code></pre>
 <h2 id="analytics"><a href="#analytics" id="analytics" name="analytics" class="anchor"></a><code>analytics</code></h2>
 <p>Conecta el análisis de vistas de página. Actualmente solo admite Google
@@ -538,7 +517,7 @@ valor por defecto), no se envía ningún script de análisis en absoluto.</li>
 <li><code>analytics.id</code> - el ID de medición de Google Analytics (por ejemplo,
 <code>&quot;G-ABC123&quot;</code>). Obligatorio cuando <code>provider</code> es <code>&quot;google&quot;</code>.</li>
 </ul>
-<pre data-bxsites-start-line="1"><code class="language-json">{ &quot;analytics&quot;: { &quot;provider&quot;: &quot;google&quot;, &quot;id&quot;: &quot;G-ABC123&quot; } }
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">analytics: { provider: google, id: &quot;G-ABC123&quot; }
 </code></pre>
 <h2 id="ogimage"><a href="#ogimage" id="ogimage" name="ogimage" class="anchor"></a><code>ogImage</code></h2>
 <p>Ruta/URL a una imagen de tarjeta social por defecto, renderizada como
@@ -548,7 +527,7 @@ cada página que no la sobrescriba - resuelta de la misma forma que
 absolutas se usan tal cual). Dejado en blanco (el valor por defecto) y
 con <code>generateOgImages</code> desactivado, no se renderiza ninguna etiqueta
 <code>og:image</code>/<code>twitter:card</code>.</p>
-<pre><code class="language-json">{ &quot;ogImage&quot;: &quot;assets/social-card.png&quot; }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">ogImage: assets/social-card.png
 </code></pre>
 <p>El propio <code>ogImage</code> del frontmatter de una página (consulta
 <a href="/bx-sites/development/theme/slate/es/getting-started/index.html#añadir-páginas">Primeros Pasos</a>) siempre prevalece sobre
@@ -562,7 +541,7 @@ que cada página comparta una imagen genérica de todo el sitio. Puro
 <code>java.awt</code>/<code>javax.imageio</code> por debajo (parte de cualquier JVM en la que
 se ejecute BoxLang), así que esto no necesita navegador headless, servicio
 externo, ni acceso a red en el momento de la construcción.</p>
-<pre><code class="language-json">{ &quot;generateOgImages&quot;: true }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">generateOgImages: true
 </code></pre>
 <h2 id="extracss--extrajs"><a href="#extracss--extrajs" id="extracss--extrajs" name="extracss--extrajs" class="anchor"></a><code>extraCss</code> / <code>extraJs</code></h2>
 <p>Arrays de URL de hojas de estilo/scripts adicionales para incluir en cada
@@ -570,23 +549,17 @@ página, añadidos después de los propios recursos del tema - cada entrada
 se resuelve de la misma forma que <code>theme.logo</code> (una ruta relativa lleva el
 prefijo <code>baseURL</code>; una URL absoluta se usa tal cual). Las entradas de
 <code>extraJs</code> se cargan con <code>defer</code>.</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;extraCss&quot;: [ &quot;assets/custom.css&quot; ],
-	&quot;extraJs&quot;: [ &quot;assets/custom.js&quot; ]
-}
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">extraCss: [ assets/custom.css ]
+extraJs: [ assets/custom.js ]
 </code></pre>
 <h2 id="assets"><a href="#assets" id="assets" name="assets" class="anchor"></a><code>assets</code></h2>
-<pre><code class="language-json">{
-	&quot;assets&quot;: {
-		&quot;fingerprint&quot;: true,
-		&quot;bundle&quot;: true,
-		&quot;images&quot;: {
-			&quot;enabled&quot;: true,
-			&quot;widths&quot;: [ 400, 800, 1200, 1600 ],
-			&quot;formats&quot;: [ &quot;original&quot;, &quot;webp&quot; ]
-		}
-	}
-}
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">assets:
+  fingerprint: true
+  bundle: true
+  images:
+    enabled: true
+    widths: [ 400, 800, 1200, 1600 ]
+    formats: [ original, webp ]
 </code></pre>
 <p>El pipeline de recursos - redimensionado de imágenes/WebP mediante
 <a href="https://github.com/ortus-boxlang/bx-image">bx-image</a> (una dependencia
@@ -635,14 +608,14 @@ defecto.</li>
 del lado del cliente y renderiza cada bloque de código con fence
 <code>```mermaid</code> como un diagrama. Consulta
 <a href="/bx-sites/development/theme/slate/es/guides/markdown/index.html#diagramas">Extensiones de Markdown</a> para la sintaxis.</p>
-<pre><code class="language-json">{ &quot;mermaid&quot;: true }
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">mermaid: true
 </code></pre>
 <h2 id="math"><a href="#math" id="math" name="math" class="anchor"></a><code>math</code></h2>
 <p><code>false</code> (el valor por defecto) - sin <a href="https://katex.org/">KaTeX</a> en
 absoluto. <code>true</code> lo carga del lado del cliente y compone <code>&#x24;...&#x24;</code>/<code>&#x24;&#x24;...&#x24;&#x24;</code>
 escrito directamente en el markdown de una página. Consulta
 <a href="/bx-sites/development/theme/slate/es/guides/markdown/index.html#matemáticas">Extensiones de Markdown</a> para la sintaxis.</p>
-<pre><code class="language-json">{ &quot;math&quot;: true }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">math: true
 </code></pre>
 <p>Las admoniciones (cuadros de aviso al estilo nota/advertencia/consejo),
 las pestañas de contenido y las anotaciones de código con fence
@@ -657,14 +630,14 @@ carga del lado del cliente y renderiza cada bloque de contenido
 OpenAPI/Swagger referenciada (JSON o YAML). Consulta
 <a href="/bx-sites/development/theme/slate/es/guides/content-blocks/index.html#openapi--swagger">Bloques de contenido</a> para la
 sintaxis.</p>
-<pre><code class="language-json">{ &quot;openapi&quot;: true }
+<pre><code class="language-yaml">openapi: true
 </code></pre>
 <h2 id="plugins"><a href="#plugins" id="plugins" name="plugins" class="anchor"></a><code>plugins</code></h2>
 <p><code>[]</code> (el valor por defecto) - un array de nombres de módulos de BoxLang
 para activar como plugins. Instalar un módulo de plugin (<code>box install</code>)
 nunca lo activa por sí solo; también tiene que nombrarse aquí. Consulta
 <a href="/bx-sites/development/theme/slate/es/guides/plugins/index.html">Plugins</a> para saber cómo escribir uno.</p>
-<pre><code class="language-json">{ &quot;plugins&quot;: [ &quot;myBxSitesPlugin&quot; ] }
+<pre><code class="language-yaml">plugins: [ myBxSitesPlugin ]
 </code></pre>
 <h2 id="i18n"><a href="#i18n" id="i18n" name="i18n" class="anchor"></a><code>i18n</code></h2>
 <p>Metadatos para la convención de carpetas de idioma
@@ -693,15 +666,11 @@ para la lista completa de claves; <code>de</code>/<code>es</code>/<code>it</code
 traducción integrada, así que <code>strings</code> solo hace falta para
 sobrescribir una clave o añadir otro idioma.</li>
 </ul>
-<pre><code class="language-json">{
-	&quot;i18n&quot;: {
-		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
-		&quot;locales&quot;: [
-			{ &quot;code&quot;: &quot;es&quot;, &quot;label&quot;: &quot;Español&quot; },
-			{ &quot;code&quot;: &quot;ar&quot;, &quot;label&quot;: &quot;العربية&quot;, &quot;dir&quot;: &quot;rtl&quot; }
-		]
-	}
-}
+<pre><code class="language-yaml">i18n:
+  defaultLocale: { code: en, label: English }
+  locales:
+    - { code: es, label: Español }
+    - { code: ar, label: العربية, dir: rtl }
 </code></pre>
 <p>Consulta <a href="/bx-sites/development/theme/slate/es/guides/i18n/index.html">Internacionalización</a> para el panorama completo</p>
 <ul>
@@ -726,13 +695,13 @@ lectores de feeds solo se preocupan por lo nuevo, así que un feed sin
 límite en un blog con cientos de entradas simplemente desperdicia ancho
 de banda en cada sondeo - consulta <a href="/bx-sites/development/theme/slate/es/guides/blog/index.html#feed">Blog: Feed</a>.</li>
 </ul>
-<pre><code class="language-json">{ &quot;blog&quot;: { &quot;postsPerPage&quot;: 10, &quot;feed&quot;: true, &quot;feedLimit&quot;: 25 } }
+<pre><code class="language-yaml">blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
 </code></pre>
 <p>Consulta <a href="/bx-sites/development/theme/slate/es/guides/blog/index.html">Blog</a> para el frontmatter de entradas/autores,
 categorías, imágenes destacadas y metadatos de SEO/redes sociales.</p>
 <h2 id="versionado"><a href="#versionado" id="versionado" name="versionado" class="anchor"></a>Versionado</h2>
 <p>Los documentos versionados son cuestión de convención, no de
-configuración - no hay ninguna clave de <code>bxsites.json</code> para ello. Añade
+configuración - no hay ninguna clave de <code>bxsites.yaml</code> para ello. Añade
 una carpeta <code>docs/versions/</code>, y cada subcarpeta directa dentro de ella se
 construye como su propio árbol de documentos totalmente autocontenido,
 junto a tu <code>docs/</code> regular (que siempre se construye como &quot;Latest&quot;):</p>
@@ -750,7 +719,7 @@ junto a tu <code>docs/</code> regular (que siempre se construye como &quot;Lates
 <p>Cada carpeta de versión es un árbol normal con forma de <code>docs/</code> - su
 propio <code>index.md</code>, su propia navegación, sus propias páginas - construido
 en <code>site/versions/&lt;name&gt;/</code> con cada enlace interno prefijado en
-consecuencia, y compartiendo el único <code>bxsites.json</code> de configuración/tema
+consecuencia, y compartiendo el único <code>bxsites.yaml</code> de configuración/tema
 del proyecto. Los nombres de versión se ordenan de más reciente a más
 antiguo, numéricamente en lugar de alfabéticamente (de modo que <code>2.0</code> se
 ordena antes que <code>10.0</code>), y cada tema renderiza automáticamente un
@@ -762,7 +731,7 @@ ignora.</p>
 junto a las del sitio principal.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/slate/es/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/slate/es/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="slate-page-nav" aria-label="Navegaci&oacute;n de p&aacute;gina">

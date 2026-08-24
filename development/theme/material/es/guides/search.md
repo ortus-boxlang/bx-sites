@@ -9,7 +9,7 @@ tags: [guías, búsqueda]
 
 BX Sites incluye un proveedor de búsqueda por defecto y se puede apuntar
 a otros mediante [`searchProvider`](../configuration.md#searchprovider)
-de `bxsites.json` - `search: true`/`false` sigue siendo el interruptor
+de `bxsites.yaml` - `search: true`/`false` sigue siendo el interruptor
 maestro de encendido/apagado, sin importar qué proveedor esté activo.
 
 ## Local (el predeterminado)
@@ -30,7 +30,7 @@ externo involucrado.
    cuerpo (con las etiquetas HTML eliminadas).
 2. El parcial `search.bxm` de cada tema renderiza un cuadro de búsqueda;
    `layout.bxm` solo lo incluye (junto con `lunr.js` y los scripts
-   compartidos de `search.js`) cuando `search` de `bxsites.json` es
+   compartidos de `search.js`) cuando `search` de `bxsites.yaml` es
    `true` y `searchProvider.provider` es `"local"` (el predeterminado -
    consulta [Otros proveedores](#otros-proveedores-de-búsqueda) más
    abajo para lo que cambia con uno distinto).
@@ -62,8 +62,8 @@ lo vincula por sí mismo.
 
 ## Desactivarla
 
-```json title="bxsites.json"
-{ "search": false }
+```yaml title="bxsites.yaml"
+search: false
 ```
 
 Omite la construcción de `search-index.json` por completo, y omite el
@@ -94,19 +94,15 @@ cuadro de búsqueda por [Algolia DocSearch](https://docsearch.algolia.com/)
 - la misma búsqueda alojada por un rastreador que admiten
 mkdocs-material, VitePress, Starlight y Docusaurus:
 
-```json title="bxsites.json" linenums="1"
-{
-	"search": true,
-	"searchProvider": {
-		"provider": "algolia",
-		"algolia": {
-			"appId": "ABC123",
-			"apiKey": "a1b2c3d4e5f6...",
-			"indexName": "my-docs",
-			"insights": false
-		}
-	}
-}
+```yaml title="bxsites.yaml" linenums="1"
+search: true
+searchProvider:
+  provider: algolia
+  algolia:
+    appId: ABC123
+    apiKey: a1b2c3d4e5f6...
+    indexName: my-docs
+    insights: false
 ```
 
 `appId`, `apiKey` e `indexName` son obligatorios - `apiKey` es la clave
@@ -140,14 +136,11 @@ cuadro de búsqueda por [Pagefind](https://pagefind.app/) - otro motor de
 búsqueda totalmente estático/sin servidor, pero indexado a partir del
 propio HTML *construido* de `site/` en lugar de rastreado como Algolia:
 
-```json title="bxsites.json" linenums="1"
-{
-	"search": true,
-	"searchProvider": {
-		"provider": "pagefind",
-		"pagefind": { "bin": "pagefind", "options": [] }
-	}
-}
+```yaml title="bxsites.yaml" linenums="1"
+search: true
+searchProvider:
+  provider: pagefind
+  pagefind: { bin: pagefind, options: [] }
 ```
 
 Ambas claves de `pagefind` son opcionales - `bin` (por defecto
@@ -189,7 +182,7 @@ Con `pagefind` activo:
 
 `searchProvider.provider` no está limitado a
 `"local"`/`"algolia"`/`"pagefind"` - cualquier otro valor es aceptado
-por `bxsites.json` tal cual (la propia validación de configuración de BX
+por `bxsites.yaml` tal cual (la propia validación de configuración de BX
 Sites solo comprueba los tres proveedores de arriba). No hay ningún hook
 de plugin para esto - los temas incorporados simplemente no renderizan
 nada para un nombre de proveedor no reconocido, y conectar un cuarto

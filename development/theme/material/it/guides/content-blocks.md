@@ -13,7 +13,7 @@ per sé, e il motivo per cui il contenuto di un sito GitBook è semplice da
 migrare: ognuno di questi corrisponde direttamente a un blocco GitBook
 dello stesso nome. Ognuno usa la stessa sintassi contenitore
 `::: name ... :::` (un `:::` nudo su una riga a sé chiude qualsiasi
-blocco attualmente aperto) - nessuna configurazione di `bxsites.json`
+blocco attualmente aperto) - nessuna configurazione di `bxsites.yaml`
 necessaria, sempre disponibile. Un blocco può essere annidato dentro un
 altro (un espandibile che contiene un gruppo di card, per esempio) -
 ognuno viene analizzato di nuovo per ulteriori blocchi al proprio
@@ -191,7 +191,7 @@ per una specifica OpenAPI/Swagger - `src` viene risolto nello stesso modo,
 relativo a `docs/assets/`, in cui viene risolto `src` di `::: file`. Sia le
 specifiche JSON che YAML funzionano; Swagger UI le analizza entrambe
 interamente lato client - da nessuna parte in questo modulo avviene
-un'analisi OpenAPI lato server. Richiede che `openapi` di `bxsites.json`
+un'analisi OpenAPI lato server. Richiede che `openapi` di `bxsites.yaml`
 ([`openapi`](../configuration.md#openapi)) sia impostato su `true` - se
 non lo è, questo segnaposto viene renderizzato ma resta inerte (il JS/CSS
 proprio di Swagger UI non viene mai copiato in `site/`, quindi la build di
@@ -289,7 +289,7 @@ Prima release.
 
 Una pagina con un blocco `::: updates` ottiene anche il proprio
 `feed.xml` (RSS 2.0) scritto accanto a sé una volta che `baseURL` di
-`bxsites.json` è un URL completo - lo stesso requisito di `sitemap.xml` -
+`bxsites.yaml` è un URL completo - lo stesso requisito di `sitemap.xml` -
 così i lettori possono iscriversi solo al changelog di quella pagina.
 
 ## Contenuto riutilizzabile (include)

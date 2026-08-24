@@ -176,7 +176,7 @@
 Flexmark native di bx-markdown - ammonizioni, note a piè di pagina e
 liste di definizioni - più un'integrazione con i diagrammi Mermaid tutta
 sua. Tutte e quattro sono configurabili tramite le
-<a href="/bx-sites/development/theme/docsy/it/configuration/index.html#markdown">chiavi <code>markdown</code>/<code>mermaid</code> di <code>bxsites.json</code></a>.</p>
+<a href="/bx-sites/development/theme/docsy/it/configuration/index.html#markdown">chiavi <code>markdown</code>/<code>mermaid</code> di <code>bxsites.yaml</code></a>.</p>
 <p>Oltre a queste, BX Sites implementa altre tre estensioni proprie di cui
 Flexmark non ha alcun concetto - schede di contenuto, matematica, e
 annotazioni <code>hl_lines</code>/<code>linenums</code>/<code>title</code> sui blocchi di codice delimitati.
@@ -191,7 +191,7 @@ normale conversione del markdown - vedi le sezioni sotto.</p>
 </code></pre>
 <h2 id="ammonizioni"><a href="#ammonizioni" id="ammonizioni" name="ammonizioni" class="anchor"></a>Ammonizioni</h2>
 <p>Un box di richiamo/nota - attivo di default, nessuna configurazione di
-<code>bxsites.json</code> necessaria:</p>
+<code>bxsites.yaml</code> necessaria:</p>
 <pre data-bxsites-start-line="1" data-bxsites-title="Esempio"><code class="language-markdown">!!! note &quot;Heads Up&quot;
     This is an admonition. Its content is regular markdown - **bold**,
     `code`, [links](../index.md) and lists all work exactly as normal.
@@ -395,7 +395,7 @@ stesso modo del corpo di un'ammonizione (4 spazi o un tab):</p>
 <p>Blocchi <code>=== &quot;...&quot;</code> consecutivi (separati al massimo da una riga vuota)
 formano un unico gruppo di schede; il contenuto di una scheda è markdown
 completo, quindi blocchi di codice, liste, ammonizioni, qualsiasi cosa
-scriveresti altrove. Nessuna configurazione di <code>bxsites.json</code> necessaria -
+scriveresti altrove. Nessuna configurazione di <code>bxsites.yaml</code> necessaria -
 sempre attivo.</p>
 <h2 id="blocchi-di-codice"><a href="#blocchi-di-codice" id="blocchi-di-codice" name="blocchi-di-codice" class="anchor"></a>Blocchi di codice</h2>
 <p>I blocchi di codice delimitati vengono evidenziati lato client
@@ -432,7 +432,7 @@ numeric function add( required numeric a, required numeric b ) {
 accetta numeri di riga e/o intervalli separati da spazi (<code>&quot;2 4-6&quot;</code>) da
 evidenziare, contati dall'inizio del blocco indipendentemente da dove
 parte <code>linenums</code>; <code>title</code> aggiunge una piccola barra del titolo sopra il
-blocco. Nessuna configurazione di <code>bxsites.json</code> necessaria - sempre
+blocco. Nessuna configurazione di <code>bxsites.yaml</code> necessaria - sempre
 disponibile.</p>
 <h3 id="indicatori-di-diff-e-cornici-terminale"><a href="#indicatori-di-diff-e-cornici-terminale" id="indicatori-di-diff-e-cornici-terminale" name="indicatori-di-diff-e-cornici-terminale" class="anchor"></a>Indicatori di diff e cornici terminale</h3>
 <p>Aggiungi <code>insert</code>/<code>delete</code> per segnalare righe aggiunte/rimosse - gli
@@ -474,7 +474,7 @@ box install bx-sites
 </code></pre>
 <p><code>frame=&quot;code&quot;</code> è il nome esplicito per la barra semplice di oggi - il
 valore predefinito; nessuno ha bisogno di scriverlo. Né <code>insert</code>/<code>delete</code>
-né <code>frame</code> richiedono configurazione in <code>bxsites.json</code>, come
+né <code>frame</code> richiedono configurazione in <code>bxsites.yaml</code>, come
 <code>hl_lines</code>/<code>linenums</code>/<code>title</code>.</p>
 <h4 id="diff-git-reali"><a href="#diff-git-reali" id="diff-git-reali" name="diff-git-reali" class="anchor"></a>Diff git reali</h4>
 <p>Etichetta un blocco come <code>diff</code> e incolla direttamente l'output reale di
@@ -537,8 +537,8 @@ parametro URL <code>code</code>, allo stesso modo in cui funziona già un link
 try.boxlang.io ↗&quot; dell'embed riprende esattamente da dove parte l'embed.</p>
 <h2 id="diagrammi"><a href="#diagrammi" id="diagrammi" name="diagrammi" class="anchor"></a>Diagrammi</h2>
 <p>Opzionale tramite la chiave <a href="/bx-sites/development/theme/docsy/it/configuration/index.html#mermaid"><code>mermaid</code></a> di
-<code>bxsites.json</code>:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;mermaid&quot;: true }
+<code>bxsites.yaml</code>:</p>
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">mermaid: true
 </code></pre>
 <p>Una volta attivato, qualsiasi blocco di codice delimitato <code>```mermaid</code>
 viene renderizzato come un diagramma <a href="https://mermaid.js.org/">Mermaid</a>
@@ -554,8 +554,8 @@ classe, diagrammi di Gantt e altro - vedi il
 per tutto ciò che può disegnare.</p>
 <h2 id="matematica"><a href="#matematica" id="matematica" name="matematica" class="anchor"></a>Matematica</h2>
 <p>Opzionale tramite la chiave <a href="/bx-sites/development/theme/docsy/it/configuration/index.html#math"><code>math</code></a> di
-<code>bxsites.json</code>:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;math&quot;: true }
+<code>bxsites.yaml</code>:</p>
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">math: true
 </code></pre>
 <p>Una volta attivato, <a href="https://katex.org/">KaTeX</a> compone <code>&#x24;...&#x24;</code> per la
 matematica in linea e <code>&#x24;&#x24;...&#x24;&#x24;</code> per un blocco centrato, entrambi scritti
@@ -597,7 +597,7 @@ Docs. Vedi il readme proprio di bx-markdown per i dettagli.</p>
 </div>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/markdown.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/docsy/it/guides/markdown.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/markdown.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/docsy/it/guides/markdown.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="docsy-page-nav" aria-label="Navigazione della pagina">

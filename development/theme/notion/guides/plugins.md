@@ -14,11 +14,11 @@ same runtime (`box install` into the project, the same way `bx-markdown`/
 BoxLang's own module system *is* the plugin system.
 
 Installing a module alone never activates it as a plugin, though - a
-project opts one in explicitly by BoxLang module name, via `bxsites.json`'s
+project opts one in explicitly by BoxLang module name, via `bxsites.yaml`'s
 [`plugins`](../configuration.md#plugins) array:
 
-```json title="bxsites.json"
-{ "plugins": [ "myBxSitesPlugin" ] }
+```yaml title="bxsites.yaml"
+plugins: [ myBxSitesPlugin ]
 ```
 
 ## Installing a published plugin
@@ -38,7 +38,7 @@ npm), so it's active in the running BoxLang module registry with no
 `BOXLANG_HOME`/global install step at all. `install:plugin` loads it into
 the runtime immediately and prints back its real registered module
 mapping name (which, per the note below, isn't always the same as the
-ForgeBox slug) - add *that* name to `bxsites.json`'s `plugins` array to
+ForgeBox slug) - add *that* name to `bxsites.yaml`'s `plugins` array to
 activate it, same as any other installed module. See
 [`install:plugin`](../cli-reference.md#installplugin) in the CLI reference.
 
@@ -54,7 +54,7 @@ BX Sites checks for each one before calling it:
 class {
 
 	struct function onConfig( required struct config ) {
-		// Mutate/return the site config, right after bxsites.json is loaded.
+		// Mutate/return the site config, right after bxsites.yaml is loaded.
 		return arguments.config
 	}
 
@@ -83,7 +83,7 @@ class {
 }
 ```
 
-Hooks run in `bxsites.json`'s own `plugins` array order, and (except
+Hooks run in `bxsites.yaml`'s own `plugins` array order, and (except
 `onBuildComplete`) each one's return value replaces the value the next
 hook (or BX Sites itself) sees - a plugin only needs to return what it was
 given if it has nothing to change.
@@ -122,7 +122,7 @@ skeleton, or read it for a worked example of the folder layout:
 
 ```text title="hello-plugin/ layout"
 hello-plugin/
-├── box.json              # boxlang.moduleName is what bxsites.json's [plugins] references
+├── box.json              # boxlang.moduleName is what bxsites.yaml's [plugins] references
 ├── ModuleConfig.bx        # a normal, otherwise-empty BoxLang module descriptor
 └── models/
     └── BxSitesPlugin.bx    # onPageHtml() + onBuildComplete()
@@ -130,7 +130,7 @@ hello-plugin/
 
 ## Errors
 
-- `BxSites.PluginNotFound` - a name in `bxsites.json`'s `plugins` array
+- `BxSites.PluginNotFound` - a name in `bxsites.yaml`'s `plugins` array
   isn't an installed/activated BoxLang module.
 - `BxSites.InvalidPlugin` - the module exists, but has no
   `models/BxSitesPlugin.bx` class.

@@ -86,7 +86,7 @@
 				<div class="slate-content-body">
 				<h1 id="バージョニング"><a href="#バージョニング" id="バージョニング" name="バージョニング" class="anchor"></a>バージョニング</h1>
 <p>バージョン管理されたドキュメントは設定より規約を重視します - 有効にするための
-<code>bxsites.json</code> のキーはありません。<code>docs/versions/</code> フォルダを追加すると、
+<code>bxsites.yaml</code> のキーはありません。<code>docs/versions/</code> フォルダを追加すると、
 その直下の各サブフォルダが、通常の <code>docs/</code>（常に「Latest」としてビルドされます）
 と並んで、それぞれ独立した完全なドキュメントツリーとしてビルドされます:</p>
 <pre data-bxsites-title="docs&#x2f; layout"><code class="language-text">docs/
@@ -103,7 +103,7 @@
 <p>各バージョンフォルダは、通常の <code>docs/</code> と同じ形をしたツリーです - 独自の
 <code>index.md</code>、独自のナビ、独自のページを持ち、内部リンクにはすべて適切な
 プレフィックスが付けられて <code>site/versions/&lt;name&gt;/</code> にビルドされ、プロジェクト
-の単一の <code>bxsites.json</code> 設定/テーマを共有します。<code>docs/versions/</code> の直下に
+の単一の <code>bxsites.yaml</code> 設定/テーマを共有します。<code>docs/versions/</code> の直下に
 （サブフォルダの中ではなく）直接置かれた単独のファイルは無視されます。</p>
 <h2 id="新しいバージョンを切り出す"><a href="#新しいバージョンを切り出す" id="新しいバージョンを切り出す" name="新しいバージョンを切り出す" class="anchor"></a>新しいバージョンを切り出す</h2>
 <p><code>version:new</code> は<em>現在</em>の <code>docs/</code> ツリーを <code>docs/versions/&lt;name&gt;/</code> にスナップ
@@ -166,7 +166,7 @@
 </ul>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/ja/guides/versioning.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> &#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x3092;&#x7de8;&#x96c6;</a><a href="/bx-sites/development/theme/slate/ja/guides/versioning.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown&#x3092;&#x30c0;&#x30a6;&#x30f3;&#x30ed;&#x30fc;&#x30c9;</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &#x6700;&#x7d42;&#x66f4;&#x65b0; Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/ja/guides/versioning.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> &#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x3092;&#x7de8;&#x96c6;</a><a href="/bx-sites/development/theme/slate/ja/guides/versioning.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown&#x3092;&#x30c0;&#x30a6;&#x30f3;&#x30ed;&#x30fc;&#x30c9;</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &#x6700;&#x7d42;&#x66f4;&#x65b0; Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="slate-page-nav" aria-label="&#x30da;&#x30fc;&#x30b8;&#x30ca;&#x30d3;&#x30b2;&#x30fc;&#x30b7;&#x30e7;&#x30f3;">

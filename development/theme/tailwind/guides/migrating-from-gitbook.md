@@ -114,5 +114,5 @@ The migrated `docs/nav.json` is a plain [nav override](../configuration.md#nav)
 file - edit it like any other, or delete it to fall back to bx-sites'
 own folder-structure-is-nav-structure convention. From here it's a normal
 bx-sites project: pick a [theme](themes.md), review
-[`bxsites.json`](../configuration.md), and [deploy](deployment.md) when
+[`bxsites.yaml`](../configuration.md), and [deploy](deployment.md) when
 you're happy with it.

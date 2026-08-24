@@ -189,8 +189,8 @@ blog:
 above. A partial <code>theme</code> object is merged one level deep, so
 <code>{theme: {name: material}}</code> alone still keeps the default (empty)
 <code>options</code>. Every key below is named/shaped identically in both formats -
-the rest of this page just shows JSON snippets for brevity, but every one
-of them reads the same in YAML.</p>
+the rest of this page just shows YAML snippets, matching <code>bxSites new</code>'s
+own default format, but every one of them reads the same in JSON.</p>
 <h2 id="name"><a href="#name" id="name" name="name" class="anchor"></a><code>name</code></h2>
 <p>The site name, shown in the header/brand mark and page titles. Required.</p>
 <h2 id="description"><a href="#description" id="description" name="description" class="anchor"></a><code>description</code></h2>
@@ -248,7 +248,7 @@ picked one themselves via the header's dark/light toggle - <code>&quot;auto&quot
 follows their OS preference, <code>&quot;light&quot;</code>/<code>&quot;dark&quot;</code> pins a fixed default.
 Once a visitor toggles the switch, their own choice (stored in
 <code>localStorage</code>) always wins on later visits, regardless of this setting.</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;colorMode&quot;: &quot;dark&quot; } } }
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">theme: { options: { colorMode: dark } }
 </code></pre>
 </li>
 <li>
@@ -264,7 +264,7 @@ so navigating there never buries the very link you're on.</p>
 <p><code>theme.options.navExpandAll</code> - only relevant when <code>navCollapsible</code> is
 <code>true</code>. <code>true</code> (the default) starts every section open; <code>false</code> starts
 every section collapsed, except the one containing the current page.</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;navCollapsible&quot;: true, &quot;navExpandAll&quot;: false } } }
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">theme: { options: { navCollapsible: true, navExpandAll: false } }
 </code></pre>
 </li>
 <li>
@@ -279,7 +279,7 @@ instead renders a collapsible &quot;On this page&quot; bar pinned to the top of
 the viewport while scrolling - tap to expand the list, same treatment
 VitePress/GitBook use on mobile - so the TOC stays reachable at every
 viewport width, it just changes shape depending on how much room there is.</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;tocPosition&quot;: &quot;sticky&quot; } } }
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">theme: { options: { tocPosition: sticky } }
 </code></pre>
 </li>
 <li>
@@ -288,7 +288,7 @@ markdown/last-updated row renders relative to a page's own content.
 <code>&quot;bottom&quot;</code> (the default) renders it as a small footer note right before
 the article ends. <code>&quot;top&quot;</code> renders it up near the title instead, the same
 place it always rendered before this option existed.</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="docs&#x2f;nav.json"><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;pageMetaPosition&quot;: &quot;top&quot; } } }
+<pre data-bxsites-start-line="1" data-bxsites-title="docs&#x2f;nav.json"><code class="language-yaml">theme: { options: { pageMetaPosition: top } }
 </code></pre>
 </li>
 </ul>
@@ -312,17 +312,13 @@ Any other value is a project's own custom provider, wired up by a
 exactly as Algolia's own DocSearch client expects them. <code>insights</code>
 (<code>false</code> by default) turns on DocSearch's click/conversion analytics.</li>
 </ul>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">  {
-    &quot;search&quot;: true,
-    &quot;searchProvider&quot;: {
-      &quot;provider&quot;: &quot;algolia&quot;,
-      &quot;algolia&quot;: {
-        &quot;appId&quot;: &quot;ABC123&quot;,
-        &quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
-        &quot;indexName&quot;: &quot;my-docs&quot;
-      }
-    }
-  }
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">  search: true
+  searchProvider:
+    provider: algolia
+    algolia:
+      appId: ABC123
+      apiKey: a1b2c3d4e5f6...
+      indexName: my-docs
 </code></pre>
 <ul>
 <li><code>pagefind</code> - both keys optional when <code>provider</code> is <code>&quot;pagefind&quot;</code>: <code>bin</code>
@@ -332,13 +328,10 @@ flags passed straight through. The <code>pagefind</code> CLI itself must already
 installed and on <code>PATH</code> - BX Sites shells out to it (like <code>git</code> for
 <code>lastUpdated</code>/<code>gh-deploy</code>), it doesn't install it for you.</li>
 </ul>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">  {
-    &quot;search&quot;: true,
-    &quot;searchProvider&quot;: {
-      &quot;provider&quot;: &quot;pagefind&quot;,
-      &quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
-    }
-  }
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">  search: true
+  searchProvider:
+    provider: pagefind
+    pagefind: { bin: pagefind, options: [] }
 </code></pre>
 <h2 id="nav"><a href="#nav" id="nav" name="nav" class="anchor"></a><code>nav</code></h2>
 <p>By default, nav is inferred from <code>docs/</code>'s own folder/file structure (with
@@ -365,42 +358,35 @@ for what an <code>icon</code> value can be</li>
 container/section label - a non-clickable heading that just groups its
 children, the same role GitBook's &quot;MAIN COMPONENTS&quot; plays in its own
 sidebar:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;nav&quot;: [
-		&quot;index.md&quot;,
-		{
-			&quot;title&quot;: &quot;Main Components&quot;,
-			&quot;children&quot;: [
-				{ &quot;title&quot;: &quot;Quick Start&quot;, &quot;path&quot;: &quot;guides/setup.md&quot; },
-				&quot;guides/deployment.md&quot;
-			]
-		}
-	]
-}
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">nav:
+  - index.md
+  - title: Main Components
+    children:
+      - title: Quick Start
+        path: guides/setup.md
+      - guides/deployment.md
 </code></pre>
 <p>Give that same group entry a <code>path</code> instead and it becomes a normal linked
 section (its own landing page, plus children) rather than a bare label - both
 shapes nest under <code>theme.options.navCollapsible</code> the same way (see above).</p>
-<p>For a nav large enough that it clutters <code>bxsites.json</code>, move it to its own
+<p>For a nav large enough that it clutters <code>bxsites.yaml</code>, move it to its own
 <code>docs/nav.json</code> file instead - same array shape, just as the whole file's
 top-level content:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">[
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-json">[
 	&quot;index.md&quot;,
 	{ &quot;title&quot;: &quot;Guides&quot;, &quot;children&quot;: [ &quot;guides/setup.md&quot; ] }
 ]
 </code></pre>
-<p><code>bxsites.json</code>'s own <code>nav</code>, when non-empty, always wins over <code>docs/nav.json</code>.
+<p><code>bxsites.yaml</code>'s own <code>nav</code>, when non-empty, always wins over <code>docs/nav.json</code>.
 Only the main tree honors either - a <code>docs/versions/&lt;name&gt;/</code> tree always
 infers its nav from its own folder structure, even when the main tree has
 an explicit one.</p>
 <h2 id="redirects"><a href="#redirects" id="redirects" name="redirects" class="anchor"></a><code>redirects</code></h2>
 <p><code>[]</code> (the default) - site-wide <code>from</code>/<code>to</code> old-URL redirects, only ever
 applied to the main tree:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;redirects&quot;: [
-		{ &quot;from&quot;: &quot;old-guide&quot;, &quot;to&quot;: &quot;guides/new-guide/&quot; }
-	]
-}
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">redirects:
+  - from: old-guide
+    to: guides/new-guide/
 </code></pre>
 <ul>
 <li><code>redirects[].from</code> - the old pretty-URL segment a static redirect stub
@@ -446,14 +432,11 @@ Docs defaults it to <code>true</code> (see the <a href="/bx-sites/development/th
 <tr><td><code>tableOptions.headerSeparationColumnMatch</code></td><td><code>true</code></td><td>Requires the <code>---</code> separator row to match the header's column count</td></tr>
 </tbody>
 </table>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;markdown&quot;: {
-		&quot;enableFootnotes&quot;: true,
-		&quot;enableDefinitionLists&quot;: true,
-		&quot;anchorLinks&quot;: false,
-		&quot;enableYouTubeTransformer&quot;: true
-	}
-}
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">markdown:
+  enableFootnotes: true
+  enableDefinitionLists: true
+  anchorLinks: false
+  enableYouTubeTransformer: true
 </code></pre>
 <h2 id="repo"><a href="#repo" id="repo" name="repo" class="anchor"></a><code>repo</code></h2>
 <p>Adds a repository icon link to the header (every built-in theme) and,
@@ -470,7 +453,7 @@ source path to build its edit link - e.g. with the example above,
 <code>repo.url</code> too; leave blank to omit edit links while still showing the
 header icon.</li>
 </ul>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;repo&quot;: { &quot;url&quot;: &quot;https://github.com/acme/docs&quot;, &quot;editUri&quot;: &quot;edit/main/docs/&quot; } }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">repo: { url: &quot;https://github.com/acme/docs&quot;, editUri: &quot;edit/main/docs/&quot; }
 </code></pre>
 <h2 id="social"><a href="#social" id="social" name="social" class="anchor"></a><code>social</code></h2>
 <p>An array of social/external links rendered in the footer (see
@@ -480,18 +463,15 @@ needs a <code>url</code>; <code>icon</code> selects from a small built-in icon s
 <code>slack</code>, <code>patreon</code>, <code>rss</code>, <code>email</code>, falling back to a generic link glyph
 for anything else), and <code>label</code> sets the link's accessible name/tooltip
 (defaults to <code>icon</code>, then <code>&quot;Link&quot;</code>).</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;social&quot;: [
-		{ &quot;url&quot;: &quot;https://twitter.com/acme&quot;, &quot;icon&quot;: &quot;twitter&quot;, &quot;label&quot;: &quot;Twitter&quot; },
-		{ &quot;url&quot;: &quot;https://acme.com/rss.xml&quot;, &quot;icon&quot;: &quot;rss&quot;, &quot;label&quot;: &quot;RSS&quot; }
-	]
-}
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">social:
+  - { url: &quot;https://twitter.com/acme&quot;, icon: twitter, label: Twitter }
+  - { url: &quot;https://acme.com/rss.xml&quot;, icon: rss, label: RSS }
 </code></pre>
 <h2 id="footer"><a href="#footer" id="footer" name="footer" class="anchor"></a><code>footer</code></h2>
 <p><code>false</code> (the default) - no footer at all. <code>true</code> adds one to every page:
 a copyright line (<code>© &lt;year&gt; &lt;site name&gt;</code>), the <code>social</code> links (if any),
 and a &quot;Built with BX Sites&quot; credit.</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;footer&quot;: true }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">footer: true
 </code></pre>
 <h2 id="lastupdated"><a href="#lastupdated" id="lastupdated" name="lastupdated" class="anchor"></a><code>lastUpdated</code></h2>
 <p><code>false</code> (the default) - no last-updated date. <code>true</code> adds a &quot;Last updated&quot;
@@ -501,7 +481,7 @@ Silently omitted for a page git has no history for - a fresh <code>git init</cod
 with no commits yet, a build running from a downloaded zip with no <code>.git</code>
 at all, or git not being installed on the build machine - rather than
 breaking the build.</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;lastUpdated&quot;: true }
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">lastUpdated: true
 </code></pre>
 <h2 id="analytics"><a href="#analytics" id="analytics" name="analytics" class="anchor"></a><code>analytics</code></h2>
 <p>Wires up pageview analytics. Currently supports Google Analytics
@@ -512,7 +492,7 @@ no analytics script is shipped at all.</li>
 <li><code>analytics.id</code> - the Google Analytics measurement ID (e.g. <code>&quot;G-ABC123&quot;</code>).
 Required when <code>provider</code> is <code>&quot;google&quot;</code>.</li>
 </ul>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;analytics&quot;: { &quot;provider&quot;: &quot;google&quot;, &quot;id&quot;: &quot;G-ABC123&quot; } }
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">analytics: { provider: google, id: &quot;G-ABC123&quot; }
 </code></pre>
 <h2 id="ogimage"><a href="#ogimage" id="ogimage" name="ogimage" class="anchor"></a><code>ogImage</code></h2>
 <p>Path/URL to a default social-card image, rendered as <code>og:image</code> (and paired
@@ -521,7 +501,7 @@ override it - resolved the same way as <code>theme.logo</code> (relative paths a
 prefixed with <code>baseURL</code>, absolute URLs are used as-is). Left blank (the
 default) and <code>generateOgImages</code> off, no <code>og:image</code>/<code>twitter:card</code> tags are
 rendered.</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;ogImage&quot;: &quot;assets/social-card.png&quot; }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">ogImage: assets/social-card.png
 </code></pre>
 <p>A page's own frontmatter <code>ogImage</code> (see <a href="/bx-sites/development/theme/docusaurus/getting-started/index.html#add-pages">Getting Started</a>)
 always wins over this site-wide default for that one page.</p>
@@ -533,34 +513,28 @@ frontmatter <code>ogImage</code> - the page's title on the brand gradient, writt
 site-wide image. Pure <code>java.awt</code>/<code>javax.imageio</code> under the hood (part of
 any JVM BoxLang runs on), so this needs no headless browser, external
 service, or network access at build time.</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;generateOgImages&quot;: true }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">generateOgImages: true
 </code></pre>
 <h2 id="extracss--extrajs"><a href="#extracss--extrajs" id="extracss--extrajs" name="extracss--extrajs" class="anchor"></a><code>extraCss</code> / <code>extraJs</code></h2>
 <p>Arrays of extra stylesheet/script URLs to include on every page, appended
 after the theme's own assets - each entry is resolved the same way as
 <code>theme.logo</code> (a relative path is prefixed with <code>baseURL</code>; an absolute URL
 is used as-is). <code>extraJs</code> entries are loaded with <code>defer</code>.</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;extraCss&quot;: [ &quot;assets/custom.css&quot; ],
-	&quot;extraJs&quot;: [ &quot;assets/custom.js&quot; ]
-}
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">extraCss: [ assets/custom.css ]
+extraJs: [ assets/custom.js ]
 </code></pre>
 <p>When <code>assets.bundle</code> is on (the default), a local <code>extraCss</code>/<code>extraJs</code>
 list like the one above is bundled into one fingerprinted file each,
 instead of one <code>&lt;link&gt;</code>/<code>&lt;script&gt;</code> tag per entry - see <a href="#assets"><code>assets</code></a>
 below.</p>
 <h2 id="assets"><a href="#assets" id="assets" name="assets" class="anchor"></a><code>assets</code></h2>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;assets&quot;: {
-		&quot;fingerprint&quot;: true,
-		&quot;bundle&quot;: true,
-		&quot;images&quot;: {
-			&quot;enabled&quot;: true,
-			&quot;widths&quot;: [ 400, 800, 1200, 1600 ],
-			&quot;formats&quot;: [ &quot;original&quot;, &quot;webp&quot; ]
-		}
-	}
-}
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">assets:
+  fingerprint: true
+  bundle: true
+  images:
+    enabled: true
+    widths: [ 400, 800, 1200, 1600 ]
+    formats: [ original, webp ]
 </code></pre>
 <p>The asset pipeline - image resizing/WebP via
 <a href="https://github.com/ortus-boxlang/bx-image">bx-image</a> (a required
@@ -603,14 +577,14 @@ variant. Both on by default.</li>
 support shipped at all. <code>true</code> loads <code>mermaid.js</code> client-side and renders
 every <code>```mermaid</code> fenced code block as a diagram. See
 <a href="/bx-sites/development/theme/docusaurus/guides/markdown/index.html#diagrams">Markdown Extensions</a> for the syntax.</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;mermaid&quot;: true }
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">mermaid: true
 </code></pre>
 <h2 id="math"><a href="#math" id="math" name="math" class="anchor"></a><code>math</code></h2>
 <p><code>false</code> (the default) - no <a href="https://katex.org/">KaTeX</a> shipped at all.
 <code>true</code> loads it client-side and typesets <code>&#x24;...&#x24;</code>/<code>&#x24;&#x24;...&#x24;&#x24;</code> written directly
 into a page's markdown. See
 <a href="/bx-sites/development/theme/docusaurus/guides/markdown/index.html#math">Markdown Extensions</a> for the syntax.</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;math&quot;: true }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">math: true
 </code></pre>
 <p>Admonitions (note/warning/tip-style callout boxes), content tabs, and
 fenced-code <code>hl_lines</code>/<code>linenums</code>/<code>title</code> annotations are always available
@@ -622,14 +596,14 @@ shipped at all. <code>true</code> loads it client-side and renders every
 <code>::: openapi src=&quot;...&quot;</code> content block as an interactive widget for the
 referenced OpenAPI/Swagger spec (JSON or YAML). See
 <a href="/bx-sites/development/theme/docusaurus/guides/content-blocks/index.html#openapi--swagger">Content Blocks</a> for the syntax.</p>
-<pre><code class="language-json">{ &quot;openapi&quot;: true }
+<pre><code class="language-yaml">openapi: true
 </code></pre>
 <h2 id="plugins"><a href="#plugins" id="plugins" name="plugins" class="anchor"></a><code>plugins</code></h2>
 <p><code>[]</code> (the default) - an array of BoxLang module names to activate as
 plugins. Installing a plugin module (<code>box install</code>) never activates it on
 its own; it has to be named here too. See <a href="/bx-sites/development/theme/docusaurus/guides/plugins/index.html">Plugins</a>
 for how to write one.</p>
-<pre><code class="language-json">{ &quot;plugins&quot;: [ &quot;myBxSitesPlugin&quot; ] }
+<pre><code class="language-yaml">plugins: [ myBxSitesPlugin ]
 </code></pre>
 <h2 id="i18n"><a href="#i18n" id="i18n" name="i18n" class="anchor"></a><code>i18n</code></h2>
 <p>Metadata for the <a href="/bx-sites/development/theme/docusaurus/guides/i18n/index.html"><code>docs/i18n/&lt;code&gt;/</code></a> locale-folder
@@ -652,15 +626,11 @@ overrides that locale's own theme-chrome UI text (search placeholder,
 full key list; <code>de</code>/<code>es</code>/<code>it</code>/<code>ja</code> already ship a built-in translation,
 so <code>strings</code> is only needed to override a key or add another locale.</li>
 </ul>
-<pre><code class="language-json">{
-	&quot;i18n&quot;: {
-		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
-		&quot;locales&quot;: [
-			{ &quot;code&quot;: &quot;es&quot;, &quot;label&quot;: &quot;Español&quot; },
-			{ &quot;code&quot;: &quot;ar&quot;, &quot;label&quot;: &quot;العربية&quot;, &quot;dir&quot;: &quot;rtl&quot; }
-		]
-	}
-}
+<pre><code class="language-yaml">i18n:
+  defaultLocale: { code: en, label: English }
+  locales:
+    - { code: es, label: Español }
+    - { code: ar, label: العربية, dir: rtl }
 </code></pre>
 <p>See <a href="/bx-sites/development/theme/docusaurus/guides/i18n/index.html">Internationalization</a> for the full picture -
 untranslated-page fallback, the language switcher, and what isn't
@@ -681,12 +651,12 @@ feed readers only care about what's new, so an unbounded feed on a blog
 with hundreds of posts just wastes bandwidth on every poll - see
 <a href="/bx-sites/development/theme/docusaurus/guides/blog/index.html#feed">Blog: Feed</a>.</li>
 </ul>
-<pre><code class="language-json">{ &quot;blog&quot;: { &quot;postsPerPage&quot;: 10, &quot;feed&quot;: true, &quot;feedLimit&quot;: 25 } }
+<pre><code class="language-yaml">blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
 </code></pre>
 <p>See <a href="/bx-sites/development/theme/docusaurus/guides/blog/index.html">Blog</a> for post/author frontmatter, categories,
 featured images, and SEO/social metadata.</p>
 <h2 id="versioning"><a href="#versioning" id="versioning" name="versioning" class="anchor"></a>Versioning</h2>
-<p>Versioned docs are convention over configuration - there's no <code>bxsites.json</code>
+<p>Versioned docs are convention over configuration - there's no <code>bxsites.yaml</code>
 key for it. Add a <code>docs/versions/&lt;name&gt;/</code> folder and it builds automatically
 as its own doc tree, with a version switcher every theme renders for free
 once more than one version exists. See <a href="/bx-sites/development/theme/docusaurus/guides/versioning/index.html">Versioning</a>
@@ -695,7 +665,7 @@ versions sort and build, and what's out of scope (per-tree search
 scoping, no deprecated/EOL flag).</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/docusaurus/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/docusaurus/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="dsrs-page-nav" aria-label="Page navigation">

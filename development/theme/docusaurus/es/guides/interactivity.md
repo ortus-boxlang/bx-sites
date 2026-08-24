@@ -11,7 +11,7 @@ Cada página construida por BX Sites ya carga [Alpine.js](https://alpinejs.dev/)
 - es lo que impulsa el interruptor de modo oscuro y el desplegable de
 idioma incorporados en todos los temas incluidos. Esa misma
 instancia de Alpine también está disponible para el contenido de tus
-propias páginas, gratis: sin ninguna opción de `bxsites.json` que
+propias páginas, gratis: sin ninguna opción de `bxsites.yaml` que
 activar, sin ninguna entrada `extraJs` que añadir, sin ninguna etiqueta
 `<script>` adicional que escribir en tu markdown.
 
@@ -96,7 +96,7 @@ más).
 
 - **Es parte del núcleo, no opcional.** El armazón del tema (modo oscuro,
   selector de idioma) depende de Alpine, así que no se puede desactivar
-  en `bxsites.json` como sí puede hacerse con `mermaid`/`math`.
+  en `bxsites.yaml` como sí puede hacerse con `mermaid`/`math`.
 - **Versión.** Actualmente `alpinejs@3.14.1`, incluida con este módulo y
   servida desde `site/assets/vendor/alpine/` - sin ningún CDN
   involucrado. Consulta el propio `layout.bxm` de un tema para ver la

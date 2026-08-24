@@ -90,7 +90,7 @@ per sé, e il motivo per cui il contenuto di un sito GitBook è semplice da
 migrare: ognuno di questi corrisponde direttamente a un blocco GitBook
 dello stesso nome. Ognuno usa la stessa sintassi contenitore
 <code>::: name ... :::</code> (un <code>:::</code> nudo su una riga a sé chiude qualsiasi
-blocco attualmente aperto) - nessuna configurazione di <code>bxsites.json</code>
+blocco attualmente aperto) - nessuna configurazione di <code>bxsites.yaml</code>
 necessaria, sempre disponibile. Un blocco può essere annidato dentro un
 altro (un espandibile che contiene un gruppo di card, per esempio) -
 ognuno viene analizzato di nuovo per ulteriori blocchi al proprio
@@ -206,7 +206,7 @@ per una specifica OpenAPI/Swagger - <code>src</code> viene risolto nello stesso 
 relativo a <code>docs/assets/</code>, in cui viene risolto <code>src</code> di <code>::: file</code>. Sia le
 specifiche JSON che YAML funzionano; Swagger UI le analizza entrambe
 interamente lato client - da nessuna parte in questo modulo avviene
-un'analisi OpenAPI lato server. Richiede che <code>openapi</code> di <code>bxsites.json</code>
+un'analisi OpenAPI lato server. Richiede che <code>openapi</code> di <code>bxsites.yaml</code>
 (<a href="/bx-sites/development/theme/docsy/it/configuration/index.html#openapi"><code>openapi</code></a>) sia impostato su <code>true</code> - se
 non lo è, questo segnaposto viene renderizzato ma resta inerte (il JS/CSS
 proprio di Swagger UI non viene mai copiato in <code>site/</code>, quindi la build di
@@ -275,7 +275,7 @@ Initial release.
 </div></div></div>
 <p>Una pagina con un blocco <code>::: updates</code> ottiene anche il proprio
 <code>feed.xml</code> (RSS 2.0) scritto accanto a sé una volta che <code>baseURL</code> di
-<code>bxsites.json</code> è un URL completo - lo stesso requisito di <code>sitemap.xml</code> -
+<code>bxsites.yaml</code> è un URL completo - lo stesso requisito di <code>sitemap.xml</code> -
 così i lettori possono iscriversi solo al changelog di quella pagina.</p>
 <h2 id="contenuto-riutilizzabile-include"><a href="#contenuto-riutilizzabile-include" id="contenuto-riutilizzabile-include" name="contenuto-riutilizzabile-include" class="anchor"></a>Contenuto riutilizzabile (include)</h2>
 <p><code>::: include src=&quot;...&quot;</code> inserisce il Markdown grezzo di un altro file in
@@ -325,7 +325,7 @@ circolare genera <code>BxSites.CircularInclude</code> al momento del build invec
 di ripetersi all'infinito).</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/content-blocks.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/docsy/it/guides/content-blocks.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/content-blocks.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/docsy/it/guides/content-blocks.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="docsy-page-nav" aria-label="Navigazione della pagina">

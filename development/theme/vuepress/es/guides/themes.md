@@ -80,7 +80,7 @@ conjunto de funciones de página:
   desde cualquier lugar de la página, y `Escape` cierra los resultados.
   Consulta [Búsqueda](search.md).
 - **Un enlace al repositorio y una línea "Edit this page"/"Last
-  updated"**, cuando las opciones `repo`/`lastUpdated` de `bxsites.json`
+  updated"**, cuando las opciones `repo`/`lastUpdated` de `bxsites.yaml`
   están configuradas. Consulta [Configuración](../configuration.md#repo).
 - **Un enlace "Download Markdown"**, junto a "Edit this page" - la fuente
   `.md` en bruto de cada página se publica junto a su HTML construido
@@ -90,7 +90,7 @@ conjunto de funciones de página:
   sin configuración necesaria. Consulta
   [Primeros Pasos](../getting-started.md#descargar-una-página-como-markdown).
 - **Un pie de página opcional** (copyright, enlaces `social`, un crédito
-  "Built with BX Sites") cuando el `footer` de `bxsites.json` es `true`.
+  "Built with BX Sites") cuando el `footer` de `bxsites.yaml` es `true`.
   Consulta [Configuración](../configuration.md#footer).
 - **Un selector de versión**, que aparece automáticamente en cuanto un
   proyecto tiene una carpeta `docs/versions/` con más de una versión en
@@ -99,49 +99,49 @@ conjunto de funciones de página:
   mayoría de los alojamientos estáticos (incluido GitHub Pages) para
   cualquier ruta sin coincidencia.
 - **Un logo y favicon personalizados**, cuando `theme.logo`/
-  `theme.favicon` de `bxsites.json` están configurados. Consulta
+  `theme.favicon` de `bxsites.yaml` están configurados. Consulta
   [Configuración](../configuration.md#theme).
 - **Una barra lateral de navegación colapsable**, opcional mediante
   `theme.options.navCollapsible`. Consulta
   [Configuración](../configuration.md#theme).
-- **Google Analytics**, cuando `analytics` de `bxsites.json` está
+- **Google Analytics**, cuando `analytics` de `bxsites.yaml` está
   configurado. Consulta [Configuración](../configuration.md#analytics).
 - **Tarjetas para compartir en redes sociales** (metaetiquetas Open Graph
   + Twitter Card), obtenidas del frontmatter `description` de cada página
   (o la `description` general del sitio) y su propio `ogImage` (o el
   general del sitio) - generadas automáticamente por página de forma
-  opcional mediante `generateOgImages` de `bxsites.json`. Consulta
+  opcional mediante `generateOgImages` de `bxsites.yaml`. Consulta
   [Configuración](../configuration.md#ogimage).
 - **Etiquetas de página, un icono y una línea de resumen**, todo opcional
   mediante el propio frontmatter de una página - las etiquetas se
   renderizan como insignias que enlazan a un índice `/tags/` de todo el
   sitio. Consulta [Primeros Pasos](../getting-started.md#añadir-páginas).
-- **Una navegación explícita personalizada**, en `bxsites.json` o en su
+- **Una navegación explícita personalizada**, en `bxsites.yaml` o en su
   propio `docs/nav.json`, que reemplaza la inferencia por carpetas en
   sitios grandes. Consulta [Configuración](../configuration.md#nav).
 - **CSS/JS adicional**, inyectado mediante `extraCss`/`extraJs` de
-  `bxsites.json`. Consulta
+  `bxsites.yaml`. Consulta
   [Configuración](../configuration.md#extracss--extrajs).
 - **Cuadros de aviso (nota/advertencia/consejo/...)**, activos por
   defecto en el markdown de cualquier página, incluidas variantes
   colapsables - sin configuración necesaria. Consulta
   [Extensiones de Markdown](markdown.md#admoniciones).
 - **Notas al pie y listas de definiciones**, opcionales mediante
-  `markdown` de `bxsites.json`. Consulta
+  `markdown` de `bxsites.yaml`. Consulta
   [Extensiones de Markdown](markdown.md#notas-al-pie).
 - **Pestañas de contenido**, **números de línea de código/líneas
   resaltadas/títulos** y **marcadores de diff/marcos de terminal** para
   bloques de código, sin configuración necesaria. Consulta
   [Extensiones de Markdown](markdown.md#pestañas-de-contenido).
-- **Diagramas Mermaid**, opcionales mediante `mermaid` de `bxsites.json`.
+- **Diagramas Mermaid**, opcionales mediante `mermaid` de `bxsites.yaml`.
   Consulta [Extensiones de Markdown](markdown.md#diagramas).
-- **Matemáticas** (KaTeX), opcional mediante `math` de `bxsites.json`.
+- **Matemáticas** (KaTeX), opcional mediante `math` de `bxsites.yaml`.
   Consulta [Extensiones de Markdown](markdown.md#matemáticas).
 
-Define cuál usa un proyecto en `bxsites.json`:
+Define cuál usa un proyecto en `bxsites.yaml`:
 
-```json
-{ "theme": { "name": "material" } }
+```yaml title="bxsites.yaml"
+theme: { name: material }
 ```
 
 ## Instalar un tema publicado
@@ -159,8 +159,8 @@ cumple el contrato `ThemeProvider` de abajo antes de terminar. Un
 proyecto puede tener varios temas instalados en paralelo de esta forma, y
 cambiar entre ellos únicamente por nombre:
 
-```json
-{ "theme": { "name": "bx-sites-theme-blog1" } }
+```yaml title="bxsites.yaml"
+theme: { name: bx-sites-theme-blog1 }
 ```
 
 Un tema no necesita ninguna participación de módulo/cargador de clases de
@@ -186,7 +186,7 @@ incluidos con este módulo
 (`resources/assets/vendor/`) y se copian directamente en
 `site/assets/vendor/` en el momento de la construcción - sin ninguna
 etiqueta `<script>`/`<link>` a un CDN en ningún lugar del HTML generado
-para ninguno de ellos. Activar la clave `mermaid` de `bxsites.json` incluye
+para ninguno de ellos. Activar la clave `mermaid` de `bxsites.yaml` incluye
 Mermaid de la misma forma - su paquete `mermaid.min.js` se copia en
 `site/assets/vendor/mermaid/` y cada tema incorporado lo carga desde ahí,
 de modo que los diagramas se siguen renderizando con cero solicitudes
@@ -204,7 +204,7 @@ mismo las activas:
   tipos de diagrama que optan por el algoritmo de diseño `elk`; el
   `mermaid.min.js` incluido renderiza por sí solo cualquier otro tipo de
   diagrama.
-- La opción `math` de `bxsites.json` carga KaTeX (tanto su JS como sus
+- La opción `math` de `bxsites.yaml` carga KaTeX (tanto su JS como sus
   propios archivos de fuente) desde un CDN cuando está activada.
 - `searchProvider.provider: "algolia"` y `analytics.provider: "google"`
   se comunican inherentemente con una API alojada/un endpoint de
@@ -285,14 +285,14 @@ Un tema es simplemente una carpeta con:
   el ámbito, e incluye el `page.bxm` hermano mediante
   `#variables.themeDir#/page.bxm`. `variables.basePath` es siempre una
   ruta relativa a la raíz que termina en `/` (`/` por defecto,
-  `/my-docs/` cuando el `baseURL` de `bxsites.json` lo sobrescribe) -
+  `/my-docs/` cuando el `baseURL` de `bxsites.yaml` lo sobrescribe) -
   antepón ese prefijo a cada `href`/`src` interno, en lugar de codificar
   una `/` inicial de forma fija, para que el tema siga funcionando cuando
   el sitio se sirva desde una subruta.
 - **`page.bxm`** (obligatorio) - el cuerpo del artículo. Renderiza
   `variables.page.contentHtml` - el markdown ya convertido.
 - **`search.bxm`** (opcional) - el marcado del cuadro de búsqueda,
-  incluido por `layout.bxm` solo cuando `search` de `bxsites.json` es
+  incluido por `layout.bxm` solo cuando `search` de `bxsites.yaml` es
   `true`. Consulta [Búsqueda](search.md).
 - **`assets/`** (opcional) - CSS/JS del tema, copiado a
   `site/assets/theme/` en el momento de la construcción.
@@ -328,12 +328,12 @@ Para un ajuste de color/fuente, bifurcar todo un tema es excesivo - cada
 tema incorporado lee su paleta de un puñado de propiedades CSS
 personalizadas en `:root`, redeclaradas bajo `[data-theme="dark"]` para
 el modo oscuro. El [`extraCss`](../configuration.md#extracss--extrajs)
-de `bxsites.json` se carga *después* de la propia hoja de estilo del tema,
+de `bxsites.yaml` se carga *después* de la propia hoja de estilo del tema,
 así que una redeclaración con la misma especificidad en él gana sin
 tocar `resources/themes/` en absoluto:
 
-```json
-{ "extraCss": [ "assets/brand.css" ] }
+```yaml title="bxsites.yaml"
+extraCss: [ assets/brand.css ]
 ```
 
 ```css
@@ -481,7 +481,7 @@ my-project/
 
 3. Ejecuta `bxSites build` (o `serve` mientras iteras) - BX
    Docs recoge `theme/` automáticamente, sin necesidad de cambiar
-   `bxsites.json` (una carpeta `theme/` a nivel de proyecto siempre tiene
+   `bxsites.yaml` (una carpeta `theme/` a nivel de proyecto siempre tiene
    precedencia sobre el tema incorporado nombrado en `theme.name`). Todo
    lo que no tocaste - el renderizado de la navegación, la búsqueda, el
    interruptor de modo oscuro, las anotaciones de código - sigue
@@ -497,7 +497,7 @@ falte cualquiera de los dos falla de inmediato con `BxSites.InvalidTheme`
 en lugar de recurrir silenciosamente al otro). Para un ajuste solo de
 CSS/sin `.bxm`, usa
 [`extraCss`](#personalizar-colores-sin-sobrescribir-un-tema) en su lugar -
-se superpone a cualquier tema que nombre `bxsites.json`, sin ninguna
+se superpone a cualquier tema que nombre `bxsites.yaml`, sin ninguna
 carpeta `theme/` involucrada en absoluto. `theme/` es para cuando también
 necesitas cambiar el propio marcado, que se cubre a continuación.
 
@@ -509,7 +509,7 @@ interfaz de búsqueda - para mostrar exactamente qué es obligatorio frente
 a lo que añaden los temas incorporados. Guarda ambos como
 `theme/layout.bxm` y `theme/page.bxm` en tu proyecto - una carpeta
 `theme/` a nivel de proyecto se recoge automáticamente (como arriba), sin
-necesidad de cambiar `bxsites.json`:
+necesidad de cambiar `bxsites.yaml`:
 
 ```bx
 <!-- theme/layout.bxm -->
@@ -565,7 +565,7 @@ markdown ya convertido (resaltado de sintaxis, admoniciones, pestañas,
 matemáticas y todo lo demás), así que no queda nada por analizar, solo
 por maquetar. A partir de aquí, añade lo que sea que tengan los temas
 incorporados que realmente quieras: `search.bxm` (incluido solo cuando
-`search` de `bxsites.json` es `true` - consulta [Búsqueda](search.md)),
+`search` de `bxsites.yaml` es `true` - consulta [Búsqueda](search.md)),
 un interruptor de modo oscuro (copia el par `x-data`/`x-init` de
 Alpine.js de la etiqueta `<body>` de `resources/themes/bootstrap/layout.bxm`
 y el bloque CSS `[data-theme="dark"]` correspondiente), migas de pan/

@@ -9,7 +9,7 @@ tags: [anleitungen, versionierung]
 # Versionierung
 
 Versionierte Docs sind Convention over Configuration - es gibt keinen
-`bxsites.json`-Schlüssel, um sie einzuschalten. Lege einen
+`bxsites.yaml`-Schlüssel, um sie einzuschalten. Lege einen
 `docs/versions/`-Ordner an, und jeder direkte Unterordner darin wird als
 eigener, vollständig eigenständiger Doc-Baum gebaut, neben deinem
 regulären `docs/` (das immer als "Latest" gebaut wird):
@@ -31,7 +31,7 @@ Jeder Versionsordner ist ein normaler, `docs/`-förmiger Baum - seine
 eigene `index.md`, seine eigene Navigation, seine eigenen Seiten -
 gebaut nach `site/versions/<name>/`, mit jedem internen Link
 entsprechend vorangestellt, und teilt sich die einzige eigene
-`bxsites.json`-Konfiguration/das Theme des Projekts. Eine lose Datei,
+`bxsites.yaml`-Konfiguration/das Theme des Projekts. Eine lose Datei,
 direkt unter `docs/versions/` abgelegt (nicht innerhalb eines
 Unterordners), wird ignoriert.
 

@@ -158,19 +158,15 @@ in cui scriviamo. Il solo WebP ottiene comunque la maggior parte del
 risparmio di peso, con un supporto di strumenti/browser molto più ampio -
 vale la pena rivederlo se bx-image aggiunge AVIF a monte.</p>
 <h2 id="disattivarlo"><a href="#disattivarlo" id="disattivarlo" name="disattivarlo" class="anchor"></a>Disattivarlo</h2>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;assets&quot;: { &quot;images&quot;: { &quot;enabled&quot;: false } } }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">assets: { images: { enabled: false } }
 </code></pre>
 <p>Ricade sulla semplice copia non elaborata di <code>docs/assets/**</code> - esattamente
 come veniva gestita ogni immagine prima che questa funzionalità esistesse.</p>
 <h2 id="scegliere-i-propri-breakpoint"><a href="#scegliere-i-propri-breakpoint" id="scegliere-i-propri-breakpoint" name="scegliere-i-propri-breakpoint" class="anchor"></a>Scegliere i propri breakpoint</h2>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;assets&quot;: {
-		&quot;images&quot;: {
-			&quot;widths&quot;: [ 480, 960, 1440 ],
-			&quot;formats&quot;: [ &quot;webp&quot; ]
-		}
-	}
-}
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">assets:
+  images:
+    widths: [ 480, 960, 1440 ]
+    formats: [ webp ]
 </code></pre>
 <p><code>widths</code> ha come predefinito <code>[400, 800, 1200, 1600]</code>; <code>formats</code> ha come
 predefinito <code>[&quot;original&quot;, &quot;webp&quot;]</code> - togli <code>&quot;original&quot;</code> per saltare del
@@ -182,10 +178,8 @@ WebP. Vedi <a href="/bx-sites/development/theme/slate/it/configuration/index.htm
 <h2 id="cssjs-bundling"><a href="#cssjs-bundling" id="cssjs-bundling" name="cssjs-bundling" class="anchor"></a>CSS/JS bundling</h2>
 <p><code>extraCss</code>/<code>extraJs</code> vengono raggruppati allo stesso modo, attivo di
 default (<code>assets.bundle</code>):</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;extraCss&quot;: [ &quot;assets/a.css&quot;, &quot;assets/b.css&quot; ],
-	&quot;extraJs&quot;: [ &quot;assets/app.js&quot; ]
-}
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">extraCss: [ assets/a.css, assets/b.css ]
+extraJs: [ assets/app.js ]
 </code></pre>
 <p>compila un unico <code>assets/bundle.&lt;hash&gt;.css</code> con impronta digitale
 (nell'ordine elencato) e un unico <code>assets/bundle.&lt;hash&gt;.js</code>, invece di un
@@ -203,7 +197,7 @@ progetto locale. Un singolo URL esterno (un link CDN) mescolato fa
 ricadere l'intero elenco sull'esatto comportamento odierno per-URL,
 invece di rischiare di riordinare silenziosamente una cascata CSS da cui
 un progetto dipendeva:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;extraCss&quot;: [ &quot;assets/custom.css&quot;, &quot;https://cdn.example.com/lib.css&quot; ] }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">extraCss: [ assets/custom.css, &quot;https://cdn.example.com/lib.css&quot; ]
 </code></pre>
 <p>renderizza due tag <code>&lt;link&gt;</code> separati, non raggruppati, esattamente come
 prima che questa funzionalità esistesse.</p>
@@ -228,7 +222,7 @@ modifica non correlata non ridecodifica/ridimensiona/ricodifica ogni
 screenshot del progetto, solo quelli effettivamente cambiati.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/images.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/slate/it/guides/images.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/images.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/slate/it/guides/images.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="slate-page-nav" aria-label="Navigazione della pagina">

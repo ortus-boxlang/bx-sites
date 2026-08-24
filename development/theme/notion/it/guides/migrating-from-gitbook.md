@@ -122,5 +122,5 @@ Il `docs/nav.json` migrato è un normale file di
 altro, oppure eliminalo per ricadere sulla convenzione propria di
 bx-sites secondo cui la struttura delle cartelle è la struttura di
 navigazione. Da qui in poi è un normale progetto bx-sites: scegli un
-[tema](themes.md), rivedi [`bxsites.json`](../configuration.md), e
+[tema](themes.md), rivedi [`bxsites.yaml`](../configuration.md), e
 [distribuisci](deployment.md) quando ne sei soddisfatto.

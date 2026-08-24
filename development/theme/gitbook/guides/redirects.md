@@ -39,19 +39,18 @@ a version's own page redirects within that version
 within that locale (`site/es/old-path/`), exactly the same way the page's
 own real URL already is. There's nothing extra to configure per tree.
 
-## Site-wide: `bxsites.json` `redirects`
+## Site-wide: `bxsites.yaml` `redirects`
 
 For an old URL that never belonged to a specific page - a restructured
 section, an old domain's path, anything not naturally a single page's own
 "old name" - list an explicit `from`/`to` pair instead:
 
-```json title="bxsites.json" linenums="1"
-{
-	"redirects": [
-		{ "from": "old-guide", "to": "guides/new-guide/" },
-		{ "from": "moved-to-another-site", "to": "https://example.com/docs" }
-	]
-}
+```yaml title="bxsites.yaml" linenums="1"
+redirects:
+  - from: old-guide
+    to: guides/new-guide/
+  - from: moved-to-another-site
+    to: https://example.com/docs
 ```
 
 - `from` - the old pretty-URL segment, same shape as `redirect_from` above

@@ -8,6 +8,35 @@ tags: [anleitungen, einrichtung]
 
 # Erste Schritte
 
+## Voraussetzung: BoxLang installieren
+
+Alles Folgende setzt voraus, dass die BoxLang-Laufzeitumgebung selbst
+bereits auf deinem Rechner vorhanden ist - `install-bx-module` ist
+BoxLangs eigener CLI-Befehl zum Installieren eines Moduls in eine
+bestehende Installation, und CommandBox' `box install` benötigt ebenfalls
+eine bereits vorhandene BoxLang-Engine, gegen die es laufen kann. Falls du
+BoxLang noch nicht installiert hast, installiere es zuerst mit einer der
+beiden Methoden:
+
+- dem **Quick Installer** (eine einzelne Version, am einfachsten für den
+  Einstieg):
+
+  ```bash frame="terminal" title="Terminal"
+  curl -fsSL https://install.boxlang.io/ | bash
+  ```
+
+- oder **BVM**, dem BoxLang Version Manager (installiert mehrere
+  BoxLang-Versionen nebeneinander und lässt dich zwischen ihnen wechseln):
+
+  ```bash frame="terminal" title="Terminal"
+  curl -fsSL https://install-bvm.boxlang.io/ | bash
+  bvm install latest && bvm use latest
+  ```
+
+Windows- und Homebrew-Installer sowie die vollständige BVM-Befehlsreferenz
+findest du in
+[BoxLangs eigener Installationsdokumentation](https://boxlang.ortusbooks.com/getting-started/installation).
+
 ## Installation
 
 BX Sites benötigt [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)

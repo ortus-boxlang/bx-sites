@@ -91,8 +91,8 @@ WebP だけでもサイズ削減の大部分は得られ、対応するツール
 
 ## 無効化する
 
-```json title="bxsites.json"
-{ "assets": { "images": { "enabled": false } } }
+```yaml title="bxsites.yaml"
+assets: { images: { enabled: false } }
 ```
 
 プレーンで未加工の `docs/assets/**` コピーにフォールバックします -
@@ -100,15 +100,11 @@ WebP だけでもサイズ削減の大部分は得られ、対応するツール
 
 ## 自分でブレークポイントを選ぶ
 
-```json title="bxsites.json" linenums="1"
-{
-	"assets": {
-		"images": {
-			"widths": [ 480, 960, 1440 ],
-			"formats": [ "webp" ]
-		}
-	}
-}
+```yaml title="bxsites.yaml" linenums="1"
+assets:
+  images:
+    widths: [ 480, 960, 1440 ]
+    formats: [ webp ]
 ```
 
 `widths` のデフォルトは `[400, 800, 1200, 1600]`、`formats` のデフォルトは
@@ -123,11 +119,9 @@ WebP だけでもサイズ削減の大部分は得られ、対応するツール
 `extraCss`/`extraJs` も同じ方法でバンドルされ、デフォルトで有効です
 （`assets.bundle`）:
 
-```json title="bxsites.json" linenums="1"
-{
-	"extraCss": [ "assets/a.css", "assets/b.css" ],
-	"extraJs": [ "assets/app.js" ]
-}
+```yaml title="bxsites.yaml" linenums="1"
+extraCss: [ assets/a.css, assets/b.css ]
+extraJs: [ assets/app.js ]
 ```
 
 エントリごとに 1 つの `<link>`/`<script>` タグを出す代わりに、フィンガープリント
@@ -145,8 +139,8 @@ JS では意図的に安全で構造的な空白整理のみを行い、コメ�
 プロジェクトが依存している CSS のカスケード順を黙って並べ替えてしまう危険を
 冒すよりも、リスト全体を今日のまったく同じ URL ごとの挙動にフォールバックさせます:
 
-```json title="bxsites.json"
-{ "extraCss": [ "assets/custom.css", "https://cdn.example.com/lib.css" ] }
+```yaml title="bxsites.yaml"
+extraCss: [ assets/custom.css, "https://cdn.example.com/lib.css" ]
 ```
 
 この機能が存在する以前とまったく同じく、バンドルされない 2 つの個別な

@@ -123,5 +123,5 @@ El `docs/nav.json` migrado es un archivo simple de
 otro, o elimínalo para volver a la propia convención de
 estructura-de-carpetas-es-estructura-de-navegación de bx-sites. Desde aquí
 es un proyecto bx-sites normal: elige un [tema](themes.md), revisa
-[`bxsites.json`](../configuration.md), y [despliega](deployment.md) cuando
+[`bxsites.yaml`](../configuration.md), y [despliega](deployment.md) cuando
 estés satisfecho con él.

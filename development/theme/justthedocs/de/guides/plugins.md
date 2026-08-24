@@ -16,10 +16,10 @@ Modulsystem *ist* das Plugin-System.
 
 Ein Modul allein zu installieren aktiviert es allerdings nie als Plugin -
 ein Projekt bindet eines explizit über den BoxLang-Modulnamen im Array
-[`plugins`](../configuration.md#plugins) von `bxsites.json` ein:
+[`plugins`](../configuration.md#plugins) von `bxsites.yaml` ein:
 
-```json title="bxsites.json"
-{ "plugins": [ "myBxSitesPlugin" ] }
+```yaml title="bxsites.yaml"
+plugins: [ myBxSitesPlugin ]
 ```
 
 ## Ein veröffentlichtes Plugin installieren
@@ -41,7 +41,7 @@ BoxLang-Modul-Registry aktiv ist. `install:plugin` lädt es sofort in die
 Laufzeitumgebung und gibt seinen echten registrierten
 Modul-Mapping-Namen zurück (der, laut dem Hinweis unten, nicht immer
 mit dem ForgeBox-Slug übereinstimmt) - füge *diesen* Namen zum
-`plugins`-Array von `bxsites.json` hinzu, um es zu aktivieren, genau wie
+`plugins`-Array von `bxsites.yaml` hinzu, um es zu aktivieren, genau wie
 bei jedem anderen installierten Modul. Siehe
 [`install:plugin`](../cli-reference.md#installplugin) in der
 CLI-Referenz.
@@ -59,7 +59,7 @@ Aufruf, ob sie existiert:
 class {
 
 	struct function onConfig( required struct config ) {
-		// Mutate/return the site config, right after bxsites.json is loaded.
+		// Mutate/return the site config, right after bxsites.yaml is loaded.
 		return arguments.config
 	}
 
@@ -89,7 +89,7 @@ class {
 ```
 
 Hooks laufen in der Reihenfolge, in der sie im eigenen `plugins`-Array
-von `bxsites.json` stehen, und (außer bei `onBuildComplete`) ersetzt der
+von `bxsites.yaml` stehen, und (außer bei `onBuildComplete`) ersetzt der
 Rückgabewert jedes Hooks das, was der nächste Hook (oder BX Sites selbst)
 sieht - ein Plugin muss nur das zurückgeben, was es erhalten hat, wenn es
 nichts zu ändern hat.
@@ -131,7 +131,7 @@ durchgearbeitetes Beispiel für den Ordneraufbau durch:
 
 ```text title="hello-plugin/ layout"
 hello-plugin/
-├── box.json              # boxlang.moduleName is what bxsites.json's [plugins] references
+├── box.json              # boxlang.moduleName is what bxsites.yaml's [plugins] references
 ├── ModuleConfig.bx        # a normal, otherwise-empty BoxLang module descriptor
 └── models/
     └── BxSitesPlugin.bx    # onPageHtml() + onBuildComplete()
@@ -140,6 +140,6 @@ hello-plugin/
 ## Fehler
 
 - `BxSites.PluginNotFound` - ein Name im `plugins`-Array von
-  `bxsites.json` ist kein installiertes/aktiviertes BoxLang-Modul.
+  `bxsites.yaml` ist kein installiertes/aktiviertes BoxLang-Modul.
 - `BxSites.InvalidPlugin` - das Modul existiert, hat aber keine Klasse
   `models/BxSitesPlugin.bx`.

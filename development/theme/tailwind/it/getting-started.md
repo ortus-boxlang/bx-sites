@@ -8,33 +8,61 @@ tags: [guide, configurazione-iniziale]
 
 # Per iniziare
 
+## Prerequisito: installare BoxLang
+
+Tutto quanto segue presuppone che il runtime di BoxLang sia già presente
+sulla tua macchina - `install-bx-module` è il comando CLI nativo di
+BoxLang che installa un modulo in un'installazione già esistente, e anche
+`box install` di CommandBox richiede un motore BoxLang già presente su cui
+girare. Se non hai ancora BoxLang, installalo prima con uno di questi due
+metodi:
+
+- il **quick installer** (una singola versione, il modo più semplice per
+  iniziare):
+
+  ```bash frame="terminal" title="Terminal"
+  curl -fsSL https://install.boxlang.io/ | bash
+  ```
+
+- oppure **BVM**, il BoxLang Version Manager (installa più versioni di
+  BoxLang fianco a fianco e permette di passare dall'una all'altra):
+
+  ```bash frame="terminal" title="Terminal"
+  curl -fsSL https://install-bvm.boxlang.io/ | bash
+  bvm install latest && bvm use latest
+  ```
+
+Gli installer per Windows e Homebrew, oltre al riferimento completo dei
+comandi BVM, sono trattati nella
+[documentazione di installazione ufficiale di BoxLang](https://boxlang.ortusbooks.com/getting-started/installation).
+
 ## Installazione
 
 BX Sites dipende da [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
 per il rendering del Markdown, da [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
-per la codifica HTML, e da [bx-yaml](https://github.com/ortus-boxlang/bx-yaml)
-per leggere `bxsites.yaml`. Con [CommandBox](https://commandbox.ortusbooks.com/)
-installato:
+per la codifica HTML, da [bx-yaml](https://github.com/ortus-boxlang/bx-yaml)
+per leggere `bxsites.yaml`, e da [bx-image](https://github.com/ortus-boxlang/bx-image)
+per la pipeline di immagini responsive (vedi
+[Immagini responsive](guides/images.md)) - tutte e quattro vengono
+installate automaticamente come dipendenze di `box.json`, quindi
+installare `bx-sites` è l'unico comando necessario, sia tramite
+l'installer nativo del sistema operativo di BoxLang:
 
-```bash
+```bash frame="terminal" title="Terminal"
+install-bx-module bx-sites
+```
+
+sia tramite [CommandBox](https://commandbox.ortusbooks.com/):
+
+```bash frame="terminal" title="Terminal"
 box install bx-sites
-box install bx-markdown
-box install bx-esapi
-box install bx-yaml
 ```
 
-Oppure, senza CommandBox, l'installer nativo di BoxLang li gestisce tutti e
-quattro con un solo comando:
+Entrambi leggono `boxlang.executable` da `box.json` e creano uno script
+`bxSites` sul tuo `PATH` (in `~/.boxlang/bin`), così ogni comando qui
+sotto funziona sia nella forma breve e autonoma:
 
-```bash
-install-bx-module bx-sites bx-markdown bx-esapi bx-yaml
-```
-
-`box install`/`install-bx-module` legge `boxlang.executable` da `box.json`
-e crea uno script `bxSites` sul tuo `PATH` (in `~/.boxlang/bin`), così ogni
-comando qui sotto funziona sia nella forma breve e autonoma:
-
-```bash
+```bash title="Usage"
 bxSites <verbo> [opzioni]
 ```
 
@@ -42,7 +70,7 @@ sia, ovunque BoxLang sia disponibile ma quello shim sul `PATH` non lo sia
 (un runner di CI, un modulo registrato a mano invece che installato) -
 entrambe le forme eseguono esattamente la stessa cosa:
 
-```bash
+```bash title="Usage (no PATH shim)"
 boxlang bxSites <verbo> [opzioni]
 ```
 

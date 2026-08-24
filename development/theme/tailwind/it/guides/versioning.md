@@ -9,7 +9,7 @@ tags: [guide, versionamento]
 # Versionamento
 
 La documentazione versionata è convenzione anziché configurazione - non
-c'è alcuna chiave di `bxsites.json` da attivare. Aggiungi una cartella
+c'è alcuna chiave di `bxsites.yaml` da attivare. Aggiungi una cartella
 `docs/versions/`, e ogni sottocartella diretta al suo interno viene
 compilata come proprio albero di documenti completamente autonomo,
 insieme al tuo normale `docs/` (che si compila sempre come "Latest"):
@@ -30,7 +30,7 @@ docs/
 Ogni cartella versione è un normale albero a forma di `docs/` - il
 proprio `index.md`, la propria nav, le proprie pagine - compilata in
 `site/versions/<name>/` con ogni link interno prefissato di conseguenza,
-e condividendo l'unica configurazione/tema `bxsites.json` del progetto.
+e condividendo l'unica configurazione/tema `bxsites.yaml` del progetto.
 Un file sciolto messo direttamente sotto `docs/versions/` (non dentro una
 sottocartella) viene ignorato.
 

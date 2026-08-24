@@ -103,7 +103,7 @@ BX Sites 自身の Markdown ツールキットが、まさにこのホームペ�
 すべての動詞とオプション。
 :::
 ::: card title="設定" icon="phosphor-duotone:gear-six" href="configuration.md"
-`bxsites.json` の完全なリファレンス。
+`bxsites.yaml` の完全なリファレンス。
 :::
 ::: card title="Markdown 拡張機能" icon="phosphor-duotone:markdown-logo" href="guides/markdown.md"
 Admonition、タブ、カード、コールアウト、数式、Mermaid ダイアグラム。

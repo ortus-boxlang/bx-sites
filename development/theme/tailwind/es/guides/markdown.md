@@ -11,7 +11,7 @@ Más allá del Markdown estándar, BX Sites activa por defecto tres de las
 extensiones nativas de Flexmark de bx-markdown - admoniciones, notas al
 pie y listas de definiciones - más una integración de diagramas Mermaid
 propia. Las cuatro son configurables mediante
-[las claves `markdown`/`mermaid` de `bxsites.json`](../configuration.md#markdown).
+[las claves `markdown`/`mermaid` de `bxsites.yaml`](../configuration.md#markdown).
 
 Además de esas, BX Sites implementa tres extensiones propias más de las
 que Flexmark no tiene ningún concepto en absoluto - pestañas de
@@ -32,7 +32,7 @@ flowchart LR
 ## Admoniciones
 
 Un cuadro de aviso/nota - activo por defecto, sin necesidad de
-configuración en `bxsites.json`:
+configuración en `bxsites.yaml`:
 
 ```markdown title="Example" linenums="1"
 !!! note "Heads Up"
@@ -195,7 +195,7 @@ Los bloques `=== "..."` consecutivos (separados por como máximo una línea
 en blanco) forman un único grupo de pestañas; el contenido propio de una
 pestaña es markdown completo, así que fences de código, listas,
 admoniciones, lo que sea que escribirías en cualquier otra parte. Sin
-necesidad de configuración en `bxsites.json` - siempre activo.
+necesidad de configuración en `bxsites.yaml` - siempre activo.
 
 ## Bloques de Código
 
@@ -244,7 +244,7 @@ números de línea separados por espacios y/o rangos (`"2 4-6"`) para
 resaltar, contados desde la parte superior del bloque
 independientemente de dónde empiece `linenums`; `title` añade una
 pequeña barra de título encima del bloque. Sin necesidad de configuración
-en `bxsites.json` - siempre disponible.
+en `bxsites.yaml` - siempre disponible.
 
 ### Marcadores de diff y marcos de terminal
 
@@ -300,7 +300,7 @@ box install bx-sites
 
 `frame="code"` es el nombre explícito de la barra simple de hoy - el
 valor por defecto; nadie necesita escribirlo. Ni `insert`/`delete` ni
-`frame` necesitan configuración en `bxsites.json`, igual que
+`frame` necesitan configuración en `bxsites.yaml`, igual que
 `hl_lines`/`linenums`/`title`.
 
 #### Diffs reales de git
@@ -381,10 +381,10 @@ esta.
 ## Diagramas
 
 Opcional mediante la clave
-[`mermaid`](../configuration.md#mermaid) de `bxsites.json`:
+[`mermaid`](../configuration.md#mermaid) de `bxsites.yaml`:
 
-```json title="bxsites.json"
-{ "mermaid": true }
+```yaml title="bxsites.yaml"
+mermaid: true
 ```
 
 Una vez activado, cualquier bloque de código con fence ` ```mermaid ` se
@@ -406,10 +406,10 @@ para todo lo que puede dibujar.
 ## Matemáticas
 
 Opcional mediante la clave [`math`](../configuration.md#math) de
-`bxsites.json`:
+`bxsites.yaml`:
 
-```json title="bxsites.json"
-{ "math": true }
+```yaml title="bxsites.yaml"
+math: true
 ```
 
 Una vez activado, [KaTeX](https://katex.org/) compone `$...$` para

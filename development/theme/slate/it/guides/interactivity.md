@@ -11,7 +11,7 @@ Ogni pagina compilata da BX Sites carica già [Alpine.js](https://alpinejs.dev/)
 - è ciò che alimenta l'interruttore modalità scura integrato e il menu a
 discesa della lingua in ogni tema integrato. Quella stessa
 istanza Alpine è disponibile gratuitamente anche per il contenuto delle
-tue pagine: nessuna impostazione di `bxsites.json` da attivare, nessuna
+tue pagine: nessuna impostazione di `bxsites.yaml` da attivare, nessuna
 voce `extraJs` da aggiungere, nessun tag `<script>` extra da scrivere nel
 tuo markdown.
 
@@ -94,7 +94,7 @@ altre).
 
 - **È fondamentale, non opzionale.** Gli elementi di contorno del tema
   (modalità scura, cambio lingua) dipendono da Alpine, quindi non può
-  essere disattivato in `bxsites.json` come invece si può fare per
+  essere disattivato in `bxsites.yaml` come invece si può fare per
   `mermaid`/`math`.
 - **Versione.** Attualmente `alpinejs@3.14.1`, incluso con questo modulo
   e servito da `site/assets/vendor/alpine/` - nessuna CDN coinvolta.

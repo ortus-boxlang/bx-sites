@@ -43,7 +43,7 @@ bxSites theme:import --source=mkdocs --path=/path/to/mkdocs-theme --name=my-impo
 - `--name`（必須）- 変換先の名前。`themes/<name>/` に書き込まれます
   （`install:theme` が使用するのと同じ
   [インストール済みテーマの規約](themes.md#公開済みテーマのインストール)
-  です）- 結果に満足したら `bxsites.json` の `theme.name` にこの名前を
+  です）- 結果に満足したら `bxsites.yaml` の `theme.name` にこの名前を
   設定してください
 
 同じ `--name` に対して再実行しても安全です - `layout.bxm`/`page.bxm` は

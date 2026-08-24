@@ -176,7 +176,7 @@
 <p>Über Standard-Markdown hinaus aktiviert BX Sites standardmäßig drei der
 nativen Flexmark-Erweiterungen von bx-markdown - Admonitions, Fußnoten und
 Definitionslisten - sowie eine eigene Mermaid-Diagramm-Integration. Alle
-vier sind über <a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#markdown">die Schlüssel <code>markdown</code>/<code>mermaid</code> von <code>bxsites.json</code></a>
+vier sind über <a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#markdown">die Schlüssel <code>markdown</code>/<code>mermaid</code> von <code>bxsites.yaml</code></a>
 konfigurierbar.</p>
 <p>Zusätzlich implementiert BX Sites drei weitere eigene Erweiterungen, von
 denen Flexmark überhaupt kein Konzept hat - Content-Tabs, Mathematik und
@@ -194,7 +194,7 @@ Vor-/Nachbearbeitungsdurchlauf rund um die normale Markdown-Konvertierung</p>
 </code></pre>
 <h2 id="admonitions"><a href="#admonitions" id="admonitions" name="admonitions" class="anchor"></a>Admonitions</h2>
 <p>Eine Callout-/Hinweisbox - standardmäßig aktiv, keine
-<code>bxsites.json</code>-Konfiguration nötig:</p>
+<code>bxsites.yaml</code>-Konfiguration nötig:</p>
 <pre data-bxsites-start-line="1" data-bxsites-title="Beispiel"><code class="language-markdown">!!! note &quot;Heads Up&quot;
     This is an admonition. Its content is regular markdown - **bold**,
     `code`, [links](../index.md) and lists all work exactly as normal.
@@ -396,7 +396,7 @@ Tab):</p>
 <p>Aufeinanderfolgende <code>=== &quot;...&quot;</code>-Blöcke (durch höchstens eine Leerzeile
 getrennt) bilden eine einzige Tab-Gruppe; der Inhalt eines Tabs ist
 vollständiges Markdown, also Code-Fences, Listen, Admonitions - alles, was
-du auch sonst irgendwo schreiben würdest. Keine <code>bxsites.json</code>-Konfiguration
+du auch sonst irgendwo schreiben würdest. Keine <code>bxsites.yaml</code>-Konfiguration
 nötig - immer aktiv.</p>
 <h2 id="codeblöcke"><a href="#codeblöcke" id="codeblöcke" name="codeblöcke" class="anchor"></a>Codeblöcke</h2>
 <p>Fenced Codeblöcke werden clientseitig syntax-hervorgehoben
@@ -432,7 +432,7 @@ numeric function add( required numeric a, required numeric b ) {
 durch Leerzeichen getrennte Zeilennummern und/oder Bereiche (<code>&quot;2 4-6&quot;</code>)
 entgegen, um sie hervorzuheben, gezählt vom Anfang des Blocks unabhängig
 davon, wo <code>linenums</code> beginnt; <code>title</code> fügt eine kleine Titelleiste über
-dem Block hinzu. Keine <code>bxsites.json</code>-Konfiguration nötig - immer
+dem Block hinzu. Keine <code>bxsites.yaml</code>-Konfiguration nötig - immer
 verfügbar.</p>
 <h3 id="diff-markierungen-und-terminal-rahmen"><a href="#diff-markierungen-und-terminal-rahmen" id="diff-markierungen-und-terminal-rahmen" name="diff-markierungen-und-terminal-rahmen" class="anchor"></a>Diff-Markierungen und Terminal-Rahmen</h3>
 <p>Füge <code>insert</code>/<code>delete</code> hinzu, um hinzugefügte/entfernte Zeilen zu
@@ -475,7 +475,7 @@ box install bx-sites
 </code></pre>
 <p><code>frame=&quot;code&quot;</code> ist der explizite Name für die heutige einfache Leiste -
 der Standard; niemand muss ihn schreiben. Weder <code>insert</code>/<code>delete</code> noch
-<code>frame</code> benötigen <code>bxsites.json</code>-Konfiguration, genau wie
+<code>frame</code> benötigen <code>bxsites.yaml</code>-Konfiguration, genau wie
 <code>hl_lines</code>/<code>linenums</code>/<code>title</code>.</p>
 <h4 id="echte-git-diffs"><a href="#echte-git-diffs" id="echte-git-diffs" name="echte-git-diffs" class="anchor"></a>Echte Git-Diffs</h4>
 <p>Markiere einen Fence als <code>diff</code> und füge echte <code>git diff</code>/<code>git show</code>-Ausgabe direkt ein - das ist keine bx-sites-spezifische Syntax,
@@ -537,8 +537,8 @@ try.boxlang.io selbst funktioniert, sodass das Öffnen des
 &quot;Open in try.boxlang.io ↗&quot;-Links des Embeds genau dort weitermacht, wo
 das Embed beginnt.</p>
 <h2 id="diagramme"><a href="#diagramme" id="diagramme" name="diagramme" class="anchor"></a>Diagramme</h2>
-<p>Opt-in über den <a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#mermaid"><code>mermaid</code></a>-Schlüssel von <code>bxsites.json</code>:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;mermaid&quot;: true }
+<p>Opt-in über den <a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#mermaid"><code>mermaid</code></a>-Schlüssel von <code>bxsites.yaml</code>:</p>
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">mermaid: true
 </code></pre>
 <p>Einmal aktiviert, wird jeder <code>```mermaid</code>-Fenced-Codeblock als
 lebendiges <a href="https://mermaid.js.org/">Mermaid</a>-Diagramm gerendert, statt
@@ -553,8 +553,8 @@ Gantt-Diagramme und mehr - siehe
 <a href="https://mermaid.js.org/intro/syntax-reference.html">Mermaids eigene Syntax-Referenz</a>
 für alles, was es zeichnen kann.</p>
 <h2 id="mathematik"><a href="#mathematik" id="mathematik" name="mathematik" class="anchor"></a>Mathematik</h2>
-<p>Opt-in über den <a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#math"><code>math</code></a>-Schlüssel von <code>bxsites.json</code>:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;math&quot;: true }
+<p>Opt-in über den <a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#math"><code>math</code></a>-Schlüssel von <code>bxsites.yaml</code>:</p>
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">math: true
 </code></pre>
 <p>Einmal aktiviert, setzt <a href="https://katex.org/">KaTeX</a> <code>&#x24;...&#x24;</code> für Inline-Mathematik
 und <code>&#x24;&#x24;...&#x24;&#x24;</code> für einen zentrierten Block, beides direkt in den
@@ -595,7 +595,7 @@ Details dazu in bx-markdowns eigenem Readme.</p>
 </div>
 
 				</div>
-<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/markdown.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/bx-sites/development/theme/tailwind/de/guides/markdown.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/markdown.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/bx-sites/development/theme/tailwind/de/guides/markdown.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="mt-8 flex justify-between border-t border-slate-200 pt-4 text-sm font-semibold" aria-label="Seitennavigation">

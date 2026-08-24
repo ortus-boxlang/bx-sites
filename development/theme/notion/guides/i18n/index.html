@@ -110,17 +110,13 @@ tree is always the <strong>default locale</strong>, built unprefixed at the site
 exactly as it is today - adding <code>docs/i18n/</code> doesn't change anything about
 it.</p>
 <p>Give each locale a display label (and, for a right-to-left language, its
-own direction) in <code>bxsites.json</code>:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;i18n&quot;: {
-		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
-		&quot;locales&quot;: [
-			{ &quot;code&quot;: &quot;es&quot;, &quot;label&quot;: &quot;Español&quot; },
-			{ &quot;code&quot;: &quot;ar&quot;, &quot;label&quot;: &quot;العربية&quot;, &quot;dir&quot;: &quot;rtl&quot; },
-			{ &quot;code&quot;: &quot;pt-BR&quot;, &quot;label&quot;: &quot;Português (Brasil)&quot;, &quot;flag&quot;: &quot;🇧🇷&quot; }
-		]
-	}
-}
+own direction) in <code>bxsites.yaml</code>:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">i18n:
+  defaultLocale: { code: en, label: English }
+  locales:
+    - { code: es, label: Español }
+    - { code: ar, label: العربية, dir: rtl }
+    - { code: pt-BR, label: &quot;Português (Brasil)&quot;, flag: 🇧🇷 }
 </code></pre>
 <p><code>defaultLocale</code> only needs setting if your default locale isn't English;
 <code>locales</code> is the list of everything else. Every <code>docs/i18n/&lt;code&gt;/</code>
@@ -193,27 +189,18 @@ and <code>ja</code>. Building any of those locale codes gets fully translated ch
 automatically, nothing to configure. Any other locale code (or a page you'd
 rather word differently) falls back to English - override just the keys
 you care about with your own <code>strings</code> on that locale's own entry in
-<code>bxsites.json</code>:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;i18n&quot;: {
-		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
-		&quot;locales&quot;: [
-			{
-				&quot;code&quot;: &quot;fr&quot;,
-				&quot;label&quot;: &quot;Français&quot;,
-				&quot;strings&quot;: {
-					&quot;searchPlaceholder&quot;: &quot;Rechercher dans la documentation...&quot;,
-					&quot;onThisPage&quot;: &quot;Sur cette page&quot;
-				}
-			},
-			{
-				&quot;code&quot;: &quot;es&quot;,
-				&quot;label&quot;: &quot;Español&quot;,
-				&quot;strings&quot;: { &quot;toggleDarkMode&quot;: &quot;Cambiar a modo nocturno&quot; }
-			}
-		]
-	}
-}
+<code>bxsites.yaml</code>:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">i18n:
+  defaultLocale: { code: en, label: English }
+  locales:
+    - code: fr
+      label: Français
+      strings:
+        searchPlaceholder: Rechercher dans la documentation...
+        onThisPage: Sur cette page
+    - code: es
+      label: Español
+      strings: { toggleDarkMode: Cambiar a modo nocturno }
 </code></pre>
 <p>A locale with a built-in translation (like <code>es</code> above) can still override
 individual keys the same way - your own <code>strings</code> always wins over both
@@ -255,7 +242,7 @@ alongside the default locale's own, the same way <a href="/bx-sites/development/
 pages are.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/notion/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/notion/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="ntn-page-nav" aria-label="Page navigation">

@@ -40,7 +40,7 @@ bxSites theme:import --source=mkdocs --path=/path/to/mkdocs-theme --name=my-impo
   project's *content*, a different job from converting its *theme*)
 - `--name` (required) - the destination name, written to `themes/<name>/`
   (the same [installed-theme convention](themes.md#installing-a-published-theme)
-  `install:theme` uses) - set `bxsites.json`'s `theme.name` to it once
+  `install:theme` uses) - set `bxsites.yaml`'s `theme.name` to it once
   you're happy with the result
 
 Re-running against the same `--name` is safe - `layout.bxm`/`page.bxm`

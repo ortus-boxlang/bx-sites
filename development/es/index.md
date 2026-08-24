@@ -106,7 +106,7 @@ Instala, crea un proyecto, constrúyelo y sírvelo.
 Todos los verbos y sus opciones.
 :::
 ::: card title="Configuración" icon="phosphor-duotone:gear-six" href="configuration.md"
-La referencia completa de `bxsites.json`.
+La referencia completa de `bxsites.yaml`.
 :::
 ::: card title="Extensiones de Markdown" icon="phosphor-duotone:markdown-logo" href="guides/markdown.md"
 Admoniciones, pestañas, tarjetas, callouts, matemáticas y diagramas

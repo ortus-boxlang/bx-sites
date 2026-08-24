@@ -176,7 +176,7 @@
 Flexmark extensions by default - admonitions, footnotes and definition lists</p>
 <ul>
 <li>plus a Mermaid diagram integration of its own. All four are configurable
-via <a href="/bx-sites/development/theme/justthedocs/configuration/index.html#markdown"><code>bxsites.json</code>'s <code>markdown</code>/<code>mermaid</code> keys</a>.</li>
+via <a href="/bx-sites/development/theme/justthedocs/configuration/index.html#markdown"><code>bxsites.yaml</code>'s <code>markdown</code>/<code>mermaid</code> keys</a>.</li>
 </ul>
 <p>On top of those, BX Sites implements three more extensions of its own that
 Flexmark has no concept of at all - content tabs, math, and fenced-code
@@ -190,7 +190,7 @@ the normal markdown conversion instead - see the sections below.</p>
     D --&gt; E[&quot;Final page HTML&quot;]
 </code></pre>
 <h2 id="admonitions"><a href="#admonitions" id="admonitions" name="admonitions" class="anchor"></a>Admonitions</h2>
-<p>A callout/note box - on by default, no <code>bxsites.json</code> config needed:</p>
+<p>A callout/note box - on by default, no <code>bxsites.yaml</code> config needed:</p>
 <pre data-bxsites-start-line="1" data-bxsites-title="Example"><code class="language-markdown">!!! note &quot;Heads Up&quot;
     This is an admonition. Its content is regular markdown - **bold**,
     `code`, [links](../index.md) and lists all work exactly as normal.
@@ -388,7 +388,7 @@ admonition body is (4 spaces or a tab):</p>
 </div></div></div>
 <p>Consecutive <code>=== &quot;...&quot;</code> blocks (separated by at most one blank line) form a
 single tab group; a tab's own content is full markdown, so code fences,
-lists, admonitions, whatever you'd write anywhere else. No <code>bxsites.json</code>
+lists, admonitions, whatever you'd write anywhere else. No <code>bxsites.yaml</code>
 config needed - always on.</p>
 <h2 id="code-blocks"><a href="#code-blocks" id="code-blocks" name="code-blocks" class="anchor"></a>Code Blocks</h2>
 <p>Fenced code blocks are syntax-highlighted client-side (highlight.js), no
@@ -423,7 +423,7 @@ numeric function add( required numeric a, required numeric b ) {
 <p><code>linenums=&quot;N&quot;</code> starts the gutter counting at <code>N</code>; <code>hl_lines</code> takes
 space-separated line numbers and/or ranges (<code>&quot;2 4-6&quot;</code>) to highlight, counted
 from the top of the block regardless of where <code>linenums</code> starts; <code>title</code>
-adds a small title bar above the block. No <code>bxsites.json</code> config needed -
+adds a small title bar above the block. No <code>bxsites.yaml</code> config needed -
 always available.</p>
 <h3 id="diff-markers-and-terminal-frames"><a href="#diff-markers-and-terminal-frames" id="diff-markers-and-terminal-frames" name="diff-markers-and-terminal-frames" class="anchor"></a>Diff markers and terminal frames</h3>
 <p>Add <code>insert</code>/<code>delete</code> to call out added/removed lines - the same
@@ -463,7 +463,7 @@ box install bx-sites
 </code></pre>
 <p><code>frame=&quot;code&quot;</code> is the explicit name for today's plain bar - the default;
 nothing needs to write it. Both <code>insert</code>/<code>delete</code> and <code>frame</code> need no
-<code>bxsites.json</code> config, same as <code>hl_lines</code>/<code>linenums</code>/<code>title</code>.</p>
+<code>bxsites.yaml</code> config, same as <code>hl_lines</code>/<code>linenums</code>/<code>title</code>.</p>
 <h4 id="real-git-diffs"><a href="#real-git-diffs" id="real-git-diffs" name="real-git-diffs" class="anchor"></a>Real git diffs</h4>
 <p>Tag a fence <code>diff</code> and paste real <code>git diff</code>/<code>git show</code> output straight in</p>
 <ul>
@@ -524,8 +524,8 @@ same way a &quot;share&quot; link from try.boxlang.io itself works, so opening t
 embed's &quot;Open in try.boxlang.io ↗&quot; link picks up right where the embed
 starts.</p>
 <h2 id="diagrams"><a href="#diagrams" id="diagrams" name="diagrams" class="anchor"></a>Diagrams</h2>
-<p>Opt-in via <code>bxsites.json</code>'s <a href="/bx-sites/development/theme/justthedocs/configuration/index.html#mermaid"><code>mermaid</code></a> key:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;mermaid&quot;: true }
+<p>Opt-in via <code>bxsites.yaml</code>'s <a href="/bx-sites/development/theme/justthedocs/configuration/index.html#mermaid"><code>mermaid</code></a> key:</p>
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">mermaid: true
 </code></pre>
 <p>Once enabled, any <code>```mermaid</code> fenced code block renders as a live
 <a href="https://mermaid.js.org/">Mermaid</a> diagram instead of a code listing:</p>
@@ -538,8 +538,8 @@ starts.</p>
 charts and more - see <a href="https://mermaid.js.org/intro/syntax-reference.html">Mermaid's own syntax reference</a>
 for everything it can draw.</p>
 <h2 id="math"><a href="#math" id="math" name="math" class="anchor"></a>Math</h2>
-<p>Opt-in via <code>bxsites.json</code>'s <a href="/bx-sites/development/theme/justthedocs/configuration/index.html#math"><code>math</code></a> key:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;math&quot;: true }
+<p>Opt-in via <code>bxsites.yaml</code>'s <a href="/bx-sites/development/theme/justthedocs/configuration/index.html#math"><code>math</code></a> key:</p>
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">math: true
 </code></pre>
 <p>Once enabled, <a href="https://katex.org/">KaTeX</a> typesets <code>&#x24;...&#x24;</code> for inline math
 and <code>&#x24;&#x24;...&#x24;&#x24;</code> for a centered block, both written straight into the markdown
@@ -578,7 +578,7 @@ independent of BX Sites. See bx-markdown's own readme for details.</p>
 </div>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/markdown.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/justthedocs/guides/markdown.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/markdown.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/justthedocs/guides/markdown.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="jtd-page-nav" aria-label="Page navigation">

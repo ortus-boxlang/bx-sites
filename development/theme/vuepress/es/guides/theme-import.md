@@ -44,7 +44,7 @@ bxSites theme:import --source=mkdocs --path=/path/to/mkdocs-theme --name=my-impo
   `themes/<name>/` (la misma
   [convención de tema instalado](themes.md#instalar-un-tema-publicado)
   que usa `install:theme`) - establece el `theme.name` de
-  `bxsites.json` una vez que estés satisfecho con el resultado
+  `bxsites.yaml` una vez que estés satisfecho con el resultado
 
 Volver a ejecutarlo contra el mismo `--name` es seguro - `layout.bxm`/
 `page.bxm` se sobrescriben y cualquier carpeta de recursos recién

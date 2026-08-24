@@ -92,8 +92,8 @@ Plugin-API zum Importieren, keine separate Registry - BoxLangs eigenes
 Modulsystem <em>ist</em> das Plugin-System.</p>
 <p>Ein Modul allein zu installieren aktiviert es allerdings nie als Plugin -
 ein Projekt bindet eines explizit über den BoxLang-Modulnamen im Array
-<a href="/bx-sites/development/theme/docusaurus/de/configuration/index.html#plugins"><code>plugins</code></a> von <code>bxsites.json</code> ein:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;plugins&quot;: [ &quot;myBxSitesPlugin&quot; ] }
+<a href="/bx-sites/development/theme/docusaurus/de/configuration/index.html#plugins"><code>plugins</code></a> von <code>bxsites.yaml</code> ein:</p>
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">plugins: [ myBxSitesPlugin ]
 </code></pre>
 <h2 id="ein-veröffentlichtes-plugin-installieren"><a href="#ein-veröffentlichtes-plugin-installieren" id="ein-veröffentlichtes-plugin-installieren" name="ein-veröffentlichtes-plugin-installieren" class="anchor"></a>Ein veröffentlichtes Plugin installieren</h2>
 <p>Ein auf ForgeBox veröffentlichtes Plugin installiert sich mit nichts
@@ -111,7 +111,7 @@ BoxLang-Modul-Registry aktiv ist. <code>install:plugin</code> lädt es sofort in
 Laufzeitumgebung und gibt seinen echten registrierten
 Modul-Mapping-Namen zurück (der, laut dem Hinweis unten, nicht immer
 mit dem ForgeBox-Slug übereinstimmt) - füge <em>diesen</em> Namen zum
-<code>plugins</code>-Array von <code>bxsites.json</code> hinzu, um es zu aktivieren, genau wie
+<code>plugins</code>-Array von <code>bxsites.yaml</code> hinzu, um es zu aktivieren, genau wie
 bei jedem anderen installierten Modul. Siehe
 <a href="/bx-sites/development/theme/docusaurus/de/cli-reference/index.html#installplugin"><code>install:plugin</code></a> in der
 CLI-Referenz.</li>
@@ -126,7 +126,7 @@ Aufruf, ob sie existiert:</p>
 class {
 
 	struct function onConfig( required struct config ) {
-		// Mutate/return the site config, right after bxsites.json is loaded.
+		// Mutate/return the site config, right after bxsites.yaml is loaded.
 		return arguments.config
 	}
 
@@ -155,7 +155,7 @@ class {
 }
 </code></pre>
 <p>Hooks laufen in der Reihenfolge, in der sie im eigenen <code>plugins</code>-Array
-von <code>bxsites.json</code> stehen, und (außer bei <code>onBuildComplete</code>) ersetzt der
+von <code>bxsites.yaml</code> stehen, und (außer bei <code>onBuildComplete</code>) ersetzt der
 Rückgabewert jedes Hooks das, was der nächste Hook (oder BX Sites selbst)
 sieht - ein Plugin muss nur das zurückgeben, was es erhalten hat, wenn es
 nichts zu ändern hat.</p>
@@ -189,7 +189,7 @@ Builds eine Build-Zusammenfassungszeile an <code>site/hello-plugin.txt</code>
 anhängt. Nutze es als Ausgangs-Skelett, oder lies es dir als
 durchgearbeitetes Beispiel für den Ordneraufbau durch:</p>
 <pre data-bxsites-title="hello-plugin&#x2f; layout"><code class="language-text">hello-plugin/
-├── box.json              # boxlang.moduleName is what bxsites.json's [plugins] references
+├── box.json              # boxlang.moduleName is what bxsites.yaml's [plugins] references
 ├── ModuleConfig.bx        # a normal, otherwise-empty BoxLang module descriptor
 └── models/
     └── BxSitesPlugin.bx    # onPageHtml() + onBuildComplete()
@@ -197,13 +197,13 @@ durchgearbeitetes Beispiel für den Ordneraufbau durch:</p>
 <h2 id="fehler"><a href="#fehler" id="fehler" name="fehler" class="anchor"></a>Fehler</h2>
 <ul>
 <li><code>BxSites.PluginNotFound</code> - ein Name im <code>plugins</code>-Array von
-<code>bxsites.json</code> ist kein installiertes/aktiviertes BoxLang-Modul.</li>
+<code>bxsites.yaml</code> ist kein installiertes/aktiviertes BoxLang-Modul.</li>
 <li><code>BxSites.InvalidPlugin</code> - das Modul existiert, hat aber keine Klasse
 <code>models/BxSitesPlugin.bx</code>.</li>
 </ul>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/plugins.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/docusaurus/de/guides/plugins.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/plugins.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/docusaurus/de/guides/plugins.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="dsrs-page-nav" aria-label="Seitennavigation">

@@ -94,8 +94,8 @@ adds AVIF upstream.
 
 ## Turning it off
 
-```json title="bxsites.json"
-{ "assets": { "images": { "enabled": false } } }
+```yaml title="bxsites.yaml"
+assets: { images: { enabled: false } }
 ```
 
 Falls back to plain, unprocessed `docs/assets/**` copying - exactly how
@@ -103,15 +103,11 @@ every image was handled before this feature existed.
 
 ## Choosing your own breakpoints
 
-```json title="bxsites.json" linenums="1"
-{
-	"assets": {
-		"images": {
-			"widths": [ 480, 960, 1440 ],
-			"formats": [ "webp" ]
-		}
-	}
-}
+```yaml title="bxsites.yaml" linenums="1"
+assets:
+  images:
+    widths: [ 480, 960, 1440 ]
+    formats: [ webp ]
 ```
 
 `widths` defaults to `[400, 800, 1200, 1600]`; `formats` defaults to
@@ -126,11 +122,9 @@ every `assets.images` key.
 `extraCss`/`extraJs` get bundled the same way, on by default
 (`assets.bundle`):
 
-```json title="bxsites.json" linenums="1"
-{
-	"extraCss": [ "assets/a.css", "assets/b.css" ],
-	"extraJs": [ "assets/app.js" ]
-}
+```yaml title="bxsites.yaml" linenums="1"
+extraCss: [ assets/a.css, assets/b.css ]
+extraJs: [ assets/app.js ]
 ```
 
 builds one fingerprinted `assets/bundle.<hash>.css` (in the order
@@ -149,8 +143,8 @@ project file. One external URL (a CDN link) mixed in falls the whole
 list back to today's exact per-URL behavior, rather than risk silently
 reordering a CSS cascade a project depended on:
 
-```json title="bxsites.json"
-{ "extraCss": [ "assets/custom.css", "https://cdn.example.com/lib.css" ] }
+```yaml title="bxsites.yaml"
+extraCss: [ assets/custom.css, "https://cdn.example.com/lib.css" ]
 ```
 
 renders two separate `<link>` tags, unbundled, exactly as before this

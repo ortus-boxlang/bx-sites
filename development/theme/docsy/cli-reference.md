@@ -215,7 +215,7 @@ Always exits `0` - purely informational, nothing here is a pass/fail gate
 
 A one-shot environment/config health check - the "run this before filing a
 bug report" verb. Checks the JVM version, that `docs/` exists, that
-`bxsites.json`/`.yaml` actually parses and validates, that the required
+`bxsites.yaml`/`.json` actually parses and validates, that the required
 BoxLang modules (`bx-markdown`, `bx-esapi`, `bx-yaml`, `bx-image`) are
 installed and activated, and - if a project-level `theme/` override
 exists - that it satisfies the two-required-file `layout.bxm`/`page.bxm`
@@ -282,7 +282,7 @@ bxSites i18n:new --code=es
 - `--code` (required) - the locale code, e.g. `es`, `fr`, `pt-BR`
 
 See [Internationalization](guides/i18n.md) for wiring the new locale into
-`bxsites.json`'s `i18n.locales`.
+`bxsites.yaml`'s `i18n.locales`.
 
 ## `page:new`
 
@@ -311,7 +311,7 @@ bxSites plugin:new --name=my-analytics-plugin [--dest=...]
 - `--dest` - defaults to `<projectRoot>/<name>`
 
 See [Plugins](guides/plugins.md) for the hook reference and how to wire the
-finished plugin into `bxsites.json`'s `plugins` array.
+finished plugin into `bxsites.yaml`'s `plugins` array.
 
 ## `install:plugin`
 
@@ -328,7 +328,7 @@ bxSites install:plugin --name=bx-sites-plugin-analytics [--version=1.2.0]
 - `--version` - a specific version; omit for the latest
 
 Prints the module's real registered mapping name once loaded - add that
-name to `bxsites.json`'s `plugins` array to activate it (installing alone
+name to `bxsites.yaml`'s `plugins` array to activate it (installing alone
 never activates a plugin - see [Plugins](guides/plugins.md)).
 
 ## `theme:new`
@@ -361,7 +361,7 @@ bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
 
 Validates the downloaded package against the `ThemeProvider` contract
 (`layout.bxm` + `page.bxm`) before finishing, so a broken package fails at
-install time rather than at the next `build`. Set `bxsites.json`'s
+install time rather than at the next `build`. Set `bxsites.yaml`'s
 `theme.name` to the installed name to use it - see
 [Themes](guides/themes.md#installing-a-published-theme).
 

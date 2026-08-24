@@ -100,8 +100,8 @@ defecto mostrados arriba. Un objeto `theme` parcial se combina un nivel
 de profundidad, así que `{theme: {name: material}}` por sí solo conserva
 las `options` por defecto (vacías). Cada clave de abajo se llama y tiene
 la misma forma en ambos formatos - el resto de esta página solo muestra
-fragmentos JSON por brevedad, pero cada uno de ellos se lee igual en
-YAML.
+fragmentos YAML, siguiendo el formato por defecto propio de `bxSites
+new`, pero cada uno de ellos se lee igual en JSON.
 
 ## `name`
 
@@ -181,8 +181,8 @@ tener sentido. Enumera cada página no oculta según el protocolo de
     siempre prevalece en visitas posteriores, independientemente de este
     valor.
 
-    ```json
-    { "theme": { "options": { "colorMode": "dark" } } }
+    ```yaml
+    theme: { options: { colorMode: dark } }
     ```
   - `theme.options.navCollapsible` - `false` (el valor por defecto)
     renderiza cada sección de navegación siempre expandida, como hoy.
@@ -198,8 +198,8 @@ tener sentido. Enumera cada página no oculta según el protocolo de
     `false` inicia cada sección colapsada, excepto la que contiene la
     página actual.
 
-    ```json
-    { "theme": { "options": { "navCollapsible": true, "navExpandAll": false } } }
+    ```yaml
+    theme: { options: { navCollapsible: true, navExpandAll: false } }
     ```
   - `theme.options.tocPosition` - dónde se renderiza la propia tabla de
     contenido "En esta página" de una página. `"top"` (el valor por
@@ -217,8 +217,8 @@ tener sentido. Enumera cada página no oculta según el protocolo de
     cualquier ancho de viewport, solo cambia de forma según el espacio
     disponible.
 
-    ```json
-    { "theme": { "options": { "tocPosition": "sticky" } } }
+    ```yaml
+    theme: { options: { tocPosition: sticky } }
     ```
   - `theme.options.pageMetaPosition` - dónde se renderiza la fila de
     editar-esta-página/descargar-markdown/última-actualización en
@@ -228,8 +228,8 @@ tener sentido. Enumera cada página no oculta según el protocolo de
     título, el mismo lugar donde siempre se renderizaba antes de que
     existiera esta opción.
 
-    ```json
-    { "theme": { "options": { "pageMetaPosition": "top" } } }
+    ```yaml
+    theme: { options: { pageMetaPosition: top } }
     ```
 
 ## `search`
@@ -258,18 +258,14 @@ Qué interfaz de búsqueda conecta `search: true`:
   cliente DocSearch de Algolia. `insights` (`false` por defecto) activa la
   analítica de clics/conversión de DocSearch.
 
-  ```json linenums="1"
-  {
-    "search": true,
-    "searchProvider": {
-      "provider": "algolia",
-      "algolia": {
-        "appId": "ABC123",
-        "apiKey": "a1b2c3d4e5f6...",
-        "indexName": "my-docs"
-      }
-    }
-  }
+  ```yaml title="bxsites.yaml" linenums="1"
+  search: true
+  searchProvider:
+    provider: algolia
+    algolia:
+      appId: ABC123
+      apiKey: a1b2c3d4e5f6...
+      indexName: my-docs
   ```
 
 - `pagefind` - ambas claves opcionales cuando `provider` es `"pagefind"`:
@@ -280,14 +276,11 @@ Qué interfaz de búsqueda conecta `search: true`:
   Sites la invoca externamente (como hace con `git` para
   `lastUpdated`/`gh-deploy`), no la instala por ti.
 
-  ```json linenums="1"
-  {
-    "search": true,
-    "searchProvider": {
-      "provider": "pagefind",
-      "pagefind": { "bin": "pagefind", "options": [] }
-    }
-  }
+  ```yaml title="bxsites.yaml" linenums="1"
+  search: true
+  searchProvider:
+    provider: pagefind
+    pagefind: { bin: pagefind, options: [] }
   ```
 
 ## `nav`
@@ -323,19 +316,14 @@ una etiqueta contenedora/de sección de menú - un encabezado no clicable
 que simplemente agrupa a sus hijos, el mismo papel que cumple
 "MAIN COMPONENTS" en la propia barra lateral de GitBook:
 
-```json title="bxsites.json" linenums="1"
-{
-	"nav": [
-		"index.md",
-		{
-			"title": "Main Components",
-			"children": [
-				{ "title": "Quick Start", "path": "guides/setup.md" },
-				"guides/deployment.md"
-			]
-		}
-	]
-}
+```yaml title="bxsites.yaml" linenums="1"
+nav:
+  - index.md
+  - title: Main Components
+    children:
+      - title: Quick Start
+        path: guides/setup.md
+      - guides/deployment.md
 ```
 
 Dale a esa misma entrada de grupo un `path` en su lugar y se convierte en
@@ -343,7 +331,7 @@ una sección enlazada normal (con su propia página de aterrizaje, más
 hijos) en lugar de una etiqueta simple - ambas formas se anidan bajo
 `theme.options.navCollapsible` de la misma manera (consulta arriba).
 
-Para una navegación lo bastante grande como para saturar `bxsites.json`,
+Para una navegación lo bastante grande como para saturar `bxsites.yaml`,
 muévela a su propio archivo `docs/nav.json` en su lugar - la misma forma
 de array, simplemente como el contenido de nivel superior de todo el
 archivo:
@@ -355,7 +343,7 @@ archivo:
 ]
 ```
 
-El propio `nav` de `bxsites.json`, cuando no está vacío, siempre prevalece
+El propio `nav` de `bxsites.yaml`, cuando no está vacío, siempre prevalece
 sobre `docs/nav.json`. Solo el árbol principal respeta cualquiera de los
 dos - un árbol `docs/versions/<name>/` siempre infiere su navegación de su
 propia estructura de carpetas, incluso cuando el árbol principal tiene una
@@ -366,12 +354,10 @@ explícita.
 `[]` (el valor por defecto) - redirecciones de URL antiguas `from`/`to`
 para todo el sitio, aplicadas solo al árbol principal:
 
-```json title="bxsites.json" linenums="1"
-{
-	"redirects": [
-		{ "from": "old-guide", "to": "guides/new-guide/" }
-	]
-}
+```yaml title="bxsites.yaml" linenums="1"
+redirects:
+  - from: old-guide
+    to: guides/new-guide/
 ```
 
 - `redirects[].from` - el segmento de URL antiguo (sin barra inicial/final,
@@ -420,15 +406,12 @@ defecto, pero BX Sites lo establece en `true` por defecto (consulta la
 | `tableOptions.className` | `"table"` | Clase CSS en cada `<table>` renderizada |
 | `tableOptions.headerSeparationColumnMatch` | `true` | Exige que la fila separadora `---` coincida con el número de columnas del encabezado |
 
-```json
-{
-	"markdown": {
-		"enableFootnotes": true,
-		"enableDefinitionLists": true,
-		"anchorLinks": false,
-		"enableYouTubeTransformer": true
-	}
-}
+```yaml title="bxsites.yaml" linenums="1"
+markdown:
+  enableFootnotes: true
+  enableDefinitionLists: true
+  anchorLinks: false
+  enableYouTubeTransformer: true
 ```
 
 ## `repo`
@@ -450,8 +433,8 @@ page" en cada página.
   requiere `repo.url`; déjalo en blanco para omitir los enlaces de edición
   mientras sigues mostrando el icono de la cabecera.
 
-```json
-{ "repo": { "url": "https://github.com/acme/docs", "editUri": "edit/main/docs/" } }
+```yaml title="bxsites.yaml"
+repo: { url: "https://github.com/acme/docs", editUri: "edit/main/docs/" }
 ```
 
 ## `social`
@@ -465,13 +448,10 @@ pequeño conjunto de iconos incorporado (`github`, `twitter`/`x`,
 cualquier otra cosa), y `label` establece el nombre accesible/tooltip del
 enlace (por defecto `icon`, y luego `"Link"`).
 
-```json
-{
-	"social": [
-		{ "url": "https://twitter.com/acme", "icon": "twitter", "label": "Twitter" },
-		{ "url": "https://acme.com/rss.xml", "icon": "rss", "label": "RSS" }
-	]
-}
+```yaml title="bxsites.yaml" linenums="1"
+social:
+  - { url: "https://twitter.com/acme", icon: twitter, label: Twitter }
+  - { url: "https://acme.com/rss.xml", icon: rss, label: RSS }
 ```
 
 ## `footer`
@@ -480,8 +460,8 @@ enlace (por defecto `icon`, y luego `"Link"`).
 añade uno a cada página: una línea de copyright (`© <year> <site name>`),
 los enlaces `social` (si los hay), y un crédito "Built with BX Sites".
 
-```json
-{ "footer": true }
+```yaml title="bxsites.yaml"
+footer: true
 ```
 
 ## `lastUpdated`
@@ -495,8 +475,8 @@ silenciosamente para una página de la que git no tiene historial - un
 desde un zip descargado sin `.git` en absoluto, o git no estando instalado
 en la máquina de construcción - en lugar de romper la construcción.
 
-```json
-{ "lastUpdated": true }
+```yaml title="bxsites.yaml"
+lastUpdated: true
 ```
 
 ## `analytics`
@@ -509,8 +489,8 @@ Analytics (`gtag.js`):
 - `analytics.id` - el ID de medición de Google Analytics (por ejemplo,
   `"G-ABC123"`). Obligatorio cuando `provider` es `"google"`.
 
-```json
-{ "analytics": { "provider": "google", "id": "G-ABC123" } }
+```yaml title="bxsites.yaml"
+analytics: { provider: google, id: "G-ABC123" }
 ```
 
 ## `ogImage`
@@ -523,8 +503,8 @@ absolutas se usan tal cual). Dejado en blanco (el valor por defecto) y
 con `generateOgImages` desactivado, no se renderiza ninguna etiqueta
 `og:image`/`twitter:card`.
 
-```json
-{ "ogImage": "assets/social-card.png" }
+```yaml title="bxsites.yaml"
+ogImage: assets/social-card.png
 ```
 
 El propio `ogImage` del frontmatter de una página (consulta
@@ -542,8 +522,8 @@ que cada página comparta una imagen genérica de todo el sitio. Puro
 se ejecute BoxLang), así que esto no necesita navegador headless, servicio
 externo, ni acceso a red en el momento de la construcción.
 
-```json
-{ "generateOgImages": true }
+```yaml title="bxsites.yaml"
+generateOgImages: true
 ```
 
 ## `extraCss` / `extraJs`
@@ -554,27 +534,21 @@ se resuelve de la misma forma que `theme.logo` (una ruta relativa lleva el
 prefijo `baseURL`; una URL absoluta se usa tal cual). Las entradas de
 `extraJs` se cargan con `defer`.
 
-```json
-{
-	"extraCss": [ "assets/custom.css" ],
-	"extraJs": [ "assets/custom.js" ]
-}
+```yaml title="bxsites.yaml" linenums="1"
+extraCss: [ assets/custom.css ]
+extraJs: [ assets/custom.js ]
 ```
 
 ## `assets`
 
-```json linenums="1"
-{
-	"assets": {
-		"fingerprint": true,
-		"bundle": true,
-		"images": {
-			"enabled": true,
-			"widths": [ 400, 800, 1200, 1600 ],
-			"formats": [ "original", "webp" ]
-		}
-	}
-}
+```yaml title="bxsites.yaml" linenums="1"
+assets:
+  fingerprint: true
+  bundle: true
+  images:
+    enabled: true
+    widths: [ 400, 800, 1200, 1600 ]
+    formats: [ original, webp ]
 ```
 
 El pipeline de recursos - redimensionado de imágenes/WebP mediante
@@ -626,8 +600,8 @@ del lado del cliente y renderiza cada bloque de código con fence
 ` ```mermaid ` como un diagrama. Consulta
 [Extensiones de Markdown](guides/markdown.md#diagramas) para la sintaxis.
 
-```json
-{ "mermaid": true }
+```yaml title="bxsites.yaml"
+mermaid: true
 ```
 
 ## `math`
@@ -637,8 +611,8 @@ absoluto. `true` lo carga del lado del cliente y compone `$...$`/`$$...$$`
 escrito directamente en el markdown de una página. Consulta
 [Extensiones de Markdown](guides/markdown.md#matemáticas) para la sintaxis.
 
-```json
-{ "math": true }
+```yaml title="bxsites.yaml"
+math: true
 ```
 
 Las admoniciones (cuadros de aviso al estilo nota/advertencia/consejo),
@@ -657,8 +631,8 @@ OpenAPI/Swagger referenciada (JSON o YAML). Consulta
 [Bloques de contenido](guides/content-blocks.md#openapi--swagger) para la
 sintaxis.
 
-```json title="bxsites.json"
-{ "openapi": true }
+```yaml title="bxsites.yaml"
+openapi: true
 ```
 
 ## `plugins`
@@ -668,8 +642,8 @@ para activar como plugins. Instalar un módulo de plugin (`box install`)
 nunca lo activa por sí solo; también tiene que nombrarse aquí. Consulta
 [Plugins](guides/plugins.md) para saber cómo escribir uno.
 
-```json
-{ "plugins": [ "myBxSitesPlugin" ] }
+```yaml title="bxsites.yaml"
+plugins: [ myBxSitesPlugin ]
 ```
 
 ## `i18n`
@@ -700,16 +674,12 @@ idioma.
   traducción integrada, así que `strings` solo hace falta para
   sobrescribir una clave o añadir otro idioma.
 
-```json
-{
-	"i18n": {
-		"defaultLocale": { "code": "en", "label": "English" },
-		"locales": [
-			{ "code": "es", "label": "Español" },
-			{ "code": "ar", "label": "العربية", "dir": "rtl" }
-		]
-	}
-}
+```yaml title="bxsites.yaml" linenums="1"
+i18n:
+  defaultLocale: { code: en, label: English }
+  locales:
+    - { code: es, label: Español }
+    - { code: ar, label: العربية, dir: rtl }
 ```
 
 Consulta [Internacionalización](guides/i18n.md) para el panorama completo
@@ -735,8 +705,8 @@ activarla.
   límite en un blog con cientos de entradas simplemente desperdicia ancho
   de banda en cada sondeo - consulta [Blog: Feed](guides/blog.md#feed).
 
-```json
-{ "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
+```yaml title="bxsites.yaml"
+blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
 ```
 
 Consulta [Blog](guides/blog.md) para el frontmatter de entradas/autores,
@@ -745,7 +715,7 @@ categorías, imágenes destacadas y metadatos de SEO/redes sociales.
 ## Versionado
 
 Los documentos versionados son cuestión de convención, no de
-configuración - no hay ninguna clave de `bxsites.json` para ello. Añade
+configuración - no hay ninguna clave de `bxsites.yaml` para ello. Añade
 una carpeta `docs/versions/`, y cada subcarpeta directa dentro de ella se
 construye como su propio árbol de documentos totalmente autocontenido,
 junto a tu `docs/` regular (que siempre se construye como "Latest"):
@@ -766,7 +736,7 @@ docs/
 Cada carpeta de versión es un árbol normal con forma de `docs/` - su
 propio `index.md`, su propia navegación, sus propias páginas - construido
 en `site/versions/<name>/` con cada enlace interno prefijado en
-consecuencia, y compartiendo el único `bxsites.json` de configuración/tema
+consecuencia, y compartiendo el único `bxsites.yaml` de configuración/tema
 del proyecto. Los nombres de versión se ordenan de más reciente a más
 antiguo, numéricamente en lugar de alfabéticamente (de modo que `2.0` se
 ordena antes que `10.0`), y cada tema renderiza automáticamente un

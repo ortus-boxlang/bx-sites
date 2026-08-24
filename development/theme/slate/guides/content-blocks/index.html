@@ -90,7 +90,7 @@ and the reason a GitBook site's content is straightforward to migrate:
 each of these maps directly to a GitBook block of the same name. Every
 one uses the same <code>::: name ... :::</code> container syntax (a bare <code>:::</code> on
 its own line closes whichever block is currently open) - no
-<code>bxsites.json</code> config needed, always available. A block can nest inside
+<code>bxsites.yaml</code> config needed, always available. A block can nest inside
 another (an expandable containing a cards group, for instance) - each
 is scanned again for further blocks inside its own content.</p>
 <h2 id="expandable"><a href="#expandable" id="expandable" name="expandable" class="anchor"></a>Expandable</h2>
@@ -198,7 +198,7 @@ refuse to render (most sites block being framed):</p>
 an OpenAPI/Swagger spec - <code>src</code> is resolved the same <code>docs/assets/</code>-relative
 way <code>::: file</code>'s own <code>src</code> is. Both JSON and YAML specs work; Swagger UI
 parses either entirely client-side; no OpenAPI parsing happens anywhere in
-this module. Requires <code>bxsites.json</code>'s <a href="/bx-sites/development/theme/slate/configuration/index.html#openapi"><code>openapi</code></a>
+this module. Requires <code>bxsites.yaml</code>'s <a href="/bx-sites/development/theme/slate/configuration/index.html#openapi"><code>openapi</code></a>
 set to <code>true</code> - unset, this placeholder renders but stays inert (Swagger
 UI's own JS/CSS is never copied into <code>site/</code> at all, keeping every other
 project's build exactly as small as before this feature existed):</p>
@@ -259,7 +259,7 @@ Initial release.
 </div></div><div class="bxsites-update"><div class="bxsites-update__meta"><time class="bxsites-update__date" datetime="2026-01-01">2026-01-01</time></div><div class="bxsites-update__body"><p>Initial release.</p>
 </div></div></div>
 <p>A page with an <code>::: updates</code> block also gets its own <code>feed.xml</code> (RSS 2.0)
-written alongside it once <code>bxsites.json</code>'s <code>baseURL</code> is a full URL - same
+written alongside it once <code>bxsites.yaml</code>'s <code>baseURL</code> is a full URL - same
 requirement as <code>sitemap.xml</code> - so readers can subscribe to just that
 page's changelog.</p>
 <h2 id="reusable-content-includes"><a href="#reusable-content-includes" id="reusable-content-includes" name="reusable-content-includes" class="anchor"></a>Reusable content (includes)</h2>
@@ -305,7 +305,7 @@ with the main tree's <code>docs/includes/</code>.</p>
 <code>BxSites.CircularInclude</code> at build time rather than looping forever).</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/content-blocks.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/slate/guides/content-blocks.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/content-blocks.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/slate/guides/content-blocks.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="slate-page-nav" aria-label="Page navigation">

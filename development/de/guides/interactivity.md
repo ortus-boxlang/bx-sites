@@ -11,7 +11,7 @@ Jede von BX Sites gebaute Seite lädt bereits [Alpine.js](https://alpinejs.dev/)
 - es treibt den eingebauten Dunkelmodus-Umschalter und das
 Sprachdropdown in jedem integrierten Theme an. Genau dieselbe
 Alpine-Instanz steht auch deinem eigenen Seiteninhalt kostenlos zur
-Verfügung: keine `bxsites.json`-Einstellung zum Umlegen, kein
+Verfügung: keine `bxsites.yaml`-Einstellung zum Umlegen, kein
 `extraJs`-Eintrag hinzuzufügen, kein zusätzliches `<script>`-Tag in
 deinem Markdown zu schreiben.
 
@@ -96,7 +96,7 @@ und mehr).
 
 - **Es ist zentral, nicht optional.** Das Theme-Chrome (Dunkelmodus,
   Sprachumschalter) hängt von Alpine ab, es lässt sich also nicht wie
-  `mermaid`/`math` in `bxsites.json` ausschalten.
+  `mermaid`/`math` in `bxsites.yaml` ausschalten.
 - **Version.** Aktuell `alpinejs@3.14.1`, mit diesem Modul vendoriert und
   ausgeliefert von `site/assets/vendor/alpine/` - kein CDN beteiligt.
   Sieh im eigenen `layout.bxm` eines Themes nach, welches genau geladen

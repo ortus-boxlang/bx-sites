@@ -65,7 +65,7 @@ Mermaid）は、このモジュールに同梱（バンドル）された状態�
   サイドバーナビ（`bootstrap`/`material`/`tailwind` いずれもハンバーガートグル）付き。
 - **検索ボックスのキーボードショートカット** - `/` でページのどこからでも検索にフォーカスし、
   `Escape` で結果を閉じます。[検索](search.md) を参照してください。
-- **リポジトリリンクと「このページを編集」/「最終更新」行** - `bxsites.json` の
+- **リポジトリリンクと「このページを編集」/「最終更新」行** - `bxsites.yaml` の
   `repo`/`lastUpdated` オプションが設定されている場合。[設定](../configuration.md#repo)
   を参照してください。
 - **「Markdown をダウンロード」リンク** - 「このページを編集」の隣に表示されます -
@@ -75,35 +75,35 @@ Mermaid）は、このモジュールに同梱（バンドル）された状態�
   直接読めます。設定不要で常に有効です。
   [はじめに](../getting-started.md#markdown-としてページをダウンロード) を参照してください。
 - **オプトインのフッター**（著作権、`social` リンク、「Built with BX Sites」クレジット）-
-  `bxsites.json` の `footer` が `true` の場合。[設定](../configuration.md#footer) を参照してください。
+  `bxsites.yaml` の `footer` が `true` の場合。[設定](../configuration.md#footer) を参照してください。
 - **バージョンスイッチャー** - プロジェクトが複数バージョンを含む `docs/versions/` フォルダを
   持つと自動的に表示されます。[設定](../configuration.md#versioning) を参照してください。
 - **テーマ化された `404.html`** - ほとんどの静的ホスト（GitHub Pages を含む）で、
   一致しないパスに対して自動的に提供されます。
-- **カスタムロゴとファビコン** - `bxsites.json` の `theme.logo`/`theme.favicon` が
+- **カスタムロゴとファビコン** - `bxsites.yaml` の `theme.logo`/`theme.favicon` が
   設定されている場合。[設定](../configuration.md#theme) を参照してください。
 - **折りたたみ可能なサイドバーナビ** - `theme.options.navCollapsible` でオプトイン -
   子要素を持つすべてのセクション（リンク付き/なしを問わず）が、常にインラインで
   子要素を表示する代わりにトグルボタンを持つようになり、現在のページを含むセクションは
   常に開いた状態で始まります。[設定](../configuration.md#theme) を参照してください。
-- **Google Analytics** - `bxsites.json` の `analytics` が設定されている場合。
+- **Google Analytics** - `bxsites.yaml` の `analytics` が設定されている場合。
   [設定](../configuration.md#analytics) を参照してください。
 - **ソーシャルシェアカード**（Open Graph + Twitter Card メタタグ）- 各ページの
   `description` フロントマター（またはサイト全体の `description`）と、それ自身の
-  `ogImage`（またはサイト全体のもの）から生成されます - `bxsites.json` の
+  `ogImage`（またはサイト全体のもの）から生成されます - `bxsites.yaml` の
   `generateOgImages` でページごとに自動生成することも任意で選べます。
   [設定](../configuration.md#ogimage) を参照してください。
 - **ページタグ、アイコン、サマリ行** - すべてページ自身のフロントマターでオプトインします -
   タグはサイト全体の `/tags/` インデックスにリンクするバッジとしてレンダリングされます。
   [はじめに](../getting-started.md#ページの追加) を参照してください。
-- **明示的な nav オーバーライド** - `bxsites.json` または独自の `docs/nav.json` で、
+- **明示的な nav オーバーライド** - `bxsites.yaml` または独自の `docs/nav.json` で、
   大規模サイト向けにフォルダ推定を置き換えます。[設定](../configuration.md#nav) を参照してください。
-- **追加の CSS/JS** - `bxsites.json` の `extraCss`/`extraJs` で注入されます。
+- **追加の CSS/JS** - `bxsites.yaml` の `extraCss`/`extraJs` で注入されます。
   [設定](../configuration.md#extracss--extrajs) を参照してください。
 - **Admonition（note/warning/tip/...）コールアウトボックス** - どのページの Markdown でも
   デフォルトで有効で、折りたたみ可能なバリアントも含みます - 設定不要です。
   [Markdown 拡張機能](markdown.md#admonition) を参照してください。
-- **脚注と定義リスト** - `bxsites.json` の `markdown` でオプトインします。
+- **脚注と定義リスト** - `bxsites.yaml` の `markdown` でオプトインします。
   [Markdown 拡張機能](markdown.md#脚注) を参照してください。
 - **コンテンツタブ**、**コードの行番号/ハイライト行/タイトル**、コードブロック用の
   **差分マーカー/ターミナル風フレーム** - 設定不要です。
@@ -111,15 +111,15 @@ Mermaid）は、このモジュールに同梱（バンドル）された状態�
 - **レスポンシブ画像** - 対象となるすべての `docs/assets/**` 画像に対する、リサイズ済み +
   WebP バリアントと `<picture>` への書き換え - デフォルトで有効です。
   [レスポンシブ画像](images.md) を参照してください。
-- **Mermaid ダイアグラム** - `bxsites.json` の `mermaid` でオプトインします。
+- **Mermaid ダイアグラム** - `bxsites.yaml` の `mermaid` でオプトインします。
   [Markdown 拡張機能](markdown.md#ダイアグラム) を参照してください。
-- **数式**（KaTeX） - `bxsites.json` の `math` でオプトインします。
+- **数式**（KaTeX） - `bxsites.yaml` の `math` でオプトインします。
   [Markdown 拡張機能](markdown.md#数式) を参照してください。
 
-プロジェクトが使用するテーマは `bxsites.json` で設定します:
+プロジェクトが使用するテーマは `bxsites.yaml` で設定します:
 
-```json title="bxsites.json"
-{ "theme": { "name": "material" } }
+```yaml title="bxsites.yaml"
+theme: { name: material }
 ```
 
 ## 公開済みテーマのインストール
@@ -136,8 +136,8 @@ bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
 満たしていることを検証します。この方法で、プロジェクトは複数のインストール済み
 テーマを並行して保持し、純粋に名前だけで切り替えることができます:
 
-```json title="bxsites.json"
-{ "theme": { "name": "bx-sites-theme-blog1" } }
+```yaml title="bxsites.yaml"
+theme: { name: bx-sites-theme-blog1 }
 ```
 
 テーマは（プラグインとは異なり）BoxLang モジュール/クラスローダーの関与を一切必要と
@@ -159,7 +159,7 @@ mkdocs/jekyll/hugo テーマ自身のテンプレートファイルを、ベス�
 highlight.js、Alpine.js、lunr.js はすべてこのモジュールに同梱されており
 （`resources/assets/vendor/`）、ビルド時に `site/assets/vendor/` へそのままコピー
 されます - これらのどれについても、生成される HTML のどこにも CDN の
-`<script>`/`<link>` タグは一切含まれません。`bxsites.json` の `mermaid` キーを
+`<script>`/`<link>` タグは一切含まれません。`bxsites.yaml` の `mermaid` キーを
 有効にすると、Mermaid も同様に同梱され、`mermaid.min.js` バンドルが
 `site/assets/vendor/mermaid/` にコピーされて、組み込みのすべてのテーマがそこから
 読み込むため、図表も外部への通信なしで描画されます。
@@ -175,7 +175,7 @@ highlight.js、Alpine.js、lunr.js はすべてこのモジュールに同梱さ
   jsDelivr から遅延読み込みしますが、これは `elk` レイアウトアルゴリズムを
   使用するダイアグラムタイプに限られます。同梱された `mermaid.min.js` は、
   それ以外のすべてのダイアグラムタイプを完全に単独でレンダリングします。
-- `bxsites.json` の `math` オプションを有効にすると、KaTeX（JS 本体とその独自
+- `bxsites.yaml` の `math` オプションを有効にすると、KaTeX（JS 本体とその独自
   フォントファイルの両方）を CDN から読み込みます。
 - `searchProvider.provider: "algolia"` と `analytics.provider: "google"` は、
   その性質上ホスト型の API／トラッキングエンドポイントと通信します - JS
@@ -248,13 +248,13 @@ Font Awesome はこれらに意図的に含まれていません - その Duoton
   `variables.page`、`variables.nav`、`variables.siteConfig`、`variables.themeDir`、
   `variables.basePath` を受け取り、`#variables.themeDir#/page.bxm` 経由で兄弟の
   `page.bxm` をインクルードします。`variables.basePath` は常に `/` で終わる
-  ルート相対パスです（デフォルトは `/`。`bxsites.json` の `baseURL` が上書きしている
+  ルート相対パスです（デフォルトは `/`。`bxsites.yaml` の `baseURL` が上書きしている
   場合は `/my-docs/` など）- 先頭に `/` をハードコードするのではなく、すべての内部
   `href`/`src` にこれをプレフィックスしてください。そうすることで、サイトがサブパス
   から配信されてもテーマは動作し続けます。
 - **`page.bxm`**（必須） - 記事本文。すでに変換済みの Markdown である
   `variables.page.contentHtml` をレンダリングします。
-- **`search.bxm`**（省略可） - 検索ボックスのマークアップ。`bxsites.json` の `search`
+- **`search.bxm`**（省略可） - 検索ボックスのマークアップ。`bxsites.yaml` の `search`
   が `true` の場合のみ `layout.bxm` にインクルードされます。[検索](search.md) を
   参照してください。
 - **`assets/`**（省略可） - テーマの CSS/JS。ビルド時に `site/assets/theme/` に
@@ -284,13 +284,13 @@ Font Awesome はこれらに意図的に含まれていません - その Duoton
 
 色やフォントの微調整のためにテーマ全体をフォークするのは過剰です - 各組み込みテーマは、
 `:root` 上の少数の CSS カスタムプロパティからパレットを読み込み、ダークモード用に
-`[data-theme="dark"]` の下で再宣言しています。`bxsites.json` の
+`[data-theme="dark"]` の下で再宣言しています。`bxsites.yaml` の
 [`extraCss`](../configuration.md#extracss--extrajs) はテーマ自身のスタイルシートの
 *後に* 読み込まれるため、そこで同じ詳細度で再宣言すれば、`resources/themes/` に
 一切触れることなく優先されます:
 
-```json title="bxsites.json"
-{ "extraCss": [ "assets/brand.css" ] }
+```yaml title="bxsites.yaml"
+extraCss: [ assets/brand.css ]
 ```
 
 ```css title="docs/assets/brand.css" linenums="1"
@@ -424,7 +424,7 @@ my-project/
    ```
 
 3. `bxSites build`（反復作業中は `serve`）を実行します - BX Sites は `theme/` を
-   自動的に検出するため、`bxsites.json` の変更は不要です（プロジェクトレベルの
+   自動的に検出するため、`bxsites.yaml` の変更は不要です（プロジェクトレベルの
    `theme/` フォルダは常に `theme.name` で指定された組み込みテーマより優先されます）。
    触れなかった部分 - ナビのレンダリング、検索、ダークモードトグル、コード
    アノテーション - は、元の `bootstrap` テーマとまったく同じように動作し続けます。
@@ -436,7 +436,7 @@ my-project/
 必要です（どちらかが欠けているフォルダは、黙ってフォールバックするのではなく
 `BxSites.InvalidTheme` で即座に失敗します）。CSS だけの/`.bxm` を伴わない調整には、
 代わりに上記の [`extraCss`](#テーマオーバーライドなしの色のカスタマイズ) を
-使用してください - `bxsites.json` が指すどのテーマの上にも重なり、`theme/` フォルダは
+使用してください - `bxsites.yaml` が指すどのテーマの上にも重なり、`theme/` フォルダは
 一切関与しません。`theme/` は、マークアップ自体も変更する必要がある場合のためのもので、
 次のセクションで扱います。
 
@@ -447,7 +447,7 @@ Bootstrap も Tailwind も、ダークモードも検索 UI もない - を示�
 その上に追加しているものと、本当に必須なものとを正確に示します。両方を
 プロジェクトの `theme/layout.bxm` と `theme/page.bxm` として保存してください -
 プロジェクトレベルの `theme/` フォルダは（上記と同様に）自動的に検出され、
-`bxsites.json` の変更は不要です:
+`bxsites.yaml` の変更は不要です:
 
 ```bx title="theme/layout.bxm" linenums="1"
 <!-- theme/layout.bxm -->
@@ -502,7 +502,7 @@ Bootstrap も Tailwind も、ダークモードも検索 UI もない - を示�
 変換済みの Markdown（シンタックスハイライト、Admonition、タブ、数式などすべて
 込み）なので、パースすべきものは何も残っておらず、レイアウトするだけです。
 ここから、組み込みテーマが持っていて実際に欲しいものを何でも追加してください:
-`search.bxm`（`bxsites.json` の `search` が `true` の場合のみインクルードされます -
+`search.bxm`（`bxsites.yaml` の `search` が `true` の場合のみインクルードされます -
 [検索](search.md) を参照）、ダークモードトグル
 （`resources/themes/bootstrap/layout.bxm` の `<body>` タグから `x-data`/`x-init` の
 Alpine.js ペアと、対応する `[data-theme="dark"]` の CSS ブロックをコピー）、

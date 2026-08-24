@@ -157,7 +157,7 @@ navegación colapsable (un interruptor de hamburguesa en <code>bootstrap</code>/
 desde cualquier lugar de la página, y <code>Escape</code> cierra los resultados.
 Consulta <a href="/bx-sites/development/theme/vuepress/es/guides/search/index.html">Búsqueda</a>.</li>
 <li><strong>Un enlace al repositorio y una línea &quot;Edit this page&quot;/&quot;Last
-updated&quot;</strong>, cuando las opciones <code>repo</code>/<code>lastUpdated</code> de <code>bxsites.json</code>
+updated&quot;</strong>, cuando las opciones <code>repo</code>/<code>lastUpdated</code> de <code>bxsites.yaml</code>
 están configuradas. Consulta <a href="/bx-sites/development/theme/vuepress/es/configuration/index.html#repo">Configuración</a>.</li>
 <li><strong>Un enlace &quot;Download Markdown&quot;</strong>, junto a &quot;Edit this page&quot; - la fuente
 <code>.md</code> en bruto de cada página se publica junto a su HTML construido
@@ -167,7 +167,7 @@ directamente en lugar de analizar el HTML renderizado. Siempre activo,
 sin configuración necesaria. Consulta
 <a href="/bx-sites/development/theme/vuepress/es/getting-started/index.html#descargar-una-página-como-markdown">Primeros Pasos</a>.</li>
 <li><strong>Un pie de página opcional</strong> (copyright, enlaces <code>social</code>, un crédito
-&quot;Built with BX Sites&quot;) cuando el <code>footer</code> de <code>bxsites.json</code> es <code>true</code>.
+&quot;Built with BX Sites&quot;) cuando el <code>footer</code> de <code>bxsites.yaml</code> es <code>true</code>.
 Consulta <a href="/bx-sites/development/theme/vuepress/es/configuration/index.html#footer">Configuración</a>.</li>
 <li><strong>Un selector de versión</strong>, que aparece automáticamente en cuanto un
 proyecto tiene una carpeta <code>docs/versions/</code> con más de una versión en
@@ -176,19 +176,19 @@ ella. Consulta <a href="/bx-sites/development/theme/vuepress/es/configuration/in
 mayoría de los alojamientos estáticos (incluido GitHub Pages) para
 cualquier ruta sin coincidencia.</li>
 <li><strong>Un logo y favicon personalizados</strong>, cuando <code>theme.logo</code>/
-<code>theme.favicon</code> de <code>bxsites.json</code> están configurados. Consulta
+<code>theme.favicon</code> de <code>bxsites.yaml</code> están configurados. Consulta
 <a href="/bx-sites/development/theme/vuepress/es/configuration/index.html#theme">Configuración</a>.</li>
 <li><strong>Una barra lateral de navegación colapsable</strong>, opcional mediante
 <code>theme.options.navCollapsible</code>. Consulta
 <a href="/bx-sites/development/theme/vuepress/es/configuration/index.html#theme">Configuración</a>.</li>
-<li><strong>Google Analytics</strong>, cuando <code>analytics</code> de <code>bxsites.json</code> está
+<li><strong>Google Analytics</strong>, cuando <code>analytics</code> de <code>bxsites.yaml</code> está
 configurado. Consulta <a href="/bx-sites/development/theme/vuepress/es/configuration/index.html#analytics">Configuración</a>.</li>
 <li><strong>Tarjetas para compartir en redes sociales</strong> (metaetiquetas Open Graph
 <ul>
 <li>Twitter Card), obtenidas del frontmatter <code>description</code> de cada página
 (o la <code>description</code> general del sitio) y su propio <code>ogImage</code> (o el
 general del sitio) - generadas automáticamente por página de forma
-opcional mediante <code>generateOgImages</code> de <code>bxsites.json</code>. Consulta
+opcional mediante <code>generateOgImages</code> de <code>bxsites.yaml</code>. Consulta
 <a href="/bx-sites/development/theme/vuepress/es/configuration/index.html#ogimage">Configuración</a>.</li>
 </ul>
 </li>
@@ -196,30 +196,30 @@ opcional mediante <code>generateOgImages</code> de <code>bxsites.json</code>. Co
 mediante el propio frontmatter de una página - las etiquetas se
 renderizan como insignias que enlazan a un índice <code>/tags/</code> de todo el
 sitio. Consulta <a href="/bx-sites/development/theme/vuepress/es/getting-started/index.html#añadir-páginas">Primeros Pasos</a>.</li>
-<li><strong>Una navegación explícita personalizada</strong>, en <code>bxsites.json</code> o en su
+<li><strong>Una navegación explícita personalizada</strong>, en <code>bxsites.yaml</code> o en su
 propio <code>docs/nav.json</code>, que reemplaza la inferencia por carpetas en
 sitios grandes. Consulta <a href="/bx-sites/development/theme/vuepress/es/configuration/index.html#nav">Configuración</a>.</li>
 <li><strong>CSS/JS adicional</strong>, inyectado mediante <code>extraCss</code>/<code>extraJs</code> de
-<code>bxsites.json</code>. Consulta
+<code>bxsites.yaml</code>. Consulta
 <a href="/bx-sites/development/theme/vuepress/es/configuration/index.html#extracss--extrajs">Configuración</a>.</li>
 <li><strong>Cuadros de aviso (nota/advertencia/consejo/...)</strong>, activos por
 defecto en el markdown de cualquier página, incluidas variantes
 colapsables - sin configuración necesaria. Consulta
 <a href="/bx-sites/development/theme/vuepress/es/guides/markdown/index.html#admoniciones">Extensiones de Markdown</a>.</li>
 <li><strong>Notas al pie y listas de definiciones</strong>, opcionales mediante
-<code>markdown</code> de <code>bxsites.json</code>. Consulta
+<code>markdown</code> de <code>bxsites.yaml</code>. Consulta
 <a href="/bx-sites/development/theme/vuepress/es/guides/markdown/index.html#notas-al-pie">Extensiones de Markdown</a>.</li>
 <li><strong>Pestañas de contenido</strong>, <strong>números de línea de código/líneas
 resaltadas/títulos</strong> y <strong>marcadores de diff/marcos de terminal</strong> para
 bloques de código, sin configuración necesaria. Consulta
 <a href="/bx-sites/development/theme/vuepress/es/guides/markdown/index.html#pestañas-de-contenido">Extensiones de Markdown</a>.</li>
-<li><strong>Diagramas Mermaid</strong>, opcionales mediante <code>mermaid</code> de <code>bxsites.json</code>.
+<li><strong>Diagramas Mermaid</strong>, opcionales mediante <code>mermaid</code> de <code>bxsites.yaml</code>.
 Consulta <a href="/bx-sites/development/theme/vuepress/es/guides/markdown/index.html#diagramas">Extensiones de Markdown</a>.</li>
-<li><strong>Matemáticas</strong> (KaTeX), opcional mediante <code>math</code> de <code>bxsites.json</code>.
+<li><strong>Matemáticas</strong> (KaTeX), opcional mediante <code>math</code> de <code>bxsites.yaml</code>.
 Consulta <a href="/bx-sites/development/theme/vuepress/es/guides/markdown/index.html#matemáticas">Extensiones de Markdown</a>.</li>
 </ul>
-<p>Define cuál usa un proyecto en <code>bxsites.json</code>:</p>
-<pre><code class="language-json">{ &quot;theme&quot;: { &quot;name&quot;: &quot;material&quot; } }
+<p>Define cuál usa un proyecto en <code>bxsites.yaml</code>:</p>
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">theme: { name: material }
 </code></pre>
 <h2 id="instalar-un-tema-publicado"><a href="#instalar-un-tema-publicado" id="instalar-un-tema-publicado" name="instalar-un-tema-publicado" class="anchor"></a>Instalar un tema publicado</h2>
 <p>Un tema publicado en ForgeBox se instala sin nada más que el propio
@@ -231,7 +231,7 @@ binario <code>bxSites</code> - no hace falta <code>box</code>/CommandBox:</p>
 cumple el contrato <code>ThemeProvider</code> de abajo antes de terminar. Un
 proyecto puede tener varios temas instalados en paralelo de esta forma, y
 cambiar entre ellos únicamente por nombre:</p>
-<pre><code class="language-json">{ &quot;theme&quot;: { &quot;name&quot;: &quot;bx-sites-theme-blog1&quot; } }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">theme: { name: bx-sites-theme-blog1 }
 </code></pre>
 <p>Un tema no necesita ninguna participación de módulo/cargador de clases de
 BoxLang (a diferencia de un plugin) - son archivos puros, así que no hay
@@ -253,7 +253,7 @@ incluidos con este módulo
 (<code>resources/assets/vendor/</code>) y se copian directamente en
 <code>site/assets/vendor/</code> en el momento de la construcción - sin ninguna
 etiqueta <code>&lt;script&gt;</code>/<code>&lt;link&gt;</code> a un CDN en ningún lugar del HTML generado
-para ninguno de ellos. Activar la clave <code>mermaid</code> de <code>bxsites.json</code> incluye
+para ninguno de ellos. Activar la clave <code>mermaid</code> de <code>bxsites.yaml</code> incluye
 Mermaid de la misma forma - su paquete <code>mermaid.min.js</code> se copia en
 <code>site/assets/vendor/mermaid/</code> y cada tema incorporado lo carga desde ahí,
 de modo que los diagramas se siguen renderizando con cero solicitudes
@@ -270,7 +270,7 @@ fragmento adicional, <code>elk-api.js</code>, desde jsDelivr - pero solo para lo
 tipos de diagrama que optan por el algoritmo de diseño <code>elk</code>; el
 <code>mermaid.min.js</code> incluido renderiza por sí solo cualquier otro tipo de
 diagrama.</li>
-<li>La opción <code>math</code> de <code>bxsites.json</code> carga KaTeX (tanto su JS como sus
+<li>La opción <code>math</code> de <code>bxsites.yaml</code> carga KaTeX (tanto su JS como sus
 propios archivos de fuente) desde un CDN cuando está activada.</li>
 <li><code>searchProvider.provider: &quot;algolia&quot;</code> y <code>analytics.provider: &quot;google&quot;</code>
 se comunican inherentemente con una API alojada/un endpoint de
@@ -335,14 +335,14 @@ navegación. Recibe <code>variables.page</code>, <code>variables.nav</code>,
 el ámbito, e incluye el <code>page.bxm</code> hermano mediante
 <code>#variables.themeDir#/page.bxm</code>. <code>variables.basePath</code> es siempre una
 ruta relativa a la raíz que termina en <code>/</code> (<code>/</code> por defecto,
-<code>/my-docs/</code> cuando el <code>baseURL</code> de <code>bxsites.json</code> lo sobrescribe) -
+<code>/my-docs/</code> cuando el <code>baseURL</code> de <code>bxsites.yaml</code> lo sobrescribe) -
 antepón ese prefijo a cada <code>href</code>/<code>src</code> interno, en lugar de codificar
 una <code>/</code> inicial de forma fija, para que el tema siga funcionando cuando
 el sitio se sirva desde una subruta.</li>
 <li><strong><code>page.bxm</code></strong> (obligatorio) - el cuerpo del artículo. Renderiza
 <code>variables.page.contentHtml</code> - el markdown ya convertido.</li>
 <li><strong><code>search.bxm</code></strong> (opcional) - el marcado del cuadro de búsqueda,
-incluido por <code>layout.bxm</code> solo cuando <code>search</code> de <code>bxsites.json</code> es
+incluido por <code>layout.bxm</code> solo cuando <code>search</code> de <code>bxsites.yaml</code> es
 <code>true</code>. Consulta <a href="/bx-sites/development/theme/vuepress/es/guides/search/index.html">Búsqueda</a>.</li>
 <li><strong><code>assets/</code></strong> (opcional) - CSS/JS del tema, copiado a
 <code>site/assets/theme/</code> en el momento de la construcción.</li>
@@ -375,10 +375,10 @@ plantilla en lo profundo del renderizado.</p>
 tema incorporado lee su paleta de un puñado de propiedades CSS
 personalizadas en <code>:root</code>, redeclaradas bajo <code>[data-theme=&quot;dark&quot;]</code> para
 el modo oscuro. El <a href="/bx-sites/development/theme/vuepress/es/configuration/index.html#extracss--extrajs"><code>extraCss</code></a>
-de <code>bxsites.json</code> se carga <em>después</em> de la propia hoja de estilo del tema,
+de <code>bxsites.yaml</code> se carga <em>después</em> de la propia hoja de estilo del tema,
 así que una redeclaración con la misma especificidad en él gana sin
 tocar <code>resources/themes/</code> en absoluto:</p>
-<pre><code class="language-json">{ &quot;extraCss&quot;: [ &quot;assets/brand.css&quot; ] }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">extraCss: [ assets/brand.css ]
 </code></pre>
 <pre><code class="language-css">/* docs/assets/brand.css - copiado a site/assets/brand.css en el momento de la construcción */
 :root {
@@ -512,7 +512,7 @@ body {
 <li>
 <p>Ejecuta <code>bxSites build</code> (o <code>serve</code> mientras iteras) - BX
 Docs recoge <code>theme/</code> automáticamente, sin necesidad de cambiar
-<code>bxsites.json</code> (una carpeta <code>theme/</code> a nivel de proyecto siempre tiene
+<code>bxsites.yaml</code> (una carpeta <code>theme/</code> a nivel de proyecto siempre tiene
 precedencia sobre el tema incorporado nombrado en <code>theme.name</code>). Todo
 lo que no tocaste - el renderizado de la navegación, la búsqueda, el
 interruptor de modo oscuro, las anotaciones de código - sigue
@@ -529,7 +529,7 @@ falte cualquiera de los dos falla de inmediato con <code>BxSites.InvalidTheme</c
 en lugar de recurrir silenciosamente al otro). Para un ajuste solo de
 CSS/sin <code>.bxm</code>, usa
 <a href="#personalizar-colores-sin-sobrescribir-un-tema"><code>extraCss</code></a> en su lugar -
-se superpone a cualquier tema que nombre <code>bxsites.json</code>, sin ninguna
+se superpone a cualquier tema que nombre <code>bxsites.yaml</code>, sin ninguna
 carpeta <code>theme/</code> involucrada en absoluto. <code>theme/</code> es para cuando también
 necesitas cambiar el propio marcado, que se cubre a continuación.</p>
 <h2 id="escribir-un-tema-desde-cero"><a href="#escribir-un-tema-desde-cero" id="escribir-un-tema-desde-cero" name="escribir-un-tema-desde-cero" class="anchor"></a>Escribir un tema desde cero</h2>
@@ -539,7 +539,7 @@ interfaz de búsqueda - para mostrar exactamente qué es obligatorio frente
 a lo que añaden los temas incorporados. Guarda ambos como
 <code>theme/layout.bxm</code> y <code>theme/page.bxm</code> en tu proyecto - una carpeta
 <code>theme/</code> a nivel de proyecto se recoge automáticamente (como arriba), sin
-necesidad de cambiar <code>bxsites.json</code>:</p>
+necesidad de cambiar <code>bxsites.yaml</code>:</p>
 <pre><code class="language-bx">&lt;!-- theme/layout.bxm --&gt;
 &lt;bx:script&gt;
 	function renderNav( required array nodes ) {
@@ -590,7 +590,7 @@ markdown ya convertido (resaltado de sintaxis, admoniciones, pestañas,
 matemáticas y todo lo demás), así que no queda nada por analizar, solo
 por maquetar. A partir de aquí, añade lo que sea que tengan los temas
 incorporados que realmente quieras: <code>search.bxm</code> (incluido solo cuando
-<code>search</code> de <code>bxsites.json</code> es <code>true</code> - consulta <a href="/bx-sites/development/theme/vuepress/es/guides/search/index.html">Búsqueda</a>),
+<code>search</code> de <code>bxsites.yaml</code> es <code>true</code> - consulta <a href="/bx-sites/development/theme/vuepress/es/guides/search/index.html">Búsqueda</a>),
 un interruptor de modo oscuro (copia el par <code>x-data</code>/<code>x-init</code> de
 Alpine.js de la etiqueta <code>&lt;body&gt;</code> de <code>resources/themes/bootstrap/layout.bxm</code>
 y el bloque CSS <code>[data-theme=&quot;dark&quot;]</code> correspondiente), migas de pan/
@@ -602,7 +602,7 @@ copiada a <code>site/assets/theme/</code> automáticamente en el momento de la
 construcción.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/vuepress/es/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/vuepress/es/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="vp-page-nav" aria-label="Navegaci&oacute;n de p&aacute;gina">

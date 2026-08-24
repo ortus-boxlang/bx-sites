@@ -38,8 +38,8 @@ Every one of them ships with the same page furniture out of the box: an "On this
 
 One line in your config:
 
-```json title="bxsites.json"
-{ "theme": { "name": "material" } }
+```yaml title="bxsites.yaml"
+theme: { name: material }
 ```
 
 Rebuild (or let `bxSites serve` pick it up automatically) and you're done. There's no content migration involved because a theme only ever touches how `variables.page.contentHtml` gets laid out - your Markdown doesn't change at all.
@@ -52,8 +52,8 @@ If your deployment target has genuinely zero internet access, stick with any the
 
 For a color or font tweak, you don't need to fork a whole theme. Every built-in theme reads its palette off a handful of CSS custom properties on `:root`:
 
-```json title="bxsites.json"
-{ "extraCss": ["assets/brand.css"] }
+```yaml title="bxsites.yaml"
+extraCss: [ assets/brand.css ]
 ```
 
 ```css title="docs/assets/brand.css" linenums="1"

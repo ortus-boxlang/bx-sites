@@ -106,7 +106,7 @@ Installa, genera lo scheletro di un progetto, compilalo e servilo.
 Ogni verbo e le sue opzioni.
 :::
 ::: card title="Configurazione" icon="phosphor-duotone:gear-six" href="configuration.md"
-Il riferimento completo di `bxsites.json`.
+Il riferimento completo di `bxsites.yaml`.
 :::
 ::: card title="Estensioni Markdown" icon="phosphor-duotone:markdown-logo" href="guides/markdown.md"
 Ammonizioni, schede, card, callout, matematica e diagrammi Mermaid.

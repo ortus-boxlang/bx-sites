@@ -159,7 +159,7 @@ auf der Seite, und <code>Escape</code> schließt die Ergebnisse. Siehe
 <a href="/bx-sites/development/theme/tailwind/de/guides/search/index.html">Suche</a>.</li>
 <li><strong>Ein Repo-Link und eine &quot;Diese Seite bearbeiten&quot;-/&quot;Zuletzt
 aktualisiert&quot;-Zeile</strong>, wenn die Optionen <code>repo</code>/<code>lastUpdated</code> in
-<code>bxsites.json</code> gesetzt sind. Siehe
+<code>bxsites.yaml</code> gesetzt sind. Siehe
 <a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#repo">Konfiguration</a>.</li>
 <li><strong>Ein &quot;Markdown herunterladen&quot;-Link</strong>, neben &quot;Diese Seite bearbeiten&quot; -
 die rohe <code>.md</code>-Quelle jeder Seite wird zusammen mit ihrem gebauten HTML
@@ -169,7 +169,7 @@ als reines Markdown lesen kann, statt gerendertes HTML zu parsen. Immer
 aktiv, keine Konfiguration nötig. Siehe
 <a href="/bx-sites/development/theme/tailwind/de/getting-started/index.html#eine-seite-als-markdown-herunterladen">Erste Schritte</a>.</li>
 <li><strong>Eine optionale Fußzeile</strong> (Copyright, <code>social</code>-Links, ein &quot;Built with
-BX Sites&quot;-Hinweis), wenn <code>footer</code> in <code>bxsites.json</code> <code>true</code> ist. Siehe
+BX Sites&quot;-Hinweis), wenn <code>footer</code> in <code>bxsites.yaml</code> <code>true</code> ist. Siehe
 <a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#footer">Konfiguration</a>.</li>
 <li><strong>Ein Versionsumschalter</strong>, der automatisch erscheint, sobald ein
 Projekt einen <code>docs/versions/</code>-Ordner mit mehr als einer Version hat.
@@ -178,7 +178,7 @@ Siehe <a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#
 meisten statischen Hosts (einschließlich GitHub Pages) für jeden nicht
 gefundenen Pfad.</li>
 <li><strong>Ein eigenes Logo und Favicon</strong>, wenn <code>theme.logo</code>/<code>theme.favicon</code> in
-<code>bxsites.json</code> gesetzt sind. Siehe
+<code>bxsites.yaml</code> gesetzt sind. Siehe
 <a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#theme">Konfiguration</a>.</li>
 <li><strong>Eine einklappbare Sidebar-Navigation</strong>, opt-in über
 <code>theme.options.navCollapsible</code> - jeder Abschnitt mit Kindern (verlinkt
@@ -186,41 +186,41 @@ oder nicht) erhält eine Umschalt-Schaltfläche, statt seine Kinder immer
 inline anzuzeigen, und der Abschnitt, der die aktuelle Seite enthält,
 startet immer geöffnet. Siehe
 <a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#theme">Konfiguration</a>.</li>
-<li><strong>Google Analytics</strong>, wenn <code>analytics</code> in <code>bxsites.json</code> konfiguriert
+<li><strong>Google Analytics</strong>, wenn <code>analytics</code> in <code>bxsites.yaml</code> konfiguriert
 ist. Siehe <a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#analytics">Konfiguration</a>.</li>
 <li><strong>Social-Share-Cards</strong> (Open-Graph- + Twitter-Card-Meta-Tags), erzeugt
 aus der <code>description</code>-Frontmatter jeder Seite (oder der websiteweiten
 <code>description</code>) und ihrem eigenen <code>ogImage</code> (oder dem websiteweiten) -
 optional automatisch pro Seite erzeugt über <code>generateOgImages</code> in
-<code>bxsites.json</code>. Siehe <a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#ogimage">Konfiguration</a>.</li>
+<code>bxsites.yaml</code>. Siehe <a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#ogimage">Konfiguration</a>.</li>
 <li><strong>Seiten-Tags, ein Icon und eine Zusammenfassungszeile</strong>, alle opt-in
 über die eigene Frontmatter einer Seite - Tags werden als Badges
 gerendert, die zu einem websiteweiten <code>/tags/</code>-Index verlinken. Siehe
 <a href="/bx-sites/development/theme/tailwind/de/getting-started/index.html#seiten-hinzufügen">Erste Schritte</a>.</li>
-<li><strong>Eine explizite Navigations-Überschreibung</strong>, in <code>bxsites.json</code> oder der
+<li><strong>Eine explizite Navigations-Überschreibung</strong>, in <code>bxsites.yaml</code> oder der
 eigenen <code>docs/nav.json</code>, die die Ordner-Ableitung für große Websites
 ersetzt. Siehe <a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#nav">Konfiguration</a>.</li>
 <li><strong>Zusätzliches CSS/JS</strong>, eingebunden über <code>extraCss</code>/<code>extraJs</code> in
-<code>bxsites.json</code>. Siehe
+<code>bxsites.yaml</code>. Siehe
 <a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#extracss--extrajs">Konfiguration</a>.</li>
 <li><strong>Admonition-Callout-Boxen</strong> (Hinweis/Warnung/Tipp/...), standardmäßig
 im Markdown jeder Seite aktiv, einschließlich einklappbarer Varianten -
 keine Konfiguration nötig. Siehe
 <a href="/bx-sites/development/theme/tailwind/de/guides/markdown/index.html#admonitions">Markdown-Erweiterungen</a>.</li>
 <li><strong>Fußnoten und Definitionslisten</strong>, opt-in über <code>markdown</code> in
-<code>bxsites.json</code>. Siehe
+<code>bxsites.yaml</code>. Siehe
 <a href="/bx-sites/development/theme/tailwind/de/guides/markdown/index.html#fußnoten">Markdown-Erweiterungen</a>.</li>
 <li><strong>Content-Tabs</strong>, <strong>Code-Zeilennummern/hervorgehobene Zeilen/Titel</strong>
 und <strong>Diff-Markierungen/Terminal-Rahmen</strong> für Codeblöcke, keine
 Konfiguration nötig. Siehe
 <a href="/bx-sites/development/theme/tailwind/de/guides/markdown/index.html#content-tabs">Markdown-Erweiterungen</a>.</li>
-<li><strong>Mermaid-Diagramme</strong>, opt-in über <code>mermaid</code> in <code>bxsites.json</code>. Siehe
+<li><strong>Mermaid-Diagramme</strong>, opt-in über <code>mermaid</code> in <code>bxsites.yaml</code>. Siehe
 <a href="/bx-sites/development/theme/tailwind/de/guides/markdown/index.html#diagramme">Markdown-Erweiterungen</a>.</li>
-<li><strong>Mathematik</strong> (KaTeX), opt-in über <code>math</code> in <code>bxsites.json</code>. Siehe
+<li><strong>Mathematik</strong> (KaTeX), opt-in über <code>math</code> in <code>bxsites.yaml</code>. Siehe
 <a href="/bx-sites/development/theme/tailwind/de/guides/markdown/index.html#mathematik">Markdown-Erweiterungen</a>.</li>
 </ul>
-<p>Lege in <code>bxsites.json</code> fest, welches Theme ein Projekt verwendet:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;theme&quot;: { &quot;name&quot;: &quot;material&quot; } }
+<p>Lege in <code>bxsites.yaml</code> fest, welches Theme ein Projekt verwendet:</p>
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">theme: { name: material }
 </code></pre>
 <h2 id="ein-veröffentlichtes-theme-installieren"><a href="#ein-veröffentlichtes-theme-installieren" id="ein-veröffentlichtes-theme-installieren" name="ein-veröffentlichtes-theme-installieren" class="anchor"></a>Ein veröffentlichtes Theme installieren</h2>
 <p>Ein auf ForgeBox veröffentlichtes Theme installiert sich mit nichts
@@ -232,7 +232,7 @@ weiter als der <code>bxSites</code>-Binary selbst - kein <code>box</code>/Comman
 Abschluss geprüft wird, ob es den <code>ThemeProvider</code>-Vertrag unten erfüllt.
 Ein Projekt kann auf diese Weise mehrere installierte Themes
 nebeneinander vorhalten und rein per Name zwischen ihnen wechseln:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;theme&quot;: { &quot;name&quot;: &quot;bx-sites-theme-blog1&quot; } }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">theme: { name: bx-sites-theme-blog1 }
 </code></pre>
 <p>Ein Theme braucht überhaupt keine BoxLang-Modul-/Klassenlader-Beteiligung
 (anders als ein Plugin) - es sind reine Dateien, es gibt also keinen
@@ -253,7 +253,7 @@ Bootstraps eigenes CSS/JS, highlight.js, Alpine.js und
 lunr.js sind alle mit diesem Modul vendoriert (<code>resources/assets/vendor/</code>)
 und werden zur Build-Zeit direkt nach <code>site/assets/vendor/</code> kopiert -
 nirgends im erzeugten HTML taucht dafür ein CDN-<code>&lt;script&gt;</code>-/<code>&lt;link&gt;</code>-Tag
-auf. Aktivierst du den Schlüssel <code>mermaid</code> in <code>bxsites.json</code>, wird Mermaid
+auf. Aktivierst du den Schlüssel <code>mermaid</code> in <code>bxsites.yaml</code>, wird Mermaid
 auf dieselbe Weise vendoriert - sein <code>mermaid.min.js</code>-Bundle wird nach
 <code>site/assets/vendor/mermaid/</code> kopiert, und jedes integrierte Theme lädt es
 von dort, sodass Diagramme weiterhin ganz ohne ausgehende Anfragen
@@ -269,7 +269,7 @@ daher ist dieses Theme (noch) nicht air-gapped-fähig.</li>
 nach, <code>elk-api.js</code>, von jsDelivr - aber nur für Diagrammtypen, die den
 <code>elk</code>-Layout-Algorithmus verwenden; das vendorierte <code>mermaid.min.js</code>
 rendert jeden anderen Diagrammtyp vollständig eigenständig.</li>
-<li>Die Option <code>math</code> in <code>bxsites.json</code> lädt KaTeX (sowohl dessen JS als auch
+<li>Die Option <code>math</code> in <code>bxsites.yaml</code> lädt KaTeX (sowohl dessen JS als auch
 die eigenen Font-Dateien) von einem CDN, wenn sie aktiviert ist.</li>
 <li><code>searchProvider.provider: &quot;algolia&quot;</code> und <code>analytics.provider: &quot;google&quot;</code>
 sprechen naturgemäß mit einer gehosteten API/einem Tracking-Endpunkt -
@@ -333,14 +333,14 @@ Erhält <code>variables.page</code>, <code>variables.nav</code>, <code>variables
 <code>variables.themeDir</code> und <code>variables.basePath</code> im Scope, und bindet das
 benachbarte <code>page.bxm</code> über <code>#variables.themeDir#/page.bxm</code> ein.
 <code>variables.basePath</code> ist immer ein root-relativer, auf <code>/</code> endender Pfad
-(standardmäßig <code>/</code>, <code>/my-docs/</code>, wenn <code>baseURL</code> in <code>bxsites.json</code> das
+(standardmäßig <code>/</code>, <code>/my-docs/</code>, wenn <code>baseURL</code> in <code>bxsites.yaml</code> das
 überschreibt) - stelle diesen jedem internen <code>href</code>/<code>src</code> voran, statt
 ein führendes <code>/</code> fest zu codieren, damit das Theme auch funktioniert,
 wenn die Website aus einem Unterpfad ausgeliefert wird.</li>
 <li><strong><code>page.bxm</code></strong> (erforderlich) - der Artikelinhalt. Rendert
 <code>variables.page.contentHtml</code> - das bereits konvertierte Markdown.</li>
 <li><strong><code>search.bxm</code></strong> (optional) - das Markup der Suchbox, von <code>layout.bxm</code>
-nur eingebunden, wenn <code>search</code> in <code>bxsites.json</code> <code>true</code> ist. Siehe
+nur eingebunden, wenn <code>search</code> in <code>bxsites.yaml</code> <code>true</code> ist. Siehe
 <a href="/bx-sites/development/theme/tailwind/de/guides/search/index.html">Suche</a>.</li>
 <li><strong><code>assets/</code></strong> (optional) - Theme-CSS/JS, zur Build-Zeit nach
 <code>site/assets/theme/</code> kopiert.</li>
@@ -370,11 +370,11 @@ fehl, statt mit einem verwirrenden Template-Fehler tief im Rendering.</p>
 Overkill - jedes integrierte Theme liest seine Palette aus einer Handvoll
 CSS-Custom-Properties auf <code>:root</code>, erneut deklariert unter
 <code>[data-theme=&quot;dark&quot;]</code> für den Dunkelmodus. Das
-<a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#extracss--extrajs"><code>extraCss</code></a> von <code>bxsites.json</code> wird
+<a href="/bx-sites/development/theme/tailwind/de/configuration/index.html#extracss--extrajs"><code>extraCss</code></a> von <code>bxsites.yaml</code> wird
 <em>nach</em> dem eigenen Stylesheet des Themes geladen, sodass eine erneute
 Deklaration mit gleicher Spezifität darin gewinnt, ohne <code>resources/themes/</code>
 überhaupt anzurühren:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;extraCss&quot;: [ &quot;assets/brand.css&quot; ] }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">extraCss: [ assets/brand.css ]
 </code></pre>
 <pre data-bxsites-start-line="1" data-bxsites-title="docs&#x2f;assets&#x2f;brand.css"><code class="language-css">/* docs/assets/brand.css - copied to site/assets/brand.css at build time */
 :root {
@@ -509,7 +509,7 @@ Schriftart zu tauschen, genügt der obere Teil von
 <ol start="3">
 <li>Führe <code>bxSites build</code> aus (oder <code>serve</code> während der
 Iteration) - BX Sites übernimmt <code>theme/</code> automatisch, keine Änderung an
-<code>bxsites.json</code> nötig (ein projektweiter <code>theme/</code>-Ordner hat immer
+<code>bxsites.yaml</code> nötig (ein projektweiter <code>theme/</code>-Ordner hat immer
 Vorrang vor dem im <code>theme.name</code> genannten integrierten Theme). Alles,
 was du nicht angefasst hast - Navigations-Rendering, Suche, der
 Dunkelmodus-Umschalter, Code-Annotationen - funktioniert genau so
@@ -525,7 +525,7 @@ Ordner, dem eine der beiden fehlt, schlägt sofort mit
 <code>BxSites.InvalidTheme</code> fehl, statt stillschweigend zurückzufallen). Für
 eine reine CSS-Anpassung ohne <code>.bxm</code>, nutze stattdessen
 <a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben"><code>extraCss</code></a> von oben - es
-legt sich über das Theme, das <code>bxsites.json</code> benennt, ganz ohne
+legt sich über das Theme, das <code>bxsites.yaml</code> benennt, ganz ohne
 <code>theme/</code>-Ordner. <code>theme/</code> ist für den Fall, dass du auch das Markup
 selbst ändern musst, siehe als Nächstes.</p>
 <h2 id="ein-theme-von-grund-auf-schreiben"><a href="#ein-theme-von-grund-auf-schreiben" id="ein-theme-von-grund-auf-schreiben" name="ein-theme-von-grund-auf-schreiben" class="anchor"></a>Ein Theme von Grund auf schreiben</h2>
@@ -535,7 +535,7 @@ keine Such-UI - um genau zu zeigen, was erforderlich ist im Vergleich zu
 dem, was die integrierten Themes zusätzlich bieten. Speichere beide als
 <code>theme/layout.bxm</code> und <code>theme/page.bxm</code> in deinem Projekt - ein
 projektweiter <code>theme/</code>-Ordner wird automatisch übernommen (wie oben),
-keine Änderung an <code>bxsites.json</code> nötig:</p>
+keine Änderung an <code>bxsites.yaml</code> nötig:</p>
 <pre data-bxsites-start-line="1" data-bxsites-title="theme&#x2f;layout.bxm"><code class="language-bx">&lt;!-- theme/layout.bxm --&gt;
 &lt;bx:script&gt;
 	function renderNav( required array nodes ) {
@@ -586,7 +586,7 @@ keine Änderung an <code>bxsites.json</code> nötig:</p>
 (Syntax-Hervorhebung, Admonitions, Tabs, Mathematik und alles), es bleibt
 also nichts mehr zu parsen, nur noch zu layouten. Von hier aus füge
 hinzu, was die integrierten Themes haben und du tatsächlich willst:
-<code>search.bxm</code> (nur eingebunden, wenn <code>search</code> in <code>bxsites.json</code> <code>true</code> ist</p>
+<code>search.bxm</code> (nur eingebunden, wenn <code>search</code> in <code>bxsites.yaml</code> <code>true</code> ist</p>
 <ul>
 <li>siehe <a href="/bx-sites/development/theme/tailwind/de/guides/search/index.html">Suche</a>), einen Dunkelmodus-Umschalter (kopiere das
 <code>x-data</code>/<code>x-init</code>-Alpine.js-Paar vom <code>&lt;body&gt;</code>-Tag von
@@ -600,7 +600,7 @@ für dein eigenes CSS/JS, automatisch zur Build-Zeit nach
 </ul>
 
 				</div>
-<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/bx-sites/development/theme/tailwind/de/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/bx-sites/development/theme/tailwind/de/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="mt-8 flex justify-between border-t border-slate-200 pt-4 text-sm font-semibold" aria-label="Seitennavigation">

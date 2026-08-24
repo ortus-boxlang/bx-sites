@@ -43,20 +43,19 @@ Seite einer Locale leitet innerhalb dieser Locale weiter
 (`site/es/old-path/`), genau so, wie es die eigene echte URL der Seite
 bereits tut. Es gibt nichts Zusätzliches pro Baum zu konfigurieren.
 
-## Websiteweit: `bxsites.json` `redirects`
+## Websiteweit: `bxsites.yaml` `redirects`
 
 Für eine alte URL, die nie zu einer bestimmten Seite gehörte - ein
 umstrukturierter Abschnitt, der Pfad einer alten Domain, alles, was
 nicht natürlich der eigene "alte Name" einer einzelnen Seite ist -
 liste stattdessen ein explizites `from`/`to`-Paar auf:
 
-```json title="bxsites.json" linenums="1"
-{
-	"redirects": [
-		{ "from": "old-guide", "to": "guides/new-guide/" },
-		{ "from": "moved-to-another-site", "to": "https://example.com/docs" }
-	]
-}
+```yaml title="bxsites.yaml" linenums="1"
+redirects:
+  - from: old-guide
+    to: guides/new-guide/
+  - from: moved-to-another-site
+    to: https://example.com/docs
 ```
 
 - `from` - das alte hübsche URL-Segment, dieselbe Form wie `redirect_from` oben

@@ -18,7 +18,7 @@ BX Sites の検索は完全に静的でクライアントサイドです。[mkdo
    フロントマターの `tags`、ページ上のすべての見出しのテキスト、
    本文の切り詰めたプレーンテキストのコピー（HTML タグを除去）を 1 エントリとして格納します。
 2. 各テーマの `search.bxm` パーシャルが検索ボックスをレンダリングします。
-   `layout.bxm` は `bxsites.json` の `search` が `true` の場合のみ
+   `layout.bxm` は `bxsites.yaml` の `search` が `true` の場合のみ
    これ（と `lunr.js` + 共有 `search.js` スクリプト）を含めます。
 3. ブラウザでは、共有の `assets/search.js` ウィジェットが `search-index.json` を
    一度取得し、`lunr` インデックスをビルドして（`title` を最高優先度として、
@@ -33,8 +33,8 @@ BX Sites の検索は完全に静的でクライアントサイドです。[mkdo
 
 ## 無効化
 
-```json
-{ "search": false }
+```yaml
+search: false
 ```
 
 `search-index.json` のビルドを完全にスキップし、すべてのレンダリングされたページから

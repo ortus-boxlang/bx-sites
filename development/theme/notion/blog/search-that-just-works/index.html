@@ -98,36 +98,30 @@
 </code></pre>
 <p>though in practice <code>build</code> already runs this as one of its own steps.</p>
 <h2 id="turning-it-off"><a href="#turning-it-off" id="turning-it-off" name="turning-it-off" class="anchor"></a>Turning it off</h2>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;search&quot;: false }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">search: false
 </code></pre>
 <p>Skips building the index entirely, and skips shipping the search box, the <code>lunr.js</code> script, and <code>search.js</code> - a project with search off ships nothing search-related at all.</p>
 <h2 id="when-local-search-isnt-enough"><a href="#when-local-search-isnt-enough" id="when-local-search-isnt-enough" name="when-local-search-isnt-enough" class="anchor"></a>When local search isn't enough</h2>
 <p>For most docs sites, lunr's relevance ranking is genuinely good. But if you're running a large site and want crawler-hosted, typo-tolerant search, swap providers instead of fighting the default:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;search&quot;: true,
-	&quot;searchProvider&quot;: {
-		&quot;provider&quot;: &quot;algolia&quot;,
-		&quot;algolia&quot;: {
-			&quot;appId&quot;: &quot;ABC123&quot;,
-			&quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
-			&quot;indexName&quot;: &quot;my-docs&quot;
-		}
-	}
-}
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">search: true
+searchProvider:
+  provider: algolia
+  algolia:
+    appId: ABC123
+    apiKey: a1b2c3d4e5f6...
+    indexName: my-docs
 </code></pre>
 <p>With Algolia active, no <code>search-index.json</code> is built at all - Algolia serves results from its own hosted index, populated by DocSearch's crawler (or your own Algolia Crawler config), and each theme renders an empty container that <code>docsearch({...})</code> mounts into.</p>
 <p>Prefer something that indexes your <em>built</em> HTML rather than a crawler hitting your live site? <a href="https://pagefind.app/">Pagefind</a> is the other built-in option:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;search&quot;: true,
-	&quot;searchProvider&quot;: { &quot;provider&quot;: &quot;pagefind&quot; }
-}
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">search: true
+searchProvider: { provider: pagefind }
 </code></pre>
 <p>The <code>pagefind</code> CLI has to already be on your <code>PATH</code> - BX Sites shells out to it right after the doc tree (including every version and locale) is written, and a missing binary fails the build loudly rather than shipping a site whose search silently doesn't work.</p>
 <p>I still reach for the local <code>lunr</code> default on almost every project I ship - it's zero-config, it's fast enough that I've never noticed the difference, and it means one less moving part at deploy time. Pagefind is the one I'd pick next, mostly because it indexes the real rendered HTML rather than trusting my own frontmatter to be accurate.</p>
 <p>Which provider is your site running - and if you switched off the default, what pushed you to do it?</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/blog/posts/search-that-just-works.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/notion/blog/posts/search-that-just-works.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/blog/posts/search-that-just-works.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/notion/blog/posts/search-that-just-works.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="ntn-page-nav" aria-label="Page navigation">

@@ -124,5 +124,5 @@ Die migrierte `docs/nav.json` ist eine reine
 andere, oder lösche sie, um auf bx-sites' eigene Konvention
 Ordnerstruktur-ist-Navigationsstruktur zurückzufallen. Von hier an ist es
 ein normales bx-sites-Projekt: wähle ein [Theme](themes.md), überprüfe
-[`bxsites.json`](../configuration.md) und [deploye](deployment.md), sobald
+[`bxsites.yaml`](../configuration.md) und [deploye](deployment.md), sobald
 du zufrieden bist.

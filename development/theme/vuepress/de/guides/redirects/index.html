@@ -81,7 +81,7 @@
 
 				<h1 class="vp-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,112l-33.62,37.35a8,8,0,0,1-5.94,2.65H40a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H200.44a8,8,0,0,1,5.94,2.65Z" opacity="0.2"/><path d="M246,106.65,212.33,69.3A16,16,0,0,0,200.44,64H136V32a8,8,0,0,0-16,0V64H40A16,16,0,0,0,24,80v64a16,16,0,0,0,16,16h80v64a8,8,0,0,0,16,0V160h64.44a16,16,0,0,0,11.89-5.3L246,117.35A8,8,0,0,0,246,106.65ZM200.44,144H40V80H200.44l28.8,32Z"/></svg></span> Weiterleitungen</h1>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/vuepress/de/tags/index.html#tag-anleitungen">anleitungen</a><a class="page-tag" href="/bx-sites/development/theme/vuepress/de/tags/index.html#tag-weiterleitungen">weiterleitungen</a></div>
-<details class="bxsites-toc-mobile vp-toc--mobile"><summary class="vp-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="vp-toc__item vp-toc__item--2"><a href="#pro-seite-frontmatter-redirect-from">Pro Seite&#x3a; Frontmatter redirect_from</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#websiteweit-bxsitesjson-redirects">Websiteweit&#x3a; bxsites.json redirects</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#pagerename-setzt-das-für-dich">page&#x3a;rename setzt das f&uuml;r dich</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#konflikte">Konflikte</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#was-vorerst-außen-vor-bleibt">Was &#x28;vorerst&#x29; au&szlig;en vor bleibt</a></li></ul></details>
+<details class="bxsites-toc-mobile vp-toc--mobile"><summary class="vp-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="vp-toc__item vp-toc__item--2"><a href="#pro-seite-frontmatter-redirect-from">Pro Seite&#x3a; Frontmatter redirect_from</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#websiteweit-bxsitesyaml-redirects">Websiteweit&#x3a; bxsites.yaml redirects</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#pagerename-setzt-das-für-dich">page&#x3a;rename setzt das f&uuml;r dich</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#konflikte">Konflikte</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#was-vorerst-außen-vor-bleibt">Was &#x28;vorerst&#x29; au&szlig;en vor bleibt</a></li></ul></details>
 				<div class="vp-content-body">
 				<h1 id="weiterleitungen"><a href="#weiterleitungen" id="weiterleitungen" name="weiterleitungen" class="anchor"></a>Weiterleitungen</h1>
 <p>Halte eine alte URL funktionsfähig, nachdem du eine Seite verschiebst,
@@ -113,17 +113,16 @@ Version weiter (<code>site/versions/2.0/old-path/</code>), die eigene übersetzt
 Seite einer Locale leitet innerhalb dieser Locale weiter
 (<code>site/es/old-path/</code>), genau so, wie es die eigene echte URL der Seite
 bereits tut. Es gibt nichts Zusätzliches pro Baum zu konfigurieren.</p>
-<h2 id="websiteweit-bxsitesjson-redirects"><a href="#websiteweit-bxsitesjson-redirects" id="websiteweit-bxsitesjson-redirects" name="websiteweit-bxsitesjson-redirects" class="anchor"></a>Websiteweit: <code>bxsites.json</code> <code>redirects</code></h2>
+<h2 id="websiteweit-bxsitesyaml-redirects"><a href="#websiteweit-bxsitesyaml-redirects" id="websiteweit-bxsitesyaml-redirects" name="websiteweit-bxsitesyaml-redirects" class="anchor"></a>Websiteweit: <code>bxsites.yaml</code> <code>redirects</code></h2>
 <p>Für eine alte URL, die nie zu einer bestimmten Seite gehörte - ein
 umstrukturierter Abschnitt, der Pfad einer alten Domain, alles, was
 nicht natürlich der eigene &quot;alte Name&quot; einer einzelnen Seite ist -
 liste stattdessen ein explizites <code>from</code>/<code>to</code>-Paar auf:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;redirects&quot;: [
-		{ &quot;from&quot;: &quot;old-guide&quot;, &quot;to&quot;: &quot;guides/new-guide/&quot; },
-		{ &quot;from&quot;: &quot;moved-to-another-site&quot;, &quot;to&quot;: &quot;https://example.com/docs&quot; }
-	]
-}
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">redirects:
+  - from: old-guide
+    to: guides/new-guide/
+  - from: moved-to-another-site
+    to: https://example.com/docs
 </code></pre>
 <ul>
 <li><code>from</code> - das alte hübsche URL-Segment, dieselbe Form wie <code>redirect_from</code> oben</li>
@@ -167,7 +166,7 @@ exakter alter Pfad - es gibt kein <code>guides/old/*</code>-Catch-all.</li>
 </ul>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/redirects.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/vuepress/de/guides/redirects.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/redirects.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/vuepress/de/guides/redirects.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 
@@ -175,7 +174,7 @@ exakter alter Pfad - es gibt kein <code>guides/old/*</code>-Catch-all.</li>
 		</main>
 
 		<aside class="vp-toc-sidebar">
-			<nav class="vp-toc" aria-label="Auf dieser Seite"><div class="vp-toc__title">Auf dieser Seite</div><ul><li class="vp-toc__item vp-toc__item--2"><a href="#pro-seite-frontmatter-redirect-from">Pro Seite&#x3a; Frontmatter redirect_from</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#websiteweit-bxsitesjson-redirects">Websiteweit&#x3a; bxsites.json redirects</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#pagerename-setzt-das-für-dich">page&#x3a;rename setzt das f&uuml;r dich</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#konflikte">Konflikte</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#was-vorerst-außen-vor-bleibt">Was &#x28;vorerst&#x29; au&szlig;en vor bleibt</a></li></ul></nav>
+			<nav class="vp-toc" aria-label="Auf dieser Seite"><div class="vp-toc__title">Auf dieser Seite</div><ul><li class="vp-toc__item vp-toc__item--2"><a href="#pro-seite-frontmatter-redirect-from">Pro Seite&#x3a; Frontmatter redirect_from</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#websiteweit-bxsitesyaml-redirects">Websiteweit&#x3a; bxsites.yaml redirects</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#pagerename-setzt-das-für-dich">page&#x3a;rename setzt das f&uuml;r dich</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#konflikte">Konflikte</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#was-vorerst-außen-vor-bleibt">Was &#x28;vorerst&#x29; au&szlig;en vor bleibt</a></li></ul></nav>
 		</aside>
 
 	</div>

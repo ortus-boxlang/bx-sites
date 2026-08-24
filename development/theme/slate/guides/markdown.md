@@ -10,7 +10,7 @@ tags: [guides, markdown]
 Beyond standard Markdown, BX Sites turns on three of bx-markdown's native
 Flexmark extensions by default - admonitions, footnotes and definition lists
 - plus a Mermaid diagram integration of its own. All four are configurable
-via [`bxsites.json`'s `markdown`/`mermaid` keys](../configuration.md#markdown).
+via [`bxsites.yaml`'s `markdown`/`mermaid` keys](../configuration.md#markdown).
 
 On top of those, BX Sites implements three more extensions of its own that
 Flexmark has no concept of at all - content tabs, math, and fenced-code
@@ -28,7 +28,7 @@ flowchart LR
 
 ## Admonitions
 
-A callout/note box - on by default, no `bxsites.json` config needed:
+A callout/note box - on by default, no `bxsites.yaml` config needed:
 
 ```markdown title="Example" linenums="1"
 !!! note "Heads Up"
@@ -183,7 +183,7 @@ Which renders as:
 
 Consecutive `=== "..."` blocks (separated by at most one blank line) form a
 single tab group; a tab's own content is full markdown, so code fences,
-lists, admonitions, whatever you'd write anywhere else. No `bxsites.json`
+lists, admonitions, whatever you'd write anywhere else. No `bxsites.yaml`
 config needed - always on.
 
 ## Code Blocks
@@ -230,7 +230,7 @@ numeric function add( required numeric a, required numeric b ) {
 `linenums="N"` starts the gutter counting at `N`; `hl_lines` takes
 space-separated line numbers and/or ranges (`"2 4-6"`) to highlight, counted
 from the top of the block regardless of where `linenums` starts; `title`
-adds a small title bar above the block. No `bxsites.json` config needed -
+adds a small title bar above the block. No `bxsites.yaml` config needed -
 always available.
 
 ### Diff markers and terminal frames
@@ -285,7 +285,7 @@ box install bx-sites
 
 `frame="code"` is the explicit name for today's plain bar - the default;
 nothing needs to write it. Both `insert`/`delete` and `frame` need no
-`bxsites.json` config, same as `hl_lines`/`linenums`/`title`.
+`bxsites.yaml` config, same as `hl_lines`/`linenums`/`title`.
 
 #### Real git diffs
 
@@ -360,10 +360,10 @@ starts.
 
 ## Diagrams
 
-Opt-in via `bxsites.json`'s [`mermaid`](../configuration.md#mermaid) key:
+Opt-in via `bxsites.yaml`'s [`mermaid`](../configuration.md#mermaid) key:
 
-```json title="bxsites.json"
-{ "mermaid": true }
+```yaml title="bxsites.yaml"
+mermaid: true
 ```
 
 Once enabled, any ` ```mermaid ` fenced code block renders as a live
@@ -382,10 +382,10 @@ for everything it can draw.
 
 ## Math
 
-Opt-in via `bxsites.json`'s [`math`](../configuration.md#math) key:
+Opt-in via `bxsites.yaml`'s [`math`](../configuration.md#math) key:
 
-```json title="bxsites.json"
-{ "math": true }
+```yaml title="bxsites.yaml"
+math: true
 ```
 
 Once enabled, [KaTeX](https://katex.org/) typesets `$...$` for inline math

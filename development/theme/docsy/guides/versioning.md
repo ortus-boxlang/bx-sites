@@ -8,7 +8,7 @@ tags: [guides, versioning]
 
 # Versioning
 
-Versioned docs are convention over configuration - there's no `bxsites.json`
+Versioned docs are convention over configuration - there's no `bxsites.yaml`
 key to turn on. Add a `docs/versions/` folder, and each direct subfolder
 inside it is built as its own fully self-contained doc tree, alongside your
 regular `docs/` (which always builds as "Latest"):
@@ -29,7 +29,7 @@ docs/
 Each version folder is a normal `docs/`-shaped tree - its own `index.md`,
 its own nav, its own pages - built into `site/versions/<name>/` with every
 internal link prefixed accordingly, and sharing the project's single
-`bxsites.json` config/theme. A loose file placed directly under
+`bxsites.yaml` config/theme. A loose file placed directly under
 `docs/versions/` (not inside a subfolder) is ignored.
 
 ## Cutting a new version

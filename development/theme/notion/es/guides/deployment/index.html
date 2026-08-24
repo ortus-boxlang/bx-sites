@@ -99,7 +99,7 @@ de flujo de trabajo. El resto de esta guía cubre el flujo de trabajo de
 GitHub Actions que este mismo repositorio usa, para la publicación
 automática multiversión en cada push.</p>
 <h2 id="qué-hace"><a href="#qué-hace" id="qué-hace" name="qué-hace" class="anchor"></a>Qué hace</h2>
-<p>En cada push a <code>main</code> o <code>development</code> que toque <code>docs/</code>, <code>bxsites.json</code>, o
+<p>En cada push a <code>main</code> o <code>development</code> que toque <code>docs/</code>, <code>bxsites.yaml</code>, o
 la propia fuente del módulo (cambios de tema/canalización), el flujo de
 trabajo:</p>
 <ol>
@@ -139,10 +139,10 @@ reciente, no publicada. Ambas permanecen activas simultáneamente: el
 trabajo de cada rama solo empuja a <code>gh-pages</code> con <code>keep_files: true</code> y su
 propio <code>destination_dir</code>, de modo que un despliegue de <code>development</code>
 nunca sobrescribe el contenido de <code>main</code> y viceversa.</p>
-<p>El propio <code>bxsites.json</code> de <code>main</code> debería tener <code>baseURL</code> configurado a
+<p>El propio <code>bxsites.yaml</code> de <code>main</code> debería tener <code>baseURL</code> configurado a
 la raíz del sitio (<code>https://&lt;user&gt;.github.io/&lt;repo&gt;/</code>); el flujo de
 trabajo lo sobrescribe para cualquier otra rama en el momento de la
-construcción, así que el <code>bxsites.json</code> de <code>development</code> no necesita su
+construcción, así que el <code>bxsites.yaml</code> de <code>development</code> no necesita su
 propia entrada <code>baseURL</code> para que esto funcione.</p>
 <p>Para añadir una tercera rama (por ejemplo, una vista previa de
 <code>release/2.0</code>), añádela a la lista <code>on.push.branches</code> y dale su propio
@@ -159,11 +159,11 @@ línea <code>modules:</code> si tu proyecto necesita algo más allá de
 <h2 id="servir-desde-una-subruta-de-pages-de-proyecto"><a href="#servir-desde-una-subruta-de-pages-de-proyecto" id="servir-desde-una-subruta-de-pages-de-proyecto" name="servir-desde-una-subruta-de-pages-de-proyecto" class="anchor"></a>Servir desde una subruta de Pages de proyecto</h2>
 <p>Un sitio de GitHub <em>Project</em> Pages (a diferencia de un sitio <em>user</em>
 <code>&lt;user&gt;.github.io</code>) se sirve desde <code>https://&lt;user&gt;.github.io/&lt;repo&gt;/</code>, no
-desde la raíz del dominio. Configura <code>baseURL</code> en <code>bxsites.json</code> con esa
+desde la raíz del dominio. Configura <code>baseURL</code> en <code>bxsites.yaml</code> con esa
 URL completa para que cada enlace interno, recurso y entrada de
 navegación obtenga el prefijo <code>/&lt;repo&gt;/</code> que necesita - y para que
 también se genere un <code>sitemap.xml</code> real:</p>
-<pre><code class="language-json">{ &quot;baseURL&quot;: &quot;https://&lt;user&gt;.github.io/&lt;repo&gt;/&quot; }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">baseURL: &quot;https://&lt;user&gt;.github.io/&lt;repo&gt;/&quot;
 </code></pre>
 <p>Consulta <a href="/bx-sites/development/theme/notion/es/configuration/index.html#baseurl">Configuración</a> para el desglose
 completo de qué hace <code>baseURL</code>. Un sitio de usuario <code>&lt;user&gt;.github.io</code>, o
@@ -171,7 +171,7 @@ cualquier dominio personalizado asignado a la raíz del sitio, puede dejar
 <code>baseURL</code> en su valor por defecto (<code>/</code>).</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/notion/es/guides/deployment.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/notion/es/guides/deployment.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="ntn-page-nav" aria-label="Navegaci&oacute;n de p&aacute;gina">

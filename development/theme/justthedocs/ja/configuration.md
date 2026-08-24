@@ -117,8 +117,9 @@ blog:
 必須なのは `name` のみで、それ以外はすべて上記のデフォルト値にフォールバックします。
 `theme` オブジェクトは1階層のみマージされるため、`{theme: {name: material}}` だけを
 指定してもデフォルトの（空の）`options` は保持されます。以下の各キーはどちらの形式でも
-名前と構造が同じです。このページの残りの部分では簡潔さのために JSON のスニペットのみを
-示しますが、YAML でも同様に読み替えられます。
+名前と構造が同じです。このページの残りの部分では、`bxSites new` 自身のデフォルト形式に
+合わせて YAML のスニペットを示しますが、どのスニペットも JSON で書いても同様に
+読み替えられます。
 
 ## `name`
 
@@ -183,8 +184,8 @@ blog:
     設定します。訪問者がいったんトグルを切り替えると、その選択（`localStorage` に
     保存されます）は、この設定に関わらず以降の訪問で常に優先されます。
 
-    ```json
-    { "theme": { "options": { "colorMode": "dark" } } }
+    ```yaml
+    theme: { options: { colorMode: dark } }
     ```
   - `theme.options.navCollapsible` - `false`（デフォルト）は、今日と同様にすべての
     ナビゲーションセクションを常に展開して表示します。`true` にすると、子要素を持つ
@@ -199,8 +200,8 @@ blog:
     現在のページを含むセクションを除くすべてのセクションを折りたたんだ状態で
     開始します。
 
-    ```json
-    { "theme": { "options": { "navCollapsible": true, "navExpandAll": false } } }
+    ```yaml
+    theme: { options: { navCollapsible: true, navExpandAll: false } }
     ```
   - `theme.options.tocPosition` - ページ自身の「このページの内容」目次がどこに
     レンダリングされるか。`"top"`（デフォルト）は、今日と同様に記事の先頭にインラインで
@@ -214,8 +215,8 @@ blog:
     同じ扱いです。そのため TOC はどのビューポート幅でも到達可能なままで、
     利用できるスペースに応じて形を変えるだけです。
 
-    ```json
-    { "theme": { "options": { "tocPosition": "sticky" } } }
+    ```yaml
+    theme: { options: { tocPosition: sticky } }
     ```
   - `theme.options.pageMetaPosition` - このページを編集/Markdown をダウンロード/
     最終更新の行が、ページ自身のコンテンツに対してどこにレンダリングされるか。
@@ -223,8 +224,8 @@ blog:
     レンダリングします。`"top"` にすると、タイトルの近くにレンダリングされます -
     このオプションが存在する前は常にそこにレンダリングされていた場所です。
 
-    ```json
-    { "theme": { "options": { "pageMetaPosition": "top" } } }
+    ```yaml
+    theme: { options: { pageMetaPosition: top } }
     ```
 
 ## `search`
@@ -249,18 +250,14 @@ blog:
   `insights`（デフォルトは `false`）は DocSearch のクリック/コンバージョン分析を
   有効にします。
 
-  ```json title="bxsites.json" linenums="1"
-  {
-    "search": true,
-    "searchProvider": {
-      "provider": "algolia",
-      "algolia": {
-        "appId": "ABC123",
-        "apiKey": "a1b2c3d4e5f6...",
-        "indexName": "my-docs"
-      }
-    }
-  }
+  ```yaml title="bxsites.yaml" linenums="1"
+  search: true
+  searchProvider:
+    provider: algolia
+    algolia:
+      appId: ABC123
+      apiKey: a1b2c3d4e5f6...
+      indexName: my-docs
   ```
 
 - `pagefind` - `provider` が `"pagefind"` の場合、両方のキーとも省略可能です:
@@ -270,14 +267,11 @@ blog:
   必要があります - BX Sites は（`lastUpdated`/`gh-deploy` の `git` と同様に）
   これを呼び出すだけで、代わりにインストールすることはありません。
 
-  ```json title="bxsites.json" linenums="1"
-  {
-    "search": true,
-    "searchProvider": {
-      "provider": "pagefind",
-      "pagefind": { "bin": "pagefind", "options": [] }
-    }
-  }
+  ```yaml title="bxsites.yaml" linenums="1"
+  search: true
+  searchProvider:
+    provider: pagefind
+    pagefind: { bin: pagefind, options: [] }
   ```
 
 ## `nav`
@@ -306,26 +300,21 @@ blog:
 セクションラベルです - その子要素をまとめるだけの、クリックできない見出しで、
 GitBook 自身のサイドバーにおける「MAIN COMPONENTS」と同じ役割を果たします:
 
-```json title="bxsites.json" linenums="1"
-{
-	"nav": [
-		"index.md",
-		{
-			"title": "メインコンポーネント",
-			"children": [
-				{ "title": "クイックスタート", "path": "guides/setup.md" },
-				"guides/deployment.md"
-			]
-		}
-	]
-}
+```yaml title="bxsites.yaml" linenums="1"
+nav:
+  - index.md
+  - title: メインコンポーネント
+    children:
+      - title: クイックスタート
+        path: guides/setup.md
+      - guides/deployment.md
 ```
 
 同じグループエントリに `path` を与えると、単なるラベルではなく（自身のランディング
 ページと子要素を持つ）通常のリンク付きセクションになります - どちらの形でも
 `theme.options.navCollapsible` の下では同じようにネストされます（上記参照）。
 
-`bxsites.json` が煩雑になるほど nav が大きい場合は、代わりに独自の `docs/nav.json`
+`bxsites.yaml` が煩雑になるほど nav が大きい場合は、代わりに独自の `docs/nav.json`
 ファイルに移動できます - 配列の形は同じで、ファイル全体のトップレベルの内容として
 そのまま置くだけです:
 
@@ -336,7 +325,7 @@ GitBook 自身のサイドバーにおける「MAIN COMPONENTS」と同じ役割
 ]
 ```
 
-`bxsites.json` 自身の `nav` が非空の場合、常に `docs/nav.json` より優先されます。
+`bxsites.yaml` 自身の `nav` が非空の場合、常に `docs/nav.json` より優先されます。
 どちらもメインツリーのみに適用されます - `docs/versions/<name>/` ツリーは、
 メインツリーに明示的な nav があっても、常に自身のフォルダ構造から nav を推定します。
 
@@ -345,12 +334,10 @@ GitBook 自身のサイドバーにおける「MAIN COMPONENTS」と同じ役割
 `[]`（デフォルト）- サイト全体の `from`/`to` 古い URL リダイレクトで、
 メインツリーにのみ適用されます:
 
-```json title="bxsites.json" linenums="1"
-{
-	"redirects": [
-		{ "from": "old-guide", "to": "guides/new-guide/" }
-	]
-}
+```yaml title="bxsites.yaml" linenums="1"
+redirects:
+  - from: old-guide
+    to: guides/new-guide/
 ```
 
 - `redirects[].from` - 静的なリダイレクトスタブが書き込まれる古いプリティ URL
@@ -395,15 +382,12 @@ GitBook 自身のサイドバーにおける「MAIN COMPONENTS」と同じ役割
 | `tableOptions.className` | `"table"` | レンダリングされるすべての `<table>` の CSS クラス |
 | `tableOptions.headerSeparationColumnMatch` | `true` | `---` の区切り行がヘッダーの列数と一致することを要求 |
 
-```json title="bxsites.json" linenums="1"
-{
-	"markdown": {
-		"enableFootnotes": true,
-		"enableDefinitionLists": true,
-		"anchorLinks": false,
-		"enableYouTubeTransformer": true
-	}
-}
+```yaml title="bxsites.yaml" linenums="1"
+markdown:
+  enableFootnotes: true
+  enableDefinitionLists: true
+  anchorLinks: false
+  enableYouTubeTransformer: true
 ```
 
 ## `repo`
@@ -420,8 +404,8 @@ GitBook 自身のサイドバーにおける「MAIN COMPONENTS」と同じ役割
   になります。これにも `repo.url` が必要です。ヘッダーアイコンは表示したまま編集
   リンクだけを省略するには空白のままにします。
 
-```json title="bxsites.json"
-{ "repo": { "url": "https://github.com/acme/docs", "editUri": "edit/main/docs/" } }
+```yaml title="bxsites.yaml"
+repo: { url: "https://github.com/acme/docs", editUri: "edit/main/docs/" }
 ```
 
 ## `social`
@@ -433,13 +417,10 @@ GitBook 自身のサイドバーにおける「MAIN COMPONENTS」と同じ役割
 汎用のリンクグリフにフォールバック）から選択し、`label` はリンクのアクセシブルな
 名前/ツールチップを設定します（デフォルトは `icon`、それもなければ `"Link"`）。
 
-```json title="bxsites.json" linenums="1"
-{
-	"social": [
-		{ "url": "https://twitter.com/acme", "icon": "twitter", "label": "Twitter" },
-		{ "url": "https://acme.com/rss.xml", "icon": "rss", "label": "RSS" }
-	]
-}
+```yaml title="bxsites.yaml" linenums="1"
+social:
+  - { url: "https://twitter.com/acme", icon: twitter, label: Twitter }
+  - { url: "https://acme.com/rss.xml", icon: rss, label: RSS }
 ```
 
 ## `footer`
@@ -448,8 +429,8 @@ GitBook 自身のサイドバーにおける「MAIN COMPONENTS」と同じ役割
 追加されます: 著作権行（`© <year> <site name>`）、`social` リンク（あれば）、
 「Built with BX Sites」のクレジット。
 
-```json title="bxsites.json"
-{ "footer": true }
+```yaml title="bxsites.yaml"
+footer: true
 ```
 
 ## `lastUpdated`
@@ -461,8 +442,8 @@ git が履歴を持たないページ（まだコミットのない新しい `gi
 ダウンロード済み zip から実行されたビルド、ビルドマシンに git がインストールされて
 いない場合など）では、ビルドを壊すことなく黙って省略されます。
 
-```json title="bxsites.json"
-{ "lastUpdated": true }
+```yaml title="bxsites.yaml"
+lastUpdated: true
 ```
 
 ## `analytics`
@@ -474,8 +455,8 @@ git が履歴を持たないページ（まだコミットのない新しい `gi
 - `analytics.id` - Google Analytics の測定 ID（例: `"G-ABC123"`）。`provider` が
   `"google"` の場合は必須です。
 
-```json title="bxsites.json"
-{ "analytics": { "provider": "google", "id": "G-ABC123" } }
+```yaml title="bxsites.yaml"
+analytics: { provider: google, id: "G-ABC123" }
 ```
 
 ## `ogImage`
@@ -486,8 +467,8 @@ git が履歴を持たないページ（まだコミットのない新しい `gi
 `baseURL` がプレフィックスされ、絶対 URL はそのまま使用されます）。空白（デフォルト）で
 `generateOgImages` もオフの場合、`og:image`/`twitter:card` タグは一切レンダリングされません。
 
-```json title="bxsites.json"
-{ "ogImage": "assets/social-card.png" }
+```yaml title="bxsites.yaml"
+ogImage: assets/social-card.png
 ```
 
 そのページのフロントマター `ogImage`（[はじめに](getting-started.md#ページの追加) を
@@ -503,8 +484,8 @@ PNG ソーシャルカードがレンダリングされます - ブランドグ�
 （BoxLang が動作するあらゆる JVM の一部）で実装されているため、ビルド時にヘッドレス
 ブラウザや外部サービス、ネットワークアクセスは一切必要ありません。
 
-```json title="bxsites.json"
-{ "generateOgImages": true }
+```yaml title="bxsites.yaml"
+generateOgImages: true
 ```
 
 ## `extraCss` / `extraJs`
@@ -514,11 +495,9 @@ PNG ソーシャルカードがレンダリングされます - ブランドグ�
 （相対パスには `baseURL` がプレフィックスされ、絶対 URL はそのまま使用されます）。
 `extraJs` のエントリは `defer` 付きで読み込まれます。
 
-```json title="bxsites.json" linenums="1"
-{
-	"extraCss": [ "assets/custom.css" ],
-	"extraJs": [ "assets/custom.js" ]
-}
+```yaml title="bxsites.yaml" linenums="1"
+extraCss: [ assets/custom.css ]
+extraJs: [ assets/custom.js ]
 ```
 
 `assets.bundle` が有効な場合（デフォルト）、上記のようなローカルの `extraCss`/`extraJs`
@@ -528,18 +507,14 @@ PNG ソーシャルカードがレンダリングされます - ブランドグ�
 
 ## `assets`
 
-```json title="bxsites.json" linenums="1"
-{
-	"assets": {
-		"fingerprint": true,
-		"bundle": true,
-		"images": {
-			"enabled": true,
-			"widths": [ 400, 800, 1200, 1600 ],
-			"formats": [ "original", "webp" ]
-		}
-	}
-}
+```yaml title="bxsites.yaml" linenums="1"
+assets:
+  fingerprint: true
+  bundle: true
+  images:
+    enabled: true
+    widths: [ 400, 800, 1200, 1600 ]
+    formats: [ original, webp ]
 ```
 
 アセットパイプライン - [bx-image](https://github.com/ortus-boxlang/bx-image)
@@ -582,8 +557,8 @@ PNG ソーシャルカードがレンダリングされます - ブランドグ�
 ` ```mermaid ` フェンス付きコードブロックがすべてダイアグラムとしてレンダリングされます。
 構文については [Markdown 拡張](guides/markdown.md#diagrams) を参照してください。
 
-```json title="bxsites.json"
-{ "mermaid": true }
+```yaml title="bxsites.yaml"
+mermaid: true
 ```
 
 ## `math`
@@ -593,8 +568,8 @@ PNG ソーシャルカードがレンダリングされます - ブランドグ�
 `$...$`/`$$...$$` が組版されます。構文については
 [Markdown 拡張](guides/markdown.md#math) を参照してください。
 
-```json title="bxsites.json"
-{ "math": true }
+```yaml title="bxsites.yaml"
+math: true
 ```
 
 admonition（note/warning/tip 形式のコールアウトボックス）、コンテンツタブ、
@@ -610,8 +585,8 @@ admonition（note/warning/tip 形式のコールアウトボックス）、コ�
 インタラクティブなウィジェットとしてレンダリングします。構文については
 [コンテンツブロック](guides/content-blocks.md#openapi--swagger) を参照してください。
 
-```json title="bxsites.json"
-{ "openapi": true }
+```yaml title="bxsites.yaml"
+openapi: true
 ```
 
 ## `plugins`
@@ -621,8 +596,8 @@ admonition（note/warning/tip 形式のコールアウトボックス）、コ�
 有効化されることはありません - ここにも名前を書く必要があります。プラグインの
 書き方については [プラグイン](guides/plugins.md) を参照してください。
 
-```json title="bxsites.json"
-{ "plugins": [ "myBxSitesPlugin" ] }
+```yaml title="bxsites.yaml"
+plugins: [ myBxSitesPlugin ]
 ```
 
 ## `i18n`
@@ -647,16 +622,12 @@ admonition（note/warning/tip 形式のコールアウトボックス）、コ�
   `de`/`es`/`it`/`ja` にはすでに組み込みの翻訳が付属しているため、`strings` は
   特定のキーを上書きするか、別のロケールを追加する場合にのみ必要です。
 
-```json title="bxsites.json" linenums="1"
-{
-	"i18n": {
-		"defaultLocale": { "code": "en", "label": "English" },
-		"locales": [
-			{ "code": "es", "label": "Español" },
-			{ "code": "ar", "label": "العربية", "dir": "rtl" }
-		]
-	}
-}
+```yaml title="bxsites.yaml" linenums="1"
+i18n:
+  defaultLocale: { code: en, label: English }
+  locales:
+    - { code: es, label: Español }
+    - { code: ar, label: العربية, dir: rtl }
 ```
 
 未翻訳ページのフォールバック、言語スイッチャー、まだ翻訳されていない部分を含む
@@ -678,8 +649,8 @@ admonition（note/warning/tip 形式のコールアウトボックス）、コ�
   フィードを配信すると、ポーリングのたびに帯域を無駄にするだけです -
   [ブログ: フィード](guides/blog.md#feed) を参照してください。
 
-```json title="bxsites.json"
-{ "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
+```yaml title="bxsites.yaml"
+blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
 ```
 
 投稿/著者のフロントマター、カテゴリ、注目画像、SEO/ソーシャルメタデータについては
@@ -687,7 +658,7 @@ admonition（note/warning/tip 形式のコールアウトボックス）、コ�
 
 ## バージョニング
 
-バージョン管理されたドキュメントは設定より規約を重視します - `bxsites.json` に
+バージョン管理されたドキュメントは設定より規約を重視します - `bxsites.yaml` に
 専用キーはありません。`docs/versions/<name>/` フォルダを追加すると、それは独自の
 ドキュメントツリーとして自動的にビルドされ、複数のバージョンが存在するようになると
 すべてのテーマが自動的にバージョンスイッチャーをレンダリングします。`version:new` で

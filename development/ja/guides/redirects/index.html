@@ -87,7 +87,7 @@
 
 					<h1 class="page-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,112l-33.62,37.35a8,8,0,0,1-5.94,2.65H40a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H200.44a8,8,0,0,1,5.94,2.65Z" opacity="0.2"/><path d="M246,106.65,212.33,69.3A16,16,0,0,0,200.44,64H136V32a8,8,0,0,0-16,0V64H40A16,16,0,0,0,24,80v64a16,16,0,0,0,16,16h80v64a8,8,0,0,0,16,0V160h64.44a16,16,0,0,0,11.89-5.3L246,117.35A8,8,0,0,0,246,106.65ZM200.44,144H40V80H200.44l28.8,32Z"/></svg></span> &#x30ea;&#x30c0;&#x30a4;&#x30ec;&#x30af;&#x30c8;</h1>
 <div class="page-tags mb-3"><a class="page-tag" href="/bx-sites/development/ja/tags/index.html#tag-ガイド">&#x30ac;&#x30a4;&#x30c9;</a><a class="page-tag" href="/bx-sites/development/ja/tags/index.html#tag-リダイレクト">&#x30ea;&#x30c0;&#x30a4;&#x30ec;&#x30af;&#x30c8;</a></div>
-<details class="bxsites-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">&#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x306e;&#x5185;&#x5bb9;</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#ページ単位-フロントマター-redirect-from">&#x30da;&#x30fc;&#x30b8;&#x5358;&#x4f4d;&#x3a; &#x30d5;&#x30ed;&#x30f3;&#x30c8;&#x30de;&#x30bf;&#x30fc; redirect_from</a></li><li class="toc-level-2"><a href="#サイト全体-bxsitesjson-の-redirects">&#x30b5;&#x30a4;&#x30c8;&#x5168;&#x4f53;&#x3a; bxsites.json &#x306e; redirects</a></li><li class="toc-level-2"><a href="#pagerename-が自動的に設定します">page&#x3a;rename &#x304c;&#x81ea;&#x52d5;&#x7684;&#x306b;&#x8a2d;&#x5b9a;&#x3057;&#x307e;&#x3059;</a></li><li class="toc-level-2"><a href="#競合">&#x7af6;&#x5408;</a></li><li class="toc-level-2"><a href="#現在対象外の機能">&#x73fe;&#x5728;&#x5bfe;&#x8c61;&#x5916;&#x306e;&#x6a5f;&#x80fd;</a></li></ul></details>
+<details class="bxsites-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">&#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x306e;&#x5185;&#x5bb9;</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#ページ単位-フロントマター-redirect-from">&#x30da;&#x30fc;&#x30b8;&#x5358;&#x4f4d;&#x3a; &#x30d5;&#x30ed;&#x30f3;&#x30c8;&#x30de;&#x30bf;&#x30fc; redirect_from</a></li><li class="toc-level-2"><a href="#サイト全体-bxsitesyaml-の-redirects">&#x30b5;&#x30a4;&#x30c8;&#x5168;&#x4f53;&#x3a; bxsites.yaml &#x306e; redirects</a></li><li class="toc-level-2"><a href="#pagerename-が自動的に設定します">page&#x3a;rename &#x304c;&#x81ea;&#x52d5;&#x7684;&#x306b;&#x8a2d;&#x5b9a;&#x3057;&#x307e;&#x3059;</a></li><li class="toc-level-2"><a href="#競合">&#x7af6;&#x5408;</a></li><li class="toc-level-2"><a href="#現在対象外の機能">&#x73fe;&#x5728;&#x5bfe;&#x8c61;&#x5916;&#x306e;&#x6a5f;&#x80fd;</a></li></ul></details>
 					<h1 id="リダイレクト"><a href="#リダイレクト" id="リダイレクト" name="リダイレクト" class="anchor"></a>リダイレクト</h1>
 <p>ページを移動、リネーム、または再構成した後も、古い URL を動作させ続け
 ます - 古いパスに静的な HTML スタブが書き込まれるため、検索エンジンの
@@ -116,16 +116,15 @@ redirect_from:
 そのロケール内でリダイレクトします（<code>site/es/old-path/</code>）、ページ自身
 の本当の URL がすでにそうしているのとまったく同じです。ツリーごとに
 追加で設定するものは何もありません。</p>
-<h2 id="サイト全体-bxsitesjson-の-redirects"><a href="#サイト全体-bxsitesjson-の-redirects" id="サイト全体-bxsitesjson-の-redirects" name="サイト全体-bxsitesjson-の-redirects" class="anchor"></a>サイト全体: <code>bxsites.json</code> の <code>redirects</code></h2>
+<h2 id="サイト全体-bxsitesyaml-の-redirects"><a href="#サイト全体-bxsitesyaml-の-redirects" id="サイト全体-bxsitesyaml-の-redirects" name="サイト全体-bxsitesyaml-の-redirects" class="anchor"></a>サイト全体: <code>bxsites.yaml</code> の <code>redirects</code></h2>
 <p>特定のページに属したことがない古い URL - 再構成されたセクション、古い
 ドメインのパス、単一ページ自身の「古い名前」として自然ではない何か -
 の場合は、代わりに明示的な <code>from</code>/<code>to</code> のペアを列挙します:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;redirects&quot;: [
-		{ &quot;from&quot;: &quot;old-guide&quot;, &quot;to&quot;: &quot;guides/new-guide/&quot; },
-		{ &quot;from&quot;: &quot;moved-to-another-site&quot;, &quot;to&quot;: &quot;https://example.com/docs&quot; }
-	]
-}
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">redirects:
+  - from: old-guide
+    to: guides/new-guide/
+  - from: moved-to-another-site
+    to: https://example.com/docs
 </code></pre>
 <ul>
 <li><code>from</code> - 上記の <code>redirect_from</code> と同じ形式の古いプリティ URL セグメント</li>
@@ -167,7 +166,7 @@ redirect_from:
 キャッチオールはありません。</li>
 </ul>
 
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/ja/guides/redirects.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> &#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x3092;&#x7de8;&#x96c6;</a><a href="/bx-sites/development/ja/guides/redirects.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown&#x3092;&#x30c0;&#x30a6;&#x30f3;&#x30ed;&#x30fc;&#x30c9;</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &#x6700;&#x7d42;&#x66f4;&#x65b0; Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/ja/guides/redirects.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> &#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x3092;&#x7de8;&#x96c6;</a><a href="/bx-sites/development/ja/guides/redirects.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown&#x3092;&#x30c0;&#x30a6;&#x30f3;&#x30ed;&#x30fc;&#x30c9;</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &#x6700;&#x7d42;&#x66f4;&#x65b0; Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 				</article>
 
 
@@ -175,7 +174,7 @@ redirect_from:
 			</main>
 
 			<aside class="col-xl-2 toc-sidebar d-none d-xl-block">
-				<nav class="toc mb-4" aria-label="&#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x306e;&#x5185;&#x5bb9;"><div class="toc-title">&#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x306e;&#x5185;&#x5bb9;</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#ページ単位-フロントマター-redirect-from">&#x30da;&#x30fc;&#x30b8;&#x5358;&#x4f4d;&#x3a; &#x30d5;&#x30ed;&#x30f3;&#x30c8;&#x30de;&#x30bf;&#x30fc; redirect_from</a></li><li class="toc-level-2"><a href="#サイト全体-bxsitesjson-の-redirects">&#x30b5;&#x30a4;&#x30c8;&#x5168;&#x4f53;&#x3a; bxsites.json &#x306e; redirects</a></li><li class="toc-level-2"><a href="#pagerename-が自動的に設定します">page&#x3a;rename &#x304c;&#x81ea;&#x52d5;&#x7684;&#x306b;&#x8a2d;&#x5b9a;&#x3057;&#x307e;&#x3059;</a></li><li class="toc-level-2"><a href="#競合">&#x7af6;&#x5408;</a></li><li class="toc-level-2"><a href="#現在対象外の機能">&#x73fe;&#x5728;&#x5bfe;&#x8c61;&#x5916;&#x306e;&#x6a5f;&#x80fd;</a></li></ul></nav>
+				<nav class="toc mb-4" aria-label="&#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x306e;&#x5185;&#x5bb9;"><div class="toc-title">&#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x306e;&#x5185;&#x5bb9;</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#ページ単位-フロントマター-redirect-from">&#x30da;&#x30fc;&#x30b8;&#x5358;&#x4f4d;&#x3a; &#x30d5;&#x30ed;&#x30f3;&#x30c8;&#x30de;&#x30bf;&#x30fc; redirect_from</a></li><li class="toc-level-2"><a href="#サイト全体-bxsitesyaml-の-redirects">&#x30b5;&#x30a4;&#x30c8;&#x5168;&#x4f53;&#x3a; bxsites.yaml &#x306e; redirects</a></li><li class="toc-level-2"><a href="#pagerename-が自動的に設定します">page&#x3a;rename &#x304c;&#x81ea;&#x52d5;&#x7684;&#x306b;&#x8a2d;&#x5b9a;&#x3057;&#x307e;&#x3059;</a></li><li class="toc-level-2"><a href="#競合">&#x7af6;&#x5408;</a></li><li class="toc-level-2"><a href="#現在対象外の機能">&#x73fe;&#x5728;&#x5bfe;&#x8c61;&#x5916;&#x306e;&#x6a5f;&#x80fd;</a></li></ul></nav>
 			</aside>
 
 		</div>

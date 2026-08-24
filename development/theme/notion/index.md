@@ -102,7 +102,7 @@ Install, scaffold a project, and build and serve it.
 Every verb and its options.
 :::
 ::: card title="Configuration" icon="phosphor-duotone:gear-six" href="configuration.md"
-The full `bxsites.json` reference.
+The full `bxsites.yaml` reference.
 :::
 ::: card title="Markdown Extensions" icon="phosphor-duotone:markdown-logo" href="guides/markdown.md"
 Admonitions, tabs, cards, callouts, math and Mermaid diagrams.

@@ -86,7 +86,7 @@
 				<h1 id="ricerca"><a href="#ricerca" id="ricerca" name="ricerca" class="anchor"></a>Ricerca</h1>
 <p>BX Sites distribuisce un provider di ricerca di default e può essere
 puntato su altri tramite <a href="/bx-sites/development/theme/docusaurus/it/configuration/index.html#searchprovider"><code>searchProvider</code></a>
-di <code>bxsites.json</code> - <code>search: true</code>/<code>false</code> resta l'interruttore master
+di <code>bxsites.yaml</code> - <code>search: true</code>/<code>false</code> resta l'interruttore master
 on/off indipendentemente da quale provider è attivo.</p>
 <h2 id="locale-il-predefinito"><a href="#locale-il-predefinito" id="locale-il-predefinito" name="locale-il-predefinito" class="anchor"></a>Locale (il predefinito)</h2>
 <p>La ricerca di BX Sites è completamente statica e lato client - lo stesso
@@ -104,7 +104,7 @@ intestazione nella pagina, e una copia in testo semplice troncata del
 suo corpo (con i tag HTML rimossi).</li>
 <li>Il parziale <code>search.bxm</code> di ogni tema renderizza un box di ricerca;
 <code>layout.bxm</code> lo include (insieme agli script <code>lunr.js</code> + <code>search.js</code>
-condiviso) solo quando <code>search</code> di <code>bxsites.json</code> è <code>true</code> e
+condiviso) solo quando <code>search</code> di <code>bxsites.yaml</code> è <code>true</code> e
 <code>searchProvider.provider</code> è <code>&quot;local&quot;</code> (il predefinito - vedi
 <a href="#other-search-providers">Altri provider</a> sotto per cosa cambia con
 uno diverso).</li>
@@ -135,7 +135,7 @@ gratuitamente da DocSearch stesso (<code>keyboardShortcuts</code> predefinito a
 <code>true</code>), e <code>pagefind</code> lo ottiene collegato da <code>layout.bxm</code> dato che
 <code>PagefindUI</code> non lo collega da sé.</p>
 <h2 id="disattivarla"><a href="#disattivarla" id="disattivarla" name="disattivarla" class="anchor"></a>Disattivarla</h2>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;search&quot;: false }
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">search: false
 </code></pre>
 <p>Salta del tutto la compilazione di <code>search-index.json</code>, e salta il box di
 ricerca, lo script incluso <code>lunr.js</code>, e il widget condiviso <code>search.js</code> in
@@ -158,18 +158,14 @@ dei due lo usa mai.</p>
 ricerca con <a href="https://docsearch.algolia.com/">Algolia DocSearch</a> - la
 stessa ricerca ospitata dal crawler che supportano mkdocs-material,
 VitePress, Starlight e Docusaurus:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;search&quot;: true,
-	&quot;searchProvider&quot;: {
-		&quot;provider&quot;: &quot;algolia&quot;,
-		&quot;algolia&quot;: {
-			&quot;appId&quot;: &quot;ABC123&quot;,
-			&quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
-			&quot;indexName&quot;: &quot;my-docs&quot;,
-			&quot;insights&quot;: false
-		}
-	}
-}
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">search: true
+searchProvider:
+  provider: algolia
+  algolia:
+    appId: ABC123
+    apiKey: a1b2c3d4e5f6...
+    indexName: my-docs
+    insights: false
 </code></pre>
 <p><code>appId</code>, <code>apiKey</code> e <code>indexName</code> sono obbligatori - <code>apiKey</code> è la chiave
 API pubblica <strong>solo per la ricerca</strong> che ti fornisce DocSearch (mai una
@@ -197,13 +193,10 @@ modale dentro quel contenitore.</li>
 di ricerca con <a href="https://pagefind.app/">Pagefind</a> - un altro motore di
 ricerca completamente statico/senza server, ma indicizzato a partire
 dall'HTML <em>compilato</em> di <code>site/</code> invece che esplorato come Algolia:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
-	&quot;search&quot;: true,
-	&quot;searchProvider&quot;: {
-		&quot;provider&quot;: &quot;pagefind&quot;,
-		&quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
-	}
-}
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">search: true
+searchProvider:
+  provider: pagefind
+  pagefind: { bin: pagefind, options: [] }
 </code></pre>
 <p>Entrambe le chiavi <code>pagefind</code> sono opzionali - <code>bin</code> (predefinito
 <code>&quot;pagefind&quot;</code>) è il nome/percorso dell'eseguibile, risolto rispetto a
@@ -240,7 +233,7 @@ i propri risultati dentro quel contenitore.</li>
 </ul>
 <h2 id="altri-provider-di-ricerca"><a href="#altri-provider-di-ricerca" id="altri-provider-di-ricerca" name="altri-provider-di-ricerca" class="anchor"></a>Altri provider di ricerca</h2>
 <p><code>searchProvider.provider</code> non è limitato a <code>&quot;local&quot;</code>/<code>&quot;algolia&quot;</code>/
-<code>&quot;pagefind&quot;</code> - qualsiasi altro valore viene accettato da <code>bxsites.json</code>
+<code>&quot;pagefind&quot;</code> - qualsiasi altro valore viene accettato da <code>bxsites.yaml</code>
 così com'è (la validazione della configurazione propria di BX Sites
 controlla solo i tre provider sopra). Non c'è alcun hook plugin per
 questo caso - i temi integrati semplicemente non renderizzano nulla per
@@ -258,7 +251,7 @@ passaggio di indicizzazione richieda quel prodotto contro <code>site/</code> dop
 propri di questo modulo per <code>algolia</code>/<code>pagefind</code>.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/docusaurus/it/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/docusaurus/it/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 3&#x3a;10&#x3a;08 AM</span></div>
 			</article>
 
 			<nav class="dsrs-page-nav" aria-label="Navigazione della pagina">

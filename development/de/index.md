@@ -106,7 +106,7 @@ Installieren, ein Projekt aufsetzen, bauen und ausliefern.
 Jedes Verb und seine Optionen.
 :::
 ::: card title="Konfiguration" icon="phosphor-duotone:gear-six" href="configuration.md"
-Die vollständige `bxsites.json`-Referenz.
+Die vollständige `bxsites.yaml`-Referenz.
 :::
 ::: card title="Markdown-Erweiterungen" icon="phosphor-duotone:markdown-logo" href="guides/markdown.md"
 Admonitions, Tabs, Cards, Callouts, Mathematik und Mermaid-Diagramme.
