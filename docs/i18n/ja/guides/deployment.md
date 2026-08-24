@@ -20,7 +20,7 @@ GitHub Actions ワークフロー（毎回の Push で自動マルチバージ�
 
 ## 動作内容
 
-`docs/`、`bxsites.json`、またはモジュール自体のソース（テーマ/パイプラインの変更）に
+`docs/`、`bxsites.yaml`、またはモジュール自体のソース（テーマ/パイプラインの変更）に
 触れる `main` または `development` へのすべての Push で、ワークフローが:
 
 1. BoxLang + [bx-markdown](https://github.com/ortus-boxlang/bx-markdown) をインストール
@@ -69,12 +69,12 @@ Actions タブから手動トリガー（`workflow_dispatch`）でも利用可�
 
 GitHub の *プロジェクト* Pages サイト（*ユーザー* サイトとは異なり）は
 `https://<user>.github.io/<repo>/` から配信されます（ドメインルートではありません）。
-`bxsites.json` の `baseURL` をその完全な URL に設定して、すべての内部リンク、アセット、
+`bxsites.yaml` の `baseURL` をその完全な URL に設定して、すべての内部リンク、アセット、
 ナビゲーションエントリに必要な `/<repo>/` プレフィックスが付くようにしてください。
 また、実際の `sitemap.xml` も生成されます:
 
-```json
-{ "baseURL": "https://<user>.github.io/<repo>/" }
+```yaml title="bxsites.yaml"
+baseURL: "https://<user>.github.io/<repo>/"
 ```
 
 `baseURL` が何をするかの完全な詳細については [設定](../configuration.md#baseurl) を参照してください。

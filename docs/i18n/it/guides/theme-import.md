@@ -43,7 +43,7 @@ bxSites theme:import --source=mkdocs --path=/percorso/del/tema-mkdocs --name=my-
 - `--name` (obbligatorio) - il nome di destinazione, scritto in
   `themes/<name>/` (la stessa convenzione dei
   [temi installati](themes.md#installare-un-tema-pubblicato) usata da
-  `install:theme`) - imposta `theme.name` di `bxsites.json` su questo
+  `install:theme`) - imposta `theme.name` di `bxsites.yaml` su questo
   nome una volta soddisfatto del risultato
 
 Rieseguire il comando con lo stesso `--name` è sicuro - `layout.bxm`/

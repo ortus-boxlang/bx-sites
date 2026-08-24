@@ -23,7 +23,7 @@ pubblicazione automatica multi-versione a ogni push.
 
 ## Cosa fa
 
-A ogni push su `main` o `development` che tocca `docs/`, `bxsites.json`, o
+A ogni push su `main` o `development` che tocca `docs/`, `bxsites.yaml`, o
 il sorgente stesso del modulo (modifiche a tema/pipeline), il workflow:
 
 1. Installa BoxLang + [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
@@ -65,10 +65,10 @@ il job di ciascun branch effettua il push su `gh-pages` solo con
 `keep_files: true` e la propria `destination_dir`, quindi un deploy di
 `development` non sovrascrive mai il contenuto di `main` e viceversa.
 
-Il `bxsites.json` proprio di `main` dovrebbe avere `baseURL` impostato
+Il `bxsites.yaml` proprio di `main` dovrebbe avere `baseURL` impostato
 sulla radice del sito (`https://<user>.github.io/<repo>/`); il workflow
 lo sovrascrive per ogni altro branch al momento del build, quindi il
-`bxsites.json` di `development` non ha bisogno di una propria voce
+`bxsites.yaml` di `development` non ha bisogno di una propria voce
 `baseURL` perché tutto funzioni.
 
 Per aggiungere un terzo branch (ad es. un'anteprima `release/2.0`),
@@ -91,12 +91,12 @@ relativo passo di deploy.
 Un sito GitHub Pages di *progetto* (a differenza di un sito *utente*
 `<user>.github.io`) viene servito da
 `https://<user>.github.io/<repo>/`, non dalla radice del dominio. Imposta
-`baseURL` in `bxsites.json` su quell'URL completo così che ogni link
+`baseURL` in `bxsites.yaml` su quell'URL completo così che ogni link
 interno, asset e voce di nav ottenga il prefisso `/<repo>/` di cui ha
 bisogno - e così che venga generato anche un vero `sitemap.xml`:
 
-```json
-{ "baseURL": "https://<user>.github.io/<repo>/" }
+```yaml title="bxsites.yaml"
+baseURL: "https://<user>.github.io/<repo>/"
 ```
 
 Vedi [Configurazione](../configuration.md#baseurl) per il quadro completo

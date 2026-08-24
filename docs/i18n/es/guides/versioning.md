@@ -9,7 +9,7 @@ tags: [guías, versionado]
 # Versionado
 
 La documentación versionada es convención antes que configuración - no
-hay ninguna clave de `bxsites.json` que activar. Añade una carpeta
+hay ninguna clave de `bxsites.yaml` que activar. Añade una carpeta
 `docs/versions/`, y cada subcarpeta directa dentro de ella se construye
 como su propio árbol de documentación totalmente autocontenido, junto a
 tu `docs/` regular (que siempre se construye como "Latest"):
@@ -31,7 +31,7 @@ Cada carpeta de versión es un árbol normal con la forma de `docs/` - su
 propio `index.md`, su propia nav, sus propias páginas - construido en
 `site/versions/<name>/` con cada enlace interno prefijado
 correspondientemente, y compartiendo la única configuración/tema de
-`bxsites.json` del proyecto. Un archivo suelto colocado directamente bajo
+`bxsites.yaml` del proyecto. Un archivo suelto colocado directamente bajo
 `docs/versions/` (no dentro de una subcarpeta) se ignora.
 
 ## Crear una nueva versión

@@ -8,6 +8,34 @@ tags: [ガイド, セットアップ]
 
 # はじめに
 
+## 前提条件: BoxLang のインストール
+
+以下はすべて、BoxLang ランタイム自体がすでにマシンにインストールされて
+いることを前提としています - `install-bx-module` は既存のインストール
+にモジュールをインストールする BoxLang 自身の CLI コマンドであり、
+CommandBox の `box install` も実行対象となる BoxLang エンジンがすでに
+存在している必要があります。まだ BoxLang をインストールしていない場合は、
+以下のいずれかの方法で先にインストールしてください:
+
+- **クイックインストーラー**（単一バージョン、最も手軽に始められます）:
+
+  ```bash frame="terminal" title="Terminal"
+  curl -fsSL https://install.boxlang.io/ | bash
+  ```
+
+- または **BVM**（BoxLang Version Manager。複数の BoxLang バージョンを
+  並行してインストールし、切り替えられるようにします）:
+
+  ```bash frame="terminal" title="Terminal"
+  curl -fsSL https://install-bvm.boxlang.io/ | bash
+  bvm install latest && bvm use latest
+  ```
+
+Windows 版と Homebrew 版のインストーラー、および BVM コマンドの完全な
+リファレンスは、
+[BoxLang 公式のインストールドキュメント](https://boxlang.ortusbooks.com/getting-started/installation)
+に掲載されています。
+
 ## インストール
 
 BX Sites は、Markdown レンダリングに [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)、

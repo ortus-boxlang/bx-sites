@@ -98,8 +98,8 @@ AVIF upstream hinzufügt.
 
 ## Ausschalten
 
-```json title="bxsites.json"
-{ "assets": { "images": { "enabled": false } } }
+```yaml title="bxsites.yaml"
+assets: { images: { enabled: false } }
 ```
 
 Fällt zurück auf das schlichte, unverarbeitete Kopieren von
@@ -108,15 +108,11 @@ diese Funktion gab.
 
 ## Eigene Breakpoints wählen
 
-```json title="bxsites.json" linenums="1"
-{
-	"assets": {
-		"images": {
-			"widths": [ 480, 960, 1440 ],
-			"formats": [ "webp" ]
-		}
-	}
-}
+```yaml title="bxsites.yaml" linenums="1"
+assets:
+  images:
+    widths: [ 480, 960, 1440 ]
+    formats: [ webp ]
 ```
 
 `widths` ist standardmäßig `[400, 800, 1200, 1600]`; `formats` ist
@@ -132,11 +128,9 @@ auszulassen. Siehe [Konfiguration](../configuration.md#assets) für jeden
 `extraCss`/`extraJs` werden auf dieselbe Weise gebündelt, standardmäßig
 aktiv (`assets.bundle`):
 
-```json title="bxsites.json" linenums="1"
-{
-	"extraCss": [ "assets/a.css", "assets/b.css" ],
-	"extraJs": [ "assets/app.js" ]
-}
+```yaml title="bxsites.yaml" linenums="1"
+extraCss: [ assets/a.css, assets/b.css ]
+extraJs: [ assets/app.js ]
 ```
 
 baut ein einzelnes, fingerprint-versehenes `assets/bundle.<hash>.css`
@@ -158,8 +152,8 @@ lässt die gesamte Liste auf das heutige, exakte Pro-URL-Verhalten
 zurückfallen, statt zu riskieren, eine CSS-Kaskade stillschweigend
 umzusortieren, auf die sich ein Projekt verlassen hat:
 
-```json title="bxsites.json"
-{ "extraCss": [ "assets/custom.css", "https://cdn.example.com/lib.css" ] }
+```yaml title="bxsites.yaml"
+extraCss: [ assets/custom.css, "https://cdn.example.com/lib.css" ]
 ```
 
 rendert zwei separate `<link>`-Tags, ungebündelt, genau wie vor

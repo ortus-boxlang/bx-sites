@@ -52,15 +52,11 @@ docs/
 
 `<code>` becomes both the folder name and the built URL prefix (`docs/i18n/es/guides/setup.md` → `/es/guides/setup/`). Give each locale a display label - and, for a right-to-left language, its own direction - in your config:
 
-```json title="bxsites.json" linenums="1"
-{
-	"i18n": {
-		"locales": [
-			{ "code": "es", "label": "Español" },
-			{ "code": "ar", "label": "العربية", "dir": "rtl" }
-		]
-	}
-}
+```yaml title="bxsites.yaml" linenums="1"
+i18n:
+  locales:
+    - { code: es, label: Español }
+    - { code: ar, label: العربية, dir: rtl }
 ```
 
 Every `docs/i18n/<code>/` folder builds automatically once it exists - `locales` only supplies display metadata, it isn't what turns the feature on.

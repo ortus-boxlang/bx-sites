@@ -43,20 +43,19 @@ redirige dentro de ese idioma (`site/es/old-path/`), exactamente igual
 que ya hace la propia URL real de la página. No hay nada extra que
 configurar por árbol.
 
-## Para todo el sitio: `bxsites.json` `redirects`
+## Para todo el sitio: `bxsites.yaml` `redirects`
 
 Para una URL antigua que nunca perteneció a una página específica - una
 sección reestructurada, la ruta de un dominio antiguo, cualquier cosa que
 no sea naturalmente el propio "nombre antiguo" de una sola página - lista
 en su lugar un par explícito `from`/`to`:
 
-```json title="bxsites.json" linenums="1"
-{
-	"redirects": [
-		{ "from": "old-guide", "to": "guides/new-guide/" },
-		{ "from": "moved-to-another-site", "to": "https://example.com/docs" }
-	]
-}
+```yaml title="bxsites.yaml" linenums="1"
+redirects:
+  - from: old-guide
+    to: guides/new-guide/
+  - from: moved-to-another-site
+    to: https://example.com/docs
 ```
 
 - `from` - el segmento de URL bonita antiguo, la misma forma que

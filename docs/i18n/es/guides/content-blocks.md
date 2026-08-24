@@ -15,7 +15,7 @@ GitBook es sencillo de migrar: cada uno de estos se corresponde
 directamente con un bloque de GitBook del mismo nombre. Cada uno usa la
 misma sintaxis de contenedor `::: name ... :::` (un `:::` solo en su
 propia línea cierra el bloque que esté abierto en ese momento) - sin
-necesidad de configuración en `bxsites.json`, siempre disponible. Un
+necesidad de configuración en `bxsites.yaml`, siempre disponible. Un
 bloque puede anidarse dentro de otro (un expandible que contiene un
 grupo de tarjetas, por ejemplo) - cada uno se vuelve a analizar en busca
 de más bloques dentro de su propio contenido.
@@ -193,7 +193,7 @@ relativo a `docs/assets/`, que el `src` de `::: file`. Tanto las
 especificaciones JSON como YAML funcionan; Swagger UI analiza ambas
 enteramente del lado del cliente - en ningún lugar de este módulo ocurre
 un análisis de OpenAPI en el servidor. Requiere que
-[`openapi`](../configuration.md#openapi) de `bxsites.json` esté en `true` -
+[`openapi`](../configuration.md#openapi) de `bxsites.yaml` esté en `true` -
 si no lo está, este marcador de posición se renderiza pero permanece
 inerte (el propio JS/CSS de Swagger UI nunca se copia a `site/`, así que
 el build de cualquier otro proyecto sigue siendo tan pequeño como antes de
@@ -293,7 +293,7 @@ Lanzamiento inicial.
 
 Una página con un bloque `::: updates` también obtiene su propio
 `feed.xml` (RSS 2.0) escrito junto a ella en cuanto `baseURL` de
-`bxsites.json` es una URL completa - el mismo requisito que
+`bxsites.yaml` es una URL completa - el mismo requisito que
 `sitemap.xml` - de modo que los lectores puedan suscribirse solo al
 registro de cambios de esa página.
 

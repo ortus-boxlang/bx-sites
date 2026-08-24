@@ -117,5 +117,5 @@ Font-Awesome ベースのアイコンに一致させる必要はありません�
 ファイルです - 他のファイルと同じように編集するか、削除して bx-sites 自身の
 「フォルダ構造がそのままナビ構造」という規約にフォールバックさせることも
 できます。ここから先は普通の bx-sites プロジェクトです:
-[テーマ](themes.md) を選び、[`bxsites.json`](../configuration.md) を見直し、
+[テーマ](themes.md) を選び、[`bxsites.yaml`](../configuration.md) を見直し、
 納得がいったら [デプロイ](deployment.md) してください。
