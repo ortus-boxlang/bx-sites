@@ -1,0 +1,50 @@
+/**
+ * A tiny in-memory cache keyed by a source file's own absolute path plus
+ * its last-modified time - `get()` returns a stored entry only when the
+ * file's mtime still matches what was cached, so a cache hit doubles as
+ * "this file hasn't changed since we last converted it".
+ *
+ * A brand-new instance (every plain `bxSites build` CLI run constructs a
+ * fresh BuildPipeline, and BuildPipeline constructs a fresh cache of its
+ * own) starts empty, so this only ever saves work when the SAME instance
+ * is reused across multiple build() calls - exactly what DevServer.bx
+ * does across `serve`'s watch-triggered rebuilds (module spec section 2).
+ */
+class {
+
+	variables.entries = {}
+
+	/**
+	 * @sourcePath Absolute path to the source file this entry was converted from
+	 * @mtime The source file's current last-modified time (epoch ms)
+	 *
+	 * @return The cached data struct if sourcePath's mtime still matches what was cached, else an empty struct
+	 */
+	struct function get( required string sourcePath, required numeric mtime ) {
+		var entry = variables.entries[ arguments.sourcePath ] ?: {}
+		if ( !entry.isEmpty() && entry.mtime == arguments.mtime ) {
+			return entry.data
+		}
+		return {}
+	}
+
+	/**
+	 * @sourcePath Absolute path to the source file this data was converted from
+	 * @mtime The source file's last-modified time (epoch ms) this data reflects
+	 * @data Whatever the caller wants back from a future get() while sourcePath's mtime still matches
+	 */
+	void function set( required string sourcePath, required numeric mtime, required struct data ) {
+		variables.entries[ arguments.sourcePath ] = { mtime : arguments.mtime, data : arguments.data }
+	}
+
+	/**
+	 * Discards every cached entry - for a change that a per-file mtime check
+	 * can't detect on its own (bxsites.json, a theme override, a plugin),
+	 * since any of those can change what a page's own unchanged markdown
+	 * renders to.
+	 */
+	void function clear() {
+		variables.entries = {}
+	}
+
+}

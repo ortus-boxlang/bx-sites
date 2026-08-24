@@ -1850,6 +1850,40 @@ class extends="testbox.system.BaseSpec" {
 				expect( sidebarHtml.reMatch( 'href="/blog/index\.html"' ).len() ).toBe( 1 );
 			} );
 
+			it( "still picks up a page's own edit across repeated build() calls on the same instance (DevServer.bx's own shape), once its source file's mtime changes", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "First body" );
+
+				pipeline.build( root );
+				pipeline.build( root ); // same instance, unchanged source - exercises the cache-hit path
+				expect( fileRead( root & "/site/index.html" ) ).toInclude( "<p>First body</p>" );
+
+				fileWrite( root & "/docs/index.md", "Second body" );
+				var futureMillis = createObject( "java", "java.lang.System" ).currentTimeMillis() + 5000;
+				createObject( "java", "java.io.File" ).init( root & "/docs/index.md" ).setLastModified( javaCast( "long", futureMillis ) );
+
+				pipeline.build( root );
+				expect( fileRead( root & "/site/index.html" ) ).toInclude( "<p>Second body</p>" );
+			} );
+
+			it( "clearDevCache() forces every page to reconvert on the next build(), even with an unchanged mtime", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "title: Original Title" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				pipeline.build( root );
+				expect( fileRead( root & "/site/index.html" ) ).toInclude( "Original Title" );
+
+				// bxsites.json's own name changing is exactly the kind of
+				// change a single page's own mtime can't reflect on its own -
+				// DevServer.bx's own onWatchEvent()/onSchedulerTick() call
+				// clearDevCache() for exactly this reason before rebuilding.
+				fileWrite( root & "/bxsites.json", '{"name":"Renamed Site","theme":{"name":"bootstrap"}}' );
+				pipeline.clearDevCache();
+				pipeline.build( root );
+
+				expect( fileRead( root & "/site/index.html" ) ).toInclude( "Renamed Site" );
+			} );
+
 		} );
 	}
 

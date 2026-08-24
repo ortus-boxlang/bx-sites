@@ -45,6 +45,7 @@ class {
 	variables.blogAuthorsLoader = new "models.build.BlogAuthorsLoader@bxsites"()
 	variables.blogBuilder = new "models.build.BlogBuilder@bxsites"()
 	variables.blogFeedGenerator = new "models.build.BlogFeedGenerator@bxsites"()
+	variables.pageCache = new "models.build.BuildCache@bxsites"()
 	variables.pluginsOverride = []
 	variables.hasPluginsOverride = false
 
@@ -672,6 +673,26 @@ class {
 	 */
 	private void function convertMarkdown( required array pages, required struct config, array plugins = [], string basePath = "/", string docsDir = "", struct imageManifest = {} ) {
 		for ( var page in arguments.pages ) {
+			// A page's own conversion is a pure function of its source file plus
+			// this tree's config/plugins/imageManifest, none of which change
+			// without the source file's own mtime changing too (a config/theme/
+			// plugin edit clears the whole cache instead - see
+			// DevServer.bx's own clearDevCache() call) - so an unchanged
+			// mtime means this page's own last conversion is still valid,
+			// skipping this whole pipeline entirely. A brand-new
+			// BuildPipeline instance (every plain `bxSites build`) starts
+			// with an empty cache, so this is a pure no-op for a one-shot
+			// build - it only actually saves work across DevServer.bx's own
+			// repeated in-process rebuild() calls.
+			var sourcePath = page.sourcePath ?: ""
+			var mtime = len( sourcePath ) ? createObject( "java", "java.io.File" ).init( sourcePath ).lastModified() : 0
+			var cached = len( sourcePath ) ? variables.pageCache.get( sourcePath, mtime ) : {}
+			if ( !cached.isEmpty() ) {
+				page.contentHtml = cached.contentHtml
+				page.updatesFeedEntries = cached.updatesFeedEntries
+				continue
+			}
+
 			var markdown = variables.pluginLoader.applyOnPageMarkdown( arguments.plugins, page.body, page, arguments.config )
 			markdown = variables.includeProcessor.process( markdown, arguments.docsDir, page.relativePath )
 
@@ -696,7 +717,23 @@ class {
 
 			page.contentHtml = html
 			page.updatesFeedEntries = collectUpdatesFeedEntries( directivesExtracted.blocks, arguments.config.markdown )
+
+			if ( len( sourcePath ) ) {
+				variables.pageCache.set( sourcePath, mtime, { contentHtml : page.contentHtml, updatesFeedEntries : page.updatesFeedEntries } )
+			}
 		}
+	}
+
+	/**
+	 * Discards every cached page conversion (see convertMarkdown()'s own
+	 * docblock) - DevServer.bx calls this whenever a watched change isn't a
+	 * single page's own markdown (bxsites.json, a theme override, a
+	 * plugin), since none of those are reflected in any one page's own
+	 * source mtime.
+	 */
+	void function clearDevCache() {
+		variables.pageCache.clear()
+		variables.searchIndexer.clearCache()
 	}
 
 	/**

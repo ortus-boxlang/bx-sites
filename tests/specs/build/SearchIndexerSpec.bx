@@ -5,6 +5,15 @@ class extends="testbox.system.BaseSpec" {
 
 			beforeEach( function() {
 				variables.indexer = new "models.build.SearchIndexer@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
 			} );
 
 			private struct function page(
@@ -92,6 +101,75 @@ class extends="testbox.system.BaseSpec" {
 				var index = indexer.build( pages );
 
 				expect( index[ 1 ].body ).toBe( 'Fish & Chips "great" deal' );
+			} );
+
+			it( "reuses a cached entry when a page's own sourcePath mtime hasn't changed, ignoring an in-memory-only content change", function() {
+				var dir = createTempDirectory( prefix = "bxsites-searchindexer-" );
+				tempDirs.append( dir );
+				var sourcePath = dir & "/page.md";
+				fileWrite( sourcePath, "original" );
+
+				var pageStruct = page( title = "First", urlPath = "p/index.html", contentHtml = "<p>Original body</p>" );
+				pageStruct.sourcePath = sourcePath;
+
+				var first = indexer.build( [ pageStruct ] );
+				expect( first[ 1 ].body ).toInclude( "Original body" );
+
+				// The file on disk (and so its mtime) is untouched - only the
+				// in-memory struct changed, which a real rebuild would never
+				// do on its own without the source file changing too.
+				pageStruct.contentHtml = "<p>Changed body</p>";
+				var second = indexer.build( [ pageStruct ] );
+
+				expect( second[ 1 ].body ).toInclude( "Original body" );
+				expect( second[ 1 ].body ).notToInclude( "Changed body" );
+			} );
+
+			it( "recomputes a page's own entry once its sourcePath mtime changes", function() {
+				var dir = createTempDirectory( prefix = "bxsites-searchindexer-" );
+				tempDirs.append( dir );
+				var sourcePath = dir & "/page.md";
+				fileWrite( sourcePath, "original" );
+
+				var pageStruct = page( title = "First", urlPath = "p/index.html", contentHtml = "<p>Original body</p>" );
+				pageStruct.sourcePath = sourcePath;
+				indexer.build( [ pageStruct ] );
+
+				pageStruct.contentHtml = "<p>Changed body</p>";
+				var futureMillis = createObject( "java", "java.lang.System" ).currentTimeMillis() + 5000;
+				createObject( "java", "java.io.File" ).init( sourcePath ).setLastModified( javaCast( "long", futureMillis ) );
+
+				var second = indexer.build( [ pageStruct ] );
+
+				expect( second[ 1 ].body ).toInclude( "Changed body" );
+			} );
+
+			it( "clearCache() forces every page's own entry to recompute even when its sourcePath mtime is unchanged", function() {
+				var dir = createTempDirectory( prefix = "bxsites-searchindexer-" );
+				tempDirs.append( dir );
+				var sourcePath = dir & "/page.md";
+				fileWrite( sourcePath, "original" );
+
+				var pageStruct = page( title = "First", urlPath = "p/index.html", contentHtml = "<p>Original body</p>" );
+				pageStruct.sourcePath = sourcePath;
+				indexer.build( [ pageStruct ] );
+
+				pageStruct.contentHtml = "<p>Changed body</p>";
+				indexer.clearCache();
+				var second = indexer.build( [ pageStruct ] );
+
+				expect( second[ 1 ].body ).toInclude( "Changed body" );
+			} );
+
+			it( "never caches a page with no sourcePath, always reflecting its current contentHtml", function() {
+				var pageStruct = page( title = "No Source", urlPath = "p/index.html", contentHtml = "<p>Original body</p>" );
+
+				indexer.build( [ pageStruct ] );
+
+				pageStruct.contentHtml = "<p>Changed body</p>";
+				var second = indexer.build( [ pageStruct ] );
+
+				expect( second[ 1 ].body ).toInclude( "Changed body" );
 			} );
 
 		} );

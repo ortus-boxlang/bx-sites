@@ -1,0 +1,59 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.BuildCache", function() {
+
+			beforeEach( function() {
+				variables.cache = new "models.build.BuildCache@bxsites"();
+			} );
+
+			it( "get() returns an empty struct for a key that was never set", function() {
+				expect( cache.get( "/some/path.md", 123 ) ).toBeStruct();
+				expect( cache.get( "/some/path.md", 123 ).isEmpty() ).toBeTrue();
+			} );
+
+			it( "get() returns the cached data when the mtime matches what was set", function() {
+				cache.set( "/some/path.md", 123, { contentHtml : "<p>Hello</p>" } );
+
+				var result = cache.get( "/some/path.md", 123 );
+
+				expect( result.isEmpty() ).toBeFalse();
+				expect( result.contentHtml ).toBe( "<p>Hello</p>" );
+			} );
+
+			it( "get() returns an empty struct when the mtime no longer matches", function() {
+				cache.set( "/some/path.md", 123, { contentHtml : "<p>Hello</p>" } );
+
+				expect( cache.get( "/some/path.md", 456 ).isEmpty() ).toBeTrue();
+			} );
+
+			it( "keys are independent - setting one path never affects another", function() {
+				cache.set( "/a.md", 1, { contentHtml : "A" } );
+				cache.set( "/b.md", 1, { contentHtml : "B" } );
+
+				expect( cache.get( "/a.md", 1 ).contentHtml ).toBe( "A" );
+				expect( cache.get( "/b.md", 1 ).contentHtml ).toBe( "B" );
+			} );
+
+			it( "a later set() for the same key replaces the earlier entry", function() {
+				cache.set( "/a.md", 1, { contentHtml : "First" } );
+				cache.set( "/a.md", 2, { contentHtml : "Second" } );
+
+				expect( cache.get( "/a.md", 1 ).isEmpty() ).toBeTrue();
+				expect( cache.get( "/a.md", 2 ).contentHtml ).toBe( "Second" );
+			} );
+
+			it( "clear() discards every cached entry", function() {
+				cache.set( "/a.md", 1, { contentHtml : "A" } );
+				cache.set( "/b.md", 1, { contentHtml : "B" } );
+
+				cache.clear();
+
+				expect( cache.get( "/a.md", 1 ).isEmpty() ).toBeTrue();
+				expect( cache.get( "/b.md", 1 ).isEmpty() ).toBeTrue();
+			} );
+
+		} );
+	}
+
+}

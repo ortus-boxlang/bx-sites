@@ -121,6 +121,56 @@ class extends="testbox.system.BaseSpec" {
 				} ).notToThrow();
 			} );
 
+			it( "stopWatching() is safe to call even when startWatching() was never called, and safe to call twice", function() {
+				var root = newProject();
+				devServer.start( root, 0, "127.0.0.1" );
+
+				expect( function() {
+					devServer.stopWatching();
+					devServer.stopWatching();
+				} ).notToThrow();
+			} );
+
+			it( "startWatching() rebuilds and reflects a docs/ page edit, without a poll loop calling checkAndRebuild()", function() {
+				var root = newProject();
+				devServer.start( root, 0, "127.0.0.1" );
+				devServer.startWatching();
+
+				fileWrite( root & "/docs/index.md", "Updated via watcher" );
+
+				// The native watcher's own debounce (250ms) plus the
+				// scheduler's own tick (300ms) settle well under this -
+				// generous only to keep this reliable under real (if slow)
+				// disk/scheduler timing, not because the feature itself is slow.
+				var deadline = getTickCount() + 8000;
+				while ( devServer.getBuildVersion() < 2 && getTickCount() < deadline ) {
+					sleep( 100 );
+				}
+
+				expect( devServer.getBuildVersion() ).toBeGTE( 2 );
+				expect( fileRead( root & "/site/index.html" ) ).toInclude( "<p>Updated via watcher</p>" );
+
+				devServer.stopWatching();
+			} );
+
+			it( "startWatching() also reacts to a bxsites.json change", function() {
+				var root = newProject();
+				devServer.start( root, 0, "127.0.0.1" );
+				devServer.startWatching();
+
+				fileWrite( root & "/bxsites.json", '{"name":"Renamed Site","theme":{"name":"bootstrap"}}' );
+
+				var deadline = getTickCount() + 8000;
+				while ( devServer.getBuildVersion() < 2 && getTickCount() < deadline ) {
+					sleep( 100 );
+				}
+
+				expect( devServer.getBuildVersion() ).toBeGTE( 2 );
+				expect( fileRead( root & "/site/index.html" ) ).toInclude( "Renamed Site" );
+
+				devServer.stopWatching();
+			} );
+
 		} );
 	}
 
