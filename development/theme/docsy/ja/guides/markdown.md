@@ -1,6 +1,7 @@
 ---
 title: Markdown 拡張機能
 order: 4
+icon: phosphor-duotone:markdown-logo
 tags: [ガイド, markdown]
 ---
 

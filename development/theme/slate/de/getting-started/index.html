@@ -98,35 +98,34 @@
 <h2 id="installation"><a href="#installation" id="installation" name="installation" class="anchor"></a>Installation</h2>
 <p>BX Sites benötigt <a href="https://github.com/ortus-boxlang/bx-markdown">bx-markdown</a>
 für das Rendern von Markdown, <a href="https://github.com/ortus-boxlang/bx-esapi">bx-esapi</a>
-für die HTML-Kodierung und <a href="https://github.com/ortus-boxlang/bx-yaml">bx-yaml</a>
-zum Lesen von <code>bxsites.yaml</code>. Mit installiertem
-<a href="https://commandbox.ortusbooks.com/">CommandBox</a>:</p>
-<pre><code class="language-bash">box install bx-sites
-box install bx-markdown
-box install bx-esapi
-box install bx-yaml
+für die HTML-Kodierung, <a href="https://github.com/ortus-boxlang/bx-yaml">bx-yaml</a>
+zum Lesen von <code>bxsites.yaml</code>, und <a href="https://github.com/ortus-boxlang/bx-image">bx-image</a>
+für die responsive Bilder-Pipeline (siehe <a href="/bx-sites/development/theme/slate/de/guides/images/index.html">Responsive Bilder</a>) -
+alle vier werden automatisch als <code>box.json</code>-Abhängigkeiten mitinstalliert,
+sodass die Installation von <code>bx-sites</code> selbst der einzige nötige Befehl ist,
+entweder über BoxLangs eigenen OS-Binary-Installer:</p>
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">install-bx-module bx-sites
 </code></pre>
-<p>Oder, ohne CommandBox, installiert BoxLangs eigener Installer alle vier mit
-einem Befehl:</p>
-<pre><code class="language-bash">install-bx-module bx-sites bx-markdown bx-esapi bx-yaml
+<p>oder über <a href="https://commandbox.ortusbooks.com/">CommandBox</a>:</p>
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">box install bx-sites
 </code></pre>
-<p><code>box install</code>/<code>install-bx-module</code> liest <code>boxlang.executable</code> aus <code>box.json</code>
-und legt ein <code>bxSites</code>-Skript in deinem <code>PATH</code> ab (in <code>~/.boxlang/bin</code>), sodass
-jeder Befehl unten entweder als kurzer, eigenständiger Befehl funktioniert:</p>
-<pre><code class="language-bash">bxSites &lt;verb&gt; [options]
+<p>Beide lesen <code>boxlang.executable</code> aus <code>box.json</code> und legen ein
+<code>bxSites</code>-Skript in deinem <code>PATH</code> ab (in <code>~/.boxlang/bin</code>), sodass jeder
+Befehl unten entweder als kurzer, eigenständiger Befehl funktioniert:</p>
+<pre data-bxsites-title="Usage"><code class="language-bash">bxSites &lt;verb&gt; [options]
 </code></pre>
 <p>oder überall dort, wo BoxLang zwar verfügbar ist, dieser <code>PATH</code>-Shim aber
 nicht (ein CI-Runner, ein von Hand statt per Installation registriertes
 Modul) - beide Formen führen genau dasselbe aus:</p>
-<pre><code class="language-bash">boxlang bxSites &lt;verb&gt; [options]
+<pre data-bxsites-title="Usage &#x28;no PATH shim&#x29;"><code class="language-bash">boxlang bxSites &lt;verb&gt; [options]
 </code></pre>
 <p>Der Rest dieser Anleitung verwendet die Kurzform.</p>
 <h2 id="ein-projekt-aufsetzen"><a href="#ein-projekt-aufsetzen" id="ein-projekt-aufsetzen" name="ein-projekt-aufsetzen" class="anchor"></a>Ein Projekt aufsetzen</h2>
-<pre><code class="language-bash">bxSites new my-docs
+<pre data-bxsites-start-line="1" data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites new my-docs
 cd my-docs
 </code></pre>
 <p>Das erzeugt:</p>
-<pre><code>my-docs/
+<pre data-bxsites-title="Project structure"><code class="language-text">my-docs/
 ├── docs/
 │   ├── assets/
 │   └── index.md
@@ -169,7 +168,7 @@ in jedem Fall in <code>site/</code> - beide kollidieren nie, da <code>site/</cod
 niemals ein gültiger Name für den Quellordner ist.</p>
 </div>
 </div>
-<pre><code>docs/
+<pre data-bxsites-title="docs&#x2f; &rarr; nav"><code class="language-text">docs/
 ├── index.md              -&gt; /
 ├── guides/
 │   ├── index.md          -&gt; /guides/
@@ -182,7 +181,7 @@ vollständig durch eine explizite Navigation ersetzen - siehe
 <p>Verlinke eine andere Seite auf die übliche mkdocs-Art - ein dateirelativer
 Pfad zu ihrer <code>.md</code>-Quelldatei, genau als lägen die beiden Dateien
 nebeneinander auf der Festplatte (denn genau das tun sie):</p>
-<pre><code class="language-markdown">See [Deployment](guides/deployment.md) or, from that same guide,
+<pre data-bxsites-title="Example link"><code class="language-markdown">See [Deployment](guides/deployment.md) or, from that same guide,
 [back to Getting Started](../getting-started.md#seiten-hinzufügen).
 </code></pre>
 <p>BX Sites schreibt jeden solchen Link zur Build-Zeit auf seine gebaute
@@ -208,7 +207,7 @@ abrufen, statt gerendertes HTML zu scrapen - und da der gesamte
 <code>docs/</code>-Baum 1:1 gespiegelt wird, funktionieren auch die relativen Links
 einer Seite weiterhin, wenn sie so gelesen wird.</p>
 <p>Jede Seite kann mit einem kleinen Frontmatter-Block beginnen:</p>
-<pre><code class="language-markdown">---
+<pre data-bxsites-start-line="1" data-bxsites-title="docs&#x2f;guides&#x2f;deployment.md"><code class="language-markdown">---
 title: Deployment
 order: 2
 hidden: false
@@ -217,6 +216,7 @@ tags: [guides, deployment]
 icon: 🚀
 summary: Everything you need to publish a built site.
 ogImage: assets/deployment-card.png
+toc: true
 ---
 
 # Deployment
@@ -244,6 +244,11 @@ Bibliothek (<code>rocket</code>, <code>lucide:rocket</code>, <code>tabler:rocket
 nie auf der Seite selbst gerendert wird)</li>
 <li><code>ogImage</code> - überschreibt das Social-Card-Bild nur für diese eine Seite -
 siehe <a href="/bx-sites/development/theme/slate/de/configuration/index.html#ogimage"><code>ogImage</code></a></li>
+<li><code>toc</code> - <code>false</code> blendet das eigene Inhaltsverzeichnis (&quot;Auf dieser Seite&quot;)
+dieser Seite aus, selbst bei 2+ Überschriften (dem üblichen Auslöser für
+dessen Anzeige) - praktisch für eine Landing-/Hero-Seite, die kein
+schwebendes Inhaltsverzeichnis neben ihrem eigenen Inhalt haben möchte;
+Standard ist <code>true</code></li>
 </ul>
 <p>Frontmatter-Werte können Inline-Listen (<code>tags: [a, b, c]</code>), YAML-artige
 Blocklisten (<code>tags:</code> gefolgt von eingerückten <code>- item</code>-Zeilen) oder
@@ -252,12 +257,12 @@ allerdings um einen kleinen, selbst geschriebenen Parser, nicht um
 vollständiges YAML, verschachtelte Objekte/Maps werden also nicht
 unterstützt.</p>
 <h2 id="build"><a href="#build" id="build" name="build" class="anchor"></a>Build</h2>
-<pre><code class="language-bash">bxSites build
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites build
 </code></pre>
 <p>Rendert jede Seite in <code>docs/</code> zu einer statischen Website in <code>site/</code>, bereit
 zum Hosten überall dort, wo statische Dateien ausgeliefert werden können.</p>
 <h2 id="lokal-ausliefern"><a href="#lokal-ausliefern" id="lokal-ausliefern" name="lokal-ausliefern" class="anchor"></a>Lokal ausliefern</h2>
-<pre><code class="language-bash">bxSites serve
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites serve
 </code></pre>
 <p>Baut das Projekt, liefert <code>site/</code> unter <code>http://127.0.0.1:8080/</code> aus und
 baut automatisch neu, sobald du eine Änderung unter <code>docs/</code>, deiner
@@ -265,13 +270,13 @@ baut automatisch neu, sobald du eine Änderung unter <code>docs/</code>, deiner
 <code>theme/</code>-Override speicherst - dein Browser lädt von selbst neu. Übergib <code>--port=3000</code> oder <code>--host=0.0.0.0</code>, um zu ändern,
 woran gebunden wird.</p>
 <h2 id="clean"><a href="#clean" id="clean" name="clean" class="anchor"></a>Clean</h2>
-<pre><code class="language-bash">bxSites clean
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites clean
 </code></pre>
 <p>Entfernt <code>site/</code> und jeglichen Build-Cache, ohne deine <code>docs/</code>-Quelle
 anzurühren.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/slate/de/getting-started.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 12&#x3a;15&#x3a;58 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/slate/de/getting-started.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
 			</article>
 
 			<nav class="slate-page-nav" aria-label="Seitennavigation">

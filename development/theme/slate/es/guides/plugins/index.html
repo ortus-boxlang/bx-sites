@@ -81,7 +81,7 @@
 
 				<h1 class="slate-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M204,168a28,28,0,0,0,12-2.69V208a8,8,0,0,1-8,8H64a8,8,0,0,1-8-8V165.31a28,28,0,1,1,0-50.62V72a8,8,0,0,1,8-8h46.69a28,28,0,1,1,50.61,0H208a8,8,0,0,1,8,8v42.69A28,28,0,1,0,204,168Z" opacity="0.2"/><path d="M220.27,158.54a8,8,0,0,0-7.7-.46,20,20,0,1,1,0-36.16A8,8,0,0,0,224,114.69V72a16,16,0,0,0-16-16H171.78a35.36,35.36,0,0,0,.22-4,36.15,36.15,0,0,0-11.36-26.25,36,36,0,0,0-60.55,23.63,36.56,36.56,0,0,0,.14,6.62H64A16,16,0,0,0,48,72v32.22a35.36,35.36,0,0,0-4-.22,36.12,36.12,0,0,0-26.24,11.36,35.7,35.7,0,0,0-9.69,27,36.08,36.08,0,0,0,33.31,33.6,36.56,36.56,0,0,0,6.62-.14V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V165.31A8,8,0,0,0,220.27,158.54ZM208,208H64V165.31a8,8,0,0,0-11.43-7.23,20,20,0,1,1,0-36.16A8,8,0,0,0,64,114.69V72h46.69a8,8,0,0,0,7.23-11.43,20,20,0,1,1,36.16,0A8,8,0,0,0,161.31,72H208v32.23a35.68,35.68,0,0,0-6.62-.14A36,36,0,0,0,204,176a35.36,35.36,0,0,0,4-.22Z"/></svg></span> Plugins</h1>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/slate/es/tags/index.html#tag-guías">gu&iacute;as</a><a class="page-tag" href="/bx-sites/development/theme/slate/es/tags/index.html#tag-plugins">plugins</a></div>
-<details class="bxsites-toc-mobile slate-toc--mobile"><summary class="slate-toc--mobile__summary">En esta p&aacute;gina</summary><ul><li class="slate-toc__item slate-toc__item--2"><a href="#escribir-un-plugin">Escribir un plugin</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#cuándo-se-dispara-cada-hook">Cu&aacute;ndo se dispara cada hook</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#un-ejemplo-mínimo">Un ejemplo m&iacute;nimo</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#errores">Errores</a></li></ul></details>
+<details class="bxsites-toc-mobile slate-toc--mobile"><summary class="slate-toc--mobile__summary">En esta p&aacute;gina</summary><ul><li class="slate-toc__item slate-toc__item--2"><a href="#instalar-un-plugin-publicado">Instalar un plugin publicado</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#escribir-un-plugin">Escribir un plugin</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#cuándo-se-dispara-cada-hook">Cu&aacute;ndo se dispara cada hook</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#un-ejemplo-mínimo">Un ejemplo m&iacute;nimo</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#errores">Errores</a></li></ul></details>
 				<div class="slate-content-body">
 				<h1 id="plugins"><a href="#plugins" id="plugins" name="plugins" class="anchor"></a>Plugins</h1>
 <p>Un plugin de BX Sites no es más que otro módulo de BoxLang - su propio
@@ -96,6 +96,25 @@ mediante el array <a href="/bx-sites/development/theme/slate/es/configuration/in
 <code>bxsites.json</code>:</p>
 <pre><code class="language-json">{ &quot;plugins&quot;: [ &quot;myBxSitesPlugin&quot; ] }
 </code></pre>
+<h2 id="instalar-un-plugin-publicado"><a href="#instalar-un-plugin-publicado" id="instalar-un-plugin-publicado" name="instalar-un-plugin-publicado" class="anchor"></a>Instalar un plugin publicado</h2>
+<p>Un plugin publicado en ForgeBox se instala sin nada más que el propio
+binario <code>bxSites</code> - no hace falta <code>box</code>/CommandBox:</p>
+<pre data-bxsites-title="Uso"><code class="language-bash">bxSites install:plugin --name=bx-sites-plugin-analytics [--version=1.2.0]
+</code></pre>
+<p>Esto descarga el zip del paquete desde ForgeBox y lo extrae en
+<code>boxlang_modules/bx-sites-plugin-analytics/</code> en la raíz del proyecto - la
+propia convención de módulos locales autocargados de BoxLang (cualquier
+carpeta de módulo ahí se detecta de la misma forma en que npm detecta un
+<code>node_modules/</code> local al proyecto), de modo que queda activo en el
+registro de módulos de BoxLang en ejecución sin necesidad de
+<code>BOXLANG_HOME</code> ni de ningún paso de instalación global. <code>install:plugin</code>
+lo carga en el runtime de inmediato e imprime de vuelta el nombre real de
+mapeo del módulo registrado (que, según la nota de abajo, no siempre
+coincide con el slug de ForgeBox) - añade <em>ese</em> nombre al array <code>plugins</code>
+de <code>bxsites.json</code> para activarlo, igual que con cualquier otro módulo
+instalado. Consulta
+<a href="/bx-sites/development/theme/slate/es/cli-reference/index.html#installplugin"><code>install:plugin</code></a> en la referencia de
+la CLI.</p>
 <h2 id="escribir-un-plugin"><a href="#escribir-un-plugin" id="escribir-un-plugin" name="escribir-un-plugin" class="anchor"></a>Escribir un plugin</h2>
 <p>Un módulo de plugin necesita exactamente una cosa más allá del habitual
 <code>box.json</code>/<code>ModuleConfig.bx</code> que ya tiene cualquier módulo de BoxLang:
@@ -182,7 +201,7 @@ un ejemplo trabajado de la estructura de carpetas:</p>
 </ul>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/plugins.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/slate/es/guides/plugins.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 24, 2026, 12&#x3a;15&#x3a;58 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/plugins.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/slate/es/guides/plugins.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
 			</article>
 
 			<nav class="slate-page-nav" aria-label="Navegaci&oacute;n de p&aacute;gina">
@@ -198,7 +217,7 @@ un ejemplo trabajado de la estructura de carpetas:</p>
 		</main>
 
 		<aside class="slate-toc-sidebar">
-			<nav class="slate-toc" aria-label="En esta p&aacute;gina"><div class="slate-toc__title">En esta p&aacute;gina</div><ul><li class="slate-toc__item slate-toc__item--2"><a href="#escribir-un-plugin">Escribir un plugin</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#cuándo-se-dispara-cada-hook">Cu&aacute;ndo se dispara cada hook</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#un-ejemplo-mínimo">Un ejemplo m&iacute;nimo</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#errores">Errores</a></li></ul></nav>
+			<nav class="slate-toc" aria-label="En esta p&aacute;gina"><div class="slate-toc__title">En esta p&aacute;gina</div><ul><li class="slate-toc__item slate-toc__item--2"><a href="#instalar-un-plugin-publicado">Instalar un plugin publicado</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#escribir-un-plugin">Escribir un plugin</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#cuándo-se-dispara-cada-hook">Cu&aacute;ndo se dispara cada hook</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#un-ejemplo-mínimo">Un ejemplo m&iacute;nimo</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#errores">Errores</a></li></ul></nav>
 		</aside>
 
 	</div>

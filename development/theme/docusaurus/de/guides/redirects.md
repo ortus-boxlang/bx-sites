@@ -72,12 +72,13 @@ braucht stattdessen sein eigenes seitenbezogenes `redirect_from`.
 
 ## `page:rename` setzt das für dich
 
-Das Umbenennen/Verschieben einer Seite mit `page:rename` fügt ihren alten
-Pfad automatisch dem eigenen `redirect_from` der verschobenen Seite hinzu
-- zusätzlich zum Umschreiben jedes relativen Markdown-Links, der darauf
+Das Umbenennen/Verschieben einer Seite mit
+[`page:rename`](../cli-reference.md#pagerename) fügt ihren alten Pfad
+automatisch dem eigenen `redirect_from` der verschobenen Seite hinzu -
+zusätzlich zum Umschreiben jedes relativen Markdown-Links, der darauf
 zeigte, funktioniert auch die alte URL selbst weiter:
 
-```bash title="Verwendung"
+```bash title="Usage"
 bxSites page:rename --from=guides/old-setup.md --to=guides/new-setup.md
 ```
 

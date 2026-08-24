@@ -8,7 +8,7 @@ tags: [riferimento, cli]
 
 # Riferimento CLI
 
-```bash
+```bash title="Utilizzo"
 bxSites <verbo> [opzioni]
 ```
 
@@ -19,7 +19,7 @@ può essere eseguito sia in quella forma breve, sia come
 cosa; usa la forma più lunga ovunque lo shim sul `PATH` non sia impostato
 (un runner di CI, un modulo registrato a mano):
 
-```bash
+```bash title="Utilizzo (senza shim sul PATH)"
 boxlang bxSites <verbo> [opzioni]
 ```
 
@@ -27,6 +27,11 @@ Ogni verbo accetta `--projectRoot=<percorso>` (oppure un percorso
 posizionale semplice) per puntare a un progetto diverso dalla cartella
 corrente, e i due flag globali qui sotto possono comparire prima di
 qualsiasi verbo.
+
+Ogni `docs/` menzionato qui sotto si applica ugualmente a un progetto che
+usa `src/` invece - vedi [Per iniziare](getting-started.md#add-pages) per
+la convenzione `docs/`-o-`src/`. `new` genera sempre lo scheletro di
+`docs/`.
 
 ## Opzioni globali
 
@@ -39,8 +44,8 @@ qualsiasi verbo.
 
 Genera lo scheletro di un progetto di documentazione.
 
-```bash
-bxSites new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...] [--format=yaml|json]
+```bash title="Utilizzo"
+bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|json]
 ```
 
 - `--name` - il nome del sito scritto nella configurazione del sito (per default, il nome della cartella di destinazione)
@@ -52,9 +57,13 @@ bxSites new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--descrip
 
 Genera `docs/**.md` in un sito statico dentro `site/`. Compila anche
 l'indice di ricerca (a meno che `search` non sia `false` nella
-configurazione del sito) e copia il tema + `docs/assets/**` in `site/`.
+configurazione del sito, o che `searchProvider` sia impostato su un
+provider - come `algolia`/`pagefind` - che non lo usa, vedi
+[Ricerca](guides/search.md)), esegue la CLI di `pagefind` sul `site/`
+finito quando `searchProvider.provider` è `"pagefind"`, e copia il tema +
+`docs/assets/**` in `site/`.
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxSites build
 ```
 
@@ -62,7 +71,7 @@ bxSites build
 
 Compila e serve il sito in locale con ricaricamento automatico.
 
-```bash
+```bash title="Utilizzo"
 bxSites serve [--port=8080] [--host=127.0.0.1]
 ```
 
@@ -73,9 +82,12 @@ Gira in primo piano finché non viene interrotto (Ctrl+C).
 Ricompila `site/search-index.json` in modo autonomo, senza rirenderizzare
 le pagine o ricopiare gli asset. `build` esegue già automaticamente
 questo stesso passaggio - questo verbo esiste per i casi in cui serve
-solo aggiornare l'indice.
+solo aggiornare l'indice. Copre sempre e solo l'albero `docs/` principale,
+anche su un progetto con `docs/versions/`/`docs/i18n/` - una vera `build`
+scrive invece l'indice con ambito proprio di ogni albero (vedi
+[Versionamento](guides/versioning.md#cosa-è-fuori-scopo-per-ora)).
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxSites search-index
 ```
 
@@ -84,7 +96,7 @@ bxSites search-index
 Rimuove `site/` e qualsiasi cache di compilazione, lasciando intatti
 `docs/` e la configurazione del sito.
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxSites clean
 ```
 
@@ -97,7 +109,7 @@ mkdocs. Richiede che il progetto sia un repository git con un remote
 configurato; non tocca mai il tuo branch corrente o la working tree
 (effettua il push da una `git worktree` usa e getta).
 
-```bash
+```bash title="Utilizzo"
 bxSites gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
 ```
 
@@ -110,32 +122,49 @@ di GitHub Pages (attivare Pages per il branch, `baseURL`, ecc.).
 
 ## `migrate`
 
-Converte un export di GitBook - un sommario `SUMMARY.md` più i suoi file
-`.md`, il formato di sincronizzazione su disco proprio di GitBook -
-nell'albero `docs/` di questo progetto: `SUMMARY.md` diventa
-`docs/nav.json`, la sintassi `{% block %}` diventa il proprio equivalente
-in bx-sites (direttive `::: name`, oppure la sintassi nativa `=== "Title"`
-per le schede / `!!! type` per le ammonizioni dove esiste già una
-corrispondenza più stretta - vedi
-[Blocchi di contenuto](guides/content-blocks.md)), i file
-`README.md` diventano `index.md`, e `.gitbook/assets/**` viene copiato in
-`docs/assets/gitbook/`.
+Converte un progetto di documentazione esistente in questo - `--from`
+sceglie il formato sorgente, `gitbook` (predefinito) o `mkdocs`.
 
-```bash
+```bash linenums="1"
 bxSites migrate --source=/percorso/dell/export-gitbook
+bxSites migrate --source=/percorso/del/progetto-mkdocs --from=mkdocs
 ```
 
-- `--source` (obbligatorio) - percorso alla cartella radice dell'export di GitBook (deve contenere `SUMMARY.md`)
+- `--source` (obbligatorio) - percorso alla cartella radice dell'export/progetto (deve contenere `SUMMARY.md` per `gitbook`, `mkdocs.yml` per `mkdocs`)
+- `--from` - `gitbook` (predefinito) o `mkdocs`
 
-Stampa un riepilogo delle pagine convertite e, quando qualcosa non ha
-potuto essere convertito automaticamente (un blocco non supportato come
-`{% prompt %}`, uno stile di hint non riconosciuto, una larghezza di
-colonna che non è una lunghezza semplice), un elenco esatto di cosa
-richiede un controllo manuale - niente viene mai scartato in silenzio, un
-blocco non riconosciuto viene lasciato nella propria sintassi originale
-`{% %}` nel file migrato. Un file di destinazione o un `docs/nav.json`
-già esistenti vengono sovrascritti (anche questo segnalato), quindi
-rivedi l'output migrato prima di fare il commit.
+### `--from=gitbook` (predefinito)
+
+Un export di GitBook - un sommario `SUMMARY.md` più i suoi file `.md`, il
+formato di sincronizzazione su disco proprio di GitBook - nell'albero
+`docs/` di questo progetto: `SUMMARY.md` diventa `docs/nav.json`, la
+sintassi `{% block %}` diventa il proprio equivalente in bx-sites
+(direttive `::: name`, oppure la sintassi nativa `=== "Title"` per le
+schede / `!!! type` per le ammonizioni dove esiste già una corrispondenza
+più stretta - vedi [Blocchi di contenuto](guides/content-blocks.md)), i
+file `README.md` diventano `index.md`, e `.gitbook/assets/**` viene
+copiato in `docs/assets/gitbook/`.
+
+### `--from=mkdocs`
+
+Un progetto mkdocs - `mkdocs.yml` più la sua cartella `docs/` - in un
+progetto bx-sites completo: `mkdocs.yml` diventa `bxsites.yaml` +
+`docs/nav.json`, e ogni pagina viene copiata praticamente invariata, dato
+che la sintassi di ammonizioni/schede/matematica/annotazioni di codice
+propria di mkdocs-material *è* già la sintassi nativa di bx-sites - vedi
+[Migrare da mkdocs](guides/migrating-from-mkdocs.md). Gli asset non-`.md`
+(immagini che comunemente si trovano accanto alla pagina che le usa,
+mkdocs non ha un'unica convenzione di cartella asset) vengono spostati in
+`docs/assets/mkdocs/` e i loro riferimenti riscritti.
+
+### Entrambi
+
+Stampa un riepilogo delle pagine (e, per mkdocs, degli asset) convertiti
+e, quando qualcosa non ha potuto essere convertito automaticamente, un
+elenco esatto di cosa richiede un controllo manuale - niente viene mai
+scartato in silenzio. Un file di destinazione, `bxsites.yaml`, o
+`docs/nav.json` già esistenti vengono sovrascritti (anche questo
+segnalato), quindi rivedi l'output migrato prima di fare il commit.
 
 ## `check`
 
@@ -156,7 +185,7 @@ compilato - esegui prima `build`. Verifica:
   dalla propria nav (ad es. frontmatter `hidden: true`) *deve* essere
   raggiungibile solo tramite un link diretto.
 
-```bash
+```bash frame="terminal" title="Terminal" linenums="1"
 bxSites build
 bxSites check
 ```
@@ -166,3 +195,304 @@ Esce con `1` quando ci sono link/immagini rotti o immagini senza alt,
 uscita). Deliberatamente limitato ai soli link interni - non effettua
 richieste HTTP per verificare URL esterni, cosa che spetta a uno
 strumento dedicato di controllo link eseguito come proprio job separato.
+
+## `stats`
+
+Un report di riepilogo di sola lettura su un `site/` già compilato -
+esegui prima `build`. Riporta:
+
+- **Pagine e parole** - conteggio totale delle pagine e un conteggio
+  approssimativo delle parole (tag rimossi, lo stesso standard "abbastanza
+  buono per una stima" della cifra di tempo di lettura propria del blog),
+  più una ripartizione per albero non appena ce n'è più di uno (una
+  versione, o una locale non predefinita).
+- **Versioni e locale** - nomi di ogni cartella `docs/versions/`/
+  `docs/i18n/` non predefinita.
+- **Blog** - conteggi di post/categorie/autori/anni attivi, presi
+  direttamente dalla forma della cartella propria di `site/blog/` (così
+  corrisponde sempre a ciò che è stato effettivamente pubblicato, bozze
+  escluse) - `none` quando non c'è alcun blog.
+- **Tag** - il numero di tag distinti in tutto il sito.
+- **Indice di ricerca** - numero di voci e dimensione file di
+  `search-index.json`, oppure `none` quando la ricerca è disattivata o è
+  attivo un provider non locale.
+- **Output del sito** - conteggio totale dei file e dimensione su disco
+  del `site/` compilato.
+
+```bash
+bxSites build
+bxSites stats
+```
+
+Esce sempre con `0` - puramente informativo, niente qui è un gate di
+superamento/fallimento (quello è compito di `check`).
+
+## `doctor`
+
+Un controllo di salute dell'ambiente/configurazione in un solo passaggio
+- il verbo "esegui questo prima di aprire una segnalazione di bug".
+Verifica la versione della JVM, che `docs/` esista, che
+`bxsites.json`/`.yaml` venga effettivamente analizzato e validato, che i
+moduli BoxLang richiesti (`bx-markdown`, `bx-esapi`, `bx-yaml`,
+`bx-image`) siano installati e attivati e - se esiste una sovrascrittura
+`theme/` a livello di progetto - che soddisfi il contratto dei due file
+obbligatori `layout.bxm`/`page.bxm`.
+
+```bash frame="terminal" title="Terminal"
+bxSites doctor
+```
+
+Esce con `1` se un controllo fallisce, `0` altrimenti. Niente qui
+modifica un progetto - è puramente diagnostico.
+
+## `post:new`
+
+Genera lo scheletro di un nuovo post del blog in `docs/blog/posts/<slug>.md`.
+
+```bash title="Utilizzo"
+bxSites post:new --title="My New Post" [--slug=...] [--date=...] [--authors=...] [--categories=...] [--tags=...] [--draft]
+```
+
+- `--title` (obbligatorio) - diventa anche il `title` nel frontmatter del post
+- `--slug` - il valore predefinito è uno slug generato da `--title`
+- `--date` - il valore predefinito è oggi (`yyyy-MM-dd`)
+- `--authors`, `--categories`, `--tags` - separati da virgola
+- `--draft` - il valore predefinito è `true` (passa `--!draft` per pubblicare immediatamente)
+
+Vedi [Blog](guides/blog.md) per il riferimento completo del frontmatter.
+
+## `version:new`
+
+Fa un'istantanea dell'albero `docs/` corrente in `docs/versions/<name>/`,
+escludendo `assets/`, `versions/`, `i18n/` e `blog/` (ognuno è un proprio
+albero caricato separatamente, non parte dell'istantanea).
+
+```bash title="Utilizzo"
+bxSites version:new --name=1.0
+```
+
+- `--name` (obbligatorio) - la cartella/etichetta di versione, ad es. `1.0`
+
+Vedi [la sezione "Versionamento" di Configurazione](configuration.md#versionamento).
+
+## `i18n:status`
+
+Riporta la copertura della traduzione per locale - per ogni locale
+configurata, quante pagine dell'albero predefinito esistono (allo stesso
+percorso relativo) sotto `docs/i18n/<code>/`, e quali mancano ancora.
+
+```bash frame="terminal" title="Terminal"
+bxSites i18n:status
+```
+
+Esce sempre con `0` - puramente informativo.
+
+## `i18n:new`
+
+Genera lo scheletro di una nuova cartella di locale `docs/i18n/<code>/`,
+seminandola con un `index.md` copiato dall'`index.md` proprio della
+locale predefinita, quando ne esiste uno.
+
+```bash title="Utilizzo"
+bxSites i18n:new --code=es
+```
+
+- `--code` (obbligatorio) - il codice della locale, ad es. `es`, `fr`, `pt-BR`
+
+Vedi [Internazionalizzazione](guides/i18n.md) per collegare la nuova
+locale a `i18n.locales` di `bxsites.json`.
+
+## `page:new`
+
+Genera lo scheletro di una singola pagina di documentazione a un percorso
+arbitrario sotto `docs/`, con il frontmatter richiesto già compilato.
+
+```bash title="Utilizzo"
+bxSites page:new --path=guides/setup.md [--title=...] [--description=...] [--icon=...] [--tags=...] [--order=...]
+```
+
+- `--path` (obbligatorio) - relativo a `docs/`, deve terminare in `.md`
+- `--title`, `--description`, `--icon`, `--order` - scritti nel frontmatter
+- `--tags` - separati da virgola
+
+## `plugin:new`
+
+Genera lo scheletro di un modulo plugin (`box.json`, `ModuleConfig.bx`, un
+`models/BxSitesPlugin.bx` con ogni hook già stubato) rispecchiando
+`examples/hello-plugin/`.
+
+```bash title="Utilizzo"
+bxSites plugin:new --name=my-analytics-plugin [--dest=...]
+```
+
+- `--name` (obbligatorio) - il nome/slug del modulo del plugin
+- `--dest` - il valore predefinito è `<projectRoot>/<name>`
+
+Vedi [Plugin](guides/plugins.md) per il riferimento degli hook e come
+collegare il plugin finito all'array `plugins` di `bxsites.json`.
+
+## `install:plugin`
+
+Scarica un plugin pubblicato da ForgeBox e lo deposita direttamente nel
+proprio `boxlang_modules/` del progetto - la convenzione nativa di
+BoxLang per i moduli locali caricati automaticamente, quindi non serve
+nulla oltre al binario `bxSites` stesso (nessun coinvolgimento di
+`box`/CommandBox).
+
+```bash title="Utilizzo"
+bxSites install:plugin --name=bx-sites-plugin-analytics [--version=1.2.0]
+```
+
+- `--name` (obbligatorio) - lo slug ForgeBox da installare
+- `--version` - una versione specifica; ometti per l'ultima
+
+Stampa il vero nome di mapping del modulo registrato una volta caricato -
+aggiungi quel nome all'array `plugins` di `bxsites.json` per attivarlo
+(l'installazione da sola non attiva mai un plugin - vedi
+[Plugin](guides/plugins.md)).
+
+## `theme:new`
+
+Estrae uno dei temi integrati nella cartella `theme/` propria del
+progetto per personalizzarlo, rispecchiando il flusso di eject `--theme`
+di mkdocs.
+
+```bash title="Utilizzo"
+bxSites theme:new --theme=material
+```
+
+- `--theme` (obbligatorio) - `bootstrap`, `material`, `tailwind`, `docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook`, o `notion` - vedi [Temi](guides/themes.md#integrati)
+
+Fallisce invece di sovrascrivere un `theme/` già esistente. Vedi
+[Temi](guides/themes.md) per il contratto di sovrascrittura
+(`layout.bxm` + `page.bxm`).
+
+## `install:theme`
+
+Scarica un tema pubblicato da ForgeBox nel proprio `themes/<name>/` del
+progetto - nient'altro che il binario `bxSites` serve, come per
+`install:plugin`.
+
+```bash title="Utilizzo"
+bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
+```
+
+- `--name` (obbligatorio) - lo slug ForgeBox da installare
+- `--version` - una versione specifica; ometti per l'ultima
+
+Valida il pacchetto scaricato rispetto al contratto `ThemeProvider`
+(`layout.bxm` + `page.bxm`) prima di terminare, così un pacchetto rotto
+fallisce al momento dell'installazione invece che alla prossima `build`.
+Imposta `theme.name` di `bxsites.json` sul nome installato per usarlo -
+vedi [Temi](guides/themes.md#installare-un-tema-pubblicato).
+
+## `theme:import`
+
+Conversione con il massimo impegno possibile di un tema proveniente
+dall'ecosistema di un altro generatore di siti statici
+(`mkdocs`/`jekyll`/`hugo`) in uno scheletro di tema bx-sites sotto
+`themes/<name>/` - un punto di partenza, non un porting senza perdite in
+un solo comando.
+
+```bash title="Utilizzo"
+bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
+```
+
+- `--source` (obbligatorio) - `mkdocs`, `jekyll`, o `hugo`
+- `--path` (obbligatorio) - la cartella radice propria del tema sorgente
+- `--name` (obbligatorio) - il nome di destinazione, scritto in `themes/<name>/`
+
+Rieseguire il comando con lo stesso `--name` è sicuro - `layout.bxm`/
+`page.bxm` vengono sovrascritti e qualsiasi cartella di asset appena
+trovata viene unita. Vedi [Importare un tema](guides/theme-import.md)
+per sapere esattamente cosa viene tradotto e cosa no, e cosa controllare
+in seguito.
+
+## `page:rename`
+
+Sposta una pagina di documentazione da un percorso a un altro,
+riscrivendo ogni link Markdown relativo in `docs/**` che puntava al
+vecchio percorso - lo stesso problema di link rot relativo ai file che il
+lato HTML compilato già risolve (`check`), applicato invece al sorgente
+Markdown grezzo al momento della rinomina.
+
+```bash title="Utilizzo"
+bxSites page:rename --from=guides/old-name.md --to=guides/new-name.md
+```
+
+- `--from` (obbligatorio) - il percorso attuale della pagina, relativo a `docs/`
+- `--to` (obbligatorio) - il suo nuovo percorso, relativo a `docs/`
+
+Vengono riscritti solo i link nudi in stile `[text](relative/path.md)` -
+gli URL assoluti, `mailto:`, e le pure ancore in pagina vengono lasciati
+stare. `docs/assets/**` non viene mai analizzato.
+
+Imprime anche il frontmatter `redirect_from` della pagina spostata con il
+suo vecchio URL, così una build ([Redirect](guides/redirects.md))
+continua a rispondere per esso invece di lasciare che la rinomina dia un
+404 a ogni link esterno di cui questo progetto non controlla la fonte.
+
+## `blog:drafts`
+
+Elenca ogni post del blog il cui frontmatter imposta `draft: true` -
+`build` salta sempre le bozze, quindi questo è l'unico posto dove la loro
+esistenza viene mostrata.
+
+```bash frame="terminal" title="Terminal"
+bxSites blog:drafts
+```
+
+Esce sempre con `0`.
+
+## `blog:find`
+
+Filtra i post del blog per autore/categoria/tag/intervallo di date, senza
+eseguire una `build` completa.
+
+```bash title="Utilizzo"
+bxSites blog:find [--author=...] [--category=...] [--tag=...] [--since=...] [--until=...] [--drafts]
+```
+
+- `--author`, `--category`, `--tag` - corrispondenza esatta senza distinzione tra maiuscole/minuscole con uno qualsiasi dei valori propri del post
+- `--since`, `--until` - una data; corrispondono solo i post a partire da/fino a `--since`/`--until`
+- `--drafts` - includi anche i post in bozza (esclusi per default)
+
+Ogni filtro è opzionale e indipendente - non passandone nessuno vengono
+elencati tutti i post pubblicati.
+
+## `search:query`
+
+Esegue una query per parole chiave su un `site/search-index.json` già
+compilato - esegui prima `build` o `search-index`. Classifica i risultati
+usando la stessa ponderazione relativa dei campi che usa il widget di
+ricerca lato client (titolo, poi tag, poi intestazioni, poi corpo), così
+puoi verificare rapidamente cosa mostrerebbe la ricerca di un visitatore
+reale senza aprire un browser.
+
+```bash title="Utilizzo"
+bxSites search:query --query="getting started" [--limit=10]
+```
+
+- `--query` (obbligatorio) - termini di ricerca separati da spazio
+- `--limit` - risultati massimi da restituire, il valore predefinito è `10`
+
+## `lint`
+
+Un passaggio di qualità del contenuto pre-build sul sorgente Markdown
+grezzo di `docs/`, distinto da `check` (che ispeziona solo un `site/` già
+compilato). Verifica:
+
+- **Salti di livello delle intestazioni** - un corpo di pagina che salta
+  direttamente da `##` a `####` senza un `###` in mezzo (struttura
+  confusa, e negativo per l'accessibilità). Le righe dentro un blocco di
+  codice recintato non vengono mai scambiate per intestazioni.
+- **Problemi di data dei post del blog** - un post in `docs/blog/posts/**`
+  con una `date` di frontmatter mancante o non valida (`build` stesso
+  lancia un errore su questo nel momento in cui carica i post - `lint` lo
+  mostra invece come un risultato).
+
+```bash frame="terminal" title="Terminal"
+bxSites lint
+```
+
+Esce con `1` quando uno dei due controlli trova qualcosa, `0` altrimenti.

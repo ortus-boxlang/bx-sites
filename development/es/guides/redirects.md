@@ -2,7 +2,7 @@
 title: Redirecciones
 order: 11
 icon: phosphor-duotone:signpost
-tags: [guias, redirecciones]
+tags: [guías, redirecciones]
 ---
 
 # Redirecciones
@@ -74,7 +74,8 @@ página.
 
 ## `page:rename` lo hace por ti
 
-Renombrar/mover una página con `page:rename` añade automáticamente su
+Renombrar/mover una página con
+[`page:rename`](../cli-reference.md#pagerename) añade automáticamente su
 ruta antigua al propio `redirect_from` de la página movida - además de
 reescribir cada enlace relativo de Markdown que apuntaba a ella, la
 propia URL antigua sigue funcionando también:

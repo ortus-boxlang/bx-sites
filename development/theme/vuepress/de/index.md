@@ -2,61 +2,139 @@
 title: Startseite
 order: 1
 icon: phosphor-duotone:house
+summary: Zeig auf einen docs/-Ordner. Erhalte eine schnelle, themefähige statische Website daraus - Dokumentation, eine Marketing-Site, ein Blog, oder alles andere, was sich in Markdown ausdrücken lässt - komplett mit Suche, i18n und einem Markdown-Toolkit für echten Content.
+toc: false
 ---
 
-# BX Sites
-
-BX Sites ist ein BoxLang-Modul, das statische Dokumentations-Websites aus
-Markdown erzeugt, im Geiste von [mkdocs](https://www.mkdocs.org/) und
-[mkdocs-material](https://squidfunk.github.io/mkdocs-material/).
+<div class="bxsites-hero">
+	<img class="bxsites-hero__banner" src="assets/home-banner.jpg" alt="BX Sites - Write. Build. Publish Beautiful Docs. The official documentation engine for BoxLang. Markdown Powered, Beautiful Themes, Blazing Fast Search, Developer Focused.">
+	<div class="bxsites-hero__actions">
+		<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="getting-started.md">Erste Schritte</a>
+		<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://github.com/ortus-boxlang/bx-sites">Auf GitHub ansehen</a>
+	</div>
+</div>
 
 Genau diese Seite wird von BX Sites gebaut, aus den Markdown-Dateien im
-`docs/`-Ordner dieses Repositorys - sieh dir
-[Erste Schritte](getting-started.md) an, um sie selbst zu bauen.
+`docs/`-Ordner dieses Repositorys.
 
-## Highlights
+BX Sites ist nicht nur für Referenzdokumentation gedacht - es ist ein
+allgemeiner **statischer Site-Generator**. Eine Marketing-Site, ein Blog,
+eine Wissensdatenbank, eine Produktseite, eine persönliche Seite: alles, was
+sich in Markdown schreiben lässt, wird auf demselben Weg gebaut - mit
+denselben Themes, derselben Suche und demselben i18n.
 
-- **Markdown rein, statisches HTML raus.** Zeig auf einen `docs/`-Ordner
-  und es entsteht eine komplette Website in `site/` - kein Server nötig,
-  um sie zu hosten.
-- **Ordnerstruktur ist Navigationsstruktur.** Verschachtele Ordner und
-  Dateien unter `docs/`, und die Navigation baut sich von selbst auf, in
-  der Reihenfolge, die du per Frontmatter festlegst.
-- **Drei integrierte Themes.** `bootstrap` (das Standard-Theme),
-  `material` und `tailwind` - alle mit derselben BoxLang-Markenpalette,
-  und alle mit deinem eigenen Theme überschreibbar.
-- **Statische, clientseitige Suche.** Eine mit [lunr.js](https://lunrjs.com/)
-  betriebene Suchbox, verdrahtet mit einem beim `build` erstellten
-  Suchindex - derselbe Ansatz, den mkdocs selbst standardmäßig verwendet,
-  ohne Server-Abhängigkeit.
-- **Markdown wird von [bx-markdown](https://github.com/ortus-boxlang/bx-markdown) verarbeitet.**
-  BX Sites parst Markdown nicht selbst; es delegiert an bx-markdown und
-  reicht deine eigenen `bxsites.json`-Optionen direkt daran weiter.
-- **Ein Plugin-System, das auf BoxLangs eigenem Modulsystem aufbaut.** Ein
-  Plugin ist einfach ein weiteres installiertes BoxLang-Modul - keine
-  separate Plugin-API zu lernen.
-- **Direkte Migration aus GitBook oder mkdocs.** `bxSites migrate
-  --source=... --from=gitbook|mkdocs` wandelt einen bestehenden
-  GitBook-Export oder ein mkdocs-Projekt mit einem Befehl in ein
-  funktionierendes bx-sites-Projekt um.
+::: cards
+::: card title="Markdown rein, statisches HTML raus" icon="phosphor-duotone:file-html"
+Zeig auf einen `docs/`-Ordner und es entsteht eine komplette Website in
+`site/` - kein Server nötig, um sie zu hosten.
+:::
+::: card title="Ordnerstruktur ist Navigationsstruktur" icon="phosphor-duotone:tree-structure"
+Verschachtele Ordner und Dateien unter `docs/`, und die Navigation baut
+sich von selbst auf, in der Reihenfolge, die du per Frontmatter festlegst.
+:::
+::: card title="Zehn integrierte Themes" icon="phosphor-duotone:palette" href="guides/themes.md"
+Eine vollständige Galerie - `bootstrap`, `material`, `tailwind` und sieben
+weitere, inspiriert von Docsy, Stripe, Docusaurus, Just the Docs, VuePress,
+GitBook und Notion - alle mit deinem eigenen Theme überschreibbar.
+:::
+::: card title="Statische, clientseitige Suche" icon="phosphor-duotone:magnifying-glass" href="guides/search.md"
+Eine mit lunr.js betriebene Suchbox, verdrahtet mit einem beim `build`
+erstellten Suchindex - ohne Server-Abhängigkeit.
+:::
+::: card title="Ein Blog, direkt eingebaut" icon="lucide:newspaper" href="guides/blog.md"
+Lege Beiträge unter `docs/blog/posts/` ab und erhalte Autoren, Kategorien,
+Jahresarchive, RSS-Feeds und Featured Images pro Beitrag - ganz ohne
+Konfiguration.
+:::
+::: card title="Schnell, standardmäßig air-gapped" icon="phosphor-duotone:wifi-slash" href="guides/themes.md#air-gappedoffline-websites"
+Fingerprinted CSS/JS-Bundling und responsive Bilder direkt eingebaut, dazu
+Bootstrap, highlight.js, Alpine.js, lunr.js und (optional) Mermaid alle
+vendored - eine gebaute Website benötigt standardmäßig keine ausgehenden
+Anfragen.
+:::
+::: card title="Ein echtes Plugin-System" icon="phosphor-duotone:puzzle-piece" href="guides/plugins.md"
+Ein Plugin ist einfach ein weiteres installiertes BoxLang-Modul - keine
+separate Plugin-API zu lernen.
+:::
+::: card title="Migration von GitBook oder mkdocs" icon="phosphor-duotone:swap" href="guides/index.md"
+`bxSites migrate --source=... --from=gitbook|mkdocs` wandelt einen
+bestehenden GitBook-Export oder ein mkdocs-Projekt mit einem Befehl in ein
+funktionierendes bx-sites-Projekt um.
+:::
+:::
+
+## Selbst sehen, statt nur davon lesen
+
+BX Sites' eigenes Markdown-Toolkit in Aktion, direkt hier auf der
+Startseite - kein Screenshot, das Original:
+
+::: stepper
+::: step "Installieren"
+`install-bx-module bx-sites`
+:::
+::: step "Gerüst erzeugen"
+`bxSites new`
+:::
+::: step "Bauen & ausliefern"
+`bxSites serve`
+:::
+:::
+
+::: columns
+::: column
+!!! tip "Callouts für jeden Anlass"
+    Zwölf kanonische Admonition-Typen - `note`, `tip`, `warning`, `danger`
+    und mehr - jeder mit eigener Akzentfarbe, dazu eine einklappbare
+    `???`-Variante. Siehe
+    [Markdown-Erweiterungen](guides/markdown.md#admonitions).
+:::
+::: column
+!!! faq "Content-Tabs, Mathematik, Diagramme"
+    Gruppierte Code-Tabs, KaTeX-Mathematik, Mermaid-Diagramme, Fußnoten und
+    Definitionslisten sind alle direkt eingebaut - siehe
+    [Markdown-Erweiterungen](guides/markdown.md).
+:::
+:::
 
 ## Wie geht es weiter
 
-- [Erste Schritte](getting-started.md) - installieren, ein Projekt aufsetzen, bauen und ausliefern
-- [CLI-Referenz](cli-reference.md) - jedes Verb und seine Optionen
-- [Konfiguration](configuration.md) - die vollständige `bxsites.json`-Referenz
-- [Themes](guides/themes.md) - die integrierten Themes und wie du dein eigenes schreibst
-- [Suche](guides/search.md) - wie der statische Suchindex funktioniert
-- [Deployment auf GitHub Pages](guides/deployment.md) - der integrierte GitHub-Actions-Workflow
-- [Markdown-Erweiterungen](guides/markdown.md) - Admonitions, Fußnoten, Definitionslisten, Content-Tabs, Mathematik, Code-Annotationen und Mermaid-Diagramme
-- [Content-Blöcke](guides/content-blocks.md) - GitBook-artige Blöcke: Expandables, Cards, Columns, ein Stepper und wiederverwendbare Content-Includes
-- [Responsive Bilder](guides/images.md) - automatische Skalierung, WebP-Varianten und CSS-/JS-Bundling, standardmäßig aktiv
-- [Interaktivität mit Alpine.js](guides/interactivity.md) - reaktiver Inhalt ganz ohne zusätzliches Setup
-- [Blog](guides/blog.md) - ein Convention-over-Configuration-Blog: Beiträge, Autoren, Kategorien, Archive, RSS und Statistiken
-- [Plugins](guides/plugins.md) - BX Sites mit einem eigenen BoxLang-Modul erweitern
-- [Versionierung](guides/versioning.md) - die Docs einer Version einfrieren und kostenlos einen Versionsumschalter erhalten
-- [Internationalisierung (i18n)](guides/i18n.md) - deine Docs in andere Sprachen übersetzen
-- [Migration von GitBook](guides/migrating-from-gitbook.md) - einen GitBook-Export mit einem Befehl in ein bx-sites-Projekt umwandeln
-- [Migration von mkdocs](guides/migrating-from-mkdocs.md) - ein mkdocs-Projekt mit einem Befehl in ein bx-sites-Projekt umwandeln
-- [Beratung & Professionelle Dienstleistungen](services.md) - Docs- und Static-Site-Beratung von Ortus Solutions
-- [Releases](releases/index.md) - Versionierungsrichtlinie und Neuigkeiten pro Release
+::: cards
+::: card title="Erste Schritte" icon="phosphor-duotone:rocket-launch" href="getting-started.md"
+Installieren, ein Projekt aufsetzen, bauen und ausliefern.
+:::
+::: card title="CLI-Referenz" icon="phosphor-duotone:terminal-window" href="cli-reference.md"
+Jedes Verb und seine Optionen.
+:::
+::: card title="Konfiguration" icon="phosphor-duotone:gear-six" href="configuration.md"
+Die vollständige `bxsites.json`-Referenz.
+:::
+::: card title="Markdown-Erweiterungen" icon="phosphor-duotone:markdown-logo" href="guides/markdown.md"
+Admonitions, Tabs, Cards, Callouts, Mathematik und Mermaid-Diagramme.
+:::
+::: card title="Blog" icon="lucide:newspaper" href="guides/blog.md"
+Beiträge, Autoren, Kategorien, Archive, RSS, Entwürfe und eine
+Statistikseite.
+:::
+::: card title="Responsive Bilder & Asset-Pipeline" icon="phosphor-duotone:image" href="guides/images.md"
+Automatische Bildskalierung/WebP und fingerprinted CSS/JS-Bundling.
+:::
+::: card title="Deployment auf GitHub Pages" icon="phosphor-duotone:cloud-arrow-up" href="guides/deployment.md"
+Der integrierte GitHub-Actions-Workflow.
+:::
+::: card title="Releases" icon="phosphor-duotone:tag" href="releases/index.md"
+Versionierungsrichtlinie und Neuigkeiten pro Release.
+:::
+:::
+
+## Brauchst du Hilfe beim Aufbau deiner Website?
+
+BX Sites ist frei und Open Source - aber wenn du lieber das Team, das es
+entwickelt, die Arbeit machen lassen möchtest, bietet
+[Ortus Solutions](https://www.ortussolutions.com) professionelle
+Dienstleistungen und Beratung für Dokumentations-Websites, Migrationen und
+jede andere mit BX Sites gebaute statische Website an.
+
+<div class="bxsites-hero__actions">
+	<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="mailto:consulting@ortussolutions.com">E-Mail an consulting@ortussolutions.com</a>
+	<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="services.md">Beratung & Professionelle Dienstleistungen</a>
+</div>

@@ -90,7 +90,7 @@ Sprachumschalter - kein Plugin, kein separater Build-Schritt nötig.</p>
 <h2 id="eine-locale-hinzufügen"><a href="#eine-locale-hinzufügen" id="eine-locale-hinzufügen" name="eine-locale-hinzufügen" class="anchor"></a>Eine Locale hinzufügen</h2>
 <p>Übersetzte Inhalte liegen unter <code>docs/i18n/&lt;code&gt;/</code>, wobei sie deinen
 regulären <code>docs/</code>-Baum Seite für Seite spiegeln:</p>
-<pre><code>docs/
+<pre data-bxsites-title="Project structure"><code class="language-text">docs/
 ├── index.md
 ├── guides/
 │   └── setup.md
@@ -111,12 +111,13 @@ Buchstaben/Ziffern/Bindestriche. Dein regulärer <code>docs/</code>-Baum ist imm
 wie heute - das Hinzufügen von <code>docs/i18n/</code> ändert daran nichts.</p>
 <p>Gib jeder Locale ein Anzeige-Label (und, für eine
 Rechts-nach-links-Sprache, ihre eigene Schreibrichtung) in <code>bxsites.json</code>:</p>
-<pre><code class="language-json">{
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
 	&quot;i18n&quot;: {
 		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
 		&quot;locales&quot;: [
 			{ &quot;code&quot;: &quot;es&quot;, &quot;label&quot;: &quot;Español&quot; },
-			{ &quot;code&quot;: &quot;ar&quot;, &quot;label&quot;: &quot;العربية&quot;, &quot;dir&quot;: &quot;rtl&quot; }
+			{ &quot;code&quot;: &quot;ar&quot;, &quot;label&quot;: &quot;العربية&quot;, &quot;dir&quot;: &quot;rtl&quot; },
+			{ &quot;code&quot;: &quot;pt-BR&quot;, &quot;label&quot;: &quot;Português (Brasil)&quot;, &quot;flag&quot;: &quot;🇧🇷&quot; }
 		]
 	}
 }
@@ -128,6 +129,12 @@ Englisch ist; <code>locales</code> ist die Liste von allem anderen. Jeder
 Ordner ohne passenden <code>locales</code>-Eintrag wird trotzdem gebaut (mit seinem
 reinen Code als eigenem Label), das ist also Metadaten, nicht das, was die
 Funktion ein- oder ausschaltet.</p>
+<p><code>flag</code> ist optional - der Umschalter wählt für rund 40 gängige
+Sprachcodes bereits von selbst ein sinnvolles Flaggen-Emoji (er prüft
+zuerst einen Regionscode wie <code>pt-BR</code>, dann fällt er auf die Basissprache
+<code>pt</code> zurück). Setze <code>flag</code> nur selbst, um diese Vermutung zu
+überschreiben, oder für einen Code, den die eingebaute Zuordnung nicht
+erkennt (in diesem Fall fällt sie auf ein schlichtes 🌐 zurück).</p>
 <h2 id="was-gebaut-wird"><a href="#was-gebaut-wird" id="was-gebaut-wird" name="was-gebaut-wird" class="anchor"></a>Was gebaut wird</h2>
 <p>Jede Locale ist ein echter, vollständig unabhängiger Build - eigene
 <code>search-index.json</code>, eigene <code>assets/</code>, alles, was ein normaler Build
@@ -152,9 +159,11 @@ funktionieren lässt: ein Sprachwechsel bringt dich auf <em>dieselbe Seite</em>,
 <h2 id="der-sprachumschalter"><a href="#der-sprachumschalter" id="der-sprachumschalter" name="der-sprachumschalter" class="anchor"></a>Der Sprachumschalter</h2>
 <p>Sobald mehr als eine Locale existiert, rendert jedes Theme automatisch ein
 Sprach-Dropdown in der Kopfzeile - nichts, wozu man sich anmelden müsste,
-genau wie beim <a href="/bx-sites/development/theme/gitbook/de/configuration/index.html#versionierung">Versionsumschalter</a>.
-Wähle eine Locale, die du gerade nicht baust, und sie wird einfach gar
-nicht gerendert.</p>
+genau wie beim <a href="/bx-sites/development/theme/gitbook/de/configuration/index.html#versionierung">Versionsumschalter</a>. Es
+zeigt die Flagge der aktuellen Locale als Auslöser; öffnest du es, listet
+es jede Locale mit ihrer eigenen Flagge und ihrem Label, die aktuelle als
+aktiv markiert. Wähle eine Locale, die du gerade nicht baust, und sie wird
+einfach gar nicht gerendert.</p>
 <h2 id="versionierte-und-übersetzte-docs"><a href="#versionierte-und-übersetzte-docs" id="versionierte-und-übersetzte-docs" name="versionierte-und-übersetzte-docs" class="anchor"></a>Versionierte und übersetzte Docs</h2>
 <p>Siehe <a href="/bx-sites/development/theme/gitbook/de/guides/versioning/index.html">Versionierung</a> für <code>docs/versions/&lt;name&gt;/</code> selbst.
 Versionen und Locales lassen sich auf einer Ebene kombinieren: lege einen
@@ -258,7 +267,7 @@ genutzte Assets, nichts, was ein Übersetzer pro Locale duplizieren müsste.</p>
 <a href="/bx-sites/development/theme/gitbook/de/configuration/index.html#versionierung">versionierte</a> Seiten sind.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/gitbook/de/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 12&#x3a;15&#x3a;58 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/gitbook/de/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
 			</article>
 
 			<nav class="gb-page-nav" aria-label="Seitennavigation">

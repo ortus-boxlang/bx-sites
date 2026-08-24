@@ -23,6 +23,30 @@ mediante el array [`plugins`](../configuration.md#plugins) de
 { "plugins": [ "myBxSitesPlugin" ] }
 ```
 
+## Instalar un plugin publicado
+
+Un plugin publicado en ForgeBox se instala sin nada más que el propio
+binario `bxSites` - no hace falta `box`/CommandBox:
+
+```bash title="Uso"
+bxSites install:plugin --name=bx-sites-plugin-analytics [--version=1.2.0]
+```
+
+Esto descarga el zip del paquete desde ForgeBox y lo extrae en
+`boxlang_modules/bx-sites-plugin-analytics/` en la raíz del proyecto - la
+propia convención de módulos locales autocargados de BoxLang (cualquier
+carpeta de módulo ahí se detecta de la misma forma en que npm detecta un
+`node_modules/` local al proyecto), de modo que queda activo en el
+registro de módulos de BoxLang en ejecución sin necesidad de
+`BOXLANG_HOME` ni de ningún paso de instalación global. `install:plugin`
+lo carga en el runtime de inmediato e imprime de vuelta el nombre real de
+mapeo del módulo registrado (que, según la nota de abajo, no siempre
+coincide con el slug de ForgeBox) - añade *ese* nombre al array `plugins`
+de `bxsites.json` para activarlo, igual que con cualquier otro módulo
+instalado. Consulta
+[`install:plugin`](../cli-reference.md#installplugin) en la referencia de
+la CLI.
+
 ## Escribir un plugin
 
 Un módulo de plugin necesita exactamente una cosa más allá del habitual

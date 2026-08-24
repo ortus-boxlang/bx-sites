@@ -9,7 +9,7 @@ tags: [guide, alpine, interattività]
 
 Ogni pagina compilata da BX Sites carica già [Alpine.js](https://alpinejs.dev/)
 - è ciò che alimenta l'interruttore modalità scura integrato e il menu a
-discesa della lingua in ognuno dei tre temi integrati. Quella stessa
+discesa della lingua in ogni tema integrato. Quella stessa
 istanza Alpine è disponibile gratuitamente anche per il contenuto delle
 tue pagine: nessuna impostazione di `bxsites.json` da attivare, nessuna
 voce `extraJs` da aggiungere, nessun tag `<script>` extra da scrivere nel

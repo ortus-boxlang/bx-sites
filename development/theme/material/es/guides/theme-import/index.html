@@ -8,10 +8,10 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Importing a theme - BX Sites</title>
+	<title>Importar un tema - BX Sites</title>
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="BX Sites">
-	<meta property="og:title" content="Importing a theme">
+	<meta property="og:title" content="Importar un tema">
 	
 
 	<meta name="description" content="Static documentation site generator for BoxLang, built on bx-markdown">
@@ -79,128 +79,143 @@
 
 			<article class="md-card">
 
-				<p class="fallback-notice"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Esta p&aacute;gina a&uacute;n no se ha traducido - se muestra la versi&oacute;n en English.</p>
-
-				<h1 class="md-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208,80v96H48V80Z" opacity="0.2"/><path d="M213.66,181.66l-32,32a8,8,0,0,1-11.32-11.32L188.69,184H48a8,8,0,0,1,0-16H188.69l-18.35-18.34a8,8,0,0,1,11.32-11.32l32,32A8,8,0,0,1,213.66,181.66Zm-139.32-64a8,8,0,0,0,11.32-11.32L67.31,88H208a8,8,0,0,0,0-16H67.31L85.66,53.66A8,8,0,0,0,74.34,42.34l-32,32a8,8,0,0,0,0,11.32Z"/></svg></span> Importing a theme</h1>
-<div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/material/es/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-sites/development/theme/material/es/tags/index.html#tag-themes">themes</a><a class="page-tag" href="/bx-sites/development/theme/material/es/tags/index.html#tag-migration">migration</a></div>
-<details class="bxsites-toc-mobile md-toc--mobile"><summary class="md-toc--mobile__summary">En esta p&aacute;gina</summary><ul><li class="md-toc__item md-toc__item--2"><a href="#what-actually-gets-converted">What actually gets converted</a></li><li class="md-toc__item md-toc__item--2"><a href="#after-importing">After importing</a></li></ul></details>
+				<h1 class="md-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208,80v96H48V80Z" opacity="0.2"/><path d="M213.66,181.66l-32,32a8,8,0,0,1-11.32-11.32L188.69,184H48a8,8,0,0,1,0-16H188.69l-18.35-18.34a8,8,0,0,1,11.32-11.32l32,32A8,8,0,0,1,213.66,181.66Zm-139.32-64a8,8,0,0,0,11.32-11.32L67.31,88H208a8,8,0,0,0,0-16H67.31L85.66,53.66A8,8,0,0,0,74.34,42.34l-32,32a8,8,0,0,0,0,11.32Z"/></svg></span> Importar un tema</h1>
+<div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/material/es/tags/index.html#tag-guías">gu&iacute;as</a><a class="page-tag" href="/bx-sites/development/theme/material/es/tags/index.html#tag-temas">temas</a><a class="page-tag" href="/bx-sites/development/theme/material/es/tags/index.html#tag-migración">migraci&oacute;n</a></div>
+<details class="bxsites-toc-mobile md-toc--mobile"><summary class="md-toc--mobile__summary">En esta p&aacute;gina</summary><ul><li class="md-toc__item md-toc__item--2"><a href="#qué-se-convierte-realmente">Qu&eacute; se convierte realmente</a></li><li class="md-toc__item md-toc__item--2"><a href="#después-de-importar">Despu&eacute;s de importar</a></li></ul></details>
 				<div class="md-content-body">
-				<h1 id="importing-a-theme"><a href="#importing-a-theme" id="importing-a-theme" name="importing-a-theme" class="anchor"></a>Importing a theme</h1>
-<p><code>bxSites theme:import</code> converts a theme from another static site
-generator's ecosystem into a bx-sites theme scaffold under
-<code>themes/&lt;name&gt;/</code> - a best-effort starting point, not a lossless
-one-command port. It handles the three ecosystems whose theme structure
-maps onto bx-sites' own <code>layout.bxm</code>+<code>page.bxm</code> contract (see
-<a href="/bx-sites/development/theme/material/es/guides/themes/index.html#the-themeprovider-contract">Themes</a>):</p>
+				<h1 id="importar-un-tema"><a href="#importar-un-tema" id="importar-un-tema" name="importar-un-tema" class="anchor"></a>Importar un tema</h1>
+<p><code>bxSites theme:import</code> convierte un tema del ecosistema de otro generador
+de sitios estáticos en un scaffold de tema bx-sites bajo <code>themes/&lt;name&gt;/</code></p>
 <ul>
-<li><strong><code>mkdocs</code></strong> - Jinja2 templates (native mkdocs and mkdocs-material both
-use <code>base.html</code>+<code>main.html</code>)</li>
-<li><strong><code>jekyll</code></strong> - Liquid templates (<code>_layouts/default.html</code>+
-<code>_layouts/page.html</code>)</li>
-<li><strong><code>hugo</code></strong> - Go templates (<code>layouts/_default/baseof.html</code>+
-<code>layouts/_default/single.html</code>)</li>
+<li>
+<p>un punto de partida de mejor esfuerzo, no una migración sin pérdidas en
+un solo comando. Maneja los tres ecosistemas cuya estructura de tema se
+corresponde con el propio contrato <code>layout.bxm</code>+<code>page.bxm</code> de bx-sites
+(consulta <a href="/bx-sites/development/theme/material/es/guides/themes/index.html#el-contrato-de-themeprovider">Temas</a>):</p>
+</li>
+<li>
+<p><strong><code>mkdocs</code></strong> - plantillas Jinja2 (tanto mkdocs nativo como
+mkdocs-material usan <code>base.html</code>+<code>main.html</code>)</p>
+</li>
+<li>
+<p><strong><code>jekyll</code></strong> - plantillas Liquid (<code>_layouts/default.html</code>+
+<code>_layouts/page.html</code>)</p>
+</li>
+<li>
+<p><strong><code>hugo</code></strong> - plantillas Go (<code>layouts/_default/baseof.html</code>+
+<code>layouts/_default/single.html</code>)</p>
+</li>
 </ul>
-<p>A React/Vue-component-based theme (Docusaurus, VuePress, Gatsby, ...) has
-no equivalent here - there's no template <em>file</em> to mechanically translate,
-since the theme is compiled UI components rather than server-rendered
-markup. Porting one of those means re-authoring it as a bx-sites theme
-from scratch (see <a href="/bx-sites/development/theme/material/es/guides/themes/index.html#writing-a-theme-from-scratch">Writing a theme from scratch</a>),
-not converting it.</p>
+<p>Un tema basado en componentes React/Vue (Docusaurus, VuePress, Gatsby,
+...) no tiene equivalente aquí - no hay ningún <em>archivo</em> de plantilla que
+traducir mecánicamente, ya que el tema son componentes de interfaz
+compilados en lugar de marcado renderizado en el servidor. Portar uno de
+esos significa reescribirlo como un tema bx-sites desde cero (consulta
+<a href="/bx-sites/development/theme/material/es/guides/themes/index.html#escribir-un-tema-desde-cero">Escribir un tema desde cero</a>), no
+convertirlo.</p>
 <pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites theme:import --source=mkdocs --path=/path/to/mkdocs-theme --name=my-imported-theme
 </code></pre>
 <ul>
-<li><code>--source</code> (required) - <code>mkdocs</code>, <code>jekyll</code>, or <code>hugo</code></li>
-<li><code>--path</code> (required) - the source theme's own root folder (the one
-containing its layout template, not the whole mkdocs/jekyll/hugo
-<em>project</em> - see <a href="/bx-sites/development/theme/material/es/guides/migrating-from-mkdocs/index.html">Migrating from mkdocs</a>/
-<a href="/bx-sites/development/theme/material/es/guides/migrating-from-gitbook/index.html">Migrating from GitBook</a> for converting a
-project's <em>content</em>, a different job from converting its <em>theme</em>)</li>
-<li><code>--name</code> (required) - the destination name, written to <code>themes/&lt;name&gt;/</code>
-(the same <a href="/bx-sites/development/theme/material/es/guides/themes/index.html#installing-a-published-theme">installed-theme convention</a>
-<code>install:theme</code> uses) - set <code>bxsites.json</code>'s <code>theme.name</code> to it once
-you're happy with the result</li>
+<li><code>--source</code> (obligatorio) - <code>mkdocs</code>, <code>jekyll</code> o <code>hugo</code></li>
+<li><code>--path</code> (obligatorio) - la propia carpeta raíz del tema de origen (la
+que contiene su plantilla de layout, no todo el <em>proyecto</em>
+mkdocs/jekyll/hugo - consulta
+<a href="/bx-sites/development/theme/material/es/guides/migrating-from-mkdocs/index.html">Migrar desde mkdocs</a>/
+<a href="/bx-sites/development/theme/material/es/guides/migrating-from-gitbook/index.html">Migrar desde GitBook</a> para convertir el
+<em>contenido</em> de un proyecto, una tarea distinta de convertir su <em>tema</em>)</li>
+<li><code>--name</code> (obligatorio) - el nombre de destino, escrito en
+<code>themes/&lt;name&gt;/</code> (la misma
+<a href="/bx-sites/development/theme/material/es/guides/themes/index.html#instalar-un-tema-publicado">convención de tema instalado</a>
+que usa <code>install:theme</code>) - establece el <code>theme.name</code> de
+<code>bxsites.json</code> una vez que estés satisfecho con el resultado</li>
 </ul>
-<p>Re-running against the same <code>--name</code> is safe - <code>layout.bxm</code>/<code>page.bxm</code>
-are overwritten and any newly-found asset folders merged in, so iterating
-(tweak the source, or the mapping, re-run) is the normal workflow, not a
-one-shot operation.</p>
-<h2 id="what-actually-gets-converted"><a href="#what-actually-gets-converted" id="what-actually-gets-converted" name="what-actually-gets-converted" class="anchor"></a>What actually gets converted</h2>
-<p>The command output reports exactly what happened - which source file
-became <code>layout.bxm</code>/<code>page.bxm</code> (or a note that none was found, if the
-source theme doesn't use one of the conventional filenames above), which
-asset folders (<code>css/</code>, <code>js/</code>, <code>static/</code>, ...) were copied verbatim into
-<code>themes/&lt;name&gt;/assets/</code>, and a numbered list of everything that needs a
-manual look.</p>
-<p>Within a template file, this is a <strong>mechanical, best-effort translator</strong>
-(<code>JinjaLikeTranslator.bx</code> for mkdocs/jekyll's shared Jinja2/Liquid syntax,
-<code>GoTemplateTranslator.bx</code> for hugo's Go templates) - not a real parser for
-either language. What it handles:</p>
+<p>Volver a ejecutarlo contra el mismo <code>--name</code> es seguro - <code>layout.bxm</code>/
+<code>page.bxm</code> se sobrescriben y cualquier carpeta de recursos recién
+encontrada se combina, así que iterar (ajustar el origen, o el mapeo,
+volver a ejecutar) es el flujo de trabajo normal, no una operación de un
+solo uso.</p>
+<h2 id="qué-se-convierte-realmente"><a href="#qué-se-convierte-realmente" id="qué-se-convierte-realmente" name="qué-se-convierte-realmente" class="anchor"></a>Qué se convierte realmente</h2>
+<p>La salida del comando informa exactamente qué ocurrió - qué archivo de
+origen se convirtió en <code>layout.bxm</code>/<code>page.bxm</code> (o una nota indicando que
+no se encontró ninguno, si el tema de origen no usa uno de los nombres de
+archivo convencionales de arriba), qué carpetas de recursos (<code>css/</code>,
+<code>js/</code>, <code>static/</code>, ...) se copiaron tal cual en <code>themes/&lt;name&gt;/assets/</code>, y
+una lista numerada de todo lo que necesita revisión manual.</p>
+<p>Dentro de un archivo de plantilla, esto es un <strong>traductor mecánico de
+mejor esfuerzo</strong> (<code>JinjaLikeTranslator.bx</code> para la sintaxis Jinja2/Liquid
+compartida de mkdocs/jekyll, <code>GoTemplateTranslator.bx</code> para las plantillas
+Go de hugo) - no un analizador real de ninguno de los dos lenguajes. Lo
+que maneja:</p>
 <ul>
-<li>Variable output (<code>{{ page.title }}</code> / Hugo's <code>{{ .Title }}</code>), mapped
-against a small, fixed table of the common fields (page title/content/
-description, site name/description, base URL, nav) - anything outside
-that table is left as a <code>&lt;!--- TODO: ... ---&gt;</code> marker rather than
-guessed at.</li>
-<li><code>if</code>/<code>elif</code>/<code>else</code>/<code>endif</code> (mkdocs/jekyll) or <code>if</code>/<code>else if</code>/<code>else</code>/<code>end</code>
-(hugo), translated into real <code>&lt;bx:if&gt;</code>/<code>&lt;bx:elseif&gt;</code>/<code>&lt;bx:else&gt;</code>
-structure - always structurally valid even when the <em>condition</em> itself
-references something outside the mapping table (flagged as a warning
-instead, since leaving the surrounding <code>if</code> broken would be worse than
-a condition a human still needs to check).</li>
-<li><code>for x in list</code>/<code>endfor</code> (mkdocs/jekyll) or <code>range</code>/<code>end</code> (hugo),
-translated into <code>&lt;bx:loop&gt;</code> the same way. Hugo's <code>range</code> rebinds <code>.</code> to
-each item with no named loop variable in the common case - the
-generated <code>&lt;bx:loop&gt;</code> always uses a synthetic <code>item</code> name, and a
-standing warning notes that a bare <code>.Field</code> <em>inside</em> the loop body
-means the range item's own field in Go, which can't be automatically
-retargeted to <code>item.Field</code>.</li>
-<li>Comments (<code>{# ... #}</code>/<code>{% comment %}</code> for Jinja2/Liquid, <code>{{/* ... */}}</code>
-for Go), dropped entirely.</li>
+<li>Salida de variables (<code>{{ page.title }}</code> / el <code>{{ .Title }}</code> de Hugo),
+mapeada contra una tabla pequeña y fija de los campos comunes (título/
+contenido/descripción de la página, nombre/descripción del sitio, URL
+base, navegación) - cualquier cosa fuera de esa tabla se deja como un
+marcador <code>&lt;!--- TODO: ... ---&gt;</code> en lugar de adivinarse.</li>
+<li><code>if</code>/<code>elif</code>/<code>else</code>/<code>endif</code> (mkdocs/jekyll) o <code>if</code>/<code>else if</code>/<code>else</code>/<code>end</code>
+(hugo), traducido a una estructura <code>&lt;bx:if&gt;</code>/<code>&lt;bx:elseif&gt;</code>/<code>&lt;bx:else&gt;</code>
+real - siempre estructuralmente válida incluso cuando la propia
+<em>condición</em> referencia algo fuera de la tabla de mapeo (marcada como
+advertencia en su lugar, ya que dejar el <code>if</code> circundante roto sería
+peor que una condición que un humano todavía necesita revisar).</li>
+<li><code>for x in list</code>/<code>endfor</code> (mkdocs/jekyll) o <code>range</code>/<code>end</code> (hugo),
+traducido a <code>&lt;bx:loop&gt;</code> de la misma forma. El <code>range</code> de Hugo reasigna
+<code>.</code> a cada elemento sin ninguna variable de bucle con nombre en el caso
+común - el <code>&lt;bx:loop&gt;</code> generado siempre usa un nombre sintético <code>item</code>,
+y una advertencia permanente señala que un <code>.Field</code> suelto <em>dentro</em> del
+cuerpo del bucle significa el propio campo del elemento del range en
+Go, que no puede redirigirse automáticamente a <code>item.Field</code>.</li>
+<li>Comentarios (<code>{# ... #}</code>/<code>{% comment %}</code> para Jinja2/Liquid,
+<code>{{/* ... */}}</code> para Go), eliminados por completo.</li>
 </ul>
-<p>What's deliberately <strong>not</strong> translated, always left as a TODO marker (or,
-inside a condition where leaving raw untranslated syntax would produce
-invalid BoxLang, substituted with a syntactically-safe placeholder -
-<code>false</code> for a condition, <code>[]</code> for a loop's list expression - flagged the
-same way):</p>
+<p>Lo que deliberadamente <strong>no</strong> se traduce, siempre dejado como un marcador
+TODO (o, dentro de una condición donde dejar la sintaxis sin traducir en
+bruto produciría BoxLang inválido, sustituido por un marcador de posición
+sintácticamente seguro - <code>false</code> para una condición, <code>[]</code> para la
+expresión de lista de un bucle - marcado de la misma forma):</p>
 <ul>
-<li>A filter/pipeline (<code>{{ page.title | upper }}</code>, <code>{{ .Title | truncate 100 }}</code>)
+<li>Un filtro/pipeline (<code>{{ page.title | upper }}</code>, <code>{{ .Title | truncate 100 }}</code>)
 <ul>
-<li>filter semantics vary too much to guess at safely.</li>
-<li>it's still worth verifying manually, since a filter with a plainly-safe BoxLang
-equivalent (<code>upper</code> → <code>ucase()</code>) is common enough to be a quick manual fix.</li>
+<li>la semántica de los filtros varía demasiado como para adivinarla con
+seguridad - de todos modos vale la pena verificarlo manualmente, ya que
+un filtro con un equivalente BoxLang claramente seguro (<code>upper</code> →
+<code>ucase()</code>) es lo bastante común como para ser un arreglo manual rápido.</li>
 </ul>
 </li>
-<li>Template inheritance (Jinja2's <code>{% extends %}</code>/<code>{% block %}</code>, Hugo's
-<code>{{ block }}</code>/<code>{{ define }}</code>) and includes/partials (<code>{% include %}</code>) -
-no automatic way to map these onto bx-sites' own single-file
-<code>layout.bxm</code>+<code>page.bxm</code> contract.</li>
-<li>Hugo's <code>{{ with .X }}</code> - rebinds <code>.</code> to a new context for its own body,
-with no bx-sites equivalent at all, so it's left untranslated rather
-than emitted as a structurally-valid but semantically-wrong <code>&lt;bx:if&gt;</code>.</li>
-<li>A Go condition that isn't a single field reference (Go writes boolean
-logic as prefix function calls - <code>{{ if and .A .B }}</code>, <code>{{ if eq .Type &quot;post&quot; }}</code>
+<li>La herencia de plantillas (<code>{% extends %}</code>/<code>{% block %}</code> de Jinja2,
+<code>{{ block }}</code>/<code>{{ define }}</code> de Hugo) e includes/parciales
+(<code>{% include %}</code>) - no hay forma automática de mapear esto al propio
+contrato de archivo único <code>layout.bxm</code>+<code>page.bxm</code> de bx-sites.</li>
+<li>El <code>{{ with .X }}</code> de Hugo - reasigna <code>.</code> a un nuevo contexto para su
+propio cuerpo, sin ningún equivalente en bx-sites en absoluto, así que
+se deja sin traducir en lugar de emitirse como un <code>&lt;bx:if&gt;</code>
+estructuralmente válido pero semánticamente incorrecto.</li>
+<li>Una condición de Go que no es una única referencia a un campo (Go
+escribe la lógica booleana como llamadas a función en notación prefija
 <ul>
-<li>which have no BoxLang infix equivalent; substituting just the
-<code>.Field</code> tokens inside one would still leave invalid BoxLang text
-behind, so the whole condition is replaced with the placeholder
-instead).</li>
+<li><code>{{ if and .A .B }}</code>, <code>{{ if eq .Type &quot;post&quot; }}</code> - que no tienen un
+equivalente infijo en BoxLang; sustituir solo los tokens <code>.Field</code>
+dentro de una de ellas seguiría dejando texto BoxLang inválido detrás,
+así que toda la condición se reemplaza por el marcador de posición en
+su lugar).</li>
 </ul>
 </li>
-<li>Any variable reference not in the fixed mapping table.</li>
+<li>Cualquier referencia de variable que no esté en la tabla de mapeo fija.</li>
 </ul>
-<h2 id="after-importing"><a href="#after-importing" id="after-importing" name="after-importing" class="anchor"></a>After importing</h2>
-<p>The scaffold is a starting point, not a finished theme - work through the
-reported TODO markers and warnings, then check it against the
-<a href="/bx-sites/development/theme/material/es/guides/themes/index.html#the-themeprovider-contract">ThemeProvider contract</a> the same
-way a hand-written theme needs to (<code>layout.bxm</code>+<code>page.bxm</code> required,
-<code>search.bxm</code> optional). None of the page-feature conventions every
-built-in theme implements (dark mode, breadcrumbs, prev/next, the search
-box, ...) come along automatically - the source theme's own markup for
-those, if it had any, went through the same mechanical translation as
-everything else and needs the same review.</p>
+<h2 id="después-de-importar"><a href="#después-de-importar" id="después-de-importar" name="después-de-importar" class="anchor"></a>Después de importar</h2>
+<p>El scaffold es un punto de partida, no un tema terminado - trabaja los
+marcadores TODO y las advertencias reportados, y luego verifícalo contra
+el <a href="/bx-sites/development/theme/material/es/guides/themes/index.html#el-contrato-de-themeprovider">contrato de ThemeProvider</a> de
+la misma forma en que lo necesita un tema escrito a mano (<code>layout.bxm</code>+
+<code>page.bxm</code> obligatorios, <code>search.bxm</code> opcional). Ninguna de las
+convenciones de funciones de página que implementa cada tema incorporado
+(modo oscuro, migas de pan, anterior/siguiente, el cuadro de búsqueda,
+...) viene incluida automáticamente - el propio marcado del tema de
+origen para esas, si lo tenía, pasó por la misma traducción mecánica que
+todo lo demás y necesita la misma revisión.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/theme-import.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/material/es/guides/theme-import.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 24, 2026, 12&#x3a;15&#x3a;58 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/theme-import.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/material/es/guides/theme-import.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
 			</article>
 
 
@@ -208,7 +223,7 @@ everything else and needs the same review.</p>
 		</main>
 
 		<aside class="md-toc-sidebar">
-			<nav class="md-toc" aria-label="En esta p&aacute;gina"><div class="md-toc__title">En esta p&aacute;gina</div><ul><li class="md-toc__item md-toc__item--2"><a href="#what-actually-gets-converted">What actually gets converted</a></li><li class="md-toc__item md-toc__item--2"><a href="#after-importing">After importing</a></li></ul></nav>
+			<nav class="md-toc" aria-label="En esta p&aacute;gina"><div class="md-toc__title">En esta p&aacute;gina</div><ul><li class="md-toc__item md-toc__item--2"><a href="#qué-se-convierte-realmente">Qu&eacute; se convierte realmente</a></li><li class="md-toc__item md-toc__item--2"><a href="#después-de-importar">Despu&eacute;s de importar</a></li></ul></nav>
 		</aside>
 
 	</div>

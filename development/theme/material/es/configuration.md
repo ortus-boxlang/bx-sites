@@ -13,7 +13,7 @@ Cada proyecto tiene una configuración de sitio única en su raíz -
 `bxsites.json` para un proyecto que prefiera quedarse con él. Ambos son
 totalmente compatibles y producen exactamente el mismo resultado;
 `bxSites new` genera `bxsites.yaml` a menos que se pase `--format=json`
-(consulta [Primeros Pasos](getting-started.md#formato-del-archivo-de-configuracion)).
+(consulta [Primeros Pasos](getting-started.md#formato-del-archivo-de-configuración)).
 Si un proyecto de algún modo tiene más de uno, `bxsites.yaml` prevalece,
 luego `bxsites.yml`, luego `bxsites.json`.
 
@@ -113,7 +113,7 @@ de página. Obligatorio.
 Una descripción de sitio opcional, usada como `<meta name="description">`
 y `og:description` de reserva para cualquier página que no defina su
 propio frontmatter `description` (consulta
-[Primeros Pasos](getting-started.md#add-pages)).
+[Primeros Pasos](getting-started.md#añadir-páginas)).
 
 ## `baseURL`
 
@@ -185,16 +185,51 @@ tener sentido. Enumera cada página no oculta según el protocolo de
     { "theme": { "options": { "colorMode": "dark" } } }
     ```
   - `theme.options.navCollapsible` - `false` (el valor por defecto)
-    renderiza cada encabezado de sección de navegación siempre expandido,
-    como hoy. `true` renderiza cada sección de navegación (una carpeta sin
-    `index.md`) como un desplegable nativo `<details>`/`<summary>` que el
-    visitante puede colapsar - sin ningún framework de JS involucrado.
+    renderiza cada sección de navegación siempre expandida, como hoy.
+    `true` da a cada sección con hijos un botón de alternancia que el
+    visitante puede pulsar para colapsarla/expandirla - ya sea que esa
+    sección sea un simple encabezado de grupo (una carpeta sin
+    `index.md`) o que enlace a su propia página. La sección que contiene
+    la página en la que estás actualmente siempre empieza abierta,
+    independientemente de `navExpandAll`, así que navegar hasta ahí nunca
+    entierra el propio enlace en el que te encuentras.
   - `theme.options.navExpandAll` - solo relevante cuando `navCollapsible`
     es `true`. `true` (el valor por defecto) inicia cada sección abierta;
-    `false` inicia cada sección colapsada.
+    `false` inicia cada sección colapsada, excepto la que contiene la
+    página actual.
 
     ```json
     { "theme": { "options": { "navCollapsible": true, "navExpandAll": false } } }
+    ```
+  - `theme.options.tocPosition` - dónde se renderiza la propia tabla de
+    contenido "En esta página" de una página. `"top"` (el valor por
+    defecto) la renderiza en línea, en la parte superior del artículo,
+    como hoy. `"sticky"` la traslada a su propia columna a la derecha que
+    permanece visible mientras el artículo se desplaza por debajo de
+    ella - la misma lista "En esta página", solo que fija, lo cual ayuda
+    en páginas largas. La columna fija solo cabe en viewports anchos (se
+    oculta por debajo del punto en el que un diseño de 3 columnas
+    resultaría apretado); por debajo de ese ancho, el modo `sticky`
+    renderiza en su lugar una barra colapsable "En esta página" fijada en
+    la parte superior del viewport mientras se hace scroll - toca para
+    expandir la lista, el mismo tratamiento que usan VitePress/GitBook en
+    móvil - así que la tabla de contenido sigue siendo accesible en
+    cualquier ancho de viewport, solo cambia de forma según el espacio
+    disponible.
+
+    ```json
+    { "theme": { "options": { "tocPosition": "sticky" } } }
+    ```
+  - `theme.options.pageMetaPosition` - dónde se renderiza la fila de
+    editar-esta-página/descargar-markdown/última-actualización en
+    relación con el propio contenido de la página. `"bottom"` (el valor
+    por defecto) la renderiza como una pequeña nota de pie justo antes de
+    que termine el artículo. `"top"` la renderiza en su lugar cerca del
+    título, el mismo lugar donde siempre se renderizaba antes de que
+    existiera esta opción.
+
+    ```json
+    { "theme": { "options": { "pageMetaPosition": "top" } } }
     ```
 
 ## `search`
@@ -203,6 +238,57 @@ tener sentido. Enumera cada página no oculta según el protocolo de
 conecta el cuadro de búsqueda; `false` omite ambos por completo - sin
 `search-index.json`, sin interfaz de búsqueda, sin JS adicional enviado.
 Consulta [Búsqueda](guides/search.md).
+
+## `searchProvider`
+
+Qué interfaz de búsqueda conecta `search: true`:
+
+- `provider` - `"local"` (el valor por defecto) es la propia búsqueda
+  estática/del lado del cliente de bx-sites (`search-index.json` +
+  lunr.js, consulta [Búsqueda](guides/search.md#local-el-predeterminado)).
+  `"algolia"` conecta en su lugar
+  [Algolia DocSearch](guides/search.md#algolia), y `"pagefind"` conecta
+  [Pagefind](guides/search.md#pagefind). Cualquier otro valor es un
+  proveedor personalizado propio de un proyecto, conectado mediante una
+  sobrescritura `theme/` - consulta
+  [Búsqueda](guides/search.md#otros-proveedores-de-búsqueda).
+- `algolia` - obligatorio cuando `provider` es `"algolia"`: `appId`,
+  `apiKey` (la clave API pública *solo de búsqueda*, no una clave de
+  administrador) e `indexName`, exactamente como los espera el propio
+  cliente DocSearch de Algolia. `insights` (`false` por defecto) activa la
+  analítica de clics/conversión de DocSearch.
+
+  ```json linenums="1"
+  {
+    "search": true,
+    "searchProvider": {
+      "provider": "algolia",
+      "algolia": {
+        "appId": "ABC123",
+        "apiKey": "a1b2c3d4e5f6...",
+        "indexName": "my-docs"
+      }
+    }
+  }
+  ```
+
+- `pagefind` - ambas claves opcionales cuando `provider` es `"pagefind"`:
+  `bin` (por defecto `"pagefind"`) es el nombre/ruta del ejecutable de la
+  CLI, resuelto contra `PATH` cuando es un nombre simple; `options` es un
+  array de flags de CLI adicionales en bruto que se pasan tal cual. La
+  propia CLI de `pagefind` debe estar ya instalada y en el `PATH` - BX
+  Sites la invoca externamente (como hace con `git` para
+  `lastUpdated`/`gh-deploy`), no la instala por ti.
+
+  ```json linenums="1"
+  {
+    "search": true,
+    "searchProvider": {
+      "provider": "pagefind",
+      "pagefind": { "bin": "pagefind", "options": [] }
+    }
+  }
+  ```
 
 ## `nav`
 
@@ -229,15 +315,20 @@ Cada entrada es o bien:
   el título/icono propio de la página enlazada en la navegación (el
   `<h1>`/`<title>` real de la página queda intacto - solo cambia la
   etiqueta/icono de navegación) - consulta
-  [Temas: Iconos](guides/themes.md#icons) para lo que puede ser un valor
+  [Temas: Iconos](guides/themes.md#iconos) para lo que puede ser un valor
   de `icon`
 
-```json
+Una entrada solo con `title`, con `children` y sin `path` es exactamente
+una etiqueta contenedora/de sección de menú - un encabezado no clicable
+que simplemente agrupa a sus hijos, el mismo papel que cumple
+"MAIN COMPONENTS" en la propia barra lateral de GitBook:
+
+```json title="bxsites.json" linenums="1"
 {
 	"nav": [
 		"index.md",
 		{
-			"title": "Guides",
+			"title": "Main Components",
 			"children": [
 				{ "title": "Quick Start", "path": "guides/setup.md" },
 				"guides/deployment.md"
@@ -246,6 +337,11 @@ Cada entrada es o bien:
 	]
 }
 ```
+
+Dale a esa misma entrada de grupo un `path` en su lugar y se convierte en
+una sección enlazada normal (con su propia página de aterrizaje, más
+hijos) en lugar de una etiqueta simple - ambas formas se anidan bajo
+`theme.options.navCollapsible` de la misma manera (consulta arriba).
 
 Para una navegación lo bastante grande como para saturar `bxsites.json`,
 muévela a su propio archivo `docs/nav.json` en su lugar - la misma forma
@@ -305,9 +401,9 @@ defecto, pero BX Sites lo establece en `true` por defecto (consulta la
 
 | Clave | Valor por defecto | Efecto |
 |---|---|---|
-| `enableAdmonition` | `true` *(valor por defecto de BX Sites; el propio valor por defecto de bx-markdown es `false`)* | Bloques de aviso `!!!`/`???`/`???+` - consulta la [guía de Extensiones de Markdown](guides/markdown.md#admonitions) |
-| `enableFootnotes` | `false` | Referencias de nota al pie `[^label]` - consulta la [guía de Extensiones de Markdown](guides/markdown.md#footnotes) |
-| `enableDefinitionLists` | `false` | Listas `Term\n:   Definition` - consulta la [guía de Extensiones de Markdown](guides/markdown.md#definition-lists) |
+| `enableAdmonition` | `true` *(valor por defecto de BX Sites; el propio valor por defecto de bx-markdown es `false`)* | Bloques de aviso `!!!`/`???`/`???+` - consulta la [guía de Extensiones de Markdown](guides/markdown.md#admoniciones) |
+| `enableFootnotes` | `false` | Referencias de nota al pie `[^label]` - consulta la [guía de Extensiones de Markdown](guides/markdown.md#notas-al-pie) |
+| `enableDefinitionLists` | `false` | Listas `Term\n:   Definition` - consulta la [guía de Extensiones de Markdown](guides/markdown.md#listas-de-definiciones) |
 | `autoLinkUrls` | `true` | Enlaza automáticamente URL y direcciones de correo sin formato |
 | `anchorLinks` | `true` | Añade un enlace de ancla clicable a cada encabezado |
 | `anchorSetId` | `true` | Estampa un atributo `id` en cada encabezado |
@@ -337,7 +433,7 @@ defecto, pero BX Sites lo establece en `true` por defecto (consulta la
 
 ## `repo`
 
-Añade un enlace con icono de repositorio a la cabecera (los tres temas
+Añade un enlace con icono de repositorio a la cabecera (todos los temas
 incorporados) y, cuando ambas claves están definidas, un enlace "Edit this
 page" en cada página.
 
@@ -432,7 +528,7 @@ con `generateOgImages` desactivado, no se renderiza ninguna etiqueta
 ```
 
 El propio `ogImage` del frontmatter de una página (consulta
-[Primeros Pasos](getting-started.md#add-pages)) siempre prevalece sobre
+[Primeros Pasos](getting-started.md#añadir-páginas)) siempre prevalece sobre
 este valor por defecto de todo el sitio para esa página en particular.
 
 ### `generateOgImages`
@@ -465,13 +561,70 @@ prefijo `baseURL`; una URL absoluta se usa tal cual). Las entradas de
 }
 ```
 
+## `assets`
+
+```json linenums="1"
+{
+	"assets": {
+		"fingerprint": true,
+		"bundle": true,
+		"images": {
+			"enabled": true,
+			"widths": [ 400, 800, 1200, 1600 ],
+			"formats": [ "original", "webp" ]
+		}
+	}
+}
+```
+
+El pipeline de recursos - redimensionado de imágenes/WebP mediante
+[bx-image](https://github.com/ortus-boxlang/bx-image) (una dependencia
+obligatoria, instalada junto a bx-markdown/bx-esapi) y empaquetado de
+CSS/JS. Todo aquí está activo por defecto con valores razonables - un
+proyecto recién creado con `bxSites new` no necesita tocar nada de esto.
+Consulta [Imágenes Responsivas](guides/images.md) para el panorama
+completo, incluido lo que deliberadamente no está cubierto (AVIF, GIFs
+animados, SVGs).
+
+- `assets.fingerprint` - `true` (el valor por defecto). Asigna un nombre
+  con hash de contenido a cada variante de imagen generada y cada paquete
+  CSS/JS (por ejemplo, `screenshot-800w.a3f9c2e1.webp`,
+  `bundle.a3f9c2e1.css`), de modo que puedan servirse con cabeceras de
+  caché seguras y de larga duración - una construcción del proyecto solo
+  cambia el propio nombre del archivo cuando su contenido realmente
+  cambia. No renombra los archivos originales propios de un proyecto bajo
+  `docs/assets/` - solo se le asigna huella digital a la salida generada
+  por el pipeline, así que cualquier otra cosa que referencie un recurso
+  por su nombre de archivo simple (una tarjeta de descarga `::: file`, un
+  enlace de markdown en bruto) sigue funcionando sin cambios.
+- `assets.bundle` - `true` (el valor por defecto). Concatena
+  `extraCss`/`extraJs` en un único archivo con huella digital cada uno -
+  BoxLang/JVM puro, sin cadena de herramientas de Node/esbuild. Recurre
+  exactamente al comportamiento actual `<link>`/`<script>` por URL, sin
+  cambios, en cuanto cualquier entrada de la lista es una URL externa (un
+  enlace de CDN) o nombra un archivo que no existe - consulta
+  [Imágenes Responsivas](guides/images.md#empaquetado-de-cssjs).
+- `assets.images.enabled` - `true` (el valor por defecto). Toda imagen
+  elegible bajo `docs/assets/**` (`.png`/`.jpg`/`.jpeg`) obtiene variantes
+  redimensionadas/WebP generadas mediante bx-image, y cada `<img>`
+  coincidente se reescribe en un `<picture>` con `srcset`. Establece
+  `false` para recurrir a la copia de imágenes simple y sin procesar,
+  exactamente como antes de que existiera esta función.
+- `assets.images.widths` - puntos de ruptura a generar, en píxeles. Un
+  ancho igual o mayor que el propio ancho de una imagen dada se omite
+  automáticamente para esa imagen - nunca se hace upscale.
+- `assets.images.formats` - `"original"` mantiene el formato de origen
+  como el fallback de `<img>`; `"webp"` añade una variante
+  `<source type="image/webp">` del mismo tamaño. Ambos activos por
+  defecto.
+
 ## `mermaid`
 
 `false` (el valor por defecto) - sin soporte de diagramas
 [Mermaid](https://mermaid.js.org/) en absoluto. `true` carga `mermaid.js`
 del lado del cliente y renderiza cada bloque de código con fence
 ` ```mermaid ` como un diagrama. Consulta
-[Extensiones de Markdown](guides/markdown.md#diagrams) para la sintaxis.
+[Extensiones de Markdown](guides/markdown.md#diagramas) para la sintaxis.
 
 ```json
 { "mermaid": true }
@@ -482,7 +635,7 @@ del lado del cliente y renderiza cada bloque de código con fence
 `false` (el valor por defecto) - sin [KaTeX](https://katex.org/) en
 absoluto. `true` lo carga del lado del cliente y compone `$...$`/`$$...$$`
 escrito directamente en el markdown de una página. Consulta
-[Extensiones de Markdown](guides/markdown.md#math) para la sintaxis.
+[Extensiones de Markdown](guides/markdown.md#matemáticas) para la sintaxis.
 
 ```json
 { "math": true }
@@ -492,7 +645,7 @@ Las admoniciones (cuadros de aviso al estilo nota/advertencia/consejo),
 las pestañas de contenido y las anotaciones de código con fence
 `hl_lines`/`linenums`/`title` están siempre disponibles en el markdown de
 cualquier página, sin necesidad de configuración - consulta
-[Extensiones de Markdown](guides/markdown.md#admonitions).
+[Extensiones de Markdown](guides/markdown.md#admoniciones).
 
 ## `openapi`
 
@@ -527,18 +680,22 @@ automáticamente en cuanto su carpeta existe; `i18n` simplemente
 proporciona su etiqueta de visualización/dirección para el selector de
 idioma.
 
-- `i18n.defaultLocale` - `{ "code", "label", "strings" }` para el propio
-  árbol `docs/` regular del proyecto, con el valor por defecto
+- `i18n.defaultLocale` - `{ "code", "label", "flag", "strings" }` para el
+  propio árbol `docs/` regular del proyecto, con el valor por defecto
   `{ "code": "en", "label": "English" }`. Solo hace falta definirlo cuando
   tu idioma predeterminado no es el inglés.
 - `i18n.locales` - `[]` (el valor por defecto) - un array de
-  `{ "code", "label", "dir", "strings" }` para cada otro idioma. `code`
-  cumple una doble función como nombre de la carpeta `docs/i18n/<code>/`
-  y como prefijo de URL generado - solo letras/dígitos/guiones (`es`,
-  `pt-BR`, `zh-Hans`). `dir` es `"ltr"` (el valor por defecto) o `"rtl"`.
-  `strings` sobrescribe las cadenas de UI de la interfaz del tema propias
-  de ese idioma (marcador de posición de búsqueda, "En esta página," ...)
-  - consulta [Internacionalización](guides/i18n.md#interfaz-del-tema-cadenas-de-ui)
+  `{ "code", "label", "dir", "flag", "strings" }` para cada otro idioma.
+  `code` cumple una doble función como nombre de la carpeta
+  `docs/i18n/<code>/` y como prefijo de URL generado - solo
+  letras/dígitos/guiones (`es`, `pt-BR`, `zh-Hans`). `dir` es `"ltr"` (el
+  valor por defecto) o `"rtl"`. `flag` es una sobrescritura opcional con
+  emoji para el icono de bandera del selector de idioma - la mayoría de
+  los códigos comunes ya se resuelven por sí solos a una bandera
+  razonable. `strings` sobrescribe las cadenas de UI de la interfaz del
+  tema propias de ese idioma (marcador de posición de búsqueda, "En esta
+  página," la página 404, ...) - consulta
+  [Internacionalización](guides/i18n.md#interfaz-del-tema-cadenas-de-ui)
   para la lista completa de claves; `de`/`es`/`it`/`ja` ya incluyen una
   traducción integrada, así que `strings` solo hace falta para
   sobrescribir una clave o añadir otro idioma.
@@ -558,6 +715,32 @@ idioma.
 Consulta [Internacionalización](guides/i18n.md) para el panorama completo
 - la reserva de páginas sin traducir, el selector de idioma y lo que
 todavía no está traducido.
+
+## `blog`
+
+Opciones para el [blog](guides/blog.md) - en sí misma una función por
+convención (`docs/blog/posts/`), sin ninguna clave aquí obligatoria para
+activarla.
+
+- `blog.postsPerPage` - `10` (el valor por defecto) - cuántas entradas por
+  página en `/blog/`, en cada página de categoría y en cada página
+  `/blog/archive/<year>/` antes de pasar a `.../page/2/`.
+- `blog.feed` - `true` (el valor por defecto) - si se escribe
+  `/blog/feed.xml` (RSS 2.0). Solo tiene sentido con un `baseURL`
+  absoluto, el mismo requisito que `sitemap.xml`.
+- `blog.feedLimit` - `25` (el valor por defecto) - limita
+  `/blog/feed.xml` a esta cantidad de entradas más recientes. `0`
+  significa sin límite (cada entrada, completa). La mayoría de los
+  lectores de feeds solo se preocupan por lo nuevo, así que un feed sin
+  límite en un blog con cientos de entradas simplemente desperdicia ancho
+  de banda en cada sondeo - consulta [Blog: Feed](guides/blog.md#feed).
+
+```json
+{ "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
+```
+
+Consulta [Blog](guides/blog.md) para el frontmatter de entradas/autores,
+categorías, imágenes destacadas y metadatos de SEO/redes sociales.
 
 ## Versionado
 

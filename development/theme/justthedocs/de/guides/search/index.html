@@ -81,14 +81,20 @@
 
 				<h1 class="jtd-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M192,112a80,80,0,1,1-80-80A80,80,0,0,1,192,112Z" opacity="0.2"/><path d="M229.66,218.34,179.6,168.28a88.21,88.21,0,1,0-11.32,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg></span> Suche</h1>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/justthedocs/de/tags/index.html#tag-anleitungen">anleitungen</a><a class="page-tag" href="/bx-sites/development/theme/justthedocs/de/tags/index.html#tag-suche">suche</a></div>
-<details class="bxsites-toc-mobile jtd-toc--mobile"><summary class="jtd-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="jtd-toc__item jtd-toc__item--2"><a href="#wie-es-funktioniert">Wie es funktioniert</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#tastaturkürzel">Tastaturk&uuml;rzel</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#ausschalten">Ausschalten</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#nur-den-index-neu-aufbauen">Nur den Index neu aufbauen</a></li></ul></details>
+<details class="bxsites-toc-mobile jtd-toc--mobile"><summary class="jtd-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="jtd-toc__item jtd-toc__item--2"><a href="#local-der-standard">Local &#x28;der Standard&#x29;</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#wie-es-funktioniert">Wie es funktioniert</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#tastaturkürzel">Tastaturk&uuml;rzel</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#ausschalten">Ausschalten</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#nur-den-index-neu-aufbauen">Nur den Index neu aufbauen</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#algolia">Algolia</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#pagefind">Pagefind</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#andere-suchprovider">Andere Suchprovider</a></li></ul></details>
 				<div class="jtd-content-body">
 				<h1 id="suche"><a href="#suche" id="suche" name="suche" class="anchor"></a>Suche</h1>
-<p>Die Suche von BX Sites ist vollständig statisch und clientseitig - derselbe
-Ansatz, den <a href="https://www.mkdocs.org/">mkdocs</a> standardmäßig verwendet: ein
-einmal zur <code>build</code>-Zeit erstellter Index, und <a href="https://lunrjs.com/">lunr.js</a>
-übernimmt die eigentliche Suche im Browser des Besuchers. Es gibt keinen
-Server, keine Datenbank und keinen externen Suchdienst.</p>
+<p>BX Sites liefert standardmäßig einen Suchprovider mit und lässt sich über
+<a href="/bx-sites/development/theme/justthedocs/de/configuration/index.html#searchprovider"><code>searchProvider</code></a> in <code>bxsites.json</code>
+auf andere ausrichten - <code>search: true</code>/<code>false</code> bleibt dabei der zentrale
+An-/Aus-Schalter, unabhängig davon, welcher Provider aktiv ist.</p>
+<h2 id="local-der-standard"><a href="#local-der-standard" id="local-der-standard" name="local-der-standard" class="anchor"></a>Local (der Standard)</h2>
+<p>Die Suche von BX Sites ist vollständig statisch und clientseitig -
+derselbe Ansatz, den <a href="https://www.mkdocs.org/">mkdocs</a> standardmäßig
+verwendet: ein einmal zur <code>build</code>-Zeit erstellter Index, und
+<a href="https://lunrjs.com/">lunr.js</a> übernimmt die eigentliche Suche im Browser
+des Besuchers. Es gibt keinen Server, keine Datenbank und keinen
+externen Suchdienst.</p>
 <h2 id="wie-es-funktioniert"><a href="#wie-es-funktioniert" id="wie-es-funktioniert" name="wie-es-funktioniert" class="anchor"></a>Wie es funktioniert</h2>
 <ol>
 <li>Zur <code>build</code>-Zeit durchläuft <code>SearchIndexer</code> jede nicht versteckte Seite
@@ -98,7 +104,10 @@ und schreibt <code>site/search-index.json</code>: ein Eintrag pro Seite mit ihre
 Inhalts (HTML-Tags entfernt).</li>
 <li>Das <code>search.bxm</code>-Partial jedes Themes rendert eine Suchbox;
 <code>layout.bxm</code> bindet sie (und die Skripte <code>lunr.js</code> + gemeinsames
-<code>search.js</code>) nur ein, wenn <code>search</code> in <code>bxsites.json</code> <code>true</code> ist.</li>
+<code>search.js</code>) nur ein, wenn <code>search</code> in <code>bxsites.json</code> <code>true</code> ist und
+<code>searchProvider.provider</code> <code>&quot;local&quot;</code> ist (der Standard - siehe
+<a href="#andere-suchprovider">Andere Provider</a> unten dafür, was sich mit
+einem anderen ändert).</li>
 <li>Im Browser lädt das gemeinsame <code>assets/search.js</code>-Widget einmalig
 <code>search-index.json</code>, baut daraus einen <code>lunr</code>-Index (<code>title</code> am
 höchsten gewichtet, dann <code>tags</code> aus der Frontmatter, dann <code>headings</code>,
@@ -114,25 +123,150 @@ dann der reine Fließtext) und durchsucht ihn bei jedem Tastendruck neu
 tippst bereits in ein anderes Feld) - dieselbe Konvention, die
 <a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a>
 verwendet.</li>
+<li><strong>Cmd/Ctrl+K</strong> fokussiert sie ebenfalls, von überall aus - auch
+während du in einem anderen Feld tippst - die Konvention, die Algolia
+DocSearch, Pagefind, VitePress und Docusaurus alle teilen. Die Suchbox
+zeigt einen kleinen <code>Ctrl K</code>/<code>⌘K</code>-Hinweis (plattformerkannt), damit es
+auffindbar ist.</li>
 <li><strong><code>Escape</code></strong> schließt das Ergebnis-Dropdown und entfernt den Fokus von
 der Suchbox.</li>
 </ul>
+<p>Cmd/Ctrl+K funktioniert bei jedem Provider auf dieselbe Weise - <code>local</code>s
+eigenes Widget bindet es direkt, <code>algolia</code> erhält es kostenlos von
+DocSearch selbst (<code>keyboardShortcuts</code> ist standardmäßig <code>true</code>), und
+<code>pagefind</code> bekommt es von <code>layout.bxm</code> verdrahtet, da <code>PagefindUI</code> es
+nicht von selbst bindet.</p>
 <h2 id="ausschalten"><a href="#ausschalten" id="ausschalten" name="ausschalten" class="anchor"></a>Ausschalten</h2>
-<pre><code class="language-json">{ &quot;search&quot;: false }
+<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;search&quot;: false }
 </code></pre>
 <p>Überspringt den Aufbau von <code>search-index.json</code> vollständig und
 überspringt die Suchbox, das vendorierte <code>lunr.js</code>-Skript sowie das
 gemeinsame <code>search.js</code>-Widget auf jeder gerenderten Seite - ein Projekt
-mit deaktivierter Suche liefert überhaupt nichts Suchbezogenes aus.</p>
+mit deaktivierter Suche liefert überhaupt nichts Suchbezogenes aus. Das
+ist der zentrale Schalter - er gilt unabhängig davon, welcher
+<code>searchProvider</code> konfiguriert ist.</p>
 <h2 id="nur-den-index-neu-aufbauen"><a href="#nur-den-index-neu-aufbauen" id="nur-den-index-neu-aufbauen" name="nur-den-index-neu-aufbauen" class="anchor"></a>Nur den Index neu aufbauen</h2>
-<pre><code class="language-bash">bxSites search-index
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites search-index
 </code></pre>
 <p>Nützlich, wenn du nur <code>search-index.json</code> auffrischen musst - <code>build</code>
 erledigt das bereits als einen seiner eigenen Schritte, du musst dies
-also nach einem normalen Build nicht separat ausführen.</p>
+also nach einem normalen Build nicht separat ausführen. Läuft nur für
+Provider, die den lokalen Index nutzen (<code>&quot;local&quot;</code>, sowie jeder Provider,
+den bx-sites sonst nicht kennt) - es ist ein No-op (<code>skipped: true</code>),
+wenn <code>searchProvider.provider</code> <code>&quot;algolia&quot;</code> oder <code>&quot;pagefind&quot;</code> ist, da
+keiner der beiden ihn jemals nutzt.</p>
+<h2 id="algolia"><a href="#algolia" id="algolia" name="algolia" class="anchor"></a>Algolia</h2>
+<p>Setze <code>searchProvider.provider</code> auf <code>&quot;algolia&quot;</code>, um die Suchbox gegen
+<a href="https://docsearch.algolia.com/">Algolia DocSearch</a> auszutauschen -
+dieselbe crawler-gehostete Suche, die mkdocs-material, VitePress,
+Starlight und Docusaurus alle unterstützen:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
+	&quot;search&quot;: true,
+	&quot;searchProvider&quot;: {
+		&quot;provider&quot;: &quot;algolia&quot;,
+		&quot;algolia&quot;: {
+			&quot;appId&quot;: &quot;ABC123&quot;,
+			&quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
+			&quot;indexName&quot;: &quot;my-docs&quot;,
+			&quot;insights&quot;: false
+		}
+	}
+}
+</code></pre>
+<p><code>appId</code>, <code>apiKey</code> und <code>indexName</code> sind erforderlich - <code>apiKey</code> ist der
+<strong>reine Such</strong>-öffentliche API-Schlüssel, den DocSearch dir gibt (nie
+ein Administrator-Schlüssel; er wird direkt in jede gerenderte Seite
+ausgeliefert). <code>insights</code> (standardmäßig <code>false</code>) schaltet DocSearchs
+eigenes Klick-/Konversions-Analytics ein.</p>
+<p>Mit aktivem <code>algolia</code>:</p>
+<ul>
+<li>Es wird keine <code>search-index.json</code> gebaut, und das gemeinsame
+<code>lunr.js</code>/<code>search.js</code>-Widget wird nicht ausgeliefert - Algolia liefert
+Ergebnisse aus seinem eigenen gehosteten Index, befüllt vom
+<a href="https://docsearch.algolia.com/docs/what-is-docsearch/">DocSearch-Crawler</a>
+oder deiner eigenen
+<a href="https://www.algolia.com/products/search-and-discovery/crawler/">Algolia-Crawler</a>-Konfiguration,
+nicht von irgendetwas, das BX Sites zur Build-Zeit schreibt. Du musst
+die Website trotzdem separat bei DocSearch registrieren (oder deinen
+eigenen Crawler betreiben) - BX Sites verdrahtet nur das Client-Widget.</li>
+<li>Jedes integrierte Theme rendert stattdessen einen leeren
+<code>#bxsites-search-algolia</code>-Container, und <code>layout.bxm</code> lädt
+<code>@docsearch/css</code>/<code>@docsearch/js</code> von jsDelivr und ruft <code>docsearch({...})</code>
+dagegen auf - DocSearch rendert seinen eigenen Such-Button und sein
+eigenes Modal in diesen Container.</li>
+</ul>
+<h2 id="pagefind"><a href="#pagefind" id="pagefind" name="pagefind" class="anchor"></a>Pagefind</h2>
+<p>Setze <code>searchProvider.provider</code> auf <code>&quot;pagefind&quot;</code>, um die Suchbox gegen
+<a href="https://pagefind.app/">Pagefind</a> auszutauschen - eine weitere
+vollständig statische Suchmaschine ohne Server, aber indiziert aus dem
+<em>gebauten</em> <code>site/</code>-HTML statt gecrawlt wie bei Algolia:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
+	&quot;search&quot;: true,
+	&quot;searchProvider&quot;: {
+		&quot;provider&quot;: &quot;pagefind&quot;,
+		&quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
+	}
+}
+</code></pre>
+<p>Beide <code>pagefind</code>-Schlüssel sind optional - <code>bin</code> (Standard <code>&quot;pagefind&quot;</code>)
+ist der Name/Pfad der Binary, aufgelöst gegen <code>PATH</code>, wenn es ein reiner
+Name ist; <code>options</code> ist ein Array zusätzlicher, roher CLI-Flags, die
+direkt durchgereicht werden (z. B.
+<code>[&quot;--exclude-selectors&quot;, &quot;.no-index&quot;]</code>).</p>
+<p>Mit aktivem <code>pagefind</code>:</p>
+<ul>
+<li><strong>Die <code>pagefind</code>-CLI muss bereits installiert und im <code>PATH</code> vorhanden
+sein</strong> - BX Sites ruft sie extern auf (es gibt keine
+BoxLang-native Anbindung, derselbe Grund, aus dem
+<code>lastUpdated</code>/<code>gh-deploy</code> <code>git</code> extern aufrufen), es installiert sie
+nicht für dich. Siehe
+<a href="https://pagefind.app/docs/installation/">Pagefinds Installationsanleitung</a>.
+Anders als bei <code>lastUpdated</code> lässt eine fehlende/fehlschlagende Binary
+den <code>build</code> laut fehlschlagen (<code>BxSites.PagefindFailed</code>), statt
+stillschweigend zu degradieren - eine Website auszuliefern, deren
+konfigurierter Suchprovider nicht funktioniert, ist schlimmer als ein
+fehlgeschlagener Build.</li>
+<li>Direkt nachdem jeder Doc-Baum (Haupt- + Versionen + Locales)
+geschrieben und <code>sitemap.xml</code>/<code>llms.txt</code> erzeugt wurden, führt BX
+Sites <code>pagefind --site &lt;siteDir&gt; [...options]</code> gegen die <em>gesamte</em>
+gebaute <code>site/</code> aus - sodass eine Multi-Versions-/Multi-Locale-Website
+in einem Durchgang vollständig indiziert wird, anders als bei
+bx-sites' eigener <code>search-index.json</code> pro Baum. Pagefind schreibt sein
+eigenes Bundle direkt nach <code>site/pagefind/</code> - selbst gehostet, kein
+CDN beteiligt.</li>
+<li>Es wird keine <code>search-index.json</code> gebaut, und das gemeinsame
+<code>lunr.js</code>/<code>search.js</code>-Widget wird nicht ausgeliefert (wie bei
+<code>algolia</code>) - und <code>bxSites search-index</code> ist aus demselben Grund ein
+No-op (siehe oben).</li>
+<li>Jedes integrierte Theme rendert einen leeren
+<code>#bxsites-search-pagefind</code>-Container, und <code>layout.bxm</code> lädt
+<code>site/pagefind/pagefind-ui.{css,js}</code> und ruft <code>new PagefindUI({...})</code>
+dagegen auf - Pagefind rendert seine eigene Inline-Suchbox und
+Ergebnisse in diesen Container.</li>
+</ul>
+<h2 id="andere-suchprovider"><a href="#andere-suchprovider" id="andere-suchprovider" name="andere-suchprovider" class="anchor"></a>Andere Suchprovider</h2>
+<p><code>searchProvider.provider</code> ist nicht auf
+<code>&quot;local&quot;</code>/<code>&quot;algolia&quot;</code>/<code>&quot;pagefind&quot;</code> beschränkt - jeder andere Wert wird
+von <code>bxsites.json</code> unverändert akzeptiert (die eigene
+Konfigurationsvalidierung von BX Sites prüft nur die drei oben genannten
+Provider). Dafür gibt es keinen Plugin-Hook - die integrierten Themes
+rendern für einen nicht erkannten Providernamen einfach nichts, und das
+Verdrahten eines vierten Suchdienstes (Meilisearch, Typesense usw.) ist
+ein projektweites
+<a href="/bx-sites/development/theme/justthedocs/de/guides/themes/index.html#ein-theme-überschreiben">Theme-Override</a>: kopiere ein
+integriertes Theme in den eigenen <code>theme/</code>-Ordner deines Projekts und
+füge das Markup/die Skripte deines Providers zu dessen
+<code>layout.bxm</code>/<code>search.bxm</code> hinzu, wobei du <code>siteConfig.searchProvider</code>
+ausliest, um zu entscheiden, wann sie gerendert werden -
+<code>searchProviderName eq &quot;...&quot;</code>-Verzweigungen für den Mount-Punkt in
+<code>search.bxm</code>, passende Verzweigungen in <code>layout.bxm</code> für dessen CSS/JS,
+und (falls es nicht crawler-gehostet ist wie Algolia) welchen
+Indizierungsschritt dieses Produkt auch immer gegen <code>site/</code> nach <code>build</code>
+braucht - dieselbe Form, die das <code>layout.bxm</code>/<code>BuildPipeline.bx</code> dieses
+Moduls bereits für <code>algolia</code>/<code>pagefind</code> verwendet.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/justthedocs/de/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 12&#x3a;15&#x3a;58 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/justthedocs/de/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
 			</article>
 
 			<nav class="jtd-page-nav" aria-label="Seitennavigation">
@@ -148,7 +282,7 @@ also nach einem normalen Build nicht separat ausführen.</p>
 		</main>
 
 		<aside class="jtd-toc-sidebar">
-			<nav class="jtd-toc" aria-label="Auf dieser Seite"><div class="jtd-toc__title">Auf dieser Seite</div><ul><li class="jtd-toc__item jtd-toc__item--2"><a href="#wie-es-funktioniert">Wie es funktioniert</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#tastaturkürzel">Tastaturk&uuml;rzel</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#ausschalten">Ausschalten</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#nur-den-index-neu-aufbauen">Nur den Index neu aufbauen</a></li></ul></nav>
+			<nav class="jtd-toc" aria-label="Auf dieser Seite"><div class="jtd-toc__title">Auf dieser Seite</div><ul><li class="jtd-toc__item jtd-toc__item--2"><a href="#local-der-standard">Local &#x28;der Standard&#x29;</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#wie-es-funktioniert">Wie es funktioniert</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#tastaturkürzel">Tastaturk&uuml;rzel</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#ausschalten">Ausschalten</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#nur-den-index-neu-aufbauen">Nur den Index neu aufbauen</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#algolia">Algolia</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#pagefind">Pagefind</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#andere-suchprovider">Andere Suchprovider</a></li></ul></nav>
 		</aside>
 
 	</div>

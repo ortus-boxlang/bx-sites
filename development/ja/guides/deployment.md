@@ -1,6 +1,7 @@
 ---
 title: GitHub Pages へのデプロイ
 order: 3
+icon: phosphor-duotone:cloud-arrow-up
 tags: [ガイド, デプロイ]
 ---
 
@@ -77,3 +78,5 @@ GitHub の *プロジェクト* Pages サイト（*ユーザー* サイトとは
 ```
 
 `baseURL` が何をするかの完全な詳細については [設定](../configuration.md#baseurl) を参照してください。
+`<user>.github.io` ユーザーサイト、またはサイトルートにマッピングされたカスタムドメインの
+場合は、`baseURL` をデフォルト（`/`）のままにしておけます。

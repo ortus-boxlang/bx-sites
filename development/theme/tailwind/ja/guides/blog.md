@@ -1,6 +1,7 @@
 ---
 title: ブログ
 order: 10
+icon: phosphor-duotone:newspaper
 tags: [ガイド, ブログ]
 ---
 

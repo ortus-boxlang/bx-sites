@@ -12,29 +12,28 @@ tags: [anleitungen, einrichtung]
 
 BX Sites benötigt [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
 für das Rendern von Markdown, [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
-für die HTML-Kodierung und [bx-yaml](https://github.com/ortus-boxlang/bx-yaml)
-zum Lesen von `bxsites.yaml`. Mit installiertem
-[CommandBox](https://commandbox.ortusbooks.com/):
+für die HTML-Kodierung, [bx-yaml](https://github.com/ortus-boxlang/bx-yaml)
+zum Lesen von `bxsites.yaml`, und [bx-image](https://github.com/ortus-boxlang/bx-image)
+für die responsive Bilder-Pipeline (siehe [Responsive Bilder](guides/images.md)) -
+alle vier werden automatisch als `box.json`-Abhängigkeiten mitinstalliert,
+sodass die Installation von `bx-sites` selbst der einzige nötige Befehl ist,
+entweder über BoxLangs eigenen OS-Binary-Installer:
 
-```bash
+```bash frame="terminal" title="Terminal"
+install-bx-module bx-sites
+```
+
+oder über [CommandBox](https://commandbox.ortusbooks.com/):
+
+```bash frame="terminal" title="Terminal"
 box install bx-sites
-box install bx-markdown
-box install bx-esapi
-box install bx-yaml
 ```
 
-Oder, ohne CommandBox, installiert BoxLangs eigener Installer alle vier mit
-einem Befehl:
+Beide lesen `boxlang.executable` aus `box.json` und legen ein
+`bxSites`-Skript in deinem `PATH` ab (in `~/.boxlang/bin`), sodass jeder
+Befehl unten entweder als kurzer, eigenständiger Befehl funktioniert:
 
-```bash
-install-bx-module bx-sites bx-markdown bx-esapi bx-yaml
-```
-
-`box install`/`install-bx-module` liest `boxlang.executable` aus `box.json`
-und legt ein `bxSites`-Skript in deinem `PATH` ab (in `~/.boxlang/bin`), sodass
-jeder Befehl unten entweder als kurzer, eigenständiger Befehl funktioniert:
-
-```bash
+```bash title="Usage"
 bxSites <verb> [options]
 ```
 
@@ -42,7 +41,7 @@ oder überall dort, wo BoxLang zwar verfügbar ist, dieser `PATH`-Shim aber
 nicht (ein CI-Runner, ein von Hand statt per Installation registriertes
 Modul) - beide Formen führen genau dasselbe aus:
 
-```bash
+```bash title="Usage (no PATH shim)"
 boxlang bxSites <verb> [options]
 ```
 
@@ -50,14 +49,14 @@ Der Rest dieser Anleitung verwendet die Kurzform.
 
 ## Ein Projekt aufsetzen
 
-```bash
+```bash frame="terminal" title="Terminal" linenums="1"
 bxSites new my-docs
 cd my-docs
 ```
 
 Das erzeugt:
 
-```
+```text title="Project structure"
 my-docs/
 ├── docs/
 │   ├── assets/
@@ -103,7 +102,7 @@ automatisch zu Navigationsverschachtelung:
     in jedem Fall in `site/` - beide kollidieren nie, da `site/` selbst
     niemals ein gültiger Name für den Quellordner ist.
 
-```
+```text title="docs/ → nav"
 docs/
 ├── index.md              -> /
 ├── guides/
@@ -121,7 +120,7 @@ Verlinke eine andere Seite auf die übliche mkdocs-Art - ein dateirelativer
 Pfad zu ihrer `.md`-Quelldatei, genau als lägen die beiden Dateien
 nebeneinander auf der Festplatte (denn genau das tun sie):
 
-```markdown
+```markdown title="Example link"
 See [Deployment](guides/deployment.md) or, from that same guide,
 [back to Getting Started](../getting-started.md#seiten-hinzufügen).
 ```
@@ -154,7 +153,7 @@ einer Seite weiterhin, wenn sie so gelesen wird.
 
 Jede Seite kann mit einem kleinen Frontmatter-Block beginnen:
 
-```markdown
+```markdown title="docs/guides/deployment.md" linenums="1"
 ---
 title: Deployment
 order: 2
@@ -164,6 +163,7 @@ tags: [guides, deployment]
 icon: 🚀
 summary: Everything you need to publish a built site.
 ogImage: assets/deployment-card.png
+toc: true
 ---
 
 # Deployment
@@ -191,6 +191,11 @@ Your content here.
   nie auf der Seite selbst gerendert wird)
 - `ogImage` - überschreibt das Social-Card-Bild nur für diese eine Seite -
   siehe [`ogImage`](configuration.md#ogimage)
+- `toc` - `false` blendet das eigene Inhaltsverzeichnis ("Auf dieser Seite")
+  dieser Seite aus, selbst bei 2+ Überschriften (dem üblichen Auslöser für
+  dessen Anzeige) - praktisch für eine Landing-/Hero-Seite, die kein
+  schwebendes Inhaltsverzeichnis neben ihrem eigenen Inhalt haben möchte;
+  Standard ist `true`
 
 Frontmatter-Werte können Inline-Listen (`tags: [a, b, c]`), YAML-artige
 Blocklisten (`tags:` gefolgt von eingerückten `- item`-Zeilen) oder
@@ -201,7 +206,7 @@ unterstützt.
 
 ## Build
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxSites build
 ```
 
@@ -210,7 +215,7 @@ zum Hosten überall dort, wo statische Dateien ausgeliefert werden können.
 
 ## Lokal ausliefern
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxSites serve
 ```
 
@@ -222,7 +227,7 @@ woran gebunden wird.
 
 ## Clean
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxSites clean
 ```
 

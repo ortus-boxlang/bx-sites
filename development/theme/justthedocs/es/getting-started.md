@@ -11,30 +11,30 @@ tags: [guías, configuración]
 ## Instalación
 
 BX Sites depende de [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
-para el renderizado de Markdown, de [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
-para la codificación HTML, y de [bx-yaml](https://github.com/ortus-boxlang/bx-yaml)
-para leer `bxsites.yaml`. Con [CommandBox](https://commandbox.ortusbooks.com/)
-instalado:
+para el renderizado de Markdown, [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
+para la codificación HTML, [bx-yaml](https://github.com/ortus-boxlang/bx-yaml)
+para leer `bxsites.yaml`, y [bx-image](https://github.com/ortus-boxlang/bx-image)
+para el pipeline de imágenes responsivas (consulta
+[Imágenes Responsivas](guides/images.md)) - los cuatro se instalan
+automáticamente como dependencias de `box.json`, así que instalar
+`bx-sites` en sí mismo es el único comando necesario, ya sea mediante el
+propio instalador de binario del sistema operativo de BoxLang:
 
-```bash
+```bash frame="terminal" title="Terminal"
+install-bx-module bx-sites
+```
+
+o mediante [CommandBox](https://commandbox.ortusbooks.com/):
+
+```bash frame="terminal" title="Terminal"
 box install bx-sites
-box install bx-markdown
-box install bx-esapi
-box install bx-yaml
 ```
 
-O, sin CommandBox, el propio instalador de BoxLang toma los cuatro en un
-solo comando:
+Cualquiera de los dos lee `boxlang.executable` de `box.json` y coloca un
+script `bxSites` en tu `PATH` (en `~/.boxlang/bin`), de modo que cada
+comando de abajo funciona tanto en su forma corta e independiente:
 
-```bash
-install-bx-module bx-sites bx-markdown bx-esapi bx-yaml
-```
-
-`box install`/`install-bx-module` lee `boxlang.executable` de `box.json`
-y coloca un script `bxSites` en tu `PATH` (en `~/.boxlang/bin`), de modo
-que cada comando de abajo funciona tanto en su forma corta e independiente:
-
-```bash
+```bash title="Uso"
 bxSites <verb> [options]
 ```
 
@@ -42,7 +42,7 @@ como, en cualquier lugar donde BoxLang esté disponible pero ese atajo del
 `PATH` no lo esté (un ejecutor de CI, un módulo registrado a mano en lugar
 de instalado) - ambas formas ejecutan exactamente lo mismo:
 
-```bash
+```bash title="Uso (sin el atajo del PATH)"
 boxlang bxSites <verb> [options]
 ```
 
@@ -50,14 +50,14 @@ El resto de esta guía usa la forma corta.
 
 ## Crear la estructura de un proyecto
 
-```bash
+```bash frame="terminal" title="Terminal" linenums="1"
 bxSites new my-docs
 cd my-docs
 ```
 
 Esto crea:
 
-```
+```text title="Estructura del proyecto"
 my-docs/
 ├── docs/
 │   ├── assets/
@@ -86,7 +86,7 @@ en ambos formatos.
 ¿Ya tienes contenido en GitBook? `bxSites migrate --source=/path/to/export`
 convierte una exportación de GitBook directamente en `docs/` - consulta
 [Migrar desde GitBook](guides/migrating-from-gitbook.md) - y puedes pasar
-directamente a [Construcción](#build).
+directamente a [Construcción](#construcción).
 
 ## Añadir páginas
 
@@ -103,7 +103,7 @@ de carpetas se convierte automáticamente en anidamiento de navegación:
     termina en `site/` de cualquier forma - los dos nunca chocan, ya que
     `site/` nunca es en sí mismo un nombre válido de carpeta de origen.
 
-```
+```text title="docs/ → nav"
 docs/
 ├── index.md              -> /
 ├── guides/
@@ -120,9 +120,9 @@ Enlaza a otra página de la manera habitual de mkdocs - una ruta relativa
 al archivo hasta su fuente `.md`, exactamente como si los dos archivos
 estuvieran uno junto al otro en el disco (porque lo están):
 
-```markdown
-See [Deployment](guides/deployment.md) or, from that same guide,
-[back to Getting Started](../getting-started.md#add-pages).
+```markdown title="Ejemplo de enlace"
+Consulta [Despliegue](guides/deployment.md) o, desde esa misma guía,
+[volver a Primeros Pasos](../getting-started.md#añadir-páginas).
 ```
 
 BX Sites reescribe cada enlace de este tipo a su URL amigable generada en
@@ -145,7 +145,7 @@ junto a ella - `docs/guides/deployment.md` termina copiado en
 la propia página, junto a "Edit this page". No requiere configuración,
 siempre está activo.
 
-Esta es la misma motivación que [`llms.txt`](../configuration.md#llmstxt) -
+Esta es la misma motivación que [`llms.txt`](configuration.md#llmstxt) -
 una persona (o un LLM) puede obtener el Markdown en bruto de una página
 directamente en lugar de raspar el HTML renderizado - y dado que todo el
 árbol `docs/` se refleja 1:1, los enlaces relativos propios de una página
@@ -153,7 +153,7 @@ también siguen funcionando leídos de esta manera.
 
 Cada página puede comenzar con un pequeño bloque de frontmatter:
 
-```markdown
+```markdown title="docs/guides/deployment.md" linenums="1"
 ---
 title: Deployment
 order: 2
@@ -163,6 +163,7 @@ tags: [guides, deployment]
 icon: 🚀
 summary: Everything you need to publish a built site.
 ogImage: assets/deployment-card.png
+toc: true
 ---
 
 # Deployment
@@ -196,6 +197,11 @@ Your content here.
   nunca se renderiza en la propia página)
 - `ogImage` - sobrescribe la imagen de tarjeta social de esta página en
   particular - consulta [`ogImage`](configuration.md#ogimage)
+- `toc` - `false` oculta la propia tabla de contenido "En esta página" de
+  esta página, incluso con 2 o más encabezados (el disparador habitual
+  para que se renderice) - útil para una página de aterrizaje/hero que no
+  quiere una TOC flotante compitiendo con su propio contenido; por
+  defecto `true`
 
 Los valores del frontmatter pueden ser listas en línea (`tags: [a, b, c]`),
 listas de bloque al estilo YAML (`tags:` seguido de líneas `- item`
@@ -205,7 +211,7 @@ así que los objetos/mapas anidados no son compatibles.
 
 ## Construcción
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxSites build
 ```
 
@@ -214,7 +220,7 @@ para alojarse en cualquier lugar que sirva archivos estáticos.
 
 ## Servir localmente
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxSites serve
 ```
 
@@ -226,7 +232,7 @@ tu configuración de sitio `bxsites.yaml`/`.json`, o una sobrescritura de
 
 ## Limpieza
 
-```bash
+```bash frame="terminal" title="Terminal"
 bxSites clean
 ```
 

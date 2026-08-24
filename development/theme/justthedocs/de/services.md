@@ -61,4 +61,3 @@ Projekt zu sprechen - was du baust, deinen Zeitplan und wo du Hilfe
 gebrauchen könntest.
 :::
 :::
-</content>

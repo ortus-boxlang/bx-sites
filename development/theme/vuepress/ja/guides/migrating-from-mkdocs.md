@@ -1,6 +1,7 @@
 ---
 title: mkdocs からの移行
 order: 8
+icon: phosphor-duotone:swap
 tags: [ガイド, 移行, mkdocs]
 ---
 

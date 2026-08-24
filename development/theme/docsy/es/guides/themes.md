@@ -17,6 +17,21 @@ plantillas ni un paso de compilación separados involucrados.
 | `bootstrap` (predeterminado) | [Bootstrap 5](https://getbootstrap.com/), incluido localmente | Fuente Poppins, barra de navegación con degradado de marca |
 | `material` | CSS al estilo Material escrito a mano | Diseño de tarjetas, sombras de elevación, fuente Roboto |
 | `tailwind` | [Tailwind Play CDN](https://tailwindcss.com/) | Basado en clases de utilidad, sin paso de compilación |
+| `docsy` | CSS escrito a mano, bifurcado de `material` | Look de manual de referencia azul marino inspirado en Read the Docs/Docsy |
+| `slate` | CSS escrito a mano, bifurcado de `material` | Inspirado en Stripe/Slate - una barra lateral permanentemente oscura sin importar el modo claro/oscuro |
+| `docusaurus` | CSS escrito a mano, bifurcado de `material` | Barra de navegación de ancho completo, coloreada y llamativa, inspirada en Docusaurus, tarjetas redondeadas |
+| `justthedocs` | CSS escrito a mano, bifurcado de `material` | Minimalismo inspirado en Just the Docs - el cuadro de búsqueda vive en la parte superior de la barra lateral |
+| `vuepress` | CSS escrito a mano, bifurcado de `material` | Acento verde inspirado en VuePress, esquinas suaves y redondeadas |
+| `gitbook` | CSS escrito a mano, bifurcado de `material` | Columna de lectura centrada inspirada en GitBook, encabezados con serifa |
+| `notion` | CSS escrito a mano, bifurcado de `material` | Barra lateral sin bordes inspirada en Notion, interfaz casi en escala de grises, amplio espacio en blanco |
+
+Los siete temas bifurcados de `material` de arriba reutilizan las mismas
+plantillas BoxLang de `material` sin cambios (layout.bxm/page.bxm/search.bxm)
+salvo por un renombrado con prefijo de clase CSS acotado - solo
+`assets/style.css` difiere (y, en el caso de `justthedocs`, una línea
+`<bx:include>` reubicada que mueve el cuadro de búsqueda a la barra
+lateral), así que heredan el mismo conjunto completo de funciones y el
+mismo comportamiento apto para sitios sin conexión que ya tiene `material`.
 
 El propio CSS/JS de cada tema incorporado (el paquete CSS/JS de Bootstrap,
 highlight.js, Alpine.js, lunr.js para el proveedor de búsqueda `local`
@@ -29,8 +44,11 @@ opcionales que actives tú mismo (`math`, búsqueda de Algolia, Google
 Analytics) siguen cargándose desde un CDN o una API alojada - consulta
 [Sitios sin conexión a internet](#sitios-sin-conexión-a-internet-air-gapped) más abajo.
 
-Los tres aplican la misma paleta de marca de BoxLang: un degradado
-`#00FF78 -> #00DBFF` y un acento `#FFF500` - y los tres incluyen el mismo
+`bootstrap`, `material` y `tailwind` aplican la misma paleta de marca de
+BoxLang (un degradado `#00FF78 -> #00DBFF` y un acento `#FFF500`); los
+siete temas de galería debajo de ellos usan cada uno su propia paleta
+distinta, inspirada en la plataforma de la que toman su look - consulta la
+tabla de arriba. Los diez incluyen, sin importar la paleta, el mismo
 conjunto de funciones de página:
 
 - **Una tabla de contenido "En esta página"**, generada a partir de los
@@ -126,12 +144,45 @@ Define cuál usa un proyecto en `bxsites.json`:
 { "theme": { "name": "material" } }
 ```
 
+## Instalar un tema publicado
+
+Un tema publicado en ForgeBox se instala sin nada más que el propio
+binario `bxSites` - no hace falta `box`/CommandBox:
+
+```bash title="Uso"
+bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
+```
+
+Esto descarga el zip del paquete y lo extrae en
+`themes/bx-sites-theme-blog1/` en la raíz del proyecto, validando que
+cumple el contrato `ThemeProvider` de abajo antes de terminar. Un
+proyecto puede tener varios temas instalados en paralelo de esta forma, y
+cambiar entre ellos únicamente por nombre:
+
+```json
+{ "theme": { "name": "bx-sites-theme-blog1" } }
+```
+
+Un tema no necesita ninguna participación de módulo/cargador de clases de
+BoxLang (a diferencia de un plugin) - son archivos puros, así que no hay
+un paso de activación separado como sí tiene `install:plugin`; configurar
+`theme.name` es la única conexión necesaria. Consulta
+[`install:theme`](../cli-reference.md#installtheme) en la referencia de
+la CLI.
+
+¿Partes de un tema construido para otro generador de sitios estáticos?
+Consulta [Importar un tema](theme-import.md) - `theme:import` convierte
+mecánicamente los propios archivos de plantilla de un tema de
+mkdocs/jekyll/hugo en un scaffold `themes/<name>/` de mejor esfuerzo.
+
 ## Sitios sin conexión a internet (air-gapped)
 
 Un sitio construido funciona sin ningún acceso a internet por defecto,
-para los temas `bootstrap` y `material` con el proveedor de búsqueda
-`local` predeterminado: el propio CSS/JS de Bootstrap, highlight.js,
-Alpine.js y lunr.js vienen todos incluidos con este módulo
+para `bootstrap`, `material` y los siete temas bifurcados de `material`
+(`docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook`,
+`notion`) con el proveedor de búsqueda `local` predeterminado: el propio
+CSS/JS de Bootstrap, highlight.js, Alpine.js y lunr.js vienen todos
+incluidos con este módulo
 (`resources/assets/vendor/`) y se copian directamente en
 `site/assets/vendor/` en el momento de la construcción - sin ninguna
 etiqueta `<script>`/`<link>` a un CDN en ningún lugar del HTML generado
@@ -161,9 +212,10 @@ mismo las activas:
   dependencia.
 
 Si tu entorno de despliegue realmente no tiene ningún acceso a internet,
-limítate a `bootstrap`/`material`, al proveedor de búsqueda `local`
-predeterminado, evita los diagramas Mermaid con diseño `elk` si `mermaid`
-está activado, y deja desactivados `math`/Algolia/Analytics.
+limítate a `bootstrap`/`material`/uno de los siete temas bifurcados de
+`material`, al proveedor de búsqueda `local` predeterminado, evita los
+diagramas Mermaid con diseño `elk` si `mermaid` está activado, y deja
+desactivados `math`/Algolia/Analytics.
 
 ## Iconos
 
@@ -255,7 +307,7 @@ renderizarlas, igual que todo lo demás. `variables.versions`
 `variables.currentVersion` (el `label` que se está renderizando en ese
 momento) dan soporte al selector de versión - vacío/`"Latest"` para un
 proyecto que no está versionado, así que un tema solo necesita renderizar
-un selector cuando `variables.versions.len() gt 1`. Los tres temas
+un selector cuando `variables.versions.len() gt 1`. Todos los temas
 incorporados obtienen sus iconos de repositorio/redes sociales de una
 pequeña tabla de búsqueda SVG compartida,
 `<bx:include template="#variables.moduleAssetsDir#/icons.bxm">` (define
@@ -304,20 +356,93 @@ El propio conjunto del tema `bootstrap`
 (`resources/themes/bootstrap/assets/style.css`) es
 `--bxsites-gradient-start`/`-end`, `--bxsites-accent`, `--bxsites-bg`,
 `--bxsites-text`, `--bxsites-sidebar-bg`, `--bxsites-sidebar-text`,
-`--bxsites-border`, `--bxsites-link`, `--bxsites-link-hover` y
-`--bxsites-code-bg` - `material` y `tailwind` siguen la misma nomenclatura
-`--bxsites-*` con sus propias pequeñas variaciones. Cualquier cosa más
-allá del color/fuente (diseño, añadir/quitar elementos de interfaz)
-necesita una sobrescritura real o un tema personalizado - ver abajo.
+`--bxsites-border`, `--bxsites-link`, `--bxsites-link-hover`,
+`--bxsites-code-bg`, `--bxsites-step-marker-bg`, `--bxsites-step-marker-text`,
+`--bxsites-step-line`, `--bxsites-step-success-bg`/`-text` y
+`--bxsites-step-warning-bg`/`-text`/`--bxsites-step-danger-bg`/`-text`.
+Todo tema incorporado garantiza `--bxsites-gradient-start`/`-end`,
+`--bxsites-accent` y el conjunto `--bxsites-step-*` bajo esos nombres
+exactos, así que `extraCss` siempre puede redirigir el color de marca/los
+acentos del stepper sin importar el tema - pero solo `bootstrap`, `slate`
+y `notion` también exponen
+`--bxsites-bg`/`-text`/`-sidebar-bg`/`-sidebar-text`/`-border`/`-link`/`-link-hover`/`-code-bg`
+bajo esos nombres (`justthedocs` alias todos menos los dos `-sidebar-*` de
+la misma forma). El resto de los temas incorporados (`material`,
+`tailwind`, `docsy`, `docusaurus`, `vuepress`, `gitbook`) usan sus propios
+nombres de propiedad personalizada internos para ese segundo grupo (por
+ejemplo, el propio `assets/style.css` de material usa
+`--md-bg`/`--md-ink`/`--md-link`/...) - abre el `assets/style.css` propio
+de ese tema para encontrar sus nombres reales antes de sobrescribir uno de
+ellos mediante `extraCss`. Cualquier cosa más allá del color/fuente
+(diseño, añadir/quitar elementos de interfaz) necesita una sobrescritura
+real o un tema personalizado - ver abajo.
+
+El resto respalda el bloque de directiva
+[`::: stepper`/`::: step`](content-blocks.md#stepper) -
+`--bxsites-step-marker-bg`/`-text` son el color de fondo/texto del
+círculo numerado por defecto (`bootstrap`/`material` lo configuran por
+defecto al propio `--bxsites-accent` del tema; `tailwind` usa un par
+verde azulado/menta dedicado ya que no tiene un único token de acento
+compartido), `--bxsites-step-line` es la línea que conecta los pasos, y
+los pares `-success`/`-warning`/`-danger` respaldan el propio atributo
+opcional `color="..."` de un paso - a diferencia del marcador por
+defecto, estos tres son el mismo par fijo de fondo/texto tanto en modo
+claro como oscuro (una insignia autocontenida, no ligada al acento de
+marca del tema), así que no hay ninguna sobrescritura
+`[data-theme="dark"]` que redeclarar:
+
+```css
+:root {
+	--bxsites-step-marker-bg: #7C3AED;
+	--bxsites-step-marker-text: #fff;
+	--bxsites-step-success-bg: #059669;
+	--bxsites-step-success-text: #fff;
+}
+
+[data-theme="dark"] {
+	--bxsites-step-marker-bg: #C4B5FD;
+	--bxsites-step-marker-text: #1b1f21;
+}
+```
+
+## Banner hero de la página de inicio
+
+Todo tema incorporado incluye CSS para un banner de página de inicio a
+todo lo ancho, con una imagen de titular y botones de llamada a la
+acción - el propio `docs/index.md` de este mismo sitio lo usa. No hay
+ningún bloque de directiva ni configuración para ello, solo HTML plano
+que cualquier página puede colocar (una página de inicio es simplemente
+una página normal, con `order: 1` o de otro modo la primera en la
+navegación):
+
+```markdown
+<div class="bxsites-hero">
+	<img class="bxsites-hero__banner" src="assets/home-banner.jpg" alt="...">
+	<div class="bxsites-hero__actions">
+		<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="getting-started.md">Get Started</a>
+		<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://github.com/your/repo">View on GitHub</a>
+	</div>
+</div>
+```
+
+`bxsites-hero__btn--primary`/`--secondary` son los dos mismos estilos de
+acento que ya usa cada tema en otros lugares - intercambia, quita o añade
+botones libremente, y redimensiona/reemplaza la propia imagen de
+`bxsites-hero__banner` mediante un `src` relativo a `docs/assets/`, de la
+misma forma en que se resuelve cualquier otra imagen.
 
 ## Sobrescribir un tema
 
 Coloca tu propio `layout.bxm` + `page.bxm` (y opcionalmente `search.bxm` /
 `assets/`) en una carpeta `theme/` en la raíz de tu proyecto. BX Sites
-prefiere una sobrescritura `theme/` a nivel de proyecto sobre cualquier
-tema incorporado, siempre que satisfaga el contrato anterior - los temas
+prefiere una sobrescritura `theme/` a nivel de proyecto tanto sobre un
+tema instalado en `themes/<name>/` como sobre cualquier tema incorporado,
+siempre que satisfaga el contrato anterior - los temas
 incorporados bajo el propio `resources/themes/` de este módulo son un
-buen punto de partida para copiar y adaptar.
+buen punto de partida para copiar y adaptar. Orden de resolución
+completo: `theme/` (esta sección) -> `themes/theme.name/`
+([un tema instalado](#instalar-un-tema-publicado), si `theme.name`
+coincide con uno) -> un tema incorporado con el nombre `theme.name`.
 
 Un ejemplo trabajado - partir de `bootstrap` e intercambiar su paleta de
 marca y su fuente de encabezados por las tuyas, manteniendo todo lo demás
@@ -371,7 +496,7 @@ así que igual necesita su propio `layout.bxm` + `page.bxm` aunque lo
 falte cualquiera de los dos falla de inmediato con `BxSites.InvalidTheme`
 en lugar de recurrir silenciosamente al otro). Para un ajuste solo de
 CSS/sin `.bxm`, usa
-[`extraCss`](#customizing-colors-without-a-theme-override) en su lugar -
+[`extraCss`](#personalizar-colores-sin-sobrescribir-un-tema) en su lugar -
 se superpone a cualquier tema que nombre `bxsites.json`, sin ninguna
 carpeta `theme/` involucrada en absoluto. `theme/` es para cuando también
 necesitas cambiar el propio marcado, que se cubre a continuación.

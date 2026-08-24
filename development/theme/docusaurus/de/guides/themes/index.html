@@ -81,7 +81,7 @@
 
 				<h1 class="dsrs-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,127.17a96.48,96.48,0,0,1-2.39,22.18A24,24,0,0,1,198.21,168H152a24,24,0,0,0-24,24,24,24,0,0,1-32,22.61C58.73,201.44,32,169.81,32,128a96,96,0,0,1,95-96C179.84,31.47,223.55,74.35,224,127.17Z" opacity="0.2"/><path d="M200.77,53.89A103.27,103.27,0,0,0,128,24h-1.07A104,104,0,0,0,24,128c0,43,26.58,79.06,69.36,94.17A32,32,0,0,0,136,192a16,16,0,0,1,16-16h46.21a31.81,31.81,0,0,0,31.2-24.88,104.43,104.43,0,0,0,2.59-24A103.28,103.28,0,0,0,200.77,53.89Zm13,93.71A15.89,15.89,0,0,1,198.21,160H152a32,32,0,0,0-32,32,16,16,0,0,1-21.31,15.07C62.49,194.3,40,164,40,128a88,88,0,0,1,87.09-88h.9a88.35,88.35,0,0,1,88,87.25A88.86,88.86,0,0,1,213.81,147.6ZM140,76a12,12,0,1,1-12-12A12,12,0,0,1,140,76ZM96,100A12,12,0,1,1,84,88,12,12,0,0,1,96,100Zm0,56a12,12,0,1,1-12-12A12,12,0,0,1,96,156Zm88-56a12,12,0,1,1-12-12A12,12,0,0,1,184,100Z"/></svg></span> Themes</h1>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/docusaurus/de/tags/index.html#tag-anleitungen">anleitungen</a><a class="page-tag" href="/bx-sites/development/theme/docusaurus/de/tags/index.html#tag-themes">themes</a></div>
-<details class="bxsites-toc-mobile dsrs-toc--mobile"><summary class="dsrs-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#integriert">Integriert</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#air-gappedoffline-websites">Air-gapped&#x2f;Offline-Websites</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#icons">Icons</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#der-themeprovider-vertrag">Der ThemeProvider -Vertrag</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben">Farben anpassen, ohne ein Theme zu &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-überschreiben">Ein Theme &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-von-grund-auf-schreiben">Ein Theme von Grund auf schreiben</a></li></ul></details>
+<details class="bxsites-toc-mobile dsrs-toc--mobile"><summary class="dsrs-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#integriert">Integriert</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-veröffentlichtes-theme-installieren">Ein ver&ouml;ffentlichtes Theme installieren</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#air-gappedoffline-websites">Air-gapped&#x2f;Offline-Websites</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#icons">Icons</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#der-themeprovider-vertrag">Der ThemeProvider -Vertrag</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben">Farben anpassen, ohne ein Theme zu &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#homepage-hero-banner">Homepage-Hero-Banner</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-überschreiben">Ein Theme &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-von-grund-auf-schreiben">Ein Theme von Grund auf schreiben</a></li></ul></details>
 				<div class="dsrs-content-body">
 				<h1 id="themes"><a href="#themes" id="themes" name="themes" class="anchor"></a>Themes</h1>
 <p>Themes sind native BoxLang-<code>.bxm</code>-Templates - es gibt keine separate
@@ -95,8 +95,23 @@ Template-Engine oder einen eigenen Build-Schritt.</p>
 <tr><td><code>bootstrap</code> (Standard)</td><td><a href="https://getbootstrap.com/">Bootstrap 5</a>, vendoriert</td><td>Poppins-Schriftart, Navbar mit Marken-Gradient</td></tr>
 <tr><td><code>material</code></td><td>Handgefertigtes Material-artiges CSS</td><td>Card-Layout, Elevation-Schatten, Roboto-Schriftart</td></tr>
 <tr><td><code>tailwind</code></td><td><a href="https://tailwindcss.com/">Tailwind Play CDN</a></td><td>Utility-Class-getrieben, kein Build-Schritt</td></tr>
+<tr><td><code>docsy</code></td><td>Handgefertigtes CSS, geforkt von <code>material</code></td><td>An Read the Docs/Docsy angelehnter, marineblauer Referenzhandbuch-Look</td></tr>
+<tr><td><code>slate</code></td><td>Handgefertigtes CSS, geforkt von <code>material</code></td><td>An Stripe/Slate angelehnt - eine dauerhaft dunkle Sidebar, unabhängig vom Hell-/Dunkelmodus</td></tr>
+<tr><td><code>docusaurus</code></td><td>Handgefertigtes CSS, geforkt von <code>material</code></td><td>An Docusaurus angelehnte, kräftige, volle Breite farbige Navbar, abgerundete Cards</td></tr>
+<tr><td><code>justthedocs</code></td><td>Handgefertigtes CSS, geforkt von <code>material</code></td><td>An Just the Docs angelehnter Minimalismus - die Suchbox sitzt oben in der Sidebar</td></tr>
+<tr><td><code>vuepress</code></td><td>Handgefertigtes CSS, geforkt von <code>material</code></td><td>An VuePress angelehnter grüner Akzent, weich abgerundete Ecken</td></tr>
+<tr><td><code>gitbook</code></td><td>Handgefertigtes CSS, geforkt von <code>material</code></td><td>An GitBook angelehnte zentrierte Lesespalte, Serifen-Überschriften</td></tr>
+<tr><td><code>notion</code></td><td>Handgefertigtes CSS, geforkt von <code>material</code></td><td>An Notion angelehnte randlose Sidebar, nahezu grauskalige UI, großzügiger Weißraum</td></tr>
 </tbody>
 </table>
+<p>Die sieben oben von <code>material</code> geforkten Themes verwenden <code>material</code>s
+exakte BoxLang-Templates (layout.bxm/page.bxm/search.bxm) unverändert,
+bis auf eine begrenzte CSS-Klassenpräfix-Umbenennung - nur
+<code>assets/style.css</code> (und bei <code>justthedocs</code> eine verschobene
+<code>&lt;bx:include&gt;</code>-Zeile, die die Suchbox in die Sidebar verlegt)
+unterscheidet sich, sodass sie denselben vollständigen Funktionsumfang
+und dasselbe air-gapped-fähige Verhalten erben, das <code>material</code> bereits
+hat.</p>
 <p>Das eigene CSS/JS jedes integrierten Themes (Bootstraps CSS/JS-Bundle,
 highlight.js, Alpine.js, lunr.js für den standardmäßigen <code>local</code>-Suchanbieter,
 und Mermaid, wenn <code>mermaid</code> aktiviert ist) wird vendoriert mit diesem Modul
@@ -107,9 +122,12 @@ statisches Stylesheet) und andere optionale Funktionen, die du selbst
 aktivierst (<code>math</code>, Algolia-Suche, Google Analytics), laden weiterhin von
 einem CDN oder einer gehosteten API - siehe
 <a href="#air-gappedoffline-websites">Air-gapped/Offline-Websites</a> unten.</p>
-<p>Alle drei verwenden dieselbe BoxLang-Markenpalette: einen
-<code>#00FF78 -&gt; #00DBFF</code>-Gradient und einen <code>#FFF500</code>-Akzent - und alle drei
-bringen denselben Satz an Seitenfunktionen mit:</p>
+<p><code>bootstrap</code>, <code>material</code> und <code>tailwind</code> verwenden dieselbe
+BoxLang-Markenpalette (einen <code>#00FF78 -&gt; #00DBFF</code>-Gradient und einen
+<code>#FFF500</code>-Akzent); die sieben Galerie-Themes darunter verwenden stattdessen
+jeweils ihre eigene, unterschiedliche Palette, angelehnt an die Plattform,
+von der sie ihren Look entlehnen - siehe die Tabelle oben. Jedes der zehn
+bringt unabhängig von der Palette denselben Satz an Seitenfunktionen mit:</p>
 <ul>
 <li><strong>Ein Inhaltsverzeichnis &quot;Auf dieser Seite&quot;</strong>, erzeugt aus den eigenen
 <code>h2</code>/<code>h3</code>-Überschriften jeder Seite.</li>
@@ -162,7 +180,10 @@ gefundenen Pfad.</li>
 <code>bxsites.json</code> gesetzt sind. Siehe
 <a href="/bx-sites/development/theme/docusaurus/de/configuration/index.html#theme">Konfiguration</a>.</li>
 <li><strong>Eine einklappbare Sidebar-Navigation</strong>, opt-in über
-<code>theme.options.navCollapsible</code>. Siehe
+<code>theme.options.navCollapsible</code> - jeder Abschnitt mit Kindern (verlinkt
+oder nicht) erhält eine Umschalt-Schaltfläche, statt seine Kinder immer
+inline anzuzeigen, und der Abschnitt, der die aktuelle Seite enthält,
+startet immer geöffnet. Siehe
 <a href="/bx-sites/development/theme/docusaurus/de/configuration/index.html#theme">Konfiguration</a>.</li>
 <li><strong>Google Analytics</strong>, wenn <code>analytics</code> in <code>bxsites.json</code> konfiguriert
 ist. Siehe <a href="/bx-sites/development/theme/docusaurus/de/configuration/index.html#analytics">Konfiguration</a>.</li>
@@ -198,12 +219,36 @@ Konfiguration nötig. Siehe
 <a href="/bx-sites/development/theme/docusaurus/de/guides/markdown/index.html#mathematik">Markdown-Erweiterungen</a>.</li>
 </ul>
 <p>Lege in <code>bxsites.json</code> fest, welches Theme ein Projekt verwendet:</p>
-<pre><code class="language-json">{ &quot;theme&quot;: { &quot;name&quot;: &quot;material&quot; } }
+<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;theme&quot;: { &quot;name&quot;: &quot;material&quot; } }
 </code></pre>
+<h2 id="ein-veröffentlichtes-theme-installieren"><a href="#ein-veröffentlichtes-theme-installieren" id="ein-veröffentlichtes-theme-installieren" name="ein-veröffentlichtes-theme-installieren" class="anchor"></a>Ein veröffentlichtes Theme installieren</h2>
+<p>Ein auf ForgeBox veröffentlichtes Theme installiert sich mit nichts
+weiter als der <code>bxSites</code>-Binary selbst - kein <code>box</code>/CommandBox nötig:</p>
+<pre data-bxsites-title="Usage"><code class="language-bash">bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
+</code></pre>
+<p>Das lädt das ZIP des Pakets herunter und entpackt es nach
+<code>themes/bx-sites-theme-blog1/</code> im Projekt-Wurzelverzeichnis, wobei vor
+Abschluss geprüft wird, ob es den <code>ThemeProvider</code>-Vertrag unten erfüllt.
+Ein Projekt kann auf diese Weise mehrere installierte Themes
+nebeneinander vorhalten und rein per Name zwischen ihnen wechseln:</p>
+<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;theme&quot;: { &quot;name&quot;: &quot;bx-sites-theme-blog1&quot; } }
+</code></pre>
+<p>Ein Theme braucht überhaupt keine BoxLang-Modul-/Klassenlader-Beteiligung
+(anders als ein Plugin) - es sind reine Dateien, es gibt also keinen
+separaten Aktivierungsschritt, wie ihn <code>install:plugin</code> hat; das Setzen
+von <code>theme.name</code> ist die einzige nötige Verdrahtung. Siehe
+<a href="/bx-sites/development/theme/docusaurus/de/cli-reference/index.html#installtheme"><code>install:theme</code></a> in der CLI-Referenz.</p>
+<p>Startest du stattdessen von einem Theme, das für einen anderen
+statischen Site-Generator gebaut wurde? Siehe
+<a href="/bx-sites/development/theme/docusaurus/de/guides/theme-import/index.html">Ein Theme importieren</a> - <code>theme:import</code> wandelt die
+eigenen Template-Dateien eines mkdocs-/jekyll-/hugo-Themes mechanisch in
+ein bestmögliches <code>themes/&lt;name&gt;/</code>-Gerüst um.</p>
 <h2 id="air-gappedoffline-websites"><a href="#air-gappedoffline-websites" id="air-gappedoffline-websites" name="air-gappedoffline-websites" class="anchor"></a>Air-gapped/Offline-Websites</h2>
 <p>Eine gebaute Website funktioniert standardmäßig völlig ohne Internetzugang,
-für die Themes <code>bootstrap</code> und <code>material</code> mit dem standardmäßigen
-<code>local</code>-Suchanbieter: Bootstraps eigenes CSS/JS, highlight.js, Alpine.js und
+für <code>bootstrap</code>, <code>material</code> und die sieben von <code>material</code> geforkten
+Themes (<code>docsy</code>, <code>slate</code>, <code>docusaurus</code>, <code>justthedocs</code>, <code>vuepress</code>,
+<code>gitbook</code>, <code>notion</code>) mit dem standardmäßigen <code>local</code>-Suchanbieter:
+Bootstraps eigenes CSS/JS, highlight.js, Alpine.js und
 lunr.js sind alle mit diesem Modul vendoriert (<code>resources/assets/vendor/</code>)
 und werden zur Build-Zeit direkt nach <code>site/assets/vendor/</code> kopiert -
 nirgends im erzeugten HTML taucht dafür ein CDN-<code>&lt;script&gt;</code>-/<code>&lt;link&gt;</code>-Tag
@@ -230,7 +275,8 @@ sprechen naturgemäß mit einer gehosteten API/einem Tracking-Endpunkt -
 das Vendorieren der JS-Datei würde diese Abhängigkeit nicht beseitigen.</li>
 </ul>
 <p>Wenn dein Einsatzziel wirklich null Internetzugang hat, bleib bei
-<code>bootstrap</code>/<code>material</code>, dem standardmäßigen <code>local</code>-Suchanbieter, vermeide
+<code>bootstrap</code>/<code>material</code>/einem der sieben von <code>material</code> geforkten Themes,
+dem standardmäßigen <code>local</code>-Suchanbieter, vermeide
 <code>elk</code>-Layout-Mermaid-Diagramme, falls <code>mermaid</code> aktiviert ist, und lass
 <code>math</code>/Algolia/Analytics aus.</p>
 <h2 id="icons"><a href="#icons" id="icons" name="icons" class="anchor"></a>Icons</h2>
@@ -242,15 +288,15 @@ gehosteten Bibliotheken, alle MIT-/ISC-lizenziert und mit diesem Modul
 mitgeliefert (~16.200 Icons insgesamt, kein CDN, kein zusätzliches Gewicht
 für eine gebaute Seite über die tatsächlich verwendete Handvoll Icons
 hinaus - siehe IconResolver.bx):</p>
-<pre><code class="language-markdown">---
+<pre data-bxsites-title="Frontmatter"><code class="language-markdown">---
 icon: rocket
 ---
 </code></pre>
-<pre><code class="language-markdown">---
+<pre data-bxsites-title="Frontmatter"><code class="language-markdown">---
 icon: lucide:rocket
 ---
 </code></pre>
-<pre><code class="language-markdown">---
+<pre data-bxsites-title="Frontmatter"><code class="language-markdown">---
 icon: phosphor-bold:rocket
 ---
 </code></pre>
@@ -276,7 +322,7 @@ weiterverbreiten könnte.</p>
 <p>Ein <a href="/bx-sites/development/theme/docusaurus/de/configuration/index.html#nav">nav.json</a>-Eintrag kann ebenfalls ein
 eigenes <code>icon</code> setzen, das die eigene Frontmatter der Zielseite für genau
 diesen einen Eintrag überschreibt:</p>
-<pre><code class="language-json">{ &quot;title&quot;: &quot;Guides&quot;, &quot;path&quot;: &quot;guides/index.md&quot;, &quot;icon&quot;: &quot;lucide:book-open&quot; }
+<pre data-bxsites-title="docs&#x2f;nav.json"><code class="language-json">{ &quot;title&quot;: &quot;Guides&quot;, &quot;path&quot;: &quot;guides/index.md&quot;, &quot;icon&quot;: &quot;lucide:book-open&quot; }
 </code></pre>
 <h2 id="der-themeprovider-vertrag"><a href="#der-themeprovider-vertrag" id="der-themeprovider-vertrag" name="der-themeprovider-vertrag" class="anchor"></a>Der <code>ThemeProvider</code>-Vertrag</h2>
 <p>Ein Theme ist einfach ein Ordner mit:</p>
@@ -307,8 +353,8 @@ alles andere. <code>variables.versions</code> (<code>[ { label, url } ]</code>, 
 und <code>variables.currentVersion</code> (das gerade gerenderte <code>label</code>) stützen den
 Versionsumschalter - leer/<code>&quot;Latest&quot;</code> für ein nicht versioniertes Projekt,
 sodass ein Theme nur dann einen Umschalter rendern muss, wenn
-<code>variables.versions.len() gt 1</code>. Die drei integrierten Themes beziehen
-ihre Repo-/Social-Icons aus einem kleinen gemeinsamen SVG-Lookup,
+<code>variables.versions.len() gt 1</code>. Jedes integrierte Theme bezieht seine
+Repo-/Social-Icons aus einem kleinen gemeinsamen SVG-Lookup,
 <code>&lt;bx:include template=&quot;#variables.moduleAssetsDir#/icons.bxm&quot;&gt;</code>
 (definiert <code>bxsitesIcon( name )</code>, eines von <code>github</code>, <code>twitter</code>/<code>x</code>, <code>rss</code>,
 <code>youtube</code>, <code>linkedin</code>, <code>facebook</code>, <code>bluesky</code>, <code>threads</code>, <code>slack</code>,
@@ -327,9 +373,9 @@ CSS-Custom-Properties auf <code>:root</code>, erneut deklariert unter
 <em>nach</em> dem eigenen Stylesheet des Themes geladen, sodass eine erneute
 Deklaration mit gleicher Spezifität darin gewinnt, ohne <code>resources/themes/</code>
 überhaupt anzurühren:</p>
-<pre><code class="language-json">{ &quot;extraCss&quot;: [ &quot;assets/brand.css&quot; ] }
+<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;extraCss&quot;: [ &quot;assets/brand.css&quot; ] }
 </code></pre>
-<pre><code class="language-css">/* docs/assets/brand.css - copied to site/assets/brand.css at build time */
+<pre data-bxsites-start-line="1" data-bxsites-title="docs&#x2f;assets&#x2f;brand.css"><code class="language-css">/* docs/assets/brand.css - copied to site/assets/brand.css at build time */
 :root {
 	--bxsites-gradient-start: #7C3AED;
 	--bxsites-gradient-end: #DB2777;
@@ -344,26 +390,94 @@ Deklaration mit gleicher Spezifität darin gewinnt, ohne <code>resources/themes/
 }
 </code></pre>
 <p>Das eigene Set des <code>bootstrap</code>-Themes
-(<code>resources/themes/bootstrap/assets/style.css</code>) besteht aus
+(<code>resources/themes/bootstrap/assets/style.css</code>) ist
 <code>--bxsites-gradient-start</code>/<code>-end</code>, <code>--bxsites-accent</code>, <code>--bxsites-bg</code>,
 <code>--bxsites-text</code>, <code>--bxsites-sidebar-bg</code>, <code>--bxsites-sidebar-text</code>,
-<code>--bxsites-border</code>, <code>--bxsites-link</code>, <code>--bxsites-link-hover</code> und
-<code>--bxsites-code-bg</code> - <code>material</code> und <code>tailwind</code> folgen derselben
-<code>--bxsites-*</code>-Namensgebung mit ihren eigenen kleinen Abweichungen. Alles
-über Farbe/Schriftart hinaus (Layout, Chrome hinzufügen/entfernen)
-braucht eine echte Überschreibung oder ein eigenes Theme - siehe unten.</p>
+<code>--bxsites-border</code>, <code>--bxsites-link</code>, <code>--bxsites-link-hover</code>,
+<code>--bxsites-code-bg</code>, <code>--bxsites-step-marker-bg</code>, <code>--bxsites-step-marker-text</code>,
+<code>--bxsites-step-line</code>, <code>--bxsites-step-success-bg</code>/<code>-text</code>,
+<code>--bxsites-step-warning-bg</code>/<code>-text</code> und <code>--bxsites-step-danger-bg</code>/<code>-text</code>.
+Jedes integrierte Theme garantiert <code>--bxsites-gradient-start</code>/<code>-end</code>,
+<code>--bxsites-accent</code> sowie das <code>--bxsites-step-*</code>-Set unter genau diesen
+Namen, sodass <code>extraCss</code> unabhängig vom Theme immer die
+Markenfarbe/Stepper-Akzente umlenken kann - aber nur <code>bootstrap</code>, <code>slate</code>
+und <code>notion</code> legen zusätzlich auch
+<code>--bxsites-bg</code>/<code>-text</code>/<code>-sidebar-bg</code>/<code>-sidebar-text</code>/<code>-border</code>/<code>-link</code>/<code>-link-hover</code>/<code>-code-bg</code>
+unter diesen Namen offen (<code>justthedocs</code> aliast alle bis auf die beiden
+<code>-sidebar-*</code> auf dieselbe Weise). Jedes andere integrierte Theme
+(<code>material</code>, <code>tailwind</code>, <code>docsy</code>, <code>docusaurus</code>, <code>vuepress</code>, <code>gitbook</code>)
+verwendet für diese zweite Gruppe stattdessen seine eigenen internen
+Custom-Property-Namen (z. B. verwendet materials eigenes
+<code>assets/style.css</code> <code>--md-bg</code>/<code>--md-ink</code>/<code>--md-link</code>/...) - öffne das
+eigene <code>assets/style.css</code> dieses Themes, um seine echten Namen zu finden,
+bevor du eines davon über <code>extraCss</code> überschreibst. Alles über
+Farbe/Schriftart hinaus (Layout, Chrome hinzufügen/entfernen) braucht
+eine echte Überschreibung oder ein eigenes Theme - siehe unten.</p>
+<p>Der Rest stützt den <a href="/bx-sites/development/theme/docusaurus/de/guides/content-blocks/index.html#stepper"><code>::: stepper</code>/<code>::: step</code></a>-Direktiv-Block</p>
+<ul>
+<li><code>--bxsites-step-marker-bg</code>/<code>-text</code> sind die Hintergrund-/Textfarbe des
+standardmäßigen nummerierten Kreises (<code>bootstrap</code>/<code>material</code> setzen ihn
+standardmäßig auf den eigenen <code>--bxsites-accent</code> des Themes; <code>tailwind</code>
+verwendet ein eigenes Türkis-/Minz-Paar, da es keinen einzelnen
+gemeinsamen Akzent-Token hat), <code>--bxsites-step-line</code> ist die
+Verbindungslinie zwischen den Schritten, und die
+<code>-success</code>/<code>-warning</code>/<code>-danger</code>-Paare stützen das eigene, optionale
+<code>color=&quot;...&quot;</code>-Attribut eines Schritts - anders als der Standard-Marker
+sind diese drei dasselbe feste Hintergrund-/Text-Paar sowohl im
+Hell- als auch im Dunkelmodus (ein in sich geschlossenes Badge, nicht an
+die eigene Markenfarbe des Themes gebunden), es gibt also keine
+<code>[data-theme=&quot;dark&quot;]</code>-Überschreibung neu zu deklarieren:</li>
+</ul>
+<pre data-bxsites-start-line="1" data-bxsites-title="docs&#x2f;assets&#x2f;brand.css"><code class="language-css">:root {
+	--bxsites-step-marker-bg: #7C3AED;
+	--bxsites-step-marker-text: #fff;
+	--bxsites-step-success-bg: #059669;
+	--bxsites-step-success-text: #fff;
+}
+
+[data-theme=&quot;dark&quot;] {
+	--bxsites-step-marker-bg: #C4B5FD;
+	--bxsites-step-marker-text: #1b1f21;
+}
+</code></pre>
+<h2 id="homepage-hero-banner"><a href="#homepage-hero-banner" id="homepage-hero-banner" name="homepage-hero-banner" class="anchor"></a>Homepage-Hero-Banner</h2>
+<p>Jedes integrierte Theme liefert CSS für ein Homepage-Banner in voller
+Breite mit Titelbild und Call-to-Action-Buttons - genau diese Website
+verwendet es in ihrer eigenen <code>docs/index.md</code>. Es gibt dafür keinen
+Direktiv-Block und keine Konfiguration, nur schlichtes HTML, das jede
+Seite einfügen kann (eine Homepage ist einfach eine normale Seite,
+<code>order: 1</code> oder sonst als Erste in der Navigation):</p>
+<pre data-bxsites-title="docs&#x2f;index.md"><code class="language-markdown">&lt;div class=&quot;bxsites-hero&quot;&gt;
+	&lt;img class=&quot;bxsites-hero__banner&quot; src=&quot;assets/home-banner.jpg&quot; alt=&quot;...&quot;&gt;
+	&lt;div class=&quot;bxsites-hero__actions&quot;&gt;
+		&lt;a class=&quot;bxsites-hero__btn bxsites-hero__btn--primary&quot; href=&quot;getting-started.md&quot;&gt;Get Started&lt;/a&gt;
+		&lt;a class=&quot;bxsites-hero__btn bxsites-hero__btn--secondary&quot; href=&quot;https://github.com/your/repo&quot;&gt;View on GitHub&lt;/a&gt;
+	&lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+<p><code>bxsites-hero__btn--primary</code>/<code>--secondary</code> sind dieselben zwei
+Akzent-Stile, die jedes Theme bereits an anderer Stelle verwendet -
+tausche, entferne oder füge Buttons nach Belieben hinzu, und
+skaliere/ersetze das eigene Bild von <code>bxsites-hero__banner</code> über ein zu
+<code>docs/assets/</code>-relatives <code>src</code>, auf dieselbe Weise, wie jedes andere Bild
+aufgelöst wird.</p>
 <h2 id="ein-theme-überschreiben"><a href="#ein-theme-überschreiben" id="ein-theme-überschreiben" name="ein-theme-überschreiben" class="anchor"></a>Ein Theme überschreiben</h2>
 <p>Lege deine eigenen <code>layout.bxm</code> + <code>page.bxm</code> (und optional <code>search.bxm</code> /
 <code>assets/</code>) in einen <code>theme/</code>-Ordner im Wurzelverzeichnis deines Projekts.
-BX Sites bevorzugt eine projektweite <code>theme/</code>-Überschreibung gegenüber
+BX Sites bevorzugt eine projektweite <code>theme/</code>-Überschreibung sowohl
+gegenüber einem installierten <code>themes/&lt;name&gt;/</code>-Theme als auch gegenüber
 jedem integrierten Theme, solange sie den obigen Vertrag erfüllt - die
 integrierten Themes unter <code>resources/themes/</code> dieses Moduls sind ein
-guter Ausgangspunkt zum Kopieren und Anpassen.</p>
+guter Ausgangspunkt zum Kopieren und Anpassen. Vollständige
+Auflösungsreihenfolge: <code>theme/</code> (dieser Abschnitt) -&gt; <code>themes/theme.name/</code>
+(ein <a href="#ein-veröffentlichtes-theme-installieren">installiertes Theme</a>,
+falls <code>theme.name</code> zu einem passt) -&gt; ein integriertes Theme namens
+<code>theme.name</code>.</p>
 <p>Ein durchgearbeitetes Beispiel - starte mit <code>bootstrap</code> und tausche seine
 Markenpalette und Überschriften-Schriftart gegen deine eigenen aus, wobei
 alles andere (Navigation, Suche, Dunkelmodus, Code-Hervorhebung, ...)
 genau so weiterläuft, wie es bereits funktioniert:</p>
-<pre><code class="language-markdown">my-project/
+<pre data-bxsites-title="Project structure"><code class="language-text">my-project/
 ├── bxsites.yaml
 ├── docs/
 └── theme/                    ← project-level override, checked before any built-in theme
@@ -374,28 +488,25 @@ genau so weiterläuft, wie es bereits funktioniert:</p>
         └── style.css              ← copied from bootstrap's assets/style.css, then edited
 </code></pre>
 <ol>
-<li>
-<p>Kopiere die drei <code>.bxm</code>-Dateien und <code>assets/style.css</code> aus
+<li>Kopiere die drei <code>.bxm</code>-Dateien und <code>assets/style.css</code> aus
 <code>resources/themes/bootstrap/</code> dieses Moduls in das <code>theme/</code> deines
-Projekts.</p>
-</li>
-<li>
-<p>Ändere nur das, was du wirklich ändern musst. Um Markenpalette und
+Projekts.</li>
+<li>Ändere nur das, was du wirklich ändern musst. Um Markenpalette und
 Schriftart zu tauschen, genügt der obere Teil von
-<code>theme/assets/style.css</code>:</p>
-<pre><code class="language-css">:root {
-	--bxsites-gradient-start: #7C3AED;  /* was #00FF78 */
-	--bxsites-gradient-end: #DB2777;    /* was #00DBFF */
-	--bxsites-accent: #FBBF24;          /* was #FFF500 */
-}
+<code>theme/assets/style.css</code>:</li>
+</ol>
+<pre data-bxsites-start-line="1" data-bxsites-title="theme&#x2f;assets&#x2f;style.css"><code class="language-css">   :root {
+   	--bxsites-gradient-start: #7C3AED;  /* was #00FF78 */
+   	--bxsites-gradient-end: #DB2777;    /* was #00DBFF */
+   	--bxsites-accent: #FBBF24;          /* was #FFF500 */
+   }
 
-body {
-	font-family: &quot;Inter&quot;, system-ui, sans-serif;  /* was &quot;Poppins&quot; */
-}
+   body {
+   	font-family: &quot;Inter&quot;, system-ui, sans-serif;  /* was &quot;Poppins&quot; */
+   }
 </code></pre>
-</li>
-<li>
-<p>Führe <code>bxSites build</code> aus (oder <code>serve</code> während der
+<ol start="3">
+<li>Führe <code>bxSites build</code> aus (oder <code>serve</code> während der
 Iteration) - BX Sites übernimmt <code>theme/</code> automatisch, keine Änderung an
 <code>bxsites.json</code> nötig (ein projektweiter <code>theme/</code>-Ordner hat immer
 Vorrang vor dem im <code>theme.name</code> genannten integrierten Theme). Alles,
@@ -403,8 +514,7 @@ was du nicht angefasst hast - Navigations-Rendering, Suche, der
 Dunkelmodus-Umschalter, Code-Annotationen - funktioniert genau so
 weiter, wie es im ursprünglichen <code>bootstrap</code>-Theme funktioniert hat, da
 es darunter immer noch genau dasselbe <code>layout.bxm</code>/<code>page.bxm</code>-Markup
-ist.</p>
-</li>
+ist.</li>
 </ol>
 <p>Ein projektweiter <code>theme/</code>-Ordner ist allerdings alles-oder-nichts -
 sobald BX Sites einen findet, wird er anstelle des integrierten Themes
@@ -425,7 +535,7 @@ dem, was die integrierten Themes zusätzlich bieten. Speichere beide als
 <code>theme/layout.bxm</code> und <code>theme/page.bxm</code> in deinem Projekt - ein
 projektweiter <code>theme/</code>-Ordner wird automatisch übernommen (wie oben),
 keine Änderung an <code>bxsites.json</code> nötig:</p>
-<pre><code class="language-bx">&lt;!-- theme/layout.bxm --&gt;
+<pre data-bxsites-start-line="1" data-bxsites-title="theme&#x2f;layout.bxm"><code class="language-bx">&lt;!-- theme/layout.bxm --&gt;
 &lt;bx:script&gt;
 	function renderNav( required array nodes ) {
 		var html = &quot;&lt;ul&gt;&quot;
@@ -462,7 +572,7 @@ keine Änderung an <code>bxsites.json</code> nötig:</p>
 &lt;/html&gt;
 &lt;/bx:output&gt;
 </code></pre>
-<pre><code class="language-bx">&lt;!-- theme/page.bxm --&gt;
+<pre data-bxsites-start-line="1" data-bxsites-title="theme&#x2f;page.bxm"><code class="language-bx">&lt;!-- theme/page.bxm --&gt;
 &lt;bx:output&gt;
 &lt;article&gt;
 	&lt;h1&gt;#encodeForHTML( variables.page.title )#&lt;/h1&gt;
@@ -489,7 +599,7 @@ für dein eigenes CSS/JS, automatisch zur Build-Zeit nach
 </ul>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/docusaurus/de/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 12&#x3a;15&#x3a;58 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/docusaurus/de/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
 			</article>
 
 			<nav class="dsrs-page-nav" aria-label="Seitennavigation">
@@ -505,7 +615,7 @@ für dein eigenes CSS/JS, automatisch zur Build-Zeit nach
 		</main>
 
 		<aside class="dsrs-toc-sidebar">
-			<nav class="dsrs-toc" aria-label="Auf dieser Seite"><div class="dsrs-toc__title">Auf dieser Seite</div><ul><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#integriert">Integriert</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#air-gappedoffline-websites">Air-gapped&#x2f;Offline-Websites</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#icons">Icons</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#der-themeprovider-vertrag">Der ThemeProvider -Vertrag</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben">Farben anpassen, ohne ein Theme zu &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-überschreiben">Ein Theme &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-von-grund-auf-schreiben">Ein Theme von Grund auf schreiben</a></li></ul></nav>
+			<nav class="dsrs-toc" aria-label="Auf dieser Seite"><div class="dsrs-toc__title">Auf dieser Seite</div><ul><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#integriert">Integriert</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-veröffentlichtes-theme-installieren">Ein ver&ouml;ffentlichtes Theme installieren</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#air-gappedoffline-websites">Air-gapped&#x2f;Offline-Websites</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#icons">Icons</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#der-themeprovider-vertrag">Der ThemeProvider -Vertrag</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben">Farben anpassen, ohne ein Theme zu &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#homepage-hero-banner">Homepage-Hero-Banner</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-überschreiben">Ein Theme &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-von-grund-auf-schreiben">Ein Theme von Grund auf schreiben</a></li></ul></nav>
 		</aside>
 
 	</div>

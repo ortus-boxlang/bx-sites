@@ -320,4 +320,3 @@ Autoren-Profil selbst gegen ein eigenes auszutauschen - es wird einmal
 von `BlogBuilder.bx` erzeugt, nicht aus einer Vorlagendatei in `theme/`
 gelesen, sodass das Umgestalten mit CSS (oben) der unterstützte Weg ist,
 statt eine Pro-Komponenten-Überschreibung.
-</content>

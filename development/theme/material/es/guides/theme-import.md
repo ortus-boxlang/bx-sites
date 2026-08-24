@@ -1,121 +1,130 @@
 ---
-title: Importing a theme
+title: Importar un tema
 order: 6.5
 icon: phosphor-duotone:arrows-left-right
-tags: [guides, themes, migration]
+tags: [guías, temas, migración]
 ---
 
-# Importing a theme
+# Importar un tema
 
-`bxSites theme:import` converts a theme from another static site
-generator's ecosystem into a bx-sites theme scaffold under
-`themes/<name>/` - a best-effort starting point, not a lossless
-one-command port. It handles the three ecosystems whose theme structure
-maps onto bx-sites' own `layout.bxm`+`page.bxm` contract (see
-[Themes](themes.md#the-themeprovider-contract)):
+`bxSites theme:import` convierte un tema del ecosistema de otro generador
+de sitios estáticos en un scaffold de tema bx-sites bajo `themes/<name>/`
+- un punto de partida de mejor esfuerzo, no una migración sin pérdidas en
+un solo comando. Maneja los tres ecosistemas cuya estructura de tema se
+corresponde con el propio contrato `layout.bxm`+`page.bxm` de bx-sites
+(consulta [Temas](themes.md#el-contrato-de-themeprovider)):
 
-- **`mkdocs`** - Jinja2 templates (native mkdocs and mkdocs-material both
-  use `base.html`+`main.html`)
-- **`jekyll`** - Liquid templates (`_layouts/default.html`+
+- **`mkdocs`** - plantillas Jinja2 (tanto mkdocs nativo como
+  mkdocs-material usan `base.html`+`main.html`)
+- **`jekyll`** - plantillas Liquid (`_layouts/default.html`+
   `_layouts/page.html`)
-- **`hugo`** - Go templates (`layouts/_default/baseof.html`+
+- **`hugo`** - plantillas Go (`layouts/_default/baseof.html`+
   `layouts/_default/single.html`)
 
-A React/Vue-component-based theme (Docusaurus, VuePress, Gatsby, ...) has
-no equivalent here - there's no template *file* to mechanically translate,
-since the theme is compiled UI components rather than server-rendered
-markup. Porting one of those means re-authoring it as a bx-sites theme
-from scratch (see [Writing a theme from scratch](themes.md#writing-a-theme-from-scratch)),
-not converting it.
+Un tema basado en componentes React/Vue (Docusaurus, VuePress, Gatsby,
+...) no tiene equivalente aquí - no hay ningún *archivo* de plantilla que
+traducir mecánicamente, ya que el tema son componentes de interfaz
+compilados en lugar de marcado renderizado en el servidor. Portar uno de
+esos significa reescribirlo como un tema bx-sites desde cero (consulta
+[Escribir un tema desde cero](themes.md#escribir-un-tema-desde-cero)), no
+convertirlo.
 
 ```bash frame="terminal" title="Terminal"
 bxSites theme:import --source=mkdocs --path=/path/to/mkdocs-theme --name=my-imported-theme
 ```
 
-- `--source` (required) - `mkdocs`, `jekyll`, or `hugo`
-- `--path` (required) - the source theme's own root folder (the one
-  containing its layout template, not the whole mkdocs/jekyll/hugo
-  *project* - see [Migrating from mkdocs](migrating-from-mkdocs.md)/
-  [Migrating from GitBook](migrating-from-gitbook.md) for converting a
-  project's *content*, a different job from converting its *theme*)
-- `--name` (required) - the destination name, written to `themes/<name>/`
-  (the same [installed-theme convention](themes.md#installing-a-published-theme)
-  `install:theme` uses) - set `bxsites.json`'s `theme.name` to it once
-  you're happy with the result
+- `--source` (obligatorio) - `mkdocs`, `jekyll` o `hugo`
+- `--path` (obligatorio) - la propia carpeta raíz del tema de origen (la
+  que contiene su plantilla de layout, no todo el *proyecto*
+  mkdocs/jekyll/hugo - consulta
+  [Migrar desde mkdocs](migrating-from-mkdocs.md)/
+  [Migrar desde GitBook](migrating-from-gitbook.md) para convertir el
+  *contenido* de un proyecto, una tarea distinta de convertir su *tema*)
+- `--name` (obligatorio) - el nombre de destino, escrito en
+  `themes/<name>/` (la misma
+  [convención de tema instalado](themes.md#instalar-un-tema-publicado)
+  que usa `install:theme`) - establece el `theme.name` de
+  `bxsites.json` una vez que estés satisfecho con el resultado
 
-Re-running against the same `--name` is safe - `layout.bxm`/`page.bxm`
-are overwritten and any newly-found asset folders merged in, so iterating
-(tweak the source, or the mapping, re-run) is the normal workflow, not a
-one-shot operation.
+Volver a ejecutarlo contra el mismo `--name` es seguro - `layout.bxm`/
+`page.bxm` se sobrescriben y cualquier carpeta de recursos recién
+encontrada se combina, así que iterar (ajustar el origen, o el mapeo,
+volver a ejecutar) es el flujo de trabajo normal, no una operación de un
+solo uso.
 
-## What actually gets converted
+## Qué se convierte realmente
 
-The command output reports exactly what happened - which source file
-became `layout.bxm`/`page.bxm` (or a note that none was found, if the
-source theme doesn't use one of the conventional filenames above), which
-asset folders (`css/`, `js/`, `static/`, ...) were copied verbatim into
-`themes/<name>/assets/`, and a numbered list of everything that needs a
-manual look.
+La salida del comando informa exactamente qué ocurrió - qué archivo de
+origen se convirtió en `layout.bxm`/`page.bxm` (o una nota indicando que
+no se encontró ninguno, si el tema de origen no usa uno de los nombres de
+archivo convencionales de arriba), qué carpetas de recursos (`css/`,
+`js/`, `static/`, ...) se copiaron tal cual en `themes/<name>/assets/`, y
+una lista numerada de todo lo que necesita revisión manual.
 
-Within a template file, this is a **mechanical, best-effort translator**
-(`JinjaLikeTranslator.bx` for mkdocs/jekyll's shared Jinja2/Liquid syntax,
-`GoTemplateTranslator.bx` for hugo's Go templates) - not a real parser for
-either language. What it handles:
+Dentro de un archivo de plantilla, esto es un **traductor mecánico de
+mejor esfuerzo** (`JinjaLikeTranslator.bx` para la sintaxis Jinja2/Liquid
+compartida de mkdocs/jekyll, `GoTemplateTranslator.bx` para las plantillas
+Go de hugo) - no un analizador real de ninguno de los dos lenguajes. Lo
+que maneja:
 
-- Variable output (`{{ page.title }}` / Hugo's `{{ .Title }}`), mapped
-  against a small, fixed table of the common fields (page title/content/
-  description, site name/description, base URL, nav) - anything outside
-  that table is left as a `<!--- TODO: ... --->` marker rather than
-  guessed at.
-- `if`/`elif`/`else`/`endif` (mkdocs/jekyll) or `if`/`else if`/`else`/`end`
-  (hugo), translated into real `<bx:if>`/`<bx:elseif>`/`<bx:else>`
-  structure - always structurally valid even when the *condition* itself
-  references something outside the mapping table (flagged as a warning
-  instead, since leaving the surrounding `if` broken would be worse than
-  a condition a human still needs to check).
-- `for x in list`/`endfor` (mkdocs/jekyll) or `range`/`end` (hugo),
-  translated into `<bx:loop>` the same way. Hugo's `range` rebinds `.` to
-  each item with no named loop variable in the common case - the
-  generated `<bx:loop>` always uses a synthetic `item` name, and a
-  standing warning notes that a bare `.Field` *inside* the loop body
-  means the range item's own field in Go, which can't be automatically
-  retargeted to `item.Field`.
-- Comments (`{# ... #}`/`{% comment %}` for Jinja2/Liquid, `{{/* ... */}}`
-  for Go), dropped entirely.
+- Salida de variables (`{{ page.title }}` / el `{{ .Title }}` de Hugo),
+  mapeada contra una tabla pequeña y fija de los campos comunes (título/
+  contenido/descripción de la página, nombre/descripción del sitio, URL
+  base, navegación) - cualquier cosa fuera de esa tabla se deja como un
+  marcador `<!--- TODO: ... --->` en lugar de adivinarse.
+- `if`/`elif`/`else`/`endif` (mkdocs/jekyll) o `if`/`else if`/`else`/`end`
+  (hugo), traducido a una estructura `<bx:if>`/`<bx:elseif>`/`<bx:else>`
+  real - siempre estructuralmente válida incluso cuando la propia
+  *condición* referencia algo fuera de la tabla de mapeo (marcada como
+  advertencia en su lugar, ya que dejar el `if` circundante roto sería
+  peor que una condición que un humano todavía necesita revisar).
+- `for x in list`/`endfor` (mkdocs/jekyll) o `range`/`end` (hugo),
+  traducido a `<bx:loop>` de la misma forma. El `range` de Hugo reasigna
+  `.` a cada elemento sin ninguna variable de bucle con nombre en el caso
+  común - el `<bx:loop>` generado siempre usa un nombre sintético `item`,
+  y una advertencia permanente señala que un `.Field` suelto *dentro* del
+  cuerpo del bucle significa el propio campo del elemento del range en
+  Go, que no puede redirigirse automáticamente a `item.Field`.
+- Comentarios (`{# ... #}`/`{% comment %}` para Jinja2/Liquid,
+  `{{/* ... */}}` para Go), eliminados por completo.
 
-What's deliberately **not** translated, always left as a TODO marker (or,
-inside a condition where leaving raw untranslated syntax would produce
-invalid BoxLang, substituted with a syntactically-safe placeholder -
-`false` for a condition, `[]` for a loop's list expression - flagged the
-same way):
+Lo que deliberadamente **no** se traduce, siempre dejado como un marcador
+TODO (o, dentro de una condición donde dejar la sintaxis sin traducir en
+bruto produciría BoxLang inválido, sustituido por un marcador de posición
+sintácticamente seguro - `false` para una condición, `[]` para la
+expresión de lista de un bucle - marcado de la misma forma):
 
-- A filter/pipeline (`{{ page.title | upper }}`, `{{ .Title | truncate 100 }}`)
-  - filter semantics vary too much to guess at safely.
-  - it's still worth verifying manually, since a filter with a plainly-safe BoxLang
-  equivalent (`upper` → `ucase()`) is common enough to be a quick manual fix.
-- Template inheritance (Jinja2's `{% extends %}`/`{% block %}`, Hugo's
-  `{{ block }}`/`{{ define }}`) and includes/partials (`{% include %}`) -
-  no automatic way to map these onto bx-sites' own single-file
-  `layout.bxm`+`page.bxm` contract.
-- Hugo's `{{ with .X }}` - rebinds `.` to a new context for its own body,
-  with no bx-sites equivalent at all, so it's left untranslated rather
-  than emitted as a structurally-valid but semantically-wrong `<bx:if>`.
-- A Go condition that isn't a single field reference (Go writes boolean
-  logic as prefix function calls - `{{ if and .A .B }}`, `{{ if eq .Type "post" }}`
-  - which have no BoxLang infix equivalent; substituting just the
-  `.Field` tokens inside one would still leave invalid BoxLang text
-  behind, so the whole condition is replaced with the placeholder
-  instead).
-- Any variable reference not in the fixed mapping table.
+- Un filtro/pipeline (`{{ page.title | upper }}`, `{{ .Title | truncate 100 }}`)
+  - la semántica de los filtros varía demasiado como para adivinarla con
+  seguridad - de todos modos vale la pena verificarlo manualmente, ya que
+  un filtro con un equivalente BoxLang claramente seguro (`upper` →
+  `ucase()`) es lo bastante común como para ser un arreglo manual rápido.
+- La herencia de plantillas (`{% extends %}`/`{% block %}` de Jinja2,
+  `{{ block }}`/`{{ define }}` de Hugo) e includes/parciales
+  (`{% include %}`) - no hay forma automática de mapear esto al propio
+  contrato de archivo único `layout.bxm`+`page.bxm` de bx-sites.
+- El `{{ with .X }}` de Hugo - reasigna `.` a un nuevo contexto para su
+  propio cuerpo, sin ningún equivalente en bx-sites en absoluto, así que
+  se deja sin traducir en lugar de emitirse como un `<bx:if>`
+  estructuralmente válido pero semánticamente incorrecto.
+- Una condición de Go que no es una única referencia a un campo (Go
+  escribe la lógica booleana como llamadas a función en notación prefija
+  - `{{ if and .A .B }}`, `{{ if eq .Type "post" }}` - que no tienen un
+  equivalente infijo en BoxLang; sustituir solo los tokens `.Field`
+  dentro de una de ellas seguiría dejando texto BoxLang inválido detrás,
+  así que toda la condición se reemplaza por el marcador de posición en
+  su lugar).
+- Cualquier referencia de variable que no esté en la tabla de mapeo fija.
 
-## After importing
+## Después de importar
 
-The scaffold is a starting point, not a finished theme - work through the
-reported TODO markers and warnings, then check it against the
-[ThemeProvider contract](themes.md#the-themeprovider-contract) the same
-way a hand-written theme needs to (`layout.bxm`+`page.bxm` required,
-`search.bxm` optional). None of the page-feature conventions every
-built-in theme implements (dark mode, breadcrumbs, prev/next, the search
-box, ...) come along automatically - the source theme's own markup for
-those, if it had any, went through the same mechanical translation as
-everything else and needs the same review.
+El scaffold es un punto de partida, no un tema terminado - trabaja los
+marcadores TODO y las advertencias reportados, y luego verifícalo contra
+el [contrato de ThemeProvider](themes.md#el-contrato-de-themeprovider) de
+la misma forma en que lo necesita un tema escrito a mano (`layout.bxm`+
+`page.bxm` obligatorios, `search.bxm` opcional). Ninguna de las
+convenciones de funciones de página que implementa cada tema incorporado
+(modo oscuro, migas de pan, anterior/siguiente, el cuadro de búsqueda,
+...) viene incluida automáticamente - el propio marcado del tema de
+origen para esas, si lo tenía, pasó por la misma traducción mecánica que
+todo lo demás y necesita la misma revisión.

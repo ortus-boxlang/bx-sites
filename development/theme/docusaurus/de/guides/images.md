@@ -182,10 +182,9 @@ funktioniert.
 Jede erzeugte Variante wird auf der Festplatte unter dem eigenen
 `.cache/images/` eines Projekts zwischengespeichert (entfernt von
 [`bxSites clean`](../cli-reference.md#clean), zusammen mit `site/`) -
-verschlüsselt nach dem Inhalts-Hash des *Quell*-Bilds, sodass ein
+indiziert nach dem Inhalts-Hash des *Quell*-Bilds, sodass ein
 erneutes Ausführen von `build` (einmal pro Versions-/Locale-Baum, alle
 teilen sich dasselbe `docs/assets/`) oder `bxSites serve` nach einer
 unabhängigen Änderung nicht jeden Screenshot des Projekts erneut
 dekodiert/skaliert/kodiert, sondern nur die, die sich tatsächlich
 geändert haben.
-</content>

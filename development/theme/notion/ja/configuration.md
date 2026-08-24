@@ -8,15 +8,15 @@ tags: [リファレンス, 設定]
 
 # 設定
 
-すべてのプロジェクトはルートに 1 つのサイト設定ファイルを持ちます。デフォルトかつ推奨の形式である
-`bxsites.yaml`（または `.yml`）を使うか、そのまま使い続けたいプロジェクト向けの `bxsites.json` を
-使うかのいずれかです。どちらも完全にサポートされており、まったく同じ結果になります。
+すべてのプロジェクトはルートに1つのサイト設定ファイルを持ちます - デフォルトかつ推奨の形式である
+`bxsites.yaml`（または `.yml`）か、そのまま使い続けたいプロジェクト向けの `bxsites.json` の
+いずれかです。どちらも完全にサポートされており、まったく同じ結果になります。
 `bxSites new` は `--format=json` を指定しない限り `bxsites.yaml` をスキャフォールドします
 （[はじめに](getting-started.md#設定ファイルの形式) を参照）。プロジェクトに何らかの理由で
 複数の設定ファイルが存在する場合は、`bxsites.yaml` が優先され、次に `bxsites.yml`、
 最後に `bxsites.json` の順で使用されます。
 
-```yaml
+```yaml title="bxsites.yaml" linenums="1"
 name: "My Docs"
 description: ""
 baseURL: "/"
@@ -47,15 +47,22 @@ ogImage: ""
 generateOgImages: false
 extraCss: []
 extraJs: []
+assets:
+  fingerprint: true
+  bundle: true
+  images: { enabled: true, widths: [400, 800, 1200, 1600], formats: [original, webp] }
 plugins: []
 i18n:
   defaultLocale: { code: en, label: English }
   locales: []
+blog:
+  postsPerPage: 10
+  feed: true
 ```
 
 そちらを好むプロジェクト向けの、同等の `bxsites.json` は次のとおりです:
 
-```json
+```json title="bxsites.json" linenums="1"
 {
 	"name": "My Docs",
 	"description": "",
@@ -90,19 +97,28 @@ i18n:
 	"generateOgImages": false,
 	"extraCss": [],
 	"extraJs": [],
+	"assets": {
+		"fingerprint": true,
+		"bundle": true,
+		"images": { "enabled": true, "widths": [400, 800, 1200, 1600], "formats": ["original", "webp"] }
+	},
 	"plugins": [],
 	"i18n": {
 		"defaultLocale": { "code": "en", "label": "English" },
 		"locales": []
+	},
+	"blog": {
+		"postsPerPage": 10,
+		"feed": true
 	}
 }
 ```
 
 必須なのは `name` のみで、それ以外はすべて上記のデフォルト値にフォールバックします。
-`theme` オブジェクトは 1 階層のみマージされます。`{"theme":{"name":"material"}}` だけでも
-デフォルトの（空の）`options` が保持されます。以下の各キーはどちらの形式でも名前と構造が
-同じです。このページの残りの部分では簡潔さのために JSON のスニペットのみを示しますが、
-YAML でも同様に読み替えられます。
+`theme` オブジェクトは1階層のみマージされるため、`{theme: {name: material}}` だけを
+指定してもデフォルトの（空の）`options` は保持されます。以下の各キーはどちらの形式でも
+名前と構造が同じです。このページの残りの部分では簡潔さのために JSON のスニペットのみを
+示しますが、YAML でも同様に読み替えられます。
 
 ## `name`
 
@@ -116,76 +132,181 @@ YAML でも同様に読み替えられます。
 
 ## `baseURL`
 
-すべての内部リンク、アセットパス、ナビゲーションエントリのプレフィックスを制御し、
+すべての内部リンク、アセットパス、ナビゲーションエントリのプレフィックスの付け方を制御し、
 `sitemap.xml` と `llms.txt` のサイト正規 URL としても機能します。
 
-- 空白または `"/"` （デフォルト）- リンクはルート相対のまま（`/page/`）。`sitemap.xml` も
-  絶対 URL の `llms.txt` も生成されません（正規ドメインがないため）。
-- パスのみ（例: `"my-docs"` や `"/my-docs/"`）- サイトがそのサブパスから配信されると見なし、
-  すべての内部リンク、ナビゲーションエントリ、アセットに `my-docs/` プレフィックスが付きます。
-  絶対ドメインがないため `sitemap.xml` は生成されません。
-- 完全な URL（例: `"https://docs.example.com/"`）- パス部分（ここでは `/`）が
-  ベアパスと同様に使用され、**さらに** ビルド時に `sitemap.xml` が書き出されます。
+- 空白または `"/"`（デフォルト）- リンクはルート相対のまま（`/page/`）で、`sitemap.xml` も
+  絶対 URL の `llms.txt` も生成されません（それらを構築するための正規ドメインがないため）。
+- パスのみ（例: `"my-docs"` や `"/my-docs/"`）- サイトがそのサブパスから配信されると見なされ、
+  すべての内部リンク、ナビゲーションエントリ、アセットにそのプレフィックスが付きます
+  （`/my-docs/page/`）。この場合も絶対ドメインがないため `sitemap.xml` は生成されません。
+- 完全な URL（例: `"https://docs.example.com/"`）- パス部分（ここでは `/`）がベアパスと
+  同様に使用され、**さらに** ビルド時にそのドメイン配下の非隠しページすべての絶対 URL を
+  含む `sitemap.xml` が書き出されます。
 
-`llms.txt`（[以下](#llmstxt) 参照）は常に書き出されます。`baseURL` が完全な URL の場合は絶対 URL が使用されます。
+`llms.txt`（[下記](#llmstxt) 参照）は常に書き出されます - `baseURL` が絶対 URL を
+提供する場合はそちらが優先して使われるだけです。
 
 ## `llms.txt`
 
-すべてのビルドでサイトルートに `llms.txt` が書き出されます。
-これは、LLM ベースのツールが HTML をクロールせずにサイトをナビゲートするための
-[llms.txt](https://llmstxt.org) 規約に準拠した、すべての非隠しページのプレーン Markdown インデックスです。
-設定キーはなく、自動的に生成されます。`baseURL` が完全な URL の場合は絶対 URL のリンク、
-そうでない場合は `basePath` 相対のリンクが使われます。
+すべてのビルドで、サイトルートに `llms.txt` が書き出されます - これは、LLM ベースの
+ツールがレンダリング済み HTML をクロールせずにサイトをナビゲートできるようにするための、
+新しく登場した [llms.txt](https://llmstxt.org) 規約に従った、すべての非隠しページの
+プレーンな Markdown インデックスです。専用の設定キーはなく、自動的に生成されます。
+`baseURL` が完全な URL の場合は各リンクに絶対 URL を、そうでない場合は `basePath` 相対の
+リンクを使用します。
 
 ## `sitemap.xml`
 
-サイトルートに書き出されますが、`baseURL` が完全な URL の場合のみです（上記を参照）。
-[sitemaps.org](https://www.sitemaps.org/) プロトコルに従ってすべての非隠しページを列挙します。
+サイトルートに書き出されますが、`baseURL` が完全な URL の場合のみです（上記参照）-
+サイトマップが意味を持つには絶対ドメインが必要だからです。
+[sitemaps.org](https://www.sitemaps.org/) プロトコルに従って、すべての非隠しページを
+列挙します。
 
 ## `theme`
 
-- `theme.name` - 組み込みテーマのいずれか（`bootstrap`、`material`、`tailwind`）、
+- `theme.name` - 組み込みテーマのいずれか（`bootstrap`、`material`、`tailwind` など）、
   またはプロジェクトルートの `theme/` フォルダで提供するカスタムテーマの名前
   （[テーマ](guides/themes.md) を参照）
-- `theme.logo` - ヘッダーブランドマークのサイト名の横に表示される画像への
-  パス/URL（デフォルトの「⚡」グリフの代わり）
-- `theme.favicon` - ファビコンへのパス/URL。空白（デフォルト）の場合、
-  `<link rel="icon">` はレンダリングされません。
-- `theme.options` - テーマ固有のオプション:
+- `theme.logo` - ヘッダーのブランドマークでサイト名の横に表示される画像への
+  パス/URL（デフォルトの「⚡」グリフの代わり）- 相対パス（例: `"assets/logo.svg"`、
+  `docs/assets/` を基準に解決されます）には他の内部アセットと同様に `baseURL` が
+  プレフィックスされます。絶対 URL はそのまま使用されます。空白（デフォルト）の場合、
+  ヘッダーには「⚡ &lt;サイト名&gt;」が表示されます。
+- `theme.favicon` - ファビコンへのパス/URL。`theme.logo` と同じ方法で解決されます。
+  空白（デフォルト）の場合、`<link rel="icon">` は一切レンダリングされません
+  （ブラウザ自身のデフォルト動作にフォールバックします）。
+- `theme.options` - すべての組み込みテーマが読み取る、テーマ固有のオプション:
   - `theme.options.colorMode` - `"auto"`（デフォルト）、`"light"` または `"dark"`。
-    ユーザーが初回訪問時に見るモードを制御します。`"auto"` は OS の設定に従います。
+    初めての訪問者がヘッダーのダーク/ライトトグルで自分で選択する前に見るモードを
+    制御します - `"auto"` は OS の設定に従い、`"light"`/`"dark"` は固定のデフォルトを
+    設定します。訪問者がいったんトグルを切り替えると、その選択（`localStorage` に
+    保存されます）は、この設定に関わらず以降の訪問で常に優先されます。
 
     ```json
     { "theme": { "options": { "colorMode": "dark" } } }
     ```
-  - `theme.options.navCollapsible` - `false`（デフォルト）は常に展開されたナビゲーションセクションを表示します。
-    `true` にすると、子要素を持つすべてのセクションにトグルボタンが追加されます。
+  - `theme.options.navCollapsible` - `false`（デフォルト）は、今日と同様にすべての
+    ナビゲーションセクションを常に展開して表示します。`true` にすると、子要素を持つ
+    すべてのセクションに、訪問者がクリックして折りたたみ/展開できるトグルボタンが
+    付きます - そのセクションが（`index.md` のないフォルダの）単なるグループ見出しで
+    あっても、自身のページにリンクしていても同様です。現在表示中のページを含む
+    セクションは、`navExpandAll` の値に関わらず常に開いた状態で始まるため、
+    そこへナビゲートしたときに今いるページへのリンク自体が埋もれてしまうことは
+    ありません。
   - `theme.options.navExpandAll` - `navCollapsible` が `true` の場合のみ関係します。
-    `true`（デフォルト）はすべてのセクションを展開した状態で開始し、
-    `false` は現在のページを含むセクション以外をすべて折りたたんだ状態で開始します。
+    `true`（デフォルト）はすべてのセクションを展開した状態で開始し、`false` は
+    現在のページを含むセクションを除くすべてのセクションを折りたたんだ状態で
+    開始します。
 
     ```json
     { "theme": { "options": { "navCollapsible": true, "navExpandAll": false } } }
+    ```
+  - `theme.options.tocPosition` - ページ自身の「このページの内容」目次がどこに
+    レンダリングされるか。`"top"`（デフォルト）は、今日と同様に記事の先頭にインラインで
+    レンダリングします。`"sticky"` にすると、記事がその下でスクロールしている間も
+    表示され続ける独自の右カラムに移動します - 同じ「このページの内容」リストが、
+    ただ固定表示されるだけで、長いページで役立ちます。この固定カラムは広いビューポート
+    でのみ収まります（3カラムレイアウトが窮屈になる幅を下回ると非表示になります）。
+    その幅を下回ると、`sticky` モードは代わりに、スクロール中もビューポート上部に
+    固定される折りたたみ可能な「このページの内容」バーをレンダリングします -
+    タップするとリストが展開する、VitePress/GitBook がモバイルで採用しているのと
+    同じ扱いです。そのため TOC はどのビューポート幅でも到達可能なままで、
+    利用できるスペースに応じて形を変えるだけです。
+
+    ```json
+    { "theme": { "options": { "tocPosition": "sticky" } } }
+    ```
+  - `theme.options.pageMetaPosition` - このページを編集/Markdown をダウンロード/
+    最終更新の行が、ページ自身のコンテンツに対してどこにレンダリングされるか。
+    `"bottom"`（デフォルト）は、記事が終わる直前に小さなフッターの注記として
+    レンダリングします。`"top"` にすると、タイトルの近くにレンダリングされます -
+    このオプションが存在する前は常にそこにレンダリングされていた場所です。
+
+    ```json
+    { "theme": { "options": { "pageMetaPosition": "top" } } }
     ```
 
 ## `search`
 
 `true`（デフォルト）は静的検索インデックスをビルドし、検索ボックスを接続します。
-`false` はすべてをスキップします。[検索](guides/search.md) を参照してください。
+`false` は両方とも完全にスキップします - `search-index.json` も検索 UI も追加の JS も
+一切ありません。[検索](guides/search.md) を参照してください。
+
+## `searchProvider`
+
+`search: true` がどの検索 UI を接続するかを制御します:
+
+- `provider` - `"local"`（デフォルト）は bx-sites 独自の静的/クライアントサイド検索
+  （`search-index.json` + lunr.js、[検索](guides/search.md#local-the-default) 参照）です。
+  `"algolia"` は代わりに [Algolia DocSearch](guides/search.md#algolia) を、`"pagefind"`
+  は [Pagefind](guides/search.md#pagefind) を接続します。それ以外の値は、`theme/`
+  オーバーライドによって配線されるプロジェクト独自のカスタムプロバイダです -
+  [検索](guides/search.md#other-search-providers) を参照してください。
+- `algolia` - `provider` が `"algolia"` の場合に必須: `appId`、`apiKey`
+  （*検索専用* の公開 API キーで、管理キーではありません）、`indexName` を、
+  Algolia 自身の DocSearch クライアントが期待する形式そのままで指定します。
+  `insights`（デフォルトは `false`）は DocSearch のクリック/コンバージョン分析を
+  有効にします。
+
+  ```json title="bxsites.json" linenums="1"
+  {
+    "search": true,
+    "searchProvider": {
+      "provider": "algolia",
+      "algolia": {
+        "appId": "ABC123",
+        "apiKey": "a1b2c3d4e5f6...",
+        "indexName": "my-docs"
+      }
+    }
+  }
+  ```
+
+- `pagefind` - `provider` が `"pagefind"` の場合、両方のキーとも省略可能です:
+  `bin`（デフォルトは `"pagefind"`）は CLI 実行ファイルの名前/パスで、単純な名前の
+  場合は `PATH` を基準に解決されます。`options` はそのまま渡される追加の生の CLI
+  フラグの配列です。`pagefind` CLI 自体は事前にインストールされ `PATH` 上にある
+  必要があります - BX Sites は（`lastUpdated`/`gh-deploy` の `git` と同様に）
+  これを呼び出すだけで、代わりにインストールすることはありません。
+
+  ```json title="bxsites.json" linenums="1"
+  {
+    "search": true,
+    "searchProvider": {
+      "provider": "pagefind",
+      "pagefind": { "bin": "pagefind", "options": [] }
+    }
+  }
+  ```
 
 ## `nav`
 
 デフォルトでは、ナビゲーションは `docs/` 自身のフォルダ/ファイル構造から推定されます
-（`order`/`hidden` フロントマター付き）。明示的な nav を使用すると、ファイルの実際の場所に
-関係なく、ページのタイトル、グループ、順序を自由に設定できます。
+（`order`/`hidden` フロントマター付き）- 小規模なサイトには十分ですが、大規模なサイトでは
+これでは足りなくなります。明示的な nav を使用すると、ファイルの実際の場所に関係なく、
+ページのタイトル、グループ、順序を自由に設定できます。
 
-空の配列（デフォルト）はフォルダ構造から推定することを意味します。非空の配列は推定を完全に置き換えます。
-各エントリは以下のいずれかです:
+空の配列（デフォルト）は「フォルダ構造から推定する」ことを意味します。非空の配列は
+この推定を完全に置き換えます - 配列の順序がそのままナビゲーションの順序になり、
+どこにも参照されていないページもビルドはされますが、nav からはリンクされません
+（`hidden: true` と同じ扱いです）。各エントリは以下のいずれかです:
 
-- `"guides/setup.md"` のような docs/ 相対パス文字列
-- `{ "title", "path", "icon", "children" }` オブジェクト
+- 裸の docs/ 相対パス文字列（例: `"guides/setup.md"`）- タイトルはそのページ自身の
+  フロントマター/ファイル名から取得され、フォルダ推定の場合と同じです
+- `{ "title", "path", "icon", "children" }` オブジェクト - `path`、`icon`、`children`
+  はすべて省略可能です。`path` のない `title` のみのエントリは、リンクのないグループ
+  見出し（今日でいう `index.md` のないフォルダのようなもの）になります。明示的な
+  `title`/`icon` は、常にリンク先ページ自身のタイトル/アイコンより優先されて nav に
+  表示されます（ページ自身の実際の `<h1>`/`<title>` は変更されません - nav のラベル/
+  アイコンだけが変わります）- `icon` に指定できる値については
+  [テーマ: アイコン](guides/themes.md#icons) を参照してください
 
-```json
+`path` を持たず `children` を持つ `title` のみのエントリは、まさにメニューコンテナ/
+セクションラベルです - その子要素をまとめるだけの、クリックできない見出しで、
+GitBook 自身のサイドバーにおける「MAIN COMPONENTS」と同じ役割を果たします:
+
+```json title="bxsites.json" linenums="1"
 {
 	"nav": [
 		"index.md",
@@ -200,11 +321,28 @@ YAML でも同様に読み替えられます。
 }
 ```
 
-`bxsites.json` が大きくなりすぎる場合は、`docs/nav.json` ファイルに移動できます。
+同じグループエントリに `path` を与えると、単なるラベルではなく（自身のランディング
+ページと子要素を持つ）通常のリンク付きセクションになります - どちらの形でも
+`theme.options.navCollapsible` の下では同じようにネストされます（上記参照）。
+
+`bxsites.json` が煩雑になるほど nav が大きい場合は、代わりに独自の `docs/nav.json`
+ファイルに移動できます - 配列の形は同じで、ファイル全体のトップレベルの内容として
+そのまま置くだけです:
+
+```json title="docs/nav.json" linenums="1"
+[
+	"index.md",
+	{ "title": "ガイド", "children": [ "guides/setup.md" ] }
+]
+```
+
+`bxsites.json` 自身の `nav` が非空の場合、常に `docs/nav.json` より優先されます。
+どちらもメインツリーのみに適用されます - `docs/versions/<name>/` ツリーは、
+メインツリーに明示的な nav があっても、常に自身のフォルダ構造から nav を推定します。
 
 ## `redirects`
 
-`[]`（デフォルト）- サイト全体の古い URL の `from`/`to` リダイレクトで、
+`[]`（デフォルト）- サイト全体の `from`/`to` 古い URL リダイレクトで、
 メインツリーにのみ適用されます:
 
 ```json title="bxsites.json" linenums="1"
@@ -215,30 +353,49 @@ YAML でも同様に読み替えられます。
 }
 ```
 
-- `redirects[].from` - 静的なリダイレクトスタブが書き込まれる古いプリティ
-  URL セグメント（先頭/末尾のスラッシュなし、拡張子なし）
-- `redirects[].to` - ルート相対パス（`baseURL` に対して解決されます）
-  または完全な `https://` URL
+- `redirects[].from` - 静的なリダイレクトスタブが書き込まれる古いプリティ URL
+  セグメント（先頭/末尾のスラッシュなし、拡張子なし）
+- `redirects[].to` - ルート相対パス（`baseURL` を基準に解決されます）または
+  完全な `https://` URL
 
-ページ自身のフロントマターの `redirect_from` は、ページ単位・ツリー単位の
-代替手段です（バージョン/ロケールツリー内でも機能します）- `page:rename`
-がどのように自動的に追加するかを含む全体像については
-[リダイレクト](guides/redirects.md) を参照してください。
+ページ自身のフロントマター `redirect_from` は、ページ単位・ツリー単位の代替手段です
+（バージョン/ロケールツリー内でも機能します）- `page:rename` がどのように自動的に
+これを刻印するかを含む全体像については [リダイレクト](guides/redirects.md) を
+参照してください。
 
 ## `markdown`
 
-[bx-markdown](https://github.com/ortus-boxlang/bx-markdown) 独自のモジュール設定として
-そのまま転送されます。
+各ページがレンダリングされる前に、[bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
+独自のモジュール設定としてそのまま転送されます。BX Sites はこれらのキーを再定義したり
+検証したりしません。ここに書いたものはそのまま bx-markdown 自身のオプションセットに
+なるため、このリストは bx-markdown 自体の進化とともにずれていく可能性があります。
+テーブル、`~~取り消し線~~`、`- [ ]` タスクリストのチェックボックス、ページ内目次は
+常に有効で、トグルはありません。唯一の例外は `enableAdmonition` です - bx-markdown
+自体のデフォルトは `false` ですが、BX Docs のデフォルトは `true` です
+（[Markdown 拡張ガイド](guides/markdown.md) を参照）。
 
 | キー | デフォルト | 効果 |
 |---|---|---|
-| `enableAdmonition` | `true` *（BX Sites デフォルト; bx-markdown 自体は `false`）* | `!!!`/`???`/`???+` コールアウトブロック |
-| `enableFootnotes` | `false` | `[^label]` 脚注参照 |
-| `enableDefinitionLists` | `false` | `Term\n:   Definition` リスト |
+| `enableAdmonition` | `true` *（BX Sites のデフォルト。bx-markdown 自体のデフォルトは `false`）* | `!!!`/`???`/`???+` コールアウトブロック - [Markdown 拡張ガイド](guides/markdown.md#admonitions) を参照 |
+| `enableFootnotes` | `false` | `[^label]` 脚注参照 - [Markdown 拡張ガイド](guides/markdown.md#footnotes) を参照 |
+| `enableDefinitionLists` | `false` | `Term\n:   Definition` リスト - [Markdown 拡張ガイド](guides/markdown.md#definition-lists) を参照 |
 | `autoLinkUrls` | `true` | 裸の URL とメールアドレスを自動リンク |
 | `anchorLinks` | `true` | すべての見出しにクリック可能なアンカーリンクを追加 |
+| `anchorSetId` | `true` | すべての見出しに `id` 属性を刻印 |
+| `achorSetName` *(原文ママ)* | `true` | すべての見出しに `name` 属性を刻印 |
+| `anchorWrapText` | `false` | 単なるマーカーだけでなく、見出しテキスト全体をアンカーリンクで囲む |
+| `anchorClass` | `"anchor"` | アンカー `<a>` の CSS クラス |
+| `anchorPrefix` / `anchorSuffix` | `""` | 見出しテキストの直前/直後に挿入される生の HTML |
+| `enableYouTubeTransformer` | `false` | 裸の YouTube リンクをプレイヤーとして自動埋め込み |
+| `codeStyleHTMLOpen` / `codeStyleHTMLClose` | `"<code>"` / `"</code>"` | インラインコードスパンを囲むラッパー HTML |
+| `fencedCodeLanguageClassPrefix` | `"language-"` | bx-sites のクライアントサイドシンタックスハイライター（および下記の Mermaid）が使用するクラスプレフィックス。例: ` ```js ` → `class="language-js"` |
+| `tableOptions.columnSpans` | `true` | `colspan` 形式の結合されたテーブルセルを尊重 |
+| `tableOptions.appendMissingColumns` | `true` | 短い行をヘッダーの列数まで埋める |
+| `tableOptions.discardExtraColumns` | `true` | 長すぎる行の余分なセルを破棄 |
+| `tableOptions.className` | `"table"` | レンダリングされるすべての `<table>` の CSS クラス |
+| `tableOptions.headerSeparationColumnMatch` | `true` | `---` の区切り行がヘッダーの列数と一致することを要求 |
 
-```json
+```json title="bxsites.json" linenums="1"
 {
 	"markdown": {
 		"enableFootnotes": true,
@@ -251,23 +408,32 @@ YAML でも同様に読み替えられます。
 
 ## `repo`
 
-ヘッダー（すべての組み込みテーマ）にリポジトリアイコンリンクを追加し、
-両方のキーが設定されている場合はすべてのページに「このページを編集」リンクを追加します。
+ヘッダー（すべての組み込みテーマ）にリポジトリアイコンリンクを追加し、両方のキーが
+設定されている場合は各ページに「このページを編集」リンクも追加します。
 
-- `repo.url` - リポジトリの URL（例: `"https://github.com/acme/docs"`）
-- `repo.editUri` - リポジトリ URL とページのソースパスの間のパスセグメント
-  （例: `"edit/main/docs/"`）
+- `repo.url` - リポジトリの URL（例: `"https://github.com/acme/docs"`）。単独でも
+  ヘッダーアイコンリンクをレンダリングします。完全に省略するには空白のままにします。
+- `repo.editUri` - リポジトリ URL とページ自身のソースパスの間のパスセグメント
+  （例: `"edit/main/docs/"`、GitHub 自身の「edit」URL 規約）。`repo.url` とページの
+  `docs/` 相対ソースパスを組み合わせて編集リンクを構築します - 例えば上記の例では、
+  `docs/guides/setup.md` は `https://github.com/acme/docs/edit/main/docs/guides/setup.md`
+  になります。これにも `repo.url` が必要です。ヘッダーアイコンは表示したまま編集
+  リンクだけを省略するには空白のままにします。
 
-```json
+```json title="bxsites.json"
 { "repo": { "url": "https://github.com/acme/docs", "editUri": "edit/main/docs/" } }
 ```
 
 ## `social`
 
-フッターにレンダリングされるソーシャル/外部リンクの配列（[`footer`](#footer) が有効な場合のみ機能します）。
-各エントリには `url` が必要です。`icon` は組み込みアイコンセットから選択し、`label` はリンクのアクセシブルな名前を設定します。
+フッターにレンダリングされるソーシャル/外部リンクの配列（[`footer`](#footer) を参照 -
+それも有効にしない限り効果はありません）。各エントリには `url` が必要です。`icon` は
+組み込みの小さなアイコンセット（`github`、`twitter`/`x`、`youtube`、`linkedin`、
+`facebook`、`bluesky`、`threads`、`slack`、`patreon`、`rss`、`email`、それ以外は
+汎用のリンクグリフにフォールバック）から選択し、`label` はリンクのアクセシブルな
+名前/ツールチップを設定します（デフォルトは `icon`、それもなければ `"Link"`）。
 
-```json
+```json title="bxsites.json" linenums="1"
 {
 	"social": [
 		{ "url": "https://twitter.com/acme", "icon": "twitter", "label": "Twitter" },
@@ -278,89 +444,171 @@ YAML でも同様に読み替えられます。
 
 ## `footer`
 
-`false`（デフォルト）- フッターなし。`true` にすると各ページにフッターが追加されます:
-著作権行（`© <year> <site name>`）、`social` リンク（あれば）、「BX Sites で構築」クレジット。
+`false`（デフォルト）- フッターは一切ありません。`true` にすると各ページにフッターが
+追加されます: 著作権行（`© <year> <site name>`）、`social` リンク（あれば）、
+「Built with BX Sites」のクレジット。
 
-```json
+```json title="bxsites.json"
 { "footer": true }
 ```
 
 ## `lastUpdated`
 
-`false`（デフォルト）。`true` にすると、ビルド時に各ページの Markdown ファイルの `git log` から取得した
-「最終更新」の日付が追加されます。
+`false`（デフォルト）- 最終更新日は表示されません。`true` にすると、編集リンクの
+横（`repo.editUri` が設定されていない場合は単独で）に「Last updated」行が追加され、
+ビルド時に各ページ自身の Markdown ファイルに対する `git log` から取得されます。
+git が履歴を持たないページ（まだコミットのない新しい `git init`、`.git` の全くない
+ダウンロード済み zip から実行されたビルド、ビルドマシンに git がインストールされて
+いない場合など）では、ビルドを壊すことなく黙って省略されます。
 
-```json
+```json title="bxsites.json"
 { "lastUpdated": true }
 ```
 
 ## `analytics`
 
-ページビュー分析を有効にします。現在は Google Analytics（`gtag.js`）のみサポートしています:
+ページビュー分析を接続します。現在は Google Analytics（`gtag.js`）のみをサポートしています:
 
-- `analytics.provider` - `"google"` で有効化。空白（デフォルト）の場合、分析スクリプトは送信されません。
-- `analytics.id` - Google Analytics 測定 ID（例: `"G-ABC123"`）。
+- `analytics.provider` - `"google"` にすると有効化されます。空白（デフォルト）の場合、
+  分析スクリプトは一切送信されません。
+- `analytics.id` - Google Analytics の測定 ID（例: `"G-ABC123"`）。`provider` が
+  `"google"` の場合は必須です。
 
-```json
+```json title="bxsites.json"
 { "analytics": { "provider": "google", "id": "G-ABC123" } }
 ```
 
 ## `ogImage`
 
-デフォルトのソーシャルカード画像へのパス/URL。独自の `ogImage` を持たないすべてのページで
-`og:image` としてレンダリングされます。
+デフォルトのソーシャルカード画像へのパス/URL。独自の `description` を上書きしない
+すべてのページで `og:image`（`summary_large_image` の `twitter:card` と対になります）
+としてレンダリングされます - `theme.logo` と同じ方法で解決されます（相対パスには
+`baseURL` がプレフィックスされ、絶対 URL はそのまま使用されます）。空白（デフォルト）で
+`generateOgImages` もオフの場合、`og:image`/`twitter:card` タグは一切レンダリングされません。
 
-```json
+```json title="bxsites.json"
 { "ogImage": "assets/social-card.png" }
 ```
 
+そのページのフロントマター `ogImage`（[はじめに](getting-started.md#ページの追加) を
+参照）は、常にこのサイト全体のデフォルトよりそのページで優先されます。
+
 ### `generateOgImages`
 
-`false`（デフォルト）。`true` にすると、独自のフロントマター `ogImage` を持たない
-すべてのページに対して実際の 1200x630 PNG ソーシャルカードが生成されます。
+`false`（デフォルト）- ページごとのカードはありません。`true` にすると、独自の
+フロントマター `ogImage` をまだ持たないすべてのページに対して、実際の 1200x630 の
+PNG ソーシャルカードがレンダリングされます - ブランドグラデーション上にページの
+タイトルが書かれ、`site/assets/og/<page>.png` に出力されます - すべてのページが
+1つの汎用的なサイト全体の画像を共有する代わりです。純粋な `java.awt`/`javax.imageio`
+（BoxLang が動作するあらゆる JVM の一部）で実装されているため、ビルド時にヘッドレス
+ブラウザや外部サービス、ネットワークアクセスは一切必要ありません。
 
-```json
+```json title="bxsites.json"
 { "generateOgImages": true }
 ```
 
 ## `extraCss` / `extraJs`
 
-各ページに含めるスタイルシート/スクリプト URL の追加配列。テーマ独自のアセットの後に追加されます。
+すべてのページに含める、追加のスタイルシート/スクリプト URL の配列で、テーマ自身の
+アセットの後に追加されます - 各エントリは `theme.logo` と同じ方法で解決されます
+（相対パスには `baseURL` がプレフィックスされ、絶対 URL はそのまま使用されます）。
+`extraJs` のエントリは `defer` 付きで読み込まれます。
 
-```json
+```json title="bxsites.json" linenums="1"
 {
 	"extraCss": [ "assets/custom.css" ],
 	"extraJs": [ "assets/custom.js" ]
 }
 ```
 
+`assets.bundle` が有効な場合（デフォルト）、上記のようなローカルの `extraCss`/`extraJs`
+リストはエントリごとに1つの `<link>`/`<script>` タグを出す代わりに、それぞれ1つの
+フィンガープリント付きファイルにバンドルされます - 下記の [`assets`](#assets) を
+参照してください。
+
+## `assets`
+
+```json title="bxsites.json" linenums="1"
+{
+	"assets": {
+		"fingerprint": true,
+		"bundle": true,
+		"images": {
+			"enabled": true,
+			"widths": [ 400, 800, 1200, 1600 ],
+			"formats": [ "original", "webp" ]
+		}
+	}
+}
+```
+
+アセットパイプライン - [bx-image](https://github.com/ortus-boxlang/bx-image)
+（bx-markdown/bx-esapi と並んでインストールされる必須の依存関係）による画像リサイズ/WebP
+変換と、CSS/JS のバンドルです。ここにあるものはすべて、妥当な設定でデフォルトで
+有効になっています - 新規の `bxSites new` プロジェクトはここに一切触れる必要が
+ありません。全体像（AVIF、アニメーション GIF、SVG が意図的にカバーされていない点を
+含む）については [レスポンシブ画像](guides/images.md) を参照してください。
+
+- `assets.fingerprint` - `true`（デフォルト）。生成されるすべての画像バリアントと
+  CSS/JS バンドルにコンテンツハッシュの名前を付けます（例: `screenshot-800w.a3f9c2e1.webp`、
+  `bundle.a3f9c2e1.css`）。これにより、安全で長期のキャッシュヘッダー付きで配信できます -
+  プロジェクトのビルドは、ファイル自身の内容が実際に変わった場合にのみファイル名を
+  変更します。`docs/assets/` 配下のプロジェクト自身のオリジナルファイルの名前は
+  変更しません - パイプラインが生成した出力だけがフィンガープリントされるため、
+  素のファイル名でアセットを参照する他のもの（`::: file` ダウンロードカード、
+  生の Markdown リンク）は変更なく機能し続けます。
+- `assets.bundle` - `true`（デフォルト）。`extraCss`/`extraJs` をそれぞれ1つの
+  フィンガープリント付きファイルに連結します - 純粋な BoxLang/JVM で、
+  Node/esbuild のツールチェーンは不要です。リスト内のいずれかのエントリが
+  外部 URL（CDN リンク）であるか、存在しないファイルを指している場合は、
+  即座に今日と全く同じエントリごとの `<link>`/`<script>` の挙動にフォールバックします -
+  [レスポンシブ画像](guides/images.md#css-js-bundling) を参照してください。
+- `assets.images.enabled` - `true`（デフォルト）。対象となるすべての `docs/assets/**`
+  画像（`.png`/`.jpg`/`.jpeg`）が bx-image によってリサイズ/WebP バリアントを
+  生成され、一致する `<img>` はすべて `srcset` 付きの `<picture>` に書き換えられます。
+  この機能が存在する前とまったく同じ、プレーンで未処理の画像コピーにフォールバック
+  するには `false` を設定します。
+- `assets.images.widths` - 生成するブレークポイント（ピクセル単位）。ある画像自身の
+  幅以上の幅は、その画像については自動的にスキップされます - アップスケールされる
+  ことは決してありません。
+- `assets.images.formats` - `"original"` はソース形式を `<img>` のフォールバックとして
+  維持します。`"webp"` は同じサイズの `<source type="image/webp">` バリアントを
+  追加します。どちらもデフォルトで有効です。
+
 ## `mermaid`
 
-`false`（デフォルト）。`true` にするとクライアントサイドで `mermaid.js` が読み込まれ、
-` ```mermaid ` フェンスコードブロックがダイアグラムとしてレンダリングされます。
+`false`（デフォルト）- [Mermaid](https://mermaid.js.org/) ダイアグラムのサポートは
+一切出荷されません。`true` にするとクライアントサイドで `mermaid.js` が読み込まれ、
+` ```mermaid ` フェンス付きコードブロックがすべてダイアグラムとしてレンダリングされます。
+構文については [Markdown 拡張](guides/markdown.md#diagrams) を参照してください。
 
-```json
+```json title="bxsites.json"
 { "mermaid": true }
 ```
 
 ## `math`
 
-`false`（デフォルト）。`true` にするとクライアントサイドで [KaTeX](https://katex.org/) が読み込まれ、
-`$...$`/`$$...$$` が数式として組版されます。
+`false`（デフォルト）- [KaTeX](https://katex.org/) は一切出荷されません。`true` に
+するとクライアントサイドで読み込まれ、ページの Markdown に直接書かれた
+`$...$`/`$$...$$` が組版されます。構文については
+[Markdown 拡張](guides/markdown.md#math) を参照してください。
 
-```json
+```json title="bxsites.json"
 { "math": true }
 ```
 
+admonition（note/warning/tip 形式のコールアウトボックス）、コンテンツタブ、
+フェンス付きコードの `hl_lines`/`linenums`/`title` アノテーションは、設定不要で
+すべてのページの Markdown で常に利用できます -
+[Markdown 拡張](guides/markdown.md#admonitions) を参照してください。
+
 ## `openapi`
 
-`false`（デフォルト）- [Swagger UI](https://swagger.io/tools/swagger-ui/)
-は一切読み込まれません。`true` にするとクライアントサイドで読み込まれ、
-`::: openapi src="..."` コンテンツブロックを参照先の OpenAPI/Swagger 仕様
-（JSON または YAML）に対するインタラクティブなウィジェットとしてレンダリ
-ングします。構文については
-[コンテンツブロック](guides/content-blocks.md#openapi--swagger) を参照して
-ください。
+`false`（デフォルト）- [Swagger UI](https://swagger.io/tools/swagger-ui/) は一切
+出荷されません。`true` にするとクライアントサイドで読み込まれ、`::: openapi src="..."`
+コンテンツブロックを、参照先の OpenAPI/Swagger 仕様（JSON または YAML）のための
+インタラクティブなウィジェットとしてレンダリングします。構文については
+[コンテンツブロック](guides/content-blocks.md#openapi--swagger) を参照してください。
 
 ```json title="bxsites.json"
 { "openapi": true }
@@ -368,29 +616,38 @@ YAML でも同様に読み替えられます。
 
 ## `plugins`
 
-`[]`（デフォルト）- プラグインとして有効化する BoxLang モジュール名の配列。
-インストールしただけでは有効化されません。ここに名前を記述する必要があります。
+`[]`（デフォルト）- プラグインとして有効化する BoxLang モジュール名の配列です。
+プラグインモジュールをインストールする（`box install`）だけでは、それ単独で
+有効化されることはありません - ここにも名前を書く必要があります。プラグインの
+書き方については [プラグイン](guides/plugins.md) を参照してください。
 
-```json
+```json title="bxsites.json"
 { "plugins": [ "myBxSitesPlugin" ] }
 ```
 
 ## `i18n`
 
-[`docs/i18n/<code>/`](guides/i18n.md) のロケールフォルダ規約のメタデータ。
-ロケールはフォルダが存在すれば自動的にビルドされます。`i18n` は言語スイッチャーの
+[`docs/i18n/<code>/`](guides/i18n.md) のロケールフォルダ規約のためのメタデータです -
+ロケールはそのフォルダが存在すれば自動的にビルドされます。`i18n` は、言語スイッチャーの
 表示ラベル/方向を提供するだけです。
 
-- `i18n.defaultLocale` - プロジェクト自身の通常の `docs/` ツリーの `{ "code", "label", "flag", "strings" }`。
-  デフォルトは `{ "code": "en", "label": "English" }`。
-- `i18n.locales` - `[]`（デフォルト）- 他のすべてのロケールの `{ "code", "label", "dir", "flag", "strings" }` の配列。
-  `strings` はそのロケール自身のテーマクローム UI 文字列（検索プレースホルダー、
-  「このページの内容」など）を上書きします - キーの全リストは
-  [国際化](guides/i18n.md#テーマのクロームui-文字列) を参照してください。
+- `i18n.defaultLocale` - プロジェクト自身の通常の `docs/` ツリーの
+  `{ "code", "label", "flag", "strings" }`。デフォルトは
+  `{ "code": "en", "label": "English" }`。デフォルトロケールが英語でない場合にのみ
+  設定が必要です。
+- `i18n.locales` - `[]`（デフォルト）- 他のすべてのロケールの
+  `{ "code", "label", "dir", "flag", "strings" }` の配列。`code` は
+  `docs/i18n/<code>/` フォルダ名とビルド後の URL プレフィックスを兼ねます -
+  英数字とハイフンのみ（`es`、`pt-BR`、`zh-Hans`）。`dir` は `"ltr"`（デフォルト）
+  または `"rtl"`。`flag` は言語スイッチャーの旗アイコンを上書きする任意の絵文字です -
+  一般的なコードのほとんどは、指定しなくても妥当な旗に自動的に解決されます。
+  `strings` はそのロケール自身のテーマクローム UI テキスト（検索プレースホルダー、
+  「このページの内容」、404 ページなど）を上書きします - キーの全リストは
+  [国際化](guides/i18n.md#theme-chrome-ui-strings) を参照してください。
   `de`/`es`/`it`/`ja` にはすでに組み込みの翻訳が付属しているため、`strings` は
   特定のキーを上書きするか、別のロケールを追加する場合にのみ必要です。
 
-```json
+```json title="bxsites.json" linenums="1"
 {
 	"i18n": {
 		"defaultLocale": { "code": "en", "label": "English" },
@@ -402,26 +659,38 @@ YAML でも同様に読み替えられます。
 }
 ```
 
-詳しくは [国際化](guides/i18n.md) をご覧ください。
+未翻訳ページのフォールバック、言語スイッチャー、まだ翻訳されていない部分を含む
+全体像については [国際化](guides/i18n.md) を参照してください。
+
+## `blog`
+
+[ブログ](guides/blog.md) 機能自体のオプションです - ブログ自体は規約ベースの機能
+（`docs/blog/posts/`）であり、有効化するために必要なキーはここにはありません。
+
+- `blog.postsPerPage` - `10`（デフォルト）- `/blog/`、各カテゴリページ、各
+  `/blog/archive/<year>/` ページで、`.../page/2/` に移る前に1ページに表示する
+  投稿数。
+- `blog.feed` - `true`（デフォルト）- `/blog/feed.xml`（RSS 2.0）を書き出すかどうか。
+  `sitemap.xml` と同じ要件で、絶対 `baseURL` の場合にのみ意味を持ちます。
+- `blog.feedLimit` - `25`（デフォルト）- `/blog/feed.xml` を直近のこの件数の投稿に
+  制限します。`0` は無制限（すべての投稿を全文）を意味します。ほとんどのフィード
+  リーダーは新しいものにしか関心がないため、数百件の投稿があるブログで無制限の
+  フィードを配信すると、ポーリングのたびに帯域を無駄にするだけです -
+  [ブログ: フィード](guides/blog.md#feed) を参照してください。
+
+```json title="bxsites.json"
+{ "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
+```
+
+投稿/著者のフロントマター、カテゴリ、注目画像、SEO/ソーシャルメタデータについては
+[ブログ](guides/blog.md) を参照してください。
 
 ## バージョニング
 
-バージョン管理されたドキュメントは設定より規約を重視します。`bxsites.json` に専用キーはありません。
-`docs/versions/` フォルダを追加すると、その中の各直接サブフォルダが独立したドキュメントツリーとして
-ビルドされます:
-
-```
-docs/
-├── index.md
-├── guides/
-└── versions/
-    ├── 1.0/
-    │   ├── index.md
-    │   └── guides/
-    └── 2.0/
-        ├── index.md
-        └── guides/
-```
-
-複数のバージョンが存在すると、すべてのテーマがヘッダーに自動的にバージョンスイッチャードロップダウンを
-レンダリングします。設定は不要です。`sitemap.xml` と `llms.txt` にはすべてのバージョンのページが含まれます。
+バージョン管理されたドキュメントは設定より規約を重視します - `bxsites.json` に
+専用キーはありません。`docs/versions/<name>/` フォルダを追加すると、それは独自の
+ドキュメントツリーとして自動的にビルドされ、複数のバージョンが存在するようになると
+すべてのテーマが自動的にバージョンスイッチャーをレンダリングします。`version:new` で
+新しいバージョンを切り出す方法、バージョンがどのように並び替えられビルドされるか、
+そして対象外の部分（ツリーごとの検索スコープ、非推奨/EOL フラグがないことなど）を
+含む全体像については [バージョニング](guides/versioning.md) を参照してください。

@@ -31,9 +31,10 @@ no server required to host it.
 Nest folders and files under `docs/` and the navigation builds itself, in
 the order you set via frontmatter.
 :::
-::: card title="Three built-in themes" icon="phosphor-duotone:palette" href="guides/themes.md"
-`bootstrap`, `material` and `tailwind` - all sharing the same BoxLang brand
-palette, and all overridable with your own theme.
+::: card title="Ten built-in themes" icon="phosphor-duotone:palette" href="guides/themes.md"
+A full gallery - `bootstrap`, `material`, `tailwind`, and seven more inspired
+by Docsy, Stripe, Docusaurus, Just the Docs, VuePress, GitBook and Notion -
+all overridable with your own theme.
 :::
 ::: card title="Static, client-side search" icon="phosphor-duotone:magnifying-glass" href="guides/search.md"
 A lunr.js-powered search box, wired against a search index built at

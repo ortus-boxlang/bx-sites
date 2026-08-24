@@ -82,10 +82,10 @@
 				<h1 class="slate-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,56V200a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V56a8,8,0,0,1,8-8H216A8,8,0,0,1,224,56Z" opacity="0.2"/><path d="M128,128a8,8,0,0,1-3,6.25l-40,32a8,8,0,1,1-10-12.5L107.19,128,75,102.25a8,8,0,1,1,10-12.5l40,32A8,8,0,0,1,128,128Zm48,24H136a8,8,0,0,0,0,16h40a8,8,0,0,0,0-16Zm56-96V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56ZM216,200V56H40V200H216Z"/></svg></span> Riferimento CLI</h1>
 				<p class="page-summary">Ogni verbo di bxSites e i suoi flag.</p>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/slate/it/tags/index.html#tag-riferimento">riferimento</a><a class="page-tag" href="/bx-sites/development/theme/slate/it/tags/index.html#tag-cli">cli</a></div>
-<details class="bxsites-toc-mobile slate-toc--mobile"><summary class="slate-toc--mobile__summary">In questa pagina</summary><ul><li class="slate-toc__item slate-toc__item--2"><a href="#opzioni-globali">Opzioni globali</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#new">new</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#build">build</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#serve">serve</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#search-index">search-index</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#clean">clean</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#gh-deploy">gh-deploy</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#migrate">migrate</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#check">check</a></li></ul></details>
+<details class="bxsites-toc-mobile slate-toc--mobile"><summary class="slate-toc--mobile__summary">In questa pagina</summary><ul><li class="slate-toc__item slate-toc__item--2"><a href="#opzioni-globali">Opzioni globali</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#new">new</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#build">build</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#serve">serve</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#search-index">search-index</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#clean">clean</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#gh-deploy">gh-deploy</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#migrate">migrate</a></li><li class="slate-toc__item slate-toc__item--3"><a href="#--fromgitbook-predefinito">--from&#x3d;gitbook &#x28;predefinito&#x29;</a></li><li class="slate-toc__item slate-toc__item--3"><a href="#--frommkdocs">--from&#x3d;mkdocs</a></li><li class="slate-toc__item slate-toc__item--3"><a href="#entrambi">Entrambi</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#check">check</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#stats">stats</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#doctor">doctor</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#postnew">post&#x3a;new</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#versionnew">version&#x3a;new</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#i18nstatus">i18n&#x3a;status</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#i18nnew">i18n&#x3a;new</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#pagenew">page&#x3a;new</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#pluginnew">plugin&#x3a;new</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#installplugin">install&#x3a;plugin</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#themenew">theme&#x3a;new</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#installtheme">install&#x3a;theme</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#themeimport">theme&#x3a;import</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#pagerename">page&#x3a;rename</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#blogdrafts">blog&#x3a;drafts</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#blogfind">blog&#x3a;find</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#searchquery">search&#x3a;query</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#lint">lint</a></li></ul></details>
 				<div class="slate-content-body">
 				<h1 id="riferimento-cli"><a href="#riferimento-cli" id="riferimento-cli" name="riferimento-cli" class="anchor"></a>Riferimento CLI</h1>
-<pre><code class="language-bash">bxSites &lt;verbo&gt; [opzioni]
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites &lt;verbo&gt; [opzioni]
 </code></pre>
 <p><code>box install bx-sites</code> crea uno script <code>bxSites</code> autonomo sul tuo <code>PATH</code>
 (tramite <code>boxlang.executable</code> di <code>box.json</code>), quindi ogni verbo qui sotto
@@ -93,12 +93,16 @@ può essere eseguito sia in quella forma breve, sia come
 <code>boxlang bxSites &lt;verbo&gt;</code> - entrambe eseguono esattamente la stessa
 cosa; usa la forma più lunga ovunque lo shim sul <code>PATH</code> non sia impostato
 (un runner di CI, un modulo registrato a mano):</p>
-<pre><code class="language-bash">boxlang bxSites &lt;verbo&gt; [opzioni]
+<pre data-bxsites-title="Utilizzo &#x28;senza shim sul PATH&#x29;"><code class="language-bash">boxlang bxSites &lt;verbo&gt; [opzioni]
 </code></pre>
 <p>Ogni verbo accetta <code>--projectRoot=&lt;percorso&gt;</code> (oppure un percorso
 posizionale semplice) per puntare a un progetto diverso dalla cartella
 corrente, e i due flag globali qui sotto possono comparire prima di
 qualsiasi verbo.</p>
+<p>Ogni <code>docs/</code> menzionato qui sotto si applica ugualmente a un progetto che
+usa <code>src/</code> invece - vedi <a href="/bx-sites/development/theme/slate/it/getting-started/index.html#add-pages">Per iniziare</a> per
+la convenzione <code>docs/</code>-o-<code>src/</code>. <code>new</code> genera sempre lo scheletro di
+<code>docs/</code>.</p>
 <h2 id="opzioni-globali"><a href="#opzioni-globali" id="opzioni-globali" name="opzioni-globali" class="anchor"></a>Opzioni globali</h2>
 <table class="table">
 <thead>
@@ -111,7 +115,7 @@ qualsiasi verbo.</p>
 </table>
 <h2 id="new"><a href="#new" id="new" name="new" class="anchor"></a><code>new</code></h2>
 <p>Genera lo scheletro di un progetto di documentazione.</p>
-<pre><code class="language-bash">bxSites new [path] [--name=...] [--theme=bootstrap|material|tailwind] [--description=...] [--format=yaml|json]
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites new [path] [--name=...] [--theme=&lt;see guides/themes.md for all 10&gt;] [--description=...] [--format=yaml|json]
 </code></pre>
 <ul>
 <li><code>--name</code> - il nome del sito scritto nella configurazione del sito (per default, il nome della cartella di destinazione)</li>
@@ -122,25 +126,32 @@ qualsiasi verbo.</p>
 <h2 id="build"><a href="#build" id="build" name="build" class="anchor"></a><code>build</code></h2>
 <p>Genera <code>docs/**.md</code> in un sito statico dentro <code>site/</code>. Compila anche
 l'indice di ricerca (a meno che <code>search</code> non sia <code>false</code> nella
-configurazione del sito) e copia il tema + <code>docs/assets/**</code> in <code>site/</code>.</p>
-<pre><code class="language-bash">bxSites build
+configurazione del sito, o che <code>searchProvider</code> sia impostato su un
+provider - come <code>algolia</code>/<code>pagefind</code> - che non lo usa, vedi
+<a href="/bx-sites/development/theme/slate/it/guides/search/index.html">Ricerca</a>), esegue la CLI di <code>pagefind</code> sul <code>site/</code>
+finito quando <code>searchProvider.provider</code> è <code>&quot;pagefind&quot;</code>, e copia il tema +
+<code>docs/assets/**</code> in <code>site/</code>.</p>
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites build
 </code></pre>
 <h2 id="serve"><a href="#serve" id="serve" name="serve" class="anchor"></a><code>serve</code></h2>
 <p>Compila e serve il sito in locale con ricaricamento automatico.</p>
-<pre><code class="language-bash">bxSites serve [--port=8080] [--host=127.0.0.1]
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites serve [--port=8080] [--host=127.0.0.1]
 </code></pre>
 <p>Gira in primo piano finché non viene interrotto (Ctrl+C).</p>
 <h2 id="search-index"><a href="#search-index" id="search-index" name="search-index" class="anchor"></a><code>search-index</code></h2>
 <p>Ricompila <code>site/search-index.json</code> in modo autonomo, senza rirenderizzare
 le pagine o ricopiare gli asset. <code>build</code> esegue già automaticamente
 questo stesso passaggio - questo verbo esiste per i casi in cui serve
-solo aggiornare l'indice.</p>
-<pre><code class="language-bash">bxSites search-index
+solo aggiornare l'indice. Copre sempre e solo l'albero <code>docs/</code> principale,
+anche su un progetto con <code>docs/versions/</code>/<code>docs/i18n/</code> - una vera <code>build</code>
+scrive invece l'indice con ambito proprio di ogni albero (vedi
+<a href="/bx-sites/development/theme/slate/it/guides/versioning/index.html#cosa-è-fuori-scopo-per-ora">Versionamento</a>).</p>
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites search-index
 </code></pre>
 <h2 id="clean"><a href="#clean" id="clean" name="clean" class="anchor"></a><code>clean</code></h2>
 <p>Rimuove <code>site/</code> e qualsiasi cache di compilazione, lasciando intatti
 <code>docs/</code> e la configurazione del sito.</p>
-<pre><code class="language-bash">bxSites clean
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites clean
 </code></pre>
 <h2 id="gh-deploy"><a href="#gh-deploy" id="gh-deploy" name="gh-deploy" class="anchor"></a><code>gh-deploy</code></h2>
 <p>Compila il sito, poi lo forza (force-push) su un branch in stile
@@ -149,7 +160,7 @@ branch, seguendo la stessa convenzione di <code>mkdocs gh-deploy</code> propria 
 mkdocs. Richiede che il progetto sia un repository git con un remote
 configurato; non tocca mai il tuo branch corrente o la working tree
 (effettua il push da una <code>git worktree</code> usa e getta).</p>
-<pre><code class="language-bash">bxSites gh-deploy [--branch=gh-pages] [--remote=origin] [--message=&quot;...&quot;]
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites gh-deploy [--branch=gh-pages] [--remote=origin] [--message=&quot;...&quot;]
 </code></pre>
 <ul>
 <li><code>--branch</code> - il valore predefinito è <code>gh-pages</code></li>
@@ -159,30 +170,42 @@ configurato; non tocca mai il tuo branch corrente o la working tree
 <p>Vedi <a href="/bx-sites/development/theme/slate/it/guides/deployment/index.html">Distribuzione</a> per la configurazione completa
 di GitHub Pages (attivare Pages per il branch, <code>baseURL</code>, ecc.).</p>
 <h2 id="migrate"><a href="#migrate" id="migrate" name="migrate" class="anchor"></a><code>migrate</code></h2>
-<p>Converte un export di GitBook - un sommario <code>SUMMARY.md</code> più i suoi file
-<code>.md</code>, il formato di sincronizzazione su disco proprio di GitBook -
-nell'albero <code>docs/</code> di questo progetto: <code>SUMMARY.md</code> diventa
-<code>docs/nav.json</code>, la sintassi <code>{% block %}</code> diventa il proprio equivalente
-in bx-sites (direttive <code>::: name</code>, oppure la sintassi nativa <code>=== &quot;Title&quot;</code>
-per le schede / <code>!!! type</code> per le ammonizioni dove esiste già una
-corrispondenza più stretta - vedi
-<a href="/bx-sites/development/theme/slate/it/guides/content-blocks/index.html">Blocchi di contenuto</a>), i file
-<code>README.md</code> diventano <code>index.md</code>, e <code>.gitbook/assets/**</code> viene copiato in
-<code>docs/assets/gitbook/</code>.</p>
-<pre><code class="language-bash">bxSites migrate --source=/percorso/dell/export-gitbook
+<p>Converte un progetto di documentazione esistente in questo - <code>--from</code>
+sceglie il formato sorgente, <code>gitbook</code> (predefinito) o <code>mkdocs</code>.</p>
+<pre data-bxsites-start-line="1"><code class="language-bash">bxSites migrate --source=/percorso/dell/export-gitbook
+bxSites migrate --source=/percorso/del/progetto-mkdocs --from=mkdocs
 </code></pre>
 <ul>
-<li><code>--source</code> (obbligatorio) - percorso alla cartella radice dell'export di GitBook (deve contenere <code>SUMMARY.md</code>)</li>
+<li><code>--source</code> (obbligatorio) - percorso alla cartella radice dell'export/progetto (deve contenere <code>SUMMARY.md</code> per <code>gitbook</code>, <code>mkdocs.yml</code> per <code>mkdocs</code>)</li>
+<li><code>--from</code> - <code>gitbook</code> (predefinito) o <code>mkdocs</code></li>
 </ul>
-<p>Stampa un riepilogo delle pagine convertite e, quando qualcosa non ha
-potuto essere convertito automaticamente (un blocco non supportato come
-<code>{% prompt %}</code>, uno stile di hint non riconosciuto, una larghezza di
-colonna che non è una lunghezza semplice), un elenco esatto di cosa
-richiede un controllo manuale - niente viene mai scartato in silenzio, un
-blocco non riconosciuto viene lasciato nella propria sintassi originale
-<code>{% %}</code> nel file migrato. Un file di destinazione o un <code>docs/nav.json</code>
-già esistenti vengono sovrascritti (anche questo segnalato), quindi
-rivedi l'output migrato prima di fare il commit.</p>
+<h3 id="--fromgitbook-predefinito"><a href="#--fromgitbook-predefinito" id="--fromgitbook-predefinito" name="--fromgitbook-predefinito" class="anchor"></a><code>--from=gitbook</code> (predefinito)</h3>
+<p>Un export di GitBook - un sommario <code>SUMMARY.md</code> più i suoi file <code>.md</code>, il
+formato di sincronizzazione su disco proprio di GitBook - nell'albero
+<code>docs/</code> di questo progetto: <code>SUMMARY.md</code> diventa <code>docs/nav.json</code>, la
+sintassi <code>{% block %}</code> diventa il proprio equivalente in bx-sites
+(direttive <code>::: name</code>, oppure la sintassi nativa <code>=== &quot;Title&quot;</code> per le
+schede / <code>!!! type</code> per le ammonizioni dove esiste già una corrispondenza
+più stretta - vedi <a href="/bx-sites/development/theme/slate/it/guides/content-blocks/index.html">Blocchi di contenuto</a>), i
+file <code>README.md</code> diventano <code>index.md</code>, e <code>.gitbook/assets/**</code> viene
+copiato in <code>docs/assets/gitbook/</code>.</p>
+<h3 id="--frommkdocs"><a href="#--frommkdocs" id="--frommkdocs" name="--frommkdocs" class="anchor"></a><code>--from=mkdocs</code></h3>
+<p>Un progetto mkdocs - <code>mkdocs.yml</code> più la sua cartella <code>docs/</code> - in un
+progetto bx-sites completo: <code>mkdocs.yml</code> diventa <code>bxsites.yaml</code> +
+<code>docs/nav.json</code>, e ogni pagina viene copiata praticamente invariata, dato
+che la sintassi di ammonizioni/schede/matematica/annotazioni di codice
+propria di mkdocs-material <em>è</em> già la sintassi nativa di bx-sites - vedi
+<a href="/bx-sites/development/theme/slate/it/guides/migrating-from-mkdocs/index.html">Migrare da mkdocs</a>. Gli asset non-<code>.md</code>
+(immagini che comunemente si trovano accanto alla pagina che le usa,
+mkdocs non ha un'unica convenzione di cartella asset) vengono spostati in
+<code>docs/assets/mkdocs/</code> e i loro riferimenti riscritti.</p>
+<h3 id="entrambi"><a href="#entrambi" id="entrambi" name="entrambi" class="anchor"></a>Entrambi</h3>
+<p>Stampa un riepilogo delle pagine (e, per mkdocs, degli asset) convertiti
+e, quando qualcosa non ha potuto essere convertito automaticamente, un
+elenco esatto di cosa richiede un controllo manuale - niente viene mai
+scartato in silenzio. Un file di destinazione, <code>bxsites.yaml</code>, o
+<code>docs/nav.json</code> già esistenti vengono sovrascritti (anche questo
+segnalato), quindi rivedi l'output migrato prima di fare il commit.</p>
 <h2 id="check"><a href="#check" id="check" name="check" class="anchor"></a><code>check</code></h2>
 <p>Un controllo di qualità del contenuto di livello CI su un <code>site/</code> già
 compilato - esegui prima <code>build</code>. Verifica:</p>
@@ -201,7 +224,7 @@ dato che una pagina che un progetto ha deliberatamente lasciato fuori
 dalla propria nav (ad es. frontmatter <code>hidden: true</code>) <em>deve</em> essere
 raggiungibile solo tramite un link diretto.</li>
 </ul>
-<pre><code class="language-bash">bxSites build
+<pre data-bxsites-start-line="1" data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites build
 bxSites check
 </code></pre>
 <p>Esce con <code>1</code> quando ci sono link/immagini rotti o immagini senza alt,
@@ -209,9 +232,242 @@ bxSites check
 uscita). Deliberatamente limitato ai soli link interni - non effettua
 richieste HTTP per verificare URL esterni, cosa che spetta a uno
 strumento dedicato di controllo link eseguito come proprio job separato.</p>
+<h2 id="stats"><a href="#stats" id="stats" name="stats" class="anchor"></a><code>stats</code></h2>
+<p>Un report di riepilogo di sola lettura su un <code>site/</code> già compilato -
+esegui prima <code>build</code>. Riporta:</p>
+<ul>
+<li><strong>Pagine e parole</strong> - conteggio totale delle pagine e un conteggio
+approssimativo delle parole (tag rimossi, lo stesso standard &quot;abbastanza
+buono per una stima&quot; della cifra di tempo di lettura propria del blog),
+più una ripartizione per albero non appena ce n'è più di uno (una
+versione, o una locale non predefinita).</li>
+<li><strong>Versioni e locale</strong> - nomi di ogni cartella <code>docs/versions/</code>/
+<code>docs/i18n/</code> non predefinita.</li>
+<li><strong>Blog</strong> - conteggi di post/categorie/autori/anni attivi, presi
+direttamente dalla forma della cartella propria di <code>site/blog/</code> (così
+corrisponde sempre a ciò che è stato effettivamente pubblicato, bozze
+escluse) - <code>none</code> quando non c'è alcun blog.</li>
+<li><strong>Tag</strong> - il numero di tag distinti in tutto il sito.</li>
+<li><strong>Indice di ricerca</strong> - numero di voci e dimensione file di
+<code>search-index.json</code>, oppure <code>none</code> quando la ricerca è disattivata o è
+attivo un provider non locale.</li>
+<li><strong>Output del sito</strong> - conteggio totale dei file e dimensione su disco
+del <code>site/</code> compilato.</li>
+</ul>
+<pre><code class="language-bash">bxSites build
+bxSites stats
+</code></pre>
+<p>Esce sempre con <code>0</code> - puramente informativo, niente qui è un gate di
+superamento/fallimento (quello è compito di <code>check</code>).</p>
+<h2 id="doctor"><a href="#doctor" id="doctor" name="doctor" class="anchor"></a><code>doctor</code></h2>
+<p>Un controllo di salute dell'ambiente/configurazione in un solo passaggio</p>
+<ul>
+<li>il verbo &quot;esegui questo prima di aprire una segnalazione di bug&quot;.
+Verifica la versione della JVM, che <code>docs/</code> esista, che
+<code>bxsites.json</code>/<code>.yaml</code> venga effettivamente analizzato e validato, che i
+moduli BoxLang richiesti (<code>bx-markdown</code>, <code>bx-esapi</code>, <code>bx-yaml</code>,
+<code>bx-image</code>) siano installati e attivati e - se esiste una sovrascrittura
+<code>theme/</code> a livello di progetto - che soddisfi il contratto dei due file
+obbligatori <code>layout.bxm</code>/<code>page.bxm</code>.</li>
+</ul>
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites doctor
+</code></pre>
+<p>Esce con <code>1</code> se un controllo fallisce, <code>0</code> altrimenti. Niente qui
+modifica un progetto - è puramente diagnostico.</p>
+<h2 id="postnew"><a href="#postnew" id="postnew" name="postnew" class="anchor"></a><code>post:new</code></h2>
+<p>Genera lo scheletro di un nuovo post del blog in <code>docs/blog/posts/&lt;slug&gt;.md</code>.</p>
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites post:new --title=&quot;My New Post&quot; [--slug=...] [--date=...] [--authors=...] [--categories=...] [--tags=...] [--draft]
+</code></pre>
+<ul>
+<li><code>--title</code> (obbligatorio) - diventa anche il <code>title</code> nel frontmatter del post</li>
+<li><code>--slug</code> - il valore predefinito è uno slug generato da <code>--title</code></li>
+<li><code>--date</code> - il valore predefinito è oggi (<code>yyyy-MM-dd</code>)</li>
+<li><code>--authors</code>, <code>--categories</code>, <code>--tags</code> - separati da virgola</li>
+<li><code>--draft</code> - il valore predefinito è <code>true</code> (passa <code>--!draft</code> per pubblicare immediatamente)</li>
+</ul>
+<p>Vedi <a href="/bx-sites/development/theme/slate/it/guides/blog/index.html">Blog</a> per il riferimento completo del frontmatter.</p>
+<h2 id="versionnew"><a href="#versionnew" id="versionnew" name="versionnew" class="anchor"></a><code>version:new</code></h2>
+<p>Fa un'istantanea dell'albero <code>docs/</code> corrente in <code>docs/versions/&lt;name&gt;/</code>,
+escludendo <code>assets/</code>, <code>versions/</code>, <code>i18n/</code> e <code>blog/</code> (ognuno è un proprio
+albero caricato separatamente, non parte dell'istantanea).</p>
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites version:new --name=1.0
+</code></pre>
+<ul>
+<li><code>--name</code> (obbligatorio) - la cartella/etichetta di versione, ad es. <code>1.0</code></li>
+</ul>
+<p>Vedi <a href="/bx-sites/development/theme/slate/it/configuration/index.html#versionamento">la sezione &quot;Versionamento&quot; di Configurazione</a>.</p>
+<h2 id="i18nstatus"><a href="#i18nstatus" id="i18nstatus" name="i18nstatus" class="anchor"></a><code>i18n:status</code></h2>
+<p>Riporta la copertura della traduzione per locale - per ogni locale
+configurata, quante pagine dell'albero predefinito esistono (allo stesso
+percorso relativo) sotto <code>docs/i18n/&lt;code&gt;/</code>, e quali mancano ancora.</p>
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites i18n:status
+</code></pre>
+<p>Esce sempre con <code>0</code> - puramente informativo.</p>
+<h2 id="i18nnew"><a href="#i18nnew" id="i18nnew" name="i18nnew" class="anchor"></a><code>i18n:new</code></h2>
+<p>Genera lo scheletro di una nuova cartella di locale <code>docs/i18n/&lt;code&gt;/</code>,
+seminandola con un <code>index.md</code> copiato dall'<code>index.md</code> proprio della
+locale predefinita, quando ne esiste uno.</p>
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites i18n:new --code=es
+</code></pre>
+<ul>
+<li><code>--code</code> (obbligatorio) - il codice della locale, ad es. <code>es</code>, <code>fr</code>, <code>pt-BR</code></li>
+</ul>
+<p>Vedi <a href="/bx-sites/development/theme/slate/it/guides/i18n/index.html">Internazionalizzazione</a> per collegare la nuova
+locale a <code>i18n.locales</code> di <code>bxsites.json</code>.</p>
+<h2 id="pagenew"><a href="#pagenew" id="pagenew" name="pagenew" class="anchor"></a><code>page:new</code></h2>
+<p>Genera lo scheletro di una singola pagina di documentazione a un percorso
+arbitrario sotto <code>docs/</code>, con il frontmatter richiesto già compilato.</p>
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites page:new --path=guides/setup.md [--title=...] [--description=...] [--icon=...] [--tags=...] [--order=...]
+</code></pre>
+<ul>
+<li><code>--path</code> (obbligatorio) - relativo a <code>docs/</code>, deve terminare in <code>.md</code></li>
+<li><code>--title</code>, <code>--description</code>, <code>--icon</code>, <code>--order</code> - scritti nel frontmatter</li>
+<li><code>--tags</code> - separati da virgola</li>
+</ul>
+<h2 id="pluginnew"><a href="#pluginnew" id="pluginnew" name="pluginnew" class="anchor"></a><code>plugin:new</code></h2>
+<p>Genera lo scheletro di un modulo plugin (<code>box.json</code>, <code>ModuleConfig.bx</code>, un
+<code>models/BxSitesPlugin.bx</code> con ogni hook già stubato) rispecchiando
+<code>examples/hello-plugin/</code>.</p>
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites plugin:new --name=my-analytics-plugin [--dest=...]
+</code></pre>
+<ul>
+<li><code>--name</code> (obbligatorio) - il nome/slug del modulo del plugin</li>
+<li><code>--dest</code> - il valore predefinito è <code>&lt;projectRoot&gt;/&lt;name&gt;</code></li>
+</ul>
+<p>Vedi <a href="/bx-sites/development/theme/slate/it/guides/plugins/index.html">Plugin</a> per il riferimento degli hook e come
+collegare il plugin finito all'array <code>plugins</code> di <code>bxsites.json</code>.</p>
+<h2 id="installplugin"><a href="#installplugin" id="installplugin" name="installplugin" class="anchor"></a><code>install:plugin</code></h2>
+<p>Scarica un plugin pubblicato da ForgeBox e lo deposita direttamente nel
+proprio <code>boxlang_modules/</code> del progetto - la convenzione nativa di
+BoxLang per i moduli locali caricati automaticamente, quindi non serve
+nulla oltre al binario <code>bxSites</code> stesso (nessun coinvolgimento di
+<code>box</code>/CommandBox).</p>
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites install:plugin --name=bx-sites-plugin-analytics [--version=1.2.0]
+</code></pre>
+<ul>
+<li><code>--name</code> (obbligatorio) - lo slug ForgeBox da installare</li>
+<li><code>--version</code> - una versione specifica; ometti per l'ultima</li>
+</ul>
+<p>Stampa il vero nome di mapping del modulo registrato una volta caricato -
+aggiungi quel nome all'array <code>plugins</code> di <code>bxsites.json</code> per attivarlo
+(l'installazione da sola non attiva mai un plugin - vedi
+<a href="/bx-sites/development/theme/slate/it/guides/plugins/index.html">Plugin</a>).</p>
+<h2 id="themenew"><a href="#themenew" id="themenew" name="themenew" class="anchor"></a><code>theme:new</code></h2>
+<p>Estrae uno dei temi integrati nella cartella <code>theme/</code> propria del
+progetto per personalizzarlo, rispecchiando il flusso di eject <code>--theme</code>
+di mkdocs.</p>
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites theme:new --theme=material
+</code></pre>
+<ul>
+<li><code>--theme</code> (obbligatorio) - <code>bootstrap</code>, <code>material</code>, <code>tailwind</code>, <code>docsy</code>, <code>slate</code>, <code>docusaurus</code>, <code>justthedocs</code>, <code>vuepress</code>, <code>gitbook</code>, o <code>notion</code> - vedi <a href="/bx-sites/development/theme/slate/it/guides/themes/index.html#integrati">Temi</a></li>
+</ul>
+<p>Fallisce invece di sovrascrivere un <code>theme/</code> già esistente. Vedi
+<a href="/bx-sites/development/theme/slate/it/guides/themes/index.html">Temi</a> per il contratto di sovrascrittura
+(<code>layout.bxm</code> + <code>page.bxm</code>).</p>
+<h2 id="installtheme"><a href="#installtheme" id="installtheme" name="installtheme" class="anchor"></a><code>install:theme</code></h2>
+<p>Scarica un tema pubblicato da ForgeBox nel proprio <code>themes/&lt;name&gt;/</code> del
+progetto - nient'altro che il binario <code>bxSites</code> serve, come per
+<code>install:plugin</code>.</p>
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
+</code></pre>
+<ul>
+<li><code>--name</code> (obbligatorio) - lo slug ForgeBox da installare</li>
+<li><code>--version</code> - una versione specifica; ometti per l'ultima</li>
+</ul>
+<p>Valida il pacchetto scaricato rispetto al contratto <code>ThemeProvider</code>
+(<code>layout.bxm</code> + <code>page.bxm</code>) prima di terminare, così un pacchetto rotto
+fallisce al momento dell'installazione invece che alla prossima <code>build</code>.
+Imposta <code>theme.name</code> di <code>bxsites.json</code> sul nome installato per usarlo -
+vedi <a href="/bx-sites/development/theme/slate/it/guides/themes/index.html#installare-un-tema-pubblicato">Temi</a>.</p>
+<h2 id="themeimport"><a href="#themeimport" id="themeimport" name="themeimport" class="anchor"></a><code>theme:import</code></h2>
+<p>Conversione con il massimo impegno possibile di un tema proveniente
+dall'ecosistema di un altro generatore di siti statici
+(<code>mkdocs</code>/<code>jekyll</code>/<code>hugo</code>) in uno scheletro di tema bx-sites sotto
+<code>themes/&lt;name&gt;/</code> - un punto di partenza, non un porting senza perdite in
+un solo comando.</p>
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
+</code></pre>
+<ul>
+<li><code>--source</code> (obbligatorio) - <code>mkdocs</code>, <code>jekyll</code>, o <code>hugo</code></li>
+<li><code>--path</code> (obbligatorio) - la cartella radice propria del tema sorgente</li>
+<li><code>--name</code> (obbligatorio) - il nome di destinazione, scritto in <code>themes/&lt;name&gt;/</code></li>
+</ul>
+<p>Rieseguire il comando con lo stesso <code>--name</code> è sicuro - <code>layout.bxm</code>/
+<code>page.bxm</code> vengono sovrascritti e qualsiasi cartella di asset appena
+trovata viene unita. Vedi <a href="/bx-sites/development/theme/slate/it/guides/theme-import/index.html">Importare un tema</a>
+per sapere esattamente cosa viene tradotto e cosa no, e cosa controllare
+in seguito.</p>
+<h2 id="pagerename"><a href="#pagerename" id="pagerename" name="pagerename" class="anchor"></a><code>page:rename</code></h2>
+<p>Sposta una pagina di documentazione da un percorso a un altro,
+riscrivendo ogni link Markdown relativo in <code>docs/**</code> che puntava al
+vecchio percorso - lo stesso problema di link rot relativo ai file che il
+lato HTML compilato già risolve (<code>check</code>), applicato invece al sorgente
+Markdown grezzo al momento della rinomina.</p>
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites page:rename --from=guides/old-name.md --to=guides/new-name.md
+</code></pre>
+<ul>
+<li><code>--from</code> (obbligatorio) - il percorso attuale della pagina, relativo a <code>docs/</code></li>
+<li><code>--to</code> (obbligatorio) - il suo nuovo percorso, relativo a <code>docs/</code></li>
+</ul>
+<p>Vengono riscritti solo i link nudi in stile <code>[text](relative/path.md)</code> -
+gli URL assoluti, <code>mailto:</code>, e le pure ancore in pagina vengono lasciati
+stare. <code>docs/assets/**</code> non viene mai analizzato.</p>
+<p>Imprime anche il frontmatter <code>redirect_from</code> della pagina spostata con il
+suo vecchio URL, così una build (<a href="/bx-sites/development/theme/slate/it/guides/redirects/index.html">Redirect</a>)
+continua a rispondere per esso invece di lasciare che la rinomina dia un
+404 a ogni link esterno di cui questo progetto non controlla la fonte.</p>
+<h2 id="blogdrafts"><a href="#blogdrafts" id="blogdrafts" name="blogdrafts" class="anchor"></a><code>blog:drafts</code></h2>
+<p>Elenca ogni post del blog il cui frontmatter imposta <code>draft: true</code> -
+<code>build</code> salta sempre le bozze, quindi questo è l'unico posto dove la loro
+esistenza viene mostrata.</p>
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites blog:drafts
+</code></pre>
+<p>Esce sempre con <code>0</code>.</p>
+<h2 id="blogfind"><a href="#blogfind" id="blogfind" name="blogfind" class="anchor"></a><code>blog:find</code></h2>
+<p>Filtra i post del blog per autore/categoria/tag/intervallo di date, senza
+eseguire una <code>build</code> completa.</p>
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites blog:find [--author=...] [--category=...] [--tag=...] [--since=...] [--until=...] [--drafts]
+</code></pre>
+<ul>
+<li><code>--author</code>, <code>--category</code>, <code>--tag</code> - corrispondenza esatta senza distinzione tra maiuscole/minuscole con uno qualsiasi dei valori propri del post</li>
+<li><code>--since</code>, <code>--until</code> - una data; corrispondono solo i post a partire da/fino a <code>--since</code>/<code>--until</code></li>
+<li><code>--drafts</code> - includi anche i post in bozza (esclusi per default)</li>
+</ul>
+<p>Ogni filtro è opzionale e indipendente - non passandone nessuno vengono
+elencati tutti i post pubblicati.</p>
+<h2 id="searchquery"><a href="#searchquery" id="searchquery" name="searchquery" class="anchor"></a><code>search:query</code></h2>
+<p>Esegue una query per parole chiave su un <code>site/search-index.json</code> già
+compilato - esegui prima <code>build</code> o <code>search-index</code>. Classifica i risultati
+usando la stessa ponderazione relativa dei campi che usa il widget di
+ricerca lato client (titolo, poi tag, poi intestazioni, poi corpo), così
+puoi verificare rapidamente cosa mostrerebbe la ricerca di un visitatore
+reale senza aprire un browser.</p>
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites search:query --query=&quot;getting started&quot; [--limit=10]
+</code></pre>
+<ul>
+<li><code>--query</code> (obbligatorio) - termini di ricerca separati da spazio</li>
+<li><code>--limit</code> - risultati massimi da restituire, il valore predefinito è <code>10</code></li>
+</ul>
+<h2 id="lint"><a href="#lint" id="lint" name="lint" class="anchor"></a><code>lint</code></h2>
+<p>Un passaggio di qualità del contenuto pre-build sul sorgente Markdown
+grezzo di <code>docs/</code>, distinto da <code>check</code> (che ispeziona solo un <code>site/</code> già
+compilato). Verifica:</p>
+<ul>
+<li><strong>Salti di livello delle intestazioni</strong> - un corpo di pagina che salta
+direttamente da <code>##</code> a <code>####</code> senza un <code>###</code> in mezzo (struttura
+confusa, e negativo per l'accessibilità). Le righe dentro un blocco di
+codice recintato non vengono mai scambiate per intestazioni.</li>
+<li><strong>Problemi di data dei post del blog</strong> - un post in <code>docs/blog/posts/**</code>
+con una <code>date</code> di frontmatter mancante o non valida (<code>build</code> stesso
+lancia un errore su questo nel momento in cui carica i post - <code>lint</code> lo
+mostra invece come un risultato).</li>
+</ul>
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites lint
+</code></pre>
+<p>Esce con <code>1</code> quando uno dei due controlli trova qualcosa, <code>0</code> altrimenti.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/slate/it/cli-reference.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 12&#x3a;15&#x3a;58 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/slate/it/cli-reference.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
 			</article>
 
 			<nav class="slate-page-nav" aria-label="Navigazione della pagina">
@@ -227,7 +483,7 @@ strumento dedicato di controllo link eseguito come proprio job separato.</p>
 		</main>
 
 		<aside class="slate-toc-sidebar">
-			<nav class="slate-toc" aria-label="In questa pagina"><div class="slate-toc__title">In questa pagina</div><ul><li class="slate-toc__item slate-toc__item--2"><a href="#opzioni-globali">Opzioni globali</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#new">new</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#build">build</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#serve">serve</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#search-index">search-index</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#clean">clean</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#gh-deploy">gh-deploy</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#migrate">migrate</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#check">check</a></li></ul></nav>
+			<nav class="slate-toc" aria-label="In questa pagina"><div class="slate-toc__title">In questa pagina</div><ul><li class="slate-toc__item slate-toc__item--2"><a href="#opzioni-globali">Opzioni globali</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#new">new</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#build">build</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#serve">serve</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#search-index">search-index</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#clean">clean</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#gh-deploy">gh-deploy</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#migrate">migrate</a></li><li class="slate-toc__item slate-toc__item--3"><a href="#--fromgitbook-predefinito">--from&#x3d;gitbook &#x28;predefinito&#x29;</a></li><li class="slate-toc__item slate-toc__item--3"><a href="#--frommkdocs">--from&#x3d;mkdocs</a></li><li class="slate-toc__item slate-toc__item--3"><a href="#entrambi">Entrambi</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#check">check</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#stats">stats</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#doctor">doctor</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#postnew">post&#x3a;new</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#versionnew">version&#x3a;new</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#i18nstatus">i18n&#x3a;status</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#i18nnew">i18n&#x3a;new</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#pagenew">page&#x3a;new</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#pluginnew">plugin&#x3a;new</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#installplugin">install&#x3a;plugin</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#themenew">theme&#x3a;new</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#installtheme">install&#x3a;theme</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#themeimport">theme&#x3a;import</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#pagerename">page&#x3a;rename</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#blogdrafts">blog&#x3a;drafts</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#blogfind">blog&#x3a;find</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#searchquery">search&#x3a;query</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#lint">lint</a></li></ul></nav>
 		</aside>
 
 	</div>

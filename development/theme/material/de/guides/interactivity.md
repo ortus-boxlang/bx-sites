@@ -9,7 +9,7 @@ tags: [anleitungen, alpine, interaktivitat]
 
 Jede von BX Sites gebaute Seite lädt bereits [Alpine.js](https://alpinejs.dev/)
 - es treibt den eingebauten Dunkelmodus-Umschalter und das
-Sprachdropdown in jedem der drei integrierten Themes an. Genau dieselbe
+Sprachdropdown in jedem integrierten Theme an. Genau dieselbe
 Alpine-Instanz steht auch deinem eigenen Seiteninhalt kostenlos zur
 Verfügung: keine `bxsites.json`-Einstellung zum Umlegen, kein
 `extraJs`-Eintrag hinzuzufügen, kein zusätzliches `<script>`-Tag in
@@ -110,4 +110,3 @@ und mehr).
   bleiben - kleine, in sich geschlossene Widgets (ein Kopieren-Button,
   ein Filter, ein Umschalter) passen gut; eine vollständige
   clientseitige App ist nicht der Zweck davon.
-</content>

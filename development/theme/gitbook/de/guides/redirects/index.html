@@ -137,13 +137,12 @@ ist ein root-relativer Pfad, der nur an der Site-Wurzel eindeutig ist.
 Ein Versions-/Locale-Baum, der dieselbe alte URL-Zuordnung möchte,
 braucht stattdessen sein eigenes seitenbezogenes <code>redirect_from</code>.</p>
 <h2 id="pagerename-setzt-das-für-dich"><a href="#pagerename-setzt-das-für-dich" id="pagerename-setzt-das-für-dich" name="pagerename-setzt-das-für-dich" class="anchor"></a><code>page:rename</code> setzt das für dich</h2>
-<p>Das Umbenennen/Verschieben einer Seite mit <code>page:rename</code> fügt ihren alten
-Pfad automatisch dem eigenen <code>redirect_from</code> der verschobenen Seite hinzu</p>
-<ul>
-<li>zusätzlich zum Umschreiben jedes relativen Markdown-Links, der darauf
-zeigte, funktioniert auch die alte URL selbst weiter:</li>
-</ul>
-<pre data-bxsites-title="Verwendung"><code class="language-bash">bxSites page:rename --from=guides/old-setup.md --to=guides/new-setup.md
+<p>Das Umbenennen/Verschieben einer Seite mit
+<a href="/bx-sites/development/theme/gitbook/de/cli-reference/index.html#pagerename"><code>page:rename</code></a> fügt ihren alten Pfad
+automatisch dem eigenen <code>redirect_from</code> der verschobenen Seite hinzu -
+zusätzlich zum Umschreiben jedes relativen Markdown-Links, der darauf
+zeigte, funktioniert auch die alte URL selbst weiter:</p>
+<pre data-bxsites-title="Usage"><code class="language-bash">bxSites page:rename --from=guides/old-setup.md --to=guides/new-setup.md
 </code></pre>
 <p>Eine Seite mehr als einmal umzubenennen, fügt einfach weiter hinzu - die
 <code>redirect_from</code>-Liste einer Seite kann so viele alte Pfade tragen, wie sie
@@ -168,7 +167,7 @@ exakter alter Pfad - es gibt kein <code>guides/old/*</code>-Catch-all.</li>
 </ul>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/redirects.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/gitbook/de/guides/redirects.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 12&#x3a;15&#x3a;58 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/redirects.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/gitbook/de/guides/redirects.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
 			</article>
 
 

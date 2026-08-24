@@ -354,4 +354,3 @@ Hauptbaums geteilt.
 Eine eingebundene Datei kann selbst eine weitere einbinden (eine
 zirkuläre Kette wirft zur Build-Zeit `BxSites.CircularInclude`, statt
 endlos zu laufen).
-</content>

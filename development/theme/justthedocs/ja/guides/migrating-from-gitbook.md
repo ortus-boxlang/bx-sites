@@ -1,6 +1,7 @@
 ---
 title: GitBook からの移行
 order: 7
+icon: phosphor-duotone:swap
 tags: [ガイド, 移行, GitBook]
 ---
 

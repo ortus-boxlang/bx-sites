@@ -136,4 +136,3 @@ bereitzustellen, das bereit ist, sie zu empfangen; `migrate` erstellt
 `docs/` auch selbst, es ist also nicht zwingend erforderlich. Überprüfe
 die eigenen Warnungen des Befehls, dann `serve`, um das Ergebnis zu
 sehen, bevor du es committest.
-</content>

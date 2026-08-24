@@ -8,7 +8,7 @@ tags: [guide, blog]
 # Blog
 
 Un blog è un'altra funzionalità per convenzione, con la stessa forma di
-[versioni](../configuration.md#versioning)/[i18n](i18n.md) o
+[versioni](../configuration.md#versionamento)/[i18n](i18n.md) o
 dell'[indice dei tag](../getting-started.md#add-pages) - metti i post
 sotto `docs/blog/posts/`, e BX Sites compila `/blog/` (paginato), una
 pagina categoria per ogni categoria, una pagina archivio per ogni anno

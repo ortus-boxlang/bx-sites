@@ -18,9 +18,33 @@ Ein Modul allein zu installieren aktiviert es allerdings nie als Plugin -
 ein Projekt bindet eines explizit über den BoxLang-Modulnamen im Array
 [`plugins`](../configuration.md#plugins) von `bxsites.json` ein:
 
-```json
+```json title="bxsites.json"
 { "plugins": [ "myBxSitesPlugin" ] }
 ```
+
+## Ein veröffentlichtes Plugin installieren
+
+Ein auf ForgeBox veröffentlichtes Plugin installiert sich mit nichts
+weiter als der `bxSites`-Binary selbst - kein `box`/CommandBox nötig:
+
+```bash title="Usage"
+bxSites install:plugin --name=bx-sites-plugin-analytics [--version=1.2.0]
+```
+
+Das lädt das ZIP des Pakets von ForgeBox herunter und entpackt es nach
+`boxlang_modules/bx-sites-plugin-analytics/` im Projekt-Wurzelverzeichnis
+- BoxLangs eigene automatisch geladene lokale-Modul-Konvention (jeder
+Modulordner dort wird genauso erkannt wie ein projektlokales
+`node_modules/` bei npm), sodass es ohne jeden
+`BOXLANG_HOME`-/globalen Installationsschritt in der laufenden
+BoxLang-Modul-Registry aktiv ist. `install:plugin` lädt es sofort in die
+Laufzeitumgebung und gibt seinen echten registrierten
+Modul-Mapping-Namen zurück (der, laut dem Hinweis unten, nicht immer
+mit dem ForgeBox-Slug übereinstimmt) - füge *diesen* Namen zum
+`plugins`-Array von `bxsites.json` hinzu, um es zu aktivieren, genau wie
+bei jedem anderen installierten Modul. Siehe
+[`install:plugin`](../cli-reference.md#installplugin) in der
+CLI-Referenz.
 
 ## Ein Plugin schreiben
 
@@ -30,7 +54,7 @@ Klasse `models/BxSitesPlugin.bx`. Jede Methode darauf ist optional -
 implementiere nur die Hooks, die du brauchst, BX Sites prüft vor jedem
 Aufruf, ob sie existiert:
 
-```bx
+```bx title="models/BxSitesPlugin.bx" linenums="1"
 // models/BxSitesPlugin.bx
 class {
 
@@ -105,7 +129,7 @@ Builds eine Build-Zusammenfassungszeile an `site/hello-plugin.txt`
 anhängt. Nutze es als Ausgangs-Skelett, oder lies es dir als
 durchgearbeitetes Beispiel für den Ordneraufbau durch:
 
-```
+```text title="hello-plugin/ layout"
 hello-plugin/
 ├── box.json              # boxlang.moduleName is what bxsites.json's [plugins] references
 ├── ModuleConfig.bx        # a normal, otherwise-empty BoxLang module descriptor

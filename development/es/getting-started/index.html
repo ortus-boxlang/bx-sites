@@ -102,36 +102,36 @@
 <h1 id="primeros-pasos"><a href="#primeros-pasos" id="primeros-pasos" name="primeros-pasos" class="anchor"></a>Primeros Pasos</h1>
 <h2 id="instalación"><a href="#instalación" id="instalación" name="instalación" class="anchor"></a>Instalación</h2>
 <p>BX Sites depende de <a href="https://github.com/ortus-boxlang/bx-markdown">bx-markdown</a>
-para el renderizado de Markdown, de <a href="https://github.com/ortus-boxlang/bx-esapi">bx-esapi</a>
-para la codificación HTML, y de <a href="https://github.com/ortus-boxlang/bx-yaml">bx-yaml</a>
-para leer <code>bxsites.yaml</code>. Con <a href="https://commandbox.ortusbooks.com/">CommandBox</a>
-instalado:</p>
-<pre><code class="language-bash">box install bx-sites
-box install bx-markdown
-box install bx-esapi
-box install bx-yaml
+para el renderizado de Markdown, <a href="https://github.com/ortus-boxlang/bx-esapi">bx-esapi</a>
+para la codificación HTML, <a href="https://github.com/ortus-boxlang/bx-yaml">bx-yaml</a>
+para leer <code>bxsites.yaml</code>, y <a href="https://github.com/ortus-boxlang/bx-image">bx-image</a>
+para el pipeline de imágenes responsivas (consulta
+<a href="/bx-sites/development/es/guides/images/index.html">Imágenes Responsivas</a>) - los cuatro se instalan
+automáticamente como dependencias de <code>box.json</code>, así que instalar
+<code>bx-sites</code> en sí mismo es el único comando necesario, ya sea mediante el
+propio instalador de binario del sistema operativo de BoxLang:</p>
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">install-bx-module bx-sites
 </code></pre>
-<p>O, sin CommandBox, el propio instalador de BoxLang toma los cuatro en un
-solo comando:</p>
-<pre><code class="language-bash">install-bx-module bx-sites bx-markdown bx-esapi bx-yaml
+<p>o mediante <a href="https://commandbox.ortusbooks.com/">CommandBox</a>:</p>
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">box install bx-sites
 </code></pre>
-<p><code>box install</code>/<code>install-bx-module</code> lee <code>boxlang.executable</code> de <code>box.json</code>
-y coloca un script <code>bxSites</code> en tu <code>PATH</code> (en <code>~/.boxlang/bin</code>), de modo
-que cada comando de abajo funciona tanto en su forma corta e independiente:</p>
-<pre><code class="language-bash">bxSites &lt;verb&gt; [options]
+<p>Cualquiera de los dos lee <code>boxlang.executable</code> de <code>box.json</code> y coloca un
+script <code>bxSites</code> en tu <code>PATH</code> (en <code>~/.boxlang/bin</code>), de modo que cada
+comando de abajo funciona tanto en su forma corta e independiente:</p>
+<pre data-bxsites-title="Uso"><code class="language-bash">bxSites &lt;verb&gt; [options]
 </code></pre>
 <p>como, en cualquier lugar donde BoxLang esté disponible pero ese atajo del
 <code>PATH</code> no lo esté (un ejecutor de CI, un módulo registrado a mano en lugar
 de instalado) - ambas formas ejecutan exactamente lo mismo:</p>
-<pre><code class="language-bash">boxlang bxSites &lt;verb&gt; [options]
+<pre data-bxsites-title="Uso &#x28;sin el atajo del PATH&#x29;"><code class="language-bash">boxlang bxSites &lt;verb&gt; [options]
 </code></pre>
 <p>El resto de esta guía usa la forma corta.</p>
 <h2 id="crear-la-estructura-de-un-proyecto"><a href="#crear-la-estructura-de-un-proyecto" id="crear-la-estructura-de-un-proyecto" name="crear-la-estructura-de-un-proyecto" class="anchor"></a>Crear la estructura de un proyecto</h2>
-<pre><code class="language-bash">bxSites new my-docs
+<pre data-bxsites-start-line="1" data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites new my-docs
 cd my-docs
 </code></pre>
 <p>Esto crea:</p>
-<pre><code>my-docs/
+<pre data-bxsites-title="Estructura del proyecto"><code class="language-text">my-docs/
 ├── docs/
 │   ├── assets/
 │   └── index.md
@@ -155,7 +155,7 @@ en ambos formatos.</p>
 <p>¿Ya tienes contenido en GitBook? <code>bxSites migrate --source=/path/to/export</code>
 convierte una exportación de GitBook directamente en <code>docs/</code> - consulta
 <a href="/bx-sites/development/es/guides/migrating-from-gitbook/index.html">Migrar desde GitBook</a> - y puedes pasar
-directamente a <a href="#build">Construcción</a>.</p>
+directamente a <a href="#construcción">Construcción</a>.</p>
 <h2 id="añadir-páginas"><a href="#añadir-páginas" id="añadir-páginas" name="añadir-páginas" class="anchor"></a>Añadir páginas</h2>
 <p>Cada archivo <code>.md</code> bajo <code>docs/</code> se convierte en una página. El anidamiento
 de carpetas se convierte automáticamente en anidamiento de navegación:</p>
@@ -174,7 +174,7 @@ termina en <code>site/</code> de cualquier forma - los dos nunca chocan, ya que
 <code>site/</code> nunca es en sí mismo un nombre válido de carpeta de origen.</p>
 </div>
 </div>
-<pre><code>docs/
+<pre data-bxsites-title="docs&#x2f; &rarr; nav"><code class="language-text">docs/
 ├── index.md              -&gt; /
 ├── guides/
 │   ├── index.md          -&gt; /guides/
@@ -186,8 +186,8 @@ inferido con una navegación explícita - consulta <a href="/bx-sites/developmen
 <p>Enlaza a otra página de la manera habitual de mkdocs - una ruta relativa
 al archivo hasta su fuente <code>.md</code>, exactamente como si los dos archivos
 estuvieran uno junto al otro en el disco (porque lo están):</p>
-<pre><code class="language-markdown">See [Deployment](guides/deployment.md) or, from that same guide,
-[back to Getting Started](../getting-started.md#add-pages).
+<pre data-bxsites-title="Ejemplo de enlace"><code class="language-markdown">Consulta [Despliegue](guides/deployment.md) o, desde esa misma guía,
+[volver a Primeros Pasos](../getting-started.md#añadir-páginas).
 </code></pre>
 <p>BX Sites reescribe cada enlace de este tipo a su URL amigable generada en
 el momento de la construcción (<code>guides/deployment.md</code> -&gt;
@@ -212,7 +212,7 @@ directamente en lugar de raspar el HTML renderizado - y dado que todo el
 árbol <code>docs/</code> se refleja 1:1, los enlaces relativos propios de una página
 también siguen funcionando leídos de esta manera.</p>
 <p>Cada página puede comenzar con un pequeño bloque de frontmatter:</p>
-<pre><code class="language-markdown">---
+<pre data-bxsites-start-line="1" data-bxsites-title="docs&#x2f;guides&#x2f;deployment.md"><code class="language-markdown">---
 title: Deployment
 order: 2
 hidden: false
@@ -221,6 +221,7 @@ tags: [guides, deployment]
 icon: 🚀
 summary: Everything you need to publish a built site.
 ogImage: assets/deployment-card.png
+toc: true
 ---
 
 # Deployment
@@ -254,6 +255,11 @@ título (distinta de <code>description</code>, que es solo para la etiqueta meta
 nunca se renderiza en la propia página)</li>
 <li><code>ogImage</code> - sobrescribe la imagen de tarjeta social de esta página en
 particular - consulta <a href="/bx-sites/development/es/configuration/index.html#ogimage"><code>ogImage</code></a></li>
+<li><code>toc</code> - <code>false</code> oculta la propia tabla de contenido &quot;En esta página&quot; de
+esta página, incluso con 2 o más encabezados (el disparador habitual
+para que se renderice) - útil para una página de aterrizaje/hero que no
+quiere una TOC flotante compitiendo con su propio contenido; por
+defecto <code>true</code></li>
 </ul>
 <p>Los valores del frontmatter pueden ser listas en línea (<code>tags: [a, b, c]</code>),
 listas de bloque al estilo YAML (<code>tags:</code> seguido de líneas <code>- item</code>
@@ -261,12 +267,12 @@ sangradas), o escalares de bloque con <code>&gt;</code>/<code>|</code> para un v
 líneas - aunque es un analizador pequeño escrito a mano, no YAML completo,
 así que los objetos/mapas anidados no son compatibles.</p>
 <h2 id="construcción"><a href="#construcción" id="construcción" name="construcción" class="anchor"></a>Construcción</h2>
-<pre><code class="language-bash">bxSites build
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites build
 </code></pre>
 <p>Renderiza cada página de <code>docs/</code> en un sitio estático en <code>site/</code>, listo
 para alojarse en cualquier lugar que sirva archivos estáticos.</p>
 <h2 id="servir-localmente"><a href="#servir-localmente" id="servir-localmente" name="servir-localmente" class="anchor"></a>Servir localmente</h2>
-<pre><code class="language-bash">bxSites serve
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites serve
 </code></pre>
 <p>Construye el proyecto, sirve <code>site/</code> en <code>http://127.0.0.1:8080/</code>, y
 reconstruye automáticamente cada vez que guardas un cambio bajo <code>docs/</code>,
@@ -274,12 +280,12 @@ tu configuración de sitio <code>bxsites.yaml</code>/<code>.json</code>, o una s
 <code>theme/</code> a nivel de proyecto - tu navegador se recarga por sí solo. Pasa
 <code>--port=3000</code> o <code>--host=0.0.0.0</code> para cambiar cómo se enlaza.</p>
 <h2 id="limpieza"><a href="#limpieza" id="limpieza" name="limpieza" class="anchor"></a>Limpieza</h2>
-<pre><code class="language-bash">bxSites clean
+<pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites clean
 </code></pre>
 <p>Elimina <code>site/</code> y cualquier caché de construcción, sin tocar tu fuente
 <code>docs/</code>.</p>
 
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/es/getting-started.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 24, 2026, 12&#x3a;15&#x3a;58 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/es/getting-started.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 24, 2026, 2&#x3a;05&#x3a;10 AM</span></div>
 				</article>
 
 				<nav class="page-nav d-flex justify-content-between" aria-label="Navegaci&oacute;n de p&aacute;gina">

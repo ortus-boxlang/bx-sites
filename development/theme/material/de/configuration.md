@@ -17,7 +17,7 @@ erzeugt `bxsites.yaml`, sofern nicht `--format=json` übergeben wird (siehe
 ein Projekt aus irgendeinem Grund mehr als eine, gewinnt `bxsites.yaml`,
 dann `bxsites.yml`, dann `bxsites.json`.
 
-```yaml
+```yaml title="bxsites.yaml" linenums="1"
 name: "My Docs"
 description: ""
 baseURL: "/"
@@ -48,15 +48,22 @@ ogImage: ""
 generateOgImages: false
 extraCss: []
 extraJs: []
+assets:
+  fingerprint: true
+  bundle: true
+  images: { enabled: true, widths: [400, 800, 1200, 1600], formats: [original, webp] }
 plugins: []
 i18n:
   defaultLocale: { code: en, label: English }
   locales: []
+blog:
+  postsPerPage: 10
+  feed: true
 ```
 
 Die äquivalente `bxsites.json`, für ein Projekt, das sie bevorzugt:
 
-```json
+```json title="bxsites.json" linenums="1"
 {
 	"name": "My Docs",
 	"description": "",
@@ -68,6 +75,10 @@ Die äquivalente `bxsites.json`, für ein Projekt, das sie bevorzugt:
 		"favicon": ""
 	},
 	"search": true,
+	"searchProvider": {
+		"provider": "local",
+		"algolia": { "appId": "", "apiKey": "", "indexName": "", "insights": false }
+	},
 	"nav": [],
 	"markdown": { "enableAdmonition": true },
 	"repo": {
@@ -87,20 +98,30 @@ Die äquivalente `bxsites.json`, für ein Projekt, das sie bevorzugt:
 	"generateOgImages": false,
 	"extraCss": [],
 	"extraJs": [],
+	"assets": {
+		"fingerprint": true,
+		"bundle": true,
+		"images": { "enabled": true, "widths": [400, 800, 1200, 1600], "formats": ["original", "webp"] }
+	},
 	"plugins": [],
 	"i18n": {
 		"defaultLocale": { "code": "en", "label": "English" },
 		"locales": []
+	},
+	"blog": {
+		"postsPerPage": 10,
+		"feed": true
 	}
 }
 ```
 
 Nur `name` ist erforderlich - alles andere fällt auf die oben gezeigten
 Standardwerte zurück. Ein teilweise angegebenes `theme`-Objekt wird eine
-Ebene tief zusammengeführt, sodass `{"theme":{"name":"material"}}` allein
-weiterhin die Standard-(leeren)-`options` behält. Jeder Schlüssel heißt in
-beiden Formaten gleich und hat dieselbe Form; der Rest dieser Seite zeigt
-der Kürze halber nur JSON, liest sich in YAML aber genauso.
+Ebene tief zusammengeführt, sodass `{theme: {name: material}}` allein
+weiterhin die Standard-(leeren)-`options` behält. Jeder Schlüssel unten
+heißt in beiden Formaten gleich und hat dieselbe Form - der Rest dieser
+Seite zeigt der Kürze halber nur JSON-Schnipsel, liest sich in YAML aber
+genauso.
 
 ## `name`
 
@@ -157,8 +178,9 @@ Domain, um sinnvoll zu sein. Listet jede nicht versteckte Seite gemäß dem
 ## `theme`
 
 - `theme.name` - eines der integrierten Themes (`bootstrap`, `material`,
-  `tailwind`) oder der Name eines eigenen Themes, das du über einen
-  `theme/`-Ordner im Projekt-Wurzelverzeichnis bereitstellst (siehe
+  `tailwind`, `docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`,
+  `gitbook`, `notion`) oder der Name eines eigenen Themes, das du über
+  einen `theme/`-Ordner im Projekt-Wurzelverzeichnis bereitstellst (siehe
   [Themes](guides/themes.md))
 - `theme.logo` - Pfad/URL zu einem Bild, das neben dem Website-Namen in der
   Kopfzeilen-Marke angezeigt wird (anstelle des standardmäßigen
@@ -184,17 +206,51 @@ Domain, um sinnvoll zu sein. Listet jede nicht versteckte Seite gemäß dem
     ```json
     { "theme": { "options": { "colorMode": "dark" } } }
     ```
-  - `theme.options.navCollapsible` - `false` (Standard) rendert jede
-    Navigationsabschnitts-Überschrift stets ausgeklappt, wie bisher. `true`
-    rendert jeden Navigationsabschnitt (einen Ordner ohne `index.md`) als
-    natives `<details>`/`<summary>`-Element, das der Besucher einklappen
-    kann - kein JS-Framework nötig.
+  - `theme.options.navCollapsible` - `false` (Standard) rendert jeden
+    Navigationsabschnitt stets ausgeklappt, wie bisher. `true` gibt jedem
+    Abschnitt mit Kindern eine Umschalt-Schaltfläche, mit der der Besucher
+    ihn ein-/ausklappen kann - egal, ob dieser Abschnitt eine reine
+    Gruppenüberschrift ist (ein Ordner ohne `index.md`) oder auf eine
+    eigene Seite verlinkt. Der Abschnitt, der die gerade angezeigte Seite
+    enthält, startet immer geöffnet, unabhängig von `navExpandAll`, damit
+    das Navigieren dorthin nie den eigenen Link verdeckt, auf dem man
+    gerade steht.
   - `theme.options.navExpandAll` - nur relevant, wenn `navCollapsible`
     `true` ist. `true` (Standard) startet jeden Abschnitt geöffnet;
-    `false` startet jeden Abschnitt eingeklappt.
+    `false` startet jeden Abschnitt eingeklappt, außer dem, der die
+    aktuelle Seite enthält.
 
     ```json
     { "theme": { "options": { "navCollapsible": true, "navExpandAll": false } } }
+    ```
+  - `theme.options.tocPosition` - wo das eigene Inhaltsverzeichnis ("Auf
+    dieser Seite") einer Seite gerendert wird. `"top"` (Standard) rendert
+    es inline, oben im Artikel, wie bisher. `"sticky"` verschiebt es in
+    eine eigene rechte Spalte, die beim Scrollen des darunterliegenden
+    Artikels sichtbar bleibt - dieselbe "Auf dieser Seite"-Liste, nur
+    fixiert, was bei langen Seiten hilft. Die fixierte Spalte passt nur
+    auf breite Viewports (sie ist unterhalb des Punkts ausgeblendet, an
+    dem ein dreispaltiges Layout zu eng würde); unterhalb dieser Breite
+    rendert der `sticky`-Modus stattdessen eine einklappbare "Auf dieser
+    Seite"-Leiste, die beim Scrollen oben am Viewport fixiert bleibt -
+    antippen, um die Liste auszuklappen, dieselbe Behandlung, die auch
+    VitePress/GitBook auf Mobilgeräten verwenden - sodass das
+    Inhaltsverzeichnis bei jeder Viewport-Breite erreichbar bleibt, nur
+    seine Form ändert sich je nach verfügbarem Platz.
+
+    ```json
+    { "theme": { "options": { "tocPosition": "sticky" } } }
+    ```
+  - `theme.options.pageMetaPosition` - wo die Zeile mit
+    Bearbeiten-diese-Seite/Markdown-herunterladen/Zuletzt-aktualisiert
+    relativ zum eigenen Inhalt einer Seite gerendert wird. `"bottom"`
+    (Standard) rendert sie als kleine Fußnotiz kurz vor Ende des Artikels.
+    `"top"` rendert sie stattdessen oben in der Nähe des Titels, an
+    derselben Stelle, an der sie immer gerendert wurde, bevor es diese
+    Option gab.
+
+    ```json
+    { "theme": { "options": { "pageMetaPosition": "top" } } }
     ```
 
 ## `search`
@@ -203,6 +259,56 @@ Domain, um sinnvoll zu sein. Listet jede nicht versteckte Seite gemäß dem
 Suchbox; `false` überspringt beides vollständig - keine
 `search-index.json`, keine Such-UI, kein zusätzliches JS ausgeliefert.
 Siehe [Suche](guides/search.md).
+
+## `searchProvider`
+
+Welche Such-UI `search: true` verdrahtet:
+
+- `provider` - `"local"` (Standard) ist bx-sites' eigene statische/
+  clientseitige Suche (`search-index.json` + lunr.js, siehe
+  [Suche](guides/search.md#local-der-standard)). `"algolia"` verdrahtet
+  stattdessen [Algolia DocSearch](guides/search.md#algolia), und
+  `"pagefind"` verdrahtet [Pagefind](guides/search.md#pagefind). Jeder
+  andere Wert ist ein eigener, projektspezifischer Provider, verdrahtet
+  über ein `theme/`-Override - siehe
+  [Suche](guides/search.md#andere-suchprovider).
+- `algolia` - erforderlich, wenn `provider` `"algolia"` ist: `appId`,
+  `apiKey` (der *reine Such*-öffentliche API-Schlüssel, kein
+  Administrator-Schlüssel) und `indexName`, genau wie es Algolias eigener
+  DocSearch-Client erwartet. `insights` (standardmäßig `false`) schaltet
+  DocSearchs Klick-/Konversions-Analytics ein.
+
+  ```json title="bxsites.json" linenums="1"
+  {
+    "search": true,
+    "searchProvider": {
+      "provider": "algolia",
+      "algolia": {
+        "appId": "ABC123",
+        "apiKey": "a1b2c3d4e5f6...",
+        "indexName": "my-docs"
+      }
+    }
+  }
+  ```
+
+- `pagefind` - beide Schlüssel optional, wenn `provider` `"pagefind"`
+  ist: `bin` (Standard `"pagefind"`) ist der Name/Pfad der CLI-Binary,
+  aufgelöst gegen `PATH`, wenn es ein reiner Name ist; `options` ist ein
+  Array zusätzlicher, roher CLI-Flags, die direkt durchgereicht werden.
+  Die `pagefind`-CLI selbst muss bereits installiert und im `PATH`
+  vorhanden sein - BX Sites ruft sie extern auf (wie `git` für
+  `lastUpdated`/`gh-deploy`), es installiert sie nicht für dich.
+
+  ```json title="bxsites.json" linenums="1"
+  {
+    "search": true,
+    "searchProvider": {
+      "provider": "pagefind",
+      "pagefind": { "bin": "pagefind", "options": [] }
+    }
+  }
+  ```
 
 ## `nav`
 
@@ -230,12 +336,17 @@ verlinkt (wie bei `hidden: true`). Jeder Eintrag ist entweder:
   Navigations-Label/-Icon ändert sich) - siehe
   [Themes: Icons](guides/themes.md#icons) dafür, was ein `icon`-Wert sein kann
 
-```json
+Ein Eintrag nur mit `title`, mit `children` und ohne `path` ist genau ein
+Menü-Container/Abschnitts-Label - eine nicht klickbare Überschrift, die
+nur ihre Kinder gruppiert, dieselbe Rolle, die "MAIN COMPONENTS" in
+GitBooks eigener Seitenleiste spielt:
+
+```json title="bxsites.json" linenums="1"
 {
 	"nav": [
 		"index.md",
 		{
-			"title": "Guides",
+			"title": "Main Components",
 			"children": [
 				{ "title": "Quick Start", "path": "guides/setup.md" },
 				"guides/deployment.md"
@@ -245,11 +356,16 @@ verlinkt (wie bei `hidden: true`). Jeder Eintrag ist entweder:
 }
 ```
 
+Gib demselben Gruppeneintrag stattdessen einen `path`, und er wird zu
+einem normal verlinkten Abschnitt (mit eigener Landingpage plus Kindern)
+statt eines reinen Labels - beide Formen verschachteln sich unter
+`theme.options.navCollapsible` auf dieselbe Weise (siehe oben).
+
 Für eine Navigation, die groß genug ist, um `bxsites.json` zu überladen,
 verschiebe sie in eine eigene `docs/nav.json`-Datei - dieselbe Array-Form,
 nur als kompletter Top-Level-Inhalt der Datei:
 
-```json
+```json title="docs/nav.json" linenums="1"
 [
 	"index.md",
 	{ "title": "Guides", "children": [ "guides/setup.md" ] }
@@ -335,7 +451,7 @@ standardmäßig auf `true` (siehe die
 
 ## `repo`
 
-Fügt der Kopfzeile (in allen drei integrierten Themes) einen
+Fügt der Kopfzeile (in jedem integrierten Theme) einen
 Repository-Icon-Link hinzu und, wenn beide Schlüssel gesetzt sind, jeder
 Seite einen "Diese Seite bearbeiten"-Link.
 
@@ -454,12 +570,74 @@ wird auf dieselbe Weise aufgelöst wie `theme.logo` (ein relativer Pfad
 wird mit `baseURL` vorangestellt; eine absolute URL wird unverändert
 verwendet). `extraJs`-Einträge werden mit `defer` geladen.
 
-```json
+```json title="bxsites.json" linenums="1"
 {
 	"extraCss": [ "assets/custom.css" ],
 	"extraJs": [ "assets/custom.js" ]
 }
 ```
+
+Wenn `assets.bundle` aktiv ist (Standard), wird eine lokale
+`extraCss`/`extraJs`-Liste wie die obige jeweils zu einer fingerprinted
+Datei gebündelt, statt einem `<link>`/`<script>`-Tag pro Eintrag - siehe
+[`assets`](#assets) unten.
+
+## `assets`
+
+```json title="bxsites.json" linenums="1"
+{
+	"assets": {
+		"fingerprint": true,
+		"bundle": true,
+		"images": {
+			"enabled": true,
+			"widths": [ 400, 800, 1200, 1600 ],
+			"formats": [ "original", "webp" ]
+		}
+	}
+}
+```
+
+Die Asset-Pipeline - Bildskalierung/WebP über
+[bx-image](https://github.com/ortus-boxlang/bx-image) (eine erforderliche
+Abhängigkeit, mitinstalliert neben bx-markdown/bx-esapi) und
+CSS/JS-Bundling. Hier ist standardmäßig alles mit sinnvollen Einstellungen
+aktiv - ein frisches `bxSites new`-Projekt muss davon nichts anfassen.
+Siehe [Responsive Bilder](guides/images.md) für das vollständige Bild,
+einschließlich dessen, was bewusst nicht abgedeckt wird (AVIF, animierte
+GIFs, SVGs).
+
+- `assets.fingerprint` - `true` (Standard). Benennt jede erzeugte
+  Bildvariante und jedes CSS/JS-Bundle nach einem Inhalts-Hash (z. B.
+  `screenshot-800w.a3f9c2e1.webp`, `bundle.a3f9c2e1.css`), sodass sie mit
+  sicheren, weit in der Zukunft liegenden Cache-Headern ausgeliefert
+  werden können - der Build eines Projekts ändert den eigenen Dateinamen
+  nur, wenn sich dessen Inhalt tatsächlich ändert. Benennt die eigenen
+  Originaldateien eines Projekts unter `docs/assets/` nicht um - nur von
+  der Pipeline erzeugte Ausgabe wird fingerprinted, sodass alles andere,
+  was ein Asset über seinen einfachen Dateinamen referenziert (eine
+  `::: file`-Download-Card, ein roher Markdown-Link), unverändert
+  weiterfunktioniert.
+- `assets.bundle` - `true` (Standard). Verkettet `extraCss`/`extraJs` je
+  zu einer fingerprinted Datei - reines BoxLang/JVM, keine
+  Node/esbuild-Toolchain. Fällt exakt auf das heutige Pro-URL-
+  `<link>`/`<script>`-Verhalten zurück, unverändert, sobald irgendein
+  Eintrag in der Liste eine externe URL (ein CDN-Link) ist oder eine
+  nicht existierende Datei benennt - siehe
+  [Responsive Bilder](guides/images.md#css-js-bundling).
+- `assets.images.enabled` - `true` (Standard). Jedes geeignete
+  `docs/assets/**`-Bild (`.png`/`.jpg`/`.jpeg`) erhält über bx-image
+  erzeugte Skalierungs-/WebP-Varianten, und jedes passende `<img>` wird zu
+  einem `<picture>` mit `srcset` umgeschrieben. Auf `false` setzen, um auf
+  einfaches, unverarbeitetes Kopieren von Bildern zurückzufallen, genau
+  wie vor Einführung dieser Funktion.
+- `assets.images.widths` - zu erzeugende Breakpoints, in Pixeln. Eine
+  Breite, die der eigenen Breite eines Bildes entspricht oder darüber
+  liegt, wird für dieses Bild automatisch übersprungen - nichts wird
+  jemals hochskaliert.
+- `assets.images.formats` - `"original"` behält das Quellformat als
+  `<img>`-Fallback bei; `"webp"` fügt eine gleich große
+  `<source type="image/webp">`-Variante hinzu. Beide standardmäßig aktiv.
 
 ## `mermaid`
 
@@ -519,17 +697,20 @@ Metadaten für die Locale-Ordner-Konvention
 gebaut, sobald ihr Ordner existiert; `i18n` liefert nur ihr
 Anzeige-Label/ihre Schreibrichtung für den Sprachumschalter.
 
-- `i18n.defaultLocale` - `{ "code", "label", "strings" }` für den eigenen
-  regulären `docs/`-Baum des Projekts, standardmäßig
+- `i18n.defaultLocale` - `{ "code", "label", "flag", "strings" }` für den
+  eigenen regulären `docs/`-Baum des Projekts, standardmäßig
   `{ "code": "en", "label": "English" }`. Muss nur gesetzt werden, wenn
   deine Standard-Locale nicht Englisch ist.
 - `i18n.locales` - `[]` (Standard) - ein Array aus
-  `{ "code", "label", "dir", "strings" }` für jede andere Locale. `code`
-  dient zugleich als Ordnername in `docs/i18n/<code>/` und als gebautes
-  URL-Präfix - nur Buchstaben/Ziffern/Bindestriche (`es`, `pt-BR`,
-  `zh-Hans`). `dir` ist `"ltr"` (Standard) oder `"rtl"`. `strings`
-  überschreibt die eigenen Theme-Chrome-UI-Texte dieser Locale
-  (Suchplatzhalter, "Auf dieser Seite", ...) - siehe
+  `{ "code", "label", "dir", "flag", "strings" }` für jede andere Locale.
+  `code` dient zugleich als Ordnername in `docs/i18n/<code>/` und als
+  gebautes URL-Präfix - nur Buchstaben/Ziffern/Bindestriche (`es`,
+  `pt-BR`, `zh-Hans`). `dir` ist `"ltr"` (Standard) oder `"rtl"`. `flag`
+  ist ein optionales Emoji-Override für das Flaggen-Icon des
+  Sprachumschalters - die meisten gängigen Codes lösen bereits von selbst
+  in eine sinnvolle Flagge auf. `strings` überschreibt die eigenen
+  Theme-Chrome-UI-Texte dieser Locale (Suchplatzhalter, "Auf dieser
+  Seite", die 404-Seite, ...) - siehe
   [Internationalisierung](guides/i18n.md#theme-chrome-ui-texte) für die
   vollständige Liste der Schlüssel; `de`/`es`/`it`/`ja` bringen bereits
   eine eingebaute Übersetzung mit, `strings` wird also nur zum
@@ -550,6 +731,32 @@ Anzeige-Label/ihre Schreibrichtung für den Sprachumschalter.
 Siehe [Internationalisierung](guides/i18n.md) für das vollständige Bild -
 Fallback bei nicht übersetzten Seiten, den Sprachumschalter und was noch
 nicht übersetzt wird.
+
+## `blog`
+
+Optionen für den [Blog](guides/blog.md) - selbst eine
+Convention-over-Configuration-Funktion (`docs/blog/posts/`), dafür ist
+kein Schlüssel hier nötig, um ihn einzuschalten.
+
+- `blog.postsPerPage` - `10` (Standard) - wie viele Beiträge pro Seite auf
+  `/blog/`, jeder Kategorieseite und jeder `/blog/archive/<year>/`-Seite
+  angezeigt werden, bevor es zu `.../page/2/` weitergeht.
+- `blog.feed` - `true` (Standard) - ob `/blog/feed.xml` (RSS 2.0)
+  geschrieben wird. Nur sinnvoll mit einer absoluten `baseURL`, dieselbe
+  Voraussetzung wie bei `sitemap.xml`.
+- `blog.feedLimit` - `25` (Standard) - begrenzt `/blog/feed.xml` auf so
+  viele der neuesten Beiträge. `0` bedeutet unbegrenzt (jeder Beitrag,
+  vollständig). Die meisten Feed-Reader interessieren sich nur für das
+  Neueste, daher verschwendet ein unbegrenzter Feed bei einem Blog mit
+  Hunderten Beiträgen bei jedem Abruf nur Bandbreite - siehe
+  [Blog: Feed](guides/blog.md#feed).
+
+```json title="bxsites.json"
+{ "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
+```
+
+Siehe [Blog](guides/blog.md) für Beitrags-/Autoren-Frontmatter,
+Kategorien, Featured Images und SEO-/Social-Metadaten.
 
 ## Versionierung
 

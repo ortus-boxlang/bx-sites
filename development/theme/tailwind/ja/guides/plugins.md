@@ -1,6 +1,7 @@
 ---
 title: プラグイン
 order: 6
+icon: phosphor-duotone:puzzle-piece
 tags: [ガイド, プラグイン]
 ---
 
@@ -19,13 +20,34 @@ BoxLang 独自のモジュールシステムが*そのまま*プラグインシ�
 { "plugins": [ "myBxSitesPlugin" ] }
 ```
 
+## 公開済みプラグインのインストール
+
+ForgeBox に公開されたプラグインは、`bxSites` バイナリ自体だけでインストールできます -
+`box`/CommandBox は不要です:
+
+```bash title="Usage"
+bxSites install:plugin --name=bx-sites-plugin-analytics [--version=1.2.0]
+```
+
+これはパッケージの zip を ForgeBox からダウンロードし、プロジェクトルートの
+`boxlang_modules/bx-sites-plugin-analytics/` に展開します - BoxLang 独自の
+自動読み込みされるローカルモジュールの規約です（そこにあるモジュールフォルダは、
+npm にとってのプロジェクトローカルな `node_modules/` と同じ方法で検出されます）。
+そのため、`BOXLANG_HOME`/グローバルインストールのステップなしに、実行中の
+BoxLang モジュールレジストリで有効になります。`install:plugin` はそれを
+即座にランタイムに読み込み、実際に登録されたモジュールのマッピング名
+（下記の注記のとおり、これは必ずしも ForgeBox のスラグと同じとは限りません）
+を出力します - 他のインストール済みモジュールと同様に、*その* 名前を
+`bxsites.json` の `plugins` 配列に追加して有効化してください。CLI リファレンスの
+[`install:plugin`](../cli-reference.md#installplugin) を参照してください。
+
 ## プラグインの作成
 
 プラグインモジュールが通常の BoxLang モジュールに追加で必要なのは `models/BxSitesPlugin.bx` クラスだけです。
 すべてのメソッドはオプションです。必要なフックのみを実装してください。BX Sites は呼び出す前に
 各フックの存在をチェックします:
 
-```bx
+```bx title="models/BxSitesPlugin.bx" linenums="1"
 // models/BxSitesPlugin.bx
 class {
 
@@ -60,6 +82,31 @@ class {
 次のフック（または BX Sites 自体）が受け取る値を置き換えます。変更がない場合は受け取った値をそのまま
 返すだけで構いません。
 
+`onPageMarkdown`/`onPageHtml` は、BX Docs がビルドするすべての docs ツリー
+（メインの `docs/` ツリーと各 `docs/versions/<name>/` ツリー）について、
+ページごとに一度実行されます。`onConfig`/`onNav`/`onBuildComplete` は、
+関係する場合はスタンドアロンの `search-index` 動詞にも適用されます
+（`onConfig` は、インデックスビルドが依存する `markdown`/その他の設定を
+変更しうるためです）。
+
+## 各フックが発火するタイミング
+
+```mermaid
+sequenceDiagram
+    participant Build as build 動詞
+    participant Plugin as あなたのプラグイン
+    Build->>Plugin: onConfig(config)
+    Build->>Build: ナビツリーをビルド
+    Build->>Plugin: onNav(nav, config)
+    loop 各ページごと
+        Build->>Plugin: onPageMarkdown(markdown, page, config)
+        Build->>Build: Markdown() + 組み込み拡張機能
+        Build->>Plugin: onPageHtml(html, page, config)
+    end
+    Build->>Build: site/ を書き出す
+    Build->>Plugin: onBuildComplete(siteDir, config)
+```
+
 ## 最小限の例
 
 このリポジトリの `examples/hello-plugin/` は完全に動作するプラグインモジュールです。
@@ -67,7 +114,7 @@ class {
 ビルド完了後に `site/hello-plugin.txt` にビルドサマリを追記します。
 フォルダレイアウトの実例として活用してください:
 
-```
+```text title="hello-plugin/ layout"
 hello-plugin/
 ├── box.json              # boxlang.moduleName が bxsites.json の [plugins] から参照される名前
 ├── ModuleConfig.bx        # 通常の（そうでなければ空の）BoxLang モジュールディスクリプタ

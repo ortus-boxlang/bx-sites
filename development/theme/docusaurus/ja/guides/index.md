@@ -1,6 +1,7 @@
 ---
 title: ガイド
 order: 5
+icon: phosphor-duotone:book-open
 ---
 
 # ガイド
@@ -14,6 +15,7 @@ order: 5
 - [Alpine.js によるインタラクティビティ](interactivity.md) - 追加設定なしのリアクティブなコンテンツ（コピーボタン、ライブフィルタなど）
 - [ブログ](blog.md) - 規約ベースのブログ: 投稿、著者、カテゴリ、アーカイブ、RSS、統計
 - [プラグイン](plugins.md) - 独自の BoxLang モジュールで BX Sites を拡張する
+- [テーマのインポート](theme-import.md) - mkdocs/jekyll/hugo のテーマを bx-sites テーマへベストエフォートで変換する
 - [バージョニング](versioning.md) - リリースのドキュメントをスナップショットし、バージョンスイッチャーを無料で手に入れる
 - [国際化（i18n）](i18n.md) - ドキュメントを他の言語に翻訳する
 - [GitBook からの移行](migrating-from-gitbook.md) - GitBook エクスポートを一つのコマンドで bx-sites プロジェクトに変換する

@@ -9,7 +9,7 @@ tags: [guías, alpine, interactividad]
 
 Cada página construida por BX Sites ya carga [Alpine.js](https://alpinejs.dev/)
 - es lo que impulsa el interruptor de modo oscuro y el desplegable de
-idioma incorporados en cada uno de los tres temas incluidos. Esa misma
+idioma incorporados en todos los temas incluidos. Esa misma
 instancia de Alpine también está disponible para el contenido de tus
 propias páginas, gratis: sin ninguna opción de `bxsites.json` que
 activar, sin ninguna entrada `extraJs` que añadir, sin ninguna etiqueta

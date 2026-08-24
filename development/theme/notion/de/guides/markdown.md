@@ -446,4 +446,3 @@ aber bx-markdown selbst hat über diese drei hinaus keine eigene Meinung -
 jede andere Flexmark-Erweiterung kann direkt mit
 `markdownRegisterExtension()` registriert werden, unabhängig von BX Sites.
 Details dazu in bx-markdowns eigenem Readme.
-</content>

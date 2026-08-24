@@ -1,6 +1,7 @@
 ---
 title: レスポンシブ画像
 order: 5
+icon: phosphor-duotone:image
 tags: [ガイド, 画像, パフォーマンス]
 ---
 
@@ -115,7 +116,7 @@ WebP だけでもサイズ削減の大部分は得られ、対応するツール
 コピー生成を完全にスキップできます（`<img>` のフォールバックとしてプレーンな
 フルサイズの元画像は引き続き保持されます）。`"webp"` を外すと WebP の `<source>`
 自体をまるごとスキップします。`assets.images` のすべてのキーについては
-[設定](../configuration.md) を参照してください。
+[設定](../configuration.md#assets) を参照してください。
 
 ## CSS/JS バンドリング
 

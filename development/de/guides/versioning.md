@@ -103,7 +103,7 @@ Version genauso spiegelt, wie das oberste `docs/i18n/<code>/`
   echten eigenen Index einer Version brauchst. Der
   `pagefind`-Suchanbieter ist die Ausnahme: Er crawlt die *gesamte*
   gebaute `site/` in einem Durchgang, Versionen eingeschlossen - siehe
-  [Suche](search.md#other-search-providers).
+  [Suche](search.md#andere-suchprovider).
 - **Kein Deprecated-/EOL-Flag, kein eigenes Label.** Der
   Umschalter-Eintrag einer Version ist immer nur sein Ordnername - es
   gibt keine Konfiguration, um eine als nicht mehr unterstützt zu
@@ -112,4 +112,3 @@ Version genauso spiegelt, wie das oberste `docs/i18n/<code>/`
   an Ort und Stelle zu lassen (oder ihn zu entfernen und die
   defekten Links in Kauf zu nehmen, genau wie beim Entfernen jeder
   anderen Seite).
-</content>
