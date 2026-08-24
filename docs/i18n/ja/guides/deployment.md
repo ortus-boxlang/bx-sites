@@ -80,3 +80,29 @@ baseURL: "https://<user>.github.io/<repo>/"
 `baseURL` が何をするかの完全な詳細については [設定](../configuration.md#baseurl) を参照してください。
 `<user>.github.io` ユーザーサイト、またはサイトルートにマッピングされたカスタムドメインの
 場合は、`baseURL` をデフォルト（`/`）のままにしておけます。
+
+## サイトへのアクセスを制限する
+
+ここには組み込みのアクセス制御はありません - bx-sites が生成するのはあくまで
+プレーンな静的 `site/` であり、静的ファイルには「誰がリクエストしているか」という
+概念がありません。`bxsites.json` の [`robots: false`](../configuration.md#robotstxt) は、
+行儀の良いクローラーにビルドをインデックスしないよう伝えます（検索結果に出したくない
+ステージング/プレビューデプロイに便利です）が、これはあくまで丁重なお願いであって
+鍵ではありません - URL を持っている人には引き続き機能します。実際にアクセスを
+制限する必要がある場合、それは静的ファイルの手前、つまりそれを配信しているホスト側で
+行う必要があります - よくある、静的サイトに適した選択肢をいくつか挙げます:
+
+- **Cloudflare Pages/Access** - デプロイしたサイトを
+  [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)
+  ポリシー（メールアドレスの許可リスト、SSO、またはワンタイム PIN）の背後に置きます -
+  アプリケーションコードは一切不要です。
+- **Netlify** - サイト設定だけで使える組み込みの
+  [パスワード保護](https://docs.netlify.com/manage/security/secure-access-to-sites/site-protection/)
+  で、サイト単位/デプロイ単位のどちらでも設定できます。
+- **小さなリバースプロキシ**（任意のホスト）- 静的ファイルの手前に HTTP Basic 認証
+  （`.htpasswd` 形式のルール、または一つのファイルで済む Cloudflare Worker/Netlify
+  Edge Function）を置けば、「検索エンジンや無関係な人を締め出す」目的には十分です -
+  ただし、サインイン済みアプリが持つような本物のユーザーごとの識別ではありません。
+
+これらはいずれも bx-sites 自体の機能ではありません - `site/` の配信先ホストの側で
+有効にする、ホストレベルの設定です。
