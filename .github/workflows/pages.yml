@@ -65,7 +65,21 @@ jobs:
       - name: Setup BoxLang
         uses: ortus-boxlang/setup-boxlang@1.4.0
         with:
-          modules: bx-markdown bx-yaml bx-image
+          # `with-commandbox: true` + all four of box.json's own declared
+          # `dependencies` explicitly listed (bx-esapi provides
+          # encodeForHTML/encodeForJavaScript/etc. - used all over every
+          # theme, not just the markdown/yaml/image pipeline) - matches
+          # tests.yml's/docbox.yml's own already-working combination
+          # exactly. An earlier pass on this same branch removed
+          # with-commandbox as apparently-unused overhead (nothing in this
+          # workflow's own steps runs a bare `box` command) without
+          # realizing it was apparently the thing silently auto-installing
+          # box.json's own dependencies - which is also how `modules:`
+          # here ended up missing bx-esapi in the first place and nobody
+          # noticed. Restored rather than re-guessing at exactly what
+          # setup-boxlang does or doesn't need commandbox for.
+          with-commandbox: true
+          modules: bx-esapi bx-yaml bx-markdown bx-image
 
       - name: Register this module so `bxSites` resolves
         run: |
