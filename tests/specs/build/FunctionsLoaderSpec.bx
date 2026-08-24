@@ -1,0 +1,85 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.FunctionsLoader", function() {
+
+			beforeEach( function() {
+				variables.loader = new "models.build.FunctionsLoader@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newDocsDir() {
+				var dir = createTempDirectory( prefix = "bxsites-functionsloader-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "returns an empty struct when functions.bxs doesn't exist", function() {
+				var dir = newDocsDir();
+				var result = loader.load( dir );
+				expect( result ).toBeStruct();
+				expect( result.isEmpty() ).toBeTrue();
+			} );
+
+			it( "loads a single $-prefixed function, callable by its own key", function() {
+				var dir = newDocsDir();
+				fileWrite( dir & "/functions.bxs", 'function $greet( name ) { return "Hi " & arguments.name }' );
+
+				var result = loader.load( dir );
+				expect( result.keyExists( "$greet" ) ).toBeTrue();
+				expect( result[ "$greet" ]( "World" ) ).toBe( "Hi World" );
+			} );
+
+			it( "loads more than one $-prefixed function from the same file", function() {
+				var dir = newDocsDir();
+				fileWrite(
+					dir & "/functions.bxs",
+					'function $greet( name ) { return "Hi " & arguments.name }' & char( 10 ) &
+					'function $shout( text ) { return uCase( arguments.text ) }'
+				);
+
+				var result = loader.load( dir );
+				expect( result.keyExists( "$greet" ) ).toBeTrue();
+				expect( result.keyExists( "$shout" ) ).toBeTrue();
+				expect( result[ "$shout" ]( "loud" ) ).toBe( "LOUD" );
+			} );
+
+			it( "also returns a plain (non-$-prefixed) function declared in the same file", function() {
+				var dir = newDocsDir();
+				fileWrite(
+					dir & "/functions.bxs",
+					'function formatPrice( amount ) { return "$" & arguments.amount }' & char( 10 ) &
+					'function $price( amount ) { return formatPrice( arguments.amount ) }'
+				);
+
+				var result = loader.load( dir );
+				// A private, non-$ helper is still returned (not filtered
+				// out) - a consumer needs it bound alongside its $-prefixed
+				// caller for that caller's own bare-name resolution to
+				// succeed once actually invoked (see FunctionsLoader.bx's
+				// and FunctionScope.bx's own docblocks for why).
+				expect( result.keyExists( "formatPrice" ) ).toBeTrue();
+				expect( result.keyExists( "$price" ) ).toBeTrue();
+			} );
+
+			it( "throws BxSites.InvalidFunctions for a functions.bxs with a syntax error", function() {
+				var dir = newDocsDir();
+				fileWrite( dir & "/functions.bxs", "function $broken( { this is not valid BoxLang" );
+
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidFunctions" );
+			} );
+
+		} );
+	}
+
+}

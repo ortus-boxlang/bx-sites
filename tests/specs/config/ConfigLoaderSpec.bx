@@ -684,6 +684,27 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
+			it( "defaults [variables] to an empty struct", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				var vars = loader.load( dir ).variables;
+				expect( vars ).toBeStruct();
+				expect( vars.isEmpty() ).toBeTrue();
+			} );
+
+			it( "preserves a user-supplied [variables] object, any shape", function() {
+				var dir = newProjectDir( '{"name":"My Docs","variables":{"company":"Ortus","product":{"name":"BoxLang"}}}' );
+				var vars = loader.load( dir ).variables;
+				expect( vars.company ).toBe( "Ortus" );
+				expect( vars.product.name ).toBe( "BoxLang" );
+			} );
+
+			it( "throws BxSites.InvalidConfig when [variables] is not an object", function() {
+				var dir = newProjectDir( '{"name":"My Docs","variables":"nope"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
 			it( "defaults [i18n] to an English default locale and no other locales", function() {
 				var dir = newProjectDir( '{"name":"My Docs"}' );
 				var i18n = loader.load( dir ).i18n;

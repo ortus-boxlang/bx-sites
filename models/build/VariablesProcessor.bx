@@ -1,0 +1,260 @@
+/**
+ * Resolves `{{ }}` expressions in a page's raw markdown body - module spec
+ * section 4's "Reusable variables" and section 8's "magic functions"
+ * (`functions.bxs`), both driven through the same `{{ }}` syntax:
+ *
+ *   - `{{ dotted.path }}` - a dot-path lookup into `bxsites.yaml`'s own
+ *     top-level `variables` block (ConfigLoader.bx), e.g.
+ *     `variables: { company: "Ortus Solutions" }` -> `{{ company }}`.
+ *   - `{{ $name(arg1, arg2) }}` - a call to one of `functions.bxs`'s
+ *     `$`-prefixed magic functions (FunctionsLoader.bx). Arguments are
+ *     comma-separated literals (numbers, `'single'`/`"double"`-quoted
+ *     strings, `true`/`false`) or `{{ }}`-less dotted variable references
+ *     (`greeting.name`, not `{{ greeting.name }}`) - no nested function
+ *     calls or expressions inside an argument in this v1.
+ *
+ * Runs as a single markdown-to-markdown pass (same shape as
+ * MarkdownLinkResolver.bx/IncludeProcessor.bx - no restore step, unlike
+ * TabsProcessor.bx/MathProtector.bx, since the substituted text is meant
+ * to become real markdown source rather than something reversed after
+ * `Markdown()` runs), fence-aware via FenceTracker.bx so a `{{ ... }}`
+ * shown inside a fenced code block (e.g. this very guide, demonstrating
+ * the syntax) is left completely untouched rather than resolved. A `{{ }}`
+ * span is also never matched across a fenced *inline* code span
+ * (`` `{{ example }}` ``) or a line break - deliberately narrow, so a
+ * project showing this syntax in inline code needs to fence it in a code
+ * block instead (the same existing convention `$...$` math/`=== "Tab"`
+ * content-tabs authors already follow - see MathProtector.bx/TabsProcessor.bx).
+ *
+ * A `{{ }}` whose inner text matches neither shape (an unrelated
+ * curly-brace use, e.g. a page discussing some other templating engine's
+ * own `{{ }}` syntax in prose) is left untouched rather than treated as an
+ * error - only a token that *looks* like a variable path or a magic
+ * function call, but fails to resolve, throws (catching real typos without
+ * misreading unrelated `{{ }}` prose as broken syntax).
+ */
+class {
+
+	variables.tokenPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "\{\{[ \t]*([^\n\{\}]+?)[ \t]*\}\}" )
+	variables.identifierPathPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$" )
+	variables.functionCallPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^(\$[A-Za-z_][A-Za-z0-9_]*)\((.*)\)$" )
+	variables.matcherHelper = createObject( "java", "java.util.regex.Matcher" )
+	variables.functionScope = new "models.build.FunctionScope@bxsites"()
+
+	/**
+	 * Resolves every `{{ }}` expression in `markdown`.
+	 *
+	 * @markdown The raw markdown body text
+	 * @vars The site config's own `variables` block (ConfigLoader.bx) - dotted-path lookup target
+	 * @functions FunctionsLoader.load()'s own output - `$`-prefixed callable magic functions
+	 * @context The including page's own docs/-relative path, for error messages only (e.g. "guides/setup.md")
+	 *
+	 * @return markdown with every recognized `{{ }}` expression replaced by its resolved value
+	 */
+	string function resolve( required string markdown, struct vars = {}, struct functions = {}, string context = "" ) {
+		var normalized = arguments.markdown.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" )
+		var lines = listToArray( normalized, char( 10 ), true )
+		var tracker = new "models.build.FenceTracker@bxsites"()
+		var fenced = lines.map( line => tracker.consume( line ) )
+
+		var outputLines = []
+		var i = 1
+		while ( i <= lines.len() ) {
+			if ( fenced[ i ] ) {
+				outputLines.append( lines[ i ] )
+				i++
+				continue
+			}
+
+			var runLines = []
+			while ( i <= lines.len() && !fenced[ i ] ) {
+				runLines.append( lines[ i ] )
+				i++
+			}
+
+			var resolvedRun = resolveRun( runLines.toList( char( 10 ) ), arguments.vars, arguments.functions, arguments.context )
+			for ( var outLine in listToArray( resolvedRun, char( 10 ), true ) ) {
+				outputLines.append( outLine )
+			}
+		}
+
+		return outputLines.toList( char( 10 ) )
+	}
+
+	/**
+	 * Resolves every `{{ }}` token in one fence-free run of text.
+	 */
+	private string function resolveRun( required string text, required struct vars, required struct functions, required string context ) {
+		var matcher = variables.tokenPattern.matcher( arguments.text )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+
+		while ( matcher.find() ) {
+			var expr = trim( matcher.group( 1 ) )
+			var resolved = resolveExpression( expr, arguments.vars, arguments.functions, arguments.context )
+			var replacement = resolved.matched ? resolved.value : matcher.group()
+			matcher.appendReplacement( buffer, variables.matcherHelper.quoteReplacement( replacement ) )
+		}
+		matcher.appendTail( buffer )
+
+		return buffer.toString()
+	}
+
+	/**
+	 * @return { matched: false } when `expr` isn't a recognized variable-path
+	 * or magic-function-call shape at all (left untouched by the caller);
+	 * otherwise `{ matched: true, value: string }` - throws on a recognized
+	 * shape that fails to resolve (unknown variable/function).
+	 */
+	private struct function resolveExpression( required string expr, required struct vars, required struct functions, required string context ) {
+		var callMatcher = variables.functionCallPattern.matcher( arguments.expr )
+		if ( callMatcher.matches() ) {
+			return { matched : true, value : resolveFunctionCall( callMatcher.group( 1 ), callMatcher.group( 2 ), arguments.vars, arguments.functions, arguments.context ) }
+		}
+
+		if ( variables.identifierPathPattern.matcher( arguments.expr ).matches() ) {
+			var lookup = lookupPath( arguments.expr, arguments.vars )
+			if ( !lookup.found ) {
+				throw(
+					type    : "BxSites.UnknownVariable",
+					message : "{{ #arguments.expr# }}#len( arguments.context ) ? ' (in ' & arguments.context & ')' : ''# - no [variables.#arguments.expr#] entry in bxsites.yaml"
+				)
+			}
+			return { matched : true, value : "#lookup.value#" }
+		}
+
+		return { matched : false, value : "" }
+	}
+
+	/**
+	 * @name The matched `$name` call target, dollar sign included
+	 * @rawArgs The call's raw, unparsed argument list text (may be empty)
+	 */
+	private string function resolveFunctionCall( required string name, required string rawArgs, required struct vars, required struct functions, required string context ) {
+		if ( !arguments.functions.keyExists( arguments.name ) ) {
+			throw(
+				type    : "BxSites.UnknownFunction",
+				message : "{{ #arguments.name#(...) }}#len( arguments.context ) ? ' (in ' & arguments.context & ')' : ''# - no magic function named [#arguments.name#] in functions.bxs"
+			)
+		}
+
+		var args = parseArgs( arguments.rawArgs, arguments.vars, arguments.context )
+
+		// Routed through a disposable FunctionScope.bx instance, not called
+		// as a bare local variable holding a detached function value - see
+		// FunctionScope.bx's own docblock for why a magic function invoked
+		// the latter way loses the ability to bare-call a sibling function
+		// from the same functions.bxs (a private helper, or another
+		// `$`-prefixed one), and why binding onto *this* class's own
+		// `variables` scope directly would risk a project's own function
+		// name silently overwriting one of this class's real methods.
+		variables.functionScope.bind( arguments.functions )
+		var result = variables.functionScope.call( arguments.name, args )
+		return "#result#"
+	}
+
+	/**
+	 * Splits a raw argument-list string on top-level commas (quote-aware -
+	 * a comma inside `'...'`/`"..."` doesn't split), then resolves each
+	 * trimmed argument as a literal (number/quoted string/boolean) or a
+	 * dotted variable-path reference.
+	 */
+	private array function parseArgs( required string rawArgs, required struct vars, required string context ) {
+		var trimmed = trim( arguments.rawArgs )
+		if ( !len( trimmed ) ) {
+			return []
+		}
+
+		var parts = splitTopLevel( trimmed )
+		var resolved = []
+		for ( var part in parts ) {
+			resolved.append( resolveArg( trim( part ), arguments.vars, arguments.context ) )
+		}
+		return resolved
+	}
+
+	/**
+	 * Quote-aware top-level comma split - a comma inside a `'...'`/`"..."`
+	 * literal argument doesn't split the list.
+	 */
+	private array function splitTopLevel( required string text ) {
+		var parts = []
+		var current = createObject( "java", "java.lang.StringBuilder" ).init()
+		var quoteChar = ""
+		var chars = arguments.text.toCharArray()
+
+		for ( var c in chars ) {
+			if ( len( quoteChar ) ) {
+				current.append( c )
+				if ( c == quoteChar ) {
+					quoteChar = ""
+				}
+				continue
+			}
+			if ( c == "'" || c == '"' ) {
+				quoteChar = c
+				current.append( c )
+				continue
+			}
+			if ( c == "," ) {
+				parts.append( current.toString() )
+				current = createObject( "java", "java.lang.StringBuilder" ).init()
+				continue
+			}
+			current.append( c )
+		}
+		parts.append( current.toString() )
+		return parts
+	}
+
+	/**
+	 * Resolves one already-trimmed argument token to its BoxLang value.
+	 */
+	private any function resolveArg( required string token, required struct vars, required string context ) {
+		if ( !len( arguments.token ) ) {
+			return ""
+		}
+
+		if ( isNumeric( arguments.token ) ) {
+			return val( arguments.token )
+		}
+
+		if ( arguments.token == "true" ) {
+			return true
+		}
+		if ( arguments.token == "false" ) {
+			return false
+		}
+
+		var first = left( arguments.token, 1 )
+		var last = right( arguments.token, 1 )
+		if ( ( first == "'" || first == '"' ) && first == last && len( arguments.token ) >= 2 ) {
+			return mid( arguments.token, 2, len( arguments.token ) - 2 )
+		}
+
+		var lookup = lookupPath( arguments.token, arguments.vars )
+		if ( !lookup.found ) {
+			throw(
+				type    : "BxSites.UnknownVariable",
+				message : "#arguments.token##len( arguments.context ) ? ' (in ' & arguments.context & ')' : ''# - no [variables.#arguments.token#] entry in bxsites.yaml"
+			)
+		}
+		return lookup.value
+	}
+
+	/**
+	 * Dot-path traversal against `vars` - `"support.email"` -> `vars.support.email`.
+	 *
+	 * @return { found: boolean, value: any }
+	 */
+	private struct function lookupPath( required string path, required struct vars ) {
+		var current = arguments.vars
+		for ( var segment in listToArray( arguments.path, "." ) ) {
+			if ( !isStruct( current ) || !current.keyExists( segment ) ) {
+				return { found : false, value : "" }
+			}
+			current = current[ segment ]
+		}
+		return { found : true, value : current }
+	}
+
+}

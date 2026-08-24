@@ -80,6 +80,7 @@ class {
 		},
 		"plugins"      : [],
 		"redirects"    : [],
+		"variables"    : {},
 		"i18n"         : { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] },
 		"blog"         : { "postsPerPage" : 10, "feed" : true, "feedLimit" : 25 }
 	}
@@ -438,8 +439,34 @@ class {
 		validateI18n( arguments.config.i18n ?: "" )
 		validateBlog( arguments.config.blog ?: "" )
 		validateRedirects( arguments.config.redirects ?: "" )
+		validateVariables( arguments.config.variables ?: "" )
 
 		return arguments.config
+	}
+
+	/**
+	 * Validates the site config's `variables` block (module spec section 4,
+	 * "Reusable variables") - an arbitrary, optionally-nested struct of
+	 * project-defined values, resolved in markdown content via
+	 * `{{ dotted.path }}` (VariablesProcessor.bx). No shape is enforced
+	 * beyond "it's an object" - any value type (string/number/boolean/array/
+	 * nested object) is valid, since VariablesProcessor only ever needs
+	 * `toString()` on whatever it finds at the end of a dotted path.
+	 *
+	 * @vars The merged config's own `variables` value - `any`, not
+	 * `struct`, for the same reason validateI18n() takes `any` (see its own
+	 * docblock). Named `vars`, not `variables` - a parameter named
+	 * `variables` would shadow this class's own `variables` scope for the
+	 * rest of the method body (see AGENTS.md's "parameter name shadows"
+	 * gotcha), breaking every `variables.configFileName` reference below.
+	 */
+	private void function validateVariables( required any vars ) {
+		if ( !isStruct( arguments.vars ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [variables], when present, must be an object"
+			)
+		}
 	}
 
 	/**

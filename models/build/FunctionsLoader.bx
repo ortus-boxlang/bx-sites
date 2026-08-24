@@ -1,0 +1,87 @@
+/**
+ * Loads a project's "magic functions" - `docs/functions.bxs`
+ * (`docs/versions/<name>/functions.bxs`, `docs/i18n/<code>/functions.bxs`
+ * inside a version/locale tree, mirroring every other by-convention file
+ * this module already supports), a plain BoxLang script a project author
+ * drops in to make small helper functions available everywhere page
+ * content gets built - no plugin module, no wiring, just a file.
+ *
+ * A magic function's name must start with `$` - `function $greet( name ) {...}`
+ * - the sigil marks a function as one of this file's *public* helpers,
+ * meant to be called directly, either as `{{ $greet(...) }}` from markdown
+ * (VariablesProcessor.bx only ever recognizes a `$`-prefixed call target -
+ * see its own docblock) or bare as `$greet(...)` from a project's own
+ * `theme/` `.bxm` overrides (ThemeRenderer.bx). A plain, non-`$` function
+ * declared in the same file is a private helper, meant to be called only
+ * from another function inside `functions.bxs` itself - `load()` still
+ * returns it (see below for why), but nothing calls it *directly* by that
+ * bare name outside of `functions.bxs`'s own functions calling each other.
+ *
+ * The loading mechanism relies on BoxLang's own `include` scope-absorption
+ * (the same mechanism ThemeRenderer.bx already leans on for `layout.bxm`/
+ * `page.bxm`): `include`-ing a plain script from inside a class method
+ * writes any top-level `function name(){...}` declaration straight into
+ * that method's owning instance's own `variables` scope, indistinguishable
+ * from a method the class declared itself. Snapshotting `variables`' own
+ * keys immediately before the include, then diffing after, isolates
+ * exactly the new functions `functions.bxs` just contributed - dropping
+ * this class's own `load()` method itself (always present before and
+ * after), the only thing filtered out.
+ *
+ * `load()` deliberately returns *every* function `functions.bxs` declares,
+ * `$`-prefixed or not, rather than dropping the plain ones - a bare-name
+ * call BoxLang resolves inside a function's own body (e.g. `$price()`
+ * calling a private `formatPrice()`) only succeeds when that callee is
+ * itself reachable in whatever scope the caller is eventually invoked
+ * from. Both real call sites (VariablesProcessor.bx, ThemeRenderer.bx)
+ * bind this whole struct into their own instance scope before calling
+ * anything from it, precisely so a `$`-prefixed function can still reach
+ * its own file's private helpers once it's actually invoked - dropping the
+ * plain ones here would silently break that for every consumer.
+ *
+ * A project with no `functions.bxs` simply has no magic functions -
+ * `load()` returns an empty struct, same "opt-in by presence" shape as
+ * BlogAuthorsLoader.bx's `authors.yml`.
+ */
+class {
+
+	/**
+	 * Loads `docs/functions.bxs` (or `src/functions.bxs`, whichever the
+	 * caller resolved) - every function it declares, `$`-prefixed or not
+	 * (see this class's own docblock for why the plain ones are kept too).
+	 *
+	 * @docsDir Absolute path to the project's (or version/locale tree's own) docs/ directory
+	 *
+	 * @return Struct keyed by function name, each value a callable BoxLang function
+	 */
+	struct function load( required string docsDir ) {
+		var dir = arguments.docsDir.reReplace( "[\/]+$", "" )
+		var functionsPath = dir & "/functions.bxs"
+
+		if ( !fileExists( functionsPath ) ) {
+			return {}
+		}
+
+		var before = structKeyArray( variables )
+		try {
+			include functionsPath
+		} catch ( any e ) {
+			throw(
+				type    : "BxSites.InvalidFunctions",
+				message : "functions.bxs at [#functionsPath#] failed to load: #e.message#"
+			)
+		}
+
+		var fns = {}
+		for ( var key in variables ) {
+			if (
+				!before.contains( key )
+				&& ( isCustomFunction( variables[ key ] ) || isClosure( variables[ key ] ) )
+			) {
+				fns[ key ] = variables[ key ]
+			}
+		}
+		return fns
+	}
+
+}
