@@ -1,0 +1,63 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.RobotsTxtGenerator", function() {
+
+			beforeEach( function() {
+				variables.generator = new "models.build.RobotsTxtGenerator@bxsites"();
+			} );
+
+			it( "allows every crawler and points at sitemap.xml when a site url is known", function() {
+				var content = generator.build( "https://example.com/", true );
+
+				expect( content ).toInclude( "User-agent: *" );
+				expect( content ).toInclude( "Allow: /" );
+				expect( content ).toInclude( "Sitemap: https://example.com/sitemap.xml" );
+			} );
+
+			it( "omits the Sitemap line when the site url is unknown", function() {
+				var content = generator.build( "", true );
+
+				expect( content ).toInclude( "Allow: /" );
+				expect( content ).notToInclude( "Sitemap:" );
+			} );
+
+			it( "disallows everything and omits Sitemap when robots is false, even with a known site url", function() {
+				var content = generator.build( "https://example.com/", false );
+
+				expect( content ).toInclude( "Disallow: /" );
+				expect( content ).notToInclude( char( 10 ) & "Allow: /" );
+				expect( content ).notToInclude( "Sitemap:" );
+			} );
+
+			it( "defaults allowed to true", function() {
+				var content = generator.build( "" );
+
+				expect( content ).toInclude( "Allow: /" );
+			} );
+
+			it( "resolve() generates normally when no docs/robots.txt override exists", function() {
+				var content = generator.resolve( "/tmp/bxsites-robots-spec-nonexistent", "https://example.com/", true );
+
+				expect( content ).toInclude( "Allow: /" );
+				expect( content ).toInclude( "Sitemap: https://example.com/sitemap.xml" );
+			} );
+
+			it( "resolve() passes a docs/robots.txt override through verbatim, ignoring the robots config key entirely", function() {
+				var docsDir = "/tmp/bxsites-robots-spec-override";
+				directoryCreate( docsDir, true, true );
+				fileWrite( docsDir & "/robots.txt", "User-agent: *" & char( 10 ) & "Disallow: /internal/" & char( 10 ) & "Sitemap: https://custom.example.com/sitemap.xml" & char( 10 ) );
+
+				var content = generator.resolve( docsDir, "https://example.com/", false );
+
+				expect( content ).toInclude( "Disallow: /internal/" );
+				expect( content ).toInclude( "Sitemap: https://custom.example.com/sitemap.xml" );
+				expect( content ).notToInclude( char( 10 ) & "Allow: /" );
+
+				directoryDelete( docsDir, true );
+			} );
+
+		} );
+	}
+
+}

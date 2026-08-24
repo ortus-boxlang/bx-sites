@@ -1,0 +1,116 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.MarkdownZipMigrator", function() {
+
+			beforeEach( function() {
+				variables.migrator = new "models.build.MarkdownZipMigrator@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newTempDir( string prefix = "bxsites-mdzip-" ) {
+				var dir = createTempDirectory( prefix = arguments.prefix );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			private string function zipOf( required string sourceDir ) {
+				var zipPath = newTempDir() & "/export.zip";
+				compress( source = arguments.sourceDir, destination = zipPath, format = "zip", overwrite = true )
+				return zipPath
+			}
+
+			it( "throws BxSites.MigrateSourceNotFound when source isn't a .zip file", function() {
+				var root = newTempDir();
+				expect( function() {
+					migrator.migrate( root & "/nope.zip", root )
+				} ).toThrow( "BxSites.MigrateSourceNotFound" )
+			} );
+
+			it( "copies every .md file into docs/, preserving folder structure", function() {
+				var src = newTempDir()
+				directoryCreate( src & "/guides", true, true )
+				fileWrite( src & "/index.md", "Home" )
+				fileWrite( src & "/guides/setup.md", "Setup body" )
+
+				var root = newTempDir()
+				var result = migrator.migrate( zipOf( src ), root )
+
+				expect( result.pagesConverted ).toBe( 2 )
+				expect( fileRead( root & "/docs/index.md" ) ).toBe( "Home" )
+				expect( fileRead( root & "/docs/guides/setup.md" ) ).toBe( "Setup body" )
+			} );
+
+			it( "unwraps a single top-level export folder", function() {
+				var src = newTempDir()
+				directoryCreate( src & "/my-export", true, true )
+				fileWrite( src & "/my-export/index.md", "Home" )
+
+				var root = newTempDir()
+				migrator.migrate( zipOf( src ), root )
+
+				expect( fileRead( root & "/docs/index.md" ) ).toBe( "Home" )
+				expect( directoryExists( root & "/docs/my-export" ) ).toBeFalse()
+			} );
+
+			it( "relocates a non-.md asset to docs/assets/imported/ and rewrites the page's own reference to it", function() {
+				var src = newTempDir()
+				directoryCreate( src & "/images", true, true )
+				fileWrite( src & "/index.md", "See ![pic](images/pic.png)." )
+				fileWrite( src & "/images/pic.png", "fake-bytes" )
+
+				var root = newTempDir()
+				var result = migrator.migrate( zipOf( src ), root )
+
+				expect( result.assetsConverted ).toBe( 1 )
+				expect( fileExists( root & "/docs/assets/imported/images/pic.png" ) ).toBeTrue()
+				expect( fileRead( root & "/docs/index.md" ) ).toInclude( "assets/imported/images/pic.png" )
+			} );
+
+			it( "leaves a .md-to-.md link untouched", function() {
+				var src = newTempDir()
+				fileWrite( src & "/index.md", "See [setup](setup.md)." )
+				fileWrite( src & "/setup.md", "Setup body" )
+
+				var root = newTempDir()
+				migrator.migrate( zipOf( src ), root )
+
+				expect( fileRead( root & "/docs/index.md" ) ).toInclude( "[setup](setup.md)" )
+			} );
+
+			it( "throws BxSites.MigrateNoMarkdownFound when the zip has no .md files at all", function() {
+				var src = newTempDir()
+				fileWrite( src & "/readme.txt", "no markdown here" )
+
+				var root = newTempDir()
+				expect( function() {
+					migrator.migrate( zipOf( src ), root )
+				} ).toThrow( "BxSites.MigrateNoMarkdownFound" )
+			} );
+
+			it( "warns rather than silently overwriting a page that already exists in docs/", function() {
+				var src = newTempDir()
+				fileWrite( src & "/index.md", "New content" )
+
+				var root = newTempDir()
+				directoryCreate( root & "/docs", true, true )
+				fileWrite( root & "/docs/index.md", "Pre-existing content" )
+
+				var result = migrator.migrate( zipOf( src ), root )
+
+				expect( result.warnings.len() ).toBe( 1 )
+				expect( fileRead( root & "/docs/index.md" ) ).toBe( "New content" )
+			} );
+
+		} );
+	}
+
+}

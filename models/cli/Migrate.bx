@@ -1,20 +1,24 @@
 /**
- * `migrate` CLI verb - converts a GitBook export or an mkdocs project into
- * this project's own `docs/` tree (GitBookMigrator.bx / MkdocsMigrator.bx).
- * CLI-agnostic: takes an already-parsed options struct (see
- * ModuleConfig.bx's main()), never touches raw argv or the current working
- * directory itself.
+ * `migrate` CLI verb - converts a GitBook export, an mkdocs project, a
+ * plain zip of Markdown files, or a Notion export into this project's own
+ * `docs/` tree (GitBookMigrator.bx / MkdocsMigrator.bx /
+ * MarkdownZipMigrator.bx / NotionMigrator.bx). CLI-agnostic: takes an
+ * already-parsed options struct (see ModuleConfig.bx's main()), never
+ * touches raw argv or the current working directory itself.
  */
 class {
 
 	/**
-	 * Dispatches the `migrate` verb: validates `--source` points at a real
-	 * directory, then hands off to the migrator `--from` selects
-	 * (`gitbook`, the default, or `mkdocs`) and reports its own result
-	 * (including anything it couldn't auto-convert) as the verb's own
-	 * message.
+	 * Dispatches the `migrate` verb: validates `--source` points at
+	 * something real for whichever `--from` selects (`gitbook`, the
+	 * default, `mkdocs`, `markdown-zip`, or `notion` - `gitbook`/`mkdocs`/
+	 * `notion` expect a directory, `markdown-zip` a `.zip` file, `notion`
+	 * accepts either since a Notion export is commonly handed over as a
+	 * `.zip` but works equally well already-extracted), then hands off to
+	 * that migrator and reports its own result (including anything it
+	 * couldn't auto-convert) as the verb's own message.
 	 *
-	 * @options { projectRoot (required, absolute path), source (required, path to a GitBook export containing SUMMARY.md, or an mkdocs project containing mkdocs.yml), from ("gitbook" (default) or "mkdocs") }
+	 * @options { projectRoot (required, absolute path), source (required, path to a GitBook export containing SUMMARY.md, an mkdocs project containing mkdocs.yml, a plain .zip of Markdown files, or a Notion export .zip/folder), from ("gitbook" (default), "mkdocs", "markdown-zip", or "notion") }
 	 */
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
@@ -26,22 +30,40 @@ class {
 		if ( !len( source ) ) {
 			throw(
 				type    = "BxSites.MissingMigrateSource",
-				message = "`migrate` requires --source=<path> - a GitBook export directory containing SUMMARY.md, or an mkdocs project containing mkdocs.yml (with --from=mkdocs)"
+				message = "`migrate` requires --source=<path> - a GitBook export directory containing SUMMARY.md, an mkdocs project containing mkdocs.yml (with --from=mkdocs), a plain .zip of Markdown files (with --from=markdown-zip), or a Notion export .zip/folder (with --from=notion)"
 			)
-		}
-		if ( !directoryExists( source ) ) {
-			throw( type = "BxSites.MigrateSourceNotFound", message = "No directory at [#source#]" )
 		}
 
 		var from = lCase( trim( len( trim( arguments.options.from ?: "" ) ) ? arguments.options.from : "gitbook" ) )
-		if ( !listFindNoCase( "gitbook,mkdocs", from ) ) {
+		if ( !listFindNoCase( "gitbook,mkdocs,markdown-zip,notion", from ) ) {
 			throw(
 				type    = "BxSites.InvalidMigrateSource",
-				message = "`migrate` --from, when present, must be one of: gitbook, mkdocs (got [#from#])"
+				message = "`migrate` --from, when present, must be one of: gitbook, mkdocs, markdown-zip, notion (got [#from#])"
 			)
 		}
 
-		return from == "mkdocs" ? runMkdocs( source, projectRoot ) : runGitBook( source, projectRoot )
+		if ( from == "markdown-zip" ) {
+			if ( !fileExists( source ) ) {
+				throw( type = "BxSites.MigrateSourceNotFound", message = "No .zip file at [#source#]" )
+			}
+		} else if ( from == "notion" ) {
+			if ( !fileExists( source ) && !directoryExists( source ) ) {
+				throw( type = "BxSites.MigrateSourceNotFound", message = "No file or directory at [#source#]" )
+			}
+		} else if ( !directoryExists( source ) ) {
+			throw( type = "BxSites.MigrateSourceNotFound", message = "No directory at [#source#]" )
+		}
+
+		switch ( from ) {
+			case "mkdocs":
+				return runMkdocs( source, projectRoot )
+			case "markdown-zip":
+				return runMarkdownZip( source, projectRoot )
+			case "notion":
+				return runNotion( source, projectRoot )
+			default:
+				return runGitBook( source, projectRoot )
+		}
 	}
 
 	/**
@@ -74,6 +96,32 @@ class {
 		if ( len( result.navPath ) ) {
 			message &= " and #result.navPath#"
 		}
+		return { exitCode : 0, message : withWarnings( message, result.warnings ) }
+	}
+
+	/**
+	 * @source Absolute path to the `.zip` file
+	 * @projectRoot Absolute path to the target bx-sites project root
+	 */
+	private struct function runMarkdownZip( required string source, required string projectRoot ) {
+		var migrator = new "models.build.MarkdownZipMigrator@bxsites"()
+		var result = migrator.migrate( arguments.source, arguments.projectRoot )
+		var sourceDirName = new "models.config.SourceDirResolver@bxsites"().name( arguments.projectRoot )
+
+		var message = "Migrated #result.pagesConverted# page(s) and #result.assetsConverted# asset(s) from [#arguments.source#] into #arguments.projectRoot#/#sourceDirName#/"
+		return { exitCode : 0, message : withWarnings( message, result.warnings ) }
+	}
+
+	/**
+	 * @source Absolute path to a Notion export `.zip`, or an already-extracted export folder
+	 * @projectRoot Absolute path to the target bx-sites project root
+	 */
+	private struct function runNotion( required string source, required string projectRoot ) {
+		var migrator = new "models.build.NotionMigrator@bxsites"()
+		var result = migrator.migrate( arguments.source, arguments.projectRoot )
+		var sourceDirName = new "models.config.SourceDirResolver@bxsites"().name( arguments.projectRoot )
+
+		var message = "Migrated #result.pagesConverted# page(s) and #result.assetsConverted# asset(s) from [#arguments.source#] into #arguments.projectRoot#/#sourceDirName#/"
 		return { exitCode : 0, message : withWarnings( message, result.warnings ) }
 	}
 

@@ -1,0 +1,111 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.NotionMigrator", function() {
+
+			beforeEach( function() {
+				variables.migrator = new "models.build.NotionMigrator@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function newTempDir( string prefix = "bxsites-notion-" ) {
+				var dir = createTempDirectory( prefix = arguments.prefix );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "throws BxSites.MigrateSourceNotFound when source is neither a .zip nor a directory", function() {
+				var root = newTempDir();
+				expect( function() {
+					migrator.migrate( root & "/nope", root );
+				} ).toThrow( "BxSites.MigrateSourceNotFound" );
+			} );
+
+			it( "throws BxSites.MigrateNoMarkdownFound when the export has no .md files", function() {
+				var src = newTempDir();
+				fileWrite( src & "/readme.txt", "no markdown here" );
+
+				var root = newTempDir();
+				expect( function() {
+					migrator.migrate( src, root );
+				} ).toThrow( "BxSites.MigrateNoMarkdownFound" );
+			} );
+
+			it( "strips a page's own Notion id suffix, slugifies the filename, and promotes its leading heading into frontmatter", function() {
+				var src = newTempDir();
+				fileWrite( src & "/Getting Started 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d.md", "## Getting Started" & char( 10 ) & char( 10 ) & "Welcome!" );
+
+				var root = newTempDir();
+				var result = migrator.migrate( src, root );
+
+				expect( result.pagesConverted ).toBe( 1 );
+				expect( fileExists( root & "/docs/getting-started.md" ) ).toBeTrue();
+				var content = fileRead( root & "/docs/getting-started.md" );
+				expect( content ).toInclude( "title: Getting Started" );
+				expect( content ).toInclude( "Welcome!" );
+				// The duplicate leading "## Getting Started" heading shouldn't survive into the body
+				expect( content ).notToInclude( "## Getting Started" & char( 10 ) );
+			} );
+
+			it( "cleans a nested sub-page's own folder+file id suffixes and rewrites the URL-encoded link between them", function() {
+				var src = newTempDir();
+				directoryCreate( src & "/Getting Started 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d", true, true );
+				fileWrite(
+					src & "/Getting Started 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d.md",
+					"## Getting Started" & char( 10 ) & char( 10 ) & "See [Setup](Getting%20Started%201a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d/Setup%20Guide%20aabbccddeeff00112233445566778899.md)."
+				);
+				fileWrite(
+					src & "/Getting Started 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d/Setup Guide aabbccddeeff00112233445566778899.md",
+					"## Setup Guide" & char( 10 ) & char( 10 ) & "Back to [Getting Started](../Getting%20Started%201a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d.md)."
+				);
+
+				var root = newTempDir();
+				var result = migrator.migrate( src, root );
+
+				expect( result.pagesConverted ).toBe( 2 );
+				expect( fileExists( root & "/docs/getting-started.md" ) ).toBeTrue();
+				expect( fileExists( root & "/docs/getting-started/setup-guide.md" ) ).toBeTrue();
+				expect( fileRead( root & "/docs/getting-started.md" ) ).toInclude( "getting-started/setup-guide.md" );
+				expect( fileRead( root & "/docs/getting-started/setup-guide.md" ) ).toInclude( "../getting-started.md" );
+			} );
+
+			it( "relocates a referenced image to docs/assets/imported/ and rewrites the link to match", function() {
+				var src = newTempDir();
+				directoryCreate( src & "/Page 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d/images", true, true );
+				fileWrite(
+					src & "/Page 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d.md",
+					"## Page" & char( 10 ) & char( 10 ) & "![diagram](Page%201a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d/images/diagram%20112233445566778899aabbccddeeff00.png)"
+				);
+				fileWrite( src & "/Page 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d/images/diagram 112233445566778899aabbccddeeff00.png", "fake-bytes" );
+
+				var root = newTempDir();
+				var result = migrator.migrate( src, root );
+
+				expect( result.assetsConverted ).toBe( 1 );
+				expect( fileExists( root & "/docs/assets/imported/page/images/diagram.png" ) ).toBeTrue();
+				expect( fileRead( root & "/docs/page.md" ) ).toInclude( "assets/imported/page/images/diagram.png" );
+			} );
+
+			it( "works from an already-extracted export directory just as well as from a .zip", function() {
+				var src = newTempDir();
+				fileWrite( src & "/Plain Page.md", "## Plain Page" & char( 10 ) & char( 10 ) & "No id suffix here." );
+
+				var root = newTempDir();
+				var result = migrator.migrate( src, root );
+
+				expect( result.pagesConverted ).toBe( 1 );
+				expect( fileExists( root & "/docs/plain-page.md" ) ).toBeTrue();
+			} );
+
+		} );
+	}
+
+}

@@ -1,0 +1,60 @@
+/**
+ * Builds a standard `robots.txt` - permissive by default (every crawler
+ * allowed, pointed at `sitemap.xml` when an absolute site URL is known,
+ * same gating `SitemapGenerator.bx` already uses), or fully closed when a
+ * project sets `bxsites.json`'s `robots: false` - the common "don't index
+ * this staging/internal deploy at all" need, distinct from a single
+ * page's own `hidden: true` (which only ever means "not linked from nav/
+ * search/sitemap," never "actively tell crawlers to stay out").
+ */
+class {
+
+	/**
+	 * @siteUrl The absolute site URL, ending with `/` (BaseUrlResolver's `absolute`), or "" if unknown - omits the `Sitemap:` line, same as sitemap.xml itself is skipped without one
+	 * @allowed `bxsites.json`'s `robots` - `true` (the default) allows every crawler; `false` disallows everything
+	 *
+	 * @return The rendered robots.txt content
+	 */
+	string function build( required string siteUrl, boolean allowed = true ) {
+		var lines = [
+			"User-agent: *",
+			arguments.allowed ? "Allow: /" : "Disallow: /"
+		]
+
+		if ( arguments.allowed && len( arguments.siteUrl ) ) {
+			lines.append( "" )
+			lines.append( "Sitemap: " & arguments.siteUrl & "sitemap.xml" )
+		}
+
+		lines.append( "" )
+
+		return lines.toList( char( 10 ) )
+	}
+
+	/**
+	 * A project's own hand-authored `robots.txt`, sitting right next to
+	 * `index.md` in its source folder (`docs/robots.txt` or `src/robots.txt`,
+	 * whichever `SourceDirResolver.bx` resolved), wins outright over the
+	 * generated one - copied through byte-for-byte, `robots` config key
+	 * ignored entirely. This is the only override mechanism: custom rules
+	 * (specific disallowed paths, multiple sitemaps, crawl-delay, per-agent
+	 * blocks) aren't expressible through `bxsites.json`/`.yaml`, so a
+	 * project that needs any of that authors the whole file itself instead.
+	 *
+	 * @docsDir Absolute path to this project's resolved source content folder (SourceDirResolver.bx - `docs/` or `src/`)
+	 * @siteUrl The absolute site URL, ending with `/` (BaseUrlResolver's `absolute`), or "" if unknown - omits the `Sitemap:` line, same as sitemap.xml itself is skipped without one
+	 * @allowed `bxsites.json`'s `robots` - `true` (the default) allows every crawler; `false` disallows everything - ignored entirely when an override file exists
+	 *
+	 * @return The `robots.txt` content to write to `site/robots.txt`
+	 */
+	string function resolve( required string docsDir, required string siteUrl, boolean allowed = true ) {
+		var overridePath = arguments.docsDir & "/robots.txt"
+
+		if ( fileExists( overridePath ) ) {
+			return fileRead( overridePath )
+		}
+
+		return build( arguments.siteUrl, arguments.allowed )
+	}
+
+}

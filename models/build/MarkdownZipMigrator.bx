@@ -1,0 +1,240 @@
+/**
+ * Converts a plain `.zip` of Markdown files (no proprietary export format
+ * of its own to translate - unlike GitBookMigrator.bx's `SUMMARY.md` or
+ * MkdocsMigrator.bx's `mkdocs.yml`) into a bx-sites project's `docs/` tree.
+ * A folder's own nesting already *is* bx-sites' own nav convention, and a
+ * page-to-page relative `.md` link inside the zip already resolves exactly
+ * the way bx-sites expects - so this is mostly a straight copy. The one
+ * real translation: every non-`.md` file (images, PDFs, ...) is relocated
+ * to `docs/assets/imported/<same-relative-path>` (bx-sites' asset pipeline
+ * only ever publishes `docs/assets/**`), with every page's own reference to
+ * it rewritten to match - the same shape MkdocsMigrator.bx's own
+ * `copyDocsTree()`/`rewriteAssetRefs()` already use for the same reason.
+ *
+ * No `bxsites.yaml`/`docs/nav.json` is written - a plain zip carries no
+ * site name/nav structure to translate, unlike mkdocs.yml/SUMMARY.md.
+ */
+class {
+
+	variables.sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
+
+	/**
+	 * Extracts `source` (a `.zip` path) to a throwaway temp directory,
+	 * unwraps a single top-level wrapper folder if the zip has one (the
+	 * common "export-name/*.md" shape most zip tools produce), then copies
+	 * every file across into `projectRoot`'s own `docs/`.
+	 *
+	 * @source Absolute path to the `.zip` file
+	 * @projectRoot Absolute path to the target bx-sites project root
+	 *
+	 * @return { pagesConverted: numeric, assetsConverted: numeric, warnings: array of human-readable strings }
+	 */
+	struct function migrate( required string source, required string projectRoot ) {
+		if ( !fileExists( arguments.source ) || !arguments.source.reFindNoCase( "\.zip$" ) ) {
+			throw(
+				type    = "BxSites.MigrateSourceNotFound",
+				message = "No .zip file found at [#arguments.source#] - a Markdown-zip migration requires a path to a .zip archive"
+			)
+		}
+
+		var docsDir = variables.sourceDirResolver.resolve( arguments.projectRoot )
+		if ( !directoryExists( docsDir ) ) {
+			directoryCreate( docsDir, true, true )
+		}
+
+		var tempDir = getTempDirectory().reReplace( "[\/]+$", "" ) & "/bxsites-markdown-zip-" & createUUID()
+		directoryCreate( tempDir, true, true )
+
+		try {
+			extract( source = arguments.source, destination = tempDir, format = "zip", overwrite = true )
+
+			var extractedRoot = unwrapSingleFolder( tempDir )
+			if ( !containsMarkdown( extractedRoot ) ) {
+				throw(
+					type    = "BxSites.MigrateNoMarkdownFound",
+					message = "No .md files found inside [#arguments.source#]"
+				)
+			}
+
+			var warnings = []
+			var copyResult = copyDocsTree( extractedRoot, docsDir, warnings )
+
+			return {
+				pagesConverted  : copyResult.pagesConverted,
+				assetsConverted : copyResult.assetsConverted,
+				warnings        : warnings
+			}
+		} finally {
+			if ( directoryExists( tempDir ) ) {
+				directoryDelete( tempDir, true )
+			}
+		}
+	}
+
+	/**
+	 * Descends into a lone top-level subfolder, up to 3 levels deep - the
+	 * common "the zip wraps everything in one export-name folder" shape.
+	 * Stops as soon as there's more than one top-level entry, or a `.md`
+	 * file sits right there already.
+	 *
+	 * @dir The extracted zip's own root
+	 */
+	private string function unwrapSingleFolder( required string dir ) {
+		var current = arguments.dir
+		for ( var i = 1; i <= 3; i++ ) {
+			var entries = directoryList( current, false, "path" )
+			if ( entries.len() != 1 || !directoryExists( entries[ 1 ] ) ) {
+				break
+			}
+			current = entries[ 1 ]
+		}
+		return current
+	}
+
+	/**
+	 * @dir Absolute path to search
+	 *
+	 * @return true if at least one `.md` file exists anywhere under `dir`
+	 */
+	private boolean function containsMarkdown( required string dir ) {
+		return directoryList( arguments.dir, true, "path", "*.md" ).len() > 0
+	}
+
+	/**
+	 * Copies every file from the extracted zip into `docsDir` - every
+	 * `.md` file with its asset references rewritten (rewriteAssetRefs()),
+	 * every other file relocated to `docsDir/assets/imported/<same-relative-path>`,
+	 * the same shape MkdocsMigrator.bx's own `copyDocsTree()` already uses.
+	 *
+	 * @sourceDir Absolute path to the (already unwrapped) extracted zip root
+	 * @docsDir Absolute path to the target project's docs/ directory
+	 * @warnings Accumulator array, mutated in place
+	 *
+	 * @return { pagesConverted: numeric, assetsConverted: numeric }
+	 */
+	private struct function copyDocsTree( required string sourceDir, required string docsDir, required array warnings ) {
+		var allFiles = directoryList( arguments.sourceDir, true, "path" ).filter( path => !directoryExists( path ) )
+		var pagesConverted = 0
+		var assetsConverted = 0
+
+		// Assets first, so every .md page's own rewriteAssetRefs() below can
+		// already tell "does this reference point at a file we're relocating".
+		for ( var sourcePath in allFiles ) {
+			var relativePath = sourcePath.reReplace( "^" & reEscape( arguments.sourceDir ), "", "one" ).reReplace( "^[\/]", "" )
+			if ( relativePath.reFindNoCase( "\.md$" ) ) {
+				continue
+			}
+			var destPath = arguments.docsDir & "/assets/imported/" & relativePath
+			var destDir = getDirectoryFromPath( destPath )
+			if ( len( destDir ) && !directoryExists( destDir ) ) {
+				directoryCreate( destDir, true, true )
+			}
+			fileCopy( sourcePath, destPath )
+			assetsConverted++
+		}
+
+		for ( var sourcePath in allFiles ) {
+			var relativePath = sourcePath.reReplace( "^" & reEscape( arguments.sourceDir ), "", "one" ).reReplace( "^[\/]", "" )
+			if ( !relativePath.reFindNoCase( "\.md$" ) ) {
+				continue
+			}
+			var pageDir = getDirectoryFromPath( relativePath ).reReplace( "[\/]$", "" )
+			if ( pageDir == "." ) {
+				pageDir = ""
+			}
+			var converted = rewriteAssetRefs( fileRead( sourcePath ), pageDir, arguments.sourceDir )
+
+			var destPath = arguments.docsDir & "/" & relativePath
+			var destDir = getDirectoryFromPath( destPath )
+			if ( len( destDir ) && !directoryExists( destDir ) ) {
+				directoryCreate( destDir, true, true )
+			}
+			if ( fileExists( destPath ) ) {
+				arguments.warnings.append( "#relativePath# already existed in docs/ and was overwritten by this migration" )
+			}
+			fileWrite( destPath, converted )
+			pagesConverted++
+		}
+
+		return { pagesConverted : pagesConverted, assetsConverted : assetsConverted }
+	}
+
+	/**
+	 * Rewrites every non-`.md` markdown link/image target in one page's
+	 * raw text that resolves (relative to the page's own directory, within
+	 * the extracted zip) to a real file - to the correct relative path
+	 * reaching that file's new `assets/imported/...` location instead,
+	 * accounting for the page's own nesting depth. A `.md` link, an
+	 * absolute URL, or a reference that doesn't resolve to a real file is
+	 * left untouched. Identical approach to MkdocsMigrator.bx's own
+	 * `rewriteAssetRefs()`.
+	 *
+	 * @text One page's raw markdown body
+	 * @pageDir The page's own zip-relative directory ("" for a root-level page)
+	 * @sourceDir Absolute path to the extracted zip root, to resolve/verify a reference against
+	 */
+	private string function rewriteAssetRefs( required string text, required string pageDir, required string sourceDir ) {
+		var pattern = createObject( "java", "java.util.regex.Pattern" ).compile( '\]\(([^)\s]+)(\s+"[^"]*")?\)' )
+		var matcher = pattern.matcher( arguments.text )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+
+		while ( matcher.find() ) {
+			var target = matcher.group( 1 )
+			var titlePart = isNull( matcher.group( 2 ) ) ? "" : matcher.group( 2 )
+			var rewritten = target
+
+			if ( !target.reFindNoCase( "\.md($|[##?])" ) && !target.reFindNoCase( "^[a-z][a-z0-9+.\-]*:" ) && target.left( 1 ) != "##" ) {
+				var rootRelative = normalizeRelativePath( len( arguments.pageDir ) ? arguments.pageDir & "/" & target : target )
+				if ( fileExists( arguments.sourceDir & "/" & rootRelative ) ) {
+					var depth = len( arguments.pageDir ) ? listLen( arguments.pageDir, "/" ) : 0
+					rewritten = repeatString( "../", depth ) & "assets/imported/" & rootRelative
+				}
+			}
+
+			matcher.appendReplacement( buffer, quoteReplacement( "](" & rewritten & titlePart & ")" ) )
+		}
+		matcher.appendTail( buffer )
+		return buffer.toString()
+	}
+
+	/**
+	 * Resolves `.`/`..` segments out of a zip-root-relative path - plain
+	 * textual resolution, no filesystem access.
+	 *
+	 * @path A zip-root-relative path, possibly containing `.`/`..` segments
+	 */
+	private string function normalizeRelativePath( required string path ) {
+		var segments = listToArray( arguments.path, "/" )
+		var resolved = []
+		for ( var segment in segments ) {
+			if ( segment == "." || !len( segment ) ) {
+				continue
+			}
+			if ( segment == ".." && resolved.len() ) {
+				resolved.deleteAt( resolved.len() )
+			} else if ( segment != ".." ) {
+				resolved.append( segment )
+			}
+		}
+		return resolved.toList( "/" )
+	}
+
+	/**
+	 * @text Literal replacement text
+	 *
+	 * @return text, safe to pass as Matcher#appendReplacement's own replacement argument
+	 */
+	private string function quoteReplacement( required string text ) {
+		return createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( arguments.text )
+	}
+
+	/**
+	 * @text Literal text to embed in a regular expression
+	 *
+	 * @return text with every regex metacharacter escaped
+	 */
+	private string function reEscape( required string text ) {
+		return createObject( "java", "java.util.regex.Pattern" ).quote( arguments.text )
+	}
+
+}
