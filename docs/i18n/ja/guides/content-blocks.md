@@ -165,6 +165,53 @@ PDF、動画、その他のプロジェクトアセット向けのダウンロ�
 ::: file src="assets/og-image.png" title="サイトプレビュー画像"
 :::
 
+## ボタン
+
+GitBook スタイルの CTA（コールトゥアクション）ボタンです - 単独の
+`::: button`、または `::: buttons` ラッパーの中に複数を横並びで配置します。
+先頭の `"ラベル"` と `href` さえあれば、ほとんどのボタンにはそれで十分です:
+
+```markdown title="Example" linenums="1"
+::: button "はじめに" href="../getting-started.md" style="primary"
+:::
+```
+
+::: button "はじめに" href="../getting-started.md" style="primary"
+:::
+
+いくつかの任意の属性で、各ボタンに独自の機能を持たせられます:
+
+- `style="primary"` または `style="secondary"`（デフォルト） - ソリッド
+  アクセント対アウトライン。
+- `size="small"`、`"medium"`（デフォルト）、または `"large"`。
+- `icon="..."` - カード自身の `icon` と同じ方法で解決されます（プレーンな
+  絵文字、または `icon="phosphor-duotone:rocket-launch"` のような名前付き
+  アイコン - [テーマ: アイコン](themes.md#アイコン) を参照してください）。
+- `target="_blank"` - 同じタブではなく新しいタブでリンクを開きます
+  （`rel="noopener noreferrer"` は自動的に追加されます）。
+- `disabled="true"` - 「近日公開」の CTA 向けに、操作不可でクリックできない
+  ボタンをレンダリングします（`href` は不要です）。
+
+```markdown title="Example" linenums="1"
+::: buttons
+::: button "ドキュメントを読む" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
+:::
+::: button "GitHub でスターする" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
+:::
+::: button "近日公開" disabled="true"
+:::
+:::
+```
+
+::: buttons
+::: button "ドキュメントを読む" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
+:::
+::: button "GitHub でスターする" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
+:::
+::: button "近日公開" disabled="true"
+:::
+:::
+
 ## 埋め込み
 
 認識されたプロバイダー向けのレスポンシブ iframe 埋め込みです - 現時点では

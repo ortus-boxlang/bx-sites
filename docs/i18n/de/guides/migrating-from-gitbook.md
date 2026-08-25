@@ -81,6 +81,16 @@ auszuführen.
 | `{% content-ref url="..." %}` | [`::: page-link`](content-blocks.md#page-link) |
 | `{% details %}` / `{% expand %}` | [`::: expandable`](content-blocks.md#expandable) |
 
+GitBooks Inline-Schaltflächen brauchen gar keinen Konvertierungsschritt -
+sie werden bereits als schlichtes `<a class="button primary">Label</a>`-HTML
+exportiert, das CommonMark unverändert durchreicht. Das eigene CSS jedes
+integrierten Themes stylt genau dieses Markup identisch zu einer
+[`::: button`](content-blocks.md#buttons), sodass eine migrierte
+Schaltfläche einfach funktioniert, mit demselben Stil und allem -
+`::: button` wird nur für eine ihrer zusätzlichen Fähigkeiten (`size`,
+`icon`, `target`, `disabled`) gebraucht, für die rohes GitBook-Markup
+keine Entsprechung hat.
+
 Ein Block, der in deinem GitBook-Inhalt als reines Beispiel in einem
 Fenced-Code-Block gezeigt wird (statt tatsächlich verwendet zu werden),
 wird korrekt in Ruhe gelassen und nicht als der echte Block missverstanden.

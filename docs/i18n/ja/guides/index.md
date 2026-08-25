@@ -10,7 +10,7 @@ icon: phosphor-duotone:book-open
 - [検索](search.md) - 静的検索インデックスの仕組み
 - [GitHub Pages へのデプロイ](deployment.md) - 組み込みの GitHub Actions ワークフロー
 - [Markdown 拡張機能](markdown.md) - Admonition、脚注、定義リスト、Mermaid ダイアグラム
-- [コンテンツブロック](content-blocks.md) - GitBook スタイルのブロック: 展開可能セクション、カード、列、ステッパー、再利用可能なコンテンツインクルード
+- [コンテンツブロック](content-blocks.md) - GitBook スタイルのブロック: 展開可能セクション、カード、列、ステッパー、ボタン、再利用可能なコンテンツインクルード
 - [レスポンシブ画像](images.md) - デフォルトで有効な自動リサイズ、WebP バリアント、CSS/JS バンドリング
 - [Alpine.js によるインタラクティビティ](interactivity.md) - 追加設定なしのリアクティブなコンテンツ（コピーボタン、ライブフィルタなど）
 - [ブログ](blog.md) - 規約ベースのブログ: 投稿、著者、カテゴリ、アーカイブ、RSS、統計

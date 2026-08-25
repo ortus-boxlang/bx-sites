@@ -168,6 +168,56 @@ Projekt-Asset - `src` wird auf dieselbe Weise aufgelöst wie
 ::: file src="assets/og-image.png" title="Site Preview Image"
 :::
 
+## Buttons
+
+Eine GitBook-artige Call-to-Action-Schaltfläche - `::: button` für sich
+allein, oder mehrere nebeneinander in einer Reihe innerhalb eines
+`::: buttons`-Wrappers. Das führende `"Label"` und `href` sind die
+einzigen Angaben, die die meisten Schaltflächen brauchen:
+
+```markdown title="Beispiel" linenums="1"
+::: button "Get Started" href="../getting-started.md" style="primary"
+:::
+```
+
+::: button "Erste Schritte" href="../getting-started.md" style="primary"
+:::
+
+Ein paar optionale Attribute verleihen jeder Schaltfläche ihre eigenen
+Fähigkeiten:
+
+- `style="primary"` oder `style="secondary"` (der Standard) - voll
+  ausgefüllt in Akzentfarbe vs. Outline.
+- `size="small"`, `"medium"` (der Standard) oder `"large"`.
+- `icon="..."` - wird auf dieselbe Weise aufgelöst wie das eigene `icon`
+  einer Card (ein reines Emoji, oder ein benanntes Icon wie
+  `icon="phosphor-duotone:rocket-launch"` - siehe
+  [Themes: Icons](themes.md#icons)).
+- `target="_blank"` - öffnet den Link in einem neuen Tab statt im selben
+  (`rel="noopener noreferrer"` wird automatisch hinzugefügt).
+- `disabled="true"` - rendert eine inaktive, nicht klickbare Schaltfläche
+  (kein `href` nötig) für einen "Demnächst verfügbar"-Aufruf.
+
+```markdown title="Beispiel" linenums="1"
+::: buttons
+::: button "Read the docs" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
+:::
+::: button "Star on GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
+:::
+::: button "Coming soon" disabled="true"
+:::
+:::
+```
+
+::: buttons
+::: button "Dokumentation lesen" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
+:::
+::: button "Auf GitHub anschauen" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
+:::
+::: button "Demnächst verfügbar" disabled="true"
+:::
+:::
+
 ## Embed
 
 Ein responsives iframe-Embed für einen erkannten Anbieter - derzeit

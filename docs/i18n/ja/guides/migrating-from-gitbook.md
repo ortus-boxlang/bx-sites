@@ -76,6 +76,16 @@ Migrated 14 page(s) from [/path/to/gitbook-export] into my-docs/docs/, wrote my-
 | `{% content-ref url="..." %}` | [`::: page-link`](content-blocks.md#ページリンク) |
 | `{% details %}` / `{% expand %}` | [`::: expandable`](content-blocks.md#展開可能) |
 
+GitBook のインラインボタンは、そもそも変換作業を必要としません - すでに
+プレーンな `<a class="button primary">Label</a>` HTML としてエクスポート
+されており、CommonMark はこれをそのまま素通しします。組み込みの各テーマ
+自身の CSS は、この正確なマークアップを
+[`::: button`](content-blocks.md#ボタン) とまったく同じ見た目にスタイル
+するため、移行されたボタンはそのままで問題なく動作します - 見た目もすべて
+同じです。`::: button` が必要になるのは、生の GitBook マークアップには
+対応するものがない追加機能（`size`、`icon`、`target`、`disabled`）の
+いずれかを使いたい場合だけです。
+
 GitBook コンテンツ内でフェンスコードの例として（実際には使われずに）示されて
 いるだけのブロックは正しくそのまま残され、本物のブロックと誤読されることは
 ありません。

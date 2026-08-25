@@ -169,6 +169,56 @@ proyecto - `src` se resuelve de la misma forma que ya lo hacen
 ::: file src="assets/og-image.png" title="Imagen de vista previa del sitio"
 :::
 
+## Botones
+
+Un botón de llamada a la acción al estilo GitBook - `::: button` por sí
+solo, o varios dispuestos en una fila dentro de un envoltorio
+`::: buttons`. La `"Label"` inicial y el `href` son las únicas piezas que
+necesita la mayoría de los botones:
+
+```markdown title="Example" linenums="1"
+::: button "Get Started" href="../getting-started.md" style="primary"
+:::
+```
+
+::: button "Primeros Pasos" href="../getting-started.md" style="primary"
+:::
+
+Unos pocos atributos opcionales le dan a cada botón sus propias
+habilidades:
+
+- `style="primary"` o `style="secondary"` (el valor predeterminado) -
+  acento sólido frente a contorno.
+- `size="small"`, `"medium"` (el valor predeterminado) o `"large"`.
+- `icon="..."` - se resuelve de la misma forma que el propio `icon` de
+  una tarjeta (un emoji sencillo, o un icono con nombre como
+  `icon="phosphor-duotone:rocket-launch"` - consulta
+  [Temas: Iconos](themes.md#iconos)).
+- `target="_blank"` - abre el enlace en una pestaña nueva en lugar de la
+  misma (`rel="noopener noreferrer"` se añade automáticamente).
+- `disabled="true"` - renderiza un botón inerte, no clicable (sin
+  necesidad de `href`) para una llamada a la acción de "próximamente".
+
+```markdown title="Example" linenums="1"
+::: buttons
+::: button "Read the docs" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
+:::
+::: button "Star on GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
+:::
+::: button "Coming soon" disabled="true"
+:::
+:::
+```
+
+::: buttons
+::: button "Lee la documentación" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
+:::
+::: button "Danos una estrella en GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
+:::
+::: button "Próximamente" disabled="true"
+:::
+:::
+
 ## Incrustación
 
 Una incrustación de iframe responsiva para un proveedor reconocido -
