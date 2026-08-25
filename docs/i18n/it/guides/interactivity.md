@@ -30,18 +30,30 @@ ricorri prima a questi:
 - Contenuto alternativo raggruppato dietro schede cliccabili →
   [Schede di contenuto](markdown.md#content-tabs)
 - Un percorso guidato numerato → [Stepper](content-blocks.md#stepper)
+- Un link di call-to-action con stile predefinito →
+  [Pulsanti](content-blocks.md#pulsanti) (il pulsante copia-negli-appunti
+  qui sotto è un caso *diverso* - non ha affatto un `href`, solo
+  comportamento lato client - esattamente ciò per cui serve Alpine)
 
 Alpine serve per il contenuto interattivo che questi non coprono -
 qualsiasi cosa con un proprio stato lato client.
 
 ## Un pulsante copia-negli-appunti
 
-Un caso comune: un pulsante accanto a un comando di installazione che lo
-copia e conferma la copia:
+[`::: button`](content-blocks.md#pulsanti) renderizza sempre e solo un
+link vero (oppure un segnaposto inerte) - come il pulsante nativo di
+GitBook, non ha alcuna nozione di eseguire JS arbitrario al click. Per un
+pulsante che *fa* qualcosa invece di navigare da qualche parte, applica
+le sue classi `bxsites-button`/`bxsites-button--*` a un normale
+`<button>` HTML - stesso aspetto, stilizzato in ogni tema integrato,
+semplicemente collegato con Alpine invece che con un `href`. Un caso
+comune: un pulsante accanto a un comando di installazione che lo copia e
+conferma la copia:
 
 ```markdown title="Pulsante di copia" linenums="1"
 <div x-data="{ copied: false }">
-  <button type="button" @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
+  <button type="button" class="bxsites-button bxsites-button--secondary bxsites-button--small"
+    @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
     <span x-show="!copied">Copy install command</span>
     <span x-show="copied" x-cloak>Copied!</span>
   </button>
@@ -49,7 +61,8 @@ copia e conferma la copia:
 ```
 
 <div x-data="{ copied: false }">
-  <button type="button" class="btn btn-sm btn-outline-secondary" @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
+  <button type="button" class="bxsites-button bxsites-button--secondary bxsites-button--small"
+    @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
     <span x-show="!copied">Copia il comando di installazione</span>
     <span x-show="copied" x-cloak>Copiato!</span>
   </button>

@@ -295,6 +295,7 @@
 	<script src="#variables.basePath#assets/toc-collapse.js" defer></script>
 	<script src="#variables.basePath#assets/tabs.js" defer></script>
 	<script src="#variables.basePath#assets/conditional-content-init.js" defer></script>
+	<script src="#variables.basePath#assets/prompt-init.js" defer></script>
 </bx:output><bx:if condition="#variables.mermaidEnabled#"><bx:output>
 	<script src="#variables.basePath#assets/vendor/mermaid/mermaid.min.js"></script>
 	<script src="#variables.basePath#assets/mermaid-init.js"></script>

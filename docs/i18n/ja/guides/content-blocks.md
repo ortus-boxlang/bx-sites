@@ -43,7 +43,7 @@ GitBook サイトのコンテンツを簡単に移行できる理由でもあり
 されます）。`icon` はフロントマター/ナビの `icon` 値と同じ方法で解決されます -
 プレーンな絵文字、または同梱ライブラリの名前付きアイコン
 （`icon="phosphor-duotone:rocket-launch"`、`icon="lucide:rocket"` など）
-です - [テーマ: アイコン](themes.md#アイコン) を参照してください:
+です - [アイコン](icons.md) を参照してください:
 
 ```markdown title="Example" linenums="1"
 ::: cards
@@ -165,6 +165,53 @@ PDF、動画、その他のプロジェクトアセット向けのダウンロ�
 ::: file src="assets/og-image.png" title="サイトプレビュー画像"
 :::
 
+## ボタン
+
+GitBook スタイルの CTA（コールトゥアクション）ボタンです - 単独の
+`::: button`、または `::: buttons` ラッパーの中に複数を横並びで配置します。
+先頭の `"ラベル"` と `href` さえあれば、ほとんどのボタンにはそれで十分です:
+
+```markdown title="Example" linenums="1"
+::: button "はじめに" href="../getting-started.md" style="primary"
+:::
+```
+
+::: button "はじめに" href="../getting-started.md" style="primary"
+:::
+
+いくつかの任意の属性で、各ボタンに独自の機能を持たせられます:
+
+- `style="primary"` または `style="secondary"`（デフォルト） - ソリッド
+  アクセント対アウトライン。
+- `size="small"`、`"medium"`（デフォルト）、または `"large"`。
+- `icon="..."` - カード自身の `icon` と同じ方法で解決されます（プレーンな
+  絵文字、または `icon="phosphor-duotone:rocket-launch"` のような名前付き
+  アイコン - [テーマ: アイコン](themes.md#アイコン) を参照してください）。
+- `target="_blank"` - 同じタブではなく新しいタブでリンクを開きます
+  （`rel="noopener noreferrer"` は自動的に追加されます）。
+- `disabled="true"` - 「近日公開」の CTA 向けに、操作不可でクリックできない
+  ボタンをレンダリングします（`href` は不要です）。
+
+```markdown title="Example" linenums="1"
+::: buttons
+::: button "ドキュメントを読む" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
+:::
+::: button "GitHub でスターする" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
+:::
+::: button "近日公開" disabled="true"
+:::
+:::
+```
+
+::: buttons
+::: button "ドキュメントを読む" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
+:::
+::: button "GitHub でスターする" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
+:::
+::: button "近日公開" disabled="true"
+:::
+:::
+
 ## 埋め込み
 
 認識されたプロバイダー向けのレスポンシブ iframe 埋め込みです - 現時点では
@@ -180,65 +227,6 @@ URL は、どのみちレンダリングを拒否する iframe（ほとんどの
 
 ::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="デモ"
 :::
-
-## OpenAPI / Swagger
-
-OpenAPI/Swagger 仕様に対するインタラクティブな
-[Swagger UI](https://swagger.io/tools/swagger-ui/) ウィジェットです。`src`
-は `::: file` の `src` と同じく、`docs/assets/` からの相対パスとして解決
-されます。JSON・YAML どちらの仕様ファイルにも対応しており、Swagger UI が
-クライアント側で完全にパースします - このモジュールのどこにもサーバー側
-での OpenAPI パースは存在しません。`bxsites.yaml` の
-[`openapi`](../configuration.md#openapi) を `true` に設定する必要があります
-- 設定されていない場合、このプレースホルダーはレンダリングされますが動作
-しません（Swagger UI 自体の JS/CSS が `site/` に一切コピーされないため、
-この機能を使わない他のすべてのプロジェクトのビルドサイズはこれまでどおり
-小さいままです）:
-
-```markdown title="例" linenums="1"
-::: openapi src="assets/openapi/example.yaml" title="Bookshelf API"
-:::
-```
-
-::: openapi src="assets/openapi/example.yaml" title="Bookshelf API"
-:::
-
-上のウィジェットはまさにこのページ自身がライブでレンダリングしているもの
-で、このガイドが同梱する小さなサンプル仕様
-`docs/assets/openapi/example.yaml` を表示しています - 自分のプロジェクトの
-`docs/assets/` 配下に置いて開く（あるいは `src` を既存の自分の仕様ファイル
-に向ける）ことで、自分の API についても同じように表示できます。
-
-同梱(ベンダリング)しているのは `SwaggerUIBundle` 自体のベースレイアウトの
-みです - 別の仕様を入力できるトップバー/「Explore」バーは含まれません
-（`::: openapi` ブロックは、著者が指定した唯一の仕様を常に表示するように
-意図されているためです）。そのため、各オペレーションとそのリクエスト/
-レスポンススキーマ、そして「Try it out」（訪問者のブラウザから仕様自身の
-`servers[0].url` へ直接呼び出します - そのサーバーがドキュメントのホスト元
-からの CORS を許可していることを確認してください）は、何も書き換えること
-なく既存の仕様からそのままレンダリングされます。
-
-### エンドポイント1件をインライン表示
-
-`operation="METHOD /path"` を追加すると、そのエンドポイント1件だけを通常の
-ページ内にそのまま配置できます - チュートリアルの途中で、読者を完全な
-リファレンスへ送り出すことなく使えて便利です:
-
-```markdown title="Example" linenums="1"
-::: openapi src="assets/openapi/example.yaml" operation="GET /books"
-:::
-```
-
-::: openapi src="assets/openapi/example.yaml" operation="GET /books"
-:::
-
-上のフルブロックとまったく同じ Swagger UI ウィジェットです（同じ仕様、
-同じくクライアント側のみのレンダリング - `operation` もこちら側で
-OpenAPI パースを一切トリガーしません）。Swagger UI 自身がすでにレンダリング
-済みのマークアップを読み取ることで、他のすべてのオペレーションは単に
-非表示にされ、このオペレーションだけが自動的に展開されます。`operation`
-のメソッドは大文字小文字を区別しませんが、パスは仕様自身のパス
-（`{param}` プレースホルダーも含めて）と完全に一致する必要があります。
 
 ## ページリンク
 
@@ -275,6 +263,62 @@ OpenAPI パースを一切トリガーしません）。Swagger UI 自身がす�
 
 ::: link-preview url="https://boxlang.io" title="BoxLang" description="動的でマルチパラダイムな JVM 言語。" image="https://boxlang.io/og.png"
 :::
+
+## プロンプト
+
+再利用可能な AI プロンプト向けのスタイル付きコンテナです - GitBook の
+[Prompt ブロック](https://gitbook.com/docs/create-content/blocks/prompt)
+に対する bx-sites 独自の対応物です。ブロックの本文がそのままプロンプトの
+テキストになり、通常の Markdown として書かれます（そのため中の見出しや
+リスト、コードもそれぞれ独自の書式を保ちます）。どのプロンプトにも
+「Copy」ボタンが付き、書式マークアップを含むそのままのソーステキストを
+コピーして、使いたい AI ツールにそのまま貼り付けられます。`description`
+（任意の1行サマリ）と `icon`（`::: card` 自身の `icon` と同じ方法で解決
+され、省略時はきらめきアイコンがデフォルトになります）はどちらも任意です:
+
+```markdown title="Example" linenums="1"
+::: prompt description="Summarizes a pull request for a changelog entry" icon="phosphor-duotone:git-pull-request"
+Summarize the following pull request diff as a single changelog entry,
+written for an end user rather than a developer. Group related changes
+together and skip anything purely internal (refactors, tests, CI).
+:::
+```
+
+::: prompt description="Summarizes a pull request for a changelog entry" icon="phosphor-duotone:git-pull-request"
+Summarize the following pull request diff as a single changelog entry,
+written for an end user rather than a developer. Group related changes
+together and skip anything purely internal (refactors, tests, CI).
+:::
+
+長いプロンプトを短くフェードアウトするプレビューに収め、読者が「Show
+more」をクリックするまでそのままにしておくには `expanded="preview"` を
+追加します。あるいは `expanded="hidden"` を使うと、「Show prompt」ボタンの
+背後に完全に折りたたまれた状態で開始します - 複数のプロンプトを連続して
+並べるページで便利です。`expanded` を省略する（またはデフォルトの
+`"full"` を指定する）と、常にプロンプト全体を表示します:
+
+```markdown title="Example" linenums="1"
+::: prompt description="A longer, multi-step prompt" expanded="preview"
+1. Read the attached error log line by line.
+2. For each stack trace, identify the failing module.
+3. Group failures by root cause, not by timestamp.
+4. Propose one fix per root cause, not per failure.
+5. Skip anything that already has an open issue - list those separately.
+:::
+```
+
+::: prompt description="A longer, multi-step prompt" expanded="preview"
+1. Read the attached error log line by line.
+2. For each stack trace, identify the failing module.
+3. Group failures by root cause, not by timestamp.
+4. Propose one fix per root cause, not per failure.
+5. Skip anything that already has an open issue - list those separately.
+:::
+
+GitBook 自身の Prompt ブロックとは異なり、ここには「Open in AI
+providers」メニューはありません - bx-sites はサードパーティの AI
+プロバイダーと一切通信しないため、GitBook 自身のブロックのその部分には
+対応するものがありません。
 
 ## 更新履歴（changelog）
 

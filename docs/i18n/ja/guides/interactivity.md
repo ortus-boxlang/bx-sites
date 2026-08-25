@@ -31,18 +31,29 @@ Markdown 内の[生のブロックレベル HTML はそのまま通過する](im
   [コンテンツタブ](markdown.md#コンテンツタブ)
 - 番号付きの手順ウォークスルー →
   [ステッパー](content-blocks.md#ステッパー)
+- スタイル付きの CTA リンク →
+  [ボタン](content-blocks.md#ボタン)（以下のコピー・トゥ・クリップボード
+  ボタンは *別の* ケースです - `href` を一切持たず、クライアントサイドの
+  動作だけです - これはまさに Alpine の出番です）
 
 Alpine は、これらがカバーしない - 独自のクライアントサイド状態を持つ -
 インタラクティブなコンテンツのためのものです。
 
 ## コピー・トゥ・クリップボードボタン
 
-よくある例: インストールコマンドの横にあり、それをコピーしてコピー完了を
-確認するボタンです:
+[`::: button`](content-blocks.md#ボタン) は常に本物のリンク（または操作
+不可のプレースホルダー）だけをレンダリングします - GitBook 自身のボタンと
+同様、クリック時に任意の JS を実行するという概念はありません。どこかへ
+移動するのではなく実際に *何かを行う* ボタンには、代わりに
+`bxsites-button`/`bxsites-button--*` クラスをプレーンな HTML の `<button>`
+に付けてください - 見た目は同じで、すべての組み込みテーマでスタイルされ、
+`href` の代わりに Alpine で配線されるだけです。よくある例: インストール
+コマンドの横にあり、それをコピーしてコピー完了を確認するボタンです:
 
 ```markdown title="Copy button" linenums="1"
 <div x-data="{ copied: false }">
-  <button type="button" @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
+  <button type="button" class="bxsites-button bxsites-button--secondary bxsites-button--small"
+    @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
     <span x-show="!copied">インストールコマンドをコピー</span>
     <span x-show="copied" x-cloak>コピーしました！</span>
   </button>
@@ -50,7 +61,8 @@ Alpine は、これらがカバーしない - 独自のクライアントサイ�
 ```
 
 <div x-data="{ copied: false }">
-  <button type="button" class="btn btn-sm btn-outline-secondary" @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
+  <button type="button" class="bxsites-button bxsites-button--secondary bxsites-button--small"
+    @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
     <span x-show="!copied">インストールコマンドをコピー</span>
     <span x-show="copied" x-cloak>コピーしました！</span>
   </button>

@@ -328,7 +328,7 @@ variables: {}
   `title`/`icon` は、常にリンク先ページ自身のタイトル/アイコンより優先されて nav に
   表示されます（ページ自身の実際の `<h1>`/`<title>` は変更されません - nav のラベル/
   アイコンだけが変わります）- `icon` に指定できる値については
-  [テーマ: アイコン](guides/themes.md#icons) を参照してください
+  [アイコン](guides/icons.md) を参照してください
 
 `path` を持たず `children` を持つ `title` のみのエントリは、まさにメニューコンテナ/
 セクションラベルです - その子要素をまとめるだけの、クリックできない見出しで、
@@ -619,7 +619,7 @@ admonition（note/warning/tip 形式のコールアウトボックス）、コ�
 出荷されません。`true` にするとクライアントサイドで読み込まれ、`::: openapi src="..."`
 コンテンツブロックを、参照先の OpenAPI/Swagger 仕様（JSON または YAML）のための
 インタラクティブなウィジェットとしてレンダリングします。構文については
-[コンテンツブロック](guides/content-blocks.md#openapi--swagger) を参照してください。
+[OpenAPI / Swagger](guides/openapi.md) を参照してください。
 
 ```yaml title="bxsites.yaml"
 openapi: true

@@ -7,11 +7,14 @@ icon: phosphor-duotone:book-open
 # Guías
 
 - [Temas](themes.md) - los temas incorporados y cómo escribir el tuyo propio
+- [Iconos](icons.md) - un emoji, o un icono con nombre de una de las ocho bibliotecas incluidas, en cualquier página/entrada de navegación
 - [Búsqueda](search.md) - cómo funciona el índice de búsqueda estático
 - [Desplegar en GitHub Pages](deployment.md) - el flujo de trabajo de GitHub Actions incorporado
 - [Extensiones de Markdown](markdown.md) - admoniciones, notas al pie, listas de definiciones y diagramas Mermaid
 - [Bloques de Contenido](content-blocks.md) - bloques al estilo GitBook: expandibles, tarjetas, columnas, un stepper, y contenido reutilizable incluible
 - [Tablas](tables.md) - tablas de pipes GFM, siempre activas, con un tratamiento automático de desplazamiento responsivo/encabezado fijo
+- [Bloques de Contenido](content-blocks.md) - bloques al estilo GitBook: expandibles, tarjetas, columnas, un stepper, botones, y contenido reutilizable incluible
+- [OpenAPI / Swagger](openapi.md) - un widget interactivo de Swagger UI para una especificación OpenAPI/Swagger, como referencia completa o una sola operación en línea
 - [Imágenes Responsivas](images.md) - redimensionado automático, variantes WebP, y empaquetado de CSS/JS, activo por defecto
 - [Interactividad con Alpine.js](interactivity.md) - contenido reactivo (botones de copiar, filtros en vivo, y más) sin configuración adicional
 - [Blog](blog.md) - un blog por convención: entradas, autores, categorías, archivos, RSS, y estadísticas

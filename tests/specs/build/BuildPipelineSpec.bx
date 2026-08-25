@@ -812,6 +812,17 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "assets/copy-code.js" );
 			} );
 
+			it( "copies the shared prompt-init.js widget unconditionally, same as conditional-content-init.js", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/assets/prompt-init.js" ) ).toBeTrue();
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "assets/prompt-init.js" );
+			} );
+
 			it( "self-hosts the theme's webfonts under site/assets/fonts, with no fonts.googleapis.com reference anywhere in the page", function() {
 				// Only the themes that actually ship an @font-face - bootstrap/
 				// material/tailwind, and gitbook (its serif headings). The other
