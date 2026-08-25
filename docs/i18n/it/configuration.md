@@ -314,7 +314,7 @@ seguenti:
   `index.md` oggi), e un `title`/`icon` esplicito sovrascrive sempre il
   titolo/icona propri della pagina collegata nella nav (l'`<h1>`/`<title>`
   reale della pagina resta intatto - cambia solo l'etichetta/icona nella
-  nav) - vedi [Temi: Icone](guides/themes.md#icons) per cosa può essere un
+  nav) - vedi [Icone](guides/icons.md) per cosa può essere un
   valore `icon`
 
 ```yaml title="bxsites.yaml" linenums="1"
@@ -629,7 +629,7 @@ pagina, senza bisogno di configurazione - vedi
 carica lato client e renderizza ogni blocco di contenuto
 `::: openapi src="..."` come widget interattivo per la specifica
 OpenAPI/Swagger referenziata (JSON o YAML). Vedi
-[Blocchi di contenuto](guides/content-blocks.md#openapi--swagger) per la
+[OpenAPI / Swagger](guides/openapi.md) per la
 sintassi.
 
 ```yaml title="bxsites.yaml"

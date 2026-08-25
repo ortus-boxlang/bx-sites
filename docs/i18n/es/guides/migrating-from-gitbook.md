@@ -49,7 +49,7 @@ decisión de criterio, exactamente qué y dónde:
 Migrated 14 page(s) from [/path/to/gitbook-export] into my-docs/docs/, wrote my-docs/docs/nav.json
 
 2 item(s) need a manual look:
-  - guides/advanced.md: Unsupported GitBook block [{% prompt %}] - left in its original syntax, needs manual conversion
+  - guides/advanced.md: Unsupported GitBook block [{% conditional-content %}] - left in its original syntax, needs manual conversion
   - guides/layout.md: Column width="one-third" is not a plain length/percentage - dropped, review manually
 ```
 
@@ -78,6 +78,7 @@ exportación de origen y volver a ejecutarlo.
 | `{% embed url="..." %}` | [`::: embed`](content-blocks.md#incrustación) |
 | `{% content-ref url="..." %}` | [`::: page-link`](content-blocks.md#enlace-de-página) |
 | `{% details %}` / `{% expand %}` | [`::: expandable`](content-blocks.md#expandible) |
+| `{% prompt description="..." icon="..." defaultExpanded="..." %}` | [`::: prompt`](content-blocks.md#prompt) - `openInAIProviders` se descarta, se reporta como advertencia cuando estaba activado |
 
 Los botones en línea de GitBook no necesitan ningún paso de conversión en
 absoluto - ya se exportan como HTML simple `<a class="button primary">Label</a>`,
@@ -96,10 +97,9 @@ malinterpretarse como el bloque real.
 
 Un puñado de bloques de GitBook no tiene ningún equivalente en bx-sites y
 se dejan en su sintaxis `{% %}` original en lugar de adivinarse:
-**Prompt** (un bloque de generación con IA - no hay nada contra lo que
-ejecutarlo una vez migrado), **Conditional content** (visibilidad basada
-en cuenta de GitBook, no es un concepto que tenga bx-sites), y la barra de
-búsqueda **Ask AI**. Cualquier otra cosa que esta herramienta no
+**Conditional content** (visibilidad basada en cuenta de GitBook, no es
+un concepto que tenga bx-sites) y la barra de búsqueda **Ask AI**.
+Cualquier otra cosa que esta herramienta no
 reconozca - un bloque con un error tipográfico, una función de GitBook
 añadida después de que se escribiera esta herramienta - recibe el mismo
 tratamiento: se deja tal cual, se reporta como advertencia.
@@ -118,7 +118,7 @@ frontmatter exportado de un proyecto realmente tiene un campo `icon`,
 mayoría de las exportaciones reales. Establece los iconos a mano después
 en su lugar - ya sea el propio frontmatter de una página, o el
 [propio `icon` de una entrada de `docs/nav.json`](../configuration.md#nav)
-- usando un [icono con nombre](themes.md#iconos) de una de las ocho
+- usando un [icono con nombre](icons.md) de una de las ocho
 bibliotecas incluidas (sin necesidad de hacer coincidir los propios
 iconos basados en Font Awesome de GitBook; elige el nombre que se vea
 mejor en la propia galería de [Phosphor](https://phosphoricons.com/)

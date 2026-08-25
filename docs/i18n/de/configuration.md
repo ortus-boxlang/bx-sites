@@ -366,7 +366,7 @@ verlinkt (wie bei `hidden: true`). Jeder Eintrag ist entweder:
   den eigenen Titel/das eigene Icon der verlinkten Seite in der Navigation
   (das echte `<h1>`/`<title>` der Seite bleibt unangetastet - nur das
   Navigations-Label/-Icon ändert sich) - siehe
-  [Themes: Icons](guides/themes.md#icons) dafür, was ein `icon`-Wert sein kann
+  [Icons](guides/icons.md) dafür, was ein `icon`-Wert sein kann
 
 Ein Eintrag nur mit `title`, mit `children` und ohne `path` ist genau ein
 Menü-Container/Abschnitts-Label - eine nicht klickbare Überschrift, die
@@ -686,7 +686,7 @@ Markdown jeder Seite immer verfügbar, ohne Konfiguration nötig - siehe
 ausgeliefert. `true` lädt es clientseitig und rendert jeden
 `::: openapi src="..."`-Content-Block als interaktives Widget für die
 referenzierte OpenAPI-/Swagger-Spezifikation (JSON oder YAML). Siehe
-[Content Blocks](guides/content-blocks.md#openapi--swagger) für die Syntax.
+[OpenAPI / Swagger](guides/openapi.md) für die Syntax.
 
 ```yaml title="bxsites.yaml"
 openapi: true

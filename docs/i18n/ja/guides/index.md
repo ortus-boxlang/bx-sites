@@ -7,10 +7,12 @@ icon: phosphor-duotone:book-open
 # ガイド
 
 - [テーマ](themes.md) - 組み込みテーマと独自テーマの作成方法
+- [アイコン](icons.md) - 絵文字、または8つの同梱ライブラリのいずれかからの名前付きアイコンを、任意のページ/nav エントリで使用する方法
 - [検索](search.md) - 静的検索インデックスの仕組み
 - [GitHub Pages へのデプロイ](deployment.md) - 組み込みの GitHub Actions ワークフロー
 - [Markdown 拡張機能](markdown.md) - Admonition、脚注、定義リスト、Mermaid ダイアグラム
 - [コンテンツブロック](content-blocks.md) - GitBook スタイルのブロック: 展開可能セクション、カード、列、ステッパー、ボタン、再利用可能なコンテンツインクルード
+- [OpenAPI / Swagger](openapi.md) - OpenAPI/Swagger 仕様のためのインタラクティブな Swagger UI ウィジェット。完全なリファレンスとしても、1件のオペレーションをインラインで表示する形でも使える
 - [レスポンシブ画像](images.md) - デフォルトで有効な自動リサイズ、WebP バリアント、CSS/JS バンドリング
 - [Alpine.js によるインタラクティビティ](interactivity.md) - 追加設定なしのリアクティブなコンテンツ（コピーボタン、ライブフィルタなど）
 - [ブログ](blog.md) - 規約ベースのブログ: 投稿、著者、カテゴリ、アーカイブ、RSS、統計

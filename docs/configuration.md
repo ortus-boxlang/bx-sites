@@ -326,7 +326,7 @@ linked from the nav (same as `hidden: true`). Each entry is either:
   unlinked group heading (like a folder with no `index.md` today), and an
   explicit `title`/`icon` always overrides the linked page's own
   title/icon in the nav (the page's real `<h1>`/`<title>` is untouched -
-  only the nav label/icon changes) - see [Themes: Icons](guides/themes.md#icons)
+  only the nav label/icon changes) - see [Icons](guides/icons.md)
   for what an `icon` value can be
 
 A `title`-only entry with `children` and no `path` is exactly a menu
@@ -627,7 +627,7 @@ in every page's markdown, no config needed - see
 shipped at all. `true` loads it client-side and renders every
 `::: openapi src="..."` content block as an interactive widget for the
 referenced OpenAPI/Swagger spec (JSON or YAML). See
-[Content Blocks](guides/content-blocks.md#openapi--swagger) for the syntax.
+[OpenAPI / Swagger](guides/openapi.md) for the syntax.
 
 ```yaml title="bxsites.yaml"
 openapi: true

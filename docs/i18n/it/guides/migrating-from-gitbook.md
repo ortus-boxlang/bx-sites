@@ -48,7 +48,7 @@ richiesto una valutazione, esattamente cosa e dove:
 Migrated 14 page(s) from [/path/to/gitbook-export] into my-docs/docs/, wrote my-docs/docs/nav.json
 
 2 item(s) need a manual look:
-  - guides/advanced.md: Unsupported GitBook block [{% prompt %}] - left in its original syntax, needs manual conversion
+  - guides/advanced.md: Unsupported GitBook block [{% conditional-content %}] - left in its original syntax, needs manual conversion
   - guides/layout.md: Column width="one-third" is not a plain length/percentage - dropped, review manually
 ```
 
@@ -77,6 +77,7 @@ eseguirlo di nuovo.
 | `{% embed url="..." %}` | [`::: embed`](content-blocks.md#embed) |
 | `{% content-ref url="..." %}` | [`::: page-link`](content-blocks.md#page-link) |
 | `{% details %}` / `{% expand %}` | [`::: expandable`](content-blocks.md#expandable) |
+| `{% prompt description="..." icon="..." defaultExpanded="..." %}` | [`::: prompt`](content-blocks.md#prompt) - `openInAIProviders` viene scartato, segnalato come avviso quando era attivato |
 
 I pulsanti inline di GitBook non richiedono alcun passaggio di
 conversione - vengono già esportati come puro HTML
@@ -96,11 +97,10 @@ stare, non frainteso per quello reale.
 
 Alcuni blocchi di GitBook non hanno alcun equivalente in bx-sites e
 vengono lasciati nella propria sintassi originale `{% %}` invece di
-essere indovinati: **Prompt** (un blocco di generazione AI - non c'è
-nulla contro cui eseguirlo una volta migrato), **Contenuto condizionale**
-(visibilità basata sull'account GitBook, un concetto che bx-sites non ha),
-e la barra di ricerca **Ask AI**. Qualsiasi altra cosa che questo
-strumento non riconosce - un blocco con un errore di battitura, una
+essere indovinati: **Contenuto condizionale** (visibilità basata
+sull'account GitBook, un concetto che bx-sites non ha) e la barra di
+ricerca **Ask AI**. Qualsiasi altra cosa che questo strumento non
+riconosce - un blocco con un errore di battitura, una
 funzionalità di GitBook aggiunta dopo la scrittura di questo strumento -
 riceve lo stesso trattamento: lasciata così com'è, segnalata come
 avviso.
@@ -119,7 +119,7 @@ riporta opportunisticamente, ma non aspettartelo per la maggior parte
 degli export reali. Imposta le icone a mano in seguito - o nel
 frontmatter proprio di una pagina, oppure nell'
 [`icon` di una voce di `docs/nav.json`](../configuration.md#nav) -
-usando un'[icona con nome](themes.md#icons) da una delle otto librerie
+usando un'[icona con nome](icons.md) da una delle otto librerie
 incluse (non serve far corrispondere le icone basate su Font Awesome
 proprie di GitBook; scegli qualunque nome sembri adatto nella galleria di
 [Phosphor](https://phosphoricons.com/) - uno qualsiasi dei suoi sei pesi -

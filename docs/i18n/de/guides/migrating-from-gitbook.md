@@ -50,7 +50,7 @@ eine Ermessensentscheidung erforderte, genau was und wo:
 Migrated 14 page(s) from [/path/to/gitbook-export] into my-docs/docs/, wrote my-docs/docs/nav.json
 
 2 item(s) need a manual look:
-  - guides/advanced.md: Unsupported GitBook block [{% prompt %}] - left in its original syntax, needs manual conversion
+  - guides/advanced.md: Unsupported GitBook block [{% conditional-content %}] - left in its original syntax, needs manual conversion
   - guides/layout.md: Column width="one-third" is not a plain length/percentage - dropped, review manually
 ```
 
@@ -80,6 +80,7 @@ auszuführen.
 | `{% embed url="..." %}` | [`::: embed`](content-blocks.md#embed) |
 | `{% content-ref url="..." %}` | [`::: page-link`](content-blocks.md#page-link) |
 | `{% details %}` / `{% expand %}` | [`::: expandable`](content-blocks.md#expandable) |
+| `{% prompt description="..." icon="..." defaultExpanded="..." %}` | [`::: prompt`](content-blocks.md#prompt) - `openInAIProviders` wird verworfen, als Warnung gemeldet, wenn es aktiviert war |
 
 GitBooks Inline-Schaltflächen brauchen gar keinen Konvertierungsschritt -
 sie werden bereits als schlichtes `<a class="button primary">Label</a>`-HTML
@@ -99,10 +100,9 @@ wird korrekt in Ruhe gelassen und nicht als der echte Block missverstanden.
 
 Eine Handvoll GitBook-Blöcke hat überhaupt keine bx-sites-Entsprechung und
 wird in ihrer ursprünglichen `{% %}`-Syntax belassen, statt geraten zu
-werden: **Prompt** (ein KI-Generierungsblock - es gibt nichts, wogegen man
-ihn nach der Migration ausführen könnte), **bedingter Inhalt**
-(GitBook-Konto-basierte Sichtbarkeit, kein Konzept, das bx-sites hat), und
-die **Ask-AI**-Suchleiste. Alles andere, das dieses Tool nicht erkennt -
+werden: **bedingter Inhalt** (GitBook-Konto-basierte Sichtbarkeit, kein
+Konzept, das bx-sites hat), und die **Ask-AI**-Suchleiste. Alles andere,
+das dieses Tool nicht erkennt -
 ein vertippter Block, eine GitBook-Funktion, die nach der Entstehung
 dieses Tools hinzugefügt wurde - erhält dieselbe Behandlung: unverändert
 belassen, als Warnung gemeldet.
@@ -120,7 +120,7 @@ ein `icon`-Feld hat, übernimmt `migrate` es opportunistisch, erwarte das
 aber bei den meisten echten Exports nicht. Setze Icons stattdessen im
 Nachhinein von Hand - entweder in der eigenen Frontmatter einer Seite,
 oder im [eigenen `icon` eines `docs/nav.json`-Eintrags](../configuration.md#nav)
-- mit einem [benannten Icon](themes.md#icons) aus einer der acht
+- mit einem [benannten Icon](icons.md) aus einer der acht
 mitgelieferten Bibliotheken (es muss nicht zu GitBooks eigenen,
 Font-Awesome-basierten Icons passen; wähle einfach den Namen, der in der
 eigenen Galerie von [Phosphor](https://phosphoricons.com/) - in jeder

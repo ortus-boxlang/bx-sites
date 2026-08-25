@@ -355,7 +355,7 @@ Cada entrada es o bien:
   el título/icono propio de la página enlazada en la navegación (el
   `<h1>`/`<title>` real de la página queda intacto - solo cambia la
   etiqueta/icono de navegación) - consulta
-  [Temas: Iconos](guides/themes.md#iconos) para lo que puede ser un valor
+  [Iconos](guides/icons.md) para lo que puede ser un valor
   de `icon`
 
 Una entrada solo con `title`, con `children` y sin `path` es exactamente
@@ -675,7 +675,7 @@ cualquier página, sin necesidad de configuración - consulta
 carga del lado del cliente y renderiza cada bloque de contenido
 `::: openapi src="..."` como un widget interactivo para la especificación
 OpenAPI/Swagger referenciada (JSON o YAML). Consulta
-[Bloques de contenido](guides/content-blocks.md#openapi--swagger) para la
+[OpenAPI / Swagger](guides/openapi.md) para la
 sintaxis.
 
 ```yaml title="bxsites.yaml"

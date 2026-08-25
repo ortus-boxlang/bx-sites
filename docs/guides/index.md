@@ -7,10 +7,12 @@ icon: phosphor-duotone:book-open
 # Guides
 
 - [Themes](themes.md) - the built-in themes, and how to write your own
+- [Icons](icons.md) - emoji, or a named icon from one of eight bundled libraries, on any page/nav entry
 - [Search](search.md) - how the static search index works
 - [Deploying to GitHub Pages](deployment.md) - the built-in GitHub Actions workflow
 - [Markdown Extensions](markdown.md) - admonitions, footnotes, definition lists and Mermaid diagrams
 - [Content Blocks](content-blocks.md) - GitBook-style blocks: expandables, cards, columns, a stepper, buttons, and reusable content includes
+- [OpenAPI / Swagger](openapi.md) - an interactive Swagger UI widget for an OpenAPI/Swagger spec, full reference or one operation inline
 - [Responsive Images](images.md) - automatic resizing, WebP variants, and CSS/JS bundling, on by default
 - [Interactivity with Alpine.js](interactivity.md) - reactive content (copy buttons, live filters, and more) with no extra setup
 - [Blog](blog.md) - a by-convention blog: posts, authors, categories, archives, RSS, and stats

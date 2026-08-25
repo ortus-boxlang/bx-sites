@@ -46,7 +46,7 @@ optional (eine Card ohne `href` wird als schlichte, nicht klickbare Card
 gerendert). `icon` wird auf dieselbe Weise aufgelöst wie
 Frontmatter-/Nav-`icon`-Werte - ein reines Emoji, oder ein benanntes
 Icon aus einer mitgelieferten Bibliothek (`icon="phosphor-duotone:rocket-launch"`,
-`icon="lucide:rocket"`, ...) - siehe [Themes: Icons](themes.md#icons):
+`icon="lucide:rocket"`, ...) - siehe [Icons](icons.md):
 
 ```markdown title="Beispiel" linenums="1"
 ::: cards
@@ -234,67 +234,6 @@ blockieren das Einbetten in Frames):
 ::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
 :::
 
-## OpenAPI / Swagger
-
-Ein interaktives [Swagger-UI](https://swagger.io/tools/swagger-ui/)-Widget
-für eine OpenAPI-/Swagger-Spezifikation - `src` wird auf dieselbe, relativ
-zu `docs/assets/` aufgelöste Weise interpretiert wie das `src` von
-`::: file`. Sowohl JSON- als auch YAML-Spezifikationen funktionieren;
-Swagger UI parst beide vollständig clientseitig - nirgendwo in diesem
-Modul findet eine serverseitige OpenAPI-Verarbeitung statt. Erfordert,
-dass `bxsites.yaml`s [`openapi`](../configuration.md#openapi) auf `true`
-gesetzt ist - ist das nicht der Fall, wird dieser Platzhalter zwar
-gerendert, bleibt aber inaktiv (Swagger UIs eigenes JS/CSS wird dann
-überhaupt nicht nach `site/` kopiert, sodass der Build jedes anderen
-Projekts genauso klein bleibt wie vor diesem Feature):
-
-```markdown title="Beispiel" linenums="1"
-::: openapi src="assets/openapi/example.yaml" title="Bookshelf API"
-:::
-```
-
-::: openapi src="assets/openapi/example.yaml" title="Bookshelf API"
-:::
-
-Das Widget oben ist genau diese Seite, live, und rendert die kleine
-Beispielspezifikation, die dieser Guide unter
-`docs/assets/openapi/example.yaml` mitliefert - öffne sie im eigenen
-Projekt unter `docs/assets/` (oder richte `src` auf die bereits vorhandene
-eigene Spezifikation), um dasselbe mit der eigenen API zu sehen.
-
-Vendort ist nur `SwaggerUIBundle`s eigenes Basis-Layout - keine
-Topbar/"Explore"-Leiste, über die eine andere Spezifikation eingetippt
-werden könnte (ein `::: openapi`-Block soll immer genau die eine
-Spezifikation zeigen, auf die seine Autorin ihn gerichtet hat), sodass
-jede Operation samt ihrer Request-/Response-Schemas und "Try it out" (das
-die eigene `servers[0].url` der Spezifikation direkt aus dem Browser der
-Besucherin aufruft - dort muss CORS für den Docs-Host erlaubt sein) direkt
-aus der bestehenden Spezifikation gerendert wird, ohne dass etwas
-umgeschrieben werden muss.
-
-### Eine einzelne Operation inline
-
-Füge `operation="METHOD /path"` hinzu, um genau diesen einen Endpunkt in
-eine gewöhnliche Seite einzubetten - praktisch mitten in einem Tutorial,
-ohne die Leserin erst zur vollständigen Referenz zu schicken:
-
-```markdown title="Beispiel" linenums="1"
-::: openapi src="assets/openapi/example.yaml" operation="GET /books"
-:::
-```
-
-::: openapi src="assets/openapi/example.yaml" operation="GET /books"
-:::
-
-Immer noch genau dasselbe Swagger-UI-Widget wie der vollständige Block
-oben (dieselbe Spezifikation, dasselbe rein clientseitige Rendering -
-auch `operation` löst niemals eine OpenAPI-Verarbeitung auf unserer
-Seite aus); jede andere Operation wird einfach ausgeblendet und diese
-eine automatisch aufgeklappt, indem Swagger UIs eigenes, bereits
-gerendertes Markup ausgelesen wird. Die Methode in `operation` ist
-Groß-/Kleinschreibung egal; ihr Pfad muss exakt dem eigenen Pfad der
-Spezifikation entsprechen (samt `{param}`-Platzhaltern).
-
 ## Page Link
 
 Eine ausführliche Vorschau-Card, die zu einer anderen Seite verlinkt -
@@ -333,6 +272,66 @@ nicht erreichbare externe Website die Build-Zeit niemals beeinflusst:
 
 ::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
 :::
+
+## Prompt
+
+Ein gestalteter Container für einen wiederverwendbaren KI-Prompt -
+bx-sites' eigenes Gegenstück zu GitBooks
+[Prompt-Block](https://gitbook.com/docs/create-content/blocks/prompt).
+Der Inhalt des Blocks *ist* der Prompt-Text, geschrieben als gewöhnliches
+Markdown (sodass Überschriften, Listen und Code darin weiterhin ihre
+eigene Formatierung erhalten); jeder Prompt bekommt eine
+"Copy"-Schaltfläche, die genau diesen Quelltext kopiert,
+Formatierungs-Markup inklusive, bereit zum Einfügen in das jeweilige
+KI-Tool, mit dem du gerade arbeitest. `description` (eine optionale,
+einzeilige Zusammenfassung) und `icon` (aufgelöst auf dieselbe Weise wie
+das eigene `icon` von `::: card` - fällt bei Weglassen standardmäßig auf
+ein Glitzer-Icon zurück) sind beide optional:
+
+```markdown title="Beispiel" linenums="1"
+::: prompt description="Summarizes a pull request for a changelog entry" icon="phosphor-duotone:git-pull-request"
+Summarize the following pull request diff as a single changelog entry,
+written for an end user rather than a developer. Group related changes
+together and skip anything purely internal (refactors, tests, CI).
+:::
+```
+
+::: prompt description="Summarizes a pull request for a changelog entry" icon="phosphor-duotone:git-pull-request"
+Summarize the following pull request diff as a single changelog entry,
+written for an end user rather than a developer. Group related changes
+together and skip anything purely internal (refactors, tests, CI).
+:::
+
+Füge `expanded="preview"` hinzu, um einen langen Prompt auf eine kurze,
+ausblendende Vorschau zu klemmen, bis die Leserin auf "Show more"
+klickt, oder `expanded="hidden"`, um ihn vollständig eingeklappt hinter
+einer "Show prompt"-Schaltfläche zu starten - praktisch für eine Seite,
+die mehrere Prompts hintereinander auflistet. Lasse `expanded` weg (oder
+setze es auf `"full"`, den Standard), um immer den gesamten Prompt
+anzuzeigen:
+
+```markdown title="Beispiel" linenums="1"
+::: prompt description="A longer, multi-step prompt" expanded="preview"
+1. Read the attached error log line by line.
+2. For each stack trace, identify the failing module.
+3. Group failures by root cause, not by timestamp.
+4. Propose one fix per root cause, not per failure.
+5. Skip anything that already has an open issue - list those separately.
+:::
+```
+
+::: prompt description="A longer, multi-step prompt" expanded="preview"
+1. Read the attached error log line by line.
+2. For each stack trace, identify the failing module.
+3. Group failures by root cause, not by timestamp.
+4. Propose one fix per root cause, not per failure.
+5. Skip anything that already has an open issue - list those separately.
+:::
+
+Anders als GitBooks eigener Prompt-Block gibt es hier kein "Open in AI
+providers"-Menü - bx-sites spricht nie mit einem KI-Anbieter eines
+Drittanbieters, daher hat dieser Teil von GitBooks eigenem Block hier
+kein Gegenstück.
 
 ## Updates (Changelog)
 

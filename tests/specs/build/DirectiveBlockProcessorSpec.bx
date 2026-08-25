@@ -415,6 +415,58 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).notToInclude( "bxsites-openapi--operation" );
 			} );
 
+			it( "renders a ::: prompt with description, a default sparkle icon, a copy button carrying the raw prompt text, and no toggle in its default full state", function() {
+				var html = render( '::: prompt description="Summarize a PR"' & char( 10 ) & "Summarize this diff." & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( '<div class="bxsites-prompt bxsites-prompt--full" data-bxsites-prompt-text="Summarize this diff.">' );
+				expect( html ).toInclude( '<div class="bxsites-prompt__icon"><svg' );
+				expect( html ).toInclude( '<span class="bxsites-prompt__label">Prompt</span>' );
+				expect( html ).toInclude( '<span class="bxsites-prompt__description">Summarize a PR</span>' );
+				expect( html ).toInclude( '<button type="button" class="bxsites-prompt__copy"' );
+				expect( html ).toInclude( "<p>Summarize this diff.</p>" );
+				expect( html ).notToInclude( "bxsites-prompt__toggle" );
+			} );
+
+			it( "omits a ::: prompt's own description span when none is given", function() {
+				var html = render( "::: prompt" & char( 10 ) & "Body." & char( 10 ) & ":::" );
+
+				expect( html ).notToInclude( "bxsites-prompt__description" );
+			} );
+
+			it( "resolves a ::: prompt's own [icon] the same way a card's icon is, overriding the default sparkle glyph", function() {
+				var html = render( '::: prompt icon="phosphor-duotone:robot"' & char( 10 ) & "Body." & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( '<div class="bxsites-prompt__icon"><svg' );
+			} );
+
+			it( "renders a ::: prompt with expanded=""hidden"" behind a Show prompt toggle", function() {
+				var html = render( '::: prompt expanded="hidden"' & char( 10 ) & "Secret prompt." & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( "bxsites-prompt--hidden" );
+				expect( html ).toInclude( 'data-label-collapsed="Show prompt"' );
+				expect( html ).toInclude( 'data-label-expanded="Hide prompt"' );
+				expect( html ).toInclude( ">Show prompt</button>" );
+			} );
+
+			it( "renders a ::: prompt with expanded=""preview"" behind a Show more toggle, and normalizes the ""partial""/""collapsed"" synonyms", function() {
+				var previewHtml = render( '::: prompt expanded="preview"' & char( 10 ) & "Body." & char( 10 ) & ":::" );
+				expect( previewHtml ).toInclude( "bxsites-prompt--preview" );
+				expect( previewHtml ).toInclude( ">Show more</button>" );
+
+				var partialHtml = render( '::: prompt expanded="partial"' & char( 10 ) & "Body." & char( 10 ) & ":::" );
+				expect( partialHtml ).toInclude( "bxsites-prompt--preview" );
+
+				var collapsedHtml = render( '::: prompt expanded="collapsed"' & char( 10 ) & "Body." & char( 10 ) & ":::" );
+				expect( collapsedHtml ).toInclude( "bxsites-prompt--hidden" );
+			} );
+
+			it( "falls back a ::: prompt's unrecognized [expanded] to full, with no toggle", function() {
+				var html = render( '::: prompt expanded="nonsense"' & char( 10 ) & "Body." & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( "bxsites-prompt--full" );
+				expect( html ).notToInclude( "bxsites-prompt__toggle" );
+			} );
+
 		} );
 	}
 

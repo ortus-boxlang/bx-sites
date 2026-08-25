@@ -2,8 +2,8 @@
  * A generic `::: name attr="value" ...` ... `:::` container-block syntax -
  * the shared foundation for every GitBook-style block Flexmark has no
  * native concept of: expandable, cards/card, columns/column,
- * stepper/step, updates/update, file, embed, page-link, link-preview, and
- * buttons/button (see each block's own `render*()` docblock below). Nests arbitrarily deep (a
+ * stepper/step, updates/update, file, embed, page-link, link-preview,
+ * buttons/button, and prompt (see each block's own `render*()` docblock below). Nests arbitrarily deep (a
  * `::: cards` block's own content is itself re-scanned for `::: card`
  * children, recursively) using the same two-phase pre/post-processing
  * shape as TabsProcessor.bx - `extract()` runs before `Markdown()`,
@@ -208,6 +208,8 @@ class {
 				return renderPageLinkStub( attrs )
 			case "link-preview":
 				return renderLinkPreview( attrs )
+			case "prompt":
+				return renderPrompt( block, attrs, renderer, markdownOptions )
 			case "conditional":
 				return renderConditional( block, attrs, renderer, markdownOptions )
 			case "audience-switcher":
@@ -739,6 +741,83 @@ class {
 			return ""
 		}
 		return host.reReplaceNoCase( "^www\.", "", "one" )
+	}
+
+	/**
+	 * `::: prompt description="..." icon="..." expanded="hidden|preview|full"`
+	 * - a styled container for a reusable AI prompt, bx-sites' own
+	 * equivalent of GitBook's Prompt block
+	 * (https://gitbook.com/docs/create-content/blocks/prompt): the block's
+	 * body *is* the prompt text (rendered as markdown, so headings/lists/
+	 * code inside it still get their own formatting), `description` is an
+	 * optional one-line summary shown under the heading, and `icon`
+	 * defaults to a sparkle glyph when omitted (resolved the same way
+	 * `::: card`'s own `icon` is - IconResolver.bx). `expanded` picks the
+	 * block's initial disclosure state (normalizePromptState() below) -
+	 * `prompt-init.js` wires up both that toggle and the "Copy" button,
+	 * which copies `data-bxsites-prompt-text` - the block's own raw
+	 * markdown source, not its rendered HTML, so a reader always copies
+	 * exactly the prompt text as authored, formatting markup included.
+	 * GitBook's own `openInAIProviders` menu (launching the prompt
+	 * straight into an external AI tool) has no equivalent here - this
+	 * module never talks to a third-party AI provider.
+	 */
+	private string function renderPrompt( required struct block, required struct attrs, required any renderer, required struct markdownOptions ) {
+		var description = trim( arguments.attrs.description ?: "" )
+		var iconRef = len( trim( arguments.attrs.icon ?: "" ) ) ? trim( arguments.attrs.icon ) : "phosphor-duotone:sparkle"
+		var iconHtml = variables.iconResolver.resolve( iconRef )
+		var state = normalizePromptState( arguments.attrs.expanded ?: "" )
+		var promptText = trim( arguments.block.content )
+
+		var html = '<div class="bxsites-prompt bxsites-prompt--' & state & '" data-bxsites-prompt-text="' & encodeForHTML( promptText ) & '">'
+			& '<div class="bxsites-prompt__header">'
+		if ( len( iconHtml ) ) {
+			html &= '<div class="bxsites-prompt__icon">' & iconHtml & '</div>'
+		}
+		html &= '<div class="bxsites-prompt__heading">'
+			& '<span class="bxsites-prompt__label">Prompt</span>'
+		if ( len( description ) ) {
+			html &= '<span class="bxsites-prompt__description">' & encodeForHTML( description ) & '</span>'
+		}
+		html &= '</div>'
+			& '<button type="button" class="bxsites-prompt__copy" aria-label="Copy prompt to clipboard">'
+			& '<span class="bxsites-prompt__copy-label">Copy</span>'
+			& '</button>'
+			& '</div>'
+			& '<div class="bxsites-prompt__body-wrap">'
+			& '<div class="bxsites-prompt__body">' & renderNested( arguments.block.content, arguments.renderer, arguments.markdownOptions ) & '</div>'
+			& '</div>'
+
+		if ( state != "full" ) {
+			// Kept as a sibling of `.bxsites-prompt__body-wrap`, not nested inside
+			// it - a "hidden" block hides that whole wrapper via CSS, and a toggle
+			// button nested inside it would vanish right along with it, leaving no
+			// way to ever reveal the prompt again.
+			var labelCollapsed = state == "hidden" ? "Show prompt" : "Show more"
+			var labelExpanded = state == "hidden" ? "Hide prompt" : "Show less"
+			html &= '<button type="button" class="bxsites-prompt__toggle" aria-expanded="false"'
+				& ' data-label-collapsed="' & encodeForHTML( labelCollapsed ) & '" data-label-expanded="' & encodeForHTML( labelExpanded ) & '">'
+				& encodeForHTML( labelCollapsed ) & '</button>'
+		}
+
+		html &= '</div>'
+		return html
+	}
+
+	/**
+	 * @raw `::: prompt`'s own `expanded` attribute, exactly as authored
+	 *
+	 * @return "hidden" (fully collapsed until toggled open), "preview" (a clamped, fade-out preview), or "full" (shown in full) - blank/unrecognized falls back to "full", the same default GitBook's own Prompt block uses ("Fully visible")
+	 */
+	private string function normalizePromptState( required string raw ) {
+		var value = lCase( trim( arguments.raw ) )
+		if ( value == "hidden" || value == "collapsed" ) {
+			return "hidden"
+		}
+		if ( value == "preview" || value == "partial" ) {
+			return "preview"
+		}
+		return "full"
 	}
 
 	/**

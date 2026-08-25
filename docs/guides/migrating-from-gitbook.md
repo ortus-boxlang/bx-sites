@@ -47,7 +47,7 @@ a judgment call, exactly what and where:
 Migrated 14 page(s) from [/path/to/gitbook-export] into my-docs/docs/, wrote my-docs/docs/nav.json
 
 2 item(s) need a manual look:
-  - guides/advanced.md: Unsupported GitBook block [{% prompt %}] - left in its original syntax, needs manual conversion
+  - guides/advanced.md: Unsupported GitBook block [{% conditional-content %}] - left in its original syntax, needs manual conversion
   - guides/layout.md: Column width="one-third" is not a plain length/percentage - dropped, review manually
 ```
 
@@ -75,6 +75,7 @@ source export and run it again.
 | `{% embed url="..." %}` | [`::: embed`](content-blocks.md#embed) |
 | `{% content-ref url="..." %}` | [`::: page-link`](content-blocks.md#page-link) |
 | `{% details %}` / `{% expand %}` | [`::: expandable`](content-blocks.md#expandable) |
+| `{% prompt description="..." icon="..." defaultExpanded="..." %}` | [`::: prompt`](content-blocks.md#prompt) - `openInAIProviders` is dropped, reported as a warning when it was turned on |
 
 GitBook's inline buttons don't need a conversion pass at all - they're
 already exported as plain `<a class="button primary">Label</a>` HTML, which
@@ -92,10 +93,9 @@ thing.
 ## What needs a manual look
 
 A handful of GitBook blocks have no bx-sites equivalent at all and are
-left in their original `{% %}` syntax rather than guessed at: **Prompt**
-(an AI-generation block - there's nothing to run it against once
-migrated), **Conditional content** (GitBook-account-based visibility, not
-a concept bx-sites has), and the **Ask AI** search bar. Anything else this
+left in their original `{% %}` syntax rather than guessed at:
+**Conditional content** (GitBook-account-based visibility, not a concept
+bx-sites has) and the **Ask AI** search bar. Anything else this
 tool doesn't recognize - a typo'd block, a GitBook feature added after
 this tool was written - gets the same treatment: left as-is, reported as
 a warning.
@@ -111,7 +111,7 @@ frontmatter genuinely has an `icon` field, `migrate` carries it through
 opportunistically, but don't expect it for most real exports. Set icons
 by hand afterward instead - either a page's own frontmatter, or a
 [`docs/nav.json` entry's own `icon`](../configuration.md#nav) - using a
-[named icon](themes.md#icons) from one of the eight bundled libraries
+[named icon](icons.md) from one of the eight bundled libraries
 (no need to match GitBook's own Font-Awesome-based icons; pick whichever
 name looks right in [Phosphor](https://phosphoricons.com/) - any of its
 six weights - [Lucide](https://lucide.dev/icons/) or
