@@ -36,6 +36,19 @@ BxSites は無料でオープンソースであり、Apache 2.0 ライセンス�
 
 ## 誰が開発しているか
 
+<div class="bxsites-ortus-logo">
+	<img class="bxsites-ortus-logo__light" src="assets/ortus-logo-full-light.svg" alt="Ortus Solutions, Corp">
+	<img class="bxsites-ortus-logo__dark" src="assets/ortus-logo-full-dark.svg" alt="Ortus Solutions, Corp">
+</div>
+
+<style>
+.bxsites-ortus-logo { margin: 0.5rem 0 1.5rem; }
+.bxsites-ortus-logo img { max-width: 260px; width: 100%; height: auto; }
+.bxsites-ortus-logo__dark { display: none; }
+[data-theme="dark"] .bxsites-ortus-logo__dark { display: inline-block; }
+[data-theme="dark"] .bxsites-ortus-logo__light { display: none; }
+</style>
+
 BxSites は [BoxLang](https://boxlang.io)、
 [ColdBox](https://coldbox.ortusbooks.com/)、
 [CommandBox](https://commandbox.ortusbooks.com/) をはじめとする BoxLang
@@ -43,6 +56,13 @@ BxSites は [BoxLang](https://boxlang.io)、
 [Ortus Solutions, Corp](https://www.ortussolutions.com) によって開発・
 保守されています - BxSites 自体が動作するランタイムを構築しているのも
 同じチームです。
+
+CFML、そして現在は BoxLang エコシステム向けのオープンソースツールを
+構築・サポート・提供してきた**20 年以上**の実績を持つ Ortus Solutions
+は、片手間のプロジェクトではありません - オープンソースこそが本業で
+す。この積み重ねこそが、BxSites(そして BoxLang スタック全体)を安心
+して採用できる理由です: 出したものを責任を持って保守し続けてきた、
+20 年の実績を持つ企業が支えています。
 
 ## プロジェクトを支援する
 

@@ -36,12 +36,33 @@ Wie du Bugs meldest, Änderungen vorschlägst und Support bekommst.
 
 ## Wer es entwickelt
 
+<div class="bxsites-ortus-logo">
+	<img class="bxsites-ortus-logo__light" src="assets/ortus-logo-full-light.svg" alt="Ortus Solutions, Corp">
+	<img class="bxsites-ortus-logo__dark" src="assets/ortus-logo-full-dark.svg" alt="Ortus Solutions, Corp">
+</div>
+
+<style>
+.bxsites-ortus-logo { margin: 0.5rem 0 1.5rem; }
+.bxsites-ortus-logo img { max-width: 260px; width: 100%; height: auto; }
+.bxsites-ortus-logo__dark { display: none; }
+[data-theme="dark"] .bxsites-ortus-logo__dark { display: inline-block; }
+[data-theme="dark"] .bxsites-ortus-logo__light { display: none; }
+</style>
+
 BxSites wird von [Ortus Solutions, Corp](https://www.ortussolutions.com)
 gebaut und gepflegt, den Machern von [BoxLang](https://boxlang.io),
 [ColdBox](https://coldbox.ortusbooks.com/),
 [CommandBox](https://commandbox.ortusbooks.com/) und dem Rest des
 BoxLang-Ökosystems - demselben Team, das auch die Runtime baut, auf der
 BxSites selbst läuft.
+
+Mit **über 20 Jahren** Erfahrung im Bauen, Unterstützen und Ausliefern
+von Open-Source-Tooling für das CFML- und mittlerweile das
+BoxLang-Ökosystem ist Ortus Solutions kein Nebenprojekt - Open Source ist
+das Kerngeschäft. Diese Kontinuität ist es, die BxSites (und den Rest des
+BoxLang-Stacks) zu etwas macht, auf das Teams sich verlassen können: Es
+steht ein Unternehmen mit zwei Jahrzehnten nachweislicher Erfahrung
+dahinter, das pflegt, was es ausliefert.
 
 ## Das Projekt unterstützen
 
