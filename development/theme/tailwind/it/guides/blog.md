@@ -177,14 +177,26 @@ reale, dato che il blog non è una pagina di `docs/`) al tuo array `nav` o
 a `docs/nav.json` - farlo sopprime del tutto quella aggiunta
 automaticamente, quindi non c'è mai un duplicato:
 
-```yaml title="bxsites.yaml" linenums="1"
-nav:
-  - path: index.md
-  - title: Blog
-    url: blog/index.html
-    icon: lucide:newspaper
-  - path: about.md
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    nav:
+      - path: index.md
+      - title: Blog
+        url: blog/index.html
+        icon: lucide:newspaper
+      - path: about.md
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"nav": [
+    		{ "path": "index.md" },
+    		{ "title": "Blog", "url": "blog/index.html", "icon": "lucide:newspaper" },
+    		{ "path": "about.md" }
+    	]
+    }
+    ```
 
 I singoli post non vengono aggiunti loro stessi alla nav (come l'indice
 dei tag) - sono raggiungibili da `/blog/`, dalla propria pagina categoria,
@@ -211,9 +223,15 @@ di feed si interessa solo a ciò che è nuovo, quindi un feed illimitato su
 un blog grande spreca solo banda a ogni polling; impostalo a `0` per
 tutti i post, senza limite:
 
-```yaml title="bxsites.yaml"
-blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
+    ```
 
 ## Vedere in anteprima le bozze
 

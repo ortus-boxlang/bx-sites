@@ -19,9 +19,15 @@ un proyecto lo habilita explícitamente por nombre de módulo de BoxLang,
 mediante el array [`plugins`](../configuration.md#plugins) de
 `bxsites.yaml`:
 
-```yaml title="bxsites.yaml"
-plugins: [ myBxSitesPlugin ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    plugins: [ myBxSitesPlugin ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "plugins": ["myBxSitesPlugin"] }
+    ```
 
 ## Instalar un plugin publicado
 

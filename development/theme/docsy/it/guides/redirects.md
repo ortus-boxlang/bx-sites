@@ -50,13 +50,24 @@ sezione ristrutturata, il percorso di un vecchio dominio, qualsiasi cosa
 non sia naturalmente il proprio "vecchio nome" di una singola pagina -
 elenca invece una coppia esplicita `from`/`to`:
 
-```yaml title="bxsites.yaml" linenums="1"
-redirects:
-  - from: old-guide
-    to: guides/new-guide/
-  - from: moved-to-another-site
-    to: https://example.com/docs
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    redirects:
+      - from: old-guide
+        to: guides/new-guide/
+      - from: moved-to-another-site
+        to: https://example.com/docs
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"redirects": [
+    		{ "from": "old-guide", "to": "guides/new-guide/" },
+    		{ "from": "moved-to-another-site", "to": "https://example.com/docs" }
+    	]
+    }
+    ```
 
 - `from` - il vecchio segmento URL "pretty", stessa forma di
   `redirect_from` sopra

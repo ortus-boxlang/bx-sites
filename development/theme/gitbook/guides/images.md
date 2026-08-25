@@ -94,21 +94,40 @@ adds AVIF upstream.
 
 ## Turning it off
 
-```yaml title="bxsites.yaml"
-assets: { images: { enabled: false } }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    assets: { images: { enabled: false } }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "assets": { "images": { "enabled": false } } }
+    ```
 
 Falls back to plain, unprocessed `docs/assets/**` copying - exactly how
 every image was handled before this feature existed.
 
 ## Choosing your own breakpoints
 
-```yaml title="bxsites.yaml" linenums="1"
-assets:
-  images:
-    widths: [ 480, 960, 1440 ]
-    formats: [ webp ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    assets:
+      images:
+        widths: [ 480, 960, 1440 ]
+        formats: [ webp ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"assets": {
+    		"images": {
+    			"widths": [480, 960, 1440],
+    			"formats": ["webp"]
+    		}
+    	}
+    }
+    ```
 
 `widths` defaults to `[400, 800, 1200, 1600]`; `formats` defaults to
 `["original", "webp"]` - drop `"original"` to skip generating resized
@@ -122,10 +141,19 @@ every `assets.images` key.
 `extraCss`/`extraJs` get bundled the same way, on by default
 (`assets.bundle`):
 
-```yaml title="bxsites.yaml" linenums="1"
-extraCss: [ assets/a.css, assets/b.css ]
-extraJs: [ assets/app.js ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    extraCss: [ assets/a.css, assets/b.css ]
+    extraJs: [ assets/app.js ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"extraCss": ["assets/a.css", "assets/b.css"],
+    	"extraJs": ["assets/app.js"]
+    }
+    ```
 
 builds one fingerprinted `assets/bundle.<hash>.css` (in the order
 listed) and one `assets/bundle.<hash>.js`, instead of one `<link>`/
@@ -143,9 +171,15 @@ project file. One external URL (a CDN link) mixed in falls the whole
 list back to today's exact per-URL behavior, rather than risk silently
 reordering a CSS cascade a project depended on:
 
-```yaml title="bxsites.yaml"
-extraCss: [ assets/custom.css, "https://cdn.example.com/lib.css" ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    extraCss: [ assets/custom.css, "https://cdn.example.com/lib.css" ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "extraCss": ["assets/custom.css", "https://cdn.example.com/lib.css"] }
+    ```
 
 renders two separate `<link>` tags, unbundled, exactly as before this
 feature existed.

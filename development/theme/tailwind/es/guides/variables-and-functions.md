@@ -27,13 +27,27 @@ Ambas comparten una única sintaxis:
 Añade un bloque `variables` a `bxsites.yaml` - con la forma que prefieras,
 plana o anidada:
 
-```yaml title="bxsites.yaml"
-variables:
-  company: "Ortus Solutions"
-  product:
-    name: "BoxLang"
-    supportEmail: "support@example.com"
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    variables:
+      company: "Ortus Solutions"
+      product:
+        name: "BoxLang"
+        supportEmail: "support@example.com"
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    {
+    	"variables": {
+    		"company": "Ortus Solutions",
+    		"product": {
+    			"name": "BoxLang",
+    			"supportEmail": "support@example.com"
+    		}
+    	}
+    }
+    ```
 
 Luego referencia cualquiera de sus valores, por ruta con puntos, desde
 cualquier página de Markdown:

@@ -87,9 +87,15 @@ domain root. Set `baseURL` in `bxsites.yaml` to that full URL so every
 internal link, asset and nav entry gets the `/<repo>/` prefix it needs -
 and so a real `sitemap.xml` gets generated too:
 
-```yaml title="bxsites.yaml"
-baseURL: "https://<user>.github.io/<repo>/"
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    baseURL: "https://<user>.github.io/<repo>/"
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "baseURL": "https://<user>.github.io/<repo>/" }
+    ```
 
 See [Configuration](../configuration.md#baseurl) for the full breakdown of
 what `baseURL` does. A `<user>.github.io` user site, or any custom domain

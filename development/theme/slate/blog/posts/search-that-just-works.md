@@ -31,9 +31,15 @@ though in practice `build` already runs this as one of its own steps.
 
 ## Turning it off
 
-```yaml title="bxsites.yaml"
-search: false
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    search: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "search": false }
+    ```
 
 Skips building the index entirely, and skips shipping the search box, the `lunr.js` script, and `search.js` - a project with search off ships nothing search-related at all.
 
@@ -41,24 +47,49 @@ Skips building the index entirely, and skips shipping the search box, the `lunr.
 
 For most docs sites, lunr's relevance ranking is genuinely good. But if you're running a large site and want crawler-hosted, typo-tolerant search, swap providers instead of fighting the default:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider:
-  provider: algolia
-  algolia:
-    appId: ABC123
-    apiKey: a1b2c3d4e5f6...
-    indexName: my-docs
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider:
+      provider: algolia
+      algolia:
+        appId: ABC123
+        apiKey: a1b2c3d4e5f6...
+        indexName: my-docs
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "algolia",
+    		"algolia": {
+    			"appId": "ABC123",
+    			"apiKey": "a1b2c3d4e5f6...",
+    			"indexName": "my-docs"
+    		}
+    	}
+    }
+    ```
 
 With Algolia active, no `search-index.json` is built at all - Algolia serves results from its own hosted index, populated by DocSearch's crawler (or your own Algolia Crawler config), and each theme renders an empty container that `docsearch({...})` mounts into.
 
 Prefer something that indexes your *built* HTML rather than a crawler hitting your live site? [Pagefind](https://pagefind.app/) is the other built-in option:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider: { provider: pagefind }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider: { provider: pagefind }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": { "provider": "pagefind" }
+    }
+    ```
 
 The `pagefind` CLI has to already be on your `PATH` - BxSites shells out to it right after the doc tree (including every version and locale) is written, and a missing binary fails the build loudly rather than shipping a site whose search silently doesn't work.
 

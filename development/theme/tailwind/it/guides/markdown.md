@@ -379,9 +379,15 @@ try.boxlang.io ↗" dell'embed riprende esattamente da dove parte l'embed.
 Opzionale tramite la chiave [`mermaid`](../configuration.md#mermaid) di
 `bxsites.yaml`:
 
-```yaml title="bxsites.yaml"
-mermaid: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    mermaid: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "mermaid": true }
+    ```
 
 Una volta attivato, qualsiasi blocco di codice delimitato ` ```mermaid `
 viene renderizzato come un diagramma [Mermaid](https://mermaid.js.org/)
@@ -404,9 +410,15 @@ per tutto ciò che può disegnare.
 Opzionale tramite la chiave [`math`](../configuration.md#math) di
 `bxsites.yaml`:
 
-```yaml title="bxsites.yaml"
-math: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    math: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "math": true }
+    ```
 
 Una volta attivato, [KaTeX](https://katex.org/) compone `$...$` per la
 matematica in linea e `$$...$$` per un blocco centrato, entrambi scritti

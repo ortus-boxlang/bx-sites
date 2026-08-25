@@ -27,13 +27,27 @@ Entrambe condividono un'unica sintassi:
 Aggiungi un blocco `variables` a `bxsites.yaml` - con qualsiasi forma tu
 preferisca, piatta o annidata:
 
-```yaml title="bxsites.yaml"
-variables:
-  company: "Ortus Solutions"
-  product:
-    name: "BoxLang"
-    supportEmail: "support@example.com"
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    variables:
+      company: "Ortus Solutions"
+      product:
+        name: "BoxLang"
+        supportEmail: "support@example.com"
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    {
+    	"variables": {
+    		"company": "Ortus Solutions",
+    		"product": {
+    			"name": "BoxLang",
+    			"supportEmail": "support@example.com"
+    		}
+    	}
+    }
+    ```
 
 Poi fai riferimento a uno qualsiasi dei suoi valori, per percorso puntato,
 da qualsiasi pagina Markdown:

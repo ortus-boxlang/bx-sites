@@ -62,9 +62,15 @@ DocSearch 自体から Cmd+K を無料で得られ（`keyboardShortcuts` のデ�
 
 ## 無効化
 
-```yaml title="bxsites.yaml"
-search: false
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    search: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "search": false }
+    ```
 
 `search-index.json` のビルドを完全にスキップし、すべてのレンダリングされたページから
 検索ボックス、同梱された（バンドルされた）`lunr.js` スクリプト、共有 `search.js` ウィジェットをスキップします。
@@ -91,16 +97,33 @@ bxSites search-index
 mkdocs-material、VitePress、Starlight、Docusaurus がいずれもサポートしている、
 同じクローラーホスト型の検索です:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider:
-  provider: algolia
-  algolia:
-    appId: ABC123
-    apiKey: a1b2c3d4e5f6...
-    indexName: my-docs
-    insights: false
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider:
+      provider: algolia
+      algolia:
+        appId: ABC123
+        apiKey: a1b2c3d4e5f6...
+        indexName: my-docs
+        insights: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "algolia",
+    		"algolia": {
+    			"appId": "ABC123",
+    			"apiKey": "a1b2c3d4e5f6...",
+    			"indexName": "my-docs",
+    			"insights": false
+    		}
+    	}
+    }
+    ```
 
 `appId`、`apiKey`、`indexName` は必須です - `apiKey` は DocSearch が発行する
 **検索専用**の公開 API キーです（管理キーでは決してありません。すべての
@@ -129,12 +152,24 @@ searchProvider:
 サーバーレスな検索エンジンですが、Algolia のようにクロールされるのではなく、
 *ビルド済み* の `site/` HTML からインデックス化されます:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider:
-  provider: pagefind
-  pagefind: { bin: pagefind, options: [] }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider:
+      provider: pagefind
+      pagefind: { bin: pagefind, options: [] }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "pagefind",
+    		"pagefind": { "bin": "pagefind", "options": [] }
+    	}
+    }
+    ```
 
 `pagefind` の両方のキーは任意です - `bin`（デフォルト `"pagefind"`）は実行
 ファイルの名前/パスで、単純な名前の場合は `PATH` を基準に解決されます。

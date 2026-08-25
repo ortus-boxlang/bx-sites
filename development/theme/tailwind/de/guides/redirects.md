@@ -50,13 +50,24 @@ umstrukturierter Abschnitt, der Pfad einer alten Domain, alles, was
 nicht natürlich der eigene "alte Name" einer einzelnen Seite ist -
 liste stattdessen ein explizites `from`/`to`-Paar auf:
 
-```yaml title="bxsites.yaml" linenums="1"
-redirects:
-  - from: old-guide
-    to: guides/new-guide/
-  - from: moved-to-another-site
-    to: https://example.com/docs
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    redirects:
+      - from: old-guide
+        to: guides/new-guide/
+      - from: moved-to-another-site
+        to: https://example.com/docs
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"redirects": [
+    		{ "from": "old-guide", "to": "guides/new-guide/" },
+    		{ "from": "moved-to-another-site", "to": "https://example.com/docs" }
+    	]
+    }
+    ```
 
 - `from` - das alte hübsche URL-Segment, dieselbe Form wie `redirect_from` oben
 - `to` - entweder ein root-relativer Pfad (aufgelöst gegen die eigene

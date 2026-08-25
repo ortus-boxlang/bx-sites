@@ -367,9 +367,15 @@ println( user.getFullName() )
 
 `bxsites.yaml` の [`mermaid`](../configuration.md#mermaid) キーでオプトイン:
 
-```yaml title="bxsites.yaml"
-mermaid: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    mermaid: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "mermaid": true }
+    ```
 
 有効にすると、` ```mermaid ` フェンスコードブロックはコードリストの代わりに
 [Mermaid](https://mermaid.js.org/) のライブダイアグラムとしてレンダリング
@@ -391,9 +397,15 @@ Mermaid はフローチャート、シーケンス図、クラス図、ガント
 
 `bxsites.yaml` の [`math`](../configuration.md#math) キーでオプトイン:
 
-```yaml title="bxsites.yaml"
-math: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    math: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "math": true }
+    ```
 
 有効にすると、[KaTeX](https://katex.org/) がインライン数式には `$...$`、
 中央揃えのブロックには `$$...$$` を組版します。どちらも Markdown 本文に

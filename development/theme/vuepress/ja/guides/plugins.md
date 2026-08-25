@@ -16,9 +16,15 @@ BoxLang 独自のモジュールシステムが*そのまま*プラグインシ�
 プロジェクトが `bxsites.yaml` の [`plugins`](../configuration.md#plugins) 配列に BoxLang モジュール名を
 明示的に追加することでオプトインする必要があります:
 
-```yaml title="bxsites.yaml"
-plugins: [ myBxSitesPlugin ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    plugins: [ myBxSitesPlugin ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "plugins": ["myBxSitesPlugin"] }
+    ```
 
 ## 公開済みプラグインのインストール
 

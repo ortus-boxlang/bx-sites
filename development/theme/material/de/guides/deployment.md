@@ -99,9 +99,15 @@ URL, damit jeder interne Link, jedes Asset und jeder Navigationseintrag
 das nötige `/<repo>/`-Präfix bekommt - und damit auch eine echte
 `sitemap.xml` erzeugt wird:
 
-```yaml title="bxsites.yaml"
-baseURL: "https://<user>.github.io/<repo>/"
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    baseURL: "https://<user>.github.io/<repo>/"
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "baseURL": "https://<user>.github.io/<repo>/" }
+    ```
 
 Siehe [Konfiguration](../configuration.md#baseurl) für die vollständige
 Aufschlüsselung dessen, was `baseURL` bewirkt. Eine

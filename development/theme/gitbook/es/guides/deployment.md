@@ -100,9 +100,15 @@ URL completa para que cada enlace interno, recurso y entrada de
 navegación obtenga el prefijo `/<repo>/` que necesita - y para que
 también se genere un `sitemap.xml` real:
 
-```yaml title="bxsites.yaml"
-baseURL: "https://<user>.github.io/<repo>/"
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    baseURL: "https://<user>.github.io/<repo>/"
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "baseURL": "https://<user>.github.io/<repo>/" }
+    ```
 
 Consulta [Configuración](../configuration.md#baseurl) para el desglose
 completo de qué hace `baseURL`. Un sitio de usuario `<user>.github.io`, o

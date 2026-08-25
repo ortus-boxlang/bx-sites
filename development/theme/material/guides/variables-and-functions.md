@@ -25,13 +25,27 @@ Both share one syntax:
 Add a `variables` block to `bxsites.yaml` - any shape you like, flat or
 nested:
 
-```yaml title="bxsites.yaml"
-variables:
-  company: "Ortus Solutions"
-  product:
-    name: "BoxLang"
-    supportEmail: "support@example.com"
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    variables:
+      company: "Ortus Solutions"
+      product:
+        name: "BoxLang"
+        supportEmail: "support@example.com"
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    {
+    	"variables": {
+    		"company": "Ortus Solutions",
+    		"product": {
+    			"name": "BoxLang",
+    			"supportEmail": "support@example.com"
+    		}
+    	}
+    }
+    ```
 
 Then reference any of it, by dotted path, from any Markdown page:
 

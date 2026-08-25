@@ -183,14 +183,26 @@ página real, ya que el blog no es una página de `docs/`) a tu array
 `nav` o a `docs/nav.json` - hacerlo suprime por completo la entrada
 añadida automáticamente, así que nunca hay una duplicada:
 
-```yaml title="bxsites.yaml" linenums="1"
-nav:
-  - path: index.md
-  - title: Blog
-    url: blog/index.html
-    icon: lucide:newspaper
-  - path: about.md
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    nav:
+      - path: index.md
+      - title: Blog
+        url: blog/index.html
+        icon: lucide:newspaper
+      - path: about.md
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"nav": [
+    		{ "path": "index.md" },
+    		{ "title": "Blog", "url": "blog/index.html", "icon": "lucide:newspaper" },
+    		{ "path": "about.md" }
+    	]
+    }
+    ```
 
 Las entradas individuales no se añaden a la nav por sí mismas (igual que
 el índice de etiquetas) - son accesibles desde `/blog/`, su propia
@@ -218,9 +230,15 @@ lectores de feeds solo se preocupan por lo que es nuevo, así que un feed
 sin límite en un blog grande simplemente desperdicia ancho de banda en
 cada sondeo; establécelo en `0` para no tener límite:
 
-```yaml title="bxsites.yaml"
-blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
+    ```
 
 ## Vista previa de borradores
 

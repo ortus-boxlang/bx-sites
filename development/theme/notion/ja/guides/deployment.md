@@ -73,9 +73,15 @@ GitHub の *プロジェクト* Pages サイト（*ユーザー* サイトとは
 ナビゲーションエントリに必要な `/<repo>/` プレフィックスが付くようにしてください。
 また、実際の `sitemap.xml` も生成されます:
 
-```yaml title="bxsites.yaml"
-baseURL: "https://<user>.github.io/<repo>/"
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    baseURL: "https://<user>.github.io/<repo>/"
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "baseURL": "https://<user>.github.io/<repo>/" }
+    ```
 
 `baseURL` が何をするかの完全な詳細については [設定](../configuration.md#baseurl) を参照してください。
 `<user>.github.io` ユーザーサイト、またはサイトルートにマッピングされたカスタムドメインの

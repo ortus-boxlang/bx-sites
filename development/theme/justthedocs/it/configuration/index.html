@@ -96,7 +96,7 @@ passato <code>--format=json</code> (vedi
 <a href="/bx-sites/development/theme/justthedocs/it/getting-started/index.html#formato-del-file-di-configurazione">Per iniziare</a>). Se
 un progetto ne ha in qualche modo più di uno, vince <code>bxsites.yaml</code>, poi
 <code>bxsites.yml</code>, poi <code>bxsites.json</code>.</p>
-<pre><code class="language-yaml">name: &quot;My Docs&quot;
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">name: &quot;My Docs&quot;
 description: &quot;&quot;
 baseURL: &quot;/&quot;
 theme:
@@ -132,8 +132,7 @@ i18n:
   locales: []
 variables: {}
 </code></pre>
-<p>L'equivalente <code>bxsites.json</code>, per un progetto che lo preferisce:</p>
-<pre><code class="language-json">{
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
 	&quot;name&quot;: &quot;My Docs&quot;,
 	&quot;description&quot;: &quot;&quot;,
 	&quot;baseURL&quot;: &quot;/&quot;,
@@ -175,13 +174,13 @@ variables: {}
 	&quot;variables&quot;: {}
 }
 </code></pre>
+</div></div></div>
 <p>Solo <code>name</code> è obbligatorio - tutto il resto ricade sui valori predefiniti
 mostrati sopra. Un oggetto <code>theme</code> parziale viene unito con quello di
 default per un livello, quindi <code>{&quot;theme&quot;:{&quot;name&quot;:&quot;material&quot;}}</code> da solo
 mantiene comunque le <code>options</code> predefinite (vuote). Ogni chiave ha lo
-stesso nome e la stessa forma in entrambi i formati; il resto di questa
-pagina mostra solo snippet YAML, secondo il formato predefinito proprio di
-<code>bxSites new</code>, ma ognuno di essi si legge allo stesso modo in JSON.</p>
+stesso nome e la stessa forma in entrambi i formati - cambia scheda in
+qualsiasi esempio qui sotto per vederlo nell'altra forma.</p>
 <h2 id="name"><a href="#name" id="name" name="name" class="anchor"></a><code>name</code></h2>
 <p>Il nome del sito, mostrato nel marchio dell'header/brand e nei titoli
 delle pagine. Obbligatorio.</p>
@@ -220,8 +219,11 @@ semplicemente un URL assoluto quando <code>baseURL</code> ne fornisce uno.</p>
 <p>Ogni build scrive un <code>robots.txt</code> alla radice del sito - nessuna chiave di
 configurazione necessaria, a meno che tu non voglia cambiarne il
 comportamento predefinito, permissivo:</p>
-<pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;robots&quot;: false }
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">robots: false
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;robots&quot;: false }
+</code></pre>
+</div></div></div>
 <ul>
 <li><code>true</code> (il valore predefinito) - <code>Allow: /</code> per ogni crawler, più una
 riga <code>Sitemap:</code> che punta a <code>sitemap.xml</code> quando <code>baseURL</code> è un URL
@@ -273,35 +275,43 @@ browser).</li>
 <li><code>theme.options</code> - opzioni specifiche del tema, lette da ogni tema
 integrato:
 <ul>
-<li>
-<p><code>theme.options.colorMode</code> - <code>&quot;auto&quot;</code> (il valore predefinito),
+<li><code>theme.options.colorMode</code> - <code>&quot;auto&quot;</code> (il valore predefinito),
 <code>&quot;light&quot;</code> o <code>&quot;dark&quot;</code>. Controlla quale modalità vede un visitatore alla
 prima visita, prima che ne scelga una propria tramite l'interruttore
 scuro/chiaro nell'header - <code>&quot;auto&quot;</code> segue la preferenza del suo
 sistema operativo, <code>&quot;light&quot;</code>/<code>&quot;dark&quot;</code> fissa un default fisso. Una
 volta che un visitatore attiva l'interruttore, la sua scelta
 (memorizzata in <code>localStorage</code>) prevale sempre nelle visite
-successive, indipendentemente da questa impostazione.</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">theme: { options: { colorMode: dark } }
-</code></pre>
+successive, indipendentemente da questa impostazione.</li>
+</ul>
 </li>
-<li>
-<p><code>theme.options.navCollapsible</code> - <code>false</code> (il valore predefinito)
+</ul>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { colorMode: dark } }
+    ```
+
+=== &quot;JSON&quot;
+    ```json
+    { &quot;theme&quot;: { &quot;options&quot;: { &quot;colorMode&quot;: &quot;dark&quot; } } }
+    ```</code></pre>
+</div></div></div>
+<ul>
+<li><code>theme.options.navCollapsible</code> - <code>false</code> (il valore predefinito)
 mostra ogni intestazione di sezione della nav sempre espansa, come
 oggi. <code>true</code> mostra ogni sezione della nav (una cartella senza
 <code>index.md</code>) come un elemento nativo <code>&lt;details&gt;</code>/<code>&lt;summary&gt;</code> che il
-visitatore può comprimere - nessun framework JS coinvolto.</p>
-</li>
-<li>
-<p><code>theme.options.navExpandAll</code> - rilevante solo quando <code>navCollapsible</code>
+visitatore può comprimere - nessun framework JS coinvolto.</li>
+<li><code>theme.options.navExpandAll</code> - rilevante solo quando <code>navCollapsible</code>
 è <code>true</code>. <code>true</code> (il valore predefinito) avvia ogni sezione aperta;
-<code>false</code> avvia ogni sezione compressa.</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">theme: { options: { navCollapsible: true, navExpandAll: false } }
-</code></pre>
-</li>
+<code>false</code> avvia ogni sezione compressa.</li>
 </ul>
-</li>
-</ul>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { navCollapsible: true, navExpandAll: false } }
+    ```
+
+=== &quot;JSON&quot;
+    ```json
+    { &quot;theme&quot;: { &quot;options&quot;: { &quot;navCollapsible&quot;: true, &quot;navExpandAll&quot;: false } } }
+    ```</code></pre>
+</div></div></div>
 <h2 id="search"><a href="#search" id="search" name="search" class="anchor"></a><code>search</code></h2>
 <p><code>true</code> (il valore predefinito) compila un indice di ricerca statico e
 attiva il box di ricerca; <code>false</code> salta entrambi del tutto - nessun
@@ -324,7 +334,7 @@ da amministratore) e <code>indexName</code>, esattamente come li richiede il
 client DocSearch di Algolia stesso. <code>insights</code> (<code>false</code> di default)
 attiva l'analytics di click/conversione proprio di DocSearch.</li>
 </ul>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">  search: true
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">  search: true
   searchProvider:
     provider: algolia
     algolia:
@@ -332,6 +342,19 @@ attiva l'analytics di click/conversione proprio di DocSearch.</li>
       apiKey: a1b2c3d4e5f6...
       indexName: my-docs
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">  {
+  	&quot;search&quot;: true,
+  	&quot;searchProvider&quot;: {
+  		&quot;provider&quot;: &quot;algolia&quot;,
+  		&quot;algolia&quot;: {
+  			&quot;appId&quot;: &quot;ABC123&quot;,
+  			&quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
+  			&quot;indexName&quot;: &quot;my-docs&quot;
+  		}
+  	}
+  }
+</code></pre>
+</div></div></div>
 <ul>
 <li><code>pagefind</code> - entrambe le chiavi opzionali quando <code>provider</code> è
 <code>&quot;pagefind&quot;</code>: <code>bin</code> (predefinito <code>&quot;pagefind&quot;</code>) è il nome/percorso
@@ -341,11 +364,20 @@ CLI <code>pagefind</code> stessa deve essere già installata e su <code>PATH</co
 ci esegue uno shell out (come <code>git</code> per <code>lastUpdated</code>/<code>gh-deploy</code>), non
 la installa al posto tuo.</li>
 </ul>
-<pre><code class="language-yaml">  search: true
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">  search: true
   searchProvider:
     provider: pagefind
     pagefind: { bin: pagefind, options: [] }
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">  {
+  	&quot;search&quot;: true,
+  	&quot;searchProvider&quot;: {
+  		&quot;provider&quot;: &quot;pagefind&quot;,
+  		&quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
+  	}
+  }
+</code></pre>
+</div></div></div>
 <h2 id="nav"><a href="#nav" id="nav" name="nav" class="anchor"></a><code>nav</code></h2>
 <p>Per impostazione predefinita, la nav viene dedotta dalla struttura stessa
 di cartelle/file di <code>docs/</code> (con il frontmatter <code>order</code>/<code>hidden</code>) - va
@@ -372,7 +404,7 @@ reale della pagina resta intatto - cambia solo l'etichetta/icona nella
 nav) - vedi <a href="/bx-sites/development/theme/justthedocs/it/guides/icons/index.html">Icone</a> per cosa può essere un
 valore <code>icon</code></li>
 </ul>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">nav:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">nav:
   - index.md
   - title: Guides
     children:
@@ -380,10 +412,24 @@ valore <code>icon</code></li>
         path: guides/setup.md
       - guides/deployment.md
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;nav&quot;: [
+		&quot;index.md&quot;,
+		{
+			&quot;title&quot;: &quot;Guides&quot;,
+			&quot;children&quot;: [
+				{ &quot;title&quot;: &quot;Quick Start&quot;, &quot;path&quot;: &quot;guides/setup.md&quot; },
+				&quot;guides/deployment.md&quot;
+			]
+		}
+	]
+}
+</code></pre>
+</div></div></div>
 <p>Per una nav abbastanza grande da appesantire <code>bxsites.yaml</code>, spostala nel
 proprio file <code>docs/nav.json</code> - stessa forma di array, solo come contenuto
 principale dell'intero file:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-json">[
+<pre><code class="language-json">[
 	&quot;index.md&quot;,
 	{ &quot;title&quot;: &quot;Guides&quot;, &quot;children&quot;: [ &quot;guides/setup.md&quot; ] }
 ]
@@ -396,10 +442,17 @@ esplicita.</p>
 <h2 id="redirects"><a href="#redirects" id="redirects" name="redirects" class="anchor"></a><code>redirects</code></h2>
 <p><code>[]</code> (il valore predefinito) - redirect <code>from</code>/<code>to</code> per URL vecchi validi
 per tutto il sito, applicati solo all'albero principale:</p>
-<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">redirects:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">redirects:
   - from: old-guide
     to: guides/new-guide/
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;redirects&quot;: [
+		{ &quot;from&quot;: &quot;old-guide&quot;, &quot;to&quot;: &quot;guides/new-guide/&quot; }
+	]
+}
+</code></pre>
+</div></div></div>
 <ul>
 <li><code>redirects[].from</code> - il vecchio segmento URL (senza slash
 iniziale/finale, senza estensione) su cui viene scritto uno stub di
@@ -449,12 +502,22 @@ ma BxSites lo imposta a <code>true</code> di default (vedi la
 </tbody>
 </table></div>
 <p>Ogni tabella renderizzata riceve anche automaticamente un wrapper per lo scroll responsive e un'intestazione fissa, senza una propria chiave di configurazione - vedi <a href="/bx-sites/development/theme/justthedocs/it/guides/tables/index.html#scorrimento-responsive-e-intestazione-fissa">Tabelle</a>.</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">markdown:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">markdown:
   enableFootnotes: true
   enableDefinitionLists: true
   anchorLinks: false
   enableYouTubeTransformer: true
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;markdown&quot;: {
+		&quot;enableFootnotes&quot;: true,
+		&quot;enableDefinitionLists&quot;: true,
+		&quot;anchorLinks&quot;: false,
+		&quot;enableYouTubeTransformer&quot;: true
+	}
+}
+</code></pre>
+</div></div></div>
 <h2 id="repo"><a href="#repo" id="repo" name="repo" class="anchor"></a><code>repo</code></h2>
 <p>Aggiunge un link con icona del repository nell'header (in tutti e tre i
 temi integrati) e, quando entrambe le chiavi sono impostate, un link
@@ -472,8 +535,11 @@ ottiene <code>https://github.com/acme/docs/edit/main/docs/guides/setup.md</code>
 Richiede anche <code>repo.url</code>; lascialo vuoto per omettere i link di
 modifica pur mostrando l'icona nell'header.</li>
 </ul>
-<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">repo: { url: &quot;https://github.com/acme/docs&quot;, editUri: &quot;edit/main/docs/&quot; }
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">repo: { url: &quot;https://github.com/acme/docs&quot;, editUri: &quot;edit/main/docs/&quot; }
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;repo&quot;: { &quot;url&quot;: &quot;https://github.com/acme/docs&quot;, &quot;editUri&quot;: &quot;edit/main/docs/&quot; } }
+</code></pre>
+</div></div></div>
 <h2 id="social"><a href="#social" id="social" name="social" class="anchor"></a><code>social</code></h2>
 <p>Un array di link social/esterni renderizzati nel footer (vedi
 <a href="#footer"><code>footer</code></a> - non ha effetto a meno che non sia anch'esso
@@ -483,16 +549,27 @@ di icone integrato (<code>github</code>, <code>twitter</code>/<code>x</code>, <c
 un glifo di link generico come ripiego per qualsiasi altra cosa), e
 <code>label</code> imposta il nome accessibile/tooltip del link (predefinito su
 <code>icon</code>, poi <code>&quot;Link&quot;</code>).</p>
-<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">social:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">social:
   - { url: &quot;https://twitter.com/acme&quot;, icon: twitter, label: Twitter }
   - { url: &quot;https://acme.com/rss.xml&quot;, icon: rss, label: RSS }
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;social&quot;: [
+		{ &quot;url&quot;: &quot;https://twitter.com/acme&quot;, &quot;icon&quot;: &quot;twitter&quot;, &quot;label&quot;: &quot;Twitter&quot; },
+		{ &quot;url&quot;: &quot;https://acme.com/rss.xml&quot;, &quot;icon&quot;: &quot;rss&quot;, &quot;label&quot;: &quot;RSS&quot; }
+	]
+}
+</code></pre>
+</div></div></div>
 <h2 id="footer"><a href="#footer" id="footer" name="footer" class="anchor"></a><code>footer</code></h2>
 <p><code>false</code> (il valore predefinito) - nessun footer. <code>true</code> ne aggiunge uno a
 ogni pagina: una riga di copyright (<code>© &lt;anno&gt; &lt;nome del sito&gt;</code>), i link
 <code>social</code> (se presenti), e un credito &quot;Built with BxSites&quot;.</p>
-<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">footer: true
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">footer: true
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;footer&quot;: true }
+</code></pre>
+</div></div></div>
 <h2 id="lastupdated"><a href="#lastupdated" id="lastupdated" name="lastupdated" class="anchor"></a><code>lastUpdated</code></h2>
 <p><code>false</code> (il valore predefinito) - nessuna data di ultimo aggiornamento.
 <code>true</code> aggiunge una riga &quot;Last updated&quot; accanto al link di modifica (o da
@@ -502,8 +579,11 @@ silenziosamente per una pagina di cui git non ha storia - un <code>git init</cod
 appena fatto senza ancora commit, un build eseguito da uno zip scaricato
 senza alcun <code>.git</code>, oppure git non installato sulla macchina di build -
 piuttosto che interrompere il build.</p>
-<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">lastUpdated: true
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">lastUpdated: true
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;lastUpdated&quot;: true }
+</code></pre>
+</div></div></div>
 <h2 id="analytics"><a href="#analytics" id="analytics" name="analytics" class="anchor"></a><code>analytics</code></h2>
 <p>Attiva l'analisi delle visualizzazioni di pagina. Attualmente supporta
 solo Google Analytics (<code>gtag.js</code>):</p>
@@ -513,8 +593,11 @@ valore predefinito), non viene distribuito alcuno script di analytics.</li>
 <li><code>analytics.id</code> - l'ID di misurazione di Google Analytics (ad es.
 <code>&quot;G-ABC123&quot;</code>). Obbligatorio quando <code>provider</code> è <code>&quot;google&quot;</code>.</li>
 </ul>
-<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">analytics: { provider: google, id: &quot;G-ABC123&quot; }
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">analytics: { provider: google, id: &quot;G-ABC123&quot; }
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;analytics&quot;: { &quot;provider&quot;: &quot;google&quot;, &quot;id&quot;: &quot;G-ABC123&quot; } }
+</code></pre>
+</div></div></div>
 <h2 id="ogimage"><a href="#ogimage" id="ogimage" name="ogimage" class="anchor"></a><code>ogImage</code></h2>
 <p>Percorso/URL a un'immagine social-card predefinita, renderizzata come
 <code>og:image</code> (abbinata a un <code>twitter:card</code> di tipo
@@ -523,8 +606,11 @@ allo stesso modo di <code>theme.logo</code> (i percorsi relativi vengono prefiss
 con <code>baseURL</code>, gli URL assoluti vengono usati così come sono). Lasciato
 vuoto (il valore predefinito) e con <code>generateOgImages</code> disattivato, non
 viene renderizzato alcun tag <code>og:image</code>/<code>twitter:card</code>.</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">ogImage: assets/social-card.png
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">ogImage: assets/social-card.png
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;ogImage&quot;: &quot;assets/social-card.png&quot; }
+</code></pre>
+</div></div></div>
 <p>Un <code>ogImage</code> proprio del frontmatter di una pagina (vedi
 <a href="/bx-sites/development/theme/justthedocs/it/getting-started/index.html#add-pages">Per iniziare</a>) prevale sempre su questo
 valore predefinito a livello di sito per quella singola pagina.</p>
@@ -538,23 +624,32 @@ un'unica immagine generica a livello di sito. Solo <code>java.awt</code>/
 <code>javax.imageio</code> dietro le quinte (parte di qualsiasi JVM su cui gira
 BoxLang), quindi non serve alcun browser headless, servizio esterno, o
 accesso alla rete al momento del build.</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">generateOgImages: true
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">generateOgImages: true
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;generateOgImages&quot;: true }
+</code></pre>
+</div></div></div>
 <h2 id="extracss--extrajs"><a href="#extracss--extrajs" id="extracss--extrajs" name="extracss--extrajs" class="anchor"></a><code>extraCss</code> / <code>extraJs</code></h2>
 <p>Array di URL di fogli di stile/script extra da includere in ogni pagina,
 aggiunti dopo gli asset propri del tema - ogni voce viene risolta allo
 stesso modo di <code>theme.logo</code> (un percorso relativo viene prefissato con
 <code>baseURL</code>; un URL assoluto viene usato così com'è). Le voci di <code>extraJs</code>
 vengono caricate con <code>defer</code>.</p>
-<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">extraCss: [ assets/custom.css ]
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">extraCss: [ assets/custom.css ]
 extraJs: [ assets/custom.js ]
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;extraCss&quot;: [&quot;assets/custom.css&quot;],
+	&quot;extraJs&quot;: [&quot;assets/custom.js&quot;]
+}
+</code></pre>
+</div></div></div>
 <p>Quando <code>assets.bundle</code> è attivo (il valore predefinito), un elenco locale
 di <code>extraCss</code>/<code>extraJs</code> come quello sopra viene raggruppato in un unico
 file con impronta digitale ciascuno, invece di un tag <code>&lt;link&gt;</code>/<code>&lt;script&gt;</code>
 per ogni voce - vedi <a href="#assets"><code>assets</code></a> sotto.</p>
 <h2 id="assets"><a href="#assets" id="assets" name="assets" class="anchor"></a><code>assets</code></h2>
-<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">assets:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">assets:
   fingerprint: true
   bundle: true
   images:
@@ -562,6 +657,19 @@ per ogni voce - vedi <a href="#assets"><code>assets</code></a> sotto.</p>
     widths: [ 400, 800, 1200, 1600 ]
     formats: [ original, webp ]
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;assets&quot;: {
+		&quot;fingerprint&quot;: true,
+		&quot;bundle&quot;: true,
+		&quot;images&quot;: {
+			&quot;enabled&quot;: true,
+			&quot;widths&quot;: [400, 800, 1200, 1600],
+			&quot;formats&quot;: [&quot;original&quot;, &quot;webp&quot;]
+		}
+	}
+}
+</code></pre>
+</div></div></div>
 <p>La pipeline degli asset - ridimensionamento immagini/WebP tramite
 <a href="https://github.com/ortus-boxlang/bx-image">bx-image</a> (una dipendenza
 obbligatoria, installata insieme a bx-markdown/bx-esapi) e bundling
@@ -610,15 +718,21 @@ default.</li>
 <code>mermaid.js</code> lato client e renderizza ogni blocco di codice delimitato
 <code>```mermaid</code> come un diagramma. Vedi
 <a href="/bx-sites/development/theme/justthedocs/it/guides/markdown/index.html#diagrams">Estensioni Markdown</a> per la sintassi.</p>
-<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">mermaid: true
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">mermaid: true
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;mermaid&quot;: true }
+</code></pre>
+</div></div></div>
 <h2 id="math"><a href="#math" id="math" name="math" class="anchor"></a><code>math</code></h2>
 <p><code>false</code> (il valore predefinito) - nessun <a href="https://katex.org/">KaTeX</a>
 distribuito. <code>true</code> lo carica lato client e compone <code>&#x24;...&#x24;</code>/<code>&#x24;&#x24;...&#x24;&#x24;</code>
 scritti direttamente nel markdown di una pagina. Vedi
 <a href="/bx-sites/development/theme/justthedocs/it/guides/markdown/index.html#math">Estensioni Markdown</a> per la sintassi.</p>
-<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">math: true
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">math: true
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;math&quot;: true }
+</code></pre>
+</div></div></div>
 <p>Le ammonizioni (box di richiamo in stile nota/avviso/suggerimento), le
 schede di contenuto e le annotazioni <code>hl_lines</code>/<code>linenums</code>/<code>title</code> sui
 blocchi di codice delimitati sono sempre disponibili nel markdown di ogni
@@ -632,15 +746,21 @@ carica lato client e renderizza ogni blocco di contenuto
 OpenAPI/Swagger referenziata (JSON o YAML). Vedi
 <a href="/bx-sites/development/theme/justthedocs/it/guides/openapi/index.html">OpenAPI / Swagger</a> per la
 sintassi.</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">openapi: true
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">openapi: true
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;openapi&quot;: true }
+</code></pre>
+</div></div></div>
 <h2 id="plugins"><a href="#plugins" id="plugins" name="plugins" class="anchor"></a><code>plugins</code></h2>
 <p><code>[]</code> (il valore predefinito) - un array di nomi di moduli BoxLang da
 attivare come plugin. Installare un modulo plugin (<code>box install</code>) non lo
 attiva mai da solo; deve essere nominato anche qui. Vedi
 <a href="/bx-sites/development/theme/justthedocs/it/guides/plugins/index.html">Plugin</a> per come scriverne uno.</p>
-<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">plugins: [ myBxSitesPlugin ]
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">plugins: [ myBxSitesPlugin ]
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;plugins&quot;: [&quot;myBxSitesPlugin&quot;] }
+</code></pre>
+</div></div></div>
 <h2 id="i18n"><a href="#i18n" id="i18n" name="i18n" class="anchor"></a><code>i18n</code></h2>
 <p>Metadati per la convenzione delle cartelle-locale
 <a href="/bx-sites/development/theme/justthedocs/it/guides/i18n/index.html"><code>docs/i18n/&lt;code&gt;/</code></a> - una locale si compila
@@ -664,12 +784,23 @@ per l'elenco completo delle chiavi; <code>de</code>/<code>es</code>/<code>it</co
 una traduzione integrata, quindi <code>strings</code> serve solo per sovrascrivere
 una chiave o aggiungere un'altra locale.</li>
 </ul>
-<pre data-bxsites-title="docs&#x2f;index.md"><code class="language-yaml">i18n:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">i18n:
   defaultLocale: { code: en, label: English }
   locales:
     - { code: es, label: Español }
     - { code: ar, label: العربية, dir: rtl }
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;i18n&quot;: {
+		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
+		&quot;locales&quot;: [
+			{ &quot;code&quot;: &quot;es&quot;, &quot;label&quot;: &quot;Español&quot; },
+			{ &quot;code&quot;: &quot;ar&quot;, &quot;label&quot;: &quot;العربية&quot;, &quot;dir&quot;: &quot;rtl&quot; }
+		]
+	}
+}
+</code></pre>
+</div></div></div>
 <p>Vedi <a href="/bx-sites/development/theme/justthedocs/it/guides/i18n/index.html">Internazionalizzazione</a> per il quadro completo -
 il fallback per le pagine non tradotte, il selettore di lingua, e cosa non
 è ancora tradotto.</p>
@@ -678,11 +809,19 @@ il fallback per le pagine non tradotte, il selettore di lingua, e cosa non
 qualsiasi forma, referenziato da qualsiasi pagina Markdown come
 <code>{{ dotted.path }}</code>. Vedi
 <a href="/bx-sites/development/theme/justthedocs/it/guides/variables-and-functions/index.html">Variabili e Funzioni Magiche</a>.</p>
-<pre><code class="language-yaml">variables:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">variables:
   company: &quot;Ortus Solutions&quot;
   product: { name: &quot;BoxLang&quot;, supportEmail: &quot;support@example.com&quot; }
 </code></pre>
-<pre><code class="language-markdown">Welcome to {{ company }}! We build {{ product.name }}.
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;variables&quot;: {
+		&quot;company&quot;: &quot;Ortus Solutions&quot;,
+		&quot;product&quot;: { &quot;name&quot;: &quot;BoxLang&quot;, &quot;supportEmail&quot;: &quot;support@example.com&quot; }
+	}
+}
+</code></pre>
+</div></div></div>
+<pre data-bxsites-title="docs&#x2f;index.md"><code class="language-markdown">Welcome to {{ company }}! We build {{ product.name }}.
 </code></pre>
 <p>Un file <code>docs/functions.bxs</code> (nessuna chiave di configurazione propria -
 per convenzione, come <code>docs/nav.json</code>/<code>docs/blog/authors.yml</code>) aggiunge
@@ -721,7 +860,7 @@ attivare esplicitamente. Un file sciolto posizionato direttamente sotto
 quelle del sito principale.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/justthedocs/it/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 25, 2026, 11&#x3a;27&#x3a;58 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/justthedocs/it/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 25, 2026, 11&#x3a;30&#x3a;38 PM</span></div>
 			</article>
 
 			<nav class="jtd-page-nav" aria-label="Navigazione della pagina">

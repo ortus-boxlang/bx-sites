@@ -73,9 +73,15 @@ Moduls.
 
 ## Ausschalten
 
-```yaml title="bxsites.yaml"
-search: false
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    search: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "search": false }
+    ```
 
 Überspringt den Aufbau von `search-index.json` vollständig und
 überspringt die Suchbox, das vendorierte `lunr.js`-Skript sowie das
@@ -105,16 +111,33 @@ Setze `searchProvider.provider` auf `"algolia"`, um die Suchbox gegen
 dieselbe crawler-gehostete Suche, die mkdocs-material, VitePress,
 Starlight und Docusaurus alle unterstützen:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider:
-  provider: algolia
-  algolia:
-    appId: ABC123
-    apiKey: a1b2c3d4e5f6...
-    indexName: my-docs
-    insights: false
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider:
+      provider: algolia
+      algolia:
+        appId: ABC123
+        apiKey: a1b2c3d4e5f6...
+        indexName: my-docs
+        insights: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "algolia",
+    		"algolia": {
+    			"appId": "ABC123",
+    			"apiKey": "a1b2c3d4e5f6...",
+    			"indexName": "my-docs",
+    			"insights": false
+    		}
+    	}
+    }
+    ```
 
 `appId`, `apiKey` und `indexName` sind erforderlich - `apiKey` ist der
 **reine Such**-öffentliche API-Schlüssel, den DocSearch dir gibt (nie
@@ -146,12 +169,24 @@ Setze `searchProvider.provider` auf `"pagefind"`, um die Suchbox gegen
 vollständig statische Suchmaschine ohne Server, aber indiziert aus dem
 *gebauten* `site/`-HTML statt gecrawlt wie bei Algolia:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider:
-  provider: pagefind
-  pagefind: { bin: pagefind, options: [] }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider:
+      provider: pagefind
+      pagefind: { bin: pagefind, options: [] }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "pagefind",
+    		"pagefind": { "bin": "pagefind", "options": [] }
+    	}
+    }
+    ```
 
 Beide `pagefind`-Schlüssel sind optional - `bin` (Standard `"pagefind"`)
 ist der Name/Pfad der Binary, aufgelöst gegen `PATH`, wenn es ein reiner

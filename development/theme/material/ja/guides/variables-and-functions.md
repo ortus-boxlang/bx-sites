@@ -25,13 +25,27 @@ BoxLang ヘルパーである**マジック関数**です。
 `bxsites.yaml` に `variables` ブロックを追加します - フラットでもネストしていても、
 好きな形で構いません:
 
-```yaml title="bxsites.yaml"
-variables:
-  company: "Ortus Solutions"
-  product:
-    name: "BoxLang"
-    supportEmail: "support@example.com"
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    variables:
+      company: "Ortus Solutions"
+      product:
+        name: "BoxLang"
+        supportEmail: "support@example.com"
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    {
+    	"variables": {
+    		"company": "Ortus Solutions",
+    		"product": {
+    			"name": "BoxLang",
+    			"supportEmail": "support@example.com"
+    		}
+    	}
+    }
+    ```
 
 その後、どの Markdown ページからでも、ドット区切りのパスで参照できます:
 

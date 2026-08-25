@@ -362,9 +362,15 @@ starts.
 
 Opt-in via `bxsites.yaml`'s [`mermaid`](../configuration.md#mermaid) key:
 
-```yaml title="bxsites.yaml"
-mermaid: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    mermaid: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "mermaid": true }
+    ```
 
 Once enabled, any ` ```mermaid ` fenced code block renders as a live
 [Mermaid](https://mermaid.js.org/) diagram instead of a code listing:
@@ -384,9 +390,15 @@ for everything it can draw.
 
 Opt-in via `bxsites.yaml`'s [`math`](../configuration.md#math) key:
 
-```yaml title="bxsites.yaml"
-math: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    math: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "math": true }
+    ```
 
 Once enabled, [KaTeX](https://katex.org/) typesets `$...$` for inline math
 and `$$...$$` for a centered block, both written straight into the markdown

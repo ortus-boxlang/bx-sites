@@ -26,13 +26,27 @@ Beide teilen sich eine Syntax:
 Füge `bxsites.yaml` einen `variables`-Block hinzu - in beliebiger Form, flach
 oder verschachtelt:
 
-```yaml title="bxsites.yaml"
-variables:
-  company: "Ortus Solutions"
-  product:
-    name: "BoxLang"
-    supportEmail: "support@example.com"
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    variables:
+      company: "Ortus Solutions"
+      product:
+        name: "BoxLang"
+        supportEmail: "support@example.com"
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    {
+    	"variables": {
+    		"company": "Ortus Solutions",
+    		"product": {
+    			"name": "BoxLang",
+    			"supportEmail": "support@example.com"
+    		}
+    	}
+    }
+    ```
 
 Referenziere davon dann alles, per Punktpfad, von jeder Markdown-Seite aus:
 

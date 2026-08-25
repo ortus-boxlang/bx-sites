@@ -163,14 +163,26 @@ lmajano:
 追加してください - そうすると自動追加分が完全に抑制されるため、重複が
 発生することはありません:
 
-```yaml title="bxsites.yaml" linenums="1"
-nav:
-  - path: index.md
-  - title: Blog
-    url: blog/index.html
-    icon: lucide:newspaper
-  - path: about.md
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    nav:
+      - path: index.md
+      - title: Blog
+        url: blog/index.html
+        icon: lucide:newspaper
+      - path: about.md
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"nav": [
+    		{ "path": "index.md" },
+    		{ "title": "Blog", "url": "blog/index.html", "icon": "lucide:newspaper" },
+    		{ "path": "about.md" }
+    	]
+    }
+    ```
 
 個々の投稿自体はナビには追加されません（タグ索引と同様）- それらは
 `/blog/`、自分のカテゴリページ、自分の年次アーカイブページ、著者ページ、
@@ -193,9 +205,15 @@ nav:
 ポーリングのたびに帯域を無駄にするだけです。すべての投稿を無制限にするには
 `0` を設定します:
 
-```yaml title="bxsites.yaml"
-blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
+    ```
 
 ## ドラフトのプレビュー
 

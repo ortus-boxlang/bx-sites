@@ -95,9 +95,15 @@ Un sito GitHub Pages di *progetto* (a differenza di un sito *utente*
 interno, asset e voce di nav ottenga il prefisso `/<repo>/` di cui ha
 bisogno - e così che venga generato anche un vero `sitemap.xml`:
 
-```yaml title="bxsites.yaml"
-baseURL: "https://<user>.github.io/<repo>/"
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    baseURL: "https://<user>.github.io/<repo>/"
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "baseURL": "https://<user>.github.io/<repo>/" }
+    ```
 
 Vedi [Configurazione](../configuration.md#baseurl) per il quadro completo
 di cosa fa `baseURL`. Un sito utente `<user>.github.io`, o qualsiasi

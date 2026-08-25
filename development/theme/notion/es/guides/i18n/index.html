@@ -113,13 +113,25 @@ predeterminado</strong>, construido sin prefijo en la raíz del sitio exactament
 como lo es hoy - añadir <code>docs/i18n/</code> no cambia nada al respecto.</p>
 <p>Dale a cada idioma una etiqueta de visualización (y, para un idioma de
 derecha a izquierda, su propia dirección) en <code>bxsites.yaml</code>:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">i18n:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">i18n:
   defaultLocale: { code: en, label: English }
   locales:
     - { code: es, label: Español }
     - { code: ar, label: العربية, dir: rtl }
     - { code: pt-BR, label: &quot;Português (Brasil)&quot;, flag: 🇧🇷 }
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;i18n&quot;: {
+		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
+		&quot;locales&quot;: [
+			{ &quot;code&quot;: &quot;es&quot;, &quot;label&quot;: &quot;Español&quot; },
+			{ &quot;code&quot;: &quot;ar&quot;, &quot;label&quot;: &quot;العربية&quot;, &quot;dir&quot;: &quot;rtl&quot; },
+			{ &quot;code&quot;: &quot;pt-BR&quot;, &quot;label&quot;: &quot;Português (Brasil)&quot;, &quot;flag&quot;: &quot;🇧🇷&quot; }
+		]
+	}
+}
+</code></pre>
+</div></div></div>
 <p><code>defaultLocale</code> solo hace falta configurarlo si tu idioma predeterminado
 no es el inglés; <code>locales</code> es la lista de todo lo demás. Cada carpeta
 <code>docs/i18n/&lt;code&gt;/</code> se construye automáticamente en cuanto existe -
@@ -204,7 +216,7 @@ configurar. Cualquier otro código de idioma (o una página que prefieras
 redactar de otra forma) recurre al inglés - sobrescribe solo las claves
 que te importen con tus propios <code>strings</code> en la entrada de ese idioma en
 <code>bxsites.yaml</code>:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">i18n:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">i18n:
   defaultLocale: { code: en, label: English }
   locales:
     - code: fr
@@ -216,6 +228,28 @@ que te importen con tus propios <code>strings</code> en la entrada de ese idioma
       label: Español
       strings: { toggleDarkMode: Cambiar a modo nocturno }
 </code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;i18n&quot;: {
+		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
+		&quot;locales&quot;: [
+			{
+				&quot;code&quot;: &quot;fr&quot;,
+				&quot;label&quot;: &quot;Français&quot;,
+				&quot;strings&quot;: {
+					&quot;searchPlaceholder&quot;: &quot;Rechercher dans la documentation...&quot;,
+					&quot;onThisPage&quot;: &quot;Sur cette page&quot;
+				}
+			},
+			{
+				&quot;code&quot;: &quot;es&quot;,
+				&quot;label&quot;: &quot;Español&quot;,
+				&quot;strings&quot;: { &quot;toggleDarkMode&quot;: &quot;Cambiar a modo nocturno&quot; }
+			}
+		]
+	}
+}
+</code></pre>
+</div></div></div>
 <p>Un idioma con traducción integrada (como <code>es</code> arriba) puede seguir
 sobrescribiendo claves individuales de la misma forma - tus propios
 <code>strings</code> siempre ganan tanto a la traducción integrada como al valor
@@ -258,7 +292,7 @@ junto a las del propio idioma predeterminado, de la misma forma que lo
 hacen las páginas <a href="/bx-sites/development/theme/notion/es/configuration/index.html#versionado">versionadas</a>.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/notion/es/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 25, 2026, 11&#x3a;27&#x3a;58 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/notion/es/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 25, 2026, 11&#x3a;30&#x3a;38 PM</span></div>
 			</article>
 
 			<nav class="ntn-page-nav" aria-label="Navegaci&oacute;n de p&aacute;gina">

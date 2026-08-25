@@ -383,9 +383,15 @@ esta.
 Opcional mediante la clave
 [`mermaid`](../configuration.md#mermaid) de `bxsites.yaml`:
 
-```yaml title="bxsites.yaml"
-mermaid: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    mermaid: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "mermaid": true }
+    ```
 
 Una vez activado, cualquier bloque de código con fence ` ```mermaid ` se
 renderiza como un diagrama [Mermaid](https://mermaid.js.org/) en vivo en
@@ -408,9 +414,15 @@ para todo lo que puede dibujar.
 Opcional mediante la clave [`math`](../configuration.md#math) de
 `bxsites.yaml`:
 
-```yaml title="bxsites.yaml"
-math: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    math: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "math": true }
+    ```
 
 Una vez activado, [KaTeX](https://katex.org/) compone `$...$` para
 matemáticas en línea y `$$...$$` para un bloque centrado, ambos escritos

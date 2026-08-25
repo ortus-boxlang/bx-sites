@@ -18,9 +18,15 @@ Installare da solo un modulo non lo attiva mai come plugin, però - un
 progetto lo attiva esplicitamente per nome di modulo BoxLang, tramite
 l'array [`plugins`](../configuration.md#plugins) di `bxsites.yaml`:
 
-```yaml title="bxsites.yaml"
-plugins: [ myBxSitesPlugin ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    plugins: [ myBxSitesPlugin ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "plugins": ["myBxSitesPlugin"] }
+    ```
 
 ## Installare un plugin pubblicato
 

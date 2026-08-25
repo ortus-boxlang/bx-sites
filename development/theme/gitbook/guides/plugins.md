@@ -17,9 +17,15 @@ Installing a module alone never activates it as a plugin, though - a
 project opts one in explicitly by BoxLang module name, via `bxsites.yaml`'s
 [`plugins`](../configuration.md#plugins) array:
 
-```yaml title="bxsites.yaml"
-plugins: [ myBxSitesPlugin ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    plugins: [ myBxSitesPlugin ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "plugins": ["myBxSitesPlugin"] }
+    ```
 
 ## Installing a published plugin
 
