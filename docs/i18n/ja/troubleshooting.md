@@ -106,7 +106,7 @@ BoxLang モジュールがインストールされ有効化されているかど
 ::: card title="Ortus コミュニティ Discourse" icon="phosphor-duotone:chats-circle" href="https://community.ortussolutions.com"
 質問したり、既存の議論を検索したりできます。
 :::
-::: card title="Box Slack チーム" icon="phosphor-duotone:slack-logo" href="http://boxteam.ortussolutions.com/"
+::: card title="Box Slack チーム" icon="phosphor-duotone:slack-logo" href="https://boxteam.slack.com"
 コミュニティやメンテナーとリアルタイムでチャットできます。
 :::
 ::: card title="Issue を報告する" icon="phosphor-duotone:bug" href="https://github.com/ortus-boxlang/bx-sites/issues"

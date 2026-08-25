@@ -19,9 +19,13 @@ construido por BxSites, a partir de los archivos Markdown de su propia
 carpeta `docs/`.
 
 ::: cards
-::: card title="Código fuente en GitHub" icon="phosphor-duotone:github-logo" href="https://github.com/ortus-boxlang/bx-sites"
-El código fuente completo, el rastreador de issues y el historial de
-lanzamientos.
+::: card title="Repositorio en GitHub" icon="phosphor-duotone:github-logo" href="https://github.com/ortus-boxlang/bx-sites"
+El código fuente completo, el historial de lanzamientos y todo lo demás
+sobre el proyecto.
+:::
+::: card title="Reportar un problema" icon="phosphor-duotone:bug" href="https://github.com/ortus-boxlang/bx-sites/issues"
+¿Encontraste un error en el código? Repórtalo en el rastreador de issues
+de GitHub.
 :::
 ::: card title="Licencia" icon="phosphor-duotone:scroll" href="license.md"
 BxSites es gratuito y de código abierto, licenciado bajo Apache 2.0.
@@ -42,13 +46,19 @@ que corre BxSites.
 
 ## Apoya el proyecto
 
-BxSites es gratuito y de código abierto, y siempre lo será. Si te resulta
-útil a ti o a tu equipo, la mejor forma de apoyar su desarrollo continuo -
+BxSites es gratuito y de código abierto, y siempre lo será. La forma más
+fácil de apoyarlo no cuesta nada: **dale una estrella al repositorio en
+GitHub** - ayuda a que otros desarrolladores descubran el proyecto y es
+una señal real para los mantenedores de que vale la pena seguir
+adelante.
+
+Si quieres ir más allá, la mejor forma de apoyar su desarrollo continuo -
 junto con BoxLang y el resto del trabajo de código abierto de Ortus
 Solutions - es convertirte en patrocinador en Patreon:
 
 <div class="bxsites-hero__actions">
-	<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="https://www.patreon.com/c/ortussolutions">Patrocinar en Patreon</a>
+	<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="https://github.com/ortus-boxlang/bx-sites">⭐ Danos una estrella en GitHub</a>
+	<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://www.patreon.com/c/ortussolutions">Patrocinar en Patreon</a>
 </div>
 
 Consulta [Contribuir](contribute.md) para otras formas de apoyar el

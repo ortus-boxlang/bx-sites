@@ -106,7 +106,7 @@ Liste:
 ::: card title="Ortus Community Discourse" icon="phosphor-duotone:chats-circle" href="https://community.ortussolutions.com"
 Stelle Fragen und durchsuche bestehende Diskussionen.
 :::
-::: card title="Box Slack Team" icon="phosphor-duotone:slack-logo" href="http://boxteam.ortussolutions.com/"
+::: card title="Box Slack Team" icon="phosphor-duotone:slack-logo" href="https://boxteam.slack.com"
 Chatte in Echtzeit mit der Community und den Maintainern.
 :::
 ::: card title="Issue eröffnen" icon="phosphor-duotone:bug" href="https://github.com/ortus-boxlang/bx-sites/issues"

@@ -59,7 +59,7 @@ BoxLang ランタイム自体の Issue はこちら。
 ::: card title="Ortus コミュニティ Discourse" icon="phosphor-duotone:chats-circle" href="https://community.ortussolutions.com"
 質問したり、既存の議論を閲覧したりできます。
 :::
-::: card title="Box Slack チーム" icon="phosphor-duotone:slack-logo" href="http://boxteam.ortussolutions.com/"
+::: card title="Box Slack チーム" icon="phosphor-duotone:slack-logo" href="https://boxteam.slack.com"
 コミュニティやメンテナーとリアルタイムでチャットできます。
 :::
 ::: card title="プロフェッショナルサポート" icon="phosphor-duotone:headset" href="https://www.ortussolutions.com/services/support"

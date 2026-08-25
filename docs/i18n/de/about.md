@@ -19,8 +19,12 @@ BxSites selbst gebaut, aus den Markdown-Dateien in ihrem eigenen
 `docs/`-Ordner.
 
 ::: cards
-::: card title="Quellcode auf GitHub" icon="phosphor-duotone:github-logo" href="https://github.com/ortus-boxlang/bx-sites"
-Der vollständige Quellcode, Issue-Tracker und die Release-Historie.
+::: card title="GitHub-Repository" icon="phosphor-duotone:github-logo" href="https://github.com/ortus-boxlang/bx-sites"
+Der vollständige Quellcode, die Release-Historie und alles andere rund
+um das Projekt.
+:::
+::: card title="Issue melden" icon="phosphor-duotone:bug" href="https://github.com/ortus-boxlang/bx-sites/issues"
+Einen Bug im Code gefunden? Melde ihn im GitHub-Issue-Tracker.
 :::
 ::: card title="Lizenz" icon="phosphor-duotone:scroll" href="license.md"
 BxSites ist kostenlos und quelloffen, lizenziert unter Apache 2.0.
@@ -41,13 +45,19 @@ BxSites selbst läuft.
 
 ## Das Projekt unterstützen
 
-BxSites ist kostenlos und quelloffen, und das wird immer so bleiben. Wenn
-es dir oder deinem Team nützt, ist der beste Weg, die weitere Entwicklung
+BxSites ist kostenlos und quelloffen, und das wird immer so bleiben. Der
+einfachste Weg, es zu unterstützen, kostet nichts: **gib dem Repository
+auf GitHub einen Stern** - das hilft anderen Entwicklern, das Projekt zu
+finden, und ist für die Maintainer ein echtes Signal, dass es sich lohnt,
+weiterzumachen.
+
+Wenn du noch weiter gehen möchtest: Der beste Weg, die weitere Entwicklung
 zu unterstützen - zusammen mit BoxLang und dem Rest der Open-Source-Arbeit
-von Ortus Solutions - Sponsor auf Patreon zu werden:
+von Ortus Solutions - ist, Sponsor auf Patreon zu werden:
 
 <div class="bxsites-hero__actions">
-	<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="https://www.patreon.com/c/ortussolutions">Auf Patreon sponsern</a>
+	<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="https://github.com/ortus-boxlang/bx-sites">⭐ Gib uns einen Stern auf GitHub</a>
+	<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://www.patreon.com/c/ortussolutions">Auf Patreon sponsern</a>
 </div>
 
 Siehe [Mitmachen](contribute.md) für weitere Wege, das Projekt zu

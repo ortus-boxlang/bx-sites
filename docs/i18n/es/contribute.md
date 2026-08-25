@@ -64,7 +64,7 @@ issue para eso - usa uno de los siguientes canales de soporte:
 ::: card title="Ortus Community Discourse" icon="phosphor-duotone:chats-circle" href="https://community.ortussolutions.com"
 Haz preguntas y explora discusiones existentes.
 :::
-::: card title="Box Slack Team" icon="phosphor-duotone:slack-logo" href="http://boxteam.ortussolutions.com/"
+::: card title="Box Slack Team" icon="phosphor-duotone:slack-logo" href="https://boxteam.slack.com"
 Chatea en tiempo real con la comunidad y los mantenedores.
 :::
 ::: card title="Soporte profesional" icon="phosphor-duotone:headset" href="https://www.ortussolutions.com/services/support"

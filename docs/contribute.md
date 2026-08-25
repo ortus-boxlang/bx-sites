@@ -62,7 +62,7 @@ use one of the support channels below instead:
 ::: card title="Ortus Community Discourse" icon="phosphor-duotone:chats-circle" href="https://community.ortussolutions.com"
 Ask questions and browse existing discussions.
 :::
-::: card title="Box Slack Team" icon="phosphor-duotone:slack-logo" href="http://boxteam.ortussolutions.com/"
+::: card title="Box Slack Team" icon="phosphor-duotone:slack-logo" href="https://boxteam.slack.com"
 Chat in real time with the community and maintainers.
 :::
 ::: card title="Professional Support" icon="phosphor-duotone:headset" href="https://www.ortussolutions.com/services/support"

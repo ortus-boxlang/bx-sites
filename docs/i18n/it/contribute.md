@@ -65,7 +65,7 @@ supporto:
 ::: card title="Ortus Community Discourse" icon="phosphor-duotone:chats-circle" href="https://community.ortussolutions.com"
 Fai domande ed esplora le discussioni esistenti.
 :::
-::: card title="Box Slack Team" icon="phosphor-duotone:slack-logo" href="http://boxteam.ortussolutions.com/"
+::: card title="Box Slack Team" icon="phosphor-duotone:slack-logo" href="https://boxteam.slack.com"
 Chatta in tempo reale con la community e i maintainer.
 :::
 ::: card title="Supporto professionale" icon="phosphor-duotone:headset" href="https://www.ortussolutions.com/services/support"

@@ -18,8 +18,12 @@ BxSites は [BoxLang](https://boxlang.io) で書かれた汎用の
 Markdown ファイルからビルドされています。
 
 ::: cards
-::: card title="GitHub のソースコード" icon="phosphor-duotone:github-logo" href="https://github.com/ortus-boxlang/bx-sites"
-完全なソースコード、Issue トラッカー、リリース履歴。
+::: card title="GitHub リポジトリ" icon="phosphor-duotone:github-logo" href="https://github.com/ortus-boxlang/bx-sites"
+完全なソースコード、リリース履歴、プロジェクトに関するその他すべて。
+:::
+::: card title="Issue を報告する" icon="phosphor-duotone:bug" href="https://github.com/ortus-boxlang/bx-sites/issues"
+コードにバグを見つけましたか? GitHub の Issue トラッカーに報告してく
+ださい。
 :::
 ::: card title="ライセンス" icon="phosphor-duotone:scroll" href="license.md"
 BxSites は無料でオープンソースであり、Apache 2.0 ライセンスの下で
@@ -42,13 +46,18 @@ BxSites は [BoxLang](https://boxlang.io)、
 
 ## プロジェクトを支援する
 
-BxSites は無料でオープンソースであり、それは今後も変わりません。もし
-あなたやあなたのチームにとって役立っているなら、BoxLang や Ortus
-Solutions の他のオープンソース活動と合わせて開発を継続的に支援する最も
-良い方法は、Patreon でスポンサーになることです。
+BxSites は無料でオープンソースであり、それは今後も変わりません。最も
+簡単な支援方法は無料です: **GitHub リポジトリにスターを付ける**ことで
+す - 他の開発者がプロジェクトを見つける助けになり、メンテナーにとって
+も「続ける価値がある」という確かなシグナルになります。
+
+さらに支援したい場合、BoxLang や Ortus Solutions の他のオープンソース
+活動と合わせて開発を継続的に支援する最も良い方法は、Patreon でスポン
+サーになることです。
 
 <div class="bxsites-hero__actions">
-	<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="https://www.patreon.com/c/ortussolutions">Patreon でスポンサーになる</a>
+	<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="https://github.com/ortus-boxlang/bx-sites">⭐ GitHub でスターを付ける</a>
+	<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://www.patreon.com/c/ortussolutions">Patreon でスポンサーになる</a>
 </div>
 
 コードでの貢献や単発の寄付など、プロジェクトを支援する他の方法について

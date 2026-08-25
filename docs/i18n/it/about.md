@@ -19,9 +19,13 @@ costruito da BxSites, a partire dai file Markdown nella sua stessa
 cartella `docs/`.
 
 ::: cards
-::: card title="Codice sorgente su GitHub" icon="phosphor-duotone:github-logo" href="https://github.com/ortus-boxlang/bx-sites"
-Il codice sorgente completo, il tracker degli issue e la cronologia
-delle release.
+::: card title="Repository su GitHub" icon="phosphor-duotone:github-logo" href="https://github.com/ortus-boxlang/bx-sites"
+Il codice sorgente completo, la cronologia delle release e tutto il
+resto sul progetto.
+:::
+::: card title="Segnala un problema" icon="phosphor-duotone:bug" href="https://github.com/ortus-boxlang/bx-sites/issues"
+Hai trovato un bug nel codice? Segnalalo sul tracker degli issue di
+GitHub.
 :::
 ::: card title="Licenza" icon="phosphor-duotone:scroll" href="license.md"
 BxSites è gratuito e open source, concesso in licenza Apache 2.0.
@@ -42,13 +46,18 @@ gira BxSites stesso.
 
 ## Sostieni il progetto
 
-BxSites è gratuito e open source, e lo sarà sempre. Se ti è utile,
-personalmente o per il tuo team, il modo migliore per sostenerne lo
-sviluppo continuo - insieme a BoxLang e al resto del lavoro open source
-di Ortus Solutions - è diventare sponsor su Patreon:
+BxSites è gratuito e open source, e lo sarà sempre. Il modo più semplice
+per sostenerlo non costa nulla: **metti una stella al repository su
+GitHub** - aiuta altri sviluppatori a scoprire il progetto ed è un
+segnale concreto per i maintainer che vale la pena continuare.
+
+Se vuoi fare di più, il modo migliore per sostenerne lo sviluppo
+continuo - insieme a BoxLang e al resto del lavoro open source di Ortus
+Solutions - è diventare sponsor su Patreon:
 
 <div class="bxsites-hero__actions">
-	<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="https://www.patreon.com/c/ortussolutions">Diventa sponsor su Patreon</a>
+	<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="https://github.com/ortus-boxlang/bx-sites">⭐ Metti una stella su GitHub</a>
+	<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://www.patreon.com/c/ortussolutions">Diventa sponsor su Patreon</a>
 </div>
 
 Consulta [Contribuisci](contribute.md) per altri modi di sostenere il

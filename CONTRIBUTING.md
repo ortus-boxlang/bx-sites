@@ -39,7 +39,7 @@ If you file a bug report, your issue should contain a title, a clear description
 If you have any questions on usage, professional support or just ideas to bounce off the maintainers, please do not create an issue. Leverage our support channels first.
 
 -   Ortus Community Discourse: https://community.ortussolutions.com
--   Box Slack Team: http://boxteam.ortussolutions.com/
+-   Box Slack Team: https://boxteam.slack.com
 -   Professional Support: https://www.ortussolutions.com/services/support
 
 ## Pull Request Guidelines
