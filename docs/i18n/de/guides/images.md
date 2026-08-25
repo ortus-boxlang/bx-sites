@@ -98,9 +98,15 @@ AVIF upstream hinzufügt.
 
 ## Ausschalten
 
-```yaml title="bxsites.yaml"
-assets: { images: { enabled: false } }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    assets: { images: { enabled: false } }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "assets": { "images": { "enabled": false } } }
+    ```
 
 Fällt zurück auf das schlichte, unverarbeitete Kopieren von
 `docs/assets/**` - genau so, wie jedes Bild behandelt wurde, bevor es
@@ -108,12 +114,25 @@ diese Funktion gab.
 
 ## Eigene Breakpoints wählen
 
-```yaml title="bxsites.yaml" linenums="1"
-assets:
-  images:
-    widths: [ 480, 960, 1440 ]
-    formats: [ webp ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    assets:
+      images:
+        widths: [ 480, 960, 1440 ]
+        formats: [ webp ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"assets": {
+    		"images": {
+    			"widths": [480, 960, 1440],
+    			"formats": ["webp"]
+    		}
+    	}
+    }
+    ```
 
 `widths` ist standardmäßig `[400, 800, 1200, 1600]`; `formats` ist
 standardmäßig `["original", "webp"]` - lass `"original"` weg, um das
@@ -128,10 +147,19 @@ auszulassen. Siehe [Konfiguration](../configuration.md#assets) für jeden
 `extraCss`/`extraJs` werden auf dieselbe Weise gebündelt, standardmäßig
 aktiv (`assets.bundle`):
 
-```yaml title="bxsites.yaml" linenums="1"
-extraCss: [ assets/a.css, assets/b.css ]
-extraJs: [ assets/app.js ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    extraCss: [ assets/a.css, assets/b.css ]
+    extraJs: [ assets/app.js ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"extraCss": ["assets/a.css", "assets/b.css"],
+    	"extraJs": ["assets/app.js"]
+    }
+    ```
 
 baut ein einzelnes, fingerprint-versehenes `assets/bundle.<hash>.css`
 (in der aufgeführten Reihenfolge) und ein `assets/bundle.<hash>.js`,
@@ -152,9 +180,15 @@ lässt die gesamte Liste auf das heutige, exakte Pro-URL-Verhalten
 zurückfallen, statt zu riskieren, eine CSS-Kaskade stillschweigend
 umzusortieren, auf die sich ein Projekt verlassen hat:
 
-```yaml title="bxsites.yaml"
-extraCss: [ assets/custom.css, "https://cdn.example.com/lib.css" ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    extraCss: [ assets/custom.css, "https://cdn.example.com/lib.css" ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "extraCss": ["assets/custom.css", "https://cdn.example.com/lib.css"] }
+    ```
 
 rendert zwei separate `<link>`-Tags, ungebündelt, genau wie vor
 Einführung dieser Funktion.
