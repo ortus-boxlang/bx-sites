@@ -12,6 +12,7 @@ icon: phosphor-duotone:book-open
 - [Deploying to GitHub Pages](deployment.md) - the built-in GitHub Actions workflow
 - [Markdown Extensions](markdown.md) - admonitions, footnotes, definition lists and Mermaid diagrams
 - [Content Blocks](content-blocks.md) - GitBook-style blocks: expandables, cards, columns, a stepper, buttons, and reusable content includes
+- [Tables](tables.md) - GFM pipe tables, always on, with an automatic responsive-scroll/sticky-header treatment
 - [OpenAPI / Swagger](openapi.md) - an interactive Swagger UI widget for an OpenAPI/Swagger spec, full reference or one operation inline
 - [Responsive Images](images.md) - automatic resizing, WebP variants, and CSS/JS bundling, on by default
 - [Interactivity with Alpine.js](interactivity.md) - reactive content (copy buttons, live filters, and more) with no extra setup

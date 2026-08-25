@@ -453,6 +453,8 @@ defecto, pero BxSites lo establece en `true` por defecto (consulta la
 | `tableOptions.className` | `"table"` | Clase CSS en cada `<table>` renderizada |
 | `tableOptions.headerSeparationColumnMatch` | `true` | Exige que la fila separadora `---` coincida con el número de columnas del encabezado |
 
+Cada tabla renderizada también recibe automáticamente un wrapper de scroll responsive y encabezado fijo, sin clave de configuración propia - ver [Tablas](guides/tables.md#desplazamiento-responsivo-y-un-encabezado-fijo).
+
 ```yaml title="bxsites.yaml" linenums="1"
 markdown:
   enableFootnotes: true

@@ -410,6 +410,9 @@ A `$` immediately followed or preceded by whitespace is left alone (so
 "$5 and $10" isn't misread as a formula) - typeset math always sits flush
 against both delimiters.
 
+See [Tables](tables.md) for GFM pipe tables - alignment, escaping, and
+the automatic responsive-scroll/sticky-header treatment every table gets.
+
 See [Content Blocks](content-blocks.md) for a family of GitBook-style
 `::: name ... :::` blocks on top of everything above - expandables,
 cards, columns, a stepper, file/embed/page-link cards, a changelog

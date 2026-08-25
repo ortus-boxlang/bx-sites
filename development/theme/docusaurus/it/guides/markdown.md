@@ -431,6 +431,10 @@ Un `$` immediatamente preceduto o seguito da uno spazio viene lasciato
 intatto (così "$5 e $10" non viene scambiato per una formula) - la
 matematica composta sta sempre accostata a entrambi i delimitatori.
 
+Vedi [Tabelle](tables.md) per le tabelle a pipe GFM - allineamento,
+escape, e il trattamento automatico di scorrimento responsive/intestazione
+fissa che ogni tabella riceve.
+
 Vedi [Blocchi di contenuto](content-blocks.md) per una famiglia di
 blocchi in stile GitBook `::: name ... :::` che si aggiunge a tutto
 quanto sopra - espandibili, card, colonne, uno stepper, card

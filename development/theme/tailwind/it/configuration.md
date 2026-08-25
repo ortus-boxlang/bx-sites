@@ -401,6 +401,8 @@ ma BxSites lo imposta a `true` di default (vedi la
 | `tableOptions.className` | `"table"` | Classe CSS su ogni `<table>` renderizzata |
 | `tableOptions.headerSeparationColumnMatch` | `true` | Richiede che la riga separatore `---` corrisponda al numero di colonne dell'intestazione |
 
+Ogni tabella renderizzata riceve anche automaticamente un wrapper per lo scroll responsive e un'intestazione fissa, senza una propria chiave di configurazione - vedi [Tabelle](guides/tables.md#scorrimento-responsive-e-intestazione-fissa).
+
 ```yaml title="bxsites.yaml" linenums="1"
 markdown:
   enableFootnotes: true

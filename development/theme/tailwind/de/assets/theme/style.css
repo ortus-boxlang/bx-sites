@@ -1771,10 +1771,26 @@ code:not( pre code ) {
 	border-radius: 8px;
 }
 
+.prose .bxsites-table-wrap {
+	max-height: 480px;
+	overflow: auto;
+}
+
 .prose table {
 	width: 100%;
 	border-collapse: collapse;
 	font-size: 0.95rem;
+}
+
+.prose thead th {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	background-color: var( --bxsites-bg, #fff );
+}
+
+[data-theme="dark"] .prose thead th {
+	background-color: #0a0d0f;
 }
 
 .prose th,

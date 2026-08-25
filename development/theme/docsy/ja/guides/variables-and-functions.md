@@ -174,6 +174,93 @@ Page: {{ $pagetitle() }}
 - ブール値: `{{ $badge('Beta', true) }}`
 - `{{ }}` なしのドット区切り変数参照: `{{ $greet(product.name) }}`
 
+## ビジュアライザーのレシピ
+
+HTML を返すマジック関数はステータスバッジだけに限られません - GitBook スタイルの
+ビジュアルセル（スターレーティング、色付きチップ、プログレスバー）を、GitBook
+自身のデータベース駆動の列ピッカー（bx-sites の Git ベースでプレーンな Markdown
+ソースにはこれに相当するものがありません）なしで得るための、汎用的な手段です。
+以下の4つは、このサイト自身の
+[`docs/functions.bxs`](https://github.com/ortus-boxlang/bx-sites/blob/development/docs/functions.bxs)
+であり、まさにこのページ上でライブにレンダリングされています。
+
+### 評価
+
+```bx title="docs/functions.bxs"
+function $stars( required numeric rating, numeric max = 5 ) {
+	var filled = min( max( round( arguments.rating ), 0 ), arguments.max )
+	var stars = repeatString( "★", filled ) & repeatString( "☆", arguments.max - filled )
+	return '<span title="' & arguments.rating & ' out of ' & arguments.max & '" style="color:##f5a623;letter-spacing:2px">' & stars & '</span>'
+}
+```
+
+`` `{{ $stars(4) }}` `` は次のようにレンダリングされます: {{ $stars(4) }}
+
+### ステータスチップ
+
+```bx title="docs/functions.bxs"
+function $badge( required string label, string kind = "info" ) {
+	var palette = {
+		"info"    : { "bg" : "##e0edff", "fg" : "##1d4ed8" },
+		"success" : { "bg" : "##dcfce7", "fg" : "##15803d" },
+		"danger"  : { "bg" : "##fee2e2", "fg" : "##b91c1c" },
+		"warning" : { "bg" : "##fef9c3", "fg" : "##854d0e" }
+	}
+	var pick = palette.keyExists( arguments.kind ) ? palette[ arguments.kind ] : { "bg" : "##f1f5f9", "fg" : "##475569" }
+	return '<span style="display:inline-block;padding:0.1em 0.6em;border-radius:999px;font-size:0.85em;font-weight:600;background:'
+		& pick.bg & ";color:" & pick.fg & '">' & encodeForHTML( arguments.label ) & "</span>"
+}
+```
+
+`` `{{ $badge('Stable', 'success') }}` `` は次のようにレンダリングされます: {{ $badge('Stable', 'success') }} - そして `` `{{ $badge('Beta', 'info') }}` `` は: {{ $badge('Beta', 'info') }}
+
+### プログレスバー
+
+```bx title="docs/functions.bxs"
+function $progress( required numeric percent ) {
+	var pct = min( max( arguments.percent, 0 ), 100 )
+	return '<span style="display:inline-block;width:120px;height:8px;background:##e5e7eb;border-radius:999px;overflow:hidden;vertical-align:middle"><span style="display:block;height:100%;width:'
+		& pct & '%;background:##2563eb"></span></span> ' & pct & "%"
+}
+```
+
+`` `{{ $progress(72) }}` `` は次のようにレンダリングされます: {{ $progress(72) }}
+
+### トレンドインジケーター
+
+```bx title="docs/functions.bxs"
+function $trend( required numeric value ) {
+	var isUp = arguments.value >= 0
+	var arrow = isUp ? "▲" : "▼"
+	var color = isUp ? "##16a34a" : "##dc2626"
+	var sign = isUp ? "+" : ""
+	return '<span style="color:' & color & ';font-weight:600">' & arrow & " " & sign & numberFormat( arguments.value, "0.0" ) & "%</span>"
+}
+```
+
+`` `{{ $trend(4.2) }}` `` は次のようにレンダリングされます: {{ $trend(4.2) }} - `` `{{ $trend(-1.8) }}` `` は: {{ $trend(-1.8) }}
+
+### テーブルセルの中で
+
+`{{ }}` は [テーブル](tables.md) がパースされるよりも前に、生の
+Markdown に対して解決されます。そのため、上記のいずれも、ページ内の他の場所と
+まったく同じように、パイプテーブルのセルの中でも動作します - これが、ここでの
+GitBook 自身の Select/Rating テーブル列に最も近いものです:
+
+```markdown title="Example" linenums="1"
+| Feature | Status | Rating |
+| --- | --- | --- |
+| Dark mode | {{ $badge('Stable', 'success') }} | {{ $stars(5) }} |
+| Table sort | {{ $badge('Beta', 'info') }} | {{ $stars(4) }} |
+```
+
+次のようにレンダリングされます:
+
+| Feature | Status | Rating |
+| --- | --- | --- |
+| Dark mode | {{ $badge('Stable', 'success') }} | {{ $stars(5) }} |
+| Table sort | {{ $badge('Beta', 'info') }} | {{ $stars(4) }} |
+
 ## 構文をそのまま表示する
 
 フェンス付きコードブロック（3つ以上のバックティック、このページのすべての例と同様）

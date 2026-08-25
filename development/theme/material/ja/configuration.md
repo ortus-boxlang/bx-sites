@@ -416,6 +416,8 @@ redirects:
 | `tableOptions.className` | `"table"` | レンダリングされるすべての `<table>` の CSS クラス |
 | `tableOptions.headerSeparationColumnMatch` | `true` | `---` の区切り行がヘッダーの列数と一致することを要求 |
 
+レンダリングされる各テーブルには、専用の設定キーなしでレスポンシブスクロールと固定ヘッダーのラッパーが自動的に付与されます - 詳細は[テーブル](guides/tables.md#レスポンシブなスクロールと固定ヘッダー)を参照してください。
+
 ```yaml title="bxsites.yaml" linenums="1"
 markdown:
   enableFootnotes: true

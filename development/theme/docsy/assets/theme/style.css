@@ -1114,10 +1114,22 @@ code:not( pre code ) {
 	border-radius: 8px;
 }
 
+.docsy-content-body .bxsites-table-wrap {
+	max-height: 480px;
+	overflow: auto;
+}
+
 .docsy-content-body table {
 	width: 100%;
 	border-collapse: collapse;
 	font-size: 0.95rem;
+}
+
+.docsy-content-body thead th {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	background-color: var( --docsy-surface );
 }
 
 .docsy-content-body th,

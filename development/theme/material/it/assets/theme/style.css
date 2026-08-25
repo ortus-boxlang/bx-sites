@@ -1132,10 +1132,22 @@ code:not( pre code ) {
 	border-radius: 8px;
 }
 
+.md-content-body .bxsites-table-wrap {
+	max-height: 480px;
+	overflow: auto;
+}
+
 .md-content-body table {
 	width: 100%;
 	border-collapse: collapse;
 	font-size: 0.95rem;
+}
+
+.md-content-body thead th {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	background-color: var( --md-surface );
 }
 
 .md-content-body th,

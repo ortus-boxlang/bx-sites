@@ -430,6 +430,10 @@ Ein `$`, dem unmittelbar Leerraum folgt oder vorausgeht, wird in Ruhe
 gelassen (sodass "$5 and $10" nicht als Formel missverstanden wird) -
 gesetzte Mathematik sitzt immer bündig an beiden Begrenzern.
 
+Siehe [Tabellen](tables.md) für GFM-Pipe-Tabellen - Ausrichtung, Escaping
+und die automatische Behandlung für responsives Scrollen/eine fixierte
+Kopfzeile, die jede Tabelle erhält.
+
 Siehe [Content-Blöcke](content-blocks.md) für eine Familie von
 GitBook-artigen `::: name ... :::`-Blöcken zusätzlich zu allem oben -
 Expandables, Cards, Columns, ein Stepper, File-/Embed-/Page-Link-Cards,

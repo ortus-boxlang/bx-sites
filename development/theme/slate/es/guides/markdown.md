@@ -436,6 +436,10 @@ tal cual (para que "$5 y $10" no se interprete erróneamente como una
 fórmula) - las matemáticas compuestas siempre se sitúan pegadas a ambos
 delimitadores.
 
+Consulta [Tablas](tables.md) para tablas de pipes GFM - alineación,
+escape, y el tratamiento automático de desplazamiento
+responsivo/encabezado fijo que recibe cada tabla.
+
 Consulta [Bloques de Contenido](content-blocks.md) para una familia de
 bloques `::: name ... :::` al estilo GitBook por encima de todo lo
 anterior - expandibles, tarjetas, columnas, un stepper, tarjetas de
