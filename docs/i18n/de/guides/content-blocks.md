@@ -284,6 +284,66 @@ nicht erreichbare externe Website die Build-Zeit niemals beeinflusst:
 ::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
 :::
 
+## Prompt
+
+Ein gestalteter Container für einen wiederverwendbaren KI-Prompt -
+bx-sites' eigenes Gegenstück zu GitBooks
+[Prompt-Block](https://gitbook.com/docs/create-content/blocks/prompt).
+Der Inhalt des Blocks *ist* der Prompt-Text, geschrieben als gewöhnliches
+Markdown (sodass Überschriften, Listen und Code darin weiterhin ihre
+eigene Formatierung erhalten); jeder Prompt bekommt eine
+"Copy"-Schaltfläche, die genau diesen Quelltext kopiert,
+Formatierungs-Markup inklusive, bereit zum Einfügen in das jeweilige
+KI-Tool, mit dem du gerade arbeitest. `description` (eine optionale,
+einzeilige Zusammenfassung) und `icon` (aufgelöst auf dieselbe Weise wie
+das eigene `icon` von `::: card` - fällt bei Weglassen standardmäßig auf
+ein Glitzer-Icon zurück) sind beide optional:
+
+```markdown title="Beispiel" linenums="1"
+::: prompt description="Summarizes a pull request for a changelog entry" icon="phosphor-duotone:git-pull-request"
+Summarize the following pull request diff as a single changelog entry,
+written for an end user rather than a developer. Group related changes
+together and skip anything purely internal (refactors, tests, CI).
+:::
+```
+
+::: prompt description="Summarizes a pull request for a changelog entry" icon="phosphor-duotone:git-pull-request"
+Summarize the following pull request diff as a single changelog entry,
+written for an end user rather than a developer. Group related changes
+together and skip anything purely internal (refactors, tests, CI).
+:::
+
+Füge `expanded="preview"` hinzu, um einen langen Prompt auf eine kurze,
+ausblendende Vorschau zu klemmen, bis die Leserin auf "Show more"
+klickt, oder `expanded="hidden"`, um ihn vollständig eingeklappt hinter
+einer "Show prompt"-Schaltfläche zu starten - praktisch für eine Seite,
+die mehrere Prompts hintereinander auflistet. Lasse `expanded` weg (oder
+setze es auf `"full"`, den Standard), um immer den gesamten Prompt
+anzuzeigen:
+
+```markdown title="Beispiel" linenums="1"
+::: prompt description="A longer, multi-step prompt" expanded="preview"
+1. Read the attached error log line by line.
+2. For each stack trace, identify the failing module.
+3. Group failures by root cause, not by timestamp.
+4. Propose one fix per root cause, not per failure.
+5. Skip anything that already has an open issue - list those separately.
+:::
+```
+
+::: prompt description="A longer, multi-step prompt" expanded="preview"
+1. Read the attached error log line by line.
+2. For each stack trace, identify the failing module.
+3. Group failures by root cause, not by timestamp.
+4. Propose one fix per root cause, not per failure.
+5. Skip anything that already has an open issue - list those separately.
+:::
+
+Anders als GitBooks eigener Prompt-Block gibt es hier kein "Open in AI
+providers"-Menü - bx-sites spricht nie mit einem KI-Anbieter eines
+Drittanbieters, daher hat dieser Teil von GitBooks eigenem Block hier
+kein Gegenstück.
+
 ## Updates (Changelog)
 
 Eine datierte, taggbare Changelog-Liste - `::: update` akzeptiert
