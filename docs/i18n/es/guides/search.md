@@ -7,14 +7,14 @@ tags: [guías, búsqueda]
 
 # Búsqueda
 
-BX Sites incluye un proveedor de búsqueda por defecto y se puede apuntar
+BxSites incluye un proveedor de búsqueda por defecto y se puede apuntar
 a otros mediante [`searchProvider`](../configuration.md#searchprovider)
 de `bxsites.yaml` - `search: true`/`false` sigue siendo el interruptor
 maestro de encendido/apagado, sin importar qué proveedor esté activo.
 
 ## Local (el predeterminado)
 
-La búsqueda de BX Sites es completamente estática y del lado del
+La búsqueda de BxSites es completamente estática y del lado del
 cliente - el mismo enfoque que usa [mkdocs](https://www.mkdocs.org/) por
 defecto: un índice construido una vez en el momento de `build`, y
 [lunr.js](https://lunrjs.com/) haciendo la búsqueda real en el navegador
@@ -73,9 +73,15 @@ ninguno de los dos abre la propia paleta de este módulo.
 
 ## Desactivarla
 
-```yaml title="bxsites.yaml"
-search: false
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    search: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "search": false }
+    ```
 
 Omite la construcción de `search-index.json` por completo, y omite el
 cuadro de búsqueda, el script incluido/autoalojado de `lunr.js`, y el
@@ -105,16 +111,33 @@ cuadro de búsqueda por [Algolia DocSearch](https://docsearch.algolia.com/)
 - la misma búsqueda alojada por un rastreador que admiten
 mkdocs-material, VitePress, Starlight y Docusaurus:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider:
-  provider: algolia
-  algolia:
-    appId: ABC123
-    apiKey: a1b2c3d4e5f6...
-    indexName: my-docs
-    insights: false
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider:
+      provider: algolia
+      algolia:
+        appId: ABC123
+        apiKey: a1b2c3d4e5f6...
+        indexName: my-docs
+        insights: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "algolia",
+    		"algolia": {
+    			"appId": "ABC123",
+    			"apiKey": "a1b2c3d4e5f6...",
+    			"indexName": "my-docs",
+    			"insights": false
+    		}
+    	}
+    }
+    ```
 
 `appId`, `apiKey` e `indexName` son obligatorios - `apiKey` es la clave
 API pública **solo de búsqueda** que te da DocSearch (nunca una clave de
@@ -130,9 +153,9 @@ Con `algolia` activo:
   [rastreador de DocSearch](https://docsearch.algolia.com/docs/what-is-docsearch/)
   o por tu propia configuración de
   [Algolia Crawler](https://www.algolia.com/products/search-and-discovery/crawler/),
-  no por nada que BX Sites escriba en el momento de la construcción.
+  no por nada que BxSites escriba en el momento de la construcción.
   Igualmente necesitas registrar el sitio con DocSearch (o ejecutar tu
-  propio rastreador) por separado - BX Sites solo conecta el widget del
+  propio rastreador) por separado - BxSites solo conecta el widget del
   cliente.
 - Cada tema incorporado renderiza en su lugar un contenedor vacío
   `#bxsites-search-algolia`, y `layout.bxm` carga `@docsearch/css`/
@@ -147,12 +170,24 @@ cuadro de búsqueda por [Pagefind](https://pagefind.app/) - otro motor de
 búsqueda totalmente estático/sin servidor, pero indexado a partir del
 propio HTML *construido* de `site/` en lugar de rastreado como Algolia:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider:
-  provider: pagefind
-  pagefind: { bin: pagefind, options: [] }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider:
+      provider: pagefind
+      pagefind: { bin: pagefind, options: [] }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "pagefind",
+    		"pagefind": { "bin": "pagefind", "options": [] }
+    	}
+    }
+    ```
 
 Ambas claves de `pagefind` son opcionales - `bin` (por defecto
 `"pagefind"`) es el nombre/ruta del ejecutable, resuelto contra `PATH`
@@ -163,7 +198,7 @@ bruto adicionales pasados directamente (por ejemplo
 Con `pagefind` activo:
 
 - **El propio CLI de `pagefind` ya debe estar instalado y en `PATH`** -
-  BX Sites lo invoca mediante shell (no hay un binding nativo de
+  BxSites lo invoca mediante shell (no hay un binding nativo de
   BoxLang, la misma razón por la que `lastUpdated`/`gh-deploy` invocan
   `git` mediante shell), no lo instala por ti. Consulta la
   [propia documentación de instalación de Pagefind](https://pagefind.app/docs/installation/).
@@ -172,7 +207,7 @@ Con `pagefind` activo:
   degradarse silenciosamente - publicar un sitio cuyo proveedor de
   búsqueda configurado no funciona es peor que una construcción fallida.
 - Justo después de que cada árbol de documentación (principal + versiones
-  + idiomas) se escribe y se generan `sitemap.xml`/`llms.txt`, BX Sites
+  + idiomas) se escribe y se generan `sitemap.xml`/`llms.txt`, BxSites
   ejecuta `pagefind --site <siteDir> [...options]` contra *todo* el
   `site/` construido - así que un sitio multiversión/multiidioma obtiene
   todo indexado en un solo paso, a diferencia del propio

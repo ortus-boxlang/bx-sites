@@ -7,12 +7,12 @@ tags: [guides, markdown]
 
 # Markdown Extensions
 
-Beyond standard Markdown, BX Sites turns on three of bx-markdown's native
+Beyond standard Markdown, BxSites turns on three of bx-markdown's native
 Flexmark extensions by default - admonitions, footnotes and definition lists
 - plus a Mermaid diagram integration of its own. All four are configurable
 via [`bxsites.yaml`'s `markdown`/`mermaid` keys](../configuration.md#markdown).
 
-On top of those, BX Sites implements three more extensions of its own that
+On top of those, BxSites implements three more extensions of its own that
 Flexmark has no concept of at all - content tabs, math, and fenced-code
 `hl_lines`/`linenums`/`title` annotations. Since bx-sites can't fork
 bx-markdown's parser, each one works as a pre/post-processing pass around
@@ -191,7 +191,7 @@ config needed - always on.
 Fenced code blocks are syntax-highlighted client-side (highlight.js), no
 config needed - the language identifier after the opening ` ``` ` selects
 the grammar, e.g. ` ```json `. On top of highlight.js's own bundled
-languages, BX Sites registers its own lightweight BoxLang grammar under
+languages, BxSites registers its own lightweight BoxLang grammar under
 `bx`/`boxlang`/`bxs`/`bxm`/`cfscript`:
 
 ```bx
@@ -362,9 +362,15 @@ starts.
 
 Opt-in via `bxsites.yaml`'s [`mermaid`](../configuration.md#mermaid) key:
 
-```yaml title="bxsites.yaml"
-mermaid: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    mermaid: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "mermaid": true }
+    ```
 
 Once enabled, any ` ```mermaid ` fenced code block renders as a live
 [Mermaid](https://mermaid.js.org/) diagram instead of a code listing:
@@ -384,9 +390,15 @@ for everything it can draw.
 
 Opt-in via `bxsites.yaml`'s [`math`](../configuration.md#math) key:
 
-```yaml title="bxsites.yaml"
-math: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    math: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "math": true }
+    ```
 
 Once enabled, [KaTeX](https://katex.org/) typesets `$...$` for inline math
 and `$$...$$` for a centered block, both written straight into the markdown
@@ -410,6 +422,9 @@ A `$` immediately followed or preceded by whitespace is left alone (so
 "$5 and $10" isn't misread as a formula) - typeset math always sits flush
 against both delimiters.
 
+See [Tables](tables.md) for GFM pipe tables - alignment, escaping, and
+the automatic responsive-scroll/sticky-header treatment every table gets.
+
 See [Content Blocks](content-blocks.md) for a family of GitBook-style
 `::: name ... :::` blocks on top of everything above - expandables,
 cards, columns, a stepper, file/embed/page-link cards, a changelog
@@ -424,4 +439,4 @@ bx-sites-specific syntax needed at all).
 Admonitions, footnotes and definition lists cover the common cases, but
 bx-markdown itself has no opinion beyond those three - any other Flexmark
 extension can be registered directly against it with `markdownRegisterExtension()`,
-independent of BX Sites. See bx-markdown's own readme for details.
+independent of BxSites. See bx-markdown's own readme for details.

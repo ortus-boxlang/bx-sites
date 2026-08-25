@@ -24,6 +24,7 @@ class{
 	    // Current working directories
 	    cwd = server.cli.executionPath & "/";
 	    buildDir = static.cwd & "build/module";
+	    bundledDir = static.cwd & "build/module-with-deps";
 	    artifactsDir = static.cwd & "build/artifacts";
 	}
 
@@ -48,7 +49,7 @@ class{
 		println( options )
 
 		// Create and build directories
-		var buildDirectories = [ static.buildDir, static.artifactsDir ]
+		var buildDirectories = [ static.buildDir, static.bundledDir, static.artifactsDir ]
 			.each( dir => {
 				if( directoryExists( dir ) ){
 					directoryDelete( dir, true )
@@ -116,7 +117,97 @@ class{
 			"md5"
 		)
 
+		// Bundle a second, self-contained artifact via BoxLang module inception
+		bundleDependencies()
+
 		println( "🔥 Build complete! 🔥" )
+	}
+
+	/**
+	 * Packages a second artifact - `#moduleSlug#-#version#-with-deps.zip` -
+	 * that bundles every runtime dependency from box.json's `dependencies`
+	 * block inside a `modules/` folder alongside the module itself, using
+	 * BoxLang's module inception (a module's own `modules/` folder is
+	 * discovered and activated before the module itself, recursively - see
+	 * https://boxlang.ortusbooks.com/boxlang-framework/module-development/module-inception).
+	 * The result needs nothing pre-installed to run standalone. `devDependencies`
+	 * (testbox, commandbox-*) are dev-only tooling and are never bundled.
+	 *
+	 * Built from a copy of the already-built `build/module` (so it stays in
+	 * sync with the primary artifact's version/build-id substitutions)
+	 * rather than `build/module` itself, so the primary artifact and the
+	 * `box forgebox publish` step - which publishes straight from
+	 * `build/module` - never pick up the bundled dependencies.
+	 */
+	function bundleDependencies(){
+		var dependencies = jsonDeserialize( fileRead( static.buildDir & "/box.json" ) ).dependencies ?: {}
+
+		if( dependencies.isEmpty() ){
+			println( "- No dependencies declared, skipping the with-deps artifact" )
+			return
+		}
+
+		println( "📦 Bundling module dependencies (module inception)..." )
+		directoryCopy( static.buildDir, static.bundledDir, true )
+		directoryCreate( static.bundledDir & "/modules", true )
+
+		for( var slug in dependencies ){
+			println( "	📥 Installing [#slug#] into [modules/#slug#]..." )
+			var result = exec(
+				[ "box", "install", slug, "modules", "--!save" ],
+				static.bundledDir
+			)
+			if( result.exitCode != 0 ){
+				throw(
+					type    = "BxSites.DependencyBundleFailed",
+					message = "`box install #slug# modules` failed (exit #result.exitCode#): #result.output#"
+				)
+			}
+		}
+
+		var destination = "#static.artifactsDir#/#variables.moduleSlug#-#variables.version#-with-deps.zip";
+		println( "📦 Zipping bundled code to [#destination#]..." )
+		compress(
+			destination : destination,
+			format : "zip",
+			source : static.bundledDir,
+			includeBaseFolder : false,
+			overwrite : true,
+			recurse : true
+		)
+
+		println( "🔑 Building checksums for the bundled artifact..." )
+		buildCheckSum( destination, "sha-512", "sha512" )
+		buildCheckSum( destination, "md5", "md5" )
+	}
+
+	/**
+	 * Runs a command via `java.lang.ProcessBuilder`, capturing its combined
+	 * stdout/stderr and exit code - same pattern as
+	 * `models/build/PagefindIndexer.bx`/`GitRevisionDate.bx`.
+	 *
+	 * @cmd Full argv, the binary included as element 1
+	 * @cwd Working directory for the process
+	 *
+	 * @return { exitCode, output }
+	 */
+	static private function exec( required array cmd, required string cwd ){
+		try {
+			var pb = createObject( "java", "java.lang.ProcessBuilder" ).init( arguments.cmd )
+			pb.directory( createObject( "java", "java.io.File" ).init( arguments.cwd ) )
+			pb.redirectErrorStream( true )
+
+			var process = pb.start()
+			var output = createObject( "java", "java.lang.String" ).init( process.getInputStream().readAllBytes(), "UTF-8" )
+			var exitCode = process.waitFor()
+
+			return { exitCode : exitCode, output : trim( output ) }
+		} catch( any e ){
+			return {
+				exitCode : -1,
+				output   : "could not run [#arguments.cmd[ 1 ]#] (#e.message#) - is CommandBox's `box` CLI installed and on PATH?"
+			}
+		}
 	}
 
 	/**

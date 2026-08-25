@@ -4,12 +4,12 @@ date: 2026-08-04
 authors: [lmajano]
 categories: [Versioning & i18n]
 tags: [versioning, i18n, localization, translations]
-summary: A reader landing on the wrong version, or bouncing off an English-only page, is a reader you just lost - versions and locales in BX Sites are both pure convention over configuration.
-description: How BX Sites' by-convention docs/versions/ and docs/i18n/ folders power an automatic version switcher and language switcher, and how the two compose.
+summary: A reader landing on the wrong version, or bouncing off an English-only page, is a reader you just lost - versions and locales in BxSites are both pure convention over configuration.
+description: How BxSites' by-convention docs/versions/ and docs/i18n/ folders power an automatic version switcher and language switcher, and how the two compose.
 image: assets/blog/never-lose-a-reader-versions-and-translations-cover.svg
 ---
 
-Two of the fastest ways to lose a documentation reader: they land on docs for the wrong version of your software, or they land on a page in a language they don't read well and there's no obvious way out. BX Sites handles both the same way it handles most things - a folder convention, no config flag to remember to flip.
+Two of the fastest ways to lose a documentation reader: they land on docs for the wrong version of your software, or they land on a page in a language they don't read well and there's no obvious way out. BxSites handles both the same way it handles most things - a folder convention, no config flag to remember to flip.
 
 <!-- more -->
 
@@ -52,12 +52,25 @@ docs/
 
 `<code>` becomes both the folder name and the built URL prefix (`docs/i18n/es/guides/setup.md` → `/es/guides/setup/`). Give each locale a display label - and, for a right-to-left language, its own direction - in your config:
 
-```yaml title="bxsites.yaml" linenums="1"
-i18n:
-  locales:
-    - { code: es, label: Español }
-    - { code: ar, label: العربية, dir: rtl }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    i18n:
+      locales:
+        - { code: es, label: Español }
+        - { code: ar, label: العربية, dir: rtl }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"i18n": {
+    		"locales": [
+    			{ "code": "es", "label": "Español" },
+    			{ "code": "ar", "label": "العربية", "dir": "rtl" }
+    		]
+    	}
+    }
+    ```
 
 Every `docs/i18n/<code>/` folder builds automatically once it exists - `locales` only supplies display metadata, it isn't what turns the feature on.
 

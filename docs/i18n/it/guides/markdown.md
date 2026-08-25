@@ -7,13 +7,13 @@ tags: [guide, markdown]
 
 # Estensioni Markdown
 
-Oltre al Markdown standard, BX Sites attiva di default tre estensioni
+Oltre al Markdown standard, BxSites attiva di default tre estensioni
 Flexmark native di bx-markdown - ammonizioni, note a piè di pagina e
 liste di definizioni - più un'integrazione con i diagrammi Mermaid tutta
 sua. Tutte e quattro sono configurabili tramite le
 [chiavi `markdown`/`mermaid` di `bxsites.yaml`](../configuration.md#markdown).
 
-Oltre a queste, BX Sites implementa altre tre estensioni proprie di cui
+Oltre a queste, BxSites implementa altre tre estensioni proprie di cui
 Flexmark non ha alcun concetto - schede di contenuto, matematica, e
 annotazioni `hl_lines`/`linenums`/`title` sui blocchi di codice delimitati.
 Dato che bx-sites non può forkare il parser di bx-markdown, ognuna di
@@ -200,7 +200,7 @@ sempre attivo.
 I blocchi di codice delimitati vengono evidenziati lato client
 (highlight.js), nessuna configurazione necessaria - l'identificatore di
 linguaggio dopo l'apertura ` ``` ` seleziona la grammatica, ad es.
-` ```json `. Oltre ai linguaggi già inclusi in highlight.js, BX Sites
+` ```json `. Oltre ai linguaggi già inclusi in highlight.js, BxSites
 registra una propria grammatica BoxLang leggera sotto
 `bx`/`boxlang`/`bxs`/`bxm`/`cfscript`:
 
@@ -379,9 +379,15 @@ try.boxlang.io ↗" dell'embed riprende esattamente da dove parte l'embed.
 Opzionale tramite la chiave [`mermaid`](../configuration.md#mermaid) di
 `bxsites.yaml`:
 
-```yaml title="bxsites.yaml"
-mermaid: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    mermaid: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "mermaid": true }
+    ```
 
 Una volta attivato, qualsiasi blocco di codice delimitato ` ```mermaid `
 viene renderizzato come un diagramma [Mermaid](https://mermaid.js.org/)
@@ -404,9 +410,15 @@ per tutto ciò che può disegnare.
 Opzionale tramite la chiave [`math`](../configuration.md#math) di
 `bxsites.yaml`:
 
-```yaml title="bxsites.yaml"
-math: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    math: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "math": true }
+    ```
 
 Una volta attivato, [KaTeX](https://katex.org/) compone `$...$` per la
 matematica in linea e `$$...$$` per un blocco centrato, entrambi scritti
@@ -430,6 +442,10 @@ $$
 Un `$` immediatamente preceduto o seguito da uno spazio viene lasciato
 intatto (così "$5 e $10" non viene scambiato per una formula) - la
 matematica composta sta sempre accostata a entrambi i delimitatori.
+
+Vedi [Tabelle](tables.md) per le tabelle a pipe GFM - allineamento,
+escape, e il trattamento automatico di scorrimento responsive/intestazione
+fissa che ogni tabella riceve.
 
 Vedi [Blocchi di contenuto](content-blocks.md) per una famiglia di
 blocchi in stile GitBook `::: name ... :::` che si aggiunge a tutto

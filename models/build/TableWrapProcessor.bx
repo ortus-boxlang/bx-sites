@@ -1,0 +1,81 @@
+/**
+ * Wraps every rendered `<table>` in a `.bxsites-table-wrap` div so a theme
+ * can give it horizontal scroll and a sticky header via plain CSS -
+ * `overflow-x` alone on the `<table>` element itself doesn't work for a
+ * sticky `<thead>` (the table becomes its own scroll container, and since
+ * its height always exactly fits its own content, there's never a viewport
+ * for the header to stick within) - it needs a separate wrapper element,
+ * which bx-markdown/Flexmark's `tableOptions` has no way to emit (see
+ * docs/guides/markdown.md#tables). This runs as a post-process pass after
+ * `Markdown()` has already turned pipe-table syntax into real `<table>`
+ * markup - same shape as CodeAnnotationProcessor.bx's `applyToHtml()`.
+ */
+class {
+
+	/**
+	 * Wraps each top-level `<table>...</table>` in the given HTML with a
+	 * `<div class="bxsites-table-wrap">`. Depth-aware so a table nested
+	 * inside another one (raw HTML in a cell - rare, but markdown does let
+	 * raw block HTML pass through untouched) only gets one wrapper, around
+	 * the outermost table.
+	 */
+	public string function wrap( required string html ) {
+		var result = ""
+		var pos = 1
+		var totalLen = len( arguments.html )
+
+		while ( pos <= totalLen ) {
+			var tableStart = findNoCase( "<table", arguments.html, pos )
+			if ( !tableStart ) {
+				result &= mid( arguments.html, pos, totalLen - pos + 1 )
+				break
+			}
+
+			result &= mid( arguments.html, pos, tableStart - pos )
+
+			var closeEnd = findMatchingTableClose( arguments.html, tableStart )
+			if ( !closeEnd ) {
+				// No matching close tag (malformed/truncated HTML) - leave the
+				// rest untouched rather than guess.
+				result &= mid( arguments.html, tableStart, totalLen - tableStart + 1 )
+				pos = totalLen + 1
+				break
+			}
+
+			result &= '<div class="bxsites-table-wrap">' & mid( arguments.html, tableStart, closeEnd - tableStart + 1 ) & '</div>'
+			pos = closeEnd + 1
+		}
+
+		return result
+	}
+
+	/**
+	 * Returns the string index of the last character of the `</table>` that
+	 * matches the `<table` starting at `tableStart`, tracking nesting depth
+	 * so an inner table's close tag isn't mistaken for the outer one's.
+	 */
+	private numeric function findMatchingTableClose( required string html, required numeric tableStart ) {
+		var depth = 1
+		var scanPos = arguments.tableStart + 6
+
+		while ( depth > 0 ) {
+			var nextOpen = findNoCase( "<table", arguments.html, scanPos )
+			var nextClose = findNoCase( "</table>", arguments.html, scanPos )
+
+			if ( !nextClose ) {
+				return 0
+			}
+
+			if ( nextOpen && nextOpen < nextClose ) {
+				depth++
+				scanPos = nextOpen + 6
+			} else {
+				depth--
+				scanPos = nextClose + 8
+			}
+		}
+
+		return scanPos - 1
+	}
+
+}

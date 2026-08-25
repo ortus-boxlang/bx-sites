@@ -7,7 +7,7 @@ tags: [guides, markdown, gitbook]
 
 # Content Blocks
 
-On top of everything in [Markdown Extensions](markdown.md), BX Sites
+On top of everything in [Markdown Extensions](markdown.md), BxSites
 supports a family of GitBook-style content blocks - handy on its own,
 and the reason a GitBook site's content is straightforward to migrate:
 each of these maps directly to a GitBook block of the same name. Every
@@ -42,7 +42,7 @@ wrapper - `title`, `icon`, `image` and `href` are all optional (a card
 with no `href` renders as a plain, non-clickable card). `icon` is resolved
 the same way frontmatter/nav `icon` values are - a plain emoji, or a named
 icon from a bundled library (`icon="phosphor-duotone:rocket-launch"`,
-`icon="lucide:rocket"`, ...) - see [Themes: Icons](themes.md#icons):
+`icon="lucide:rocket"`, ...) - see [Icons](icons.md):
 
 ```markdown title="Example" linenums="1"
 ::: cards
@@ -162,6 +162,53 @@ resolved the same way `theme.logo`/frontmatter `ogImage` already are
 ::: file src="assets/og-image.png" title="Site Preview Image"
 :::
 
+## Buttons
+
+A GitBook-style call-to-action button - `::: button` on its own, or several
+laid out in a row inside a `::: buttons` wrapper. The leading `"Label"` and
+`href` are the only pieces most buttons need:
+
+```markdown title="Example" linenums="1"
+::: button "Get Started" href="../getting-started.md" style="primary"
+:::
+```
+
+::: button "Get Started" href="../getting-started.md" style="primary"
+:::
+
+A few optional attributes give each button its own abilities:
+
+- `style="primary"` or `style="secondary"` (the default) - solid-accent vs.
+  outline.
+- `size="small"`, `"medium"` (the default) or `"large"`.
+- `icon="..."` - resolved the same way a card's own `icon` is (a plain
+  emoji, or a named icon like `icon="phosphor-duotone:rocket-launch"` -
+  see [Themes: Icons](themes.md#icons)).
+- `target="_blank"` - opens the link in a new tab instead of the same one
+  (`rel="noopener noreferrer"` is added automatically).
+- `disabled="true"` - renders an inert, unclickable button (no `href`
+  needed) for a "coming soon" call to action.
+
+```markdown title="Example" linenums="1"
+::: buttons
+::: button "Read the docs" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
+:::
+::: button "Star on GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
+:::
+::: button "Coming soon" disabled="true"
+:::
+:::
+```
+
+::: buttons
+::: button "Read the docs" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
+:::
+::: button "Star on GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
+:::
+::: button "Coming soon" disabled="true"
+:::
+:::
+
 ## Embed
 
 A responsive iframe embed for a recognized provider - currently YouTube,
@@ -176,59 +223,6 @@ refuse to render (most sites block being framed):
 
 ::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
 :::
-
-## OpenAPI / Swagger
-
-An interactive [Swagger UI](https://swagger.io/tools/swagger-ui/) widget for
-an OpenAPI/Swagger spec - `src` is resolved the same `docs/assets/`-relative
-way `::: file`'s own `src` is. Both JSON and YAML specs work; Swagger UI
-parses either entirely client-side; no OpenAPI parsing happens anywhere in
-this module. Requires `bxsites.yaml`'s [`openapi`](../configuration.md#openapi)
-set to `true` - unset, this placeholder renders but stays inert (Swagger
-UI's own JS/CSS is never copied into `site/` at all, keeping every other
-project's build exactly as small as before this feature existed):
-
-```markdown title="Example" linenums="1"
-::: openapi src="assets/openapi/example.yaml" title="Bookshelf API"
-:::
-```
-
-::: openapi src="assets/openapi/example.yaml" title="Bookshelf API"
-:::
-
-The widget above is this exact page, live, rendering the small example spec
-this guide ships at `docs/assets/openapi/example.yaml` - open it in your
-own project's `docs/assets/` (or point `src` at wherever your own spec
-already lives) to see it with your own API instead.
-
-Only `SwaggerUIBundle`'s own base layout is vendored - no topbar/"Explore"
-bar letting a reader type in a *different* spec (a `::: openapi` block is
-meant to always show the one spec its author pointed it at), so every
-operation, its request/response schemas, and "Try it out" (which calls the
-spec's own `servers[0].url` directly from the visitor's browser - make
-sure that server allows CORS from wherever your docs are hosted) render
-straight from your existing spec with no rewriting needed.
-
-### One operation inline
-
-Add `operation="METHOD /path"` to drop just that one endpoint into a
-regular page - handy mid-tutorial, without sending the reader off to the
-full reference:
-
-```markdown title="Example" linenums="1"
-::: openapi src="assets/openapi/example.yaml" operation="GET /books"
-:::
-```
-
-::: openapi src="assets/openapi/example.yaml" operation="GET /books"
-:::
-
-Still the exact same Swagger UI widget as the full block above (same spec,
-same client-side-only rendering - `operation` never triggers any OpenAPI
-parsing on our side either); every other operation is simply hidden and
-this one auto-expanded, by reading Swagger UI's own already-rendered
-markup. `operation`'s method is case-insensitive; its path must match the
-spec's own path exactly (`{param}` placeholders and all).
 
 ## Page link
 
@@ -265,6 +259,60 @@ build time:
 
 ::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
 :::
+
+## Prompt
+
+A styled container for a reusable AI prompt - bx-sites' own equivalent of
+GitBook's [Prompt block](https://gitbook.com/docs/create-content/blocks/prompt).
+The block's body *is* the prompt text, written as ordinary Markdown (so
+headings, lists, and code inside it still get their own formatting); every
+prompt gets a "Copy" button that copies that exact source text, formatting
+markup included, ready to paste into whatever AI tool you're using it with.
+`description` (an optional one-line summary) and `icon` (resolved the same
+way `::: card`'s own `icon` is - defaults to a sparkle glyph when omitted)
+are both optional:
+
+```markdown title="Example" linenums="1"
+::: prompt description="Summarizes a pull request for a changelog entry" icon="phosphor-duotone:git-pull-request"
+Summarize the following pull request diff as a single changelog entry,
+written for an end user rather than a developer. Group related changes
+together and skip anything purely internal (refactors, tests, CI).
+:::
+```
+
+::: prompt description="Summarizes a pull request for a changelog entry" icon="phosphor-duotone:git-pull-request"
+Summarize the following pull request diff as a single changelog entry,
+written for an end user rather than a developer. Group related changes
+together and skip anything purely internal (refactors, tests, CI).
+:::
+
+Add `expanded="preview"` to clamp a long prompt to a short, fade-out
+preview until the reader clicks "Show more", or `expanded="hidden"` to
+start it fully collapsed behind a "Show prompt" button - handy for a page
+that lists several prompts back to back. Omit `expanded` (or set it to
+`"full"`, the default) to always show the whole prompt:
+
+```markdown title="Example" linenums="1"
+::: prompt description="A longer, multi-step prompt" expanded="preview"
+1. Read the attached error log line by line.
+2. For each stack trace, identify the failing module.
+3. Group failures by root cause, not by timestamp.
+4. Propose one fix per root cause, not per failure.
+5. Skip anything that already has an open issue - list those separately.
+:::
+```
+
+::: prompt description="A longer, multi-step prompt" expanded="preview"
+1. Read the attached error log line by line.
+2. For each stack trace, identify the failing module.
+3. Group failures by root cause, not by timestamp.
+4. Propose one fix per root cause, not per failure.
+5. Skip anything that already has an open issue - list those separately.
+:::
+
+Unlike GitBook's own Prompt block, there's no "Open in AI providers" menu
+here - bx-sites never talks to a third-party AI provider, so that part of
+GitBook's own block has no equivalent.
 
 ## Updates (changelog)
 

@@ -7,14 +7,14 @@ tags: [anleitungen, suche]
 
 # Suche
 
-BX Sites liefert standardmäßig einen Suchprovider mit und lässt sich über
+BxSites liefert standardmäßig einen Suchprovider mit und lässt sich über
 [`searchProvider`](../configuration.md#searchprovider) in `bxsites.yaml`
 auf andere ausrichten - `search: true`/`false` bleibt dabei der zentrale
 An-/Aus-Schalter, unabhängig davon, welcher Provider aktiv ist.
 
 ## Local (der Standard)
 
-Die Suche von BX Sites ist vollständig statisch und clientseitig -
+Die Suche von BxSites ist vollständig statisch und clientseitig -
 derselbe Ansatz, den [mkdocs](https://www.mkdocs.org/) standardmäßig
 verwendet: ein einmal zur `build`-Zeit erstellter Index, und
 [lunr.js](https://lunrjs.com/) übernimmt die eigentliche Suche im Browser
@@ -73,9 +73,15 @@ Moduls.
 
 ## Ausschalten
 
-```yaml title="bxsites.yaml"
-search: false
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    search: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "search": false }
+    ```
 
 Überspringt den Aufbau von `search-index.json` vollständig und
 überspringt die Suchbox, das vendorierte `lunr.js`-Skript sowie das
@@ -105,16 +111,33 @@ Setze `searchProvider.provider` auf `"algolia"`, um die Suchbox gegen
 dieselbe crawler-gehostete Suche, die mkdocs-material, VitePress,
 Starlight und Docusaurus alle unterstützen:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider:
-  provider: algolia
-  algolia:
-    appId: ABC123
-    apiKey: a1b2c3d4e5f6...
-    indexName: my-docs
-    insights: false
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider:
+      provider: algolia
+      algolia:
+        appId: ABC123
+        apiKey: a1b2c3d4e5f6...
+        indexName: my-docs
+        insights: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "algolia",
+    		"algolia": {
+    			"appId": "ABC123",
+    			"apiKey": "a1b2c3d4e5f6...",
+    			"indexName": "my-docs",
+    			"insights": false
+    		}
+    	}
+    }
+    ```
 
 `appId`, `apiKey` und `indexName` sind erforderlich - `apiKey` ist der
 **reine Such**-öffentliche API-Schlüssel, den DocSearch dir gibt (nie
@@ -130,9 +153,9 @@ Mit aktivem `algolia`:
   [DocSearch-Crawler](https://docsearch.algolia.com/docs/what-is-docsearch/)
   oder deiner eigenen
   [Algolia-Crawler](https://www.algolia.com/products/search-and-discovery/crawler/)-Konfiguration,
-  nicht von irgendetwas, das BX Sites zur Build-Zeit schreibt. Du musst
+  nicht von irgendetwas, das BxSites zur Build-Zeit schreibt. Du musst
   die Website trotzdem separat bei DocSearch registrieren (oder deinen
-  eigenen Crawler betreiben) - BX Sites verdrahtet nur das Client-Widget.
+  eigenen Crawler betreiben) - BxSites verdrahtet nur das Client-Widget.
 - Jedes integrierte Theme rendert stattdessen einen leeren
   `#bxsites-search-algolia`-Container, und `layout.bxm` lädt
   `@docsearch/css`/`@docsearch/js` von jsDelivr und ruft `docsearch({...})`
@@ -146,12 +169,24 @@ Setze `searchProvider.provider` auf `"pagefind"`, um die Suchbox gegen
 vollständig statische Suchmaschine ohne Server, aber indiziert aus dem
 *gebauten* `site/`-HTML statt gecrawlt wie bei Algolia:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider:
-  provider: pagefind
-  pagefind: { bin: pagefind, options: [] }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider:
+      provider: pagefind
+      pagefind: { bin: pagefind, options: [] }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "pagefind",
+    		"pagefind": { "bin": "pagefind", "options": [] }
+    	}
+    }
+    ```
 
 Beide `pagefind`-Schlüssel sind optional - `bin` (Standard `"pagefind"`)
 ist der Name/Pfad der Binary, aufgelöst gegen `PATH`, wenn es ein reiner
@@ -162,7 +197,7 @@ direkt durchgereicht werden (z. B.
 Mit aktivem `pagefind`:
 
 - **Die `pagefind`-CLI muss bereits installiert und im `PATH` vorhanden
-  sein** - BX Sites ruft sie extern auf (es gibt keine
+  sein** - BxSites ruft sie extern auf (es gibt keine
   BoxLang-native Anbindung, derselbe Grund, aus dem
   `lastUpdated`/`gh-deploy` `git` extern aufrufen), es installiert sie
   nicht für dich. Siehe
@@ -195,7 +230,7 @@ Mit aktivem `pagefind`:
 `searchProvider.provider` ist nicht auf
 `"local"`/`"algolia"`/`"pagefind"` beschränkt - jeder andere Wert wird
 von `bxsites.yaml` unverändert akzeptiert (die eigene
-Konfigurationsvalidierung von BX Sites prüft nur die drei oben genannten
+Konfigurationsvalidierung von BxSites prüft nur die drei oben genannten
 Provider). Dafür gibt es keinen Plugin-Hook - die integrierten Themes
 rendern für einen nicht erkannten Providernamen einfach nichts, und das
 Verdrahten eines vierten Suchdienstes (Meilisearch, Typesense usw.) ist

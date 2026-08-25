@@ -38,7 +38,7 @@ Windows 版と Homebrew 版のインストーラー、および BVM コマンド
 
 ## インストール
 
-BX Sites は、Markdown レンダリングに [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)、
+BxSites は、Markdown レンダリングに [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)、
 HTML エンコードに [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)、
 `bxsites.yaml` の読み込みに [bx-yaml](https://github.com/ortus-boxlang/bx-yaml)、
 レスポンシブ画像パイプライン（[レスポンシブ画像](guides/images.md) を参照）に
@@ -146,7 +146,7 @@ docs/
 [はじめにに戻る](../getting-started.md#ページの追加) ことができます。
 ```
 
-BX Sites はビルド時にすべてのリンクをビルド後のキレイな URL に書き換えます
+BxSites はビルド時にすべてのリンクをビルド後のキレイな URL に書き換えます
 （`guides/deployment.md` → `/guides/deployment/index.html`、アンカーとクエリ文字列を保持）。
 これは *リンク元* ページ自身のフォルダを基準に解決されます - `../` や兄弟参照は、
 他の相対パスを解決するのとまったく同じように機能します。これは、ビルドされたサイトではなく
@@ -174,7 +174,7 @@ GitHub 上で直接ファイルを読んだ場合でもリンクが機能し続�
 title: デプロイ
 order: 2
 hidden: false
-description: ビルドした BX Sites サイトのデプロイ方法。
+description: ビルドした BxSites サイトのデプロイ方法。
 tags: [ガイド, デプロイ]
 icon: 🚀
 summary: サイトを公開するために必要なすべてのこと。
@@ -198,7 +198,7 @@ toc: true
 - `icon` - ページタイトルとナビゲーションエントリの横に表示されます - 単純な絵文字、
   またはバンドルされたライブラリの名前付きアイコン（`rocket`、`lucide:rocket`、
   `tabler:rocket`、プロジェクト独自の `custom:my-icon`）を指定できます。
-  [テーマ: アイコン](guides/themes.md#icons) を参照してください
+  [アイコン](guides/icons.md) を参照してください
 - `summary` - タイトルの下に表示される1行のリードイン（ページ自体には
   レンダリングされないメタタグ専用の `description` とは別物です）
 - `ogImage` - このページのソーシャルカード画像を上書きします -

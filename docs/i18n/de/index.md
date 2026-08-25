@@ -7,17 +7,17 @@ toc: false
 ---
 
 <div class="bxsites-hero">
-	<img class="bxsites-hero__banner" src="assets/home-banner.jpg" alt="BX Sites - Write. Build. Publish Beautiful Docs. The official documentation engine for BoxLang. Markdown Powered, Beautiful Themes, Blazing Fast Search, Developer Focused.">
+	<img class="bxsites-hero__banner" src="assets/home-banner.jpg" alt="BxSites - Write. Build. Publish Beautiful Docs. The official documentation engine for BoxLang. Markdown Powered, Beautiful Themes, Blazing Fast Search, Developer Focused.">
 	<div class="bxsites-hero__actions">
 		<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="getting-started.md">Erste Schritte</a>
 		<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://github.com/ortus-boxlang/bx-sites">Auf GitHub ansehen</a>
 	</div>
 </div>
 
-Genau diese Seite wird von BX Sites gebaut, aus den Markdown-Dateien im
+Genau diese Seite wird von BxSites gebaut, aus den Markdown-Dateien im
 `docs/`-Ordner dieses Repositorys.
 
-BX Sites ist nicht nur für Referenzdokumentation gedacht - es ist ein
+BxSites ist nicht nur für Referenzdokumentation gedacht - es ist ein
 allgemeiner **statischer Site-Generator**. Eine Marketing-Site, ein Blog,
 eine Wissensdatenbank, eine Produktseite, eine persönliche Seite: alles, was
 sich in Markdown schreiben lässt, wird auf demselben Weg gebaut - mit
@@ -75,7 +75,7 @@ funktionierendes bx-sites-Projekt um.
 
 ## Selbst sehen, statt nur davon lesen
 
-BX Sites' eigenes Markdown-Toolkit in Aktion, direkt hier auf der
+BxSites' eigenes Markdown-Toolkit in Aktion, direkt hier auf der
 Startseite - kein Screenshot, das Original:
 
 ::: stepper
@@ -138,11 +138,11 @@ Versionierungsrichtlinie und Neuigkeiten pro Release.
 
 ## Brauchst du Hilfe beim Aufbau deiner Website?
 
-BX Sites ist frei und Open Source - aber wenn du lieber das Team, das es
+BxSites ist frei und Open Source - aber wenn du lieber das Team, das es
 entwickelt, die Arbeit machen lassen möchtest, bietet
 [Ortus Solutions](https://www.ortussolutions.com) professionelle
 Dienstleistungen und Beratung für Dokumentations-Websites, Migrationen und
-jede andere mit BX Sites gebaute statische Website an.
+jede andere mit BxSites gebaute statische Website an.
 
 <div class="bxsites-hero__actions">
 	<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="mailto:consulting@ortussolutions.com">E-Mail an consulting@ortussolutions.com</a>

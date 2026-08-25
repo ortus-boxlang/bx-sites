@@ -4,12 +4,12 @@ date: 2026-07-24
 authors: [lmajano]
 categories: [Search]
 tags: [search, lunr, algolia, pagefind]
-summary: A static site with no server-side search index still deserves fast, relevant search - here's how BX Sites pulls that off by default, and when to reach for something bigger.
-description: How BX Sites' default lunr.js-based static search works, plus when and how to switch to Algolia DocSearch or Pagefind instead.
+summary: A static site with no server-side search index still deserves fast, relevant search - here's how BxSites pulls that off by default, and when to reach for something bigger.
+description: How BxSites' default lunr.js-based static search works, plus when and how to switch to Algolia DocSearch or Pagefind instead.
 image: assets/blog/search-that-just-works-cover.svg
 ---
 
-Search is one of those features that either quietly works or loudly doesn't, and for a static docs site it's easy to end up with the latter - no server to query, so search either gets bolted on as a third-party widget or skipped entirely. BX Sites takes the same approach [mkdocs](https://www.mkdocs.org/) does by default: fully static, fully client-side, no server or external service required.
+Search is one of those features that either quietly works or loudly doesn't, and for a static docs site it's easy to end up with the latter - no server to query, so search either gets bolted on as a third-party widget or skipped entirely. BxSites takes the same approach [mkdocs](https://www.mkdocs.org/) does by default: fully static, fully client-side, no server or external service required.
 
 <!-- more -->
 
@@ -31,9 +31,15 @@ though in practice `build` already runs this as one of its own steps.
 
 ## Turning it off
 
-```yaml title="bxsites.yaml"
-search: false
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    search: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "search": false }
+    ```
 
 Skips building the index entirely, and skips shipping the search box, the `lunr.js` script, and `search.js` - a project with search off ships nothing search-related at all.
 
@@ -41,26 +47,51 @@ Skips building the index entirely, and skips shipping the search box, the `lunr.
 
 For most docs sites, lunr's relevance ranking is genuinely good. But if you're running a large site and want crawler-hosted, typo-tolerant search, swap providers instead of fighting the default:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider:
-  provider: algolia
-  algolia:
-    appId: ABC123
-    apiKey: a1b2c3d4e5f6...
-    indexName: my-docs
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider:
+      provider: algolia
+      algolia:
+        appId: ABC123
+        apiKey: a1b2c3d4e5f6...
+        indexName: my-docs
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "algolia",
+    		"algolia": {
+    			"appId": "ABC123",
+    			"apiKey": "a1b2c3d4e5f6...",
+    			"indexName": "my-docs"
+    		}
+    	}
+    }
+    ```
 
 With Algolia active, no `search-index.json` is built at all - Algolia serves results from its own hosted index, populated by DocSearch's crawler (or your own Algolia Crawler config), and each theme renders an empty container that `docsearch({...})` mounts into.
 
 Prefer something that indexes your *built* HTML rather than a crawler hitting your live site? [Pagefind](https://pagefind.app/) is the other built-in option:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider: { provider: pagefind }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider: { provider: pagefind }
+    ```
 
-The `pagefind` CLI has to already be on your `PATH` - BX Sites shells out to it right after the doc tree (including every version and locale) is written, and a missing binary fails the build loudly rather than shipping a site whose search silently doesn't work.
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": { "provider": "pagefind" }
+    }
+    ```
+
+The `pagefind` CLI has to already be on your `PATH` - BxSites shells out to it right after the doc tree (including every version and locale) is written, and a missing binary fails the build loudly rather than shipping a site whose search silently doesn't work.
 
 I still reach for the local `lunr` default on almost every project I ship - it's zero-config, it's fast enough that I've never noticed the difference, and it means one less moving part at deploy time. Pagefind is the one I'd pick next, mostly because it indexes the real rendered HTML rather than trusting my own frontmatter to be accurate.
 

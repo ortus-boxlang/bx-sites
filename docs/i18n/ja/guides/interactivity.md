@@ -7,7 +7,7 @@ tags: [ガイド, Alpine, インタラクティビティ]
 
 # Alpine.js によるインタラクティビティ
 
-BX Sites がビルドするすべてのページは、すでに [Alpine.js](https://alpinejs.dev/)
+BxSites がビルドするすべてのページは、すでに [Alpine.js](https://alpinejs.dev/)
 を読み込んでいます - すべての組み込みテーマで、ダーク/ライトモード切替と
 言語ドロップダウンを動かしているのがこれです。同じ Alpine インスタンスは、
 あなた自身のページコンテンツからも無料で使えます。`bxsites.yaml` で切り替える
@@ -31,18 +31,29 @@ Markdown 内の[生のブロックレベル HTML はそのまま通過する](im
   [コンテンツタブ](markdown.md#コンテンツタブ)
 - 番号付きの手順ウォークスルー →
   [ステッパー](content-blocks.md#ステッパー)
+- スタイル付きの CTA リンク →
+  [ボタン](content-blocks.md#ボタン)（以下のコピー・トゥ・クリップボード
+  ボタンは *別の* ケースです - `href` を一切持たず、クライアントサイドの
+  動作だけです - これはまさに Alpine の出番です）
 
 Alpine は、これらがカバーしない - 独自のクライアントサイド状態を持つ -
 インタラクティブなコンテンツのためのものです。
 
 ## コピー・トゥ・クリップボードボタン
 
-よくある例: インストールコマンドの横にあり、それをコピーしてコピー完了を
-確認するボタンです:
+[`::: button`](content-blocks.md#ボタン) は常に本物のリンク（または操作
+不可のプレースホルダー）だけをレンダリングします - GitBook 自身のボタンと
+同様、クリック時に任意の JS を実行するという概念はありません。どこかへ
+移動するのではなく実際に *何かを行う* ボタンには、代わりに
+`bxsites-button`/`bxsites-button--*` クラスをプレーンな HTML の `<button>`
+に付けてください - 見た目は同じで、すべての組み込みテーマでスタイルされ、
+`href` の代わりに Alpine で配線されるだけです。よくある例: インストール
+コマンドの横にあり、それをコピーしてコピー完了を確認するボタンです:
 
 ```markdown title="Copy button" linenums="1"
 <div x-data="{ copied: false }">
-  <button type="button" @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
+  <button type="button" class="bxsites-button bxsites-button--secondary bxsites-button--small"
+    @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
     <span x-show="!copied">インストールコマンドをコピー</span>
     <span x-show="copied" x-cloak>コピーしました！</span>
   </button>
@@ -50,7 +61,8 @@ Alpine は、これらがカバーしない - 独自のクライアントサイ�
 ```
 
 <div x-data="{ copied: false }">
-  <button type="button" class="btn btn-sm btn-outline-secondary" @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
+  <button type="button" class="bxsites-button bxsites-button--secondary bxsites-button--small"
+    @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
     <span x-show="!copied">インストールコマンドをコピー</span>
     <span x-show="copied" x-cloak>コピーしました！</span>
   </button>
@@ -73,6 +85,116 @@ Alpine は、これらがカバーしない - 独自のクライアントサイ�
 
 `x-model` は入力値を Alpine の状態にバインドします。各 `<li>` の `x-show` は
 キー入力のたびに再評価されます。
+
+## ソート・フィルタ可能なテーブル
+
+[ネイティブなパイプテーブル](tables.md) は、一度組み立てられると
+静的なままです - 読者が実際にクライアントサイドでソート・フィルタできるテーブル
+（ここでの GitBook のテーブル検索/ソートに最も近いもの）が欲しい場合は、
+`| Feature | Status |` というパイプ構文を書く代わりに、Alpine に行（row）を
+管理させます: データを `x-data` に入れ、`x-for` でレンダリングします:
+
+```markdown title="Sortable table" linenums="1"
+<div x-data="{
+  query: '',
+  sortKey: 'name',
+  sortAsc: true,
+  rows: [
+    { name: 'Bootstrap', type: 'Components', stars: 4 },
+    { name: 'GitBook', type: 'SaaS', stars: 5 },
+    { name: 'Docusaurus', type: 'React', stars: 4 },
+    { name: 'VuePress', type: 'Vue', stars: 3 }
+  ],
+  sortBy(key) {
+    this.sortAsc = this.sortKey === key ? !this.sortAsc : true
+    this.sortKey = key
+  },
+  get sorted() {
+    return [...this.rows]
+      .filter(r => r.name.toLowerCase().includes(this.query.toLowerCase()))
+      .sort((a, b) => {
+        const dir = this.sortAsc ? 1 : -1
+        return a[this.sortKey] > b[this.sortKey] ? dir : a[this.sortKey] < b[this.sortKey] ? -dir : 0
+      })
+  }
+}">
+  <input type="text" x-model="query" placeholder="Filter by name...">
+  <table class="table">
+    <thead>
+      <tr>
+        <th @click="sortBy('name')" style="cursor:pointer">Name</th>
+        <th @click="sortBy('type')" style="cursor:pointer">Type</th>
+        <th @click="sortBy('stars')" style="cursor:pointer">Stars</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="row in sorted" :key="row.name">
+        <tr>
+          <td x-text="row.name"></td>
+          <td x-text="row.type"></td>
+          <td x-text="row.stars"></td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+</div>
+```
+
+次のようにレンダリングされます（ボックスに入力するか、列見出しをクリックしてください）:
+
+<div x-data="{
+  query: '',
+  sortKey: 'name',
+  sortAsc: true,
+  rows: [
+    { name: 'Bootstrap', type: 'Components', stars: 4 },
+    { name: 'GitBook', type: 'SaaS', stars: 5 },
+    { name: 'Docusaurus', type: 'React', stars: 4 },
+    { name: 'VuePress', type: 'Vue', stars: 3 }
+  ],
+  sortBy(key) {
+    this.sortAsc = this.sortKey === key ? !this.sortAsc : true
+    this.sortKey = key
+  },
+  get sorted() {
+    return [...this.rows]
+      .filter(r => r.name.toLowerCase().includes(this.query.toLowerCase()))
+      .sort((a, b) => {
+        const dir = this.sortAsc ? 1 : -1
+        return a[this.sortKey] > b[this.sortKey] ? dir : a[this.sortKey] < b[this.sortKey] ? -dir : 0
+      })
+  }
+}">
+  <input type="text" x-model="query" placeholder="Filter by name...">
+  <table class="table">
+    <thead>
+      <tr>
+        <th @click="sortBy('name')" style="cursor:pointer">Name</th>
+        <th @click="sortBy('type')" style="cursor:pointer">Type</th>
+        <th @click="sortBy('stars')" style="cursor:pointer">Stars</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="row in sorted" :key="row.name">
+        <tr>
+          <td x-text="row.name"></td>
+          <td x-text="row.type"></td>
+          <td x-text="row.stars"></td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+</div>
+
+`rows` はページに直接埋め込まれた単なる JS 配列です - ドキュメントが実際に持つ
+ような小さな参照用テーブルには十分です。`sorted` は Alpine の `get`ter なので、
+キー入力やクリックのたびに追加の配線なしで再フィルタ・再ソートされます。
+`sortBy()` は同じ列を2回目にクリックすると向きを切り替えます。ここでの
+`<table>` は手書きの本物の `<table>` タグです（row を Alpine に直接渡すパイプ
+テーブル構文はありません）- そのため、bx-markdown 自身がレンダリングする他の
+どのテーブルとも同じように、自動的に `.bxsites-table-wrap` でラップされ、
+[レスポンシブなスクロールと固定ヘッダー](tables.md#レスポンシブなスクロールと固定ヘッダー)
+の処理も適用されます。
 
 ## `x-data` の基本（Alpine が初めての方向け）
 

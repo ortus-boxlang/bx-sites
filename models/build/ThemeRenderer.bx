@@ -28,7 +28,7 @@
  *     `bxsites.json`'s `search` is `true` (regardless of provider).
  *     `variables.siteConfig.searchProvider.provider` (defaulted to `"local"`
  *     by ConfigLoader.bx) tells it which UI to render - the built-in themes'
- *     own `search.bxm` render the local lunr search box for `"local"`, an
+ *     own `search.bxm` render the local MiniSearch search box for `"local"`, an
  *     empty container for `"algolia"` (wired up by `layout.bxm` instead, via
  *     Algolia DocSearch), and nothing for any other provider name, which a
  *     project's own `theme/` override is then free to handle itself - see
@@ -54,6 +54,15 @@
  * has no translation for it yet - showing the default locale's own content
  * instead of a broken link, per mergeLocalePages()'s docblock; a theme's
  * `page.bxm` can check it to show a "not yet translated" notice.
+ *
+ * `functions` (module spec section 8, `docs/functions.bxs` - FunctionsLoader.bx)
+ * - a project's own "magic functions", each named with a leading `$` - are
+ * bound directly into this scope, unprefixed, right before `layout.bxm` is
+ * included below: `functions = { "$greet" : <fn> }` makes `$greet(...)`
+ * callable bare from `layout.bxm`/`page.bxm` (or any further sibling
+ * `.bxm` a project's own `theme/` override includes), the same
+ * include-scope-absorption trick this class already relies on for
+ * `variables.page`/`variables.siteConfig` etc. - see docs/guides/variables-and-functions.md.
  */
 class {
 
@@ -170,10 +179,11 @@ class {
 	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]` (default locale first, then each discovered docs/i18n/ folder) - empty when the project doesn't use i18n
 	 * @currentLocale The `code` (from `locales`) of the locale being rendered right now - the default locale's own code for an unlocalized build
 	 * @currentLocaleDir `"ltr"`/`"rtl"` - the current locale's own text direction, stamped onto `<html dir="...">`
+	 * @functions FunctionsLoader.load()'s own output (module spec section 8) - each `$`-prefixed magic function bound directly into this scope, bare-callable from `layout.bxm`/`page.bxm`
 	 *
 	 * @return The rendered page HTML
 	 */
-	string function renderPage( required struct page, required array nav, required struct config, required string themeDir, string basePath = "/", array versions = [], string currentVersion = "Latest", array locales = [], string currentLocale = "", string currentLocaleDir = "ltr" ) {
+	string function renderPage( required struct page, required array nav, required struct config, required string themeDir, string basePath = "/", array versions = [], string currentVersion = "Latest", array locales = [], string currentLocale = "", string currentLocaleDir = "ltr", struct functions = {} ) {
 		variables.page = arguments.page
 		if ( !variables.page.keyExists( "toc" ) ) {
 			variables.page.toc = []
@@ -234,6 +244,20 @@ class {
 		variables.currentLocale = arguments.currentLocale
 		variables.currentLocaleDir = listFindNoCase( "ltr,rtl", arguments.currentLocaleDir ) ? arguments.currentLocaleDir : "ltr"
 		variables.strings = variables.stringsResolver.resolve( variables.currentLocale, arguments.config.i18n ?: { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] } )
+
+		// Binds each loaded function (FunctionsLoader.bx - `$`-prefixed magic
+		// functions and their own private, non-`$` helpers alike) directly
+		// into this instance's own `variables` scope, so `layout.bxm`/`page.bxm`
+		// (or a project's own `theme/` override) can call `$name(...)` bare,
+		// exactly like they already read `variables.page`/`variables.siteConfig`.
+		// Safe to overwrite unconditionally - FunctionsLoader.load() itself
+		// already rejects a function name that collides with one of this
+		// method's own reserved context keys (`page`/`nav`/`siteConfig`/etc. -
+		// see its own `reservedNames`), so nothing loaded here can ever
+		// silently shadow real page/site context.
+		for ( var fnName in arguments.functions ) {
+			variables[ fnName ] = arguments.functions[ fnName ]
+		}
 
 		var html = ""
 		bx:savecontent variable="html" {

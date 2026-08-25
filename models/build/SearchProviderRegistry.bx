@@ -1,16 +1,16 @@
 /**
  * Names bx-sites' built-in search providers (module spec section 7) and
- * which of them need the static lunr index BuildPipeline builds by default.
+ * which of them need the static MiniSearch index BuildPipeline builds by default.
  *
  * `local` (the default, unchanged) is bx-sites' own fully static/client-side
  * search - a `search-index.json` built at `build` time, searched with
- * lunr.js in the browser, no server involved. `algolia` wires up Algolia
+ * MiniSearch in the browser, no server involved. `algolia` wires up Algolia
  * DocSearch instead, which serves results from Algolia's own hosted index
  * (populated by their crawler/API, not by bx-sites), so it has no use for
  * `search-index.json` at all. `pagefind` is also fully static/no-server,
  * like `local`, but indexes the *built* `site/` HTML with the external
  * `pagefind` CLI (PagefindIndexer.bx) into its own self-hosted
- * `site/pagefind/` bundle, rather than bx-sites' own `search-index.json`/lunr.
+ * `site/pagefind/` bundle, rather than bx-sites' own `search-index.json`/MiniSearch.
  *
  * A `searchProvider.provider` outside `getBuiltIn()` isn't an error -
  * ConfigLoader only validates the providers this module ships built-in UI
@@ -32,7 +32,7 @@ class {
 
 	/**
 	 * Whether `provider` should get the static `search-index.json` built (and
-	 * the shared lunr widget copied/wired up) - true for `local` and for any
+	 * the shared MiniSearch widget copied/wired up) - true for `local` and for any
 	 * provider this module doesn't specifically know about (harmless, and
 	 * leaves the index available as a fallback for a custom theme that wants
 	 * it); false for `algolia`/`pagefind`, the two built-in providers that

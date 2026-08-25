@@ -90,14 +90,18 @@ di funzionalità di pagina indipendentemente dalla palette:
   renderizzato. Sempre attivo, nessuna configurazione necessaria. Vedi
   [Per iniziare](../getting-started.md#downloading-a-page-as-markdown).
 - **Un footer opzionale** (copyright, link `social`, un credito "Built
-  with BX Sites") quando `footer` di `bxsites.yaml` è `true`. Vedi
+  with BxSites") quando `footer` di `bxsites.yaml` è `true`. Vedi
   [Configurazione](../configuration.md#footer).
 - **Un selettore di versione**, che appare automaticamente non appena un
   progetto ha una cartella `docs/versions/` con più di una versione al
   suo interno. Vedi [Configurazione](../configuration.md#versionamento).
 - **Un `404.html` con tema applicato**, servito automaticamente dalla
   maggior parte degli host statici (incluso GitHub Pages) per qualsiasi
-  percorso non corrispondente.
+  percorso non corrispondente. Aggiungi un `404.md` alla radice di
+  `docs/` (o `src/`) per sostituirne titolo e contenuto con i tuoi - non
+  viene mai compilato come una pagina normale (nessuna voce nel nav,
+  nessun URL in `sitemap.xml`), ma renderizzato al suo posto in
+  `site/404.html`.
 - **Un logo e una favicon personalizzati**, quando `theme.logo`/
   `theme.favicon` di `bxsites.yaml` sono impostati. Vedi
   [Configurazione](../configuration.md#theme).
@@ -143,9 +147,15 @@ di funzionalità di pagina indipendentemente dalla palette:
 
 Imposta quale tema usa un progetto in `bxsites.yaml`:
 
-```yaml title="bxsites.yaml"
-theme: { name: material }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: material }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "material" } }
+    ```
 
 ## Installare un tema pubblicato
 
@@ -165,9 +175,15 @@ soddisfi il contratto `ThemeProvider` sotto prima di terminare. Un
 progetto può portare con sé più temi installati fianco a fianco in
 questo modo e passare dall'uno all'altro semplicemente per nome:
 
-```yaml title="bxsites.yaml"
-theme: { name: bx-sites-theme-blog1 }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: bx-sites-theme-blog1 }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "bx-sites-theme-blog1" } }
+    ```
 
 Un tema non necessita di alcun coinvolgimento del modulo BoxLang/
 class-loader (a differenza di un plugin) - sono puri file, quindi non
@@ -223,62 +239,10 @@ da `material`, al provider di ricerca `local` predefinito, evita i
 diagrammi Mermaid con layout `elk` se `mermaid` è attivo, e lascia
 disattivati `math`/Algolia/analytics.
 
-## Icone
-
-Il frontmatter `icon` di una pagina (mostrato accanto al suo titolo, e
-accanto alla sua voce nella nav laterale) accetta sia un'emoji/testo breve
-semplice - la forma originale, ancora pienamente supportata - sia
-un'icona con nome da una delle otto librerie autoospitate, tutte con
-licenza MIT/ISC e incluse in questo modulo (circa 16.200 icone
-combinate, nessuna CDN, nulla di aggiunto al peso di una pagina compilata
-oltre alla manciata di icone effettivamente usate - vedi IconResolver.bx):
-
-```markdown title="Frontmatter"
----
-icon: rocket
----
-```
-
-```markdown title="Frontmatter"
----
-icon: lucide:rocket
----
-```
-
-```markdown title="Frontmatter"
----
-icon: phosphor-bold:rocket
----
-```
-
-Un semplice `rocket` ricade su [Phosphor](https://phosphoricons.com/),
-peso regolare. Phosphor include tutti e sei i suoi pesi, ciascuno con il
-proprio prefisso: `phosphor-thin:`, `phosphor-light:`, `phosphor:`
-(regolare, uguale al nome nudo), `phosphor-bold:`, `phosphor-fill:` e
-`phosphor-duotone:`. Usa il prefisso `lucide:` per
-[Lucide](https://lucide.dev/icons/), oppure `tabler:` per
-[Tabler](https://tabler.io/icons). Sfoglia la galleria di ciascun sito
-per il nome esatto - corrisponde esattamente al nome file incluso in
-questo modulo (minuscolo, con trattini, ad es. `book-open`,
-`arrow-up-right`; il sito di Phosphor mostra un selettore di peso -
-ciascuna delle sue sei opzioni lì corrisponde a uno dei sei prefissi
-`phosphor[-weight]:` di questo modulo).
-
-Font Awesome non è deliberatamente incluso tra queste - il suo stile
-Duotone (e la maggior parte del suo set di icone dalla v6 in poi) è
-disponibile solo con Pro, non disponibile con una licenza che questo
-modulo possa includere e ridistribuire gratuitamente.
-
-Anche un SVG del tuo progetto funziona - mettilo in
-`docs/assets/icons/my-icon.svg` e riferiscilo come `icon: custom:my-icon`.
-
-Una voce di [nav.json](../configuration.md#nav) può impostare la propria
-`icon`, sovrascrivendo il frontmatter proprio della pagina di destinazione
-per quella singola voce:
-
-```json title="docs/nav.json"
-{ "title": "Guides", "path": "guides/index.md", "icon": "lucide:book-open" }
-```
+Vedi [Icone](icons.md) per come il frontmatter `icon` proprio di una
+pagina (o l'`icon` proprio di una voce di `nav.json`) viene risolto in
+un'emoji, un'icona con nome da una delle otto librerie incluse, oppure
+un SVG del tuo progetto.
 
 ## Il contratto `ThemeProvider`
 
@@ -335,9 +299,15 @@ carica *dopo* il foglio di stile proprio del tema, quindi una
 ridichiarazione con la stessa specificità al suo interno vince senza
 toccare affatto `resources/themes/`:
 
-```yaml title="bxsites.yaml"
-extraCss: [ assets/brand.css ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    extraCss: [ assets/brand.css ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "extraCss": ["assets/brand.css"] }
+    ```
 
 ```css title="docs/assets/brand.css" linenums="1"
 /* docs/assets/brand.css - copiato in site/assets/brand.css al momento del build */
@@ -434,7 +404,7 @@ stesso modo in cui si risolve qualsiasi altra immagine.
 ## Sovrascrivere un tema
 
 Metti il tuo `layout.bxm` + `page.bxm` (e opzionalmente `search.bxm` /
-`assets/`) in una cartella `theme/` alla radice del tuo progetto. BX Sites
+`assets/`) in una cartella `theme/` alla radice del tuo progetto. BxSites
 preferisce una sovrascrittura `theme/` a livello di progetto sia rispetto
 a un tema `themes/<name>/` installato sia rispetto a qualsiasi tema
 integrato, purché soddisfi il contratto sopra descritto - i temi
@@ -490,7 +460,7 @@ my-project/
    sempre lo stesso identico markup `layout.bxm`/`page.bxm` sottostante.
 
 Una cartella `theme/` di progetto è comunque tutto-o-niente - una volta
-che BX Sites ne trova una, viene usata al posto del tema integrato per
+che BxSites ne trova una, viene usata al posto del tema integrato per
 intero, quindi necessita comunque del proprio `layout.bxm` + `page.bxm`
 anche se l'unica cosa cambiata è `assets/style.css` (una cartella priva
 di uno dei due file fallisce subito con `BxSites.InvalidTheme` invece di
