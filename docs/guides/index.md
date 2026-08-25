@@ -11,7 +11,7 @@ icon: phosphor-duotone:book-open
 - [Search](search.md) - how the static search index works
 - [Deploying to GitHub Pages](deployment.md) - the built-in GitHub Actions workflow
 - [Markdown Extensions](markdown.md) - admonitions, footnotes, definition lists and Mermaid diagrams
-- [Content Blocks](content-blocks.md) - GitBook-style blocks: expandables, cards, columns, a stepper, and reusable content includes
+- [Content Blocks](content-blocks.md) - GitBook-style blocks: expandables, cards, columns, a stepper, buttons, and reusable content includes
 - [OpenAPI / Swagger](openapi.md) - an interactive Swagger UI widget for an OpenAPI/Swagger spec, full reference or one operation inline
 - [Responsive Images](images.md) - automatic resizing, WebP variants, and CSS/JS bundling, on by default
 - [Interactivity with Alpine.js](interactivity.md) - reactive content (copy buttons, live filters, and more) with no extra setup

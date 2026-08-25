@@ -177,6 +177,67 @@ class extends="testbox.system.BaseSpec" {
 				expect( processor.resolveFileHrefs( absolute, "/guides/content-blocks/" ) ).toInclude( 'href="https://example.com/spec.pdf"' );
 			} );
 
+			it( "renders a basic button as a link, defaulting to secondary style and medium size", function() {
+				var html = render( '::: button "Get Started" href="getting-started.md"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( '<a class="bxsites-button bxsites-button--secondary bxsites-button--medium" href="getting-started.md">' );
+				expect( html ).toInclude( '<span class="bxsites-button__label">Get Started</span>' );
+			} );
+
+			it( "renders a button with an explicit primary style and large size", function() {
+				var html = render( '::: button "Get Started" href="getting-started.md" style="primary" size="large"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( 'bxsites-button bxsites-button--primary bxsites-button--large' );
+			} );
+
+			it( "falls back to secondary/medium for an unrecognized [style]/[size] instead of erroring", function() {
+				var html = render( '::: button "Get Started" href="x.md" style="bogus" size="huge"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( 'bxsites-button--secondary bxsites-button--medium' );
+			} );
+
+			it( "resolves a button's [icon] the same way a card's icon is", function() {
+				var html = render( '::: button "Get Started" href="x.md" icon="🚀"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( '<span class="bxsites-button__icon">🚀</span>' );
+			} );
+
+			it( "adds target=""_blank""/rel=noopener when [target] is ""_blank"", and omits it otherwise", function() {
+				var blank = render( '::: button "Docs" href="https://example.com" target="_blank"' & char( 10 ) & ":::" );
+				var sameTab = render( '::: button "Docs" href="https://example.com"' & char( 10 ) & ":::" );
+
+				expect( blank ).toInclude( 'target="_blank" rel="noopener noreferrer"' );
+				expect( sameTab ).notToInclude( "target=" );
+			} );
+
+			it( "renders a disabled button as an inert <span>, even when an href is also given", function() {
+				var html = render( '::: button "Coming soon" href="x.md" disabled="true"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( '<span class="bxsites-button bxsites-button--secondary bxsites-button--medium bxsites-button--disabled" aria-disabled="true">' );
+				expect( html ).toInclude( "Coming soon" );
+				expect( html ).notToInclude( "<a " );
+			} );
+
+			it( "renders an invalid-block message when a button is missing its required label", function() {
+				var html = render( '::: button href="x.md"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( "bxsites-button--invalid" );
+				expect( html ).toInclude( '::: button - requires a "Label" title' );
+			} );
+
+			it( "renders a buttons wrapper with multiple button children laid out in a row", function() {
+				var md = "::: buttons" & char( 10 ) &
+					'::: button "Get Started" href="a.md" style="primary"' & char( 10 ) & ":::" & char( 10 ) &
+					'::: button "Learn More" href="b.md"' & char( 10 ) & ":::" & char( 10 ) &
+					":::";
+				var html = render( md );
+
+				expect( html ).toInclude( '<div class="bxsites-buttons">' );
+				expect( html ).toInclude( "bxsites-button--primary" );
+				expect( html ).toInclude( "Get Started" );
+				expect( html ).toInclude( "Learn More" );
+			} );
+
 			it( "renders an openapi block as a placeholder div carrying its src and optional title", function() {
 				var html = render( '::: openapi src="assets/openapi/example.yaml" title="Example API"' & char( 10 ) & ":::" );
 
