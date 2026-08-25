@@ -361,13 +361,19 @@ class {
 			allPages.append( blogResult.indexPages, true )
 
 			if ( searchNeedsLocalIndex( config ) ) {
-				writeSearchIndex( tagsPages, siteDir )
+				writeSearchIndex( tagsPages, siteDir, plugins, config )
 			}
 		}
 
 		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, "Latest", locales, defaultLocaleCode, functions, docsDir, plugins, imageManifest, custom404Page.len() ? custom404Page[ 1 ] : {} )
 		writeTagsPage( tagsPages, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, siteOrigin, functions )
 		variables.redirectGenerator.write( mainResult.pages, siteDir, urls.basePath, config.redirects )
+
+		// A plugin's onSitemap() gets one shot at the site-wide accumulated
+		// page list, right before both sitemap.xml and llms.txt are built
+		// from it - a contributed entry (e.g. a dynamic, non-docs/ page)
+		// flows into both, not just the sitemap.
+		allPages = variables.pluginLoader.applyOnSitemap( plugins, allPages, config )
 
 		if ( len( urls.absolute ) ) {
 			fileWrite( siteDir & "/sitemap.xml", variables.sitemapGenerator.build( allPages, urls.absolute ) )
@@ -558,7 +564,7 @@ class {
 		variables.markdownPublisher.publish( pages, arguments.outputDir )
 
 		if ( searchNeedsLocalIndex( arguments.config ) ) {
-			writeSearchIndex( pages, arguments.outputDir )
+			writeSearchIndex( pages, arguments.outputDir, arguments.plugins, arguments.config )
 		}
 
 		return { pages : pages, nav : nav }
@@ -675,7 +681,7 @@ class {
 
 		return {
 			skipped   : false,
-			indexPath : writeSearchIndex( pages, siteDir ),
+			indexPath : writeSearchIndex( pages, siteDir, plugins, config ),
 			pageCount : pages.len()
 		}
 	}
@@ -1336,15 +1342,18 @@ class {
 
 	/**
 	 * Builds the search index from already-converted pages and writes it to
-	 * `siteDir`.
+	 * `siteDir`, applying every plugin's `onSearchIndex` hook first.
 	 *
 	 * @pages Array of page structs with `contentHtml` already set
 	 * @siteDir Absolute path to the build output directory (must already exist)
+	 * @plugins resolvePlugins()'s own output, applied via onSearchIndex
+	 * @config The site's bxsites.json config
 	 *
 	 * @return Absolute path to the written search-index.json
 	 */
-	private string function writeSearchIndex( required array pages, required string siteDir ) {
+	private string function writeSearchIndex( required array pages, required string siteDir, array plugins = [], struct config = {} ) {
 		var searchIndex = variables.searchIndexer.build( arguments.pages )
+		searchIndex = variables.pluginLoader.applyOnSearchIndex( arguments.plugins, searchIndex, arguments.config )
 		var indexPath = arguments.siteDir & "/search-index.json"
 		fileWrite( indexPath, jsonSerialize( searchIndex ) )
 		return indexPath

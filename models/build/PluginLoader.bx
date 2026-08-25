@@ -28,6 +28,8 @@
  *   - `onPageMarkdown( markdown, page, config )` -> string, before a page's Markdown() call
  *   - `onPageHtml( html, page, config )` -> string, after a page's Markdown() call
  *   - `onNav( nav, config )` -> array, after the nav tree is built
+ *   - `onSearchIndex( entries, config )` -> array, after a search-index.json's entries are built, before it's written - entries are `{ title, url, headings, body, tags }`, the same shape SearchIndexer.bx itself produces
+ *   - `onSitemap( pages, config )` -> array, right before sitemap.xml and llms.txt are both built from the same accumulated page list - a contributed entry only needs `{ urlPath, title, hidden }`, not DocsLoader's full page shape
  *   - `onBuildComplete( siteDir, config )` -> void, once after everything is written
  */
 class {
@@ -135,6 +137,45 @@ class {
 		for ( var plugin in arguments.plugins ) {
 			if ( structKeyExists( plugin.instance, "onNav" ) ) {
 				result = plugin.instance.onNav( result, arguments.config )
+			}
+		}
+		return result
+	}
+
+	/**
+	 * Runs every plugin's `onSearchIndex` hook, in array order, each one's
+	 * return value feeding the next - the same chaining `applyOnNav()` uses.
+	 *
+	 * @plugins discover()'s own output (or a test-provided equivalent)
+	 * @entries SearchIndexer.build()'s own output - an array of `{ title, url, headings, body, tags }`
+	 * @config The site's bxsites.json config
+	 */
+	array function applyOnSearchIndex( required array plugins, required array entries, required struct config ) {
+		var result = arguments.entries
+		for ( var plugin in arguments.plugins ) {
+			if ( structKeyExists( plugin.instance, "onSearchIndex" ) ) {
+				result = plugin.instance.onSearchIndex( result, arguments.config )
+			}
+		}
+		return result
+	}
+
+	/**
+	 * Runs every plugin's `onSitemap` hook, in array order, each one's
+	 * return value feeding the next - the same chaining `applyOnNav()` uses.
+	 * Fires once, against the site-wide accumulated page list right before
+	 * both sitemap.xml and llms.txt are built from it - a contributed entry
+	 * flows into both, not just the sitemap.
+	 *
+	 * @plugins discover()'s own output (or a test-provided equivalent)
+	 * @pages The accumulated page list sitemap.xml/llms.txt are about to be built from - only `urlPath`/`title`/`hidden` need be present on a contributed entry
+	 * @config The site's bxsites.json config
+	 */
+	array function applyOnSitemap( required array plugins, required array pages, required struct config ) {
+		var result = arguments.pages
+		for ( var plugin in arguments.plugins ) {
+			if ( structKeyExists( plugin.instance, "onSitemap" ) ) {
+				result = plugin.instance.onSitemap( result, arguments.config )
 			}
 		}
 		return result

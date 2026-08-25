@@ -1,0 +1,101 @@
+/**
+ * Only tests collectVerbs() against plain fake provider structs (a struct
+ * with a verbs() function value passes the same structKeyExists() duck-
+ * typing check a real BxSitesCliProvider.bx instance does - no BoxLang
+ * module needed at all). discoverProviders() itself - the only part of
+ * CliProviderLoader.bx that touches the real module system - has no test
+ * here, same reason PluginLoaderSpec.bx's discover() doesn't: a plain
+ * `testbox run` has no second BoxLang module registered to discover.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.CliProviderLoader", function() {
+
+			beforeEach( function() {
+				variables.loader = new "models.cli.CliProviderLoader@bxsites"();
+			} );
+
+			it( "collectVerbs() returns empty verbs/descriptions for an empty providers array", function() {
+				var result = loader.collectVerbs( [] );
+
+				expect( result.verbs ).toBe( {} );
+				expect( result.descriptions ).toBe( {} );
+			} );
+
+			it( "collectVerbs() merges a single provider's verbs() struct", function() {
+				var providers = [
+					{ name : "addon", instance : { verbs : function() {
+						return {
+							"cloud:publish" : { class : "models.cli.cloud.Publish@addon", description : "Publish the site" }
+						};
+					} } }
+				];
+
+				var result = loader.collectVerbs( providers );
+
+				expect( result.verbs[ "cloud:publish" ] ).toBe( "models.cli.cloud.Publish@addon" );
+				expect( result.descriptions[ "cloud:publish" ] ).toBe( "Publish the site" );
+			} );
+
+			it( "collectVerbs() merges verbs from multiple providers", function() {
+				var providers = [
+					{ name : "a", instance : { verbs : function() {
+						return { "deploy" : { class : "models.cli.Deploy@a", description : "Deploy" } };
+					} } },
+					{ name : "b", instance : { verbs : function() {
+						return { "mcp:serve" : { class : "models.cli.mcp.Serve@b", description : "Serve MCP" } };
+					} } }
+				];
+
+				var result = loader.collectVerbs( providers );
+
+				expect( result.verbs ).toHaveKey( "deploy" );
+				expect( result.verbs ).toHaveKey( "mcp:serve" );
+			} );
+
+			it( "collectVerbs() lets an earlier provider win a verb-name collision over a later one", function() {
+				var providers = [
+					{ name : "first", instance : { verbs : function() {
+						return { "deploy" : { class : "models.cli.Deploy@first", description : "First" } };
+					} } },
+					{ name : "second", instance : { verbs : function() {
+						return { "deploy" : { class : "models.cli.Deploy@second", description : "Second" } };
+					} } }
+				];
+
+				var result = loader.collectVerbs( providers );
+
+				expect( result.verbs[ "deploy" ] ).toBe( "models.cli.Deploy@first" );
+			} );
+
+			it( "collectVerbs() defaults a missing description to an empty string", function() {
+				var providers = [
+					{ name : "a", instance : { verbs : function() {
+						return { "deploy" : { class : "models.cli.Deploy@a" } };
+					} } }
+				];
+
+				var result = loader.collectVerbs( providers );
+
+				expect( result.descriptions[ "deploy" ] ).toBe( "" );
+			} );
+
+			it( "collectVerbs() skips a provider instance with no verbs() method", function() {
+				var providers = [
+					{ name : "noop", instance : {} },
+					{ name : "a", instance : { verbs : function() {
+						return { "deploy" : { class : "models.cli.Deploy@a", description : "Deploy" } };
+					} } }
+				];
+
+				var result = loader.collectVerbs( providers );
+
+				expect( result.verbs.count() ).toBe( 1 );
+				expect( result.verbs ).toHaveKey( "deploy" );
+			} );
+
+		} );
+	}
+
+}

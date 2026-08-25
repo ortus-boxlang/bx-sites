@@ -1104,6 +1104,50 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( root & "/site/plugin-marker.txt" ) ).toBeTrue();
 			} );
 
+			it( "runs a plugin's onSearchIndex hook, injecting an extra search entry into search-index.json", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				var fakePlugin = {
+					onSearchIndex : function( required array entries, required struct config ) {
+						arguments.entries.append( { title : "Contact", url : "contact/index.html", headings : [], body : "", tags : [] } );
+						return arguments.entries;
+					}
+				};
+				pipeline.setPlugins( [ { name : "fake", instance : fakePlugin } ] );
+
+				pipeline.build( root );
+
+				var index = jsonDeserialize( fileRead( root & "/site/search-index.json" ) );
+				expect( index.len() ).toBe( 2 );
+				expect( index[ 2 ].title ).toBe( "Contact" );
+			} );
+
+			it( "runs a plugin's onSitemap hook, injecting an extra page into both sitemap.xml and llms.txt", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"https://docs.example.com/"}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				var fakePlugin = {
+					onSitemap : function( required array pages, required struct config ) {
+						arguments.pages.append( { urlPath : "contact/index.html", title : "Contact", hidden : false } );
+						return arguments.pages;
+					}
+				};
+				pipeline.setPlugins( [ { name : "fake", instance : fakePlugin } ] );
+
+				pipeline.build( root );
+
+				var sitemap = fileRead( root & "/site/sitemap.xml" );
+				expect( sitemap ).toInclude( "<loc>https://docs.example.com/contact/index.html</loc>" );
+
+				var llmsTxt = fileRead( root & "/site/llms.txt" );
+				expect( llmsTxt ).toInclude( "[Contact](https://docs.example.com/contact/index.html)" );
+			} );
+
 			it( "throws BxSites.PluginNotFound when bxsites.json [plugins] names an uninstalled module, without the setPlugins() seam", function() {
 				var root = newProject();
 				fileWrite(

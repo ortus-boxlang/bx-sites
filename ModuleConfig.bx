@@ -230,6 +230,7 @@ class {
 		}
 
 		if ( firstToken == "--help" || firstToken == "-h" || firstToken == "help" ) {
+			mergeProviderVerbs( verbs, verbDescriptions, arguments.args )
 			printUsage( verbs, verbDescriptions )
 			return 0
 		}
@@ -239,7 +240,25 @@ class {
 			return 1
 		}
 
+		mergeProviderVerbs( verbs, verbDescriptions, arguments.args )
+
+		// A provider-contributed verb may register under a colon-joined
+		// compound name (e.g. "cloud:publish", following the same
+		// convention core's own "post:new"/"i18n:status" already use) -
+		// "cloud publish" (two space-separated argv tokens) is UX sugar
+		// over that same registration, not a second dispatch mechanism.
+		// Checked only after provider verbs are merged in, so a provider's
+		// own compound verb is eligible here exactly like a core one.
 		var verbName = firstToken
+		var verbTokens = 1
+
+		if ( arrayLen( arguments.args ) >= 2 ) {
+			var compoundVerbName = firstToken & ":" & arguments.args[ 2 ]
+			if ( verbs.keyExists( compoundVerbName ) ) {
+				verbName = compoundVerbName
+				verbTokens = 2
+			}
+		}
 
 		if ( !verbs.keyExists( verbName ) ) {
 			println( "Unknown verb [#verbName#]." )
@@ -249,7 +268,7 @@ class {
 		}
 
 		var rawVerbArgs = []
-		for ( var i = 2; i <= arrayLen( arguments.args ); i++ ) {
+		for ( var i = verbTokens + 1; i <= arrayLen( arguments.args ); i++ ) {
 			rawVerbArgs.append( arguments.args[ i ] )
 		}
 
@@ -267,6 +286,71 @@ class {
 			println( "Error: #e.message#" )
 			return 1
 		}
+	}
+
+	/**
+	 * Merges CLI verbs contributed by installed+activated addon modules
+	 * into the core verb tables, IN PLACE - the mechanism that lets an
+	 * addon like a commercial bxSites companion module register its own
+	 * verbs (`bxSites deploy`, `bxSites cloud:publish`, ...) without any
+	 * further core changes. See `models/cli/CliProviderLoader.bx` for the
+	 * `models/BxSitesCliProvider.bx` contract a module implements, and
+	 * `docs/guides/cli-providers.md` for the end-to-end guide.
+	 *
+	 * Core's own literal verb table always wins on a name collision (a
+	 * verb already present in `arguments.verbs` is left untouched).
+	 *
+	 * Hardened end-to-end: a missing/malformed `bxsites.yaml`, a project
+	 * that doesn't exist yet (e.g. `--help` run outside any project), a
+	 * module listed in `plugins` with no `BxSitesCliProvider.bx` of its
+	 * own, or a provider whose `verbs()` throws, all silently leave the
+	 * core verb table untouched rather than breaking dispatch - this must
+	 * never be the reason `bxSites --help`/`new`/any core verb stops working.
+	 *
+	 * @verbs Core's own verb-name -> dispatch-class-path struct, mutated in place
+	 * @verbDescriptions Core's own verb-name -> description struct, mutated in place
+	 * @rawArgs The full, untouched argv passed to main()
+	 */
+	private void function mergeProviderVerbs( required struct verbs, required struct verbDescriptions, required array rawArgs ) {
+		try {
+			var projectRoot = guessProjectRootForDiscovery( arguments.rawArgs )
+			var config = new "models.config.ConfigLoader@bxsites"().load( projectRoot )
+			var loader = new "models.cli.CliProviderLoader@bxsites"()
+			var providers = loader.discoverProviders( config.plugins ?: [] )
+			var contributed = loader.collectVerbs( providers )
+
+			for ( var verbName in contributed.verbs ) {
+				if ( !arguments.verbs.keyExists( verbName ) ) {
+					arguments.verbs[ verbName ] = contributed.verbs[ verbName ]
+					arguments.verbDescriptions[ verbName ] = contributed.descriptions[ verbName ] ?: ""
+				}
+			}
+		} catch ( any e ) {
+			// No project, no config, invalid config, or discovery failure -
+			// core verbs remain fully usable on their own either way.
+		}
+	}
+
+	/**
+	 * A best-effort project root for provider-verb DISCOVERY ONLY - never
+	 * used for actual verb dispatch, which stays `resolveProjectRoot()`'s
+	 * job further down `main()`. Deliberately narrower than
+	 * `resolveProjectRoot()`'s own precedence: at the point this runs, the
+	 * verb (and, for a compound "cloud publish"-style verb, its own second
+	 * token) hasn't been identified yet, so a bare positional argument
+	 * can't be trusted to be a project path rather than another verb
+	 * token - only an explicit `--projectRoot=` flag is honored here,
+	 * else the current working directory.
+	 *
+	 * @rawArgs The full, untouched argv passed to main()
+	 */
+	private string function guessProjectRootForDiscovery( required array rawArgs ) {
+		for ( var token in arguments.rawArgs ) {
+			if ( token.startsWith( "--projectRoot=" ) ) {
+				return stripQuotes( token.right( len( token ) - len( "--projectRoot=" ) ) )
+			}
+		}
+		return resolveProjectRoot( {} )
 	}
 
 	/**

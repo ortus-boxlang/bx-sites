@@ -76,6 +76,44 @@ class extends="testbox.system.BaseSpec" {
 				expect( result[ 2 ].title ).toBe( "Extra" );
 			} );
 
+			it( "applyOnSearchIndex() lets a plugin append an extra search entry", function() {
+				var plugins = [ { name : "a", instance : { onSearchIndex : function( required array entries, required struct config ) {
+					arguments.entries.append( { title : "Contact", url : "/contact/", headings : [], body : "", tags : [] } );
+					return arguments.entries;
+				} } } ];
+
+				var result = loader.applyOnSearchIndex( plugins, [ { title : "Existing", url : "/existing/", headings : [], body : "", tags : [] } ], {} );
+
+				expect( result.len() ).toBe( 2 );
+				expect( result[ 2 ].title ).toBe( "Contact" );
+			} );
+
+			it( "applyOnSearchIndex() is a no-op over an empty plugins array", function() {
+				var entries = [ { title : "Existing", url : "/existing/", headings : [], body : "", tags : [] } ];
+				var result = loader.applyOnSearchIndex( [], entries, {} );
+
+				expect( result ).toBe( entries );
+			} );
+
+			it( "applyOnSitemap() lets a plugin append an extra page entry", function() {
+				var plugins = [ { name : "a", instance : { onSitemap : function( required array pages, required struct config ) {
+					arguments.pages.append( { urlPath : "contact/index.html", title : "Contact", hidden : false } );
+					return arguments.pages;
+				} } } ];
+
+				var result = loader.applyOnSitemap( plugins, [ { urlPath : "index.html", title : "Home", hidden : false } ], {} );
+
+				expect( result.len() ).toBe( 2 );
+				expect( result[ 2 ].urlPath ).toBe( "contact/index.html" );
+			} );
+
+			it( "applyOnSitemap() is a no-op over an empty plugins array", function() {
+				var pages = [ { urlPath : "index.html", title : "Home", hidden : false } ];
+				var result = loader.applyOnSitemap( [], pages, {} );
+
+				expect( result ).toBe( pages );
+			} );
+
 			it( "applyOnBuildComplete() calls every plugin implementing it, ignoring ones that don't", function() {
 				var calls = [];
 				var plugins = [
