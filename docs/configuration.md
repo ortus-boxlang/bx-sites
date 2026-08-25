@@ -272,7 +272,7 @@ extra JS shipped. See [Search](guides/search.md).
 Which search UI `search: true` wires up:
 
 - `provider` - `"local"` (the default) is bx-sites' own static/client-side
-  search (`search-index.json` + lunr.js, see [Search](guides/search.md#local-the-default)).
+  search (`search-index.json` + [MiniSearch](https://lucaong.github.io/minisearch/), see [Search](guides/search.md#local-the-default)).
   `"algolia"` wires up [Algolia DocSearch](guides/search.md#algolia)
   instead, and `"pagefind"` wires up [Pagefind](guides/search.md#pagefind).
   Any other value is a project's own custom provider, wired up by a
