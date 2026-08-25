@@ -37,6 +37,12 @@ instead - see [Getting Started](getting-started.md#add-pages) for the
 | `-h`, `--help` | Show usage and exit |
 | `-v`, `--version` | Show the module version and exit |
 
+Every verb below ships with core. An installed and activated addon module
+can register further verbs of its own (e.g. a commercial deploy/hosting
+addon adding `bxSites cloud publish`) - `--help` lists whatever's
+currently activated in your project alongside the verbs below. See
+[CLI Providers](guides/cli-providers.md) if you're writing one.
+
 ## `new`
 
 Scaffold a docs project.
