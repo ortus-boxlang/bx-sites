@@ -627,7 +627,7 @@ in every page's markdown, no config needed - see
 shipped at all. `true` loads it client-side and renders every
 `::: openapi src="..."` content block as an interactive widget for the
 referenced OpenAPI/Swagger spec (JSON or YAML). See
-[Content Blocks](guides/content-blocks.md#openapi--swagger) for the syntax.
+[OpenAPI / Swagger](guides/openapi.md) for the syntax.
 
 ```yaml title="bxsites.yaml"
 openapi: true

@@ -629,7 +629,7 @@ pagina, senza bisogno di configurazione - vedi
 carica lato client e renderizza ogni blocco di contenuto
 `::: openapi src="..."` come widget interattivo per la specifica
 OpenAPI/Swagger referenziata (JSON o YAML). Vedi
-[Blocchi di contenuto](guides/content-blocks.md#openapi--swagger) per la
+[OpenAPI / Swagger](guides/openapi.md) per la
 sintassi.
 
 ```yaml title="bxsites.yaml"

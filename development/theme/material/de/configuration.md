@@ -686,7 +686,7 @@ Markdown jeder Seite immer verfügbar, ohne Konfiguration nötig - siehe
 ausgeliefert. `true` lädt es clientseitig und rendert jeden
 `::: openapi src="..."`-Content-Block als interaktives Widget für die
 referenzierte OpenAPI-/Swagger-Spezifikation (JSON oder YAML). Siehe
-[Content Blocks](guides/content-blocks.md#openapi--swagger) für die Syntax.
+[OpenAPI / Swagger](guides/openapi.md) für die Syntax.
 
 ```yaml title="bxsites.yaml"
 openapi: true

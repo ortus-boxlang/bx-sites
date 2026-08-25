@@ -617,7 +617,7 @@ admonition（note/warning/tip 形式のコールアウトボックス）、コ�
 出荷されません。`true` にするとクライアントサイドで読み込まれ、`::: openapi src="..."`
 コンテンツブロックを、参照先の OpenAPI/Swagger 仕様（JSON または YAML）のための
 インタラクティブなウィジェットとしてレンダリングします。構文については
-[コンテンツブロック](guides/content-blocks.md#openapi--swagger) を参照してください。
+[OpenAPI / Swagger](guides/openapi.md) を参照してください。
 
 ```yaml title="bxsites.yaml"
 openapi: true

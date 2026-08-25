@@ -3,7 +3,7 @@ info:
   title: Bookshelf API
   description: >-
     A tiny example API, hand-authored for BxSites' own `::: openapi` docs
-    (see [Content Blocks](../../guides/content-blocks.md#openapi--swagger)) -
+    (see [OpenAPI / Swagger](../../guides/openapi.md)) -
     not a real, deployed service.
   version: "1.0.0"
 servers:
