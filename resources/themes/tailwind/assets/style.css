@@ -1750,6 +1750,79 @@ code:not( pre code ) {
 	color: #000;
 }
 
+.bxsites-button--invalid {
+	opacity: 0.7;
+	font-style: italic;
+}
+
+.bxsites-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.6rem;
+	margin: 1rem 0;
+}
+
+.bxsites-button,
+a.button {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	margin: 0.35rem 0.5rem 0.35rem 0;
+	padding: 0.55rem 1.1rem;
+	border-radius: 0.5rem;
+	border: 1px solid var( --bxsites-border );
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	font-weight: 600;
+	line-height: 1.2;
+	text-decoration: none;
+	cursor: pointer;
+	transition: opacity 0.15s ease;
+}
+
+.bxsites-buttons > .bxsites-button {
+	margin: 0;
+}
+
+a.bxsites-button:hover,
+a.button:hover {
+	opacity: 0.82;
+}
+
+.bxsites-button--primary,
+a.button.primary {
+	background: var( --bxsites-accent );
+	border-color: var( --bxsites-accent );
+	color: #000;
+}
+
+.bxsites-button--small {
+	padding: 0.3rem 0.75rem;
+	font-size: 0.85rem;
+}
+
+.bxsites-button--large {
+	padding: 0.8rem 1.5rem;
+	font-size: 1.05rem;
+}
+
+.bxsites-button--disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+.bxsites-button__icon {
+	display: inline-flex;
+	align-items: center;
+}
+
+.bxsites-button__icon svg {
+	width: 1em;
+	height: 1em;
+}
 
 .bxsites-command-palette {
 	position: fixed;

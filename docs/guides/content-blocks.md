@@ -162,6 +162,53 @@ resolved the same way `theme.logo`/frontmatter `ogImage` already are
 ::: file src="assets/og-image.png" title="Site Preview Image"
 :::
 
+## Buttons
+
+A GitBook-style call-to-action button - `::: button` on its own, or several
+laid out in a row inside a `::: buttons` wrapper. The leading `"Label"` and
+`href` are the only pieces most buttons need:
+
+```markdown title="Example" linenums="1"
+::: button "Get Started" href="../getting-started.md" style="primary"
+:::
+```
+
+::: button "Get Started" href="../getting-started.md" style="primary"
+:::
+
+A few optional attributes give each button its own abilities:
+
+- `style="primary"` or `style="secondary"` (the default) - solid-accent vs.
+  outline.
+- `size="small"`, `"medium"` (the default) or `"large"`.
+- `icon="..."` - resolved the same way a card's own `icon` is (a plain
+  emoji, or a named icon like `icon="phosphor-duotone:rocket-launch"` -
+  see [Themes: Icons](themes.md#icons)).
+- `target="_blank"` - opens the link in a new tab instead of the same one
+  (`rel="noopener noreferrer"` is added automatically).
+- `disabled="true"` - renders an inert, unclickable button (no `href`
+  needed) for a "coming soon" call to action.
+
+```markdown title="Example" linenums="1"
+::: buttons
+::: button "Read the docs" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
+:::
+::: button "Star on GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
+:::
+::: button "Coming soon" disabled="true"
+:::
+:::
+```
+
+::: buttons
+::: button "Read the docs" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
+:::
+::: button "Star on GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
+:::
+::: button "Coming soon" disabled="true"
+:::
+:::
+
 ## Embed
 
 A responsive iframe embed for a recognized provider - currently YouTube,

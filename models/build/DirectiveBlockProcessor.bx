@@ -2,8 +2,8 @@
  * A generic `::: name attr="value" ...` ... `:::` container-block syntax -
  * the shared foundation for every GitBook-style block Flexmark has no
  * native concept of: expandable, cards/card, columns/column,
- * stepper/step, updates/update, file, embed, page-link, and link-preview
- * (see each block's own `render*()` docblock below). Nests arbitrarily deep (a
+ * stepper/step, updates/update, file, embed, page-link, link-preview, and
+ * buttons/button (see each block's own `render*()` docblock below). Nests arbitrarily deep (a
  * `::: cards` block's own content is itself re-scanned for `::: card`
  * children, recursively) using the same two-phase pre/post-processing
  * shape as TabsProcessor.bx - `extract()` runs before `Markdown()`,
@@ -196,6 +196,10 @@ class {
 				return renderUpdates( block, renderer, markdownOptions )
 			case "file":
 				return renderFile( attrs )
+			case "button":
+				return renderButton( attrs )
+			case "buttons":
+				return renderButtons( block, renderer, markdownOptions )
 			case "openapi":
 				return renderOpenApi( attrs )
 			case "embed":
@@ -476,6 +480,73 @@ class {
 			& '<span class="bxsites-file__icon" aria-hidden="true">📎</span>'
 			& '<span class="bxsites-file__title">' & encodeForHTML( title ) & '</span>'
 			& '</a>'
+	}
+
+	/**
+	 * `::: button "Get Started" href="../getting-started.md" style="primary" size="large" icon="phosphor-duotone:rocket-launch" target="_blank" disabled="true"` -
+	 * a single GitBook-style call-to-action button. Only the leading
+	 * `"Label"` shorthand and `href` are commonly needed; every other
+	 * attribute is optional:
+	 *
+	 * - `style` - `"primary"` or `"secondary"` (default); any other/missing
+	 *   value falls back to `"secondary"` rather than erroring, the same
+	 *   forgiving-typo behavior admonitions/steps already have.
+	 * - `size` - `"small"`, `"medium"` (default) or `"large"`.
+	 * - `icon` - resolved the same way a card's own `icon` is (IconResolver.bx).
+	 * - `target="_blank"` - opens the link in a new tab (`rel="noopener noreferrer"`
+	 *   added automatically); omitted, it opens in the same tab like any
+	 *   other markdown link.
+	 * - `disabled="true"` - renders an inert `<span>` instead of an `<a>`
+	 *   (no `href` needed), for a GitBook-style "coming soon" button.
+	 *
+	 * Usually used standalone, but nests inside `::: buttons` (below) to
+	 * lay several out in a row.
+	 */
+	private string function renderButton( required struct attrs ) {
+		var label = trim( arguments.attrs.title ?: "" )
+		if ( !len( label ) ) {
+			return '<div class="bxsites-button bxsites-button--invalid">::: button - requires a "Label" title</div>'
+		}
+
+		var style = lCase( trim( arguments.attrs.style ?: "" ) )
+		if ( !listFindNoCase( "primary,secondary", style ) ) {
+			style = "secondary"
+		}
+		var size = lCase( trim( arguments.attrs.size ?: "" ) )
+		if ( !listFindNoCase( "small,medium,large", size ) ) {
+			size = "medium"
+		}
+		var disabled = ( arguments.attrs.disabled ?: "" ) == "true"
+		var href = trim( arguments.attrs.href ?: "" )
+		var classes = "bxsites-button bxsites-button--" & style & " bxsites-button--" & size & ( disabled ? " bxsites-button--disabled" : "" )
+
+		var inner = ""
+		if ( len( trim( arguments.attrs.icon ?: "" ) ) ) {
+			inner &= '<span class="bxsites-button__icon">' & variables.iconResolver.resolve( arguments.attrs.icon ) & '</span>'
+		}
+		inner &= '<span class="bxsites-button__label">' & encodeForHTML( label ) & '</span>'
+
+		if ( disabled || !len( href ) ) {
+			return '<span class="' & classes & '" aria-disabled="true">' & inner & '</span>'
+		}
+
+		var targetAttr = lCase( trim( arguments.attrs.target ?: "" ) ) == "_blank" ? ' target="_blank" rel="noopener noreferrer"' : ""
+		return '<a class="' & classes & '" href="' & attrEscape( href ) & '"' & targetAttr & '>' & inner & '</a>'
+	}
+
+	/**
+	 * `::: buttons` containing `::: button ...` children (see `renderButton()`
+	 * above for their own attributes) - lays several buttons out in a row,
+	 * wrapping on narrow viewports. Purely optional: a lone `::: button`
+	 * outside a `::: buttons` wrapper renders fine on its own.
+	 */
+	private string function renderButtons( required struct block, required any renderer, required struct markdownOptions ) {
+		var children = this.extract( arguments.block.content ).blocks
+		var html = '<div class="bxsites-buttons">'
+		for ( var child in children ) {
+			html &= renderButton( parseAttrs( child.attrsRaw ) )
+		}
+		return html & "</div>"
 	}
 
 	/**

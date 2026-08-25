@@ -29,6 +29,9 @@ doesn't require writing any JS yourself - reach for these first:
 - Grouped alternative content behind clickable tabs → [Content
   Tabs](markdown.md#content-tabs)
 - A numbered walkthrough → [Stepper](content-blocks.md#stepper)
+- A styled call-to-action link → [Buttons](content-blocks.md#buttons) (the
+  copy-to-clipboard button below is a *different* case - it has no `href`
+  at all, just client-side behavior - which is exactly what Alpine is for)
 
 Alpine is for the interactive content those don't cover - anything with
 its own client-side state.
