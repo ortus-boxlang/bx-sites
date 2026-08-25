@@ -197,59 +197,6 @@ pestaña es markdown completo, así que fences de código, listas,
 admoniciones, lo que sea que escribirías en cualquier otra parte. Sin
 necesidad de configuración en `bxsites.yaml` - siempre activo.
 
-## Tablas
-
-Tablas de pipes GFM estándar - sin necesidad de configuración en
-`bxsites.yaml`, siempre activas:
-
-```markdown title="Example" linenums="1"
-| Feature      | Community | Enterprise |
-| ------------ | :-------: | ---------: |
-| Themes       |    10     |         10 |
-| Multi-locale |    Yes    |        Yes |
-| Support      |  Forums   |     24/7   |
-```
-
-Lo que se renderiza como:
-
-| Feature      | Community | Enterprise |
-| ------------ | :-------: | ---------: |
-| Themes       |    10     |         10 |
-| Multi-locale |    Yes    |        Yes |
-| Support      |  Forums   |     24/7   |
-
-Una fila de `---` bajo el encabezado activa la tabla; pon dos puntos en
-esa fila separadora para controlar la alineación por columna - `:---`
-izquierda, `:---:` centro, `---:` derecha. El contenido de las celdas es
-markdown inline normal, así que `code`, **negrita**, y
-[enlaces](../index.md) funcionan todos.
-
-Los detalles de parseo - las filas cortas se rellenan, las filas largas se
-recortan, y la clase CSS con la que se renderiza cada `<table>` - están
-todos controlados por
-[`markdown.tableOptions`](../configuration.md#markdown) de `bxsites.yaml`;
-los valores por defecto de arriba son casi siempre lo que quieres.
-
-### Desplazamiento responsivo y un encabezado fijo
-
-Toda tabla renderizada se envuelve automáticamente en un `div`
-`.bxsites-table-wrap` - sin necesidad de configuración en
-`bxsites.yaml`, sin markdown adicional. Esto le da a una tabla ancha su
-propia barra de desplazamiento horizontal en lugar de desbordar la
-página, y limita las tablas altas (más allá de un `max-height`) a una
-altura fija con su propia barra de desplazamiento vertical, con la fila
-de encabezado fijada en su sitio mientras el cuerpo se desplaza por
-debajo - una tabla corta como la de arriba nunca llega a tener barra de
-desplazamiento alguna, ya que ya cabe sin problema. Una sobrescritura
-personalizada en `theme/` puede modificar el estilo de
-`.bxsites-table-wrap` (su `max-height`, en particular) igual que
-cualquier otra clase CSS.
-
-¿Necesitas algo más cercano a las columnas de tabla Select/Rating de
-GitBook - una insignia de estado o una valoración con estrellas en una
-celda? Consulta [Recetas de
-visualización](variables-and-functions.md#recetas-de-visualización).
-
 ## Bloques de Código
 
 Los bloques de código con fence se resaltan sintácticamente del lado del
@@ -488,6 +435,10 @@ Un `$` inmediatamente seguido o precedido de un espacio en blanco se deja
 tal cual (para que "$5 y $10" no se interprete erróneamente como una
 fórmula) - las matemáticas compuestas siempre se sitúan pegadas a ambos
 delimitadores.
+
+Consulta [Tablas](tables.md) para tablas de pipes GFM - alineación,
+escape, y el tratamiento automático de desplazamiento
+responsivo/encabezado fijo que recibe cada tabla.
 
 Consulta [Bloques de Contenido](content-blocks.md) para una familia de
 bloques `::: name ... :::` al estilo GitBook por encima de todo lo

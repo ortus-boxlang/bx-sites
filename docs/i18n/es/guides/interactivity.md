@@ -77,7 +77,7 @@ cada `<li>` se reevalúa en cada pulsación de tecla.
 
 ## Una tabla ordenable y filtrable
 
-Una [tabla de pipes nativa](markdown.md#tablas) es estática una vez
+Una [tabla de pipes nativa](tables.md) es estática una vez
 construida - para una que el lector realmente pueda ordenar y filtrar del
 lado del cliente (lo más parecido que hay aquí a la búsqueda/orden de
 tablas de GitBook), deja que Alpine sea el dueño de las filas en su
@@ -186,7 +186,7 @@ invierte la dirección al hacer un segundo clic en la misma columna. El
 sintaxis de tabla de pipes que entregue filas a Alpine directamente), así
 que de todas formas se envuelve en `.bxsites-table-wrap` y recibe
 automáticamente el tratamiento de [desplazamiento
-responsivo/encabezado fijo](markdown.md#desplazamiento-responsivo-y-un-encabezado-fijo),
+responsivo/encabezado fijo](tables.md#desplazamiento-responsivo-y-un-encabezado-fijo),
 igual que cualquier tabla que el propio bx-markdown renderiza.
 
 ## Fundamentos de `x-data`, si eres nuevo en Alpine

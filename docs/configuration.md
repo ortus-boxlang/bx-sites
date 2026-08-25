@@ -417,7 +417,7 @@ Docs defaults it to `true` (see the [Markdown Extensions guide](guides/markdown.
 | `tableOptions.className` | `"table"` | CSS class on every rendered `<table>` |
 | `tableOptions.headerSeparationColumnMatch` | `true` | Requires the `---` separator row to match the header's column count |
 
-Every rendered table also gets a responsive-scroll/sticky-header wrapper automatically, with no config key of its own - see [Tables](guides/markdown.md#responsive-scroll-and-a-sticky-header).
+Every rendered table also gets a responsive-scroll/sticky-header wrapper automatically, with no config key of its own - see [Tables](guides/tables.md#responsive-scroll-and-a-sticky-header).
 
 ```yaml title="bxsites.yaml" linenums="1"
 markdown:

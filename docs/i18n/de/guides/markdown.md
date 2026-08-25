@@ -195,56 +195,6 @@ vollständiges Markdown, also Code-Fences, Listen, Admonitions - alles, was
 du auch sonst irgendwo schreiben würdest. Keine `bxsites.yaml`-Konfiguration
 nötig - immer aktiv.
 
-## Tabellen
-
-Standard-GFM-Pipe-Tabellen - keine `bxsites.yaml`-Konfiguration nötig,
-immer aktiv:
-
-```markdown title="Example" linenums="1"
-| Feature      | Community | Enterprise |
-| ------------ | :-------: | ---------: |
-| Themes       |    10     |         10 |
-| Multi-locale |    Yes    |        Yes |
-| Support      |  Forums   |     24/7   |
-```
-
-Was so gerendert wird:
-
-| Feature      | Community | Enterprise |
-| ------------ | :-------: | ---------: |
-| Themes       |    10     |         10 |
-| Multi-locale |    Yes    |        Yes |
-| Support      |  Forums   |     24/7   |
-
-Eine Zeile aus `---` unter der Kopfzeile schaltet die Tabelle ein; setze
-Doppelpunkte in diese Trennzeile, um die Ausrichtung pro Spalte zu steuern
-- `:---` links, `:---:` zentriert, `---:` rechts. Der Zellinhalt ist
-normales Inline-Markdown, also funktionieren `code`, **fett** und
-[Links](../index.md) alle.
-
-Details zum Parsen - kurze Zeilen werden aufgefüllt, lange Zeilen werden
-gekürzt, und die CSS-Klasse, mit der jede `<table>` gerendert wird - werden
-alle über
-[`markdown.tableOptions`](../configuration.md#markdown) in `bxsites.yaml`
-gesteuert; die obigen Standardwerte sind fast immer das, was du willst.
-
-### Responsives Scrollen und eine fixierte Kopfzeile
-
-Jede gerenderte Tabelle wird automatisch in ein `.bxsites-table-wrap`-Div
-eingepackt - keine `bxsites.yaml`-Konfiguration, kein zusätzliches
-Markdown nötig. Das gibt einer breiten Tabelle ihre eigene horizontale
-Scrollleiste, statt die Seite zu sprengen, und begrenzt hohe Tabellen (ab
-einer `max-height`) auf eine feste Höhe mit eigener vertikaler
-Scrollleiste, wobei die Kopfzeile fixiert bleibt, während der Rumpf
-darunter scrollt - eine kurze Tabelle wie die obige bekommt nie eine
-Scrollleiste, weil sie ohnehin schon passt. Ein eigenes `theme/`-Override
-kann `.bxsites-table-wrap` (insbesondere seine `max-height`) genau wie
-jede andere CSS-Klasse umgestalten.
-
-Brauchst du etwas, das GitBooks Select-/Rating-Tabellenspalten näherkommt
-- einen Status-Chip oder eine Sternebewertung in einer Zelle? Siehe
-[Visualizer-Rezepte](variables-and-functions.md#visualizer-rezepte).
-
 ## Codeblöcke
 
 Fenced Codeblöcke werden clientseitig syntax-hervorgehoben
@@ -479,6 +429,10 @@ $$
 Ein `$`, dem unmittelbar Leerraum folgt oder vorausgeht, wird in Ruhe
 gelassen (sodass "$5 and $10" nicht als Formel missverstanden wird) -
 gesetzte Mathematik sitzt immer bündig an beiden Begrenzern.
+
+Siehe [Tabellen](tables.md) für GFM-Pipe-Tabellen - Ausrichtung, Escaping
+und die automatische Behandlung für responsives Scrollen/eine fixierte
+Kopfzeile, die jede Tabelle erhält.
 
 Siehe [Content-Blöcke](content-blocks.md) für eine Familie von
 GitBook-artigen `::: name ... :::`-Blöcken zusätzlich zu allem oben -

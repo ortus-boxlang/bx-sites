@@ -75,7 +75,7 @@ ogni `<li>` viene rivalutato a ogni tasto premuto.
 
 ## Una tabella ordinabile e filtrabile
 
-Una [tabella nativa a pipe](markdown.md#tabelle) è statica una volta
+Una [tabella nativa a pipe](tables.md) è statica una volta
 costruita - per averne una che il lettore possa davvero ordinare e
 filtrare lato client (la cosa più vicina qui alla ricerca/ordinamento
 delle tabelle di GitBook), lascia che sia Alpine a possedere le righe:
@@ -183,7 +183,7 @@ tag `<table>` scritto a mano (non esiste una sintassi per tabelle a pipe
 che passi le righe direttamente ad Alpine), quindi viene comunque
 racchiuso in `.bxsites-table-wrap` e riceve il trattamento di [scorrimento
 responsive/intestazione
-fissa](markdown.md#scorrimento-responsive-e-intestazione-fissa)
+fissa](tables.md#scorrimento-responsive-e-intestazione-fissa)
 automaticamente, esattamente come qualsiasi tabella renderizzata da
 bx-markdown stesso.
 

@@ -257,7 +257,7 @@ function $trend( required numeric value ) {
 ### Innerhalb einer Tabellenzelle
 
 `{{ }}` wird gegen das rohe Markdown aufgelöst, bevor
-[Tabellen](markdown.md#tabellen) überhaupt geparst werden, sodass jede der
+[Tabellen](tables.md) überhaupt geparst werden, sodass jede der
 obigen Funktionen innerhalb der Zellen einer Pipe-Tabelle genauso
 funktioniert wie überall sonst auf der Seite - das Nächste, was es hier zu
 GitBooks eigenen Select-/Rating-Tabellenspalten gibt:

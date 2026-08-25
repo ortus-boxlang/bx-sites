@@ -74,7 +74,7 @@ re-evaluates on every keystroke.
 
 ## A sortable, filterable table
 
-A [native pipe table](markdown.md#tables) is static once built - for one
+A [native pipe table](tables.md) is static once built - for one
 that a reader can actually sort and filter client-side (the closest thing
 here to GitBook's table search/sort), have Alpine own the rows instead:
 put the data in `x-data` and render it with `x-for`, rather than writing
@@ -179,7 +179,7 @@ extra wiring; `sortBy()` toggles direction on a second click of the same
 column. The `<table>` here is a real `<table>` tag written by hand
 (there's no pipe-table syntax to hand rows to Alpine directly), so it
 still gets wrapped in `.bxsites-table-wrap` and the [responsive
-scroll/sticky header](markdown.md#responsive-scroll-and-a-sticky-header)
+scroll/sticky header](tables.md#responsive-scroll-and-a-sticky-header)
 treatment automatically, same as any table bx-markdown itself renders.
 
 ## `x-data` fundamentals, if you're new to Alpine

@@ -257,7 +257,7 @@ function $trend( required numeric value ) {
 ### Dentro de una celda de tabla
 
 `{{ }}` se resuelve contra el Markdown en bruto antes incluso de que se
-analicen las [tablas](markdown.md#tablas), así que cualquiera de las
+analicen las [tablas](tables.md), así que cualquiera de las
 anteriores funciona dentro de las celdas de una tabla de pipes igual que
 en cualquier otra parte de la página - lo más parecido que hay aquí a las
 propias columnas de tabla Select/Rating de GitBook:

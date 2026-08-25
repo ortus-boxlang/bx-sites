@@ -246,7 +246,7 @@ function $trend( required numeric value ) {
 
 ### Inside a table cell
 
-`{{ }}` resolves against the raw Markdown before [tables](markdown.md#tables)
+`{{ }}` resolves against the raw Markdown before [tables](tables.md)
 are even parsed, so any of the above work inside a pipe table's cells the
 same as anywhere else on the page - the closest thing here to GitBook's own
 Select/Rating table columns:

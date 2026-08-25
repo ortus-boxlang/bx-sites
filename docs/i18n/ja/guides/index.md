@@ -11,6 +11,7 @@ icon: phosphor-duotone:book-open
 - [GitHub Pages へのデプロイ](deployment.md) - 組み込みの GitHub Actions ワークフロー
 - [Markdown 拡張機能](markdown.md) - Admonition、脚注、定義リスト、Mermaid ダイアグラム
 - [コンテンツブロック](content-blocks.md) - GitBook スタイルのブロック: 展開可能セクション、カード、列、ステッパー、再利用可能なコンテンツインクルード
+- [テーブル](tables.md) - GFM パイプテーブル、常に有効、自動のレスポンシブスクロール/固定ヘッダー処理付き
 - [レスポンシブ画像](images.md) - デフォルトで有効な自動リサイズ、WebP バリアント、CSS/JS バンドリング
 - [Alpine.js によるインタラクティビティ](interactivity.md) - 追加設定なしのリアクティブなコンテンツ（コピーボタン、ライブフィルタなど）
 - [ブログ](blog.md) - 規約ベースのブログ: 投稿、著者、カテゴリ、アーカイブ、RSS、統計

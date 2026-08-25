@@ -77,7 +77,7 @@ Eine Liste clientseitig filtern, ohne Server-Roundtrip:
 
 ## Eine sortierbare, filterbare Tabelle
 
-Eine [native Pipe-Tabelle](markdown.md#tabellen) ist statisch, sobald sie
+Eine [native Pipe-Tabelle](tables.md) ist statisch, sobald sie
 gebaut ist - für eine, die ein Leser tatsächlich clientseitig sortieren
 und filtern kann (das Nächste, was es hier zu GitBooks
 Tabellen-Suche/-Sortierung gibt), lass stattdessen Alpine die Zeilen
@@ -186,7 +186,7 @@ kehrt die Richtung bei einem zweiten Klick auf dieselbe Spalte um. Das
 gibt keine Pipe-Tabellen-Syntax, um Zeilen direkt an Alpine zu übergeben),
 also wird es trotzdem automatisch in `.bxsites-table-wrap` eingepackt und
 erhält automatisch die Behandlung für [responsives Scrollen und eine
-fixierte Kopfzeile](markdown.md#responsives-scrollen-und-eine-fixierte-kopfzeile),
+fixierte Kopfzeile](tables.md#responsives-scrollen-und-eine-fixierte-kopfzeile),
 genau wie jede Tabelle, die bx-markdown selbst rendert.
 
 ## `x-data`-Grundlagen, falls du neu bei Alpine bist

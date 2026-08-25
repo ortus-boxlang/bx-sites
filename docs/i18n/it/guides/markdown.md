@@ -195,57 +195,6 @@ completo, quindi blocchi di codice, liste, ammonizioni, qualsiasi cosa
 scriveresti altrove. Nessuna configurazione di `bxsites.yaml` necessaria -
 sempre attivo.
 
-## Tabelle
-
-Tabelle a pipe GFM standard - nessuna configurazione di `bxsites.yaml`
-necessaria, sempre attive:
-
-```markdown title="Example" linenums="1"
-| Feature      | Community | Enterprise |
-| ------------ | :-------: | ---------: |
-| Themes       |    10     |         10 |
-| Multi-locale |    Yes    |        Yes |
-| Support      |  Forums   |     24/7   |
-```
-
-Che viene renderizzato così:
-
-| Feature      | Community | Enterprise |
-| ------------ | :-------: | ---------: |
-| Themes       |    10     |         10 |
-| Multi-locale |    Yes    |        Yes |
-| Support      |  Forums   |     24/7   |
-
-Una riga di `---` sotto l'intestazione attiva la tabella; metti i due
-punti su quella riga separatrice per controllare l'allineamento per
-colonna - `:---` sinistra, `:---:` centro, `---:` destra. Il contenuto
-delle celle è normale markdown inline, quindi `code`, **grassetto**, e
-[link](../index.md) funzionano tutti.
-
-I dettagli del parsing - le righe corte vengono riempite, le righe lunghe
-vengono troncate, e la classe CSS con cui viene renderizzata ogni
-`<table>` - sono tutti controllati da
-[`markdown.tableOptions`](../configuration.md#markdown) in `bxsites.yaml`;
-i valori predefiniti sopra sono quasi sempre quello che vuoi.
-
-### Scorrimento responsive e intestazione fissa
-
-Ogni tabella renderizzata viene automaticamente racchiusa in un div
-`.bxsites-table-wrap` - nessuna configurazione di `bxsites.yaml`, nessun
-markdown aggiuntivo. Dà a una tabella larga una propria barra di
-scorrimento orizzontale invece di farla traboccare oltre la pagina, e
-limita le tabelle alte (oltre una `max-height`) a un'altezza fissa con una
-propria barra di scorrimento verticale, con la riga di intestazione
-fissata mentre il corpo scorre sotto di essa - una tabella corta come
-quella qui sopra non sviluppa mai una barra di scorrimento, dato che ci
-sta già. Una sovrascrittura personalizzata in `theme/` può ridefinire lo
-stile di `.bxsites-table-wrap` (in particolare la sua `max-height`), come
-qualsiasi altra classe CSS.
-
-Serve qualcosa di più vicino alle colonne Select/Rating di GitBook - un
-chip di stato o una valutazione a stelle in una cella? Vedi [Ricette per
-i visualizzatori](variables-and-functions.md#ricette-per-i-visualizzatori).
-
 ## Blocchi di codice
 
 I blocchi di codice delimitati vengono evidenziati lato client
@@ -481,6 +430,10 @@ $$
 Un `$` immediatamente preceduto o seguito da uno spazio viene lasciato
 intatto (così "$5 e $10" non viene scambiato per una formula) - la
 matematica composta sta sempre accostata a entrambi i delimitatori.
+
+Vedi [Tabelle](tables.md) per le tabelle a pipe GFM - allineamento,
+escape, e il trattamento automatico di scorrimento responsive/intestazione
+fissa che ogni tabella riceve.
 
 Vedi [Blocchi di contenuto](content-blocks.md) per una famiglia di
 blocchi in stile GitBook `::: name ... :::` che si aggiunge a tutto
