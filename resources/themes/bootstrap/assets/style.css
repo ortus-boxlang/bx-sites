@@ -367,6 +367,27 @@ body {
 	padding: 2rem;
 }
 
+/* Bootstrap's own `.table` (tableOptions.className's default) has no
+   responsive-scroll or sticky-header behavior of its own without wrapping
+   markup bx-markdown doesn't emit - BuildPipeline's own TableWrapProcessor
+   adds a `.bxsites-table-wrap` div around every rendered table for exactly
+   this (see docs/guides/markdown.md#tables). A bounded, actually-scrolling
+   box is what makes the sticky header below work at all - `overflow-x` on
+   the table itself can't do it, since the table's height always exactly
+   fits its own content, leaving no room for `position: sticky` to stick
+   within. */
+.content .bxsites-table-wrap {
+	max-height: 480px;
+	overflow: auto;
+}
+
+.content thead th {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	background-color: var( --bxsites-bg );
+}
+
 a {
 	color: var( --bxsites-link );
 }

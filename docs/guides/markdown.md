@@ -216,6 +216,22 @@ CSS class every `<table>` renders with - are all controlled by
 `bxsites.yaml`'s [`markdown.tableOptions`](../configuration.md#markdown);
 the defaults above are almost always what you want.
 
+### Responsive scroll and a sticky header
+
+Every rendered table is automatically wrapped in a `.bxsites-table-wrap`
+div - no `bxsites.yaml` config, no extra markdown. It gives a wide table
+its own horizontal scrollbar instead of overflowing the page, and caps tall
+tables (past a `max-height`) at a fixed height with their own vertical
+scrollbar, header row pinned in place while the body scrolls underneath -
+a short table like the one above never grows a scrollbar at all, since it
+already fits. A custom `theme/` override can restyle
+`.bxsites-table-wrap` (its `max-height`, in particular) like any other CSS
+class.
+
+Need something closer to GitBook's Select/Rating table columns - a status
+chip or a star rating in a cell? See [Visualizer
+recipes](variables-and-functions.md#visualizer-recipes).
+
 ## Code Blocks
 
 Fenced code blocks are syntax-highlighted client-side (highlight.js), no

@@ -1,0 +1,38 @@
+/**
+ * BxSites's own magic functions - see docs/guides/variables-and-functions.md.
+ * Every `$`-prefixed one here is callable as `{{ $name(args) }}` from any
+ * page's Markdown, or bare as `$name(args)` from a theme override; the four
+ * below back that guide's own "Visualizer recipes" section, live.
+ */
+
+function $stars( required numeric rating, numeric max = 5 ) {
+	var filled = min( max( round( arguments.rating ), 0 ), arguments.max )
+	var stars = repeatString( "★", filled ) & repeatString( "☆", arguments.max - filled )
+	return '<span title="' & arguments.rating & ' out of ' & arguments.max & '" style="color:##f5a623;letter-spacing:2px">' & stars & '</span>'
+}
+
+function $badge( required string label, string kind = "info" ) {
+	var palette = {
+		"info"    : { "bg" : "##e0edff", "fg" : "##1d4ed8" },
+		"success" : { "bg" : "##dcfce7", "fg" : "##15803d" },
+		"danger"  : { "bg" : "##fee2e2", "fg" : "##b91c1c" },
+		"warning" : { "bg" : "##fef9c3", "fg" : "##854d0e" }
+	}
+	var pick = palette.keyExists( arguments.kind ) ? palette[ arguments.kind ] : { "bg" : "##f1f5f9", "fg" : "##475569" }
+	return '<span style="display:inline-block;padding:0.1em 0.6em;border-radius:999px;font-size:0.85em;font-weight:600;background:'
+		& pick.bg & ";color:" & pick.fg & '">' & encodeForHTML( arguments.label ) & "</span>"
+}
+
+function $progress( required numeric percent ) {
+	var pct = min( max( arguments.percent, 0 ), 100 )
+	return '<span style="display:inline-block;width:120px;height:8px;background:##e5e7eb;border-radius:999px;overflow:hidden;vertical-align:middle"><span style="display:block;height:100%;width:'
+		& pct & '%;background:##2563eb"></span></span> ' & pct & "%"
+}
+
+function $trend( required numeric value ) {
+	var isUp = arguments.value >= 0
+	var arrow = isUp ? "▲" : "▼"
+	var color = isUp ? "##16a34a" : "##dc2626"
+	var sign = isUp ? "+" : ""
+	return '<span style="color:' & color & ';font-weight:600">' & arrow & " " & sign & numberFormat( arguments.value, "0.0" ) & "%</span>"
+}

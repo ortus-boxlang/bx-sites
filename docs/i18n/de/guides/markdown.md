@@ -228,6 +228,23 @@ alle über
 [`markdown.tableOptions`](../configuration.md#markdown) in `bxsites.yaml`
 gesteuert; die obigen Standardwerte sind fast immer das, was du willst.
 
+### Responsives Scrollen und eine fixierte Kopfzeile
+
+Jede gerenderte Tabelle wird automatisch in ein `.bxsites-table-wrap`-Div
+eingepackt - keine `bxsites.yaml`-Konfiguration, kein zusätzliches
+Markdown nötig. Das gibt einer breiten Tabelle ihre eigene horizontale
+Scrollleiste, statt die Seite zu sprengen, und begrenzt hohe Tabellen (ab
+einer `max-height`) auf eine feste Höhe mit eigener vertikaler
+Scrollleiste, wobei die Kopfzeile fixiert bleibt, während der Rumpf
+darunter scrollt - eine kurze Tabelle wie die obige bekommt nie eine
+Scrollleiste, weil sie ohnehin schon passt. Ein eigenes `theme/`-Override
+kann `.bxsites-table-wrap` (insbesondere seine `max-height`) genau wie
+jede andere CSS-Klasse umgestalten.
+
+Brauchst du etwas, das GitBooks Select-/Rating-Tabellenspalten näherkommt
+- einen Status-Chip oder eine Sternebewertung in einer Zelle? Siehe
+[Visualizer-Rezepte](variables-and-functions.md#visualizer-rezepte).
+
 ## Codeblöcke
 
 Fenced Codeblöcke werden clientseitig syntax-hervorgehoben

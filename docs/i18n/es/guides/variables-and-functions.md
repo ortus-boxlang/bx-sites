@@ -187,6 +187,95 @@ función anidadas ni expresiones en esta primera versión:
 - Booleanos: `{{ $badge('Beta', true) }}`
 - Una referencia a variable con puntos, sin `{{ }}`: `{{ $greet(product.name) }}`
 
+## Recetas de visualización
+
+Una función mágica que devuelve HTML no se limita a una insignia de
+estado - es una forma de propósito general de obtener celdas visuales al
+estilo GitBook (una valoración con estrellas, un chip de color, una barra
+de progreso) sin el propio selector de columnas respaldado por base de
+datos de GitBook, del que el origen basado en git y en Markdown plano de
+bx-sites no tiene equivalente alguno. Las cuatro de abajo son el propio
+[`docs/functions.bxs`](https://github.com/ortus-boxlang/bx-sites/blob/development/docs/functions.bxs)
+de este sitio, renderizándose en vivo justo en esta misma página.
+
+### Valoraciones
+
+```bx title="docs/functions.bxs"
+function $stars( required numeric rating, numeric max = 5 ) {
+	var filled = min( max( round( arguments.rating ), 0 ), arguments.max )
+	var stars = repeatString( "★", filled ) & repeatString( "☆", arguments.max - filled )
+	return '<span title="' & arguments.rating & ' out of ' & arguments.max & '" style="color:##f5a623;letter-spacing:2px">' & stars & '</span>'
+}
+```
+
+`` `{{ $stars(4) }}` `` se renderiza como: {{ $stars(4) }}
+
+### Chips de estado
+
+```bx title="docs/functions.bxs"
+function $badge( required string label, string kind = "info" ) {
+	var palette = {
+		"info"    : { "bg" : "##e0edff", "fg" : "##1d4ed8" },
+		"success" : { "bg" : "##dcfce7", "fg" : "##15803d" },
+		"danger"  : { "bg" : "##fee2e2", "fg" : "##b91c1c" },
+		"warning" : { "bg" : "##fef9c3", "fg" : "##854d0e" }
+	}
+	var pick = palette.keyExists( arguments.kind ) ? palette[ arguments.kind ] : { "bg" : "##f1f5f9", "fg" : "##475569" }
+	return '<span style="display:inline-block;padding:0.1em 0.6em;border-radius:999px;font-size:0.85em;font-weight:600;background:'
+		& pick.bg & ";color:" & pick.fg & '">' & encodeForHTML( arguments.label ) & "</span>"
+}
+```
+
+`` `{{ $badge('Stable', 'success') }}` `` se renderiza como: {{ $badge('Stable', 'success') }} - y `` `{{ $badge('Beta', 'info') }}` ``: {{ $badge('Beta', 'info') }}
+
+### Barras de progreso
+
+```bx title="docs/functions.bxs"
+function $progress( required numeric percent ) {
+	var pct = min( max( arguments.percent, 0 ), 100 )
+	return '<span style="display:inline-block;width:120px;height:8px;background:##e5e7eb;border-radius:999px;overflow:hidden;vertical-align:middle"><span style="display:block;height:100%;width:'
+		& pct & '%;background:##2563eb"></span></span> ' & pct & "%"
+}
+```
+
+`` `{{ $progress(72) }}` `` se renderiza como: {{ $progress(72) }}
+
+### Indicadores de tendencia
+
+```bx title="docs/functions.bxs"
+function $trend( required numeric value ) {
+	var isUp = arguments.value >= 0
+	var arrow = isUp ? "▲" : "▼"
+	var color = isUp ? "##16a34a" : "##dc2626"
+	var sign = isUp ? "+" : ""
+	return '<span style="color:' & color & ';font-weight:600">' & arrow & " " & sign & numberFormat( arguments.value, "0.0" ) & "%</span>"
+}
+```
+
+`` `{{ $trend(4.2) }}` `` se renderiza como: {{ $trend(4.2) }} - `` `{{ $trend(-1.8) }}` ``: {{ $trend(-1.8) }}
+
+### Dentro de una celda de tabla
+
+`{{ }}` se resuelve contra el Markdown en bruto antes incluso de que se
+analicen las [tablas](markdown.md#tablas), así que cualquiera de las
+anteriores funciona dentro de las celdas de una tabla de pipes igual que
+en cualquier otra parte de la página - lo más parecido que hay aquí a las
+propias columnas de tabla Select/Rating de GitBook:
+
+```markdown title="Example" linenums="1"
+| Feature | Status | Rating |
+| --- | --- | --- |
+| Dark mode | {{ $badge('Stable', 'success') }} | {{ $stars(5) }} |
+| Table sort | {{ $badge('Beta', 'info') }} | {{ $stars(4) }} |
+```
+
+Lo que se renderiza como:
+
+| Feature | Status | Rating |
+| --- | --- | --- |
+| Dark mode | {{ $badge('Stable', 'success') }} | {{ $stars(5) }} |
+| Table sort | {{ $badge('Beta', 'info') }} | {{ $stars(4) }} |
+
 ## Mostrar la sintaxis de forma literal
 
 Un `{{ }}` mostrado dentro de un bloque de código con fence (tres

@@ -30,6 +30,7 @@ class {
 	variables.tabsProcessor = new "models.build.TabsProcessor@bxsites"()
 	variables.mathProtector = new "models.build.MathProtector@bxsites"()
 	variables.codeAnnotationProcessor = new "models.build.CodeAnnotationProcessor@bxsites"()
+	variables.tableWrapProcessor = new "models.build.TableWrapProcessor@bxsites"()
 	variables.tryBoxLangProcessor = new "models.build.TryBoxLangProcessor@bxsites"()
 	variables.markdownLinkResolver = new "models.build.MarkdownLinkResolver@bxsites"()
 	variables.markdownPublisher = new "models.build.MarkdownPublisher@bxsites"()
@@ -798,6 +799,7 @@ class {
 			html = variables.tryBoxLangProcessor.restore( html, tryBoxLangExtracted.embeds )
 			html = variables.markdownLinkResolver.resolve( html, page.relativePath, arguments.basePath )
 			html = variables.responsiveImageProcessor.resolve( html, page.relativePath, arguments.basePath, arguments.imageManifest )
+			html = variables.tableWrapProcessor.wrap( html )
 
 			html = variables.pluginLoader.applyOnPageHtml( arguments.plugins, html, page, arguments.config )
 

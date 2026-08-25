@@ -230,6 +230,26 @@ todos controlados por
 [`markdown.tableOptions`](../configuration.md#markdown) de `bxsites.yaml`;
 los valores por defecto de arriba son casi siempre lo que quieres.
 
+### Desplazamiento responsivo y un encabezado fijo
+
+Toda tabla renderizada se envuelve automáticamente en un `div`
+`.bxsites-table-wrap` - sin necesidad de configuración en
+`bxsites.yaml`, sin markdown adicional. Esto le da a una tabla ancha su
+propia barra de desplazamiento horizontal en lugar de desbordar la
+página, y limita las tablas altas (más allá de un `max-height`) a una
+altura fija con su propia barra de desplazamiento vertical, con la fila
+de encabezado fijada en su sitio mientras el cuerpo se desplaza por
+debajo - una tabla corta como la de arriba nunca llega a tener barra de
+desplazamiento alguna, ya que ya cabe sin problema. Una sobrescritura
+personalizada en `theme/` puede modificar el estilo de
+`.bxsites-table-wrap` (su `max-height`, en particular) igual que
+cualquier otra clase CSS.
+
+¿Necesitas algo más cercano a las columnas de tabla Select/Rating de
+GitBook - una insignia de estado o una valoración con estrellas en una
+celda? Consulta [Recetas de
+visualización](variables-and-functions.md#recetas-de-visualización).
+
 ## Bloques de Código
 
 Los bloques de código con fence se resaltan sintácticamente del lado del

@@ -228,6 +228,24 @@ vengono troncate, e la classe CSS con cui viene renderizzata ogni
 [`markdown.tableOptions`](../configuration.md#markdown) in `bxsites.yaml`;
 i valori predefiniti sopra sono quasi sempre quello che vuoi.
 
+### Scorrimento responsive e intestazione fissa
+
+Ogni tabella renderizzata viene automaticamente racchiusa in un div
+`.bxsites-table-wrap` - nessuna configurazione di `bxsites.yaml`, nessun
+markdown aggiuntivo. Dà a una tabella larga una propria barra di
+scorrimento orizzontale invece di farla traboccare oltre la pagina, e
+limita le tabelle alte (oltre una `max-height`) a un'altezza fissa con una
+propria barra di scorrimento verticale, con la riga di intestazione
+fissata mentre il corpo scorre sotto di essa - una tabella corta come
+quella qui sopra non sviluppa mai una barra di scorrimento, dato che ci
+sta già. Una sovrascrittura personalizzata in `theme/` può ridefinire lo
+stile di `.bxsites-table-wrap` (in particolare la sua `max-height`), come
+qualsiasi altra classe CSS.
+
+Serve qualcosa di più vicino alle colonne Select/Rating di GitBook - un
+chip di stato o una valutazione a stelle in una cella? Vedi [Ricette per
+i visualizzatori](variables-and-functions.md#ricette-per-i-visualizzatori).
+
 ## Blocchi di codice
 
 I blocchi di codice delimitati vengono evidenziati lato client

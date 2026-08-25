@@ -189,6 +189,95 @@ annidata né espressione in questa prima versione:
 - Un riferimento a variabile puntato senza `{{ }}`:
   `{{ $greet(product.name) }}`
 
+## Ricette per i visualizzatori
+
+Una funzione magica che restituisce HTML non si limita a un badge di
+stato - è un modo generico per ottenere celle visive in stile GitBook
+(una valutazione a stelle, un chip colorato, una barra di progresso)
+senza il selettore di colonne di GitBook basato su database, di cui il
+codice sorgente di bx-sites, basato su git e Markdown puro, non ha un
+equivalente. Le quattro funzioni qui sotto sono lo stesso
+[`docs/functions.bxs`](https://github.com/ortus-boxlang/bx-sites/blob/development/docs/functions.bxs)
+di questo sito, renderizzate dal vivo proprio in questa pagina.
+
+### Valutazioni
+
+```bx title="docs/functions.bxs"
+function $stars( required numeric rating, numeric max = 5 ) {
+	var filled = min( max( round( arguments.rating ), 0 ), arguments.max )
+	var stars = repeatString( "★", filled ) & repeatString( "☆", arguments.max - filled )
+	return '<span title="' & arguments.rating & ' out of ' & arguments.max & '" style="color:##f5a623;letter-spacing:2px">' & stars & '</span>'
+}
+```
+
+`` `{{ $stars(4) }}` `` viene renderizzato come: {{ $stars(4) }}
+
+### Chip di stato
+
+```bx title="docs/functions.bxs"
+function $badge( required string label, string kind = "info" ) {
+	var palette = {
+		"info"    : { "bg" : "##e0edff", "fg" : "##1d4ed8" },
+		"success" : { "bg" : "##dcfce7", "fg" : "##15803d" },
+		"danger"  : { "bg" : "##fee2e2", "fg" : "##b91c1c" },
+		"warning" : { "bg" : "##fef9c3", "fg" : "##854d0e" }
+	}
+	var pick = palette.keyExists( arguments.kind ) ? palette[ arguments.kind ] : { "bg" : "##f1f5f9", "fg" : "##475569" }
+	return '<span style="display:inline-block;padding:0.1em 0.6em;border-radius:999px;font-size:0.85em;font-weight:600;background:'
+		& pick.bg & ";color:" & pick.fg & '">' & encodeForHTML( arguments.label ) & "</span>"
+}
+```
+
+`` `{{ $badge('Stable', 'success') }}` `` viene renderizzato come: {{ $badge('Stable', 'success') }} - e `` `{{ $badge('Beta', 'info') }}` ``: {{ $badge('Beta', 'info') }}
+
+### Barre di progresso
+
+```bx title="docs/functions.bxs"
+function $progress( required numeric percent ) {
+	var pct = min( max( arguments.percent, 0 ), 100 )
+	return '<span style="display:inline-block;width:120px;height:8px;background:##e5e7eb;border-radius:999px;overflow:hidden;vertical-align:middle"><span style="display:block;height:100%;width:'
+		& pct & '%;background:##2563eb"></span></span> ' & pct & "%"
+}
+```
+
+`` `{{ $progress(72) }}` `` viene renderizzato come: {{ $progress(72) }}
+
+### Indicatori di tendenza
+
+```bx title="docs/functions.bxs"
+function $trend( required numeric value ) {
+	var isUp = arguments.value >= 0
+	var arrow = isUp ? "▲" : "▼"
+	var color = isUp ? "##16a34a" : "##dc2626"
+	var sign = isUp ? "+" : ""
+	return '<span style="color:' & color & ';font-weight:600">' & arrow & " " & sign & numberFormat( arguments.value, "0.0" ) & "%</span>"
+}
+```
+
+`` `{{ $trend(4.2) }}` `` viene renderizzato come: {{ $trend(4.2) }} - `` `{{ $trend(-1.8) }}` ``: {{ $trend(-1.8) }}
+
+### Dentro una cella di tabella
+
+`{{ }}` si risolve rispetto al Markdown grezzo prima ancora che le
+[tabelle](markdown.md#tabelle) vengano analizzate, quindi qualsiasi
+elemento tra quelli sopra funziona anche dentro le celle di una tabella a
+pipe, esattamente come in qualsiasi altro punto della pagina - la cosa più
+vicina qui alle colonne Select/Rating di GitBook:
+
+```markdown title="Example" linenums="1"
+| Feature | Status | Rating |
+| --- | --- | --- |
+| Dark mode | {{ $badge('Stable', 'success') }} | {{ $stars(5) }} |
+| Table sort | {{ $badge('Beta', 'info') }} | {{ $stars(4) }} |
+```
+
+Che viene renderizzato così:
+
+| Feature | Status | Rating |
+| --- | --- | --- |
+| Dark mode | {{ $badge('Stable', 'success') }} | {{ $stars(5) }} |
+| Table sort | {{ $badge('Beta', 'info') }} | {{ $stars(4) }} |
+
 ## Mostrare la sintassi in modo letterale
 
 Un `{{ }}` mostrato dentro un blocco di codice delimitato (tre o più

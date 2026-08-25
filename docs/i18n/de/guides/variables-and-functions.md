@@ -186,6 +186,96 @@ Funktionsaufrufe oder Ausdrücke in dieser ersten Version:
 - Booleans: `{{ $badge('Beta', true) }}`
 - Eine `{{ }}`-lose Punktpfad-Variablenreferenz: `{{ $greet(product.name) }}`
 
+## Visualizer-Rezepte
+
+Eine magische Funktion, die HTML zurückgibt, ist nicht auf ein
+Status-Badge beschränkt - sie ist ein universeller Weg, um GitBook-artige
+visuelle Zellen (eine Sternebewertung, einen farbigen Chip, einen
+Fortschrittsbalken) zu bekommen, ganz ohne GitBooks eigenen
+datenbankgestützten Spalten-Picker, für den die git-basierte, reine
+Markdown-Quelle von bx-sites kein Äquivalent hat. Die folgenden vier
+stammen aus der eigenen
+[`docs/functions.bxs`](https://github.com/ortus-boxlang/bx-sites/blob/development/docs/functions.bxs)
+dieser Site und werden live auf genau dieser Seite gerendert.
+
+### Bewertungen
+
+```bx title="docs/functions.bxs"
+function $stars( required numeric rating, numeric max = 5 ) {
+	var filled = min( max( round( arguments.rating ), 0 ), arguments.max )
+	var stars = repeatString( "★", filled ) & repeatString( "☆", arguments.max - filled )
+	return '<span title="' & arguments.rating & ' out of ' & arguments.max & '" style="color:##f5a623;letter-spacing:2px">' & stars & '</span>'
+}
+```
+
+`` `{{ $stars(4) }}` `` rendert als: {{ $stars(4) }}
+
+### Status-Chips
+
+```bx title="docs/functions.bxs"
+function $badge( required string label, string kind = "info" ) {
+	var palette = {
+		"info"    : { "bg" : "##e0edff", "fg" : "##1d4ed8" },
+		"success" : { "bg" : "##dcfce7", "fg" : "##15803d" },
+		"danger"  : { "bg" : "##fee2e2", "fg" : "##b91c1c" },
+		"warning" : { "bg" : "##fef9c3", "fg" : "##854d0e" }
+	}
+	var pick = palette.keyExists( arguments.kind ) ? palette[ arguments.kind ] : { "bg" : "##f1f5f9", "fg" : "##475569" }
+	return '<span style="display:inline-block;padding:0.1em 0.6em;border-radius:999px;font-size:0.85em;font-weight:600;background:'
+		& pick.bg & ";color:" & pick.fg & '">' & encodeForHTML( arguments.label ) & "</span>"
+}
+```
+
+`` `{{ $badge('Stable', 'success') }}` `` rendert als: {{ $badge('Stable', 'success') }} - und `` `{{ $badge('Beta', 'info') }}` ``: {{ $badge('Beta', 'info') }}
+
+### Fortschrittsbalken
+
+```bx title="docs/functions.bxs"
+function $progress( required numeric percent ) {
+	var pct = min( max( arguments.percent, 0 ), 100 )
+	return '<span style="display:inline-block;width:120px;height:8px;background:##e5e7eb;border-radius:999px;overflow:hidden;vertical-align:middle"><span style="display:block;height:100%;width:'
+		& pct & '%;background:##2563eb"></span></span> ' & pct & "%"
+}
+```
+
+`` `{{ $progress(72) }}` `` rendert als: {{ $progress(72) }}
+
+### Trendanzeigen
+
+```bx title="docs/functions.bxs"
+function $trend( required numeric value ) {
+	var isUp = arguments.value >= 0
+	var arrow = isUp ? "▲" : "▼"
+	var color = isUp ? "##16a34a" : "##dc2626"
+	var sign = isUp ? "+" : ""
+	return '<span style="color:' & color & ';font-weight:600">' & arrow & " " & sign & numberFormat( arguments.value, "0.0" ) & "%</span>"
+}
+```
+
+`` `{{ $trend(4.2) }}` `` rendert als: {{ $trend(4.2) }} - `` `{{ $trend(-1.8) }}` ``: {{ $trend(-1.8) }}
+
+### Innerhalb einer Tabellenzelle
+
+`{{ }}` wird gegen das rohe Markdown aufgelöst, bevor
+[Tabellen](markdown.md#tabellen) überhaupt geparst werden, sodass jede der
+obigen Funktionen innerhalb der Zellen einer Pipe-Tabelle genauso
+funktioniert wie überall sonst auf der Seite - das Nächste, was es hier zu
+GitBooks eigenen Select-/Rating-Tabellenspalten gibt:
+
+```markdown title="Example" linenums="1"
+| Feature | Status | Rating |
+| --- | --- | --- |
+| Dark mode | {{ $badge('Stable', 'success') }} | {{ $stars(5) }} |
+| Table sort | {{ $badge('Beta', 'info') }} | {{ $stars(4) }} |
+```
+
+Was so gerendert wird:
+
+| Feature | Status | Rating |
+| --- | --- | --- |
+| Dark mode | {{ $badge('Stable', 'success') }} | {{ $stars(5) }} |
+| Table sort | {{ $badge('Beta', 'info') }} | {{ $stars(4) }} |
+
 ## Die Syntax wörtlich anzeigen
 
 Ein `{{ }}`, das innerhalb eines eingezäunten Codeblocks angezeigt wird (drei
