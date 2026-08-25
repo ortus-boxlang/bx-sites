@@ -5,6 +5,10 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/guides/search/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/license/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/configuration/index.html</loc></url>
@@ -31,6 +35,10 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/es/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/es/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/es/guides/search/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/es/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/es/license/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/es/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/es/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/es/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/es/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/es/configuration/index.html</loc></url>
@@ -57,6 +65,10 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/it/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/it/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/it/guides/search/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/it/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/it/license/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/it/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/it/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/it/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/it/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/it/configuration/index.html</loc></url>
@@ -83,6 +95,10 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/de/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/de/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/de/guides/search/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/de/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/de/license/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/de/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/de/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/de/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/de/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/de/configuration/index.html</loc></url>
@@ -109,6 +125,10 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/ja/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/ja/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/ja/guides/search/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/ja/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/ja/license/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/ja/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/ja/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/ja/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/ja/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docsy/ja/configuration/index.html</loc></url>

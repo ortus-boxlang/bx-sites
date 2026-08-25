@@ -5,6 +5,10 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/guides/search/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/license/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/configuration/index.html</loc></url>
@@ -31,6 +35,10 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/es/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/es/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/es/guides/search/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/es/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/es/license/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/es/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/es/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/es/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/es/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/es/configuration/index.html</loc></url>
@@ -57,6 +65,10 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/it/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/it/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/it/guides/search/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/it/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/it/license/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/it/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/it/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/it/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/it/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/it/configuration/index.html</loc></url>
@@ -83,6 +95,10 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/de/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/de/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/de/guides/search/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/de/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/de/license/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/de/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/de/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/de/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/de/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/de/configuration/index.html</loc></url>
@@ -109,6 +125,10 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/ja/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/ja/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/ja/guides/search/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/ja/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/ja/license/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/ja/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/ja/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/ja/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/ja/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/tailwind/ja/configuration/index.html</loc></url>

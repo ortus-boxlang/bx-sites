@@ -10,7 +10,7 @@ toc: false
 	<img class="bxsites-hero__banner" src="assets/home-banner.jpg" alt="BxSites - Write. Build. Publish Beautiful Docs. The official documentation engine for BoxLang. Markdown Powered, Beautiful Themes, Blazing Fast Search, Developer Focused.">
 	<div class="bxsites-hero__actions">
 		<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="getting-started.md">Erste Schritte</a>
-		<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://github.com/ortus-boxlang/bx-sites">Auf GitHub ansehen</a>
+		<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://github.com/ortus-boxlang/bx-sites">⭐ Gib uns einen Stern auf GitHub</a>
 	</div>
 </div>
 
