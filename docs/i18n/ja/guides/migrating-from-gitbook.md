@@ -104,7 +104,7 @@ Git-Sync エクスポートに実際に残るかどうかを確認していま�
 ページ自身のフロントマター、または
 [`docs/nav.json` エントリ自身の `icon`](../configuration.md#nav) のいずれかに、
 8 つの同梱ライブラリのいずれかから
-[名前付きアイコン](themes.md#アイコン) を指定します（GitBook 自身の
+[名前付きアイコン](icons.md) を指定します（GitBook 自身の
 Font-Awesome ベースのアイコンに一致させる必要はありません。
 [Phosphor](https://phosphoricons.com/)（6 つのウェイトいずれでも）、
 [Lucide](https://lucide.dev/icons/)、または
