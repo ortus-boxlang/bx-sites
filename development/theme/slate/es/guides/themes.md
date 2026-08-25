@@ -97,7 +97,10 @@ conjunto de funciones de página:
   ella. Consulta [Configuración](../configuration.md#versionado).
 - **Un `404.html` con el tema aplicado**, servido automáticamente por la
   mayoría de los alojamientos estáticos (incluido GitHub Pages) para
-  cualquier ruta sin coincidencia.
+  cualquier ruta sin coincidencia. Añade un `404.md` en la raíz de `docs/`
+  (o `src/`) para sustituir su título y contenido por los tuyos - nunca se
+  compila como una página normal (sin entrada en el nav, sin URL en
+  `sitemap.xml`), solo se renderiza en su lugar como `site/404.html`.
 - **Un logo y favicon personalizados**, cuando `theme.logo`/
   `theme.favicon` de `bxsites.yaml` están configurados. Consulta
   [Configuración](../configuration.md#theme).

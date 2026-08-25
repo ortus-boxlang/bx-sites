@@ -98,7 +98,10 @@ bringt unabhängig von der Palette denselben Satz an Seitenfunktionen mit:
   Siehe [Konfiguration](../configuration.md#versionierung).
 - **Eine themenspezifische `404.html`**, automatisch ausgeliefert von den
   meisten statischen Hosts (einschließlich GitHub Pages) für jeden nicht
-  gefundenen Pfad.
+  gefundenen Pfad. Lege eine `404.md` im Stammverzeichnis von `docs/`
+  (oder `src/`) an, um Titel und Inhalt selbst zu bestimmen - sie wird nie
+  als reguläre Seite gebaut (kein Nav-Eintrag, keine `sitemap.xml`-URL),
+  sondern stattdessen direkt in `site/404.html` gerendert.
 - **Ein eigenes Logo und Favicon**, wenn `theme.logo`/`theme.favicon` in
   `bxsites.yaml` gesetzt sind. Siehe
   [Konfiguration](../configuration.md#theme).

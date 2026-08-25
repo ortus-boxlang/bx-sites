@@ -97,7 +97,11 @@ di funzionalità di pagina indipendentemente dalla palette:
   suo interno. Vedi [Configurazione](../configuration.md#versionamento).
 - **Un `404.html` con tema applicato**, servito automaticamente dalla
   maggior parte degli host statici (incluso GitHub Pages) per qualsiasi
-  percorso non corrispondente.
+  percorso non corrispondente. Aggiungi un `404.md` alla radice di
+  `docs/` (o `src/`) per sostituirne titolo e contenuto con i tuoi - non
+  viene mai compilato come una pagina normale (nessuna voce nel nav,
+  nessun URL in `sitemap.xml`), ma renderizzato al suo posto in
+  `site/404.html`.
 - **Un logo e una favicon personalizzati**, quando `theme.logo`/
   `theme.favicon` di `bxsites.yaml` sono impostati. Vedi
   [Configurazione](../configuration.md#theme).
