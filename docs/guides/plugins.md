@@ -136,3 +136,11 @@ hello-plugin/
   isn't an installed/activated BoxLang module.
 - `BxSites.InvalidPlugin` - the module exists, but has no
   `models/BxSitesPlugin.bx` class.
+
+## Registering your own `bxSites` commands
+
+`models/BxSitesPlugin.bx` only covers the *build* lifecycle. A module can
+also register its own `bxSites <verb>` commands (e.g. a `deploy` or
+`cloud publish` a commercial addon might ship) via a sibling
+`models/BxSitesCliProvider.bx` contract - same `plugins` array activation,
+different file. See [CLI Providers](cli-providers.md).

@@ -1,0 +1,111 @@
+/**
+ * Discovers BoxLang modules that contribute CLI verbs to the `bxSites`
+ * verb table - the CLI-dispatch analog of models/build/PluginLoader.bx's
+ * build-lifecycle plugin discovery. A module opts in the SAME way a build
+ * plugin does: installed (`box install`) as a sibling of bx-sites, and
+ * activated by BoxLang module name in the project's `bxsites.yaml`
+ * `plugins` array (module spec section 4) - installing a module alone
+ * never activates it, exactly like `models/BxSitesPlugin.bx`.
+ *
+ * A provider exposes `models/BxSitesCliProvider.bx`, a class with a single
+ * method:
+ *
+ *   struct function verbs() {
+ *       return {
+ *           "cloud:publish" : { class : "models.cli.cloud.Publish@myAddon", description : "..." }
+ *       }
+ *   }
+ *
+ * Because a bare dotted class path (e.g. "models.cli.New") only resolves
+ * relative to the module whose ModuleConfig.bx directly invoked main() -
+ * see ModuleConfig.bx's own `main()` docblock - a provider's `class`
+ * entries MUST self-supply their own "@<moduleMapping>" suffix. This
+ * loader never rewrites or validates that suffix; an unresolvable class
+ * path only surfaces later, when `main()` actually tries to dispatch to it.
+ *
+ * A module listed in `plugins` that only implements the build-lifecycle
+ * `models/BxSitesPlugin.bx` contract (no CLI verbs of its own) is not an
+ * error here - it's simply skipped, same as a module with no
+ * `models/BxSitesCliProvider.bx` at all.
+ *
+ * `discoverProviders()` is the only part of this class that touches the
+ * real module system (`BoxRuntime.getModuleService()`) - it has no unit
+ * test of its own for the same reason `PluginLoader.discover()` doesn't
+ * (see that method's own docblock): a plain `testbox run` has no second
+ * BoxLang module registered to discover. `collectVerbs()` takes an
+ * already-resolved `providers` array instead, so it's fully unit-testable
+ * against plain fake provider objects - see CliProviderLoaderSpec.bx.
+ */
+class {
+
+	/**
+	 * Resolves every opted-in plugin module name against the real BoxLang
+	 * module registry and instantiates its `models/BxSitesCliProvider.bx`,
+	 * for every name that actually has one.
+	 *
+	 * @pluginNames bxsites.yaml's own `plugins` array - BoxLang module names
+	 *
+	 * @return Array of { name, instance }, in the same order as pluginNames - names with no BxSitesCliProvider.bx are simply absent, not an error
+	 */
+	array function discoverProviders( required array pluginNames ) {
+		var moduleService = getBoxRuntime().getModuleService()
+		var providers = []
+
+		for ( var name in arguments.pluginNames ) {
+			if ( !moduleService.hasModule( name ) ) {
+				continue
+			}
+
+			try {
+				var instance = new "models.BxSitesCliProvider@#name#"()
+			} catch ( any e ) {
+				continue
+			}
+
+			providers.append( { name : name, instance : instance } )
+		}
+
+		return providers
+	}
+
+	/**
+	 * Merges every provider's `verbs()` struct into one combined
+	 * `{ verbs, descriptions }` result, in `providers` array order - the
+	 * first provider to claim a given verb name wins over a later one.
+	 * Core's own literal verb table always wins over every provider
+	 * regardless of this ordering - that precedence is enforced by the
+	 * caller (ModuleConfig.bx's `mergeProviderVerbs()`), not here.
+	 *
+	 * @providers discoverProviders()'s own output (or a test-provided equivalent)
+	 *
+	 * @return { verbs : { "<verb>" : "<dotted.class.path@mapping>" }, descriptions : { "<verb>" : "<one-liner>" } }
+	 */
+	struct function collectVerbs( required array providers ) {
+		var result = { verbs : {}, descriptions : {} }
+
+		for ( var provider in arguments.providers ) {
+			if ( !structKeyExists( provider.instance, "verbs" ) ) {
+				continue
+			}
+
+			var contributed = provider.instance.verbs()
+			for ( var verbName in contributed ) {
+				if ( result.verbs.keyExists( verbName ) ) {
+					continue
+				}
+				result.verbs[ verbName ] = contributed[ verbName ].class
+				result.descriptions[ verbName ] = contributed[ verbName ].description ?: ""
+			}
+		}
+
+		return result
+	}
+
+	/**
+	 * The running BoxRuntime singleton, reached the same way PluginLoader.bx does.
+	 */
+	private any function getBoxRuntime() {
+		return createObject( "java", "ortus.boxlang.runtime.BoxRuntime" ).getInstance()
+	}
+
+}

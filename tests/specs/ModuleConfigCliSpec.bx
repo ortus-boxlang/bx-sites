@@ -142,6 +142,20 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( projectRoot & "/bxsites.yaml" ) ).toBeTrue();
 			} );
 
+			it( "returns exit code 0 for --help even when --projectRoot points at a project with no bxsites.yaml", function() {
+				var parent = newTempDir();
+
+				var exitCode = moduleConfig.main( [ "--help", "--projectRoot=#parent#" ] );
+
+				expect( exitCode ).toBe( 0 );
+			} );
+
+			it( "returns exit code 1 for an unregistered two-token verb pair like `cloud publish` (no CLI-provider module installed)", function() {
+				var exitCode = moduleConfig.main( [ "cloud", "publish" ] );
+
+				expect( exitCode ).toBe( 1 );
+			} );
+
 		} );
 	}
 

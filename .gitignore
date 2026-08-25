@@ -15,6 +15,7 @@ bin/**
 
 # Dependencies
 testbox/**
+boxlang_modules/**
 tests/results/**
 .agents/skills/**
 
