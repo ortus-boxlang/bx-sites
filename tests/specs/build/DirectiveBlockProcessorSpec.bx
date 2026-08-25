@@ -202,7 +202,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( '<span class="bxsites-button__icon">🚀</span>' );
 			} );
 
-			it( "adds target=\"_blank\"/rel=noopener when [target] is \"_blank\", and omits it otherwise", function() {
+			it( "adds target=""_blank""/rel=noopener when [target] is ""_blank"", and omits it otherwise", function() {
 				var blank = render( '::: button "Docs" href="https://example.com" target="_blank"' & char( 10 ) & ":::" );
 				var sameTab = render( '::: button "Docs" href="https://example.com"' & char( 10 ) & ":::" );
 
