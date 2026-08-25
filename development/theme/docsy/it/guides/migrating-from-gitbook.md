@@ -79,6 +79,16 @@ eseguirlo di nuovo.
 | `{% details %}` / `{% expand %}` | [`::: expandable`](content-blocks.md#expandable) |
 | `{% prompt description="..." icon="..." defaultExpanded="..." %}` | [`::: prompt`](content-blocks.md#prompt) - `openInAIProviders` viene scartato, segnalato come avviso quando era attivato |
 
+I pulsanti inline di GitBook non richiedono alcun passaggio di
+conversione - vengono già esportati come puro HTML
+`<a class="button primary">Label</a>`, che CommonMark lascia passare
+inalterato. Il CSS di ogni tema integrato stilizza quell'esatto markup in
+modo identico a un [`::: button`](content-blocks.md#pulsanti), quindi un
+pulsante migrato funziona semplicemente, stesso stile e tutto il resto -
+`::: button` serve solo per una delle sue capacità aggiuntive (`size`,
+`icon`, `target`, `disabled`) per cui il markup grezzo di GitBook non ha
+alcun equivalente.
+
 Un blocco mostrato come esempio letterale delimitato nel tuo contenuto
 GitBook (invece di essere usato per davvero) viene correttamente lasciato
 stare, non frainteso per quello reale.

@@ -89,7 +89,7 @@
 
 					<h1 class="page-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M112,56v48a8,8,0,0,1-8,8H56a8,8,0,0,1-8-8V56a8,8,0,0,1,8-8h48A8,8,0,0,1,112,56Zm88-8H152a8,8,0,0,0-8,8v48a8,8,0,0,0,8,8h48a8,8,0,0,0,8-8V56A8,8,0,0,0,200,48Zm-96,96H56a8,8,0,0,0-8,8v48a8,8,0,0,0,8,8h48a8,8,0,0,0,8-8V152A8,8,0,0,0,104,144Zm96,0H152a8,8,0,0,0-8,8v48a8,8,0,0,0,8,8h48a8,8,0,0,0,8-8V152A8,8,0,0,0,200,144Z" opacity="0.2"/><path d="M200,136H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,200,136Zm0,64H152V152h48v48ZM104,40H56A16,16,0,0,0,40,56v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,104,40Zm0,64H56V56h48v48Zm96-64H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,200,40Zm0,64H152V56h48v48Zm-96,32H56a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,104,136Zm0,64H56V152h48v48Z"/></svg></span> Content-Bl&ouml;cke</h1>
 <div class="page-tags mb-3"><a class="page-tag" href="/bx-sites/development/de/tags/index.html#tag-anleitungen">anleitungen</a><a class="page-tag" href="/bx-sites/development/de/tags/index.html#tag-markdown">markdown</a><a class="page-tag" href="/bx-sites/development/de/tags/index.html#tag-gitbook">gitbook</a></div>
-<details class="bxsites-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">Auf dieser Seite</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#expandable">Expandable</a></li><li class="toc-level-2"><a href="#cards">Cards</a></li><li class="toc-level-2"><a href="#columns">Columns</a></li><li class="toc-level-2"><a href="#stepper">Stepper</a></li><li class="toc-level-2"><a href="#file">File</a></li><li class="toc-level-2"><a href="#embed">Embed</a></li><li class="toc-level-2"><a href="#page-link">Page Link</a></li><li class="toc-level-2"><a href="#link-preview">Link Preview</a></li><li class="toc-level-2"><a href="#prompt">Prompt</a></li><li class="toc-level-2"><a href="#updates-changelog">Updates &#x28;Changelog&#x29;</a></li><li class="toc-level-2"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte &#x28;Includes&#x29;</a></li><li class="toc-level-2"><a href="#conditional-content">Conditional content</a></li></ul></details>
+<details class="bxsites-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">Auf dieser Seite</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#expandable">Expandable</a></li><li class="toc-level-2"><a href="#cards">Cards</a></li><li class="toc-level-2"><a href="#columns">Columns</a></li><li class="toc-level-2"><a href="#stepper">Stepper</a></li><li class="toc-level-2"><a href="#file">File</a></li><li class="toc-level-2"><a href="#buttons">Buttons</a></li><li class="toc-level-2"><a href="#embed">Embed</a></li><li class="toc-level-2"><a href="#page-link">Page Link</a></li><li class="toc-level-2"><a href="#link-preview">Link Preview</a></li><li class="toc-level-2"><a href="#prompt">Prompt</a></li><li class="toc-level-2"><a href="#updates-changelog">Updates &#x28;Changelog&#x29;</a></li><li class="toc-level-2"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte &#x28;Includes&#x29;</a></li><li class="toc-level-2"><a href="#conditional-content">Conditional content</a></li></ul></details>
 					<h1 id="content-blöcke"><a href="#content-blöcke" id="content-blöcke" name="content-blöcke" class="anchor"></a>Content-Blöcke</h1>
 <p>Zusätzlich zu allem in <a href="/bx-sites/development/de/guides/markdown/index.html">Markdown-Erweiterungen</a> unterstützt
 BxSites eine Familie von GitBook-artigen Content-Blöcken - für sich
@@ -197,6 +197,40 @@ Projekt-Asset - <code>src</code> wird auf dieselbe Weise aufgelöst wie
 :::
 </code></pre>
 <a class="bxsites-file" href="/bx-sites/development/de/assets/og-image.png" download><span class="bxsites-file__icon" aria-hidden="true">📎</span><span class="bxsites-file__title">Site Preview Image</span></a>
+<h2 id="buttons"><a href="#buttons" id="buttons" name="buttons" class="anchor"></a>Buttons</h2>
+<p>Eine GitBook-artige Call-to-Action-Schaltfläche - <code>::: button</code> für sich
+allein, oder mehrere nebeneinander in einer Reihe innerhalb eines
+<code>::: buttons</code>-Wrappers. Das führende <code>&quot;Label&quot;</code> und <code>href</code> sind die
+einzigen Angaben, die die meisten Schaltflächen brauchen:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="Beispiel"><code class="language-markdown">::: button &quot;Get Started&quot; href=&quot;../getting-started.md&quot; style=&quot;primary&quot;
+:::
+</code></pre>
+<a class="bxsites-button bxsites-button--primary bxsites-button--medium" href="/bx-sites/development/de/getting-started/index.html"><span class="bxsites-button__label">Erste Schritte</span></a>
+<p>Ein paar optionale Attribute verleihen jeder Schaltfläche ihre eigenen
+Fähigkeiten:</p>
+<ul>
+<li><code>style=&quot;primary&quot;</code> oder <code>style=&quot;secondary&quot;</code> (der Standard) - voll
+ausgefüllt in Akzentfarbe vs. Outline.</li>
+<li><code>size=&quot;small&quot;</code>, <code>&quot;medium&quot;</code> (der Standard) oder <code>&quot;large&quot;</code>.</li>
+<li><code>icon=&quot;...&quot;</code> - wird auf dieselbe Weise aufgelöst wie das eigene <code>icon</code>
+einer Card (ein reines Emoji, oder ein benanntes Icon wie
+<code>icon=&quot;phosphor-duotone:rocket-launch&quot;</code> - siehe
+<a href="/bx-sites/development/de/guides/themes/index.html#icons">Themes: Icons</a>).</li>
+<li><code>target=&quot;_blank&quot;</code> - öffnet den Link in einem neuen Tab statt im selben
+(<code>rel=&quot;noopener noreferrer&quot;</code> wird automatisch hinzugefügt).</li>
+<li><code>disabled=&quot;true&quot;</code> - rendert eine inaktive, nicht klickbare Schaltfläche
+(kein <code>href</code> nötig) für einen &quot;Demnächst verfügbar&quot;-Aufruf.</li>
+</ul>
+<pre data-bxsites-start-line="1" data-bxsites-title="Beispiel"><code class="language-markdown">::: buttons
+::: button &quot;Read the docs&quot; href=&quot;../getting-started.md&quot; icon=&quot;phosphor-duotone:book-open&quot; size=&quot;large&quot;
+:::
+::: button &quot;Star on GitHub&quot; href=&quot;https://github.com/ortus-boxlang/bx-sites&quot; style=&quot;secondary&quot; target=&quot;_blank&quot;
+:::
+::: button &quot;Coming soon&quot; disabled=&quot;true&quot;
+:::
+:::
+</code></pre>
+<div class="bxsites-buttons"><a class="bxsites-button bxsites-button--secondary bxsites-button--large" href="/bx-sites/development/de/getting-started/index.html"><span class="bxsites-button__icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,56V200H160a32,32,0,0,0-32,32,32,32,0,0,0-32-32H24V56H96a32,32,0,0,1,32,32,32,32,0,0,1,32-32Z" opacity="0.2"/><path d="M232,48H160a40,40,0,0,0-32,16A40,40,0,0,0,96,48H24a8,8,0,0,0-8,8V200a8,8,0,0,0,8,8H96a24,24,0,0,1,24,24,8,8,0,0,0,16,0,24,24,0,0,1,24-24h72a8,8,0,0,0,8-8V56A8,8,0,0,0,232,48ZM96,192H32V64H96a24,24,0,0,1,24,24V200A39.81,39.81,0,0,0,96,192Zm128,0H160a39.81,39.81,0,0,0-24,8V88a24,24,0,0,1,24-24h64Z"/></svg></span><span class="bxsites-button__label">Dokumentation lesen</span></a><a class="bxsites-button bxsites-button--secondary bxsites-button--medium" href="https://github.com/ortus-boxlang/bx-sites" target="_blank" rel="noopener noreferrer"><span class="bxsites-button__label">Auf GitHub anschauen</span></a><span class="bxsites-button bxsites-button--secondary bxsites-button--medium bxsites-button--disabled" aria-disabled="true"><span class="bxsites-button__label">Demn&auml;chst verf&uuml;gbar</span></span></div>
 <h2 id="embed"><a href="#embed" id="embed" name="embed" class="anchor"></a>Embed</h2>
 <p>Ein responsives iframe-Embed für einen erkannten Anbieter - derzeit
 YouTube, Vimeo, CodePen, Spotify, Loom und Figma. Eine URL von woanders
@@ -396,7 +430,7 @@ Seite&quot; zu teilen), und das eigene Theme-Override eines Projekts kann
 stattdessen direkt <code>window.bxSitesSetPreference( key, value )</code> aufrufen,
 um es von einer eigenen UI aus zu steuern.</p>
 
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/content-blocks.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/de/guides/content-blocks.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 25, 2026, 5&#x3a;40&#x3a;15 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/content-blocks.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/de/guides/content-blocks.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 25, 2026, 5&#x3a;52&#x3a;25 AM</span></div>
 				</article>
 
 				<nav class="page-nav d-flex justify-content-between" aria-label="Seitennavigation">
@@ -412,7 +446,7 @@ um es von einer eigenen UI aus zu steuern.</p>
 			</main>
 
 			<aside class="col-xl-2 toc-sidebar d-none d-xl-block">
-				<nav class="toc mb-4" aria-label="Auf dieser Seite"><div class="toc-title">Auf dieser Seite</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#expandable">Expandable</a></li><li class="toc-level-2"><a href="#cards">Cards</a></li><li class="toc-level-2"><a href="#columns">Columns</a></li><li class="toc-level-2"><a href="#stepper">Stepper</a></li><li class="toc-level-2"><a href="#file">File</a></li><li class="toc-level-2"><a href="#embed">Embed</a></li><li class="toc-level-2"><a href="#page-link">Page Link</a></li><li class="toc-level-2"><a href="#link-preview">Link Preview</a></li><li class="toc-level-2"><a href="#prompt">Prompt</a></li><li class="toc-level-2"><a href="#updates-changelog">Updates &#x28;Changelog&#x29;</a></li><li class="toc-level-2"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte &#x28;Includes&#x29;</a></li><li class="toc-level-2"><a href="#conditional-content">Conditional content</a></li></ul></nav>
+				<nav class="toc mb-4" aria-label="Auf dieser Seite"><div class="toc-title">Auf dieser Seite</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#expandable">Expandable</a></li><li class="toc-level-2"><a href="#cards">Cards</a></li><li class="toc-level-2"><a href="#columns">Columns</a></li><li class="toc-level-2"><a href="#stepper">Stepper</a></li><li class="toc-level-2"><a href="#file">File</a></li><li class="toc-level-2"><a href="#buttons">Buttons</a></li><li class="toc-level-2"><a href="#embed">Embed</a></li><li class="toc-level-2"><a href="#page-link">Page Link</a></li><li class="toc-level-2"><a href="#link-preview">Link Preview</a></li><li class="toc-level-2"><a href="#prompt">Prompt</a></li><li class="toc-level-2"><a href="#updates-changelog">Updates &#x28;Changelog&#x29;</a></li><li class="toc-level-2"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte &#x28;Includes&#x29;</a></li><li class="toc-level-2"><a href="#conditional-content">Conditional content</a></li></ul></nav>
 			</aside>
 
 		</div>

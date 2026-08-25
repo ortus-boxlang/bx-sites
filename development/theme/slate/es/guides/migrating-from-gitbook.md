@@ -80,6 +80,15 @@ exportación de origen y volver a ejecutarlo.
 | `{% details %}` / `{% expand %}` | [`::: expandable`](content-blocks.md#expandible) |
 | `{% prompt description="..." icon="..." defaultExpanded="..." %}` | [`::: prompt`](content-blocks.md#prompt) - `openInAIProviders` se descarta, se reporta como advertencia cuando estaba activado |
 
+Los botones en línea de GitBook no necesitan ningún paso de conversión en
+absoluto - ya se exportan como HTML simple `<a class="button primary">Label</a>`,
+que CommonMark deja pasar sin cambios. El propio CSS de cada tema
+incorporado da a ese marcado exacto un estilo idéntico al de un
+[`::: button`](content-blocks.md#botones), así que un botón migrado
+simplemente funciona, con el mismo estilo y todo - `::: button` solo hace
+falta para una de sus habilidades adicionales (`size`, `icon`, `target`,
+`disabled`) que el marcado GitBook en bruto no tiene forma de igualar.
+
 Un bloque mostrado como un ejemplo literal en fence en tu contenido de
 GitBook (en lugar de usarse de verdad) se deja correctamente intacto, sin
 malinterpretarse como el bloque real.

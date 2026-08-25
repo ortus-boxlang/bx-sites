@@ -77,6 +77,15 @@ source export and run it again.
 | `{% details %}` / `{% expand %}` | [`::: expandable`](content-blocks.md#expandable) |
 | `{% prompt description="..." icon="..." defaultExpanded="..." %}` | [`::: prompt`](content-blocks.md#prompt) - `openInAIProviders` is dropped, reported as a warning when it was turned on |
 
+GitBook's inline buttons don't need a conversion pass at all - they're
+already exported as plain `<a class="button primary">Label</a>` HTML, which
+CommonMark passes straight through untouched. Every built-in theme's own
+CSS styles that exact markup identically to a
+[`::: button`](content-blocks.md#buttons), so a migrated button just works,
+same style and everything - `::: button` is only needed for one of its
+extra abilities (`size`, `icon`, `target`, `disabled`) that raw GitBook
+markup has no equivalent for.
+
 A block shown as a literal fenced example in your GitBook content (rather
 than used for real) is correctly left alone, not misread as the real
 thing.

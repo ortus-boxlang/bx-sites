@@ -107,21 +107,32 @@ doesn't require writing any JS yourself - reach for these first:</p>
 <li>Grouped alternative content behind clickable tabs → <a href="/bx-sites/development/theme/material/guides/markdown/index.html#content-tabs">Content
 Tabs</a></li>
 <li>A numbered walkthrough → <a href="/bx-sites/development/theme/material/guides/content-blocks/index.html#stepper">Stepper</a></li>
+<li>A styled call-to-action link → <a href="/bx-sites/development/theme/material/guides/content-blocks/index.html#buttons">Buttons</a> (the
+copy-to-clipboard button below is a <em>different</em> case - it has no <code>href</code>
+at all, just client-side behavior - which is exactly what Alpine is for)</li>
 </ul>
 <p>Alpine is for the interactive content those don't cover - anything with
 its own client-side state.</p>
 <h2 id="a-copy-to-clipboard-button"><a href="#a-copy-to-clipboard-button" id="a-copy-to-clipboard-button" name="a-copy-to-clipboard-button" class="anchor"></a>A copy-to-clipboard button</h2>
-<p>A common one: a button next to an install command that copies it and
-confirms the copy:</p>
+<p><a href="/bx-sites/development/theme/material/guides/content-blocks/index.html#buttons"><code>::: button</code></a> only ever renders a real link (or
+an inert placeholder) - like GitBook's own button, it has no notion of
+running arbitrary JS on click. For a button that <em>does</em> something instead
+of navigating somewhere, drop its <code>bxsites-button</code>/<code>bxsites-button--*</code>
+classes onto a plain HTML <code>&lt;button&gt;</code> instead - same look, styled in every
+built-in theme, just wired up with Alpine rather than an <code>href</code>. A common
+one: a button next to an install command that copies it and confirms the
+copy:</p>
 <pre data-bxsites-start-line="1" data-bxsites-title="Copy button"><code class="language-markdown">&lt;div x-data=&quot;{ copied: false }&quot;&gt;
-  &lt;button type=&quot;button&quot; @click=&quot;navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () =&gt; copied = false, 1500 )&quot;&gt;
+  &lt;button type=&quot;button&quot; class=&quot;bxsites-button bxsites-button--secondary bxsites-button--small&quot;
+    @click=&quot;navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () =&gt; copied = false, 1500 )&quot;&gt;
     &lt;span x-show=&quot;!copied&quot;&gt;Copy install command&lt;/span&gt;
     &lt;span x-show=&quot;copied&quot; x-cloak&gt;Copied!&lt;/span&gt;
   &lt;/button&gt;
 &lt;/div&gt;
 </code></pre>
 <div x-data="{ copied: false }">
-  <button type="button" class="btn btn-sm btn-outline-secondary" @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
+  <button type="button" class="bxsites-button bxsites-button--secondary bxsites-button--small"
+    @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
     <span x-show="!copied">Copy install command</span>
     <span x-show="copied" x-cloak>Copied!</span>
   </button>
@@ -168,7 +179,7 @@ fit; a full client-side app isn't what this is for.</li>
 </ul>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/interactivity.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/material/guides/interactivity.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 25, 2026, 5&#x3a;40&#x3a;15 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/interactivity.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/material/guides/interactivity.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 25, 2026, 5&#x3a;52&#x3a;25 AM</span></div>
 			</article>
 
 			<nav class="md-page-nav" aria-label="Page navigation">
