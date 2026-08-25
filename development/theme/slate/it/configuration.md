@@ -53,6 +53,7 @@ plugins: []
 i18n:
   defaultLocale: { code: en, label: English }
   locales: []
+variables: {}
 ```
 
 L'equivalente `bxsites.json`, per un progetto che lo preferisce:
@@ -96,7 +97,8 @@ L'equivalente `bxsites.json`, per un progetto che lo preferisce:
 	"i18n": {
 		"defaultLocale": { "code": "en", "label": "English" },
 		"locales": []
-	}
+	},
+	"variables": {}
 }
 ```
 
@@ -680,6 +682,29 @@ i18n:
 Vedi [Internazionalizzazione](guides/i18n.md) per il quadro completo -
 il fallback per le pagine non tradotte, il selettore di lingua, e cosa non
 è ancora tradotto.
+
+## `variables`
+
+`{}` (il valore predefinito) - un oggetto di valori riutilizzabili, di
+qualsiasi forma, referenziato da qualsiasi pagina Markdown come
+`{{ dotted.path }}`. Vedi
+[Variabili e Funzioni Magiche](guides/variables-and-functions.md).
+
+```yaml title="bxsites.yaml"
+variables:
+  company: "Ortus Solutions"
+  product: { name: "BoxLang", supportEmail: "support@example.com" }
+```
+
+```markdown title="docs/index.md"
+Welcome to {{ company }}! We build {{ product.name }}.
+```
+
+Un file `docs/functions.bxs` (nessuna chiave di configurazione propria -
+per convenzione, come `docs/nav.json`/`docs/blog/authors.yml`) aggiunge
+"funzioni magiche" BoxLang accanto a `variables` - richiamabili allo
+stesso modo, come `{{ $name(...) }}`. Vedi
+[Variabili e Funzioni Magiche](guides/variables-and-functions.md#funzioni-magiche).
 
 ## Versionamento
 

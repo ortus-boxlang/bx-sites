@@ -58,6 +58,7 @@ i18n:
 blog:
   postsPerPage: 10
   feed: true
+variables: {}
 ```
 
 The equivalent `bxsites.json`, for a project that prefers it:
@@ -110,7 +111,8 @@ The equivalent `bxsites.json`, for a project that prefers it:
 	"blog": {
 		"postsPerPage": 10,
 		"feed": true
-	}
+	},
+	"variables": {}
 }
 ```
 
@@ -699,6 +701,28 @@ blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
 
 See [Blog](guides/blog.md) for post/author frontmatter, categories,
 featured images, and SEO/social metadata.
+
+## `variables`
+
+`{}` (the default) - an object of reusable values, any shape, referenced
+from any Markdown page as `{{ dotted.path }}`. See
+[Variables & Magic Functions](guides/variables-and-functions.md).
+
+```yaml title="bxsites.yaml"
+variables:
+  company: "Ortus Solutions"
+  product: { name: "BoxLang", supportEmail: "support@example.com" }
+```
+
+```markdown title="docs/index.md"
+Welcome to {{ company }}! We build {{ product.name }}.
+```
+
+A `docs/functions.bxs` file (no config key of its own - by convention,
+same as `docs/nav.json`/`docs/blog/authors.yml`) adds BoxLang "magic
+functions" alongside `variables` - callable the same way, as
+`{{ $name(...) }}`. See
+[Variables & Magic Functions](guides/variables-and-functions.md#magic-functions).
 
 ## Versioning
 

@@ -52,6 +52,10 @@ plugins: []
 i18n:
   defaultLocale: { code: en, label: English }
   locales: []
+blog:
+  postsPerPage: 10
+  feed: true
+variables: {}
 ```
 
 El `bxsites.json` equivalente, para un proyecto que lo prefiera:
@@ -91,7 +95,12 @@ El `bxsites.json` equivalente, para un proyecto que lo prefiera:
 	"i18n": {
 		"defaultLocale": { "code": "en", "label": "English" },
 		"locales": []
-	}
+	},
+	"blog": {
+		"postsPerPage": 10,
+		"feed": true
+	},
+	"variables": {}
 }
 ```
 
@@ -749,6 +758,29 @@ blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
 
 Consulta [Blog](guides/blog.md) para el frontmatter de entradas/autores,
 categorías, imágenes destacadas y metadatos de SEO/redes sociales.
+
+## `variables`
+
+`{}` (el valor por defecto) - un objeto de valores reutilizables, con la
+forma que prefieras, referenciado desde cualquier página de Markdown como
+`{{ dotted.path }}`. Consulta
+[Variables y Funciones Mágicas](guides/variables-and-functions.md).
+
+```yaml title="bxsites.yaml"
+variables:
+  company: "Ortus Solutions"
+  product: { name: "BoxLang", supportEmail: "support@example.com" }
+```
+
+```markdown title="docs/index.md"
+Welcome to {{ company }}! We build {{ product.name }}.
+```
+
+Un archivo `docs/functions.bxs` (sin clave de configuración propia - por
+convención, igual que `docs/nav.json`/`docs/blog/authors.yml`) añade
+"funciones mágicas" de BoxLang junto a `variables` - invocables de la
+misma forma, como `{{ $name(...) }}`. Consulta
+[Variables y Funciones Mágicas](guides/variables-and-functions.md#funciones-mágicas).
 
 ## Versionado
 

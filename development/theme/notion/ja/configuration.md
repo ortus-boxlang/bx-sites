@@ -58,6 +58,7 @@ i18n:
 blog:
   postsPerPage: 10
   feed: true
+variables: {}
 ```
 
 そちらを好むプロジェクト向けの、同等の `bxsites.json` は次のとおりです:
@@ -110,7 +111,8 @@ blog:
 	"blog": {
 		"postsPerPage": 10,
 		"feed": true
-	}
+	},
+	"variables": {}
 }
 ```
 
@@ -687,6 +689,27 @@ blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
 
 投稿/著者のフロントマター、カテゴリ、注目画像、SEO/ソーシャルメタデータについては
 [ブログ](guides/blog.md) を参照してください。
+
+## `variables`
+
+`{}`（デフォルト）- 再利用可能な値のオブジェクトで、形は自由です。どの Markdown
+ページからも `{{ dotted.path }}` として参照できます。
+[変数とマジック関数](guides/variables-and-functions.md) を参照してください。
+
+```yaml title="bxsites.yaml"
+variables:
+  company: "Ortus Solutions"
+  product: { name: "BoxLang", supportEmail: "support@example.com" }
+```
+
+```markdown title="docs/index.md"
+Welcome to {{ company }}! We build {{ product.name }}.
+```
+
+`docs/functions.bxs` ファイル（`docs/nav.json`/`docs/blog/authors.yml` と同様、
+専用の設定キーはなく規約ベースです）は、`variables` と並んで BoxLang の
+「マジック関数」を追加します - `{{ $name(...) }}` として同じ方法で呼び出せます。
+[変数とマジック関数](guides/variables-and-functions.md#マジック関数) を参照してください。
 
 ## バージョニング
 

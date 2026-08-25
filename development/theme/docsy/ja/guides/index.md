@@ -14,6 +14,7 @@ icon: phosphor-duotone:book-open
 - [レスポンシブ画像](images.md) - デフォルトで有効な自動リサイズ、WebP バリアント、CSS/JS バンドリング
 - [Alpine.js によるインタラクティビティ](interactivity.md) - 追加設定なしのリアクティブなコンテンツ（コピーボタン、ライブフィルタなど）
 - [ブログ](blog.md) - 規約ベースのブログ: 投稿、著者、カテゴリ、アーカイブ、RSS、統計
+- [変数とマジック関数](variables-and-functions.md) - コンテンツのどこからでも使える再利用可能な `{{ variables }}` と BoxLang ヘルパー関数
 - [プラグイン](plugins.md) - 独自の BoxLang モジュールで BxSites を拡張する
 - [テーマのインポート](theme-import.md) - mkdocs/jekyll/hugo のテーマを bx-sites テーマへベストエフォートで変換する
 - [バージョニング](versioning.md) - リリースのドキュメントをスナップショットし、バージョンスイッチャーを無料で手に入れる
