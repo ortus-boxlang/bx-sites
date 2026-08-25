@@ -72,8 +72,8 @@ Che viene renderizzato così:
 | --- | --- |
 | a \| b | bitwise OR |
 
-Un `|` dentro il codice inline non ha affatto bisogno di essere sfuggito
-- lo span di codice (`` `a | b` ``) lo protegge già:
+Un `|` dentro il codice inline non ha affatto bisogno di essere sfuggito -
+lo span di codice (`` `a | b` ``) lo protegge già:
 
 | Expression | Meaning |
 | --- | --- |
