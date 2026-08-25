@@ -320,6 +320,49 @@ Body.' );
 				expect( result.warnings.toList( char( 10 ) ) ).toInclude( "page.md already existed" );
 			} );
 
+			it( "converts {% prompt %} into ::: prompt, carrying description/icon/defaultExpanded through", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '{% prompt description="Summarize a PR" icon="git-pull-request" defaultExpanded="partial" %}
+Summarize this diff.
+{% endprompt %}' );
+
+				migrator.migrate( sourceDir, docsDir );
+				var converted = fileRead( docsDir & "/page.md" );
+
+				expect( converted ).toInclude( '::: prompt description="Summarize a PR" icon="git-pull-request" expanded="preview"' );
+				expect( converted ).toInclude( "Summarize this diff." );
+				expect( converted ).toInclude( char( 10 ) & ":::" );
+			} );
+
+			it( "drops {% prompt %}'s openInAIProviders and reports a warning only when it was turned on", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [On](on.md)" & char( 10 ) & "* [Off](off.md)" );
+				fileWrite( sourceDir & "/on.md", '{% prompt openInAIProviders="true" %}
+Body.
+{% endprompt %}' );
+				fileWrite( sourceDir & "/off.md", '{% prompt %}
+Body.
+{% endprompt %}' );
+
+				var result = migrator.migrate( sourceDir, docsDir );
+
+				expect( fileRead( docsDir & "/on.md" ) ).notToInclude( "openInAIProviders" );
+				expect( fileRead( docsDir & "/off.md" ) ).notToInclude( "openInAIProviders" );
+				expect( result.warnings.toList( char( 10 ) ) ).toInclude( "on.md: {% prompt %} openInAIProviders" );
+				expect( result.warnings.toList( char( 10 ) ) ).notToInclude( "off.md:" );
+			} );
+
+			it( "reports a warning and leaves defaultExpanded unset for an unrecognized {% prompt %} defaultExpanded value", function() {
+				fileWrite( sourceDir & "/SUMMARY.md", "* [Page](page.md)" );
+				fileWrite( sourceDir & "/page.md", '{% prompt defaultExpanded="mystery" %}
+Body.
+{% endprompt %}' );
+
+				var result = migrator.migrate( sourceDir, docsDir );
+
+				expect( fileRead( docsDir & "/page.md" ) ).notToInclude( "expanded=" );
+				expect( result.warnings.toList( char( 10 ) ) ).toInclude( 'defaultExpanded="mystery"' );
+			} );
+
 		} );
 	}
 

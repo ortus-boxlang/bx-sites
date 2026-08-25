@@ -47,7 +47,7 @@ bxSites serve
 Migrated 14 page(s) from [/path/to/gitbook-export] into my-docs/docs/, wrote my-docs/docs/nav.json
 
 2 item(s) need a manual look:
-  - guides/advanced.md: Unsupported GitBook block [{% prompt %}] - left in its original syntax, needs manual conversion
+  - guides/advanced.md: Unsupported GitBook block [{% conditional-content %}] - left in its original syntax, needs manual conversion
   - guides/layout.md: Column width="one-third" is not a plain length/percentage - dropped, review manually
 ```
 
@@ -75,6 +75,7 @@ Migrated 14 page(s) from [/path/to/gitbook-export] into my-docs/docs/, wrote my-
 | `{% embed url="..." %}` | [`::: embed`](content-blocks.md#埋め込み) |
 | `{% content-ref url="..." %}` | [`::: page-link`](content-blocks.md#ページリンク) |
 | `{% details %}` / `{% expand %}` | [`::: expandable`](content-blocks.md#展開可能) |
+| `{% prompt description="..." icon="..." defaultExpanded="..." %}` | [`::: prompt`](content-blocks.md#プロンプト) - `openInAIProviders` は削除され、有効になっていた場合は警告として報告されます |
 
 GitBook コンテンツ内でフェンスコードの例として（実際には使われずに）示されて
 いるだけのブロックは正しくそのまま残され、本物のブロックと誤読されることは
@@ -84,7 +85,6 @@ GitBook コンテンツ内でフェンスコードの例として（実際には
 
 GitBook のブロックの中には、bx-sites にまったく対応するものがなく、推測で
 変換されるのではなく元の `{% %}` 構文のまま残されるものがいくつかあります:
-**Prompt**（AI 生成ブロック - 移行後にそれを実行する相手が存在しません）、
 **Conditional content**（GitBook アカウントベースの表示制御で、bx-sites に
 ある概念ではありません）、そして **Ask AI** 検索バーです。このツールが
 認識しないその他のもの - タイプミスされたブロックや、このツールが書かれた
@@ -104,7 +104,7 @@ Git-Sync エクスポートに実際に残るかどうかを確認していま�
 ページ自身のフロントマター、または
 [`docs/nav.json` エントリ自身の `icon`](../configuration.md#nav) のいずれかに、
 8 つの同梱ライブラリのいずれかから
-[名前付きアイコン](themes.md#アイコン) を指定します（GitBook 自身の
+[名前付きアイコン](icons.md) を指定します（GitBook 自身の
 Font-Awesome ベースのアイコンに一致させる必要はありません。
 [Phosphor](https://phosphoricons.com/)（6 つのウェイトいずれでも）、
 [Lucide](https://lucide.dev/icons/)、または

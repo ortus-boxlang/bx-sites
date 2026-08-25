@@ -7,6 +7,7 @@ icon: phosphor-duotone:book-open
 # Guías
 
 - [Temas](themes.md) - los temas incorporados y cómo escribir el tuyo propio
+- [Iconos](icons.md) - un emoji, o un icono con nombre de una de las ocho bibliotecas incluidas, en cualquier página/entrada de navegación
 - [Búsqueda](search.md) - cómo funciona el índice de búsqueda estático
 - [Desplegar en GitHub Pages](deployment.md) - el flujo de trabajo de GitHub Actions incorporado
 - [Extensiones de Markdown](markdown.md) - admoniciones, notas al pie, listas de definiciones y diagramas Mermaid

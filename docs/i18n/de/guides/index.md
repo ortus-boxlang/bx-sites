@@ -7,6 +7,7 @@ icon: phosphor-duotone:book-open
 # Anleitungen
 
 - [Themes](themes.md) - die integrierten Themes und wie du dein eigenes schreibst
+- [Icons](icons.md) - Emoji oder ein benanntes Icon aus einer von acht mitgelieferten Bibliotheken, auf jeder Seite/jedem Nav-Eintrag
 - [Suche](search.md) - wie der statische Suchindex funktioniert
 - [Deployment auf GitHub Pages](deployment.md) - der integrierte GitHub-Actions-Workflow
 - [Markdown-Erweiterungen](markdown.md) - Admonitions, Fußnoten, Definitionslisten und Mermaid-Diagramme

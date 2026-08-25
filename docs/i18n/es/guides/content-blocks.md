@@ -46,7 +46,7 @@ son todos opcionales (una tarjeta sin `href` se renderiza como una
 tarjeta simple, no clicable). `icon` se resuelve de la misma forma que
 los valores `icon` de frontmatter/nav - un emoji sencillo, o un icono con
 nombre de una biblioteca incluida (`icon="phosphor-duotone:rocket-launch"`,
-`icon="lucide:rocket"`, ...) - consulta [Temas: Iconos](themes.md#iconos):
+`icon="lucide:rocket"`, ...) - consulta [Iconos](icons.md):
 
 ```markdown title="Example" linenums="1"
 ::: cards
@@ -225,6 +225,63 @@ inalcanzable nunca afecta al tiempo de construcción:
 
 ::: link-preview url="https://boxlang.io" title="BoxLang" description="Un lenguaje JVM dinámico y multiparadigma." image="https://boxlang.io/og.png"
 :::
+
+## Prompt
+
+Un contenedor con estilo propio para un prompt de IA reutilizable - el
+equivalente propio de bx-sites al [bloque Prompt](https://gitbook.com/docs/create-content/blocks/prompt)
+de GitBook. El cuerpo del bloque *es* el texto del prompt, escrito como
+Markdown normal (así que los encabezados, listas y código que contenga
+siguen recibiendo su propio formato); todo prompt obtiene un botón
+"Copy" que copia ese texto fuente exacto, marcado de formato incluido,
+listo para pegar en cualquier herramienta de IA con la que lo estés
+usando. `description` (un resumen opcional de una línea) e `icon`
+(resuelto de la misma forma que el propio `icon` de `::: card` - por
+defecto usa un glifo de destello cuando se omite) son ambos opcionales:
+
+```markdown title="Ejemplo" linenums="1"
+::: prompt description="Summarizes a pull request for a changelog entry" icon="phosphor-duotone:git-pull-request"
+Summarize the following pull request diff as a single changelog entry,
+written for an end user rather than a developer. Group related changes
+together and skip anything purely internal (refactors, tests, CI).
+:::
+```
+
+::: prompt description="Summarizes a pull request for a changelog entry" icon="phosphor-duotone:git-pull-request"
+Summarize the following pull request diff as a single changelog entry,
+written for an end user rather than a developer. Group related changes
+together and skip anything purely internal (refactors, tests, CI).
+:::
+
+Añade `expanded="preview"` para recortar un prompt largo a una vista
+previa corta, con desvanecido, hasta que quien lee haga clic en "Show
+more", o `expanded="hidden"` para que empiece completamente colapsado
+detrás de un botón "Show prompt" - útil para una página que enumera
+varios prompts seguidos. Omite `expanded` (o ajústalo a `"full"`, el
+valor predeterminado) para mostrar siempre el prompt completo:
+
+```markdown title="Ejemplo" linenums="1"
+::: prompt description="A longer, multi-step prompt" expanded="preview"
+1. Read the attached error log line by line.
+2. For each stack trace, identify the failing module.
+3. Group failures by root cause, not by timestamp.
+4. Propose one fix per root cause, not per failure.
+5. Skip anything that already has an open issue - list those separately.
+:::
+```
+
+::: prompt description="A longer, multi-step prompt" expanded="preview"
+1. Read the attached error log line by line.
+2. For each stack trace, identify the failing module.
+3. Group failures by root cause, not by timestamp.
+4. Propose one fix per root cause, not per failure.
+5. Skip anything that already has an open issue - list those separately.
+:::
+
+A diferencia del propio bloque Prompt de GitBook, aquí no hay ningún
+menú "Open in AI providers" - bx-sites nunca se comunica con un
+proveedor de IA externo, así que esa parte del bloque propio de GitBook
+no tiene equivalente.
 
 ## Novedades (registro de cambios)
 

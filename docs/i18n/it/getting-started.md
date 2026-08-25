@@ -215,7 +215,7 @@ Your content here.
   nav - un'emoji semplice, oppure un'icona con nome da una libreria
   integrata (`rocket`, `lucide:rocket`, `tabler:rocket`, o un
   `custom:my-icon` proprio del progetto) - vedi
-  [Temi: Icone](guides/themes.md#icons)
+  [Icone](guides/icons.md)
 - `summary` - una riga di presentazione mostrata sotto il titolo (distinta
   da `description`, che è solo per i meta tag e non viene mai mostrata
   sulla pagina stessa)

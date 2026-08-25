@@ -7,6 +7,7 @@ icon: phosphor-duotone:book-open
 # ガイド
 
 - [テーマ](themes.md) - 組み込みテーマと独自テーマの作成方法
+- [アイコン](icons.md) - 絵文字、または8つの同梱ライブラリのいずれかからの名前付きアイコンを、任意のページ/nav エントリで使用する方法
 - [検索](search.md) - 静的検索インデックスの仕組み
 - [GitHub Pages へのデプロイ](deployment.md) - 組み込みの GitHub Actions ワークフロー
 - [Markdown 拡張機能](markdown.md) - Admonition、脚注、定義リスト、Mermaid ダイアグラム
