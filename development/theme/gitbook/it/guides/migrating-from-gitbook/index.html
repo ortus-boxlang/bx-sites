@@ -119,7 +119,7 @@ richiesto una valutazione, esattamente cosa e dove:</p>
 <pre><code>Migrated 14 page(s) from [/path/to/gitbook-export] into my-docs/docs/, wrote my-docs/docs/nav.json
 
 2 item(s) need a manual look:
-  - guides/advanced.md: Unsupported GitBook block [{% prompt %}] - left in its original syntax, needs manual conversion
+  - guides/advanced.md: Unsupported GitBook block [{% conditional-content %}] - left in its original syntax, needs manual conversion
   - guides/layout.md: Column width=&quot;one-third&quot; is not a plain length/percentage - dropped, review manually
 </code></pre>
 <p>Niente viene mai scartato in silenzio - un blocco che questo strumento
@@ -148,6 +148,7 @@ eseguirlo di nuovo.</p>
 <tr><td><code>{% embed url=&quot;...&quot; %}</code></td><td><a href="/bx-sites/development/theme/gitbook/it/guides/content-blocks/index.html#embed"><code>::: embed</code></a></td></tr>
 <tr><td><code>{% content-ref url=&quot;...&quot; %}</code></td><td><a href="/bx-sites/development/theme/gitbook/it/guides/content-blocks/index.html#page-link"><code>::: page-link</code></a></td></tr>
 <tr><td><code>{% details %}</code> / <code>{% expand %}</code></td><td><a href="/bx-sites/development/theme/gitbook/it/guides/content-blocks/index.html#expandable"><code>::: expandable</code></a></td></tr>
+<tr><td><code>{% prompt description=&quot;...&quot; icon=&quot;...&quot; defaultExpanded=&quot;...&quot; %}</code></td><td><a href="/bx-sites/development/theme/gitbook/it/guides/content-blocks/index.html#prompt"><code>::: prompt</code></a> - <code>openInAIProviders</code> viene scartato, segnalato come avviso quando era attivato</td></tr>
 </tbody>
 </table>
 <p>Un blocco mostrato come esempio letterale delimitato nel tuo contenuto
@@ -156,11 +157,10 @@ stare, non frainteso per quello reale.</p>
 <h2 id="cosa-richiede-un-controllo-manuale"><a href="#cosa-richiede-un-controllo-manuale" id="cosa-richiede-un-controllo-manuale" name="cosa-richiede-un-controllo-manuale" class="anchor"></a>Cosa richiede un controllo manuale</h2>
 <p>Alcuni blocchi di GitBook non hanno alcun equivalente in bx-sites e
 vengono lasciati nella propria sintassi originale <code>{% %}</code> invece di
-essere indovinati: <strong>Prompt</strong> (un blocco di generazione AI - non c'è
-nulla contro cui eseguirlo una volta migrato), <strong>Contenuto condizionale</strong>
-(visibilità basata sull'account GitBook, un concetto che bx-sites non ha),
-e la barra di ricerca <strong>Ask AI</strong>. Qualsiasi altra cosa che questo
-strumento non riconosce - un blocco con un errore di battitura, una
+essere indovinati: <strong>Contenuto condizionale</strong> (visibilità basata
+sull'account GitBook, un concetto che bx-sites non ha) e la barra di
+ricerca <strong>Ask AI</strong>. Qualsiasi altra cosa che questo strumento non
+riconosce - un blocco con un errore di battitura, una
 funzionalità di GitBook aggiunta dopo la scrittura di questo strumento -
 riceve lo stesso trattamento: lasciata così com'è, segnalata come
 avviso.</p>
@@ -192,7 +192,7 @@ navigazione. Da qui in poi è un normale progetto bx-sites: scegli un
 <a href="/bx-sites/development/theme/gitbook/it/guides/deployment/index.html">distribuisci</a> quando ne sei soddisfatto.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/migrating-from-gitbook.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/gitbook/it/guides/migrating-from-gitbook.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 25, 2026, 5&#x3a;32&#x3a;13 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/migrating-from-gitbook.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/gitbook/it/guides/migrating-from-gitbook.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 25, 2026, 5&#x3a;37&#x3a;35 AM</span></div>
 			</article>
 
 			<nav class="gb-page-nav" aria-label="Navigazione della pagina">
@@ -233,6 +233,7 @@ navigazione. Da qui in poi è un normale progetto bx-sites: scegli un
 	<script src="/bx-sites/development/theme/gitbook/it/assets/toc-collapse.js" defer></script>
 	<script src="/bx-sites/development/theme/gitbook/it/assets/tabs.js" defer></script>
 	<script src="/bx-sites/development/theme/gitbook/it/assets/conditional-content-init.js" defer></script>
+	<script src="/bx-sites/development/theme/gitbook/it/assets/prompt-init.js" defer></script>
 
 	<script src="/bx-sites/development/theme/gitbook/it/assets/vendor/mermaid/mermaid.min.js"></script>
 	<script src="/bx-sites/development/theme/gitbook/it/assets/mermaid-init.js"></script>

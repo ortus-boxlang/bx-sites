@@ -118,7 +118,7 @@ a judgment call, exactly what and where:</p>
 <pre data-bxsites-title="migrate output"><code class="language-text">Migrated 14 page(s) from [/path/to/gitbook-export] into my-docs/docs/, wrote my-docs/docs/nav.json
 
 2 item(s) need a manual look:
-  - guides/advanced.md: Unsupported GitBook block [{% prompt %}] - left in its original syntax, needs manual conversion
+  - guides/advanced.md: Unsupported GitBook block [{% conditional-content %}] - left in its original syntax, needs manual conversion
   - guides/layout.md: Column width=&quot;one-third&quot; is not a plain length/percentage - dropped, review manually
 </code></pre>
 <p>Nothing is ever silently dropped - a block this tool doesn't know how to
@@ -146,6 +146,7 @@ source export and run it again.</p>
 <tr><td><code>{% embed url=&quot;...&quot; %}</code></td><td><a href="/bx-sites/development/theme/vuepress/guides/content-blocks/index.html#embed"><code>::: embed</code></a></td></tr>
 <tr><td><code>{% content-ref url=&quot;...&quot; %}</code></td><td><a href="/bx-sites/development/theme/vuepress/guides/content-blocks/index.html#page-link"><code>::: page-link</code></a></td></tr>
 <tr><td><code>{% details %}</code> / <code>{% expand %}</code></td><td><a href="/bx-sites/development/theme/vuepress/guides/content-blocks/index.html#expandable"><code>::: expandable</code></a></td></tr>
+<tr><td><code>{% prompt description=&quot;...&quot; icon=&quot;...&quot; defaultExpanded=&quot;...&quot; %}</code></td><td><a href="/bx-sites/development/theme/vuepress/guides/content-blocks/index.html#prompt"><code>::: prompt</code></a> - <code>openInAIProviders</code> is dropped, reported as a warning when it was turned on</td></tr>
 </tbody>
 </table>
 <p>A block shown as a literal fenced example in your GitBook content (rather
@@ -153,10 +154,9 @@ than used for real) is correctly left alone, not misread as the real
 thing.</p>
 <h2 id="what-needs-a-manual-look"><a href="#what-needs-a-manual-look" id="what-needs-a-manual-look" name="what-needs-a-manual-look" class="anchor"></a>What needs a manual look</h2>
 <p>A handful of GitBook blocks have no bx-sites equivalent at all and are
-left in their original <code>{% %}</code> syntax rather than guessed at: <strong>Prompt</strong>
-(an AI-generation block - there's nothing to run it against once
-migrated), <strong>Conditional content</strong> (GitBook-account-based visibility, not
-a concept bx-sites has), and the <strong>Ask AI</strong> search bar. Anything else this
+left in their original <code>{% %}</code> syntax rather than guessed at:
+<strong>Conditional content</strong> (GitBook-account-based visibility, not a concept
+bx-sites has) and the <strong>Ask AI</strong> search bar. Anything else this
 tool doesn't recognize - a typo'd block, a GitBook feature added after
 this tool was written - gets the same treatment: left as-is, reported as
 a warning.</p>
@@ -184,7 +184,7 @@ bx-sites project: pick a <a href="/bx-sites/development/theme/vuepress/guides/th
 you're happy with it.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/migrating-from-gitbook.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/vuepress/guides/migrating-from-gitbook.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 25, 2026, 5&#x3a;32&#x3a;13 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/migrating-from-gitbook.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/vuepress/guides/migrating-from-gitbook.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 25, 2026, 5&#x3a;37&#x3a;35 AM</span></div>
 			</article>
 
 			<nav class="vp-page-nav" aria-label="Page navigation">
@@ -225,6 +225,7 @@ you're happy with it.</p>
 	<script src="/bx-sites/development/theme/vuepress/assets/toc-collapse.js" defer></script>
 	<script src="/bx-sites/development/theme/vuepress/assets/tabs.js" defer></script>
 	<script src="/bx-sites/development/theme/vuepress/assets/conditional-content-init.js" defer></script>
+	<script src="/bx-sites/development/theme/vuepress/assets/prompt-init.js" defer></script>
 
 	<script src="/bx-sites/development/theme/vuepress/assets/vendor/mermaid/mermaid.min.js"></script>
 	<script src="/bx-sites/development/theme/vuepress/assets/mermaid-init.js"></script>

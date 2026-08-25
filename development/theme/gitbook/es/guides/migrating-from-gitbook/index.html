@@ -120,7 +120,7 @@ decisión de criterio, exactamente qué y dónde:</p>
 <pre><code>Migrated 14 page(s) from [/path/to/gitbook-export] into my-docs/docs/, wrote my-docs/docs/nav.json
 
 2 item(s) need a manual look:
-  - guides/advanced.md: Unsupported GitBook block [{% prompt %}] - left in its original syntax, needs manual conversion
+  - guides/advanced.md: Unsupported GitBook block [{% conditional-content %}] - left in its original syntax, needs manual conversion
   - guides/layout.md: Column width=&quot;one-third&quot; is not a plain length/percentage - dropped, review manually
 </code></pre>
 <p>Nada se descarta jamás silenciosamente - un bloque que esta herramienta
@@ -149,6 +149,7 @@ exportación de origen y volver a ejecutarlo.</p>
 <tr><td><code>{% embed url=&quot;...&quot; %}</code></td><td><a href="/bx-sites/development/theme/gitbook/es/guides/content-blocks/index.html#incrustación"><code>::: embed</code></a></td></tr>
 <tr><td><code>{% content-ref url=&quot;...&quot; %}</code></td><td><a href="/bx-sites/development/theme/gitbook/es/guides/content-blocks/index.html#enlace-de-página"><code>::: page-link</code></a></td></tr>
 <tr><td><code>{% details %}</code> / <code>{% expand %}</code></td><td><a href="/bx-sites/development/theme/gitbook/es/guides/content-blocks/index.html#expandible"><code>::: expandable</code></a></td></tr>
+<tr><td><code>{% prompt description=&quot;...&quot; icon=&quot;...&quot; defaultExpanded=&quot;...&quot; %}</code></td><td><a href="/bx-sites/development/theme/gitbook/es/guides/content-blocks/index.html#prompt"><code>::: prompt</code></a> - <code>openInAIProviders</code> se descarta, se reporta como advertencia cuando estaba activado</td></tr>
 </tbody>
 </table>
 <p>Un bloque mostrado como un ejemplo literal en fence en tu contenido de
@@ -157,10 +158,9 @@ malinterpretarse como el bloque real.</p>
 <h2 id="qué-necesita-revisión-manual"><a href="#qué-necesita-revisión-manual" id="qué-necesita-revisión-manual" name="qué-necesita-revisión-manual" class="anchor"></a>Qué necesita revisión manual</h2>
 <p>Un puñado de bloques de GitBook no tiene ningún equivalente en bx-sites y
 se dejan en su sintaxis <code>{% %}</code> original en lugar de adivinarse:
-<strong>Prompt</strong> (un bloque de generación con IA - no hay nada contra lo que
-ejecutarlo una vez migrado), <strong>Conditional content</strong> (visibilidad basada
-en cuenta de GitBook, no es un concepto que tenga bx-sites), y la barra de
-búsqueda <strong>Ask AI</strong>. Cualquier otra cosa que esta herramienta no
+<strong>Conditional content</strong> (visibilidad basada en cuenta de GitBook, no es
+un concepto que tenga bx-sites) y la barra de búsqueda <strong>Ask AI</strong>.
+Cualquier otra cosa que esta herramienta no
 reconozca - un bloque con un error tipográfico, una función de GitBook
 añadida después de que se escribiera esta herramienta - recibe el mismo
 tratamiento: se deja tal cual, se reporta como advertencia.</p>
@@ -195,7 +195,7 @@ es un proyecto bx-sites normal: elige un <a href="/bx-sites/development/theme/gi
 estés satisfecho con él.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/migrating-from-gitbook.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/gitbook/es/guides/migrating-from-gitbook.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 25, 2026, 5&#x3a;32&#x3a;13 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/migrating-from-gitbook.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/theme/gitbook/es/guides/migrating-from-gitbook.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 25, 2026, 5&#x3a;37&#x3a;35 AM</span></div>
 			</article>
 
 			<nav class="gb-page-nav" aria-label="Navegaci&oacute;n de p&aacute;gina">
@@ -236,6 +236,7 @@ estés satisfecho con él.</p>
 	<script src="/bx-sites/development/theme/gitbook/es/assets/toc-collapse.js" defer></script>
 	<script src="/bx-sites/development/theme/gitbook/es/assets/tabs.js" defer></script>
 	<script src="/bx-sites/development/theme/gitbook/es/assets/conditional-content-init.js" defer></script>
+	<script src="/bx-sites/development/theme/gitbook/es/assets/prompt-init.js" defer></script>
 
 	<script src="/bx-sites/development/theme/gitbook/es/assets/vendor/mermaid/mermaid.min.js"></script>
 	<script src="/bx-sites/development/theme/gitbook/es/assets/mermaid-init.js"></script>
