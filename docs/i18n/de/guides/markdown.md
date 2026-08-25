@@ -195,6 +195,39 @@ vollständiges Markdown, also Code-Fences, Listen, Admonitions - alles, was
 du auch sonst irgendwo schreiben würdest. Keine `bxsites.yaml`-Konfiguration
 nötig - immer aktiv.
 
+## Tabellen
+
+Standard-GFM-Pipe-Tabellen - keine `bxsites.yaml`-Konfiguration nötig,
+immer aktiv:
+
+```markdown title="Example" linenums="1"
+| Feature      | Community | Enterprise |
+| ------------ | :-------: | ---------: |
+| Themes       |    10     |         10 |
+| Multi-locale |    Yes    |        Yes |
+| Support      |  Forums   |     24/7   |
+```
+
+Was so gerendert wird:
+
+| Feature      | Community | Enterprise |
+| ------------ | :-------: | ---------: |
+| Themes       |    10     |         10 |
+| Multi-locale |    Yes    |        Yes |
+| Support      |  Forums   |     24/7   |
+
+Eine Zeile aus `---` unter der Kopfzeile schaltet die Tabelle ein; setze
+Doppelpunkte in diese Trennzeile, um die Ausrichtung pro Spalte zu steuern
+- `:---` links, `:---:` zentriert, `---:` rechts. Der Zellinhalt ist
+normales Inline-Markdown, also funktionieren `code`, **fett** und
+[Links](../index.md) alle.
+
+Details zum Parsen - kurze Zeilen werden aufgefüllt, lange Zeilen werden
+gekürzt, und die CSS-Klasse, mit der jede `<table>` gerendert wird - werden
+alle über
+[`markdown.tableOptions`](../configuration.md#markdown) in `bxsites.yaml`
+gesteuert; die obigen Standardwerte sind fast immer das, was du willst.
+
 ## Codeblöcke
 
 Fenced Codeblöcke werden clientseitig syntax-hervorgehoben

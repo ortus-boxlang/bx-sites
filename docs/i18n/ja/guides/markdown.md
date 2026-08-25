@@ -188,6 +188,36 @@ flowchart LR
 リスト、Admonition など、他のどこにでも書けるものが使えます。`bxsites.yaml`
 の設定は不要 - 常に有効です。
 
+## テーブル
+
+標準の GFM パイプテーブルです - `bxsites.yaml` の設定は不要で、常に有効です:
+
+```markdown title="Example" linenums="1"
+| Feature      | Community | Enterprise |
+| ------------ | :-------: | ---------: |
+| Themes       |    10     |         10 |
+| Multi-locale |    Yes    |        Yes |
+| Support      |  Forums   |     24/7   |
+```
+
+これは次のようにレンダリングされます:
+
+| Feature      | Community | Enterprise |
+| ------------ | :-------: | ---------: |
+| Themes       |    10     |         10 |
+| Multi-locale |    Yes    |        Yes |
+| Support      |  Forums   |     24/7   |
+
+見出しの下にある `---` の行がテーブルを有効にします。その区切り行にコロンを
+付けることで、列ごとの配置を制御できます - `:---` は左寄せ、`:---:` は
+中央寄せ、`---:` は右寄せです。セルの内容は通常のインライン Markdown なので、
+`code`、**太字**、[リンク](../index.md) がすべて使えます。
+
+パース時の細かい挙動 - 短い行は埋められ、長い行は切り詰められ、各
+`<table>` がレンダリングされる際の CSS クラス - はすべて `bxsites.yaml` の
+[`markdown.tableOptions`](../configuration.md#markdown) で制御されます。
+上記のデフォルト値でほとんどの場合は十分です。
+
 ## コードブロック
 
 フェンスコードブロックはクライアントサイドで構文ハイライトされます

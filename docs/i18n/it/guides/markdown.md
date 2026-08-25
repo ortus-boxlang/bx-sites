@@ -195,6 +195,39 @@ completo, quindi blocchi di codice, liste, ammonizioni, qualsiasi cosa
 scriveresti altrove. Nessuna configurazione di `bxsites.yaml` necessaria -
 sempre attivo.
 
+## Tabelle
+
+Tabelle a pipe GFM standard - nessuna configurazione di `bxsites.yaml`
+necessaria, sempre attive:
+
+```markdown title="Example" linenums="1"
+| Feature      | Community | Enterprise |
+| ------------ | :-------: | ---------: |
+| Themes       |    10     |         10 |
+| Multi-locale |    Yes    |        Yes |
+| Support      |  Forums   |     24/7   |
+```
+
+Che viene renderizzato così:
+
+| Feature      | Community | Enterprise |
+| ------------ | :-------: | ---------: |
+| Themes       |    10     |         10 |
+| Multi-locale |    Yes    |        Yes |
+| Support      |  Forums   |     24/7   |
+
+Una riga di `---` sotto l'intestazione attiva la tabella; metti i due
+punti su quella riga separatrice per controllare l'allineamento per
+colonna - `:---` sinistra, `:---:` centro, `---:` destra. Il contenuto
+delle celle è normale markdown inline, quindi `code`, **grassetto**, e
+[link](../index.md) funzionano tutti.
+
+I dettagli del parsing - le righe corte vengono riempite, le righe lunghe
+vengono troncate, e la classe CSS con cui viene renderizzata ogni
+`<table>` - sono tutti controllati da
+[`markdown.tableOptions`](../configuration.md#markdown) in `bxsites.yaml`;
+i valori predefiniti sopra sono quasi sempre quello che vuoi.
+
 ## Blocchi di codice
 
 I blocchi di codice delimitati vengono evidenziati lato client

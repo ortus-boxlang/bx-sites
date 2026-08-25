@@ -197,6 +197,39 @@ pestaña es markdown completo, así que fences de código, listas,
 admoniciones, lo que sea que escribirías en cualquier otra parte. Sin
 necesidad de configuración en `bxsites.yaml` - siempre activo.
 
+## Tablas
+
+Tablas de pipes GFM estándar - sin necesidad de configuración en
+`bxsites.yaml`, siempre activas:
+
+```markdown title="Example" linenums="1"
+| Feature      | Community | Enterprise |
+| ------------ | :-------: | ---------: |
+| Themes       |    10     |         10 |
+| Multi-locale |    Yes    |        Yes |
+| Support      |  Forums   |     24/7   |
+```
+
+Lo que se renderiza como:
+
+| Feature      | Community | Enterprise |
+| ------------ | :-------: | ---------: |
+| Themes       |    10     |         10 |
+| Multi-locale |    Yes    |        Yes |
+| Support      |  Forums   |     24/7   |
+
+Una fila de `---` bajo el encabezado activa la tabla; pon dos puntos en
+esa fila separadora para controlar la alineación por columna - `:---`
+izquierda, `:---:` centro, `---:` derecha. El contenido de las celdas es
+markdown inline normal, así que `code`, **negrita**, y
+[enlaces](../index.md) funcionan todos.
+
+Los detalles de parseo - las filas cortas se rellenan, las filas largas se
+recortan, y la clase CSS con la que se renderiza cada `<table>` - están
+todos controlados por
+[`markdown.tableOptions`](../configuration.md#markdown) de `bxsites.yaml`;
+los valores por defecto de arriba son casi siempre lo que quieres.
+
 ## Bloques de Código
 
 Los bloques de código con fence se resaltan sintácticamente del lado del

@@ -186,6 +186,36 @@ single tab group; a tab's own content is full markdown, so code fences,
 lists, admonitions, whatever you'd write anywhere else. No `bxsites.yaml`
 config needed - always on.
 
+## Tables
+
+Standard GFM pipe tables - no `bxsites.yaml` config needed, always on:
+
+```markdown title="Example" linenums="1"
+| Feature      | Community | Enterprise |
+| ------------ | :-------: | ---------: |
+| Themes       |    10     |         10 |
+| Multi-locale |    Yes    |        Yes |
+| Support      |  Forums   |     24/7   |
+```
+
+Which renders as:
+
+| Feature      | Community | Enterprise |
+| ------------ | :-------: | ---------: |
+| Themes       |    10     |         10 |
+| Multi-locale |    Yes    |        Yes |
+| Support      |  Forums   |     24/7   |
+
+A row of `---` under the header turns on the table; put colons on that
+separator row to control alignment per-column - `:---` left, `:---:`
+center, `---:` right. Cell content is regular inline markdown, so `code`,
+**bold**, and [links](../index.md) all work.
+
+Parsing details - short rows get padded, long rows get trimmed, and the
+CSS class every `<table>` renders with - are all controlled by
+`bxsites.yaml`'s [`markdown.tableOptions`](../configuration.md#markdown);
+the defaults above are almost always what you want.
+
 ## Code Blocks
 
 Fenced code blocks are syntax-highlighted client-side (highlight.js), no
