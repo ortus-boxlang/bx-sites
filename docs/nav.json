@@ -4,7 +4,11 @@
 		"title": "Introduction",
 		"children": [
 			"getting-started.md",
-			"cli-reference.md"
+			"cli-reference.md",
+			"about.md",
+			"license.md",
+			"contribute.md",
+			"troubleshooting.md"
 		]
 	},
 	{
