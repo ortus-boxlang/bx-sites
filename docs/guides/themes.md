@@ -87,7 +87,10 @@ regardless of palette:
   `docs/versions/` folder with more than one version in it. See
   [Configuration](../configuration.md#versioning).
 - **A themed `404.html`**, served automatically by most static hosts
-  (including GitHub Pages) for any unmatched path.
+  (including GitHub Pages) for any unmatched path. Add a `404.md` at the
+  root of `docs/` (or `src/`) to override its title and body with your
+  own - it's never built as a regular page (no nav entry, no
+  `sitemap.xml` URL), just rendered into `site/404.html` in its place.
 - **A custom logo and favicon**, when `bxsites.yaml`'s `theme.logo`/
   `theme.favicon` are set. See [Configuration](../configuration.md#theme).
 - **A collapsible sidebar nav**, opt-in via `theme.options.navCollapsible` -

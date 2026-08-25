@@ -177,6 +177,15 @@ class {
 
 		var navConfig = resolveExplicitNav( docsDir, config.nav )
 		var mainPages = variables.docsLoader.load( docsDir )
+		// A `404.md` at the root of docsDir is the custom-404 convention
+		// (write404Page()'s own docblock) - pulled out here, before it ever
+		// reaches renderDocTree(), so it's never built as a normal page
+		// (nav entry, sitemap.xml URL, tags/search index) that nothing else
+		// links to.
+		var custom404Page = mainPages.filter( p => compareNoCase( p.relativePath, "404.md" ) == 0 )
+		if ( custom404Page.len() ) {
+			mainPages = mainPages.filter( p => compareNoCase( p.relativePath, "404.md" ) != 0 )
+		}
 		// Loaded (frontmatter parsed, not yet markdown-converted) up front,
 		// purely so the main tree's own nav can carry a "Blog" entry from
 		// its very first render - see renderDocTree()'s own blogNavUrl
@@ -356,7 +365,7 @@ class {
 			}
 		}
 
-		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, "Latest", locales, defaultLocaleCode, functions )
+		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, "Latest", locales, defaultLocaleCode, functions, docsDir, plugins, imageManifest, custom404Page.len() ? custom404Page[ 1 ] : {} )
 		writeTagsPage( tagsPages, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, siteOrigin, functions )
 		variables.redirectGenerator.write( mainResult.pages, siteDir, urls.basePath, config.redirects )
 
@@ -1192,9 +1201,23 @@ class {
 	}
 
 	/**
-	 * Renders a generic "page not found" page through the active theme and
+	 * Renders the site's "page not found" page through the active theme and
 	 * writes it to `site/404.html` - the filename GitHub Pages (and most
 	 * static hosts) automatically serve for any unmatched path.
+	 *
+	 * By-convention override: a `404.md` at the root of `docs`/`src`
+	 * (SourceDirResolver.bx) is never built as a normal page - build()
+	 * pulls it out of `mainPages` before renderDocTree() ever sees it (so
+	 * it never leaks into nav/sitemap.xml/tags/search as a real, unlinked
+	 * URL) and hands it here as `custom404Page` instead. When present, its
+	 * own frontmatter `title` and markdown body (run through the same
+	 * convertMarkdown() pass every other page gets - includes, `{{ }}`/magic
+	 * functions, image variants, plugin onPageMarkdown/onPageHtml hooks)
+	 * replace the synthetic English/i18n-strings title+body below; nothing
+	 * else about the page (still no toc/prev-next/breadcrumbs - never
+	 * meaningful for a page nothing else links to) or how/where it's
+	 * written changes. No `404.md` present -> unchanged synthetic-page
+	 * behavior.
 	 *
 	 * @nav The site's nav tree
 	 * @config The site's bxsites.json config
@@ -1205,17 +1228,36 @@ class {
 	 * @currentVersion Always `"Latest"` - the 404 page is only ever written once, for the main site
 	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]` - not built per-locale in v1 (a single 404.html is all a static host serves for any unmatched path, regardless of which locale subtree the reader was in), shown here only so the header renders the same everywhere
 	 * @currentLocale The default locale's own code
-	 * @functions FunctionsLoader.load()'s own output, threaded through to themeRenderer.renderPage()
+	 * @functions FunctionsLoader.load()'s own output, threaded through to convertMarkdown()/themeRenderer.renderPage()
+	 * @docsDir Absolute path to the main tree's own docs root - only used (`custom:` icons/`::: include` resolution) when `custom404Page` is set
+	 * @plugins resolvePlugins()'s own output - only applied (onPageMarkdown/onPageHtml) when `custom404Page` is set
+	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - only used (the `<img>` -> `<picture>` rewrite) when `custom404Page` is set
+	 * @custom404Page The main tree's own `docs/404.md`, already loaded by DocsLoader.bx (title/body/frontmatter parsed, not yet markdown-converted) - `{}` (the default) keeps today's synthetic-page behavior
 	 */
-	private void function write404Page( required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required string currentVersion, array locales = [], string currentLocale = "", struct functions = {} ) {
-		var strings = variables.stringsResolver.resolve( arguments.currentLocale, arguments.config.i18n )
-		var page = {
-			title       : strings.notFoundTitle,
-			contentHtml : "<p>" & encodeForHTML( strings.notFoundBody ) & "</p>",
-			toc         : [],
-			prevPage    : { title : "", url : "" },
-			nextPage    : { title : "", url : "" },
-			breadcrumbs : []
+	private void function write404Page( required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required string currentVersion, array locales = [], string currentLocale = "", struct functions = {}, string docsDir = "", array plugins = [], struct imageManifest = {}, struct custom404Page = {} ) {
+		var page = {}
+
+		if ( arguments.custom404Page.isEmpty() ) {
+			var strings = variables.stringsResolver.resolve( arguments.currentLocale, arguments.config.i18n )
+			page = {
+				title       : strings.notFoundTitle,
+				contentHtml : "<p>" & encodeForHTML( strings.notFoundBody ) & "</p>",
+				toc         : [],
+				prevPage    : { title : "", url : "" },
+				nextPage    : { title : "", url : "" },
+				breadcrumbs : []
+			}
+		} else {
+			var pages = [ duplicate( arguments.custom404Page ) ]
+			convertMarkdown(
+				pages, arguments.config, arguments.plugins, arguments.basePath, arguments.docsDir, arguments.imageManifest, arguments.functions,
+				arguments.nav, arguments.versions, arguments.currentVersion, arguments.locales, arguments.currentLocale
+			)
+			page = pages[ 1 ]
+			page.toc = []
+			page.prevPage = { title : "", url : "" }
+			page.nextPage = { title : "", url : "" }
+			page.breadcrumbs = []
 		}
 
 		var html = variables.themeRenderer.renderPage(

@@ -648,6 +648,28 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "Test Site" );
 			} );
 
+			it( "renders a project's own docs/404.md as the 404 page when present", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				fileWrite(
+					root & "/docs/404.md",
+					"---" & char( 10 ) & "title: Lost?" & char( 10 ) & "---" & char( 10 ) &
+						"That page wandered off. Try the [homepage](index.md)."
+				);
+
+				var result = pipeline.build( root );
+
+				expect( fileExists( root & "/site/404.html" ) ).toBeTrue();
+				var html = fileRead( root & "/site/404.html" );
+				expect( html ).toInclude( "Lost?" );
+				expect( html ).toInclude( "That page wandered off." );
+				expect( html ).notToInclude( "Page Not Found" );
+
+				// Never a regular built page: no /404/ output, and not counted among built pages.
+				expect( fileExists( root & "/site/404/index.html" ) ).toBeFalse();
+				expect( result.pageCount ).toBe( 1 );
+			} );
+
 			it( "writes a redirect stub for a page's own frontmatter redirect_from", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Home" );
