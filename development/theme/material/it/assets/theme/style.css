@@ -1396,6 +1396,29 @@ code:not( pre code ) {
 	color: #f87171;
 }
 
+/* The rest of github.min.css's own token classes (keywords, strings,
+   comments, ...) have exactly the same light-only problem - every fenced
+   code block rendered white-on-dark-page in dark mode, since nothing
+   overrode the vendored stylesheet's own light palette. These values are
+   highlight.js's own bundled "GitHub Dark" theme (styles/github-dark.min.css
+   in @highlightjs/cdn-assets, the same package github.min.css itself is
+   vendored from - see vendorAssets.mjs), scoped under [data-theme="dark"]
+   rather than swapping the whole vendored stylesheet file, the same
+   convention every other dark-mode override in this file already follows. */
+[data-theme="dark"] .hljs { color: #c9d1d9; background: #0d1117; }
+[data-theme="dark"] .hljs-doctag, [data-theme="dark"] .hljs-keyword, [data-theme="dark"] .hljs-meta .hljs-keyword, [data-theme="dark"] .hljs-template-tag, [data-theme="dark"] .hljs-template-variable, [data-theme="dark"] .hljs-type, [data-theme="dark"] .hljs-variable.language_ { color: #ff7b72; }
+[data-theme="dark"] .hljs-title, [data-theme="dark"] .hljs-title.class_, [data-theme="dark"] .hljs-title.class_.inherited__, [data-theme="dark"] .hljs-title.function_ { color: #d2a8ff; }
+[data-theme="dark"] .hljs-attr, [data-theme="dark"] .hljs-attribute, [data-theme="dark"] .hljs-literal, [data-theme="dark"] .hljs-meta, [data-theme="dark"] .hljs-number, [data-theme="dark"] .hljs-operator, [data-theme="dark"] .hljs-selector-attr, [data-theme="dark"] .hljs-selector-class, [data-theme="dark"] .hljs-selector-id, [data-theme="dark"] .hljs-variable { color: #79c0ff; }
+[data-theme="dark"] .hljs-meta .hljs-string, [data-theme="dark"] .hljs-regexp, [data-theme="dark"] .hljs-string { color: #a5d6ff; }
+[data-theme="dark"] .hljs-built_in, [data-theme="dark"] .hljs-symbol { color: #ffa657; }
+[data-theme="dark"] .hljs-code, [data-theme="dark"] .hljs-comment, [data-theme="dark"] .hljs-formula { color: #8b949e; }
+[data-theme="dark"] .hljs-name, [data-theme="dark"] .hljs-quote, [data-theme="dark"] .hljs-selector-pseudo, [data-theme="dark"] .hljs-selector-tag { color: #7ee787; }
+[data-theme="dark"] .hljs-subst { color: #c9d1d9; }
+[data-theme="dark"] .hljs-section { color: #1f6feb; font-weight: 700; }
+[data-theme="dark"] .hljs-bullet { color: #f2cc60; }
+[data-theme="dark"] .hljs-emphasis { color: #c9d1d9; font-style: italic; }
+[data-theme="dark"] .hljs-strong { color: #c9d1d9; font-weight: 700; }
+
 /* GitBook-style ::: directive blocks (see DirectiveBlockProcessor.bx) */
 .bxsites-expandable {
 	margin: 1rem 0;
