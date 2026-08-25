@@ -38,6 +38,8 @@ class {
 	variables.pageLinkResolver = new "models.build.PageLinkResolver@bxsites"()
 	variables.updatesFeedGenerator = new "models.build.UpdatesFeedGenerator@bxsites"()
 	variables.pluginLoader = new "models.build.PluginLoader@bxsites"()
+	variables.functionsLoader = new "models.build.FunctionsLoader@bxsites"()
+	variables.variablesProcessor = new "models.build.VariablesProcessor@bxsites"()
 	variables.iconResolver = new "models.build.IconResolver@bxsites"()
 	variables.imageVariantGenerator = new "models.build.ImageVariantGenerator@bxsites"()
 	variables.responsiveImageProcessor = new "models.build.ResponsiveImageProcessor@bxsites"()
@@ -138,6 +140,13 @@ class {
 		var plugins = resolvePlugins( config )
 		config = variables.pluginLoader.applyOnConfig( plugins, config )
 		var docsDir = variables.sourceDirResolver.resolve( root )
+		// A project's own "magic functions" (module spec section 8) - a
+		// single project-wide `docs/functions.bxs`, loaded once here rather
+		// than per version/locale tree, so a project doesn't need to
+		// duplicate the file into every `docs/versions/<name>/` or
+		// `docs/i18n/<code>/` folder to keep the same functions working
+		// everywhere - see FunctionsLoader.bx's own docblock.
+		var functions = variables.functionsLoader.load( docsDir )
 		var assetPipeline = applyAssetPipeline( config, root, docsDir )
 		config = assetPipeline.config
 		var imageManifest = variables.imageVariantGenerator.buildManifest( docsDir & "/assets", config.assets.images, root & "/.cache/images", config.assets.fingerprint )
@@ -176,7 +185,7 @@ class {
 		// blog posts in too.
 		var blogPosts = variables.blogDiscoverer.load( docsDir, arguments.includeDrafts )
 		var blogNavUrl = blogPosts.len() ? "blog/index.html" : ""
-		var mainResult = renderDocTree( mainPages, docsDir, config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, imageManifest, navConfig, locales, defaultLocaleCode, defaultLocaleDir, blogNavUrl, siteOrigin )
+		var mainResult = renderDocTree( mainPages, docsDir, config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, imageManifest, navConfig, locales, defaultLocaleCode, defaultLocaleDir, blogNavUrl, siteOrigin, functions )
 		var allPages = duplicate( mainResult.pages )
 		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 
@@ -208,11 +217,12 @@ class {
 				defaultLocaleCode,
 				defaultLocaleDir,
 				"",
-				siteOrigin
+				siteOrigin,
+				functions
 			)
 			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
 			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
-			writeTagsPage( versionResult.pages, versionResult.nav, config, themeDir, versionOutputDir, versionBasePath, versions, versionLocales, defaultLocaleCode, siteOrigin )
+			writeTagsPage( versionResult.pages, versionResult.nav, config, themeDir, versionOutputDir, versionBasePath, versions, versionLocales, defaultLocaleCode, siteOrigin, functions )
 			variables.redirectGenerator.write( versionResult.pages, versionOutputDir, versionBasePath )
 
 			for ( var versionLocale in versionLocales ) {
@@ -241,11 +251,12 @@ class {
 					versionLocale.code,
 					versionLocale.dir,
 					"",
-					siteOrigin
+					siteOrigin,
+					functions
 				)
 				allPages.append( prefixPageUrls( versionLocaleResult.pages, "versions/" & versionName & "/" & versionLocale.code & "/" ), true )
 				copyAssets( root, themeDir, versionLocaleOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
-				writeTagsPage( versionLocaleResult.pages, versionLocaleResult.nav, config, themeDir, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/", versions, versionLocales, versionLocale.code, siteOrigin )
+				writeTagsPage( versionLocaleResult.pages, versionLocaleResult.nav, config, themeDir, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/", versions, versionLocales, versionLocale.code, siteOrigin, functions )
 				variables.redirectGenerator.write( versionLocaleResult.pages, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/" )
 			}
 		}
@@ -276,11 +287,12 @@ class {
 				locale.code,
 				locale.dir,
 				"",
-				siteOrigin
+				siteOrigin,
+				functions
 			)
 			allPages.append( prefixPageUrls( localeResult.pages, locale.code & "/" ), true )
 			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
-			writeTagsPage( localeResult.pages, localeResult.nav, config, themeDir, localeOutputDir, urls.basePath & locale.code & "/", versions, locales, locale.code, siteOrigin )
+			writeTagsPage( localeResult.pages, localeResult.nav, config, themeDir, localeOutputDir, urls.basePath & locale.code & "/", versions, locales, locale.code, siteOrigin, functions )
 			variables.redirectGenerator.write( localeResult.pages, localeOutputDir, urls.basePath & locale.code & "/" )
 		}
 
@@ -299,7 +311,10 @@ class {
 				}
 			}
 
-			convertMarkdown( blogPosts, config, plugins, urls.basePath, docsDir, imageManifest )
+			convertMarkdown(
+				blogPosts, config, plugins, urls.basePath, docsDir, imageManifest, functions,
+				mainResult.nav, versions, "Latest", locales, defaultLocaleCode, defaultLocaleDir
+			)
 			assignTableOfContents( blogPosts )
 			assignEditAndLastUpdated( blogPosts, config, root, "" )
 			assignOgImages( blogPosts, config, siteDir )
@@ -310,10 +325,10 @@ class {
 			var blogResult = variables.blogBuilder.build( blogPosts, blogAuthors, config.blog.postsPerPage, urls.basePath, imageManifest )
 
 			for ( var post in blogResult.posts ) {
-				writeRenderedPage( post, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir, siteOrigin )
+				writeRenderedPage( post, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir, siteOrigin, functions )
 			}
 			for ( var indexPage in blogResult.indexPages ) {
-				writeRenderedPage( indexPage, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir, siteOrigin )
+				writeRenderedPage( indexPage, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir, siteOrigin, functions )
 			}
 
 			variables.markdownPublisher.publish( blogResult.posts, siteDir )
@@ -340,8 +355,8 @@ class {
 			}
 		}
 
-		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, "Latest", locales, defaultLocaleCode )
-		writeTagsPage( tagsPages, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, siteOrigin )
+		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, "Latest", locales, defaultLocaleCode, functions )
+		writeTagsPage( tagsPages, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, siteOrigin, functions )
 		variables.redirectGenerator.write( mainResult.pages, siteDir, urls.basePath, config.redirects )
 
 		if ( len( urls.absolute ) ) {
@@ -441,6 +456,8 @@ class {
 	 * @currentLocale Which `locales` entry's `code` this tree IS, for the switcher's own "selected" state - the default locale's own code for the main tree and every version tree's own default-locale render (never "")
 	 * @currentLocaleDir `"ltr"`/`"rtl"`, this tree's own locale direction - stamped onto `<html dir="...">`
 	 * @blogNavUrl A synthetic "Blog" nav entry's own `url` (`"blog/index.html"`), appended to this tree's own nav when non-empty - "" (the default) adds nothing. Only ever passed for the main tree's own render (build()'s docblock) - a version/locale tree's nav stays exactly as its own folder structure infers, same as it already does for tags (no nav entry at all there either, see writeTagsPage()'s docblock)
+	 * @siteOrigin The scheme+host portion of the site's absolute URL (no trailing slash, no basePath) - see build()'s own docblock for canonicalUrlFor()
+	 * @functions FunctionsLoader.load()'s own output (module spec section 8's "magic functions") - the single project-wide `functions.bxs`, the same for every tree, threaded through to convertMarkdown() (`{{ $name(...) }}` in markdown) and themeRenderer.renderPage() (bare `$name(...)` in a project's own `theme/` `.bxm` overrides)
 	 *
 	 * @return { pages, nav }
 	 */
@@ -463,7 +480,8 @@ class {
 		string currentLocale = "",
 		string currentLocaleDir = "ltr",
 		string blogNavUrl = "",
-		string siteOrigin = ""
+		string siteOrigin = "",
+		struct functions = {}
 	) {
 		// Deep-copied rather than aliased - `pages` gets mutated in place
 		// below (contentHtml/toc/editUrl/ogImage/... added per tree), and the
@@ -498,7 +516,10 @@ class {
 
 		directoryCreate( arguments.outputDir, true, true )
 
-		convertMarkdown( pages, arguments.config, arguments.plugins, arguments.basePath, arguments.docsDir, arguments.imageManifest )
+		convertMarkdown(
+			pages, arguments.config, arguments.plugins, arguments.basePath, arguments.docsDir, arguments.imageManifest, arguments.functions,
+			nav, arguments.versions, arguments.currentVersion, arguments.locales, arguments.currentLocale, arguments.currentLocaleDir
+		)
 		variables.pageLinkResolver.resolve( pages, arguments.basePath )
 		assignTableOfContents( pages )
 		assignPrevNext( pages, flatSequence )
@@ -512,7 +533,7 @@ class {
 			page.canonicalUrl = canonicalUrlFor( page.urlPath, arguments.basePath, arguments.siteOrigin )
 			var html = variables.themeRenderer.renderPage(
 				page, nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, arguments.currentVersion,
-				arguments.locales, arguments.currentLocale, arguments.currentLocaleDir
+				arguments.locales, arguments.currentLocale, arguments.currentLocaleDir, arguments.functions
 			)
 			var outputPath = arguments.outputDir & "/" & page.urlPath
 			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
@@ -635,8 +656,9 @@ class {
 		config = variables.pluginLoader.applyOnConfig( plugins, config )
 
 		var docsDir = variables.sourceDirResolver.resolve( root )
+		var functions = variables.functionsLoader.load( docsDir )
 		var pages = variables.docsLoader.load( docsDir )
-		convertMarkdown( pages, config, plugins, "/", docsDir )
+		convertMarkdown( pages, config, plugins, "/", docsDir, {}, functions )
 
 		var siteDir = root & "/site"
 		directoryCreate( siteDir, true, true )
@@ -688,8 +710,42 @@ class {
 	 * @basePath Root-relative base path ending with `/` - relative `.md` links are re-rooted under it, same as every other internal link the theme renders
 	 * @docsDir Absolute path to this tree's own docs root - `::: include` paths are resolved against it
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - defaults to empty, which makes the `<img>` -> `<picture>` rewrite (ResponsiveImageProcessor.bx) a no-op; buildSearchIndex() relies on exactly that default, since the search index has no use for it
+	 * @functions FunctionsLoader.load()'s own output (module spec section 8) - defaults to empty, which makes every `{{ $name(...) }}` call fail with `BxSites.UnknownFunction` (there's nothing to call), same "just doesn't resolve" shape `{{ }}` variable lookups already have against an empty `config.variables`
+	 * @nav This tree's own nav tree (NavBuilder.build()'s own output) - one of the "supporting variables" a magic function reads bare, alongside `page`/`siteConfig`/etc. (see below)
+	 * @versions Version switcher entries, same shape/meaning as ThemeRenderer.renderPage()'s own `versions` param - another supporting variable
+	 * @currentVersion Supporting variable - see ThemeRenderer.renderPage()'s own `currentVersion` param
+	 * @locales Supporting variable - see ThemeRenderer.renderPage()'s own `locales` param
+	 * @currentLocale Supporting variable - see ThemeRenderer.renderPage()'s own `currentLocale` param
+	 * @currentLocaleDir Supporting variable - see ThemeRenderer.renderPage()'s own `currentLocaleDir` param
+	 *
+	 * Also resolves every `{{ }}` expression (VariablesProcessor.bx) -
+	 * `{{ dotted.path }}` against `config.variables`, `{{ $name(...) }}`
+	 * against `functions` - immediately after the include pass above, so an
+	 * included partial's own `{{ }}` expressions resolve too, and before
+	 * every other pre-processor below, so the substituted text is ordinary
+	 * markdown source by the time tabs/math/code-annotations/directives see it.
+	 *
+	 * A magic function's own body can also bare-reference a fixed set of
+	 * "supporting variables" - `siteConfig` (this tree's `config`), `page`
+	 * (this specific page - see below for what's/isn't populated on it yet
+	 * at this point), `nav`, `basePath`, `versions`, `currentVersion`,
+	 * `locales`, `currentLocale`, `currentLocaleDir` - the same names (and,
+	 * `page` aside, the same values) a theme's own `.bxm` override already
+	 * has bare in scope (ThemeRenderer.bx), so a magic function reads them
+	 * identically regardless of which of the two places calls it. `page`
+	 * itself is this loop's own in-progress page struct (DocsLoader.bx's
+	 * own shape - `title`/`description`/`tags`/`icon`/`summary`/`ogImage`/
+	 * `urlPath`/`relativePath`/`sourcePath`/`body`/etc. are already there),
+	 * but not yet enriched with the fields only knowable after every page
+	 * in this tree has been converted - `toc`, `prevPage`/`nextPage`,
+	 * `breadcrumbs`, `editUrl`/`lastUpdated`, `iconHtml`, `markdownUrl`,
+	 * `canonicalUrl` don't exist on it yet here (renderDocTree()'s own
+	 * assignXxx() calls add those after this method returns) - by the time
+	 * the very same magic function runs again from `page.bxm`, `page` is
+	 * the fully-enriched struct instead. See
+	 * docs/guides/variables-and-functions.md's "Context variables" section.
 	 */
-	private void function convertMarkdown( required array pages, required struct config, array plugins = [], string basePath = "/", string docsDir = "", struct imageManifest = {} ) {
+	private void function convertMarkdown( required array pages, required struct config, array plugins = [], string basePath = "/", string docsDir = "", struct imageManifest = {}, struct functions = {}, array nav = [], array versions = [], string currentVersion = "Latest", array locales = [], string currentLocale = "", string currentLocaleDir = "ltr" ) {
 		for ( var page in arguments.pages ) {
 			// A page's own conversion is a pure function of its source file plus
 			// this tree's config/plugins/imageManifest, none of which change
@@ -713,6 +769,18 @@ class {
 
 			var markdown = variables.pluginLoader.applyOnPageMarkdown( arguments.plugins, page.body, page, arguments.config )
 			markdown = variables.includeProcessor.process( markdown, arguments.docsDir, page.relativePath )
+			var functionContext = {
+				siteConfig       : arguments.config,
+				page             : page,
+				nav              : arguments.nav,
+				basePath         : arguments.basePath,
+				versions         : arguments.versions,
+				currentVersion   : arguments.currentVersion,
+				locales          : arguments.locales,
+				currentLocale    : arguments.currentLocale,
+				currentLocaleDir : arguments.currentLocaleDir
+			}
+			markdown = variables.variablesProcessor.resolve( markdown, arguments.config.variables ?: {}, arguments.functions, page.relativePath, functionContext )
 
 			var tryBoxLangExtracted = variables.tryBoxLangProcessor.extract( markdown )
 			var tabsExtracted = variables.tabsProcessor.extract( tryBoxLangExtracted.markdown )
@@ -1108,12 +1176,13 @@ class {
 	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]`
 	 * @currentLocale The default locale's own code - the blog is main-tree-only in v1, not rendered per-locale
 	 * @currentLocaleDir The default locale's own direction
+	 * @functions FunctionsLoader.load()'s own output, threaded through to themeRenderer.renderPage()
 	 */
-	private void function writeRenderedPage( required struct page, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required array locales, required string currentLocale, required string currentLocaleDir, string siteOrigin = "" ) {
+	private void function writeRenderedPage( required struct page, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required array locales, required string currentLocale, required string currentLocaleDir, string siteOrigin = "", struct functions = {} ) {
 		arguments.page.canonicalUrl = canonicalUrlFor( arguments.page.urlPath, arguments.basePath, arguments.siteOrigin )
 		var html = variables.themeRenderer.renderPage(
 			arguments.page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, "Latest",
-			arguments.locales, arguments.currentLocale, arguments.currentLocaleDir
+			arguments.locales, arguments.currentLocale, arguments.currentLocaleDir, arguments.functions
 		)
 		var outputPath = arguments.siteDir & "/" & arguments.page.urlPath
 		directoryCreate( getDirectoryFromPath( outputPath ), true, true )
@@ -1134,8 +1203,9 @@ class {
 	 * @currentVersion Always `"Latest"` - the 404 page is only ever written once, for the main site
 	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]` - not built per-locale in v1 (a single 404.html is all a static host serves for any unmatched path, regardless of which locale subtree the reader was in), shown here only so the header renders the same everywhere
 	 * @currentLocale The default locale's own code
+	 * @functions FunctionsLoader.load()'s own output, threaded through to themeRenderer.renderPage()
 	 */
-	private void function write404Page( required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required string currentVersion, array locales = [], string currentLocale = "" ) {
+	private void function write404Page( required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required string currentVersion, array locales = [], string currentLocale = "", struct functions = {} ) {
 		var strings = variables.stringsResolver.resolve( arguments.currentLocale, arguments.config.i18n )
 		var page = {
 			title       : strings.notFoundTitle,
@@ -1148,7 +1218,7 @@ class {
 
 		var html = variables.themeRenderer.renderPage(
 			page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, arguments.currentVersion,
-			arguments.locales, arguments.currentLocale
+			arguments.locales, arguments.currentLocale, "ltr", arguments.functions
 		)
 		fileWrite( arguments.siteDir & "/404.html", html )
 	}
@@ -1178,8 +1248,9 @@ class {
 	 * @versions Version switcher entries as `[ { label, url } ]`
 	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]` - only the locales *this tree* itself has, same scoping renderDocTree()'s own `locales` param already uses
 	 * @currentLocale This tree's own current locale code (the default locale's own code for the main tree and every version's own default-locale render, never "")
+	 * @functions FunctionsLoader.load()'s own output, threaded through to themeRenderer.renderPage()
 	 */
-	private void function writeTagsPage( required array pages, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, array locales = [], string currentLocale = "", string siteOrigin = "" ) {
+	private void function writeTagsPage( required array pages, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, array locales = [], string currentLocale = "", string siteOrigin = "", struct functions = {} ) {
 		var built = variables.tagsIndexBuilder.build( arguments.pages, arguments.basePath )
 		if ( !built.hasTags ) {
 			return
@@ -1198,7 +1269,7 @@ class {
 
 		var html = variables.themeRenderer.renderPage(
 			page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, "Latest",
-			arguments.locales, arguments.currentLocale
+			arguments.locales, arguments.currentLocale, "ltr", arguments.functions
 		)
 		directoryCreate( arguments.siteDir & "/tags", true, true )
 		fileWrite( arguments.siteDir & "/tags/index.html", html )
