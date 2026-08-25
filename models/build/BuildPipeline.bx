@@ -1321,7 +1321,7 @@ class {
 
 	/**
 	 * Whether this build should produce/copy bx-sites' own static search
-	 * index and lunr widget - `config.search` is the master on/off switch
+	 * index and MiniSearch widget - `config.search` is the master on/off switch
 	 * (module spec section 7); `config.searchProvider.provider` then decides
 	 * whether the *local* index is actually needed (SearchProviderRegistry.bx) -
 	 * `false` only for `algolia`, which is fed from its own hosted index
@@ -1357,7 +1357,7 @@ class {
 	 * highlight widget unconditionally), the vendored third-party CSS/JS every built site
 	 * needs with no CDN/internet access (module spec section 8 - highlight.js
 	 * and Alpine.js always, Bootstrap's own CSS/JS for the `bootstrap` theme,
-	 * lunr.js alongside search.js, mermaid.js alongside mermaid-init.js when
+	 * MiniSearch alongside search.js, mermaid.js alongside mermaid-init.js when
 	 * `mermaid` is on, Swagger UI alongside openapi-init.js when `openapi`
 	 * is on), and a project's own `docs/assets/**` to `site/assets/`
 	 * (module spec section 5, step 6).
@@ -1366,7 +1366,7 @@ class {
 	 * @themeDir Absolute path to the resolved theme folder
 	 * @siteDir Absolute path to the build output directory
 	 * @themeName bxsites.json's `theme.name` - selects which vendored theme-specific assets (currently just Bootstrap's own CSS/JS) to copy
-	 * @searchEnabled Whether to copy the shared search.js/lunr widget - searchNeedsLocalIndex()'s own result, so this is only true for the `local` search provider (or one bx-sites doesn't otherwise know about), never `algolia`
+	 * @searchEnabled Whether to copy the shared search.js/MiniSearch widget - searchNeedsLocalIndex()'s own result, so this is only true for the `local` search provider (or one bx-sites doesn't otherwise know about), never `algolia`
 	 * @mermaidEnabled Whether to copy the shared mermaid-init.js widget and the vendored mermaid.js bundle itself
 	 * @mathEnabled Whether to copy the shared math-init.js (KaTeX auto-render) widget
 	 * @openapiEnabled Whether to copy the shared openapi-init.js widget and the vendored Swagger UI bundle/CSS - only ever needed by a project actually using a `::: openapi` block (DirectiveBlockProcessor.bx)
@@ -1400,7 +1400,7 @@ class {
 
 		if ( arguments.searchEnabled ) {
 			fileCopy( moduleAssetsDir() & "/search.js", arguments.siteDir & "/assets/search.js" )
-			directoryCopy( moduleAssetsDir() & "/vendor/lunr", arguments.siteDir & "/assets/vendor/lunr", true )
+			directoryCopy( moduleAssetsDir() & "/vendor/minisearch", arguments.siteDir & "/assets/vendor/minisearch", true )
 		}
 
 		if ( arguments.mermaidEnabled ) {

@@ -4,9 +4,9 @@
  * and ranks results, so a query can be sanity-checked from the command
  * line without opening a browser. Mirrors the relative field weighting
  * the real client-side widget uses (resources/assets/search.js's own
- * lunr.js field boosts: title 10, tags 8, headings 5, body 1) with a
- * simple per-term substring match instead of lunr's full tokenizing/
- * stemming index - close enough to sanity-check ranking, not a
+ * MiniSearch field boosts: title 10, tags 8, headings 5, body 1) with a
+ * simple per-term substring match instead of MiniSearch's full tokenizing/
+ * fuzzy-matching index - close enough to sanity-check ranking, not a
  * replacement for the real widget.
  */
 class {
@@ -54,7 +54,7 @@ class {
 	/**
 	 * Sums this doc's weighted score across every query term - a term
 	 * matching in more than one field (e.g. both title and body) counts
-	 * for each field it's found in, same as lunr's own per-field scoring.
+	 * for each field it's found in, same as MiniSearch's own per-field scoring.
 	 *
 	 * @doc One search-index.json entry: { title, url, headings, body, tags }
 	 * @terms Lowercased, non-blank query terms
