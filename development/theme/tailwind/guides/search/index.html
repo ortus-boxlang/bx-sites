@@ -46,7 +46,7 @@
 
 	<script>window.__BXSITES_BASE_PATH__ = "/bx-sites/development/theme/tailwind/";</script>
 	<script>window.__BXSITES_SEARCH_NO_RESULTS__ = "No\x20results\x20found.";</script>
-	<script src="/bx-sites/development/theme/tailwind/assets/vendor/lunr/lunr.min.js"></script>
+	<script src="/bx-sites/development/theme/tailwind/assets/vendor/minisearch/minisearch.js"></script>
 	<script src="/bx-sites/development/theme/tailwind/assets/search.js" defer></script>
 
 	<script src="/bx-sites/development/theme/tailwind/assets/vendor/alpine/cdn.min.js" defer></script>
@@ -84,7 +84,7 @@
 
 				<h1 class="relative mb-6 border-b-4 border-[#FFF500] pb-2 text-2xl font-bold" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M192,112a80,80,0,1,1-80-80A80,80,0,0,1,192,112Z" opacity="0.2"/><path d="M229.66,218.34,179.6,168.28a88.21,88.21,0,1,0-11.32,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg></span> Search</h1>
 <div class="mb-4 flex flex-wrap gap-2"><a class="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700 hover:bg-cyan-100" href="/bx-sites/development/theme/tailwind/tags/index.html#tag-guides">guides</a><a class="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700 hover:bg-cyan-100" href="/bx-sites/development/theme/tailwind/tags/index.html#tag-search">search</a></div>
-<details class="bxsites-toc-mobile group sticky top-0 z-10 mb-6 max-h-screen overflow-y-auto rounded border border-slate-200 bg-cyan-50/95 text-sm backdrop-blur xl:hidden"><summary class="flex list-none items-center justify-between gap-2 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">On this page<span class="h-1.5 w-1.5 shrink-0 rotate-45 border-b-2 border-r-2 border-current transition-transform group-open:-rotate-[135deg]"></span></summary><div class="px-4 pb-3"><ul class="space-y-1"><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#local-the-default">Local &#x28;the default&#x29;</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#how-it-works">How it works</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#keyboard-shortcuts">Keyboard shortcuts</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#turning-it-off">Turning it off</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#rebuilding-just-the-index">Rebuilding just the index</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#algolia">Algolia</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#pagefind">Pagefind</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#other-search-providers">Other search providers</a></li></ul></div></details>
+<details class="bxsites-toc-mobile group sticky top-0 z-10 mb-6 max-h-screen overflow-y-auto rounded border border-slate-200 bg-cyan-50/95 text-sm backdrop-blur xl:hidden"><summary class="flex list-none items-center justify-between gap-2 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">On this page<span class="h-1.5 w-1.5 shrink-0 rotate-45 border-b-2 border-r-2 border-current transition-transform group-open:-rotate-[135deg]"></span></summary><div class="px-4 pb-3"><ul class="space-y-1"><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#local-the-default">Local &#x28;the default&#x29;</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#how-it-works">How it works</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#keyboard-shortcuts">Keyboard shortcuts</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#turning-it-off">Turning it off</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#rebuilding-just-the-index">Rebuilding just the index</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#algolia">Algolia</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#pagefind">Pagefind</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#choosing-a-provider">Choosing a provider</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#building-your-own-provider">Building your own provider</a></li></ul></div></details>
 				<div class="prose max-w-none">
 					<h1 id="search"><a href="#search" id="search" name="search" class="anchor"></a>Search</h1>
 <p>BxSites ships one search provider by default and can be pointed at others
@@ -94,9 +94,14 @@ provider is active.</p>
 <h2 id="local-the-default"><a href="#local-the-default" id="local-the-default" name="local-the-default" class="anchor"></a>Local (the default)</h2>
 <p>BxSites' search is fully static and client-side - the same approach
 <a href="https://www.mkdocs.org/">mkdocs</a> uses by default: an index built once at
-<code>build</code> time, and <a href="https://lunrjs.com/">lunr.js</a> doing the actual searching
-in the visitor's browser. There's no server, database, or external search
-service involved.</p>
+<code>build</code> time, and <a href="https://lucaong.github.io/minisearch/">MiniSearch</a> doing
+the actual searching in the visitor's browser. There's no server, database,
+or external search service involved.</p>
+<p>MiniSearch adds prefix matching (finds &quot;installation&quot; while you're still
+typing &quot;instal&quot;) and typo-tolerant fuzzy matching (finds &quot;search&quot; for a
+query like &quot;serch&quot;) on top of the same per-field boosting every provider
+below uses (title weighted highest, then tags, then headings, then body) -
+both are on by default, no extra configuration needed.</p>
 <h2 id="how-it-works"><a href="#how-it-works" id="how-it-works" name="how-it-works" class="anchor"></a>How it works</h2>
 <ol>
 <li>At <code>build</code> time, <code>SearchIndexer</code> walks every non-hidden page and writes
@@ -104,15 +109,15 @@ service involved.</p>
 frontmatter <code>tags</code>, the text of every heading on the page, and a
 truncated plain-text copy of its body (HTML tags stripped).</li>
 <li>Each theme's <code>search.bxm</code> partial renders a search box; <code>layout.bxm</code>
-only includes it (and the <code>lunr.js</code> + shared <code>search.js</code> scripts) when
+only includes it (and the MiniSearch bundle + shared <code>search.js</code> scripts) when
 <code>bxsites.yaml</code>'s <code>search</code> is <code>true</code> and <code>searchProvider.provider</code> is
 <code>&quot;local&quot;</code> (the default - see <a href="#other-search-providers">Other providers</a>
 below for what changes with a different one).</li>
 <li>In the browser, the shared <code>assets/search.js</code> widget fetches
-<code>search-index.json</code> once, builds a <code>lunr</code> index from it (<code>title</code>
+<code>search-index.json</code> once, builds a <code>MiniSearch</code> index from it (<code>title</code>
 weighted highest, then frontmatter <code>tags</code>, then <code>headings</code>, then plain
-body text), and re-searches it on every keystroke - no network
-round-trip per query.</li>
+body text, with prefix and fuzzy matching both turned on), and
+re-searches it on every keystroke - no network round-trip per query.</li>
 </ol>
 <h2 id="keyboard-shortcuts"><a href="#keyboard-shortcuts" id="keyboard-shortcuts" name="keyboard-shortcuts" class="anchor"></a>Keyboard shortcuts</h2>
 <ul>
@@ -131,7 +136,7 @@ Docusaurus and GitBook all share.</li>
 <li><strong><code>Escape</code></strong> also closes the sidebar box's own results dropdown and
 blurs it, independent of the palette above.</li>
 </ul>
-<p>The palette reuses the exact same already-built <code>lunr</code> index the sidebar
+<p>The palette reuses the exact same already-built <code>MiniSearch</code> index the sidebar
 widget itself builds, rather than fetching <code>search-index.json</code> a second
 time - only ever available for <code>local</code> (the default provider); <code>algolia</code>
 gets its own Cmd+K for free from DocSearch itself (<code>keyboardShortcuts</code>
@@ -142,7 +147,7 @@ own - neither opens this module's own palette.</p>
 <pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">search: false
 </code></pre>
 <p>Skips building <code>search-index.json</code> entirely, and skips the search box, the
-vendored <code>lunr.js</code> script, and the shared <code>search.js</code> widget in every
+vendored MiniSearch script, and the shared <code>search.js</code> widget in every
 rendered page - a project with search off ships nothing search-related at
 all. This
 is the master switch - it applies no matter which <code>searchProvider</code> is
@@ -176,7 +181,7 @@ shipped straight into every rendered page). <code>insights</code> (<code>false</
 turns on DocSearch's own click/conversion analytics.</p>
 <p>With <code>algolia</code> active:</p>
 <ul>
-<li>No <code>search-index.json</code> is built, and the shared <code>lunr.js</code>/<code>search.js</code>
+<li>No <code>search-index.json</code> is built, and the shared <code>MiniSearch</code>/<code>search.js</code>
 widget isn't shipped - Algolia serves results from its own hosted index,
 populated by <a href="https://docsearch.algolia.com/docs/what-is-docsearch/">DocSearch's crawler</a>
 or your own <a href="https://www.algolia.com/products/search-and-discovery/crawler/">Algolia Crawler</a>
@@ -219,7 +224,7 @@ failed build.</li>
 in one pass, unlike bx-sites' own per-tree <code>search-index.json</code>. Pagefind
 writes its own bundle straight into <code>site/pagefind/</code> - self-hosted, no
 CDN involved.</li>
-<li>No <code>search-index.json</code> is built, and the shared <code>lunr.js</code>/<code>search.js</code>
+<li>No <code>search-index.json</code> is built, and the shared <code>MiniSearch</code>/<code>search.js</code>
 widget isn't shipped (same as <code>algolia</code>) - and <code>bxSites search-index</code> is
 a no-op for the same reason (see above).</li>
 <li>Each built-in theme renders an empty <code>#bxsites-search-pagefind</code>
@@ -227,25 +232,107 @@ container, and <code>layout.bxm</code> loads <code>site/pagefind/pagefind-ui.{cs
 and calls <code>new PagefindUI({...})</code> against it - Pagefind renders its own
 inline search box and results into that container.</li>
 </ul>
-<h2 id="other-search-providers"><a href="#other-search-providers" id="other-search-providers" name="other-search-providers" class="anchor"></a>Other search providers</h2>
+<h2 id="choosing-a-provider"><a href="#choosing-a-provider" id="choosing-a-provider" name="choosing-a-provider" class="anchor"></a>Choosing a provider</h2>
+<div class="bxsites-table-wrap"><table class="table">
+<thead>
+<tr><th> </th><th><code>local</code> (default)</th><th><code>algolia</code></th><th><code>pagefind</code></th></tr>
+</thead>
+<tbody>
+<tr><td>Server/account needed</td><td>No</td><td>Yes (Algolia account)</td><td>No</td></tr>
+<tr><td>Indexed from</td><td><code>search-index.json</code> (title/tags/headings/truncated body)</td><td>Algolia's own hosted index (crawler/API)</td><td>The built <code>site/</code> HTML directly</td></tr>
+<tr><td>Fuzzy/prefix matching</td><td>Yes (MiniSearch)</td><td>Yes (Algolia's own engine)</td><td>Yes (Pagefind's own engine)</td></tr>
+<tr><td>Extra install</td><td>None</td><td>None (client-only)</td><td>The <code>pagefind</code> CLI on <code>PATH</code> at build time</td></tr>
+<tr><td>Best for</td><td>Most projects - zero setup, zero ongoing dependency</td><td>Large sites wanting hosted analytics/typo-tolerance tuning</td><td>Large multi-version/multi-locale sites wanting full-page indexing without a hosted account</td></tr>
+</tbody>
+</table></div>
+<p>Both <code>algolia</code> and <code>pagefind</code> are real, built-in alternatives - see their
+own sections above for exactly what changes when you pick one. Everything
+below is for the fourth option: a search service this module doesn't ship
+built-in support for.</p>
+<h2 id="building-your-own-provider"><a href="#building-your-own-provider" id="building-your-own-provider" name="building-your-own-provider" class="anchor"></a>Building your own provider</h2>
 <p><code>searchProvider.provider</code> isn't limited to <code>&quot;local&quot;</code>/<code>&quot;algolia&quot;</code>/<code>&quot;pagefind&quot;</code> -
 any other value is accepted by <code>bxsites.yaml</code> as-is (BxSites' own config
-validation only checks the three providers above). There's no plugin hook
-for this one - the built-in themes simply render nothing for an
-unrecognized provider name, and wiring up a fourth search service
-(Meilisearch, Typesense, etc.) is a project-level
-<a href="/bx-sites/development/theme/tailwind/guides/themes/index.html#overriding-a-theme">theme override</a>: copy a built-in theme into
-your project's own <code>theme/</code> folder and add your provider's markup/scripts
-to its <code>layout.bxm</code>/<code>search.bxm</code>, reading <code>siteConfig.searchProvider</code> to
-decide when to render them - <code>searchProviderName eq &quot;...&quot;</code> branches for
-the mount point in <code>search.bxm</code>, matching branches in <code>layout.bxm</code> for its
-CSS/JS, and (if it isn't crawler-hosted like Algolia) whatever indexing
-step that product needs against <code>site/</code> after <code>build</code> - the same shape
-this module's own <code>layout.bxm</code>/<code>BuildPipeline.bx</code> already use for
-<code>algolia</code>/<code>pagefind</code>.</p>
+validation only checks the three providers above, and freely allows an
+arbitrary sub-block alongside it, e.g. <code>searchProvider.meilisearch: {...}</code>,
+for your own provider's own settings). There's no plugin hook for the UI
+itself - the built-in themes simply render nothing for an unrecognized
+provider name - so wiring up a fourth search service (Meilisearch,
+Typesense, a proprietary internal search API, ...) is a project-level
+<a href="/bx-sites/development/theme/tailwind/guides/themes/index.html#overriding-a-theme">theme override</a>. Worked example, wiring up
+<a href="https://www.meilisearch.com/">Meilisearch</a>:</p>
+<ol>
+<li><strong>Configure it</strong> - any shape you want, since <code>bxsites.yaml</code> doesn't
+validate it:</li>
+</ol>
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">   search: true
+   searchProvider:
+     provider: meilisearch
+     meilisearch:
+       host: https://my-project.meilisearch.io
+       apiKey: a1b2c3d4e5f6...
+       indexName: my-docs
+</code></pre>
+<ol start="2">
+<li>
+<p><strong>Eject a theme to customize</strong> - <code>bxSites theme:new --theme=bootstrap</code>
+copies the built-in <code>bootstrap</code> theme into your project's own <code>theme/</code>
+folder (see <a href="/bx-sites/development/theme/tailwind/guides/themes/index.html#overriding-a-theme">Overriding a theme</a>);
+project-theme-wins resolution means bx-sites now renders through your
+copy instead of the built-in one.</p>
+</li>
+<li>
+<p><strong>Add the mount point</strong> - <code>theme/search.bxm</code> already branches on
+<code>variables.searchProviderName</code> for <code>local</code>/<code>algolia</code>/<code>pagefind</code>; add
+your own branch the same way:</p>
+</li>
+</ol>
+<pre data-bxsites-title="theme&#x2f;search.bxm"><code class="language-html">   &lt;bx:if condition=&quot;#variables.searchProviderName eq 'meilisearch'#&quot;&gt;
+       &lt;div id=&quot;bxsites-search-meilisearch&quot;&gt;&lt;/div&gt;
+   &lt;/bx:if&gt;
+</code></pre>
+<ol start="4">
+<li><strong>Load the client and wire it up</strong> - <code>theme/layout.bxm</code> already has a
+<code>&lt;bx:if condition=&quot;#variables.searchEnabled and variables.searchProviderName eq 'algolia'#&quot;&gt;</code>
+block loading DocSearch's CSS/JS and calling <code>docsearch({...})</code>; add the
+equivalent for Meilisearch's own
+<a href="https://github.com/meilisearch/meilisearch-docsearch">instant-meilisearch</a>
+widget, reading your own config block back out of <code>siteConfig</code>:</li>
+</ol>
+<pre data-bxsites-title="theme&#x2f;layout.bxm"><code class="language-html">   &lt;bx:if condition=&quot;#variables.searchEnabled and variables.searchProviderName eq 'meilisearch'#&quot;&gt;
+       &lt;script src=&quot;https://cdn.jsdelivr.net/npm/@meilisearch/instant-meilisearch/dist/instant-meilisearch.umd.min.js&quot;&gt;&lt;/script&gt;
+       &lt;script&gt;
+           document.addEventListener( &quot;DOMContentLoaded&quot;, function () {
+               // instantMeiliSearch()/instantsearch() setup, reading:
+               //   host      : &quot;#encodeForJavaScript( variables.siteConfig.searchProvider.meilisearch.host ?: '' )#&quot;
+               //   apiKey    : &quot;#encodeForJavaScript( variables.siteConfig.searchProvider.meilisearch.apiKey ?: '' )#&quot;
+               //   indexName : &quot;#encodeForJavaScript( variables.siteConfig.searchProvider.meilisearch.indexName ?: '' )#&quot;
+               // mounted against #bxsites-search-meilisearch, the same shape
+               // the built-in algolia branch already uses just above this one.
+           } );
+       &lt;/script&gt;
+   &lt;/bx:if&gt;
+</code></pre>
+<ol start="5">
+<li><strong>Index the built site, if it isn't crawler-hosted</strong> - Algolia's own
+crawler populates its index out of band, so nothing else is needed
+there; Meilisearch (like Pagefind) needs <em>something</em> to push documents
+into it after <code>build</code> writes <code>site/</code>. Rather than shelling out from a
+theme template, use this module's own plugin system: a
+<code>models/BxSitesPlugin.bx</code> with an <code>onBuildComplete( siteDir, config )</code>
+hook (see <a href="/bx-sites/development/theme/tailwind/guides/plugins/index.html">Plugins</a>) runs once, after every doc tree is
+written, with the finished <code>site/</code> directory and the resolved config
+both in hand - reuse <code>site/search-index.json</code> (still built for
+<code>meilisearch</code> too, since <code>SearchProviderRegistry.usesLocalIndex()</code>
+defaults to <code>true</code> for any provider it doesn't otherwise know about)
+as the payload to push, exactly like <code>PagefindIndexer.bx</code> shells out to
+the <code>pagefind</code> CLI against <code>site/</code> in the built-in provider.</li>
+</ol>
+<p>This is the same shape <code>layout.bxm</code>/<code>search.bxm</code>/<code>BuildPipeline.bx</code> already
+use for <code>algolia</code>/<code>pagefind</code> internally - a fourth provider is just one
+more branch alongside them, entirely in project-owned files.</p>
 
 				</div>
-<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/bx-sites/development/theme/tailwind/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 25, 2026, 10&#x3a;58&#x3a;01 PM</span></div>
+<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/bx-sites/development/theme/tailwind/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 25, 2026, 11&#x3a;27&#x3a;58 PM</span></div>
 			</article>
 
 			<nav class="mt-8 flex justify-between border-t border-slate-200 pt-4 text-sm font-semibold" aria-label="Page navigation">
@@ -261,7 +348,7 @@ this module's own <code>layout.bxm</code>/<code>BuildPipeline.bx</code> already 
 		</main>
 
 		<aside class="hidden w-56 shrink-0 p-4 xl:sticky xl:top-6 xl:block xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto">
-			<nav class="mb-6 rounded border border-slate-200 bg-cyan-50/40 px-4 py-3 text-sm"><div class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">On this page</div><ul class="space-y-1"><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#local-the-default">Local &#x28;the default&#x29;</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#how-it-works">How it works</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#keyboard-shortcuts">Keyboard shortcuts</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#turning-it-off">Turning it off</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#rebuilding-just-the-index">Rebuilding just the index</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#algolia">Algolia</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#pagefind">Pagefind</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#other-search-providers">Other search providers</a></li></ul></nav>
+			<nav class="mb-6 rounded border border-slate-200 bg-cyan-50/40 px-4 py-3 text-sm"><div class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">On this page</div><ul class="space-y-1"><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#local-the-default">Local &#x28;the default&#x29;</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#how-it-works">How it works</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#keyboard-shortcuts">Keyboard shortcuts</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#turning-it-off">Turning it off</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#rebuilding-just-the-index">Rebuilding just the index</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#algolia">Algolia</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#pagefind">Pagefind</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#choosing-a-provider">Choosing a provider</a></li><li class=""><a class="text-slate-700 hover:text-cyan-700" href="#building-your-own-provider">Building your own provider</a></li></ul></nav>
 		</aside>
 
 	</div>

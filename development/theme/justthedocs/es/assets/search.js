@@ -1,10 +1,15 @@
 /**
  * Shared client-side search widget for bx-sites' built-in themes - fully
- * static, no server dependency, matching mkdocs' own default search
- * (lunr.js) per module spec section 7. Every theme's own search.bxm partial
- * just renders the markup (an #bxsites-search-input + #bxsites-search-results
- * pair); this one script wires all of them the same way against the shared
- * search-index.json format built by SearchIndexer.bx.
+ * static, no server dependency, the same "index once at build time, search
+ * in the browser" approach mkdocs uses by default, per module spec section 7.
+ * Every theme's own search.bxm partial just renders the markup (an
+ * #bxsites-search-input + #bxsites-search-results pair); this one script
+ * wires all of them the same way against the shared search-index.json format
+ * built by SearchIndexer.bx, using MiniSearch (vendored alongside this file)
+ * to actually index/query it - prefix matching and typo-tolerant fuzzy
+ * matching are both built into MiniSearch's own `search()` call, so unlike
+ * the lunr.js widget this replaced, there's no separate wildcard-query retry
+ * needed to match a partial word while typing.
  *
  * `window.__BXSITES_BASE_PATH__` (set inline by layout.bxm from
  * BaseUrlResolver's `basePath`) prefixes both the index fetch and every
@@ -22,8 +27,8 @@
  * every other doc-search widget (Algolia DocSearch, Pagefind, VitePress,
  * Docusaurus, GitBook) uses. Its own markup is built entirely in JS and
  * appended to `document.body` - no theme template changes needed - and it
- * reuses the exact same already-fetched `idx`/`docsById` the sidebar widget
- * itself builds below, rather than fetching search-index.json twice. A
+ * reuses the exact same already-built `idx` the sidebar widget itself
+ * builds below, rather than fetching search-index.json twice. A
  * theme's `.bxsites-search-kbd` badge (if it renders one) gets its text
  * swapped to the platform-correct hint.
  */
@@ -169,7 +174,6 @@
 			return;
 		}
 
-		var docsById = {};
 		var idx = null;
 
 		fetch( basePath() + "search-index.json" )
@@ -177,27 +181,26 @@
 				return res.json();
 			} )
 			.then( function ( docs ) {
-				docs.forEach( function ( doc, i ) {
-					docsById[ i ] = doc;
+				idx = new MiniSearch( {
+					fields      : [ "title", "tags", "headings", "body" ],
+					storeFields : [ "title", "url" ],
+					searchOptions : {
+						boost  : { title : 10, tags : 8, headings : 5 },
+						prefix : true,
+						fuzzy  : 0.2
+					}
 				} );
 
-				idx = lunr( function () {
-					this.ref( "id" );
-					this.field( "title", { boost : 10 } );
-					this.field( "tags", { boost : 8 } );
-					this.field( "headings", { boost : 5 } );
-					this.field( "body" );
-
-					docs.forEach( function ( doc, i ) {
-						this.add( {
-							id       : i,
-							title    : doc.title,
-							tags     : ( doc.tags || [] ).join( " " ),
-							headings : ( doc.headings || [] ).join( " " ),
-							body     : doc.body
-						} );
-					}, this );
-				} );
+				idx.addAll( docs.map( function ( doc, i ) {
+					return {
+						id       : i,
+						title    : doc.title,
+						url      : doc.url,
+						tags     : ( doc.tags || [] ).join( " " ),
+						headings : ( doc.headings || [] ).join( " " ),
+						body     : doc.body
+					};
+				} ) );
 			} )
 			.catch( function () {
 				// The index may legitimately be missing (search disabled for
@@ -205,38 +208,24 @@
 			} );
 
 		// Shared by the sidebar widget below and buildPalette()'s own query
-		// handler - looks up against whatever `idx`/`docsById` the fetch
-		// above finished building (both stay empty/null, so this just
-		// returns no hits, until it does).
-		//
-		// Tries a trailing-wildcard query first (partial-word matches while
-		// still typing), falling back to a plain query - not just on a
-		// thrown error (lunr's own wildcard query bypasses its stemming
-		// pipeline entirely, so "advanced*" plainly finds nothing against
-		// an index that stored the stemmed term "advanc" - it doesn't
-		// throw, it just silently returns zero hits), but whenever the
-		// wildcard attempt comes back empty.
+		// handler - looks up against whatever `idx` the fetch above finished
+		// building (stays null, so this just returns no hits, until it does).
+		// MiniSearch's own `prefix`/`fuzzy` search options (set above) already
+		// cover partial words while typing and simple typos in one call - no
+		// separate wildcard-query retry needed, unlike the lunr.js widget
+		// this replaced.
 		function search( query ) {
 			if ( !query || !idx ) {
 				return [];
 			}
 			var hits = [];
 			try {
-				hits = idx.search( query + "*" );
+				hits = idx.search( query );
 			} catch ( e ) {
 				hits = [];
 			}
-			if ( !hits.length ) {
-				try {
-					hits = idx.search( query );
-				} catch ( e ) {
-					hits = [];
-				}
-			}
 			return hits.slice( 0, 10 ).map( function ( hit ) {
-				return docsById[ hit.ref ];
-			} ).filter( function ( doc ) {
-				return !!doc;
+				return { title : hit.title, url : hit.url };
 			} );
 		}
 
