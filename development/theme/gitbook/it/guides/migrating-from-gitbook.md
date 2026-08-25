@@ -109,7 +109,7 @@ riporta opportunisticamente, ma non aspettartelo per la maggior parte
 degli export reali. Imposta le icone a mano in seguito - o nel
 frontmatter proprio di una pagina, oppure nell'
 [`icon` di una voce di `docs/nav.json`](../configuration.md#nav) -
-usando un'[icona con nome](themes.md#icons) da una delle otto librerie
+usando un'[icona con nome](icons.md) da una delle otto librerie
 incluse (non serve far corrispondere le icone basate su Font Awesome
 proprie di GitBook; scegli qualunque nome sembri adatto nella galleria di
 [Phosphor](https://phosphoricons.com/) - uno qualsiasi dei suoi sei pesi -

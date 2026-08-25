@@ -83,7 +83,7 @@
 
 				<h1 class="docsy-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,127.17a96.48,96.48,0,0,1-2.39,22.18A24,24,0,0,1,198.21,168H152a24,24,0,0,0-24,24,24,24,0,0,1-32,22.61C58.73,201.44,32,169.81,32,128a96,96,0,0,1,95-96C179.84,31.47,223.55,74.35,224,127.17Z" opacity="0.2"/><path d="M200.77,53.89A103.27,103.27,0,0,0,128,24h-1.07A104,104,0,0,0,24,128c0,43,26.58,79.06,69.36,94.17A32,32,0,0,0,136,192a16,16,0,0,1,16-16h46.21a31.81,31.81,0,0,0,31.2-24.88,104.43,104.43,0,0,0,2.59-24A103.28,103.28,0,0,0,200.77,53.89Zm13,93.71A15.89,15.89,0,0,1,198.21,160H152a32,32,0,0,0-32,32,16,16,0,0,1-21.31,15.07C62.49,194.3,40,164,40,128a88,88,0,0,1,87.09-88h.9a88.35,88.35,0,0,1,88,87.25A88.86,88.86,0,0,1,213.81,147.6ZM140,76a12,12,0,1,1-12-12A12,12,0,0,1,140,76ZM96,100A12,12,0,1,1,84,88,12,12,0,0,1,96,100Zm0,56a12,12,0,1,1-12-12A12,12,0,0,1,96,156Zm88-56a12,12,0,1,1-12-12A12,12,0,0,1,184,100Z"/></svg></span> Themes</h1>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/docsy/de/tags/index.html#tag-anleitungen">anleitungen</a><a class="page-tag" href="/bx-sites/development/theme/docsy/de/tags/index.html#tag-themes">themes</a></div>
-<details class="bxsites-toc-mobile docsy-toc--mobile"><summary class="docsy-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="docsy-toc__item docsy-toc__item--2"><a href="#integriert">Integriert</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#ein-veröffentlichtes-theme-installieren">Ein ver&ouml;ffentlichtes Theme installieren</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#air-gappedoffline-websites">Air-gapped&#x2f;Offline-Websites</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#icons">Icons</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#der-themeprovider-vertrag">Der ThemeProvider -Vertrag</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben">Farben anpassen, ohne ein Theme zu &uuml;berschreiben</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#homepage-hero-banner">Homepage-Hero-Banner</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#ein-theme-überschreiben">Ein Theme &uuml;berschreiben</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#ein-theme-von-grund-auf-schreiben">Ein Theme von Grund auf schreiben</a></li></ul></details>
+<details class="bxsites-toc-mobile docsy-toc--mobile"><summary class="docsy-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="docsy-toc__item docsy-toc__item--2"><a href="#integriert">Integriert</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#ein-veröffentlichtes-theme-installieren">Ein ver&ouml;ffentlichtes Theme installieren</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#air-gappedoffline-websites">Air-gapped&#x2f;Offline-Websites</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#der-themeprovider-vertrag">Der ThemeProvider -Vertrag</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben">Farben anpassen, ohne ein Theme zu &uuml;berschreiben</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#homepage-hero-banner">Homepage-Hero-Banner</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#ein-theme-überschreiben">Ein Theme &uuml;berschreiben</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#ein-theme-von-grund-auf-schreiben">Ein Theme von Grund auf schreiben</a></li></ul></details>
 				<div class="docsy-content-body">
 				<h1 id="themes"><a href="#themes" id="themes" name="themes" class="anchor"></a>Themes</h1>
 <p>Themes sind native BoxLang-<code>.bxm</code>-Templates - es gibt keine separate
@@ -284,51 +284,10 @@ das Vendorieren der JS-Datei würde diese Abhängigkeit nicht beseitigen.</li>
 dem standardmäßigen <code>local</code>-Suchanbieter, vermeide
 <code>elk</code>-Layout-Mermaid-Diagramme, falls <code>mermaid</code> aktiviert ist, und lass
 <code>math</code>/Algolia/Analytics aus.</p>
-<h2 id="icons"><a href="#icons" id="icons" name="icons" class="anchor"></a>Icons</h2>
-<p>Die eigene <code>icon</code>-Frontmatter einer Seite (angezeigt neben ihrem Titel und
-neben ihrem Eintrag in der Sidebar-Navigation) akzeptiert entweder ein
-reines Emoji/einen kurzen Text - die ursprüngliche, weiterhin vollständig
-unterstützte Form - oder ein benanntes Icon aus einer von acht selbst
-gehosteten Bibliotheken, alle MIT-/ISC-lizenziert und mit diesem Modul
-mitgeliefert (~16.200 Icons insgesamt, kein CDN, kein zusätzliches Gewicht
-für eine gebaute Seite über die tatsächlich verwendete Handvoll Icons
-hinaus - siehe IconResolver.bx):</p>
-<pre data-bxsites-title="Frontmatter"><code class="language-markdown">---
-icon: rocket
----
-</code></pre>
-<pre data-bxsites-title="Frontmatter"><code class="language-markdown">---
-icon: lucide:rocket
----
-</code></pre>
-<pre data-bxsites-title="Frontmatter"><code class="language-markdown">---
-icon: phosphor-bold:rocket
----
-</code></pre>
-<p>Ein reines <code>rocket</code> verwendet standardmäßig <a href="https://phosphoricons.com/">Phosphor</a>,
-reguläre Stärke. Phosphor liefert alle sechs eigenen Stärken, jede mit
-eigenem Präfix: <code>phosphor-thin:</code>, <code>phosphor-light:</code>, <code>phosphor:</code> (regulär,
-identisch mit dem reinen Namen), <code>phosphor-bold:</code>, <code>phosphor-fill:</code> und
-<code>phosphor-duotone:</code>. Stelle <code>lucide:</code> voran für <a href="https://lucide.dev/icons/">Lucide</a>,
-oder <code>tabler:</code> für <a href="https://tabler.io/icons">Tabler</a>. Durchsuche die
-jeweilige eigene Galerie der Website nach dem exakten Namen - er stimmt
-genau mit dem vendorierten Dateinamen dieses Moduls überein
-(Kleinbuchstaben, mit Bindestrichen, z. B. <code>book-open</code>, <code>arrow-up-right</code>;
-Phosphors eigene Website zeigt einen Stärke-Umschalter - jede ihrer sechs
-Optionen dort entspricht einem der sechs <code>phosphor[-weight]:</code>-Präfixe
-dieses Moduls).</p>
-<p>Font Awesome ist bewusst nicht dabei - sein Duotone-Stil (und der
-Großteil seines Icon-Sets ab v6) ist Pro-only, nicht unter einer Lizenz
-verfügbar, unter der dieses Modul sie kostenlos bündeln und
-weiterverbreiten könnte.</p>
-<p>Auch eine eigene SVG-Datei eines Projekts funktioniert - lege sie unter
-<code>docs/assets/icons/my-icon.svg</code> ab und referenziere sie als
-<code>icon: custom:my-icon</code>.</p>
-<p>Ein <a href="/bx-sites/development/theme/docsy/de/configuration/index.html#nav">nav.json</a>-Eintrag kann ebenfalls ein
-eigenes <code>icon</code> setzen, das die eigene Frontmatter der Zielseite für genau
-diesen einen Eintrag überschreibt:</p>
-<pre data-bxsites-title="docs&#x2f;nav.json"><code class="language-json">{ &quot;title&quot;: &quot;Guides&quot;, &quot;path&quot;: &quot;guides/index.md&quot;, &quot;icon&quot;: &quot;lucide:book-open&quot; }
-</code></pre>
+<p>Siehe <a href="/bx-sites/development/theme/docsy/de/guides/icons/index.html">Icons</a> dafür, wie die eigene <code>icon</code>-Frontmatter einer
+Seite (oder das eigene <code>icon</code> eines <code>nav.json</code>-Eintrags) zu einem Emoji,
+einem benannten Icon aus einer von acht mitgelieferten Bibliotheken oder
+einer eigenen, projekteigenen SVG-Datei aufgelöst wird.</p>
 <h2 id="der-themeprovider-vertrag"><a href="#der-themeprovider-vertrag" id="der-themeprovider-vertrag" name="der-themeprovider-vertrag" class="anchor"></a>Der <code>ThemeProvider</code>-Vertrag</h2>
 <p>Ein Theme ist einfach ein Ordner mit:</p>
 <ul>
@@ -604,7 +563,7 @@ für dein eigenes CSS/JS, automatisch zur Build-Zeit nach
 </ul>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/docsy/de/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 25, 2026, 4&#x3a;55&#x3a;55 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/de/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/bx-sites/development/theme/docsy/de/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Aug 25, 2026, 5&#x3a;32&#x3a;13 AM</span></div>
 			</article>
 
 			<nav class="docsy-page-nav" aria-label="Seitennavigation">
@@ -620,7 +579,7 @@ für dein eigenes CSS/JS, automatisch zur Build-Zeit nach
 		</main>
 
 		<aside class="docsy-toc-sidebar">
-			<nav class="docsy-toc" aria-label="Auf dieser Seite"><div class="docsy-toc__title">Auf dieser Seite</div><ul><li class="docsy-toc__item docsy-toc__item--2"><a href="#integriert">Integriert</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#ein-veröffentlichtes-theme-installieren">Ein ver&ouml;ffentlichtes Theme installieren</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#air-gappedoffline-websites">Air-gapped&#x2f;Offline-Websites</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#icons">Icons</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#der-themeprovider-vertrag">Der ThemeProvider -Vertrag</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben">Farben anpassen, ohne ein Theme zu &uuml;berschreiben</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#homepage-hero-banner">Homepage-Hero-Banner</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#ein-theme-überschreiben">Ein Theme &uuml;berschreiben</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#ein-theme-von-grund-auf-schreiben">Ein Theme von Grund auf schreiben</a></li></ul></nav>
+			<nav class="docsy-toc" aria-label="Auf dieser Seite"><div class="docsy-toc__title">Auf dieser Seite</div><ul><li class="docsy-toc__item docsy-toc__item--2"><a href="#integriert">Integriert</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#ein-veröffentlichtes-theme-installieren">Ein ver&ouml;ffentlichtes Theme installieren</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#air-gappedoffline-websites">Air-gapped&#x2f;Offline-Websites</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#der-themeprovider-vertrag">Der ThemeProvider -Vertrag</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben">Farben anpassen, ohne ein Theme zu &uuml;berschreiben</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#homepage-hero-banner">Homepage-Hero-Banner</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#ein-theme-überschreiben">Ein Theme &uuml;berschreiben</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#ein-theme-von-grund-auf-schreiben">Ein Theme von Grund auf schreiben</a></li></ul></nav>
 		</aside>
 
 	</div>

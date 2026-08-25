@@ -46,7 +46,7 @@ son todos opcionales (una tarjeta sin `href` se renderiza como una
 tarjeta simple, no clicable). `icon` se resuelve de la misma forma que
 los valores `icon` de frontmatter/nav - un emoji sencillo, o un icono con
 nombre de una biblioteca incluida (`icon="phosphor-duotone:rocket-launch"`,
-`icon="lucide:rocket"`, ...) - consulta [Temas: Iconos](themes.md#iconos):
+`icon="lucide:rocket"`, ...) - consulta [Iconos](icons.md):
 
 ```markdown title="Example" linenums="1"
 ::: cards

@@ -42,7 +42,7 @@ wrapper - `title`, `icon`, `image` and `href` are all optional (a card
 with no `href` renders as a plain, non-clickable card). `icon` is resolved
 the same way frontmatter/nav `icon` values are - a plain emoji, or a named
 icon from a bundled library (`icon="phosphor-duotone:rocket-launch"`,
-`icon="lucide:rocket"`, ...) - see [Themes: Icons](themes.md#icons):
+`icon="lucide:rocket"`, ...) - see [Icons](icons.md):
 
 ```markdown title="Example" linenums="1"
 ::: cards

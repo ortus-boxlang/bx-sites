@@ -43,7 +43,7 @@ GitBook サイトのコンテンツを簡単に移行できる理由でもあり
 されます）。`icon` はフロントマター/ナビの `icon` 値と同じ方法で解決されます -
 プレーンな絵文字、または同梱ライブラリの名前付きアイコン
 （`icon="phosphor-duotone:rocket-launch"`、`icon="lucide:rocket"` など）
-です - [テーマ: アイコン](themes.md#アイコン) を参照してください:
+です - [アイコン](icons.md) を参照してください:
 
 ```markdown title="Example" linenums="1"
 ::: cards

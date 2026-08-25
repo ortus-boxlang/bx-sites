@@ -214,7 +214,7 @@ Your content here.
   ein reines Emoji oder ein benannter Icon-Verweis aus einer mitgelieferten
   Bibliothek (`rocket`, `lucide:rocket`, `tabler:rocket`, oder ein eigenes
   `custom:my-icon` eines Projekts) - siehe
-  [Themes: Icons](guides/themes.md#icons)
+  [Icons](guides/icons.md)
 - `summary` - eine einzeilige Einleitung, die unter dem Titel angezeigt wird
   (zu unterscheiden von `description`, die nur für Meta-Tags gedacht ist und
   nie auf der Seite selbst gerendert wird)

@@ -83,7 +83,7 @@
 
 				<h1 class="gb-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,127.17a96.48,96.48,0,0,1-2.39,22.18A24,24,0,0,1,198.21,168H152a24,24,0,0,0-24,24,24,24,0,0,1-32,22.61C58.73,201.44,32,169.81,32,128a96,96,0,0,1,95-96C179.84,31.47,223.55,74.35,224,127.17Z" opacity="0.2"/><path d="M200.77,53.89A103.27,103.27,0,0,0,128,24h-1.07A104,104,0,0,0,24,128c0,43,26.58,79.06,69.36,94.17A32,32,0,0,0,136,192a16,16,0,0,1,16-16h46.21a31.81,31.81,0,0,0,31.2-24.88,104.43,104.43,0,0,0,2.59-24A103.28,103.28,0,0,0,200.77,53.89Zm13,93.71A15.89,15.89,0,0,1,198.21,160H152a32,32,0,0,0-32,32,16,16,0,0,1-21.31,15.07C62.49,194.3,40,164,40,128a88,88,0,0,1,87.09-88h.9a88.35,88.35,0,0,1,88,87.25A88.86,88.86,0,0,1,213.81,147.6ZM140,76a12,12,0,1,1-12-12A12,12,0,0,1,140,76ZM96,100A12,12,0,1,1,84,88,12,12,0,0,1,96,100Zm0,56a12,12,0,1,1-12-12A12,12,0,0,1,96,156Zm88-56a12,12,0,1,1-12-12A12,12,0,0,1,184,100Z"/></svg></span> Themes</h1>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/gitbook/tags/index.html#tag-guides">guides</a><a class="page-tag" href="/bx-sites/development/theme/gitbook/tags/index.html#tag-themes">themes</a></div>
-<details class="bxsites-toc-mobile gb-toc--mobile"><summary class="gb-toc--mobile__summary">On this page</summary><ul><li class="gb-toc__item gb-toc__item--2"><a href="#built-in">Built in</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#installing-a-published-theme">Installing a published theme</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#air-gappedoffline-sites">Air-gapped&#x2f;offline sites</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#icons">Icons</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#the-themeprovider-contract">The ThemeProvider contract</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#customizing-colors-without-a-theme-override">Customizing colors without a theme override</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#homepage-hero-banner">Homepage hero banner</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#overriding-a-theme">Overriding a theme</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#writing-a-theme-from-scratch">Writing a theme from scratch</a></li></ul></details>
+<details class="bxsites-toc-mobile gb-toc--mobile"><summary class="gb-toc--mobile__summary">On this page</summary><ul><li class="gb-toc__item gb-toc__item--2"><a href="#built-in">Built in</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#installing-a-published-theme">Installing a published theme</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#air-gappedoffline-sites">Air-gapped&#x2f;offline sites</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#the-themeprovider-contract">The ThemeProvider contract</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#customizing-colors-without-a-theme-override">Customizing colors without a theme override</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#homepage-hero-banner">Homepage hero banner</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#overriding-a-theme">Overriding a theme</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#writing-a-theme-from-scratch">Writing a theme from scratch</a></li></ul></details>
 				<div class="gb-content-body">
 				<h1 id="themes"><a href="#themes" id="themes" name="themes" class="anchor"></a>Themes</h1>
 <p>Themes are native BoxLang <code>.bxm</code> templates - there's no separate template
@@ -264,45 +264,9 @@ file wouldn't remove that dependency.</li>
 <code>bootstrap</code>/<code>material</code>/one of the seven <code>material</code>-forked themes, the
 default <code>local</code> search provider, avoid <code>elk</code>-layout Mermaid diagrams if
 <code>mermaid</code> is on, and leave <code>math</code>/Algolia/analytics off.</p>
-<h2 id="icons"><a href="#icons" id="icons" name="icons" class="anchor"></a>Icons</h2>
-<p>A page's own <code>icon</code> frontmatter (shown next to its title, and next to its
-entry in the sidebar nav) accepts either a plain emoji/short text - the
-original, still fully supported form - or a named icon from one of eight
-self-hosted libraries, all MIT/ISC-licensed and bundled with this module
-(~16,200 icons combined, no CDN, nothing added to a built page's own
-weight beyond the handful of icons it actually uses - see IconResolver.bx):</p>
-<pre data-bxsites-title="Frontmatter"><code class="language-markdown">---
-icon: rocket
----
-</code></pre>
-<pre data-bxsites-title="Frontmatter"><code class="language-markdown">---
-icon: lucide:rocket
----
-</code></pre>
-<pre data-bxsites-title="Frontmatter"><code class="language-markdown">---
-icon: phosphor-bold:rocket
----
-</code></pre>
-<p>Bare <code>rocket</code> defaults to <a href="https://phosphoricons.com/">Phosphor</a>, regular
-weight. Phosphor ships all six of its own weights, each its own prefix:
-<code>phosphor-thin:</code>, <code>phosphor-light:</code>, <code>phosphor:</code> (regular, same as the
-bare name), <code>phosphor-bold:</code>, <code>phosphor-fill:</code> and <code>phosphor-duotone:</code>.
-Prefix with <code>lucide:</code> for <a href="https://lucide.dev/icons/">Lucide</a>, or
-<code>tabler:</code> for <a href="https://tabler.io/icons">Tabler</a> instead. Browse each
-site's own gallery for the exact name - it matches this module's own
-vendored filename exactly (lowercase, hyphenated, e.g. <code>book-open</code>,
-<code>arrow-up-right</code>; Phosphor's own site shows a weight switcher - each of
-its six options there is one of this module's six <code>phosphor[-weight]:</code>
-prefixes).</p>
-<p>Font Awesome is deliberately not one of these - its Duotone style (and
-most of its icon set from v6 on) is Pro-only, not available under a
-license this module could bundle and redistribute for free.</p>
-<p>A project's own SVG works too - drop it at <code>docs/assets/icons/my-icon.svg</code>
-and reference it as <code>icon: custom:my-icon</code>.</p>
-<p>A <a href="/bx-sites/development/theme/gitbook/configuration/index.html#nav">nav.json</a> entry can set its own <code>icon</code> too,
-overriding the target page's own frontmatter for that one entry:</p>
-<pre data-bxsites-title="docs&#x2f;nav.json"><code class="language-json">{ &quot;title&quot;: &quot;Guides&quot;, &quot;path&quot;: &quot;guides/index.md&quot;, &quot;icon&quot;: &quot;lucide:book-open&quot; }
-</code></pre>
+<p>See <a href="/bx-sites/development/theme/gitbook/guides/icons/index.html">Icons</a> for how a page's own <code>icon</code> frontmatter (or a
+<code>nav.json</code> entry's own <code>icon</code>) resolves to an emoji, a named icon from one
+of eight bundled libraries, or a project's own custom SVG.</p>
 <h2 id="the-themeprovider-contract"><a href="#the-themeprovider-contract" id="the-themeprovider-contract" name="the-themeprovider-contract" class="anchor"></a>The <code>ThemeProvider</code> contract</h2>
 <p>A theme is just a folder with:</p>
 <ul>
@@ -547,7 +511,7 @@ on <code>variables.page</code>), or an <code>assets/</code> folder for your own 
 <code>site/assets/theme/</code> automatically at build time.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/gitbook/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 25, 2026, 4&#x3a;55&#x3a;55 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/bx-sites/development/theme/gitbook/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 25, 2026, 5&#x3a;32&#x3a;13 AM</span></div>
 			</article>
 
 			<nav class="gb-page-nav" aria-label="Page navigation">
@@ -563,7 +527,7 @@ on <code>variables.page</code>), or an <code>assets/</code> folder for your own 
 		</main>
 
 		<aside class="gb-toc-sidebar">
-			<nav class="gb-toc" aria-label="On this page"><div class="gb-toc__title">On this page</div><ul><li class="gb-toc__item gb-toc__item--2"><a href="#built-in">Built in</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#installing-a-published-theme">Installing a published theme</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#air-gappedoffline-sites">Air-gapped&#x2f;offline sites</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#icons">Icons</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#the-themeprovider-contract">The ThemeProvider contract</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#customizing-colors-without-a-theme-override">Customizing colors without a theme override</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#homepage-hero-banner">Homepage hero banner</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#overriding-a-theme">Overriding a theme</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#writing-a-theme-from-scratch">Writing a theme from scratch</a></li></ul></nav>
+			<nav class="gb-toc" aria-label="On this page"><div class="gb-toc__title">On this page</div><ul><li class="gb-toc__item gb-toc__item--2"><a href="#built-in">Built in</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#installing-a-published-theme">Installing a published theme</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#air-gappedoffline-sites">Air-gapped&#x2f;offline sites</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#the-themeprovider-contract">The ThemeProvider contract</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#customizing-colors-without-a-theme-override">Customizing colors without a theme override</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#homepage-hero-banner">Homepage hero banner</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#overriding-a-theme">Overriding a theme</a></li><li class="gb-toc__item gb-toc__item--2"><a href="#writing-a-theme-from-scratch">Writing a theme from scratch</a></li></ul></nav>
 		</aside>
 
 	</div>

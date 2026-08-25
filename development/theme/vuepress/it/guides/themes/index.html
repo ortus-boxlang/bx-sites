@@ -83,7 +83,7 @@
 
 				<h1 class="vp-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,127.17a96.48,96.48,0,0,1-2.39,22.18A24,24,0,0,1,198.21,168H152a24,24,0,0,0-24,24,24,24,0,0,1-32,22.61C58.73,201.44,32,169.81,32,128a96,96,0,0,1,95-96C179.84,31.47,223.55,74.35,224,127.17Z" opacity="0.2"/><path d="M200.77,53.89A103.27,103.27,0,0,0,128,24h-1.07A104,104,0,0,0,24,128c0,43,26.58,79.06,69.36,94.17A32,32,0,0,0,136,192a16,16,0,0,1,16-16h46.21a31.81,31.81,0,0,0,31.2-24.88,104.43,104.43,0,0,0,2.59-24A103.28,103.28,0,0,0,200.77,53.89Zm13,93.71A15.89,15.89,0,0,1,198.21,160H152a32,32,0,0,0-32,32,16,16,0,0,1-21.31,15.07C62.49,194.3,40,164,40,128a88,88,0,0,1,87.09-88h.9a88.35,88.35,0,0,1,88,87.25A88.86,88.86,0,0,1,213.81,147.6ZM140,76a12,12,0,1,1-12-12A12,12,0,0,1,140,76ZM96,100A12,12,0,1,1,84,88,12,12,0,0,1,96,100Zm0,56a12,12,0,1,1-12-12A12,12,0,0,1,96,156Zm88-56a12,12,0,1,1-12-12A12,12,0,0,1,184,100Z"/></svg></span> Temi</h1>
 <div class="page-tags"><a class="page-tag" href="/bx-sites/development/theme/vuepress/it/tags/index.html#tag-guide">guide</a><a class="page-tag" href="/bx-sites/development/theme/vuepress/it/tags/index.html#tag-temi">temi</a></div>
-<details class="bxsites-toc-mobile vp-toc--mobile"><summary class="vp-toc--mobile__summary">In questa pagina</summary><ul><li class="vp-toc__item vp-toc__item--2"><a href="#integrati">Integrati</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#installare-un-tema-pubblicato">Installare un tema pubblicato</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#siti-air-gappedoffline">Siti air-gapped&#x2f;offline</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#icone">Icone</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#il-contratto-themeprovider">Il contratto ThemeProvider</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#personalizzare-i-colori-senza-sovrascrivere-un-tema">Personalizzare i colori senza sovrascrivere un tema</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#banner-hero-della-homepage">Banner hero della homepage</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#sovrascrivere-un-tema">Sovrascrivere un tema</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#scrivere-un-tema-da-zero">Scrivere un tema da zero</a></li></ul></details>
+<details class="bxsites-toc-mobile vp-toc--mobile"><summary class="vp-toc--mobile__summary">In questa pagina</summary><ul><li class="vp-toc__item vp-toc__item--2"><a href="#integrati">Integrati</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#installare-un-tema-pubblicato">Installare un tema pubblicato</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#siti-air-gappedoffline">Siti air-gapped&#x2f;offline</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#il-contratto-themeprovider">Il contratto ThemeProvider</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#personalizzare-i-colori-senza-sovrascrivere-un-tema">Personalizzare i colori senza sovrascrivere un tema</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#banner-hero-della-homepage">Banner hero della homepage</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#sovrascrivere-un-tema">Sovrascrivere un tema</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#scrivere-un-tema-da-zero">Scrivere un tema da zero</a></li></ul></details>
 				<div class="vp-content-body">
 				<h1 id="temi"><a href="#temi" id="temi" name="temi" class="anchor"></a>Temi</h1>
 <p>I temi sono template nativi BoxLang <code>.bxm</code> - non c'è alcun motore di
@@ -287,49 +287,10 @@ internet, limitati a <code>bootstrap</code>/<code>material</code>/uno dei sette 
 da <code>material</code>, al provider di ricerca <code>local</code> predefinito, evita i
 diagrammi Mermaid con layout <code>elk</code> se <code>mermaid</code> è attivo, e lascia
 disattivati <code>math</code>/Algolia/analytics.</p>
-<h2 id="icone"><a href="#icone" id="icone" name="icone" class="anchor"></a>Icone</h2>
-<p>Il frontmatter <code>icon</code> di una pagina (mostrato accanto al suo titolo, e
-accanto alla sua voce nella nav laterale) accetta sia un'emoji/testo breve
-semplice - la forma originale, ancora pienamente supportata - sia
-un'icona con nome da una delle otto librerie autoospitate, tutte con
-licenza MIT/ISC e incluse in questo modulo (circa 16.200 icone
-combinate, nessuna CDN, nulla di aggiunto al peso di una pagina compilata
-oltre alla manciata di icone effettivamente usate - vedi IconResolver.bx):</p>
-<pre data-bxsites-title="Frontmatter"><code class="language-markdown">---
-icon: rocket
----
-</code></pre>
-<pre data-bxsites-title="Frontmatter"><code class="language-markdown">---
-icon: lucide:rocket
----
-</code></pre>
-<pre data-bxsites-title="Frontmatter"><code class="language-markdown">---
-icon: phosphor-bold:rocket
----
-</code></pre>
-<p>Un semplice <code>rocket</code> ricade su <a href="https://phosphoricons.com/">Phosphor</a>,
-peso regolare. Phosphor include tutti e sei i suoi pesi, ciascuno con il
-proprio prefisso: <code>phosphor-thin:</code>, <code>phosphor-light:</code>, <code>phosphor:</code>
-(regolare, uguale al nome nudo), <code>phosphor-bold:</code>, <code>phosphor-fill:</code> e
-<code>phosphor-duotone:</code>. Usa il prefisso <code>lucide:</code> per
-<a href="https://lucide.dev/icons/">Lucide</a>, oppure <code>tabler:</code> per
-<a href="https://tabler.io/icons">Tabler</a>. Sfoglia la galleria di ciascun sito
-per il nome esatto - corrisponde esattamente al nome file incluso in
-questo modulo (minuscolo, con trattini, ad es. <code>book-open</code>,
-<code>arrow-up-right</code>; il sito di Phosphor mostra un selettore di peso -
-ciascuna delle sue sei opzioni lì corrisponde a uno dei sei prefissi
-<code>phosphor[-weight]:</code> di questo modulo).</p>
-<p>Font Awesome non è deliberatamente incluso tra queste - il suo stile
-Duotone (e la maggior parte del suo set di icone dalla v6 in poi) è
-disponibile solo con Pro, non disponibile con una licenza che questo
-modulo possa includere e ridistribuire gratuitamente.</p>
-<p>Anche un SVG del tuo progetto funziona - mettilo in
-<code>docs/assets/icons/my-icon.svg</code> e riferiscilo come <code>icon: custom:my-icon</code>.</p>
-<p>Una voce di <a href="/bx-sites/development/theme/vuepress/it/configuration/index.html#nav">nav.json</a> può impostare la propria
-<code>icon</code>, sovrascrivendo il frontmatter proprio della pagina di destinazione
-per quella singola voce:</p>
-<pre data-bxsites-title="docs&#x2f;nav.json"><code class="language-json">{ &quot;title&quot;: &quot;Guides&quot;, &quot;path&quot;: &quot;guides/index.md&quot;, &quot;icon&quot;: &quot;lucide:book-open&quot; }
-</code></pre>
+<p>Vedi <a href="/bx-sites/development/theme/vuepress/it/guides/icons/index.html">Icone</a> per come il frontmatter <code>icon</code> proprio di una
+pagina (o l'<code>icon</code> proprio di una voce di <code>nav.json</code>) viene risolto in
+un'emoji, un'icona con nome da una delle otto librerie incluse, oppure
+un SVG del tuo progetto.</p>
 <h2 id="il-contratto-themeprovider"><a href="#il-contratto-themeprovider" id="il-contratto-themeprovider" name="il-contratto-themeprovider" class="anchor"></a>Il contratto <code>ThemeProvider</code></h2>
 <p>Un tema è semplicemente una cartella con:</p>
 <ul>
@@ -598,7 +559,7 @@ oppure una cartella <code>assets/</code> per il tuo CSS/JS, copiata automaticame
 in <code>site/assets/theme/</code> al momento del build.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/vuepress/it/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 25, 2026, 4&#x3a;55&#x3a;55 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/it/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/bx-sites/development/theme/vuepress/it/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Aug 25, 2026, 5&#x3a;32&#x3a;13 AM</span></div>
 			</article>
 
 			<nav class="vp-page-nav" aria-label="Navigazione della pagina">
@@ -614,7 +575,7 @@ in <code>site/assets/theme/</code> al momento del build.</p>
 		</main>
 
 		<aside class="vp-toc-sidebar">
-			<nav class="vp-toc" aria-label="In questa pagina"><div class="vp-toc__title">In questa pagina</div><ul><li class="vp-toc__item vp-toc__item--2"><a href="#integrati">Integrati</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#installare-un-tema-pubblicato">Installare un tema pubblicato</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#siti-air-gappedoffline">Siti air-gapped&#x2f;offline</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#icone">Icone</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#il-contratto-themeprovider">Il contratto ThemeProvider</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#personalizzare-i-colori-senza-sovrascrivere-un-tema">Personalizzare i colori senza sovrascrivere un tema</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#banner-hero-della-homepage">Banner hero della homepage</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#sovrascrivere-un-tema">Sovrascrivere un tema</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#scrivere-un-tema-da-zero">Scrivere un tema da zero</a></li></ul></nav>
+			<nav class="vp-toc" aria-label="In questa pagina"><div class="vp-toc__title">In questa pagina</div><ul><li class="vp-toc__item vp-toc__item--2"><a href="#integrati">Integrati</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#installare-un-tema-pubblicato">Installare un tema pubblicato</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#siti-air-gappedoffline">Siti air-gapped&#x2f;offline</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#il-contratto-themeprovider">Il contratto ThemeProvider</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#personalizzare-i-colori-senza-sovrascrivere-un-tema">Personalizzare i colori senza sovrascrivere un tema</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#banner-hero-della-homepage">Banner hero della homepage</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#sovrascrivere-un-tema">Sovrascrivere un tema</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#scrivere-un-tema-da-zero">Scrivere un tema da zero</a></li></ul></nav>
 		</aside>
 
 	</div>

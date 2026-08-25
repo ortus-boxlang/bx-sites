@@ -110,7 +110,7 @@ ein `icon`-Feld hat, übernimmt `migrate` es opportunistisch, erwarte das
 aber bei den meisten echten Exports nicht. Setze Icons stattdessen im
 Nachhinein von Hand - entweder in der eigenen Frontmatter einer Seite,
 oder im [eigenen `icon` eines `docs/nav.json`-Eintrags](../configuration.md#nav)
-- mit einem [benannten Icon](themes.md#icons) aus einer der acht
+- mit einem [benannten Icon](icons.md) aus einer der acht
 mitgelieferten Bibliotheken (es muss nicht zu GitBooks eigenen,
 Font-Awesome-basierten Icons passen; wähle einfach den Namen, der in der
 eigenen Galerie von [Phosphor](https://phosphoricons.com/) - in jeder

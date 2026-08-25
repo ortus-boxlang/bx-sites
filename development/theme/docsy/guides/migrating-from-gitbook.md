@@ -102,7 +102,7 @@ frontmatter genuinely has an `icon` field, `migrate` carries it through
 opportunistically, but don't expect it for most real exports. Set icons
 by hand afterward instead - either a page's own frontmatter, or a
 [`docs/nav.json` entry's own `icon`](../configuration.md#nav) - using a
-[named icon](themes.md#icons) from one of the eight bundled libraries
+[named icon](icons.md) from one of the eight bundled libraries
 (no need to match GitBook's own Font-Awesome-based icons; pick whichever
 name looks right in [Phosphor](https://phosphoricons.com/) - any of its
 six weights - [Lucide](https://lucide.dev/icons/) or

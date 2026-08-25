@@ -46,7 +46,7 @@ optional (eine Card ohne `href` wird als schlichte, nicht klickbare Card
 gerendert). `icon` wird auf dieselbe Weise aufgelöst wie
 Frontmatter-/Nav-`icon`-Werte - ein reines Emoji, oder ein benanntes
 Icon aus einer mitgelieferten Bibliothek (`icon="phosphor-duotone:rocket-launch"`,
-`icon="lucide:rocket"`, ...) - siehe [Themes: Icons](themes.md#icons):
+`icon="lucide:rocket"`, ...) - siehe [Icons](icons.md):
 
 ```markdown title="Beispiel" linenums="1"
 ::: cards

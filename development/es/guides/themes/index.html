@@ -89,7 +89,7 @@
 
 					<h1 class="page-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,127.17a96.48,96.48,0,0,1-2.39,22.18A24,24,0,0,1,198.21,168H152a24,24,0,0,0-24,24,24,24,0,0,1-32,22.61C58.73,201.44,32,169.81,32,128a96,96,0,0,1,95-96C179.84,31.47,223.55,74.35,224,127.17Z" opacity="0.2"/><path d="M200.77,53.89A103.27,103.27,0,0,0,128,24h-1.07A104,104,0,0,0,24,128c0,43,26.58,79.06,69.36,94.17A32,32,0,0,0,136,192a16,16,0,0,1,16-16h46.21a31.81,31.81,0,0,0,31.2-24.88,104.43,104.43,0,0,0,2.59-24A103.28,103.28,0,0,0,200.77,53.89Zm13,93.71A15.89,15.89,0,0,1,198.21,160H152a32,32,0,0,0-32,32,16,16,0,0,1-21.31,15.07C62.49,194.3,40,164,40,128a88,88,0,0,1,87.09-88h.9a88.35,88.35,0,0,1,88,87.25A88.86,88.86,0,0,1,213.81,147.6ZM140,76a12,12,0,1,1-12-12A12,12,0,0,1,140,76ZM96,100A12,12,0,1,1,84,88,12,12,0,0,1,96,100Zm0,56a12,12,0,1,1-12-12A12,12,0,0,1,96,156Zm88-56a12,12,0,1,1-12-12A12,12,0,0,1,184,100Z"/></svg></span> Temas</h1>
 <div class="page-tags mb-3"><a class="page-tag" href="/bx-sites/development/es/tags/index.html#tag-guías">gu&iacute;as</a><a class="page-tag" href="/bx-sites/development/es/tags/index.html#tag-temas">temas</a></div>
-<details class="bxsites-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">En esta p&aacute;gina</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#incorporados">Incorporados</a></li><li class="toc-level-2"><a href="#instalar-un-tema-publicado">Instalar un tema publicado</a></li><li class="toc-level-2"><a href="#sitios-sin-conexión-a-internet-air-gapped">Sitios sin conexi&oacute;n a internet &#x28;air-gapped&#x29;</a></li><li class="toc-level-2"><a href="#iconos">Iconos</a></li><li class="toc-level-2"><a href="#el-contrato-de-themeprovider">El contrato de ThemeProvider</a></li><li class="toc-level-2"><a href="#personalizar-colores-sin-sobrescribir-un-tema">Personalizar colores sin sobrescribir un tema</a></li><li class="toc-level-2"><a href="#banner-hero-de-la-página-de-inicio">Banner hero de la p&aacute;gina de inicio</a></li><li class="toc-level-2"><a href="#sobrescribir-un-tema">Sobrescribir un tema</a></li><li class="toc-level-2"><a href="#escribir-un-tema-desde-cero">Escribir un tema desde cero</a></li></ul></details>
+<details class="bxsites-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">En esta p&aacute;gina</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#incorporados">Incorporados</a></li><li class="toc-level-2"><a href="#instalar-un-tema-publicado">Instalar un tema publicado</a></li><li class="toc-level-2"><a href="#sitios-sin-conexión-a-internet-air-gapped">Sitios sin conexi&oacute;n a internet &#x28;air-gapped&#x29;</a></li><li class="toc-level-2"><a href="#el-contrato-de-themeprovider">El contrato de ThemeProvider</a></li><li class="toc-level-2"><a href="#personalizar-colores-sin-sobrescribir-un-tema">Personalizar colores sin sobrescribir un tema</a></li><li class="toc-level-2"><a href="#banner-hero-de-la-página-de-inicio">Banner hero de la p&aacute;gina de inicio</a></li><li class="toc-level-2"><a href="#sobrescribir-un-tema">Sobrescribir un tema</a></li><li class="toc-level-2"><a href="#escribir-un-tema-desde-cero">Escribir un tema desde cero</a></li></ul></details>
 					<h1 id="temas"><a href="#temas" id="temas" name="temas" class="anchor"></a>Temas</h1>
 <p>Los temas son plantillas <code>.bxm</code> nativas de BoxLang - no hay un motor de
 plantillas ni un paso de compilación separados involucrados.</p>
@@ -292,50 +292,10 @@ limítate a <code>bootstrap</code>/<code>material</code>/uno de los siete temas 
 <code>material</code>, al proveedor de búsqueda <code>local</code> predeterminado, evita los
 diagramas Mermaid con diseño <code>elk</code> si <code>mermaid</code> está activado, y deja
 desactivados <code>math</code>/Algolia/Analytics.</p>
-<h2 id="iconos"><a href="#iconos" id="iconos" name="iconos" class="anchor"></a>Iconos</h2>
-<p>El propio frontmatter <code>icon</code> de una página (mostrado junto a su título, y
-junto a su entrada en la barra lateral de navegación) acepta ya sea un
-emoji/texto corto simple - la forma original, todavía totalmente
-compatible - o un icono con nombre de una de las ocho bibliotecas
-autoalojadas, todas con licencia MIT/ISC e incluidas con este módulo
-(~16.200 iconos combinados, sin CDN, sin nada añadido al peso de una
-página construida más allá de los pocos iconos que realmente usa -
-consulta IconResolver.bx):</p>
-<pre><code class="language-markdown">---
-icon: rocket
----
-</code></pre>
-<pre><code class="language-markdown">---
-icon: lucide:rocket
----
-</code></pre>
-<pre><code class="language-markdown">---
-icon: phosphor-bold:rocket
----
-</code></pre>
-<p>El <code>rocket</code> sin prefijo usa por defecto <a href="https://phosphoricons.com/">Phosphor</a>,
-peso regular. Phosphor incluye sus seis pesos propios, cada uno con su
-propio prefijo: <code>phosphor-thin:</code>, <code>phosphor-light:</code>, <code>phosphor:</code> (regular,
-igual que el nombre sin prefijo), <code>phosphor-bold:</code>, <code>phosphor-fill:</code> y
-<code>phosphor-duotone:</code>. Usa el prefijo <code>lucide:</code> para
-<a href="https://lucide.dev/icons/">Lucide</a>, o <code>tabler:</code> para
-<a href="https://tabler.io/icons">Tabler</a> en su lugar. Explora la propia galería
-de cada sitio para el nombre exacto - coincide exactamente con el propio
-nombre de archivo incluido en este módulo (minúsculas, con guiones, por
-ejemplo <code>book-open</code>, <code>arrow-up-right</code>; el propio sitio de Phosphor
-muestra un selector de peso - cada una de sus seis opciones allí es uno
-de los seis prefijos <code>phosphor[-weight]:</code> de este módulo).</p>
-<p>Font Awesome deliberadamente no es una de ellas - su estilo Duotone (y la
-mayor parte de su conjunto de iconos desde la v6 en adelante) es exclusivo
-de la versión Pro, no disponible bajo una licencia que este módulo pudiera
-incluir y redistribuir de forma gratuita.</p>
-<p>El propio SVG de un proyecto también funciona - colócalo en
-<code>docs/assets/icons/my-icon.svg</code> y referéncialo como <code>icon: custom:my-icon</code>.</p>
-<p>Una entrada de <a href="/bx-sites/development/es/configuration/index.html#nav">nav.json</a> también puede definir
-su propio <code>icon</code>, sobrescribiendo el propio frontmatter de la página de
-destino solo para esa entrada:</p>
-<pre><code class="language-json">{ &quot;title&quot;: &quot;Guides&quot;, &quot;path&quot;: &quot;guides/index.md&quot;, &quot;icon&quot;: &quot;lucide:book-open&quot; }
-</code></pre>
+<p>Consulta <a href="/bx-sites/development/es/guides/icons/index.html">Iconos</a> para saber cómo el propio frontmatter <code>icon</code>
+de una página (o el propio <code>icon</code> de una entrada de <code>nav.json</code>) se
+resuelve en un emoji, un icono con nombre de una de las ocho bibliotecas
+incluidas, o el SVG propio de un proyecto.</p>
 <h2 id="el-contrato-de-themeprovider"><a href="#el-contrato-de-themeprovider" id="el-contrato-de-themeprovider" name="el-contrato-de-themeprovider" class="anchor"></a>El contrato de <code>ThemeProvider</code></h2>
 <p>Un tema es simplemente una carpeta con:</p>
 <ul>
@@ -611,7 +571,7 @@ en <code>variables.page</code>), o una carpeta <code>assets/</code> para tu prop
 copiada a <code>site/assets/theme/</code> automáticamente en el momento de la
 construcción.</p>
 
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/es/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 25, 2026, 4&#x3a;55&#x3a;55 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/i18n/es/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/bx-sites/development/es/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Aug 25, 2026, 5&#x3a;32&#x3a;13 AM</span></div>
 				</article>
 
 				<nav class="page-nav d-flex justify-content-between" aria-label="Navegaci&oacute;n de p&aacute;gina">
@@ -627,7 +587,7 @@ construcción.</p>
 			</main>
 
 			<aside class="col-xl-2 toc-sidebar d-none d-xl-block">
-				<nav class="toc mb-4" aria-label="En esta p&aacute;gina"><div class="toc-title">En esta p&aacute;gina</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#incorporados">Incorporados</a></li><li class="toc-level-2"><a href="#instalar-un-tema-publicado">Instalar un tema publicado</a></li><li class="toc-level-2"><a href="#sitios-sin-conexión-a-internet-air-gapped">Sitios sin conexi&oacute;n a internet &#x28;air-gapped&#x29;</a></li><li class="toc-level-2"><a href="#iconos">Iconos</a></li><li class="toc-level-2"><a href="#el-contrato-de-themeprovider">El contrato de ThemeProvider</a></li><li class="toc-level-2"><a href="#personalizar-colores-sin-sobrescribir-un-tema">Personalizar colores sin sobrescribir un tema</a></li><li class="toc-level-2"><a href="#banner-hero-de-la-página-de-inicio">Banner hero de la p&aacute;gina de inicio</a></li><li class="toc-level-2"><a href="#sobrescribir-un-tema">Sobrescribir un tema</a></li><li class="toc-level-2"><a href="#escribir-un-tema-desde-cero">Escribir un tema desde cero</a></li></ul></nav>
+				<nav class="toc mb-4" aria-label="En esta p&aacute;gina"><div class="toc-title">En esta p&aacute;gina</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#incorporados">Incorporados</a></li><li class="toc-level-2"><a href="#instalar-un-tema-publicado">Instalar un tema publicado</a></li><li class="toc-level-2"><a href="#sitios-sin-conexión-a-internet-air-gapped">Sitios sin conexi&oacute;n a internet &#x28;air-gapped&#x29;</a></li><li class="toc-level-2"><a href="#el-contrato-de-themeprovider">El contrato de ThemeProvider</a></li><li class="toc-level-2"><a href="#personalizar-colores-sin-sobrescribir-un-tema">Personalizar colores sin sobrescribir un tema</a></li><li class="toc-level-2"><a href="#banner-hero-de-la-página-de-inicio">Banner hero de la p&aacute;gina de inicio</a></li><li class="toc-level-2"><a href="#sobrescribir-un-tema">Sobrescribir un tema</a></li><li class="toc-level-2"><a href="#escribir-un-tema-desde-cero">Escribir un tema desde cero</a></li></ul></nav>
 			</aside>
 
 		</div>

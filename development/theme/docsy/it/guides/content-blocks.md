@@ -46,7 +46,7 @@ semplice, non cliccabile). `icon` viene risolta allo stesso modo dei
 valori `icon` di frontmatter/nav - una semplice emoji, oppure un'icona
 con nome da una libreria inclusa
 (`icon="phosphor-duotone:rocket-launch"`, `icon="lucide:rocket"`, ...) -
-vedi [Temi: Icone](themes.md#icons):
+vedi [Icone](icons.md):
 
 ```markdown title="Esempio" linenums="1"
 ::: cards

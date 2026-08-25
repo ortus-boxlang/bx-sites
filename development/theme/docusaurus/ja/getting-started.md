@@ -198,7 +198,7 @@ toc: true
 - `icon` - ページタイトルとナビゲーションエントリの横に表示されます - 単純な絵文字、
   またはバンドルされたライブラリの名前付きアイコン（`rocket`、`lucide:rocket`、
   `tabler:rocket`、プロジェクト独自の `custom:my-icon`）を指定できます。
-  [テーマ: アイコン](guides/themes.md#icons) を参照してください
+  [アイコン](guides/icons.md) を参照してください
 - `summary` - タイトルの下に表示される1行のリードイン（ページ自体には
   レンダリングされないメタタグ専用の `description` とは別物です）
 - `ogImage` - このページのソーシャルカード画像を上書きします -

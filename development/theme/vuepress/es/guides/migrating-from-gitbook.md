@@ -109,7 +109,7 @@ frontmatter exportado de un proyecto realmente tiene un campo `icon`,
 mayoría de las exportaciones reales. Establece los iconos a mano después
 en su lugar - ya sea el propio frontmatter de una página, o el
 [propio `icon` de una entrada de `docs/nav.json`](../configuration.md#nav)
-- usando un [icono con nombre](themes.md#iconos) de una de las ocho
+- usando un [icono con nombre](icons.md) de una de las ocho
 bibliotecas incluidas (sin necesidad de hacer coincidir los propios
 iconos basados en Font Awesome de GitBook; elige el nombre que se vea
 mejor en la propia galería de [Phosphor](https://phosphoricons.com/)
