@@ -143,9 +143,15 @@ bringt unabhängig von der Palette denselben Satz an Seitenfunktionen mit:
 
 Lege in `bxsites.yaml` fest, welches Theme ein Projekt verwendet:
 
-```yaml title="bxsites.yaml"
-theme: { name: material }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: material }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "material" } }
+    ```
 
 ## Ein veröffentlichtes Theme installieren
 
@@ -165,9 +171,15 @@ Abschluss geprüft wird, ob es den `ThemeProvider`-Vertrag unten erfüllt.
 Ein Projekt kann auf diese Weise mehrere installierte Themes
 nebeneinander vorhalten und rein per Name zwischen ihnen wechseln:
 
-```yaml title="bxsites.yaml"
-theme: { name: bx-sites-theme-blog1 }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: bx-sites-theme-blog1 }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "bx-sites-theme-blog1" } }
+    ```
 
 Ein Theme braucht überhaupt keine BoxLang-Modul-/Klassenlader-Beteiligung
 (anders als ein Plugin) - es sind reine Dateien, es gibt also keinen
@@ -279,9 +291,15 @@ CSS-Custom-Properties auf `:root`, erneut deklariert unter
 Deklaration mit gleicher Spezifität darin gewinnt, ohne `resources/themes/`
 überhaupt anzurühren:
 
-```yaml title="bxsites.yaml"
-extraCss: [ assets/brand.css ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    extraCss: [ assets/brand.css ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "extraCss": ["assets/brand.css"] }
+    ```
 
 ```css title="docs/assets/brand.css" linenums="1"
 /* docs/assets/brand.css - copied to site/assets/brand.css at build time */

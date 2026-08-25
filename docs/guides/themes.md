@@ -128,9 +128,15 @@ regardless of palette:
 
 Set which one a project uses in `bxsites.yaml`:
 
-```yaml title="bxsites.yaml"
-theme: { name: material }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: material }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "material" } }
+    ```
 
 ## Installing a published theme
 
@@ -149,9 +155,15 @@ satisfies the `ThemeProvider` contract below before finishing. A project
 can carry several installed themes side by side this way and switch
 between them purely by name:
 
-```yaml title="bxsites.yaml"
-theme: { name: bx-sites-theme-blog1 }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: bx-sites-theme-blog1 }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "bx-sites-theme-blog1" } }
+    ```
 
 A theme needs no BoxLang module/class-loader involvement at all (unlike a
 plugin) - it's pure files, so there's no separate activation step the way
@@ -253,9 +265,15 @@ re-declared under `[data-theme="dark"]` for dark mode. `bxsites.yaml`'s
 theme's own stylesheet, so a same-specificity re-declaration in it wins
 without touching `resources/themes/` at all:
 
-```yaml title="bxsites.yaml"
-extraCss: [ assets/brand.css ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    extraCss: [ assets/brand.css ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "extraCss": ["assets/brand.css"] }
+    ```
 
 ```css title="docs/assets/brand.css" linenums="1"
 /* docs/assets/brand.css - copied to site/assets/brand.css at build time */

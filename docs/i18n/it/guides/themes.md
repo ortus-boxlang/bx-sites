@@ -143,9 +143,15 @@ di funzionalità di pagina indipendentemente dalla palette:
 
 Imposta quale tema usa un progetto in `bxsites.yaml`:
 
-```yaml title="bxsites.yaml"
-theme: { name: material }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: material }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "material" } }
+    ```
 
 ## Installare un tema pubblicato
 
@@ -165,9 +171,15 @@ soddisfi il contratto `ThemeProvider` sotto prima di terminare. Un
 progetto può portare con sé più temi installati fianco a fianco in
 questo modo e passare dall'uno all'altro semplicemente per nome:
 
-```yaml title="bxsites.yaml"
-theme: { name: bx-sites-theme-blog1 }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: bx-sites-theme-blog1 }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "bx-sites-theme-blog1" } }
+    ```
 
 Un tema non necessita di alcun coinvolgimento del modulo BoxLang/
 class-loader (a differenza di un plugin) - sono puri file, quindi non
@@ -283,9 +295,15 @@ carica *dopo* il foglio di stile proprio del tema, quindi una
 ridichiarazione con la stessa specificità al suo interno vince senza
 toccare affatto `resources/themes/`:
 
-```yaml title="bxsites.yaml"
-extraCss: [ assets/brand.css ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    extraCss: [ assets/brand.css ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "extraCss": ["assets/brand.css"] }
+    ```
 
 ```css title="docs/assets/brand.css" linenums="1"
 /* docs/assets/brand.css - copiato in site/assets/brand.css al momento del build */

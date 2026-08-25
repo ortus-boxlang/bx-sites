@@ -64,9 +64,15 @@ own - neither opens this module's own palette.
 
 ## Turning it off
 
-```yaml title="bxsites.yaml"
-search: false
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    search: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "search": false }
+    ```
 
 Skips building `search-index.json` entirely, and skips the search box, the
 vendored `lunr.js` script, and the shared `search.js` widget in every
@@ -95,16 +101,33 @@ Set `searchProvider.provider` to `"algolia"` to swap the search box for
 crawler-hosted search mkdocs-material, VitePress, Starlight and Docusaurus
 all support:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider:
-  provider: algolia
-  algolia:
-    appId: ABC123
-    apiKey: a1b2c3d4e5f6...
-    indexName: my-docs
-    insights: false
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider:
+      provider: algolia
+      algolia:
+        appId: ABC123
+        apiKey: a1b2c3d4e5f6...
+        indexName: my-docs
+        insights: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "algolia",
+    		"algolia": {
+    			"appId": "ABC123",
+    			"apiKey": "a1b2c3d4e5f6...",
+    			"indexName": "my-docs",
+    			"insights": false
+    		}
+    	}
+    }
+    ```
 
 `appId`, `apiKey` and `indexName` are required - `apiKey` is the
 **search-only** public API key DocSearch gives you (never an admin key; it's
@@ -132,12 +155,24 @@ Set `searchProvider.provider` to `"pagefind"` to swap the search box for
 engine, but indexed from the *built* `site/` HTML rather than crawled like
 Algolia:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider:
-  provider: pagefind
-  pagefind: { bin: pagefind, options: [] }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider:
+      provider: pagefind
+      pagefind: { bin: pagefind, options: [] }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "pagefind",
+    		"pagefind": { "bin": "pagefind", "options": [] }
+    	}
+    }
+    ```
 
 Both `pagefind` keys are optional - `bin` (default `"pagefind"`) is the
 executable name/path, resolved against `PATH` when it's a bare name;

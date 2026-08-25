@@ -379,9 +379,15 @@ das Embed beginnt.
 
 Opt-in über den [`mermaid`](../configuration.md#mermaid)-Schlüssel von `bxsites.yaml`:
 
-```yaml title="bxsites.yaml"
-mermaid: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    mermaid: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "mermaid": true }
+    ```
 
 Einmal aktiviert, wird jeder ` ```mermaid `-Fenced-Codeblock als
 lebendiges [Mermaid](https://mermaid.js.org/)-Diagramm gerendert, statt
@@ -403,9 +409,15 @@ für alles, was es zeichnen kann.
 
 Opt-in über den [`math`](../configuration.md#math)-Schlüssel von `bxsites.yaml`:
 
-```yaml title="bxsites.yaml"
-math: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    math: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "math": true }
+    ```
 
 Einmal aktiviert, setzt [KaTeX](https://katex.org/) `$...$` für Inline-Mathematik
 und `$$...$$` für einen zentrierten Block, beides direkt in den

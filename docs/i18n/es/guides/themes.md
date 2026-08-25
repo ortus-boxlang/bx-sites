@@ -140,9 +140,15 @@ conjunto de funciones de página:
 
 Define cuál usa un proyecto en `bxsites.yaml`:
 
-```yaml title="bxsites.yaml"
-theme: { name: material }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: material }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "material" } }
+    ```
 
 ## Instalar un tema publicado
 
@@ -162,9 +168,15 @@ cumple el contrato `ThemeProvider` de abajo antes de terminar. Un
 proyecto puede tener varios temas instalados en paralelo de esta forma, y
 cambiar entre ellos únicamente por nombre:
 
-```yaml title="bxsites.yaml"
-theme: { name: bx-sites-theme-blog1 }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: bx-sites-theme-blog1 }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "bx-sites-theme-blog1" } }
+    ```
 
 Un tema no necesita ninguna participación de módulo/cargador de clases de
 BoxLang (a diferencia de un plugin) - son archivos puros, así que no hay
@@ -282,9 +294,15 @@ de `bxsites.yaml` se carga *después* de la propia hoja de estilo del tema,
 así que una redeclaración con la misma especificidad en él gana sin
 tocar `resources/themes/` en absoluto:
 
-```yaml title="bxsites.yaml"
-extraCss: [ assets/brand.css ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    extraCss: [ assets/brand.css ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "extraCss": ["assets/brand.css"] }
+    ```
 
 ```css
 /* docs/assets/brand.css - copiado a site/assets/brand.css en el momento de la construcción */

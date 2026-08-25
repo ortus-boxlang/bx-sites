@@ -118,9 +118,15 @@ Mermaid）は、このモジュールに同梱（バンドル）された状態�
 
 プロジェクトが使用するテーマは `bxsites.yaml` で設定します:
 
-```yaml title="bxsites.yaml"
-theme: { name: material }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: material }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "material" } }
+    ```
 
 ## 公開済みテーマのインストール
 
@@ -138,9 +144,15 @@ bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
 満たしていることを検証します。この方法で、プロジェクトは複数のインストール済み
 テーマを並行して保持し、純粋に名前だけで切り替えることができます:
 
-```yaml title="bxsites.yaml"
-theme: { name: bx-sites-theme-blog1 }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: bx-sites-theme-blog1 }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "bx-sites-theme-blog1" } }
+    ```
 
 テーマは（プラグインとは異なり）BoxLang モジュール/クラスローダーの関与を一切必要と
 しません - 単なるファイル群であるため、`install:plugin` にあるような別途の有効化
@@ -243,9 +255,15 @@ highlight.js、Alpine.js、lunr.js はすべてこのモジュールに同梱さ
 *後に* 読み込まれるため、そこで同じ詳細度で再宣言すれば、`resources/themes/` に
 一切触れることなく優先されます:
 
-```yaml title="bxsites.yaml"
-extraCss: [ assets/brand.css ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    extraCss: [ assets/brand.css ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "extraCss": ["assets/brand.css"] }
+    ```
 
 ```css title="docs/assets/brand.css" linenums="1"
 /* docs/assets/brand.css - ビルド時に site/assets/brand.css にコピーされます */
