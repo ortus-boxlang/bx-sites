@@ -653,7 +653,7 @@ class extends="testbox.system.BaseSpec" {
 				fileWrite( root & "/docs/index.md", "Home" );
 				fileWrite(
 					root & "/docs/404.md",
-					"---" & char( 10 ) & "title: Lost?" & char( 10 ) & "---" & char( 10 ) &
+					"---" & char( 10 ) & "title: Lost" & char( 10 ) & "---" & char( 10 ) &
 						"That page wandered off. Try the [homepage](index.md)."
 				);
 
@@ -661,7 +661,7 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( fileExists( root & "/site/404.html" ) ).toBeTrue();
 				var html = fileRead( root & "/site/404.html" );
-				expect( html ).toInclude( "Lost?" );
+				expect( html ).toInclude( "Lost" );
 				expect( html ).toInclude( "That page wandered off." );
 				expect( html ).notToInclude( "Page Not Found" );
 
