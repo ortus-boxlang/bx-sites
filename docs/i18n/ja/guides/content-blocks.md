@@ -276,6 +276,62 @@ OpenAPI パースを一切トリガーしません）。Swagger UI 自身がす�
 ::: link-preview url="https://boxlang.io" title="BoxLang" description="動的でマルチパラダイムな JVM 言語。" image="https://boxlang.io/og.png"
 :::
 
+## プロンプト
+
+再利用可能な AI プロンプト向けのスタイル付きコンテナです - GitBook の
+[Prompt ブロック](https://gitbook.com/docs/create-content/blocks/prompt)
+に対する bx-sites 独自の対応物です。ブロックの本文がそのままプロンプトの
+テキストになり、通常の Markdown として書かれます（そのため中の見出しや
+リスト、コードもそれぞれ独自の書式を保ちます）。どのプロンプトにも
+「Copy」ボタンが付き、書式マークアップを含むそのままのソーステキストを
+コピーして、使いたい AI ツールにそのまま貼り付けられます。`description`
+（任意の1行サマリ）と `icon`（`::: card` 自身の `icon` と同じ方法で解決
+され、省略時はきらめきアイコンがデフォルトになります）はどちらも任意です:
+
+```markdown title="Example" linenums="1"
+::: prompt description="Summarizes a pull request for a changelog entry" icon="phosphor-duotone:git-pull-request"
+Summarize the following pull request diff as a single changelog entry,
+written for an end user rather than a developer. Group related changes
+together and skip anything purely internal (refactors, tests, CI).
+:::
+```
+
+::: prompt description="Summarizes a pull request for a changelog entry" icon="phosphor-duotone:git-pull-request"
+Summarize the following pull request diff as a single changelog entry,
+written for an end user rather than a developer. Group related changes
+together and skip anything purely internal (refactors, tests, CI).
+:::
+
+長いプロンプトを短くフェードアウトするプレビューに収め、読者が「Show
+more」をクリックするまでそのままにしておくには `expanded="preview"` を
+追加します。あるいは `expanded="hidden"` を使うと、「Show prompt」ボタンの
+背後に完全に折りたたまれた状態で開始します - 複数のプロンプトを連続して
+並べるページで便利です。`expanded` を省略する（またはデフォルトの
+`"full"` を指定する）と、常にプロンプト全体を表示します:
+
+```markdown title="Example" linenums="1"
+::: prompt description="A longer, multi-step prompt" expanded="preview"
+1. Read the attached error log line by line.
+2. For each stack trace, identify the failing module.
+3. Group failures by root cause, not by timestamp.
+4. Propose one fix per root cause, not per failure.
+5. Skip anything that already has an open issue - list those separately.
+:::
+```
+
+::: prompt description="A longer, multi-step prompt" expanded="preview"
+1. Read the attached error log line by line.
+2. For each stack trace, identify the failing module.
+3. Group failures by root cause, not by timestamp.
+4. Propose one fix per root cause, not per failure.
+5. Skip anything that already has an open issue - list those separately.
+:::
+
+GitBook 自身の Prompt ブロックとは異なり、ここには「Open in AI
+providers」メニューはありません - bx-sites はサードパーティの AI
+プロバイダーと一切通信しないため、GitBook 自身のブロックのその部分には
+対応するものがありません。
+
 ## 更新履歴（changelog）
 
 日付とタグ付けが可能な変更履歴リストです - `::: update` は
