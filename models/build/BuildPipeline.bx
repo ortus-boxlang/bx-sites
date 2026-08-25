@@ -1309,8 +1309,8 @@ class {
 	/**
 	 * Copies theme assets to `site/assets/theme/`, this module's own shared
 	 * scripts (the search widget when search is enabled; the copy-code
-	 * button, tab widget, and code line-number/highlight widget
-	 * unconditionally), the vendored third-party CSS/JS every built site
+	 * button, tab widget, `::: prompt` widget, and code line-number/
+	 * highlight widget unconditionally), the vendored third-party CSS/JS every built site
 	 * needs with no CDN/internet access (module spec section 8 - highlight.js
 	 * and Alpine.js always, Bootstrap's own CSS/JS for the `bootstrap` theme,
 	 * lunr.js alongside search.js, mermaid.js alongside mermaid-init.js when
@@ -1344,6 +1344,7 @@ class {
 		fileCopy( moduleAssetsDir() & "/highlight-boxlang.js", arguments.siteDir & "/assets/highlight-boxlang.js" )
 		fileCopy( moduleAssetsDir() & "/tabs.js", arguments.siteDir & "/assets/tabs.js" )
 		fileCopy( moduleAssetsDir() & "/conditional-content-init.js", arguments.siteDir & "/assets/conditional-content-init.js" )
+		fileCopy( moduleAssetsDir() & "/prompt-init.js", arguments.siteDir & "/assets/prompt-init.js" )
 		fileCopy( moduleAssetsDir() & "/code-lines.js", arguments.siteDir & "/assets/code-lines.js" )
 		directoryCopy( moduleAssetsDir() & "/fonts", arguments.siteDir & "/assets/fonts", true )
 		directoryCopy( moduleAssetsDir() & "/vendor/highlight", arguments.siteDir & "/assets/vendor/highlight", true )

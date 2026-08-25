@@ -266,6 +266,60 @@ build time:
 ::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
 :::
 
+## Prompt
+
+A styled container for a reusable AI prompt - bx-sites' own equivalent of
+GitBook's [Prompt block](https://gitbook.com/docs/create-content/blocks/prompt).
+The block's body *is* the prompt text, written as ordinary Markdown (so
+headings, lists, and code inside it still get their own formatting); every
+prompt gets a "Copy" button that copies that exact source text, formatting
+markup included, ready to paste into whatever AI tool you're using it with.
+`description` (an optional one-line summary) and `icon` (resolved the same
+way `::: card`'s own `icon` is - defaults to a sparkle glyph when omitted)
+are both optional:
+
+```markdown title="Example" linenums="1"
+::: prompt description="Summarizes a pull request for a changelog entry" icon="phosphor-duotone:git-pull-request"
+Summarize the following pull request diff as a single changelog entry,
+written for an end user rather than a developer. Group related changes
+together and skip anything purely internal (refactors, tests, CI).
+:::
+```
+
+::: prompt description="Summarizes a pull request for a changelog entry" icon="phosphor-duotone:git-pull-request"
+Summarize the following pull request diff as a single changelog entry,
+written for an end user rather than a developer. Group related changes
+together and skip anything purely internal (refactors, tests, CI).
+:::
+
+Add `expanded="preview"` to clamp a long prompt to a short, fade-out
+preview until the reader clicks "Show more", or `expanded="hidden"` to
+start it fully collapsed behind a "Show prompt" button - handy for a page
+that lists several prompts back to back. Omit `expanded` (or set it to
+`"full"`, the default) to always show the whole prompt:
+
+```markdown title="Example" linenums="1"
+::: prompt description="A longer, multi-step prompt" expanded="preview"
+1. Read the attached error log line by line.
+2. For each stack trace, identify the failing module.
+3. Group failures by root cause, not by timestamp.
+4. Propose one fix per root cause, not per failure.
+5. Skip anything that already has an open issue - list those separately.
+:::
+```
+
+::: prompt description="A longer, multi-step prompt" expanded="preview"
+1. Read the attached error log line by line.
+2. For each stack trace, identify the failing module.
+3. Group failures by root cause, not by timestamp.
+4. Propose one fix per root cause, not per failure.
+5. Skip anything that already has an open issue - list those separately.
+:::
+
+Unlike GitBook's own Prompt block, there's no "Open in AI providers" menu
+here - bx-sites never talks to a third-party AI provider, so that part of
+GitBook's own block has no equivalent.
+
 ## Updates (changelog)
 
 A dated, taggable changelog list - `::: update` accepts `date="YYYY-MM-DD"`
