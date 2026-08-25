@@ -112,4 +112,8 @@ Chatte in Echtzeit mit der Community und den Maintainern.
 ::: card title="Issue eröffnen" icon="phosphor-duotone:bug" href="https://github.com/ortus-boxlang/bx-sites/issues"
 Für einen reproduzierbaren Bug, mit angehängter `bxSites doctor`-Ausgabe.
 :::
+::: card title="Professioneller Support" icon="phosphor-duotone:handshake" href="services.md"
+Soll das Team hinter BxSites es für dich lösen? Ortus Solutions bietet
+professionellen Support und Beratung an.
+:::
 :::

@@ -112,4 +112,9 @@ BoxLang モジュールがインストールされ有効化されているかど
 ::: card title="Issue を報告する" icon="phosphor-duotone:bug" href="https://github.com/ortus-boxlang/bx-sites/issues"
 再現可能なバグの場合は、`bxSites doctor` の出力を添えてください。
 :::
+::: card title="プロフェッショナルサポート" icon="phosphor-duotone:handshake" href="services.md"
+BxSites を開発しているチームに解決してもらいたいですか? Ortus
+Solutions はプロフェッショナルサポートとコンサルティングを提供して
+います。
+:::
 :::
