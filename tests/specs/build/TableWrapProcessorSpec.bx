@@ -1,0 +1,47 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.TableWrapProcessor", function() {
+
+			beforeEach( function() {
+				variables.processor = new "models.build.TableWrapProcessor@bxsites"()
+			} );
+
+			it( "leaves HTML with no table untouched", function() {
+				var html = "<p>No tables here.</p>"
+				expect( processor.wrap( html ) ).toBe( html )
+			} );
+
+			it( "wraps a single table in a bxsites-table-wrap div", function() {
+				var html = "<p>Before.</p><table><thead><tr><th>A</th></tr></thead><tbody><tr><td>1</td></tr></tbody></table><p>After.</p>"
+				var result = processor.wrap( html )
+				expect( result ).toBe( '<p>Before.</p><div class="bxsites-table-wrap"><table><thead><tr><th>A</th></tr></thead><tbody><tr><td>1</td></tr></tbody></table></div><p>After.</p>' )
+			} );
+
+			it( "wraps each of multiple sibling tables independently", function() {
+				var html = "<table><tr><td>1</td></tr></table><p>Between.</p><table><tr><td>2</td></tr></table>"
+				var result = processor.wrap( html )
+				expect( result ).toBe( '<div class="bxsites-table-wrap"><table><tr><td>1</td></tr></table></div><p>Between.</p><div class="bxsites-table-wrap"><table><tr><td>2</td></tr></table></div>' )
+			} );
+
+			it( "preserves a table's own attributes (e.g. tableOptions.className)", function() {
+				var html = '<table class="table"><tr><td>1</td></tr></table>'
+				var result = processor.wrap( html )
+				expect( result ).toBe( '<div class="bxsites-table-wrap"><table class="table"><tr><td>1</td></tr></table></div>' )
+			} );
+
+			it( "wraps only the outer table when one table is nested inside another (raw HTML in a cell)", function() {
+				var html = "<table><tr><td>outer<table><tr><td>inner</td></tr></table></td></tr></table>"
+				var result = processor.wrap( html )
+				expect( result ).toBe( '<div class="bxsites-table-wrap"><table><tr><td>outer<table><tr><td>inner</td></tr></table></td></tr></table></div>' )
+			} );
+
+			it( "leaves an unterminated table tag untouched rather than guessing", function() {
+				var html = "<p>Before.</p><table><tr><td>no closing tag"
+				expect( processor.wrap( html ) ).toBe( html )
+			} );
+
+		} );
+	}
+
+}

@@ -463,6 +463,8 @@ standardmäßig auf `true` (siehe die
 | `tableOptions.className` | `"table"` | CSS-Klasse auf jeder gerenderten `<table>` |
 | `tableOptions.headerSeparationColumnMatch` | `true` | Verlangt, dass die `---`-Trennzeile der Spaltenzahl der Kopfzeile entspricht |
 
+Jede gerenderte Tabelle erhält außerdem automatisch einen Wrapper für responsives Scrollen und einen fixierten Kopfbereich, ohne eigenen Konfigurationsschlüssel - siehe [Tabellen](guides/tables.md#responsives-scrollen-und-eine-fixierte-kopfzeile).
+
 ```yaml title="bxsites.yaml" linenums="1"
 markdown:
   enableFootnotes: true

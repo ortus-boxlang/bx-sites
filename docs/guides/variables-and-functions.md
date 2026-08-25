@@ -178,6 +178,93 @@ first version:
 - Booleans: `{{ $badge('Beta', true) }}`
 - A `{{ }}`-less dotted variable reference: `{{ $greet(product.name) }}`
 
+## Visualizer recipes
+
+A magic function returning HTML isn't limited to a status badge - it's a
+general-purpose way to get GitBook-style visual cells (a star rating, a
+colored chip, a progress bar) without GitBook's own database-backed column
+picker, which bx-sites' git-based, plain-Markdown source has no equivalent
+of. The four below are this site's own
+[`docs/functions.bxs`](https://github.com/ortus-boxlang/bx-sites/blob/development/docs/functions.bxs),
+rendering live on this exact page.
+
+### Ratings
+
+```bx title="docs/functions.bxs"
+function $stars( required numeric rating, numeric max = 5 ) {
+	var filled = min( max( round( arguments.rating ), 0 ), arguments.max )
+	var stars = repeatString( "★", filled ) & repeatString( "☆", arguments.max - filled )
+	return '<span title="' & arguments.rating & ' out of ' & arguments.max & '" style="color:##f5a623;letter-spacing:2px">' & stars & '</span>'
+}
+```
+
+`` `{{ $stars(4) }}` `` renders as: {{ $stars(4) }}
+
+### Status chips
+
+```bx title="docs/functions.bxs"
+function $badge( required string label, string kind = "info" ) {
+	var palette = {
+		"info"    : { "bg" : "##e0edff", "fg" : "##1d4ed8" },
+		"success" : { "bg" : "##dcfce7", "fg" : "##15803d" },
+		"danger"  : { "bg" : "##fee2e2", "fg" : "##b91c1c" },
+		"warning" : { "bg" : "##fef9c3", "fg" : "##854d0e" }
+	}
+	var pick = palette.keyExists( arguments.kind ) ? palette[ arguments.kind ] : { "bg" : "##f1f5f9", "fg" : "##475569" }
+	return '<span style="display:inline-block;padding:0.1em 0.6em;border-radius:999px;font-size:0.85em;font-weight:600;background:'
+		& pick.bg & ";color:" & pick.fg & '">' & encodeForHTML( arguments.label ) & "</span>"
+}
+```
+
+`` `{{ $badge('Stable', 'success') }}` `` renders as: {{ $badge('Stable', 'success') }} - and `` `{{ $badge('Beta', 'info') }}` ``: {{ $badge('Beta', 'info') }}
+
+### Progress bars
+
+```bx title="docs/functions.bxs"
+function $progress( required numeric percent ) {
+	var pct = min( max( arguments.percent, 0 ), 100 )
+	return '<span style="display:inline-block;width:120px;height:8px;background:##e5e7eb;border-radius:999px;overflow:hidden;vertical-align:middle"><span style="display:block;height:100%;width:'
+		& pct & '%;background:##2563eb"></span></span> ' & pct & "%"
+}
+```
+
+`` `{{ $progress(72) }}` `` renders as: {{ $progress(72) }}
+
+### Trend indicators
+
+```bx title="docs/functions.bxs"
+function $trend( required numeric value ) {
+	var isUp = arguments.value >= 0
+	var arrow = isUp ? "▲" : "▼"
+	var color = isUp ? "##16a34a" : "##dc2626"
+	var sign = isUp ? "+" : ""
+	return '<span style="color:' & color & ';font-weight:600">' & arrow & " " & sign & numberFormat( arguments.value, "0.0" ) & "%</span>"
+}
+```
+
+`` `{{ $trend(4.2) }}` `` renders as: {{ $trend(4.2) }} - `` `{{ $trend(-1.8) }}` ``: {{ $trend(-1.8) }}
+
+### Inside a table cell
+
+`{{ }}` resolves against the raw Markdown before [tables](tables.md)
+are even parsed, so any of the above work inside a pipe table's cells the
+same as anywhere else on the page - the closest thing here to GitBook's own
+Select/Rating table columns:
+
+```markdown title="Example" linenums="1"
+| Feature | Status | Rating |
+| --- | --- | --- |
+| Dark mode | {{ $badge('Stable', 'success') }} | {{ $stars(5) }} |
+| Table sort | {{ $badge('Beta', 'info') }} | {{ $stars(4) }} |
+```
+
+Which renders as:
+
+| Feature | Status | Rating |
+| --- | --- | --- |
+| Dark mode | {{ $badge('Stable', 'success') }} | {{ $stars(5) }} |
+| Table sort | {{ $badge('Beta', 'info') }} | {{ $stars(4) }} |
+
 ## Showing the syntax literally
 
 A `{{ }}` shown inside a fenced code block (three backticks or more, like

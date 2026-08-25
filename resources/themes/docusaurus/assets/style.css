@@ -1109,10 +1109,22 @@ code:not( pre code ) {
 	border-radius: 8px;
 }
 
+.dsrs-content-body .bxsites-table-wrap {
+	max-height: 480px;
+	overflow: auto;
+}
+
 .dsrs-content-body table {
 	width: 100%;
 	border-collapse: collapse;
 	font-size: 0.95rem;
+}
+
+.dsrs-content-body thead th {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	background-color: var( --md-surface );
 }
 
 .dsrs-content-body th,
