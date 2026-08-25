@@ -33,7 +33,7 @@ differs, so they inherit the same full feature set and the same
 air-gapped-capable behavior `material` already has.
 
 Every built-in theme's own CSS/JS (Bootstrap's CSS/JS bundle, highlight.js,
-Alpine.js, lunr.js for the default `local` search provider, and Mermaid
+Alpine.js, MiniSearch for the default `local` search provider, and Mermaid
 when `mermaid` is turned on) ships vendored with this module and is
 copied straight into every built `site/` - no CDN, no internet access
 needed to view a built site. The `tailwind` theme's own utility engine (a
@@ -80,14 +80,17 @@ regardless of palette:
   sitting next to `guides/themes/index.html`), so it (or an LLM) can read
   the page as plain Markdown directly instead of parsing rendered HTML.
   Always on, no config needed. See [Getting Started](../getting-started.md#downloading-a-page-as-markdown).
-- **An opt-in footer** (copyright, `social` links, a "Built with BX Sites"
+- **An opt-in footer** (copyright, `social` links, a "Built with BxSites"
   credit) when `bxsites.yaml`'s `footer` is `true`. See
   [Configuration](../configuration.md#footer).
 - **A version switcher**, appearing automatically once a project has a
   `docs/versions/` folder with more than one version in it. See
   [Configuration](../configuration.md#versioning).
 - **A themed `404.html`**, served automatically by most static hosts
-  (including GitHub Pages) for any unmatched path.
+  (including GitHub Pages) for any unmatched path. Add a `404.md` at the
+  root of `docs/` (or `src/`) to override its title and body with your
+  own - it's never built as a regular page (no nav entry, no
+  `sitemap.xml` URL), just rendered into `site/404.html` in its place.
 - **A custom logo and favicon**, when `bxsites.yaml`'s `theme.logo`/
   `theme.favicon` are set. See [Configuration](../configuration.md#theme).
 - **A collapsible sidebar nav**, opt-in via `theme.options.navCollapsible` -
@@ -128,9 +131,15 @@ regardless of palette:
 
 Set which one a project uses in `bxsites.yaml`:
 
-```yaml title="bxsites.yaml"
-theme: { name: material }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: material }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "material" } }
+    ```
 
 ## Installing a published theme
 
@@ -149,9 +158,15 @@ satisfies the `ThemeProvider` contract below before finishing. A project
 can carry several installed themes side by side this way and switch
 between them purely by name:
 
-```yaml title="bxsites.yaml"
-theme: { name: bx-sites-theme-blog1 }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: bx-sites-theme-blog1 }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "bx-sites-theme-blog1" } }
+    ```
 
 A theme needs no BoxLang module/class-loader involvement at all (unlike a
 plugin) - it's pure files, so there's no separate activation step the way
@@ -169,7 +184,7 @@ A built site works with no internet access at all by default, for
 `bootstrap`, `material`, and the seven `material`-forked themes (`docsy`,
 `slate`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook`, `notion`) with
 the default `local` search provider: Bootstrap's own CSS/JS, highlight.js,
-Alpine.js, and lunr.js are all vendored with this module
+Alpine.js, and MiniSearch are all vendored with this module
 (`resources/assets/vendor/`) and copied straight into
 `site/assets/vendor/` at build time - no CDN `<script>`/`<link>` tag
 anywhere in the generated HTML for any of those. Turning on
@@ -200,58 +215,9 @@ If your deployment target genuinely has zero internet access, stick to
 default `local` search provider, avoid `elk`-layout Mermaid diagrams if
 `mermaid` is on, and leave `math`/Algolia/analytics off.
 
-## Icons
-
-A page's own `icon` frontmatter (shown next to its title, and next to its
-entry in the sidebar nav) accepts either a plain emoji/short text - the
-original, still fully supported form - or a named icon from one of eight
-self-hosted libraries, all MIT/ISC-licensed and bundled with this module
-(~16,200 icons combined, no CDN, nothing added to a built page's own
-weight beyond the handful of icons it actually uses - see IconResolver.bx):
-
-```markdown title="Frontmatter"
----
-icon: rocket
----
-```
-
-```markdown title="Frontmatter"
----
-icon: lucide:rocket
----
-```
-
-```markdown title="Frontmatter"
----
-icon: phosphor-bold:rocket
----
-```
-
-Bare `rocket` defaults to [Phosphor](https://phosphoricons.com/), regular
-weight. Phosphor ships all six of its own weights, each its own prefix:
-`phosphor-thin:`, `phosphor-light:`, `phosphor:` (regular, same as the
-bare name), `phosphor-bold:`, `phosphor-fill:` and `phosphor-duotone:`.
-Prefix with `lucide:` for [Lucide](https://lucide.dev/icons/), or
-`tabler:` for [Tabler](https://tabler.io/icons) instead. Browse each
-site's own gallery for the exact name - it matches this module's own
-vendored filename exactly (lowercase, hyphenated, e.g. `book-open`,
-`arrow-up-right`; Phosphor's own site shows a weight switcher - each of
-its six options there is one of this module's six `phosphor[-weight]:`
-prefixes).
-
-Font Awesome is deliberately not one of these - its Duotone style (and
-most of its icon set from v6 on) is Pro-only, not available under a
-license this module could bundle and redistribute for free.
-
-A project's own SVG works too - drop it at `docs/assets/icons/my-icon.svg`
-and reference it as `icon: custom:my-icon`.
-
-A [nav.json](../configuration.md#nav) entry can set its own `icon` too,
-overriding the target page's own frontmatter for that one entry:
-
-```json title="docs/nav.json"
-{ "title": "Guides", "path": "guides/index.md", "icon": "lucide:book-open" }
-```
+See [Icons](icons.md) for how a page's own `icon` frontmatter (or a
+`nav.json` entry's own `icon`) resolves to an emoji, a named icon from one
+of eight bundled libraries, or a project's own custom SVG.
 
 ## The `ThemeProvider` contract
 
@@ -302,9 +268,15 @@ re-declared under `[data-theme="dark"]` for dark mode. `bxsites.yaml`'s
 theme's own stylesheet, so a same-specificity re-declaration in it wins
 without touching `resources/themes/` at all:
 
-```yaml title="bxsites.yaml"
-extraCss: [ assets/brand.css ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    extraCss: [ assets/brand.css ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "extraCss": ["assets/brand.css"] }
+    ```
 
 ```css title="docs/assets/brand.css" linenums="1"
 /* docs/assets/brand.css - copied to site/assets/brand.css at build time */
@@ -394,7 +366,7 @@ resize/replace `bxsites-hero__banner`'s own image via a `docs/assets/`-relative
 ## Overriding a theme
 
 Drop your own `layout.bxm` + `page.bxm` (and optionally `search.bxm` /
-`assets/`) into a `theme/` folder at your project root. BX Sites prefers a
+`assets/`) into a `theme/` folder at your project root. BxSites prefers a
 project-level `theme/` override over both an installed `themes/<name>/`
 theme and any built-in theme, as long as it satisfies the contract below -
 the built-in themes under this module's own `resources/themes/` are a good
@@ -435,7 +407,7 @@ my-project/
    }
    ```
 
-3. Run `bxSites build` (or `serve` while iterating) - BX Sites
+3. Run `bxSites build` (or `serve` while iterating) - BxSites
    picks up `theme/` automatically, no `bxsites.yaml` change needed (a
    project-level `theme/` folder always takes precedence over the built-in
    theme named in `theme.name`). Everything you didn't touch - nav
@@ -443,7 +415,7 @@ my-project/
    working exactly as it did in the original `bootstrap` theme, since it's
    still the exact same `layout.bxm`/`page.bxm` markup underneath.
 
-A project `theme/` folder is all-or-nothing, though - once BX Sites finds
+A project `theme/` folder is all-or-nothing, though - once BxSites finds
 one, it's used instead of the built-in theme entirely, so it still needs
 its own `layout.bxm` + `page.bxm` even if all you changed is
 `assets/style.css` (a folder missing either fails fast with

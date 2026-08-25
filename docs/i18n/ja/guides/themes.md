@@ -74,12 +74,15 @@ Mermaid）は、このモジュールに同梱（バンドル）された状態�
   レンダリング済みの HTML を解析する代わりに、プレーンな Markdown としてページを
   直接読めます。設定不要で常に有効です。
   [はじめに](../getting-started.md#markdown-としてページをダウンロード) を参照してください。
-- **オプトインのフッター**（著作権、`social` リンク、「Built with BX Sites」クレジット）-
+- **オプトインのフッター**（著作権、`social` リンク、「Built with BxSites」クレジット）-
   `bxsites.yaml` の `footer` が `true` の場合。[設定](../configuration.md#footer) を参照してください。
 - **バージョンスイッチャー** - プロジェクトが複数バージョンを含む `docs/versions/` フォルダを
   持つと自動的に表示されます。[設定](../configuration.md#versioning) を参照してください。
 - **テーマ化された `404.html`** - ほとんどの静的ホスト（GitHub Pages を含む）で、
-  一致しないパスに対して自動的に提供されます。
+  一致しないパスに対して自動的に提供されます。`docs/`（または `src/`）の直下に
+  `404.md` を置くと、タイトルと本文を独自の内容で上書きできます - 通常のページ
+  としてはビルドされず（ナビ項目も `sitemap.xml` の URL も生成されません）、
+  代わりに `site/404.html` としてレンダリングされます。
 - **カスタムロゴとファビコン** - `bxsites.yaml` の `theme.logo`/`theme.favicon` が
   設定されている場合。[設定](../configuration.md#theme) を参照してください。
 - **折りたたみ可能なサイドバーナビ** - `theme.options.navCollapsible` でオプトイン -
@@ -118,9 +121,15 @@ Mermaid）は、このモジュールに同梱（バンドル）された状態�
 
 プロジェクトが使用するテーマは `bxsites.yaml` で設定します:
 
-```yaml title="bxsites.yaml"
-theme: { name: material }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: material }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "material" } }
+    ```
 
 ## 公開済みテーマのインストール
 
@@ -138,9 +147,15 @@ bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
 満たしていることを検証します。この方法で、プロジェクトは複数のインストール済み
 テーマを並行して保持し、純粋に名前だけで切り替えることができます:
 
-```yaml title="bxsites.yaml"
-theme: { name: bx-sites-theme-blog1 }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: bx-sites-theme-blog1 }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "bx-sites-theme-blog1" } }
+    ```
 
 テーマは（プラグインとは異なり）BoxLang モジュール/クラスローダーの関与を一切必要と
 しません - 単なるファイル群であるため、`install:plugin` にあるような別途の有効化
@@ -189,58 +204,10 @@ highlight.js、Alpine.js、lunr.js はすべてこのモジュールに同梱さ
 `elk` レイアウトの Mermaid ダイアグラムを避け、`math`/Algolia/analytics はオフの
 ままにしてください。
 
-## アイコン
-
-ページ自身の `icon` フロントマター（タイトルの横、サイドバーナビのそのエントリの横に
-表示されます）は、プレーンな絵文字/短いテキスト（元々の、今も完全にサポートされている
-形式）か、8 つの自己ホスト型ライブラリのいずれかからの名前付きアイコンを受け付けます -
-すべて MIT/ISC ライセンスでこのモジュールにバンドルされています（合計約 16,200
-アイコン、CDN なし、実際に使用する数個のアイコン以外はビルド済みページの重量に
-一切追加されません - IconResolver.bx を参照してください）:
-
-```markdown title="Frontmatter"
----
-icon: rocket
----
-```
-
-```markdown title="Frontmatter"
----
-icon: lucide:rocket
----
-```
-
-```markdown title="Frontmatter"
----
-icon: phosphor-bold:rocket
----
-```
-
-裸の `rocket` は [Phosphor](https://phosphoricons.com/)（レギュラーウェイト）に
-デフォルトします。Phosphor は 6 つの自身のウェイトすべてを、それぞれ独自の
-プレフィックスで提供します: `phosphor-thin:`、`phosphor-light:`、`phosphor:`
-（レギュラー、裸の名前と同じ）、`phosphor-bold:`、`phosphor-fill:`、
-`phosphor-duotone:`。代わりに [Lucide](https://lucide.dev/icons/) には `lucide:`、
-[Tabler](https://tabler.io/icons) には `tabler:` をプレフィックスします。正確な名前は
-各サイト自身のギャラリーを参照してください - このモジュール自身が同梱している
-ファイル名と完全に一致します（小文字、ハイフン区切り。例: `book-open`、
-`arrow-up-right`。Phosphor 自身のサイトはウェイト切替を表示しますが、そこにある
-6 つの選択肢はそれぞれこのモジュールの 6 つの `phosphor[-weight]:` プレフィックスの
-いずれかに対応します）。
-
-Font Awesome はこれらに意図的に含まれていません - その Duotone スタイル（および v6
-以降のアイコンセットの大部分）は Pro 限定であり、このモジュールが無償でバンドル・
-再配布できるライセンスの下にないためです。
-
-プロジェクト独自の SVG も使用できます - `docs/assets/icons/my-icon.svg` に配置し、
-`icon: custom:my-icon` として参照します。
-
-[nav.json](../configuration.md#nav) のエントリも独自の `icon` を設定でき、その1つの
-エントリについて対象ページ自身のフロントマターを上書きします:
-
-```json title="docs/nav.json"
-{ "title": "Guides", "path": "guides/index.md", "icon": "lucide:book-open" }
-```
+ページ自身の `icon` フロントマター（または `nav.json` エントリ自身の `icon`）が、
+絵文字、8 つの同梱ライブラリのいずれかからの名前付きアイコン、またはプロジェクト
+独自のカスタム SVG にどのように解決されるかについては、[アイコン](icons.md) を
+参照してください。
 
 ## `ThemeProvider` コントラクト
 
@@ -291,9 +258,15 @@ Font Awesome はこれらに意図的に含まれていません - その Duoton
 *後に* 読み込まれるため、そこで同じ詳細度で再宣言すれば、`resources/themes/` に
 一切触れることなく優先されます:
 
-```yaml title="bxsites.yaml"
-extraCss: [ assets/brand.css ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    extraCss: [ assets/brand.css ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "extraCss": ["assets/brand.css"] }
+    ```
 
 ```css title="docs/assets/brand.css" linenums="1"
 /* docs/assets/brand.css - ビルド時に site/assets/brand.css にコピーされます */
@@ -383,7 +356,7 @@ CSS を同梱しています - このサイト自身の `docs/index.md` もこ�
 ## テーマのオーバーライド
 
 自分の `layout.bxm` + `page.bxm`（オプションで `search.bxm`/`assets/`）を、
-プロジェクトルートの `theme/` フォルダに配置します。BX Sites は、下記の契約を
+プロジェクトルートの `theme/` フォルダに配置します。BxSites は、下記の契約を
 満たしている限り、インストール済みの `themes/<name>/` テーマとどの組み込みテーマ
 よりも、プロジェクトレベルの `theme/` オーバーライドを優先します -
 このモジュール自身の `resources/themes/` にある組み込みテーマは、コピーして
@@ -425,14 +398,14 @@ my-project/
    }
    ```
 
-3. `bxSites build`（反復作業中は `serve`）を実行します - BX Sites は `theme/` を
+3. `bxSites build`（反復作業中は `serve`）を実行します - BxSites は `theme/` を
    自動的に検出するため、`bxsites.yaml` の変更は不要です（プロジェクトレベルの
    `theme/` フォルダは常に `theme.name` で指定された組み込みテーマより優先されます）。
    触れなかった部分 - ナビのレンダリング、検索、ダークモードトグル、コード
    アノテーション - は、元の `bootstrap` テーマとまったく同じように動作し続けます。
    その裏側にあるのは、まったく同じ `layout.bxm`/`page.bxm` のマークアップだからです。
 
-ただし、プロジェクトの `theme/` フォルダはオール・オア・ナッシングです - BX Sites が
+ただし、プロジェクトの `theme/` フォルダはオール・オア・ナッシングです - BxSites が
 1つでも見つけると、組み込みテーマの代わりに完全にそちらが使われます。そのため、
 変更したのが `assets/style.css` だけであっても、独自の `layout.bxm` + `page.bxm` は
 必要です（どちらかが欠けているフォルダは、黙ってフォールバックするのではなく

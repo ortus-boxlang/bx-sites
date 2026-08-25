@@ -10,8 +10,9 @@
  * `index.md` (bx-sites' own folder-index convention - NavBuilder.bx), and
  * `.gitbook/assets/**` is copied to `docs/assets/gitbook/`.
  *
- * A handful of GitBook blocks have no bx-sites equivalent at all (Prompt,
- * Conditional content, the Ask-AI search bar) and, along with anything
+ * A handful of GitBook blocks have no bx-sites equivalent at all
+ * (Conditional content - GitBook-account-based visibility, not a concept
+ * bx-sites has - and the Ask-AI search bar) and, along with anything
  * this converter doesn't recognize, are left in their original `{% %}`
  * syntax rather than silently dropped - every such spot, plus every
  * lower-confidence guess (an unrecognized hint style, a column width that
@@ -350,9 +351,9 @@ class {
 	 * Dispatches one block segment to its own bx-sites equivalent. A
 	 * child-only tag (`tab`/`card`/`column`/`step`) found outside its
 	 * expected group wrapper, and any tag this converter doesn't
-	 * recognize at all (`prompt`, `conditional-content`, `ai-chat`, or
-	 * simply a typo), is reported into `warnings` and left in its
-	 * original `{% %}` syntax rather than silently dropped.
+	 * recognize at all (`conditional-content`, `ai-chat`, or simply a
+	 * typo), is reported into `warnings` and left in its original `{% %}`
+	 * syntax rather than silently dropped.
 	 *
 	 * @block One `{ type: "block", tag, attrsRaw, segments }` entry
 	 * @warnings Accumulator array, mutated in place
@@ -379,6 +380,8 @@ class {
 			case "details":
 			case "expand":
 				return renderExpandable( arguments.block, attrs, arguments.warnings )
+			case "prompt":
+				return renderPrompt( arguments.block, attrs, arguments.warnings )
 			case "tab":
 			case "card":
 			case "column":
@@ -675,6 +678,52 @@ class {
 		var title = trim( arguments.attrs.title ?: "" )
 		var body = renderSegments( arguments.block.segments, arguments.warnings )
 		var out = [ "::: expandable" & ( len( title ) ? ' "' & escapeAttr( title ) & '"' : "" ) ]
+		if ( len( trim( body ) ) ) {
+			out.append( body )
+		}
+		out.append( ":::" )
+		return out.toList( char( 10 ) )
+	}
+
+	/**
+	 * `{% prompt description="..." icon="..." openInAIProviders="..."
+	 * defaultExpanded="..." %}` -> `::: prompt description="..."
+	 * icon="..." expanded="..."` (DirectiveBlockProcessor.bx - see
+	 * docs/guides/content-blocks.md#prompt). `openInAIProviders` has no
+	 * bx-sites equivalent (there's no "open this prompt in
+	 * ChatGPT/Claude/..." menu here, since this module never talks to a
+	 * third-party AI provider) - dropped, reported into `warnings` only
+	 * when GitBook actually turned it on, so a page that never set it
+	 * doesn't get a pointless warning. `defaultExpanded`'s GitBook states
+	 * map onto bx-sites' own `expanded` attribute; anything else is
+	 * reported and left unset (DirectiveBlockProcessor.bx's own default is
+	 * already "full", matching GitBook's own default).
+	 */
+	private string function renderPrompt( required struct block, required struct attrs, required array warnings ) {
+		var line = "::: prompt"
+		if ( len( trim( arguments.attrs.description ?: "" ) ) ) {
+			line &= ' description="' & escapeAttr( arguments.attrs.description ) & '"'
+		}
+		if ( len( trim( arguments.attrs.icon ?: "" ) ) ) {
+			line &= ' icon="' & escapeAttr( arguments.attrs.icon ) & '"'
+		}
+
+		var expandedRaw = lCase( trim( arguments.attrs.defaultExpanded ?: "" ) )
+		if ( len( expandedRaw ) ) {
+			var expandedMap = { "hidden" : "hidden", "collapsed" : "hidden", "partial" : "preview", "preview" : "preview", "full" : "full" }
+			if ( expandedMap.keyExists( expandedRaw ) ) {
+				line &= ' expanded="' & expandedMap[ expandedRaw ] & '"'
+			} else {
+				arguments.warnings.append( 'Unrecognized prompt defaultExpanded="#expandedRaw#" - left unset, defaults to "full"' )
+			}
+		}
+
+		if ( lCase( trim( arguments.attrs.openInAIProviders ?: "" ) ) == "true" ) {
+			arguments.warnings.append( '{% prompt %} openInAIProviders="true" has no bx-sites equivalent - dropped' )
+		}
+
+		var out = [ line ]
+		var body = renderSegments( arguments.block.segments, arguments.warnings )
 		if ( len( trim( body ) ) ) {
 			out.append( body )
 		}

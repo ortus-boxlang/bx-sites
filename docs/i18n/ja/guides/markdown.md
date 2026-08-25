@@ -7,13 +7,13 @@ tags: [ガイド, markdown]
 
 # Markdown 拡張機能
 
-標準 Markdown に加えて、BX Sites は bx-markdown のネイティブ Flexmark 拡張機能を
+標準 Markdown に加えて、BxSites は bx-markdown のネイティブ Flexmark 拡張機能を
 デフォルトで 3 つ有効にします - Admonition、脚注、定義リストです - さらに独自の
 Mermaid ダイアグラム統合も備えています。この 4 つはすべて
 [`bxsites.yaml` の `markdown`/`mermaid` キー](../configuration.md#markdown)
 から設定できます。
 
-これらに加えて、BX Sites は Flexmark がまったく概念すら持たない、独自の拡張機能を
+これらに加えて、BxSites は Flexmark がまったく概念すら持たない、独自の拡張機能を
 さらに 3 つ実装しています - コンテンツタブ、数式、そしてフェンスコードの
 `hl_lines`/`linenums`/`title` アノテーションです。bx-sites は bx-markdown の
 パーサーをフォークできないため、それぞれが通常の Markdown 変換の前後に
@@ -193,7 +193,7 @@ flowchart LR
 フェンスコードブロックはクライアントサイドで構文ハイライトされます
 （highlight.js）。設定は不要です - 開きの ` ``` ` の後の言語識別子でグラマーが
 選択されます（例: ` ```json `）。highlight.js 自身が同梱する言語に加えて、
-BX Sites は `bx`/`boxlang`/`bxs`/`bxm`/`cfscript` 用に独自の軽量な BoxLang
+BxSites は `bx`/`boxlang`/`bxs`/`bxm`/`cfscript` 用に独自の軽量な BoxLang
 グラマーを登録しています:
 
 ```bx
@@ -367,9 +367,15 @@ println( user.getFullName() )
 
 `bxsites.yaml` の [`mermaid`](../configuration.md#mermaid) キーでオプトイン:
 
-```yaml title="bxsites.yaml"
-mermaid: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    mermaid: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "mermaid": true }
+    ```
 
 有効にすると、` ```mermaid ` フェンスコードブロックはコードリストの代わりに
 [Mermaid](https://mermaid.js.org/) のライブダイアグラムとしてレンダリング
@@ -391,9 +397,15 @@ Mermaid はフローチャート、シーケンス図、クラス図、ガント
 
 `bxsites.yaml` の [`math`](../configuration.md#math) キーでオプトイン:
 
-```yaml title="bxsites.yaml"
-math: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    math: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "math": true }
+    ```
 
 有効にすると、[KaTeX](https://katex.org/) がインライン数式には `$...$`、
 中央揃えのブロックには `$$...$$` を組版します。どちらも Markdown 本文に
@@ -417,6 +429,10 @@ $$
 「$5 and $10」が数式と誤読されることはありません）- 組版される数式は
 常に両方の区切り記号にぴったりと接しています。
 
+GFM パイプテーブル - 配置、エスケープ、そしてすべてのテーブルに自動で
+適用されるレスポンシブなスクロール/固定ヘッダー処理 - については
+[テーブル](tables.md) を参照してください。
+
 上記のすべてに加えて、GitBook スタイルの `::: name ... :::` ブロック群
 （展開可能セクション、カード、列、ステッパー、ファイル/埋め込み/
 ページリンクカード、更新履歴（changelog）ブロック、再利用可能な
@@ -432,5 +448,5 @@ bx-sites 独自の構文は一切不要です）については
 
 Admonition、脚注、定義リストは一般的なユースケースをカバーしますが、
 bx-markdown 自体はこの 3 つ以外について特に意見を持ちません - その他の
-Flexmark 拡張機能は、BX Sites とは独立に `markdownRegisterExtension()` を
+Flexmark 拡張機能は、BxSites とは独立に `markdownRegisterExtension()` を
 使って直接登録できます。詳細は bx-markdown 自身の readme を参照してください。

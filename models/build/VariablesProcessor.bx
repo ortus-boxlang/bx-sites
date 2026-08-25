@@ -1,0 +1,340 @@
+/**
+ * Resolves `{{ }}` expressions in a page's raw markdown body - module spec
+ * section 4's "Reusable variables" and section 8's "magic functions"
+ * (`functions.bxs`), both driven through the same `{{ }}` syntax:
+ *
+ *   - `{{ dotted.path }}` - a dot-path lookup into `bxsites.yaml`'s own
+ *     top-level `variables` block (ConfigLoader.bx), e.g.
+ *     `variables: { company: "Ortus Solutions" }` -> `{{ company }}`.
+ *   - `{{ $name(arg1, arg2) }}` - a call to one of `functions.bxs`'s
+ *     `$`-prefixed magic functions (FunctionsLoader.bx). Arguments are
+ *     comma-separated literals (numbers, `'single'`/`"double"`-quoted
+ *     strings, `true`/`false`) or `{{ }}`-less dotted variable references
+ *     (`greeting.name`, not `{{ greeting.name }}`) - no nested function
+ *     calls or expressions inside an argument in this v1.
+ *
+ * Runs as a single markdown-to-markdown pass (same shape as
+ * MarkdownLinkResolver.bx/IncludeProcessor.bx - no restore step, unlike
+ * TabsProcessor.bx/MathProtector.bx, since the substituted text is meant
+ * to become real markdown source rather than something reversed after
+ * `Markdown()` runs), fence-aware via FenceTracker.bx so a `{{ ... }}`
+ * shown inside a fenced code block (e.g. this very guide, demonstrating
+ * the syntax) is left completely untouched rather than resolved. Unlike
+ * MathProtector.bx/TabsProcessor.bx (whose own `$...$`/`=== "Tab"` syntax
+ * is only fence-protected, never inline-protected - harmless for them,
+ * since neither ever throws on an unrecognized match), a `{{ }}` shown in
+ * an *inline* code span (`` `{{ example }}` ``, single or double
+ * backticks) is masked out too (maskInlineCode()) before the token search
+ * runs - this class's own fail-fast behavior on an unresolved-but-
+ * recognized-shape token means an inline documentation example needs the
+ * same protection a fenced block already gets, not just a "prefer an
+ * unambiguous name" convention to remember. Best-effort CommonMark inline-
+ * span matching (matched backtick-run lengths), not a full parser - good
+ * enough for the spans real documentation actually writes, including this
+ * very guide's own inline examples.
+ *
+ * A `{{ }}` whose inner text matches neither shape (an unrelated
+ * curly-brace use, e.g. a page discussing some other templating engine's
+ * own `{{ }}` syntax in prose) is left untouched rather than treated as an
+ * error - only a token that *looks* like a variable path or a magic
+ * function call, but fails to resolve, throws (catching real typos without
+ * misreading unrelated `{{ }}` prose as broken syntax).
+ */
+class {
+
+	variables.tokenPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "\{\{[ \t]*([^\n\{\}]+?)[ \t]*\}\}" )
+	variables.identifierPathPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$" )
+	variables.functionCallPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^(\$[A-Za-z_][A-Za-z0-9_]*)\((.*)\)$" )
+	// Matches one CommonMark inline code span - a run of one or more
+	// backticks, opening and closing (the closing run must be the exact
+	// same length - `` `single` `` vs ``` ``needs-a-`-inside`` ```) - so a
+	// `{{ }}` shown as a *literal, inline* documentation example (like
+	// this very guide's own "Argument syntax" list) is never mistaken for
+	// a real expression. Best-effort, not a full CommonMark inline-parser:
+	// good enough for the single/double-backtick spans real documentation
+	// actually writes.
+	variables.inlineCodePattern = createObject( "java", "java.util.regex.Pattern" ).compile( "(`+)(?:(?!\1)[^\n])*?\1" )
+	variables.matcherHelper = createObject( "java", "java.util.regex.Matcher" )
+
+	/**
+	 * Resolves every `{{ }}` expression in `markdown`.
+	 *
+	 * @markdown The raw markdown body text
+	 * @vars The site config's own `variables` block (ConfigLoader.bx) - dotted-path lookup target
+	 * @functions FunctionsLoader.load()'s own output - `$`-prefixed callable magic functions
+	 * @context The including page's own docs/-relative path, for error messages only (e.g. "guides/setup.md")
+	 * @functionContext The "supporting variables" bound bare into a magic function's own body - `siteConfig`/`page`/`nav`/`basePath`/`versions`/`currentVersion`/`locales`/`currentLocale`/`currentLocaleDir` (BuildPipeline.bx's own `convertMarkdown()` docblock has the exact shape) - the same names/values a `theme/` `.bxm` override already has bare in scope, so a magic function reads them identically regardless of where it's called from. See docs/guides/variables-and-functions.md's "Context variables" section
+	 *
+	 * @return markdown with every recognized `{{ }}` expression replaced by its resolved value
+	 */
+	string function resolve( required string markdown, struct vars = {}, struct functions = {}, string context = "", struct functionContext = {} ) {
+		var normalized = arguments.markdown.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" )
+		var lines = listToArray( normalized, char( 10 ), true )
+		var tracker = new "models.build.FenceTracker@bxsites"()
+		var fenced = lines.map( line => tracker.consume( line ) )
+
+		var outputLines = []
+		var i = 1
+		while ( i <= lines.len() ) {
+			if ( fenced[ i ] ) {
+				outputLines.append( lines[ i ] )
+				i++
+				continue
+			}
+
+			var runLines = []
+			while ( i <= lines.len() && !fenced[ i ] ) {
+				runLines.append( lines[ i ] )
+				i++
+			}
+
+			var resolvedRun = resolveRun( runLines.toList( char( 10 ) ), arguments.vars, arguments.functions, arguments.context, arguments.functionContext )
+			for ( var outLine in listToArray( resolvedRun, char( 10 ), true ) ) {
+				outputLines.append( outLine )
+			}
+		}
+
+		return outputLines.toList( char( 10 ) )
+	}
+
+	/**
+	 * Resolves every `{{ }}` token in one fence-free run of text - except
+	 * one shown inside an *inline* code span (`` `{{ example }}` ``),
+	 * which is masked out first (maskInlineCode()) so the token search
+	 * below never finds it: a `{{ }}` example inline in prose, not a real
+	 * expression, is exactly as untouched as one inside a fenced code
+	 * block.
+	 */
+	private string function resolveRun( required string text, required struct vars, required struct functions, required string context, required struct functionContext ) {
+		var masked = maskInlineCode( arguments.text )
+		var matcher = variables.tokenPattern.matcher( masked )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+		var lastEnd = 1
+
+		while ( matcher.find() ) {
+			// Positions read off `matcher` (matched against `masked`) but
+			// the actual text substituted always comes from `arguments.text`
+			// (the original, unmasked source) - masking only ever changes
+			// which spans the token search is allowed to find, never the
+			// content a real match resolves to.
+			var matchStart = matcher.start() + 1
+			var matchEnd = matcher.end() + 1
+			var groupStart = matcher.start( 1 ) + 1
+			var groupEnd = matcher.end( 1 ) + 1
+
+			buffer.append( mid( arguments.text, lastEnd, matchStart - lastEnd ) )
+
+			var expr = trim( mid( arguments.text, groupStart, groupEnd - groupStart ) )
+			var resolved = resolveExpression( expr, arguments.vars, arguments.functions, arguments.context, arguments.functionContext )
+			var replacement = resolved.matched ? resolved.value : mid( arguments.text, matchStart, matchEnd - matchStart )
+			buffer.append( replacement )
+
+			lastEnd = matchEnd
+		}
+		buffer.append( mid( arguments.text, lastEnd, len( arguments.text ) - lastEnd + 1 ) )
+
+		return buffer.toString()
+	}
+
+	/**
+	 * Replaces every CommonMark inline code span in `text` with a
+	 * same-length run of a filler character (never `{`/`}`, so it can
+	 * never form a new, spurious `{{ }}` shape of its own) - masking out
+	 * the position of every `` `...` ``/``` ``...`` ``` span so
+	 * `resolveRun()`'s own token search, run against this masked copy,
+	 * never matches inside one, while every position/length stays
+	 * identical to the original text (so the same offsets read back
+	 * correctly against `arguments.text` in resolveRun()). Applied
+	 * per-line - an inline code span is never expected to cross a line
+	 * break in practice.
+	 */
+	private string function maskInlineCode( required string text ) {
+		var lines = listToArray( arguments.text, char( 10 ), true )
+		var maskedLines = []
+
+		for ( var line in lines ) {
+			var matcher = variables.inlineCodePattern.matcher( line )
+			var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+			while ( matcher.find() ) {
+				matcher.appendReplacement( buffer, variables.matcherHelper.quoteReplacement( repeatString( "x", len( matcher.group() ) ) ) )
+			}
+			matcher.appendTail( buffer )
+			maskedLines.append( buffer.toString() )
+		}
+
+		return maskedLines.toList( char( 10 ) )
+	}
+
+	/**
+	 * @return { matched: false } when `expr` isn't a recognized variable-path
+	 * or magic-function-call shape at all (left untouched by the caller);
+	 * otherwise `{ matched: true, value: string }` - throws on a recognized
+	 * shape that fails to resolve (unknown variable/function).
+	 */
+	private struct function resolveExpression( required string expr, required struct vars, required struct functions, required string context, required struct functionContext ) {
+		var callMatcher = variables.functionCallPattern.matcher( arguments.expr )
+		if ( callMatcher.matches() ) {
+			return { matched : true, value : resolveFunctionCall( callMatcher.group( 1 ), callMatcher.group( 2 ), arguments.vars, arguments.functions, arguments.context, arguments.functionContext ) }
+		}
+
+		if ( variables.identifierPathPattern.matcher( arguments.expr ).matches() ) {
+			var lookup = lookupPath( arguments.expr, arguments.vars )
+			if ( !lookup.found ) {
+				throw(
+					type    : "BxSites.UnknownVariable",
+					message : "{{ #arguments.expr# }}#len( arguments.context ) ? ' (in ' & arguments.context & ')' : ''# - no [variables.#arguments.expr#] entry in bxsites.yaml"
+				)
+			}
+			return { matched : true, value : "#lookup.value#" }
+		}
+
+		return { matched : false, value : "" }
+	}
+
+	/**
+	 * @name The matched `$name` call target, dollar sign included
+	 * @rawArgs The call's raw, unparsed argument list text (may be empty)
+	 */
+	private string function resolveFunctionCall( required string name, required string rawArgs, required struct vars, required struct functions, required string context, required struct functionContext ) {
+		if ( !arguments.functions.keyExists( arguments.name ) ) {
+			throw(
+				type    : "BxSites.UnknownFunction",
+				message : "{{ #arguments.name#(...) }}#len( arguments.context ) ? ' (in ' & arguments.context & ')' : ''# - no magic function named [#arguments.name#] in functions.bxs"
+			)
+		}
+
+		var args = parseArgs( arguments.rawArgs, arguments.vars, arguments.context )
+
+		// A fresh FunctionScope.bx instance every call, not a single
+		// persistent one reused across calls - see FunctionScope.bx's own
+		// docblock for why a magic function invoked as a bare local
+		// variable holding a detached function value loses the ability to
+		// bare-call a sibling function from the same functions.bxs (a
+		// private helper, or another `$`-prefixed one), and why binding
+		// onto *this* class's own `variables` scope directly would risk a
+		// project's own function name silently overwriting one of this
+		// class's real methods. A shared instance would additionally risk
+		// one call's own `page`/`nav`/functions leaking into the next
+		// call's resolution whenever the next call's own bind() doesn't
+		// happen to overwrite every key the previous one set - a fresh
+		// instance every time removes that risk entirely, at the cost of
+		// one small extra allocation per `{{ $name(...) }}` call.
+		// `functionContext` (siteConfig/page/nav/etc.) is bound the same
+		// way, right alongside the functions themselves, so a magic
+		// function's own body can read them bare too - the same
+		// "supporting variables" a theme .bxm override already has in
+		// scope (ThemeRenderer.bx), just bound here instead of relying on
+		// this class's own `variables` scope already happening to have them.
+		var functionScope = new "models.build.FunctionScope@bxsites"()
+		functionScope.bind( arguments.functionContext )
+		functionScope.bind( arguments.functions )
+		var result = functionScope.call( arguments.name, args )
+		return "#result#"
+	}
+
+	/**
+	 * Splits a raw argument-list string on top-level commas (quote-aware -
+	 * a comma inside `'...'`/`"..."` doesn't split), then resolves each
+	 * trimmed argument as a literal (number/quoted string/boolean) or a
+	 * dotted variable-path reference.
+	 */
+	private array function parseArgs( required string rawArgs, required struct vars, required string context ) {
+		var trimmed = trim( arguments.rawArgs )
+		if ( !len( trimmed ) ) {
+			return []
+		}
+
+		var parts = splitTopLevel( trimmed )
+		var resolved = []
+		for ( var part in parts ) {
+			resolved.append( resolveArg( trim( part ), arguments.vars, arguments.context ) )
+		}
+		return resolved
+	}
+
+	/**
+	 * Quote-aware top-level comma split - a comma inside a `'...'`/`"..."`
+	 * literal argument doesn't split the list.
+	 */
+	private array function splitTopLevel( required string text ) {
+		var parts = []
+		var current = createObject( "java", "java.lang.StringBuilder" ).init()
+		var quoteChar = ""
+		var chars = arguments.text.toCharArray()
+
+		for ( var c in chars ) {
+			if ( len( quoteChar ) ) {
+				current.append( c )
+				if ( c == quoteChar ) {
+					quoteChar = ""
+				}
+				continue
+			}
+			if ( c == "'" || c == '"' ) {
+				quoteChar = c
+				current.append( c )
+				continue
+			}
+			if ( c == "," ) {
+				parts.append( current.toString() )
+				current = createObject( "java", "java.lang.StringBuilder" ).init()
+				continue
+			}
+			current.append( c )
+		}
+		parts.append( current.toString() )
+		return parts
+	}
+
+	/**
+	 * Resolves one already-trimmed argument token to its BoxLang value.
+	 */
+	private any function resolveArg( required string token, required struct vars, required string context ) {
+		if ( !len( arguments.token ) ) {
+			return ""
+		}
+
+		if ( isNumeric( arguments.token ) ) {
+			return val( arguments.token )
+		}
+
+		if ( arguments.token == "true" ) {
+			return true
+		}
+		if ( arguments.token == "false" ) {
+			return false
+		}
+
+		var first = left( arguments.token, 1 )
+		var last = right( arguments.token, 1 )
+		if ( ( first == "'" || first == '"' ) && first == last && len( arguments.token ) >= 2 ) {
+			return mid( arguments.token, 2, len( arguments.token ) - 2 )
+		}
+
+		var lookup = lookupPath( arguments.token, arguments.vars )
+		if ( !lookup.found ) {
+			throw(
+				type    : "BxSites.UnknownVariable",
+				message : "#arguments.token##len( arguments.context ) ? ' (in ' & arguments.context & ')' : ''# - no [variables.#arguments.token#] entry in bxsites.yaml"
+			)
+		}
+		return lookup.value
+	}
+
+	/**
+	 * Dot-path traversal against `vars` - `"support.email"` -> `vars.support.email`.
+	 *
+	 * @return { found: boolean, value: any }
+	 */
+	private struct function lookupPath( required string path, required struct vars ) {
+		var current = arguments.vars
+		for ( var segment in listToArray( arguments.path, "." ) ) {
+			if ( !isStruct( current ) || !current.keyExists( segment ) ) {
+				return { found : false, value : "" }
+			}
+			current = current[ segment ]
+		}
+		return { found : true, value : current }
+	}
+
+}

@@ -1,7 +1,7 @@
 /**
  * Exercises SearchProviderRegistry.bx's own small rules directly - the
  * built-in provider name list, which providers need the local
- * `search-index.json`/lunr widget, and which need PagefindIndexer.bx run
+ * `search-index.json`/MiniSearch widget, and which need PagefindIndexer.bx run
  * against the finished site (module spec section 7).
  */
 class extends="testbox.system.BaseSpec" {

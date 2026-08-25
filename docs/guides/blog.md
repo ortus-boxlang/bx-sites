@@ -10,7 +10,7 @@ tags: [guides, blog]
 A blog is another by-convention feature, the same shape as
 [versions](../configuration.md#versioning)/[i18n](i18n.md) or the
 [tags index](../getting-started.md#add-pages) - drop posts under
-`docs/blog/posts/`, and BX Sites builds `/blog/` (paginated), a category page
+`docs/blog/posts/`, and BxSites builds `/blog/` (paginated), a category page
 per category, a year archive page per calendar year, an author page per
 author, an RSS feed per category plus one for the whole blog, and a
 `/blog/stats/` page, with zero config required. A project with no
@@ -60,7 +60,7 @@ out of the excerpt shown on `/blog/` and category pages, but still renders
 in full on the post's own page.
 ```
 
-- `date` (required) - any BX Sites can parse (`2026-08-15`, or a full
+- `date` (required) - any BxSites can parse (`2026-08-15`, or a full
   date-time). Sets the post's own sort order (newest first) and its
   `<pubDate>`/`article:published_time`.
 - `authors` - a list of ids matching [`docs/blog/authors.yml`](#authors)
@@ -75,7 +75,7 @@ in full on the post's own page.
   every other tagged page.
 - `summary` - a one-line excerpt shown on `/blog/`/category pages and in
   the RSS feed, used when a post has no `<!-- more -->` marker. Without
-  either, BX Sites falls back to a plain-text truncation of the post's own
+  either, BxSites falls back to a plain-text truncation of the post's own
   body.
 - `image` - a featured image (a `docs/assets/`-relative path, or a full
   URL) - shown at the top of the post and as a thumbnail on every list/
@@ -164,14 +164,26 @@ it somewhere specific instead, add your own entry with an explicit `url`
 a `docs/` page) to your `nav` array or `docs/nav.json` - doing so suppresses
 the auto-appended one entirely, so there's never a duplicate:
 
-```yaml title="bxsites.yaml" linenums="1"
-nav:
-  - path: index.md
-  - title: Blog
-    url: blog/index.html
-    icon: lucide:newspaper
-  - path: about.md
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    nav:
+      - path: index.md
+      - title: Blog
+        url: blog/index.html
+        icon: lucide:newspaper
+      - path: about.md
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"nav": [
+    		{ "path": "index.md" },
+    		{ "title": "Blog", "url": "blog/index.html", "icon": "lucide:newspaper" },
+    		{ "path": "about.md" }
+    	]
+    }
+    ```
 
 Individual posts aren't added to the nav themselves (same as the tags
 index) - they're reachable from `/blog/`, their own category page, their
@@ -195,9 +207,15 @@ Every category also gets its own filtered feed at
 unbounded feed on a large blog just wastes bandwidth on every poll; set it
 to `0` for every post, uncapped:
 
-```yaml title="bxsites.yaml"
-blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
+    ```
 
 ## Previewing drafts
 

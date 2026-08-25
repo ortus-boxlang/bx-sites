@@ -39,7 +39,7 @@ findest du in
 
 ## Installation
 
-BX Sites benötigt [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
+BxSites benötigt [bx-markdown](https://github.com/ortus-boxlang/bx-markdown)
 für das Rendern von Markdown, [bx-esapi](https://github.com/ortus-boxlang/bx-esapi)
 für die HTML-Kodierung, [bx-yaml](https://github.com/ortus-boxlang/bx-yaml)
 zum Lesen von `bxsites.yaml`, und [bx-image](https://github.com/ortus-boxlang/bx-image)
@@ -154,7 +154,7 @@ See [Deployment](guides/deployment.md) or, from that same guide,
 [back to Getting Started](../getting-started.md#seiten-hinzufügen).
 ```
 
-BX Sites schreibt jeden solchen Link zur Build-Zeit auf seine gebaute
+BxSites schreibt jeden solchen Link zur Build-Zeit auf seine gebaute
 Pretty-URL um (`guides/deployment.md` -> `/guides/deployment/index.html`,
 Anker und Query-Strings bleiben erhalten), aufgelöst relativ zum eigenen
 Ordner der *verlinkenden* Seite - `../`- und Geschwister-Referenzen
@@ -187,7 +187,7 @@ Jede Seite kann mit einem kleinen Frontmatter-Block beginnen:
 title: Deployment
 order: 2
 hidden: false
-description: How to deploy a built BX Sites site.
+description: How to deploy a built BxSites site.
 tags: [guides, deployment]
 icon: 🚀
 summary: Everything you need to publish a built site.
@@ -214,7 +214,7 @@ Your content here.
   ein reines Emoji oder ein benannter Icon-Verweis aus einer mitgelieferten
   Bibliothek (`rocket`, `lucide:rocket`, `tabler:rocket`, oder ein eigenes
   `custom:my-icon` eines Projekts) - siehe
-  [Themes: Icons](guides/themes.md#icons)
+  [Icons](guides/icons.md)
 - `summary` - eine einzeilige Einleitung, die unter dem Titel angezeigt wird
   (zu unterscheiden von `description`, die nur für Meta-Tags gedacht ist und
   nie auf der Seite selbst gerendert wird)

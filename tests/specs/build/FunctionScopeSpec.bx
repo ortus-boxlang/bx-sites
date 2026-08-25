@@ -1,0 +1,32 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.FunctionScope", function() {
+
+			beforeEach( function() {
+				variables.scope = new "models.build.FunctionScope@bxsites"();
+			} );
+
+			it( "binds and calls a single function", function() {
+				scope.bind( { "$greet" : function( name ) { return "Hi " & arguments.name } } );
+				expect( scope.call( "$greet", [ "World" ] ) ).toBe( "Hi World" );
+			} );
+
+			it( "lets one bound function bare-call a sibling bound in the same bind() call", function() {
+				// Named top-level declarations, not closure literals - see
+				// VariablesProcessorSpec.bx's own matching test for why that
+				// distinction is the whole point of this test.
+				function formatPrice( amount ) {
+					return "$" & arguments.amount;
+				}
+				function $price( amount ) {
+					return formatPrice( arguments.amount );
+				}
+				scope.bind( { "formatPrice" : formatPrice, "$price" : $price } );
+				expect( scope.call( "$price", [ 5 ] ) ).toBe( "$5" );
+			} );
+
+		} );
+	}
+
+}

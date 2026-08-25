@@ -1,0 +1,155 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.VariablesProcessor", function() {
+
+			beforeEach( function() {
+				variables.processor = new "models.build.VariablesProcessor@bxsites"();
+			} );
+
+			it( "leaves markdown with no {{ }} expressions untouched", function() {
+				var md = "Just a paragraph with no expressions.";
+				expect( processor.resolve( md ) ).toBe( md );
+			} );
+
+			it( "resolves a top-level variable", function() {
+				var result = processor.resolve( "Hello {{ company }}!", { "company" : "Ortus" } );
+				expect( result ).toBe( "Hello Ortus!" );
+			} );
+
+			it( "resolves a nested dotted-path variable", function() {
+				var vars = { "product" : { "name" : "BoxLang" } };
+				var result = processor.resolve( "We build {{ product.name }}.", vars );
+				expect( result ).toBe( "We build BoxLang." );
+			} );
+
+			it( "calls a $-prefixed magic function with a quoted string argument", function() {
+				var fns = { "$greet" : function( name ) { return "Hi " & arguments.name } };
+				var result = processor.resolve( "{{ $greet('World') }}", {}, fns );
+				expect( result ).toBe( "Hi World" );
+			} );
+
+			it( "calls a magic function with number/boolean/variable-reference arguments", function() {
+				var fns = { "$badge" : function( label, kind, count ) {
+					return arguments.label & "/" & arguments.kind & "/" & arguments.count
+				} };
+				var vars = { "status" : "success" };
+				var result = processor.resolve( "{{ $badge('Stable', status, 3) }}", vars, fns );
+				expect( result ).toBe( "Stable/success/3" );
+			} );
+
+			it( "lets a magic function bare-reference the shared siteConfig/page/nav context", function() {
+				// Named top-level declarations, not closure literals - same
+				// reasoning as the sibling-call tests below: only a named
+				// declaration resolves a bare reference dynamically against
+				// whatever scope actually invokes it.
+				function $sitename() {
+					return siteConfig.name;
+				}
+				function $pagetitle() {
+					return page.title;
+				}
+				function $navcount() {
+					return nav.len();
+				}
+				var fns = { "$sitename" : $sitename, "$pagetitle" : $pagetitle, "$navcount" : $navcount };
+				var functionContext = {
+					siteConfig : { name : "My Docs" },
+					page       : { title : "Home" },
+					nav        : [ { title : "Home" }, { title : "Guides" } ]
+				};
+				var result = processor.resolve( "{{ $sitename() }} / {{ $pagetitle() }} / {{ $navcount() }}", {}, fns, "", functionContext );
+				expect( result ).toBe( "My Docs / Home / 2" );
+			} );
+
+			it( "lets a magic function call a private, non-$-prefixed helper from the same functions.bxs", function() {
+				// Named top-level function declarations, not closure
+				// literals assigned as struct values - a real functions.bxs
+				// (loaded via FunctionsLoader.bx's own `include`) produces
+				// the former, and only the former resolves a sibling's bare
+				// name dynamically against whatever scope later calls it; a
+				// closure literal (`"key": function(){...}`) instead
+				// captures its own defining lexical scope, which would make
+				// this test pass for the wrong reason (or not exercise the
+				// real bug this pair of tests exists to catch at all).
+				function formatPrice( amount ) {
+					return "$" & arguments.amount;
+				}
+				function $price( amount ) {
+					return formatPrice( arguments.amount );
+				}
+				var fns = { "formatPrice" : formatPrice, "$price" : $price };
+				var result = processor.resolve( "{{ $price(5) }}", {}, fns );
+				expect( result ).toBe( "$5" );
+			} );
+
+			it( "lets one $-prefixed magic function call another", function() {
+				function $b( x ) {
+					return "b(" & arguments.x & ")";
+				}
+				function $a( x ) {
+					return $b( arguments.x ) & "-a";
+				}
+				var fns = { "$b" : $b, "$a" : $a };
+				var result = processor.resolve( "{{ $a(1) }}", {}, fns );
+				expect( result ).toBe( "b(1)-a" );
+			} );
+
+			it( "splices a magic function's HTML return value directly into the markdown", function() {
+				var fns = { "$badge" : function( label ) {
+					return "<span class=""badge"">" & arguments.label & "</span>"
+				} };
+				var result = processor.resolve( "{{ $badge('Stable') }}", {}, fns );
+				expect( result ).toBe( '<span class="badge">Stable</span>' );
+			} );
+
+			it( "leaves a {{ }} shown inside a fenced code block untouched", function() {
+				var md = "Text." & char( 10 ) & "```" & char( 10 ) & "{{ company }}" & char( 10 ) & "```";
+				var result = processor.resolve( md, { "company" : "Ortus" } );
+				expect( result ).toBe( md );
+			} );
+
+			it( "leaves a {{ }} shown inside inline code untouched, even when it looks like a real call", function() {
+				// A doc page listing this syntax inline (not in a fenced
+				// block) must not have the fail-fast UnknownFunction/
+				// UnknownVariable behavior misfire on its own examples.
+				var fns = { "$greet" : function( name ) { return "Hi " & arguments.name } };
+				var md = "- Numbers: `{{ $discount(20) }}`" & char( 10 ) & "- Strings: `{{ $greet('World') }}`";
+				var result = processor.resolve( md, {}, fns );
+				expect( result ).toBe( md );
+			} );
+
+			it( "still resolves real prose {{ }} on the same line as an inline-code example", function() {
+				var md = "Real: {{ company }} and inline `{{ company }}` example";
+				var result = processor.resolve( md, { "company" : "Ortus" } );
+				expect( result ).toBe( "Real: Ortus and inline `{{ company }}` example" );
+			} );
+
+			it( "leaves a {{ }} whose contents match neither shape untouched", function() {
+				var md = "{{ not a valid expression at all }}";
+				expect( processor.resolve( md ) ).toBe( md );
+			} );
+
+			it( "throws BxSites.UnknownVariable for an unresolved variable path", function() {
+				expect( function() {
+					processor.resolve( "{{ compnay }}", { "company" : "Ortus" } );
+				} ).toThrow( "BxSites.UnknownVariable" );
+			} );
+
+			it( "throws BxSites.UnknownFunction for a $-call with no matching magic function", function() {
+				expect( function() {
+					processor.resolve( "{{ $missing('x') }}" );
+				} ).toThrow( "BxSites.UnknownFunction" );
+			} );
+
+			it( "throws BxSites.UnknownVariable for an unresolved variable-reference argument", function() {
+				var fns = { "$greet" : function( name ) { return "Hi " & arguments.name } };
+				expect( function() {
+					processor.resolve( "{{ $greet(unknownVar) }}", {}, fns );
+				} ).toThrow( "BxSites.UnknownVariable" );
+			} );
+
+		} );
+	}
+
+}

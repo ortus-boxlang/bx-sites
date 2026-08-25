@@ -7,14 +7,18 @@ icon: phosphor-duotone:book-open
 # Guides
 
 - [Themes](themes.md) - the built-in themes, and how to write your own
+- [Icons](icons.md) - emoji, or a named icon from one of eight bundled libraries, on any page/nav entry
 - [Search](search.md) - how the static search index works
 - [Deploying to GitHub Pages](deployment.md) - the built-in GitHub Actions workflow
 - [Markdown Extensions](markdown.md) - admonitions, footnotes, definition lists and Mermaid diagrams
-- [Content Blocks](content-blocks.md) - GitBook-style blocks: expandables, cards, columns, a stepper, and reusable content includes
+- [Content Blocks](content-blocks.md) - GitBook-style blocks: expandables, cards, columns, a stepper, buttons, and reusable content includes
+- [Tables](tables.md) - GFM pipe tables, always on, with an automatic responsive-scroll/sticky-header treatment
+- [OpenAPI / Swagger](openapi.md) - an interactive Swagger UI widget for an OpenAPI/Swagger spec, full reference or one operation inline
 - [Responsive Images](images.md) - automatic resizing, WebP variants, and CSS/JS bundling, on by default
 - [Interactivity with Alpine.js](interactivity.md) - reactive content (copy buttons, live filters, and more) with no extra setup
 - [Blog](blog.md) - a by-convention blog: posts, authors, categories, archives, RSS, and stats
-- [Plugins](plugins.md) - extending BX Sites with a BoxLang module of your own
+- [Variables & Magic Functions](variables-and-functions.md) - reusable `{{ variables }}` and BoxLang helper functions, usable anywhere in your content
+- [Plugins](plugins.md) - extending BxSites with a BoxLang module of your own
 - [CLI Providers](cli-providers.md) - registering your own `bxSites <verb>` commands from a module
 - [Importing a theme](theme-import.md) - best-effort convert an mkdocs/jekyll/hugo theme into a bx-sites theme
 - [Versioning](versioning.md) - snapshot a release's docs and get a version switcher for free

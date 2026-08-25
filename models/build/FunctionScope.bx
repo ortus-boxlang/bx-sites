@@ -1,0 +1,58 @@
+/**
+ * A bare, single-purpose `variables` scope for invoking magic functions
+ * (`docs/functions.bxs` - FunctionsLoader.bx) with no other members of its
+ * own to collide with.
+ *
+ * `VariablesProcessor.bx` needs a magic function's own body to still be
+ * able to bare-call a sibling function from the same `functions.bxs` (a
+ * private helper, or another `$`-prefixed one), and to bare-*read* the
+ * same "supporting variables" (`siteConfig`/`page`/`nav`/etc.) a `.bxm`
+ * theme template already has in scope - once it's actually invoked from
+ * `{{ }}` markdown, BoxLang only resolves that kind of bare reference
+ * against whatever scope the call happens to run in, not something
+ * captured at the function's own definition time (see FunctionsLoader.bx's
+ * own docblock). Binding those directly onto VariablesProcessor's own
+ * `variables` scope would make that work too, but risks a project's own
+ * function name (a plain, non-`$` private helper - `$`-prefixed magic
+ * functions can never collide, since none of this class's own members
+ * start with `$`) silently overwriting one of VariablesProcessor's *own*
+ * real methods (`resolve`, `parseArgs`, `lookupPath`, ...) for the rest of
+ * the build. Routing every call through a disposable instance of *this*
+ * class instead - which declares nothing but `bind()`/`call()` - removes
+ * that risk entirely for the markdown path.
+ *
+ * (No equivalent exists for ThemeRenderer.bx's own `.bxm`-template bare
+ * calls - a `.bxm` file's bare `$name(...)` has to resolve against
+ * ThemeRenderer's *own* scope, since that's the instance actually
+ * `include`-ing it, so that collision risk is real and documented instead
+ * - see docs/guides/variables-and-functions.md's "Reserved names" section.)
+ */
+class {
+
+	/**
+	 * Binds every key in `values` into this instance's own `variables`
+	 * scope, so one bound value (typically a function) can bare-reference
+	 * another (call() below runs the same way ThemeRenderer.bx's own
+	 * bind-then-bare-call does for `.bxm` templates) - `values` is
+	 * FunctionsLoader.load()'s own output on one call, and the shared
+	 * "supporting variables" context (`siteConfig`/`page`/`nav`/etc.) on
+	 * another; both just become bare-referenceable names here, function or
+	 * plain data alike.
+	 *
+	 * @values Struct of name -> value to bind
+	 */
+	void function bind( required struct values ) {
+		for ( var name in arguments.values ) {
+			variables[ name ] = arguments.values[ name ]
+		}
+	}
+
+	/**
+	 * @name A function name already bound via bind()
+	 * @args Positional arguments
+	 */
+	any function call( required string name, required array args ) {
+		return variables[ arguments.name ]( argumentCollection : arguments.args )
+	}
+
+}

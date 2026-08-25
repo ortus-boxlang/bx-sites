@@ -7,7 +7,7 @@ tags: [guide, alpine, interattività]
 
 # Interattività con Alpine.js
 
-Ogni pagina compilata da BX Sites carica già [Alpine.js](https://alpinejs.dev/)
+Ogni pagina compilata da BxSites carica già [Alpine.js](https://alpinejs.dev/)
 - è ciò che alimenta l'interruttore modalità scura integrato e il menu a
 discesa della lingua in ogni tema integrato. Quella stessa
 istanza Alpine è disponibile gratuitamente anche per il contenuto delle
@@ -30,18 +30,30 @@ ricorri prima a questi:
 - Contenuto alternativo raggruppato dietro schede cliccabili →
   [Schede di contenuto](markdown.md#content-tabs)
 - Un percorso guidato numerato → [Stepper](content-blocks.md#stepper)
+- Un link di call-to-action con stile predefinito →
+  [Pulsanti](content-blocks.md#pulsanti) (il pulsante copia-negli-appunti
+  qui sotto è un caso *diverso* - non ha affatto un `href`, solo
+  comportamento lato client - esattamente ciò per cui serve Alpine)
 
 Alpine serve per il contenuto interattivo che questi non coprono -
 qualsiasi cosa con un proprio stato lato client.
 
 ## Un pulsante copia-negli-appunti
 
-Un caso comune: un pulsante accanto a un comando di installazione che lo
-copia e conferma la copia:
+[`::: button`](content-blocks.md#pulsanti) renderizza sempre e solo un
+link vero (oppure un segnaposto inerte) - come il pulsante nativo di
+GitBook, non ha alcuna nozione di eseguire JS arbitrario al click. Per un
+pulsante che *fa* qualcosa invece di navigare da qualche parte, applica
+le sue classi `bxsites-button`/`bxsites-button--*` a un normale
+`<button>` HTML - stesso aspetto, stilizzato in ogni tema integrato,
+semplicemente collegato con Alpine invece che con un `href`. Un caso
+comune: un pulsante accanto a un comando di installazione che lo copia e
+conferma la copia:
 
 ```markdown title="Pulsante di copia" linenums="1"
 <div x-data="{ copied: false }">
-  <button type="button" @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
+  <button type="button" class="bxsites-button bxsites-button--secondary bxsites-button--small"
+    @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
     <span x-show="!copied">Copy install command</span>
     <span x-show="copied" x-cloak>Copied!</span>
   </button>
@@ -49,7 +61,8 @@ copia e conferma la copia:
 ```
 
 <div x-data="{ copied: false }">
-  <button type="button" class="btn btn-sm btn-outline-secondary" @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
+  <button type="button" class="bxsites-button bxsites-button--secondary bxsites-button--small"
+    @click="navigator.clipboard.writeText( 'box install bx-sites' ); copied = true; setTimeout( () => copied = false, 1500 )">
     <span x-show="!copied">Copia il comando di installazione</span>
     <span x-show="copied" x-cloak>Copiato!</span>
   </button>
@@ -72,6 +85,120 @@ Filtrare una lista lato client, senza andata e ritorno verso il server:
 
 `x-model` collega il valore dell'input allo stato Alpine; l'`x-show` di
 ogni `<li>` viene rivalutato a ogni tasto premuto.
+
+## Una tabella ordinabile e filtrabile
+
+Una [tabella nativa a pipe](tables.md) è statica una volta
+costruita - per averne una che il lettore possa davvero ordinare e
+filtrare lato client (la cosa più vicina qui alla ricerca/ordinamento
+delle tabelle di GitBook), lascia che sia Alpine a possedere le righe:
+metti i dati in `x-data` e renderizzali con `x-for`, invece di scrivere la
+sintassi a pipe `| Feature | Status |`:
+
+```markdown title="Sortable table" linenums="1"
+<div x-data="{
+  query: '',
+  sortKey: 'name',
+  sortAsc: true,
+  rows: [
+    { name: 'Bootstrap', type: 'Components', stars: 4 },
+    { name: 'GitBook', type: 'SaaS', stars: 5 },
+    { name: 'Docusaurus', type: 'React', stars: 4 },
+    { name: 'VuePress', type: 'Vue', stars: 3 }
+  ],
+  sortBy(key) {
+    this.sortAsc = this.sortKey === key ? !this.sortAsc : true
+    this.sortKey = key
+  },
+  get sorted() {
+    return [...this.rows]
+      .filter(r => r.name.toLowerCase().includes(this.query.toLowerCase()))
+      .sort((a, b) => {
+        const dir = this.sortAsc ? 1 : -1
+        return a[this.sortKey] > b[this.sortKey] ? dir : a[this.sortKey] < b[this.sortKey] ? -dir : 0
+      })
+  }
+}">
+  <input type="text" x-model="query" placeholder="Filter by name...">
+  <table class="table">
+    <thead>
+      <tr>
+        <th @click="sortBy('name')" style="cursor:pointer">Name</th>
+        <th @click="sortBy('type')" style="cursor:pointer">Type</th>
+        <th @click="sortBy('stars')" style="cursor:pointer">Stars</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="row in sorted" :key="row.name">
+        <tr>
+          <td x-text="row.name"></td>
+          <td x-text="row.type"></td>
+          <td x-text="row.stars"></td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+</div>
+```
+
+Che viene renderizzato così (scrivi nella casella, clicca un'intestazione di colonna):
+
+<div x-data="{
+  query: '',
+  sortKey: 'name',
+  sortAsc: true,
+  rows: [
+    { name: 'Bootstrap', type: 'Components', stars: 4 },
+    { name: 'GitBook', type: 'SaaS', stars: 5 },
+    { name: 'Docusaurus', type: 'React', stars: 4 },
+    { name: 'VuePress', type: 'Vue', stars: 3 }
+  ],
+  sortBy(key) {
+    this.sortAsc = this.sortKey === key ? !this.sortAsc : true
+    this.sortKey = key
+  },
+  get sorted() {
+    return [...this.rows]
+      .filter(r => r.name.toLowerCase().includes(this.query.toLowerCase()))
+      .sort((a, b) => {
+        const dir = this.sortAsc ? 1 : -1
+        return a[this.sortKey] > b[this.sortKey] ? dir : a[this.sortKey] < b[this.sortKey] ? -dir : 0
+      })
+  }
+}">
+  <input type="text" x-model="query" placeholder="Filter by name...">
+  <table class="table">
+    <thead>
+      <tr>
+        <th @click="sortBy('name')" style="cursor:pointer">Name</th>
+        <th @click="sortBy('type')" style="cursor:pointer">Type</th>
+        <th @click="sortBy('stars')" style="cursor:pointer">Stars</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="row in sorted" :key="row.name">
+        <tr>
+          <td x-text="row.name"></td>
+          <td x-text="row.type"></td>
+          <td x-text="row.stars"></td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+</div>
+
+`rows` è un semplice array JS incorporato direttamente nella pagina - va
+bene per il tipo di piccola tabella di riferimento che i docs hanno
+davvero. `sorted` è un `get`ter di Alpine, quindi rifiltra e riordina a
+ogni tasto premuto/clic senza cablaggio aggiuntivo; `sortBy()` inverte la
+direzione al secondo clic sulla stessa colonna. Il `<table>` qui è un vero
+tag `<table>` scritto a mano (non esiste una sintassi per tabelle a pipe
+che passi le righe direttamente ad Alpine), quindi viene comunque
+racchiuso in `.bxsites-table-wrap` e riceve il trattamento di [scorrimento
+responsive/intestazione
+fissa](tables.md#scorrimento-responsive-e-intestazione-fissa)
+automaticamente, esattamente come qualsiasi tabella renderizzata da
+bx-markdown stesso.
 
 ## Le basi di `x-data`, se sei nuovo ad Alpine
 
