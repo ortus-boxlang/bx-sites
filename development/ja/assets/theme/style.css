@@ -689,6 +689,12 @@ dd {
 	margin-bottom: 0.25rem;
 }
 
+.toc li,
+.toc-mobile li {
+	margin: 0.35rem 0;
+	line-height: 1.4;
+}
+
 .toc .toc-level-3,
 .toc-mobile .toc-level-3 {
 	padding-left: 1rem;

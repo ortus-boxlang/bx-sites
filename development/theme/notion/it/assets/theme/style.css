@@ -848,6 +848,11 @@ dd {
 	padding: 0;
 }
 
+.ntn-toc__item {
+	margin: 0.35rem 0;
+	line-height: 1.4;
+}
+
 .ntn-toc__item--3 {
 	padding-left: 1rem;
 	font-size: 0.9em;
