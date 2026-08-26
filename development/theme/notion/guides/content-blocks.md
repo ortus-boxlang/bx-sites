@@ -162,6 +162,21 @@ resolved the same way `theme.logo`/frontmatter `ogImage` already are
 ::: file src="assets/og-image.png" title="Site Preview Image"
 :::
 
+## Page break
+
+Forces a page break wherever it's placed - handy for printing the built
+site, or exporting it to PDF (e.g. via a browser's own "Print to PDF"),
+and want a section to always start on a fresh page. No attributes:
+
+```markdown title="Example" linenums="1"
+::: pagebreak
+:::
+```
+
+It renders as a plain, subtle divider on screen (so it's still visible
+while editing or previewing), and only forces an actual page break inside
+print/PDF output - it has no other effect on normal browsing.
+
 ## Buttons
 
 A GitBook-style call-to-action button - `::: button` on its own, or several
