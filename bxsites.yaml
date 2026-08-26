@@ -1,6 +1,6 @@
 name: "BxSites"
 description: "Static documentation site generator for BoxLang, built on bx-markdown"
-baseURL: "https://ortus-boxlang.github.io/bx-sites/"
+baseURL: "https://bxsites.io/"
 theme:
   name: bootstrap
   options: { navCollapsible: true, tocPosition: sticky }
