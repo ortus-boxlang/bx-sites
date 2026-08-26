@@ -31,7 +31,7 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "loads and validates bxsites.yaml", function() {
 				var config = new "models.config.ConfigLoader@bxsites"().load( repoRoot )
-				expect( config.name ).toBe( "BX Sites" )
+				expect( config.name ).toBe( "BxSites" )
 				expect( config.theme.name ).toBe( "bootstrap" )
 			} );
 
