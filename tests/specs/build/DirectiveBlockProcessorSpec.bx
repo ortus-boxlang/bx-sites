@@ -177,6 +177,12 @@ class extends="testbox.system.BaseSpec" {
 				expect( processor.resolveFileHrefs( absolute, "/guides/content-blocks/" ) ).toInclude( 'href="https://example.com/spec.pdf"' );
 			} );
 
+			it( "renders a pagebreak block as a plain <hr>, no attributes needed", function() {
+				var html = render( "::: pagebreak" & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( '<hr class="bxsites-pagebreak" data-bxsites-pagebreak>' );
+			} );
+
 			it( "renders a basic button as a link, defaulting to secondary style and medium size", function() {
 				var html = render( '::: button "Get Started" href="getting-started.md"' & char( 10 ) & ":::" );
 
