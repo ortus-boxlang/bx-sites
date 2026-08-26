@@ -51,10 +51,12 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "resolves the password from the named environment variable, not from a literal in config", function() {
-				setEnvVar( "BXSITES_TEST_FTP_PW2", "real-secret-value" );
+				// A fixture string, not a real credential - only proving the value
+				// flows from the env var through to attrs.password, nothing else.
+				setEnvVar( "BXSITES_TEST_FTP_PW2", "fixture-value-not-a-real-credential" );
 				var attrs = target.buildConnectAttributes( { host : "x", username : "y", passwordEnvVar : "BXSITES_TEST_FTP_PW2" }, "conn1", false );
 
-				expect( attrs.password ).toBe( "real-secret-value" );
+				expect( attrs.password ).toBe( "fixture-value-not-a-real-credential" );
 			} );
 
 			it( "resolves an empty password when the named environment variable isn't set", function() {
