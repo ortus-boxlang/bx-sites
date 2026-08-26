@@ -110,6 +110,35 @@ bxSites gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
 完全な GitHub Pages の設定（Pages のブランチ有効化、`baseURL` など）については
 [デプロイ](guides/deployment.md) を参照してください。
 
+## `deploy`
+
+サイトをビルドし、実際のデプロイターゲットへ配信します - S3（および
+DigitalOcean Spaces、Cloudflare R2、Backblaze B2、MinIO などの S3 互換サービス）、
+Azure Blob Storage、Google Cloud Storage、Firebase Hosting、FTP、SFTP、
+rsync-over-SSH、Netlify、Vercel、Cloudflare Pages、ローカルディレクトリ、
+または GitHub Pages（`gh-deploy` と同じプッシュに、この統合コマンドからも
+到達できます）。
+
+```bash title="Usage"
+bxSites deploy --entry=<name>
+bxSites deploy [--target=local|github-pages] [target-specific flags]
+```
+
+呼び出し方は2通りあります:
+
+1. **`--entry=<name>`** - `deployments/<name>.json` ファイルが宣言している
+   ターゲットへディスパッチします（詳細は後述）。`local`/`github-pages` 以外の
+   すべてのターゲットはこちらが必要です - いくつかのフラグだけでは持ちきれない
+   量の設定があるためです。
+2. **`--target=<name>` と専用フラグ** - 最も単純な2つのターゲット向けの、
+   `deployments/` フォルダを一切必要としないフラグのみのショートハンドです:
+   `local`（`--destination=<path>`。`--target` を省略した場合のデフォルトでも
+   あります）と `github-pages`（`[--branch] [--remote] [--message]`、すべて
+   省略可能で `gh-deploy` と同じデフォルト値）。
+
+各ターゲットの設定内容と、それぞれの `deployments/*.json` の実例については
+[デプロイ](guides/deployment.md#deploy) を参照してください。
+
 ## `migrate`
 
 既存の docs プロジェクトをこの形式に変換します - `--from` で変換元の形式を指定します:

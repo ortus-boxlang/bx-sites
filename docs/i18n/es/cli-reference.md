@@ -119,6 +119,36 @@ bxSites gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
 Consulta [Despliegue](guides/deployment.md) para la configuración completa
 de GitHub Pages (activar Pages para la rama, `baseURL`, etc.).
 
+## `deploy`
+
+Construye el sitio y luego lo envía a un destino de despliegue real - S3
+(y cualquier servicio compatible con S3 - DigitalOcean Spaces, Cloudflare
+R2, Backblaze B2, MinIO), Azure Blob Storage, Google Cloud Storage,
+Firebase Hosting, FTP, SFTP, rsync sobre SSH, Netlify, Vercel, Cloudflare
+Pages, un directorio local, o GitHub Pages (el mismo push que hace
+`gh-deploy`, solo que también accesible desde este comando unificado).
+
+```bash title="Uso"
+bxSites deploy --entry=<name>
+bxSites deploy [--target=local|github-pages] [target-specific flags]
+```
+
+Dos formas de invocarlo:
+
+1. **`--entry=<name>`** - despacha al destino que declare un archivo
+   `deployments/<name>.json` (consulta más abajo). Todo destino salvo
+   `local`/`github-pages` lo necesita - hay más configuración de la que
+   un par de opciones puede razonablemente llevar.
+2. **`--target=<name>` con sus propias opciones** - un atajo solo con
+   opciones para los dos destinos más simples, que no necesitan ninguna
+   carpeta `deployments/`: `local` (`--destination=<path>`, también el
+   valor por defecto cuando se omite `--target` por completo) y
+   `github-pages` (`[--branch] [--remote] [--message]`, todos los campos
+   opcionales, con los mismos valores por defecto que `gh-deploy`).
+
+Consulta [Despliegue](guides/deployment.md) para la configuración propia
+de cada destino y un ejemplo real de `deployments/*.json` para cada uno.
+
 ## `migrate`
 
 Convierte un proyecto de documentación existente en este - `--from`
