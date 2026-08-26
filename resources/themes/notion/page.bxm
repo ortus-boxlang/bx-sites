@@ -58,6 +58,7 @@
 			items &= '<div class="bxsites-page-actions__divider" role="separator"></div>'
 			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://x.com/intent/tweet?url=" & urlEncodedFormat( canonicalUrl ) & "&text=" & urlEncodedFormat( variables.page.title ) ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "x" ) & '<span>' & encodeForHTML( variables.strings.shareOnX ) & '</span></a>'
 			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://www.linkedin.com/sharing/share-offsite/?url=" & urlEncodedFormat( canonicalUrl ) ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "linkedin" ) & '<span>' & encodeForHTML( variables.strings.shareOnLinkedIn ) & '</span></a>'
+			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://www.facebook.com/sharer/sharer.php?u=" & urlEncodedFormat( canonicalUrl ) ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "facebook" ) & '<span>' & encodeForHTML( variables.strings.shareOnFacebook ) & '</span></a>'
 		}
 
 		return '<div class="bxsites-page-actions">'

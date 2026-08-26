@@ -1016,6 +1016,7 @@ class extends="testbox.system.BaseSpec" {
 					expect( onHtml ).toInclude( "github.com/acme/docs/issues/new?title=" );
 					expect( onHtml ).toInclude( "x.com/intent/tweet?url=" );
 					expect( onHtml ).toInclude( "linkedin.com/sharing/share-offsite/?url=" );
+					expect( onHtml ).toInclude( "facebook.com/sharer/sharer.php?u=" );
 					expect( onHtml ).toInclude( '<kbd class="bxsites-page-actions__kbd" aria-hidden="true">C</kbd>' );
 					expect( onHtml.reMatchNoCase( 'class="bxsites-page-actions__divider"' ).len() ).toBe( 3 );
 					expect( onHtml ).toInclude( "assets/page-actions-init.js" );

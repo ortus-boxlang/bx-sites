@@ -855,22 +855,23 @@ see `theme.options.pageActionsPosition` above) that opens a small menu:
   forcing a page break at a chosen spot first.
 - **Report an issue** - opens a pre-filled "new issue" form on `repo.url`
   ([Configuration: `repo`](#repo)), naming the page it was opened from.
-- **Share on X** / **Share on LinkedIn** - opens that platform's own
-  share-intent page, prefilled with the page's URL (and title, for X).
+- **Share on X** / **Share on LinkedIn** / **Share on Facebook** - opens
+  that platform's own share-intent page, prefilled with the page's URL
+  (and title, for X).
 
 Press **c** anywhere on the page to toggle the menu open/closed too - no
 modifier key, same as the `/` search shortcut, and disabled while you're
 already typing somewhere else.
 
-"Copy link", both "Open in..." links, and both "Share on..." links only
-render when `baseURL` is a full URL (same requirement `<link rel="canonical">`
-itself already has) - there's otherwise no real page URL to hand off.
-"Report an issue" only renders when `repo.url` is set. No extra JS is
-shipped at all unless this is turned on.
+"Copy link", both "Open in..." links, and all three "Share on..." links
+only render when `baseURL` is a full URL (same requirement
+`<link rel="canonical">` itself already has) - there's otherwise no real
+page URL to hand off. "Report an issue" only renders when `repo.url` is
+set. No extra JS is shipped at all unless this is turned on.
 
 A thin divider separates the "Open in ChatGPT"/"Open in Claude" pair and
-the "Share on X"/"Share on LinkedIn" pair from the rest of the menu, so
-the AI and social-sharing groups read as their own sections rather than
+the "Share on..." group from the rest of the menu, so the AI and
+social-sharing groups read as their own sections rather than
 running together with everything else.
 
 === "YAML"

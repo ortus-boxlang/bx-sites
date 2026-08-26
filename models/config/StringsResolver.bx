@@ -62,7 +62,8 @@ class {
 		"exportAsPdf"          : "Export as PDF",
 		"reportIssue"          : "Report an issue",
 		"shareOnX"             : "Share on X",
-		"shareOnLinkedIn"      : "Share on LinkedIn"
+		"shareOnLinkedIn"      : "Share on LinkedIn",
+		"shareOnFacebook"      : "Share on Facebook"
 	}
 
 	/**
