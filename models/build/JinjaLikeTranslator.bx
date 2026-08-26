@@ -159,11 +159,11 @@ class {
 
 		if ( trimmed.reFindNoCase( "^if\s+" ) ) {
 			arguments.blockStack.append( "if" )
-			return '<bx:if condition="' & variables.hash & translateCondition( trimmed.reReplaceNoCase( "^if\s+", "" ), arguments.variableMap, arguments.warnings ) & variables.hash & '">'
+			return '<bx:if ' & translateCondition( trimmed.reReplaceNoCase( "^if\s+", "" ), arguments.variableMap, arguments.warnings ) & '>'
 		}
 
 		if ( trimmed.reFindNoCase( "^(elif|elsif)\s+" ) ) {
-			return '<bx:elseif condition="' & variables.hash & translateCondition( trimmed.reReplaceNoCase( "^(elif|elsif)\s+", "" ), arguments.variableMap, arguments.warnings ) & variables.hash & '">'
+			return '<bx:elseif ' & translateCondition( trimmed.reReplaceNoCase( "^(elif|elsif)\s+", "" ), arguments.variableMap, arguments.warnings ) & '>'
 		}
 
 		if ( trimmed.reFindNoCase( "^else$" ) ) {

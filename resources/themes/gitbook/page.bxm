@@ -81,25 +81,25 @@
 	}
 </bx:script>
 <bx:output>			<article class="gb-card">
-</bx:output><bx:if condition="#variables.page.isFallbackContent#"><bx:output>
+</bx:output><bx:if variables.page.isFallbackContent><bx:output>
 				<p class="fallback-notice">#bxsitesIcon( 'globe' )# #encodeForHTML( variables.stringsResolver.format( variables.strings.notTranslatedNotice, { "locale" : defaultLocaleLabel() } ) )#</p>
-</bx:output></bx:if><bx:if condition="#variables.page.breadcrumbs.len() gt 1#"><bx:output>#renderBreadcrumbs( variables.page.breadcrumbs )#</bx:output></bx:if><bx:output>
-				<h1 class="gb-title" id="page-title"><a href="##page-title" id="page-title" class="anchor"></a></bx:output><bx:if condition="#len( variables.page.iconHtml )#"><bx:output><span class="page-icon">#variables.page.iconHtml#</span> </bx:output></bx:if><bx:output>#encodeForHTML( variables.page.title )#</h1>
-</bx:output><bx:if condition="#len( variables.page.summary )#"><bx:output>				<p class="page-summary">#encodeForHTML( variables.page.summary )#</p>
-</bx:output></bx:if><bx:if condition="#variables.page.tags.len() gt 0#"><bx:output>#renderTags( variables.page.tags )#</bx:output></bx:if><bx:if condition="#( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'top'#"><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:output></bx:if><bx:output>
-</bx:output><bx:if condition="#variables.page.toc.len() gt 0 and variables.tocPosition == 'top'#"><bx:output>#renderToc( variables.page.toc )#</bx:output></bx:if><bx:if condition="#variables.page.toc.len() gt 0 and variables.tocPosition == 'sticky'#"><bx:output>#renderToc( variables.page.toc, true )#</bx:output></bx:if><bx:output>
+</bx:output></bx:if><bx:if variables.page.breadcrumbs.len() gt 1><bx:output>#renderBreadcrumbs( variables.page.breadcrumbs )#</bx:output></bx:if><bx:output>
+				<h1 class="gb-title" id="page-title"><a href="##page-title" id="page-title" class="anchor"></a></bx:output><bx:if len( variables.page.iconHtml )><bx:output><span class="page-icon">#variables.page.iconHtml#</span> </bx:output></bx:if><bx:output>#encodeForHTML( variables.page.title )#</h1>
+</bx:output><bx:if len( variables.page.summary )><bx:output>				<p class="page-summary">#encodeForHTML( variables.page.summary )#</p>
+</bx:output></bx:if><bx:if variables.page.tags.len() gt 0><bx:output>#renderTags( variables.page.tags )#</bx:output></bx:if><bx:if ( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'top'><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:output></bx:if><bx:output>
+</bx:output><bx:if variables.page.toc.len() gt 0 and variables.tocPosition == 'top'><bx:output>#renderToc( variables.page.toc )#</bx:output></bx:if><bx:if variables.page.toc.len() gt 0 and variables.tocPosition == 'sticky'><bx:output>#renderToc( variables.page.toc, true )#</bx:output></bx:if><bx:output>
 				<div class="gb-content-body">
 				#variables.page.contentHtml#
 			</div>
-</bx:output><bx:if condition="#( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'bottom'#"><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:output></bx:if><bx:output>
+</bx:output><bx:if ( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'bottom'><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:output></bx:if><bx:output>
 			</article>
-</bx:output><bx:if condition="#len( variables.page.prevPage.url ) or len( variables.page.nextPage.url )#"><bx:output>
+</bx:output><bx:if len( variables.page.prevPage.url ) or len( variables.page.nextPage.url )><bx:output>
 			<nav class="gb-page-nav" aria-label="#encodeForHTML( variables.strings.pageNavigation )#">
-</bx:output><bx:if condition="#len( variables.page.prevPage.url )#"><bx:output>
+</bx:output><bx:if len( variables.page.prevPage.url )><bx:output>
 				<a class="gb-page-nav__prev" href="#variables.basePath##variables.page.prevPage.url#">&larr; #encodeForHTML( variables.page.prevPage.title )#</a>
-</bx:output></bx:if><bx:if condition="#!len( variables.page.prevPage.url )#"><bx:output>
+</bx:output></bx:if><bx:if !len( variables.page.prevPage.url )><bx:output>
 				<span></span>
-</bx:output></bx:if><bx:if condition="#len( variables.page.nextPage.url )#"><bx:output>
+</bx:output></bx:if><bx:if len( variables.page.nextPage.url )><bx:output>
 				<a class="gb-page-nav__next" href="#variables.basePath##variables.page.nextPage.url#">#encodeForHTML( variables.page.nextPage.title )# &rarr;</a>
 </bx:output></bx:if><bx:output>
 			</nav>
