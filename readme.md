@@ -18,9 +18,21 @@
 
 Write your content in Markdown. BX Sites turns it into a complete, themed, searchable website - ready to deploy.
 
-It's a general-purpose static site generator, not just for documentation - docs, a blog, a marketing site, a knowledge base, anything Markdown can express, all built the same way, with the same themes, search and i18n. Built in BoxLang on top of [bx-markdown](https://github.com/ortus-boxlang/bx-markdown), in the spirit of [mkdocs](https://www.mkdocs.org/): point it at a `docs/` folder (or `src/`, if that reads better for your project) and get a themed, searchable static site out. Already on GitBook or mkdocs? `bxSites migrate --source=...` converts an existing export/project straight into a bx-sites one - see [Migrating from GitBook](docs/guides/migrating-from-gitbook.md) or [Migrating from mkdocs](docs/guides/migrating-from-mkdocs.md).
+It's a general-purpose static site generator, not just for documentation - docs, a blog, a marketing site, a knowledge base, anything Markdown can express, all built the same way, with the same themes, search and i18n. Built in BoxLang on top of [bx-markdown](https://github.com/ortus-boxlang/bx-markdown), in the spirit of [mkdocs](https://www.mkdocs.org/): point it at a `docs/` folder (or `src/`, if that reads better for your project) and get a themed, searchable static site out. Already on GitBook, mkdocs, or Notion, or just have a folder of Markdown? `bxSites migrate --from=gitbook|mkdocs|markdown-zip|notion` converts it straight into a bx-sites project - see [Migrating from GitBook](docs/guides/migrating-from-gitbook.md) or [Migrating from mkdocs](docs/guides/migrating-from-mkdocs.md).
 
 ----
+
+## Features
+
+- **Ten built-in themes** - `bootstrap` (default), `material`, `tailwind`, and seven more inspired by Docsy, Stripe, Docusaurus, Just the Docs, VuePress, GitBook and Notion, all overridable via a project's own `theme/` folder. See [Themes](docs/guides/themes.md).
+- **Static, client-side search** - a MiniSearch-powered index (fuzzy matching, prefix search) with a Cmd/Ctrl+K command palette, or wire up Algolia DocSearch/Pagefind/your own provider instead. See [Search](docs/guides/search.md).
+- **A rich Markdown+ toolkit** - GitBook-style content blocks (cards, tabs, expandables, buttons, prompts, conditional/audience-switched content), always-on GFM tables with a sticky-header/responsive-scroll treatment, an embeddable OpenAPI/Swagger widget, admonitions, footnotes, math and Mermaid diagrams. See [Content Blocks](docs/guides/content-blocks.md) and [Markdown Extensions](docs/guides/markdown.md).
+- **Reusable `{{ variables }}` and magic functions** - reference `bxsites.yaml`-defined values or call a small BoxLang helper function straight from Markdown, no plugin needed. See [Variables & Magic Functions](docs/guides/variables-and-functions.md).
+- **A blog, versioning, and i18n**, all by convention - `docs/blog/posts/` for authors/categories/RSS/drafts, `version:new` to snapshot a release, `docs/i18n/<code>/` to translate. See [Blog](docs/guides/blog.md), [Versioning](docs/guides/versioning.md), [i18n](docs/guides/i18n.md).
+- **Ship it anywhere** - `bxSites deploy` to S3 (and any S3-compatible service), Azure Blob Storage, GCS, Firebase Hosting, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages, a local directory, or GitHub Pages - one shared build, every `deployments/*.json` target at once if you want, or `bxSites package` for a plain zip instead. See [Deployment](docs/guides/deployment.md).
+- **A real plugin/theme system** - a plugin is just another BoxLang module; `install:plugin`/`install:theme` pull published ones from ForgeBox, and `theme:import` converts an existing mkdocs/jekyll/hugo theme into a starting point. See [Plugins](docs/guides/plugins.md).
+- **SEO and correctness out of the box** - `sitemap.xml`, `robots.txt` (or your own hand-authored one), canonical links, `llms.txt`, and redirects that keep a moved/renamed page's old URL working instead of 404ing.
+- **Fast and air-gapped by default** - fingerprinted CSS/JS bundling and responsive images, with Bootstrap, highlight.js, Alpine.js, MiniSearch and (opt-in) Mermaid all vendored locally - zero outbound requests from a built site.
 
 ## Quick Start
 
@@ -109,7 +121,7 @@ Or read the source directly:
 - [Getting Started](docs/getting-started.md)
 - [CLI Reference](docs/cli-reference.md)
 - [Configuration](docs/configuration.md) - the full site config reference (`bxsites.yaml`, the default, or `bxsites.json`)
-- Guides: [Themes](docs/guides/themes.md) · [Search](docs/guides/search.md) · [Deployment](docs/guides/deployment.md) · [Migrating from GitBook](docs/guides/migrating-from-gitbook.md)
+- Guides: [Themes](docs/guides/themes.md) · [Search](docs/guides/search.md) · [Markdown Extensions](docs/guides/markdown.md) · [Content Blocks](docs/guides/content-blocks.md) · [Tables](docs/guides/tables.md) · [OpenAPI/Swagger](docs/guides/openapi.md) · [Variables & Magic Functions](docs/guides/variables-and-functions.md) · [Blog](docs/guides/blog.md) · [Versioning](docs/guides/versioning.md) · [i18n](docs/guides/i18n.md) · [Deployment](docs/guides/deployment.md) · [Plugins](docs/guides/plugins.md) · [Migrating from GitBook](docs/guides/migrating-from-gitbook.md) - see the [Guides index](docs/guides/index.md) for the rest
 - [Releases](docs/releases/index.md) - versioning policy and what's new per release
 
 See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's development.
@@ -119,7 +131,7 @@ See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's d
 - `.github/workflows` - CI: tests (`tests.yml`), PR checks (`pr.yml`), snapshot/release builds (`snapshot.yml`, `release.yml`), and publishing this repo's own docs to GitHub Pages (`pages.yml`)
 - `models` - the module's own source: `models/cli` (one dispatcher per `bxSites` verb), `models/config` (site config loader/validator - `bxsites.yaml`/`.yml`/`.json`), `models/build` (project scaffolding + the docs/nav/markdown/theme/search/sitemap build pipeline), `models/deploy` (the `deploy` verb's pluggable targets - S3, Azure, GCS, Firebase, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages, local, GitHub Pages)
 - `resources/themes` - built-in themes (native BoxLang `.bxm` templates + assets), ten in total: `bootstrap` (default), `material`, `tailwind`, plus seven `material`-forked themes (`docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook`, `notion`) - all with the BoxLang brand palette, dark mode, breadcrumbs and code-copy buttons applied out of the box. A project can override any of them via its own `theme/` folder (same `layout.bxm` + `page.bxm` contract - see [Themes](docs/guides/themes.md))
-- `resources/assets` - module-wide shared client-side assets: the search widget (`search.js`) and the copy-code button (`copy-code.js`)
+- `resources/assets` - module-wide shared client-side assets: the search widget (`search.js`, MiniSearch-backed with a Cmd/Ctrl+K palette), the copy-code button, and per-feature init scripts (tabs, Mermaid, math, OpenAPI, prompts, conditional content, ...), plus every vendored third-party library under `vendor/` (Bootstrap, highlight.js, Alpine.js, MiniSearch, Mermaid, Swagger UI) - no CDN, no outbound requests from a built site
 - `docs` / `bxsites.yaml` - this repository's own docs, built by BX Sites itself (`boxlang bxSites build`)
 - `tests/specs` - TestBox specs, one bundle per class under `models/`
 - `bifs`, `components`, `interceptors` - unused by this module today, kept for BoxLang module convention

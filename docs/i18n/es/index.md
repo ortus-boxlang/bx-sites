@@ -38,8 +38,9 @@ inspirados en Docsy, Stripe, Docusaurus, Just the Docs, VuePress, GitBook y
 Notion - todos sobrescribibles con tu propio tema.
 :::
 ::: card title="Búsqueda estática del lado del cliente" icon="phosphor-duotone:magnifying-glass" href="guides/search.md"
-Un cuadro de búsqueda impulsado por lunr.js, conectado a un índice de
-búsqueda generado en el momento de `build` - sin dependencia de servidor.
+Un cuadro de búsqueda impulsado por MiniSearch (coincidencia difusa, búsqueda por prefijo), más una paleta de comandos
+Cmd/Ctrl+K, conectado a un índice de búsqueda generado en el momento de
+`build` - sin dependencia de servidor.
 :::
 ::: card title="Un blog, listo de fábrica" icon="lucide:newspaper" href="guides/blog.md"
 Coloca entradas bajo `docs/blog/posts/` y obtén autores, categorías,
@@ -48,7 +49,7 @@ configuración necesaria.
 :::
 ::: card title="Rápido y sin conexión por defecto" icon="phosphor-duotone:wifi-slash" href="guides/themes.md#sitios-sin-conexión-a-internet-air-gapped"
 Empaquetado de CSS/JS con huella digital e imágenes responsivas listos de
-fábrica, además de Bootstrap, highlight.js, Alpine.js, lunr.js y (opcional)
+fábrica, además de Bootstrap, highlight.js, Alpine.js, MiniSearch y (opcional)
 Mermaid, todos incluidos localmente - un sitio construido no necesita
 ninguna solicitud saliente por defecto.
 :::
@@ -66,10 +67,25 @@ en ForgeBox.
 de tema de otro generador en un scaffold de bx-sites sobre el que construir,
 en lugar de empezar desde cero.
 :::
-::: card title="Migra desde GitBook o mkdocs" icon="phosphor-duotone:swap" href="guides/index.md"
-`bxSites migrate --source=... --from=gitbook|mkdocs` convierte una
-exportación de GitBook o un proyecto mkdocs existente en un proyecto
-bx-sites funcional con un solo comando.
+::: card title="Migra desde GitBook, mkdocs, un zip o Notion" icon="phosphor-duotone:swap" href="guides/index.md"
+`bxSites migrate --from=gitbook|mkdocs|markdown-zip|notion` convierte una
+exportación o proyecto existente en un proyecto bx-sites funcional con un
+solo comando.
+:::
+::: card title="Despliégalo donde quieras" icon="phosphor-duotone:cloud-arrow-up" href="guides/deployment.md"
+`bxSites deploy` envía el sitio construido directamente a S3, Azure, GCS,
+Firebase, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages o GitHub
+Pages - o `bxSites package` lo empaqueta en un único archivo.
+:::
+::: card title="Variables reutilizables y funciones mágicas" icon="phosphor-duotone:function" href="guides/variables-and-functions.md"
+`{{ dotted.path }}` toma valores del propio bloque `variables` de
+`bxsites.yaml`; `{{ $name(args) }}` llama a un pequeño ayudante de
+BoxLang directamente desde Markdown - sin plugin, sin cableado alguno.
+:::
+::: card title="Bloques de contenido enriquecido" icon="phosphor-duotone:squares-four" href="guides/content-blocks.md"
+Tablas, botones, prompts, expandibles, pestañas y especificaciones
+OpenAPI incrustadas - una biblioteca de bloques al estilo GitBook sobre
+Markdown puro.
 :::
 :::
 
@@ -130,8 +146,8 @@ estadísticas.
 Redimensionado automático de imágenes/WebP, y empaquetado de CSS/JS con
 huella digital.
 :::
-::: card title="Desplegar en GitHub Pages" icon="phosphor-duotone:cloud-arrow-up" href="guides/deployment.md"
-El flujo de trabajo de GitHub Actions incorporado.
+::: card title="Despliegue" icon="phosphor-duotone:cloud-arrow-up" href="guides/deployment.md"
+`deploy`/`package`, y el flujo de trabajo de GitHub Actions incorporado.
 :::
 ::: card title="Lanzamientos" icon="phosphor-duotone:tag" href="releases/index.md"
 Política de versionado y novedades de cada lanzamiento.
