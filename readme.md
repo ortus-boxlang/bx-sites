@@ -111,8 +111,8 @@ Every verb accepts `--projectRoot=<path>` (or a bare positional path) to target 
 
 This repository documents itself with BX Sites - see `bxsites.yaml` and `docs/` at the repo root, published at:
 
-- **[ortus-boxlang.github.io/bx-sites](https://ortus-boxlang.github.io/bx-sites/)** - stable docs, built from `main`
-- **[ortus-boxlang.github.io/bx-sites/development](https://ortus-boxlang.github.io/bx-sites/development/)** - latest/unreleased docs, built from `development`
+- **[bxsites.io](https://bxsites.io/)** - stable docs, built from `main`
+- **[bxsites.io/development](https://bxsites.io/development/)** - latest/unreleased docs, built from `development`
 
 Both are built with all ten built-in themes side by side (`bootstrap` at the root, every other theme under `theme/<name>/`) - this doubles as a theme gallery - use the switcher next to the dark-mode toggle to flip between them on any page. CI builds each theme as its own parallel job (see `.github/workflows/pages.yml`); `./buildMultiTheme.sh` reproduces the same gallery layout locally for a quick preview.
 

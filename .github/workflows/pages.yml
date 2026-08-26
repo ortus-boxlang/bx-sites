@@ -103,7 +103,7 @@ jobs:
           # patch this job's own checkout of the config just for this build
           # (each matrix job gets its own independent checkout, so this
           # never has to be undone or shared with any other job).
-          export URL="https://ortus-boxlang.github.io/bx-sites/${{ github.ref_name }}/"
+          export URL="https://bxsites.io/${{ github.ref_name }}/"
           export EDIT_URI="edit/${{ github.ref_name }}/docs/"
           yq eval -i '.baseURL = strenv(URL) | .repo.editUri = strenv(EDIT_URI)' bxsites.yaml
 
@@ -186,6 +186,12 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
           keep_files: true
+          # Writes CNAME at the true gh-pages root (destination_dir: development
+          # below would instead land it under /development/, where GitHub Pages
+          # won't see it) - keeps the custom domain durable across a gh-pages
+          # wipe, rather than depending solely on the one-time manual
+          # Settings -> Pages -> Custom domain click having created it already.
+          cname: bxsites.io
 
       - name: Deploy development to /development/
         if: github.ref_name == 'development'
