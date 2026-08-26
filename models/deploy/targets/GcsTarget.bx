@@ -1,0 +1,175 @@
+/**
+ * Uploads every file under the already-built `site/` directory to a Google
+ * Cloud Storage bucket, via the GCS JSON API's "simple upload" endpoint -
+ * one `POST .../upload/storage/v1/b/<bucket>/o?uploadType=media&name=...`
+ * per file, with the raw file bytes as the request body. Authenticated with
+ * a Bearer token from `GoogleServiceAccountAuth.getAccessToken()` (scope:
+ * `devstorage.read_write`) - one token is minted before the upload loop and
+ * reused for every file, since a whole `deploy()` run comfortably finishes
+ * within the token's ~1 hour lifetime.
+ *
+ * `buildObjectName()` and `guessContentType()` are kept pure (no HTTP) so
+ * specs can exercise the object-name/URL-encoding and MIME-type-guessing
+ * logic directly. The real upload calls (`uploadFile()`) are NOT verified
+ * against a real GCS bucket in this sandbox - no live GCP credentials are
+ * available here; only guard clauses and the pure helpers are exercised for
+ * real (see GcsTargetSpec.bx). `uploadFile()` sends the file's raw bytes via
+ * `bx:httpparam type="body"` - documented as accepting "the request body
+ * content" generically, with CFML's long-standing convention (which
+ * BoxLang's `bx:http`/`bx:httpparam` tags follow) being that a binary
+ * `value` is sent as the raw body bytes rather than stringified; this is
+ * implemented per that convention but not verified end-to-end against a
+ * real GCS endpoint here.
+ *
+ * @config { bucket (required), serviceAccountKeyPath (required - path to a downloaded GCP service-account JSON key file), prefix (optional) }
+ */
+class implements="models.deploy.IDeploymentTarget@bxsites" {
+
+	variables.SCOPE = "https://www.googleapis.com/auth/devstorage.read_write"
+	variables.MIME_TYPES = {
+		"html"  : "text/html",
+		"htm"   : "text/html",
+		"css"   : "text/css",
+		"js"    : "application/javascript",
+		"json"  : "application/json",
+		"xml"   : "application/xml",
+		"svg"   : "image/svg+xml",
+		"png"   : "image/png",
+		"jpg"   : "image/jpeg",
+		"jpeg"  : "image/jpeg",
+		"gif"   : "image/gif",
+		"ico"   : "image/x-icon",
+		"woff"  : "font/woff",
+		"woff2" : "font/woff2"
+	}
+
+	/**
+	 * @return this
+	 */
+	function init() {
+		variables.auth = new "models.deploy.GoogleServiceAccountAuth@bxsites"()
+		return this
+	}
+
+	/**
+	 * @config This target's own resolved config (see the class docblock's `@config` shape)
+	 * @context { projectRoot, siteDir, config } - only `siteDir` is used
+	 *
+	 * @return { success, message, details: { bucket, uploaded } }
+	 */
+	struct function deploy( required struct config, required struct context ) {
+		var bucket = trim( arguments.config.bucket ?: "" )
+		if ( !len( bucket ) ) {
+			throw( type = "BxSites.MissingBucket", message = "deploy target 'gcs' requires a 'bucket'" )
+		}
+
+		var serviceAccountKeyPath = trim( arguments.config.serviceAccountKeyPath ?: "" )
+		if ( !len( serviceAccountKeyPath ) ) {
+			throw( type = "BxSites.MissingServiceAccountKeyPath", message = "deploy target 'gcs' requires a 'serviceAccountKeyPath'" )
+		}
+
+		if ( !directoryExists( arguments.context.siteDir ) ) {
+			throw(
+				type    = "BxSites.SiteNotBuilt",
+				message = "No [#arguments.context.siteDir#] to deploy - run `build` first"
+			)
+		}
+
+		var prefix = trim( arguments.config.prefix ?: "" )
+		var siteDir = arguments.context.siteDir.reReplace( "[\/]+$", "" )
+
+		var files = directoryList( siteDir, true, "path" ).filter( function( path ) {
+			return !directoryExists( path )
+		} )
+
+		var accessToken = variables.auth.getAccessToken( serviceAccountKeyPath, variables.SCOPE ).accessToken
+
+		for ( var filePath in files ) {
+			var relativePath = filePath.replace( siteDir, "", "one" ).reReplace( "^[\/]+", "" )
+			uploadFile( bucket, buildObjectName( prefix, relativePath ), filePath, accessToken )
+		}
+
+		var destination = "gs://" & bucket & ( len( prefix ) ? "/" & prefix : "" )
+		return {
+			success : true,
+			message : "Uploaded #files.len()# file(s) to #destination#",
+			details : { bucket : bucket, uploaded : files.len() }
+		}
+	}
+
+	/**
+	 * Builds a GCS object name from a `prefix` + a file's path relative to
+	 * `siteDir`, then URL-encodes it for use as the `name` query-string
+	 * value on the simple-upload endpoint - kept pure (no HTTP) so this can
+	 * be unit-tested directly.
+	 *
+	 * GCS object names are flat strings that MAY contain literal `/`
+	 * (there's no real "directory" in a bucket, just naming convention) -
+	 * so a `/` in the object name is restored to a literal `/` after
+	 * encoding, rather than left as `%2F`, matching how GCS itself treats
+	 * `/` in object names and how the GCS/`gsutil`/console tooling displays
+	 * them (as pseudo-directories).
+	 *
+	 * @prefix This deploy entry's own `prefix` config (may be "")
+	 * @relativePath The file's path relative to `siteDir`, `/`-separated
+	 *
+	 * @return The URL-encoded object name, safe to place directly after `name=` in a query string
+	 */
+	string function buildObjectName( required string prefix, required string relativePath ) {
+		var normalizedRelative = arguments.relativePath.replace( char( 92 ), "/", "all" ).reReplace( "^[\/]+", "" )
+		var normalizedPrefix = trim( arguments.prefix ).replace( char( 92 ), "/", "all" ).reReplace( "^[\/]+", "" ).reReplace( "[\/]+$", "" )
+		var objectName = len( normalizedPrefix ) ? normalizedPrefix & "/" & normalizedRelative : normalizedRelative
+
+		return urlEncodedFormat( objectName ).reReplaceNoCase( "%2F", "/", "all" )
+	}
+
+	/**
+	 * Guesses a file's `Content-Type` from its extension - the same fixed
+	 * web-asset set every other target in this module guesses against,
+	 * falling back to `application/octet-stream` for anything else.
+	 *
+	 * @relativePath A file path (or bare filename) - only its extension is used
+	 *
+	 * @return The guessed MIME type
+	 */
+	string function guessContentType( required string relativePath ) {
+		var ext = lCase( listLast( arguments.relativePath, "." ) )
+		return variables.MIME_TYPES[ ext ] ?: "application/octet-stream"
+	}
+
+	/**
+	 * Uploads one file's raw bytes to GCS via the JSON API's simple-upload
+	 * endpoint, throwing `BxSites.DeployFailed` on any non-2xx response.
+	 *
+	 * @bucket The target GCS bucket name
+	 * @objectName The already-built, already-URL-encoded object name (see buildObjectName())
+	 * @filePath Absolute local path to the file to upload
+	 * @accessToken A valid OAuth2 Bearer access token (devstorage.read_write scope)
+	 */
+	private void function uploadFile(
+		required string bucket,
+		required string objectName,
+		required string filePath,
+		required string accessToken
+	) {
+		var contentType = guessContentType( arguments.filePath )
+		var bytes = fileReadBinary( arguments.filePath )
+		var url = "https://storage.googleapis.com/upload/storage/v1/b/#arguments.bucket#/o?uploadType=media&name=#arguments.objectName#"
+
+		var result = ""
+		bx:http url="#url#" method="POST" result="result" {
+			bx:httpparam type="header" name="Authorization" value="Bearer #arguments.accessToken#";
+			bx:httpparam type="header" name="Content-Type" value="#contentType#";
+			bx:httpparam type="body" value="#bytes#";
+		}
+
+		var statusCode = val( listFirst( result.statusCode ?: "0", " " ) )
+		if ( statusCode < 200 || statusCode >= 300 ) {
+			throw(
+				type    = "BxSites.DeployFailed",
+				message = "Upload to gs://#arguments.bucket#/#arguments.objectName# failed (status #result.statusCode#): #result.fileContent#"
+			)
+		}
+	}
+
+}
