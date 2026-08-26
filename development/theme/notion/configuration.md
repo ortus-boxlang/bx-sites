@@ -868,6 +868,11 @@ itself already has) - there's otherwise no real page URL to hand off.
 "Report an issue" only renders when `repo.url` is set. No extra JS is
 shipped at all unless this is turned on.
 
+A thin divider separates the "Open in ChatGPT"/"Open in Claude" pair and
+the "Share on X"/"Share on LinkedIn" pair from the rest of the menu, so
+the AI and social-sharing groups read as their own sections rather than
+running together with everything else.
+
 === "YAML"
     ```yaml title="bxsites.yaml"
     pageActions: true

@@ -2263,6 +2263,12 @@ a.button.primary {
 	background: rgba( 0, 0, 0, 0.06 );
 }
 
+.bxsites-page-actions__divider {
+	height: 1px;
+	margin: 0.3rem 0.25rem;
+	background: var( --bxsites-border );
+}
+
 @media print {
 	.bxsites-page-actions {
 		display: none !important;
