@@ -289,6 +289,20 @@ build - the `robots` key above is ignored entirely once this file exists.
         ```json
         { "theme": { "options": { "pageMetaPosition": "top" } } }
         ```
+  - `theme.options.pageActionsPosition` - where the [page-actions
+    dropdown](#pageactions) renders relative to a page's own content.
+    `"top"` (the default) renders it right-aligned above the breadcrumbs/
+    title. `"bottom"` renders it after the page, past the prev/next links.
+
+    === "YAML"
+        ```yaml
+        theme: { options: { pageActionsPosition: bottom } }
+        ```
+
+    === "JSON"
+        ```json
+        { "theme": { "options": { "pageActionsPosition": "bottom" } } }
+        ```
 
 ## `search`
 
@@ -820,6 +834,39 @@ referenced OpenAPI/Swagger spec (JSON or YAML). See
 === "JSON"
     ```json title="bxsites.json"
     { "openapi": true }
+    ```
+
+## `pageActions`
+
+`false` (the default) - no page-actions dropdown at all. `true` adds a
+GitBook-style "Copy" button to every page (near the title by default -
+see `theme.options.pageActionsPosition` above) that opens a small menu:
+
+- **Copy page** - copies the page's own raw Markdown source to the
+  clipboard.
+- **View as Markdown** - opens that same raw `.md` source in a new tab.
+- **Copy link** - copies the page's absolute canonical URL to the
+  clipboard.
+- **Open in ChatGPT** / **Open in Claude** - opens a new chat on the
+  respective site, prefilled with a prompt pointing at the page's URL.
+- **Export as PDF** - triggers the browser's own print dialog
+  (`window.print()`), scoped to just that page - see
+  [Content Blocks: Page break](guides/content-blocks.md#page-break) for
+  forcing a page break at a chosen spot first.
+
+"Copy link" and both "Open in..." links only render when `baseURL` is a
+full URL (same requirement `<link rel="canonical">` itself already has) -
+there's otherwise no real page URL to hand off. No extra JS is shipped at
+all unless this is turned on.
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    pageActions: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "pageActions": true }
     ```
 
 ## `plugins`

@@ -988,6 +988,36 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "renders the page-actions dropdown and its init script only when [pageActions] is enabled, across every built-in theme", function() {
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
+					var root = newProject( themeName );
+					fileWrite( root & "/docs/index.md", "Home" );
+					pipeline.build( root );
+
+					var offHtml = fileRead( root & "/site/index.html" );
+					expect( offHtml ).notToInclude( "bxsites-page-actions" );
+					expect( fileExists( root & "/site/assets/page-actions-init.js" ) ).toBeFalse();
+
+					var onRoot = newProject( themeName );
+					fileWrite(
+						onRoot & "/bxsites.json",
+						'{"name":"Test Site","baseURL":"https://example.com/","theme":{"name":"' & themeName & '"},"pageActions":true}'
+					);
+					fileWrite( onRoot & "/docs/index.md", "Home" );
+					pipeline.build( onRoot );
+
+					var onHtml = fileRead( onRoot & "/site/index.html" );
+					expect( onHtml ).toInclude( "bxsites-page-actions" );
+					expect( onHtml ).toInclude( 'data-bxsites-action="copy-markdown"' );
+					expect( onHtml ).toInclude( 'data-bxsites-action="copy-link"' );
+					expect( onHtml ).toInclude( 'data-bxsites-action="print"' );
+					expect( onHtml ).toInclude( "https://chatgpt.com/?q=" );
+					expect( onHtml ).toInclude( "https://claude.ai/new?q=" );
+					expect( onHtml ).toInclude( "assets/page-actions-init.js" );
+					expect( fileExists( onRoot & "/site/assets/page-actions-init.js" ) ).toBeTrue();
+				}
+			} );
+
 			it( "copies the shared tabs.js and code-lines.js widgets unconditionally, loading code-lines.js after hljs.highlightAll()", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Home" );

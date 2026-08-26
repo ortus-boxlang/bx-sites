@@ -417,6 +417,23 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
+			it( "accepts [theme.options.pageActionsPosition] of top or bottom, defaulting to top when absent", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).theme.options.pageActionsPosition ?: "top" ).toBe( "top" );
+
+				for ( var position in [ "top", "bottom" ] ) {
+					var positionDir = newProjectDir( '{"name":"My Docs","theme":{"options":{"pageActionsPosition":"' & position & '"}}}' );
+					expect( loader.load( positionDir ).theme.options.pageActionsPosition ).toBe( position );
+				}
+			} );
+
+			it( "throws BxSites.InvalidConfig when [theme.options.pageActionsPosition] isn't top or bottom", function() {
+				var dir = newProjectDir( '{"name":"My Docs","theme":{"options":{"pageActionsPosition":"middle"}}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
 			it( "preserves a user-supplied Google [analytics] block", function() {
 				var dir = newProjectDir( '{"name":"My Docs","analytics":{"provider":"google","id":"G-ABC123"}}' );
 				var config = loader.load( dir );
@@ -521,6 +538,23 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "throws BxSites.InvalidConfig when [openapi] is not a boolean", function() {
 				var dir = newProjectDir( '{"name":"My Docs","openapi":"yes please"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
+			it( "defaults [pageActions] to false", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).pageActions ).toBeFalse();
+			} );
+
+			it( "preserves a user-supplied [pageActions]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","pageActions":true}' );
+				expect( loader.load( dir ).pageActions ).toBeTrue();
+			} );
+
+			it( "throws BxSites.InvalidConfig when [pageActions] is not a boolean", function() {
+				var dir = newProjectDir( '{"name":"My Docs","pageActions":"yes please"}' );
 				expect( function() {
 					loader.load( dir );
 				} ).toThrow( "BxSites.InvalidConfig" );

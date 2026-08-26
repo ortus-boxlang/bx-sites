@@ -1,7 +1,8 @@
 /**
  * Resolves the theme "chrome" strings (search placeholder, dark-mode
- * toggle, "On this page", edit/download page-meta links, the 404 page,
- * the tags page title, the untranslated-fallback notice, ...) for
+ * toggle, "On this page", edit/download page-meta links, the page-actions
+ * dropdown, the 404 page, the tags page title, the untranslated-fallback
+ * notice, ...) for
  * whichever locale a tree is currently being rendered in - the small,
  * fixed set of UI strings every built-in theme's own `layout.bxm`/`page.bxm`
  * renders on every page, previously hardcoded in English regardless of
@@ -50,7 +51,15 @@ class {
 		"notFoundTitle"        : "Page Not Found",
 		"notFoundBody"         : "Sorry, that page doesn't exist. Try the search box, or head back to the homepage.",
 		"tagsTitle"            : "Tags",
-		"pageNavigation"       : "Page navigation"
+		"pageNavigation"       : "Page navigation",
+		"pageActionsButton"    : "Copy",
+		"pageActionsAriaLabel" : "Page actions",
+		"copyPageMarkdown"     : "Copy page",
+		"viewAsMarkdown"       : "View as Markdown",
+		"copyPageLink"         : "Copy link",
+		"openInChatGPT"        : "Open in ChatGPT",
+		"openInClaude"         : "Open in Claude",
+		"exportAsPdf"          : "Export as PDF"
 	}
 
 	/**

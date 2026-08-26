@@ -197,7 +197,7 @@ class {
 		var blogNavUrl = blogPosts.len() ? "blog/index.html" : ""
 		var mainResult = renderDocTree( mainPages, docsDir, config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, imageManifest, navConfig, locales, defaultLocaleCode, defaultLocaleDir, blogNavUrl, siteOrigin, functions )
 		var allPages = duplicate( mainResult.pages )
-		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
+		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 
 		for ( var versionName in versionNames ) {
 			var versionDocsDir = docsDir & "/versions/" & versionName
@@ -231,7 +231,7 @@ class {
 				functions
 			)
 			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
-			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
+			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 			writeTagsPage( versionResult.pages, versionResult.nav, config, themeDir, versionOutputDir, versionBasePath, versions, versionLocales, defaultLocaleCode, siteOrigin, functions )
 			variables.redirectGenerator.write( versionResult.pages, versionOutputDir, versionBasePath )
 
@@ -265,7 +265,7 @@ class {
 					functions
 				)
 				allPages.append( prefixPageUrls( versionLocaleResult.pages, "versions/" & versionName & "/" & versionLocale.code & "/" ), true )
-				copyAssets( root, themeDir, versionLocaleOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
+				copyAssets( root, themeDir, versionLocaleOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 				writeTagsPage( versionLocaleResult.pages, versionLocaleResult.nav, config, themeDir, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/", versions, versionLocales, versionLocale.code, siteOrigin, functions )
 				variables.redirectGenerator.write( versionLocaleResult.pages, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/" )
 			}
@@ -301,7 +301,7 @@ class {
 				functions
 			)
 			allPages.append( prefixPageUrls( localeResult.pages, locale.code & "/" ), true )
-			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
+			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
 			writeTagsPage( localeResult.pages, localeResult.nav, config, themeDir, localeOutputDir, urls.basePath & locale.code & "/", versions, locales, locale.code, siteOrigin, functions )
 			variables.redirectGenerator.write( localeResult.pages, localeOutputDir, urls.basePath & locale.code & "/" )
 		}
@@ -1379,11 +1379,12 @@ class {
 	 * @mermaidEnabled Whether to copy the shared mermaid-init.js widget and the vendored mermaid.js bundle itself
 	 * @mathEnabled Whether to copy the shared math-init.js (KaTeX auto-render) widget
 	 * @openapiEnabled Whether to copy the shared openapi-init.js widget and the vendored Swagger UI bundle/CSS - only ever needed by a project actually using a `::: openapi` block (DirectiveBlockProcessor.bx)
+	 * @pageActionsEnabled Whether to copy the shared page-actions-init.js widget - only ever needed by a project with `pageActions: true` (the GitBook-style Copy/Export dropdown, page.bxm's own `renderPageActions()`)
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - its already-generated variant files get copied into this tree's own site.../assets/, right alongside the plain docs/assets/** copy below; empty (the default) copies nothing extra
 	 * @cssBundle AssetBundler.bundleCss()'s own output (via applyAssetPipeline()) - its cached bundle file gets copied into this tree's own site.../assets/ so the `<link>` config.extraCss now points at actually resolves; empty `cachedPath` (the default) copies nothing
 	 * @jsBundle AssetBundler.bundleJs()'s own output - same as cssBundle, for the `<script>` config.extraJs now points at
 	 */
-	private void function copyAssets( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {} ) {
+	private void function copyAssets( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, boolean pageActionsEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {} ) {
 		var themeAssetsDir = arguments.themeDir & "/assets"
 		if ( directoryExists( themeAssetsDir ) ) {
 			directoryCopy( themeAssetsDir, arguments.siteDir & "/assets/theme", true )
@@ -1424,6 +1425,10 @@ class {
 		if ( arguments.openapiEnabled ) {
 			fileCopy( moduleAssetsDir() & "/openapi-init.js", arguments.siteDir & "/assets/openapi-init.js" )
 			directoryCopy( moduleAssetsDir() & "/vendor/swagger-ui", arguments.siteDir & "/assets/vendor/swagger-ui", true )
+		}
+
+		if ( arguments.pageActionsEnabled ) {
+			fileCopy( moduleAssetsDir() & "/page-actions-init.js", arguments.siteDir & "/assets/page-actions-init.js" )
 		}
 
 		var docsAssetsDir = variables.sourceDirResolver.resolve( arguments.root ) & "/assets"

@@ -16,6 +16,44 @@
 		return html
 	}
 
+	/**
+	 * The GitBook-style page-actions dropdown (`bxsites.json`'s `pageActions:
+	 * true` - `theme.options.pageActionsPosition` picks top/bottom). A native
+	 * `<details>`/`<summary>` disclosure needs no JS to open/close (same as
+	 * `::: expandable` - DirectiveBlockProcessor.bx's own `renderExpandable()`);
+	 * `page-actions-init.js` only wires up the individual actions themselves.
+	 *
+	 * "Copy link"/"Open in ChatGPT"/"Open in Claude" all need a real,
+	 * publicly-reachable URL - silently omitted whenever `page.canonicalUrl`
+	 * is empty (no full `baseURL` configured), the same requirement
+	 * `<link rel="canonical">` itself already has.
+	 */
+	function renderPageActions() {
+		var markdownHref = len( variables.page.markdownUrl ?: "" ) ? variables.basePath & variables.page.markdownUrl : ""
+		var canonicalUrl = trim( variables.page.canonicalUrl ?: "" )
+
+		var items = ""
+		if ( len( markdownHref ) ) {
+			items &= '<button type="button" class="bxsites-page-actions__item" data-bxsites-action="copy-markdown" data-bxsites-markdown-url="' & bxsitesUrlAttr( markdownHref ) & '">' & bxsitesIcon( "copy" ) & '<span>' & encodeForHTML( variables.strings.copyPageMarkdown ) & '</span></button>'
+			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( markdownHref ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "markdown" ) & '<span>' & encodeForHTML( variables.strings.viewAsMarkdown ) & '</span></a>'
+		}
+		if ( len( canonicalUrl ) ) {
+			items &= '<button type="button" class="bxsites-page-actions__item" data-bxsites-action="copy-link" data-bxsites-page-url="' & bxsitesUrlAttr( canonicalUrl ) & '">' & bxsitesIcon( "link" ) & '<span>' & encodeForHTML( variables.strings.copyPageLink ) & '</span></button>'
+			items &= '<a class="bxsites-page-actions__item" href="https://chatgpt.com/?q=' & urlEncodedFormat( "Read " & canonicalUrl & " so I can ask questions about it." ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "sparkle" ) & '<span>' & encodeForHTML( variables.strings.openInChatGPT ) & '</span></a>'
+			items &= '<a class="bxsites-page-actions__item" href="https://claude.ai/new?q=' & urlEncodedFormat( "Read " & canonicalUrl & " so I can ask questions about it." ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "sparkle" ) & '<span>' & encodeForHTML( variables.strings.openInClaude ) & '</span></a>'
+		}
+		items &= '<button type="button" class="bxsites-page-actions__item" data-bxsites-action="print">' & bxsitesIcon( "print" ) & '<span>' & encodeForHTML( variables.strings.exportAsPdf ) & '</span></button>'
+
+		return '<div class="bxsites-page-actions">'
+			& '<details class="bxsites-page-actions__disclosure">'
+			& '<summary class="bxsites-page-actions__button" aria-label="' & encodeForHTML( variables.strings.pageActionsAriaLabel ) & '">'
+			& '<span>' & encodeForHTML( variables.strings.pageActionsButton ) & '</span>' & bxsitesIcon( "chevron-down" )
+			& '</summary>'
+			& '<div class="bxsites-page-actions__panel">' & items & '</div>'
+			& '</details>'
+			& '</div>'
+	}
+
 	function renderPageMeta( required string editUrl, required string lastUpdated, required string markdownUrl ) {
 		var html = '<div class="page-meta">'
 		if ( len( arguments.editUrl ) ) {
@@ -81,7 +119,7 @@
 	}
 </bx:script>
 <bx:output>			<article class="jtd-card">
-</bx:output><bx:if variables.page.isFallbackContent><bx:output>
+</bx:output><bx:if variables.pageActionsEnabled and variables.pageActionsPosition == 'top'><bx:output>#renderPageActions()#</bx:output></bx:if><bx:if variables.page.isFallbackContent><bx:output>
 				<p class="fallback-notice">#bxsitesIcon( 'globe' )# #encodeForHTML( variables.stringsResolver.format( variables.strings.notTranslatedNotice, { "locale" : defaultLocaleLabel() } ) )#</p>
 </bx:output></bx:if><bx:if variables.page.breadcrumbs.len() gt 1><bx:output>#renderBreadcrumbs( variables.page.breadcrumbs )#</bx:output></bx:if><bx:output>
 				<h1 class="jtd-title" id="page-title"><a href="##page-title" id="page-title" class="anchor"></a></bx:output><bx:if len( variables.page.iconHtml )><bx:output><span class="page-icon">#variables.page.iconHtml#</span> </bx:output></bx:if><bx:output>#encodeForHTML( variables.page.title )#</h1>
@@ -103,5 +141,5 @@
 				<a class="jtd-page-nav__next" href="#variables.basePath##variables.page.nextPage.url#">#encodeForHTML( variables.page.nextPage.title )# &rarr;</a>
 </bx:output></bx:if><bx:output>
 			</nav>
-</bx:output></bx:if><bx:output>
+</bx:output></bx:if><bx:if variables.pageActionsEnabled and variables.pageActionsPosition == 'bottom'><bx:output>#renderPageActions()#</bx:output></bx:if><bx:output>
 </bx:output>
