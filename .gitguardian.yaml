@@ -1,0 +1,13 @@
+version: 2
+
+secret:
+  # Known false positive: a hardcoded string in a TestBox spec used purely as
+  # a fixture value to prove a password is read from an env var (never a
+  # literal in config), not a real credential. See
+  # tests/specs/deploy/targets/BaseFtpTargetSpec.bx. It was already renamed
+  # to a less alarming fixture value going forward, but the original string
+  # still exists in this PR's earlier commit history, so it's ignored by
+  # exact match here rather than rewriting history.
+  ignored_matches:
+    - name: bxsites-ftp-test-fixture-password
+      match: real-secret-value
