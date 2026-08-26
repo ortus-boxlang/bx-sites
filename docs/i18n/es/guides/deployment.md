@@ -42,7 +42,31 @@ en sí siempre es seguro de incluir en un commit. Un campo que es una
 *ruta* a un archivo de credenciales que ya gestionas tú mismo (una clave
 privada SSH, una clave JSON de cuenta de servicio de GCP descargada) es
 la única excepción - un campo normal, ya que lo que se mantiene fuera del
-control de versiones es el propio archivo, no su ruta.
+control de versiones es el propio archivo, no su ruta. Localmente, esas
+variables de entorno también pueden provenir de un archivo `.env` (BoxLang
+carga uno automáticamente y `getSystemSetting()` - lo que usa cada destino
+para resolverlas - lo consulta de forma transparente) en lugar de
+exportarlas a mano en tu shell; en CI, configúralas como secretos reales
+en el ejecutor.
+
+### Desplegar a todos los destinos a la vez
+
+Ejecuta `bxSites deploy` sin `--entry` ni `--target` y cada entrada
+`deployments/*.json` se despliega por turno, a partir de una única
+construcción compartida:
+
+```bash frame="terminal" title="Terminal"
+bxSites deploy
+```
+
+El sitio solo se construye una vez sin importar cuántas entradas tengas.
+Que un destino falle no detiene el resto - se intenta cada entrada, y el
+comando solo sale con un código distinto de cero si al menos uno de ellos
+falló; el resumen reporta cuántos tuvieron éxito (por ejemplo, `Deployed
+to 2/3 target(s) (1 failed)`). Añade `--verbose` (también funciona con
+`--entry`/`--target`) para imprimir una línea de progreso a medida que la
+construcción y cada destino comienzan y terminan, en lugar de solo el
+resumen final.
 
 ### `local`
 
@@ -209,6 +233,25 @@ asperezas de este caso.
   "apiTokenEnvVar": "CLOUDFLARE_API_TOKEN"
 }
 ```
+
+## El comando `package`
+
+¿Prefieres un archivo simple antes que cualquiera de los destinos de
+arriba - adjuntar una construcción a un release de GitHub, entregarla a
+un host que solo acepta una carga en zip, o enviarla a algún lugar que
+ninguno de los destinos conectables alcanza?
+[`bxSites package`](../cli-reference.md#package) construye el sitio y
+luego lo comprime en un único archivo cuya raíz son los propios
+contenidos del sitio construido (no una carpeta `site/` que lo envuelva):
+
+```bash frame="terminal" title="Terminal"
+bxSites package
+bxSites package --output=dist/my-site.zip
+```
+
+`--output` por defecto es `<projectRoot>/site.zip`; un valor relativo se
+resuelve contra la raíz del proyecto, y sus directorios padre se crean
+automáticamente si todavía no existen.
 
 ## GitHub Actions (publicación multiversión)
 

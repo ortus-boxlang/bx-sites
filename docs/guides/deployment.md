@@ -37,7 +37,28 @@ an API token) - resolved live at deploy time, so `deployments/*.json`
 itself is always safe to commit. A field that's a *path* to a credential
 file you already manage yourself (an SSH private key, a downloaded GCP
 service-account JSON key) is the one exception - a plain field, since the
-file itself is what's kept out of version control, not its path.
+file itself is what's kept out of version control, not its path. Locally,
+those environment variables can come from a `.env` file too (BoxLang loads
+one automatically and `getSystemSetting()` - what every target uses to
+resolve them - checks it transparently) instead of exporting them into
+your shell by hand; in CI, set them as real secrets on the runner.
+
+### Deploying to every target at once
+
+Run `bxSites deploy` with neither `--entry` nor `--target` and every
+`deployments/*.json` entry is deployed in turn, off a single shared build:
+
+```bash frame="terminal" title="Terminal"
+bxSites deploy
+```
+
+The site is only built once no matter how many entries you have. One
+target failing doesn't stop the rest - every entry is attempted, and the
+command only exits non-zero if at least one of them failed; the summary
+reports how many succeeded (e.g. `Deployed to 2/3 target(s) (1 failed)`).
+Add `--verbose` (works with `--entry`/`--target` too) to print a progress
+line as the build and each target start and finish, instead of just the
+final summary.
 
 ### `local`
 
@@ -196,6 +217,24 @@ for the full, honest detail on this one's rough edges.
   "apiTokenEnvVar": "CLOUDFLARE_API_TOKEN"
 }
 ```
+
+## The `package` command
+
+Prefer a plain archive over any of the targets above - attaching a build to
+a GitHub release, handing it to a host that only accepts a zip upload, or
+shipping it somewhere none of the pluggable targets reach?
+[`bxSites package`](../cli-reference.md#package) builds the site, then zips
+it into a single file whose root is the built site's own contents (not a
+wrapping `site/` folder):
+
+```bash frame="terminal" title="Terminal"
+bxSites package
+bxSites package --output=dist/my-site.zip
+```
+
+`--output` defaults to `<projectRoot>/site.zip`; a relative value is
+resolved against the project root, and its parent directories are created
+automatically if they don't already exist.
 
 ## GitHub Actions (multi-version publishing)
 

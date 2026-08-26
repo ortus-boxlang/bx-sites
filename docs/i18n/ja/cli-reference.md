@@ -120,11 +120,12 @@ rsync-over-SSH、Netlify、Vercel、Cloudflare Pages、ローカルディレク�
 到達できます）。
 
 ```bash title="Usage"
-bxSites deploy --entry=<name>
-bxSites deploy [--target=local|github-pages] [target-specific flags]
+bxSites deploy --entry=<name> [--verbose]
+bxSites deploy [--target=local|github-pages] [target-specific flags] [--verbose]
+bxSites deploy [--verbose]
 ```
 
-呼び出し方は2通りあります:
+呼び出し方は3通りあります:
 
 1. **`--entry=<name>`** - `deployments/<name>.json` ファイルが宣言している
    ターゲットへディスパッチします（詳細は後述）。`local`/`github-pages` 以外の
@@ -132,12 +133,37 @@ bxSites deploy [--target=local|github-pages] [target-specific flags]
    量の設定があるためです。
 2. **`--target=<name>` と専用フラグ** - 最も単純な2つのターゲット向けの、
    `deployments/` フォルダを一切必要としないフラグのみのショートハンドです:
-   `local`（`--destination=<path>`。`--target` を省略した場合のデフォルトでも
-   あります）と `github-pages`（`[--branch] [--remote] [--message]`、すべて
-   省略可能で `gh-deploy` と同じデフォルト値）。
+   `local`（`--destination=<path>`）と `github-pages`（`[--branch]
+   [--remote] [--message]`、すべて省略可能で `gh-deploy` と同じデフォルト値）。
+3. **どちらのフラグも指定しない場合 - すべてにデプロイ。** `deployments/*.json`
+   の各エントリーが、単一の共有ビルド（サイトはターゲットごとではなく一度だけ
+   ビルドされます）を使って順番にデプロイされます。少なくとも1つの
+   `deployments/*.json` エントリーが存在している必要があります。1つの
+   ターゲットが失敗しても他は止まりません - すべてのエントリーが試行され、
+   コマンドは少なくとも1つが失敗した場合にのみ非ゼロで終了します。最終的な
+   サマリーには成功した数が報告されます（例: `Deployed to 2/3 target(s) (1
+   failed)`）。
+
+`--verbose` を付けると、最終的な1行サマリーだけでなく、ビルドの開始/終了時と
+各ターゲットの開始/終了時にも進捗行が出力されます。
 
 各ターゲットの設定内容と、それぞれの `deployments/*.json` の実例については
 [デプロイ](guides/deployment.md#deploy) を参照してください。
+
+## `package`
+
+サイトをビルドし、単一の配布可能なアーカイブへ圧縮します - ルートがビルド
+されたサイト自身の内容になっている（`site/` フォルダで包まれていない）単純な
+zip ファイルで、リリースへの添付や、zip アップロードのみを受け付けるホストへの
+受け渡しにすぐ使えます。
+
+```bash title="Usage"
+bxSites package [--output=<path>]
+```
+
+`--output` のデフォルトは `<projectRoot>/site.zip` です（相対パスを指定した
+場合はプロジェクトルートを基準に解決されます）。ネストした出力先を指定した
+場合、親ディレクトリは自動的に作成されます。
 
 ## `migrate`
 

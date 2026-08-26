@@ -1,0 +1,47 @@
+/**
+ * cli.Package only covers guard clauses here, matching cli.Deploy's own
+ * spec (DeploySpec.bx) - a full successful run needs a real bx-markdown
+ * module activation (MarkdownRenderer.bx's hard dependency), which this
+ * plain unit-test environment doesn't have.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.Package", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.Package@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newTempProject() {
+				var dir = createTempDirectory( prefix = "bxsites-cli-package-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
+			} );
+
+			it( "throws BxSites.ConfigNotFound when the project has no bxsites.json", function() {
+				var dir = newTempProject();
+				expect( function() {
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxSites.ConfigNotFound" );
+			} );
+
+		} );
+	}
+
+}

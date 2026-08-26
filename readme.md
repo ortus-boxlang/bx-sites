@@ -90,6 +90,8 @@ boxlang bxSites <verb> [options]
 | `blog:find` | Filter blog posts by author/category/tag/date range |
 | `search:query` | Query a built `search-index.json` and rank results |
 | `lint` | Pre-build content checks: heading level skips, blog posts missing a valid date |
+| `deploy` | Build and ship `site/` to a real target (s3, azure, gcs, firebase, ftp, sftp, rsync, netlify, vercel, cloudflare-pages, local, github-pages); no args deploys every `deployments/*.json` entry; `--verbose` |
+| `package` | Build and zip `site/` into a single archive (`--output=<path>`, defaults to `site.zip`) |
 
 Every verb accepts `--projectRoot=<path>` (or a bare positional path) to target a project other than the current directory. Run `bxSites --help` for full usage.
 

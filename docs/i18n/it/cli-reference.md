@@ -131,11 +131,12 @@ Pages, una directory locale, oppure GitHub Pages (lo stesso push che fa
 unificato).
 
 ```bash title="Utilizzo"
-bxSites deploy --entry=<nome>
-bxSites deploy [--target=local|github-pages] [flag specifici del target]
+bxSites deploy --entry=<nome> [--verbose]
+bxSites deploy [--target=local|github-pages] [flag specifici del target] [--verbose]
+bxSites deploy [--verbose]
 ```
 
-Due modi per invocarlo:
+Tre modi per invocarlo:
 
 1. **`--entry=<nome>`** - smista verso qualunque target dichiarato da un
    file `deployments/<nome>.json` (vedi sotto). Ogni target eccetto
@@ -143,14 +144,41 @@ Due modi per invocarlo:
    ne possano ragionevolmente portare un paio di flag.
 2. **`--target=<nome>` con i propri flag** - una scorciatoia a soli flag
    per i due target più semplici, che non necessitano affatto di una
-   cartella `deployments/`: `local` (`--destination=<percorso>`, anche il
-   valore predefinito quando `--target` è del tutto omesso) e
+   cartella `deployments/`: `local` (`--destination=<percorso>`) e
    `github-pages` (`[--branch] [--remote] [--message]`, ogni campo
    opzionale, con gli stessi valori predefiniti di `gh-deploy`).
+3. **Nessun flag - distribuisce tutto.** Ogni voce `deployments/*.json`
+   viene distribuita a turno, a partire da un'unica build condivisa (il
+   sito viene compilato una sola volta, non una volta per target).
+   Richiede che esista almeno una voce `deployments/*.json`. Il
+   fallimento di un target non ferma gli altri - ogni voce viene tentata,
+   e il comando esce con un codice diverso da zero solo se almeno una di
+   esse è fallita; il riepilogo finale riporta quante sono andate a buon
+   fine (ad es. `Deployed to 2/3 target(s) (1 failed)`).
+
+`--verbose` stampa una riga di avanzamento quando la build inizia/finisce
+e quando ciascun target inizia/finisce, invece del solo riepilogo finale
+su una riga.
 
 Vedi [Distribuzione](guides/deployment.md) per la struttura di
 configurazione propria di ogni target e un esempio reale di
 `deployments/*.json` per ciascuno.
+
+## `package`
+
+Compila il sito, poi lo comprime in un unico archivio distribuibile - uno
+zip semplice la cui radice è il contenuto stesso del sito compilato (non
+una cartella `site/` che lo racchiude), pronto per essere allegato a una
+release o consegnato a qualsiasi host che accetta solo il caricamento di
+uno zip.
+
+```bash title="Utilizzo"
+bxSites package [--output=<percorso>]
+```
+
+`--output` ha come valore predefinito `<projectRoot>/site.zip` (un valore
+relativo viene risolto rispetto alla radice del progetto); le cartelle
+padre di una destinazione annidata vengono create automaticamente.
 
 ## `migrate`
 

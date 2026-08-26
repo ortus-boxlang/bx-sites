@@ -4,21 +4,31 @@
  * older single-purpose `gh-deploy` verb (still kept working, unchanged -
  * see GhDeploy.bx's own docblock) with one command covering every target.
  *
- * Two ways to invoke it:
+ * Three ways to invoke it:
  *
  *  1. `--entry=<name>` - dispatches to whatever target the named
  *     `deployments/<name>.json` convention entry declares (`s3`, `azure`,
  *     `gcs`, `firebase`, `ftp`, `sftp`, `rsync`, `netlify`, `vercel`,
  *     `cloudflare-pages`, `local`, or `github-pages`), resolved and
  *     validated via `DeploymentConfigResolver`.
- *  2. `--target=<name> [flags]` (or no `--target` at all, which defaults to
- *     `local`) - a flag-only shorthand, kept working with no `deployments/`
- *     folder present so the simplest cases never need one:
+ *  2. `--target=<name> [flags]` - a flag-only shorthand, kept working with
+ *     no `deployments/` folder present so the simplest cases never need one:
  *       - `local`: `--destination=<path>`
  *       - `github-pages`: `[--branch] [--remote] [--message]`, all
  *         optional - the exact defaults `gh-deploy` already has
  *     Every other target needs more configuration than a couple of flags
  *     can reasonably carry, and requires a `deployments/*.json` entry instead.
+ *  3. Neither flag - "deploy all": every `deployments/*.json` entry is
+ *     deployed in turn, off a single shared build (the site is only built
+ *     once, not once per target). Requires at least one `deployments/*.json`
+ *     entry to exist; throws `BxSites.NoDeploymentsFound` otherwise, since
+ *     there's nothing implicit to fall back to. One target failing doesn't
+ *     stop the others - every entry is attempted, and the verb only exits
+ *     non-zero if at least one of them failed.
+ *
+ * `--verbose` prints a progress line as each target starts and finishes
+ * (build, then one line per target); without it, only the final one-line
+ * summary `main()` already prints is shown.
  */
 class {
 
@@ -40,7 +50,7 @@ class {
 	variables.FLAG_ONLY_TARGETS = [ "local", "github-pages" ]
 
 	/**
-	 * @options { projectRoot (required), entry (optional, a deployments/* entry name - NOT `name`, which collides with a reserved top-level BoxLang CLI flag and crashes the runtime before this class is even reached), target (optional, defaults to "local"), destination, branch, remote, message }
+	 * @options { projectRoot (required), entry (optional, a deployments/* entry name - NOT `name`, which collides with a reserved top-level BoxLang CLI flag and crashes the runtime before this class is even reached), target (optional; when neither entry nor target is given, every deployments/*.json entry is deployed instead), destination, branch, remote, message, verbose (optional, prints a progress line per target) }
 	 */
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
@@ -48,18 +58,44 @@ class {
 			throw( type = "BxSites.MissingProjectRoot", message = "`deploy` requires a project root" )
 		}
 		var root = projectRoot.reReplace( "[\/]+$", "" )
+		var verbose = arguments.options.verbose ?: false
 
 		var entryName = trim( arguments.options.entry ?: "" )
+		var explicitTarget = trim( arguments.options.target ?: "" )
+		var deployAllMode = !len( entryName ) && !len( explicitTarget )
+
+		// Resolve/validate what we're deploying to FIRST, same as the
+		// single-entry/single-target paths below - a bad or empty
+		// deployments/ folder should fail fast, before an expensive build,
+		// not after one.
+		var allEntries = []
 		var target = ""
 		var config = {}
 
-		if ( len( entryName ) ) {
+		if ( deployAllMode ) {
+			var resolver = new "models.deploy.DeploymentConfigResolver@bxsites"()
+			var resolved = resolver.resolve( root )
+
+			if ( resolved.errors.len() ) {
+				throw(
+					type    = "BxSites.InvalidDeployConfig",
+					message = "deployments/ has #resolved.errors.len()# error(s): #resolved.errors.toList( '; ' )#"
+				)
+			}
+			if ( !resolved.entries.len() ) {
+				throw(
+					type    = "BxSites.NoDeploymentsFound",
+					message = "No deployments/*.json entries found - add one, or use --entry=<name> / --target=<name> to deploy a single target"
+				)
+			}
+			allEntries = resolved.entries
+		} else if ( len( entryName ) ) {
 			var resolver = new "models.deploy.DeploymentConfigResolver@bxsites"()
 			var entry = resolver.getEntry( root, entryName )
 			target = entry.target
 			config = entry.config
 		} else {
-			target = len( arguments.options.target ?: "" ) ? arguments.options.target : "local"
+			target = explicitTarget
 
 			if ( !variables.TARGET_CLASSES.keyExists( target ) ) {
 				throw(
@@ -80,17 +116,99 @@ class {
 		var configLoader = new "models.config.ConfigLoader@bxsites"()
 		var siteConfig = configLoader.load( root )
 
+		if ( verbose ) {
+			println( "Building site..." )
+		}
 		var pipeline = new "models.build.BuildPipeline@bxsites"()
 		var buildResult = pipeline.build( root )
+		if ( verbose ) {
+			println( "Built #buildResult.pageCount# page(s) to #buildResult.siteDir#" )
+		}
 
 		var context = { projectRoot : root, siteDir : buildResult.siteDir, config : siteConfig }
-		var targetInstance = new "#variables.TARGET_CLASSES[ target ]#"()
-		var result = targetInstance.deploy( config, context )
+
+		if ( deployAllMode ) {
+			return deployAllEntries( allEntries, context, buildResult, verbose )
+		}
+
+		if ( verbose ) {
+			println( "Deploying to [#target#]..." )
+		}
+		var result = deployToTarget( target, config, context )
+		if ( verbose ) {
+			println( result.success ? "Deployed to [#target#]" : "Failed to deploy to [#target#]: #result.message#" )
+		}
 
 		return {
 			exitCode : result.success ? 0 : 1,
 			message  : "Built #buildResult.pageCount# page(s). #result.message#",
 			result   : result
+		}
+	}
+
+	/**
+	 * "Deploy all" - every already-resolved `deployments/*.json` entry,
+	 * deployed in turn off the single build `run()` already produced. One
+	 * entry failing doesn't stop the rest; the overall result only fails if
+	 * at least one did.
+	 *
+	 * @entries The already-resolved+validated deployments/*.json entries ({ name, target, config }[])
+	 * @context The shared deploy context ({ projectRoot, siteDir, config }), already built once
+	 * @buildResult The BuildPipeline result, for the page-count summary
+	 * @verbose Whether to print a progress line per target
+	 *
+	 * @return { exitCode, message, result: { success, targets: [ { name, target, result } ] } }
+	 */
+	private struct function deployAllEntries(
+		required array entries,
+		required struct context,
+		required struct buildResult,
+		required boolean verbose
+	) {
+		var targets = []
+		var failureCount = 0
+
+		for ( var entry in arguments.entries ) {
+			if ( arguments.verbose ) {
+				println( "Deploying [#entry.name#] (#entry.target#)..." )
+			}
+			var result = deployToTarget( entry.target, entry.config, arguments.context )
+			if ( !result.success ) {
+				failureCount++
+			}
+			if ( arguments.verbose ) {
+				println( result.success ? "Deployed [#entry.name#]" : "Failed to deploy [#entry.name#]: #result.message#" )
+			}
+			targets.append( { name : entry.name, target : entry.target, result : result } )
+		}
+
+		var successCount = arguments.entries.len() - failureCount
+
+		return {
+			exitCode : failureCount ? 1 : 0,
+			message  : "Built #arguments.buildResult.pageCount# page(s). Deployed to #successCount#/#arguments.entries.len()# target(s)#failureCount ? ' (' & failureCount & ' failed)' : ''#.",
+			result   : { success : failureCount == 0, targets : targets }
+		}
+	}
+
+	/**
+	 * Instantiates the right target class and deploys, converting a thrown
+	 * failure into a `{ success: false, message }` result instead of letting
+	 * it propagate - so one target failing during "deploy all" never stops
+	 * the entries after it.
+	 *
+	 * @target The target name, e.g. "s3"/"azure"
+	 * @config That target's own resolved config struct
+	 * @context The shared deploy context ({ projectRoot, siteDir, config })
+	 *
+	 * @return { success, message, ... } - whatever the target's own deploy() returns, or a synthesized failure
+	 */
+	private struct function deployToTarget( required string target, required struct config, required struct context ) {
+		try {
+			var targetInstance = new "#variables.TARGET_CLASSES[ arguments.target ]#"()
+			return targetInstance.deploy( arguments.config, arguments.context )
+		} catch ( any e ) {
+			return { success : false, message : e.message }
 		}
 	}
 

@@ -132,24 +132,50 @@ or GitHub Pages (the same push `gh-deploy` does, just reachable from this
 one unified command too).
 
 ```bash title="Usage"
-bxSites deploy --entry=<name>
-bxSites deploy [--target=local|github-pages] [target-specific flags]
+bxSites deploy --entry=<name> [--verbose]
+bxSites deploy [--target=local|github-pages] [target-specific flags] [--verbose]
+bxSites deploy [--verbose]
 ```
 
-Two ways to invoke it:
+Three ways to invoke it:
 
-1. **`--entry=<name`>** - dispatches to whatever target a
+1. **`--entry=<name>`** - dispatches to whatever target a
    `deployments/<name>.json` file declares (see below). Every target
    except `local`/`github-pages` needs this - there's more configuration
    than a couple of flags can reasonably carry.
 2. **`--target=<name>` with its own flags** - a flag-only shorthand for
    the two simplest targets, needing no `deployments/` folder at all:
-   `local` (`--destination=<path>`, also the default when `--target` is
-   omitted entirely) and `github-pages` (`[--branch] [--remote]
-   [--message]`, every field optional, same defaults as `gh-deploy`).
+   `local` (`--destination=<path>`) and `github-pages` (`[--branch]
+   [--remote] [--message]`, every field optional, same defaults as
+   `gh-deploy`).
+3. **Neither flag - deploy everything.** Every `deployments/*.json` entry
+   is deployed in turn, off a single shared build (the site is built once,
+   not once per target). Requires at least one `deployments/*.json` entry
+   to exist. One target failing doesn't stop the rest - every entry is
+   attempted, and the command only exits non-zero if at least one of them
+   failed; the final summary reports how many succeeded (e.g. `Deployed to
+   2/3 target(s) (1 failed)`).
+
+`--verbose` prints a progress line as the build starts/finishes and as each
+target starts/finishes, instead of just the final one-line summary.
 
 See [Deployment](guides/deployment.md) for every target's own config
 shape and a real `deployments/*.json` example for each.
+
+## `package`
+
+Builds the site, then zips it into a single distributable archive - a
+plain zip whose root is the built site's own contents (not a wrapping
+`site/` folder), ready to attach to a release or hand to any host that
+only accepts a zip upload.
+
+```bash title="Usage"
+bxSites package [--output=<path>]
+```
+
+`--output` defaults to `<projectRoot>/site.zip` (a relative value is
+resolved against the project root); a nested destination's parent
+directories are created automatically.
 
 ## `migrate`
 

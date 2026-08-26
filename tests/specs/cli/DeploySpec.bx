@@ -64,11 +64,28 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.UnknownDeployEntry" );
 			} );
 
-			it( "defaults to the local target and requires --destination when neither --target nor --entry is given", function() {
+			it( "throws BxSites.NoDeploymentsFound when neither --target nor --entry is given and deployments/ doesn't exist", function() {
 				var dir = newTempProject();
 				expect( function() {
 					verb.run( { projectRoot : dir } );
-				} ).toThrow( "BxSites.MissingDestination" );
+				} ).toThrow( "BxSites.NoDeploymentsFound" );
+			} );
+
+			it( "throws BxSites.NoDeploymentsFound when deployments/ exists but is empty, and neither --target nor --entry is given", function() {
+				var dir = newTempProject();
+				directoryCreate( dir & "/deployments" );
+				expect( function() {
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxSites.NoDeploymentsFound" );
+			} );
+
+			it( "throws BxSites.InvalidDeployConfig for deploy-all when a deployments/*.json entry fails validation", function() {
+				var dir = newTempProject();
+				directoryCreate( dir & "/deployments" );
+				fileWrite( dir & "/deployments/prod.json", '{"target":"s3"}' );
+				expect( function() {
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxSites.InvalidDeployConfig" );
 			} );
 
 			it( "throws BxSites.ConfigNotFound once past target resolution, when the project has no bxsites.json", function() {

@@ -42,7 +42,30 @@ campo che è invece un *percorso* verso un file di credenziali che già
 gestisci tu stesso (una chiave privata SSH, una chiave JSON di service
 account GCP scaricata) è la sola eccezione - un campo semplice, dato che
 è il file stesso a dover restare fuori dal controllo di versione, non il
-suo percorso.
+suo percorso. In locale, quelle variabili d'ambiente possono provenire
+anche da un file `.env` (BoxLang ne carica uno automaticamente e
+`getSystemSetting()` - quello che ogni target usa per risolverle - lo
+controlla in modo trasparente) invece di esportarle a mano nella tua
+shell; in CI, impostale come veri segreti sul runner.
+
+### Distribuire su tutti i target contemporaneamente
+
+Esegui `bxSites deploy` senza `--entry` né `--target` e ogni voce
+`deployments/*.json` viene distribuita a turno, a partire da un'unica
+build condivisa:
+
+```bash frame="terminal" title="Terminal"
+bxSites deploy
+```
+
+Il sito viene compilato una sola volta, indipendentemente da quante voci
+hai. Il fallimento di un target non ferma gli altri - ogni voce viene
+tentata, e il comando esce con un codice diverso da zero solo se almeno
+una di esse è fallita; il riepilogo riporta quante sono andate a buon
+fine (ad es. `Deployed to 2/3 target(s) (1 failed)`). Aggiungi
+`--verbose` (funziona anche con `--entry`/`--target`) per stampare una
+riga di avanzamento quando la build e ciascun target iniziano e
+finiscono, invece del solo riepilogo finale.
 
 ### `local`
 
@@ -209,6 +232,25 @@ asperità di questo target.
   "apiTokenEnvVar": "CLOUDFLARE_API_TOKEN"
 }
 ```
+
+## Il comando `package`
+
+Preferisci un semplice archivio rispetto a uno qualsiasi dei target qui
+sopra - allegare una build a una release GitHub, consegnarla a un host
+che accetta solo il caricamento di uno zip, oppure spedirla in un posto
+che nessuno dei target collegabili raggiunge?
+[`bxSites package`](../cli-reference.md#package) compila il sito, poi lo
+comprime in un unico file la cui radice è il contenuto stesso del sito
+compilato (non una cartella `site/` che lo racchiude):
+
+```bash frame="terminal" title="Terminal"
+bxSites package
+bxSites package --output=dist/my-site.zip
+```
+
+`--output` ha come valore predefinito `<projectRoot>/site.zip`; un
+valore relativo viene risolto rispetto alla radice del progetto, e le
+sue cartelle padre vengono create automaticamente se non esistono già.
 
 ## GitHub Actions (pubblicazione multi-versione)
 

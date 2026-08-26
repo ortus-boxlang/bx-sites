@@ -40,7 +40,32 @@ werden kann. Ein Feld, das ein *Pfad* zu einer Credential-Datei ist, die
 du bereits selbst verwaltest (ein privater SSH-Schlüssel, ein
 heruntergeladener GCP-Service-Account-JSON-Key), ist die eine Ausnahme -
 ein einfaches Feld, da die Datei selbst aus der Versionskontrolle
-herausgehalten wird, nicht ihr Pfad.
+herausgehalten wird, nicht ihr Pfad. Lokal können diese
+Umgebungsvariablen auch aus einer `.env`-Datei stammen (BoxLang lädt
+automatisch eine, und `getSystemSetting()` - was jedes Ziel zu ihrer
+Auflösung nutzt - prüft sie transparent), statt sie von Hand in deine
+Shell zu exportieren; in CI werden sie als echte Secrets auf dem Runner
+gesetzt.
+
+### Alle Ziele auf einmal deployen
+
+`bxSites deploy` ohne `--entry` und ohne `--target` ausgeführt, deployt
+jeden `deployments/*.json`-Eintrag der Reihe nach, ausgehend von einem
+einzigen gemeinsamen Build:
+
+```bash frame="terminal" title="Terminal"
+bxSites deploy
+```
+
+Die Website wird nur einmal gebaut, egal wie viele Einträge du hast.
+Schlägt ein Ziel fehl, stoppt das die übrigen nicht - jeder Eintrag wird
+versucht, und der Befehl liefert nur dann einen von null verschiedenen
+Exit-Code, wenn mindestens einer davon fehlgeschlagen ist; die
+Zusammenfassung meldet, wie viele erfolgreich waren (z. B. `Deployed to
+2/3 target(s) (1 failed)`). Mit `--verbose` (funktioniert auch mit
+`--entry`/`--target`) wird eine Fortschrittszeile ausgegeben, wenn der
+Build und jedes Ziel starten und enden, statt nur der abschließenden
+Zusammenfassung.
 
 ### `local`
 
@@ -206,6 +231,26 @@ dieses Ziels für das vollständige, ehrliche Detail zu diesen rauen Kanten.
   "apiTokenEnvVar": "CLOUDFLARE_API_TOKEN"
 }
 ```
+
+## Der Befehl `package`
+
+Bevorzugst du ein reines Archiv gegenüber einem der obigen Ziele - einen
+Build an ein GitHub-Release anhängen, ihn an einen Host übergeben, der nur
+einen Zip-Upload akzeptiert, oder ihn irgendwohin ausliefern, wo keines
+der anbindbaren Ziele hinreicht? [`bxSites package`](../cli-reference.md#package)
+baut die Website und packt sie dann in eine einzige Datei, deren Wurzel
+der Inhalt der gebauten Website selbst ist (kein umschließender
+`site/`-Ordner):
+
+```bash frame="terminal" title="Terminal"
+bxSites package
+bxSites package --output=dist/my-site.zip
+```
+
+`--output` ist standardmäßig `<projectRoot>/site.zip`; ein relativer Wert
+wird gegenüber dem Projekt-Root aufgelöst, und seine übergeordneten
+Verzeichnisse werden automatisch angelegt, falls sie noch nicht
+existieren.
 
 ## GitHub Actions (Multi-Versions-Veröffentlichung)
 
