@@ -1,4 +1,4 @@
-name: "BX Sites"
+name: "BxSites"
 description: "Static documentation site generator for BoxLang, built on bx-markdown"
 baseURL: "https://ortus-boxlang.github.io/bx-sites/"
 theme:
