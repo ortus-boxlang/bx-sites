@@ -1067,6 +1067,25 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "gives in-page table-of-contents entries breathing room, so a wrapped heading doesn't read as its own entry", function() {
+				// The TOC list items previously had no margin/line-height of
+				// their own, relying entirely on the browser's UA default -
+				// on a long heading (e.g. "Prerequisite: install BoxLang")
+				// that wraps to two lines, the wrapped second line sat flush
+				// against the next entry, making it look like its own list
+				// item rather than a continuation.
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
+					var root = newProject( themeName );
+					fileWrite( root & "/docs/index.md", '<h2 id="install">Install</h2>' & char( 10 ) & '<h3 id="prereqs">Prereqs</h3>' );
+
+					pipeline.build( root );
+
+					var css = fileRead( root & "/site/assets/theme/style.css" );
+					expect( css ).toInclude( "margin: 0.35rem 0;" );
+					expect( css ).toInclude( "line-height: 1.4;" );
+				}
+			} );
+
 			it( "copies the shared tabs.js and code-lines.js widgets unconditionally, loading code-lines.js after hljs.highlightAll()", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Home" );
