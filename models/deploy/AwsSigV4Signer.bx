@@ -1,0 +1,289 @@
+/**
+ * Pure AWS Signature Version 4 (SigV4) request signer - no HTTP calls of
+ * its own, so every function here is exercised directly against known
+ * values without needing a real AWS/S3-compatible account. Implements the
+ * one signing scheme every S3-compatible storage provider speaks
+ * identically (real AWS S3, DigitalOcean Spaces, Cloudflare R2, Backblaze
+ * B2, MinIO, Wasabi) - see S3Target.bx, this signer's only real caller.
+ *
+ * Algorithm (https://docs.aws.amazon.com/general/latest/gr/sigv4-signing-process.html):
+ *   1. Canonical request = METHOD\nURI\nQUERYSTRING\nCANONICAL_HEADERS\n\nSIGNED_HEADERS\nPAYLOAD_HASH
+ *   2. String to sign     = AWS4-HMAC-SHA256\nAMZ_DATE\nCREDENTIAL_SCOPE\nHEX_SHA256(canonical request)
+ *   3. Signing key        = HMAC chain: HMAC(HMAC(HMAC(HMAC("AWS4"+secret, dateStamp), region), service), "aws4_request")
+ *   4. Signature          = lowercase-hex HMAC-SHA256(signing key, string to sign)
+ *
+ * BoxLang's native `hmac()` BIF accepts either a string OR a raw binary
+ * value as its `key` argument (confirmed against the BoxLang docs) but
+ * always RETURNS lowercase hex text - so every intermediate HMAC in the
+ * chain is round-tripped back to raw bytes via `binaryDecode( hex, "hex" )`
+ * before being fed in as the next step's key, to stay byte-for-byte
+ * faithful to the real algorithm. Only the FINAL signature stays as hex,
+ * for the Authorization header.
+ *
+ * `sign()` itself is verified in AwsSigV4SignerSpec.bx against AWS's own
+ * published "Example: GET Object" SigV4 walkthrough (a real, independently
+ * cross-checked test vector - not invented for this task, see that spec's
+ * own docblock) - not just internal determinism checks.
+ */
+class {
+
+	variables.UNRESERVED = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~"
+
+	/**
+	 * @method e.g. "PUT"/"GET"
+	 * @host The request's Host header value, e.g. "mybucket.s3.us-east-1.amazonaws.com" -
+	 *       used only to compute the signature, NOT added to the returned headers (the
+	 *       HTTP client sets its own Host header from the request URL)
+	 * @uriPath The request path, e.g. "/some/key.html" - this function does its own
+	 *          RFC 3986 percent-encoding, segment by segment, preserving "/"
+	 * @queryString A raw "key=value&key2=value2" query string, or "" if none - this
+	 *              function re-encodes and sorts it into canonical form itself
+	 * @headers Extra headers to sign besides `host`/`x-amz-date`/`x-amz-content-sha256`
+	 *          (which this function adds itself) - e.g. `{ "x-amz-acl" : "public-read" }`
+	 * @payloadHash Lowercase hex SHA-256 of the request body (see `hashBytes()` below)
+	 * @accessKey The real access key (never a literal in `deployments/*` config - see
+	 *            each target's own docblock)
+	 * @secretKey The real secret key
+	 * @region e.g. "us-east-1"
+	 * @service Defaults to "s3"
+	 * @amzDate Optional `yyyyMMdd'T'HHmmss'Z'` UTC override, so tests can pin a fixed
+	 *          timestamp instead of depending on "now" (this codebase's own rule against
+	 *          `now()`-based test fragility applies just as much to a signer as anything
+	 *          else - see AGENTS.md)
+	 *
+	 * @return A NEW struct - a copy of `arguments.headers` (never mutated) with
+	 *         `x-amz-date`, `x-amz-content-sha256`, and `Authorization` added
+	 */
+	struct function sign(
+		required string method,
+		required string host,
+		required string uriPath,
+		required string queryString,
+		required struct headers,
+		required string payloadHash,
+		required string accessKey,
+		required string secretKey,
+		required string region,
+		string service = "s3",
+		string amzDate = ""
+	) {
+		var amzDate = len( arguments.amzDate ) ? arguments.amzDate : defaultAmzDate()
+		var dateStamp = left( amzDate, 8 )
+
+		var toSign = normalizeHeaderKeys( arguments.headers )
+		toSign[ "host" ] = arguments.host
+		toSign[ "x-amz-date" ] = amzDate
+		toSign[ "x-amz-content-sha256" ] = arguments.payloadHash
+
+		var canonicalHeaders = buildCanonicalHeaders( toSign )
+		var signedHeaders = buildSignedHeadersList( toSign )
+		var canonicalRequest = arguments.method & char( 10 ) &
+			canonicalUri( arguments.uriPath ) & char( 10 ) &
+			canonicalQueryString( arguments.queryString ) & char( 10 ) &
+			canonicalHeaders & char( 10 ) & char( 10 ) &
+			signedHeaders & char( 10 ) &
+			arguments.payloadHash
+
+		var credentialScope = dateStamp & "/" & arguments.region & "/" & arguments.service & "/aws4_request"
+		var stringToSign = "AWS4-HMAC-SHA256" & char( 10 ) &
+			amzDate & char( 10 ) &
+			credentialScope & char( 10 ) &
+			hashBytes( charsetDecode( canonicalRequest, "utf-8" ) )
+
+		var signature = calculateSignature( arguments.secretKey, dateStamp, arguments.region, arguments.service, stringToSign )
+
+		var result = duplicate( arguments.headers )
+		result[ "x-amz-date" ] = amzDate
+		result[ "x-amz-content-sha256" ] = arguments.payloadHash
+		result[ "Authorization" ] = "AWS4-HMAC-SHA256 Credential=#arguments.accessKey#/#credentialScope#, SignedHeaders=#signedHeaders#, Signature=#signature#"
+		return result
+	}
+
+	/**
+	 * Lowercase-hex SHA-256 of raw bytes - the payload-hash half of the
+	 * signing contract (the other half, `sign()`, only ever sees the
+	 * already-computed hash, never the body itself, so it can stay pure).
+	 *
+	 * @bytes Raw bytes (a `binary` value, e.g. from `fileReadBinary()` or `charsetDecode()`)
+	 *
+	 * @return Lowercase hex SHA-256 digest
+	 */
+	string function hashBytes( required binary bytes ) {
+		return lCase( hash( arguments.bytes, "SHA-256" ) )
+	}
+
+	/**
+	 * RFC 3986 percent-encoding of a full request path, segment by segment,
+	 * with "/" preserved as the path separator - operates on the string's
+	 * own UTF-8 bytes directly (not per-character), so multi-byte
+	 * characters are percent-encoded correctly without any char/byte
+	 * boundary guesswork.
+	 *
+	 * @path The request path, e.g. "/docs/getting started.html"
+	 *
+	 * @return The percent-encoded path
+	 */
+	string function canonicalUri( required string path ) {
+		return uriEncode( arguments.path, true )
+	}
+
+	/**
+	 * Builds AWS's canonical query string: pairs sorted by their own already
+	 * percent-encoded "key=value" text, joined with "&". Not exercised by
+	 * `S3Target.bx` today (every PUT it signs has no query string), kept
+	 * here for completeness/future callers (e.g. presigned URLs).
+	 *
+	 * @queryString A raw "key=value&key2=value2" string, or "" for none
+	 *
+	 * @return The canonical, sorted, percent-encoded query string ("" if none)
+	 */
+	string function canonicalQueryString( required string queryString ) {
+		if ( !len( arguments.queryString ) ) {
+			return ""
+		}
+
+		var pairs = []
+		for ( var rawPair in listToArray( arguments.queryString, "&" ) ) {
+			var eqPos = find( "=", rawPair )
+			var rawKey = eqPos > 0 ? left( rawPair, eqPos - 1 ) : rawPair
+			var rawValue = eqPos > 0 ? mid( rawPair, eqPos + 1, len( rawPair ) ) : ""
+			pairs.append( uriEncode( rawKey, false ) & "=" & uriEncode( rawValue, false ) )
+		}
+		pairs.sort( "text" )
+		return pairs.toList( "&" )
+	}
+
+	/**
+	 * @headers A struct whose keys are already lowercase (see `normalizeHeaderKeys()`)
+	 *
+	 * @return `lowercase-name:trimmed-value` lines, sorted by name, joined with `\n`
+	 */
+	private string function buildCanonicalHeaders( required struct headers ) {
+		var names = structKeyArray( arguments.headers )
+		names.sort( "text" )
+		var lines = []
+		for ( var name in names ) {
+			lines.append( name & ":" & trim( arguments.headers[ name ] ) )
+		}
+		return lines.toList( char( 10 ) )
+	}
+
+	/**
+	 * @headers A struct whose keys are already lowercase (see `normalizeHeaderKeys()`)
+	 *
+	 * @return The same header names, sorted, joined with `;`
+	 */
+	private string function buildSignedHeadersList( required struct headers ) {
+		var names = structKeyArray( arguments.headers )
+		names.sort( "text" )
+		return names.toList( ";" )
+	}
+
+	/**
+	 * @headers A raw headers struct, any key casing/whitespace
+	 *
+	 * @return A NEW struct with every key lowercased and every value trimmed -
+	 *         `arguments.headers` itself is never mutated
+	 */
+	private struct function normalizeHeaderKeys( required struct headers ) {
+		var normalized = {}
+		for ( var key in arguments.headers ) {
+			normalized[ lCase( key ) ] = trim( arguments.headers[ key ] )
+		}
+		return normalized
+	}
+
+	/**
+	 * The chained-HMAC signing key derivation (step 3 of the algorithm) -
+	 * every intermediate key stays raw bytes end to end, only the final
+	 * result is hex.
+	 *
+	 * @secretKey The real secret key
+	 * @dateStamp `yyyyMMdd` only (no time)
+	 * @region e.g. "us-east-1"
+	 * @service e.g. "s3"
+	 * @stringToSign The string to sign built in `sign()`
+	 *
+	 * @return Lowercase hex HMAC-SHA256 signature
+	 */
+	private string function calculateSignature(
+		required string secretKey,
+		required string dateStamp,
+		required string region,
+		required string service,
+		required string stringToSign
+	) {
+		var kDate = binaryDecode( hmac( arguments.dateStamp, "AWS4" & arguments.secretKey, "HmacSHA256" ), "hex" )
+		var kRegion = binaryDecode( hmac( arguments.region, kDate, "HmacSHA256" ), "hex" )
+		var kService = binaryDecode( hmac( arguments.service, kRegion, "HmacSHA256" ), "hex" )
+		var kSigning = binaryDecode( hmac( "aws4_request", kService, "HmacSHA256" ), "hex" )
+		return lCase( hmac( arguments.stringToSign, kSigning, "HmacSHA256" ) )
+	}
+
+	/**
+	 * RFC 3986 percent-encoding, operating byte by byte on the value's own
+	 * UTF-8 bytes - every byte outside the unreserved set (`A-Z a-z 0-9 - . _ ~`)
+	 * is percent-encoded as uppercase hex; a multi-byte UTF-8 character's
+	 * continuation bytes always have the high bit set, so they're always
+	 * outside the (all-ASCII) unreserved set and always get encoded, with no
+	 * separate character/byte-boundary handling needed.
+	 *
+	 * @value The raw string to encode
+	 * @preserveSlash When true, a literal "/" byte is passed through unencoded
+	 *                (path segments); when false, "/" is percent-encoded like
+	 *                everything else outside the unreserved set (query keys/values)
+	 *
+	 * @return The percent-encoded string
+	 */
+	private string function uriEncode( required string value, required boolean preserveSlash ) {
+		var bytes = charsetDecode( arguments.value, "utf-8" )
+		var byteCount = arrayLen( bytes )
+		var result = ""
+
+		for ( var i = 1; i <= byteCount; i++ ) {
+			var unsigned = bitAnd( bytes[ i ], 255 )
+			if ( unsigned <= 127 ) {
+				var ch = char( unsigned )
+				if ( variables.UNRESERVED.find( ch ) > 0 || ( arguments.preserveSlash && ch == "/" ) ) {
+					result &= ch
+					continue
+				}
+			}
+			result &= "%" & byteToHex( unsigned )
+		}
+
+		return result
+	}
+
+	/**
+	 * @b A byte value already normalized to the unsigned 0-255 range
+	 *
+	 * @return 2-digit uppercase hex, e.g. "%20" -> "20", "%" prefix added by the caller
+	 */
+	private string function byteToHex( required numeric b ) {
+		var hex = uCase( createObject( "java", "java.lang.Integer" ).toHexString( arguments.b ) )
+		return len( hex ) < 2 ? "0" & hex : hex
+	}
+
+	/**
+	 * The default `amzDate` when no override is supplied - built from discrete
+	 * UTC date/time components (never a `dateFormat()`/`dateTimeFormat()` mask
+	 * string) specifically to sidestep this codebase's own confirmed landmine
+	 * that mask letter case (`mm` vs `MM`) is easy to get backwards - see
+	 * AGENTS.md's "BoxLang Gotchas".
+	 *
+	 * @return `yyyyMMdd'T'HHmmss'Z'`, in UTC
+	 */
+	private string function defaultAmzDate() {
+		var utc = dateConvert( "local2Utc", now() )
+		return numberFormat( year( utc ), "0000" ) &
+			numberFormat( month( utc ), "00" ) &
+			numberFormat( day( utc ), "00" ) &
+			"T" &
+			numberFormat( hour( utc ), "00" ) &
+			numberFormat( minute( utc ), "00" ) &
+			numberFormat( second( utc ), "00" ) &
+			"Z"
+	}
+
+}

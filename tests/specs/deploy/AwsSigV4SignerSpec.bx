@@ -1,0 +1,201 @@
+/**
+ * `sign()` is verified against AWS's own published "Example: GET Object"
+ * SigV4 walkthrough (from the S3 API docs' "Authenticating Requests: Using
+ * the Authorization Header" page) - a REAL, independently cross-checked
+ * test vector, not one invented for this task. It was pulled from two
+ * independent third-party sources that both quote it verbatim (so a single
+ * mistranscription wouldn't go unnoticed) and its final Signature hex was
+ * separately confirmed to appear on AWS's own docs page via a web search
+ * hit, before being hardcoded here:
+ *   - Bucket examplebucket, key test.txt, GET, Range: bytes=0-9
+ *   - Date 20130524T000000Z, region us-east-1, service s3
+ *   - Access key AKIAIOSFODNN7EXAMPLE / secret wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+ *   - Expected Authorization: AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20130524/us-east-1/s3/aws4_request,
+ *     SignedHeaders=host;range;x-amz-content-sha256;x-amz-date,
+ *     Signature=f0e8bdb87c964420e857bd35b5d6ed310bd44f0170aba48dd91039c6036bdb41
+ *
+ * Beyond that one real vector, the rest of this spec is determinism/
+ * sensitivity coverage (same inputs -> same signature; changing any single
+ * input -> a different signature) plus format assertions on the
+ * Authorization header shape - this class has no HTTP calls of its own to
+ * exercise for real (see S3Target.bx for where it's actually used).
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "deploy.AwsSigV4Signer", function() {
+
+			beforeEach( function() {
+				variables.signer = new "models.deploy.AwsSigV4Signer@bxsites"();
+			} );
+
+			it( "matches AWS's own published SigV4 'Example: GET Object' test vector exactly", function() {
+				var emptyPayloadHash = signer.hashBytes( charsetDecode( "", "utf-8" ) );
+
+				// The empty-body SHA-256 is itself one of the most well-known hash
+				// constants there is - asserting it here ties the payload-hash half
+				// of the pipeline into the same real vector as the signature below.
+				expect( emptyPayloadHash ).toBe( "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" );
+
+				var headers = signer.sign(
+					method      : "GET",
+					host        : "examplebucket.s3.amazonaws.com",
+					uriPath     : "/test.txt",
+					queryString : "",
+					headers     : { "Range" : "bytes=0-9" },
+					payloadHash : emptyPayloadHash,
+					accessKey   : "AKIAIOSFODNN7EXAMPLE",
+					secretKey   : "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					region      : "us-east-1",
+					service     : "s3",
+					amzDate     : "20130524T000000Z"
+				);
+
+				expect( headers[ "x-amz-date" ] ).toBe( "20130524T000000Z" );
+				expect( headers[ "x-amz-content-sha256" ] ).toBe( emptyPayloadHash );
+				expect( headers.Range ).toBe( "bytes=0-9" );
+				expect( headers.Authorization ).toBe(
+					"AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20130524/us-east-1/s3/aws4_request, SignedHeaders=host;range;x-amz-content-sha256;x-amz-date, Signature=f0e8bdb87c964420e857bd35b5d6ed310bd44f0170aba48dd91039c6036bdb41"
+				);
+			} );
+
+			it( "never mutates the caller's own headers struct", function() {
+				var original = { "Range" : "bytes=0-9" };
+				signer.sign(
+					method      : "GET",
+					host        : "h",
+					uriPath     : "/x",
+					queryString : "",
+					headers     : original,
+					payloadHash : "abc",
+					accessKey   : "AK",
+					secretKey   : "SK",
+					region      : "us-east-1",
+					amzDate     : "20130524T000000Z"
+				);
+
+				expect( original.keyExists( "Authorization" ) ).toBeFalse();
+				expect( structCount( original ) ).toBe( 1 );
+			} );
+
+			it( "is deterministic - identical inputs always produce the identical signature", function() {
+				var call = function() {
+					return signer.sign(
+						method      : "PUT",
+						host        : "mybucket.s3.us-east-1.amazonaws.com",
+						uriPath     : "/assets/style.css",
+						queryString : "",
+						headers     : { "Content-Type" : "text/css" },
+						payloadHash : "d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2",
+						accessKey   : "AKIDEXAMPLE",
+						secretKey   : "wJalrXUtnFEMI/K7MDENG+bPxRfiCYzEXAMPLEKEY",
+						region      : "us-east-1",
+						amzDate     : "20250101T120000Z"
+					);
+				};
+
+				expect( call().Authorization ).toBe( call().Authorization );
+			} );
+
+			it( "produces a different signature when the secret key changes", function() {
+				var base = { method : "PUT", host : "h", uriPath : "/k", queryString : "", headers : {}, payloadHash : "p", accessKey : "AK", region : "us-east-1", amzDate : "20250101T120000Z" };
+
+				var sig1 = signer.sign( argumentCollection = base, secretKey = "secret-one" ).Authorization;
+				var sig2 = signer.sign( argumentCollection = base, secretKey = "secret-two" ).Authorization;
+
+				expect( sig1 ).notToBe( sig2 );
+			} );
+
+			it( "produces a different signature when the method changes", function() {
+				var base = { host : "h", uriPath : "/k", queryString : "", headers : {}, payloadHash : "p", accessKey : "AK", secretKey : "SK", region : "us-east-1", amzDate : "20250101T120000Z" };
+
+				var sig1 = signer.sign( argumentCollection = base, method = "GET" ).Authorization;
+				var sig2 = signer.sign( argumentCollection = base, method = "PUT" ).Authorization;
+
+				expect( sig1 ).notToBe( sig2 );
+			} );
+
+			it( "produces a different signature when the uriPath changes", function() {
+				var base = { method : "PUT", host : "h", queryString : "", headers : {}, payloadHash : "p", accessKey : "AK", secretKey : "SK", region : "us-east-1", amzDate : "20250101T120000Z" };
+
+				var sig1 = signer.sign( argumentCollection = base, uriPath = "/a.html" ).Authorization;
+				var sig2 = signer.sign( argumentCollection = base, uriPath = "/b.html" ).Authorization;
+
+				expect( sig1 ).notToBe( sig2 );
+			} );
+
+			it( "produces a different signature when amzDate changes", function() {
+				var base = { method : "PUT", host : "h", uriPath : "/k", queryString : "", headers : {}, payloadHash : "p", accessKey : "AK", secretKey : "SK", region : "us-east-1" };
+
+				var sig1 = signer.sign( argumentCollection = base, amzDate = "20250101T120000Z" ).Authorization;
+				var sig2 = signer.sign( argumentCollection = base, amzDate = "20250101T120001Z" ).Authorization;
+
+				expect( sig1 ).notToBe( sig2 );
+			} );
+
+			it( "produces a different signature when an extra signed header's value changes", function() {
+				var base = { method : "PUT", host : "h", uriPath : "/k", queryString : "", payloadHash : "p", accessKey : "AK", secretKey : "SK", region : "us-east-1", amzDate : "20250101T120000Z" };
+
+				var sig1 = signer.sign( argumentCollection = base, headers = { "x-amz-acl" : "public-read" } ).Authorization;
+				var sig2 = signer.sign( argumentCollection = base, headers = { "x-amz-acl" : "private" } ).Authorization;
+
+				expect( sig1 ).notToBe( sig2 );
+			} );
+
+			it( "builds an Authorization header in the exact expected shape", function() {
+				var headers = signer.sign(
+					method      : "PUT",
+					host        : "mybucket.s3.us-east-1.amazonaws.com",
+					uriPath     : "/index.html",
+					queryString : "",
+					headers     : {},
+					payloadHash : "d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2",
+					accessKey   : "AKIDEXAMPLE",
+					secretKey   : "secret",
+					region      : "us-west-2",
+					service     : "s3",
+					amzDate     : "20250601T081530Z"
+				);
+
+				expect( headers.Authorization ).toMatch(
+					"^AWS4\-HMAC\-SHA256 Credential=AKIDEXAMPLE/20250601/us\-west\-2/s3/aws4_request, SignedHeaders=[a-z0-9\-;]+, Signature=[0-9a-f]{64}$"
+				);
+			} );
+
+			it( "sorts and lowercases signed headers regardless of the caller's own casing/order", function() {
+				var headers1 = signer.sign(
+					method : "PUT", host : "h", uriPath : "/k", queryString : "", payloadHash : "p",
+					accessKey : "AK", secretKey : "SK", region : "us-east-1", amzDate : "20250101T120000Z",
+					headers : { "X-Amz-Acl" : "public-read", "Content-Type" : "text/html" }
+				);
+				var headers2 = signer.sign(
+					method : "PUT", host : "h", uriPath : "/k", queryString : "", payloadHash : "p",
+					accessKey : "AK", secretKey : "SK", region : "us-east-1", amzDate : "20250101T120000Z",
+					headers : { "content-type" : "text/html", "x-amz-acl" : "public-read" }
+				);
+
+				expect( headers1.Authorization ).toBe( headers2.Authorization );
+				expect( headers1.Authorization ).toInclude( "SignedHeaders=content-type;host;x-amz-acl;x-amz-content-sha256;x-amz-date" );
+			} );
+
+			it( "canonicalUri percent-encodes a path segment-by-segment, preserving '/'", function() {
+				expect( signer.canonicalUri( "/docs/getting started.html" ) ).toBe( "/docs/getting%20started.html" );
+				expect( signer.canonicalUri( "/a/b/c" ) ).toBe( "/a/b/c" );
+				expect( signer.canonicalUri( "/" ) ).toBe( "/" );
+			} );
+
+			it( "canonicalQueryString sorts and encodes pairs, empty string in -> empty string out", function() {
+				expect( signer.canonicalQueryString( "" ) ).toBe( "" );
+				expect( signer.canonicalQueryString( "b=2&a=1" ) ).toBe( "a=1&b=2" );
+				expect( signer.canonicalQueryString( "key=a value" ) ).toBe( "key=a%20value" );
+			} );
+
+			it( "hashBytes returns the well-known empty-input and 'abc' SHA-256 constants", function() {
+				expect( signer.hashBytes( charsetDecode( "", "utf-8" ) ) ).toBe( "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" );
+				expect( signer.hashBytes( charsetDecode( "abc", "utf-8" ) ) ).toBe( "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad" );
+			} );
+
+		} );
+	}
+
+}
