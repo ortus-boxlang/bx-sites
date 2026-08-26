@@ -416,7 +416,7 @@ class extends="testbox.system.BaseSpec" {
 
 				var html = fileRead( root & "/site/index.html" );
 				expect( html ).toInclude( "bxsites-search-input" );
-				expect( html ).toInclude( "lunr" );
+				expect( html ).toInclude( "minisearch" );
 			} );
 
 			it( "skips the search index, search.js and search UI when search is disabled", function() {
@@ -434,7 +434,7 @@ class extends="testbox.system.BaseSpec" {
 
 				var html = fileRead( root & "/site/index.html" );
 				expect( html ).notToInclude( "bxsites-search-input" );
-				expect( html ).notToInclude( "lunr" );
+				expect( html ).notToInclude( "minisearch" );
 			} );
 
 			it( "excludes hidden pages from the search index too", function() {
@@ -495,7 +495,7 @@ class extends="testbox.system.BaseSpec" {
 
 				var html = fileRead( root & "/site/index.html" );
 				expect( html ).notToInclude( "bxsites-search-input" );
-				expect( html ).notToInclude( "lunr" );
+				expect( html ).notToInclude( "minisearch" );
 				expect( html ).toInclude( "bxsites-search-algolia" );
 				expect( html ).toInclude( "docsearch(" );
 				expect( html ).toInclude( "ABC123" );
@@ -891,15 +891,15 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
-			it( "vendors lunr.js alongside search.js, only when the local search provider needs it", function() {
+			it( "vendors minisearch.js alongside search.js, only when the local search provider needs it", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Home" );
 
 				pipeline.build( root );
 
-				expect( fileExists( root & "/site/assets/vendor/lunr/lunr.min.js" ) ).toBeTrue();
+				expect( fileExists( root & "/site/assets/vendor/minisearch/minisearch.js" ) ).toBeTrue();
 				var html = fileRead( root & "/site/index.html" );
-				expect( html ).notToInclude( "cdn.jsdelivr.net/npm/lunr" );
+				expect( html ).notToInclude( "cdn.jsdelivr.net/npm/minisearch" );
 
 				var noSearchRoot = newProject();
 				fileWrite(
@@ -910,7 +910,7 @@ class extends="testbox.system.BaseSpec" {
 
 				pipeline.build( noSearchRoot );
 
-				expect( fileExists( noSearchRoot & "/site/assets/vendor/lunr/lunr.min.js" ) ).toBeFalse();
+				expect( fileExists( noSearchRoot & "/site/assets/vendor/minisearch/minisearch.js" ) ).toBeFalse();
 			} );
 
 			it( "copies the shared highlight-boxlang.js grammar and loads it before hljs.highlightAll()", function() {
@@ -1102,6 +1102,50 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "<!--plugin-html-->" );
 				expect( html ).toInclude( "Plugin Page" );
 				expect( fileExists( root & "/site/plugin-marker.txt" ) ).toBeTrue();
+			} );
+
+			it( "runs a plugin's onSearchIndex hook, injecting an extra search entry into search-index.json", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				var fakePlugin = {
+					onSearchIndex : function( required array entries, required struct config ) {
+						arguments.entries.append( { title : "Contact", url : "contact/index.html", headings : [], body : "", tags : [] } );
+						return arguments.entries;
+					}
+				};
+				pipeline.setPlugins( [ { name : "fake", instance : fakePlugin } ] );
+
+				pipeline.build( root );
+
+				var index = jsonDeserialize( fileRead( root & "/site/search-index.json" ) );
+				expect( index.len() ).toBe( 2 );
+				expect( index[ 2 ].title ).toBe( "Contact" );
+			} );
+
+			it( "runs a plugin's onSitemap hook, injecting an extra page into both sitemap.xml and llms.txt", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"https://docs.example.com/"}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				var fakePlugin = {
+					onSitemap : function( required array pages, required struct config ) {
+						arguments.pages.append( { urlPath : "contact/index.html", title : "Contact", hidden : false } );
+						return arguments.pages;
+					}
+				};
+				pipeline.setPlugins( [ { name : "fake", instance : fakePlugin } ] );
+
+				pipeline.build( root );
+
+				var sitemap = fileRead( root & "/site/sitemap.xml" );
+				expect( sitemap ).toInclude( "<loc>https://docs.example.com/contact/index.html</loc>" );
+
+				var llmsTxt = fileRead( root & "/site/llms.txt" );
+				expect( llmsTxt ).toInclude( "[Contact](https://docs.example.com/contact/index.html)" );
 			} );
 
 			it( "throws BxSites.PluginNotFound when bxsites.json [plugins] names an uninstalled module, without the setPlugins() seam", function() {

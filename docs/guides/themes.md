@@ -33,7 +33,7 @@ differs, so they inherit the same full feature set and the same
 air-gapped-capable behavior `material` already has.
 
 Every built-in theme's own CSS/JS (Bootstrap's CSS/JS bundle, highlight.js,
-Alpine.js, lunr.js for the default `local` search provider, and Mermaid
+Alpine.js, MiniSearch for the default `local` search provider, and Mermaid
 when `mermaid` is turned on) ships vendored with this module and is
 copied straight into every built `site/` - no CDN, no internet access
 needed to view a built site. The `tailwind` theme's own utility engine (a
@@ -131,9 +131,15 @@ regardless of palette:
 
 Set which one a project uses in `bxsites.yaml`:
 
-```yaml title="bxsites.yaml"
-theme: { name: material }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: material }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "material" } }
+    ```
 
 ## Installing a published theme
 
@@ -152,9 +158,15 @@ satisfies the `ThemeProvider` contract below before finishing. A project
 can carry several installed themes side by side this way and switch
 between them purely by name:
 
-```yaml title="bxsites.yaml"
-theme: { name: bx-sites-theme-blog1 }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    theme: { name: bx-sites-theme-blog1 }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "theme": { "name": "bx-sites-theme-blog1" } }
+    ```
 
 A theme needs no BoxLang module/class-loader involvement at all (unlike a
 plugin) - it's pure files, so there's no separate activation step the way
@@ -172,7 +184,7 @@ A built site works with no internet access at all by default, for
 `bootstrap`, `material`, and the seven `material`-forked themes (`docsy`,
 `slate`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook`, `notion`) with
 the default `local` search provider: Bootstrap's own CSS/JS, highlight.js,
-Alpine.js, and lunr.js are all vendored with this module
+Alpine.js, and MiniSearch are all vendored with this module
 (`resources/assets/vendor/`) and copied straight into
 `site/assets/vendor/` at build time - no CDN `<script>`/`<link>` tag
 anywhere in the generated HTML for any of those. Turning on
@@ -256,9 +268,15 @@ re-declared under `[data-theme="dark"]` for dark mode. `bxsites.yaml`'s
 theme's own stylesheet, so a same-specificity re-declaration in it wins
 without touching `resources/themes/` at all:
 
-```yaml title="bxsites.yaml"
-extraCss: [ assets/brand.css ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    extraCss: [ assets/brand.css ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "extraCss": ["assets/brand.css"] }
+    ```
 
 ```css title="docs/assets/brand.css" linenums="1"
 /* docs/assets/brand.css - copied to site/assets/brand.css at build time */

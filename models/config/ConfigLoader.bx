@@ -541,7 +541,7 @@ class {
 	/**
 	 * Validates the site config's `searchProvider` block - which search UI
 	 * `search: true` wires up (module spec section 7). `local` (the
-	 * default, bx-sites' own static lunr search) needs no further settings.
+	 * default, bx-sites' own static MiniSearch search) needs no further settings.
 	 * `algolia` (Algolia DocSearch) requires its own `algolia.{appId,apiKey,
 	 * indexName}` - everything DocSearch's client itself requires to run.
 	 * `pagefind` only validates its own `pagefind.{bin,options}` shape, if

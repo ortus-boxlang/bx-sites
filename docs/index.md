@@ -10,7 +10,7 @@ toc: false
 	<img class="bxsites-hero__banner" src="assets/home-banner.jpg" alt="BxSites - Write. Build. Publish Beautiful Docs. The official documentation engine for BoxLang. Markdown Powered, Beautiful Themes, Blazing Fast Search, Developer Focused.">
 	<div class="bxsites-hero__actions">
 		<a class="bxsites-hero__btn bxsites-hero__btn--primary" href="getting-started.md">Get Started</a>
-		<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://github.com/ortus-boxlang/bx-sites">View on GitHub</a>
+		<a class="bxsites-hero__btn bxsites-hero__btn--secondary" href="https://github.com/ortus-boxlang/bx-sites">⭐ Star us on GitHub</a>
 	</div>
 </div>
 
@@ -37,8 +37,8 @@ by Docsy, Stripe, Docusaurus, Just the Docs, VuePress, GitBook and Notion -
 all overridable with your own theme.
 :::
 ::: card title="Static, client-side search" icon="phosphor-duotone:magnifying-glass" href="guides/search.md"
-A lunr.js-powered search box, wired against a search index built at
-`build` time - no server dependency.
+A MiniSearch-powered search box (fuzzy matching, prefix search) wired
+against a search index built at `build` time - no server dependency.
 :::
 ::: card title="A blog, out of the box" icon="lucide:newspaper" href="guides/blog.md"
 Drop posts under `docs/blog/posts/` and get authors, categories, year
@@ -46,7 +46,7 @@ archives, RSS feeds, and per-post featured images - zero config required.
 :::
 ::: card title="Fast, air-gapped by default" icon="phosphor-duotone:wifi-slash" href="guides/themes.md#air-gapped-offline-sites"
 Fingerprinted CSS/JS bundling and responsive images out of the box, plus
-Bootstrap, highlight.js, Alpine.js, lunr.js and (opt-in) Mermaid all
+Bootstrap, highlight.js, Alpine.js, MiniSearch and (opt-in) Mermaid all
 vendored - a built site needs zero outbound requests by default.
 :::
 ::: card title="A real plugin system" icon="phosphor-duotone:puzzle-piece" href="guides/plugins.md"

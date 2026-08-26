@@ -17,9 +17,15 @@ Installing a module alone never activates it as a plugin, though - a
 project opts one in explicitly by BoxLang module name, via `bxsites.yaml`'s
 [`plugins`](../configuration.md#plugins) array:
 
-```yaml title="bxsites.yaml"
-plugins: [ myBxSitesPlugin ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    plugins: [ myBxSitesPlugin ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "plugins": ["myBxSitesPlugin"] }
+    ```
 
 ## Installing a published plugin
 
@@ -78,6 +84,24 @@ class {
 		return arguments.nav
 	}
 
+	array function onSearchIndex( required array entries, required struct config ) {
+		// Mutate the built search-index.json entries, right before it's
+		// written - each entry is { title, url, headings, body, tags },
+		// the same shape SearchIndexer.bx itself produces. Runs once per
+		// search-index.json actually written (the main site-wide index,
+		// and each version/locale tree's own local index when one is
+		// enabled - see [Search](search.md)).
+		return arguments.entries
+	}
+
+	array function onSitemap( required array pages, required struct config ) {
+		// Mutate the site-wide accumulated page list right before BOTH
+		// sitemap.xml and llms.txt are built from it - a contributed entry
+		// flows into both. Only urlPath/title/hidden need be set; this
+		// isn't DocsLoader's full page shape.
+		return arguments.pages
+	}
+
 	void function onBuildComplete( required string siteDir, required struct config ) {
 		// Fires once, after everything is written to siteDir - no return value.
 	}
@@ -96,6 +120,11 @@ tree). `onConfig`/`onNav`/`onBuildComplete` are also applied by the
 standalone `search-index` verb where relevant (`onConfig`, since it can
 change `markdown`/other settings the index build depends on).
 
+`onSearchIndex`/`onSitemap` exist specifically for content that lives
+outside `docs/` altogether - a dynamically-served page a
+[CLI provider](cli-providers.md) addon adds, for instance - and so would
+otherwise be invisible to search, the sitemap, and `llms.txt`.
+
 ## When each hook fires
 
 ```mermaid
@@ -111,6 +140,10 @@ sequenceDiagram
         Build->>Plugin: onPageHtml(html, page, config)
     end
     Build->>Build: write site/
+    Build->>Plugin: onSearchIndex(entries, config)
+    Build->>Build: write search-index.json
+    Build->>Plugin: onSitemap(pages, config)
+    Build->>Build: write sitemap.xml + llms.txt
     Build->>Plugin: onBuildComplete(siteDir, config)
 ```
 
@@ -136,3 +169,11 @@ hello-plugin/
   isn't an installed/activated BoxLang module.
 - `BxSites.InvalidPlugin` - the module exists, but has no
   `models/BxSitesPlugin.bx` class.
+
+## Registering your own `bxSites` commands
+
+`models/BxSitesPlugin.bx` only covers the *build* lifecycle. A module can
+also register its own `bxSites <verb>` commands (e.g. a `deploy` or
+`cloud publish` a commercial addon might ship) via a sibling
+`models/BxSitesCliProvider.bx` contract - same `plugins` array activation,
+different file. See [CLI Providers](cli-providers.md).

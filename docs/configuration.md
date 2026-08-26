@@ -16,112 +16,111 @@ stay on it. Both are fully supported and produce the exact same result;
 somehow has more than one, `bxsites.yaml` wins, then `bxsites.yml`, then
 `bxsites.json`.
 
-```yaml title="bxsites.yaml" linenums="1"
-name: "My Docs"
-description: ""
-baseURL: "/"
-theme:
-  name: bootstrap
-  options: {}
-  logo: ""
-  favicon: ""
-search: true
-searchProvider:
-  provider: local
-  algolia: { appId: "", apiKey: "", indexName: "", insights: false }
-nav: []
-markdown:
-  enableAdmonition: true
-repo:
-  url: ""
-  editUri: ""
-social: []
-footer: false
-lastUpdated: false
-mermaid: false
-math: false
-analytics:
-  provider: ""
-  id: ""
-ogImage: ""
-generateOgImages: false
-extraCss: []
-extraJs: []
-assets:
-  fingerprint: true
-  bundle: true
-  images: { enabled: true, widths: [400, 800, 1200, 1600], formats: [original, webp] }
-plugins: []
-i18n:
-  defaultLocale: { code: en, label: English }
-  locales: []
-blog:
-  postsPerPage: 10
-  feed: true
-variables: {}
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    name: "My Docs"
+    description: ""
+    baseURL: "/"
+    theme:
+      name: bootstrap
+      options: {}
+      logo: ""
+      favicon: ""
+    search: true
+    searchProvider:
+      provider: local
+      algolia: { appId: "", apiKey: "", indexName: "", insights: false }
+    nav: []
+    markdown:
+      enableAdmonition: true
+    repo:
+      url: ""
+      editUri: ""
+    social: []
+    footer: false
+    lastUpdated: false
+    mermaid: false
+    math: false
+    analytics:
+      provider: ""
+      id: ""
+    ogImage: ""
+    generateOgImages: false
+    extraCss: []
+    extraJs: []
+    assets:
+      fingerprint: true
+      bundle: true
+      images: { enabled: true, widths: [400, 800, 1200, 1600], formats: [original, webp] }
+    plugins: []
+    i18n:
+      defaultLocale: { code: en, label: English }
+      locales: []
+    blog:
+      postsPerPage: 10
+      feed: true
+    variables: {}
+    ```
 
-The equivalent `bxsites.json`, for a project that prefers it:
-
-```json title="bxsites.json" linenums="1"
-{
-	"name": "My Docs",
-	"description": "",
-	"baseURL": "/",
-	"theme": {
-		"name": "bootstrap",
-		"options": {},
-		"logo": "",
-		"favicon": ""
-	},
-	"search": true,
-	"searchProvider": {
-		"provider": "local",
-		"algolia": { "appId": "", "apiKey": "", "indexName": "", "insights": false }
-	},
-	"nav": [],
-	"markdown": { "enableAdmonition": true },
-	"repo": {
-		"url": "",
-		"editUri": ""
-	},
-	"social": [],
-	"footer": false,
-	"lastUpdated": false,
-	"mermaid": false,
-	"math": false,
-	"analytics": {
-		"provider": "",
-		"id": ""
-	},
-	"ogImage": "",
-	"generateOgImages": false,
-	"extraCss": [],
-	"extraJs": [],
-	"assets": {
-		"fingerprint": true,
-		"bundle": true,
-		"images": { "enabled": true, "widths": [400, 800, 1200, 1600], "formats": ["original", "webp"] }
-	},
-	"plugins": [],
-	"i18n": {
-		"defaultLocale": { "code": "en", "label": "English" },
-		"locales": []
-	},
-	"blog": {
-		"postsPerPage": 10,
-		"feed": true
-	},
-	"variables": {}
-}
-```
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"name": "My Docs",
+    	"description": "",
+    	"baseURL": "/",
+    	"theme": {
+    		"name": "bootstrap",
+    		"options": {},
+    		"logo": "",
+    		"favicon": ""
+    	},
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "local",
+    		"algolia": { "appId": "", "apiKey": "", "indexName": "", "insights": false }
+    	},
+    	"nav": [],
+    	"markdown": { "enableAdmonition": true },
+    	"repo": {
+    		"url": "",
+    		"editUri": ""
+    	},
+    	"social": [],
+    	"footer": false,
+    	"lastUpdated": false,
+    	"mermaid": false,
+    	"math": false,
+    	"analytics": {
+    		"provider": "",
+    		"id": ""
+    	},
+    	"ogImage": "",
+    	"generateOgImages": false,
+    	"extraCss": [],
+    	"extraJs": [],
+    	"assets": {
+    		"fingerprint": true,
+    		"bundle": true,
+    		"images": { "enabled": true, "widths": [400, 800, 1200, 1600], "formats": ["original", "webp"] }
+    	},
+    	"plugins": [],
+    	"i18n": {
+    		"defaultLocale": { "code": "en", "label": "English" },
+    		"locales": []
+    	},
+    	"blog": {
+    		"postsPerPage": 10,
+    		"feed": true
+    	},
+    	"variables": {}
+    }
+    ```
 
 Only `name` is required - everything else falls back to the defaults shown
 above. A partial `theme` object is merged one level deep, so
 `{theme: {name: material}}` alone still keeps the default (empty)
 `options`. Every key below is named/shaped identically in both formats -
-the rest of this page just shows YAML snippets, matching `bxSites new`'s
-own default format, but every one of them reads the same in JSON.
+switch the tabs on any example below to see it either way.
 
 ## `name`
 
@@ -178,9 +177,15 @@ non-hidden page per the [sitemaps.org](https://www.sitemaps.org/) protocol.
 Every build writes a `robots.txt` to the site root - no config key needed
 unless you want to change its default, permissive behavior:
 
-```json title="bxsites.json"
-{ "robots": false }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    robots: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "robots": false }
+    ```
 
 - `true` (the default) - `Allow: /` for every crawler, plus a `Sitemap:`
   line pointing at `sitemap.xml` when `baseURL` is a full URL (see above).
@@ -219,9 +224,15 @@ build - the `robots` key above is ignored entirely once this file exists.
     Once a visitor toggles the switch, their own choice (stored in
     `localStorage`) always wins on later visits, regardless of this setting.
 
-    ```yaml
-    theme: { options: { colorMode: dark } }
-    ```
+    === "YAML"
+        ```yaml
+        theme: { options: { colorMode: dark } }
+        ```
+
+    === "JSON"
+        ```json
+        { "theme": { "options": { "colorMode": "dark" } } }
+        ```
   - `theme.options.navCollapsible` - `false` (the default) renders every nav
     section always expanded, as today. `true` gives every section with
     children a toggle button the visitor can click to collapse/expand it -
@@ -233,9 +244,15 @@ build - the `robots` key above is ignored entirely once this file exists.
     `true`. `true` (the default) starts every section open; `false` starts
     every section collapsed, except the one containing the current page.
 
-    ```yaml
-    theme: { options: { navCollapsible: true, navExpandAll: false } }
-    ```
+    === "YAML"
+        ```yaml
+        theme: { options: { navCollapsible: true, navExpandAll: false } }
+        ```
+
+    === "JSON"
+        ```json
+        { "theme": { "options": { "navCollapsible": true, "navExpandAll": false } } }
+        ```
   - `theme.options.tocPosition` - where a page's own "On this page" table of
     contents renders. `"top"` (the default) renders it inline, at the top of
     the article, same as today. `"sticky"` moves it into its own right-hand
@@ -248,18 +265,30 @@ build - the `robots` key above is ignored entirely once this file exists.
     VitePress/GitBook use on mobile - so the TOC stays reachable at every
     viewport width, it just changes shape depending on how much room there is.
 
-    ```yaml
-    theme: { options: { tocPosition: sticky } }
-    ```
+    === "YAML"
+        ```yaml
+        theme: { options: { tocPosition: sticky } }
+        ```
+
+    === "JSON"
+        ```json
+        { "theme": { "options": { "tocPosition": "sticky" } } }
+        ```
   - `theme.options.pageMetaPosition` - where the edit-this-page/download-
     markdown/last-updated row renders relative to a page's own content.
     `"bottom"` (the default) renders it as a small footer note right before
     the article ends. `"top"` renders it up near the title instead, the same
     place it always rendered before this option existed.
 
-    ```yaml
-    theme: { options: { pageMetaPosition: top } }
-    ```
+    === "YAML"
+        ```yaml
+        theme: { options: { pageMetaPosition: top } }
+        ```
+
+    === "JSON"
+        ```json
+        { "theme": { "options": { "pageMetaPosition": "top" } } }
+        ```
 
 ## `search`
 
@@ -272,7 +301,7 @@ extra JS shipped. See [Search](guides/search.md).
 Which search UI `search: true` wires up:
 
 - `provider` - `"local"` (the default) is bx-sites' own static/client-side
-  search (`search-index.json` + lunr.js, see [Search](guides/search.md#local-the-default)).
+  search (`search-index.json` + [MiniSearch](https://lucaong.github.io/minisearch/), see [Search](guides/search.md#local-the-default)).
   `"algolia"` wires up [Algolia DocSearch](guides/search.md#algolia)
   instead, and `"pagefind"` wires up [Pagefind](guides/search.md#pagefind).
   Any other value is a project's own custom provider, wired up by a
@@ -282,15 +311,31 @@ Which search UI `search: true` wires up:
   exactly as Algolia's own DocSearch client expects them. `insights`
   (`false` by default) turns on DocSearch's click/conversion analytics.
 
-  ```yaml title="bxsites.yaml" linenums="1"
-  search: true
-  searchProvider:
-    provider: algolia
-    algolia:
-      appId: ABC123
-      apiKey: a1b2c3d4e5f6...
-      indexName: my-docs
-  ```
+  === "YAML"
+      ```yaml title="bxsites.yaml" linenums="1"
+      search: true
+      searchProvider:
+        provider: algolia
+        algolia:
+          appId: ABC123
+          apiKey: a1b2c3d4e5f6...
+          indexName: my-docs
+      ```
+
+  === "JSON"
+      ```json title="bxsites.json" linenums="1"
+      {
+      	"search": true,
+      	"searchProvider": {
+      		"provider": "algolia",
+      		"algolia": {
+      			"appId": "ABC123",
+      			"apiKey": "a1b2c3d4e5f6...",
+      			"indexName": "my-docs"
+      		}
+      	}
+      }
+      ```
 
 - `pagefind` - both keys optional when `provider` is `"pagefind"`: `bin`
   (default `"pagefind"`) is the CLI executable name/path, resolved against
@@ -299,12 +344,24 @@ Which search UI `search: true` wires up:
   installed and on `PATH` - BxSites shells out to it (like `git` for
   `lastUpdated`/`gh-deploy`), it doesn't install it for you.
 
-  ```yaml title="bxsites.yaml" linenums="1"
-  search: true
-  searchProvider:
-    provider: pagefind
-    pagefind: { bin: pagefind, options: [] }
-  ```
+  === "YAML"
+      ```yaml title="bxsites.yaml" linenums="1"
+      search: true
+      searchProvider:
+        provider: pagefind
+        pagefind: { bin: pagefind, options: [] }
+      ```
+
+  === "JSON"
+      ```json title="bxsites.json" linenums="1"
+      {
+      	"search": true,
+      	"searchProvider": {
+      		"provider": "pagefind",
+      		"pagefind": { "bin": "pagefind", "options": [] }
+      	}
+      }
+      ```
 
 ## `nav`
 
@@ -334,15 +391,32 @@ container/section label - a non-clickable heading that just groups its
 children, the same role GitBook's "MAIN COMPONENTS" plays in its own
 sidebar:
 
-```yaml title="bxsites.yaml" linenums="1"
-nav:
-  - index.md
-  - title: Main Components
-    children:
-      - title: Quick Start
-        path: guides/setup.md
-      - guides/deployment.md
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    nav:
+      - index.md
+      - title: Main Components
+        children:
+          - title: Quick Start
+            path: guides/setup.md
+          - guides/deployment.md
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"nav": [
+    		"index.md",
+    		{
+    			"title": "Main Components",
+    			"children": [
+    				{ "title": "Quick Start", "path": "guides/setup.md" },
+    				"guides/deployment.md"
+    			]
+    		}
+    	]
+    }
+    ```
 
 Give that same group entry a `path` instead and it becomes a normal linked
 section (its own landing page, plus children) rather than a bare label - both
@@ -369,11 +443,21 @@ an explicit one.
 `[]` (the default) - site-wide `from`/`to` old-URL redirects, only ever
 applied to the main tree:
 
-```yaml title="bxsites.yaml" linenums="1"
-redirects:
-  - from: old-guide
-    to: guides/new-guide/
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    redirects:
+      - from: old-guide
+        to: guides/new-guide/
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"redirects": [
+    		{ "from": "old-guide", "to": "guides/new-guide/" }
+    	]
+    }
+    ```
 
 - `redirects[].from` - the old pretty-URL segment a static redirect stub
   gets written at (no leading/trailing slash, no extension)
@@ -419,13 +503,26 @@ Docs defaults it to `true` (see the [Markdown Extensions guide](guides/markdown.
 
 Every rendered table also gets a responsive-scroll/sticky-header wrapper automatically, with no config key of its own - see [Tables](guides/tables.md#responsive-scroll-and-a-sticky-header).
 
-```yaml title="bxsites.yaml" linenums="1"
-markdown:
-  enableFootnotes: true
-  enableDefinitionLists: true
-  anchorLinks: false
-  enableYouTubeTransformer: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    markdown:
+      enableFootnotes: true
+      enableDefinitionLists: true
+      anchorLinks: false
+      enableYouTubeTransformer: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"markdown": {
+    		"enableFootnotes": true,
+    		"enableDefinitionLists": true,
+    		"anchorLinks": false,
+    		"enableYouTubeTransformer": true
+    	}
+    }
+    ```
 
 ## `repo`
 
@@ -443,9 +540,15 @@ when both keys are set, an "Edit this page" link on every page.
   `repo.url` too; leave blank to omit edit links while still showing the
   header icon.
 
-```yaml title="bxsites.yaml"
-repo: { url: "https://github.com/acme/docs", editUri: "edit/main/docs/" }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    repo: { url: "https://github.com/acme/docs", editUri: "edit/main/docs/" }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "repo": { "url": "https://github.com/acme/docs", "editUri": "edit/main/docs/" } }
+    ```
 
 ## `social`
 
@@ -457,11 +560,22 @@ needs a `url`; `icon` selects from a small built-in icon set (`github`,
 for anything else), and `label` sets the link's accessible name/tooltip
 (defaults to `icon`, then `"Link"`).
 
-```yaml title="bxsites.yaml" linenums="1"
-social:
-  - { url: "https://twitter.com/acme", icon: twitter, label: Twitter }
-  - { url: "https://acme.com/rss.xml", icon: rss, label: RSS }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    social:
+      - { url: "https://twitter.com/acme", icon: twitter, label: Twitter }
+      - { url: "https://acme.com/rss.xml", icon: rss, label: RSS }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"social": [
+    		{ "url": "https://twitter.com/acme", "icon": "twitter", "label": "Twitter" },
+    		{ "url": "https://acme.com/rss.xml", "icon": "rss", "label": "RSS" }
+    	]
+    }
+    ```
 
 ## `footer`
 
@@ -469,9 +583,15 @@ social:
 a copyright line (`© <year> <site name>`), the `social` links (if any),
 and a "Built with BxSites" credit.
 
-```yaml title="bxsites.yaml"
-footer: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    footer: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "footer": true }
+    ```
 
 ## `lastUpdated`
 
@@ -483,9 +603,15 @@ with no commits yet, a build running from a downloaded zip with no `.git`
 at all, or git not being installed on the build machine - rather than
 breaking the build.
 
-```yaml title="bxsites.yaml"
-lastUpdated: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    lastUpdated: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "lastUpdated": true }
+    ```
 
 ## `analytics`
 
@@ -497,9 +623,15 @@ Wires up pageview analytics. Currently supports Google Analytics
 - `analytics.id` - the Google Analytics measurement ID (e.g. `"G-ABC123"`).
   Required when `provider` is `"google"`.
 
-```yaml title="bxsites.yaml"
-analytics: { provider: google, id: "G-ABC123" }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    analytics: { provider: google, id: "G-ABC123" }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "analytics": { "provider": "google", "id": "G-ABC123" } }
+    ```
 
 ## `ogImage`
 
@@ -510,9 +642,15 @@ prefixed with `baseURL`, absolute URLs are used as-is). Left blank (the
 default) and `generateOgImages` off, no `og:image`/`twitter:card` tags are
 rendered.
 
-```yaml title="bxsites.yaml"
-ogImage: assets/social-card.png
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    ogImage: assets/social-card.png
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "ogImage": "assets/social-card.png" }
+    ```
 
 A page's own frontmatter `ogImage` (see [Getting Started](getting-started.md#add-pages))
 always wins over this site-wide default for that one page.
@@ -527,9 +665,15 @@ site-wide image. Pure `java.awt`/`javax.imageio` under the hood (part of
 any JVM BoxLang runs on), so this needs no headless browser, external
 service, or network access at build time.
 
-```yaml title="bxsites.yaml"
-generateOgImages: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    generateOgImages: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "generateOgImages": true }
+    ```
 
 ## `extraCss` / `extraJs`
 
@@ -538,10 +682,19 @@ after the theme's own assets - each entry is resolved the same way as
 `theme.logo` (a relative path is prefixed with `baseURL`; an absolute URL
 is used as-is). `extraJs` entries are loaded with `defer`.
 
-```yaml title="bxsites.yaml" linenums="1"
-extraCss: [ assets/custom.css ]
-extraJs: [ assets/custom.js ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    extraCss: [ assets/custom.css ]
+    extraJs: [ assets/custom.js ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"extraCss": ["assets/custom.css"],
+    	"extraJs": ["assets/custom.js"]
+    }
+    ```
 
 When `assets.bundle` is on (the default), a local `extraCss`/`extraJs`
 list like the one above is bundled into one fingerprinted file each,
@@ -550,15 +703,31 @@ below.
 
 ## `assets`
 
-```yaml title="bxsites.yaml" linenums="1"
-assets:
-  fingerprint: true
-  bundle: true
-  images:
-    enabled: true
-    widths: [ 400, 800, 1200, 1600 ]
-    formats: [ original, webp ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    assets:
+      fingerprint: true
+      bundle: true
+      images:
+        enabled: true
+        widths: [ 400, 800, 1200, 1600 ]
+        formats: [ original, webp ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"assets": {
+    		"fingerprint": true,
+    		"bundle": true,
+    		"images": {
+    			"enabled": true,
+    			"widths": [400, 800, 1200, 1600],
+    			"formats": ["original", "webp"]
+    		}
+    	}
+    }
+    ```
 
 The asset pipeline - image resizing/WebP via
 [bx-image](https://github.com/ortus-boxlang/bx-image) (a required
@@ -603,9 +772,15 @@ support shipped at all. `true` loads `mermaid.js` client-side and renders
 every ` ```mermaid ` fenced code block as a diagram. See
 [Markdown Extensions](guides/markdown.md#diagrams) for the syntax.
 
-```yaml title="bxsites.yaml"
-mermaid: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    mermaid: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "mermaid": true }
+    ```
 
 ## `math`
 
@@ -614,9 +789,15 @@ mermaid: true
 into a page's markdown. See
 [Markdown Extensions](guides/markdown.md#math) for the syntax.
 
-```yaml title="bxsites.yaml"
-math: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    math: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "math": true }
+    ```
 
 Admonitions (note/warning/tip-style callout boxes), content tabs, and
 fenced-code `hl_lines`/`linenums`/`title` annotations are always available
@@ -631,9 +812,15 @@ shipped at all. `true` loads it client-side and renders every
 referenced OpenAPI/Swagger spec (JSON or YAML). See
 [OpenAPI / Swagger](guides/openapi.md) for the syntax.
 
-```yaml title="bxsites.yaml"
-openapi: true
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    openapi: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "openapi": true }
+    ```
 
 ## `plugins`
 
@@ -642,9 +829,15 @@ plugins. Installing a plugin module (`box install`) never activates it on
 its own; it has to be named here too. See [Plugins](guides/plugins.md)
 for how to write one.
 
-```yaml title="bxsites.yaml"
-plugins: [ myBxSitesPlugin ]
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    plugins: [ myBxSitesPlugin ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "plugins": ["myBxSitesPlugin"] }
+    ```
 
 ## `i18n`
 
@@ -668,13 +861,27 @@ switcher.
   full key list; `de`/`es`/`it`/`ja` already ship a built-in translation,
   so `strings` is only needed to override a key or add another locale.
 
-```yaml title="bxsites.yaml" linenums="1"
-i18n:
-  defaultLocale: { code: en, label: English }
-  locales:
-    - { code: es, label: Español }
-    - { code: ar, label: العربية, dir: rtl }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    i18n:
+      defaultLocale: { code: en, label: English }
+      locales:
+        - { code: es, label: Español }
+        - { code: ar, label: العربية, dir: rtl }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"i18n": {
+    		"defaultLocale": { "code": "en", "label": "English" },
+    		"locales": [
+    			{ "code": "es", "label": "Español" },
+    			{ "code": "ar", "label": "العربية", "dir": "rtl" }
+    		]
+    	}
+    }
+    ```
 
 See [Internationalization](guides/i18n.md) for the full picture -
 untranslated-page fallback, the language switcher, and what isn't
@@ -697,9 +904,15 @@ Options for the [blog](guides/blog.md) - itself a by-convention feature
   with hundreds of posts just wastes bandwidth on every poll - see
   [Blog: Feed](guides/blog.md#feed).
 
-```yaml title="bxsites.yaml"
-blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
+    ```
 
 See [Blog](guides/blog.md) for post/author frontmatter, categories,
 featured images, and SEO/social metadata.
@@ -710,11 +923,22 @@ featured images, and SEO/social metadata.
 from any Markdown page as `{{ dotted.path }}`. See
 [Variables & Magic Functions](guides/variables-and-functions.md).
 
-```yaml title="bxsites.yaml"
-variables:
-  company: "Ortus Solutions"
-  product: { name: "BoxLang", supportEmail: "support@example.com" }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    variables:
+      company: "Ortus Solutions"
+      product: { name: "BoxLang", supportEmail: "support@example.com" }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    {
+    	"variables": {
+    		"company": "Ortus Solutions",
+    		"product": { "name": "BoxLang", "supportEmail": "support@example.com" }
+    	}
+    }
+    ```
 
 ```markdown title="docs/index.md"
 Welcome to {{ company }}! We build {{ product.name }}.

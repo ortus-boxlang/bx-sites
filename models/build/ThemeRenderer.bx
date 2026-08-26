@@ -28,7 +28,7 @@
  *     `bxsites.json`'s `search` is `true` (regardless of provider).
  *     `variables.siteConfig.searchProvider.provider` (defaulted to `"local"`
  *     by ConfigLoader.bx) tells it which UI to render - the built-in themes'
- *     own `search.bxm` render the local lunr search box for `"local"`, an
+ *     own `search.bxm` render the local MiniSearch search box for `"local"`, an
  *     empty container for `"algolia"` (wired up by `layout.bxm` instead, via
  *     Algolia DocSearch), and nothing for any other provider name, which a
  *     project's own `theme/` override is then free to handle itself - see

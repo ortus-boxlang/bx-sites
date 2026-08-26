@@ -8,9 +8,12 @@
 // Only libraries that are (a) a single self-contained static file/pair of
 // files, no further sub-resources of their own, and (b) either always
 // loaded (Bootstrap, highlight.js, Alpine.js) or gated behind a project's
-// own opt-in (lunr.js behind the `local` search provider, Mermaid behind
+// own opt-in (MiniSearch behind the `local` search provider, Mermaid behind
 // `bxsites.json`'s `mermaid`, Swagger UI behind `bxsites.json`'s `openapi`)
-// are vendored this way. Mermaid's own UMD bundle (mermaid.min.js) is
+// are vendored this way. MiniSearch ships no separate minified build of its
+// own (its `dist/umd/index.js` is the same file unpkg/jsDelivr serve for
+// browser use) - vendored as-is, renamed to `minisearch.js` rather than
+// `minisearch.min.js` since it isn't actually minified. Mermaid's own UMD bundle (mermaid.min.js) is
 // otherwise self-contained - its one dynamic import, `elk-api.js` (an
 // alternate layout engine used by a handful of diagram types), isn't
 // vendored and still resolves against jsDelivr, the one remaining CDN
@@ -30,7 +33,7 @@
 // with the version each theme's own layout.bxm expects) to refresh
 // resources/assets/vendor/:
 //
-//   npm install --no-save bootstrap@5.3.3 @highlightjs/cdn-assets@11.10.0 alpinejs@3.14.1 lunr@2.3.9 mermaid@10.9.1 swagger-ui-dist@5.32.14
+//   npm install --no-save bootstrap@5.3.3 @highlightjs/cdn-assets@11.10.0 alpinejs@3.14.1 minisearch@7.2.0 mermaid@10.9.1 swagger-ui-dist@5.32.14
 //   node vendorAssets.mjs resources/assets/vendor
 
 import { copyFileSync, existsSync, mkdirSync } from "node:fs";
@@ -71,7 +74,7 @@ vendor("highlight.js", "highlight", [
 
 vendor("alpine.js", "alpine", [["node_modules/alpinejs/dist/cdn.min.js"]]);
 
-vendor("lunr", "lunr", [["node_modules/lunr/lunr.min.js"]]);
+vendor("minisearch", "minisearch", [["node_modules/minisearch/dist/umd/index.js", "minisearch.js"]]);
 
 vendor("mermaid", "mermaid", [["node_modules/mermaid/dist/mermaid.min.js"]]);
 

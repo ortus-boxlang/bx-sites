@@ -73,9 +73,15 @@ ninguno de los dos abre la propia paleta de este módulo.
 
 ## Desactivarla
 
-```yaml title="bxsites.yaml"
-search: false
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    search: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "search": false }
+    ```
 
 Omite la construcción de `search-index.json` por completo, y omite el
 cuadro de búsqueda, el script incluido/autoalojado de `lunr.js`, y el
@@ -105,16 +111,33 @@ cuadro de búsqueda por [Algolia DocSearch](https://docsearch.algolia.com/)
 - la misma búsqueda alojada por un rastreador que admiten
 mkdocs-material, VitePress, Starlight y Docusaurus:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider:
-  provider: algolia
-  algolia:
-    appId: ABC123
-    apiKey: a1b2c3d4e5f6...
-    indexName: my-docs
-    insights: false
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider:
+      provider: algolia
+      algolia:
+        appId: ABC123
+        apiKey: a1b2c3d4e5f6...
+        indexName: my-docs
+        insights: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "algolia",
+    		"algolia": {
+    			"appId": "ABC123",
+    			"apiKey": "a1b2c3d4e5f6...",
+    			"indexName": "my-docs",
+    			"insights": false
+    		}
+    	}
+    }
+    ```
 
 `appId`, `apiKey` e `indexName` son obligatorios - `apiKey` es la clave
 API pública **solo de búsqueda** que te da DocSearch (nunca una clave de
@@ -147,12 +170,24 @@ cuadro de búsqueda por [Pagefind](https://pagefind.app/) - otro motor de
 búsqueda totalmente estático/sin servidor, pero indexado a partir del
 propio HTML *construido* de `site/` en lugar de rastreado como Algolia:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider:
-  provider: pagefind
-  pagefind: { bin: pagefind, options: [] }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider:
+      provider: pagefind
+      pagefind: { bin: pagefind, options: [] }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "pagefind",
+    		"pagefind": { "bin": "pagefind", "options": [] }
+    	}
+    }
+    ```
 
 Ambas claves de `pagefind` son opcionales - `bin` (por defecto
 `"pagefind"`) es el nombre/ruta del ejecutable, resuelto contra `PATH`

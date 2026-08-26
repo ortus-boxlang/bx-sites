@@ -47,13 +47,24 @@ redirect_from:
 ドメインのパス、単一ページ自身の「古い名前」として自然ではない何か -
 の場合は、代わりに明示的な `from`/`to` のペアを列挙します:
 
-```yaml title="bxsites.yaml" linenums="1"
-redirects:
-  - from: old-guide
-    to: guides/new-guide/
-  - from: moved-to-another-site
-    to: https://example.com/docs
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    redirects:
+      - from: old-guide
+        to: guides/new-guide/
+      - from: moved-to-another-site
+        to: https://example.com/docs
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"redirects": [
+    		{ "from": "old-guide", "to": "guides/new-guide/" },
+    		{ "from": "moved-to-another-site", "to": "https://example.com/docs" }
+    	]
+    }
+    ```
 
 - `from` - 上記の `redirect_from` と同じ形式の古いプリティ URL セグメント
 - `to` - ルート相対パス（サイト自身の `baseURL` に対して解決されます、

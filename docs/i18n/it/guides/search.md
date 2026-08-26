@@ -72,9 +72,15 @@ palette propria di questo modulo.
 
 ## Disattivarla
 
-```yaml title="bxsites.yaml"
-search: false
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    search: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "search": false }
+    ```
 
 Salta del tutto la compilazione di `search-index.json`, e salta il box di
 ricerca, lo script incluso `lunr.js`, e il widget condiviso `search.js` in
@@ -104,16 +110,33 @@ ricerca con [Algolia DocSearch](https://docsearch.algolia.com/) - la
 stessa ricerca ospitata dal crawler che supportano mkdocs-material,
 VitePress, Starlight e Docusaurus:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider:
-  provider: algolia
-  algolia:
-    appId: ABC123
-    apiKey: a1b2c3d4e5f6...
-    indexName: my-docs
-    insights: false
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider:
+      provider: algolia
+      algolia:
+        appId: ABC123
+        apiKey: a1b2c3d4e5f6...
+        indexName: my-docs
+        insights: false
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "algolia",
+    		"algolia": {
+    			"appId": "ABC123",
+    			"apiKey": "a1b2c3d4e5f6...",
+    			"indexName": "my-docs",
+    			"insights": false
+    		}
+    	}
+    }
+    ```
 
 `appId`, `apiKey` e `indexName` sono obbligatori - `apiKey` è la chiave
 API pubblica **solo per la ricerca** che ti fornisce DocSearch (mai una
@@ -144,12 +167,24 @@ di ricerca con [Pagefind](https://pagefind.app/) - un altro motore di
 ricerca completamente statico/senza server, ma indicizzato a partire
 dall'HTML *compilato* di `site/` invece che esplorato come Algolia:
 
-```yaml title="bxsites.yaml" linenums="1"
-search: true
-searchProvider:
-  provider: pagefind
-  pagefind: { bin: pagefind, options: [] }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    search: true
+    searchProvider:
+      provider: pagefind
+      pagefind: { bin: pagefind, options: [] }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"search": true,
+    	"searchProvider": {
+    		"provider": "pagefind",
+    		"pagefind": { "bin": "pagefind", "options": [] }
+    	}
+    }
+    ```
 
 Entrambe le chiavi `pagefind` sono opzionali - `bin` (predefinito
 `"pagefind"`) è il nome/percorso dell'eseguibile, risolto rispetto a

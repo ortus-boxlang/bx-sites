@@ -187,14 +187,26 @@ Regel, dass `path` auf eine echte Seite passen muss, da der Blog keine
 unterdrückt den automatisch angehängten Eintrag vollständig, es gibt
 also nie ein Duplikat:
 
-```yaml title="bxsites.yaml" linenums="1"
-nav:
-  - path: index.md
-  - title: Blog
-    url: blog/index.html
-    icon: lucide:newspaper
-  - path: about.md
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml" linenums="1"
+    nav:
+      - path: index.md
+      - title: Blog
+        url: blog/index.html
+        icon: lucide:newspaper
+      - path: about.md
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json" linenums="1"
+    {
+    	"nav": [
+    		{ "path": "index.md" },
+    		{ "title": "Blog", "url": "blog/index.html", "icon": "lucide:newspaper" },
+    		{ "path": "about.md" }
+    	]
+    }
+    ```
 
 Einzelne Beiträge werden nicht selbst zur Navigation hinzugefügt
 (genau wie der Tags-Index) - sie sind erreichbar von `/blog/`, ihrer
@@ -222,9 +234,15 @@ sich nur für das Neueste, sodass ein unbegrenzter Feed auf einem großen
 Blog bei jedem Poll einfach Bandbreite verschwendet; setze ihn auf `0`
 für jeden Beitrag, unbegrenzt:
 
-```yaml title="bxsites.yaml"
-blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
-```
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
+    ```
 
 ## Entwürfe ansehen
 
