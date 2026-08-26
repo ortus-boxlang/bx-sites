@@ -1,0 +1,23 @@
+/**
+ * Ships the already-built `site/` directory to a remote server over plain
+ * FTP, via the real `bx:ftp` component (`bx-ftp` module - see
+ * BaseFtpTarget.bx, which holds the actual shared implementation and
+ * uploads the whole directory tree, preserving its folder structure
+ * remotely).
+ *
+ * @config { host (required), username (required), passwordEnvVar (required), remotePath (required - a remote DIRECTORY, the site's root), port (default 21), passive (default true), proxyServer (optional), timeout (default 30) }
+ */
+class implements="models.deploy.IDeploymentTarget@bxsites" {
+
+	/**
+	 * @config This target's own resolved config (see the class docblock's `@config` shape)
+	 * @context { projectRoot, siteDir, config } - only `siteDir` is used, as the whole tree to upload
+	 *
+	 * @return { success, message, details: { host, remotePath, filesUploaded } }
+	 */
+	struct function deploy( required struct config, required struct context ) {
+		return new "models.deploy.targets.BaseFtpTarget@bxsites"()
+			.performDeploy( arguments.config, arguments.context, false )
+	}
+
+}

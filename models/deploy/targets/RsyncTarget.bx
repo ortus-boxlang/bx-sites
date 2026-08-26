@@ -1,0 +1,179 @@
+/**
+ * Syncs the already-built `site/` directory to a remote server via the real
+ * `rsync` binary over SSH, shelled out to via `java.lang.ProcessBuilder` -
+ * the exact same external-binary pattern GhPagesDeployer.bx already uses
+ * for `git` in this repo (see its own `exec()` helper, and PagefindIndexer.bx's
+ * near-identical one for `pagefind`), just against `rsync` instead. There's
+ * no BoxLang-native rsync binding, same rationale as those two.
+ *
+ * Runs `rsync -avz [--delete] -e "ssh -p <port> [-i <identityFile>]
+ * [<sshOptions>] -o StrictHostKeyChecking=accept-new" <siteDir>/
+ * <username>@<host>:<remotePath>/` (see `buildRsyncCommand()`, a pure
+ * function returning that full argv, independently testable without ever
+ * invoking a process). Trailing slashes on BOTH the source and destination
+ * paths are deliberate rsync semantics - they make rsync copy the CONTENTS
+ * of `siteDir`/sync INTO `remotePath`, rather than nesting `siteDir` itself
+ * as a subfolder of `remotePath`.
+ *
+ * `-o StrictHostKeyChecking=accept-new` is a real, worth-flagging default:
+ * the first-ever connection to a host not yet in `known_hosts` is accepted
+ * and its key recorded automatically, so a first deploy to a brand new host
+ * never hangs on an interactive yes/no prompt - the same tradeoff most CI
+ * systems make. Every SUBSEQUENT connection to that same host still
+ * verifies against the key recorded on that first contact, exactly like
+ * ordinary SSH host-key checking; only the very first contact is
+ * auto-trusted, not every connection forever.
+ *
+ * The `-e "ssh ..."` sub-command is built as ONE argv element - `rsync`
+ * itself further shell-parses that one string internally, so it's
+ * deliberately NOT run through `sh -c`, and none of `buildRsyncCommand()`'s
+ * inputs are shell-escaped (`ProcessBuilder` takes real argv, not a shell
+ * command line - there is no outer shell to escape for).
+ *
+ * IMPORTANT - honest test boundary: this sandbox has neither `rsync` nor
+ * `ssh` installed at all (confirmed via `which rsync ssh`), and no
+ * reachable real remote host either way. What IS verified for real:
+ * `buildRsyncCommand()` as a pure function (fully covered, no process ever
+ * invoked), and that a missing `rsync` binary is caught and re-thrown as a
+ * clear `BxSites.RsyncNotFound` rather than a raw Java stack trace or a
+ * hang - see RsyncTargetSpec.bx's own docblock for the same boundary,
+ * stated there too, including what it does when `rsync` genuinely isn't on
+ * `PATH` (this environment's own real case) versus when it is.
+ *
+ * @config { host (required), username (required), remotePath (required - a remote DIRECTORY), port (default 22), identityFile (optional, path to an SSH private key for `-i`), sshOptions (optional, raw extra string appended to the `-e "ssh ..."` sub-command, e.g. "-o StrictHostKeyChecking=no"), deleteExtraneous (optional boolean, default true - passes rsync's own `--delete`, removing remote files no longer present locally) }
+ */
+class implements="models.deploy.IDeploymentTarget@bxsites" {
+
+	/**
+	 * @config This target's own resolved config (see the class docblock's `@config` shape)
+	 * @context { projectRoot, siteDir, config } - only `siteDir` is used
+	 *
+	 * @return { success, message, details: { host, remotePath } }
+	 */
+	struct function deploy( required struct config, required struct context ) {
+		var siteDir = arguments.context.siteDir
+		// Validates host/username/remotePath and builds the full argv before
+		// ever touching the filesystem/network, same validate-first order
+		// LocalTarget.bx/BaseFtpTarget.bx already use.
+		var cmd = buildRsyncCommand( arguments.config, siteDir )
+
+		if ( !directoryExists( siteDir ) ) {
+			throw(
+				type    = "BxSites.SiteNotBuilt",
+				message = "No [#siteDir#] to deploy - run `build` first"
+			)
+		}
+
+		var host = trim( arguments.config.host )
+		var username = trim( arguments.config.username )
+		var remotePath = trim( arguments.config.remotePath ).reReplace( "[\/]+$", "" )
+
+		var result = exec( cmd, siteDir )
+		if ( result.exitCode != 0 ) {
+			throw(
+				type    = "BxSites.DeployFailed",
+				message = "`#cmd.toList( ' ' )#` failed (exit #result.exitCode#): #result.output#"
+			)
+		}
+
+		return {
+			success : true,
+			message : "Synced site to #username#@#host#:#remotePath#",
+			// rsync's default `-avz` output (no `--stats` flag) doesn't print
+			// a reliably-parseable "files transferred" count - inferring one
+			// from the per-file listing lines would be fragile (the line
+			// count also varies with directory-creation lines, deletions,
+			// and verbosity), so `filesTransferred` is deliberately omitted
+			// here rather than guessed at from unstructured output.
+			details : { host : host, remotePath : remotePath }
+		}
+	}
+
+	/**
+	 * Pure - validates `host`/`username`/`remotePath` the same way every
+	 * other target self-checks its own required config (see
+	 * IDeploymentTarget.bx's own docblock), then builds the full `rsync`
+	 * argv. Never touches the filesystem or a process - fully testable on
+	 * its own.
+	 *
+	 * @config This target's own resolved config (see the class docblock's `@config` shape)
+	 * @siteDir Absolute path to the already-built site (its existence is NOT checked here - see `deploy()`)
+	 *
+	 * @return Full argv, `rsync` included as element 1
+	 */
+	array function buildRsyncCommand( required struct config, required string siteDir ) {
+		var host = trim( arguments.config.host ?: "" )
+		var username = trim( arguments.config.username ?: "" )
+		var remotePath = trim( arguments.config.remotePath ?: "" )
+
+		if ( !len( host ) || !len( username ) || !len( remotePath ) ) {
+			throw(
+				type    = "BxSites.InvalidDeployConfig",
+				message = "deploy target 'rsync' requires 'host', 'username', and 'remotePath'"
+			)
+		}
+
+		var port = arguments.config.port ?: 22
+		var identityFile = trim( arguments.config.identityFile ?: "" )
+		var sshOptions = trim( arguments.config.sshOptions ?: "" )
+		var deleteExtraneous = arguments.config.deleteExtraneous ?: true
+
+		var sshCmd = "ssh -p #port#"
+		if ( len( identityFile ) ) {
+			sshCmd &= " -i #identityFile#"
+		}
+		if ( len( sshOptions ) ) {
+			sshCmd &= " #sshOptions#"
+		}
+		sshCmd &= " -o StrictHostKeyChecking=accept-new"
+
+		var cmd = [ "rsync", "-avz" ]
+		if ( deleteExtraneous ) {
+			cmd.append( "--delete" )
+		}
+		cmd.append( "-e" )
+		cmd.append( sshCmd )
+		cmd.append( arguments.siteDir.reReplace( "[\/]+$", "" ) & "/" )
+		cmd.append( "#username#@#host#:#remotePath.reReplace( '[\/]+$', '' )#/" )
+
+		return cmd
+	}
+
+	/**
+	 * Runs a command via `java.lang.ProcessBuilder`, capturing combined
+	 * stdout/stderr and exit code - the same pattern GhPagesDeployer.bx/
+	 * PagefindIndexer.bx already use for `git`/`pagefind` in this repo. A
+	 * missing `rsync` binary surfaces as an `IOException` from `pb.start()`
+	 * itself (`Cannot run program "rsync": ... No such file or directory`),
+	 * caught here and re-thrown as a distinct `BxSites.RsyncNotFound` -
+	 * deliberately NOT the same error type a real (started-but-failed)
+	 * transfer throws below, so callers/tests can tell "rsync isn't
+	 * installed" apart from "the transfer itself failed".
+	 *
+	 * @cmd Full argv, `rsync` included as element 1
+	 * @cwd Working directory for the process
+	 *
+	 * @return { exitCode, output }
+	 */
+	private struct function exec( required array cmd, required string cwd ) {
+		var process = ""
+
+		try {
+			var pb = createObject( "java", "java.lang.ProcessBuilder" ).init( arguments.cmd )
+			pb.directory( createObject( "java", "java.io.File" ).init( arguments.cwd ) )
+			pb.redirectErrorStream( true )
+			process = pb.start()
+		} catch ( any e ) {
+			throw(
+				type    = "BxSites.RsyncNotFound",
+				message = "Could not run `rsync` (#e.message#) - is rsync installed and on PATH? See https://rsync.samba.org/"
+			)
+		}
+
+		var output = createObject( "java", "java.lang.String" ).init( process.getInputStream().readAllBytes(), "UTF-8" )
+		var exitCode = process.waitFor()
+
+		return { exitCode : exitCode, output : trim( output ) }
+	}
+
+}

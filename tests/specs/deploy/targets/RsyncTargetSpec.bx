@@ -1,0 +1,163 @@
+/**
+ * `buildRsyncCommand()` is pure (builds the full `rsync` argv, never
+ * touches a process) and is fully covered directly. `deploy()` itself IS
+ * exercised for real, against a target that's genuinely unreachable in
+ * whichever environment this spec runs in - but this environment (checked
+ * at authoring time via `which rsync ssh`, and by scanning the filesystem)
+ * has neither `rsync` nor `ssh` installed at all, so a real refused-TCP-
+ * connection path (what the sibling `ftp`/`sftp` specs exercise against
+ * `127.0.0.1` on a closed port) can't be exercised here - there is no
+ * `rsync` binary to even start. What IS genuinely true in THIS sandbox,
+ * and is asserted below rather than assumed: attempting a real deploy
+ * throws `BxSites.RsyncNotFound`, not a raw Java stack trace and not a
+ * hang. `rsyncAvailable()` detects which reality a given test run is in at
+ * runtime, so this same spec also correctly exercises the genuine-refused-
+ * connection -> `BxSites.DeployFailed` path on any environment that DOES
+ * have `rsync` on `PATH`, without hardcoding an assumption that doesn't
+ * hold here.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "deploy.targets.RsyncTarget", function() {
+
+			beforeEach( function() {
+				variables.target = new "models.deploy.targets.RsyncTarget@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newTempDir() {
+				var dir = createTempDirectory( prefix = "bxsites-rsynctarget-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			private boolean function rsyncAvailable() {
+				try {
+					var pb = createObject( "java", "java.lang.ProcessBuilder" ).init( [ "rsync", "--version" ] );
+					pb.redirectErrorStream( true );
+					var process = pb.start();
+					process.getInputStream().readAllBytes();
+					process.waitFor();
+					return true;
+				} catch ( any e ) {
+					return false;
+				}
+			}
+
+			it( "builds the rsync argv with default port 22, --delete, and trailing slashes on both paths", function() {
+				var cmd = target.buildRsyncCommand( { host : "example.com", username : "deploy", remotePath : "/var/www/site" }, "/tmp/site" );
+
+				expect( cmd ).toBe( [
+					"rsync",
+					"-avz",
+					"--delete",
+					"-e",
+					"ssh -p 22 -o StrictHostKeyChecking=accept-new",
+					"/tmp/site/",
+					"deploy@example.com:/var/www/site/"
+				] );
+			} );
+
+			it( "strips a pre-existing trailing slash from both siteDir and remotePath rather than doubling it", function() {
+				var cmd = target.buildRsyncCommand( { host : "example.com", username : "deploy", remotePath : "/var/www/site/" }, "/tmp/site/" );
+
+				expect( cmd[ 6 ] ).toBe( "/tmp/site/" );
+				expect( cmd[ 7 ] ).toBe( "deploy@example.com:/var/www/site/" );
+			} );
+
+			it( "honors an explicit port, identityFile, sshOptions, and deleteExtraneous:false", function() {
+				var cmd = target.buildRsyncCommand(
+					{
+						host             : "example.com",
+						username         : "deploy",
+						remotePath       : "/var/www/site",
+						port             : 2222,
+						identityFile     : "/home/me/.ssh/id_rsa",
+						sshOptions       : "-o Compression=yes",
+						deleteExtraneous : false
+					},
+					"/tmp/site"
+				);
+
+				expect( cmd ).toBe( [
+					"rsync",
+					"-avz",
+					"-e",
+					"ssh -p 2222 -i /home/me/.ssh/id_rsa -o Compression=yes -o StrictHostKeyChecking=accept-new",
+					"/tmp/site/",
+					"deploy@example.com:/var/www/site/"
+				] );
+			} );
+
+			it( "omits --delete when deleteExtraneous is explicitly false, but keeps it on true and on the default", function() {
+				var withDelete = target.buildRsyncCommand( { host : "h", username : "u", remotePath : "/r", deleteExtraneous : true }, "/tmp/site" );
+				var withoutDelete = target.buildRsyncCommand( { host : "h", username : "u", remotePath : "/r", deleteExtraneous : false }, "/tmp/site" );
+				var defaulted = target.buildRsyncCommand( { host : "h", username : "u", remotePath : "/r" }, "/tmp/site" );
+
+				expect( withDelete ).toInclude( "--delete" );
+				expect( withoutDelete ).notToInclude( "--delete" );
+				expect( defaulted ).toInclude( "--delete" );
+			} );
+
+			it( "throws BxSites.InvalidDeployConfig when host/username/remotePath are missing", function() {
+				expect( function() {
+					target.buildRsyncCommand( {}, "/tmp/site" );
+				} ).toThrow( "BxSites.InvalidDeployConfig" );
+			} );
+
+			it( "throws BxSites.SiteNotBuilt when siteDir doesn't exist", function() {
+				var root = newTempDir();
+				expect( function() {
+					target.deploy(
+						{ host : "example.com", username : "deploy", remotePath : "/var/www/site" },
+						{ siteDir : root & "/site" }
+					);
+				} ).toThrow( "BxSites.SiteNotBuilt" );
+			} );
+
+			it( "attempts a real deploy against a genuinely unreachable target, wrapping the outcome to a clear BxSites error", function() {
+				var siteDir = newTempDir();
+				fileWrite( siteDir & "/index.html", "<h1>Home</h1>" );
+
+				if ( rsyncAvailable() ) {
+					// This environment has a real rsync binary - exercise the
+					// genuine refused-connection path (127.0.0.1, a port
+					// nothing listens on, a short ConnectTimeout so this
+					// fails fast rather than hanging the suite).
+					expect( function() {
+						target.deploy(
+							{
+								host       : "127.0.0.1",
+								port       : 1,
+								username   : "user",
+								remotePath : "/uploads",
+								sshOptions : "-o ConnectTimeout=2"
+							},
+							{ siteDir : siteDir }
+						);
+					} ).toThrow( "BxSites.DeployFailed" );
+				} else {
+					// This sandbox has no rsync binary at all - the real,
+					// honest outcome here is BxSites.RsyncNotFound.
+					expect( function() {
+						target.deploy(
+							{ host : "127.0.0.1", port : 1, username : "user", remotePath : "/uploads" },
+							{ siteDir : siteDir }
+						);
+					} ).toThrow( "BxSites.RsyncNotFound" );
+				}
+			} );
+
+		} );
+	}
+
+}

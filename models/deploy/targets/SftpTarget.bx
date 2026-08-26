@@ -1,0 +1,23 @@
+/**
+ * Ships the already-built `site/` directory to a remote server over SFTP,
+ * via the real `bx:ftp` component (`bx-ftp` module - see BaseFtpTarget.bx,
+ * which holds the actual shared implementation and uploads the whole
+ * directory tree, preserving its folder structure remotely) - password or
+ * SSH key authentication, matching bx-ftp's own real SFTP support.
+ *
+ * @config { host (required), username (required), remotePath (required - a remote DIRECTORY, the site's root), passwordEnvVar OR key (one required - `key` is a PATH to a private key file, not the secret itself), passphraseEnvVar (optional, the key's own passphrase), fingerprint (optional), port (default 22), timeout (default 30) }
+ */
+class implements="models.deploy.IDeploymentTarget@bxsites" {
+
+	/**
+	 * @config This target's own resolved config (see the class docblock's `@config` shape)
+	 * @context { projectRoot, siteDir, config } - only `siteDir` is used, as the whole tree to upload
+	 *
+	 * @return { success, message, details: { host, remotePath, filesUploaded } }
+	 */
+	struct function deploy( required struct config, required struct context ) {
+		return new "models.deploy.targets.BaseFtpTarget@bxsites"()
+			.performDeploy( arguments.config, arguments.context, true )
+	}
+
+}
