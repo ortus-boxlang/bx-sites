@@ -3,7 +3,7 @@
  * the shared foundation for every GitBook-style block Flexmark has no
  * native concept of: expandable, cards/card, columns/column,
  * stepper/step, updates/update, file, embed, page-link, link-preview,
- * buttons/button, and prompt (see each block's own `render*()` docblock below). Nests arbitrarily deep (a
+ * buttons/button, prompt, and pagebreak (see each block's own `render*()` docblock below). Nests arbitrarily deep (a
  * `::: cards` block's own content is itself re-scanned for `::: card`
  * children, recursively) using the same two-phase pre/post-processing
  * shape as TabsProcessor.bx - `extract()` runs before `Markdown()`,
@@ -214,6 +214,8 @@ class {
 				return renderConditional( block, attrs, renderer, markdownOptions )
 			case "audience-switcher":
 				return renderAudienceSwitcher( attrs )
+			case "pagebreak":
+				return renderPagebreak()
 			default:
 				return '<div class="bxsites-directive-unknown">' & renderNested( block.content, renderer, markdownOptions ) & '</div>'
 		}
@@ -482,6 +484,20 @@ class {
 			& '<span class="bxsites-file__icon" aria-hidden="true">📎</span>'
 			& '<span class="bxsites-file__title">' & encodeForHTML( title ) & '</span>'
 			& '</a>'
+	}
+
+	/**
+	 * `::: pagebreak` - forces a page break wherever it's placed, for a
+	 * project that later prints or exports the built site to PDF (e.g. a
+	 * browser's own "Print to PDF"). No attributes - a bare
+	 * `::: pagebreak` ... `:::` pair with nothing in between. Renders as a
+	 * plain `<hr>` so it's visible as a subtle divider on screen too, in
+	 * case a reader forgets it's there while editing; each theme's own CSS
+	 * (`.bxsites-pagebreak`) turns that into an actual forced break only
+	 * inside `@media print` - it does nothing to normal on-screen browsing.
+	 */
+	private string function renderPagebreak() {
+		return '<hr class="bxsites-pagebreak" data-bxsites-pagebreak>'
 	}
 
 	/**
