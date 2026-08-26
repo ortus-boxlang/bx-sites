@@ -1,24 +1,210 @@
 ---
-title: Deploying to GitHub Pages
+title: Deployment
 order: 3
 icon: phosphor-duotone:cloud-arrow-up
 tags: [guides, deployment]
 ---
 
-# Deploying to GitHub Pages
+# Deployment
 
 `site/` is a plain static site - host it anywhere that serves static
-files. This module ships a ready-to-use GitHub Actions workflow
-(`.github/workflows/pages.yml`) for the common case: publishing straight
-to GitHub Pages, with `main` and `development` published as two
-independently-live versions of the same site.
+files. [`bxSites deploy`](../cli-reference.md#deploy) ships it there
+directly, in one command: S3 (and any S3-compatible service - DigitalOcean
+Spaces, Cloudflare R2, Backblaze B2, MinIO), Azure Blob Storage, Google
+Cloud Storage, Firebase Hosting, FTP, SFTP, rsync-over-SSH, Netlify,
+Vercel, Cloudflare Pages, a local directory, or GitHub Pages.
 
-For a simpler single-version project with no CI setup at all,
-[`bxSites gh-deploy`](../cli-reference.md#gh-deploy) builds and pushes
-`site/` to a `gh-pages` branch in one command, run from your own machine
-whenever you want to publish - no workflow file needed. The rest of this
-guide covers the GitHub Actions workflow this repo itself uses, for
-automatic multi-version publishing on every push.
+## The `deploy` command
+
+Every target but the two simplest (`local`/`github-pages`, which work from
+flags alone - see [CLI Reference](../cli-reference.md#deploy)) is
+configured via a `deployments/<name>.json` file at your project root - one
+file per deploy target you actually use, each naming which `target` it is
+plus that target's own fields:
+
+```bash frame="terminal" title="Terminal"
+bxSites deploy --entry=production
+```
+
+```json title="deployments/production.json"
+{ "target": "s3", "bucket": "my-docs-site", "accessKeyIdEnvVar": "AWS_ACCESS_KEY_ID", "secretAccessKeyEnvVar": "AWS_SECRET_ACCESS_KEY" }
+```
+
+**Secrets always come from an environment variable, never from a literal
+value in `deployments/*.json`.** Every field ending in `EnvVar` names the
+*environment variable* holding the real secret (an access key, a password,
+an API token) - resolved live at deploy time, so `deployments/*.json`
+itself is always safe to commit. A field that's a *path* to a credential
+file you already manage yourself (an SSH private key, a downloaded GCP
+service-account JSON key) is the one exception - a plain field, since the
+file itself is what's kept out of version control, not its path.
+
+### `local`
+
+Copies the built site to any directory - a shared drive, a staging folder,
+anywhere. The only target that needs no `deployments/` entry at all.
+
+```bash frame="terminal" title="Terminal"
+bxSites deploy --target=local --destination=/path/to/somewhere
+```
+
+### `github-pages`
+
+The same push [`gh-deploy`](../cli-reference.md#gh-deploy) does, reachable
+from this unified command too - also needs no `deployments/` entry:
+
+```bash frame="terminal" title="Terminal"
+bxSites deploy --target=github-pages [--branch=gh-pages] [--remote=origin] [--message="..."]
+```
+
+### `s3`
+
+Real AWS S3, or any S3-compatible service - set `endpoint` for anything
+other than AWS itself, and `forcePathStyle: true` for most non-AWS
+providers.
+
+```json title="deployments/production.json"
+{
+  "target": "s3",
+  "bucket": "my-docs-site",
+  "region": "us-east-1",
+  "prefix": "",
+  "accessKeyIdEnvVar": "AWS_ACCESS_KEY_ID",
+  "secretAccessKeyEnvVar": "AWS_SECRET_ACCESS_KEY"
+}
+```
+
+```json title="deployments/spaces.json (DigitalOcean Spaces)"
+{
+  "target": "s3",
+  "bucket": "my-docs-site",
+  "endpoint": "https://nyc3.digitaloceanspaces.com",
+  "forcePathStyle": true,
+  "accessKeyIdEnvVar": "SPACES_KEY",
+  "secretAccessKeyEnvVar": "SPACES_SECRET"
+}
+```
+
+The same shape (custom `endpoint` + `forcePathStyle: true`) also covers
+Cloudflare R2 (`https://<accountid>.r2.cloudflarestorage.com`), Backblaze
+B2, and MinIO/Wasabi.
+
+### `azure`
+
+Azure Blob Storage, authenticated with a SAS token, an account key, or a
+full connection string - exactly one of the three.
+
+```json title="deployments/production.json"
+{
+  "target": "azure",
+  "account": "mystorageaccount",
+  "container": "site",
+  "accountKeyEnvVar": "AZURE_STORAGE_KEY"
+}
+```
+
+### `gcs`
+
+Google Cloud Storage, authenticated with a downloaded service-account JSON
+key (Google Cloud Console -> IAM & Admin -> Service Accounts -> Keys).
+
+```json title="deployments/production.json"
+{
+  "target": "gcs",
+  "bucket": "my-docs-site",
+  "serviceAccountKeyPath": "/path/to/service-account.json"
+}
+```
+
+### `firebase`
+
+Firebase Hosting, using the same kind of service-account key as `gcs`.
+
+```json title="deployments/production.json"
+{
+  "target": "firebase",
+  "siteId": "my-firebase-site",
+  "serviceAccountKeyPath": "/path/to/service-account.json"
+}
+```
+
+### `ftp` / `sftp`
+
+Uploads the whole site to a remote server over FTP or SFTP, preserving its
+folder structure. SFTP accepts a password or an SSH key.
+
+```json title="deployments/production.json"
+{
+  "target": "sftp",
+  "host": "example.com",
+  "username": "deploy",
+  "remotePath": "/var/www/html",
+  "key": "/home/me/.ssh/id_rsa"
+}
+```
+
+### `rsync`
+
+Syncs the site to a remote server over SSH via the real `rsync` binary -
+faster than FTP/SFTP for a full rebuild, since it only transfers what
+changed. Requires `rsync` and `ssh` on the machine running `bxSites`.
+
+```json title="deployments/production.json"
+{
+  "target": "rsync",
+  "host": "example.com",
+  "username": "deploy",
+  "remotePath": "/var/www/html",
+  "identityFile": "/home/me/.ssh/id_rsa"
+}
+```
+
+### `netlify`
+
+```json title="deployments/production.json"
+{
+  "target": "netlify",
+  "siteId": "my-site-id-or-name.netlify.app",
+  "authTokenEnvVar": "NETLIFY_AUTH_TOKEN"
+}
+```
+
+### `vercel`
+
+```json title="deployments/production.json"
+{
+  "target": "vercel",
+  "projectId": "my-project",
+  "authTokenEnvVar": "VERCEL_TOKEN"
+}
+```
+
+### `cloudflare-pages`
+
+Cloudflare has no officially documented REST API for direct-upload
+deploys - only its `wrangler` CLI. This target reverse-engineers
+Wrangler's own upload flow, and needs a BLAKE3 hash implementation on the
+JVM classpath that most default Java installs don't ship - see
+[CLI Reference](../cli-reference.md#deploy) and the target's own source
+for the full, honest detail on this one's rough edges.
+
+```json title="deployments/production.json"
+{
+  "target": "cloudflare-pages",
+  "accountId": "your-account-id",
+  "projectName": "my-project",
+  "apiTokenEnvVar": "CLOUDFLARE_API_TOKEN"
+}
+```
+
+## GitHub Actions (multi-version publishing)
+
+For automatic publishing on every push, rather than a manually-run
+`bxSites deploy`/`gh-deploy`, this module ships a ready-to-use GitHub
+Actions workflow (`.github/workflows/pages.yml`) that publishes `main` and
+`development` as two independently-live versions of the same site to
+GitHub Pages. The rest of this guide covers that workflow, which this
+repo's own docs use.
 
 ## What it does
 

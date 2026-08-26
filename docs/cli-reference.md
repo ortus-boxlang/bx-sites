@@ -122,6 +122,35 @@ bxSites gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
 See [Deployment](guides/deployment.md) for the full GitHub Pages setup
 (enabling Pages for the branch, `baseURL`, etc.).
 
+## `deploy`
+
+Builds the site, then ships it to a real deployment target - S3 (and any
+S3-compatible service - DigitalOcean Spaces, Cloudflare R2, Backblaze B2,
+MinIO), Azure Blob Storage, Google Cloud Storage, Firebase Hosting, FTP,
+SFTP, rsync-over-SSH, Netlify, Vercel, Cloudflare Pages, a local directory,
+or GitHub Pages (the same push `gh-deploy` does, just reachable from this
+one unified command too).
+
+```bash title="Usage"
+bxSites deploy --entry=<name>
+bxSites deploy [--target=local|github-pages] [target-specific flags]
+```
+
+Two ways to invoke it:
+
+1. **`--entry=<name`>** - dispatches to whatever target a
+   `deployments/<name>.json` file declares (see below). Every target
+   except `local`/`github-pages` needs this - there's more configuration
+   than a couple of flags can reasonably carry.
+2. **`--target=<name>` with its own flags** - a flag-only shorthand for
+   the two simplest targets, needing no `deployments/` folder at all:
+   `local` (`--destination=<path>`, also the default when `--target` is
+   omitted entirely) and `github-pages` (`[--branch] [--remote]
+   [--message]`, every field optional, same defaults as `gh-deploy`).
+
+See [Deployment](guides/deployment.md) for every target's own config
+shape and a real `deployments/*.json` example for each.
+
 ## `migrate`
 
 Converts an existing docs project into this one - `--from` picks the
