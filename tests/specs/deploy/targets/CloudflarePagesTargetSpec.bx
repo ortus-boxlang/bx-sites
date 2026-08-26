@@ -1,0 +1,200 @@
+/**
+ * deploy.targets.CloudflarePagesTarget - guard clauses, plus everything
+ * about this target that CAN genuinely be verified offline: the manifest/
+ * upload-payload SHAPE (`buildManifestFromHashes()`, `buildUploadPayload()`)
+ * built from fixed, injected fake hash strings, and MIME-type guessing
+ * (`guessContentType()`). These deliberately do NOT need BLAKE3 or a real
+ * Cloudflare account - see CloudflarePagesTarget.bx's own docblock for why
+ * that separation exists.
+ *
+ * TWO THINGS THIS SPEC DOES NOT AND CANNOT CLAIM, BOTH DOCUMENTED UP FRONT
+ * IN THE TARGET CLASS ITSELF:
+ *  1. The real per-asset hash (`hashFileForCloudflare()`/`hashSiteFiles()`)
+ *     - Wrangler's own documented BLAKE3-based algorithm - cannot be
+ *     exercised for real here: confirmed directly in this sandbox that
+ *     `java.security.MessageDigest.getInstance("BLAKE3")` throws
+ *     `NoSuchAlgorithmException` (no BLAKE3 JVM provider present). The one
+ *     test below for this method asserts it fails LOUDLY with a clear,
+ *     typed `BxSites.MissingBlake3Support` error rather than silently
+ *     producing a wrong hash - that failure mode itself is real and
+ *     verified; the actual BLAKE3 digest is not.
+ *  2. The real 4-call HTTP flow (`getUploadToken`/`uploadAssets`/
+ *     `upsertHashes`/`createDeployment`) against Cloudflare's own
+ *     (unofficial, reverse-engineered - see the target's docblock) Direct
+ *     Upload endpoints - there is no real Cloudflare account/API token
+ *     available in this plain unit-test environment, matching this repo's
+ *     existing honesty pattern for untestable-without-real-credentials
+ *     code (see GhDeploySpec.bx's own docblock).
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "deploy.targets.CloudflarePagesTarget", function() {
+
+			beforeEach( function() {
+				variables.target = new "models.deploy.targets.CloudflarePagesTarget@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newTempDir() {
+				var dir = createTempDirectory( prefix = "bxsites-cfpagestarget-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "throws BxSites.InvalidDeployConfig when accountId is missing", function() {
+				expect( function() {
+					target.deploy(
+						{ projectName : "my-site", apiTokenEnvVar : "CF_TOKEN" },
+						{ siteDir : newTempDir() }
+					);
+				} ).toThrow( "BxSites.InvalidDeployConfig" );
+			} );
+
+			it( "throws BxSites.InvalidDeployConfig when projectName is missing", function() {
+				expect( function() {
+					target.deploy(
+						{ accountId : "acct123", apiTokenEnvVar : "CF_TOKEN" },
+						{ siteDir : newTempDir() }
+					);
+				} ).toThrow( "BxSites.InvalidDeployConfig" );
+			} );
+
+			it( "throws BxSites.InvalidDeployConfig when apiTokenEnvVar is missing", function() {
+				expect( function() {
+					target.deploy(
+						{ accountId : "acct123", projectName : "my-site" },
+						{ siteDir : newTempDir() }
+					);
+				} ).toThrow( "BxSites.InvalidDeployConfig" );
+			} );
+
+			it( "throws BxSites.SiteNotBuilt when siteDir doesn't exist", function() {
+				var root = newTempDir();
+				expect( function() {
+					target.deploy(
+						{ accountId : "acct123", projectName : "my-site", apiTokenEnvVar : "CF_TOKEN" },
+						{ siteDir : root & "/site" }
+					);
+				} ).toThrow( "BxSites.SiteNotBuilt" );
+			} );
+
+			it( "throws BxSites.MissingCredentials when the apiTokenEnvVar env var isn't set", function() {
+				var siteDir = newTempDir();
+				fileWrite( siteDir & "/index.html", "hi" );
+
+				expect( function() {
+					target.deploy(
+						{
+							accountId      : "acct123",
+							projectName    : "my-site",
+							apiTokenEnvVar : "BXSITES_TEST_CF_TOKEN_DOES_NOT_EXIST"
+						},
+						{ siteDir : siteDir }
+					);
+				} ).toThrow( "BxSites.MissingCredentials" );
+			} );
+
+			describe( "hashFileForCloudflare() - the one real, known gap", function() {
+
+				it( "throws BxSites.MissingBlake3Support rather than silently producing a wrong hash", function() {
+					expect( function() {
+						target.hashFileForCloudflare( "hello".getBytes(), "html" );
+					} ).toThrow( "BxSites.MissingBlake3Support" );
+				} );
+
+			} );
+
+			describe( "guessContentType()", function() {
+
+				it( "maps common static-site extensions to their real MIME types", function() {
+					expect( target.guessContentType( "index.html" ) ).toBe( "text/html" );
+					expect( target.guessContentType( "assets/app.js" ) ).toBe( "application/javascript" );
+					expect( target.guessContentType( "assets/style.css" ) ).toBe( "text/css" );
+					expect( target.guessContentType( "logo.svg" ) ).toBe( "image/svg+xml" );
+					expect( target.guessContentType( "favicon.ico" ) ).toBe( "image/x-icon" );
+				} );
+
+				it( "defaults to application/octet-stream for an unrecognized extension", function() {
+					expect( target.guessContentType( "data.unknownext" ) ).toBe( "application/octet-stream" );
+				} );
+
+				it( "defaults to application/octet-stream for a file with no extension at all", function() {
+					expect( target.guessContentType( "LICENSE" ) ).toBe( "application/octet-stream" );
+				} );
+
+			} );
+
+			describe( "buildManifestFromHashes() - pure, given fixed fake hashes", function() {
+
+				it( "keys the manifest by path with a leading slash, mapped to each given hash", function() {
+					var siteDir = newTempDir();
+					var fakeHashes = {
+						"index.html"            : "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+						"assets/css/style.css"  : "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+					};
+
+					var manifest = target.buildManifestFromHashes( siteDir, fakeHashes );
+
+					expect( manifest ).toBe( {
+						"/index.html"           : "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+						"/assets/css/style.css" : "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+					} );
+				} );
+
+			} );
+
+			describe( "buildUploadPayload() - pure aside from disk reads, given fixed fake hashes", function() {
+
+				it( "base64-round-trips each file's real content and tags it with a guessed content-type", function() {
+					var siteDir = newTempDir();
+					directoryCreate( siteDir & "/assets/css", true, true );
+					fileWrite( siteDir & "/index.html", "<h1>Home</h1>" );
+					fileWrite( siteDir & "/assets/css/style.css", "body{color:red}" );
+
+					var fakeHashes = {
+						"index.html"           : "hash-for-index",
+						"assets/css/style.css" : "hash-for-style"
+					};
+
+					var payload = target.buildUploadPayload( siteDir, fakeHashes );
+					expect( payload.len() ).toBe( 2 );
+
+					var byKey = {};
+					for ( var item in payload ) {
+						byKey[ item.key ] = item;
+					}
+
+					expect( byKey.keyExists( "hash-for-index" ) ).toBeTrue();
+					expect( byKey[ "hash-for-index" ].base64 ).toBeTrue();
+					expect( byKey[ "hash-for-index" ].metadata.contentType ).toBe( "text/html" );
+					expect( decodeBase64Utf8( byKey[ "hash-for-index" ].value ) ).toBe( "<h1>Home</h1>" );
+
+					expect( byKey.keyExists( "hash-for-style" ) ).toBeTrue();
+					expect( byKey[ "hash-for-style" ].metadata.contentType ).toBe( "text/css" );
+					expect( decodeBase64Utf8( byKey[ "hash-for-style" ].value ) ).toBe( "body{color:red}" );
+				} );
+
+			} );
+
+		} );
+	}
+
+	/**
+	 * @value A base64-encoded string
+	 *
+	 * @return The decoded UTF-8 text
+	 */
+	private string function decodeBase64Utf8( required string value ) {
+		return createObject( "java", "java.lang.String" ).init( binaryDecode( arguments.value, "base64" ), "UTF-8" );
+	}
+
+}

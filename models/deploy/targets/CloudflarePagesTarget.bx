@@ -1,0 +1,389 @@
+/**
+ * Deploys the already-built `site/` directory to Cloudflare Pages via its
+ * "Direct Upload" flow - by a wide margin the least-documented of the
+ * three new static-host targets (Netlify/Vercel/Cloudflare Pages).
+ *
+ * WHAT'S ACTUALLY OFFICIALLY DOCUMENTED (confirmed this session,
+ * 2026-08-26, developers.cloudflare.com/pages/get-started/direct-upload/
+ * and developers.cloudflare.com/pages/how-to/use-direct-upload-with-
+ * continuous-integration/): Cloudflare's own published guidance for doing
+ * a Direct Upload deploy from a script/CI pipeline is to shell out to the
+ * `wrangler` CLI (`wrangler pages deploy <dir> --project-name=<name>`),
+ * *not* to call a documented REST endpoint directly - every official
+ * example given (GitHub Actions, CircleCI, Travis) runs `wrangler`, never
+ * raw HTTP. Cloudflare's public API reference (developers.cloudflare.com/
+ * api/...) documents `POST .../pages/projects/{project_name}/deployments`
+ * only for retriggering a deployment from an already-connected git branch,
+ * not for uploading arbitrary local files directly.
+ *
+ * WHAT THIS TARGET ACTUALLY DOES (INFERRED, not from an official Cloudflare
+ * doc): the 4-call sequence Wrangler itself performs under the hood, as
+ * reverse-engineered and published by third parties - specifically
+ * hunterashaw.com's "Reverse-Engineering the Cloudflare Pages Deployment
+ * API" writeup, corroborated by the (also explicitly unofficial)
+ * `adamburgess/cloudflare-pages-direct-uploader` npm package, whose own
+ * README states outright: "the API routes used are not documented/private.
+ * This could break at any time":
+ *   1. `GET  /accounts/{accountId}/pages/projects/{projectName}/upload-token`
+ *      (normal API token) -> a short-lived, account-scoped JWT.
+ *   2. `POST /pages/assets/upload` (that JWT, no `/accounts/{id}` prefix -
+ *      the JWT already carries the account scope) - a JSON array of
+ *      `{ key: <hash>, value: <base64 content>, metadata: { contentType },
+ *      base64: true }` per asset.
+ *   3. `POST /pages/assets/upsert-hashes` (same JWT) - `{ hashes: [...] }`,
+ *      registering every uploaded asset's hash against the project.
+ *   4. `POST /accounts/{accountId}/pages/projects/{projectName}/deployments`
+ *      (back to the normal API token) - `multipart/form-data` with a
+ *      `manifest` field: a JSON object mapping each file's path (leading
+ *      `/`, e.g. `/index.html`) to its hash.
+ * This target skips the "check which hashes are already present" round
+ * trip real Wrangler does before step 2 (an incremental-deploy
+ * optimization) and simply (re-)uploads every asset on every deploy -
+ * correct, just not bandwidth-optimal for large, mostly-unchanged sites.
+ *
+ * THE HASH ALGORITHM ITSELF IS A KNOWN, DOCUMENTED GAP IN THIS SANDBOX:
+ * Wrangler hashes each asset as BLAKE3( base64(fileContent) & fileExtension ),
+ * hex-encoded and truncated to 32 characters (per the same reverse-
+ * engineering research). BLAKE3 has no built-in JVM security provider -
+ * confirmed directly in this environment:
+ * `createObject("java","java.security.MessageDigest").getInstance("BLAKE3")`
+ * throws `NoSuchAlgorithmException: BLAKE3 MessageDigest not available`.
+ * `hashFileForCloudflare()` below attempts exactly Wrangler's documented
+ * algorithm and throws a clear `BxSites.MissingBlake3Support` the moment
+ * that JVM gap is hit, rather than silently deploying with a wrong hash
+ * that would just fail against the real API anyway - a real Cloudflare
+ * Pages deploy from this module currently requires a BLAKE3
+ * implementation on the classpath (e.g. a small extra `lib/*.jar`), which
+ * this module does not yet bundle.
+ *
+ * Everything BELOW the hashing step - manifest shape, base64 upload
+ * payload shape, content-type guessing, and the multipart manifest field -
+ * is kept in pure, no-HTTP, no-BLAKE3-needed helpers (`guessContentType()`,
+ * `buildManifestFromHashes()`, `buildUploadPayload()`) that take
+ * already-computed hashes as plain input, so CloudflarePagesTargetSpec.bx
+ * can fully verify the REST *shape* this target would send, offline, with
+ * fixed fake hash strings - without needing BLAKE3 or a real account.
+ *
+ * NOT verified at all, for either reason above (no real account, AND no
+ * working hash function): an actual end-to-end call against the live API.
+ *
+ * @config { accountId (required), projectName (required), apiTokenEnvVar (required - resolved via getSystemSetting() at deploy time, never a literal token) }
+ */
+class implements="models.deploy.IDeploymentTarget@bxsites" {
+
+	variables.API_BASE = "https://api.cloudflare.com/client/v4"
+	variables.CONTENT_TYPES = {
+		"html" : "text/html", "htm" : "text/html", "css" : "text/css",
+		"js" : "application/javascript", "mjs" : "application/javascript",
+		"json" : "application/json", "xml" : "application/xml",
+		"svg" : "image/svg+xml", "png" : "image/png", "jpg" : "image/jpeg",
+		"jpeg" : "image/jpeg", "gif" : "image/gif", "ico" : "image/x-icon",
+		"webp" : "image/webp", "woff" : "font/woff", "woff2" : "font/woff2",
+		"ttf" : "font/ttf", "eot" : "application/vnd.ms-fontobject",
+		"txt" : "text/plain", "pdf" : "application/pdf",
+		"map" : "application/json", "webmanifest" : "application/manifest+json"
+	}
+
+	/**
+	 * @config This target's own resolved config (see the class docblock's `@config` shape)
+	 * @context { projectRoot, siteDir, config } - only `siteDir` is used
+	 *
+	 * @return { success, message, details: { deploymentId, url } }
+	 */
+	struct function deploy( required struct config, required struct context ) {
+		var accountId = trim( arguments.config.accountId ?: "" )
+		if ( !len( accountId ) ) {
+			throw( type = "BxSites.InvalidDeployConfig", message = "deploy target 'cloudflare-pages' requires an 'accountId'" )
+		}
+		var projectName = trim( arguments.config.projectName ?: "" )
+		if ( !len( projectName ) ) {
+			throw( type = "BxSites.InvalidDeployConfig", message = "deploy target 'cloudflare-pages' requires a 'projectName'" )
+		}
+		var apiTokenEnvVar = trim( arguments.config.apiTokenEnvVar ?: "" )
+		if ( !len( apiTokenEnvVar ) ) {
+			throw( type = "BxSites.InvalidDeployConfig", message = "deploy target 'cloudflare-pages' requires an 'apiTokenEnvVar'" )
+		}
+
+		var siteDir = arguments.context.siteDir
+		if ( !directoryExists( siteDir ) ) {
+			throw(
+				type    = "BxSites.SiteNotBuilt",
+				message = "No [#siteDir#] to deploy - run `build` first"
+			)
+		}
+
+		var apiToken = getSystemSetting( apiTokenEnvVar, "" )
+		if ( !len( apiToken ) ) {
+			throw(
+				type    = "BxSites.MissingCredentials",
+				message = "deploy target 'cloudflare-pages' requires the #apiTokenEnvVar# environment variable to hold a Cloudflare API token"
+			)
+		}
+
+		// This throws BxSites.MissingBlake3Support in any environment without a
+		// BLAKE3 JVM provider - see the class docblock. Everything past this
+		// line is real HTTP against Cloudflare's (unofficial) Direct Upload flow.
+		var relativePathToHash = hashSiteFiles( siteDir )
+
+		var manifest = buildManifestFromHashes( siteDir, relativePathToHash )
+		var uploadPayload = buildUploadPayload( siteDir, relativePathToHash )
+
+		var jwt = getUploadToken( accountId, projectName, apiToken )
+		uploadAssets( jwt, uploadPayload )
+		upsertHashes( jwt, relativePathToHash.valueArray() )
+		var created = createDeployment( accountId, projectName, apiToken, manifest )
+
+		return {
+			success : true,
+			message : "Deployed to Cloudflare Pages - #created.url#",
+			details : { deploymentId : created.id, url : created.url }
+		}
+	}
+
+	/**
+	 * Walks `siteDir` and hashes every file with Wrangler's own documented
+	 * algorithm (see class docblock) - real disk I/O, but throws
+	 * `BxSites.MissingBlake3Support` on the first file in any environment
+	 * without a BLAKE3 JVM provider (confirmed to be every plain JVM/JRE,
+	 * including this sandbox's).
+	 *
+	 * `directoryList( siteDir, true, "path" )` with no glob pattern also
+	 * returns directory entries, not just files (a known gotcha in this
+	 * codebase) - filtered out below via `!directoryExists( path )`.
+	 *
+	 * @siteDir Absolute path to the built site directory
+	 *
+	 * @return { relativePath (no leading slash) : hash }
+	 */
+	struct function hashSiteFiles( required string siteDir ) {
+		var root = arguments.siteDir.reReplace( "[\/]+$", "" )
+		var files = directoryList( root, true, "path" ).filter( function( path ) {
+			return !directoryExists( path )
+		} )
+
+		var result = {}
+		for ( var filePath in files ) {
+			var relativePath = filePath.replace( root, "", "one" )
+				.reReplace( "^[\/]+", "" )
+				.replace( char( 92 ), "/", "all" )
+			var extension = listLen( relativePath, "." ) > 1 ? listLast( relativePath, "." ) : ""
+			result[ relativePath ] = hashFileForCloudflare( readFileBytes( filePath ), extension )
+		}
+		return result
+	}
+
+	/**
+	 * Reads a file's raw bytes, guaranteed as real binary regardless of
+	 * extension - `fileReadBinary()` is NOT safe for this: confirmed in
+	 * this sandbox it silently returns a decoded STRING (not binary) for
+	 * common text-ish extensions like `.html`/`.txt` (only `isBinary()`
+	 * true for something like `.bin`), which would corrupt both the
+	 * uploaded asset content and the hash computed over it.
+	 * `java.nio.file.Files.readAllBytes()` has no such extension-based
+	 * guessing.
+	 *
+	 * @path Absolute path to the file to read
+	 *
+	 * @return The file's exact raw bytes
+	 */
+	private binary function readFileBytes( required string path ) {
+		var nioPath = createObject( "java", "java.nio.file.Paths" ).get( arguments.path, [] )
+		return createObject( "java", "java.nio.file.Files" ).readAllBytes( nioPath )
+	}
+
+	/**
+	 * Wrangler's own documented per-asset hash: BLAKE3 of
+	 * `base64(fileContent) & fileExtension`, hex-encoded, truncated to the
+	 * first 32 characters (see class docblock for the source). Isolated
+	 * into its own method specifically so it - and only it - is the single
+	 * point of failure when no BLAKE3 provider is available, rather than
+	 * silently producing a wrong hash.
+	 *
+	 * @bytes The raw file content
+	 * @extension The file's extension with no leading dot (e.g. "html"), or "" if none
+	 *
+	 * @return The 32-character hex hash Cloudflare's manifest expects
+	 *
+	 * @throws BxSites.MissingBlake3Support when no BLAKE3 MessageDigest provider is on the classpath
+	 */
+	string function hashFileForCloudflare( required binary bytes, required string extension ) {
+		var digest = "";
+		try {
+			digest = createObject( "java", "java.security.MessageDigest" ).getInstance( "BLAKE3" )
+		} catch ( any e ) {
+			throw(
+				type    = "BxSites.MissingBlake3Support",
+				message = "deploy target 'cloudflare-pages' needs a BLAKE3 hash to build its upload manifest, but no BLAKE3 java.security.MessageDigest provider is available on this JVM (#e.message#) - add one to lib/ to enable real Cloudflare Pages deploys"
+			)
+		}
+		var encoded = binaryEncode( arguments.bytes, "base64" ) & arguments.extension
+		var hex = binaryEncode( digest.digest( charsetDecode( encoded, "UTF-8" ) ), "hex" )
+		return hex.len() > 32 ? hex.left( 32 ) : hex
+	}
+
+	/**
+	 * Builds the `{ "/path" : hash }` manifest struct the final
+	 * `POST .../deployments` call's `manifest` form field expects - pure,
+	 * takes already-computed hashes so it's fully testable without BLAKE3.
+	 *
+	 * @siteDir Unused directly (kept for signature symmetry with buildUploadPayload) - accepted for a stable, obvious call site
+	 * @relativePathToHash `hashSiteFiles()`'s result (or an equivalent fixed test fixture)
+	 *
+	 * @return { "/relativePath" : hash }
+	 */
+	struct function buildManifestFromHashes( required string siteDir, required struct relativePathToHash ) {
+		var manifest = {}
+		for ( var relativePath in arguments.relativePathToHash ) {
+			manifest[ "/" & relativePath ] = arguments.relativePathToHash[ relativePath ]
+		}
+		return manifest
+	}
+
+	/**
+	 * Builds the JSON array body `POST /pages/assets/upload` expects - one
+	 * `{ key, value, metadata: { contentType }, base64: true }` entry per
+	 * file, `value` being the file's own base64-encoded content. Pure
+	 * aside from reading each file's bytes from disk - no HTTP, no BLAKE3
+	 * needed (takes already-computed hashes as `key`), so
+	 * CloudflarePagesTargetSpec.bx can base64-decode the result and assert
+	 * it round-trips to each fixture file's real content.
+	 *
+	 * @siteDir Absolute path to the built site directory (its files are re-read here for their content)
+	 * @relativePathToHash `hashSiteFiles()`'s result (or an equivalent fixed test fixture) - each hash becomes that entry's `key`
+	 *
+	 * @return [ { key, value, metadata: { contentType }, base64 : true } ]
+	 */
+	array function buildUploadPayload( required string siteDir, required struct relativePathToHash ) {
+		var root = arguments.siteDir.reReplace( "[\/]+$", "" )
+		var payload = []
+		for ( var relativePath in arguments.relativePathToHash ) {
+			var bytes = readFileBytes( root & "/" & relativePath )
+			payload.append( {
+				"key"      : arguments.relativePathToHash[ relativePath ],
+				"value"    : binaryEncode( bytes, "base64" ),
+				"metadata" : { "contentType" : guessContentType( relativePath ) },
+				"base64"   : true
+			} )
+		}
+		return payload
+	}
+
+	/**
+	 * Pure file-extension-to-MIME-type guess covering common static-site
+	 * asset types, defaulting to `application/octet-stream` for anything
+	 * unrecognized.
+	 *
+	 * @fileName A file name or path - only its extension is used
+	 *
+	 * @return The guessed MIME type
+	 */
+	string function guessContentType( required string fileName ) {
+		var extension = listLen( arguments.fileName, "." ) > 1 ? lCase( listLast( arguments.fileName, "." ) ) : ""
+		return variables.CONTENT_TYPES[ extension ] ?: "application/octet-stream"
+	}
+
+	/**
+	 * Step 1 (INFERRED endpoint - see class docblock) - exchanges the
+	 * caller's normal Cloudflare API token for a short-lived, account/
+	 * project-scoped upload JWT.
+	 *
+	 * @accountId Cloudflare account ID
+	 * @projectName Cloudflare Pages project name
+	 * @apiToken A valid Cloudflare API token with Pages edit permission
+	 *
+	 * @return The upload JWT
+	 */
+	private string function getUploadToken( required string accountId, required string projectName, required string apiToken ) {
+		var result = ""
+		bx:http url="#variables.API_BASE#/accounts/#arguments.accountId#/pages/projects/#arguments.projectName#/upload-token" method="GET" result="result" {
+			bx:httpparam type="header" name="Authorization" value="Bearer #arguments.apiToken#";
+		}
+		assertOk( result, "GET .../pages/projects/#arguments.projectName#/upload-token" )
+		var body = jsonDeserialize( result.fileContent )
+		return body.result.jwt ?: ""
+	}
+
+	/**
+	 * Step 2 (INFERRED endpoint - see class docblock) - uploads every
+	 * asset's base64 content in one batch, authenticated with the upload
+	 * JWT (not the caller's own API token).
+	 *
+	 * @jwt The upload JWT from getUploadToken()
+	 * @payload buildUploadPayload()'s result
+	 */
+	private void function uploadAssets( required string jwt, required array payload ) {
+		var result = ""
+		bx:http url="https://api.cloudflare.com/client/v4/pages/assets/upload" method="POST" result="result" {
+			bx:httpparam type="header" name="Authorization" value="Bearer #arguments.jwt#";
+			bx:httpparam type="header" name="Content-Type" value="application/json";
+			bx:httpparam type="body" value="#jsonSerialize( arguments.payload )#";
+		}
+		assertOk( result, "POST /pages/assets/upload" )
+	}
+
+	/**
+	 * Step 3 (INFERRED endpoint - see class docblock) - registers every
+	 * uploaded asset's hash against the project, still using the upload JWT.
+	 *
+	 * @jwt The upload JWT from getUploadToken()
+	 * @hashes Every asset hash that was just uploaded
+	 */
+	private void function upsertHashes( required string jwt, required array hashes ) {
+		var result = ""
+		bx:http url="https://api.cloudflare.com/client/v4/pages/assets/upsert-hashes" method="POST" result="result" {
+			bx:httpparam type="header" name="Authorization" value="Bearer #arguments.jwt#";
+			bx:httpparam type="header" name="Content-Type" value="application/json";
+			bx:httpparam type="body" value="#jsonSerialize( { hashes : arguments.hashes } )#";
+		}
+		assertOk( result, "POST /pages/assets/upsert-hashes" )
+	}
+
+	/**
+	 * Step 4 (INFERRED endpoint/shape - see class docblock) - creates the
+	 * actual Pages deployment from the manifest, back to the caller's own
+	 * API token (not the upload JWT).
+	 *
+	 * @accountId Cloudflare account ID
+	 * @projectName Cloudflare Pages project name
+	 * @apiToken A valid Cloudflare API token with Pages edit permission
+	 * @manifest buildManifestFromHashes()'s result
+	 *
+	 * @return { id, url }
+	 */
+	private struct function createDeployment(
+		required string accountId,
+		required string projectName,
+		required string apiToken,
+		required struct manifest
+	) {
+		var result = ""
+		bx:http
+			url="#variables.API_BASE#/accounts/#arguments.accountId#/pages/projects/#arguments.projectName#/deployments"
+			method="POST"
+			multipart="true"
+			result="result"
+		{
+			bx:httpparam type="header" name="Authorization" value="Bearer #arguments.apiToken#";
+			bx:httpparam type="formfield" name="manifest" value="#jsonSerialize( arguments.manifest )#";
+		}
+		assertOk( result, "POST .../pages/projects/#arguments.projectName#/deployments" )
+
+		var body = jsonDeserialize( result.fileContent )
+		return { id : body.result.id ?: "", url : body.result.url ?: "" }
+	}
+
+	/**
+	 * @result A `bx:http` result struct
+	 * @operation A short label for the request, used in the thrown error message
+	 */
+	private void function assertOk( required struct result, required string operation ) {
+		var statusCode = val( listFirst( arguments.result.statusCode ?: "0", " " ) )
+		if ( statusCode < 200 || statusCode >= 300 ) {
+			throw(
+				type    = "BxSites.DeployFailed",
+				message = "#arguments.operation# failed (status #arguments.result.statusCode#): #arguments.result.fileContent#"
+			)
+		}
+	}
+
+}
