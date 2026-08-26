@@ -1,6 +1,6 @@
 ---
 title: Consulting & Professional Services
-order: 6
+order: 7.2
 icon: phosphor-duotone:handshake
 summary: Need help building, migrating, or maintaining a BxSites site? Ortus Solutions offers professional services and consulting for documentation sites and static sites of any kind.
 tags: [services, consulting]

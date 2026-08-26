@@ -4,11 +4,7 @@
 		"title": "Introduction",
 		"children": [
 			"getting-started.md",
-			"cli-reference.md",
-			"about.md",
-			"license.md",
-			"contribute.md",
-			"troubleshooting.md"
+			"cli-reference.md"
 		]
 	},
 	{
@@ -46,5 +42,14 @@
 			"guides/migrating-from-mkdocs.md"
 		]
 	},
-	"services.md"
+	{
+		"title": "Help",
+		"children": [
+			"troubleshooting.md",
+			"contribute.md",
+			"services.md",
+			"about.md",
+			"license.md"
+		]
+	}
 ]
