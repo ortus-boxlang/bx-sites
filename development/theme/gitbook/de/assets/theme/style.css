@@ -2363,6 +2363,16 @@ a.button.primary {
 	background: rgba( 0, 0, 0, 0.5 );
 }
 
+/* CSS's own cascade quirk: an author rule (however plain) always beats the
+   UA stylesheet's `[hidden] { display: none }`, specificity or no - so the
+   base rule above alone leaves this backdrop visibly `display: flex` even
+   while `hidden` (search.js's own buildPalette() sets `backdrop.hidden =
+   true` right away, before ever appending it), showing a stuck-open, empty
+   overlay on every single page load. Needs its own explicit override. */
+.bxsites-command-palette[hidden] {
+	display: none;
+}
+
 .bxsites-command-palette__panel {
 	width: 100%;
 	max-width: 40rem;
