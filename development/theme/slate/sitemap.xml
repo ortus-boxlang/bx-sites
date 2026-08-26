@@ -5,10 +5,6 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/guides/search/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/about/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/license/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/contribute/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/configuration/index.html</loc></url>
@@ -18,12 +14,16 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/guides/tables/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/guides/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/guides/images/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/services/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/guides/plugins/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/releases/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/guides/cli-providers/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/guides/theme-import/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/guides/migrating-from-gitbook/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/troubleshooting/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/services/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/license/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/guides/versioning/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/guides/i18n/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/guides/migrating-from-mkdocs/index.html</loc></url>
@@ -36,10 +36,6 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/guides/search/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/about/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/license/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/contribute/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/configuration/index.html</loc></url>
@@ -49,12 +45,16 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/guides/tables/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/guides/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/guides/images/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/services/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/guides/plugins/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/releases/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/guides/cli-providers/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/guides/theme-import/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/guides/migrating-from-gitbook/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/troubleshooting/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/services/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/license/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/guides/versioning/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/guides/i18n/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/es/guides/migrating-from-mkdocs/index.html</loc></url>
@@ -67,10 +67,6 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/guides/search/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/about/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/license/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/contribute/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/configuration/index.html</loc></url>
@@ -80,12 +76,16 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/guides/tables/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/guides/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/guides/images/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/services/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/guides/plugins/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/releases/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/guides/cli-providers/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/guides/theme-import/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/guides/migrating-from-gitbook/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/troubleshooting/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/services/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/license/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/guides/versioning/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/guides/i18n/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/it/guides/migrating-from-mkdocs/index.html</loc></url>
@@ -98,10 +98,6 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/guides/search/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/about/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/license/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/contribute/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/configuration/index.html</loc></url>
@@ -111,12 +107,16 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/guides/tables/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/guides/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/guides/images/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/services/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/guides/plugins/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/releases/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/guides/cli-providers/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/guides/theme-import/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/guides/migrating-from-gitbook/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/troubleshooting/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/services/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/license/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/guides/versioning/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/guides/i18n/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/de/guides/migrating-from-mkdocs/index.html</loc></url>
@@ -129,10 +129,6 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/guides/search/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/about/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/license/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/contribute/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/configuration/index.html</loc></url>
@@ -142,12 +138,16 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/guides/tables/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/guides/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/guides/images/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/services/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/guides/plugins/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/releases/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/guides/cli-providers/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/guides/theme-import/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/guides/migrating-from-gitbook/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/troubleshooting/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/services/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/license/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/guides/versioning/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/guides/i18n/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/slate/ja/guides/migrating-from-mkdocs/index.html</loc></url>

@@ -262,20 +262,20 @@ Typesense, a proprietary internal search API, ...) is a project-level
    your own branch the same way:
 
    ```html title="theme/search.bxm"
-   <bx:if condition="#variables.searchProviderName eq 'meilisearch'#">
+   <bx:if variables.searchProviderName eq 'meilisearch'>
        <div id="bxsites-search-meilisearch"></div>
    </bx:if>
    ```
 
 4. **Load the client and wire it up** - `theme/layout.bxm` already has a
-   `<bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'algolia'#">`
+   `<bx:if variables.searchEnabled and variables.searchProviderName eq 'algolia'>`
    block loading DocSearch's CSS/JS and calling `docsearch({...})`; add the
    equivalent for Meilisearch's own
    [instant-meilisearch](https://github.com/meilisearch/meilisearch-docsearch)
    widget, reading your own config block back out of `siteConfig`:
 
    ```html title="theme/layout.bxm"
-   <bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'meilisearch'#">
+   <bx:if variables.searchEnabled and variables.searchProviderName eq 'meilisearch'>
        <script src="https://cdn.jsdelivr.net/npm/@meilisearch/instant-meilisearch/dist/instant-meilisearch.umd.min.js"></script>
        <script>
            document.addEventListener( "DOMContentLoaded", function () {

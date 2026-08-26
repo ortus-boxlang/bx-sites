@@ -1,6 +1,6 @@
 ---
 title: About
-order: 2.1
+order: 7.3
 icon: phosphor-duotone:info
 summary: What BxSites is, who builds it, and where the project lives.
 tags: [about, project]

@@ -5,10 +5,6 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/guides/search/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/about/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/license/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/contribute/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/configuration/index.html</loc></url>
@@ -18,12 +14,16 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/guides/tables/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/guides/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/guides/images/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/services/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/guides/plugins/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/releases/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/guides/cli-providers/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/guides/theme-import/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/guides/migrating-from-gitbook/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/troubleshooting/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/services/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/license/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/guides/versioning/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/guides/i18n/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/guides/migrating-from-mkdocs/index.html</loc></url>
@@ -36,10 +36,6 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/guides/search/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/about/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/license/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/contribute/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/configuration/index.html</loc></url>
@@ -49,12 +45,16 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/guides/tables/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/guides/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/guides/images/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/services/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/guides/plugins/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/releases/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/guides/cli-providers/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/guides/theme-import/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/guides/migrating-from-gitbook/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/troubleshooting/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/services/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/license/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/guides/versioning/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/guides/i18n/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/es/guides/migrating-from-mkdocs/index.html</loc></url>
@@ -67,10 +67,6 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/guides/search/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/about/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/license/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/contribute/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/configuration/index.html</loc></url>
@@ -80,12 +76,16 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/guides/tables/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/guides/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/guides/images/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/services/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/guides/plugins/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/releases/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/guides/cli-providers/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/guides/theme-import/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/guides/migrating-from-gitbook/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/troubleshooting/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/services/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/license/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/guides/versioning/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/guides/i18n/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/it/guides/migrating-from-mkdocs/index.html</loc></url>
@@ -98,10 +98,6 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/guides/search/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/about/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/license/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/contribute/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/configuration/index.html</loc></url>
@@ -111,12 +107,16 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/guides/tables/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/guides/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/guides/images/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/services/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/guides/plugins/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/releases/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/guides/cli-providers/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/guides/theme-import/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/guides/migrating-from-gitbook/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/troubleshooting/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/services/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/license/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/guides/versioning/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/guides/i18n/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/de/guides/migrating-from-mkdocs/index.html</loc></url>
@@ -129,10 +129,6 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/guides/icons/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/getting-started/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/guides/search/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/about/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/license/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/contribute/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/troubleshooting/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/cli-reference/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/guides/deployment/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/configuration/index.html</loc></url>
@@ -142,12 +138,16 @@
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/guides/tables/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/guides/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/guides/images/index.html</loc></url>
-	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/services/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/guides/plugins/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/releases/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/guides/cli-providers/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/guides/theme-import/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/guides/migrating-from-gitbook/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/troubleshooting/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/contribute/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/services/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/about/index.html</loc></url>
+	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/license/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/guides/versioning/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/guides/i18n/index.html</loc></url>
 	<url><loc>https://ortus-boxlang.github.io/bx-sites/development/theme/docusaurus/ja/guides/migrating-from-mkdocs/index.html</loc></url>
