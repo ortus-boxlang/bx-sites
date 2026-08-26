@@ -1,6 +1,6 @@
-<bx:if condition="#variables.searchProviderName eq 'algolia'#"><bx:output><div id="bxsites-search-algolia" class="bxsites-search-algolia"></div>
-</bx:output></bx:if><bx:if condition="#variables.searchProviderName eq 'pagefind'#"><bx:output><div id="bxsites-search-pagefind" class="bxsites-search-pagefind"></div>
-</bx:output></bx:if><bx:if condition="#variables.searchProviderName eq 'local'#"><bx:output><div class="bxsites-search docsy-search">
+<bx:if variables.searchProviderName eq 'algolia'><bx:output><div id="bxsites-search-algolia" class="bxsites-search-algolia"></div>
+</bx:output></bx:if><bx:if variables.searchProviderName eq 'pagefind'><bx:output><div id="bxsites-search-pagefind" class="bxsites-search-pagefind"></div>
+</bx:output></bx:if><bx:if variables.searchProviderName eq 'local'><bx:output><div class="bxsites-search docsy-search">
 	<input type="search" id="bxsites-search-input" class="docsy-search__input" placeholder="#encodeForHTML( variables.strings.searchPlaceholder )#" aria-label="#encodeForHTML( variables.strings.searchAriaLabel )#">
 	<kbd class="bxsites-search-kbd" aria-hidden="true">Ctrl K</kbd>
 	<ul id="bxsites-search-results" class="bxsites-search-results"></ul>

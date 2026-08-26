@@ -54,14 +54,14 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "translates {{ if }}/{{ end }} into <bx:if>/</bx:if>, substituting mapped fields in the condition", function() {
 				var result = translator.translate( "{{ if .Title }}Hi{{ end }}", map );
-				expect( result.output ).toBe( '<bx:if condition="' & h( "variables.page.title" ) & '">Hi</bx:if>' );
+				expect( result.output ).toBe( '<bx:if variables.page.title>Hi</bx:if>' );
 				expect( result.warnings ).toBeEmpty();
 			} );
 
 			it( "translates a full if/else if/else chain", function() {
 				var source = "{{ if .Title }}A{{ else if .Site.Title }}B{{ else }}C{{ end }}";
 				var result = translator.translate( source, map );
-				var expected = '<bx:if condition="' & h( "variables.page.title" ) & '">A<bx:elseif condition="' & h( "variables.siteConfig.name" ) & '">B<bx:else>C</bx:if>';
+				var expected = '<bx:if variables.page.title>A<bx:elseif variables.siteConfig.name>B<bx:else>C</bx:if>';
 				expect( result.output ).toBe( expected );
 			} );
 
@@ -96,7 +96,7 @@ class extends="testbox.system.BaseSpec" {
 				// isn't valid BoxLang - it must never appear literally in the
 				// output.
 				expect( result.output ).notToInclude( ".Draft" );
-				expect( result.output ).toBe( '<bx:if condition="' & h( "false" ) & '">Hi</bx:if>' );
+				expect( result.output ).toBe( '<bx:if false>Hi</bx:if>' );
 				expect( result.warnings.len() ).toBe( 1 );
 				expect( result.warnings[ 1 ] ).toInclude( ".Draft" );
 			} );
@@ -108,7 +108,7 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "translates a mapped `not .Field` condition into BoxLang's own `not` keyword", function() {
 				var result = translator.translate( "{{ if not .Title }}Hi{{ end }}", map );
-				expect( result.output ).toBe( '<bx:if condition="' & h( "not variables.page.title" ) & '">Hi</bx:if>' );
+				expect( result.output ).toBe( '<bx:if not variables.page.title>Hi</bx:if>' );
 				expect( result.warnings ).toBeEmpty();
 			} );
 
@@ -122,7 +122,7 @@ class extends="testbox.system.BaseSpec" {
 				var result = translator.translate( '{{ if eq .Title "home" }}Hi{{ end }}', map );
 				expect( result.output ).notToInclude( ".Title" );
 				expect( result.output ).notToInclude( "eq" );
-				expect( result.output ).toBe( '<bx:if condition="' & h( "false" ) & '">Hi</bx:if>' );
+				expect( result.output ).toBe( '<bx:if false>Hi</bx:if>' );
 				expect( result.warnings.len() ).toBe( 1 );
 				expect( result.warnings[ 1 ] ).toInclude( "prefix function call" );
 			} );
@@ -149,7 +149,7 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "handles Go's whitespace-trim markers ({{- -}})", function() {
 				var result = translator.translate( "{{- if .Title -}}Hi{{- end -}}", map );
-				expect( result.output ).toBe( '<bx:if condition="' & h( "variables.page.title" ) & '">Hi</bx:if>' );
+				expect( result.output ).toBe( '<bx:if variables.page.title>Hi</bx:if>' );
 			} );
 
 		} );

@@ -193,15 +193,15 @@
 	<meta property="og:site_name" content="#encodeForHTML( variables.siteConfig.name )#">
 	<meta property="og:title" content="#encodeForHTML( variables.page.title )#">
 	#renderArticleMeta()#
-</bx:output><bx:if condition="#len( variables.page.canonicalUrl )#"><bx:output>
+</bx:output><bx:if len( variables.page.canonicalUrl )><bx:output>
 	<link rel="canonical" href="#encodeForHTML( variables.page.canonicalUrl )#">
-</bx:output></bx:if><bx:if condition="#len( variables.ogDescription )#"><bx:output>
+</bx:output></bx:if><bx:if len( variables.ogDescription )><bx:output>
 	<meta name="description" content="#encodeForHTML( variables.ogDescription )#">
 	<meta property="og:description" content="#encodeForHTML( variables.ogDescription )#">
-</bx:output></bx:if><bx:if condition="#len( variables.ogImageUrl )#"><bx:output>
+</bx:output></bx:if><bx:if len( variables.ogImageUrl )><bx:output>
 	<meta property="og:image" content="#resolveAssetUrl( variables.ogImageUrl )#">
 	<meta name="twitter:card" content="summary_large_image">
-</bx:output></bx:if><bx:if condition="#len( variables.faviconUrl )#"><bx:output>
+</bx:output></bx:if><bx:if len( variables.faviconUrl )><bx:output>
 	<link rel="icon" href="#resolveAssetUrl( variables.faviconUrl )#">
 </bx:output></bx:if><bx:output>
 	<script>
@@ -218,11 +218,11 @@
 	<link rel="stylesheet" href="#variables.basePath#assets/vendor/highlight/github.min.css">
 	<link rel="stylesheet" href="#variables.basePath#assets/theme/style.css">
 	#renderExtraCss( variables.siteConfig.extraCss ?: [] )#
-</bx:output><bx:if condition="#variables.mathEnabled#"><bx:output>
+</bx:output><bx:if variables.mathEnabled><bx:output>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-</bx:output></bx:if><bx:if condition="#variables.openapiEnabled#"><bx:output>
+</bx:output></bx:if><bx:if variables.openapiEnabled><bx:output>
 	<link rel="stylesheet" href="#variables.basePath#assets/vendor/swagger-ui/swagger-ui.css">
-</bx:output></bx:if><bx:if condition="#variables.analyticsProvider == 'google'#"><bx:output>
+</bx:output></bx:if><bx:if variables.analyticsProvider == 'google'><bx:output>
 	<script async src="https://www.googletagmanager.com/gtag/js?id=#encodeForHTML( variables.analyticsId )#"></script>
 	<script>
 		window.dataLayer = window.dataLayer || [];
@@ -230,14 +230,14 @@
 		gtag('js', new Date());
 		gtag('config', '#variables.analyticsId#');
 	</script>
-</bx:output></bx:if><bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'local'#"><bx:output>
+</bx:output></bx:if><bx:if variables.searchEnabled and variables.searchProviderName eq 'local'><bx:output>
 	<script>window.__BXSITES_BASE_PATH__ = "#variables.basePath#";</script>
 	<script>window.__BXSITES_SEARCH_NO_RESULTS__ = "#encodeForJavaScript( variables.strings.searchNoResults )#";</script>
 	<script src="#variables.basePath#assets/vendor/minisearch/minisearch.js"></script>
 	<script src="#variables.basePath#assets/search.js" defer></script>
-</bx:output></bx:if><bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'algolia'#"><bx:output>
+</bx:output></bx:if><bx:if variables.searchEnabled and variables.searchProviderName eq 'algolia'><bx:output>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
-</bx:output></bx:if><bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'pagefind'#"><bx:output>
+</bx:output></bx:if><bx:if variables.searchEnabled and variables.searchProviderName eq 'pagefind'><bx:output>
 	<link rel="stylesheet" href="#variables.basePath#pagefind/pagefind-ui.css">
 </bx:output></bx:if><bx:output>
 	<script src="#variables.basePath#assets/vendor/alpine/cdn.min.js" defer></script>
@@ -247,12 +247,12 @@
 		<button class="vp-nav-toggle" type="button" aria-controls="bxsites-sidebar" aria-label="#encodeForHTML( variables.strings.toggleNavigation )#" onclick="document.getElementById('bxsites-sidebar').classList.toggle('vp-sidebar--open')">☰</button>
 		<a class="vp-header__brand" href="#variables.basePath#">#renderBrandMark()#</a>
 		<div class="vp-header__controls">
-</bx:output><bx:if condition="#variables.searchEnabled#"><bx:include template="#variables.themeDir#/search.bxm"></bx:if><bx:output>
-</bx:output><bx:if condition="#variables.versions.len() gt 1#"><bx:output>
+</bx:output><bx:if variables.searchEnabled><bx:include template="#variables.themeDir#/search.bxm"></bx:if><bx:output>
+</bx:output><bx:if variables.versions.len() gt 1><bx:output>
 			#renderVersionSwitcher( variables.versions, variables.currentVersion )#
-</bx:output></bx:if><bx:if condition="#variables.locales.len() gt 1#"><bx:output>
+</bx:output></bx:if><bx:if variables.locales.len() gt 1><bx:output>
 			#renderLocaleDropdown( variables.locales, variables.currentLocale )#
-</bx:output></bx:if><bx:if condition="#len( variables.repoUrl )#"><bx:output>
+</bx:output></bx:if><bx:if len( variables.repoUrl )><bx:output>
 			<a class="repo-link" href="#bxsitesUrlAttr( variables.repoUrl )#" target="_blank" rel="noopener noreferrer" aria-label="#encodeForHTML( variables.strings.repository )#" title="#encodeForHTML( variables.strings.repository )#">#bxsitesIcon( "github" )#</a>
 </bx:output></bx:if><bx:output>
 			<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="#encodeForHTML( variables.strings.toggleDarkMode )#">
@@ -268,17 +268,17 @@
 		<main class="vp-content">
 </bx:output><bx:include template="#variables.themeDir#/page.bxm"><bx:output>
 		</main>
-</bx:output><bx:if condition="#variables.tocPosition == 'sticky' and variables.page.toc.len() gt 0#"><bx:output>
+</bx:output><bx:if variables.tocPosition == 'sticky' and variables.page.toc.len() gt 0><bx:output>
 		<aside class="vp-toc-sidebar">
 			#renderToc( variables.page.toc )#
 		</aside>
 </bx:output></bx:if><bx:output>
 	</div>
-</bx:output><bx:if condition="#variables.footerEnabled#"><bx:output>
+</bx:output><bx:if variables.footerEnabled><bx:output>
 	<footer class="bxsites-footer">
 		<div class="bxsites-footer__inner">
 			<div class="bxsites-footer__copy">&copy; #year( now() )# #encodeForHTML( variables.siteConfig.name )#</div>
-</bx:output><bx:if condition="#variables.socialLinks.len() gt 0#"><bx:output>
+</bx:output><bx:if variables.socialLinks.len() gt 0><bx:output>
 			<div class="bxsites-footer__social">#renderSocialLinks( variables.socialLinks )#</div>
 </bx:output></bx:if><bx:output>
 			<div class="bxsites-footer__credit">Built with <a href="https://github.com/ortus-boxlang/bx-sites" target="_blank" rel="noopener noreferrer">BX Sites</a></div>
@@ -296,17 +296,17 @@
 	<script src="#variables.basePath#assets/tabs.js" defer></script>
 	<script src="#variables.basePath#assets/conditional-content-init.js" defer></script>
 	<script src="#variables.basePath#assets/prompt-init.js" defer></script>
-</bx:output><bx:if condition="#variables.mermaidEnabled#"><bx:output>
+</bx:output><bx:if variables.mermaidEnabled><bx:output>
 	<script src="#variables.basePath#assets/vendor/mermaid/mermaid.min.js"></script>
 	<script src="#variables.basePath#assets/mermaid-init.js"></script>
-</bx:output></bx:if><bx:if condition="#variables.mathEnabled#"><bx:output>
+</bx:output></bx:if><bx:if variables.mathEnabled><bx:output>
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 	<script src="#variables.basePath#assets/math-init.js"></script>
-</bx:output></bx:if><bx:if condition="#variables.openapiEnabled#"><bx:output>
+</bx:output></bx:if><bx:if variables.openapiEnabled><bx:output>
 	<script src="#variables.basePath#assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
 	<script src="#variables.basePath#assets/openapi-init.js"></script>
-</bx:output></bx:if><bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'algolia'#"><bx:output>
+</bx:output></bx:if><bx:if variables.searchEnabled and variables.searchProviderName eq 'algolia'><bx:output>
 	<script src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>
 	<script>
 		document.addEventListener( "DOMContentLoaded", function () {
@@ -319,7 +319,7 @@
 			} );
 		} );
 	</script>
-</bx:output></bx:if><bx:if condition="#variables.searchEnabled and variables.searchProviderName eq 'pagefind'#"><bx:output>
+</bx:output></bx:if><bx:if variables.searchEnabled and variables.searchProviderName eq 'pagefind'><bx:output>
 	<script src="#variables.basePath#pagefind/pagefind-ui.js"></script>
 	<script>
 		document.addEventListener( "DOMContentLoaded", function () {

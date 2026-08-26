@@ -93,7 +93,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( layout ).toInclude( "<!--- TODO:" );
 
 				var page = fileRead( destDir & "/page.bxm" );
-				expect( page ).toInclude( '<bx:if condition="' & h( "variables.page.title" ) & '">' );
+				expect( page ).toInclude( '<bx:if variables.page.title>' );
 				expect( page ).toInclude( h( "variables.page.title" ) );
 
 				expect( result.message ).toInclude( "mkblog" );
@@ -117,7 +117,7 @@ class extends="testbox.system.BaseSpec" {
 
 				var page = fileRead( destDir & "/page.bxm" );
 				expect( page ).notToInclude( ".Draft" );
-				expect( page ).toInclude( '<bx:if condition="' & h( "false" ) & '">' );
+				expect( page ).toInclude( '<bx:if false>' );
 				expect( page ).toInclude( h( "variables.page.title" ) );
 
 				expect( result.message ).toInclude( "item(s) need a manual look" );

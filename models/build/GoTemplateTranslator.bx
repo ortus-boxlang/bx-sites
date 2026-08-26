@@ -121,11 +121,11 @@ class {
 
 		if ( trimmed.reFindNoCase( "^if\s+" ) ) {
 			arguments.blockStack.append( "if" )
-			return '<bx:if condition="' & variables.hash & translateExpr( trimmed.reReplaceNoCase( "^if\s+", "" ), arguments.variableMap, arguments.warnings, false, "false" ) & variables.hash & '">'
+			return '<bx:if ' & translateExpr( trimmed.reReplaceNoCase( "^if\s+", "" ), arguments.variableMap, arguments.warnings, false, "false" ) & '>'
 		}
 
 		if ( trimmed.reFindNoCase( "^else\s+if\s+" ) ) {
-			return '<bx:elseif condition="' & variables.hash & translateExpr( trimmed.reReplaceNoCase( "^else\s+if\s+", "" ), arguments.variableMap, arguments.warnings, false, "false" ) & variables.hash & '">'
+			return '<bx:elseif ' & translateExpr( trimmed.reReplaceNoCase( "^else\s+if\s+", "" ), arguments.variableMap, arguments.warnings, false, "false" ) & '>'
 		}
 
 		if ( trimmed.reFindNoCase( "^else$" ) ) {
