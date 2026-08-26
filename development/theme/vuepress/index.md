@@ -37,8 +37,9 @@ by Docsy, Stripe, Docusaurus, Just the Docs, VuePress, GitBook and Notion -
 all overridable with your own theme.
 :::
 ::: card title="Static, client-side search" icon="phosphor-duotone:magnifying-glass" href="guides/search.md"
-A MiniSearch-powered search box (fuzzy matching, prefix search) wired
-against a search index built at `build` time - no server dependency.
+A MiniSearch-powered search box (fuzzy matching, prefix search) plus a
+Cmd/Ctrl+K command palette, wired against a search index built at `build`
+time - no server dependency.
 :::
 ::: card title="A blog, out of the box" icon="lucide:newspaper" href="guides/blog.md"
 Drop posts under `docs/blog/posts/` and get authors, categories, year
@@ -63,10 +64,23 @@ ForgeBox.
 theme templates into a bx-sites scaffold to build on, instead of starting
 from scratch.
 :::
-::: card title="Migrate from GitBook or mkdocs" icon="phosphor-duotone:swap" href="guides/index.md"
-`bxSites migrate --source=... --from=gitbook|mkdocs` converts an existing
-GitBook export or mkdocs project into a working bx-sites project in one
-command.
+::: card title="Migrate from GitBook, mkdocs, a zip, or Notion" icon="phosphor-duotone:swap" href="guides/index.md"
+`bxSites migrate --from=gitbook|mkdocs|markdown-zip|notion` converts an
+existing export or project into a working bx-sites project in one command.
+:::
+::: card title="Ship it anywhere" icon="phosphor-duotone:cloud-arrow-up" href="guides/deployment.md"
+`bxSites deploy` ships the built site straight to S3, Azure, GCS, Firebase,
+FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages, or GitHub Pages - or
+`bxSites package` zips it into a single archive instead.
+:::
+::: card title="Reusable variables & magic functions" icon="phosphor-duotone:function" href="guides/variables-and-functions.md"
+`{{ dotted.path }}` pulls from `bxsites.yaml`'s own `variables` block;
+`{{ $name(args) }}` calls a small BoxLang helper straight from Markdown -
+no plugin, no wiring.
+:::
+::: card title="Rich content blocks" icon="phosphor-duotone:squares-four" href="guides/content-blocks.md"
+Tables, buttons, prompts, expandables, tabs, and embedded OpenAPI specs -
+a GitBook-style block library on top of plain Markdown.
 :::
 :::
 
@@ -123,8 +137,8 @@ Posts, authors, categories, archives, RSS, drafts, and a stats page.
 ::: card title="Responsive Images & Asset Pipeline" icon="phosphor-duotone:image" href="guides/images.md"
 Automatic image resizing/WebP, and fingerprinted CSS/JS bundling.
 :::
-::: card title="Deploying to GitHub Pages" icon="phosphor-duotone:cloud-arrow-up" href="guides/deployment.md"
-The built-in GitHub Actions workflow.
+::: card title="Deployment" icon="phosphor-duotone:cloud-arrow-up" href="guides/deployment.md"
+`deploy`/`package`, and the built-in GitHub Actions workflow.
 :::
 ::: card title="Releases" icon="phosphor-duotone:tag" href="releases/index.md"
 Versioning policy and what's new per release.

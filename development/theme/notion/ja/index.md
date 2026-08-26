@@ -37,8 +37,9 @@ Just the Docs・VuePress・GitBook・Notion にインスパイアされた 7 個
 フルギャラリー - すべて独自テーマで上書き可能です。
 :::
 ::: card title="静的なクライアントサイド検索" icon="phosphor-duotone:magnifying-glass" href="guides/search.md"
-`build` 時に生成される検索インデックスと連携する lunr.js 駆動の検索ボックス -
-サーバー依存なし。
+あいまい検索・前方一致検索に対応した MiniSearch 駆動の検索ボックスに加え、
+Cmd/Ctrl+K コマンドパレットも搭載 - `build` 時に生成される検索インデックスと
+連携し、サーバー依存なし。
 :::
 ::: card title="標準搭載のブログ" icon="lucide:newspaper" href="guides/blog.md"
 `docs/blog/posts/` に投稿を置くだけで、著者・カテゴリ・年別アーカイブ・
@@ -64,10 +65,24 @@ RSS フィード・投稿ごとのアイキャッチ画像が設定不要で手�
 テーマテンプレートを bx-sites のスキャフォールドに変換します - ゼロから
 書き直す代わりに、そこから作り込めます。
 :::
-::: card title="GitBook または mkdocs から移行" icon="phosphor-duotone:swap" href="guides/index.md"
-`bxSites migrate --source=... --from=gitbook|mkdocs` コマンドで、既存の
-GitBook エクスポートまたは mkdocs プロジェクトを、一つのコマンドで動作する
-bx-sites プロジェクトに変換します。
+::: card title="GitBook、mkdocs、zip、または Notion から移行" icon="phosphor-duotone:swap" href="guides/index.md"
+`bxSites migrate --from=gitbook|mkdocs|markdown-zip|notion` は、既存の
+エクスポートやプロジェクトを、一つのコマンドで動作する bx-sites プロジェクトに
+変換します。
+:::
+::: card title="どこへでもデプロイ" icon="phosphor-duotone:cloud-arrow-up" href="guides/deployment.md"
+`bxSites deploy` は、ビルドしたサイトを S3、Azure、GCS、Firebase、FTP/SFTP、
+rsync、Netlify、Vercel、Cloudflare Pages、GitHub Pages に直接デプロイします -
+`bxSites package` なら単一のアーカイブに zip 圧縮することもできます。
+:::
+::: card title="再利用可能な変数とマジック関数" icon="phosphor-duotone:function" href="guides/variables-and-functions.md"
+`{{ dotted.path }}` は `bxsites.yaml` 自身の `variables` ブロックから値を
+取得し、`{{ $name(args) }}` は Markdown から直接、小さな BoxLang ヘルパー
+関数を呼び出します - プラグインも配線も不要です。
+:::
+::: card title="リッチなコンテンツブロック" icon="phosphor-duotone:squares-four" href="guides/content-blocks.md"
+テーブル、ボタン、プロンプト、展開可能セクション、タブ、埋め込み OpenAPI
+仕様 - 素の Markdown の上に構築された GitBook スタイルのブロックライブラリです。
 :::
 :::
 
@@ -124,8 +139,8 @@ Admonition、タブ、カード、コールアウト、数式、Mermaid ダイ�
 ::: card title="レスポンシブ画像 & アセットパイプライン" icon="phosphor-duotone:image" href="guides/images.md"
 自動画像リサイズ/WebP 変換と、フィンガープリント付き CSS/JS バンドリング。
 :::
-::: card title="GitHub Pages へのデプロイ" icon="phosphor-duotone:cloud-arrow-up" href="guides/deployment.md"
-組み込みの GitHub Actions ワークフロー。
+::: card title="デプロイ" icon="phosphor-duotone:cloud-arrow-up" href="guides/deployment.md"
+`deploy`/`package` コマンドと、組み込みの GitHub Actions ワークフロー。
 :::
 ::: card title="リリース" icon="phosphor-duotone:tag" href="releases/index.md"
 バージョニングポリシーと各リリースの新機能。

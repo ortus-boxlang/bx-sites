@@ -9,7 +9,7 @@ icon: phosphor-duotone:book-open
 - [テーマ](themes.md) - 組み込みテーマと独自テーマの作成方法
 - [アイコン](icons.md) - 絵文字、または8つの同梱ライブラリのいずれかからの名前付きアイコンを、任意のページ/nav エントリで使用する方法
 - [検索](search.md) - 静的検索インデックスの仕組み
-- [GitHub Pages へのデプロイ](deployment.md) - 組み込みの GitHub Actions ワークフロー
+- [デプロイ](deployment.md) - `bxSites deploy` で S3、Azure、GCS、Firebase、FTP/SFTP、rsync、Netlify、Vercel、Cloudflare Pages、または GitHub Pages へ
 - [Markdown 拡張機能](markdown.md) - Admonition、脚注、定義リスト、Mermaid ダイアグラム
 - [コンテンツブロック](content-blocks.md) - GitBook スタイルのブロック: 展開可能セクション、カード、列、ステッパー、ボタン、再利用可能なコンテンツインクルード
 - [テーブル](tables.md) - GFM パイプテーブル、常に有効、自動のレスポンシブスクロール/固定ヘッダー処理付き

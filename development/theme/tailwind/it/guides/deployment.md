@@ -1,25 +1,266 @@
 ---
-title: Distribuire su GitHub Pages
+title: Distribuzione
 order: 3
 icon: phosphor-duotone:cloud-arrow-up
 tags: [guide, distribuzione]
 ---
 
-# Distribuire su GitHub Pages
+# Distribuzione
 
 `site/` è un semplice sito statico - ospitalo ovunque vengano serviti
-file statici. Questo modulo include un workflow GitHub Actions già pronto
-all'uso (`.github/workflows/pages.yml`) per il caso comune: pubblicare
-direttamente su GitHub Pages, con `main` e `development` pubblicati come
-due versioni dello stesso sito, live in modo indipendente.
+file statici. [`bxSites deploy`](../cli-reference.md#deploy) lo invia lì
+direttamente, con un solo comando: S3 (e qualsiasi servizio compatibile
+con S3 - DigitalOcean Spaces, Cloudflare R2, Backblaze B2, MinIO), Azure
+Blob Storage, Google Cloud Storage, Firebase Hosting, FTP, SFTP, rsync
+via SSH, Netlify, Vercel, Cloudflare Pages, una directory locale, oppure
+GitHub Pages.
 
-Per un progetto più semplice, con una sola versione e nessuna
-configurazione di CI, [`bxSites gh-deploy`](../cli-reference.md#gh-deploy)
-compila e invia `site/` a un branch `gh-pages` con un solo comando,
-eseguito dalla tua stessa macchina ogni volta che vuoi pubblicare -
-nessun file di workflow necessario. Il resto di questa guida copre il
-workflow GitHub Actions usato da questo stesso repository, per la
-pubblicazione automatica multi-versione a ogni push.
+## Il comando `deploy`
+
+Ogni target tranne i due più semplici (`local`/`github-pages`, che
+funzionano soltanto con dei flag - vedi
+[Riferimento CLI](../cli-reference.md#deploy)) viene configurato tramite
+un file `deployments/<nome>.json` nella radice del progetto - un file per
+ogni target di deploy che usi realmente, ciascuno indicando quale
+`target` è, oltre ai campi propri di quel target:
+
+```bash frame="terminal" title="Terminal"
+bxSites deploy --entry=production
+```
+
+```json title="deployments/production.json"
+{ "target": "s3", "bucket": "my-docs-site", "accessKeyIdEnvVar": "AWS_ACCESS_KEY_ID", "secretAccessKeyEnvVar": "AWS_SECRET_ACCESS_KEY" }
+```
+
+**I segreti provengono sempre da una variabile d'ambiente, mai da un
+valore letterale in `deployments/*.json`.** Ogni campo che termina in
+`EnvVar` indica il nome della *variabile d'ambiente* che contiene il
+segreto vero e proprio (una chiave d'accesso, una password, un token
+API) - risolta dal vivo al momento del deploy, quindi `deployments/*.json`
+di per sé è sempre sicuro da mettere sotto controllo di versione. Un
+campo che è invece un *percorso* verso un file di credenziali che già
+gestisci tu stesso (una chiave privata SSH, una chiave JSON di service
+account GCP scaricata) è la sola eccezione - un campo semplice, dato che
+è il file stesso a dover restare fuori dal controllo di versione, non il
+suo percorso. In locale, quelle variabili d'ambiente possono provenire
+anche da un file `.env` (BoxLang ne carica uno automaticamente e
+`getSystemSetting()` - quello che ogni target usa per risolverle - lo
+controlla in modo trasparente) invece di esportarle a mano nella tua
+shell; in CI, impostale come veri segreti sul runner.
+
+### Distribuire su tutti i target contemporaneamente
+
+Esegui `bxSites deploy` senza `--entry` né `--target` e ogni voce
+`deployments/*.json` viene distribuita a turno, a partire da un'unica
+build condivisa:
+
+```bash frame="terminal" title="Terminal"
+bxSites deploy
+```
+
+Il sito viene compilato una sola volta, indipendentemente da quante voci
+hai. Il fallimento di un target non ferma gli altri - ogni voce viene
+tentata, e il comando esce con un codice diverso da zero solo se almeno
+una di esse è fallita; il riepilogo riporta quante sono andate a buon
+fine (ad es. `Deployed to 2/3 target(s) (1 failed)`). Aggiungi
+`--verbose` (funziona anche con `--entry`/`--target`) per stampare una
+riga di avanzamento quando la build e ciascun target iniziano e
+finiscono, invece del solo riepilogo finale.
+
+### `local`
+
+Copia il sito compilato in qualsiasi directory - un'unità condivisa, una
+cartella di staging, ovunque. È l'unico target che non necessita affatto
+di una voce in `deployments/`.
+
+```bash frame="terminal" title="Terminal"
+bxSites deploy --target=local --destination=/percorso/di/destinazione
+```
+
+### `github-pages`
+
+Lo stesso push che fa [`gh-deploy`](../cli-reference.md#gh-deploy),
+raggiungibile anche da questo comando unificato - anch'esso non
+necessita di alcuna voce in `deployments/`:
+
+```bash frame="terminal" title="Terminal"
+bxSites deploy --target=github-pages [--branch=gh-pages] [--remote=origin] [--message="..."]
+```
+
+### `s3`
+
+Vero AWS S3, oppure qualsiasi servizio compatibile con S3 - imposta
+`endpoint` per qualsiasi cosa diversa da AWS stesso, e
+`forcePathStyle: true` per la maggior parte dei provider non-AWS.
+
+```json title="deployments/production.json"
+{
+  "target": "s3",
+  "bucket": "my-docs-site",
+  "region": "us-east-1",
+  "prefix": "",
+  "accessKeyIdEnvVar": "AWS_ACCESS_KEY_ID",
+  "secretAccessKeyEnvVar": "AWS_SECRET_ACCESS_KEY"
+}
+```
+
+```json title="deployments/spaces.json (DigitalOcean Spaces)"
+{
+  "target": "s3",
+  "bucket": "my-docs-site",
+  "endpoint": "https://nyc3.digitaloceanspaces.com",
+  "forcePathStyle": true,
+  "accessKeyIdEnvVar": "SPACES_KEY",
+  "secretAccessKeyEnvVar": "SPACES_SECRET"
+}
+```
+
+La stessa struttura (`endpoint` personalizzato + `forcePathStyle: true`)
+copre anche Cloudflare R2 (`https://<accountid>.r2.cloudflarestorage.com`),
+Backblaze B2, e MinIO/Wasabi.
+
+### `azure`
+
+Azure Blob Storage, autenticato con un token SAS, una chiave d'account, o
+una connection string completa - esattamente uno dei tre.
+
+```json title="deployments/production.json"
+{
+  "target": "azure",
+  "account": "mystorageaccount",
+  "container": "site",
+  "accountKeyEnvVar": "AZURE_STORAGE_KEY"
+}
+```
+
+### `gcs`
+
+Google Cloud Storage, autenticato con una chiave JSON di service account
+scaricata (Google Cloud Console -> IAM & Admin -> Service Accounts ->
+Keys).
+
+```json title="deployments/production.json"
+{
+  "target": "gcs",
+  "bucket": "my-docs-site",
+  "serviceAccountKeyPath": "/path/to/service-account.json"
+}
+```
+
+### `firebase`
+
+Firebase Hosting, che utilizza lo stesso tipo di chiave di service
+account di `gcs`.
+
+```json title="deployments/production.json"
+{
+  "target": "firebase",
+  "siteId": "my-firebase-site",
+  "serviceAccountKeyPath": "/path/to/service-account.json"
+}
+```
+
+### `ftp` / `sftp`
+
+Carica l'intero sito su un server remoto via FTP o SFTP, preservandone la
+struttura delle cartelle. SFTP accetta una password oppure una chiave
+SSH.
+
+```json title="deployments/production.json"
+{
+  "target": "sftp",
+  "host": "example.com",
+  "username": "deploy",
+  "remotePath": "/var/www/html",
+  "key": "/home/me/.ssh/id_rsa"
+}
+```
+
+### `rsync`
+
+Sincronizza il sito con un server remoto via SSH usando il vero binario
+`rsync` - più veloce di FTP/SFTP per una ricompilazione completa, dato
+che trasferisce solo ciò che è cambiato. Richiede `rsync` e `ssh` sulla
+macchina che esegue `bxSites`.
+
+```json title="deployments/production.json"
+{
+  "target": "rsync",
+  "host": "example.com",
+  "username": "deploy",
+  "remotePath": "/var/www/html",
+  "identityFile": "/home/me/.ssh/id_rsa"
+}
+```
+
+### `netlify`
+
+```json title="deployments/production.json"
+{
+  "target": "netlify",
+  "siteId": "my-site-id-or-name.netlify.app",
+  "authTokenEnvVar": "NETLIFY_AUTH_TOKEN"
+}
+```
+
+### `vercel`
+
+```json title="deployments/production.json"
+{
+  "target": "vercel",
+  "projectId": "my-project",
+  "authTokenEnvVar": "VERCEL_TOKEN"
+}
+```
+
+### `cloudflare-pages`
+
+Cloudflare non dispone di un'API REST ufficialmente documentata per i
+deploy a caricamento diretto - solo della propria CLI `wrangler`. Questo
+target replica, per ingegneria inversa, lo stesso flusso di upload di
+Wrangler, e richiede un'implementazione dell'hash BLAKE3 nel classpath
+della JVM che la maggior parte delle installazioni Java predefinite non
+include - vedi [Riferimento CLI](../cli-reference.md#deploy) e il codice
+sorgente stesso del target per il quadro completo e onesto sulle
+asperità di questo target.
+
+```json title="deployments/production.json"
+{
+  "target": "cloudflare-pages",
+  "accountId": "your-account-id",
+  "projectName": "my-project",
+  "apiTokenEnvVar": "CLOUDFLARE_API_TOKEN"
+}
+```
+
+## Il comando `package`
+
+Preferisci un semplice archivio rispetto a uno qualsiasi dei target qui
+sopra - allegare una build a una release GitHub, consegnarla a un host
+che accetta solo il caricamento di uno zip, oppure spedirla in un posto
+che nessuno dei target collegabili raggiunge?
+[`bxSites package`](../cli-reference.md#package) compila il sito, poi lo
+comprime in un unico file la cui radice è il contenuto stesso del sito
+compilato (non una cartella `site/` che lo racchiude):
+
+```bash frame="terminal" title="Terminal"
+bxSites package
+bxSites package --output=dist/my-site.zip
+```
+
+`--output` ha come valore predefinito `<projectRoot>/site.zip`; un
+valore relativo viene risolto rispetto alla radice del progetto, e le
+sue cartelle padre vengono create automaticamente se non esistono già.
+
+## GitHub Actions (pubblicazione multi-versione)
+
+Per la pubblicazione automatica a ogni push, invece di un
+`bxSites deploy`/`gh-deploy` eseguito manualmente, questo modulo include
+un workflow GitHub Actions già pronto all'uso
+(`.github/workflows/pages.yml`) che pubblica `main` e `development` come
+due versioni dello stesso sito su GitHub Pages, live in modo indipendente.
+Il resto di questa guida copre questo workflow, usato dalla
+documentazione di questo stesso repository.
 
 ## Cosa fa
 

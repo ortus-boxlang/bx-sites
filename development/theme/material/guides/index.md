@@ -9,7 +9,7 @@ icon: phosphor-duotone:book-open
 - [Themes](themes.md) - the built-in themes, and how to write your own
 - [Icons](icons.md) - emoji, or a named icon from one of eight bundled libraries, on any page/nav entry
 - [Search](search.md) - how the static search index works
-- [Deploying to GitHub Pages](deployment.md) - the built-in GitHub Actions workflow
+- [Deployment](deployment.md) - `bxSites deploy` to S3, Azure, GCS, Firebase, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages, or GitHub Pages
 - [Markdown Extensions](markdown.md) - admonitions, footnotes, definition lists and Mermaid diagrams
 - [Content Blocks](content-blocks.md) - GitBook-style blocks: expandables, cards, columns, a stepper, buttons, and reusable content includes
 - [Tables](tables.md) - GFM pipe tables, always on, with an automatic responsive-scroll/sticky-header treatment

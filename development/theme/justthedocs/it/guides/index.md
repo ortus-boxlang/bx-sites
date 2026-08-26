@@ -9,7 +9,7 @@ icon: phosphor-duotone:book-open
 - [Temi](themes.md) - i temi integrati e come scriverne uno tuo
 - [Icone](icons.md) - emoji, oppure un'icona con nome da una delle otto librerie incluse, su qualsiasi pagina/voce di nav
 - [Ricerca](search.md) - come funziona l'indice di ricerca statico
-- [Distribuire su GitHub Pages](deployment.md) - il workflow GitHub Actions integrato
+- [Distribuzione](deployment.md) - `bxSites deploy` su S3, Azure, GCS, Firebase, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages, o GitHub Pages
 - [Estensioni Markdown](markdown.md) - ammonizioni, note a piè di pagina, liste di definizioni e diagrammi Mermaid
 - [Blocchi di contenuto](content-blocks.md) - blocchi in stile GitBook: espandibili, card, colonne, uno stepper, pulsanti, e contenuto riutilizzabile tramite include
 - [Tabelle](tables.md) - tabelle a pipe GFM, sempre attive, con un trattamento automatico di scorrimento responsive/intestazione fissa

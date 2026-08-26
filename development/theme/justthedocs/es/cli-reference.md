@@ -119,6 +119,63 @@ bxSites gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
 Consulta [Despliegue](guides/deployment.md) para la configuración completa
 de GitHub Pages (activar Pages para la rama, `baseURL`, etc.).
 
+## `deploy`
+
+Construye el sitio y luego lo envía a un destino de despliegue real - S3
+(y cualquier servicio compatible con S3 - DigitalOcean Spaces, Cloudflare
+R2, Backblaze B2, MinIO), Azure Blob Storage, Google Cloud Storage,
+Firebase Hosting, FTP, SFTP, rsync sobre SSH, Netlify, Vercel, Cloudflare
+Pages, un directorio local, o GitHub Pages (el mismo push que hace
+`gh-deploy`, solo que también accesible desde este comando unificado).
+
+```bash title="Uso"
+bxSites deploy --entry=<name> [--verbose]
+bxSites deploy [--target=local|github-pages] [target-specific flags] [--verbose]
+bxSites deploy [--verbose]
+```
+
+Tres formas de invocarlo:
+
+1. **`--entry=<name>`** - despacha al destino que declare un archivo
+   `deployments/<name>.json` (consulta más abajo). Todo destino salvo
+   `local`/`github-pages` lo necesita - hay más configuración de la que
+   un par de opciones puede razonablemente llevar.
+2. **`--target=<name>` con sus propias opciones** - un atajo solo con
+   opciones para los dos destinos más simples, que no necesitan ninguna
+   carpeta `deployments/`: `local` (`--destination=<path>`) y
+   `github-pages` (`[--branch] [--remote] [--message]`, todos los campos
+   opcionales, con los mismos valores por defecto que `gh-deploy`).
+3. **Ni una opción ni la otra - despliega todo.** Cada entrada
+   `deployments/*.json` se despliega por turno, a partir de una única
+   construcción compartida (el sitio se construye una sola vez, no una
+   vez por destino). Requiere que exista al menos una entrada
+   `deployments/*.json`. Que un destino falle no detiene el resto - se
+   intenta cada entrada, y el comando solo sale con un código distinto de
+   cero si al menos uno de ellos falló; el resumen final reporta cuántos
+   tuvieron éxito (por ejemplo, `Deployed to 2/3 target(s) (1 failed)`).
+
+`--verbose` imprime una línea de progreso a medida que la construcción
+comienza/termina y cada destino comienza/termina, en lugar de solo el
+resumen final de una línea.
+
+Consulta [Despliegue](guides/deployment.md) para la configuración propia
+de cada destino y un ejemplo real de `deployments/*.json` para cada uno.
+
+## `package`
+
+Construye el sitio y luego lo comprime en un único archivo distribuible -
+un zip simple cuya raíz son los propios contenidos del sitio construido
+(no una carpeta `site/` que lo envuelva), listo para adjuntar a un
+release o entregar a cualquier host que solo acepte una carga en zip.
+
+```bash title="Uso"
+bxSites package [--output=<path>]
+```
+
+`--output` por defecto es `<projectRoot>/site.zip` (un valor relativo se
+resuelve contra la raíz del proyecto); los directorios padre de un
+destino anidado se crean automáticamente.
+
 ## `migrate`
 
 Convierte un proyecto de documentación existente en este - `--from`

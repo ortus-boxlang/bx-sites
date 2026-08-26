@@ -121,6 +121,65 @@ bxSites gh-deploy [--branch=gh-pages] [--remote=origin] [--message="..."]
 Siehe [Deployment](guides/deployment.md) für die vollständige
 GitHub-Pages-Einrichtung (Pages für den Branch aktivieren, `baseURL` usw.).
 
+## `deploy`
+
+Baut die Website und liefert sie dann an ein echtes Deployment-Ziel aus -
+S3 (und jeden S3-kompatiblen Dienst - DigitalOcean Spaces, Cloudflare R2,
+Backblaze B2, MinIO), Azure Blob Storage, Google Cloud Storage, Firebase
+Hosting, FTP, SFTP, rsync über SSH, Netlify, Vercel, Cloudflare Pages, ein
+lokales Verzeichnis oder GitHub Pages (derselbe Push, den auch `gh-deploy`
+macht, nur eben auch über diesen einen einheitlichen Befehl erreichbar).
+
+```bash title="Usage"
+bxSites deploy --entry=<name> [--verbose]
+bxSites deploy [--target=local|github-pages] [target-specific flags] [--verbose]
+bxSites deploy [--verbose]
+```
+
+Drei Arten, es aufzurufen:
+
+1. **`--entry=<name>`** - leitet an das Ziel weiter, das eine
+   `deployments/<name>.json`-Datei deklariert (siehe unten). Jedes Ziel
+   außer `local`/`github-pages` braucht das - es gibt mehr Konfiguration,
+   als ein paar Flags sinnvoll tragen könnten.
+2. **`--target=<name>` mit seinen eigenen Flags** - eine reine
+   Flag-Kurzform für die beiden einfachsten Ziele, die überhaupt keinen
+   `deployments/`-Ordner brauchen: `local` (`--destination=<path>`) und
+   `github-pages` (`[--branch] [--remote] [--message]`, jedes Feld
+   optional, dieselben Standardwerte wie bei `gh-deploy`).
+3. **Kein Flag - alles deployen.** Jeder `deployments/*.json`-Eintrag wird
+   der Reihe nach deployt, ausgehend von einem einzigen gemeinsamen Build
+   (die Website wird einmal gebaut, nicht einmal pro Ziel). Setzt voraus,
+   dass mindestens ein `deployments/*.json`-Eintrag existiert. Schlägt ein
+   Ziel fehl, stoppt das die übrigen nicht - jeder Eintrag wird versucht,
+   und der Befehl liefert nur dann einen von null verschiedenen Exit-Code,
+   wenn mindestens einer davon fehlgeschlagen ist; die abschließende
+   Zusammenfassung meldet, wie viele erfolgreich waren (z. B. `Deployed to
+   2/3 target(s) (1 failed)`).
+
+`--verbose` gibt eine Fortschrittszeile aus, wenn der Build startet/endet
+und wenn jedes Ziel startet/endet, statt nur der abschließenden
+einzeiligen Zusammenfassung.
+
+Siehe [Deployment](guides/deployment.md) für die eigene Konfigurationsform
+jedes Ziels und ein echtes `deployments/*.json`-Beispiel für jedes davon.
+
+## `package`
+
+Baut die Website und packt sie dann in ein einziges, verteilbares Archiv -
+ein einfaches Zip, dessen Wurzel der Inhalt der gebauten Website selbst
+ist (kein umschließender `site/`-Ordner), bereit zum Anhängen an ein
+Release oder zur Übergabe an jeden Host, der nur einen Zip-Upload
+akzeptiert.
+
+```bash title="Usage"
+bxSites package [--output=<path>]
+```
+
+`--output` ist standardmäßig `<projectRoot>/site.zip` (ein relativer Wert
+wird gegenüber dem Projekt-Root aufgelöst); die übergeordneten
+Verzeichnisse eines verschachtelten Ziels werden automatisch angelegt.
+
 ## `migrate`
 
 Wandelt ein bestehendes Docs-Projekt in dieses um - `--from` wählt das
