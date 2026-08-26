@@ -39,10 +39,14 @@
 		var items = ""
 		if ( len( markdownHref ) ) {
 			items &= '<button type="button" class="bxsites-page-actions__item" data-bxsites-action="copy-markdown" data-bxsites-markdown-url="' & bxsitesUrlAttr( markdownHref ) & '">' & bxsitesIcon( "copy" ) & '<span>' & encodeForHTML( variables.strings.copyPageMarkdown ) & '</span></button>'
-			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( markdownHref ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "markdown" ) & '<span>' & encodeForHTML( variables.strings.viewAsMarkdown ) & '</span></a>'
 		}
 		if ( len( canonicalUrl ) ) {
 			items &= '<button type="button" class="bxsites-page-actions__item" data-bxsites-action="copy-link" data-bxsites-page-url="' & bxsitesUrlAttr( canonicalUrl ) & '">' & bxsitesIcon( "link" ) & '<span>' & encodeForHTML( variables.strings.copyPageLink ) & '</span></button>'
+		}
+		if ( len( markdownHref ) ) {
+			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( markdownHref ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "markdown" ) & '<span>' & encodeForHTML( variables.strings.viewAsMarkdown ) & '</span></a>'
+		}
+		if ( len( canonicalUrl ) ) {
 			items &= '<div class="bxsites-page-actions__divider" role="separator"></div>'
 			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://chatgpt.com/?q=" & urlEncodedFormat( "Read " & canonicalUrl & " so I can ask questions about it." ) ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "sparkle" ) & '<span>' & encodeForHTML( variables.strings.openInChatGPT ) & '</span></a>'
 			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://claude.ai/new?q=" & urlEncodedFormat( "Read " & canonicalUrl & " so I can ask questions about it." ) ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "sparkle" ) & '<span>' & encodeForHTML( variables.strings.openInClaude ) & '</span></a>'

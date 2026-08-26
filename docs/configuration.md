@@ -844,9 +844,9 @@ see `theme.options.pageActionsPosition` above) that opens a small menu:
 
 - **Copy page** - copies the page's own raw Markdown source to the
   clipboard.
-- **View as Markdown** - opens that same raw `.md` source in a new tab.
 - **Copy link** - copies the page's absolute canonical URL to the
-  clipboard.
+  clipboard, right after "Copy page" since both are clipboard actions.
+- **View as Markdown** - opens that same raw `.md` source in a new tab.
 - **Open in ChatGPT** / **Open in Claude** - opens a new chat on the
   respective site, prefilled with a prompt pointing at the page's URL.
 - **Export as PDF** - triggers the browser's own print dialog

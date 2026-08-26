@@ -1020,6 +1020,15 @@ class extends="testbox.system.BaseSpec" {
 					expect( onHtml.reMatchNoCase( 'class="bxsites-page-actions__divider"' ).len() ).toBe( 3 );
 					expect( onHtml ).toInclude( "assets/page-actions-init.js" );
 					expect( fileExists( onRoot & "/site/assets/page-actions-init.js" ) ).toBeTrue();
+
+					// "Copy page" and "Copy link" sit right after each other -
+					// "View as Markdown" (also markdownHref-gated) comes after
+					// both, not squeezed between them.
+					var copyMarkdownPos = onHtml.find( 'data-bxsites-action="copy-markdown"' );
+					var copyLinkPos = onHtml.find( 'data-bxsites-action="copy-link"' );
+					var viewAsMarkdownPos = onHtml.find( "View as Markdown" );
+					expect( copyLinkPos ).toBeGT( copyMarkdownPos );
+					expect( viewAsMarkdownPos ).toBeGT( copyLinkPos );
 				}
 			} );
 
