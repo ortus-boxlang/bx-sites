@@ -1,0 +1,168 @@
+/**
+ * Deploys the already-built `site/` directory to Netlify via its real,
+ * officially documented "direct file upload" deploy flow - the simplest of
+ * the three new static-host targets (Netlify/Vercel/Cloudflare Pages) by a
+ * wide margin: a single `POST` of a zip archive of the whole site, no
+ * separate file-hashing/manifest round-trip required.
+ *
+ * CONFIRMED VIA RESEARCH (this session, 2026-08-26) against Netlify's own
+ * docs:
+ *  - docs.netlify.com's "Get started with the Netlify API" guide and
+ *    developers.netlify.com's "Deploy a zip file to a production website
+ *    using Netlify's Build API" guide both document:
+ *    `POST https://api.netlify.com/api/v1/sites/{site_id}/deploys` with
+ *    header `Content-Type: application/zip`, `Authorization: Bearer
+ *    <token>`, and the raw zip file bytes as the entire request body (no
+ *    multipart/form-data needed for this endpoint - that's a *different*,
+ *    separate `/sites/<site-id>/builds` endpoint for triggering a
+ *    *connected* build, not a direct-upload deploy, and not used here).
+ *  - `site_id` may be the site's UUID or its `*.netlify.app` subdomain -
+ *    this target just passes `siteId` straight through, whichever form the
+ *    caller's config supplies.
+ *  - The response body is the new Deploy object; `id`, `url` (draft URL),
+ *    `deploy_ssl_url`/`ssl_url` (the live HTTPS URL once this deploy is the
+ *    production one), and `admin_url` (Netlify's own dashboard link for
+ *    this deploy) all confirmed present on the real Deploy resource shape
+ *    per the same docs. Netlify enqueues post-processing asynchronously
+ *    after this call returns 200 - this target does not poll
+ *    `GET /api/v1/deploys/{deploy_id}` for a terminal `ready` state, so
+ *    `success: true` here means "Netlify accepted the upload", not "the
+ *    deploy has finished post-processing".
+ *
+ * NOT independently verified (no real Netlify account/token available in
+ * this sandbox): an actual end-to-end call against the live API. The zip
+ * archive built by `buildZipArchive()` below IS fully, offline verified
+ * (see NetlifyTargetSpec.bx) via a real zip-then-unzip round trip.
+ *
+ * @config { siteId (required), authTokenEnvVar (required - resolved via getSystemSetting() at deploy time, never a literal token) }
+ */
+class implements="models.deploy.IDeploymentTarget@bxsites" {
+
+	variables.API_BASE = "https://api.netlify.com/api/v1"
+
+	/**
+	 * @config This target's own resolved config (see the class docblock's `@config` shape)
+	 * @context { projectRoot, siteDir, config } - only `siteDir` is used
+	 *
+	 * @return { success, message, details: { deployId, url, adminUrl } }
+	 */
+	struct function deploy( required struct config, required struct context ) {
+		var siteId = trim( arguments.config.siteId ?: "" )
+		if ( !len( siteId ) ) {
+			throw( type = "BxSites.InvalidDeployConfig", message = "deploy target 'netlify' requires a 'siteId'" )
+		}
+		var authTokenEnvVar = trim( arguments.config.authTokenEnvVar ?: "" )
+		if ( !len( authTokenEnvVar ) ) {
+			throw( type = "BxSites.InvalidDeployConfig", message = "deploy target 'netlify' requires an 'authTokenEnvVar'" )
+		}
+
+		var siteDir = arguments.context.siteDir
+		if ( !directoryExists( siteDir ) ) {
+			throw(
+				type    = "BxSites.SiteNotBuilt",
+				message = "No [#siteDir#] to deploy - run `build` first"
+			)
+		}
+
+		var token = getSystemSetting( authTokenEnvVar, "" )
+		if ( !len( token ) ) {
+			throw(
+				type    = "BxSites.MissingCredentials",
+				message = "deploy target 'netlify' requires the #authTokenEnvVar# environment variable to hold a Netlify personal access token"
+			)
+		}
+
+		var zipBytes = buildZipArchive( siteDir )
+
+		var result = ""
+		bx:http url="#variables.API_BASE#/sites/#siteId#/deploys" method="POST" result="result" {
+			bx:httpparam type="header" name="Authorization" value="Bearer #token#";
+			bx:httpparam type="header" name="Content-Type" value="application/zip";
+			bx:httpparam type="body" value="#zipBytes#";
+		}
+		assertOk( result, "POST /sites/#siteId#/deploys" )
+
+		var body = jsonDeserialize( result.fileContent )
+		var url = len( body.deploy_ssl_url ?: "" ) ? body.deploy_ssl_url : ( body.ssl_url ?: ( body.url ?: "" ) )
+
+		return {
+			success : true,
+			message : "Deployed to Netlify - #url#",
+			details : { deployId : body.id ?: "", url : url, adminUrl : body.admin_url ?: "" }
+		}
+	}
+
+	/**
+	 * Zips `sourceDir` into an in-memory archive whose root IS the
+	 * directory's own contents (no wrapping top-level folder) - exactly the
+	 * shape Netlify's direct-upload endpoint expects. Pure/no HTTP, so
+	 * NetlifyTargetSpec.bx can fully verify it offline via a real
+	 * zip-then-unzip round trip.
+	 *
+	 * `directoryList( sourceDir, true, "path" )` with no glob pattern also
+	 * returns directory entries, not just files (a known gotcha in this
+	 * codebase) - filtered out below via `!directoryExists( path )`.
+	 *
+	 * @sourceDir Absolute path to the directory to zip (its own contents become the zip root)
+	 *
+	 * @return The zip archive's raw bytes
+	 */
+	binary function buildZipArchive( required string sourceDir ) {
+		var root = arguments.sourceDir.reReplace( "[\/]+$", "" )
+		var files = directoryList( root, true, "path" ).filter( function( path ) {
+			return !directoryExists( path )
+		} )
+
+		var buffer = createObject( "java", "java.io.ByteArrayOutputStream" ).init()
+		var zipStream = createObject( "java", "java.util.zip.ZipOutputStream" ).init( buffer )
+
+		try {
+			for ( var filePath in files ) {
+				var relativePath = filePath.replace( root, "", "one" )
+					.reReplace( "^[\/]+", "" )
+					.replace( char( 92 ), "/", "all" )
+				var entry = createObject( "java", "java.util.zip.ZipEntry" ).init( relativePath )
+				zipStream.putNextEntry( entry )
+				zipStream.write( readFileBytes( filePath ) )
+				zipStream.closeEntry()
+			}
+		} finally {
+			zipStream.close()
+		}
+
+		return buffer.toByteArray()
+	}
+
+	/**
+	 * Reads a file's raw bytes, guaranteed as real binary regardless of
+	 * extension - `fileReadBinary()` is NOT safe for this: confirmed in
+	 * this sandbox it silently returns a decoded STRING (not binary) for
+	 * common text-ish extensions like `.html`/`.txt` (only `isBinary()`
+	 * true for something like `.bin`), which would corrupt every text
+	 * asset written into the zip. `java.nio.file.Files.readAllBytes()`
+	 * has no such extension-based guessing.
+	 *
+	 * @path Absolute path to the file to read
+	 *
+	 * @return The file's exact raw bytes
+	 */
+	private binary function readFileBytes( required string path ) {
+		var nioPath = createObject( "java", "java.nio.file.Paths" ).get( arguments.path, [] )
+		return createObject( "java", "java.nio.file.Files" ).readAllBytes( nioPath )
+	}
+
+	/**
+	 * @result A `bx:http` result struct
+	 * @operation A short label for the request, used in the thrown error message, e.g. "POST /sites/xxx/deploys"
+	 */
+	private void function assertOk( required struct result, required string operation ) {
+		var statusCode = val( listFirst( arguments.result.statusCode ?: "0", " " ) )
+		if ( statusCode < 200 || statusCode >= 300 ) {
+			throw(
+				type    = "BxSites.DeployFailed",
+				message = "#arguments.operation# failed (status #arguments.result.statusCode#): #arguments.result.fileContent#"
+			)
+		}
+	}
+
+}

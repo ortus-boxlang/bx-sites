@@ -1,0 +1,287 @@
+/**
+ * Deploys the already-built `site/` directory to Firebase Hosting, via the
+ * real documented Firebase Hosting REST API's multi-step version-then-
+ * release flow (https://firebase.google.com/docs/hosting/api-deploy):
+ *
+ *  1. `POST /v1beta1/sites/{siteId}/versions` (empty body) - creates a new,
+ *     empty version, returning its `name` (`sites/{siteId}/versions/{id}`).
+ *  2. Gzip every file's bytes and SHA-256-hash the GZIPPED bytes (Firebase
+ *     Hosting hashes/dedupes on compressed content, not raw content).
+ *     `POST {versionName}:populateFiles` with `{"files": {"/path": "hash"}}`
+ *     - the response lists which hashes Firebase doesn't already have
+ *       (`uploadRequiredHashes`) and a base `uploadUrl` to upload them to.
+ *  3. For each required hash, `POST {uploadUrl}/{hash}` with that file's
+ *     gzipped bytes as the raw body and `Content-Type: application/octet-stream`.
+ *  4. `PATCH {versionName}?update_mask=status` with `{"status":"FINALIZED"}`
+ *     to close out the version (CREATED -> FINALIZED is the only legal
+ *     transition).
+ *  5. `POST /v1beta1/sites/{siteId}/releases?versionName={versionName}`
+ *     (empty body) to actually make the finalized version live.
+ *
+ * Every call's `Authorization: Bearer` token comes from
+ * `GoogleServiceAccountAuth.getAccessToken()`, requested once up front and
+ * reused for the whole flow.
+ *
+ * RESEARCHED, NOT LIVE-VERIFIED - important honesty caveat: this sandbox has
+ * no real Firebase project/service-account to deploy against, so nothing
+ * below was exercised against a live `firebasehosting.googleapis.com`.
+ * What's implemented is this class's best-verified understanding from
+ * Google's own current published docs and API reference pages (see the
+ * endpoint list above, confirmed step-by-step against
+ * https://firebase.google.com/docs/hosting/api-deploy and
+ * https://firebase.google.com/docs/hosting/reference/rest/v1beta1/sites.versions/*
+ * during this implementation), specifically:
+ *   - Steps 1-5's endpoint paths/methods/response field names
+ *     (`name`, `uploadRequiredHashes`, `uploadUrl`) are confirmed from the
+ *     official guide's own worked example.
+ *   - Step 3's exact upload contract (`POST {uploadUrl}/{hash}`, raw gzipped
+ *     bytes as body, `Content-Type: application/octet-stream`) is confirmed
+ *     from the official guide's own curl example for that step.
+ *   - Step 4's `PATCH ...?update_mask=status` shape is confirmed from the
+ *     official `sites.versions.patch` reference page.
+ *   - Step 5's `POST .../releases?versionName=...` shape (empty body) is
+ *     confirmed from the official guide's own curl example for that step;
+ *     the generic API reference additionally describes the request body as
+ *     "an instance of Release" without an example populating any fields
+ *     for this simple "release exactly this version" case, so an empty
+ *     `{}` body is used here, matching the guide's own worked curl example.
+ *   - The exact OAuth2 scope(s) Google expects for this API are NOT stated
+ *     plainly on any page this research reached - the guide's own code
+ *     samples reference a `SCOPES` variable without ever defining it. The
+ *     two scopes documented as valid for Firebase's own management APIs in
+ *     general (`https://www.googleapis.com/auth/firebase` and
+ *     `https://www.googleapis.com/auth/cloud-platform`) are both requested
+ *     together (space-separated) as the best-verified choice, but this
+ *     specific combination is NOT confirmed against a real token exchange +
+ *     API call in this sandbox.
+ *   - `bx:httpparam type="body"`'s handling of a binary `value` (used for
+ *     step 3's raw gzipped-bytes upload) follows the same CFML `type="body"`
+ *     convention `GcsTarget.bx` relies on (see its own docblock) - not
+ *     independently verified against a real endpoint here either.
+ *
+ * `gzip()` and `sha256Hex()` are kept pure (no HTTP, no Google account
+ * needed) so they can be verified for real, fully offline - see
+ * FirebaseTargetSpec.bx's gzip-then-gunzip round-trip test.
+ *
+ * @config { siteId (required), serviceAccountKeyPath (required - path to a downloaded GCP/Firebase service-account JSON key file), projectId (optional - defaults to siteId) }
+ */
+class implements="models.deploy.IDeploymentTarget@bxsites" {
+
+	variables.SCOPE = "https://www.googleapis.com/auth/firebase https://www.googleapis.com/auth/cloud-platform"
+	variables.API_BASE = "https://firebasehosting.googleapis.com/v1beta1"
+
+	/**
+	 * @return this
+	 */
+	function init() {
+		variables.auth = new "models.deploy.GoogleServiceAccountAuth@bxsites"()
+		return this
+	}
+
+	/**
+	 * @config This target's own resolved config (see the class docblock's `@config` shape)
+	 * @context { projectRoot, siteDir, config } - only `siteDir` is used
+	 *
+	 * @return { success, message, details: { siteId, versionName, uploaded } }
+	 */
+	struct function deploy( required struct config, required struct context ) {
+		var siteId = trim( arguments.config.siteId ?: "" )
+		if ( !len( siteId ) ) {
+			throw( type = "BxSites.MissingSiteId", message = "deploy target 'firebase' requires a 'siteId'" )
+		}
+
+		var serviceAccountKeyPath = trim( arguments.config.serviceAccountKeyPath ?: "" )
+		if ( !len( serviceAccountKeyPath ) ) {
+			throw( type = "BxSites.MissingServiceAccountKeyPath", message = "deploy target 'firebase' requires a 'serviceAccountKeyPath'" )
+		}
+
+		if ( !directoryExists( arguments.context.siteDir ) ) {
+			throw(
+				type    = "BxSites.SiteNotBuilt",
+				message = "No [#arguments.context.siteDir#] to deploy - run `build` first"
+			)
+		}
+
+		var siteDir = arguments.context.siteDir.reReplace( "[\/]+$", "" )
+		var files = directoryList( siteDir, true, "path" ).filter( function( path ) {
+			return !directoryExists( path )
+		} )
+
+		// Gzip + hash every file up front, keyed by its Hosting-style
+		// leading-slash relative path - both populateFiles() (hashes) and
+		// the upload loop (gzipped bytes, looked back up by hash) read from
+		// these two maps.
+		var gzippedByPath = {}
+		var hashByPath = {}
+		for ( var filePath in files ) {
+			var relativePath = "/" & filePath.replace( siteDir, "", "one" ).reReplace( "^[\/]+", "" ).replace( char( 92 ), "/", "all" )
+			var gzipped = gzip( fileReadBinary( filePath ) )
+			gzippedByPath[ relativePath ] = gzipped
+			hashByPath[ relativePath ] = sha256Hex( gzipped )
+		}
+
+		var accessToken = variables.auth.getAccessToken( serviceAccountKeyPath, variables.SCOPE ).accessToken
+
+		var versionName = createVersion( siteId, accessToken )
+		var populated = populateFiles( versionName, hashByPath, accessToken )
+
+		var gzippedByHash = {}
+		for ( var relativePath in hashByPath ) {
+			gzippedByHash[ hashByPath[ relativePath ] ] = gzippedByPath[ relativePath ]
+		}
+
+		for ( var hash in ( populated.uploadRequiredHashes ?: [] ) ) {
+			if ( structKeyExists( gzippedByHash, hash ) ) {
+				uploadFile( populated.uploadUrl, hash, gzippedByHash[ hash ], accessToken )
+			}
+		}
+
+		finalizeVersion( versionName, accessToken )
+		createRelease( siteId, versionName, accessToken )
+
+		return {
+			success : true,
+			message : "Deployed #files.len()# file(s) to Firebase Hosting site #siteId#",
+			details : { siteId : siteId, versionName : versionName, uploaded : files.len() }
+		}
+	}
+
+	/**
+	 * Gzip-compresses `bytes` (`java.util.zip.GZIPOutputStream`) - pure, no
+	 * HTTP, no Google account needed, so it's exercised for real via a
+	 * gzip-then-gunzip round-trip in FirebaseTargetSpec.bx.
+	 *
+	 * @bytes The raw bytes to compress
+	 *
+	 * @return The gzipped bytes
+	 */
+	binary function gzip( required binary bytes ) {
+		var buffer = createObject( "java", "java.io.ByteArrayOutputStream" ).init()
+		var gzipStream = createObject( "java", "java.util.zip.GZIPOutputStream" ).init( buffer )
+		gzipStream.write( arguments.bytes )
+		gzipStream.close()
+		return buffer.toByteArray()
+	}
+
+	/**
+	 * Lowercase hex SHA-256 digest of `bytes` - pure, no HTTP.
+	 *
+	 * @bytes The bytes to hash (Firebase Hosting expects this to be GZIPPED content, not raw)
+	 *
+	 * @return 64-character lowercase hex SHA-256 digest
+	 */
+	string function sha256Hex( required binary bytes ) {
+		var digest = createObject( "java", "java.security.MessageDigest" ).getInstance( "SHA-256" )
+		return binaryEncode( digest.digest( arguments.bytes ), "hex" )
+	}
+
+	/**
+	 * Step 1 - creates a new, empty Hosting version.
+	 *
+	 * @siteId The Firebase Hosting site ID
+	 * @accessToken A valid OAuth2 Bearer access token
+	 *
+	 * @return The new version's `name` (`sites/{siteId}/versions/{id}`)
+	 */
+	private string function createVersion( required string siteId, required string accessToken ) {
+		var result = ""
+		bx:http url="#variables.API_BASE#/sites/#arguments.siteId#/versions" method="POST" result="result" {
+			bx:httpparam type="header" name="Authorization" value="Bearer #arguments.accessToken#";
+			bx:httpparam type="header" name="Content-Type" value="application/json";
+			bx:httpparam type="body" value="{}";
+		}
+		assertOk( result, "POST sites/#arguments.siteId#/versions" )
+		return jsonDeserialize( result.fileContent ).name
+	}
+
+	/**
+	 * Step 2 - tells Firebase Hosting which files (by gzipped-content SHA-256
+	 * hash) this version has, at which paths.
+	 *
+	 * @versionName The version's `name`, from createVersion()
+	 * @hashByPath Struct of `{ "/relative/path" : "sha256HexOfGzippedBytes" }`
+	 * @accessToken A valid OAuth2 Bearer access token
+	 *
+	 * @return The parsed response - `{ uploadRequiredHashes: [...], uploadUrl: "..." }`
+	 */
+	private struct function populateFiles( required string versionName, required struct hashByPath, required string accessToken ) {
+		var result = ""
+		var url = "https://firebasehosting.googleapis.com/v1beta1/#arguments.versionName#:populateFiles"
+		bx:http url="#url#" method="POST" result="result" {
+			bx:httpparam type="header" name="Authorization" value="Bearer #arguments.accessToken#";
+			bx:httpparam type="header" name="Content-Type" value="application/json";
+			bx:httpparam type="body" value="#jsonSerialize( { "files" : arguments.hashByPath } )#";
+		}
+		assertOk( result, "POST #arguments.versionName#:populateFiles" )
+		return jsonDeserialize( result.fileContent )
+	}
+
+	/**
+	 * Step 3 - uploads one required file's gzipped bytes.
+	 *
+	 * @uploadUrl The base upload URL from populateFiles()'s response
+	 * @hash That file's gzipped-content SHA-256 hash (also the URL segment appended to `uploadUrl`)
+	 * @gzippedBytes That file's gzipped bytes
+	 * @accessToken A valid OAuth2 Bearer access token
+	 */
+	private void function uploadFile( required string uploadUrl, required string hash, required binary gzippedBytes, required string accessToken ) {
+		var url = arguments.uploadUrl & "/" & arguments.hash
+		var result = ""
+		bx:http url="#url#" method="POST" result="result" {
+			bx:httpparam type="header" name="Authorization" value="Bearer #arguments.accessToken#";
+			bx:httpparam type="header" name="Content-Type" value="application/octet-stream";
+			bx:httpparam type="body" value="#arguments.gzippedBytes#";
+		}
+		assertOk( result, "POST #url#" )
+	}
+
+	/**
+	 * Step 4 - the only legal state transition, CREATED -> FINALIZED.
+	 *
+	 * @versionName The version's `name`, from createVersion()
+	 * @accessToken A valid OAuth2 Bearer access token
+	 */
+	private void function finalizeVersion( required string versionName, required string accessToken ) {
+		var result = ""
+		var url = "#variables.API_BASE#/#arguments.versionName#?update_mask=status"
+		bx:http url="#url#" method="PATCH" result="result" {
+			bx:httpparam type="header" name="Authorization" value="Bearer #arguments.accessToken#";
+			bx:httpparam type="header" name="Content-Type" value="application/json";
+			bx:httpparam type="body" value='{"status":"FINALIZED"}';
+		}
+		assertOk( result, "PATCH #arguments.versionName#?update_mask=status" )
+	}
+
+	/**
+	 * Step 5 - makes the finalized version live.
+	 *
+	 * @siteId The Firebase Hosting site ID
+	 * @versionName The version's `name`, from createVersion()
+	 * @accessToken A valid OAuth2 Bearer access token
+	 */
+	private void function createRelease( required string siteId, required string versionName, required string accessToken ) {
+		var result = ""
+		var url = "#variables.API_BASE#/sites/#arguments.siteId#/releases?versionName=#urlEncodedFormat( arguments.versionName )#"
+		bx:http url="#url#" method="POST" result="result" {
+			bx:httpparam type="header" name="Authorization" value="Bearer #arguments.accessToken#";
+			bx:httpparam type="header" name="Content-Type" value="application/json";
+			bx:httpparam type="body" value="{}";
+		}
+		assertOk( result, "POST sites/#arguments.siteId#/releases" )
+	}
+
+	/**
+	 * @result A `bx:http` result struct
+	 * @operation A short label for the request, used in the thrown error message
+	 */
+	private void function assertOk( required struct result, required string operation ) {
+		var statusCode = val( listFirst( arguments.result.statusCode ?: "0", " " ) )
+		if ( statusCode < 200 || statusCode >= 300 ) {
+			throw(
+				type    = "BxSites.DeployFailed",
+				message = "#arguments.operation# failed (status #arguments.result.statusCode#): #arguments.result.fileContent#"
+			)
+		}
+	}
+
+}

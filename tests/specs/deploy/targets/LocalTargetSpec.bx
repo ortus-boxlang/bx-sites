@@ -1,0 +1,82 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "deploy.targets.LocalTarget", function() {
+
+			beforeEach( function() {
+				variables.target = new "models.deploy.targets.LocalTarget@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newTempDir() {
+				var dir = createTempDirectory( prefix = "bxsites-localtarget-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "throws BxSites.MissingDestination when destination is missing", function() {
+				expect( function() {
+					target.deploy( {}, { siteDir : newTempDir() } );
+				} ).toThrow( "BxSites.MissingDestination" );
+			} );
+
+			it( "throws BxSites.SiteNotBuilt when siteDir doesn't exist", function() {
+				var root = newTempDir();
+				expect( function() {
+					target.deploy( { destination : root & "/deployed" }, { siteDir : root & "/site" } );
+				} ).toThrow( "BxSites.SiteNotBuilt" );
+			} );
+
+			it( "copies the whole built site to an absolute destination", function() {
+				var root = newTempDir();
+				var siteDir = root & "/site";
+				directoryCreate( siteDir & "/assets", true, true );
+				fileWrite( siteDir & "/index.html", "<h1>Home</h1>" );
+				fileWrite( siteDir & "/assets/style.css", "body{}" );
+
+				var destination = root & "/deployed";
+				var result = target.deploy( { destination : destination }, { siteDir : siteDir, projectRoot : root } );
+
+				expect( result.success ).toBeTrue();
+				expect( fileExists( destination & "/index.html" ) ).toBeTrue();
+				expect( fileExists( destination & "/assets/style.css" ) ).toBeTrue();
+			} );
+
+			it( "resolves a relative destination against projectRoot - NOT against this class file's own location", function() {
+				var root = newTempDir();
+				var siteDir = root & "/site";
+				directoryCreate( siteDir, true, true );
+				fileWrite( siteDir & "/index.html", "<h1>Home</h1>" );
+
+				var result = target.deploy( { destination : "deployed-relative" }, { siteDir : siteDir, projectRoot : root } );
+
+				expect( result.success ).toBeTrue();
+				expect( result.details.destination ).toBe( root & "/deployed-relative" );
+				expect( fileExists( root & "/deployed-relative/index.html" ) ).toBeTrue();
+			} );
+
+			it( "creates the destination directory if it doesn't exist", function() {
+				var root = newTempDir();
+				var siteDir = root & "/site";
+				directoryCreate( siteDir, true, true );
+				fileWrite( siteDir & "/index.html", "content" );
+
+				var destination = root & "/nested/does/not/exist";
+				var result = target.deploy( { destination : destination }, { siteDir : siteDir, projectRoot : root } );
+
+				expect( result.success ).toBeTrue();
+				expect( directoryExists( destination ) ).toBeTrue();
+			} );
+
+		} );
+	}
+
+}

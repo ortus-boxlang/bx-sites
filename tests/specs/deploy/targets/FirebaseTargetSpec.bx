@@ -1,0 +1,142 @@
+/**
+ * deploy.targets.FirebaseTarget only covers guard clauses and the pure
+ * (no-HTTP) `gzip()`/`sha256Hex()` helpers here - there is no real Firebase
+ * project/site/service-account available in this sandbox, so the actual
+ * multi-step REST deploy flow (`createVersion`/`populateFiles`/`uploadFile`/
+ * `finalizeVersion`/`createRelease`, and by extension the full `deploy()`
+ * happy path) is NOT exercised for real by this spec - see the class's own
+ * docblock for exactly which parts of that flow were researched-and-
+ * verified against Google's documentation vs. genuinely unverified here.
+ *
+ * `gzip()` IS exercised for real, fully offline: gzip the bytes with our
+ * own code, then gunzip them back with Java's own `GZIPInputStream`
+ * (independent of anything this module wrote) and assert the original
+ * bytes come back unchanged - a real, complete round-trip, no network
+ * involved.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "deploy.targets.FirebaseTarget", function() {
+
+			beforeEach( function() {
+				variables.target = new "models.deploy.targets.FirebaseTarget@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newTempDir() {
+				var dir = createTempDirectory( prefix = "bxsites-firebasetarget-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			/** Gunzips via real java.util.zip.GZIPInputStream - independent of gzip()'s own implementation. */
+			private binary function gunzipForReal( required binary gzippedBytes ) {
+				var bais = createObject( "java", "java.io.ByteArrayInputStream" ).init( arguments.gzippedBytes );
+				var gzipStream = createObject( "java", "java.util.zip.GZIPInputStream" ).init( bais );
+				var baos = createObject( "java", "java.io.ByteArrayOutputStream" ).init();
+				var buffer = repeatString( " ", 1024 ).getBytes();
+				var readCount = 0;
+				while ( ( readCount = gzipStream.read( buffer ) ) != -1 ) {
+					baos.write( buffer, 0, readCount );
+				}
+				return baos.toByteArray();
+			}
+
+			describe( "deploy() guard clauses", function() {
+
+				it( "throws BxSites.MissingSiteId when siteId is missing", function() {
+					expect( function() {
+						target.deploy( { serviceAccountKeyPath : "/tmp/key.json" }, { siteDir : newTempDir() } );
+					} ).toThrow( "BxSites.MissingSiteId" );
+				} );
+
+				it( "throws BxSites.MissingServiceAccountKeyPath when serviceAccountKeyPath is missing", function() {
+					expect( function() {
+						target.deploy( { siteId : "my-site" }, { siteDir : newTempDir() } );
+					} ).toThrow( "BxSites.MissingServiceAccountKeyPath" );
+				} );
+
+				it( "throws BxSites.SiteNotBuilt when siteDir doesn't exist", function() {
+					var root = newTempDir();
+					expect( function() {
+						target.deploy(
+							{ siteId : "my-site", serviceAccountKeyPath : "/tmp/key.json" },
+							{ siteDir : root & "/site" }
+						);
+					} ).toThrow( "BxSites.SiteNotBuilt" );
+				} );
+
+			} );
+
+			describe( "gzip()", function() {
+
+				it( "round-trips arbitrary text bytes through a real independent gunzip", function() {
+					var original = charsetDecode( "Hello, Firebase Hosting! Some repeated text. " & repeatString( "abc123 ", 200 ), "utf-8" );
+
+					var gzipped = target.gzip( original );
+					var restored = gunzipForReal( gzipped );
+
+					expect( charsetEncode( restored, "utf-8" ) ).toBe( charsetEncode( original, "utf-8" ) );
+				} );
+
+				it( "round-trips empty content", function() {
+					var original = charsetDecode( "", "utf-8" );
+					var gzipped = target.gzip( original );
+					var restored = gunzipForReal( gzipped );
+					expect( arrayLen( restored ) ).toBe( 0 );
+				} );
+
+				it( "round-trips binary (non-UTF8-text) content", function() {
+					var original = binaryDecode( "//5+/w==", "base64" );
+					var gzipped = target.gzip( original );
+					var restored = gunzipForReal( gzipped );
+					expect( binaryEncode( restored, "base64" ) ).toBe( binaryEncode( original, "base64" ) );
+				} );
+
+			} );
+
+			describe( "sha256Hex()", function() {
+
+				it( "matches the well-known SHA-256 digest of an empty input", function() {
+					var bytes = charsetDecode( "", "utf-8" );
+					expect( target.sha256Hex( bytes ) ).toBe( "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" );
+				} );
+
+				it( "matches the well-known SHA-256 digest of 'abc'", function() {
+					var bytes = charsetDecode( "abc", "utf-8" );
+					expect( target.sha256Hex( bytes ) ).toBe( "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad" );
+				} );
+
+				it( "is 64 lowercase hex characters", function() {
+					var hash = target.sha256Hex( charsetDecode( "some content", "utf-8" ) );
+					expect( len( hash ) ).toBe( 64 );
+					expect( hash ).toBe( lCase( hash ) );
+					expect( reFind( "[^0-9a-f]", hash ) ).toBe( 0 );
+				} );
+
+				it( "is deterministic for the same bytes", function() {
+					var bytes = charsetDecode( "same bytes twice", "utf-8" );
+					expect( target.sha256Hex( bytes ) ).toBe( target.sha256Hex( bytes ) );
+				} );
+
+				it( "hashes gzipped content differently than the raw content (Hosting hashes compressed bytes)", function() {
+					var raw = charsetDecode( repeatString( "x", 500 ), "utf-8" );
+					var gzipped = target.gzip( raw );
+					expect( target.sha256Hex( raw ) ).notToBe( target.sha256Hex( gzipped ) );
+				} );
+
+			} );
+
+		} );
+	}
+
+}

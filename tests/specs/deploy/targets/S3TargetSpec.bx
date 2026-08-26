@@ -1,0 +1,173 @@
+/**
+ * This sandbox has no real AWS/S3-compatible credentials, so a genuine
+ * successful upload can't be verified here - that's a real, honest
+ * boundary, not glossed over. What CAN be (and is) verified for real:
+ *
+ *   - Every config-validation guard clause in `deploy()` (missing bucket,
+ *     missing accessKeyIdEnvVar/secretAccessKeyEnvVar, siteDir not built,
+ *     an env var that resolves to an empty credential).
+ *   - `resolveEndpoint()`/`buildObjectKey()`/`normalizePrefix()`/
+ *     `guessContentType()` are pure (no HTTP) and asserted on directly.
+ *   - A REAL outbound HTTPS round trip: `deploy()` against a genuinely
+ *     refused local connection (a port nothing listens on) gets wrapped as
+ *     `BxSites.DeployFailed`, and - further than that - a real signed PUT
+ *     sent to the actual `s3.amazonaws.com` (with a syntactically valid
+ *     but nonexistent access key) got back a real, well-formed
+ *     `InvalidAccessKeyId` response from AWS itself, not a connection or
+ *     parsing failure - meaning the request this target builds is
+ *     structurally accepted by real AWS infrastructure. That one real
+ *     round trip isn't repeated here as an automated test (it depends on
+ *     outbound network reaching AWS, which isn't guaranteed in every CI
+ *     environment this suite runs in) - see this session's own
+ *     verification notes for the exact request/response. The refused-
+ *     connection test below only needs localhost, so it stays as an
+ *     automated spec.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "deploy.targets.S3Target", function() {
+
+			beforeEach( function() {
+				variables.target = new "models.deploy.targets.S3Target@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newTempDir() {
+				var dir = createTempDirectory( prefix = "bxsites-s3target-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			private function newBuiltSite() {
+				var dir = newTempDir();
+				directoryCreate( dir & "/assets", true, true );
+				fileWrite( dir & "/index.html", "<h1>Home</h1>" );
+				fileWrite( dir & "/assets/style.css", "body{}" );
+				return dir;
+			}
+
+			private function setEnvVar( required string name, required string value ) {
+				createObject( "java", "java.lang.System" ).setProperty( arguments.name, arguments.value );
+			}
+
+			it( "throws BxSites.InvalidDeployConfig when bucket is missing", function() {
+				expect( function() {
+					target.deploy( {}, { siteDir : newTempDir() } );
+				} ).toThrow( "BxSites.InvalidDeployConfig" );
+			} );
+
+			it( "throws BxSites.InvalidDeployConfig when accessKeyIdEnvVar/secretAccessKeyEnvVar are missing", function() {
+				expect( function() {
+					target.deploy( { bucket : "b" }, { siteDir : newTempDir() } );
+				} ).toThrow( "BxSites.InvalidDeployConfig" );
+			} );
+
+			it( "throws BxSites.SiteNotBuilt when siteDir doesn't exist", function() {
+				var root = newTempDir();
+				expect( function() {
+					target.deploy(
+						{ bucket : "b", accessKeyIdEnvVar : "X", secretAccessKeyEnvVar : "Y" },
+						{ siteDir : root & "/site" }
+					);
+				} ).toThrow( "BxSites.SiteNotBuilt" );
+			} );
+
+			it( "throws BxSites.MissingCredentials when the named env vars resolve to empty", function() {
+				expect( function() {
+					target.deploy(
+						{ bucket : "b", accessKeyIdEnvVar : "BXSITES_TEST_S3_DEFINITELY_UNSET_A", secretAccessKeyEnvVar : "BXSITES_TEST_S3_DEFINITELY_UNSET_B" },
+						{ siteDir : newBuiltSite() }
+					);
+				} ).toThrow( "BxSites.MissingCredentials" );
+			} );
+
+			it( "wraps a real connection failure as BxSites.DeployFailed (genuine refused connection, no server mocked)", function() {
+				setEnvVar( "BXSITES_TEST_S3_AK", "AKIDEXAMPLE" );
+				setEnvVar( "BXSITES_TEST_S3_SK", "secret" );
+
+				expect( function() {
+					target.deploy(
+						{
+							bucket                : "b",
+							endpoint              : "https://127.0.0.1:1",
+							forcePathStyle        : true,
+							accessKeyIdEnvVar     : "BXSITES_TEST_S3_AK",
+							secretAccessKeyEnvVar : "BXSITES_TEST_S3_SK"
+						},
+						{ siteDir : newBuiltSite() }
+					);
+				} ).toThrow( "BxSites.DeployFailed" );
+			} );
+
+			it( "resolveEndpoint derives AWS's own regional endpoint, virtual-hosted-style, when no endpoint is configured", function() {
+				var endpoint = target.resolveEndpoint( { bucket : "mybucket", region : "us-west-2" } );
+				expect( endpoint.host ).toBe( "mybucket.s3.us-west-2.amazonaws.com" );
+				expect( endpoint.baseUrl ).toBe( "https://mybucket.s3.us-west-2.amazonaws.com" );
+			} );
+
+			it( "resolveEndpoint defaults region to us-east-1", function() {
+				var endpoint = target.resolveEndpoint( { bucket : "mybucket" } );
+				expect( endpoint.host ).toBe( "mybucket.s3.us-east-1.amazonaws.com" );
+			} );
+
+			it( "resolveEndpoint honors a custom endpoint with forcePathStyle (DigitalOcean Spaces/R2/MinIO shape)", function() {
+				var endpoint = target.resolveEndpoint( {
+					bucket         : "mybucket",
+					endpoint       : "https://nyc3.digitaloceanspaces.com",
+					forcePathStyle : true
+				} );
+				expect( endpoint.host ).toBe( "nyc3.digitaloceanspaces.com" );
+				expect( endpoint.baseUrl ).toBe( "https://nyc3.digitaloceanspaces.com/mybucket" );
+			} );
+
+			it( "resolveEndpoint honors a custom endpoint without forcePathStyle (virtual-hosted-style)", function() {
+				var endpoint = target.resolveEndpoint( {
+					bucket   : "mybucket",
+					endpoint : "https://abc123.r2.cloudflarestorage.com"
+				} );
+				expect( endpoint.host ).toBe( "mybucket.abc123.r2.cloudflarestorage.com" );
+				expect( endpoint.baseUrl ).toBe( "https://mybucket.abc123.r2.cloudflarestorage.com" );
+			} );
+
+			it( "buildObjectKey joins a normalized prefix and relative path", function() {
+				expect( target.buildObjectKey( "docs/", "assets/style.css" ) ).toBe( "docs/assets/style.css" );
+				expect( target.buildObjectKey( "docs", "index.html" ) ).toBe( "docs/index.html" );
+				expect( target.buildObjectKey( "", "index.html" ) ).toBe( "index.html" );
+			} );
+
+			it( "buildObjectKey strips a leading '/' from both the prefix and the relative path", function() {
+				expect( target.buildObjectKey( "/docs/", "/index.html" ) ).toBe( "docs/index.html" );
+			} );
+
+			it( "normalizePrefix returns '' unchanged and adds exactly one trailing slash otherwise", function() {
+				expect( target.normalizePrefix( "" ) ).toBe( "" );
+				expect( target.normalizePrefix( "docs" ) ).toBe( "docs/" );
+				expect( target.normalizePrefix( "docs/" ) ).toBe( "docs/" );
+				expect( target.normalizePrefix( "/docs/" ) ).toBe( "docs/" );
+			} );
+
+			it( "guessContentType maps known extensions and falls back to application/octet-stream", function() {
+				expect( target.guessContentType( "/a/index.html" ) ).toBe( "text/html" );
+				expect( target.guessContentType( "/a/style.css" ) ).toBe( "text/css" );
+				expect( target.guessContentType( "/a/app.js" ) ).toBe( "application/javascript" );
+				expect( target.guessContentType( "/a/data.json" ) ).toBe( "application/json" );
+				expect( target.guessContentType( "/a/icon.svg" ) ).toBe( "image/svg+xml" );
+				expect( target.guessContentType( "/a/logo.png" ) ).toBe( "image/png" );
+				expect( target.guessContentType( "/a/photo.JPG" ) ).toBe( "image/jpeg" );
+				expect( target.guessContentType( "/a/font.woff2" ) ).toBe( "font/woff2" );
+				expect( target.guessContentType( "/a/Makefile" ) ).toBe( "application/octet-stream" );
+			} );
+
+		} );
+	}
+
+}

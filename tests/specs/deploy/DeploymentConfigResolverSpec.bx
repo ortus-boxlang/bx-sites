@@ -1,0 +1,257 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "deploy.DeploymentConfigResolver", function() {
+
+			beforeEach( function() {
+				variables.resolver = new "models.deploy.DeploymentConfigResolver@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newTempProject() {
+				var dir = createTempDirectory( prefix = "bxsites-deployconfig-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			private function writeEntry( required string dir, required string name, required struct config ) {
+				directoryCreate( arguments.dir & "/deployments", true, true );
+				fileWrite( arguments.dir & "/deployments/#arguments.name#.json", jsonSerialize( arguments.config ) );
+			}
+
+			it( "returns no entries or errors when deployments/ doesn't exist", function() {
+				var dir = newTempProject();
+
+				var result = resolver.resolve( dir );
+
+				expect( result.entries.len() ).toBe( 0 );
+				expect( result.errors.len() ).toBe( 0 );
+			} );
+
+			it( "discovers a valid local entry", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "production", { target : "local", destination : "/tmp/wherever" } );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.len() ).toBe( 0 );
+				expect( result.entries.len() ).toBe( 1 );
+				expect( result.entries[ 1 ].name ).toBe( "production" );
+				expect( result.entries[ 1 ].target ).toBe( "local" );
+			} );
+
+			it( "rejects an entry missing a target", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "broken", { destination : "/tmp/wherever" } );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.len() ).toBeGT( 0 );
+				expect( result.errors[ 1 ] ).toInclude( "missing a 'target'" );
+			} );
+
+			it( "rejects an entry with an unknown target", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "broken", { target : "kubernetes" } );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.len() ).toBeGT( 0 );
+				expect( result.errors[ 1 ] ).toInclude( "unknown target" );
+			} );
+
+			it( "rejects duplicate entry names (name is the part before the first '.')", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "production", { target : "local", destination : "/tmp/a" } );
+				fileWrite( dir & "/deployments/production.staging.json", jsonSerialize( { target : "local", destination : "/tmp/b" } ) );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.toList( "|" ) ).toInclude( "Duplicate deploy entry name" );
+			} );
+
+			it( "requires bucket, accessKeyIdEnvVar, and secretAccessKeyEnvVar for an s3 target", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "prod", { target : "s3" } );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'bucket'" );
+				expect( result.errors.toList( "|" ) ).toInclude( "missing an 'accessKeyIdEnvVar'" );
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'secretAccessKeyEnvVar'" );
+			} );
+
+			it( "accepts a valid s3 target", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "prod", {
+					target : "s3", bucket : "my-bucket",
+					accessKeyIdEnvVar : "AWS_KEY", secretAccessKeyEnvVar : "AWS_SECRET"
+				} );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.len() ).toBe( 0 );
+			} );
+
+			it( "requires host, username, remotePath, and passwordEnvVar for an ftp target", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "prod", { target : "ftp" } );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'host'" );
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'username'" );
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'remotePath'" );
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'passwordEnvVar'" );
+			} );
+
+			it( "requires host, username, and remotePath for an sftp target, plus a passwordEnvVar or key", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "prod", { target : "sftp" } );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'passwordEnvVar' or a 'key'" );
+			} );
+
+			it( "accepts a valid sftp target authenticated by key only", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "prod", { target : "sftp", host : "sftp.example.com", username : "user", key : "/home/me/.ssh/id_rsa", remotePath : "/uploads" } );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.len() ).toBe( 0 );
+			} );
+
+			it( "requires host, username, and remotePath for an rsync target", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "prod", { target : "rsync" } );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'host'" );
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'username'" );
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'remotePath'" );
+			} );
+
+			it( "requires account, container, and one of the credential env vars for an azure target", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "prod", { target : "azure" } );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.toList( "|" ) ).toInclude( "missing an 'account'" );
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'container'" );
+				expect( result.errors.toList( "|" ) ).toInclude( "accountKeyEnvVar" );
+			} );
+
+			it( "accepts a valid azure target authenticated by SAS token only", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "prod", { target : "azure", account : "myacct", container : "site", sasTokenEnvVar : "AZ_SAS" } );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.len() ).toBe( 0 );
+			} );
+
+			it( "requires bucket and serviceAccountKeyPath for a gcs target", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "prod", { target : "gcs" } );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'bucket'" );
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'serviceAccountKeyPath'" );
+			} );
+
+			it( "requires siteId and serviceAccountKeyPath for a firebase target", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "prod", { target : "firebase" } );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'siteId'" );
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'serviceAccountKeyPath'" );
+			} );
+
+			it( "requires siteId and authTokenEnvVar for a netlify target", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "prod", { target : "netlify" } );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'siteId'" );
+				expect( result.errors.toList( "|" ) ).toInclude( "missing an 'authTokenEnvVar'" );
+			} );
+
+			it( "requires projectId and authTokenEnvVar for a vercel target", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "prod", { target : "vercel" } );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'projectId'" );
+				expect( result.errors.toList( "|" ) ).toInclude( "missing an 'authTokenEnvVar'" );
+			} );
+
+			it( "requires accountId, projectName, and apiTokenEnvVar for a cloudflare-pages target", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "prod", { target : "cloudflare-pages" } );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.toList( "|" ) ).toInclude( "missing an 'accountId'" );
+				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'projectName'" );
+				expect( result.errors.toList( "|" ) ).toInclude( "missing an 'apiTokenEnvVar'" );
+			} );
+
+			it( "requires no fields at all for a github-pages target", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "prod", { target : "github-pages" } );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors.len() ).toBe( 0 );
+			} );
+
+			it( "getEntry() returns the matching entry by name", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "production", { target : "local", destination : "/tmp/wherever" } );
+
+				var entry = resolver.getEntry( dir, "production" );
+
+				expect( entry.target ).toBe( "local" );
+				expect( entry.config.destination ).toBe( "/tmp/wherever" );
+			} );
+
+			it( "getEntry() throws BxSites.UnknownDeployEntry for a missing name", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "production", { target : "local", destination : "/tmp/wherever" } );
+
+				expect( function() {
+					resolver.getEntry( dir, "nonexistent" );
+				} ).toThrow( "BxSites.UnknownDeployEntry" );
+			} );
+
+			it( "getEntry() throws BxSites.InvalidDeployConfig when deployments/ has any errors", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "production", { target : "local", destination : "/tmp/wherever" } );
+				writeEntry( dir, "broken", { target : "kubernetes" } );
+
+				expect( function() {
+					resolver.getEntry( dir, "production" );
+				} ).toThrow( "BxSites.InvalidDeployConfig" );
+			} );
+
+		} );
+	}
+
+}

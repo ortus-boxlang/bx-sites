@@ -1,0 +1,63 @@
+/**
+ * Copies the already-built `site/` directory to an arbitrary destination -
+ * a shared drive, an artifact folder, a staging directory another tool
+ * picks up from, etc. The only target that never needs a `deployments/*.json`
+ * entry at all (`deploy --target=local --destination=...`, or that flag
+ * with no `--target` given, since it's also the default).
+ *
+ * @config { destination (required) }
+ */
+class implements="models.deploy.IDeploymentTarget@bxsites" {
+
+	/**
+	 * @config This target's own resolved config (see the class docblock's `@config` shape)
+	 * @context { projectRoot, siteDir, config } - `projectRoot` only matters for resolving a relative `destination` (see `resolveDestination()`'s own docblock); `siteDir` is what gets copied
+	 *
+	 * @return { success, message, details: { destination } }
+	 */
+	struct function deploy( required struct config, required struct context ) {
+		var destination = trim( arguments.config.destination ?: "" )
+		if ( !len( destination ) ) {
+			throw( type = "BxSites.MissingDestination", message = "deploy target 'local' requires a 'destination'" )
+		}
+		if ( !directoryExists( arguments.context.siteDir ) ) {
+			throw(
+				type    = "BxSites.SiteNotBuilt",
+				message = "No [#arguments.context.siteDir#] to deploy - run `build` first"
+			)
+		}
+
+		var destinationDir = resolveDestination( destination, arguments.context.projectRoot )
+		directoryCreate( path = destinationDir, createPath = true, ignoreExists = true )
+		directoryCopy( arguments.context.siteDir, destinationDir, true )
+
+		return {
+			success : true,
+			message : "Deployed site to #destinationDir#",
+			details : { destination : destinationDir }
+		}
+	}
+
+	/**
+	 * Resolves `destination` to an absolute path (also stripping any trailing
+	 * slash), anchoring a RELATIVE value against the project root - never
+	 * against this class file's own location. BoxLang's file BIFs
+	 * (`directoryCreate()`/`directoryCopy()`/etc.) resolve a relative path
+	 * against the currently-executing template's own directory (the same
+	 * page-relative convention CFML/Lucee use), not the OS process's working
+	 * directory - a relative `--destination` left unresolved here would
+	 * silently land inside bx-sites' OWN installed module tree
+	 * (`models/deploy/targets/<destination>`) instead of anywhere near the
+	 * project being deployed, confirmed by hitting exactly that while
+	 * developing this class.
+	 *
+	 * @destination The raw, already-trimmed `destination` config value
+	 * @projectRoot Absolute path to the project root - the base a relative `destination` resolves against
+	 */
+	private string function resolveDestination( required string destination, required string projectRoot ) {
+		var isAbsolute = arguments.destination.left( 1 ) == "/" || arguments.destination.reFind( "^[A-Za-z]:[\/\\]" )
+		var absolute = isAbsolute ? arguments.destination : arguments.projectRoot & "/" & arguments.destination
+		return absolute.reReplace( "[\/]+$", "" )
+	}
+
+}

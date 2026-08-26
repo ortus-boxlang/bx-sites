@@ -1,0 +1,101 @@
+/**
+ * cli.Deploy only covers guard clauses and target-resolution logic here,
+ * matching cli.GhDeploy's own spec (GhDeploySpec.bx) - a full successful
+ * run needs a real bx-markdown module activation (MarkdownRenderer.bx's
+ * hard dependency), which this plain unit-test environment doesn't have.
+ * Each target's own real work is covered in its own spec under
+ * tests/specs/deploy/targets/.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.Deploy", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.Deploy@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newTempProject() {
+				var dir = createTempDirectory( prefix = "bxsites-cli-deploy-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
+			} );
+
+			it( "throws BxSites.UnknownDeploymentTarget for an unrecognized --target", function() {
+				var dir = newTempProject();
+				expect( function() {
+					verb.run( { projectRoot : dir, target : "kubernetes" } );
+				} ).toThrow( "BxSites.UnknownDeploymentTarget" );
+			} );
+
+			it( "throws BxSites.MissingDeployEntry for a target that isn't flag-only, with no --name", function() {
+				var dir = newTempProject();
+				expect( function() {
+					verb.run( { projectRoot : dir, target : "s3" } );
+				} ).toThrow( "BxSites.MissingDeployEntry" );
+			} );
+
+			it( "throws BxSites.MissingDestination when --target=local has no --destination", function() {
+				var dir = newTempProject();
+				expect( function() {
+					verb.run( { projectRoot : dir, target : "local" } );
+				} ).toThrow( "BxSites.MissingDestination" );
+			} );
+
+			it( "throws BxSites.UnknownDeployEntry for a --entry that doesn't exist", function() {
+				var dir = newTempProject();
+				expect( function() {
+					verb.run( { projectRoot : dir, entry : "nonexistent" } );
+				} ).toThrow( "BxSites.UnknownDeployEntry" );
+			} );
+
+			it( "throws BxSites.NoDeploymentsFound when neither --target nor --entry is given and deployments/ doesn't exist", function() {
+				var dir = newTempProject();
+				expect( function() {
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxSites.NoDeploymentsFound" );
+			} );
+
+			it( "throws BxSites.NoDeploymentsFound when deployments/ exists but is empty, and neither --target nor --entry is given", function() {
+				var dir = newTempProject();
+				directoryCreate( dir & "/deployments" );
+				expect( function() {
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxSites.NoDeploymentsFound" );
+			} );
+
+			it( "throws BxSites.InvalidDeployConfig for deploy-all when a deployments/*.json entry fails validation", function() {
+				var dir = newTempProject();
+				directoryCreate( dir & "/deployments" );
+				fileWrite( dir & "/deployments/prod.json", '{"target":"s3"}' );
+				expect( function() {
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxSites.InvalidDeployConfig" );
+			} );
+
+			it( "throws BxSites.ConfigNotFound once past target resolution, when the project has no bxsites.json", function() {
+				var dir = newTempProject();
+				expect( function() {
+					verb.run( { projectRoot : dir, target : "local", destination : dir & "/deployed" } );
+				} ).toThrow( "BxSites.ConfigNotFound" );
+			} );
+
+		} );
+	}
+
+}

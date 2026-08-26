@@ -1,0 +1,248 @@
+/**
+ * Deploys the already-built `site/` directory to Vercel via its real,
+ * officially documented non-git deployment flow: upload each file's raw
+ * bytes to Vercel's file-upload endpoint (keyed by its SHA1 digest), then
+ * create a deployment that references every file by that digest.
+ *
+ * CONFIRMED VIA RESEARCH (this session, 2026-08-26) against Vercel's own
+ * REST API reference docs (vercel.com/docs/rest-api/reference/endpoints/
+ * deployments/{upload-deployment-files,create-a-new-deployment}):
+ *  - Step 1, per file: `POST https://api.vercel.com/v2/files` with header
+ *    `Authorization: Bearer <token>`, the raw file bytes as the body
+ *    (`Content-Type: application/octet-stream`), and the file's own SHA1
+ *    hex digest in the `x-Vercel-Digest` header ("The file SHA1 used to
+ *    check the integrity") - confirmed by both the official endpoint
+ *    reference and vercel.com/kb's "How do I generate an SHA for uploading
+ *    a file to the Vercel API?" guide, whose own example payload is
+ *    `{ "file": "vercel.json", "sha": "<sha1>", "size": <bytes> }`.
+ *  - Step 2: `POST https://api.vercel.com/v13/deployments` with a JSON
+ *    body whose `files` array entries are exactly that `{file, sha, size}`
+ *    shape (referencing the already-uploaded bytes by digest, no need to
+ *    re-send file content) - confirmed both by that same kb guide's
+ *    example body and the official `create-a-new-deployment` reference's
+ *    schema (`files[].sha` "Used in the case you want to reference a file
+ *    that was already uploaded"). `project` ("The target project
+ *    identifier in which the deployment will be created... overrides
+ *    name") is set to this target's `projectId`; `name` is required by the
+ *    schema regardless, so it's set to the same value. `target:
+ *    "production"` is passed explicitly - confirmed via the schema's own
+ *    description ("If `production`, any aliases defined in `alias` will be
+ *    assigned. If omitted, the target will be `preview`") - a `deploy`
+ *    verb should ship a real, aliased production deployment, not a
+ *    throwaway preview one.
+ *  - Both endpoints accept an optional `teamId` **query string** parameter
+ *    ("The Team identifier to perform the request on behalf of") -
+ *    confirmed on both endpoints' own reference pages. This target sends
+ *    it whenever `teamId` (or, absent that, `orgId`) is present in config.
+ *
+ * INFERRED, not found spelled out in Vercel's REST API reference itself:
+ * `orgId` as a *fallback* source for that same `teamId` query param.
+ * Vercel's REST API reference only ever documents `teamId`/`slug` for
+ * scoping a request to a team - `orgId` only appears in the Vercel CLI's
+ * own local `.vercel/project.json` link file (alongside `projectId`),
+ * where it identifies the same team/personal-account scope under a
+ * different name. Since `DeploymentConfigResolver.bx` already fixes
+ * `orgId` as one of this target's optional config fields (mirroring that
+ * CLI link-file shape), this target treats it as an alternate name for the
+ * same `teamId` query value when `teamId` itself isn't set - not verified
+ * against a real multi-team Vercel account.
+ *
+ * NOT independently verified (no real Vercel account/token available in
+ * this sandbox): an actual end-to-end call against the live API.
+ * `buildFileManifest()` and `sha1Hex()` below ARE fully, offline verified
+ * for real (see VercelTargetSpec.bx) - genuinely real SHA1 digests over
+ * fixture file content, not stand-ins.
+ *
+ * @config { projectId (required), authTokenEnvVar (required - resolved via getSystemSetting() at deploy time, never a literal token), teamId (optional), orgId (optional - fallback for teamId, see docblock above) }
+ */
+class implements="models.deploy.IDeploymentTarget@bxsites" {
+
+	variables.API_BASE = "https://api.vercel.com"
+
+	/**
+	 * @config This target's own resolved config (see the class docblock's `@config` shape)
+	 * @context { projectRoot, siteDir, config } - only `siteDir` is used
+	 *
+	 * @return { success, message, details: { deploymentId, url, readyState } }
+	 */
+	struct function deploy( required struct config, required struct context ) {
+		var projectId = trim( arguments.config.projectId ?: "" )
+		if ( !len( projectId ) ) {
+			throw( type = "BxSites.InvalidDeployConfig", message = "deploy target 'vercel' requires a 'projectId'" )
+		}
+		var authTokenEnvVar = trim( arguments.config.authTokenEnvVar ?: "" )
+		if ( !len( authTokenEnvVar ) ) {
+			throw( type = "BxSites.InvalidDeployConfig", message = "deploy target 'vercel' requires an 'authTokenEnvVar'" )
+		}
+
+		var siteDir = arguments.context.siteDir
+		if ( !directoryExists( siteDir ) ) {
+			throw(
+				type    = "BxSites.SiteNotBuilt",
+				message = "No [#siteDir#] to deploy - run `build` first"
+			)
+		}
+
+		var token = getSystemSetting( authTokenEnvVar, "" )
+		if ( !len( token ) ) {
+			throw(
+				type    = "BxSites.MissingCredentials",
+				message = "deploy target 'vercel' requires the #authTokenEnvVar# environment variable to hold a Vercel access token"
+			)
+		}
+
+		var teamId = len( trim( arguments.config.teamId ?: "" ) ) ? trim( arguments.config.teamId ) : trim( arguments.config.orgId ?: "" )
+
+		var manifest = buildFileManifest( siteDir )
+
+		for ( var entry in manifest ) {
+			uploadFile( token, teamId, entry )
+		}
+
+		var created = createDeployment( token, teamId, projectId, manifest )
+
+		return {
+			success : true,
+			message : "Deployed to Vercel - https://#created.url# (#created.readyState#)",
+			details : { deploymentId : created.id, url : created.url, readyState : created.readyState }
+		}
+	}
+
+	/**
+	 * Walks `siteDir` and computes each file's SHA1 digest/size/relative
+	 * path - pure, no HTTP, so VercelTargetSpec.bx can assert on real SHA1
+	 * digests over known fixture content without a Vercel account.
+	 *
+	 * `directoryList( siteDir, true, "path" )` with no glob pattern also
+	 * returns directory entries, not just files (a known gotcha in this
+	 * codebase) - filtered out below via `!directoryExists( path )`.
+	 *
+	 * @siteDir Absolute path to the built site directory
+	 *
+	 * @return [ { file: relativePath, sha: sha1Hex, size: bytes, bytes: rawFileBytes } ]
+	 *         (`bytes` is carried along purely so `uploadFile()` never has to
+	 *         re-read the file from disk a second time - it is not part of
+	 *         Vercel's own wire format, which only ever sees `file`/`sha`/`size`)
+	 */
+	array function buildFileManifest( required string siteDir ) {
+		var root = arguments.siteDir.reReplace( "[\/]+$", "" )
+		var files = directoryList( root, true, "path" ).filter( function( path ) {
+			return !directoryExists( path )
+		} )
+
+		var manifest = []
+		for ( var filePath in files ) {
+			var relativePath = filePath.replace( root, "", "one" )
+				.reReplace( "^[\/]+", "" )
+				.replace( char( 92 ), "/", "all" )
+			var bytes = readFileBytes( filePath )
+			manifest.append( { file : relativePath, sha : sha1Hex( bytes ), size : bytes.len(), bytes : bytes } )
+		}
+		return manifest
+	}
+
+	/**
+	 * Lowercase hex SHA1 digest of `bytes` - pure, no HTTP.
+	 *
+	 * @bytes The bytes to hash
+	 *
+	 * @return The lowercase hex SHA1 digest
+	 */
+	string function sha1Hex( required binary bytes ) {
+		var digest = createObject( "java", "java.security.MessageDigest" ).getInstance( "SHA-1" )
+		return binaryEncode( digest.digest( arguments.bytes ), "hex" )
+	}
+
+	/**
+	 * Reads a file's raw bytes, guaranteed as real binary regardless of
+	 * extension - `fileReadBinary()` is NOT safe for this: confirmed in
+	 * this sandbox it silently returns a decoded STRING (not binary) for
+	 * common text-ish extensions like `.html`/`.txt` (only `isBinary()`
+	 * true for something like `.bin`), which would both corrupt the
+	 * uploaded file content AND produce a SHA1 digest computed over the
+	 * wrong bytes (a String's own encoding round-trip, not the file's
+	 * actual on-disk bytes). `java.nio.file.Files.readAllBytes()` has no
+	 * such extension-based guessing.
+	 *
+	 * @path Absolute path to the file to read
+	 *
+	 * @return The file's exact raw bytes
+	 */
+	private binary function readFileBytes( required string path ) {
+		var nioPath = createObject( "java", "java.nio.file.Paths" ).get( arguments.path, [] )
+		return createObject( "java", "java.nio.file.Files" ).readAllBytes( nioPath )
+	}
+
+	/**
+	 * Step 1 - uploads one file's raw bytes to Vercel's file-upload endpoint.
+	 *
+	 * @token A valid Vercel Bearer access token
+	 * @teamId Team/org identifier for the `teamId` query param, or "" to omit it
+	 * @entry One `buildFileManifest()` entry: { file, sha, size }
+	 */
+	private void function uploadFile( required string token, required string teamId, required struct entry ) {
+		var url = variables.API_BASE & "/v2/files" & ( len( arguments.teamId ) ? "?teamId=#arguments.teamId#" : "" )
+		var result = ""
+		bx:http url="#url#" method="POST" result="result" {
+			bx:httpparam type="header" name="Authorization" value="Bearer #arguments.token#";
+			bx:httpparam type="header" name="Content-Type" value="application/octet-stream";
+			bx:httpparam type="header" name="x-vercel-digest" value="#arguments.entry.sha#";
+			bx:httpparam type="body" value="#arguments.entry.bytes#";
+		}
+		assertOk( result, "POST /v2/files (#arguments.entry.file#)" )
+	}
+
+	/**
+	 * Step 2 - creates the deployment, referencing every already-uploaded
+	 * file by its SHA1 digest.
+	 *
+	 * @token A valid Vercel Bearer access token
+	 * @teamId Team/org identifier for the `teamId` query param, or "" to omit it
+	 * @projectId This target's `projectId` config - sent as both `name` and `project`
+	 * @manifest The full `buildFileManifest()` result
+	 *
+	 * @return { id, url, readyState }
+	 */
+	private struct function createDeployment(
+		required string token,
+		required string teamId,
+		required string projectId,
+		required array manifest
+	) {
+		var url = variables.API_BASE & "/v13/deployments" & ( len( arguments.teamId ) ? "?teamId=#arguments.teamId#" : "" )
+		var body = {
+			"name"    : arguments.projectId,
+			"project" : arguments.projectId,
+			"target"  : "production",
+			"files"   : arguments.manifest.map( function( entry ) {
+				return { "file" : entry.file, "sha" : entry.sha, "size" : entry.size }
+			} )
+		}
+
+		var result = ""
+		bx:http url="#url#" method="POST" result="result" {
+			bx:httpparam type="header" name="Authorization" value="Bearer #arguments.token#";
+			bx:httpparam type="header" name="Content-Type" value="application/json";
+			bx:httpparam type="body" value="#jsonSerialize( body )#";
+		}
+		assertOk( result, "POST /v13/deployments" )
+
+		var responseBody = jsonDeserialize( result.fileContent )
+		return { id : responseBody.id ?: "", url : responseBody.url ?: "", readyState : responseBody.readyState ?: "" }
+	}
+
+	/**
+	 * @result A `bx:http` result struct
+	 * @operation A short label for the request, used in the thrown error message
+	 */
+	private void function assertOk( required struct result, required string operation ) {
+		var statusCode = val( listFirst( arguments.result.statusCode ?: "0", " " ) )
+		if ( statusCode < 200 || statusCode >= 300 ) {
+			throw(
+				type    = "BxSites.DeployFailed",
+				message = "#arguments.operation# failed (status #arguments.result.statusCode#): #arguments.result.fileContent#"
+			)
+		}
+	}
+
+}

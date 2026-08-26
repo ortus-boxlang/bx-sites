@@ -1,0 +1,68 @@
+/**
+ * `package` CLI verb - builds the site, then zips it into a single
+ * distributable archive: a plain zip whose root IS the built site's own
+ * contents (not a wrapping `site/` folder), ready to attach to a release,
+ * hand to any host that only accepts a zip upload, or ship anywhere
+ * `bxSites deploy`'s pluggable targets don't reach.
+ *
+ * The archive is written OUTSIDE the site's own output directory (default
+ * `<projectRoot>/site.zip`, a sibling of `site/`, never inside it) - zipping
+ * `site/` into a file that also lives under `site/` would recurse into its
+ * own output.
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required), output (optional, defaults to <projectRoot>/site.zip; a relative value is resolved against projectRoot) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxSites.MissingProjectRoot", message = "`package` requires a project root" )
+		}
+		var root = projectRoot.reReplace( "[\/]+$", "" )
+
+		var output = resolveOutput( root, trim( arguments.options.output ?: "" ) )
+
+		var pipeline = new "models.build.BuildPipeline@bxsites"()
+		var buildResult = pipeline.build( root )
+
+		var destDir = getDirectoryFromPath( output )
+		if ( !directoryExists( destDir ) ) {
+			directoryCreate( destDir, true, true )
+		}
+
+		compress(
+			destination       : output,
+			format            : "zip",
+			source            : buildResult.siteDir,
+			includeBaseFolder : false,
+			overwrite         : true,
+			recurse           : true
+		)
+
+		return {
+			exitCode : 0,
+			message  : "Packaged #buildResult.pageCount# page(s) into #output#"
+		}
+	}
+
+	/**
+	 * Resolves the archive's destination path: `--output` if given (relative
+	 * values resolved against `projectRoot`, not this file's own location -
+	 * see AGENTS.md's page-relative-path gotcha), else `<projectRoot>/site.zip`.
+	 *
+	 * @projectRoot Absolute path to the project root
+	 * @output The raw `--output` option value, "" if not given
+	 *
+	 * @return An absolute destination path for the zip archive
+	 */
+	private string function resolveOutput( required string projectRoot, required string output ) {
+		if ( !len( arguments.output ) ) {
+			return arguments.projectRoot & "/site.zip"
+		}
+		var isAbsolute = arguments.output.left( 1 ) == "/" || reFind( "^[A-Za-z]:", arguments.output ) > 0
+		return isAbsolute ? arguments.output : ( arguments.projectRoot & "/" & arguments.output )
+	}
+
+}

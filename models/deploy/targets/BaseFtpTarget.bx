@@ -1,0 +1,298 @@
+/**
+ * Shared logic for the `ftp` and `sftp` deploy targets, both backed by the
+ * real `bx:ftp` component the `bx-ftp` BoxLang module provides (a genuine
+ * `box.json` dependency of this module, `"bx-ftp":"*"` - not vendored, same
+ * relationship this module has with `bx-markdown`/`bx-yaml`/`bx-esapi`/
+ * `bx-image`). The two targets differ only in the `secure` flag passed to
+ * `performDeploy()` (`false` = plain FTP, `true` = SFTP) and which extra
+ * authentication/connection options each protocol supports - mirroring the
+ * exact same `secure`-boolean-differentiator pattern a sibling BoxLang
+ * project (`bx-agents`) already uses for its own `ftp`/`sftp` targets.
+ *
+ * Unlike that sibling project's version (which ships exactly one packaged
+ * artifact file), this target uploads the ENTIRE already-built `site/`
+ * directory tree, preserving its relative folder structure remotely:
+ * `collectSiteFiles()` walks `context.siteDir` recursively (filtering out
+ * the directory entries `directoryList()` also returns - see this repo's
+ * own AGENTS.md gotcha), `collectRemoteDirs()` derives every unique
+ * remote subdirectory implied by those files' relative paths (including
+ * every ancestor, sorted shallowest-first so a parent always exists before
+ * a child is created), then ONE connection is opened, every remote
+ * directory is created (idempotently), every file is uploaded through it,
+ * and the connection is closed in a `finally` - never reopened per file.
+ *
+ * Remote directory creation: confirmed against this environment's actual
+ * installed `bx-ftp-1.6.0.jar` (decompiled its `FTP`/`FTPKeys` classes) AND
+ * the module's own bundled readme.md, both agreeing on the same shape:
+ * `bx:ftp action="createdir" connection="..." new="<path>" result="r"` -
+ * `result.returnValue` (boolean), non-recursive (a plain server-side
+ * `mkdir`, not `mkdir -p` - the parent must already exist, which is exactly
+ * why `collectRemoteDirs()` creates shallowest-first). To make that
+ * idempotent without depending on unverified "does createdir throw or
+ * return false on an already-existing directory" behavior, `ensureRemoteDir()`
+ * checks first via the sibling `existsdir` action (`directory="<path>"`,
+ * also `result.returnValue`) and only calls `createdir` when the check
+ * says the directory isn't there yet - this sidesteps the question
+ * entirely rather than guessing at unverified error-tolerance behavior.
+ *
+ * `bx:ftp`'s own `port` attribute on `action="open"` defaults unconditionally
+ * to 21 REGARDLESS of `secure` - confirmed here the same way the sibling
+ * project's own BaseFtpTarget.bx comment claims (decompiling `FTP.class`
+ * shows a literal `bipush 21` baked into the attribute's own default,
+ * unconditional on the `secure` flag; the module's readme.md's attribute
+ * table technically documents a protocol-aware "21 (FTP) / 22 (SFTP)"
+ * default, but the real bytecode says otherwise) - so `buildConnectAttributes()`
+ * supplies its OWN protocol-aware port default (21 for ftp, 22 for sftp)
+ * whenever a project doesn't set one explicitly, same as the sibling.
+ *
+ * `passwordEnvVar`/`passphraseEnvVar` name environment variables holding the
+ * real secret - NEVER the secret value itself - resolved live at deploy time
+ * via `getSystemSetting()`, matching IDeploymentTarget.bx's own "secrets stay
+ * external" rule. `key` stays a plain config field since it's already a PATH
+ * to a key file the caller manages themselves, never key material.
+ *
+ * Any `IOException` `bx:ftp` throws (connection refused, auth failure, a
+ * negative FTP/SFTP reply) is caught and re-thrown as a clear
+ * `BxSites.DeployFailed` - every `bx:ftp` action throws on failure rather
+ * than ever returning a graceful `succeeded: false`/`returnValue: false`
+ * result for a genuine error, so the `succeeded`/`returnValue` checks below
+ * are defense-in-depth only, matching bx-ftp's own documented usage pattern
+ * (its readme.md's own "Error Handling Patterns" section still checks
+ * `uploadResult.succeeded` after a `putfile` call that could also have
+ * thrown).
+ *
+ * IMPORTANT - honest test boundary: this sandbox has no outbound raw TCP
+ * egress (only HTTPS through a proxy), so a real successful FTP/SFTP upload
+ * has NOT been verified end-to-end here. What IS verified for real: the
+ * `bx:ftp` component itself loads and dispatches correctly (a real
+ * connection attempt against a genuinely refused local port throws a real
+ * connection-refused error, not a "tag not found" error), and
+ * `buildConnectAttributes()` is fully covered as a pure function. See
+ * BaseFtpTargetSpec.bx's own docblock for the same boundary, stated there
+ * too.
+ */
+class {
+
+	/**
+	 * @config The `ftp`/`sftp` target's own resolved `deployments/*` entry
+	 * @context { projectRoot, siteDir, config } - only `siteDir` is used, as the whole tree to upload
+	 * @secure false = ftp, true = sftp
+	 *
+	 * @return { success, message, details: { host, remotePath, filesUploaded } }
+	 */
+	struct function performDeploy( required struct config, required struct context, required boolean secure ) {
+		var protocol = arguments.secure ? "sftp" : "ftp"
+		var host = trim( arguments.config.host ?: "" )
+		var username = trim( arguments.config.username ?: "" )
+		var remotePath = trim( arguments.config.remotePath ?: "" )
+		var passwordEnvVar = trim( arguments.config.passwordEnvVar ?: "" )
+		var key = trim( arguments.config.key ?: "" )
+
+		if ( !len( host ) || !len( username ) || !len( remotePath ) ) {
+			throw(
+				type    = "BxSites.InvalidDeployConfig",
+				message = "deploy target '#protocol#' requires 'host', 'username', and 'remotePath'"
+			)
+		}
+		if ( !arguments.secure && !len( passwordEnvVar ) ) {
+			throw( type = "BxSites.InvalidDeployConfig", message = "deploy target 'ftp' requires a 'passwordEnvVar'" )
+		}
+		if ( arguments.secure && !len( passwordEnvVar ) && !len( key ) ) {
+			throw( type = "BxSites.InvalidDeployConfig", message = "deploy target 'sftp' requires a 'passwordEnvVar' or a 'key'" )
+		}
+
+		var siteDir = arguments.context.siteDir
+		if ( !directoryExists( siteDir ) ) {
+			throw(
+				type    = "BxSites.SiteNotBuilt",
+				message = "No [#siteDir#] to deploy - run `build` first"
+			)
+		}
+
+		var remoteRoot = remotePath.reReplace( "[\/]+$", "" )
+		var files = collectSiteFiles( siteDir )
+		var relativeDirs = files.map( function( f ) { return f.relativeDir; } )
+		var remoteDirs = collectRemoteDirs( relativeDirs )
+
+		var connectionName = "bxsitesDeploy" & createUUID().replace( "-", "", "all" )
+		var connectAttrs = buildConnectAttributes( arguments.config, connectionName, arguments.secure )
+		var opened = false
+		var uploadedCount = 0
+
+		try {
+			bx:ftp action="open" attributeCollection="#connectAttrs#";
+			opened = true
+
+			for ( var dir in remoteDirs ) {
+				ensureRemoteDir( connectionName, remoteRoot & "/" & dir )
+			}
+
+			for ( var file in files ) {
+				var remoteFile = len( file.relativeDir ) ? ( remoteRoot & "/" & file.relativeDir & "/" & file.name ) : ( remoteRoot & "/" & file.name )
+				var putResult = ""
+				bx:ftp action="putfile" connection="#connectionName#" localFile="#file.path#" remoteFile="#remoteFile#" result="putResult";
+
+				if ( !( putResult.succeeded ?: false ) ) {
+					throw(
+						type    = "BxSites.DeployFailed",
+						message = "#protocol# upload of #file.relativePath# to #host# failed: #putResult.statusText ?: ( putResult.errorText ?: '' )#"
+					)
+				}
+				uploadedCount++
+			}
+		} catch ( any e ) {
+			if ( e.type == "BxSites.DeployFailed" ) {
+				rethrow;
+			}
+			throw(
+				type    = "BxSites.DeployFailed",
+				message = "#protocol# deploy to #host# failed: #e.message#"
+			)
+		} finally {
+			if ( opened ) {
+				try {
+					bx:ftp action="close" connection="#connectionName#";
+				} catch ( any ignore ) {
+					// best-effort cleanup - the upload's own outcome already
+					// determined success/failure above
+				}
+			}
+		}
+
+		return {
+			success : true,
+			message : "Deployed #uploadedCount# file(s) to #protocol#://#host#/#remoteRoot#",
+			details : { host : host, remotePath : remoteRoot, filesUploaded : uploadedCount }
+		}
+	}
+
+	/**
+	 * Idempotently ensures one remote directory exists - `existsdir` first,
+	 * `createdir` only if it isn't already there (see the class docblock for
+	 * why this check-first approach was chosen over relying on unverified
+	 * "already exists" error-tolerance in `createdir` itself).
+	 *
+	 * @connectionName The open `bx:ftp` connection's name
+	 * @remoteDir The full remote directory path to ensure exists
+	 */
+	private void function ensureRemoteDir( required string connectionName, required string remoteDir ) {
+		var existsResult = ""
+		bx:ftp action="existsdir" connection="#arguments.connectionName#" directory="#arguments.remoteDir#" result="existsResult";
+
+		if ( existsResult.returnValue ?: false ) {
+			return
+		}
+
+		var createResult = ""
+		bx:ftp action="createdir" connection="#arguments.connectionName#" new="#arguments.remoteDir#" result="createResult";
+	}
+
+	/**
+	 * Pure - walks `siteDir` recursively, filtering out the directory
+	 * entries `directoryList( path, true, "path" )` also returns (this
+	 * repo's own AGENTS.md gotcha), and returns each file alongside its
+	 * path relative to `siteDir`.
+	 *
+	 * @siteDir Absolute path to the already-built site
+	 *
+	 * @return [ { path (absolute), name, relativeDir (""  for root, no leading/trailing slash), relativePath } ]
+	 */
+	array function collectSiteFiles( required string siteDir ) {
+		var root = arguments.siteDir.reReplace( "[\/]+$", "" )
+		var allFiles = directoryList( root, true, "path" ).filter( function( p ) { return !directoryExists( p ); } )
+		var files = []
+
+		for ( var p in allFiles ) {
+			var name = getFileFromPath( p )
+			var fileDir = getDirectoryFromPath( p ).reReplace( "[\/]+$", "" )
+			var relativeDir = ( fileDir == root ) ? "" : fileDir.replace( root & "/", "", "one" )
+			var relativePath = len( relativeDir ) ? ( relativeDir & "/" & name ) : name
+
+			files.append( { path : p, name : name, relativeDir : relativeDir, relativePath : relativePath } )
+		}
+
+		return files
+	}
+
+	/**
+	 * Pure - given every file's own `relativeDir`, derives the full set of
+	 * remote subdirectories that must exist (including every ancestor of
+	 * each - e.g. `"a/b/c"` implies `"a"`, `"a/b"`, and `"a/b/c"` must all
+	 * exist), sorted shallowest-first so a parent directory is always
+	 * created before any of its children (`createdir` is a plain
+	 * non-recursive `mkdir`, not `mkdir -p`).
+	 *
+	 * @relativeDirs Every file's own `relativeDir` (see `collectSiteFiles()`) - duplicates and `""` (root) are fine
+	 *
+	 * @return Unique remote-relative directory paths, shallowest-first
+	 */
+	array function collectRemoteDirs( required array relativeDirs ) {
+		var seen = {}
+
+		for ( var relDir in arguments.relativeDirs ) {
+			if ( !len( relDir ) ) {
+				continue
+			}
+
+			var segments = listToArray( relDir, "/" )
+			var running = ""
+			for ( var seg in segments ) {
+				running = len( running ) ? ( running & "/" & seg ) : seg
+				seen[ running ] = true
+			}
+		}
+
+		var dirs = seen.keyArray()
+		dirs.sort( ( a, b ) => listLen( a, "/" ) - listLen( b, "/" ) )
+		return dirs
+	}
+
+	/**
+	 * Pure - builds the attribute struct passed to `bx:ftp action="open" attributeCollection="..."`.
+	 * `passwordEnvVar`/`passphraseEnvVar` are resolved into real secret
+	 * values here (via `getSystemSetting()`, defaulting to "" when unset) -
+	 * every other field renders straight through from `config`.
+	 *
+	 * @config The `ftp`/`sftp` target's own resolved `deployments/*` entry
+	 * @connectionName A unique name for this `bx:ftp` connection, so concurrent deploys never collide
+	 * @secure false = ftp, true = sftp
+	 *
+	 * @return The attribute struct for `bx:ftp action="open" attributeCollection="..."`
+	 */
+	struct function buildConnectAttributes( required struct config, required string connectionName, required boolean secure ) {
+		var attrs = {
+			connection : arguments.connectionName,
+			server     : arguments.config.host,
+			port       : arguments.config.port ?: ( arguments.secure ? 22 : 21 ),
+			username   : arguments.config.username,
+			timeout    : arguments.config.timeout ?: 30,
+			secure     : arguments.secure
+		}
+
+		var passwordEnvVar = trim( arguments.config.passwordEnvVar ?: "" )
+		if ( len( passwordEnvVar ) ) {
+			attrs.password = getSystemSetting( passwordEnvVar, "" )
+		}
+
+		if ( arguments.secure ) {
+			if ( len( arguments.config.key ?: "" ) ) {
+				attrs.key = arguments.config.key
+			}
+			var passphraseEnvVar = trim( arguments.config.passphraseEnvVar ?: "" )
+			if ( len( passphraseEnvVar ) ) {
+				attrs.passphrase = getSystemSetting( passphraseEnvVar, "" )
+			}
+			if ( len( arguments.config.fingerprint ?: "" ) ) {
+				attrs.fingerprint = arguments.config.fingerprint
+			}
+		} else {
+			attrs.passive = arguments.config.passive ?: true
+			if ( len( arguments.config.proxyServer ?: "" ) ) {
+				attrs.proxyServer = arguments.config.proxyServer
+			}
+		}
+
+		return attrs
+	}
+
+}

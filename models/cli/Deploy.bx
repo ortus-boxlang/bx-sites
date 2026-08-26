@@ -1,0 +1,246 @@
+/**
+ * `deploy` CLI verb - builds the site, then ships it to a real deployment
+ * target via the pluggable `IDeploymentTarget` interface. Supersedes the
+ * older single-purpose `gh-deploy` verb (still kept working, unchanged -
+ * see GhDeploy.bx's own docblock) with one command covering every target.
+ *
+ * Three ways to invoke it:
+ *
+ *  1. `--entry=<name>` - dispatches to whatever target the named
+ *     `deployments/<name>.json` convention entry declares (`s3`, `azure`,
+ *     `gcs`, `firebase`, `ftp`, `sftp`, `rsync`, `netlify`, `vercel`,
+ *     `cloudflare-pages`, `local`, or `github-pages`), resolved and
+ *     validated via `DeploymentConfigResolver`.
+ *  2. `--target=<name> [flags]` - a flag-only shorthand, kept working with
+ *     no `deployments/` folder present so the simplest cases never need one:
+ *       - `local`: `--destination=<path>`
+ *       - `github-pages`: `[--branch] [--remote] [--message]`, all
+ *         optional - the exact defaults `gh-deploy` already has
+ *     Every other target needs more configuration than a couple of flags
+ *     can reasonably carry, and requires a `deployments/*.json` entry instead.
+ *  3. Neither flag - "deploy all": every `deployments/*.json` entry is
+ *     deployed in turn, off a single shared build (the site is only built
+ *     once, not once per target). Requires at least one `deployments/*.json`
+ *     entry to exist; throws `BxSites.NoDeploymentsFound` otherwise, since
+ *     there's nothing implicit to fall back to. One target failing doesn't
+ *     stop the others - every entry is attempted, and the verb only exits
+ *     non-zero if at least one of them failed.
+ *
+ * `--verbose` prints a progress line as each target starts and finishes
+ * (build, then one line per target); without it, only the final one-line
+ * summary `main()` already prints is shown.
+ */
+class {
+
+	variables.TARGET_CLASSES = {
+		"local"            : "models.deploy.targets.LocalTarget@bxsites",
+		"github-pages"     : "models.deploy.targets.GitHubPagesTarget@bxsites",
+		"s3"               : "models.deploy.targets.S3Target@bxsites",
+		"ftp"              : "models.deploy.targets.FtpTarget@bxsites",
+		"sftp"             : "models.deploy.targets.SftpTarget@bxsites",
+		"rsync"            : "models.deploy.targets.RsyncTarget@bxsites",
+		"azure"            : "models.deploy.targets.AzureBlobTarget@bxsites",
+		"gcs"              : "models.deploy.targets.GcsTarget@bxsites",
+		"firebase"         : "models.deploy.targets.FirebaseTarget@bxsites",
+		"netlify"          : "models.deploy.targets.NetlifyTarget@bxsites",
+		"vercel"           : "models.deploy.targets.VercelTarget@bxsites",
+		"cloudflare-pages" : "models.deploy.targets.CloudflarePagesTarget@bxsites"
+	}
+
+	variables.FLAG_ONLY_TARGETS = [ "local", "github-pages" ]
+
+	/**
+	 * @options { projectRoot (required), entry (optional, a deployments/* entry name - NOT `name`, which collides with a reserved top-level BoxLang CLI flag and crashes the runtime before this class is even reached), target (optional; when neither entry nor target is given, every deployments/*.json entry is deployed instead), destination, branch, remote, message, verbose (optional, prints a progress line per target) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxSites.MissingProjectRoot", message = "`deploy` requires a project root" )
+		}
+		var root = projectRoot.reReplace( "[\/]+$", "" )
+		var verbose = arguments.options.verbose ?: false
+
+		var entryName = trim( arguments.options.entry ?: "" )
+		var explicitTarget = trim( arguments.options.target ?: "" )
+		var deployAllMode = !len( entryName ) && !len( explicitTarget )
+
+		// Resolve/validate what we're deploying to FIRST, same as the
+		// single-entry/single-target paths below - a bad or empty
+		// deployments/ folder should fail fast, before an expensive build,
+		// not after one.
+		var allEntries = []
+		var target = ""
+		var config = {}
+
+		if ( deployAllMode ) {
+			var resolver = new "models.deploy.DeploymentConfigResolver@bxsites"()
+			var resolved = resolver.resolve( root )
+
+			if ( resolved.errors.len() ) {
+				throw(
+					type    = "BxSites.InvalidDeployConfig",
+					message = "deployments/ has #resolved.errors.len()# error(s): #resolved.errors.toList( '; ' )#"
+				)
+			}
+			if ( !resolved.entries.len() ) {
+				throw(
+					type    = "BxSites.NoDeploymentsFound",
+					message = "No deployments/*.json entries found - add one, or use --entry=<name> / --target=<name> to deploy a single target"
+				)
+			}
+			allEntries = resolved.entries
+		} else if ( len( entryName ) ) {
+			var resolver = new "models.deploy.DeploymentConfigResolver@bxsites"()
+			var entry = resolver.getEntry( root, entryName )
+			target = entry.target
+			config = entry.config
+		} else {
+			target = explicitTarget
+
+			if ( !variables.TARGET_CLASSES.keyExists( target ) ) {
+				throw(
+					type    = "BxSites.UnknownDeploymentTarget",
+					message = "Unknown deployment target [#target#] - must be one of: #variables.TARGET_CLASSES.keyArray().toList()#"
+				)
+			}
+			if ( !variables.FLAG_ONLY_TARGETS.contains( target ) ) {
+				throw(
+					type    = "BxSites.MissingDeployEntry",
+					message = "deploy target [#target#] requires a deployments/*.json entry (`deploy --entry=<name>`) - only #variables.FLAG_ONLY_TARGETS.toList( '/' )# support the flag-only form"
+				)
+			}
+
+			config = buildFlagOnlyConfig( target, arguments.options )
+		}
+
+		var configLoader = new "models.config.ConfigLoader@bxsites"()
+		var siteConfig = configLoader.load( root )
+
+		if ( verbose ) {
+			println( "Building site..." )
+		}
+		var pipeline = new "models.build.BuildPipeline@bxsites"()
+		var buildResult = pipeline.build( root )
+		if ( verbose ) {
+			println( "Built #buildResult.pageCount# page(s) to #buildResult.siteDir#" )
+		}
+
+		var context = { projectRoot : root, siteDir : buildResult.siteDir, config : siteConfig }
+
+		if ( deployAllMode ) {
+			return deployAllEntries( allEntries, context, buildResult, verbose )
+		}
+
+		if ( verbose ) {
+			println( "Deploying to [#target#]..." )
+		}
+		var result = deployToTarget( target, config, context )
+		if ( verbose ) {
+			println( result.success ? "Deployed to [#target#]" : "Failed to deploy to [#target#]: #result.message#" )
+		}
+
+		return {
+			exitCode : result.success ? 0 : 1,
+			message  : "Built #buildResult.pageCount# page(s). #result.message#",
+			result   : result
+		}
+	}
+
+	/**
+	 * "Deploy all" - every already-resolved `deployments/*.json` entry,
+	 * deployed in turn off the single build `run()` already produced. One
+	 * entry failing doesn't stop the rest; the overall result only fails if
+	 * at least one did.
+	 *
+	 * @entries The already-resolved+validated deployments/*.json entries ({ name, target, config }[])
+	 * @context The shared deploy context ({ projectRoot, siteDir, config }), already built once
+	 * @buildResult The BuildPipeline result, for the page-count summary
+	 * @verbose Whether to print a progress line per target
+	 *
+	 * @return { exitCode, message, result: { success, targets: [ { name, target, result } ] } }
+	 */
+	private struct function deployAllEntries(
+		required array entries,
+		required struct context,
+		required struct buildResult,
+		required boolean verbose
+	) {
+		var targets = []
+		var failureCount = 0
+
+		for ( var entry in arguments.entries ) {
+			if ( arguments.verbose ) {
+				println( "Deploying [#entry.name#] (#entry.target#)..." )
+			}
+			var result = deployToTarget( entry.target, entry.config, arguments.context )
+			if ( !result.success ) {
+				failureCount++
+			}
+			if ( arguments.verbose ) {
+				println( result.success ? "Deployed [#entry.name#]" : "Failed to deploy [#entry.name#]: #result.message#" )
+			}
+			targets.append( { name : entry.name, target : entry.target, result : result } )
+		}
+
+		var successCount = arguments.entries.len() - failureCount
+
+		return {
+			exitCode : failureCount ? 1 : 0,
+			message  : "Built #arguments.buildResult.pageCount# page(s). Deployed to #successCount#/#arguments.entries.len()# target(s)#failureCount ? ' (' & failureCount & ' failed)' : ''#.",
+			result   : { success : failureCount == 0, targets : targets }
+		}
+	}
+
+	/**
+	 * Instantiates the right target class and deploys, converting a thrown
+	 * failure into a `{ success: false, message }` result instead of letting
+	 * it propagate - so one target failing during "deploy all" never stops
+	 * the entries after it.
+	 *
+	 * @target The target name, e.g. "s3"/"azure"
+	 * @config That target's own resolved config struct
+	 * @context The shared deploy context ({ projectRoot, siteDir, config })
+	 *
+	 * @return { success, message, ... } - whatever the target's own deploy() returns, or a synthesized failure
+	 */
+	private struct function deployToTarget( required string target, required struct config, required struct context ) {
+		try {
+			var targetInstance = new "#variables.TARGET_CLASSES[ arguments.target ]#"()
+			return targetInstance.deploy( arguments.config, arguments.context )
+		} catch ( any e ) {
+			return { success : false, message : e.message }
+		}
+	}
+
+	/**
+	 * Builds the `local`/`github-pages` flag-only config shape from raw CLI options.
+	 *
+	 * @target Which flag-only target is being built for
+	 * @options The verb's own raw options struct
+	 *
+	 * @return The target's own config struct
+	 */
+	private struct function buildFlagOnlyConfig( required string target, required struct options ) {
+		if ( arguments.target == "local" ) {
+			var destination = trim( arguments.options.destination ?: "" )
+			if ( !len( destination ) ) {
+				throw( type = "BxSites.MissingDestination", message = "`deploy --target=local` requires --destination" )
+			}
+			return { destination : destination }
+		}
+
+		// github-pages - every field optional, same defaults GhPagesDeployer.bx already has
+		var config = {}
+		if ( len( trim( arguments.options.branch ?: "" ) ) ) {
+			config.branch = trim( arguments.options.branch )
+		}
+		if ( len( trim( arguments.options.remote ?: "" ) ) ) {
+			config.remote = trim( arguments.options.remote )
+		}
+		if ( len( trim( arguments.options.message ?: "" ) ) ) {
+			config.message = trim( arguments.options.message )
+		}
+		return config
+	}
+
+}

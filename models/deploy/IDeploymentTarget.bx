@@ -1,0 +1,32 @@
+/**
+ * Contract every pluggable `deploy` target implements. A target is
+ * responsible for shipping an already-built `site/` directory somewhere
+ * real - an object storage bucket, a remote server, a static-hosting
+ * platform's own API, or a git branch - and for validating whatever
+ * config fields IT specifically needs, the same way every other CLI verb
+ * in this module self-checks its own prerequisites rather than relying on
+ * a caller to have checked first.
+ *
+ * Every target reads secrets (API tokens, passwords, access keys) from
+ * environment variables at deploy time - never from a literal value in
+ * `deployments/*` config - the config field naming a secret always ends in
+ * `EnvVar` (e.g. `passwordEnvVar`, `apiTokenEnvVar`). A field that's a
+ * PATH to a credential file the caller manages themselves (an SSH private
+ * key, a GCP service-account JSON key) is a plain config field instead,
+ * same convention `sftp`'s own `key` field uses - the file's permissions/
+ * gitignore status is what protects it, not indirection through env vars.
+ */
+interface {
+
+	/**
+	 * @config  The resolved `deployments/*` entry's own config struct (whatever
+	 *          fields this target declares - see each target's own docblock)
+	 * @context { projectRoot, siteDir, config } - `siteDir` is the already-built
+	 *          site (run `build` first); `config` is the project's own
+	 *          bxsites.json config, for targets that want the site name/baseURL
+	 *
+	 * @return { success: boolean, message: string, details: struct }
+	 */
+	struct function deploy( required struct config, required struct context );
+
+}

@@ -1,0 +1,197 @@
+/**
+ * `buildConnectAttributes()`, `collectSiteFiles()`, and `collectRemoteDirs()`
+ * are pure and tested directly. `performDeploy()` itself IS exercised for
+ * real against a genuinely refused local connection (`127.0.0.1` on a port
+ * nothing is listening on) - this sandbox has no outbound raw TCP egress at
+ * all (only HTTPS through a proxy), so a real successful FTP/SFTP upload
+ * can NOT be verified here, but a real connection attempt/failure/
+ * error-wrapping/cleanup path can be, and is.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "deploy.targets.BaseFtpTarget", function() {
+
+			beforeEach( function() {
+				variables.target = new "models.deploy.targets.BaseFtpTarget@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newTempDir() {
+				var dir = createTempDirectory( prefix = "bxsites-ftptarget-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			private function setEnvVar( required string name, required string value ) {
+				createObject( "java", "java.lang.System" ).setProperty( arguments.name, arguments.value );
+			}
+
+			it( "builds ftp connect attributes defaulting port 21 and passive true", function() {
+				setEnvVar( "BXSITES_TEST_FTP_PW", "pass" );
+				var attrs = target.buildConnectAttributes( { host : "ftp.example.com", username : "user", passwordEnvVar : "BXSITES_TEST_FTP_PW" }, "conn1", false );
+
+				expect( attrs.server ).toBe( "ftp.example.com" );
+				expect( attrs.connection ).toBe( "conn1" );
+				expect( attrs.username ).toBe( "user" );
+				expect( attrs.password ).toBe( "pass" );
+				expect( attrs.port ).toBe( 21 );
+				expect( attrs.passive ).toBeTrue();
+				expect( attrs.secure ).toBeFalse();
+				expect( attrs.timeout ).toBe( 30 );
+				expect( attrs.keyExists( "key" ) ).toBeFalse();
+			} );
+
+			it( "resolves the password from the named environment variable, not from a literal in config", function() {
+				// A fixture string, not a real credential - only proving the value
+				// flows from the env var through to attrs.password, nothing else.
+				setEnvVar( "BXSITES_TEST_FTP_PW2", "fixture-value-not-a-real-credential" );
+				var attrs = target.buildConnectAttributes( { host : "x", username : "y", passwordEnvVar : "BXSITES_TEST_FTP_PW2" }, "conn1", false );
+
+				expect( attrs.password ).toBe( "fixture-value-not-a-real-credential" );
+			} );
+
+			it( "resolves an empty password when the named environment variable isn't set", function() {
+				var attrs = target.buildConnectAttributes( { host : "x", username : "y", passwordEnvVar : "BXSITES_TEST_DEFINITELY_UNSET_VAR" }, "conn1", false );
+
+				expect( attrs.password ).toBe( "" );
+			} );
+
+			it( "honors an explicit ftp port, passive, and proxyServer", function() {
+				setEnvVar( "BXSITES_TEST_FTP_PW", "pass" );
+				var attrs = target.buildConnectAttributes(
+					{ host : "ftp.example.com", username : "user", passwordEnvVar : "BXSITES_TEST_FTP_PW", port : 2121, passive : false, proxyServer : "proxy.company.com:8080" },
+					"conn1",
+					false
+				);
+
+				expect( attrs.port ).toBe( 2121 );
+				expect( attrs.passive ).toBeFalse();
+				expect( attrs.proxyServer ).toBe( "proxy.company.com:8080" );
+			} );
+
+			it( "builds sftp connect attributes defaulting port 22, with a password", function() {
+				setEnvVar( "BXSITES_TEST_FTP_PW", "pass" );
+				var attrs = target.buildConnectAttributes( { host : "sftp.example.com", username : "user", passwordEnvVar : "BXSITES_TEST_FTP_PW" }, "conn2", true );
+
+				expect( attrs.port ).toBe( 22 );
+				expect( attrs.secure ).toBeTrue();
+				expect( attrs.password ).toBe( "pass" );
+				expect( attrs.keyExists( "passive" ) ).toBeFalse();
+			} );
+
+			it( "builds sftp connect attributes with a key, passphrase, and fingerprint", function() {
+				setEnvVar( "BXSITES_TEST_FTP_PASSPHRASE", "secret" );
+				var attrs = target.buildConnectAttributes(
+					{
+						host             : "sftp.example.com",
+						username         : "deploy",
+						key              : "/home/me/.ssh/id_rsa",
+						passphraseEnvVar : "BXSITES_TEST_FTP_PASSPHRASE",
+						fingerprint      : "SHA256:abc123"
+					},
+					"conn2",
+					true
+				);
+
+				expect( attrs.key ).toBe( "/home/me/.ssh/id_rsa" );
+				expect( attrs.passphrase ).toBe( "secret" );
+				expect( attrs.fingerprint ).toBe( "SHA256:abc123" );
+				expect( attrs.keyExists( "password" ) ).toBeFalse();
+			} );
+
+			it( "collects every file under siteDir with its path relative to siteDir, filtering out directory entries", function() {
+				var siteDir = newTempDir();
+				directoryCreate( siteDir & "/assets/img", true, true );
+				fileWrite( siteDir & "/index.html", "home" );
+				fileWrite( siteDir & "/assets/style.css", "body{}" );
+				fileWrite( siteDir & "/assets/img/logo.png", "png" );
+
+				var files = target.collectSiteFiles( siteDir );
+				var relativePaths = files.map( function( f ) { return f.relativePath; } );
+
+				expect( files.len() ).toBe( 3 );
+				expect( relativePaths ).toInclude( "index.html" );
+				expect( relativePaths ).toInclude( "assets/style.css" );
+				expect( relativePaths ).toInclude( "assets/img/logo.png" );
+
+				var rootFile = files.filter( function( f ) { return f.name == "index.html"; } )[ 1 ];
+				expect( rootFile.relativeDir ).toBe( "" );
+
+				var nestedFile = files.filter( function( f ) { return f.name == "logo.png"; } )[ 1 ];
+				expect( nestedFile.relativeDir ).toBe( "assets/img" );
+			} );
+
+			it( "derives every ancestor remote directory, sorted shallowest-first", function() {
+				var dirs = target.collectRemoteDirs( [ "assets/img", "guides/2025" ] );
+
+				expect( dirs.len() ).toBe( 4 );
+				expect( dirs ).toInclude( "assets" );
+				expect( dirs ).toInclude( "assets/img" );
+				expect( dirs ).toInclude( "guides" );
+				expect( dirs ).toInclude( "guides/2025" );
+
+				expect( arrayFind( dirs, "assets" ) ).toBeLT( arrayFind( dirs, "assets/img" ) );
+				expect( arrayFind( dirs, "guides" ) ).toBeLT( arrayFind( dirs, "guides/2025" ) );
+			} );
+
+			it( "de-duplicates remote directories shared by multiple files, and ignores the root (empty) entry", function() {
+				var dirs = target.collectRemoteDirs( [ "assets", "assets", "", "assets" ] );
+
+				expect( dirs ).toBe( [ "assets" ] );
+			} );
+
+			it( "throws BxSites.InvalidDeployConfig when host/username/remotePath are missing", function() {
+				expect( function() {
+					target.performDeploy( {}, { siteDir : newTempDir() }, false );
+				} ).toThrow( "BxSites.InvalidDeployConfig" );
+			} );
+
+			it( "throws BxSites.InvalidDeployConfig when ftp has no passwordEnvVar", function() {
+				expect( function() {
+					target.performDeploy( { host : "x", username : "y", remotePath : "/z" }, { siteDir : newTempDir() }, false );
+				} ).toThrow( "BxSites.InvalidDeployConfig" );
+			} );
+
+			it( "throws BxSites.InvalidDeployConfig when sftp has neither passwordEnvVar nor key", function() {
+				expect( function() {
+					target.performDeploy( { host : "x", username : "y", remotePath : "/z" }, { siteDir : newTempDir() }, true );
+				} ).toThrow( "BxSites.InvalidDeployConfig" );
+			} );
+
+			it( "throws BxSites.SiteNotBuilt when siteDir doesn't exist", function() {
+				var root = newTempDir();
+				expect( function() {
+					target.performDeploy(
+						{ host : "x", username : "y", passwordEnvVar : "BXSITES_TEST_FTP_PW", remotePath : "/uploads" },
+						{ siteDir : root & "/site" },
+						false
+					);
+				} ).toThrow( "BxSites.SiteNotBuilt" );
+			} );
+
+			it( "wraps a real connection failure as BxSites.DeployFailed (genuine refused connection, no server mocked)", function() {
+				var siteDir = newTempDir();
+				fileWrite( siteDir & "/index.html", "<h1>Home</h1>" );
+
+				expect( function() {
+					target.performDeploy(
+						{ host : "127.0.0.1", port : 1, username : "user", passwordEnvVar : "BXSITES_TEST_FTP_PW", remotePath : "/uploads", timeout : 2 },
+						{ siteDir : siteDir },
+						false
+					);
+				} ).toThrow( "BxSites.DeployFailed" );
+			} );
+
+		} );
+	}
+
+}

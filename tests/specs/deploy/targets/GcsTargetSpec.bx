@@ -1,0 +1,121 @@
+/**
+ * deploy.targets.GcsTarget only covers guard clauses and the pure (no-HTTP)
+ * `buildObjectName()`/`guessContentType()` helpers here, matching this
+ * module's own honesty convention for targets with no real cloud account
+ * available in this sandbox (see e.g. cli.GhDeploy's own spec docblock).
+ * There is no real GCP project/bucket/service-account to deploy against
+ * here, so the actual upload HTTP calls (`uploadFile()`, and by extension
+ * the full `deploy()` happy path) are NOT exercised for real by this spec.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "deploy.targets.GcsTarget", function() {
+
+			beforeEach( function() {
+				variables.target = new "models.deploy.targets.GcsTarget@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newTempDir() {
+				var dir = createTempDirectory( prefix = "bxsites-gcstarget-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			describe( "deploy() guard clauses", function() {
+
+				it( "throws BxSites.MissingBucket when bucket is missing", function() {
+					expect( function() {
+						target.deploy( { serviceAccountKeyPath : "/tmp/key.json" }, { siteDir : newTempDir() } );
+					} ).toThrow( "BxSites.MissingBucket" );
+				} );
+
+				it( "throws BxSites.MissingServiceAccountKeyPath when serviceAccountKeyPath is missing", function() {
+					expect( function() {
+						target.deploy( { bucket : "my-bucket" }, { siteDir : newTempDir() } );
+					} ).toThrow( "BxSites.MissingServiceAccountKeyPath" );
+				} );
+
+				it( "throws BxSites.SiteNotBuilt when siteDir doesn't exist", function() {
+					var root = newTempDir();
+					expect( function() {
+						target.deploy(
+							{ bucket : "my-bucket", serviceAccountKeyPath : "/tmp/key.json" },
+							{ siteDir : root & "/site" }
+						);
+					} ).toThrow( "BxSites.SiteNotBuilt" );
+				} );
+
+			} );
+
+			describe( "buildObjectName()", function() {
+
+				it( "uses the bare relative path when prefix is empty", function() {
+					expect( target.buildObjectName( "", "index.html" ) ).toBe( "index.html" );
+				} );
+
+				it( "joins prefix and relative path with a single slash", function() {
+					expect( target.buildObjectName( "releases/v1", "assets/style.css" ) ).toBe( "releases/v1/assets/style.css" );
+				} );
+
+				it( "strips leading/trailing slashes from prefix before joining", function() {
+					expect( target.buildObjectName( "/releases/v1/", "index.html" ) ).toBe( "releases/v1/index.html" );
+				} );
+
+				it( "keeps literal '/' characters in the relative path (GCS flat object names, not %2F)", function() {
+					var objectName = target.buildObjectName( "", "assets/img/logo.png" );
+					expect( objectName ).toBe( "assets/img/logo.png" );
+					expect( objectName ).notToInclude( "%2F" );
+				} );
+
+				it( "URL-encodes other special characters in the relative path", function() {
+					var objectName = target.buildObjectName( "", "my file.html" );
+					expect( objectName ).notToInclude( " " );
+					expect( objectName.find( "%20" ) || objectName.find( "+" ) ).toBeTrue();
+				} );
+
+			} );
+
+			describe( "guessContentType()", function() {
+
+				it( "guesses common web asset MIME types", function() {
+					expect( target.guessContentType( "index.html" ) ).toBe( "text/html" );
+					expect( target.guessContentType( "index.htm" ) ).toBe( "text/html" );
+					expect( target.guessContentType( "style.css" ) ).toBe( "text/css" );
+					expect( target.guessContentType( "app.js" ) ).toBe( "application/javascript" );
+					expect( target.guessContentType( "data.json" ) ).toBe( "application/json" );
+					expect( target.guessContentType( "feed.xml" ) ).toBe( "application/xml" );
+					expect( target.guessContentType( "icon.svg" ) ).toBe( "image/svg+xml" );
+					expect( target.guessContentType( "logo.png" ) ).toBe( "image/png" );
+					expect( target.guessContentType( "photo.jpg" ) ).toBe( "image/jpeg" );
+					expect( target.guessContentType( "photo.jpeg" ) ).toBe( "image/jpeg" );
+					expect( target.guessContentType( "anim.gif" ) ).toBe( "image/gif" );
+					expect( target.guessContentType( "favicon.ico" ) ).toBe( "image/x-icon" );
+					expect( target.guessContentType( "font.woff" ) ).toBe( "font/woff" );
+					expect( target.guessContentType( "font.woff2" ) ).toBe( "font/woff2" );
+				} );
+
+				it( "falls back to application/octet-stream for unknown extensions", function() {
+					expect( target.guessContentType( "data.bin" ) ).toBe( "application/octet-stream" );
+					expect( target.guessContentType( "no-extension-at-all" ) ).toBe( "application/octet-stream" );
+				} );
+
+				it( "is case-insensitive on the extension", function() {
+					expect( target.guessContentType( "IMAGE.PNG" ) ).toBe( "image/png" );
+				} );
+
+			} );
+
+		} );
+	}
+
+}

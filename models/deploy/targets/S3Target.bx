@@ -1,0 +1,264 @@
+/**
+ * Recursively uploads every file under the already-built `site/` directory
+ * to an S3 (or S3-compatible) bucket, preserving relative paths as object
+ * keys - one target covering real AWS S3, DigitalOcean Spaces, Cloudflare
+ * R2, Backblaze B2, and MinIO/Wasabi transparently, since they all speak
+ * the same S3 REST API and the same AWS Signature Version 4 scheme, only
+ * differing in `endpoint`/`region`/path-style (see `resolveEndpoint()`).
+ * All request signing is delegated to `AwsSigV4Signer.bx`, kept as a
+ * separate, pure, independently-tested class.
+ *
+ * Uploads run sequentially, one PUT per file - there is no concurrency/
+ * batching here, matching the other targets' own "simple and obviously
+ * correct" bar rather than optimizing for very large sites up front.
+ *
+ * @config {
+ *   bucket (required),
+ *   region ("us-east-1" default),
+ *   endpoint (optional full https:// custom endpoint, e.g.
+ *     "https://nyc3.digitaloceanspaces.com" for DO Spaces or
+ *     "https://<accountid>.r2.cloudflarestorage.com" for Cloudflare R2 -
+ *     when absent, AWS's own regional endpoint is derived),
+ *   forcePathStyle (boolean, false default - true for
+ *     "https://endpoint/bucket/key" instead of "https://bucket.endpoint/key";
+ *     most non-AWS S3-compatible services need this true),
+ *   prefix (optional key prefix inside the bucket, e.g. "docs/"),
+ *   acl (optional, e.g. "public-read" - sent as the `x-amz-acl` header when present),
+ *   accessKeyIdEnvVar (required - the NAME of an env var holding the real access key),
+ *   secretAccessKeyEnvVar (required - the NAME of an env var holding the real secret key)
+ * }
+ */
+class implements="models.deploy.IDeploymentTarget@bxsites" {
+
+	variables.MIME_TYPES = {
+		"html"  : "text/html",
+		"htm"   : "text/html",
+		"css"   : "text/css",
+		"js"    : "application/javascript",
+		"json"  : "application/json",
+		"xml"   : "application/xml",
+		"svg"   : "image/svg+xml",
+		"png"   : "image/png",
+		"jpg"   : "image/jpeg",
+		"jpeg"  : "image/jpeg",
+		"gif"   : "image/gif",
+		"ico"   : "image/x-icon",
+		"woff"  : "font/woff",
+		"woff2" : "font/woff2"
+	}
+
+	/**
+	 * @config This target's own resolved config (see the class docblock's `@config` shape)
+	 * @context { projectRoot, siteDir, config } - only `siteDir` is used
+	 *
+	 * @return { success, message, details: { bucket, uploaded, endpoint } }
+	 */
+	struct function deploy( required struct config, required struct context ) {
+		var bucket = trim( arguments.config.bucket ?: "" )
+		if ( !len( bucket ) ) {
+			throw( type = "BxSites.InvalidDeployConfig", message = "deploy target 's3' requires a 'bucket'" )
+		}
+
+		var accessKeyIdEnvVar = trim( arguments.config.accessKeyIdEnvVar ?: "" )
+		var secretAccessKeyEnvVar = trim( arguments.config.secretAccessKeyEnvVar ?: "" )
+		if ( !len( accessKeyIdEnvVar ) || !len( secretAccessKeyEnvVar ) ) {
+			throw(
+				type    = "BxSites.InvalidDeployConfig",
+				message = "deploy target 's3' requires an 'accessKeyIdEnvVar' and a 'secretAccessKeyEnvVar'"
+			)
+		}
+
+		if ( !directoryExists( arguments.context.siteDir ) ) {
+			throw(
+				type    = "BxSites.SiteNotBuilt",
+				message = "No [#arguments.context.siteDir#] to deploy - run `build` first"
+			)
+		}
+
+		var accessKey = getSystemSetting( accessKeyIdEnvVar, "" )
+		var secretKey = getSystemSetting( secretAccessKeyEnvVar, "" )
+		if ( !len( accessKey ) || !len( secretKey ) ) {
+			throw(
+				type    = "BxSites.MissingCredentials",
+				message = "deploy target 's3' could not resolve real credentials from the '#accessKeyIdEnvVar#'/'#secretAccessKeyEnvVar#' environment variables"
+			)
+		}
+
+		var endpoint = resolveEndpoint( arguments.config )
+		var region = len( trim( arguments.config.region ?: "" ) ) ? trim( arguments.config.region ) : "us-east-1"
+		var prefix = normalizePrefix( arguments.config.prefix ?: "" )
+		var acl = trim( arguments.config.acl ?: "" )
+
+		var signer = new "models.deploy.AwsSigV4Signer@bxsites"()
+		var siteDir = arguments.context.siteDir.reReplace( "[\/]+$", "" )
+		var files = directoryList( siteDir, true, "path" )
+			.filter( function( p ) { return !directoryExists( p ) } )
+
+		var uploaded = 0
+		for ( var filePath in files ) {
+			var relativePath = filePath.replace( siteDir & "/", "", "one" )
+			var key = buildObjectKey( prefix, relativePath )
+			uploadFile(
+				signer      : signer,
+				endpoint    : endpoint,
+				key         : key,
+				filePath    : filePath,
+				region      : region,
+				acl         : acl,
+				accessKey   : accessKey,
+				secretKey   : secretKey
+			)
+			uploaded++
+		}
+
+		return {
+			success : true,
+			message : "Uploaded #uploaded# file(s) to s3://#bucket#/#prefix#",
+			details : { bucket : bucket, uploaded : uploaded, endpoint : endpoint.baseUrl }
+		}
+	}
+
+	/**
+	 * Signs and PUTs a single file to its resolved object URL, throwing
+	 * `BxSites.DeployFailed` (naming the file and the response) on anything
+	 * other than a 2xx.
+	 *
+	 * @signer An `AwsSigV4Signer@bxsites` instance
+	 * @endpoint This deploy's resolved `{ host, baseUrl }` (see `resolveEndpoint()`)
+	 * @key The destination object key (already prefixed - see `buildObjectKey()`)
+	 * @filePath Absolute local path to the file being uploaded
+	 * @region The bucket's region, e.g. "us-east-1"
+	 * @acl "" for none, otherwise sent as the `x-amz-acl` header
+	 * @accessKey The real access key
+	 * @secretKey The real secret key
+	 */
+	private void function uploadFile(
+		required any signer,
+		required struct endpoint,
+		required string key,
+		required string filePath,
+		required string region,
+		required string acl,
+		required string accessKey,
+		required string secretKey
+	) {
+		var body = fileReadBinary( arguments.filePath )
+		var payloadHash = arguments.signer.hashBytes( body )
+		var uriPath = "/" & arguments.key
+		var url = arguments.endpoint.baseUrl & uriPath
+		var contentType = guessContentType( arguments.filePath )
+
+		var extraHeaders = { "Content-Type" : contentType }
+		if ( len( arguments.acl ) ) {
+			extraHeaders[ "x-amz-acl" ] = arguments.acl
+		}
+
+		var signedHeaders = arguments.signer.sign(
+			method       : "PUT",
+			host         : arguments.endpoint.host,
+			uriPath      : uriPath,
+			queryString  : "",
+			headers      : extraHeaders,
+			payloadHash  : payloadHash,
+			accessKey    : arguments.accessKey,
+			secretKey    : arguments.secretKey,
+			region       : arguments.region,
+			service      : "s3"
+		)
+
+		var result = ""
+		bx:http url="#url#" method="PUT" result="result" {
+			for ( var headerName in signedHeaders ) {
+				bx:httpparam type="header" name="#headerName#" value="#signedHeaders[ headerName ]#";
+			}
+			bx:httpparam type="body" value="#body#";
+		}
+
+		var statusCode = val( listFirst( result.statusCode ?: "0", " " ) )
+		if ( statusCode < 200 || statusCode >= 300 ) {
+			throw(
+				type    = "BxSites.DeployFailed",
+				message = "PUT #arguments.key# failed (status #result.statusCode ?: 'unknown'#): #result.fileContent ?: ''#"
+			)
+		}
+	}
+
+	/**
+	 * Pure - resolves this deploy's signing host and request base URL from
+	 * `bucket`/`region`/`endpoint`/`forcePathStyle`, covering all of: real
+	 * AWS (regional endpoint, virtual-hosted-style by default), and any
+	 * S3-compatible provider (a custom `endpoint`, almost always with
+	 * `forcePathStyle: true`).
+	 *
+	 * @config This target's own resolved config
+	 *
+	 * @return { host, baseUrl } - `host` is the Host header used for
+	 *         signing, `baseUrl` is `https://.../bucket-or-not` ready to
+	 *         have `/<key>` appended
+	 */
+	struct function resolveEndpoint( required struct config ) {
+		var bucket = trim( arguments.config.bucket ?: "" )
+		var region = len( trim( arguments.config.region ?: "" ) ) ? trim( arguments.config.region ) : "us-east-1"
+		var forcePathStyle = arguments.config.forcePathStyle ?: false
+		var customEndpoint = trim( arguments.config.endpoint ?: "" )
+
+		var baseHost = len( customEndpoint )
+			? customEndpoint.reReplace( "^https?://", "" ).reReplace( "[\/]+$", "" )
+			: "s3.#region#.amazonaws.com"
+
+		if ( forcePathStyle ) {
+			return { host : baseHost, baseUrl : "https://#baseHost#/#bucket#" }
+		}
+
+		return { host : "#bucket#.#baseHost#", baseUrl : "https://#bucket#.#baseHost#" }
+	}
+
+	/**
+	 * Pure - joins a normalized prefix and a file's path relative to
+	 * `siteDir` into the object key it's uploaded under.
+	 *
+	 * @prefix This deploy's raw `prefix` config value (may be "", may be
+	 *         missing a trailing "/")
+	 * @relativePath A file's path relative to `siteDir`, forward-slash separated
+	 *
+	 * @return The object key, e.g. "docs/index.html"
+	 */
+	string function buildObjectKey( required string prefix, required string relativePath ) {
+		var backslash = char( 92 )
+		var cleanRelative = arguments.relativePath.replace( backslash, "/", "all" ).reReplace( "^[\/]+", "" )
+		return normalizePrefix( arguments.prefix ) & cleanRelative
+	}
+
+	/**
+	 * Pure - normalizes a `prefix` config value into a form safe to
+	 * directly prepend to a relative path: no leading "/", exactly one
+	 * trailing "/" when non-empty, "" stays "".
+	 *
+	 * @prefix The raw `prefix` config value
+	 *
+	 * @return The normalized prefix
+	 */
+	string function normalizePrefix( required string prefix ) {
+		var cleaned = trim( arguments.prefix ).reReplace( "^[\/]+", "" )
+		if ( !len( cleaned ) ) {
+			return ""
+		}
+		return right( cleaned, 1 ) == "/" ? cleaned : cleaned & "/"
+	}
+
+	/**
+	 * Pure - guesses a file's `Content-Type` from its extension. Falls back
+	 * to `application/octet-stream` for anything unrecognized (or
+	 * extensionless).
+	 *
+	 * @filePath Absolute or relative path to the file
+	 *
+	 * @return The guessed MIME type
+	 */
+	string function guessContentType( required string filePath ) {
+		var fileName = getFileFromPath( arguments.filePath )
+		var ext = fileName.find( "." ) ? lCase( listLast( fileName, "." ) ) : ""
+		return variables.MIME_TYPES[ ext ] ?: "application/octet-stream"
+	}
+
+}
