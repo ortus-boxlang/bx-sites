@@ -34,6 +34,7 @@
 	function renderPageActions() {
 		var markdownHref = len( variables.page.markdownUrl ?: "" ) ? variables.basePath & variables.page.markdownUrl : ""
 		var canonicalUrl = trim( variables.page.canonicalUrl ?: "" )
+		var repoUrl = trim( variables.repoUrl ?: "" )
 
 		var items = ""
 		if ( len( markdownHref ) ) {
@@ -42,15 +43,24 @@
 		}
 		if ( len( canonicalUrl ) ) {
 			items &= '<button type="button" class="bxsites-page-actions__item" data-bxsites-action="copy-link" data-bxsites-page-url="' & bxsitesUrlAttr( canonicalUrl ) & '">' & bxsitesIcon( "link" ) & '<span>' & encodeForHTML( variables.strings.copyPageLink ) & '</span></button>'
-			items &= '<a class="bxsites-page-actions__item" href="https://chatgpt.com/?q=' & urlEncodedFormat( "Read " & canonicalUrl & " so I can ask questions about it." ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "sparkle" ) & '<span>' & encodeForHTML( variables.strings.openInChatGPT ) & '</span></a>'
-			items &= '<a class="bxsites-page-actions__item" href="https://claude.ai/new?q=' & urlEncodedFormat( "Read " & canonicalUrl & " so I can ask questions about it." ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "sparkle" ) & '<span>' & encodeForHTML( variables.strings.openInClaude ) & '</span></a>'
+			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://chatgpt.com/?q=" & urlEncodedFormat( "Read " & canonicalUrl & " so I can ask questions about it." ) ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "sparkle" ) & '<span>' & encodeForHTML( variables.strings.openInChatGPT ) & '</span></a>'
+			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://claude.ai/new?q=" & urlEncodedFormat( "Read " & canonicalUrl & " so I can ask questions about it." ) ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "sparkle" ) & '<span>' & encodeForHTML( variables.strings.openInClaude ) & '</span></a>'
 		}
 		items &= '<button type="button" class="bxsites-page-actions__item" data-bxsites-action="print">' & bxsitesIcon( "print" ) & '<span>' & encodeForHTML( variables.strings.exportAsPdf ) & '</span></button>'
+		if ( len( repoUrl ) ) {
+			var issueUrl = repoUrl & "/issues/new?title=" & urlEncodedFormat( "Issue with: " & variables.page.title ) & ( len( canonicalUrl ) ? "&body=" & urlEncodedFormat( "Found on: " & canonicalUrl ) : "" )
+			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( issueUrl ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "flag" ) & '<span>' & encodeForHTML( variables.strings.reportIssue ) & '</span></a>'
+		}
+		if ( len( canonicalUrl ) ) {
+			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://x.com/intent/tweet?url=" & urlEncodedFormat( canonicalUrl ) & "&text=" & urlEncodedFormat( variables.page.title ) ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "x" ) & '<span>' & encodeForHTML( variables.strings.shareOnX ) & '</span></a>'
+			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://www.linkedin.com/sharing/share-offsite/?url=" & urlEncodedFormat( canonicalUrl ) ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "linkedin" ) & '<span>' & encodeForHTML( variables.strings.shareOnLinkedIn ) & '</span></a>'
+		}
 
 		return '<div class="bxsites-page-actions">'
 			& '<details class="bxsites-page-actions__disclosure">'
 			& '<summary class="bxsites-page-actions__button" aria-label="' & encodeForHTML( variables.strings.pageActionsAriaLabel ) & '">'
 			& '<span>' & encodeForHTML( variables.strings.pageActionsButton ) & '</span>' & bxsitesIcon( "chevron-down" )
+			& '<kbd class="bxsites-page-actions__kbd" aria-hidden="true">C</kbd>'
 			& '</summary>'
 			& '<div class="bxsites-page-actions__panel">' & items & '</div>'
 			& '</details>'

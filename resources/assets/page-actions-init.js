@@ -15,8 +15,13 @@
  *   (window.print()), scoped to just this page by each theme's own
  *   @media print rules (see the ::: pagebreak content block's own CSS).
  *
- * "View as Markdown"/"Open in ChatGPT"/"Open in Claude" are plain <a>
- * links - no JS needed to fire them, only to close the panel afterwards.
+ * "View as Markdown"/"Open in ChatGPT"/"Open in Claude"/"Report an
+ * issue"/"Share on X"/"Share on LinkedIn" are plain <a> links - no JS
+ * needed to fire them, only to close the panel afterwards.
+ *
+ * A bare "c" keydown (see below) also toggles the whole menu open/closed
+ * from anywhere on the page, matching the "C" hint page.bxm's own
+ * renderPageActions() renders in the button.
  */
 ( function () {
 	function flashLabel( button, text, revertAfter ) {
@@ -123,6 +128,32 @@
 					details.open = false;
 				}
 			} );
+		} );
+
+		// Bare "c" toggles the page-actions menu from anywhere on the page -
+		// same "not already typing somewhere else" guard search.js's own "/"
+		// shortcut uses, since this one (unlike search's Cmd/Ctrl+K) has no
+		// modifier of its own to disambiguate it from a reader's real typing.
+		document.addEventListener( "keydown", function ( event ) {
+			if ( event.key.toLowerCase() !== "c" || event.ctrlKey || event.metaKey || event.altKey ) {
+				return;
+			}
+			var tag = ( event.target.tagName || "" ).toLowerCase();
+			if ( tag === "input" || tag === "textarea" || event.target.isContentEditable ) {
+				return;
+			}
+			var details = document.querySelector( ".bxsites-page-actions__disclosure" );
+			if ( !details ) {
+				return;
+			}
+			event.preventDefault();
+			details.open = !details.open;
+			if ( details.open ) {
+				var firstItem = details.querySelector( ".bxsites-page-actions__item" );
+				if ( firstItem ) {
+					firstItem.focus();
+				}
+			}
 		} );
 	}
 

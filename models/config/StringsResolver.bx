@@ -59,7 +59,10 @@ class {
 		"copyPageLink"         : "Copy link",
 		"openInChatGPT"        : "Open in ChatGPT",
 		"openInClaude"         : "Open in Claude",
-		"exportAsPdf"          : "Export as PDF"
+		"exportAsPdf"          : "Export as PDF",
+		"reportIssue"          : "Report an issue",
+		"shareOnX"             : "Share on X",
+		"shareOnLinkedIn"      : "Share on LinkedIn"
 	}
 
 	/**

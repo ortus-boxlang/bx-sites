@@ -2407,6 +2407,21 @@ a.button.primary {
 	list-style: none;
 }
 
+.bxsites-page-actions__kbd {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 1.1rem;
+	padding: 0.05rem 0.3rem;
+	margin-left: 0.15rem;
+	border: 1px solid var( --bxsites-border );
+	border-radius: 0.25rem;
+	font-family: inherit;
+	font-size: 0.7rem;
+	font-weight: 600;
+	opacity: 0.7;
+}
+
 .bxsites-page-actions__button::-webkit-details-marker {
 	display: none;
 }

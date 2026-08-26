@@ -853,11 +853,20 @@ see `theme.options.pageActionsPosition` above) that opens a small menu:
   (`window.print()`), scoped to just that page - see
   [Content Blocks: Page break](guides/content-blocks.md#page-break) for
   forcing a page break at a chosen spot first.
+- **Report an issue** - opens a pre-filled "new issue" form on `repo.url`
+  ([Configuration: `repo`](#repo)), naming the page it was opened from.
+- **Share on X** / **Share on LinkedIn** - opens that platform's own
+  share-intent page, prefilled with the page's URL (and title, for X).
 
-"Copy link" and both "Open in..." links only render when `baseURL` is a
-full URL (same requirement `<link rel="canonical">` itself already has) -
-there's otherwise no real page URL to hand off. No extra JS is shipped at
-all unless this is turned on.
+Press **c** anywhere on the page to toggle the menu open/closed too - no
+modifier key, same as the `/` search shortcut, and disabled while you're
+already typing somewhere else.
+
+"Copy link", both "Open in..." links, and both "Share on..." links only
+render when `baseURL` is a full URL (same requirement `<link rel="canonical">`
+itself already has) - there's otherwise no real page URL to hand off.
+"Report an issue" only renders when `repo.url` is set. No extra JS is
+shipped at all unless this is turned on.
 
 === "YAML"
     ```yaml title="bxsites.yaml"

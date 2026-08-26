@@ -1001,7 +1001,7 @@ class extends="testbox.system.BaseSpec" {
 					var onRoot = newProject( themeName );
 					fileWrite(
 						onRoot & "/bxsites.json",
-						'{"name":"Test Site","baseURL":"https://example.com/","theme":{"name":"' & themeName & '"},"pageActions":true}'
+						'{"name":"Test Site","baseURL":"https://example.com/","theme":{"name":"' & themeName & '"},"pageActions":true,"repo":{"url":"https://github.com/acme/docs","editUri":"edit/main/docs/"}}'
 					);
 					fileWrite( onRoot & "/docs/index.md", "Home" );
 					pipeline.build( onRoot );
@@ -1013,9 +1013,27 @@ class extends="testbox.system.BaseSpec" {
 					expect( onHtml ).toInclude( 'data-bxsites-action="print"' );
 					expect( onHtml ).toInclude( "https://chatgpt.com/?q=" );
 					expect( onHtml ).toInclude( "https://claude.ai/new?q=" );
+					expect( onHtml ).toInclude( "github.com/acme/docs/issues/new?title=" );
+					expect( onHtml ).toInclude( "x.com/intent/tweet?url=" );
+					expect( onHtml ).toInclude( "linkedin.com/sharing/share-offsite/?url=" );
+					expect( onHtml ).toInclude( '<kbd class="bxsites-page-actions__kbd" aria-hidden="true">C</kbd>' );
 					expect( onHtml ).toInclude( "assets/page-actions-init.js" );
 					expect( fileExists( onRoot & "/site/assets/page-actions-init.js" ) ).toBeTrue();
 				}
+			} );
+
+			it( "omits the [pageActions] dropdown's [repo.url]-dependent Report an issue item when [repo.url] is unset", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","baseURL":"https://example.com/","theme":{"name":"bootstrap"},"pageActions":true}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "bxsites-page-actions" );
+				expect( html ).notToInclude( "issues/new?title=" );
 			} );
 
 			it( "copies the shared tabs.js and code-lines.js widgets unconditionally, loading code-lines.js after hljs.highlightAll()", function() {
