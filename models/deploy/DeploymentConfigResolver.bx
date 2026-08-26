@@ -1,0 +1,284 @@
+/**
+ * Discovers and validates a project's `deployments/*` convention entries.
+ *
+ * One `.json` file per target attempt under `deployments/` - same shape/format
+ * as `docs/nav.json`, the other by-convention project-root JSON file this
+ * project already reads. Deploy config is plain data (bucket names, hosts,
+ * env var names) with no need for the dynamic-computation a `.bx` script
+ * entry would offer, so - unlike similar `deployments/` conventions in sibling
+ * BoxLang projects that also accept a `.bx` entry via a custom dynamic
+ * class loader - this resolver only ever reads `.json`. Each entry must
+ * declare a `target` (one of the registered target names below) plus
+ * whatever fields that target type requires. Secrets (API tokens,
+ * passwords, access keys) are NEVER expected here - every target resolves
+ * those from environment variables at deploy time instead (see each
+ * target's own docblock and IDeploymentTarget.bx's own docblock) - only a
+ * credential FILE PATH (an SSH key, a GCP service-account JSON key) is a
+ * plain config field.
+ *
+ * Deliberately NOT wired into `build` - deployment config never affects the
+ * generated site, so validating it on every build would be pure overhead
+ * for a project that never deploys. This resolver is only ever invoked by
+ * the `deploy` CLI verb itself.
+ */
+class {
+
+	/**
+	 * @return this
+	 */
+	function init() {
+		variables.VALID_TARGETS = [
+			"local", "github-pages", "s3", "ftp", "sftp", "rsync",
+			"azure", "gcs", "firebase", "netlify", "vercel", "cloudflare-pages"
+		]
+		return this
+	}
+
+	/**
+	 * @projectRoot Absolute path to the project root
+	 *
+	 * @return { entries: [ { name, path, target, config } ], errors: [] }
+	 */
+	struct function resolve( required string projectRoot ) {
+		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		var deployDir = root & "/deployments"
+		var entries = []
+		var errors = []
+
+		if ( !directoryExists( deployDir ) ) {
+			return { entries : entries, errors : errors }
+		}
+
+		var seenNames = {}
+		var files = directoryList( deployDir, false, "path", "*.json", "asc", "file" )
+			.filter( function( path ) {
+				return getFileFromPath( path ).left( 1 ) != "."
+			} )
+
+		for ( var path in files ) {
+			var name = listFirst( getFileFromPath( path ), "." )
+
+			if ( structKeyExists( seenNames, name ) ) {
+				errors.append( "Duplicate deploy entry name [#name#]" )
+				continue
+			}
+			seenNames[ name ] = true
+
+			var config = readEntryConfig( path )
+			if ( isNull( config ) ) {
+				errors.append( "deployments/#getFileFromPath( path )# could not be read" )
+				continue
+			}
+
+			var target = config.target ?: ""
+			if ( !len( target ) ) {
+				errors.append( "deployments/#name# is missing a 'target'" )
+				continue
+			}
+			if ( !variables.VALID_TARGETS.contains( target ) ) {
+				errors.append( "deployments/#name# has an unknown target [#target#] - must be one of: #variables.VALID_TARGETS.toList()#" )
+				continue
+			}
+
+			validateTargetFields( name, target, config, errors )
+
+			entries.append( { name : name, path : path, target : target, config : config } )
+		}
+
+		return { entries : entries, errors : errors }
+	}
+
+	/**
+	 * Resolves a single named `deployments/*` entry, throwing a clear error if it
+	 * doesn't exist or the project's `deployments/` config has validation errors.
+	 *
+	 * @projectRoot Absolute path to the project root
+	 * @name The `deployments/*` entry name to resolve, e.g. "production" for `deployments/production.json`
+	 *
+	 * @return { name, path, target, config }
+	 */
+	struct function getEntry( required string projectRoot, required string name ) {
+		var result = resolve( arguments.projectRoot )
+
+		if ( result.errors.len() ) {
+			throw(
+				type    = "BxSites.InvalidDeployConfig",
+				message = "deployments/ has #result.errors.len()# error(s): #result.errors.toList( '; ' )#"
+			)
+		}
+
+		for ( var entry in result.entries ) {
+			if ( entry.name == arguments.name ) {
+				return entry
+			}
+		}
+
+		throw(
+			type    = "BxSites.UnknownDeployEntry",
+			message = "No deployments/#arguments.name# entry found"
+		)
+	}
+
+	/**
+	 * Dispatches to the right per-target-type required-field check, by `target` name.
+	 *
+	 * @name The `deployments/*` entry name, for error message context
+	 * @target The entry's `target` value, e.g. "s3"/"azure"
+	 * @config The entry's own resolved config struct
+	 * @errors Accumulator array - append() any validation errors found
+	 */
+	private void function validateTargetFields(
+		required string name,
+		required string target,
+		required struct config,
+		required array errors
+	) {
+		switch ( arguments.target ) {
+			case "local": {
+				if ( !len( arguments.config.destination ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (local) is missing a 'destination'" )
+				}
+				break
+			}
+			case "github-pages": {
+				// branch/remote/message all optional, same defaults `gh-deploy` already has
+				break
+			}
+			case "s3": {
+				if ( !len( arguments.config.bucket ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (s3) is missing a 'bucket'" )
+				}
+				if ( !len( arguments.config.accessKeyIdEnvVar ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (s3) is missing an 'accessKeyIdEnvVar'" )
+				}
+				if ( !len( arguments.config.secretAccessKeyEnvVar ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (s3) is missing a 'secretAccessKeyEnvVar'" )
+				}
+				break
+			}
+			case "ftp": {
+				validateRemoteHostFields( arguments.name, "ftp", arguments.config, arguments.errors )
+				if ( !len( arguments.config.passwordEnvVar ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (ftp) is missing a 'passwordEnvVar'" )
+				}
+				break
+			}
+			case "sftp": {
+				validateRemoteHostFields( arguments.name, "sftp", arguments.config, arguments.errors )
+				if ( !len( arguments.config.passwordEnvVar ?: "" ) && !len( arguments.config.key ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (sftp) is missing a 'passwordEnvVar' or a 'key'" )
+				}
+				break
+			}
+			case "rsync": {
+				validateRemoteHostFields( arguments.name, "rsync", arguments.config, arguments.errors )
+				break
+			}
+			case "azure": {
+				if ( !len( arguments.config.account ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (azure) is missing an 'account'" )
+				}
+				if ( !len( arguments.config.container ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (azure) is missing a 'container'" )
+				}
+				if (
+					!len( arguments.config.accountKeyEnvVar ?: "" ) &&
+					!len( arguments.config.sasTokenEnvVar ?: "" ) &&
+					!len( arguments.config.connectionStringEnvVar ?: "" )
+				) {
+					arguments.errors.append( "deployments/#arguments.name# (azure) is missing an 'accountKeyEnvVar', 'sasTokenEnvVar', or 'connectionStringEnvVar'" )
+				}
+				break
+			}
+			case "gcs": {
+				if ( !len( arguments.config.bucket ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (gcs) is missing a 'bucket'" )
+				}
+				if ( !len( arguments.config.serviceAccountKeyPath ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (gcs) is missing a 'serviceAccountKeyPath'" )
+				}
+				break
+			}
+			case "firebase": {
+				if ( !len( arguments.config.siteId ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (firebase) is missing a 'siteId'" )
+				}
+				if ( !len( arguments.config.serviceAccountKeyPath ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (firebase) is missing a 'serviceAccountKeyPath'" )
+				}
+				break
+			}
+			case "netlify": {
+				if ( !len( arguments.config.siteId ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (netlify) is missing a 'siteId'" )
+				}
+				if ( !len( arguments.config.authTokenEnvVar ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (netlify) is missing an 'authTokenEnvVar'" )
+				}
+				break
+			}
+			case "vercel": {
+				if ( !len( arguments.config.projectId ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (vercel) is missing a 'projectId'" )
+				}
+				if ( !len( arguments.config.authTokenEnvVar ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (vercel) is missing an 'authTokenEnvVar'" )
+				}
+				break
+			}
+			case "cloudflare-pages": {
+				if ( !len( arguments.config.accountId ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (cloudflare-pages) is missing an 'accountId'" )
+				}
+				if ( !len( arguments.config.projectName ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (cloudflare-pages) is missing a 'projectName'" )
+				}
+				if ( !len( arguments.config.apiTokenEnvVar ?: "" ) ) {
+					arguments.errors.append( "deployments/#arguments.name# (cloudflare-pages) is missing an 'apiTokenEnvVar'" )
+				}
+				break
+			}
+		}
+	}
+
+	/**
+	 * Shared `host`/`username`/`remotePath` presence check, reused by `ftp`, `sftp`, and `rsync`.
+	 *
+	 * @name The `deployments/*` entry name, for error message context
+	 * @target The entry's `target` value, for error message context
+	 * @config The entry's own resolved config struct
+	 * @errors Accumulator array - append() any validation errors found
+	 */
+	private void function validateRemoteHostFields(
+		required string name,
+		required string target,
+		required struct config,
+		required array errors
+	) {
+		if ( !len( arguments.config.host ?: "" ) ) {
+			arguments.errors.append( "deployments/#arguments.name# (#arguments.target#) is missing a 'host'" )
+		}
+		if ( !len( arguments.config.username ?: "" ) ) {
+			arguments.errors.append( "deployments/#arguments.name# (#arguments.target#) is missing a 'username'" )
+		}
+		if ( !len( arguments.config.remotePath ?: "" ) ) {
+			arguments.errors.append( "deployments/#arguments.name# (#arguments.target#) is missing a 'remotePath'" )
+		}
+	}
+
+	/**
+	 * Reads a discovered `deployments/*.json` entry's config.
+	 *
+	 * @path Absolute path to the entry's `.json` file
+	 *
+	 * @return The entry's config struct, or null if it could not be read
+	 */
+	private any function readEntryConfig( required string path ) {
+		try {
+			return jsonDeserialize( fileRead( arguments.path ) )
+		} catch ( any e ) {
+			return null
+		}
+	}
+
+}

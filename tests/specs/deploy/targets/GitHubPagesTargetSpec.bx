@@ -1,0 +1,88 @@
+/**
+ * A thin `IDeploymentTarget` wrapper around GhPagesDeployer.bx (already
+ * fully exercised for real against throwaway git repos in
+ * GhPagesDeployerSpec.bx) - this spec only covers the wrapper's own
+ * default-resolution and result-shaping, against one real throwaway repo.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "deploy.targets.GitHubPagesTarget", function() {
+
+			beforeEach( function() {
+				variables.target = new "models.deploy.targets.GitHubPagesTarget@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private string function git( required array cmd, required string cwd ) {
+				var pb = createObject( "java", "java.lang.ProcessBuilder" ).init( arguments.cmd );
+				pb.directory( createObject( "java", "java.io.File" ).init( arguments.cwd ) );
+				pb.redirectErrorStream( true );
+				var process = pb.start();
+				var output = createObject( "java", "java.lang.String" ).init( process.getInputStream().readAllBytes(), "UTF-8" );
+				process.waitFor();
+				return output;
+			}
+
+			private string function newBareRemote() {
+				var dir = createTempDirectory( prefix = "bxsites-ghpagestarget-remote-" );
+				tempDirs.append( dir );
+				git( [ "git", "init", "--bare", "--initial-branch=main", dir ], dir );
+				return dir;
+			}
+
+			private string function newProjectRepo( required string remotePath ) {
+				var dir = createTempDirectory( prefix = "bxsites-ghpagestarget-project-" );
+				tempDirs.append( dir );
+				git( [ "git", "init", "--initial-branch=main", dir ], dir );
+				git( [ "git", "-C", dir, "config", "user.email", "test@example.com" ], dir );
+				git( [ "git", "-C", dir, "config", "user.name", "Test" ], dir );
+				fileWrite( dir & "/README.md", "hi" );
+				git( [ "git", "-C", dir, "add", "-A" ], dir );
+				git( [ "git", "-C", dir, "commit", "-m", "initial" ], dir );
+				git( [ "git", "-C", dir, "remote", "add", "origin", arguments.remotePath ], dir );
+				return dir;
+			}
+
+			it( "deploys with the default branch/remote when config supplies neither", function() {
+				var remote = newBareRemote();
+				var root = newProjectRepo( remote );
+				directoryCreate( root & "/site", true, true );
+				fileWrite( root & "/site/index.html", "<h1>Home</h1>" );
+
+				var result = target.deploy( {}, { projectRoot : root, siteDir : root & "/site" } );
+
+				expect( result.success ).toBeTrue();
+				expect( result.details.branch ).toBe( "gh-pages" );
+				expect( result.details.remote ).toBe( "origin" );
+				expect( result.message ).toInclude( "origin/gh-pages" );
+			} );
+
+			it( "honors an explicit branch and remote", function() {
+				var remote = newBareRemote();
+				var root = newProjectRepo( remote );
+				git( [ "git", "-C", root, "remote", "rename", "origin", "upstream" ], root );
+				directoryCreate( root & "/site", true, true );
+				fileWrite( root & "/site/index.html", "<h1>Home</h1>" );
+
+				var result = target.deploy(
+					{ branch : "pages", remote : "upstream" },
+					{ projectRoot : root, siteDir : root & "/site" }
+				);
+
+				expect( result.details.branch ).toBe( "pages" );
+				expect( result.details.remote ).toBe( "upstream" );
+			} );
+
+		} );
+	}
+
+}

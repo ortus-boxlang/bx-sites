@@ -1,0 +1,33 @@
+/**
+ * Force-pushes the already-built `site/` to a `gh-pages`-style branch - a
+ * thin `IDeploymentTarget` wrapper around `GhPagesDeployer.bx`, the same
+ * real implementation the older single-purpose `gh-deploy` verb uses (see
+ * GhDeploy.bx). The other target that never needs a `deployments/*.json` entry
+ * (`deploy --target=github-pages`, every field optional).
+ *
+ * @config { branch ("gh-pages" default), remote ("origin" default), message (default "Deploy site via bxSites deploy") }
+ */
+class implements="models.deploy.IDeploymentTarget@bxsites" {
+
+	/**
+	 * @config This target's own resolved config (see the class docblock's `@config` shape)
+	 * @context { projectRoot, siteDir, config } - `projectRoot`/`siteDir` are both used
+	 *
+	 * @return { success, message, details: { branch, remote } }
+	 */
+	struct function deploy( required struct config, required struct context ) {
+		var branch = len( trim( arguments.config.branch ?: "" ) ) ? trim( arguments.config.branch ) : "gh-pages"
+		var remote = len( trim( arguments.config.remote ?: "" ) ) ? trim( arguments.config.remote ) : "origin"
+		var message = len( trim( arguments.config.message ?: "" ) ) ? trim( arguments.config.message ) : "Deploy site via bxSites deploy"
+
+		var deployer = new "models.build.GhPagesDeployer@bxsites"()
+		var deployResult = deployer.deploy( arguments.context.projectRoot, arguments.context.siteDir, branch, remote, message )
+
+		return {
+			success : true,
+			message : "Pushed to #deployResult.remote#/#deployResult.branch#",
+			details : deployResult
+		}
+	}
+
+}

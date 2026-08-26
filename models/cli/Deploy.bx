@@ -1,0 +1,128 @@
+/**
+ * `deploy` CLI verb - builds the site, then ships it to a real deployment
+ * target via the pluggable `IDeploymentTarget` interface. Supersedes the
+ * older single-purpose `gh-deploy` verb (still kept working, unchanged -
+ * see GhDeploy.bx's own docblock) with one command covering every target.
+ *
+ * Two ways to invoke it:
+ *
+ *  1. `--entry=<name>` - dispatches to whatever target the named
+ *     `deployments/<name>.json` convention entry declares (`s3`, `azure`,
+ *     `gcs`, `firebase`, `ftp`, `sftp`, `rsync`, `netlify`, `vercel`,
+ *     `cloudflare-pages`, `local`, or `github-pages`), resolved and
+ *     validated via `DeploymentConfigResolver`.
+ *  2. `--target=<name> [flags]` (or no `--target` at all, which defaults to
+ *     `local`) - a flag-only shorthand, kept working with no `deployments/`
+ *     folder present so the simplest cases never need one:
+ *       - `local`: `--destination=<path>`
+ *       - `github-pages`: `[--branch] [--remote] [--message]`, all
+ *         optional - the exact defaults `gh-deploy` already has
+ *     Every other target needs more configuration than a couple of flags
+ *     can reasonably carry, and requires a `deployments/*.json` entry instead.
+ */
+class {
+
+	variables.TARGET_CLASSES = {
+		"local"            : "models.deploy.targets.LocalTarget@bxsites",
+		"github-pages"     : "models.deploy.targets.GitHubPagesTarget@bxsites",
+		"s3"               : "models.deploy.targets.S3Target@bxsites",
+		"ftp"              : "models.deploy.targets.FtpTarget@bxsites",
+		"sftp"             : "models.deploy.targets.SftpTarget@bxsites",
+		"rsync"            : "models.deploy.targets.RsyncTarget@bxsites",
+		"azure"            : "models.deploy.targets.AzureBlobTarget@bxsites",
+		"gcs"              : "models.deploy.targets.GcsTarget@bxsites",
+		"firebase"         : "models.deploy.targets.FirebaseTarget@bxsites",
+		"netlify"          : "models.deploy.targets.NetlifyTarget@bxsites",
+		"vercel"           : "models.deploy.targets.VercelTarget@bxsites",
+		"cloudflare-pages" : "models.deploy.targets.CloudflarePagesTarget@bxsites"
+	}
+
+	variables.FLAG_ONLY_TARGETS = [ "local", "github-pages" ]
+
+	/**
+	 * @options { projectRoot (required), entry (optional, a deployments/* entry name - NOT `name`, which collides with a reserved top-level BoxLang CLI flag and crashes the runtime before this class is even reached), target (optional, defaults to "local"), destination, branch, remote, message }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxSites.MissingProjectRoot", message = "`deploy` requires a project root" )
+		}
+		var root = projectRoot.reReplace( "[\/]+$", "" )
+
+		var entryName = trim( arguments.options.entry ?: "" )
+		var target = ""
+		var config = {}
+
+		if ( len( entryName ) ) {
+			var resolver = new "models.deploy.DeploymentConfigResolver@bxsites"()
+			var entry = resolver.getEntry( root, entryName )
+			target = entry.target
+			config = entry.config
+		} else {
+			target = len( arguments.options.target ?: "" ) ? arguments.options.target : "local"
+
+			if ( !variables.TARGET_CLASSES.keyExists( target ) ) {
+				throw(
+					type    = "BxSites.UnknownDeploymentTarget",
+					message = "Unknown deployment target [#target#] - must be one of: #variables.TARGET_CLASSES.keyArray().toList()#"
+				)
+			}
+			if ( !variables.FLAG_ONLY_TARGETS.contains( target ) ) {
+				throw(
+					type    = "BxSites.MissingDeployEntry",
+					message = "deploy target [#target#] requires a deployments/*.json entry (`deploy --entry=<name>`) - only #variables.FLAG_ONLY_TARGETS.toList( '/' )# support the flag-only form"
+				)
+			}
+
+			config = buildFlagOnlyConfig( target, arguments.options )
+		}
+
+		var configLoader = new "models.config.ConfigLoader@bxsites"()
+		var siteConfig = configLoader.load( root )
+
+		var pipeline = new "models.build.BuildPipeline@bxsites"()
+		var buildResult = pipeline.build( root )
+
+		var context = { projectRoot : root, siteDir : buildResult.siteDir, config : siteConfig }
+		var targetInstance = new "#variables.TARGET_CLASSES[ target ]#"()
+		var result = targetInstance.deploy( config, context )
+
+		return {
+			exitCode : result.success ? 0 : 1,
+			message  : "Built #buildResult.pageCount# page(s). #result.message#",
+			result   : result
+		}
+	}
+
+	/**
+	 * Builds the `local`/`github-pages` flag-only config shape from raw CLI options.
+	 *
+	 * @target Which flag-only target is being built for
+	 * @options The verb's own raw options struct
+	 *
+	 * @return The target's own config struct
+	 */
+	private struct function buildFlagOnlyConfig( required string target, required struct options ) {
+		if ( arguments.target == "local" ) {
+			var destination = trim( arguments.options.destination ?: "" )
+			if ( !len( destination ) ) {
+				throw( type = "BxSites.MissingDestination", message = "`deploy --target=local` requires --destination" )
+			}
+			return { destination : destination }
+		}
+
+		// github-pages - every field optional, same defaults GhPagesDeployer.bx already has
+		var config = {}
+		if ( len( trim( arguments.options.branch ?: "" ) ) ) {
+			config.branch = trim( arguments.options.branch )
+		}
+		if ( len( trim( arguments.options.remote ?: "" ) ) ) {
+			config.remote = trim( arguments.options.remote )
+		}
+		if ( len( trim( arguments.options.message ?: "" ) ) ) {
+			config.message = trim( arguments.options.message )
+		}
+		return config
+	}
+
+}

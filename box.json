@@ -36,7 +36,8 @@
         "bx-markdown":"*",
         "bx-esapi":"*",
         "bx-yaml":"*",
-        "bx-image":"*"
+        "bx-image":"*",
+        "bx-ftp":"*"
     },
     "devDependencies":{
         "commandbox-boxlang":"*",
