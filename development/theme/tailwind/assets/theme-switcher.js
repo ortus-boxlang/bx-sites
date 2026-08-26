@@ -27,7 +27,7 @@
  * time from bxsites.json's own `baseURL`.
  */
 ( function () {
-	var ROOT = "/bx-sites/development/";
+	var ROOT = "/development/";
 
 	var VARIANTS = [
 		{ key: "bootstrap", label: "Bootstrap", prefix: "", dot: "#7952b3" },

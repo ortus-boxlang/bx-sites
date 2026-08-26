@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel>
 	<title>BxSites Blog - Getting Started</title>
-	<link>https://ortus-boxlang.github.io/bx-sites/development/theme/gitbook/blog/category/getting-started/</link>
+	<link>https://bxsites.io/development/theme/gitbook/blog/category/getting-started/</link>
 	<description>Blog posts from BxSites</description>
 	<item>
 		<title>Migrate From GitBook or mkdocs in One Command</title>
-		<link>https://ortus-boxlang.github.io/bx-sites/development/theme/gitbook/blog/migrate-from-gitbook-or-mkdocs-in-one-command/</link>
-		<guid isPermaLink="true">https://ortus-boxlang.github.io/bx-sites/development/theme/gitbook/blog/migrate-from-gitbook-or-mkdocs-in-one-command/</guid>
+		<link>https://bxsites.io/development/theme/gitbook/blog/migrate-from-gitbook-or-mkdocs-in-one-command/</link>
+		<guid isPermaLink="true">https://bxsites.io/development/theme/gitbook/blog/migrate-from-gitbook-or-mkdocs-in-one-command/</guid>
 		<pubDate>Sat, 15 Aug 2026 00:00:00 +0000</pubDate>
 		<dc:creator>Luis Majano</dc:creator>
 		<category>Migration</category>
@@ -15,8 +15,8 @@
 	</item>
 	<item>
 		<title>Pick Your Theme</title>
-		<link>https://ortus-boxlang.github.io/bx-sites/development/theme/gitbook/blog/pick-your-theme/</link>
-		<guid isPermaLink="true">https://ortus-boxlang.github.io/bx-sites/development/theme/gitbook/blog/pick-your-theme/</guid>
+		<link>https://bxsites.io/development/theme/gitbook/blog/pick-your-theme/</link>
+		<guid isPermaLink="true">https://bxsites.io/development/theme/gitbook/blog/pick-your-theme/</guid>
 		<pubDate>Tue, 14 Jul 2026 00:00:00 +0000</pubDate>
 		<dc:creator>Luis Majano</dc:creator>
 		<category>Getting Started</category>
@@ -25,8 +25,8 @@
 	</item>
 	<item>
 		<title>Get Your Docs Live in 10 Minutes</title>
-		<link>https://ortus-boxlang.github.io/bx-sites/development/theme/gitbook/blog/get-your-docs-live-in-10-minutes/</link>
-		<guid isPermaLink="true">https://ortus-boxlang.github.io/bx-sites/development/theme/gitbook/blog/get-your-docs-live-in-10-minutes/</guid>
+		<link>https://bxsites.io/development/theme/gitbook/blog/get-your-docs-live-in-10-minutes/</link>
+		<guid isPermaLink="true">https://bxsites.io/development/theme/gitbook/blog/get-your-docs-live-in-10-minutes/</guid>
 		<pubDate>Wed, 01 Jul 2026 00:00:00 +0000</pubDate>
 		<dc:creator>Luis Majano</dc:creator>
 		<category>Getting Started</category>

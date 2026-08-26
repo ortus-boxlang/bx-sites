@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel>
 	<title>BxSites Blog</title>
-	<link>https://ortus-boxlang.github.io/bx-sites/development/theme/material/blog/</link>
+	<link>https://bxsites.io/development/theme/material/blog/</link>
 	<description>Blog posts from BxSites</description>
 	<item>
 		<title>Migrate From GitBook or mkdocs in One Command</title>
-		<link>https://ortus-boxlang.github.io/bx-sites/development/theme/material/blog/migrate-from-gitbook-or-mkdocs-in-one-command/</link>
-		<guid isPermaLink="true">https://ortus-boxlang.github.io/bx-sites/development/theme/material/blog/migrate-from-gitbook-or-mkdocs-in-one-command/</guid>
+		<link>https://bxsites.io/development/theme/material/blog/migrate-from-gitbook-or-mkdocs-in-one-command/</link>
+		<guid isPermaLink="true">https://bxsites.io/development/theme/material/blog/migrate-from-gitbook-or-mkdocs-in-one-command/</guid>
 		<pubDate>Sat, 15 Aug 2026 00:00:00 +0000</pubDate>
 		<dc:creator>Luis Majano</dc:creator>
 		<category>Migration</category>
@@ -15,8 +15,8 @@
 	</item>
 	<item>
 		<title>Never Lose a Reader&#x3a; Versions and Translations</title>
-		<link>https://ortus-boxlang.github.io/bx-sites/development/theme/material/blog/never-lose-a-reader-versions-and-translations/</link>
-		<guid isPermaLink="true">https://ortus-boxlang.github.io/bx-sites/development/theme/material/blog/never-lose-a-reader-versions-and-translations/</guid>
+		<link>https://bxsites.io/development/theme/material/blog/never-lose-a-reader-versions-and-translations/</link>
+		<guid isPermaLink="true">https://bxsites.io/development/theme/material/blog/never-lose-a-reader-versions-and-translations/</guid>
 		<pubDate>Tue, 04 Aug 2026 00:00:00 +0000</pubDate>
 		<dc:creator>Luis Majano</dc:creator>
 		<category>Versioning &amp; i18n</category>
@@ -24,8 +24,8 @@
 	</item>
 	<item>
 		<title>Search That Just Works</title>
-		<link>https://ortus-boxlang.github.io/bx-sites/development/theme/material/blog/search-that-just-works/</link>
-		<guid isPermaLink="true">https://ortus-boxlang.github.io/bx-sites/development/theme/material/blog/search-that-just-works/</guid>
+		<link>https://bxsites.io/development/theme/material/blog/search-that-just-works/</link>
+		<guid isPermaLink="true">https://bxsites.io/development/theme/material/blog/search-that-just-works/</guid>
 		<pubDate>Fri, 24 Jul 2026 00:00:00 +0000</pubDate>
 		<dc:creator>Luis Majano</dc:creator>
 		<category>Search</category>
@@ -33,8 +33,8 @@
 	</item>
 	<item>
 		<title>Pick Your Theme</title>
-		<link>https://ortus-boxlang.github.io/bx-sites/development/theme/material/blog/pick-your-theme/</link>
-		<guid isPermaLink="true">https://ortus-boxlang.github.io/bx-sites/development/theme/material/blog/pick-your-theme/</guid>
+		<link>https://bxsites.io/development/theme/material/blog/pick-your-theme/</link>
+		<guid isPermaLink="true">https://bxsites.io/development/theme/material/blog/pick-your-theme/</guid>
 		<pubDate>Tue, 14 Jul 2026 00:00:00 +0000</pubDate>
 		<dc:creator>Luis Majano</dc:creator>
 		<category>Getting Started</category>
@@ -43,8 +43,8 @@
 	</item>
 	<item>
 		<title>Get Your Docs Live in 10 Minutes</title>
-		<link>https://ortus-boxlang.github.io/bx-sites/development/theme/material/blog/get-your-docs-live-in-10-minutes/</link>
-		<guid isPermaLink="true">https://ortus-boxlang.github.io/bx-sites/development/theme/material/blog/get-your-docs-live-in-10-minutes/</guid>
+		<link>https://bxsites.io/development/theme/material/blog/get-your-docs-live-in-10-minutes/</link>
+		<guid isPermaLink="true">https://bxsites.io/development/theme/material/blog/get-your-docs-live-in-10-minutes/</guid>
 		<pubDate>Wed, 01 Jul 2026 00:00:00 +0000</pubDate>
 		<dc:creator>Luis Majano</dc:creator>
 		<category>Getting Started</category>

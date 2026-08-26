@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel>
 	<title>BxSites Blog - Search</title>
-	<link>https://ortus-boxlang.github.io/bx-sites/development/theme/gitbook/blog/category/search/</link>
+	<link>https://bxsites.io/development/theme/gitbook/blog/category/search/</link>
 	<description>Blog posts from BxSites</description>
 	<item>
 		<title>Search That Just Works</title>
-		<link>https://ortus-boxlang.github.io/bx-sites/development/theme/gitbook/blog/search-that-just-works/</link>
-		<guid isPermaLink="true">https://ortus-boxlang.github.io/bx-sites/development/theme/gitbook/blog/search-that-just-works/</guid>
+		<link>https://bxsites.io/development/theme/gitbook/blog/search-that-just-works/</link>
+		<guid isPermaLink="true">https://bxsites.io/development/theme/gitbook/blog/search-that-just-works/</guid>
 		<pubDate>Fri, 24 Jul 2026 00:00:00 +0000</pubDate>
 		<dc:creator>Luis Majano</dc:creator>
 		<category>Search</category>
