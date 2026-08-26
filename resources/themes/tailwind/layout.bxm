@@ -182,6 +182,8 @@
 	variables.mermaidEnabled = ( variables.siteConfig.mermaid ?: false ) ? true : false
 	variables.mathEnabled = ( variables.siteConfig.math ?: false ) ? true : false
 	variables.openapiEnabled = ( variables.siteConfig.openapi ?: false ) ? true : false
+	variables.pageActionsEnabled = ( variables.siteConfig.pageActions ?: false ) ? true : false
+	variables.pageActionsPosition = variables.siteConfig.theme.options.pageActionsPosition ?: "top"
 </bx:script>
 <bx:output><!doctype html>
 <html lang="#encodeForHTML( variables.currentLocale.len() ? variables.currentLocale : 'en' )#" dir="#encodeForHTML( variables.currentLocaleDir )#">
@@ -297,7 +299,9 @@
 	<script src="#variables.basePath#assets/tabs.js" defer></script>
 	<script src="#variables.basePath#assets/conditional-content-init.js" defer></script>
 	<script src="#variables.basePath#assets/prompt-init.js" defer></script>
-</bx:output><bx:if variables.mermaidEnabled><bx:output>
+</bx:output><bx:if variables.pageActionsEnabled><bx:output>
+	<script src="#variables.basePath#assets/page-actions-init.js" defer></script>
+</bx:output></bx:if><bx:if variables.mermaidEnabled><bx:output>
 	<script src="#variables.basePath#assets/vendor/mermaid/mermaid.min.js"></script>
 	<script src="#variables.basePath#assets/mermaid-init.js"></script>
 </bx:output></bx:if><bx:if variables.mathEnabled><bx:output>

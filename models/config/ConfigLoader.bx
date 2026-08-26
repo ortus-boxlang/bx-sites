@@ -67,6 +67,7 @@ class {
 		"mermaid"      : false,
 		"math"         : false,
 		"openapi"      : false,
+		"pageActions"  : false,
 		"robots"       : true,
 		"analytics"    : { "provider" : "", "id" : "" },
 		"ogImage"      : "",
@@ -272,6 +273,14 @@ class {
 			)
 		}
 
+		var pageActionsPosition = theme.options.pageActionsPosition ?: "top"
+		if ( !listFindNoCase( "top,bottom", pageActionsPosition ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [theme.options.pageActionsPosition], when present, must be one of: top, bottom"
+			)
+		}
+
 		if ( !isBoolean( arguments.config.search ?: "" ) ) {
 			throw(
 				type    = "BxSites.InvalidConfig",
@@ -299,6 +308,13 @@ class {
 			throw(
 				type    = "BxSites.InvalidConfig",
 				message = "#variables.configFileName# [openapi] must be a boolean"
+			)
+		}
+
+		if ( !isBoolean( arguments.config.pageActions ?: "" ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [pageActions] must be a boolean"
 			)
 		}
 
