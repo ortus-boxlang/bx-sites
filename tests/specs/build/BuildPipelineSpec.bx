@@ -1047,6 +1047,26 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).notToInclude( "issues/new?title=" );
 			} );
 
+			it( "gives the command-palette backdrop an explicit [hidden] CSS override, across every built-in theme", function() {
+				// A plain `.bxsites-command-palette { display: flex }` rule alone
+				// loses to the UA stylesheet's `[hidden] { display: none }` - an
+				// author rule of *any* specificity always wins over a UA rule
+				// regardless (browsers apply origin/importance before
+				// specificity) - leaving the backdrop stuck visibly `display:
+				// flex` even while `hidden` (search.js's own buildPalette() sets
+				// `backdrop.hidden = true` immediately, before ever appending
+				// it). Without this override, every page shows a stuck-open,
+				// empty command palette on load, in every theme.
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
+					var root = newProject( themeName );
+					fileWrite( root & "/docs/index.md", "Home" );
+					pipeline.build( root );
+
+					var css = fileRead( root & "/site/assets/theme/style.css" );
+					expect( css ).toInclude( ".bxsites-command-palette[hidden]" );
+				}
+			} );
+
 			it( "copies the shared tabs.js and code-lines.js widgets unconditionally, loading code-lines.js after hljs.highlightAll()", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Home" );
