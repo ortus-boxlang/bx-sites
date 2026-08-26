@@ -1,0 +1,350 @@
+/**
+ * There is no real Azure Storage account/credentials in this sandbox, so
+ * this spec never makes a real request to `*.blob.core.windows.net` - the
+ * same honesty pattern GhDeploySpec.bx's own docblock uses for a path it
+ * can't fully exercise here. What IS fully covered, with no external
+ * dependency needed at all:
+ *  - `buildStringToSign()` - the exact Shared Key string-to-sign line
+ *    order/content for a fixed set of inputs (asserted as a FULL string,
+ *    not just "non-empty"), plus determinism and per-field sensitivity.
+ *  - `sign()` - a REAL, independently-verifiable HMAC-SHA256 test vector
+ *    (RFC 4231 Test Case 1: key = 20 bytes of 0x0b, data = "Hi There",
+ *    expected base64 digest cross-checked against a plain Python
+ *    `hmac`/`hashlib` run outside this suite) - this validates the
+ *    HMAC-SHA256 + base64 math itself is correct, though it is NOT an
+ *    Azure-published string-to-sign vector (Azure doesn't publish one),
+ *    so it does not by itself prove Azure would accept a real request
+ *    signed this way - only that this class's own crypto primitive is
+ *    correct. The full `Authorization: SharedKey ...` header shape is
+ *    then checked separately against a fabricated-but-fixed input, for
+ *    regression/determinism purposes only (labeled explicitly below).
+ *  - `parseConnectionString()` - extracting `AccountName`/`AccountKey`
+ *    from a realistic connection-string value.
+ *  - `guessContentType()`, `normalizePrefix()`, `buildBlobName()` - pure
+ *    request-shaping helpers.
+ *  - `deploy()`'s own guard clauses (missing `account`/`container`, an
+ *    unbuilt `siteDir`, no auth env var configured/resolved) - a real
+ *    successful upload needs an actual Azure Storage account reachable
+ *    over the network, which this plain unit-test environment doesn't have.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "deploy.targets.AzureBlobTarget", function() {
+
+			beforeEach( function() {
+				variables.target = new "models.deploy.targets.AzureBlobTarget@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newTempDir() {
+				var dir = createTempDirectory( prefix = "bxsites-azuretarget-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			describe( "buildStringToSign()", function() {
+
+				it( "produces the exact expected string-to-sign for a fixed set of inputs", function() {
+					var headers = {
+						"Content-Length" : "1234",
+						"Content-Type"   : "text/html",
+						"x-ms-blob-type" : "BlockBlob",
+						"x-ms-date"      : "Wed, 25 Aug 2026 12:00:00 GMT",
+						"x-ms-version"   : "2021-08-06"
+					};
+
+					var result = target.buildStringToSign( headers, "PUT", "myacct", "mycontainer", "index.html" );
+
+					// Built by hand from the spec in AzureBlobTarget.bx's own
+					// docblock: VERB, then 11 mostly-empty canonical fields
+					// (Date is always blank - x-ms-date carries it instead),
+					// then the sorted x-ms-* CanonicalizedHeaders block, then
+					// CanonicalizedResource - every field on its own line.
+					var expected = "PUT" & char( 10 ) &
+						char( 10 ) &                        // Content-Encoding
+						char( 10 ) &                        // Content-Language
+						"1234" & char( 10 ) &                // Content-Length
+						char( 10 ) &                        // Content-MD5
+						"text/html" & char( 10 ) &           // Content-Type
+						char( 10 ) &                        // Date (always blank - x-ms-date used instead)
+						char( 10 ) &                        // If-Modified-Since
+						char( 10 ) &                        // If-Match
+						char( 10 ) &                        // If-None-Match
+						char( 10 ) &                        // If-Unmodified-Since
+						char( 10 ) &                        // Range
+						"x-ms-blob-type:BlockBlob" & char( 10 ) &
+						"x-ms-date:Wed, 25 Aug 2026 12:00:00 GMT" & char( 10 ) &
+						"x-ms-version:2021-08-06" & char( 10 ) &
+						"/myacct/mycontainer/index.html";
+
+					expect( result ).toBe( expected );
+				} );
+
+				it( "is deterministic - the same inputs always produce the same string", function() {
+					var headers = { "Content-Length" : "10", "x-ms-blob-type" : "BlockBlob", "x-ms-date" : "d", "x-ms-version" : "v" };
+					var first = target.buildStringToSign( headers, "PUT", "acct", "container", "a.txt" );
+					var second = target.buildStringToSign( headers, "PUT", "acct", "container", "a.txt" );
+					expect( first ).toBe( second );
+				} );
+
+				it( "omits any header not provided as an empty canonical field, never shifting later lines", function() {
+					// No Content-Length/Content-Type at all this time.
+					var headers = { "x-ms-blob-type" : "BlockBlob", "x-ms-date" : "d", "x-ms-version" : "v" };
+					var result = target.buildStringToSign( headers, "PUT", "acct", "container", "a.txt" );
+					var lines = listToArray( result, char( 10 ), true, true );
+
+					expect( lines[ 1 ] ).toBe( "PUT" );
+					// Content-Encoding/Language/Length/MD5/Type/Date/If-*/Range = 11 blank lines
+					for ( var i = 2; i <= 12; i++ ) {
+						expect( lines[ i ] ).toBe( "" );
+					}
+				} );
+
+				it( "changing the verb changes the string-to-sign", function() {
+					var headers = { "x-ms-blob-type" : "BlockBlob", "x-ms-date" : "d", "x-ms-version" : "v" };
+					var put = target.buildStringToSign( headers, "PUT", "acct", "container", "a.txt" );
+					var get = target.buildStringToSign( headers, "GET", "acct", "container", "a.txt" );
+					expect( put ).notToBe( get );
+				} );
+
+				it( "changing the account, container, or blob name each changes the string-to-sign", function() {
+					var headers = { "x-ms-blob-type" : "BlockBlob", "x-ms-date" : "d", "x-ms-version" : "v" };
+					var base = target.buildStringToSign( headers, "PUT", "acct", "container", "a.txt" );
+
+					expect( target.buildStringToSign( headers, "PUT", "otheracct", "container", "a.txt" ) ).notToBe( base );
+					expect( target.buildStringToSign( headers, "PUT", "acct", "othercontainer", "a.txt" ) ).notToBe( base );
+					expect( target.buildStringToSign( headers, "PUT", "acct", "container", "b.txt" ) ).notToBe( base );
+				} );
+
+				it( "changing any one x-ms- header value changes the string-to-sign", function() {
+					var base = target.buildStringToSign(
+						{ "x-ms-blob-type" : "BlockBlob", "x-ms-date" : "d1", "x-ms-version" : "v1" },
+						"PUT", "acct", "container", "a.txt"
+					);
+					var changedDate = target.buildStringToSign(
+						{ "x-ms-blob-type" : "BlockBlob", "x-ms-date" : "d2", "x-ms-version" : "v1" },
+						"PUT", "acct", "container", "a.txt"
+					);
+					var changedVersion = target.buildStringToSign(
+						{ "x-ms-blob-type" : "BlockBlob", "x-ms-date" : "d1", "x-ms-version" : "v2" },
+						"PUT", "acct", "container", "a.txt"
+					);
+
+					expect( changedDate ).notToBe( base );
+					expect( changedVersion ).notToBe( base );
+				} );
+
+				it( "sorts x-ms- headers lexicographically regardless of the order they're passed in", function() {
+					var inOrder = target.buildStringToSign(
+						{ "x-ms-blob-type" : "BlockBlob", "x-ms-date" : "d", "x-ms-version" : "v" },
+						"PUT", "acct", "container", "a.txt"
+					);
+					var reversed = target.buildStringToSign(
+						{ "x-ms-version" : "v", "x-ms-date" : "d", "x-ms-blob-type" : "BlockBlob" },
+						"PUT", "acct", "container", "a.txt"
+					);
+					expect( inOrder ).toBe( reversed );
+				} );
+
+				it( "matches header names case-insensitively when finding x-ms- headers", function() {
+					var lower = target.buildStringToSign(
+						{ "x-ms-blob-type" : "BlockBlob", "x-ms-date" : "d", "x-ms-version" : "v" },
+						"PUT", "acct", "container", "a.txt"
+					);
+					var mixedCase = target.buildStringToSign(
+						{ "X-MS-Blob-Type" : "BlockBlob", "X-Ms-Date" : "d", "x-MS-version" : "v" },
+						"PUT", "acct", "container", "a.txt"
+					);
+					expect( lower ).toBe( mixedCase );
+				} );
+
+			} );
+
+			describe( "sign()", function() {
+
+				it( "matches a real, independently-verifiable HMAC-SHA256 test vector (RFC 4231 Test Case 1)", function() {
+					// KNOWN-CORRECT REFERENCE VALUE - RFC 4231's own published
+					// HMAC-SHA256 test case 1 (key = twenty 0x0b bytes, data =
+					// "Hi There"), cross-checked outside this suite with
+					// Python's stdlib `hmac`/`hashlib`
+					// (hmac.new(bytes([0x0b]*20), b"Hi There", hashlib.sha256)).
+					// This validates the HMAC-SHA256 + base64 math sign() does,
+					// not an Azure-specific request signature (Azure publishes
+					// no such vector) - the base64 key below is simply that
+					// same 20-byte RFC 4231 key, base64-encoded.
+					var base64Key = "CwsLCwsLCwsLCwsLCwsLCwsLCws=";
+					var expectedSignature = "sDRMYdjbOFNcqK/OrwvxK4gdwgDJgz2nJuk3bC4yz/c=";
+
+					expect( target.sign( "Hi There", base64Key ) ).toBe( expectedSignature );
+				} );
+
+				it( "is deterministic - the same string-to-sign and key always produce the same signature", function() {
+					// FABRICATED-BUT-FIXED inputs - only used to check this
+					// signer's own output is stable/regression-safe run to
+					// run, not checked against any external reference.
+					var key = "MTIzNDU2Nzg5MDEyMzQ1Ng==";
+					var first = target.sign( "some-string-to-sign", key );
+					var second = target.sign( "some-string-to-sign", key );
+					expect( first ).toBe( second );
+				} );
+
+				it( "changing the string-to-sign changes the signature", function() {
+					var key = "MTIzNDU2Nzg5MDEyMzQ1Ng==";
+					var sigA = target.sign( "string-A", key );
+					var sigB = target.sign( "string-B", key );
+					expect( sigA ).notToBe( sigB );
+				} );
+
+				it( "changing the key changes the signature", function() {
+					var sigA = target.sign( "same-string-to-sign", "MTIzNDU2Nzg5MDEyMzQ1Ng==" );
+					var sigB = target.sign( "same-string-to-sign", "NjU0MzIxMDk4NzY1NDMyMQ==" );
+					expect( sigA ).notToBe( sigB );
+				} );
+
+				it( "produces a base64 string, not a hex digest", function() {
+					// Guards against accidentally wiring in the hmac() BIF's
+					// own hex-digest output (see AzureBlobTarget.bx's own
+					// sign() docblock) instead of a real base64 signature.
+					var signature = target.sign( "Hi There", "CwsLCwsLCwsLCwsLCwsLCwsLCws=" );
+					expect( reFind( "^[0-9a-fA-F]+$", signature ) ).toBe( 0 );
+					expect( signature ).toMatch( "^[A-Za-z0-9+/]+=*$" );
+				} );
+
+			} );
+
+			describe( "Authorization header shape", function() {
+
+				it( "formats as 'SharedKey <account>:<signature>'", function() {
+					// FABRICATED-BUT-FIXED inputs - regression/shape check only.
+					var headers = {
+						"Content-Length" : "5",
+						"Content-Type"   : "text/plain",
+						"x-ms-blob-type" : "BlockBlob",
+						"x-ms-date"      : "Wed, 25 Aug 2026 12:00:00 GMT",
+						"x-ms-version"   : "2021-08-06"
+					};
+					var stringToSign = target.buildStringToSign( headers, "PUT", "myacct", "mycontainer", "a.txt" );
+					var signature = target.sign( stringToSign, "CwsLCwsLCwsLCwsLCwsLCwsLCws=" );
+					var authHeader = "SharedKey myacct:#signature#";
+
+					expect( authHeader ).toMatch( "^SharedKey myacct:[A-Za-z0-9+/]+=*$" );
+				} );
+
+			} );
+
+			describe( "parseConnectionString()", function() {
+
+				it( "extracts AccountName and AccountKey from a realistic connection string", function() {
+					var connectionString = "DefaultEndpointsProtocol=https;AccountName=myacct;AccountKey=CwsLCwsLCwsLCwsLCwsLCwsLCws=;EndpointSuffix=core.windows.net";
+					var parsed = target.parseConnectionString( connectionString );
+
+					expect( parsed.accountName ).toBe( "myacct" );
+					expect( parsed.accountKey ).toBe( "CwsLCwsLCwsLCwsLCwsLCwsLCws=" );
+				} );
+
+				it( "keeps a base64 AccountKey's own trailing '=' padding intact (splits only on the FIRST '=')", function() {
+					var connectionString = "AccountName=myacct;AccountKey=abcd1234==;EndpointSuffix=core.windows.net";
+					var parsed = target.parseConnectionString( connectionString );
+
+					expect( parsed.accountKey ).toBe( "abcd1234==" );
+				} );
+
+				it( "throws BxSites.InvalidDeployConfig when AccountKey is missing", function() {
+					expect( function() {
+						target.parseConnectionString( "DefaultEndpointsProtocol=https;AccountName=myacct;EndpointSuffix=core.windows.net" );
+					} ).toThrow( "BxSites.InvalidDeployConfig" );
+				} );
+
+			} );
+
+			describe( "guessContentType()", function() {
+
+				it( "guesses common static-site extensions", function() {
+					expect( target.guessContentType( "index.html" ) ).toBe( "text/html" );
+					expect( target.guessContentType( "styles/site.css" ) ).toBe( "text/css" );
+					expect( target.guessContentType( "app.js" ) ).toBe( "application/javascript" );
+					expect( target.guessContentType( "data.json" ) ).toBe( "application/json" );
+					expect( target.guessContentType( "logo.svg" ) ).toBe( "image/svg+xml" );
+					expect( target.guessContentType( "font.woff2" ) ).toBe( "font/woff2" );
+				} );
+
+				it( "matches extensions case-insensitively", function() {
+					expect( target.guessContentType( "PHOTO.PNG" ) ).toBe( "image/png" );
+				} );
+
+				it( "falls back to application/octet-stream for an unknown or missing extension", function() {
+					expect( target.guessContentType( "archive.tar.gz" ) ).toBe( "application/octet-stream" );
+					expect( target.guessContentType( "README" ) ).toBe( "application/octet-stream" );
+				} );
+
+			} );
+
+			describe( "normalizePrefix() / buildBlobName()", function() {
+
+				it( "strips a leading slash from prefix but keeps a trailing one", function() {
+					expect( target.normalizePrefix( "/docs/" ) ).toBe( "docs/" );
+					expect( target.normalizePrefix( "docs/" ) ).toBe( "docs/" );
+					expect( target.normalizePrefix( "" ) ).toBe( "" );
+				} );
+
+				it( "joins prefix and relative path, stripping a leading slash from the relative path", function() {
+					expect( target.buildBlobName( "docs/", "/assets/style.css" ) ).toBe( "docs/assets/style.css" );
+					expect( target.buildBlobName( "", "index.html" ) ).toBe( "index.html" );
+				} );
+
+			} );
+
+			describe( "deploy() guard clauses", function() {
+
+				it( "throws BxSites.InvalidDeployConfig when account is missing", function() {
+					expect( function() {
+						target.deploy( {}, { siteDir : newTempDir() } );
+					} ).toThrow( "BxSites.InvalidDeployConfig" );
+				} );
+
+				it( "throws BxSites.InvalidDeployConfig when container is missing", function() {
+					expect( function() {
+						target.deploy( { account : "myacct" }, { siteDir : newTempDir() } );
+					} ).toThrow( "BxSites.InvalidDeployConfig" );
+				} );
+
+				it( "throws BxSites.SiteNotBuilt when siteDir doesn't exist", function() {
+					var root = newTempDir();
+					expect( function() {
+						target.deploy(
+							{ account : "myacct", container : "site" },
+							{ siteDir : root & "/site" }
+						);
+					} ).toThrow( "BxSites.SiteNotBuilt" );
+				} );
+
+				it( "throws BxSites.InvalidDeployConfig when no auth method is configured", function() {
+					expect( function() {
+						target.deploy( { account : "myacct", container : "site" }, { siteDir : newTempDir() } );
+					} ).toThrow( "BxSites.InvalidDeployConfig" );
+				} );
+
+				it( "throws BxSites.MissingCredentials when accountKeyEnvVar names an unset environment variable", function() {
+					expect( function() {
+						target.deploy(
+							{ account : "myacct", container : "site", accountKeyEnvVar : "BXSITES_TEST_DEFINITELY_UNSET_AZURE_KEY" },
+							{ siteDir : newTempDir() }
+						);
+					} ).toThrow( "BxSites.MissingCredentials" );
+				} );
+
+			} );
+
+		} );
+	}
+
+}

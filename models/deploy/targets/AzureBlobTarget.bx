@@ -1,0 +1,475 @@
+/**
+ * Uploads the already-built `site/` directory to an Azure Storage Blob
+ * container, preserving each file's path relative to `siteDir` as its blob
+ * name, via the real Azure Blob Storage REST API - no Azure SDK dependency,
+ * matching this project's "just the bxSites binary" pattern (see
+ * DigitalOceanTarget.bx in the sibling bx-agents module for the same
+ * hand-rolled `bx:http` approach: manual auth headers, an `assertOk()`-style
+ * non-2xx guard).
+ *
+ * Each file is uploaded with `PUT https://<account>.blob.core.windows.net/
+ * <container>/<blobName>`, header `x-ms-blob-type: BlockBlob`, and the
+ * file's raw bytes as the request body (`BlockBlob` = a single-shot upload,
+ * fine for the modest file sizes a built static site produces - no chunked
+ * `Put Block`/`Put Block List` dance).
+ *
+ * `DeploymentConfigResolver.bx` already guarantees exactly one auth method
+ * is present on `config`:
+ *  - `sasTokenEnvVar` - a full SAS query-string token (e.g.
+ *    "sv=2022-11-02&sp=rwdlac&...&sig=..."), appended directly as each
+ *    request URL's query string - no request signing needed at all.
+ *  - `accountKeyEnvVar` - the account's base64 shared key, used to sign
+ *    every request with Azure's own "Shared Key" scheme (NOT AWS SigV4 -
+ *    a different string-to-sign shape and a different signing key
+ *    encoding, see buildStringToSign()/sign()'s own docblocks).
+ *  - `connectionStringEnvVar` - a full `AccountName=...;AccountKey=...;...`
+ *    connection string; its `AccountKey` is extracted (parseConnectionString())
+ *    and reused via the exact same Shared Key signing path as
+ *    `accountKeyEnvVar`.
+ * If more than one were somehow set at once, `sasTokenEnvVar` wins, then
+ * `connectionStringEnvVar`, then `accountKeyEnvVar` (resolveAuth()) -
+ * `DeploymentConfigResolver.bx`'s own validation only requires *at least*
+ * one, it doesn't forbid more than one being present.
+ *
+ * `buildStringToSign()`, `sign()`, `parseConnectionString()`,
+ * `guessContentType()`, and `buildBlobName()` are all kept pure (no HTTP,
+ * no environment reads) so the Shared Key signing math and the other
+ * request-shaping logic are directly unit-testable without a real Azure
+ * account - see AzureBlobTargetSpec.bx's own docblock for exactly what is
+ * (and, since there's no real Azure account in this sandbox, definitely
+ * isn't) verified against a real Azure endpoint.
+ *
+ * @config { account (required), container (required), prefix (optional blob-name prefix, e.g. "docs/"), accountKeyEnvVar|sasTokenEnvVar|connectionStringEnvVar (exactly one required) }
+ */
+class implements="models.deploy.IDeploymentTarget@bxsites" {
+
+	/**
+	 * Pinned Azure Storage REST API version - sent as the `x-ms-version`
+	 * header on every request (and included in the Shared Key signature's
+	 * own canonicalized headers) so behavior doesn't shift under us if
+	 * Azure ever changes its own "no version pinned" default.
+	 */
+	variables.API_VERSION = "2021-08-06"
+
+	/**
+	 * Small static-file-server-style extension -> MIME type lookup, same
+	 * idea `guessContentType()` uses for every uploaded file. Anything not
+	 * listed here falls back to `application/octet-stream`.
+	 */
+	variables.MIME_TYPES = {
+		"html"  : "text/html",
+		"htm"   : "text/html",
+		"css"   : "text/css",
+		"js"    : "application/javascript",
+		"json"  : "application/json",
+		"xml"   : "application/xml",
+		"svg"   : "image/svg+xml",
+		"png"   : "image/png",
+		"jpg"   : "image/jpeg",
+		"jpeg"  : "image/jpeg",
+		"gif"   : "image/gif",
+		"ico"   : "image/x-icon",
+		"woff"  : "font/woff",
+		"woff2" : "font/woff2"
+	}
+
+	/**
+	 * @config This target's own resolved config (see the class docblock's `@config` shape)
+	 * @context { projectRoot, siteDir, config } - only `siteDir` is used
+	 *
+	 * @return { success, message, details: { account, container, uploaded } }
+	 */
+	struct function deploy( required struct config, required struct context ) {
+		var account = trim( arguments.config.account ?: "" )
+		var container = trim( arguments.config.container ?: "" )
+
+		if ( !len( account ) ) {
+			throw( type = "BxSites.InvalidDeployConfig", message = "deploy target 'azure' requires an 'account'" )
+		}
+		if ( !len( container ) ) {
+			throw( type = "BxSites.InvalidDeployConfig", message = "deploy target 'azure' requires a 'container'" )
+		}
+		if ( !directoryExists( arguments.context.siteDir ) ) {
+			throw(
+				type    = "BxSites.SiteNotBuilt",
+				message = "No [#arguments.context.siteDir#] to deploy - run `build` first"
+			)
+		}
+
+		var prefix = normalizePrefix( arguments.config.prefix ?: "" )
+		var auth = resolveAuth( arguments.config )
+
+		// Trailing-slash-stripped so a plain string.replace() below cleanly
+		// turns each absolute file path into a path relative to siteDir.
+		var siteDir = arguments.context.siteDir.reReplace( "[\/]+$", "" )
+
+		// directoryList() with no glob also returns directories, not just
+		// files - filter those out (see this repo's own AGENTS.md gotcha).
+		var allPaths = directoryList( siteDir, true, "path", "*", "asc" )
+		var files = allPaths.filter( function( path ) {
+			return !directoryExists( path )
+		} )
+
+		var uploaded = 0
+		for ( var filePath in files ) {
+			var relativePath = filePath.replace( siteDir, "", "one" )
+			var blobName = buildBlobName( prefix, relativePath )
+			uploadFile( auth, account, container, blobName, filePath )
+			uploaded++
+		}
+
+		return {
+			success : true,
+			message : "Uploaded #uploaded# file(s) to Azure container #container#",
+			details : { account : account, container : container, uploaded : uploaded }
+		}
+	}
+
+	/**
+	 * Guesses a file's `Content-Type` from its extension alone - the same
+	 * small lookup-table idea any static-file server uses - falling back to
+	 * `application/octet-stream` for an unrecognized (or missing) extension.
+	 *
+	 * @path A file path - only its own file name's extension is used, so a
+	 *       directory segment that happens to contain a "." never confuses this
+	 *
+	 * @return The guessed MIME type
+	 */
+	string function guessContentType( required string path ) {
+		var fileName = getFileFromPath( arguments.path )
+		var ext = lCase( listLast( fileName, "." ) )
+		if ( ext == lCase( fileName ) ) {
+			// listLast() returned the whole name back - there was no "." to split on
+			return "application/octet-stream"
+		}
+		return variables.MIME_TYPES[ ext ] ?: "application/octet-stream"
+	}
+
+	/**
+	 * Normalizes a config `prefix` - trims whitespace and strips any leading
+	 * slash (a blob name never starts with `/`). Any trailing slash is left
+	 * exactly as configured (e.g. "docs/") since that's what visibly
+	 * separates the prefix from the relative path glued on after it in
+	 * buildBlobName().
+	 *
+	 * @prefix The config's own `prefix` value, possibly blank
+	 *
+	 * @return The normalized prefix, or "" if none was configured
+	 */
+	string function normalizePrefix( required string prefix ) {
+		return trim( arguments.prefix ).reReplace( "^[\/]+", "" )
+	}
+
+	/**
+	 * Builds a blob name from an already-normalized `prefix` (see
+	 * normalizePrefix()) and a file's path relative to `siteDir` - normalizing
+	 * OS path separators to `/` and stripping any leading slash so the
+	 * result never accidentally starts with `//` or contains a `\`.
+	 *
+	 * @prefix Already-normalized via normalizePrefix()
+	 * @relativePath A file path relative to siteDir, e.g. "/assets/style.css"
+	 *                or "assets\style.css" on a backslash-separated OS
+	 *
+	 * @return The blob name, e.g. "docs/assets/style.css"
+	 */
+	string function buildBlobName( required string prefix, required string relativePath ) {
+		var backslash = char( 92 )
+		var normalized = arguments.relativePath.replace( backslash, "/", "all" ).reReplace( "^[\/]+", "" )
+		return arguments.prefix & normalized
+	}
+
+	/**
+	 * Extracts `AccountName`/`AccountKey` from a full Azure Storage
+	 * connection string (`DefaultEndpointsProtocol=https;AccountName=...;
+	 * AccountKey=...;EndpointSuffix=core.windows.net`) - a pure
+	 * string-parsing function, directly unit-testable against a realistic
+	 * connection-string value with no real Azure account involved. Splits
+	 * each `Key=Value` pair on only its FIRST `=`, since `AccountKey`'s own
+	 * base64 value routinely ends in `=` padding.
+	 *
+	 * @connectionString A full Azure Storage connection string
+	 *
+	 * @return { accountName, accountKey }
+	 */
+	struct function parseConnectionString( required string connectionString ) {
+		var parsed = {}
+		for ( var part in listToArray( arguments.connectionString, ";" ) ) {
+			var eqPos = find( "=", part )
+			if ( eqPos > 0 ) {
+				var key = trim( part.left( eqPos - 1 ) )
+				var value = trim( mid( part, eqPos + 1, len( part ) - eqPos ) )
+				parsed[ key ] = value
+			}
+		}
+
+		var accountKey = trim( parsed.AccountKey ?: "" )
+		if ( !len( accountKey ) ) {
+			throw(
+				type    = "BxSites.InvalidDeployConfig",
+				message = "deploy target 'azure' connection string is missing an 'AccountKey'"
+			)
+		}
+
+		return { accountName : trim( parsed.AccountName ?: "" ), accountKey : accountKey }
+	}
+
+	/**
+	 * Builds the exact Azure "Shared Key" string-to-sign for a `PUT` blob
+	 * upload - pure (no HTTP), so the exact line order/content is directly
+	 * assertable against known-fixed inputs. This is Azure's own scheme,
+	 * NOT AWS SigV4 - a different field order and a different final signing
+	 * step (see sign()).
+	 *
+	 * Every field is on its own line (`char(10)`-joined), using an EMPTY
+	 * STRING for any header not being sent - never omitted, or every
+	 * following line would shift up and produce a signature Azure rejects.
+	 * `Date` is always left empty here: this target always sends `x-ms-date`
+	 * instead (Azure's own convention - when `x-ms-date` is present, a real
+	 * `Date` header must not be sent and the `Date` string-to-sign line
+	 * stays blank).
+	 *
+	 * @headers The exact headers this request will send - recognized keys:
+	 *          `Content-Encoding`, `Content-Language`, `Content-Length`,
+	 *          `Content-MD5`, `Content-Type`, `If-Modified-Since`, `If-Match`,
+	 *          `If-None-Match`, `If-Unmodified-Since`, `Range`, plus any
+	 *          `x-ms-*` header (matched case-insensitively) - everything
+	 *          else is ignored
+	 * @verb The HTTP verb, e.g. "PUT"
+	 * @account The storage account name
+	 * @container The target container name
+	 * @blobName The target blob name (already prefix-applied)
+	 *
+	 * @return The full string-to-sign, ready for sign()
+	 */
+	string function buildStringToSign(
+		required struct headers,
+		required string verb,
+		required string account,
+		required string container,
+		required string blobName
+	) {
+		// Lowercase every header name up front so lookups below are
+		// case-insensitive regardless of how the caller cased them.
+		var lower = {}
+		for ( var name in arguments.headers ) {
+			lower[ lCase( name ) ] = arguments.headers[ name ]
+		}
+
+		var contentEncoding    = trim( lower[ "content-encoding" ] ?: "" )
+		var contentLanguage    = trim( lower[ "content-language" ] ?: "" )
+		var contentLength      = trim( lower[ "content-length" ] ?: "" )
+		var contentMD5         = trim( lower[ "content-md5" ] ?: "" )
+		var contentType        = trim( lower[ "content-type" ] ?: "" )
+		var ifModifiedSince    = trim( lower[ "if-modified-since" ] ?: "" )
+		var ifMatch            = trim( lower[ "if-match" ] ?: "" )
+		var ifNoneMatch        = trim( lower[ "if-none-match" ] ?: "" )
+		var ifUnmodifiedSince  = trim( lower[ "if-unmodified-since" ] ?: "" )
+		var range              = trim( lower[ "range" ] ?: "" )
+
+		var msKeys = []
+		for ( var name in lower ) {
+			if ( name.left( 5 ) == "x-ms-" ) {
+				msKeys.append( name )
+			}
+		}
+		msKeys.sort( "text" )
+
+		var canonicalizedHeaders = ""
+		for ( var name in msKeys ) {
+			canonicalizedHeaders &= name & ":" & trim( lower[ name ] ) & char( 10 )
+		}
+
+		var canonicalizedResource = "/" & arguments.account & "/" & arguments.container & "/" & arguments.blobName
+
+		return arguments.verb & char( 10 ) &
+			contentEncoding & char( 10 ) &
+			contentLanguage & char( 10 ) &
+			contentLength & char( 10 ) &
+			contentMD5 & char( 10 ) &
+			contentType & char( 10 ) &
+			char( 10 ) &
+			ifModifiedSince & char( 10 ) &
+			ifMatch & char( 10 ) &
+			ifNoneMatch & char( 10 ) &
+			ifUnmodifiedSince & char( 10 ) &
+			range & char( 10 ) &
+			canonicalizedHeaders &
+			canonicalizedResource
+	}
+
+	/**
+	 * Computes an Azure Shared Key signature: base64( HMAC-SHA256(
+	 * base64-DECODED account key bytes, UTF-8 bytes of `stringToSign` ) ) -
+	 * pure (no HTTP), via `javax.crypto.Mac`/`SecretKeySpec` Java interop
+	 * (BoxLang's own `hmac()` BIF only emits a hex digest, not base64, so
+	 * interop is used directly instead of hex-decoding its output).
+	 *
+	 * The account key itself arrives as a BASE64 string (Azure's own
+	 * publishing format for it) and MUST be `binaryDecode()`d to raw bytes
+	 * first - it is never used as a raw UTF-8 string.
+	 *
+	 * @stringToSign The exact string-to-sign, from buildStringToSign()
+	 * @base64Key The account's shared key, base64-encoded (as Azure hands it out)
+	 *
+	 * @return The base64-encoded signature
+	 */
+	string function sign( required string stringToSign, required string base64Key ) {
+		var keyBytes = binaryDecode( arguments.base64Key, "base64" )
+		var messageBytes = charsetDecode( arguments.stringToSign, "utf-8" )
+
+		var secretKeySpec = createObject( "java", "javax.crypto.spec.SecretKeySpec" ).init( keyBytes, "HmacSHA256" )
+		var mac = createObject( "java", "javax.crypto.Mac" ).getInstance( "HmacSHA256" )
+		mac.init( secretKeySpec )
+		var signatureBytes = mac.doFinal( messageBytes )
+
+		return binaryEncode( signatureBytes, "base64" )
+	}
+
+	/**
+	 * Resolves this target's single configured auth method (`DeploymentConfigResolver.bx`
+	 * already guarantees at least one is present) into a uniform
+	 * `{ mode, sasToken, key }` shape the rest of this class works from -
+	 * `key` is the base64 shared key to sign with, whether it came straight
+	 * from `accountKeyEnvVar` or was extracted from `connectionStringEnvVar`.
+	 * Preference order if more than one were somehow configured at once:
+	 * `sasTokenEnvVar`, then `connectionStringEnvVar`, then `accountKeyEnvVar`.
+	 *
+	 * @config This target's own resolved config
+	 *
+	 * @return { mode: "sas"|"key", sasToken, key }
+	 */
+	private struct function resolveAuth( required struct config ) {
+		var sasTokenEnvVar = trim( arguments.config.sasTokenEnvVar ?: "" )
+		if ( len( sasTokenEnvVar ) ) {
+			var sasToken = trim( getSystemSetting( sasTokenEnvVar, "" ) )
+			if ( !len( sasToken ) ) {
+				throw(
+					type    = "BxSites.MissingCredentials",
+					message = "deploy target 'azure' requires the #sasTokenEnvVar# environment variable"
+				)
+			}
+			return { mode : "sas", sasToken : sasToken, key : "" }
+		}
+
+		var connectionStringEnvVar = trim( arguments.config.connectionStringEnvVar ?: "" )
+		if ( len( connectionStringEnvVar ) ) {
+			var connectionString = trim( getSystemSetting( connectionStringEnvVar, "" ) )
+			if ( !len( connectionString ) ) {
+				throw(
+					type    = "BxSites.MissingCredentials",
+					message = "deploy target 'azure' requires the #connectionStringEnvVar# environment variable"
+				)
+			}
+			var parsed = parseConnectionString( connectionString )
+			return { mode : "key", sasToken : "", key : parsed.accountKey }
+		}
+
+		var accountKeyEnvVar = trim( arguments.config.accountKeyEnvVar ?: "" )
+		if ( len( accountKeyEnvVar ) ) {
+			var accountKey = trim( getSystemSetting( accountKeyEnvVar, "" ) )
+			if ( !len( accountKey ) ) {
+				throw(
+					type    = "BxSites.MissingCredentials",
+					message = "deploy target 'azure' requires the #accountKeyEnvVar# environment variable"
+				)
+			}
+			return { mode : "key", sasToken : "", key : accountKey }
+		}
+
+		throw(
+			type    = "BxSites.InvalidDeployConfig",
+			message = "deploy target 'azure' requires an 'accountKeyEnvVar', 'sasTokenEnvVar', or 'connectionStringEnvVar'"
+		)
+	}
+
+	/**
+	 * The current UTC time, formatted as an RFC 1123 HTTP date
+	 * ("Wed, 25 Aug 2026 12:00:00 GMT") for the `x-ms-date` header. Calling
+	 * `.format()` on the *formatter* (rather than on the date/time value
+	 * itself) is deliberate - BoxLang wraps `java.time` values in its own
+	 * Date type that intercepts an unqualified `.format(mask)` call as its
+	 * own string-mask-based date formatting, throwing a type error when
+	 * handed a real `DateTimeFormatter` object instead of a mask string.
+	 *
+	 * @return An RFC 1123-formatted UTC date string
+	 */
+	private string function httpDateNow() {
+		var utcNow = createObject( "java", "java.time.ZonedDateTime" ).now( createObject( "java", "java.time.ZoneOffset" ).UTC )
+		var formatter = createObject( "java", "java.time.format.DateTimeFormatter" ).RFC_1123_DATE_TIME
+		return formatter.format( utcNow )
+	}
+
+	/**
+	 * Uploads one file's raw bytes to its blob, throwing
+	 * `BxSites.DeployFailed` on any non-2xx response.
+	 *
+	 * @auth Resolved via resolveAuth()
+	 * @account The storage account name
+	 * @container The target container
+	 * @blobName The blob name to upload as (already prefix-applied)
+	 * @filePath Absolute local path to the file to upload
+	 */
+	private void function uploadFile(
+		required struct auth,
+		required string account,
+		required string container,
+		required string blobName,
+		required string filePath
+	) {
+		var bytes = fileReadBinary( arguments.filePath )
+		var contentType = guessContentType( arguments.filePath )
+		var contentLength = toString( len( bytes ) )
+
+		var url = "https://#arguments.account#.blob.core.windows.net/#arguments.container#/#arguments.blobName#"
+
+		var xmsDate = ""
+		var authorizationHeader = ""
+
+		if ( arguments.auth.mode == "sas" ) {
+			url &= "?#arguments.auth.sasToken#"
+		} else {
+			xmsDate = httpDateNow()
+			var headersForSigning = {
+				"Content-Length" : contentLength,
+				"Content-Type"   : contentType,
+				"x-ms-blob-type" : "BlockBlob",
+				"x-ms-date"      : xmsDate,
+				"x-ms-version"   : variables.API_VERSION
+			}
+			var stringToSign = buildStringToSign( headersForSigning, "PUT", arguments.account, arguments.container, arguments.blobName )
+			var signature = sign( stringToSign, arguments.auth.key )
+			authorizationHeader = "SharedKey #arguments.account#:#signature#"
+		}
+
+		var result = ""
+		bx:http url="#url#" method="PUT" result="result" {
+			bx:httpparam type="header" name="x-ms-blob-type" value="BlockBlob";
+			bx:httpparam type="header" name="x-ms-version" value="#variables.API_VERSION#";
+			bx:httpparam type="header" name="Content-Type" value="#contentType#";
+			if ( len( xmsDate ) ) {
+				bx:httpparam type="header" name="x-ms-date" value="#xmsDate#";
+			}
+			if ( len( authorizationHeader ) ) {
+				bx:httpparam type="header" name="Authorization" value="#authorizationHeader#";
+			}
+			bx:httpparam type="body" value="#bytes#";
+		}
+
+		assertOk( result, arguments.blobName )
+	}
+
+	/**
+	 * @result A `bx:http` result struct from an upload attempt
+	 * @blobName The blob name that was being uploaded, for the thrown error message
+	 */
+	private void function assertOk( required struct result, required string blobName ) {
+		var statusCode = val( listFirst( arguments.result.statusCode ?: "0", " " ) )
+		if ( statusCode < 200 || statusCode >= 300 ) {
+			throw(
+				type    = "BxSites.DeployFailed",
+				message = "Uploading [#arguments.blobName#] to Azure failed (#arguments.result.statusCode ?: 'unknown'#): #arguments.result.fileContent ?: ''#"
+			)
+		}
+	}
+
+}
