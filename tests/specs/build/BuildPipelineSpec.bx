@@ -1074,7 +1074,7 @@ class extends="testbox.system.BaseSpec" {
 				// that wraps to two lines, the wrapped second line sat flush
 				// against the next entry, making it look like its own list
 				// item rather than a continuation.
-				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
+				for ( var themeName in [ "bootstrap", "material", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
 					var root = newProject( themeName );
 					fileWrite( root & "/docs/index.md", '<h2 id="install">Install</h2>' & char( 10 ) & '<h3 id="prereqs">Prereqs</h3>' );
 
@@ -1084,6 +1084,19 @@ class extends="testbox.system.BaseSpec" {
 					expect( css ).toInclude( "margin: 0.35rem 0;" );
 					expect( css ).toInclude( "line-height: 1.4;" );
 				}
+
+				// tailwind is utility-class-driven, not stylesheet-driven - its
+				// own assets/theme/style.css is just a handful of overrides on
+				// top of the Tailwind Play CDN, so the same spacing instead
+				// shows up as classes in the rendered markup itself.
+				var tailwindRoot = newProject( "tailwind" );
+				fileWrite( tailwindRoot & "/docs/index.md", '<h2 id="install">Install</h2>' & char( 10 ) & '<h3 id="prereqs">Prereqs</h3>' );
+
+				pipeline.build( tailwindRoot );
+
+				var tailwindHtml = fileRead( tailwindRoot & "/site/index.html" );
+				expect( tailwindHtml ).toInclude( 'class="space-y-2"' );
+				expect( tailwindHtml ).toInclude( "leading-snug" );
 			} );
 
 			it( "copies the shared tabs.js and code-lines.js widgets unconditionally, loading code-lines.js after hljs.highlightAll()", function() {
