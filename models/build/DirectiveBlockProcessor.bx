@@ -366,7 +366,19 @@ class {
 				html &= '<div class="bxsites-card__title">' & encodeForHTML( attrs.title ) & '</div>'
 			}
 			if ( len( trim( child.content ) ) ) {
-				html &= '<div class="bxsites-card__body">' & renderNested( child.content, arguments.renderer, arguments.markdownOptions ) & '</div>'
+				var bodyHtml = renderNested( child.content, arguments.renderer, arguments.markdownOptions )
+				if ( tag == "a" ) {
+					// The whole card is already one big <a> - markdown auto-linking
+					// a bare URL/email in the body (e.g. "consulting@ortussolutions.com")
+					// would otherwise nest a second <a> inside it, which is invalid
+					// HTML. Browsers "fix" that by force-closing the outer <a> the
+					// moment they hit the inner one, splitting the card in half and
+					// leaving the rest of its content stranded outside the box. Unwrap
+					// any inner anchors instead - their text still reads fine, and the
+					// whole card already links to the same place a click would.
+					bodyHtml = reReplaceNoCase( bodyHtml, "</?a\b[^>]*>", "", "all" )
+				}
+				html &= '<div class="bxsites-card__body">' & bodyHtml & '</div>'
 			}
 			html &= "</" & tag & ">"
 		}
