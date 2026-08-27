@@ -1,5 +1,5 @@
 name: "BxSites"
-description: "Static documentation site generator for BoxLang, built on bx-markdown"
+description: "Enterprise Static Site Generator powered by BoxLang"
 baseURL: "https://bxsites.io/"
 theme:
   name: bootstrap
