@@ -72,6 +72,26 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( '<div class="bxsites-card__title">Themes</div>' );
 			} );
 
+			it( "unwraps a nested <a> from a linked card's body, instead of nesting it inside the card's own <a>", function() {
+				// bx-markdown auto-links a bare email/URL it finds in body text
+				// (GFM autolinking) - if the card itself already has an [href],
+				// that produces an <a> nested inside the card's own outer <a>,
+				// which is invalid HTML. Browsers "fix" that by force-closing the
+				// outer <a> the instant they hit the inner one, splitting the
+				// card's rendered box in half and stranding the rest of its
+				// content outside it entirely.
+				var md = "::: cards" & char( 10 ) &
+					'::: card title="Get in touch" href="mailto:consulting@ortussolutions.com"' & char( 10 ) &
+					'Email <a href="mailto:consulting@ortussolutions.com">consulting@ortussolutions.com</a> to talk.' & char( 10 ) & ":::" & char( 10 ) &
+					":::";
+				var html = render( md );
+
+				expect( html ).toInclude( '<a class="bxsites-card" href="mailto:consulting@ortussolutions.com">' );
+				expect( html ).toInclude( "consulting@ortussolutions.com" );
+				// Exactly one <a> for the whole card - none nested inside its body.
+				expect( html.reMatchNoCase( "<a[ >]" ).len() ).toBe( 1 );
+			} );
+
 			it( "resolves a card's [icon] the same way frontmatter/nav icons are - a named icon renders as inline SVG", function() {
 				var md = "::: cards" & char( 10 ) &
 					'::: card title="Themes" icon="phosphor-duotone:palette"' & char( 10 ) & "Body." & char( 10 ) & ":::" & char( 10 ) &
