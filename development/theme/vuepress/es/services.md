@@ -3,7 +3,6 @@ title: Consultoría y Servicios Profesionales
 order: 6
 icon: phosphor-duotone:handshake
 summary: ¿Necesitas ayuda para construir, migrar o mantener un sitio con BxSites? Ortus Solutions ofrece servicios profesionales y consultoría para sitios de documentación y sitios estáticos de cualquier tipo.
-description: ¿Necesitas ayuda para construir, migrar o mantener un sitio con BxSites? Ortus Solutions ofrece servicios profesionales y consultoría para sitios de documentación y sitios estáticos de cualquier tipo.
 tags: [servicios, consultoría]
 ---
 

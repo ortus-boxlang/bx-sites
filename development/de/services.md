@@ -3,7 +3,6 @@ title: Beratung & Professionelle Dienstleistungen
 order: 6
 icon: phosphor-duotone:handshake
 summary: Brauchst du Hilfe beim Aufbau, der Migration oder der Pflege einer BX-Sites-Website? Ortus Solutions bietet professionelle Dienstleistungen und Beratung für Docs-Websites und statische Websites jeder Art.
-description: Brauchst du Hilfe beim Aufbau, der Migration oder der Pflege einer BX-Sites-Website? Ortus Solutions bietet professionelle Dienstleistungen und Beratung für Docs-Websites und statische Websites jeder Art.
 tags: [dienstleistungen, beratung]
 ---
 

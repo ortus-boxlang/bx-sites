@@ -3,7 +3,6 @@ title: Chi siamo
 order: 2.1
 icon: phosphor-duotone:info
 summary: Cos'è BxSites, chi lo sviluppa e dove trovare il progetto.
-description: Cos'è BxSites, chi lo sviluppa e dove trovare il progetto.
 tags: [chi-siamo, progetto]
 ---
 

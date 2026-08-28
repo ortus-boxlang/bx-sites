@@ -3,7 +3,6 @@ title: トラブルシューティング
 order: 2.4
 icon: phosphor-duotone:lifebuoy
 summary: セットアップ・ビルド・serve に関するよくある問題を診断します。このページで解決しない場合の問い合わせ先も掲載しています。
-description: セットアップ・ビルド・serve に関するよくある問題を診断します。このページで解決しない場合の問い合わせ先も掲載しています。
 tags: [トラブルシューティング, faq]
 ---
 

@@ -3,7 +3,6 @@ title: AI Agent Skills
 order: 6.3
 icon: phosphor-duotone:robot
 summary: Give Claude Code, Cursor, Codex, and other AI coding assistants deep, structured knowledge of bx-sites - install the official skill pack via npx, the ColdBox CLI, or bxSites' own skills:install verb.
-description: Give Claude Code, Cursor, Codex, and other AI coding assistants deep, structured knowledge of bx-sites - install the official skill pack via npx, the ColdBox CLI, or bxSites' own skills:install verb.
 tags: [guides, ai, skills]
 ---
 

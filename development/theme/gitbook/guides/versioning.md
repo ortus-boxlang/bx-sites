@@ -3,7 +3,6 @@ title: Versioning
 order: 7.5
 icon: phosphor-duotone:git-branch
 summary: Ship docs for more than one release at once - cut a version snapshot, and every theme gets a version switcher for free.
-description: Ship docs for more than one release at once - cut a version snapshot, and every theme gets a version switcher for free.
 tags: [guides, versioning]
 ---
 

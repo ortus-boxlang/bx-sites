@@ -3,7 +3,6 @@ title: Bloques de Contenido
 order: 4.5
 icon: phosphor-duotone:squares-four
 summary: Cuadrículas de tarjetas, columnas, un stepper, tarjetas de archivo/incrustación/vista previa, un registro de cambios y contenido reutilizable.
-description: Cuadrículas de tarjetas, columnas, un stepper, tarjetas de archivo/incrustación/vista previa, un registro de cambios y contenido reutilizable.
 tags: [guías, markdown, gitbook]
 ---
 

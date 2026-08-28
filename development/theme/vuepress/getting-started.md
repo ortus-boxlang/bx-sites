@@ -3,7 +3,6 @@ title: Getting Started
 order: 2
 icon: phosphor-duotone:rocket-launch
 summary: Install the module, scaffold a project, and build your first site.
-description: Install the module, scaffold a project, and build your first site.
 tags: [guides, setup]
 ---
 
@@ -194,8 +193,10 @@ Your content here.
 - `order` - controls sibling ordering in the nav (lower sorts first; omitted pages sort last, alphabetically)
 - `hidden` - `true` excludes the page from the nav (and from search) without excluding it from the build
 - `description` - this page's social-card/meta description (see
-  [`ogImage`](configuration.md#ogimage)); falls back to the site-wide
-  `description` in the site config when omitted
+  [`ogImage`](configuration.md#ogimage)); when omitted, falls back to this
+  page's own `summary` (below), then to a plain-text excerpt of the page's
+  own rendered content, then - only if that content has no plain text of
+  its own either - to the site-wide `description` in the site config
 - `tags` - an array of tags for this page, rendered as clickable badges
   under the title and collected into a site-wide `/tags/` index page
   (only built at all once at least one page has tags); also boosts search

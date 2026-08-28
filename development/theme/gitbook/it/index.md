@@ -3,7 +3,6 @@ title: Home
 order: 1
 icon: phosphor-duotone:house
 summary: Punta BxSites su una cartella docs/ (o src/, se il tuo progetto non è davvero "docs" nello spirito). Ottieni un sito statico veloce e personalizzabile - documentazione, un sito marketing, un blog, o qualsiasi altra cosa il Markdown possa esprimere - completo di ricerca, i18n, e un toolkit Markdown pensato per contenuti reali.
-description: Punta BxSites su una cartella docs/ (o src/, se il tuo progetto non è davvero "docs" nello spirito). Ottieni un sito statico veloce e personalizzabile - documentazione, un sito marketing, un blog, o qualsiasi altra cosa il Markdown possa esprimere - completo di ricerca, i18n, e un toolkit Markdown pensato per contenuti reali.
 toc: false
 ---
 

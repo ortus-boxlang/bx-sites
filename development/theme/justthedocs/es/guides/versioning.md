@@ -3,7 +3,6 @@ title: Versionado
 order: 7.5
 icon: phosphor-duotone:git-branch
 summary: Publica documentación de más de un lanzamiento a la vez - crea una instantánea de versión, y cada tema obtiene un selector de versión gratis.
-description: Publica documentación de más de un lanzamiento a la vez - crea una instantánea de versión, y cada tema obtiene un selector de versión gratis.
 tags: [guías, versionado]
 ---
 

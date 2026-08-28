@@ -243,8 +243,10 @@ Your content here.
 <li><code>order</code> - controls sibling ordering in the nav (lower sorts first; omitted pages sort last, alphabetically)</li>
 <li><code>hidden</code> - <code>true</code> excludes the page from the nav (and from search) without excluding it from the build</li>
 <li><code>description</code> - this page's social-card/meta description (see
-<a href="/development/theme/docsy/configuration/index.html#ogimage"><code>ogImage</code></a>); falls back to the site-wide
-<code>description</code> in the site config when omitted</li>
+<a href="/development/theme/docsy/configuration/index.html#ogimage"><code>ogImage</code></a>); when omitted, falls back to this
+page's own <code>summary</code> (below), then to a plain-text excerpt of the page's
+own rendered content, then - only if that content has no plain text of
+its own either - to the site-wide <code>description</code> in the site config</li>
 <li><code>tags</code> - an array of tags for this page, rendered as clickable badges
 under the title and collected into a site-wide <code>/tags/</code> index page
 (only built at all once at least one page has tags); also boosts search
@@ -288,7 +290,7 @@ one page stays fast even on a large site. Pass <code>--port=3000</code> or
 <p>Removes <code>site/</code> and any build cache, without touching your <code>docs/</code> source.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/development/theme/docsy/getting-started.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 28, 2026, 2&#x3a;34&#x3a;59 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/development/theme/docsy/getting-started.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 28, 2026, 3&#x3a;16&#x3a;38 AM</span></div>
 			</article>
 
 			<nav class="docsy-page-nav" aria-label="Page navigation">

@@ -3,7 +3,6 @@ title: Configuration
 order: 4
 icon: phosphor-duotone:gear-six
 summary: Every site config key, what it defaults to, and what it does.
-description: Every site config key, what it defaults to, and what it does.
 tags: [reference, configuration]
 ---
 
@@ -130,8 +129,10 @@ The site name, shown in the header/brand mark and page titles. Required.
 ## `description`
 
 An optional site description, used as the fallback `<meta name="description">`
-and `og:description` for any page that doesn't set its own `description`
-frontmatter (see [Getting Started](getting-started.md#add-pages)).
+and `og:description` for any page that has neither its own `description`
+frontmatter nor a `summary` nor any plain text of its own to derive an
+excerpt from - see [Getting Started](getting-started.md#add-pages) for the
+full per-page fallback chain.
 
 ## `baseURL`
 

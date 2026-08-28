@@ -3,7 +3,6 @@ title: Über das Projekt
 order: 2.1
 icon: phosphor-duotone:info
 summary: Was BxSites ist, wer es entwickelt und wo das Projekt zu finden ist.
-description: Was BxSites ist, wer es entwickelt und wo das Projekt zu finden ist.
 tags: [über-uns, projekt]
 ---
 

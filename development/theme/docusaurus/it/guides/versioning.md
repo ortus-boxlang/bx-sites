@@ -3,7 +3,6 @@ title: Versionamento
 order: 7.5
 icon: phosphor-duotone:git-branch
 summary: Distribuisci la documentazione di più di una release contemporaneamente - crea un'istantanea di versione, e ogni tema ottiene gratuitamente un selettore di versione.
-description: Distribuisci la documentazione di più di una release contemporaneamente - crea un'istantanea di versione, e ogni tema ottiene gratuitamente un selettore di versione.
 tags: [guide, versionamento]
 ---
 

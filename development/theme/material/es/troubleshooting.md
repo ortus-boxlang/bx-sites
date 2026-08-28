@@ -3,7 +3,6 @@ title: Solución de problemas
 order: 2.4
 icon: phosphor-duotone:lifebuoy
 summary: Diagnostica problemas comunes de configuración, build y serve - y dónde obtener ayuda si esta página no lo cubre.
-description: Diagnostica problemas comunes de configuración, build y serve - y dónde obtener ayuda si esta página no lo cubre.
 tags: [solución-de-problemas, faq]
 ---
 

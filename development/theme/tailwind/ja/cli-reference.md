@@ -3,7 +3,6 @@ title: CLI リファレンス
 order: 3
 icon: phosphor-duotone:terminal-window
 summary: bxSites のすべての動詞とフラグ。
-description: bxSites のすべての動詞とフラグ。
 tags: [リファレンス, cli]
 ---
 

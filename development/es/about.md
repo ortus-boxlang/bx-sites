@@ -3,7 +3,6 @@ title: Acerca de
 order: 2.1
 icon: phosphor-duotone:info
 summary: Qué es BxSites, quién lo desarrolla y dónde encontrar el proyecto.
-description: Qué es BxSites, quién lo desarrolla y dónde encontrar el proyecto.
 tags: [acerca-de, proyecto]
 ---
 

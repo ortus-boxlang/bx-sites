@@ -3,7 +3,6 @@ title: Contribute
 order: 7.1
 icon: phosphor-duotone:git-pull-request
 summary: Report bugs, ask questions, submit pull requests, or support the project financially.
-description: Report bugs, ask questions, submit pull requests, or support the project financially.
 tags: [about, contributing]
 ---
 

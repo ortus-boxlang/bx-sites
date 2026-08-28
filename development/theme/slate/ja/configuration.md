@@ -3,7 +3,6 @@ title: 設定
 order: 4
 icon: phosphor-duotone:gear-six
 summary: サイト設定のすべてのキー、デフォルト値、および動作。
-description: サイト設定のすべてのキー、デフォルト値、および動作。
 tags: [リファレンス, 設定]
 ---
 
