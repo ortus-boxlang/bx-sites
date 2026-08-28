@@ -3,6 +3,7 @@ title: Contribuir
 order: 2.3
 icon: phosphor-duotone:git-pull-request
 summary: Reporta errores, haz preguntas, envía pull requests o apoya el proyecto financieramente.
+description: Reporta errores, haz preguntas, envía pull requests o apoya el proyecto financieramente.
 tags: [acerca-de, contribuir]
 ---
 

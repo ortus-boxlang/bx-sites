@@ -3,6 +3,7 @@ title: Home
 order: 1
 icon: phosphor-duotone:house
 summary: Point BxSites at a docs/ folder (or src/, for a project that isn't really "docs" in spirit). Get a fast, themeable static site out - documentation, a marketing site, a blog, or anything else Markdown can express - complete with search, i18n, and a markdown toolkit built for real content.
+description: Point BxSites at a docs/ folder (or src/, for a project that isn't really "docs" in spirit). Get a fast, themeable static site out - documentation, a marketing site, a blog, or anything else Markdown can express - complete with search, i18n, and a markdown toolkit built for real content.
 toc: false
 ---
 

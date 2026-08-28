@@ -3,6 +3,7 @@ title: コンサルティングとプロフェッショナルサービス
 order: 6
 icon: phosphor-duotone:handshake
 summary: BxSites サイトの構築、移行、保守にお困りですか？ Ortus Solutions は、あらゆる種類のドキュメントサイトや静的サイトに向けたプロフェッショナルサービスとコンサルティングを提供しています。
+description: BxSites サイトの構築、移行、保守にお困りですか？ Ortus Solutions は、あらゆる種類のドキュメントサイトや静的サイトに向けたプロフェッショナルサービスとコンサルティングを提供しています。
 tags: [サービス, コンサルティング]
 ---
 

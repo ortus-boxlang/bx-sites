@@ -3,6 +3,7 @@ title: Licencia
 order: 2.2
 icon: phosphor-duotone:scroll
 summary: BxSites es gratuito y de código abierto, licenciado bajo Apache 2.0.
+description: BxSites es gratuito y de código abierto, licenciado bajo Apache 2.0.
 tags: [acerca-de, licencia]
 ---
 

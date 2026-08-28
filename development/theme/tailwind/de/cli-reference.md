@@ -3,6 +3,7 @@ title: CLI-Referenz
 order: 3
 icon: phosphor-duotone:terminal-window
 summary: Jedes bxSites-Verb und seine Optionen.
+description: Jedes bxSites-Verb und seine Optionen.
 tags: [referenz, cli]
 ---
 

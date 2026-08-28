@@ -3,6 +3,7 @@ title: ホーム
 order: 1
 icon: phosphor-duotone:house
 summary: docs/ フォルダ(または、"docs" らしくないプロジェクトなら src/)を指定するだけ。ドキュメント、マーケティングサイト、ブログ、その他 Markdown で書けるものなら何でも、検索・i18n・実運用向けの Markdown ツールキットを備えた、高速でテーマ変更可能な静的サイトが手に入ります。
+description: docs/ フォルダ(または、"docs" らしくないプロジェクトなら src/)を指定するだけ。ドキュメント、マーケティングサイト、ブログ、その他 Markdown で書けるものなら何でも、検索・i18n・実運用向けの Markdown ツールキットを備えた、高速でテーマ変更可能な静的サイトが手に入ります。
 toc: false
 ---
 

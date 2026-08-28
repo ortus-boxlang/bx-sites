@@ -3,6 +3,7 @@ title: Risoluzione dei problemi
 order: 2.4
 icon: phosphor-duotone:lifebuoy
 summary: Diagnostica i problemi più comuni di setup, build e serve - e dove trovare aiuto se questa pagina non li copre.
+description: Diagnostica i problemi più comuni di setup, build e serve - e dove trovare aiuto se questa pagina non li copre.
 tags: [risoluzione-problemi, faq]
 ---
 

@@ -3,6 +3,7 @@ title: Contribuisci
 order: 2.3
 icon: phosphor-duotone:git-pull-request
 summary: Segnala bug, fai domande, invia pull request o sostieni il progetto finanziariamente.
+description: Segnala bug, fai domande, invia pull request o sostieni il progetto finanziariamente.
 tags: [chi-siamo, contribuire]
 ---
 

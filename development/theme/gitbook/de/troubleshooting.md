@@ -3,6 +3,7 @@ title: Fehlerbehebung
 order: 2.4
 icon: phosphor-duotone:lifebuoy
 summary: Häufige Probleme bei Einrichtung, Build und Serve diagnostizieren - und wo du Hilfe findest, wenn diese Seite es nicht abdeckt.
+description: Häufige Probleme bei Einrichtung, Build und Serve diagnostizieren - und wo du Hilfe findest, wenn diese Seite es nicht abdeckt.
 tags: [fehlerbehebung, faq]
 ---
 

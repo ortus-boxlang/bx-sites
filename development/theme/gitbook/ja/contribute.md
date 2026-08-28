@@ -3,6 +3,7 @@ title: 貢献する
 order: 2.3
 icon: phosphor-duotone:git-pull-request
 summary: バグを報告したり、質問したり、プルリクエストを送ったり、プロジェクトを資金面で支援したりする方法。
+description: バグを報告したり、質問したり、プルリクエストを送ったり、プロジェクトを資金面で支援したりする方法。
 tags: [概要, 貢献]
 ---
 

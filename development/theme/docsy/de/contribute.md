@@ -3,6 +3,7 @@ title: Mitmachen
 order: 2.3
 icon: phosphor-duotone:git-pull-request
 summary: Bugs melden, Fragen stellen, Pull Requests einreichen oder das Projekt finanziell unterstützen.
+description: Bugs melden, Fragen stellen, Pull Requests einreichen oder das Projekt finanziell unterstützen.
 tags: [über-uns, mitmachen]
 ---
 

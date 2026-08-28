@@ -3,6 +3,7 @@ title: はじめに
 order: 2
 icon: phosphor-duotone:rocket-launch
 summary: モジュールをインストールし、プロジェクトをスキャフォールドして、最初のサイトをビルドします。
+description: モジュールをインストールし、プロジェクトをスキャフォールドして、最初のサイトをビルドします。
 tags: [ガイド, セットアップ]
 ---
 

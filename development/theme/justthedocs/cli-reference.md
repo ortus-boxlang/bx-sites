@@ -3,6 +3,7 @@ title: CLI Reference
 order: 3
 icon: phosphor-duotone:terminal-window
 summary: Every bxSites verb and its flags.
+description: Every bxSites verb and its flags.
 tags: [reference, cli]
 ---
 

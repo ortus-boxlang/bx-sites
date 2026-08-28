@@ -3,6 +3,7 @@ title: ライセンス
 order: 2.2
 icon: phosphor-duotone:scroll
 summary: BxSites は無料でオープンソースであり、Apache 2.0 ライセンスの下で提供されています。
+description: BxSites は無料でオープンソースであり、Apache 2.0 ライセンスの下で提供されています。
 tags: [概要, ライセンス]
 ---
 
