@@ -53,6 +53,16 @@ class extends="testbox.system.BaseSpec" {
 				expect( posts[ 1 ].hidden ).toBeFalse();
 			} );
 
+			it( "preserves the raw frontmatter struct, custom keys included, on post.frontmatter", function() {
+				var dir = newDocsDir();
+				writePost( dir, "hello-world.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "series: Getting Started" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var posts = discoverer.load( dir );
+
+				expect( posts[ 1 ].frontmatter.date ).toBe( "2026-01-01" );
+				expect( posts[ 1 ].frontmatter.series ).toBe( "Getting Started" );
+			} );
+
 			it( "derives the title from the filename when frontmatter has none", function() {
 				var dir = newDocsDir();
 				writePost( dir, "hello-world.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "---" & char( 10 ) & "Body." );

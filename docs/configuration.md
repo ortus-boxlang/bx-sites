@@ -1015,8 +1015,9 @@ the version switcher, `sitemap.xml`/`robots.txt` exclusion).
 ## `variables`
 
 `{}` (the default) - an object of reusable values, any shape, referenced
-from any Markdown page as `{{ dotted.path }}`. See
-[Variables & Magic Functions](guides/variables-and-functions.md).
+from any Markdown page as `{{ dotted.path }}`. A page's own frontmatter is
+also reachable this way, with no entry needed here - see
+[Variables & Magic Functions](guides/variables-and-functions.md#page-variables).
 
 === "YAML"
     ```yaml title="bxsites.yaml"

@@ -871,7 +871,10 @@ class {
 	 * @currentLocaleDir Supporting variable - see ThemeRenderer.renderPage()'s own `currentLocaleDir` param
 	 *
 	 * Also resolves every `{{ }}` expression (VariablesProcessor.bx) -
-	 * `{{ dotted.path }}` against `config.variables`, `{{ $name(...) }}`
+	 * `{{ dotted.path }}` against `config.variables` with this page's own
+	 * `page` struct merged in under that same name (so `{{ page.title }}`/
+	 * `{{ page.frontmatter.<customKey> }}` work too, reusing the exact same
+	 * lookup - see this loop's own `pageVars` below), `{{ $name(...) }}`
 	 * against `functions` - immediately after the include pass above, so an
 	 * included partial's own `{{ }}` expressions resolve too, and before
 	 * every other pre-processor below, so the substituted text is ordinary
@@ -932,7 +935,19 @@ class {
 				currentLocale    : arguments.currentLocale,
 				currentLocaleDir : arguments.currentLocaleDir
 			}
-			markdown = variables.variablesProcessor.resolve( markdown, arguments.config.variables ?: {}, arguments.functions, page.relativePath, functionContext )
+			// `page` merged in under its own key, alongside whatever
+			// bxsites.yaml's own `variables` block declares - `{{ page.title }}`,
+			// `{{ page.summary }}`, and `{{ page.frontmatter.<customKey> }}`
+			// (DocsLoader.bx's own loadFile() docblock) all resolve through
+			// the exact same dotted-path lookup `{{ dotted.path }}` already
+			// used for site-wide variables, no VariablesProcessor.bx changes
+			// needed. `page` is a reserved name here the same way it already
+			// is as a magic-function "supporting variable" (functionContext,
+			// right above) - a project's own `variables.page`, if it somehow
+			// declared one, would be shadowed by this page's own struct.
+			var pageVars = duplicate( arguments.config.variables ?: {} )
+			pageVars.page = page
+			markdown = variables.variablesProcessor.resolve( markdown, pageVars, arguments.functions, page.relativePath, functionContext )
 
 			var tryBoxLangExtracted = variables.tryBoxLangProcessor.extract( markdown )
 			var tabsExtracted = variables.tabsProcessor.extract( tryBoxLangExtracted.markdown )
