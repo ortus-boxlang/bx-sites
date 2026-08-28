@@ -31,6 +31,7 @@ It's a general-purpose static site generator, not just for documentation - docs,
 - **A blog, versioning, and i18n**, all by convention - `docs/blog/posts/` for authors/categories/RSS/drafts, `version:new` to snapshot a release, `docs/i18n/<code>/` to translate. See [Blog](docs/guides/blog.md), [Versioning](docs/guides/versioning.md), [i18n](docs/guides/i18n.md).
 - **Ship it anywhere** - `bxSites deploy` to S3 (and any S3-compatible service), Azure Blob Storage, GCS, Firebase Hosting, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages, a local directory, or GitHub Pages - one shared build, every `deployments/*.json` target at once if you want, or `bxSites package` for a plain zip instead. See [Deployment](docs/guides/deployment.md).
 - **A real plugin/theme system** - a plugin is just another BoxLang module; `install:plugin`/`install:theme` pull published ones from ForgeBox, and `theme:import` converts an existing mkdocs/jekyll/hugo theme into a starting point. See [Plugins](docs/guides/plugins.md).
+- **AI agent skills** - `bxSites skills:install` (or `npx skills add ortus-boxlang/bx-sites-skills`, or `coldbox ai skills install`) teaches Claude Code, Cursor, Codex, and other AI coding assistants bx-sites' own conventions - content blocks, config keys, deployment, and more. See [AI Agent Skills](docs/guides/ai-agent-skills.md).
 - **SEO and correctness out of the box** - `sitemap.xml`, `robots.txt` (or your own hand-authored one), canonical links, `llms.txt`, and redirects that keep a moved/renamed page's old URL working instead of 404ing.
 - **Fast and air-gapped by default** - fingerprinted CSS/JS bundling and responsive images, with Bootstrap, highlight.js, Alpine.js, MiniSearch and (opt-in) Mermaid all vendored locally - zero outbound requests from a built site.
 
@@ -96,6 +97,7 @@ boxlang bxSites <verb> [options]
 | `install:plugin` | Download a plugin from ForgeBox into project-local `boxlang_modules/` |
 | `theme:new` | Eject a built-in theme into project `theme/` for customizing |
 | `install:theme` | Download a theme from ForgeBox into project-local `themes/<name>/` |
+| `skills:install` | Install the [official AI agent skill pack](docs/guides/ai-agent-skills.md) (`ortus-boxlang/bx-sites-skills`) via `npx skills add` |
 | `theme:import` | Best-effort convert a mkdocs/jekyll/hugo theme's own template files into a `themes/<name>/` scaffold |
 | `page:rename` | Move a docs page and rewrite every relative link that pointed at it |
 | `blog:drafts` | List every blog post whose frontmatter sets `draft: true` |

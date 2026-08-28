@@ -1,0 +1,26 @@
+/**
+ * cli.SkillsInstall only covers its own guard clause here, matching
+ * cli.InstallPlugin's own spec (InstallPluginSpec.bx) - a successful run
+ * shells out to the real `npx` CLI (SkillsInstaller.bx), which this plain
+ * unit-test environment can't assume is on PATH. The argv/failure-path
+ * mechanics are fully covered in SkillsInstallerSpec.bx.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.SkillsInstall", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.SkillsInstall@bxsites"();
+			} );
+
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
+			} );
+
+		} );
+	}
+
+}

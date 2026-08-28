@@ -1,0 +1,96 @@
+/**
+ * Backs the `skills:install` CLI verb - shells out to the `skills` CLI
+ * (`npx skills add ...`, https://github.com/skillslib/skills) to install
+ * this project's own AI coding-assistant skills
+ * (`ortus-boxlang/bx-sites-skills`) straight from GitHub, the same way
+ * PagefindIndexer.bx shells out to `pagefind` (there's no BoxLang-native
+ * binding for either, same as `git` in GitRevisionDate.bx/GhPagesDeployer.bx).
+ *
+ * `npx skills add` writes each skill's `SKILL.md` into whichever AI
+ * coding assistant(s) it detects configured in the target directory
+ * (`.claude/skills/`, `.cursor/rules/`, `.codex/`, ...) - this class only
+ * ever runs it in `projectRoot`, so a project scaffolded by `bxSites new`
+ * gets its skills installed right alongside its own `docs/`/`bxsites.yaml`.
+ *
+ * See docs/guides/ai-agent-skills.md for the end-user guide (what a skill
+ * is, the two install paths - `npx skills add`/`coldbox ai skills install` -
+ * and the full skill list).
+ */
+class {
+
+	/**
+	 * Runs `npx skills add ortus-boxlang/bx-sites-skills[/skills/<skill>] -y`
+	 * against `projectRoot`.
+	 *
+	 * @projectRoot Absolute path to the project to install skills into (must already exist)
+	 * @skill Install just this one skill (its bare name, e.g. "bx-sites-getting-started") instead of the full set
+	 * @yes Pass `skills add`'s own `-y` (non-interactive - installs into every AI assistant it detects, with no confirmation prompt); false runs it interactively instead
+	 * @bin The `npx` executable name/path - resolved against `PATH` when it's a bare name
+	 *
+	 * @return { target, output } - the `owner/repo[/skills/<skill>]` spec installed, and the CLI's own combined stdout/stderr
+	 */
+	struct function install(
+		required string projectRoot,
+		string skill = "",
+		boolean yes = true,
+		string bin = "npx"
+	) {
+		if ( !directoryExists( arguments.projectRoot ) ) {
+			throw(
+				type    = "BxSites.MissingProjectRoot",
+				message = "`skills:install` requires an existing project root, got [#arguments.projectRoot#]"
+			)
+		}
+
+		var skillName = trim( arguments.skill )
+		var target = "ortus-boxlang/bx-sites-skills" & ( len( skillName ) ? "/skills/" & skillName : "" )
+
+		var cmd = [ arguments.bin, "-y", "skills", "add", target ]
+		if ( arguments.yes ) {
+			cmd.append( "-y" )
+		}
+
+		var result = exec( cmd, arguments.projectRoot )
+		if ( result.exitCode != 0 ) {
+			throw(
+				type    = "BxSites.SkillsInstallFailed",
+				message = "`#cmd.toList( ' ' )#` failed (exit #result.exitCode#): #result.output# - is Node.js/npx installed? See https://nodejs.org/"
+			)
+		}
+
+		return { target : target, output : result.output }
+	}
+
+	/**
+	 * Runs a command via `java.lang.ProcessBuilder`, capturing its combined
+	 * stdout/stderr and exit code - the same pattern PagefindIndexer.bx uses.
+	 * A missing binary (`npx`/Node.js not installed/not on `PATH`) surfaces
+	 * as a `java.io.IOException` from `start()` itself, caught here and
+	 * turned into the same failure shape with an install pointer, rather
+	 * than a raw Java stack trace.
+	 *
+	 * @cmd Full argv, the `npx` binary included as element 1
+	 * @cwd Working directory for the process
+	 *
+	 * @return { exitCode, output }
+	 */
+	private struct function exec( required array cmd, required string cwd ) {
+		try {
+			var pb = createObject( "java", "java.lang.ProcessBuilder" ).init( arguments.cmd )
+			pb.directory( createObject( "java", "java.io.File" ).init( arguments.cwd ) )
+			pb.redirectErrorStream( true )
+
+			var process = pb.start()
+			var output = createObject( "java", "java.lang.String" ).init( process.getInputStream().readAllBytes(), "UTF-8" )
+			var exitCode = process.waitFor()
+
+			return { exitCode : exitCode, output : trim( output ) }
+		} catch ( any e ) {
+			return {
+				exitCode : -1,
+				output   : "could not run [#arguments.cmd[ 1 ]#] (#e.message#)"
+			}
+		}
+	}
+
+}

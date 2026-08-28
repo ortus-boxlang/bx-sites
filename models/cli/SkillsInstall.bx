@@ -1,0 +1,26 @@
+/**
+ * `skills:install` CLI verb - thin dispatcher over SkillsInstaller.install().
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path), skill (optional - a single skill's bare name, e.g. "bx-sites-getting-started"; installs the whole set when omitted) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxSites.MissingProjectRoot", message = "`skills:install` requires a project root" )
+		}
+
+		var skill = trim( arguments.options.skill ?: "" )
+
+		var installer = new "models.build.SkillsInstaller@bxsites"()
+		var result = installer.install( projectRoot : projectRoot, skill : skill )
+
+		return {
+			exitCode : 0,
+			message  : "Installed [#result.target#] - restart or reload any AI coding assistant (Claude Code, Cursor, Codex, ...) open on this project to pick up the new skill#len( skill ) ? '' : 's'#."
+		}
+	}
+
+}

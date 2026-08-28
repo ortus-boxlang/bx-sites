@@ -67,6 +67,7 @@ Beyond the verb table below, an installed+activated module (the same `plugins` a
 | `install:plugin` | Download a plugin from ForgeBox into project-local `boxlang_modules/`, load it into the running runtime, and report its registered mapping name |
 | `theme:new` | Eject a built-in theme into project `theme/` for customizing |
 | `install:theme` | Download a theme from ForgeBox into project-local `themes/<name>/`, validating the `ThemeProvider` contract |
+| `skills:install` | Install the official AI agent skill pack (`ortus-boxlang/bx-sites-skills`) via `npx skills add`, into every AI coding assistant the project has configured (`--skill=<name>` for just one) |
 | `theme:import` | Best-effort convert a mkdocs/jekyll/hugo theme's own template files into a `themes/<name>/` scaffold |
 | `page:rename` | Move a docs page and rewrite every relative Markdown link that pointed at it |
 | `blog:drafts` | List every blog post whose frontmatter sets `draft: true` |
