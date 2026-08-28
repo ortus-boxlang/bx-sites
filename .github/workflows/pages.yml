@@ -2,8 +2,12 @@ name: Publish Docs
 
 # Builds this repository's own dogfooded docs (docs/ + bxsites.yaml at the
 # repo root - see readme.md) with bx-sites itself, and publishes site/ to
-# GitHub Pages - main publishes to the site root (stable), development
-# publishes to /development/ (latest), so both versions stay live at once.
+# GitHub Pages - main is the only branch that deploys, straight to the site
+# root. The docs are versioned now (bxsites.yaml's own `versions.default` -
+# see docs/guides/versioning.md), so a released version publishes at the
+# root and the plain docs/ tree (whatever's being written toward the next
+# release) publishes at /next/ instead - no separate branch-based preview
+# deploy needed for that anymore.
 # Each publish is itself a showcase of all ten built-in themes (the theme
 # gallery) - bootstrap at the root, every other theme under theme/<name>/,
 # with a switcher (docs/assets/theme-switcher.js) to jump between them from
@@ -26,7 +30,6 @@ on:
   push:
     branches:
       - main
-      - development
     paths:
       - "docs/**"
       - "bxsites.yaml"
@@ -44,8 +47,9 @@ on:
 permissions:
   contents: write
 
-# Each branch publishes to its own destination_dir, so main and development
-# deploys never conflict - only serialize a branch against its own prior runs.
+# Only main ever pushes here now, but keyed by ref_name still so a manual
+# workflow_dispatch run from another branch (build-only - see the deploy
+# steps' own `if: github.ref_name == 'main'`) never queues behind main's.
 concurrency:
   group: "pages-${{ github.ref_name }}"
   cancel-in-progress: false
@@ -93,19 +97,6 @@ jobs:
         run: |
           sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
           sudo chmod +x /usr/bin/yq
-
-      - name: Point baseURL and repo.editUri at this branch's own sub-path
-        if: github.ref_name != 'main'
-        run: |
-          # main's committed bxsites.yaml already points baseURL/editUri at
-          # the site root / main branch - every other branch publishes under
-          # /<branch-name>/ and edits against its own branch instead, so
-          # patch this job's own checkout of the config just for this build
-          # (each matrix job gets its own independent checkout, so this
-          # never has to be undone or shared with any other job).
-          export URL="https://bxsites.io/${{ github.ref_name }}/"
-          export EDIT_URI="edit/${{ github.ref_name }}/docs/"
-          yq eval -i '.baseURL = strenv(URL) | .repo.editUri = strenv(EDIT_URI)' bxsites.yaml
 
       - name: Point theme-switcher.js at this build's own site root
         run: |
@@ -179,25 +170,15 @@ jobs:
             mv "${dir}" "site/theme/${name}"
           done
 
-      - name: Deploy main to the site root
+      - name: Deploy to the site root
         if: github.ref_name == 'main'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
           keep_files: true
-          # Writes CNAME at the true gh-pages root (destination_dir: development
-          # below would instead land it under /development/, where GitHub Pages
-          # won't see it) - keeps the custom domain durable across a gh-pages
-          # wipe, rather than depending solely on the one-time manual
-          # Settings -> Pages -> Custom domain click having created it already.
+          # Writes CNAME at the true gh-pages root - keeps the custom
+          # domain durable across a gh-pages wipe, rather than depending
+          # solely on the one-time manual Settings -> Pages -> Custom
+          # domain click having created it already.
           cname: bxsites.io
-
-      - name: Deploy development to /development/
-        if: github.ref_name == 'development'
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
-          destination_dir: development
-          keep_files: true

@@ -36,6 +36,27 @@ class extends="testbox.system.BaseSpec" {
 				expect( content ).toInclude( "Allow: /" );
 			} );
 
+			it( "adds an extraDisallow entry as its own Disallow line, alongside Allow: /", function() {
+				var content = generator.build( "https://example.com/", true, [ "/next/" ] );
+
+				expect( content ).toInclude( "Allow: /" );
+				expect( content ).toInclude( "Disallow: /next/" );
+				expect( content ).toInclude( "Sitemap: https://example.com/sitemap.xml" );
+			} );
+
+			it( "defaults extraDisallow to an empty array, adding nothing extra", function() {
+				var content = generator.build( "https://example.com/", true );
+
+				expect( content ).notToInclude( "Disallow:" );
+			} );
+
+			it( "ignores extraDisallow entirely when robots is false - Disallow: / already covers everything", function() {
+				var content = generator.build( "https://example.com/", false, [ "/next/" ] );
+
+				expect( content ).toInclude( "Disallow: /" );
+				expect( content ).notToInclude( "Disallow: /next/" );
+			} );
+
 			it( "resolve() generates normally when no docs/robots.txt override exists", function() {
 				var content = generator.resolve( "/tmp/bxsites-robots-spec-nonexistent", "https://example.com/", true );
 

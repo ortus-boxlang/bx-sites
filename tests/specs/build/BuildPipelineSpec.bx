@@ -1721,6 +1721,108 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( root & "/site/versions/README.md" ) ).toBeFalse();
 			} );
 
+			it( "renders the default version's own content at the site root, and the plain docs/ tree separately at /next/, once versions.default is set", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"versions":{"default":"1.0.x"}}'
+				);
+				fileWrite( root & "/docs/index.md", "Next home" );
+				directoryCreate( root & "/docs/versions/1.0.x", true, true );
+				fileWrite( root & "/docs/versions/1.0.x/index.md", "1.0.x home" );
+
+				pipeline.build( root );
+
+				var rootHtml = fileRead( root & "/site/index.html" );
+				expect( rootHtml ).toInclude( "<p>1.0.x home</p>" );
+
+				var nextHtml = fileRead( root & "/site/next/index.html" );
+				expect( nextHtml ).toInclude( "<p>Next home</p>" );
+
+				// Never duplicated at its own /versions/1.0.x/ URL too - it
+				// already rendered at the root, above.
+				expect( fileExists( root & "/site/versions/1.0.x/index.html" ) ).toBeFalse();
+			} );
+
+			it( "renders a version switcher with the default version selected at root, a Next entry for the plain docs/ tree, and every other version unaffected", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"versions":{"default":"1.0.x"}}'
+				);
+				fileWrite( root & "/docs/index.md", "Next home" );
+				directoryCreate( root & "/docs/versions/1.0.x", true, true );
+				fileWrite( root & "/docs/versions/1.0.x/index.md", "1.0.x home" );
+				directoryCreate( root & "/docs/versions/2.0", true, true );
+				fileWrite( root & "/docs/versions/2.0/index.md", "2.0 home" );
+
+				pipeline.build( root );
+
+				var rootHtml = fileRead( root & "/site/index.html" );
+				expect( rootHtml ).toInclude( "version-switcher" );
+				expect( rootHtml ).toInclude( ">1.0.x<" );
+				expect( rootHtml ).toInclude( ">Next<" );
+				expect( rootHtml ).toInclude( ">2.0<" );
+				expect( rootHtml ).notToInclude( ">Latest<" );
+
+				var v2Html = fileRead( root & "/site/versions/2.0/index.html" );
+				expect( v2Html ).toInclude( ">1.0.x<" );
+				expect( v2Html ).toInclude( ">Next<" );
+			} );
+
+			it( "computes editUrl and lastUpdated for the root-tree page relative to its own docs/versions/<default>/ folder, once versions.default is set", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"repo":{"url":"https://github.com/acme/docs","editUri":"edit/main/docs/"},"versions":{"default":"1.0.x"}}'
+				);
+				fileWrite( root & "/docs/index.md", "Next home" );
+				directoryCreate( root & "/docs/versions/1.0.x", true, true );
+				fileWrite( root & "/docs/versions/1.0.x/index.md", "1.0.x home" );
+
+				pipeline.build( root );
+
+				var rootHtml = fileRead( root & "/site/index.html" );
+				expect( rootHtml ).toInclude( "Edit this page" );
+				expect( rootHtml ).toInclude( "versions" );
+				expect( rootHtml ).toInclude( "1.0.x" );
+			} );
+
+			it( "excludes /next/ pages from sitemap.xml and adds a Disallow: /next/ line to robots.txt, once versions.default is set", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"https://docs.example.com/","versions":{"default":"1.0.x"}}'
+				);
+				fileWrite( root & "/docs/index.md", "Next home" );
+				directoryCreate( root & "/docs/versions/1.0.x", true, true );
+				fileWrite( root & "/docs/versions/1.0.x/index.md", "1.0.x home" );
+
+				pipeline.build( root );
+
+				var sitemap = fileRead( root & "/site/sitemap.xml" );
+				expect( sitemap ).toInclude( "<loc>https://docs.example.com/index.html</loc>" );
+				expect( sitemap ).notToInclude( "<loc>https://docs.example.com/next/index.html</loc>" );
+
+				var robots = fileRead( root & "/site/robots.txt" );
+				expect( robots ).toInclude( "Disallow: /next/" );
+			} );
+
+			it( "throws BxSites.UnknownDefaultVersion when versions.default doesn't match any docs/versions/* folder", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"versions":{"default":"9.9"}}'
+				);
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/versions/1.0.x", true, true );
+				fileWrite( root & "/docs/versions/1.0.x/index.md", "1.0.x home" );
+
+				expect( function() {
+					pipeline.build( root );
+				} ).toThrow( "BxSites.UnknownDefaultVersion" );
+			} );
+
 			it( "builds each docs/i18n/<code>/ folder as its own tree under site/<code>/, using the translated content when it exists", function() {
 				var root = newProject();
 				fileWrite(

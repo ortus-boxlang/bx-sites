@@ -12,14 +12,21 @@ class {
 	/**
 	 * @siteUrl The absolute site URL, ending with `/` (BaseUrlResolver's `absolute`), or "" if unknown - omits the `Sitemap:` line, same as sitemap.xml itself is skipped without one
 	 * @allowed `bxsites.json`'s `robots` - `true` (the default) allows every crawler; `false` disallows everything
+	 * @extraDisallow Extra root-relative paths (e.g. `"/next/"`) to disallow even when `allowed` is `true` - BuildPipeline.bx passes `["/next/"]` once `versions.default` is set, so the work-in-progress tree previewing the next release doesn't compete with the real docs in search results; empty (the default) adds nothing, same as today
 	 *
 	 * @return The rendered robots.txt content
 	 */
-	string function build( required string siteUrl, boolean allowed = true ) {
+	string function build( required string siteUrl, boolean allowed = true, array extraDisallow = [] ) {
 		var lines = [
 			"User-agent: *",
 			arguments.allowed ? "Allow: /" : "Disallow: /"
 		]
+
+		if ( arguments.allowed ) {
+			for ( var path in arguments.extraDisallow ) {
+				lines.append( "Disallow: " & path )
+			}
+		}
 
 		if ( arguments.allowed && len( arguments.siteUrl ) ) {
 			lines.append( "" )
@@ -44,17 +51,18 @@ class {
 	 * @docsDir Absolute path to this project's resolved source content folder (SourceDirResolver.bx - `docs/` or `src/`)
 	 * @siteUrl The absolute site URL, ending with `/` (BaseUrlResolver's `absolute`), or "" if unknown - omits the `Sitemap:` line, same as sitemap.xml itself is skipped without one
 	 * @allowed `bxsites.json`'s `robots` - `true` (the default) allows every crawler; `false` disallows everything - ignored entirely when an override file exists
+	 * @extraDisallow See `build()`'s own docblock - ignored entirely when an override file exists, same as `allowed`, since a hand-authored `robots.txt` is meant to be the project's own full and final say
 	 *
 	 * @return The `robots.txt` content to write to `site/robots.txt`
 	 */
-	string function resolve( required string docsDir, required string siteUrl, boolean allowed = true ) {
+	string function resolve( required string docsDir, required string siteUrl, boolean allowed = true, array extraDisallow = [] ) {
 		var overridePath = arguments.docsDir & "/robots.txt"
 
 		if ( fileExists( overridePath ) ) {
 			return fileRead( overridePath )
 		}
 
-		return build( arguments.siteUrl, arguments.allowed )
+		return build( arguments.siteUrl, arguments.allowed, arguments.extraDisallow )
 	}
 
 }
