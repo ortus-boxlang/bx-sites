@@ -29,6 +29,25 @@ class extends="testbox.system.BaseSpec" {
 				return dir;
 			}
 
+			/**
+			 * Locates a build's actual theme CSS file, whether or not
+			 * [assets.fingerprint] (on by default) renamed it to a hashed
+			 * filename - most tests here only care about the CSS content
+			 * or that it exists at all, not its exact URL, so this keeps
+			 * them agnostic to that (see BuildPipeline.bx's own
+			 * resolveThemeStyleUrl()).
+			 *
+			 * @siteDir Absolute path to a built site/ directory
+			 */
+			private string function themeCssPath( required string siteDir ) {
+				var plain = arguments.siteDir & "/assets/theme/style.css";
+				if ( fileExists( plain ) ) {
+					return plain;
+				}
+				var matches = directoryList( arguments.siteDir & "/assets/theme", false, "path", "style.*.css" );
+				return matches.len() ? matches[ 1 ] : plain;
+			}
+
 			it( "builds a single page site end to end", function() {
 				var root = newProject();
 				fileWrite( root & "/docs/index.md", "Welcome home" );
@@ -226,7 +245,7 @@ class extends="testbox.system.BaseSpec" {
 					expect( result.pageCount ).toBe( 1 );
 					var html = fileRead( root & "/site/index.html" );
 					expect( html ).toInclude( "<p>Welcome home</p>" );
-					expect( fileExists( root & "/site/assets/theme/style.css" ) ).toBeTrue();
+					expect( fileExists( themeCssPath( root & "/site" ) ) ).toBeTrue();
 				}
 			} );
 
@@ -238,8 +257,36 @@ class extends="testbox.system.BaseSpec" {
 
 				pipeline.build( root );
 
-				expect( fileExists( root & "/site/assets/theme/style.css" ) ).toBeTrue();
+				expect( fileExists( themeCssPath( root & "/site" ) ) ).toBeTrue();
 				expect( fileExists( root & "/site/assets/logo.svg" ) ).toBeTrue();
+			} );
+
+			it( "fingerprints the theme's own style.css with a content hash by default, and rewrites the rendered <link> to match", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/assets/theme/style.css" ) ).toBeFalse();
+				var hashedPath = themeCssPath( root & "/site" );
+				expect( hashedPath ).toMatch( ".*/style\.[0-9a-f]{8}\.css$" );
+
+				var html = fileRead( root & "/site/index.html" );
+				var hashedFileName = listLast( hashedPath, "/" );
+				expect( html ).toInclude( 'href="assets/theme/' & hashedFileName & '"' );
+			} );
+
+			it( "keeps the theme's style.css unfingerprinted when assets.fingerprint is false", function() {
+				var root = newProject();
+				fileWrite( root & "/bxsites.json", '{"name":"Test Site","theme":{"name":"bootstrap"},"assets":{"fingerprint":false}}' );
+				fileWrite( root & "/docs/index.md", "Home" );
+
+				pipeline.build( root );
+
+				expect( fileExists( root & "/site/assets/theme/style.css" ) ).toBeTrue();
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( 'href="assets/theme/style.css"' );
 			} );
 
 			it( "builds the responsive-image manifest once from docs/assets/ and passes it to buildManifest() with the site's own assets.images config, via the setImageVariantGenerator() test seam", function() {
@@ -719,7 +766,7 @@ class extends="testbox.system.BaseSpec" {
 				var root = newProject();
 				fileWrite(
 					root & "/bxsites.json",
-					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"my-docs"}'
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"baseURL":"my-docs","assets":{"fingerprint":false}}'
 				);
 				fileWrite( root & "/docs/index.md", "Home" );
 				directoryCreate( root & "/docs/guides", true, true );
@@ -864,7 +911,7 @@ class extends="testbox.system.BaseSpec" {
 					expect( html ).notToInclude( "fonts.googleapis.com" );
 					expect( html ).notToInclude( "fonts.gstatic.com" );
 
-					var css = fileRead( root & "/site/assets/theme/style.css" );
+					var css = fileRead( themeCssPath( root & "/site" ) );
 					expect( css ).toInclude( "@font-face" );
 					expect( css ).toInclude( "../fonts/" );
 				}
@@ -1062,7 +1109,7 @@ class extends="testbox.system.BaseSpec" {
 					fileWrite( root & "/docs/index.md", "Home" );
 					pipeline.build( root );
 
-					var css = fileRead( root & "/site/assets/theme/style.css" );
+					var css = fileRead( themeCssPath( root & "/site" ) );
 					expect( css ).toInclude( ".bxsites-command-palette[hidden]" );
 				}
 			} );
@@ -1080,7 +1127,7 @@ class extends="testbox.system.BaseSpec" {
 
 					pipeline.build( root );
 
-					var css = fileRead( root & "/site/assets/theme/style.css" );
+					var css = fileRead( themeCssPath( root & "/site" ) );
 					expect( css ).toInclude( "margin: 0.35rem 0;" );
 					expect( css ).toInclude( "line-height: 1.4;" );
 				}
@@ -1576,6 +1623,10 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "prefixes a version build's internal links with its own versions/<name>/ basePath", function() {
 				var root = newProject();
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"assets":{"fingerprint":false}}'
+				);
 				fileWrite( root & "/docs/index.md", "Latest home" );
 				directoryCreate( root & "/docs/versions/1.0/guides", true, true );
 				fileWrite( root & "/docs/versions/1.0/index.md", "1.0 home" );

@@ -458,7 +458,7 @@ change needed:
 <head>
 	<meta charset="UTF-8">
 	<title>#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#</title>
-	<link rel="stylesheet" href="#variables.basePath#assets/theme/style.css">
+	<link rel="stylesheet" href="#variables.basePath##variables.siteConfig.theme.styleUrl ?: 'assets/theme/style.css'#">
 </head>
 <body>
 	<header><a href="#variables.basePath#">#encodeForHTML( variables.siteConfig.name )#</a></header>
@@ -495,3 +495,12 @@ links (`page.bxm` in any built-in theme shows the pattern - each is just an
 `if` around a small render function, all driven by fields already present
 on `variables.page`), or an `assets/` folder for your own CSS/JS, copied to
 `site/assets/theme/` automatically at build time.
+
+The `variables.siteConfig.theme.styleUrl ?: 'assets/theme/style.css'`
+pattern used above (rather than a hardcoded `assets/theme/style.css`) is
+what makes your theme's own `assets/style.css` pick up [content-hash
+fingerprinting](../configuration.md#assets) - `assets.fingerprint` (on by
+default) means every edit you make to that CSS gets a new filename on the
+next build, so visitors' browsers never serve a stale cached copy. Any
+`.bxm` (built-in or custom) that hardcodes the plain path instead won't
+break, it just won't bust caches automatically when the CSS changes.
