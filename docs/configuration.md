@@ -3,6 +3,7 @@ title: Configuration
 order: 4
 icon: phosphor-duotone:gear-six
 summary: Every site config key, what it defaults to, and what it does.
+description: Every site config key, what it defaults to, and what it does.
 tags: [reference, configuration]
 ---
 

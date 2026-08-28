@@ -49,6 +49,7 @@ math: true
 openapi: true
 pageActions: true
 ogImage: "assets/og-image.png"
+generateOgImages: true
 extraJs:
   - "assets/theme-switcher.js"
 i18n:
