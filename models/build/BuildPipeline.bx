@@ -45,6 +45,7 @@ class {
 	variables.imageVariantGenerator = new "models.build.ImageVariantGenerator@bxsites"()
 	variables.responsiveImageProcessor = new "models.build.ResponsiveImageProcessor@bxsites"()
 	variables.assetBundler = new "models.build.AssetBundler@bxsites"()
+	variables.fingerprinter = new "models.build.AssetFingerprinter@bxsites"()
 	variables.blogDiscoverer = new "models.build.BlogDiscoverer@bxsites"()
 	variables.blogAuthorsLoader = new "models.build.BlogAuthorsLoader@bxsites"()
 	variables.blogBuilder = new "models.build.BlogBuilder@bxsites"()
@@ -160,6 +161,7 @@ class {
 		// see canonicalUrlFor()'s own docblock.
 		var siteOrigin = len( urls.absolute ) ? left( urls.absolute, len( urls.absolute ) - len( urls.basePath ) ) : ""
 		var themeDir = variables.themeRenderer.resolveThemeDir( config.theme.name, root )
+		config.theme.styleUrl = resolveThemeStyleUrl( themeDir, config.assets.fingerprint )
 		var siteDir = root & "/site"
 
 		if ( directoryExists( siteDir ) ) {
@@ -197,7 +199,7 @@ class {
 		var blogNavUrl = blogPosts.len() ? "blog/index.html" : ""
 		var mainResult = renderDocTree( mainPages, docsDir, config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, imageManifest, navConfig, locales, defaultLocaleCode, defaultLocaleDir, blogNavUrl, siteOrigin, functions )
 		var allPages = duplicate( mainResult.pages )
-		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
+		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
 
 		for ( var versionName in versionNames ) {
 			var versionDocsDir = docsDir & "/versions/" & versionName
@@ -231,7 +233,7 @@ class {
 				functions
 			)
 			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
-			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
+			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
 			writeTagsPage( versionResult.pages, versionResult.nav, config, themeDir, versionOutputDir, versionBasePath, versions, versionLocales, defaultLocaleCode, siteOrigin, functions )
 			variables.redirectGenerator.write( versionResult.pages, versionOutputDir, versionBasePath )
 
@@ -265,7 +267,7 @@ class {
 					functions
 				)
 				allPages.append( prefixPageUrls( versionLocaleResult.pages, "versions/" & versionName & "/" & versionLocale.code & "/" ), true )
-				copyAssets( root, themeDir, versionLocaleOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
+				copyAssets( root, themeDir, versionLocaleOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
 				writeTagsPage( versionLocaleResult.pages, versionLocaleResult.nav, config, themeDir, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/", versions, versionLocales, versionLocale.code, siteOrigin, functions )
 				variables.redirectGenerator.write( versionLocaleResult.pages, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/" )
 			}
@@ -301,7 +303,7 @@ class {
 				functions
 			)
 			allPages.append( prefixPageUrls( localeResult.pages, locale.code & "/" ), true )
-			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle )
+			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
 			writeTagsPage( localeResult.pages, localeResult.nav, config, themeDir, localeOutputDir, urls.basePath & locale.code & "/", versions, locales, locale.code, siteOrigin, functions )
 			variables.redirectGenerator.write( localeResult.pages, localeOutputDir, urls.basePath & locale.code & "/" )
 		}
@@ -442,6 +444,39 @@ class {
 		arguments.config.extraJs = len( jsBundle.bundleUrl ) ? [ jsBundle.bundleUrl ] : jsBundle.urls
 
 		return { config : arguments.config, cssBundle : cssBundle, jsBundle : jsBundle }
+	}
+
+	/**
+	 * Fingerprints the theme's own `assets/style.css`, so a theme update -
+	 * a built-in theme upgraded along with the module, or a project's own
+	 * `theme/` override edited by hand - always reaches every visitor on
+	 * the next load instead of possibly serving a browser's stale cached
+	 * copy under the same unchanging filename forever (unlike `extraCss`/
+	 * `extraJs`, which already get this via applyAssetPipeline()'s own
+	 * `assetBundler.bundleCss()`/`bundleJs()`). Runs before renderDocTree()
+	 * ever writes a page (build()'s own call site), mutating `config.theme.styleUrl`
+	 * in place so every theme's own `layout.bxm` already has the final,
+	 * correct filename by the time it renders its own `<link>` tag -
+	 * copyAssets() calls this same method again when it actually copies
+	 * the file into `site/`, deterministic from the same source file, so
+	 * no value needs threading through the rest of the render pipeline
+	 * for this.
+	 *
+	 * @themeDir Absolute path to the resolved theme folder (ThemeRenderer.resolveThemeDir()'s own output)
+	 * @fingerprintEnabled `config.assets.fingerprint` - `false` leaves the plain, unhashed filename (rewritten, never cache-skipped, on every build)
+	 *
+	 * @return "assets/theme/style.css" (fingerprinting off, or this theme has no assets/style.css of its own) or "assets/theme/style.<hash>.css"
+	 */
+	private string function resolveThemeStyleUrl( required string themeDir, required boolean fingerprintEnabled ) {
+		var plainUrl = "assets/theme/style.css"
+		var styleCssPath = arguments.themeDir & "/assets/style.css"
+
+		if ( !arguments.fingerprintEnabled || !fileExists( styleCssPath ) ) {
+			return plainUrl
+		}
+
+		var hash8 = variables.fingerprinter.hashOf( fileRead( styleCssPath ) )
+		return "assets/theme/" & variables.fingerprinter.fingerprint( "style.css", hash8 )
 	}
 
 	/**
@@ -1445,11 +1480,25 @@ class {
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - its already-generated variant files get copied into this tree's own site.../assets/, right alongside the plain docs/assets/** copy below; empty (the default) copies nothing extra
 	 * @cssBundle AssetBundler.bundleCss()'s own output (via applyAssetPipeline()) - its cached bundle file gets copied into this tree's own site.../assets/ so the `<link>` config.extraCss now points at actually resolves; empty `cachedPath` (the default) copies nothing
 	 * @jsBundle AssetBundler.bundleJs()'s own output - same as cssBundle, for the `<script>` config.extraJs now points at
+	 * @fingerprintEnabled `config.assets.fingerprint` - whether the theme's own `assets/style.css` gets renamed to its fingerprinted filename after copying (resolveThemeStyleUrl()'s own docblock); `true` (the default) matches the site-wide default
 	 */
-	private void function copyAssets( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, boolean pageActionsEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {} ) {
+	private void function copyAssets( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, boolean pageActionsEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {}, boolean fingerprintEnabled = true ) {
 		var themeAssetsDir = arguments.themeDir & "/assets"
 		if ( directoryExists( themeAssetsDir ) ) {
 			directoryCopy( themeAssetsDir, arguments.siteDir & "/assets/theme", true )
+
+			// Renames the just-copied plain style.css to its fingerprinted
+			// name (resolveThemeStyleUrl() recomputes the identical hash
+			// from the same source file build() already used to pick the
+			// filename every rendered page's own <link> tag points at) -
+			// rather than leaving both the old plain name and the new
+			// hashed one sitting in site/, which would just be dead weight
+			// nothing ever links to.
+			var styleUrl = resolveThemeStyleUrl( arguments.themeDir, arguments.fingerprintEnabled )
+			var copiedStylePath = arguments.siteDir & "/assets/theme/style.css"
+			if ( styleUrl != "assets/theme/style.css" && fileExists( copiedStylePath ) ) {
+				fileMove( copiedStylePath, arguments.siteDir & "/" & styleUrl )
+			}
 		}
 
 		directoryCreate( arguments.siteDir & "/assets", true, true )

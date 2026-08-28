@@ -222,7 +222,7 @@
 	</script>
 	<link rel="stylesheet" href="#variables.basePath#assets/vendor/bootstrap/bootstrap.min.css">
 	<link rel="stylesheet" href="#variables.basePath#assets/vendor/highlight/github.min.css">
-	<link rel="stylesheet" href="#variables.basePath#assets/theme/style.css">
+	<link rel="stylesheet" href="#variables.basePath##variables.siteConfig.theme.styleUrl ?: 'assets/theme/style.css'#">
 	#renderExtraCss( variables.siteConfig.extraCss ?: [] )#
 </bx:output><bx:if variables.mathEnabled><bx:output>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
