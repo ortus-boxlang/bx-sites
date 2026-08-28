@@ -3,7 +3,6 @@ title: BxSites について
 order: 2.1
 icon: phosphor-duotone:info
 summary: BxSites とは何か、誰が開発しているか、プロジェクトの所在地について。
-description: BxSites とは何か、誰が開発しているか、プロジェクトの所在地について。
 tags: [概要, プロジェクト]
 ---
 

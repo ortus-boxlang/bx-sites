@@ -3,7 +3,6 @@ title: Troubleshooting
 order: 7
 icon: phosphor-duotone:lifebuoy
 summary: Diagnose common setup, build, and serve problems - and where to get help when this page doesn't cover it.
-description: Diagnose common setup, build, and serve problems - and where to get help when this page doesn't cover it.
 tags: [troubleshooting, faq]
 ---
 

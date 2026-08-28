@@ -3,7 +3,6 @@ title: Lizenz
 order: 2.2
 icon: phosphor-duotone:scroll
 summary: BxSites ist kostenlos und quelloffen, lizenziert unter Apache 2.0.
-description: BxSites ist kostenlos und quelloffen, lizenziert unter Apache 2.0.
 tags: [über-uns, lizenz]
 ---
 
