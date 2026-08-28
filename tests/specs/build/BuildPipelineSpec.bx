@@ -1381,6 +1381,78 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( '<meta property="og:image" content="/assets/custom-card.png">' );
 			} );
 
+			it( "keeps a page's own frontmatter [description] untouched", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/docs/index.md",
+					"---" & char( 10 ) & "title: Home" & char( 10 ) & "summary: The on-page blurb" & char( 10 ) &
+						"description: The real meta description" & char( 10 ) & "---" & char( 10 ) & "Body text here."
+				);
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( '<meta name="description" content="The real meta description">' );
+			} );
+
+			it( "falls back to a page's own [summary] for its description when frontmatter sets no [description]", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/docs/index.md",
+					"---" & char( 10 ) & "title: Home" & char( 10 ) & "summary: The on-page blurb" & char( 10 ) & "---" & char( 10 ) & "Body text here."
+				);
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( '<meta name="description" content="The on-page blurb">' );
+			} );
+
+			it( "falls back to a stripped, truncated excerpt of its own content when a page sets neither [description] nor [summary]", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/docs/index.md",
+					"---" & char( 10 ) & "title: Home" & char( 10 ) & "---" & char( 10 ) &
+						"<h2>Heading</h2>" & char( 10 ) & "<p>Some real body content for the excerpt.</p>"
+				);
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( '<meta name="description" content="Heading Some real body content for the excerpt.">' );
+				expect( html ).notToInclude( "<h2>" );
+			} );
+
+			it( "truncates a long auto-derived excerpt to 160 characters at a word boundary, with a trailing ellipsis", function() {
+				var root = newProject();
+				var longText = repeatString( "word ", 40 ); // 200 chars, no frontmatter description/summary
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "title: Home" & char( 10 ) & "---" & char( 10 ) & longText );
+
+				pipeline.build( root );
+
+				var html = htmlDecode( fileRead( root & "/site/index.html" ) );
+				var marker = 'name="description" content="';
+				var startPos = html.find( marker ) + len( marker );
+				var endPos = html.find( '"', startPos );
+				var descValue = html.mid( startPos, endPos - startPos );
+				expect( len( descValue ) ).toBeLTE( 161 ); // 160 chars + the trailing ellipsis character
+				expect( descValue ).toEndWith( "…" );
+			} );
+
+			it( "still falls back to the site-wide [description] when a page's own content has no plain text at all", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"description":"The site-wide fallback"}'
+				);
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "title: Home" & char( 10 ) & "---" & char( 10 ) & "<hr>" );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( '<meta name="description" content="The site-wide fallback">' );
+			} );
+
 			it( "renders a repo link when [repo.url] is configured, and none when it isn't", function() {
 				var root = newProject();
 				fileWrite(

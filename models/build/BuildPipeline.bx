@@ -541,6 +541,7 @@ class {
 		assignPrevNext( pages, flatSequence )
 		assignBreadcrumbs( pages, nav )
 		assignEditAndLastUpdated( pages, arguments.config, arguments.root, arguments.docsRelativePrefix )
+		assignDescriptions( pages )
 		assignOgImages( pages, arguments.config, arguments.outputDir )
 		assignMarkdownUrl( pages )
 		assignIconHtml( pages, arguments.docsDir )
@@ -1093,6 +1094,67 @@ class {
 			base = "home"
 		}
 		return base.reReplace( "[\/]", "-", "all" ) & ".png"
+	}
+
+	/**
+	 * Fills in each page's own `description` (the frontmatter key layout.bxm
+	 * actually reads for `og:description`/`<meta name="description">` -
+	 * distinct from `summary`, which only ever renders as the on-page
+	 * blurb under the title) when a page's own frontmatter didn't set one -
+	 * its `summary`, if it has one, else a plain-text excerpt of its own
+	 * rendered content. The same fallback chain BlogBuilder.bx's own
+	 * computeExcerpt() already gives every blog post, extended to every
+	 * regular doc page - previously a page with neither `description` nor
+	 * `summary` fell straight through to the site-wide `description` in
+	 * layout.bxm, same as every other page with nothing of its own, making
+	 * every such page's social-card preview identical regardless of what
+	 * it actually covered.
+	 *
+	 * A page with content that's entirely markup (an embed, an image, a
+	 * single content block) with no plain text of its own still ends up
+	 * with an empty `description` here - layout.bxm's own further fallback
+	 * to the site-wide description still applies in that rare case.
+	 *
+	 * @pages Array of page structs with contentHtml/summary/description already set
+	 */
+	private void function assignDescriptions( required array pages ) {
+		for ( var page in arguments.pages ) {
+			if ( len( trim( page.description ?: "" ) ) ) {
+				continue
+			}
+			if ( len( trim( page.summary ?: "" ) ) ) {
+				page.description = trim( page.summary )
+				continue
+			}
+			page.description = truncateText( stripTags( page.contentHtml ?: "" ), 160 )
+		}
+	}
+
+	/**
+	 * A crude HTML-tag stripper for a page's own auto-derived description -
+	 * good enough for "plain text summary of this HTML", not a real
+	 * sanitizer. Same shape as BlogBuilder.bx's own stripTags() (used for
+	 * the same purpose there - a post's own excerpt).
+	 *
+	 * @html Rendered HTML
+	 */
+	private string function stripTags( required string html ) {
+		return trim( arguments.html.reReplace( "<[^>]+>", " ", "all" ).reReplace( "\s+", " ", "all" ) )
+	}
+
+	/**
+	 * Truncates plain text to at most `maxLength` characters, backing off to
+	 * the previous word boundary rather than cutting mid-word. Same shape
+	 * as BlogBuilder.bx's own truncateText().
+	 *
+	 * @text Plain text (already HTML-tag-stripped)
+	 * @maxLength Maximum length before the trailing ellipsis
+	 */
+	private string function truncateText( required string text, required numeric maxLength ) {
+		if ( len( arguments.text ) <= arguments.maxLength ) {
+			return arguments.text
+		}
+		return left( arguments.text, arguments.maxLength ).reReplace( "\s+\S*$", "", "one" ) & "…"
 	}
 
 	/**

@@ -3,7 +3,6 @@ title: Versionierung
 order: 7.5
 icon: phosphor-duotone:git-branch
 summary: Baue Docs für mehr als eine Version gleichzeitig - lege einen Versions-Snapshot an, und jedes Theme erhält kostenlos einen Versionsumschalter.
-description: Baue Docs für mehr als eine Version gleichzeitig - lege einen Versions-Snapshot an, und jedes Theme erhält kostenlos einen Versionsumschalter.
 tags: [anleitungen, versionierung]
 ---
 
