@@ -754,14 +754,18 @@ fresh `bxSites new` project needs to touch none of this. See
 what deliberately isn't covered (AVIF, animated GIFs, SVGs).
 
 - `assets.fingerprint` - `true` (the default). Content-hash-names every
-  generated image variant and CSS/JS bundle (e.g.
-  `screenshot-800w.a3f9c2e1.webp`, `bundle.a3f9c2e1.css`) so they can be
-  served with safe, far-future cache headers - a project's build changes
-  the file's own name only when its content actually changes. Does not
-  rename a project's own original files under `docs/assets/` - only
-  pipeline-generated output gets fingerprinted, so anything else that
-  references an asset by its plain filename (a `::: file` download card,
-  a raw markdown link) keeps working unchanged.
+  generated image variant, CSS/JS bundle, and the active theme's own
+  `assets/style.css` (e.g. `screenshot-800w.a3f9c2e1.webp`,
+  `bundle.a3f9c2e1.css`, `style.a3f9c2e1.css`) so they can be served with
+  safe, far-future cache headers - a project's build changes the file's own
+  name only when its content actually changes. This means a theme update -
+  a built-in theme upgrade, or a custom author editing their own theme's
+  CSS - automatically busts every visitor's browser cache on the next
+  deploy, with no manual versioning step. Does not rename a project's own
+  original files under `docs/assets/` - only pipeline-generated output gets
+  fingerprinted, so anything else that references an asset by its plain
+  filename (a `::: file` download card, a raw markdown link) keeps working
+  unchanged.
 - `assets.bundle` - `true` (the default). Concatenates `extraCss`/`extraJs`
   into one fingerprinted file each - pure BoxLang/JVM, no Node/esbuild
   toolchain. Falls back to today's exact per-URL `<link>`/`<script>`

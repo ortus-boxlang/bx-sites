@@ -36,7 +36,7 @@
 		} )();
 	</script>
 	<link rel="stylesheet" href="/development/theme/notion/assets/vendor/highlight/github.min.css">
-	<link rel="stylesheet" href="/development/theme/notion/assets/theme/style.css">
+	<link rel="stylesheet" href="/development/theme/notion/assets/theme/style.e75a4f8d.css">
 	
 
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
@@ -712,14 +712,18 @@ fresh <code>bxSites new</code> project needs to touch none of this. See
 what deliberately isn't covered (AVIF, animated GIFs, SVGs).</p>
 <ul>
 <li><code>assets.fingerprint</code> - <code>true</code> (the default). Content-hash-names every
-generated image variant and CSS/JS bundle (e.g.
-<code>screenshot-800w.a3f9c2e1.webp</code>, <code>bundle.a3f9c2e1.css</code>) so they can be
-served with safe, far-future cache headers - a project's build changes
-the file's own name only when its content actually changes. Does not
-rename a project's own original files under <code>docs/assets/</code> - only
-pipeline-generated output gets fingerprinted, so anything else that
-references an asset by its plain filename (a <code>::: file</code> download card,
-a raw markdown link) keeps working unchanged.</li>
+generated image variant, CSS/JS bundle, and the active theme's own
+<code>assets/style.css</code> (e.g. <code>screenshot-800w.a3f9c2e1.webp</code>,
+<code>bundle.a3f9c2e1.css</code>, <code>style.a3f9c2e1.css</code>) so they can be served with
+safe, far-future cache headers - a project's build changes the file's own
+name only when its content actually changes. This means a theme update -
+a built-in theme upgrade, or a custom author editing their own theme's
+CSS - automatically busts every visitor's browser cache on the next
+deploy, with no manual versioning step. Does not rename a project's own
+original files under <code>docs/assets/</code> - only pipeline-generated output gets
+fingerprinted, so anything else that references an asset by its plain
+filename (a <code>::: file</code> download card, a raw markdown link) keeps working
+unchanged.</li>
 <li><code>assets.bundle</code> - <code>true</code> (the default). Concatenates <code>extraCss</code>/<code>extraJs</code>
 into one fingerprinted file each - pure BoxLang/JVM, no Node/esbuild
 toolchain. Falls back to today's exact per-URL <code>&lt;link&gt;</code>/<code>&lt;script&gt;</code>
@@ -920,7 +924,7 @@ versions sort and build, and what's out of scope (per-tree search
 scoping, no deprecated/EOL flag).</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/development/theme/notion/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 28, 2026, 3&#x3a;16&#x3a;38 AM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/development/docs/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/development/theme/notion/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Aug 28, 2026, 5&#x3a;03&#x3a;08 PM</span></div>
 			</article>
 
 			<nav class="ntn-page-nav" aria-label="Page navigation">
