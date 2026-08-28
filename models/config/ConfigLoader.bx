@@ -83,7 +83,8 @@ class {
 		"redirects"    : [],
 		"variables"    : {},
 		"i18n"         : { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] },
-		"blog"         : { "postsPerPage" : 10, "feed" : true, "feedLimit" : 25 }
+		"blog"         : { "postsPerPage" : 10, "feed" : true, "feedLimit" : 25 },
+		"versions"     : { "default" : "" }
 	}
 
 	/**
@@ -456,6 +457,7 @@ class {
 		validateBlog( arguments.config.blog ?: "" )
 		validateRedirects( arguments.config.redirects ?: "" )
 		validateVariables( arguments.config.variables ?: "" )
+		validateVersions( arguments.config.versions ?: "" )
 
 		return arguments.config
 	}
@@ -481,6 +483,35 @@ class {
 			throw(
 				type    = "BxSites.InvalidConfig",
 				message = "#variables.configFileName# [variables], when present, must be an object"
+			)
+		}
+	}
+
+	/**
+	 * Validates the site config's `versions` block - `versions.default`
+	 * (empty, the default, by far the common case) names which
+	 * `docs/versions/<name>/` folder should build at the site root instead
+	 * of the plain `docs/` tree (BuildPipeline.bx's own `build()` resolves
+	 * the actual folder-exists check against `VersionsDiscoverer.bx`'s
+	 * output, since that's a filesystem concern this config-only validator
+	 * has no `docsDir` to check against). Only the shape is validated here.
+	 *
+	 * @versions The merged config's own `versions` value - `any`, not
+	 * `struct`, for the same reason validateI18n() takes `any` (see its
+	 * own docblock)
+	 */
+	private void function validateVersions( required any versions ) {
+		if ( !isStruct( arguments.versions ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [versions], when present, must be an object"
+			)
+		}
+
+		if ( !isSimpleValue( arguments.versions.default ?: "" ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [versions.default], when present, must be a string"
 			)
 		}
 	}

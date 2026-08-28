@@ -658,6 +658,30 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
+			it( "defaults [versions.default] to an empty string", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).versions.default ).toBe( "" );
+			} );
+
+			it( "preserves a user-supplied [versions.default]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","versions":{"default":"1.0.x"}}' );
+				expect( loader.load( dir ).versions.default ).toBe( "1.0.x" );
+			} );
+
+			it( "throws BxSites.InvalidConfig when [versions] is not an object", function() {
+				var dir = newProjectDir( '{"name":"My Docs","versions":"nope"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
+			it( "throws BxSites.InvalidConfig when [versions.default] is not a string", function() {
+				var dir = newProjectDir( '{"name":"My Docs","versions":{"default":["not","a","string"]}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
 			it( "defaults [plugins] to an empty array", function() {
 				var dir = newProjectDir( '{"name":"My Docs"}' );
 				expect( loader.load( dir ).plugins ).toBeArray();

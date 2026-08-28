@@ -170,23 +170,47 @@ class {
 		directoryCreate( siteDir, true, true )
 
 		var versionNames = variables.versionsDiscoverer.discover( docsDir )
-		var versions = buildVersionsList( versionNames, urls.basePath )
+		// `versions.default` (empty, the common case, changes nothing below)
+		// names which docs/versions/<name>/ folder should build AT THE SITE
+		// ROOT instead of the plain docs/ tree - the plain tree then builds
+		// separately at /next/ instead (see the block right after
+		// copyAssets() below), previewing whatever's being written toward
+		// the next release. See docs/guides/versioning.md.
+		var defaultVersionName = trim( config.versions.default ?: "" )
+		var hasDefaultVersion = len( defaultVersionName ) > 0
+		if ( hasDefaultVersion && !versionNames.contains( defaultVersionName ) ) {
+			throw(
+				type    = "BxSites.UnknownDefaultVersion",
+				message = "versions.default [#defaultVersionName#] does not match any docs/versions/* folder"
+			)
+		}
+		var rootDocsDir = hasDefaultVersion ? ( docsDir & "/versions/" & defaultVersionName ) : docsDir
+		var rootVersionLabel = hasDefaultVersion ? defaultVersionName : "Latest"
+		var rootDocsRelativePrefix = hasDefaultVersion ? ( "versions/" & defaultVersionName & "/" ) : ""
+		var versions = buildVersionsList( versionNames, urls.basePath, defaultVersionName )
 
-		var localeNames = variables.localesDiscoverer.discover( docsDir )
+		var localeNames = variables.localesDiscoverer.discover( rootDocsDir )
 		var locales = buildLocalesList( localeNames, config.i18n, urls.basePath )
 		var defaultLocaleCode = config.i18n.defaultLocale.code
 		var defaultLocaleDir = config.i18n.defaultLocale.dir ?: "ltr"
 
-		var navConfig = resolveExplicitNav( docsDir, config.nav )
-		var mainPages = variables.docsLoader.load( docsDir )
-		// A `404.md` at the root of docsDir is the custom-404 convention
-		// (write404Page()'s own docblock) - pulled out here, before it ever
-		// reaches renderDocTree(), so it's never built as a normal page
-		// (nav entry, sitemap.xml URL, tags/search index) that nothing else
-		// links to.
+		var navConfig = resolveExplicitNav( rootDocsDir, config.nav )
+		var mainPages = variables.docsLoader.load( rootDocsDir )
+		// A `404.md` at the root of whichever tree renders at the site root
+		// is the custom-404 convention (write404Page()'s own docblock) -
+		// pulled out here, before it ever reaches renderDocTree(), so it's
+		// never built as a normal page (nav entry, sitemap.xml URL,
+		// tags/search index) that nothing else links to. When
+		// `versions.default` is set, the physical docs/ tree (rendered
+		// separately at /next/, below) stays the single source of truth for
+		// this instead - a copy of 404.md a cut version snapshot may carry
+		// along is stripped here too, just never treated as the real one.
 		var custom404Page = mainPages.filter( p => compareNoCase( p.relativePath, "404.md" ) == 0 )
 		if ( custom404Page.len() ) {
 			mainPages = mainPages.filter( p => compareNoCase( p.relativePath, "404.md" ) != 0 )
+		}
+		if ( hasDefaultVersion ) {
+			custom404Page = []
 		}
 		// Loaded (frontmatter parsed, not yet markdown-converted) up front,
 		// purely so the main tree's own nav can carry a "Blog" entry from
@@ -197,11 +221,47 @@ class {
 		// blog posts in too.
 		var blogPosts = variables.blogDiscoverer.load( docsDir, arguments.includeDrafts )
 		var blogNavUrl = blogPosts.len() ? "blog/index.html" : ""
-		var mainResult = renderDocTree( mainPages, docsDir, config, themeDir, siteDir, urls.basePath, root, versions, "Latest", "", plugins, urls.absolute, imageManifest, navConfig, locales, defaultLocaleCode, defaultLocaleDir, blogNavUrl, siteOrigin, functions )
+		var mainResult = renderDocTree( mainPages, rootDocsDir, config, themeDir, siteDir, urls.basePath, root, versions, rootVersionLabel, rootDocsRelativePrefix, plugins, urls.absolute, imageManifest, navConfig, locales, defaultLocaleCode, defaultLocaleDir, blogNavUrl, siteOrigin, functions )
 		var allPages = duplicate( mainResult.pages )
 		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
 
+		// The plain docs/ tree - "the root" itself when versions.default is
+		// unset - instead renders separately at /next/ once a default
+		// version has taken over the root, so work-in-progress content
+		// toward the next release stays browsable without being what every
+		// visitor sees by default. Built the same way any other version
+		// tree is (own copyAssets/writeTagsPage/redirects/search-index) -
+		// no locale sub-trees of its own in v1 though (docs/i18n/<code>/
+		// keeps translating this same physical folder, same as always, but
+		// only the default-locale build is published under /next/ for now).
+		if ( hasDefaultVersion ) {
+			var nextOutputDir = siteDir & "/next"
+			var nextBasePath = urls.basePath & "next/"
+			var nextPages = variables.docsLoader.load( docsDir )
+			var nextCustom404 = nextPages.filter( p => compareNoCase( p.relativePath, "404.md" ) == 0 )
+			if ( nextCustom404.len() ) {
+				nextPages = nextPages.filter( p => compareNoCase( p.relativePath, "404.md" ) != 0 )
+				custom404Page = nextCustom404
+			}
+			var nextNavConfig = resolveExplicitNav( docsDir, config.nav )
+			var nextLocaleNames = variables.localesDiscoverer.discover( docsDir )
+			var nextLocales = buildLocalesList( nextLocaleNames, config.i18n, nextBasePath )
+			var nextResult = renderDocTree(
+				nextPages, docsDir, config, themeDir, nextOutputDir, nextBasePath, root, versions, "Next", "next/",
+				plugins, urls.absolute, imageManifest, nextNavConfig, nextLocales, defaultLocaleCode, defaultLocaleDir, "", siteOrigin, functions
+			)
+			allPages.append( prefixPageUrls( nextResult.pages, "next/" ), true )
+			copyAssets( root, themeDir, nextOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
+			writeTagsPage( nextResult.pages, nextResult.nav, config, themeDir, nextOutputDir, nextBasePath, versions, nextLocales, defaultLocaleCode, siteOrigin, functions, "Next" )
+			variables.redirectGenerator.write( nextResult.pages, nextOutputDir, nextBasePath )
+		}
+
 		for ( var versionName in versionNames ) {
+			// Already rendered at the site root, above - never duplicated
+			// at its own /versions/<name>/ URL too.
+			if ( versionName == defaultVersionName ) {
+				continue
+			}
 			var versionDocsDir = docsDir & "/versions/" & versionName
 			var versionOutputDir = siteDir & "/versions/" & versionName
 			var versionBasePath = urls.basePath & "versions/" & versionName & "/"
@@ -234,7 +294,7 @@ class {
 			)
 			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
 			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
-			writeTagsPage( versionResult.pages, versionResult.nav, config, themeDir, versionOutputDir, versionBasePath, versions, versionLocales, defaultLocaleCode, siteOrigin, functions )
+			writeTagsPage( versionResult.pages, versionResult.nav, config, themeDir, versionOutputDir, versionBasePath, versions, versionLocales, defaultLocaleCode, siteOrigin, functions, versionName )
 			variables.redirectGenerator.write( versionResult.pages, versionOutputDir, versionBasePath )
 
 			for ( var versionLocale in versionLocales ) {
@@ -268,7 +328,7 @@ class {
 				)
 				allPages.append( prefixPageUrls( versionLocaleResult.pages, "versions/" & versionName & "/" & versionLocale.code & "/" ), true )
 				copyAssets( root, themeDir, versionLocaleOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
-				writeTagsPage( versionLocaleResult.pages, versionLocaleResult.nav, config, themeDir, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/", versions, versionLocales, versionLocale.code, siteOrigin, functions )
+				writeTagsPage( versionLocaleResult.pages, versionLocaleResult.nav, config, themeDir, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/", versions, versionLocales, versionLocale.code, siteOrigin, functions, versionName )
 				variables.redirectGenerator.write( versionLocaleResult.pages, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/" )
 			}
 		}
@@ -278,18 +338,18 @@ class {
 				continue
 			}
 			var localeOutputDir = siteDir & "/" & locale.code
-			var localePages = variables.docsLoader.load( docsDir & "/i18n/" & locale.code )
-			var mergedPages = mergeLocalePages( mainPages, localePages, locale.code )
+			var localePages = variables.docsLoader.load( rootDocsDir & "/i18n/" & locale.code )
+			var mergedPages = mergeLocalePages( mainPages, localePages, locale.code, rootDocsRelativePrefix )
 			var localeResult = renderDocTree(
 				mergedPages,
-				docsDir,
+				rootDocsDir,
 				config,
 				themeDir,
 				localeOutputDir,
 				urls.basePath & locale.code & "/",
 				root,
 				[],
-				"Latest",
+				rootVersionLabel,
 				"",
 				plugins,
 				urls.absolute,
@@ -304,7 +364,7 @@ class {
 			)
 			allPages.append( prefixPageUrls( localeResult.pages, locale.code & "/" ), true )
 			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
-			writeTagsPage( localeResult.pages, localeResult.nav, config, themeDir, localeOutputDir, urls.basePath & locale.code & "/", versions, locales, locale.code, siteOrigin, functions )
+			writeTagsPage( localeResult.pages, localeResult.nav, config, themeDir, localeOutputDir, urls.basePath & locale.code & "/", versions, locales, locale.code, siteOrigin, functions, rootVersionLabel )
 			variables.redirectGenerator.write( localeResult.pages, localeOutputDir, urls.basePath & locale.code & "/" )
 		}
 
@@ -325,7 +385,7 @@ class {
 
 			convertMarkdown(
 				blogPosts, config, plugins, urls.basePath, docsDir, imageManifest, functions,
-				mainResult.nav, versions, "Latest", locales, defaultLocaleCode, defaultLocaleDir
+				mainResult.nav, versions, rootVersionLabel, locales, defaultLocaleCode, defaultLocaleDir
 			)
 			assignTableOfContents( blogPosts )
 			assignEditAndLastUpdated( blogPosts, config, root, "" )
@@ -337,10 +397,10 @@ class {
 			var blogResult = variables.blogBuilder.build( blogPosts, blogAuthors, config.blog.postsPerPage, urls.basePath, imageManifest )
 
 			for ( var post in blogResult.posts ) {
-				writeRenderedPage( post, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir, siteOrigin, functions )
+				writeRenderedPage( post, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir, siteOrigin, functions, rootVersionLabel )
 			}
 			for ( var indexPage in blogResult.indexPages ) {
-				writeRenderedPage( indexPage, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir, siteOrigin, functions )
+				writeRenderedPage( indexPage, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir, siteOrigin, functions, rootVersionLabel )
 			}
 
 			variables.markdownPublisher.publish( blogResult.posts, siteDir )
@@ -367,8 +427,8 @@ class {
 			}
 		}
 
-		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, "Latest", locales, defaultLocaleCode, functions, docsDir, plugins, imageManifest, custom404Page.len() ? custom404Page[ 1 ] : {} )
-		writeTagsPage( tagsPages, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, siteOrigin, functions )
+		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, rootVersionLabel, locales, defaultLocaleCode, functions, docsDir, plugins, imageManifest, custom404Page.len() ? custom404Page[ 1 ] : {} )
+		writeTagsPage( tagsPages, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, siteOrigin, functions, rootVersionLabel )
 		variables.redirectGenerator.write( mainResult.pages, siteDir, urls.basePath, config.redirects )
 
 		// A plugin's onSitemap() gets one shot at the site-wide accumulated
@@ -377,11 +437,20 @@ class {
 		// flows into both, not just the sitemap.
 		allPages = variables.pluginLoader.applyOnSitemap( plugins, allPages, config )
 
+		// The /next/ tree (unreleased, work-in-progress toward the next
+		// release - only ever present once versions.default is set) is
+		// still fully browsable/linkable, just deliberately kept out of
+		// sitemap.xml/robots.txt so it doesn't compete with the real,
+		// released docs in search results.
+		var sitemapPages = hasDefaultVersion
+			? allPages.filter( p => !p.urlPath.startsWith( "next/" ) )
+			: allPages
+
 		if ( len( urls.absolute ) ) {
-			fileWrite( siteDir & "/sitemap.xml", variables.sitemapGenerator.build( allPages, urls.absolute ) )
+			fileWrite( siteDir & "/sitemap.xml", variables.sitemapGenerator.build( sitemapPages, urls.absolute ) )
 		}
 
-		fileWrite( siteDir & "/robots.txt", variables.robotsTxtGenerator.resolve( docsDir, urls.absolute, config.robots ) )
+		fileWrite( siteDir & "/robots.txt", variables.robotsTxtGenerator.resolve( docsDir, urls.absolute, config.robots, hasDefaultVersion ? [ "/next/" ] : [] ) )
 
 		fileWrite( siteDir & "/llms.txt", variables.llmsTxtGenerator.build( allPages, config, urls.absolute, urls.basePath ) )
 
@@ -672,15 +741,46 @@ class {
 	}
 
 	/**
-	 * Builds the version switcher's own entries - "Latest" (the project's
-	 * regular `docs/`) first, then one per discovered `docs/versions/` folder.
+	 * Builds the version switcher's own entries - each one `{ label, url }`,
+	 * consumed identically by every built-in theme's own
+	 * `renderVersionSwitcher()` regardless of which branch below produced
+	 * it, so neither this shape nor any theme needs to change between the
+	 * two.
+	 *
+	 * No `defaultVersionName` (empty, by far the common case): "Latest"
+	 * (the project's regular `docs/`) first, then one per discovered
+	 * `docs/versions/` folder - today's exact, unchanged behavior.
+	 *
+	 * `defaultVersionName` set: that version's own name first, pointing at
+	 * the site root (it's the one build() actually renders there - see
+	 * its own docblock), then `"Next"` (the plain `docs/` tree, now built
+	 * separately at `/next/`), then every *other* discovered version -
+	 * `defaultVersionName` itself is skipped here since it's already the
+	 * first entry, never duplicated at its own `/versions/<name>/` URL too.
 	 *
 	 * @versionNames VersionsDiscoverer.discover()'s own output, newest first
-	 * @basePath The main/"Latest" build's own basePath
+	 * @basePath The site's own root basePath
+	 * @defaultVersionName `config.versions.default`, trimmed - "" (the default) keeps today's "Latest"-at-root behavior
 	 */
-	private array function buildVersionsList( required array versionNames, required string basePath ) {
-		var versions = [ { label : "Latest", url : arguments.basePath } ]
+	private array function buildVersionsList( required array versionNames, required string basePath, string defaultVersionName = "" ) {
+		var hasDefault = len( arguments.defaultVersionName ) > 0
+
+		if ( !hasDefault ) {
+			var versions = [ { label : "Latest", url : arguments.basePath } ]
+			for ( var versionName in arguments.versionNames ) {
+				versions.append( { label : versionName, url : arguments.basePath & "versions/" & versionName & "/" } )
+			}
+			return versions
+		}
+
+		var versions = [
+			{ label : arguments.defaultVersionName, url : arguments.basePath },
+			{ label : "Next", url : arguments.basePath & "next/" }
+		]
 		for ( var versionName in arguments.versionNames ) {
+			if ( versionName == arguments.defaultVersionName ) {
+				continue
+			}
 			versions.append( { label : versionName, url : arguments.basePath & "versions/" & versionName & "/" } )
 		}
 		return versions
@@ -1291,11 +1391,12 @@ class {
 	 * @currentLocale The default locale's own code - the blog is main-tree-only in v1, not rendered per-locale
 	 * @currentLocaleDir The default locale's own direction
 	 * @functions FunctionsLoader.load()'s own output, threaded through to themeRenderer.renderPage()
+	 * @currentVersion Which `versions` entry this page's own tree IS, for the switcher's own "selected" state - "Latest" by default, matching the root tree's own render (the blog is main-tree-only in v1, always rendered as part of whichever tree is currently the site root)
 	 */
-	private void function writeRenderedPage( required struct page, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required array locales, required string currentLocale, required string currentLocaleDir, string siteOrigin = "", struct functions = {} ) {
+	private void function writeRenderedPage( required struct page, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required array locales, required string currentLocale, required string currentLocaleDir, string siteOrigin = "", struct functions = {}, string currentVersion = "Latest" ) {
 		arguments.page.canonicalUrl = canonicalUrlFor( arguments.page.urlPath, arguments.basePath, arguments.siteOrigin )
 		var html = variables.themeRenderer.renderPage(
-			arguments.page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, "Latest",
+			arguments.page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, arguments.currentVersion,
 			arguments.locales, arguments.currentLocale, arguments.currentLocaleDir, arguments.functions
 		)
 		var outputPath = arguments.siteDir & "/" & arguments.page.urlPath
@@ -1328,7 +1429,7 @@ class {
 	 * @siteDir Absolute path to the build output directory
 	 * @basePath Root-relative base path ending with `/`
 	 * @versions Version switcher entries as `[ { label, url } ]`
-	 * @currentVersion Always `"Latest"` - the 404 page is only ever written once, for the main site
+	 * @currentVersion The site's own root-tree version label - "Latest", or `versions.default`'s own name once set - the 404 page is only ever written once, for whichever tree renders at the site root
 	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]` - not built per-locale in v1 (a single 404.html is all a static host serves for any unmatched path, regardless of which locale subtree the reader was in), shown here only so the header renders the same everywhere
 	 * @currentLocale The default locale's own code
 	 * @functions FunctionsLoader.load()'s own output, threaded through to convertMarkdown()/themeRenderer.renderPage()
@@ -1396,8 +1497,9 @@ class {
 	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]` - only the locales *this tree* itself has, same scoping renderDocTree()'s own `locales` param already uses
 	 * @currentLocale This tree's own current locale code (the default locale's own code for the main tree and every version's own default-locale render, never "")
 	 * @functions FunctionsLoader.load()'s own output, threaded through to themeRenderer.renderPage()
+	 * @currentVersion Which `versions` entry this tree IS, for the switcher's own "selected" state - "Latest" by default, matching this tree's own render (renderDocTree()'s own `currentVersion` param)
 	 */
-	private void function writeTagsPage( required array pages, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, array locales = [], string currentLocale = "", string siteOrigin = "", struct functions = {} ) {
+	private void function writeTagsPage( required array pages, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, array locales = [], string currentLocale = "", string siteOrigin = "", struct functions = {}, string currentVersion = "Latest" ) {
 		var built = variables.tagsIndexBuilder.build( arguments.pages, arguments.basePath )
 		if ( !built.hasTags ) {
 			return
@@ -1415,7 +1517,7 @@ class {
 		}
 
 		var html = variables.themeRenderer.renderPage(
-			page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, "Latest",
+			page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, arguments.currentVersion,
 			arguments.locales, arguments.currentLocale, "ltr", arguments.functions
 		)
 		directoryCreate( arguments.siteDir & "/tags", true, true )

@@ -1,0 +1,56 @@
+[
+	"index.md",
+	{
+		"title": "Introduction",
+		"children": [
+			"getting-started.md",
+			"cli-reference.md"
+		]
+	},
+	{
+		"title": "Configuration & Reference",
+		"children": [
+			"configuration.md",
+			"releases/index.md"
+		]
+	},
+	{
+		"title": "Guides",
+		"children": [
+			"guides/index.md",
+			"guides/themes.md",
+			"guides/markdown.md",
+			"guides/content-blocks.md",
+			"guides/tables.md",
+			"guides/openapi.md",
+			"guides/images.md",
+			"guides/interactivity.md",
+			"guides/search.md",
+			"guides/variables-and-functions.md",
+			"guides/plugins.md",
+			"guides/cli-providers.md",
+			"guides/ai-agent-skills.md",
+			"guides/versioning.md",
+			"guides/i18n.md",
+			"guides/blog.md"
+		]
+	},
+	{
+		"title": "Migration & Deployment",
+		"children": [
+			"guides/deployment.md",
+			"guides/migrating-from-gitbook.md",
+			"guides/migrating-from-mkdocs.md"
+		]
+	},
+	{
+		"title": "Help",
+		"children": [
+			"troubleshooting.md",
+			"contribute.md",
+			"services.md",
+			"about.md",
+			"license.md"
+		]
+	}
+]

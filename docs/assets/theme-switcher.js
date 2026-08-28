@@ -21,10 +21,10 @@
  * every built-in theme already sets on `<html>` for dark mode.
  *
  * `ROOT` is a placeholder - buildMultiTheme.sh substitutes it
- * with the site's real root-relative base path (e.g. "/bx-sites/" or
- * "/bx-sites/development/") before each of the ten builds, since that
- * root is identical across every variant and only known at build
- * time from bxsites.json's own `baseURL`.
+ * with the site's real root-relative base path (e.g. "/" or "/next/")
+ * before each of the ten builds, since that root is identical across
+ * every variant and only known at build time from bxsites.json's own
+ * `baseURL`.
  */
 ( function () {
 	var ROOT = "__BXSITES_ROOT__";
