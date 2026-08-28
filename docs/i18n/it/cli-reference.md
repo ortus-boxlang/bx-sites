@@ -3,6 +3,7 @@ title: Riferimento CLI
 order: 3
 icon: phosphor-duotone:terminal-window
 summary: Ogni verbo di bxSites e i suoi flag.
+description: Ogni verbo di bxSites e i suoi flag.
 tags: [riferimento, cli]
 ---
 
