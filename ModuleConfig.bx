@@ -1,12 +1,15 @@
 /**
- * This is the module descriptor and entry point for your module in the runtime.
- * The unique name of the module is the name of the directory on the modules folder
- * or the name property in the box.json file.
- * <p>
- * A BoxLang mapping will be created for you with the name of the module as well using the
- * this.mapping property.
- *<p>
- * Every module will have its own classloader that will be used to load the module libs and dependencies.
+ * BxSites' module descriptor AND its CLI entry point, in one file - the
+ * `this.*` properties below are what BoxLang's ModuleService reads to
+ * register/activate this as a module (standard BoxLang module contract,
+ * nothing bx-sites-specific there), while `main()` further down is what
+ * actually runs on every `boxlang bxSites <verb> ...` invocation - see its
+ * own docblock for the real verb-dispatch mechanics. `configure()` stays
+ * near-empty on purpose: this module registers no interceptors and needs
+ * no settings beyond the loadedOn/loadedBy bookkeeping BoxLang itself
+ * expects, since almost everything bx-sites does happens synchronously
+ * inside a `main()` verb call rather than through the runtime's own
+ * event/interceptor system.
  */
 
 class {
@@ -94,9 +97,7 @@ class {
 		/**
 		 * The module interceptors to register into the runtime
 		 */
-		interceptors = [
-			// { class="interceptors.Listener", properties={} }
-		];
+		interceptors = [];
 
 		/**
 		 * A list of custom interception points to register into the runtime

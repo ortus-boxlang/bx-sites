@@ -19,8 +19,11 @@
 class {
 
 	/**
-	 * Runs `npx skills add ortus-boxlang/bx-sites-skills[/skills/<skill>] -y`
-	 * against `projectRoot`.
+	 * Runs `npx -y skills add ortus-boxlang/bx-sites-skills[/skills/<skill>] [-y]`
+	 * against `projectRoot` - two independent `-y` flags: `npx`'s own
+	 * (always passed, skips npx's "ok to download this package?" prompt for
+	 * `skills` itself) and `skills add`'s own (only when `yes` is true - see
+	 * its own docblock below).
 	 *
 	 * @projectRoot Absolute path to the project to install skills into (must already exist)
 	 * @skill Install just this one skill (its bare name, e.g. "bx-sites-getting-started") instead of the full set

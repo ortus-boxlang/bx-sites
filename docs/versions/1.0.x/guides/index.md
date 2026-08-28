@@ -23,6 +23,7 @@ icon: phosphor-duotone:book-open
 - [AI Agent Skills](ai-agent-skills.md) - give Claude Code, Cursor, and other AI coding assistants deep knowledge of bx-sites via the official skill pack
 - [Importing a theme](theme-import.md) - best-effort convert an mkdocs/jekyll/hugo theme into a bx-sites theme
 - [Versioning](versioning.md) - snapshot a release's docs and get a version switcher for free
+- [Redirects](redirects.md) - keep an old URL working after you move, rename, or restructure a page
 - [Internationalization (i18n)](i18n.md) - translating your docs into other languages
 - [Migrating from GitBook](migrating-from-gitbook.md) - convert a GitBook export into a bx-sites project with one command
 - [Migrating from mkdocs](migrating-from-mkdocs.md) - convert an mkdocs project into a bx-sites project with one command
