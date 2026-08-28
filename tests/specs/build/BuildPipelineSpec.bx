@@ -273,7 +273,7 @@ class extends="testbox.system.BaseSpec" {
 
 				var html = fileRead( root & "/site/index.html" );
 				var hashedFileName = listLast( hashedPath, "/" );
-				expect( html ).toInclude( 'href="assets/theme/' & hashedFileName & '"' );
+				expect( html ).toInclude( 'href="/assets/theme/' & hashedFileName & '"' );
 			} );
 
 			it( "keeps the theme's style.css unfingerprinted when assets.fingerprint is false", function() {
@@ -286,7 +286,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( root & "/site/assets/theme/style.css" ) ).toBeTrue();
 
 				var html = fileRead( root & "/site/index.html" );
-				expect( html ).toInclude( 'href="assets/theme/style.css"' );
+				expect( html ).toInclude( 'href="/assets/theme/style.css"' );
 			} );
 
 			it( "builds the responsive-image manifest once from docs/assets/ and passes it to buildManifest() with the site's own assets.images config, via the setImageVariantGenerator() test seam", function() {
