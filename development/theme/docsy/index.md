@@ -2,7 +2,7 @@
 title: Home
 order: 1
 icon: phosphor-duotone:house
-summary: Point BxSites at a docs/ folder. Get a fast, themeable static site out - documentation, a marketing site, a blog, or anything else Markdown can express - complete with search, i18n, and a markdown toolkit built for real content.
+summary: Point BxSites at a docs/ folder (or src/, for a project that isn't really "docs" in spirit). Get a fast, themeable static site out - documentation, a marketing site, a blog, or anything else Markdown can express - complete with search, i18n, and a markdown toolkit built for real content.
 toc: false
 ---
 
@@ -20,16 +20,19 @@ repository's own `docs/` folder.
 BxSites isn't only for reference documentation - it's a general-purpose
 **static site generator**. A marketing site, a blog, a knowledge base, a
 product site, a personal site: anything you can write in Markdown builds
-the same way, through the same themes, search, and i18n.
+the same way, through the same themes, search, and i18n. Content lives in
+`docs/` by default, or `src/` for a project that reads more like a website
+than "docs" - every command works the same either way.
 
 ::: cards
 ::: card title="Markdown in, static HTML out" icon="phosphor-duotone:file-html"
-Point it at a `docs/` folder and it renders a complete site into `site/` -
-no server required to host it.
+Point it at a `docs/` folder - or `src/`, if your project reads more like
+a website than "docs" - and it renders a complete site into `site/`, no
+server required to host it.
 :::
 ::: card title="Folder structure is nav structure" icon="phosphor-duotone:tree-structure"
-Nest folders and files under `docs/` and the navigation builds itself, in
-the order you set via frontmatter.
+Nest folders and files under `docs/` (or `src/`) and the navigation builds
+itself, in the order you set via frontmatter.
 :::
 ::: card title="Ten built-in themes" icon="phosphor-duotone:palette" href="guides/themes.md"
 A full gallery - `bootstrap`, `material`, `tailwind`, and seven more inspired

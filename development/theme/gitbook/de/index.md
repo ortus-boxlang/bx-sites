@@ -2,7 +2,7 @@
 title: Startseite
 order: 1
 icon: phosphor-duotone:house
-summary: Zeig auf einen docs/-Ordner. Erhalte eine schnelle, themefähige statische Website daraus - Dokumentation, eine Marketing-Site, ein Blog, oder alles andere, was sich in Markdown ausdrücken lässt - komplett mit Suche, i18n und einem Markdown-Toolkit für echten Content.
+summary: Zeig auf einen docs/-Ordner (oder src/, wenn dein Projekt inhaltlich gar nicht "docs" ist). Erhalte eine schnelle, themefähige statische Website daraus - Dokumentation, eine Marketing-Site, ein Blog, oder alles andere, was sich in Markdown ausdrücken lässt - komplett mit Suche, i18n und einem Markdown-Toolkit für echten Content.
 toc: false
 ---
 
@@ -21,15 +21,19 @@ BxSites ist nicht nur für Referenzdokumentation gedacht - es ist ein
 allgemeiner **statischer Site-Generator**. Eine Marketing-Site, ein Blog,
 eine Wissensdatenbank, eine Produktseite, eine persönliche Seite: alles, was
 sich in Markdown schreiben lässt, wird auf demselben Weg gebaut - mit
-denselben Themes, derselben Suche und demselben i18n.
+denselben Themes, derselben Suche und demselben i18n. Der Content liegt
+standardmäßig unter `docs/`, oder unter `src/`, wenn dein Projekt
+inhaltlich eher eine Website als "docs" ist - jeder Befehl funktioniert in
+beiden Fällen gleich.
 
 ::: cards
 ::: card title="Markdown rein, statisches HTML raus" icon="phosphor-duotone:file-html"
-Zeig auf einen `docs/`-Ordner und es entsteht eine komplette Website in
-`site/` - kein Server nötig, um sie zu hosten.
+Zeig auf einen `docs/`-Ordner - oder `src/`, wenn dein Projekt eher wie
+eine Website als wie "docs" wirkt - und es entsteht eine komplette Website
+in `site/`, kein Server nötig, um sie zu hosten.
 :::
 ::: card title="Ordnerstruktur ist Navigationsstruktur" icon="phosphor-duotone:tree-structure"
-Verschachtele Ordner und Dateien unter `docs/`, und die Navigation baut
+Verschachtele Ordner und Dateien unter `docs/` (oder `src/`), und die Navigation baut
 sich von selbst auf, in der Reihenfolge, die du per Frontmatter festlegst.
 :::
 ::: card title="Zehn integrierte Themes" icon="phosphor-duotone:palette" href="guides/themes.md"

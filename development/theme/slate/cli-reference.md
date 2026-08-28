@@ -458,6 +458,27 @@ install time rather than at the next `build`. Set `bxsites.yaml`'s
 `theme.name` to the installed name to use it - see
 [Themes](guides/themes.md#installing-a-published-theme).
 
+## `skills:install`
+
+Install the [official AI agent skill pack](guides/ai-agent-skills.md)
+(`ortus-boxlang/bx-sites-skills`) into every AI coding assistant this
+project has configured - a thin wrapper over `npx skills add`, so a
+freshly-scaffolded project's assistant knows bx-sites from the first
+prompt. Also runnable as the two-word `bxSites skills install` - every
+colon-joined verb doubles as its own space-separated form this way.
+
+```bash title="Usage"
+bxSites skills:install [--skill=<name>]
+```
+
+- `--skill` - install just this one skill (its bare name, e.g.
+  `bx-sites-deployment`) instead of the full thirteen-skill set
+
+Requires Node.js/`npx` on `PATH`. See
+[AI Agent Skills](guides/ai-agent-skills.md) for what a skill is, the full
+skill list, and the other two install paths (`npx skills add`/`coldbox ai
+skills install`) that don't need `bxSites` at all.
+
 ## `theme:import`
 
 Best-effort conversion of a theme from another static site generator's

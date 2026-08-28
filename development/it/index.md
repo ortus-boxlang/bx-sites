@@ -2,7 +2,7 @@
 title: Home
 order: 1
 icon: phosphor-duotone:house
-summary: Punta BxSites su una cartella docs/. Ottieni un sito statico veloce e personalizzabile - documentazione, un sito marketing, un blog, o qualsiasi altra cosa il Markdown possa esprimere - completo di ricerca, i18n, e un toolkit Markdown pensato per contenuti reali.
+summary: Punta BxSites su una cartella docs/ (o src/, se il tuo progetto non è davvero "docs" nello spirito). Ottieni un sito statico veloce e personalizzabile - documentazione, un sito marketing, un blog, o qualsiasi altra cosa il Markdown possa esprimere - completo di ricerca, i18n, e un toolkit Markdown pensato per contenuti reali.
 toc: false
 ---
 
@@ -21,16 +21,20 @@ BxSites non serve solo per la documentazione di riferimento - è un
 **generatore di siti statici** di uso generale. Un sito marketing, un
 blog, una knowledge base, un sito prodotto, un sito personale: qualsiasi
 cosa tu possa scrivere in Markdown si compila allo stesso modo,
-attraverso gli stessi temi, la stessa ricerca e la stessa i18n.
+attraverso gli stessi temi, la stessa ricerca e la stessa i18n. I
+contenuti vivono in `docs/` per impostazione predefinita, o in `src/` se
+il tuo progetto assomiglia più a un sito web che a "docs" - ogni comando
+funziona allo stesso modo in entrambi i casi.
 
 ::: cards
 ::: card title="Markdown in ingresso, HTML statico in uscita" icon="phosphor-duotone:file-html"
-Puntalo su una cartella `docs/` e genera un sito completo dentro `site/`
-- nessun server necessario per ospitarlo.
+Puntalo su una cartella `docs/` - o `src/`, se il tuo progetto assomiglia
+più a un sito web che a "docs" - e genera un sito completo dentro `site/`,
+nessun server necessario per ospitarlo.
 :::
 ::: card title="La struttura delle cartelle è la struttura di navigazione" icon="phosphor-duotone:tree-structure"
-Annida cartelle e file sotto `docs/` e la navigazione si costruisce da
-sola, nell'ordine che imposti tramite il frontmatter.
+Annida cartelle e file sotto `docs/` (o `src/`) e la navigazione si
+costruisce da sola, nell'ordine che imposti tramite il frontmatter.
 :::
 ::: card title="Dieci temi integrati" icon="phosphor-duotone:palette" href="guides/themes.md"
 Una galleria completa - `bootstrap`, `material`, `tailwind`, e altri

@@ -2,7 +2,7 @@
 title: Inicio
 order: 1
 icon: phosphor-duotone:house
-summary: Apunta BxSites a una carpeta docs/. Obtén un sitio estático rápido y personalizable - documentación, un sitio de marketing, un blog o cualquier otra cosa que Markdown pueda expresar - completo con búsqueda, i18n y un conjunto de herramientas Markdown pensado para contenido real.
+summary: Apunta BxSites a una carpeta docs/ (o src/, si tu proyecto no es realmente "docs" en espíritu). Obtén un sitio estático rápido y personalizable - documentación, un sitio de marketing, un blog o cualquier otra cosa que Markdown pueda expresar - completo con búsqueda, i18n y un conjunto de herramientas Markdown pensado para contenido real.
 toc: false
 ---
 
@@ -21,16 +21,19 @@ BxSites no es solo para documentación de referencia - es un
 **generador de sitios estáticos** de propósito general. Un sitio de
 marketing, un blog, una base de conocimiento, un sitio de producto, un sitio
 personal: todo lo que puedas escribir en Markdown se construye de la misma
-forma, a través de los mismos temas, búsqueda e i18n.
+forma, a través de los mismos temas, búsqueda e i18n. El contenido vive en
+`docs/` por defecto, o en `src/` si tu proyecto se parece más a un sitio
+web que a "docs" - cada comando funciona igual en ambos casos.
 
 ::: cards
 ::: card title="Markdown como entrada, HTML estático como salida" icon="phosphor-duotone:file-html"
-Apúntalo a una carpeta `docs/` y genera un sitio completo en `site/` - sin
+Apúntalo a una carpeta `docs/` - o `src/`, si tu proyecto se parece más a
+un sitio web que a "docs" - y genera un sitio completo en `site/`, sin
 necesidad de servidor para alojarlo.
 :::
 ::: card title="La estructura de carpetas es la estructura de navegación" icon="phosphor-duotone:tree-structure"
-Anida carpetas y archivos bajo `docs/` y la navegación se construye sola,
-en el orden que definas mediante el frontmatter.
+Anida carpetas y archivos bajo `docs/` (o `src/`) y la navegación se
+construye sola, en el orden que definas mediante el frontmatter.
 :::
 ::: card title="Diez temas incorporados" icon="phosphor-duotone:palette" href="guides/themes.md"
 Una galería completa - `bootstrap`, `material`, `tailwind` y siete más
