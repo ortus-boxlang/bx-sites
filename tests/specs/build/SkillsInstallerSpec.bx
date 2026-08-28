@@ -1,0 +1,73 @@
+/**
+ * Exercises SkillsInstaller.bx's own argument handling and failure paths
+ * against a deliberately-bogus `bin` - no real `npx`/network call, same
+ * reason PagefindIndexer.bx has no direct spec of its own for a successful
+ * run (there's no seam for the real external CLI, and CI can't assume
+ * Node.js is on PATH). The bogus-binary path is real and deterministic
+ * either way (a nonexistent binary always fails to start), so it doubles
+ * as coverage for the exact argv `install()` builds - the failure message
+ * echoes the full command line back.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.SkillsInstaller", function() {
+
+			beforeEach( function() {
+				variables.installer = new "models.build.SkillsInstaller@bxsites"();
+				variables.projectRoot = createTempDirectory( prefix = "bxsites-skillsinstall-" );
+			} );
+
+			afterEach( function() {
+				if ( directoryExists( projectRoot ) ) {
+					directoryDelete( projectRoot, true );
+				}
+			} );
+
+			it( "throws BxSites.MissingProjectRoot when projectRoot doesn't exist", function() {
+				expect( function() {
+					installer.install( projectRoot : "/no/such/directory-bxsites-skills-test", bin : "npx" );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
+			} );
+
+			it( "builds the full-set target and surfaces a Node.js pointer when the binary can't be found", function() {
+				expect( function() {
+					installer.install( projectRoot : projectRoot, bin : "bxsites-definitely-not-a-real-binary" );
+				} ).toThrow( "BxSites.SkillsInstallFailed" );
+
+				var caught = "";
+				try {
+					installer.install( projectRoot : projectRoot, bin : "bxsites-definitely-not-a-real-binary" );
+				} catch ( any e ) {
+					caught = e.message;
+				}
+				expect( caught ).toInclude( "ortus-boxlang/bx-sites-skills" );
+				expect( caught ).toInclude( "bxsites-definitely-not-a-real-binary" );
+				expect( caught ).toInclude( "npx" );
+				expect( caught ).toInclude( "Node.js" );
+			} );
+
+			it( "targets a single skill's own path when [skill] is given", function() {
+				var caught = "";
+				try {
+					installer.install( projectRoot : projectRoot, skill : "bx-sites-getting-started", bin : "bxsites-definitely-not-a-real-binary" );
+				} catch ( any e ) {
+					caught = e.message;
+				}
+				expect( caught ).toInclude( "ortus-boxlang/bx-sites-skills/skills/bx-sites-getting-started" );
+			} );
+
+			it( "omits the trailing -y flag when [yes] is false", function() {
+				var caught = "";
+				try {
+					installer.install( projectRoot : projectRoot, yes : false, bin : "bxsites-definitely-not-a-real-binary" );
+				} catch ( any e ) {
+					caught = e.message;
+				}
+				expect( caught ).toInclude( "bxsites-definitely-not-a-real-binary -y skills add ortus-boxlang/bx-sites-skills`" );
+			} );
+
+		} );
+	}
+
+}
