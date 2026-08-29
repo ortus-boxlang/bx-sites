@@ -12,20 +12,29 @@ name: Publish Docs
 #  - `development` (this project's active branch, working toward the next
 #    minor/major version) deploys only /next/ - the plain docs/ tree, i.e.
 #    whatever's currently being written toward that next release.
-# Before `main` exists (this repo's current state, still pre-1.0.0),
-# `development` is the only branch pushing here, and its own root output
-# simply never gets deployed (pruned away below) - there is nothing at the
-# site root to publish until a real release is cut and `main` starts
-# deploying it.
+# Before `main` exists (this repo's current state, still pre-1.0.0), there
+# is nobody to own the root except `development` - so `development` still
+# deploys the *entire* site, root included, exactly as it always has.
+# `assemble-and-deploy` below detects at runtime whether `main` actually
+# exists (a live `git ls-remote` check, not a hardcoded assumption) and
+# only starts pruning `development`'s own deploy down to /next/-only once
+# it does - this self-activates the moment `main` is really cut, with no
+# further pages.yml edit needed at that point. Get this backwards (start
+# pruning `development` down to /next/-only before `main` exists to take
+# over the root) and the root gets deployed by *nobody* - a real incident
+# this workflow caused once already, immediately after the split first
+# shipped: the very next `development` push stopped deploying root content
+# even though `main` still didn't exist, and bxsites.io 404'd.
 #
 # `bxSites build` always builds the *entire* site in one pass - root,
 # /next/, every other docs/versions/* folder, all ten themes - there's no
-# CLI flag to build just one part. So both branches run the exact same
-# build; only the deploy step differs, pruning the assembled site/ tree
-# right before publishing based on which branch triggered the run (see
-# `assemble-and-deploy` below) - `keep_files: true` means whatever gets
-# pruned away locally simply stays untouched on the live site, so a
-# `development` push can't clobber `main`'s root and vice versa.
+# CLI flag to build just one part. So every triggering branch runs the
+# exact same build; only the deploy step differs, pruning the assembled
+# site/ tree right before publishing based on which branch triggered the
+# run and whether main exists yet (see `assemble-and-deploy` below) -
+# `keep_files: true` means whatever gets pruned away locally simply stays
+# untouched on the live site, so a `development` push can't clobber
+# `main`'s root and vice versa, once both are actually deploying.
 #
 # Each publish is itself a showcase of all ten built-in themes (the theme
 # gallery) - bootstrap at the root, every other theme under theme/<name>/,
@@ -193,14 +202,31 @@ jobs:
             mv "${dir}" "site/theme/${name}"
           done
 
+      - name: Detect whether main exists yet
+        id: detect-main
+        run: |
+          # The root/next/ split below only makes sense once main is real
+          # and actually deploying the root itself - before that, main
+          # doesn't exist to own the root, so development must keep
+          # deploying the whole site (exactly like it always did) or the
+          # root ends up 404, published by nobody. Checked against the
+          # real remote (no local checkout of main needed) so this
+          # activates on its own the moment main is actually cut - no
+          # follow-up pages.yml edit needed at that point.
+          if git ls-remote --exit-code --heads https://github.com/${{ github.repository }}.git main > /dev/null 2>&1; then
+            echo "exists=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "exists=false" >> "${GITHUB_OUTPUT}"
+          fi
+
       - name: On main, prune every next/ (development owns that, this run doesn't touch it)
         if: github.ref_name == 'main'
         run: |
           rm -rf site/next
           rm -rf site/theme/*/next
 
-      - name: On development, keep only next/ (main owns everything else)
-        if: github.ref_name == 'development'
+      - name: On development, keep only next/ once main exists to own the root (deploys everything until then)
+        if: github.ref_name == 'development' && steps.detect-main.outputs.exists == 'true'
         run: |
           # Rebuilds site/ to contain *only* the next/ paths (root's own
           # next/, plus each theme/<name>/next/) at the exact same
