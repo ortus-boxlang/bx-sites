@@ -165,6 +165,23 @@ class {
 	}
 
 	/**
+	 * Turns a real, OS-native absolute path into the form `include`/
+	 * `<bx:include template="...">` expects once prefixed with the
+	 * `/bxApp` mapping ModuleConfig.bx's `onLoad()` registers - a no-op on
+	 * Linux/Mac (already forward-slash, no drive letter), but on Windows a
+	 * path like `C:\project\theme` has a drive letter and backslashes
+	 * that `/bxApp` & path would otherwise turn into the nonsensical
+	 * `/bxAppC:\project\theme`.
+	 *
+	 * @path A real absolute filesystem path, in whatever format the current OS gives it
+	 *
+	 * @return The same path, forward-slashed and drive-letter-stripped, ready to prefix with `/bxApp`
+	 */
+	private string function toVirtualPath( required string path ) {
+		return arguments.path.reReplace( "^[A-Za-z]:", "" ).replace( chr( 92 ), "/", "all" )
+	}
+
+	/**
 	 * Renders one page through its theme's `layout.bxm`/`page.bxm`,
 	 * defaulting `tags`/`icon`/`summary`/`ogImage` on `page` first if
 	 * frontmatter left any of them unset.
@@ -243,10 +260,13 @@ class {
 		// layout.bxm/page.bxm/icons.bxm/etc.) fixes every nested theme
 		// include across all built-in themes with zero per-theme changes,
 		// since these two variables are the only thing any theme ever
-		// builds an include path from.
-		variables.themeDir = "/bxApp" & arguments.themeDir
+		// builds an include path from. toVirtualPath() below handles
+		// Windows' drive-letter/backslash absolute-path format - a no-op
+		// on Linux/Mac, where these paths already look the way `include`
+		// expects.
+		variables.themeDir = "/bxApp" & toVirtualPath( arguments.themeDir )
 		variables.basePath = len( trim( arguments.basePath ) ) ? arguments.basePath : "/"
-		variables.moduleAssetsDir = "/bxApp" & computeModuleAssetsDir()
+		variables.moduleAssetsDir = "/bxApp" & toVirtualPath( computeModuleAssetsDir() )
 		variables.versions = arguments.versions
 		variables.currentVersion = arguments.currentVersion
 		variables.locales = arguments.locales

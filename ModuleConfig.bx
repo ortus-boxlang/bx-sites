@@ -137,13 +137,29 @@ class {
 		//    discovery), and overriding it clobbers that. A distinct,
 		//    non-colliding prefix avoids that collision entirely.
 		//
-		// "/bxApp" -> "/" (the real OS root) lets any existing absolute
-		// path resolve correctly by prefixing it with "/bxApp" at the
-		// `include` call site (`"/bxApp" & functionsPath`, etc.) - no
-		// relative-path math needed, and it works uniformly whether that
-		// absolute path is under a real project's docs/theme folders or a
-		// throwaway temp directory a test spec created.
-		getBoxRuntime().getConfiguration().registerMapping( "/bxApp", "/" )
+		// "/bxApp" -> the real OS root lets any existing absolute path
+		// resolve correctly by prefixing it with "/bxApp" at the `include`
+		// call site (`"/bxApp" & functionsPath`, etc.) - no relative-path
+		// math needed, and it works uniformly whether that absolute path
+		// is under a real project's docs/theme folders, this module's own
+		// bundled resources, or a throwaway temp directory a test spec
+		// created (all three need this - see FunctionsLoader.bx's/
+		// ThemeRenderer.bx's own comments at their `include` call sites).
+		//
+		// A bare literal "/" is only the OS root on Linux/Mac - Windows has
+		// no single filesystem root (each drive has its own, e.g. "C:\"),
+		// so this computes the root of whatever drive the process' own
+		// working directory lives on instead, the same `user.dir` system
+		// property `resolveProjectRoot()` below already reads. This covers
+		// every real-world case (project files, this module's own install,
+		// and the OS temp directory a test spec uses are all overwhelmingly
+		// on that same drive) short of a project deliberately spanning
+		// multiple drives or a UNC network path, which falls back to "/"
+		// (Linux/Mac's actual root, wrong on Windows) rather than guessing.
+		var cwd = getSystemSetting( "user.dir", "" )
+		var driveLetterMatch = reFind( "^[A-Za-z]:", cwd )
+		var osRoot = driveLetterMatch > 0 ? left( cwd, 2 ) & chr( 92 ) : "/"
+		getBoxRuntime().getConfiguration().registerMapping( "/bxApp", osRoot )
 	}
 
 	/**

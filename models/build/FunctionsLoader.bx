@@ -98,10 +98,17 @@ class {
 		// mapping, not the real OS filesystem - ModuleConfig.bx's own
 		// `onLoad()` registers "/bxApp" as a mapping onto the real OS root
 		// once, at module activation, so prefixing this already-absolute
-		// path with it resolves to the exact same real file.
+		// path with it resolves to the exact same real file. On Windows,
+		// functionsPath looks like "C:\project\docs\functions.bxs" (a
+		// drive letter, backslashes) rather than a leading "/" - stripping
+		// a leading drive letter and converting backslashes to forward
+		// slashes first (both no-ops on Linux/Mac, where this path already
+		// looks the way `include` expects) turns it into the same
+		// "/bxApp"-relative virtual path either way.
 		var before = structKeyArray( variables )
 		try {
-			include "/bxApp" & functionsPath
+			var virtualPath = functionsPath.reReplace( "^[A-Za-z]:", "" ).replace( chr( 92 ), "/", "all" )
+			include "/bxApp" & virtualPath
 		} catch ( any e ) {
 			throw(
 				type    : "BxSites.InvalidFunctions",
