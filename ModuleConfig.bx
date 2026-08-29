@@ -156,9 +156,17 @@ class {
 		// on that same drive) short of a project deliberately spanning
 		// multiple drives or a UNC network path, which falls back to "/"
 		// (Linux/Mac's actual root, wrong on Windows) rather than guessing.
+		//
+		// Deliberately no regex BIF (reFind/reReplace) here - `onLoad()`
+		// runs during module activation, itself part of BoxRuntime's own
+		// startup sequence, before the runtime's regex-pattern cache
+		// exists yet ("Cache [bxRegex] does not exist" - confirmed the
+		// hard way). A plain character check works identically and has no
+		// such ordering dependency; regex is safe again everywhere else in
+		// this codebase, which only ever runs after startup completes.
 		var cwd = getSystemSetting( "user.dir", "" )
-		var driveLetterMatch = reFind( "^[A-Za-z]:", cwd )
-		var osRoot = driveLetterMatch > 0 ? left( cwd, 2 ) & chr( 92 ) : "/"
+		var looksLikeWindowsDrive = len( cwd ) >= 2 && cwd.mid( 2, 1 ) == ":"
+		var osRoot = looksLikeWindowsDrive ? left( cwd, 2 ) & chr( 92 ) : "/"
 		getBoxRuntime().getConfiguration().registerMapping( "/bxApp", osRoot )
 	}
 
