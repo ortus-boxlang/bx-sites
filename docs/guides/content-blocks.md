@@ -464,3 +464,57 @@ same preference automatically on load (handy for sharing a direct link to
 "the Pro version of this page"), and a project's own theme override can
 call `window.bxSitesSetPreference( key, value )` directly to drive it from
 custom UI instead.
+
+## Loop and conditional (data-driven)
+
+`::: for` and `::: if` render their own content against [reusable
+data](data-files.md) - a `docs/data/*.yaml`/`.json` file's own value,
+addressed by dotted path. Unlike every block above, these two take a bare
+expression instead of `key="value"` attributes - deliberately narrow, the
+same dotted-path-only philosophy `{{ }}` itself already uses (no
+comparison operators in this first version):
+
+```markdown title="Example" linenums="1"
+::: for member, idx in data.team
+{{ idx }}. **{{ member.name }}** - {{ member.role }}
+:::
+```
+
+::: for member, idx in data.team
+{{ idx }}. **{{ member.name }}** - {{ member.role }}
+:::
+
+`::: for <item>, <index> in <dotted.path>` binds `<item>`/`<index>` the
+same way BoxLang's own two-variable `for` loop does for whatever the path
+resolves to - item + 1-based index for an array (as above), or key + value
+for a struct, the identical syntax either way:
+
+```markdown title="Example" linenums="1"
+::: for name, enabled in data.flags
+- {{ name }}: {{ enabled }}
+:::
+```
+
+::: for name, enabled in data.flags
+- {{ name }}: {{ enabled }}
+:::
+
+`::: if <dotted.path>` renders its content only when the resolved value is
+truthy - an empty array/struct/string, `0` and `false` all count as
+falsy:
+
+```markdown title="Example" linenums="1"
+::: if data.flags.betaBanner
+Beta features are enabled on this build.
+:::
+```
+
+::: if data.flags.betaBanner
+Beta features are enabled on this build.
+:::
+
+Both bodies can contain ordinary Markdown and even other content blocks,
+nested exactly like any block above. See [Data Files: Consuming
+data](data-files.md#consuming-data) for the full loop/conditional story,
+including the two other ways to work with `data.*` - a theme override, or
+a magic function.

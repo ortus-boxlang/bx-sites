@@ -198,6 +198,24 @@ class {
 	}
 
 	/**
+	 * Public counterpart to the private `lookupPath()` used internally by
+	 * `{{ }}` resolution - returns the raw, untouched value at a dotted path
+	 * (an array/struct/whatever, not string-coerced the way a `{{ }}` token
+	 * embedded in prose resolves to). `DirectiveBlockProcessor.bx`'s
+	 * `::: for`/`::: if` directives are the one caller today - resolving
+	 * `::: for item, idx in data.products`'s own `data.products` needs the
+	 * real array to loop over, not a stringified copy of it.
+	 *
+	 * @path Dotted path, e.g. "data.products"
+	 * @vars The struct to walk - same shape `resolve()`'s own `vars` param takes
+	 *
+	 * @return { found: boolean, value: any }
+	 */
+	struct function lookupValue( required string path, required struct vars ) {
+		return lookupPath( arguments.path, arguments.vars )
+	}
+
+	/**
 	 * @name The matched `$name` call target, dollar sign included
 	 * @rawArgs The call's raw, unparsed argument list text (may be empty)
 	 */

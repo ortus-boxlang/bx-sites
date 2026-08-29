@@ -140,6 +140,21 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "<!doctype html>" );
 			} );
 
+			it( "binds data bare into a project theme/ override, readable as variables.data (or bare data)", function() {
+				var root = newProjectRoot();
+				directoryCreate( root & "/theme", true, true );
+				fileWrite( root & "/theme/layout.bxm", "<bx:output>#variables.data.products.name#</bx:output>" );
+				fileWrite( root & "/theme/page.bxm", "<bx:output>#variables.page.contentHtml#</bx:output>" );
+				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+
+				var page = { title : "My Page", contentHtml : "<p>Hello</p>" };
+				var data = { products : { name : "Widget" } };
+
+				var html = renderer.renderPage( page, [], { name : "My Site" }, themeDir, "/", [], "Latest", [], "", "ltr", {}, data );
+
+				expect( html ).toInclude( "Widget" );
+			} );
+
 			it( "renders a page through every built-in theme without error", function() {
 				var root = newProjectRoot();
 				var page = { title : "My Page", contentHtml : "<p>Hello World</p>" };
