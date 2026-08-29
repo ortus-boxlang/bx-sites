@@ -235,9 +235,18 @@ class {
 		}
 		variables.nav = arguments.nav
 		variables.siteConfig = arguments.config
-		variables.themeDir = arguments.themeDir
+		// `include` treats a leading "/" as relative to a registered mapping,
+		// not the real OS filesystem - ModuleConfig.bx's own `onLoad()`
+		// registers "/bxApp" as a mapping onto the real OS root once, at
+		// module activation. Prefixing both of these here (rather than at
+		// each individual `<bx:include template="...">` call site inside
+		// layout.bxm/page.bxm/icons.bxm/etc.) fixes every nested theme
+		// include across all built-in themes with zero per-theme changes,
+		// since these two variables are the only thing any theme ever
+		// builds an include path from.
+		variables.themeDir = "/bxApp" & arguments.themeDir
 		variables.basePath = len( trim( arguments.basePath ) ) ? arguments.basePath : "/"
-		variables.moduleAssetsDir = computeModuleAssetsDir()
+		variables.moduleAssetsDir = "/bxApp" & computeModuleAssetsDir()
 		variables.versions = arguments.versions
 		variables.currentVersion = arguments.currentVersion
 		variables.locales = arguments.locales
@@ -259,16 +268,12 @@ class {
 			variables[ fnName ] = arguments.functions[ fnName ]
 		}
 
-		// `include` treats a leading "/" as relative to a registered
-		// mapping, not the real OS filesystem - ModuleConfig.bx's own
-		// `onLoad()` registers "/" itself as a mapping onto the real OS
-		// root once, at module activation, so this plain absolute-path
-		// include (and every theme's own nested `<bx:include template=
-		// "#variables.themeDir#/page.bxm">`/`.../icons.bxm">`) resolves
-		// exactly the way it looks like it should.
+		// variables.themeDir was already prefixed with "/bxApp" above, so
+		// this resolves through the mapping ModuleConfig.bx's onLoad()
+		// registers - see the comment there for why.
 		var html = ""
 		bx:savecontent variable="html" {
-			include arguments.themeDir & "/layout.bxm"
+			include variables.themeDir & "/layout.bxm"
 		}
 		return html
 	}

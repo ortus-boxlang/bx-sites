@@ -96,12 +96,12 @@ class {
 
 		// `include` treats a leading "/" as relative to a registered
 		// mapping, not the real OS filesystem - ModuleConfig.bx's own
-		// `onLoad()` registers "/" itself as a mapping onto the real OS
-		// root once, at module activation, so this plain absolute-path
-		// include resolves exactly the way it looks like it should.
+		// `onLoad()` registers "/bxApp" as a mapping onto the real OS root
+		// once, at module activation, so prefixing this already-absolute
+		// path with it resolves to the exact same real file.
 		var before = structKeyArray( variables )
 		try {
-			include functionsPath
+			include "/bxApp" & functionsPath
 		} catch ( any e ) {
 			throw(
 				type    : "BxSites.InvalidFunctions",
