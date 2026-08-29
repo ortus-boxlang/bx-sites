@@ -94,37 +94,32 @@ class {
 			return {}
 		}
 
+		// `include` doesn't resolve a bare OS absolute path against the real
+		// filesystem - BoxLang coerces an absolute-looking path against
+		// registered mappings/webroot instead, so `include functionsPath`
+		// here intermittently threw "The template path [...] could not be
+		// found" for this exact path, moments after `fileExists()` just
+		// above had already confirmed it was there - not a race, just an
+		// unsupported way to reach an arbitrary, runtime-computed
+		// directory. Registering a mapping for `dir` and including through
+		// that instead is the supported path (see
+		// `getBoxRuntime().getConfiguration().registerMapping()` - BoxLang
+		// docs' "Includes"/"Mappings & Class Resolution" pages). A fixed,
+		// module-namespaced prefix is safe to re-register on every call
+		// (cheap, and this class's own singleton is reused with a
+		// potentially different `docsDir` across `bxSites serve` rebuilds) -
+		// it simply repoints the same prefix at the current `dir`.
+		var mappingPrefix = "/bxsitesFunctionsInclude"
+		getBoxRuntime().getConfiguration().registerMapping( mappingPrefix, dir )
+
 		var before = structKeyArray( variables )
-		// A handful of CI runs (observed on the "Publish Docs" theme-gallery
-		// matrix - fresh JVM every job) have hit `include` throwing "The
-		// template path [...] could not be found" for this exact path on
-		// the very first `include` the whole build performs, immediately
-		// after `fileExists()` just above confirmed it - a cold-start race
-		// in BoxLang's own template resolver, not a real missing file. A
-		// bounded retry, gated on that specific message *and* a fresh
-		// `fileExists()` recheck (so a genuinely deleted-mid-build file
-		// still fails fast), rides out the race without masking a real
-		// compile error in a project's own functions.bxs, which throws
-		// immediately on its first (and only) attempt.
-		var maxAttempts = 3
-		var attempt = 0
-		while ( true ) {
-			attempt++
-			try {
-				include functionsPath
-				break
-			} catch ( any e ) {
-				var isTransientNotFound = attempt < maxAttempts
-					&& findNoCase( "could not be found", e.message )
-					&& fileExists( functionsPath )
-				if ( !isTransientNotFound ) {
-					throw(
-						type    : "BxSites.InvalidFunctions",
-						message : "functions.bxs at [#functionsPath#] failed to load: #e.message#"
-					)
-				}
-				sleep( 150 * attempt )
-			}
+		try {
+			include "#mappingPrefix#/functions.bxs"
+		} catch ( any e ) {
+			throw(
+				type    : "BxSites.InvalidFunctions",
+				message : "functions.bxs at [#functionsPath#] failed to load: #e.message#"
+			)
 		}
 
 		var fns = {}
