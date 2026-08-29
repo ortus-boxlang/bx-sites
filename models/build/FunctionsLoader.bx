@@ -94,9 +94,26 @@ class {
 			return {}
 		}
 
+		// `include` doesn't resolve a bare OS absolute path against the real
+		// filesystem - BoxLang coerces an absolute-looking path against
+		// registered mappings/webroot instead, so `include functionsPath`
+		// here failed with "The template path [...] could not be found" for
+		// this exact path, moments after `fileExists()` just above had
+		// already confirmed it was there - not a race, just an unsupported
+		// way to reach an arbitrary, runtime-computed directory. Registering
+		// a mapping for `dir` and including through that instead is the
+		// supported path (see `getBoxRuntime().getConfiguration().registerMapping()` -
+		// BoxLang docs' "Includes"/"Mappings & Class Resolution" pages). A
+		// fixed, module-namespaced prefix is safe to re-register on every
+		// call (cheap, and this class's own singleton is reused with a
+		// potentially different `docsDir` across `bxSites serve` rebuilds) -
+		// it simply repoints the same prefix at the current `dir`.
+		var mappingPrefix = "/bxsitesFunctionsInclude"
+		getBoxRuntime().getConfiguration().registerMapping( mappingPrefix, dir )
+
 		var before = structKeyArray( variables )
 		try {
-			include functionsPath
+			include "#mappingPrefix#/functions.bxs"
 		} catch ( any e ) {
 			throw(
 				type    : "BxSites.InvalidFunctions",
