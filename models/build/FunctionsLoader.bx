@@ -95,13 +95,36 @@ class {
 		}
 
 		var before = structKeyArray( variables )
-		try {
-			include functionsPath
-		} catch ( any e ) {
-			throw(
-				type    : "BxSites.InvalidFunctions",
-				message : "functions.bxs at [#functionsPath#] failed to load: #e.message#"
-			)
+		// A handful of CI runs (observed on the "Publish Docs" theme-gallery
+		// matrix - fresh JVM every job) have hit `include` throwing "The
+		// template path [...] could not be found" for this exact path on
+		// the very first `include` the whole build performs, immediately
+		// after `fileExists()` just above confirmed it - a cold-start race
+		// in BoxLang's own template resolver, not a real missing file. A
+		// bounded retry, gated on that specific message *and* a fresh
+		// `fileExists()` recheck (so a genuinely deleted-mid-build file
+		// still fails fast), rides out the race without masking a real
+		// compile error in a project's own functions.bxs, which throws
+		// immediately on its first (and only) attempt.
+		var maxAttempts = 3
+		var attempt = 0
+		while ( true ) {
+			attempt++
+			try {
+				include functionsPath
+				break
+			} catch ( any e ) {
+				var isTransientNotFound = attempt < maxAttempts
+					&& findNoCase( "could not be found", e.message )
+					&& fileExists( functionsPath )
+				if ( !isTransientNotFound ) {
+					throw(
+						type    : "BxSites.InvalidFunctions",
+						message : "functions.bxs at [#functionsPath#] failed to load: #e.message#"
+					)
+				}
+				sleep( 150 * attempt )
+			}
 		}
 
 		var fns = {}
