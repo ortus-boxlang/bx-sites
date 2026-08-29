@@ -1046,6 +1046,40 @@ functions" alongside `variables` - callable the same way, as
 `{{ $name(...) }}`. See
 [Variables & Magic Functions](guides/variables-and-functions.md#magic-functions).
 
+## `cloud`
+
+Where [`bxSites publish`](cli-reference.md#publish) ships the built site -
+`cloud.siteId` (the target site's UUID in
+[bxSites Cloud](guides/deployment.md#the-publish-command)) and
+`cloud.apiUrl` (that instance's base URL, e.g. `https://cloud.bxsites.app`,
+or a self-hosted URL). Both default to `""` - not configuring this block at
+all is fine for every other verb; `publish` is the only one that needs it,
+and fails with a clear error if either is missing.
+
+**No API token field lives here, ever** - `publish` reads it from the
+`BXSITES_CLOUD_TOKEN` environment variable (or an explicit `--token` flag),
+never from `bxsites.yaml`, so this file always stays safe to commit.
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    cloud:
+      siteId: "3f2b1c9a-....-....-............"
+      apiUrl: "https://cloud.bxsites.app"
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    {
+    	"cloud": {
+    		"siteId": "3f2b1c9a-....-....-............",
+    		"apiUrl": "https://cloud.bxsites.app"
+    	}
+    }
+    ```
+
+See [Deployment](guides/deployment.md#the-publish-command) for the full
+`publish` workflow.
+
 ## Versioning
 
 Versioned docs are convention over configuration - there's no `bxsites.yaml`

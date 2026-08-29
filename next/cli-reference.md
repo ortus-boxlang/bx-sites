@@ -162,6 +162,33 @@ target starts/finishes, instead of just the final one-line summary.
 See [Deployment](guides/deployment.md) for every target's own config
 shape and a real `deployments/*.json` example for each.
 
+## `publish`
+
+Builds the site, then ships it to [bxSites Cloud](guides/deployment.md#the-publish-command)
+- the hosting SaaS this module targets - over its publish API. Distinct
+from `deploy`'s pluggable targets (which ship to infrastructure *you* own):
+`publish` always ships to bxSites Cloud, identified by
+[`cloud.siteId`/`cloud.apiUrl`](configuration.md#cloud) in `bxsites.yaml`.
+
+```bash title="Usage"
+bxSites publish [--token=<token>]
+```
+
+- `--token` - a bxSites Cloud API token, overriding the `BXSITES_CLOUD_TOKEN`
+  environment variable when both are set. One of the two is required - the
+  token is never read from `bxsites.yaml` itself.
+
+On success, prints the published site's live URL. Fails with a clear error
+(not a raw exception) when: the `[cloud]` block is missing/incomplete in
+`bxsites.yaml`; no token is available from either source; the token is
+rejected (401/403 - check it's valid and has access to this site); the
+configured `[cloud.siteId]` isn't found (404 - check it's correct); or any
+other server/network failure (the actual HTTP status and response body are
+included).
+
+See [Deployment](guides/deployment.md#the-publish-command) for the full
+setup.
+
 ## `package`
 
 Builds the site, then zips it into a single distributable archive - a
