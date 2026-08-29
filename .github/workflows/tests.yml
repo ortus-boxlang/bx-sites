@@ -41,7 +41,7 @@ jobs:
         run: boxlang --version
 
       - name: Install Dev Dependencies
-        run: box install id=testbox --verbose --nosave
+        run: box install --verbose --nosave
 
       - name: Test Module
         run: |
