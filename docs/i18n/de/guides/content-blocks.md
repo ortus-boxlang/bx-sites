@@ -479,3 +479,95 @@ Präferenz (praktisch, um einen direkten Link zu "der Pro-Version dieser
 Seite" zu teilen), und das eigene Theme-Override eines Projekts kann
 stattdessen direkt `window.bxSitesSetPreference( key, value )` aufrufen,
 um es von einer eigenen UI aus zu steuern.
+
+## Schleife und Bedingung (datengesteuert)
+
+`::: for` und `::: if` rendern ihren eigenen Inhalt gegen
+[wiederverwendbare Daten](data-files.md) - den eigenen Wert einer
+`docs/data/*.yaml`-/`.json`-Datei, adressiert per Punktpfad. Anders als
+jeder Block oben nehmen diese beiden einen bloßen Ausdruck statt
+`key="value"`-Attributen entgegen - bewusst schmal, dieselbe
+Nur-Punktpfad-Philosophie, die `{{ }}` selbst bereits verwendet (keine
+Vergleichsoperatoren in dieser ersten Version):
+
+```markdown title="Beispiel" linenums="1"
+::: for member, idx in data.team
+{{ idx }}. **{{ member.name }}** - {{ member.role }}
+:::
+```
+
+::: for member, idx in data.team
+{{ idx }}. **{{ member.name }}** - {{ member.role }}
+:::
+
+`::: for <item>, <index> in <dotted.path>` bindet `<item>`/`<index>` auf
+dieselbe Weise, wie es BoxLangs eigene Zwei-Variablen-`for`-Schleife für
+das tut, worauf der Pfad auflöst - Element + 1-basierter Index für ein
+Array (wie oben), oder Schlüssel + Wert für ein Struct, in beiden Fällen
+dieselbe Syntax:
+
+```markdown title="Beispiel" linenums="1"
+::: for name, enabled in data.flags
+- {{ name }}: {{ enabled }}
+:::
+```
+
+::: for name, enabled in data.flags
+- {{ name }}: {{ enabled }}
+:::
+
+`::: if <dotted.path>` rendert seinen Inhalt nur, wenn der aufgelöste
+Wert truthy ist - ein leeres Array/Struct/String, `0` und `false` gelten
+allesamt als falsy:
+
+```markdown title="Beispiel" linenums="1"
+::: if data.flags.betaBanner
+Beta features are enabled on this build.
+:::
+```
+
+::: if data.flags.betaBanner
+Beta-Features sind in diesem Build aktiviert.
+:::
+
+Verkette `::: elseif <dotted.path>` (beliebig viele davon) und ein
+abschließendes, bloßes `::: else` nach einem `::: if` für echte
+`if`/`elseif`/`else`-Semantik - die erste truthy Bedingung gewinnt,
+`::: else` (ohne eigene Bedingung) fängt auf, was übrig bleibt, und eine
+Bedingung nach der gewinnenden wird nie überhaupt aufgelöst, sodass ein
+fehlerhafter `::: elseif`-Pfad den Build erst dann bricht, wenn sein
+eigener Zweig tatsächlich erreicht wird. Die gesamte Kette schließt mit
+**einem** abschließenden `:::` - `::: elseif`/`::: else` markieren
+selbst, wo der vorherige Zweig endet, es ist also kein `:::` vor jedem
+von ihnen nötig:
+
+```markdown title="Beispiel" linenums="1"
+::: if data.flags.darkModeDefault
+Dark mode is on by default.
+::: elseif data.flags.betaBanner
+Beta features are enabled, though dark mode isn't on by default.
+::: else
+Nothing special about this build.
+:::
+```
+
+::: if data.flags.darkModeDefault
+Der Dunkelmodus ist standardmäßig aktiviert.
+::: elseif data.flags.betaBanner
+Beta-Features sind aktiviert, auch wenn der Dunkelmodus nicht
+standardmäßig an ist.
+::: else
+Nichts Besonderes an diesem Build.
+:::
+
+Ein `:::` vor einem `::: elseif`/`::: else` funktioniert ebenfalls
+weiterhin, falls du lieber jeden Zweig explizit schließen möchtest -
+beide Formen werden identisch geparst.
+
+Beide Inhalte können gewöhnliches Markdown und sogar weitere
+Content-Blöcke enthalten - einschließlich eines weiteren
+`::: for`/`::: if`, genauso verschachtelt wie jeder Block oben. Siehe
+[Datendateien: Daten verwenden](data-files.md#daten-verwenden) für die
+vollständige Schleifen-/Bedingungs-Geschichte, einschließlich der zwei
+weiteren Wege, mit `data.*` zu arbeiten - ein Theme-Override, oder eine
+magische Funktion.
