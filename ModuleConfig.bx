@@ -117,8 +117,8 @@ class {
 		// genuinely exists, unless that leading "/" resolves through a
 		// mapping.
 		//
-		// Two earlier attempts at fixing this both failed, for two
-		// different reasons worth recording:
+		// Earlier attempts at fixing this failed for reasons worth
+		// recording:
 		//  - Registering a fresh mapping inline, inside the same method
 		//    call that immediately used it (FunctionsLoader.bx's own
 		//    load(), ThemeRenderer.bx's own renderPage()), still threw
@@ -134,40 +134,53 @@ class {
 		//    hitting the original include failure. BoxLang appears to
 		//    already rely on an implicit "/" mapping (used at least by
 		//    TestBox's own `directory:"tests.specs"` dot-notation bundle
-		//    discovery), and overriding it clobbers that. A distinct,
-		//    non-colliding prefix avoids that collision entirely.
+		//    discovery), and overriding it clobbers that.
+		//  - Computing a synthetic OS-root/drive-root target as the ONLY
+		//    mapping was solving the wrong problem as the primary
+		//    mechanism - bxSites only ever needs to reach files under
+		//    wherever it was actually invoked from, never the whole
+		//    filesystem.
 		//
-		// "/bxApp" -> the real OS root lets any existing absolute path
-		// resolve correctly by prefixing it with "/bxApp" at the `include`
-		// call site (`"/bxApp" & functionsPath`, etc.) - no relative-path
-		// math needed, and it works uniformly whether that absolute path
-		// is under a real project's docs/theme folders, this module's own
-		// bundled resources, or a throwaway temp directory a test spec
-		// created (all three need this - see FunctionsLoader.bx's/
-		// ThemeRenderer.bx's own comments at their `include` call sites).
+		// "/bxApp" -> `server.cli.executionPath` (the directory `boxlang
+		// bxSites ...` was actually invoked from - BoxLang's own `server`
+		// scope, populated in CLI mode; `server.java.executionPath` is the
+		// documented fallback for non-CLI execution) gives every absolute
+		// path under a real project (docs/, theme/, functions.bxs, ...) a
+		// working, tidy invocation-relative mapping for the common case -
+		// bxSites' own real usage never reaches outside wherever it was
+		// run from.
 		//
-		// A bare literal "/" is only the OS root on Linux/Mac - Windows has
-		// no single filesystem root (each drive has its own, e.g. "C:\"),
-		// so this computes the root of whatever drive the process' own
-		// working directory lives on instead, the same `user.dir` system
-		// property `resolveProjectRoot()` below already reads. This covers
-		// every real-world case (project files, this module's own install,
-		// and the OS temp directory a test spec uses are all overwhelmingly
-		// on that same drive) short of a project deliberately spanning
-		// multiple drives or a UNC network path, which falls back to "/"
-		// (Linux/Mac's actual root, wrong on Windows) rather than guessing.
+		// This module's own bundled resources (built-in themes/assets)
+		// don't need this mapping at all - BoxLang automatically registers
+		// `/bxmodules/bxsites` pointing at this module's own root for
+		// every module (from `this.mapping = "bxsites"` above), so
+		// ThemeRenderer.bx's `builtInThemesDir()`/`computeModuleAssetsDir()`
+		// use that directly instead.
 		//
-		// Deliberately no regex BIF (reFind/reReplace) here - `onLoad()`
-		// runs during module activation, itself part of BoxRuntime's own
-		// startup sequence, before the runtime's regex-pattern cache
-		// exists yet ("Cache [bxRegex] does not exist" - confirmed the
-		// hard way). A plain character check works identically and has no
-		// such ordering dependency; regex is safe again everywhere else in
-		// this codebase, which only ever runs after startup completes.
-		var cwd = getSystemSetting( "user.dir", "" )
+		// "/bxAppRoot" is a second, narrower-purpose mapping onto the OS/
+		// drive root, for the one case "/bxApp" can't reach: a path
+		// outside the invocation directory entirely. Real bxSites usage
+		// never needs it - only this module's own test suite does, whose
+		// specs create throwaway fixture directories via
+		// `createTempDirectory()` (the OS temp directory, unrelated to
+		// wherever `./testbox/run` itself was invoked from) and then call
+		// FunctionsLoader.bx's/ThemeRenderer.bx's own `include`-driving
+		// methods directly, bypassing `main()` (and its `/bxApp` mapping)
+		// entirely. See FunctionsLoader.bx's/ThemeRenderer.bx's own
+		// `toVirtualPath()` for exactly when each mapping is used.
+		//
+		// Deliberately no regex BIF (reFind/reReplace) anywhere in this
+		// method - `onLoad()` runs during module activation, itself part
+		// of BoxRuntime's own startup sequence, before the runtime's
+		// regex-pattern cache exists yet ("Cache [bxRegex] does not exist"
+		// - confirmed the hard way). Regex is safe again everywhere else
+		// in this codebase, which only ever runs after startup completes.
+		var cwd = server.boxlang.cliMode ? server.cli.executionPath : server.java.executionPath
+		getBoxRuntime().getConfiguration().registerMapping( "/bxApp", cwd )
+
 		var looksLikeWindowsDrive = len( cwd ) >= 2 && cwd.mid( 2, 1 ) == ":"
 		var osRoot = looksLikeWindowsDrive ? left( cwd, 2 ) & char( 92 ) : "/"
-		getBoxRuntime().getConfiguration().registerMapping( "/bxApp", osRoot )
+		getBoxRuntime().getConfiguration().registerMapping( "/bxAppRoot", osRoot )
 	}
 
 	/**

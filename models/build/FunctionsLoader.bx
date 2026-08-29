@@ -96,19 +96,14 @@ class {
 
 		// `include` treats a leading "/" as relative to a registered
 		// mapping, not the real OS filesystem - ModuleConfig.bx's own
-		// `onLoad()` registers "/bxApp" as a mapping onto the real OS root
-		// once, at module activation, so prefixing this already-absolute
-		// path with it resolves to the exact same real file. On Windows,
-		// functionsPath looks like "C:\project\docs\functions.bxs" (a
-		// drive letter, backslashes) rather than a leading "/" - stripping
-		// a leading drive letter and converting backslashes to forward
-		// slashes first (both no-ops on Linux/Mac, where this path already
-		// looks the way `include` expects) turns it into the same
-		// "/bxApp"-relative virtual path either way.
+		// `onLoad()` registers "/bxApp" (onto the directory `bxSites` was
+		// invoked from) once, at module activation, so an include path
+		// made of "/bxApp/" plus this already-absolute path's own offset
+		// from that same directory resolves to the exact same real file.
+		// toVirtualPath() below computes that offset.
 		var before = structKeyArray( variables )
 		try {
-			var virtualPath = functionsPath.reReplace( "^[A-Za-z]:", "" ).replace( char( 92 ), "/", "all" )
-			include "/bxApp" & virtualPath
+			include toVirtualPath( functionsPath )
 		} catch ( any e ) {
 			throw(
 				type    : "BxSites.InvalidFunctions",
@@ -142,6 +137,45 @@ class {
 				structDelete( variables, newKey )
 			}
 		}
+	}
+
+	/**
+	 * Turns a real, OS-native absolute path into a virtual path `include`
+	 * can resolve, via one of the two mappings ModuleConfig.bx's
+	 * `onLoad()` registers:
+	 *  - `/bxApp`, onto the directory `bxSites` was invoked from
+	 *    (`server.cli.executionPath`) - used whenever the given path is
+	 *    under that directory (bxSites' own real usage always is), as a
+	 *    tidy invocation-relative path.
+	 *  - `/bxAppRoot`, onto the OS/drive root - the fallback for a path
+	 *    outside that directory entirely (an explicit `--projectRoot`
+	 *    elsewhere, or - only relevant to this module's own test suite -
+	 *    a temp directory a spec created for its own throwaway fixtures,
+	 *    since specs call this class directly, bypassing `main()` and its
+	 *    `/bxApp` mapping).
+	 * Either way, Windows' backslashes are normalized to forward slashes
+	 * along the way - a no-op on Linux/Mac, where paths already look the
+	 * way `include` expects.
+	 *
+	 * @path A real absolute filesystem path, in whatever format the current OS gives it
+	 *
+	 * @return A virtual path prefixed with whichever of the two mappings applies
+	 */
+	private string function toVirtualPath( required string path ) {
+		var cwd = server.boxlang.cliMode ? server.cli.executionPath : server.java.executionPath
+		var normalizedCwd = cwd.replace( char( 92 ), "/", "all" ).reReplace( "[\/]+$", "" )
+		var normalizedPath = arguments.path.replace( char( 92 ), "/", "all" )
+
+		if ( normalizedPath.left( len( normalizedCwd ) ) == normalizedCwd ) {
+			// +2 (not +1) skips both the matched cwd prefix and the path
+			// separator right after it - remaining is never negative here,
+			// since functionsPath is always some real subdirectory deeper
+			// than cwd itself, never cwd exactly.
+			var remaining = len( normalizedPath ) - len( normalizedCwd ) - 1
+			return remaining > 0 ? "/bxApp/" & normalizedPath.mid( len( normalizedCwd ) + 2, remaining ) : "/bxApp"
+		}
+
+		return "/bxAppRoot" & normalizedPath.reReplace( "^[A-Za-z]:", "" )
 	}
 
 }

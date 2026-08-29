@@ -94,7 +94,9 @@ class {
 	 * @themeName The configured theme name (bxsites.json's `theme.name`)
 	 * @projectRoot Absolute path to the project root
 	 *
-	 * @return Absolute path to the resolved theme's own folder
+	 * @return Absolute path to the resolved theme's own folder - or, for
+	 *         a built-in theme (case 3 above), the virtual `/bxmodules/bxsites/...`
+	 *         path builtInThemesDir() returns instead (see its own docblock)
 	 */
 	string function resolveThemeDir( required string themeName, required string projectRoot ) {
 		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
@@ -145,40 +147,68 @@ class {
 	}
 
 	/**
-	 * Absolute path to this module's own bundled themes folder, found
-	 * relative to this class's own file rather than any module-registration
-	 * mapping, so it resolves the same way whether the module is fully
-	 * activated or just loaded for a unit test.
+	 * Virtual path to this module's own bundled themes folder, via
+	 * BoxLang's own automatic per-module mapping - `this.mapping =
+	 * "bxsites"` in ModuleConfig.bx makes BoxLang register `/bxmodules/bxsites`
+	 * pointing at this module's own root automatically, for every module,
+	 * no `registerMapping()` of our own needed. Resolves the same way
+	 * whether the module is fully activated or just loaded for a unit
+	 * test, and cross-platform by construction (it's a virtual path, not
+	 * an OS one).
 	 */
 	string function builtInThemesDir() {
-		return getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]models[\/]build[\/]?$", "" ) & "/resources/themes"
+		return "/bxmodules/bxsites/resources/themes"
 	}
 
 	/**
-	 * Absolute path to this module's own shared (theme-independent) assets
+	 * Virtual path to this module's own shared (theme-independent) assets
 	 * folder - exposed to every theme at render time as `variables.moduleAssetsDir`,
 	 * so a theme can `<bx:include template="#variables.moduleAssetsDir#/icons.bxm">`
 	 * for the shared repo/social icon partial rather than duplicating it.
+	 * Same automatic `/bxmodules/bxsites` module mapping as `builtInThemesDir()`
+	 * above - see its own docblock for why.
 	 */
 	private string function computeModuleAssetsDir() {
-		return getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]models[\/]build[\/]?$", "" ) & "/resources/assets"
+		return "/bxmodules/bxsites/resources/assets"
 	}
 
 	/**
-	 * Turns a real, OS-native absolute path into the form `include`/
-	 * `<bx:include template="...">` expects once prefixed with the
-	 * `/bxApp` mapping ModuleConfig.bx's `onLoad()` registers - a no-op on
-	 * Linux/Mac (already forward-slash, no drive letter), but on Windows a
-	 * path like `C:\project\theme` has a drive letter and backslashes
-	 * that `/bxApp` & path would otherwise turn into the nonsensical
-	 * `/bxAppC:\project\theme`.
+	 * Turns a real, OS-native absolute path into a virtual path `include`/
+	 * `<bx:include template="...">` can resolve, via one of the two
+	 * mappings ModuleConfig.bx's `onLoad()` registers:
+	 *  - `/bxApp`, onto the directory `bxSites` was invoked from
+	 *    (`server.cli.executionPath`) - used whenever the given path is
+	 *    under that directory (bxSites' own real usage always is), as a
+	 *    tidy invocation-relative path.
+	 *  - `/bxAppRoot`, onto the OS/drive root - the fallback for a path
+	 *    outside that directory entirely (an explicit `--projectRoot`
+	 *    elsewhere, or - only relevant to this module's own test suite -
+	 *    a temp directory a spec created for its own throwaway fixtures,
+	 *    since specs call this class directly, bypassing `main()` and its
+	 *    `/bxApp` mapping).
+	 * Either way, Windows' backslashes are normalized to forward slashes
+	 * along the way - a no-op on Linux/Mac, where paths already look the
+	 * way `include` expects.
 	 *
 	 * @path A real absolute filesystem path, in whatever format the current OS gives it
 	 *
-	 * @return The same path, forward-slashed and drive-letter-stripped, ready to prefix with `/bxApp`
+	 * @return A virtual path prefixed with whichever of the two mappings applies
 	 */
 	private string function toVirtualPath( required string path ) {
-		return arguments.path.reReplace( "^[A-Za-z]:", "" ).replace( char( 92 ), "/", "all" )
+		var cwd = server.boxlang.cliMode ? server.cli.executionPath : server.java.executionPath
+		var normalizedCwd = cwd.replace( char( 92 ), "/", "all" ).reReplace( "[\/]+$", "" )
+		var normalizedPath = arguments.path.replace( char( 92 ), "/", "all" )
+
+		if ( normalizedPath.left( len( normalizedCwd ) ) == normalizedCwd ) {
+			// +2 (not +1) skips both the matched cwd prefix and the path
+			// separator right after it - remaining is never negative here,
+			// since a themeDir is always some real subdirectory deeper
+			// than cwd itself, never cwd exactly.
+			var remaining = len( normalizedPath ) - len( normalizedCwd ) - 1
+			return remaining > 0 ? "/bxApp/" & normalizedPath.mid( len( normalizedCwd ) + 2, remaining ) : "/bxApp"
+		}
+
+		return "/bxAppRoot" & normalizedPath.reReplace( "^[A-Za-z]:", "" )
 	}
 
 	/**
@@ -252,21 +282,27 @@ class {
 		}
 		variables.nav = arguments.nav
 		variables.siteConfig = arguments.config
-		// `include` treats a leading "/" as relative to a registered mapping,
-		// not the real OS filesystem - ModuleConfig.bx's own `onLoad()`
-		// registers "/bxApp" as a mapping onto the real OS root once, at
-		// module activation. Prefixing both of these here (rather than at
-		// each individual `<bx:include template="...">` call site inside
-		// layout.bxm/page.bxm/icons.bxm/etc.) fixes every nested theme
-		// include across all built-in themes with zero per-theme changes,
-		// since these two variables are the only thing any theme ever
-		// builds an include path from. toVirtualPath() below handles
-		// Windows' drive-letter/backslash absolute-path format - a no-op
-		// on Linux/Mac, where these paths already look the way `include`
-		// expects.
-		variables.themeDir = "/bxApp" & toVirtualPath( arguments.themeDir )
+		// `include` treats a leading "/" as relative to a registered
+		// mapping, not the real OS filesystem. Resolving both of these
+		// here (rather than at each individual `<bx:include template="...">`
+		// call site inside layout.bxm/page.bxm/icons.bxm/etc.) fixes every
+		// nested theme include across all built-in themes with zero
+		// per-theme changes, since these two variables are the only thing
+		// any theme ever builds an include path from.
+		//
+		// arguments.themeDir is either this module's own builtInThemesDir()
+		// - already a virtual `/bxmodules/bxsites/...` path (BoxLang's own
+		// automatic per-module mapping - see that function's own docblock)
+		// and used as-is - or a real OS absolute path under a project's
+		// own theme/ override, which toVirtualPath() below turns into a
+		// working virtual path instead. moduleAssetsDir is always this
+		// module's own bundled asset folder, so it's always the former
+		// case.
+		variables.themeDir = arguments.themeDir.left( 11 ) == "/bxmodules/"
+			? arguments.themeDir
+			: toVirtualPath( arguments.themeDir )
 		variables.basePath = len( trim( arguments.basePath ) ) ? arguments.basePath : "/"
-		variables.moduleAssetsDir = "/bxApp" & toVirtualPath( computeModuleAssetsDir() )
+		variables.moduleAssetsDir = computeModuleAssetsDir()
 		variables.versions = arguments.versions
 		variables.currentVersion = arguments.currentVersion
 		variables.locales = arguments.locales
@@ -288,9 +324,10 @@ class {
 			variables[ fnName ] = arguments.functions[ fnName ]
 		}
 
-		// variables.themeDir was already prefixed with "/bxApp" above, so
-		// this resolves through the mapping ModuleConfig.bx's onLoad()
-		// registers - see the comment there for why.
+		// variables.themeDir was already turned into a working virtual
+		// path above (either "/bxmodules/bxsites/..." or "/bxApp/..."),
+		// so this resolves through one of BoxLang's own module mapping or
+		// the one ModuleConfig.bx's onLoad() registers.
 		var html = ""
 		bx:savecontent variable="html" {
 			include variables.themeDir & "/layout.bxm"
