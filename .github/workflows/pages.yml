@@ -2,8 +2,14 @@ name: Publish Docs
 
 # Builds this repository's own dogfooded docs (docs/ + bxsites.yaml at the
 # repo root - see readme.md) with bx-sites itself, and publishes site/ to
-# GitHub Pages - main is the only branch that deploys, straight to the site
-# root. The docs are versioned now (bxsites.yaml's own `versions.default` -
+# GitHub Pages - development is the only branch that deploys, straight to
+# the site root, since it's this project's active branch working toward the
+# 1.0.0 release (there is no `main` yet). Once development is stable enough
+# to cut the real 1.0.0 release, it merges into a new `main` branch - at
+# that point `main` becomes the frozen 1.0.x line and this workflow's
+# trigger/deploy condition below should move from `development` to `main`,
+# with `development` free to start the next version's work. The docs are
+# versioned now (bxsites.yaml's own `versions.default` -
 # see docs/guides/versioning.md), so a released version publishes at the
 # root and the plain docs/ tree (whatever's being written toward the next
 # release) publishes at /next/ instead - no separate branch-based preview
@@ -29,7 +35,7 @@ name: Publish Docs
 on:
   push:
     branches:
-      - main
+      - development
     paths:
       - "docs/**"
       - "bxsites.yaml"
@@ -47,9 +53,10 @@ on:
 permissions:
   contents: write
 
-# Only main ever pushes here now, but keyed by ref_name still so a manual
-# workflow_dispatch run from another branch (build-only - see the deploy
-# steps' own `if: github.ref_name == 'main'`) never queues behind main's.
+# Only development ever pushes here now, but keyed by ref_name still so a
+# manual workflow_dispatch run from another branch (build-only - see the
+# deploy step's own `if: github.ref_name == 'development'`) never queues
+# behind development's.
 concurrency:
   group: "pages-${{ github.ref_name }}"
   cancel-in-progress: false
@@ -171,7 +178,7 @@ jobs:
           done
 
       - name: Deploy to the site root
-        if: github.ref_name == 'main'
+        if: github.ref_name == 'development'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
