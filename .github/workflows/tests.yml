@@ -41,7 +41,17 @@ jobs:
         run: boxlang --version
 
       - name: Install Dev Dependencies
-        run: box install id=testbox --verbose --nosave
+        run: |
+          # Pinned to the bleeding-edge channel rather than the default
+          # latest-stable release - testbox@be picks up
+          # Ortus-Solutions/TestBox#201's fix for a real TestBox bug
+          # (server.cli.parsed.positionals leaking the runner's own
+          # invocation path as argv[0], misread as a bundle argument -
+          # ClassNotFoundBoxLangException on BoxLangRunner.bx) before that
+          # fix has made it into a tagged stable release. Revert to the
+          # unpinned `id=testbox` once a stable TestBox release carrying
+          # the fix ships.
+          box install id=testbox@be --verbose --nosave
 
       - name: Test Module
         run: |
