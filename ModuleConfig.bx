@@ -109,7 +109,19 @@ class {
 	 * Called by the ModuleService on module activation
 	 */
 	function onLoad(){
-
+		// `include` treats a leading "/" as relative to a registered
+		// mapping, not the real OS filesystem, on current BoxLang engine
+		// builds - a bare absolute path like `include functionsPath` (or
+		// any `<bx:include template="...">`/theme .bxm using
+		// variables.themeDir/variables.moduleAssetsDir the same way) fails
+		// with "The template path [...] could not be found" even though
+		// the file genuinely exists, unless that leading "/" resolves
+		// through a mapping. Registering "/" itself as a mapping onto the
+		// real OS root makes every existing absolute-path include across
+		// this whole codebase (FunctionsLoader.bx, ThemeRenderer.bx, and
+		// any theme's own .bxm files) resolve exactly as before, with no
+		// call-site changes needed anywhere.
+		getBoxRuntime().getConfiguration().registerMapping( "/", "/" )
 	}
 
 	/**

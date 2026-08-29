@@ -259,23 +259,16 @@ class {
 			variables[ fnName ] = arguments.functions[ fnName ]
 		}
 
-		// Same fix as FunctionsLoader.bx's own `load()` - a bare `include`
-		// statement doesn't resolve an OS absolute path against the real
-		// filesystem (BoxLang coerces it against registered mappings/webroot
-		// instead), so `include arguments.themeDir & "/layout.bxm"` failed
-		// with "The template path [...] could not be found" for a path this
-		// class's own caller already resolved to a real, existing
-		// directory. Registering a mapping and including through that
-		// instead is the supported path. Cheap to re-register on every call
-		// (this method runs once per page) - a fixed, module-namespaced
-		// prefix simply gets repointed at the current page's own themeDir,
-		// which never actually changes mid-build (one theme per build).
-		var themeMappingPrefix = "/bxsitesThemeInclude"
-		getBoxRuntime().getConfiguration().registerMapping( themeMappingPrefix, arguments.themeDir )
-
+		// `include` treats a leading "/" as relative to a registered
+		// mapping, not the real OS filesystem - ModuleConfig.bx's own
+		// `onLoad()` registers "/" itself as a mapping onto the real OS
+		// root once, at module activation, so this plain absolute-path
+		// include (and every theme's own nested `<bx:include template=
+		// "#variables.themeDir#/page.bxm">`/`.../icons.bxm">`) resolves
+		// exactly the way it looks like it should.
 		var html = ""
 		bx:savecontent variable="html" {
-			include "#themeMappingPrefix#/layout.bxm"
+			include arguments.themeDir & "/layout.bxm"
 		}
 		return html
 	}
