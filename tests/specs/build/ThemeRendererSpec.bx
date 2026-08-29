@@ -143,8 +143,8 @@ class extends="testbox.system.BaseSpec" {
 			it( "binds data bare into a project theme/ override, readable as variables.data (or bare data)", function() {
 				var root = newProjectRoot();
 				directoryCreate( root & "/theme", true, true );
-				fileWrite( root & "/theme/layout.bxm", "<bx:output>#variables.data.products.name#</bx:output>" );
-				fileWrite( root & "/theme/page.bxm", "<bx:output>#variables.page.contentHtml#</bx:output>" );
+				fileWrite( root & "/theme/layout.bxm", "<bx:output>##variables.data.products.name##</bx:output>" );
+				fileWrite( root & "/theme/page.bxm", "<bx:output>##variables.page.contentHtml##</bx:output>" );
 				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
 
 				var page = { title : "My Page", contentHtml : "<p>Hello</p>" };
