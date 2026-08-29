@@ -183,6 +183,7 @@ called from `{{ }}` in Markdown or bare from a theme override:
 | `locales` | Language switcher entries - `[ { code, label, url, dir, flag } ]` |
 | `currentLocale` | Which `locales` entry's code is being rendered right now |
 | `currentLocaleDir` | `"ltr"`/`"rtl"` for the current locale |
+| `data` | This project's own [data files](data-files.md) - `docs/data/*.yaml`/`.json`, one key per file - `{}` when the project has none |
 
 ```bx title="docs/functions.bxs"
 function $sitename() {
@@ -349,10 +350,11 @@ rendering scope, right alongside the built-in `variables.page`/
 `functions.bxs` function sharing a name with one of those already has one:
 avoid `page`, `nav`, `siteConfig`, `themeDir`, `basePath`,
 `moduleAssetsDir`, `versions`, `currentVersion`, `locales`,
-`currentLocale`, `currentLocaleDir`, `strings`, `requiredFiles` and
-`stringsResolver` for a private helper's own name (a `$`-prefixed magic
-function can never collide with any of these, since none of them start
-with `$`).
+`currentLocale`, `currentLocaleDir`, `strings`, `requiredFiles`,
+`stringsResolver` and `data` for a private helper's own name (a
+`$`-prefixed magic function can never collide with any of these, since
+none of them start with `$`). See [Data Files: Scope](data-files.md#scope)
+for `data`'s own reserved-name note.
 
 ## Errors
 

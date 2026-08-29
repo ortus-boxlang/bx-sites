@@ -193,6 +193,25 @@ still gets wrapped in `.bxsites-table-wrap` and the [responsive
 scroll/sticky header](tables.md#responsive-scroll-and-a-sticky-header)
 treatment automatically, same as any table bx-markdown itself renders.
 
+Hand-typing `rows` works, but it's still content living inside a JS object
+literal, edited nowhere near the rest of your reusable data. If the same
+rows also belong in a plain table elsewhere, or in several pages,
+[reusable data](data-files.md) plus `$jsonAttr()` feeds real
+`docs/data/*.yaml`/`.json` content into `x-data` instead of a hand-typed
+array:
+
+```markdown title="Server-fed rows" linenums="1"
+<div x-data="{ query: '', rows: {{ $jsonAttr(data.providers) }} }">
+  ...
+</div>
+```
+
+Same `x-for`/`x-model`/sort logic as above, just backed by
+`docs/data/providers.yaml` instead of a literal baked into the page - see
+[Data Files: Consuming data](data-files.md#consuming-data) for the full
+recipe (and why it needs `encodeForHtmlAttribute()`, not just
+`jsonSerialize()`, to land safely inside a `"..."`-quoted attribute).
+
 ## `x-data` fundamentals, if you're new to Alpine
 
 `x-data` declares a scope's own reactive state as a plain JS object;
