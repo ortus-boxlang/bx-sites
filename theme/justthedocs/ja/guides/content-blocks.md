@@ -459,3 +459,88 @@ HTML 内にレンダリングされます - クライアント側で非表示に
 Pro 版」への直接リンクを共有するのに便利です）。また、プロジェクト自身の
 テーマオーバーライドから `window.bxSitesSetPreference( key, value )` を
 直接呼び出して、独自の UI から制御することもできます。
+
+## ループと条件分岐（データ駆動）
+
+`::: for` と `::: if` は、[再利用可能なデータ](data-files.md) -
+`docs/data/*.yaml`/`.json` ファイル自身の値を、ドット区切りのパスで指定した
+もの - に対して、自身のコンテンツをレンダリングします。上記のすべての
+ブロックとは異なり、この2つは `key="value"` 属性の代わりに裸の式を取ります -
+意図的に狭く絞られており、`{{ }}` 自身がすでに採用しているのと同じドット
+区切りパスのみという哲学です（この最初のバージョンには比較演算子はありません）:
+
+```markdown title="Example" linenums="1"
+::: for member, idx in data.team
+{{ idx }}. **{{ member.name }}** - {{ member.role }}
+:::
+```
+
+::: for member, idx in data.team
+{{ idx }}. **{{ member.name }}** - {{ member.role }}
+:::
+
+`::: for <item>, <index> in <dotted.path>` は、パスが何に解決されるかに
+応じて、BoxLang 自身の2変数版 `for` ループと同じ方法で `<item>`/`<index>`
+をバインドします - 配列なら要素 + 1始まりのインデックス（上記の通り）、
+構造体ならキー + 値というように、どちらの場合も同じ構文です:
+
+```markdown title="Example" linenums="1"
+::: for name, enabled in data.flags
+- {{ name }}: {{ enabled }}
+:::
+```
+
+::: for name, enabled in data.flags
+- {{ name }}: {{ enabled }}
+:::
+
+`::: if <dotted.path>` は、解決された値が真の場合にのみそのコンテンツを
+レンダリングします - 空の配列/構造体/文字列、`0`、`false` はすべて偽として
+扱われます:
+
+```markdown title="Example" linenums="1"
+::: if data.flags.betaBanner
+このビルドではベータ機能が有効になっています。
+:::
+```
+
+::: if data.flags.betaBanner
+このビルドではベータ機能が有効になっています。
+:::
+
+`::: if` の後に `::: elseif <dotted.path>`（何個でも）を連ね、末尾に裸の
+`::: else` を置くことで、本物の `if`/`elseif`/`else` セマンティクスになります -
+最初に真になった条件が採用され、`::: else`（それ自身は条件を持ちません）は
+残りすべてを引き受けます。採用された分岐より後の条件は解決すらされないため、
+タイプミスした `::: elseif` のパスは、実際にその分岐に到達したときにだけ
+ビルドを壊します。連鎖全体は**1つの**末尾の `:::` で閉じます -
+`::: elseif`/`::: else` 自体が直前の分岐の終わりを示すため、それぞれの手前に
+`:::` を書く必要はありません:
+
+```markdown title="Example" linenums="1"
+::: if data.flags.darkModeDefault
+ダークモードがデフォルトで有効になっています。
+::: elseif data.flags.betaBanner
+ベータ機能は有効になっていますが、ダークモードはデフォルトでは有効ではありません。
+::: else
+このビルドには特に変わったところはありません。
+:::
+```
+
+::: if data.flags.darkModeDefault
+ダークモードがデフォルトで有効になっています。
+::: elseif data.flags.betaBanner
+ベータ機能は有効になっていますが、ダークモードはデフォルトでは有効ではありません。
+::: else
+このビルドには特に変わったところはありません。
+:::
+
+各分岐を明示的に閉じたい場合は、`::: elseif`/`::: else` の前に `:::` を
+置いても問題なく動作します - どちらの書き方でも同じようにパースされます。
+
+どちらの本文にも、通常の Markdown や、別の `::: for`/`::: if` を含む他の
+コンテンツブロックを入れることができます - 上記のどのブロックともまったく
+同じようにネストできます。ループ/条件分岐の全体像 - `data.*` を扱う他の
+2つの方法（テーマオーバーライド、またはマジック関数）も含む - については、
+[データファイル: データを利用する](data-files.md#consuming-data) を
+参照してください。

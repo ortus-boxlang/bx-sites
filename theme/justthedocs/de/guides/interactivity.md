@@ -202,6 +202,27 @@ erhält automatisch die Behandlung für [responsives Scrollen und eine
 fixierte Kopfzeile](tables.md#responsives-scrollen-und-eine-fixierte-kopfzeile),
 genau wie jede Tabelle, die bx-markdown selbst rendert.
 
+Rows von Hand einzutippen funktioniert, aber es ist weiterhin Inhalt, der
+innerhalb eines JS-Objektliterals lebt, bearbeitet weit weg vom Rest
+deiner wiederverwendbaren Daten. Gehören dieselben Zeilen auch anderswo
+in eine gewöhnliche Tabelle, oder auf mehrere Seiten, speist
+[wiederverwendbare Daten](data-files.md) plus `$jsonAttr()` echten
+`docs/data/*.yaml`-/`.json`-Inhalt in `x-data` ein, statt eines
+handgetippten Arrays:
+
+```markdown title="Server-fed rows" linenums="1"
+<div x-data="{ query: '', rows: {{ $jsonAttr(data.providers) }} }">
+  ...
+</div>
+```
+
+Dieselbe `x-for`-/`x-model`-/Sortierlogik wie oben, nur gestützt durch
+`docs/data/providers.yaml` statt eines in die Seite gebackenen Literals -
+siehe [Datendateien: Daten verwenden](data-files.md#daten-verwenden) für
+das vollständige Rezept (und warum es `encodeForHtmlAttribute()` braucht,
+nicht nur `jsonSerialize()`, um sicher innerhalb eines mit `"..."`
+gequoteten Attributs zu landen).
+
 ## `x-data`-Grundlagen, falls du neu bei Alpine bist
 
 `x-data` deklariert den eigenen reaktiven Zustand eines Bereichs als

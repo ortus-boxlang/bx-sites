@@ -936,6 +936,12 @@ Welcome to {{ company }}! We build {{ product.name }}.
 「マジック関数」を追加します - `{{ $name(...) }}` として同じ方法で呼び出せます。
 [変数とマジック関数](guides/variables-and-functions.md#マジック関数) を参照してください。
 
+`docs/data/*.yaml`/`.yml`/`.json` フォルダ（これも専用の設定キーはありません）は、
+`{{ data.<file>.<key> }}` として参照できる、構造化された、ネスト/配列形式の
+データを追加します - `variables` 自身のフラットな形にうまく収まらないもの
+（チームの名簿、料金表など）向けです。[データファイル](guides/data-files.md)
+を参照してください。
+
 ## バージョニング
 
 バージョン管理されたドキュメントは設定より規約を重視します - `bxsites.yaml` に

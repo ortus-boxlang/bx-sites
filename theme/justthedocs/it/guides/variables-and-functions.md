@@ -161,6 +161,7 @@ Markdown oppure allo stato puro da una sovrascrittura di tema:
 | `locales` | Le voci del selettore di lingua - `[ { code, label, url, dir, flag } ]` |
 | `currentLocale` | Il codice di quale voce di `locales` viene renderizzato in questo momento |
 | `currentLocaleDir` | `"ltr"`/`"rtl"` per il locale corrente |
+| `data` | I [file di dati](data-files.md) propri di questo progetto - `docs/data/*.yaml`/`.json`, una chiave per ogni file - `{}` quando il progetto non ne ha |
 
 ```bx title="docs/functions.bxs"
 function $sitename() {
@@ -340,10 +341,12 @@ integrati che ogni tema già legge. Questo significa che una funzione di
 `functions.bxs` che condivide un nome con uno di questi ne ha già uno:
 evita `page`, `nav`, `siteConfig`, `themeDir`, `basePath`,
 `moduleAssetsDir`, `versions`, `currentVersion`, `locales`,
-`currentLocale`, `currentLocaleDir`, `strings`, `requiredFiles` e
-`stringsResolver` come nome proprio di un helper privato (una funzione
-magica con prefisso `$` non può mai entrare in collisione con nessuno di
-questi, dato che nessuno di essi inizia con `$`).
+`currentLocale`, `currentLocaleDir`, `strings`, `requiredFiles`,
+`stringsResolver` e `data` come nome proprio di un helper privato (una
+funzione magica con prefisso `$` non può mai entrare in collisione con
+nessuno di questi, dato che nessuno di essi inizia con `$`). Vedi
+[File di dati: Ambito](data-files.md#scope) per la nota sui nomi
+riservati propria di `data`.
 
 ## Errori
 

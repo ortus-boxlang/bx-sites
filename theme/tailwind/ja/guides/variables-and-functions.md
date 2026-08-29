@@ -151,6 +151,7 @@ function $price( amount ) {
 | `locales` | 言語切り替えのエントリ - `[ { code, label, url, dir, flag } ]` |
 | `currentLocale` | 現在レンダリングされているのが `locales` のどのエントリのコードか |
 | `currentLocaleDir` | 現在のロケールに対する `"ltr"`/`"rtl"` |
+| `data` | このプロジェクト自身の[データファイル](data-files.md) - `docs/data/*.yaml`/`.json`、ファイルごとに1つのキー - プロジェクトが1つも持たない場合は `{}` |
 
 ```bx title="docs/functions.bxs"
 function $sitename() {
@@ -316,9 +317,10 @@ GitBook 自身の Select/Rating テーブル列に最も近いものです:
 プライベートヘルパー自身の名前として `page`、`nav`、`siteConfig`、`themeDir`、
 `basePath`、`moduleAssetsDir`、`versions`、`currentVersion`、`locales`、
 `currentLocale`、`currentLocaleDir`、`strings`、`requiredFiles`、
-`stringsResolver` は避けてください（`$` 付きの
+`stringsResolver`、`data` は避けてください（`$` 付きの
 マジック関数がこれらのいずれかと衝突することは決してありません。これらはどれも
-`$` から始まらないためです）。
+`$` から始まらないためです）。`data` 自身の予約名についての注記は、
+[データファイル: スコープ](data-files.md#scope) を参照してください。
 
 ## エラー
 

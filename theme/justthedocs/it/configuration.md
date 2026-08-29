@@ -914,6 +914,13 @@ per convenzione, come `docs/nav.json`/`docs/blog/authors.yml`) aggiunge
 stesso modo, come `{{ $name(...) }}`. Vedi
 [Variabili e Funzioni Magiche](guides/variables-and-functions.md#funzioni-magiche).
 
+Una cartella `docs/data/*.yaml`/`.yml`/`.json` (anch'essa senza una
+propria chiave di configurazione) aggiunge dati strutturati,
+annidati/a forma di array - raggiungibili come
+`{{ data.<file>.<key> }}` - per tutto ciò a cui la forma piatta propria
+di `variables` non si adatta bene (un elenco del team, una tabella dei
+prezzi). Vedi [File di dati](guides/data-files.md).
+
 ## Versionamento
 
 I documenti versionati sono convenzione più che configurazione - non c'è

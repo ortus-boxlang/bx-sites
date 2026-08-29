@@ -161,6 +161,7 @@ prefijo desde una sobrescritura de tema:
 | `locales` | Entradas del selector de idioma - `[ { code, label, url, dir, flag } ]` |
 | `currentLocale` | El código de qué entrada de `locales` se está renderizando en este momento |
 | `currentLocaleDir` | `"ltr"`/`"rtl"` para el idioma actual |
+| `data` | Los propios [archivos de datos](data-files.md) de este proyecto - `docs/data/*.yaml`/`.json`, una clave por archivo - `{}` cuando el proyecto no tiene ninguno |
 
 ```bx title="docs/functions.bxs"
 function $sitename() {
@@ -337,9 +338,11 @@ cualquier tema. Eso significa que una función de `functions.bxs` que
 comparta nombre con uno de esos ya tiene uno propio: evita `page`, `nav`,
 `siteConfig`, `themeDir`, `basePath`, `moduleAssetsDir`, `versions`,
 `currentVersion`, `locales`, `currentLocale`, `currentLocaleDir`,
-`strings`, `requiredFiles` y `stringsResolver` como nombre propio para un
-ayudante privado (una función mágica con prefijo `$` nunca puede chocar
-con ninguno de estos, ya que ninguno de ellos empieza con `$`).
+`strings`, `requiredFiles`, `stringsResolver` y `data` como nombre propio
+para un ayudante privado (una función mágica con prefijo `$` nunca puede
+chocar con ninguno de estos, ya que ninguno de ellos empieza con `$`).
+Consulta [Archivos de Datos: Ámbito](data-files.md#ámbito) para la nota
+sobre el propio nombre reservado de `data`.
 
 ## Errores
 

@@ -476,3 +476,94 @@ preferenza al caricamento (comodo per condividere un link diretto verso
 di un progetto può chiamare direttamente
 `window.bxSitesSetPreference( key, value )` per pilotarla da
 un'interfaccia personalizzata invece.
+
+## Loop e condizionale (basati sui dati)
+
+`::: for` e `::: if` renderizzano il proprio contenuto rispetto ai
+[dati riutilizzabili](data-files.md) - il valore proprio di un file
+`docs/data/*.yaml`/`.json`, indirizzato per percorso puntato. A differenza
+di ogni blocco sopra, questi due accettano un'espressione nuda invece di
+attributi `key="value"` - deliberatamente ristretti, la stessa filosofia
+basata solo sul percorso puntato che `{{ }}` stesso già usa (nessun
+operatore di confronto in questa prima versione):
+
+```markdown title="Esempio" linenums="1"
+::: for member, idx in data.team
+{{ idx }}. **{{ member.name }}** - {{ member.role }}
+:::
+```
+
+::: for member, idx in data.team
+{{ idx }}. **{{ member.name }}** - {{ member.role }}
+:::
+
+`::: for <item>, <index> in <dotted.path>` associa `<item>`/`<index>`
+nello stesso modo in cui lo fa il loop `for` a due variabili proprio di
+BoxLang, qualunque cosa risolva il percorso - elemento + indice a base 1
+per un array (come sopra), oppure chiave + valore per uno struct, con la
+sintassi identica in entrambi i casi:
+
+```markdown title="Esempio" linenums="1"
+::: for name, enabled in data.flags
+- {{ name }}: {{ enabled }}
+:::
+```
+
+::: for name, enabled in data.flags
+- {{ name }}: {{ enabled }}
+:::
+
+`::: if <dotted.path>` renderizza il proprio contenuto solo quando il
+valore risolto è veritiero - un array/struct/stringa vuoto, `0` e `false`
+contano tutti come falsi:
+
+```markdown title="Esempio" linenums="1"
+::: if data.flags.betaBanner
+Beta features are enabled on this build.
+:::
+```
+
+::: if data.flags.betaBanner
+Le funzionalità beta sono attive in questa build.
+:::
+
+Concatena `::: elseif <dotted.path>` (un numero qualsiasi) e un
+`::: else` nudo finale dopo un `::: if` per una vera semantica
+`if`/`elseif`/`else` - la prima condizione veritiera vince, `::: else`
+(senza una propria condizione) cattura tutto ciò che resta, e una
+condizione successiva a quella vincente non viene nemmeno risolta, quindi
+un percorso `::: elseif` con un errore di battitura interrompe il build
+solo una volta che il proprio ramo viene effettivamente raggiunto.
+L'intera catena si chiude con **un solo** `:::` finale - `::: elseif`/
+`::: else` stessi segnano dove finisce il ramo precedente, quindi non
+serve alcun `:::` prima di ciascuno di essi:
+
+```markdown title="Esempio" linenums="1"
+::: if data.flags.darkModeDefault
+Dark mode is on by default.
+::: elseif data.flags.betaBanner
+Beta features are enabled, though dark mode isn't on by default.
+::: else
+Nothing special about this build.
+:::
+```
+
+::: if data.flags.darkModeDefault
+La modalità scura è attiva per impostazione predefinita.
+::: elseif data.flags.betaBanner
+Le funzionalità beta sono attive, anche se la modalità scura non è attiva
+per impostazione predefinita.
+::: else
+Niente di speciale in questa build.
+:::
+
+Un `:::` prima di un `::: elseif`/`::: else` funziona comunque, se
+preferisci chiudere esplicitamente ogni ramo - entrambe le forme vengono
+analizzate in modo identico.
+
+Entrambi i corpi possono contenere normale Markdown e persino altri
+blocchi di contenuto - incluso un altro `::: for`/`::: if`, annidato
+esattamente come qualsiasi blocco sopra. Vedi
+[File di dati: Usare i dati](data-files.md#consuming-data) per il quadro
+completo di loop/condizionali, inclusi gli altri due modi per lavorare
+con `data.*` - una sovrascrittura di tema, oppure una funzione magica.

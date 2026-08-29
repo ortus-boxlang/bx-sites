@@ -203,6 +203,27 @@ automáticamente el tratamiento de [desplazamiento
 responsivo/encabezado fijo](tables.md#desplazamiento-responsivo-y-un-encabezado-fijo),
 igual que cualquier tabla que el propio bx-markdown renderiza.
 
+Escribir `rows` a mano funciona, pero sigue siendo contenido que vive
+dentro de un literal de objeto JS, editado lejos del resto de tus datos
+reutilizables. Si esas mismas filas también pertenecen a una tabla simple
+en otro lugar, o a varias páginas, [datos reutilizables](data-files.md)
+más `$jsonAttr()` alimentan `x-data` con contenido real de
+`docs/data/*.yaml`/`.json` en lugar de un array escrito a mano:
+
+```markdown title="Server-fed rows" linenums="1"
+<div x-data="{ query: '', rows: {{ $jsonAttr(data.providers) }} }">
+  ...
+</div>
+```
+
+La misma lógica de `x-for`/`x-model`/orden que arriba, solo que respaldada
+por `docs/data/providers.yaml` en lugar de un literal incrustado en la
+página - consulta
+[Archivos de Datos: Consumir datos](data-files.md#consumir-datos) para la
+receta completa (y por qué necesita `encodeForHtmlAttribute()`, no solo
+`jsonSerialize()`, para asentarse con seguridad dentro de un atributo
+entre comillas `"..."`).
+
 ## Fundamentos de `x-data`, si eres nuevo en Alpine
 
 `x-data` declara el propio estado reactivo de un ámbito como un objeto

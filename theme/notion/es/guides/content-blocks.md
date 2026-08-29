@@ -480,3 +480,95 @@ versión Pro de esta página"), y la sobrescritura de tema propia de un
 proyecto puede llamar directamente a
 `window.bxSitesSetPreference( key, value )` para controlarlo desde una
 UI personalizada en su lugar.
+
+## Bucle y condicional (basado en datos)
+
+`::: for` y `::: if` renderizan su propio contenido contra [datos
+reutilizables](data-files.md) - el propio valor de un archivo
+`docs/data/*.yaml`/`.json`, direccionado por ruta con puntos. A
+diferencia de todos los bloques anteriores, estos dos toman una
+expresión simple en lugar de atributos `key="value"` - deliberadamente
+estrecho, la misma filosofía de solo-ruta-con-puntos que ya usa el
+propio `{{ }}` (sin operadores de comparación en esta primera versión):
+
+```markdown title="Example" linenums="1"
+::: for member, idx in data.team
+{{ idx }}. **{{ member.name }}** - {{ member.role }}
+:::
+```
+
+::: for member, idx in data.team
+{{ idx }}. **{{ member.name }}** - {{ member.role }}
+:::
+
+`::: for <item>, <index> in <dotted.path>` enlaza `<item>`/`<index>` de
+la misma forma en que ya lo hace el propio bucle `for` de dos variables
+de BoxLang para lo que sea que resuelva la ruta - elemento + índice en
+base 1 para un array (como arriba), o clave + valor para un struct, con
+la sintaxis idéntica en ambos casos:
+
+```markdown title="Example" linenums="1"
+::: for name, enabled in data.flags
+- {{ name }}: {{ enabled }}
+:::
+```
+
+::: for name, enabled in data.flags
+- {{ name }}: {{ enabled }}
+:::
+
+`::: if <dotted.path>` renderiza su contenido solo cuando el valor
+resuelto es verdadero - un array/struct/cadena vacío, `0` y `false`
+cuentan todos como falso:
+
+```markdown title="Example" linenums="1"
+::: if data.flags.betaBanner
+Beta features are enabled on this build.
+:::
+```
+
+::: if data.flags.betaBanner
+Las funciones beta están activadas en esta compilación.
+:::
+
+Encadena `::: elseif <dotted.path>` (cualquier cantidad de ellos) y un
+`::: else` final sin condición después de un `::: if` para una semántica
+real de `if`/`elseif`/`else` - la primera condición verdadera gana,
+`::: else` (sin condición propia) captura lo que quede, y una condición
+posterior a la ganadora nunca llega siquiera a resolverse, así que una
+ruta de `::: elseif` con un error tipográfico solo rompe la construcción
+una vez que realmente se alcanza su propia rama. Toda la cadena se cierra
+con **un** `:::` final - `::: elseif`/`::: else` marcan por sí mismos
+dónde termina la rama anterior, así que no hace falta ningún `:::` antes
+de cada uno:
+
+```markdown title="Example" linenums="1"
+::: if data.flags.darkModeDefault
+Dark mode is on by default.
+::: elseif data.flags.betaBanner
+Beta features are enabled, though dark mode isn't on by default.
+::: else
+Nothing special about this build.
+:::
+```
+
+::: if data.flags.darkModeDefault
+El modo oscuro está activado por defecto.
+::: elseif data.flags.betaBanner
+Las funciones beta están activadas, aunque el modo oscuro no lo está por
+defecto.
+::: else
+Nada especial en esta compilación.
+:::
+
+Un `:::` antes de un `::: elseif`/`::: else` también sigue funcionando,
+si prefieres cerrar cada rama explícitamente - ambas formas se analizan
+de forma idéntica.
+
+Ambos cuerpos pueden contener Markdown normal e incluso otros bloques de
+contenido - incluyendo otro `::: for`/`::: if`, anidado exactamente igual
+que cualquier bloque anterior. Consulta
+[Archivos de Datos: Consumir datos](data-files.md#consumir-datos) para
+la historia completa de bucle/condicional, incluyendo las otras dos
+formas de trabajar con `data.*` - una sobrescritura de tema, o una
+función mágica.

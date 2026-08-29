@@ -1012,6 +1012,13 @@ convención, igual que `docs/nav.json`/`docs/blog/authors.yml`) añade
 misma forma, como `{{ $name(...) }}`. Consulta
 [Variables y Funciones Mágicas](guides/variables-and-functions.md#funciones-mágicas).
 
+Una carpeta `docs/data/*.yaml`/`.yml`/`.json` (tampoco con clave de
+configuración propia) añade datos estructurados, con forma anidada/de
+array - accesibles como `{{ data.<archivo>.<clave> }}` - para cualquier
+cosa que no encaje bien en la propia forma plana de `variables` (una
+lista de equipo, una tabla de precios). Consulta
+[Archivos de Datos](guides/data-files.md).
+
 ## Versionado
 
 Los documentos versionados son cuestión de convención, no de

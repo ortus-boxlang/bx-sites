@@ -159,6 +159,7 @@ Theme-Override aufgerufen wird:
 | `locales` | Einträge des Sprachumschalters - `[ { code, label, url, dir, flag } ]` |
 | `currentLocale` | Der Code welchen `locales`-Eintrags gerade gerendert wird |
 | `currentLocaleDir` | `"ltr"`/`"rtl"` für die aktuelle Locale |
+| `data` | Die eigenen [Datendateien](data-files.md) dieses Projekts - `docs/data/*.yaml`/`.json`, ein Schlüssel pro Datei - `{}`, wenn das Projekt keine hat |
 
 ```bx title="docs/functions.bxs"
 function $sitename() {
@@ -335,9 +336,11 @@ bereits liest. Das bedeutet, dass eine Funktion aus `functions.bxs`, die
 sich einen Namen mit einem davon teilt, bereits einen hat: vermeide `page`,
 `nav`, `siteConfig`, `themeDir`, `basePath`, `moduleAssetsDir`, `versions`,
 `currentVersion`, `locales`, `currentLocale`, `currentLocaleDir`, `strings`,
-`requiredFiles` und `stringsResolver` als eigenen Namen für einen privaten
-Helfer (eine `$`-präfigierte magische Funktion kann mit keinem davon je
-kollidieren, da keiner von ihnen mit `$` beginnt).
+`requiredFiles`, `stringsResolver` und `data` als eigenen Namen für einen
+privaten Helfer (eine `$`-präfigierte magische Funktion kann mit keinem
+davon je kollidieren, da keiner von ihnen mit `$` beginnt). Siehe
+[Datendateien: Geltungsbereich](data-files.md#geltungsbereich) für den
+eigenen Hinweis zum reservierten Namen `data`.
 
 ## Fehler
 

@@ -200,6 +200,26 @@ fissa](tables.md#scorrimento-responsive-e-intestazione-fissa)
 automaticamente, esattamente come qualsiasi tabella renderizzata da
 bx-markdown stesso.
 
+Scrivere `rows` a mano funziona, ma resta comunque contenuto che vive
+dentro un letterale oggetto JS, modificato lontano dal resto dei tuoi
+dati riutilizzabili. Se le stesse righe appartengono anche a una tabella
+normale altrove, o a più pagine, i [dati riutilizzabili](data-files.md)
+più `$jsonAttr()` alimentano `x-data` con vero contenuto
+`docs/data/*.yaml`/`.json` invece di un array scritto a mano:
+
+```markdown title="Righe alimentate dal server" linenums="1"
+<div x-data="{ query: '', rows: {{ $jsonAttr(data.providers) }} }">
+  ...
+</div>
+```
+
+Stessa logica `x-for`/`x-model`/ordinamento di sopra, solo sostenuta da
+`docs/data/providers.yaml` invece che da un letterale incorporato nella
+pagina - vedi [File di dati: Usare i dati](data-files.md#consuming-data)
+per la ricetta completa (e perché serve `encodeForHtmlAttribute()`, non
+solo `jsonSerialize()`, per atterrare in sicurezza dentro un attributo
+tra virgolette `"..."`).
+
 ## Le basi di `x-data`, se sei nuovo ad Alpine
 
 `x-data` dichiara lo stato reattivo proprio di uno scope come un semplice

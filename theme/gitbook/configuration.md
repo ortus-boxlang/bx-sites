@@ -1045,6 +1045,11 @@ functions" alongside `variables` - callable the same way, as
 `{{ $name(...) }}`. See
 [Variables & Magic Functions](guides/variables-and-functions.md#magic-functions).
 
+A `docs/data/*.yaml`/`.yml`/`.json` folder (also no config key of its own)
+adds structured, nested/array-shaped data - reachable as `{{ data.<file>.<key> }}` -
+for anything `variables`' own flat shape doesn't fit well (a team roster,
+a pricing table). See [Data Files](guides/data-files.md).
+
 ## Versioning
 
 Versioned docs are convention over configuration - there's no `bxsites.yaml`

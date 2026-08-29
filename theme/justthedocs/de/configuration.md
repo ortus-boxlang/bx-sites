@@ -1015,6 +1015,12 @@ Konvention, genau wie `docs/nav.json`/`docs/blog/authors.yml`) fügt neben
 Weise, als `{{ $name(...) }}`. Siehe
 [Variablen & Magische Funktionen](guides/variables-and-functions.md#magische-funktionen).
 
+Ein Ordner `docs/data/*.yaml`/`.yml`/`.json` (ebenfalls kein eigener
+Konfigurationsschlüssel) fügt strukturierte, verschachtelte/array-förmige
+Daten hinzu - erreichbar als `{{ data.<file>.<key> }}` - für alles, wofür
+die eigene flache Form von `variables` nicht gut passt (eine Teamliste,
+eine Preistabelle). Siehe [Datendateien](guides/data-files.md).
+
 ## Versionierung
 
 Versionierte Docs sind Convention over Configuration - dafür gibt es

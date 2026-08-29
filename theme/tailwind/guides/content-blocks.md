@@ -464,3 +464,87 @@ same preference automatically on load (handy for sharing a direct link to
 "the Pro version of this page"), and a project's own theme override can
 call `window.bxSitesSetPreference( key, value )` directly to drive it from
 custom UI instead.
+
+## Loop and conditional (data-driven)
+
+`::: for` and `::: if` render their own content against [reusable
+data](data-files.md) - a `docs/data/*.yaml`/`.json` file's own value,
+addressed by dotted path. Unlike every block above, these two take a bare
+expression instead of `key="value"` attributes - deliberately narrow, the
+same dotted-path-only philosophy `{{ }}` itself already uses (no
+comparison operators in this first version):
+
+```markdown title="Example" linenums="1"
+::: for member, idx in data.team
+{{ idx }}. **{{ member.name }}** - {{ member.role }}
+:::
+```
+
+::: for member, idx in data.team
+{{ idx }}. **{{ member.name }}** - {{ member.role }}
+:::
+
+`::: for <item>, <index> in <dotted.path>` binds `<item>`/`<index>` the
+same way BoxLang's own two-variable `for` loop does for whatever the path
+resolves to - item + 1-based index for an array (as above), or key + value
+for a struct, the identical syntax either way:
+
+```markdown title="Example" linenums="1"
+::: for name, enabled in data.flags
+- {{ name }}: {{ enabled }}
+:::
+```
+
+::: for name, enabled in data.flags
+- {{ name }}: {{ enabled }}
+:::
+
+`::: if <dotted.path>` renders its content only when the resolved value is
+truthy - an empty array/struct/string, `0` and `false` all count as
+falsy:
+
+```markdown title="Example" linenums="1"
+::: if data.flags.betaBanner
+Beta features are enabled on this build.
+:::
+```
+
+::: if data.flags.betaBanner
+Beta features are enabled on this build.
+:::
+
+Chain `::: elseif <dotted.path>` (any number of them) and a trailing bare
+`::: else` after a `::: if` for real `if`/`elseif`/`else` semantics - the
+first truthy condition wins, `::: else` (no condition of its own) catches
+whatever's left, and a condition after the winning one is never even
+resolved, so a typo'd `::: elseif` path only breaks the build once its
+own branch is actually reached. The whole chain closes with **one**
+trailing `:::` - `::: elseif`/`::: else` themselves mark where the
+previous branch ends, so there's no `:::` needed before each of them:
+
+```markdown title="Example" linenums="1"
+::: if data.flags.darkModeDefault
+Dark mode is on by default.
+::: elseif data.flags.betaBanner
+Beta features are enabled, though dark mode isn't on by default.
+::: else
+Nothing special about this build.
+:::
+```
+
+::: if data.flags.darkModeDefault
+Dark mode is on by default.
+::: elseif data.flags.betaBanner
+Beta features are enabled, though dark mode isn't on by default.
+::: else
+Nothing special about this build.
+:::
+
+A `:::` before an `::: elseif`/`::: else` still works too, if you'd
+rather close each branch explicitly - both forms parse identically.
+
+Both bodies can contain ordinary Markdown and even other content blocks -
+including another `::: for`/`::: if`, nested exactly like any block above.
+See [Data Files: Consuming data](data-files.md#consuming-data) for the
+full loop/conditional story, including the two other ways to work with
+`data.*` - a theme override, or a magic function.
