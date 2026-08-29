@@ -63,6 +63,11 @@
  * `.bxm` a project's own `theme/` override includes), the same
  * include-scope-absorption trick this class already relies on for
  * `variables.page`/`variables.siteConfig` etc. - see docs/guides/variables-and-functions.md.
+ *
+ * `variables.data` (docs/guides/data-files.md - DataLoader.bx) is a
+ * project's own `docs/data/*.yaml|.yml|.json` files, one top-level key per
+ * file - bound the same bare, include-scope-absorbed way, so `layout.bxm`/
+ * `page.bxm` can read `data.<file>.<key>` directly.
  */
 class {
 
@@ -227,10 +232,11 @@ class {
 	 * @currentLocale The `code` (from `locales`) of the locale being rendered right now - the default locale's own code for an unlocalized build
 	 * @currentLocaleDir `"ltr"`/`"rtl"` - the current locale's own text direction, stamped onto `<html dir="...">`
 	 * @functions FunctionsLoader.load()'s own output (module spec section 8) - each `$`-prefixed magic function bound directly into this scope, bare-callable from `layout.bxm`/`page.bxm`
+	 * @data DataLoader.load()'s own output (docs/guides/data-files.md) - bound bare as `variables.data`, so `layout.bxm`/`page.bxm` (or a project's own `theme/` override) can read `data.<file>.<key>` directly, the same way they already read `page`/`siteConfig`
 	 *
 	 * @return The rendered page HTML
 	 */
-	string function renderPage( required struct page, required array nav, required struct config, required string themeDir, string basePath = "/", array versions = [], string currentVersion = "Latest", array locales = [], string currentLocale = "", string currentLocaleDir = "ltr", struct functions = {} ) {
+	string function renderPage( required struct page, required array nav, required struct config, required string themeDir, string basePath = "/", array versions = [], string currentVersion = "Latest", array locales = [], string currentLocale = "", string currentLocaleDir = "ltr", struct functions = {}, struct data = {} ) {
 		variables.page = arguments.page
 		if ( !variables.page.keyExists( "toc" ) ) {
 			variables.page.toc = []
@@ -309,6 +315,7 @@ class {
 		variables.currentLocale = arguments.currentLocale
 		variables.currentLocaleDir = listFindNoCase( "ltr,rtl", arguments.currentLocaleDir ) ? arguments.currentLocaleDir : "ltr"
 		variables.strings = variables.stringsResolver.resolve( variables.currentLocale, arguments.config.i18n ?: { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] } )
+		variables.data = arguments.data
 
 		// Binds each loaded function (FunctionsLoader.bx - `$`-prefixed magic
 		// functions and their own private, non-`$` helpers alike) directly

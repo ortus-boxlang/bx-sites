@@ -1,0 +1,124 @@
+/**
+ * Loads a project's reusable structured data "by convention" -
+ * `docs/data/*.yaml`/`.yml`/`.json`, one file per top-level key (extension
+ * stripped, verbatim - no case-folding), each file's own parsed root -
+ * object *or* array - used unchanged as that key's value. A project with
+ * no `docs/data/` folder simply has no data, and `load()` returns an empty
+ * struct - the same "opt-in by presence" shape as `BlogAuthorsLoader.bx`'s
+ * `authors.yml`/`FunctionsLoader.bx`'s `functions.bxs`.
+ *
+ * Unlike `BlogAuthorsLoader.bx`, there is no fixed shape to validate/default
+ * per entry - arbitrary JSON-shaped content (a team roster, a pricing
+ * table, a feature matrix) is the whole point, so a file's parsed root is
+ * used exactly as parsed.
+ *
+ * Loaded once, project-wide - not per version/locale tree - mirroring
+ * `FunctionsLoader.bx`'s own *actual* (not just documented) scope: `functions`
+ * is loaded once at the project's root `docsDir` in `BuildPipeline.build()`
+ * and threaded unchanged into every version/locale tree, never reloaded
+ * per-tree despite `FunctionsLoader.bx` itself being capable of a
+ * different `docsDir` per call. `data` follows the identical real
+ * precedent - one load, the same value everywhere - see
+ * `docs/guides/data-files.md`'s own "Scope" section.
+ *
+ * No subfolder recursion into `docs/data/` in v1 - flat directory only,
+ * matching `docs/blog/authors.yml`'s own "exactly one file, no nesting"
+ * precedent.
+ */
+class {
+
+	/**
+	 * Extensions checked, in order, when more than one file shares a
+	 * basename (e.g. both `products.yaml` and `products.json` present) -
+	 * first found wins, the same by-convention resolution-order shape as
+	 * `BlogAuthorsLoader.bx`'s own `variables.avatarExtensions`.
+	 */
+	variables.extensions = [ "yaml", "yml", "json" ]
+
+	/**
+	 * Parses a YAML data file - real bx-yaml BIFs by default, swappable via
+	 * setYamlRenderer() (YamlRenderer.bx's own docblock explains why).
+	 */
+	variables.yamlRenderer = new "models.build.YamlRenderer@bxsites"()
+
+	/**
+	 * Swaps in a fake/test YAML renderer - see YamlRenderer.bx's docblock.
+	 *
+	 * @renderer Any object exposing `fromYaml( content )`
+	 */
+	void function setYamlRenderer( required any renderer ) {
+		variables.yamlRenderer = arguments.renderer
+	}
+
+	/**
+	 * Loads `docs/data/*.yaml`/`.yml`/`.json` - `{}` if `docs/data/` doesn't
+	 * exist.
+	 *
+	 * @docsDir Absolute path to the project's docs/ directory
+	 *
+	 * @return Struct keyed by data-file basename (extension stripped)
+	 */
+	struct function load( required string docsDir ) {
+		var dataDir = arguments.docsDir.reReplace( "[\/]+$", "" ) & "/data"
+
+		if ( !directoryExists( dataDir ) ) {
+			return {}
+		}
+
+		var basenames = []
+		var filesByBasename = {}
+		for ( var fileName in directoryList( dataDir, false, "name" ) ) {
+			var dotAt = fileName.reFind( "\.[^.]+$" )
+			if ( dotAt == 0 ) {
+				continue
+			}
+			var ext = lCase( fileName.mid( dotAt + 1, len( fileName ) - dotAt ) )
+			if ( !variables.extensions.contains( ext ) ) {
+				continue
+			}
+			var basename = fileName.left( dotAt - 1 )
+			if ( !filesByBasename.keyExists( basename ) ) {
+				basenames.append( basename )
+				filesByBasename[ basename ] = {}
+			}
+			filesByBasename[ basename ][ ext ] = dataDir & "/" & fileName
+		}
+
+		var data = {}
+		for ( var basename in basenames ) {
+			data[ basename ] = loadOne( basename, filesByBasename[ basename ] )
+		}
+		return data
+	}
+
+	/**
+	 * Loads one data file, resolving a basename collision across
+	 * extensions via `variables.extensions`' own order (first found wins).
+	 *
+	 * @basename The data key this file loads into (for error messages)
+	 * @filesByExt This basename's own `{ ext : absolutePath }` matches
+	 */
+	private any function loadOne( required string basename, required struct filesByExt ) {
+		// Captured into a local first - an arrow function's own `arguments`
+		// scope is its own (item/index/array, per array .filter()'s own
+		// callback signature), not loadOne()'s, so `arguments.filesByExt`
+		// inside the closure below would look up a key that was never
+		// there (the same lesson BuildPipeline.bx's own renderDocTree()
+		// docblock already documents for `blogNavUrl`).
+		var filesByExt = arguments.filesByExt
+		var ext = variables.extensions.filter( e => filesByExt.keyExists( e ) )[ 1 ]
+		var filePath = filesByExt[ ext ]
+
+		try {
+			return ext == "json"
+				? jsonDeserialize( fileRead( filePath ) )
+				: variables.yamlRenderer.fromYaml( fileRead( filePath ) )
+		} catch ( any e ) {
+			throw(
+				type    = "BxSites.InvalidDataFile",
+				message = "docs/data/#arguments.basename#.#ext# is not valid #ext == "json" ? "JSON" : "YAML"#: #e.message#"
+			)
+		}
+	}
+
+}

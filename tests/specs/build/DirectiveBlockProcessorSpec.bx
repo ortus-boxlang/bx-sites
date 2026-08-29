@@ -6,11 +6,23 @@ class extends="testbox.system.BaseSpec" {
 			beforeEach( function() {
 				variables.processor = new "models.build.DirectiveBlockProcessor@bxsites"();
 				variables.renderer = new "tests.support.FakeMarkdownRenderer@bxsites"();
+				variables.variablesProcessor = new "models.build.VariablesProcessor@bxsites"();
 			} );
 
 			private string function render( required string markdown ) {
 				var extracted = processor.extract( markdown );
 				return htmlDecode( processor.restore( extracted.markdown, extracted.blocks, renderer, {} ) );
+			}
+
+			/**
+			 * ::: for/::: if need setLoopContext() called first (mirroring
+			 * BuildPipeline.convertMarkdown()'s own wiring) - a plain render()
+			 * call (no context) is used instead where a test wants to prove
+			 * the "no data context available" fallback.
+			 */
+			private string function renderWithData( required string markdown, struct pageVars = {} ) {
+				processor.setLoopContext( variablesProcessor, arguments.pageVars, {}, {} );
+				return render( arguments.markdown );
 			}
 
 			// encodeForHTML()'s exact escaping range for "safe" ASCII punctuation
@@ -491,6 +503,256 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( html ).toInclude( "bxsites-prompt--full" );
 				expect( html ).notToInclude( "bxsites-prompt__toggle" );
+			} );
+
+			it( "::: for item, index in <path> iterates an array, binding item+1-based index per iteration", function() {
+				var md = "::: for item, idx in data.products" & char( 10 ) &
+					"{{ item.name }} at position {{ idx }}" & char( 10 ) & ":::";
+				var html = renderWithData( md, { data : { products : [ { name : "Widget" }, { name : "Gadget" } ] } } );
+
+				expect( html ).toInclude( "Widget at position 1" );
+				expect( html ).toInclude( "Gadget at position 2" );
+			} );
+
+			it( "::: for key, value in <path> iterates a struct, binding key+value per iteration", function() {
+				var md = "::: for who, role in data.roster" & char( 10 ) &
+					"{{ who }} is {{ role }}" & char( 10 ) & ":::";
+				var html = renderWithData( md, { data : { roster : { "alice" : "Admin" } } } );
+
+				expect( html ).toInclude( "alice is Admin" );
+			} );
+
+			it( "resolves {{ }} in a ::: for body against the page's own outer vars too, layered under the loop vars", function() {
+				var md = "::: for item, idx in data.products" & char( 10 ) &
+					"{{ page.title }}: {{ item.name }}" & char( 10 ) & ":::";
+				var html = renderWithData( md, { page : { title : "Catalog" }, data : { products : [ { name : "Widget" } ] } } );
+
+				expect( html ).toInclude( "Catalog: Widget" );
+			} );
+
+			it( "a ::: for nested inside ::: cards is still found and resolved, layered on the card's own body", function() {
+				var md = "::: cards" & char( 10 ) &
+					'::: card title="Team"' & char( 10 ) &
+					"::: for member, idx in data.team" & char( 10 ) &
+					"{{ member.name }}" & char( 10 ) & ":::" & char( 10 ) &
+					":::" & char( 10 ) & ":::";
+				var html = renderWithData( md, { data : { team : [ { name : "Luis" }, { name : "Jon" } ] } } );
+
+				expect( html ).toInclude( "Luis" );
+				expect( html ).toInclude( "Jon" );
+			} );
+
+			it( "::: if <path> renders its content only when the resolved value is truthy", function() {
+				var md = "::: if data.showBanner" & char( 10 ) & "Banner shown." & char( 10 ) & ":::";
+
+				expect( renderWithData( md, { data : { showBanner : true } } ) ).toInclude( "Banner shown." );
+				expect( renderWithData( md, { data : { showBanner : false } } ) ).notToInclude( "Banner shown." );
+			} );
+
+			it( "::: if <path> treats an empty array/struct/string as falsy, not just BoxLang's own boolean coercion", function() {
+				var md = "::: if data.items" & char( 10 ) & "Has items." & char( 10 ) & ":::";
+
+				expect( renderWithData( md, { data : { items : [] } } ) ).notToInclude( "Has items." );
+				expect( renderWithData( md, { data : { items : [ "one" ] } } ) ).toInclude( "Has items." );
+			} );
+
+			it( "throws BxSites.UnknownVariable when a ::: for/::: if path doesn't resolve", function() {
+				expect( function() {
+					renderWithData( "::: for item, idx in data.missing" & char( 10 ) & "x" & char( 10 ) & ":::", { data : {} } );
+				} ).toThrow( "BxSites.UnknownVariable" );
+
+				expect( function() {
+					renderWithData( "::: if data.missing" & char( 10 ) & "x" & char( 10 ) & ":::", { data : {} } );
+				} ).toThrow( "BxSites.UnknownVariable" );
+			} );
+
+			it( "throws BxSites.InvalidForTarget when a ::: for path resolves to neither an array nor a struct", function() {
+				expect( function() {
+					renderWithData( "::: for item, idx in data.name" & char( 10 ) & "x" & char( 10 ) & ":::", { data : { name : "Widget" } } );
+				} ).toThrow( "BxSites.InvalidForTarget" );
+			} );
+
+			it( "renders a ::: for with malformed grammar (not ""a, b in path"") as an invalid-directive placeholder, not a throw", function() {
+				var html = render( "::: for item in data.products" & char( 10 ) & "x" & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( "bxsites-directive-invalid" );
+			} );
+
+			it( "renders a ::: for whose loop variable name collides with a reserved name (page/data) as an invalid-directive placeholder", function() {
+				var html = renderWithData( "::: for data, idx in data.products" & char( 10 ) & "x" & char( 10 ) & ":::", { data : { products : [] } } );
+
+				expect( html ).toInclude( "bxsites-directive-invalid" );
+				expect( html ).toInclude( "reserved" );
+			} );
+
+			it( "renders ::: for/::: if as an invalid-directive placeholder when no data context was ever wired (setLoopContext() never called)", function() {
+				expect( render( "::: for item, idx in data.products" & char( 10 ) & "x" & char( 10 ) & ":::" ) ).toInclude( "bxsites-directive-invalid" );
+				expect( render( "::: if data.showBanner" & char( 10 ) & "x" & char( 10 ) & ":::" ) ).toInclude( "bxsites-directive-invalid" );
+			} );
+
+			it( "protectLoopDirectives() shields a ::: for/::: if body from a {{ }} pass, restoreLoopDirectives() puts it back verbatim", function() {
+				var md = "::: for item, idx in data.products" & char( 10 ) & "{{ item.name }}" & char( 10 ) & ":::";
+
+				var protectedResult = processor.protectLoopDirectives( md );
+				// The loop body is still placeholder-protected - {{ item.name }}
+				// (an as-yet-unbound loop variable) must never reach a real
+				// {{ }} pass, or it would fail as an unknown variable.
+				expect( protectedResult.markdown ).notToInclude( "{{ item.name }}" );
+				expect( protectedResult.markdown ).toInclude( "bxsites-raw-block" );
+
+				var restored = processor.restoreLoopDirectives( protectedResult.markdown, protectedResult.placeholders );
+				expect( restored ).toInclude( "::: for item, idx in data.products" );
+				expect( restored ).toInclude( "{{ item.name }}" );
+			} );
+
+			it( "protectLoopDirectives() leaves a non-loop directive's own body completely untouched, reconstructed verbatim", function() {
+				var md = '::: expandable "FAQ"' & char( 10 ) & "{{ page.title }}" & char( 10 ) & ":::";
+
+				var protectedResult = processor.protectLoopDirectives( md );
+
+				expect( protectedResult.placeholders.isEmpty() ).toBeTrue();
+				expect( protectedResult.markdown ).toInclude( '::: expandable "FAQ"' );
+				expect( protectedResult.markdown ).toInclude( "{{ page.title }}" );
+			} );
+
+			it( "::: if / ::: elseif / ::: else - renders the ::: if branch when its own condition is truthy, skipping every later branch entirely", function() {
+				var md = "::: if data.flags.a" & char( 10 ) & "A" & char( 10 ) & ":::" & char( 10 ) &
+					// data.missing would throw if ever actually looked up -
+					// proves the elseif/else branches below are never even
+					// evaluated once an earlier branch already won.
+					"::: elseif data.missing" & char( 10 ) & "B" & char( 10 ) & ":::" & char( 10 ) &
+					"::: else" & char( 10 ) & "C" & char( 10 ) & ":::";
+				var html = renderWithData( md, { data : { flags : { a : true } } } );
+
+				expect( html ).toInclude( "A" );
+				expect( html ).notToInclude( "B" );
+				expect( html ).notToInclude( "C" );
+			} );
+
+			it( "::: if / ::: elseif / ::: else - falls through to the first true ::: elseif when ::: if is falsy", function() {
+				var md = "::: if data.flags.a" & char( 10 ) & "A" & char( 10 ) & ":::" & char( 10 ) &
+					"::: elseif data.flags.b" & char( 10 ) & "B" & char( 10 ) & ":::" & char( 10 ) &
+					"::: else" & char( 10 ) & "C" & char( 10 ) & ":::";
+				var html = renderWithData( md, { data : { flags : { a : false, b : true } } } );
+
+				expect( html ).notToInclude( "A" );
+				expect( html ).toInclude( "B" );
+				expect( html ).notToInclude( "C" );
+			} );
+
+			it( "::: if / ::: elseif / ::: else - falls all the way through to ::: else when every condition above is falsy", function() {
+				var md = "::: if data.flags.a" & char( 10 ) & "A" & char( 10 ) & ":::" & char( 10 ) &
+					"::: elseif data.flags.b" & char( 10 ) & "B" & char( 10 ) & ":::" & char( 10 ) &
+					"::: else" & char( 10 ) & "C" & char( 10 ) & ":::";
+				var html = renderWithData( md, { data : { flags : { a : false, b : false } } } );
+
+				expect( html ).notToInclude( "A" );
+				expect( html ).notToInclude( "B" );
+				expect( html ).toInclude( "C" );
+			} );
+
+			it( "::: if / ::: elseif - renders nothing when every condition is falsy and there's no ::: else", function() {
+				var md = "::: if data.flags.a" & char( 10 ) & "A" & char( 10 ) & ":::" & char( 10 ) &
+					"::: elseif data.flags.b" & char( 10 ) & "B" & char( 10 ) & ":::";
+				var html = renderWithData( md, { data : { flags : { a : false, b : false } } } );
+
+				expect( html ).notToInclude( "A" );
+				expect( html ).notToInclude( "B" );
+			} );
+
+			it( "the compact form - one trailing ::: for the whole chain, no ::: before ::: elseif/::: else - parses and evaluates identically", function() {
+				var md = "::: if data.flags.a" & char( 10 ) & "A" & char( 10 ) &
+					"::: elseif data.flags.b" & char( 10 ) & "B" & char( 10 ) &
+					"::: else" & char( 10 ) & "C" & char( 10 ) &
+					":::";
+
+				expect( renderWithData( md, { data : { flags : { a : true, b : false } } } ) ).toInclude( "A" );
+				expect( renderWithData( md, { data : { flags : { a : false, b : true } } } ) ).toInclude( "B" );
+				expect( renderWithData( md, { data : { flags : { a : false, b : false } } } ) ).toInclude( "C" );
+			} );
+
+			it( "the compact form still short-circuits - a later ::: elseif's own unresolvable path is never looked up once an earlier branch already won", function() {
+				var md = "::: if data.flags.a" & char( 10 ) & "A" & char( 10 ) &
+					"::: elseif data.missing" & char( 10 ) & "B" & char( 10 ) &
+					":::";
+
+				expect( renderWithData( md, { data : { flags : { a : true } } } ) ).toInclude( "A" );
+			} );
+
+			it( "mixing an explicit ::: before one ::: elseif with the compact form elsewhere in the same chain still parses correctly", function() {
+				var md = "::: if data.flags.a" & char( 10 ) & "A" & char( 10 ) & ":::" & char( 10 ) &
+					"::: elseif data.flags.b" & char( 10 ) & "B" & char( 10 ) &
+					"::: else" & char( 10 ) & "C" & char( 10 ) &
+					":::";
+
+				expect( renderWithData( md, { data : { flags : { a : false, b : true } } } ) ).toInclude( "B" );
+			} );
+
+			it( "the compact form works nested inside another block too (e.g. ::: cards)", function() {
+				var md = "::: cards" & char( 10 ) &
+					'::: card title="Status"' & char( 10 ) &
+					"::: if data.flags.a" & char( 10 ) & "On" & char( 10 ) &
+					"::: else" & char( 10 ) & "Off" & char( 10 ) &
+					":::" & char( 10 ) &
+					":::" & char( 10 ) & ":::";
+				var html = renderWithData( md, { data : { flags : { a : false } } } );
+
+				expect( html ).toInclude( "Off" );
+				expect( html ).notToInclude( "On" );
+			} );
+
+			it( "a standalone ::: if (no elseif/else siblings) still works exactly as before", function() {
+				var md = "::: if data.flags.a" & char( 10 ) & "A" & char( 10 ) & ":::";
+
+				expect( renderWithData( md, { data : { flags : { a : true } } } ) ).toInclude( "A" );
+				expect( renderWithData( md, { data : { flags : { a : false } } } ) ).notToInclude( "A" );
+			} );
+
+			it( "resolves {{ }} inside the winning branch's own body against the page's outer vars", function() {
+				var md = "::: if data.flags.a" & char( 10 ) & "{{ page.title }}" & char( 10 ) & ":::" & char( 10 ) &
+					"::: else" & char( 10 ) & "no" & char( 10 ) & ":::";
+				var html = renderWithData( md, { page : { title : "Catalog" }, data : { flags : { a : true } } } );
+
+				expect( html ).toInclude( "Catalog" );
+			} );
+
+			it( "an orphaned ::: elseif/::: else (no leading ::: if immediately before it) renders as an invalid-directive placeholder", function() {
+				var elseifHtml = render( "Some text." & char( 10 ) & char( 10 ) & "::: elseif data.x" & char( 10 ) & "x" & char( 10 ) & ":::" );
+				var elseHtml = render( "::: else" & char( 10 ) & "x" & char( 10 ) & ":::" );
+
+				expect( elseifHtml ).toInclude( "bxsites-directive-invalid" );
+				expect( elseHtml ).toInclude( "bxsites-directive-invalid" );
+			} );
+
+			it( "renders ::: else with a trailing condition as an invalid-directive placeholder (::: else takes no condition)", function() {
+				var md = "::: if data.flags.a" & char( 10 ) & "A" & char( 10 ) & ":::" & char( 10 ) &
+					"::: else data.flags.b" & char( 10 ) & "B" & char( 10 ) & ":::";
+				var html = renderWithData( md, { data : { flags : { a : false, b : true } } } );
+
+				expect( html ).toInclude( "bxsites-directive-invalid" );
+			} );
+
+			it( "a ::: for nested inside another ::: for resolves both levels' own {{ }} tokens without the outer loop swallowing the inner one's", function() {
+				var md = "::: for group, gIdx in data.groups" & char( 10 ) &
+					"{{ group.name }}:" & char( 10 ) &
+					"::: for member, mIdx in group.members" & char( 10 ) & "{{ member }}" & char( 10 ) & ":::" & char( 10 ) &
+					":::";
+				var html = renderWithData( md, { data : { groups : [ { name : "Core", members : [ "Luis", "Jon" ] } ] } } );
+
+				expect( html ).toInclude( "Core" );
+				expect( html ).toInclude( "Luis" );
+				expect( html ).toInclude( "Jon" );
+			} );
+
+			it( "a ::: for inside a ::: if / ::: else branch still resolves - chains and loops compose", function() {
+				var md = "::: if data.flags.a" & char( 10 ) &
+					"::: for item, idx in data.team" & char( 10 ) & "{{ item.name }}" & char( 10 ) & ":::" & char( 10 ) &
+					":::" & char( 10 ) &
+					"::: else" & char( 10 ) & "no team" & char( 10 ) & ":::";
+				var html = renderWithData( md, { data : { flags : { a : true }, team : [ { name : "Luis" } ] } } );
+
+				expect( html ).toInclude( "Luis" );
+				expect( html ).notToInclude( "no team" );
 			} );
 
 		} );

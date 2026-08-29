@@ -72,7 +72,7 @@ class {
 	variables.reservedNames = [
 		"page", "nav", "siteConfig", "themeDir", "basePath", "moduleAssetsDir",
 		"versions", "currentVersion", "locales", "currentLocale", "currentLocaleDir",
-		"strings", "requiredFiles", "stringsResolver"
+		"strings", "requiredFiles", "stringsResolver", "data"
 	]
 
 	/**

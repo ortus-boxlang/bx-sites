@@ -3,7 +3,7 @@
  * the shared foundation for every GitBook-style block Flexmark has no
  * native concept of: expandable, cards/card, columns/column,
  * stepper/step, updates/update, file, embed, page-link, link-preview,
- * buttons/button, prompt, and pagebreak (see each block's own `render*()` docblock below). Nests arbitrarily deep (a
+ * buttons/button, prompt, for, if/elseif/else, and pagebreak (see each block's own `render*()` docblock below). Nests arbitrarily deep (a
  * `::: cards` block's own content is itself re-scanned for `::: card`
  * children, recursively) using the same two-phase pre/post-processing
  * shape as TabsProcessor.bx - `extract()` runs before `Markdown()`,
@@ -16,6 +16,22 @@
  * Syntax: `::: name` optionally followed by a leading `"Title"` and/or
  * `key="value"` attributes, e.g. `::: card title="Themes" href="themes.md"`.
  * A bare `:::` on its own line closes the innermost still-open block.
+ *
+ * `::: for item, index in data.products`, `::: if data.showBanner`
+ * (optionally chained with sibling `::: elseif <path>`/a trailing bare
+ * `::: else`), are a narrower family, deliberately grammared like `{{ }}`
+ * itself (a bare dotted path, no comparison operators) rather than the
+ * generic `key="value"` shape every other directive above uses - see
+ * `renderFor()`/`collectIfChain()`/`renderIfChain()` below,
+ * `protectLoopDirectives()`/`restoreLoopDirectives()` for how their own
+ * bodies survive the page's single top-level `{{ }}` pass unresolved, and
+ * `setLoopContext()` for the per-page wiring BuildPipeline.convertMarkdown()
+ * does to make any of this work at all. Unlike every directive above, a
+ * `::: if`/`::: elseif`/`::: else` chain needs only ONE trailing `:::`
+ * for the whole chain, not one per branch - `extract()`'s own
+ * `closeFrame()` treats `::: elseif`/`::: else` as an implicit close of
+ * whatever `::: if`/`::: elseif` branch is still open, the same as a
+ * real bare `:::` would (an explicit one still works too, if written).
  */
 class {
 
@@ -28,7 +44,67 @@ class {
 	// `bxsites-openapi--operation` class (renderOpenApi()'s own docblock).
 	variables.openApiSrcPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(<div class="bxsites-openapi[^"]*" data-openapi-src=")([^"]*)("[^>]*>)' )
 	variables.openApiOperationPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^(\S+)\s+(/\S*)$" )
+	variables.forSpecPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^(\w+)\s*,\s*(\w+)\s+in\s+(.+)$" )
 	variables.iconResolver = new "models.build.IconResolver@bxsites"()
+
+	/**
+	 * `::: for`'s own `itemName`/`indexName` binding - layered on top of
+	 * `variables.loopPageVars` for `{{ }}` resolution inside the loop body -
+	 * would otherwise silently shadow one of the two reserved keys
+	 * `pageVars` always itself already carries (`page`/`data` -
+	 * BuildPipeline.convertMarkdown()'s own docblock) rather than throwing a
+	 * clear error the way a `functions.bxs` name collision already does
+	 * (FunctionsLoader.bx's own `reservedNames`). A narrower,
+	 * `{{ }}`-scoped concern than that list (which guards a magic
+	 * function's own bare-BoxLang-scope names instead), so kept as its own
+	 * short list here rather than sharing FunctionsLoader.bx's.
+	 */
+	variables.reservedLoopNames = [ "page", "data" ]
+
+	/**
+	 * `::: for`/`::: if`/`::: elseif`/`::: else`'s own per-page context -
+	 * the `VariablesProcessor` instance plus the same
+	 * `pageVars`/`functions`/`functionContext` `BuildPipeline.convertMarkdown()`
+	 * already builds for the page's own top-level `{{ }}` pass - needed so
+	 * `renderFor()`/`renderIfChain()` below can resolve `{{ }}` inside a
+	 * loop/conditional body themselves, once per iteration (`renderFor()`)
+	 * or once for whichever branch wins (`renderIfChain()`), rather than
+	 * relying on that single top-level pass (which runs *before* these
+	 * directives' own placeholders are even unprotected - see
+	 * `protectLoopDirectives()`). Set once per page by `setLoopContext()`
+	 * (called right before BuildPipeline.convertMarkdown()'s own real
+	 * `extract()` call); this class is a long-lived singleton reused
+	 * across every page/rebuild (the same shape FunctionsLoader.bx's own
+	 * docblock already discusses), but `extract()`+`restore()` always run
+	 * back-to-back for one page before the next page's own `setLoopContext()`
+	 * call overwrites these, so no cross-page leakage - and `renderFor()`
+	 * itself saves/restores `variables.loopPageVars` around each of its own
+	 * recursive per-iteration renders, so a nested `::: for`'s own inner
+	 * scope never leaks into a sibling block rendered afterward on the same
+	 * page either.
+	 */
+	variables.loopVariablesProcessor = ""
+	variables.loopPageVars = {}
+	variables.loopFunctions = {}
+	variables.loopFunctionContext = {}
+
+	/**
+	 * Wires this page's own `{{ }}` resolution context into `renderFor()`/
+	 * `renderIfChain()` - see `variables.loopVariablesProcessor`'s own
+	 * docblock for why this is a setter rather than a constructor/`extract()`
+	 * param.
+	 *
+	 * @variablesProcessor A VariablesProcessor.bx instance (its own `resolve()`/`lookupValue()`)
+	 * @pageVars Same shape BuildPipeline.convertMarkdown()'s own `pageVars` local is - the page's own `variables` (config-wide) plus `page`/`data`
+	 * @functions FunctionsLoader.load()'s own output, forwarded to `resolve()` unchanged
+	 * @functionContext The "supporting variables" struct `resolve()` binds into a magic function's own body, forwarded unchanged
+	 */
+	void function setLoopContext( required any variablesProcessor, required struct pageVars, required struct functions, required struct functionContext ) {
+		variables.loopVariablesProcessor = arguments.variablesProcessor
+		variables.loopPageVars = arguments.pageVars
+		variables.loopFunctions = arguments.functions
+		variables.loopFunctionContext = arguments.functionContext
+	}
 
 	/**
 	 * `::: step`'s own `color` attribute (renderStepper() below) - the
@@ -47,6 +123,29 @@ class {
 	 * `::: cards`) is left as literal `:::`-fenced text within its
 	 * parent's own captured content, to be found again by that parent's
 	 * own render function via a fresh `extract()` call - see `restore()`.
+	 *
+	 * A `::: elseif`/`::: else` immediately following an already-open
+	 * `::: if`/`::: elseif` implicitly closes that *previous* branch first
+	 * (closeFrame() below), the same way a real bare `:::` would - so a
+	 * whole `::: if` / `::: elseif` / `::: else` chain only ever needs ONE
+	 * trailing `:::`, not one per branch:
+	 *
+	 *   ::: if a
+	 *   A
+	 *   ::: elseif b
+	 *   B
+	 *   ::: else
+	 *   C
+	 *   :::
+	 *
+	 * The old, fully-explicit form (a `:::` before every `::: elseif`/
+	 * `::: else` too) still works exactly as it always has - this only
+	 * ever fires when the previous branch is still open, so an explicit
+	 * close just means there's nothing left for it to implicitly do.
+	 * Either way, every branch still becomes its own `blocks` entry, same
+	 * `{ token, type, attrsRaw, content }` shape as any other directive -
+	 * `collectIfChain()`/`renderIfChain()` (which group and evaluate them)
+	 * never need to know which form a project actually wrote.
 	 *
 	 * @markdown The raw markdown body text
 	 *
@@ -80,28 +179,21 @@ class {
 					outputLines.append( line )
 					continue
 				}
-				var frame = stack[ stack.len() ]
-				stack.deleteAt( stack.len() )
-				var content = frame.lines.toList( char( 10 ) )
-
-				if ( !stack.len() ) {
-					var token = "bxsitesdirective" & replace( createUUID(), "-", "", "all" )
-					blocks.append( { token : token, type : frame.type, attrsRaw : frame.attrsRaw, content : content } )
-					outputLines.append( "" )
-					outputLines.append( '<div class="bxsites-raw-block" data-bxsites-token="' & token & '"></div>' )
-					outputLines.append( "" )
-				} else {
-					var parent = stack[ stack.len() ]
-					parent.lines.append( "::: " & frame.type & " " & frame.attrsRaw )
-					parent.lines.append( content )
-					parent.lines.append( ":::" )
-				}
+				closeFrame( stack, blocks, outputLines )
 				continue
 			}
 
 			var matcher = variables.openPattern.matcher( trimmedLine )
 			if ( matcher.matches() ) {
-				stack.append( { type : matcher.group( 1 ), attrsRaw : trim( matcher.group( 2 ) ), lines : [] } )
+				var newType = matcher.group( 1 )
+				if (
+					stack.len()
+					&& listFindNoCase( "elseif,else", trim( newType ) )
+					&& listFindNoCase( "if,elseif", trim( stack[ stack.len() ].type ) )
+				) {
+					closeFrame( stack, blocks, outputLines )
+				}
+				stack.append( { type : newType, attrsRaw : trim( matcher.group( 2 ) ), lines : [] } )
 				continue
 			}
 
@@ -136,6 +228,40 @@ class {
 	}
 
 	/**
+	 * Finalizes the innermost currently-open stack frame - extract()'s own
+	 * shared closing logic, called both for a real bare `:::` line and for
+	 * an implicit `::: elseif`/`::: else` continuation (extract()'s own
+	 * docblock explains why the latter needs this too). A top-level frame
+	 * becomes its own `blocks` entry, placeholder spliced into
+	 * `outputLines`; a nested one is folded back into its own parent
+	 * frame's `lines` as literal `::: type attrs` ... `:::` source text,
+	 * to be found again by a fresh `extract()` call later (this class's
+	 * own docblock).
+	 *
+	 * @stack extract()'s own open-frame stack (mutated - the top frame is popped)
+	 * @blocks extract()'s own top-level blocks array (mutated when the popped frame was itself top-level)
+	 * @outputLines extract()'s own output lines array (mutated the same way)
+	 */
+	private void function closeFrame( required array stack, required array blocks, required array outputLines ) {
+		var frame = arguments.stack[ arguments.stack.len() ]
+		arguments.stack.deleteAt( arguments.stack.len() )
+		var content = frame.lines.toList( char( 10 ) )
+
+		if ( !arguments.stack.len() ) {
+			var token = "bxsitesdirective" & replace( createUUID(), "-", "", "all" )
+			arguments.blocks.append( { token : token, type : frame.type, attrsRaw : frame.attrsRaw, content : content } )
+			arguments.outputLines.append( "" )
+			arguments.outputLines.append( '<div class="bxsites-raw-block" data-bxsites-token="' & token & '"></div>' )
+			arguments.outputLines.append( "" )
+		} else {
+			var parent = arguments.stack[ arguments.stack.len() ]
+			parent.lines.append( "::: " & frame.type & " " & frame.attrsRaw )
+			parent.lines.append( content )
+			parent.lines.append( ":::" )
+		}
+	}
+
+	/**
 	 * Renders every top-level block from `extract()` and swaps each one's
 	 * placeholder for its final markup.
 	 *
@@ -148,11 +274,216 @@ class {
 	 */
 	string function restore( required string html, required array blocks, required any renderer, struct markdownOptions = {} ) {
 		var result = arguments.html
-		for ( var block in arguments.blocks ) {
+		var i = 1
+		while ( i <= arguments.blocks.len() ) {
+			var block = arguments.blocks[ i ]
+
+			// `::: if`/`::: elseif`/`::: else` are a linked chain, not
+			// independent blocks - collectIfChain() below groups an `if`
+			// with whatever `elseif`/`else` siblings immediately follow it
+			// in this same array, so only the one branch that actually wins
+			// (or none) ever renders; every other placeholder in the chain
+			// resolves to "". An `elseif`/`else` reached here on its own
+			// (never true for a well-formed chain, since this loop always
+			// consumes them as part of their leading `if`) is an orphan -
+			// renderBlock()'s own switch reports it as invalid.
+			if ( lCase( trim( block.type ) ) == "if" ) {
+				var chain = collectIfChain( arguments.blocks, i )
+				var outcome = renderIfChain( chain.blocks, arguments.renderer, arguments.markdownOptions )
+				for ( var chainBlock in chain.blocks ) {
+					var chainPlaceholder = '<div class="bxsites-raw-block" data-bxsites-token="' & chainBlock.token & '"></div>'
+					result = result.replace( chainPlaceholder, chainBlock.token == outcome.winnerToken ? outcome.html : "", "one" )
+				}
+				i = chain.nextIndex
+				continue
+			}
+
 			var placeholder = '<div class="bxsites-raw-block" data-bxsites-token="' & block.token & '"></div>'
 			result = result.replace( placeholder, renderBlock( block, arguments.renderer, arguments.markdownOptions ), "one" )
+			i++
 		}
 		return result
+	}
+
+	/**
+	 * Groups `blocks[startIndex]` (a `::: if` block) with whatever
+	 * `::: elseif` blocks immediately follow it in the same sibling array,
+	 * plus one trailing `::: else` if present - the run stops at the first
+	 * block that's neither (or at end of array), so a chain is always
+	 * contiguous: no other directive can sit between an `if` and its own
+	 * `elseif`/`else` without breaking the chain there.
+	 *
+	 * @blocks The sibling blocks array `restore()` is walking (top-level, or one block's own nested children)
+	 * @startIndex 1-based index of the `::: if` block starting this chain
+	 *
+	 * @return { blocks: this chain's own blocks in source order, nextIndex: the index restore()'s own scan should resume from }
+	 */
+	private struct function collectIfChain( required array blocks, required numeric startIndex ) {
+		var chain = [ arguments.blocks[ arguments.startIndex ] ]
+		var i = arguments.startIndex + 1
+
+		while ( i <= arguments.blocks.len() && lCase( trim( arguments.blocks[ i ].type ) ) == "elseif" ) {
+			chain.append( arguments.blocks[ i ] )
+			i++
+		}
+		if ( i <= arguments.blocks.len() && lCase( trim( arguments.blocks[ i ].type ) ) == "else" ) {
+			chain.append( arguments.blocks[ i ] )
+			i++
+		}
+
+		return { blocks : chain, nextIndex : i }
+	}
+
+	/**
+	 * Renders one `::: if`/`::: elseif`/`::: else` chain with real
+	 * `if`/`elseif`/`else` semantics: each condition (`if`, then every
+	 * `elseif`, in source order) is resolved and checked for truthiness,
+	 * stopping at the first match - a later branch's own condition is
+	 * never even looked up, so a typo'd `elseif` path only ever fails the
+	 * build when its own branch is actually reached, the same
+	 * short-circuiting a real `if`/`elseif` chain has. A trailing
+	 * `::: else`, if present, always wins when nothing above it matched.
+	 * No branch matches and there's no `::: else` -> renders nothing, the
+	 * same as a standalone `::: if`'s own falsy case.
+	 *
+	 * @chain collectIfChain()'s own `blocks` - one `::: if`, zero or more `::: elseif`, an optional trailing `::: else`
+	 *
+	 * @return { html: this chain's own rendered output, winnerToken: the token of the chain block that won, or "" when none did }
+	 */
+	private struct function renderIfChain( required array chain, required any renderer, required struct markdownOptions ) {
+		for ( var block in arguments.chain ) {
+			var type = lCase( trim( block.type ) )
+
+			if ( type == "else" ) {
+				if ( len( trim( block.attrsRaw ) ) ) {
+					return { html : '<div class="bxsites-directive-invalid">::: else - takes no condition (did you mean ::: elseif?)</div>', winnerToken : block.token }
+				}
+				return { html : renderWithVars( block.content, variables.loopPageVars, arguments.renderer, arguments.markdownOptions ), winnerToken : block.token }
+			}
+
+			var path = trim( block.attrsRaw )
+			if ( !len( path ) ) {
+				return { html : '<div class="bxsites-directive-invalid">::: ' & type & ' - missing a dotted.path condition</div>', winnerToken : block.token }
+			}
+			if ( !isObject( variables.loopVariablesProcessor ) ) {
+				return { html : '<div class="bxsites-directive-invalid">::: ' & type & ' - no data context available to resolve "' & encodeForHTML( path ) & '"</div>', winnerToken : block.token }
+			}
+
+			var lookup = variables.loopVariablesProcessor.lookupValue( path, variables.loopPageVars )
+			if ( !lookup.found ) {
+				throw(
+					type    : "BxSites.UnknownVariable",
+					message : "::: #type# #path# - no [#path#] entry found"
+				)
+			}
+
+			if ( isTruthy( lookup.value ) ) {
+				return { html : renderWithVars( block.content, variables.loopPageVars, arguments.renderer, arguments.markdownOptions ), winnerToken : block.token }
+			}
+		}
+
+		return { html : "", winnerToken : "" }
+	}
+
+	/**
+	 * A pre-pass BuildPipeline.convertMarkdown() runs *before* the page's
+	 * own single top-level `{{ }}` pass (VariablesProcessor.resolve()) -
+	 * shields every `::: for`/`::: if` block's own raw content, at any
+	 * nesting depth, from that pass, the same way FenceTracker.bx shields a
+	 * fenced code block's own `{{ }}`-looking text from it. A
+	 * `::: for item, idx in data.products` body's own `{{ item.name }}`
+	 * doesn't refer to a page-wide variable at all - `item`/`idx` don't
+	 * exist until `renderFor()` below binds them, once per iteration, so
+	 * the token would otherwise fail the top pass's own "recognized shape,
+	 * unresolved" check (VariablesProcessor.resolveExpression()'s own
+	 * `BxSites.UnknownVariable` throw) long before `renderFor()` ever gets
+	 * a chance to bind it.
+	 *
+	 * Every *other* directive type is deliberately left alone -
+	 * reconstructed back to its own literal `::: type ...` source right
+	 * where its placeholder was (recursing into its own content first, so a
+	 * `::: for` nested inside e.g. `::: cards` is still found and
+	 * protected) - preserving today's existing behavior of `{{ }}`
+	 * resolving normally inside every non-loop block's own body, exactly as
+	 * if this pre-pass had never run for them at all.
+	 *
+	 * @markdown Raw markdown text (a whole page, or - recursively - one block's own nested content)
+	 *
+	 * @return { markdown: string with only for/if blocks still placeholder-protected, placeholders: struct keyed by token -> that block's own reconstructed `::: type ...` source, restored after the top `{{ }}` pass by restoreLoopDirectives() }
+	 */
+	struct function protectLoopDirectives( required string markdown ) {
+		var extracted = this.extract( arguments.markdown )
+		var rebuilt = extracted.markdown
+		var placeholders = {}
+
+		for ( var block in extracted.blocks ) {
+			var placeholder = '<div class="bxsites-raw-block" data-bxsites-token="' & block.token & '"></div>'
+			var innerProtected = protectLoopDirectives( block.content )
+			structAppend( placeholders, innerProtected.placeholders, true )
+			var source = directiveSource( block.type, block.attrsRaw, innerProtected.markdown )
+
+			if ( isLoopDirectiveType( block.type ) ) {
+				// Placeholder itself stays untouched in `rebuilt` here -
+				// still protected from the top `{{ }}` pass, restored later
+				// by restoreLoopDirectives().
+				placeholders[ block.token ] = source
+			} else {
+				rebuilt = rebuilt.replace( placeholder, source, "one" )
+			}
+		}
+
+		return { markdown : rebuilt, placeholders : placeholders }
+	}
+
+	/**
+	 * Swaps every `::: for`/`::: if` placeholder `protectLoopDirectives()`
+	 * left in place back to that block's own real `::: type ...` source
+	 * text - called right after the page's own top-level `{{ }}` pass, so
+	 * the standard `extract()` call BuildPipeline.convertMarkdown() already
+	 * makes right after that pass discovers these blocks completely fresh,
+	 * same as any other directive. Loops to a fixed point (rather than one
+	 * flat pass) since an outer loop block's own reconstructed source can
+	 * itself still contain an inner loop block's own placeholder (nested
+	 * `::: for`/`::: if`) - a single pass in the "wrong" struct-iteration
+	 * order would restore the inner one before the outer placeholder
+	 * carrying it even exists in `result` yet.
+	 *
+	 * @markdown The top-level `{{ }}`-resolved markdown, still carrying loop placeholders
+	 * @placeholders protectLoopDirectives()'s own `placeholders` output
+	 */
+	string function restoreLoopDirectives( required string markdown, required struct placeholders ) {
+		var result = arguments.markdown
+		var changed = true
+		while ( changed ) {
+			changed = false
+			for ( var token in arguments.placeholders ) {
+				var placeholder = '<div class="bxsites-raw-block" data-bxsites-token="' & token & '"></div>'
+				if ( result.find( placeholder ) ) {
+					result = result.replace( placeholder, arguments.placeholders[ token ], "one" )
+					changed = true
+				}
+			}
+		}
+		return result
+	}
+
+	/**
+	 * @return true for the data-driven directive types protectLoopDirectives() shields from the page's own top-level `{{ }}` pass - `for`, and the `if`/`elseif`/`else` chain family
+	 */
+	private boolean function isLoopDirectiveType( required string type ) {
+		return listFindNoCase( "for,if,elseif,else", trim( arguments.type ) ) > 0
+	}
+
+	/**
+	 * Reconstructs one block's own literal `::: type attrsRaw` ... `:::`
+	 * source text - the inverse of extract()'s own parsing, used by
+	 * protectLoopDirectives() to put a non-loop block back exactly as
+	 * authored (so the top `{{ }}` pass sees it untouched) and to build a
+	 * loop block's own protected replacement text.
+	 */
+	private string function directiveSource( required string type, required string attrsRaw, required string content ) {
+		var header = "::: " & trim( arguments.type ) & ( len( trim( arguments.attrsRaw ) ) ? " " & arguments.attrsRaw : "" )
+		return header & char( 10 ) & arguments.content & char( 10 ) & ":::"
 	}
 
 	/**
@@ -216,6 +547,19 @@ class {
 				return renderAudienceSwitcher( attrs )
 			case "pagebreak":
 				return renderPagebreak()
+			case "for":
+				return renderFor( block, renderer, markdownOptions )
+			case "if":
+				// restore()'s own scan always consumes a well-formed `if`
+				// as part of a chain (collectIfChain()) before renderBlock()
+				// is ever called for it - reached here only if renderBlock()
+				// is invoked directly on a lone block, so treat it as its
+				// own one-block chain instead of duplicating that logic.
+				return renderIfChain( [ block ], renderer, markdownOptions ).html
+			case "elseif":
+				return '<div class="bxsites-directive-invalid">::: elseif - must directly follow a ::: if (with only ::: elseif in between)</div>'
+			case "else":
+				return '<div class="bxsites-directive-invalid">::: else - must directly follow a ::: if or ::: elseif</div>'
 			default:
 				return '<div class="bxsites-directive-unknown">' & renderNested( block.content, renderer, markdownOptions ) & '</div>'
 		}
@@ -303,6 +647,151 @@ class {
 		return '<div class="bxsites-conditional" data-bxsites-key="' & attrEscape( key ) & '" data-bxsites-value="' & attrEscape( value ) & '">'
 			& renderNested( arguments.block.content, arguments.renderer, arguments.markdownOptions )
 			& '</div>'
+	}
+
+	/**
+	 * `::: for item, index in data.products` ... `:::` - a real, native
+	 * BoxLang `for( a, b in collection )` over whatever `data.products`
+	 * resolves to (docs/guides/data-files.md's "Consuming data" section) -
+	 * the *same* two-variable syntax BoxLang itself uses for both an array
+	 * (item + 1-based index) and a struct (key + value), so this one
+	 * directive/one `renderFor()` handles both with no array-vs-struct
+	 * special-casing here either - BoxLang's own runtime already dispatches
+	 * on the resolved value's real type. Deliberately dotted-path only, no
+	 * comparison/filter expressions - the same narrow grammar `{{ }}`
+	 * itself already uses.
+	 *
+	 * The loop body's own `{{ }}` tokens (e.g. `{{ item.name }}`) are
+	 * resolved fresh on every iteration (renderWithVars() below), layered
+	 * on top of the page's own `variables.loopPageVars` - never by the
+	 * page's own single top-level `{{ }}` pass, which never even sees them
+	 * unresolved in the first place (protectLoopDirectives()'s own
+	 * docblock) specifically so a loop variable's own reference doesn't
+	 * fail there as an unknown variable before this method ever runs.
+	 */
+	private string function renderFor( required struct block, required any renderer, required struct markdownOptions ) {
+		var spec = parseForSpec( arguments.block.attrsRaw )
+		if ( isNull( spec ) ) {
+			return '<div class="bxsites-directive-invalid">::: for - expected "item, index in dotted.path", got "' & encodeForHTML( arguments.block.attrsRaw ) & '"</div>'
+		}
+
+		var guardError = loopNameGuardError( [ spec.itemName, spec.indexName ] )
+		if ( len( guardError ) ) {
+			return '<div class="bxsites-directive-invalid">::: for - ' & encodeForHTML( guardError ) & '</div>'
+		}
+
+		if ( !isObject( variables.loopVariablesProcessor ) ) {
+			return '<div class="bxsites-directive-invalid">::: for - no data context available to resolve "' & encodeForHTML( spec.path ) & '"</div>'
+		}
+
+		var lookup = variables.loopVariablesProcessor.lookupValue( spec.path, variables.loopPageVars )
+		if ( !lookup.found ) {
+			throw(
+				type    : "BxSites.UnknownVariable",
+				message : "::: for #arguments.block.attrsRaw# - no [#spec.path#] entry found"
+			)
+		}
+		if ( !isArray( lookup.value ) && !isStruct( lookup.value ) ) {
+			throw(
+				type    : "BxSites.InvalidForTarget",
+				message : "::: for #arguments.block.attrsRaw# - [#spec.path#] is neither an array nor a struct"
+			)
+		}
+
+		var html = ""
+		for ( loopItem, loopIndex in lookup.value ) {
+			var iterVars = duplicate( variables.loopPageVars )
+			iterVars[ spec.itemName ] = loopItem
+			iterVars[ spec.indexName ] = loopIndex
+			html &= renderWithVars( arguments.block.content, iterVars, arguments.renderer, arguments.markdownOptions )
+		}
+		return html
+	}
+
+	/**
+	 * @spec `::: for`'s own raw attrsRaw text, e.g. "item, idx in data.products"
+	 *
+	 * @return { itemName, indexName, path } or null when it doesn't match "a, b in dotted.path"
+	 */
+	private any function parseForSpec( required string spec ) {
+		var matcher = variables.forSpecPattern.matcher( trim( arguments.spec ) )
+		if ( !matcher.matches() ) {
+			return
+		}
+		return { itemName : matcher.group( 1 ), indexName : matcher.group( 2 ), path : trim( matcher.group( 3 ) ) }
+	}
+
+	/**
+	 * @return "" when every name in `names` is safe to bind, otherwise a message naming the first reserved collision (variables.reservedLoopNames)
+	 */
+	private string function loopNameGuardError( required array names ) {
+		for ( var name in arguments.names ) {
+			if ( listFindNoCase( arrayToList( variables.reservedLoopNames ), name ) ) {
+				return 'loop variable name "' & name & '" is reserved - pick a different name'
+			}
+		}
+		return ""
+	}
+
+	/**
+	 * @return false for an empty array/struct/string or `0`, true otherwise - a project author's own intuitive notion of "is this data present/on", not BoxLang's own stricter boolean coercion
+	 */
+	private boolean function isTruthy( required any value ) {
+		if ( isArray( arguments.value ) ) {
+			return arguments.value.len() > 0
+		}
+		if ( isStruct( arguments.value ) ) {
+			return !arguments.value.isEmpty()
+		}
+		if ( isBoolean( arguments.value ) ) {
+			return arguments.value
+		}
+		if ( isNumeric( arguments.value ) ) {
+			return arguments.value != 0
+		}
+		return len( trim( "" & arguments.value ) ) > 0
+	}
+
+	/**
+	 * Resolves `{{ }}` in `content` against `vars` - `renderFor()`'s own
+	 * per-iteration `iterVars`, or `renderIfChain()`'s unmodified
+	 * `variables.loopPageVars` - then runs the result through the same
+	 * extract -> Markdown() -> restore() cycle `renderNested()` already
+	 * uses for every other block type, so a `::: for`/`::: if` body can
+	 * itself contain ordinary markdown, other nested directives, and even
+	 * another `::: for`/`::: if` alike (this class's own docblock, "Nests
+	 * arbitrarily deep").
+	 *
+	 * `content` is run through `protectLoopDirectives()`/`restoreLoopDirectives()`
+	 * around the `{{ }}` resolve() call below, the exact same way
+	 * BuildPipeline.convertMarkdown() already shields the *page's* own
+	 * top-level pass - without it, a `::: for`/`::: if` nested *inside*
+	 * this branch's own body would have its own `{{ }}` tokens (referencing
+	 * a loop variable that doesn't exist yet at this outer level either)
+	 * swept up and resolved against `vars` right here, before that inner
+	 * directive's own `renderFor()`/`renderIfChain()` call ever gets a
+	 * chance to bind them.
+	 *
+	 * `variables.loopPageVars` is saved and restored around this call
+	 * (rather than just overwritten) so a nested `::: for`'s own inner
+	 * scope - discovered by the recursive `this.extract()` call inside
+	 * `renderNested()` below - never leaks into a sibling block rendered
+	 * afterward on the same page (variables.loopVariablesProcessor's own
+	 * docblock).
+	 */
+	private string function renderWithVars( required string content, required struct vars, required any renderer, required struct markdownOptions ) {
+		var loopProtected = protectLoopDirectives( arguments.content )
+		var resolvedMarkdown = variables.loopVariablesProcessor.resolve(
+			loopProtected.markdown, arguments.vars, variables.loopFunctions, "", variables.loopFunctionContext
+		)
+		resolvedMarkdown = restoreLoopDirectives( resolvedMarkdown, loopProtected.placeholders )
+
+		var savedPageVars = variables.loopPageVars
+		variables.loopPageVars = arguments.vars
+		var html = renderNested( resolvedMarkdown, arguments.renderer, arguments.markdownOptions )
+		variables.loopPageVars = savedPageVars
+
+		return html
 	}
 
 	/**
