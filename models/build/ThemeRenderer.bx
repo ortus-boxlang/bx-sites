@@ -178,7 +178,7 @@ class {
 	 * @return The same path, forward-slashed and drive-letter-stripped, ready to prefix with `/bxApp`
 	 */
 	private string function toVirtualPath( required string path ) {
-		return arguments.path.reReplace( "^[A-Za-z]:", "" ).replace( chr( 92 ), "/", "all" )
+		return arguments.path.reReplace( "^[A-Za-z]:", "" ).replace( char( 92 ), "/", "all" )
 	}
 
 	/**

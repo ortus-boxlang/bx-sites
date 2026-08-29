@@ -166,7 +166,7 @@ class {
 		// this codebase, which only ever runs after startup completes.
 		var cwd = getSystemSetting( "user.dir", "" )
 		var looksLikeWindowsDrive = len( cwd ) >= 2 && cwd.mid( 2, 1 ) == ":"
-		var osRoot = looksLikeWindowsDrive ? left( cwd, 2 ) & chr( 92 ) : "/"
+		var osRoot = looksLikeWindowsDrive ? left( cwd, 2 ) & char( 92 ) : "/"
 		getBoxRuntime().getConfiguration().registerMapping( "/bxApp", osRoot )
 	}
 

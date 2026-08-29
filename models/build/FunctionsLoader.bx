@@ -107,7 +107,7 @@ class {
 		// "/bxApp"-relative virtual path either way.
 		var before = structKeyArray( variables )
 		try {
-			var virtualPath = functionsPath.reReplace( "^[A-Za-z]:", "" ).replace( chr( 92 ), "/", "all" )
+			var virtualPath = functionsPath.reReplace( "^[A-Za-z]:", "" ).replace( char( 92 ), "/", "all" )
 			include "/bxApp" & virtualPath
 		} catch ( any e ) {
 			throw(
