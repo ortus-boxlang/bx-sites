@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel>
+	<title>BxSites Blog - Versioning &amp; i18n</title>
+	<link>https://bxsites.io/theme/notion/blog/category/versioning---i18n/</link>
+	<description>Blog posts from BxSites</description>
+	<item>
+		<title>Never Lose a Reader&#x3a; Versions and Translations</title>
+		<link>https://bxsites.io/theme/notion/blog/never-lose-a-reader-versions-and-translations/</link>
+		<guid isPermaLink="true">https://bxsites.io/theme/notion/blog/never-lose-a-reader-versions-and-translations/</guid>
+		<pubDate>Tue, 04 Aug 2026 00:00:00 +0000</pubDate>
+		<dc:creator>Luis Majano</dc:creator>
+		<category>Versioning &amp; i18n</category>
+		<description>Two of the fastest ways to lose a documentation reader&#x3a; they land on docs for the wrong version of your software, or they land on a page in a language they don&#x27;t read well and there&#x27;s no obvious way out. BxSites handles both the same way it handles most things - a folder convention, no config flag to remember to flip.</description>
+	</item>
+</channel></rss>

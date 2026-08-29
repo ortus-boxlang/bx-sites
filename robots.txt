@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /next/
+
+Sitemap: https://bxsites.io/sitemap.xml

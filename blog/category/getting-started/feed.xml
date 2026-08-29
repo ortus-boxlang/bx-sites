@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel>
+	<title>BxSites Blog - Getting Started</title>
+	<link>https://bxsites.io/blog/category/getting-started/</link>
+	<description>Blog posts from BxSites</description>
+	<item>
+		<title>Migrate From GitBook or mkdocs in One Command</title>
+		<link>https://bxsites.io/blog/migrate-from-gitbook-or-mkdocs-in-one-command/</link>
+		<guid isPermaLink="true">https://bxsites.io/blog/migrate-from-gitbook-or-mkdocs-in-one-command/</guid>
+		<pubDate>Sat, 15 Aug 2026 00:00:00 +0000</pubDate>
+		<dc:creator>Luis Majano</dc:creator>
+		<category>Migration</category>
+		<category>Getting Started</category>
+		<description>The single biggest thing standing between a team and switching docs tools is almost never the tool itself - it&#x27;s the migration. Nobody wants to hand-convert three hundred Markdown files and their nav structure. bxSites migrate exists specifically to remove that excuse, for the two sources I hear about most&#x3a; GitBook and mkdocs.</description>
+	</item>
+	<item>
+		<title>Pick Your Theme</title>
+		<link>https://bxsites.io/blog/pick-your-theme/</link>
+		<guid isPermaLink="true">https://bxsites.io/blog/pick-your-theme/</guid>
+		<pubDate>Tue, 14 Jul 2026 00:00:00 +0000</pubDate>
+		<dc:creator>Luis Majano</dc:creator>
+		<category>Getting Started</category>
+		<category>Themes</category>
+		<description>Update&#x3a; this post originally covered the three themes BxSites launched with. The lineup has since grown into a full ten-theme gallery - the table and advice below now cover all ten. One question I get a lot after someone runs bxSites new for the first time&#x3a; &amp;quot&#x3b;which theme should I actually pick&#x3f;&amp;quot&#x3b; The honest answer is that it barely matters at the feature level - all ten built-in themes ship the exact same set of capabilities. It&#x27;s purely a question of which one matches your project&#x27;s own visual identity.</description>
+	</item>
+	<item>
+		<title>Get Your Docs Live in 10 Minutes</title>
+		<link>https://bxsites.io/blog/get-your-docs-live-in-10-minutes/</link>
+		<guid isPermaLink="true">https://bxsites.io/blog/get-your-docs-live-in-10-minutes/</guid>
+		<pubDate>Wed, 01 Jul 2026 00:00:00 +0000</pubDate>
+		<dc:creator>Luis Majano</dc:creator>
+		<category>Getting Started</category>
+		<description>I&#x27;ve written a lot of documentation tools over the years, and the thing I keep coming back to with BxSites is how little ceremony is involved in going from nothing to a real, browsable static site. No config wizard, no plugin marketplace to shop through first - just a folder of Markdown and one command.</description>
+	</item>
+</channel></rss>
