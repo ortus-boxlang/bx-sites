@@ -148,9 +148,9 @@ class extends="testbox.system.BaseSpec" {
 				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
 
 				var page = { title : "My Page", contentHtml : "<p>Hello</p>" };
-				var data = { products : { name : "Widget" } };
+				var siteData = { products : { name : "Widget" } };
 
-				var html = renderer.renderPage( page, [], { name : "My Site" }, themeDir, "/", [], "Latest", [], "", "ltr", {}, data );
+				var html = renderer.renderPage( page, [], { name : "My Site" }, themeDir, "/", [], "Latest", [], "", "ltr", {}, siteData );
 
 				expect( html ).toInclude( "Widget" );
 			} );

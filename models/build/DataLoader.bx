@@ -99,8 +99,15 @@ class {
 	 * @filesByExt This basename's own `{ ext : absolutePath }` matches
 	 */
 	private any function loadOne( required string basename, required struct filesByExt ) {
-		var ext = variables.extensions.filter( e => arguments.filesByExt.keyExists( e ) )[ 1 ]
-		var filePath = arguments.filesByExt[ ext ]
+		// Captured into a local first - an arrow function's own `arguments`
+		// scope is its own (item/index/array, per array .filter()'s own
+		// callback signature), not loadOne()'s, so `arguments.filesByExt`
+		// inside the closure below would look up a key that was never
+		// there (the same lesson BuildPipeline.bx's own renderDocTree()
+		// docblock already documents for `blogNavUrl`).
+		var filesByExt = arguments.filesByExt
+		var ext = variables.extensions.filter( e => filesByExt.keyExists( e ) )[ 1 ]
+		var filePath = filesByExt[ ext ]
 
 		try {
 			return ext == "json"
