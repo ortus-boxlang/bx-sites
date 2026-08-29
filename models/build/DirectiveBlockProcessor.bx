@@ -26,7 +26,12 @@
  * `protectLoopDirectives()`/`restoreLoopDirectives()` for how their own
  * bodies survive the page's single top-level `{{ }}` pass unresolved, and
  * `setLoopContext()` for the per-page wiring BuildPipeline.convertMarkdown()
- * does to make any of this work at all.
+ * does to make any of this work at all. Unlike every directive above, a
+ * `::: if`/`::: elseif`/`::: else` chain needs only ONE trailing `:::`
+ * for the whole chain, not one per branch - `extract()`'s own
+ * `closeFrame()` treats `::: elseif`/`::: else` as an implicit close of
+ * whatever `::: if`/`::: elseif` branch is still open, the same as a
+ * real bare `:::` would (an explicit one still works too, if written).
  */
 class {
 
@@ -119,6 +124,29 @@ class {
 	 * parent's own captured content, to be found again by that parent's
 	 * own render function via a fresh `extract()` call - see `restore()`.
 	 *
+	 * A `::: elseif`/`::: else` immediately following an already-open
+	 * `::: if`/`::: elseif` implicitly closes that *previous* branch first
+	 * (closeFrame() below), the same way a real bare `:::` would - so a
+	 * whole `::: if` / `::: elseif` / `::: else` chain only ever needs ONE
+	 * trailing `:::`, not one per branch:
+	 *
+	 *   ::: if a
+	 *   A
+	 *   ::: elseif b
+	 *   B
+	 *   ::: else
+	 *   C
+	 *   :::
+	 *
+	 * The old, fully-explicit form (a `:::` before every `::: elseif`/
+	 * `::: else` too) still works exactly as it always has - this only
+	 * ever fires when the previous branch is still open, so an explicit
+	 * close just means there's nothing left for it to implicitly do.
+	 * Either way, every branch still becomes its own `blocks` entry, same
+	 * `{ token, type, attrsRaw, content }` shape as any other directive -
+	 * `collectIfChain()`/`renderIfChain()` (which group and evaluate them)
+	 * never need to know which form a project actually wrote.
+	 *
 	 * @markdown The raw markdown body text
 	 *
 	 * @return { markdown: string with top-level directives replaced by placeholders, blocks: array of { token, type, attrsRaw, content } }
@@ -151,28 +179,21 @@ class {
 					outputLines.append( line )
 					continue
 				}
-				var frame = stack[ stack.len() ]
-				stack.deleteAt( stack.len() )
-				var content = frame.lines.toList( char( 10 ) )
-
-				if ( !stack.len() ) {
-					var token = "bxsitesdirective" & replace( createUUID(), "-", "", "all" )
-					blocks.append( { token : token, type : frame.type, attrsRaw : frame.attrsRaw, content : content } )
-					outputLines.append( "" )
-					outputLines.append( '<div class="bxsites-raw-block" data-bxsites-token="' & token & '"></div>' )
-					outputLines.append( "" )
-				} else {
-					var parent = stack[ stack.len() ]
-					parent.lines.append( "::: " & frame.type & " " & frame.attrsRaw )
-					parent.lines.append( content )
-					parent.lines.append( ":::" )
-				}
+				closeFrame( stack, blocks, outputLines )
 				continue
 			}
 
 			var matcher = variables.openPattern.matcher( trimmedLine )
 			if ( matcher.matches() ) {
-				stack.append( { type : matcher.group( 1 ), attrsRaw : trim( matcher.group( 2 ) ), lines : [] } )
+				var newType = matcher.group( 1 )
+				if (
+					stack.len()
+					&& listFindNoCase( "elseif,else", trim( newType ) )
+					&& listFindNoCase( "if,elseif", trim( stack[ stack.len() ].type ) )
+				) {
+					closeFrame( stack, blocks, outputLines )
+				}
+				stack.append( { type : newType, attrsRaw : trim( matcher.group( 2 ) ), lines : [] } )
 				continue
 			}
 
@@ -204,6 +225,40 @@ class {
 		}
 
 		return { markdown : outputLines.toList( char( 10 ) ), blocks : blocks }
+	}
+
+	/**
+	 * Finalizes the innermost currently-open stack frame - extract()'s own
+	 * shared closing logic, called both for a real bare `:::` line and for
+	 * an implicit `::: elseif`/`::: else` continuation (extract()'s own
+	 * docblock explains why the latter needs this too). A top-level frame
+	 * becomes its own `blocks` entry, placeholder spliced into
+	 * `outputLines`; a nested one is folded back into its own parent
+	 * frame's `lines` as literal `::: type attrs` ... `:::` source text,
+	 * to be found again by a fresh `extract()` call later (this class's
+	 * own docblock).
+	 *
+	 * @stack extract()'s own open-frame stack (mutated - the top frame is popped)
+	 * @blocks extract()'s own top-level blocks array (mutated when the popped frame was itself top-level)
+	 * @outputLines extract()'s own output lines array (mutated the same way)
+	 */
+	private void function closeFrame( required array stack, required array blocks, required array outputLines ) {
+		var frame = arguments.stack[ arguments.stack.len() ]
+		arguments.stack.deleteAt( arguments.stack.len() )
+		var content = frame.lines.toList( char( 10 ) )
+
+		if ( !arguments.stack.len() ) {
+			var token = "bxsitesdirective" & replace( createUUID(), "-", "", "all" )
+			arguments.blocks.append( { token : token, type : frame.type, attrsRaw : frame.attrsRaw, content : content } )
+			arguments.outputLines.append( "" )
+			arguments.outputLines.append( '<div class="bxsites-raw-block" data-bxsites-token="' & token & '"></div>' )
+			arguments.outputLines.append( "" )
+		} else {
+			var parent = arguments.stack[ arguments.stack.len() ]
+			parent.lines.append( "::: " & frame.type & " " & frame.attrsRaw )
+			parent.lines.append( content )
+			parent.lines.append( ":::" )
+		}
 	}
 
 	/**

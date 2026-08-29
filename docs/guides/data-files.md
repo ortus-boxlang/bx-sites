@@ -157,15 +157,16 @@ Chain `::: elseif <dotted.path>` (any number) and a trailing bare
 `::: else` right after a `::: if` for real `if`/`elseif`/`else`
 semantics - the first truthy condition wins, `::: else` catches whatever's
 left, and a later branch's own condition is never even resolved until
-its own turn comes:
+its own turn comes. One trailing `:::` closes the whole chain -
+`::: elseif`/`::: else` mark where the previous branch ends, no `:::`
+needed before each of them (though it still works if you'd rather write
+it that way):
 
 ```markdown title="Example" linenums="1"
 ::: if data.flags.darkModeDefault
 Dark mode is on by default.
-:::
 ::: elseif data.flags.betaBanner
 Beta features are enabled, though dark mode isn't on by default.
-:::
 ::: else
 Nothing special about this build.
 :::

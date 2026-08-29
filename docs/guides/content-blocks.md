@@ -514,21 +514,19 @@ Beta features are enabled on this build.
 :::
 
 Chain `::: elseif <dotted.path>` (any number of them) and a trailing bare
-`::: else` after a `::: if` - each is its own `::: type ... :::` block,
-one right after another, the same way `::: card` children sit inside
-`::: cards`. Real `if`/`elseif`/`else` semantics: the first truthy
-condition wins, `::: else` (no condition of its own) catches whatever's
-left, and a condition after the winning one is never even resolved - a
-typo'd `::: elseif` path only breaks the build once its own branch is
-actually reached:
+`::: else` after a `::: if` for real `if`/`elseif`/`else` semantics - the
+first truthy condition wins, `::: else` (no condition of its own) catches
+whatever's left, and a condition after the winning one is never even
+resolved, so a typo'd `::: elseif` path only breaks the build once its
+own branch is actually reached. The whole chain closes with **one**
+trailing `:::` - `::: elseif`/`::: else` themselves mark where the
+previous branch ends, so there's no `:::` needed before each of them:
 
 ```markdown title="Example" linenums="1"
 ::: if data.flags.darkModeDefault
 Dark mode is on by default.
-:::
 ::: elseif data.flags.betaBanner
 Beta features are enabled, though dark mode isn't on by default.
-:::
 ::: else
 Nothing special about this build.
 :::
@@ -536,13 +534,14 @@ Nothing special about this build.
 
 ::: if data.flags.darkModeDefault
 Dark mode is on by default.
-:::
 ::: elseif data.flags.betaBanner
 Beta features are enabled, though dark mode isn't on by default.
-:::
 ::: else
 Nothing special about this build.
 :::
+
+A `:::` before an `::: elseif`/`::: else` still works too, if you'd
+rather close each branch explicitly - both forms parse identically.
 
 Both bodies can contain ordinary Markdown and even other content blocks -
 including another `::: for`/`::: if`, nested exactly like any block above.

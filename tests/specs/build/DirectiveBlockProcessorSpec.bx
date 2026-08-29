@@ -660,6 +660,47 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).notToInclude( "B" );
 			} );
 
+			it( "the compact form - one trailing ::: for the whole chain, no ::: before ::: elseif/::: else - parses and evaluates identically", function() {
+				var md = "::: if data.flags.a" & char( 10 ) & "A" & char( 10 ) &
+					"::: elseif data.flags.b" & char( 10 ) & "B" & char( 10 ) &
+					"::: else" & char( 10 ) & "C" & char( 10 ) &
+					":::";
+
+				expect( renderWithData( md, { data : { flags : { a : true, b : false } } } ) ).toInclude( "A" );
+				expect( renderWithData( md, { data : { flags : { a : false, b : true } } } ) ).toInclude( "B" );
+				expect( renderWithData( md, { data : { flags : { a : false, b : false } } } ) ).toInclude( "C" );
+			} );
+
+			it( "the compact form still short-circuits - a later ::: elseif's own unresolvable path is never looked up once an earlier branch already won", function() {
+				var md = "::: if data.flags.a" & char( 10 ) & "A" & char( 10 ) &
+					"::: elseif data.missing" & char( 10 ) & "B" & char( 10 ) &
+					":::";
+
+				expect( renderWithData( md, { data : { flags : { a : true } } } ) ).toInclude( "A" );
+			} );
+
+			it( "mixing an explicit ::: before one ::: elseif with the compact form elsewhere in the same chain still parses correctly", function() {
+				var md = "::: if data.flags.a" & char( 10 ) & "A" & char( 10 ) & ":::" & char( 10 ) &
+					"::: elseif data.flags.b" & char( 10 ) & "B" & char( 10 ) &
+					"::: else" & char( 10 ) & "C" & char( 10 ) &
+					":::";
+
+				expect( renderWithData( md, { data : { flags : { a : false, b : true } } } ) ).toInclude( "B" );
+			} );
+
+			it( "the compact form works nested inside another block too (e.g. ::: cards)", function() {
+				var md = "::: cards" & char( 10 ) &
+					'::: card title="Status"' & char( 10 ) &
+					"::: if data.flags.a" & char( 10 ) & "On" & char( 10 ) &
+					"::: else" & char( 10 ) & "Off" & char( 10 ) &
+					":::" & char( 10 ) &
+					":::" & char( 10 ) & ":::";
+				var html = renderWithData( md, { data : { flags : { a : false } } } );
+
+				expect( html ).toInclude( "Off" );
+				expect( html ).notToInclude( "On" );
+			} );
+
 			it( "a standalone ::: if (no elseif/else siblings) still works exactly as before", function() {
 				var md = "::: if data.flags.a" & char( 10 ) & "A" & char( 10 ) & ":::";
 
