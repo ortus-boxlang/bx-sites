@@ -513,8 +513,39 @@ Beta features are enabled on this build.
 Beta features are enabled on this build.
 :::
 
-Both bodies can contain ordinary Markdown and even other content blocks,
-nested exactly like any block above. See [Data Files: Consuming
-data](data-files.md#consuming-data) for the full loop/conditional story,
-including the two other ways to work with `data.*` - a theme override, or
-a magic function.
+Chain `::: elseif <dotted.path>` (any number of them) and a trailing bare
+`::: else` after a `::: if` - each is its own `::: type ... :::` block,
+one right after another, the same way `::: card` children sit inside
+`::: cards`. Real `if`/`elseif`/`else` semantics: the first truthy
+condition wins, `::: else` (no condition of its own) catches whatever's
+left, and a condition after the winning one is never even resolved - a
+typo'd `::: elseif` path only breaks the build once its own branch is
+actually reached:
+
+```markdown title="Example" linenums="1"
+::: if data.flags.darkModeDefault
+Dark mode is on by default.
+:::
+::: elseif data.flags.betaBanner
+Beta features are enabled, though dark mode isn't on by default.
+:::
+::: else
+Nothing special about this build.
+:::
+```
+
+::: if data.flags.darkModeDefault
+Dark mode is on by default.
+:::
+::: elseif data.flags.betaBanner
+Beta features are enabled, though dark mode isn't on by default.
+:::
+::: else
+Nothing special about this build.
+:::
+
+Both bodies can contain ordinary Markdown and even other content blocks -
+including another `::: for`/`::: if`, nested exactly like any block above.
+See [Data Files: Consuming data](data-files.md#consuming-data) for the
+full loop/conditional story, including the two other ways to work with
+`data.*` - a theme override, or a magic function.

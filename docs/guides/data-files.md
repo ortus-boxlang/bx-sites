@@ -153,6 +153,24 @@ Beta features are enabled on this build.
 :::
 ```
 
+Chain `::: elseif <dotted.path>` (any number) and a trailing bare
+`::: else` right after a `::: if` for real `if`/`elseif`/`else`
+semantics - the first truthy condition wins, `::: else` catches whatever's
+left, and a later branch's own condition is never even resolved until
+its own turn comes:
+
+```markdown title="Example" linenums="1"
+::: if data.flags.darkModeDefault
+Dark mode is on by default.
+:::
+::: elseif data.flags.betaBanner
+Beta features are enabled, though dark mode isn't on by default.
+:::
+::: else
+Nothing special about this build.
+:::
+```
+
 Both bodies can contain ordinary Markdown and even other content blocks,
 including a nested `::: for`/`::: if`. Deliberately narrow grammar,
 matching `{{ }}` itself - a dotted path only, no comparison operators
