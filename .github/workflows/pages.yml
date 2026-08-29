@@ -2,22 +2,36 @@ name: Publish Docs
 
 # Builds this repository's own dogfooded docs (docs/ + bxsites.yaml at the
 # repo root - see readme.md) with bx-sites itself, and publishes site/ to
-# GitHub Pages - development is the only branch that deploys, straight to
-# the site root, since it's this project's active branch working toward the
-# 1.0.0 release (there is no `main` yet). Once development is stable enough
-# to cut the real 1.0.0 release, it merges into a new `main` branch - at
-# that point `main` becomes the frozen 1.0.x line and this workflow's
-# trigger/deploy condition below should move from `development` to `main`,
-# with `development` free to start the next version's work. The docs are
-# versioned now (bxsites.yaml's own `versions.default` -
-# see docs/guides/versioning.md), so a released version publishes at the
-# root and the plain docs/ tree (whatever's being written toward the next
-# release) publishes at /next/ instead - no separate branch-based preview
-# deploy needed for that anymore.
+# GitHub Pages. Two branches deploy, each owning a different part of the
+# published site:
+#  - `main` (the frozen release line, cut from `development` once a version
+#    ships - patch releases like 1.0.1/1.0.2 land directly on `main`)
+#    deploys the site root: whatever `bxsites.yaml`'s own `versions.default`
+#    points at (see docs/guides/versioning.md), in every built-in theme
+#    (the theme gallery below).
+#  - `development` (this project's active branch, working toward the next
+#    minor/major version) deploys only /next/ - the plain docs/ tree, i.e.
+#    whatever's currently being written toward that next release.
+# Before `main` exists (this repo's current state, still pre-1.0.0),
+# `development` is the only branch pushing here, and its own root output
+# simply never gets deployed (pruned away below) - there is nothing at the
+# site root to publish until a real release is cut and `main` starts
+# deploying it.
+#
+# `bxSites build` always builds the *entire* site in one pass - root,
+# /next/, every other docs/versions/* folder, all ten themes - there's no
+# CLI flag to build just one part. So both branches run the exact same
+# build; only the deploy step differs, pruning the assembled site/ tree
+# right before publishing based on which branch triggered the run (see
+# `assemble-and-deploy` below) - `keep_files: true` means whatever gets
+# pruned away locally simply stays untouched on the live site, so a
+# `development` push can't clobber `main`'s root and vice versa.
+#
 # Each publish is itself a showcase of all ten built-in themes (the theme
 # gallery) - bootstrap at the root, every other theme under theme/<name>/,
 # with a switcher (docs/assets/theme-switcher.js) to jump between them from
-# any page.
+# any page. Every variant carries its own /next/ too (theme/<name>/next/),
+# since /next/ is just another part of the same per-theme build output.
 #
 # The ten themes build as ten separate matrix jobs, each on its own runner -
 # real OS-level parallelism, no shared disk/BOXLANG_HOME/working tree
@@ -36,16 +50,17 @@ on:
   push:
     branches:
       - development
-    paths:
-      - "docs/**"
-      - "bxsites.yaml"
-      - "resources/**"
-      - "models/**"
-      - "bifs/**"
-      - "components/**"
-      - "interceptors/**"
-      - "ModuleConfig.bx"
-      - ".github/workflows/pages.yml"
+      - main
+    # Deliberately no `paths:` filter - every push to either branch
+    # rebuilds and redeploys, full stop. A paths filter here previously
+    # left bxsites.io stuck on stale/empty content more than once: a push
+    # whose own files didn't match the filter (tests.yml/box.json-only
+    # changes, say) skipped the deploy entirely, so a real fix landing in
+    # an earlier, non-matching commit never got a retry until some later,
+    # unrelated matching push happened to come along. A full ten-theme
+    # rebuild is cheap enough (a few parallelized minutes) that "always
+    # rebuild" is worth it for "never silently stale" - see this
+    # workflow's own docblock above for what actually gets built/deployed.
 
   # Manual Trigger
   workflow_dispatch:
@@ -53,10 +68,11 @@ on:
 permissions:
   contents: write
 
-# Only development ever pushes here now, but keyed by ref_name still so a
-# manual workflow_dispatch run from another branch (build-only - see the
-# deploy step's own `if: github.ref_name == 'development'`) never queues
-# behind development's.
+# Keyed by ref_name so main's own runs and development's own runs never
+# queue behind each other (they deploy different, non-overlapping parts of
+# the site) - and so a manual workflow_dispatch run from any other branch
+# (build-only - see the deploy step's own `if:` condition) never queues
+# behind either.
 concurrency:
   group: "pages-${{ github.ref_name }}"
   cancel-in-progress: false
@@ -177,8 +193,34 @@ jobs:
             mv "${dir}" "site/theme/${name}"
           done
 
-      - name: Deploy to the site root
+      - name: On main, prune every next/ (development owns that, this run doesn't touch it)
+        if: github.ref_name == 'main'
+        run: |
+          rm -rf site/next
+          rm -rf site/theme/*/next
+
+      - name: On development, keep only next/ (main owns everything else)
         if: github.ref_name == 'development'
+        run: |
+          # Rebuilds site/ to contain *only* the next/ paths (root's own
+          # next/, plus each theme/<name>/next/) at the exact same
+          # relative locations they'll deploy to - keep_files:true then
+          # leaves every non-next/ path already on gh-pages (main's own
+          # root output) completely untouched.
+          mkdir -p /tmp/next-only/theme
+          [[ -d site/next ]] && mv site/next /tmp/next-only/next
+          for dir in site/theme/*/; do
+            name="$(basename "${dir}")"
+            if [[ -d "${dir}next" ]]; then
+              mkdir -p "/tmp/next-only/theme/${name}"
+              mv "${dir}next" "/tmp/next-only/theme/${name}/next"
+            fi
+          done
+          rm -rf site
+          mv /tmp/next-only site
+
+      - name: Deploy the pruned site/ tree to GitHub Pages
+        if: github.ref_name == 'development' || github.ref_name == 'main'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -187,5 +229,7 @@ jobs:
           # Writes CNAME at the true gh-pages root - keeps the custom
           # domain durable across a gh-pages wipe, rather than depending
           # solely on the one-time manual Settings -> Pages -> Custom
-          # domain click having created it already.
+          # domain click having created it already. Idempotent (the same
+          # file, written identically by either branch's own deploy), so
+          # safe to keep on both rather than picking one branch to own it.
           cname: bxsites.io
