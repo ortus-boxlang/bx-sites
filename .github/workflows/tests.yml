@@ -51,29 +51,27 @@ jobs:
           mkdir -p "${BOXLANG_HOME}/modules"
           ln -s "$(pwd)" "${BOXLANG_HOME}/modules/$(basename "$(pwd)")"
 
-      - name: Run Tests (streamed)
+      - name: Run Tests
         run: |
-          # --stream prints each bundle/suite/spec result live as it
-          # completes, instead of only the final aggregate report - kept on
-          # since it's what surfaced a real compile error (an unescaped `#`
-          # in a ResponsiveImageProcessor.bx string literal, masked by a
-          # StackOverflowError in TestBox's own JSON serialization of the
-          # resulting giant cascaded-parse-error message) that the default,
-          # end-of-run-only report never showed at all.
-          #
-          # BoxLangRunner.bx unconditionally forces its own reporter to
-          # "text" whenever --stream is set (see its own shouldStream
-          # branch), discarding whatever --reporter was actually requested -
-          # so this streamed run can never itself produce real JUnit XML;
-          # that's what the second, non-streamed run below is for.
-          ./testbox/run --verbose --stream
-
-      - name: Run Tests (JUnit report)
-        run: |
+          # Just the one run, with --reporter=ANTJunit - BoxLangRunner.bx
+          # unconditionally forces its own reporter to "text" whenever
+          # --stream is set (its own shouldStream branch: "Console reporter
+          # writes directly to stdout, which conflicts with stream-only
+          # output"), and only calls generateAntReports() when the reporter
+          # is still "ANTJunit" - so streaming and real JUnit XML output are
+          # mutually exclusive in a single invocation, not something a
+          # workflow-side flag combination can work around. A prior version
+          # of this step ran the suite twice (once streamed for live
+          # progress/a real compile error that a StackOverflowError in
+          # TestBox's own JSON serialization once masked from the
+          # end-of-run-only report, once with --reporter=ANTJunit for the
+          # JUnit XML this step's own failure check and the
+          # publish-test-results job both need) - not worth doubling every
+          # CI run's wall-clock time for that.
           ./testbox/run --reporter=ANTJunit --verbose
           # BoxLang's TestBox runner never sets a nonzero process exit code
-          # based on spec failures - the shell step above "succeeds" even
-          # when specs failed, the same silent-green gap that let a real
+          # based on spec failures - the step above "succeeds" even when
+          # specs failed, the same silent-green gap that let a real
           # regression (a stale test assertion) ship unnoticed for a while.
           # Fail this step explicitly by summing every generated JUnit XML
           # file's own `failures`/`errors` attributes (ANTJUnitReporter.cfc's
@@ -82,7 +80,7 @@ jobs:
           errors=$(grep -ohE 'errors="[0-9]+"' tests/results/*.xml | grep -oE '[0-9]+' | awk '{s+=$1} END {print s+0}')
           echo "Failures: ${failures}, Errors: ${errors}"
           if [ "${failures}" -gt 0 ] || [ "${errors}" -gt 0 ]; then
-            echo "::error::${failures} failing / ${errors} erroring spec(s) - see the streamed run above for exactly which ones"
+            echo "::error::${failures} failing / ${errors} erroring spec(s) - see tests/results/*.xml (uploaded as this job's tests-${{ matrix.os }} artifact) for exactly which ones"
             exit 1
           fi
 
