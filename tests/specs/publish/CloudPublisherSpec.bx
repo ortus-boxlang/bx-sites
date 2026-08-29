@@ -1,0 +1,172 @@
+/**
+ * publish.CloudPublisher - guard clauses, a fully real offline
+ * zip-then-unzip round trip of `buildZipArchive()` (no HTTP, no bxSites
+ * Cloud account), and a genuine connection-failure test against an
+ * unreachable endpoint (no server mocked) - matching this repo's existing
+ * pattern for untestable-without-real-credentials/servers code (see
+ * `NetlifyTargetSpec.bx`/`S3TargetSpec.bx`'s own docblocks). The publish
+ * API itself doesn't exist yet (built in parallel, against this same
+ * contract, in the separate `bx-sites-cloud` repo) - so a real successful
+ * `publish()` call has not been exercised anywhere in this repo either.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "publish.CloudPublisher", function() {
+
+			beforeEach( function() {
+				variables.publisher = new "models.publish.CloudPublisher@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newTempDir() {
+				var dir = createTempDirectory( prefix = "bxsites-cloudpublisher-" );
+				tempDirs.append( dir );
+				return dir;
+			}
+
+			it( "throws BxSites.SiteNotBuilt when siteDir doesn't exist", function() {
+				var root = newTempDir();
+				expect( function() {
+					publisher.publish(
+						siteDir : root & "/site",
+						apiUrl  : "https://cloud.bxsites.app",
+						siteId  : "abc123",
+						token   : "cb_test"
+					);
+				} ).toThrow( "BxSites.SiteNotBuilt" );
+			} );
+
+			it( "wraps a real connection failure as BxSites.PublishFailed (genuine refused connection, no server mocked)", function() {
+				var siteDir = newTempDir();
+				fileWrite( siteDir & "/index.html", "hi" );
+
+				expect( function() {
+					publisher.publish(
+						siteDir : siteDir,
+						apiUrl  : "https://127.0.0.1:1",
+						siteId  : "abc123",
+						token   : "cb_test"
+					);
+				} ).toThrow( "BxSites.PublishFailed" );
+			} );
+
+			describe( "buildZipArchive()", function() {
+
+				it( "zips the whole directory with no wrapping top-level folder, preserving exact file bytes", function() {
+					var siteDir = newTempDir();
+					directoryCreate( siteDir & "/assets/css", true, true );
+					fileWrite( siteDir & "/index.html", "<h1>Home</h1>" );
+					fileWrite( siteDir & "/assets/css/style.css", "body{color:red}" );
+					fileWrite( siteDir & "/assets/nested.txt", "nested content" );
+					directoryCreate( siteDir & "/blog", true, true );
+					fileWrite( siteDir & "/blog/post.html", "<p>Post</p>" );
+
+					var zipBytes = publisher.buildZipArchive( siteDir );
+					expect( isBinary( zipBytes ) ).toBeTrue();
+					expect( zipBytes.len() ).toBeGT( 0 );
+
+					var entries = unzipEntries( zipBytes );
+
+					// exactly these 4 entries, with paths relative to siteDir's own
+					// contents - no wrapping top-level folder (e.g. no
+					// "<tempdir-basename>/index.html") - the same relative-path
+					// shape the publish API's `site` field maps directly to storage
+					// keys, per the publish-api.md contract (site/index.html ->
+					// index.html, site/blog/post.html -> blog/post.html)
+					expect( entries.count() ).toBe( 4 );
+					expect( entries.keyExists( "index.html" ) ).toBeTrue();
+					expect( entries.keyExists( "assets/css/style.css" ) ).toBeTrue();
+					expect( entries.keyExists( "assets/nested.txt" ) ).toBeTrue();
+					expect( entries.keyExists( "blog/post.html" ) ).toBeTrue();
+
+					expect( entries[ "index.html" ] ).toBe( "<h1>Home</h1>" );
+					expect( entries[ "assets/css/style.css" ] ).toBe( "body{color:red}" );
+					expect( entries[ "assets/nested.txt" ] ).toBe( "nested content" );
+					expect( entries[ "blog/post.html" ] ).toBe( "<p>Post</p>" );
+				} );
+
+				it( "round-trips binary (non-text) file content exactly", function() {
+					var siteDir = newTempDir();
+					directoryCreate( siteDir, true, true );
+
+					// build some non-UTF8-safe bytes (0..255) and write them via real Java I/O
+					var out = createObject( "java", "java.io.ByteArrayOutputStream" ).init();
+					for ( var i = 0; i <= 255; i++ ) {
+						out.write( javaCast( "int", i ) );
+					}
+					var rawBytes = out.toByteArray();
+					var fos = createObject( "java", "java.io.FileOutputStream" ).init( siteDir & "/image.bin" );
+					fos.write( rawBytes );
+					fos.close();
+
+					var zipBytes = publisher.buildZipArchive( siteDir );
+					var rawEntries = unzipRawEntries( zipBytes );
+
+					expect( rawEntries.keyExists( "image.bin" ) ).toBeTrue();
+					expect( rawEntries[ "image.bin" ].len() ).toBe( rawBytes.len() );
+					for ( var i = 1; i <= rawBytes.len(); i++ ) {
+						if ( rawBytes[ i ] != rawEntries[ "image.bin" ][ i ] ) {
+							expect( false ).toBeTrue( "byte mismatch at index #i#" );
+						}
+					}
+				} );
+
+				it( "filters out directory entries - only real files end up in the zip", function() {
+					var siteDir = newTempDir();
+					directoryCreate( siteDir & "/empty-subdir", true, true );
+					fileWrite( siteDir & "/index.html", "hi" );
+
+					var zipBytes = publisher.buildZipArchive( siteDir );
+					var entries = unzipEntries( zipBytes );
+
+					expect( entries.count() ).toBe( 1 );
+					expect( entries.keyExists( "index.html" ) ).toBeTrue();
+				} );
+
+			} );
+
+		} );
+	}
+
+	/**
+	 * Unzips `zipBytes` (via `java.util.zip.ZipInputStream`) into a
+	 * { entryName : utf8Content } struct, for asserting on text content.
+	 */
+	private struct function unzipEntries( required binary zipBytes ) {
+		var raw = unzipRawEntries( arguments.zipBytes );
+		var result = {};
+		for ( var name in raw ) {
+			result[ name ] = createObject( "java", "java.lang.String" ).init( raw[ name ], "UTF-8" );
+		}
+		return result;
+	}
+
+	/**
+	 * Unzips `zipBytes` into a { entryName : rawBytes } struct, for
+	 * asserting on exact binary content.
+	 */
+	private struct function unzipRawEntries( required binary zipBytes ) {
+		var bais = createObject( "java", "java.io.ByteArrayInputStream" ).init( arguments.zipBytes );
+		var zis = createObject( "java", "java.util.zip.ZipInputStream" ).init( bais );
+		var result = {};
+
+		var entry = zis.getNextEntry();
+		while ( !isNull( entry ) ) {
+			result[ entry.getName() ] = zis.readAllBytes();
+			zis.closeEntry();
+			entry = zis.getNextEntry();
+		}
+		zis.close();
+		return result;
+	}
+
+}

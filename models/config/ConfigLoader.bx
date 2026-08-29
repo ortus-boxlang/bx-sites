@@ -84,7 +84,8 @@ class {
 		"variables"    : {},
 		"i18n"         : { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] },
 		"blog"         : { "postsPerPage" : 10, "feed" : true, "feedLimit" : 25 },
-		"versions"     : { "default" : "" }
+		"versions"     : { "default" : "" },
+		"cloud"        : { "siteId" : "", "apiUrl" : "" }
 	}
 
 	/**
@@ -458,6 +459,7 @@ class {
 		validateRedirects( arguments.config.redirects ?: "" )
 		validateVariables( arguments.config.variables ?: "" )
 		validateVersions( arguments.config.versions ?: "" )
+		validateCloud( arguments.config.cloud ?: "" )
 
 		return arguments.config
 	}
@@ -512,6 +514,47 @@ class {
 			throw(
 				type    = "BxSites.InvalidConfig",
 				message = "#variables.configFileName# [versions.default], when present, must be a string"
+			)
+		}
+	}
+
+	/**
+	 * Validates the site config's `cloud` block - the `publish` verb's own
+	 * destination (module spec's bxSites Cloud publish-API contract):
+	 * `siteId` (the target site's UUID in bxSites Cloud) and `apiUrl` (that
+	 * instance's base URL, e.g. `https://cloud.bxsites.app` or a self-hosted
+	 * URL). Deliberately no token/secret field here at all, not even an
+	 * `EnvVar`-suffixed indirection like every `deployments/*` target uses -
+	 * `publish`'s own auth token is a fixed, hardcoded env var name
+	 * (`BXSITES_CLOUD_TOKEN`) plus an optional `--token` CLI flag (see
+	 * `models/cli/Publish.bx`), never anything named in `bxsites.yaml`
+	 * itself, so there's no field here whose value could ever be mistaken
+	 * for a place to paste a real token. Both fields are optional here -
+	 * empty is the "not configured yet" default - `publish` itself is what
+	 * requires them to be non-empty when it actually runs.
+	 *
+	 * @cloud The merged config's own `cloud` value - `any`, not `struct`, for
+	 * the same reason validateI18n() takes `any` (see its own docblock)
+	 */
+	private void function validateCloud( required any cloud ) {
+		if ( !isStruct( arguments.cloud ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [cloud], when present, must be an object"
+			)
+		}
+
+		if ( !isSimpleValue( arguments.cloud.siteId ?: "" ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [cloud.siteId], when present, must be a string"
+			)
+		}
+
+		if ( !isSimpleValue( arguments.cloud.apiUrl ?: "" ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [cloud.apiUrl], when present, must be a string"
 			)
 		}
 	}

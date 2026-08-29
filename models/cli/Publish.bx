@@ -1,0 +1,96 @@
+/**
+ * `publish` CLI verb - builds the site, then ships it to bxSites Cloud (the
+ * hosting SaaS this module targets) over its documented publish API, via
+ * `models/publish/CloudPublisher.bx`. Distinct from the pluggable
+ * `deploy`/`gh-deploy` verbs (which ship to a target the *caller* owns -
+ * S3, Netlify, a git branch, ...) - `publish` always ships to bxSites
+ * Cloud specifically, identified by `cloud.siteId`/`cloud.apiUrl` in
+ * `bxsites.yaml`.
+ *
+ * Resolves the destination (config + token) FIRST, before the (potentially
+ * expensive) build, same reasoning `GhDeploy.bx`'s own docblock gives -
+ * failing fast on a missing `[cloud]` block or a missing token avoids
+ * wasted build work for the common "forgot to configure this" case.
+ *
+ * The API token is never read from `bxsites.yaml` (or any other committed
+ * file) - only from the `BXSITES_CLOUD_TOKEN` environment variable, or an
+ * explicit `--token` flag which wins when both are set. There is
+ * deliberately no `tokenEnvVar`-style config field here, unlike every
+ * `deployments/*` target - `publish`'s own destination is always bxSites
+ * Cloud, so there's nothing for a configurable env-var name to select
+ * between.
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path), token (optional - overrides the BXSITES_CLOUD_TOKEN env var when set) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxSites.MissingProjectRoot", message = "`publish` requires a project root" )
+		}
+		var root = projectRoot.reReplace( "[\/]+$", "" )
+
+		var configLoader = new "models.config.ConfigLoader@bxsites"()
+		var siteConfig = configLoader.load( root )
+
+		var cloud = siteConfig.cloud ?: {}
+		var siteId = trim( cloud.siteId ?: "" )
+		var apiUrl = trim( cloud.apiUrl ?: "" )
+		if ( !len( siteId ) || !len( apiUrl ) ) {
+			throw(
+				type    = "BxSites.MissingCloudConfig",
+				message = "`publish` requires a [cloud] block in bxsites.yaml with both [siteId] and [apiUrl] set - see the Deployment guide for the bxSites Cloud publish setup"
+			)
+		}
+
+		var token = resolveToken( arguments.options )
+		if ( !len( token ) ) {
+			throw(
+				type    = "BxSites.MissingCloudToken",
+				message = "`publish` requires a bxSites Cloud API token - set the BXSITES_CLOUD_TOKEN environment variable, or pass --token=<token>"
+			)
+		}
+
+		var pipeline = new "models.build.BuildPipeline@bxsites"()
+		var buildResult = pipeline.build( root )
+
+		var publisher = new "models.publish.CloudPublisher@bxsites"()
+		var publishResult = publisher.publish(
+			siteDir : buildResult.siteDir,
+			apiUrl  : apiUrl,
+			siteId  : siteId,
+			token   : token
+		)
+
+		return {
+			exitCode : 0,
+			message  : "Published #buildResult.pageCount# page(s) to bxSites Cloud - #publishResult.url ?: ''#"
+		}
+	}
+
+	/**
+	 * Resolves the bxSites Cloud API token: an explicit `--token` flag wins
+	 * when set, else the `BXSITES_CLOUD_TOKEN` environment variable, else ""
+	 * (the caller turns that into a clear `BxSites.MissingCloudToken`).
+	 *
+	 * Public (not `private`) specifically so `PublishSpec.bx` can verify the
+	 * precedence directly - a full `run()` call needs a real bx-markdown
+	 * module activation (`BuildPipeline.bx`'s own hard dependency) this
+	 * plain unit-test environment doesn't have, same reasoning
+	 * `S3Target.bx`'s own `resolveEndpoint()` is public.
+	 *
+	 * @options The verb's own raw options struct
+	 *
+	 * @return The resolved token, or "" if neither source has one
+	 */
+	string function resolveToken( required struct options ) {
+		var flagToken = trim( arguments.options.token ?: "" )
+		if ( len( flagToken ) ) {
+			return flagToken
+		}
+		return trim( getSystemSetting( "BXSITES_CLOUD_TOKEN", "" ) )
+	}
+
+}

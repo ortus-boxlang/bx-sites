@@ -850,6 +850,51 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
+			it( "defaults [cloud] to empty [siteId]/[apiUrl] when not configured", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				var config = loader.load( dir );
+
+				expect( config.cloud.siteId ).toBe( "" );
+				expect( config.cloud.apiUrl ).toBe( "" );
+			} );
+
+			it( "deep-merges a partial [cloud] override, keeping the default empty apiUrl", function() {
+				var dir = newProjectDir( '{"name":"My Docs","cloud":{"siteId":"11111111-1111-1111-1111-111111111111"}}' );
+				var config = loader.load( dir );
+
+				expect( config.cloud.siteId ).toBe( "11111111-1111-1111-1111-111111111111" );
+				expect( config.cloud.apiUrl ).toBe( "" );
+			} );
+
+			it( "preserves a fully-configured [cloud] block", function() {
+				var dir = newProjectDir( '{"name":"My Docs","cloud":{"siteId":"abc123","apiUrl":"https://cloud.bxsites.app"}}' );
+				var config = loader.load( dir );
+
+				expect( config.cloud.siteId ).toBe( "abc123" );
+				expect( config.cloud.apiUrl ).toBe( "https://cloud.bxsites.app" );
+			} );
+
+			it( "throws BxSites.InvalidConfig when [cloud] is not an object", function() {
+				var dir = newProjectDir( '{"name":"My Docs","cloud":"not-an-object"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
+			it( "throws BxSites.InvalidConfig when [cloud.siteId] is not a string", function() {
+				var dir = newProjectDir( '{"name":"My Docs","cloud":{"siteId":["not","a","string"]}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
+			it( "throws BxSites.InvalidConfig when [cloud.apiUrl] is not a string", function() {
+				var dir = newProjectDir( '{"name":"My Docs","cloud":{"apiUrl":["not","a","string"]}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
 		} );
 	}
 
