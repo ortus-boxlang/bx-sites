@@ -18,7 +18,7 @@
  *
  * Each loaded post is shaped as a superset of DocsLoader.bx's own page
  * struct (`relativePath`/`sourcePath`/`urlPath`/`title`/`description`/
- * `hidden`/`showToc`/`tags`/`icon`/`summary`/`ogImage`/`body`), so
+ * `hidden`/`showToc`/`tags`/`frontmatter`/`icon`/`summary`/`ogImage`/`body`), so
  * BuildPipeline.bx's existing per-page finishing steps (convertMarkdown(),
  * assignTableOfContents(), assignEditAndLastUpdated(), assignOgImages(),
  * assignMarkdownUrl(), assignIconHtml()) all work against a post unchanged -
@@ -47,7 +47,7 @@ class {
 	 * @docsDir Absolute path to the project's docs/ directory
 	 * @includeDrafts Include posts whose frontmatter sets `draft: true`
 	 *
-	 * @return Array of post structs, newest first: { relativePath, sourcePath, urlPath, slug, title, description, hidden, showToc, tags, icon, summary, ogImage, body, date, authors, categories, draft, image }
+	 * @return Array of post structs, newest first: { relativePath, sourcePath, urlPath, slug, title, description, hidden, showToc, tags, frontmatter, icon, summary, ogImage, body, date, authors, categories, draft, image }
 	 */
 	array function load( required string docsDir, boolean includeDrafts = false ) {
 		var postsDir = arguments.docsDir.reReplace( "[\/]+$", "" ) & "/blog/posts"
@@ -110,6 +110,11 @@ class {
 			hidden       : false,
 			showToc      : ( fm.toc ?: true ) ? true : false,
 			tags         : toStringArray( fm.tags ?: "" ),
+			// See DocsLoader.bx's own loadFile() docblock comment - the raw
+			// frontmatter struct, reachable from markdown as
+			// `{{ page.frontmatter.<key> }}` for a custom post field
+			// (`series: "Getting Started"`, say) beyond the named ones here.
+			frontmatter  : fm,
 			icon         : trim( fm.icon ?: "" ),
 			summary      : trim( fm.summary ?: "" ),
 			ogImage      : trim( fm.ogImage ?: "" ),

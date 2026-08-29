@@ -20,7 +20,7 @@ class {
 	 *
 	 * @docsDir Absolute path to the project's docs/ directory
 	 *
-	 * @return Array of page structs, sorted by [order] then [title]: { relativePath, sourcePath, urlPath, title, description, order, hidden, tags, redirectFrom, icon, summary, ogImage, body }
+	 * @return Array of page structs, sorted by [order] then [title]: { relativePath, sourcePath, urlPath, title, description, order, hidden, tags, redirectFrom, frontmatter, icon, summary, ogImage, body }
 	 */
 	array function load( required string docsDir ) {
 		var dir = arguments.docsDir.reReplace( "[\/]+$", "" )
@@ -71,6 +71,20 @@ class {
 			showToc      : ( fm.toc ?: true ) ? true : false,
 			tags         : isArray( fm.tags ?: "" ) ? fm.tags : [],
 			redirectFrom : isArray( fm.redirect_from ?: "" ) ? fm.redirect_from : [],
+			// The raw, unfiltered frontmatter struct - every key above is
+			// also just a named/defaulted/type-coerced read off this same
+			// `fm`, so this is deliberately redundant with them (page.title
+			// and page.frontmatter.title both work) rather than exposing
+			// only whatever a project named beyond bx-sites' own known
+			// keys. What this adds is any *custom* key a project's own
+			// frontmatter sets (`product: BoxLang`, `release: 1.0.0`, ...) -
+			// otherwise dropped entirely - reachable from markdown as
+			// `{{ page.frontmatter.product }}` (BuildPipeline.bx's
+			// convertMarkdown() merges `page` into VariablesProcessor.bx's
+			// own `{{ dotted.path }}` lookup scope) and bare as
+			// `page.frontmatter.product` from a magic function/theme
+			// override, the same way `page.title` already is.
+			frontmatter  : fm,
 			icon         : trim( fm.icon ?: "" ),
 			summary      : trim( fm.summary ?: "" ),
 			ogImage      : trim( fm.ogImage ?: "" ),

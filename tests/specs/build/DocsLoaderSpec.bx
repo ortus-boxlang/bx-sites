@@ -44,6 +44,27 @@ class extends="testbox.system.BaseSpec" {
 				expect( pages[ 1 ].body ).toBe( "Body text" );
 			} );
 
+			it( "preserves the raw frontmatter struct, custom keys included, on page.frontmatter", function() {
+				var dir = newDocsDir();
+				fileWrite( dir & "/guide.md", "---" & char( 10 ) & "title: My Guide" & char( 10 ) & "product: BoxLang" & char( 10 ) & "release: 1.0.0" & char( 10 ) & "---" & char( 10 ) & "Body text" );
+
+				var pages = loader.load( dir );
+
+				expect( pages[ 1 ].frontmatter.title ).toBe( "My Guide" );
+				expect( pages[ 1 ].frontmatter.product ).toBe( "BoxLang" );
+				expect( pages[ 1 ].frontmatter.release ).toBe( "1.0.0" );
+			} );
+
+			it( "defaults page.frontmatter to an empty struct when a page has no frontmatter at all", function() {
+				var dir = newDocsDir();
+				fileWrite( dir & "/plain.md", "No frontmatter here" );
+
+				var pages = loader.load( dir );
+
+				expect( pages[ 1 ].frontmatter ).toBeStruct();
+				expect( pages[ 1 ].frontmatter.isEmpty() ).toBeTrue();
+			} );
+
 			it( "maps a root index.md to index.html directly, not a subfolder", function() {
 				var dir = newDocsDir();
 				fileWrite( dir & "/index.md", "Welcome" );

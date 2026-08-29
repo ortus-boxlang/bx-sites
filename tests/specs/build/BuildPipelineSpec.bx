@@ -235,6 +235,52 @@ class extends="testbox.system.BaseSpec" {
 				expect( calls[ 1 ].options.anchorLinks ).toBeFalse();
 			} );
 
+			it( "resolves {{ page.<field> }} against the current page's own frontmatter/fields in its rendered content", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "title: My Guide" & char( 10 ) & "---" & char( 10 ) & "Hello {{ page.title }}!" );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "<p>Hello My Guide!</p>" );
+			} );
+
+			it( "resolves {{ page.frontmatter.<customKey> }} against a page's own custom frontmatter field", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "title: My Guide" & char( 10 ) & "product: BoxLang" & char( 10 ) & "---" & char( 10 ) & "Built with {{ page.frontmatter.product }}." );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "<p>Built with BoxLang.</p>" );
+			} );
+
+			it( "resolves {{ page.frontmatter.<customKey> }} in a blog post's own content too", function() {
+				var root = newProject();
+				fileWrite( root & "/docs/index.md", "Home" );
+				directoryCreate( root & "/docs/blog/posts", true, true );
+				fileWrite( root & "/docs/blog/posts/hello.md", "---" & char( 10 ) & "date: 2026-01-01" & char( 10 ) & "series: Getting Started" & char( 10 ) & "---" & char( 10 ) & "Part of {{ page.frontmatter.series }}." );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/blog/hello/index.html" );
+				expect( html ).toInclude( "<p>Part of Getting Started.</p>" );
+			} );
+
+			it( "shadows a site-wide variables.page (if declared) with the current page's own struct - page is a reserved {{ }} name", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"variables":{"page":"should not win"}}'
+				);
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "title: My Guide" & char( 10 ) & "---" & char( 10 ) & "{{ page.title }}" );
+
+				pipeline.build( root );
+
+				var html = fileRead( root & "/site/index.html" );
+				expect( html ).toInclude( "<p>My Guide</p>" );
+			} );
+
 			it( "builds end to end with the material and tailwind themes too", function() {
 				for ( var themeName in [ "material", "tailwind" ] ) {
 					var root = newProject( themeName );
