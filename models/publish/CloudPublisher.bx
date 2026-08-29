@@ -1,0 +1,235 @@
+/**
+ * Publishes an already-built `site/` directory to bxSites Cloud - the
+ * hosting SaaS this module's `publish` verb (`models/cli/Publish.bx`) ships
+ * to, over its documented publish API:
+ *
+ *   POST {apiUrl}/api/v1/sites/{siteId}/publish
+ *   Authorization: Bearer <token>
+ *   Content-Type: multipart/form-data
+ *     site: a zip archive of the built site (required)
+ *     dynamicRoutes: a JSON array of path prefixes to proxy to dynamic
+ *       compute instead of serving as static files (optional - omitted
+ *       entirely for a fully static site, the common case)
+ *
+ * No other metadata goes in the request - everything else about the
+ * destination (storage location, plan tier, ownership) lives server-side
+ * against `siteId` already. This class only ever supplies *what to
+ * publish*, exactly like `publish`'s own contract says.
+ *
+ * `buildZipArchive()` is a pure, in-memory zip builder with the exact same
+ * shape/behavior as `NetlifyTarget.bx`'s own (its root IS the site's own
+ * contents, no wrapping folder) - deliberately duplicated rather than
+ * shared, matching every other "target" in this module that also builds
+ * its own zip independently (Netlify/Cloudflare Pages). The real HTTP path
+ * writes those bytes out to a real temp file only because BoxLang's own
+ * `bx:httpparam type="file"` requires an actual filesystem path, not raw
+ * bytes - never left behind on either success or failure (see `publish()`).
+ *
+ * NOT independently verified against a real bxSites Cloud instance - the
+ * publish API this targets doesn't exist yet either (built in parallel,
+ * against this exact same contract, in the separate `bx-sites-cloud`
+ * repo). Everything below the zip-building step is implemented purely
+ * from that documented contract, the same honesty pattern this module
+ * already uses for `NetlifyTarget.bx`/`CloudflarePagesTarget.bx`.
+ */
+class {
+
+	/**
+	 * Publishes `siteDir`'s contents to bxSites Cloud.
+	 *
+	 * @siteDir Absolute path to the already-built site directory (`build`'s own `siteDir` result)
+	 * @apiUrl The bxSites Cloud instance's base URL (`cloud.apiUrl`, e.g. "https://cloud.bxsites.app") - a trailing slash, if present, is stripped
+	 * @siteId The target site's UUID in bxSites Cloud (`cloud.siteId`)
+	 * @token A bxSites Cloud API token (`cb_...`) - resolved by the caller (`--token` flag, else `BXSITES_CLOUD_TOKEN`), never read from config here
+	 * @dynamicRoutes Path prefixes to proxy to dynamic compute instead of serving as static files - omitted from the request entirely when empty (a fully static site, the default)
+	 *
+	 * @return The publish API's own response body: { status, siteId, publishedAt, fileCount, totalBytes, url }
+	 *
+	 * @throws BxSites.SiteNotBuilt when `siteDir` doesn't exist
+	 * @throws BxSites.PublishAuthFailed on a 401/403 response
+	 * @throws BxSites.PublishSiteNotFound on a 404 response
+	 * @throws BxSites.PublishFailed on any other non-2xx response, or a network/connection failure
+	 */
+	struct function publish(
+		required string siteDir,
+		required string apiUrl,
+		required string siteId,
+		required string token,
+		array dynamicRoutes = []
+	) {
+		if ( !directoryExists( arguments.siteDir ) ) {
+			throw(
+				type    = "BxSites.SiteNotBuilt",
+				message = "No [#arguments.siteDir#] to publish - run `build` first"
+			)
+		}
+
+		var zipBytes = buildZipArchive( arguments.siteDir )
+		var tempZipPath = getTempDirectory().reReplace( "[\/]+$", "" ) & "/bxsites-publish-" & createUUID() & ".zip"
+
+		try {
+			writeFileBytes( tempZipPath, zipBytes )
+			var result = postPublishRequest( arguments.apiUrl, arguments.siteId, arguments.token, tempZipPath, arguments.dynamicRoutes )
+			return handleResponse( result )
+		} finally {
+			if ( fileExists( tempZipPath ) ) {
+				fileDelete( tempZipPath )
+			}
+		}
+	}
+
+	/**
+	 * The real `POST {apiUrl}/api/v1/sites/{siteId}/publish` call - isolated
+	 * from `publish()` itself only so the request-building shape stays a
+	 * single, obvious call site; not independently mockable (this module has
+	 * no HTTP-mocking convention - see the class docblock).
+	 *
+	 * @apiUrl The bxSites Cloud instance's base URL, trailing slash stripped
+	 * @siteId The target site's UUID
+	 * @token A bxSites Cloud API token
+	 * @zipPath Absolute path to the already-written zip archive on disk
+	 * @dynamicRoutes Path prefixes to proxy to dynamic compute - omitted from the request when empty
+	 *
+	 * @return A `bx:http` result struct
+	 */
+	private struct function postPublishRequest(
+		required string apiUrl,
+		required string siteId,
+		required string token,
+		required string zipPath,
+		required array dynamicRoutes
+	) {
+		var base = arguments.apiUrl.reReplace( "[\/]+$", "" )
+		var url = base & "/api/v1/sites/" & arguments.siteId & "/publish"
+		var hasDynamicRoutes = arguments.dynamicRoutes.len() > 0
+
+		var result = ""
+		bx:http url="#url#" method="POST" multipart="true" result="result" {
+			bx:httpparam type="header" name="Authorization" value="Bearer #arguments.token#";
+			bx:httpparam type="file" name="site" file="#arguments.zipPath#" mimetype="application/zip";
+			if ( hasDynamicRoutes ) {
+				bx:httpparam type="formfield" name="dynamicRoutes" value="#jsonSerialize( arguments.dynamicRoutes )#";
+			}
+		}
+		return result
+	}
+
+	/**
+	 * Turns a `bx:http` result into either the parsed `200 OK` response body,
+	 * or a clear, typed error distinguishing auth failure/unknown site/
+	 * everything else - per the publish API's own documented error contract
+	 * (401/403/404/400/413/500), matching this module's existing
+	 * `assertOk()` convention (see e.g. `NetlifyTarget.bx`) but with the
+	 * finer-grained error types `publish`'s own CLI verb needs to phrase a
+	 * human-readable message for each case.
+	 *
+	 * @result A `bx:http` result struct
+	 *
+	 * @return The parsed JSON response body, on a 2xx status
+	 */
+	private struct function handleResponse( required struct result ) {
+		var statusCode = val( listFirst( arguments.result.statusCode ?: "0", " " ) )
+		var body = arguments.result.fileContent ?: ""
+
+		if ( statusCode >= 200 && statusCode < 300 ) {
+			return jsonDeserialize( body )
+		}
+
+		if ( statusCode == 401 || statusCode == 403 ) {
+			throw(
+				type    = "BxSites.PublishAuthFailed",
+				message = "Publish to bxSites Cloud failed: authentication failed (status #statusCode#) - check that BXSITES_CLOUD_TOKEN (or --token) holds a valid token with access to this site. #body#"
+			)
+		}
+
+		if ( statusCode == 404 ) {
+			throw(
+				type    = "BxSites.PublishSiteNotFound",
+				message = "Publish to bxSites Cloud failed: site not found (404) - check [cloud.siteId] in bxsites.yaml is correct. #body#"
+			)
+		}
+
+		throw(
+			type    = "BxSites.PublishFailed",
+			message = "Publish to bxSites Cloud failed (status #arguments.result.statusCode ?: 'unknown'#): #body#"
+		)
+	}
+
+	/**
+	 * Zips `sourceDir` into an in-memory archive whose root IS the
+	 * directory's own contents (no wrapping top-level folder) - exactly the
+	 * shape the publish API's `site` field expects (relative paths inside
+	 * the zip become the server's storage keys). Pure/no HTTP, so
+	 * `CloudPublisherSpec.bx` can fully verify it offline via a real
+	 * zip-then-unzip round trip.
+	 *
+	 * `directoryList( sourceDir, true, "path" )` with no glob pattern also
+	 * returns directory entries, not just files (a known gotcha in this
+	 * codebase) - filtered out below via `!directoryExists( path )`.
+	 *
+	 * @sourceDir Absolute path to the directory to zip (its own contents become the zip root)
+	 *
+	 * @return The zip archive's raw bytes
+	 */
+	binary function buildZipArchive( required string sourceDir ) {
+		var root = arguments.sourceDir.reReplace( "[\/]+$", "" )
+		var files = directoryList( root, true, "path" ).filter( function( path ) {
+			return !directoryExists( path )
+		} )
+
+		var buffer = createObject( "java", "java.io.ByteArrayOutputStream" ).init()
+		var zipStream = createObject( "java", "java.util.zip.ZipOutputStream" ).init( buffer )
+
+		try {
+			for ( var filePath in files ) {
+				var relativePath = filePath.replace( root, "", "one" )
+					.reReplace( "^[\/]+", "" )
+					.replace( char( 92 ), "/", "all" )
+				var entry = createObject( "java", "java.util.zip.ZipEntry" ).init( relativePath )
+				zipStream.putNextEntry( entry )
+				zipStream.write( readFileBytes( filePath ) )
+				zipStream.closeEntry()
+			}
+		} finally {
+			zipStream.close()
+		}
+
+		return buffer.toByteArray()
+	}
+
+	/**
+	 * Reads a file's raw bytes, guaranteed as real binary regardless of
+	 * extension - `fileReadBinary()` is NOT safe for this: confirmed in
+	 * this sandbox it silently returns a decoded STRING (not binary) for
+	 * common text-ish extensions like `.html`/`.txt` (only `isBinary()`
+	 * true for something like `.bin`), which would corrupt every text
+	 * asset written into the zip. `java.nio.file.Files.readAllBytes()`
+	 * has no such extension-based guessing.
+	 *
+	 * @path Absolute path to the file to read
+	 *
+	 * @return The file's exact raw bytes
+	 */
+	private binary function readFileBytes( required string path ) {
+		var nioPath = createObject( "java", "java.nio.file.Paths" ).get( arguments.path, [] )
+		return createObject( "java", "java.nio.file.Files" ).readAllBytes( nioPath )
+	}
+
+	/**
+	 * Writes `bytes` to `path` as exact raw binary - `fileWrite()` is not
+	 * used here for the same reason `readFileBytes()` above avoids
+	 * `fileReadBinary()`: this module's own real-binary-content gotcha with
+	 * text-ish extensions (here, `.zip` is never text-ish, but staying
+	 * consistent with the rest of this class's own read/write path avoids
+	 * relying on that distinction at all). `java.nio.file.Files.write()` has
+	 * no such extension-based guessing.
+	 *
+	 * @path Absolute destination path
+	 * @bytes The raw bytes to write
+	 */
+	private void function writeFileBytes( required string path, required binary bytes ) {
+		var nioPath = createObject( "java", "java.nio.file.Paths" ).get( arguments.path, [] )
+		createObject( "java", "java.nio.file.Files" ).write( nioPath, arguments.bytes )
+	}
+
+}

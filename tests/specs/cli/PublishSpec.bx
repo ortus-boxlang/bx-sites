@@ -1,0 +1,117 @@
+/**
+ * cli.Publish only covers guard clauses and token-resolution precedence
+ * here, matching cli.Build's own spec (BuildSpec.bx) - a full successful
+ * run needs a real bx-markdown module activation (MarkdownRenderer.bx's
+ * hard dependency, see its own docblock) AND a real bxSites Cloud instance
+ * to publish to (which doesn't exist yet - see CloudPublisherSpec.bx's own
+ * docblock), neither of which this plain unit-test environment has.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.Publish", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.Publish@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+				// BXSITES_CLOUD_TOKEN is `publish`'s own fixed, real env var
+				// name (not a per-test made-up one, unlike every `deployments/*`
+				// target's own configurable `*EnvVar` fields) - clearing it here
+				// keeps every test in this suite order-independent regardless of
+				// which earlier test (if any) set it via setEnvVar() below.
+				createObject( "java", "java.lang.System" ).clearProperty( "BXSITES_CLOUD_TOKEN" );
+			} );
+
+			private function newTempProject( string extraConfig = "" ) {
+				var dir = createTempDirectory( prefix = "bxsites-cli-publish-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite( dir & "/docs/index.md", "Home" );
+				var config = len( arguments.extraConfig ) ? '{"name":"Test Site",' & arguments.extraConfig & '}' : '{"name":"Test Site"}';
+				fileWrite( dir & "/bxsites.json", config );
+				return dir;
+			}
+
+			private function setEnvVar( required string name, required string value ) {
+				createObject( "java", "java.lang.System" ).setProperty( arguments.name, arguments.value );
+			}
+
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
+			} );
+
+			it( "throws BxSites.ConfigNotFound when the project has no bxsites.json", function() {
+				var dir = createTempDirectory( prefix = "bxsites-cli-publish-" );
+				tempDirs.append( dir );
+
+				expect( function() {
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxSites.ConfigNotFound" );
+			} );
+
+			it( "throws BxSites.MissingCloudConfig when the project has no [cloud] block at all", function() {
+				var dir = newTempProject();
+
+				expect( function() {
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxSites.MissingCloudConfig" );
+			} );
+
+			it( "throws BxSites.MissingCloudConfig when [cloud.siteId] is set but [cloud.apiUrl] is missing", function() {
+				var dir = newTempProject( '"cloud":{"siteId":"abc123"}' );
+
+				expect( function() {
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxSites.MissingCloudConfig" );
+			} );
+
+			it( "throws BxSites.MissingCloudConfig when [cloud.apiUrl] is set but [cloud.siteId] is missing", function() {
+				var dir = newTempProject( '"cloud":{"apiUrl":"https://cloud.bxsites.app"}' );
+
+				expect( function() {
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxSites.MissingCloudConfig" );
+			} );
+
+			it( "throws BxSites.MissingCloudToken when [cloud] is fully configured but no token is available", function() {
+				var dir = newTempProject( '"cloud":{"siteId":"abc123","apiUrl":"https://cloud.bxsites.app"}' );
+
+				expect( function() {
+					// No --token option, and (in a normal test environment) no
+					// BXSITES_CLOUD_TOKEN env var either.
+					verb.run( { projectRoot : dir } );
+				} ).toThrow( "BxSites.MissingCloudToken" );
+			} );
+
+			describe( "resolveToken()", function() {
+
+				it( "resolves from the BXSITES_CLOUD_TOKEN env var when no --token flag is given", function() {
+					setEnvVar( "BXSITES_CLOUD_TOKEN", "cb_from_env" );
+					expect( verb.resolveToken( {} ) ).toBe( "cb_from_env" );
+				} );
+
+				it( "prefers an explicit --token flag over the BXSITES_CLOUD_TOKEN env var", function() {
+					setEnvVar( "BXSITES_CLOUD_TOKEN", "cb_from_env" );
+					expect( verb.resolveToken( { token : "cb_from_flag" } ) ).toBe( "cb_from_flag" );
+				} );
+
+				it( "returns '' when neither a --token flag nor the env var is set", function() {
+					expect( verb.resolveToken( { token : "" } ) ).toBe( "" );
+				} );
+
+			} );
+
+		} );
+	}
+
+}
