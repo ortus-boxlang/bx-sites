@@ -36,16 +36,16 @@ on:
   push:
     branches:
       - development
-    paths:
-      - "docs/**"
-      - "bxsites.yaml"
-      - "resources/**"
-      - "models/**"
-      - "bifs/**"
-      - "components/**"
-      - "interceptors/**"
-      - "ModuleConfig.bx"
-      - ".github/workflows/pages.yml"
+    # Deliberately no `paths:` filter - every push to development rebuilds
+    # and redeploys, full stop. A paths filter here previously left
+    # bxsites.io stuck on stale/empty content more than once: a push whose
+    # own files didn't match the filter (tests.yml/box.json-only changes,
+    # say) skipped the deploy entirely, so a real fix landing in an
+    # earlier, non-matching commit never got a retry until some later,
+    # unrelated matching push happened to come along. A full ten-theme
+    # rebuild is cheap enough (a few parallelized minutes) that "always
+    # rebuild" is worth it for "never silently stale" - see this
+    # workflow's own docblock above for what actually gets built/deployed.
 
   # Manual Trigger
   workflow_dispatch:
