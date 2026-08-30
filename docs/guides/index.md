@@ -11,7 +11,7 @@ icon: phosphor-duotone:book-open
 - [Search](search.md) - how the static search index works
 - [Deployment](deployment.md) - `bxSites deploy` to S3, Azure, GCS, Firebase, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages, or GitHub Pages
 - [Markdown Extensions](markdown.md) - admonitions, footnotes, definition lists and Mermaid diagrams
-- [Content Blocks](content-blocks.md) - GitBook-style blocks: expandables, cards, columns, a stepper, buttons, and reusable content includes
+- [Content Blocks](content-blocks.md) - rich content blocks: expandables, cards, columns, a stepper, buttons, and reusable content includes
 - [Tables](tables.md) - GFM pipe tables, always on, with an automatic responsive-scroll/sticky-header treatment
 - [OpenAPI / Swagger](openapi.md) - an interactive Swagger UI widget for an OpenAPI/Swagger spec, full reference or one operation inline
 - [Responsive Images](images.md) - automatic resizing, WebP variants, and CSS/JS bundling, on by default
