@@ -2,22 +2,26 @@
 title: Blocchi di contenuto
 order: 4.5
 icon: phosphor-duotone:squares-four
-tags: [guide, markdown, gitbook]
+tags: [guide, markdown]
 ---
 
 # Blocchi di contenuto
 
 Oltre a tutto quanto in [Estensioni Markdown](markdown.md), BxSites
-supporta una famiglia di blocchi di contenuto in stile GitBook - utili di
-per sé, e il motivo per cui il contenuto di un sito GitBook è semplice da
-migrare: ognuno di questi corrisponde direttamente a un blocco GitBook
-dello stesso nome. Ognuno usa la stessa sintassi contenitore
-`::: name ... :::` (un `:::` nudo su una riga a sé chiude qualsiasi
-blocco attualmente aperto) - nessuna configurazione di `bxsites.yaml`
-necessaria, sempre disponibile. Un blocco può essere annidato dentro un
-altro (un espandibile che contiene un gruppo di card, per esempio) -
-ognuno viene analizzato di nuovo per ulteriori blocchi al proprio
-interno.
+supporta una famiglia di ricchi blocchi di contenuto per cose di cui il
+CommonMark puro non ha alcun concetto - card, sequenze a schede di
+passaggi, download, embed e altro ancora. Ognuno usa la stessa sintassi
+contenitore `::: name ... :::` (un `:::` nudo su una riga a sé chiude
+qualsiasi blocco attualmente aperto, oppure scrivi il `:::` di chiusura
+direttamente sulla stessa riga per un blocco senza un proprio corpo -
+`::: file src="assets/spec.pdf" :::` funziona esattamente come la forma
+su due righe) - nessuna configurazione di `bxsites.yaml` necessaria,
+sempre disponibile. Un blocco può essere annidato dentro un altro (un
+espandibile che contiene un gruppo di card, per esempio) - ognuno viene
+analizzato di nuovo per ulteriori blocchi al proprio interno. Stai
+migrando da GitBook? Ogni blocco qui corrisponde direttamente al proprio
+omologo GitBook dello stesso nome - vedi
+[Migrare da GitBook](migrating-from-gitbook.md).
 
 ## Espandibile
 
@@ -161,27 +165,23 @@ progetto - `src` viene risolto allo stesso modo in cui lo sono già
 `theme.logo`/frontmatter `ogImage` (relativo a `docs/assets/`):
 
 ```markdown title="Esempio" linenums="1"
-::: file src="assets/spec.pdf" title="API Specification"
-:::
+::: file src="assets/spec.pdf" title="API Specification" :::
 ```
 
-::: file src="assets/og-image.png" title="Immagine di anteprima del sito"
-:::
+::: file src="assets/og-image.png" title="Immagine di anteprima del sito" :::
 
 ## Pulsanti
 
-Un pulsante di call-to-action in stile GitBook - un `::: button` da solo,
+Un pulsante di call-to-action - un `::: button` da solo,
 oppure diversi allineati in riga dentro un wrapper `::: buttons`.
 L'etichetta iniziale tra virgolette e l'attributo `href` sono le uniche
 parti di cui la maggior parte dei pulsanti ha bisogno:
 
 ```markdown title="Esempio" linenums="1"
-::: button "Get Started" href="../getting-started.md" style="primary"
-:::
+::: button "Get Started" href="../getting-started.md" style="primary" :::
 ```
 
-::: button "Per iniziare" href="../getting-started.md" style="primary"
-:::
+::: button "Per iniziare" href="../getting-started.md" style="primary" :::
 
 Alcuni attributi opzionali danno a ogni pulsante le proprie capacità:
 

@@ -3,22 +3,26 @@ title: Bloques de Contenido
 order: 4.5
 icon: phosphor-duotone:squares-four
 summary: Cuadrículas de tarjetas, columnas, un stepper, tarjetas de archivo/incrustación/vista previa, un registro de cambios y contenido reutilizable.
-tags: [guías, markdown, gitbook]
+tags: [guías, markdown]
 ---
 
 # Bloques de Contenido
 
 Además de todo lo que hay en [Extensiones de Markdown](markdown.md), BX
-Sites admite una familia de bloques de contenido al estilo GitBook -
-útiles por sí mismos, y la razón por la que el contenido de un sitio de
-GitBook es sencillo de migrar: cada uno de estos se corresponde
-directamente con un bloque de GitBook del mismo nombre. Cada uno usa la
-misma sintaxis de contenedor `::: name ... :::` (un `:::` solo en su
-propia línea cierra el bloque que esté abierto en ese momento) - sin
-necesidad de configuración en `bxsites.yaml`, siempre disponible. Un
-bloque puede anidarse dentro de otro (un expandible que contiene un
-grupo de tarjetas, por ejemplo) - cada uno se vuelve a analizar en busca
-de más bloques dentro de su propio contenido.
+Sites admite una familia de bloques de contenido enriquecido para cosas
+que el CommonMark plano no contempla en absoluto - tarjetas, pestañas de
+pasos, descargas, incrustaciones, y más. Cada uno usa la misma sintaxis
+de contenedor `::: name ... :::` (un `:::` solo en su propia línea
+cierra el bloque que esté abierto en ese momento, o escribe el `:::` de
+cierre en la misma línea para un bloque sin cuerpo propio -
+`::: file src="assets/spec.pdf" :::` funciona exactamente igual que la
+forma de dos líneas) - sin necesidad de configuración en `bxsites.yaml`,
+siempre disponible. Un bloque puede anidarse dentro de otro (un
+expandible que contiene un grupo de tarjetas, por ejemplo) - cada uno se
+vuelve a analizar en busca de más bloques dentro de su propio contenido.
+¿Estás migrando desde GitBook? Cada bloque de aquí se corresponde
+directamente con su homólogo de GitBook del mismo nombre - consulta
+[Migrar desde GitBook](migrating-from-gitbook.md).
 
 ## Expandible
 
@@ -162,27 +166,23 @@ proyecto - `src` se resuelve de la misma forma que ya lo hacen
 `theme.logo`/el `ogImage` del frontmatter (relativo a `docs/assets/`):
 
 ```markdown title="Example" linenums="1"
-::: file src="assets/spec.pdf" title="API Specification"
-:::
+::: file src="assets/spec.pdf" title="API Specification" :::
 ```
 
-::: file src="assets/og-image.png" title="Imagen de vista previa del sitio"
-:::
+::: file src="assets/og-image.png" title="Imagen de vista previa del sitio" :::
 
 ## Botones
 
-Un botón de llamada a la acción al estilo GitBook - `::: button` por sí
-solo, o varios dispuestos en una fila dentro de un envoltorio
-`::: buttons`. La `"Label"` inicial y el `href` son las únicas piezas que
-necesita la mayoría de los botones:
+Un botón de llamada a la acción - `::: button` por sí solo, o varios
+dispuestos en una fila dentro de un envoltorio `::: buttons`. La
+`"Label"` inicial y el `href` son las únicas piezas que necesita la
+mayoría de los botones:
 
 ```markdown title="Example" linenums="1"
-::: button "Get Started" href="../getting-started.md" style="primary"
-:::
+::: button "Get Started" href="../getting-started.md" style="primary" :::
 ```
 
-::: button "Primeros Pasos" href="../getting-started.md" style="primary"
-:::
+::: button "Primeros Pasos" href="../getting-started.md" style="primary" :::
 
 Unos pocos atributos opcionales le dan a cada botón sus propias
 habilidades:
@@ -201,22 +201,16 @@ habilidades:
 
 ```markdown title="Example" linenums="1"
 ::: buttons
-::: button "Read the docs" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
-:::
-::: button "Star on GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
-:::
-::: button "Coming soon" disabled="true"
-:::
+::: button "Read the docs" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large" :::
+::: button "Star on GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank" :::
+::: button "Coming soon" disabled="true" :::
 :::
 ```
 
 ::: buttons
-::: button "Lee la documentación" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
-:::
-::: button "Danos una estrella en GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
-:::
-::: button "Próximamente" disabled="true"
-:::
+::: button "Lee la documentación" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large" :::
+::: button "Danos una estrella en GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank" :::
+::: button "Próximamente" disabled="true" :::
 :::
 
 ## Incrustación
@@ -228,12 +222,10 @@ lugar de un iframe que simplemente se negaría a renderizarse (la mayoría
 de los sitios bloquean ser incrustados en un frame):
 
 ```markdown title="Example" linenums="1"
-::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
-:::
+::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo" :::
 ```
 
-::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="Una demostración"
-:::
+::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="Una demostración" :::
 
 ## Enlace de página
 
@@ -246,12 +238,10 @@ así que se mantiene sincronizado si esa página se renombra o cambia su
 resumen:
 
 ```markdown title="Example" linenums="1"
-::: page-link href="../getting-started.md"
-:::
+::: page-link href="../getting-started.md" :::
 ```
 
-::: page-link href="../getting-started.md"
-:::
+::: page-link href="../getting-started.md" :::
 
 ## Vista previa de enlace
 
@@ -269,18 +259,15 @@ aplica también aquí, de modo que un sitio de terceros lento o
 inalcanzable nunca afecta al tiempo de construcción:
 
 ```markdown title="Example" linenums="1"
-::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language."
-:::
+::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." :::
 ```
 
-::: link-preview url="https://boxlang.io" title="BoxLang" description="Un lenguaje JVM dinámico y multiparadigma."
-:::
+::: link-preview url="https://boxlang.io" title="BoxLang" description="Un lenguaje JVM dinámico y multiparadigma." :::
 
-## Prompt
+## Prompt de IA
 
-Un contenedor con estilo propio para un prompt de IA reutilizable - el
-equivalente propio de bx-sites al [bloque Prompt](https://gitbook.com/docs/create-content/blocks/prompt)
-de GitBook. El cuerpo del bloque *es* el texto del prompt, escrito como
+Un contenedor con estilo propio para un prompt de IA reutilizable. El
+cuerpo del bloque *es* el texto del prompt, escrito como
 Markdown normal (así que los encabezados, listas y código que contenga
 siguen recibiendo su propio formato); todo prompt obtiene un botón
 "Copy" que copia ese texto fuente exacto, marcado de formato incluido,
@@ -328,10 +315,10 @@ valor predeterminado) para mostrar siempre el prompt completo:
 5. Skip anything that already has an open issue - list those separately.
 :::
 
-A diferencia del propio bloque Prompt de GitBook, aquí no hay ningún
-menú "Open in AI providers" - bx-sites nunca se comunica con un
-proveedor de IA externo, así que esa parte del bloque propio de GitBook
-no tiene equivalente.
+Aquí no hay ningún menú "Open in AI providers" - bx-sites nunca se
+comunica con un proveedor de IA externo, así que el propio botón "Copy"
+de un prompt es la única forma de llevarlo a la herramienta que estés
+usando.
 
 ## Novedades (registro de cambios)
 
@@ -438,8 +425,7 @@ quien lee elige por sí mismo, y su elección simplemente se recuerda en
 su propio navegador (`localStorage`) también para cada página posterior:
 
 ```markdown title="Ejemplo" linenums="1"
-::: audience-switcher key="plan" options="free:Free,pro:Pro"
-:::
+::: audience-switcher key="plan" options="free:Free,pro:Pro" :::
 
 ::: conditional key="plan" value="free"
 The Free plan includes basic search.
@@ -450,8 +436,7 @@ The Pro plan adds AI-assisted search and unlimited team seats.
 :::
 ```
 
-::: audience-switcher key="plan" options="free:Free,pro:Pro"
-:::
+::: audience-switcher key="plan" options="free:Free,pro:Pro" :::
 
 ::: conditional key="plan" value="free"
 The Free plan includes basic search.
