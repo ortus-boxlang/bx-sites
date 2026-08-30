@@ -212,7 +212,9 @@ class {
 				var selfCloseMatcher = variables.selfClosePattern.matcher( newAttrsRaw )
 				var selfClosing = selfCloseMatcher.find()
 				if ( selfClosing ) {
-					newAttrsRaw = trim( newAttrsRaw.left( selfCloseMatcher.start() ) )
+					newAttrsRaw = selfCloseMatcher.start() == 0
+						? ""
+						: trim( newAttrsRaw.left( selfCloseMatcher.start() ) )
 				}
 
 				stack.append( { type : newType, attrsRaw : newAttrsRaw, lines : [] } )
