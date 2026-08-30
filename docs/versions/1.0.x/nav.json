@@ -18,21 +18,36 @@
 		"title": "Guides",
 		"children": [
 			"guides/index.md",
-			"guides/themes.md",
-			"guides/icons.md",
 			"guides/markdown.md",
 			"guides/content-blocks.md",
 			"guides/tables.md",
-			"guides/openapi.md",
 			"guides/images.md",
-			"guides/interactivity.md",
-			"guides/search.md",
-			"guides/variables-and-functions.md",
+			"guides/icons.md",
 			"guides/data-files.md",
+			"guides/variables-and-functions.md"
+		]
+	},
+	{
+		"title": "Theming",
+		"children": [
+			"guides/themes.md",
+			"guides/theme-import.md",
+			"guides/interactivity.md"
+		]
+	},
+	{
+		"title": "Search & Extensibility",
+		"children": [
+			"guides/search.md",
+			"guides/openapi.md",
 			"guides/plugins.md",
 			"guides/cli-providers.md",
-			"guides/ai-agent-skills.md",
-			"guides/theme-import.md",
+			"guides/ai-agent-skills.md"
+		]
+	},
+	{
+		"title": "Site Structure",
+		"children": [
 			"guides/versioning.md",
 			"guides/redirects.md",
 			"guides/i18n.md",
