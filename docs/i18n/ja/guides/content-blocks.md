@@ -257,11 +257,11 @@ URL は、どのみちレンダリングを拒否する iframe（ほとんどの
 サイトがビルド時間に影響することは決してありません:
 
 ```markdown title="Example" linenums="1"
-::: link-preview url="https://boxlang.io" title="BoxLang" description="動的でマルチパラダイムな JVM 言語。" image="https://boxlang.io/og.png"
+::: link-preview url="https://boxlang.io" title="BoxLang" description="動的でマルチパラダイムな JVM 言語。"
 :::
 ```
 
-::: link-preview url="https://boxlang.io" title="BoxLang" description="動的でマルチパラダイムな JVM 言語。" image="https://boxlang.io/og.png"
+::: link-preview url="https://boxlang.io" title="BoxLang" description="動的でマルチパラダイムな JVM 言語。"
 :::
 
 ## プロンプト

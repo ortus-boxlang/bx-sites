@@ -269,11 +269,11 @@ aplica también aquí, de modo que un sitio de terceros lento o
 inalcanzable nunca afecta al tiempo de construcción:
 
 ```markdown title="Example" linenums="1"
-::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
+::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language."
 :::
 ```
 
-::: link-preview url="https://boxlang.io" title="BoxLang" description="Un lenguaje JVM dinámico y multiparadigma." image="https://boxlang.io/og.png"
+::: link-preview url="https://boxlang.io" title="BoxLang" description="Un lenguaje JVM dinámico y multiparadigma."
 :::
 
 ## Prompt

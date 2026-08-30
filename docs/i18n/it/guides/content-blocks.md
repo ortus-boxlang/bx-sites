@@ -266,11 +266,11 @@ applica anche qui, così un sito di terze parti lento o irraggiungibile
 non influisce mai sul tempo di build:
 
 ```markdown title="Esempio" linenums="1"
-::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
+::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language."
 :::
 ```
 
-::: link-preview url="https://boxlang.io" title="BoxLang" description="Un linguaggio JVM dinamico e multi-paradigma." image="https://boxlang.io/og.png"
+::: link-preview url="https://boxlang.io" title="BoxLang" description="Un linguaggio JVM dinamico e multi-paradigma."
 :::
 
 ## Prompt

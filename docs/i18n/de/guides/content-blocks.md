@@ -266,11 +266,11 @@ interne Links beschränkt, gilt auch hier, sodass eine langsame oder
 nicht erreichbare externe Website die Build-Zeit niemals beeinflusst:
 
 ```markdown title="Beispiel" linenums="1"
-::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
+::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language."
 :::
 ```
 
-::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
+::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language."
 :::
 
 ## Prompt

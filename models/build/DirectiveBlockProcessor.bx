@@ -45,6 +45,11 @@ class {
 	variables.openApiSrcPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(<div class="bxsites-openapi[^"]*" data-openapi-src=")([^"]*)("[^>]*>)' )
 	variables.openApiOperationPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^(\S+)\s+(/\S*)$" )
 	variables.forSpecPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^(\w+)\s*,\s*(\w+)\s+in\s+(.+)$" )
+	// Matches a trailing bare `:::` at the end of a `::: name attrs...`
+	// line's own attrs text (with at least one preceding whitespace char,
+	// or nothing before it at all) - extract()'s own self-closing
+	// single-line form, e.g. `::: file src="a.pdf" :::`.
+	variables.selfClosePattern = createObject( "java", "java.util.regex.Pattern" ).compile( "(?:^|\s):::$" )
 	variables.iconResolver = new "models.build.IconResolver@bxsites"()
 
 	/**
@@ -186,6 +191,7 @@ class {
 			var matcher = variables.openPattern.matcher( trimmedLine )
 			if ( matcher.matches() ) {
 				var newType = matcher.group( 1 )
+				var newAttrsRaw = trim( matcher.group( 2 ) )
 				if (
 					stack.len()
 					&& listFindNoCase( "elseif,else", trim( newType ) )
@@ -193,7 +199,26 @@ class {
 				) {
 					closeFrame( stack, blocks, outputLines )
 				}
-				stack.append( { type : newType, attrsRaw : trim( matcher.group( 2 ) ), lines : [] } )
+
+				// A trailing bare `:::` on the SAME line self-closes a
+				// directive with no body of its own on the spot - most of
+				// this file's own directives (file, embed, page-link,
+				// link-preview, button, openapi, audience-switcher,
+				// pagebreak) never use `content` at all, so writing
+				// `::: file src="..." :::` on one line, with no separate
+				// closing line, works exactly the same as the two-line
+				// form (still fully supported, e.g. when a body IS
+				// needed - expandable, cards, stepper, ...).
+				var selfCloseMatcher = variables.selfClosePattern.matcher( newAttrsRaw )
+				var selfClosing = selfCloseMatcher.find()
+				if ( selfClosing ) {
+					newAttrsRaw = trim( newAttrsRaw.left( selfCloseMatcher.start() ) )
+				}
+
+				stack.append( { type : newType, attrsRaw : newAttrsRaw, lines : [] } )
+				if ( selfClosing ) {
+					closeFrame( stack, blocks, outputLines )
+				}
 				continue
 			}
 
