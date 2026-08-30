@@ -193,6 +193,35 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "spec.pdf" );
 			} );
 
+			it( "a trailing bare ::: on the same line self-closes a directive with no body - no separate closing line needed", function() {
+				var html = render( '::: file src="assets/spec.pdf" :::' );
+
+				expect( html ).toInclude( '<a class="bxsites-file" href="assets/spec.pdf" download>' );
+				expect( html ).toInclude( "spec.pdf" );
+			} );
+
+			it( "the self-closing form and the two-line form render identically", function() {
+				var twoLine = render( '::: page-link href="../getting-started.md"' & char( 10 ) & ":::" );
+				var oneLine = render( '::: page-link href="../getting-started.md" :::' );
+
+				expect( oneLine ).toBe( twoLine );
+			} );
+
+			it( "the self-closing form still works with no attrs at all (a bare directive followed only by a trailing :::)", function() {
+				var html = render( "::: pagebreak :::" );
+
+				expect( html ).toInclude( 'data-bxsites-pagebreak' );
+			} );
+
+			it( "the self-closing form composes with nesting - a self-closed child inside a container block still renders", function() {
+				var md = "::: cards" & char( 10 ) &
+					'::: card title="Solo" :::' & char( 10 ) &
+					":::";
+				var html = render( md );
+
+				expect( html ).toInclude( '<div class="bxsites-card__title">Solo</div>' );
+			} );
+
 			it( "resolveFileHrefs() prefixes a bare file href with basePath, so a nested page's download link doesn't 404", function() {
 				var html = render( '::: file src="assets/spec.pdf"' & char( 10 ) & ":::" );
 

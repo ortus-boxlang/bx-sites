@@ -2,20 +2,24 @@
 title: コンテンツブロック
 order: 4.5
 icon: phosphor-duotone:squares-four
-tags: [ガイド, markdown, GitBook]
+tags: [ガイド, markdown]
 ---
 
 # コンテンツブロック
 
-[Markdown 拡張機能](markdown.md) のすべてに加えて、BxSites は GitBook
-スタイルのコンテンツブロック群をサポートしています - それ自体便利であるだけでなく、
-GitBook サイトのコンテンツを簡単に移行できる理由でもあります。それぞれが
-同名の GitBook ブロックに直接対応しています。すべて同じ `::: name ... :::`
-コンテナ構文を使い（単独の行にある裸の `:::` が、現在開いているブロックを
-閉じます）、`bxsites.yaml` の設定は不要で、常に使用できます。ブロックは
+[Markdown 拡張機能](markdown.md) のすべてに加えて、BxSites は、プレーンな
+CommonMark には概念が存在しないもの向けの、リッチなコンテンツブロック群を
+サポートしています - カード、手順のタブ、ダウンロード、埋め込みなどです。
+すべて同じ `::: name ... :::` コンテナ構文を使います（単独の行にある裸の
+`:::` が、現在開いているブロックを閉じます。あるいは、本文を持たない
+ブロックであれば、閉じの `:::` を同じ行に書くこともできます -
+`::: file src="assets/spec.pdf" :::` は2行形式とまったく同じように
+動作します）。`bxsites.yaml` の設定は不要で、常に使用できます。ブロックは
 別のブロックの中にネストできます（例えば、カードグループを含む展開可能
 セクションなど）- それぞれが自身のコンテンツの中でさらにブロックがないか
-再スキャンされます。
+再スキャンされます。GitBook から移行する場合は、ここにあるすべての
+ブロックが同名の GitBook ブロックに直接対応しています -
+[GitBook からの移行](migrating-from-gitbook.md) を参照してください。
 
 ## 展開可能
 
@@ -158,26 +162,22 @@ PDF、動画、その他のプロジェクトアセット向けのダウンロ�
 同じ方法で解決されます（`docs/assets/` からの相対パス）:
 
 ```markdown title="Example" linenums="1"
-::: file src="assets/spec.pdf" title="API 仕様"
-:::
+::: file src="assets/spec.pdf" title="API 仕様" :::
 ```
 
-::: file src="assets/og-image.png" title="サイトプレビュー画像"
-:::
+::: file src="assets/og-image.png" title="サイトプレビュー画像" :::
 
 ## ボタン
 
-GitBook スタイルの CTA（コールトゥアクション）ボタンです - 単独の
+CTA（コールトゥアクション）ボタンです - 単独の
 `::: button`、または `::: buttons` ラッパーの中に複数を横並びで配置します。
 先頭の `"ラベル"` と `href` さえあれば、ほとんどのボタンにはそれで十分です:
 
 ```markdown title="Example" linenums="1"
-::: button "はじめに" href="../getting-started.md" style="primary"
-:::
+::: button "はじめに" href="../getting-started.md" style="primary" :::
 ```
 
-::: button "はじめに" href="../getting-started.md" style="primary"
-:::
+::: button "はじめに" href="../getting-started.md" style="primary" :::
 
 いくつかの任意の属性で、各ボタンに独自の機能を持たせられます:
 
@@ -194,22 +194,16 @@ GitBook スタイルの CTA（コールトゥアクション）ボタンです -
 
 ```markdown title="Example" linenums="1"
 ::: buttons
-::: button "ドキュメントを読む" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
-:::
-::: button "GitHub でスターする" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
-:::
-::: button "近日公開" disabled="true"
-:::
+::: button "ドキュメントを読む" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large" :::
+::: button "GitHub でスターする" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank" :::
+::: button "近日公開" disabled="true" :::
 :::
 ```
 
 ::: buttons
-::: button "ドキュメントを読む" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
-:::
-::: button "GitHub でスターする" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
-:::
-::: button "近日公開" disabled="true"
-:::
+::: button "ドキュメントを読む" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large" :::
+::: button "GitHub でスターする" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank" :::
+::: button "近日公開" disabled="true" :::
 :::
 
 ## 埋め込み
@@ -221,12 +215,10 @@ URL は、どのみちレンダリングを拒否する iframe（ほとんどの
 フォールバックします:
 
 ```markdown title="Example" linenums="1"
-::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="デモ"
-:::
+::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="デモ" :::
 ```
 
-::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="デモ"
-:::
+::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="デモ" :::
 
 ## ページリンク
 
@@ -237,12 +229,10 @@ URL は、どのみちレンダリングを拒否する iframe（ほとんどの
 リネームされたりサマリが変更されたりしても同期が保たれます:
 
 ```markdown title="Example" linenums="1"
-::: page-link href="../getting-started.md"
-:::
+::: page-link href="../getting-started.md" :::
 ```
 
-::: page-link href="../getting-started.md"
-:::
+::: page-link href="../getting-started.md" :::
 
 ## リンクプレビュー
 
@@ -257,18 +247,14 @@ URL は、どのみちレンダリングを拒否する iframe（ほとんどの
 サイトがビルド時間に影響することは決してありません:
 
 ```markdown title="Example" linenums="1"
-::: link-preview url="https://boxlang.io" title="BoxLang" description="動的でマルチパラダイムな JVM 言語。" image="https://boxlang.io/og.png"
-:::
+::: link-preview url="https://boxlang.io" title="BoxLang" description="動的でマルチパラダイムな JVM 言語。" :::
 ```
 
-::: link-preview url="https://boxlang.io" title="BoxLang" description="動的でマルチパラダイムな JVM 言語。" image="https://boxlang.io/og.png"
-:::
+::: link-preview url="https://boxlang.io" title="BoxLang" description="動的でマルチパラダイムな JVM 言語。" :::
 
-## プロンプト
+## AI プロンプト
 
-再利用可能な AI プロンプト向けのスタイル付きコンテナです - GitBook の
-[Prompt ブロック](https://gitbook.com/docs/create-content/blocks/prompt)
-に対する bx-sites 独自の対応物です。ブロックの本文がそのままプロンプトの
+再利用可能な AI プロンプト向けのスタイル付きコンテナです。ブロックの本文がそのままプロンプトの
 テキストになり、通常の Markdown として書かれます（そのため中の見出しや
 リスト、コードもそれぞれ独自の書式を保ちます）。どのプロンプトにも
 「Copy」ボタンが付き、書式マークアップを含むそのままのソーステキストを
@@ -315,10 +301,9 @@ more」をクリックするまでそのままにしておくには `expanded="p
 5. Skip anything that already has an open issue - list those separately.
 :::
 
-GitBook 自身の Prompt ブロックとは異なり、ここには「Open in AI
-providers」メニューはありません - bx-sites はサードパーティの AI
-プロバイダーと一切通信しないため、GitBook 自身のブロックのその部分には
-対応するものがありません。
+ここには「Open in AI providers」メニューはありません - bx-sites は
+サードパーティの AI プロバイダーと一切通信しないため、使いたいツールに
+プロンプトを渡す唯一の手段は、プロンプト自身の「Copy」ボタンです。
 
 ## 更新履歴（changelog）
 
@@ -419,8 +404,7 @@ docs/
 （`localStorage`）に記憶され、以降のすべてのページにも引き継がれます:
 
 ```markdown title="Example" linenums="1"
-::: audience-switcher key="plan" options="free:Free,pro:Pro"
-:::
+::: audience-switcher key="plan" options="free:Free,pro:Pro" :::
 
 ::: conditional key="plan" value="free"
 The Free plan includes basic search.
@@ -431,8 +415,7 @@ The Pro plan adds AI-assisted search and unlimited team seats.
 :::
 ```
 
-::: audience-switcher key="plan" options="free:Free,pro:Pro"
-:::
+::: audience-switcher key="plan" options="free:Free,pro:Pro" :::
 
 ::: conditional key="plan" value="free"
 The Free plan includes basic search.

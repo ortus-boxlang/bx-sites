@@ -41,8 +41,8 @@ qualsiasi cosa con un proprio stato lato client.
 ## Un pulsante copia-negli-appunti
 
 [`::: button`](content-blocks.md#pulsanti) renderizza sempre e solo un
-link vero (oppure un segnaposto inerte) - come il pulsante nativo di
-GitBook, non ha alcuna nozione di eseguire JS arbitrario al click. Per un
+link vero (oppure un segnaposto inerte) - non ha alcuna nozione di
+eseguire JS arbitrario al click. Per un
 pulsante che *fa* qualcosa invece di navigare da qualche parte, applica
 le sue classi `bxsites-button`/`bxsites-button--*` a un normale
 `<button>` HTML - stesso aspetto, stilizzato in ogni tema integrato,
@@ -90,8 +90,7 @@ ogni `<li>` viene rivalutato a ogni tasto premuto.
 
 Una [tabella nativa a pipe](tables.md) è statica una volta
 costruita - per averne una che il lettore possa davvero ordinare e
-filtrare lato client (la cosa più vicina qui alla ricerca/ordinamento
-delle tabelle di GitBook), lascia che sia Alpine a possedere le righe:
+filtrare lato client, lascia che sia Alpine a possedere le righe:
 metti i dati in `x-data` e renderizzali con `x-for`, invece di scrivere la
 sintassi a pipe `| Feature | Status |`:
 

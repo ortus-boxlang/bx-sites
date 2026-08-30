@@ -2,22 +2,26 @@
 title: Content-Blöcke
 order: 4.5
 icon: phosphor-duotone:squares-four
-tags: [anleitungen, markdown, gitbook]
+tags: [anleitungen, markdown]
 ---
 
 # Content-Blöcke
 
 Zusätzlich zu allem in [Markdown-Erweiterungen](markdown.md) unterstützt
-BxSites eine Familie von GitBook-artigen Content-Blöcken - für sich
-genommen praktisch, und der Grund, warum sich der Inhalt einer
-GitBook-Website unkompliziert migrieren lässt: jeder dieser Blöcke
-bildet direkt auf einen gleichnamigen GitBook-Block ab. Jeder verwendet
-dieselbe Container-Syntax `::: name ... :::` (ein einzelnes `:::` in
-seiner eigenen Zeile schließt den jeweils gerade offenen Block) - keine
-`bxsites.yaml`-Konfiguration nötig, immer verfügbar. Ein Block kann in
-einem anderen verschachtelt sein (etwa ein Expandable mit einer
-Cards-Gruppe darin) - jeder wird erneut nach weiteren Blöcken in seinem
-eigenen Inhalt durchsucht.
+BxSites eine Familie von umfangreichen Content-Blöcken für Dinge, die im
+reinen CommonMark gar nicht vorgesehen sind - Cards, Tabs aus Schritten,
+Downloads, Embeds und mehr. Jeder verwendet dieselbe Container-Syntax
+`::: name ... :::` (ein einzelnes `:::` in seiner eigenen Zeile schließt
+den jeweils gerade offenen Block, oder du schreibst das schließende
+`:::` direkt in dieselbe Zeile für einen Block ohne eigenen Inhalt -
+`::: file src="assets/spec.pdf" :::` funktioniert genau wie die
+zweizeilige Form) - keine `bxsites.yaml`-Konfiguration nötig, immer
+verfügbar. Ein Block kann in einem anderen verschachtelt sein (etwa ein
+Expandable mit einer Cards-Gruppe darin) - jeder wird erneut nach
+weiteren Blöcken in seinem eigenen Inhalt durchsucht. Migrierst du von
+GitBook? Jeder Block hier bildet direkt auf sein gleichnamiges
+GitBook-Gegenstück ab - siehe
+[Migration von GitBook](migrating-from-gitbook.md).
 
 ## Expandable
 
@@ -161,27 +165,23 @@ Projekt-Asset - `src` wird auf dieselbe Weise aufgelöst wie
 `theme.logo`/die Frontmatter-`ogImage` (relativ zu `docs/assets/`):
 
 ```markdown title="Beispiel" linenums="1"
-::: file src="assets/spec.pdf" title="API Specification"
-:::
+::: file src="assets/spec.pdf" title="API Specification" :::
 ```
 
-::: file src="assets/og-image.png" title="Site Preview Image"
-:::
+::: file src="assets/og-image.png" title="Site Preview Image" :::
 
 ## Buttons
 
-Eine GitBook-artige Call-to-Action-Schaltfläche - `::: button` für sich
-allein, oder mehrere nebeneinander in einer Reihe innerhalb eines
+Eine Call-to-Action-Schaltfläche - `::: button` für sich allein, oder
+mehrere nebeneinander in einer Reihe innerhalb eines
 `::: buttons`-Wrappers. Das führende `"Label"` und `href` sind die
 einzigen Angaben, die die meisten Schaltflächen brauchen:
 
 ```markdown title="Beispiel" linenums="1"
-::: button "Get Started" href="../getting-started.md" style="primary"
-:::
+::: button "Get Started" href="../getting-started.md" style="primary" :::
 ```
 
-::: button "Erste Schritte" href="../getting-started.md" style="primary"
-:::
+::: button "Erste Schritte" href="../getting-started.md" style="primary" :::
 
 Ein paar optionale Attribute verleihen jeder Schaltfläche ihre eigenen
 Fähigkeiten:
@@ -200,22 +200,16 @@ Fähigkeiten:
 
 ```markdown title="Beispiel" linenums="1"
 ::: buttons
-::: button "Read the docs" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
-:::
-::: button "Star on GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
-:::
-::: button "Coming soon" disabled="true"
-:::
+::: button "Read the docs" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large" :::
+::: button "Star on GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank" :::
+::: button "Coming soon" disabled="true" :::
 :::
 ```
 
 ::: buttons
-::: button "Dokumentation lesen" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
-:::
-::: button "Auf GitHub anschauen" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
-:::
-::: button "Demnächst verfügbar" disabled="true"
-:::
+::: button "Dokumentation lesen" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large" :::
+::: button "Auf GitHub anschauen" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank" :::
+::: button "Demnächst verfügbar" disabled="true" :::
 :::
 
 ## Embed
@@ -227,12 +221,10 @@ auf ein iframe, das ohnehin nicht rendern würde (die meisten Websites
 blockieren das Einbetten in Frames):
 
 ```markdown title="Beispiel" linenums="1"
-::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
-:::
+::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo" :::
 ```
 
-::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
-:::
+::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo" :::
 
 ## Page Link
 
@@ -244,12 +236,10 @@ Frontmatter der Zielseite gezogen, sodass sie synchron bleibt, wenn
 diese Seite umbenannt wird oder sich ihre Zusammenfassung ändert:
 
 ```markdown title="Beispiel" linenums="1"
-::: page-link href="../getting-started.md"
-:::
+::: page-link href="../getting-started.md" :::
 ```
 
-::: page-link href="../getting-started.md"
-:::
+::: page-link href="../getting-started.md" :::
 
 ## Link Preview
 
@@ -266,19 +256,15 @@ interne Links beschränkt, gilt auch hier, sodass eine langsame oder
 nicht erreichbare externe Website die Build-Zeit niemals beeinflusst:
 
 ```markdown title="Beispiel" linenums="1"
-::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
-:::
+::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." :::
 ```
 
-::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
-:::
+::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." :::
 
-## Prompt
+## KI-Prompt
 
-Ein gestalteter Container für einen wiederverwendbaren KI-Prompt -
-bx-sites' eigenes Gegenstück zu GitBooks
-[Prompt-Block](https://gitbook.com/docs/create-content/blocks/prompt).
-Der Inhalt des Blocks *ist* der Prompt-Text, geschrieben als gewöhnliches
+Ein gestalteter Container für einen wiederverwendbaren KI-Prompt. Der
+Inhalt des Blocks *ist* der Prompt-Text, geschrieben als gewöhnliches
 Markdown (sodass Überschriften, Listen und Code darin weiterhin ihre
 eigene Formatierung erhalten); jeder Prompt bekommt eine
 "Copy"-Schaltfläche, die genau diesen Quelltext kopiert,
@@ -328,10 +314,10 @@ anzuzeigen:
 5. Skip anything that already has an open issue - list those separately.
 :::
 
-Anders als GitBooks eigener Prompt-Block gibt es hier kein "Open in AI
-providers"-Menü - bx-sites spricht nie mit einem KI-Anbieter eines
-Drittanbieters, daher hat dieser Teil von GitBooks eigenem Block hier
-kein Gegenstück.
+Es gibt hier kein "Open in AI providers"-Menü - bx-sites spricht nie mit
+einem KI-Anbieter eines Drittanbieters, daher ist die eigene
+"Copy"-Schaltfläche eines Prompts der einzige Weg, ihn in das jeweilige
+Tool zu bekommen, mit dem du gerade arbeitest.
 
 ## Updates (Changelog)
 
@@ -438,8 +424,7 @@ die Leserin trifft die Wahl selbst, und ihre Wahl wird einfach im eigenen
 Browser (`localStorage`) gemerkt, auch für jede spätere Seite:
 
 ```markdown title="Beispiel" linenums="1"
-::: audience-switcher key="plan" options="free:Free,pro:Pro"
-:::
+::: audience-switcher key="plan" options="free:Free,pro:Pro" :::
 
 ::: conditional key="plan" value="free"
 The Free plan includes basic search.
@@ -450,8 +435,7 @@ The Pro plan adds AI-assisted search and unlimited team seats.
 :::
 ```
 
-::: audience-switcher key="plan" options="free:Free,pro:Pro"
-:::
+::: audience-switcher key="plan" options="free:Free,pro:Pro" :::
 
 ::: conditional key="plan" value="free"
 The Free plan includes basic search.
