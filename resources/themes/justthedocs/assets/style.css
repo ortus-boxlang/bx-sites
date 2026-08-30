@@ -1591,6 +1591,130 @@ a.bxsites-card:hover {
 	margin-bottom: 0;
 }
 
+/* Course index (::: course id="..." :::) - CourseBuilder.bx's own numbered
+   lesson list, plus the checkmark/progress bar/resume CTA course-progress.js
+   drives client-side. Reuses .bxsites-stepper's numbered-marker visual
+   language just below. */
+
+.bxsites-course-index {
+	margin: 1.5rem 0;
+}
+
+.bxsites-course-index__progress {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+}
+
+.bxsites-course-index__bar {
+	flex: 1 1 auto;
+	height: 8px;
+	border-radius: 999px;
+	background: rgba( 0, 0, 0, 0.08 );
+	overflow: hidden;
+}
+
+.bxsites-course-index__bar-fill {
+	height: 100%;
+	width: 0%;
+	background: var( --bxsites-link, #0d7a8f );
+	transition: width 0.2s ease;
+}
+
+.bxsites-course-index__progress-label {
+	font-size: 0.85rem;
+	opacity: 0.75;
+	white-space: nowrap;
+}
+
+.bxsites-course-index__resume {
+	margin-bottom: 1rem;
+	padding: 0.75rem 1rem;
+	border: 1px solid var( --bxsites-border, rgba( 0, 0, 0, 0.1 ) );
+	border-radius: 10px;
+	font-size: 0.9rem;
+}
+
+.bxsites-course-index__list {
+	list-style: none;
+	counter-reset: bxsites-course-index;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.bxsites-course-index__item {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	border: 1px solid var( --bxsites-border, rgba( 0, 0, 0, 0.1 ) );
+	border-radius: 12px;
+	padding: 0.75rem 1rem;
+}
+
+.bxsites-course-index__check {
+	counter-increment: bxsites-course-index;
+	flex-shrink: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.75rem;
+	height: 1.75rem;
+	border-radius: 50%;
+	background: rgba( 0, 0, 0, 0.06 );
+	border: 2px solid var( --bxsites-border, rgba( 0, 0, 0, 0.15 ) );
+	font-size: 0.8rem;
+	font-weight: 600;
+}
+
+.bxsites-course-index__check::before {
+	content: counter( bxsites-course-index );
+}
+
+.bxsites-course-index__check--done {
+	background: var( --bxsites-link, #0d7a8f );
+	border-color: var( --bxsites-link, #0d7a8f );
+	color: #fff;
+}
+
+.bxsites-course-index__check--done::before {
+	content: "\2713";
+}
+
+.bxsites-course-index__icon {
+	flex-shrink: 0;
+	font-size: 1.25rem;
+}
+
+.bxsites-course-index__link {
+	font-weight: 600;
+	color: inherit;
+	text-decoration: none;
+}
+
+.bxsites-course-index__link:hover {
+	color: var( --bxsites-link, #0d7a8f );
+}
+
+.bxsites-course-index__summary {
+	margin-left: auto;
+	padding-left: 1rem;
+	font-size: 0.85rem;
+	opacity: 0.7;
+	text-align: right;
+}
+
+.bxsites-course-index--unavailable {
+	border: 1px dashed var( --bxsites-border, rgba( 0, 0, 0, 0.2 ) );
+	border-radius: 10px;
+	padding: 0.75rem 1rem;
+	font-size: 0.9rem;
+	opacity: 0.8;
+}
+
 .bxsites-stepper {
 	margin: 1.5rem 0;
 }

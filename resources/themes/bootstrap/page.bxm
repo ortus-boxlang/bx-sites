@@ -150,7 +150,21 @@
 					#variables.page.contentHtml#
 </bx:output><bx:if ( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'bottom'><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:output></bx:if><bx:output>
 				</article>
-</bx:output><bx:if len( variables.page.prevPage.url ) or len( variables.page.nextPage.url )><bx:output>
+</bx:output><bx:if len( variables.page.course.id )><bx:output>
+				<div class="bxsites-course-lesson-badge">Lesson #variables.page.course.lessonIndex# of #variables.page.course.lessonTotal# - #encodeForHTML( variables.page.course.courseTitle )#</div>
+				<div class="bxsites-course-lesson-meta" data-bxsites-course-lesson data-bxsites-course-id="#variables.page.course.id#" data-bxsites-lesson-url="#variables.basePath##variables.page.urlPath#" hidden></div>
+				<button type="button" class="bxsites-course-mark-complete" data-bxsites-course-mark-complete data-bxsites-course-id="#variables.page.course.id#" data-bxsites-lesson-url="#variables.basePath##variables.page.urlPath#">Mark complete</button>
+</bx:output><bx:if len( variables.page.course.prevLesson.url ) or len( variables.page.course.nextLesson.url )><bx:output>
+				<nav class="page-nav page-nav--course d-flex justify-content-between" aria-label="Course lesson navigation">
+</bx:output><bx:if len( variables.page.course.prevLesson.url )><bx:output>
+					<a class="page-nav__prev" href="#variables.basePath##variables.page.course.prevLesson.url#">&larr; #encodeForHTML( variables.page.course.prevLesson.title )#</a>
+</bx:output></bx:if><bx:if !len( variables.page.course.prevLesson.url )><bx:output>
+					<span></span>
+</bx:output></bx:if><bx:if len( variables.page.course.nextLesson.url )><bx:output>
+					<a class="page-nav__next" href="#variables.basePath##variables.page.course.nextLesson.url#">#encodeForHTML( variables.page.course.nextLesson.title )# &rarr;</a>
+</bx:output></bx:if><bx:output>
+				</nav>
+</bx:output></bx:if></bx:if><bx:if len( variables.page.prevPage.url ) or len( variables.page.nextPage.url )><bx:output>
 				<nav class="page-nav d-flex justify-content-between" aria-label="#encodeForHTML( variables.strings.pageNavigation )#">
 </bx:output><bx:if len( variables.page.prevPage.url )><bx:output>
 					<a class="page-nav__prev" href="#variables.basePath##variables.page.prevPage.url#">&larr; #encodeForHTML( variables.page.prevPage.title )#</a>

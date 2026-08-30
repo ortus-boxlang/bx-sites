@@ -1,0 +1,301 @@
+/**
+ * Resolves `docs/data/courses.yaml`'s own `data.courses` manifest (loaded
+ * for free by DataLoader.bx - no changes needed there, a course is just
+ * another top-level `docs/data/*` key) into a real, ordered lesson
+ * sequence scoped independently of the main `nav.json` tree - a course is
+ * a flat, manifest-driven sequence, not a nav subtree, so this class is
+ * deliberately NOT an extension of NavBuilder.bx (whose own `flatten()`/
+ * `assignPrevNext()` stay untouched, global, and unrelated to this).
+ *
+ * Two-phase, same shape as PageLinkResolver.bx: `resolveCourses()` +
+ * `assignCourseContext()` + `resolveIndexBlocks()` all run once per tree,
+ * after every page in that tree has already been through
+ * `convertMarkdown()` - a course's own lesson pages are only fully known
+ * (title/summary/icon, drawn from each lesson's own frontmatter) once the
+ * whole tree's pages are loaded, the same reason `PageLinkResolver.bx`
+ * itself runs as a post-pass rather than inline in
+ * `DirectiveBlockProcessor.bx`.
+ *
+ * `data.courses` is loaded once, project-wide (DataLoader.bx's own
+ * documented scope) and reused unchanged across every version/locale
+ * tree - but each tree has its own independently-loaded `pages` array, so
+ * a bare `docs/versions/<name>/` snapshot may legitimately not contain a
+ * course's lesson files at all. `resolveCourses()` handles this by
+ * silently excluding (never throwing for) any course whose lessons don't
+ * *all* match `pages` in the tree currently asking - the same
+ * graceful-degrade-per-tree shape blog/locale/version resolution already
+ * has elsewhere in this codebase. Manifest *shape* errors (not a struct,
+ * a missing title, `lessons` not a non-empty array of strings, the same
+ * lesson path listed under two different courses) are real authoring
+ * mistakes independent of which tree is asking, so those always throw
+ * regardless of `pages`.
+ */
+class {
+
+	variables.iconResolver = new "models.build.IconResolver@bxsites"()
+	variables.stubPattern = createObject( "java", "java.util.regex.Pattern" ).compile(
+		'<div class="bxsites-course-index" data-bxsites-course-index data-bxsites-course-id="([^"]*)"></div>'
+	)
+
+	/**
+	 * Resolves the raw `data.courses` manifest struct against one tree's
+	 * own already-loaded `pages` into a real, ordered lesson sequence per
+	 * course.
+	 *
+	 * Each `lessons` entry is a bare `docs/`-relative path string in v1
+	 * (e.g. `"guides/course/introduction.md"`) - deliberately narrow,
+	 * matching `nav.json`'s own simplest bare-string node form. The
+	 * *resolved* per-lesson struct this returns additionally carries a
+	 * `type` field (always `"lesson"` in v1) specifically so a future
+	 * version can accept a `lessons` entry that's either a bare string or
+	 * a `{path, type}` object (e.g. `type: "quiz"`) without changing the
+	 * shape v1 manifests already use, and reserves (but never reads) an
+	 * optional top-level `finalTest` key per course for the same reason -
+	 * see `docs/guides/courses.md`'s own "Extending this later" section.
+	 *
+	 * @coursesData `data.courses` - `{}` when the project defines no courses at all
+	 * @pages This tree's own already-loaded, already markdown-converted pages
+	 *
+	 * @return Struct keyed by courseId -> { id, title, description, lessons: [ { relativePath, urlPath, title, summary, icon, type } ] } - a course whose `lessons` don't every one of them match a page in `pages` is silently excluded from the result, not thrown
+	 */
+	struct function resolveCourses( required struct coursesData, required array pages ) {
+		var pagesByRelativePath = indexPagesByRelativePath( arguments.pages )
+		var seenLessonPaths = {}
+		var resolved = {}
+
+		for ( var courseId in arguments.coursesData ) {
+			var course = arguments.coursesData[ courseId ]
+			validateCourseShape( courseId, course, seenLessonPaths )
+
+			var lessons = []
+			var allLessonsPresent = true
+			for ( var relativePath in course.lessons ) {
+				var page = pagesByRelativePath[ relativePath ] ?: javacast( "null", "" )
+				if ( isNull( page ) ) {
+					allLessonsPresent = false
+					break
+				}
+				lessons.append( {
+					relativePath : relativePath,
+					urlPath      : page.urlPath,
+					title        : page.title,
+					summary      : len( trim( page.summary ?: "" ) ) ? trim( page.summary ) : trim( page.description ?: "" ),
+					icon         : trim( page.icon ?: "" ),
+					type         : "lesson"
+				} )
+			}
+
+			if ( allLessonsPresent ) {
+				resolved[ courseId ] = {
+					id          : courseId,
+					title       : trim( course.title ?: "" ),
+					description : trim( course.description ?: "" ),
+					lessons     : lessons
+				}
+			}
+		}
+
+		return resolved
+	}
+
+	/**
+	 * Mutates `pages` in place, adding a `course` struct to EVERY page -
+	 * an all-empty default for a page that isn't a lesson in any resolved
+	 * course, so a theme never needs to guard its existence, the same
+	 * "always present" convention ThemeRenderer.bx already documents for
+	 * `prevPage`/`breadcrumbs`/etc.
+	 *
+	 * @pages Mutated in place
+	 * @resolvedCourses resolveCourses()'s own output
+	 */
+	void function assignCourseContext( required array pages, required struct resolvedCourses ) {
+		var lessonLookup = {}
+		for ( var courseId in arguments.resolvedCourses ) {
+			var course = arguments.resolvedCourses[ courseId ]
+			for ( var i = 1; i <= course.lessons.len(); i++ ) {
+				lessonLookup[ course.lessons[ i ].relativePath ] = {
+					course : course,
+					index  : i
+				}
+			}
+		}
+
+		for ( var page in arguments.pages ) {
+			var entry = lessonLookup[ page.relativePath ] ?: javacast( "null", "" )
+			if ( isNull( entry ) ) {
+				page.course = emptyCourseContext()
+				continue
+			}
+
+			var course = entry.course
+			var index = entry.index
+			page.course = {
+				id          : course.id,
+				courseTitle : course.title,
+				lessonIndex : index,
+				lessonTotal : course.lessons.len(),
+				prevLesson  : index > 1 ? toLink( course.lessons[ index - 1 ] ) : { title : "", url : "" },
+				nextLesson  : index < course.lessons.len() ? toLink( course.lessons[ index + 1 ] ) : { title : "", url : "" },
+				indexUrl    : ""
+			}
+		}
+	}
+
+	/**
+	 * Replaces every `::: course id="..." :::` stub
+	 * (`DirectiveBlockProcessor.bx`'s `renderCourseIndexStub()`) across
+	 * `pages` with its real, server-rendered numbered index - one real
+	 * `<ol>` of `<li>`s, not `::: for`'s own per-iteration-fragment shape
+	 * (each `::: for` iteration is markdown-converted independently and
+	 * concatenated, producing N separate single-item `<ol start="N">`
+	 * blocks rather than one semantic list - a purpose-built block avoids
+	 * that here). A stub whose `id` has no resolved course (a typo, or a
+	 * course whose lessons don't exist in this tree) degrades to a
+	 * visible, non-fatal note - never a build failure.
+	 *
+	 * @pages Mutated in place
+	 * @resolvedCourses resolveCourses()'s own output
+	 * @basePath Root-relative base path, prefixed onto every lesson href
+	 */
+	void function resolveIndexBlocks( required array pages, required struct resolvedCourses, required string basePath ) {
+		for ( var page in arguments.pages ) {
+			if ( !findNoCase( "data-bxsites-course-index", page.contentHtml ?: "" ) ) {
+				continue
+			}
+
+			var matcher = variables.stubPattern.matcher( page.contentHtml )
+			var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+
+			while ( matcher.find() ) {
+				var courseId = matcher.group( 1 )
+				var course = arguments.resolvedCourses[ courseId ] ?: javacast( "null", "" )
+				var replacement = isNull( course )
+					? '<div class="bxsites-course-index bxsites-course-index--unavailable">::: course id="' & encodeForHTML( courseId ) & '" - no such course, or its lessons aren\'t all present in this build</div>'
+					: renderIndex( course, arguments.basePath )
+				matcher.appendReplacement( buffer, quoteReplacement( replacement ) )
+			}
+			matcher.appendTail( buffer )
+
+			page.contentHtml = buffer.toString()
+		}
+	}
+
+	/**
+	 * @courseId The manifest key being validated (for error messages)
+	 * @course The raw `data.courses[courseId]` struct
+	 * @seenLessonPaths Mutated in place - tracks which course each lesson path was first seen under, to catch a path listed in more than one course
+	 */
+	private void function validateCourseShape( required string courseId, required any course, required struct seenLessonPaths ) {
+		if ( !isStruct( arguments.course ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "docs/data/courses.yaml [#arguments.courseId#] must be an object"
+			)
+		}
+		if ( !len( trim( arguments.course.title ?: "" ) ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "docs/data/courses.yaml [#arguments.courseId#] is missing a required [title]"
+			)
+		}
+		var lessons = arguments.course.lessons ?: ""
+		if ( !isArray( lessons ) || !lessons.len() || lessons.filter( l => !isSimpleValue( l ) || !len( trim( l ) ) ).len() ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "docs/data/courses.yaml [#arguments.courseId#].lessons must be a non-empty array of docs/-relative path strings"
+			)
+		}
+		for ( var relativePath in lessons ) {
+			if ( arguments.seenLessonPaths.keyExists( relativePath ) && arguments.seenLessonPaths[ relativePath ] != arguments.courseId ) {
+				throw(
+					type    = "BxSites.InvalidConfig",
+					message = "docs/data/courses.yaml [#relativePath#] is listed under both [#arguments.seenLessonPaths[ relativePath ]#] and [#arguments.courseId#] - a lesson can only belong to one course"
+				)
+			}
+			arguments.seenLessonPaths[ relativePath ] = arguments.courseId
+		}
+	}
+
+	/**
+	 * @pages This tree's own already-loaded pages
+	 *
+	 * @return Struct keyed by each page's own `relativePath`
+	 */
+	private struct function indexPagesByRelativePath( required array pages ) {
+		var byRelativePath = {}
+		for ( var page in arguments.pages ) {
+			byRelativePath[ page.relativePath ] = page
+		}
+		return byRelativePath
+	}
+
+	/**
+	 * @lesson One resolved lesson struct from resolveCourses()'s own `lessons` array
+	 */
+	private struct function toLink( required struct lesson ) {
+		return { title : arguments.lesson.title, url : arguments.lesson.urlPath }
+	}
+
+	private struct function emptyCourseContext() {
+		return {
+			id          : "",
+			courseTitle : "",
+			lessonIndex : 0,
+			lessonTotal : 0,
+			prevLesson  : { title : "", url : "" },
+			nextLesson  : { title : "", url : "" },
+			indexUrl    : ""
+		}
+	}
+
+	/**
+	 * @course One resolved course struct from resolveCourses()'s own output
+	 * @basePath Root-relative base path, prefixed onto every lesson href
+	 */
+	private string function renderIndex( required struct course, required string basePath ) {
+		var items = ""
+		for ( var lesson in arguments.course.lessons ) {
+			var href = attrEscape( arguments.basePath & lesson.urlPath )
+			var icon = len( lesson.icon ) ? '<span class="bxsites-course-index__icon">' & variables.iconResolver.resolve( lesson.icon ) & '</span>' : ""
+			var summary = len( lesson.summary ) ? '<span class="bxsites-course-index__summary">' & encodeForHTML( lesson.summary ) & '</span>' : ""
+			items &= '<li class="bxsites-course-index__item" data-bxsites-lesson-url="' & href & '">'
+				& '<span class="bxsites-course-index__check" data-bxsites-course-check aria-hidden="true"></span>'
+				& icon
+				& '<a class="bxsites-course-index__link" href="' & href & '">' & encodeForHTML( lesson.title ) & '</a>'
+				& summary
+				& '</li>'
+		}
+
+		return '<div class="bxsites-course-index" data-bxsites-course-id="' & attrEscape( arguments.course.id ) & '">'
+			& '<div class="bxsites-course-index__progress" data-bxsites-course-progress data-bxsites-course-id="' & attrEscape( arguments.course.id ) & '" hidden>'
+				& '<div class="bxsites-course-index__bar"><div class="bxsites-course-index__bar-fill" data-bxsites-course-progress-fill></div></div>'
+				& '<span class="bxsites-course-index__progress-label" data-bxsites-course-progress-label></span>'
+			& '</div>'
+			& '<div class="bxsites-course-index__resume" data-bxsites-course-resume data-bxsites-course-id="' & attrEscape( arguments.course.id ) & '" hidden>'
+				& 'Continue where you left off: <a data-bxsites-course-resume-link href=""></a>'
+			& '</div>'
+			& '<ol class="bxsites-course-index__list">' & items & '</ol>'
+			& '</div>'
+	}
+
+	/**
+	 * A minimal, attribute-value-safe escape - only `&`/`"`/`<`, the
+	 * characters that actually matter inside a double-quoted HTML
+	 * attribute (same minimal escape PageLinkResolver.bx already uses for
+	 * the identical reason - a plain built URL/id doesn't need
+	 * `encodeForHTML()`'s much broader, locale/JVM-dependent range).
+	 */
+	private string function attrEscape( required string value ) {
+		return arguments.value.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
+	}
+
+	/**
+	 * Escapes literal text for use as a `Matcher#appendReplacement` argument.
+	 *
+	 * @text Literal text to safely pass through java.util.regex.Matcher#appendReplacement, which otherwise treats `$` and `\` as backreference syntax
+	 */
+	private string function quoteReplacement( required string text ) {
+		return createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( arguments.text )
+	}
+
+}

@@ -1,0 +1,218 @@
+class extends="testbox.system.BaseSpec" {
+
+	private struct function threeLessonCourse() {
+		return {
+			c : {
+				id      : "c",
+				title   : "C",
+				lessons : [
+					{ relativePath : "a.md", urlPath : "a/index.html", title : "A" },
+					{ relativePath : "b.md", urlPath : "b/index.html", title : "B" },
+					{ relativePath : "c.md", urlPath : "c/index.html", title : "C" }
+				]
+			}
+		};
+	}
+
+	private struct function oneCourse() {
+		return {
+			"getting-started" : {
+				id      : "getting-started",
+				title   : "Getting Started",
+				lessons : [
+					{ relativePath : "a.md", urlPath : "a/index.html", title : "A", summary : "", icon : "" },
+					{ relativePath : "b.md", urlPath : "b/index.html", title : "B", summary : "Second one.", icon : "" }
+				]
+			}
+		};
+	}
+
+	function run() {
+		describe( "build.CourseBuilder", function() {
+
+			beforeEach( function() {
+				variables.builder = new "models.build.CourseBuilder@bxsites"();
+			} );
+
+			describe( "resolveCourses()", function() {
+
+				it( "resolves a well-formed manifest against matching pages, pulling title/summary/icon from each lesson's own frontmatter", function() {
+					var coursesData = {
+						"getting-started" : {
+							title       : "Getting Started",
+							description : "A guided walkthrough.",
+							lessons     : [ "guides/course/one.md", "guides/course/two.md" ]
+						}
+					};
+					var pages = [
+						{ relativePath : "guides/course/one.md", urlPath : "guides/course/one/index.html", title : "One", summary : "First lesson.", icon : "🥇" },
+						{ relativePath : "guides/course/two.md", urlPath : "guides/course/two/index.html", title : "Two", summary : "", description : "Second lesson." }
+					];
+
+					var resolved = variables.builder.resolveCourses( coursesData, pages );
+
+					expect( resolved.keyExists( "getting-started" ) ).toBeTrue();
+					var course = resolved[ "getting-started" ];
+					expect( course.title ).toBe( "Getting Started" );
+					expect( course.description ).toBe( "A guided walkthrough." );
+					expect( course.lessons.len() ).toBe( 2 );
+					expect( course.lessons[ 1 ].title ).toBe( "One" );
+					expect( course.lessons[ 1 ].urlPath ).toBe( "guides/course/one/index.html" );
+					expect( course.lessons[ 1 ].summary ).toBe( "First lesson." );
+					expect( course.lessons[ 1 ].icon ).toBe( "🥇" );
+					expect( course.lessons[ 1 ].type ).toBe( "lesson" );
+					expect( course.lessons[ 2 ].summary ).toBe( "Second lesson." );
+				} );
+
+				it( "throws BxSites.InvalidConfig when a course value isn't an object", function() {
+					expect( function() {
+						variables.builder.resolveCourses( { bad : "not-a-struct" }, [] );
+					} ).toThrow( "BxSites.InvalidConfig" );
+				} );
+
+				it( "throws BxSites.InvalidConfig when a course is missing a title", function() {
+					expect( function() {
+						variables.builder.resolveCourses( { bad : { lessons : [ "a.md" ] } }, [] );
+					} ).toThrow( "BxSites.InvalidConfig" );
+				} );
+
+				it( "throws BxSites.InvalidConfig when lessons isn't a non-empty array of path strings", function() {
+					expect( function() {
+						variables.builder.resolveCourses( { bad : { title : "Bad", lessons : [] } }, [] );
+					} ).toThrow( "BxSites.InvalidConfig" );
+
+					expect( function() {
+						variables.builder.resolveCourses( { bad : { title : "Bad", lessons : "not-an-array" } }, [] );
+					} ).toThrow( "BxSites.InvalidConfig" );
+				} );
+
+				it( "throws BxSites.InvalidConfig when the same lesson path is listed under two different courses", function() {
+					var coursesData = {
+						a : { title : "A", lessons : [ "shared.md" ] },
+						b : { title : "B", lessons : [ "shared.md" ] }
+					};
+
+					expect( function() {
+						variables.builder.resolveCourses( coursesData, [] );
+					} ).toThrow( "BxSites.InvalidConfig" );
+				} );
+
+				it( "silently excludes (never throws for) a course whose lessons don't all match this tree's own pages - the version-tree graceful-skip", function() {
+					var coursesData = {
+						"getting-started" : { title : "Getting Started", lessons : [ "guides/course/one.md", "guides/course/missing.md" ] }
+					};
+					var pages = [ { relativePath : "guides/course/one.md", urlPath : "x/index.html", title : "One" } ];
+
+					var resolved = variables.builder.resolveCourses( coursesData, pages );
+
+					expect( resolved.keyExists( "getting-started" ) ).toBeFalse();
+				} );
+
+				it( "returns {} for an empty manifest, no throw", function() {
+					expect( variables.builder.resolveCourses( {}, [] ) ).toBe( {} );
+				} );
+
+			} );
+
+			describe( "assignCourseContext()", function() {
+
+				it( "assigns correct lessonIndex/lessonTotal/prevLesson/nextLesson to a middle lesson", function() {
+					var pages = [ { relativePath : "a.md" }, { relativePath : "b.md" }, { relativePath : "c.md" } ];
+
+					variables.builder.assignCourseContext( pages, threeLessonCourse() );
+
+					expect( pages[ 2 ].course.id ).toBe( "c" );
+					expect( pages[ 2 ].course.lessonIndex ).toBe( 2 );
+					expect( pages[ 2 ].course.lessonTotal ).toBe( 3 );
+					expect( pages[ 2 ].course.prevLesson.url ).toBe( "a/index.html" );
+					expect( pages[ 2 ].course.prevLesson.title ).toBe( "A" );
+					expect( pages[ 2 ].course.nextLesson.url ).toBe( "c/index.html" );
+				} );
+
+				it( "leaves prevLesson empty for the first lesson", function() {
+					var pages = [ { relativePath : "a.md" }, { relativePath : "b.md" }, { relativePath : "c.md" } ];
+
+					variables.builder.assignCourseContext( pages, threeLessonCourse() );
+
+					expect( pages[ 1 ].course.prevLesson.url ).toBe( "" );
+					expect( pages[ 1 ].course.nextLesson.url ).toBe( "b/index.html" );
+				} );
+
+				it( "leaves nextLesson empty for the last lesson", function() {
+					var pages = [ { relativePath : "a.md" }, { relativePath : "b.md" }, { relativePath : "c.md" } ];
+
+					variables.builder.assignCourseContext( pages, threeLessonCourse() );
+
+					expect( pages[ 3 ].course.nextLesson.url ).toBe( "" );
+					expect( pages[ 3 ].course.prevLesson.url ).toBe( "b/index.html" );
+				} );
+
+				it( "gives a page that's not a lesson in any course the all-empty default course struct", function() {
+					var pages = [ { relativePath : "unrelated.md" } ];
+
+					variables.builder.assignCourseContext( pages, {} );
+
+					expect( pages[ 1 ].course.id ).toBe( "" );
+					expect( pages[ 1 ].course.lessonIndex ).toBe( 0 );
+					expect( pages[ 1 ].course.lessonTotal ).toBe( 0 );
+					expect( pages[ 1 ].course.prevLesson.url ).toBe( "" );
+					expect( pages[ 1 ].course.nextLesson.url ).toBe( "" );
+				} );
+
+			} );
+
+			describe( "resolveIndexBlocks()", function() {
+
+				it( "replaces a ::: course stub with one real <ol> containing one <li> per lesson - not ::: for's own multi-<ol> fragment shape", function() {
+					var pages = [ { contentHtml : '<div class="bxsites-course-index" data-bxsites-course-index data-bxsites-course-id="getting-started"></div>' } ];
+
+					variables.builder.resolveIndexBlocks( pages, oneCourse(), "/" );
+					var html = pages[ 1 ].contentHtml;
+
+					expect( html.reMatchNoCase( "<ol[^>]*>" ).len() ).toBe( 1 );
+					expect( html.reMatchNoCase( "<li[^>]*>" ).len() ).toBe( 2 );
+					expect( html ).toInclude( 'href="/a/index.html"' );
+					expect( html ).toInclude( 'href="/b/index.html"' );
+					expect( html ).toInclude( "Second one." );
+				} );
+
+				it( "renders hidden progress-bar and resume-CTA placeholders, SSR-present but inert until course-progress.js fills them in", function() {
+					var pages = [ { contentHtml : '<div class="bxsites-course-index" data-bxsites-course-index data-bxsites-course-id="getting-started"></div>' } ];
+
+					variables.builder.resolveIndexBlocks( pages, oneCourse(), "/" );
+					var html = pages[ 1 ].contentHtml;
+
+					expect( html ).toInclude( "data-bxsites-course-progress" );
+					expect( html ).toInclude( "data-bxsites-course-resume" );
+				} );
+
+				it( "degrades an unmatched course id to a visible, non-fatal note rather than failing the build", function() {
+					var pages = [ { contentHtml : '<div class="bxsites-course-index" data-bxsites-course-index data-bxsites-course-id="nope"></div>' } ];
+
+					variables.builder.resolveIndexBlocks( pages, {}, "/" );
+
+					expect( pages[ 1 ].contentHtml ).toInclude( "bxsites-course-index--unavailable" );
+				} );
+
+				it( "is a no-op on a page with no course-index stub", function() {
+					var pages = [ { contentHtml : "<p>Nothing here.</p>" } ];
+
+					variables.builder.resolveIndexBlocks( pages, {}, "/" );
+
+					expect( pages[ 1 ].contentHtml ).toBe( "<p>Nothing here.</p>" );
+				} );
+
+				it( "resolves stubs correctly under a non-root basePath", function() {
+					var pages = [ { contentHtml : '<div class="bxsites-course-index" data-bxsites-course-index data-bxsites-course-id="getting-started"></div>' } ];
+
+					variables.builder.resolveIndexBlocks( pages, oneCourse(), "/my-docs/" );
+
+					expect( pages[ 1 ].contentHtml ).toInclude( 'href="/my-docs/a/index.html"' );
+				} );
+
+			} );
+
+		} );
+	}
+
+}

@@ -323,6 +323,48 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileRead( root & "/site/versions/1.0/index.html" ) ).toInclude( "<p>1.0: Widget</p>" );
 			} );
 
+			it( "gives a course its own scoped prev/next, independent of the site's global nav-order prev/next - the load-bearing proof CourseBuilder.bx's scoping is real, not a copy of assignPrevNext()", function() {
+				var root = newProject();
+				directoryCreate( root & "/docs/data", true, true );
+				// Deliberately ordered differently from the course's own
+				// manifest order below - titles Alpha/Home/Mike/Zulu sort
+				// alphabetically into the site's GLOBAL nav (folder-inferred,
+				// no nav.json), so Zulu's global prevPage is Mike and its
+				// global nextPage is none (last alphabetically) - while the
+				// course manifest puts Zulu FIRST, so its course-scoped
+				// prevLesson should be none and nextLesson should be Alpha.
+				fileWrite(
+					root & "/docs/data/courses.json",
+					'{"course-1":{"title":"Test Course","lessons":["course/zulu.md","course/alpha.md","course/mike.md"]}}'
+				);
+				directoryCreate( root & "/docs/course", true, true )
+				fileWrite( root & "/docs/index.md", '::: course id="course-1" :::' )
+				fileWrite( root & "/docs/course/zulu.md", "---" & char( 10 ) & "title: Zulu" & char( 10 ) & "---" & char( 10 ) & "Zulu content." )
+				fileWrite( root & "/docs/course/alpha.md", "---" & char( 10 ) & "title: Alpha" & char( 10 ) & "---" & char( 10 ) & "Alpha content." )
+				fileWrite( root & "/docs/course/mike.md", "---" & char( 10 ) & "title: Mike" & char( 10 ) & "---" & char( 10 ) & "Mike content." )
+
+				pipeline.build( root )
+
+				var indexHtml = fileRead( root & "/site/index.html" )
+				expect( indexHtml ).toInclude( "bxsites-course-index" )
+				expect( indexHtml ).toInclude( "Zulu" )
+				expect( indexHtml ).toInclude( "Alpha" )
+				expect( indexHtml ).toInclude( "Mike" )
+
+				var zuluHtml = fileRead( root & "/site/course/zulu/index.html" )
+				expect( zuluHtml ).toInclude( "Lesson 1 of 3 - Test Course" )
+
+				var courseNav = zuluHtml.reMatchNoCase( '<nav class="page-nav page-nav--course[\s\S]*?</nav>' )
+				expect( courseNav.len() ).toBe( 1 )
+				expect( courseNav[ 1 ] ).toInclude( "Alpha" )
+				expect( courseNav[ 1 ] ).notToInclude( "Mike" )
+
+				var globalNav = zuluHtml.reMatchNoCase( '<nav class="page-nav d-flex[\s\S]*?</nav>' )
+				expect( globalNav.len() ).toBe( 1 )
+				expect( globalNav[ 1 ] ).toInclude( "Mike" )
+				expect( globalNav[ 1 ] ).notToInclude( "Alpha" )
+			} );
+
 			it( "builds end to end with the material and tailwind themes too", function() {
 				for ( var themeName in [ "material", "tailwind" ] ) {
 					var root = newProject( themeName );
