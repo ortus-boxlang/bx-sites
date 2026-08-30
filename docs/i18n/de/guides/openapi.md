@@ -2,16 +2,15 @@
 title: OpenAPI / Swagger
 order: 4.6
 icon: phosphor-duotone:plug
-tags: [anleitungen, openapi, api, gitbook]
+tags: [anleitungen, openapi, api]
 ---
 
 # OpenAPI / Swagger
 
 Ein interaktives [Swagger-UI](https://swagger.io/tools/swagger-ui/)-Widget
 für eine OpenAPI-/Swagger-Spezifikation, mit derselben `::: name ... :::`-
-Container-Syntax wie jeder Block in [Content-Blöcke](content-blocks.md) -
-das direkte Gegenstück zu GitBooks eigenem OpenAPI-Block. `src` wird auf
-dieselbe, relativ zu `docs/assets/` aufgelöste Weise interpretiert wie das
+Container-Syntax wie jeder Block in [Content-Blöcke](content-blocks.md).
+`src` wird auf dieselbe, relativ zu `docs/assets/` aufgelöste Weise interpretiert wie das
 `src` von `::: file` (siehe [Content-Blöcke](content-blocks.md#file)).
 Sowohl JSON- als auch YAML-Spezifikationen funktionieren; Swagger UI parst
 beide vollständig clientseitig - nirgendwo in diesem Modul findet eine

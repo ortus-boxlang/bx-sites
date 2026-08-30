@@ -199,22 +199,16 @@ Alcuni attributi opzionali danno a ogni pulsante le proprie capacità:
 
 ```markdown title="Esempio" linenums="1"
 ::: buttons
-::: button "Read the docs" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
-:::
-::: button "Star on GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
-:::
-::: button "Coming soon" disabled="true"
-:::
+::: button "Read the docs" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large" :::
+::: button "Star on GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank" :::
+::: button "Coming soon" disabled="true" :::
 :::
 ```
 
 ::: buttons
-::: button "Leggi la documentazione" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
-:::
-::: button "Metti una stella su GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
-:::
-::: button "Prossimamente" disabled="true"
-:::
+::: button "Leggi la documentazione" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large" :::
+::: button "Metti una stella su GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank" :::
+::: button "Prossimamente" disabled="true" :::
 :::
 
 ## Embed
@@ -226,12 +220,10 @@ che si rifiuterebbe comunque di renderizzarsi (la maggior parte dei siti
 blocca l'essere incorniciata):
 
 ```markdown title="Esempio" linenums="1"
-::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
-:::
+::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo" :::
 ```
 
-::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="Una demo"
-:::
+::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="Una demo" :::
 
 ## Link a pagina
 
@@ -244,12 +236,10 @@ così resta sincronizzato se quella pagina viene rinominata o il suo
 riepilogo cambia:
 
 ```markdown title="Esempio" linenums="1"
-::: page-link href="../getting-started.md"
-:::
+::: page-link href="../getting-started.md" :::
 ```
 
-::: page-link href="../getting-started.md"
-:::
+::: page-link href="../getting-started.md" :::
 
 ## Anteprima link
 
@@ -266,18 +256,14 @@ applica anche qui, così un sito di terze parti lento o irraggiungibile
 non influisce mai sul tempo di build:
 
 ```markdown title="Esempio" linenums="1"
-::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language."
-:::
+::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." :::
 ```
 
-::: link-preview url="https://boxlang.io" title="BoxLang" description="Un linguaggio JVM dinamico e multi-paradigma."
-:::
+::: link-preview url="https://boxlang.io" title="BoxLang" description="Un linguaggio JVM dinamico e multi-paradigma." :::
 
-## Prompt
+## Prompt AI
 
-Un contenitore stilizzato per un prompt AI riutilizzabile - l'equivalente
-proprio di bx-sites del [blocco Prompt](https://gitbook.com/docs/create-content/blocks/prompt)
-di GitBook. Il corpo del blocco *è* il testo del prompt, scritto come
+Un contenitore stilizzato per un prompt AI riutilizzabile. Il corpo del blocco *è* il testo del prompt, scritto come
 normale Markdown (quindi intestazioni, elenchi e codice al suo interno
 ottengono comunque la propria formattazione); ogni prompt ottiene un
 pulsante "Copy" che copia esattamente quel testo sorgente, markup di
@@ -327,10 +313,9 @@ prompt per intero:
 5. Skip anything that already has an open issue - list those separately.
 :::
 
-A differenza del blocco Prompt proprio di GitBook, qui non c'è alcun menu
-"Open in AI providers" - bx-sites non comunica mai con un provider AI di
-terze parti, quindi quella parte del blocco proprio di GitBook non ha un
-equivalente.
+Qui non c'è alcun menu "Open in AI providers" - bx-sites non comunica mai
+con un provider AI di terze parti, quindi il pulsante "Copy" proprio di un
+prompt è l'unico modo per portarlo nello strumento che stai usando.
 
 ## Aggiornamenti (changelog)
 
@@ -434,8 +419,7 @@ stesso a scegliere, e la sua scelta viene semplicemente ricordata nel
 proprio browser (`localStorage`) anche per ogni pagina successiva:
 
 ```markdown title="Esempio" linenums="1"
-::: audience-switcher key="plan" options="free:Free,pro:Pro"
-:::
+::: audience-switcher key="plan" options="free:Free,pro:Pro" :::
 
 ::: conditional key="plan" value="free"
 The Free plan includes basic search.
@@ -446,8 +430,7 @@ The Pro plan adds AI-assisted search and unlimited team seats.
 :::
 ```
 
-::: audience-switcher key="plan" options="free:Free,pro:Pro"
-:::
+::: audience-switcher key="plan" options="free:Free,pro:Pro" :::
 
 ::: conditional key="plan" value="free"
 The Free plan includes basic search.
