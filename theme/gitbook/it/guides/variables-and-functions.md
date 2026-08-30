@@ -207,11 +207,11 @@ annidata né espressione in questa prima versione:
 ## Ricette per i visualizzatori
 
 Una funzione magica che restituisce HTML non si limita a un badge di
-stato - è un modo generico per ottenere celle visive in stile GitBook
-(una valutazione a stelle, un chip colorato, una barra di progresso)
-senza il selettore di colonne di GitBook basato su database, di cui il
-codice sorgente di bx-sites, basato su git e Markdown puro, non ha un
-equivalente. Le quattro funzioni qui sotto sono lo stesso
+stato - è un modo generico per ottenere celle visive (una valutazione a
+stelle, un chip colorato, una barra di progresso) senza bisogno di alcun
+selettore di colonne basato su database - il codice sorgente di
+bx-sites, basato su git e Markdown puro, non ne ha un equivalente. Le
+quattro funzioni qui sotto sono lo stesso
 [`docs/functions.bxs`](https://github.com/ortus-boxlang/bx-sites/blob/development/docs/functions.bxs)
 di questo sito, renderizzate dal vivo proprio in questa pagina.
 
@@ -276,8 +276,7 @@ function $trend( required numeric value ) {
 `{{ }}` si risolve rispetto al Markdown grezzo prima ancora che le
 [tabelle](tables.md) vengano analizzate, quindi qualsiasi
 elemento tra quelli sopra funziona anche dentro le celle di una tabella a
-pipe, esattamente come in qualsiasi altro punto della pagina - la cosa più
-vicina qui alle colonne Select/Rating di GitBook:
+pipe, esattamente come in qualsiasi altro punto della pagina:
 
 ```markdown title="Example" linenums="1"
 | Feature | Status | Rating |

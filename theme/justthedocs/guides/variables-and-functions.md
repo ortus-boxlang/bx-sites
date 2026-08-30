@@ -196,10 +196,9 @@ first version:
 ## Visualizer recipes
 
 A magic function returning HTML isn't limited to a status badge - it's a
-general-purpose way to get GitBook-style visual cells (a star rating, a
-colored chip, a progress bar) without GitBook's own database-backed column
-picker, which bx-sites' git-based, plain-Markdown source has no equivalent
-of. The four below are this site's own
+general-purpose way to get visual cells (a star rating, a colored chip, a
+progress bar) with no database-backed column picker needed - bx-sites'
+git-based, plain-Markdown source has no equivalent of one. The four below are this site's own
 [`docs/functions.bxs`](https://github.com/ortus-boxlang/bx-sites/blob/development/docs/functions.bxs),
 rendering live on this exact page.
 
@@ -263,8 +262,7 @@ function $trend( required numeric value ) {
 
 `{{ }}` resolves against the raw Markdown before [tables](tables.md)
 are even parsed, so any of the above work inside a pipe table's cells the
-same as anywhere else on the page - the closest thing here to GitBook's own
-Select/Rating table columns:
+same as anywhere else on the page:
 
 ```markdown title="Example" linenums="1"
 | Feature | Status | Rating |

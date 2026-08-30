@@ -2,7 +2,7 @@
 title: Tablas
 order: 4.6
 icon: phosphor-duotone:table
-tags: [guides, markdown, gitbook]
+tags: [guides, markdown]
 ---
 
 # Tablas
@@ -131,8 +131,7 @@ cualquier otra clase CSS.
 Dos recetas más se construyen directamente encima de una tabla simple
 como las de arriba:
 
-- ¿Necesitas algo más cercano a las columnas de tabla Select/Rating de
-  GitBook - una insignia de estado o una valoración con estrellas en una
+- ¿Necesitas una insignia de estado o una valoración con estrellas en una
   celda? Consulta [Recetas de
   visualización](variables-and-functions.md#recetas-de-visualización).
 - ¿Necesitas que un lector realmente pueda ordenar o filtrar una tabla

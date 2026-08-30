@@ -425,7 +425,7 @@ against both delimiters.
 See [Tables](tables.md) for GFM pipe tables - alignment, escaping, and
 the automatic responsive-scroll/sticky-header treatment every table gets.
 
-See [Content Blocks](content-blocks.md) for a family of GitBook-style
+See [Content Blocks](content-blocks.md) for a family of rich
 `::: name ... :::` blocks on top of everything above - expandables,
 cards, columns, a stepper, file/embed/page-link cards, a changelog
 block, and reusable content includes.

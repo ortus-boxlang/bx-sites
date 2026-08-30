@@ -2,7 +2,7 @@
 title: OpenAPI / Swagger
 order: 4.6
 icon: phosphor-duotone:plug
-tags: [guide, openapi, api, gitbook]
+tags: [guide, openapi, api]
 ---
 
 # OpenAPI / Swagger
@@ -10,8 +10,7 @@ tags: [guide, openapi, api, gitbook]
 Un widget interattivo [Swagger UI](https://swagger.io/tools/swagger-ui/)
 per una specifica OpenAPI/Swagger, con la stessa sintassi di contenitore
 `::: name ... :::` di ogni blocco in
-[Blocchi di contenuto](content-blocks.md) - l'equivalente diretto del
-blocco OpenAPI proprio di GitBook. `src` viene risolto nello stesso modo,
+[Blocchi di contenuto](content-blocks.md). `src` viene risolto nello stesso modo,
 relativo a `docs/assets/`, in cui viene risolto `src` di `::: file` (vedi
 [Blocchi di contenuto](content-blocks.md#file)). Sia le specifiche JSON
 che YAML funzionano; Swagger UI le analizza entrambe interamente lato
@@ -74,10 +73,8 @@ specifica (segnaposto `{param}` compresi).
 
 `::: openapi` richiede sempre un documento OpenAPI/Swagger reale in `src`
 - non esiste una versione manuale e senza specifica di questo blocco per
-descrivere a mano un singolo endpoint. Nemmeno GitBook ce l'ha più: il suo
-equivalente, il blocco "API method", è stato dismesso a febbraio 2024 a
-favore dell'importazione sempre di una specifica reale. Se non ne hai
-ancora una:
+descrivere a mano un singolo endpoint; importa sempre una specifica reale
+al suo posto. Se non ne hai ancora una:
 
 - Scrivi solo la specifica necessaria per la pagina su cui ti trovi. Una
   singola voce `paths` con un proprio `info`/`servers` minimo (vedi

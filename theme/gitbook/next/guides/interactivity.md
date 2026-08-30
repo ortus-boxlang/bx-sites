@@ -39,8 +39,8 @@ its own client-side state.
 ## A copy-to-clipboard button
 
 [`::: button`](content-blocks.md#buttons) only ever renders a real link (or
-an inert placeholder) - like GitBook's own button, it has no notion of
-running arbitrary JS on click. For a button that *does* something instead
+an inert placeholder) - it has no notion of running arbitrary JS on
+click. For a button that *does* something instead
 of navigating somewhere, drop its `bxsites-button`/`bxsites-button--*`
 classes onto a plain HTML `<button>` instead - same look, styled in every
 built-in theme, just wired up with Alpine rather than an `href`. A common
@@ -85,10 +85,10 @@ re-evaluates on every keystroke.
 
 ## A sortable, filterable table
 
-A [native pipe table](tables.md) is static once built - for one
-that a reader can actually sort and filter client-side (the closest thing
-here to GitBook's table search/sort), have Alpine own the rows instead:
-put the data in `x-data` and render it with `x-for`, rather than writing
+A [native pipe table](tables.md) is static once built - for one that a
+reader can actually sort and filter client-side, have Alpine own the
+rows instead: put the data in `x-data` and render it with `x-for`,
+rather than writing
 `| Feature | Status |` pipe syntax:
 
 ```markdown title="Sortable table" linenums="1"

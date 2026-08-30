@@ -56,7 +56,7 @@ both are on by default, no extra configuration needed.
   move a highlight across results, **Enter** navigates to the highlighted
   one, and **Escape** (or clicking the backdrop) closes it - the same
   "Quick Find"/⌘K convention Algolia DocSearch, Pagefind, VitePress,
-  Docusaurus and GitBook all share.
+  and Docusaurus all share.
 - **`Escape`** also closes the sidebar box's own results dropdown and
   blurs it, independent of the palette above.
 

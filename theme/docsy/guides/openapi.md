@@ -2,15 +2,14 @@
 title: OpenAPI / Swagger
 order: 4.6
 icon: phosphor-duotone:plug
-tags: [guides, openapi, api, gitbook]
+tags: [guides, openapi, api]
 ---
 
 # OpenAPI / Swagger
 
 An interactive [Swagger UI](https://swagger.io/tools/swagger-ui/) widget for
 an OpenAPI/Swagger spec, using the same `::: name ... :::` container syntax
-as every block in [Content Blocks](content-blocks.md) - GitBook's own
-OpenAPI block's direct equivalent. `src` is resolved the same
+as every block in [Content Blocks](content-blocks.md). `src` is resolved the same
 `docs/assets/`-relative way `::: file`'s own `src` is (see
 [Content Blocks](content-blocks.md#file)). Both JSON and YAML specs work;
 Swagger UI parses either entirely client-side; no OpenAPI parsing happens
@@ -66,9 +65,7 @@ spec's own path exactly (`{param}` placeholders and all).
 
 `::: openapi` always needs a real OpenAPI/Swagger document at `src` -
 there's no manual, spec-less version of this block for hand-describing a
-single endpoint. GitBook itself doesn't have one either anymore: its own
-equivalent, the "API method" block, was deprecated in February 2024 in
-favor of always importing a real spec. If you don't have one yet:
+single endpoint; always import a real spec instead. If you don't have one yet:
 
 - Write just enough spec to cover the page you're on. A single `paths`
   entry with its own minimal `info`/`servers` (see

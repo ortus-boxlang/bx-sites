@@ -205,11 +205,11 @@ función anidadas ni expresiones en esta primera versión:
 ## Recetas de visualización
 
 Una función mágica que devuelve HTML no se limita a una insignia de
-estado - es una forma de propósito general de obtener celdas visuales al
-estilo GitBook (una valoración con estrellas, un chip de color, una barra
-de progreso) sin el propio selector de columnas respaldado por base de
-datos de GitBook, del que el origen basado en git y en Markdown plano de
-bx-sites no tiene equivalente alguno. Las cuatro de abajo son el propio
+estado - es una forma de propósito general de obtener celdas visuales
+(una valoración con estrellas, un chip de color, una barra de progreso)
+sin necesitar ningún selector de columnas respaldado por base de datos -
+el origen basado en git y en Markdown plano de bx-sites no tiene
+equivalente alguno de eso. Las cuatro de abajo son el propio
 [`docs/functions.bxs`](https://github.com/ortus-boxlang/bx-sites/blob/development/docs/functions.bxs)
 de este sitio, renderizándose en vivo justo en esta misma página.
 
@@ -274,8 +274,7 @@ function $trend( required numeric value ) {
 `{{ }}` se resuelve contra el Markdown en bruto antes incluso de que se
 analicen las [tablas](tables.md), así que cualquiera de las
 anteriores funciona dentro de las celdas de una tabla de pipes igual que
-en cualquier otra parte de la página - lo más parecido que hay aquí a las
-propias columnas de tabla Select/Rating de GitBook:
+en cualquier otra parte de la página:
 
 ```markdown title="Example" linenums="1"
 | Feature | Status | Rating |

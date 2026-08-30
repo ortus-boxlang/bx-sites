@@ -289,10 +289,10 @@ existiert.
     dem ein dreispaltiges Layout zu eng würde); unterhalb dieser Breite
     rendert der `sticky`-Modus stattdessen eine einklappbare "Auf dieser
     Seite"-Leiste, die beim Scrollen oben am Viewport fixiert bleibt -
-    antippen, um die Liste auszuklappen, dieselbe Behandlung, die auch
-    VitePress/GitBook auf Mobilgeräten verwenden - sodass das
-    Inhaltsverzeichnis bei jeder Viewport-Breite erreichbar bleibt, nur
-    seine Form ändert sich je nach verfügbarem Platz.
+    antippen, um die Liste auszuklappen, eine gängige Behandlung für
+    schmale Viewports - sodass das Inhaltsverzeichnis bei jeder
+    Viewport-Breite erreichbar bleibt, nur seine Form ändert sich je nach
+    verfügbarem Platz.
 
     === "YAML"
         ```yaml
@@ -427,8 +427,7 @@ verlinkt (wie bei `hidden: true`). Jeder Eintrag ist entweder:
 
 Ein Eintrag nur mit `title`, mit `children` und ohne `path` ist genau ein
 Menü-Container/Abschnitts-Label - eine nicht klickbare Überschrift, die
-nur ihre Kinder gruppiert, dieselbe Rolle, die "MAIN COMPONENTS" in
-GitBooks eigener Seitenleiste spielt:
+nur ihre Kinder gruppiert:
 
 === "YAML"
     ```yaml title="bxsites.yaml" linenums="1"

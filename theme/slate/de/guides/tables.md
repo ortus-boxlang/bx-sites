@@ -2,7 +2,7 @@
 title: Tabellen
 order: 4.6
 icon: phosphor-duotone:table
-tags: [anleitungen, markdown, gitbook]
+tags: [anleitungen, markdown]
 ---
 
 # Tabellen
@@ -128,8 +128,7 @@ jede andere CSS-Klasse umgestalten.
 Zwei weitere Rezepte bauen direkt auf einer einfachen Tabelle wie den
 obigen auf:
 
-- Brauchst du etwas, das GitBooks Select-/Rating-Tabellenspalten
-  näherkommt - einen Status-Chip oder eine Sternebewertung in einer
+- Brauchst du einen Status-Chip oder eine Sternebewertung in einer
   Zelle? Siehe [Visualizer-Rezepte](variables-and-functions.md#visualizer-rezepte).
 - Soll ein Leser eine Tabelle tatsächlich clientseitig sortieren oder
   filtern können, statt sie nur zu lesen? Siehe [Eine sortierbare,

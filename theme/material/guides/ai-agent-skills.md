@@ -84,7 +84,7 @@ files), so it installs correctly through every path above:
 | Skill | Description |
 |---|---|
 | `bx-sites-getting-started` | Install bx-sites, scaffold a new project (or migrate an existing GitBook/mkdocs/Notion one in), project layout, page frontmatter, linking, build/serve/clean. |
-| `bx-sites-content-blocks` | GitBook-style `::: name :::` blocks - cards, columns, stepper, buttons, embeds, page-link/link-preview, prompt, updates, includes, conditional content, OpenAPI widget. |
+| `bx-sites-content-blocks` | Rich `::: name :::` content blocks - cards, columns, stepper, buttons, embeds, page-link/link-preview, prompt, updates, includes, conditional content, OpenAPI widget. |
 | `bx-sites-markdown` | Admonitions, footnotes, definition lists, content tabs, code-block annotations, Mermaid, math, tables, icons, responsive images, Alpine.js interactivity. |
 | `bx-sites-variables-functions` | Reusable `{{ variables }}` and BoxLang magic functions (`docs/functions.bxs`), including status-badge/rating/progress-bar visualizer recipes. |
 | `bx-sites-blog-versioning-i18n` | The blog (`docs/blog/posts/`), versioned docs (`docs/versions/`), translated locales (`docs/i18n/`), and redirects. |

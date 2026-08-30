@@ -263,8 +263,8 @@ build - the `robots` key above is ignored entirely once this file exists.
     pinned column only fits on wide viewports (it's hidden below the point a
     3-column layout would get cramped); below that width `sticky` mode
     instead renders a collapsible "On this page" bar pinned to the top of
-    the viewport while scrolling - tap to expand the list, same treatment
-    VitePress/GitBook use on mobile - so the TOC stays reachable at every
+    the viewport while scrolling - tap to expand the list, a common
+    treatment for narrow viewports - so the TOC stays reachable at every
     viewport width, it just changes shape depending on how much room there is.
 
     === "YAML"
@@ -404,8 +404,7 @@ linked from the nav (same as `hidden: true`). Each entry is either:
 
 A `title`-only entry with `children` and no `path` is exactly a menu
 container/section label - a non-clickable heading that just groups its
-children, the same role GitBook's "MAIN COMPONENTS" plays in its own
-sidebar:
+children:
 
 === "YAML"
     ```yaml title="bxsites.yaml" linenums="1"
@@ -845,7 +844,7 @@ referenced OpenAPI/Swagger spec (JSON or YAML). See
 ## `pageActions`
 
 `false` (the default) - no page-actions dropdown at all. `true` adds a
-GitBook-style "Copy" button to every page (near the title by default -
+"Copy" button to every page (near the title by default -
 see `theme.options.pageActionsPosition` above) that opens a small menu:
 
 - **Copy page** - copies the page's own raw Markdown source to the

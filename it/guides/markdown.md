@@ -448,7 +448,7 @@ escape, e il trattamento automatico di scorrimento responsive/intestazione
 fissa che ogni tabella riceve.
 
 Vedi [Blocchi di contenuto](content-blocks.md) per una famiglia di
-blocchi in stile GitBook `::: name ... :::` che si aggiunge a tutto
+ricchi blocchi `::: name ... :::` che si aggiunge a tutto
 quanto sopra - espandibili, card, colonne, uno stepper, card
 file/embed/link-a-pagina, un blocco changelog, e contenuto riutilizzabile
 tramite include.

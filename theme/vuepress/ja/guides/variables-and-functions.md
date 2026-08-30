@@ -191,11 +191,11 @@ Page: {{ $pagetitle() }}
 
 ## ビジュアライザーのレシピ
 
-HTML を返すマジック関数はステータスバッジだけに限られません - GitBook スタイルの
-ビジュアルセル（スターレーティング、色付きチップ、プログレスバー）を、GitBook
-自身のデータベース駆動の列ピッカー（bx-sites の Git ベースでプレーンな Markdown
-ソースにはこれに相当するものがありません）なしで得るための、汎用的な手段です。
-以下の4つは、このサイト自身の
+HTML を返すマジック関数はステータスバッジだけに限られません - ビジュアルセル
+（スターレーティング、色付きチップ、プログレスバー）を、データベース駆動の
+列ピッカーなしで得るための、汎用的な手段です - bx-sites の Git ベースで
+プレーンな Markdown ソースには、そうした列ピッカーに相当するものが
+ありません。以下の4つは、このサイト自身の
 [`docs/functions.bxs`](https://github.com/ortus-boxlang/bx-sites/blob/development/docs/functions.bxs)
 であり、まさにこのページ上でライブにレンダリングされています。
 
@@ -259,8 +259,7 @@ function $trend( required numeric value ) {
 
 `{{ }}` は [テーブル](tables.md) がパースされるよりも前に、生の
 Markdown に対して解決されます。そのため、上記のいずれも、ページ内の他の場所と
-まったく同じように、パイプテーブルのセルの中でも動作します - これが、ここでの
-GitBook 自身の Select/Rating テーブル列に最も近いものです:
+まったく同じように、パイプテーブルのセルの中でも動作します:
 
 ```markdown title="Example" linenums="1"
 | Feature | Status | Rating |

@@ -44,8 +44,8 @@ cosa con su propio estado del lado del cliente.
 ## Un botón de copiar al portapapeles
 
 [`::: button`](content-blocks.md#botones) únicamente renderiza un enlace
-real (o un marcador de posición inerte) - al igual que el propio botón de
-GitBook, no tiene ninguna noción de ejecutar JS arbitrario al hacer clic.
+real (o un marcador de posición inerte) - no tiene ninguna noción de
+ejecutar JS arbitrario al hacer clic.
 Para un botón que *sí* hace algo en lugar de navegar a algún sitio, coloca
 sus clases `bxsites-button`/`bxsites-button--*` en un `<button>` HTML
 simple en su lugar - el mismo aspecto, con estilos en todos los temas
@@ -93,8 +93,7 @@ cada `<li>` se reevalúa en cada pulsación de tecla.
 
 Una [tabla de pipes nativa](tables.md) es estática una vez
 construida - para una que el lector realmente pueda ordenar y filtrar del
-lado del cliente (lo más parecido que hay aquí a la búsqueda/orden de
-tablas de GitBook), deja que Alpine sea el dueño de las filas en su
+lado del cliente, deja que Alpine sea el dueño de las filas en su
 lugar: coloca los datos en `x-data` y renderízalos con `x-for`, en lugar
 de escribir la sintaxis de pipes `| Feature | Status |`:
 

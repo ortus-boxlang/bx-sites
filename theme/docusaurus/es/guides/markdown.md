@@ -453,7 +453,7 @@ escape, y el tratamiento automático de desplazamiento
 responsivo/encabezado fijo que recibe cada tabla.
 
 Consulta [Bloques de Contenido](content-blocks.md) para una familia de
-bloques `::: name ... :::` al estilo GitBook por encima de todo lo
+bloques de contenido enriquecido `::: name ... :::` por encima de todo lo
 anterior - expandibles, tarjetas, columnas, un stepper, tarjetas de
 archivo/incrustación/enlace de página, un bloque de registro de cambios,
 y contenido reutilizable incluible.

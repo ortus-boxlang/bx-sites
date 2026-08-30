@@ -2,7 +2,7 @@
 title: OpenAPI / Swagger
 order: 4.6
 icon: phosphor-duotone:plug
-tags: [ガイド, openapi, api, gitbook]
+tags: [ガイド, openapi, api]
 ---
 
 # OpenAPI / Swagger
@@ -10,8 +10,7 @@ tags: [ガイド, openapi, api, gitbook]
 OpenAPI/Swagger 仕様に対するインタラクティブな
 [Swagger UI](https://swagger.io/tools/swagger-ui/) ウィジェットです。
 [コンテンツブロック](content-blocks.md) のどのブロックとも同じ
-`::: name ... :::` コンテナ構文を使い、GitBook 自身の OpenAPI ブロックの
-直接の対応物です。`src` は `::: file` の `src`（[コンテンツブロック](content-blocks.md#ファイル)
+`::: name ... :::` コンテナ構文を使います。`src` は `::: file` の `src`（[コンテンツブロック](content-blocks.md#ファイル)
 参照）と同じく、`docs/assets/` からの相対パスとして解決されます。
 JSON・YAML どちらの仕様ファイルにも対応しており、Swagger UI が
 クライアント側で完全にパースします - このモジュールのどこにもサーバー側
@@ -71,9 +70,8 @@ OpenAPI パースを一切トリガーしません）。Swagger UI 自身がす�
 
 `::: openapi` には常に `src` に実在する OpenAPI/Swagger ドキュメントが
 必要です - 1件のエンドポイントを手書きで説明するための、仕様ファイル不要
-の手動版ブロックは存在しません。GitBook 自身も同様で、かつて存在した
-対応物「API method」ブロックは 2024年2月に廃止され、常に実際の仕様を
-インポートする方式に一本化されました。まだ仕様がない場合は:
+の手動版ブロックは存在しません。代わりに、常に実際の仕様をインポートして
+ください。まだ仕様がない場合は:
 
 - 今いるページに必要な分だけ仕様を書きます。最小限の `info`/`servers`
   を伴う `paths` の1エントリだけでも（`docs/assets/openapi/example.yaml`

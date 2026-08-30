@@ -11,7 +11,7 @@ icon: phosphor-duotone:book-open
 - [Ricerca](search.md) - come funziona l'indice di ricerca statico
 - [Distribuzione](deployment.md) - `bxSites deploy` su S3, Azure, GCS, Firebase, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages, o GitHub Pages
 - [Estensioni Markdown](markdown.md) - ammonizioni, note a piè di pagina, liste di definizioni e diagrammi Mermaid
-- [Blocchi di contenuto](content-blocks.md) - blocchi in stile GitBook: espandibili, card, colonne, uno stepper, pulsanti, e contenuto riutilizzabile tramite include
+- [Blocchi di contenuto](content-blocks.md) - ricchi blocchi di contenuto: espandibili, card, colonne, uno stepper, pulsanti, e contenuto riutilizzabile tramite include
 - [Tabelle](tables.md) - tabelle a pipe GFM, sempre attive, con un trattamento automatico di scorrimento responsive/intestazione fissa
 - [OpenAPI / Swagger](openapi.md) - un widget Swagger UI interattivo per una specifica OpenAPI/Swagger, come riferimento completo o una singola operazione inline
 - [Immagini Responsive](images.md) - ridimensionamento automatico, varianti WebP, e bundling CSS/JS, attivi di default

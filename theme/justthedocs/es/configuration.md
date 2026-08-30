@@ -280,8 +280,8 @@ cual, byte a byte, en lugar del generado, en cada construcción - la clave
     resultaría apretado); por debajo de ese ancho, el modo `sticky`
     renderiza en su lugar una barra colapsable "En esta página" fijada en
     la parte superior del viewport mientras se hace scroll - toca para
-    expandir la lista, el mismo tratamiento que usan VitePress/GitBook en
-    móvil - así que la tabla de contenido sigue siendo accesible en
+    expandir la lista, un tratamiento habitual para viewports estrechos -
+    así que la tabla de contenido sigue siendo accesible en
     cualquier ancho de viewport, solo cambia de forma según el espacio
     disponible.
 
@@ -421,8 +421,7 @@ Cada entrada es o bien:
 
 Una entrada solo con `title`, con `children` y sin `path` es exactamente
 una etiqueta contenedora/de sección de menú - un encabezado no clicable
-que simplemente agrupa a sus hijos, el mismo papel que cumple
-"MAIN COMPONENTS" en la propia barra lateral de GitBook:
+que simplemente agrupa a sus hijos:
 
 === "YAML"
     ```yaml title="bxsites.yaml" linenums="1"

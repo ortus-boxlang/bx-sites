@@ -57,7 +57,7 @@ externo involucrado.
   **Enter** navega hasta el resultado resaltado, y **Escape** (o hacer
   clic en el fondo oscurecido) la cierra - la misma convención de
   "Búsqueda rápida"/⌘K que comparten Algolia DocSearch, Pagefind,
-  VitePress, Docusaurus y GitBook.
+  VitePress y Docusaurus.
 - **`Escape`** también cierra el propio desplegable de resultados del
   cuadro de la barra lateral y le quita el foco, de forma independiente
   a la paleta de arriba.

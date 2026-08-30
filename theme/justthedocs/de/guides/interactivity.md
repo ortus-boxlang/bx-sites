@@ -42,8 +42,8 @@ abdecken - alles mit eigenem clientseitigem Zustand.
 ## Ein Kopieren-in-die-Zwischenablage-Button
 
 [`::: button`](content-blocks.md#buttons) rendert immer nur einen echten
-Link (oder einen inaktiven Platzhalter) - wie GitBooks eigener Button hat
-es keine Vorstellung davon, beim Klick beliebiges JS auszuführen. Für
+Link (oder einen inaktiven Platzhalter) - es hat keine Vorstellung davon,
+beim Klick beliebiges JS auszuführen. Für
 einen Button, der stattdessen tatsächlich *etwas tut*, statt irgendwohin
 zu navigieren, hänge stattdessen dessen
 `bxsites-button`/`bxsites-button--*`-Klassen an ein schlichtes
@@ -92,8 +92,7 @@ Eine Liste clientseitig filtern, ohne Server-Roundtrip:
 
 Eine [native Pipe-Tabelle](tables.md) ist statisch, sobald sie
 gebaut ist - für eine, die ein Leser tatsächlich clientseitig sortieren
-und filtern kann (das Nächste, was es hier zu GitBooks
-Tabellen-Suche/-Sortierung gibt), lass stattdessen Alpine die Zeilen
+und filtern kann, lass stattdessen Alpine die Zeilen
 besitzen: leg die Daten in `x-data` ab und rendere sie mit `x-for`, statt
 die `| Feature | Status |`-Pipe-Syntax zu schreiben:
 

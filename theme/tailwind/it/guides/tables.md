@@ -2,7 +2,7 @@
 title: Tabelle
 order: 4.6
 icon: phosphor-duotone:table
-tags: [guides, markdown, gitbook]
+tags: [guides, markdown]
 ---
 
 # Tabelle
@@ -129,8 +129,7 @@ qualsiasi altra classe CSS.
 Altre due ricette si costruiscono direttamente sopra una tabella
 semplice come quelle sopra:
 
-- Serve qualcosa di più vicino alle colonne Select/Rating di GitBook - un
-  chip di stato o una valutazione a stelle in una cella? Vedi [Ricette
+- Serve un chip di stato o una valutazione a stelle in una cella? Vedi [Ricette
   per i visualizzatori](variables-and-functions.md#ricette-per-i-visualizzatori).
 - Serve che un lettore possa davvero ordinare o filtrare una tabella lato
   client, invece di limitarsi a leggerla? Vedi [Una tabella ordinabile e

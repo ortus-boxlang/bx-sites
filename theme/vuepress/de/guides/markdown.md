@@ -447,7 +447,7 @@ und die automatische Behandlung für responsives Scrollen/eine fixierte
 Kopfzeile, die jede Tabelle erhält.
 
 Siehe [Content-Blöcke](content-blocks.md) für eine Familie von
-GitBook-artigen `::: name ... :::`-Blöcken zusätzlich zu allem oben -
+umfangreichen `::: name ... :::`-Blöcken zusätzlich zu allem oben -
 Expandables, Cards, Columns, ein Stepper, File-/Embed-/Page-Link-Cards,
 ein Changelog-Block und wiederverwendbare Content-Includes.
 

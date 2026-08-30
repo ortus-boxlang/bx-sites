@@ -2,20 +2,24 @@
 title: Content Blocks
 order: 4.5
 icon: phosphor-duotone:squares-four
-tags: [guides, markdown, gitbook]
+tags: [guides, markdown]
 ---
 
 # Content Blocks
 
 On top of everything in [Markdown Extensions](markdown.md), BxSites
-supports a family of GitBook-style content blocks - handy on its own,
-and the reason a GitBook site's content is straightforward to migrate:
-each of these maps directly to a GitBook block of the same name. Every
+supports a family of rich content blocks for things plain CommonMark has
+no concept of - cards, tabs of steps, downloads, embeds, and more. Every
 one uses the same `::: name ... :::` container syntax (a bare `:::` on
-its own line closes whichever block is currently open) - no
-`bxsites.yaml` config needed, always available. A block can nest inside
-another (an expandable containing a cards group, for instance) - each
-is scanned again for further blocks inside its own content.
+its own line closes whichever block is currently open, or write the
+closing `:::` right on the same line for a block with no body of its
+own - `::: file src="assets/spec.pdf" :::` works exactly the same as the
+two-line form) - no `bxsites.yaml` config needed, always available. A
+block can nest inside another (an expandable containing a cards group,
+for instance) - each is scanned again for further blocks inside its own
+content. Migrating from GitBook? Every block here maps directly onto its
+GitBook counterpart of the same name - see
+[Migrating from GitBook](migrating-from-gitbook.md).
 
 ## Expandable
 
@@ -155,12 +159,10 @@ resolved the same way `theme.logo`/frontmatter `ogImage` already are
 (relative to `docs/assets/`):
 
 ```markdown title="Example" linenums="1"
-::: file src="assets/spec.pdf" title="API Specification"
-:::
+::: file src="assets/spec.pdf" title="API Specification" :::
 ```
 
-::: file src="assets/og-image.png" title="Site Preview Image"
-:::
+::: file src="assets/og-image.png" title="Site Preview Image" :::
 
 ## Page break
 
@@ -169,8 +171,7 @@ site, or exporting it to PDF (e.g. via a browser's own "Print to PDF"),
 and want a section to always start on a fresh page. No attributes:
 
 ```markdown title="Example" linenums="1"
-::: pagebreak
-:::
+::: pagebreak :::
 ```
 
 It renders as a plain, subtle divider on screen (so it's still visible
@@ -179,17 +180,15 @@ print/PDF output - it has no other effect on normal browsing.
 
 ## Buttons
 
-A GitBook-style call-to-action button - `::: button` on its own, or several
-laid out in a row inside a `::: buttons` wrapper. The leading `"Label"` and
-`href` are the only pieces most buttons need:
+A call-to-action button - `::: button` on its own, or several laid out in
+a row inside a `::: buttons` wrapper. The leading `"Label"` and `href` are
+the only pieces most buttons need:
 
 ```markdown title="Example" linenums="1"
-::: button "Get Started" href="../getting-started.md" style="primary"
-:::
+::: button "Get Started" href="../getting-started.md" style="primary" :::
 ```
 
-::: button "Get Started" href="../getting-started.md" style="primary"
-:::
+::: button "Get Started" href="../getting-started.md" style="primary" :::
 
 A few optional attributes give each button its own abilities:
 
@@ -206,22 +205,16 @@ A few optional attributes give each button its own abilities:
 
 ```markdown title="Example" linenums="1"
 ::: buttons
-::: button "Read the docs" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
-:::
-::: button "Star on GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
-:::
-::: button "Coming soon" disabled="true"
-:::
+::: button "Read the docs" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large" :::
+::: button "Star on GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank" :::
+::: button "Coming soon" disabled="true" :::
 :::
 ```
 
 ::: buttons
-::: button "Read the docs" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large"
-:::
-::: button "Star on GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank"
-:::
-::: button "Coming soon" disabled="true"
-:::
+::: button "Read the docs" href="../getting-started.md" icon="phosphor-duotone:book-open" size="large" :::
+::: button "Star on GitHub" href="https://github.com/ortus-boxlang/bx-sites" style="secondary" target="_blank" :::
+::: button "Coming soon" disabled="true" :::
 :::
 
 ## Embed
@@ -232,12 +225,10 @@ back to a plain "visit ↗" link card instead of an iframe that would just
 refuse to render (most sites block being framed):
 
 ```markdown title="Example" linenums="1"
-::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
-:::
+::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo" :::
 ```
 
-::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo"
-:::
+::: embed url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="A demo" :::
 
 ## Page link
 
@@ -248,12 +239,10 @@ target page's own frontmatter, so it stays in sync if that page is
 renamed or its summary changes:
 
 ```markdown title="Example" linenums="1"
-::: page-link href="../getting-started.md"
-:::
+::: page-link href="../getting-started.md" :::
 ```
 
-::: page-link href="../getting-started.md"
-:::
+::: page-link href="../getting-started.md" :::
 
 ## Link preview
 
@@ -268,18 +257,15 @@ applies here too, so a slow or unreachable third-party site never affects
 build time:
 
 ```markdown title="Example" linenums="1"
-::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
-:::
+::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." :::
 ```
 
-::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." image="https://boxlang.io/og.png"
-:::
+::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic, multi-paradigm JVM language." :::
 
-## Prompt
+## AI Prompt
 
-A styled container for a reusable AI prompt - bx-sites' own equivalent of
-GitBook's [Prompt block](https://gitbook.com/docs/create-content/blocks/prompt).
-The block's body *is* the prompt text, written as ordinary Markdown (so
+A styled container for a reusable AI prompt. The block's body *is* the
+prompt text, written as ordinary Markdown (so
 headings, lists, and code inside it still get their own formatting); every
 prompt gets a "Copy" button that copies that exact source text, formatting
 markup included, ready to paste into whatever AI tool you're using it with.
@@ -325,9 +311,9 @@ that lists several prompts back to back. Omit `expanded` (or set it to
 5. Skip anything that already has an open issue - list those separately.
 :::
 
-Unlike GitBook's own Prompt block, there's no "Open in AI providers" menu
-here - bx-sites never talks to a third-party AI provider, so that part of
-GitBook's own block has no equivalent.
+There's no "Open in AI providers" menu here - bx-sites never talks to a
+third-party AI provider, so a prompt's own "Copy" button is the one way
+to get it into whatever tool you're using.
 
 ## Updates (changelog)
 
@@ -425,8 +411,7 @@ the reader picks for themself, and their choice is simply remembered in
 their own browser (`localStorage`) for every later page too:
 
 ```markdown title="Example" linenums="1"
-::: audience-switcher key="plan" options="free:Free,pro:Pro"
-:::
+::: audience-switcher key="plan" options="free:Free,pro:Pro" :::
 
 ::: conditional key="plan" value="free"
 The Free plan includes basic search.
@@ -437,8 +422,7 @@ The Pro plan adds AI-assisted search and unlimited team seats.
 :::
 ```
 
-::: audience-switcher key="plan" options="free:Free,pro:Pro"
-:::
+::: audience-switcher key="plan" options="free:Free,pro:Pro" :::
 
 ::: conditional key="plan" value="free"
 The Free plan includes basic search.

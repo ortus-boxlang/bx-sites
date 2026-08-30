@@ -2,7 +2,7 @@
 title: Tables
 order: 4.6
 icon: phosphor-duotone:table
-tags: [guides, markdown, gitbook]
+tags: [guides, markdown]
 ---
 
 # Tables
@@ -120,8 +120,7 @@ CSS class.
 Two more recipes build directly on top of a plain table like the ones
 above:
 
-- Need something closer to GitBook's Select/Rating table columns - a
-  status chip or a star rating in a cell? See [Visualizer
+- Need a status chip or a star rating in a cell? See [Visualizer
   recipes](variables-and-functions.md#visualizer-recipes).
 - Need a reader to actually sort or filter a table client-side, rather
   than just read it? See [A sortable, filterable

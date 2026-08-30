@@ -204,12 +204,11 @@ Funktionsaufrufe oder Ausdrücke in dieser ersten Version:
 ## Visualizer-Rezepte
 
 Eine magische Funktion, die HTML zurückgibt, ist nicht auf ein
-Status-Badge beschränkt - sie ist ein universeller Weg, um GitBook-artige
-visuelle Zellen (eine Sternebewertung, einen farbigen Chip, einen
-Fortschrittsbalken) zu bekommen, ganz ohne GitBooks eigenen
-datenbankgestützten Spalten-Picker, für den die git-basierte, reine
-Markdown-Quelle von bx-sites kein Äquivalent hat. Die folgenden vier
-stammen aus der eigenen
+Status-Badge beschränkt - sie ist ein universeller Weg, um visuelle
+Zellen (eine Sternebewertung, einen farbigen Chip, einen
+Fortschrittsbalken) zu bekommen, ganz ohne einen datenbankgestützten
+Spalten-Picker - für den die git-basierte, reine Markdown-Quelle von
+bx-sites kein Äquivalent hat. Die folgenden vier stammen aus der eigenen
 [`docs/functions.bxs`](https://github.com/ortus-boxlang/bx-sites/blob/development/docs/functions.bxs)
 dieser Site und werden live auf genau dieser Seite gerendert.
 
@@ -274,8 +273,7 @@ function $trend( required numeric value ) {
 `{{ }}` wird gegen das rohe Markdown aufgelöst, bevor
 [Tabellen](tables.md) überhaupt geparst werden, sodass jede der
 obigen Funktionen innerhalb der Zellen einer Pipe-Tabelle genauso
-funktioniert wie überall sonst auf der Seite - das Nächste, was es hier zu
-GitBooks eigenen Select-/Rating-Tabellenspalten gibt:
+funktioniert wie überall sonst auf der Seite:
 
 ```markdown title="Example" linenums="1"
 | Feature | Status | Rating |

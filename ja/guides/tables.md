@@ -2,7 +2,7 @@
 title: テーブル
 order: 4.6
 icon: phosphor-duotone:table
-tags: [guides, markdown, gitbook]
+tags: [guides, markdown]
 ---
 
 # テーブル
@@ -120,8 +120,8 @@ tags: [guides, markdown, gitbook]
 
 プレーンなテーブルの上に、さらに次の2つのレシピを直接組み合わせられます:
 
-- GitBook の Select/Rating テーブル列にもっと近いもの - セル内のステータス
-  チップやスターレーティング - が必要ですか？[ビジュアライザーのレシピ](variables-and-functions.md#ビジュアライザーのレシピ)
+- セル内のステータスチップやスターレーティングが必要ですか？
+  [ビジュアライザーのレシピ](variables-and-functions.md#ビジュアライザーのレシピ)
   を参照してください。
 - 読者に実際にテーブルをクライアントサイドでソート・フィルタさせたい、
   単に読ませるだけでは足りない場合は？[ソート・フィルタ可能なテーブル](interactivity.md#ソートフィルタ可能なテーブル)

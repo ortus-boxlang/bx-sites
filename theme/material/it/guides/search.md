@@ -56,7 +56,7 @@ di ricerca esterno.
   l'evidenziazione tra i risultati, **Invio** apre quello evidenziato, ed
   **Escape** (oppure un clic sullo sfondo) la chiude - la stessa
   convenzione "Quick Find"/⌘K che condividono Algolia DocSearch,
-  Pagefind, VitePress, Docusaurus e GitBook.
+  Pagefind, VitePress e Docusaurus.
 - **`Escape`** chiude anche il menu a discesa dei risultati proprio del
   box nella barra laterale e gli toglie il focus, indipendentemente
   dalla palette qui sopra.

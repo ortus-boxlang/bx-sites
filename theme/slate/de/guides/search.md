@@ -55,7 +55,7 @@ externen Suchdienst.
   -runter bewegt eine Hervorhebung über die Ergebnisse, **Enter**
   navigiert zum hervorgehobenen Ergebnis, und **Escape** (oder ein Klick
   auf den Hintergrund) schließt es - dieselbe "Quick Find"/⌘K-Konvention,
-  die Algolia DocSearch, Pagefind, VitePress, Docusaurus und GitBook alle
+  die Algolia DocSearch, Pagefind, VitePress und Docusaurus alle
   teilen.
 - **`Escape`** schließt außerdem das eigene Ergebnis-Dropdown der
   Seitenleisten-Box und entfernt deren Fokus, unabhängig von der Palette
