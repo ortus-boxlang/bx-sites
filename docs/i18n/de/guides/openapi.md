@@ -72,10 +72,8 @@ Spezifikation entsprechen (samt `{param}`-Platzhaltern).
 
 `::: openapi` benötigt immer ein echtes OpenAPI-/Swagger-Dokument unter
 `src` - es gibt keine manuelle, spezifikationslose Variante dieses Blocks
-zum handschriftlichen Beschreiben eines einzelnen Endpunkts. Auch GitBook
-selbst hat so etwas nicht mehr: Sein eigenes Gegenstück, der "API
-method"-Block, wurde im Februar 2024 zugunsten des Imports einer echten
-Spezifikation abgeschafft. Falls noch keine existiert:
+zum handschriftlichen Beschreiben eines einzelnen Endpunkts; importiere
+stattdessen immer eine echte Spezifikation. Falls noch keine existiert:
 
 - Schreibe nur so viel Spezifikation, wie die aktuelle Seite braucht. Ein
   einzelner `paths`-Eintrag mit eigenem, minimalem `info`/`servers`

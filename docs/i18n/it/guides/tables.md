@@ -2,7 +2,7 @@
 title: Tabelle
 order: 4.6
 icon: phosphor-duotone:table
-tags: [guides, markdown, gitbook]
+tags: [guides, markdown]
 ---
 
 # Tabelle
