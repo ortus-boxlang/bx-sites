@@ -11,7 +11,7 @@
  *     carries those variables through automatically - no explicit hand-off).
  *   - `page.bxm` (required) - the article body; renders `variables.page.contentHtml`
  *     (the already-converted markdown, set by BuildPipeline before rendering).
- *     `variables.page.toc`, `.prevPage`, `.nextPage`, `.breadcrumbs`,
+ *     `variables.page.toc`, `.prevPage`, `.nextPage`, `.breadcrumbs`, `.course`,
  *     `.editUrl`, `.lastUpdated`, `.description`, `.tags`, `.icon`,
  *     `.iconHtml`, `.summary`, `.ogImage` and `.urlPath` are always present too (defaulted by
  *     `renderPage()` below if the caller didn't set them - empty
@@ -249,6 +249,17 @@ class {
 		}
 		if ( !variables.page.keyExists( "breadcrumbs" ) ) {
 			variables.page.breadcrumbs = []
+		}
+		if ( !variables.page.keyExists( "course" ) ) {
+			variables.page.course = {
+				id          : "",
+				courseTitle : "",
+				lessonIndex : 0,
+				lessonTotal : 0,
+				prevLesson  : { title : "", url : "" },
+				nextLesson  : { title : "", url : "" },
+				indexUrl    : ""
+			}
 		}
 		if ( !variables.page.keyExists( "editUrl" ) ) {
 			variables.page.editUrl = ""
