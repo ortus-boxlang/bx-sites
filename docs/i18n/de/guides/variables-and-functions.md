@@ -182,12 +182,20 @@ Festplatte geladen* - `title`/`description`/`tags`/`icon`/`summary`/
 `ogImage`/`urlPath`/`relativePath`/`body`/etc. sind bereits vorhanden, aber
 die Felder, die erst bekannt sind, sobald jede Seite im Baum fertig
 konvertiert wurde - `toc`, `prevPage`/`nextPage`, `breadcrumbs`,
-`editUrl`/`lastUpdated`, `iconHtml`, `markdownUrl`, `canonicalUrl` -
-existieren darauf noch nicht. Bar aus `page.bxm` aufgerufen, ist `page` das
-vollständig angereicherte Struct, all das eingeschlossen. Jede andere
-unterstützende Variable (`siteConfig`, `nav`, `basePath`, `versions`,
-`currentVersion`, `locales`, `currentLocale`, `currentLocaleDir`) ist an
-beiden Stellen identisch.
+`editUrl`/`lastUpdated`, `iconHtml`, `markdownUrl`, `canonicalUrl`,
+`course` - existieren darauf noch nicht. Bar aus `page.bxm` aufgerufen,
+ist `page` das vollständig angereicherte Struct, all das eingeschlossen.
+
+`page.course` ist immer vorhanden (ein durchweg leeres `{id:"",
+courseTitle:"", lessonIndex:0, lessonTotal:0,
+prevLesson:{title:"",url:""}, nextLesson:{title:"",url:""},
+indexUrl:""}`-Struct für eine Seite, die nicht Teil irgendeines
+[Kurses](courses.md) ist) - `prevLesson`/`nextLesson` sind auf genau
+diesen einen Kurs beschränkt, unabhängig vom websiteweiten
+`prevPage`/`nextPage` oben, das stattdessen immer den gesamten Nav-Baum
+durchläuft. Jede andere unterstützende Variable (`siteConfig`, `nav`,
+`basePath`, `versions`, `currentVersion`, `locales`, `currentLocale`,
+`currentLocaleDir`) ist an beiden Stellen identisch.
 
 ### Argumentsyntax
 
