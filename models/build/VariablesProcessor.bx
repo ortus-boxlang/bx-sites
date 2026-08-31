@@ -18,6 +18,15 @@
  *     strings, `true`/`false`) or `{{ }}`-less dotted variable references
  *     (`greeting.name`, not `{{ greeting.name }}`) - no nested function
  *     calls or expressions inside an argument in this v1.
+ *   - `{{ data.<key>.<method>(arg1, arg2) }}` - a call to any public method
+ *     on a `docs/data/*.bx`-backed `data.<key>` class instance
+ *     (DataLoader.bx), not just its conventional `getData()` (see
+ *     `lookupPath()`'s own docblock for that auto-invoked default). Same
+ *     argument syntax as a magic-function call, immediately above. Only a
+ *     `.bx`-backed `data.<key>` has methods to call this way at all - the
+ *     prefix before the final `.<method>(...)` can be any dotted path, but
+ *     only ever resolves to something callable when it lands on a live
+ *     class instance.
  *
  * Runs as a single markdown-to-markdown pass (same shape as
  * MarkdownLinkResolver.bx/IncludeProcessor.bx - no restore step, unlike
@@ -51,6 +60,13 @@ class {
 	variables.tokenPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "\{\{[ \t]*([^\n\{\}]+?)[ \t]*\}\}" )
 	variables.identifierPathPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$" )
 	variables.functionCallPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^(\$[A-Za-z_][A-Za-z0-9_]*)\((.*)\)$" )
+	// `<dotted.path>.<method>(args)` - calling any public method on a
+	// `docs/data/*.bx`-backed `data.<key>` class instance (see this class's
+	// own docblock's third bullet, and lookupPath()'s docblock). The prefix
+	// group reuses `identifierPathPattern`'s own dotted-identifier grammar
+	// verbatim, so anything valid as a plain `{{ }}` path is also valid as
+	// this shape's own prefix.
+	variables.dataMethodCallPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\.([A-Za-z_][A-Za-z0-9_]*)\((.*)\)$" )
 	// Matches one CommonMark inline code span - a run of one or more
 	// backticks, opening and closing (the closing run must be the exact
 	// same length - `` `single` `` vs ``` ``needs-a-`-inside`` ```) - so a
@@ -183,6 +199,17 @@ class {
 			return { matched : true, value : resolveFunctionCall( callMatcher.group( 1 ), callMatcher.group( 2 ), arguments.vars, arguments.functions, arguments.context, arguments.functionContext ) }
 		}
 
+		if ( variables.dataMethodCallPattern.matcher( arguments.expr ).matches() ) {
+			var methodLookup = lookupPath( arguments.expr, arguments.vars )
+			if ( !methodLookup.found ) {
+				throw(
+					type    : "BxSites.UnknownVariable",
+					message : "{{ #arguments.expr# }}#len( arguments.context ) ? ' (in ' & arguments.context & ')' : ''# - no [#arguments.expr#] entry found"
+				)
+			}
+			return { matched : true, value : "#methodLookup.value#" }
+		}
+
 		if ( variables.identifierPathPattern.matcher( arguments.expr ).matches() ) {
 			var lookup = lookupPath( arguments.expr, arguments.vars )
 			if ( !lookup.found ) {
@@ -204,9 +231,13 @@ class {
 	 * embedded in prose resolves to). `DirectiveBlockProcessor.bx`'s
 	 * `::: for`/`::: if` directives are the one caller today - resolving
 	 * `::: for item, idx in data.products`'s own `data.products` needs the
-	 * real array to loop over, not a stringified copy of it.
+	 * real array to loop over, not a stringified copy of it. `path` may also
+	 * be a `<dotted.path>.<method>(args)` call shape (`lookupPath()`'s own
+	 * docblock) - `::: for plan, idx in data.pricing.getPlans()`/
+	 * `::: if data.pricing.hasDiscount("pro")` work through this exact same
+	 * method, with no changes needed in `DirectiveBlockProcessor.bx` itself.
 	 *
-	 * @path Dotted path, e.g. "data.products"
+	 * @path Dotted path, e.g. "data.products", optionally ending in a `.method(args)` call
 	 * @vars The struct to walk - same shape `resolve()`'s own `vars` param takes
 	 *
 	 * @return { found: boolean, value: any }
@@ -346,19 +377,154 @@ class {
 	}
 
 	/**
-	 * Dot-path traversal against `vars` - `"support.email"` -> `vars.support.email`.
+	 * Dot-path traversal against `vars` - `"support.email"` -> `vars.support.email` -
+	 * with two additions beyond a plain struct walk, both about
+	 * `docs/data/*.bx`-backed `data.<key>` class instances (DataLoader.bx):
+	 *
+	 *   - `path` ending in `.<method>(args)` (`data.pricing.getDiscountedPrice(...)`)
+	 *     calls that method directly - resolveDataMethodCall() below.
+	 *   - Otherwise, when the fully-resolved value is a live class instance
+	 *     rather than plain data (a bare `data.pricing` reference, or one
+	 *     used as an argument, a `::: for`/`::: if` target, etc.), its
+	 *     conventional `getData()` method is called automatically and ITS
+	 *     result used instead - invokeConventionalMethod() below. This is
+	 *     what makes `{{ data.pricing }}`/`::: for x in data.pricing`/
+	 *     `::: if data.pricing.enabled` keep working completely unchanged
+	 *     whether `pricing` comes from `pricing.json` or `Pricing.bx` - see
+	 *     docs/guides/data-files.md's "Data classes" section.
+	 *
+	 * Calling any method OTHER than `getData()` needs the explicit
+	 * `<path>.<method>(args)` shape instead, which resolves its own prefix
+	 * via `lookupPathRaw()` - deliberately NOT through this method itself,
+	 * since that would auto-invoke `getData()` on the prefix before this
+	 * method ever got a chance to call the DIFFERENT method the caller
+	 * actually asked for.
 	 *
 	 * @return { found: boolean, value: any }
 	 */
 	private struct function lookupPath( required string path, required struct vars ) {
+		var methodCallMatcher = variables.dataMethodCallPattern.matcher( arguments.path )
+		if ( methodCallMatcher.matches() ) {
+			return resolveDataMethodCall( methodCallMatcher.group( 1 ), methodCallMatcher.group( 2 ), methodCallMatcher.group( 3 ), arguments.vars )
+		}
+
+		var lookup = lookupPathRaw( arguments.path, arguments.vars )
+		if ( lookup.found && isObject( lookup.value ) ) {
+			return { found : true, value : invokeConventionalMethod( arguments.path, lookup.value ) }
+		}
+		return lookup
+	}
+
+	/**
+	 * The raw traversal `lookupPath()` builds on - no method-call parsing,
+	 * and (the one subtlety) no auto-invoking `getData()` on the FINAL
+	 * resolved value, so a caller that specifically needs the bare instance
+	 * at the very end of the path (resolveDataMethodCall(), to call a
+	 * DIFFERENT method on it) can get it - `lookupPath()`'s own wrapper is
+	 * what applies that last auto-invoke, for every OTHER caller.
+	 *
+	 * Every object encountered *before* the final segment DOES still get
+	 * auto-invoked, mid-traversal, before continuing - `data.pricing.pro.price`
+	 * (drilling past the `data.pricing` instance into its own `getData()`
+	 * result's own nested shape) needs exactly this to resolve at all,
+	 * since there's no other way to reach `.pro.price` than through
+	 * `getData()`'s own returned struct. This is also what keeps the whole
+	 * mechanism crash-safe: a `docs/data/*.bx` instance answers `isStruct()`
+	 * `true` (confirmed directly in this session - a real BoxLang gotcha,
+	 * not a documented guarantee) but throws a raw, un-catchable-as-"not
+	 * found" `BoxRuntimeException` the moment `.keyExists( segment )`/
+	 * `[ segment ]` is actually called on it (no such method) -
+	 * `isObject( current )` is checked, and resolved via `getData()`,
+	 * BEFORE either is ever attempted on it.
+	 *
+	 * @return { found: boolean, value: any }
+	 */
+	private struct function lookupPathRaw( required string path, required struct vars ) {
 		var current = arguments.vars
 		for ( var segment in listToArray( arguments.path, "." ) ) {
+			if ( isObject( current ) ) {
+				current = invokeConventionalMethod( arguments.path, current )
+			}
 			if ( !isStruct( current ) || !current.keyExists( segment ) ) {
 				return { found : false, value : "" }
 			}
 			current = current[ segment ]
 		}
 		return { found : true, value : current }
+	}
+
+	/**
+	 * Resolves a `<prefix>.<method>(args)` path (lookupPath()'s own method-
+	 * call shape) - `prefix` itself resolved via `lookupPathRaw()` (never
+	 * `lookupPath()` - see lookupPath()'s own docblock for why), then
+	 * `method` invoked on it if it's really a callable `docs/data/*.bx`
+	 * instance. Argument syntax is `parseArgs()`'s own - identical to a
+	 * magic-function call's arguments.
+	 *
+	 * A `prefix` that doesn't resolve at all returns `{ found: false }`,
+	 * same as a plain path would - the caller (resolveExpression(), or a
+	 * `::: for`/`::: if` directive) already has its own wording for that
+	 * case. A `prefix` that DOES resolve, just not to something callable,
+	 * or a `method` that isn't a real public method on it, are both
+	 * unambiguous authoring mistakes rather than "maybe this data just
+	 * doesn't exist" - both throw immediately instead.
+	 *
+	 * @return { found: boolean, value: any }
+	 */
+	private struct function resolveDataMethodCall( required string prefix, required string method, required string rawArgs, required struct vars ) {
+		var prefixLookup = lookupPathRaw( arguments.prefix, arguments.vars )
+		if ( !prefixLookup.found ) {
+			return { found : false, value : "" }
+		}
+		if ( !isObject( prefixLookup.value ) ) {
+			throw(
+				type    : "BxSites.NotCallable",
+				message : "#arguments.prefix#.#arguments.method#(...) - [#arguments.prefix#] is plain data, not a docs/data/*.bx class instance, so it has no methods to call"
+			)
+		}
+		if ( !hasPublicMethod( prefixLookup.value, arguments.method ) ) {
+			throw(
+				type    : "BxSites.UnknownDataMethod",
+				message : "#arguments.prefix#.#arguments.method#(...) - [#arguments.prefix#] has no public [#arguments.method#] method"
+			)
+		}
+
+		var args = parseArgs( arguments.rawArgs, arguments.vars, "" )
+		return { found : true, value : invoke( prefixLookup.value, arguments.method, args ) }
+	}
+
+	/**
+	 * Calls a `docs/data/*.bx` instance's own conventional `getData()` -
+	 * `lookupPath()`'s own auto-invoke rule for a bare (no explicit method
+	 * call) reference. Throws `BxSites.MissingDataMethod` rather than
+	 * DataLoader.bx's own load-time check firing here - kept as a second,
+	 * defensive check (an instance built some other way, e.g. a future
+	 * caller of this class that isn't DataLoader.bx, would otherwise crash
+	 * on a raw "Method not found" instead of a clear bx-sites error).
+	 *
+	 * @path The original dotted path, for the thrown error message only
+	 */
+	private any function invokeConventionalMethod( required string path, required any instance ) {
+		if ( !hasPublicMethod( arguments.instance, "getData" ) ) {
+			throw(
+				type    : "BxSites.MissingDataMethod",
+				message : "[#arguments.path#] is a docs/data/*.bx class instance with no public getData() method - every data class needs one (even if it just returns {})"
+			)
+		}
+		return invoke( arguments.instance, "getData", [] )
+	}
+
+	/**
+	 * @return true when `instance` has a public method named `methodName` (case-insensitive) - checked via `getMetadata()`, never by calling `invoke()` and inspecting the failure, so a method that genuinely exists but throws its OWN error isn't misreported as missing
+	 */
+	private boolean function hasPublicMethod( required any instance, required string methodName ) {
+		var metadata = getMetadata( arguments.instance )
+		for ( var fn in ( metadata.functions ?: [] ) ) {
+			if ( compareNoCase( fn.name, arguments.methodName ) == 0 && lCase( fn.access ?: "public" ) == "public" ) {
+				return true
+			}
+		}
+		return false
 	}
 
 }

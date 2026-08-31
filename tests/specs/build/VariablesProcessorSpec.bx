@@ -149,6 +149,70 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.UnknownVariable" );
 			} );
 
+			describe( "docs/data/*.bx class instances (data.<key>)", function() {
+
+				it( "auto-invokes getData() when a data.<key> class instance is referenced bare", function() {
+					var vars = { "data" : { "pricing" : new "tests.support.FakeDataClass@bxsites"() } };
+					var result = processor.resolve( "Pro is {{ data.pricing.pro.price }}.", vars );
+					expect( result ).toBe( "Pro is 29." );
+				} );
+
+				it( "lookupValue() auto-invokes getData() for a bare data.<key> reference too", function() {
+					var vars = { "data" : { "pricing" : new "tests.support.FakeDataClass@bxsites"() } };
+					var lookup = processor.lookupValue( "data.pricing", vars );
+					expect( lookup.found ).toBeTrue();
+					expect( lookup.value.pro.price ).toBe( 29 );
+				} );
+
+				it( "auto-invokes getData() when data.<key> is passed as a magic-function argument", function() {
+					var fns = { "$plan" : function( pricing ) { return arguments.pricing.pro.price } };
+					var vars = { "data" : { "pricing" : new "tests.support.FakeDataClass@bxsites"() } };
+					var result = processor.resolve( "{{ $plan(data.pricing) }}", vars, fns );
+					expect( result ).toBe( "29" );
+				} );
+
+				it( "calls an explicit public method with literal arguments", function() {
+					var vars = { "data" : { "pricing" : new "tests.support.FakeDataClass@bxsites"() } };
+					var result = processor.resolve( 'Discounted: {{ data.pricing.getDiscountedPrice("pro", 0.2) }}', vars );
+					expect( result ).toBe( "Discounted: 23.2" );
+				} );
+
+				it( "throws BxSites.UnknownDataMethod when the named method doesn't exist", function() {
+					var vars = { "data" : { "pricing" : new "tests.support.FakeDataClass@bxsites"() } };
+					expect( function() {
+						processor.resolve( "{{ data.pricing.nope() }}", vars );
+					} ).toThrow( "BxSites.UnknownDataMethod" );
+				} );
+
+				it( "throws BxSites.UnknownDataMethod when the named method exists but is private", function() {
+					var vars = { "data" : { "pricing" : new "tests.support.FakeDataClass@bxsites"() } };
+					expect( function() {
+						processor.resolve( "{{ data.pricing.secretHelper() }}", vars );
+					} ).toThrow( "BxSites.UnknownDataMethod" );
+				} );
+
+				it( "throws BxSites.NotCallable when calling a method on plain (non-class) data", function() {
+					var vars = { "data" : { "team" : [ { "name" : "Luis" } ] } };
+					expect( function() {
+						processor.resolve( "{{ data.team.getData() }}", vars );
+					} ).toThrow( "BxSites.NotCallable" );
+				} );
+
+				it( "throws BxSites.MissingDataMethod when the instance has no public getData()", function() {
+					var vars = { "data" : { "broken" : new "tests.support.FakeDataClassNoGetData@bxsites"() } };
+					expect( function() {
+						processor.resolve( "{{ data.broken }}", vars );
+					} ).toThrow( "BxSites.MissingDataMethod" );
+				} );
+
+				it( "throws BxSites.UnknownVariable when the method-call prefix doesn't resolve at all", function() {
+					expect( function() {
+						processor.resolve( "{{ data.bogus.getData() }}", {} );
+					} ).toThrow( "BxSites.UnknownVariable" );
+				} );
+
+			} );
+
 		} );
 	}
 
