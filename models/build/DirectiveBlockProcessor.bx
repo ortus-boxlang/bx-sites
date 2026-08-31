@@ -576,6 +576,8 @@ class {
 				return renderPagebreak()
 			case "for":
 				return renderFor( block, renderer, markdownOptions )
+			case "course":
+				return renderCourseIndexStub( attrs )
 			case "if":
 				// restore()'s own scan always consumes a well-formed `if`
 				// as part of a chain (collectIfChain()) before renderBlock()
@@ -1477,6 +1479,27 @@ class {
 		return '<a class="bxsites-page-link" href="' & attrEscape( href ) & '" data-bxsites-page-link>'
 			& '<span class="bxsites-page-link__title">' & encodeForHTML( href ) & '</span>'
 			& '</a>'
+	}
+
+	/**
+	 * `::: course id="getting-started" :::` - a placeholder only.
+	 * `DirectiveBlockProcessor.bx` never has access to the whole tree's
+	 * pages (only this one page's own attrs), so it can't yet know the
+	 * target course's lessons/titles - `CourseBuilder.resolveIndexBlocks()`
+	 * runs as a post-pass, once every page in the tree has been through
+	 * `convertMarkdown()`, and swaps this stub for the real, fully
+	 * rendered numbered index - the identical two-phase shape
+	 * `renderPageLinkStub()`/`PageLinkResolver.bx` already use, for the
+	 * same reason.
+	 *
+	 * @attrs Must include `id`
+	 */
+	private string function renderCourseIndexStub( required struct attrs ) {
+		var id = trim( arguments.attrs.id ?: "" )
+		if ( !len( id ) ) {
+			return '<div class="bxsites-course-index bxsites-course-index--invalid">::: course - missing required id="..."</div>'
+		}
+		return '<div class="bxsites-course-index" data-bxsites-course-index data-bxsites-course-id="' & attrEscape( id ) & '"></div>'
 	}
 
 }

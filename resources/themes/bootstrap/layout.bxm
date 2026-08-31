@@ -308,6 +308,7 @@
 	<script src="#variables.basePath#assets/toc-collapse.js" defer></script>
 	<script src="#variables.basePath#assets/tabs.js" defer></script>
 	<script src="#variables.basePath#assets/conditional-content-init.js" defer></script>
+	<script src="#variables.basePath#assets/course-progress.js" defer></script>
 	<script src="#variables.basePath#assets/prompt-init.js" defer></script>
 </bx:output><bx:if variables.pageActionsEnabled><bx:output>
 	<script src="#variables.basePath#assets/page-actions-init.js" defer></script>

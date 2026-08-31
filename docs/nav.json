@@ -1,5 +1,6 @@
 [
 	"index.md",
+	"course/index.md",
 	{
 		"title": "Introduction",
 		"children": [
@@ -24,6 +25,7 @@
 			"guides/images.md",
 			"guides/icons.md",
 			"guides/data-files.md",
+			"guides/courses.md",
 			"guides/variables-and-functions.md"
 		]
 	},

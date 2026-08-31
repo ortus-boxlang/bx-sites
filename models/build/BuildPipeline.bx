@@ -41,6 +41,7 @@ class {
 	variables.pluginLoader = new "models.build.PluginLoader@bxsites"()
 	variables.functionsLoader = new "models.build.FunctionsLoader@bxsites"()
 	variables.dataLoader = new "models.build.DataLoader@bxsites"()
+	variables.courseBuilder = new "models.build.CourseBuilder@bxsites"()
 	variables.variablesProcessor = new "models.build.VariablesProcessor@bxsites"()
 	variables.iconResolver = new "models.build.IconResolver@bxsites"()
 	variables.imageVariantGenerator = new "models.build.ImageVariantGenerator@bxsites"()
@@ -652,6 +653,17 @@ class {
 			nav, arguments.versions, arguments.currentVersion, arguments.locales, arguments.currentLocale, arguments.currentLocaleDir, arguments.data
 		)
 		variables.pageLinkResolver.resolve( pages, arguments.basePath )
+		// Gracefully skips (never throws for) any course whose lessons
+		// don't all exist in THIS tree's own `pages` - `data.courses` is
+		// loaded once, project-wide, and reused unchanged across every
+		// version/locale tree (DataLoader.bx's own documented scope), but
+		// a bare docs/versions/<name>/ snapshot may not contain a
+		// course's lesson files at all - see CourseBuilder.bx's own
+		// docblock. This is why the same 3 lines below work unmodified at
+		// every renderDocTree() call site, with zero new parameter.
+		var resolvedCourses = variables.courseBuilder.resolveCourses( arguments.data.courses ?: {}, pages )
+		variables.courseBuilder.resolveIndexBlocks( pages, resolvedCourses, arguments.basePath )
+		variables.courseBuilder.assignCourseContext( pages, resolvedCourses )
 		assignTableOfContents( pages )
 		assignPrevNext( pages, flatSequence )
 		assignBreadcrumbs( pages, nav )
@@ -1661,6 +1673,7 @@ class {
 		fileCopy( moduleAssetsDir() & "/highlight-boxlang.js", arguments.siteDir & "/assets/highlight-boxlang.js" )
 		fileCopy( moduleAssetsDir() & "/tabs.js", arguments.siteDir & "/assets/tabs.js" )
 		fileCopy( moduleAssetsDir() & "/conditional-content-init.js", arguments.siteDir & "/assets/conditional-content-init.js" )
+		fileCopy( moduleAssetsDir() & "/course-progress.js", arguments.siteDir & "/assets/course-progress.js" )
 		fileCopy( moduleAssetsDir() & "/prompt-init.js", arguments.siteDir & "/assets/prompt-init.js" )
 		fileCopy( moduleAssetsDir() & "/code-lines.js", arguments.siteDir & "/assets/code-lines.js" )
 		directoryCopy( moduleAssetsDir() & "/fonts", arguments.siteDir & "/assets/fonts", true )

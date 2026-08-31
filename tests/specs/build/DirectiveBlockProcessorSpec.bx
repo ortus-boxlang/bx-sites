@@ -784,6 +784,18 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).notToInclude( "no team" );
 			} );
 
+			it( "renders a ::: course block as a placeholder div carrying its id - the real index is CourseBuilder.bx's own post-pass, not something DirectiveBlockProcessor can render on its own (it never sees the whole page tree)", function() {
+				var html = render( '::: course id="getting-started" :::' );
+
+				expect( html ).toInclude( '<div class="bxsites-course-index" data-bxsites-course-index data-bxsites-course-id="getting-started"></div>' );
+			} );
+
+			it( "renders an invalid-block message when a course block is missing its required id", function() {
+				var html = render( "::: course" & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( "missing required id" );
+			} );
+
 		} );
 	}
 

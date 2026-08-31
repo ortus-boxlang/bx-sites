@@ -1,0 +1,24 @@
+getting-started:
+  title: "Getting Started with bx-sites"
+  description: "A guided, 20-lesson walkthrough from install to a deployed site - the fastest way to learn bx-sites end to end."
+  lessons:
+    - course/01-introduction.md
+    - course/02-installation.md
+    - course/03-creating-a-new-site.md
+    - course/04-content-organization.md
+    - course/05-page-frontmatter.md
+    - course/06-markdown-extensions.md
+    - course/07-content-blocks.md
+    - course/08-tables.md
+    - course/09-images-and-icons.md
+    - course/10-variables-and-magic-functions.md
+    - course/11-data-files.md
+    - course/12-loops-and-conditionals.md
+    - course/13-interactivity-with-alpine.md
+    - course/14-choosing-a-theme.md
+    - course/15-search.md
+    - course/16-openapi-documentation.md
+    - course/17-blog-versioning-i18n.md
+    - course/18-redirects-and-site-structure.md
+    - course/19-plugins-and-cli-providers.md
+    - course/20-building-deploying-publishing.md

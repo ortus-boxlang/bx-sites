@@ -206,8 +206,16 @@ Page: {{ $pagetitle() }}
 `relativePath`/`body`/etc. are already there, but the fields only known
 once every page in the tree has finished converting - `toc`,
 `prevPage`/`nextPage`, `breadcrumbs`, `editUrl`/`lastUpdated`, `iconHtml`,
-`markdownUrl`, `canonicalUrl` - don't exist on it yet. Called bare from
-`page.bxm`, `page` is the fully-enriched struct, all of those included.
+`markdownUrl`, `canonicalUrl`, `course` - don't exist on it yet. Called
+bare from `page.bxm`, `page` is the fully-enriched struct, all of those
+included.
+
+`page.course` is always present (an all-empty `{id:"", courseTitle:"",
+lessonIndex:0, lessonTotal:0, prevLesson:{title:"",url:""},
+nextLesson:{title:"",url:""}, indexUrl:""}` struct for a page that isn't
+part of any [course](courses.md)) - `prevLesson`/`nextLesson` are scoped
+to that one course only, independent of the site-wide `prevPage`/
+`nextPage` above, which always walks the whole nav tree instead.
 Every other supporting variable (`siteConfig`, `nav`, `basePath`,
 `versions`, `currentVersion`, `locales`, `currentLocale`,
 `currentLocaleDir`) is identical in both places.
