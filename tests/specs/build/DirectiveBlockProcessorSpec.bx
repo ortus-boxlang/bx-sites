@@ -551,6 +551,23 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "alice is Admin" );
 			} );
 
+			it( "::: for over a docs/data/*.bx class instance auto-invokes getData(), same as a plain struct/array data.<key>", function() {
+				var md = "::: for plan, info in data.pricing" & char( 10 ) &
+					"{{ plan }}: {{ info.price }}" & char( 10 ) & ":::";
+				var html = renderWithData( md, { data : { pricing : new "tests.support.FakeDataClass@bxsites"() } } );
+
+				expect( html ).toInclude( "free: 0" );
+				expect( html ).toInclude( "pro: 29" );
+			} );
+
+			it( "::: if resolves a call to an explicit method on a docs/data/*.bx class instance", function() {
+				var md = '::: if data.pricing.getDiscountedPrice("pro", 0.5)' & char( 10 ) &
+					"Discounted!" & char( 10 ) & ":::";
+				var html = renderWithData( md, { data : { pricing : new "tests.support.FakeDataClass@bxsites"() } } );
+
+				expect( html ).toInclude( "Discounted!" );
+			} );
+
 			it( "resolves {{ }} in a ::: for body against the page's own outer vars too, layered under the loop vars", function() {
 				var md = "::: for item, idx in data.products" & char( 10 ) &
 					"{{ page.title }}: {{ item.name }}" & char( 10 ) & ":::";

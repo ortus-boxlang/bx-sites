@@ -35,6 +35,23 @@ class extends="testbox.system.BaseSpec" {
 				fileWrite( arguments.docsDir & "/data/" & arguments.fileName, jsonSerialize( arguments.content ) );
 			}
 
+			/**
+			 * A `.bx`-loading test needs a docs/data/*.bx path with no
+			 * hyphens anywhere in it (DataLoader.bx's own `toClassPath()`
+			 * docblock explains why - a real BoxLang class-name-segment
+			 * restriction, not a bx-sites one) - `createTempDirectory()`'s
+			 * own `prefix` (used unmodified by `newDocsDir()` above, fine
+			 * for the plain YAML/JSON tests, which never resolve a class
+			 * path at all) always contains one, so `.bx` tests get their
+			 * own dedicated, hyphen-free temp directory instead.
+			 */
+			private function newClassSafeDocsDir() {
+				var dir = getTempDirectory().reReplace( "[\/]+$", "" ) & "/bxsitesdataloadertest" & replace( createUUID(), "-", "", "all" );
+				directoryCreate( dir, true, true );
+				tempDirs.append( dir );
+				return dir;
+			}
+
 			it( "returns an empty struct when docs/data/ doesn't exist", function() {
 				var dir = newDocsDir();
 				expect( loader.load( dir ) ).toBeStruct();
@@ -113,7 +130,7 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.InvalidDataFile" );
 			} );
 
-			it( "ignores a file whose extension isn't yaml/yml/json", function() {
+			it( "ignores a file whose extension isn't yaml/yml/json/bx", function() {
 				var dir = newDocsDir();
 				directoryCreate( dir & "/data", true, true );
 				fileWrite( dir & "/data/readme.txt", "not data" );
@@ -121,6 +138,91 @@ class extends="testbox.system.BaseSpec" {
 				var data = loader.load( dir );
 
 				expect( data.isEmpty() ).toBeTrue();
+			} );
+
+			describe( "docs/data/*.bx classes", function() {
+
+				private function writeClassFile( required string docsDir, required string rawBasename, required string body ) {
+					directoryCreate( arguments.docsDir & "/data", true, true );
+					fileWrite( arguments.docsDir & "/data/" & arguments.rawBasename & ".bx", arguments.body );
+				}
+
+				it( "loads a .bx class, keyed by its basename with the first letter lowercased", function() {
+					var dir = newClassSafeDocsDir();
+					writeClassFile( dir, "Pricing", '
+						class {
+							struct function getData() {
+								return { "pro" : { "price" : 29 } }
+							}
+						}
+					' );
+
+					var data = loader.load( dir );
+
+					expect( data.keyExists( "pricing" ) ).toBeTrue();
+					expect( isObject( data.pricing ) ).toBeTrue();
+					expect( data.pricing.getData().pro.price ).toBe( 29 );
+				} );
+
+				it( "the stored value is the live instance, not getData()'s own result - a caller can invoke any other public method too", function() {
+					var dir = newClassSafeDocsDir();
+					writeClassFile( dir, "Pricing", '
+						class {
+							struct function getData() {
+								return { "pro" : { "price" : 29 } }
+							}
+							numeric function discounted( required numeric pct ) {
+								return getData().pro.price - ( getData().pro.price * arguments.pct )
+							}
+						}
+					' );
+
+					var data = loader.load( dir );
+
+					expect( data.pricing.discounted( 0.2 ) ).toBe( 23.2 );
+				} );
+
+				it( "a .bx file wins over a same-key .yaml/.json file", function() {
+					var dir = newClassSafeDocsDir();
+					writeDataFile( dir, "pricing.json", { "from" : "json" } );
+					writeClassFile( dir, "Pricing", '
+						class {
+							struct function getData() {
+								return { "from" : "bx" }
+							}
+						}
+					' );
+
+					var data = loader.load( dir );
+
+					expect( isObject( data.pricing ) ).toBeTrue();
+					expect( data.pricing.getData().from ).toBe( "bx" );
+				} );
+
+				it( "throws BxSites.MissingDataMethod when a .bx class has no public getData()", function() {
+					var dir = newClassSafeDocsDir();
+					writeClassFile( dir, "Broken", '
+						class {
+							string function somethingElse() {
+								return "not getData"
+							}
+						}
+					' );
+
+					expect( function() {
+						loader.load( dir );
+					} ).toThrow( "BxSites.MissingDataMethod" );
+				} );
+
+				it( "throws BxSites.InvalidDataFile naming the file when a .bx class fails to compile/instantiate", function() {
+					var dir = newClassSafeDocsDir();
+					writeClassFile( dir, "Broken", "this is not valid BoxLang class syntax {{{" );
+
+					expect( function() {
+						loader.load( dir );
+					} ).toThrow( "BxSites.InvalidDataFile" );
+				} );
+
 			} );
 
 		} );

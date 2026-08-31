@@ -1,0 +1,13 @@
+/**
+ * A `docs/data/*.bx`-shaped class missing the required `getData()` method -
+ * VariablesProcessor.bx's own defensive `BxSites.MissingDataMethod` check
+ * (its own docblock explains why that check exists here too, not just in
+ * DataLoader.bx).
+ */
+class {
+
+	string function somethingElse() {
+		return "not getData";
+	}
+
+}

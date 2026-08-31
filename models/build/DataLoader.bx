@@ -1,16 +1,37 @@
 /**
  * Loads a project's reusable structured data "by convention" -
- * `docs/data/*.yaml`/`.yml`/`.json`, one file per top-level key (extension
- * stripped, verbatim - no case-folding), each file's own parsed root -
- * object *or* array - used unchanged as that key's value. A project with
- * no `docs/data/` folder simply has no data, and `load()` returns an empty
+ * `docs/data/*.yaml`/`.yml`/`.json`/`.bx`, one file per top-level key
+ * (extension stripped), used as that key's value. A project with no
+ * `docs/data/` folder simply has no data, and `load()` returns an empty
  * struct - the same "opt-in by presence" shape as `BlogAuthorsLoader.bx`'s
  * `authors.yml`/`FunctionsLoader.bx`'s `functions.bxs`.
  *
- * Unlike `BlogAuthorsLoader.bx`, there is no fixed shape to validate/default
- * per entry - arbitrary JSON-shaped content (a team roster, a pricing
- * table, a feature matrix) is the whole point, so a file's parsed root is
- * used exactly as parsed.
+ * `.yaml`/`.yml`/`.json` - basename used verbatim, no case-folding, and the
+ * file's own parsed root (object *or* array) used exactly as parsed. There's
+ * no fixed shape to validate/default per entry, unlike `BlogAuthorsLoader.bx`
+ * - arbitrary JSON-shaped content (a team roster, a pricing table, a feature
+ * matrix) is the whole point.
+ *
+ * `.bx` - a real BoxLang class for computed/encapsulated data
+ * (docs/guides/data-files.md's "Data classes" section) - `docs/data/Pricing.bx`
+ * (PascalCase, this module's own universal class-file convention) becomes
+ * `data.pricing` (the FIRST letter lowercased - `lcfirst()` below - so a
+ * `.bx`-backed key still reads like every other `data.*` key regardless of
+ * source format; nothing else about the basename is touched). The class is
+ * instantiated once and validated to expose a public `getData()` method
+ * (checked eagerly here, at load time, the same "fail fast, name the file"
+ * spirit as a YAML/JSON parse error below) - but the *value* stored under
+ * `data.<key>` is the live INSTANCE itself, not `getData()`'s own result.
+ * `VariablesProcessor.bx`'s own `lookupPath()` is what actually calls
+ * `getData()` (automatically, whenever a `.bx`-backed key is used bare - see
+ * its own docblock) or any other public method (an explicit
+ * `data.<key>.<method>(args)` reference) - keeping the *value* here as the
+ * raw instance is what makes calling a method other than `getData()`
+ * possible at all downstream.
+ *
+ * `.bx` wins first when a basename collides across extensions (both
+ * `Pricing.bx` and `pricing.json` present) - `variables.extensions`' own
+ * order, same resolution mechanic every other collision already uses.
  *
  * Loaded once, project-wide - not per version/locale tree - mirroring
  * `FunctionsLoader.bx`'s own *actual* (not just documented) scope: `functions`
@@ -29,11 +50,13 @@ class {
 
 	/**
 	 * Extensions checked, in order, when more than one file shares a
-	 * basename (e.g. both `products.yaml` and `products.json` present) -
-	 * first found wins, the same by-convention resolution-order shape as
-	 * `BlogAuthorsLoader.bx`'s own `variables.avatarExtensions`.
+	 * basename (e.g. both `Pricing.bx` and `pricing.json` present) - first
+	 * found wins, the same by-convention resolution-order shape as
+	 * `BlogAuthorsLoader.bx`'s own `variables.avatarExtensions`. `bx` goes
+	 * first - an author who adds a data class alongside a stale same-key
+	 * static file almost certainly means the class to win.
 	 */
-	variables.extensions = [ "yaml", "yml", "json" ]
+	variables.extensions = [ "bx", "yaml", "yml", "json" ]
 
 	/**
 	 * Parses a YAML data file - real bx-yaml BIFs by default, swappable via
@@ -51,12 +74,12 @@ class {
 	}
 
 	/**
-	 * Loads `docs/data/*.yaml`/`.yml`/`.json` - `{}` if `docs/data/` doesn't
-	 * exist.
+	 * Loads `docs/data/*.yaml`/`.yml`/`.json`/`.bx` - `{}` if `docs/data/`
+	 * doesn't exist.
 	 *
 	 * @docsDir Absolute path to the project's docs/ directory
 	 *
-	 * @return Struct keyed by data-file basename (extension stripped)
+	 * @return Struct keyed by data-file basename (a `.bx` basename's own first letter lowercased)
 	 */
 	struct function load( required string docsDir ) {
 		var dataDir = arguments.docsDir.reReplace( "[\/]+$", "" ) & "/data"
@@ -65,8 +88,8 @@ class {
 			return {}
 		}
 
-		var basenames = []
-		var filesByBasename = {}
+		var keys = []
+		var filesByKey = {}
 		for ( var fileName in directoryList( dataDir, false, "name" ) ) {
 			var dotAt = fileName.reFind( "\.[^.]+$" )
 			if ( dotAt == 0 ) {
@@ -76,29 +99,31 @@ class {
 			if ( !variables.extensions.contains( ext ) ) {
 				continue
 			}
-			var basename = fileName.left( dotAt - 1 )
-			if ( !filesByBasename.keyExists( basename ) ) {
-				basenames.append( basename )
-				filesByBasename[ basename ] = {}
+			var rawBasename = fileName.left( dotAt - 1 )
+			var key = ext == "bx" ? lcfirst( rawBasename ) : rawBasename
+			if ( !filesByKey.keyExists( key ) ) {
+				keys.append( key )
+				filesByKey[ key ] = {}
 			}
-			filesByBasename[ basename ][ ext ] = dataDir & "/" & fileName
+			filesByKey[ key ][ ext ] = { path : dataDir & "/" & fileName, rawBasename : rawBasename }
 		}
 
 		var data = {}
-		for ( var basename in basenames ) {
-			data[ basename ] = loadOne( basename, filesByBasename[ basename ] )
+		for ( var key in keys ) {
+			data[ key ] = loadOne( key, filesByKey[ key ], dataDir )
 		}
 		return data
 	}
 
 	/**
-	 * Loads one data file, resolving a basename collision across
-	 * extensions via `variables.extensions`' own order (first found wins).
+	 * Loads one data key, resolving an extension collision via
+	 * `variables.extensions`' own order (first found wins).
 	 *
-	 * @basename The data key this file loads into (for error messages)
-	 * @filesByExt This basename's own `{ ext : absolutePath }` matches
+	 * @key The data key this file loads into (for error messages)
+	 * @filesByExt This key's own `{ ext : { path, rawBasename } }` matches
+	 * @dataDir Absolute path to `docs/data/` itself - only used for a `.bx` match (loadClass()'s own mapping)
 	 */
-	private any function loadOne( required string basename, required struct filesByExt ) {
+	private any function loadOne( required string key, required struct filesByExt, required string dataDir ) {
 		// Captured into a local first - an arrow function's own `arguments`
 		// scope is its own (item/index/array, per array .filter()'s own
 		// callback signature), not loadOne()'s, so `arguments.filesByExt`
@@ -107,18 +132,157 @@ class {
 		// docblock already documents for `blogNavUrl`).
 		var filesByExt = arguments.filesByExt
 		var ext = variables.extensions.filter( e => filesByExt.keyExists( e ) )[ 1 ]
-		var filePath = filesByExt[ ext ]
+		var fileInfo = filesByExt[ ext ]
+
+		if ( ext == "bx" ) {
+			return loadClass( arguments.key, fileInfo.rawBasename, arguments.dataDir )
+		}
 
 		try {
 			return ext == "json"
-				? jsonDeserialize( fileRead( filePath ) )
-				: variables.yamlRenderer.fromYaml( fileRead( filePath ) )
+				? jsonDeserialize( fileRead( fileInfo.path ) )
+				: variables.yamlRenderer.fromYaml( fileRead( fileInfo.path ) )
 		} catch ( any e ) {
 			throw(
 				type    = "BxSites.InvalidDataFile",
-				message = "docs/data/#arguments.basename#.#ext# is not valid #ext == "json" ? "JSON" : "YAML"#: #e.message#"
+				message = "docs/data/#arguments.key#.#ext# is not valid #ext == "json" ? "JSON" : "YAML"#: #e.message#"
 			)
 		}
+	}
+
+	/**
+	 * Instantiates one `docs/data/<rawBasename>.bx` class and validates it
+	 * exposes a public `getData()` (see this class's own docblock for why
+	 * the *instance*, not `getData()`'s result, is what gets returned/stored).
+	 *
+	 * Resolved via a DOT-NOTATION `new` against the `/bxApp`/`/bxAppRoot`
+	 * mapping ModuleConfig.bx's own `onLoad()` already registers, at module
+	 * activation - deliberately NOT a fresh mapping registered here, per
+	 * call. Confirmed directly, the hard way, in this session: a mapping
+	 * registered *inside* one class's own method, then immediately resolved
+	 * from a `new` call inside that SAME (or any other) class's own method,
+	 * reliably fails with "has not been located in any class resolver" -
+	 * even a brand-new, never-before-used mapping name, even in a fresh
+	 * process - while the *identical* mapping+`new` sequence at a script's
+	 * own top level, or through a mapping already registered *before* the
+	 * consuming class was ever touched, both work correctly. `/bxApp`/
+	 * `/bxAppRoot` are registered at module activation, well before
+	 * `DataLoader.bx` itself (or anything that calls it) is ever loaded -
+	 * exactly the "already registered before the consuming class exists"
+	 * shape that's confirmed to work.
+	 *
+	 * @key The data key this class loads into (for error messages)
+	 * @rawBasename The `.bx` file's own on-disk basename, PascalCase, unmodified (e.g. "Pricing")
+	 * @dataDir Absolute path to `docs/data/`
+	 */
+	private any function loadClass( required string key, required string rawBasename, required string dataDir ) {
+		var classPath = toClassPath( arguments.dataDir, arguments.rawBasename )
+
+		var instance = "";
+		try {
+			instance = new "#classPath#"()
+		} catch ( any e ) {
+			throw(
+				type    = "BxSites.InvalidDataFile",
+				message = "docs/data/#arguments.rawBasename#.bx failed to load: #e.message#"
+			)
+		}
+
+		if ( !hasPublicMethod( instance, "getData" ) ) {
+			throw(
+				type    = "BxSites.MissingDataMethod",
+				message = "docs/data/#arguments.rawBasename#.bx has no public getData() method - every data class needs one (even if it just returns {}), since data.#arguments.key# calls it automatically whenever it's used bare"
+			)
+		}
+
+		return instance
+	}
+
+	/**
+	 * Turns `dataDir`/`rawBasename` into a dot-notation class path `new` can
+	 * resolve, via one of the two mappings `ModuleConfig.bx`'s own
+	 * `onLoad()` registers at module activation - the exact same mapping
+	 * *selection* logic `FunctionsLoader.bx`'s own `toVirtualPath()` already
+	 * uses for `include`, just producing dots instead of slashes (`new`
+	 * needs a dotted, mapping-relative class path; `include` needs a
+	 * slash-based virtual one):
+	 *  - `/bxApp`, onto the directory `bxSites` was invoked from - used
+	 *    whenever `dataDir` is under that directory (real bx-sites usage
+	 *    always is, when no `--projectRoot` points elsewhere).
+	 *  - `/bxAppRoot`, onto the OS/drive root - the fallback for a `dataDir`
+	 *    outside that directory (an explicit `--projectRoot` elsewhere, or -
+	 *    only relevant to this module's own test suite - a temp directory a
+	 *    spec created for its own throwaway fixtures).
+	 *
+	 * Every resulting segment must be a valid BoxLang identifier (letters/
+	 * digits/underscore, not starting with a digit) - true for `docs`/`data`/
+	 * a `.bx` file's own PascalCase basename always, but NOT guaranteed for
+	 * whatever real directory names sit between `/bxAppRoot` and `dataDir`
+	 * in the fallback case (a project path containing a hyphen or space,
+	 * e.g. `/home/me/my-project`, is a completely ordinary thing to have -
+	 * this module just can't turn it into a dotted class-path segment).
+	 * Throws a clear, named `BxSites.UnsupportedDataClassPath` up front
+	 * instead of letting `new` fail on it with a cryptic "class not found".
+	 *
+	 * @dataDir Absolute path to `docs/data/`
+	 * @rawBasename The `.bx` file's own on-disk basename, PascalCase, unmodified
+	 *
+	 * @return A dotted, mapping-relative class path, e.g. "bxApp.docs.data.Pricing"
+	 */
+	private string function toClassPath( required string dataDir, required string rawBasename ) {
+		var cwd = server.boxlang.cliMode ? server.cli.executionPath : server.java.executionPath
+		var normalizedCwd = cwd.replace( char( 92 ), "/", "all" ).reReplace( "[\/]+$", "" )
+		var normalizedDataDir = arguments.dataDir.replace( char( 92 ), "/", "all" ).reReplace( "[\/]+$", "" )
+
+		var relative = "";
+		if ( normalizedDataDir.left( len( normalizedCwd ) ) == normalizedCwd ) {
+			// +2 (not +1) skips both the matched cwd prefix and the path
+			// separator right after it - mirrors FunctionsLoader.bx's own
+			// toVirtualPath(), see its own docblock for why.
+			var remaining = len( normalizedDataDir ) - len( normalizedCwd ) - 1
+			relative = "bxApp" & ( remaining > 0 ? "." & normalizedDataDir.mid( len( normalizedCwd ) + 2, remaining ).replace( "/", ".", "all" ) : "" )
+		} else {
+			relative = "bxAppRoot." & normalizedDataDir.reReplace( "^[A-Za-z]:", "" ).reReplace( "^[\/]+", "" ).replace( "/", ".", "all" )
+		}
+
+		var classPath = relative & "." & arguments.rawBasename
+
+		for ( var segment in listToArray( classPath, "." ) ) {
+			if ( !reFind( "^[A-Za-z_][A-Za-z0-9_]*$", segment ) ) {
+				throw(
+					type    = "BxSites.UnsupportedDataClassPath",
+					message = "docs/data/#arguments.rawBasename#.bx can't be loaded - its resolved path contains a [#segment#] segment, which isn't valid in a BoxLang class name (letters/digits/underscore only, e.g. no hyphens or spaces). This only happens when the project isn't reached through bxSites' own invocation directory (an explicit --projectRoot pointing elsewhere, most commonly) - try running bxSites from within the project root itself, or move the project to a path with no hyphens/spaces in any parent directory name."
+				)
+			}
+		}
+
+		return classPath
+	}
+
+	/**
+	 * @return true when `instance` has a public method named `methodName` (case-insensitive) - checked via `getMetadata()`, never by calling `invoke()` and inspecting the failure, so a method that genuinely exists but throws its OWN error isn't misreported as missing
+	 */
+	private boolean function hasPublicMethod( required any instance, required string methodName ) {
+		var metadata = getMetadata( arguments.instance )
+		for ( var fn in ( metadata.functions ?: [] ) ) {
+			if ( compareNoCase( fn.name, arguments.methodName ) == 0 && lCase( fn.access ?: "public" ) == "public" ) {
+				return true
+			}
+		}
+		return false
+	}
+
+	/**
+	 * Lowercases just the first character - `"Pricing"` -> `"pricing"` -
+	 * used only for a `.bx` file's own PascalCase basename (this module's
+	 * universal class-file convention) when computing its `data.*` key, so
+	 * that key still reads like every other lowercase `data.*` key
+	 * regardless of source format. Never applied to a `.yaml`/`.yml`/`.json`
+	 * basename, which is already used verbatim (see this class's own
+	 * docblock).
+	 */
+	private string function lcfirst( required string text ) {
+		return len( arguments.text ) ? lCase( left( arguments.text, 1 ) ) & mid( arguments.text, 2, len( arguments.text ) - 1 ) : arguments.text
 	}
 
 }

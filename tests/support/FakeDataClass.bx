@@ -1,0 +1,24 @@
+/**
+ * A small, fixed `docs/data/*.bx`-shaped class for exercising
+ * VariablesProcessor.bx/DirectiveBlockProcessor.bx's own `data.<key>` class-
+ * instance mechanics (auto-invoked `getData()`, an explicit
+ * `data.<key>.<method>(args)` call, a private method staying uncallable)
+ * directly, with no dependency on DataLoader.bx's own file-loading/dynamic-
+ * mapping machinery - DataLoaderSpec.bx covers that separately.
+ */
+class {
+
+	struct function getData() {
+		return { "free" : { "price" : 0 }, "pro" : { "price" : 29 } }
+	}
+
+	numeric function getDiscountedPrice( required string plan, required numeric pct ) {
+		var base = getData()[ arguments.plan ].price
+		return base - ( base * arguments.pct )
+	}
+
+	private string function secretHelper() {
+		return "never callable from markdown";
+	}
+
+}
