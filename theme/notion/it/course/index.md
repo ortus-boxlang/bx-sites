@@ -1,5 +1,5 @@
 ---
-title: Course
+title: Tutorial Course
 summary: A guided, 20-lesson walkthrough from install to a deployed site.
 icon: phosphor-duotone:graduation-cap
 tags: [course]
