@@ -13,7 +13,11 @@ anything with real shape - a team roster, a pricing table, a feature
 matrix. **Data files** fill that gap: drop a `docs/data/*.yaml`/`.yml`/
 `.json` file in your project, and its whole content - any shape you like,
 an object or an array - becomes reachable as `data.<file>` from every
-page, the same `{{ }}` syntax `variables`/`page` already use.
+page, the same `{{ }}` syntax `variables`/`page` already use. Need the data
+*computed* rather than just parsed from a static file - a discount applied
+at read time, a value that shouldn't live in three duplicated files? Drop a
+`docs/data/*.bx` **class** instead - see [Data classes](#data-classes)
+below.
 
 ## The convention
 
@@ -63,9 +67,95 @@ builds to:
 ```
 
 If more than one file shares a basename across extensions (both
-`products.yaml` and `products.json` present), `.yaml` wins, then `.yml`,
-then `.json` - pick one format per basename rather than relying on that
-order in practice.
+`products.yaml` and `products.json` present), `.bx` wins first (see
+[Data classes](#data-classes)), then `.yaml`, then `.yml`, then `.json` -
+pick one format per basename rather than relying on that order in practice.
+
+## Data classes
+
+A `.yaml`/`.json` file is static - parsed once, used exactly as written.
+For data that needs computing (a discounted price, a value assembled from
+several sources, anything with real logic behind it), drop a real BoxLang
+**class** instead - `docs/data/Pricing.bx` (PascalCase, this module's own
+class-file convention everywhere else too) becomes `data.pricing` - same
+lowercase `data.*` key shape as every other file, just the class
+basename's own first letter lowercased:
+
+```bx title="docs/data/Pricing.bx"
+class {
+	struct function getData() {
+		return { "free": { "price": 0 }, "pro": { "price": 29 } }
+	}
+
+	numeric function getDiscountedPrice( required string plan, required numeric pct ) {
+		var base = getData()[ arguments.plan ].price
+		return base - ( base * arguments.pct )
+	}
+}
+```
+
+**`getData()` is required** - every data class needs one (even a trivial
+one returning `{}`), since it's what gets called automatically whenever
+`data.pricing` is used bare, exactly like a parsed YAML/JSON root:
+
+```markdown title="docs/pricing.md"
+The Pro plan is **${{ data.pricing.pro.price }}/mo**.
+
+::: for plan, info in data.pricing
+- {{ plan }}: ${{ info.price }}
+:::
+```
+
+**Any other public method is callable too**, directly from `{{ }}`, with
+the exact same argument syntax a [magic function](variables-and-functions.md#magic-functions)
+call already uses (literals or dotted variable references, comma-separated):
+
+```markdown title="docs/pricing.md"
+Discounted for early adopters: **${{ data.pricing.getDiscountedPrice("pro", 0.2) }}/mo**
+```
+
+builds to:
+
+```html
+Discounted for early adopters: <strong>$23.2/mo</strong>
+```
+
+This works from `::: for`/`::: if` too, the identical `<dotted.path>`
+grammar those directives already resolve through:
+
+```markdown title="Example" linenums="1"
+::: if data.pricing.getDiscountedPrice("pro", 0.2)
+Discounts are active.
+:::
+```
+
+A theme override or a magic function, which already have full BoxLang at
+their disposal, get the live instance itself bound bare as `data.pricing` -
+call `getData()` or any other method on it directly, no auto-invoke magic
+needed there (see [Consuming data](#consuming-data) below).
+
+**Only public methods are reachable this way** - a `private function`
+in the same class stays a genuine implementation detail, unreachable from
+`{{ }}` just like a non-`$`-prefixed helper in `functions.bxs` is
+unreachable *directly* (though, same as there, it's still callable from
+another method in the same file).
+
+This doesn't loosen the trust boundary [below](#why-data-files-not-boxlang-templates-in-markdown) -
+a `.bx` file under `docs/data/` is code the *project owner* writes, the
+same tier of trust `docs/functions.bxs` already has, never something a
+docs-only contributor's Markdown can reach into.
+
+**One narrow limitation**, real but rare in practice: loading a data class
+needs its own resolved path to be expressible as a BoxLang class name (no
+hyphens or spaces anywhere in it). Running `bxSites` from inside the
+project itself - the overwhelmingly common case - always works, since
+nothing about the project's own path (which can have hyphens all it
+wants, e.g. `my-project/`) ever needs spelling out that way. It only
+becomes a real constraint with an explicit `--projectRoot` pointing at a
+project outside the current directory, whose own path (or an ancestor
+directory's) contains a hyphen or space - see
+[`BxSites.UnsupportedDataClassPath`](#errors) for the exact error that
+throws instead of a cryptic failure.
 
 ## Consuming data
 
@@ -91,7 +181,10 @@ Once a project has a `theme/` override (see
 
 This is the natural home for data that belongs on *every* page (a footer
 sponsor list, a site-wide nav badge) rather than one specific page's
-content.
+content. If `sponsors` were a [data class](#data-classes) instead of a
+`.yaml`/`.json` file, `data.sponsors` here is the live instance itself
+(real BoxLang, no `{{ }}`-only auto-invoke convenience) - loop over
+`data.sponsors.getData()` explicitly instead.
 
 ### From a magic function
 
@@ -236,8 +329,10 @@ leaning on magic functions for anything more? Two reasons:
 
 Data files close the actual gap (structured content, and loops/
 conditionals over it) without either tradeoff: Markdown itself stays
-inert-until-`{{ }}`-substituted, and `functions.bxs` remains the one
-explicitly-trusted escape hatch into real BoxLang logic.
+inert-until-`{{ }}`-substituted, and `functions.bxs`/a `docs/data/*.bx`
+class remain the explicitly-trusted escape hatches into real BoxLang
+logic - both project-owner-authored code, never something a Markdown
+contributor's own PR can add.
 
 ## Scope
 
@@ -260,7 +355,19 @@ explicitly-trusted escape hatch into real BoxLang logic.
 ## Errors
 
 - `BxSites.InvalidDataFile` - a `docs/data/*.yaml`/`.yml`/`.json` file
-  failed to parse (a YAML/JSON syntax error), naming the offending file.
+  failed to parse (a YAML/JSON syntax error), or a `docs/data/*.bx` class
+  failed to compile/instantiate, naming the offending file.
+- `BxSites.MissingDataMethod` - a `docs/data/*.bx` class has no public
+  `getData()` method.
+- `BxSites.UnknownDataMethod` - `{{ data.x.someMethod(...) }}` names a
+  method that doesn't exist (or isn't public) on that data class instance.
+- `BxSites.NotCallable` - `{{ data.x.someMethod(...) }}` where `data.x`
+  isn't a data class instance at all (a `.yaml`/`.json`-backed key has no
+  methods to call).
+- `BxSites.UnsupportedDataClassPath` - a `docs/data/*.bx` class couldn't be
+  loaded because its resolved path contains a character not valid in a
+  BoxLang class name (a hyphen or space in some parent directory name) -
+  see [Data classes](#data-classes)'s own note on this.
 - `BxSites.UnknownVariable` - a `{{ data.x.y }}` (or a `::: for`/`::: if`
   path) doesn't resolve against what's actually in `docs/data/`.
 - `BxSites.InvalidForTarget` - a `::: for`'s own path resolved to
