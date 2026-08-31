@@ -170,7 +170,7 @@ class {
 				var courseId = matcher.group( 1 )
 				var course = arguments.resolvedCourses[ courseId ] ?: javacast( "null", "" )
 				var replacement = isNull( course )
-					? '<div class="bxsites-course-index bxsites-course-index--unavailable">::: course id="' & encodeForHTML( courseId ) & '" - no such course, or its lessons aren\'t all present in this build</div>'
+					? '<div class="bxsites-course-index bxsites-course-index--unavailable">::: course id="' & encodeForHTML( courseId ) & '" - no such course, or its lessons are not all present in this build</div>'
 					: renderIndex( course, arguments.basePath )
 				matcher.appendReplacement( buffer, quoteReplacement( replacement ) )
 			}
