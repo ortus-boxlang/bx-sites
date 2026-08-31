@@ -532,3 +532,20 @@ including another `::: for`/`::: if`, nested exactly like any block above.
 See [Data Files: Consuming data](data-files.md#consuming-data) for the
 full loop/conditional story, including the two other ways to work with
 `data.*` - a theme override, or a magic function.
+
+## Course index
+
+`::: course id="..." :::` renders a whole [course](courses.md)'s lessons
+as one numbered, linked index - a big "1. Introduction, 2. Windows
+Installation, 3. Mac Installation..." list, each number a real link,
+built from a `docs/data/courses.yaml` manifest rather than hand-authored:
+
+```markdown title="Example" linenums="1"
+::: course id="getting-started" :::
+```
+
+Unlike every block above, this one takes only a bare `id`, no `href`/body
+content of its own - the lessons themselves, and their order, come
+entirely from the manifest. See [Courses](courses.md) for the manifest
+format, scoped lesson-to-lesson navigation, and how reader progress gets
+tracked once the index is on the page.

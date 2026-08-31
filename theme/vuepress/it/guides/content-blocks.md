@@ -550,3 +550,22 @@ esattamente come qualsiasi blocco sopra. Vedi
 [File di dati: Usare i dati](data-files.md#consuming-data) per il quadro
 completo di loop/condizionali, inclusi gli altri due modi per lavorare
 con `data.*` - una sovrascrittura di tema, oppure una funzione magica.
+
+## Indice del corso
+
+`::: course id="..." :::` renderizza tutte le lezioni di un intero
+[corso](courses.md) come un unico indice numerato e collegato - un grande
+elenco "1. Introduzione, 2. Installazione su Windows, 3. Installazione su
+Mac..." in cui ogni numero è un link vero e proprio, costruito a partire
+da un manifest `docs/data/courses.yaml` invece che redatto a mano:
+
+```markdown title="Esempio" linenums="1"
+::: course id="getting-started" :::
+```
+
+A differenza di ogni blocco sopra, questo accetta solo un `id` nudo,
+senza un proprio `href`/corpo di contenuto - le lezioni stesse, e il loro
+ordine, provengono interamente dal manifest. Vedi [Corsi](courses.md) per
+il formato del manifest, la navigazione lezione-per-lezione limitata al
+corso, e come vengono tracciati i progressi del lettore una volta che
+l'indice è presente sulla pagina.

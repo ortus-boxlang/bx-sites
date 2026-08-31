@@ -184,12 +184,21 @@ caricato da disco* - `title`/`description`/`tags`/`icon`/`summary`/
 `ogImage`/`urlPath`/`relativePath`/`body`/ecc. sono già presenti, ma i
 campi noti solo dopo che ogni pagina dell'albero ha terminato la
 conversione - `toc`, `prevPage`/`nextPage`, `breadcrumbs`,
-`editUrl`/`lastUpdated`, `iconHtml`, `markdownUrl`, `canonicalUrl` - non
-esistono ancora su di essa. Se richiamata allo stato puro da `page.bxm`,
-`page` è invece lo struct completamente arricchito, con tutti questi
-campi inclusi. Ogni altra variabile di supporto (`siteConfig`, `nav`,
-`basePath`, `versions`, `currentVersion`, `locales`, `currentLocale`,
-`currentLocaleDir`) è identica in entrambi i casi.
+`editUrl`/`lastUpdated`, `iconHtml`, `markdownUrl`, `canonicalUrl`,
+`course` - non esistono ancora su di essa. Se richiamata allo stato puro
+da `page.bxm`, `page` è invece lo struct completamente arricchito, con
+tutti questi campi inclusi.
+
+`page.course` è sempre presente (uno struct completamente vuoto
+`{id:"", courseTitle:"", lessonIndex:0, lessonTotal:0,
+prevLesson:{title:"",url:""}, nextLesson:{title:"",url:""}, indexUrl:""}`
+per una pagina che non fa parte di alcun [corso](courses.md)) -
+`prevLesson`/`nextLesson` sono limitati a quel singolo corso, in modo
+indipendente dai `prevPage`/`nextPage` a livello di sito visti sopra, che
+invece percorrono sempre l'intero albero di navigazione. Ogni altra
+variabile di supporto (`siteConfig`, `nav`, `basePath`, `versions`,
+`currentVersion`, `locales`, `currentLocale`, `currentLocaleDir`) è
+identica in entrambi i casi.
 
 ### Sintassi degli argomenti
 

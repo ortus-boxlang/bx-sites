@@ -184,10 +184,19 @@ se cargó desde disco* - `title`/`description`/`tags`/`icon`/`summary`/
 `ogImage`/`urlPath`/`relativePath`/`body`/etc. ya están ahí, pero los
 campos que solo se conocen una vez que todas las páginas del árbol han
 terminado de convertirse - `toc`, `prevPage`/`nextPage`, `breadcrumbs`,
-`editUrl`/`lastUpdated`, `iconHtml`, `markdownUrl`, `canonicalUrl` - todavía
-no existen en ella. Llamada sin prefijo desde `page.bxm`, `page` es el
-struct totalmente enriquecido, con todos esos incluidos. Cualquier otra
-variable de soporte (`siteConfig`, `nav`, `basePath`, `versions`,
+`editUrl`/`lastUpdated`, `iconHtml`, `markdownUrl`, `canonicalUrl`,
+`course` - todavía no existen en ella. Llamada sin prefijo desde
+`page.bxm`, `page` es el struct totalmente enriquecido, con todos esos
+incluidos.
+
+`page.course` está siempre presente (un struct totalmente vacío
+`{id:"", courseTitle:"", lessonIndex:0, lessonTotal:0,
+prevLesson:{title:"",url:""}, nextLesson:{title:"",url:""}, indexUrl:""}`
+para una página que no forma parte de ningún [curso](courses.md)) -
+`prevLesson`/`nextLesson` tienen ámbito solo a ese curso en concreto,
+independientes del `prevPage`/`nextPage` de todo el sitio de más arriba,
+que siempre recorre todo el árbol de navegación en su lugar. Cualquier
+otra variable de soporte (`siteConfig`, `nav`, `basePath`, `versions`,
 `currentVersion`, `locales`, `currentLocale`, `currentLocaleDir`) es
 idéntica en ambos lugares.
 

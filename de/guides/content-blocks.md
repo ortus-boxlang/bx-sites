@@ -555,3 +555,22 @@ Content-Blöcke enthalten - einschließlich eines weiteren
 vollständige Schleifen-/Bedingungs-Geschichte, einschließlich der zwei
 weiteren Wege, mit `data.*` zu arbeiten - ein Theme-Override, oder eine
 magische Funktion.
+
+## Kursindex
+
+`::: course id="..." :::` rendert die gesamten Lektionen eines
+[Kurses](courses.md) als einen einzigen, nummerierten, verlinkten Index
+- eine große "1. Introduction, 2. Windows Installation, 3. Mac
+Installation ..."-Liste, jede Nummer ein echter Link, aufgebaut aus
+einem `docs/data/courses.yaml`-Manifest statt von Hand verfasst:
+
+```markdown title="Example" linenums="1"
+::: course id="getting-started" :::
+```
+
+Anders als jeder Block oben nimmt dieser nur eine bloße `id` entgegen,
+keinen eigenen `href`/Inhalt - die Lektionen selbst, und ihre
+Reihenfolge, stammen vollständig aus dem Manifest. Siehe
+[Kurse](courses.md) für das Manifestformat, die kursbezogene
+Lektion-zu-Lektion-Navigation, und wie der Lesefortschritt erfasst
+wird, sobald der Index auf der Seite steht.

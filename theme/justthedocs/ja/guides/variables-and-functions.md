@@ -173,11 +173,18 @@ Page: {{ $pagetitle() }}
 ままの状態*です - `title`/`description`/`tags`/`icon`/`summary`/`ogImage`/`urlPath`/
 `relativePath`/`body` などはすでに存在していますが、ツリー内のすべてのページの
 変換が完了して初めて分かるフィールド - `toc`、`prevPage`/`nextPage`、`breadcrumbs`、
-`editUrl`/`lastUpdated`、`iconHtml`、`markdownUrl`、`canonicalUrl` - はまだ存在しません。
-`page.bxm` から裸のまま呼び出された場合、`page` はそれらすべてを含む、完全に拡充された
-構造体です。それ以外のサポート変数（`siteConfig`、`nav`、`basePath`、`versions`、
-`currentVersion`、`locales`、`currentLocale`、`currentLocaleDir`）はどちらの場所でも
-同一です。
+`editUrl`/`lastUpdated`、`iconHtml`、`markdownUrl`、`canonicalUrl`、`course` -
+はまだ存在しません。`page.bxm` から裸のまま呼び出された場合、`page` はそれら
+すべてを含む、完全に拡充された構造体です。それ以外のサポート変数
+（`siteConfig`、`nav`、`basePath`、`versions`、`currentVersion`、`locales`、
+`currentLocale`、`currentLocaleDir`）はどちらの場所でも同一です。
+
+`page.course` は常に存在します（いかなる[コース](courses.md)にも属さない
+ページでは、すべて空の `{id:"", courseTitle:"", lessonIndex:0, lessonTotal:0,
+prevLesson:{title:"",url:""}, nextLesson:{title:"",url:""}, indexUrl:""}`
+構造体になります）- `prevLesson`/`nextLesson` はその1つのコースだけに
+スコープされており、上記のサイト全体の `prevPage`/`nextPage` とは独立して
+います。こちらは常にナビツリー全体を歩きます。
 
 ### 引数の構文
 

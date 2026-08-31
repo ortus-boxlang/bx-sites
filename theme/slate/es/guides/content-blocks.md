@@ -557,3 +557,22 @@ que cualquier bloque anterior. Consulta
 la historia completa de bucle/condicional, incluyendo las otras dos
 formas de trabajar con `data.*` - una sobrescritura de tema, o una
 función mágica.
+
+## Índice de curso
+
+`::: course id="..." :::` renderiza las lecciones de todo un
+[curso](courses.md) como un índice numerado y enlazado - una gran lista
+"1. Introducción, 2. Instalación en Windows, 3. Instalación en Mac..."
+donde cada número es un enlace real, construida a partir de un
+manifiesto `docs/data/courses.yaml` en lugar de redactarse a mano:
+
+```markdown title="Example" linenums="1"
+::: course id="getting-started" :::
+```
+
+A diferencia de todos los bloques anteriores, este solo toma un `id`
+desnudo, sin `href` ni contenido propio de cuerpo - las propias lecciones,
+y su orden, provienen enteramente del manifiesto. Consulta
+[Cursos](courses.md) para el formato del manifiesto, la navegación de
+lección a lección de ámbito propio, y cómo se rastrea el progreso de
+quien lee una vez que el índice está en la página.
