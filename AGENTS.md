@@ -2,91 +2,109 @@
 
 ## Purpose
 
-This repository is the pure BoxLang template for BoxLang modules.
-Treat it as a template first: preserve placeholders, setup flow, build script behavior, and distribution structure unless the task explicitly changes the template contract.
+This repository contains the `bx-sites` BoxLang module, its static-site
+generator, and the documentation site that dogfoods it. Keep changes focused
+on the module's public CLI, build output, tests, documentation, and packaging
+contracts.
 
 ## Architecture
 
-- Module metadata and runtime lifecycle live in `ModuleConfig.bx` at the repo root.
-- BoxLang module features should follow the existing root folders: `bifs`, `components`, `interceptors`, `tests`, and `lib`.
-- This template is BoxLang-first. Keep implementation in BoxLang unless the task specifically involves shipping external Java libraries or compiled classes through `lib`.
-- Every module is loaded in its own class loader. When working with jars or classes in `lib`, avoid assumptions about shared classpath state across modules.
+- `ModuleConfig.bx` owns module metadata, runtime activation, CLI argument
+  parsing, and verb dispatch.
+- `models/build/` contains the build pipeline and content processors.
+- `models/cli/` contains one dispatcher class per CLI verb.
+- `models/config/` contains configuration and source-directory resolution.
+- `models/deploy/` contains deployment contracts and target implementations;
+  `models/publish/` contains the bxSites Cloud publisher.
+- `resources/assets/` and `resources/themes/` are packaged runtime resources.
+- `docs/` is this repository's site source, `tests/specs/` contains TestBox
+  specs, and `tests/support/` contains test doubles and fixtures.
+- Keep implementation BoxLang-first. Add Java libraries or compiled classes
+  only when they are genuinely required as packaged runtime input.
+
+### Project folders
+
+- A consuming project uses `docs/` or `src/` as its content source directory.
+  `SourceDirResolver` checks `docs/` first, then `src/`, and defaults to
+  `docs/` when neither exists.
+- `site/` is always generated build output. Never treat it as a source folder;
+  builds remove and recreate it.
+- Deployment configuration belongs under `deployments/`, not `deploy/`, to
+  avoid colliding with the `deploy` CLI verb.
+- `bxsites.yaml` is the preferred project configuration format. JSON remains
+  supported through `bxsites.json` and `--format=json`; `docs/nav.json` is
+  always JSON because it is parsed separately as a navigation override.
 
 ## Build And Test
 
-- Use `boxlang Build.bx` for local packaging. Preserve its token replacement, compile, zip, and checksum steps.
-- Prefer narrow validation first: run the build script or the module tests relevant to the touched area.
-- Tests live under `tests`, and the documented test entry point is `./testbox/run` after installing dependencies with `box install`.
-- Keep generated artifacts under `build` only; do not move packaging outputs or source exclusions unless the task explicitly requires it.
+- Install dependencies with `box install --verbose --nosave` when reproducing
+  CI locally.
+- Run the focused TestBox suite with:
+  `./testbox/run --reporter=ANTJunit --verbose`.
+- TestBox's runner does not reliably return a failing process exit code. When
+  consuming its results in automation, inspect the generated JUnit XML for
+  nonzero `failures` or `errors`, as `.github/workflows/tests.yml` does.
+- Package the module with `boxlang Build.bx --version=<version>
+  --buildId=<id> --branch=<branch>`. Preserve token replacement, source
+  exclusions, the primary artifact, the with-dependencies artifact, and
+  checksum generation. Generated files belong under `build/`.
+- For a real local site build, use `boxlang bxSites build`. The repository's
+  `buildMultiTheme.sh` is local preview tooling only; it builds the ten themes
+  with separate Git worktrees and requires `boxlang`, `yq`, and a Git checkout.
+- Changes to the real build path should be checked with a real build, not only
+  the TestBox fakes. CI also verifies that a successful-looking build produced
+  non-empty `site/` output because CLI errors can be swallowed during dispatch.
 
-## Conventions
+## Documentation And Locales
 
-- Follow `.editorconfig` indentation and line-ending rules. This repo uses tabs by default, with spaces for YAML.
-- Keep `ModuleConfig.bx`, `box.json`, `readme.md`, `changelog.md`, `SetupTemplate.bx`, and `Build.bx` consistent when changing module names, versions, slugs, or template placeholders.
-- Prefer small template-safe edits. If a change affects generated modules, update both the implementation and the template placeholders or setup flow that keep the template coherent.
-- Treat `lib` as packaged runtime input for jars or compiled classes, not as a place to mirror source that should live in the BoxLang folders.
-- **Any docs change under `docs/` must be applied to all four locale mirrors in the same pass, not English only.** `docs/i18n/{de,es,it,ja}/` mirrors the English tree 1:1, file-for-file. A new section, a rewritten paragraph, a corrected example, a new guide - whatever changed in English needs the equivalent edit (translated, not copy-pasted) in every locale copy of that same file before the task is done. Treat "update the docs" as implicitly "update the docs in all five places" unless the user scopes it to English only. See the fuller locale-parity notes under "Git/PR Workflow Notes" below (`i18n:status` only checks page *presence*, never per-page content parity, so a locale can silently fall behind on one specific addition while still reporting 100% coverage).
-- **`bxsites.yaml` is a *project's* config default/preferred format** (`bxSites new` scaffolds `.yaml` unless `--format=json` is passed) - `bxsites.json` is fully supported but not the default. Any new doc/example snippet across `docs/` (and its locale mirrors) should default to showing YAML, not JSON, matching what a real scaffolded project actually has. The one genuine exception is `docs/nav.json` - a separate, always-JSON file (`BuildPipeline.bx`'s own nav-override loader parses it as JSON unconditionally, unrelated to whichever format the main site config uses) - never "fix" a `docs/nav.json` example into YAML. `docs/configuration.md`'s own top-of-page side-by-side yaml+json comparison, and any place specifically discussing the `--format=json` CLI flag, are also meant to stay JSON.
+- Keep `docs/i18n/{de,es,it,ja}/` synchronized with the English documentation
+  tree. Any documentation change under `docs/` needs the equivalent translated
+  update in each locale mirror unless the task explicitly scopes the change to
+  English.
+- New examples should use YAML by default and should match the behavior of a
+  freshly scaffolded `bxSites new` project.
+- Preserve the distinction between authored source under `docs/` or `src/` and
+  generated output under `site/`.
 
-## BoxLang Gotchas (learned the hard way)
+## BoxLang Conventions
 
-- **Unqualified call to a same-named BIF wins silently.** Calling a private method by its bare name (no `this.`) from another method of the *same* class can resolve to a built-in BIF of the same name instead, with no compile error. Confirmed real BIFs that collide with tempting helper names: `slugify()` (doesn't trim trailing hyphens - wrong for slug generation), `camelCase()` (actually does what you want, so a hand-rolled version is often just dead code), `getBoxRuntime()` (harmless - returns the same singleton). Before naming a private helper something generic (`slugify`, `slug`, `camelCase`, ...), check it isn't a BIF: `try { invoke("", "name", ["x"]); /* IS a BIF */ } catch (any e) { /* not a BIF */ }`.
-- **A parameter name shadows a same-named private method.** If a function has a parameter (e.g. `string slug`) and also calls a private method named `slug()`, the unqualified call resolves to the parameter (a string), throwing `"Variable 'slug' of type 'String' is not a function"`. Give the method and the parameter/return-key different names.
-- **A literal `#` in a string must be doubled (`##`).** `"# Heading"` breaks the parser (read as starting `#expression#`); use `"## Heading"` for a literal single `#`. Applies anywhere a `#` should appear literally, including inside regex string literals passed to `reFind`/`reReplace` (e.g. `"^#{1,6}"` must be written `"^##{1,6}"`).
-- **No backslash escaping in string literals.** `\"` inside a double-quoted string is a literal backslash followed by a quote that terminates the string - it does NOT escape the quote. To embed a literal quote: switch the string's own delimiter to the opposite quote style, or double the delimiter character (`""` inside a double-quoted string, `''` inside a single-quoted string).
-- **`dateFormat()` mask letters are case-sensitive.** Lowercase `mm` = minutes; uppercase `MM` = month. `dateFormat(now(), "yyyy-mm-dd")` silently produces garbage dates (e.g. `2026-46-22`).
-- **`directoryList(path, true, "path")` with no glob pattern returns directories too**, not just files. Filter with `.filter(path => !directoryExists(path))` when you want files only (established convention, see `MkdocsMigrator.bx`).
-- **An arrow closure's `arguments` scope is its own, not the enclosing function's.** Inside `.filter(x => ...)`/`.map(x => ...)`/`.some(x => ...)`, `arguments` refers to the closure's own callback arguments (item/index/array), NOT the outer function's `arguments`. Referencing `arguments.someOuterParam` inside the closure silently looks up a key that was never there (or throws `KeyNotFoundException`). Fix: capture the value into a local `var` before the closure and reference that local, not `arguments.x`, inside it.
-- **Can't mix named and positional arguments in one call.** `fn( someVar, includeDrafts = true )` is a parse error ("cannot mix named and positional arguments"). Use all-named (`fn( x : someVar, includeDrafts : true )`) or all-positional.
-- **A single `.bxs` script with several `try/catch` blocks can trigger a real compiler bug** (`java.lang.VerifyError: Inconsistent stackmap frames`) unrelated to your actual source code - this hit ad-hoc verification scripts, not the shipped module code. Split scratch test scripts so each has at most one or two try/catch blocks per file.
-- **A module's own registry mapping name (`this.mapping` in its `ModuleConfig.bx`) isn't necessarily its box.json/ForgeBox slug.** Confirmed for this environment's installed modules: `bx-markdown` → `bxMarkdown`, `bx-esapi` → `esapi`, `bx-yaml` → `yaml`, `bx-image` → `image`, `bx-sites` → `bxsites`. Check via `getBoxRuntime().getModuleService().hasModule( mappingName )`, not the slug.
-- **`dateCompare(a, b)` is a real BIF** and works as expected on ISO-formatted date strings (`-1`/`0`/`1`) - no need to hand-roll date range comparisons.
-- **CLI verbs must use `--flag=value`, never a bare positional**, for their "primary" argument (title/name/path/from/to/etc.) - `ModuleConfig.bx`'s `resolveProjectRoot()` unconditionally treats the first bare positional as a project-root override candidate for every verb.
-- **A CLI verb name that collides with a same-named file/directory in the CURRENT WORKING DIRECTORY crashes the whole `boxlang` process** with `Exception in thread "main" java.io.UncheckedIOException: java.io.IOException: Is a directory`, thrown from `ortus.boxlang.runtime.BoxRunner.isShebangScript()`/`parseCommandLineOptions()` - entirely inside the BoxLang runtime itself, before `ModuleConfig.bx`'s own `main()` is ever reached, so there's no way to catch or work around it from module code. Confirmed general (not specific to any one verb): a project with a literal `clean/` folder already breaks today's `bxSites clean` the same way. This is exactly why the `deploy` CLI verb's own by-convention config folder is named `deployments/`, not `deploy/` - the obvious name would collide with the verb itself for every real user, since a `deploy`-adjacent config folder naturally sits right next to where `bxSites deploy` gets run. **Before naming a new verb, check whether its own natural by-convention folder name (if it needs one) would collide with the verb name itself** - rename the folder, never the verb, to route around this.
-- **This sandbox couldn't get a working TestBox install** (ForgeBox unreachable even after fixing CommandBox's proxy/cacerts config; even when `testbox/` is present, running the suite still fails with `The requested class [testbox.system.modules.globber.models.PathPatternMatcher] has not been located...` - `TestBox.cfc`'s own directory/bundle discovery needs its `globber` sub-dependency, which never resolved here). Verification here was done via ad-hoc `.bxs` scratch scripts run directly with `boxlang script.bxs`, exercising the model/cli classes' public methods with hand-rolled PASS/FAIL prints.
-- **Ad-hoc scratch-script verification does NOT catch bugs in the checked-in spec files themselves** - it only exercises the model/cli classes directly, never the actual `tests/specs/**/*.bx` TestBox spec source. Confirmed in this session's own PR: a checked-in spec file (`ContentLinterSpec.bx`) shipped with the exact same un-doubled-`#` bug as above, past local review, and was only caught once by real CI (which has a working TestBox/globber install). Before pushing, at minimum re-read every new/changed spec file's own string literals for the same escaping rules that apply to source - don't assume "the logic is verified" means "the spec file compiles."
+- Avoid private helper names that collide with built-in functions, and qualify
+  helper calls when name resolution could be ambiguous.
+- An arrow closure has its own `arguments` scope. Capture outer arguments in a
+  local variable before using them inside `filter`, `map`, `some`, or similar
+  callbacks.
+- Do not mix positional and named arguments in one call. Use one style for the
+  complete call.
+- BoxLang string literals use doubled delimiters rather than backslash escapes.
+  Interpolation with `#...#` works in both quote styles; construct literal hash
+  delimiters with `char( 35 )` when a string would otherwise contain a pair.
+- `dateFormat()` masks are case-sensitive: `MM` is month and `mm` is minutes.
+- `directoryList(path, true, "path")` can include directories; filter them when
+  a file-only result is required.
+- Use the module mapping (`bxsites`) for runtime class lookup, not the ForgeBox
+  slug (`bx-sites`).
+- CLI primary values should use `--flag=value`; a bare first positional can be
+  interpreted as a project-root override by `ModuleConfig.bx`.
 
-## External Reference Notes
+## GitHub Actions
 
-- **BoxLang's own two install paths** (needed whenever this repo's docs reference installing the BoxLang runtime itself - a prerequisite separate from installing this module via `install-bx-module`/`box install`, which both assume BoxLang/CommandBox already exists): the **quick installer** - `curl -fsSL https://install.boxlang.io/ | bash` (single version, simplest) - and **BVM** (BoxLang Version Manager, for switching between versions side by side) - `curl -fsSL https://install-bvm.boxlang.io/ | bash` then `bvm install latest && bvm use latest`. Canonical source (also covers Windows/Homebrew variants this repo's own docs don't): https://boxlang.ortusbooks.com/getting-started/installation.
+- `.github/workflows/tests.yml` installs BoxLang dependencies, links this
+  checkout into `BOXLANG_HOME/modules`, runs the TestBox suite, and uploads
+  JUnit results.
+- `.github/workflows/pages.yml` builds the ten built-in themes in a matrix,
+  verifies each `site/` before publishing, and assembles the theme gallery.
+  The workflow detects whether `main` exists before splitting ownership of the
+  published root and `/next/` content between `main` and `development`.
+- Keep workflow changes aligned with the module's actual packaging and build
+  behavior; do not rely on a green CLI exit code alone for site builds.
 
-## Skills
+## Change Discipline
 
-- Relevant BoxLang development skills live under `.agents/skills` in the related template repo and should be used when tasks involve BIFs, components, interceptors, async tasks, logging, or runtime architecture.
-- Keep AGENTS.md focused on workspace-wide rules. Put task-specific workflows or deeper domain guidance into skills or scoped instruction files instead.
-
-## BoxLang Gotchas (learned the hard way)
-
-- **An arrow function's own `arguments` scope shadows the enclosing function's.** Inside `items.filter( n => n.url == arguments.blogNavUrl )`, `arguments` resolves to the *arrow function's own* scope (its declared param plus positional index/array, e.g. `{n, 2, 3}` for a `.filter()` callback) - not the enclosing function's arguments. Referencing an outer-function argument by name inside a closure throws `KeyNotFoundException`. Always capture it into a local variable *before* the closure: `var blogNavUrl = arguments.blogNavUrl` then use `blogNavUrl` inside the arrow function. `BlogDiscoverer.bx`'s own `includeDrafts` capture is the existing precedent for this pattern - grep for it before writing a new closure that touches `arguments`.
-- **`var` inside a top-level `.bxs` script's `for` loop throws `"Scope [local] is not available in this context"`.** `var` implies a function-local declaration, which doesn't exist at top-level script scope (only inside a function/closure). Drop `var` for loop variables in standalone `.bxs` test/debug scripts: `for ( p in someArray )`, not `for ( var p in someArray )`.
-- **Inside a single-quoted BoxLang string, a literal `'` is written as `''`** (doubled), the same idea as SQL string escaping.
-- **CORRECTION to an earlier entry in this file: `#...#` interpolation is NOT double-quote-only - it works identically in single-quoted strings too**, confirmed both by the BoxLang docs ("interpolation... means we can interpolate into *any* string" - quote style doesn't matter) and by real, already-shipped, tested code in this repo: `ProjectScaffolder.bx`'s `return '"#escaped#"'` and `GitBookMigrator.bx`'s `'Unrecognized hint style="#style#"...'` both rely on single-quoted `#var#` interpolation actually working. Don't write (or trust) a claim that single-quoted strings are `#`-safe - they aren't.
-- **A `#...#`-shaped pair inside ANY string literal (either quote style) is read as interpolation, even when you don't want it to be - this is a real, easy-to-miss landmine, not just a "wrap a bare `#` in `##`" edge case.** Concatenating pieces to build generated-code output like `'<bx:loop array="#' & value & '#">'` looks safe (each half only has *one* `#`) but isn't: the trailing `#` in the first half and the leading `#` in the second half are two different string literals, so neither is "paired" *within its own literal* - but a regex pattern string like `"\{#([\s\S]*?)#\}"` (building a **Java regex** meant to match a literal `#`) *is* one single string literal with two `#`s in it, and everything between them (`([\s\S]*?)`, not valid BoxLang) gets read as an interpolated expression - a compile error. Likewise a test string built to describe/contain literal hash-delimited syntax, e.g. `"drops a {# comment #} block"` or `"{# a comment #}"` as literal input text, has the exact same problem - `" comment "`/`" a comment "` between the hashes isn't a valid expression either. The safe fix that sidesteps the whole question of exactly when doubling (`##`) does or doesn't apply: build the literal `#` via `char( 35 )` and concatenate, never write two `#` characters in the same string literal unless you genuinely want BoxLang to evaluate what's between them. Caught three separate instances of this in one file (`JinjaLikeTranslator.bx`'s own tokenizer regex, its `#value#`-output-wrapping code, and multiple sibling spec files' expected-value assertions) only by systematically grepping every touched file for 2+ `#` characters per line before pushing - do the same before trusting any new code that builds `#`-delimited output/regex patterns as strings.
-- **`bx:if`/`bx:elseif` take their condition as an implicit bare expression, not a `condition="..."` attribute.** Write `<bx:if variables.x eq 'y'>`, never `<bx:if condition="#variables.x eq 'y'#">` - the latter form actually parses and runs fine in this BoxLang install (verified directly against the real runtime, including with function calls and compound `and`/`eq` expressions), so it's not a functional bug, but it's a CFML/Lucee-ism, not idiomatic BoxLang tag syntax. All 10 built-in themes' `.bxm` templates and `GoTemplateTranslator.bx`/`JinjaLikeTranslator.bx`'s generated output were fixed to the implicit form in one pass - grep for `bx:if condition=`/`bx:elseif condition=` before adding new template/generated-code content, to catch a regression. This is specific to `bx:if`/`bx:elseif`'s own condition - it does NOT extend to other tags' named attributes that happen to hold an expression too (`bx:loop`'s `array=`/`item=`, `bx:include`'s `template=`), which still need their attribute name written out.
-- **Not every `encodeForXxx()` BIF has the same availability guarantee.** `encodeForHTML` (and `htmlEditFormat`, `Dump`, `WriteOutput`, etc.) are BoxLang **core/language** built-ins - always available. `encodeForJavaScript` (and the rest of the ESAPI-specific set: `encodeForCSS`, `encodeForDN`, `encodeForLDAP`, `encodeForXML`, `encodeForXPath`) are provided *exclusively* by the `bx-esapi` **module**, with no core fallback (confirmed by checking which functions have a page under `boxlang-language/reference/built-in-functions/system/` on the BoxLang docs site vs. only under `boxlang-framework/modularity/esapi/...`). If bx-esapi isn't fully active at the exact call site, only the module-exclusive BIFs fail - the core-overlapping ones (like `encodeForHTML`) silently keep working, which makes the failure look inconsistent/mysterious rather than an obvious "module not loaded". Prefer core BIFs in code paths that must be bulletproof; if you need an ESAPI-only encoding, verify it against a real build in the target CI environment, not just the local sandbox (where the module install path may differ).
-- **This environment's `boxlang`/`box` CLIs and the real `bx-markdown`/`bx-yaml`/`bx-esapi`/`bx-image` modules are actually installed and working** (`/root/.boxlang/modules/`), and `bx-sites` itself is symlinked there straight to the repo checkout (`/root/.boxlang/modules/bx-sites -> /home/user/bx-docs`) - so editing a `.bx` file under `models/` takes effect immediately for a real `boxlang bxSites <verb>` run, no reinstall/relink step needed. This makes real end-to-end verification (not just ad-hoc `.bxs` scratch scripts against a class directly) the fastest way to check a `BuildPipeline.bx`/CLI-verb change: scaffold a throwaway project under the scratchpad dir and run the actual verb against it.
-- **Before assuming no shared helper exists for a project-wide filesystem convention, grep for the pattern first.** This codebase has no central path-resolution utility for its two hardcoded folder conventions (`docs/` source, `site/` build output) - every consuming class does its own inline `root & "/docs"` string concatenation (confirmed via `grep -rn '"/docs"' models/`, ~20 hits across `models/build/*.bx` and `models/cli/*.bx`). When introducing a new cross-cutting convention (e.g. this session's `docs/`-or-`src/` source-folder detection), follow the existing pattern of a small single-purpose class instantiated as `variables.xyz = new "models.x.Y@bxsites"()` in each consumer (see `ConfigLoader.bx`, `DocsLoader.bx`, `VersionsDiscoverer.bx`) rather than re-duplicating the same logic inline again.
-
-## CI/Build Landmines
-
-- **The CLI verb dispatcher's top-level `try/catch` (`ModuleConfig.bx`) swallows the real stack trace to a bare `Error: <message>`, and its returned exit code does not reliably propagate to the actual OS-level process exit status when invoked as `boxlang bxSites <verb>`.** This means `set -e`/`set -euo pipefail` in a calling shell script (or a bare `run:` step in `pages.yml`'s own matrix build job - one per theme, each independent) can fail to catch a genuinely crashed build - the workflow step reports **success** while a whole theme's build silently produced incomplete/stale (or, worse, completely empty) output. `pages.yml`'s own "Verify the build actually produced output" step exists specifically to catch this (an empty/missing `site/` after a "successful" build step is treated as a real failure, attributed to that one theme), but any *other* place `boxlang bxSites <verb>` gets shelled out to needs the same explicit check - never trust the bare exit code alone. Combined with the gh-pages deploy's own `keep_files: true` (which never deletes old files), a crashed build that slips past this check can leave broken content live indefinitely with a fully green CI run. **When a fix doesn't appear to take effect on the live site after a "successful" deploy, don't trust the green checkmark - pull the actual `get_job_logs` output for the relevant theme's "Build the site" step and grep it for `Error:`.**
-- **The TestBox suite mocks the real integrations** (`FakeImageVariantGenerator`, `FakeMarkdownRenderer`, and similar fakes for the blog builder) - a green `tests` CI job does **not** prove a real `boxlang bxSites build` succeeds. Only the `pages.yml` "Publish Docs" workflow (or a local `boxlang bxSites build` run with the real `bx-markdown`/`bx-yaml`/`bx-esapi`/`bx-image` modules installed, not the test fakes) exercises the true build path. Verify any change to `BuildPipeline.bx`, `BlogBuilder.bx`, `ModuleConfig.bx`'s CLI dispatch, or `vendorIcons.mjs`/`vendorAssets.mjs` against a real build before trusting it's fixed - a real BoxLang install is one `curl -fsSL https://install.boxlang.io | bash` away, and ForgeBox modules can be fetched directly from `https://downloads.ortussolutions.com/ortussolutions/boxlang-modules/<module>/<version>/<module>-<version>.zip` (get the exact URL from `https://www.forgebox.io/api/v1/entry/<module>`'s `latestVersion.downloadURL`) if `box install` itself is blocked by network/cert restrictions in a sandboxed environment.
-- **`vendorIcons.mjs`'s attribute-stripping regex must be scoped to the outer `<svg ...>` tag only, and must not anchor with `^`.** A global (`/g`) regex meant to strip `width`/`height`/`class` from just the root `<svg>` tag will also strip them from inner shape elements like a calendar/archive icon's own `<rect width="18" height="18" .../>`, where those attributes are real geometry, not presentational sizing - silently corrupting the icon into a broken/incomplete shape. Also, don't anchor the scoped match with `^<svg` - the preceding license-comment-stripping step leaves a leading newline before `<svg` in the source, so an anchored regex never matches at all; use an unanchored first-match `.replace()` instead (it only touches the first occurrence regardless, since no `/g` flag is set).
-- **A brand-new project-wide convention can silently collide with an existing hardcoded one - check both directions before implementing.** This session's `docs/`-or-`src/` alternate source-folder feature was almost designed as "`site/` can *also* be a source-folder name" per the user's first phrasing, which would have been genuinely destructive: `BuildPipeline.bx`'s `build()` does `directoryDelete( siteDir, true )` on `root & "/site"` before every rebuild, so a project whose *source* happened to live in `site/` would have its own content deleted the instant a build started. Caught before writing any code by tracing what `site/` already means elsewhere in the codebase, not by testing the feature after building it. When a new convention introduces a new "magic" folder/file name, always grep for every existing meaning of that same name first (`grep -rn '"/<name>"' models/`) before wiring it in as a second, different meaning.
-
-## Git/PR Workflow Notes
-
-- **A base branch can move forward again minutes after you resolve a merge conflict against it.** GitHub's `mergeable_state` on a PR is a live signal, not a one-time check - re-verify it after any push, not just once.
-- **If a human collaborator is also actively working the same PR branch, pushes can race.** A `git push` rejection (403 or non-fast-forward) right after another push to the same branch can mean someone else already resolved the identical conflict via the GitHub web UI. Before force-pushing over it, check whether their commit is a superseding/equivalent resolution (`git merge-base --is-ancestor <their-sha> origin/<base>`) and reset onto theirs instead of clobbering.
-- **Once a PR is merged, treat further related work as a fresh change**, not more commits stacked on the old (now-merged) branch: restart the branch from the current default branch tip. If a force-push would be required to reuse the same branch name and isn't available/appropriate, push the follow-up under a new branch name instead - no force needed, no risk of clobbering anything.
-- **GitHub auto-deletes a PR's head branch once it merges**, at least in this repo. After `git fetch origin development && git checkout -B <branch> origin/development` to restart the branch per the rule above, the next `git push -u origin <branch>` reports `* [new branch]` even though the same branch name was pushed under minutes earlier - this is expected (the remote ref was deleted server-side on merge, not a sign anything went wrong), not a conflict to investigate.
-- **This repo's local `origin` remote can silently revert to its pre-rename URL (`https://github.com/ortus-boxlang/bx-docs`) between conversation turns**, even though the actual live repository is `ortus-boxlang/bx-sites` (renamed mid-lifetime). `git push`/`git fetch` keep working transparently either way via GitHub's own repository-rename redirect, so this is harmless for plain git commands - but every GitHub API/MCP tool call (`create_pull_request`, `subscribe_pr_activity`, `pull_request_read`, etc.) must still use `owner: ortus-boxlang, repo: bx-sites` explicitly; those tools don't follow the same redirect the way `git` does.
-- **A "document this convention everywhere" task needs a sweep beyond the obvious source files.** When wiring a new project-wide convention into the codebase, a `grep` scoped to `models/**/*.bx` (or wherever the code lives) finds every code call site, but the matching documentation sweep needs its own separate, deliberately broader grep across: root-level docs (`readme.md`, `MODULE_SPEC.md`, `changelog.md`), every guide under `docs/`, *and* every locale's copy of each touched guide (`docs/i18n/{de,es,it,ja}/...`) - a locale copy is easy to forget entirely since `bxSites i18n:status` only checks page *presence* per locale, not per-page *content* parity, so a locale silently falling behind the English source on one specific addition still reports 100% coverage. When a user asks "did you update all the docs" after a docs pass, treat it as a real prompt to re-grep beyond the one file already touched, not a rhetorical check.
-- **A prior session's (or a background agent's) "100% locale parity"/"fully complete" claim is not proof any one page's *content* is actually current - re-verify by reading, not by trusting the earlier summary.** A prior full-parity pass on this repo declared `de`/`es`/`it`/`ja` fully synced, but three real staleness spots surfaced later anyway: Italian's `getting-started.md` Install section still showed old pre-fix per-dependency install commands (missing a whole dependency), Italian's `configuration.md` `## nav` section was missing an explanatory paragraph present in current English, and Japanese's `guides/search.md` turned out to be a much shorter partial translation missing entire sections (Algolia/Pagefind) outright. When asked to fix or verify something specific in the locale docs, actually diff/read the file against current English rather than trusting a prior "parity" claim - `i18n:status`-green and "fully complete" only ever meant every page *exists*, never that every page's *content* matches.
-- **Running several background agents in parallel against overlapping locale files, each independently pointed at the same reference commit/pattern, is safe without explicit coordination between them - their edits converge to identical content rather than conflicting**, since they're all deriving the same fix from the same source of truth. Committing checkpoints as each agent finishes (rather than waiting for every one) is fine; a later-finishing agent whose own `git diff` comes back empty (because an earlier agent's identical fix was already committed) is the expected outcome, not a sign of a race bug - it should still report what it verified, not silently assume its instructions were wrong.
-
-## Handling Ambiguous User Direction
-
-- **A terse bug report pointing at one instance often signals a repo-wide pattern, not a request to patch just that one spot.** The user's entire report was "there is also still mention of the bxSites.json when the default is bxSites.yml" - no file, no line, no locale named. It turned out to span `docs/configuration.md`'s entire per-key reference (~19 snippets), every other English guide, three blog posts, and all four locale mirrors. Before fixing only the literal example a short bug report seems to describe, `grep` broadly for the same pattern across the whole docs tree (and its locale mirrors) to gauge true scope, then fix all of it in one pass rather than waiting for the user to report each remaining instance one at a time.
-- **A plain-text user message sent after an `AskUserQuestion` reply supersedes that reply, even mid-task.** In one session, a second `AskUserQuestion` call's recorded answer ("dist/ (Recommended)") was immediately overridden by the user's very next real message proposing a different, better design (`src/` instead of redirecting build output to `dist/`) before any code was written against the stale answer. Always treat the most recent genuine user message as authoritative over an earlier tool-mediated answer, and be ready to discard an in-progress plan built on the older answer rather than mechanically implementing what a prior `AskUserQuestion` recorded.
-- **Flag a destructive design conflict to the user before writing code, rather than silently working around it or silently proceeding.** When a user's literal phrasing implies a design that would concretely destroy data (see the `site/`-as-source-folder collision above), stop and ask a follow-up `AskUserQuestion` rather than guessing at a safe interpretation or building it as asked - this repo's history shows the user's own follow-up correction is often a strictly better design (`src/`) than any workaround the assistant would have picked alone (`dist/`-style output redirection).
+- Prefer small, template-safe changes and preserve public APIs and generated
+  output conventions.
+- Update related metadata together when changing names, versions, slugs, or
+  build tokens: `ModuleConfig.bx`, `box.json`, `Build.bx`, `readme.md`, and
+  `changelog.md` as applicable.
+- Do not commit generated `build/`, `site/`, test-result, or temporary files.
+- Keep this file focused on repository-wide rules. Put task-specific workflows
+  in a scoped instruction file or skill instead.
