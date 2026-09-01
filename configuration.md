@@ -1014,8 +1014,9 @@ the version switcher, `sitemap.xml`/`robots.txt` exclusion).
 ## `variables`
 
 `{}` (the default) - an object of reusable values, any shape, referenced
-from any Markdown page as `{{ dotted.path }}`. See
-[Variables & Magic Functions](guides/variables-and-functions.md).
+from any Markdown page as `{{ dotted.path }}`. A page's own frontmatter is
+also reachable this way, with no entry needed here - see
+[Variables & Magic Functions](guides/variables-and-functions.md#page-variables).
 
 === "YAML"
     ```yaml title="bxsites.yaml"
@@ -1048,6 +1049,40 @@ A `docs/data/*.yaml`/`.yml`/`.json` folder (also no config key of its own)
 adds structured, nested/array-shaped data - reachable as `{{ data.<file>.<key> }}` -
 for anything `variables`' own flat shape doesn't fit well (a team roster,
 a pricing table). See [Data Files](guides/data-files.md).
+
+## `cloud`
+
+Where [`bxSites publish`](cli-reference.md#publish) ships the built site -
+`cloud.siteId` (the target site's UUID in
+[bxSites Cloud](guides/deployment.md#the-publish-command)) and
+`cloud.apiUrl` (that instance's base URL, e.g. `https://cloud.bxsites.app`,
+or a self-hosted URL). Both default to `""` - not configuring this block at
+all is fine for every other verb; `publish` is the only one that needs it,
+and fails with a clear error if either is missing.
+
+**No API token field lives here, ever** - `publish` reads it from the
+`BXSITES_CLOUD_TOKEN` environment variable (or an explicit `--token` flag),
+never from `bxsites.yaml`, so this file always stays safe to commit.
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    cloud:
+      siteId: "3f2b1c9a-....-....-............"
+      apiUrl: "https://cloud.bxsites.app"
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    {
+    	"cloud": {
+    		"siteId": "3f2b1c9a-....-....-............",
+    		"apiUrl": "https://cloud.bxsites.app"
+    	}
+    }
+    ```
+
+See [Deployment](guides/deployment.md#the-publish-command) for the full
+`publish` workflow.
 
 ## Versioning
 

@@ -15,7 +15,11 @@ dati** colmano questo divario: inserisci un file `docs/data/*.yaml`/`.yml`/
 `.json` nel tuo progetto, e l'intero suo contenuto - qualsiasi forma tu
 preferisca, un oggetto o un array - diventa raggiungibile come
 `data.<file>` da ogni pagina, con la stessa sintassi `{{ }}` che
-`variables`/`page` già usano.
+`variables`/`page` già usano. Ti servono dati *calcolati* invece che
+semplicemente analizzati da un file statico - uno sconto applicato al
+momento della lettura, un valore che non dovrebbe vivere duplicato in tre
+file diversi? Inserisci invece una **classe** `docs/data/*.bx` - vedi
+[Classi di dati](#classi-di-dati) più sotto.
 
 ## La convenzione
 
@@ -68,9 +72,104 @@ viene compilata in:
 ```
 
 Se più di un file condivide lo stesso nome base tra estensioni diverse
-(sia `products.yaml` sia `products.json` presenti), vince `.yaml`, poi
-`.yml`, poi `.json` - nella pratica scegli un solo formato per ogni nome
-base invece di affidarti a quest'ordine.
+(sia `products.yaml` sia `products.json` presenti), vince prima `.bx`
+(vedi [Classi di dati](#classi-di-dati)), poi `.yaml`, poi `.yml`, poi
+`.json` - nella pratica scegli un solo formato per ogni nome base invece
+di affidarti a quest'ordine.
+
+## Classi di dati
+
+Un file `.yaml`/`.json` è statico - analizzato una volta, usato esattamente
+così com'è scritto. Per dati che richiedono un calcolo (un prezzo scontato,
+un valore assemblato da più fonti, qualsiasi cosa con una logica reale
+dietro), inserisci invece una vera **classe** BoxLang - `docs/data/Pricing.bx`
+(PascalCase, la stessa convenzione dei file classe che questo modulo usa
+ovunque altrove) diventa `data.pricing` - la stessa forma di chiave
+`data.*` minuscola di ogni altro file, con solo la prima lettera del nome
+base della classe resa minuscola:
+
+```bx title="docs/data/Pricing.bx"
+class {
+	struct function getData() {
+		return { "free": { "price": 0 }, "pro": { "price": 29 } }
+	}
+
+	numeric function getDiscountedPrice( required string plan, required numeric pct ) {
+		var base = getData()[ arguments.plan ].price
+		return base - ( base * arguments.pct )
+	}
+}
+```
+
+**`getData()` è obbligatoria** - ogni classe di dati ne ha bisogno (anche
+una banale che restituisce `{}`), perché è ciò che viene chiamato
+automaticamente ogni volta che `data.pricing` viene usato allo stato puro,
+esattamente come una radice YAML/JSON già analizzata:
+
+```markdown title="docs/pricing.md"
+The Pro plan is **${{ data.pricing.pro.price }}/mo**.
+
+::: for plan, info in data.pricing
+- {{ plan }}: ${{ info.price }}
+:::
+```
+
+**Anche qualsiasi altro metodo pubblico è invocabile**, direttamente da
+`{{ }}`, con esattamente la stessa sintassi degli argomenti già usata da
+una chiamata a una [funzione magica](variables-and-functions.md#magic-functions)
+(letterali o riferimenti a variabili con percorso puntato, separati da
+virgole):
+
+```markdown title="docs/pricing.md"
+Discounted for early adopters: **${{ data.pricing.getDiscountedPrice("pro", 0.2) }}/mo**
+```
+
+viene compilata in:
+
+```html
+Discounted for early adopters: <strong>$23.2/mo</strong>
+```
+
+Questo funziona anche da `::: for`/`::: if`, la stessa grammatica
+`<dotted.path>` che queste direttive già risolvono:
+
+```markdown title="Example" linenums="1"
+::: if data.pricing.getDiscountedPrice("pro", 0.2)
+Discounts are active.
+:::
+```
+
+Una sovrascrittura di tema o una funzione magica, che hanno già a
+disposizione BoxLang per intero, ricevono l'istanza viva stessa collegata
+allo stato puro come `data.pricing` - invoca `getData()` o qualsiasi altro
+metodo direttamente lì, senza bisogno di alcuna magia di invocazione
+automatica (vedi [Usare i dati](#usare-i-dati) più sotto).
+
+**Solo i metodi pubblici sono raggiungibili in questo modo** - una
+`private function` nella stessa classe resta un vero dettaglio
+implementativo, irraggiungibile da `{{ }}`, proprio come un helper senza
+prefisso `$` in `functions.bxs` è irraggiungibile *direttamente* (anche
+se, come lì, resta comunque invocabile da un altro metodo dello stesso
+file).
+
+Questo non allenta il confine di fiducia [più sotto](#perché-file-di-dati-e-non-template-boxlang-nel-markdown) -
+un file `.bx` sotto `docs/data/` è codice che scrive il *proprietario del
+progetto*, lo stesso livello di fiducia che ha già `docs/functions.bxs`,
+mai qualcosa che il Markdown di un contributore estraneo ai soli docs
+possa raggiungere.
+
+**Una limitazione ristretta**, reale ma rara nella pratica: caricare una
+classe di dati richiede che il proprio percorso risolto sia esprimibile
+come nome di classe BoxLang (nessun trattino o spazio da nessuna parte al
+suo interno). Eseguire `bxSites` dall'interno del progetto stesso - il
+caso di gran lunga più comune - funziona sempre, perché nulla del percorso
+proprio del progetto (che può avere tutti i trattini che vuole, ad es.
+`my-project/`) deve mai essere espresso in quel modo. Diventa una
+restrizione reale solo con un `--projectRoot` esplicito che punta a un
+progetto fuori dalla directory corrente, il cui percorso proprio (o quello
+di una directory antenata) contiene un trattino o uno spazio - vedi
+[`BxSites.UnsupportedDataClassPath`](#errori) per l'errore esatto che
+viene generato al suo posto, invece di un fallimento criptico.
 
 ## Usare i dati
 
@@ -96,7 +195,11 @@ puro in `layout.bxm`/`page.bxm` allo stesso modo in cui lo sono già
 
 Questa è la sede naturale per i dati che appartengono a *ogni* pagina (un
 elenco di sponsor nel footer, un badge di navigazione a livello di sito)
-piuttosto che al contenuto di una pagina specifica.
+piuttosto che al contenuto di una pagina specifica. Se `sponsors` fosse
+una [classe di dati](#classi-di-dati) invece di un file `.yaml`/`.json`,
+qui `data.sponsors` è l'istanza viva stessa (vero BoxLang, senza la
+comodità di invocazione automatica esclusiva di `{{ }}`) - scorri invece
+in loop esplicitamente su `data.sponsors.getData()`.
 
 ### Da una funzione magica
 
@@ -254,9 +357,11 @@ magiche per qualsiasi cosa in più? Due motivi:
 
 I file di dati colmano il vero divario (contenuto strutturato, e
 loop/condizionali su di esso) senza nessuno dei due compromessi: il
-Markdown resta inerte-finché-non-sostituito-da-`{{ }}`, e `functions.bxs`
-rimane l'unica via di fuga esplicitamente fidata verso la vera logica
-BoxLang.
+Markdown resta inerte-finché-non-sostituito-da-`{{ }}`, e
+`functions.bxs`/una classe `docs/data/*.bx` restano le vie di fuga
+esplicitamente fidate verso la vera logica BoxLang - entrambe codice
+scritto dal proprietario del progetto, mai qualcosa che la PR di un
+contributore del solo Markdown possa aggiungere.
 
 ## Ambito
 
@@ -281,8 +386,22 @@ BoxLang.
 ## Errori
 
 - `BxSites.InvalidDataFile` - un file `docs/data/*.yaml`/`.yml`/`.json`
-  non è riuscito ad analizzarsi (un errore di sintassi YAML/JSON),
+  non è riuscito ad analizzarsi (un errore di sintassi YAML/JSON), oppure
+  una classe `docs/data/*.bx` non è riuscita a compilarsi/istanziarsi,
   nominando il file incriminato.
+- `BxSites.MissingDataMethod` - una classe `docs/data/*.bx` non ha alcun
+  metodo pubblico `getData()`.
+- `BxSites.UnknownDataMethod` - `{{ data.x.someMethod(...) }}` nomina un
+  metodo che non esiste (o non è pubblico) su quell'istanza di classe di
+  dati.
+- `BxSites.NotCallable` - `{{ data.x.someMethod(...) }}` dove `data.x` non
+  è affatto un'istanza di classe di dati (una chiave basata su
+  `.yaml`/`.json` non ha metodi da invocare).
+- `BxSites.UnsupportedDataClassPath` - una classe `docs/data/*.bx` non è
+  stata caricata perché il suo percorso risolto contiene un carattere non
+  valido in un nome di classe BoxLang (un trattino o uno spazio in un
+  nome di directory antenata) - vedi la nota apposita in
+  [Classi di dati](#classi-di-dati).
 - `BxSites.UnknownVariable` - un `{{ data.x.y }}` (o un percorso
   `::: for`/`::: if`) non si risolve rispetto a ciò che è effettivamente
   presente in `docs/data/`.

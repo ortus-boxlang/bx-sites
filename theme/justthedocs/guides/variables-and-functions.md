@@ -70,6 +70,36 @@ using it picks up the change on the next build. See
 [`variables`](../configuration.md#variables) in the configuration
 reference.
 
+## Page variables
+
+Every page's own frontmatter is available the same way, under a reserved
+`page` name - no `bxsites.yaml` `variables` entry needed:
+
+```markdown title="docs/guides/setup.md"
+---
+title: Setup
+product: BoxLang
+---
+
+# {{ page.title }}
+
+This guide covers installing {{ page.frontmatter.product }}.
+```
+
+`page.title`/`page.summary`/`page.description`/etc. - anything bx-sites
+itself already reads off frontmatter (see [Getting Started](../getting-started.md#add-pages)'s
+frontmatter reference) - are reachable directly; any other, project-defined
+frontmatter key (`product` above) is reachable under `page.frontmatter.<key>`,
+since only bx-sites' own known fields get promoted to a top-level `page.*`
+name of their own. A blog post's own frontmatter works identically (see
+[Writing a post](blog.md#writing-a-post)).
+
+`page` is a reserved name here, the same way it's already reserved for a
+magic function's own bare `page` reference (see [Reserved names](#reserved-names)
+below) - a `bxsites.yaml` `variables.page` entry, if a project somehow
+declared one, would be shadowed by the current page's own struct rather
+than winning.
+
 ## Magic functions
 
 Add a `docs/functions.bxs` file (or `src/functions.bxs`, if your project

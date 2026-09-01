@@ -14,6 +14,10 @@ tags: [ガイド, データ]
 `docs/data/*.yaml`/`.yml`/`.json` ファイルを置くだけで、その内容全体 - オブジェクト
 でも配列でも、好きな形で構いません - が、どのページからでも `data.<file>` として、
 `variables`/`page` がすでに使っているのと同じ `{{ }}` 構文で参照できるようになります。
+静的ファイルからパースするだけでなく、データを*計算*したい場合 - 読み取り時に
+適用する割引や、3つのファイルに重複させたくない値など - は、代わりに
+`docs/data/*.bx` **クラス** を置いてください - 詳しくは下記の
+[データクラス](#データクラス) を参照してください。
 
 ## 規約
 
@@ -64,9 +68,100 @@ The Pro plan is **${{ data.pricing.pro.price }}/mo** for up to
 ```
 
 同じベースネームを持つファイルが拡張子違いで複数存在する場合（`products.yaml` と
-`products.json` の両方がある場合）、`.yaml` が優先され、次に `.yml`、最後に
-`.json` の順になります - 実運用では、この優先順位に頼るのではなく、ベースネーム
-ごとに1つの形式を選ぶようにしてください。
+`products.json` の両方がある場合）、まず `.bx`（[データクラス](#データクラス)
+を参照）が優先され、次に `.yaml`、次に `.yml`、最後に `.json` の順になります -
+実運用では、この優先順位に頼るのではなく、ベースネームごとに1つの形式を選ぶ
+ようにしてください。
+
+## データクラス
+
+`.yaml`/`.json` ファイルは静的です - 一度パースされ、書かれたとおりに正確に
+使われます。計算が必要なデータ（割引後の価格、複数のソースから組み立てられる値、
+実際のロジックが背後にあるもの）の場合は、代わりに本物の BoxLang **クラス** を
+置いてください - `docs/data/Pricing.bx`（PascalCase、この他の場所でもこのモジュール
+が使っているのと同じクラスファイルの規約）は `data.pricing` になります -
+他のどのファイルとも同じ小文字の `data.*` キーの形で、クラスのベースネームの
+先頭の文字だけが小文字化されます:
+
+```bx title="docs/data/Pricing.bx"
+class {
+	struct function getData() {
+		return { "free": { "price": 0 }, "pro": { "price": 29 } }
+	}
+
+	numeric function getDiscountedPrice( required string plan, required numeric pct ) {
+		var base = getData()[ arguments.plan ].price
+		return base - ( base * arguments.pct )
+	}
+}
+```
+
+**`getData()` は必須です** - すべてのデータクラスには（たとえ `{}` を返すだけの
+些細なものであっても）これが必要です。`data.pricing` が裸のまま使われるたびに、
+パース済みの YAML/JSON のルートとまったく同じように、自動的に呼び出されるからです:
+
+```markdown title="docs/pricing.md"
+The Pro plan is **${{ data.pricing.pro.price }}/mo**.
+
+::: for plan, info in data.pricing
+- {{ plan }}: ${{ info.price }}
+:::
+```
+
+**他の公開メソッドも呼び出せます**。`{{ }}` から直接、
+[マジック関数](variables-and-functions.md#magic-functions) の呼び出しと
+まったく同じ引数構文（リテラル、またはカンマ区切りのドット区切りパスの
+変数参照）を使います:
+
+```markdown title="docs/pricing.md"
+Discounted for early adopters: **${{ data.pricing.getDiscountedPrice("pro", 0.2) }}/mo**
+```
+
+ビルドすると次のようになります:
+
+```html
+Discounted for early adopters: <strong>$23.2/mo</strong>
+```
+
+これは `::: for`/`::: if` からも機能します。これらのディレクティブがすでに
+解決している、まったく同じ `<dotted.path>` 文法です:
+
+```markdown title="Example" linenums="1"
+::: if data.pricing.getDiscountedPrice("pro", 0.2)
+Discounts are active.
+:::
+```
+
+すでに BoxLang をフルに使えるテーマオーバーライドやマジック関数では、
+`data.pricing` として裸のまま生きたインスタンス自体がバインドされます -
+自動呼び出しの仕組みは不要で、`getData()` や他のメソッドを直接そこで
+呼び出してください（詳しくは下記の [データを利用する](#データを利用する) を
+参照してください）。
+
+**この方法で到達できるのは公開メソッドのみです** - 同じクラス内の
+`private function` は本物の実装詳細のままであり、`functions.bxs` 内の
+`$` プレフィックスなしのヘルパーが *直接* は到達不能なのと同じように、
+`{{ }}` からは到達不能です（ただし、そちらと同様、同じファイル内の他の
+メソッドからは引き続き呼び出せます）。
+
+これは下記の「なぜ Markdown 内の BoxLang テンプレートではなく、データファイルなのか？」
+で説明する信頼境界を緩めるものではありません - `docs/data/` の下にある `.bx` ファイルは
+*プロジェクトオーナー* が書くコードであり、`docs/functions.bxs` がすでに持って
+いるのと同じ信頼レベルであって、ドキュメントのみの貢献者の Markdown が到達
+できるものでは決してありません。
+
+**1つの狭い制限事項** - 実際に存在しますが、実運用ではまれです:
+データクラスの読み込みには、解決されたパス自体が BoxLang のクラス名として
+表現可能である必要があります（内部のどこにもハイフンやスペースがないこと）。
+プロジェクト自身の内部から `bxSites` を実行する場合 - 圧倒的に多いケースです -
+は常に問題なく動作します。プロジェクト自身のパス（`my-project/` のように
+ハイフンをいくつ持っていても構いません）は、その形で表記される必要が
+決してないためです。これが実際の制約になるのは、カレントディレクトリの
+外にあるプロジェクトを指す明示的な `--projectRoot` を使い、そのプロジェクト
+自身のパス（または祖先ディレクトリのいずれか）にハイフンやスペースが
+含まれている場合だけです - 正確なエラー内容については
+[`BxSites.UnsupportedDataClassPath`](#エラー) を参照してください。分かりにくい
+失敗の代わりに、このエラーが送出されます。
 
 ## データを利用する
 
@@ -92,7 +187,11 @@ BoxLang だけです:
 
 これは、特定の1ページのコンテンツというより、*すべての* ページに属するデータ
 （フッターのスポンサー一覧、サイト全体のナビバッジなど）にとって自然な
-置き場所です。
+置き場所です。もし `sponsors` が `.yaml`/`.json` ファイルではなく
+[データクラス](#データクラス) だった場合、ここでの `data.sponsors` は
+生きたインスタンスそのものです（本物の BoxLang であり、`{{ }}` 専用の
+自動呼び出しの利便性はありません）- 代わりに明示的に `data.sponsors.getData()`
+をループしてください。
 
 ### マジック関数から
 
@@ -236,8 +335,11 @@ function $jsonAttr( required any value ) {
 
 データファイルは、どちらのトレードオフも払うことなく、実際のギャップ
 （構造化されたコンテンツと、それに対するループ/条件分岐）を埋めます:
-Markdown 自体は `{{ }}` で置換されるまで不活性なままであり、`functions.bxs`
-は本物の BoxLang ロジックへの、明示的に信頼された唯一の抜け道であり続けます。
+Markdown 自体は `{{ }}` で置換されるまで不活性なままであり、
+`functions.bxs`/`docs/data/*.bx` クラスは、本物の BoxLang ロジックへの、
+明示的に信頼された抜け道であり続けます - どちらもプロジェクトオーナーが
+書くコードであり、Markdown だけの貢献者自身の PR が追加できるものでは
+決してありません。
 
 ## スコープ
 
@@ -261,8 +363,21 @@ Markdown 自体は `{{ }}` で置換されるまで不活性なままであり�
 ## エラー
 
 - `BxSites.InvalidDataFile` - `docs/data/*.yaml`/`.yml`/`.json` ファイルの
-  パースに失敗した場合（YAML/JSON の構文エラー）。問題のファイル名が
+  パースに失敗した場合（YAML/JSON の構文エラー）、または `docs/data/*.bx`
+  クラスのコンパイル/インスタンス化に失敗した場合。問題のファイル名が
   示されます。
+- `BxSites.MissingDataMethod` - `docs/data/*.bx` クラスに公開の `getData()`
+  メソッドがない場合。
+- `BxSites.UnknownDataMethod` - `{{ data.x.someMethod(...) }}` が、その
+  データクラスのインスタンスに存在しない（または公開されていない）
+  メソッドを指定した場合。
+- `BxSites.NotCallable` - `{{ data.x.someMethod(...) }}` で、`data.x` が
+  そもそもデータクラスのインスタンスではない場合（`.yaml`/`.json` ベースの
+  キーには呼び出せるメソッドがありません）。
+- `BxSites.UnsupportedDataClassPath` - `docs/data/*.bx` クラスを読み込め
+  なかった場合。解決されたパスに BoxLang のクラス名として無効な文字
+  （祖先ディレクトリ名の中のハイフンやスペース）が含まれています -
+  詳しくは [データクラス](#データクラス) 内の該当する注記を参照してください。
 - `BxSites.UnknownVariable` - `{{ data.x.y }}`（または `::: for`/`::: if`
   のパス）が、実際の `docs/data/` の内容に対して解決できない場合。
 - `BxSites.InvalidForTarget` - `::: for` 自身のパスが、配列でも構造体でも

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Luis Majano avatar">
+	<defs>
+		<linearGradient id="lmajanoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#00FF78"/>
+			<stop offset="100%" stop-color="#00DBFF"/>
+		</linearGradient>
+	</defs>
+	<circle cx="100" cy="100" r="100" fill="url(#lmajanoGradient)"/>
+	<text x="100" y="100" text-anchor="middle" dominant-baseline="central"
+		font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+		font-size="76" font-weight="700" fill="#0B2B22">LM</text>
+</svg>

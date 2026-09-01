@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Search That Just Works">
+	<defs>
+		<linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#00FF78"/>
+			<stop offset="100%" stop-color="#00DBFF"/>
+		</linearGradient>
+	</defs>
+	<rect width="1200" height="630" fill="url(#g3)"/>
+	<circle cx="1080" cy="90" r="170" fill="#ffffff" opacity="0.10"/>
+	<circle cx="1150" cy="520" r="110" fill="#0B2B22" opacity="0.06"/>
+
+	<text x="80" y="120" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="24" font-weight="700" fill="#0B2B22" opacity="0.75" letter-spacing="2">BX SITES &#183; SEARCH</text>
+
+	<text x="76" y="260" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="72" font-weight="800" fill="#0B2B22">
+		<tspan x="76" dy="0">Search That</tspan>
+		<tspan x="76" dy="86">Just Works</tspan>
+	</text>
+
+	<g transform="translate(80,470)" stroke="#0B2B22" stroke-width="10" fill="none" opacity="0.85">
+		<circle cx="26" cy="26" r="20"/>
+		<line x1="41" y1="41" x2="64" y2="64"/>
+	</g>
+	<text x="150" y="500" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="24" font-weight="700" fill="#0B2B22">Press &#47; to search</text>
+
+	<text x="80" y="580" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="22" font-weight="600" fill="#0B2B22" opacity="0.8">Static. Fast. No server required.</text>
+</svg>

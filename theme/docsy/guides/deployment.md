@@ -12,7 +12,10 @@ files. [`bxSites deploy`](../cli-reference.md#deploy) ships it there
 directly, in one command: S3 (and any S3-compatible service - DigitalOcean
 Spaces, Cloudflare R2, Backblaze B2, MinIO), Azure Blob Storage, Google
 Cloud Storage, Firebase Hosting, FTP, SFTP, rsync-over-SSH, Netlify,
-Vercel, Cloudflare Pages, a local directory, or GitHub Pages.
+Vercel, Cloudflare Pages, a local directory, or GitHub Pages. Hosting on
+[bxSites Cloud](https://bxsites.io) itself instead?
+[`bxSites publish`](../cli-reference.md#publish) is the dedicated command
+for that - see [below](#the-publish-command).
 
 ## The `deploy` command
 
@@ -217,6 +220,49 @@ for the full, honest detail on this one's rough edges.
   "apiTokenEnvVar": "CLOUDFLARE_API_TOKEN"
 }
 ```
+
+## The `publish` command
+
+[bxSites Cloud](https://bxsites.io) is a hosting SaaS built specifically
+for bxSites sites. `bxSites publish` builds the site and ships it there
+directly, over bxSites Cloud's own publish API - distinct from `deploy`'s
+pluggable targets above (which all ship to infrastructure *you* own).
+
+```bash frame="terminal" title="Terminal"
+export BXSITES_CLOUD_TOKEN="cb_..."
+bxSites publish
+```
+
+Configure the destination in `bxsites.yaml`'s [`cloud`](../configuration.md#cloud)
+block - the target site's UUID and your bxSites Cloud instance's base URL:
+
+```yaml title="bxsites.yaml"
+cloud:
+  siteId: "3f2b1c9a-....-....-............"
+  apiUrl: "https://cloud.bxsites.app"
+```
+
+**The API token never goes in `bxsites.yaml`.** `publish` reads it from the
+`BXSITES_CLOUD_TOKEN` environment variable, or an explicit `--token=<token>`
+flag which wins when both are set:
+
+```bash frame="terminal" title="Terminal"
+bxSites publish --token=cb_...
+```
+
+On success, `publish` prints the site's live URL. It fails with a clear,
+specific error (not a raw exception or stack trace) for every case worth
+distinguishing:
+
+- **No `[cloud]` block, or an incomplete one** - add `cloud.siteId`/
+  `cloud.apiUrl` to `bxsites.yaml` as shown above.
+- **No token available** - set `BXSITES_CLOUD_TOKEN` or pass `--token`.
+- **401/403 (authentication failed)** - the token is missing, invalid, or
+  doesn't have access to this site.
+- **404 (site not found)** - double check `cloud.siteId` is correct.
+- **Anything else (400/413/500, or a network failure)** - the actual HTTP
+  status and any error body the server returned are included, for
+  debugging.
 
 ## The `package` command
 
