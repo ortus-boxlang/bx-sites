@@ -285,6 +285,44 @@ class extends="testbox.system.BaseSpec" {
 				expect( htmlWithoutCrumbs ).notToInclude( "breadcrumb-nav" );
 			} );
 
+			it( "marks a course's own nav entry active while viewing any of its lesson pages (page.course.indexUrl), not just its own literal urlPath, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var nav = [
+					{ title : "My Page", url : "index.html", order : 1, children : [] },
+					{ title : "Tutorial Course", url : "course/index.html", order : 2, children : [] }
+				];
+				var lessonPage = {
+					title       : "Installation",
+					contentHtml : "<p>Body</p>",
+					urlPath     : "course/02-installation/index.html",
+					course      : {
+						id          : "getting-started",
+						courseTitle : "Getting Started",
+						lessonIndex : 2,
+						lessonTotal : 20,
+						prevLesson  : { title : "", url : "" },
+						nextLesson  : { title : "", url : "" },
+						indexUrl    : "course/index.html"
+					}
+				};
+				var homePage = { title : "My Page", contentHtml : "<p>Body</p>", urlPath : "index.html" };
+				var courseLinkPattern = '<a[^>]*href="[^"]*course/index\.html"[^>]*>'
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+
+					var lessonHtml = renderer.renderPage( lessonPage, nav, { name : "My Site" }, themeDir );
+					var lessonMatch = lessonHtml.reMatchNoCase( courseLinkPattern )
+					expect( lessonMatch.len() ).toBe( 1, "theme [#themeName#] should render the course's own nav link" )
+					expect( lessonMatch[ 1 ] ).toInclude( "active" )
+
+					var homeHtml = renderer.renderPage( homePage, nav, { name : "My Site" }, themeDir );
+					var homeMatch = homeHtml.reMatchNoCase( courseLinkPattern )
+					expect( homeMatch.len() ).toBe( 1 )
+					expect( homeMatch[ 1 ] ).notToInclude( "active" )
+				}
+			} );
+
 			it( "renders breadcrumbs by default and skips them when [theme.options.breadcrumbs] is false, across every built-in theme", function() {
 				var root = newProjectRoot();
 				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];

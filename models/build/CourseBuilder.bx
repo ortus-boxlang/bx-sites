@@ -136,7 +136,7 @@ class {
 				lessonTotal : course.lessons.len(),
 				prevLesson  : index > 1 ? toLink( course.lessons[ index - 1 ] ) : { title : "", url : "" },
 				nextLesson  : index < course.lessons.len() ? toLink( course.lessons[ index + 1 ] ) : { title : "", url : "" },
-				indexUrl    : ""
+				indexUrl    : trim( course.indexUrl ?: "" )
 			}
 		}
 	}
@@ -172,6 +172,15 @@ class {
 				var replacement = isNull( course )
 					? '<div class="bxsites-course-index bxsites-course-index--unavailable">::: course id="' & encodeForHTML( courseId ) & '" - no such course, or its lessons are not all present in this build</div>'
 					: renderIndex( course, arguments.basePath )
+				if ( !isNull( course ) ) {
+					// The page carrying this course's own `::: course id="..." :::`
+					// stub *is* that course's index page - captured here, the one
+					// place that association is ever actually made, so
+					// assignCourseContext() below can hand every lesson page a
+					// real link back to it (`page.course.indexUrl`, otherwise left
+					// blank - see this class's own docblock on graceful degrade).
+					arguments.resolvedCourses[ courseId ].indexUrl = page.urlPath ?: ""
+				}
 				matcher.appendReplacement( buffer, quoteReplacement( replacement ) )
 			}
 			matcher.appendTail( buffer )

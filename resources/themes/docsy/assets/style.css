@@ -606,7 +606,7 @@ a:hover {
 }
 
 .docsy-nav-toggle {
-	display: none;
+	display: inline-block;
 	border: none;
 	background: transparent;
 	font-size: 1.5rem;
@@ -1159,12 +1159,7 @@ code:not( pre code ) {
 }
 
 @media ( max-width: 900px ) {
-	.docsy-nav-toggle {
-		display: inline-block;
-	}
-
 	.docsy-sidebar {
-		display: none;
 		position: fixed;
 		top: 64px;
 		left: 0;
@@ -1174,10 +1169,6 @@ code:not( pre code ) {
 		background: var( --docsy-bg );
 		overflow-y: auto;
 		z-index: 9;
-	}
-
-	.docsy-sidebar.docsy-sidebar--open {
-		display: block;
 	}
 }
 

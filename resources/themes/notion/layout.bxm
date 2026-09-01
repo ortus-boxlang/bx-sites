@@ -17,7 +17,7 @@
 	function renderNavList( required array nodes, boolean nested = false, boolean collapsed = false ) {
 		var html = "<ul class=""ntn-nav" & ( arguments.nested ? " ntn-nav--nested" : "" ) & """" & ( arguments.collapsed ? " hidden" : "" ) & ">"
 		for ( var node in arguments.nodes ) {
-			var isActive = len( node.url ) && node.url == variables.page.urlPath
+			var isActive = len( node.url ) && ( node.url == variables.page.urlPath || ( len( variables.page.course.id ) && node.url == variables.page.course.indexUrl ) )
 			var linkClass = "ntn-nav__link" & ( isActive ? " ntn-nav__link--active" : "" )
 			var labelHtml = ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title )
 			var linkOrSpan = len( node.url )
@@ -51,7 +51,7 @@
 	 * regardless of `navExpandAll`.
 	 */
 	boolean function navContainsActive( required struct node ) {
-		if ( len( arguments.node.url ) && arguments.node.url == variables.page.urlPath ) {
+		if ( len( arguments.node.url ) && ( arguments.node.url == variables.page.urlPath || ( len( variables.page.course.id ) && arguments.node.url == variables.page.course.indexUrl ) ) ) {
 			return true
 		}
 		for ( var child in arguments.node.children ) {
@@ -245,9 +245,9 @@
 </bx:output></bx:if><bx:output>
 	<script src="#variables.basePath#assets/vendor/alpine/cdn.min.js" defer></script>
 </head>
-<body class="ntn-body" x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } )">
+<body class="ntn-body" x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark', navOpen: localStorage.getItem( 'bxsites-nav-open' ) !== null ? localStorage.getItem( 'bxsites-nav-open' ) === 'true' : window.matchMedia( '(min-width: 900px)' ).matches }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } ); $watch( 'navOpen', v => localStorage.setItem( 'bxsites-nav-open', v ) )">
 	<header class="ntn-header">
-		<button class="ntn-nav-toggle" type="button" aria-controls="bxsites-sidebar" aria-label="#encodeForHTML( variables.strings.toggleNavigation )#" onclick="document.getElementById('bxsites-sidebar').classList.toggle('ntn-sidebar--open')">☰</button>
+		<button class="ntn-nav-toggle" type="button" aria-controls="bxsites-sidebar" @click="navOpen = !navOpen" :aria-expanded="navOpen.toString()" aria-label="#encodeForHTML( variables.strings.toggleNavigation )#">☰</button>
 		<a class="ntn-header__brand" href="#variables.basePath#">#renderBrandMark()#</a>
 		<div class="ntn-header__controls">
 </bx:output><bx:if variables.searchEnabled><bx:include template="#variables.themeDir#/search.bxm"></bx:if><bx:output>
@@ -265,7 +265,7 @@
 		</div>
 	</header>
 	<div class="ntn-layout">
-		<nav class="ntn-sidebar" id="bxsites-sidebar" aria-label="Navigation">
+		<nav class="ntn-sidebar" id="bxsites-sidebar" aria-label="Navigation" x-show="navOpen" x-cloak>
 			#renderNavList( variables.nav )#
 		</nav>
 		<main class="ntn-content">

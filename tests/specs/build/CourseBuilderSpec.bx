@@ -157,6 +157,17 @@ class extends="testbox.system.BaseSpec" {
 					expect( pages[ 1 ].course.lessonTotal ).toBe( 0 );
 					expect( pages[ 1 ].course.prevLesson.url ).toBe( "" );
 					expect( pages[ 1 ].course.nextLesson.url ).toBe( "" );
+					expect( pages[ 1 ].course.indexUrl ).toBe( "" );
+				} );
+
+				it( "carries a resolved course's own indexUrl (set by resolveIndexBlocks()) through onto every one of its lesson pages", function() {
+					var pages = [ { relativePath : "a.md" } ];
+					var course = threeLessonCourse();
+					course.c.indexUrl = "course/index.html";
+
+					variables.builder.assignCourseContext( pages, course );
+
+					expect( pages[ 1 ].course.indexUrl ).toBe( "course/index.html" );
 				} );
 
 			} );
@@ -208,6 +219,30 @@ class extends="testbox.system.BaseSpec" {
 					variables.builder.resolveIndexBlocks( pages, oneCourse(), "/my-docs/" );
 
 					expect( pages[ 1 ].contentHtml ).toInclude( 'href="/my-docs/a/index.html"' );
+				} );
+
+				it( "records the resolved course's own indexUrl as the urlPath of the page carrying its ::: course stub", function() {
+					var pages = [ {
+						urlPath     : "course/index.html",
+						contentHtml : '<div class="bxsites-course-index" data-bxsites-course-index data-bxsites-course-id="getting-started"></div>'
+					} ];
+					var resolvedCourses = oneCourse();
+
+					variables.builder.resolveIndexBlocks( pages, resolvedCourses, "/" );
+
+					expect( resolvedCourses[ "getting-started" ].indexUrl ).toBe( "course/index.html" );
+				} );
+
+				it( "never sets indexUrl for an unmatched course id", function() {
+					var pages = [ {
+						urlPath     : "course/index.html",
+						contentHtml : '<div class="bxsites-course-index" data-bxsites-course-index data-bxsites-course-id="nope"></div>'
+					} ];
+					var resolvedCourses = oneCourse();
+
+					variables.builder.resolveIndexBlocks( pages, resolvedCourses, "/" );
+
+					expect( resolvedCourses[ "getting-started" ].keyExists( "indexUrl" ) ).toBeFalse();
 				} );
 
 			} );

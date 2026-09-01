@@ -624,7 +624,7 @@ a:hover {
 }
 
 .md-nav-toggle {
-	display: none;
+	display: inline-block;
 	border: none;
 	background: transparent;
 	font-size: 1.5rem;
@@ -1177,12 +1177,7 @@ code:not( pre code ) {
 }
 
 @media ( max-width: 900px ) {
-	.md-nav-toggle {
-		display: inline-block;
-	}
-
 	.md-sidebar {
-		display: none;
 		position: fixed;
 		top: 64px;
 		left: 0;
@@ -1192,10 +1187,6 @@ code:not( pre code ) {
 		background: var( --md-bg );
 		overflow-y: auto;
 		z-index: 9;
-	}
-
-	.md-sidebar.md-sidebar--open {
-		display: block;
 	}
 }
 

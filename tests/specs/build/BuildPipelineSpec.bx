@@ -365,6 +365,28 @@ class extends="testbox.system.BaseSpec" {
 				expect( globalNav[ 1 ] ).notToInclude( "Alpha" )
 			} );
 
+			it( "falls back to a real [courseTitle -> lesson title] breadcrumb for a lesson page an explicit nav.json never lists - the common shape (course index linked, its lessons left out)", function() {
+				var root = newProject();
+				directoryCreate( root & "/docs/data", true, true );
+				fileWrite(
+					root & "/docs/data/courses.json",
+					'{"course-1":{"title":"Test Course","lessons":["course/zulu.md"]}}'
+				);
+				directoryCreate( root & "/docs/course", true, true );
+				fileWrite( root & "/docs/index.md", "Home" );
+				fileWrite( root & "/docs/course/index.md", '::: course id="course-1" :::' );
+				fileWrite( root & "/docs/course/zulu.md", "---" & char( 10 ) & "title: Zulu" & char( 10 ) & "---" & char( 10 ) & "Zulu content." );
+				fileWrite( root & "/docs/nav.json", '["index.md","course/index.md"]' );
+
+				pipeline.build( root );
+
+				var zuluHtml = fileRead( root & "/site/course/zulu/index.html" );
+				expect( zuluHtml ).toInclude( "breadcrumb-nav" );
+				expect( zuluHtml ).toInclude( 'href="/course/index.html"' );
+				expect( zuluHtml ).toInclude( ">Test Course<" );
+				expect( zuluHtml ).toInclude( ">Zulu<" );
+			} );
+
 			it( "builds end to end with the material and tailwind themes too", function() {
 				for ( var themeName in [ "material", "tailwind" ] ) {
 					var root = newProject( themeName );

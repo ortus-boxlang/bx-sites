@@ -1101,14 +1101,31 @@ class {
 	/**
 	 * Adds a `breadcrumbs` key (root -> ... -> the page itself, from
 	 * NavBuilder.breadcrumbs()) to every page. Empty for a hidden page - it
-	 * isn't in the nav to begin with.
+	 * isn't in the nav to begin with, which is exactly what a course lesson
+	 * page normally is (CourseBuilder.bx's own docblock - a course is a
+	 * flat, manifest-driven sequence, deliberately not a nav.json subtree).
+	 * A lesson page falls back to a real two-level trail of its own -
+	 * `[courseTitle -> its own title]` - built from `page.course` (already
+	 * assigned by CourseBuilder.assignCourseContext(), which always runs
+	 * before this), rather than showing no breadcrumb at all. Only applies
+	 * when nav.json genuinely has nothing to say (fewer than two crumbs)
+	 * and `page.course.indexUrl` actually resolved to something linkable -
+	 * a project that explicitly lists its lessons in nav.json keeps
+	 * whatever real trail that produces, untouched.
 	 *
 	 * @pages Array of page structs
 	 * @nav The site's nav tree, from NavBuilder.build()
 	 */
 	private void function assignBreadcrumbs( required array pages, required array nav ) {
 		for ( var page in arguments.pages ) {
-			page.breadcrumbs = variables.navBuilder.breadcrumbs( arguments.nav, page.urlPath )
+			var crumbs = variables.navBuilder.breadcrumbs( arguments.nav, page.urlPath )
+			if ( crumbs.len() < 2 && len( page.course.id ?: "" ) && len( page.course.indexUrl ?: "" ) ) {
+				crumbs = [
+					{ title : page.course.courseTitle, url : page.course.indexUrl },
+					{ title : page.title, url : page.urlPath }
+				]
+			}
+			page.breadcrumbs = crumbs
 		}
 	}
 
