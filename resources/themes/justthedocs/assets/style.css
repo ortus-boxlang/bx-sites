@@ -634,7 +634,7 @@ a:hover {
 }
 
 .jtd-nav-toggle {
-	display: none;
+	display: inline-block;
 	border: none;
 	background: transparent;
 	font-size: 1.5rem;
@@ -1180,12 +1180,7 @@ code:not( pre code ) {
 }
 
 @media ( max-width: 900px ) {
-	.jtd-nav-toggle {
-		display: inline-block;
-	}
-
 	.jtd-sidebar {
-		display: none;
 		position: fixed;
 		top: 60px;
 		left: 0;
@@ -1195,10 +1190,6 @@ code:not( pre code ) {
 		background: var( --md-sidebar-bg );
 		overflow-y: auto;
 		z-index: 9;
-	}
-
-	.jtd-sidebar.jtd-sidebar--open {
-		display: block;
 	}
 }
 

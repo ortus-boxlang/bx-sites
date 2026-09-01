@@ -605,7 +605,7 @@ a:hover {
 /* Lives inside .dsrs-header too - same reasoning as .theme-toggle/.repo-link
    above, no [data-theme="dark"] variant needed. */
 .dsrs-nav-toggle {
-	display: none;
+	display: inline-block;
 	border: none;
 	background: transparent;
 	font-size: 1.5rem;
@@ -1154,12 +1154,7 @@ code:not( pre code ) {
 }
 
 @media ( max-width: 900px ) {
-	.dsrs-nav-toggle {
-		display: inline-block;
-	}
-
 	.dsrs-sidebar {
-		display: none;
 		position: fixed;
 		top: 76px;
 		left: 0;
@@ -1169,10 +1164,6 @@ code:not( pre code ) {
 		background: var( --md-bg );
 		overflow-y: auto;
 		z-index: 9;
-	}
-
-	.dsrs-sidebar.dsrs-sidebar--open {
-		display: block;
 	}
 }
 

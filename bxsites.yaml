@@ -3,7 +3,7 @@ description: "Enterprise Static Site Generator powered by BoxLang"
 baseURL: "https://bxsites.io/"
 theme:
   name: bootstrap
-  options: { navCollapsible: true, tocPosition: sticky }
+  options: { navCollapsible: true, navExpandAll: false, tocPosition: sticky }
   logo: "assets/boxlang-icon-full.svg"
   favicon: "assets/favicon.png"
 search: true

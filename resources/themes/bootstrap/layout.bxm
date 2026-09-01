@@ -20,7 +20,7 @@
 	function renderNavList( required array nodes, boolean nested = false, boolean collapsed = false ) {
 		var html = "<ul class=""nav flex-column" & ( arguments.nested ? " nav--nested" : "" ) & """" & ( arguments.collapsed ? " hidden" : "" ) & ">"
 		for ( var node in arguments.nodes ) {
-			var isActive = len( node.url ) && node.url == variables.page.urlPath
+			var isActive = len( node.url ) && ( node.url == variables.page.urlPath || ( len( variables.page.course.id ) && node.url == variables.page.course.indexUrl ) )
 			var linkClass = "nav-link" & ( isActive ? " active" : "" )
 			var labelHtml = ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title )
 			var linkOrSpan = len( node.url )
@@ -54,7 +54,7 @@
 	 * regardless of `navExpandAll`.
 	 */
 	boolean function navContainsActive( required struct node ) {
-		if ( len( arguments.node.url ) && arguments.node.url == variables.page.urlPath ) {
+		if ( len( arguments.node.url ) && ( arguments.node.url == variables.page.urlPath || ( len( variables.page.course.id ) && arguments.node.url == variables.page.course.indexUrl ) ) ) {
 			return true
 		}
 		for ( var child in arguments.node.children ) {
@@ -249,7 +249,7 @@
 </bx:output></bx:if><bx:output>
 	<script src="#variables.basePath#assets/vendor/alpine/cdn.min.js" defer></script>
 </head>
-<body x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark', navOpen: window.matchMedia( '(min-width: 992px)' ).matches }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } )">
+<body x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark', navOpen: localStorage.getItem( 'bxsites-nav-open' ) !== null ? localStorage.getItem( 'bxsites-nav-open' ) === 'true' : window.matchMedia( '(min-width: 992px)' ).matches }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } ); $watch( 'navOpen', v => localStorage.setItem( 'bxsites-nav-open', v ) )">
 	<nav class="navbar navbar-expand-lg brand-navbar">
 		<div class="container-fluid navbar-row">
 			<button class="navbar-toggler" type="button" @click="navOpen = !navOpen" :aria-expanded="navOpen.toString()" aria-controls="bxsites-sidebar" aria-label="#encodeForHTML( variables.strings.toggleNavigation )#">

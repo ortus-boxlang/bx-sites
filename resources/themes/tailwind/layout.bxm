@@ -17,7 +17,7 @@
 	function renderNavList( required array nodes, boolean nested = false, boolean collapsed = false ) {
 		var html = "<ul class=""space-y-1" & ( arguments.nested ? " ms-4 mt-1" : "" ) & """" & ( arguments.collapsed ? " hidden" : "" ) & ">"
 		for ( var node in arguments.nodes ) {
-			var isActive = len( node.url ) && node.url == variables.page.urlPath
+			var isActive = len( node.url ) && ( node.url == variables.page.urlPath || ( len( variables.page.course.id ) && node.url == variables.page.course.indexUrl ) )
 			var linkClass = "block rounded px-3 py-1.5 text-sm" & ( isActive ? " nav-link--active bg-cyan-50 font-semibold text-cyan-700" : " text-slate-700 hover:bg-cyan-50" )
 			var labelHtml = ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title )
 			var linkOrSpan = len( node.url )
@@ -51,7 +51,7 @@
 	 * regardless of `navExpandAll`.
 	 */
 	boolean function navContainsActive( required struct node ) {
-		if ( len( arguments.node.url ) && arguments.node.url == variables.page.urlPath ) {
+		if ( len( arguments.node.url ) && ( arguments.node.url == variables.page.urlPath || ( len( variables.page.course.id ) && arguments.node.url == variables.page.course.indexUrl ) ) ) {
 			return true
 		}
 		for ( var child in arguments.node.children ) {
@@ -246,9 +246,9 @@
 </bx:output></bx:if><bx:output>
 	<script src="#variables.basePath#assets/vendor/alpine/cdn.min.js" defer></script>
 </head>
-<body class="min-h-screen bg-slate-50 font-[Poppins,sans-serif] text-slate-900" x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } )">
+<body class="min-h-screen bg-slate-50 font-[Poppins,sans-serif] text-slate-900" x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark', navOpen: localStorage.getItem( 'bxsites-nav-open' ) !== null ? localStorage.getItem( 'bxsites-nav-open' ) === 'true' : window.matchMedia( '(min-width: 768px)' ).matches }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } ); $watch( 'navOpen', v => localStorage.setItem( 'bxsites-nav-open', v ) )">
 	<header class="flex h-16 items-center gap-3 px-6 bg-gradient-to-r from-[##00FF78] to-[##00DBFF] shadow navbar-row">
-		<button type="button" class="text-xl md:hidden" aria-controls="bxsites-sidebar" aria-label="#encodeForHTML( variables.strings.toggleNavigation )#" onclick="document.getElementById('bxsites-sidebar').classList.toggle('hidden')">☰</button>
+		<button type="button" class="text-xl" aria-controls="bxsites-sidebar" @click="navOpen = !navOpen" :aria-expanded="navOpen.toString()" aria-label="#encodeForHTML( variables.strings.toggleNavigation )#">☰</button>
 		<a class="text-lg font-bold text-slate-900 brand-mark" href="#variables.basePath#">#renderBrandMark()#</a>
 		<div class="navbar-controls">
 </bx:output><bx:if variables.searchEnabled><bx:include template="#variables.themeDir#/search.bxm"></bx:if><bx:output>
@@ -266,7 +266,7 @@
 		</div>
 	</header>
 	<div class="mx-auto flex max-w-6xl">
-		<nav id="bxsites-sidebar" class="hidden w-64 shrink-0 p-4 md:block" aria-label="Navigation">
+		<nav id="bxsites-sidebar" class="w-64 shrink-0 p-4" aria-label="Navigation" x-show="navOpen" x-cloak>
 			#renderNavList( variables.nav )#
 		</nav>
 		<main class="min-w-0 flex-1 p-8">

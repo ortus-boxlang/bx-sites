@@ -635,7 +635,7 @@ a:hover {
 }
 
 .slate-nav-toggle {
-	display: none;
+	display: inline-block;
 	border: none;
 	background: transparent;
 	font-size: 1.5rem;
@@ -1203,12 +1203,7 @@ code:not( pre code ) {
 }
 
 @media ( max-width: 900px ) {
-	.slate-nav-toggle {
-		display: inline-block;
-	}
-
 	.slate-sidebar {
-		display: none;
 		position: fixed;
 		top: 56px;
 		left: 0;
@@ -1221,10 +1216,6 @@ code:not( pre code ) {
 		background: #0e1f1b;
 		overflow-y: auto;
 		z-index: 9;
-	}
-
-	.slate-sidebar.slate-sidebar--open {
-		display: block;
 	}
 }
 
