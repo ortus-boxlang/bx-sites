@@ -1,47 +1,47 @@
 name: "BxSites"
-description: "Enterprise Static Site Generator powered by BoxLang"
+description: "A modern, BoxLang-powered static site generator that turns Markdown into fast, themed, searchable websites for documentation, blogs, marketing sites, and knowledge bases."
 baseURL: "https://bxsites.io/"
 theme:
-  name: bootstrap
-  options: { navCollapsible: true, navExpandAll: false, tocPosition: sticky }
-  logo: "assets/boxlang-icon-full.svg"
-  favicon: "assets/favicon.png"
+    name: bootstrap
+    options: { navCollapsible: true, navExpandAll: false, tocPosition: sticky }
+    logo: "assets/boxlang-icon-full.svg"
+    favicon: "assets/favicon.png"
 search: true
 nav: []
 markdown:
-  enableFootnotes: true
-  enableDefinitionLists: true
+    enableFootnotes: true
+    enableDefinitionLists: true
 repo:
-  url: "https://github.com/ortus-boxlang/bx-sites"
-  editUri: "edit/main/docs/"
+    url: "https://github.com/ortus-boxlang/bx-sites"
+    editUri: "edit/main/docs/"
 social:
-  - url: "https://github.com/ortus-boxlang/BoxLang"
-    icon: github
-    label: "BoxLang on GitHub"
-  - url: "https://x.com/TryBoxLang"
-    icon: twitter
-    label: "X (Twitter)"
-  - url: "https://www.youtube.com/@OrtusSolutions"
-    icon: youtube
-    label: "YouTube"
-  - url: "https://www.linkedin.com/company/tryboxlang"
-    icon: linkedin
-    label: "LinkedIn"
-  - url: "https://www.facebook.com/tryboxlang/"
-    icon: facebook
-    label: "Facebook"
-  - url: "https://bsky.app/profile/boxlang.bsky.social"
-    icon: bluesky
-    label: "Bluesky"
-  - url: "https://www.threads.com/@ortussolutions"
-    icon: threads
-    label: "Threads"
-  - url: "https://www.ortussolutions.com/community/slack"
-    icon: slack
-    label: "Slack Community"
-  - url: "https://www.patreon.com/ortussolutions"
-    icon: patreon
-    label: "Patreon"
+    - url: "https://github.com/ortus-boxlang/BoxLang"
+      icon: github
+      label: "BoxLang on GitHub"
+    - url: "https://x.com/TryBoxLang"
+      icon: twitter
+      label: "X (Twitter)"
+    - url: "https://www.youtube.com/@OrtusSolutions"
+      icon: youtube
+      label: "YouTube"
+    - url: "https://www.linkedin.com/company/tryboxlang"
+      icon: linkedin
+      label: "LinkedIn"
+    - url: "https://www.facebook.com/tryboxlang/"
+      icon: facebook
+      label: "Facebook"
+    - url: "https://bsky.app/profile/boxlang.bsky.social"
+      icon: bluesky
+      label: "Bluesky"
+    - url: "https://www.threads.com/@ortussolutions"
+      icon: threads
+      label: "Threads"
+    - url: "https://www.ortussolutions.com/community/slack"
+      icon: slack
+      label: "Slack Community"
+    - url: "https://www.patreon.com/ortussolutions"
+      icon: patreon
+      label: "Patreon"
 footer: true
 lastUpdated: true
 mermaid: true
@@ -51,13 +51,13 @@ pageActions: true
 ogImage: "assets/og-image.png"
 generateOgImages: true
 extraJs:
-  - "assets/theme-switcher.js"
+    - "assets/theme-switcher.js"
 i18n:
-  defaultLocale: { code: en, label: English }
-  locales:
-    - { code: es, label: Español }
-    - { code: it, label: Italiano }
-    - { code: de, label: Deutsch }
-    - { code: ja, label: 日本語 }
+    defaultLocale: { code: en, label: English }
+    locales:
+        - { code: es, label: Español }
+        - { code: it, label: Italiano }
+        - { code: de, label: Deutsch }
+        - { code: ja, label: 日本語 }
 versions:
-  default: ""
+    default: ""

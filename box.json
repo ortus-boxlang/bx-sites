@@ -1,60 +1,60 @@
 {
-    "name":"BX Sites",
-    "version":"1.0.0",
-    "location":"https://downloads.ortussolutions.com/ortussolutions/boxlang-modules/bx-sites/@build.version@/bx-sites-@build.version@.zip",
-    "author":"Ortus Solutions",
-    "homepage":"https://github.com/ortus-boxlang/bx-sites",
-    "documentation":"https://github.com/ortus-boxlang/bx-sites",
-    "repository":{
-        "type":"git",
-        "URL":"https://github.com/ortus-boxlang/bx-sites"
-    },
-    "bugs":"https://ortussolutions.atlassian.net/browse/BLMODULES",
-    "slug":"bx-sites",
-    "shortDescription":"Static documentation site generator for BoxLang, built on bx-markdown",
-    "type":"boxlang-modules",
-    "keywords":[
-        "boxlang",
-        "docs",
-        "documentation",
-        "static-site",
-        "markdown"
-    ],
-    "boxlang":{
-        "minimumVersion":"1.6.0",
-        "moduleName":"bxsites",
-        "executable":"bxSites"
-    },
-    "private":false,
-    "license":[
-        {
-            "type":"Apache-2.0",
-            "URL":"https://www.apache.org/licenses/LICENSE-2.0"
-        }
-    ],
-    "dependencies":{
-        "bx-markdown":"*",
-        "bx-esapi":"*",
-        "bx-yaml":"*",
-        "bx-image":"*",
-        "bx-ftp":"*"
-    },
-    "devDependencies":{
-        "commandbox-boxlang":"*",
-        "commandbox-cfformat":"*",
-        "commandbox-docbox":"*",
-        "testbox":"be"
-    },
-    "ignore":[
-        "**/.*",
-        "/build/**",
-        "Build.bx",
-        "/tests/**",
-        "/examples/**",
-        "/apidocs/**",
-        "/site/**"
-    ],
-    "installPaths":{
-        "testbox":"testbox/"
-    }
+	"name": "BX Sites",
+	"version": "1.0.0",
+	"location": "https://downloads.ortussolutions.com/ortussolutions/boxlang-modules/bx-sites/@build.version@/bx-sites-@build.version@.zip",
+	"author": "Ortus Solutions",
+	"homepage": "https://github.com/ortus-boxlang/bx-sites",
+	"documentation": "https://github.com/ortus-boxlang/bx-sites",
+	"repository": {
+		"type": "git",
+		"URL": "https://github.com/ortus-boxlang/bx-sites"
+	},
+	"bugs": "https://ortussolutions.atlassian.net/browse/BLMODULES",
+	"slug": "bx-sites",
+	"shortDescription": "A modern, BoxLang-powered static site generator that turns Markdown into fast, themed, searchable websites for documentation, blogs, marketing sites, and knowledge bases.",
+	"type": "boxlang-modules",
+	"keywords": [
+		"boxlang",
+		"docs",
+		"documentation",
+		"static-site",
+		"markdown"
+	],
+	"boxlang": {
+		"minimumVersion": "1.6.0",
+		"moduleName": "bxsites",
+		"executable": "bxSites"
+	},
+	"private": false,
+	"license": [
+		{
+			"type": "Apache-2.0",
+			"URL": "https://www.apache.org/licenses/LICENSE-2.0"
+		}
+	],
+	"dependencies": {
+		"bx-markdown": "*",
+		"bx-esapi": "*",
+		"bx-yaml": "*",
+		"bx-image": "*",
+		"bx-ftp": "*"
+	},
+	"devDependencies": {
+		"commandbox-boxlang": "*",
+		"commandbox-cfformat": "*",
+		"commandbox-docbox": "*",
+		"testbox": "be"
+	},
+	"ignore": [
+		"**/.*",
+		"/build/**",
+		"Build.bx",
+		"/tests/**",
+		"/examples/**",
+		"/apidocs/**",
+		"/site/**"
+	],
+	"installPaths": {
+		"testbox": "testbox/"
+	}
 }
