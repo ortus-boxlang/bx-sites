@@ -285,6 +285,30 @@ class extends="testbox.system.BaseSpec" {
 				expect( htmlWithoutCrumbs ).notToInclude( "breadcrumb-nav" );
 			} );
 
+			it( "renders breadcrumbs by default and skips them when [theme.options.breadcrumbs] is false, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var page = {
+					title       : "Setup",
+					contentHtml : "<p>Body</p>",
+					breadcrumbs : [
+						{ title : "Guides", url : "guides/index.html" },
+						{ title : "Setup", url : "guides/setup/index.html" }
+					]
+				};
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+
+					var defaultHtml = renderer.renderPage( page, nav, { name : "My Site" }, themeDir );
+					expect( defaultHtml ).toInclude( "breadcrumb" );
+
+					var disabledConfig = { name : "My Site", theme : { options : { breadcrumbs : false } } };
+					var disabledHtml = renderer.renderPage( page, nav, disabledConfig, themeDir );
+					expect( disabledHtml ).notToInclude( ">Guides<" );
+				}
+			} );
+
 			it( "renders a repo link, social links and a footer when configured, across every built-in theme", function() {
 				var root = newProjectRoot();
 				var page = { title : "My Page", contentHtml : "<p>Body</p>" };

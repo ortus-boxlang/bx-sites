@@ -250,11 +250,11 @@ class {
 			)
 		}
 
-		for ( var navFlag in [ "navCollapsible", "navExpandAll" ] ) {
-			if ( theme.options.keyExists( navFlag ) && !isBoolean( theme.options[ navFlag ] ) ) {
+		for ( var boolOption in [ "navCollapsible", "navExpandAll", "breadcrumbs" ] ) {
+			if ( theme.options.keyExists( boolOption ) && !isBoolean( theme.options[ boolOption ] ) ) {
 				throw(
 					type    = "BxSites.InvalidConfig",
-					message = "#variables.configFileName# [theme.options.#navFlag#], when present, must be a boolean"
+					message = "#variables.configFileName# [theme.options.#boolOption#], when present, must be a boolean"
 				)
 			}
 		}

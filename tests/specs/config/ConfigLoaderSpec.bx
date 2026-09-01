@@ -383,6 +383,21 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
+			it( "accepts boolean [theme.options.breadcrumbs], defaulting to unset (themes treat absent as true)", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).theme.options.keyExists( "breadcrumbs" ) ).toBeFalse();
+
+				var offDir = newProjectDir( '{"name":"My Docs","theme":{"options":{"breadcrumbs":false}}}' );
+				expect( loader.load( offDir ).theme.options.breadcrumbs ).toBeFalse();
+			} );
+
+			it( "throws BxSites.InvalidConfig when [theme.options.breadcrumbs] isn't a boolean", function() {
+				var dir = newProjectDir( '{"name":"My Docs","theme":{"options":{"breadcrumbs":["not","a","boolean"]}}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
 			it( "accepts [theme.options.tocPosition] of top or sticky, defaulting to top when absent", function() {
 				var dir = newProjectDir( '{"name":"My Docs"}' );
 				expect( loader.load( dir ).theme.options.tocPosition ?: "top" ).toBe( "top" );
