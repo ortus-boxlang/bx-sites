@@ -305,6 +305,21 @@ build - the `robots` key above is ignored entirely once this file exists.
         ```json
         { "theme": { "options": { "pageActionsPosition": "bottom" } } }
         ```
+  - `theme.options.breadcrumbs` - `true` (the default) renders the
+    "Guides > Setup" trail above a page's own title, whenever that page is
+    nested more than one level deep (a page at the top of `docs/` never
+    has one - there's nothing to trail from). `false` turns breadcrumbs
+    off site-wide, across every built-in theme.
+
+    === "YAML"
+        ```yaml
+        theme: { options: { breadcrumbs: false } }
+        ```
+
+    === "JSON"
+        ```json
+        { "theme": { "options": { "breadcrumbs": false } } }
+        ```
 
 ## `search`
 
