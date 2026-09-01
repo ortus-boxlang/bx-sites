@@ -139,7 +139,7 @@
 <bx:output>			<article class="vp-card">
 </bx:output><bx:if variables.pageActionsEnabled and variables.pageActionsPosition == 'top'><bx:output>#renderPageActions()#</bx:output></bx:if><bx:if variables.page.isFallbackContent><bx:output>
 				<p class="fallback-notice">#bxsitesIcon( 'globe' )# #encodeForHTML( variables.stringsResolver.format( variables.strings.notTranslatedNotice, { "locale" : defaultLocaleLabel() } ) )#</p>
-</bx:output></bx:if><bx:if variables.page.breadcrumbs.len() gt 1><bx:output>#renderBreadcrumbs( variables.page.breadcrumbs )#</bx:output></bx:if><bx:output>
+</bx:output></bx:if><bx:if variables.breadcrumbsEnabled and variables.page.breadcrumbs.len() gt 1><bx:output>#renderBreadcrumbs( variables.page.breadcrumbs )#</bx:output></bx:if><bx:output>
 				<h1 class="vp-title" id="page-title"><a href="##page-title" id="page-title" class="anchor"></a></bx:output><bx:if len( variables.page.iconHtml )><bx:output><span class="page-icon">#variables.page.iconHtml#</span> </bx:output></bx:if><bx:output>#encodeForHTML( variables.page.title )#</h1>
 </bx:output><bx:if len( variables.page.summary )><bx:output>				<p class="page-summary">#encodeForHTML( variables.page.summary )#</p>
 </bx:output></bx:if><bx:if variables.page.tags.len() gt 0><bx:output>#renderTags( variables.page.tags )#</bx:output></bx:if><bx:if ( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'top'><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:output></bx:if><bx:output>
