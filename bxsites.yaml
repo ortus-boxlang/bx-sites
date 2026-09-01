@@ -60,4 +60,4 @@ i18n:
     - { code: de, label: Deutsch }
     - { code: ja, label: 日本語 }
 versions:
-  default: "1.0.x"
+  default: ""
