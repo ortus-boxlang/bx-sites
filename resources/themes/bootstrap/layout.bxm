@@ -248,10 +248,10 @@
 </bx:output></bx:if><bx:output>
 	<script src="#variables.basePath#assets/vendor/alpine/cdn.min.js" defer></script>
 </head>
-<body x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } )">
+<body x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark', navOpen: window.matchMedia( '(min-width: 992px)' ).matches }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } )">
 	<nav class="navbar navbar-expand-lg brand-navbar">
 		<div class="container-fluid navbar-row">
-			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="##bxsites-sidebar" aria-controls="bxsites-sidebar" aria-label="#encodeForHTML( variables.strings.toggleNavigation )#">
+			<button class="navbar-toggler" type="button" @click="navOpen = !navOpen" :aria-expanded="navOpen.toString()" aria-controls="bxsites-sidebar" aria-label="#encodeForHTML( variables.strings.toggleNavigation )#">
 				<span class="navbar-toggler-icon"></span>
 			</button>
 			<a class="navbar-brand brand-mark" href="#variables.basePath#">#renderBrandMark()#</a>
@@ -272,8 +272,8 @@
 		</div>
 	</nav>
 	<div class="container-fluid">
-		<div class="row">
-			<aside class="col-lg-3 col-xl-2 sidebar collapse d-lg-block" id="bxsites-sidebar">
+		<div class="row" :class="{ 'bxsites-nav-collapsed' : !navOpen }">
+			<aside class="col-lg-3 col-xl-2 sidebar" id="bxsites-sidebar" x-show="navOpen" x-cloak>
 				#renderNavList( variables.nav )#
 			</aside>
 			<main class="col-lg-9</bx:output><bx:if variables.tocPosition == 'sticky'><bx:output> col-xl-8</bx:output></bx:if><bx:if variables.tocPosition != 'sticky'><bx:output> col-xl-10</bx:output></bx:if><bx:output> content">

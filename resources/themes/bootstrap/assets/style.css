@@ -291,6 +291,38 @@ body {
 	background: var( --bxsites-sidebar-bg );
 }
 
+/* The toggler is Alpine-driven (layout.bxm's own `navOpen`) at every
+   width now, not just below `lg` - overrides Bootstrap's own
+   `.navbar-expand-lg .navbar-toggler { display: none }` (same
+   specificity, this stylesheet loads after bootstrap.min.css) so a
+   tablet/desktop reader can collapse the sidebar too, not just toggle
+   it open on mobile. */
+.navbar-expand-lg .navbar-toggler {
+	display: inline-flex;
+}
+
+/* `.content`'s own width is a fixed Bootstrap column (`col-lg-9`/
+   `col-xl-8`/`col-xl-10`) - reclaiming the sidebar's freed width once
+   it's collapsed (`.bxsites-nav-collapsed`, set alongside `navOpen`)
+   needs an explicit override, since a hidden flex sibling doesn't
+   otherwise change a fixed-percentage column's own basis. `:has()`
+   keys the wider (12/12) case to when there's no `.toc-sidebar`
+   sibling still claiming its own 2 columns at `xl` - unsupported
+   `:has()` just leaves `.content` at its normal width, no breakage. */
+@media ( min-width: 992px ) {
+	.row.bxsites-nav-collapsed .content {
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
+}
+
+@media ( min-width: 1200px ) {
+	.row.bxsites-nav-collapsed:has( .toc-sidebar ) .content {
+		flex: 0 0 83.33333%;
+		max-width: 83.33333%;
+	}
+}
+
 .sidebar .nav-link {
 	color: var( --bxsites-sidebar-text );
 }
