@@ -251,6 +251,9 @@
 <body x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } )">
 	<nav class="navbar navbar-expand-lg brand-navbar">
 		<div class="container-fluid navbar-row">
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="##bxsites-sidebar" aria-controls="bxsites-sidebar" aria-label="#encodeForHTML( variables.strings.toggleNavigation )#">
+				<span class="navbar-toggler-icon"></span>
+			</button>
 			<a class="navbar-brand brand-mark" href="#variables.basePath#">#renderBrandMark()#</a>
 			<div class="navbar-controls">
 </bx:output><bx:if variables.searchEnabled><bx:include template="#variables.themeDir#/search.bxm"></bx:if><bx:output>
@@ -264,9 +267,6 @@
 				<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="#encodeForHTML( variables.strings.toggleDarkMode )#">
 					<span x-show="!dark">#bxsitesIcon( "moon" )#</span>
 					<span x-show="dark" x-cloak>#bxsitesIcon( "sun" )#</span>
-				</button>
-				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="##bxsites-sidebar" aria-controls="bxsites-sidebar" aria-label="#encodeForHTML( variables.strings.toggleNavigation )#">
-					<span class="navbar-toggler-icon"></span>
 				</button>
 			</div>
 		</div>
