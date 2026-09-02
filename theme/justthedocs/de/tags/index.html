@@ -50,7 +50,7 @@
 
 	<script src="/theme/justthedocs/de/assets/vendor/alpine/cdn.min.js" defer></script>
 </head>
-<body class="jtd-body" x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark', navOpen: localStorage.getItem( 'bxsites-nav-open' ) !== null ? localStorage.getItem( 'bxsites-nav-open' ) === 'true' : window.matchMedia( '(min-width: 900px)' ).matches }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } ); $watch( 'navOpen', v => localStorage.setItem( 'bxsites-nav-open', v ) )">
+<body class="jtd-body" x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark', navOpen: window.matchMedia( '(min-width: 900px)' ).matches ? ( localStorage.getItem( 'bxsites-nav-open' ) !== null ? localStorage.getItem( 'bxsites-nav-open' ) === 'true' : true ) : false }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } ); $watch( 'navOpen', v => { if ( window.matchMedia( '(min-width: 900px)' ).matches ) localStorage.setItem( 'bxsites-nav-open', v ) } )">
 	<header class="jtd-header">
 		<button class="jtd-nav-toggle" type="button" aria-controls="bxsites-sidebar" @click="navOpen = !navOpen" :aria-expanded="navOpen.toString()" aria-label="Navigation umschalten">☰</button>
 		<a class="jtd-header__brand" href="/theme/justthedocs/de/"><img class="brand-logo" src="/theme/justthedocs/de/assets/boxlang-icon-full.svg" alt=""><span class="brand-name">BxSites</span></a>
