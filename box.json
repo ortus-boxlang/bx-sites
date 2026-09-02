@@ -9,7 +9,7 @@
 		"type": "git",
 		"URL": "https://github.com/ortus-boxlang/bx-sites"
 	},
-	"bugs": "https://ortussolutions.atlassian.net/browse/BLMODULES",
+	"bugs": "https://github.com/ortus-boxlang/bx-sites/issues",
 	"slug": "bx-sites",
 	"shortDescription": "A modern, BoxLang-powered static site generator that turns Markdown into fast, themed, searchable websites for documentation, blogs, marketing sites, and knowledge bases.",
 	"type": "boxlang-modules",
@@ -37,11 +37,11 @@
 		"bx-esapi": "*",
 		"bx-yaml": "*",
 		"bx-image": "*",
-		"bx-ftp": "*"
+		"bx-ftp": "*",
+		"bx-toml": "*"
 	},
 	"devDependencies": {
 		"commandbox-boxlang": "*",
-		"commandbox-cfformat": "*",
 		"commandbox-docbox": "*",
 		"testbox": "be"
 	},
