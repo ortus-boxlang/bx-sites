@@ -185,6 +185,8 @@
 	variables.openapiEnabled = ( variables.siteConfig.openapi ?: false ) ? true : false
 	variables.pageActionsEnabled = ( variables.siteConfig.pageActions ?: false ) ? true : false
 	variables.pageActionsPosition = variables.siteConfig.theme.options.pageActionsPosition ?: "top"
+	variables.accentColor = trim( variables.siteConfig.theme.options.accentColor ?: "" )
+	variables.accentColorDark = trim( variables.siteConfig.theme.options.accentColorDark ?: "" )
 </bx:script>
 <bx:output><!doctype html>
 <html lang="#encodeForHTML( variables.currentLocale.len() ? variables.currentLocale : 'en' )#" dir="#encodeForHTML( variables.currentLocaleDir )#">
@@ -216,15 +218,26 @@
 			if ( wantsDark ) {
 				document.documentElement.setAttribute( "data-theme", "dark" );
 			}
-			var accent = localStorage.getItem( "bxsites-accent" );
-			if ( accent ) {
-				document.documentElement.setAttribute( "data-accent", accent );
-			}
 		} )();
 	</script>
 	<link rel="stylesheet" href="#variables.basePath#assets/vendor/highlight/github.min.css">
 	<link rel="stylesheet" href="#variables.basePath##variables.siteConfig.theme.styleUrl ?: 'assets/theme/style.css'#">
 	#renderExtraCss( variables.siteConfig.extraCss ?: [] )#
+</bx:output><bx:if len( variables.accentColor ) or len( variables.accentColorDark )><bx:output>
+	<style>
+</bx:output><bx:if len( variables.accentColor )><bx:output>
+		:root {
+			--bxsites-link: #variables.accentColor#;
+			--bxsites-link-hover: color-mix( in srgb, #variables.accentColor# 85%, black );
+		}
+</bx:output></bx:if><bx:if len( variables.accentColorDark )><bx:output>
+		[data-theme="dark"] {
+			--bxsites-link: #variables.accentColorDark#;
+			--bxsites-link-hover: color-mix( in srgb, #variables.accentColorDark# 85%, white );
+		}
+</bx:output></bx:if><bx:output>
+	</style>
+</bx:output></bx:if><bx:output>
 </bx:output><bx:if variables.mathEnabled><bx:output>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 </bx:output></bx:if><bx:if variables.openapiEnabled><bx:output>
@@ -265,19 +278,6 @@
 				<span x-show="!dark">#bxsitesIcon( "moon" )#</span>
 				<span x-show="dark" x-cloak>#bxsitesIcon( "sun" )#</span>
 			</button>
-			<div class="accent-picker" x-data="{ accentOpen: false, accent: localStorage.getItem( 'bxsites-accent' ) || 'default' }" x-init="$watch( 'accent', v => { document.documentElement.setAttribute( 'data-accent', v ); localStorage.setItem( 'bxsites-accent', v ) } )" @click.outside="accentOpen = false" @keydown.escape.window="accentOpen = false">
-				<button type="button" class="accent-picker__trigger" @click="accentOpen = !accentOpen" aria-haspopup="true" :aria-expanded="accentOpen" aria-label="#encodeForHTML( variables.strings.accentColor )#">
-					#bxsitesIcon( "palette" )#
-				</button>
-				<div class="accent-picker__menu" x-show="accentOpen" x-cloak role="menu">
-					<button type="button" class="accent-swatch accent-swatch--default" :class="accent === 'default' ? 'is-active' : ''" @click="accent = 'default'; accentOpen = false" role="menuitem" aria-label="#encodeForHTML( variables.strings.accentColor )#: #encodeForHTML( variables.strings.accentColorDefault )#"></button>
-					<button type="button" class="accent-swatch" style="--swatch: ##2563eb" :class="accent === 'ocean' ? 'is-active' : ''" @click="accent = 'ocean'; accentOpen = false" role="menuitem" aria-label="#encodeForHTML( variables.strings.accentColor )#: Ocean"></button>
-					<button type="button" class="accent-swatch" style="--swatch: ##7c3aed" :class="accent === 'violet' ? 'is-active' : ''" @click="accent = 'violet'; accentOpen = false" role="menuitem" aria-label="#encodeForHTML( variables.strings.accentColor )#: Violet"></button>
-					<button type="button" class="accent-swatch" style="--swatch: ##db2777" :class="accent === 'rose' ? 'is-active' : ''" @click="accent = 'rose'; accentOpen = false" role="menuitem" aria-label="#encodeForHTML( variables.strings.accentColor )#: Rose"></button>
-					<button type="button" class="accent-swatch" style="--swatch: ##d97706" :class="accent === 'amber' ? 'is-active' : ''" @click="accent = 'amber'; accentOpen = false" role="menuitem" aria-label="#encodeForHTML( variables.strings.accentColor )#: Amber"></button>
-					<button type="button" class="accent-swatch" style="--swatch: ##059669" :class="accent === 'emerald' ? 'is-active' : ''" @click="accent = 'emerald'; accentOpen = false" role="menuitem" aria-label="#encodeForHTML( variables.strings.accentColor )#: Emerald"></button>
-				</div>
-			</div>
 		</div>
 	</header>
 	<div class="jtd-layout">

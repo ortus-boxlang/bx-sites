@@ -53,23 +53,6 @@
 	--bxsites-step-line: rgba( 255, 255, 255, 0.15 );
 }
 
-/* Accent color picker override - user-chosen via the accent-picker control
-   in layout.bxm, persisted to localStorage and applied via a `data-accent`
-   attribute on <html> (set blocking, in <head>, same FOUC-avoidance shape
-   as the dark/light `data-theme` attribute above) - see
-   docs/guides/theming.md#accent-color. "default" needs no rule here since
-   it just falls through to this theme's own --bxsites-link above. */
-html[data-accent="ocean"] { --bxsites-link: #2563eb; --bxsites-link-hover: #1d4ed8; }
-html[data-accent="violet"] { --bxsites-link: #7c3aed; --bxsites-link-hover: #6d28d9; }
-html[data-accent="rose"] { --bxsites-link: #db2777; --bxsites-link-hover: #be185d; }
-html[data-accent="amber"] { --bxsites-link: #d97706; --bxsites-link-hover: #b45309; }
-html[data-accent="emerald"] { --bxsites-link: #059669; --bxsites-link-hover: #047857; }
-html[data-accent="ocean"][data-theme="dark"] { --bxsites-link: #60a5fa; --bxsites-link-hover: #93c5fd; }
-html[data-accent="violet"][data-theme="dark"] { --bxsites-link: #a78bfa; --bxsites-link-hover: #c4b5fd; }
-html[data-accent="rose"][data-theme="dark"] { --bxsites-link: #f472b6; --bxsites-link-hover: #f9a8d4; }
-html[data-accent="amber"][data-theme="dark"] { --bxsites-link: #fbbf24; --bxsites-link-hover: #fcd34d; }
-html[data-accent="emerald"][data-theme="dark"] { --bxsites-link: #34d399; --bxsites-link-hover: #6ee7b7; }
-
 [x-cloak] {
 	display: none !important;
 }
@@ -417,8 +400,7 @@ a:hover {
    with light/dark mode - so unlike material, there's no [data-theme="dark"]
    variant of this rule to keep in sync, just one light-on-color treatment. */
 .theme-toggle,
-.repo-link,
-.accent-picker__trigger {
+.repo-link {
 	background: transparent;
 	border: 1px solid rgba( 255, 255, 255, 0.4 );
 	border-radius: 10px;
@@ -498,46 +480,6 @@ a:hover {
 	box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.15 );
 }
 
-.accent-picker {
-	position: relative;
-	flex-shrink: 0;
-}
-
-.accent-picker__menu {
-	position: absolute;
-	top: calc( 100% + 0.35rem );
-	right: 0;
-	z-index: 20;
-	display: flex;
-	gap: 0.4rem;
-	margin: 0;
-	padding: 0.5rem;
-	background: var( --md-surface );
-	color: var( --md-ink );
-	border: 1px solid var( --md-border );
-	border-radius: 8px;
-	box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.15 );
-}
-
-.accent-swatch {
-	width: 1.4rem;
-	height: 1.4rem;
-	padding: 0;
-	border: 2px solid transparent;
-	border-radius: 50%;
-	background: var( --swatch, var( --bxsites-muted ) );
-	cursor: pointer;
-	box-sizing: border-box;
-}
-
-.accent-swatch--default {
-	background: conic-gradient( var( --bxsites-link ), var( --bxsites-muted ), var( --bxsites-link ) );
-}
-
-.accent-swatch.is-active {
-	border-color: currentColor;
-}
-
 .locale-dropdown__item {
 	display: flex;
 	align-items: center;
@@ -580,8 +522,7 @@ a:hover {
 }
 
 .theme-toggle:hover,
-.repo-link:hover,
-.accent-picker__trigger:hover {
+.repo-link:hover {
 	background: rgba( 255, 255, 255, 0.18 );
 	color: #ffffff;
 }

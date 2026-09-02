@@ -40,8 +40,6 @@ class {
 		"toggleDarkMode"       : "Toggle dark mode",
 		"toggleNavigation"     : "Toggle navigation",
 		"toggleSection"        : "Toggle {title} section",
-		"accentColor"          : "Accent color",
-		"accentColorDefault"   : "Default",
 		"repository"           : "Repository",
 		"version"              : "Version",
 		"language"             : "Language: {label}",

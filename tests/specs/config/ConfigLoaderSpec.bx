@@ -297,6 +297,33 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
+			it( "accepts [theme.options.accentColor]/[accentColorDark] as 3- or 6-digit hex colors, undefined when absent", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).theme.options.keyExists( "accentColor" ) ).toBeFalse();
+				expect( loader.load( dir ).theme.options.keyExists( "accentColorDark" ) ).toBeFalse();
+
+				for ( var hex in [ "##2563eb", "##fff", "##FFFFFF" ] ) {
+					var hexDir = newProjectDir( '{"name":"My Docs","theme":{"options":{"accentColor":"' & hex & '","accentColorDark":"' & hex & '"}}}' );
+					var config = loader.load( hexDir );
+					expect( config.theme.options.accentColor ).toBe( hex );
+					expect( config.theme.options.accentColorDark ).toBe( hex );
+				}
+			} );
+
+			it( "throws BxSites.InvalidConfig when [theme.options.accentColor] isn't a valid hex color", function() {
+				var dir = newProjectDir( '{"name":"My Docs","theme":{"options":{"accentColor":"blue"}}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
+			it( "throws BxSites.InvalidConfig when [theme.options.accentColorDark] isn't a valid hex color", function() {
+				var dir = newProjectDir( '{"name":"My Docs","theme":{"options":{"accentColorDark":"not-a-color"}}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
 			it( "exposes the v1 built-in theme names", function() {
 				expect( loader.getBuiltInThemes() ).toBe( [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] );
 			} );
