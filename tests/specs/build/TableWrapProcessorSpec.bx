@@ -41,6 +41,56 @@ class extends="testbox.system.BaseSpec" {
 				expect( processor.wrap( html ) ).toBe( html )
 			} );
 
+			describe( "row filter (>= 10 data rows)", function() {
+
+				private string function tableWithRows( required numeric rowCount ) {
+					var rows = ""
+					for ( var i = 1; i <= arguments.rowCount; i++ ) {
+						rows &= "<tr><td>Row #i#</td></tr>"
+					}
+					return "<table><thead><tr><th>Name</th></tr></thead><tbody>" & rows & "</tbody></table>"
+				}
+
+				it( "adds no filter input or x-show for a table with fewer than 10 data rows", function() {
+					var result = processor.wrap( tableWithRows( 9 ) )
+					expect( result ).notToInclude( "bxsites-table-filter" )
+					expect( result ).notToInclude( "x-show" )
+					expect( result ).toInclude( '<div class="bxsites-table-wrap"><table>' )
+				} );
+
+				it( "adds a filter input and x-data on the wrap div for a table with exactly 10 data rows", function() {
+					var result = processor.wrap( tableWithRows( 10 ) )
+					expect( result ).toInclude( 'x-data="{ q: '''' }"' )
+					expect( result ).toInclude( 'x-model="q"' )
+					expect( result ).toInclude( 'class="bxsites-table-filter"' )
+				} );
+
+				it( "tags every data row with x-show bound to q, but leaves the header row untouched", function() {
+					var result = processor.wrap( tableWithRows( 10 ) )
+					expect( result ).toInclude( '<thead><tr><th>Name</th></tr></thead>' )
+					expect( result.reMatchNoCase( "<tr x-show=" ).len() ).toBe( 10 )
+				} );
+
+				it( "does not tag rows when there's no thead, still counting all <tr> as data rows", function() {
+					var rows = ""
+					for ( var i = 1; i <= 10; i++ ) {
+						rows &= "<tr><td>Row #i#</td></tr>"
+					}
+					var result = processor.wrap( "<table>" & rows & "</table>" )
+					expect( result.reMatchNoCase( "<tr x-show=" ).len() ).toBe( 10 )
+				} );
+
+				it( "preserves a tagged row's own attributes", function() {
+					var rows = ""
+					for ( var i = 1; i <= 10; i++ ) {
+						rows &= '<tr class="row-#i#"><td>Row #i#</td></tr>'
+					}
+					var result = processor.wrap( "<table><thead><tr><th>Name</th></tr></thead><tbody>" & rows & "</tbody></table>" )
+					expect( result ).toInclude( '<tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )" class="row-1">' )
+				} );
+
+			} );
+
 		} );
 	}
 
