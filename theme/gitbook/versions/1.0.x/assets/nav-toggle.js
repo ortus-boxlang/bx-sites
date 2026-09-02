@@ -11,6 +11,11 @@
  * many links a section holds. Shared across all built-in themes, loaded
  * unconditionally alongside admonition-collapse.js - a no-op page with no
  * `theme.options.navCollapsible` simply has no `.nav-toggle` buttons to find.
+ *
+ * The click target is the whole `.nav-group-header` row (a bigger, more
+ * discoverable hit area than the small chevron alone), not just the button -
+ * except when the click actually lands on the row's own `<a>` title link,
+ * which must keep navigating normally rather than only toggling.
  */
 ( function () {
 	function collapse( list ) {
@@ -49,7 +54,7 @@
 				childList.style.maxHeight = "none";
 			}
 
-			button.addEventListener( "click", function () {
+			function toggle() {
 				var open = button.getAttribute( "aria-expanded" ) === "true";
 				button.setAttribute( "aria-expanded", open ? "false" : "true" );
 				if ( open ) {
@@ -57,7 +62,22 @@
 				} else {
 					expand( childList );
 				}
-			} );
+			}
+
+			var header = button.parentElement;
+			if ( header && header.classList.contains( "nav-group-header" ) ) {
+				header.addEventListener( "click", function ( event ) {
+					// A click on (or inside) the row's own title link keeps
+					// navigating normally - everything else in the row,
+					// chevron included, toggles.
+					if ( event.target.closest( "a" ) ) {
+						return;
+					}
+					toggle();
+				} );
+			} else {
+				button.addEventListener( "click", toggle );
+			}
 		} );
 	}
 
