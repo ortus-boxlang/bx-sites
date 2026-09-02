@@ -35,6 +35,19 @@
 	/* Every header control shares this one height so the toolbar reads as
 	   a single aligned row instead of a mix of ad hoc utility paddings. */
 	--bxsites-toolbar-h: 2.375rem;
+	/* Unlike every other theme, this one otherwise leans entirely on
+	   Tailwind's own utility classes (slate-*/cyan-* etc.) instead of
+	   custom properties - these four exist only so shared components
+	   (blog-author-posts search, the table-header tint, the accent color
+	   picker) and this file's own `var( --bxsites-accent )` references
+	   further down have something real to resolve against. */
+	--bxsites-bg: #ffffff;
+	--bxsites-text: #0f172a;
+	--bxsites-muted: #64748b;
+	--bxsites-border: rgba( 0, 0, 0, 0.12 );
+	--bxsites-link: #0e7490;
+	--bxsites-link-hover: #0891b2;
+	--bxsites-accent: #38bdf8;
 	--bxsites-step-marker-bg: #0e7490;
 	--bxsites-step-marker-text: #fff;
 	--bxsites-step-line: rgba( 0, 0, 0, 0.12 );
@@ -51,17 +64,42 @@
 }
 
 [data-theme="dark"] {
+	--bxsites-bg: #0a0d0f;
+	--bxsites-text: #e7ecee;
+	--bxsites-muted: #8b979c;
+	--bxsites-border: rgba( 255, 255, 255, 0.09 );
+	--bxsites-link: #34d399;
+	--bxsites-link-hover: #6ee7b7;
+	--bxsites-accent: #34d399;
 	--bxsites-step-marker-bg: #34d399;
 	--bxsites-step-marker-text: #0a0d0f;
 	--bxsites-step-line: rgba( 255, 255, 255, 0.15 );
 }
+
+/* Accent color picker override - user-chosen via the accent-picker control
+   in layout.bxm, persisted to localStorage and applied via a `data-accent`
+   attribute on <html> (set blocking, in <head>, same FOUC-avoidance shape
+   as the dark/light `data-theme` attribute above) - see
+   docs/guides/theming.md#accent-color. "default" needs no rule here since
+   it just falls through to this theme's own --bxsites-link above. */
+html[data-accent="ocean"] { --bxsites-link: #2563eb; --bxsites-link-hover: #1d4ed8; }
+html[data-accent="violet"] { --bxsites-link: #7c3aed; --bxsites-link-hover: #6d28d9; }
+html[data-accent="rose"] { --bxsites-link: #db2777; --bxsites-link-hover: #be185d; }
+html[data-accent="amber"] { --bxsites-link: #d97706; --bxsites-link-hover: #b45309; }
+html[data-accent="emerald"] { --bxsites-link: #059669; --bxsites-link-hover: #047857; }
+html[data-accent="ocean"][data-theme="dark"] { --bxsites-link: #60a5fa; --bxsites-link-hover: #93c5fd; }
+html[data-accent="violet"][data-theme="dark"] { --bxsites-link: #a78bfa; --bxsites-link-hover: #c4b5fd; }
+html[data-accent="rose"][data-theme="dark"] { --bxsites-link: #f472b6; --bxsites-link-hover: #f9a8d4; }
+html[data-accent="amber"][data-theme="dark"] { --bxsites-link: #fbbf24; --bxsites-link-hover: #fcd34d; }
+html[data-accent="emerald"][data-theme="dark"] { --bxsites-link: #34d399; --bxsites-link-hover: #6ee7b7; }
 
 [x-cloak] {
 	display: none !important;
 }
 
 .theme-toggle,
-.repo-link {
+.repo-link,
+.accent-picker__trigger {
 	background: transparent;
 	border: 1px solid rgba( 0, 0, 0, 0.2 );
 	border-radius: 10px;
@@ -80,17 +118,20 @@
 }
 
 .theme-toggle:hover,
-.repo-link:hover {
+.repo-link:hover,
+.accent-picker__trigger:hover {
 	background: rgba( 0, 0, 0, 0.08 );
 }
 
 [data-theme="dark"] .theme-toggle,
-[data-theme="dark"] .repo-link {
+[data-theme="dark"] .repo-link,
+[data-theme="dark"] .accent-picker__trigger {
 	border-color: rgba( 255, 255, 255, 0.09 ) !important;
 }
 
 [data-theme="dark"] .theme-toggle:hover,
-[data-theme="dark"] .repo-link:hover {
+[data-theme="dark"] .repo-link:hover,
+[data-theme="dark"] .accent-picker__trigger:hover {
 	background: rgba( 255, 255, 255, 0.08 );
 }
 
@@ -177,6 +218,46 @@
 	border: 1px solid rgb( 226 232 240 );
 	border-radius: 8px;
 	box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.15 );
+}
+
+.accent-picker {
+	position: relative;
+	flex-shrink: 0;
+}
+
+.accent-picker__menu {
+	position: absolute;
+	top: calc( 100{'chrome': 'background: #ffffff;\n\em );
+	right: 0;
+	z-index: 20;
+	display: flex;
+	gap: 0.4rem;
+	margin: 0;
+	padding: 0.5rem;
+	background: #ffffff;
+	color: #1e293b;
+	border: 1px solid rgb( 226 232 240 );
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.15 );
+}
+
+.accent-swatch {
+	width: 1.4rem;
+	height: 1.4rem;
+	padding: 0;
+	border: 2px solid transparent;
+	border-radius: 50%;
+	background: var( --swatch, var( --bxsites-muted ) );
+	cursor: pointer;
+	box-sizing: border-box;
+}
+
+.accent-swatch--default {
+	background: conic-gradient( var( --bxsites-link ), var( --bxsites-muted ), var( --bxsites-link ) );
+}
+
+.accent-swatch.is-active {
+	border-color: currentColor;
 }
 
 .locale-dropdown__item {
@@ -1900,6 +1981,26 @@ code:not( pre code ) {
 	overflow: auto;
 }
 
+.prose .bxsites-table-filter {
+	display: block;
+	width: 100%;
+	max-width: 20rem;
+	margin: 0 0 0.6rem;
+	padding: 0.4rem 0.75rem;
+	font-size: 0.85rem;
+	font-family: inherit;
+	border: 1px solid var( --bxsites-border );
+	border-radius: 6px;
+	background: var( --bxsites-bg );
+	color: var( --bxsites-text );
+	box-sizing: border-box;
+}
+
+.prose .bxsites-table-filter:focus {
+	outline: 2px solid var( --bxsites-link );
+	outline-offset: 1px;
+}
+
 .prose table {
 	width: 100%;
 	border-collapse: collapse;
@@ -1914,7 +2015,7 @@ code:not( pre code ) {
 }
 
 [data-theme="dark"] .prose thead th {
-	background-color: #0a0d0f;
+	background-color: var( --bxsites-bg );
 }
 
 .prose th,
@@ -1927,7 +2028,11 @@ code:not( pre code ) {
 
 .prose th {
 	background: rgba( 56, 189, 248, 0.08 );
-	font-weight: 600;
+	font-weight: 700;
+	font-size: 0.78rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	border-bottom: 2px solid var( --bxsites-link );
 }
 
 .prose tbody tr:nth-child( even ) {
