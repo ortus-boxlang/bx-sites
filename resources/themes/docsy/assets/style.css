@@ -189,6 +189,18 @@ body.docsy-body {
 	display: flex;
 	align-items: center;
 	gap: 0.25rem;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.docsy-nav__group-header:hover,
+.docsy-nav__link:hover {
+	background: rgba( 0, 0, 0, 0.05 );
+}
+
+[data-theme="dark"] .docsy-nav__group-header:hover,
+[data-theme="dark"] .docsy-nav__link:hover {
+	background: rgba( 255, 255, 255, 0.06 );
 }
 
 .docsy-nav__group-header .docsy-nav__link,
@@ -214,7 +226,7 @@ body.docsy-body {
 }
 
 .nav-toggle[aria-expanded="true"] .nav-toggle__icon {
-	transform: rotate( -180deg );
+	transform: rotate( 90deg );
 }
 
 /* nav-toggle.js measures each list's own real height and transitions
@@ -223,6 +235,14 @@ body.docsy-body {
 .nav-toggle-body {
 	overflow: hidden;
 	transition: max-height 0.25s ease;
+	/* Bootstrap's own `.nav.flex-column` is `display: flex; flex-wrap: wrap`
+	   - with a column direction, wrap triggers on the CROSS axis, i.e. the
+	   container's height, so while max-height is small during this slide
+	   flex-wrap: wrap misreads that as "out of vertical room" and lays
+	   items out in side-by-side columns instead of stacking them (visible
+	   as a jarring flash of items on one row right as a section opens).
+	   Forcing nowrap keeps every item in its one true column throughout. */
+	flex-wrap: nowrap;
 }
 
 .brand-logo {
@@ -1186,8 +1206,11 @@ code:not( pre code ) {
 }
 
 .docsy-content-body .bxsites-table-wrap {
-	max-height: 480px;
-	overflow: auto;
+	/* Horizontal only - a tall table (e.g. from the filter feature) must
+	   never be vertically clipped; sticky-header pinning (below) still
+	   works fine against the page's own scroll. */
+	overflow-x: auto;
+	margin-bottom: 1.5rem;
 }
 
 .docsy-content-body .bxsites-table-filter {

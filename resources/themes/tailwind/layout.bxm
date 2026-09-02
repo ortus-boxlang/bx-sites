@@ -27,8 +27,8 @@
 			if ( node.children.len() && variables.navCollapsible ) {
 				var open = variables.navExpandAll || navContainsActive( node )
 				html &= "<li>"
-				html &= "<div class=""flex items-center justify-between"">" & linkOrSpan
-				html &= "<button type=""button"" class=""nav-toggle"" aria-expanded=""" & ( open ? "true" : "false" ) & """ aria-label=""" & encodeForHTML( variables.stringsResolver.format( variables.strings.toggleSection, { "title" : node.title } ) ) & """><span class=""nav-toggle__icon"" aria-hidden=""true"">▾</span></button>"
+				html &= "<div class=""flex items-center justify-between nav-group-header"">" & linkOrSpan
+				html &= "<button type=""button"" class=""nav-toggle"" aria-expanded=""" & ( open ? "true" : "false" ) & """ aria-label=""" & encodeForHTML( variables.stringsResolver.format( variables.strings.toggleSection, { "title" : node.title } ) ) & """><span class=""nav-toggle__icon"" aria-hidden=""true"">▸</span></button>"
 				html &= "</div>"
 				html &= renderNavList( node.children, true, !open )
 				html &= "</li>"

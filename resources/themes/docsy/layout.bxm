@@ -27,8 +27,8 @@
 			if ( node.children.len() && variables.navCollapsible ) {
 				var open = variables.navExpandAll || navContainsActive( node )
 				html &= "<li class=""docsy-nav__item docsy-nav__item--group"">"
-				html &= "<div class=""docsy-nav__group-header"">" & linkOrSpan
-				html &= "<button type=""button"" class=""nav-toggle"" aria-expanded=""" & ( open ? "true" : "false" ) & """ aria-label=""" & encodeForHTML( variables.stringsResolver.format( variables.strings.toggleSection, { "title" : node.title } ) ) & """><span class=""nav-toggle__icon"" aria-hidden=""true"">▾</span></button>"
+				html &= "<div class=""docsy-nav__group-header nav-group-header"">" & linkOrSpan
+				html &= "<button type=""button"" class=""nav-toggle"" aria-expanded=""" & ( open ? "true" : "false" ) & """ aria-label=""" & encodeForHTML( variables.stringsResolver.format( variables.strings.toggleSection, { "title" : node.title } ) ) & """><span class=""nav-toggle__icon"" aria-hidden=""true"">▸</span></button>"
 				html &= "</div>"
 				html &= renderNavList( node.children, true, !open )
 				html &= "</li>"

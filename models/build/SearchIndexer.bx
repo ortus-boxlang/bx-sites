@@ -8,6 +8,24 @@ class {
 
 	variables.entryCache = new "models.build.BuildCache@bxsites"()
 
+	// stripTags() uses these directly via java.util.regex rather than
+	// BoxLang's own reReplace()/replace() BIFs - each of those re-scans the
+	// *entire* (already large, tag-heavy) page HTML from scratch per call,
+	// which turns quadratic in the number of matches; a content-rich page
+	// with a few thousand small inline tags could take several seconds this
+	// way where a single compiled-pattern pass takes milliseconds.
+	variables.tagPattern    = createObject( "java", "java.util.regex.Pattern" ).compile( "<[^>]+>" )
+	variables.wsPattern     = createObject( "java", "java.util.regex.Pattern" ).compile( "[ \t\r\n]+" )
+	variables.entityPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "&nbsp;|&amp;|&lt;|&gt;|&quot;|&##39;" )
+	variables.entityMap     = {
+		"&nbsp;"  : " ",
+		"&amp;"   : "&",
+		"&lt;"    : "<",
+		"&gt;"    : ">",
+		"&quot;"  : '"',
+		"&##39;"  : "'"
+	}
+
 	/**
 	 * Hidden pages are excluded, matching NavBuilder's own treatment of them
 	 * - a page that isn't linked from the nav shouldn't be searchable either.
@@ -88,14 +106,16 @@ class {
 	 * @html Rendered HTML
 	 */
 	private string function stripTags( required string html ) {
-		var text = arguments.html.reReplace( "<[^>]+>", " ", "all" )
-		text = text.replace( "&nbsp;", " ", "all" )
-		text = text.replace( "&amp;", "&", "all" )
-		text = text.replace( "&lt;", "<", "all" )
-		text = text.replace( "&gt;", ">", "all" )
-		text = text.replace( "&quot;", '"', "all" )
-		text = text.replace( "&##39;", "'", "all" )
-		return trim( text.reReplace( "[ \t\r\n]+", " ", "all" ) )
+		var text = variables.tagPattern.matcher( arguments.html ).replaceAll( " " )
+
+		var matcher = variables.entityPattern.matcher( text )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+		while ( matcher.find() ) {
+			matcher.appendReplacement( buffer, createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( variables.entityMap[ matcher.group() ] ) )
+		}
+		matcher.appendTail( buffer )
+
+		return trim( variables.wsPattern.matcher( buffer.toString() ).replaceAll( " " ) )
 	}
 
 	/**

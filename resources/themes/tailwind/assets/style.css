@@ -304,6 +304,19 @@ html[data-accent="emerald"][data-theme="dark"] { --bxsites-link: #34d399; --bxsi
 	white-space: nowrap;
 }
 
+.nav-group-header {
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.nav-group-header:hover {
+	background: rgba( 0, 0, 0, 0.05 );
+}
+
+[data-theme="dark"] .nav-group-header:hover {
+	background: rgba( 255, 255, 255, 0.06 ) !important;
+}
+
 .nav-toggle {
 	flex: 0 0 auto;
 	background: transparent;
@@ -320,7 +333,7 @@ html[data-accent="emerald"][data-theme="dark"] { --bxsites-link: #34d399; --bxsi
 }
 
 .nav-toggle[aria-expanded="true"] .nav-toggle__icon {
-	transform: rotate( -180deg );
+	transform: rotate( 90deg );
 }
 
 /* nav-toggle.js measures each list's own real height and transitions
@@ -329,6 +342,14 @@ html[data-accent="emerald"][data-theme="dark"] { --bxsites-link: #34d399; --bxsi
 .nav-toggle-body {
 	overflow: hidden;
 	transition: max-height 0.25s ease;
+	/* Bootstrap's own `.nav.flex-column` is `display: flex; flex-wrap: wrap`
+	   - with a column direction, wrap triggers on the CROSS axis, i.e. the
+	   container's height, so while max-height is small during this slide
+	   flex-wrap: wrap misreads that as "out of vertical room" and lays
+	   items out in side-by-side columns instead of stacking them (visible
+	   as a jarring flash of items on one row right as a section opens).
+	   Forcing nowrap keeps every item in its one true column throughout. */
+	flex-wrap: nowrap;
 }
 
 /* A named icon (icon: rocket / lucide:rocket / tabler:rocket / custom:name)
@@ -1977,8 +1998,11 @@ code:not( pre code ) {
 }
 
 .prose .bxsites-table-wrap {
-	max-height: 480px;
-	overflow: auto;
+	/* Horizontal only - a tall table (e.g. from the filter feature) must
+	   never be vertically clipped; sticky-header pinning (below) still
+	   works fine against the page's own scroll. */
+	overflow-x: auto;
+	margin-bottom: 1.5rem;
 }
 
 .prose .bxsites-table-filter {
