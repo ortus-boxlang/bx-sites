@@ -1211,7 +1211,6 @@ code:not( pre code ) {
 .md-content-body .bxsites-table-filter {
 	display: block;
 	width: 100%;
-	max-width: 20rem;
 	margin: 0 0 0.6rem;
 	padding: 0.4rem 0.75rem;
 	font-size: 0.85rem;
