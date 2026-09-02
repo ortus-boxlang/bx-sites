@@ -159,13 +159,28 @@ boxlang Build.bx --version=1.1.0
 
 ## Running Tests
 
-1. With CommandBox installed, install TestBox: `box install`
-2. Register the module so BoxLang can resolve its `bxsites.*` source classes: symlink this repo into your BoxLang home's `modules/` folder - that's `~/.boxlang/modules` unless `$BOXLANG_HOME` is set to something else (CI pins it to the checkout's own `.boxlang/`, per `.github/workflows/tests.yml`):
-   ```bash
-   mkdir -p "${BOXLANG_HOME:-$HOME/.boxlang}/modules"
-   ln -s "$(pwd)" "${BOXLANG_HOME:-$HOME/.boxlang}/modules/$(basename "$(pwd)")"
-   ```
-3. With the BoxLang CLI installed, run tests using `./testbox/run`
+Copy `.env.example` to `.env`. The example uses a project-local `.boxlang/` home so the checkout is portable and does not depend on a machine-specific BoxLang installation path.
+
+```bash
+cp .env.example .env
+source .env
+```
+
+Run the setup script once to create the local BoxLang module folder and register this checkout. If the root `modules/` folder is missing, it asks whether it should run `box install` for you:
+
+```bash
+boxlang Setup.bx
+```
+
+With CommandBox installed, run tests using `bash ./testbox/run`.
+
+To preview the dogfooded documentation site locally:
+
+```bash
+boxlang bxSites serve --host="$BXSITES_PREVIEW_HOST" --port="$BXSITES_PREVIEW_PORT"
+```
+
+Open `http://$BXSITES_PREVIEW_HOST:$BXSITES_PREVIEW_PORT` in a browser. `serve` builds the site, watches source files, and reloads the browser when changes are detected. Stop it with `Ctrl+C`; the generated `site/` directory is ignored and should not be committed.
 
 ## Version Management
 

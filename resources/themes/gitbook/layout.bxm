@@ -284,6 +284,7 @@
 	<div class="gb-layout">
 		<nav class="gb-sidebar" id="bxsites-sidebar" aria-label="Navigation" x-show="navOpen" x-cloak>
 			#renderNavList( variables.nav )#
+			<a class="bxsites-powered-by" href="https://bxsites.io" target="_blank" rel="noopener noreferrer">#bxsitesIcon( "phosphor:stack" )# <span>Powered by BxSites</span></a>
 		</nav>
 		<main class="gb-content">
 </bx:output><bx:include template="#variables.themeDir#/page.bxm"><bx:output>

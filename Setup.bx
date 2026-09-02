@@ -1,0 +1,53 @@
+class {
+
+	function main( args = [] ) {
+		var projectRoot = getDirectoryFromPath( getCurrentTemplatePath() )
+		var boxHome = projectRoot & ".boxlang"
+		var moduleLink = boxHome & "/modules/bxsites"
+		var files = createObject( "java", "java.nio.file.Files" )
+		var paths = createObject( "java", "java.nio.file.Paths" )
+		var linkPath = paths.get( moduleLink )
+		var envFile = projectRoot & ".env"
+		var dependenciesDir = projectRoot & "modules"
+
+		if ( !directoryExists( dependenciesDir ) ) {
+			var installAnswer = lCase( trim( cliRead( "Dependencies are not installed. Run `box install` now? [y/N] " ) ) )
+			if ( !installAnswer.reFind( "^(y|yes)$" ) ) {
+				println( "Skipped dependency installation. Run `boxlang Setup.bx` again after `box install`." )
+				return
+			}
+
+			var installResult = systemExecute(
+				name = "box",
+				arguments = [ "install" ],
+				directory = projectRoot
+			)
+			println( installResult.output ?: "" )
+			if ( len( trim( installResult.error ?: "" ) ) || installResult.timeout ?: false || installResult.terminated ?: false ) {
+				throw( type = "BxSites.SetupInstallFailed", message = "`box install` failed: #installResult.error ?: 'the process did not complete successfully'#" )
+			}
+			if ( !directoryExists( dependenciesDir ) ) {
+				throw( type = "BxSites.SetupInstallFailed", message = "`box install` completed without creating the modules directory." )
+			}
+		}
+
+		if ( !fileExists( envFile ) ) {
+			fileCopy( projectRoot & ".env.example", envFile )
+			println( "Created: #envFile#" )
+		}
+
+		directoryCreate( boxHome & "/modules", true, true )
+		if ( files.exists( linkPath ) || files.isSymbolicLink( linkPath ) ) {
+			if ( !files.isSymbolicLink( linkPath ) ) {
+				throw( type = "BxSites.SetupConflict", message = "Cannot replace existing non-symlink module path: #moduleLink#" )
+			}
+			files.delete( linkPath )
+		}
+
+		files.createSymbolicLink( linkPath, paths.get( projectRoot ) )
+		println( "Created: #boxHome#/modules" )
+		println( "Registered: #moduleLink# -> #projectRoot#" )
+		println( "Run `source .env` before using the local BoxLang home." )
+	}
+
+}

@@ -284,6 +284,7 @@
 		<nav class="jtd-sidebar" id="bxsites-sidebar" aria-label="Navigation" x-show="navOpen" x-cloak>
 </bx:output><bx:if variables.searchEnabled><bx:include template="#variables.themeDir#/search.bxm"></bx:if><bx:output>
 			#renderNavList( variables.nav )#
+			<a class="bxsites-powered-by" href="https://bxsites.io" target="_blank" rel="noopener noreferrer">#bxsitesIcon( "phosphor:stack" )# <span>Powered by BxSites</span></a>
 		</nav>
 		<main class="jtd-content">
 </bx:output><bx:include template="#variables.themeDir#/page.bxm"><bx:output>

@@ -12,6 +12,7 @@ class{
 	        "^\..*",
 	        "^build$",
 	        "^Build\.bx$",
+			"^Setup\.bx$",
 			"^docker-compose\.yml$",
 	        "^SetupTemplate\.bx$",
 			"^server-.*\.json$",

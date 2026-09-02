@@ -285,6 +285,7 @@
 	<div class="mx-auto flex max-w-6xl">
 		<nav id="bxsites-sidebar" class="w-64 shrink-0 p-4" aria-label="Navigation" x-show="navOpen" x-cloak>
 			#renderNavList( variables.nav )#
+			<a class="bxsites-powered-by" href="https://bxsites.io" target="_blank" rel="noopener noreferrer">#bxsitesIcon( "phosphor:stack" )# <span>Powered by BxSites</span></a>
 		</nav>
 		<main class="min-w-0 flex-1 p-8">
 </bx:output><bx:include template="#variables.themeDir#/page.bxm"><bx:output>

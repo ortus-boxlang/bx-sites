@@ -293,6 +293,7 @@
 		<div class="row" :class="{ 'bxsites-nav-collapsed' : !navOpen }">
 			<aside class="col-lg-3 col-xl-2 sidebar" id="bxsites-sidebar" x-show="navOpen" x-cloak>
 				#renderNavList( variables.nav )#
+				<a class="bxsites-powered-by" href="https://bxsites.io" target="_blank" rel="noopener noreferrer">#bxsitesIcon( "phosphor:stack" )# <span>Powered by BxSites</span></a>
 			</aside>
 			<main class="col-lg-9</bx:output><bx:if variables.tocPosition == 'sticky'><bx:output> col-xl-8</bx:output></bx:if><bx:if variables.tocPosition != 'sticky'><bx:output> col-xl-10</bx:output></bx:if><bx:output> content">
 </bx:output><bx:include template="#variables.themeDir#/page.bxm"><bx:output>

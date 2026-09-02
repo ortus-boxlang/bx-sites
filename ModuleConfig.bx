@@ -76,6 +76,72 @@ class {
 	 */
 	this.dependencies = [];
 
+	static {
+		verbs = {
+			"new"          : "models.cli.New",
+			"build"        : "models.cli.Build",
+			"serve"        : "models.cli.Serve",
+			"search-index" : "models.cli.SearchIndex",
+			"clean"        : "models.cli.Clean",
+			"gh-deploy"    : "models.cli.GhDeploy",
+			"deploy"       : "models.cli.Deploy",
+			"publish"      : "models.cli.Publish",
+			"package"      : "models.cli.Package",
+			"migrate"      : "models.cli.Migrate",
+			"check"        : "models.cli.Check",
+			"stats"        : "models.cli.Stats",
+			"doctor"       : "models.cli.Doctor",
+			"post:new"     : "models.cli.PostNew",
+			"version:new"  : "models.cli.VersionNew",
+			"i18n:status"  : "models.cli.I18nStatus",
+			"i18n:new"     : "models.cli.I18nNew",
+			"page:new"     : "models.cli.PageNew",
+			"plugin:new"   : "models.cli.PluginNew",
+			"theme:new"    : "models.cli.ThemeNew",
+			"install:plugin" : "models.cli.InstallPlugin",
+			"install:theme"  : "models.cli.InstallTheme",
+			"skills:install" : "models.cli.SkillsInstall",
+			"theme:import"   : "models.cli.ThemeImport",
+			"page:rename"  : "models.cli.PageRename",
+			"blog:drafts"  : "models.cli.BlogDrafts",
+			"blog:find"    : "models.cli.BlogFind",
+			"search:query" : "models.cli.SearchQuery",
+			"lint"         : "models.cli.Lint"
+		}
+
+		verbDescriptions = {
+			"new"          : "Scaffold a docs project                ([--theme], [--name])",
+			"build"        : "Render docs/**.md into a static site in site/",
+			"serve"        : "Build and serve the site locally with live reload ([--port], [--host])",
+			"search-index" : "Rebuild the search index standalone",
+			"clean"        : "Remove site/ and any build cache",
+			"gh-deploy"    : "Build and force-push site/ to a gh-pages branch ([--branch], [--remote], [--message])",
+			"deploy"       : "Build and ship site/ to a real target: s3, azure, gcs, firebase, ftp, sftp, rsync, netlify, vercel, cloudflare-pages, local, github-pages ([--entry=<deployments/*.json entry name>] or [--target] with its own flags; no args deploys every deployments/*.json entry; [--verbose])",
+			"publish"      : "Build and publish site/ to bxSites Cloud, using [cloud.siteId]/[cloud.apiUrl] in bxsites.yaml ([--token], overrides the BXSITES_CLOUD_TOKEN env var)",
+			"package"      : "Build and zip site/ into a single archive ([--output=<path>], defaults to site.zip)",
+			"migrate"      : "Convert a GitBook export or mkdocs project into a bx-sites project (--source, required; [--from=gitbook|mkdocs])",
+			"check"        : "CI-grade content check on a built site: broken links/images, missing alt text, orphaned pages",
+			"stats"        : "Report page/word counts, versions/locales, blog, tags, search index, and site size for a built site",
+			"doctor"       : "Check the project/environment for common problems (modules, config, theme override)",
+			"post:new"     : "Scaffold a new blog post (--title, required; [--slug], [--date], [--authors], [--categories], [--tags], [--draft])",
+			"version:new"  : "Snapshot docs/ into a new docs/versions/<name>/ (--name, required)",
+			"i18n:status"  : "Report per-locale translation coverage against the default tree",
+			"i18n:new"     : "Scaffold a new docs/i18n/<code> locale (--code, required)",
+			"page:new"     : "Scaffold a single docs page at an arbitrary path (--path, required; [--title], [--description], [--icon], [--tags], [--order])",
+			"plugin:new"   : "Scaffold a plugin module skeleton (--name, required; [--dest])",
+			"theme:new"    : "Eject a built-in theme into project theme/ for customizing (--theme, required)",
+			"install:plugin" : "Download a plugin from ForgeBox into boxlang_modules/ (--name, required; [--version])",
+			"install:theme"  : "Download a theme from ForgeBox into themes/<name>/ (--name, required; [--version])",
+			"skills:install" : "Install the bx-sites AI agent skills (ortus-boxlang/bx-sites-skills) into every AI coding assistant this project has configured, via `npx skills add` ([--skill=<name>] for just one)",
+			"theme:import"   : "Best-effort convert a mkdocs/jekyll/hugo theme into themes/<name>/ (--source, --path, --name, all required)",
+			"page:rename"  : "Move a docs page and rewrite every relative link that pointed at it (--from, required; --to, required)",
+			"blog:drafts"  : "List every blog post whose frontmatter sets draft: true",
+			"blog:find"    : "Filter blog posts ([--author], [--category], [--tag], [--since], [--until], [--drafts])",
+			"search:query" : "Query a built search-index.json and rank results (--query, required; [--limit])",
+			"lint"         : "Pre-build content checks: heading level skips, blog posts missing a valid date"
+		}
+	}
+
 	/**
 	 * --------------------------------------------------------------------------
 	 * Module Methods
@@ -90,8 +156,6 @@ class {
 		 * Every module has a settings configuration object
 		 */
 		settings = {
-			loadedOn : now(),
-			loadedBy : "Luis Majano"
 		};
 
 		/**
@@ -109,75 +173,10 @@ class {
 	 * Called by the ModuleService on module activation
 	 */
 	function onLoad(){
-		// `include` treats a leading "/" as relative to a registered
-		// mapping, not the real OS filesystem, on current BoxLang engine
-		// builds - a bare absolute path like `include functionsPath` (or
-		// `include arguments.themeDir & "/layout.bxm"`) fails with "The
-		// template path [...] could not be found" even though the file
-		// genuinely exists, unless that leading "/" resolves through a
-		// mapping.
-		//
-		// Earlier attempts at fixing this failed for reasons worth
-		// recording:
-		//  - Registering a fresh mapping inline, inside the same method
-		//    call that immediately used it (FunctionsLoader.bx's own
-		//    load(), ThemeRenderer.bx's own renderPage()), still threw
-		//    "could not be found" for the mapping path itself - a mapping
-		//    registered mid-execution doesn't appear to be visible to an
-		//    `include` in that same already-executing call. Registering
-		//    it once here, at module activation - before any command or
-		//    test spec runs - avoids that.
-		//  - Registering "/" itself as a mapping (onto the real OS root)
-		//    did take effect, but broke something else: the very next
-		//    test run discovered zero bundles at all
-		//    (`<testsuites></testsuites>`), instead of running and
-		//    hitting the original include failure. BoxLang appears to
-		//    already rely on an implicit "/" mapping (used at least by
-		//    TestBox's own `directory:"tests.specs"` dot-notation bundle
-		//    discovery), and overriding it clobbers that.
-		//  - Computing a synthetic OS-root/drive-root target as the ONLY
-		//    mapping was solving the wrong problem as the primary
-		//    mechanism - bxSites only ever needs to reach files under
-		//    wherever it was actually invoked from, never the whole
-		//    filesystem.
-		//
-		// "/bxApp" -> `server.cli.executionPath` (the directory `boxlang
-		// bxSites ...` was actually invoked from - BoxLang's own `server`
-		// scope, populated in CLI mode; `server.java.executionPath` is the
-		// documented fallback for non-CLI execution) gives every absolute
-		// path under a real project (docs/, theme/, functions.bxs, ...) a
-		// working, tidy invocation-relative mapping for the common case -
-		// bxSites' own real usage never reaches outside wherever it was
-		// run from.
-		//
-		// This module's own bundled resources (built-in themes/assets)
-		// don't need this mapping at all - BoxLang automatically registers
-		// `/bxmodules/bxsites` pointing at this module's own root for
-		// every module (from `this.mapping = "bxsites"` above), so
-		// ThemeRenderer.bx's `builtInThemesDir()`/`computeModuleAssetsDir()`
-		// use that directly instead.
-		//
-		// "/bxAppRoot" is a second, narrower-purpose mapping onto the OS/
-		// drive root, for the one case "/bxApp" can't reach: a path
-		// outside the invocation directory entirely. Real bxSites usage
-		// never needs it - only this module's own test suite does, whose
-		// specs create throwaway fixture directories via
-		// `createTempDirectory()` (the OS temp directory, unrelated to
-		// wherever `./testbox/run` itself was invoked from) and then call
-		// FunctionsLoader.bx's/ThemeRenderer.bx's own `include`-driving
-		// methods directly, bypassing `main()` (and its `/bxApp` mapping)
-		// entirely. See FunctionsLoader.bx's/ThemeRenderer.bx's own
-		// `toVirtualPath()` for exactly when each mapping is used.
-		//
-		// Deliberately no regex BIF (reFind/reReplace) anywhere in this
-		// method - `onLoad()` runs during module activation, itself part
-		// of BoxRuntime's own startup sequence, before the runtime's
-		// regex-pattern cache exists yet ("Cache [bxRegex] does not exist"
-		// - confirmed the hard way). Regex is safe again everywhere else
-		// in this codebase, which only ever runs after startup completes.
+		// Register the current working directory as the /bxApp mapping in the BoxLang runtime
 		var cwd = server.boxlang.cliMode ? server.cli.executionPath : server.java.executionPath
 		getBoxRuntime().getConfiguration().registerMapping( "/bxApp", cwd )
-
+		// Register the root of the application as /bxAppRoot in the BoxLang runtime
 		var looksLikeWindowsDrive = len( cwd ) >= 2 && cwd.mid( 2, 1 ) == ":"
 		var osRoot = looksLikeWindowsDrive ? left( cwd, 2 ) & char( 92 ) : "/"
 		getBoxRuntime().getConfiguration().registerMapping( "/bxAppRoot", osRoot )
@@ -238,70 +237,6 @@ class {
 		// module root only from the file the runtime directly invokes as the
 		// module's main() (this one). Nested classes must use the "Class@bxsites"
 		// suffix form instead when referencing each other.
-		var verbs = {
-			"new"          : "models.cli.New",
-			"build"        : "models.cli.Build",
-			"serve"        : "models.cli.Serve",
-			"search-index" : "models.cli.SearchIndex",
-			"clean"        : "models.cli.Clean",
-			"gh-deploy"    : "models.cli.GhDeploy",
-			"deploy"       : "models.cli.Deploy",
-			"publish"      : "models.cli.Publish",
-			"package"      : "models.cli.Package",
-			"migrate"      : "models.cli.Migrate",
-			"check"        : "models.cli.Check",
-			"stats"        : "models.cli.Stats",
-			"doctor"       : "models.cli.Doctor",
-			"post:new"     : "models.cli.PostNew",
-			"version:new"  : "models.cli.VersionNew",
-			"i18n:status"  : "models.cli.I18nStatus",
-			"i18n:new"     : "models.cli.I18nNew",
-			"page:new"     : "models.cli.PageNew",
-			"plugin:new"   : "models.cli.PluginNew",
-			"theme:new"    : "models.cli.ThemeNew",
-			"install:plugin" : "models.cli.InstallPlugin",
-			"install:theme"  : "models.cli.InstallTheme",
-			"skills:install" : "models.cli.SkillsInstall",
-			"theme:import"   : "models.cli.ThemeImport",
-			"page:rename"  : "models.cli.PageRename",
-			"blog:drafts"  : "models.cli.BlogDrafts",
-			"blog:find"    : "models.cli.BlogFind",
-			"search:query" : "models.cli.SearchQuery",
-			"lint"         : "models.cli.Lint"
-		}
-
-		var verbDescriptions = {
-			"new"          : "Scaffold a docs project                ([--theme], [--name])",
-			"build"        : "Render docs/**.md into a static site in site/",
-			"serve"        : "Build and serve the site locally with live reload ([--port], [--host])",
-			"search-index" : "Rebuild the search index standalone",
-			"clean"        : "Remove site/ and any build cache",
-			"gh-deploy"    : "Build and force-push site/ to a gh-pages branch ([--branch], [--remote], [--message])",
-			"deploy"       : "Build and ship site/ to a real target: s3, azure, gcs, firebase, ftp, sftp, rsync, netlify, vercel, cloudflare-pages, local, github-pages ([--entry=<deployments/*.json entry name>] or [--target] with its own flags; no args deploys every deployments/*.json entry; [--verbose])",
-			"publish"      : "Build and publish site/ to bxSites Cloud, using [cloud.siteId]/[cloud.apiUrl] in bxsites.yaml ([--token], overrides the BXSITES_CLOUD_TOKEN env var)",
-			"package"      : "Build and zip site/ into a single archive ([--output=<path>], defaults to site.zip)",
-			"migrate"      : "Convert a GitBook export or mkdocs project into a bx-sites project (--source, required; [--from=gitbook|mkdocs])",
-			"check"        : "CI-grade content check on a built site: broken links/images, missing alt text, orphaned pages",
-			"stats"        : "Report page/word counts, versions/locales, blog, tags, search index, and site size for a built site",
-			"doctor"       : "Check the project/environment for common problems (modules, config, theme override)",
-			"post:new"     : "Scaffold a new blog post (--title, required; [--slug], [--date], [--authors], [--categories], [--tags], [--draft])",
-			"version:new"  : "Snapshot docs/ into a new docs/versions/<name>/ (--name, required)",
-			"i18n:status"  : "Report per-locale translation coverage against the default tree",
-			"i18n:new"     : "Scaffold a new docs/i18n/<code>/ locale (--code, required)",
-			"page:new"     : "Scaffold a single docs page at an arbitrary path (--path, required; [--title], [--description], [--icon], [--tags], [--order])",
-			"plugin:new"   : "Scaffold a plugin module skeleton (--name, required; [--dest])",
-			"theme:new"    : "Eject a built-in theme into project theme/ for customizing (--theme, required)",
-			"install:plugin" : "Download a plugin from ForgeBox into boxlang_modules/ (--name, required; [--version])",
-			"install:theme"  : "Download a theme from ForgeBox into themes/<name>/ (--name, required; [--version])",
-			"skills:install" : "Install the bx-sites AI agent skills (ortus-boxlang/bx-sites-skills) into every AI coding assistant this project has configured, via `npx skills add` ([--skill=<name>] for just one)",
-			"theme:import"   : "Best-effort convert a mkdocs/jekyll/hugo theme into themes/<name>/ (--source, --path, --name, all required)",
-			"page:rename"  : "Move a docs page and rewrite every relative link that pointed at it (--from, required; --to, required)",
-			"blog:drafts"  : "List every blog post whose frontmatter sets draft: true",
-			"blog:find"    : "Filter blog posts ([--author], [--category], [--tag], [--since], [--until], [--drafts])",
-			"search:query" : "Query a built search-index.json and rank results (--query, required; [--limit])",
-			"lint"         : "Pre-build content checks: heading level skips, blog posts missing a valid date"
-		}
-
 		var firstToken = arrayLen( arguments.args ) >= 1 ? arguments.args[ 1 ] : ""
 
 		if ( firstToken == "--version" || firstToken == "-v" ) {
@@ -310,17 +245,17 @@ class {
 		}
 
 		if ( firstToken == "--help" || firstToken == "-h" || firstToken == "help" ) {
-			mergeProviderVerbs( verbs, verbDescriptions, arguments.args )
-			printUsage( verbs, verbDescriptions )
+			mergeProviderVerbs( static.verbs, static.verbDescriptions, arguments.args )
+			printUsage( static.verbs, static.verbDescriptions )
 			return 0
 		}
 
 		if ( !len( firstToken ) ) {
-			printUsage( verbs, verbDescriptions )
+			printUsage( static.verbs, static.verbDescriptions )
 			return 1
 		}
 
-		mergeProviderVerbs( verbs, verbDescriptions, arguments.args )
+		mergeProviderVerbs( static.verbs, static.verbDescriptions, arguments.args )
 
 		// A provider-contributed verb may register under a colon-joined
 		// compound name (e.g. "cloud:publish", following the same
@@ -334,16 +269,16 @@ class {
 
 		if ( arrayLen( arguments.args ) >= 2 ) {
 			var compoundVerbName = firstToken & ":" & arguments.args[ 2 ]
-			if ( verbs.keyExists( compoundVerbName ) ) {
+			if ( static.verbs.keyExists( compoundVerbName ) ) {
 				verbName = compoundVerbName
 				verbTokens = 2
 			}
 		}
 
-		if ( !verbs.keyExists( verbName ) ) {
+		if ( !static.verbs.keyExists( verbName ) ) {
 			println( "Unknown verb [#verbName#]." )
 			println( "" )
-			printUsage( verbs, verbDescriptions )
+			printUsage( static.verbs, static.verbDescriptions )
 			return 1
 		}
 
@@ -356,7 +291,7 @@ class {
 		options.projectRoot = resolveProjectRoot( options )
 
 		try {
-			var verbClass = new "#verbs[ verbName ]#"()
+			var verbClass = new "#static.verbs[ verbName ]#"()
 			var result = verbClass.run( options )
 			if ( len( result.message ?: "" ) ) {
 				println( result.message )

@@ -2603,6 +2603,24 @@ a.button.primary {
 	border-top: 1px dashed var( --bxsites-border );
 }
 
+.bxsites-powered-by {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 1.5rem 0 0.5rem;
+	padding: 0.7rem 0.85rem;
+	border: 1px solid currentColor;
+	border-radius: 0.75rem;
+	color: inherit;
+	opacity: 0.72;
+	font-size: 0.85rem;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.bxsites-powered-by:hover { opacity: 1; }
+.bxsites-powered-by .bxsites-icon { width: 1.25rem; height: 1.25rem; flex: 0 0 auto; }
+
 @media print {
 	.bxsites-pagebreak {
 		margin: 0;
