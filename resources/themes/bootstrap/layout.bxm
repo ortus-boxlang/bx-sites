@@ -294,7 +294,7 @@
 </bx:output><bx:if variables.socialLinks.len() gt 0><bx:output>
 			<div class="bxsites-footer__social">#renderSocialLinks( variables.socialLinks )#</div>
 </bx:output></bx:if><bx:output>
-			<div class="bxsites-footer__credit">Built with <a href="https://github.com/ortus-boxlang/bx-sites" target="_blank" rel="noopener noreferrer">BxSites</a></div>
+			<div class="bxsites-footer__credit">Built with <a href="https://bxsites.io" target="_blank" rel="noopener noreferrer">BxSites</a></div>
 		</div>
 	</footer>
 </bx:output></bx:if><bx:output>
