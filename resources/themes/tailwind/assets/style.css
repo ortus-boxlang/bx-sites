@@ -227,7 +227,7 @@ html[data-accent="emerald"][data-theme="dark"] { --bxsites-link: #34d399; --bxsi
 
 .accent-picker__menu {
 	position: absolute;
-	top: calc( 100{'chrome': 'background: #ffffff;\n\em );
+	top: calc( 100% + 0.35rem );
 	right: 0;
 	z-index: 20;
 	display: flex;

@@ -490,7 +490,7 @@ a:hover {
 
 .accent-picker__menu {
 	position: absolute;
-	top: calc( 100{'chrome': 'background: var( --docsem );
+	top: calc( 100% + 0.35rem );
 	right: 0;
 	z-index: 20;
 	display: flex;
