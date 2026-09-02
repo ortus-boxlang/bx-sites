@@ -35,6 +35,19 @@
 	/* Every header control shares this one height so the toolbar reads as
 	   a single aligned row instead of a mix of ad hoc utility paddings. */
 	--bxsites-toolbar-h: 2.375rem;
+	/* Unlike every other theme, this one otherwise leans entirely on
+	   Tailwind's own utility classes (slate-*/cyan-* etc.) instead of
+	   custom properties - these four exist only so shared components
+	   (blog-author-posts search, the table-header tint, the accent color
+	   picker) and this file's own `var( --bxsites-accent )` references
+	   further down have something real to resolve against. */
+	--bxsites-bg: #ffffff;
+	--bxsites-text: #0f172a;
+	--bxsites-muted: #64748b;
+	--bxsites-border: rgba( 0, 0, 0, 0.12 );
+	--bxsites-link: #0e7490;
+	--bxsites-link-hover: #0891b2;
+	--bxsites-accent: #38bdf8;
 	--bxsites-step-marker-bg: #0e7490;
 	--bxsites-step-marker-text: #fff;
 	--bxsites-step-line: rgba( 0, 0, 0, 0.12 );
@@ -51,6 +64,13 @@
 }
 
 [data-theme="dark"] {
+	--bxsites-bg: #0a0d0f;
+	--bxsites-text: #e7ecee;
+	--bxsites-muted: #8b979c;
+	--bxsites-border: rgba( 255, 255, 255, 0.09 );
+	--bxsites-link: #34d399;
+	--bxsites-link-hover: #6ee7b7;
+	--bxsites-accent: #34d399;
 	--bxsites-step-marker-bg: #34d399;
 	--bxsites-step-marker-text: #0a0d0f;
 	--bxsites-step-line: rgba( 255, 255, 255, 0.15 );
@@ -223,6 +243,19 @@
 	white-space: nowrap;
 }
 
+.nav-group-header {
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.nav-group-header:hover {
+	background: rgba( 0, 0, 0, 0.05 );
+}
+
+[data-theme="dark"] .nav-group-header:hover {
+	background: rgba( 255, 255, 255, 0.06 ) !important;
+}
+
 .nav-toggle {
 	flex: 0 0 auto;
 	background: transparent;
@@ -239,7 +272,7 @@
 }
 
 .nav-toggle[aria-expanded="true"] .nav-toggle__icon {
-	transform: rotate( -180deg );
+	transform: rotate( 90deg );
 }
 
 /* nav-toggle.js measures each list's own real height and transitions
@@ -248,6 +281,14 @@
 .nav-toggle-body {
 	overflow: hidden;
 	transition: max-height 0.25s ease;
+	/* Bootstrap's own `.nav.flex-column` is `display: flex; flex-wrap: wrap`
+	   - with a column direction, wrap triggers on the CROSS axis, i.e. the
+	   container's height, so while max-height is small during this slide
+	   flex-wrap: wrap misreads that as "out of vertical room" and lays
+	   items out in side-by-side columns instead of stacking them (visible
+	   as a jarring flash of items on one row right as a section opens).
+	   Forcing nowrap keeps every item in its one true column throughout. */
+	flex-wrap: nowrap;
 }
 
 /* A named icon (icon: rocket / lucide:rocket / tabler:rocket / custom:name)
@@ -1896,8 +1937,30 @@ code:not( pre code ) {
 }
 
 .prose .bxsites-table-wrap {
-	max-height: 480px;
-	overflow: auto;
+	/* Horizontal only - a tall table (e.g. from the filter feature) must
+	   never be vertically clipped; sticky-header pinning (below) still
+	   works fine against the page's own scroll. */
+	overflow-x: auto;
+	margin-bottom: 1.5rem;
+}
+
+.prose .bxsites-table-filter {
+	display: block;
+	width: 100%;
+	margin: 0 0 0.6rem;
+	padding: 0.4rem 0.75rem;
+	font-size: 0.85rem;
+	font-family: inherit;
+	border: 1px solid var( --bxsites-border );
+	border-radius: 6px;
+	background: var( --bxsites-bg );
+	color: var( --bxsites-text );
+	box-sizing: border-box;
+}
+
+.prose .bxsites-table-filter:focus {
+	outline: 2px solid var( --bxsites-link );
+	outline-offset: 1px;
 }
 
 .prose table {
@@ -1914,7 +1977,7 @@ code:not( pre code ) {
 }
 
 [data-theme="dark"] .prose thead th {
-	background-color: #0a0d0f;
+	background-color: var( --bxsites-bg );
 }
 
 .prose th,
@@ -1927,7 +1990,11 @@ code:not( pre code ) {
 
 .prose th {
 	background: rgba( 56, 189, 248, 0.08 );
-	font-weight: 600;
+	font-weight: 700;
+	font-size: 0.78rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	border-bottom: 2px solid var( --bxsites-link );
 }
 
 .prose tbody tr:nth-child( even ) {

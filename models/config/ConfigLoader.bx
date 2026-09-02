@@ -243,6 +243,15 @@ class {
 			)
 		}
 
+		for ( var accentOption in [ "accentColor", "accentColorDark" ] ) {
+			if ( theme.options.keyExists( accentOption ) && !reFind( "^##[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$", trim( theme.options[ accentOption ] ) ) ) {
+				throw(
+					type    = "BxSites.InvalidConfig",
+					message = "#variables.configFileName# [theme.options.#accentOption#], when present, must be a hex color like ##2563eb"
+				)
+			}
+		}
+
 		if ( !isSimpleValue( theme.logo ?: "" ) || !isSimpleValue( theme.favicon ?: "" ) ) {
 			throw(
 				type    = "BxSites.InvalidConfig",

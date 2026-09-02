@@ -320,6 +320,23 @@ build - the `robots` key above is ignored entirely once this file exists.
         ```json
         { "theme": { "options": { "breadcrumbs": false } } }
         ```
+  - `theme.options.accentColor`/`theme.options.accentColorDark` - a hex
+    color (3- or 6-digit, e.g. `#2563eb`) overriding the theme's own
+    interactive/accent color (links, active nav items, focus states, ...)
+    for light mode and dark mode respectively. This is a site-wide,
+    build-time setting picked by the site owner - there's no visitor-facing
+    UI to change it. Either or both can be set independently; leaving one
+    unset keeps that mode on the theme's own native accent color.
+
+    === "YAML"
+        ```yaml
+        theme: { options: { accentColor: "#2563eb", accentColorDark: "#60a5fa" } }
+        ```
+
+    === "JSON"
+        ```json
+        { "theme": { "options": { "accentColor": "#2563eb", "accentColorDark": "#60a5fa" } } }
+        ```
 
 ## `search`
 

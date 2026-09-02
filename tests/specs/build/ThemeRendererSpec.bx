@@ -231,6 +231,30 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "emits [theme.options.accentColor]/[accentColorDark] as a server-rendered <style> override, across every built-in theme, with no visitor-facing picker UI", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+
+					var plainHtml = renderer.renderPage( page, nav, { name : "My Site" }, themeDir );
+					expect( plainHtml ).notToInclude( "--bxsites-link: ##2563eb" );
+					expect( plainHtml ).notToInclude( "accent-picker" );
+
+					var accentConfig = {
+						name  : "My Site",
+						theme : { options : { accentColor : "##2563eb", accentColorDark : "##60a5fa" } }
+					};
+					var accentHtml = renderer.renderPage( page, nav, accentConfig, themeDir );
+					expect( accentHtml ).toInclude( "--bxsites-link: ##2563eb" );
+					expect( accentHtml ).toInclude( '[data-theme="dark"]' );
+					expect( accentHtml ).toInclude( "--bxsites-link: ##60a5fa" );
+					expect( accentHtml ).notToInclude( "accent-picker" );
+				}
+			} );
+
 			it( "renders a distinct, recognized icon for every built-in social platform, across every built-in theme", function() {
 				var root = newProjectRoot();
 				var page = { title : "My Page", contentHtml : "<p>Body</p>" };

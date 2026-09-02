@@ -26,6 +26,7 @@ class {
 
 	variables.blockPattern  = createObject( "java", "java.util.regex.Pattern" ).compile( "\$\$([\s\S]+?)\$\$" )
 	variables.inlinePattern = createObject( "java", "java.util.regex.Pattern" ).compile( "\$([^\s\$][^\$\n]*?[^\s\$]|[^\s\$])\$" )
+	variables.tokenPattern  = createObject( "java", "java.util.regex.Pattern" ).compile( "bxsitesmath[0-9a-f]{32}" )
 
 	/**
 	 * Replaces every `$...$`/`$$...$$` formula with a plain alphanumeric
@@ -84,11 +85,22 @@ class {
 	 * @return html with every placeholder token swapped back for its original (HTML-escaped) formula text
 	 */
 	string function restore( required string html, required struct formulas ) {
-		var result = arguments.html
-		for ( var token in arguments.formulas ) {
-			result = result.replace( token, encodeForHTML( arguments.formulas[ token ] ), "all" )
+		// One regex pass over `html` rather than one whole-string `.replace()`
+		// per formula - looping `.replace()` calls, each re-scanning the
+		// *entire* (already large) html for just one token, turns quadratic
+		// in the number of formulas on a page; a page with a few dozen (e.g.
+		// docs pages showing many `$name(...)$`-shaped code examples that
+		// happen to parse as "formulas") could take upwards of ten seconds
+		// where this takes milliseconds - same tokenizeMatches() shape
+		// protect() already uses for the reverse direction.
+		var matcher = variables.tokenPattern.matcher( arguments.html )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+		while ( matcher.find() ) {
+			var replacement = arguments.formulas[ matcher.group() ] ?: matcher.group()
+			matcher.appendReplacement( buffer, createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( encodeForHTML( replacement ) ) )
 		}
-		return result
+		matcher.appendTail( buffer )
+		return buffer.toString()
 	}
 
 	/**

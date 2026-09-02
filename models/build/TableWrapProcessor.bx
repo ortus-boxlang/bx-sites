@@ -9,8 +9,16 @@
  * docs/guides/markdown.md#tables). This runs as a post-process pass after
  * `Markdown()` has already turned pipe-table syntax into real `<table>`
  * markup - same shape as CodeAnnotationProcessor.bx's `applyToHtml()`.
+ *
+ * Any table with `FILTER_ROW_THRESHOLD` or more data rows also gets a live
+ * Alpine-powered filter input injected above it, in the same spirit as
+ * BlogBuilder.bx's author-posts search - here driven by each row's own
+ * `$el.textContent` rather than a precomputed attribute, since a table row
+ * spans several cells worth of unpredictable content.
  */
 class {
+
+	variables.FILTER_ROW_THRESHOLD = 10
 
 	/**
 	 * Wraps each top-level `<table>...</table>` in the given HTML with a
@@ -42,11 +50,48 @@ class {
 				break
 			}
 
-			result &= '<div class="bxsites-table-wrap">' & mid( arguments.html, tableStart, closeEnd - tableStart + 1 ) & '</div>'
+			var tableHtml = mid( arguments.html, tableStart, closeEnd - tableStart + 1 )
+			var tagged = tagFilterableRows( tableHtml )
+
+			if ( tagged.filtered ) {
+				result &= '<div class="bxsites-table-wrap" x-data="{ q: '''' }"><input type="search" class="bxsites-table-filter" x-model="q" placeholder="Filter table..." aria-label="Filter table">' & tagged.html & '</div>'
+			} else {
+				result &= '<div class="bxsites-table-wrap">' & tagged.html & '</div>'
+			}
+
 			pos = closeEnd + 1
 		}
 
 		return result
+	}
+
+	/**
+	 * Counts the data rows in a single `<table>...</table>` (every `<tr>`
+	 * after the `</thead>`, or every `<tr>` at all when there's no `<thead>`
+	 * to exclude). When that count meets `FILTER_ROW_THRESHOLD`, tags each
+	 * of those `<tr>` elements with an `x-show` bound to a shared Alpine `q`
+	 * variable (owned by the wrapping div - see `wrap()`) so the filter
+	 * input can hide non-matching rows client-side.
+	 */
+	private struct function tagFilterableRows( required string tableHtml ) {
+		var headEnd = findNoCase( "</thead>", arguments.tableHtml )
+		var bodyStart = headEnd ? headEnd + 8 : 1
+		var head = headEnd ? left( arguments.tableHtml, headEnd + 7 ) : ""
+		var body = mid( arguments.tableHtml, bodyStart, len( arguments.tableHtml ) - bodyStart + 1 )
+		var rowCount = reMatchNoCase( "<tr(\s|>)", body ).len()
+
+		if ( rowCount < variables.FILTER_ROW_THRESHOLD ) {
+			return { html : arguments.tableHtml, filtered : false }
+		}
+
+		var taggedBody = reReplaceNoCase(
+			body,
+			"<tr(\s|>)",
+			'<tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"\1',
+			"all"
+		)
+
+		return { html : head & taggedBody, filtered : true }
 	}
 
 	/**

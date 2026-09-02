@@ -27,8 +27,8 @@
 			if ( node.children.len() && variables.navCollapsible ) {
 				var open = variables.navExpandAll || navContainsActive( node )
 				html &= "<li class=""vp-nav__item vp-nav__item--group"">"
-				html &= "<div class=""vp-nav__group-header"">" & linkOrSpan
-				html &= "<button type=""button"" class=""nav-toggle"" aria-expanded=""" & ( open ? "true" : "false" ) & """ aria-label=""" & encodeForHTML( variables.stringsResolver.format( variables.strings.toggleSection, { "title" : node.title } ) ) & """><span class=""nav-toggle__icon"" aria-hidden=""true"">▾</span></button>"
+				html &= "<div class=""vp-nav__group-header nav-group-header"">" & linkOrSpan
+				html &= "<button type=""button"" class=""nav-toggle"" aria-expanded=""" & ( open ? "true" : "false" ) & """ aria-label=""" & encodeForHTML( variables.stringsResolver.format( variables.strings.toggleSection, { "title" : node.title } ) ) & """><span class=""nav-toggle__icon"" aria-hidden=""true"">▸</span></button>"
 				html &= "</div>"
 				html &= renderNavList( node.children, true, !open )
 				html &= "</li>"
@@ -185,6 +185,8 @@
 	variables.openapiEnabled = ( variables.siteConfig.openapi ?: false ) ? true : false
 	variables.pageActionsEnabled = ( variables.siteConfig.pageActions ?: false ) ? true : false
 	variables.pageActionsPosition = variables.siteConfig.theme.options.pageActionsPosition ?: "top"
+	variables.accentColor = trim( variables.siteConfig.theme.options.accentColor ?: "" )
+	variables.accentColorDark = trim( variables.siteConfig.theme.options.accentColorDark ?: "" )
 </bx:script>
 <bx:output><!doctype html>
 <html lang="#encodeForHTML( variables.currentLocale.len() ? variables.currentLocale : 'en' )#" dir="#encodeForHTML( variables.currentLocaleDir )#">
@@ -221,6 +223,21 @@
 	<link rel="stylesheet" href="#variables.basePath#assets/vendor/highlight/github.min.css">
 	<link rel="stylesheet" href="#variables.basePath##variables.siteConfig.theme.styleUrl ?: 'assets/theme/style.css'#">
 	#renderExtraCss( variables.siteConfig.extraCss ?: [] )#
+</bx:output><bx:if len( variables.accentColor ) or len( variables.accentColorDark )><bx:output>
+	<style>
+</bx:output><bx:if len( variables.accentColor )><bx:output>
+		:root {
+			--bxsites-link: #variables.accentColor#;
+			--bxsites-link-hover: color-mix( in srgb, #variables.accentColor# 85%, black );
+		}
+</bx:output></bx:if><bx:if len( variables.accentColorDark )><bx:output>
+		[data-theme="dark"] {
+			--bxsites-link: #variables.accentColorDark#;
+			--bxsites-link-hover: color-mix( in srgb, #variables.accentColorDark# 85%, white );
+		}
+</bx:output></bx:if><bx:output>
+	</style>
+</bx:output></bx:if><bx:output>
 </bx:output><bx:if variables.mathEnabled><bx:output>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 </bx:output></bx:if><bx:if variables.openapiEnabled><bx:output>

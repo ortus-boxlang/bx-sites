@@ -35,6 +35,11 @@
 	--md-muted: #6b7280;
 	--md-link: #2563EB;
 	--md-link-hover: #1D4ED8;
+	/* Alias of the --md-link tokens above - a couple of shared blog
+	   components and the accent color picker target --bxsites-link
+	   directly, see docs/guides/theming.md#accent-color. */
+	--bxsites-link: var( --md-link );
+	--bxsites-link-hover: var( --md-link-hover );
 	--md-border: rgba( 0, 0, 0, 0.08 );
 	--md-code-bg: #f3f6fb;
 	/* Every header control shares this one height so the toolbar reads as
@@ -206,6 +211,18 @@ body.gb-body {
 	display: flex;
 	align-items: center;
 	gap: 0.25rem;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.gb-nav__group-header:hover,
+.gb-nav__link:hover {
+	background: rgba( 0, 0, 0, 0.05 );
+}
+
+[data-theme="dark"] .gb-nav__group-header:hover,
+[data-theme="dark"] .gb-nav__link:hover {
+	background: rgba( 255, 255, 255, 0.06 );
 }
 
 .gb-nav__group-header .gb-nav__link,
@@ -231,7 +248,7 @@ body.gb-body {
 }
 
 .nav-toggle[aria-expanded="true"] .nav-toggle__icon {
-	transform: rotate( -180deg );
+	transform: rotate( 90deg );
 }
 
 /* nav-toggle.js measures each list's own real height and transitions
@@ -240,6 +257,14 @@ body.gb-body {
 .nav-toggle-body {
 	overflow: hidden;
 	transition: max-height 0.25s ease;
+	/* Bootstrap's own `.nav.flex-column` is `display: flex; flex-wrap: wrap`
+	   - with a column direction, wrap triggers on the CROSS axis, i.e. the
+	   container's height, so while max-height is small during this slide
+	   flex-wrap: wrap misreads that as "out of vertical room" and lays
+	   items out in side-by-side columns instead of stacking them (visible
+	   as a jarring flash of items on one row right as a section opens).
+	   Forcing nowrap keeps every item in its one true column throughout. */
+	flex-wrap: nowrap;
 }
 
 .brand-logo {
@@ -1170,8 +1195,30 @@ code:not( pre code ) {
 }
 
 .gb-content-body .bxsites-table-wrap {
-	max-height: 480px;
-	overflow: auto;
+	/* Horizontal only - a tall table (e.g. from the filter feature) must
+	   never be vertically clipped; sticky-header pinning (below) still
+	   works fine against the page's own scroll. */
+	overflow-x: auto;
+	margin-bottom: 1.5rem;
+}
+
+.gb-content-body .bxsites-table-filter {
+	display: block;
+	width: 100%;
+	margin: 0 0 0.6rem;
+	padding: 0.4rem 0.75rem;
+	font-size: 0.85rem;
+	font-family: inherit;
+	border: 1px solid var( --bxsites-border );
+	border-radius: 20px;
+	background: var( --bxsites-bg );
+	color: var( --bxsites-text );
+	box-sizing: border-box;
+}
+
+.gb-content-body .bxsites-table-filter:focus {
+	outline: 2px solid var( --bxsites-link );
+	outline-offset: 1px;
 }
 
 .gb-content-body table {
@@ -1197,7 +1244,11 @@ code:not( pre code ) {
 
 .gb-content-body th {
 	background: rgba( 37, 99, 235, 0.08 );
-	font-weight: 600;
+	font-weight: 700;
+	font-size: 0.78rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	border-bottom: 2px solid var( --bxsites-link );
 }
 
 .gb-content-body tbody tr:nth-child( even ) {
