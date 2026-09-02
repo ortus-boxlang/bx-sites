@@ -12,6 +12,7 @@ class extends="testbox.system.BaseSpec" {
 			beforeEach( function() {
 				variables.loader = new "models.build.BlogAuthorsLoader@bxsites"();
 				variables.loader.setYamlRenderer( new "tests.support.FakeYamlRenderer@bxsites"() );
+				variables.loader.setTomlRenderer( new "tests.support.FakeTomlRenderer@bxsites"() );
 				variables.tempDirs = [];
 			} );
 
@@ -52,6 +53,14 @@ class extends="testbox.system.BaseSpec" {
 				expect( authors.lmajano.url ).toBe( "" );
 				expect( authors.lmajano.email ).toBe( "" );
 				expect( authors.lmajano.socials ).toBeStruct();
+			} );
+
+			it( "loads authors.toml when authors.yml is absent", function() {
+				var dir = newDocsDir();
+				directoryCreate( dir & "/blog", true, true );
+				fileWrite( dir & "/blog/authors.toml", '{"lmajano":{"name":"Luis Majano"}}' );
+
+				expect( loader.load( dir ).lmajano.name ).toBe( "Luis Majano" );
 			} );
 
 			it( "preserves title/bio/url/email/socials when set", function() {

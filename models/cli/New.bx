@@ -14,7 +14,7 @@ class {
 	 * Dispatches the `new` verb to ProjectScaffolder.scaffold(), after
 	 * validating `--theme` against the built-in theme names.
 	 *
-	 * @options { projectRoot (required, absolute path), name, theme (defaults to "bootstrap"), description, format ("yaml" default, or "json") }
+	 * @options { projectRoot (required, absolute path), name, theme (defaults to "bootstrap"), description, format ("yaml" default, "toml", or "json") }
 	 */
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )

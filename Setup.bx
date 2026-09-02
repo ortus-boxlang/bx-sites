@@ -2,8 +2,8 @@ class {
 
 	function main( args = [] ) {
 		var projectRoot = getDirectoryFromPath( getCurrentTemplatePath() )
-		var boxHome = projectRoot & ".boxlang"
-		var moduleLink = boxHome & "/modules/bxsites"
+		var modulesHome = projectRoot & "boxlang_modules"
+		var moduleLink = modulesHome & "/bx-sites"
 		var files = createObject( "java", "java.nio.file.Files" )
 		var paths = createObject( "java", "java.nio.file.Paths" )
 		var linkPath = paths.get( moduleLink )
@@ -36,7 +36,7 @@ class {
 			println( "Created: #envFile#" )
 		}
 
-		directoryCreate( boxHome & "/modules", true, true )
+		directoryCreate( modulesHome, true, true )
 		if ( files.exists( linkPath ) || files.isSymbolicLink( linkPath ) ) {
 			if ( !files.isSymbolicLink( linkPath ) ) {
 				throw( type = "BxSites.SetupConflict", message = "Cannot replace existing non-symlink module path: #moduleLink#" )
@@ -45,9 +45,9 @@ class {
 		}
 
 		files.createSymbolicLink( linkPath, paths.get( projectRoot ) )
-		println( "Created: #boxHome#/modules" )
+		println( "Created: #modulesHome#" )
 		println( "Registered: #moduleLink# -> #projectRoot#" )
-		println( "Run `source .env` before using the local BoxLang home." )
+		println( "The local bx-sites module is ready." )
 	}
 
 }

@@ -1,12 +1,12 @@
 /**
  * Loads a project's reusable structured data "by convention" -
- * `docs/data/*.yaml`/`.yml`/`.json`/`.bx`, one file per top-level key
+ * `docs/data/*.yaml`/`.yml`/`.toml`/`.json`/`.bx`, one file per top-level key
  * (extension stripped), used as that key's value. A project with no
  * `docs/data/` folder simply has no data, and `load()` returns an empty
  * struct - the same "opt-in by presence" shape as `BlogAuthorsLoader.bx`'s
  * `authors.yml`/`FunctionsLoader.bx`'s `functions.bxs`.
  *
- * `.yaml`/`.yml`/`.json` - basename used verbatim, no case-folding, and the
+ * `.yaml`/`.yml`/`.toml`/`.json` - basename used verbatim, no case-folding, and the
  * file's own parsed root (object *or* array) used exactly as parsed. There's
  * no fixed shape to validate/default per entry, unlike `BlogAuthorsLoader.bx`
  * - arbitrary JSON-shaped content (a team roster, a pricing table, a feature
@@ -56,13 +56,14 @@ class {
 	 * first - an author who adds a data class alongside a stale same-key
 	 * static file almost certainly means the class to win.
 	 */
-	variables.extensions = [ "bx", "yaml", "yml", "json" ]
+	variables.extensions = [ "bx", "yaml", "yml", "toml", "json" ]
 
 	/**
 	 * Parses a YAML data file - real bx-yaml BIFs by default, swappable via
 	 * setYamlRenderer() (YamlRenderer.bx's own docblock explains why).
 	 */
 	variables.yamlRenderer = new "models.build.YamlRenderer@bxsites"()
+	variables.tomlRenderer = new "models.build.TomlRenderer@bxsites"()
 
 	/**
 	 * Swaps in a fake/test YAML renderer - see YamlRenderer.bx's docblock.
@@ -71,6 +72,15 @@ class {
 	 */
 	void function setYamlRenderer( required any renderer ) {
 		variables.yamlRenderer = arguments.renderer
+	}
+
+	/**
+	 * Swaps in a fake/test TOML renderer - see TomlRenderer.bx's docblock.
+	 *
+	 * @renderer Any object exposing `fromToml( content )`
+	 */
+	void function setTomlRenderer( required any renderer ) {
+		variables.tomlRenderer = arguments.renderer
 	}
 
 	/**
@@ -130,9 +140,9 @@ class {
 		// inside the closure below would look up a key that was never
 		// there (the same lesson BuildPipeline.bx's own renderDocTree()
 		// docblock already documents for `blogNavUrl`).
-		var filesByExt = arguments.filesByExt
-		var ext = variables.extensions.filter( e => filesByExt.keyExists( e ) )[ 1 ]
-		var fileInfo = filesByExt[ ext ]
+		var fileMap = arguments.filesByExt
+		var ext = variables.extensions.filter( e => fileMap.keyExists( e ) )[ 1 ]
+		var fileInfo = fileMap[ ext ]
 
 		if ( ext == "bx" ) {
 			return loadClass( arguments.key, fileInfo.rawBasename, arguments.dataDir )
@@ -141,11 +151,13 @@ class {
 		try {
 			return ext == "json"
 				? jsonDeserialize( fileRead( fileInfo.path ) )
-				: variables.yamlRenderer.fromYaml( fileRead( fileInfo.path ) )
+				: ( ext == "toml"
+					? variables.tomlRenderer.fromToml( fileRead( fileInfo.path ) )
+					: variables.yamlRenderer.fromYaml( fileRead( fileInfo.path ) ) )
 		} catch ( any e ) {
 			throw(
 				type    = "BxSites.InvalidDataFile",
-				message = "docs/data/#arguments.key#.#ext# is not valid #ext == "json" ? "JSON" : "YAML"#: #e.message#"
+				message = "docs/data/#arguments.key#.#ext# is not valid #ext == "json" ? "JSON" : ( ext == "toml" ? "TOML" : "YAML" )#: #e.message#"
 			)
 		}
 	}

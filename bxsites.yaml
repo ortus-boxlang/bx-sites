@@ -3,7 +3,7 @@ description: "A modern, BoxLang-powered static site generator that turns Markdow
 baseURL: "https://bxsites.io/"
 theme:
     name: bootstrap
-    options: { navCollapsible: true, navExpandAll: false, tocPosition: sticky }
+    options: { navCollapsible: true, navExpandAll: false, tocPosition: sticky, accentColor: "#00C853", accentColorDark: "#34D399" }
     logo: "assets/boxlang-icon-full.svg"
     favicon: "assets/favicon.png"
 search: true

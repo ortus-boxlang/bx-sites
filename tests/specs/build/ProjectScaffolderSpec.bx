@@ -71,6 +71,18 @@ class extends="testbox.system.BaseSpec" {
 				expect( config.name ).toBe( "My Site" );
 			} );
 
+			it( "scaffolds bxsites.toml instead when format is toml", function() {
+				var dir = newTargetDir();
+				var result = scaffolder.scaffold( dir, "My Site", "bootstrap", "", "toml" );
+
+				expect( fileExists( dir & "/bxsites.toml" ) ).toBeTrue();
+				expect( fileExists( dir & "/bxsites.yaml" ) ).toBeFalse();
+				expect( result.configPath ).toBe( dir & "/bxsites.toml" );
+
+				var config = new "models.config.ConfigLoader@bxsites"().load( dir );
+				expect( config.name ).toBe( "My Site" );
+			} );
+
 			it( "escapes quotes in the site name/description so the scaffolded JSON stays valid", function() {
 				var dir = newTargetDir();
 				scaffolder.scaffold( dir, 'Say "Hi"', "bootstrap", 'Quote: "hello"', "json" );
@@ -83,7 +95,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "throws BxSites.InvalidFormat for an unknown format", function() {
 				var dir = newTargetDir();
 				expect( function() {
-					scaffolder.scaffold( dir, "My Site", "bootstrap", "", "toml" );
+					scaffolder.scaffold( dir, "My Site", "bootstrap", "", "ini" );
 				} ).toThrow( "BxSites.InvalidFormat" );
 			} );
 

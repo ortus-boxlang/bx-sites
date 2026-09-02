@@ -159,14 +159,13 @@ boxlang Build.bx --version=1.1.0
 
 ## Running Tests
 
-Copy `.env.example` to `.env`. The example uses a project-local `.boxlang/` home so the checkout is portable and does not depend on a machine-specific BoxLang installation path.
+Copy `.env.example` to `.env` for the local preview settings.
 
 ```bash
 cp .env.example .env
-source .env
 ```
 
-Run the setup script once to create the local BoxLang module folder and register this checkout. If the root `modules/` folder is missing, it asks whether it should run `box install` for you:
+Run the setup script once to create `boxlang_modules/` and register this checkout as `boxlang_modules/bx-sites`. If the root `modules/` folder is missing, it asks whether it should run `box install` for you:
 
 ```bash
 boxlang Setup.bx

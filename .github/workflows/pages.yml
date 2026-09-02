@@ -93,7 +93,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        theme: [bootstrap, material, tailwind, docsy, slate, docusaurus, justthedocs, vuepress, gitbook, notion]
+        theme:
+          [
+            bootstrap,
+            material,
+            tailwind,
+            docsy,
+            slate,
+            docusaurus,
+            justthedocs,
+            vuepress,
+            gitbook,
+            notion,
+          ]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -115,7 +127,7 @@ jobs:
           # noticed. Restored rather than re-guessing at exactly what
           # setup-boxlang does or doesn't need commandbox for.
           with-commandbox: true
-          modules: bx-esapi bx-yaml bx-markdown bx-image
+          modules: bx-esapi bx-yaml bx-toml bx-markdown bx-image
 
       - name: Register this module so `bxSites` resolves
         run: |

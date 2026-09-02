@@ -9,6 +9,7 @@ class extends="testbox.system.BaseSpec" {
 
 			beforeEach( function() {
 				variables.loader = new "models.config.ConfigLoader@bxsites"();
+				variables.loader.setTomlRenderer( new "tests.support.FakeTomlRenderer@bxsites"() );
 				variables.tempDirs = [];
 			} );
 
@@ -59,6 +60,31 @@ class extends="testbox.system.BaseSpec" {
 				loader.setYamlRenderer( new "tests.support.FakeYamlRenderer@bxsites"() );
 
 				expect( loader.load( dir ).name ).toBe( "YAML Site" );
+			} );
+
+			it( "loads bxsites.toml when YAML and JSON are absent", function() {
+				var dir = createTempDirectory( prefix = "bxsites-configloader-toml-" );
+				tempDirs.append( dir );
+				fileWrite( dir & "/bxsites.toml", '{"name":"TOML Site"}' );
+
+				expect( loader.load( dir ).name ).toBe( "TOML Site" );
+			} );
+
+			it( "prefers bxsites.toml over bxsites.json when YAML is absent", function() {
+				var dir = newProjectDir( '{"name":"JSON Site"}' );
+				fileWrite( dir & "/bxsites.toml", '{"name":"TOML Site"}' );
+
+				expect( loader.load( dir ).name ).toBe( "TOML Site" );
+			} );
+
+			it( "throws BxSites.InvalidConfig for malformed TOML", function() {
+				var dir = createTempDirectory( prefix = "bxsites-configloader-badtoml-" );
+				tempDirs.append( dir );
+				fileWrite( dir & "/bxsites.toml", "{ not valid" );
+
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
 			it( "throws BxSites.InvalidConfig for malformed YAML", function() {

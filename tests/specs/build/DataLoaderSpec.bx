@@ -13,6 +13,7 @@ class extends="testbox.system.BaseSpec" {
 			beforeEach( function() {
 				variables.loader = new "models.build.DataLoader@bxsites"();
 				variables.loader.setYamlRenderer( new "tests.support.FakeYamlRenderer@bxsites"() );
+				variables.loader.setTomlRenderer( new "tests.support.FakeTomlRenderer@bxsites"() );
 				variables.tempDirs = [];
 			} );
 
@@ -78,6 +79,15 @@ class extends="testbox.system.BaseSpec" {
 				expect( data.team.name ).toBe( "Ortus" );
 			} );
 
+			it( "loads a .toml file keyed by its basename", function() {
+				var dir = newDocsDir();
+				writeDataFile( dir, "team.toml", { "name" : "Ortus" } );
+
+				var data = loader.load( dir );
+
+				expect( data.team.name ).toBe( "Ortus" );
+			} );
+
 			it( "preserves an array root exactly as parsed", function() {
 				var dir = newDocsDir();
 				writeDataFile( dir, "sponsors.yaml", [ "Ortus", "BoxLang" ] );
@@ -100,7 +110,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( data.keyExists( "team" ) ).toBeTrue();
 			} );
 
-			it( "resolves a basename collision across extensions via the extensions order (yaml before json)", function() {
+			it( "resolves a basename collision across extensions via the extensions order (yaml before toml before json)", function() {
 				var dir = newDocsDir();
 				writeDataFile( dir, "products.yaml", { "name" : "From YAML" } );
 				writeDataFile( dir, "products.json", { "name" : "From JSON" } );
@@ -108,6 +118,16 @@ class extends="testbox.system.BaseSpec" {
 				var data = loader.load( dir );
 
 				expect( data.products.name ).toBe( "From YAML" );
+			} );
+
+			it( "prefers TOML over JSON when YAML is absent", function() {
+				var dir = newDocsDir();
+				writeDataFile( dir, "products.toml", { "name" : "From TOML" } );
+				writeDataFile( dir, "products.json", { "name" : "From JSON" } );
+
+				var data = loader.load( dir );
+
+				expect( data.products.name ).toBe( "From TOML" );
 			} );
 
 			it( "throws BxSites.InvalidDataFile naming the file when a YAML file is malformed", function() {

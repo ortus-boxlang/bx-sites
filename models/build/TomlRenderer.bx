@@ -1,0 +1,26 @@
+/**
+ * Reads/writes TOML through bx-toml's `tomlDeserialize()`/`tomlSerialize()`
+ * BIFs. Callers keep this behind an injectable renderer seam so their unit
+ * tests do not require a live bx-toml module activation.
+ */
+class {
+
+	/**
+	 * Parses a TOML document into a BoxLang value.
+	 *
+	 * @content Raw TOML text
+	 */
+	any function fromToml( required string content ) {
+		return tomlDeserialize( arguments.content )
+	}
+
+	/**
+	 * Serializes a BoxLang struct into TOML text.
+	 *
+	 * @value The struct to serialize
+	 */
+	string function toToml( required struct value ) {
+		return tomlSerialize( arguments.value )
+	}
+
+}

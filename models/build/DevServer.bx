@@ -101,7 +101,7 @@ class {
 
 	/**
 	 * Starts native watching of `docs/` (or `src/`), `bxsites.json`/`.yaml`/
-	 * `.yml` and a project `theme/` override (whichever exist), reacting to
+	 * `.yml`/`.toml` and a project `theme/` override (whichever exist), reacting to
 	 * a real filesystem change instead of Serve.bx's own old 1-second
 	 * `checkAndRebuild()` poll loop - see this class's own docblock. Safe to
 	 * call more than once; a later call replaces the running watcher/scheduler.

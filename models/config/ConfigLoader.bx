@@ -1,7 +1,7 @@
 /**
  * Reads, defaults, and validates a project's site configuration (module spec
- * section 4). `bxsites.yaml` (or `.yml`) is the preferred/default format -
- * `bxsites.json` is still fully supported for existing projects, resolved in
+ * section 4). `bxsites.yaml` (or `.yml`) is the preferred/default format;
+ * `bxsites.toml` and `bxsites.json` are also fully supported, resolved in
  * that order when more than one is present. Pure struct in, struct out - no
  * CLI/argv concerns, so it is unit-testable directly against a temp project
  * directory.
@@ -14,7 +14,7 @@ class {
 	 * `.yml` are parsed via bx-yaml's `yamlDeserialize()`/`yamlDeserializeFile()`
 	 * BIFs, `bxsites.json` via the built-in `jsonDeserialize()`.
 	 */
-	variables.configFileNames = [ "bxsites.yaml", "bxsites.yml", "bxsites.json" ]
+	variables.configFileNames = [ "bxsites.yaml", "bxsites.yml", "bxsites.toml", "bxsites.json" ]
 
 	/**
 	 * The config file name in play for the current/last `load()` call - only
@@ -30,6 +30,7 @@ class {
 	 * via setYamlRenderer() (YamlRenderer.bx's own docblock explains why).
 	 */
 	variables.yamlRenderer = new "models.build.YamlRenderer@bxsites"()
+	variables.tomlRenderer = new "models.build.TomlRenderer@bxsites"()
 
 	/**
 	 * Swaps in a fake/test YAML renderer - see YamlRenderer.bx's docblock.
@@ -38,6 +39,10 @@ class {
 	 */
 	void function setYamlRenderer( required any renderer ) {
 		variables.yamlRenderer = arguments.renderer
+	}
+
+	void function setTomlRenderer( required any renderer ) {
+		variables.tomlRenderer = arguments.renderer
 	}
 
 	/**
@@ -109,26 +114,29 @@ class {
 		if ( !fileExists( configPath ) ) {
 			throw(
 				type    = "BxSites.ConfigNotFound",
-				message = "No bxsites.yaml (or bxsites.json) found at [#arguments.projectRoot#] - run `new` to scaffold a project first"
+				message = "No bxsites.yaml, bxsites.toml, or bxsites.json found at [#arguments.projectRoot#] - run `new` to scaffold a project first"
 			)
 		}
 
 		var isYaml = variables.configFileName.endsWith( ".yaml" ) || variables.configFileName.endsWith( ".yml" )
+		var isToml = variables.configFileName.endsWith( ".toml" )
 
 		var parsed = ""
 		try {
-			parsed = isYaml ? variables.yamlRenderer.fromYaml( fileRead( configPath ) ) : jsonDeserialize( fileRead( configPath ) )
+			parsed = isYaml
+				? variables.yamlRenderer.fromYaml( fileRead( configPath ) )
+				: ( isToml ? variables.tomlRenderer.fromToml( fileRead( configPath ) ) : jsonDeserialize( fileRead( configPath ) ) )
 		} catch ( any e ) {
 			throw(
 				type    = "BxSites.InvalidConfig",
-				message = "#variables.configFileName# at [#configPath#] is not valid #isYaml ? 'YAML' : 'JSON'#: #e.message#"
+				message = "#variables.configFileName# at [#configPath#] is not valid #isYaml ? 'YAML' : ( isToml ? 'TOML' : 'JSON' )#: #e.message#"
 			)
 		}
 
 		if ( !isStruct( parsed ) ) {
 			throw(
 				type    = "BxSites.InvalidConfig",
-				message = "#variables.configFileName# at [#configPath#] must contain a #isYaml ? 'YAML' : 'JSON'# object"
+				message = "#variables.configFileName# at [#configPath#] must contain a #isYaml ? 'YAML' : ( isToml ? 'TOML' : 'JSON' )# object"
 			)
 		}
 

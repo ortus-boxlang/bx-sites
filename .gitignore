@@ -15,11 +15,10 @@ bin/**
 
 # Dependencies
 testbox/**
-boxlang_modules/**
+boxlang_modules/
 modules/**
 tests/results/**
 .env
-.boxlang/
 .agents/skills/**
 
 # npm packages pulled in ad-hoc by vendorIcons.mjs/vendorAssets.mjs - their

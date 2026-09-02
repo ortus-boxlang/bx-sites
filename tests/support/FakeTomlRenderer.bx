@@ -1,0 +1,15 @@
+/**
+ * Deterministic TOML renderer fake for loader specs. Fixtures use JSON text
+ * under a `.toml` extension so tests isolate file selection and delegation.
+ */
+class {
+
+	any function fromToml( required string content ) {
+		return jsonDeserialize( arguments.content )
+	}
+
+	string function toToml( required struct value ) {
+		return jsonSerialize( arguments.value )
+	}
+
+}

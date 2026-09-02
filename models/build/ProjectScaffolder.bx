@@ -3,7 +3,8 @@
  * implementation: a `docs/` folder with a starter `index.md`, and a site
  * config defaulted to the requested (or bootstrap) theme (module spec
  * sections 3, 4 and 6). `bxsites.yaml` is the default/preferred format;
- * `format: "json"` scaffolds a `bxsites.json` instead, for a project that
+ * `format: "toml"` or `format: "json"` scaffolds the matching config file,
+ * for a project that
  * wants to stay on it - both are fully supported by ConfigLoader.bx.
  */
 class {
@@ -15,7 +16,7 @@ class {
 	 * @name The site name written into the config
 	 * @theme The built-in theme name to default the project to
 	 * @description Optional site description
-	 * @format `"yaml"` (default) or `"json"` - which config format to scaffold
+	 * @format `"yaml"` (default), `"toml"`, or `"json"` - which config format to scaffold
 	 *
 	 * @return { projectRoot, configPath, indexPath }
 	 */
@@ -26,17 +27,17 @@ class {
 		string description = "",
 		string format = "yaml"
 	) {
-		var format = lCase( trim( arguments.format ) )
-		if ( !listFindNoCase( "yaml,json", format ) ) {
+		var configFormat = lCase( trim( arguments.format ) )
+		if ( !listFindNoCase( "yaml,toml,json", configFormat ) ) {
 			throw(
 				type    = "BxSites.InvalidFormat",
-				message = "Unknown config format [#arguments.format#] - must be one of: yaml, json"
+				message = "Unknown config format [#arguments.format#] - must be one of: yaml, toml, json"
 			)
 		}
 
 		var dir = arguments.targetDir.reReplace( "[\/]+$", "" )
 
-		for ( var existingName in [ "bxsites.yaml", "bxsites.yml", "bxsites.json" ] ) {
+		for ( var existingName in [ "bxsites.yaml", "bxsites.yml", "bxsites.toml", "bxsites.json" ] ) {
 			if ( fileExists( dir & "/" & existingName ) ) {
 				throw(
 					type    = "BxSites.ProjectAlreadyExists",
@@ -45,7 +46,7 @@ class {
 			}
 		}
 
-		var configPath = dir & "/bxsites." & ( format == "yaml" ? "yaml" : "json" )
+		var configPath = dir & "/bxsites." & configFormat
 
 		directoryCreate( path = dir, createPath = true, ignoreExists = true )
 		directoryCreate( path = dir & "/docs", createPath = true, ignoreExists = true )
@@ -54,9 +55,11 @@ class {
 		var indexPath = dir & "/docs/index.md"
 		fileWrite( indexPath, renderIndexMd( arguments.name ) )
 
-		var configSource = format == "yaml"
+		var configSource = configFormat == "yaml"
 			? renderConfigYaml( arguments.name, arguments.theme, arguments.description )
-			: renderConfigJson( arguments.name, arguments.theme, arguments.description )
+			: ( configFormat == "toml"
+				? renderConfigToml( arguments.name, arguments.theme, arguments.description )
+				: renderConfigJson( arguments.name, arguments.theme, arguments.description ) )
 		fileWrite( configPath, configSource )
 
 		return {
@@ -119,6 +122,28 @@ class {
 			""
 		]
 		return lines.toList( char( 10 ) )
+	}
+
+	/**
+	 * Renders a starter `bxsites.toml`, escaping `name`/`description` so
+	 * quotes in either can't break the generated TOML.
+	 *
+	 * @name The site name
+	 * @theme The default theme name
+	 * @description The site description
+	 *
+	 * @return The rendered bxsites.toml source
+	 */
+	private string function renderConfigToml( required string name, required string theme, required string description ) {
+		return tomlSerialize( {
+			name        : arguments.name,
+			description : arguments.description,
+			baseURL     : "/",
+			theme       : { name : arguments.theme, options : {} },
+			search      : true,
+			nav         : [],
+			markdown    : {}
+		} )
 	}
 
 	/**

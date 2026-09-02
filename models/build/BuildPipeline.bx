@@ -152,7 +152,7 @@ class {
 		// everywhere - see FunctionsLoader.bx's own docblock.
 		var functions = variables.functionsLoader.load( docsDir )
 		// A project's own reusable structured data (docs/guides/data-files.md) -
-		// docs/data/*.yaml|.yml|.json, one file per top-level key. Same
+		// docs/data/*.yaml|.yml|.toml|.json, one file per top-level key. Same
 		// project-wide, load-once scope as functions above, for the same
 		// reason - see DataLoader.bx's own docblock.
 		var data = variables.dataLoader.load( docsDir )
