@@ -100,6 +100,49 @@ class extends="testbox.system.BaseSpec" {
 				expect( restored ).toInclude( 'class="bxsites-tab-panel" data-bxsites-tab="2"' );
 			} );
 
+			it( "extracts every tab in a group nested inside a list item, whose own headers need extra indentation just to stay part of that item", function() {
+				// A real docs.md pattern: `  - some option - description:` followed by
+				// a blank line, then a tab group whose headers are indented 4 spaces
+				// (to remain part of the list item's own content) and whose body
+				// lines are indented 4 further (8 total) to be read as that header's
+				// own content. Before the fix, the second header's own indentation
+				// made isTabBodyLine() misread it as more body content of the first
+				// tab, silently dropping the whole second tab.
+				var md = "  - `some.option` - description text." & char( 10 ) &
+					char( 10 ) &
+					'    === "YAML"' & char( 10 ) &
+					"        some: yaml" & char( 10 ) &
+					char( 10 ) &
+					'    === "JSON"' & char( 10 ) &
+					'        { "some": "json" }' & char( 10 ) &
+					"  - next item";
+
+				var result = processor.extract( md );
+
+				expect( result.groups.len() ).toBe( 1 );
+				var group = result.groups[ 1 ];
+				expect( group.tabs.len() ).toBe( 2 );
+				expect( group.tabs[ 1 ].title ).toBe( "YAML" );
+				expect( group.tabs[ 1 ].content ).toBe( "some: yaml" );
+				expect( group.tabs[ 2 ].title ).toBe( "JSON" );
+				expect( group.tabs[ 2 ].content ).toBe( '{ "some": "json" }' );
+				expect( result.markdown ).notToInclude( "===" );
+				expect( result.markdown ).toInclude( "  - next item" );
+			} );
+
+			it( "keeps a nested tab group's placeholder indented to stay inside its enclosing list item", function() {
+				var md = "  - `some.option` - description text." & char( 10 ) &
+					char( 10 ) &
+					'    === "YAML"' & char( 10 ) &
+					"        some: yaml" & char( 10 ) &
+					"  - next item";
+
+				var result = processor.extract( md );
+
+				var group = result.groups[ 1 ];
+				expect( result.markdown ).toInclude( '    <div class="bxsites-raw-block" data-bxsites-token="' & group.token & '"></div>' );
+			} );
+
 		} );
 	}
 
