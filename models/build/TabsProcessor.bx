@@ -56,6 +56,14 @@ class {
 				continue
 			}
 
+			// A tab group nested inside a list item has its own headers
+			// indented just to stay part of that item's content (see
+			// isTabBodyLine()'s own docblock) - the placeholder swapped in
+			// for the whole group has to carry that same indentation, or
+			// CommonMark reads it as un-indented enough to fall out of the
+			// list item (and split its `<ul>` in two) rather than as part
+			// of the list item's own content.
+			var groupIndent = line.reReplace( "\S.*", "", "one" )
 			var tabs = []
 			while ( i <= lines.len() && trim( lines[ i ] ).reFind( variables.tabHeaderPattern ) ) {
 				tracker.consume( lines[ i ] )
@@ -65,7 +73,7 @@ class {
 				var contentLines = []
 				while ( i <= lines.len() && isTabBodyLine( lines[ i ] ) ) {
 					tracker.consume( lines[ i ] )
-					contentLines.append( dedentTabLine( lines[ i ] ) )
+					contentLines.append( dedentTabLine( lines[ i ], groupIndent ) )
 					i++
 				}
 				while ( contentLines.len() && !len( trim( contentLines[ contentLines.len() ] ) ) ) {
@@ -85,7 +93,7 @@ class {
 			var token = "bxsitestabs" & replace( createUUID(), "-", "", "all" )
 			groups.append( { token : token, tabs : tabs } )
 			outputLines.append( "" )
-			outputLines.append( '<div class="bxsites-raw-block" data-bxsites-token="' & token & '"></div>' )
+			outputLines.append( groupIndent & '<div class="bxsites-raw-block" data-bxsites-token="' & token & '"></div>' )
 			outputLines.append( "" )
 		}
 
@@ -114,27 +122,46 @@ class {
 
 	/**
 	 * Whether `line` still belongs to the tab body currently being read -
-	 * blank, or indented by a leading tab or at least 4 spaces.
+	 * blank, or indented by a leading tab or at least 4 spaces - EXCEPT a
+	 * line that's itself a new `=== "..."` tab header, even one indented
+	 * far enough to pass the 4-space test (a tab group nested inside a
+	 * list item needs its own header indented to stay part of that list
+	 * item's content, so this can't be told apart from body content by
+	 * indentation alone - see extract()'s own docblock).
 	 *
 	 * @line A raw source line, still at its original indentation
 	 */
 	private boolean function isTabBodyLine( required string line ) {
-		return !len( trim( arguments.line ) ) || arguments.line.reFind( "^(    |\t)" ) > 0
+		if ( !len( trim( arguments.line ) ) ) {
+			return true
+		}
+		if ( trim( arguments.line ).reFind( variables.tabHeaderPattern ) ) {
+			return false
+		}
+		return arguments.line.reFind( "^(    |\t)" ) > 0
 	}
 
 	/**
-	 * Strips one tab body line's leading tab (or 4 spaces) of indentation.
+	 * Strips one tab body line's leading tab (or, when the group's own
+	 * `=== "..."` headers are themselves indented to stay inside an
+	 * enclosing list item, that same indentation plus 4 more spaces) of
+	 * indentation - matching whatever depth `isTabBodyLine()` required the
+	 * line to have to be read as this tab's own content in the first
+	 * place, so a nested tab group's content ends up dedented flush left,
+	 * same as a top-level one.
 	 *
-	 * @line A tab body line, prefixed with either a leading tab or (at least) 4 spaces
+	 * @line A tab body line, prefixed with either a leading tab or (at least) `groupIndent`'s own length plus 4 spaces
+	 * @groupIndent The tab group's own header indentation (`""` for a top-level, un-nested group)
 	 */
-	private string function dedentTabLine( required string line ) {
+	private string function dedentTabLine( required string line, string groupIndent = "" ) {
 		if ( !len( trim( arguments.line ) ) ) {
 			return ""
 		}
 		if ( left( arguments.line, 1 ) == char( 9 ) ) {
 			return mid( arguments.line, 2, len( arguments.line ) )
 		}
-		return mid( arguments.line, 5, len( arguments.line ) )
+		var stripLength = len( arguments.groupIndent ) + 4
+		return mid( arguments.line, stripLength + 1, len( arguments.line ) )
 	}
 
 	/**
