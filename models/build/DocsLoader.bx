@@ -92,6 +92,14 @@ class {
 		}
 	}
 
+	/**
+	 * Derives a docs-root-relative path from an absolute file path without
+	 * interpreting the docs root as a regex pattern, so Windows-style
+	 * backslashes are treated as plain separators.
+	 *
+	 * @basePath Absolute docs root path
+	 * @filePath Absolute path to a file under docs root
+	 */
 	private string function relativePathFrom( required string basePath, required string filePath ) {
 		var normalizedBase = normalizePath( arguments.basePath ).reReplace( "[\/]+$", "" )
 		var normalizedPath = normalizePath( arguments.filePath )
@@ -104,6 +112,12 @@ class {
 		return normalizedPath.reReplace( "^[\/]+", "" )
 	}
 
+	/**
+	 * Normalizes path separators to "/" for consistent cross-platform path
+	 * comparisons and prefix stripping.
+	 *
+	 * @value The path to normalize
+	 */
 	private string function normalizePath( required string value ) {
 		return arguments.value.replace( char( 92 ), "/", "all" )
 	}
