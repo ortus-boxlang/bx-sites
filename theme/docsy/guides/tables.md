@@ -103,17 +103,95 @@ the CSS class every `<table>` renders with are all controlled by
 `bxsites.yaml`'s [`markdown.tableOptions`](../configuration.md#markdown);
 the defaults shown throughout this page are almost always what you want.
 
+## A more complex example
+
+Everything above combines freely - alignment, inline code, links, bold/
+italic, and even a short row - in one real-world-shaped table:
+
+```markdown title="Example" linenums="1"
+| Endpoint | Method | Auth | Notes |
+| --- | :---: | :---: | --- |
+| `/sites` | `GET` | ✅ | List every site. See [Sites API](../guides/variables-and-functions.md). |
+| `/sites/{id}` | `GET` | ✅ | Fetch one site by id. |
+| `/sites` | `POST` | ✅ | **Create** a site; body is a `bxsites.yaml`-shaped JSON object. |
+| `/sites/{id}` | `DELETE` | ✅ | Irreversible. |
+| `/health` | `GET` | |
+```
+
+Which renders as:
+
+| Endpoint | Method | Auth | Notes |
+| --- | :---: | :---: | --- |
+| `/sites` | `GET` | ✅ | List every site. See [Sites API](../guides/variables-and-functions.md). |
+| `/sites/{id}` | `GET` | ✅ | Fetch one site by id. |
+| `/sites` | `POST` | ✅ | **Create** a site; body is a `bxsites.yaml`-shaped JSON object. |
+| `/sites/{id}` | `DELETE` | ✅ | Irreversible. |
+| `/health` | `GET` | |
+
 ## Responsive scroll and a sticky header
 
 Every rendered table is automatically wrapped in a `.bxsites-table-wrap`
 div - no `bxsites.yaml` config, no extra markdown. It gives a wide table
-its own horizontal scrollbar instead of overflowing the page, and caps
-tall tables (past a `max-height`) at a fixed height with their own
-vertical scrollbar, header row pinned in place while the body scrolls
-underneath - a short table like the ones above never grows a scrollbar
-at all, since it already fits. A custom `theme/` override can restyle
-`.bxsites-table-wrap` (its `max-height`, in particular) like any other
-CSS class.
+its own horizontal scrollbar instead of overflowing the page (a table is
+never clipped vertically - it always renders at its own full height,
+with normal breathing room below it), and its header row sticks to the
+top of the viewport while the surrounding page scrolls past it, so a
+long table's column headers stay in view - a short table like the ones
+above never needs any of this, since it already fits on screen. A custom
+`theme/` override can restyle `.bxsites-table-wrap` like any other CSS
+class.
+
+## Large tables get an automatic filter
+
+Any table with 10 or more data rows automatically gets a live filter
+input injected right above it - no `bxsites.yaml` config, no extra
+markdown, same "just works" treatment as the scroll wrapper above.
+Typing into it hides every row whose text doesn't match, checked against
+each row as a whole (every cell's text, not just one column), so it's a
+quick way to jump to the right entry in a long reference table without
+scrolling:
+
+```markdown title="Example - 10+ rows" linenums="1"
+| Code | Category | Description |
+| :--: | --- | --- |
+| 200 | Success | OK |
+| 201 | Success | Created |
+| 204 | Success | No Content |
+| 301 | Redirection | Moved Permanently |
+| 304 | Redirection | Not Modified |
+| 400 | Client Error | Bad Request |
+| 401 | Client Error | Unauthorized |
+| 403 | Client Error | Forbidden |
+| 404 | Client Error | Not Found |
+| 429 | Client Error | Too Many Requests |
+| 500 | Server Error | Internal Server Error |
+| 503 | Server Error | Service Unavailable |
+```
+
+Which renders as:
+
+| Code | Category | Description |
+| :--: | --- | --- |
+| 200 | Success | OK |
+| 201 | Success | Created |
+| 204 | Success | No Content |
+| 301 | Redirection | Moved Permanently |
+| 304 | Redirection | Not Modified |
+| 400 | Client Error | Bad Request |
+| 401 | Client Error | Unauthorized |
+| 403 | Client Error | Forbidden |
+| 404 | Client Error | Not Found |
+| 429 | Client Error | Too Many Requests |
+| 500 | Server Error | Internal Server Error |
+| 503 | Server Error | Service Unavailable |
+
+Try typing "error" or "3" into the filter above - notice the [endpoints
+table](#a-more-complex-example) higher up this page (5 rows) never got
+one; the threshold is a flat per-table row count, not a page-wide
+setting. Sorting isn't part of this - it's a filter only. For a table a
+reader can also re-sort, see [A sortable, filterable
+table](interactivity.md#a-sortable-filterable-table) below, which builds
+the table from Alpine data instead of markdown.
 
 ## Beyond plain data
 

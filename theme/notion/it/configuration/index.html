@@ -277,43 +277,41 @@ browser).</li>
 <li><code>theme.options</code> - opzioni specifiche del tema, lette da ogni tema
 integrato:
 <ul>
-<li><code>theme.options.colorMode</code> - <code>&quot;auto&quot;</code> (il valore predefinito),
+<li>
+<p><code>theme.options.colorMode</code> - <code>&quot;auto&quot;</code> (il valore predefinito),
 <code>&quot;light&quot;</code> o <code>&quot;dark&quot;</code>. Controlla quale modalità vede un visitatore alla
 prima visita, prima che ne scelga una propria tramite l'interruttore
 scuro/chiaro nell'header - <code>&quot;auto&quot;</code> segue la preferenza del suo
 sistema operativo, <code>&quot;light&quot;</code>/<code>&quot;dark&quot;</code> fissa un default fisso. Una
 volta che un visitatore attiva l'interruttore, la sua scelta
 (memorizzata in <code>localStorage</code>) prevale sempre nelle visite
-successive, indipendentemente da questa impostazione.</li>
-</ul>
-</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { colorMode: dark } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;colorMode&quot;: &quot;dark&quot; } } }
-    ```</code></pre>
+successive, indipendentemente da questa impostazione.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { colorMode: dark } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;colorMode&quot;: &quot;dark&quot; } } }
+</code></pre>
 </div></div></div>
-<ul>
-<li><code>theme.options.navCollapsible</code> - <code>false</code> (il valore predefinito)
+</li>
+<li>
+<p><code>theme.options.navCollapsible</code> - <code>false</code> (il valore predefinito)
 mostra ogni intestazione di sezione della nav sempre espansa, come
 oggi. <code>true</code> mostra ogni sezione della nav (una cartella senza
 <code>index.md</code>) come un elemento nativo <code>&lt;details&gt;</code>/<code>&lt;summary&gt;</code> che il
-visitatore può comprimere - nessun framework JS coinvolto.</li>
-<li><code>theme.options.navExpandAll</code> - rilevante solo quando <code>navCollapsible</code>
+visitatore può comprimere - nessun framework JS coinvolto.</p>
+</li>
+<li>
+<p><code>theme.options.navExpandAll</code> - rilevante solo quando <code>navCollapsible</code>
 è <code>true</code>. <code>true</code> (il valore predefinito) avvia ogni sezione aperta;
-<code>false</code> avvia ogni sezione compressa.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { navCollapsible: true, navExpandAll: false } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;navCollapsible&quot;: true, &quot;navExpandAll&quot;: false } } }
-    ```</code></pre>
+<code>false</code> avvia ogni sezione compressa.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { navCollapsible: true, navExpandAll: false } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;navCollapsible&quot;: true, &quot;navExpandAll&quot;: false } } }
+</code></pre>
 </div></div></div>
+</li>
+</ul>
+</li>
+</ul>
 <h2 id="search"><a href="#search" id="search" name="search" class="anchor"></a><code>search</code></h2>
 <p><code>true</code> (il valore predefinito) compila un indice di ricerca statico e
 attiva il box di ricerca; <code>false</code> salta entrambi del tutto - nessun
@@ -322,64 +320,68 @@ Vedi <a href="/theme/notion/it/guides/search/index.html">Ricerca</a>.</p>
 <h2 id="searchprovider"><a href="#searchprovider" id="searchprovider" name="searchprovider" class="anchor"></a><code>searchProvider</code></h2>
 <p>Quale UI di ricerca <code>search: true</code> attiva:</p>
 <ul>
-<li><code>provider</code> - <code>&quot;local&quot;</code> (il valore predefinito) è la ricerca
+<li>
+<p><code>provider</code> - <code>&quot;local&quot;</code> (il valore predefinito) è la ricerca
 statica/lato client propria di bx-sites (<code>search-index.json</code> + lunr.js,
 vedi <a href="/theme/notion/it/guides/search/index.html#local-the-default">Ricerca</a>). <code>&quot;algolia&quot;</code> attiva
 invece <a href="/theme/notion/it/guides/search/index.html#algolia">Algolia DocSearch</a>, e <code>&quot;pagefind&quot;</code>
 attiva <a href="/theme/notion/it/guides/search/index.html#pagefind">Pagefind</a>. Qualsiasi altro valore è un
 provider personalizzato del progetto, collegato tramite una
 sovrascrittura <code>theme/</code> - vedi
-<a href="/theme/notion/it/guides/search/index.html#other-search-providers">Ricerca</a>.</li>
-<li><code>algolia</code> - obbligatorio quando <code>provider</code> è <code>&quot;algolia&quot;</code>: <code>appId</code>,
+<a href="/theme/notion/it/guides/search/index.html#other-search-providers">Ricerca</a>.</p>
+</li>
+<li>
+<p><code>algolia</code> - obbligatorio quando <code>provider</code> è <code>&quot;algolia&quot;</code>: <code>appId</code>,
 <code>apiKey</code> (la chiave API pubblica <em>solo per la ricerca</em>, non una chiave
 da amministratore) e <code>indexName</code>, esattamente come li richiede il
 client DocSearch di Algolia stesso. <code>insights</code> (<code>false</code> di default)
-attiva l'analytics di click/conversione proprio di DocSearch.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">  search: true
-  searchProvider:
-    provider: algolia
-    algolia:
-      appId: ABC123
-      apiKey: a1b2c3d4e5f6...
-      indexName: my-docs
+attiva l'analytics di click/conversione proprio di DocSearch.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">search: true
+searchProvider:
+  provider: algolia
+  algolia:
+    appId: ABC123
+    apiKey: a1b2c3d4e5f6...
+    indexName: my-docs
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">  {
-  	&quot;search&quot;: true,
-  	&quot;searchProvider&quot;: {
-  		&quot;provider&quot;: &quot;algolia&quot;,
-  		&quot;algolia&quot;: {
-  			&quot;appId&quot;: &quot;ABC123&quot;,
-  			&quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
-  			&quot;indexName&quot;: &quot;my-docs&quot;
-  		}
-  	}
-  }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;search&quot;: true,
+	&quot;searchProvider&quot;: {
+		&quot;provider&quot;: &quot;algolia&quot;,
+		&quot;algolia&quot;: {
+			&quot;appId&quot;: &quot;ABC123&quot;,
+			&quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
+			&quot;indexName&quot;: &quot;my-docs&quot;
+		}
+	}
+}
 </code></pre>
 </div></div></div>
-<ul>
-<li><code>pagefind</code> - entrambe le chiavi opzionali quando <code>provider</code> è
+</li>
+<li>
+<p><code>pagefind</code> - entrambe le chiavi opzionali quando <code>provider</code> è
 <code>&quot;pagefind&quot;</code>: <code>bin</code> (predefinito <code>&quot;pagefind&quot;</code>) è il nome/percorso
 dell'eseguibile CLI, risolto rispetto a <code>PATH</code> quando è un nome nudo;
 <code>options</code> è un array di flag CLI grezzi extra passati direttamente. La
 CLI <code>pagefind</code> stessa deve essere già installata e su <code>PATH</code> - BxSites
 ci esegue uno shell out (come <code>git</code> per <code>lastUpdated</code>/<code>gh-deploy</code>), non
-la installa al posto tuo.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">  search: true
-  searchProvider:
-    provider: pagefind
-    pagefind: { bin: pagefind, options: [] }
+la installa al posto tuo.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">search: true
+searchProvider:
+  provider: pagefind
+  pagefind: { bin: pagefind, options: [] }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">  {
-  	&quot;search&quot;: true,
-  	&quot;searchProvider&quot;: {
-  		&quot;provider&quot;: &quot;pagefind&quot;,
-  		&quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
-  	}
-  }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;search&quot;: true,
+	&quot;searchProvider&quot;: {
+		&quot;provider&quot;: &quot;pagefind&quot;,
+		&quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
+	}
+}
 </code></pre>
 </div></div></div>
+</li>
+</ul>
 <h2 id="nav"><a href="#nav" id="nav" name="nav" class="anchor"></a><code>nav</code></h2>
 <p>Per impostazione predefinita, la nav viene dedotta dalla struttura stessa
 di cartelle/file di <code>docs/</code> (con il frontmatter <code>order</code>/<code>hidden</code>) - va
@@ -868,7 +870,7 @@ attivare esplicitamente. Un file sciolto posizionato direttamente sotto
 quelle del sito principale.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/it/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/theme/notion/it/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Sep 2, 2026, 8&#x3a;52&#x3a;46 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/it/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/theme/notion/it/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Sep 3, 2026, 4&#x3a;35&#x3a;09 PM</span></div>
 			</article>
 
 			<nav class="ntn-page-nav" aria-label="Navigazione della pagina">

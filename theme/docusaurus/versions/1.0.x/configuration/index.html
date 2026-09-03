@@ -279,45 +279,40 @@ as-is. Left blank (the default), the header shows &quot;⚡ &lt;site name&gt;&qu
 rendered at all (falling back to the browser's own default behavior).</li>
 <li><code>theme.options</code> - theme-specific options, read by every built-in theme:
 <ul>
-<li><code>theme.options.colorMode</code> - <code>&quot;auto&quot;</code> (the default), <code>&quot;light&quot;</code> or
+<li>
+<p><code>theme.options.colorMode</code> - <code>&quot;auto&quot;</code> (the default), <code>&quot;light&quot;</code> or
 <code>&quot;dark&quot;</code>. Controls which mode a first-time visitor sees before they've
 picked one themselves via the header's dark/light toggle - <code>&quot;auto&quot;</code>
 follows their OS preference, <code>&quot;light&quot;</code>/<code>&quot;dark&quot;</code> pins a fixed default.
 Once a visitor toggles the switch, their own choice (stored in
-<code>localStorage</code>) always wins on later visits, regardless of this setting.</li>
-</ul>
-</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { colorMode: dark } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;colorMode&quot;: &quot;dark&quot; } } }
-    ```</code></pre>
+<code>localStorage</code>) always wins on later visits, regardless of this setting.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { colorMode: dark } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;colorMode&quot;: &quot;dark&quot; } } }
+</code></pre>
 </div></div></div>
-<ul>
-<li><code>theme.options.navCollapsible</code> - <code>false</code> (the default) renders every nav
+</li>
+<li>
+<p><code>theme.options.navCollapsible</code> - <code>false</code> (the default) renders every nav
 section always expanded, as today. <code>true</code> gives every section with
 children a toggle button the visitor can click to collapse/expand it -
 whether that section is a bare group heading (a folder with no
 <code>index.md</code>) or links to its own page. The section containing the page
 you're currently on always starts open, regardless of <code>navExpandAll</code>,
-so navigating there never buries the very link you're on.</li>
-<li><code>theme.options.navExpandAll</code> - only relevant when <code>navCollapsible</code> is
+so navigating there never buries the very link you're on.</p>
+</li>
+<li>
+<p><code>theme.options.navExpandAll</code> - only relevant when <code>navCollapsible</code> is
 <code>true</code>. <code>true</code> (the default) starts every section open; <code>false</code> starts
-every section collapsed, except the one containing the current page.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { navCollapsible: true, navExpandAll: false } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;navCollapsible&quot;: true, &quot;navExpandAll&quot;: false } } }
-    ```</code></pre>
+every section collapsed, except the one containing the current page.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { navCollapsible: true, navExpandAll: false } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;navCollapsible&quot;: true, &quot;navExpandAll&quot;: false } } }
+</code></pre>
 </div></div></div>
-<ul>
-<li><code>theme.options.tocPosition</code> - where a page's own &quot;On this page&quot; table of
+</li>
+<li>
+<p><code>theme.options.tocPosition</code> - where a page's own &quot;On this page&quot; table of
 contents renders. <code>&quot;top&quot;</code> (the default) renders it inline, at the top of
 the article, same as today. <code>&quot;sticky&quot;</code> moves it into its own right-hand
 column that stays in view while the article scrolls underneath it - the
@@ -327,45 +322,39 @@ pinned column only fits on wide viewports (it's hidden below the point a
 instead renders a collapsible &quot;On this page&quot; bar pinned to the top of
 the viewport while scrolling - tap to expand the list, a common
 treatment for narrow viewports - so the TOC stays reachable at every
-viewport width, it just changes shape depending on how much room there is.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { tocPosition: sticky } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;tocPosition&quot;: &quot;sticky&quot; } } }
-    ```</code></pre>
+viewport width, it just changes shape depending on how much room there is.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { tocPosition: sticky } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;tocPosition&quot;: &quot;sticky&quot; } } }
+</code></pre>
 </div></div></div>
-<ul>
-<li><code>theme.options.pageMetaPosition</code> - where the edit-this-page/download-
+</li>
+<li>
+<p><code>theme.options.pageMetaPosition</code> - where the edit-this-page/download-
 markdown/last-updated row renders relative to a page's own content.
 <code>&quot;bottom&quot;</code> (the default) renders it as a small footer note right before
 the article ends. <code>&quot;top&quot;</code> renders it up near the title instead, the same
-place it always rendered before this option existed.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { pageMetaPosition: top } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;pageMetaPosition&quot;: &quot;top&quot; } } }
-    ```</code></pre>
+place it always rendered before this option existed.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { pageMetaPosition: top } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;pageMetaPosition&quot;: &quot;top&quot; } } }
+</code></pre>
 </div></div></div>
-<ul>
-<li><code>theme.options.pageActionsPosition</code> - where the <a href="#pageactions">page-actions
+</li>
+<li>
+<p><code>theme.options.pageActionsPosition</code> - where the <a href="#pageactions">page-actions
 dropdown</a> renders relative to a page's own content.
 <code>&quot;top&quot;</code> (the default) renders it right-aligned above the breadcrumbs/
-title. <code>&quot;bottom&quot;</code> renders it after the page, past the prev/next links.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { pageActionsPosition: bottom } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;pageActionsPosition&quot;: &quot;bottom&quot; } } }
-    ```</code></pre>
+title. <code>&quot;bottom&quot;</code> renders it after the page, past the prev/next links.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { pageActionsPosition: bottom } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;pageActionsPosition&quot;: &quot;bottom&quot; } } }
+</code></pre>
 </div></div></div>
+</li>
+</ul>
+</li>
+</ul>
 <h2 id="search"><a href="#search" id="search" name="search" class="anchor"></a><code>search</code></h2>
 <p><code>true</code> (the default) builds a static search index and wires up the search
 box; <code>false</code> skips both entirely - no <code>search-index.json</code>, no search UI, no
@@ -373,60 +362,64 @@ extra JS shipped. See <a href="/theme/docusaurus/versions/1.0.x/guides/search/in
 <h2 id="searchprovider"><a href="#searchprovider" id="searchprovider" name="searchprovider" class="anchor"></a><code>searchProvider</code></h2>
 <p>Which search UI <code>search: true</code> wires up:</p>
 <ul>
-<li><code>provider</code> - <code>&quot;local&quot;</code> (the default) is bx-sites' own static/client-side
+<li>
+<p><code>provider</code> - <code>&quot;local&quot;</code> (the default) is bx-sites' own static/client-side
 search (<code>search-index.json</code> + <a href="https://lucaong.github.io/minisearch/">MiniSearch</a>, see <a href="/theme/docusaurus/versions/1.0.x/guides/search/index.html#local-the-default">Search</a>).
 <code>&quot;algolia&quot;</code> wires up <a href="/theme/docusaurus/versions/1.0.x/guides/search/index.html#algolia">Algolia DocSearch</a>
 instead, and <code>&quot;pagefind&quot;</code> wires up <a href="/theme/docusaurus/versions/1.0.x/guides/search/index.html#pagefind">Pagefind</a>.
 Any other value is a project's own custom provider, wired up by a
-<code>theme/</code> override - see <a href="/theme/docusaurus/versions/1.0.x/guides/search/index.html#other-search-providers">Search</a>.</li>
-<li><code>algolia</code> - required when <code>provider</code> is <code>&quot;algolia&quot;</code>: <code>appId</code>, <code>apiKey</code>
+<code>theme/</code> override - see <a href="/theme/docusaurus/versions/1.0.x/guides/search/index.html#other-search-providers">Search</a>.</p>
+</li>
+<li>
+<p><code>algolia</code> - required when <code>provider</code> is <code>&quot;algolia&quot;</code>: <code>appId</code>, <code>apiKey</code>
 (the <em>search-only</em> public API key, not an admin key) and <code>indexName</code>,
 exactly as Algolia's own DocSearch client expects them. <code>insights</code>
-(<code>false</code> by default) turns on DocSearch's click/conversion analytics.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">  search: true
-  searchProvider:
-    provider: algolia
-    algolia:
-      appId: ABC123
-      apiKey: a1b2c3d4e5f6...
-      indexName: my-docs
+(<code>false</code> by default) turns on DocSearch's click/conversion analytics.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">search: true
+searchProvider:
+  provider: algolia
+  algolia:
+    appId: ABC123
+    apiKey: a1b2c3d4e5f6...
+    indexName: my-docs
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">  {
-  	&quot;search&quot;: true,
-  	&quot;searchProvider&quot;: {
-  		&quot;provider&quot;: &quot;algolia&quot;,
-  		&quot;algolia&quot;: {
-  			&quot;appId&quot;: &quot;ABC123&quot;,
-  			&quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
-  			&quot;indexName&quot;: &quot;my-docs&quot;
-  		}
-  	}
-  }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;search&quot;: true,
+	&quot;searchProvider&quot;: {
+		&quot;provider&quot;: &quot;algolia&quot;,
+		&quot;algolia&quot;: {
+			&quot;appId&quot;: &quot;ABC123&quot;,
+			&quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
+			&quot;indexName&quot;: &quot;my-docs&quot;
+		}
+	}
+}
 </code></pre>
 </div></div></div>
-<ul>
-<li><code>pagefind</code> - both keys optional when <code>provider</code> is <code>&quot;pagefind&quot;</code>: <code>bin</code>
+</li>
+<li>
+<p><code>pagefind</code> - both keys optional when <code>provider</code> is <code>&quot;pagefind&quot;</code>: <code>bin</code>
 (default <code>&quot;pagefind&quot;</code>) is the CLI executable name/path, resolved against
 <code>PATH</code> when it's a bare name; <code>options</code> is an array of extra raw CLI
 flags passed straight through. The <code>pagefind</code> CLI itself must already be
 installed and on <code>PATH</code> - BxSites shells out to it (like <code>git</code> for
-<code>lastUpdated</code>/<code>gh-deploy</code>), it doesn't install it for you.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">  search: true
-  searchProvider:
-    provider: pagefind
-    pagefind: { bin: pagefind, options: [] }
+<code>lastUpdated</code>/<code>gh-deploy</code>), it doesn't install it for you.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">search: true
+searchProvider:
+  provider: pagefind
+  pagefind: { bin: pagefind, options: [] }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">  {
-  	&quot;search&quot;: true,
-  	&quot;searchProvider&quot;: {
-  		&quot;provider&quot;: &quot;pagefind&quot;,
-  		&quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
-  	}
-  }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;search&quot;: true,
+	&quot;searchProvider&quot;: {
+		&quot;provider&quot;: &quot;pagefind&quot;,
+		&quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
+	}
+}
 </code></pre>
 </div></div></div>
+</li>
+</ul>
 <h2 id="nav"><a href="#nav" id="nav" name="nav" class="anchor"></a><code>nav</code></h2>
 <p>By default, nav is inferred from <code>docs/</code>'s own folder/file structure (with
 <code>order</code>/<code>hidden</code> frontmatter) - fine for small sites, but a large one can
@@ -951,7 +944,7 @@ versions sort and build, and what's out of scope (per-tree search
 scoping, no deprecated/EOL flag).</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/versions/1.0.x/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/theme/docusaurus/versions/1.0.x/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Sep 2, 2026, 8&#x3a;52&#x3a;46 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/versions/1.0.x/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/theme/docusaurus/versions/1.0.x/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Sep 3, 2026, 4&#x3a;35&#x3a;09 PM</span></div>
 			</article>
 
 			<nav class="dsrs-page-nav" aria-label="Page navigation">

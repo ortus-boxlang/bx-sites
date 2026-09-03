@@ -288,27 +288,23 @@ por defecto propio del navegador).</li>
 <li><code>theme.options</code> - opciones específicas del tema, leídas por todos los
 temas incorporados:
 <ul>
-<li><code>theme.options.colorMode</code> - <code>&quot;auto&quot;</code> (el valor por defecto), <code>&quot;light&quot;</code>
+<li>
+<p><code>theme.options.colorMode</code> - <code>&quot;auto&quot;</code> (el valor por defecto), <code>&quot;light&quot;</code>
 o <code>&quot;dark&quot;</code>. Controla qué modo ve un visitante por primera vez antes de
 haber elegido uno propio mediante el interruptor claro/oscuro de la
 cabecera - <code>&quot;auto&quot;</code> sigue la preferencia de su sistema operativo,
 <code>&quot;light&quot;</code>/<code>&quot;dark&quot;</code> fija un valor por defecto. Una vez que un visitante
 activa el interruptor, su propia elección (guardada en <code>localStorage</code>)
 siempre prevalece en visitas posteriores, independientemente de este
-valor.</li>
-</ul>
-</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { colorMode: dark } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;colorMode&quot;: &quot;dark&quot; } } }
-    ```</code></pre>
+valor.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { colorMode: dark } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;colorMode&quot;: &quot;dark&quot; } } }
+</code></pre>
 </div></div></div>
-<ul>
-<li><code>theme.options.navCollapsible</code> - <code>false</code> (el valor por defecto)
+</li>
+<li>
+<p><code>theme.options.navCollapsible</code> - <code>false</code> (el valor por defecto)
 renderiza cada sección de navegación siempre expandida, como hoy.
 <code>true</code> da a cada sección con hijos un botón de alternancia que el
 visitante puede pulsar para colapsarla/expandirla - ya sea que esa
@@ -316,22 +312,21 @@ sección sea un simple encabezado de grupo (una carpeta sin
 <code>index.md</code>) o que enlace a su propia página. La sección que contiene
 la página en la que estás actualmente siempre empieza abierta,
 independientemente de <code>navExpandAll</code>, así que navegar hasta ahí nunca
-entierra el propio enlace en el que te encuentras.</li>
-<li><code>theme.options.navExpandAll</code> - solo relevante cuando <code>navCollapsible</code>
+entierra el propio enlace en el que te encuentras.</p>
+</li>
+<li>
+<p><code>theme.options.navExpandAll</code> - solo relevante cuando <code>navCollapsible</code>
 es <code>true</code>. <code>true</code> (el valor por defecto) inicia cada sección abierta;
 <code>false</code> inicia cada sección colapsada, excepto la que contiene la
-página actual.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { navCollapsible: true, navExpandAll: false } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;navCollapsible&quot;: true, &quot;navExpandAll&quot;: false } } }
-    ```</code></pre>
+página actual.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { navCollapsible: true, navExpandAll: false } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;navCollapsible&quot;: true, &quot;navExpandAll&quot;: false } } }
+</code></pre>
 </div></div></div>
-<ul>
-<li><code>theme.options.tocPosition</code> - dónde se renderiza la propia tabla de
+</li>
+<li>
+<p><code>theme.options.tocPosition</code> - dónde se renderiza la propia tabla de
 contenido &quot;En esta página&quot; de una página. <code>&quot;top&quot;</code> (el valor por
 defecto) la renderiza en línea, en la parte superior del artículo,
 como hoy. <code>&quot;sticky&quot;</code> la traslada a su propia columna a la derecha que
@@ -345,33 +340,30 @@ la parte superior del viewport mientras se hace scroll - toca para
 expandir la lista, un tratamiento habitual para viewports estrechos -
 así que la tabla de contenido sigue siendo accesible en
 cualquier ancho de viewport, solo cambia de forma según el espacio
-disponible.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { tocPosition: sticky } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;tocPosition&quot;: &quot;sticky&quot; } } }
-    ```</code></pre>
+disponible.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { tocPosition: sticky } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;tocPosition&quot;: &quot;sticky&quot; } } }
+</code></pre>
 </div></div></div>
-<ul>
-<li><code>theme.options.pageMetaPosition</code> - dónde se renderiza la fila de
+</li>
+<li>
+<p><code>theme.options.pageMetaPosition</code> - dónde se renderiza la fila de
 editar-esta-página/descargar-markdown/última-actualización en
 relación con el propio contenido de la página. <code>&quot;bottom&quot;</code> (el valor
 por defecto) la renderiza como una pequeña nota de pie justo antes de
 que termine el artículo. <code>&quot;top&quot;</code> la renderiza en su lugar cerca del
 título, el mismo lugar donde siempre se renderizaba antes de que
-existiera esta opción.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { pageMetaPosition: top } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;pageMetaPosition&quot;: &quot;top&quot; } } }
-    ```</code></pre>
+existiera esta opción.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { pageMetaPosition: top } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;pageMetaPosition&quot;: &quot;top&quot; } } }
+</code></pre>
 </div></div></div>
+</li>
+</ul>
+</li>
+</ul>
 <h2 id="search"><a href="#search" id="search" name="search" class="anchor"></a><code>search</code></h2>
 <p><code>true</code> (el valor por defecto) construye un índice de búsqueda estático y
 conecta el cuadro de búsqueda; <code>false</code> omite ambos por completo - sin
@@ -380,7 +372,8 @@ Consulta <a href="/theme/notion/versions/1.0.x/es/guides/search/index.html">Bús
 <h2 id="searchprovider"><a href="#searchprovider" id="searchprovider" name="searchprovider" class="anchor"></a><code>searchProvider</code></h2>
 <p>Qué interfaz de búsqueda conecta <code>search: true</code>:</p>
 <ul>
-<li><code>provider</code> - <code>&quot;local&quot;</code> (el valor por defecto) es la propia búsqueda
+<li>
+<p><code>provider</code> - <code>&quot;local&quot;</code> (el valor por defecto) es la propia búsqueda
 estática/del lado del cliente de bx-sites (<code>search-index.json</code> +
 lunr.js, consulta <a href="/theme/notion/versions/1.0.x/es/guides/search/index.html#local-el-predeterminado">Búsqueda</a>).
 <code>&quot;algolia&quot;</code> conecta en su lugar
@@ -388,57 +381,60 @@ lunr.js, consulta <a href="/theme/notion/versions/1.0.x/es/guides/search/index.h
 <a href="/theme/notion/versions/1.0.x/es/guides/search/index.html#pagefind">Pagefind</a>. Cualquier otro valor es un
 proveedor personalizado propio de un proyecto, conectado mediante una
 sobrescritura <code>theme/</code> - consulta
-<a href="/theme/notion/versions/1.0.x/es/guides/search/index.html#otros-proveedores-de-búsqueda">Búsqueda</a>.</li>
-<li><code>algolia</code> - obligatorio cuando <code>provider</code> es <code>&quot;algolia&quot;</code>: <code>appId</code>,
+<a href="/theme/notion/versions/1.0.x/es/guides/search/index.html#otros-proveedores-de-búsqueda">Búsqueda</a>.</p>
+</li>
+<li>
+<p><code>algolia</code> - obligatorio cuando <code>provider</code> es <code>&quot;algolia&quot;</code>: <code>appId</code>,
 <code>apiKey</code> (la clave API pública <em>solo de búsqueda</em>, no una clave de
 administrador) e <code>indexName</code>, exactamente como los espera el propio
 cliente DocSearch de Algolia. <code>insights</code> (<code>false</code> por defecto) activa la
-analítica de clics/conversión de DocSearch.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">  search: true
-  searchProvider:
-    provider: algolia
-    algolia:
-      appId: ABC123
-      apiKey: a1b2c3d4e5f6...
-      indexName: my-docs
+analítica de clics/conversión de DocSearch.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">search: true
+searchProvider:
+  provider: algolia
+  algolia:
+    appId: ABC123
+    apiKey: a1b2c3d4e5f6...
+    indexName: my-docs
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">  {
-  	&quot;search&quot;: true,
-  	&quot;searchProvider&quot;: {
-  		&quot;provider&quot;: &quot;algolia&quot;,
-  		&quot;algolia&quot;: {
-  			&quot;appId&quot;: &quot;ABC123&quot;,
-  			&quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
-  			&quot;indexName&quot;: &quot;my-docs&quot;
-  		}
-  	}
-  }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;search&quot;: true,
+	&quot;searchProvider&quot;: {
+		&quot;provider&quot;: &quot;algolia&quot;,
+		&quot;algolia&quot;: {
+			&quot;appId&quot;: &quot;ABC123&quot;,
+			&quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
+			&quot;indexName&quot;: &quot;my-docs&quot;
+		}
+	}
+}
 </code></pre>
 </div></div></div>
-<ul>
-<li><code>pagefind</code> - ambas claves opcionales cuando <code>provider</code> es <code>&quot;pagefind&quot;</code>:
+</li>
+<li>
+<p><code>pagefind</code> - ambas claves opcionales cuando <code>provider</code> es <code>&quot;pagefind&quot;</code>:
 <code>bin</code> (por defecto <code>&quot;pagefind&quot;</code>) es el nombre/ruta del ejecutable de la
 CLI, resuelto contra <code>PATH</code> cuando es un nombre simple; <code>options</code> es un
 array de flags de CLI adicionales en bruto que se pasan tal cual. La
 propia CLI de <code>pagefind</code> debe estar ya instalada y en el <code>PATH</code> - BX
 Sites la invoca externamente (como hace con <code>git</code> para
-<code>lastUpdated</code>/<code>gh-deploy</code>), no la instala por ti.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">  search: true
-  searchProvider:
-    provider: pagefind
-    pagefind: { bin: pagefind, options: [] }
+<code>lastUpdated</code>/<code>gh-deploy</code>), no la instala por ti.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">search: true
+searchProvider:
+  provider: pagefind
+  pagefind: { bin: pagefind, options: [] }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">  {
-  	&quot;search&quot;: true,
-  	&quot;searchProvider&quot;: {
-  		&quot;provider&quot;: &quot;pagefind&quot;,
-  		&quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
-  	}
-  }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;search&quot;: true,
+	&quot;searchProvider&quot;: {
+		&quot;provider&quot;: &quot;pagefind&quot;,
+		&quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
+	}
+}
 </code></pre>
 </div></div></div>
+</li>
+</ul>
 <h2 id="nav"><a href="#nav" id="nav" name="nav" class="anchor"></a><code>nav</code></h2>
 <p>Por defecto, la navegación se infiere de la propia estructura de
 carpetas/archivos de <code>docs/</code> (con el frontmatter <code>order</code>/<code>hidden</code>) - bien
@@ -961,7 +957,7 @@ ignora.</p>
 junto a las del sitio principal.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/versions/1.0.x/i18n/es/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/notion/versions/1.0.x/es/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Sep 2, 2026, 8&#x3a;52&#x3a;46 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/versions/1.0.x/i18n/es/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/notion/versions/1.0.x/es/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Sep 3, 2026, 4&#x3a;35&#x3a;09 PM</span></div>
 			</article>
 
 			<nav class="ntn-page-nav" aria-label="Navegaci&oacute;n de p&aacute;gina">

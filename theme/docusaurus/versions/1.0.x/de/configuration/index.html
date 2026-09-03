@@ -298,27 +298,23 @@ Browsers).</li>
 <li><code>theme.options</code> - themenspezifische Optionen, von jedem integrierten
 Theme gelesen:
 <ul>
-<li><code>theme.options.colorMode</code> - <code>&quot;auto&quot;</code> (Standard), <code>&quot;light&quot;</code> oder
+<li>
+<p><code>theme.options.colorMode</code> - <code>&quot;auto&quot;</code> (Standard), <code>&quot;light&quot;</code> oder
 <code>&quot;dark&quot;</code>. Steuert, welchen Modus ein Erstbesucher sieht, bevor er
 selbst über den Dunkel-/Hell-Umschalter in der Kopfzeile eine Wahl
 getroffen hat - <code>&quot;auto&quot;</code> folgt der Betriebssystem-Präferenz,
 <code>&quot;light&quot;</code>/<code>&quot;dark&quot;</code> legt einen festen Standard fest. Sobald ein Besucher
 den Schalter umlegt, gewinnt seine eigene Wahl (in <code>localStorage</code>
 gespeichert) bei späteren Besuchen immer, unabhängig von dieser
-Einstellung.</li>
-</ul>
-</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { colorMode: dark } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;colorMode&quot;: &quot;dark&quot; } } }
-    ```</code></pre>
+Einstellung.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { colorMode: dark } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;colorMode&quot;: &quot;dark&quot; } } }
+</code></pre>
 </div></div></div>
-<ul>
-<li><code>theme.options.navCollapsible</code> - <code>false</code> (Standard) rendert jeden
+</li>
+<li>
+<p><code>theme.options.navCollapsible</code> - <code>false</code> (Standard) rendert jeden
 Navigationsabschnitt stets ausgeklappt, wie bisher. <code>true</code> gibt jedem
 Abschnitt mit Kindern eine Umschalt-Schaltfläche, mit der der Besucher
 ihn ein-/ausklappen kann - egal, ob dieser Abschnitt eine reine
@@ -326,22 +322,21 @@ Gruppenüberschrift ist (ein Ordner ohne <code>index.md</code>) oder auf eine
 eigene Seite verlinkt. Der Abschnitt, der die gerade angezeigte Seite
 enthält, startet immer geöffnet, unabhängig von <code>navExpandAll</code>, damit
 das Navigieren dorthin nie den eigenen Link verdeckt, auf dem man
-gerade steht.</li>
-<li><code>theme.options.navExpandAll</code> - nur relevant, wenn <code>navCollapsible</code>
+gerade steht.</p>
+</li>
+<li>
+<p><code>theme.options.navExpandAll</code> - nur relevant, wenn <code>navCollapsible</code>
 <code>true</code> ist. <code>true</code> (Standard) startet jeden Abschnitt geöffnet;
 <code>false</code> startet jeden Abschnitt eingeklappt, außer dem, der die
-aktuelle Seite enthält.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { navCollapsible: true, navExpandAll: false } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;navCollapsible&quot;: true, &quot;navExpandAll&quot;: false } } }
-    ```</code></pre>
+aktuelle Seite enthält.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { navCollapsible: true, navExpandAll: false } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;navCollapsible&quot;: true, &quot;navExpandAll&quot;: false } } }
+</code></pre>
 </div></div></div>
-<ul>
-<li><code>theme.options.tocPosition</code> - wo das eigene Inhaltsverzeichnis (&quot;Auf
+</li>
+<li>
+<p><code>theme.options.tocPosition</code> - wo das eigene Inhaltsverzeichnis (&quot;Auf
 dieser Seite&quot;) einer Seite gerendert wird. <code>&quot;top&quot;</code> (Standard) rendert
 es inline, oben im Artikel, wie bisher. <code>&quot;sticky&quot;</code> verschiebt es in
 eine eigene rechte Spalte, die beim Scrollen des darunterliegenden
@@ -354,33 +349,30 @@ Seite&quot;-Leiste, die beim Scrollen oben am Viewport fixiert bleibt -
 antippen, um die Liste auszuklappen, eine gängige Behandlung für
 schmale Viewports - sodass das Inhaltsverzeichnis bei jeder
 Viewport-Breite erreichbar bleibt, nur seine Form ändert sich je nach
-verfügbarem Platz.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { tocPosition: sticky } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;tocPosition&quot;: &quot;sticky&quot; } } }
-    ```</code></pre>
+verfügbarem Platz.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { tocPosition: sticky } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;tocPosition&quot;: &quot;sticky&quot; } } }
+</code></pre>
 </div></div></div>
-<ul>
-<li><code>theme.options.pageMetaPosition</code> - wo die Zeile mit
+</li>
+<li>
+<p><code>theme.options.pageMetaPosition</code> - wo die Zeile mit
 Bearbeiten-diese-Seite/Markdown-herunterladen/Zuletzt-aktualisiert
 relativ zum eigenen Inhalt einer Seite gerendert wird. <code>&quot;bottom&quot;</code>
 (Standard) rendert sie als kleine Fußnotiz kurz vor Ende des Artikels.
 <code>&quot;top&quot;</code> rendert sie stattdessen oben in der Nähe des Titels, an
 derselben Stelle, an der sie immer gerendert wurde, bevor es diese
-Option gab.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { pageMetaPosition: top } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;pageMetaPosition&quot;: &quot;top&quot; } } }
-    ```</code></pre>
+Option gab.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { pageMetaPosition: top } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;pageMetaPosition&quot;: &quot;top&quot; } } }
+</code></pre>
 </div></div></div>
+</li>
+</ul>
+</li>
+</ul>
 <h2 id="search"><a href="#search" id="search" name="search" class="anchor"></a><code>search</code></h2>
 <p><code>true</code> (Standard) baut einen statischen Suchindex und verdrahtet die
 Suchbox; <code>false</code> überspringt beides vollständig - keine
@@ -389,64 +381,68 @@ Siehe <a href="/theme/docusaurus/versions/1.0.x/de/guides/search/index.html">Suc
 <h2 id="searchprovider"><a href="#searchprovider" id="searchprovider" name="searchprovider" class="anchor"></a><code>searchProvider</code></h2>
 <p>Welche Such-UI <code>search: true</code> verdrahtet:</p>
 <ul>
-<li><code>provider</code> - <code>&quot;local&quot;</code> (Standard) ist bx-sites' eigene statische/
+<li>
+<p><code>provider</code> - <code>&quot;local&quot;</code> (Standard) ist bx-sites' eigene statische/
 clientseitige Suche (<code>search-index.json</code> + lunr.js, siehe
 <a href="/theme/docusaurus/versions/1.0.x/de/guides/search/index.html#local-der-standard">Suche</a>). <code>&quot;algolia&quot;</code> verdrahtet
 stattdessen <a href="/theme/docusaurus/versions/1.0.x/de/guides/search/index.html#algolia">Algolia DocSearch</a>, und
 <code>&quot;pagefind&quot;</code> verdrahtet <a href="/theme/docusaurus/versions/1.0.x/de/guides/search/index.html#pagefind">Pagefind</a>. Jeder
 andere Wert ist ein eigener, projektspezifischer Provider, verdrahtet
 über ein <code>theme/</code>-Override - siehe
-<a href="/theme/docusaurus/versions/1.0.x/de/guides/search/index.html#andere-suchprovider">Suche</a>.</li>
-<li><code>algolia</code> - erforderlich, wenn <code>provider</code> <code>&quot;algolia&quot;</code> ist: <code>appId</code>,
+<a href="/theme/docusaurus/versions/1.0.x/de/guides/search/index.html#andere-suchprovider">Suche</a>.</p>
+</li>
+<li>
+<p><code>algolia</code> - erforderlich, wenn <code>provider</code> <code>&quot;algolia&quot;</code> ist: <code>appId</code>,
 <code>apiKey</code> (der <em>reine Such</em>-öffentliche API-Schlüssel, kein
 Administrator-Schlüssel) und <code>indexName</code>, genau wie es Algolias eigener
 DocSearch-Client erwartet. <code>insights</code> (standardmäßig <code>false</code>) schaltet
-DocSearchs Klick-/Konversions-Analytics ein.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">  search: true
-  searchProvider:
-    provider: algolia
-    algolia:
-      appId: ABC123
-      apiKey: a1b2c3d4e5f6...
-      indexName: my-docs
+DocSearchs Klick-/Konversions-Analytics ein.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">search: true
+searchProvider:
+  provider: algolia
+  algolia:
+    appId: ABC123
+    apiKey: a1b2c3d4e5f6...
+    indexName: my-docs
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">  {
-  	&quot;search&quot;: true,
-  	&quot;searchProvider&quot;: {
-  		&quot;provider&quot;: &quot;algolia&quot;,
-  		&quot;algolia&quot;: {
-  			&quot;appId&quot;: &quot;ABC123&quot;,
-  			&quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
-  			&quot;indexName&quot;: &quot;my-docs&quot;
-  		}
-  	}
-  }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;search&quot;: true,
+	&quot;searchProvider&quot;: {
+		&quot;provider&quot;: &quot;algolia&quot;,
+		&quot;algolia&quot;: {
+			&quot;appId&quot;: &quot;ABC123&quot;,
+			&quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
+			&quot;indexName&quot;: &quot;my-docs&quot;
+		}
+	}
+}
 </code></pre>
 </div></div></div>
-<ul>
-<li><code>pagefind</code> - beide Schlüssel optional, wenn <code>provider</code> <code>&quot;pagefind&quot;</code>
+</li>
+<li>
+<p><code>pagefind</code> - beide Schlüssel optional, wenn <code>provider</code> <code>&quot;pagefind&quot;</code>
 ist: <code>bin</code> (Standard <code>&quot;pagefind&quot;</code>) ist der Name/Pfad der CLI-Binary,
 aufgelöst gegen <code>PATH</code>, wenn es ein reiner Name ist; <code>options</code> ist ein
 Array zusätzlicher, roher CLI-Flags, die direkt durchgereicht werden.
 Die <code>pagefind</code>-CLI selbst muss bereits installiert und im <code>PATH</code>
 vorhanden sein - BxSites ruft sie extern auf (wie <code>git</code> für
-<code>lastUpdated</code>/<code>gh-deploy</code>), es installiert sie nicht für dich.</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">  search: true
-  searchProvider:
-    provider: pagefind
-    pagefind: { bin: pagefind, options: [] }
+<code>lastUpdated</code>/<code>gh-deploy</code>), es installiert sie nicht für dich.</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">search: true
+searchProvider:
+  provider: pagefind
+  pagefind: { bin: pagefind, options: [] }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">  {
-  	&quot;search&quot;: true,
-  	&quot;searchProvider&quot;: {
-  		&quot;provider&quot;: &quot;pagefind&quot;,
-  		&quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
-  	}
-  }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;search&quot;: true,
+	&quot;searchProvider&quot;: {
+		&quot;provider&quot;: &quot;pagefind&quot;,
+		&quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
+	}
+}
 </code></pre>
 </div></div></div>
+</li>
+</ul>
 <h2 id="nav"><a href="#nav" id="nav" name="nav" class="anchor"></a><code>nav</code></h2>
 <p>Standardmäßig wird die Navigation aus der eigenen Ordner-/Dateistruktur von
 <code>docs/</code> abgeleitet (mit <code>order</code>/<code>hidden</code>-Frontmatter) - für kleine
@@ -939,7 +935,7 @@ Versionen sortieren und bauen, und was außen vor bleibt (Suche pro Baum
 begrenzt, kein Deprecated-/EOL-Flag).</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/versions/1.0.x/i18n/de/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/docusaurus/versions/1.0.x/de/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Sep 2, 2026, 8&#x3a;52&#x3a;46 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/versions/1.0.x/i18n/de/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/docusaurus/versions/1.0.x/de/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Sep 3, 2026, 4&#x3a;35&#x3a;09 PM</span></div>
 			</article>
 
 			<nav class="dsrs-page-nav" aria-label="Seitennavigation">

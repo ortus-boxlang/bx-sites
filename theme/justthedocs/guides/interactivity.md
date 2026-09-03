@@ -85,10 +85,11 @@ re-evaluates on every keystroke.
 
 ## A sortable, filterable table
 
-A [native pipe table](tables.md) is static once built - for one that a
-reader can actually sort and filter client-side, have Alpine own the
-rows instead: put the data in `x-data` and render it with `x-for`,
-rather than writing
+A [native pipe table](tables.md) with 10+ rows already gets an automatic
+filter input for free, but that's filter-only, and any smaller table gets
+nothing at all - for one a reader can actually *sort*, at any size, have
+Alpine own the rows instead: put the data in `x-data` and render it with
+`x-for`, rather than writing
 `| Feature | Status |` pipe syntax:
 
 ```markdown title="Sortable table" linenums="1"

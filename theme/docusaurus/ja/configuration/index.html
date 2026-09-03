@@ -274,46 +274,41 @@ variables: {}
 （ブラウザ自身のデフォルト動作にフォールバックします）。</li>
 <li><code>theme.options</code> - すべての組み込みテーマが読み取る、テーマ固有のオプション:
 <ul>
-<li><code>theme.options.colorMode</code> - <code>&quot;auto&quot;</code>（デフォルト）、<code>&quot;light&quot;</code> または <code>&quot;dark&quot;</code>。
+<li>
+<p><code>theme.options.colorMode</code> - <code>&quot;auto&quot;</code>（デフォルト）、<code>&quot;light&quot;</code> または <code>&quot;dark&quot;</code>。
 初めての訪問者がヘッダーのダーク/ライトトグルで自分で選択する前に見るモードを
 制御します - <code>&quot;auto&quot;</code> は OS の設定に従い、<code>&quot;light&quot;</code>/<code>&quot;dark&quot;</code> は固定のデフォルトを
 設定します。訪問者がいったんトグルを切り替えると、その選択（<code>localStorage</code> に
-保存されます）は、この設定に関わらず以降の訪問で常に優先されます。</li>
-</ul>
-</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { colorMode: dark } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;colorMode&quot;: &quot;dark&quot; } } }
-    ```</code></pre>
+保存されます）は、この設定に関わらず以降の訪問で常に優先されます。</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { colorMode: dark } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;colorMode&quot;: &quot;dark&quot; } } }
+</code></pre>
 </div></div></div>
-<ul>
-<li><code>theme.options.navCollapsible</code> - <code>false</code>（デフォルト）は、今日と同様にすべての
+</li>
+<li>
+<p><code>theme.options.navCollapsible</code> - <code>false</code>（デフォルト）は、今日と同様にすべての
 ナビゲーションセクションを常に展開して表示します。<code>true</code> にすると、子要素を持つ
 すべてのセクションに、訪問者がクリックして折りたたみ/展開できるトグルボタンが
 付きます - そのセクションが（<code>index.md</code> のないフォルダの）単なるグループ見出しで
 あっても、自身のページにリンクしていても同様です。現在表示中のページを含む
 セクションは、<code>navExpandAll</code> の値に関わらず常に開いた状態で始まるため、
 そこへナビゲートしたときに今いるページへのリンク自体が埋もれてしまうことは
-ありません。</li>
-<li><code>theme.options.navExpandAll</code> - <code>navCollapsible</code> が <code>true</code> の場合のみ関係します。
+ありません。</p>
+</li>
+<li>
+<p><code>theme.options.navExpandAll</code> - <code>navCollapsible</code> が <code>true</code> の場合のみ関係します。
 <code>true</code>（デフォルト）はすべてのセクションを展開した状態で開始し、<code>false</code> は
 現在のページを含むセクションを除くすべてのセクションを折りたたんだ状態で
-開始します。</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { navCollapsible: true, navExpandAll: false } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;navCollapsible&quot;: true, &quot;navExpandAll&quot;: false } } }
-    ```</code></pre>
+開始します。</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { navCollapsible: true, navExpandAll: false } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;navCollapsible&quot;: true, &quot;navExpandAll&quot;: false } } }
+</code></pre>
 </div></div></div>
-<ul>
-<li><code>theme.options.tocPosition</code> - ページ自身の「このページの内容」目次がどこに
+</li>
+<li>
+<p><code>theme.options.tocPosition</code> - ページ自身の「このページの内容」目次がどこに
 レンダリングされるか。<code>&quot;top&quot;</code>（デフォルト）は、今日と同様に記事の先頭にインラインで
 レンダリングします。<code>&quot;sticky&quot;</code> にすると、記事がその下でスクロールしている間も
 表示され続ける独自の右カラムに移動します - 同じ「このページの内容」リストが、
@@ -323,31 +318,28 @@ variables: {}
 固定される折りたたみ可能な「このページの内容」バーをレンダリングします -
 タップするとリストが展開する、狭いビューポート向けによくある扱いです。
 そのため TOC はどのビューポート幅でも到達可能なままで、
-利用できるスペースに応じて形を変えるだけです。</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { tocPosition: sticky } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;tocPosition&quot;: &quot;sticky&quot; } } }
-    ```</code></pre>
+利用できるスペースに応じて形を変えるだけです。</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { tocPosition: sticky } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;tocPosition&quot;: &quot;sticky&quot; } } }
+</code></pre>
 </div></div></div>
-<ul>
-<li><code>theme.options.pageMetaPosition</code> - このページを編集/Markdown をダウンロード/
+</li>
+<li>
+<p><code>theme.options.pageMetaPosition</code> - このページを編集/Markdown をダウンロード/
 最終更新の行が、ページ自身のコンテンツに対してどこにレンダリングされるか。
 <code>&quot;bottom&quot;</code>（デフォルト）は、記事が終わる直前に小さなフッターの注記として
 レンダリングします。<code>&quot;top&quot;</code> にすると、タイトルの近くにレンダリングされます -
-このオプションが存在する前は常にそこにレンダリングされていた場所です。</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">    theme: { options: { pageMetaPosition: top } }
-    ```
-
-=== &quot;JSON&quot;
-    ```json
-    { &quot;theme&quot;: { &quot;options&quot;: { &quot;pageMetaPosition&quot;: &quot;top&quot; } } }
-    ```</code></pre>
+このオプションが存在する前は常にそこにレンダリングされていた場所です。</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { options: { pageMetaPosition: top } }
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;options&quot;: { &quot;pageMetaPosition&quot;: &quot;top&quot; } } }
+</code></pre>
 </div></div></div>
+</li>
+</ul>
+</li>
+</ul>
 <h2 id="search"><a href="#search" id="search" name="search" class="anchor"></a><code>search</code></h2>
 <p><code>true</code>（デフォルト）は静的検索インデックスをビルドし、検索ボックスを接続します。
 <code>false</code> は両方とも完全にスキップします - <code>search-index.json</code> も検索 UI も追加の JS も
@@ -355,61 +347,65 @@ variables: {}
 <h2 id="searchprovider"><a href="#searchprovider" id="searchprovider" name="searchprovider" class="anchor"></a><code>searchProvider</code></h2>
 <p><code>search: true</code> がどの検索 UI を接続するかを制御します:</p>
 <ul>
-<li><code>provider</code> - <code>&quot;local&quot;</code>（デフォルト）は bx-sites 独自の静的/クライアントサイド検索
+<li>
+<p><code>provider</code> - <code>&quot;local&quot;</code>（デフォルト）は bx-sites 独自の静的/クライアントサイド検索
 （<code>search-index.json</code> + lunr.js、<a href="/theme/docusaurus/ja/guides/search/index.html#localデフォルト">検索</a> 参照）です。
 <code>&quot;algolia&quot;</code> は代わりに <a href="/theme/docusaurus/ja/guides/search/index.html#algolia">Algolia DocSearch</a> を、<code>&quot;pagefind&quot;</code>
 は <a href="/theme/docusaurus/ja/guides/search/index.html#pagefind">Pagefind</a> を接続します。それ以外の値は、<code>theme/</code>
 オーバーライドによって配線されるプロジェクト独自のカスタムプロバイダです -
-<a href="/theme/docusaurus/ja/guides/search/index.html#その他の検索プロバイダー">検索</a> を参照してください。</li>
-<li><code>algolia</code> - <code>provider</code> が <code>&quot;algolia&quot;</code> の場合に必須: <code>appId</code>、<code>apiKey</code>
+<a href="/theme/docusaurus/ja/guides/search/index.html#その他の検索プロバイダー">検索</a> を参照してください。</p>
+</li>
+<li>
+<p><code>algolia</code> - <code>provider</code> が <code>&quot;algolia&quot;</code> の場合に必須: <code>appId</code>、<code>apiKey</code>
 （<em>検索専用</em> の公開 API キーで、管理キーではありません）、<code>indexName</code> を、
 Algolia 自身の DocSearch クライアントが期待する形式そのままで指定します。
 <code>insights</code>（デフォルトは <code>false</code>）は DocSearch のクリック/コンバージョン分析を
-有効にします。</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">  search: true
-  searchProvider:
-    provider: algolia
-    algolia:
-      appId: ABC123
-      apiKey: a1b2c3d4e5f6...
-      indexName: my-docs
+有効にします。</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">search: true
+searchProvider:
+  provider: algolia
+  algolia:
+    appId: ABC123
+    apiKey: a1b2c3d4e5f6...
+    indexName: my-docs
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">  {
-  	&quot;search&quot;: true,
-  	&quot;searchProvider&quot;: {
-  		&quot;provider&quot;: &quot;algolia&quot;,
-  		&quot;algolia&quot;: {
-  			&quot;appId&quot;: &quot;ABC123&quot;,
-  			&quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
-  			&quot;indexName&quot;: &quot;my-docs&quot;
-  		}
-  	}
-  }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;search&quot;: true,
+	&quot;searchProvider&quot;: {
+		&quot;provider&quot;: &quot;algolia&quot;,
+		&quot;algolia&quot;: {
+			&quot;appId&quot;: &quot;ABC123&quot;,
+			&quot;apiKey&quot;: &quot;a1b2c3d4e5f6...&quot;,
+			&quot;indexName&quot;: &quot;my-docs&quot;
+		}
+	}
+}
 </code></pre>
 </div></div></div>
-<ul>
-<li><code>pagefind</code> - <code>provider</code> が <code>&quot;pagefind&quot;</code> の場合、両方のキーとも省略可能です:
+</li>
+<li>
+<p><code>pagefind</code> - <code>provider</code> が <code>&quot;pagefind&quot;</code> の場合、両方のキーとも省略可能です:
 <code>bin</code>（デフォルトは <code>&quot;pagefind&quot;</code>）は CLI 実行ファイルの名前/パスで、単純な名前の
 場合は <code>PATH</code> を基準に解決されます。<code>options</code> はそのまま渡される追加の生の CLI
 フラグの配列です。<code>pagefind</code> CLI 自体は事前にインストールされ <code>PATH</code> 上にある
 必要があります - BxSites は（<code>lastUpdated</code>/<code>gh-deploy</code> の <code>git</code> と同様に）
-これを呼び出すだけで、代わりにインストールすることはありません。</li>
-</ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">  search: true
-  searchProvider:
-    provider: pagefind
-    pagefind: { bin: pagefind, options: [] }
+これを呼び出すだけで、代わりにインストールすることはありません。</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">search: true
+searchProvider:
+  provider: pagefind
+  pagefind: { bin: pagefind, options: [] }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">  {
-  	&quot;search&quot;: true,
-  	&quot;searchProvider&quot;: {
-  		&quot;provider&quot;: &quot;pagefind&quot;,
-  		&quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
-  	}
-  }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;search&quot;: true,
+	&quot;searchProvider&quot;: {
+		&quot;provider&quot;: &quot;pagefind&quot;,
+		&quot;pagefind&quot;: { &quot;bin&quot;: &quot;pagefind&quot;, &quot;options&quot;: [] }
+	}
+}
 </code></pre>
 </div></div></div>
+</li>
+</ul>
 <h2 id="nav"><a href="#nav" id="nav" name="nav" class="anchor"></a><code>nav</code></h2>
 <p>デフォルトでは、ナビゲーションは <code>docs/</code> 自身のフォルダ/ファイル構造から推定されます
 （<code>order</code>/<code>hidden</code> フロントマター付き）- 小規模なサイトには十分ですが、大規模なサイトでは
@@ -857,7 +853,7 @@ Node/esbuild のツールチェーンは不要です。リスト内のいずれ�
 含む全体像については <a href="/theme/docusaurus/ja/guides/versioning/index.html">バージョニング</a> を参照してください。</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/ja/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> &#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x3092;&#x7de8;&#x96c6;</a><a href="/theme/docusaurus/ja/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown&#x3092;&#x30c0;&#x30a6;&#x30f3;&#x30ed;&#x30fc;&#x30c9;</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &#x6700;&#x7d42;&#x66f4;&#x65b0; Sep 2, 2026, 8&#x3a;52&#x3a;46 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/ja/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> &#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x3092;&#x7de8;&#x96c6;</a><a href="/theme/docusaurus/ja/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown&#x3092;&#x30c0;&#x30a6;&#x30f3;&#x30ed;&#x30fc;&#x30c9;</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &#x6700;&#x7d42;&#x66f4;&#x65b0; Sep 3, 2026, 4&#x3a;35&#x3a;09 PM</span></div>
 			</article>
 
 			<nav class="dsrs-page-nav" aria-label="&#x30da;&#x30fc;&#x30b8;&#x30ca;&#x30d3;&#x30b2;&#x30fc;&#x30b7;&#x30e7;&#x30f3;">
