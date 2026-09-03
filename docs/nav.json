@@ -1,18 +1,18 @@
 [
 	"index.md",
-	"course/index.md",
 	{
 		"title": "Introduction",
 		"children": [
 			"getting-started.md",
-			"cli-reference.md"
+			"course/index.md",
+			"releases/index.md"
 		]
 	},
 	{
 		"title": "Configuration & Reference",
 		"children": [
 			"configuration.md",
-			"releases/index.md"
+			"cli-reference.md"
 		]
 	},
 	{
