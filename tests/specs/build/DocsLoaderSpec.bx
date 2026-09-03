@@ -74,6 +74,18 @@ class extends="testbox.system.BaseSpec" {
 				expect( pages[ 1 ].urlPath ).toBe( "index.html" );
 			} );
 
+			it( "loads docs when the docs path contains Windows-style backslashes", function() {
+				var dir = newDocsDir() & "/C:\sites\published\presentations\bxai-chat\my-docs/docs";
+				directoryCreate( dir, true, true );
+				fileWrite( dir & "/index.md", "Welcome" );
+
+				var pages = loader.load( dir );
+
+				expect( pages.len() ).toBe( 1 );
+				expect( pages[ 1 ].relativePath ).toBe( "index.md" );
+				expect( pages[ 1 ].urlPath ).toBe( "index.html" );
+			} );
+
 			it( "maps a nested folder's index.md to <folder>/index.html", function() {
 				var dir = newDocsDir();
 				directoryCreate( dir & "/guides", true, true );
