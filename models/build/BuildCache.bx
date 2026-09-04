@@ -21,7 +21,10 @@ class {
 	 * @return The cached data struct if sourcePath's mtime still matches what was cached, else an empty struct
 	 */
 	struct function get( required string sourcePath, required numeric mtime ) {
-		var entry = variables.entries[ arguments.sourcePath ] ?: {}
+		var entry = {}
+		lock name="bxsites-build-cache" timeout=10 type="readonly" {
+			entry = variables.entries[ arguments.sourcePath ] ?: {}
+		}
 		if ( !entry.isEmpty() && entry.mtime == arguments.mtime ) {
 			return entry.data
 		}
@@ -34,7 +37,9 @@ class {
 	 * @data Whatever the caller wants back from a future get() while sourcePath's mtime still matches
 	 */
 	void function set( required string sourcePath, required numeric mtime, required struct data ) {
-		variables.entries[ arguments.sourcePath ] = { mtime : arguments.mtime, data : arguments.data }
+		lock name="bxsites-build-cache" timeout=10 type="exclusive" {
+			variables.entries[ arguments.sourcePath ] = { mtime : arguments.mtime, data : arguments.data }
+		}
 	}
 
 	/**
@@ -44,7 +49,9 @@ class {
 	 * renders to.
 	 */
 	void function clear() {
-		variables.entries = {}
+		lock name="bxsites-build-cache" timeout=10 type="exclusive" {
+			variables.entries = {}
+		}
 	}
 
 }
