@@ -66,6 +66,17 @@ somehow has more than one, `bxsites.yaml` wins, then `bxsites.yml`, then
     ```json title="bxsites.json" linenums="1"
     {
     	"name": "My Docs",
+
+  === "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    search = true
+    [searchProvider]
+    provider = "algolia"
+    [searchProvider.algolia]
+    appId = "ABC123"
+    apiKey = "a1b2c3d4e5f6..."
+    indexName = "my-docs"
+    ```
     	"description": "",
     	"baseURL": "/",
     	"theme": {
@@ -118,31 +129,31 @@ somehow has more than one, `bxsites.yaml` wins, then `bxsites.yml`, then
 
 === "TOML"
     ```toml title="bxsites.toml" linenums="1"
-  name = "My Docs"
-  description = ""
-  baseURL = "/"
-  search = true
-  nav = []
-  social = []
-  footer = false
-  lastUpdated = false
-  extraCss = []
-  extraJs = []
-  plugins = []
-  variables = {}
+    name = "My Docs"
+    description = ""
+    baseURL = "/"
+    search = true
+    nav = []
+    social = []
+    footer = false
+    lastUpdated = false
+    extraCss = []
+    extraJs = []
+    plugins = []
+    variables = {}
 
-  [theme]
-  name = "bootstrap"
-  options = {}
-  logo = ""
-  favicon = ""
+    [theme]
+    name = "bootstrap"
+    options = {}
+    logo = ""
+    favicon = ""
 
-  [markdown]
-  enableAdmonition = true
+    [markdown]
+    enableAdmonition = true
 
-  [repo]
-  url = ""
-  editUri = ""
+    [repo]
+    url = ""
+    editUri = ""
     ```
 
 Only `name` is required - everything else falls back to the defaults shown
@@ -269,6 +280,12 @@ build - the `robots` key above is ignored entirely once this file exists.
         ```json
         { "theme": { "options": { "colorMode": "dark" } } }
         ```
+
+    === "TOML"
+      ```toml
+      [theme.options]
+      colorMode = "dark"
+      ```
   - `theme.options.navCollapsible` - `false` (the default) renders every nav
     section always expanded, as today. `true` gives every section with
     children a toggle button the visitor can click to collapse/expand it -
@@ -289,6 +306,13 @@ build - the `robots` key above is ignored entirely once this file exists.
         ```json
         { "theme": { "options": { "navCollapsible": true, "navExpandAll": false } } }
         ```
+
+    === "TOML"
+      ```toml
+      [theme.options]
+      navCollapsible = true
+      navExpandAll = false
+      ```
   - `theme.options.tocPosition` - where a page's own "On this page" table of
     contents renders. `"top"` (the default) renders it inline, at the top of
     the article, same as today. `"sticky"` moves it into its own right-hand
@@ -310,6 +334,12 @@ build - the `robots` key above is ignored entirely once this file exists.
         ```json
         { "theme": { "options": { "tocPosition": "sticky" } } }
         ```
+
+    === "TOML"
+      ```toml
+      [theme.options]
+      tocPosition = "sticky"
+      ```
   - `theme.options.pageMetaPosition` - where the edit-this-page/download-
     markdown/last-updated row renders relative to a page's own content.
     `"bottom"` (the default) renders it as a small footer note right before
@@ -325,6 +355,12 @@ build - the `robots` key above is ignored entirely once this file exists.
         ```json
         { "theme": { "options": { "pageMetaPosition": "top" } } }
         ```
+
+    === "TOML"
+      ```toml
+      [theme.options]
+      pageMetaPosition = "top"
+      ```
   - `theme.options.pageActionsPosition` - where the [page-actions
     dropdown](#pageactions) renders relative to a page's own content.
     `"top"` (the default) renders it right-aligned above the breadcrumbs/
@@ -339,6 +375,12 @@ build - the `robots` key above is ignored entirely once this file exists.
         ```json
         { "theme": { "options": { "pageActionsPosition": "bottom" } } }
         ```
+
+    === "TOML"
+      ```toml
+      [theme.options]
+      pageActionsPosition = "bottom"
+      ```
   - `theme.options.breadcrumbs` - `true` (the default) renders the
     "Guides > Setup" trail above a page's own title, whenever that page is
     nested more than one level deep (a page at the top of `docs/` never
@@ -354,6 +396,12 @@ build - the `robots` key above is ignored entirely once this file exists.
         ```json
         { "theme": { "options": { "breadcrumbs": false } } }
         ```
+
+    === "TOML"
+      ```toml
+      [theme.options]
+      breadcrumbs = false
+      ```
   - `theme.options.accentColor`/`theme.options.accentColorDark` - a hex
     color (3- or 6-digit, e.g. `#2563eb`) overriding the theme's own
     interactive/accent color (links, active nav items, focus states, ...)
@@ -371,6 +419,13 @@ build - the `robots` key above is ignored entirely once this file exists.
         ```json
         { "theme": { "options": { "accentColor": "#2563eb", "accentColorDark": "#60a5fa" } } }
         ```
+
+    === "TOML"
+      ```toml
+      [theme.options]
+      accentColor = "#2563eb"
+      accentColorDark = "#60a5fa"
+      ```
 
 ## `search`
 
@@ -417,6 +472,16 @@ Which search UI `search: true` wires up:
       		}
       	}
       }
+      ```
+
+  === "TOML"
+      ```toml title="bxsites.toml" linenums="1"
+      search = true
+      [searchProvider]
+      provider = "pagefind"
+      [searchProvider.pagefind]
+      bin = "pagefind"
+      options = []
       ```
 
 - `pagefind` - both keys optional when `provider` is `"pagefind"`: `bin`
@@ -499,6 +564,29 @@ children:
     }
     ```
 
+  === "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [i18n.defaultLocale]
+    code = "en"
+    label = "English"
+    [[i18n.locales]]
+    code = "es"
+    label = "Español"
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[nav]]
+    path = "index.md"
+
+    [[nav]]
+    title = "Main Components"
+    children = [
+      { title = "Quick Start", path = "guides/setup.md" },
+      { path = "guides/deployment.md" }
+    ]
+    ```
+
 Give that same group entry a `path` instead and it becomes a normal linked
 section (its own landing page, plus children) rather than a bare label - both
 shapes nest under `theme.options.navCollapsible` the same way (see above).
@@ -538,6 +626,13 @@ applied to the main tree:
     		{ "from": "old-guide", "to": "guides/new-guide/" }
     	]
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[redirects]]
+    from = "old-guide"
+    to = "guides/new-guide/"
     ```
 
 - `redirects[].from` - the old pretty-URL segment a static redirect stub
@@ -605,6 +700,15 @@ Every rendered table also gets a responsive-scroll/sticky-header wrapper automat
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [markdown]
+    enableFootnotes = true
+    enableDefinitionLists = true
+    anchorLinks = false
+    enableYouTubeTransformer = true
+    ```
+
 ## `repo`
 
 Adds a repository icon link to the header (every built-in theme) and,
@@ -629,6 +733,13 @@ when both keys are set, an "Edit this page" link on every page.
 === "JSON"
     ```json title="bxsites.json"
     { "repo": { "url": "https://github.com/acme/docs", "editUri": "edit/main/docs/" } }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [repo]
+    url = "https://github.com/acme/docs"
+    editUri = "edit/main/docs/"
     ```
 
 ## `social`
@@ -658,6 +769,19 @@ for anything else), and `label` sets the link's accessible name/tooltip
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[social]]
+    url = "https://twitter.com/acme"
+    icon = "twitter"
+    label = "Twitter"
+
+    [[social]]
+    url = "https://acme.com/rss.xml"
+    icon = "rss"
+    label = "RSS"
+    ```
+
 ## `footer`
 
 `false` (the default) - no footer at all. `true` adds one to every page:
@@ -672,6 +796,11 @@ and a "Built with BxSites" credit.
 === "JSON"
     ```json title="bxsites.json"
     { "footer": true }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    footer = true
     ```
 
 ## `lastUpdated`
@@ -694,6 +823,11 @@ breaking the build.
     { "lastUpdated": true }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    lastUpdated = true
+    ```
+
 ## `analytics`
 
 Wires up pageview analytics. Currently supports Google Analytics
@@ -714,6 +848,13 @@ Wires up pageview analytics. Currently supports Google Analytics
     { "analytics": { "provider": "google", "id": "G-ABC123" } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [analytics]
+    provider = "google"
+    id = "G-ABC123"
+    ```
+
 ## `ogImage`
 
 Path/URL to a default social-card image, rendered as `og:image` (and paired
@@ -731,6 +872,11 @@ rendered.
 === "JSON"
     ```json title="bxsites.json"
     { "ogImage": "assets/social-card.png" }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    ogImage = "assets/social-card.png"
     ```
 
 A page's own frontmatter `ogImage` (see [Getting Started](getting-started.md#add-pages))
@@ -756,6 +902,11 @@ service, or network access at build time.
     { "generateOgImages": true }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    generateOgImages = true
+    ```
+
 ## `extraCss` / `extraJs`
 
 Arrays of extra stylesheet/script URLs to include on every page, appended
@@ -775,6 +926,12 @@ is used as-is). `extraJs` entries are loaded with `defer`.
     	"extraCss": ["assets/custom.css"],
     	"extraJs": ["assets/custom.js"]
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    extraCss = [ "assets/custom.css" ]
+    extraJs = [ "assets/custom.js" ]
     ```
 
 When `assets.bundle` is on (the default), a local `extraCss`/`extraJs`
@@ -808,6 +965,18 @@ below.
     		}
     	}
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [assets]
+    fingerprint = true
+    bundle = true
+
+    [assets.images]
+    enabled = true
+    widths = [ 400, 800, 1200, 1600 ]
+    formats = [ "original", "webp" ]
     ```
 
 The asset pipeline - image resizing/WebP via
@@ -867,6 +1036,11 @@ every ` ```mermaid ` fenced code block as a diagram. See
     { "mermaid": true }
     ```
 
+  === "TOML"
+    ```toml title="bxsites.toml"
+    mermaid = true
+    ```
+
 ## `math`
 
 `false` (the default) - no [KaTeX](https://katex.org/) shipped at all.
@@ -882,6 +1056,11 @@ into a page's markdown. See
 === "JSON"
     ```json title="bxsites.json"
     { "math": true }
+    ```
+
+  === "TOML"
+    ```toml title="bxsites.toml"
+    math = true
     ```
 
 Admonitions (note/warning/tip-style callout boxes), content tabs, and
@@ -905,6 +1084,11 @@ referenced OpenAPI/Swagger spec (JSON or YAML). See
 === "JSON"
     ```json title="bxsites.json"
     { "openapi": true }
+    ```
+
+  === "TOML"
+    ```toml title="bxsites.toml"
+    openapi = true
     ```
 
 ## `pageActions`
@@ -955,6 +1139,11 @@ running together with everything else.
     { "pageActions": true }
     ```
 
+  === "TOML"
+    ```toml title="bxsites.toml"
+    pageActions = true
+    ```
+
 ## `plugins`
 
 `[]` (the default) - an array of BoxLang module names to activate as
@@ -970,6 +1159,11 @@ for how to write one.
 === "JSON"
     ```json title="bxsites.json"
     { "plugins": ["myBxSitesPlugin"] }
+    ```
+
+  === "TOML"
+    ```toml title="bxsites.toml"
+    plugins = [ "myBxSitesPlugin" ]
     ```
 
 ## `i18n`
@@ -1047,6 +1241,14 @@ Options for the [blog](guides/blog.md) - itself a by-convention feature
     { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
     ```
 
+  === "TOML"
+    ```toml title="bxsites.toml"
+    [blog]
+    postsPerPage = 10
+    feed = true
+    feedLimit = 25
+    ```
+
 See [Blog](guides/blog.md) for post/author frontmatter, categories,
 featured images, and SEO/social metadata.
 
@@ -1072,6 +1274,12 @@ featured images, and SEO/social metadata.
     ```json title="bxsites.json"
     { "versions": { "default": "1.0.x" } }
     ```
+
+=== "TOML"
+  ```toml title="bxsites.toml"
+  [versions]
+  default = "1.0.x"
+  ```
 
 See [Versioning](guides/versioning.md#publishing-a-default-version-at-the-site-root)
 for what publishing a default version actually changes (the `/next/` tree,
@@ -1099,6 +1307,15 @@ also reachable this way, with no entry needed here - see
     		"product": { "name": "BoxLang", "supportEmail": "support@example.com" }
     	}
     }
+    ```
+
+  === "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [variables]
+    company = "Ortus Solutions"
+    [variables.product]
+    name = "BoxLang"
+    supportEmail = "support@example.com"
     ```
 
 ```markdown title="docs/index.md"
@@ -1145,6 +1362,13 @@ never from `bxsites.yaml`, so this file always stays safe to commit.
     		"apiUrl": "https://cloud.bxsites.app"
     	}
     }
+    ```
+
+  === "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [cloud]
+    siteId = "3f2b1c9a-....-....-............"
+    apiUrl = "https://cloud.bxsites.app"
     ```
 
 See [Deployment](guides/deployment.md#the-publish-command) for the full

@@ -14,7 +14,7 @@ toc: false
 	</div>
 </div>
 
-This very site is built by BxSites, from the Markdown files in this
+This very site is built by **BxSites**, from the Markdown files in this
 repository's own `docs/` folder.
 
 BxSites isn't only for reference documentation - it's a general-purpose

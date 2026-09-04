@@ -116,6 +116,48 @@ somehow has more than one, `bxsites.yaml` wins, then `bxsites.yml`, then
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[nav]]
+    path = "index.md"
+
+    [[nav]]
+    title = "Main Components"
+    children = [
+      { title = "Quick Start", path = "guides/setup.md" },
+      { path = "guides/deployment.md" }
+    ]
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    name = "My Docs"
+    description = ""
+    baseURL = "/"
+    search = true
+    nav = []
+    social = []
+    footer = false
+    lastUpdated = false
+    extraCss = []
+    extraJs = []
+    plugins = []
+    variables = {}
+
+    [theme]
+    name = "bootstrap"
+    options = {}
+    logo = ""
+    favicon = ""
+
+    [markdown]
+    enableAdmonition = true
+
+    [repo]
+    url = ""
+    editUri = ""
+    ```
+
 Only `name` is required - everything else falls back to the defaults shown
 above. A partial `theme` object is merged one level deep, so
 `{theme: {name: material}}` alone still keeps the default (empty)
@@ -433,6 +475,13 @@ children:
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[redirects]]
+    from = "old-guide"
+    to = "guides/new-guide/"
+    ```
+
 Give that same group entry a `path` instead and it becomes a normal linked
 section (its own landing page, plus children) rather than a bare label - both
 shapes nest under `theme.options.navCollapsible` the same way (see above).
@@ -472,6 +521,15 @@ applied to the main tree:
     		{ "from": "old-guide", "to": "guides/new-guide/" }
     	]
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [markdown]
+    enableFootnotes = true
+    enableDefinitionLists = true
+    anchorLinks = false
+    enableYouTubeTransformer = true
     ```
 
 - `redirects[].from` - the old pretty-URL segment a static redirect stub
@@ -565,6 +623,13 @@ when both keys are set, an "Edit this page" link on every page.
     { "repo": { "url": "https://github.com/acme/docs", "editUri": "edit/main/docs/" } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [repo]
+    url = "https://github.com/acme/docs"
+    editUri = "edit/main/docs/"
+    ```
+
 ## `social`
 
 An array of social/external links rendered in the footer (see
@@ -592,6 +657,19 @@ for anything else), and `label` sets the link's accessible name/tooltip
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[social]]
+    url = "https://twitter.com/acme"
+    icon = "twitter"
+    label = "Twitter"
+
+    [[social]]
+    url = "https://acme.com/rss.xml"
+    icon = "rss"
+    label = "RSS"
+    ```
+
 ## `footer`
 
 `false` (the default) - no footer at all. `true` adds one to every page:
@@ -606,6 +684,11 @@ and a "Built with BxSites" credit.
 === "JSON"
     ```json title="bxsites.json"
     { "footer": true }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    footer = true
     ```
 
 ## `lastUpdated`
@@ -628,6 +711,11 @@ breaking the build.
     { "lastUpdated": true }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    lastUpdated = true
+    ```
+
 ## `analytics`
 
 Wires up pageview analytics. Currently supports Google Analytics
@@ -648,6 +736,13 @@ Wires up pageview analytics. Currently supports Google Analytics
     { "analytics": { "provider": "google", "id": "G-ABC123" } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [analytics]
+    provider = "google"
+    id = "G-ABC123"
+    ```
+
 ## `ogImage`
 
 Path/URL to a default social-card image, rendered as `og:image` (and paired
@@ -665,6 +760,11 @@ rendered.
 === "JSON"
     ```json title="bxsites.json"
     { "ogImage": "assets/social-card.png" }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    ogImage = "assets/social-card.png"
     ```
 
 A page's own frontmatter `ogImage` (see [Getting Started](getting-started.md#add-pages))
@@ -690,6 +790,11 @@ service, or network access at build time.
     { "generateOgImages": true }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    generateOgImages = true
+    ```
+
 ## `extraCss` / `extraJs`
 
 Arrays of extra stylesheet/script URLs to include on every page, appended
@@ -709,6 +814,12 @@ is used as-is). `extraJs` entries are loaded with `defer`.
     	"extraCss": ["assets/custom.css"],
     	"extraJs": ["assets/custom.js"]
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    extraCss = [ "assets/custom.css" ]
+    extraJs = [ "assets/custom.js" ]
     ```
 
 When `assets.bundle` is on (the default), a local `extraCss`/`extraJs`
@@ -742,6 +853,18 @@ below.
     		}
     	}
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [assets]
+    fingerprint = true
+    bundle = true
+
+    [assets.images]
+    enabled = true
+    widths = [ 400, 800, 1200, 1600 ]
+    formats = [ "original", "webp" ]
     ```
 
 The asset pipeline - image resizing/WebP via

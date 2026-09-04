@@ -102,6 +102,48 @@ un progetto ne ha in qualche modo più di uno, vince `bxsites.yaml`, poi
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[nav]]
+    path = "index.md"
+
+    [[nav]]
+    title = "Main Components"
+    children = [
+      { title = "Quick Start", path = "guides/setup.md" },
+      { path = "guides/deployment.md" }
+    ]
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    name = "My Docs"
+    description = ""
+    baseURL = "/"
+    search = true
+    nav = []
+    social = []
+    footer = false
+    lastUpdated = false
+    extraCss = []
+    extraJs = []
+    plugins = []
+    variables = {}
+
+    [theme]
+    name = "bootstrap"
+    options = {}
+    logo = ""
+    favicon = ""
+
+    [markdown]
+    enableAdmonition = true
+
+    [repo]
+    url = ""
+    editUri = ""
+    ```
+
 Solo `name` è obbligatorio - tutto il resto ricade sui valori predefiniti
 mostrati sopra. Un oggetto `theme` parziale viene unito con quello di
 default per un livello, quindi `{"theme":{"name":"material"}}` da solo
@@ -389,6 +431,13 @@ seguenti:
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[redirects]]
+    from = "old-guide"
+    to = "guides/new-guide/"
+    ```
+
 Per una nav abbastanza grande da appesantire `bxsites.yaml`, spostala nel
 proprio file `docs/nav.json` - stessa forma di array, solo come contenuto
 principale dell'intero file:
@@ -425,6 +474,15 @@ per tutto il sito, applicati solo all'albero principale:
     		{ "from": "old-guide", "to": "guides/new-guide/" }
     	]
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [markdown]
+    enableFootnotes = true
+    enableDefinitionLists = true
+    anchorLinks = false
+    enableYouTubeTransformer = true
     ```
 
 - `redirects[].from` - il vecchio segmento URL (senza slash
@@ -524,6 +582,13 @@ temi integrati) e, quando entrambe le chiavi sono impostate, un link
     { "repo": { "url": "https://github.com/acme/docs", "editUri": "edit/main/docs/" } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [repo]
+    url = "https://github.com/acme/docs"
+    editUri = "edit/main/docs/"
+    ```
+
 ## `social`
 
 Un array di link social/esterni renderizzati nel footer (vedi
@@ -552,6 +617,19 @@ un glifo di link generico come ripiego per qualsiasi altra cosa), e
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[social]]
+    url = "https://twitter.com/acme"
+    icon = "twitter"
+    label = "Twitter"
+
+    [[social]]
+    url = "https://acme.com/rss.xml"
+    icon = "rss"
+    label = "RSS"
+    ```
+
 ## `footer`
 
 `false` (il valore predefinito) - nessun footer. `true` ne aggiunge uno a
@@ -566,6 +644,11 @@ ogni pagina: una riga di copyright (`© <anno> <nome del sito>`), i link
 === "JSON"
     ```json title="bxsites.json"
     { "footer": true }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    footer = true
     ```
 
 ## `lastUpdated`
@@ -589,6 +672,11 @@ piuttosto che interrompere il build.
     { "lastUpdated": true }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    lastUpdated = true
+    ```
+
 ## `analytics`
 
 Attiva l'analisi delle visualizzazioni di pagina. Attualmente supporta
@@ -609,6 +697,13 @@ solo Google Analytics (`gtag.js`):
     { "analytics": { "provider": "google", "id": "G-ABC123" } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [analytics]
+    provider = "google"
+    id = "G-ABC123"
+    ```
+
 ## `ogImage`
 
 Percorso/URL a un'immagine social-card predefinita, renderizzata come
@@ -627,6 +722,11 @@ viene renderizzato alcun tag `og:image`/`twitter:card`.
 === "JSON"
     ```json title="bxsites.json"
     { "ogImage": "assets/social-card.png" }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    ogImage = "assets/social-card.png"
     ```
 
 Un `ogImage` proprio del frontmatter di una pagina (vedi
@@ -655,6 +755,11 @@ accesso alla rete al momento del build.
     { "generateOgImages": true }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    generateOgImages = true
+    ```
+
 ## `extraCss` / `extraJs`
 
 Array di URL di fogli di stile/script extra da includere in ogni pagina,
@@ -675,6 +780,12 @@ vengono caricate con `defer`.
     	"extraCss": ["assets/custom.css"],
     	"extraJs": ["assets/custom.js"]
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    extraCss = [ "assets/custom.css" ]
+    extraJs = [ "assets/custom.js" ]
     ```
 
 Quando `assets.bundle` è attivo (il valore predefinito), un elenco locale
@@ -708,6 +819,18 @@ per ogni voce - vedi [`assets`](#assets) sotto.
     		}
     	}
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [assets]
+    fingerprint = true
+    bundle = true
+
+    [assets.images]
+    enabled = true
+    widths = [ 400, 800, 1200, 1600 ]
+    formats = [ "original", "webp" ]
     ```
 
 La pipeline degli asset - ridimensionamento immagini/WebP tramite

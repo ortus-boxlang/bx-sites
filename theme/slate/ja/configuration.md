@@ -8,6 +8,35 @@ tags: [リファレンス, 設定]
 
 # 設定
 
+=== "TOML"
+  ```toml title="bxsites.toml" linenums="1"
+  name = "My Docs"
+  description = ""
+  baseURL = "/"
+  search = true
+  nav = []
+  social = []
+  footer = false
+  lastUpdated = false
+  extraCss = []
+  extraJs = []
+  plugins = []
+  variables = {}
+
+  [theme]
+  name = "bootstrap"
+  options = {}
+  logo = ""
+  favicon = ""
+
+  [markdown]
+  enableAdmonition = true
+
+  [repo]
+  url = ""
+  editUri = ""
+  ```
+
 すべてのプロジェクトはルートに1つのサイト設定ファイルを持ちます - デフォルトかつ推奨の形式である
 `bxsites.yaml`（または `.yml`）か、そのまま使い続けたいプロジェクト向けの `bxsites.json` の
 いずれかです。どちらも完全にサポートされており、まったく同じ結果になります。
@@ -114,6 +143,19 @@ tags: [リファレンス, 設定]
     	},
     	"variables": {}
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[nav]]
+    path = "index.md"
+
+    [[nav]]
+    title = "Main Components"
+    children = [
+      { title = "Quick Start", path = "guides/setup.md" },
+      { path = "guides/deployment.md" }
+    ]
     ```
 
 必須なのは `name` のみで、それ以外はすべて上記のデフォルト値にフォールバックします。
@@ -416,6 +458,13 @@ tags: [リファレンス, 設定]
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[redirects]]
+    from = "old-guide"
+    to = "guides/new-guide/"
+    ```
+
 同じグループエントリに `path` を与えると、単なるラベルではなく（自身のランディング
 ページと子要素を持つ）通常のリンク付きセクションになります - どちらの形でも
 `theme.options.navCollapsible` の下では同じようにネストされます（上記参照）。
@@ -454,6 +503,15 @@ tags: [リファレンス, 設定]
     		{ "from": "old-guide", "to": "guides/new-guide/" }
     	]
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [markdown]
+    enableFootnotes = true
+    enableDefinitionLists = true
+    anchorLinks = false
+    enableYouTubeTransformer = true
     ```
 
 - `redirects[].from` - 静的なリダイレクトスタブが書き込まれる古いプリティ URL
@@ -545,6 +603,13 @@ tags: [リファレンス, 設定]
     { "repo": { "url": "https://github.com/acme/docs", "editUri": "edit/main/docs/" } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [repo]
+    url = "https://github.com/acme/docs"
+    editUri = "edit/main/docs/"
+    ```
+
 ## `social`
 
 フッターにレンダリングされるソーシャル/外部リンクの配列（[`footer`](#footer) を参照 -
@@ -571,6 +636,19 @@ tags: [リファレンス, 設定]
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[social]]
+    url = "https://twitter.com/acme"
+    icon = "twitter"
+    label = "Twitter"
+
+    [[social]]
+    url = "https://acme.com/rss.xml"
+    icon = "rss"
+    label = "RSS"
+    ```
+
 ## `footer`
 
 `false`（デフォルト）- フッターは一切ありません。`true` にすると各ページにフッターが
@@ -585,6 +663,11 @@ tags: [リファレンス, 設定]
 === "JSON"
     ```json title="bxsites.json"
     { "footer": true }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    footer = true
     ```
 
 ## `lastUpdated`
@@ -606,6 +689,11 @@ git が履歴を持たないページ（まだコミットのない新しい `gi
     { "lastUpdated": true }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    lastUpdated = true
+    ```
+
 ## `analytics`
 
 ページビュー分析を接続します。現在は Google Analytics（`gtag.js`）のみをサポートしています:
@@ -625,6 +713,13 @@ git が履歴を持たないページ（まだコミットのない新しい `gi
     { "analytics": { "provider": "google", "id": "G-ABC123" } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [analytics]
+    provider = "google"
+    id = "G-ABC123"
+    ```
+
 ## `ogImage`
 
 デフォルトのソーシャルカード画像へのパス/URL。独自の `description` を上書きしない
@@ -641,6 +736,11 @@ git が履歴を持たないページ（まだコミットのない新しい `gi
 === "JSON"
     ```json title="bxsites.json"
     { "ogImage": "assets/social-card.png" }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    ogImage = "assets/social-card.png"
     ```
 
 そのページのフロントマター `ogImage`（[はじめに](getting-started.md#ページの追加) を
@@ -666,6 +766,11 @@ PNG ソーシャルカードがレンダリングされます - ブランドグ�
     { "generateOgImages": true }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    generateOgImages = true
+    ```
+
 ## `extraCss` / `extraJs`
 
 すべてのページに含める、追加のスタイルシート/スクリプト URL の配列で、テーマ自身の
@@ -685,6 +790,12 @@ PNG ソーシャルカードがレンダリングされます - ブランドグ�
     	"extraCss": ["assets/custom.css"],
     	"extraJs": ["assets/custom.js"]
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    extraCss = [ "assets/custom.css" ]
+    extraJs = [ "assets/custom.js" ]
     ```
 
 `assets.bundle` が有効な場合（デフォルト）、上記のようなローカルの `extraCss`/`extraJs`
@@ -718,6 +829,18 @@ PNG ソーシャルカードがレンダリングされます - ブランドグ�
     		}
     	}
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [assets]
+    fingerprint = true
+    bundle = true
+
+    [assets.images]
+    enabled = true
+    widths = [ 400, 800, 1200, 1600 ]
+    formats = [ "original", "webp" ]
     ```
 
 アセットパイプライン - [bx-image](https://github.com/ortus-boxlang/bx-image)
