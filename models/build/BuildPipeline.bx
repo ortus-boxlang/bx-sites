@@ -55,6 +55,17 @@ class {
 	variables.pageCache = new "models.build.BuildCache@bxsites"()
 	variables.pluginsOverride = []
 	variables.hasPluginsOverride = false
+	variables.profiling = false
+	variables.profileTimings = []
+	variables.profileLastAt = 0
+
+	/**
+	 * Enables phase timing for a focused build investigation. Disabled by
+	 * default so normal CLI output and build behavior remain unchanged.
+	 */
+	void function setProfiling( required boolean enabled ) {
+		variables.profiling = arguments.enabled
+	}
 
 	/**
 	 * Swaps in a fake/test markdown renderer. The real one (MarkdownRenderer.bx)
@@ -140,6 +151,10 @@ class {
 	 */
 	struct function build( required string projectRoot, boolean includeDrafts = false ) {
 		var root = normalizeRoot( arguments.projectRoot )
+		var buildStartedAt = getTickCount()
+		variables.profileTimings = []
+		variables.profileLastAt = buildStartedAt
+		progress( "Loading configuration and content" )
 		var config = variables.configLoader.load( root )
 		var plugins = resolvePlugins( config )
 		config = variables.pluginLoader.applyOnConfig( plugins, config )
@@ -203,6 +218,7 @@ class {
 
 		var navConfig = resolveExplicitNav( rootDocsDir, config.nav )
 		var mainPages = variables.docsLoader.load( rootDocsDir )
+		profile( "setup and main docs load", buildStartedAt )
 		// A `404.md` at the root of whichever tree renders at the site root
 		// is the custom-404 convention (write404Page()'s own docblock) -
 		// pulled out here, before it ever reaches renderDocTree(), so it's
@@ -229,8 +245,11 @@ class {
 		var blogPosts = variables.blogDiscoverer.load( docsDir, arguments.includeDrafts )
 		var blogNavUrl = blogPosts.len() ? "blog/index.html" : ""
 		var mainResult = renderDocTree( mainPages, rootDocsDir, config, themeDir, siteDir, urls.basePath, root, versions, rootVersionLabel, rootDocsRelativePrefix, plugins, urls.absolute, imageManifest, navConfig, locales, defaultLocaleCode, defaultLocaleDir, blogNavUrl, siteOrigin, functions, data )
+		profile( "main tree", buildStartedAt )
+		progress( "Copying main site assets" )
 		var allPages = duplicate( mainResult.pages )
 		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
+		profile( "main assets", buildStartedAt )
 
 		// The plain docs/ tree - "the root" itself when versions.default is
 		// unset - instead renders separately at /next/ once a default
@@ -242,6 +261,7 @@ class {
 		// keeps translating this same physical folder, same as always, but
 		// only the default-locale build is published under /next/ for now).
 		if ( hasDefaultVersion ) {
+			progress( "Building next documentation tree" )
 			var nextOutputDir = siteDir & "/next"
 			var nextBasePath = urls.basePath & "next/"
 			var nextPages = variables.docsLoader.load( docsDir )
@@ -261,6 +281,7 @@ class {
 			copyAssets( root, themeDir, nextOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
 			writeTagsPage( nextResult.pages, nextResult.nav, config, themeDir, nextOutputDir, nextBasePath, versions, nextLocales, defaultLocaleCode, siteOrigin, functions, "Next", data )
 			variables.redirectGenerator.write( nextResult.pages, nextOutputDir, nextBasePath )
+			profile( "next tree", buildStartedAt )
 		}
 
 		for ( var versionName in versionNames ) {
@@ -269,6 +290,7 @@ class {
 			if ( versionName == defaultVersionName ) {
 				continue
 			}
+			progress( "Building version: #versionName#" )
 			var versionDocsDir = docsDir & "/versions/" & versionName
 			var versionOutputDir = siteDir & "/versions/" & versionName
 			var versionBasePath = urls.basePath & "versions/" & versionName & "/"
@@ -341,11 +363,13 @@ class {
 				variables.redirectGenerator.write( versionLocaleResult.pages, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/" )
 			}
 		}
+		profile( "version trees", buildStartedAt )
 
 		for ( var locale in locales ) {
 			if ( locale.code == defaultLocaleCode ) {
 				continue
 			}
+			progress( "Building locale: #locale.code#" )
 			var localeOutputDir = siteDir & "/" & locale.code
 			var localePages = variables.docsLoader.load( rootDocsDir & "/i18n/" & locale.code )
 			var mergedPages = mergeLocalePages( mainPages, localePages, locale.code, rootDocsRelativePrefix )
@@ -377,10 +401,12 @@ class {
 			writeTagsPage( localeResult.pages, localeResult.nav, config, themeDir, localeOutputDir, urls.basePath & locale.code & "/", versions, locales, locale.code, siteOrigin, functions, rootVersionLabel, data )
 			variables.redirectGenerator.write( localeResult.pages, localeOutputDir, urls.basePath & locale.code & "/" )
 		}
+		profile( "locale trees", buildStartedAt )
 
 		var tagsPages = mainResult.pages
 
 		if ( blogPosts.len() ) {
+			progress( "Building blog (#blogPosts.len()# post(s))" )
 			// A featured image (frontmatter `image`) becomes a post's own
 			// `og:image` when it hasn't set an explicit `ogImage` of its
 			// own - resolved here, before assignOgImages() below, so a real
@@ -436,8 +462,10 @@ class {
 				writeSearchIndex( tagsPages, siteDir, plugins, config )
 			}
 		}
+		profile( "blog", buildStartedAt )
 
 		write404Page( mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, rootVersionLabel, locales, defaultLocaleCode, functions, docsDir, plugins, imageManifest, custom404Page.len() ? custom404Page[ 1 ] : {}, data )
+		progress( "Writing site metadata and search output" )
 		writeTagsPage( tagsPages, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, siteOrigin, functions, rootVersionLabel, data )
 		variables.redirectGenerator.write( mainResult.pages, siteDir, urls.basePath, config.redirects )
 
@@ -463,14 +491,68 @@ class {
 		fileWrite( siteDir & "/robots.txt", variables.robotsTxtGenerator.resolve( docsDir, urls.absolute, config.robots, hasDefaultVersion ? [ "/next/" ] : [] ) )
 
 		fileWrite( siteDir & "/llms.txt", variables.llmsTxtGenerator.build( allPages, config, urls.absolute, urls.basePath ) )
+		profile( "site metadata", buildStartedAt )
 
 		if ( config.search && variables.searchProviderRegistry.usesPagefind( config.searchProvider.provider ) ) {
 			variables.pagefindIndexer.index( siteDir, config.searchProvider.pagefind.bin, config.searchProvider.pagefind.options )
+			profile( "pagefind", buildStartedAt )
 		}
 
 		variables.pluginLoader.applyOnBuildComplete( plugins, siteDir, config )
+		profile( "build complete", buildStartedAt )
 
-		return { siteDir : siteDir, pageCount : mainResult.pages.len() }
+		return {
+			siteDir   : siteDir,
+			pageCount : mainResult.pages.len(),
+			report    : buildReport( siteDir, allPages.len(), versionNames.len(), locales.len(), buildStartedAt )
+		}
+	}
+
+	private void function profile( required string label, required numeric startedAt ) {
+		if ( variables.profiling ) {
+			var now = getTickCount()
+			variables.profileTimings.append( {
+				label      : arguments.label,
+				elapsedMs  : now - variables.profileLastAt,
+				totalMs    : now - arguments.startedAt
+			} )
+			variables.profileLastAt = now
+		}
+	}
+
+	private void function progress( required string message ) {
+		if ( variables.profiling ) {
+			systemOutput( "[bx-sites] #arguments.message#...", true )
+		}
+	}
+
+	private void function profileSegment( required string label, required numeric startedAt ) {
+		if ( variables.profiling ) {
+			variables.profileTimings.append( {
+				label     : arguments.label,
+				elapsedMs : getTickCount() - arguments.startedAt
+			} )
+		}
+	}
+
+	private struct function buildReport( required string siteDir, required numeric pageCount, required numeric versionCount, required numeric localeCount, required numeric startedAt ) {
+		var outputFiles = directoryList( arguments.siteDir, true, "path" )
+			.filter( path => !directoryExists( path ) )
+		var outputBytes = 0
+
+		for ( var filePath in outputFiles ) {
+			outputBytes += createObject( "java", "java.io.File" ).init( filePath ).length()
+		}
+
+		return {
+			durationMs  : getTickCount() - arguments.startedAt,
+			pageCount   : arguments.pageCount,
+			versionCount : arguments.versionCount,
+			localeCount  : arguments.localeCount,
+			outputFiles : outputFiles.len(),
+			outputBytes : outputBytes,
+			timings     : variables.profileTimings
+		}
 	}
 
 	/**
@@ -648,10 +730,12 @@ class {
 
 		directoryCreate( arguments.outputDir, true, true )
 
+		var markdownStartedAt = getTickCount()
 		convertMarkdown(
 			pages, arguments.config, arguments.plugins, arguments.basePath, arguments.docsDir, arguments.imageManifest, arguments.functions,
 			nav, arguments.versions, arguments.currentVersion, arguments.locales, arguments.currentLocale, arguments.currentLocaleDir, arguments.data
 		)
+		profileSegment( "markdown conversion", markdownStartedAt )
 		variables.pageLinkResolver.resolve( pages, arguments.basePath )
 		// Gracefully skips (never throws for) any course whose lessons
 		// don't all exist in THIS tree's own `pages` - `data.courses` is
@@ -673,6 +757,7 @@ class {
 		assignMarkdownUrl( pages )
 		assignIconHtml( pages, arguments.docsDir )
 
+		var renderingStartedAt = getTickCount()
 		for ( var page in pages ) {
 			page.canonicalUrl = canonicalUrlFor( page.urlPath, arguments.basePath, arguments.siteOrigin )
 			var html = variables.themeRenderer.renderPage(
@@ -688,6 +773,7 @@ class {
 				fileWrite( getDirectoryFromPath( outputPath ) & "/feed.xml", feedXml )
 			}
 		}
+		profileSegment( "page rendering and writes", renderingStartedAt )
 
 		variables.markdownPublisher.publish( pages, arguments.outputDir )
 
@@ -821,6 +907,7 @@ class {
 	 */
 	struct function buildSearchIndex( required string projectRoot ) {
 		var root = normalizeRoot( arguments.projectRoot )
+		var buildStartedAt = getTickCount()
 		var config = variables.configLoader.load( root )
 
 		if ( !searchNeedsLocalIndex( config ) ) {
@@ -834,7 +921,9 @@ class {
 		var functions = variables.functionsLoader.load( docsDir )
 		var data = variables.dataLoader.load( docsDir )
 		var pages = variables.docsLoader.load( docsDir )
+		profile( "search-index docs load", buildStartedAt )
 		convertMarkdown( pages, config, plugins, "/", docsDir, {}, functions, [], [], "Latest", [], "", "ltr", data )
+		profile( "search-index markdown", buildStartedAt )
 
 		var siteDir = root & "/site"
 		directoryCreate( siteDir, true, true )

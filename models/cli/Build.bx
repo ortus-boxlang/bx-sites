@@ -17,12 +17,42 @@ class {
 		}
 
 		var pipeline = new "models.build.BuildPipeline@bxsites"()
+		pipeline.setProfiling( true )
 		var result = pipeline.build( projectRoot )
 
 		return {
 			exitCode : 0,
-			message  : "Built #result.pageCount# page(s) to #result.siteDir#"
+			message  : formatReport( result )
 		}
+	}
+
+	private string function formatReport( required struct result ) {
+		var report = arguments.result.report
+		var lines = [
+			"Built #result.pageCount# page(s) to #result.siteDir#",
+			"",
+			"Build report:",
+			"  Duration: #numberFormat( report.durationMs / 1000, '0.000' )#s",
+			"  Pages:    #numberFormat( report.pageCount, '9,999' )# (versions #report.versionCount#, locales #report.localeCount#)",
+			"  Output:   #numberFormat( report.outputFiles, '9,999' )# file(s), #formatBytes( report.outputBytes )#",
+			"  Phases:"
+		]
+
+		for ( var timing in report.timings ) {
+			lines.append( "    - #timing.label#: #numberFormat( timing.elapsedMs / 1000, '0.000' )#s" )
+		}
+
+		return lines.toList( char( 10 ) )
+	}
+
+	private string function formatBytes( required numeric bytes ) {
+		if ( arguments.bytes >= 1024 * 1024 ) {
+			return numberFormat( arguments.bytes / ( 1024 * 1024 ), "9,999.0" ) & " MB"
+		}
+		if ( arguments.bytes >= 1024 ) {
+			return numberFormat( arguments.bytes / 1024, "9,999.0" ) & " KB"
+		}
+		return arguments.bytes & " B"
 	}
 
 }
