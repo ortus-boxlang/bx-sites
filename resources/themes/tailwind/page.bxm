@@ -145,28 +145,31 @@
 		return variables.locales.len() ? variables.locales[ 1 ].label : ""
 	}
 </bx:script>
-<bx:output>			<article class="rounded-lg bg-white p-8 shadow-sm ring-1 ring-slate-200">
-</bx:output><bx:if variables.pageActionsEnabled and variables.pageActionsPosition == 'top'><bx:output>#renderPageActions()#</bx:output></bx:if><bx:if variables.page.isFallbackContent><bx:output>
+<bx:output>
+			<article class="rounded-lg bg-white p-8 shadow-sm ring-1 ring-slate-200">
+<bx:if variables.pageActionsEnabled and variables.pageActionsPosition == 'top'>#renderPageActions()#</bx:if><bx:if variables.page.isFallbackContent>
 				<p class="fallback-notice mb-6 flex items-center gap-2 rounded border border-amber-300 bg-amber-50 px-4 py-2 text-sm text-amber-900">#bxsitesIcon( 'globe' )# #encodeForHTML( variables.stringsResolver.format( variables.strings.notTranslatedNotice, { "locale" : defaultLocaleLabel() } ) )#</p>
-</bx:output></bx:if><bx:if variables.breadcrumbsEnabled and variables.page.breadcrumbs.len() gt 1><bx:output>#renderBreadcrumbs( variables.page.breadcrumbs )#</bx:output></bx:if><bx:output>
-				<h1 class="relative mb-6 border-b-4 border-[##FFF500] pb-2 text-2xl font-bold" id="page-title"><a href="##page-title" id="page-title" class="anchor"></a></bx:output><bx:if len( variables.page.iconHtml )><bx:output><span class="page-icon">#variables.page.iconHtml#</span> </bx:output></bx:if><bx:output>#encodeForHTML( variables.page.title )#</h1>
-</bx:output><bx:if len( variables.page.summary )><bx:output>				<p class="mb-6 -mt-4 text-lg text-slate-500">#encodeForHTML( variables.page.summary )#</p>
-</bx:output></bx:if><bx:if variables.page.tags.len() gt 0><bx:output>#renderTags( variables.page.tags )#</bx:output></bx:if><bx:if ( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'top'><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:output></bx:if><bx:output>
-</bx:output><bx:if variables.page.toc.len() gt 0 and variables.tocPosition == 'top'><bx:output>#renderToc( variables.page.toc )#</bx:output></bx:if><bx:if variables.page.toc.len() gt 0 and variables.tocPosition == 'sticky'><bx:output>#renderToc( variables.page.toc, true )#</bx:output></bx:if><bx:output>
+</bx:if><bx:if variables.breadcrumbsEnabled and variables.page.breadcrumbs.len() gt 1>#renderBreadcrumbs( variables.page.breadcrumbs )#</bx:if>
+				<h1 class="relative mb-6 border-b-4 border-[##FFF500] pb-2 text-2xl font-bold" id="page-title"><a href="##page-title" id="page-title" class="anchor"></a><bx:if len( variables.page.iconHtml )><span class="page-icon">#variables.page.iconHtml#</span> </bx:if>#encodeForHTML( variables.page.title )#</h1>
+<bx:if len( variables.page.summary )>				<p class="mb-6 -mt-4 text-lg text-slate-500">#encodeForHTML( variables.page.summary )#</p>
+</bx:if><bx:if variables.page.tags.len() gt 0>#renderTags( variables.page.tags )#</bx:if><bx:if ( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'top'>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:if>
+<bx:if variables.page.toc.len() gt 0 and variables.tocPosition == 'top'>#renderToc( variables.page.toc )#</bx:if><bx:if variables.page.toc.len() gt 0 and variables.tocPosition == 'sticky'>#renderToc( variables.page.toc, true )#</bx:if>
 				<div class="prose max-w-none">
 					#variables.page.contentHtml#
 				</div>
-</bx:output><bx:if ( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'bottom'><bx:output>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl, true )#</bx:output></bx:if><bx:output>
+<bx:if ( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'bottom'>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl, true )#</bx:if>
 			</article>
-</bx:output><bx:if len( variables.page.prevPage.url ) or len( variables.page.nextPage.url )><bx:output>
+<bx:if len( variables.page.prevPage.url ) or len( variables.page.nextPage.url )>
 			<nav class="mt-8 flex justify-between border-t border-slate-200 pt-4 text-sm font-semibold" aria-label="#encodeForHTML( variables.strings.pageNavigation )#">
-</bx:output><bx:if len( variables.page.prevPage.url )><bx:output>
+<bx:if len( variables.page.prevPage.url )>
 				<a class="text-cyan-700 hover:text-cyan-900" href="#variables.basePath##variables.page.prevPage.url#">&larr; #encodeForHTML( variables.page.prevPage.title )#</a>
-</bx:output></bx:if><bx:if !len( variables.page.prevPage.url )><bx:output>
+</bx:if><bx:if !len( variables.page.prevPage.url )>
 				<span></span>
-</bx:output></bx:if><bx:if len( variables.page.nextPage.url )><bx:output>
+</bx:if><bx:if len( variables.page.nextPage.url )>
 				<a class="text-cyan-700 hover:text-cyan-900" href="#variables.basePath##variables.page.nextPage.url#">#encodeForHTML( variables.page.nextPage.title )# &rarr;</a>
-</bx:output></bx:if><bx:output>
+</bx:if>
 			</nav>
-</bx:output></bx:if><bx:if variables.pageActionsEnabled and variables.pageActionsPosition == 'bottom'><bx:output>#renderPageActions()#</bx:output></bx:if><bx:output>
+</bx:if><bx:if variables.pageActionsEnabled and variables.pageActionsPosition == 'bottom'>#renderPageActions()#</bx:if>
+
+
 </bx:output>
