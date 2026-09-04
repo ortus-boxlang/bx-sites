@@ -48,7 +48,7 @@ currently activated in your project alongside the verbs below. See
 Scaffold a docs project.
 
 ```bash title="Usage"
-bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|json]
+bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|toml|json]
 ```
 
 - `--name` - the site name written into the site config (defaults to the target directory's name)

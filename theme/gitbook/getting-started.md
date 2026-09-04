@@ -98,13 +98,13 @@ front - otherwise `new` derives it from the target directory name.
 
 `bxsites.yaml` is the default and preferred format - it's what `new`
 scaffolds unless told otherwise, and every example in this guide and in
-[Configuration](configuration.md) shows it first. `bxsites.json` is fully
-supported too, for a project that prefers it: pass `--format=json` to
-scaffold one instead, or just hand-write/rename one yourself - ConfigLoader
-resolves whichever of `bxsites.yaml`/`.yml`/`.json` is actually present, in
-that order, with no other config needed to switch. See
-[Configuration](configuration.md) for the full key reference in both
-formats.
+[Configuration](configuration.md) shows it first. `bxsites.toml` and
+`bxsites.json` are fully supported too: pass `--format=toml` or
+`--format=json` to scaffold one instead, or just hand-write/rename one
+yourself. ConfigLoader resolves whichever of `bxsites.yaml`/`.yml`/`.toml`/
+`.json` is actually present, in that order, with no other config needed to
+switch. See [Configuration](configuration.md) for the full key reference in
+all three formats.
 
 Already have content in GitBook? `bxSites migrate --source=/path/to/export`
 converts a GitBook export straight into `docs/` - see

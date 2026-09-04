@@ -39,6 +39,22 @@
 	<link rel="stylesheet" href="/theme/justthedocs/assets/theme/style.310f3960.css">
 	
 
+	<style>
+
+		:root {
+			--bxsites-accent: #00C853;
+			--bxsites-link: #00C853;
+			--bxsites-link-hover: color-mix( in srgb, #00C853 85%, black );
+		}
+
+		[data-theme="dark"] {
+			--bxsites-accent: #34D399;
+			--bxsites-link: #34D399;
+			--bxsites-link-hover: color-mix( in srgb, #34D399 85%, white );
+		}
+
+	</style>
+
 
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 
@@ -94,7 +110,7 @@
 great for a flat, one-off fact (<code>company</code>, <code>supportEmail</code>) but awkward for
 anything with real shape - a team roster, a pricing table, a feature
 matrix. <strong>Data files</strong> fill that gap: drop a <code>docs/data/*.yaml</code>/<code>.yml</code>/
-<code>.json</code> file in your project, and its whole content - any shape you like,
+<code>.toml</code>/<code>.json</code> file in your project, and its whole content - any shape you like,
 an object or an array - becomes reachable as <code>data.&lt;file&gt;</code> from every
 page, the same <code>{{ }}</code> syntax <code>variables</code>/<code>page</code> already use. Need the data
 <em>computed</em> rather than just parsed from a static file - a discount applied
@@ -108,6 +124,7 @@ becomes one top-level key under <code>data</code>:</p>
 ├── index.md
 └── data/
     ├── team.yaml
+    ├── team.toml
     └── pricing.json
 </code></pre>
 <pre data-bxsites-title="docs&#x2f;data&#x2f;team.yaml"><code class="language-yaml">- name: Luis Majano
@@ -119,6 +136,14 @@ becomes one top-level key under <code>data</code>:</p>
 	&quot;free&quot;: { &quot;price&quot;: 0, &quot;seats&quot;: 3 },
 	&quot;pro&quot;: { &quot;price&quot;: 29, &quot;seats&quot;: 20 }
 }
+</code></pre>
+<pre data-bxsites-title="docs&#x2f;data&#x2f;team.toml"><code class="language-toml">[[team]]
+name = &quot;Luis Majano&quot;
+role = &quot;CEO&quot;
+
+[[team]]
+name = &quot;Jon Clausen&quot;
+role = &quot;CTO&quot;
 </code></pre>
 <p><code>data.team</code> is now that array, <code>data.pricing.pro.price</code> that nested
 number - a file's parsed root is used exactly as parsed, object or array
@@ -135,10 +160,10 @@ means no <code>data</code> - the same opt-in-by-presence shape
 </code></pre>
 <p>If more than one file shares a basename across extensions (both
 <code>products.yaml</code> and <code>products.json</code> present), <code>.bx</code> wins first (see
-<a href="#data-classes">Data classes</a>), then <code>.yaml</code>, then <code>.yml</code>, then <code>.json</code> -
+<a href="#data-classes">Data classes</a>), then <code>.yaml</code>, then <code>.yml</code>, then <code>.toml</code>, then <code>.json</code> -
 pick one format per basename rather than relying on that order in practice.</p>
 <h2 id="data-classes"><a href="#data-classes" id="data-classes" name="data-classes" class="anchor"></a>Data classes</h2>
-<p>A <code>.yaml</code>/<code>.json</code> file is static - parsed once, used exactly as written.
+<p>A <code>.yaml</code>/<code>.toml</code>/<code>.json</code> file is static - parsed once, used exactly as written.
 For data that needs computing (a discounted price, a value assembled from
 several sources, anything with real logic behind it), drop a real BoxLang
 <strong>class</strong> instead - <code>docs/data/Pricing.bx</code> (PascalCase, this module's own
@@ -383,7 +408,7 @@ something that's neither an array nor a struct (can't be looped).</li>
 </ul>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/data-files.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/theme/justthedocs/guides/data-files.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Sep 3, 2026, 8&#x3a;28&#x3a;42 PM</span></div>
+<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/data-files.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/theme/justthedocs/guides/data-files.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Sep 4, 2026, 3&#x3a;40&#x3a;31 PM</span></div>
 			</article>
 
 			<nav class="jtd-page-nav" aria-label="Page navigation">

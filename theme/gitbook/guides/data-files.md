@@ -11,7 +11,7 @@ tags: [guides, data]
 great for a flat, one-off fact (`company`, `supportEmail`) but awkward for
 anything with real shape - a team roster, a pricing table, a feature
 matrix. **Data files** fill that gap: drop a `docs/data/*.yaml`/`.yml`/
-`.json` file in your project, and its whole content - any shape you like,
+`.toml`/`.json` file in your project, and its whole content - any shape you like,
 an object or an array - becomes reachable as `data.<file>` from every
 page, the same `{{ }}` syntax `variables`/`page` already use. Need the data
 *computed* rather than just parsed from a static file - a discount applied
@@ -29,6 +29,7 @@ docs/
 ├── index.md
 └── data/
     ├── team.yaml
+    ├── team.toml
     └── pricing.json
 ```
 
@@ -44,6 +45,16 @@ docs/
 	"free": { "price": 0, "seats": 3 },
 	"pro": { "price": 29, "seats": 20 }
 }
+```
+
+```toml title="docs/data/team.toml"
+[[team]]
+name = "Luis Majano"
+role = "CEO"
+
+[[team]]
+name = "Jon Clausen"
+role = "CTO"
 ```
 
 `data.team` is now that array, `data.pricing.pro.price` that nested
@@ -68,12 +79,12 @@ builds to:
 
 If more than one file shares a basename across extensions (both
 `products.yaml` and `products.json` present), `.bx` wins first (see
-[Data classes](#data-classes)), then `.yaml`, then `.yml`, then `.json` -
+[Data classes](#data-classes)), then `.yaml`, then `.yml`, then `.toml`, then `.json` -
 pick one format per basename rather than relying on that order in practice.
 
 ## Data classes
 
-A `.yaml`/`.json` file is static - parsed once, used exactly as written.
+A `.yaml`/`.toml`/`.json` file is static - parsed once, used exactly as written.
 For data that needs computing (a discounted price, a value assembled from
 several sources, anything with real logic behind it), drop a real BoxLang
 **class** instead - `docs/data/Pricing.bx` (PascalCase, this module's own

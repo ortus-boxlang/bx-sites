@@ -9,12 +9,12 @@ tags: [reference, configuration]
 # Configuration
 
 Every project has one site config at its root - `bxsites.yaml` (or `.yml`),
-the default/preferred format, or `bxsites.json` for a project that wants to
-stay on it. Both are fully supported and produce the exact same result;
-`bxSites new` scaffolds `bxsites.yaml` unless `--format=json` is passed (see
+the default/preferred format, `bxsites.toml`, or `bxsites.json`. All are fully
+supported and produce the exact same result; `bxSites new` scaffolds
+`bxsites.yaml` unless `--format=toml` or `--format=json` is passed (see
 [Getting Started](getting-started.md#config-file-format)). If a project
 somehow has more than one, `bxsites.yaml` wins, then `bxsites.yml`, then
-`bxsites.json`.
+`bxsites.toml`, then `bxsites.json`.
 
 === "YAML"
     ```yaml title="bxsites.yaml" linenums="1"
@@ -116,6 +116,35 @@ somehow has more than one, `bxsites.yaml` wins, then `bxsites.yml`, then
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+  name = "My Docs"
+  description = ""
+  baseURL = "/"
+  search = true
+  nav = []
+  social = []
+  footer = false
+  lastUpdated = false
+  extraCss = []
+  extraJs = []
+  plugins = []
+  variables = {}
+
+  [theme]
+  name = "bootstrap"
+  options = {}
+  logo = ""
+  favicon = ""
+
+  [markdown]
+  enableAdmonition = true
+
+  [repo]
+  url = ""
+  editUri = ""
+    ```
+
 Only `name` is required - everything else falls back to the defaults shown
 above. A partial `theme` object is merged one level deep, so
 `{theme: {name: material}}` alone still keeps the default (empty)
@@ -187,6 +216,11 @@ unless you want to change its default, permissive behavior:
 === "JSON"
     ```json title="bxsites.json"
     { "robots": false }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    robots = false
     ```
 
 - `true` (the default) - `Allow: /` for every crawler, plus a `Sitemap:`
