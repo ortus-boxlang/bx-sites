@@ -228,11 +228,13 @@
 	<style>
 </bx:output><bx:if len( variables.accentColor )><bx:output>
 		:root {
+			--bxsites-accent: #variables.accentColor#;
 			--bxsites-link: #variables.accentColor#;
 			--bxsites-link-hover: color-mix( in srgb, #variables.accentColor# 85%, black );
 		}
 </bx:output></bx:if><bx:if len( variables.accentColorDark )><bx:output>
 		[data-theme="dark"] {
+			--bxsites-accent: #variables.accentColorDark#;
 			--bxsites-link: #variables.accentColorDark#;
 			--bxsites-link-hover: color-mix( in srgb, #variables.accentColorDark# 85%, white );
 		}
