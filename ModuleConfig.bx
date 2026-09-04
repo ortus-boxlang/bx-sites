@@ -237,10 +237,10 @@ class {
 		// module root only from the file the runtime directly invokes as the
 		// module's main() (this one). Nested classes must use the "Class@bxsites"
 		// suffix form instead when referencing each other.
-		var firstToken = arrayLen( arguments.args ) >= 1 ? arguments.args[ 1 ] : ""
+		var firstToken = arguments.args[ 1 ] ?: ""
 
 		if ( firstToken == "--version" || firstToken == "-v" ) {
-			println( "bxSites v#this.version#" )
+			println( "✨ bxSites v#this.version#" )
 			return 0
 		}
 
@@ -377,23 +377,62 @@ class {
 	 * @verbDescriptions Struct mapping verb name -> one-line help text
 	 */
 	private void function printUsage( required struct verbs, required struct verbDescriptions ) {
-		println( "bxSites v#this.version# - #this.description#" )
+		println( "✨ bxSites v#this.version# - #this.description#" )
 		println( "" )
-		println( "Usage: bxSites <verb> [options]" )
+		println( "📖 Usage: bxSites <verb> [options]" )
 		println( "   or: boxlang bxSites <verb> [options]" )
 		println( "" )
 
-		for ( var verbName in arguments.verbs.keyArray().sort( "textnocase" ) ) {
-			println( "  #verbName.lJustify( 13 )# #arguments.verbDescriptions[ verbName ] ?: ''#" )
+		var verbNames = arguments.verbs.keyArray().sort( "textnocase" )
+		var verbWidth = 0
+		for ( var verbName in verbNames ) {
+			verbWidth = max( verbWidth, len( verbName ) )
+		}
+
+		println( "🛠 Commands:" )
+		for ( var verbName in verbNames ) {
+			var description = arguments.verbDescriptions[ verbName ] ?: ""
+			var descriptionLines = wrapUsageText( description, 96 - verbWidth - 4 )
+			var prefix = "  " & verbName.lJustify( verbWidth ) & "  "
+			println( prefix & ( descriptionLines[ 1 ] ?: "" ) )
+			for ( var lineIndex = 2; lineIndex <= descriptionLines.len(); lineIndex++ ) {
+				println( repeatString( " ", len( prefix ) ) & descriptionLines[ lineIndex ] )
+			}
 		}
 
 		println( "" )
-		println( "Global options:" )
+		println( "⚙ Global options:" )
 		println( "  -h, --help     Show this help message and exit" )
 		println( "  -v, --version  Show the module version and exit" )
 		println( "" )
+		println( "📍 Project root:" )
 		println( "Every verb also accepts --projectRoot=<path> (or a bare positional path) to" )
 		println( "target a project other than the current directory." )
+	}
+
+	/**
+	 * Wraps help text at word boundaries while preserving a usable minimum width
+	 * for unusually long command names.
+	 */
+	private array function wrapUsageText( required string text, required numeric width ) {
+		var words = len( trim( arguments.text ) ) ? listToArray( trim( arguments.text ), " " ) : [ "" ]
+		var lines = []
+		var currentLine = ""
+		var wrapWidth = max( 20, arguments.width )
+
+		for ( var word in words ) {
+			if ( len( currentLine ) && len( currentLine ) + len( word ) + 1 > wrapWidth ) {
+				lines.append( currentLine )
+				currentLine = word
+			} else {
+				currentLine = len( currentLine ) ? currentLine & " " & word : word
+			}
+		}
+
+		if ( len( currentLine ) || lines.isEmpty() ) {
+			lines.append( currentLine )
+		}
+		return lines
 	}
 
 	/**
