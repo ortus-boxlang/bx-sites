@@ -28,6 +28,7 @@ class {
 		devServer.startWatching()
 
 		println( "Serving #projectRoot# at #started.url# (Ctrl+C to stop)" )
+		println( "Watching for changes in docs, configuration, and theme files..." )
 
 		try {
 			while ( true ) {

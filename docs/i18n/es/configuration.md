@@ -108,6 +108,35 @@ luego `bxsites.yml`, luego `bxsites.json`.
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    name = "My Docs"
+    description = ""
+    baseURL = "/"
+    search = true
+    nav = []
+    social = []
+    footer = false
+    lastUpdated = false
+    extraCss = []
+    extraJs = []
+    plugins = []
+    variables = {}
+
+    [theme]
+    name = "bootstrap"
+    options = {}
+    logo = ""
+    favicon = ""
+
+    [markdown]
+    enableAdmonition = true
+
+    [repo]
+    url = ""
+    editUri = ""
+    ```
+
 Solo `name` es obligatorio - todo lo demás recurre a los valores por
 defecto mostrados arriba. Un objeto `theme` parcial se combina un nivel
 de profundidad, así que `{theme: {name: material}}` por sí solo conserva
@@ -450,6 +479,19 @@ que simplemente agrupa a sus hijos:
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[nav]]
+    path = "index.md"
+
+    [[nav]]
+    title = "Main Components"
+    children = [
+      { title = "Quick Start", path = "guides/setup.md" },
+      { path = "guides/deployment.md" }
+    ]
+    ```
+
 Dale a esa misma entrada de grupo un `path` en su lugar y se convierte en
 una sección enlazada normal (con su propia página de aterrizaje, más
 hijos) en lugar de una etiqueta simple - ambas formas se anidan bajo
@@ -492,6 +534,13 @@ para todo el sitio, aplicadas solo al árbol principal:
     		{ "from": "old-guide", "to": "guides/new-guide/" }
     	]
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[redirects]]
+    from = "old-guide"
+    to = "guides/new-guide/"
     ```
 
 - `redirects[].from` - el segmento de URL antiguo (sin barra inicial/final,
@@ -563,6 +612,15 @@ Cada tabla renderizada también recibe automáticamente un wrapper de scroll res
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [markdown]
+    enableFootnotes = true
+    enableDefinitionLists = true
+    anchorLinks = false
+    enableYouTubeTransformer = true
+    ```
+
 ## `repo`
 
 Añade un enlace con icono de repositorio a la cabecera (todos los temas
@@ -590,6 +648,13 @@ page" en cada página.
 === "JSON"
     ```json title="bxsites.json"
     { "repo": { "url": "https://github.com/acme/docs", "editUri": "edit/main/docs/" } }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [repo]
+    url = "https://github.com/acme/docs"
+    editUri = "edit/main/docs/"
     ```
 
 ## `social`
@@ -620,6 +685,19 @@ enlace (por defecto `icon`, y luego `"Link"`).
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[social]]
+    url = "https://twitter.com/acme"
+    icon = "twitter"
+    label = "Twitter"
+
+    [[social]]
+    url = "https://acme.com/rss.xml"
+    icon = "rss"
+    label = "RSS"
+    ```
+
 ## `footer`
 
 `false` (el valor por defecto) - sin pie de página en absoluto. `true`
@@ -634,6 +712,11 @@ los enlaces `social` (si los hay), y un crédito "Built with BxSites".
 === "JSON"
     ```json title="bxsites.json"
     { "footer": true }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    footer = true
     ```
 
 ## `lastUpdated`
@@ -657,6 +740,11 @@ en la máquina de construcción - en lugar de romper la construcción.
     { "lastUpdated": true }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    lastUpdated = true
+    ```
+
 ## `analytics`
 
 Conecta el análisis de vistas de página. Actualmente solo admite Google
@@ -677,6 +765,13 @@ Analytics (`gtag.js`):
     { "analytics": { "provider": "google", "id": "G-ABC123" } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [analytics]
+    provider = "google"
+    id = "G-ABC123"
+    ```
+
 ## `ogImage`
 
 Ruta/URL a una imagen de tarjeta social por defecto, renderizada como
@@ -695,6 +790,11 @@ con `generateOgImages` desactivado, no se renderiza ninguna etiqueta
 === "JSON"
     ```json title="bxsites.json"
     { "ogImage": "assets/social-card.png" }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    ogImage = "assets/social-card.png"
     ```
 
 El propio `ogImage` del frontmatter de una página (consulta
@@ -722,6 +822,11 @@ externo, ni acceso a red en el momento de la construcción.
     { "generateOgImages": true }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    generateOgImages = true
+    ```
+
 ## `extraCss` / `extraJs`
 
 Arrays de URL de hojas de estilo/scripts adicionales para incluir en cada
@@ -744,9 +849,27 @@ prefijo `baseURL`; una URL absoluta se usa tal cual). Las entradas de
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    extraCss = [ "assets/custom.css" ]
+    extraJs = [ "assets/custom.js" ]
+    ```
+
 ## `assets`
 
 === "YAML"
+
+=== "TOML"
+  ```toml title="bxsites.toml" linenums="1"
+  [assets]
+  fingerprint = true
+  bundle = true
+
+  [assets.images]
+  enabled = true
+  widths = [ 400, 800, 1200, 1600 ]
+  formats = [ "original", "webp" ]
+  ```
     ```yaml title="bxsites.yaml" linenums="1"
     assets:
       fingerprint: true

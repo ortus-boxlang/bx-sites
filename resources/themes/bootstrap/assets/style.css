@@ -1004,6 +1004,14 @@ dd {
 	margin: 2rem 0;
 }
 
+.bxsites-pre + .bxsites-pre {
+	margin-top: 2.5rem;
+}
+
+.bxsites-pre code {
+	line-height: 1.6;
+}
+
 .bxsites-copy-btn {
 	position: absolute;
 	top: 0.5rem;
