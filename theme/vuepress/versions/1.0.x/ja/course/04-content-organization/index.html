@@ -17,11 +17,14 @@
 
 	<link rel="canonical" href="https&#x3a;&#x2f;&#x2f;bxsites.io&#x2f;theme&#x2f;vuepress&#x2f;versions&#x2f;1.0.x&#x2f;ja&#x2f;course&#x2f;04-content-organization&#x2f;index.html">
 
+
 	<meta name="description" content="How docs&#x2f; maps to your site&#x27;s nav and URLs, and how pages link to each other.">
 	<meta property="og:description" content="How docs&#x2f; maps to your site&#x27;s nav and URLs, and how pages link to each other.">
 
+
 	<meta property="og:image" content="/theme/vuepress/versions/1.0.x/ja/assets/og/course-04-content-organization.png">
 	<meta name="twitter:card" content="summary_large_image">
+
 
 	<link rel="icon" href="/theme/vuepress/versions/1.0.x/ja/assets/favicon.png">
 
@@ -48,6 +51,7 @@
 			--bxsites-link-hover: color-mix( in srgb, #00C853 85%, black );
 		}
 
+
 		[data-theme="dark"] {
 			--bxsites-accent: #34D399;
 			--bxsites-link: #34D399;
@@ -59,12 +63,17 @@
 
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 
+
 	<link rel="stylesheet" href="/theme/vuepress/versions/1.0.x/ja/assets/vendor/swagger-ui/swagger-ui.css">
+
+
 
 	<script>window.__BXSITES_BASE_PATH__ = "/theme/vuepress/versions/1.0.x/ja/";</script>
 	<script>window.__BXSITES_SEARCH_NO_RESULTS__ = "\u8A72\u5F53\u3059\u308B\u7D50\u679C\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093\u3067\u3057\u305F\u3002";</script>
 	<script src="/theme/vuepress/versions/1.0.x/ja/assets/vendor/minisearch/minisearch.js"></script>
 	<script src="/theme/vuepress/versions/1.0.x/ja/assets/search.js" defer></script>
+
+
 
 	<script src="/theme/vuepress/versions/1.0.x/ja/assets/vendor/alpine/cdn.min.js" defer></script>
 </head>
@@ -74,7 +83,11 @@
 		<a class="vp-header__brand" href="/theme/vuepress/versions/1.0.x/ja/"><img class="brand-logo" src="/theme/vuepress/versions/1.0.x/ja/assets/boxlang-icon-full.svg" alt=""><span class="brand-name">BxSites</span></a>
 		<div class="vp-header__controls">
 
-<div class="bxsites-search vp-search">
+	
+
+
+
+	<div class="bxsites-search vp-search">
 	<input type="search" id="bxsites-search-input" class="vp-search__input" placeholder="&#x30c9;&#x30ad;&#x30e5;&#x30e1;&#x30f3;&#x30c8;&#x3092;&#x691c;&#x7d22;..." aria-label="&#x691c;&#x7d22;">
 	<kbd class="bxsites-search-kbd" aria-hidden="true">Ctrl K</kbd>
 	<ul id="bxsites-search-results" class="bxsites-search-results"></ul>
@@ -84,9 +97,12 @@
 
 
 
+
 			<select class="version-switcher" onchange="location.href=this.value" aria-label="&#x30d0;&#x30fc;&#x30b8;&#x30e7;&#x30f3;"><option value="/theme/vuepress/">Latest</option><option value="/theme/vuepress/versions/1.0.x/" selected>1.0.x</option></select>
 
+
 			<div class="locale-dropdown" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false"><button type="button" class="locale-dropdown__trigger" @click="open = !open" aria-haspopup="true" :aria-expanded="open" aria-label="&#x8a00;&#x8a9e;&#x3a; &#x65e5;&#x672c;&#x8a9e;"><span class="locale-dropdown__flag" aria-hidden="true">🇯🇵</span><span class="locale-dropdown__caret" aria-hidden="true">▾</span></button><ul class="locale-dropdown__menu" x-show="open" x-cloak role="menu"><li role="none"><a role="menuitem" class="locale-dropdown__item" href="/theme/vuepress/versions/1.0.x/"><span class="locale-dropdown__flag" aria-hidden="true">🇺🇸</span> English</a></li><li role="none"><a role="menuitem" class="locale-dropdown__item" href="/theme/vuepress/versions/1.0.x/es/"><span class="locale-dropdown__flag" aria-hidden="true">🇪🇸</span> Espa&ntilde;ol</a></li><li role="none"><a role="menuitem" class="locale-dropdown__item" href="/theme/vuepress/versions/1.0.x/it/"><span class="locale-dropdown__flag" aria-hidden="true">🇮🇹</span> Italiano</a></li><li role="none"><a role="menuitem" class="locale-dropdown__item" href="/theme/vuepress/versions/1.0.x/de/"><span class="locale-dropdown__flag" aria-hidden="true">🇩🇪</span> Deutsch</a></li><li role="none"><a role="menuitem" class="locale-dropdown__item locale-dropdown__item--active" href="/theme/vuepress/versions/1.0.x/ja/"><span class="locale-dropdown__flag" aria-hidden="true">🇯🇵</span> &#x65e5;&#x672c;&#x8a9e;</a></li></ul></div>
+
 
 			<a class="repo-link" href="https://github.com/ortus-boxlang/bx-sites" target="_blank" rel="noopener noreferrer" aria-label="&#x30ea;&#x30dd;&#x30b8;&#x30c8;&#x30ea;" title="&#x30ea;&#x30dd;&#x30b8;&#x30c8;&#x30ea;"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.083-.729.083-.729 1.205.084 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.303-5.467-1.332-5.467-5.93 0-1.31.468-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23A11.5 11.5 0 0 1 12 5.803c1.02.005 2.045.138 3.003.404 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.807 5.625-5.48 5.92.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 21.795 24 17.298 24 12c0-6.63-5.37-12-12-12"/></svg></a>
 
@@ -105,13 +121,31 @@
 
 
 			<article class="vp-card">
-<div class="bxsites-page-actions"><details class="bxsites-page-actions__disclosure"><summary class="bxsites-page-actions__button" aria-label="Page actions"><span>Copy</span><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg><kbd class="bxsites-page-actions__kbd" aria-hidden="true">C</kbd></summary><div class="bxsites-page-actions__panel"><button type="button" class="bxsites-page-actions__item" data-bxsites-action="copy-markdown" data-bxsites-markdown-url="/theme/vuepress/versions/1.0.x/ja/course/04-content-organization.md"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy page</span></button><button type="button" class="bxsites-page-actions__item" data-bxsites-action="copy-link" data-bxsites-page-url="https://bxsites.io/theme/vuepress/versions/1.0.x/ja/course/04-content-organization/index.html"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>Copy link</span></button><a class="bxsites-page-actions__item" href="/theme/vuepress/versions/1.0.x/ja/course/04-content-organization.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg><span>View as Markdown</span></a><div class="bxsites-page-actions__divider" role="separator"></div><a class="bxsites-page-actions__item" href="https://chatgpt.com/?q=Read%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fvuepress%2Fversions%2F1.0.x%2Fja%2Fcourse%2F04-content-organization%2Findex.html%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2c.3 3.6 1 6.2 2.1 7.9C15.2 11.5 17 12.5 20 13c-3 .5-4.8 1.5-5.9 3.1C13 17.8 12.3 20.4 12 24c-.3-3.6-1-6.2-2.1-7.9C8.8 14.5 7 13.5 4 13c3-.5 4.8-1.5 5.9-3.1C11 8.2 11.7 5.6 12 2Z"/></svg><span>Open in ChatGPT</span></a><a class="bxsites-page-actions__item" href="https://claude.ai/new?q=Read%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fvuepress%2Fversions%2F1.0.x%2Fja%2Fcourse%2F04-content-organization%2Findex.html%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2c.3 3.6 1 6.2 2.1 7.9C15.2 11.5 17 12.5 20 13c-3 .5-4.8 1.5-5.9 3.1C13 17.8 12.3 20.4 12 24c-.3-3.6-1-6.2-2.1-7.9C8.8 14.5 7 13.5 4 13c3-.5 4.8-1.5 5.9-3.1C11 8.2 11.7 5.6 12 2Z"/></svg><span>Open in Claude</span></a><div class="bxsites-page-actions__divider" role="separator"></div><button type="button" class="bxsites-page-actions__item" data-bxsites-action="print"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg><span>Export as PDF</span></button><a class="bxsites-page-actions__item" href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Content%20Organization&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fvuepress%2Fversions%2F1.0.x%2Fja%2Fcourse%2F04-content-organization%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg><span>Report an issue</span></a><div class="bxsites-page-actions__divider" role="separator"></div><a class="bxsites-page-actions__item" href="https://x.com/intent/tweet?url=https%3A%2F%2Fbxsites.io%2Ftheme%2Fvuepress%2Fversions%2F1.0.x%2Fja%2Fcourse%2F04-content-organization%2Findex.html&amp;text=Content%20Organization" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><span>Share on X</span></a><a class="bxsites-page-actions__item" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fbxsites.io%2Ftheme%2Fvuepress%2Fversions%2F1.0.x%2Fja%2Fcourse%2F04-content-organization%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286ZM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124ZM7.119 20.452H3.554V9h3.565v11.452ZM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003Z"/></svg><span>Share on LinkedIn</span></a><a class="bxsites-page-actions__item" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fbxsites.io%2Ftheme%2Fvuepress%2Fversions%2F1.0.x%2Fja%2Fcourse%2F04-content-organization%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073Z"/></svg><span>Share on Facebook</span></a></div></details></div>
+
+	<div class="bxsites-page-actions"><details class="bxsites-page-actions__disclosure"><summary class="bxsites-page-actions__button" aria-label="Page actions"><span>Copy</span><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg><kbd class="bxsites-page-actions__kbd" aria-hidden="true">C</kbd></summary><div class="bxsites-page-actions__panel"><button type="button" class="bxsites-page-actions__item" data-bxsites-action="copy-markdown" data-bxsites-markdown-url="/theme/vuepress/versions/1.0.x/ja/course/04-content-organization.md"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy page</span></button><button type="button" class="bxsites-page-actions__item" data-bxsites-action="copy-link" data-bxsites-page-url="https://bxsites.io/theme/vuepress/versions/1.0.x/ja/course/04-content-organization/index.html"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>Copy link</span></button><a class="bxsites-page-actions__item" href="/theme/vuepress/versions/1.0.x/ja/course/04-content-organization.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg><span>View as Markdown</span></a><div class="bxsites-page-actions__divider" role="separator"></div><a class="bxsites-page-actions__item" href="https://chatgpt.com/?q=Read%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fvuepress%2Fversions%2F1.0.x%2Fja%2Fcourse%2F04-content-organization%2Findex.html%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2c.3 3.6 1 6.2 2.1 7.9C15.2 11.5 17 12.5 20 13c-3 .5-4.8 1.5-5.9 3.1C13 17.8 12.3 20.4 12 24c-.3-3.6-1-6.2-2.1-7.9C8.8 14.5 7 13.5 4 13c3-.5 4.8-1.5 5.9-3.1C11 8.2 11.7 5.6 12 2Z"/></svg><span>Open in ChatGPT</span></a><a class="bxsites-page-actions__item" href="https://claude.ai/new?q=Read%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fvuepress%2Fversions%2F1.0.x%2Fja%2Fcourse%2F04-content-organization%2Findex.html%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2c.3 3.6 1 6.2 2.1 7.9C15.2 11.5 17 12.5 20 13c-3 .5-4.8 1.5-5.9 3.1C13 17.8 12.3 20.4 12 24c-.3-3.6-1-6.2-2.1-7.9C8.8 14.5 7 13.5 4 13c3-.5 4.8-1.5 5.9-3.1C11 8.2 11.7 5.6 12 2Z"/></svg><span>Open in Claude</span></a><div class="bxsites-page-actions__divider" role="separator"></div><button type="button" class="bxsites-page-actions__item" data-bxsites-action="print"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg><span>Export as PDF</span></button><a class="bxsites-page-actions__item" href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Content%20Organization&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fvuepress%2Fversions%2F1.0.x%2Fja%2Fcourse%2F04-content-organization%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg><span>Report an issue</span></a><div class="bxsites-page-actions__divider" role="separator"></div><a class="bxsites-page-actions__item" href="https://x.com/intent/tweet?url=https%3A%2F%2Fbxsites.io%2Ftheme%2Fvuepress%2Fversions%2F1.0.x%2Fja%2Fcourse%2F04-content-organization%2Findex.html&amp;text=Content%20Organization" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><span>Share on X</span></a><a class="bxsites-page-actions__item" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fbxsites.io%2Ftheme%2Fvuepress%2Fversions%2F1.0.x%2Fja%2Fcourse%2F04-content-organization%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286ZM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124ZM7.119 20.452H3.554V9h3.565v11.452ZM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003Z"/></svg><span>Share on LinkedIn</span></a><a class="bxsites-page-actions__item" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fbxsites.io%2Ftheme%2Fvuepress%2Fversions%2F1.0.x%2Fja%2Fcourse%2F04-content-organization%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073Z"/></svg><span>Share on Facebook</span></a></div></details></div>
+
+
 				<p class="fallback-notice"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> &#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x306f;&#x307e;&#x3060;&#x7ffb;&#x8a33;&#x3055;&#x308c;&#x3066;&#x3044;&#x307e;&#x305b;&#x3093; - English&#x7248;&#x3092;&#x8868;&#x793a;&#x3057;&#x3066;&#x3044;&#x307e;&#x3059;&#x3002;</p>
-<nav class="vp-breadcrumb" aria-label="breadcrumb"><ol><li class="vp-breadcrumb__item"><a href="/theme/vuepress/versions/1.0.x/ja/course/index.html">Tutorial Course</a></li><li class="vp-breadcrumb__item vp-breadcrumb__item--active" aria-current="page">Content Organization</li></ol></nav>
-				<h1 class="vp-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a><span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,80v88.89a7.11,7.11,0,0,1-7.11,7.11H200V112a8,8,0,0,0-8-8H120L90.13,81.6a8,8,0,0,0-4.8-1.6H64V56a8,8,0,0,1,8-8h45.33a8,8,0,0,1,4.8,1.6L152,72h72A8,8,0,0,1,232,80Z" opacity="0.2"/><path d="M224,64H154.67L126.93,43.2a16.12,16.12,0,0,0-9.6-3.2H72A16,16,0,0,0,56,56V72H40A16,16,0,0,0,24,88V200a16,16,0,0,0,16,16H192.89A15.13,15.13,0,0,0,208,200.89V184h16.89A15.13,15.13,0,0,0,240,168.89V80A16,16,0,0,0,224,64ZM192,200H40V88H85.33l29.87,22.4A8,8,0,0,0,120,112h72Zm32-32H208V112a16,16,0,0,0-16-16H122.67L94.93,75.2a16.12,16.12,0,0,0-9.6-3.2H72V56h45.33L147.2,78.4A8,8,0,0,0,152,80h72Z"/></svg></span> Content Organization</h1>
-				<p class="page-summary">How docs&#x2f; maps to your site&#x27;s nav and URLs, and how pages link to each other.</p>
-<div class="page-tags"><a class="page-tag" href="/theme/vuepress/versions/1.0.x/ja/tags/index.html#tag-course">course</a></div>
-<details class="bxsites-toc-mobile vp-toc--mobile"><summary class="vp-toc--mobile__summary">&#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x306e;&#x5185;&#x5bb9;</summary><ul><li class="vp-toc__item vp-toc__item--2"><a href="#linking-between-pages">Linking between pages</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#docs-or-src">docs&#x2f; or src&#x2f;</a></li></ul></details>
+
+
+	<nav class="vp-breadcrumb" aria-label="breadcrumb"><ol><li class="vp-breadcrumb__item"><a href="/theme/vuepress/versions/1.0.x/ja/course/index.html">Tutorial Course</a></li><li class="vp-breadcrumb__item vp-breadcrumb__item--active" aria-current="page">Content Organization</li></ol></nav>
+
+				<h1 class="vp-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a>
+
+	<span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,80v88.89a7.11,7.11,0,0,1-7.11,7.11H200V112a8,8,0,0,0-8-8H120L90.13,81.6a8,8,0,0,0-4.8-1.6H64V56a8,8,0,0,1,8-8h45.33a8,8,0,0,1,4.8,1.6L152,72h72A8,8,0,0,1,232,80Z" opacity="0.2"/><path d="M224,64H154.67L126.93,43.2a16.12,16.12,0,0,0-9.6-3.2H72A16,16,0,0,0,56,56V72H40A16,16,0,0,0,24,88V200a16,16,0,0,0,16,16H192.89A15.13,15.13,0,0,0,208,200.89V184h16.89A15.13,15.13,0,0,0,240,168.89V80A16,16,0,0,0,224,64ZM192,200H40V88H85.33l29.87,22.4A8,8,0,0,0,120,112h72Zm32-32H208V112a16,16,0,0,0-16-16H122.67L94.93,75.2a16.12,16.12,0,0,0-9.6-3.2H72V56h45.33L147.2,78.4A8,8,0,0,0,152,80h72Z"/></svg></span>
+
+Content Organization</h1>
+
+	<p class="page-summary">How docs&#x2f; maps to your site&#x27;s nav and URLs, and how pages link to each other.</p>
+
+
+	<div class="page-tags"><a class="page-tag" href="/theme/vuepress/versions/1.0.x/ja/tags/index.html#tag-course">course</a></div>
+
+
+
+
+	<details class="bxsites-toc-mobile vp-toc--mobile"><summary class="vp-toc--mobile__summary">&#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x306e;&#x5185;&#x5bb9;</summary><ul><li class="vp-toc__item vp-toc__item--2"><a href="#linking-between-pages">Linking between pages</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#docs-or-src">docs&#x2f; or src&#x2f;</a></li></ul></details>
+
 				<div class="vp-content-body">
 				<h1 id="content-organization"><a href="#content-organization" id="content-organization" name="content-organization" class="anchor"></a>Content Organization</h1>
 <p>Every <code>.md</code> file under <code>docs/</code> becomes a page. Folder nesting becomes
@@ -150,16 +184,21 @@ always lands in <code>site/</code> either way.</p>
 <a href="/theme/vuepress/versions/1.0.x/guides/redirects/index.html">Redirects</a>.</p>
 
 			</div>
-<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/versions/1.0.x/course/04-content-organization.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> &#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x3092;&#x7de8;&#x96c6;</a><a href="/theme/vuepress/versions/1.0.x/ja/course/04-content-organization.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown&#x3092;&#x30c0;&#x30a6;&#x30f3;&#x30ed;&#x30fc;&#x30c9;</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &#x6700;&#x7d42;&#x66f4;&#x65b0; Sep 4, 2026, 8&#x3a;43&#x3a;49 PM</span></div>
+
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/versions/1.0.x/course/04-content-organization.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> &#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x3092;&#x7de8;&#x96c6;</a><a href="/theme/vuepress/versions/1.0.x/ja/course/04-content-organization.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown&#x3092;&#x30c0;&#x30a6;&#x30f3;&#x30ed;&#x30fc;&#x30c9;</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &#x6700;&#x7d42;&#x66f4;&#x65b0; Sep 5, 2026, 4&#x3a;37&#x3a;59 PM</span></div>
+
 			</article>
 
 			<nav class="vp-page-nav" aria-label="&#x30da;&#x30fc;&#x30b8;&#x30ca;&#x30d3;&#x30b2;&#x30fc;&#x30b7;&#x30e7;&#x30f3;">
 
 				<a class="vp-page-nav__prev" href="/theme/vuepress/versions/1.0.x/ja/course/07-content-blocks/index.html">&larr; Content Blocks</a>
 
+
+
 				<a class="vp-page-nav__next" href="/theme/vuepress/versions/1.0.x/ja/course/03-creating-a-new-site/index.html">Creating a New Site &rarr;</a>
 
 			</nav>
+
 
 
 
@@ -198,15 +237,20 @@ always lands in <code>site/</code> either way.</p>
 
 	<script src="/theme/vuepress/versions/1.0.x/ja/assets/page-actions-init.js" defer></script>
 
+
 	<script src="/theme/vuepress/versions/1.0.x/ja/assets/vendor/mermaid/mermaid.min.js"></script>
 	<script src="/theme/vuepress/versions/1.0.x/ja/assets/mermaid-init.js"></script>
+
 
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 	<script src="/theme/vuepress/versions/1.0.x/ja/assets/math-init.js"></script>
 
+
 	<script src="/theme/vuepress/versions/1.0.x/ja/assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
 	<script src="/theme/vuepress/versions/1.0.x/ja/assets/openapi-init.js"></script>
+
+
 
 	<script src="/theme/vuepress/versions/1.0.x/ja/assets/bundle.a432a71f.js" defer></script>
 </body>
