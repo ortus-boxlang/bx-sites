@@ -176,6 +176,7 @@
 	variables.navCollapsible = ( variables.siteConfig.theme.options.navCollapsible ?: false ) ? true : false
 	variables.navExpandAll = ( variables.siteConfig.theme.options.navExpandAll ?: true ) ? true : false
 	variables.tocPosition = variables.siteConfig.theme.options.tocPosition ?: "top"
+	variables.mainContentClass = variables.tocPosition == "sticky" ? "col-xl-8" : "col-xl-10"
 	variables.pageMetaPosition = variables.siteConfig.theme.options.pageMetaPosition ?: "bottom"
 	variables.breadcrumbsEnabled = ( variables.siteConfig.theme.options.breadcrumbs ?: true ) ? true : false
 	variables.faviconUrl = trim( variables.siteConfig.theme.favicon ?: "" )
@@ -192,7 +193,6 @@
 	variables.accentColorDark = trim( variables.siteConfig.theme.options.accentColorDark ?: "" )
 </bx:script>
 <bx:output>
-
 <!doctype html>
 <html lang="#encodeForHTML( variables.currentLocale.len() ? variables.currentLocale : 'en' )#" dir="#encodeForHTML( variables.currentLocaleDir )#">
 <head>
@@ -205,13 +205,16 @@
 	#renderArticleMeta()#
 <bx:if len( variables.page.canonicalUrl )>
 	<link rel="canonical" href="#encodeForHTML( variables.page.canonicalUrl )#">
-</bx:if><bx:if len( variables.ogDescription )>
+</bx:if>
+<bx:if len( variables.ogDescription )>
 	<meta name="description" content="#encodeForHTML( variables.ogDescription )#">
 	<meta property="og:description" content="#encodeForHTML( variables.ogDescription )#">
-</bx:if><bx:if len( variables.ogImageUrl )>
+</bx:if>
+<bx:if len( variables.ogImageUrl )>
 	<meta property="og:image" content="#resolveAssetUrl( variables.ogImageUrl )#">
 	<meta name="twitter:card" content="summary_large_image">
-</bx:if><bx:if len( variables.faviconUrl )>
+</bx:if>
+<bx:if len( variables.faviconUrl )>
 	<link rel="icon" href="#resolveAssetUrl( variables.faviconUrl )#">
 </bx:if>
 	<script>
@@ -237,7 +240,8 @@
 			--bxsites-link: #variables.accentColor#;
 			--bxsites-link-hover: color-mix( in srgb, #variables.accentColor# 85%, black );
 		}
-</bx:if><bx:if len( variables.accentColorDark )>
+</bx:if>
+<bx:if len( variables.accentColorDark )>
 		[data-theme="dark"] {
 			--bxsites-accent: #variables.accentColorDark#;
 			--bxsites-link: #variables.accentColorDark#;
@@ -248,9 +252,11 @@
 </bx:if>
 <bx:if variables.mathEnabled>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-</bx:if><bx:if variables.openapiEnabled>
+</bx:if>
+<bx:if variables.openapiEnabled>
 	<link rel="stylesheet" href="#variables.basePath#assets/vendor/swagger-ui/swagger-ui.css">
-</bx:if><bx:if variables.analyticsProvider == 'google'>
+</bx:if>
+<bx:if variables.analyticsProvider == 'google'>
 	<script async src="https://www.googletagmanager.com/gtag/js?id=#encodeForHTML( variables.analyticsId )#"></script>
 	<script>
 		window.dataLayer = window.dataLayer || [];
@@ -258,14 +264,17 @@
 		gtag('js', new Date());
 		gtag('config', '#variables.analyticsId#');
 	</script>
-</bx:if><bx:if variables.searchEnabled and variables.searchProviderName eq 'local'>
+</bx:if>
+<bx:if variables.searchEnabled and variables.searchProviderName eq 'local'>
 	<script>window.__BXSITES_BASE_PATH__ = "#variables.basePath#";</script>
 	<script>window.__BXSITES_SEARCH_NO_RESULTS__ = "#encodeForJavaScript( variables.strings.searchNoResults )#";</script>
 	<script src="#variables.basePath#assets/vendor/minisearch/minisearch.js"></script>
 	<script src="#variables.basePath#assets/search.js" defer></script>
-</bx:if><bx:if variables.searchEnabled and variables.searchProviderName eq 'algolia'>
+</bx:if>
+<bx:if variables.searchEnabled and variables.searchProviderName eq 'algolia'>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
-</bx:if><bx:if variables.searchEnabled and variables.searchProviderName eq 'pagefind'>
+</bx:if>
+<bx:if variables.searchEnabled and variables.searchProviderName eq 'pagefind'>
 	<link rel="stylesheet" href="#variables.basePath#pagefind/pagefind-ui.css">
 </bx:if>
 	<script src="#variables.basePath#assets/vendor/alpine/cdn.min.js" defer></script>
@@ -278,12 +287,16 @@
 			</button>
 			<a class="navbar-brand brand-mark" href="#variables.basePath#">#renderBrandMark()#</a>
 			<div class="navbar-controls">
-<bx:if variables.searchEnabled><bx:include template="#variables.themeDir#/search.bxm"></bx:if>
+<bx:if variables.searchEnabled>
+	<bx:include template="#variables.themeDir#/search.bxm">
+</bx:if>
 <bx:if variables.versions.len() gt 1>
 				#renderVersionSwitcher( variables.versions, variables.currentVersion )#
-</bx:if><bx:if variables.locales.len() gt 1>
+</bx:if>
+<bx:if variables.locales.len() gt 1>
 				#renderLocaleDropdown( variables.locales, variables.currentLocale )#
-</bx:if><bx:if len( variables.repoUrl )>
+</bx:if>
+<bx:if len( variables.repoUrl )>
 				<a class="repo-link" href="#bxsitesUrlAttr( variables.repoUrl )#" target="_blank" rel="noopener noreferrer" aria-label="#encodeForHTML( variables.strings.repository )#" title="#encodeForHTML( variables.strings.repository )#">#bxsitesIcon( "github" )#</a>
 </bx:if>
 				<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="#encodeForHTML( variables.strings.toggleDarkMode )#">
@@ -299,7 +312,7 @@
 				#renderNavList( variables.nav )#
 				<a class="bxsites-powered-by" href="https://bxsites.io" target="_blank" rel="noopener noreferrer">#bxsitesIcon( "phosphor:stack" )# <span>Powered by BxSites</span></a>
 			</aside>
-			<main class="col-lg-9<bx:if variables.tocPosition == 'sticky'> col-xl-8</bx:if><bx:if variables.tocPosition != 'sticky'> col-xl-10</bx:if> content">
+			<main class="col-lg-9 #variables.mainContentClass# content">
 <bx:include template="#variables.themeDir#/page.bxm">
 			</main>
 <bx:if variables.tocPosition == 'sticky' and variables.page.toc.len() gt 0>
@@ -335,17 +348,21 @@
 	<script src="#variables.basePath#assets/prompt-init.js" defer></script>
 <bx:if variables.pageActionsEnabled>
 	<script src="#variables.basePath#assets/page-actions-init.js" defer></script>
-</bx:if><bx:if variables.mermaidEnabled>
+</bx:if>
+<bx:if variables.mermaidEnabled>
 	<script src="#variables.basePath#assets/vendor/mermaid/mermaid.min.js"></script>
 	<script src="#variables.basePath#assets/mermaid-init.js"></script>
-</bx:if><bx:if variables.mathEnabled>
+</bx:if>
+<bx:if variables.mathEnabled>
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 	<script src="#variables.basePath#assets/math-init.js"></script>
-</bx:if><bx:if variables.openapiEnabled>
+</bx:if>
+<bx:if variables.openapiEnabled>
 	<script src="#variables.basePath#assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
 	<script src="#variables.basePath#assets/openapi-init.js"></script>
-</bx:if><bx:if variables.searchEnabled and variables.searchProviderName eq 'algolia'>
+</bx:if>
+<bx:if variables.searchEnabled and variables.searchProviderName eq 'algolia'>
 	<script src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>
 	<script>
 		document.addEventListener( "DOMContentLoaded", function () {
@@ -358,7 +375,8 @@
 			} );
 		} );
 	</script>
-</bx:if><bx:if variables.searchEnabled and variables.searchProviderName eq 'pagefind'>
+</bx:if>
+<bx:if variables.searchEnabled and variables.searchProviderName eq 'pagefind'>
 	<script src="#variables.basePath#pagefind/pagefind-ui.js"></script>
 	<script>
 		document.addEventListener( "DOMContentLoaded", function () {

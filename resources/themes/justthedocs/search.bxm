@@ -1,7 +1,12 @@
 <bx:output>
-<bx:if variables.searchProviderName eq 'algolia'><div id="bxsites-search-algolia" class="bxsites-search-algolia"></div>
-</bx:if><bx:if variables.searchProviderName eq 'pagefind'><div id="bxsites-search-pagefind" class="bxsites-search-pagefind"></div>
-</bx:if><bx:if variables.searchProviderName eq 'local'><div class="bxsites-search jtd-search">
+<bx:if variables.searchProviderName eq 'algolia'>
+	<div id="bxsites-search-algolia" class="bxsites-search-algolia"></div>
+</bx:if>
+<bx:if variables.searchProviderName eq 'pagefind'>
+	<div id="bxsites-search-pagefind" class="bxsites-search-pagefind"></div>
+</bx:if>
+<bx:if variables.searchProviderName eq 'local'>
+	<div class="bxsites-search jtd-search">
 	<input type="search" id="bxsites-search-input" class="jtd-search__input" placeholder="#encodeForHTML( variables.strings.searchPlaceholder )#" aria-label="#encodeForHTML( variables.strings.searchAriaLabel )#">
 	<kbd class="bxsites-search-kbd" aria-hidden="true">Ctrl K</kbd>
 	<ul id="bxsites-search-results" class="bxsites-search-results"></ul>

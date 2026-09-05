@@ -138,29 +138,58 @@
 </bx:script>
 <bx:output>
 			<article class="ntn-card">
-<bx:if variables.pageActionsEnabled and variables.pageActionsPosition == 'top'>#renderPageActions()#</bx:if><bx:if variables.page.isFallbackContent>
+<bx:if variables.pageActionsEnabled and variables.pageActionsPosition == 'top'>
+	#renderPageActions()#
+</bx:if>
+<bx:if variables.page.isFallbackContent>
 				<p class="fallback-notice">#bxsitesIcon( 'globe' )# #encodeForHTML( variables.stringsResolver.format( variables.strings.notTranslatedNotice, { "locale" : defaultLocaleLabel() } ) )#</p>
-</bx:if><bx:if variables.breadcrumbsEnabled and variables.page.breadcrumbs.len() gt 1>#renderBreadcrumbs( variables.page.breadcrumbs )#</bx:if>
-				<h1 class="ntn-title" id="page-title"><a href="##page-title" id="page-title" class="anchor"></a><bx:if len( variables.page.iconHtml )><span class="page-icon">#variables.page.iconHtml#</span> </bx:if>#encodeForHTML( variables.page.title )#</h1>
-<bx:if len( variables.page.summary )>				<p class="page-summary">#encodeForHTML( variables.page.summary )#</p>
-</bx:if><bx:if variables.page.tags.len() gt 0>#renderTags( variables.page.tags )#</bx:if><bx:if ( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'top'>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:if>
-<bx:if variables.page.toc.len() gt 0 and variables.tocPosition == 'top'>#renderToc( variables.page.toc )#</bx:if><bx:if variables.page.toc.len() gt 0 and variables.tocPosition == 'sticky'>#renderToc( variables.page.toc, true )#</bx:if>
+</bx:if>
+<bx:if variables.breadcrumbsEnabled and variables.page.breadcrumbs.len() gt 1>
+	#renderBreadcrumbs( variables.page.breadcrumbs )#
+</bx:if>
+				<h1 class="ntn-title" id="page-title"><a href="##page-title" id="page-title" class="anchor"></a>
+<bx:if len( variables.page.iconHtml )>
+	<span class="page-icon">#variables.page.iconHtml#</span>
+</bx:if>
+#encodeForHTML( variables.page.title )#</h1>
+<bx:if len( variables.page.summary )>
+	<p class="page-summary">#encodeForHTML( variables.page.summary )#</p>
+</bx:if>
+<bx:if variables.page.tags.len() gt 0>
+	#renderTags( variables.page.tags )#
+</bx:if>
+<bx:if ( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'top'>
+	#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#
+</bx:if>
+<bx:if variables.page.toc.len() gt 0 and variables.tocPosition == 'top'>
+	#renderToc( variables.page.toc )#
+</bx:if>
+<bx:if variables.page.toc.len() gt 0 and variables.tocPosition == 'sticky'>
+	#renderToc( variables.page.toc, true )#
+</bx:if>
 				<div class="ntn-content-body">
 				#variables.page.contentHtml#
 			</div>
-<bx:if ( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'bottom'>#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#</bx:if>
+<bx:if ( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'bottom'>
+	#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#
+</bx:if>
 			</article>
 <bx:if len( variables.page.prevPage.url ) or len( variables.page.nextPage.url )>
 			<nav class="ntn-page-nav" aria-label="#encodeForHTML( variables.strings.pageNavigation )#">
 <bx:if len( variables.page.prevPage.url )>
 				<a class="ntn-page-nav__prev" href="#variables.basePath##variables.page.prevPage.url#">&larr; #encodeForHTML( variables.page.prevPage.title )#</a>
-</bx:if><bx:if !len( variables.page.prevPage.url )>
+</bx:if>
+<bx:if !len( variables.page.prevPage.url )>
 				<span></span>
-</bx:if><bx:if len( variables.page.nextPage.url )>
+</bx:if>
+<bx:if len( variables.page.nextPage.url )>
 				<a class="ntn-page-nav__next" href="#variables.basePath##variables.page.nextPage.url#">#encodeForHTML( variables.page.nextPage.title )# &rarr;</a>
 </bx:if>
 			</nav>
-</bx:if><bx:if variables.pageActionsEnabled and variables.pageActionsPosition == 'bottom'>#renderPageActions()#</bx:if>
+</bx:if>
+<bx:if variables.pageActionsEnabled and variables.pageActionsPosition == 'bottom'>
+	#renderPageActions()#
+</bx:if>
 
 
 </bx:output>
