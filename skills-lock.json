@@ -43,6 +43,96 @@
       "skillPath": "boxlang-core-development/runtime-architecture/SKILL.md",
       "computedHash": "ab17b6e1b2559fe5abda5e01b2811f1d883b72caa0883ce32bd7d90c6944fd8e"
     },
+    "boxlang-scheduled-tasks": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "boxlang-developer/scheduled-tasks/SKILL.md",
+      "computedHash": "534448e61aacce705de4065549cfccd9cf8bb1c552330fddd3b40b200960ab58"
+    },
+    "boxlang-security": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "boxlang-developer/security/SKILL.md",
+      "computedHash": "bcf72fd5f5d27c40efef3e6f4ee33017497f0b6bc54e35ae59b3a485b824af0f"
+    },
+    "boxlang-templating": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "boxlang-developer/templating/SKILL.md",
+      "computedHash": "92712aa9582312ebd5ed430d8966aa45a47996cb3ec9679cfb401a88085eae63"
+    },
+    "boxlang-testing": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "boxlang-developer/testing/SKILL.md",
+      "computedHash": "5062447bfb00f97d62536e8f83e78f5e0e05ea9b01f1ab542b9d29c6a4a7224c"
+    },
+    "boxlang-web-development": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "boxlang-developer/web-development/SKILL.md",
+      "computedHash": "365a7dea08d0aa06af2dec134ef5a6c67fe4cc622e9856e2a10426a65ec90de5"
+    },
+    "boxlang-zip": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "boxlang-developer/zip/SKILL.md",
+      "computedHash": "06f346e32aacdccfd501222341cca88b3226e3703123e6e8053495e058bc9f0a"
+    },
+    "bx-docbox": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "boxlang-modules/bx-docbox/SKILL.md",
+      "computedHash": "4bdeb81b5a266f1ac62814aa8d555f1247cf320c872be6eefa651c1a1095250c"
+    },
+    "bx-esapi": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "boxlang-modules/bx-esapi/SKILL.md",
+      "computedHash": "b80e123c5d6f8a7257993fe902290cc57b5ab26e1305f31c3dae1c23418d6897"
+    },
+    "bx-ftp": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "boxlang-modules/bx-ftp/SKILL.md",
+      "computedHash": "2d596687f4c8ee371c76e34745b71c9dd948660b77c6f85a2cc968586dfd466a"
+    },
+    "bx-image": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "boxlang-modules/bx-image/SKILL.md",
+      "computedHash": "7510b151355e028bae40697760ee2d795698b8c1c8a4db0c51b6d0ea143b4389"
+    },
+    "bx-mail": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "boxlang-modules/bx-mail/SKILL.md",
+      "computedHash": "aad5841b771503f524ad34fe729381ab8564d34f37dbd36ac353ad70e80fbe7a"
+    },
+    "bx-pdf": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "boxlang-modules/bx-pdf/SKILL.md",
+      "computedHash": "e314bdec3261824dec5adef18b6c45a17c84d7fb76fa23181ad75be3076be7fc"
+    },
+    "bx-rss": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "boxlang-modules/bx-rss/SKILL.md",
+      "computedHash": "114fe45f8da61484cdc6f60a31a2fdcdf6e2756374a71de1e65c3c18ef9f2bc6"
+    },
+    "bx-web-support": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "boxlang-modules/bx-web-support/SKILL.md",
+      "computedHash": "09f157d59567cec5faf1788d8974e75e60c871fc5dfbe837a9cac6773d013977"
+    },
+    "bx-yaml": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "boxlang-modules/bx-yaml/SKILL.md",
+      "computedHash": "f2c3bd6ab12efa7fd9686ae5d1777c66ad6d6bfbca5bc8a4933e8f8351b80057"
+    },
     "code-documenter": {
       "source": "ortus-solutions/skills",
       "sourceType": "github",
@@ -54,6 +144,60 @@
       "sourceType": "github",
       "skillPath": "code-reviewer/SKILL.md",
       "computedHash": "66d98957820171099d66958feb3e7623d2753021ecb5ab50139404f3b22a1fa0"
+    },
+    "commandbox-config-settings": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "commandbox/commandbox-config-settings/SKILL.md",
+      "computedHash": "19dfd2dbd842e0c4fa428e5c7921fd36c996b56d94345daa308be32293c12ab2"
+    },
+    "commandbox-deploying": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "commandbox/commandbox-deploying/SKILL.md",
+      "computedHash": "81ed1fdd292fb9ad29ed7daa1dba9f7daa722bd684d9b2cf7fc96faa7387cefd"
+    },
+    "commandbox-developing": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "commandbox/commandbox-developing/SKILL.md",
+      "computedHash": "c18b0d4ceaf9c03edb5ed9a61b59d1a696014744126929017fc2856c90b7c709"
+    },
+    "commandbox-embedded-server": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "commandbox/commandbox-embedded-server/SKILL.md",
+      "computedHash": "ffb7bc1079ab5fc3361bf2a64427030ecef5ae4c74ef0e9bfecb6c210b14200b"
+    },
+    "commandbox-package-management": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "commandbox/commandbox-package-management/SKILL.md",
+      "computedHash": "63b73016c804250f9e05104d4c87015071b0bbbe84af268369d1d3243f9c4548"
+    },
+    "commandbox-setup": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "commandbox/commandbox-setup/SKILL.md",
+      "computedHash": "8ae2ee6f93d668e4a11d9bd57d72d3b9f68f1cb3f9e2d780b6f2675463371bf3"
+    },
+    "commandbox-task-runners": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "commandbox/commandbox-task-runners/SKILL.md",
+      "computedHash": "a32c3fe1969f261e789e732ca68e4c5e2e9383b35d0be20ed1fba473ea95feef"
+    },
+    "commandbox-testing": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "commandbox/commandbox-testing/SKILL.md",
+      "computedHash": "15dfb0ca0d64edfd0ec0344df2f9b3494a8a15a666a464927148f43deaa5b585"
+    },
+    "commandbox-usage": {
+      "source": "ortus-boxlang/skills",
+      "sourceType": "github",
+      "skillPath": "commandbox/commandbox-usage/SKILL.md",
+      "computedHash": "db689cb9f7f895a202ecae3986f24557ff0e57d4c614da6919678204e995dd87"
     },
     "gitbook-docs-expert": {
       "source": "ortus-solutions/skills",
@@ -96,6 +240,72 @@
       "sourceType": "github",
       "skillPath": "security-expert/SKILL.md",
       "computedHash": "abf315283fb188b80d0b767cfdbd0984f501ab1ec7083c5b58d15e3e6b3abf59"
+    },
+    "testbox-assertions": {
+      "source": "coldbox/skills",
+      "sourceType": "github",
+      "skillPath": "testbox/assertions/SKILL.md",
+      "computedHash": "6940e85e95b3155c44309b8d8615bf30677ece747f5a0c67336598d73449e61d"
+    },
+    "testbox-bdd": {
+      "source": "coldbox/skills",
+      "sourceType": "github",
+      "skillPath": "testbox/bdd/SKILL.md",
+      "computedHash": "e17f42b195875dd7e798956afdea82f12b82def2b3bae2fd5f3d6df8d5321e85"
+    },
+    "testbox-cbmockdata": {
+      "source": "coldbox/skills",
+      "sourceType": "github",
+      "skillPath": "testbox/cbmockdata/SKILL.md",
+      "computedHash": "899b465c01b9257720f6d04834ffc567a8ad4381ece2f807ec431ae887d0a132"
+    },
+    "testbox-expectations": {
+      "source": "coldbox/skills",
+      "sourceType": "github",
+      "skillPath": "testbox/expectations/SKILL.md",
+      "computedHash": "da02c7b7eb94a372e19eec23d6c508b5aeaca4dfc46e0ab4484764ef40bf5958"
+    },
+    "testbox-listeners": {
+      "source": "coldbox/skills",
+      "sourceType": "github",
+      "skillPath": "testbox/listeners/SKILL.md",
+      "computedHash": "ca3d8a2120e5362592827cf22e5712c8f64a79d3da9392a829ffea6f78e9a221"
+    },
+    "testbox-mockbox": {
+      "source": "coldbox/skills",
+      "sourceType": "github",
+      "skillPath": "testbox/mockbox/SKILL.md",
+      "computedHash": "2fde1ab0082ad8c3142a0348608525e45b14313e66eb50ecb8848115964f9ec5"
+    },
+    "testbox-reporters": {
+      "source": "coldbox/skills",
+      "sourceType": "github",
+      "skillPath": "testbox/reporters/SKILL.md",
+      "computedHash": "89da95096b7a7c4f2f2da8a18a2d701056df0321bac5962f11fa48167541ec1b"
+    },
+    "testbox-runners": {
+      "source": "coldbox/skills",
+      "sourceType": "github",
+      "skillPath": "testbox/runners/SKILL.md",
+      "computedHash": "aba4f06737ee355047f1341602e3a12473aa17bde41b8759045536e513791dd5"
+    },
+    "testbox-unit-xunit": {
+      "source": "coldbox/skills",
+      "sourceType": "github",
+      "skillPath": "testbox/unit/SKILL.md",
+      "computedHash": "95311c92598ea2900510cf7e5bbca8f3c46ba68c18b695ce475ff5a912600745"
+    },
+    "testing-coverage": {
+      "source": "coldbox/skills",
+      "sourceType": "github",
+      "skillPath": "testbox/testing-coverage/SKILL.md",
+      "computedHash": "d3aa52571131fa4127ce1b53f74308adca563c526a86cd5126dce6100aa7462e"
+    },
+    "testing-fixtures": {
+      "source": "coldbox/skills",
+      "sourceType": "github",
+      "skillPath": "testbox/testing-fixtures/SKILL.md",
+      "computedHash": "4393c328b30d2201a5419f8ea4aee8186e451cb90ea196d8bf77ffd47355e2f2"
     }
   }
 }

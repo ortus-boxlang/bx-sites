@@ -98,6 +98,80 @@ contracts.
 - Keep workflow changes aligned with the module's actual packaging and build
   behavior; do not rely on a green CLI exit code alone for site builds.
 
+## Available Skills
+
+The repository ships task-specific agent skills in `.agents/skills`. Before
+implementing, reviewing, or debugging work covered by one of these areas, read
+the relevant `SKILL.md` and follow its guidance. Prefer the most specific skill
+available when more than one applies.
+
+### BoxLang Core
+
+- `boxlang-core-dev-async-tasks`: BoxFuture, AsyncService, executors, schedulers, and async lifecycle callbacks.
+- `boxlang-core-dev-bif-development`: Custom BoxLang built-in functions and module registration.
+- `boxlang-core-dev-component-development`: Custom BoxLang components and tag registration.
+- `boxlang-core-dev-interceptors`: Interceptors, observer events, pools, and registration.
+- `boxlang-core-dev-logging`: LoggingService, BoxLangLogger, and structured logging configuration.
+- `boxlang-core-dev-module-development`: ModuleConfig lifecycle, metadata, BIFs, interceptors, and packaging.
+- `boxlang-core-dev-runtime-architecture`: BoxLang runtime, scopes, types, parsing, contexts, and class loading.
+- `boxlang-scheduled-tasks`: Scheduler DSL, cron/frequency constraints, lifecycle callbacks, and scheduled HTTP work.
+- `boxlang-security`: BoxLang security settings, validation, file uploads, secrets, and OWASP concerns.
+- `boxlang-templating`: `.bxm` templates, mixed HTML/BoxLang, and template components.
+- `boxlang-web-development`: BoxLang web applications, HTTP handling, REST, sessions, CSRF, and servers.
+- `boxlang-zip`: ZIP creation and extraction with the `bx:zip` component.
+
+### BoxLang Modules And Integrations
+
+- `bx-docbox`: DocBox API documentation generation and output strategies.
+- `bx-esapi`: OWASP ESAPI encoding, decoding, and HTML sanitization.
+- `bx-ftp`: FTP, FTPS, SFTP, SSH keys, and connection pools.
+- `bx-image`: Image creation and manipulation with bx-image.
+- `bx-mail`: Mail components, multipart messages, SMTP, signing, and encryption.
+- `bx-pdf`: PDF documents, sections, headers, footers, saving, and encryption.
+- `bx-rss`: RSS/Atom feed reading and creation.
+- `bx-web-support`: Mock web servers, requests, and web-context tests.
+- `bx-yaml`: YAML serialization, deserialization, files, and BoxLang classes.
+
+### CommandBox
+
+- `commandbox-config-settings`: Global CommandBox settings and environment overrides.
+- `commandbox-deploying`: CommandBox production deployment, Docker, CI, and hosting.
+- `commandbox-developing`: Custom commands, namespaces, WireBox, modules, and interceptors.
+- `commandbox-embedded-server`: Embedded server configuration, SSL, bindings, aliases, and profiles.
+- `commandbox-package-management`: `box.json`, ForgeBox packages, dependencies, locks, and publishing.
+- `commandbox-setup`: Installing and configuring CommandBox and Java runtimes.
+- `commandbox-task-runners`: Task runners, targets, lifecycle hooks, jobs, watchers, and shell integration.
+- `commandbox-testing`: CommandBox and TestBox integration, runners, reporters, and coverage.
+- `commandbox-usage`: CommandBox commands, namespaces, settings, recipes, aliases, and shell usage.
+
+### Testing
+
+- `boxlang-testing`: BoxLang TestBox tests, BDD, xUnit, MockBox, fixtures, async tests, and CLI execution.
+- `testbox-assertions`: `$assert` methods, custom assertions, type, collection, exception, and numeric checks.
+- `testbox-bdd`: BDD suites, lifecycle hooks, labels, focused/skipped specs, and data binding.
+- `testbox-cbmockdata`: Realistic mock data, nested objects, arrays, and custom suppliers.
+- `testbox-expectations`: Fluent `expect()` matchers, collection modes, negation, and custom matchers.
+- `testing-fixtures`: Shared fixtures, factories, test data builders, and fixture lifecycle.
+- `testbox-listeners`: Test run listener callbacks and lifecycle reporting.
+- `testbox-mockbox`: MockBox mocks, stubs, spies, verification, properties, and query simulation.
+- `testbox-reporters`: TestBox reporter selection, options, and custom reporters.
+- `testbox-runners`: TestBox CLI, BoxLang, web, programmatic, streaming, watcher, and filtering options.
+- `testbox-unit-xunit`: xUnit test classes, lifecycle methods, `$assert`, and AAA structure.
+- `testing-coverage`: Coverage configuration, reporting, CI integration, and interpretation.
+- `testing-fixtures`: Shared fixtures, factories, test data builders, and fixture lifecycle.
+
+### Engineering And Supporting Tools
+
+- `code-documenter`: Developer documentation, API references, runbooks, and documentation consistency.
+- `code-reviewer`: Reviews focused on correctness, security, maintainability, performance, and test risk.
+- `gitbook-docs-expert`: GitBook frontmatter, hints, content references, embeds, tabs, and navigation.
+- `github-action-authoring`: Composite GitHub Actions, runner support, PATH issues, and CI jobs.
+- `java-expert`: Java services, libraries, concurrency, performance, dependencies, and hardening.
+- `junit-expert`: JUnit 5 lifecycle, parameterized tests, assertions, extensions, and build integration.
+- `mockito-expert`: Mockito mocks, stubs, spies, matchers, captors, and strict stubbing.
+- `ortus-java-coding-standards`: Ortus formatting, naming, structure, and code-style conventions.
+- `security-expert`: Secure system design, threat modeling, secrets, authentication, and authorization.
+
 ## Change Discipline
 
 - Prefer small, template-safe changes and preserve public APIs and generated

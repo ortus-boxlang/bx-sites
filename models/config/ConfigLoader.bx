@@ -8,13 +8,94 @@
  */
 class {
 
-	/**
-	 * The config file names this module recognizes, in resolution
-	 * preference order - the first one found on disk wins. `bxsites.yaml`/
-	 * `.yml` are parsed via bx-yaml's `yamlDeserialize()`/`yamlDeserializeFile()`
-	 * BIFs, `bxsites.json` via the built-in `jsonDeserialize()`.
-	 */
-	variables.configFileNames = [ "bxsites.yaml", "bxsites.yml", "bxsites.toml", "bxsites.json" ]
+	static {
+
+		/**
+		 * The config file names this module recognizes, in resolution
+		 * preference order - the first one found on disk wins. `bxsites.yaml`/
+		 * `.yml` are parsed via bx-yaml's `yamlDeserialize()`/`yamlDeserializeFile()`
+		 * BIFs, `bxsites.json` via the built-in `jsonDeserialize()`.
+		 */
+		configFileNames = [ "bxsites.yaml", "bxsites.yml", "bxsites.toml", "bxsites.json" ]
+
+		/**
+		 * Default site configuration, deep-merged with the user's site config.
+		 * Markdown passthrough options are otherwise left to bx-markdown's own
+		 * defaults - the one exception is `enableAdmonition`, which bx-sites
+		 * itself defaults to `true` (admonition callout blocks have always been
+		 * an out-of-the-box bx-sites feature; a project can still turn them off
+		 * via `{"markdown":{"enableAdmonition":false}}`).
+		 */
+		defaults = {
+			"description"  : "",
+			"baseURL"      : "/",
+			"theme"        : { "name" : "bootstrap", "options" : {}, "logo" : "", "favicon" : "" },
+			"search"       : true,
+			"mcp"          : false,
+			"searchProvider" : {
+				"provider" : "local",
+				"algolia"  : { "appId" : "", "apiKey" : "", "indexName" : "", "insights" : false },
+				"pagefind" : { "bin" : "pagefind", "options" : [] }
+			},
+			"nav"          : [],
+			"markdown"     : { "enableAdmonition" : true },
+			"repo"         : { "url" : "", "editUri" : "" },
+			"social"       : [],
+			"footer"       : false,
+			"lastUpdated"  : false,
+			"mermaid"      : false,
+			"math"         : false,
+			"openapi"      : false,
+			"pageActions"  : false,
+			"robots"       : true,
+			"analytics"    : { "provider" : "", "id" : "" },
+			"ogImage"      : "",
+			"generateOgImages" : false,
+			"extraCss"     : [],
+			"extraJs"      : [],
+			"assets"       : {
+				"fingerprint" : true,
+				"bundle"      : true,
+				"images"      : { "enabled" : true, "widths" : [ 400, 800, 1200, 1600 ], "formats" : [ "original", "webp" ] }
+			},
+			"plugins"      : [],
+			"redirects"    : [],
+			"variables"    : {},
+			"i18n"         : { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] },
+			"blog"         : { "postsPerPage" : 10, "feed" : true, "feedLimit" : 25 },
+			"versions"     : { "default" : "" },
+			"cloud"        : { "siteId" : "", "apiUrl" : "" },
+			"docbox"       : {
+				"projectTitle"   : "",
+				"mappings"       : {},
+				"excludes"       : "",
+				"pagePathPrefix" : "api/docbox",
+				"tags"           : [ "api", "docbox" ]
+			},
+			"coldbox"      : {
+				"appRoot"        : "",
+				"pagePathPrefix" : "api/coldbox",
+				"tags"           : [ "api", "coldbox" ],
+				"include"        : [ "routes", "handlers", "models", "modules", "interceptors", "scheduler" ]
+			}
+		}
+
+		/**
+		 * The theme names shipped by this module
+		 */
+		builtInThemes = [
+			"bootstrap",
+			"material",
+			"tailwind",
+			"docsy",
+			"slate",
+			"docusaurus",
+			"justthedocs",
+			"vuepress",
+			"gitbook",
+			"notion"
+		]
+	}
 
 	/**
 	 * The config file name in play for the current/last `load()` call - only
@@ -44,73 +125,6 @@ class {
 	void function setTomlRenderer( required any renderer ) {
 		variables.tomlRenderer = arguments.renderer
 	}
-
-	/**
-	 * Default site configuration, deep-merged with the user's site config.
-	 * Markdown passthrough options are otherwise left to bx-markdown's own
-	 * defaults - the one exception is `enableAdmonition`, which bx-sites
-	 * itself defaults to `true` (admonition callout blocks have always been
-	 * an out-of-the-box bx-sites feature; a project can still turn them off
-	 * via `{"markdown":{"enableAdmonition":false}}`).
-	 */
-	variables.defaults = {
-		"description"  : "",
-		"baseURL"      : "/",
-		"theme"        : { "name" : "bootstrap", "options" : {}, "logo" : "", "favicon" : "" },
-		"search"       : true,
-		"mcp"          : false,
-		"searchProvider" : {
-			"provider" : "local",
-			"algolia"  : { "appId" : "", "apiKey" : "", "indexName" : "", "insights" : false },
-			"pagefind" : { "bin" : "pagefind", "options" : [] }
-		},
-		"nav"          : [],
-		"markdown"     : { "enableAdmonition" : true },
-		"repo"         : { "url" : "", "editUri" : "" },
-		"social"       : [],
-		"footer"       : false,
-		"lastUpdated"  : false,
-		"mermaid"      : false,
-		"math"         : false,
-		"openapi"      : false,
-		"pageActions"  : false,
-		"robots"       : true,
-		"analytics"    : { "provider" : "", "id" : "" },
-		"ogImage"      : "",
-		"generateOgImages" : false,
-		"extraCss"     : [],
-		"extraJs"      : [],
-		"assets"       : {
-			"fingerprint" : true,
-			"bundle"      : true,
-			"images"      : { "enabled" : true, "widths" : [ 400, 800, 1200, 1600 ], "formats" : [ "original", "webp" ] }
-		},
-		"plugins"      : [],
-		"redirects"    : [],
-		"variables"    : {},
-		"i18n"         : { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] },
-		"blog"         : { "postsPerPage" : 10, "feed" : true, "feedLimit" : 25 },
-		"versions"     : { "default" : "" },
-		"cloud"        : { "siteId" : "", "apiUrl" : "" },
-		"docbox"       : {
-			"projectTitle"   : "",
-			"mappings"       : {},
-			"excludes"       : "",
-			"pagePathPrefix" : "api/docbox",
-			"tags"           : [ "api", "docbox" ]
-		},
-		"coldbox"      : {
-			"appRoot"        : "",
-			"pagePathPrefix" : "api/coldbox",
-			"tags"           : [ "api", "coldbox" ],
-			"include"        : [ "routes", "handlers", "models", "modules", "interceptors", "scheduler" ]
-		}
-	}
-
-	/**
-	 * The theme names shipped by this module in v1 (module spec section 6).
-	 */
-	variables.builtInThemes = [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ]
 
 	/**
 	 * Reads and validates a project's site config - `<projectRoot>/bxsites.yaml`
@@ -177,7 +191,7 @@ class {
 		var rawImages = isStruct( rawAssets ) ? ( rawAssets.images ?: {} ) : {}
 
 		if ( isStruct( rawImages ) ) {
-			var defaultImages = variables.defaults.assets.images
+			var defaultImages = static.defaults.assets.images
 			for ( var key in defaultImages ) {
 				if ( !rawImages.keyExists( key ) ) {
 					arguments.merged.assets.images[ key ] = defaultImages[ key ]
@@ -198,14 +212,14 @@ class {
 	string function configPathFor( required string projectRoot ) {
 		var dir = arguments.projectRoot.reReplace( "[\/]+$", "" )
 
-		for ( var fileName in variables.configFileNames ) {
+		for ( var fileName in static.configFileNames ) {
 			var candidate = dir & "/" & fileName
 			if ( fileExists( candidate ) ) {
 				return candidate
 			}
 		}
 
-		return dir & "/" & variables.configFileNames[ 1 ]
+		return dir & "/" & static.configFileNames[ 1 ]
 	}
 
 	/**
@@ -219,7 +233,7 @@ class {
 	 * @return The config struct with defaults applied
 	 */
 	struct function mergeDefaults( required struct config ) {
-		var merged = duplicate( variables.defaults )
+		var merged = duplicate( static.defaults )
 
 		for ( var key in arguments.config ) {
 			if ( isStruct( merged[ key ] ?: "" ) && isStruct( arguments.config[ key ] ) ) {
@@ -1012,7 +1026,7 @@ class {
 	 * The theme names this module ships built-in support for (module spec section 6).
 	 */
 	array function getBuiltInThemes() {
-		return variables.builtInThemes
+		return static.builtInThemes
 	}
 
 }
