@@ -126,102 +126,122 @@
 
 				<h1 class="slate-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a>
 
-	<span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M212,132l-58.63,58.63a32,32,0,0,1-45.25,0L65.37,147.88a32,32,0,0,1,0-45.25L124,44Z" opacity="0.2"/><path d="M237.66,66.34a8,8,0,0,0-11.32,0L192,100.69,155.31,64l34.35-34.34a8,8,0,1,0-11.32-11.32L144,52.69,117.66,26.34a8,8,0,0,0-11.32,11.32L112.69,44l-53,53a40,40,0,0,0,0,56.57l15.71,15.71L26.34,218.34a8,8,0,0,0,11.32,11.32l49.09-49.09,15.71,15.71a40,40,0,0,0,56.57,0l53-53,6.34,6.35a8,8,0,0,0,11.32-11.32L203.31,112l34.35-34.34A8,8,0,0,0,237.66,66.34ZM147.72,185a24,24,0,0,1-33.95,0L71,142.23a24,24,0,0,1,0-33.95l53-53L200.69,132Z"/></svg></span>
+	<span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,128l-48,40H64L16,128,64,88H192Z" opacity="0.2"/><path d="M69.12,94.15,28.5,128l40.62,33.85a8,8,0,1,1-10.24,12.29l-48-40a8,8,0,0,1,0-12.29l48-40a8,8,0,0,1,10.24,12.3Zm176,27.7-48-40a8,8,0,1,0-10.24,12.3L227.5,128l-40.62,33.85a8,8,0,1,0,10.24,12.29l48-40a8,8,0,0,0,0-12.29ZM162.73,32.48a8,8,0,0,0-10.25,4.79l-64,176a8,8,0,0,0,4.79,10.26A8.14,8.14,0,0,0,96,224a8,8,0,0,0,7.52-5.27l64-176A8,8,0,0,0,162.73,32.48Z"/></svg></span>
 
-OpenAPI &#x2f; Swagger</h1>
-
-
-	<div class="page-tags"><a class="page-tag" href="/theme/slate/de/tags/index.html#tag-anleitungen">anleitungen</a><a class="page-tag" href="/theme/slate/de/tags/index.html#tag-openapi">openapi</a><a class="page-tag" href="/theme/slate/de/tags/index.html#tag-api">api</a></div>
+Ejemplo de salida Javadoc</h1>
 
 
+	<div class="page-tags"><a class="page-tag" href="/theme/slate/de/tags/index.html#tag-guías">gu&iacute;as</a><a class="page-tag" href="/theme/slate/es/tags/index.html#tag-java">java</a><a class="page-tag" href="/theme/slate/es/tags/index.html#tag-spring-boot">spring-boot</a><a class="page-tag" href="/theme/slate/es/tags/index.html#tag-javadoc">javadoc</a><a class="page-tag" href="/theme/slate/es/tags/index.html#tag-ejemplo">ejemplo</a></div>
 
 
-	<details class="bxsites-toc-mobile slate-toc--mobile"><summary class="slate-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="slate-toc__item slate-toc__item--2"><a href="#eine-einzelne-operation-inline">Eine einzelne Operation inline</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#eine-api-ohne-spezifikationsdatei-dokumentieren">Eine API ohne Spezifikationsdatei dokumentieren</a></li></ul></details>
+
+
+	<details class="bxsites-toc-mobile slate-toc--mobile"><summary class="slate-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="slate-toc__item slate-toc__item--2"><a href="#constructors">Constructors</a></li><li class="slate-toc__item slate-toc__item--3"><a href="#bookjavalangstring-title-javalangstring-author">Book&#x28;java.lang.String title, java.lang.String author&#x29;</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#methods">Methods</a></li><li class="slate-toc__item slate-toc__item--3"><a href="#comexamplebook-withtitlejavalangstring-newtitle">com.example.Book withTitle&#x28;java.lang.String newTitle&#x29;</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#lo-que-esto-no-cubre">Lo que esto no cubre</a></li></ul></details>
 
 				<div class="slate-content-body">
-				<h1 id="openapi--swagger"><a href="#openapi--swagger" id="openapi--swagger" name="openapi--swagger" class="anchor"></a>OpenAPI / Swagger</h1>
-<p>Ein interaktives <a href="https://swagger.io/tools/swagger-ui/">Swagger-UI</a>-Widget
-für eine OpenAPI-/Swagger-Spezifikation, mit derselben <code>::: name ... :::</code>-
-Container-Syntax wie jeder Block in <a href="/theme/slate/de/guides/content-blocks/index.html">Content-Blöcke</a>.
-<code>src</code> wird auf dieselbe, relativ zu <code>docs/assets/</code> aufgelöste Weise interpretiert wie das
-<code>src</code> von <code>::: file</code> (siehe <a href="/theme/slate/de/guides/content-blocks/index.html#file">Content-Blöcke</a>).
-Sowohl JSON- als auch YAML-Spezifikationen funktionieren; Swagger UI parst
-beide vollständig clientseitig - nirgendwo in diesem Modul findet eine
-serverseitige OpenAPI-Verarbeitung statt. Erfordert, dass <code>bxsites.yaml</code>s
-<a href="/theme/slate/de/configuration/index.html#openapi"><code>openapi</code></a> auf <code>true</code> gesetzt ist - ist das
-nicht der Fall, wird dieser Platzhalter zwar gerendert, bleibt aber
-inaktiv (Swagger UIs eigenes JS/CSS wird dann überhaupt nicht nach
-<code>site/</code> kopiert, sodass der Build jedes anderen Projekts genauso klein
-bleibt wie vor diesem Feature):</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="Beispiel"><code class="language-markdown">::: openapi src=&quot;assets/openapi/example.yaml&quot; title=&quot;Bookshelf API&quot;
-:::
+				<h1 id="ejemplo-de-salida-javadoc"><a href="#ejemplo-de-salida-javadoc" id="ejemplo-de-salida-javadoc" name="ejemplo-de-salida-javadoc" class="anchor"></a>Ejemplo de salida Javadoc</h1>
+<p>Un ejemplo real de lo que <code>bxSitesJavadocDoc</code> (Gradle) /
+<code>bxsites:javadoc</code> (Maven) produce realmente - ver
+<a href="/theme/slate/es/guides/gradle-plugin/index.html#spring-boot-doc-generation">Plugin de Gradle</a> o
+<a href="/theme/slate/es/guides/maven-plugin/index.html#spring-boot-doc-generation">Plugin de Maven</a> para saber
+cómo activar esto en tu propio proyecto.</p>
+<p>Apúntalo a las fuentes <code>.java</code> de tu propio proyecto y recorre cada tipo
+público de nivel superior, generando una página por tipo. Dada esta
+clase:</p>
+<pre data-bxsites-title="com&#x2f;example&#x2f;Book.java"><code class="language-java">package com.example;
+
+/**
+ * A single book in the shelf, immutable once created. Two books are
+ * considered equal only by reference, not by content.
+ */
+public class Book {
+
+    /**
+     * Creates a book with the given title and author.
+     *
+     * @param title  the book's title
+     * @param author the book's author
+     */
+    public Book(String title, String author) {
+        this.title = title;
+        this.author = author;
+    }
+
+    /**
+     * Returns a copy of this book with a new title.
+     *
+     * @param newTitle the new title
+     * @return a copy of this book with the given title
+     */
+    public Book withTitle(String newTitle) {
+        return new Book(newTitle, author);
+    }
+}
 </code></pre>
-<div class="bxsites-openapi" data-openapi-src="/theme/slate/de/assets/openapi/example.yaml"><div class="bxsites-openapi__title">Bookshelf API</div></div>
-<p>Das Widget oben ist genau diese Seite, live, und rendert die kleine
-Beispielspezifikation, die dieser Guide unter
-<code>docs/assets/openapi/example.yaml</code> mitliefert - öffne sie im eigenen
-Projekt unter <code>docs/assets/</code> (oder richte <code>src</code> auf die bereits vorhandene
-eigene Spezifikation), um dasselbe mit der eigenen API zu sehen.</p>
-<p>Vendort ist nur <code>SwaggerUIBundle</code>s eigenes Basis-Layout - keine
-Topbar/&quot;Explore&quot;-Leiste, über die eine andere Spezifikation eingetippt
-werden könnte (ein <code>::: openapi</code>-Block soll immer genau die eine
-Spezifikation zeigen, auf die seine Autorin ihn gerichtet hat), sodass
-jede Operation samt ihrer Request-/Response-Schemas und &quot;Try it out&quot; (das
-die eigene <code>servers[0].url</code> der Spezifikation direkt aus dem Browser der
-Besucherin aufruft - dort muss CORS für den Docs-Host erlaubt sein) direkt
-aus der bestehenden Spezifikation gerendert wird, ohne dass etwas
-umgeschrieben werden muss.</p>
-<h2 id="eine-einzelne-operation-inline"><a href="#eine-einzelne-operation-inline" id="eine-einzelne-operation-inline" name="eine-einzelne-operation-inline" class="anchor"></a>Eine einzelne Operation inline</h2>
-<p>Füge <code>operation=&quot;METHOD /path&quot;</code> hinzu, um genau diesen einen Endpunkt in
-eine gewöhnliche Seite einzubetten - praktisch mitten in einem Tutorial,
-ohne die Leserin erst zur vollständigen Referenz zu schicken:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="Beispiel"><code class="language-markdown">::: openapi src=&quot;assets/openapi/example.yaml&quot; operation=&quot;GET /books&quot;
-:::
+<p>...el generador escribe <code>api/javadoc/com/example/Book.md</code> con este
+frontmatter:</p>
+<pre data-bxsites-title="Frontmatter generado"><code class="language-yaml">---
+title: &quot;Book&quot;
+summary: &quot;A single book in the shelf, immutable once created.&quot;
+tags: [api, javadoc]
+---
 </code></pre>
-<div class="bxsites-openapi bxsites-openapi--operation" data-openapi-src="/theme/slate/de/assets/openapi/example.yaml" data-openapi-operation="get /books"></div>
-<p>Immer noch genau dasselbe Swagger-UI-Widget wie der vollständige Block
-oben (dieselbe Spezifikation, dasselbe rein clientseitige Rendering -
-auch <code>operation</code> löst niemals eine OpenAPI-Verarbeitung auf unserer
-Seite aus); jede andere Operation wird einfach ausgeblendet und diese
-eine automatisch aufgeklappt, indem Swagger UIs eigenes, bereits
-gerendertes Markup ausgelesen wird. Die Methode in <code>operation</code> ist
-Groß-/Kleinschreibung egal; ihr Pfad muss exakt dem eigenen Pfad der
-Spezifikation entsprechen (samt <code>{param}</code>-Platzhaltern).</p>
-<h2 id="eine-api-ohne-spezifikationsdatei-dokumentieren"><a href="#eine-api-ohne-spezifikationsdatei-dokumentieren" id="eine-api-ohne-spezifikationsdatei-dokumentieren" name="eine-api-ohne-spezifikationsdatei-dokumentieren" class="anchor"></a>Eine API ohne Spezifikationsdatei dokumentieren</h2>
-<p><code>::: openapi</code> benötigt immer ein echtes OpenAPI-/Swagger-Dokument unter
-<code>src</code> - es gibt keine manuelle, spezifikationslose Variante dieses Blocks
-zum handschriftlichen Beschreiben eines einzelnen Endpunkts; importiere
-stattdessen immer eine echte Spezifikation. Falls noch keine existiert:</p>
+<p>Y este cuerpo, reproducido abajo no como un bloque de código sino
+renderizado de verdad - este <em>es</em> el cuerpo real de la página generada,
+en vivo:</p>
+<hr />
+<h1 id="book"><a href="#book" id="book" name="book" class="anchor"></a>Book</h1>
+<p><code>com.example.Book</code></p>
+<p>A single book in the shelf, immutable once created. Two books are
+considered equal only by reference, not by content.</p>
+<h2 id="constructors"><a href="#constructors" id="constructors" name="constructors" class="anchor"></a>Constructors</h2>
+<h3 id="bookjavalangstring-title-javalangstring-author"><a href="#bookjavalangstring-title-javalangstring-author" id="bookjavalangstring-title-javalangstring-author" name="bookjavalangstring-title-javalangstring-author" class="anchor"></a><code>Book(java.lang.String title, java.lang.String author)</code></h3>
+<p>Creates a book with the given title and author.</p>
 <ul>
-<li>Schreibe nur so viel Spezifikation, wie die aktuelle Seite braucht. Ein
-einzelner <code>paths</code>-Eintrag mit eigenem, minimalem <code>info</code>/<code>servers</code>
-(siehe <code>docs/assets/openapi/example.yaml</code> dafür, wie wenig das
-tatsächlich braucht) liefert bereits das interaktive Widget samt
-&quot;Try it out&quot; für diesen einen Endpunkt - wächst später zur
-vollständigen Spezifikation heran, ohne dass sich am Block selbst
-etwas ändert.</li>
-<li>Oder verzichte ganz auf das Widget und beschreibe den Endpunkt als
-gewöhnlichen Inhalt - eine Parametertabelle, ein Codeblock-Paar für
-Anfrage/Antwort (<code>```http</code>/<code>```json</code>), begleitet von
-einem <a href="/theme/slate/de/guides/content-blocks/index.html#stepper">Stepper</a>, falls das beim Durchgehen
-hilft. Jeder andere Content-Block und jede Markdown-Erweiterung steht
-auf jeder Seite zur Verfügung, unabhängig davon, ob <code>openapi</code> überhaupt
-aktiviert ist.</li>
+<li><strong>Parameter</strong> <code>title</code> - the book's title</li>
+<li><strong>Parameter</strong> <code>author</code> - the book's author</li>
 </ul>
+<h2 id="methods"><a href="#methods" id="methods" name="methods" class="anchor"></a>Methods</h2>
+<h3 id="comexamplebook-withtitlejavalangstring-newtitle"><a href="#comexamplebook-withtitlejavalangstring-newtitle" id="comexamplebook-withtitlejavalangstring-newtitle" name="comexamplebook-withtitlejavalangstring-newtitle" class="anchor"></a><code>com.example.Book withTitle(java.lang.String newTitle)</code></h3>
+<p>Returns a copy of this book with a new title.</p>
+<ul>
+<li><strong>Parameter</strong> <code>newTitle</code> - the new title</li>
+<li><strong>Returns</strong> a copy of this book with the given title</li>
+</ul>
+<hr />
+<p>Fíjate en que la primera frase de la clase se convierte en el <code>summary</code>
+del frontmatter, mientras que el cuerpo de la página lleva el comentario
+de documentación <em>completo</em> (ambas frases) - eso es extracción real de la
+primera frase de <code>DocCommentTree</code>, no una simplificación hecha para este
+ejemplo.</p>
+<h2 id="lo-que-esto-no-cubre"><a href="#lo-que-esto-no-cubre" id="lo-que-esto-no-cubre" name="lo-que-esto-no-cubre" class="anchor"></a>Lo que esto no cubre</h2>
+<p><strong>Alcance deliberadamente reducido para v1, no un conversor completo de
+Javadoc a Markdown</strong> - este es el más pesado de los tres generadores de
+Spring Boot. Los tipos anidados y de paquete privado (y los campos) se
+omiten por completo; solo se usa el comentario de documentación <em>propio</em>
+de cada miembro, nunca uno heredado; el HTML incrustado en los
+comentarios de documentación se elimina en vez de convertirse a Markdown;
+<code>{@link}</code>/<code>{@see}</code> se renderizan como código en línea sin resolución de
+hipervínculo entre páginas; no se genera ninguna página de índice/nav. Un
+<code>record</code> también añade sus accesores generados por el compilador/
+<code>toString</code>/<code>equals</code>/<code>hashCode</code>, igual que el propio comportamiento de la
+herramienta <code>javadoc</code> estándar - <code>Book</code> de arriba es una clase sencilla
+para que este ejemplo se mantenga centrado en el caso común. Consulta las
+guías de Gradle/Maven enlazadas arriba para la lista completa.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/openapi.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/slate/de/guides/openapi.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Sep 16, 2026, 11&#x3a;12&#x3a;40 AM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/guides/java-javadoc-example.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/slate/es/guides/java-javadoc-example.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Sep 16, 2026, 11&#x3a;38&#x3a;11 AM</span></div>
 
 			</article>
 
-			<nav class="slate-page-nav" aria-label="Seitennavigation">
+			<nav class="slate-page-nav" aria-label="Navegaci&oacute;n de p&aacute;gina">
 
-				<a class="slate-page-nav__prev" href="/theme/slate/de/guides/search/index.html">&larr; Suche</a>
+				<a class="slate-page-nav__prev" href="/theme/slate/es/guides/java-openapi-example/index.html">&larr; Ejemplo de salida OpenAPI</a>
 
 
 
-				<a class="slate-page-nav__next" href="/theme/slate/de/guides/plugins/index.html">Plugins &rarr;</a>
+				<a class="slate-page-nav__next" href="/theme/slate/es/guides/java-controller-scan-example/index.html">Ejemplo de salida del escaneo de controladores &rarr;</a>
 
 			</nav>
 
@@ -233,7 +253,7 @@ aktiviert ist.</li>
 		</main>
 
 		<aside class="slate-toc-sidebar">
-			<nav class="slate-toc" aria-label="Auf dieser Seite"><div class="slate-toc__title">Auf dieser Seite</div><ul><li class="slate-toc__item slate-toc__item--2"><a href="#eine-einzelne-operation-inline">Eine einzelne Operation inline</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#eine-api-ohne-spezifikationsdatei-dokumentieren">Eine API ohne Spezifikationsdatei dokumentieren</a></li></ul></nav>
+			<nav class="slate-toc" aria-label="En esta p&aacute;gina"><div class="slate-toc__title">En esta p&aacute;gina</div><ul><li class="slate-toc__item slate-toc__item--2"><a href="#constructors">Constructors</a></li><li class="slate-toc__item slate-toc__item--3"><a href="#bookjavalangstring-title-javalangstring-author">Book&#x28;java.lang.String title, java.lang.String author&#x29;</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#methods">Methods</a></li><li class="slate-toc__item slate-toc__item--3"><a href="#comexamplebook-withtitlejavalangstring-newtitle">com.example.Book withTitle&#x28;java.lang.String newTitle&#x29;</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#lo-que-esto-no-cubre">Lo que esto no cubre</a></li></ul></nav>
 		</aside>
 
 	</div>
@@ -248,38 +268,38 @@ aktiviert ist.</li>
 		</div>
 	</footer>
 
-	<script src="/theme/slate/de/assets/vendor/highlight/highlight.min.js"></script>
-	<script src="/theme/slate/de/assets/highlight-boxlang.js"></script>
+	<script src="/theme/slate/es/assets/vendor/highlight/highlight.min.js"></script>
+	<script src="/theme/slate/es/assets/highlight-boxlang.js"></script>
 	<script>hljs.highlightAll();</script>
-	<script src="/theme/slate/de/assets/code-lines.js"></script>
-	<script src="/theme/slate/de/assets/copy-code.js" defer></script>
-	<script src="/theme/slate/de/assets/admonition-collapse.js" defer></script>
-	<script src="/theme/slate/de/assets/nav-toggle.js" defer></script>
-	<script src="/theme/slate/de/assets/toc-collapse.js" defer></script>
-	<script src="/theme/slate/de/assets/tabs.js" defer></script>
-	<script src="/theme/slate/de/assets/conditional-content-init.js" defer></script>
-	<script src="/theme/slate/de/assets/course-progress.js" defer></script>
-	<script src="/theme/slate/de/assets/prompt-init.js" defer></script>
-	<script src="/theme/slate/de/assets/contact-form-init.js" defer></script>
+	<script src="/theme/slate/es/assets/code-lines.js"></script>
+	<script src="/theme/slate/es/assets/copy-code.js" defer></script>
+	<script src="/theme/slate/es/assets/admonition-collapse.js" defer></script>
+	<script src="/theme/slate/es/assets/nav-toggle.js" defer></script>
+	<script src="/theme/slate/es/assets/toc-collapse.js" defer></script>
+	<script src="/theme/slate/es/assets/tabs.js" defer></script>
+	<script src="/theme/slate/es/assets/conditional-content-init.js" defer></script>
+	<script src="/theme/slate/es/assets/course-progress.js" defer></script>
+	<script src="/theme/slate/es/assets/prompt-init.js" defer></script>
+	<script src="/theme/slate/es/assets/contact-form-init.js" defer></script>
 
-	<script src="/theme/slate/de/assets/page-actions-init.js" defer></script>
+	<script src="/theme/slate/es/assets/page-actions-init.js" defer></script>
 
 
-	<script src="/theme/slate/de/assets/vendor/mermaid/mermaid.min.js"></script>
-	<script src="/theme/slate/de/assets/mermaid-init.js"></script>
+	<script src="/theme/slate/es/assets/vendor/mermaid/mermaid.min.js"></script>
+	<script src="/theme/slate/es/assets/mermaid-init.js"></script>
 
 
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-	<script src="/theme/slate/de/assets/math-init.js"></script>
+	<script src="/theme/slate/es/assets/math-init.js"></script>
 
 
-	<script src="/theme/slate/de/assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
-	<script src="/theme/slate/de/assets/openapi-init.js"></script>
+	<script src="/theme/slate/es/assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
+	<script src="/theme/slate/es/assets/openapi-init.js"></script>
 
 
 
-	<script src="/theme/slate/de/assets/bundle.a432a71f.js" defer></script>
+	<script src="/theme/slate/es/assets/bundle.a432a71f.js" defer></script>
 </body>
 </html>
 

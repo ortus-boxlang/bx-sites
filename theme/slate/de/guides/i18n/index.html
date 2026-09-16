@@ -126,279 +126,135 @@
 
 				<h1 class="slate-title" id="page-title"><a href="#page-title" id="page-title" class="anchor"></a>
 
-	<span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,184H144l40-80ZM96,127.56h0A95.78,95.78,0,0,0,128,56H64A95.78,95.78,0,0,0,96,127.56Z" opacity="0.2"/><path d="M247.15,212.42l-56-112a8,8,0,0,0-14.31,0l-21.71,43.43A88,88,0,0,1,108,126.93,103.65,103.65,0,0,0,135.69,64H160a8,8,0,0,0,0-16H104V32a8,8,0,0,0-16,0V48H32a8,8,0,0,0,0,16h87.63A87.7,87.7,0,0,1,96,116.35a87.74,87.74,0,0,1-19-31,8,8,0,1,0-15.08,5.34A103.63,103.63,0,0,0,84,127a87.55,87.55,0,0,1-52,17,8,8,0,0,0,0,16,103.46,103.46,0,0,0,64-22.08,104.18,104.18,0,0,0,51.44,21.31l-26.6,53.19a8,8,0,0,0,14.31,7.16L148.94,192h70.11l13.79,27.58A8,8,0,0,0,240,224a8,8,0,0,0,7.15-11.58ZM156.94,176,184,121.89,211.05,176Z"/></svg></span>
+	<span class="page-icon"><svg class="bxsites-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,112l-33.62,37.35a8,8,0,0,1-5.94,2.65H40a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H200.44a8,8,0,0,1,5.94,2.65Z" opacity="0.2"/><path d="M246,106.65,212.33,69.3A16,16,0,0,0,200.44,64H136V32a8,8,0,0,0-16,0V64H40A16,16,0,0,0,24,80v64a16,16,0,0,0,16,16h80v64a8,8,0,0,0,16,0V160h64.44a16,16,0,0,0,11.89-5.3L246,117.35A8,8,0,0,0,246,106.65ZM200.44,144H40V80H200.44l28.8,32Z"/></svg></span>
 
-Internationalisierung &#x28;i18n&#x29;</h1>
-
-
-	<div class="page-tags"><a class="page-tag" href="/theme/slate/de/tags/index.html#tag-anleitungen">anleitungen</a><a class="page-tag" href="/theme/slate/de/tags/index.html#tag-i18n">i18n</a></div>
+Redirecciones</h1>
 
 
+	<div class="page-tags"><a class="page-tag" href="/theme/slate/es/tags/index.html#tag-guías">gu&iacute;as</a><a class="page-tag" href="/theme/slate/es/tags/index.html#tag-redirecciones">redirecciones</a></div>
 
 
-	<details class="bxsites-toc-mobile slate-toc--mobile"><summary class="slate-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="slate-toc__item slate-toc__item--2"><a href="#eine-locale-hinzufügen">Eine Locale hinzuf&uuml;gen</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#was-gebaut-wird">Was gebaut wird</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#nicht-übersetzte-seiten">Nicht &uuml;bersetzte Seiten</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#der-sprachumschalter">Der Sprachumschalter</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#versionierte-und-übersetzte-docs">Versionierte und &uuml;bersetzte Docs</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#theme-chrome-ui-texte">Theme-Chrome &#x28;UI-Texte&#x29;</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#was-vorerst-außen-vor-bleibt">Was &#x28;vorerst&#x29; au&szlig;en vor bleibt</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#eigene-icons-und-includes">Eigene Icons und Includes</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#seo">SEO</a></li></ul></details>
+
+
+	<details class="bxsites-toc-mobile slate-toc--mobile"><summary class="slate-toc--mobile__summary">En esta p&aacute;gina</summary><ul><li class="slate-toc__item slate-toc__item--2"><a href="#por-página-frontmatter-redirect-from">Por p&aacute;gina&#x3a; frontmatter redirect_from</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#para-todo-el-sitio-bxsitesyaml-redirects">Para todo el sitio&#x3a; bxsites.yaml redirects</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#pagerename-lo-hace-por-ti">page&#x3a;rename lo hace por ti</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#conflictos">Conflictos</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#qué-queda-fuera-de-alcance-por-ahora">Qu&eacute; queda fuera de alcance &#x28;por ahora&#x29;</a></li></ul></details>
 
 				<div class="slate-content-body">
-				<h1 id="internationalisierung-i18n"><a href="#internationalisierung-i18n" id="internationalisierung-i18n" name="internationalisierung-i18n" class="anchor"></a>Internationalisierung (i18n)</h1>
-<p>Übersetze deine Docs in andere Sprachen, jede mit ihrem eigenen
-URL-Präfix, ihrem eigenen <code>&lt;html lang dir&gt;</code> und einem automatischen
-Sprachumschalter - kein Plugin, kein separater Build-Schritt nötig.</p>
-<h2 id="eine-locale-hinzufügen"><a href="#eine-locale-hinzufügen" id="eine-locale-hinzufügen" name="eine-locale-hinzufügen" class="anchor"></a>Eine Locale hinzufügen</h2>
-<p>Übersetzte Inhalte liegen unter <code>docs/i18n/&lt;code&gt;/</code>, wobei sie deinen
-regulären <code>docs/</code>-Baum Seite für Seite spiegeln:</p>
-<pre data-bxsites-title="Project structure"><code class="language-text">docs/
-├── index.md
-├── guides/
-│   └── setup.md
-└── i18n/
-    ├── es/
-    │   ├── index.md
-    │   └── guides/
-    │       └── setup.md
-    └── ar/
-        └── index.md
+				<h1 id="redirecciones"><a href="#redirecciones" id="redirecciones" name="redirecciones" class="anchor"></a>Redirecciones</h1>
+<p>Mantén una URL antigua funcionando después de mover, renombrar o
+reestructurar una página - se escribe un stub HTML estático en la ruta
+antigua, para que una entrada de índice desactualizada de un buscador o
+el marcador antiguo de alguien sigan aterrizando en la página correcta en
+lugar de un 404. No interviene ninguna regla de reescritura del lado del
+servidor (un host estático no tiene dónde ejecutar una) - el stub es
+justo el HTML suficiente para que un navegador se redirija solo y un
+rastreador conozca la URL canónica real.</p>
+<h2 id="por-página-frontmatter-redirect-from"><a href="#por-página-frontmatter-redirect-from" id="por-página-frontmatter-redirect-from" name="por-página-frontmatter-redirect-from" class="anchor"></a>Por página: frontmatter <code>redirect_from</code></h2>
+<p>Añade una o más rutas antiguas al propio frontmatter de una página:</p>
+<pre data-bxsites-title="docs&#x2f;guides&#x2f;new-setup.md"><code class="language-md">---
+title: New Setup
+redirect_from:
+  - guides/old-setup
+  - setup
+---
 </code></pre>
-<p><code>&lt;code&gt;</code> wird sowohl zum Ordnernamen als auch zum gebauten URL-Präfix
-(<code>docs/i18n/es/guides/setup.md</code> → <code>/es/guides/setup/</code>), halte ihn daher
-kurz - ein reiner Sprachcode (<code>es</code>, <code>fr</code>) oder ein
-Sprach-Region-Paar (<code>pt-BR</code>, <code>zh-Hans</code>) funktionieren beide, nur
-Buchstaben/Ziffern/Bindestriche. Dein regulärer <code>docs/</code>-Baum ist immer die
-<strong>Standard-Locale</strong>, unpräfixiert an der Wurzel der Website gebaut, genau
-wie heute - das Hinzufügen von <code>docs/i18n/</code> ändert daran nichts.</p>
-<p>Gib jeder Locale ein Anzeige-Label (und, für eine
-Rechts-nach-links-Sprache, ihre eigene Schreibrichtung) in <code>bxsites.yaml</code>:</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">i18n:
-  defaultLocale: { code: en, label: English }
-  locales:
-    - { code: es, label: Español }
-    - { code: ar, label: العربية, dir: rtl }
-    - { code: pt-BR, label: &quot;Português (Brasil)&quot;, flag: 🇧🇷 }
-</code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
-	&quot;i18n&quot;: {
-		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
-		&quot;locales&quot;: [
-			{ &quot;code&quot;: &quot;es&quot;, &quot;label&quot;: &quot;Español&quot; },
-			{ &quot;code&quot;: &quot;ar&quot;, &quot;label&quot;: &quot;العربية&quot;, &quot;dir&quot;: &quot;rtl&quot; },
-			{ &quot;code&quot;: &quot;pt-BR&quot;, &quot;label&quot;: &quot;Português (Brasil)&quot;, &quot;flag&quot;: &quot;🇧🇷&quot; }
-		]
-	}
-}
-</code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="3"><pre><code class="language-toml">
-[i18n]
-
-[i18n.defaultLocale]
-code = &quot;en&quot;
-label = &quot;English&quot;
-
-[[i18n.locales]]
-code = &quot;es&quot;
-label = &quot;Español&quot;
-
-[[i18n.locales]]
-code = &quot;ar&quot;
-label = &quot;العربية&quot;
-dir = &quot;rtl&quot;
-
-[[i18n.locales]]
-code = &quot;pt-BR&quot;
-label = &quot;Português (Brasil)&quot;
-flag = &quot;🇧🇷&quot;
-</code></pre>
-</div></div></div>
-<p><code>defaultLocale</code> muss nur gesetzt werden, wenn deine Standard-Locale nicht
-Englisch ist; <code>locales</code> ist die Liste von allem anderen. Jeder
-<code>docs/i18n/&lt;code&gt;/</code>-Ordner wird automatisch gebaut, sobald er existiert -
-<code>locales</code> liefert nur sein Anzeige-Label und seine Textrichtung. Ein
-Ordner ohne passenden <code>locales</code>-Eintrag wird trotzdem gebaut (mit seinem
-reinen Code als eigenem Label), das ist also Metadaten, nicht das, was die
-Funktion ein- oder ausschaltet.</p>
-<p><code>flag</code> ist optional - der Umschalter wählt für rund 40 gängige
-Sprachcodes bereits von selbst ein sinnvolles Flaggen-Emoji (er prüft
-zuerst einen Regionscode wie <code>pt-BR</code>, dann fällt er auf die Basissprache
-<code>pt</code> zurück). Setze <code>flag</code> nur selbst, um diese Vermutung zu
-überschreiben, oder für einen Code, den die eingebaute Zuordnung nicht
-erkennt (in diesem Fall fällt sie auf ein schlichtes 🌐 zurück).</p>
-<h2 id="was-gebaut-wird"><a href="#was-gebaut-wird" id="was-gebaut-wird" name="was-gebaut-wird" class="anchor"></a>Was gebaut wird</h2>
-<p>Jede Locale ist ein echter, vollständig unabhängiger Build - eigene
-<code>search-index.json</code>, eigene <code>assets/</code>, alles, was ein normaler Build
-erzeugt - geschrieben unter <code>site/&lt;code&gt;/</code> (<code>site/es/</code>, <code>site/ar/</code>).
-Nichts muss pro Locale aktiviert werden: sobald <code>docs/i18n/es/</code> existiert,
-übernimmt <code>bxSites build</code> das von selbst.</p>
-<h2 id="nicht-übersetzte-seiten"><a href="#nicht-übersetzte-seiten" id="nicht-übersetzte-seiten" name="nicht-übersetzte-seiten" class="anchor"></a>Nicht übersetzte Seiten</h2>
-<p>Eine Locale muss nicht jede Seite übersetzt haben, um nutzbar zu sein.
-Eine Seite, die in <code>docs/i18n/es/</code> fehlt, wird trotzdem unter ihrer
-erwarteten URL gebaut - sie zeigt den Inhalt der Standard-Locale, mit
-einem kleinen Hinweis oben auf der Seite, dass sie noch nicht übersetzt
-wurde. Nichts liefert einen 404, nichts sieht halbfertig aus, während eine
-Übersetzung noch in Arbeit ist.</p>
-<p>Die Navigation jeder Locale hat immer genau dieselbe Form wie die der
-Standard-Locale - dieselben Seiten, dieselbe Reihenfolge, dieselbe
-Verschachtelung (was auch immer die eigene Ordnerstruktur von <code>docs/</code>,
-oder eine explizite <a href="/theme/slate/de/configuration/index.html#nav"><code>nav</code></a>, bereits erzeugt) -
-nur mit Titel/Inhalt jeder Seite, aus ihrer eigenen Übersetzung
-eingesetzt, wo eine existiert. Das ist auch das, was den Sprachumschalter
-funktionieren lässt: ein Sprachwechsel bringt dich auf <em>dieselbe Seite</em>,
-übersetzt oder nicht, niemals auf die Startseite dieser Locale.</p>
-<h2 id="der-sprachumschalter"><a href="#der-sprachumschalter" id="der-sprachumschalter" name="der-sprachumschalter" class="anchor"></a>Der Sprachumschalter</h2>
-<p>Sobald mehr als eine Locale existiert, rendert jedes Theme automatisch ein
-Sprach-Dropdown in der Kopfzeile - nichts, wozu man sich anmelden müsste,
-genau wie beim <a href="/theme/slate/de/configuration/index.html#versionierung">Versionsumschalter</a>. Es
-zeigt die Flagge der aktuellen Locale als Auslöser; öffnest du es, listet
-es jede Locale mit ihrer eigenen Flagge und ihrem Label, die aktuelle als
-aktiv markiert. Wähle eine Locale, die du gerade nicht baust, und sie wird
-einfach gar nicht gerendert.</p>
-<h2 id="versionierte-und-übersetzte-docs"><a href="#versionierte-und-übersetzte-docs" id="versionierte-und-übersetzte-docs" name="versionierte-und-übersetzte-docs" class="anchor"></a>Versionierte und übersetzte Docs</h2>
-<p>Siehe <a href="/theme/slate/de/guides/versioning/index.html">Versionierung</a> für <code>docs/versions/&lt;name&gt;/</code> selbst.
-Versionen und Locales lassen sich auf einer Ebene kombinieren: lege einen
-<code>docs/versions/&lt;name&gt;/i18n/&lt;code&gt;/</code>-Ordner neben die eigenen Seiten einer
-Version, der die eigene Struktur dieser Version genau so spiegelt, wie
-ein oberstes <code>docs/i18n/&lt;code&gt;/</code> <code>docs/</code> selbst spiegelt:</p>
-<pre data-bxsites-title="docs&#x2f;versions&#x2f;2.0&#x2f;-Layout"><code class="language-text">docs/
-  versions/
-    2.0/
-      index.md
-      guides/
-        setup.md
-      i18n/
-        es/
-          index.md          # translated
-          guides/
-            setup.md        # untranslated pages still fall back, same as top-level i18n
-</code></pre>
-<p>Das baut <code>site/versions/2.0/es/</code>. Die eigenen Seiten der Standard-Locale
-einer Version (<code>site/versions/2.0/</code>) erhalten ebenfalls einen
-Sprachumschalter, der nur die Locales listet, für die <em>diese Version
-selbst</em> Übersetzungen hat - eine Version ohne eigenen
-<code>i18n/</code>-Unterordner wird genau so gerendert wie vorher, kein Umschalter
-gezeigt. Ein Versionswechsel fällt immer auf die eigene Standard-Locale
-dieser Version zurück (nimmt nie an, dass die Zielversion dieselbe
-Übersetzung hat); ein Locale-Wechsel bleibt immer auf der aktuellen
-Version.</p>
-<h2 id="theme-chrome-ui-texte"><a href="#theme-chrome-ui-texte" id="theme-chrome-ui-texte" name="theme-chrome-ui-texte" class="anchor"></a>Theme-Chrome (UI-Texte)</h2>
-<p>Der gesamte umgebende UI-Text jedes eingebauten Themes - der
-Suchplatzhalter, &quot;Auf dieser Seite&quot;, &quot;Diese Seite bearbeiten&quot;, &quot;Zuletzt
-aktualisiert&quot;, die 404-Seite, der Titel der Tags-Seite und der Hinweis
-&quot;noch nicht übersetzt&quot; selbst - wird jetzt auch pro Locale übersetzt,
-nicht nur dein eigener Seiteninhalt.</p>
-<p>Vier Locales bringen von Haus aus eine eingebaute Übersetzung mit: <code>de</code>,
-<code>es</code>, <code>it</code> und <code>ja</code>. Baust du einen dieser Locale-Codes, erhältst du
-automatisch vollständig übersetztes Theme-Chrome - nichts zu
-konfigurieren. Jeder andere Locale-Code (oder eine Seite, die du lieber
-anders formulieren möchtest) fällt auf Englisch zurück - überschreibe nur
-die Schlüssel, die dich interessieren, mit deinen eigenen <code>strings</code> im
-jeweiligen Locale-Eintrag in <code>bxsites.yaml</code>:</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">i18n:
-  defaultLocale: { code: en, label: English }
-  locales:
-    - code: fr
-      label: Français
-      strings:
-        searchPlaceholder: Rechercher dans la documentation...
-        onThisPage: Sur cette page
-    - code: es
-      label: Español
-      strings: { toggleDarkMode: Cambiar a modo nocturno }
-</code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
-	&quot;i18n&quot;: {
-		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
-		&quot;locales&quot;: [
-			{
-				&quot;code&quot;: &quot;fr&quot;,
-				&quot;label&quot;: &quot;Français&quot;,
-				&quot;strings&quot;: {
-					&quot;searchPlaceholder&quot;: &quot;Rechercher dans la documentation...&quot;,
-					&quot;onThisPage&quot;: &quot;Sur cette page&quot;
-				}
-			},
-			{
-				&quot;code&quot;: &quot;es&quot;,
-				&quot;label&quot;: &quot;Español&quot;,
-				&quot;strings&quot;: { &quot;toggleDarkMode&quot;: &quot;Cambiar a modo nocturno&quot; }
-			}
-		]
-	}
-}
-</code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="3"><pre><code class="language-toml">
-[i18n]
-
-[i18n.defaultLocale]
-code = &quot;en&quot;
-label = &quot;English&quot;
-
-[[i18n.locales]]
-code = &quot;fr&quot;
-label = &quot;Français&quot;
-
-[i18n.locales.strings]
-searchPlaceholder = &quot;Rechercher dans la documentation...&quot;
-onThisPage = &quot;Sur cette page&quot;
-
-[[i18n.locales]]
-code = &quot;es&quot;
-label = &quot;Español&quot;
-
-[i18n.locales.strings]
-toggleDarkMode = &quot;Cambiar a modo nocturno&quot;
-</code></pre>
-</div></div></div>
-<p>Eine Locale mit eingebauter Übersetzung (wie <code>es</code> oben) kann trotzdem
-einzelne Schlüssel genauso überschreiben - deine eigenen <code>strings</code>
-gewinnen immer sowohl gegen die eingebaute Übersetzung als auch gegen den
-englischen Standardwert. Auch <code>defaultLocale</code> selbst kann eigene
-<code>strings</code> tragen, für ein Projekt, dessen Standard-Locale nicht Englisch
-ist und das eigene Chrome-Formulierungen möchte, statt auf den englischen
-Standardwert zurückzufallen.</p>
-<p>Die vollständige Liste überschreibbarer Schlüssel: <code>searchPlaceholder</code>,
-<code>searchAriaLabel</code>, <code>searchNoResults</code>, <code>toggleDarkMode</code>,
-<code>toggleNavigation</code>, <code>toggleSection</code> (Platzhalter <code>{title}</code>),
-<code>repository</code>, <code>version</code>, <code>language</code> (Platzhalter <code>{label}</code>), <code>onThisPage</code>,
-<code>editThisPage</code>, <code>downloadMarkdown</code>, <code>lastUpdated</code>, <code>notTranslatedNotice</code>
-(Platzhalter <code>{locale}</code>), <code>notFoundTitle</code>, <code>notFoundBody</code>, <code>tagsTitle</code> und
-<code>pageNavigation</code>.</p>
-<h2 id="was-vorerst-außen-vor-bleibt"><a href="#was-vorerst-außen-vor-bleibt" id="was-vorerst-außen-vor-bleibt" name="was-vorerst-außen-vor-bleibt" class="anchor"></a>Was (vorerst) außen vor bleibt</h2>
+<p>Cada entrada es un segmento de URL bonita - sin barra inicial/final, sin
+extensión <code>.md</code>/<code>.html</code> - la misma forma que toma la propia URL de la
+página. Una construcción escribe entonces un stub en cada una
+(<code>site/guides/old-setup/index.html</code>, <code>site/setup/index.html</code> para el
+ejemplo anterior), ambos redirigiendo a la URL real propia de esta
+página.</p>
+<p><code>redirect_from</code> está limitado al árbol al que pertenece la propia página</p>
 <ul>
-<li><strong>Blog-Chrome bleibt auf Englisch.</strong> Die eigenen UI-Texte des
-Blog-Subsystems (&quot;Categories&quot;, &quot;Archive&quot;, &quot;Read more&quot;, &quot;N min read&quot;,
-...) werden vom <code>strings</code>-Override oben noch nicht erfasst - nur der
-Rest des Theme-Chromes ist es.</li>
-<li><strong>Der Datumswert von <code>lastUpdated</code> ist nicht locale-abhängig.</strong> Sein
-Label wird übersetzt; der Datums-/Uhrzeitwert selbst wird unabhängig
-von der Locale weiterhin gleich formatiert.</li>
-<li><strong>Die RTL-Layout-Spiegelung ist grundlegend, nicht pixelgenau.</strong>
-<code>dir=&quot;rtl&quot;</code> wird korrekt gesetzt, und Sidebar/Kopfzeile spiegeln sich
-tatsächlich, aber ein paar dekorative Details (etwa die Seite des
-Akzentbalkens einer Admonition) drehen sich noch nicht mit.</li>
-<li><strong>Keine automatische Übersetzung.</strong> Jede Datei unter
-<code>docs/i18n/&lt;code&gt;/</code> wird von Hand verfasst, genau wie jede andere
-Markdown-Seite - es gibt keinen maschinellen Übersetzungsschritt.</li>
+<li>la propia página de una versión redirige dentro de esa versión
+(<code>site/versions/2.0/old-path/</code>), la propia página traducida de un idioma
+redirige dentro de ese idioma (<code>site/es/old-path/</code>), exactamente igual
+que ya hace la propia URL real de la página. No hay nada extra que
+configurar por árbol.</li>
 </ul>
-<h2 id="eigene-icons-und-includes"><a href="#eigene-icons-und-includes" id="eigene-icons-und-includes" name="eigene-icons-und-includes" class="anchor"></a>Eigene Icons und Includes</h2>
-<p>Ein <code>custom:</code>-Icon-Verweis und ein <code>::: include</code> lösen beide gegen die
-eigenen <code>docs/assets/</code>/wiederverwendbaren Inhalte deines Projekts auf,
-unabhängig davon, welche Locale gerade gebaut wird - das sind gemeinsam
-genutzte Assets, nichts, was ein Übersetzer pro Locale duplizieren müsste.</p>
-<h2 id="seo"><a href="#seo" id="seo" name="seo" class="anchor"></a>SEO</h2>
-<p>Die Seiten jeder Locale sind neben denen der Standard-Locale in
-<code>sitemap.xml</code> und <code>llms.txt</code> enthalten, genauso wie es
-<a href="/theme/slate/de/configuration/index.html#versionierung">versionierte</a> Seiten sind.</p>
+<h2 id="para-todo-el-sitio-bxsitesyaml-redirects"><a href="#para-todo-el-sitio-bxsitesyaml-redirects" id="para-todo-el-sitio-bxsitesyaml-redirects" name="para-todo-el-sitio-bxsitesyaml-redirects" class="anchor"></a>Para todo el sitio: <code>bxsites.yaml</code> <code>redirects</code></h2>
+<p>Para una URL antigua que nunca perteneció a una página específica - una
+sección reestructurada, la ruta de un dominio antiguo, cualquier cosa que
+no sea naturalmente el propio &quot;nombre antiguo&quot; de una sola página - lista
+en su lugar un par explícito <code>from</code>/<code>to</code>:</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">redirects:
+  - from: old-guide
+    to: guides/new-guide/
+  - from: moved-to-another-site
+    to: https://example.com/docs
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+	&quot;redirects&quot;: [
+		{ &quot;from&quot;: &quot;old-guide&quot;, &quot;to&quot;: &quot;guides/new-guide/&quot; },
+		{ &quot;from&quot;: &quot;moved-to-another-site&quot;, &quot;to&quot;: &quot;https://example.com/docs&quot; }
+	]
+}
+</code></pre>
+</div><div class="bxsites-tab-panel" data-bxsites-tab="3"><pre><code class="language-toml">
+[[redirects]]
+from = &quot;old-guide&quot;
+to = &quot;guides/new-guide/&quot;
+
+[[redirects]]
+from = &quot;moved-to-another-site&quot;
+to = &quot;https://example.com/docs&quot;
+</code></pre>
+</div></div></div>
+<ul>
+<li><code>from</code> - el segmento de URL bonita antiguo, la misma forma que
+<code>redirect_from</code> arriba</li>
+<li><code>to</code> - una ruta relativa a la raíz (resuelta contra el propio <code>baseURL</code>
+del sitio, la misma convención que ya usan <code>theme.logo</code>/<code>ogImage</code>) o
+una URL <code>https://</code> completa, para redirigir completamente fuera del
+sitio</li>
+</ul>
+<p><code>redirects</code> solo se aplica siempre al árbol principal del sitio - un <code>to</code>
+sin adornos es una ruta relativa a la raíz que solo es inequívoca en la
+raíz del sitio. Un árbol de versión/idioma que quiera el mismo mapeo de
+URL antigua necesita en su lugar su propio <code>redirect_from</code> a nivel de
+página.</p>
+<h2 id="pagerename-lo-hace-por-ti"><a href="#pagerename-lo-hace-por-ti" id="pagerename-lo-hace-por-ti" name="pagerename-lo-hace-por-ti" class="anchor"></a><code>page:rename</code> lo hace por ti</h2>
+<p>Renombrar/mover una página con
+<a href="/theme/slate/es/cli-reference/index.html#pagerename"><code>page:rename</code></a> añade automáticamente su
+ruta antigua al propio <code>redirect_from</code> de la página movida - además de
+reescribir cada enlace relativo de Markdown que apuntaba a ella, la
+propia URL antigua sigue funcionando también:</p>
+<pre data-bxsites-title="Uso"><code class="language-bash">bxSites page:rename --from=guides/old-setup.md --to=guides/new-setup.md
+</code></pre>
+<p>Renombrar una página más de una vez simplemente sigue añadiendo - la
+lista <code>redirect_from</code> de una página puede llevar tantas rutas antiguas
+como haya tenido a lo largo del tiempo.</p>
+<h2 id="conflictos"><a href="#conflictos" id="conflictos" name="conflictos" class="anchor"></a>Conflictos</h2>
+<p>Una construcción falla por completo, en lugar de sobrescribir contenido
+real silenciosamente, si:</p>
+<ul>
+<li>La propia ruta <code>from</code> de una redirección choca con una página real ya
+construida en esa ruta (<code>BxSites.RedirectConflict</code>)</li>
+<li>Dos redirecciones (entradas <code>redirect_from</code>, entradas de configuración
+<code>redirects</code>, o una de cada una) apuntan ambas a la misma ruta <code>from</code></li>
+</ul>
+<h2 id="qué-queda-fuera-de-alcance-por-ahora"><a href="#qué-queda-fuera-de-alcance-por-ahora" id="qué-queda-fuera-de-alcance-por-ahora" name="qué-queda-fuera-de-alcance-por-ahora" class="anchor"></a>Qué queda fuera de alcance (por ahora)</h2>
+<ul>
+<li><strong>Las entradas de blog no obtienen <code>redirect_from</code>.</strong> La clave de
+frontmatter solo se lee para páginas regulares de <code>docs/</code>, no para
+<code>docs/blog/posts/**</code> - una entrada de blog movida necesita en su lugar
+su propia entrada de configuración <code>redirects</code>.</li>
+<li><strong>Sin redirecciones de comodín/patrón.</strong> Cada <code>from</code> es una ruta
+antigua exacta - no hay un comodín <code>guides/old/*</code>.</li>
+</ul>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/slate/de/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Sep 16, 2026, 11&#x3a;12&#x3a;40 AM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/guides/redirects.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/slate/es/guides/redirects.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Sep 16, 2026, 11&#x3a;38&#x3a;11 AM</span></div>
 
 			</article>
 
-			<nav class="slate-page-nav" aria-label="Seitennavigation">
+			<nav class="slate-page-nav" aria-label="Navegaci&oacute;n de p&aacute;gina">
 
-				<a class="slate-page-nav__prev" href="/theme/slate/de/guides/redirects/index.html">&larr; Weiterleitungen</a>
+				<a class="slate-page-nav__prev" href="/theme/slate/es/guides/versioning/index.html">&larr; Versionado</a>
 
 
 
-				<a class="slate-page-nav__next" href="/theme/slate/de/guides/blog/index.html">Blog &rarr;</a>
+				<a class="slate-page-nav__next" href="/theme/slate/es/guides/i18n/index.html">Internacionalizaci&oacute;n &#x28;i18n&#x29; &rarr;</a>
 
 			</nav>
 
@@ -410,7 +266,7 @@ genutzte Assets, nichts, was ein Übersetzer pro Locale duplizieren müsste.</p>
 		</main>
 
 		<aside class="slate-toc-sidebar">
-			<nav class="slate-toc" aria-label="Auf dieser Seite"><div class="slate-toc__title">Auf dieser Seite</div><ul><li class="slate-toc__item slate-toc__item--2"><a href="#eine-locale-hinzufügen">Eine Locale hinzuf&uuml;gen</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#was-gebaut-wird">Was gebaut wird</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#nicht-übersetzte-seiten">Nicht &uuml;bersetzte Seiten</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#der-sprachumschalter">Der Sprachumschalter</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#versionierte-und-übersetzte-docs">Versionierte und &uuml;bersetzte Docs</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#theme-chrome-ui-texte">Theme-Chrome &#x28;UI-Texte&#x29;</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#was-vorerst-außen-vor-bleibt">Was &#x28;vorerst&#x29; au&szlig;en vor bleibt</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#eigene-icons-und-includes">Eigene Icons und Includes</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#seo">SEO</a></li></ul></nav>
+			<nav class="slate-toc" aria-label="En esta p&aacute;gina"><div class="slate-toc__title">En esta p&aacute;gina</div><ul><li class="slate-toc__item slate-toc__item--2"><a href="#por-página-frontmatter-redirect-from">Por p&aacute;gina&#x3a; frontmatter redirect_from</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#para-todo-el-sitio-bxsitesyaml-redirects">Para todo el sitio&#x3a; bxsites.yaml redirects</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#pagerename-lo-hace-por-ti">page&#x3a;rename lo hace por ti</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#conflictos">Conflictos</a></li><li class="slate-toc__item slate-toc__item--2"><a href="#qué-queda-fuera-de-alcance-por-ahora">Qu&eacute; queda fuera de alcance &#x28;por ahora&#x29;</a></li></ul></nav>
 		</aside>
 
 	</div>
@@ -425,38 +281,38 @@ genutzte Assets, nichts, was ein Übersetzer pro Locale duplizieren müsste.</p>
 		</div>
 	</footer>
 
-	<script src="/theme/slate/de/assets/vendor/highlight/highlight.min.js"></script>
-	<script src="/theme/slate/de/assets/highlight-boxlang.js"></script>
+	<script src="/theme/slate/es/assets/vendor/highlight/highlight.min.js"></script>
+	<script src="/theme/slate/es/assets/highlight-boxlang.js"></script>
 	<script>hljs.highlightAll();</script>
-	<script src="/theme/slate/de/assets/code-lines.js"></script>
-	<script src="/theme/slate/de/assets/copy-code.js" defer></script>
-	<script src="/theme/slate/de/assets/admonition-collapse.js" defer></script>
-	<script src="/theme/slate/de/assets/nav-toggle.js" defer></script>
-	<script src="/theme/slate/de/assets/toc-collapse.js" defer></script>
-	<script src="/theme/slate/de/assets/tabs.js" defer></script>
-	<script src="/theme/slate/de/assets/conditional-content-init.js" defer></script>
-	<script src="/theme/slate/de/assets/course-progress.js" defer></script>
-	<script src="/theme/slate/de/assets/prompt-init.js" defer></script>
-	<script src="/theme/slate/de/assets/contact-form-init.js" defer></script>
+	<script src="/theme/slate/es/assets/code-lines.js"></script>
+	<script src="/theme/slate/es/assets/copy-code.js" defer></script>
+	<script src="/theme/slate/es/assets/admonition-collapse.js" defer></script>
+	<script src="/theme/slate/es/assets/nav-toggle.js" defer></script>
+	<script src="/theme/slate/es/assets/toc-collapse.js" defer></script>
+	<script src="/theme/slate/es/assets/tabs.js" defer></script>
+	<script src="/theme/slate/es/assets/conditional-content-init.js" defer></script>
+	<script src="/theme/slate/es/assets/course-progress.js" defer></script>
+	<script src="/theme/slate/es/assets/prompt-init.js" defer></script>
+	<script src="/theme/slate/es/assets/contact-form-init.js" defer></script>
 
-	<script src="/theme/slate/de/assets/page-actions-init.js" defer></script>
+	<script src="/theme/slate/es/assets/page-actions-init.js" defer></script>
 
 
-	<script src="/theme/slate/de/assets/vendor/mermaid/mermaid.min.js"></script>
-	<script src="/theme/slate/de/assets/mermaid-init.js"></script>
+	<script src="/theme/slate/es/assets/vendor/mermaid/mermaid.min.js"></script>
+	<script src="/theme/slate/es/assets/mermaid-init.js"></script>
 
 
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-	<script src="/theme/slate/de/assets/math-init.js"></script>
+	<script src="/theme/slate/es/assets/math-init.js"></script>
 
 
-	<script src="/theme/slate/de/assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
-	<script src="/theme/slate/de/assets/openapi-init.js"></script>
+	<script src="/theme/slate/es/assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
+	<script src="/theme/slate/es/assets/openapi-init.js"></script>
 
 
 
-	<script src="/theme/slate/de/assets/bundle.a432a71f.js" defer></script>
+	<script src="/theme/slate/es/assets/bundle.a432a71f.js" defer></script>
 </body>
 </html>
 
