@@ -326,7 +326,8 @@ class {
 			}
 			return result.exitCode ?: 0
 		} catch ( any e ) {
-			println( "Error: #e.message#" )
+			println( "Error: #e.message & e.detail#" )
+			println( e.stacktrace )
 			return 1
 		}
 	}
