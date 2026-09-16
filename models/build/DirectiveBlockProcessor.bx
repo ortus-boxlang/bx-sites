@@ -735,14 +735,14 @@ class {
 			)
 		}
 
-		var html = ""
+		var html = sb{ "" }
 		for ( loopItem, loopIndex in lookup.value ) {
 			var iterVars = duplicate( variables.loopPageVars )
 			iterVars[ spec.itemName ] = loopItem
 			iterVars[ spec.indexName ] = loopIndex
 			html &= renderWithVars( arguments.block.content, iterVars, arguments.renderer, arguments.markdownOptions )
 		}
-		return html
+		return html.toString()
 	}
 
 	/**
@@ -852,7 +852,7 @@ class {
 			return '<div class="bxsites-audience-switcher bxsites-audience-switcher--invalid">::: audience-switcher - requires both key="..." and options="value:Label,..."</div>'
 		}
 
-		var buttons = ""
+		var buttons = sb{ "" }
 		for ( var pair in listToArray( optionsRaw, "," ) ) {
 			var value = trim( listFirst( pair, ":" ) )
 			var label = listLen( pair, ":" ) > 1 ? trim( listRest( pair, ":" ) ) : value
@@ -862,7 +862,7 @@ class {
 			buttons &= '<button type="button" class="bxsites-audience-switcher__option" data-bxsites-value="' & attrEscape( value ) & '">' & encodeForHTML( label ) & '</button>'
 		}
 
-		return '<div class="bxsites-audience-switcher" data-bxsites-key="' & attrEscape( key ) & '">' & buttons & '</div>'
+		return '<div class="bxsites-audience-switcher" data-bxsites-key="' & attrEscape( key ) & '">' & buttons.toString() & '</div>'
 	}
 
 	/**
@@ -874,7 +874,7 @@ class {
 	 */
 	private string function renderCards( required struct block, required any renderer, required struct markdownOptions ) {
 		var children = this.extract( arguments.block.content ).blocks
-		var html = '<div class="bxsites-cards">'
+		var html = sb{ '<div class="bxsites-cards">' }
 
 		for ( var child in children ) {
 			var attrs = parseAttrs( child.attrsRaw )
@@ -909,7 +909,7 @@ class {
 			html &= "</" & tag & ">"
 		}
 
-		return html & "</div>"
+		return html.toString() & "</div>"
 	}
 
 	/**
@@ -919,7 +919,7 @@ class {
 	 */
 	private string function renderColumns( required struct block, required any renderer, required struct markdownOptions ) {
 		var children = this.extract( arguments.block.content ).blocks
-		var html = '<div class="bxsites-columns">'
+		var html = sb{ '<div class="bxsites-columns">' }
 
 		for ( var child in children ) {
 			var attrs = parseAttrs( child.attrsRaw )
@@ -933,7 +933,7 @@ class {
 			html &= '<div class="bxsites-column"' & styleAttr & '>' & renderNested( child.content, arguments.renderer, arguments.markdownOptions ) & '</div>'
 		}
 
-		return html & "</div>"
+		return html.toString() & "</div>"
 	}
 
 	/**
@@ -945,7 +945,7 @@ class {
 	 */
 	private string function renderStepper( required struct block, required any renderer, required struct markdownOptions ) {
 		var children = this.extract( arguments.block.content ).blocks
-		var html = '<div class="bxsites-stepper">'
+		var html = sb{ '<div class="bxsites-stepper">' }
 		var idx = 0
 
 		for ( var child in children ) {
@@ -965,7 +965,7 @@ class {
 				& '</div></div>'
 		}
 
-		return html & "</div>"
+		return html.toString() & "</div>"
 	}
 
 	/**
@@ -977,7 +977,7 @@ class {
 	 */
 	private string function renderUpdates( required struct block, required any renderer, required struct markdownOptions ) {
 		var children = this.extract( arguments.block.content ).blocks
-		var html = '<div class="bxsites-updates">'
+		var html = sb{ '<div class="bxsites-updates">' }
 
 		for ( var child in children ) {
 			var attrs = parseAttrs( child.attrsRaw )
@@ -999,7 +999,7 @@ class {
 				& '</div>'
 		}
 
-		return html & "</div>"
+		return html.toString() & "</div>"
 	}
 
 	/**
@@ -1076,18 +1076,18 @@ class {
 		var href = trim( arguments.attrs.href ?: "" )
 		var classes = "bxsites-button bxsites-button--" & style & " bxsites-button--" & size & ( disabled ? " bxsites-button--disabled" : "" )
 
-		var inner = ""
+		var inner = sb{ "" }
 		if ( len( trim( arguments.attrs.icon ?: "" ) ) ) {
 			inner &= '<span class="bxsites-button__icon">' & variables.iconResolver.resolve( arguments.attrs.icon ) & '</span>'
 		}
 		inner &= '<span class="bxsites-button__label">' & encodeForHTML( label ) & '</span>'
 
 		if ( disabled || !len( href ) ) {
-			return '<span class="' & classes & '" aria-disabled="true">' & inner & '</span>'
+			return '<span class="' & classes & '" aria-disabled="true">' & inner.toString() & '</span>'
 		}
 
 		var targetAttr = lCase( trim( arguments.attrs.target ?: "" ) ) == "_blank" ? ' target="_blank" rel="noopener noreferrer"' : ""
-		return '<a class="' & classes & '" href="' & attrEscape( href ) & '"' & targetAttr & '>' & inner & '</a>'
+		return '<a class="' & classes & '" href="' & attrEscape( href ) & '"' & targetAttr & '>' & inner.toString() & '</a>'
 	}
 
 	/**
@@ -1098,11 +1098,11 @@ class {
 	 */
 	private string function renderButtons( required struct block, required any renderer, required struct markdownOptions ) {
 		var children = this.extract( arguments.block.content ).blocks
-		var html = '<div class="bxsites-buttons">'
+		var html = sb{ '<div class="bxsites-buttons">' }
 		for ( var child in children ) {
 			html &= renderButton( parseAttrs( child.attrsRaw ) )
 		}
-		return html & "</div>"
+		return html.toString() & "</div>"
 	}
 
 	/**
@@ -1146,11 +1146,11 @@ class {
 		}
 
 		var title = trim( arguments.attrs.title ?: "" )
-		var html = ""
+		var html = sb{ "" }
 		if ( len( title ) ) {
 			html &= '<div class="bxsites-openapi__title">' & encodeForHTML( title ) & '</div>'
 		}
-		return '<div class="bxsites-openapi' & ( len( operation ) ? " bxsites-openapi--operation" : "" ) & '" data-openapi-src="' & attrEscape( src ) & '"' & operationAttr & '>' & html & '</div>'
+		return '<div class="bxsites-openapi' & ( len( operation ) ? " bxsites-openapi--operation" : "" ) & '" data-openapi-src="' & attrEscape( src ) & '"' & operationAttr & '>' & html.toString() & '</div>'
 	}
 
 	/**
@@ -1189,12 +1189,12 @@ class {
 				& ( len( title ) ? encodeForHTML( title ) : encodeForHTML( url ) ) & ' ↗</a>'
 		}
 
-		var html = '<div class="bxsites-embed"><iframe src="' & attrEscape( embedUrl ) & '" loading="lazy" allowfullscreen'
-			& ' referrerpolicy="strict-origin-when-cross-origin"></iframe></div>'
+		var html = sb{ '<div class="bxsites-embed"><iframe src="' & attrEscape( embedUrl ) & '" loading="lazy" allowfullscreen'
+			& ' referrerpolicy="strict-origin-when-cross-origin"></iframe></div>' }
 		if ( len( title ) ) {
 			html &= '<div class="bxsites-embed__caption">' & encodeForHTML( title ) & '</div>'
 		}
-		return html
+		return html.toString()
 	}
 
 	/**
@@ -1263,7 +1263,7 @@ class {
 		var image = trim( arguments.attrs.image ?: "" )
 		var domain = linkPreviewDomain( url )
 
-		var html = '<a class="bxsites-link-preview" href="' & attrEscape( url ) & '" target="_blank" rel="noopener noreferrer">'
+		var html = sb{ '<a class="bxsites-link-preview" href="' & attrEscape( url ) & '" target="_blank" rel="noopener noreferrer">' }
 		if ( len( image ) ) {
 			html &= '<div class="bxsites-link-preview__image"><img src="' & attrEscape( image ) & '" alt=""></div>'
 		}
@@ -1276,7 +1276,7 @@ class {
 			html &= '<div class="bxsites-link-preview__domain">' & encodeForHTML( domain ) & '</div>'
 		}
 		html &= '</div></a>'
-		return html
+		return html.toString()
 	}
 
 	/**
@@ -1323,8 +1323,8 @@ class {
 		var state = normalizePromptState( arguments.attrs.expanded ?: "" )
 		var promptText = trim( arguments.block.content )
 
-		var html = '<div class="bxsites-prompt bxsites-prompt--' & state & '" data-bxsites-prompt-text="' & encodeForHTML( promptText ) & '">'
-			& '<div class="bxsites-prompt__header">'
+		var html = sb{ '<div class="bxsites-prompt bxsites-prompt--' & state & '" data-bxsites-prompt-text="' & encodeForHTML( promptText ) & '">'
+			& '<div class="bxsites-prompt__header">' }
 		if ( len( iconHtml ) ) {
 			html &= '<div class="bxsites-prompt__icon">' & iconHtml & '</div>'
 		}
@@ -1355,7 +1355,7 @@ class {
 		}
 
 		html &= '</div>'
-		return html
+		return html.toString()
 	}
 
 	/**
@@ -1567,7 +1567,7 @@ class {
 		// (that keeps the author's own `id` exactly as written).
 		var domId = "bxsites-contact-form-" & reReplace( formId, "[^a-zA-Z0-9_-]", "-", "all" )
 
-		var html = '<form class="bxsites-contact-form" data-bx-form data-form-id="' & attrEscape( formId ) & '"'
+		var html = sb{ '<form class="bxsites-contact-form" data-bx-form data-form-id="' & attrEscape( formId ) & '"' }
 		if ( len( to ) ) {
 			html &= ' data-form-to="' & attrEscape( to ) & '"'
 		}
@@ -1597,7 +1597,7 @@ class {
 			& '<div class="bxsites-contact-form__status" data-bx-form-status hidden></div>'
 			& '</form>'
 
-		return html
+		return html.toString()
 	}
 
 	/**

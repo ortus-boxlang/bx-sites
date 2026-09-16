@@ -238,7 +238,7 @@ class {
 	private string function uriEncode( required string value, required boolean preserveSlash ) {
 		var bytes = charsetDecode( arguments.value, "utf-8" )
 		var byteCount = arrayLen( bytes )
-		var result = sb{}
+		var result = sb{ "" }
 
 		for ( var i = 1; i <= byteCount; i++ ) {
 			var unsigned = bitAnd( bytes[ i ], 255 )

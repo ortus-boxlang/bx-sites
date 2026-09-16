@@ -28,7 +28,7 @@ class {
 	 * the outermost table.
 	 */
 	public string function wrap( required string html ) {
-		var result = ""
+		var result = sb{ "" }
 		var pos = 1
 		var totalLen = len( arguments.html )
 
@@ -62,7 +62,7 @@ class {
 			pos = closeEnd + 1
 		}
 
-		return result
+		return result.toString()
 	}
 
 	/**

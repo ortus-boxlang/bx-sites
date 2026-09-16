@@ -24,7 +24,7 @@ class {
 	 * @source The source code
 	 */
 	string function stripComments( required string source ) {
-		var output = createObject( "java", "java.lang.StringBuilder" ).init()
+		var output = sb{ "" }
 		var length = arguments.source.len()
 		var index = 1
 		var quote = ""
@@ -34,7 +34,7 @@ class {
 			var next = index < length ? arguments.source.mid( index + 1, 1 ) : ""
 
 			if ( len( quote ) ) {
-				output.append( current )
+				output &= current
 				if ( current == quote ) {
 					quote = ""
 				}
@@ -44,7 +44,7 @@ class {
 
 			if ( current == """" || current == "'" ) {
 				quote = current
-				output.append( current )
+				output &= current
 				index++
 				continue
 			}
@@ -65,7 +65,7 @@ class {
 				continue
 			}
 
-			output.append( current )
+			output &= current
 			index++
 		}
 
@@ -88,7 +88,7 @@ class {
 	 */
 	array function statements( required string source ) {
 		var found = []
-		var buffer = ""
+		var buffer = sb{ "" }
 		var depth = 0
 		var quote = ""
 		var length = arguments.source.len()
@@ -117,8 +117,8 @@ class {
 			}
 
 			if ( depth == 0 && ( current == ";" || current == "{" || current == "}" ) ) {
-				found.append( buffer )
-				buffer = ""
+				found.append( buffer.toString() )
+				buffer.clear()
 				continue
 			}
 
@@ -128,15 +128,15 @@ class {
 					continue
 				}
 
-				found.append( buffer )
-				buffer = ""
+				found.append( buffer.toString() )
+				buffer.clear()
 				continue
 			}
 
 			buffer &= current
 		}
 
-		found.append( buffer )
+		found.append( buffer.toString() )
 
 		return found.map( ( statement ) => trim( statement ) ).filter( ( statement ) => len( statement ) )
 	}

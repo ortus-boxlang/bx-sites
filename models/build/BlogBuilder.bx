@@ -235,7 +235,7 @@ class {
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - see build()'s own docblock
 	 */
 	private string function renderListContentHtml( required array pagePosts, required string baseDir, required numeric pageNumber, required numeric totalPages, required string basePath, struct imageManifest = {} ) {
-		var html = ""
+		var html = sb{ "" }
 
 		if ( !arguments.pagePosts.len() ) {
 			html &= "<p>No posts yet.</p>"
@@ -247,7 +247,7 @@ class {
 
 		html &= renderPager( arguments.baseDir, arguments.pageNumber, arguments.totalPages, arguments.basePath )
 
-		return html
+		return html.toString()
 	}
 
 	/**
@@ -259,7 +259,7 @@ class {
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - see build()'s own docblock
 	 */
 	private string function renderPostCard( required struct post, required string basePath, struct imageManifest = {} ) {
-		var html = '<article class="blog-post-card' & ( ( arguments.post.draft ?: false ) ? ' blog-post-card--draft' : '' ) & '">'
+		var html = sb{ '<article class="blog-post-card' & ( ( arguments.post.draft ?: false ) ? ' blog-post-card--draft' : '' ) & '">' }
 		html &= renderDraftBadgeHtml( arguments.post )
 
 		if ( len( trim( arguments.post.image ?: "" ) ) ) {
@@ -276,7 +276,7 @@ class {
 		html &= '<p><a href="' & arguments.basePath & arguments.post.urlPath & '">Read more &rarr;</a></p>'
 		html &= '</article><hr>'
 
-		return html
+		return html.toString()
 	}
 
 	/**
@@ -292,7 +292,7 @@ class {
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - see build()'s own docblock
 	 */
 	private string function renderPostHeaderHtml( required struct post, required string basePath, struct imageManifest = {} ) {
-		var html = ""
+		var html = sb{ "" }
 
 		if ( len( trim( arguments.post.image ?: "" ) ) ) {
 			html &= variables.responsiveImageProcessor.pictureTag( arguments.post.image, 'alt="" style="max-width:100%;height:auto;" class="blog-post-featured-image"', arguments.basePath, arguments.imageManifest )
@@ -300,7 +300,7 @@ class {
 
 		html &= '<p class="blog-post-meta">' & metaLine( arguments.post, arguments.basePath ) & '</p>'
 
-		return html
+		return html.toString()
 	}
 
 	/**
@@ -376,7 +376,7 @@ class {
 			return ""
 		}
 
-		var html = '<nav class="blog-pager" aria-label="Blog pagination">'
+		var html = sb{ '<nav class="blog-pager" aria-label="Blog pagination">' }
 		if ( arguments.pageNumber > 1 ) {
 			html &= '<a href="' & arguments.basePath & pageUrlPath( arguments.baseDir, arguments.pageNumber - 1 ) & '">&larr; Newer posts</a> '
 		}
@@ -385,7 +385,7 @@ class {
 		}
 		html &= '</nav>'
 
-		return html
+		return html.toString()
 	}
 
 	/**
@@ -398,7 +398,7 @@ class {
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - see build()'s own docblock
 	 */
 	private string function renderAuthorPageHtml( required struct author, required array authorPosts, required string basePath, struct imageManifest = {} ) {
-		var html = '<div class="blog-author-profile">'
+		var html = sb{ '<div class="blog-author-profile">' }
 
 		if ( len( trim( arguments.author.avatar ?: "" ) ) ) {
 			html &= variables.responsiveImageProcessor.pictureTag( arguments.author.avatar, 'alt="' & encodeForHTML( arguments.author.name ) & '" style="max-width:120px;border-radius:50%;"', arguments.basePath, arguments.imageManifest )
@@ -427,7 +427,7 @@ class {
 		html &= '</div>'
 		html &= renderAuthorPostsListHtml( arguments.authorPosts, arguments.basePath )
 
-		return html
+		return html.toString()
 	}
 
 	/**
@@ -458,7 +458,7 @@ class {
 		var calendarIcon = variables.iconResolver.resolve( "phosphor-duotone:calendar" )
 		var clockIcon = variables.iconResolver.resolve( "phosphor-duotone:clock" )
 
-		var items = ""
+		var items = sb{ "" }
 		for ( var post in arguments.posts ) {
 			// The searchable title lives in a plain `data-title` attribute
 			// (HTML-attribute-escaped, same as the link text right next to
@@ -469,13 +469,13 @@ class {
 			items &= '<li data-title="' & encodeForHTML( lCase( post.title ) ) & '" x-show="!q || $el.dataset.title.includes( q.toLowerCase() )"><a href="' & arguments.basePath & post.urlPath & '">' & encodeForHTML( post.title ) & '</a> <span class="blog-post-meta">' & calendarIcon & ' ' & post.dateDisplay & ' &middot; ' & clockIcon & ' ' & post.readingTimeMinutes & ' min read</span></li>'
 		}
 
-		var html = '<h2>' & variables.iconResolver.resolve( "phosphor-duotone:newspaper" ) & ' Posts</h2>'
+		var html = sb{ '<h2>' & variables.iconResolver.resolve( "phosphor-duotone:newspaper" ) & ' Posts</h2>' }
 		html &= '<div class="blog-author-posts" x-data="{ q: '''' }">'
 		html &= '<input type="search" class="blog-author-search" x-model="q" placeholder="Search posts by title..." aria-label="Search posts by title">'
-		html &= '<ul class="blog-author-posts-list">' & items & '</ul>'
+		html &= '<ul class="blog-author-posts-list">' & items.toString() & '</ul>'
 		html &= '</div>'
 
-		return html
+		return html.toString()
 	}
 
 	/**
@@ -550,7 +550,7 @@ class {
 			}
 		}
 
-		var cardsHtml = ""
+		var cardsHtml = sb{ "" }
 		for ( var card in cards ) {
 			cardsHtml &= card
 		}
@@ -558,7 +558,7 @@ class {
 		return {
 			title       : "Blog Stats",
 			description : "Aggregate stats about the blog - " & totalPosts & " post" & ( totalPosts == 1 ? "" : "s" ) & " and counting.",
-			contentHtml : '<div class="bxsites-cards">' & cardsHtml & "</div>",
+			contentHtml : '<div class="bxsites-cards">' & cardsHtml.toString() & "</div>",
 			urlPath     : "blog/stats/index.html",
 			ogImage     : "",
 			tags        : [],
@@ -686,14 +686,14 @@ class {
 			return ""
 		}
 
-		var html = '<div class="blog-archive-links"><h2>' & variables.iconResolver.resolve( "phosphor-duotone:archive" ) & ' Archive</h2><ul>'
+		var html = sb{ '<div class="blog-archive-links"><h2>' & variables.iconResolver.resolve( "phosphor-duotone:archive" ) & ' Archive</h2><ul>' }
 		for ( var yr in arguments.years ) {
 			var count = arguments.posts.filter( post => year( post.date ) == yr ).len()
 			html &= '<li><a href="' & arguments.basePath & "blog/archive/" & yr & '/index.html">' & yr & "</a> (" & count & ")</li>"
 		}
 		html &= "</ul></div>"
 
-		return html
+		return html.toString()
 	}
 
 	/**
@@ -756,13 +756,13 @@ class {
 			return ""
 		}
 
-		var html = '<div class="blog-category-links"><h2>' & variables.iconResolver.resolve( "phosphor-duotone:tag" ) & ' Categories</h2><ul>'
+		var html = sb{ '<div class="blog-category-links"><h2>' & variables.iconResolver.resolve( "phosphor-duotone:tag" ) & ' Categories</h2><ul>' }
 		for ( var category in arguments.categories ) {
 			html &= '<li><a href="' & arguments.basePath & "blog/category/" & category.slug & '/index.html">' & encodeForHTML( category.name ) & "</a> (" & category.count & ")</li>"
 		}
 		html &= "</ul></div>"
 
-		return html
+		return html.toString()
 	}
 
 	/**

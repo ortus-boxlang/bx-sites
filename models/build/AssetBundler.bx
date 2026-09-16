@@ -63,7 +63,7 @@ class {
 
 		var canonicalDocsDir = createObject( "java", "java.io.File" ).init( arguments.docsDir ).getCanonicalPath()
 
-		var combined = ""
+		var combined = sb{ "" }
 		for ( var url in arguments.urls ) {
 			var filePath = arguments.docsDir & "/" & url
 			// A `../`-laden entry (accidental or otherwise) could otherwise
@@ -87,7 +87,7 @@ class {
 			}
 		}
 
-		var cleaned = ( arguments.ext == "css" ) ? minifyCss( combined ) : cleanJs( combined )
+		var cleaned = ( arguments.ext == "css" ) ? minifyCss( combined.toString() ) : cleanJs( combined.toString() )
 		var fileName = arguments.fingerprint
 			? variables.fingerprinter.fingerprint( "bundle." & arguments.ext, variables.fingerprinter.hashOf( cleaned ) )
 			: ( "bundle." & arguments.ext )
