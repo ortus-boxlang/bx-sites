@@ -26,7 +26,7 @@ class {
 	/**
 	 * Recognized source-folder names, in resolution preference order.
 	 */
-	variables.candidateNames = [ "docs", "src" ]
+	static.candidateNames = [ "docs", "src" ]
 
 	/**
 	 * The bare folder name (`"docs"` or `"src"`) this project's source
@@ -38,13 +38,13 @@ class {
 	string function name( required string projectRoot ) {
 		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
 
-		for ( var candidate in variables.candidateNames ) {
+		for ( var candidate in static.candidateNames ) {
 			if ( directoryExists( root & "/" & candidate ) ) {
 				return candidate
 			}
 		}
 
-		return variables.candidateNames[ 1 ]
+		return static.candidateNames.first()
 	}
 
 	/**
