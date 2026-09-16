@@ -98,6 +98,12 @@ un tema predefinito diverso, e `--name="My Project Docs"` per impostare
 subito il nome del sito - altrimenti `new` lo ricava dal nome della
 cartella di destinazione.
 
+`docs/` è la cartella sorgente predefinita. Usa `bxSites new my-site
+--source=src` per generare le pagine sotto `src/`; i comandi successivi
+rilevano automaticamente la cartella sorgente e l'output resta in `site/`.
+Le opzioni brevi `--docs` e `--site` sono alias di `--source=docs` e
+`--source=src`.
+
 ### Formato del file di configurazione
 
 `bxsites.yaml` è il formato predefinito e preferito - è quello che `new`

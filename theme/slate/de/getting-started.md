@@ -98,6 +98,12 @@ Standard-Theme zu starten, und `--name="My Project Docs"`, um den
 Website-Namen direkt festzulegen - andernfalls leitet `new` ihn aus dem Namen
 des Zielverzeichnisses ab.
 
+`docs/` ist der Standard-Quellordner. Mit `bxSites new my-site
+--source=src` werden die Seiten stattdessen unter `src/` angelegt; die
+folgenden Befehle erkennen den Quellordner automatisch und die Ausgabe bleibt
+unter `site/`. Die Kurzoptionen `--docs` und `--site` sind Aliase für
+`--source=docs` und `--source=src`.
+
 ### Format der Konfigurationsdatei
 
 `bxsites.yaml` ist das Standard- und bevorzugte Format - es ist das, was `new`

@@ -67,17 +67,6 @@ somehow has more than one, `bxsites.yaml` wins, then `bxsites.yml`, then
     ```json title="bxsites.json" linenums="1"
     {
     	"name": "My Docs",
-
-  === "TOML"
-    ```toml title="bxsites.toml" linenums="1"
-    search = true
-    [searchProvider]
-    provider = "algolia"
-    [searchProvider.algolia]
-    appId = "ABC123"
-    apiKey = "a1b2c3d4e5f6..."
-    indexName = "my-docs"
-    ```
     	"description": "",
     	"baseURL": "/",
     	"theme": {

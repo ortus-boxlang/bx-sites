@@ -161,6 +161,14 @@ cd my-docs
 setting you'll meet later in this course, all covered in full in
 <a href="/theme/docusaurus/configuration/index.html">Configuration</a>. <code>docs/</code> is where every page you
 write lives - you'll spend most of the rest of this course inside it.</p>
+<p><code>docs/</code> is the default source folder. For a site whose content is better
+organized under <code>src/</code>, use the same scaffold command with an explicit
+source choice:</p>
+<pre data-bxsites-title="Terminal"><code class="language-bash">bxSites new my-site --source=src
+</code></pre>
+<p>That creates <code>src/index.md</code> and <code>src/assets/</code> instead. The build, serve, and
+other content commands resolve the selected source folder automatically;
+generated files still go to <code>site/</code>.</p>
 <p>Two flags worth knowing now:</p>
 <ul>
 <li><code>--theme=material</code> (or any other <a href="/theme/docusaurus/course/14-choosing-a-theme/index.html">built-in theme</a>)
@@ -172,7 +180,8 @@ deriving it from the folder name.</li>
 <h2 id="build-it"><a href="#build-it" id="build-it" name="build-it" class="anchor"></a>Build it</h2>
 <pre data-bxsites-title="Terminal"><code class="language-bash">bxSites build
 </code></pre>
-<p>This converts every page under <code>docs/</code> into a static <code>site/</code> folder -
+<p>This converts every page under the project's source folder (<code>docs/</code> by
+default, or <code>src/</code>) into a static <code>site/</code> folder -
 plain HTML, CSS, and JS, ready to host anywhere. Every built-in theme
 renders identically from the same Markdown, so switching themes later
 never means rewriting content.</p>
@@ -191,7 +200,7 @@ skip ahead to <a href="/theme/docusaurus/course/14-choosing-a-theme/index.html">
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/course/03-creating-a-new-site.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> &#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x3092;&#x7de8;&#x96c6;</a><a href="/theme/docusaurus/ja/course/03-creating-a-new-site.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown&#x3092;&#x30c0;&#x30a6;&#x30f3;&#x30ed;&#x30fc;&#x30c9;</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &#x6700;&#x7d42;&#x66f4;&#x65b0; Sep 16, 2026, 10&#x3a;44&#x3a;19 AM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/course/03-creating-a-new-site.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> &#x3053;&#x306e;&#x30da;&#x30fc;&#x30b8;&#x3092;&#x7de8;&#x96c6;</a><a href="/theme/docusaurus/ja/course/03-creating-a-new-site.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown&#x3092;&#x30c0;&#x30a6;&#x30f3;&#x30ed;&#x30fc;&#x30c9;</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &#x6700;&#x7d42;&#x66f4;&#x65b0; Sep 16, 2026, 11&#x3a;12&#x3a;40 AM</span></div>
 
 			</article>
 

@@ -45,13 +45,14 @@ für die `docs/`-oder-`src/`-Konvention. `new` erzeugt immer ein Gerüst mit
 Ein Docs-Projekt aufsetzen.
 
 ```bash title="Usage"
-bxSites new [path] [--name=...] [--theme=<siehe guides/themes.md für alle 10>] [--description=...] [--format=yaml|json]
+bxSites new [path] [--name=...] [--theme=<siehe guides/themes.md für alle 10>] [--description=...] [--format=yaml|json] [--source=docs|src]
 ```
 
 - `--name` - der in die Website-Konfiguration geschriebene Website-Name (Standard: der Name des Zielverzeichnisses)
 - `--theme` - Standard ist `bootstrap`
 - `--description` - die in die Website-Konfiguration geschriebene Website-Beschreibung
 - `--format` - `yaml` (Standard, erzeugt `bxsites.yaml`) oder `json` (erzeugt `bxsites.json`) - siehe [Konfiguration](configuration.md)
+- `--source` - `docs` (Standard) oder `src`, der Quellordner für Seiten und Assets
 
 ## `build`
 

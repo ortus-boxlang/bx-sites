@@ -45,7 +45,7 @@ currently activated in your project alongside the verbs below. See
 
 ## `new`
 
-Scaffold a docs project.
+Scaffold a new project.
 
 ```bash title="Usage"
 bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|json]

@@ -213,8 +213,11 @@ cd my-docs
 └── bxsites.yaml
 </code></pre>
 <p>Pass <code>--theme=material</code> or <code>--theme=tailwind</code> to scaffold with a different
-default theme, and <code>--name=&quot;My Project Docs&quot;</code> to set the site name up
-front - otherwise <code>new</code> derives it from the target directory name.</p>
+default theme, <code>--name=&quot;My Project Docs&quot;</code> to set the site name up front, or
+<code>--source=src</code> to scaffold pages under <code>src/</code> instead of <code>docs/</code>. Otherwise,
+<code>new</code> uses the bootstrap theme, derives the site name from the target
+directory, and uses <code>docs/</code>. The shorter <code>--docs</code> and <code>--site</code> flags are
+aliases for <code>--source=docs</code> and <code>--source=src</code>.</p>
 <h3 id="config-file-format"><a href="#config-file-format" id="config-file-format" name="config-file-format" class="anchor"></a>Config file format</h3>
 <p><code>bxsites.yaml</code> is the default and preferred format - it's what <code>new</code>
 scaffolds unless told otherwise, and every example in this guide and in
@@ -230,8 +233,9 @@ converts a GitBook export straight into <code>docs/</code> - see
 <a href="/theme/tailwind/guides/migrating-from-gitbook/index.html">Migrating from GitBook</a> - and you can
 skip ahead to <a href="#build">Build</a>.</p>
 <h2 id="add-pages"><a href="#add-pages" id="add-pages" name="add-pages" class="anchor"></a>Add pages</h2>
-<p>Every <code>.md</code> file under <code>docs/</code> becomes a page. Folder nesting becomes nav
-nesting automatically:</p>
+<p>Every <code>.md</code> file under the project's source folder becomes a page. New
+projects use <code>docs/</code> by default, or use <code>bxSites new my-site --source=src</code>
+to start with <code>src/</code>. Folder nesting becomes nav nesting automatically:</p>
 <div class="adm-block adm-note">
 <div class="adm-heading">
 <svg class="adm-icon"><use xlink:href="#adm-note" /></svg><span>docs/ or src/</span>
@@ -349,7 +353,7 @@ one page stays fast even on a large site. Pass <code>--port=3000</code> or
 
 				</div>
 
-	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/getting-started.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Sep 16, 2026, 10&#x3a;44&#x3a;19 AM</span></div>
+	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/getting-started.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Sep 16, 2026, 11&#x3a;12&#x3a;40 AM</span></div>
 
 			</article>
 

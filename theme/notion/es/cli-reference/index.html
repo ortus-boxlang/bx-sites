@@ -158,7 +158,8 @@ para apuntar a un proyecto distinto del directorio actual, y las dos
 opciones globales de abajo pueden aparecer antes de cualquier verbo.</p>
 <p>Cada <code>docs/</code> mencionado abajo se aplica igualmente a un proyecto que use
 <code>src/</code> en su lugar - consulta <a href="/theme/notion/es/getting-started/index.html#añadir-páginas">Primeros Pasos</a>
-para la convención <code>docs/</code>-o-<code>src/</code>. <code>new</code> siempre genera <code>docs/</code>.</p>
+para la convención <code>docs/</code>-o-<code>src/</code>. <code>docs/</code> es la carpeta de origen
+predeterminada para proyectos nuevos.</p>
 <h2 id="opciones-globales"><a href="#opciones-globales" id="opciones-globales" name="opciones-globales" class="anchor"></a>Opciones globales</h2>
 <div class="bxsites-table-wrap"><table class="table">
 <thead>
@@ -171,13 +172,14 @@ para la convención <code>docs/</code>-o-<code>src/</code>. <code>new</code> sie
 </table></div>
 <h2 id="new"><a href="#new" id="new" name="new" class="anchor"></a><code>new</code></h2>
 <p>Crea la estructura de un proyecto de documentación.</p>
-<pre data-bxsites-title="Uso"><code class="language-bash">bxSites new [path] [--name=...] [--theme=&lt;consulta guides/themes.md para los 10&gt;] [--description=...] [--format=yaml|json]
+<pre data-bxsites-title="Uso"><code class="language-bash">bxSites new [path] [--name=...] [--theme=&lt;consulta guides/themes.md para los 10&gt;] [--description=...] [--format=yaml|json] [--source=docs|src]
 </code></pre>
 <ul>
 <li><code>--name</code> - el nombre del sitio escrito en la configuración del sitio (por defecto, el nombre del directorio de destino)</li>
 <li><code>--theme</code> - por defecto <code>bootstrap</code></li>
 <li><code>--description</code> - la descripción del sitio escrita en la configuración del sitio</li>
 <li><code>--format</code> - <code>yaml</code> (por defecto, genera <code>bxsites.yaml</code>) o <code>json</code> (genera <code>bxsites.json</code>) - consulta <a href="/theme/notion/es/configuration/index.html">Configuración</a></li>
+<li><code>--source</code> - <code>docs</code> (por defecto) o <code>src</code>, la carpeta donde se generan las páginas y los assets</li>
 </ul>
 <h2 id="build"><a href="#build" id="build" name="build" class="anchor"></a><code>build</code></h2>
 <p>Renderiza <code>docs/**.md</code> en un sitio estático en <code>site/</code>. También construye
@@ -656,7 +658,7 @@ páginas.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/notion/es/cli-reference.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Sep 16, 2026, 10&#x3a;44&#x3a;19 AM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/notion/es/cli-reference.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Sep 16, 2026, 11&#x3a;12&#x3a;40 AM</span></div>
 
 			</article>
 

@@ -26,7 +26,7 @@ boxlang bxSites <verb> [options]
 
 以下で言及する `docs/` はすべて、代わりに `src/` を使うプロジェクトにも同様に適用されます -
 `docs/`-か-`src/` かの慣習については [はじめに](getting-started.md#ページの追加) を参照してください。
-`new` は常に `docs/` をスキャフォールドします。
+新規プロジェクトのソースフォルダーは `docs/` がデフォルトです。
 
 ## グローバルオプション
 
@@ -40,13 +40,14 @@ boxlang bxSites <verb> [options]
 docs プロジェクトをスキャフォールドします。
 
 ```bash title="Usage"
-bxSites new [path] [--name=...] [--theme=<全10種は guides/themes.md を参照>] [--description=...] [--format=yaml|json]
+bxSites new [path] [--name=...] [--theme=<全10種は guides/themes.md を参照>] [--description=...] [--format=yaml|json] [--source=docs|src]
 ```
 
 - `--name` - サイト設定に書き込まれるサイト名（デフォルトはターゲットディレクトリ名）
 - `--theme` - デフォルトは `bootstrap`
 - `--description` - サイト設定に書き込まれるサイトの説明
 - `--format` - `yaml`（デフォルト、`bxsites.yaml` をスキャフォールド）または `json`（`bxsites.json` をスキャフォールド）- [設定](configuration.md) を参照
+- `--source` - `docs`（デフォルト）または `src`。ページとアセットを生成するソースフォルダー
 
 ## `build`
 

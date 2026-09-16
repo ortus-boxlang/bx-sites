@@ -45,13 +45,14 @@ la convenzione `docs/`-o-`src/`. `new` genera sempre lo scheletro di
 Genera lo scheletro di un progetto di documentazione.
 
 ```bash title="Utilizzo"
-bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|json]
+bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|json] [--source=docs|src]
 ```
 
 - `--name` - il nome del sito scritto nella configurazione del sito (per default, il nome della cartella di destinazione)
 - `--theme` - il valore predefinito è `bootstrap`
 - `--description` - la descrizione del sito scritta nella configurazione del sito
 - `--format` - `yaml` (predefinito, genera lo scheletro di `bxsites.yaml`) oppure `json` (genera lo scheletro di `bxsites.json`)
+- `--source` - `docs` (predefinito) oppure `src`, la cartella in cui vengono generati pagine e asset
 
 ## `build`
 
