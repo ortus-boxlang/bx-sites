@@ -20,6 +20,9 @@
  */
 class {
 
+	/** ForgeBox client used to resolve and download plugin packages. */
+	property name="forgeBoxClient";
+
 	/**
 	 * The ForgeBox client used to resolve/download packages - swappable via
 	 * `setForgeBoxClient()`, the same seam ConfigLoader.setYamlRenderer()
@@ -29,13 +32,6 @@ class {
 	 * HTTP request. See PluginInstallerSpec.bx.
 	 */
 	variables.forgeBoxClient = new "models.build.ForgeBoxClient@bxsites"()
-
-	/**
-	 * @client Any object exposing `resolve( slug, version )` -> `{ name, version, location }` and `download( url, destZipPath )`
-	 */
-	void function setForgeBoxClient( required any client ) {
-		variables.forgeBoxClient = arguments.client
-	}
 
 	/**
 	 * Where a plugin named `slug` lands under a project root - BoxLang's own

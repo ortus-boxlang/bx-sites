@@ -1,6 +1,6 @@
 /**
  * Scaffolds a new bx-sites project skeleton - the `new` CLI verb's real
- * implementation: a `docs/` folder with a starter `index.md`, and a site
+	 * implementation: a selected source folder with a starter `index.md`, and a site
  * config defaulted to the requested (or bootstrap) theme (module spec
  * sections 3, 4 and 6). `bxsites.yaml` is the default/preferred format;
  * `format: "toml"` or `format: "json"` scaffolds the matching config file,
@@ -17,6 +17,7 @@ class {
 	 * @theme The built-in theme name to default the project to
 	 * @description Optional site description
 	 * @format `"yaml"` (default), `"toml"`, or `"json"` - which config format to scaffold
+	 * @source `"docs"` (default) or `"src"` - the content source folder to scaffold
 	 *
 	 * @return { projectRoot, configPath, indexPath }
 	 */
@@ -25,7 +26,8 @@ class {
 		required string name,
 		required string theme,
 		string description = "",
-		string format = "yaml"
+		string format = "yaml",
+		string source = "docs"
 	) {
 		var configFormat = lCase( trim( arguments.format ) )
 		if ( !listFindNoCase( "yaml,toml,json", configFormat ) ) {
@@ -36,6 +38,13 @@ class {
 		}
 
 		var dir = arguments.targetDir.reReplace( "[\/]+$", "" )
+		var sourceDir = lCase( trim( arguments.source ) )
+		if ( ![ "docs", "src" ].contains( sourceDir ) ) {
+			throw(
+				type    = "BxSites.InvalidSource",
+				message = "Unknown source folder [#sourceDir#] - must be one of: docs, src"
+			)
+		}
 
 		for ( var existingName in [ "bxsites.yaml", "bxsites.yml", "bxsites.toml", "bxsites.json" ] ) {
 			if ( fileExists( dir & "/" & existingName ) ) {
@@ -49,11 +58,11 @@ class {
 		var configPath = dir & "/bxsites." & configFormat
 
 		directoryCreate( path = dir, createPath = true, ignoreExists = true )
-		directoryCreate( path = dir & "/docs", createPath = true, ignoreExists = true )
-		directoryCreate( path = dir & "/docs/assets", createPath = true, ignoreExists = true )
+		directoryCreate( path = dir & "/" & sourceDir, createPath = true, ignoreExists = true )
+		directoryCreate( path = dir & "/" & sourceDir & "/assets", createPath = true, ignoreExists = true )
 
-		var indexPath = dir & "/docs/index.md"
-		fileWrite( indexPath, renderIndexMd( arguments.name ) )
+		var indexPath = dir & "/" & sourceDir & "/index.md"
+		fileWrite( indexPath, renderIndexMd( arguments.name, sourceDir ) )
 
 		var configSource = configFormat == "yaml"
 			? renderConfigYaml( arguments.name, arguments.theme, arguments.description )
@@ -179,13 +188,14 @@ class {
 	}
 
 	/**
-	 * Renders a minimal starter `docs/index.md`.
+	 * Renders a minimal starter source `index.md`.
 	 *
 	 * @name The site name, used as the starter page's H1
+	 * @source The selected content source folder
 	 *
 	 * @return The rendered docs/index.md source
 	 */
-	private string function renderIndexMd( required string name ) {
+	private string function renderIndexMd( required string name, required string source ) {
 		var lines = [
 			"---",
 			"title: Home",
@@ -194,8 +204,8 @@ class {
 			"",
 			"## #arguments.name#",
 			"",
-			"Welcome to your new documentation site. Edit this page at `docs/index.md`,",
-			"and add more `.md` files under `docs/` - folder and file nesting becomes",
+			"Welcome to your new documentation site. Edit this page at `#arguments.source#/index.md`,",
+			"and add more `.md` files under `#arguments.source#/` - folder and file nesting becomes",
 			"the site navigation automatically.",
 			""
 		]

@@ -29,6 +29,9 @@
  */
 class {
 
+	/** Monotonically increasing version returned by the live-reload endpoint. */
+	property name="buildVersion";
+
 	variables.buildPipeline = new "models.build.BuildPipeline@bxsites"()
 	variables.configLoader  = new "models.config.ConfigLoader@bxsites"()
 	variables.sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
@@ -250,14 +253,6 @@ class {
 		}
 		rebuild()
 		return true
-	}
-
-	/**
-	 * The live-reload poller's current version number, exposed for tests -
-	 * the same value the `/__bxsites/version` endpoint serves.
-	 */
-	numeric function getBuildVersion() {
-		return variables.buildVersion
 	}
 
 	/**

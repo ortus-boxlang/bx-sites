@@ -39,8 +39,19 @@ contracts.
 
 - Install dependencies with `box install --verbose --nosave` when reproducing
   CI locally.
-- Run the focused TestBox suite with:
-  `./testbox/run --reporter=ANTJunit --verbose`.
+- Use the native BoxLang TestBox runner at `./testbox/run`; its streaming flag
+  is `--stream` (not `--streaming`).
+- Run all normal specs with `./testbox/run --stream` or use
+  `./testbox/run --reporter=ANTJunit --verbose` for CI-style output.
+- Select bundles with `--bundles=<dot-notated-bundle>`; use
+  `--filter-bundles=<pattern>` only to filter discovered bundles. For example:
+  `./testbox/run --bundles=tests.specs.cli.NewSpec --stream`.
+- Use `--show-failed-only --hide-skipped` to keep focused streaming output
+  concise, and `--slow-threshold-ms=<n>` or `--top-slowest=<n>` to investigate
+  slow specs.
+- The full dogfood documentation build is opt-in. Normal tests skip
+  `DogfoodDocsSpec` without building the docs; run it explicitly with:
+  `BXSITES_RUN_DOGFOOD_TESTS=true ./testbox/run --bundles=tests.specs.DogfoodDocsSpec --stream`.
 - TestBox's runner does not reliably return a failing process exit code. When
   consuming its results in automation, inspect the generated JUnit XML for
   nonzero `failures` or `errors`, as `.github/workflows/tests.yml` does.

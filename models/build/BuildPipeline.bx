@@ -6,6 +6,15 @@
  */
 class {
 
+	/** Enables optional phase timing for focused build investigations. */
+	property name="profiling";
+	/** Markdown renderer used to convert source content into HTML. */
+	property name="markdownRenderer";
+	/** Pagefind indexer used when the configured search provider is pagefind. */
+	property name="pagefindIndexer";
+	/** Image processor used to build responsive image variants. */
+	property name="imageVariantGenerator";
+
 	variables.configLoader     = new "models.config.ConfigLoader@bxsites"()
 	variables.sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
 	variables.stringsResolver  = new "models.config.StringsResolver@bxsites"()
@@ -78,51 +87,6 @@ class {
 	variables.profiling = false
 	variables.profileTimings = []
 	variables.profileLastAt = 0
-
-	/**
-	 * Enables phase timing for a focused build investigation. Disabled by
-	 * default so normal CLI output and build behavior remain unchanged.
-	 */
-	void function setProfiling( required boolean enabled ) {
-		variables.profiling = arguments.enabled
-	}
-
-	/**
-	 * Swaps in a fake/test markdown renderer. The real one (MarkdownRenderer.bx)
-	 * depends on the bx-markdown module being activated, which this
-	 * pipeline's own unit tests don't have - see MarkdownRenderer.bx's
-	 * docblock for why that dependency is kept behind this seam.
-	 *
-	 * @renderer Any object exposing `toHtml( markdown, options = {} )`
-	 */
-	void function setMarkdownRenderer( required any renderer ) {
-		variables.markdownRenderer = arguments.renderer
-	}
-
-	/**
-	 * Swaps in a fake/test pagefind indexer. The real one (PagefindIndexer.bx)
-	 * shells out to the external `pagefind` CLI, which this pipeline's own
-	 * unit tests can't assume is installed - see PagefindIndexer.bx's own
-	 * docblock for why it fails loud rather than degrading silently.
-	 *
-	 * @indexer Any object exposing `index( siteDir, bin = "pagefind", options = [] )`
-	 */
-	void function setPagefindIndexer( required any indexer ) {
-		variables.pagefindIndexer = arguments.indexer
-	}
-
-	/**
-	 * Swaps in a fake/test image variant generator. The real one
-	 * (ImageVariantGenerator.bx) calls bx-image's own `imageRead()`/
-	 * `.scaleToFit()`/`.write()`, which this pipeline's own unit tests
-	 * can't assume is installed - same reasoning as setMarkdownRenderer()/
-	 * setPagefindIndexer() above.
-	 *
-	 * @generator Any object exposing `buildManifest( docsAssetsDir, imagesConfig, cacheDir )` and `copyToOutput( manifest, outputAssetsDir )`
-	 */
-	void function setImageVariantGenerator( required any generator ) {
-		variables.imageVariantGenerator = arguments.generator
-	}
 
 	/**
 	 * Bypasses PluginLoader.discover() (real BoxLang module lookup - no

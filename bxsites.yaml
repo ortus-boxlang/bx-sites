@@ -14,6 +14,7 @@ theme:
     logo: "assets/boxlang-icon-full.svg"
     favicon: "assets/favicon.png"
 search: true
+mcp: true
 nav: []
 markdown:
     enableFootnotes: true

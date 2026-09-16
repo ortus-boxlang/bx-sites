@@ -35,7 +35,47 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.exitCode ).toBe( 0 );
 				expect( fileExists( dir & "/bxsites.yaml" ) ).toBeTrue();
 				expect( fileExists( dir & "/bxsites.json" ) ).toBeFalse();
+				expect( fileExists( dir & "/docs/index.md" ) ).toBeTrue();
 				expect( result.message ).toInclude( "bootstrap" );
+			} );
+
+			it( "scaffolds content under src when --source=src is provided", function() {
+				var dir = newTargetDir();
+				verb.run( { projectRoot : dir, source : "src" } );
+
+				expect( fileExists( dir & "/src/index.md" ) ).toBeTrue();
+				expect( directoryExists( dir & "/src/assets" ) ).toBeTrue();
+				expect( fileExists( dir & "/docs/index.md" ) ).toBeFalse();
+			} );
+
+			it( "scaffolds content under docs when --docs is provided", function() {
+				var dir = newTargetDir();
+				verb.run( { projectRoot : dir, docs : true } );
+
+				expect( fileExists( dir & "/docs/index.md" ) ).toBeTrue();
+				expect( fileExists( dir & "/src/index.md" ) ).toBeFalse();
+			} );
+
+			it( "scaffolds content under src when --site is provided", function() {
+				var dir = newTargetDir();
+				verb.run( { projectRoot : dir, site : true } );
+
+				expect( fileExists( dir & "/src/index.md" ) ).toBeTrue();
+				expect( fileExists( dir & "/docs/index.md" ) ).toBeFalse();
+			} );
+
+			it( "throws BxSites.InvalidSource when --docs and --site are both provided", function() {
+				var dir = newTargetDir();
+				expect( function() {
+					verb.run( { projectRoot : dir, docs : true, site : true } );
+				} ).toThrow( "BxSites.InvalidSource" );
+			} );
+
+			it( "throws BxSites.InvalidSource for an unsupported source folder", function() {
+				var dir = newTargetDir();
+				expect( function() {
+					verb.run( { projectRoot : dir, source : "content" } );
+				} ).toThrow( "BxSites.InvalidSource" );
 			} );
 
 			it( "honors an explicit --format=json, scaffolding bxsites.json instead", function() {
