@@ -68,7 +68,7 @@ contracts.
 
 ## Documentation And Locales
 
-- Keep `docs/i18n/{de,es,it,ja}/` synchronized with the English documentation
+- Keep `docs/i18n/{de,es,it}/` synchronized with the English documentation
   tree. Any documentation change under `docs/` needs the equivalent translated
   update in each locale mirror unless the task explicitly scopes the change to
   English.

@@ -11,7 +11,7 @@
  *
  * Three-layer resolution, later layers winning: this class's own English
  * `defaults`, then a built-in translation for the locale's own code (if
- * this module ships one - currently `de`/`es`/`it`/`ja`, the same four
+ * this module ships one - currently `de`/`es`/`it`, the same three
  * this repo's own docs are dogfooded in), then a project's own override
  * (`bxsites.json`'s `i18n.defaultLocale.strings`/`i18n.locales[].strings` -
  * ConfigLoader.bx already validates it's a struct when present, but never
