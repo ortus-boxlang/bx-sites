@@ -989,7 +989,7 @@ lingua.
   `strings` sovrascrive le stringhe UI dell'interfaccia del tema proprie
   di quella locale (placeholder della ricerca, "In questa pagina," ...) -
   consulta [Internazionalizzazione](guides/i18n.md#interfaccia-del-tema-stringhe-ui)
-  per l'elenco completo delle chiavi; `de`/`es`/`it`/`ja` includono già
+  per l'elenco completo delle chiavi; `de`/`es`/`it` includono già
   una traduzione integrata, quindi `strings` serve solo per sovrascrivere
   una chiave o aggiungere un'altra locale.
 

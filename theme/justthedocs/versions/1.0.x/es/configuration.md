@@ -915,7 +915,7 @@ idioma.
   tema propias de ese idioma (marcador de posición de búsqueda, "En esta
   página," la página 404, ...) - consulta
   [Internacionalización](guides/i18n.md#interfaz-del-tema-cadenas-de-ui)
-  para la lista completa de claves; `de`/`es`/`it`/`ja` ya incluyen una
+  para la lista completa de claves; `de`/`es`/`it` ya incluyen una
   traducción integrada, así que `strings` solo hace falta para
   sobrescribir una clave o añadir otro idioma.
 

@@ -919,7 +919,7 @@ Anzeige-Label/ihre Schreibrichtung für den Sprachumschalter.
   Theme-Chrome-UI-Texte dieser Locale (Suchplatzhalter, "Auf dieser
   Seite", die 404-Seite, ...) - siehe
   [Internationalisierung](guides/i18n.md#theme-chrome-ui-texte) für die
-  vollständige Liste der Schlüssel; `de`/`es`/`it`/`ja` bringen bereits
+  vollständige Liste der Schlüssel; `de`/`es`/`it` bringen bereits
   eine eingebaute Übersetzung mit, `strings` wird also nur zum
   Überschreiben eines Schlüssels oder für eine weitere Locale gebraucht.
 

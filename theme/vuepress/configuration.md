@@ -1201,7 +1201,7 @@ switcher.
   overrides that locale's own theme-chrome UI text (search placeholder,
   "On this page," the 404 page, ...) - see
   [Internationalization](guides/i18n.md#theme-chrome-ui-strings) for the
-  full key list; `de`/`es`/`it`/`ja` already ship a built-in translation,
+  full key list; `de`/`es`/`it` already ship a built-in translation,
   so `strings` is only needed to override a key or add another locale.
 
 === "YAML"
