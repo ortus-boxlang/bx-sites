@@ -64,7 +64,7 @@ del sitio, o que `searchProvider` esté configurado a un proveedor - como
 `algolia`/`pagefind` - que no lo use, consulta
 [Búsqueda](guides/search.md)), ejecuta la CLI de `pagefind` contra el
 `site/` terminado cuando `searchProvider.provider` es `"pagefind"`, y
-copia el tema + `docs/assets/**` en `site/`.
+copia el tema y `assets/**` del directorio de origen en `site/`.
 
 ```bash frame="terminal" title="Terminal"
 bxSites build

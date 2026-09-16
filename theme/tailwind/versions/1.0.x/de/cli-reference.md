@@ -63,7 +63,7 @@ oder `searchProvider` nicht auf einen Provider gesetzt ist - wie
 `algolia`/`pagefind` -, der ihn nicht nutzt, siehe
 [Suche](guides/search.md)), führt die `pagefind`-CLI gegen die fertige
 `site/` aus, wenn `searchProvider.provider` auf `"pagefind"` steht, und
-kopiert Theme + `docs/assets/**` nach `site/`.
+kopiert das Theme sowie `assets/**` aus dem Quellordner nach `site/`.
 
 ```bash frame="terminal" title="Terminal"
 bxSites build

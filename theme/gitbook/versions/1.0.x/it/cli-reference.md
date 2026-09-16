@@ -62,8 +62,8 @@ l'indice di ricerca (a meno che `search` non sia `false` nella
 configurazione del sito, o che `searchProvider` sia impostato su un provider
 - come `algolia`/`pagefind` - che non lo usa, vedi
 [Ricerca](guides/search.md)), esegue la CLI di `pagefind` sul `site/`
-finito quando `searchProvider.provider` è `"pagefind"`, e copia il tema +
-`docs/assets/**` in `site/`.
+finito quando `searchProvider.provider` è `"pagefind"`, e copia il tema e
+`assets/**` dalla cartella sorgente in `site/`.
 
 ```bash frame="terminal" title="Terminal"
 bxSites build
