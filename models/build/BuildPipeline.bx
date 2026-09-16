@@ -405,16 +405,15 @@ class {
 		}
 		profile( "version trees", buildStartedAt )
 
-		// Build all non-default locales
+		// Build all non-default locales asynchronously
 		var localesToBuild = locales.filter( ( locale ) =>
 			locale.code != defaultLocaleCode
 		)
-
 		var localeResults = futureNew().allApply(
 			localesToBuild,
 			( locale ) => {
 				progress( "Building locale: #locale.code#" )
-				var buildStartedAt = now()
+				var localeStartedAt = getTickCount()
 				// Determine the output directory for this locale
 				var localeOutputDir = siteDir & "/" & locale.code
 				// Load the pages for this locale
@@ -493,15 +492,18 @@ class {
 				)
 
 				// Output how long it took to build this locale
-				profile( "locale: " & locale.code, buildStartedAt )
+				profile( "locale: " & locale.code, localeStartedAt )
 
 				// Return the result for this locale
 				return {
 					locale : locale,
 					result : localeResult
 				}
-			}
+			},
+			null
 		)
+
+		progress( "Finished building all locales." )
 
 		// Now we're back on a single thread
 		// Process the results for each locale
