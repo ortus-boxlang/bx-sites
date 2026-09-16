@@ -146,268 +146,326 @@ Variabili e Funzioni Magiche</h1>
 
 	<details class="bxsites-toc-mobile toc-mobile d-xl-none"><summary class="toc-mobile__summary">In questa pagina</summary><ul class="list-unstyled"><li class="toc-level-2"><a href="#variabili-riutilizzabili">Variabili riutilizzabili</a></li><li class="toc-level-2"><a href="#funzioni-magiche">Funzioni magiche</a></li><li class="toc-level-3"><a href="#richiamare-una-funzione-magica-da-una-sovrascrittura-di-tema">Richiamare una funzione magica da una sovrascrittura di tema</a></li><li class="toc-level-3"><a href="#variabili-di-contesto">Variabili di contesto</a></li><li class="toc-level-3"><a href="#sintassi-degli-argomenti">Sintassi degli argomenti</a></li><li class="toc-level-2"><a href="#ricette-per-i-visualizzatori">Ricette per i visualizzatori</a></li><li class="toc-level-3"><a href="#valutazioni">Valutazioni</a></li><li class="toc-level-3"><a href="#chip-di-stato">Chip di stato</a></li><li class="toc-level-3"><a href="#barre-di-progresso">Barre di progresso</a></li><li class="toc-level-3"><a href="#indicatori-di-tendenza">Indicatori di tendenza</a></li><li class="toc-level-3"><a href="#dentro-una-cella-di-tabella">Dentro una cella di tabella</a></li><li class="toc-level-2"><a href="#mostrare-la-sintassi-in-modo-letterale">Mostrare la sintassi in modo letterale</a></li><li class="toc-level-2"><a href="#ambito">Ambito</a></li><li class="toc-level-2"><a href="#nomi-riservati">Nomi riservati</a></li><li class="toc-level-2"><a href="#errori">Errori</a></li></ul></details>
 
-					<h1 id="internacionalización-i18n"><a href="#internacionalización-i18n" id="internacionalización-i18n" name="internacionalización-i18n" class="anchor"></a>Internacionalización (i18n)</h1>
-<p>Traduce tus documentos a otros idiomas, cada uno con su propio prefijo de
-URL, su propio <code>&lt;html lang dir&gt;</code>, y un selector de idioma automático -
-sin plugin, sin paso de construcción separado.</p>
-<h2 id="añadir-un-idioma"><a href="#añadir-un-idioma" id="añadir-un-idioma" name="añadir-un-idioma" class="anchor"></a>Añadir un idioma</h2>
-<p>El contenido traducido vive en <code>docs/i18n/&lt;code&gt;/</code>, reflejando tu árbol
-<code>docs/</code> regular página por página:</p>
-<pre><code>docs/
-├── index.md
-├── guides/
-│   └── setup.md
-└── i18n/
-    ├── es/
-    │   ├── index.md
-    │   └── guides/
-    │       └── setup.md
-    └── ar/
-        └── index.md
+					<h1 id="variabili-e-funzioni-magiche"><a href="#variabili-e-funzioni-magiche" id="variabili-e-funzioni-magiche" name="variabili-e-funzioni-magiche" class="anchor"></a>Variabili e Funzioni Magiche</h1>
+<p>Due funzionalità piccole e correlate per tenere fuori dal tuo Markdown i
+fatti ripetuti e la logica ripetuta: le <strong>variabili riutilizzabili</strong>,
+definite una sola volta in <code>bxsites.yaml</code> e inserite in qualsiasi pagina
+con <code>{{ }}</code>, e le <strong>funzioni magiche</strong>, piccoli helper BoxLang che scrivi
+una sola volta in <code>docs/functions.bxs</code> e richiami allo stesso modo -
+ovunque, senza import, senza plugin, senza alcun collegamento da
+configurare.</p>
+<p>Entrambe condividono un'unica sintassi:</p>
+<pre><code class="language-text">{{ dotted.path }}          # a reusable variable
+{{ $name(arg1, arg2) }}    # a magic function call
 </code></pre>
-<p><code>&lt;code&gt;</code> se convierte tanto en el nombre de la carpeta como en el prefijo
-de URL generado (<code>docs/i18n/es/guides/setup.md</code> → <code>/es/guides/setup/</code>),
-así que mantenlo corto - tanto un código de idioma simple (<code>es</code>, <code>fr</code>)
-como un par idioma-región (<code>pt-BR</code>, <code>zh-Hans</code>) funcionan, solo
-letras/dígitos/guiones. Tu árbol <code>docs/</code> regular es siempre el <strong>idioma
-predeterminado</strong>, construido sin prefijo en la raíz del sitio exactamente
-como lo es hoy - añadir <code>docs/i18n/</code> no cambia nada al respecto.</p>
-<p>Dale a cada idioma una etiqueta de visualización (y, para un idioma de
-derecha a izquierda, su propia dirección) en <code>bxsites.yaml</code>:</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">i18n:
-  defaultLocale: { code: en, label: English }
-  locales:
-    - { code: es, label: Español }
-    - { code: ar, label: العربية, dir: rtl }
-    - { code: pt-BR, label: &quot;Português (Brasil)&quot;, flag: 🇧🇷 }
+<h2 id="variabili-riutilizzabili"><a href="#variabili-riutilizzabili" id="variabili-riutilizzabili" name="variabili-riutilizzabili" class="anchor"></a>Variabili riutilizzabili</h2>
+<p>Aggiungi un blocco <code>variables</code> a <code>bxsites.yaml</code> - con qualsiasi forma tu
+preferisca, piatta o annidata:</p>
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">variables:
+  company: &quot;Ortus Solutions&quot;
+  product:
+    name: &quot;BoxLang&quot;
+    supportEmail: &quot;support@example.com&quot;
 </code></pre>
 </div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
-	&quot;i18n&quot;: {
-		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
-		&quot;locales&quot;: [
-			{ &quot;code&quot;: &quot;es&quot;, &quot;label&quot;: &quot;Español&quot; },
-			{ &quot;code&quot;: &quot;ar&quot;, &quot;label&quot;: &quot;العربية&quot;, &quot;dir&quot;: &quot;rtl&quot; },
-			{ &quot;code&quot;: &quot;pt-BR&quot;, &quot;label&quot;: &quot;Português (Brasil)&quot;, &quot;flag&quot;: &quot;🇧🇷&quot; }
-		]
+	&quot;variables&quot;: {
+		&quot;company&quot;: &quot;Ortus Solutions&quot;,
+		&quot;product&quot;: {
+			&quot;name&quot;: &quot;BoxLang&quot;,
+			&quot;supportEmail&quot;: &quot;support@example.com&quot;
+		}
 	}
 }
 </code></pre>
 </div><div class="bxsites-tab-panel" data-bxsites-tab="3"><pre><code class="language-toml">
-[i18n]
+[variables]
+company = &quot;Ortus Solutions&quot;
 
-[i18n.defaultLocale]
-code = &quot;en&quot;
-label = &quot;English&quot;
-
-[[i18n.locales]]
-code = &quot;es&quot;
-label = &quot;Español&quot;
-
-[[i18n.locales]]
-code = &quot;ar&quot;
-label = &quot;العربية&quot;
-dir = &quot;rtl&quot;
-
-[[i18n.locales]]
-code = &quot;pt-BR&quot;
-label = &quot;Português (Brasil)&quot;
-flag = &quot;🇧🇷&quot;
+[variables.product]
+name = &quot;BoxLang&quot;
+supportEmail = &quot;support@example.com&quot;
 </code></pre>
 </div></div></div>
-<p><code>defaultLocale</code> solo hace falta configurarlo si tu idioma predeterminado
-no es el inglés; <code>locales</code> es la lista de todo lo demás. Cada carpeta
-<code>docs/i18n/&lt;code&gt;/</code> se construye automáticamente en cuanto existe -
-<code>locales</code> simplemente proporciona su etiqueta de visualización y
-dirección de texto. Una carpeta sin una entrada coincidente en <code>locales</code>
-igualmente se construye (usando su código simple como su propia
-etiqueta), así que esto son metadatos, no lo que activa o desactiva la
-función.</p>
-<p><code>flag</code> es opcional - el propio selector ya elige un emoji de bandera
-razonable para unos ~40 códigos de idioma comunes por sí solo
-(comprobando primero un código de región como <code>pt-BR</code>, y recurriendo
-después al idioma base <code>pt</code>). Establece <code>flag</code> tú mismo solo para
-anular esa suposición, o para un código que la búsqueda incorporada no
-reconoce (en ese caso recurre a un 🌐 simple).</p>
-<h2 id="qué-se-construye"><a href="#qué-se-construye" id="qué-se-construye" name="qué-se-construye" class="anchor"></a>Qué se construye</h2>
-<p>Cada idioma es una construcción real, totalmente independiente - su
-propio <code>search-index.json</code>, sus propios <code>assets/</code>, todo lo que produce
-una construcción normal - escrito bajo <code>site/&lt;code&gt;/</code> (<code>site/es/</code>,
-<code>site/ar/</code>). No hay nada que activar por idioma: en cuanto existe
-<code>docs/i18n/es/</code>, <code>bxSites build</code> lo recoge por sí solo.</p>
-<h2 id="páginas-sin-traducir"><a href="#páginas-sin-traducir" id="páginas-sin-traducir" name="páginas-sin-traducir" class="anchor"></a>Páginas sin traducir</h2>
-<p>Un idioma no necesita tener todas las páginas traducidas para ser
-utilizable. Una página que falte en <code>docs/i18n/es/</code> igualmente se
-construye en su URL esperada - mostrando el propio contenido del idioma
-predeterminado, con un pequeño aviso en la parte superior de la página
-indicando que aún no se ha traducido. Nada devuelve un 404, nada se ve a
-medio construir mientras una traducción está en progreso.</p>
-<p>La navegación de cada idioma siempre tiene exactamente la misma forma que
-la del idioma predeterminado - las mismas páginas, el mismo orden, el
-mismo anidamiento (lo que sea que ya produzca la propia estructura de
-carpetas de <code>docs/</code>, o una <a href="/es/configuration/index.html#nav"><code>nav</code></a> explícita) -
-solo con el título/contenido de cada página sustituido por su propia
-traducción donde exista una. Esto es también lo que hace funcionar al
-selector de idioma: cambiar de idioma te lleva a la <em>misma página</em>,
-traducida o no, nunca a la página de inicio de ese idioma.</p>
-<h2 id="el-selector-de-idioma"><a href="#el-selector-de-idioma" id="el-selector-de-idioma" name="el-selector-de-idioma" class="anchor"></a>El selector de idioma</h2>
-<p>En cuanto existe más de un idioma, cada tema renderiza automáticamente un
-desplegable de idioma en la cabecera - nada que activar, igual que el
-<a href="/es/configuration/index.html#versionado">selector de versión</a>. Muestra la
-bandera del idioma actual como disparador; al abrirlo se lista cada
-idioma con su propia bandera y etiqueta, marcando el actual como activo.
-Elige un idioma que no estés construyendo actualmente y simplemente no
-se renderizará en absoluto.</p>
-<h2 id="docs-versionados-y-traducidos"><a href="#docs-versionados-y-traducidos" id="docs-versionados-y-traducidos" name="docs-versionados-y-traducidos" class="anchor"></a>Docs versionados y traducidos</h2>
-<p>Consulta <a href="/es/guides/versioning/index.html">Versionado</a> para el propio <code>docs/versions/&lt;name&gt;/</code>.
-Las versiones y los idiomas se combinan un nivel: coloca una carpeta
-<code>docs/versions/&lt;name&gt;/i18n/&lt;code&gt;/</code> junto a las propias páginas de una
-versión, reflejando la propia estructura de esa versión exactamente de
-la misma forma que un <code>docs/i18n/&lt;code&gt;/</code> de nivel superior refleja el
-propio <code>docs/</code>:</p>
-<pre data-bxsites-title="docs&#x2f;versions&#x2f;2.0&#x2f; layout"><code class="language-text">docs/
-  versions/
-    2.0/
-      index.md
-      guides/
-        setup.md
-      i18n/
-        es/
-          index.md          # traducida
-          guides/
-            setup.md        # las páginas sin traducir igualmente recurren al idioma predeterminado, igual que en el i18n de nivel superior
+<p>Poi fai riferimento a uno qualsiasi dei suoi valori, per percorso puntato,
+da qualsiasi pagina Markdown:</p>
+<pre data-bxsites-title="docs&#x2f;index.md"><code class="language-markdown"># Welcome to {{ company }}
+
+We build {{ product.name }} tools. Need help? Write us at
+{{ product.supportEmail }}.
 </code></pre>
-<p>Esto construye <code>site/versions/2.0/es/</code>. Las propias páginas del idioma
-predeterminado de una versión (<code>site/versions/2.0/</code>) también obtienen un
-selector de idioma, listando solo los idiomas para los que <em>esa misma
-versión</em> tiene traducciones - una versión sin su propia subcarpeta
-<code>i18n/</code> se renderiza exactamente igual que antes de que existiera esto,
-sin selector mostrado. Cambiar de versión siempre vuelve al propio
-idioma predeterminado de esa versión (nunca asume que la versión de
-destino tiene la misma traducción); cambiar de idioma siempre se
-mantiene en la versión actual.</p>
-<h2 id="interfaz-del-tema-cadenas-de-ui"><a href="#interfaz-del-tema-cadenas-de-ui" id="interfaz-del-tema-cadenas-de-ui" name="interfaz-del-tema-cadenas-de-ui" class="anchor"></a>Interfaz del tema (cadenas de UI)</h2>
-<p>Todo el texto de interfaz que rodea cada tema integrado - el marcador de
-posición de búsqueda, &quot;En esta página,&quot; &quot;Editar esta página,&quot; &quot;Última
-actualización,&quot; la página 404, el título de la página de etiquetas, y el
-propio aviso de &quot;aún no traducida&quot; - también se traduce por idioma, no
-solo el contenido de tu propia página.</p>
-<p>Cuatro idiomas incluyen una traducción integrada de fábrica: <code>de</code>, <code>es</code>,
-<code>it</code> y <code>ja</code>. Construir cualquiera de esos códigos de idioma obtiene
-automáticamente una interfaz completamente traducida, nada que
-configurar. Cualquier otro código de idioma (o una página que prefieras
-redactar de otra forma) recurre al inglés - sobrescribe solo las claves
-que te importen con tus propios <code>strings</code> en la entrada de ese idioma en
-<code>bxsites.yaml</code>:</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">i18n:
-  defaultLocale: { code: en, label: English }
-  locales:
-    - code: fr
-      label: Français
-      strings:
-        searchPlaceholder: Rechercher dans la documentation...
-        onThisPage: Sur cette page
-    - code: es
-      label: Español
-      strings: { toggleDarkMode: Cambiar a modo nocturno }
+<p>viene compilata in:</p>
+<pre><code class="language-html">&lt;h1&gt;Welcome to Ortus Solutions&lt;/h1&gt;
+&lt;p&gt;We build BoxLang tools. Need help? Write us at support@example.com.&lt;/p&gt;
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
-	&quot;i18n&quot;: {
-		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
-		&quot;locales&quot;: [
-			{
-				&quot;code&quot;: &quot;fr&quot;,
-				&quot;label&quot;: &quot;Français&quot;,
-				&quot;strings&quot;: {
-					&quot;searchPlaceholder&quot;: &quot;Rechercher dans la documentation...&quot;,
-					&quot;onThisPage&quot;: &quot;Sur cette page&quot;
-				}
-			},
-			{
-				&quot;code&quot;: &quot;es&quot;,
-				&quot;label&quot;: &quot;Español&quot;,
-				&quot;strings&quot;: { &quot;toggleDarkMode&quot;: &quot;Cambiar a modo nocturno&quot; }
-			}
-		]
-	}
+<p>Una variabile <code>{{ }}</code> viene risolta una sola volta, al momento del build,
+rispetto a ciò che il blocco <code>variables</code> proprio di <code>bxsites.yaml</code>
+contiene in quel preciso istante - rinomina un prodotto, aggiorna un
+indirizzo di supporto o cambia un anno in un unico punto, e ogni pagina
+che la usa recepisce la modifica al build successivo. Vedi
+<a href="/it/configuration/index.html#variables"><code>variables</code></a> nel riferimento di
+configurazione.</p>
+<h2 id="funzioni-magiche"><a href="#funzioni-magiche" id="funzioni-magiche" name="funzioni-magiche" class="anchor"></a>Funzioni magiche</h2>
+<p>Aggiungi un file <code>docs/functions.bxs</code> (o <code>src/functions.bxs</code>, se il tuo
+progetto usa <code>src/</code> - vedi <a href="/it/getting-started/index.html">Per iniziare</a>) - un
+semplice script BoxLang. Ogni funzione che nomini con un <code>$</code> iniziale
+diventa una <em>funzione magica</em>: richiamabile da <code>{{ }}</code> nel Markdown, e
+richiamabile allo stato puro, direttamente, dalle sovrascritture <code>.bxm</code>
+del proprio <a href="/it/guides/themes/index.html#sovrascrivere-un-tema"><code>theme/</code></a> di un progetto.</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="docs&#x2f;functions.bxs"><code class="language-bx">function $shout( text ) {
+	return uCase( arguments.text ) &amp; &quot;!&quot;
+}
+
+function $badge( label, kind = &quot;info&quot; ) {
+	return '&lt;span class=&quot;badge bg-' &amp; arguments.kind &amp; '&quot;&gt;' &amp; arguments.label &amp; '&lt;/span&gt;'
 }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="3"><pre><code class="language-toml">
-[i18n]
+<pre data-bxsites-title="docs&#x2f;index.md"><code class="language-markdown">{{ $shout('this is important') }}
 
-[i18n.defaultLocale]
-code = &quot;en&quot;
-label = &quot;English&quot;
-
-[[i18n.locales]]
-code = &quot;fr&quot;
-label = &quot;Français&quot;
-
-[i18n.locales.strings]
-searchPlaceholder = &quot;Rechercher dans la documentation...&quot;
-onThisPage = &quot;Sur cette page&quot;
-
-[[i18n.locales]]
-code = &quot;es&quot;
-label = &quot;Español&quot;
-
-[i18n.locales.strings]
-toggleDarkMode = &quot;Cambiar a modo nocturno&quot;
+Status: {{ $badge('Stable', 'success') }}
 </code></pre>
-</div></div></div>
-<p>Un idioma con traducción integrada (como <code>es</code> arriba) puede seguir
-sobrescribiendo claves individuales de la misma forma - tus propios
-<code>strings</code> siempre ganan tanto a la traducción integrada como al valor
-predeterminado en inglés. El propio <code>defaultLocale</code> también puede llevar
-sus propios <code>strings</code>, para un proyecto cuyo idioma predeterminado no sea
-el inglés y que quiera su propia redacción de interfaz en lugar de
-recurrir al valor predeterminado en inglés.</p>
-<p>El conjunto completo de claves sobrescribibles: <code>searchPlaceholder</code>,
-<code>searchAriaLabel</code>, <code>searchNoResults</code>, <code>toggleDarkMode</code>,
-<code>toggleNavigation</code>, <code>toggleSection</code> (marcador <code>{title}</code>), <code>repository</code>,
-<code>version</code>, <code>language</code> (marcador <code>{label}</code>), <code>onThisPage</code>, <code>editThisPage</code>,
-<code>downloadMarkdown</code>, <code>lastUpdated</code>, <code>notTranslatedNotice</code> (marcador
-<code>{locale}</code>), <code>notFoundTitle</code>, <code>notFoundBody</code>, <code>tagsTitle</code> y
-<code>pageNavigation</code>.</p>
-<h2 id="qué-queda-fuera-de-alcance-por-ahora"><a href="#qué-queda-fuera-de-alcance-por-ahora" id="qué-queda-fuera-de-alcance-por-ahora" name="qué-queda-fuera-de-alcance-por-ahora" class="anchor"></a>Qué queda fuera de alcance (por ahora)</h2>
+<p>viene compilata in:</p>
+<pre><code class="language-html">&lt;p&gt;THIS IS IMPORTANT!&lt;/p&gt;
+&lt;p&gt;Status: &lt;span class=&quot;badge bg-success&quot;&gt;Stable&lt;/span&gt;&lt;/p&gt;
+</code></pre>
+<p>Una funzione magica può restituire qualsiasi cosa convertibile con
+<code>toString()</code> - testo semplice, HTML, un numero - e viene inserita
+direttamente nel Markdown della pagina prima che questo venga convertito,
+quindi restituire vero HTML (come <code>$badge()</code> sopra) funziona esattamente
+come ci si aspetterebbe.</p>
+<p>Una funzione dichiarata <em>senza</em> un <code>$</code> iniziale nello stesso
+<code>functions.bxs</code> è solo un helper privato, pensato per essere richiamato
+unicamente dalle tue altre funzioni con prefisso <code>$</code> nello stesso file
+(vengono tutte caricate nello stesso scope, quindi una può richiamare
+l'altra allo stato puro) - <code>{{ }}</code> non può mai richiamarne una
+direttamente (viene riconosciuto solo un bersaglio di chiamata
+<code>$name(...)</code>), e non fa nemmeno parte della superficie pubblica
+documentata che una sovrascrittura di tema dovrebbe richiamare, anche se
+tecnicamente risulta raggiungibile anche lì:</p>
+<pre data-bxsites-title="docs&#x2f;functions.bxs"><code class="language-bx">private string function formatPrice( amount ) {
+	return &quot;$&quot; &amp; numberFormat( arguments.amount, &quot;9.99&quot; )
+}
+
+function $price( amount ) {
+	return formatPrice( arguments.amount )
+}
+</code></pre>
+<h3 id="richiamare-una-funzione-magica-da-una-sovrascrittura-di-tema"><a href="#richiamare-una-funzione-magica-da-una-sovrascrittura-di-tema" id="richiamare-una-funzione-magica-da-una-sovrascrittura-di-tema" name="richiamare-una-funzione-magica-da-una-sovrascrittura-di-tema" class="anchor"></a>Richiamare una funzione magica da una sovrascrittura di tema</h3>
+<p>Poiché una funzione magica viene collegata direttamente nello scope del
+template, il proprio <code>theme/page.bxm</code> (o <code>layout.bxm</code>) di un progetto può
+richiamarla allo stato puro, senza alcun prefisso - esattamente come già
+legge <code>variables.page</code>/<code>variables.siteConfig</code>:</p>
+<pre data-bxsites-title="theme&#x2f;page.bxm &#x28;excerpt&#x29;"><code class="language-bx">&lt;p class=&quot;build-banner&quot;&gt;#$shout( 'built with boxlang' )#&lt;/p&gt;
+</code></pre>
+<h3 id="variabili-di-contesto"><a href="#variabili-di-contesto" id="variabili-di-contesto" name="variabili-di-contesto" class="anchor"></a>Variabili di contesto</h3>
+<p>Il corpo di ogni funzione magica può anche leggere un insieme fisso di
+&quot;variabili di supporto&quot; - allo stato puro, senza bisogno di alcun
+argomento - a prescindere dal fatto che venga richiamata da <code>{{ }}</code> nel
+Markdown oppure allo stato puro da una sovrascrittura di tema:</p>
+<div class="bxsites-table-wrap" x-data="{ q: '' }"><input type="search" class="bxsites-table-filter" x-model="q" placeholder="Filter table..." aria-label="Filter table"><table class="table">
+<thead>
+<tr><th>Variabile</th><th>Cos'è</th></tr>
+</thead>
+<tbody>
+<tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>siteConfig</code></td><td>La configurazione <code>bxsites.yaml</code> propria del sito (già impostata sui valori predefiniti/validata)</td></tr>
+<tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>page</code></td><td>La pagina corrente (vedi la nota sotto - non tutti i campi sono già popolati quando viene richiamata dal Markdown)</td></tr>
+<tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>nav</code></td><td>L'albero di navigazione proprio di questo albero</td></tr>
+<tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>basePath</code></td><td>Il percorso base relativo alla radice, che termina con <code>/</code></td></tr>
+<tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>versions</code></td><td>Le voci del selettore di versione - <code>[ { label, url } ]</code></td></tr>
+<tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>currentVersion</code></td><td>Quale voce di <code>versions</code> viene renderizzata in questo momento</td></tr>
+<tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>locales</code></td><td>Le voci del selettore di lingua - <code>[ { code, label, url, dir, flag } ]</code></td></tr>
+<tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>currentLocale</code></td><td>Il codice di quale voce di <code>locales</code> viene renderizzato in questo momento</td></tr>
+<tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>currentLocaleDir</code></td><td><code>&quot;ltr&quot;</code>/<code>&quot;rtl&quot;</code> per il locale corrente</td></tr>
+<tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>data</code></td><td>I <a href="/it/guides/data-files/index.html">file di dati</a> propri di questo progetto - <code>docs/data/*.yaml</code>/<code>.json</code>, una chiave per ogni file - <code>{}</code> quando il progetto non ne ha</td></tr>
+</tbody>
+</table></div>
+<pre data-bxsites-title="docs&#x2f;functions.bxs"><code class="language-bx">function $sitename() {
+	return siteConfig.name
+}
+
+function $pagetitle() {
+	return page.title
+}
+</code></pre>
+<pre data-bxsites-title="docs&#x2f;index.md"><code class="language-markdown">Site: {{ $sitename() }}
+Page: {{ $pagetitle() }}
+</code></pre>
+<p><strong><code>page</code> non è ugualmente completa in entrambi i casi.</strong> Se richiamata dal
+Markdown, <code>page</code> è lo struct proprio di questa specifica pagina <em>così come
+caricato da disco</em> - <code>title</code>/<code>description</code>/<code>tags</code>/<code>icon</code>/<code>summary</code>/
+<code>ogImage</code>/<code>urlPath</code>/<code>relativePath</code>/<code>body</code>/ecc. sono già presenti, ma i
+campi noti solo dopo che ogni pagina dell'albero ha terminato la
+conversione - <code>toc</code>, <code>prevPage</code>/<code>nextPage</code>, <code>breadcrumbs</code>,
+<code>editUrl</code>/<code>lastUpdated</code>, <code>iconHtml</code>, <code>markdownUrl</code>, <code>canonicalUrl</code>,
+<code>course</code> - non esistono ancora su di essa. Se richiamata allo stato puro
+da <code>page.bxm</code>, <code>page</code> è invece lo struct completamente arricchito, con
+tutti questi campi inclusi.</p>
+<p><code>page.course</code> è sempre presente (uno struct completamente vuoto
+<code>{id:&quot;&quot;, courseTitle:&quot;&quot;, lessonIndex:0, lessonTotal:0, prevLesson:{title:&quot;&quot;,url:&quot;&quot;}, nextLesson:{title:&quot;&quot;,url:&quot;&quot;}, indexUrl:&quot;&quot;}</code>
+per una pagina che non fa parte di alcun <a href="/it/guides/courses/index.html">corso</a>) -
+<code>prevLesson</code>/<code>nextLesson</code> sono limitati a quel singolo corso, in modo
+indipendente dai <code>prevPage</code>/<code>nextPage</code> a livello di sito visti sopra, che
+invece percorrono sempre l'intero albero di navigazione. Ogni altra
+variabile di supporto (<code>siteConfig</code>, <code>nav</code>, <code>basePath</code>, <code>versions</code>,
+<code>currentVersion</code>, <code>locales</code>, <code>currentLocale</code>, <code>currentLocaleDir</code>) è
+identica in entrambi i casi.</p>
+<h3 id="sintassi-degli-argomenti"><a href="#sintassi-degli-argomenti" id="sintassi-degli-argomenti" name="sintassi-degli-argomenti" class="anchor"></a>Sintassi degli argomenti</h3>
+<p>Gli argomenti di una chiamata a funzione magica sono semplici letterali o
+riferimenti a variabili separati da virgola - nessuna chiamata a funzione
+annidata né espressione in questa prima versione:</p>
 <ul>
-<li><strong>La interfaz del blog permanece en inglés.</strong> Las propias cadenas de UI
-del subsistema de blog (&quot;Categories,&quot; &quot;Archive,&quot; &quot;Read more,&quot; &quot;N min
-read,&quot; ...) todavía no están cubiertas por el override de <code>strings</code> de
-arriba - solo lo está el resto de la interfaz del tema.</li>
-<li><strong>El valor de fecha de <code>lastUpdated</code> no depende del idioma.</strong> Su
-etiqueta se traduce; el propio valor de fecha/hora se sigue formateando
-igual sin importar el idioma.</li>
-<li><strong>El espejado de diseño RTL es básico, no pixel-perfecto.</strong> <code>dir=&quot;rtl&quot;</code>
-se establece correctamente, y la barra lateral/cabecera se reflejan de
-verdad, pero algunos detalles decorativos (el lado de la barra de
-acento de una admonición, por ejemplo) todavía no se voltean.</li>
-<li><strong>Sin traducción automatizada.</strong> Cada archivo de <code>docs/i18n/&lt;code&gt;/</code>
-se redacta a mano, igual que cualquier otra página de markdown - no hay
-ningún paso de traducción automática.</li>
+<li>Numeri: <code>{{ $discount(20) }}</code></li>
+<li>Stringhe tra virgolette: <code>{{ $greet('World') }}</code> oppure
+<code>{{ $greet(&quot;World&quot;) }}</code></li>
+<li>Booleani: <code>{{ $badge('Beta', true) }}</code></li>
+<li>Un riferimento a variabile puntato senza <code>{{ }}</code>:
+<code>{{ $greet(product.name) }}</code></li>
 </ul>
-<h2 id="iconos-personalizados-e-inclusiones"><a href="#iconos-personalizados-e-inclusiones" id="iconos-personalizados-e-inclusiones" name="iconos-personalizados-e-inclusiones" class="anchor"></a>Iconos personalizados e inclusiones</h2>
-<p>Una referencia de icono <code>custom:</code> y un <code>::: include</code> se resuelven ambos
-contra los propios <code>docs/assets/</code>/contenido reutilizable de tu proyecto,
-independientemente de qué idioma se esté construyendo - son recursos
-compartidos, no algo que un traductor necesite duplicar por idioma.</p>
-<h2 id="seo"><a href="#seo" id="seo" name="seo" class="anchor"></a>SEO</h2>
-<p>Las páginas de cada idioma se incluyen en <code>sitemap.xml</code> y <code>llms.txt</code>
-junto a las del propio idioma predeterminado, de la misma forma que lo
-hacen las páginas <a href="/es/configuration/index.html#versionado">versionadas</a>.</p>
+<h2 id="ricette-per-i-visualizzatori"><a href="#ricette-per-i-visualizzatori" id="ricette-per-i-visualizzatori" name="ricette-per-i-visualizzatori" class="anchor"></a>Ricette per i visualizzatori</h2>
+<p>Una funzione magica che restituisce HTML non si limita a un badge di
+stato - è un modo generico per ottenere celle visive (una valutazione a
+stelle, un chip colorato, una barra di progresso) senza bisogno di alcun
+selettore di colonne basato su database - il codice sorgente di
+bx-sites, basato su git e Markdown puro, non ne ha un equivalente. Le
+quattro funzioni qui sotto sono lo stesso
+<a href="https://github.com/ortus-boxlang/bx-sites/blob/development/docs/functions.bxs"><code>docs/functions.bxs</code></a>
+di questo sito, renderizzate dal vivo proprio in questa pagina.</p>
+<h3 id="valutazioni"><a href="#valutazioni" id="valutazioni" name="valutazioni" class="anchor"></a>Valutazioni</h3>
+<pre data-bxsites-title="docs&#x2f;functions.bxs"><code class="language-bx">function $stars( required numeric rating, numeric max = 5 ) {
+	var filled = min( max( round( arguments.rating ), 0 ), arguments.max )
+	var stars = repeatString( &quot;★&quot;, filled ) &amp; repeatString( &quot;☆&quot;, arguments.max - filled )
+	return '&lt;span title=&quot;' &amp; arguments.rating &amp; ' out of ' &amp; arguments.max &amp; '&quot; style=&quot;color:##f5a623;letter-spacing:2px&quot;&gt;' &amp; stars &amp; '&lt;/span&gt;'
+}
+</code></pre>
+<p><code>`{{ $stars(4) }}`</code> viene renderizzato come: <span title="4 out of 5" style="color:#f5a623;letter-spacing:2px">★★★★☆</span></p>
+<h3 id="chip-di-stato"><a href="#chip-di-stato" id="chip-di-stato" name="chip-di-stato" class="anchor"></a>Chip di stato</h3>
+<pre data-bxsites-title="docs&#x2f;functions.bxs"><code class="language-bx">function $badge( required string label, string kind = &quot;info&quot; ) {
+	var palette = {
+		&quot;info&quot;    : { &quot;bg&quot; : &quot;##e0edff&quot;, &quot;fg&quot; : &quot;##1d4ed8&quot; },
+		&quot;success&quot; : { &quot;bg&quot; : &quot;##dcfce7&quot;, &quot;fg&quot; : &quot;##15803d&quot; },
+		&quot;danger&quot;  : { &quot;bg&quot; : &quot;##fee2e2&quot;, &quot;fg&quot; : &quot;##b91c1c&quot; },
+		&quot;warning&quot; : { &quot;bg&quot; : &quot;##fef9c3&quot;, &quot;fg&quot; : &quot;##854d0e&quot; }
+	}
+	var pick = palette.keyExists( arguments.kind ) ? palette[ arguments.kind ] : { &quot;bg&quot; : &quot;##f1f5f9&quot;, &quot;fg&quot; : &quot;##475569&quot; }
+	return '&lt;span style=&quot;display:inline-block;padding:0.1em 0.6em;border-radius:999px;font-size:0.85em;font-weight:600;background:'
+		&amp; pick.bg &amp; &quot;;color:&quot; &amp; pick.fg &amp; '&quot;&gt;' &amp; encodeForHTML( arguments.label ) &amp; &quot;&lt;/span&gt;&quot;
+}
+</code></pre>
+<p><code>`{{ $badge('Stable', 'success') }}`</code> viene renderizzato come: <span style="display:inline-block;padding:0.1em 0.6em;border-radius:999px;font-size:0.85em;font-weight:600;background:#dcfce7;color:#15803d">Stable</span> - e <code>`{{ $badge('Beta', 'info') }}`</code>: <span style="display:inline-block;padding:0.1em 0.6em;border-radius:999px;font-size:0.85em;font-weight:600;background:#e0edff;color:#1d4ed8">Beta</span></p>
+<h3 id="barre-di-progresso"><a href="#barre-di-progresso" id="barre-di-progresso" name="barre-di-progresso" class="anchor"></a>Barre di progresso</h3>
+<pre data-bxsites-title="docs&#x2f;functions.bxs"><code class="language-bx">function $progress( required numeric percent ) {
+	var pct = min( max( arguments.percent, 0 ), 100 )
+	return '&lt;span style=&quot;display:inline-block;width:120px;height:8px;background:##e5e7eb;border-radius:999px;overflow:hidden;vertical-align:middle&quot;&gt;&lt;span style=&quot;display:block;height:100%;width:'
+		&amp; pct &amp; '%;background:##2563eb&quot;&gt;&lt;/span&gt;&lt;/span&gt; ' &amp; pct &amp; &quot;%&quot;
+}
+</code></pre>
+<p><code>`{{ $progress(72) }}`</code> viene renderizzato come: <span style="display:inline-block;width:120px;height:8px;background:#e5e7eb;border-radius:999px;overflow:hidden;vertical-align:middle"><span style="display:block;height:100%;width:72%;background:#2563eb"></span></span> 72%</p>
+<h3 id="indicatori-di-tendenza"><a href="#indicatori-di-tendenza" id="indicatori-di-tendenza" name="indicatori-di-tendenza" class="anchor"></a>Indicatori di tendenza</h3>
+<pre data-bxsites-title="docs&#x2f;functions.bxs"><code class="language-bx">function $trend( required numeric value ) {
+	var isUp = arguments.value &gt;= 0
+	var arrow = isUp ? &quot;▲&quot; : &quot;▼&quot;
+	var color = isUp ? &quot;##16a34a&quot; : &quot;##dc2626&quot;
+	var sign = isUp ? &quot;+&quot; : &quot;&quot;
+	return '&lt;span style=&quot;color:' &amp; color &amp; ';font-weight:600&quot;&gt;' &amp; arrow &amp; &quot; &quot; &amp; sign &amp; numberFormat( arguments.value, &quot;0.0&quot; ) &amp; &quot;%&lt;/span&gt;&quot;
+}
+</code></pre>
+<p><code>`{{ $trend(4.2) }}`</code> viene renderizzato come: <span style="color:#16a34a;font-weight:600">▲ +4.2%</span> - <code>`{{ $trend(-1.8) }}`</code>: <span style="color:#dc2626;font-weight:600">▼ -1.8%</span></p>
+<h3 id="dentro-una-cella-di-tabella"><a href="#dentro-una-cella-di-tabella" id="dentro-una-cella-di-tabella" name="dentro-una-cella-di-tabella" class="anchor"></a>Dentro una cella di tabella</h3>
+<p><code>{{ }}</code> si risolve rispetto al Markdown grezzo prima ancora che le
+<a href="/it/guides/tables/index.html">tabelle</a> vengano analizzate, quindi qualsiasi
+elemento tra quelli sopra funziona anche dentro le celle di una tabella a
+pipe, esattamente come in qualsiasi altro punto della pagina:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="Example"><code class="language-markdown">| Feature | Status | Rating |
+| --- | --- | --- |
+| Dark mode | {{ $badge('Stable', 'success') }} | {{ $stars(5) }} |
+| Table sort | {{ $badge('Beta', 'info') }} | {{ $stars(4) }} |
+</code></pre>
+<p>Che viene renderizzato così:</p>
+<div class="bxsites-table-wrap"><table class="table">
+<thead>
+<tr><th>Feature</th><th>Status</th><th>Rating</th></tr>
+</thead>
+<tbody>
+<tr><td>Dark mode</td><td><span style="display:inline-block;padding:0.1em 0.6em;border-radius:999px;font-size:0.85em;font-weight:600;background:#dcfce7;color:#15803d">Stable</span></td><td><span title="5 out of 5" style="color:#f5a623;letter-spacing:2px">★★★★★</span></td></tr>
+<tr><td>Table sort</td><td><span style="display:inline-block;padding:0.1em 0.6em;border-radius:999px;font-size:0.85em;font-weight:600;background:#e0edff;color:#1d4ed8">Beta</span></td><td><span title="4 out of 5" style="color:#f5a623;letter-spacing:2px">★★★★☆</span></td></tr>
+</tbody>
+</table></div>
+<h2 id="mostrare-la-sintassi-in-modo-letterale"><a href="#mostrare-la-sintassi-in-modo-letterale" id="mostrare-la-sintassi-in-modo-letterale" name="mostrare-la-sintassi-in-modo-letterale" class="anchor"></a>Mostrare la sintassi in modo letterale</h2>
+<p>Un <code>{{ }}</code> mostrato dentro un blocco di codice delimitato (tre o più
+backtick, come ogni esempio in questa pagina) viene lasciato del tutto
+intatto invece di essere risolto - la stessa convenzione che questo
+modulo usa già per la matematica <code>&#x24;...&#x24;</code> e per le schede di contenuto
+<code>=== &quot;Tab&quot;</code>. A differenza di queste due, un <code>{{ }}</code> mostrato in codice
+<em>inline</em> (<code>`{{ example }}`</code>, con singolo o doppio backtick) è
+protetto anch'esso - ogni punto elenco più sopra che mostra
+<code>`{{ $discount(20) }}`</code> inline è un esempio reale e funzionante di
+questo.</p>
+<p>Un <code>{{ }}</code> il cui contenuto non assomiglia né a un percorso di variabile
+né a una chiamata <code>$name(...)</code> - la sintassi <code>{{ }}</code> propria di un altro
+motore di template, mostrata in un testo discorsivo, ad esempio - viene
+lasciato intatto invece di essere trattato come un errore. Solo un token
+che <em>sembra</em> una variabile o una chiamata a funzione magica, ma che non
+si risolve, fa fallire il build (vedi <a href="#errori">Errori</a> sotto) - questo è
+deliberato, per intercettare un vero errore di battitura senza
+interpretare erroneamente un testo <code>{{ }}</code> non correlato come sintassi
+rotta.</p>
+<h2 id="ambito"><a href="#ambito" id="ambito" name="ambito" class="anchor"></a>Ambito</h2>
+<ul>
+<li><code>functions.bxs</code> è a livello di progetto - un solo file, caricato una
+volta, con lo stesso insieme di funzioni magiche disponibile su ogni
+pagina, sia nell'albero principale sia in ogni albero di
+<a href="/it/guides/versioning/index.html">versione</a>/<a href="/it/guides/i18n/index.html">locale</a>. Non è necessario
+duplicarlo in <code>docs/versions/&lt;name&gt;/</code> o <code>docs/i18n/&lt;code&gt;/</code>.</li>
+<li><code>variables</code> è allo stesso modo un unico blocco di <code>bxsites.yaml</code> a
+livello di progetto - non è di per sé traducibile per locale. Un
+progetto multilingue che desideri un testo di variabile diverso per
+ogni lingua può invece ricorrere a una funzione magica che smisti in
+base a <code>siteConfig.i18n.defaultLocale.code</code> (oppure, semplicemente,
+mantenere il valore neutro rispetto alla lingua - un nome di prodotto,
+un indirizzo di supporto).</li>
+</ul>
+<h2 id="nomi-riservati"><a href="#nomi-riservati" id="nomi-riservati" name="nomi-riservati" class="anchor"></a>Nomi riservati</h2>
+<p>Una sovrascrittura <code>theme/page.bxm</code>/<code>layout.bxm</code> che richiama una
+funzione magica allo stato puro (<code>$name(...)</code>) funziona perché ogni
+funzione caricata - con prefisso <code>$</code> o helper privato indifferentemente -
+viene collegata direttamente nello stesso scope di rendering di quel
+template, proprio accanto ai <code>variables.page</code>/<code>variables.siteConfig</code>/ecc.
+integrati che ogni tema già legge. Questo significa che una funzione di
+<code>functions.bxs</code> che condivide un nome con uno di questi ne ha già uno:
+evita <code>page</code>, <code>nav</code>, <code>siteConfig</code>, <code>themeDir</code>, <code>basePath</code>,
+<code>moduleAssetsDir</code>, <code>versions</code>, <code>currentVersion</code>, <code>locales</code>,
+<code>currentLocale</code>, <code>currentLocaleDir</code>, <code>strings</code>, <code>requiredFiles</code>,
+<code>stringsResolver</code> e <code>data</code> come nome proprio di un helper privato (una
+funzione magica con prefisso <code>$</code> non può mai entrare in collisione con
+nessuno di questi, dato che nessuno di essi inizia con <code>$</code>). Vedi
+<a href="/it/guides/data-files/index.html#scope">File di dati: Ambito</a> per la nota sui nomi
+riservati propria di <code>data</code>.</p>
+<h2 id="errori"><a href="#errori" id="errori" name="errori" class="anchor"></a>Errori</h2>
+<ul>
+<li><code>BxSites.UnknownVariable</code> - un <code>{{ dotted.path }}</code> (o un argomento di
+<code>$name(...)</code> che assomiglia a un riferimento a variabile) non
+corrisponde a nulla nel blocco <code>variables</code> di <code>bxsites.yaml</code>.</li>
+<li><code>BxSites.UnknownFunction</code> - una chiamata <code>{{ $name(...) }}</code> non
+corrisponde a nessuna funzione con prefisso <code>$</code> in
+<code>docs/functions.bxs</code>.</li>
+<li><code>BxSites.InvalidFunctions</code> - <code>docs/functions.bxs</code> non è riuscito a
+caricarsi (un errore di sintassi BoxLang nel file stesso).</li>
+<li><code>BxSites.InvalidConfig</code> - la chiave <code>variables</code> di <code>bxsites.yaml</code> è
+presente, ma non è un oggetto.</li>
+</ul>
 
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/es/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Sep 16, 2026, 11&#x3a;38&#x3a;11 AM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/it/guides/variables-and-functions.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/it/guides/variables-and-functions.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Sep 16, 2026, 12&#x3a;15&#x3a;29 PM</span></div>
 
 				</article>
 
 
-				<nav class="page-nav d-flex justify-content-between" aria-label="Navegaci&oacute;n de p&aacute;gina">
+				<nav class="page-nav d-flex justify-content-between" aria-label="Navigazione della pagina">
 
-					<a class="page-nav__prev" href="/es/guides/redirects/index.html">&larr; Redirecciones</a>
+					<a class="page-nav__prev" href="/it/guides/courses/index.html">&larr; Corsi</a>
 
 
 
-					<a class="page-nav__next" href="/es/guides/blog/index.html">Blog &rarr;</a>
+					<a class="page-nav__next" href="/it/guides/themes/index.html">Temi &rarr;</a>
 
 				</nav>
 
@@ -419,7 +477,7 @@ hacen las páginas <a href="/es/configuration/index.html#versionado">versionadas
 			</main>
 
 			<aside class="col-xl-2 toc-sidebar d-none d-xl-block">
-				<nav class="toc mb-4" aria-label="En esta p&aacute;gina"><div class="toc-title">En esta p&aacute;gina</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#añadir-un-idioma">A&ntilde;adir un idioma</a></li><li class="toc-level-2"><a href="#qué-se-construye">Qu&eacute; se construye</a></li><li class="toc-level-2"><a href="#páginas-sin-traducir">P&aacute;ginas sin traducir</a></li><li class="toc-level-2"><a href="#el-selector-de-idioma">El selector de idioma</a></li><li class="toc-level-2"><a href="#docs-versionados-y-traducidos">Docs versionados y traducidos</a></li><li class="toc-level-2"><a href="#interfaz-del-tema-cadenas-de-ui">Interfaz del tema &#x28;cadenas de UI&#x29;</a></li><li class="toc-level-2"><a href="#qué-queda-fuera-de-alcance-por-ahora">Qu&eacute; queda fuera de alcance &#x28;por ahora&#x29;</a></li><li class="toc-level-2"><a href="#iconos-personalizados-e-inclusiones">Iconos personalizados e inclusiones</a></li><li class="toc-level-2"><a href="#seo">SEO</a></li></ul></nav>
+				<nav class="toc mb-4" aria-label="In questa pagina"><div class="toc-title">In questa pagina</div><ul class="list-unstyled"><li class="toc-level-2"><a href="#variabili-riutilizzabili">Variabili riutilizzabili</a></li><li class="toc-level-2"><a href="#funzioni-magiche">Funzioni magiche</a></li><li class="toc-level-3"><a href="#richiamare-una-funzione-magica-da-una-sovrascrittura-di-tema">Richiamare una funzione magica da una sovrascrittura di tema</a></li><li class="toc-level-3"><a href="#variabili-di-contesto">Variabili di contesto</a></li><li class="toc-level-3"><a href="#sintassi-degli-argomenti">Sintassi degli argomenti</a></li><li class="toc-level-2"><a href="#ricette-per-i-visualizzatori">Ricette per i visualizzatori</a></li><li class="toc-level-3"><a href="#valutazioni">Valutazioni</a></li><li class="toc-level-3"><a href="#chip-di-stato">Chip di stato</a></li><li class="toc-level-3"><a href="#barre-di-progresso">Barre di progresso</a></li><li class="toc-level-3"><a href="#indicatori-di-tendenza">Indicatori di tendenza</a></li><li class="toc-level-3"><a href="#dentro-una-cella-di-tabella">Dentro una cella di tabella</a></li><li class="toc-level-2"><a href="#mostrare-la-sintassi-in-modo-letterale">Mostrare la sintassi in modo letterale</a></li><li class="toc-level-2"><a href="#ambito">Ambito</a></li><li class="toc-level-2"><a href="#nomi-riservati">Nomi riservati</a></li><li class="toc-level-2"><a href="#errori">Errori</a></li></ul></nav>
 			</aside>
 
 		</div>
@@ -435,39 +493,39 @@ hacen las páginas <a href="/es/configuration/index.html#versionado">versionadas
 		</div>
 	</footer>
 
-	<script src="/es/assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
-	<script src="/es/assets/vendor/highlight/highlight.min.js"></script>
-	<script src="/es/assets/highlight-boxlang.js"></script>
+	<script src="/it/assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+	<script src="/it/assets/vendor/highlight/highlight.min.js"></script>
+	<script src="/it/assets/highlight-boxlang.js"></script>
 	<script>hljs.highlightAll();</script>
-	<script src="/es/assets/code-lines.js"></script>
-	<script src="/es/assets/copy-code.js" defer></script>
-	<script src="/es/assets/admonition-collapse.js" defer></script>
-	<script src="/es/assets/nav-toggle.js" defer></script>
-	<script src="/es/assets/toc-collapse.js" defer></script>
-	<script src="/es/assets/tabs.js" defer></script>
-	<script src="/es/assets/conditional-content-init.js" defer></script>
-	<script src="/es/assets/course-progress.js" defer></script>
-	<script src="/es/assets/prompt-init.js" defer></script>
-	<script src="/es/assets/contact-form-init.js" defer></script>
+	<script src="/it/assets/code-lines.js"></script>
+	<script src="/it/assets/copy-code.js" defer></script>
+	<script src="/it/assets/admonition-collapse.js" defer></script>
+	<script src="/it/assets/nav-toggle.js" defer></script>
+	<script src="/it/assets/toc-collapse.js" defer></script>
+	<script src="/it/assets/tabs.js" defer></script>
+	<script src="/it/assets/conditional-content-init.js" defer></script>
+	<script src="/it/assets/course-progress.js" defer></script>
+	<script src="/it/assets/prompt-init.js" defer></script>
+	<script src="/it/assets/contact-form-init.js" defer></script>
 
-	<script src="/es/assets/page-actions-init.js" defer></script>
+	<script src="/it/assets/page-actions-init.js" defer></script>
 
 
-	<script src="/es/assets/vendor/mermaid/mermaid.min.js"></script>
-	<script src="/es/assets/mermaid-init.js"></script>
+	<script src="/it/assets/vendor/mermaid/mermaid.min.js"></script>
+	<script src="/it/assets/mermaid-init.js"></script>
 
 
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-	<script src="/es/assets/math-init.js"></script>
+	<script src="/it/assets/math-init.js"></script>
 
 
-	<script src="/es/assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
-	<script src="/es/assets/openapi-init.js"></script>
+	<script src="/it/assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
+	<script src="/it/assets/openapi-init.js"></script>
 
 
 
-	<script src="/es/assets/bundle.a432a71f.js" defer></script>
+	<script src="/it/assets/bundle.a432a71f.js" defer></script>
 </body>
 </html>
 
