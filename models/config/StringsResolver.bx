@@ -27,130 +27,132 @@
  * itself replaces for the rest of the theme chrome.
  */
 class {
+	static {
 
-	/**
-	 * The English default for every theme-chrome string this class knows
-	 * about - the fallback whenever a locale has no built-in translation
-	 * and no project override either.
-	 */
-	variables.defaults = {
-		"searchPlaceholder"    : "Search docs...",
-		"searchAriaLabel"      : "Search",
-		"searchNoResults"      : "No results found.",
-		"toggleDarkMode"       : "Toggle dark mode",
-		"toggleNavigation"     : "Toggle navigation",
-		"toggleSection"        : "Toggle {title} section",
-		"repository"           : "Repository",
-		"version"              : "Version",
-		"language"             : "Language: {label}",
-		"onThisPage"           : "On this page",
-		"editThisPage"         : "Edit this page",
-		"downloadMarkdown"     : "Download Markdown",
-		"lastUpdated"          : "Last updated",
-		"notTranslatedNotice"  : "This page hasn't been translated yet - showing the {locale} version.",
-		"notFoundTitle"        : "Page Not Found",
-		"notFoundBody"         : "Sorry, that page doesn't exist. Try the search box, or head back to the homepage.",
-		"tagsTitle"            : "Tags",
-		"pageNavigation"       : "Page navigation",
-		"pageActionsButton"    : "Copy",
-		"pageActionsAriaLabel" : "Page actions",
-		"copyPageMarkdown"     : "Copy page",
-		"viewAsMarkdown"       : "View as Markdown",
-		"copyPageLink"         : "Copy link",
-		"openInChatGPT"        : "Open in ChatGPT",
-		"openInClaude"         : "Open in Claude",
-		"exportAsPdf"          : "Export as PDF",
-		"reportIssue"          : "Report an issue",
-		"shareOnX"             : "Share on X",
-		"shareOnLinkedIn"      : "Share on LinkedIn",
-		"shareOnFacebook"      : "Share on Facebook"
-	}
+		/**
+		 * The English default for every theme-chrome string this class knows
+		 * about - the fallback whenever a locale has no built-in translation
+		 * and no project override either.
+		 */
+		defaults = {
+			"searchPlaceholder"    : "Search...",
+			"searchAriaLabel"      : "Search",
+			"searchNoResults"      : "No results found.",
+			"toggleDarkMode"       : "Toggle dark mode",
+			"toggleNavigation"     : "Toggle navigation",
+			"toggleSection"        : "Toggle {title} section",
+			"repository"           : "Repository",
+			"version"              : "Version",
+			"language"             : "Language: {label}",
+			"onThisPage"           : "On this page",
+			"editThisPage"         : "Edit this page",
+			"downloadMarkdown"     : "Download Markdown",
+			"lastUpdated"          : "Last updated",
+			"notTranslatedNotice"  : "This page hasn't been translated yet - showing the {locale} version.",
+			"notFoundTitle"        : "Page Not Found",
+			"notFoundBody"         : "Sorry, that page doesn't exist. Try the search box, or head back to the homepage.",
+			"tagsTitle"            : "Tags",
+			"pageNavigation"       : "Page navigation",
+			"pageActionsButton"    : "Copy",
+			"pageActionsAriaLabel" : "Page actions",
+			"copyPageMarkdown"     : "Copy page",
+			"viewAsMarkdown"       : "View as Markdown",
+			"copyPageLink"         : "Copy link",
+			"openInChatGPT"        : "Open in ChatGPT",
+			"openInClaude"         : "Open in Claude",
+			"exportAsPdf"          : "Export as PDF",
+			"reportIssue"          : "Report an issue",
+			"shareOnX"             : "Share on X",
+			"shareOnLinkedIn"      : "Share on LinkedIn",
+			"shareOnFacebook"      : "Share on Facebook"
+		}
 
-	/**
-	 * Built-in translations for the locales this module ships one for -
-	 * every key from `defaults` above, translated. Keyed lowercase; looked
-	 * up case-insensitively in `resolve()`.
-	 */
-	variables.builtIn = {
-		"de" : {
-			"searchPlaceholder"   : "Dokumentation durchsuchen...",
-			"searchAriaLabel"     : "Suche",
-			"searchNoResults"     : "Keine Ergebnisse gefunden.",
-			"toggleDarkMode"      : "Dunkelmodus umschalten",
-			"toggleNavigation"    : "Navigation umschalten",
-			"toggleSection"       : "Abschnitt „{title}“ umschalten",
-			"repository"          : "Repository",
-			"version"             : "Version",
-			"language"            : "Sprache: {label}",
-			"onThisPage"          : "Auf dieser Seite",
-			"editThisPage"        : "Diese Seite bearbeiten",
-			"downloadMarkdown"    : "Markdown herunterladen",
-			"lastUpdated"         : "Zuletzt aktualisiert",
-			"notTranslatedNotice" : "Diese Seite wurde noch nicht übersetzt - es wird die {locale}-Version angezeigt.",
-			"notFoundTitle"       : "Seite nicht gefunden",
-			"notFoundBody"        : "Diese Seite existiert leider nicht. Nutze die Suche oder kehre zur Startseite zurück.",
-			"tagsTitle"           : "Tags",
-			"pageNavigation"      : "Seitennavigation"
-		},
-		"es" : {
-			"searchPlaceholder"   : "Buscar en la documentación...",
-			"searchAriaLabel"     : "Buscar",
-			"searchNoResults"     : "No se encontraron resultados.",
-			"toggleDarkMode"      : "Alternar modo oscuro",
-			"toggleNavigation"    : "Alternar navegación",
-			"toggleSection"       : "Alternar sección {title}",
-			"repository"          : "Repositorio",
-			"version"             : "Versión",
-			"language"            : "Idioma: {label}",
-			"onThisPage"          : "En esta página",
-			"editThisPage"        : "Editar esta página",
-			"downloadMarkdown"    : "Descargar Markdown",
-			"lastUpdated"         : "Última actualización",
-			"notTranslatedNotice" : "Esta página aún no se ha traducido - se muestra la versión en {locale}.",
-			"notFoundTitle"       : "Página no encontrada",
-			"notFoundBody"        : "Lo sentimos, esa página no existe. Prueba el buscador o vuelve a la página de inicio.",
-			"tagsTitle"           : "Etiquetas",
-			"pageNavigation"      : "Navegación de página"
-		},
-		"it" : {
-			"searchPlaceholder"   : "Cerca nella documentazione...",
-			"searchAriaLabel"     : "Cerca",
-			"searchNoResults"     : "Nessun risultato trovato.",
-			"toggleDarkMode"      : "Attiva/disattiva modalità scura",
-			"toggleNavigation"    : "Attiva/disattiva navigazione",
-			"toggleSection"       : "Attiva/disattiva sezione {title}",
-			"repository"          : "Repository",
-			"version"             : "Versione",
-			"language"            : "Lingua: {label}",
-			"onThisPage"          : "In questa pagina",
-			"editThisPage"        : "Modifica questa pagina",
-			"downloadMarkdown"    : "Scarica Markdown",
-			"lastUpdated"         : "Ultimo aggiornamento",
-			"notTranslatedNotice" : "Questa pagina non è ancora stata tradotta - viene mostrata la versione in {locale}.",
-			"notFoundTitle"       : "Pagina non trovata",
-			"notFoundBody"        : "Questa pagina non esiste. Prova la ricerca oppure torna alla home page.",
-			"tagsTitle"           : "Tag",
-			"pageNavigation"      : "Navigazione della pagina"
-		},
-		"ja" : {
-			"searchPlaceholder"   : "ドキュメントを検索...",
-			"searchAriaLabel"     : "検索",
-			"searchNoResults"     : "該当する結果が見つかりませんでした。",
-			"toggleDarkMode"      : "ダークモードの切り替え",
-			"toggleNavigation"    : "ナビゲーションの切り替え",
-			"toggleSection"       : "「{title}」セクションの切り替え",
-			"repository"          : "リポジトリ",
-			"version"             : "バージョン",
-			"language"            : "言語: {label}",
-			"onThisPage"          : "このページの内容",
-			"editThisPage"        : "このページを編集",
-			"downloadMarkdown"    : "Markdownをダウンロード",
-			"lastUpdated"         : "最終更新",
-			"notTranslatedNotice" : "このページはまだ翻訳されていません - {locale}版を表示しています。",
-			"notFoundTitle"       : "ページが見つかりません",
-			"notFoundBody"        : "そのページは存在しません。検索を試すか、ホームページに戻ってください。",
-			"tagsTitle"           : "タグ",
-			"pageNavigation"      : "ページナビゲーション"
+		/**
+		 * Built-in translations for the locales this module ships one for -
+		 * every key from `defaults` above, translated. Keyed lowercase; looked
+		 * up case-insensitively in `resolve()`.
+		 */
+		builtIn = {
+			"de" : {
+				"searchPlaceholder"   : "Dokumentation durchsuchen...",
+				"searchAriaLabel"     : "Suche",
+				"searchNoResults"     : "Keine Ergebnisse gefunden.",
+				"toggleDarkMode"      : "Dunkelmodus umschalten",
+				"toggleNavigation"    : "Navigation umschalten",
+				"toggleSection"       : "Abschnitt „{title}“ umschalten",
+				"repository"          : "Repository",
+				"version"             : "Version",
+				"language"            : "Sprache: {label}",
+				"onThisPage"          : "Auf dieser Seite",
+				"editThisPage"        : "Diese Seite bearbeiten",
+				"downloadMarkdown"    : "Markdown herunterladen",
+				"lastUpdated"         : "Zuletzt aktualisiert",
+				"notTranslatedNotice" : "Diese Seite wurde noch nicht übersetzt - es wird die {locale}-Version angezeigt.",
+				"notFoundTitle"       : "Seite nicht gefunden",
+				"notFoundBody"        : "Diese Seite existiert leider nicht. Nutze die Suche oder kehre zur Startseite zurück.",
+				"tagsTitle"           : "Tags",
+				"pageNavigation"      : "Seitennavigation"
+			},
+			"es" : {
+				"searchPlaceholder"   : "Buscar en la documentación...",
+				"searchAriaLabel"     : "Buscar",
+				"searchNoResults"     : "No se encontraron resultados.",
+				"toggleDarkMode"      : "Alternar modo oscuro",
+				"toggleNavigation"    : "Alternar navegación",
+				"toggleSection"       : "Alternar sección {title}",
+				"repository"          : "Repositorio",
+				"version"             : "Versión",
+				"language"            : "Idioma: {label}",
+				"onThisPage"          : "En esta página",
+				"editThisPage"        : "Editar esta página",
+				"downloadMarkdown"    : "Descargar Markdown",
+				"lastUpdated"         : "Última actualización",
+				"notTranslatedNotice" : "Esta página aún no se ha traducido - se muestra la versión en {locale}.",
+				"notFoundTitle"       : "Página no encontrada",
+				"notFoundBody"        : "Lo sentimos, esa página no existe. Prueba el buscador o vuelve a la página de inicio.",
+				"tagsTitle"           : "Etiquetas",
+				"pageNavigation"      : "Navegación de página"
+			},
+			"it" : {
+				"searchPlaceholder"   : "Cerca nella documentazione...",
+				"searchAriaLabel"     : "Cerca",
+				"searchNoResults"     : "Nessun risultato trovato.",
+				"toggleDarkMode"      : "Attiva/disattiva modalità scura",
+				"toggleNavigation"    : "Attiva/disattiva navigazione",
+				"toggleSection"       : "Attiva/disattiva sezione {title}",
+				"repository"          : "Repository",
+				"version"             : "Versione",
+				"language"            : "Lingua: {label}",
+				"onThisPage"          : "In questa pagina",
+				"editThisPage"        : "Modifica questa pagina",
+				"downloadMarkdown"    : "Scarica Markdown",
+				"lastUpdated"         : "Ultimo aggiornamento",
+				"notTranslatedNotice" : "Questa pagina non è ancora stata tradotta - viene mostrata la versione in {locale}.",
+				"notFoundTitle"       : "Pagina non trovata",
+				"notFoundBody"        : "Questa pagina non esiste. Prova la ricerca oppure torna alla home page.",
+				"tagsTitle"           : "Tag",
+				"pageNavigation"      : "Navigazione della pagina"
+			},
+			"ja" : {
+				"searchPlaceholder"   : "ドキュメントを検索...",
+				"searchAriaLabel"     : "検索",
+				"searchNoResults"     : "該当する結果が見つかりませんでした。",
+				"toggleDarkMode"      : "ダークモードの切り替え",
+				"toggleNavigation"    : "ナビゲーションの切り替え",
+				"toggleSection"       : "「{title}」セクションの切り替え",
+				"repository"          : "リポジトリ",
+				"version"             : "バージョン",
+				"language"            : "言語: {label}",
+				"onThisPage"          : "このページの内容",
+				"editThisPage"        : "このページを編集",
+				"downloadMarkdown"    : "Markdownをダウンロード",
+				"lastUpdated"         : "最終更新",
+				"notTranslatedNotice" : "このページはまだ翻訳されていません - {locale}版を表示しています。",
+				"notFoundTitle"       : "ページが見つかりません",
+				"notFoundBody"        : "そのページは存在しません。検索を試すか、ホームページに戻ってください。",
+				"tagsTitle"           : "タグ",
+				"pageNavigation"      : "ページナビゲーション"
+			}
 		}
 	}
 
@@ -169,9 +171,9 @@ class {
 	 */
 	struct function resolve( required string localeCode, required struct i18nConfig ) {
 		var code = len( trim( arguments.localeCode ) ) ? arguments.localeCode : arguments.i18nConfig.defaultLocale.code
-		var merged = duplicate( variables.defaults )
+		var merged = duplicate( static.defaults )
 
-		var builtInTranslation = variables.builtIn[ lCase( trim( code ) ) ] ?: {}
+		var builtInTranslation = static.builtIn[ lCase( trim( code ) ) ] ?: {}
 		for ( var key in builtInTranslation ) {
 			merged[ key ] = builtInTranslation[ key ]
 		}
