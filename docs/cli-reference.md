@@ -82,8 +82,8 @@ in `site/`: `docs/**/*.md` when the project uses `docs/` (the default), or
 `search` is `false` in the site config, or `searchProvider` is set to a
 provider - like `algolia`/`pagefind` - that doesn't use it, see
 [Search](guides/search.md)), runs the `pagefind` CLI against the finished
-`site/` when `searchProvider.provider` is `"pagefind"`, and copies theme +
-`docs/assets/**` into `site/`.
+`site/` when `searchProvider.provider` is `"pagefind"`, and copies the theme
+and the source directory's `assets/**` into `site/`.
 
 ```bash frame="terminal" title="Terminal"
 bxSites build
