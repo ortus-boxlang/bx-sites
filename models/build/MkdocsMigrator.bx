@@ -299,6 +299,14 @@ class {
 		return arguments.mkdocsNav.map( entry => convertNavEntry( entry ) )
 	}
 
+	/**
+	 * Converts one mkdocs nav entry into a bx-sites navigation node.
+	 * Scalar entries become page links; keyed arrays become nested groups; and
+	 * keyed scalar values become titled page links.
+	 *
+	 * @entry A scalar path or a one-key struct from mkdocs.yml's nav array
+	 * @return A bx-sites nav node with title, path, and children keys
+	 */
 	private struct function convertNavEntry( required any entry ) {
 		if ( isSimpleValue( arguments.entry ) ) {
 			return { title : "", path : arguments.entry, children : [] }

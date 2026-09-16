@@ -15,6 +15,9 @@ class {
 	/** Image processor used to build responsive image variants. */
 	property name="imageVariantGenerator";
 
+	/**
+	 * Initializes all the necessary build pipeline components.
+	 */
 	variables.configLoader     = new "models.config.ConfigLoader@bxsites"()
 	variables.sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
 	variables.stringsResolver  = new "models.config.StringsResolver@bxsites"()
@@ -139,7 +142,9 @@ class {
 		variables.profileTimings = []
 		variables.profileLastAt = buildStartedAt
 		variables.canonicalAssetsDir = ""
-		progress( "Loading configuration and content" )
+
+		progress( "Loading configuration and content..." )
+
 		var config = variables.configLoader.load( root )
 		var plugins = resolvePlugins( config )
 		config = variables.pluginLoader.applyOnConfig( plugins, config )
@@ -169,13 +174,15 @@ class {
 		var siteOrigin = len( urls.absolute ) ? left( urls.absolute, len( urls.absolute ) - len( urls.basePath ) ) : ""
 		var themeDir = variables.themeRenderer.resolveThemeDir( config.theme.name, root )
 		config.theme.styleUrl = resolveThemeStyleUrl( themeDir, config.assets.fingerprint )
-		var siteDir = root & "/site"
 
+		// Prepare the site output directory. If it exists, delete it first to ensure a clean build.
+		var siteDir = root & "/site"
 		if ( directoryExists( siteDir ) ) {
 			directoryDelete( siteDir, true )
 		}
 		directoryCreate( siteDir, true, true )
 
+		// Discover all version names within the project's documentation.
 		var versionNames = variables.versionsDiscoverer.discover( docsDir )
 		// `versions.default` (empty, the common case, changes nothing below)
 		// names which docs/versions/<name>/ folder should build AT THE SITE
@@ -196,11 +203,13 @@ class {
 		var rootDocsRelativePrefix = hasDefaultVersion ? ( "versions/" & defaultVersionName & "/" ) : ""
 		var versions = buildVersionsList( versionNames, urls.basePath, defaultVersionName )
 
+		// Discover all locale names within the root documentation directory.
 		var localeNames = variables.localesDiscoverer.discover( rootDocsDir )
 		var locales = buildLocalesList( localeNames, config.i18n, urls.basePath )
 		var defaultLocaleCode = config.i18n.defaultLocale.code
 		var defaultLocaleDir = config.i18n.defaultLocale.dir ?: "ltr"
 
+		// Resolve the navigation configuration for the root documentation directory.
 		var navConfig = resolveExplicitNav( rootDocsDir, config.nav )
 		var mainPages = variables.docsLoader.load( rootDocsDir )
 		profile( "setup and main docs load", buildStartedAt )
@@ -396,51 +405,129 @@ class {
 		}
 		profile( "version trees", buildStartedAt )
 
-		for ( var locale in locales ) {
-			if ( locale.code == defaultLocaleCode ) {
-				continue
+		// Build all non-default locales
+		var localesToBuild = locales.filter( ( locale ) =>
+			locale.code != defaultLocaleCode
+		)
+
+		var localeResults = futureNew().allApply(
+			localesToBuild,
+			( locale ) => {
+				progress( "Building locale: #locale.code#" )
+				var buildStartedAt = now()
+				// Determine the output directory for this locale
+				var localeOutputDir = siteDir & "/" & locale.code
+				// Load the pages for this locale
+				var localePages = variables.docsLoader.load(
+					rootDocsDir & "/i18n/" & locale.code
+				)
+				// Merge the locale-specific pages with the main pages
+				var mergedPages = mergeLocalePages(
+					mainPages,
+					localePages,
+					locale.code,
+					rootDocsRelativePrefix
+				)
+				// Render the documentation tree for this locale
+				var localeResult = renderDocTree(
+					mergedPages,
+					rootDocsDir,
+					config,
+					themeDir,
+					localeOutputDir,
+					urls.basePath & locale.code & "/",
+					root,
+					[],
+					rootVersionLabel,
+					"",
+					plugins,
+					urls.absolute,
+					imageManifest,
+					navConfig,
+					locales,
+					locale.code,
+					locale.dir,
+					"",
+					siteOrigin,
+					functions,
+					data
+				)
+				// Copy static assets for this locale
+				copyAssets(
+					root,
+					themeDir,
+					localeOutputDir,
+					config.theme.name,
+					searchNeedsLocalIndex( config ),
+					config.mermaid,
+					config.math,
+					config.openapi,
+					config.pageActions,
+					imageManifest,
+					assetPipeline.cssBundle,
+					assetPipeline.jsBundle,
+					config.assets.fingerprint
+				)
+				// Write the tags page for this locale
+				writeTagsPage(
+					localeResult.pages,
+					localeResult.nav,
+					config,
+					themeDir,
+					localeOutputDir,
+					urls.basePath & locale.code & "/",
+					versions,
+					locales,
+					locale.code,
+					siteOrigin,
+					functions,
+					rootVersionLabel,
+					data
+				)
+
+				// Generate redirects for this locale
+				variables.redirectGenerator.write(
+					localeResult.pages,
+					localeOutputDir,
+					urls.basePath & locale.code & "/"
+				)
+
+				// Output how long it took to build this locale
+				profile( "locale: " & locale.code, buildStartedAt )
+
+				// Return the result for this locale
+				return {
+					locale : locale,
+					result : localeResult
+				}
 			}
-			progress( "Building locale: #locale.code#" )
-			var localeOutputDir = siteDir & "/" & locale.code
-			var localePages = variables.docsLoader.load( rootDocsDir & "/i18n/" & locale.code )
-			var mergedPages = mergeLocalePages( mainPages, localePages, locale.code, rootDocsRelativePrefix )
-			var localeResult = renderDocTree(
-				mergedPages,
-				rootDocsDir,
-				config,
-				themeDir,
-				localeOutputDir,
-				urls.basePath & locale.code & "/",
-				root,
-				[],
-				rootVersionLabel,
-				"",
-				plugins,
-				urls.absolute,
-				imageManifest,
-				navConfig,
-				locales,
-				locale.code,
-				locale.dir,
-				"",
-				siteOrigin,
-				functions,
-				data
+		)
+
+		// Now we're back on a single thread
+		// Process the results for each locale
+		localeResults.each( ( build ) => {
+			// Append the pages for this locale to the overall list of all pages
+			allPages.append(
+				prefixPageUrls(
+					build.result.pages,
+					build.locale.code & "/"
+				),
+				true
 			)
-			allPages.append( prefixPageUrls( localeResult.pages, locale.code & "/" ), true )
+			// Append the locale-specific pages to the overall list of pages
 			mcpManifestTrees.append( {
-				path    : locale.code,
-				label   : locale.label,
-				version : hasDefaultVersion ? defaultVersionName : javacast( "null", "" ),
-				locale  : locale.code,
+				path    : build.locale.code,
+				label   : build.locale.label,
+				version : hasDefaultVersion
+					? defaultVersionName
+					: javacast( "null", "" ),
+				locale  : build.locale.code,
 				default : false
 			} )
-			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
-			writeTagsPage( localeResult.pages, localeResult.nav, config, themeDir, localeOutputDir, urls.basePath & locale.code & "/", versions, locales, locale.code, siteOrigin, functions, rootVersionLabel, data )
-			variables.redirectGenerator.write( localeResult.pages, localeOutputDir, urls.basePath & locale.code & "/" )
-		}
-		profile( "locale trees", buildStartedAt )
+		} )
 
+		// Profile the time taken to build all locale-specific page trees.
+		profile( "locale trees", buildStartedAt )
 		var tagsPages = mainResult.pages
 
 		if ( blogPosts.len() ) {
@@ -549,6 +636,13 @@ class {
 		}
 	}
 
+	/**
+	 * Records elapsed and cumulative timing for a build phase when profiling is enabled.
+	 * Updates the previous-timestamp marker used by the next phase.
+	 *
+	 * @label Human-readable build phase label
+	 * @startedAt Tick count captured when the build started
+	 */
 	private void function profile( required string label, required numeric startedAt ) {
 		if ( variables.profiling ) {
 			var now = getTickCount()
@@ -561,12 +655,24 @@ class {
 		}
 	}
 
+	/**
+	 * Prints a profiling progress message when build profiling is enabled.
+	 *
+	 * @message The phase message to print
+	 */
 	private void function progress( required string message ) {
 		if ( variables.profiling ) {
-			systemOutput( "[bx-sites] #arguments.message#...", true )
+			println( "[bx-sites] #arguments.message#..." )
 		}
 	}
 
+	/**
+	 * Records the elapsed time for an independently timed build segment.
+	 * Unlike profile(), this does not update the shared previous-timestamp marker.
+	 *
+	 * @label Human-readable segment label
+	 * @startedAt Tick count captured when the segment started
+	 */
 	private void function profileSegment( required string label, required numeric startedAt ) {
 		if ( variables.profiling ) {
 			variables.profileTimings.append( {
@@ -576,6 +682,16 @@ class {
 		}
 	}
 
+	/**
+	 * Summarizes generated output size, counts, duration, and profiling timings.
+	 *
+	 * @siteDir Absolute path to the generated site directory
+	 * @pageCount Number of pages in the primary tree
+	 * @versionCount Number of version trees generated
+	 * @localeCount Number of locale trees generated
+	 * @startedAt Tick count captured when the build started
+	 * @return A build report struct containing output counts, byte size, duration, and timings
+	 */
 	private struct function buildReport( required string siteDir, required numeric pageCount, required numeric versionCount, required numeric localeCount, required numeric startedAt ) {
 		var outputFiles = directoryList( arguments.siteDir, true, "path" )
 			.filter( path => !directoryExists( path ) )
@@ -1574,6 +1690,14 @@ class {
 		return len( arguments.siteOrigin ) ? ( arguments.siteOrigin & arguments.basePath & arguments.urlPath ) : ""
 	}
 
+	/**
+	 * Builds the repository edit URL for a source page.
+	 *
+	 * @repoUrl Repository root URL
+	 * @editUri Repository path between the root and the source file
+	 * @relativePath Source path relative to the documentation root
+	 * @return The combined edit URL with normalized separators
+	 */
 	private string function buildEditUrl( required string repoUrl, required string editUri, required string relativePath ) {
 		var base = arguments.repoUrl.reReplace( "[\/]+$", "" )
 		var uri = arguments.editUri.reReplace( "^[\/]+|[\/]+$", "", "all" )

@@ -245,6 +245,11 @@ class {
 		return { title : arguments.lesson.title, url : arguments.lesson.urlPath }
 	}
 
+	/**
+	 * Creates the default context used when a page is not inside a course.
+	 *
+	 * @return An empty course context with no lesson navigation or index URL
+	 */
 	private struct function emptyCourseContext() {
 		return {
 			id          : "",

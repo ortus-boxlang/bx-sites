@@ -16,8 +16,7 @@ class {
 			throw( type = "BxSites.MissingProjectRoot", message = "`build` requires a project root" )
 		}
 
-		var pipeline = new "models.build.BuildPipeline@bxsites"()
-		pipeline.setProfiling( true )
+		var pipeline = new "models.build.BuildPipeline@bxsites"().setProfiling( true )
 		var result = pipeline.build( projectRoot )
 
 		return {
@@ -26,6 +25,12 @@ class {
 		}
 	}
 
+	/**
+	 * Formats the build result and its timing report for console output.
+	 *
+	 * @result The struct returned by BuildPipeline.build()
+	 * @return A human-readable, newline-delimited build summary
+	 */
 	private string function formatReport( required struct result ) {
 		var report = arguments.result.report
 		var lines = [
@@ -45,6 +50,12 @@ class {
 		return lines.toList( char( 10 ) )
 	}
 
+	/**
+	 * Formats a byte count using the largest practical binary unit.
+	 *
+	 * @bytes The number of bytes to format
+	 * @return The value formatted as B, KB, or MB
+	 */
 	private string function formatBytes( required numeric bytes ) {
 		if ( arguments.bytes >= 1024 * 1024 ) {
 			return numberFormat( arguments.bytes / ( 1024 * 1024 ), "9,999.0" ) & " MB"
