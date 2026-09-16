@@ -55,10 +55,12 @@ bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--d
 
 ## `build`
 
-Genera `docs/**.md` in un sito statico dentro `site/`. Compila anche
+Genera le pagine Markdown dalla cartella sorgente del progetto in un sito
+statico dentro `site/`: `docs/**/*.md` quando il progetto usa `docs/` (il
+predefinito), oppure `src/**/*.md` quando usa `src/`. Compila anche
 l'indice di ricerca (a meno che `search` non sia `false` nella
-configurazione del sito, o che `searchProvider` sia impostato su un
-provider - come `algolia`/`pagefind` - che non lo usa, vedi
+configurazione del sito, o che `searchProvider` sia impostato su un provider
+- come `algolia`/`pagefind` - che non lo usa, vedi
 [Ricerca](guides/search.md)), esegue la CLI di `pagefind` sul `site/`
 finito quando `searchProvider.provider` è `"pagefind"`, e copia il tema +
 `docs/assets/**` in `site/`.

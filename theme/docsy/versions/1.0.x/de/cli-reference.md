@@ -55,10 +55,12 @@ bxSites new [path] [--name=...] [--theme=<siehe guides/themes.md für alle 10>] 
 
 ## `build`
 
-Rendert `docs/**.md` zu einer statischen Website in `site/`. Baut
-außerdem den Suchindex (sofern `search` in der Website-Konfiguration nicht
-`false` ist, oder `searchProvider` nicht auf einen Provider gesetzt ist -
-wie `algolia`/`pagefind` -, der ihn nicht nutzt, siehe
+Rendert Markdown-Seiten aus dem Quellordner des Projekts zu einer statischen
+Website in `site/`: `docs/**/*.md`, wenn das Projekt `docs/` verwendet (der
+Standard), oder `src/**/*.md`, wenn es `src/` verwendet. Baut außerdem den
+Suchindex (sofern `search` in der Website-Konfiguration nicht `false` ist,
+oder `searchProvider` nicht auf einen Provider gesetzt ist - wie
+`algolia`/`pagefind` -, der ihn nicht nutzt, siehe
 [Suche](guides/search.md)), führt die `pagefind`-CLI gegen die fertige
 `site/` aus, wenn `searchProvider.provider` auf `"pagefind"` steht, und
 kopiert Theme + `docs/assets/**` nach `site/`.

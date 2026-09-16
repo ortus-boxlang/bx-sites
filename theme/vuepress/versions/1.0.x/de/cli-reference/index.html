@@ -183,10 +183,12 @@ für die <code>docs/</code>-oder-<code>src/</code>-Konvention. <code>new</code> 
 <li><code>--format</code> - <code>yaml</code> (Standard, erzeugt <code>bxsites.yaml</code>) oder <code>json</code> (erzeugt <code>bxsites.json</code>) - siehe <a href="/theme/vuepress/versions/1.0.x/de/configuration/index.html">Konfiguration</a></li>
 </ul>
 <h2 id="build"><a href="#build" id="build" name="build" class="anchor"></a><code>build</code></h2>
-<p>Rendert <code>docs/**.md</code> zu einer statischen Website in <code>site/</code>. Baut
-außerdem den Suchindex (sofern <code>search</code> in der Website-Konfiguration nicht
-<code>false</code> ist, oder <code>searchProvider</code> nicht auf einen Provider gesetzt ist -
-wie <code>algolia</code>/<code>pagefind</code> -, der ihn nicht nutzt, siehe
+<p>Rendert Markdown-Seiten aus dem Quellordner des Projekts zu einer statischen
+Website in <code>site/</code>: <code>docs/**/*.md</code>, wenn das Projekt <code>docs/</code> verwendet (der
+Standard), oder <code>src/**/*.md</code>, wenn es <code>src/</code> verwendet. Baut außerdem den
+Suchindex (sofern <code>search</code> in der Website-Konfiguration nicht <code>false</code> ist,
+oder <code>searchProvider</code> nicht auf einen Provider gesetzt ist - wie
+<code>algolia</code>/<code>pagefind</code> -, der ihn nicht nutzt, siehe
 <a href="/theme/vuepress/versions/1.0.x/de/guides/search/index.html">Suche</a>), führt die <code>pagefind</code>-CLI gegen die fertige
 <code>site/</code> aus, wenn <code>searchProvider.provider</code> auf <code>&quot;pagefind&quot;</code> steht, und
 kopiert Theme + <code>docs/assets/**</code> nach <code>site/</code>.</p>
@@ -608,7 +610,7 @@ mit <code>0</code>.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/versions/1.0.x/i18n/de/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/vuepress/versions/1.0.x/de/cli-reference.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Sep 16, 2026, 12&#x3a;18&#x3a;27 PM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/versions/1.0.x/i18n/de/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/vuepress/versions/1.0.x/de/cli-reference.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Sep 16, 2026, 9&#x3a;51&#x3a;58 PM</span></div>
 
 			</article>
 
