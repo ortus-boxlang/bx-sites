@@ -313,7 +313,7 @@
 				<a class="bxsites-powered-by" href="https://bxsites.io" target="_blank" rel="noopener noreferrer">#bxsitesIcon( "phosphor:stack" )# <span>Powered by BxSites</span></a>
 			</aside>
 			<main class="col-lg-9 #variables.mainContentClass# content">
-<bx:include template="#variables.themeDir#/page.bxm">
+<bx:include template="#variables.themeDir#/#variables.bodyFile#">
 			</main>
 <bx:if variables.tocPosition == 'sticky' and variables.page.toc.len() gt 0>
 			<aside class="col-xl-2 toc-sidebar d-none d-xl-block">

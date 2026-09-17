@@ -1,10 +1,23 @@
+<!---
+	The outer shell for the blog's own listing/category/archive/author/stats
+	pages (BlogBuilder.bx's own `indexPages`) - selected in place of
+	`layout.bxm` via ThemeRenderer.renderPage()'s own `layoutHint`
+	(BuildPipeline.bx's blog `indexPages` loop). A close derivative of
+	`layout.bxm` - same header/nav/search/switchers/footer chrome - minus
+	the sticky "On this page" TOC rail, which these pages never have
+	anything to show in (`page.toc` is always empty for them), so the main
+	content column takes the width that rail would otherwise reserve.
+--->
 <bx:include template="#variables.moduleAssetsDir#/icons.bxm">
 <bx:include template="#variables.moduleAssetsDir#/locale-flags.bxm">
 <bx:script>
 	/**
 	 * Recursively renders a nav tree (module spec section 5, step 4) as a
-	 * nested Tailwind-utility nav list. A node with no `url` (a folder with
-	 * no `index.md`) renders as a section heading instead of a link.
+	 * nested Bootstrap nav list. A node with no `url` (a folder with no
+	 * `index.md`) renders as a disabled section heading instead of a link.
+	 * `nested` marks every level below the top one with `nav--nested` so
+	 * style.css can indent it - without that, a child `<ul>` shares the
+	 * exact same class as the top-level list and reads as one flat list.
 	 *
 	 * When `theme.options.navCollapsible` is on, any node with children (
 	 * whether it links to its own page or is a bare group heading) renders a
@@ -15,19 +28,19 @@
 	 * hides the very link you're on.
 	 */
 	function renderNavList( required array nodes, boolean nested = false, boolean collapsed = false ) {
-		var html = "<ul class=""space-y-1" & ( arguments.nested ? " ms-4 mt-1" : "" ) & """" & ( arguments.collapsed ? " hidden" : "" ) & ">"
+		var html = "<ul class=""nav flex-column" & ( arguments.nested ? " nav--nested" : "" ) & """" & ( arguments.collapsed ? " hidden" : "" ) & ">"
 		for ( var node in arguments.nodes ) {
 			var isActive = len( node.url ) && ( node.url == variables.page.urlPath || ( len( variables.page.course.id ) && node.url == variables.page.course.indexUrl ) )
-			var linkClass = "block rounded px-3 py-1.5 text-sm" & ( isActive ? " nav-link--active bg-cyan-50 font-semibold text-cyan-700" : " text-slate-700 hover:bg-cyan-50" )
+			var linkClass = "nav-link" & ( isActive ? " active" : "" )
 			var labelHtml = ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title )
 			var linkOrSpan = len( node.url )
 				? "<a class=""" & linkClass & """ href=""" & variables.basePath & node.url & """>" & labelHtml & "</a>"
-				: "<span class=""block px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400"">" & labelHtml & "</span>"
+				: "<span class=""nav-link disabled"">" & labelHtml & "</span>"
 
 			if ( node.children.len() && variables.navCollapsible ) {
 				var open = variables.navExpandAll || navContainsActive( node )
-				html &= "<li>"
-				html &= "<div class=""flex items-center justify-between nav-group-header"">" & linkOrSpan
+				html &= "<li class=""nav-item nav-item--group"">"
+				html &= "<div class=""nav-group-header"">" & linkOrSpan
 				html &= "<button type=""button"" class=""nav-toggle"" aria-expanded=""" & ( open ? "true" : "false" ) & """ aria-label=""" & encodeForHTML( variables.stringsResolver.format( variables.strings.toggleSection, { "title" : node.title } ) ) & """><span class=""nav-toggle__icon"" aria-hidden=""true"">▸</span></button>"
 				html &= "</div>"
 				html &= renderNavList( node.children, true, !open )
@@ -35,7 +48,7 @@
 				continue
 			}
 
-			html &= "<li>" & linkOrSpan
+			html &= "<li class=""nav-item"">" & linkOrSpan
 			if ( node.children.len() ) {
 				html &= renderNavList( node.children, true )
 			}
@@ -71,7 +84,7 @@
 	}
 
 	function renderVersionSwitcher( required array versions, required string currentVersion ) {
-		var html = '<select class="version-switcher rounded border border-slate-900/20 bg-transparent px-2 py-1 text-sm" onchange="location.href=this.value" aria-label="' & encodeForHTML( variables.strings.version ) & '">'
+		var html = '<select class="version-switcher form-select form-select-sm" onchange="location.href=this.value" aria-label="' & encodeForHTML( variables.strings.version ) & '">'
 		for ( var v in arguments.versions ) {
 			var selected = v.label == arguments.currentVersion ? " selected" : ""
 			html &= '<option value="' & bxsitesUrlAttr( v.url ) & '"' & selected & '>' & encodeForHTML( v.label ) & '</option>'
@@ -163,7 +176,7 @@
 
 	// module spec section 7 - search is fully static/client-side (provider "local") by
 	// default, opt-out via bxsites.json's `search`; `searchProvider.provider` picks a
-	// different provider ("algolia" built-in here, anything else left to a theme override)
+	// different provider ("algolia"/"pagefind" built-in here, anything else left to a theme override)
 	variables.searchEnabled = ( variables.siteConfig.search ?: false ) ? true : false
 	variables.searchProviderName = lCase( trim( variables.siteConfig.searchProvider.provider ?: "local" ) )
 	variables.searchAlgolia = variables.siteConfig.searchProvider.algolia ?: {}
@@ -172,7 +185,6 @@
 	variables.footerEnabled = ( variables.siteConfig.footer ?: false ) ? true : false
 	variables.navCollapsible = ( variables.siteConfig.theme.options.navCollapsible ?: false ) ? true : false
 	variables.navExpandAll = ( variables.siteConfig.theme.options.navExpandAll ?: true ) ? true : false
-	variables.tocPosition = variables.siteConfig.theme.options.tocPosition ?: "top"
 	variables.pageMetaPosition = variables.siteConfig.theme.options.pageMetaPosition ?: "bottom"
 	variables.breadcrumbsEnabled = ( variables.siteConfig.theme.options.breadcrumbs ?: true ) ? true : false
 	variables.faviconUrl = trim( variables.siteConfig.theme.favicon ?: "" )
@@ -224,7 +236,7 @@
 			}
 		} )();
 	</script>
-	<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="stylesheet" href="#variables.basePath#assets/vendor/bootstrap/bootstrap.min.css">
 	<link rel="stylesheet" href="#variables.basePath#assets/vendor/highlight/github.min.css">
 	<link rel="stylesheet" href="#variables.basePath##variables.siteConfig.theme.styleUrl ?: 'assets/theme/style.css'#">
 	#renderExtraCss( variables.siteConfig.extraCss ?: [] )#
@@ -275,46 +287,47 @@
 </bx:if>
 	<script src="#variables.basePath#assets/vendor/alpine/cdn.min.js" defer></script>
 </head>
-<body class="min-h-screen bg-slate-50 font-[Poppins,sans-serif] text-slate-900" x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark', navOpen: window.matchMedia( '(min-width: 768px)' ).matches ? ( localStorage.getItem( 'bxsites-nav-open' ) !== null ? localStorage.getItem( 'bxsites-nav-open' ) === 'true' : true ) : false }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } ); $watch( 'navOpen', v => { if ( window.matchMedia( '(min-width: 768px)' ).matches ) localStorage.setItem( 'bxsites-nav-open', v ) } )">
-	<header class="flex h-16 items-center gap-3 px-6 bg-gradient-to-r from-[##00FF78] to-[##00DBFF] shadow navbar-row">
-		<button type="button" class="text-xl" aria-controls="bxsites-sidebar" @click="navOpen = !navOpen" :aria-expanded="navOpen.toString()" aria-label="#encodeForHTML( variables.strings.toggleNavigation )#">☰</button>
-		<a class="text-lg font-bold text-slate-900 brand-mark" href="#variables.basePath#">#renderBrandMark()#</a>
-		<div class="navbar-controls">
+<body x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark', navOpen: window.matchMedia( '(min-width: 992px)' ).matches ? ( localStorage.getItem( 'bxsites-nav-open' ) !== null ? localStorage.getItem( 'bxsites-nav-open' ) === 'true' : true ) : false }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } ); $watch( 'navOpen', v => { if ( window.matchMedia( '(min-width: 992px)' ).matches ) localStorage.setItem( 'bxsites-nav-open', v ) } )">
+	<nav class="navbar navbar-expand-lg brand-navbar">
+		<div class="container-fluid navbar-row">
+			<button class="navbar-toggler" type="button" @click="navOpen = !navOpen" :aria-expanded="navOpen.toString()" aria-controls="bxsites-sidebar" aria-label="#encodeForHTML( variables.strings.toggleNavigation )#">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<a class="navbar-brand brand-mark" href="#variables.basePath#">#renderBrandMark()#</a>
+			<div class="navbar-controls">
 <bx:if variables.searchEnabled>
 	<bx:include template="#variables.themeDir#/search.bxm">
 </bx:if>
 <bx:if variables.versions.len() gt 1>
-			#renderVersionSwitcher( variables.versions, variables.currentVersion )#
+				#renderVersionSwitcher( variables.versions, variables.currentVersion )#
 </bx:if>
 <bx:if variables.locales.len() gt 1>
-			#renderLocaleDropdown( variables.locales, variables.currentLocale )#
+				#renderLocaleDropdown( variables.locales, variables.currentLocale )#
 </bx:if>
 <bx:if len( variables.repoUrl )>
-			<a class="repo-link" href="#bxsitesUrlAttr( variables.repoUrl )#" target="_blank" rel="noopener noreferrer" aria-label="#encodeForHTML( variables.strings.repository )#" title="#encodeForHTML( variables.strings.repository )#">#bxsitesIcon( "github" )#</a>
+				<a class="repo-link" href="#bxsitesUrlAttr( variables.repoUrl )#" target="_blank" rel="noopener noreferrer" aria-label="#encodeForHTML( variables.strings.repository )#" title="#encodeForHTML( variables.strings.repository )#">#bxsitesIcon( "github" )#</a>
 </bx:if>
-			<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="#encodeForHTML( variables.strings.toggleDarkMode )#">
-				<span x-show="!dark">#bxsitesIcon( "moon" )#</span>
-				<span x-show="dark" x-cloak>#bxsitesIcon( "sun" )#</span>
-			</button>
+				<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="#encodeForHTML( variables.strings.toggleDarkMode )#">
+					<span x-show="!dark">#bxsitesIcon( "moon" )#</span>
+					<span x-show="dark" x-cloak>#bxsitesIcon( "sun" )#</span>
+				</button>
+			</div>
 		</div>
-	</header>
-	<div class="mx-auto flex max-w-6xl">
-		<nav id="bxsites-sidebar" class="w-64 shrink-0 p-4" aria-label="Navigation" x-show="navOpen" x-cloak>
-			#renderNavList( variables.nav )#
-			<a class="bxsites-powered-by" href="https://bxsites.io" target="_blank" rel="noopener noreferrer">#bxsitesIcon( "phosphor:stack" )# <span>Powered by BxSites</span></a>
-		</nav>
-		<main class="min-w-0 flex-1 p-8">
+	</nav>
+	<div class="container-fluid">
+		<div class="row" :class="{ 'bxsites-nav-collapsed' : !navOpen }">
+			<aside class="col-lg-3 col-xl-2 sidebar" id="bxsites-sidebar" x-show="navOpen" x-cloak>
+				#renderNavList( variables.nav )#
+				<a class="bxsites-powered-by" href="https://bxsites.io" target="_blank" rel="noopener noreferrer">#bxsitesIcon( "phosphor:stack" )# <span>Powered by BxSites</span></a>
+			</aside>
+			<main class="col-lg-9 col-xl-10 content">
 <bx:include template="#variables.themeDir#/#variables.bodyFile#">
-		</main>
-<bx:if variables.tocPosition == 'sticky' and variables.page.toc.len() gt 0>
-		<aside class="hidden w-56 shrink-0 p-4 xl:sticky xl:top-6 xl:block xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto">
-			#renderToc( variables.page.toc )#
-		</aside>
-</bx:if>
+			</main>
+		</div>
 	</div>
 <bx:if variables.footerEnabled>
 	<footer class="bxsites-footer">
-		<div class="bxsites-footer__inner">
+		<div class="container-fluid bxsites-footer__inner">
 			<div class="bxsites-footer__copy">&copy; #year( now() )# #encodeForHTML( variables.siteConfig.name )#</div>
 <bx:if variables.socialLinks.len() gt 0>
 			<div class="bxsites-footer__social">#renderSocialLinks( variables.socialLinks )#</div>
@@ -323,6 +336,7 @@
 		</div>
 	</footer>
 </bx:if>
+	<script src="#variables.basePath#assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
 	<script src="#variables.basePath#assets/vendor/highlight/highlight.min.js"></script>
 	<script src="#variables.basePath#assets/highlight-boxlang.js"></script>
 	<script>hljs.highlightAll();</script>

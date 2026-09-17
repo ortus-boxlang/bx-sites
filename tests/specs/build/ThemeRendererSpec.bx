@@ -729,6 +729,144 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "renders through <themeDir>/<layoutHint>.bxm as the outer shell when it exists, and falls back to layout.bxm when it doesn't", function() {
+				var root = newProjectRoot();
+				directoryCreate( root & "/theme", true, true );
+				fileWrite( root & "/theme/layout.bxm", '<bx:output>DEFAULT-LAYOUT</bx:output><bx:include template="#variables.themeDir#/#variables.bodyFile#">' );
+				fileWrite( root & "/theme/page.bxm", "<bx:output>DEFAULT-BODY</bx:output>" );
+				fileWrite( root & "/theme/blog.bxm", '<bx:output>BLOG-LAYOUT</bx:output><bx:include template="#variables.themeDir#/#variables.bodyFile#">' );
+				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+				var page = { title : "My Page", contentHtml : "<p>Hello</p>" };
+
+				var blogHtml = renderer.renderPage( page = page, nav = [], config = { name : "My Site" }, themeDir = themeDir, layoutHint = "blog" );
+				expect( blogHtml ).toInclude( "BLOG-LAYOUT" );
+				expect( blogHtml ).notToInclude( "DEFAULT-LAYOUT" );
+				expect( blogHtml ).toInclude( "DEFAULT-BODY" );
+
+				var fallbackHtml = renderer.renderPage( page = page, nav = [], config = { name : "My Site" }, themeDir = themeDir, layoutHint = "does-not-exist" );
+				expect( fallbackHtml ).toInclude( "DEFAULT-LAYOUT" );
+				expect( fallbackHtml ).notToInclude( "BLOG-LAYOUT" );
+			} );
+
+			it( "renders through <themeDir>/<bodyHint>.bxm as the body when it exists, and falls back to page.bxm when it doesn't", function() {
+				var root = newProjectRoot();
+				directoryCreate( root & "/theme", true, true );
+				fileWrite( root & "/theme/layout.bxm", '<bx:output>LAYOUT</bx:output><bx:include template="#variables.themeDir#/#variables.bodyFile#">' );
+				fileWrite( root & "/theme/page.bxm", "<bx:output>DEFAULT-BODY</bx:output>" );
+				fileWrite( root & "/theme/blog-page.bxm", "<bx:output>BLOG-BODY</bx:output>" );
+				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+				var page = { title : "My Page", contentHtml : "<p>Hello</p>" };
+
+				var blogHtml = renderer.renderPage( page = page, nav = [], config = { name : "My Site" }, themeDir = themeDir, bodyHint = "blog-page" );
+				expect( blogHtml ).toInclude( "BLOG-BODY" );
+				expect( blogHtml ).notToInclude( "DEFAULT-BODY" );
+
+				var fallbackHtml = renderer.renderPage( page = page, nav = [], config = { name : "My Site" }, themeDir = themeDir, bodyHint = "does-not-exist" );
+				expect( fallbackHtml ).toInclude( "DEFAULT-BODY" );
+				expect( fallbackHtml ).notToInclude( "BLOG-BODY" );
+			} );
+
+			it( "prefers a page's own frontmatter [layout] over bodyHint, and falls back to page.bxm when that named file doesn't exist", function() {
+				var root = newProjectRoot();
+				directoryCreate( root & "/theme", true, true );
+				fileWrite( root & "/theme/layout.bxm", '<bx:output>LAYOUT</bx:output><bx:include template="#variables.themeDir#/#variables.bodyFile#">' );
+				fileWrite( root & "/theme/page.bxm", "<bx:output>DEFAULT-BODY</bx:output>" );
+				fileWrite( root & "/theme/blog-page.bxm", "<bx:output>BLOG-BODY</bx:output>" );
+				fileWrite( root & "/theme/press-release.bxm", "<bx:output>PRESS-RELEASE-BODY</bx:output>" );
+				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+
+				var overriddenPage = { title : "My Page", contentHtml : "<p>Hello</p>", layout : "press-release" };
+				var overriddenHtml = renderer.renderPage( page = overriddenPage, nav = [], config = { name : "My Site" }, themeDir = themeDir, bodyHint = "blog-page" );
+				expect( overriddenHtml ).toInclude( "PRESS-RELEASE-BODY" );
+				expect( overriddenHtml ).notToInclude( "BLOG-BODY" );
+				expect( overriddenHtml ).notToInclude( "DEFAULT-BODY" );
+
+				var missingOverridePage = { title : "My Page", contentHtml : "<p>Hello</p>", layout : "does-not-exist" };
+				var missingOverrideHtml = renderer.renderPage( page = missingOverridePage, nav = [], config = { name : "My Site" }, themeDir = themeDir, bodyHint = "blog-page" );
+				expect( missingOverrideHtml ).toInclude( "DEFAULT-BODY" );
+				expect( missingOverrideHtml ).notToInclude( "BLOG-BODY" );
+				expect( missingOverrideHtml ).notToInclude( "PRESS-RELEASE-BODY" );
+			} );
+
+			it( "keeps back-to-back renders on the same renderer instance from leaking page/nav/config state into each other", function() {
+				var root = newProjectRoot();
+				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+
+				var pageA = { title : "Page A", contentHtml : "<p>Content A</p>" };
+				var pageB = { title : "Page B", contentHtml : "<p>Content B</p>" };
+				var navA = [ { title : "Page A", url : "a.html", order : 1, children : [] } ];
+				var navB = [ { title : "Page B", url : "b.html", order : 1, children : [] } ];
+
+				var htmlA = renderer.renderPage( pageA, navA, { name : "Site A" }, themeDir );
+				var htmlB = renderer.renderPage( pageB, navB, { name : "Site B" }, themeDir );
+
+				expect( htmlA ).toInclude( "Page A" );
+				expect( htmlA ).toInclude( "Site A" );
+				expect( htmlA ).notToInclude( "Page B" );
+				expect( htmlA ).notToInclude( "Site B" );
+
+				expect( htmlB ).toInclude( "Page B" );
+				expect( htmlB ).toInclude( "Site B" );
+				expect( htmlB ).notToInclude( "Page A" );
+				expect( htmlB ).notToInclude( "Site A" );
+			} );
+
+			it( "renders through bootstrap's own blog.bxm for layoutHint='blog', dropping the sticky TOC rail bootstrap's normal layout.bxm has", function() {
+				var root = newProjectRoot();
+				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+				var stickyConfig = { name : "My Site", theme : { options : { tocPosition : "sticky" } } };
+				var page = {
+					title       : "Blog",
+					contentHtml : "<p>Post cards</p>",
+					toc         : [ { level : 2, id : "should-not-appear", text : "Should Not Appear" } ]
+				};
+				var nav = [ { title : "Blog", url : "blog/index.html", order : 1, children : [] } ];
+
+				var blogHtml = renderer.renderPage( page = page, nav = nav, config = stickyConfig, themeDir = themeDir, layoutHint = "blog" );
+				expect( blogHtml ).toInclude( "<p>Post cards</p>" );
+				expect( blogHtml ).toInclude( 'class="col-lg-9 col-xl-10 content"' );
+				expect( blogHtml ).notToInclude( "toc-sidebar" );
+
+				var docHtml = renderer.renderPage( page = page, nav = nav, config = stickyConfig, themeDir = themeDir );
+				expect( docHtml ).toInclude( "toc-sidebar" );
+			} );
+
+			it( "renders through bootstrap's own blog-page.bxm for bodyHint='blog-page', using the same page-actions/page-meta/tags helpers page.bxm already has", function() {
+				var root = newProjectRoot();
+				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+				var page = {
+					title       : "My Post",
+					contentHtml : "<p>Post body</p>",
+					editUrl     : "https://github.com/acme/docs/edit/main/blog/posts/my-post.md",
+					tags        : [ "release" ]
+				};
+				var nav = [ { title : "Blog", url : "blog/index.html", order : 1, children : [] } ];
+
+				var blogHtml = renderer.renderPage( page = page, nav = nav, config = { name : "My Site" }, themeDir = themeDir, bodyHint = "blog-page" );
+				expect( blogHtml ).toInclude( 'class="page-content blog-post-article"' );
+				expect( blogHtml ).toInclude( "<p>Post body</p>" );
+				expect( blogHtml ).toInclude( "Edit this page" );
+				expect( blogHtml ).toInclude( "page-tag" );
+
+				var docHtml = renderer.renderPage( page = page, nav = nav, config = { name : "My Site" }, themeDir = themeDir );
+				expect( docHtml ).notToInclude( "blog-post-article" );
+			} );
+
+			it( "falls back to layout.bxm/page.bxm for layoutHint='blog'/bodyHint='blog-page' on every built-in theme except bootstrap, which doesn't ship those files", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var config = { name : "My Site" };
+
+				for ( var themeName in [ "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					var html = renderer.renderPage( page = page, nav = nav, config = config, themeDir = themeDir, layoutHint = "blog", bodyHint = "blog-page" );
+
+					expect( html ).toInclude( "<!doctype html>", "theme [#themeName#] should still render normally" );
+					expect( html ).toInclude( "<p>Body</p>" );
+				}
+			} );
+
 		} );
 	}
 

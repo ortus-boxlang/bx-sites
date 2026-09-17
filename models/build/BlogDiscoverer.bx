@@ -48,7 +48,7 @@ class {
 	 * @docsDir Absolute path to the project's docs/ directory
 	 * @includeDrafts Include posts whose frontmatter sets `draft: true`
 	 *
-	 * @return Array of post structs, newest first: { relativePath, sourcePath, urlPath, slug, title, description, hidden, showToc, tags, frontmatter, icon, summary, ogImage, body, date, authors, categories, draft, image }
+	 * @return Array of post structs, newest first: { relativePath, sourcePath, urlPath, slug, title, description, hidden, showToc, tags, frontmatter, icon, summary, ogImage, layout, body, date, authors, categories, draft, image }
 	 */
 	array function load( required string docsDir, boolean includeDrafts = false ) {
 		var postsDir = arguments.docsDir.reReplace( "[\/]+$", "" ) & "/blog/posts"
@@ -121,6 +121,11 @@ class {
 			icon         : trim( fm.icon ?: "" ),
 			summary      : trim( fm.summary ?: "" ),
 			ogImage      : trim( fm.ogImage ?: "" ),
+			// See DocsLoader.bx's own loadFile() - explicit theme body-template
+			// override, e.g. `layout: press-release`, wins over BuildPipeline.bx's
+			// own `bodyHint = "blog-page"` for this post (ThemeRenderer.renderPage()'s
+			// own docblock covers the full resolution chain).
+			layout       : trim( fm.layout ?: "" ),
 			body         : parsed.body,
 			date         : date,
 			authors      : toStringArray( fm.authors ?: "" ),
