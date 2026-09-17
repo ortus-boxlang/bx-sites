@@ -261,7 +261,10 @@ Ein Theme ist einfach ein Ordner mit:
 - **`layout.bxm`** (erforderlich) - die äußere HTML-Hülle + Navigation.
   Erhält `variables.page`, `variables.nav`, `variables.siteConfig`,
   `variables.themeDir` und `variables.basePath` im Scope, und bindet das
-  benachbarte `page.bxm` über `#variables.themeDir#/page.bxm` ein.
+  aufgelöste Body-Template über `#variables.themeDir#/#variables.bodyFile#`
+  ein (`page.bxm`, sofern eine Seite/ein Inhaltstyp nicht auf etwas anderes
+  auflöst - siehe [Mehrere Layouts pro Seite](#mehrere-layouts-pro-seite)
+  unten).
   `variables.basePath` ist immer ein root-relativer, auf `/` endender Pfad
   (standardmäßig `/`, `/my-docs/`, wenn `baseURL` in `bxsites.yaml` das
   überschreibt) - stelle diesen jedem internen `href`/`src` voran, statt
@@ -272,6 +275,14 @@ Ein Theme ist einfach ein Ordner mit:
 - **`search.bxm`** (optional) - das Markup der Suchbox, von `layout.bxm`
   nur eingebunden, wenn `search` in `bxsites.yaml` `true` ist. Siehe
   [Suche](search.md).
+- **`blog.bxm`** (optional) - eine alternative äußere Hülle für die
+  eigenen Listen-/Kategorie-/Archiv-/Autoren-/Statistikseiten des Blogs.
+  Fällt auf `layout.bxm` zurück, wenn ein Theme sie nicht hat. Siehe
+  [Mehrere Layouts pro Seite](#mehrere-layouts-pro-seite).
+- **`blog-page.bxm`** (optional) - ein alternativer Body für einen
+  einzelnen Blogbeitrag, weiterhin gerendert unter dem normalen
+  `layout.bxm` des Themes. Fällt auf `page.bxm` zurück, wenn ein Theme sie
+  nicht hat.
 - **`assets/`** (optional) - Theme-CSS/JS, zur Build-Zeit nach
   `site/assets/theme/` kopiert.
 
@@ -296,6 +307,73 @@ seine Icons vollständig selbst bereitstellen.
 Ein Theme-Ordner, dem eine der beiden erforderlichen Dateien fehlt,
 schlägt sofort mit einem klaren `BxSites.InvalidTheme`-Fehler zur Build-Zeit
 fehl, statt mit einem verwirrenden Template-Fehler tief im Rendering.
+`blog.bxm`/`blog-page.bxm` werden nie erzwungen - dieselbe "optional, fällt
+zurück"-Form, die `search.bxm` bereits hat.
+
+## Mehrere Layouts pro Seite
+
+Ein Theme kann mehr als eine äußere Hülle und mehr als ein Body-Template
+anbieten, sodass ein Blog (oder ein beliebiger anderer Inhaltstyp) anders
+aussehen kann als der Rest der Website, während dieselbe Chrome und
+Assets des Themes weiterverwendet werden. Zwei unabhängige
+Auflösungsketten:
+
+- **Äußere Hülle** - immer `layout.bxm`, außer bei den eigenen
+  Listen-/Kategorie-/Archiv-/Autoren-/Statistikseiten des Blogs, die
+  `blog.bxm` verwenden, wenn das aktive Theme es hat. Diese folgt dem
+  Inhaltstyp - dafür gibt es keinen Frontmatter-Schlüssel.
+- **Body** - standardmäßig `page.bxm`. Ein Blogbeitrag verwendet
+  `blog-page.bxm`, wenn das aktive Theme es hat. So oder so gewinnt immer
+  das eigene Frontmatter einer Seite, wenn eines gesetzt ist:
+
+```markdown title="docs/marketing/press-release.md"
+---
+title: We raised a Series A
+layout: press-release
+---
+```
+
+`layout: press-release` rendert den Body dieser einen Seite über
+`theme/press-release.bxm` (oder das eigene des aktiven integrierten
+Themes, falls vorhanden) statt über `page.bxm` - weiterhin innerhalb der
+normalen `layout.bxm`-Hülle der Website. Ein `layout:`, das eine Datei
+benennt, die das aktive Theme nicht hat, fällt auf `page.bxm` zurück,
+statt den Build fehlschlagen zu lassen, sodass ein Themewechsel niemals
+eine Seite bricht, die das eigene benutzerdefinierte Layout eines anderen
+Themes benannt hat.
+
+`bootstrap` liefert `blog.bxm`/`blog-page.bxm` als funktionierendes
+Beispiel zum Kopieren mit; die anderen integrierten Themes (noch) nicht
+und fallen für Blog-Inhalte auf `layout.bxm`/`page.bxm` zurück, genau wie
+es ein unvollständiges `theme/`-Override auch täte.
+
+### Welches Layout/Body gerade aktiv ist
+
+Jede `.bxm`-Datei, durch die eine Seite gerendert wird - `layout.bxm`,
+`page.bxm`, `blog.bxm`, `blog-page.bxm`, oder eine eigene benutzerdefinierte
+eines Projekts - kann auslesen, welche Dateien tatsächlich aufgelöst
+wurden, auf dieselbe direkte Art, wie sie bereits `variables.page`/
+`variables.data` liest:
+
+- `variables.layoutFile` - die aktive äußere Hülle, z. B. `"layout.bxm"`
+  oder `"blog.bxm"`
+- `variables.bodyFile` - der aktive Body, z. B. `"page.bxm"`,
+  `"blog-page.bxm"`, oder ein per Frontmatter benannter
+- `variables.page.layout` - der eigene, unverarbeitete Frontmatter-Wert
+  `layout:` der Seite, falls einer gesetzt wurde; sonst `""`
+
+Nützlich als Hook für eine Body-Klasse, oder um ohne separates Template
+zu verzweigen:
+
+```bx title="theme/layout.bxm"
+<body class="layout-#reReplace( variables.bodyFile, '\.bxm$', '' )#">
+```
+
+```bx title="theme/page.bxm"
+<bx:if variables.bodyFile == "blog-page.bxm">
+	<!-- Chrome nur für Blogbeiträge -->
+</bx:if>
+```
 
 ## Farben anpassen, ohne ein Theme zu überschreiben
 
@@ -533,7 +611,7 @@ keine Änderung an `bxsites.yaml` nötig:
 	<nav>#renderNav( variables.nav )#</nav>
 	<main>
 </bx:output>
-<bx:include template="#variables.themeDir#/page.bxm">
+<bx:include template="#variables.themeDir#/#variables.bodyFile#">
 <bx:output>
 	</main>
 </body>

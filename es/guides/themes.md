@@ -261,8 +261,11 @@ Un tema es simplemente una carpeta con:
 - **`layout.bxm`** (obligatorio) - el shell HTML exterior + la
   navegación. Recibe `variables.page`, `variables.nav`,
   `variables.siteConfig`, `variables.themeDir` y `variables.basePath` en
-  el ámbito, e incluye el `page.bxm` hermano mediante
-  `#variables.themeDir#/page.bxm`. `variables.basePath` es siempre una
+  el ámbito, e incluye la plantilla de cuerpo resuelta mediante
+  `#variables.themeDir#/#variables.bodyFile#` (`page.bxm`, salvo que una
+  página/tipo de contenido resuelva a otra cosa - consulta
+  [Múltiples layouts por página](#multiples-layouts-por-pagina) más abajo).
+  `variables.basePath` es siempre una
   ruta relativa a la raíz que termina en `/` (`/` por defecto,
   `/my-docs/` cuando el `baseURL` de `bxsites.yaml` lo sobrescribe) -
   antepón ese prefijo a cada `href`/`src` interno, en lugar de codificar
@@ -273,6 +276,13 @@ Un tema es simplemente una carpeta con:
 - **`search.bxm`** (opcional) - el marcado del cuadro de búsqueda,
   incluido por `layout.bxm` solo cuando `search` de `bxsites.yaml` es
   `true`. Consulta [Búsqueda](search.md).
+- **`blog.bxm`** (opcional) - un shell exterior alternativo para las
+  propias páginas de listado/categoría/archivo/autor/estadísticas del
+  blog. Recurre a `layout.bxm` cuando un tema no lo tiene. Consulta
+  [Múltiples layouts por página](#multiples-layouts-por-pagina).
+- **`blog-page.bxm`** (opcional) - un cuerpo alternativo para una entrada
+  de blog individual, renderizado igualmente bajo el `layout.bxm` normal
+  del tema. Recurre a `page.bxm` cuando un tema no lo tiene.
 - **`assets/`** (opcional) - CSS/JS del tema, copiado a
   `site/assets/theme/` en el momento de la construcción.
 
@@ -299,7 +309,72 @@ propios iconos por completo.
 Una carpeta de tema a la que le falte cualquiera de los archivos
 obligatorios falla de inmediato con un error claro `BxSites.InvalidTheme`
 en el momento de la construcción, en lugar de un confuso error de
-plantilla en lo profundo del renderizado.
+plantilla en lo profundo del renderizado. `blog.bxm`/`blog-page.bxm`
+nunca son obligatorios - la misma forma "opcional, con reserva" que ya
+tiene `search.bxm`.
+
+## Múltiples layouts por página
+
+Un tema puede ofrecer más de un shell exterior y más de una plantilla de
+cuerpo, permitiendo que un blog (o cualquier otro tipo de contenido)
+tenga un aspecto distinto del resto del sitio mientras reutiliza el mismo
+chrome y los mismos assets del tema. Dos cadenas de resolución
+independientes:
+
+- **Shell exterior** - siempre `layout.bxm`, salvo en las propias
+  páginas de listado/categoría/archivo/autor/estadísticas del blog, que
+  usan `blog.bxm` cuando el tema activo lo tiene. Esta cadena sigue el
+  tipo de contenido - no hay clave de frontmatter para ella.
+- **Cuerpo** - `page.bxm` por defecto. Una entrada de blog usa
+  `blog-page.bxm` cuando el tema activo lo tiene. En cualquier caso, el
+  propio frontmatter de una página siempre gana cuando establece uno:
+
+```markdown title="docs/marketing/press-release.md"
+---
+title: We raised a Series A
+layout: press-release
+---
+```
+
+`layout: press-release` renderiza el cuerpo de esta página concreta a
+través de `theme/press-release.bxm` (o el propio del tema incorporado
+activo, si tiene uno) en lugar de `page.bxm` - todavía dentro del shell
+`layout.bxm` normal del sitio. Un `layout:` que nombre un archivo que el
+tema activo no tiene recurre a `page.bxm` en lugar de hacer fallar la
+construcción, así que cambiar de tema nunca rompe una página que nombró
+el layout personalizado propio de otro tema.
+
+`bootstrap` incluye `blog.bxm`/`blog-page.bxm` como ejemplo funcional
+para copiar; los demás temas incorporados todavía no, y recurren a
+`layout.bxm`/`page.bxm` para el contenido del blog del mismo modo que lo
+haría cualquier override `theme/` incompleto.
+
+### Qué layout/cuerpo está activo
+
+Cualquier `.bxm` a través del cual se renderiza una página - `layout.bxm`,
+`page.bxm`, `blog.bxm`, `blog-page.bxm`, o uno personalizado propio de un
+proyecto - puede leer qué archivos se resolvieron realmente, de la misma
+forma directa en que ya lee `variables.page`/`variables.data`:
+
+- `variables.layoutFile` - el shell exterior en uso, p. ej. `"layout.bxm"`
+  o `"blog.bxm"`
+- `variables.bodyFile` - el cuerpo en uso, p. ej. `"page.bxm"`,
+  `"blog-page.bxm"`, o uno nombrado por frontmatter
+- `variables.page.layout` - el propio valor bruto del frontmatter
+  `layout:` de la página, si estableció uno; `""` en caso contrario
+
+Útil como gancho para una clase del body, o para ramificar sin una
+plantilla separada:
+
+```bx title="theme/layout.bxm"
+<body class="layout-#reReplace( variables.bodyFile, '\.bxm$', '' )#">
+```
+
+```bx title="theme/page.bxm"
+<bx:if variables.bodyFile == "blog-page.bxm">
+	<!-- chrome exclusivo de entradas de blog -->
+</bx:if>
+```
 
 ## Personalizar colores sin sobrescribir un tema
 
@@ -535,7 +610,7 @@ necesidad de cambiar `bxsites.yaml`:
 	<nav>#renderNav( variables.nav )#</nav>
 	<main>
 </bx:output>
-<bx:include template="#variables.themeDir#/page.bxm">
+<bx:include template="#variables.themeDir#/#variables.bodyFile#">
 <bx:output>
 	</main>
 </body>

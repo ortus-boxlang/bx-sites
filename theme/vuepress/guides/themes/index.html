@@ -138,7 +138,7 @@ Themes</h1>
 
 
 
-	<details class="bxsites-toc-mobile vp-toc--mobile"><summary class="vp-toc--mobile__summary">On this page</summary><ul><li class="vp-toc__item vp-toc__item--2"><a href="#built-in">Built in</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#installing-a-published-theme">Installing a published theme</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#air-gappedoffline-sites">Air-gapped&#x2f;offline sites</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#the-themeprovider-contract">The ThemeProvider contract</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#customizing-colors-without-a-theme-override">Customizing colors without a theme override</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#homepage-hero-banner">Homepage hero banner</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#overriding-a-theme">Overriding a theme</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#writing-a-theme-from-scratch">Writing a theme from scratch</a></li></ul></details>
+	<details class="bxsites-toc-mobile vp-toc--mobile"><summary class="vp-toc--mobile__summary">On this page</summary><ul><li class="vp-toc__item vp-toc__item--2"><a href="#built-in">Built in</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#installing-a-published-theme">Installing a published theme</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#air-gappedoffline-sites">Air-gapped&#x2f;offline sites</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#the-themeprovider-contract">The ThemeProvider contract</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#multiple-layouts-per-page">Multiple layouts per page</a></li><li class="vp-toc__item vp-toc__item--3"><a href="#which-layoutbody-is-active">Which layout&#x2f;body is active</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#customizing-colors-without-a-theme-override">Customizing colors without a theme override</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#homepage-hero-banner">Homepage hero banner</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#overriding-a-theme">Overriding a theme</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#writing-a-theme-from-scratch">Writing a theme from scratch</a></li></ul></details>
 
 				<div class="vp-content-body">
 				<h1 id="themes"><a href="#themes" id="themes" name="themes" class="anchor"></a>Themes</h1>
@@ -346,7 +346,9 @@ of eight bundled libraries, or a project's own custom SVG.</p>
 <li><strong><code>layout.bxm</code></strong> (required) - the outer HTML shell + nav. Receives
 <code>variables.page</code>, <code>variables.nav</code>, <code>variables.siteConfig</code>,
 <code>variables.themeDir</code> and <code>variables.basePath</code> in scope, and includes the
-sibling <code>page.bxm</code> via <code>#variables.themeDir#/page.bxm</code>.
+resolved body template via <code>#variables.themeDir#/#variables.bodyFile#</code>
+(<code>page.bxm</code> unless a page/content type resolves to something else - see
+<a href="#multiple-layouts-per-page">Multiple layouts per page</a> below).
 <code>variables.basePath</code> is always a root-relative path ending in <code>/</code> (<code>/</code> by
 default, <code>/my-docs/</code> when <code>bxsites.yaml</code>'s <code>baseURL</code> overrides it) - prefix
 every internal <code>href</code>/<code>src</code> with it, rather than hardcoding a leading <code>/</code>,
@@ -356,6 +358,13 @@ so the theme still works when the site is served from a sub-path.</li>
 <li><strong><code>search.bxm</code></strong> (optional) - the search box markup, included by
 <code>layout.bxm</code> only when <code>bxsites.yaml</code>'s <code>search</code> is <code>true</code>. See
 <a href="/theme/vuepress/guides/search/index.html">Search</a>.</li>
+<li><strong><code>blog.bxm</code></strong> (optional) - an alternate outer shell for the blog's own
+listing/category/archive/author/stats pages. Falls back to <code>layout.bxm</code>
+when a theme doesn't have it. See
+<a href="#multiple-layouts-per-page">Multiple layouts per page</a>.</li>
+<li><strong><code>blog-page.bxm</code></strong> (optional) - an alternate body for an individual blog
+post, still rendered under the theme's normal <code>layout.bxm</code>. Falls back to
+<code>page.bxm</code> when a theme doesn't have it.</li>
 <li><strong><code>assets/</code></strong> (optional) - theme CSS/JS, copied to <code>site/assets/theme/</code>
 at build time.</li>
 </ul>
@@ -378,7 +387,56 @@ theme can include it the same way, or supply its own icons entirely.</li>
 </ul>
 <p>A theme folder missing either required file fails fast with a clear
 <code>BxSites.InvalidTheme</code> error at build time, rather than a confusing template
-error deep inside rendering.</p>
+error deep inside rendering. <code>blog.bxm</code>/<code>blog-page.bxm</code> are never
+enforced - same &quot;optional, falls back&quot; shape <code>search.bxm</code> already has.</p>
+<h2 id="multiple-layouts-per-page"><a href="#multiple-layouts-per-page" id="multiple-layouts-per-page" name="multiple-layouts-per-page" class="anchor"></a>Multiple layouts per page</h2>
+<p>A theme can offer more than one outer shell and more than one body
+template, letting a blog (or any other content type) look different from
+the rest of the site while reusing the same theme's chrome and assets. Two
+independent resolution chains:</p>
+<ul>
+<li><strong>Outer shell</strong> - always <code>layout.bxm</code>, except the blog's own listing/
+category/archive/author/stats pages, which use <code>blog.bxm</code> when the active
+theme has it. This one follows content type - there's no frontmatter
+key for it.</li>
+<li><strong>Body</strong> - <code>page.bxm</code> by default. A blog post uses <code>blog-page.bxm</code> when
+the active theme has it. Either way, a page's own frontmatter always wins
+when it sets one:</li>
+</ul>
+<pre data-bxsites-title="docs&#x2f;marketing&#x2f;press-release.md"><code class="language-markdown">---
+title: We raised a Series A
+layout: press-release
+---
+</code></pre>
+<p><code>layout: press-release</code> renders this one page's body through
+<code>theme/press-release.bxm</code> (or the active built-in theme's own, if it ships
+one) instead of <code>page.bxm</code> - still inside the site's normal <code>layout.bxm</code>
+shell. A <code>layout:</code> naming a file the active theme doesn't have falls back
+to <code>page.bxm</code> rather than failing the build, so switching themes never
+breaks a page that named one theme's own custom layout.</p>
+<p><code>bootstrap</code> ships <code>blog.bxm</code>/<code>blog-page.bxm</code> as a working example to copy;
+the other built-in themes don't yet, and fall back to <code>layout.bxm</code>/<code>page.bxm</code>
+for blog content the same way any incomplete <code>theme/</code> override would.</p>
+<h3 id="which-layoutbody-is-active"><a href="#which-layoutbody-is-active" id="which-layoutbody-is-active" name="which-layoutbody-is-active" class="anchor"></a>Which layout/body is active</h3>
+<p>Every <code>.bxm</code> a page renders through - <code>layout.bxm</code>, <code>page.bxm</code>, <code>blog.bxm</code>,
+<code>blog-page.bxm</code>, or a project's own custom one - can read which files
+actually resolved, the same bare way it already reads <code>variables.page</code>/
+<code>variables.data</code>:</p>
+<ul>
+<li><code>variables.layoutFile</code> - the outer shell in use, e.g. <code>&quot;layout.bxm&quot;</code> or
+<code>&quot;blog.bxm&quot;</code></li>
+<li><code>variables.bodyFile</code> - the body in use, e.g. <code>&quot;page.bxm&quot;</code>,
+<code>&quot;blog-page.bxm&quot;</code>, or a frontmatter-named one</li>
+<li><code>variables.page.layout</code> - the page's own raw frontmatter <code>layout:</code>
+value, if it set one; <code>&quot;&quot;</code> otherwise</li>
+</ul>
+<p>Useful for a body class hook, or branching without a separate template:</p>
+<pre data-bxsites-title="theme&#x2f;layout.bxm"><code class="language-bx">&lt;body class=&quot;layout-#reReplace( variables.bodyFile, '\.bxm$', '' )#&quot;&gt;
+</code></pre>
+<pre data-bxsites-title="theme&#x2f;page.bxm"><code class="language-bx">&lt;bx:if variables.bodyFile == &quot;blog-page.bxm&quot;&gt;
+	&lt;!-- blog-post-only chrome --&gt;
+&lt;/bx:if&gt;
+</code></pre>
 <h2 id="customizing-colors-without-a-theme-override"><a href="#customizing-colors-without-a-theme-override" id="customizing-colors-without-a-theme-override" name="customizing-colors-without-a-theme-override" class="anchor"></a>Customizing colors without a theme override</h2>
 <p>For a color/font tweak, forking a whole theme is overkill - each built-in
 theme reads its palette from a handful of CSS custom properties on <code>:root</code>,
@@ -563,7 +621,7 @@ change needed:</p>
 	&lt;nav&gt;#renderNav( variables.nav )#&lt;/nav&gt;
 	&lt;main&gt;
 &lt;/bx:output&gt;
-&lt;bx:include template=&quot;#variables.themeDir#/page.bxm&quot;&gt;
+&lt;bx:include template=&quot;#variables.themeDir#/#variables.bodyFile#&quot;&gt;
 &lt;bx:output&gt;
 	&lt;/main&gt;
 &lt;/body&gt;
@@ -601,7 +659,7 @@ break, it just won't bust caches automatically when the CSS changes.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/theme/vuepress/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Sep 17, 2026, 12&#x3a;19&#x3a;01 PM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/theme/vuepress/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Sep 17, 2026, 10&#x3a;09&#x3a;31 PM</span></div>
 
 			</article>
 
@@ -623,7 +681,7 @@ break, it just won't bust caches automatically when the CSS changes.</p>
 		</main>
 
 		<aside class="vp-toc-sidebar">
-			<nav class="vp-toc" aria-label="On this page"><div class="vp-toc__title">On this page</div><ul><li class="vp-toc__item vp-toc__item--2"><a href="#built-in">Built in</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#installing-a-published-theme">Installing a published theme</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#air-gappedoffline-sites">Air-gapped&#x2f;offline sites</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#the-themeprovider-contract">The ThemeProvider contract</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#customizing-colors-without-a-theme-override">Customizing colors without a theme override</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#homepage-hero-banner">Homepage hero banner</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#overriding-a-theme">Overriding a theme</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#writing-a-theme-from-scratch">Writing a theme from scratch</a></li></ul></nav>
+			<nav class="vp-toc" aria-label="On this page"><div class="vp-toc__title">On this page</div><ul><li class="vp-toc__item vp-toc__item--2"><a href="#built-in">Built in</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#installing-a-published-theme">Installing a published theme</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#air-gappedoffline-sites">Air-gapped&#x2f;offline sites</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#the-themeprovider-contract">The ThemeProvider contract</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#multiple-layouts-per-page">Multiple layouts per page</a></li><li class="vp-toc__item vp-toc__item--3"><a href="#which-layoutbody-is-active">Which layout&#x2f;body is active</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#customizing-colors-without-a-theme-override">Customizing colors without a theme override</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#homepage-hero-banner">Homepage hero banner</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#overriding-a-theme">Overriding a theme</a></li><li class="vp-toc__item vp-toc__item--2"><a href="#writing-a-theme-from-scratch">Writing a theme from scratch</a></li></ul></nav>
 		</aside>
 
 	</div>

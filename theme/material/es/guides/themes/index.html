@@ -136,7 +136,7 @@ Temas</h1>
 
 
 
-	<details class="bxsites-toc-mobile md-toc--mobile"><summary class="md-toc--mobile__summary">En esta p&aacute;gina</summary><ul><li class="md-toc__item md-toc__item--2"><a href="#incorporados">Incorporados</a></li><li class="md-toc__item md-toc__item--2"><a href="#instalar-un-tema-publicado">Instalar un tema publicado</a></li><li class="md-toc__item md-toc__item--2"><a href="#sitios-sin-conexión-a-internet-air-gapped">Sitios sin conexi&oacute;n a internet &#x28;air-gapped&#x29;</a></li><li class="md-toc__item md-toc__item--2"><a href="#el-contrato-de-themeprovider">El contrato de ThemeProvider</a></li><li class="md-toc__item md-toc__item--2"><a href="#personalizar-colores-sin-sobrescribir-un-tema">Personalizar colores sin sobrescribir un tema</a></li><li class="md-toc__item md-toc__item--2"><a href="#banner-hero-de-la-página-de-inicio">Banner hero de la p&aacute;gina de inicio</a></li><li class="md-toc__item md-toc__item--2"><a href="#sobrescribir-un-tema">Sobrescribir un tema</a></li><li class="md-toc__item md-toc__item--2"><a href="#escribir-un-tema-desde-cero">Escribir un tema desde cero</a></li></ul></details>
+	<details class="bxsites-toc-mobile md-toc--mobile"><summary class="md-toc--mobile__summary">En esta p&aacute;gina</summary><ul><li class="md-toc__item md-toc__item--2"><a href="#incorporados">Incorporados</a></li><li class="md-toc__item md-toc__item--2"><a href="#instalar-un-tema-publicado">Instalar un tema publicado</a></li><li class="md-toc__item md-toc__item--2"><a href="#sitios-sin-conexión-a-internet-air-gapped">Sitios sin conexi&oacute;n a internet &#x28;air-gapped&#x29;</a></li><li class="md-toc__item md-toc__item--2"><a href="#el-contrato-de-themeprovider">El contrato de ThemeProvider</a></li><li class="md-toc__item md-toc__item--2"><a href="#múltiples-layouts-por-página">M&uacute;ltiples layouts por p&aacute;gina</a></li><li class="md-toc__item md-toc__item--3"><a href="#qué-layoutcuerpo-está-activo">Qu&eacute; layout&#x2f;cuerpo est&aacute; activo</a></li><li class="md-toc__item md-toc__item--2"><a href="#personalizar-colores-sin-sobrescribir-un-tema">Personalizar colores sin sobrescribir un tema</a></li><li class="md-toc__item md-toc__item--2"><a href="#banner-hero-de-la-página-de-inicio">Banner hero de la p&aacute;gina de inicio</a></li><li class="md-toc__item md-toc__item--2"><a href="#sobrescribir-un-tema">Sobrescribir un tema</a></li><li class="md-toc__item md-toc__item--2"><a href="#escribir-un-tema-desde-cero">Escribir un tema desde cero</a></li></ul></details>
 
 				<div class="md-content-body">
 				<h1 id="temas"><a href="#temas" id="temas" name="temas" class="anchor"></a>Temas</h1>
@@ -368,8 +368,11 @@ incluidas, o el SVG propio de un proyecto.</p>
 <li><strong><code>layout.bxm</code></strong> (obligatorio) - el shell HTML exterior + la
 navegación. Recibe <code>variables.page</code>, <code>variables.nav</code>,
 <code>variables.siteConfig</code>, <code>variables.themeDir</code> y <code>variables.basePath</code> en
-el ámbito, e incluye el <code>page.bxm</code> hermano mediante
-<code>#variables.themeDir#/page.bxm</code>. <code>variables.basePath</code> es siempre una
+el ámbito, e incluye la plantilla de cuerpo resuelta mediante
+<code>#variables.themeDir#/#variables.bodyFile#</code> (<code>page.bxm</code>, salvo que una
+página/tipo de contenido resuelva a otra cosa - consulta
+<a href="#multiples-layouts-por-pagina">Múltiples layouts por página</a> más abajo).
+<code>variables.basePath</code> es siempre una
 ruta relativa a la raíz que termina en <code>/</code> (<code>/</code> por defecto,
 <code>/my-docs/</code> cuando el <code>baseURL</code> de <code>bxsites.yaml</code> lo sobrescribe) -
 antepón ese prefijo a cada <code>href</code>/<code>src</code> interno, en lugar de codificar
@@ -380,6 +383,13 @@ el sitio se sirva desde una subruta.</li>
 <li><strong><code>search.bxm</code></strong> (opcional) - el marcado del cuadro de búsqueda,
 incluido por <code>layout.bxm</code> solo cuando <code>search</code> de <code>bxsites.yaml</code> es
 <code>true</code>. Consulta <a href="/theme/material/es/guides/search/index.html">Búsqueda</a>.</li>
+<li><strong><code>blog.bxm</code></strong> (opcional) - un shell exterior alternativo para las
+propias páginas de listado/categoría/archivo/autor/estadísticas del
+blog. Recurre a <code>layout.bxm</code> cuando un tema no lo tiene. Consulta
+<a href="#multiples-layouts-por-pagina">Múltiples layouts por página</a>.</li>
+<li><strong><code>blog-page.bxm</code></strong> (opcional) - un cuerpo alternativo para una entrada
+de blog individual, renderizado igualmente bajo el <code>layout.bxm</code> normal
+del tema. Recurre a <code>page.bxm</code> cuando un tema no lo tiene.</li>
 <li><strong><code>assets/</code></strong> (opcional) - CSS/JS del tema, copiado a
 <code>site/assets/theme/</code> en el momento de la construcción.</li>
 </ul>
@@ -405,7 +415,61 @@ propios iconos por completo.</p>
 <p>Una carpeta de tema a la que le falte cualquiera de los archivos
 obligatorios falla de inmediato con un error claro <code>BxSites.InvalidTheme</code>
 en el momento de la construcción, en lugar de un confuso error de
-plantilla en lo profundo del renderizado.</p>
+plantilla en lo profundo del renderizado. <code>blog.bxm</code>/<code>blog-page.bxm</code>
+nunca son obligatorios - la misma forma &quot;opcional, con reserva&quot; que ya
+tiene <code>search.bxm</code>.</p>
+<h2 id="múltiples-layouts-por-página"><a href="#múltiples-layouts-por-página" id="múltiples-layouts-por-página" name="múltiples-layouts-por-página" class="anchor"></a>Múltiples layouts por página</h2>
+<p>Un tema puede ofrecer más de un shell exterior y más de una plantilla de
+cuerpo, permitiendo que un blog (o cualquier otro tipo de contenido)
+tenga un aspecto distinto del resto del sitio mientras reutiliza el mismo
+chrome y los mismos assets del tema. Dos cadenas de resolución
+independientes:</p>
+<ul>
+<li><strong>Shell exterior</strong> - siempre <code>layout.bxm</code>, salvo en las propias
+páginas de listado/categoría/archivo/autor/estadísticas del blog, que
+usan <code>blog.bxm</code> cuando el tema activo lo tiene. Esta cadena sigue el
+tipo de contenido - no hay clave de frontmatter para ella.</li>
+<li><strong>Cuerpo</strong> - <code>page.bxm</code> por defecto. Una entrada de blog usa
+<code>blog-page.bxm</code> cuando el tema activo lo tiene. En cualquier caso, el
+propio frontmatter de una página siempre gana cuando establece uno:</li>
+</ul>
+<pre data-bxsites-title="docs&#x2f;marketing&#x2f;press-release.md"><code class="language-markdown">---
+title: We raised a Series A
+layout: press-release
+---
+</code></pre>
+<p><code>layout: press-release</code> renderiza el cuerpo de esta página concreta a
+través de <code>theme/press-release.bxm</code> (o el propio del tema incorporado
+activo, si tiene uno) en lugar de <code>page.bxm</code> - todavía dentro del shell
+<code>layout.bxm</code> normal del sitio. Un <code>layout:</code> que nombre un archivo que el
+tema activo no tiene recurre a <code>page.bxm</code> en lugar de hacer fallar la
+construcción, así que cambiar de tema nunca rompe una página que nombró
+el layout personalizado propio de otro tema.</p>
+<p><code>bootstrap</code> incluye <code>blog.bxm</code>/<code>blog-page.bxm</code> como ejemplo funcional
+para copiar; los demás temas incorporados todavía no, y recurren a
+<code>layout.bxm</code>/<code>page.bxm</code> para el contenido del blog del mismo modo que lo
+haría cualquier override <code>theme/</code> incompleto.</p>
+<h3 id="qué-layoutcuerpo-está-activo"><a href="#qué-layoutcuerpo-está-activo" id="qué-layoutcuerpo-está-activo" name="qué-layoutcuerpo-está-activo" class="anchor"></a>Qué layout/cuerpo está activo</h3>
+<p>Cualquier <code>.bxm</code> a través del cual se renderiza una página - <code>layout.bxm</code>,
+<code>page.bxm</code>, <code>blog.bxm</code>, <code>blog-page.bxm</code>, o uno personalizado propio de un
+proyecto - puede leer qué archivos se resolvieron realmente, de la misma
+forma directa en que ya lee <code>variables.page</code>/<code>variables.data</code>:</p>
+<ul>
+<li><code>variables.layoutFile</code> - el shell exterior en uso, p. ej. <code>&quot;layout.bxm&quot;</code>
+o <code>&quot;blog.bxm&quot;</code></li>
+<li><code>variables.bodyFile</code> - el cuerpo en uso, p. ej. <code>&quot;page.bxm&quot;</code>,
+<code>&quot;blog-page.bxm&quot;</code>, o uno nombrado por frontmatter</li>
+<li><code>variables.page.layout</code> - el propio valor bruto del frontmatter
+<code>layout:</code> de la página, si estableció uno; <code>&quot;&quot;</code> en caso contrario</li>
+</ul>
+<p>Útil como gancho para una clase del body, o para ramificar sin una
+plantilla separada:</p>
+<pre data-bxsites-title="theme&#x2f;layout.bxm"><code class="language-bx">&lt;body class=&quot;layout-#reReplace( variables.bodyFile, '\.bxm$', '' )#&quot;&gt;
+</code></pre>
+<pre data-bxsites-title="theme&#x2f;page.bxm"><code class="language-bx">&lt;bx:if variables.bodyFile == &quot;blog-page.bxm&quot;&gt;
+	&lt;!-- chrome exclusivo de entradas de blog --&gt;
+&lt;/bx:if&gt;
+</code></pre>
 <h2 id="personalizar-colores-sin-sobrescribir-un-tema"><a href="#personalizar-colores-sin-sobrescribir-un-tema" id="personalizar-colores-sin-sobrescribir-un-tema" name="personalizar-colores-sin-sobrescribir-un-tema" class="anchor"></a>Personalizar colores sin sobrescribir un tema</h2>
 <p>Para un ajuste de color/fuente, bifurcar todo un tema es excesivo - cada
 tema incorporado lee su paleta de un puñado de propiedades CSS
@@ -614,7 +678,7 @@ necesidad de cambiar <code>bxsites.yaml</code>:</p>
 	&lt;nav&gt;#renderNav( variables.nav )#&lt;/nav&gt;
 	&lt;main&gt;
 &lt;/bx:output&gt;
-&lt;bx:include template=&quot;#variables.themeDir#/page.bxm&quot;&gt;
+&lt;bx:include template=&quot;#variables.themeDir#/#variables.bodyFile#&quot;&gt;
 &lt;bx:output&gt;
 	&lt;/main&gt;
 &lt;/body&gt;
@@ -647,7 +711,7 @@ construcción.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/material/es/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Sep 17, 2026, 12&#x3a;19&#x3a;01 PM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/material/es/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Sep 17, 2026, 10&#x3a;09&#x3a;31 PM</span></div>
 
 			</article>
 
@@ -669,7 +733,7 @@ construcción.</p>
 		</main>
 
 		<aside class="md-toc-sidebar">
-			<nav class="md-toc" aria-label="En esta p&aacute;gina"><div class="md-toc__title">En esta p&aacute;gina</div><ul><li class="md-toc__item md-toc__item--2"><a href="#incorporados">Incorporados</a></li><li class="md-toc__item md-toc__item--2"><a href="#instalar-un-tema-publicado">Instalar un tema publicado</a></li><li class="md-toc__item md-toc__item--2"><a href="#sitios-sin-conexión-a-internet-air-gapped">Sitios sin conexi&oacute;n a internet &#x28;air-gapped&#x29;</a></li><li class="md-toc__item md-toc__item--2"><a href="#el-contrato-de-themeprovider">El contrato de ThemeProvider</a></li><li class="md-toc__item md-toc__item--2"><a href="#personalizar-colores-sin-sobrescribir-un-tema">Personalizar colores sin sobrescribir un tema</a></li><li class="md-toc__item md-toc__item--2"><a href="#banner-hero-de-la-página-de-inicio">Banner hero de la p&aacute;gina de inicio</a></li><li class="md-toc__item md-toc__item--2"><a href="#sobrescribir-un-tema">Sobrescribir un tema</a></li><li class="md-toc__item md-toc__item--2"><a href="#escribir-un-tema-desde-cero">Escribir un tema desde cero</a></li></ul></nav>
+			<nav class="md-toc" aria-label="En esta p&aacute;gina"><div class="md-toc__title">En esta p&aacute;gina</div><ul><li class="md-toc__item md-toc__item--2"><a href="#incorporados">Incorporados</a></li><li class="md-toc__item md-toc__item--2"><a href="#instalar-un-tema-publicado">Instalar un tema publicado</a></li><li class="md-toc__item md-toc__item--2"><a href="#sitios-sin-conexión-a-internet-air-gapped">Sitios sin conexi&oacute;n a internet &#x28;air-gapped&#x29;</a></li><li class="md-toc__item md-toc__item--2"><a href="#el-contrato-de-themeprovider">El contrato de ThemeProvider</a></li><li class="md-toc__item md-toc__item--2"><a href="#múltiples-layouts-por-página">M&uacute;ltiples layouts por p&aacute;gina</a></li><li class="md-toc__item md-toc__item--3"><a href="#qué-layoutcuerpo-está-activo">Qu&eacute; layout&#x2f;cuerpo est&aacute; activo</a></li><li class="md-toc__item md-toc__item--2"><a href="#personalizar-colores-sin-sobrescribir-un-tema">Personalizar colores sin sobrescribir un tema</a></li><li class="md-toc__item md-toc__item--2"><a href="#banner-hero-de-la-página-de-inicio">Banner hero de la p&aacute;gina de inicio</a></li><li class="md-toc__item md-toc__item--2"><a href="#sobrescribir-un-tema">Sobrescribir un tema</a></li><li class="md-toc__item md-toc__item--2"><a href="#escribir-un-tema-desde-cero">Escribir un tema desde cero</a></li></ul></nav>
 		</aside>
 
 	</div>

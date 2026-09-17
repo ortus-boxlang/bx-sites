@@ -217,6 +217,11 @@ Your content here.
   even with 2+ headings (the usual trigger for it to render) - handy for a
   landing/hero page that doesn't want a floating TOC competing with its own
   content; defaults to `true`
+- `layout` - renders this page's body through a named `.bxm` instead of the
+  active theme's default `page.bxm` (the active theme's own `blog-page.bxm`
+  for a blog post, if it has one) - falls back to `page.bxm` when the named
+  file doesn't exist, rather than failing the build - see
+  [Multiple layouts per page](guides/themes.md#multiple-layouts-per-page)
 
 Frontmatter values can be inline lists (`tags: [a, b, c]`), YAML-style block
 lists (`tags:` followed by indented `- item` lines), or `>`/`|` block

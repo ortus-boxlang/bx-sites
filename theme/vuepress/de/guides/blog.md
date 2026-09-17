@@ -107,7 +107,11 @@ in full on the post's own page.
 Jeder andere Seiten-Frontmatter-Schlüssel, der bereits in
 [Erste Schritte](../getting-started.md#seiten-hinzufügen) dokumentiert ist
 (`icon`, `description`, `ogImage`, `toc`), funktioniert auch auf einem
-Beitrag.
+Beitrag - einschließlich `layout`, das den Body dieses Beitrags über eine
+benannte `.bxm`-Datei rendert statt über die Standarddatei des aktiven
+Themes (dessen eigenes `blog-page.bxm`, falls vorhanden, sonst
+`page.bxm`) - siehe
+[Mehrere Layouts pro Seite](themes.md#mehrere-layouts-pro-seite).
 
 ## Beitragsbilder und andere Blog-Assets
 

@@ -236,6 +236,12 @@ Your content here.
   para que se renderice) - útil para una página de aterrizaje/hero que no
   quiere una TOC flotante compitiendo con su propio contenido; por
   defecto `true`
+- `layout` - renderiza el cuerpo de esta página a través de un `.bxm` con
+  nombre en lugar del `page.bxm` predeterminado del tema activo (el propio
+  `blog-page.bxm` del tema activo para una entrada de blog, si lo tiene) -
+  recurre a `page.bxm` cuando el archivo indicado no existe, en lugar de
+  hacer fallar la compilación - consulta
+  [Múltiples layouts por página](guides/themes.md#multiples-layouts-por-pagina)
 
 Los valores del frontmatter pueden ser listas en línea (`tags: [a, b, c]`),
 listas de bloque al estilo YAML (`tags:` seguido de líneas `- item`

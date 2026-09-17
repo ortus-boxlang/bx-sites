@@ -105,7 +105,11 @@ in full on the post's own page.
 
 Cualquier otra clave de frontmatter a nivel de página ya documentada en
 [Primeros Pasos](../getting-started.md#añadir-páginas) (`icon`, `description`,
-`ogImage`, `toc`) funciona también en una entrada.
+`ogImage`, `toc`) funciona también en una entrada - incluida `layout`,
+que renderiza el cuerpo de esta entrada a través de un `.bxm` con nombre
+en lugar del predeterminado del tema activo (su propio `blog-page.bxm`,
+si lo tiene, o si no `page.bxm`) - consulta
+[Múltiples layouts por página](themes.md#multiples-layouts-por-pagina).
 
 ## Imágenes destacadas y otros recursos del blog
 

@@ -4,7 +4,17 @@ order: 1
 icon: phosphor-duotone:house
 summary: BxSites is a modern, BoxLang-powered static site generator that turns Markdown into fast, themed, searchable websites for documentation, blogs, marketing sites, and knowledge bases.
 toc: false
+layout: home
 ---
+
+<!--
+	This page renders through resources/themes/bootstrap/home.bxm (the
+	`layout: home` above), which hardcodes the whole page and never
+	includes this file's own rendered body - everything below is kept,
+	unused, as the starting point for reverting to the normal layout.bxm +
+	page.bxm rendering if `layout: home` is ever removed.
+-->
+
 
 <div class="bxsites-hero">
 	<img class="bxsites-hero__banner" src="assets/home-banner.jpg" alt="BxSites - Write. Build. Publish Beautiful Docs. The official documentation engine for BoxLang. Markdown Powered, Beautiful Themes, Blazing Fast Search, Developer Focused.">

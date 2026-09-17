@@ -231,6 +231,12 @@ Your content here.
   dessen Anzeige) - praktisch für eine Landing-/Hero-Seite, die kein
   schwebendes Inhaltsverzeichnis neben ihrem eigenen Inhalt haben möchte;
   Standard ist `true`
+- `layout` - rendert den Inhalt dieser Seite über eine benannte `.bxm`-Datei
+  statt über das Standard-`page.bxm` des aktiven Themes (bei einem
+  Blogbeitrag über das eigene `blog-page.bxm` des aktiven Themes, falls
+  vorhanden) - fällt auf `page.bxm` zurück, wenn die benannte Datei nicht
+  existiert, statt den Build fehlschlagen zu lassen - siehe
+  [Mehrere Layouts pro Seite](guides/themes.md#mehrere-layouts-pro-seite)
 
 Frontmatter-Werte können Inline-Listen (`tags: [a, b, c]`), YAML-artige
 Blocklisten (`tags:` gefolgt von eingerückten `- item`-Zeilen) oder

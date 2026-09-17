@@ -136,7 +136,7 @@ Themes</h1>
 
 
 
-	<details class="bxsites-toc-mobile dsrs-toc--mobile"><summary class="dsrs-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#integriert">Integriert</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-veröffentlichtes-theme-installieren">Ein ver&ouml;ffentlichtes Theme installieren</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#air-gappedoffline-websites">Air-gapped&#x2f;Offline-Websites</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#der-themeprovider-vertrag">Der ThemeProvider -Vertrag</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben">Farben anpassen, ohne ein Theme zu &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#homepage-hero-banner">Homepage-Hero-Banner</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-überschreiben">Ein Theme &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-von-grund-auf-schreiben">Ein Theme von Grund auf schreiben</a></li></ul></details>
+	<details class="bxsites-toc-mobile dsrs-toc--mobile"><summary class="dsrs-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#integriert">Integriert</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-veröffentlichtes-theme-installieren">Ein ver&ouml;ffentlichtes Theme installieren</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#air-gappedoffline-websites">Air-gapped&#x2f;Offline-Websites</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#der-themeprovider-vertrag">Der ThemeProvider -Vertrag</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#mehrere-layouts-pro-seite">Mehrere Layouts pro Seite</a></li><li class="dsrs-toc__item dsrs-toc__item--3"><a href="#welches-layoutbody-gerade-aktiv-ist">Welches Layout&#x2f;Body gerade aktiv ist</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben">Farben anpassen, ohne ein Theme zu &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#homepage-hero-banner">Homepage-Hero-Banner</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-überschreiben">Ein Theme &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-von-grund-auf-schreiben">Ein Theme von Grund auf schreiben</a></li></ul></details>
 
 				<div class="dsrs-content-body">
 				<h1 id="themes"><a href="#themes" id="themes" name="themes" class="anchor"></a>Themes</h1>
@@ -365,7 +365,10 @@ einer eigenen, projekteigenen SVG-Datei aufgelöst wird.</p>
 <li><strong><code>layout.bxm</code></strong> (erforderlich) - die äußere HTML-Hülle + Navigation.
 Erhält <code>variables.page</code>, <code>variables.nav</code>, <code>variables.siteConfig</code>,
 <code>variables.themeDir</code> und <code>variables.basePath</code> im Scope, und bindet das
-benachbarte <code>page.bxm</code> über <code>#variables.themeDir#/page.bxm</code> ein.
+aufgelöste Body-Template über <code>#variables.themeDir#/#variables.bodyFile#</code>
+ein (<code>page.bxm</code>, sofern eine Seite/ein Inhaltstyp nicht auf etwas anderes
+auflöst - siehe <a href="#mehrere-layouts-pro-seite">Mehrere Layouts pro Seite</a>
+unten).
 <code>variables.basePath</code> ist immer ein root-relativer, auf <code>/</code> endender Pfad
 (standardmäßig <code>/</code>, <code>/my-docs/</code>, wenn <code>baseURL</code> in <code>bxsites.yaml</code> das
 überschreibt) - stelle diesen jedem internen <code>href</code>/<code>src</code> voran, statt
@@ -376,6 +379,14 @@ wenn die Website aus einem Unterpfad ausgeliefert wird.</li>
 <li><strong><code>search.bxm</code></strong> (optional) - das Markup der Suchbox, von <code>layout.bxm</code>
 nur eingebunden, wenn <code>search</code> in <code>bxsites.yaml</code> <code>true</code> ist. Siehe
 <a href="/theme/docusaurus/de/guides/search/index.html">Suche</a>.</li>
+<li><strong><code>blog.bxm</code></strong> (optional) - eine alternative äußere Hülle für die
+eigenen Listen-/Kategorie-/Archiv-/Autoren-/Statistikseiten des Blogs.
+Fällt auf <code>layout.bxm</code> zurück, wenn ein Theme sie nicht hat. Siehe
+<a href="#mehrere-layouts-pro-seite">Mehrere Layouts pro Seite</a>.</li>
+<li><strong><code>blog-page.bxm</code></strong> (optional) - ein alternativer Body für einen
+einzelnen Blogbeitrag, weiterhin gerendert unter dem normalen
+<code>layout.bxm</code> des Themes. Fällt auf <code>page.bxm</code> zurück, wenn ein Theme sie
+nicht hat.</li>
 <li><strong><code>assets/</code></strong> (optional) - Theme-CSS/JS, zur Build-Zeit nach
 <code>site/assets/theme/</code> kopiert.</li>
 </ul>
@@ -398,7 +409,63 @@ Fallback) - ein eigenes Theme kann das auf dieselbe Weise einbinden, oder
 seine Icons vollständig selbst bereitstellen.</p>
 <p>Ein Theme-Ordner, dem eine der beiden erforderlichen Dateien fehlt,
 schlägt sofort mit einem klaren <code>BxSites.InvalidTheme</code>-Fehler zur Build-Zeit
-fehl, statt mit einem verwirrenden Template-Fehler tief im Rendering.</p>
+fehl, statt mit einem verwirrenden Template-Fehler tief im Rendering.
+<code>blog.bxm</code>/<code>blog-page.bxm</code> werden nie erzwungen - dieselbe &quot;optional, fällt
+zurück&quot;-Form, die <code>search.bxm</code> bereits hat.</p>
+<h2 id="mehrere-layouts-pro-seite"><a href="#mehrere-layouts-pro-seite" id="mehrere-layouts-pro-seite" name="mehrere-layouts-pro-seite" class="anchor"></a>Mehrere Layouts pro Seite</h2>
+<p>Ein Theme kann mehr als eine äußere Hülle und mehr als ein Body-Template
+anbieten, sodass ein Blog (oder ein beliebiger anderer Inhaltstyp) anders
+aussehen kann als der Rest der Website, während dieselbe Chrome und
+Assets des Themes weiterverwendet werden. Zwei unabhängige
+Auflösungsketten:</p>
+<ul>
+<li><strong>Äußere Hülle</strong> - immer <code>layout.bxm</code>, außer bei den eigenen
+Listen-/Kategorie-/Archiv-/Autoren-/Statistikseiten des Blogs, die
+<code>blog.bxm</code> verwenden, wenn das aktive Theme es hat. Diese folgt dem
+Inhaltstyp - dafür gibt es keinen Frontmatter-Schlüssel.</li>
+<li><strong>Body</strong> - standardmäßig <code>page.bxm</code>. Ein Blogbeitrag verwendet
+<code>blog-page.bxm</code>, wenn das aktive Theme es hat. So oder so gewinnt immer
+das eigene Frontmatter einer Seite, wenn eines gesetzt ist:</li>
+</ul>
+<pre data-bxsites-title="docs&#x2f;marketing&#x2f;press-release.md"><code class="language-markdown">---
+title: We raised a Series A
+layout: press-release
+---
+</code></pre>
+<p><code>layout: press-release</code> rendert den Body dieser einen Seite über
+<code>theme/press-release.bxm</code> (oder das eigene des aktiven integrierten
+Themes, falls vorhanden) statt über <code>page.bxm</code> - weiterhin innerhalb der
+normalen <code>layout.bxm</code>-Hülle der Website. Ein <code>layout:</code>, das eine Datei
+benennt, die das aktive Theme nicht hat, fällt auf <code>page.bxm</code> zurück,
+statt den Build fehlschlagen zu lassen, sodass ein Themewechsel niemals
+eine Seite bricht, die das eigene benutzerdefinierte Layout eines anderen
+Themes benannt hat.</p>
+<p><code>bootstrap</code> liefert <code>blog.bxm</code>/<code>blog-page.bxm</code> als funktionierendes
+Beispiel zum Kopieren mit; die anderen integrierten Themes (noch) nicht
+und fallen für Blog-Inhalte auf <code>layout.bxm</code>/<code>page.bxm</code> zurück, genau wie
+es ein unvollständiges <code>theme/</code>-Override auch täte.</p>
+<h3 id="welches-layoutbody-gerade-aktiv-ist"><a href="#welches-layoutbody-gerade-aktiv-ist" id="welches-layoutbody-gerade-aktiv-ist" name="welches-layoutbody-gerade-aktiv-ist" class="anchor"></a>Welches Layout/Body gerade aktiv ist</h3>
+<p>Jede <code>.bxm</code>-Datei, durch die eine Seite gerendert wird - <code>layout.bxm</code>,
+<code>page.bxm</code>, <code>blog.bxm</code>, <code>blog-page.bxm</code>, oder eine eigene benutzerdefinierte
+eines Projekts - kann auslesen, welche Dateien tatsächlich aufgelöst
+wurden, auf dieselbe direkte Art, wie sie bereits <code>variables.page</code>/
+<code>variables.data</code> liest:</p>
+<ul>
+<li><code>variables.layoutFile</code> - die aktive äußere Hülle, z. B. <code>&quot;layout.bxm&quot;</code>
+oder <code>&quot;blog.bxm&quot;</code></li>
+<li><code>variables.bodyFile</code> - der aktive Body, z. B. <code>&quot;page.bxm&quot;</code>,
+<code>&quot;blog-page.bxm&quot;</code>, oder ein per Frontmatter benannter</li>
+<li><code>variables.page.layout</code> - der eigene, unverarbeitete Frontmatter-Wert
+<code>layout:</code> der Seite, falls einer gesetzt wurde; sonst <code>&quot;&quot;</code></li>
+</ul>
+<p>Nützlich als Hook für eine Body-Klasse, oder um ohne separates Template
+zu verzweigen:</p>
+<pre data-bxsites-title="theme&#x2f;layout.bxm"><code class="language-bx">&lt;body class=&quot;layout-#reReplace( variables.bodyFile, '\.bxm$', '' )#&quot;&gt;
+</code></pre>
+<pre data-bxsites-title="theme&#x2f;page.bxm"><code class="language-bx">&lt;bx:if variables.bodyFile == &quot;blog-page.bxm&quot;&gt;
+	&lt;!-- Chrome nur für Blogbeiträge --&gt;
+&lt;/bx:if&gt;
+</code></pre>
 <h2 id="farben-anpassen-ohne-ein-theme-zu-überschreiben"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben" id="farben-anpassen-ohne-ein-theme-zu-überschreiben" name="farben-anpassen-ohne-ein-theme-zu-überschreiben" class="anchor"></a>Farben anpassen, ohne ein Theme zu überschreiben</h2>
 <p>Für eine kleine Farb-/Schriftanpassung ist ein ganzes Theme zu forken
 Overkill - jedes integrierte Theme liest seine Palette aus einer Handvoll
@@ -607,7 +674,7 @@ keine Änderung an <code>bxsites.yaml</code> nötig:</p>
 	&lt;nav&gt;#renderNav( variables.nav )#&lt;/nav&gt;
 	&lt;main&gt;
 &lt;/bx:output&gt;
-&lt;bx:include template=&quot;#variables.themeDir#/page.bxm&quot;&gt;
+&lt;bx:include template=&quot;#variables.themeDir#/#variables.bodyFile#&quot;&gt;
 &lt;bx:output&gt;
 	&lt;/main&gt;
 &lt;/body&gt;
@@ -642,7 +709,7 @@ für dein eigenes CSS/JS, automatisch zur Build-Zeit nach
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/docusaurus/de/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Sep 17, 2026, 12&#x3a;19&#x3a;01 PM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/docusaurus/de/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Sep 17, 2026, 10&#x3a;09&#x3a;31 PM</span></div>
 
 			</article>
 
@@ -664,7 +731,7 @@ für dein eigenes CSS/JS, automatisch zur Build-Zeit nach
 		</main>
 
 		<aside class="dsrs-toc-sidebar">
-			<nav class="dsrs-toc" aria-label="Auf dieser Seite"><div class="dsrs-toc__title">Auf dieser Seite</div><ul><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#integriert">Integriert</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-veröffentlichtes-theme-installieren">Ein ver&ouml;ffentlichtes Theme installieren</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#air-gappedoffline-websites">Air-gapped&#x2f;Offline-Websites</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#der-themeprovider-vertrag">Der ThemeProvider -Vertrag</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben">Farben anpassen, ohne ein Theme zu &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#homepage-hero-banner">Homepage-Hero-Banner</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-überschreiben">Ein Theme &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-von-grund-auf-schreiben">Ein Theme von Grund auf schreiben</a></li></ul></nav>
+			<nav class="dsrs-toc" aria-label="Auf dieser Seite"><div class="dsrs-toc__title">Auf dieser Seite</div><ul><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#integriert">Integriert</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-veröffentlichtes-theme-installieren">Ein ver&ouml;ffentlichtes Theme installieren</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#air-gappedoffline-websites">Air-gapped&#x2f;Offline-Websites</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#der-themeprovider-vertrag">Der ThemeProvider -Vertrag</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#mehrere-layouts-pro-seite">Mehrere Layouts pro Seite</a></li><li class="dsrs-toc__item dsrs-toc__item--3"><a href="#welches-layoutbody-gerade-aktiv-ist">Welches Layout&#x2f;Body gerade aktiv ist</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben">Farben anpassen, ohne ein Theme zu &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#homepage-hero-banner">Homepage-Hero-Banner</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-überschreiben">Ein Theme &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-von-grund-auf-schreiben">Ein Theme von Grund auf schreiben</a></li></ul></nav>
 		</aside>
 
 	</div>
