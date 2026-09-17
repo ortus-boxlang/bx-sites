@@ -1190,7 +1190,8 @@ class {
 				arguments.currentLocale,
 				arguments.currentLocaleDir,
 				arguments.functions,
-				arguments.data
+				arguments.data,
+				page.layout
 			)
 			var outputPath = arguments.outputDir & "/" & page.urlPath
 			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
@@ -2363,6 +2364,7 @@ class {
 		fileCopy( moduleAssetsDir() & "/prompt-init.js", arguments.siteDir & "/assets/prompt-init.js" )
 		fileCopy( moduleAssetsDir() & "/contact-form-init.js", arguments.siteDir & "/assets/contact-form-init.js" )
 		fileCopy( moduleAssetsDir() & "/code-lines.js", arguments.siteDir & "/assets/code-lines.js" )
+		fileCopy( moduleAssetsDir() & "/home.css", arguments.siteDir & "/assets/home.css" )
 		directoryCopy( moduleAssetsDir() & "/fonts", arguments.siteDir & "/assets/fonts", true )
 		directoryCopy( moduleAssetsDir() & "/vendor/highlight", arguments.siteDir & "/assets/vendor/highlight", true )
 		directoryCopy( moduleAssetsDir() & "/vendor/alpine", arguments.siteDir & "/assets/vendor/alpine", true )
