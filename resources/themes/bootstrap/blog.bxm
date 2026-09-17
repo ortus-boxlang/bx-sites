@@ -199,6 +199,12 @@
 	variables.pageActionsPosition = variables.siteConfig.theme.options.pageActionsPosition ?: "top"
 	variables.accentColor = trim( variables.siteConfig.theme.options.accentColor ?: "" )
 	variables.accentColorDark = trim( variables.siteConfig.theme.options.accentColorDark ?: "" )
+	// page.bxm (this layout's own default body) reads variables.tocPosition
+	// directly for its inline "On this page" rendering - still needed here
+	// even though this layout drops the sticky-rail aside, since a listing
+	// page COULD carry a non-empty page.toc (nothing prevents it) and
+	// page.bxm's own inline-TOC branch would otherwise read an unset variable.
+	variables.tocPosition = variables.siteConfig.theme.options.tocPosition ?: "top"
 </bx:script>
 <bx:output>
 <!doctype html>

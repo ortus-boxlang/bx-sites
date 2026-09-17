@@ -436,6 +436,7 @@ class {
 			arguments.currentLocale,
 			currentLocaleDir,
 			strings,
+			variables.stringsResolver,
 			arguments.data,
 			arguments.functions
 		)

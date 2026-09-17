@@ -35,6 +35,7 @@ class {
 	 * @currentLocale The `code` (from `locales`) being rendered right now
 	 * @currentLocaleDir `"ltr"`/`"rtl"` - the current locale's own text direction
 	 * @strings StringsResolver.resolve()'s own output for the locale being rendered right now
+	 * @stringsResolver ThemeRenderer's own StringsResolver instance - stateless/pure (no per-render data), so safe to hand across concurrent renders unchanged; a theme's own `.format()` calls (e.g. `renderNavList()`'s `toggleSection` label) need the resolver itself, not just its already-resolved `strings` output
 	 * @data DataLoader.load()'s own output, bound bare as `variables.data`
 	 * @functions FunctionsLoader.load()'s own output - each `$`-prefixed magic function bound directly into this scope, bare-callable from the included templates
 	 *
@@ -55,6 +56,7 @@ class {
 		required string currentLocale,
 		required string currentLocaleDir,
 		required struct strings,
+		required any stringsResolver,
 		required struct data,
 		struct functions = {}
 	) {
@@ -70,6 +72,7 @@ class {
 		variables.currentLocale      = arguments.currentLocale
 		variables.currentLocaleDir   = arguments.currentLocaleDir
 		variables.strings            = arguments.strings
+		variables.stringsResolver    = arguments.stringsResolver
 		variables.data                = arguments.data
 		variables.layoutFile         = arguments.layoutFile
 		variables.bodyFile           = arguments.bodyFile
