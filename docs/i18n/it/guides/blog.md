@@ -101,7 +101,11 @@ in full on the post's own page.
 
 Ogni altra chiave di frontmatter a livello di pagina già documentata in
 [Per iniziare](../getting-started.md#add-pages) (`icon`, `description`,
-`ogImage`, `toc`) funziona anche su un post.
+`ogImage`, `toc`) funziona anche su un post - inclusa `layout`, che
+renderizza il corpo di questo post tramite un file `.bxm` con nome
+specifico invece del predefinito del tema attivo (il proprio
+`blog-page.bxm`, se presente, altrimenti `page.bxm`) - vedi
+[Più layout per pagina](themes.md#piu-layout-per-pagina).
 
 ## Immagini in evidenza e altri asset del blog
 

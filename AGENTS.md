@@ -35,6 +35,67 @@ contracts.
   supported through `bxsites.json` and `--format=json`; `docs/nav.json` is
   always JSON because it is parsed separately as a navigation override.
 
+## Local Toolchain Setup
+
+On a fresh machine/sandbox with no BoxLang install, bootstrap the toolchain
+like this (idempotent - safe to re-run):
+
+```bash
+# 1. Installs BoxLang + a bundled Lucee-based CommandBox (v6.x) to
+#    /usr/local/boxlang, and bx-cli's own launcher scripts to /root/.boxlang/bin.
+/bin/bash -c "$(curl -fsSL https://install.boxlang.io)"
+
+# 2. install-boxlang/install-bx-module need these two vars in the SAME shell
+#    invocation that calls them - the installer appends them to ~/.bashrc, but
+#    most non-interactive shells (including how Bash tool calls run here) hit
+#    Ubuntu's default `[ -z "$PS1" ] && return` guard near the top of
+#    ~/.bashrc, so `source ~/.bashrc` alone silently no-ops and leaves them
+#    unset. Export them directly instead, every time, rather than sourcing.
+export BOXLANG_INSTALL_HOME="/usr/local/boxlang"
+export PATH="/root/.boxlang/bin:/usr/local/bin:$PATH"
+
+# 3. Install the real, BoxLang-native CommandBox (bx-cli, v7.x) - NOT the
+#    Lucee-based v6.x one the quick installer bundles as a fallback at
+#    /usr/local/boxlang/bin/box. Both land on PATH as `box`; bx-cli's own
+#    launcher at /root/.boxlang/bin/box must come FIRST (see the export
+#    above) or the wrong `box` wins silently. `box version` should report
+#    "CommandBox 7.x" (bx-cli), not "CommandBox 6.x" (Lucee) - verify this
+#    before trusting any following `box`/`install-bx-module` output.
+install-bx-module bx-cli
+
+# 4. Project-local dependencies (testbox, coldbox modules, etc. - box.json's
+#    own devDependencies), plus the global BoxLang modules CI installs via
+#    setup-boxlang's own `modules:` list (not part of box.json, since these
+#    are runtime deps of the module itself, not the test tooling).
+cd /path/to/bx-sites
+box install --verbose --nosave
+install-bx-module bx-esapi,bx-yaml,bx-toml,bx-markdown,bx-image,bx-docbox
+
+# 5. BoxLang looks for modules under $BOXLANG_HOME/modules (default
+#    ~/.boxlang/modules) by name, matching @bxsites references throughout
+#    this codebase - symlink this checkout in under that name (see
+#    tests.yml's own "Test Module" step, which does the same in CI).
+export BOXLANG_HOME="/root/.boxlang"
+mkdir -p "${BOXLANG_HOME}/modules"
+ln -sfn "$(pwd)" "${BOXLANG_HOME}/modules/bx-sites"
+
+chmod +x testbox/run
+./testbox/run --stream
+```
+
+Every later shell (a fresh Bash tool call, a new terminal) needs the three
+`export`s from steps 2 and 5 re-set - none of it persists via `~/.bashrc` in
+a non-interactive shell, per the gotcha above.
+
+If a source file's edits don't seem to take effect on the next test run,
+clear BoxLang's own compiled-class cache and retry before assuming the
+change is wrong - it's usually just stale bytecode from a prior run in the
+same session:
+
+```bash
+rm -rf "${BOXLANG_HOME}/classes/$(pwd | tr '/' '_')"
+```
+
 ## Build And Test
 
 - Install dependencies with `box install --verbose --nosave` when reproducing

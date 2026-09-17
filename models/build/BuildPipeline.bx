@@ -740,10 +740,10 @@ class {
 			var blogResult = variables.blogBuilder.build( blogPosts, blogAuthors, config.blog.postsPerPage, urls.basePath, imageManifest )
 
 			for ( var post in blogResult.posts ) {
-				writeRenderedPage( post, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir, siteOrigin, functions, rootVersionLabel, data )
+				writeRenderedPage( post, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir, siteOrigin, functions, rootVersionLabel, data, "", "blog-page" )
 			}
 			for ( var indexPage in blogResult.indexPages ) {
-				writeRenderedPage( indexPage, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir, siteOrigin, functions, rootVersionLabel, data )
+				writeRenderedPage( indexPage, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir, siteOrigin, functions, rootVersionLabel, data, "blog", "" )
 			}
 
 			variables.markdownPublisher.publish( blogResult.posts, siteDir )
@@ -1104,7 +1104,6 @@ class {
 		// let one tree's own computed fields (an og:image path written under
 		// its own outputDir, a basePath-specific contentHtml) leak into another.
 		var pages = duplicate( arguments.pages )
-		var treeThemeRenderer = new "models.build.ThemeRenderer@bxsites"()
 		var treeDirectiveBlockProcessor = new "models.build.DirectiveBlockProcessor@bxsites"()
 		var nav = variables.navBuilder.build( pages, arguments.navConfig )
 		nav = variables.pluginLoader.applyOnNav( arguments.plugins, nav, arguments.config )
@@ -1174,23 +1173,25 @@ class {
 		var renderingStartedAt = getTickCount()
 		for ( var page in pages ) {
 			page.canonicalUrl = canonicalUrlFor( page.urlPath, arguments.basePath, arguments.siteOrigin )
-			var html = ""
-			lock name="bxsites-theme-renderer" type="exclusive" timeout=30 throwOnTimeout=true {
-					html = treeThemeRenderer.renderPage(
-					page,
-					nav,
-					arguments.config,
-					arguments.themeDir,
-					arguments.basePath,
-					arguments.versions,
-					arguments.currentVersion,
-					arguments.locales,
-					arguments.currentLocale,
-					arguments.currentLocaleDir,
-					arguments.functions,
-					arguments.data
-				)
-			}
+			// No lock - ThemeRenderer.renderPage() renders every page through
+			// its own fresh, isolated RendererEncapsulator instance rather
+			// than shared instance state, so concurrent calls into this one
+			// shared variables.themeRenderer (across trees building in
+			// parallel via futureNew().allApply()) are race-free.
+			var html = variables.themeRenderer.renderPage(
+				page,
+				nav,
+				arguments.config,
+				arguments.themeDir,
+				arguments.basePath,
+				arguments.versions,
+				arguments.currentVersion,
+				arguments.locales,
+				arguments.currentLocale,
+				arguments.currentLocaleDir,
+				arguments.functions,
+				arguments.data
+			)
 			var outputPath = arguments.outputDir & "/" & page.urlPath
 			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
 			fileWrite( outputPath, html )
@@ -2015,12 +2016,15 @@ class {
 	 * @functions FunctionsLoader.load()'s own output, threaded through to themeRenderer.renderPage()
 	 * @currentVersion Which `versions` entry this page's own tree IS, for the switcher's own "selected" state - "Latest" by default, matching the root tree's own render (the blog is main-tree-only in v1, always rendered as part of whichever tree is currently the site root)
 	 * @data DataLoader.load()'s own output, threaded through to themeRenderer.renderPage()
+	 * @layoutHint ThemeRenderer.renderPage()'s own `layoutHint` - "" (the default) for a blog post (renders through the theme's normal `layout.bxm`), `"blog"` for one of BlogBuilder.build()'s own `indexPages` (build()'s own docblock)
+	 * @bodyHint ThemeRenderer.renderPage()'s own `bodyHint` - `"blog-page"` for an individual blog post, "" (the default) for an index page (its own `contentHtml` is already fully built by BlogBuilder.bx, so it renders through the theme's normal `page.bxm` body unless a project's own theme overrides that)
 	 */
-	private void function writeRenderedPage( required struct page, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required array locales, required string currentLocale, required string currentLocaleDir, string siteOrigin = "", struct functions = {}, string currentVersion = "Latest", struct data = {} ) {
+	private void function writeRenderedPage( required struct page, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required array locales, required string currentLocale, required string currentLocaleDir, string siteOrigin = "", struct functions = {}, string currentVersion = "Latest", struct data = {}, string layoutHint = "", string bodyHint = "" ) {
 		arguments.page.canonicalUrl = canonicalUrlFor( arguments.page.urlPath, arguments.basePath, arguments.siteOrigin )
 		var html = variables.themeRenderer.renderPage(
 			arguments.page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, arguments.currentVersion,
-			arguments.locales, arguments.currentLocale, arguments.currentLocaleDir, arguments.functions, arguments.data
+			arguments.locales, arguments.currentLocale, arguments.currentLocaleDir, arguments.functions, arguments.data,
+			arguments.layoutHint, arguments.bodyHint
 		)
 		var outputPath = arguments.siteDir & "/" & arguments.page.urlPath
 		directoryCreate( getDirectoryFromPath( outputPath ), true, true )

@@ -227,6 +227,12 @@ Your content here.
   sulla pagina stessa)
 - `ogImage` - sovrascrive l'immagine social-card di questa singola pagina -
   vedi [`ogImage`](configuration.md#ogimage)
+- `layout` - renderizza il corpo di questa pagina tramite un file `.bxm`
+  con un nome specifico invece del `page.bxm` predefinito del tema attivo
+  (il proprio `blog-page.bxm` del tema attivo per un articolo del blog, se
+  presente) - ricade su `page.bxm` quando il file indicato non esiste,
+  invece di far fallire la build - vedi
+  [Più layout per pagina](guides/themes.md#piu-layout-per-pagina)
 
 I valori del frontmatter possono essere liste inline (`tags: [a, b, c]`),
 liste in stile YAML a blocchi (`tags:` seguito da righe `- elemento`

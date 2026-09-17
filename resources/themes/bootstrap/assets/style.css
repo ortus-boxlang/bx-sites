@@ -591,6 +591,14 @@ a:hover {
    for free from bx-markdown's own `anchorLinks` setting (on by default),
    which already emits an empty `<a class="anchor" id="...">` right before
    each heading's text - this only adds the missing "#" glyph + hover. */
+/* blog-page.bxm's own reading-column hook - a blog post is long-form prose,
+   read comfortably narrower than docs' wider, sidebar-flanked layout. */
+.blog-post-article {
+    max-width: 46rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .page-content h1,
 .page-content h2,
 .page-content h3 {
