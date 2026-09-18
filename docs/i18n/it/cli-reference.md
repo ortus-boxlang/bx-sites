@@ -45,23 +45,26 @@ la convenzione `docs/`-o-`src/`. `new` genera sempre lo scheletro di
 Genera lo scheletro di un progetto di documentazione.
 
 ```bash title="Utilizzo"
-bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|json]
+bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|json] [--source=docs|src]
 ```
 
 - `--name` - il nome del sito scritto nella configurazione del sito (per default, il nome della cartella di destinazione)
 - `--theme` - il valore predefinito è `bootstrap`
 - `--description` - la descrizione del sito scritta nella configurazione del sito
 - `--format` - `yaml` (predefinito, genera lo scheletro di `bxsites.yaml`) oppure `json` (genera lo scheletro di `bxsites.json`)
+- `--source` - `docs` (predefinito) oppure `src`, la cartella in cui vengono generati pagine e asset
 
 ## `build`
 
-Genera `docs/**.md` in un sito statico dentro `site/`. Compila anche
+Genera le pagine Markdown dalla cartella sorgente del progetto in un sito
+statico dentro `site/`: `docs/**/*.md` quando il progetto usa `docs/` (il
+predefinito), oppure `src/**/*.md` quando usa `src/`. Compila anche
 l'indice di ricerca (a meno che `search` non sia `false` nella
-configurazione del sito, o che `searchProvider` sia impostato su un
-provider - come `algolia`/`pagefind` - che non lo usa, vedi
+configurazione del sito, o che `searchProvider` sia impostato su un provider
+- come `algolia`/`pagefind` - che non lo usa, vedi
 [Ricerca](guides/search.md)), esegue la CLI di `pagefind` sul `site/`
-finito quando `searchProvider.provider` è `"pagefind"`, e copia il tema +
-`docs/assets/**` in `site/`.
+finito quando `searchProvider.provider` è `"pagefind"`, e copia il tema e
+`assets/**` dalla cartella sorgente in `site/`.
 
 ```bash frame="terminal" title="Terminal"
 bxSites build

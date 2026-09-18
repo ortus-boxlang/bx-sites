@@ -12,9 +12,10 @@ class {
 
 	/**
 	 * Dispatches the `new` verb to ProjectScaffolder.scaffold(), after
-	 * validating `--theme` against the built-in theme names.
+	 * validating `--theme` and `--source` against the supported values.
 	 *
 	 * @options { projectRoot (required, absolute path), name, theme (defaults to "bootstrap"), description, format ("yaml" default, "toml", or "json") }
+	 * @options { projectRoot (required, absolute path), name, theme (defaults to "bootstrap"), description, format ("yaml" default, "toml", or "json"), source ("docs" default or "src") }
 	 */
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
@@ -37,9 +38,30 @@ class {
 		}
 
 		var format = trim( len( arguments.options.format ?: "" ) ? arguments.options.format : "yaml" )
+		var hasDocsShortcut = arguments.options.docs ?: false
+		var hasSiteShortcut = arguments.options.site ?: false
+		if ( hasDocsShortcut && hasSiteShortcut ) {
+			throw(
+				type    = "BxSites.InvalidSource",
+				message = "Use only one of --docs or --site"
+			)
+		}
+
+		var source = lCase( trim( len( arguments.options.source ?: "" ) ? arguments.options.source : "docs" ) )
+		if ( !len( arguments.options.source ?: "" ) && hasDocsShortcut ) {
+			source = "docs"
+		} else if ( !len( arguments.options.source ?: "" ) && hasSiteShortcut ) {
+			source = "src"
+		}
+		if ( ![ "docs", "src" ].contains( source ) ) {
+			throw(
+				type    = "BxSites.InvalidSource",
+				message = "Unknown source folder [#source#] - must be one of: docs, src"
+			)
+		}
 
 		var scaffolder = new "models.build.ProjectScaffolder@bxsites"()
-		var result = scaffolder.scaffold( projectRoot, name, theme, arguments.options.description ?: "", format )
+		var result = scaffolder.scaffold( projectRoot, name, theme, arguments.options.description ?: "", format, source )
 
 		return {
 			exitCode : 0,

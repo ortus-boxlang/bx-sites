@@ -35,12 +35,84 @@ contracts.
   supported through `bxsites.json` and `--format=json`; `docs/nav.json` is
   always JSON because it is parsed separately as a navigation override.
 
+## Local Toolchain Setup
+
+On a fresh machine/sandbox with no BoxLang install, bootstrap the toolchain
+like this (idempotent - safe to re-run):
+
+```bash
+# 1. Installs BoxLang + a bundled Lucee-based CommandBox (v6.x) to
+#    /usr/local/boxlang, and bx-cli's own launcher scripts to /root/.boxlang/bin.
+/bin/bash -c "$(curl -fsSL https://install.boxlang.io)"
+
+# 2. install-boxlang/install-bx-module need these two vars in the SAME shell
+#    invocation that calls them - the installer appends them to ~/.bashrc, but
+#    most non-interactive shells (including how Bash tool calls run here) hit
+#    Ubuntu's default `[ -z "$PS1" ] && return` guard near the top of
+#    ~/.bashrc, so `source ~/.bashrc` alone silently no-ops and leaves them
+#    unset. Export them directly instead, every time, rather than sourcing.
+export BOXLANG_INSTALL_HOME="/usr/local/boxlang"
+export PATH="/root/.boxlang/bin:/usr/local/bin:$PATH"
+
+# 3. Install the real, BoxLang-native CommandBox (bx-cli, v7.x) - NOT the
+#    Lucee-based v6.x one the quick installer bundles as a fallback at
+#    /usr/local/boxlang/bin/box. Both land on PATH as `box`; bx-cli's own
+#    launcher at /root/.boxlang/bin/box must come FIRST (see the export
+#    above) or the wrong `box` wins silently. `box version` should report
+#    "CommandBox 7.x" (bx-cli), not "CommandBox 6.x" (Lucee) - verify this
+#    before trusting any following `box`/`install-bx-module` output.
+install-bx-module bx-cli
+
+# 4. Project-local dependencies (testbox, coldbox modules, etc. - box.json's
+#    own devDependencies), plus the global BoxLang modules CI installs via
+#    setup-boxlang's own `modules:` list (not part of box.json, since these
+#    are runtime deps of the module itself, not the test tooling).
+cd /path/to/bx-sites
+box install --verbose --nosave
+install-bx-module bx-esapi,bx-yaml,bx-toml,bx-markdown,bx-image,bx-docbox
+
+# 5. BoxLang looks for modules under $BOXLANG_HOME/modules (default
+#    ~/.boxlang/modules) by name, matching @bxsites references throughout
+#    this codebase - symlink this checkout in under that name (see
+#    tests.yml's own "Test Module" step, which does the same in CI).
+export BOXLANG_HOME="/root/.boxlang"
+mkdir -p "${BOXLANG_HOME}/modules"
+ln -sfn "$(pwd)" "${BOXLANG_HOME}/modules/bx-sites"
+
+chmod +x testbox/run
+./testbox/run --stream
+```
+
+Every later shell (a fresh Bash tool call, a new terminal) needs the three
+`export`s from steps 2 and 5 re-set - none of it persists via `~/.bashrc` in
+a non-interactive shell, per the gotcha above.
+
+If a source file's edits don't seem to take effect on the next test run,
+clear BoxLang's own compiled-class cache and retry before assuming the
+change is wrong - it's usually just stale bytecode from a prior run in the
+same session:
+
+```bash
+rm -rf "${BOXLANG_HOME}/classes/$(pwd | tr '/' '_')"
+```
+
 ## Build And Test
 
 - Install dependencies with `box install --verbose --nosave` when reproducing
   CI locally.
-- Run the focused TestBox suite with:
-  `./testbox/run --reporter=ANTJunit --verbose`.
+- Use the native BoxLang TestBox runner at `./testbox/run`; its streaming flag
+  is `--stream` (not `--streaming`).
+- Run all normal specs with `./testbox/run --stream` or use
+  `./testbox/run --reporter=ANTJunit --verbose` for CI-style output.
+- Select bundles with `--bundles=<dot-notated-bundle>`; use
+  `--filter-bundles=<pattern>` only to filter discovered bundles. For example:
+  `./testbox/run --bundles=tests.specs.cli.NewSpec --stream`.
+- Use `--show-failed-only --hide-skipped` to keep focused streaming output
+  concise, and `--slow-threshold-ms=<n>` or `--top-slowest=<n>` to investigate
+  slow specs.
+- The full dogfood documentation build is opt-in. Normal tests skip
+  `DogfoodDocsSpec` without building the docs; run it explicitly with:
+  `BXSITES_RUN_DOGFOOD_TESTS=true ./testbox/run --bundles=tests.specs.DogfoodDocsSpec --stream`.
 - TestBox's runner does not reliably return a failing process exit code. When
   consuming its results in automation, inspect the generated JUnit XML for
   nonzero `failures` or `errors`, as `.github/workflows/tests.yml` does.
@@ -57,7 +129,7 @@ contracts.
 
 ## Documentation And Locales
 
-- Keep `docs/i18n/{de,es,it,ja}/` synchronized with the English documentation
+- Keep `docs/i18n/{de,es,it}/` synchronized with the English documentation
   tree. Any documentation change under `docs/` needs the equivalent translated
   update in each locale mirror unless the task explicitly scopes the change to
   English.
@@ -97,6 +169,80 @@ contracts.
   published root and `/next/` content between `main` and `development`.
 - Keep workflow changes aligned with the module's actual packaging and build
   behavior; do not rely on a green CLI exit code alone for site builds.
+
+## Available Skills
+
+The repository ships task-specific agent skills in `.agents/skills`. Before
+implementing, reviewing, or debugging work covered by one of these areas, read
+the relevant `SKILL.md` and follow its guidance. Prefer the most specific skill
+available when more than one applies.
+
+### BoxLang Core
+
+- `boxlang-core-dev-async-tasks`: BoxFuture, AsyncService, executors, schedulers, and async lifecycle callbacks.
+- `boxlang-core-dev-bif-development`: Custom BoxLang built-in functions and module registration.
+- `boxlang-core-dev-component-development`: Custom BoxLang components and tag registration.
+- `boxlang-core-dev-interceptors`: Interceptors, observer events, pools, and registration.
+- `boxlang-core-dev-logging`: LoggingService, BoxLangLogger, and structured logging configuration.
+- `boxlang-core-dev-module-development`: ModuleConfig lifecycle, metadata, BIFs, interceptors, and packaging.
+- `boxlang-core-dev-runtime-architecture`: BoxLang runtime, scopes, types, parsing, contexts, and class loading.
+- `boxlang-scheduled-tasks`: Scheduler DSL, cron/frequency constraints, lifecycle callbacks, and scheduled HTTP work.
+- `boxlang-security`: BoxLang security settings, validation, file uploads, secrets, and OWASP concerns.
+- `boxlang-templating`: `.bxm` templates, mixed HTML/BoxLang, and template components.
+- `boxlang-web-development`: BoxLang web applications, HTTP handling, REST, sessions, CSRF, and servers.
+- `boxlang-zip`: ZIP creation and extraction with the `bx:zip` component.
+
+### BoxLang Modules And Integrations
+
+- `bx-docbox`: DocBox API documentation generation and output strategies.
+- `bx-esapi`: OWASP ESAPI encoding, decoding, and HTML sanitization.
+- `bx-ftp`: FTP, FTPS, SFTP, SSH keys, and connection pools.
+- `bx-image`: Image creation and manipulation with bx-image.
+- `bx-mail`: Mail components, multipart messages, SMTP, signing, and encryption.
+- `bx-pdf`: PDF documents, sections, headers, footers, saving, and encryption.
+- `bx-rss`: RSS/Atom feed reading and creation.
+- `bx-web-support`: Mock web servers, requests, and web-context tests.
+- `bx-yaml`: YAML serialization, deserialization, files, and BoxLang classes.
+
+### CommandBox
+
+- `commandbox-config-settings`: Global CommandBox settings and environment overrides.
+- `commandbox-deploying`: CommandBox production deployment, Docker, CI, and hosting.
+- `commandbox-developing`: Custom commands, namespaces, WireBox, modules, and interceptors.
+- `commandbox-embedded-server`: Embedded server configuration, SSL, bindings, aliases, and profiles.
+- `commandbox-package-management`: `box.json`, ForgeBox packages, dependencies, locks, and publishing.
+- `commandbox-setup`: Installing and configuring CommandBox and Java runtimes.
+- `commandbox-task-runners`: Task runners, targets, lifecycle hooks, jobs, watchers, and shell integration.
+- `commandbox-testing`: CommandBox and TestBox integration, runners, reporters, and coverage.
+- `commandbox-usage`: CommandBox commands, namespaces, settings, recipes, aliases, and shell usage.
+
+### Testing
+
+- `boxlang-testing`: BoxLang TestBox tests, BDD, xUnit, MockBox, fixtures, async tests, and CLI execution.
+- `testbox-assertions`: `$assert` methods, custom assertions, type, collection, exception, and numeric checks.
+- `testbox-bdd`: BDD suites, lifecycle hooks, labels, focused/skipped specs, and data binding.
+- `testbox-cbmockdata`: Realistic mock data, nested objects, arrays, and custom suppliers.
+- `testbox-expectations`: Fluent `expect()` matchers, collection modes, negation, and custom matchers.
+- `testing-fixtures`: Shared fixtures, factories, test data builders, and fixture lifecycle.
+- `testbox-listeners`: Test run listener callbacks and lifecycle reporting.
+- `testbox-mockbox`: MockBox mocks, stubs, spies, verification, properties, and query simulation.
+- `testbox-reporters`: TestBox reporter selection, options, and custom reporters.
+- `testbox-runners`: TestBox CLI, BoxLang, web, programmatic, streaming, watcher, and filtering options.
+- `testbox-unit-xunit`: xUnit test classes, lifecycle methods, `$assert`, and AAA structure.
+- `testing-coverage`: Coverage configuration, reporting, CI integration, and interpretation.
+- `testing-fixtures`: Shared fixtures, factories, test data builders, and fixture lifecycle.
+
+### Engineering And Supporting Tools
+
+- `code-documenter`: Developer documentation, API references, runbooks, and documentation consistency.
+- `code-reviewer`: Reviews focused on correctness, security, maintainability, performance, and test risk.
+- `gitbook-docs-expert`: GitBook frontmatter, hints, content references, embeds, tabs, and navigation.
+- `github-action-authoring`: Composite GitHub Actions, runner support, PATH issues, and CI jobs.
+- `java-expert`: Java services, libraries, concurrency, performance, dependencies, and hardening.
+- `junit-expert`: JUnit 5 lifecycle, parameterized tests, assertions, extensions, and build integration.
+- `mockito-expert`: Mockito mocks, stubs, spies, matchers, captors, and strict stubbing.
+- `ortus-java-coding-standards`: Ortus formatting, naming, structure, and code-style conventions.
+- `security-expert`: Secure system design, threat modeling, secrets, authentication, and authorization.
 
 ## Change Discipline
 

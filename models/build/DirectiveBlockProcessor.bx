@@ -44,6 +44,17 @@ class {
 	// `bxsites-openapi--operation` class (renderOpenApi()'s own docblock).
 	variables.openApiSrcPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '(<div class="bxsites-openapi[^"]*" data-openapi-src=")([^"]*)("[^>]*>)' )
 	variables.openApiOperationPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^(\S+)\s+(/\S*)$" )
+	// A convention-mode `::: image-gallery name="..."` (no ::: image
+	// children) - see renderImageGallery()'s own docblock for why it's
+	// left as a placeholder here and filled in later by
+	// resolveImageGalleries().
+	variables.imageGalleryPendingPattern = createObject( "java", "java.util.regex.Pattern" ).compile( '<div class="bxsites-image-gallery bxsites-image-gallery--cols-(\d) bxsites-image-gallery--pending" data-bxsites-gallery-name="([^"]*)"></div>' )
+	// A convention-mode gallery's own image files - "{galleryName}-{order}.{ext}",
+	// e.g. "vacation-1.jpg". Matched generically (not with the gallery name
+	// baked into the pattern) so an untrusted gallery name is never compiled
+	// as part of a regex - resolveImageGalleries() compares group(1) against
+	// the gallery name as a plain string instead.
+	variables.imageGalleryFilePattern = createObject( "java", "java.util.regex.Pattern" ).compile( "(?i)^(.+)-(\d+)\.(jpg|jpeg|png|webp|gif)$" )
 	variables.forSpecPattern = createObject( "java", "java.util.regex.Pattern" ).compile( "^(\w+)\s*,\s*(\w+)\s+in\s+(.+)$" )
 	// `::: contact-form`'s own `fields="name:type,..."` DSL - matched
 	// against each comma-separated segment *after* parseContactFields()
@@ -583,6 +594,8 @@ class {
 				return renderColumns( block, renderer, markdownOptions )
 			case "stepper":
 				return renderStepper( block, renderer, markdownOptions )
+			case "image-gallery":
+				return renderImageGallery( block, attrs, renderer, markdownOptions )
 			case "updates":
 				return renderUpdates( block, renderer, markdownOptions )
 			case "file":
@@ -764,14 +777,14 @@ class {
 			)
 		}
 
-		var html = ""
+		var html = sb{ "" }
 		for ( loopItem, loopIndex in lookup.value ) {
 			var iterVars = duplicate( variables.loopPageVars )
 			iterVars[ spec.itemName ] = loopItem
 			iterVars[ spec.indexName ] = loopIndex
 			html &= renderWithVars( arguments.block.content, iterVars, arguments.renderer, arguments.markdownOptions )
 		}
-		return html
+		return html.toString()
 	}
 
 	/**
@@ -881,7 +894,7 @@ class {
 			return '<div class="bxsites-audience-switcher bxsites-audience-switcher--invalid">::: audience-switcher - requires both key="..." and options="value:Label,..."</div>'
 		}
 
-		var buttons = ""
+		var buttons = sb{ "" }
 		for ( var pair in listToArray( optionsRaw, "," ) ) {
 			var value = trim( listFirst( pair, ":" ) )
 			var label = listLen( pair, ":" ) > 1 ? trim( listRest( pair, ":" ) ) : value
@@ -891,7 +904,7 @@ class {
 			buttons &= '<button type="button" class="bxsites-audience-switcher__option" data-bxsites-value="' & attrEscape( value ) & '">' & encodeForHTML( label ) & '</button>'
 		}
 
-		return '<div class="bxsites-audience-switcher" data-bxsites-key="' & attrEscape( key ) & '">' & buttons & '</div>'
+		return '<div class="bxsites-audience-switcher" data-bxsites-key="' & attrEscape( key ) & '">' & buttons.toString() & '</div>'
 	}
 
 	/**
@@ -903,7 +916,7 @@ class {
 	 */
 	private string function renderCards( required struct block, required any renderer, required struct markdownOptions ) {
 		var children = this.extract( arguments.block.content ).blocks
-		var html = '<div class="bxsites-cards">'
+		var html = sb{ '<div class="bxsites-cards">' }
 
 		for ( var child in children ) {
 			var attrs = parseAttrs( child.attrsRaw )
@@ -938,7 +951,7 @@ class {
 			html &= "</" & tag & ">"
 		}
 
-		return html & "</div>"
+		return html.toString() & "</div>"
 	}
 
 	/**
@@ -948,7 +961,7 @@ class {
 	 */
 	private string function renderColumns( required struct block, required any renderer, required struct markdownOptions ) {
 		var children = this.extract( arguments.block.content ).blocks
-		var html = '<div class="bxsites-columns">'
+		var html = sb{ '<div class="bxsites-columns">' }
 
 		for ( var child in children ) {
 			var attrs = parseAttrs( child.attrsRaw )
@@ -962,7 +975,7 @@ class {
 			html &= '<div class="bxsites-column"' & styleAttr & '>' & renderNested( child.content, arguments.renderer, arguments.markdownOptions ) & '</div>'
 		}
 
-		return html & "</div>"
+		return html.toString() & "</div>"
 	}
 
 	/**
@@ -974,7 +987,7 @@ class {
 	 */
 	private string function renderStepper( required struct block, required any renderer, required struct markdownOptions ) {
 		var children = this.extract( arguments.block.content ).blocks
-		var html = '<div class="bxsites-stepper">'
+		var html = sb{ '<div class="bxsites-stepper">' }
 		var idx = 0
 
 		for ( var child in children ) {
@@ -994,7 +1007,76 @@ class {
 				& '</div></div>'
 		}
 
-		return html & "</div>"
+		return html.toString() & "</div>"
+	}
+
+	/**
+	 * `::: image-gallery columns="3"` - a responsive grid of images with a
+	 * click-to-enlarge lightbox (image-gallery-init.js). Two ways to fill
+	 * it, checked in this order:
+	 *
+	 * 1. `::: image src="..." alt="..." caption="..."` children (renderImage()
+	 *    below) - `src` is resolved the same file-relative way as an
+	 *    ordinary Markdown image (`![]()`) or a card's own `image="..."` -
+	 *    ResponsiveImageProcessor.bx picks up every plain `<img>` this
+	 *    emits generically (directive-agnostic), so a gallery image gets
+	 *    the same automatic WebP/`<picture>` upgrade with no extra work
+	 *    here.
+	 * 2. No children - a `name="..."` attribute instead, building itself
+	 *    from every `docs/assets/gallery/{name}/{name}-{N}.*` file on disk,
+	 *    in ascending `N` order. This processor has no filesystem/basePath
+	 *    access during restore() itself (the same reason renderFile()'s own
+	 *    `src` is resolved later, not here) - a placeholder is left instead,
+	 *    filled in by resolveImageGalleries() right after restore() runs,
+	 *    once BuildPipeline.bx's convertMarkdown() can hand it `docsDir`.
+	 *    This mode has no per-image alt/caption - use `::: image` children
+	 *    for that.
+	 *
+	 * `columns` is one of 2/3/4 (default 3) - anything else silently falls
+	 * back to 3, the same "forgiving typo" precedent as `::: step`'s own
+	 * `color` attribute.
+	 */
+	private string function renderImageGallery( required struct block, required struct attrs, required any renderer, required struct markdownOptions ) {
+		var requestedColumns = trim( arguments.attrs.columns ?: "3" )
+		var columns = listFindNoCase( "2,3,4", requestedColumns ) ? requestedColumns : "3"
+		var children = this.extract( arguments.block.content ).blocks
+
+		if ( !children.len() ) {
+			var name = trim( arguments.attrs.name ?: "" )
+			if ( !len( name ) ) {
+				return '<div class="bxsites-image-gallery bxsites-image-gallery--invalid">::: image-gallery - needs either ::: image children or a name="..." attribute</div>'
+			}
+			return '<div class="bxsites-image-gallery bxsites-image-gallery--cols-' & columns & ' bxsites-image-gallery--pending" data-bxsites-gallery-name="' & attrEscape( name ) & '"></div>'
+		}
+
+		var html = sb{ '<div class="bxsites-image-gallery bxsites-image-gallery--cols-' & columns & '">' }
+		for ( var child in children ) {
+			html &= renderImage( parseAttrs( child.attrsRaw ) )
+		}
+		return html.toString() & "</div>"
+	}
+
+	/**
+	 * One `::: image-gallery` item - `alt`/`caption` are both optional
+	 * (an omitted `alt` matches `::: card`'s own `image="..."` precedent of
+	 * an empty, not missing, `alt`). `loading="lazy"` and
+	 * `data-bxsites-lightbox` (image-gallery-init.js's own click hook) are
+	 * preserved as-authored by ResponsiveImageProcessor.bx's `<img>`
+	 * rewrite - only `src`/`srcset`/`sizes` are ever touched there.
+	 */
+	private string function renderImage( required struct attrs ) {
+		var src = trim( arguments.attrs.src ?: "" )
+		if ( !len( src ) ) {
+			return '<figure class="bxsites-image-gallery__item bxsites-image-gallery__item--invalid">::: image - missing required src="..."</figure>'
+		}
+		var alt = trim( arguments.attrs.alt ?: "" )
+		var caption = trim( arguments.attrs.caption ?: "" )
+		var figcaption = len( caption ) ? '<figcaption class="bxsites-image-gallery__caption">' & encodeForHTML( caption ) & '</figcaption>' : ""
+
+		return '<figure class="bxsites-image-gallery__item">'
+			& '<img class="bxsites-image-gallery__image" src="' & attrEscape( src ) & '" alt="' & attrEscape( alt ) & '" data-bxsites-lightbox loading="lazy">'
+			& figcaption
+			& '</figure>'
 	}
 
 	/**
@@ -1006,7 +1088,7 @@ class {
 	 */
 	private string function renderUpdates( required struct block, required any renderer, required struct markdownOptions ) {
 		var children = this.extract( arguments.block.content ).blocks
-		var html = '<div class="bxsites-updates">'
+		var html = sb{ '<div class="bxsites-updates">' }
 
 		for ( var child in children ) {
 			var attrs = parseAttrs( child.attrsRaw )
@@ -1028,7 +1110,7 @@ class {
 				& '</div>'
 		}
 
-		return html & "</div>"
+		return html.toString() & "</div>"
 	}
 
 	/**
@@ -1105,18 +1187,18 @@ class {
 		var href = trim( arguments.attrs.href ?: "" )
 		var classes = "bxsites-button bxsites-button--" & style & " bxsites-button--" & size & ( disabled ? " bxsites-button--disabled" : "" )
 
-		var inner = ""
+		var inner = sb{ "" }
 		if ( len( trim( arguments.attrs.icon ?: "" ) ) ) {
 			inner &= '<span class="bxsites-button__icon">' & variables.iconResolver.resolve( arguments.attrs.icon ) & '</span>'
 		}
 		inner &= '<span class="bxsites-button__label">' & encodeForHTML( label ) & '</span>'
 
 		if ( disabled || !len( href ) ) {
-			return '<span class="' & classes & '" aria-disabled="true">' & inner & '</span>'
+			return '<span class="' & classes & '" aria-disabled="true">' & inner.toString() & '</span>'
 		}
 
 		var targetAttr = lCase( trim( arguments.attrs.target ?: "" ) ) == "_blank" ? ' target="_blank" rel="noopener noreferrer"' : ""
-		return '<a class="' & classes & '" href="' & attrEscape( href ) & '"' & targetAttr & '>' & inner & '</a>'
+		return '<a class="' & classes & '" href="' & attrEscape( href ) & '"' & targetAttr & '>' & inner.toString() & '</a>'
 	}
 
 	/**
@@ -1127,11 +1209,11 @@ class {
 	 */
 	private string function renderButtons( required struct block, required any renderer, required struct markdownOptions ) {
 		var children = this.extract( arguments.block.content ).blocks
-		var html = '<div class="bxsites-buttons">'
+		var html = sb{ '<div class="bxsites-buttons">' }
 		for ( var child in children ) {
 			html &= renderButton( parseAttrs( child.attrsRaw ) )
 		}
-		return html & "</div>"
+		return html.toString() & "</div>"
 	}
 
 	/**
@@ -1175,11 +1257,11 @@ class {
 		}
 
 		var title = trim( arguments.attrs.title ?: "" )
-		var html = ""
+		var html = sb{ "" }
 		if ( len( title ) ) {
 			html &= '<div class="bxsites-openapi__title">' & encodeForHTML( title ) & '</div>'
 		}
-		return '<div class="bxsites-openapi' & ( len( operation ) ? " bxsites-openapi--operation" : "" ) & '" data-openapi-src="' & attrEscape( src ) & '"' & operationAttr & '>' & html & '</div>'
+		return '<div class="bxsites-openapi' & ( len( operation ) ? " bxsites-openapi--operation" : "" ) & '" data-openapi-src="' & attrEscape( src ) & '"' & operationAttr & '>' & html.toString() & '</div>'
 	}
 
 	/**
@@ -1218,12 +1300,12 @@ class {
 				& ( len( title ) ? encodeForHTML( title ) : encodeForHTML( url ) ) & ' ↗</a>'
 		}
 
-		var html = '<div class="bxsites-embed"><iframe src="' & attrEscape( embedUrl ) & '" loading="lazy" allowfullscreen'
-			& ' referrerpolicy="strict-origin-when-cross-origin"></iframe></div>'
+		var html = sb{ '<div class="bxsites-embed"><iframe src="' & attrEscape( embedUrl ) & '" loading="lazy" allowfullscreen'
+			& ' referrerpolicy="strict-origin-when-cross-origin"></iframe></div>' }
 		if ( len( title ) ) {
 			html &= '<div class="bxsites-embed__caption">' & encodeForHTML( title ) & '</div>'
 		}
-		return html
+		return html.toString()
 	}
 
 	/**
@@ -1440,7 +1522,7 @@ class {
 		var image = trim( arguments.attrs.image ?: "" )
 		var domain = linkPreviewDomain( url )
 
-		var html = '<a class="bxsites-link-preview" href="' & attrEscape( url ) & '" target="_blank" rel="noopener noreferrer">'
+		var html = sb{ '<a class="bxsites-link-preview" href="' & attrEscape( url ) & '" target="_blank" rel="noopener noreferrer">' }
 		if ( len( image ) ) {
 			html &= '<div class="bxsites-link-preview__image"><img src="' & attrEscape( image ) & '" alt=""></div>'
 		}
@@ -1453,7 +1535,7 @@ class {
 			html &= '<div class="bxsites-link-preview__domain">' & encodeForHTML( domain ) & '</div>'
 		}
 		html &= '</div></a>'
-		return html
+		return html.toString()
 	}
 
 	/**
@@ -1500,8 +1582,8 @@ class {
 		var state = normalizePromptState( arguments.attrs.expanded ?: "" )
 		var promptText = trim( arguments.block.content )
 
-		var html = '<div class="bxsites-prompt bxsites-prompt--' & state & '" data-bxsites-prompt-text="' & encodeForHTML( promptText ) & '">'
-			& '<div class="bxsites-prompt__header">'
+		var html = sb{ '<div class="bxsites-prompt bxsites-prompt--' & state & '" data-bxsites-prompt-text="' & encodeForHTML( promptText ) & '">'
+			& '<div class="bxsites-prompt__header">' }
 		if ( len( iconHtml ) ) {
 			html &= '<div class="bxsites-prompt__icon">' & iconHtml & '</div>'
 		}
@@ -1532,7 +1614,7 @@ class {
 		}
 
 		html &= '</div>'
-		return html
+		return html.toString()
 	}
 
 	/**
@@ -1627,6 +1709,88 @@ class {
 		matcher.appendTail( buffer )
 
 		return buffer.toString()
+	}
+
+	/**
+	 * Fills in every convention-mode `::: image-gallery name="..."` left as
+	 * a placeholder by renderImageGallery() above - the filesystem-scanning
+	 * counterpart to resolveFileHrefs()/resolveOpenApiSrcs(), and the same
+	 * reason it runs here instead of during restore(): only BuildPipeline.bx's
+	 * convertMarkdown() has `docsDir`/the current page's own
+	 * `sourceRelativePath` in scope.
+	 *
+	 * @html Already-rendered page HTML (this class's own `restore()` output)
+	 * @docsDir Absolute path to this tree's own `docs/` directory
+	 * @sourceRelativePath The current page's own docs/-relative source path (DocsLoader.bx's `relativePath`)
+	 */
+	string function resolveImageGalleries( required string html, required string docsDir, required string sourceRelativePath ) {
+		var matcher = variables.imageGalleryPendingPattern.matcher( arguments.html )
+		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+
+		while ( matcher.find() ) {
+			var replacement = renderConventionGallery( matcher.group( 2 ), arguments.docsDir, arguments.sourceRelativePath, matcher.group( 1 ) )
+			matcher.appendReplacement( buffer, createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( replacement ) )
+		}
+		matcher.appendTail( buffer )
+
+		return buffer.toString()
+	}
+
+	/**
+	 * Lists `docsDir/assets/gallery/{name}/`, keeps only `{name}-{N}.{jpg,
+	 * jpeg,png,webp,gif}` files (case-insensitive), sorts by `N` ascending,
+	 * and emits the same plain `<img>` markup renderImage() would for an
+	 * explicit `::: image` child - each `src` written relative to the
+	 * CURRENT PAGE (however deep `sourceRelativePath` is nested), the same
+	 * file-relative convention every other image in this file already uses,
+	 * so ResponsiveImageProcessor.bx's later, generic `<img>` pass still
+	 * picks these up for the WebP/`<picture>` upgrade with zero
+	 * gallery-specific code there.
+	 *
+	 * A `name` with no matching directory/files renders the same
+	 * `--invalid` fallback renderImageGallery() uses for a genuinely
+	 * malformed block - a typo'd gallery name should be as visible as a
+	 * typo'd directive name, not a silently empty grid.
+	 *
+	 * @name The gallery's own `name="..."` attribute value
+	 * @docsDir Absolute path to this tree's own `docs/` directory
+	 * @sourceRelativePath The current page's own docs/-relative source path
+	 * @columns 2/3/4 - already validated by renderImageGallery()
+	 */
+	private string function renderConventionGallery( required string name, required string docsDir, required string sourceRelativePath, required string columns ) {
+		var galleryDir = arguments.docsDir.reReplace( "[\/]+$", "" ) & "/assets/gallery/" & arguments.name
+		var invalid = '<div class="bxsites-image-gallery bxsites-image-gallery--invalid">::: image-gallery - no images found for name="' & encodeForHTML( arguments.name ) & '"</div>'
+
+		if ( !directoryExists( galleryDir ) ) {
+			return invalid
+		}
+
+		var entries = []
+		for ( var fileName in directoryList( galleryDir, false, "name" ) ) {
+			var fileMatcher = variables.imageGalleryFilePattern.matcher( fileName )
+			if ( fileMatcher.matches() && fileMatcher.group( 1 ) == arguments.name ) {
+				entries.append( { order: val( fileMatcher.group( 2 ) ), fileName: fileName } )
+			}
+		}
+		if ( !entries.len() ) {
+			return invalid
+		}
+		entries.sort( ( a, b ) => a.order - b.order )
+
+		// The number of directory levels the current page's own docs/-relative
+		// source path is nested under docs/ - one "../" per level needed to
+		// get back to docs/ before descending into assets/gallery/... (same
+		// "depth = listLen(pageDir, '/')" precedent as MarkdownZipMigrator.bx's
+		// own rewriteAssetRefs()).
+		var pageSegments = listToArray( arguments.sourceRelativePath, "/", true )
+		pageSegments.deleteAt( pageSegments.len() )
+		var relativePrefix = repeatString( "../", pageSegments.len() )
+
+		var html = sb{ '<div class="bxsites-image-gallery bxsites-image-gallery--cols-' & arguments.columns & '">' }
+		for ( var entry in entries ) {
+			html &= renderImage( { src: relativePrefix & "assets/gallery/" & arguments.name & "/" & entry.fileName } )
+		}
+		return html.toString() & "</div>"
 	}
 
 	/**
@@ -1744,7 +1908,7 @@ class {
 		// (that keeps the author's own `id` exactly as written).
 		var domId = "bxsites-contact-form-" & reReplace( formId, "[^a-zA-Z0-9_-]", "-", "all" )
 
-		var html = '<form class="bxsites-contact-form" data-bx-form data-form-id="' & attrEscape( formId ) & '"'
+		var html = sb{ '<form class="bxsites-contact-form" data-bx-form data-form-id="' & attrEscape( formId ) & '"' }
 		if ( len( to ) ) {
 			html &= ' data-form-to="' & attrEscape( to ) & '"'
 		}
@@ -1774,7 +1938,7 @@ class {
 			& '<div class="bxsites-contact-form__status" data-bx-form-status hidden></div>'
 			& '</form>'
 
-		return html
+		return html.toString()
 	}
 
 	/**

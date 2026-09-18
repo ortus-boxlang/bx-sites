@@ -1013,6 +1013,24 @@ sintaxis.
     { "openapi": true }
     ```
 
+## `imageGallery`
+
+`false` (el valor por defecto) - sin widget de lightbox en absoluto. `true`
+carga una pequeña lightbox de clic para ampliar para cada bloque de
+contenido `::: image-gallery`. Consulta
+[Bloques de Contenido](guides/content-blocks.md#image-gallery) para la
+sintaxis.
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    imageGallery: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "imageGallery": true }
+    ```
+
 ## `plugins`
 
 `[]` (el valor por defecto) - un array de nombres de módulos de BoxLang
@@ -1054,7 +1072,7 @@ idioma.
   tema propias de ese idioma (marcador de posición de búsqueda, "En esta
   página," la página 404, ...) - consulta
   [Internacionalización](guides/i18n.md#interfaz-del-tema-cadenas-de-ui)
-  para la lista completa de claves; `de`/`es`/`it`/`ja` ya incluyen una
+  para la lista completa de claves; `de`/`es`/`it` ya incluyen una
   traducción integrada, así que `strings` solo hace falta para
   sobrescribir una clave o añadir otro idioma.
 

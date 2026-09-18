@@ -76,23 +76,23 @@ class {
 		var warnings = []
 		var blockStack = [] // stack of "if" / "range", tracking what a generic {{ end }} should become
 		var matcher = variables.tokenPattern.matcher( arguments.source )
-		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+		var buffer = sb{ "" }
 		var lastEnd = 0
 
 		while ( matcher.find() ) {
 			if ( matcher.start() > lastEnd ) {
-				buffer.append( arguments.source.mid( lastEnd + 1, matcher.start() - lastEnd ) )
+				buffer &= arguments.source.mid( lastEnd + 1, matcher.start() - lastEnd )
 			}
 			lastEnd = matcher.end()
 
 			if ( matcher.start( 1 ) != -1 ) {
 				// {{/* comment */}} - dropped entirely, same as Jinja2's {# #}.
 			} else {
-				buffer.append( translateTag( matcher.group( 2 ), arguments.variableMap, blockStack, warnings ) )
+				buffer &= translateTag( matcher.group( 2 ), arguments.variableMap, blockStack, warnings )
 			}
 		}
 		if ( lastEnd < len( arguments.source ) ) {
-			buffer.append( arguments.source.mid( lastEnd + 1, len( arguments.source ) - lastEnd ) )
+			buffer &= arguments.source.mid( lastEnd + 1, len( arguments.source ) - lastEnd )
 		}
 
 		if ( blockStack.len() ) {

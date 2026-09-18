@@ -1021,6 +1021,23 @@ referenzierte OpenAPI-/Swagger-Spezifikation (JSON oder YAML). Siehe
     { "openapi": true }
     ```
 
+## `imageGallery`
+
+`false` (Standard) - keine Lightbox ausgeliefert. `true` lädt eine kleine
+Klick-zum-Vergrößern-Lightbox für jeden `::: image-gallery`-Content-Block.
+Siehe [Content-Blöcke](guides/content-blocks.md#image-gallery) für die
+Syntax.
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    imageGallery: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "imageGallery": true }
+    ```
+
 ## `plugins`
 
 `[]` (Standard) - ein Array von BoxLang-Modulnamen, die als Plugins
@@ -1060,7 +1077,7 @@ Anzeige-Label/ihre Schreibrichtung für den Sprachumschalter.
   Theme-Chrome-UI-Texte dieser Locale (Suchplatzhalter, "Auf dieser
   Seite", die 404-Seite, ...) - siehe
   [Internationalisierung](guides/i18n.md#theme-chrome-ui-texte) für die
-  vollständige Liste der Schlüssel; `de`/`es`/`it`/`ja` bringen bereits
+  vollständige Liste der Schlüssel; `de`/`es`/`it` bringen bereits
   eine eingebaute Übersetzung mit, `strings` wird also nur zum
   Überschreiben eines Schlüssels oder für eine weitere Locale gebraucht.
 

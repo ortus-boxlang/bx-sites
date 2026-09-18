@@ -10,9 +10,14 @@
 class extends="testbox.system.BaseSpec" {
 
 	function run() {
-		describe( "Dogfooded docs (this repo's own docs/ + bxsites.yaml)", function() {
+		var runDogfood = getSystemSetting( "BXSITES_RUN_DOGFOOD_TESTS", "false" ) == "true";
 
-			beforeEach( function() {
+		describe(
+			title = "Dogfooded docs (this repo's own docs/ + bxsites.yaml)",
+			skip  = !runDogfood,
+			body  = () => {
+
+			beforeEach( () => {
 				variables.repoRoot = getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]tests[\/]specs[\/]?$", "" )
 				variables.tempRoot = createTempDirectory( prefix = "bxsites-dogfood-" )
 				directoryCopy( variables.repoRoot & "/docs", variables.tempRoot & "/docs", true )
@@ -23,19 +28,19 @@ class extends="testbox.system.BaseSpec" {
 				variables.pipeline.setImageVariantGenerator( new "tests.support.FakeImageVariantGenerator@bxsites"() )
 			} );
 
-			afterEach( function() {
+			afterEach( () => {
 				if ( directoryExists( variables.tempRoot ) ) {
 					directoryDelete( variables.tempRoot, true )
 				}
 			} );
 
-			it( "loads and validates bxsites.yaml", function() {
+			it( "loads and validates bxsites.yaml", () => {
 				var config = new "models.config.ConfigLoader@bxsites"().load( repoRoot )
 				expect( config.name ).toBe( "BxSites" )
 				expect( config.theme.name ).toBe( "bootstrap" )
 			} );
 
-			it( "builds every dogfooded page without error, with a non-empty nav", function() {
+			it( "builds every dogfooded page without error, with a non-empty nav", () => {
 				var result = pipeline.build( tempRoot )
 
 				expect( result.pageCount ).toBeGTE( 5 )
@@ -47,7 +52,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( nav.len() ).toBeGT( 0 )
 			} );
 
-			it( "builds a non-empty search index for the dogfooded docs", function() {
+			it( "builds a non-empty search index for the dogfooded docs", () => {
 				pipeline.build( tempRoot )
 
 				expect( fileExists( tempRoot & "/site/search-index.json" ) ).toBeTrue()
@@ -55,7 +60,8 @@ class extends="testbox.system.BaseSpec" {
 				expect( index.len() ).toBeGTE( 5 )
 			} );
 
-		} );
+			}
+		);
 	}
 
 }

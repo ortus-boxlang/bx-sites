@@ -98,6 +98,12 @@ con un tema predeterminado diferente, y `--name="My Project Docs"` para
 establecer el nombre del sitio de antemano - de lo contrario `new` lo
 deriva del nombre del directorio de destino.
 
+`docs/` es la carpeta de origen predeterminada. Usa `bxSites new my-site
+--source=src` para generar las páginas bajo `src/`; los comandos posteriores
+detectan automáticamente la carpeta de origen y la salida sigue estando en
+`site/`. Las opciones abreviadas `--docs` y `--site` son alias de
+`--source=docs` y `--source=src`.
+
 ### Formato del archivo de configuración
 
 `bxsites.yaml` es el formato por defecto y preferido - es lo que `new`
@@ -230,6 +236,12 @@ Your content here.
   para que se renderice) - útil para una página de aterrizaje/hero que no
   quiere una TOC flotante compitiendo con su propio contenido; por
   defecto `true`
+- `layout` - renderiza el cuerpo de esta página a través de un `.bxm` con
+  nombre en lugar del `page.bxm` predeterminado del tema activo (el propio
+  `blog-page.bxm` del tema activo para una entrada de blog, si lo tiene) -
+  recurre a `page.bxm` cuando el archivo indicado no existe, en lugar de
+  hacer fallar la compilación - consulta
+  [Múltiples layouts por página](guides/themes.md#multiples-layouts-por-pagina)
 
 Los valores del frontmatter pueden ser listas en línea (`tags: [a, b, c]`),
 listas de bloque al estilo YAML (`tags:` seguido de líneas `- item`

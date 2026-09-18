@@ -29,10 +29,14 @@
  */
 class {
 
+	/** Monotonically increasing version returned by the live-reload endpoint. */
+	property name="buildVersion";
+
 	variables.buildPipeline = new "models.build.BuildPipeline@bxsites"()
 	variables.configLoader  = new "models.config.ConfigLoader@bxsites"()
 	variables.sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
 	variables.pathRelativizer = new "models.build.PathRelativizer@bxsites"()
+	variables.themeRenderer = new "models.build.ThemeRenderer@bxsites"()
 	variables.projectRoot   = ""
 	variables.fileFingerprint = { count : 0, maxModified : 0 }
 	variables.buildVersion  = 0
@@ -42,6 +46,7 @@ class {
 	variables.dirty         = false
 	variables.needsCacheClear = false
 	variables.watchedDocsDir = ""
+	variables.watchedThemeDir = ""
 	variables.configPath    = ""
 	variables.lastConfigMtime = 0
 
@@ -115,6 +120,7 @@ class {
 
 		var docsDir = variables.sourceDirResolver.resolve( variables.projectRoot )
 		var themeDir = variables.projectRoot & "/theme"
+		var builtInThemeDir = resolveBuiltInThemeDirSafely()
 
 		// watcherNew() only ever registers directories, never a single file
 		// (bxsites.json/.yaml/.yml) - and site/ itself can never safely be
@@ -132,6 +138,9 @@ class {
 		if ( directoryExists( themeDir ) ) {
 			watchPaths.append( themeDir )
 		}
+		if ( len( builtInThemeDir ) && !watchPaths.some( p => variables.pathRelativizer.normalize( p ) == variables.pathRelativizer.normalize( builtInThemeDir ) ) ) {
+			watchPaths.append( builtInThemeDir )
+		}
 
 		// Normalized once here so onWatchEvent()'s own startsWith() compares
 		// like separators against like - the watcher hands back a native
@@ -142,6 +151,7 @@ class {
 		// not a crash - see PathRelativizer.bx for the sibling bug that
 		// actually did crash the build).
 		variables.watchedDocsDir = variables.pathRelativizer.normalize( docsDir )
+		variables.watchedThemeDir = len( builtInThemeDir ) ? variables.pathRelativizer.normalize( builtInThemeDir ) : ""
 		variables.dirty = false
 		variables.needsCacheClear = false
 
@@ -195,10 +205,42 @@ class {
 	private void function onWatchEvent( required struct event ) {
 		var path = variables.pathRelativizer.normalize( arguments.event.path ?: "" )
 		var isPageEdit = len( path ) && path.startsWith( variables.watchedDocsDir ) && path.reFindNoCase( "\.md$" )
-		if ( !isPageEdit ) {
+		if ( !isPageEdit && len( variables.watchedThemeDir ) && path.startsWith( variables.watchedThemeDir ) ) {
+			// The built-in theme's shared assets live under resources/assets/,
+			// sibling to resources/themes/ - a change there only affects pages
+			// that actually include those templates, so the per-page content
+			// cache (keyed on each page's own source mtime) stays valid and we
+			// can rebuild without clearing it, just like a single-page edit.
+			var inSharedAssets = path.contains( "/resources/assets/" )
+			if ( !inSharedAssets ) {
+				variables.needsCacheClear = true
+			}
+		} else if ( !isPageEdit ) {
 			variables.needsCacheClear = true
 		}
 		variables.dirty = true
+	}
+
+	/**
+	 * Best-effort resolution of the active theme's real directory when it is
+	 * one of this module's own built-in themes (i.e. the project root is this
+	 * module's checkout - the dogfooding case). Returns "" for project `theme/`
+	 * overrides, installed `themes/<name>/` folders, unresolvable virtual
+	 * paths, or any error, since those are either already watched or not
+	 * watchable here.
+	 */
+	private string function resolveBuiltInThemeDirSafely() {
+		try {
+			var config = variables.configLoader.load( variables.projectRoot )
+			var themeName = trim( config.theme.name ?: "" )
+			var real = variables.projectRoot & "/resources/themes/" & themeName
+			if ( !len( themeName ) || !directoryExists( real ) ) {
+				return ""
+			}
+			return real
+		} catch ( any e ) {
+			return ""
+		}
 	}
 
 	/**
@@ -250,14 +292,6 @@ class {
 		}
 		rebuild()
 		return true
-	}
-
-	/**
-	 * The live-reload poller's current version number, exposed for tests -
-	 * the same value the `/__bxsites/version` endpoint serves.
-	 */
-	numeric function getBuildVersion() {
-		return variables.buildVersion
 	}
 
 	/**

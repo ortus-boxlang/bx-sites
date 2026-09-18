@@ -13,6 +13,9 @@
  */
 class {
 
+	/** ForgeBox client used to resolve and download theme packages. */
+	property name="forgeBoxClient";
+
 	/**
 	 * The `ThemeProvider` contract's required files - same list
 	 * ThemeRenderer.bx's own `requiredFiles` checks, duplicated here rather
@@ -29,13 +32,6 @@ class {
 	 * without a live network call. See ThemeInstallerSpec.bx.
 	 */
 	variables.forgeBoxClient = new "models.build.ForgeBoxClient@bxsites"()
-
-	/**
-	 * @client Any object exposing `resolve( slug, version )` -> `{ name, version, location }` and `download( url, destZipPath )`
-	 */
-	void function setForgeBoxClient( required any client ) {
-		variables.forgeBoxClient = arguments.client
-	}
 
 	/**
 	 * Where a theme named `name` lands under a project root.

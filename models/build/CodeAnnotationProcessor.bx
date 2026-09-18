@@ -135,13 +135,14 @@ class {
 	 */
 	string function applyToHtml( required string html, required array annotations ) {
 		var matcher = variables.preCodePattern.matcher( arguments.html )
+		// Java Matcher.appendReplacement/appendTail require a raw java.lang.StringBuilder
 		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
 		var idx = 0
 
 		while ( matcher.find() ) {
 			idx++
 			var annotation = ( idx <= arguments.annotations.len() ) ? arguments.annotations[ idx ] : {}
-			var attrs = ""
+			var attrs = sb{ "" }
 
 			if ( !annotation.isEmpty() ) {
 				if ( ( annotation.hlLines ?: [] ).len() ) {
@@ -164,7 +165,7 @@ class {
 				}
 			}
 
-			matcher.appendReplacement( buffer, quoteReplacement( "<pre" & attrs & "><code" ) )
+			matcher.appendReplacement( buffer, quoteReplacement( "<pre" & attrs.toString() & "><code" ) )
 		}
 		matcher.appendTail( buffer )
 

@@ -183,6 +183,7 @@
 	variables.mermaidEnabled = ( variables.siteConfig.mermaid ?: false ) ? true : false
 	variables.mathEnabled = ( variables.siteConfig.math ?: false ) ? true : false
 	variables.openapiEnabled = ( variables.siteConfig.openapi ?: false ) ? true : false
+	variables.imageGalleryEnabled = ( variables.siteConfig.imageGallery ?: false ) ? true : false
 	variables.pageActionsEnabled = ( variables.siteConfig.pageActions ?: false ) ? true : false
 	variables.contentBlocksEnabled = ( variables.siteConfig.cloud.contentBlocks ?: false ) ? true : false
 	variables.pageActionsPosition = variables.siteConfig.theme.options.pageActionsPosition ?: "top"
@@ -304,7 +305,7 @@
 			<a class="bxsites-powered-by" href="https://bxsites.io" target="_blank" rel="noopener noreferrer">#bxsitesIcon( "phosphor:stack" )# <span>Powered by BxSites</span></a>
 		</nav>
 		<main class="gb-content">
-<bx:include template="#variables.themeDir#/page.bxm">
+<bx:include template="#variables.themeDir#/#variables.bodyFile#">
 		</main>
 <bx:if variables.tocPosition == 'sticky' and variables.page.toc.len() gt 0>
 		<aside class="gb-toc-sidebar">
@@ -354,6 +355,9 @@
 </bx:if>
 <bx:if variables.contentBlocksEnabled>
 	<script src="#variables.basePath#assets/cloud-content-init.js" defer></script>
+</bx:if>
+<bx:if variables.imageGalleryEnabled>
+	<script src="#variables.basePath#assets/image-gallery-init.js" defer></script>
 </bx:if>
 <bx:if variables.searchEnabled and variables.searchProviderName eq 'algolia'>
 	<script src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>

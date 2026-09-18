@@ -33,6 +33,23 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.configPath ).toBe( dir & "/bxsites.yaml" );
 			} );
 
+			it( "creates src/index.md and src/assets when source is src", function() {
+				var dir = newTargetDir();
+				var result = scaffolder.scaffold( dir, "My Site", "bootstrap", "", "yaml", "src" );
+
+				expect( fileExists( dir & "/src/index.md" ) ).toBeTrue();
+				expect( directoryExists( dir & "/src/assets" ) ).toBeTrue();
+				expect( fileExists( dir & "/docs/index.md" ) ).toBeFalse();
+				expect( result.indexPath ).toBe( dir & "/src/index.md" );
+			} );
+
+			it( "throws BxSites.InvalidSource for an unsupported source folder", function() {
+				var dir = newTargetDir();
+				expect( function() {
+					scaffolder.scaffold( dir, "My Site", "bootstrap", "", "yaml", "content" );
+				} ).toThrow( "BxSites.InvalidSource" );
+			} );
+
 			it( "writes a bxsites.yaml with the requested name/description/theme, and ConfigLoader resolves it as this project's config file", function() {
 				var dir = newTargetDir();
 				scaffolder.scaffold( dir, "My Site", "material", "A cool site" );

@@ -45,7 +45,7 @@ currently activated in your project alongside the verbs below. See
 
 ## `new`
 
-Scaffold a docs project.
+Scaffold a new project.
 
 ```bash title="Usage"
 bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|json]
@@ -58,12 +58,14 @@ bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--d
 
 ## `build`
 
-Render `docs/**.md` into a static site in `site/`. Also builds the search
-index (unless `search` is `false` in the site config, or `searchProvider` is
-set to a provider - like `algolia`/`pagefind` - that doesn't use it, see
+Render Markdown pages from the project's source directory into a static site
+in `site/`: `docs/**/*.md` when the project uses `docs/` (the default), or
+`src/**/*.md` when it uses `src/`. Also builds the search index (unless
+`search` is `false` in the site config, or `searchProvider` is set to a
+provider - like `algolia`/`pagefind` - that doesn't use it, see
 [Search](guides/search.md)), runs the `pagefind` CLI against the finished
-`site/` when `searchProvider.provider` is `"pagefind"`, and copies theme +
-`docs/assets/**` into `site/`.
+`site/` when `searchProvider.provider` is `"pagefind"`, and copies the theme
+and the source directory's `assets/**` into `site/`.
 
 ```bash frame="terminal" title="Terminal"
 bxSites build

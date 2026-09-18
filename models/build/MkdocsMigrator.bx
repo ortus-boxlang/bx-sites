@@ -30,6 +30,9 @@
  */
 class {
 
+	/** YAML parser and serializer used during MkDocs migration. */
+	property name="yamlRenderer";
+
 	/**
 	 * Reads the source `mkdocs.yml` and serializes the generated
 	 * `bxsites.yaml` - real bx-yaml BIFs by default, swappable via
@@ -42,15 +45,6 @@ class {
 	 */
 	variables.yamlRenderer = new "models.build.YamlRenderer@bxsites"()
 	variables.sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
-
-	/**
-	 * Swaps in a fake/test YAML renderer - see YamlRenderer.bx's docblock.
-	 *
-	 * @renderer Any object exposing `fromYaml( content )`/`toYaml( value )`
-	 */
-	void function setYamlRenderer( required any renderer ) {
-		variables.yamlRenderer = arguments.renderer
-	}
 
 	/**
 	 * Extension names with a direct, always-on bx-markdown/bx-sites
@@ -305,6 +299,14 @@ class {
 		return arguments.mkdocsNav.map( entry => convertNavEntry( entry ) )
 	}
 
+	/**
+	 * Converts one mkdocs nav entry into a bx-sites navigation node.
+	 * Scalar entries become page links; keyed arrays become nested groups; and
+	 * keyed scalar values become titled page links.
+	 *
+	 * @entry A scalar path or a one-key struct from mkdocs.yml's nav array
+	 * @return A bx-sites nav node with title, path, and children keys
+	 */
 	private struct function convertNavEntry( required any entry ) {
 		if ( isSimpleValue( arguments.entry ) ) {
 			return { title : "", path : arguments.entry, children : [] }

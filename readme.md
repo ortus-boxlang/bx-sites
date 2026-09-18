@@ -81,8 +81,8 @@ boxlang bxSites <verb> [options]
 
 | Verb | Purpose |
 |---|---|
-| `new` | Scaffold a docs project (`docs/` + `bxsites.yaml`, defaulting to the `bootstrap` theme; `--format=json` for `bxsites.json` instead) |
-| `build` | Render `docs/**.md` into a static site in `site/`, including the search index, `sitemap.xml`, `llms.txt` and assets. Needs bx-markdown, bx-esapi, bx-yaml and bx-image installed |
+| `new` | Scaffold a new project (`docs|src/` + `bxsites.yaml`, defaulting to the `bootstrap` theme; `--format=json` for `bxsites.json` instead) |
+| `build` | Render `docs|src/**.md` into a static site in `site/`, including the search index, `sitemap.xml`, `llms.txt` and assets. Needs bx-markdown, bx-esapi, bx-yaml and bx-image installed |
 | `serve` | Build and serve the site locally with live reload (needs bx-markdown, bx-esapi, bx-yaml and bx-image too) |
 | `search-index` | Rebuild `site/search-index.json` standalone (also runs automatically during `build`) |
 | `clean` | Remove `site/` and any build cache |

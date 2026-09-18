@@ -98,6 +98,12 @@ Standard-Theme zu starten, und `--name="My Project Docs"`, um den
 Website-Namen direkt festzulegen - andernfalls leitet `new` ihn aus dem Namen
 des Zielverzeichnisses ab.
 
+`docs/` ist der Standard-Quellordner. Mit `bxSites new my-site
+--source=src` werden die Seiten stattdessen unter `src/` angelegt; die
+folgenden Befehle erkennen den Quellordner automatisch und die Ausgabe bleibt
+unter `site/`. Die Kurzoptionen `--docs` und `--site` sind Aliase für
+`--source=docs` und `--source=src`.
+
 ### Format der Konfigurationsdatei
 
 `bxsites.yaml` ist das Standard- und bevorzugte Format - es ist das, was `new`
@@ -225,6 +231,12 @@ Your content here.
   dessen Anzeige) - praktisch für eine Landing-/Hero-Seite, die kein
   schwebendes Inhaltsverzeichnis neben ihrem eigenen Inhalt haben möchte;
   Standard ist `true`
+- `layout` - rendert den Inhalt dieser Seite über eine benannte `.bxm`-Datei
+  statt über das Standard-`page.bxm` des aktiven Themes (bei einem
+  Blogbeitrag über das eigene `blog-page.bxm` des aktiven Themes, falls
+  vorhanden) - fällt auf `page.bxm` zurück, wenn die benannte Datei nicht
+  existiert, statt den Build fehlschlagen zu lassen - siehe
+  [Mehrere Layouts pro Seite](guides/themes.md#mehrere-layouts-pro-seite)
 
 Frontmatter-Werte können Inline-Listen (`tags: [a, b, c]`), YAML-artige
 Blocklisten (`tags:` gefolgt von eingerückten `- item`-Zeilen) oder

@@ -25,7 +25,7 @@ class extends="testbox.system.BaseSpec" {
 				var result = resolver.resolve( "", i18nConfig );
 
 				expect( result.onThisPage ).toBe( "On this page" );
-				expect( result.searchPlaceholder ).toBe( "Search docs..." );
+				expect( result.searchPlaceholder ).toBe( "Search..." );
 			} );
 
 			it( "resolves a built-in translation with no project override", function() {

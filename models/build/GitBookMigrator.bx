@@ -484,7 +484,7 @@ class {
 			}
 			found = true
 			var attrs = parseAttrs( seg.attrsRaw )
-			var line = "::: card"
+			var line = sb{ "::: card" }
 			if ( len( trim( attrs.title ?: "" ) ) ) {
 				line &= ' title="' & escapeAttr( attrs.title ) & '"'
 			}
@@ -497,7 +497,7 @@ class {
 			if ( len( trim( attrs.href ?: "" ) ) ) {
 				line &= ' href="' & escapeAttr( rewriteLink( attrs.href ) ) & '"'
 			}
-			out.append( line )
+			out.append( line.toString() )
 			var body = renderSegments( seg.segments, arguments.warnings )
 			if ( len( trim( body ) ) ) {
 				out.append( body )
@@ -628,11 +628,11 @@ class {
 			return ""
 		}
 		var title = trim( arguments.attrs.title ?: "" )
-		var line = '::: file src="' & escapeAttr( rewritePath( src ) ) & '"'
+		var line = sb{ '::: file src="' & escapeAttr( rewritePath( src ) ) & '"' }
 		if ( len( title ) ) {
 			line &= ' title="' & escapeAttr( title ) & '"'
 		}
-		return line & char( 10 ) & ":::"
+		return line.toString() & char( 10 ) & ":::"
 	}
 
 	/**
@@ -652,11 +652,11 @@ class {
 				title = trim( listToArray( body, char( 10 ), true )[ 1 ] )
 			}
 		}
-		var line = '::: embed url="' & escapeAttr( url ) & '"'
+		var line = sb{ '::: embed url="' & escapeAttr( url ) & '"' }
 		if ( len( title ) ) {
 			line &= ' title="' & escapeAttr( title ) & '"'
 		}
-		return line & char( 10 ) & ":::"
+		return line.toString() & char( 10 ) & ":::"
 	}
 
 	/**
@@ -700,7 +700,7 @@ class {
 	 * already "full", matching GitBook's own default).
 	 */
 	private string function renderPrompt( required struct block, required struct attrs, required array warnings ) {
-		var line = "::: prompt"
+		var line = sb{ "::: prompt" }
 		if ( len( trim( arguments.attrs.description ?: "" ) ) ) {
 			line &= ' description="' & escapeAttr( arguments.attrs.description ) & '"'
 		}

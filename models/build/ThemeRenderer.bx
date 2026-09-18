@@ -6,9 +6,10 @@
  * satisfy:
  *   - `layout.bxm` (required) - the outer HTML shell + nav; receives
  *     `variables.page`, `variables.nav`, `variables.siteConfig` and
- *     `variables.themeDir` in scope, and includes the sibling `page.bxm` via
- *     `#variables.themeDir#/page.bxm` (BoxLang's include scope-absorption
- *     carries those variables through automatically - no explicit hand-off).
+ *     `variables.themeDir` in scope, and includes the sibling body template
+ *     via `#variables.themeDir#/#variables.bodyFile#` (BoxLang's include scope-
+ *     absorption carries those variables through automatically - no explicit
+ *     hand-off).
  *   - `page.bxm` (required) - the article body; renders `variables.page.contentHtml`
  *     (the already-converted markdown, set by BuildPipeline before rendering).
  *     `variables.page.toc`, `.prevPage`, `.nextPage`, `.breadcrumbs`, `.course`,
@@ -35,6 +36,13 @@
  *     docs/guides/search.md.
  *   - `assets/` (optional) - theme CSS/JS, copied to `site/assets/theme/` by
  *     BuildPipeline's asset pipeline.
+ *   - `blog.bxm`/`blog-page.bxm` (both optional) - alternate outer shell/body
+ *     templates a theme can add on top of the required pair above. Neither
+ *     is enforced by `assertThemeProvider()` below - a theme missing either
+ *     (or both) simply keeps falling back to `layout.bxm`/`page.bxm`, the
+ *     same as any theme not implementing an optional file already does for
+ *     `search.bxm`. See `renderPage()`'s own docblock for exactly which
+ *     candidate wins when.
  *
  * `variables.versions` (`[ { label, url } ]`, "Latest" first) and
  * `variables.currentVersion` (the `label` being rendered right now) back
@@ -68,6 +76,18 @@
  * project's own `docs/data/*.yaml|.yml|.json` files, one top-level key per
  * file - bound the same bare, include-scope-absorbed way, so `layout.bxm`/
  * `page.bxm` can read `data.<file>.<key>` directly.
+ *
+ * Thread safety: none of the above actually lives on THIS class's own
+ * `variables` scope any more - `variables` here holds only pure,
+ * deterministic, request-independent data (`requiredFiles`, `stringsResolver`,
+ * `templateResolutionCache`), safe for concurrent `renderPage()` calls on
+ * the same (singleton) instance. Every per-render value is a `var` local
+ * inside `renderPage()`, handed to a fresh `RendererEncapsulator.bx`
+ * instance per call - BoxLang's `include` only ever absorbs the *current*
+ * component instance's own `variables` scope, so that fresh instance, not
+ * this one, is what `layout.bxm`/`page.bxm` actually see as
+ * `variables.page`/`variables.nav`/etc. See `RendererEncapsulator.bx`'s own
+ * docblock for why.
  */
 class {
 
@@ -83,6 +103,17 @@ class {
 	 * see StringsResolver.bx's own docblock.
 	 */
 	variables.stringsResolver = new "models.config.StringsResolver@bxsites"()
+
+	/**
+	 * Memoized `<themeDir>/<candidate>.bxm` existence checks, keyed
+	 * `"#themeDir#::#candidate#"` - pure and deterministic for the life of
+	 * one build process (a theme's own files don't change mid-build), so
+	 * safe to populate from concurrent `renderPage()` calls with no lock:
+	 * the worst case is two threads independently computing and writing the
+	 * same boolean to the same key, which is idempotent. Same shape as
+	 * ColdBox's own `Renderer.cfc` `locateViewCache`/`locateLayoutCache`.
+	 */
+	variables.templateResolutionCache = {}
 
 	/**
 	 * Resolution order:
@@ -173,7 +204,7 @@ class {
 	 * Same automatic `/bxmodules/bxsites` module mapping as `builtInThemesDir()`
 	 * above - see its own docblock for why.
 	 */
-	private string function computeModuleAssetsDir() {
+	private function computeModuleAssetsDir() {
 		return "/bxmodules/bxsites/resources/assets"
 	}
 
@@ -217,9 +248,52 @@ class {
 	}
 
 	/**
-	 * Renders one page through its theme's `layout.bxm`/`page.bxm`,
+	 * Resolves `<themeDir>/<candidate>.bxm` when it exists, else `fallback`
+	 * - the shared mechanism behind both `layoutHint`/`bodyHint` and the
+	 * frontmatter `layout:` override (renderPage()'s own docblock). A
+	 * `candidate` naming a file the theme doesn't have is never an error -
+	 * it just silently resolves to `fallback`, the same "optional file,
+	 * fall back to the required one" shape `search.bxm` already has.
+	 *
+	 * @themeDir Absolute/virtual path to a resolved theme folder (must already be filesystem-resolvable via `fileExists()`, i.e. the same form passed to the final `include`)
+	 * @candidate A bare template name with no extension, e.g. `"blog"` - an empty string always resolves straight to `fallback`, no lookup needed
+	 * @fallback The already-known-to-exist file name to fall back to, e.g. `"layout.bxm"`/`"page.bxm"`
+	 *
+	 * @return `<candidate>.bxm` or `fallback`
+	 */
+	private string function resolveTemplateFile( required string themeDir, required string candidate, required string fallback ) {
+		var name = trim( arguments.candidate )
+		if ( !len( name ) ) {
+			return arguments.fallback
+		}
+
+		var cacheKey = arguments.themeDir & "::" & name
+		if ( !variables.templateResolutionCache.keyExists( cacheKey ) ) {
+			variables.templateResolutionCache[ cacheKey ] = fileExists( arguments.themeDir & "/" & name & ".bxm" )
+		}
+
+		return variables.templateResolutionCache[ cacheKey ] ? ( name & ".bxm" ) : arguments.fallback
+	}
+
+	/**
+	 * Renders one page through its theme's `layout.bxm`/`page.bxm` (or
+	 * whichever alternate templates resolve instead - see below),
 	 * defaulting `tags`/`icon`/`summary`/`ogImage` on `page` first if
 	 * frontmatter left any of them unset.
+	 *
+	 * Two independent template slots, each with its own fallback chain:
+	 *   - The outer shell: `layoutHint` (e.g. `"blog"`, passed by a caller
+	 *     that already knows this page's own content type - BuildPipeline.bx's
+	 *     blog `indexPages` loop) resolves to `<themeDir>/<layoutHint>.bxm`
+	 *     when the active theme has it, else `layout.bxm`.
+	 *   - The body: `page.layout` (a page's own frontmatter `layout:` key,
+	 *     DocsLoader.bx/BlogDiscoverer.bx) wins whenever it's set - "if the
+	 *     user overrides the layout in the frontmatter, we respect it" -
+	 *     else `bodyHint` (e.g. `"blog-page"`, passed the same way as
+	 *     `layoutHint` above, for BuildPipeline.bx's blog `posts` loop),
+	 *     else `page.bxm`. Either way, a candidate naming a file the theme
+	 *     doesn't have silently falls back rather than failing the build -
+	 *     see `resolveTemplateFile()`.
 	 *
 	 * @page A page struct with an added `contentHtml` key (the already-converted markdown body)
 	 * @nav The site's nav tree, from NavBuilder.build()
@@ -233,25 +307,42 @@ class {
 	 * @currentLocaleDir `"ltr"`/`"rtl"` - the current locale's own text direction, stamped onto `<html dir="...">`
 	 * @functions FunctionsLoader.load()'s own output (module spec section 8) - each `$`-prefixed magic function bound directly into this scope, bare-callable from `layout.bxm`/`page.bxm`
 	 * @data DataLoader.load()'s own output (docs/guides/data-files.md) - bound bare as `variables.data`, so `layout.bxm`/`page.bxm` (or a project's own `theme/` override) can read `data.<file>.<key>` directly, the same way they already read `page`/`siteConfig`
+	 * @layoutHint A bare outer-shell template name with no extension, e.g. `"blog"` - `""` (the default) always renders through `layout.bxm`
+	 * @bodyHint A bare body template name with no extension, e.g. `"blog-page"` - only consulted when `page.layout` is unset; `""` (the default) always renders through `page.bxm`
 	 *
 	 * @return The rendered page HTML
 	 */
-	string function renderPage( required struct page, required array nav, required struct config, required string themeDir, string basePath = "/", array versions = [], string currentVersion = "Latest", array locales = [], string currentLocale = "", string currentLocaleDir = "ltr", struct functions = {}, struct data = {} ) {
-		variables.page = arguments.page
-		if ( !variables.page.keyExists( "toc" ) ) {
-			variables.page.toc = []
+	string function renderPage(
+		required struct page,
+		required array nav,
+		required struct config,
+		required string themeDir,
+		string basePath = "/",
+		array versions = [],
+		string currentVersion = "Latest",
+		array locales = [],
+		string currentLocale = "",
+		string currentLocaleDir = "ltr",
+		struct functions = {},
+		struct data = {},
+		string layoutHint = "",
+		string bodyHint = ""
+	) {
+		var page = arguments.page
+		if ( !page.keyExists( "toc" ) ) {
+			page.toc = []
 		}
-		if ( !variables.page.keyExists( "prevPage" ) ) {
-			variables.page.prevPage = { title : "", url : "" }
+		if ( !page.keyExists( "prevPage" ) ) {
+			page.prevPage = { title : "", url : "" }
 		}
-		if ( !variables.page.keyExists( "nextPage" ) ) {
-			variables.page.nextPage = { title : "", url : "" }
+		if ( !page.keyExists( "nextPage" ) ) {
+			page.nextPage = { title : "", url : "" }
 		}
-		if ( !variables.page.keyExists( "breadcrumbs" ) ) {
-			variables.page.breadcrumbs = []
+		if ( !page.keyExists( "breadcrumbs" ) ) {
+			page.breadcrumbs = []
 		}
-		if ( !variables.page.keyExists( "course" ) ) {
-			variables.page.course = {
+		if ( !page.keyExists( "course" ) ) {
+			page.course = {
 				id          : "",
 				courseTitle : "",
 				lessonIndex : 0,
@@ -261,96 +352,94 @@ class {
 				indexUrl    : ""
 			}
 		}
-		if ( !variables.page.keyExists( "editUrl" ) ) {
-			variables.page.editUrl = ""
+		if ( !page.keyExists( "editUrl" ) ) {
+			page.editUrl = ""
 		}
-		if ( !variables.page.keyExists( "lastUpdated" ) ) {
-			variables.page.lastUpdated = ""
+		if ( !page.keyExists( "lastUpdated" ) ) {
+			page.lastUpdated = ""
 		}
-		if ( !variables.page.keyExists( "description" ) ) {
-			variables.page.description = ""
+		if ( !page.keyExists( "description" ) ) {
+			page.description = ""
 		}
-		if ( !variables.page.keyExists( "tags" ) ) {
-			variables.page.tags = []
+		if ( !page.keyExists( "tags" ) ) {
+			page.tags = []
 		}
-		if ( !variables.page.keyExists( "icon" ) ) {
-			variables.page.icon = ""
+		if ( !page.keyExists( "icon" ) ) {
+			page.icon = ""
 		}
-		if ( !variables.page.keyExists( "iconHtml" ) ) {
-			variables.page.iconHtml = ""
+		if ( !page.keyExists( "iconHtml" ) ) {
+			page.iconHtml = ""
 		}
-		if ( !variables.page.keyExists( "summary" ) ) {
-			variables.page.summary = ""
+		if ( !page.keyExists( "summary" ) ) {
+			page.summary = ""
 		}
-		if ( !variables.page.keyExists( "ogImage" ) ) {
-			variables.page.ogImage = ""
+		if ( !page.keyExists( "ogImage" ) ) {
+			page.ogImage = ""
 		}
-		if ( !variables.page.keyExists( "markdownUrl" ) ) {
-			variables.page.markdownUrl = ""
+		if ( !page.keyExists( "markdownUrl" ) ) {
+			page.markdownUrl = ""
 		}
-		if ( !variables.page.keyExists( "isFallbackContent" ) ) {
-			variables.page.isFallbackContent = false
+		if ( !page.keyExists( "isFallbackContent" ) ) {
+			page.isFallbackContent = false
 		}
-		if ( !variables.page.keyExists( "urlPath" ) ) {
-			variables.page.urlPath = ""
+		if ( !page.keyExists( "urlPath" ) ) {
+			page.urlPath = ""
 		}
-		if ( !variables.page.keyExists( "canonicalUrl" ) ) {
-			variables.page.canonicalUrl = ""
+		if ( !page.keyExists( "canonicalUrl" ) ) {
+			page.canonicalUrl = ""
 		}
-		variables.nav = arguments.nav
-		variables.siteConfig = arguments.config
+
 		// `include` treats a leading "/" as relative to a registered
-		// mapping, not the real OS filesystem. Resolving both of these
-		// here (rather than at each individual `<bx:include template="...">`
-		// call site inside layout.bxm/page.bxm/icons.bxm/etc.) fixes every
-		// nested theme include across all built-in themes with zero
-		// per-theme changes, since these two variables are the only thing
-		// any theme ever builds an include path from.
+		// mapping, not the real OS filesystem. Resolving this here (rather
+		// than at each individual include call site inside
+		// layout.bxm/page.bxm/icons.bxm/etc.) fixes every nested theme
+		// include across all built-in themes with zero per-theme changes,
+		// since this is the only thing any theme ever builds an include
+		// path from.
 		//
 		// arguments.themeDir is either this module's own builtInThemesDir()
 		// - already a virtual `/bxmodules/bxsites/...` path (BoxLang's own
 		// automatic per-module mapping - see that function's own docblock)
 		// and used as-is - or a real OS absolute path under a project's
 		// own theme/ override, which toVirtualPath() below turns into a
-		// working virtual path instead. moduleAssetsDir is always this
-		// module's own bundled asset folder, so it's always the former
-		// case.
-		variables.themeDir = arguments.themeDir.left( 11 ) == "/bxmodules/"
+		// working virtual path instead.
+		var themeDirVirtual = arguments.themeDir.left( 11 ) == "/bxmodules/"
 			? arguments.themeDir
 			: toVirtualPath( arguments.themeDir )
-		variables.basePath = len( trim( arguments.basePath ) ) ? arguments.basePath : "/"
-		variables.moduleAssetsDir = computeModuleAssetsDir()
-		variables.versions = arguments.versions
-		variables.currentVersion = arguments.currentVersion
-		variables.locales = arguments.locales
-		variables.currentLocale = arguments.currentLocale
-		variables.currentLocaleDir = listFindNoCase( "ltr,rtl", arguments.currentLocaleDir ) ? arguments.currentLocaleDir : "ltr"
-		variables.strings = variables.stringsResolver.resolve( variables.currentLocale, arguments.config.i18n ?: { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] } )
-		variables.data = arguments.data
+		var basePath = len( trim( arguments.basePath ) ) ? arguments.basePath : "/"
+		var moduleAssetsDir = computeModuleAssetsDir()
+		var currentLocaleDir = listFindNoCase( "ltr,rtl", arguments.currentLocaleDir ) ? arguments.currentLocaleDir : "ltr"
+		var strings = variables.stringsResolver.resolve( arguments.currentLocale, arguments.config.i18n ?: { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] } )
 
-		// Binds each loaded function (FunctionsLoader.bx - `$`-prefixed magic
-		// functions and their own private, non-`$` helpers alike) directly
-		// into this instance's own `variables` scope, so `layout.bxm`/`page.bxm`
-		// (or a project's own `theme/` override) can call `$name(...)` bare,
-		// exactly like they already read `variables.page`/`variables.siteConfig`.
-		// Safe to overwrite unconditionally - FunctionsLoader.load() itself
-		// already rejects a function name that collides with one of this
-		// method's own reserved context keys (`page`/`nav`/`siteConfig`/etc. -
-		// see its own `reservedNames`), so nothing loaded here can ever
-		// silently shadow real page/site context.
-		for ( var fnName in arguments.functions ) {
-			variables[ fnName ] = arguments.functions[ fnName ]
-		}
+		var layoutFile = resolveTemplateFile( themeDirVirtual, arguments.layoutHint, "layout.bxm" )
+		var bodyCandidate = len( trim( page.layout ?: "" ) ) ? trim( page.layout ) : arguments.bodyHint
+		var bodyFile = resolveTemplateFile( themeDirVirtual, bodyCandidate, "page.bxm" )
 
-		// variables.themeDir was already turned into a working virtual
-		// path above (either "/bxmodules/bxsites/..." or "/bxApp/..."),
-		// so this resolves through one of BoxLang's own module mapping or
-		// the one ModuleConfig.bx's onLoad() registers.
-		var html = ""
-		bx:savecontent variable="html" {
-			include variables.themeDir & "/layout.bxm"
-		}
-		return html
+		// Rendered through a fresh RendererEncapsulator.bx instance per call
+		// (see its own docblock) - never `include`d directly from here - so
+		// none of the values above ever touch this (singleton) instance's
+		// own `variables` scope, keeping concurrent renderPage() calls on
+		// the same instance race-free.
+		var encapsulator = new "models.build.RendererEncapsulator@bxsites"()
+		return encapsulator.render(
+			page,
+			arguments.nav,
+			arguments.config,
+			themeDirVirtual,
+			layoutFile,
+			bodyFile,
+			basePath,
+			moduleAssetsDir,
+			arguments.versions,
+			arguments.currentVersion,
+			arguments.locales,
+			arguments.currentLocale,
+			currentLocaleDir,
+			strings,
+			variables.stringsResolver,
+			arguments.data,
+			arguments.functions
+		)
 	}
 
 }

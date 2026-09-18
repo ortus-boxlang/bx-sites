@@ -171,8 +171,8 @@ class {
 	 * @group One entry from extract()'s own `groups` array
 	 */
 	private string function renderGroup( required struct group, required any renderer, required struct markdownOptions ) {
-		var navHtml = ""
-		var panelsHtml = ""
+		var navHtml = sb{ "" }
+		var panelsHtml = sb{ "" }
 		var idx = 0
 
 		for ( var tab in arguments.group.tabs ) {
@@ -189,8 +189,8 @@ class {
 		}
 
 		return '<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist">'
-			& '<div class="bxsites-tabs__nav">' & navHtml & '</div>'
-			& '<div class="bxsites-tabs__panels">' & panelsHtml & '</div>'
+			& '<div class="bxsites-tabs__nav">' & navHtml.toString() & '</div>'
+			& '<div class="bxsites-tabs__panels">' & panelsHtml.toString() & '</div>'
 			& '</div>'
 	}
 

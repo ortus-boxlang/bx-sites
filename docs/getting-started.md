@@ -91,8 +91,11 @@ my-docs/
 ```
 
 Pass `--theme=material` or `--theme=tailwind` to scaffold with a different
-default theme, and `--name="My Project Docs"` to set the site name up
-front - otherwise `new` derives it from the target directory name.
+default theme, `--name="My Project Docs"` to set the site name up front, or
+`--source=src` to scaffold pages under `src/` instead of `docs/`. Otherwise,
+`new` uses the bootstrap theme, derives the site name from the target
+directory, and uses `docs/`. The shorter `--docs` and `--site` flags are
+aliases for `--source=docs` and `--source=src`.
 
 ### Config file format
 
@@ -113,8 +116,9 @@ skip ahead to [Build](#build).
 
 ## Add pages
 
-Every `.md` file under `docs/` becomes a page. Folder nesting becomes nav
-nesting automatically:
+Every `.md` file under the project's source folder becomes a page. New
+projects use `docs/` by default, or use `bxSites new my-site --source=src`
+to start with `src/`. Folder nesting becomes nav nesting automatically:
 
 !!! note "docs/ or src/"
     `docs/` is what `new` scaffolds and what every example here uses, but a
@@ -213,6 +217,11 @@ Your content here.
   even with 2+ headings (the usual trigger for it to render) - handy for a
   landing/hero page that doesn't want a floating TOC competing with its own
   content; defaults to `true`
+- `layout` - renders this page's body through a named `.bxm` instead of the
+  active theme's default `page.bxm` (the active theme's own `blog-page.bxm`
+  for a blog post, if it has one) - falls back to `page.bxm` when the named
+  file doesn't exist, rather than failing the build - see
+  [Multiple layouts per page](guides/themes.md#multiple-layouts-per-page)
 
 Frontmatter values can be inline lists (`tags: [a, b, c]`), YAML-style block
 lists (`tags:` followed by indented `- item` lines), or `>`/`|` block

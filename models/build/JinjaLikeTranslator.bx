@@ -84,7 +84,7 @@ class {
 		var warnings = []
 		var blockStack = [] // stack of "if" / "for", tracking which closing tag an "end..." should become
 		var matcher = variables.tokenPattern.matcher( arguments.source )
-		var buffer = createObject( "java", "java.lang.StringBuilder" ).init()
+		var buffer = sb{ "" }
 		var lastEnd = 0
 
 		while ( matcher.find() ) {
@@ -93,14 +93,14 @@ class {
 			// `{{ a }}{{ b }}`) would otherwise call mid() with a zero
 			// count, which isn't confirmed safe across BoxLang versions.
 			if ( matcher.start() > lastEnd ) {
-				buffer.append( arguments.source.mid( lastEnd + 1, matcher.start() - lastEnd ) )
+				buffer &= arguments.source.mid( lastEnd + 1, matcher.start() - lastEnd )
 			}
 			lastEnd = matcher.end()
 
 			if ( matcher.start( 1 ) != -1 ) {
-				buffer.append( translateOutput( matcher.group( 1 ), arguments.variableMap, warnings ) )
+				buffer &= translateOutput( matcher.group( 1 ), arguments.variableMap, warnings )
 			} else if ( matcher.start( 2 ) != -1 ) {
-				buffer.append( translateTag( matcher.group( 2 ), arguments.variableMap, blockStack, warnings ) )
+				buffer &= translateTag( matcher.group( 2 ), arguments.variableMap, blockStack, warnings )
 			} else {
 				// {# ... #} - a comment, dropped entirely (no BoxLang
 				// output equivalent needed, same as it renders nothing
@@ -108,7 +108,7 @@ class {
 			}
 		}
 		if ( lastEnd < len( arguments.source ) ) {
-			buffer.append( arguments.source.mid( lastEnd + 1, len( arguments.source ) - lastEnd ) )
+			buffer &= arguments.source.mid( lastEnd + 1, len( arguments.source ) - lastEnd )
 		}
 
 		if ( blockStack.len() ) {

@@ -30,7 +30,8 @@ opciones globales de abajo pueden aparecer antes de cualquier verbo.
 
 Cada `docs/` mencionado abajo se aplica igualmente a un proyecto que use
 `src/` en su lugar - consulta [Primeros Pasos](getting-started.md#añadir-páginas)
-para la convención `docs/`-o-`src/`. `new` siempre genera `docs/`.
+para la convención `docs/`-o-`src/`. `docs/` es la carpeta de origen
+predeterminada para proyectos nuevos.
 
 ## Opciones globales
 
@@ -44,23 +45,26 @@ para la convención `docs/`-o-`src/`. `new` siempre genera `docs/`.
 Crea la estructura de un proyecto de documentación.
 
 ```bash title="Uso"
-bxSites new [path] [--name=...] [--theme=<consulta guides/themes.md para los 10>] [--description=...] [--format=yaml|json]
+bxSites new [path] [--name=...] [--theme=<consulta guides/themes.md para los 10>] [--description=...] [--format=yaml|json] [--source=docs|src]
 ```
 
 - `--name` - el nombre del sitio escrito en la configuración del sitio (por defecto, el nombre del directorio de destino)
 - `--theme` - por defecto `bootstrap`
 - `--description` - la descripción del sitio escrita en la configuración del sitio
 - `--format` - `yaml` (por defecto, genera `bxsites.yaml`) o `json` (genera `bxsites.json`) - consulta [Configuración](configuration.md)
+- `--source` - `docs` (por defecto) o `src`, la carpeta donde se generan las páginas y los assets
 
 ## `build`
 
-Renderiza `docs/**.md` en un sitio estático en `site/`. También construye
-el índice de búsqueda (a menos que `search` sea `false` en la
-configuración del sitio, o que `searchProvider` esté configurado a un
-proveedor - como `algolia`/`pagefind` - que no lo use, consulta
+Renderiza las páginas Markdown del directorio de origen del proyecto en un
+sitio estático en `site/`: `docs/**/*.md` cuando el proyecto usa `docs/`
+(por defecto), o `src/**/*.md` cuando usa `src/`. También construye el
+índice de búsqueda (a menos que `search` sea `false` en la configuración
+del sitio, o que `searchProvider` esté configurado a un proveedor - como
+`algolia`/`pagefind` - que no lo use, consulta
 [Búsqueda](guides/search.md)), ejecuta la CLI de `pagefind` contra el
 `site/` terminado cuando `searchProvider.provider` es `"pagefind"`, y
-copia el tema + `docs/assets/**` en `site/`.
+copia el tema y `assets/**` del directorio de origen en `site/`.
 
 ```bash frame="terminal" title="Terminal"
 bxSites build

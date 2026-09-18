@@ -14,6 +14,11 @@
  */
 class {
 
+	/** YAML parser used to load the project author roster. */
+	property name="yamlRenderer";
+	/** TOML parser used to load the project author roster. */
+	property name="tomlRenderer";
+
 	/**
 	 * Extensions checked, in order, when resolving an author's avatar by
 	 * convention.
@@ -27,24 +32,6 @@ class {
 	 */
 	variables.yamlRenderer = new "models.build.YamlRenderer@bxsites"()
 	variables.tomlRenderer = new "models.build.TomlRenderer@bxsites"()
-
-	/**
-	 * Swaps in a fake/test YAML renderer - see YamlRenderer.bx's docblock.
-	 *
-	 * @renderer Any object exposing `fromYaml( content )`
-	 */
-	void function setYamlRenderer( required any renderer ) {
-		variables.yamlRenderer = arguments.renderer
-	}
-
-	/**
-	 * Swaps in a fake/test TOML renderer - see TomlRenderer.bx's docblock.
-	 *
-	 * @renderer Any object exposing `fromToml( content )`
-	 */
-	void function setTomlRenderer( required any renderer ) {
-		variables.tomlRenderer = arguments.renderer
-	}
 
 	/**
 	 * Loads and normalizes `docs/blog/authors.yml`.

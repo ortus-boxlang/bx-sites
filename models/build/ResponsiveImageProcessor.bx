@@ -118,19 +118,19 @@ class {
 			return plainImg
 		}
 
-		var newAttrs = ' src="' & arguments.basePath & arguments.imagePath & '"'
+		var newAttrs = sb{ ' src="' & arguments.basePath & arguments.imagePath & '"' }
 		if ( entry.originalVariants.len() ) {
 			newAttrs &= ' srcset="' & buildSrcset( entry.originalVariants, arguments.imagePath, arguments.basePath ) & '" sizes="' & variables.sizesAttr & '"'
 		}
-		var img = '<img' & newAttrs & ' ' & arguments.extraAttrs & '>'
+		var img = '<img' & newAttrs.toString() & ' ' & arguments.extraAttrs & '>'
 
-		var picture = "<picture>"
+		var picture = sb{ "<picture>" }
 		if ( entry.webpVariants.len() ) {
 			picture &= '<source type="image/webp" srcset="' & buildSrcset( entry.webpVariants, arguments.imagePath, arguments.basePath ) & '" sizes="' & variables.sizesAttr & '">'
 		}
 		picture &= img & "</picture>"
 
-		return picture
+		return picture.toString()
 	}
 
 	/**
@@ -179,23 +179,23 @@ class {
 		withoutSrc = variables.sizesPatternDouble.matcher( withoutSrc ).replaceAll( "" )
 		withoutSrc = variables.sizesPatternSingle.matcher( withoutSrc ).replaceAll( "" )
 
-		var newAttrs = ' src="' & arguments.basePath & key & '"'
+		var newAttrs = sb{ ' src="' & arguments.basePath & key & '"' }
 		if ( entry.originalVariants.len() ) {
 			newAttrs &= ' srcset="' & buildSrcset( entry.originalVariants, key, arguments.basePath ) & '" sizes="' & variables.sizesAttr & '"'
 		}
-		var newImg = withoutSrc.reReplaceNoCase( "^<img", "<img" & newAttrs, "one" )
+		var newImg = withoutSrc.reReplaceNoCase( "^<img", "<img" & newAttrs.toString(), "one" )
 
 		if ( !hasVariants ) {
 			return newImg
 		}
 
-		var picture = "<picture>"
+		var picture = sb{ "<picture>" }
 		if ( entry.webpVariants.len() ) {
 			picture &= '<source type="image/webp" srcset="' & buildSrcset( entry.webpVariants, key, arguments.basePath ) & '" sizes="' & variables.sizesAttr & '">'
 		}
 		picture &= newImg & "</picture>"
 
-		return picture
+		return picture.toString()
 	}
 
 	/**

@@ -1,0 +1,95 @@
+/**
+ * Renders one page's own `layout.bxm`/body-template pair with a fully
+ * isolated `variables` scope - the BoxLang equivalent of ColdBox's own
+ * `RendererEncapsulator.cfm` (`cfmodule`-based isolation), built instead on
+ * a mechanism this codebase already relies on everywhere else: a freshly
+ * `new`'d class instance gets its own `variables` scope, entirely separate
+ * from whichever other instance created it.
+ *
+ * `include` only ever absorbs the CURRENT component instance's own
+ * `variables` scope (BoxLang has no isolated-scope `include` of its own) -
+ * which is exactly why `ThemeRenderer.renderPage()` used to stash
+ * page/nav/config/etc. directly onto ITS OWN `variables` before including
+ * `layout.bxm`, making concurrent renders on that shared singleton race on
+ * the same keys. `ThemeRenderer.renderPage()` now `new`s a fresh instance
+ * of THIS class per call and hands it everything through `render()`'s own
+ * arguments instead - so every render gets its own private `variables.page`/
+ * `variables.nav`/etc., and `include`-ing the theme's layout from inside
+ * this instance's own method only ever touches this instance's own scope,
+ * never another concurrent render's.
+ */
+class {
+
+	/**
+	 * @page A page struct with an added `contentHtml` key (already defaulted by ThemeRenderer.renderPage())
+	 * @nav The site's nav tree
+	 * @config The site's bxsites.json config
+	 * @themeDir A virtual, `include`-resolvable path to the active theme folder
+	 * @layoutFile The outer-shell template file name to include, e.g. `"layout.bxm"`/`"blog.bxm"` (ThemeRenderer.resolveTemplateFile())
+	 * @bodyFile The body template file name a theme's own `layout.bxm` should include, e.g. `"page.bxm"`/`"blog-page.bxm"` - exposed here as `variables.bodyFile` for that purpose
+	 * @basePath Root-relative base path ending with `/`
+	 * @moduleAssetsDir Virtual path to this module's own bundled (theme-independent) assets folder
+	 * @versions Version switcher entries as `[ { label, url } ]`
+	 * @currentVersion The `label` (from `versions`) being rendered right now
+	 * @locales Language switcher entries as `[ { code, label, url, dir, flag } ]`
+	 * @currentLocale The `code` (from `locales`) being rendered right now
+	 * @currentLocaleDir `"ltr"`/`"rtl"` - the current locale's own text direction
+	 * @strings StringsResolver.resolve()'s own output for the locale being rendered right now
+	 * @stringsResolver ThemeRenderer's own StringsResolver instance - stateless/pure (no per-render data), so safe to hand across concurrent renders unchanged; a theme's own `.format()` calls (e.g. `renderNavList()`'s `toggleSection` label) need the resolver itself, not just its already-resolved `strings` output
+	 * @data DataLoader.load()'s own output, bound bare as `variables.data`
+	 * @functions FunctionsLoader.load()'s own output - each `$`-prefixed magic function bound directly into this scope, bare-callable from the included templates
+	 *
+	 * @return The rendered page HTML
+	 */
+	string function render(
+		required struct page,
+		required array nav,
+		required struct config,
+		required string themeDir,
+		required string layoutFile,
+		required string bodyFile,
+		required string basePath,
+		required string moduleAssetsDir,
+		required array versions,
+		required string currentVersion,
+		required array locales,
+		required string currentLocale,
+		required string currentLocaleDir,
+		required struct strings,
+		required any stringsResolver,
+		required struct data,
+		struct functions = {}
+	) {
+		variables.page              = arguments.page
+		variables.nav                = arguments.nav
+		variables.siteConfig         = arguments.config
+		variables.themeDir           = arguments.themeDir
+		variables.basePath           = arguments.basePath
+		variables.moduleAssetsDir    = arguments.moduleAssetsDir
+		variables.versions           = arguments.versions
+		variables.currentVersion     = arguments.currentVersion
+		variables.locales            = arguments.locales
+		variables.currentLocale      = arguments.currentLocale
+		variables.currentLocaleDir   = arguments.currentLocaleDir
+		variables.strings            = arguments.strings
+		variables.stringsResolver    = arguments.stringsResolver
+		variables.data                = arguments.data
+		variables.layoutFile         = arguments.layoutFile
+		variables.bodyFile           = arguments.bodyFile
+
+		// Same bare `$`-function bind-through ThemeRenderer.renderPage() used
+		// to do directly on its own (shared) scope - FunctionsLoader.bx's own
+		// reservedNames already guards against a project function colliding
+		// with any name assigned above.
+		for ( var fnName in arguments.functions ) {
+			variables[ fnName ] = arguments.functions[ fnName ]
+		}
+
+		var html = ""
+		bx:savecontent variable="html" {
+			include variables.themeDir & "/" & variables.layoutFile
+		}
+		return html
+	}
+
+}

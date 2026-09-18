@@ -54,13 +54,15 @@ bxSites new [path] [--name=...] [--theme=<consulta guides/themes.md para los 10>
 
 ## `build`
 
-Renderiza `docs/**.md` en un sitio estático en `site/`. También construye
-el índice de búsqueda (a menos que `search` sea `false` en la
-configuración del sitio, o que `searchProvider` esté configurado a un
-proveedor - como `algolia`/`pagefind` - que no lo use, consulta
+Renderiza las páginas Markdown del directorio de origen del proyecto en un
+sitio estático en `site/`: `docs/**/*.md` cuando el proyecto usa `docs/`
+(por defecto), o `src/**/*.md` cuando usa `src/`. También construye el
+índice de búsqueda (a menos que `search` sea `false` en la configuración
+del sitio, o que `searchProvider` esté configurado a un proveedor - como
+`algolia`/`pagefind` - que no lo use, consulta
 [Búsqueda](guides/search.md)), ejecuta la CLI de `pagefind` contra el
 `site/` terminado cuando `searchProvider.provider` es `"pagefind"`, y
-copia el tema + `docs/assets/**` en `site/`.
+copia el tema y `assets/**` del directorio de origen en `site/`.
 
 ```bash frame="terminal" title="Terminal"
 bxSites build

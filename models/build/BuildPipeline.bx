@@ -6,6 +6,18 @@
  */
 class {
 
+	/** Enables optional phase timing for focused build investigations. */
+	property name="profiling";
+	/** Markdown renderer used to convert source content into HTML. */
+	property name="markdownRenderer";
+	/** Pagefind indexer used when the configured search provider is pagefind. */
+	property name="pagefindIndexer";
+	/** Image processor used to build responsive image variants. */
+	property name="imageVariantGenerator";
+
+	/**
+	 * Initializes all the necessary build pipeline components.
+	 */
 	variables.configLoader     = new "models.config.ConfigLoader@bxsites"()
 	variables.sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
 	variables.stringsResolver  = new "models.config.StringsResolver@bxsites"()
@@ -80,51 +92,6 @@ class {
 	variables.profileLastAt = 0
 
 	/**
-	 * Enables phase timing for a focused build investigation. Disabled by
-	 * default so normal CLI output and build behavior remain unchanged.
-	 */
-	void function setProfiling( required boolean enabled ) {
-		variables.profiling = arguments.enabled
-	}
-
-	/**
-	 * Swaps in a fake/test markdown renderer. The real one (MarkdownRenderer.bx)
-	 * depends on the bx-markdown module being activated, which this
-	 * pipeline's own unit tests don't have - see MarkdownRenderer.bx's
-	 * docblock for why that dependency is kept behind this seam.
-	 *
-	 * @renderer Any object exposing `toHtml( markdown, options = {} )`
-	 */
-	void function setMarkdownRenderer( required any renderer ) {
-		variables.markdownRenderer = arguments.renderer
-	}
-
-	/**
-	 * Swaps in a fake/test pagefind indexer. The real one (PagefindIndexer.bx)
-	 * shells out to the external `pagefind` CLI, which this pipeline's own
-	 * unit tests can't assume is installed - see PagefindIndexer.bx's own
-	 * docblock for why it fails loud rather than degrading silently.
-	 *
-	 * @indexer Any object exposing `index( siteDir, bin = "pagefind", options = [] )`
-	 */
-	void function setPagefindIndexer( required any indexer ) {
-		variables.pagefindIndexer = arguments.indexer
-	}
-
-	/**
-	 * Swaps in a fake/test image variant generator. The real one
-	 * (ImageVariantGenerator.bx) calls bx-image's own `imageRead()`/
-	 * `.scaleToFit()`/`.write()`, which this pipeline's own unit tests
-	 * can't assume is installed - same reasoning as setMarkdownRenderer()/
-	 * setPagefindIndexer() above.
-	 *
-	 * @generator Any object exposing `buildManifest( docsAssetsDir, imagesConfig, cacheDir )` and `copyToOutput( manifest, outputAssetsDir )`
-	 */
-	void function setImageVariantGenerator( required any generator ) {
-		variables.imageVariantGenerator = arguments.generator
-	}
-
-	/**
 	 * Bypasses PluginLoader.discover() (real BoxLang module lookup - no
 	 * unit test of its own, see PluginLoader.bx's docblock) with an
 	 * already-resolved plugins list, so BuildPipelineSpec.bx can test the
@@ -175,7 +142,9 @@ class {
 		variables.profileTimings = []
 		variables.profileLastAt = buildStartedAt
 		variables.canonicalAssetsDir = ""
-		progress( "Loading configuration and content" )
+
+		progress( "Loading configuration and content..." )
+
 		var config = variables.configLoader.load( root )
 		var plugins = resolvePlugins( config )
 		config = variables.pluginLoader.applyOnConfig( plugins, config )
@@ -215,13 +184,15 @@ class {
 		var siteOrigin = len( urls.absolute ) ? left( urls.absolute, len( urls.absolute ) - len( urls.basePath ) ) : ""
 		var themeDir = variables.themeRenderer.resolveThemeDir( config.theme.name, root )
 		config.theme.styleUrl = resolveThemeStyleUrl( themeDir, config.assets.fingerprint )
-		var siteDir = root & "/site"
 
+		// Prepare the site output directory. If it exists, delete it first to ensure a clean build.
+		var siteDir = root & "/site"
 		if ( directoryExists( siteDir ) ) {
 			directoryDelete( siteDir, true )
 		}
 		directoryCreate( siteDir, true, true )
 
+		// Discover all version names within the project's documentation.
 		var versionNames = variables.versionsDiscoverer.discover( docsDir )
 		// `versions.default` (empty, the common case, changes nothing below)
 		// names which docs/versions/<name>/ folder should build AT THE SITE
@@ -242,11 +213,13 @@ class {
 		var rootDocsRelativePrefix = hasDefaultVersion ? ( "versions/" & defaultVersionName & "/" ) : ""
 		var versions = buildVersionsList( versionNames, urls.basePath, defaultVersionName )
 
+		// Discover all locale names within the root documentation directory.
 		var localeNames = variables.localesDiscoverer.discover( rootDocsDir )
 		var locales = buildLocalesList( localeNames, config.i18n, urls.basePath )
 		var defaultLocaleCode = config.i18n.defaultLocale.code
 		var defaultLocaleDir = config.i18n.defaultLocale.dir ?: "ltr"
 
+		// Resolve the navigation configuration for the root documentation directory.
 		var navConfig = resolveExplicitNav( rootDocsDir, config.nav )
 		var mainPages = variables.docsLoader.load( rootDocsDir )
 		profile( "setup and main docs load", buildStartedAt )
@@ -304,7 +277,7 @@ class {
 			default : true
 		} ]
 		var allPages = duplicate( mainResult.pages )
-		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, config.cloud.contentBlocks, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
+		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.imageGallery, config.pageActions, config.cloud.contentBlocks, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
 		profile( "main assets", buildStartedAt )
 
 		// The plain docs/ tree - "the root" itself when versions.default is
@@ -341,154 +314,420 @@ class {
 				locale  : defaultLocaleCode,
 				default : false
 			} )
-			copyAssets( root, themeDir, nextOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, config.cloud.contentBlocks, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
+			copyAssets( root, themeDir, nextOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.imageGallery, config.pageActions, config.cloud.contentBlocks, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
 			writeTagsPage( nextResult.pages, nextResult.nav, config, themeDir, nextOutputDir, nextBasePath, versions, nextLocales, defaultLocaleCode, siteOrigin, functions, "Next", data )
 			variables.redirectGenerator.write( nextResult.pages, nextOutputDir, nextBasePath )
 			profile( "next tree", buildStartedAt )
 		}
 
-		for ( var versionName in versionNames ) {
-			// Already rendered at the site root, above - never duplicated
-			// at its own /versions/<name>/ URL too.
-			if ( versionName == defaultVersionName ) {
-				continue
-			}
-			progress( "Building version: #versionName#" )
-			var versionDocsDir = docsDir & "/versions/" & versionName
-			var versionOutputDir = siteDir & "/versions/" & versionName
-			var versionBasePath = urls.basePath & "versions/" & versionName & "/"
-			var versionPages = variables.docsLoader.load( versionDocsDir )
+		// Build all non-default versions of the documentation
+		var versionsToBuild = versionNames.filter( ( versionName ) =>
+			versionName != defaultVersionName
+		)
+		// Build each version concurrently using futures
+		var versionBuildResults = futureNew().allApply(
+			versionsToBuild,
+			( versionName ) => {
+				progress( "Building version: #versionName#" )
 
-			var versionLocaleNames = variables.localesDiscoverer.discover( versionDocsDir )
-			var versionLocales = buildLocalesList( versionLocaleNames, config.i18n, versionBasePath )
+				var versionDocsDir   = docsDir & "/versions/" & versionName
+				var versionOutputDir = siteDir & "/versions/" & versionName
+				var versionBasePath  = urls.basePath & "versions/" & versionName & "/"
+				var versionPages = variables.docsLoader.load( versionDocsDir )
+				var versionLocaleNames = variables.localesDiscoverer.discover(
+					versionDocsDir
+				)
+				var versionLocales = buildLocalesList(
+					versionLocaleNames,
+					config.i18n,
+					versionBasePath
+				)
 
-			var versionResult = renderDocTree(
-				versionPages,
-				versionDocsDir,
-				config,
-				themeDir,
-				versionOutputDir,
-				versionBasePath,
-				root,
-				versions,
-				versionName,
-				"versions/" & versionName & "/",
-				plugins,
-				urls.absolute,
-				imageManifest,
-				[],
-				versionLocales,
-				defaultLocaleCode,
-				defaultLocaleDir,
-				"",
-				siteOrigin,
-				functions,
-				data
-			)
-			allPages.append( prefixPageUrls( versionResult.pages, "versions/" & versionName & "/" ), true )
-			mcpManifestTrees.append( {
-				path    : "versions/" & versionName,
-				label   : versionName,
-				version : versionName,
-				locale  : defaultLocaleCode,
-				default : false
-			} )
-			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, config.cloud.contentBlocks, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
-			writeTagsPage( versionResult.pages, versionResult.nav, config, themeDir, versionOutputDir, versionBasePath, versions, versionLocales, defaultLocaleCode, siteOrigin, functions, versionName, data )
-			variables.redirectGenerator.write( versionResult.pages, versionOutputDir, versionBasePath )
+				// ---------------------------------------------
+				// Build default locale for this version
+				// ---------------------------------------------
 
-			for ( var versionLocale in versionLocales ) {
-				if ( versionLocale.code == defaultLocaleCode ) {
-					continue
-				}
-				var versionLocaleOutputDir = versionOutputDir & "/" & versionLocale.code
-				var versionLocalePages = variables.docsLoader.load( versionDocsDir & "/i18n/" & versionLocale.code )
-				var mergedVersionLocalePages = mergeLocalePages( versionPages, versionLocalePages, versionLocale.code, "versions/" & versionName & "/" )
-				var versionLocaleResult = renderDocTree(
-					mergedVersionLocalePages,
+				var versionResult = renderDocTree(
+					versionPages,
 					versionDocsDir,
 					config,
 					themeDir,
-					versionLocaleOutputDir,
-					versionBasePath & versionLocale.code & "/",
+					versionOutputDir,
+					versionBasePath,
 					root,
 					versions,
 					versionName,
-					"",
+					"versions/" & versionName & "/",
 					plugins,
 					urls.absolute,
 					imageManifest,
 					[],
 					versionLocales,
-					versionLocale.code,
-					versionLocale.dir,
+					defaultLocaleCode,
+					defaultLocaleDir,
 					"",
 					siteOrigin,
 					functions,
 					data
 				)
-				allPages.append( prefixPageUrls( versionLocaleResult.pages, "versions/" & versionName & "/" & versionLocale.code & "/" ), true )
-				mcpManifestTrees.append( {
-					path    : "versions/" & versionName & "/" & versionLocale.code,
-					label   : versionName & " / " & versionLocale.label,
-					version : versionName,
-					locale  : versionLocale.code,
-					default : false
+
+				copyAssets(
+					root,
+					themeDir,
+					versionOutputDir,
+					config.theme.name,
+					searchNeedsLocalIndex( config ),
+					config.mermaid,
+					config.math,
+					config.openapi,
+					config.imageGallery,
+					config.pageActions,
+					config.cloud.contentBlocks,
+					imageManifest,
+					assetPipeline.cssBundle,
+					assetPipeline.jsBundle,
+					config.assets.fingerprint
+				)
+
+				writeTagsPage(
+					versionResult.pages,
+					versionResult.nav,
+					config,
+					themeDir,
+					versionOutputDir,
+					versionBasePath,
+					versions,
+					versionLocales,
+					defaultLocaleCode,
+					siteOrigin,
+					functions,
+					versionName,
+					data
+				)
+
+				variables.redirectGenerator.write(
+					versionResult.pages,
+					versionOutputDir,
+					versionBasePath
+				)
+
+				// Data we'll return from this version worker.
+				// These arrays belong only to this worker.
+				var builtPages = [
+					{
+						pages  : versionResult.pages,
+						prefix : "versions/" & versionName & "/"
+					}
+				]
+
+				var builtManifests = [
+					{
+						path    : "versions/" & versionName,
+						label   : versionName,
+						version : versionName,
+						locale  : defaultLocaleCode,
+						default : false
+					}
+				]
+
+				// ---------------------------------------------
+				// Build locales for this version in parallel
+				// ---------------------------------------------
+
+				var localesToBuild = versionLocales.filter(
+					( versionLocale ) => versionLocale.code != defaultLocaleCode
+				)
+
+				var localeBuildResults = futureNew().allApply(
+					localesToBuild,
+					( versionLocale ) => {
+						progress(
+							"Building version: #versionName# / #versionLocale.code#"
+						)
+
+						var versionLocaleOutputDir =
+							versionOutputDir & "/" & versionLocale.code
+
+						var versionLocalePages = variables.docsLoader.load(
+							versionDocsDir & "/i18n/" & versionLocale.code
+						)
+
+						var mergedVersionLocalePages = mergeLocalePages(
+							versionPages,
+							versionLocalePages,
+							versionLocale.code,
+							"versions/" & versionName & "/"
+						)
+
+						var versionLocaleResult = renderDocTree(
+							mergedVersionLocalePages,
+							versionDocsDir,
+							config,
+							themeDir,
+							versionLocaleOutputDir,
+							versionBasePath & versionLocale.code & "/",
+							root,
+							versions,
+							versionName,
+							"",
+							plugins,
+							urls.absolute,
+							imageManifest,
+							[],
+							versionLocales,
+							versionLocale.code,
+							versionLocale.dir,
+							"",
+							siteOrigin,
+							functions,
+							data
+						)
+
+						copyAssets(
+							root,
+							themeDir,
+							versionLocaleOutputDir,
+							config.theme.name,
+							searchNeedsLocalIndex( config ),
+							config.mermaid,
+							config.math,
+							config.openapi,
+							config.imageGallery,
+							config.pageActions,
+							config.cloud.contentBlocks,
+							imageManifest,
+							assetPipeline.cssBundle,
+							assetPipeline.jsBundle,
+							config.assets.fingerprint
+						)
+
+						writeTagsPage(
+							versionLocaleResult.pages,
+							versionLocaleResult.nav,
+							config,
+							themeDir,
+							versionLocaleOutputDir,
+							versionBasePath & versionLocale.code & "/",
+							versions,
+							versionLocales,
+							versionLocale.code,
+							siteOrigin,
+							functions,
+							versionName,
+							data
+						)
+
+						variables.redirectGenerator.write(
+							versionLocaleResult.pages,
+							versionLocaleOutputDir,
+							versionBasePath & versionLocale.code & "/"
+						)
+
+						return {
+							pages : {
+								pages  : versionLocaleResult.pages,
+								prefix : "versions/"
+									& versionName
+									& "/"
+									& versionLocale.code
+									& "/"
+							},
+							manifest : {
+								path    : "versions/"
+									& versionName
+									& "/"
+									& versionLocale.code,
+								label   : versionName
+									& " / "
+									& versionLocale.label,
+								version : versionName,
+								locale  : versionLocale.code,
+								default : false
+							}
+						}
+					},
+					( error ) => parallelFailure( error, versionName, "version locale" )
+				)
+
+				// We're serial again inside this version worker.
+				localeBuildResults.each( ( localeBuild ) => {
+					if ( isStruct( localeBuild ) && localeBuild.keyExists( "__bxsitesParallelFailure" ) ) {
+						throwParallelFailure( localeBuild )
+					}
+					if ( isStruct( localeBuild ) && localeBuild.keyExists( "Message" ) && localeBuild.keyExists( "StackTrace" ) ) {
+						throwParallelFailure( parallelFailure( localeBuild, versionName & "/unknown", "version locale" ) )
+					}
+					builtPages.append( localeBuild.pages )
+					builtManifests.append( localeBuild.manifest )
 				} )
-				copyAssets( root, themeDir, versionLocaleOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, config.cloud.contentBlocks, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
-				writeTagsPage( versionLocaleResult.pages, versionLocaleResult.nav, config, themeDir, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/", versions, versionLocales, versionLocale.code, siteOrigin, functions, versionName, data )
-				variables.redirectGenerator.write( versionLocaleResult.pages, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/" )
+
+				return {
+					pages     : builtPages,
+					manifests : builtManifests
+				}
+			},
+			( error ) => parallelFailure( error, "unknown", "version" )
+		)
+
+		// -------------------------------------------------
+		// All parallel work is finished.
+		// Merge into shared collections serially.
+		// -------------------------------------------------
+		versionBuildResults.each( ( versionBuild ) => {
+			if ( isStruct( versionBuild ) && versionBuild.keyExists( "__bxsitesParallelFailure" ) ) {
+				throwParallelFailure( versionBuild )
 			}
-		}
+			if ( isStruct( versionBuild ) && versionBuild.keyExists( "Message" ) && versionBuild.keyExists( "StackTrace" ) ) {
+				throwParallelFailure( parallelFailure( versionBuild, "unknown", "version" ) )
+			}
+			versionBuild.pages.each( ( pageBuild ) => {
+				allPages.append(
+					prefixPageUrls(
+						pageBuild.pages,
+						pageBuild.prefix
+					),
+					true
+				)
+			} )
+			versionBuild.manifests.each( ( manifest ) => {
+				mcpManifestTrees.append( manifest )
+			} )
+		} )
 		profile( "version trees", buildStartedAt )
 
-		for ( var locale in locales ) {
-			if ( locale.code == defaultLocaleCode ) {
-				continue
+		// Build all non-default locales asynchronously
+		var localesToBuild = locales.filter( ( locale ) =>
+			locale.code != defaultLocaleCode
+		)
+		var localeResults = futureNew().allApply(
+			localesToBuild,
+			( locale ) => {
+				progress( "Building locale: #locale.code#" )
+				var localeStartedAt = getTickCount()
+				// Determine the output directory for this locale
+				var localeOutputDir = siteDir & "/" & locale.code
+				// Load the pages for this locale
+				var localePages = variables.docsLoader.load(
+					rootDocsDir & "/i18n/" & locale.code
+				)
+				// Merge the locale-specific pages with the main pages
+				var mergedPages = mergeLocalePages(
+					mainPages,
+					localePages,
+					locale.code,
+					rootDocsRelativePrefix
+				)
+				// Render the documentation tree for this locale
+				var localeResult = renderDocTree(
+					mergedPages,
+					rootDocsDir,
+					config,
+					themeDir,
+					localeOutputDir,
+					urls.basePath & locale.code & "/",
+					root,
+					[],
+					rootVersionLabel,
+					"",
+					plugins,
+					urls.absolute,
+					imageManifest,
+					navConfig,
+					locales,
+					locale.code,
+					locale.dir,
+					"",
+					siteOrigin,
+					functions,
+					data
+				)
+				// Copy static assets for this locale
+				copyAssets(
+					root,
+					themeDir,
+					localeOutputDir,
+					config.theme.name,
+					searchNeedsLocalIndex( config ),
+					config.mermaid,
+					config.math,
+					config.openapi,
+					config.imageGallery,
+					config.pageActions,
+					config.cloud.contentBlocks,
+					imageManifest,
+					assetPipeline.cssBundle,
+					assetPipeline.jsBundle,
+					config.assets.fingerprint
+				)
+				// Write the tags page for this locale
+				writeTagsPage(
+					localeResult.pages,
+					localeResult.nav,
+					config,
+					themeDir,
+					localeOutputDir,
+					urls.basePath & locale.code & "/",
+					versions,
+					locales,
+					locale.code,
+					siteOrigin,
+					functions,
+					rootVersionLabel,
+					data
+				)
+
+				// Generate redirects for this locale
+				variables.redirectGenerator.write(
+					localeResult.pages,
+					localeOutputDir,
+					urls.basePath & locale.code & "/"
+				)
+
+				// Output how long it took to build this locale
+				profile( "locale: " & locale.code, localeStartedAt )
+
+				// Return the result for this locale
+				return {
+					locale : locale,
+					result : localeResult
+				}
+				},
+				( error ) => parallelFailure( error, "unknown", "locale" )
+		)
+		// -------------------------------------------------
+		// All parallel work is finished.
+		// Merge into shared collections serially.
+		// -------------------------------------------------
+		localeResults.each( ( build ) => {
+			if ( isStruct( build ) && build.keyExists( "__bxsitesParallelFailure" ) ) {
+				throwParallelFailure( build )
 			}
-			progress( "Building locale: #locale.code#" )
-			var localeOutputDir = siteDir & "/" & locale.code
-			var localePages = variables.docsLoader.load( rootDocsDir & "/i18n/" & locale.code )
-			var mergedPages = mergeLocalePages( mainPages, localePages, locale.code, rootDocsRelativePrefix )
-			var localeResult = renderDocTree(
-				mergedPages,
-				rootDocsDir,
-				config,
-				themeDir,
-				localeOutputDir,
-				urls.basePath & locale.code & "/",
-				root,
-				[],
-				rootVersionLabel,
-				"",
-				plugins,
-				urls.absolute,
-				imageManifest,
-				navConfig,
-				locales,
-				locale.code,
-				locale.dir,
-				"",
-				siteOrigin,
-				functions,
-				data
+			// Append the pages for this locale to the overall list of all pages
+			allPages.append(
+				prefixPageUrls(
+					build.result.pages,
+					build.locale.code & "/"
+				),
+				true
 			)
-			allPages.append( prefixPageUrls( localeResult.pages, locale.code & "/" ), true )
+			// Append the locale-specific pages to the overall list of pages
 			mcpManifestTrees.append( {
-				path    : locale.code,
-				label   : locale.label,
-				version : hasDefaultVersion ? defaultVersionName : javacast( "null", "" ),
-				locale  : locale.code,
+				path    : build.locale.code,
+				label   : build.locale.label,
+				version : hasDefaultVersion
+					? defaultVersionName
+					: javacast( "null", "" ),
+				locale  : build.locale.code,
 				default : false
 			} )
-			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, config.cloud.contentBlocks, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
-			writeTagsPage( localeResult.pages, localeResult.nav, config, themeDir, localeOutputDir, urls.basePath & locale.code & "/", versions, locales, locale.code, siteOrigin, functions, rootVersionLabel, data )
-			variables.redirectGenerator.write( localeResult.pages, localeOutputDir, urls.basePath & locale.code & "/" )
-		}
+		} )
+
+		// Profile the time taken to build all locale-specific page trees.
+		progress( "Finished building all locales." )
 		profile( "locale trees", buildStartedAt )
 
+		// Collect all tag pages from the main result.
 		var tagsPages = mainResult.pages
-
 		if ( blogPosts.len() ) {
 			progress( "Building blog (#blogPosts.len()# post(s))" )
 			// A featured image (frontmatter `image`) becomes a post's own
@@ -517,10 +756,10 @@ class {
 			var blogResult = variables.blogBuilder.build( blogPosts, blogAuthors, config.blog.postsPerPage, urls.basePath, imageManifest )
 
 			for ( var post in blogResult.posts ) {
-				writeRenderedPage( post, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir, siteOrigin, functions, rootVersionLabel, data )
+				writeRenderedPage( post, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir, siteOrigin, functions, rootVersionLabel, data, "", "blog-page" )
 			}
 			for ( var indexPage in blogResult.indexPages ) {
-				writeRenderedPage( indexPage, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir, siteOrigin, functions, rootVersionLabel, data )
+				writeRenderedPage( indexPage, mainResult.nav, config, themeDir, siteDir, urls.basePath, versions, locales, defaultLocaleCode, defaultLocaleDir, siteOrigin, functions, rootVersionLabel, data, "blog", "" )
 			}
 
 			variables.markdownPublisher.publish( blogResult.posts, siteDir )
@@ -576,7 +815,6 @@ class {
 		}
 
 		fileWrite( siteDir & "/robots.txt", variables.robotsTxtGenerator.resolve( docsDir, urls.absolute, config.robots, hasDefaultVersion ? [ "/next/" ] : [] ) )
-
 		fileWrite( siteDir & "/llms.txt", variables.llmsTxtGenerator.build( allPages, config, urls.absolute, urls.basePath ) )
 		profile( "site metadata", buildStartedAt )
 
@@ -595,33 +833,113 @@ class {
 		}
 	}
 
+	/**
+	 * Records elapsed and cumulative timing for a build phase when profiling is enabled.
+	 * Updates the previous-timestamp marker used by the next phase.
+	 *
+	 * @label Human-readable build phase label
+	 * @startedAt Tick count captured when the build started
+	 */
 	private void function profile( required string label, required numeric startedAt ) {
 		if ( variables.profiling ) {
-			var now = getTickCount()
-			variables.profileTimings.append( {
-				label      : arguments.label,
-				elapsedMs  : now - variables.profileLastAt,
-				totalMs    : now - arguments.startedAt
-			} )
-			variables.profileLastAt = now
+			lock name="bxsites-profile" type="exclusive" timeout=30 throwOnTimeout=true {
+				var now = getTickCount()
+				variables.profileTimings.append( {
+					label      : arguments.label,
+					elapsedMs  : now - variables.profileLastAt,
+					totalMs    : now - arguments.startedAt
+				} )
+				variables.profileLastAt = now
+			}
 		}
 	}
 
+	/**
+	 * Prints a profiling progress message when build profiling is enabled.
+	 *
+	 * @message The phase message to print
+	 */
 	private void function progress( required string message ) {
 		if ( variables.profiling ) {
-			systemOutput( "[bx-sites] #arguments.message#...", true )
+			println( "[bx-sites] #arguments.message#..." )
 		}
 	}
 
+	/**
+	 * Records the elapsed time for an independently timed build segment.
+	 * Unlike profile(), this does not update the shared previous-timestamp marker.
+	 *
+	 * @label Human-readable segment label
+	 * @startedAt Tick count captured when the segment started
+	 */
 	private void function profileSegment( required string label, required numeric startedAt ) {
 		if ( variables.profiling ) {
-			variables.profileTimings.append( {
-				label     : arguments.label,
-				elapsedMs : getTickCount() - arguments.startedAt
-			} )
+			lock name="bxsites-profile" type="exclusive" timeout=30 throwOnTimeout=true {
+				variables.profileTimings.append( {
+					label     : arguments.label,
+					elapsedMs : getTickCount() - arguments.startedAt
+				} )
+			}
 		}
 	}
 
+	/**
+	 * Converts an allApply worker exception into a result that can be printed
+	 * and rethrown after the future collection has completed.
+	 *
+	 * @error The exception struct supplied by allApply
+	 * @item The version or locale item being processed
+	 * @phase The parallel build phase name
+	 * @return A marked failure struct containing the original error details
+	 */
+	private struct function parallelFailure( required any error, required any item, required string phase ) {
+		var message = isStruct( arguments.error ) && arguments.error.keyExists( "Message" )
+			? arguments.error.Message
+			: "Unknown parallel build failure"
+		var detail = isStruct( arguments.error ) && arguments.error.keyExists( "Detail" )
+			? arguments.error.Detail
+			: ""
+		var stackTrace = isStruct( arguments.error ) && arguments.error.keyExists( "StackTrace" )
+			? arguments.error.StackTrace
+			: ""
+		var output = "[bx-sites] #arguments.phase# build failed for [#arguments.item#]: #message#"
+		println( output )
+		if ( len( detail ) ) {
+			println( "Detail: #detail#" )
+		}
+		if ( len( stackTrace ) ) {
+			println( stackTrace )
+		}
+		return {
+			__bxsitesParallelFailure : true,
+			message                 : output,
+			detail                  : len( detail ) ? detail : stackTrace
+		}
+	}
+
+	/**
+	 * Stops the build with the original message after a parallel worker failed.
+	 *
+	 * @failure A marker returned by parallelFailure()
+	 */
+	private void function throwParallelFailure( required struct failure ) {
+		throw(
+			type    = "BxSites.ParallelBuildFailure",
+			message = arguments.failure.message,
+			detail  = arguments.failure.detail ?: ""
+		)
+	}
+
+	/**
+	 * Summarizes generated output size, counts, duration, and profiling timings.
+	 *
+	 * @siteDir Absolute path to the generated site directory
+	 * @pageCount Number of pages in the primary tree
+	 * @versionCount Number of version trees generated
+	 * @localeCount Number of locale trees generated
+	 * @startedAt Tick count captured when the build started
+	 * @return A build report struct containing output counts, byte size, duration, and timings
+	 */
 	private struct function buildReport( required string siteDir, required numeric pageCount, required numeric versionCount, required numeric localeCount, required numeric startedAt ) {
 		var outputFiles = directoryList( arguments.siteDir, true, "path" )
 			.filter( path => !directoryExists( path ) )
@@ -682,13 +1000,23 @@ class {
 			return { config : arguments.config, cssBundle : emptyBundle, jsBundle : emptyBundle }
 		}
 
-		var docsDir = arguments.docsDir
+		var targetDir = arguments.docsDir
 		var cacheDir = arguments.root & "/.cache/assets"
 
-		var cssBundle = variables.assetBundler.bundleCss( arguments.config.extraCss, docsDir, cacheDir, arguments.config.assets.fingerprint )
+		var cssBundle = variables.assetBundler.bundleCss(
+			arguments.config.extraCss,
+			targetDir,
+			cacheDir,
+			arguments.config.assets.fingerprint
+		)
 		arguments.config.extraCss = len( cssBundle.bundleUrl ) ? [ cssBundle.bundleUrl ] : cssBundle.urls
 
-		var jsBundle = variables.assetBundler.bundleJs( arguments.config.extraJs, docsDir, cacheDir, arguments.config.assets.fingerprint )
+		var jsBundle = variables.assetBundler.bundleJs(
+			arguments.config.extraJs,
+			targetDir,
+			cacheDir,
+			arguments.config.assets.fingerprint
+		)
 		arguments.config.extraJs = len( jsBundle.bundleUrl ) ? [ jsBundle.bundleUrl ] : jsBundle.urls
 
 		return { config : arguments.config, cssBundle : cssBundle, jsBundle : jsBundle }
@@ -792,6 +1120,7 @@ class {
 		// let one tree's own computed fields (an og:image path written under
 		// its own outputDir, a basePath-specific contentHtml) leak into another.
 		var pages = duplicate( arguments.pages )
+		var treeDirectiveBlockProcessor = new "models.build.DirectiveBlockProcessor@bxsites"()
 		var nav = variables.navBuilder.build( pages, arguments.navConfig )
 		nav = variables.pluginLoader.applyOnNav( arguments.plugins, nav, arguments.config )
 		// Captured before the synthetic "Blog" nav node (if any) is appended
@@ -819,8 +1148,21 @@ class {
 
 		var markdownStartedAt = getTickCount()
 		convertMarkdown(
-			pages, arguments.config, arguments.plugins, arguments.basePath, arguments.docsDir, arguments.imageManifest, arguments.functions,
-			nav, arguments.versions, arguments.currentVersion, arguments.locales, arguments.currentLocale, arguments.currentLocaleDir, arguments.data
+			pages,
+			arguments.config,
+			arguments.plugins,
+			arguments.basePath,
+			arguments.docsDir,
+			arguments.imageManifest,
+			arguments.functions,
+			nav,
+			arguments.versions,
+			arguments.currentVersion,
+			arguments.locales,
+			arguments.currentLocale,
+			arguments.currentLocaleDir,
+			arguments.data,
+			treeDirectiveBlockProcessor
 		)
 		profileSegment( "markdown conversion", markdownStartedAt )
 		variables.pageLinkResolver.resolve( pages, arguments.basePath )
@@ -847,9 +1189,25 @@ class {
 		var renderingStartedAt = getTickCount()
 		for ( var page in pages ) {
 			page.canonicalUrl = canonicalUrlFor( page.urlPath, arguments.basePath, arguments.siteOrigin )
+			// No lock - ThemeRenderer.renderPage() renders every page through
+			// its own fresh, isolated RendererEncapsulator instance rather
+			// than shared instance state, so concurrent calls into this one
+			// shared variables.themeRenderer (across trees building in
+			// parallel via futureNew().allApply()) are race-free.
 			var html = variables.themeRenderer.renderPage(
-				page, nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, arguments.currentVersion,
-				arguments.locales, arguments.currentLocale, arguments.currentLocaleDir, arguments.functions, arguments.data
+				page,
+				nav,
+				arguments.config,
+				arguments.themeDir,
+				arguments.basePath,
+				arguments.versions,
+				arguments.currentVersion,
+				arguments.locales,
+				arguments.currentLocale,
+				arguments.currentLocaleDir,
+				arguments.functions,
+				arguments.data,
+				page.layout
 			)
 			var outputPath = arguments.outputDir & "/" & page.urlPath
 			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
@@ -1101,7 +1459,24 @@ class {
 	 * the fully-enriched struct instead. See
 	 * docs/guides/variables-and-functions.md's "Context variables" section.
 	 */
-	private void function convertMarkdown( required array pages, required struct config, array plugins = [], string basePath = "/", string docsDir = "", struct imageManifest = {}, struct functions = {}, array nav = [], array versions = [], string currentVersion = "Latest", array locales = [], string currentLocale = "", string currentLocaleDir = "ltr", struct data = {} ) {
+	private void function convertMarkdown(
+		required array pages,
+		required struct config,
+		array plugins = [],
+		string basePath = "/",
+		string docsDir = "",
+		struct imageManifest = {},
+		struct functions = {},
+		array nav = [],
+		array versions = [],
+		string currentVersion = "Latest",
+		array locales = [],
+		string currentLocale = "",
+		string currentLocaleDir = "ltr",
+		struct data = {},
+		any directiveProcessor = ""
+	) {
+		var activeDirectiveProcessor = isObject( arguments.directiveProcessor ) ? arguments.directiveProcessor : variables.directiveBlockProcessor
 		for ( var page in arguments.pages ) {
 			// A page's own conversion is a pure function of its source file plus
 			// this tree's config/plugins/imageManifest, none of which change
@@ -1162,9 +1537,9 @@ class {
 			// right back once the pass is done - see
 			// DirectiveBlockProcessor.protectLoopDirectives()'s own
 			// docblock for why.
-			var loopProtected = variables.directiveBlockProcessor.protectLoopDirectives( markdown )
+			var loopProtected = activeDirectiveProcessor.protectLoopDirectives( markdown )
 			markdown = variables.variablesProcessor.resolve( loopProtected.markdown, pageVars, arguments.functions, page.relativePath, functionContext )
-			markdown = variables.directiveBlockProcessor.restoreLoopDirectives( markdown, loopProtected.placeholders )
+			markdown = activeDirectiveProcessor.restoreLoopDirectives( markdown, loopProtected.placeholders )
 
 			var tryBoxLangExtracted = variables.tryBoxLangProcessor.extract( markdown )
 			var tabsExtracted = variables.tabsProcessor.extract( tryBoxLangExtracted.markdown )
@@ -1173,13 +1548,17 @@ class {
 			// Wires this page's own {{ }} resolution context into
 			// renderFor()/renderIf() - see DirectiveBlockProcessor's own
 			// setLoopContext() docblock.
-			variables.directiveBlockProcessor.setLoopContext( variables.variablesProcessor, pageVars, arguments.functions, functionContext )
-			var directivesExtracted = variables.directiveBlockProcessor.extract( codeExtracted.markdown )
+			activeDirectiveProcessor.setLoopContext( variables.variablesProcessor, pageVars, arguments.functions, functionContext )
+			var directivesExtracted = activeDirectiveProcessor.extract( codeExtracted.markdown )
 
-			var html = variables.markdownRenderer.toHtml( directivesExtracted.markdown, arguments.config.markdown )
-			html = variables.directiveBlockProcessor.restore( html, directivesExtracted.blocks, variables.markdownRenderer, arguments.config.markdown )
-			html = variables.directiveBlockProcessor.resolveFileHrefs( html, arguments.basePath )
-			html = variables.directiveBlockProcessor.resolveOpenApiSrcs( html, arguments.basePath )
+			var html = ""
+			lock name="bxsites-markdown-renderer" type="exclusive" timeout=30 throwOnTimeout=true {
+				html = variables.markdownRenderer.toHtml( directivesExtracted.markdown, arguments.config.markdown )
+				html = activeDirectiveProcessor.restore( html, directivesExtracted.blocks, variables.markdownRenderer, arguments.config.markdown )
+				html = activeDirectiveProcessor.resolveFileHrefs( html, arguments.basePath )
+				html = activeDirectiveProcessor.resolveOpenApiSrcs( html, arguments.basePath )
+				html = activeDirectiveProcessor.resolveImageGalleries( html, arguments.docsDir, page.relativePath )
+			}
 			html = variables.codeAnnotationProcessor.applyToHtml( html, codeExtracted.annotations )
 			html = variables.mathProtector.restore( html, mathProtected.formulas )
 			html = variables.tabsProcessor.restore( html, tabsExtracted.groups, variables.markdownRenderer, arguments.config.markdown )
@@ -1620,6 +1999,14 @@ class {
 		return len( arguments.siteOrigin ) ? ( arguments.siteOrigin & arguments.basePath & arguments.urlPath ) : ""
 	}
 
+	/**
+	 * Builds the repository edit URL for a source page.
+	 *
+	 * @repoUrl Repository root URL
+	 * @editUri Repository path between the root and the source file
+	 * @relativePath Source path relative to the documentation root
+	 * @return The combined edit URL with normalized separators
+	 */
 	private string function buildEditUrl( required string repoUrl, required string editUri, required string relativePath ) {
 		var base = arguments.repoUrl.reReplace( "[\/]+$", "" )
 		var uri = arguments.editUri.reReplace( "^[\/]+|[\/]+$", "", "all" )
@@ -1647,12 +2034,15 @@ class {
 	 * @functions FunctionsLoader.load()'s own output, threaded through to themeRenderer.renderPage()
 	 * @currentVersion Which `versions` entry this page's own tree IS, for the switcher's own "selected" state - "Latest" by default, matching the root tree's own render (the blog is main-tree-only in v1, always rendered as part of whichever tree is currently the site root)
 	 * @data DataLoader.load()'s own output, threaded through to themeRenderer.renderPage()
+	 * @layoutHint ThemeRenderer.renderPage()'s own `layoutHint` - "" (the default) for a blog post (renders through the theme's normal `layout.bxm`), `"blog"` for one of BlogBuilder.build()'s own `indexPages` (build()'s own docblock)
+	 * @bodyHint ThemeRenderer.renderPage()'s own `bodyHint` - `"blog-page"` for an individual blog post, "" (the default) for an index page (its own `contentHtml` is already fully built by BlogBuilder.bx, so it renders through the theme's normal `page.bxm` body unless a project's own theme overrides that)
 	 */
-	private void function writeRenderedPage( required struct page, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required array locales, required string currentLocale, required string currentLocaleDir, string siteOrigin = "", struct functions = {}, string currentVersion = "Latest", struct data = {} ) {
+	private void function writeRenderedPage( required struct page, required array nav, required struct config, required string themeDir, required string siteDir, required string basePath, required array versions, required array locales, required string currentLocale, required string currentLocaleDir, string siteOrigin = "", struct functions = {}, string currentVersion = "Latest", struct data = {}, string layoutHint = "", string bodyHint = "" ) {
 		arguments.page.canonicalUrl = canonicalUrlFor( arguments.page.urlPath, arguments.basePath, arguments.siteOrigin )
 		var html = variables.themeRenderer.renderPage(
 			arguments.page, arguments.nav, arguments.config, arguments.themeDir, arguments.basePath, arguments.versions, arguments.currentVersion,
-			arguments.locales, arguments.currentLocale, arguments.currentLocaleDir, arguments.functions, arguments.data
+			arguments.locales, arguments.currentLocale, arguments.currentLocaleDir, arguments.functions, arguments.data,
+			arguments.layoutHint, arguments.bodyHint
 		)
 		var outputPath = arguments.siteDir & "/" & arguments.page.urlPath
 		directoryCreate( getDirectoryFromPath( outputPath ), true, true )
@@ -1906,6 +2296,7 @@ class {
 	 * @mermaidEnabled Whether to copy the shared mermaid-init.js widget and the vendored mermaid.js bundle itself
 	 * @mathEnabled Whether to copy the shared math-init.js (KaTeX auto-render) widget
 	 * @openapiEnabled Whether to copy the shared openapi-init.js widget and the vendored Swagger UI bundle/CSS - only ever needed by a project actually using a `::: openapi` block (DirectiveBlockProcessor.bx)
+	 * @imageGalleryEnabled Whether to copy the shared image-gallery-init.js lightbox widget - only ever needed by a project with `imageGallery: true` (a `::: image-gallery` block, DirectiveBlockProcessor.bx)
 	 * @pageActionsEnabled Whether to copy the shared page-actions-init.js widget - only ever needed by a project with `pageActions: true` (the GitBook-style Copy/Export dropdown, page.bxm's own `renderPageActions()`)
 	 * @contentBlocksEnabled Whether to copy the shared cloud-content-init.js widget - `config.cloud.contentBlocks`, same explicit-opt-in-only shape as `openapiEnabled`; only ever needed by a project actually using a `::: cloud` block (DirectiveBlockProcessor.bx's own `renderCloud()`)
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - its already-generated variant files get copied into this tree's own site.../assets/, right alongside the plain docs/assets/** copy below; empty (the default) copies nothing extra
@@ -1913,19 +2304,21 @@ class {
 	 * @jsBundle AssetBundler.bundleJs()'s own output - same as cssBundle, for the `<script>` config.extraJs now points at
 	 * @fingerprintEnabled `config.assets.fingerprint` - whether the theme's own `assets/style.css` gets renamed to its fingerprinted filename after copying (resolveThemeStyleUrl()'s own docblock); `true` (the default) matches the site-wide default
 	 */
-	private void function copyAssets( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, boolean pageActionsEnabled = false, boolean contentBlocksEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {}, boolean fingerprintEnabled = true ) {
+	private void function copyAssets( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, boolean imageGalleryEnabled = false, boolean pageActionsEnabled = false, boolean contentBlocksEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {}, boolean fingerprintEnabled = true ) {
 		var destAssetsDir = arguments.siteDir & "/assets"
 
-		if ( !len( variables.canonicalAssetsDir ) ) {
-			copyAssetsFresh( argumentCollection = arguments )
-			variables.canonicalAssetsDir = destAssetsDir
-			return
-		}
+		lock name="bxsites-canonical-assets" type="exclusive" timeout=30 throwOnTimeout=true {
+			if ( !len( variables.canonicalAssetsDir ) ) {
+				copyAssetsFresh( argumentCollection = arguments )
+				variables.canonicalAssetsDir = destAssetsDir
+				return
+			}
 
-		try {
-			hardlinkDirectory( variables.canonicalAssetsDir, destAssetsDir )
-		} catch ( any e ) {
-			copyAssetsFresh( argumentCollection = arguments )
+			try {
+				hardlinkDirectory( variables.canonicalAssetsDir, destAssetsDir )
+			} catch ( any e ) {
+				copyAssetsFresh( argumentCollection = arguments )
+			}
 		}
 	}
 
@@ -1953,6 +2346,7 @@ class {
 	 * @mermaidEnabled Whether to copy the shared mermaid-init.js widget and the vendored mermaid.js bundle itself
 	 * @mathEnabled Whether to copy the shared math-init.js (KaTeX auto-render) widget
 	 * @openapiEnabled Whether to copy the shared openapi-init.js widget and the vendored Swagger UI bundle/CSS - only ever needed by a project actually using a `::: openapi` block (DirectiveBlockProcessor.bx)
+	 * @imageGalleryEnabled Whether to copy the shared image-gallery-init.js lightbox widget - only ever needed by a project with `imageGallery: true` (a `::: image-gallery` block, DirectiveBlockProcessor.bx)
 	 * @pageActionsEnabled Whether to copy the shared page-actions-init.js widget - only ever needed by a project with `pageActions: true` (the GitBook-style Copy/Export dropdown, page.bxm's own `renderPageActions()`)
 	 * @contentBlocksEnabled Whether to copy the shared cloud-content-init.js widget - `config.cloud.contentBlocks`, same explicit-opt-in-only shape as `openapiEnabled`; only ever needed by a project actually using a `::: cloud` block (DirectiveBlockProcessor.bx's own `renderCloud()`)
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - its already-generated variant files get copied into this tree's own site.../assets/, right alongside the plain docs/assets/** copy below; empty (the default) copies nothing extra
@@ -1960,7 +2354,7 @@ class {
 	 * @jsBundle AssetBundler.bundleJs()'s own output - same as cssBundle, for the `<script>` config.extraJs now points at
 	 * @fingerprintEnabled `config.assets.fingerprint` - whether the theme's own `assets/style.css` gets renamed to its fingerprinted filename after copying (resolveThemeStyleUrl()'s own docblock); `true` (the default) matches the site-wide default
 	 */
-	private void function copyAssetsFresh( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, boolean pageActionsEnabled = false, boolean contentBlocksEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {}, boolean fingerprintEnabled = true ) {
+	private void function copyAssetsFresh( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, boolean imageGalleryEnabled = false, boolean pageActionsEnabled = false, boolean contentBlocksEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {}, boolean fingerprintEnabled = true ) {
 		var themeAssetsDir = arguments.themeDir & "/assets"
 		if ( directoryExists( themeAssetsDir ) ) {
 			directoryCopy( themeAssetsDir, arguments.siteDir & "/assets/theme", true )
@@ -1991,6 +2385,7 @@ class {
 		fileCopy( moduleAssetsDir() & "/prompt-init.js", arguments.siteDir & "/assets/prompt-init.js" )
 		fileCopy( moduleAssetsDir() & "/contact-form-init.js", arguments.siteDir & "/assets/contact-form-init.js" )
 		fileCopy( moduleAssetsDir() & "/code-lines.js", arguments.siteDir & "/assets/code-lines.js" )
+		fileCopy( moduleAssetsDir() & "/home.css", arguments.siteDir & "/assets/home.css" )
 		directoryCopy( moduleAssetsDir() & "/fonts", arguments.siteDir & "/assets/fonts", true )
 		directoryCopy( moduleAssetsDir() & "/vendor/highlight", arguments.siteDir & "/assets/vendor/highlight", true )
 		directoryCopy( moduleAssetsDir() & "/vendor/alpine", arguments.siteDir & "/assets/vendor/alpine", true )
@@ -2016,6 +2411,10 @@ class {
 		if ( arguments.openapiEnabled ) {
 			fileCopy( moduleAssetsDir() & "/openapi-init.js", arguments.siteDir & "/assets/openapi-init.js" )
 			directoryCopy( moduleAssetsDir() & "/vendor/swagger-ui", arguments.siteDir & "/assets/vendor/swagger-ui", true )
+		}
+
+		if ( arguments.imageGalleryEnabled ) {
+			fileCopy( moduleAssetsDir() & "/image-gallery-init.js", arguments.siteDir & "/assets/image-gallery-init.js" )
 		}
 
 		if ( arguments.pageActionsEnabled ) {

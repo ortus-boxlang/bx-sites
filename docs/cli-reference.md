@@ -28,7 +28,8 @@ flags below can appear before any verb.
 
 Every `docs/` mentioned below applies equally to a project using `src/`
 instead - see [Getting Started](getting-started.md#add-pages) for the
-`docs/`-or-`src/` convention. `new` always scaffolds `docs/`.
+`docs/`-or-`src/` convention. `docs/` is the default source folder for new
+projects.
 
 ## Global options
 
@@ -54,25 +55,35 @@ currently activated in your project alongside the verbs below. See
 
 ## `new`
 
-Scaffold a docs project.
+Scaffold a new project.
 
 ```bash title="Usage"
-bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|toml|json]
+bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|toml|json] [--source=docs|src] [--docs|--site]
 ```
 
 - `--name` - the site name written into the site config (defaults to the target directory's name)
 - `--theme` - defaults to `bootstrap`
 - `--description` - the site description written into the site config
 - `--format` - `yaml` (default, scaffolds `bxsites.yaml`) or `json` (scaffolds `bxsites.json`) - see [Configuration](configuration.md)
+- `--source` - `docs` (default) or `src`, the folder where pages and assets are scaffolded
+- `--docs` - shortcut for `--source=docs`
+- `--site` - shortcut for `--source=src`
+
+Use `--source=src` when the project is a general site rather than a
+documentation site. The choice affects the initial folder only; all later
+verbs resolve the existing `docs/` or `src/` source folder automatically.
+Use only one of `--docs` or `--site`; build output is always written to `site/`.
 
 ## `build`
 
-Render `docs/**.md` into a static site in `site/`. Also builds the search
-index (unless `search` is `false` in the site config, or `searchProvider` is
-set to a provider - like `algolia`/`pagefind` - that doesn't use it, see
+Render Markdown pages from the project's source directory into a static site
+in `site/`: `docs/**/*.md` when the project uses `docs/` (the default), or
+`src/**/*.md` when it uses `src/`. Also builds the search index (unless
+`search` is `false` in the site config, or `searchProvider` is set to a
+provider - like `algolia`/`pagefind` - that doesn't use it, see
 [Search](guides/search.md)), runs the `pagefind` CLI against the finished
-`site/` when `searchProvider.provider` is `"pagefind"`, and copies theme +
-`docs/assets/**` into `site/`.
+`site/` when `searchProvider.provider` is `"pagefind"`, and copies the theme
+and the source directory's `assets/**` into `site/`.
 
 ```bash frame="terminal" title="Terminal"
 bxSites build

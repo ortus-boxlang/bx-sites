@@ -94,7 +94,10 @@ in full on the post's own page.
 
 Every other page-level frontmatter key already documented in
 [Getting Started](../getting-started.md#add-pages) (`icon`, `description`,
-`ogImage`, `toc`) works on a post too.
+`ogImage`, `toc`) works on a post too - including `layout`, which renders
+this post's own body through a named `.bxm` instead of the active theme's
+default (its own `blog-page.bxm`, if it has one, else `page.bxm`) - see
+[Multiple layouts per page](themes.md#multiple-layouts-per-page).
 
 ## Featured images and other blog assets
 

@@ -21,14 +21,10 @@
  */
 class {
 
-	variables.builtIn = [ "local", "algolia", "pagefind" ]
+	/** Search providers with built-in bx-sites theme support. */
+	property name="builtIn";
 
-	/**
-	 * The search provider names this module ships built-in theme support for.
-	 */
-	array function getBuiltIn() {
-		return variables.builtIn
-	}
+	variables.builtIn = [ "local", "algolia", "pagefind" ]
 
 	/**
 	 * Whether `provider` should get the static `search-index.json` built (and

@@ -49,12 +49,22 @@ class {
 			return cached
 		}
 
+		var crumbs = arguments.page.breadcrumbs ?: []
+		// Drop the page's own trailing crumb - only its ancestors are useful
+		// for grouping/breadcrumb display, the title field already covers the
+		// page itself.
+		var ancestorTitles = crumbs
+			.slice( 1, max( crumbs.len() - 1, 0 ) )
+			.map( crumb => crumb.title )
+
 		var entry = {
-			title    : arguments.page.title,
-			url      : arguments.page.urlPath,
-			headings : variables.textExtractor.extractHeadings( arguments.page.contentHtml ),
-			body     : truncate( variables.textExtractor.stripTags( arguments.page.contentHtml ), 400 ),
-			tags     : arguments.page.tags ?: []
+			title      : arguments.page.title,
+			url        : arguments.page.urlPath,
+			headings   : variables.textExtractor.extractHeadings( arguments.page.contentHtml ),
+			body       : truncate( variables.textExtractor.stripTags( arguments.page.contentHtml ), 400 ),
+			tags       : arguments.page.tags ?: [],
+			section    : ancestorTitles.len() ? ancestorTitles[ 1 ] : "",
+			breadcrumb : ancestorTitles
 		}
 
 		if ( len( sourcePath ) ) {

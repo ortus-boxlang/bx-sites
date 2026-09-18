@@ -274,7 +274,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 		}
 		msKeys.sort( "text" )
 
-		var canonicalizedHeaders = ""
+		var canonicalizedHeaders = sb{ "" }
 		for ( var name in msKeys ) {
 			canonicalizedHeaders &= name & ":" & trim( lower[ name ] ) & char( 10 )
 		}
@@ -293,7 +293,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 			ifNoneMatch & char( 10 ) &
 			ifUnmodifiedSince & char( 10 ) &
 			range & char( 10 ) &
-			canonicalizedHeaders &
+			canonicalizedHeaders.toString() &
 			canonicalizedResource
 	}
 

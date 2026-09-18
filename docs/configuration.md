@@ -67,17 +67,6 @@ somehow has more than one, `bxsites.yaml` wins, then `bxsites.yml`, then
     ```json title="bxsites.json" linenums="1"
     {
     	"name": "My Docs",
-
-  === "TOML"
-    ```toml title="bxsites.toml" linenums="1"
-    search = true
-    [searchProvider]
-    provider = "algolia"
-    [searchProvider.algolia]
-    appId = "ABC123"
-    apiKey = "a1b2c3d4e5f6..."
-    indexName = "my-docs"
-    ```
     	"description": "",
     	"baseURL": "/",
     	"theme": {
@@ -1118,6 +1107,28 @@ referenced OpenAPI/Swagger spec (JSON or YAML). See
     openapi = true
     ```
 
+## `imageGallery`
+
+`false` (the default) - no lightbox widget shipped at all. `true` loads a
+small click-to-enlarge lightbox for every `::: image-gallery` content
+block. See [Content Blocks](guides/content-blocks.md#image-gallery) for
+the syntax.
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    imageGallery: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "imageGallery": true }
+    ```
+
+  === "TOML"
+    ```toml title="bxsites.toml"
+    imageGallery = true
+    ```
+
 ## `pageActions`
 
 `false` (the default) - no page-actions dropdown at all. `true` adds a
@@ -1212,7 +1223,7 @@ switcher.
   overrides that locale's own theme-chrome UI text (search placeholder,
   "On this page," the 404 page, ...) - see
   [Internationalization](guides/i18n.md#theme-chrome-ui-strings) for the
-  full key list; `de`/`es`/`it`/`ja` already ship a built-in translation,
+  full key list; `de`/`es`/`it` already ship a built-in translation,
   so `strings` is only needed to override a key or add another locale.
 
 === "YAML"
