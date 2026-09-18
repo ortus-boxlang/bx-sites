@@ -158,6 +158,52 @@ palette `color` sopra sono personalizzabili indipendentemente dal resto
 della palette del sito, tramite proprietà CSS personalizzate - vedi
 [Personalizzare i colori](themes.md#customizing-colors-without-a-theme-override).
 
+## Galleria di immagini
+
+Una griglia responsiva di immagini. L'attributo opzionale `columns` è
+`2`, `3` o `4` (predefinito `3`); qualsiasi altro valore ricade su `3`.
+La griglia stessa non richiede configurazione, ma la lightbox
+click-per-ingrandire richiede che
+[`imageGallery`](../configuration.md#imagegallery) sia impostato su
+`true` in `bxsites.yaml` - senza, la griglia si renderizza comunque, solo
+senza il JS della lightbox. Ci sono due modi per costruirne una:
+
+Elenca ogni immagine esplicitamente con figli `::: image` - `src` è
+obbligatorio, `alt` e `caption` sono entrambi opzionali:
+
+```markdown title="Esempio" linenums="1"
+::: image-gallery columns="3"
+::: image src="../assets/favicon.png" alt="BoxLang icon" caption="Icon"
+:::
+::: image src="../assets/home-banner.jpg" alt="Home banner"
+:::
+::: image src="../assets/og-image.png" caption="Social preview"
+:::
+:::
+```
+
+::: image-gallery columns="3"
+::: image src="../assets/favicon.png" alt="BoxLang icon" caption="Icon"
+:::
+::: image src="../assets/home-banner.jpg" alt="Home banner"
+:::
+::: image src="../assets/og-image.png" caption="Social preview"
+:::
+:::
+
+Oppure lascia che bxSites scopra le immagini per convenzione: metti i
+file chiamati `{name}-{order}.{jpg,jpeg,png,webp,gif}` in
+`docs/assets/gallery/{name}/` e referenziali solo con `name` - nessun
+figlio necessario. I file vengono ordinati numericamente per `{order}`:
+
+```markdown title="Esempio" linenums="1"
+::: image-gallery name="showcase" columns="3"
+:::
+```
+
+::: image-gallery name="showcase" columns="3"
+:::
+
 ## File
 
 Una card di download per un PDF, un video, o qualsiasi altro asset di

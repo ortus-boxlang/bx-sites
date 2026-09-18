@@ -50,10 +50,10 @@ offrire.
 
 ## Didascalie, allineamento e cornici
 
-Una didascalia, una cornice, o una galleria multi-immagine sono tutte
-semplicemente HTML a livello di blocco - che bx-markdown/Flexmark lascia
-passare completamente intatto (la regola "HTML block" propria di
-CommonMark), quindi non serve alcuna sintassi specifica di bx-sites:
+Una didascalia o una cornice sono semplicemente HTML a livello di
+blocco - che bx-markdown/Flexmark lascia passare completamente intatto
+(la regola "HTML block" propria di CommonMark), quindi non serve alcuna
+sintassi specifica di bx-sites:
 
 ```markdown title="Esempio" linenums="1"
 <figure>
@@ -64,16 +64,15 @@ CommonMark), quindi non serve alcuna sintassi specifica di bx-sites:
 <div data-with-frame="true">
   <img src="../assets/screenshot.png" alt="Framed">
 </div>
-
-<div class="bxsites-gallery">
-  <img src="../assets/one.png" alt="">
-  <img src="../assets/two.png" alt="">
-  <img src="../assets/three.png" alt="">
-</div>
 ```
 
 Lo stesso vale per `x-data`/`x-show`/`@click` e qualsiasi altro attributo
 Alpine.js - vedi [Interattività con Alpine.js](interactivity.md).
+
+Per una galleria multi-immagine, usa il blocco di contenuto integrato
+[`::: image-gallery`](content-blocks.md#image-gallery) invece di HTML
+scritto a mano - ti dà una griglia responsiva e una lightbox
+click-per-ingrandire senza costi aggiuntivi.
 
 ## Cosa non viene ridimensionato
 

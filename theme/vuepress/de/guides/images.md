@@ -50,10 +50,10 @@ Dateigrößen-Gewinn, auch ganz ohne responsiven Breakpoint.
 
 ## Bildunterschriften, Ausrichtung und Rahmung
 
-Eine Bildunterschrift, ein Rahmen oder eine Mehrbild-Galerie sind alle
-einfach block-level HTML - das bx-markdown/Flexmark vollständig
-unverändert durchreicht (CommonMarks eigene "HTML-Block"-Regel), sodass
-dafür überhaupt keine bx-sites-spezifische Syntax nötig ist:
+Eine Bildunterschrift oder ein Rahmen sind einfach block-level HTML -
+das bx-markdown/Flexmark vollständig unverändert durchreicht (CommonMarks
+eigene "HTML-Block"-Regel), sodass dafür überhaupt keine
+bx-sites-spezifische Syntax nötig ist:
 
 ```markdown title="Beispiel" linenums="1"
 <figure>
@@ -64,17 +64,16 @@ dafür überhaupt keine bx-sites-spezifische Syntax nötig ist:
 <div data-with-frame="true">
   <img src="../assets/screenshot.png" alt="Framed">
 </div>
-
-<div class="bxsites-gallery">
-  <img src="../assets/one.png" alt="">
-  <img src="../assets/two.png" alt="">
-  <img src="../assets/three.png" alt="">
-</div>
 ```
 
 Dasselbe gilt für `x-data`/`x-show`/`@click` und jedes andere
 Alpine.js-Attribut - siehe
 [Interaktivität mit Alpine.js](interactivity.md).
+
+Für eine Mehrbild-Galerie nutze den eingebauten
+[`::: image-gallery`](content-blocks.md#image-gallery)-Content-Block
+anstelle von handgestricktem HTML - er liefert dir ein responsives
+Raster und eine Klick-zum-Vergrößern-Lightbox gratis dazu.
 
 ## Was nicht skaliert wird
 

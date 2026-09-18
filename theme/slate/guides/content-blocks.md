@@ -152,6 +152,51 @@ The numbered marker, connecting line, and each of the three `color`
 palettes above are themeable independently of the rest of the site's
 palette, via CSS custom properties - see [Customizing colors](themes.md#customizing-colors-without-a-theme-override).
 
+## Image gallery
+
+A responsive grid of images. The optional `columns` attribute is `2`,
+`3` or `4` (default `3`); any other value falls back to `3`. The grid
+itself needs no configuration, but the click-to-enlarge lightbox needs
+`bxsites.yaml`'s [`imageGallery`](../configuration.md#imagegallery) set
+to `true` - unset, the grid still renders, just without the lightbox's
+JS. There are two ways to build one:
+
+List each image explicitly with `::: image` children - `src` is
+required, `alt` and `caption` are both optional:
+
+```markdown title="Example" linenums="1"
+::: image-gallery columns="3"
+::: image src="../assets/favicon.png" alt="BoxLang icon" caption="Icon"
+:::
+::: image src="../assets/home-banner.jpg" alt="Home banner"
+:::
+::: image src="../assets/og-image.png" caption="Social preview"
+:::
+:::
+```
+
+::: image-gallery columns="3"
+::: image src="../assets/favicon.png" alt="BoxLang icon" caption="Icon"
+:::
+::: image src="../assets/home-banner.jpg" alt="Home banner"
+:::
+::: image src="../assets/og-image.png" caption="Social preview"
+:::
+:::
+
+Or let bxSites discover the images for you by convention: drop files
+named `{name}-{order}.{jpg,jpeg,png,webp,gif}` into
+`docs/assets/gallery/{name}/` and reference them by `name` alone - no
+children needed. Files are sorted numerically by `{order}`:
+
+```markdown title="Example" linenums="1"
+::: image-gallery name="showcase" columns="3"
+:::
+```
+
+::: image-gallery name="showcase" columns="3"
+:::
+
 ## File
 
 A download card for a PDF, video, or any other project asset - `src` is

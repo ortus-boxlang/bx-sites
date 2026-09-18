@@ -1021,6 +1021,23 @@ referenzierte OpenAPI-/Swagger-Spezifikation (JSON oder YAML). Siehe
     { "openapi": true }
     ```
 
+## `imageGallery`
+
+`false` (Standard) - keine Lightbox ausgeliefert. `true` lädt eine kleine
+Klick-zum-Vergrößern-Lightbox für jeden `::: image-gallery`-Content-Block.
+Siehe [Content-Blöcke](guides/content-blocks.md#image-gallery) für die
+Syntax.
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    imageGallery: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "imageGallery": true }
+    ```
+
 ## `plugins`
 
 `[]` (Standard) - ein Array von BoxLang-Modulnamen, die als Plugins

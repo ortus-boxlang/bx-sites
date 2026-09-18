@@ -159,6 +159,52 @@ independiente al resto de la paleta del sitio, mediante propiedades CSS
 personalizadas - consulta
 [Personalizar colores](themes.md#personalizar-colores-sin-sobrescribir-un-tema).
 
+## Galería de imágenes
+
+Una cuadrícula responsiva de imágenes. El atributo opcional `columns` es
+`2`, `3` o `4` (por defecto `3`); cualquier otro valor recurre a `3`. La
+cuadrícula en sí no necesita configuración, pero la lightbox de clic
+para ampliar necesita que
+[`imageGallery`](../configuration.md#imagegallery) esté en `true` en
+`bxsites.yaml` - sin eso, la cuadrícula igual se renderiza, solo sin el
+JS de la lightbox. Hay dos formas de construir una:
+
+Enumera cada imagen explícitamente con hijos `::: image` - `src` es
+obligatorio, `alt` y `caption` son ambos opcionales:
+
+```markdown title="Ejemplo" linenums="1"
+::: image-gallery columns="3"
+::: image src="../assets/favicon.png" alt="BoxLang icon" caption="Icon"
+:::
+::: image src="../assets/home-banner.jpg" alt="Home banner"
+:::
+::: image src="../assets/og-image.png" caption="Social preview"
+:::
+:::
+```
+
+::: image-gallery columns="3"
+::: image src="../assets/favicon.png" alt="BoxLang icon" caption="Icon"
+:::
+::: image src="../assets/home-banner.jpg" alt="Home banner"
+:::
+::: image src="../assets/og-image.png" caption="Social preview"
+:::
+:::
+
+O deja que bxSites descubra las imágenes por convención: coloca archivos
+llamados `{name}-{order}.{jpg,jpeg,png,webp,gif}` en
+`docs/assets/gallery/{name}/` y referéncialos solo con `name` - sin
+necesidad de hijos. Los archivos se ordenan numéricamente por `{order}`:
+
+```markdown title="Ejemplo" linenums="1"
+::: image-gallery name="showcase" columns="3"
+:::
+```
+
+::: image-gallery name="showcase" columns="3"
+:::
+
 ## Archivo
 
 Una tarjeta de descarga para un PDF, video, o cualquier otro recurso del

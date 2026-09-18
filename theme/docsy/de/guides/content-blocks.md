@@ -158,6 +158,53 @@ Der nummerierte Marker, die Verbindungslinie und jede der drei
 der Website themen, über CSS-Custom-Properties - siehe
 [Farben anpassen](themes.md#farben-anpassen-ohne-ein-theme-zu-überschreiben).
 
+## Bildergalerie
+
+Ein responsives Bilderraster. Das optionale Attribut `columns` ist `2`,
+`3` oder `4` (Standard `3`); jeder andere Wert fällt auf `3` zurück. Das
+Raster selbst benötigt keine Konfiguration, aber die
+Klick-zum-Vergrößern-Lightbox benötigt
+[`imageGallery`](../configuration.md#imagegallery) in `bxsites.yaml` auf
+`true` gesetzt - ohne das rendert das Raster trotzdem, nur ohne das
+JS der Lightbox. Es gibt zwei Wege, eine Galerie zu bauen:
+
+Liste jedes Bild explizit mit `::: image`-Kindern auf - `src` ist
+erforderlich, `alt` und `caption` sind beide optional:
+
+```markdown title="Beispiel" linenums="1"
+::: image-gallery columns="3"
+::: image src="../assets/favicon.png" alt="BoxLang icon" caption="Icon"
+:::
+::: image src="../assets/home-banner.jpg" alt="Home banner"
+:::
+::: image src="../assets/og-image.png" caption="Social preview"
+:::
+:::
+```
+
+::: image-gallery columns="3"
+::: image src="../assets/favicon.png" alt="BoxLang icon" caption="Icon"
+:::
+::: image src="../assets/home-banner.jpg" alt="Home banner"
+:::
+::: image src="../assets/og-image.png" caption="Social preview"
+:::
+:::
+
+Oder lass bxSites die Bilder per Konvention selbst finden: Lege Dateien
+mit dem Namen `{name}-{order}.{jpg,jpeg,png,webp,gif}` in
+`docs/assets/gallery/{name}/` ab und referenziere sie allein über `name`
+- keine Kind-Blöcke nötig. Die Dateien werden numerisch nach `{order}`
+sortiert:
+
+```markdown title="Beispiel" linenums="1"
+::: image-gallery name="showcase" columns="3"
+:::
+```
+
+::: image-gallery name="showcase" columns="3"
+:::
+
 ## File
 
 Eine Download-Card für ein PDF, ein Video oder ein beliebiges anderes

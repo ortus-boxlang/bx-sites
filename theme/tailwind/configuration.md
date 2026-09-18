@@ -1107,6 +1107,28 @@ referenced OpenAPI/Swagger spec (JSON or YAML). See
     openapi = true
     ```
 
+## `imageGallery`
+
+`false` (the default) - no lightbox widget shipped at all. `true` loads a
+small click-to-enlarge lightbox for every `::: image-gallery` content
+block. See [Content Blocks](guides/content-blocks.md#image-gallery) for
+the syntax.
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    imageGallery: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "imageGallery": true }
+    ```
+
+  === "TOML"
+    ```toml title="bxsites.toml"
+    imageGallery = true
+    ```
+
 ## `pageActions`
 
 `false` (the default) - no page-actions dropdown at all. `true` adds a

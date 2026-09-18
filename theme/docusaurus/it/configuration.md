@@ -952,6 +952,24 @@ sintassi.
     { "openapi": true }
     ```
 
+## `imageGallery`
+
+`false` (il valore predefinito) - nessun widget lightbox distribuito.
+`true` carica una piccola lightbox click-per-ingrandire per ogni blocco
+di contenuto `::: image-gallery`. Vedi
+[Blocchi di contenuto](guides/content-blocks.md#image-gallery) per la
+sintassi.
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    imageGallery: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "imageGallery": true }
+    ```
+
 ## `plugins`
 
 `[]` (il valore predefinito) - un array di nomi di moduli BoxLang da

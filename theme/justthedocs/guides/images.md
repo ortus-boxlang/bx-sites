@@ -48,10 +48,9 @@ breakpoint to offer.
 
 ## Captions, alignment and framing
 
-A caption, a frame, or a multi-image gallery are all just block-level
-HTML - which bx-markdown/Flexmark passes through completely untouched
-(CommonMark's own "HTML block" rule), so no bx-sites-specific syntax is
-needed at all:
+A caption or a frame is just block-level HTML - which bx-markdown/Flexmark
+passes through completely untouched (CommonMark's own "HTML block" rule),
+so no bx-sites-specific syntax is needed at all:
 
 ```markdown title="Example" linenums="1"
 <figure>
@@ -62,16 +61,15 @@ needed at all:
 <div data-with-frame="true">
   <img src="../assets/screenshot.png" alt="Framed">
 </div>
-
-<div class="bxsites-gallery">
-  <img src="../assets/one.png" alt="">
-  <img src="../assets/two.png" alt="">
-  <img src="../assets/three.png" alt="">
-</div>
 ```
 
 The same is true of `x-data`/`x-show`/`@click` and any other Alpine.js
 attribute - see [Interactivity with Alpine.js](interactivity.md).
+
+For a multi-image gallery, use the built-in
+[`::: image-gallery`](content-blocks.md#image-gallery) content block
+instead of hand-rolled HTML - it gives you a responsive grid and a
+click-to-enlarge lightbox for free.
 
 ## What doesn't get resized
 

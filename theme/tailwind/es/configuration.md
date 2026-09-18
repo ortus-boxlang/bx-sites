@@ -1013,6 +1013,24 @@ sintaxis.
     { "openapi": true }
     ```
 
+## `imageGallery`
+
+`false` (el valor por defecto) - sin widget de lightbox en absoluto. `true`
+carga una pequeña lightbox de clic para ampliar para cada bloque de
+contenido `::: image-gallery`. Consulta
+[Bloques de Contenido](guides/content-blocks.md#image-gallery) para la
+sintaxis.
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    imageGallery: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "imageGallery": true }
+    ```
+
 ## `plugins`
 
 `[]` (el valor por defecto) - un array de nombres de módulos de BoxLang
