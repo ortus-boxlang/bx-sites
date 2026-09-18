@@ -153,7 +153,7 @@
 	}
 </bx:script>
 <bx:output>
-				<article class="page-content blog-post-article">
+<article class="page-content blog-post-article">
 <bx:if variables.pageActionsEnabled and variables.pageActionsPosition == 'top'>
 	#renderPageActions()#
 </bx:if>
@@ -183,7 +183,9 @@
 <bx:if variables.page.toc.len() gt 0 and variables.tocPosition == 'sticky'>
 	#renderToc( variables.page.toc, true )#
 </bx:if>
-					#variables.page.contentHtml#
+<!--- Page content --->
+#variables.page.contentHtml#
+<!--- End of page content --->
 <bx:if ( len( variables.page.editUrl ) or len( variables.page.lastUpdated ) or len( variables.page.markdownUrl ) ) and variables.pageMetaPosition == 'bottom'>
 	#renderPageMeta( variables.page.editUrl, variables.page.lastUpdated, variables.page.markdownUrl )#
 </bx:if>
@@ -221,6 +223,4 @@
 <bx:if variables.pageActionsEnabled and variables.pageActionsPosition == 'bottom'>
 	#renderPageActions()#
 </bx:if>
-
-
 </bx:output>
