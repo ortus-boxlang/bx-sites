@@ -91,7 +91,7 @@ class {
 		"i18n"         : { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] },
 		"blog"         : { "postsPerPage" : 10, "feed" : true, "feedLimit" : 25 },
 		"versions"     : { "default" : "" },
-		"cloud"        : { "siteId" : "", "apiUrl" : "" },
+		"cloud"        : { "siteId" : "", "apiUrl" : "", "contentBlocks" : false, "contentBlocksOnError" : "fail" },
 		"docbox"       : {
 			"projectTitle"   : "",
 			"mappings"       : {},
@@ -650,7 +650,15 @@ class {
 	 * destination (module spec's bxSites Cloud publish-API contract):
 	 * `siteId` (the target site's UUID in bxSites Cloud) and `apiUrl` (that
 	 * instance's base URL, e.g. `https://cloud.bxsites.app` or a self-hosted
-	 * URL). Deliberately no token/secret field here at all, not even an
+	 * URL) - also reused as the base URL DirectiveBlockProcessor.bx's own
+	 * `::: cloud` block fetches from at build time. `contentBlocks`
+	 * (default `false`) gates whether the small client-side runtime that
+	 * live-refreshes a `::: cloud` block gets shipped at all - see
+	 * BuildPipeline.bx's `copyAssets()`, same explicit-opt-in convention as
+	 * `mermaid`/`openapi`/`math`. `contentBlocksOnError` (`"fail"` or
+	 * `"skip"`, default `"fail"`) controls what a `::: cloud` block does
+	 * when its own build-time fetch fails - DirectiveBlockProcessor.bx's
+	 * own `renderCloud()`. Deliberately no token/secret field here at all, not even an
 	 * `EnvVar`-suffixed indirection like every `deployments/*` target uses -
 	 * `publish`'s own auth token is a fixed, hardcoded env var name
 	 * (`BXSITES_CLOUD_TOKEN`) plus an optional `--token` CLI flag (see
@@ -682,6 +690,27 @@ class {
 			throw(
 				type    = "BxSites.InvalidConfig",
 				message = "#variables.configFileName# [cloud.apiUrl], when present, must be a string"
+			)
+		}
+
+		if ( !isBoolean( arguments.cloud.contentBlocks ?: false ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [cloud.contentBlocks], when present, must be true or false"
+			)
+		}
+
+		if ( !listFindNoCase( "fail,skip", arguments.cloud.contentBlocksOnError ?: "fail" ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = '#variables.configFileName# [cloud.contentBlocksOnError], when present, must be "fail" or "skip"'
+			)
+		}
+
+		if ( ( arguments.cloud.contentBlocks ?: false ) && !len( trim( arguments.cloud.apiUrl ?: "" ) ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [cloud.contentBlocks] is true but [cloud.apiUrl] is empty - `::: cloud` blocks need it to know where to fetch content from"
 			)
 		}
 	}

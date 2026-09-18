@@ -368,6 +368,36 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( '<a class="bxsites-page-link" href="guides/themes.md" data-bxsites-page-link>' );
 			} );
 
+			it( "renders an invalid-block message when a cloud block is missing its required slug", function() {
+				var html = render( "::: cloud" & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( "bxsites-cloud--invalid" );
+			} );
+
+			it( "throws BxSites.CloudContentNotConfigured when a cloud block is used without setCloudContext() ever having been called (cloud.contentBlocks not enabled)", function() {
+				expect( function() {
+					render( '::: cloud slug="press/release1"' & char( 10 ) & ":::" );
+				} ).toThrow( "BxSites.CloudContentNotConfigured" );
+			} );
+
+			it( 'throws BxSites.CloudFetchFailed when the configured apiUrl can never be reached and contentBlocksOnError is "fail" (the default)', function() {
+				processor.setCloudContext( "http://127.0.0.1:1", "fake-token", "fail" );
+
+				expect( function() {
+					render( '::: cloud slug="press/release1"' & char( 10 ) & ":::" );
+				} ).toThrow( "BxSites.CloudFetchFailed" );
+			} );
+
+			it( 'renders an empty, client-refreshable placeholder instead of throwing when contentBlocksOnError is "skip"', function() {
+				processor.setCloudContext( "http://127.0.0.1:1", "fake-token", "skip" );
+
+				var html = render( '::: cloud slug="press/release1"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( 'bxsites-cloud--unavailable' );
+				expect( html ).toInclude( 'data-cloud-slug="press/release1"' );
+				expect( html ).notToInclude( "data-cloud-version" );
+			} );
+
 			it( "renders a link-preview card for an external URL with title/description/image/domain", function() {
 				var md = '::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic JVM language." image="https://boxlang.io/og.png"' & char( 10 ) & ":::";
 				var html = render( md );

@@ -100,6 +100,33 @@ class {
 	variables.loopFunctionContext = {}
 
 	/**
+	 * `::: cloud`'s own build-wide context (`renderCloud()` below) - set once
+	 * per `build()` call (BuildPipeline.bx, right after config resolution),
+	 * not per page like `setLoopContext()` above, since none of this varies
+	 * page to page. `cloudApiUrl` stays `""` when a project hasn't set
+	 * `cloud.contentBlocks: true` - `renderCloud()` reads that directly as
+	 * "not configured" rather than needing a separate enabled flag here.
+	 */
+	variables.cloudApiUrl = ""
+	variables.cloudToken = ""
+	variables.cloudOnError = "fail"
+
+	/**
+	 * Wires bxSites Cloud's own content-block delivery destination into
+	 * `renderCloud()` below - see `variables.cloudApiUrl`'s own docblock for
+	 * why this is a setter, called once per `build()` rather than per page.
+	 *
+	 * @apiUrl `cloud.apiUrl` - the bxSites Cloud instance's base URL, a trailing slash (if present) stripped below
+	 * @token A bxSites Cloud API token - same `BXSITES_CLOUD_TOKEN` env var `publish` itself resolves (BuildPipeline.bx's own docblock on why build() resolves this, not this class)
+	 * @onError `cloud.contentBlocksOnError` - `"fail"` or `"skip"`
+	 */
+	void function setCloudContext( required string apiUrl, required string token, required string onError ) {
+		variables.cloudApiUrl = arguments.apiUrl.reReplace( "[\/]+$", "" )
+		variables.cloudToken = arguments.token
+		variables.cloudOnError = arguments.onError
+	}
+
+	/**
 	 * Wires this page's own `{{ }}` resolution context into `renderFor()`/
 	 * `renderIfChain()` - see `variables.loopVariablesProcessor`'s own
 	 * docblock for why this is a setter rather than a constructor/`extract()`
@@ -568,6 +595,8 @@ class {
 				return renderOpenApi( attrs )
 			case "embed":
 				return renderEmbed( attrs )
+			case "cloud":
+				return renderCloud( attrs, renderer, markdownOptions )
 			case "page-link":
 				return renderPageLinkStub( attrs )
 			case "link-preview":
@@ -1238,6 +1267,154 @@ class {
 		}
 
 		return ""
+	}
+
+	/**
+	 * `::: cloud slug="press/release1"` - bakes a bxSites Cloud content
+	 * block's current, published HTML directly into the page at build time
+	 * (instant paint, readable with no JS/edge dependency, real SEO text) -
+	 * the one directive in this file that deliberately DOES make an outbound
+	 * HTTP request during a build (`::: link-preview`'s own docblock above
+	 * explains why every other directive here refuses to - this is the
+	 * documented exception: content_block delivery, not arbitrary third-party
+	 * metadata scraping, over an authenticated, project-owned API).
+	 *
+	 * Requires `cloud.contentBlocks: true` in `bxsites.yaml` (BuildPipeline.bx
+	 * calls `setCloudContext()` once per `build()` only when that's set,
+	 * after resolving `BXSITES_CLOUD_TOKEN` - see its own docblock) - a bare
+	 * `::: cloud` block in a project that hasn't turned that on always fails
+	 * the build outright, regardless of `contentBlocksOnError` below, since
+	 * there's no sensible placeholder for "this directive can never work at
+	 * all here" the way a fetch failure has one.
+	 *
+	 * A found-but-fetch-failed block instead branches on
+	 * `cloud.contentBlocksOnError` (`"fail"`, the default - fails the whole
+	 * build, same posture as a broken internal link; or `"skip"` - logs a
+	 * `systemOutput()` warning and renders an inert placeholder carrying only
+	 * `data-cloud-slug` and no `data-cloud-version`, so cloud-content-init.js
+	 * still attempts its own client-side fetch on page load even though the
+	 * build itself never got real content to bake in).
+	 *
+	 * A block that exists but isn't `status = "published"` (or has expired)
+	 * is deliberately treated identically to "fetch failed" - never
+	 * distinguished, same "don't leak draft/unpublished existence" posture
+	 * ContentBlockService.findPublishedBySlugForCustomer()'s own docblock
+	 * documents for the public delivery API, so a build never bakes
+	 * draft/expired content into a publicly-shipped HTML file.
+	 *
+	 * `content` comes back as this customer's raw saved markdown/HTML
+	 * (the SAME authenticated CRUD API the portal editor itself uses, not
+	 * the public unauthenticated delivery API - ContentApi.bx - which is
+	 * edge-router-only and has no build-machine-usable auth story). A
+	 * `contentType: "markdown"` block is rendered through THIS SITE's own
+	 * `renderer`/`markdownOptions` (via `renderNested()`, nested directives
+	 * and all) rather than any rendering bx-sites-cloud might do itself -
+	 * deliberate: a site's own Flexmark extensions/plugins (this project's
+	 * own `docs/functions.bxs`, custom directives, syntax highlighting,
+	 * etc.) should apply to a content block's body exactly like they do to
+	 * every other page, and a customer's content library is written once but
+	 * may be embedded across sites with different plugin sets. `"html"`
+	 * content is used as-is (no markdown pass). Either way, the resulting
+	 * HTML is sanitized (bx-esapi's `sanitizeHTML()`, OWASP Java HTML
+	 * Sanitizer) before being baked into the page - this HTML ultimately
+	 * comes from a customer's own portal editor, not this project's own
+	 * trusted markdown source tree, so it's treated the same as any other
+	 * user-supplied HTML would be.
+	 */
+	private string function renderCloud( required struct attrs, required any renderer, required struct markdownOptions ) {
+		var slug = trim( arguments.attrs.slug ?: "" )
+		if ( !len( slug ) ) {
+			return '<div class="bxsites-cloud bxsites-cloud--invalid">::: cloud - missing required slug="..."</div>'
+		}
+
+		if ( !len( variables.cloudApiUrl ) ) {
+			throw(
+				type    = "BxSites.CloudContentNotConfigured",
+				message = '::: cloud slug="#slug#" - requires [cloud.contentBlocks] set to true in bxsites.yaml (with [cloud.apiUrl] pointing at your bxSites Cloud instance) - see the Cloud Content guide'
+			)
+		}
+
+		var block = fetchCloudBlock( slug )
+		if ( isNull( block ) ) {
+			return handleCloudFetchFailure( slug )
+		}
+
+		var html = lCase( trim( block.contentType ?: "markdown" ) ) == "html"
+			? ( block.content ?: "" )
+			: renderNested( block.content ?: "", arguments.renderer, arguments.markdownOptions )
+		var sanitizedHtml = sanitizeHTML( html, "ALL" )
+
+		return '<div class="bxsites-cloud" data-cloud-slug="' & attrEscape( slug ) & '" data-cloud-version="' & val( block.currentVersion ?: 0 ) & '">'
+			& sanitizedHtml & '</div>'
+	}
+
+	/**
+	 * The real `GET {apiUrl}/api/v1/content-blocks/{slug}` call
+	 * (`docs/content-blocks-api.md` in the `bx-sites-cloud` repo - the same
+	 * Bearer-token-authenticated CRUD API the portal editor itself uses),
+	 * returning that block's memento when it's a live, published, unexpired
+	 * block this token can see - `null` for every other case (unknown slug,
+	 * cross-tenant slug, draft, expired, or a non-2xx/network failure) so
+	 * `renderCloud()` above has exactly one "couldn't get it" branch to
+	 * handle, the same never-distinguish posture the public delivery API
+	 * itself uses (see `renderCloud()`'s own docblock).
+	 *
+	 * @slug The already-trimmed `slug="..."` attribute value - forwarded verbatim as the URL's own trailing path segment (it may itself contain "/", e.g. "press/release1" - the route on the other end captures everything after the prefix verbatim, same convention ContentApi.bx's own docblock documents)
+	 *
+	 * @return The block's memento struct, or null
+	 */
+	private any function fetchCloudBlock( required string slug ) {
+		var url = variables.cloudApiUrl & "/api/v1/content-blocks/" & arguments.slug
+
+		var result = ""
+		try {
+			bx:http url="#url#" method="GET" result="result" {
+				bx:httpparam type="header" name="Authorization" value="Bearer #variables.cloudToken#";
+			}
+		} catch ( any e ) {
+			return
+		}
+
+		var statusCode = val( listFirst( result.statusCode ?: "0", " " ) )
+		if ( statusCode < 200 || statusCode >= 300 ) {
+			return
+		}
+
+		var block = "";
+		try {
+			block = jsonDeserialize( result.fileContent ?: "" )
+		} catch ( any e ) {
+			return
+		}
+
+		if ( !isStruct( block ) || lCase( trim( block.status ?: "" ) ) != "published" ) {
+			return
+		}
+
+		var expireDate = block.expireDate ?: ""
+		if ( isSimpleValue( expireDate ) && len( expireDate ) && isDate( expireDate ) && dateCompare( expireDate, now() ) <= 0 ) {
+			return
+		}
+
+		return block
+	}
+
+	/**
+	 * `renderCloud()`'s own fetch-failed branch - see its docblock for the
+	 * full `contentBlocksOnError` reasoning.
+	 *
+	 * @slug The already-trimmed `slug="..."` attribute value, for the warning message/placeholder's own `data-cloud-slug`
+	 */
+	private string function handleCloudFetchFailure( required string slug ) {
+		if ( variables.cloudOnError == "fail" ) {
+			throw(
+				type    = "BxSites.CloudFetchFailed",
+				message = '::: cloud slug="#arguments.slug#" - could not fetch a published content block at build time (unknown slug, not published, expired, or a request failure) - set [cloud.contentBlocksOnError] to "skip" in bxsites.yaml to render a placeholder instead of failing the build'
+			)
+		}
+
+		systemOutput( '[bx-sites] Warning: ::: cloud slug="#arguments.slug#" could not be fetched at build time - rendering an empty placeholder (cloud.contentBlocksOnError = "skip")', true )
+		return '<div class="bxsites-cloud bxsites-cloud--unavailable" data-cloud-slug="' & attrEscape( arguments.slug ) & '"></div>'
 	}
 
 	/**

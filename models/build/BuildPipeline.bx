@@ -179,6 +179,16 @@ class {
 		var config = variables.configLoader.load( root )
 		var plugins = resolvePlugins( config )
 		config = variables.pluginLoader.applyOnConfig( plugins, config )
+		if ( config.cloud.contentBlocks ) {
+			var cloudToken = trim( getSystemSetting( "BXSITES_CLOUD_TOKEN", "" ) )
+			if ( !len( cloudToken ) ) {
+				throw(
+					type    = "BxSites.MissingCloudToken",
+					message = "[cloud.contentBlocks] is true but no bxSites Cloud API token was found - set the BXSITES_CLOUD_TOKEN environment variable so `::: cloud` blocks can fetch content at build time"
+				)
+			}
+			variables.directiveBlockProcessor.setCloudContext( config.cloud.apiUrl, cloudToken, config.cloud.contentBlocksOnError )
+		}
 		var docsDir = variables.sourceDirResolver.resolve( root )
 		// A project's own "magic functions" (module spec section 8) - a
 		// single project-wide `docs/functions.bxs`, loaded once here rather
@@ -294,7 +304,7 @@ class {
 			default : true
 		} ]
 		var allPages = duplicate( mainResult.pages )
-		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
+		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, config.cloud.contentBlocks, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
 		profile( "main assets", buildStartedAt )
 
 		// The plain docs/ tree - "the root" itself when versions.default is
@@ -331,7 +341,7 @@ class {
 				locale  : defaultLocaleCode,
 				default : false
 			} )
-			copyAssets( root, themeDir, nextOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
+			copyAssets( root, themeDir, nextOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, config.cloud.contentBlocks, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
 			writeTagsPage( nextResult.pages, nextResult.nav, config, themeDir, nextOutputDir, nextBasePath, versions, nextLocales, defaultLocaleCode, siteOrigin, functions, "Next", data )
 			variables.redirectGenerator.write( nextResult.pages, nextOutputDir, nextBasePath )
 			profile( "next tree", buildStartedAt )
@@ -383,7 +393,7 @@ class {
 				locale  : defaultLocaleCode,
 				default : false
 			} )
-			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
+			copyAssets( root, themeDir, versionOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, config.cloud.contentBlocks, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
 			writeTagsPage( versionResult.pages, versionResult.nav, config, themeDir, versionOutputDir, versionBasePath, versions, versionLocales, defaultLocaleCode, siteOrigin, functions, versionName, data )
 			variables.redirectGenerator.write( versionResult.pages, versionOutputDir, versionBasePath )
 
@@ -425,7 +435,7 @@ class {
 					locale  : versionLocale.code,
 					default : false
 				} )
-				copyAssets( root, themeDir, versionLocaleOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
+				copyAssets( root, themeDir, versionLocaleOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, config.cloud.contentBlocks, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
 				writeTagsPage( versionLocaleResult.pages, versionLocaleResult.nav, config, themeDir, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/", versions, versionLocales, versionLocale.code, siteOrigin, functions, versionName, data )
 				variables.redirectGenerator.write( versionLocaleResult.pages, versionLocaleOutputDir, versionBasePath & versionLocale.code & "/" )
 			}
@@ -471,7 +481,7 @@ class {
 				locale  : locale.code,
 				default : false
 			} )
-			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
+			copyAssets( root, themeDir, localeOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.pageActions, config.cloud.contentBlocks, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
 			writeTagsPage( localeResult.pages, localeResult.nav, config, themeDir, localeOutputDir, urls.basePath & locale.code & "/", versions, locales, locale.code, siteOrigin, functions, rootVersionLabel, data )
 			variables.redirectGenerator.write( localeResult.pages, localeOutputDir, urls.basePath & locale.code & "/" )
 		}
@@ -1897,12 +1907,13 @@ class {
 	 * @mathEnabled Whether to copy the shared math-init.js (KaTeX auto-render) widget
 	 * @openapiEnabled Whether to copy the shared openapi-init.js widget and the vendored Swagger UI bundle/CSS - only ever needed by a project actually using a `::: openapi` block (DirectiveBlockProcessor.bx)
 	 * @pageActionsEnabled Whether to copy the shared page-actions-init.js widget - only ever needed by a project with `pageActions: true` (the GitBook-style Copy/Export dropdown, page.bxm's own `renderPageActions()`)
+	 * @contentBlocksEnabled Whether to copy the shared cloud-content-init.js widget - `config.cloud.contentBlocks`, same explicit-opt-in-only shape as `openapiEnabled`; only ever needed by a project actually using a `::: cloud` block (DirectiveBlockProcessor.bx's own `renderCloud()`)
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - its already-generated variant files get copied into this tree's own site.../assets/, right alongside the plain docs/assets/** copy below; empty (the default) copies nothing extra
 	 * @cssBundle AssetBundler.bundleCss()'s own output (via applyAssetPipeline()) - its cached bundle file gets copied into this tree's own site.../assets/ so the `<link>` config.extraCss now points at actually resolves; empty `cachedPath` (the default) copies nothing
 	 * @jsBundle AssetBundler.bundleJs()'s own output - same as cssBundle, for the `<script>` config.extraJs now points at
 	 * @fingerprintEnabled `config.assets.fingerprint` - whether the theme's own `assets/style.css` gets renamed to its fingerprinted filename after copying (resolveThemeStyleUrl()'s own docblock); `true` (the default) matches the site-wide default
 	 */
-	private void function copyAssets( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, boolean pageActionsEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {}, boolean fingerprintEnabled = true ) {
+	private void function copyAssets( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, boolean pageActionsEnabled = false, boolean contentBlocksEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {}, boolean fingerprintEnabled = true ) {
 		var destAssetsDir = arguments.siteDir & "/assets"
 
 		if ( !len( variables.canonicalAssetsDir ) ) {
@@ -1943,12 +1954,13 @@ class {
 	 * @mathEnabled Whether to copy the shared math-init.js (KaTeX auto-render) widget
 	 * @openapiEnabled Whether to copy the shared openapi-init.js widget and the vendored Swagger UI bundle/CSS - only ever needed by a project actually using a `::: openapi` block (DirectiveBlockProcessor.bx)
 	 * @pageActionsEnabled Whether to copy the shared page-actions-init.js widget - only ever needed by a project with `pageActions: true` (the GitBook-style Copy/Export dropdown, page.bxm's own `renderPageActions()`)
+	 * @contentBlocksEnabled Whether to copy the shared cloud-content-init.js widget - `config.cloud.contentBlocks`, same explicit-opt-in-only shape as `openapiEnabled`; only ever needed by a project actually using a `::: cloud` block (DirectiveBlockProcessor.bx's own `renderCloud()`)
 	 * @imageManifest ImageVariantGenerator.buildManifest()'s own output - its already-generated variant files get copied into this tree's own site.../assets/, right alongside the plain docs/assets/** copy below; empty (the default) copies nothing extra
 	 * @cssBundle AssetBundler.bundleCss()'s own output (via applyAssetPipeline()) - its cached bundle file gets copied into this tree's own site.../assets/ so the `<link>` config.extraCss now points at actually resolves; empty `cachedPath` (the default) copies nothing
 	 * @jsBundle AssetBundler.bundleJs()'s own output - same as cssBundle, for the `<script>` config.extraJs now points at
 	 * @fingerprintEnabled `config.assets.fingerprint` - whether the theme's own `assets/style.css` gets renamed to its fingerprinted filename after copying (resolveThemeStyleUrl()'s own docblock); `true` (the default) matches the site-wide default
 	 */
-	private void function copyAssetsFresh( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, boolean pageActionsEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {}, boolean fingerprintEnabled = true ) {
+	private void function copyAssetsFresh( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, boolean pageActionsEnabled = false, boolean contentBlocksEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {}, boolean fingerprintEnabled = true ) {
 		var themeAssetsDir = arguments.themeDir & "/assets"
 		if ( directoryExists( themeAssetsDir ) ) {
 			directoryCopy( themeAssetsDir, arguments.siteDir & "/assets/theme", true )
@@ -2008,6 +2020,10 @@ class {
 
 		if ( arguments.pageActionsEnabled ) {
 			fileCopy( moduleAssetsDir() & "/page-actions-init.js", arguments.siteDir & "/assets/page-actions-init.js" )
+		}
+
+		if ( arguments.contentBlocksEnabled ) {
+			fileCopy( moduleAssetsDir() & "/cloud-content-init.js", arguments.siteDir & "/assets/cloud-content-init.js" )
 		}
 
 		var docsAssetsDir = variables.sourceDirResolver.resolve( arguments.root ) & "/assets"

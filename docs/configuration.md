@@ -1384,17 +1384,32 @@ Where [`bxSites publish`](cli-reference.md#publish) ships the built site -
 `cloud.apiUrl` (that instance's base URL, e.g. `https://cloud.bxsites.app`,
 or a self-hosted URL). Both default to `""` - not configuring this block at
 all is fine for every other verb; `publish` is the only one that needs it,
-and fails with a clear error if either is missing.
+and fails with a clear error if either is missing. `cloud.apiUrl` is also
+where [`::: cloud`](guides/content-blocks.md#cloud-content) blocks fetch
+content from at build time - `cloud.siteId` isn't needed for that.
 
-**No API token field lives here, ever** - `publish` reads it from the
-`BXSITES_CLOUD_TOKEN` environment variable (or an explicit `--token` flag),
-never from `bxsites.yaml`, so this file always stays safe to commit.
+**No API token field lives here, ever** - `publish` (and a build using
+`::: cloud`) both read it from the `BXSITES_CLOUD_TOKEN` environment
+variable (`publish` also accepts an explicit `--token` flag), never from
+`bxsites.yaml`, so this file always stays safe to commit.
+
+`cloud.contentBlocks` (`false` by default) turns on
+[`::: cloud`](guides/content-blocks.md#cloud-content) blocks - explicit
+opt-in, the same convention `mermaid`/`openapi`/`math` already use, since it
+gates whether the small client-side runtime that live-refreshes a block
+gets shipped at all. Requires `cloud.apiUrl` to be set too.
+`cloud.contentBlocksOnError` (`"fail"`, the default, or `"skip"`) controls
+what happens when a `::: cloud` block's own build-time fetch fails - see
+[Cloud content](guides/content-blocks.md#cloud-content) for the full
+behavior of each.
 
 === "YAML"
     ```yaml title="bxsites.yaml"
     cloud:
       siteId: "3f2b1c9a-....-....-............"
       apiUrl: "https://cloud.bxsites.app"
+      contentBlocks: true
+      contentBlocksOnError: "fail"
     ```
 
 === "JSON"
@@ -1402,7 +1417,9 @@ never from `bxsites.yaml`, so this file always stays safe to commit.
     {
     	"cloud": {
     		"siteId": "3f2b1c9a-....-....-............",
-    		"apiUrl": "https://cloud.bxsites.app"
+    		"apiUrl": "https://cloud.bxsites.app",
+    		"contentBlocks": true,
+    		"contentBlocksOnError": "fail"
     	}
     }
     ```
@@ -1412,6 +1429,8 @@ never from `bxsites.yaml`, so this file always stays safe to commit.
     [cloud]
     siteId = "3f2b1c9a-....-....-............"
     apiUrl = "https://cloud.bxsites.app"
+    contentBlocks = true
+    contentBlocksOnError = "fail"
     ```
 
 See [Deployment](guides/deployment.md#the-publish-command) for the full
