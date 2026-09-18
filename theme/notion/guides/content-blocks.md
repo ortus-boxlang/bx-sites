@@ -534,6 +534,54 @@ Every form also carries a hidden honeypot field a real visitor never
 sees or fills in - bxSites Cloud's own spam filtering uses it, no
 configuration needed here.
 
+## Cloud content
+
+> **Premium feature.** `::: cloud` bakes a [bxSites Cloud](deployment.md)
+> content block into the page at build time - it requires a bxSites Cloud
+> account with Content Blocks on your plan, `cloud.apiUrl`/
+> `cloud.contentBlocks: true` set in `bxsites.yaml`, and a
+> `BXSITES_CLOUD_TOKEN` environment variable holding a valid API token
+> (never written to `bxsites.yaml` itself - same convention
+> [`publish`](../cli-reference.md#publish) already uses for its own token).
+> Without `cloud.contentBlocks: true`, a `::: cloud` block always fails the
+> build outright.
+
+`slug` is the content block's own slug (set when it was created in bxSites
+Cloud's portal, or via its headless API) - it can itself contain `/` for a
+hierarchical slug like `press/release1`:
+
+```markdown title="Example" linenums="1"
+::: cloud slug="press/release1" :::
+```
+
+At build time, this fetches that block's current *published* content,
+renders it through this site's own Markdown pipeline exactly like any other
+page (so this project's own plugins/syntax highlighting/nested content
+blocks all apply), sanitizes the resulting HTML, and bakes it straight into
+the page - instant paint, fully readable with no JavaScript, real indexable
+text for search engines. A draft or expired block is treated the same as a
+missing one.
+
+What happens when that fetch fails (unknown slug, not published, or a
+request failure) is configurable per project via `cloud.contentBlocksOnError`
+in `bxsites.yaml`:
+
+- `"fail"` (the default) - fails the whole build, the same posture as a
+  broken internal link.
+- `"skip"` - logs a build warning and renders an empty placeholder instead.
+
+Either way, once the page is live, a small client-side script (shipped only
+when `cloud.contentBlocks: true` - the same explicit opt-in
+`mermaid`/`openapi` already use) checks bxSites Cloud again on page load and
+swaps in the latest content if it's changed since the build - so a content
+edit shows up for visitors without waiting for the next deploy. That check
+is a plain `fetch()`, so it honors the delivery endpoint's own
+`Cache-Control: public, max-age=60` header automatically - a browser that's
+already checked within the last minute skips the network call entirely on
+its next page view. A first-time visitor (or one past that window) always
+gets the current version; an edit is visible to everyone within about a
+minute, not on every single page view.
+
 ## Loop and conditional (data-driven)
 
 `::: for` and `::: if` render their own content against [reusable

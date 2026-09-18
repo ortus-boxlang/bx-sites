@@ -138,7 +138,7 @@ Content Blocks</h1>
 
 
 
-	<details class="bxsites-toc-mobile jtd-toc--mobile"><summary class="jtd-toc--mobile__summary">On this page</summary><ul><li class="jtd-toc__item jtd-toc__item--2"><a href="#expandable">Expandable</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#cards">Cards</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#columns">Columns</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#stepper">Stepper</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#image-gallery">Image gallery</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#file">File</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#page-break">Page break</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#buttons">Buttons</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#embed">Embed</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#page-link">Page link</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#link-preview">Link preview</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#ai-prompt">AI Prompt</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#updates-changelog">Updates &#x28;changelog&#x29;</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#reusable-content-includes">Reusable content &#x28;includes&#x29;</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#conditional-content">Conditional content</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#contact-forms">Contact forms</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#loop-and-conditional-data-driven">Loop and conditional &#x28;data-driven&#x29;</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#course-index">Course index</a></li></ul></details>
+	<details class="bxsites-toc-mobile jtd-toc--mobile"><summary class="jtd-toc--mobile__summary">On this page</summary><ul><li class="jtd-toc__item jtd-toc__item--2"><a href="#expandable">Expandable</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#cards">Cards</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#columns">Columns</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#stepper">Stepper</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#image-gallery">Image gallery</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#file">File</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#page-break">Page break</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#buttons">Buttons</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#embed">Embed</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#page-link">Page link</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#link-preview">Link preview</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#ai-prompt">AI Prompt</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#updates-changelog">Updates &#x28;changelog&#x29;</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#reusable-content-includes">Reusable content &#x28;includes&#x29;</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#conditional-content">Conditional content</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#contact-forms">Contact forms</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#cloud-content">Cloud content</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#loop-and-conditional-data-driven">Loop and conditional &#x28;data-driven&#x29;</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#course-index">Course index</a></li></ul></details>
 
 				<div class="jtd-content-body">
 				<h1 id="content-blocks"><a href="#content-blocks" id="content-blocks" name="content-blocks" class="anchor"></a>Content Blocks</h1>
@@ -516,6 +516,49 @@ label is derived from its name (<code>full-name</code> becomes &quot;Full Name&q
 <p>Every form also carries a hidden honeypot field a real visitor never
 sees or fills in - bxSites Cloud's own spam filtering uses it, no
 configuration needed here.</p>
+<h2 id="cloud-content"><a href="#cloud-content" id="cloud-content" name="cloud-content" class="anchor"></a>Cloud content</h2>
+<blockquote>
+<p><strong>Premium feature.</strong> <code>::: cloud</code> bakes a <a href="/theme/justthedocs/guides/deployment/index.html">bxSites Cloud</a>
+content block into the page at build time - it requires a bxSites Cloud
+account with Content Blocks on your plan, <code>cloud.apiUrl</code>/
+<code>cloud.contentBlocks: true</code> set in <code>bxsites.yaml</code>, and a
+<code>BXSITES_CLOUD_TOKEN</code> environment variable holding a valid API token
+(never written to <code>bxsites.yaml</code> itself - same convention
+<a href="/theme/justthedocs/cli-reference/index.html#publish"><code>publish</code></a> already uses for its own token).
+Without <code>cloud.contentBlocks: true</code>, a <code>::: cloud</code> block always fails the
+build outright.</p>
+</blockquote>
+<p><code>slug</code> is the content block's own slug (set when it was created in bxSites
+Cloud's portal, or via its headless API) - it can itself contain <code>/</code> for a
+hierarchical slug like <code>press/release1</code>:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="Example"><code class="language-markdown">::: cloud slug=&quot;press/release1&quot; :::
+</code></pre>
+<p>At build time, this fetches that block's current <em>published</em> content,
+renders it through this site's own Markdown pipeline exactly like any other
+page (so this project's own plugins/syntax highlighting/nested content
+blocks all apply), sanitizes the resulting HTML, and bakes it straight into
+the page - instant paint, fully readable with no JavaScript, real indexable
+text for search engines. A draft or expired block is treated the same as a
+missing one.</p>
+<p>What happens when that fetch fails (unknown slug, not published, or a
+request failure) is configurable per project via <code>cloud.contentBlocksOnError</code>
+in <code>bxsites.yaml</code>:</p>
+<ul>
+<li><code>&quot;fail&quot;</code> (the default) - fails the whole build, the same posture as a
+broken internal link.</li>
+<li><code>&quot;skip&quot;</code> - logs a build warning and renders an empty placeholder instead.</li>
+</ul>
+<p>Either way, once the page is live, a small client-side script (shipped only
+when <code>cloud.contentBlocks: true</code> - the same explicit opt-in
+<code>mermaid</code>/<code>openapi</code> already use) checks bxSites Cloud again on page load and
+swaps in the latest content if it's changed since the build - so a content
+edit shows up for visitors without waiting for the next deploy. That check
+is a plain <code>fetch()</code>, so it honors the delivery endpoint's own
+<code>Cache-Control: public, max-age=60</code> header automatically - a browser that's
+already checked within the last minute skips the network call entirely on
+its next page view. A first-time visitor (or one past that window) always
+gets the current version; an edit is visible to everyone within about a
+minute, not on every single page view.</p>
 <h2 id="loop-and-conditional-data-driven"><a href="#loop-and-conditional-data-driven" id="loop-and-conditional-data-driven" name="loop-and-conditional-data-driven" class="anchor"></a>Loop and conditional (data-driven)</h2>
 <p><code>::: for</code> and <code>::: if</code> render their own content against <a href="/theme/justthedocs/guides/data-files/index.html">reusable
 data</a> - a <code>docs/data/*.yaml</code>/<code>.json</code> file's own value,
@@ -600,7 +643,7 @@ tracked once the index is on the page.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/content-blocks.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/theme/justthedocs/guides/content-blocks.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Sep 18, 2026, 4&#x3a;57&#x3a;02 PM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/content-blocks.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/theme/justthedocs/guides/content-blocks.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Sep 18, 2026, 5&#x3a;33&#x3a;26 PM</span></div>
 
 			</article>
 
@@ -622,7 +665,7 @@ tracked once the index is on the page.</p>
 		</main>
 
 		<aside class="jtd-toc-sidebar">
-			<nav class="jtd-toc" aria-label="On this page"><div class="jtd-toc__title">On this page</div><ul><li class="jtd-toc__item jtd-toc__item--2"><a href="#expandable">Expandable</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#cards">Cards</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#columns">Columns</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#stepper">Stepper</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#image-gallery">Image gallery</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#file">File</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#page-break">Page break</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#buttons">Buttons</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#embed">Embed</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#page-link">Page link</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#link-preview">Link preview</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#ai-prompt">AI Prompt</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#updates-changelog">Updates &#x28;changelog&#x29;</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#reusable-content-includes">Reusable content &#x28;includes&#x29;</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#conditional-content">Conditional content</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#contact-forms">Contact forms</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#loop-and-conditional-data-driven">Loop and conditional &#x28;data-driven&#x29;</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#course-index">Course index</a></li></ul></nav>
+			<nav class="jtd-toc" aria-label="On this page"><div class="jtd-toc__title">On this page</div><ul><li class="jtd-toc__item jtd-toc__item--2"><a href="#expandable">Expandable</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#cards">Cards</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#columns">Columns</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#stepper">Stepper</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#image-gallery">Image gallery</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#file">File</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#page-break">Page break</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#buttons">Buttons</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#embed">Embed</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#page-link">Page link</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#link-preview">Link preview</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#ai-prompt">AI Prompt</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#updates-changelog">Updates &#x28;changelog&#x29;</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#reusable-content-includes">Reusable content &#x28;includes&#x29;</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#conditional-content">Conditional content</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#contact-forms">Contact forms</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#cloud-content">Cloud content</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#loop-and-conditional-data-driven">Loop and conditional &#x28;data-driven&#x29;</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#course-index">Course index</a></li></ul></nav>
 		</aside>
 
 	</div>
@@ -665,6 +708,7 @@ tracked once the index is on the page.</p>
 
 	<script src="/theme/justthedocs/assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
 	<script src="/theme/justthedocs/assets/openapi-init.js"></script>
+
 
 
 	<script src="/theme/justthedocs/assets/image-gallery-init.js" defer></script>
