@@ -187,6 +187,7 @@
 	variables.mermaidEnabled = ( variables.siteConfig.mermaid ?: false ) ? true : false
 	variables.mathEnabled = ( variables.siteConfig.math ?: false ) ? true : false
 	variables.openapiEnabled = ( variables.siteConfig.openapi ?: false ) ? true : false
+	variables.imageGalleryEnabled = ( variables.siteConfig.imageGallery ?: false ) ? true : false
 	variables.pageActionsEnabled = ( variables.siteConfig.pageActions ?: false ) ? true : false
 	variables.pageActionsPosition = variables.siteConfig.theme.options.pageActionsPosition ?: "top"
 	variables.accentColor = trim( variables.siteConfig.theme.options.accentColor ?: "" )
@@ -362,6 +363,9 @@
 <bx:if variables.openapiEnabled>
 	<script src="#variables.basePath#assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
 	<script src="#variables.basePath#assets/openapi-init.js"></script>
+</bx:if>
+<bx:if variables.imageGalleryEnabled>
+	<script src="#variables.basePath#assets/image-gallery-init.js" defer></script>
 </bx:if>
 <bx:if variables.searchEnabled and variables.searchProviderName eq 'algolia'>
 	<script src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>

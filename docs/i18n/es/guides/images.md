@@ -51,11 +51,10 @@ ruptura responsivo que ofrecer.
 
 ## Leyendas, alineación y marcos
 
-Una leyenda, un marco, o una galería de varias imágenes son todos
-simplemente HTML a nivel de bloque - que bx-markdown/Flexmark deja pasar
-completamente intacto (la propia regla de "bloque HTML" de CommonMark),
-así que no se necesita ninguna sintaxis específica de bx-sites en
-absoluto:
+Una leyenda o un marco son simplemente HTML a nivel de bloque - que
+bx-markdown/Flexmark deja pasar completamente intacto (la propia regla
+de "bloque HTML" de CommonMark), así que no se necesita ninguna sintaxis
+específica de bx-sites en absoluto:
 
 ```markdown title="Example" linenums="1"
 <figure>
@@ -66,17 +65,16 @@ absoluto:
 <div data-with-frame="true">
   <img src="../assets/screenshot.png" alt="Framed">
 </div>
-
-<div class="bxsites-gallery">
-  <img src="../assets/one.png" alt="">
-  <img src="../assets/two.png" alt="">
-  <img src="../assets/three.png" alt="">
-</div>
 ```
 
 Lo mismo aplica a `x-data`/`x-show`/`@click` y a cualquier otro atributo
 de Alpine.js - consulta
 [Interactividad con Alpine.js](interactivity.md).
+
+Para una galería de varias imágenes, usa el bloque de contenido
+integrado [`::: image-gallery`](content-blocks.md#image-gallery) en
+lugar de HTML hecho a mano - te da una cuadrícula responsiva y una
+lightbox de clic para ampliar sin costo adicional.
 
 ## Lo que no se redimensiona
 
