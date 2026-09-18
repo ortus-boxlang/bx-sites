@@ -173,6 +173,119 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).notToInclude( "bxsites-step__marker--purple" );
 			} );
 
+			it( "renders an image-gallery with explicit image children, each with alt/caption", function() {
+				var md = '::: image-gallery columns="2"' & char( 10 ) &
+					'::: image src="../assets/one.jpg" alt="One" caption="First photo" :::' & char( 10 ) &
+					'::: image src="../assets/two.jpg" :::' & char( 10 ) &
+					":::";
+				var html = render( md );
+
+				expect( html ).toInclude( '<div class="bxsites-image-gallery bxsites-image-gallery--cols-2">' );
+				expect( html ).toInclude( '<img class="bxsites-image-gallery__image" src="../assets/one.jpg" alt="One" data-bxsites-lightbox loading="lazy">' );
+				expect( html ).toInclude( '<figcaption class="bxsites-image-gallery__caption">First photo</figcaption>' );
+				// The second image has no [caption] - no <figcaption> for it.
+				expect( html ).toInclude( '<img class="bxsites-image-gallery__image" src="../assets/two.jpg" alt="" data-bxsites-lightbox loading="lazy"></figure>' );
+			} );
+
+			it( "defaults an image-gallery to 3 columns, and falls back to 3 for an unrecognized [columns] value", function() {
+				var noColumns = render( "::: image-gallery" & char( 10 ) & '::: image src="a.jpg" :::' & char( 10 ) & ":::" );
+				var invalidColumns = render( '::: image-gallery columns="5"' & char( 10 ) & '::: image src="a.jpg" :::' & char( 10 ) & ":::" );
+
+				expect( noColumns ).toInclude( "bxsites-image-gallery--cols-3" );
+				expect( invalidColumns ).toInclude( "bxsites-image-gallery--cols-3" );
+			} );
+
+			it( "flags an image with no [src] as invalid instead of rendering a broken <img>", function() {
+				var html = render( "::: image-gallery" & char( 10 ) & "::: image :::" & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( "bxsites-image-gallery__item--invalid" );
+				expect( html ).notToInclude( "<img" );
+			} );
+
+			it( "flags an image-gallery with neither image children nor a [name] as invalid", function() {
+				var html = render( "::: image-gallery" & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( "bxsites-image-gallery--invalid" );
+			} );
+
+			it( "the self-closing form composes with image-gallery, same as it does with cards", function() {
+				var md = "::: image-gallery" & char( 10 ) &
+					'::: image src="solo.jpg" alt="Solo" :::' & char( 10 ) &
+					":::";
+				var html = render( md );
+
+				expect( html ).toInclude( 'src="solo.jpg" alt="Solo"' );
+			} );
+
+			describe( "resolveImageGalleries() - convention-mode ::: image-gallery name=""...""", function() {
+				beforeEach( function() {
+					variables.galleryDocsDir = createTempDirectory( prefix = "bxsites-gallery-" );
+				} );
+
+				afterEach( function() {
+					if ( directoryExists( variables.galleryDocsDir ) ) {
+						directoryDelete( variables.galleryDocsDir, true );
+					}
+				} );
+
+				private function writeGalleryFile( required string name, required string fileName ) {
+					var dir = variables.galleryDocsDir & "/assets/gallery/" & arguments.name;
+					directoryCreate( dir, true, true );
+					fileWrite( dir & "/" & arguments.fileName, "" );
+				}
+
+				it( "builds the gallery from every {name}-{N}.* file on disk, sorted numerically (not alphabetically)", function() {
+					writeGalleryFile( "vacation", "vacation-2.jpg" );
+					writeGalleryFile( "vacation", "vacation-10.jpg" );
+					writeGalleryFile( "vacation", "vacation-1.png" );
+
+					var html = render( '::: image-gallery name="vacation"' & char( 10 ) & ":::" );
+					var resolved = processor.resolveImageGalleries( html, variables.galleryDocsDir, "guides/setup.md" );
+
+					var firstIdx = resolved.findNoCase( "vacation-1.png" );
+					var secondIdx = resolved.findNoCase( "vacation-2.jpg" );
+					var thirdIdx = resolved.findNoCase( "vacation-10.jpg" );
+					expect( firstIdx ).toBeGT( 0 );
+					expect( firstIdx ).toBeLT( secondIdx );
+					expect( secondIdx ).toBeLT( thirdIdx );
+					// One "../" per directory level of "guides/setup.md" (1 level).
+					expect( resolved ).toInclude( 'src="../assets/gallery/vacation/vacation-1.png"' );
+				} );
+
+				it( "writes no ../ prefix for a root-level page", function() {
+					writeGalleryFile( "team", "team-1.jpg" );
+
+					var html = render( '::: image-gallery name="team"' & char( 10 ) & ":::" );
+					var resolved = processor.resolveImageGalleries( html, variables.galleryDocsDir, "index.md" );
+
+					expect( resolved ).toInclude( 'src="assets/gallery/team/team-1.jpg"' );
+				} );
+
+				it( "ignores a file that doesn't match {name}-{N}.{ext}, including another gallery's own files", function() {
+					writeGalleryFile( "team", "team-1.jpg" );
+					writeGalleryFile( "team", "readme.txt" );
+					writeGalleryFile( "team", "team-extra.jpg" );
+
+					var html = render( '::: image-gallery name="team"' & char( 10 ) & ":::" );
+					var resolved = processor.resolveImageGalleries( html, variables.galleryDocsDir, "index.md" );
+
+					expect( resolved ).toInclude( "team-1.jpg" );
+					expect( resolved ).notToInclude( "readme.txt" );
+					expect( resolved ).notToInclude( "team-extra.jpg" );
+				} );
+
+				it( "falls back to an invalid marker for a [name] with no matching directory or no matching files", function() {
+					var noDir = render( '::: image-gallery name="missing"' & char( 10 ) & ":::" );
+					var resolvedNoDir = processor.resolveImageGalleries( noDir, variables.galleryDocsDir, "index.md" );
+					expect( resolvedNoDir ).toInclude( "bxsites-image-gallery--invalid" );
+
+					writeGalleryFile( "empty", "not-a-match.gif" );
+					var emptyMatch = render( '::: image-gallery name="empty"' & char( 10 ) & ":::" );
+					var resolvedEmpty = processor.resolveImageGalleries( emptyMatch, variables.galleryDocsDir, "index.md" );
+					expect( resolvedEmpty ).toInclude( "bxsites-image-gallery--invalid" );
+				} );
+			} );
+
 			it( "recurses into a directive nested inside another block's content", function() {
 				var md = '::: expandable "Outer"' & char( 10 ) &
 					"::: cards" & char( 10 ) &

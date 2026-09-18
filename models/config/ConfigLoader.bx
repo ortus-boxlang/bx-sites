@@ -46,6 +46,7 @@ class {
 			"mermaid"      : false,
 			"math"         : false,
 			"openapi"      : false,
+			"imageGallery" : false,
 			"pageActions"  : false,
 			"robots"       : true,
 			"analytics"    : { "provider" : "", "id" : "" },
@@ -362,6 +363,13 @@ class {
 			throw(
 				type    = "BxSites.InvalidConfig",
 				message = "#variables.configFileName# [openapi] must be a boolean"
+			)
+		}
+
+		if ( !isBoolean( arguments.config.imageGallery ?: "" ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [imageGallery] must be a boolean"
 			)
 		}
 
