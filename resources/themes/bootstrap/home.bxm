@@ -320,7 +320,7 @@
 			</div>
 		</div>
 		<div class="preview">
-			<div class="float-badge badge-1">#bxsitesIcon( "globe" )# search-index built &middot; 42ms</div>
+			<div class="float-badge badge-1">#homeIcon( "search" )# search index built &middot; 42ms</div>
 			<div class="preview-card">
 				<div class="preview-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">yourproject.dev/docs</span></div>
 				<div class="preview-body">
@@ -337,7 +337,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="float-badge badge-2">#bxsitesIcon( "sparkle" )# 0 outbound requests</div>
+			<div class="float-badge badge-2">#homeIcon( "offline" )# 0 outbound requests &middot; air‑gapped</div>
 		</div>
 	</div>
 </main>
