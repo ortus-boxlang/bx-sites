@@ -96,10 +96,29 @@
 		<nav class="bxh-navlinks">
 			<a href="/getting-started/">Docs</a>
 			<a href="/guides/themes/">Themes</a>
-			<a href="/guides/blog/">Blog</a>
+			<a href="/blog/">Blog</a>
 			<a href="/guides/plugins/">Plugins</a>
 		</nav>
 		<div class="bxh-navcta">
+			<div class="bxh-search">
+				
+					
+
+
+
+
+	<div class="bxsites-search position-relative">
+	<input type="search" id="bxsites-search-input" class="form-control" placeholder="Search..." aria-label="Search">
+	<kbd class="bxsites-search-kbd" aria-hidden="true">Ctrl K</kbd>
+	<ul id="bxsites-search-results" class="bxsites-search-results list-unstyled"></ul>
+</div>
+
+
+
+
+
+				
+			</div>
 			<div class="bxh-nav-utils">
 
 				<select class="version-switcher form-select form-select-sm" onchange="location.href=this.value" aria-label="Version"><option value="/" selected>Latest</option><option value="/versions/1.0.x/">1.0.x</option></select>
@@ -112,10 +131,16 @@
 					<span x-show="dark" x-cloak"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></span>
 				</button>
 			</div>
-
-			<a class="bxh-btn bxh-btn-ghost bxh-btn-sm" href="https://github.com/ortus-boxlang/bx-sites" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.083-.729.083-.729 1.205.084 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.303-5.467-1.332-5.467-5.93 0-1.31.468-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23A11.5 11.5 0 0 1 12 5.803c1.02.005 2.045.138 3.003.404 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.807 5.625-5.48 5.92.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 21.795 24 17.298 24 12c0-6.63-5.37-12-12-12"/></svg> Star</a>
-
-			<a class="bxh-btn bxh-btn-primary bxh-btn-sm" href="/getting-started/">Get Started</a>
+			
+				<a
+					class="bxh-btn bxh-btn-ghost bxh-btn-sm"
+					href="https://github.com/ortus-boxlang/bx-sites"
+					target="_blank"
+					rel="noopener noreferrer"
+					>
+					<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.083-.729.083-.729 1.205.084 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.303-5.467-1.332-5.467-5.93 0-1.31.468-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23A11.5 11.5 0 0 1 12 5.803c1.02.005 2.045.138 3.003.404 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.807 5.625-5.48 5.92.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 21.795 24 17.298 24 12c0-6.63-5.37-12-12-12"/></svg> Star
+				</a>
+			
 		</div>
 	</div>
 </header>
@@ -248,11 +273,11 @@
 				<h3><a href="/guides/theme-import/">Import an existing theme</a></h3>
 				<p><code>theme:import --source=mkdocs|jekyll|hugo</code> converts another generator's own templates into a bx-sites scaffold.</p>
 			</div>
-		</div>
+			</div>
 	</div>
 </section>
 
-<section>
+<section class="comparison-section">
 	<div class="bxh-wrap">
 		<div class="section-head">
 			<span class="eyebrow">Built for the agentic web</span>
@@ -376,6 +401,7 @@
 						<th>Docusaurus</th>
 						<th>VitePress</th>
 						<th>MkDocs Material</th>
+						<th>Hugo</th>
 					</tr>
 					</thead>
 				<tbody>
@@ -385,10 +411,28 @@
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
+						<td class="no">&cross;</td>
 					</tr>
 					<tr>
-						<td>Gradle / Maven build integration</td>
+						<td>Gradle / Maven / Spring Boot build integration</td>
 						<td class="us yes">&check;</td>
+						<td class="no">&cross;</td>
+						<td class="no">&cross;</td>
+						<td class="no">&cross;</td>
+						<td class="no">&cross;</td>
+					</tr>
+					<tr>
+						<td>ColdBox & DocBox integration</td>
+						<td class="us yes">&check;</td>
+						<td class="no">&cross;</td>
+						<td class="no">&cross;</td>
+						<td class="no">&cross;</td>
+						<td class="no">&cross;</td>
+					</tr>
+					<tr>
+						<td>Official <code>bxSites</code> CLI</td>
+						<td class="us yes">&check;</td>
+						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
@@ -399,10 +443,12 @@
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
+						<td class="no">&cross;</td>
 					</tr>
 					<tr>
 						<td>*Built-in AI / MCP server</td>
 						<td class="us yes">&check;</td>
+						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
@@ -413,6 +459,7 @@
 						<td class="no">1</td>
 						<td class="no">1</td>
 						<td class="no">1</td>
+						<td class="no">&cross;</td>
 					</tr>
 					<tr>
 						<td>Versioning, zero plugins</td>
@@ -420,12 +467,14 @@
 						<td class="yes" style="color:var(--muted)">&check;</td>
 						<td class="no">&cross;</td>
 						<td class="yes" style="color:var(--muted)">&check;</td>
+						<td class="no">&cross;</td>
 					</tr>
 					<tr>
 						<td>i18n, zero plugins</td>
 						<td class="us yes">&check;</td>
 						<td class="yes" style="color:var(--muted)">&check;</td>
 						<td class="no">&cross;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
 						<td class="yes" style="color:var(--muted)">&check;</td>
 					</tr>
 					<tr>
@@ -434,6 +483,7 @@
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
 					</tr>
 					<tr>
 						<td>Built-in blog, zero plugins</td>
@@ -441,6 +491,7 @@
 						<td class="yes" style="color:var(--muted)">&check;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
 					</tr>
 					<tr>
 						<td>One-command deploy (S3, Netlify, Vercel, Cloudflare, FTP&hellip;)</td>
@@ -448,27 +499,31 @@
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
 					</tr>
 					<tr>
-						<td>Responsive &lt;picture&gt; + WebP generated from every image, automatically</td>
+						<td>Responsive &lt;picture&gt; + WebP generated from every image</td>
 						<td class="us yes">&check;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
 					</tr>
 					<tr>
-						<td>Content-hash fingerprinted assets &mdash; far-future cache headers are safe</td>
+						<td>Content-hash fingerprinted assets</td>
 						<td class="us yes">&check;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
 					</tr>
 					<tr>
-						<td>CSS/JS bundling + incremental build cache (only changed sources reprocessed)</td>
+						<td>CSS/JS bundling + incremental build cache</td>
 						<td class="us yes">&check;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
 					</tr>
 					<tr>
 						<td>Sitemap, robots.txt and OG/meta cards generated automatically</td>
@@ -476,19 +531,44 @@
 						<td class="yes" style="color:var(--muted)">&check;</td>
 						<td class="yes" style="color:var(--muted)">&check;</td>
 						<td class="no">&cross;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
 					</tr>
 					<tr>
-						<td>Extensible search providers &mdash; several ship built-in, anyone can build their own</td>
+						<td>Extensible search providers with built-in and custom options</td>
 						<td class="us yes">&check;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
 						<td class="no">&cross;</td>
+						<td class="no">&cross;</td>
+					</tr>
+					<tr>
+						<td>Mermaid diagrams from fenced Markdown (opt-in, vendored)</td>
+						<td class="us yes">&check;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
+					</tr>
+					<tr>
+						<td>Rich content blocks: cards, tabs, steps, embeds and reusable includes</td>
+						<td class="us yes">&check;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
+					</tr>
+					<tr>
+						<td>Interactive OpenAPI / Swagger embeds from JSON or YAML</td>
+						<td class="us yes">&check;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
+						<td class="yes" style="color:var(--muted)">&check;</td>
 					</tr>
 				</tbody>
 			</table>
-			<p class="footnote" style="font-size:smaller;color:var(--muted)">*</p>
-			<p class="footnote" style="font-size:smaller;color:var(--muted)">* Requires hosting in bxSites Cloud (coming soon)</p>
 		</div>
+		<p class="footnote" style="font-size:smaller;color:var(--muted)">* Requires hosting in bxSites Cloud (coming soon)</p>
 	</div>
 </section>
 
