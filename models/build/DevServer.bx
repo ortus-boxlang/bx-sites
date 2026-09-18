@@ -232,12 +232,9 @@ class {
 	private string function resolveBuiltInThemeDirSafely() {
 		try {
 			var config = variables.configLoader.load( variables.projectRoot )
-			var resolved = variables.themeRenderer.resolveThemeDir( config.theme.name, variables.projectRoot )
-			if ( !resolved.startsWith( "/bxmodules/" ) ) {
-				return ""
-			}
-			var real = resolvePath( resolved )
-			if ( !len( real ) || !directoryExists( real ) || !real.startsWith( variables.projectRoot ) ) {
+			var themeName = trim( config.theme.name ?: "" )
+			var real = variables.projectRoot & "/resources/themes/" & themeName
+			if ( !len( themeName ) || !directoryExists( real ) ) {
 				return ""
 			}
 			return real
