@@ -942,12 +942,22 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
-			it( "defaults [cloud] to empty [siteId]/[apiUrl] when not configured", function() {
+			it( 'defaults [cloud] to empty [siteId]/[apiUrl], [contentBlocks] false, [contentBlocksOnError] "fail" when not configured', function() {
 				var dir = newProjectDir( '{"name":"My Docs"}' );
 				var config = loader.load( dir );
 
 				expect( config.cloud.siteId ).toBe( "" );
 				expect( config.cloud.apiUrl ).toBe( "" );
+				expect( config.cloud.contentBlocks ).toBeFalse();
+				expect( config.cloud.contentBlocksOnError ).toBe( "fail" );
+			} );
+
+			it( "preserves a fully-configured [cloud.contentBlocks]/[cloud.contentBlocksOnError]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","cloud":{"apiUrl":"https://cloud.bxsites.app","contentBlocks":true,"contentBlocksOnError":"skip"}}' );
+				var config = loader.load( dir );
+
+				expect( config.cloud.contentBlocks ).toBeTrue();
+				expect( config.cloud.contentBlocksOnError ).toBe( "skip" );
 			} );
 
 			it( "deep-merges a partial [cloud] override, keeping the default empty apiUrl", function() {
@@ -1080,6 +1090,27 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "throws BxSites.InvalidConfig when [cloud.apiUrl] is not a string", function() {
 				var dir = newProjectDir( '{"name":"My Docs","cloud":{"apiUrl":["not","a","string"]}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
+			it( "throws BxSites.InvalidConfig when [cloud.contentBlocks] is not a boolean", function() {
+				var dir = newProjectDir( '{"name":"My Docs","cloud":{"contentBlocks":"yes"}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
+			it( 'throws BxSites.InvalidConfig when [cloud.contentBlocksOnError] is not "fail"/"skip"', function() {
+				var dir = newProjectDir( '{"name":"My Docs","cloud":{"contentBlocksOnError":"ignore"}}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
+			it( "throws BxSites.InvalidConfig when [cloud.contentBlocks] is true but [cloud.apiUrl] is empty", function() {
+				var dir = newProjectDir( '{"name":"My Docs","cloud":{"contentBlocks":true}}' );
 				expect( function() {
 					loader.load( dir );
 				} ).toThrow( "BxSites.InvalidConfig" );

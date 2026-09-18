@@ -188,6 +188,7 @@
 	variables.mathEnabled = ( variables.siteConfig.math ?: false ) ? true : false
 	variables.openapiEnabled = ( variables.siteConfig.openapi ?: false ) ? true : false
 	variables.imageGalleryEnabled = ( variables.siteConfig.imageGallery ?: false ) ? true : false
+	variables.contentBlocksEnabled = ( variables.siteConfig.cloud.contentBlocks ?: false ) ? true : false
 	variables.pageActionsEnabled = ( variables.siteConfig.pageActions ?: false ) ? true : false
 	variables.pageActionsPosition = variables.siteConfig.theme.options.pageActionsPosition ?: "top"
 	variables.accentColor = trim( variables.siteConfig.theme.options.accentColor ?: "" )
@@ -467,6 +468,11 @@
 	<!--- Image Gallery --->
 	<bx:if variables.imageGalleryEnabled>
 		<script src="#variables.basePath#assets/image-gallery-init.js" defer></script>
+	</bx:if>
+
+	<!--- Cloud Content Blocks --->
+	<bx:if variables.contentBlocksEnabled>
+		<script src="#variables.basePath#assets/cloud-content-init.js" defer></script>
 	</bx:if>
 
 	<!--- Search (Algolia) --->
