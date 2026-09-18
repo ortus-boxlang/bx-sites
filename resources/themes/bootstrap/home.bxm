@@ -286,10 +286,15 @@
 		<nav class="bxh-navlinks">
 			<a href="#variables.basePath#getting-started/">Docs</a>
 			<a href="#variables.basePath#guides/themes/">Themes</a>
-			<a href="#variables.basePath#guides/blog/">Blog</a>
+			<a href="#variables.basePath#blog/">Blog</a>
 			<a href="#variables.basePath#guides/plugins/">Plugins</a>
 		</nav>
 		<div class="bxh-navcta">
+			<div class="bxh-search">
+				<bx:if variables.searchEnabled>
+					<bx:include template="#variables.themeDir#/search.bxm">
+				</bx:if>
+			</div>
 			<div class="bxh-nav-utils">
 <bx:if variables.versions.len() gt 1>
 				#renderVersionSwitcher( variables.versions, variables.currentVersion )#
@@ -302,10 +307,16 @@
 					<span x-show="dark" x-cloak">#bxsitesIcon( "sun" )#</span>
 				</button>
 			</div>
-<bx:if len( variables.repoUrl )>
-			<a class="bxh-btn bxh-btn-ghost bxh-btn-sm" href="#bxsitesUrlAttr( variables.repoUrl )#" target="_blank" rel="noopener noreferrer">#bxsitesIcon( "github" )# Star</a>
-</bx:if>
-			<a class="bxh-btn bxh-btn-primary bxh-btn-sm" href="#variables.basePath#getting-started/">Get Started</a>
+			<bx:if len( variables.repoUrl )>
+				<a
+					class="bxh-btn bxh-btn-ghost bxh-btn-sm"
+					href="#bxsitesUrlAttr( variables.repoUrl )#"
+					target="_blank"
+					rel="noopener noreferrer"
+					>
+					#bxsitesIcon( "github" )# Star
+				</a>
+			</bx:if>
 		</div>
 	</div>
 </header>

@@ -79,6 +79,29 @@
 .bxh-navlinks a:hover { color: var(--text); }
 .bxh-navcta { display: flex; align-items: center; gap: 12px; }
 .bxh-nav-utils { display: flex; align-items: center; gap: 10px; }
+/* Search box (search.bxm) reused from the docs navbar, restyled to match this
+   page's own "Terminal Dawn" palette rather than the theme's Bootstrap look. */
+.bxsites-home .bxh-search { display: flex; align-items: center; }
+.bxsites-home .bxsites-search { position: relative; width: 240px; max-width: 38vw; }
+.bxsites-home .bxsites-search .form-control {
+	height: 34px; padding: 0 2.6rem 0 .75rem; border-radius: 8px;
+	border: 1px solid var(--border-strong); background: var(--surface); color: var(--text);
+	font-family: var(--body-font); font-size: .9rem;
+}
+.bxsites-home .bxsites-search .form-control::placeholder { color: var(--muted-2); }
+.bxsites-home .bxsites-search .form-control:focus {
+	outline: none; border-color: var(--brand2); box-shadow: 0 0 0 3px var(--glow);
+}
+.bxsites-home .bxsites-search-kbd { top: 50%; right: .45rem; transform: translateY(-50%); border-color: var(--border-strong); background: var(--surface-2); color: var(--muted); }
+.bxsites-home .bxsites-search-results {
+	z-index: 60; min-width: 320px; max-width: 90vw; background: var(--surface);
+	border-color: var(--border-strong); box-shadow: 0 12px 32px var(--shadow-color);
+}
+.bxsites-home .bxsites-search-results a,
+.bxsites-home .bxsites-search-results .bxsites-search-empty { color: var(--text); }
+.bxsites-home .bxsites-search-results a:hover,
+.bxsites-home .bxsites-search-result--active .bxsites-search-result__link { background: var(--surface-2); }
+@media (max-width: 900px) { .bxsites-home .bxh-search { display: none; } }
 .bxh-theme-toggle {
 	display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px;
 	border-radius: 8px; border: 1px solid var(--border-strong); background: transparent; color: var(--muted); cursor: pointer;
