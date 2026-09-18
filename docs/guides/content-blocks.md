@@ -574,8 +574,13 @@ Either way, once the page is live, a small client-side script (shipped only
 when `cloud.contentBlocks: true` - the same explicit opt-in
 `mermaid`/`openapi` already use) checks bxSites Cloud again on page load and
 swaps in the latest content if it's changed since the build - so a content
-edit shows up for visitors immediately, without waiting for the next
-deploy.
+edit shows up for visitors without waiting for the next deploy. That check
+is a plain `fetch()`, so it honors the delivery endpoint's own
+`Cache-Control: public, max-age=60` header automatically - a browser that's
+already checked within the last minute skips the network call entirely on
+its next page view. A first-time visitor (or one past that window) always
+gets the current version; an edit is visible to everyone within about a
+minute, not on every single page view.
 
 ## Loop and conditional (data-driven)
 
