@@ -5,6 +5,7 @@ icon: phosphor-duotone:house
 summary: BxSites is a modern, BoxLang-powered static site generator that turns Markdown into fast, themed, searchable websites for documentation, blogs, marketing sites, and knowledge bases.
 toc: false
 layout: home
+ogImage: assets/og-image.png
 ---
 
 <!--
