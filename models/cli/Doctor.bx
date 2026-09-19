@@ -5,8 +5,9 @@
  * installed/activated, does this SPECIFIC project also need (and have)
  * bx-toml (a `.toml` site config or `docs/data/*.toml` file) or bx-ftp (an
  * `ftp`/`sftp` `deployments/*.json` entry), and (if present) does a
- * project-level `theme/` override satisfy the two-required-file
- * `ThemeProvider` contract. Nothing here mutates a project - purely
+ * project-level `.theme/` override (inside the resolved content root)
+ * satisfy the two-required-file `ThemeProvider` contract. Nothing here
+ * mutates a project - purely
  * diagnostic, the same "run this before filing a bug report" idea as
  * `flutter doctor`/`brew doctor`.
  */
@@ -51,12 +52,13 @@ class {
 		checks.append( { label : "JVM", ok : true, detail : createObject( "java", "java.lang.System" ).getProperty( "java.version" ) } )
 
 		var sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
-		var sourceDirName = sourceDirResolver.name( root )
-		var docsDir = sourceDirResolver.resolve( root )
-		if ( directoryExists( docsDir ) ) {
+		var docsDir = ""
+		try {
+			var sourceDirName = sourceDirResolver.nameConfigured( root )
+			docsDir = sourceDirResolver.resolveConfigured( root )
 			checks.append( { label : sourceDirName & "/", ok : true, detail : "found at " & docsDir } )
-		} else {
-			checks.append( { label : "docs/ or src/", ok : false, detail : "no docs/ or src/ directory at " & root } )
+		} catch ( any e ) {
+			checks.append( { label : "Content source", ok : false, detail : e.message } )
 			failed = true
 		}
 
@@ -95,14 +97,16 @@ class {
 			failed = failed || !ftpCheck.ok
 		}
 
-		var themeDir = root & "/theme"
-		if ( directoryExists( themeDir ) ) {
-			var missingThemeFiles = [ "layout.bxm", "page.bxm" ].filter( name => !fileExists( themeDir & "/" & name ) )
-			if ( missingThemeFiles.len() ) {
-				checks.append( { label : "theme/ override", ok : false, detail : "missing required " & missingThemeFiles.toList( ", " ) } )
-				failed = true
-			} else {
-				checks.append( { label : "theme/ override", ok : true, detail : "layout.bxm + page.bxm present" } )
+		if ( len( docsDir ) ) {
+			var themeDir = docsDir & "/.theme"
+			if ( directoryExists( themeDir ) ) {
+				var missingThemeFiles = [ "layout.bxm", "page.bxm" ].filter( name => !fileExists( themeDir & "/" & name ) )
+				if ( missingThemeFiles.len() ) {
+					checks.append( { label : ".theme/ override", ok : false, detail : "missing required " & missingThemeFiles.toList( ", " ) } )
+					failed = true
+				} else {
+					checks.append( { label : ".theme/ override", ok : true, detail : "layout.bxm + page.bxm present" } )
+				}
 			}
 		}
 

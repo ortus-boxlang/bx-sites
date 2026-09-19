@@ -127,7 +127,10 @@ to start with `src/`. Folder nesting becomes nav nesting automatically:
     (`build`, `serve`, `audit`, `lint`, `page:new`, ...) looks for `docs/`
     first and falls back to `src/` when that's what actually exists. Build
     output always lands in `site/` either way - the two never collide, since
-    `site/` is never itself a valid source-folder name.
+    `site/` is never itself a valid source-folder name. This folder is
+    itself configurable - a custom name, or the whole repository with no
+    subfolder at all - via `bxsites.yaml`'s `source` key; see
+    [Content Source](guides/content-source.md) for the full picture.
 
 ```text title="docs/ → nav"
 docs/
@@ -245,7 +248,7 @@ bxSites serve
 
 Builds the project, serves `site/` at `http://127.0.0.1:8080/`, and
 rebuilds automatically whenever you save a change under `docs/`, your
-`bxsites.yaml`/`.json` site config, or a project-level `theme/` override -
+`bxsites.yaml`/`.json` site config, or a content-root `.theme/` override -
 your browser reloads on its own. Reacts to the save itself (a native
 BoxLang file watcher, not a poll loop) and only reconverts the page(s) you
 actually changed, reusing everything else from the last build - so saving

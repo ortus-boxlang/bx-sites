@@ -139,7 +139,7 @@ top of the viewport while the surrounding page scrolls past it, so a
 long table's column headers stay in view - a short table like the ones
 above never needs any of this, since it already fits on screen. The
 wrapper is also what the theme paints as the table's own card - see
-[Theming](#theming) for the tokens behind it - and a custom `theme/`
+[Theming](#theming) for the tokens behind it - and a custom `.theme/`
 override can restyle `.bxsites-table-wrap` like any other CSS class.
 
 ## Large tables get an automatic filter
@@ -229,7 +229,7 @@ Keep `--bxsites-table-stripe-bg`/`-hover-bg` alpha colors: they're
 painted on top of whatever `--bxsites-table-bg` puts down, so an opaque
 value there covers the card surface instead of tinting it. Anything past
 color - padding, the corner radius, the uppercase header labels - is a
-real `theme/` override, the same as any other CSS in a theme.
+real `.theme/` override, the same as any other CSS in a theme.
 
 ## Beyond plain data
 

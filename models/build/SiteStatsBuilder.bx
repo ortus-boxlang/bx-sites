@@ -33,7 +33,7 @@ class {
 	struct function build( required string projectRoot ) {
 		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
 		var siteDir = root & "/site"
-		var docsDir = variables.sourceDirResolver.resolve( root )
+		var docsDir = variables.sourceDirResolver.resolveConfigured( root )
 
 		if ( !directoryExists( siteDir ) ) {
 			throw(

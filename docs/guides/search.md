@@ -283,29 +283,29 @@ Typesense, a proprietary internal search API, ...) is a project-level
    ```
 
 2. **Eject a theme to customize** - `bxSites theme:new --theme=bootstrap`
-   copies the built-in `bootstrap` theme into your project's own `theme/`
-   folder (see [Overriding a theme](themes.md#overriding-a-theme));
+   copies the built-in `bootstrap` theme into your project's own `.theme/`
+   folder, inside your content root (see [Overriding a theme](themes.md#overriding-a-theme));
    project-theme-wins resolution means bx-sites now renders through your
    copy instead of the built-in one.
 
-3. **Add the mount point** - `theme/search.bxm` already branches on
+3. **Add the mount point** - `.theme/search.bxm` already branches on
    `variables.searchProviderName` for `local`/`algolia`/`pagefind`; add
    your own branch the same way:
 
-   ```html title="theme/search.bxm"
+   ```html title=".theme/search.bxm"
    <bx:if variables.searchProviderName eq 'meilisearch'>
        <div id="bxsites-search-meilisearch"></div>
    </bx:if>
    ```
 
-4. **Load the client and wire it up** - `theme/layout.bxm` already has a
+4. **Load the client and wire it up** - `.theme/layout.bxm` already has a
    `<bx:if variables.searchEnabled and variables.searchProviderName eq 'algolia'>`
    block loading DocSearch's CSS/JS and calling `docsearch({...})`; add the
    equivalent for Meilisearch's own
    [instant-meilisearch](https://github.com/meilisearch/meilisearch-docsearch)
    widget, reading your own config block back out of `siteConfig`:
 
-   ```html title="theme/layout.bxm"
+   ```html title=".theme/layout.bxm"
    <bx:if variables.searchEnabled and variables.searchProviderName eq 'meilisearch'>
        <script src="https://cdn.jsdelivr.net/npm/@meilisearch/instant-meilisearch/dist/instant-meilisearch.umd.min.js"></script>
        <script>

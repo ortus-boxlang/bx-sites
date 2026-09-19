@@ -24,9 +24,15 @@ contracts.
 
 ### Project folders
 
-- A consuming project uses `docs/` or `src/` as its content source directory.
-  `SourceDirResolver` checks `docs/` first, then `src/`, and defaults to
-  `docs/` when neither exists.
+- A project's content root is resolved by `SourceDirResolver`. `bxsites.yaml`'s
+  own `source` key wins outright when set - `docs`, `src`, any custom folder
+  name, or `.` (the whole repo is the content, no subfolder). When `source` is
+  unset, `docs/` then `src/` are auto-detected; when neither exists AND
+  `source` is unset, resolving throws `BxSites.SourceNotConfigured` instead of
+  silently falling back to the project root - see docs/guides/content-source.md.
+- A project's `.theme/` (an authored override) and `.themes/<name>/` (an
+  `install:theme`-installed theme) both live inside that resolved content
+  root, not at the project root.
 - `site/` is always generated build output. Never treat it as a source folder;
   builds remove and recreate it.
 - Deployment configuration belongs under `deployments/`, not `deploy/`, to

@@ -25,7 +25,7 @@ class {
 
 		return {
 			exitCode : 0,
-			message  : 'Installed [#result.name##versionSuffix#] into themes/#result.name#/ - set bxsites.yaml''s [theme.name] to "#result.name#" to use it'
+			message  : 'Installed [#result.name##versionSuffix#] into .themes/#result.name#/ - set bxsites.yaml''s [theme.name] to "#result.name#" to use it'
 		}
 	}
 

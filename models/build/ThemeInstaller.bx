@@ -1,8 +1,8 @@
 /**
  * Backs the `install:theme` CLI verb - downloads a theme's zip from
- * ForgeBox and extracts it into the project's own `themes/<name>/`
- * (module spec section 6's third theme-resolution tier, between a
- * project-level `theme/` override and the built-in themes -
+ * ForgeBox and extracts it into the project's resolved content root, under
+ * `.themes/<name>/` (module spec section 6's third theme-resolution tier,
+ * between a project-level `.theme/` override and the built-in themes -
  * `ThemeRenderer.resolveThemeDir()`). A theme needs no code loading at
  * all (no BoxLang module/class-loader involvement, unlike
  * PluginInstaller.bx) - it's pure files, so installing one is nothing more
@@ -34,18 +34,31 @@ class {
 	variables.forgeBoxClient = new "models.build.ForgeBoxClient@bxsites"()
 
 	/**
-	 * Where a theme named `name` lands under a project root.
+	 * Resolves a project's content root - `.themes/<name>` (below) lands
+	 * inside it, the same place `ThemeRenderer.resolveThemeDir()` looks for
+	 * it. Swappable via `setSourceDirResolver()` for tests, same seam as
+	 * `setForgeBoxClient()` above.
+	 */
+	variables.sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
+
+	void function setSourceDirResolver( required any resolver ) {
+		variables.sourceDirResolver = arguments.resolver
+	}
+
+	/**
+	 * Where a theme named `name` lands under a project's content root.
 	 *
 	 * @projectRoot Absolute path to the project root
 	 * @name The theme's own name (the ForgeBox slug, and the value a project later sets `theme.name` to)
 	 */
 	string function targetDir( required string projectRoot, required string name ) {
-		return arguments.projectRoot.reReplace( "[\/]+$", "" ) & "/themes/" & arguments.name
+		var contentRoot = variables.sourceDirResolver.resolveConfigured( arguments.projectRoot )
+		return contentRoot & "/.themes/" & arguments.name
 	}
 
 	/**
 	 * Full `install:theme` flow: resolve + download + extract into
-	 * `<projectRoot>/themes/<name>/`, hoist a single wrapping subfolder the
+	 * `<contentRoot>/.themes/<name>/`, hoist a single wrapping subfolder the
 	 * same way PluginInstaller.bx does (a GitHub "Download ZIP" shape), then
 	 * validate the result satisfies the `ThemeProvider` contract so a bad
 	 * package fails loudly at install time rather than at the next `build`.

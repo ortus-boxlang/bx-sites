@@ -31,7 +31,7 @@ class {
 			throw( type = "BxSites.InvalidDate", message = "--until must be a valid date (got [#until#])" )
 		}
 
-		var docsDir = new "models.config.SourceDirResolver@bxsites"().resolve( projectRoot )
+		var docsDir = new "models.config.SourceDirResolver@bxsites"().resolveConfigured( projectRoot )
 
 		var matches = new "models.build.BlogDiscoverer@bxsites"()
 			.load( docsDir : docsDir, includeDrafts : includeDrafts )

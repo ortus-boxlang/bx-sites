@@ -38,7 +38,7 @@ class {
 
 		var config = new "models.config.ConfigLoader@bxsites"().load( root )
 		var settings = config.coldbox ?: {}
-		var contentDir = new "models.config.SourceDirResolver@bxsites"().resolve( root )
+		var contentDir = new "models.config.SourceDirResolver@bxsites"().resolveConfigured( root )
 		var appRoot = resolveAppRoot( root, settings, arguments.options )
 
 		var scanner = new "models.build.ColdBoxAppScanner@bxsites"()

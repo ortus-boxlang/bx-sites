@@ -19,6 +19,8 @@ class extends="testbox.system.BaseSpec" {
 			private string function newProjectRoot() {
 				var dir = createTempDirectory( prefix = "bxsites-themescaffolder-" );
 				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite( dir & "/bxsites.json", '{"name":"Test Site"}' );
 				return dir;
 			}
 
@@ -28,12 +30,12 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.UnknownTheme" );
 			} );
 
-			it( "copies the named built-in theme's layout.bxm/page.bxm/assets into project theme/", function() {
+			it( "copies the named built-in theme's layout.bxm/page.bxm/assets into <contentRoot>/.theme/", function() {
 				var projectRoot = newProjectRoot();
 
 				var result = scaffolder.scaffold( projectRoot : projectRoot, theme : "bootstrap" );
 
-				expect( result.themeDir ).toBe( projectRoot & "/theme" );
+				expect( result.themeDir ).toBe( projectRoot & "/docs/.theme" );
 				expect( fileExists( result.themeDir & "/layout.bxm" ) ).toBeTrue();
 				expect( fileExists( result.themeDir & "/page.bxm" ) ).toBeTrue();
 				expect( directoryExists( result.themeDir & "/assets" ) ).toBeTrue();

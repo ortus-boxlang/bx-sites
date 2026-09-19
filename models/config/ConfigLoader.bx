@@ -29,6 +29,8 @@ class {
 		defaults = {
 			"description"  : "",
 			"baseURL"      : "/",
+			"source"       : "",
+			"exclude"      : [],
 			"theme"        : { "name" : "bootstrap", "options" : {}, "logo" : "", "favicon" : "" },
 			"search"       : true,
 			"mcp"          : false,
@@ -333,6 +335,21 @@ class {
 			throw(
 				type    = "BxSites.InvalidConfig",
 				message = "#variables.configFileName# [search] must be a boolean"
+			)
+		}
+
+		if ( !isSimpleValue( arguments.config.source ?: "" ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [source], when present, must be a string"
+			)
+		}
+
+		var exclude = arguments.config.exclude ?: []
+		if ( !isArray( exclude ) || exclude.some( entry => !isSimpleValue( entry ) || !len( trim( entry ) ) ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [exclude], when present, must be an array of non-empty strings"
 			)
 		}
 

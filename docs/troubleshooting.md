@@ -19,8 +19,8 @@ bxSites doctor
 
 It checks the JVM version, that `docs/` (or `src/`) exists, that
 `bxsites.yaml`/`.json` actually parses and validates, that the required
-BoxLang modules are installed and activated, and - if a project-level
-`theme/` override exists - that it satisfies the theme contract. It exits
+BoxLang modules are installed and activated, and - if a content-root
+`.theme/` override exists - that it satisfies the theme contract. It exits
 `1` if any check fails and prints what's wrong; nothing here mutates your
 project.
 
@@ -53,16 +53,17 @@ project.
     re-resolves everything; `bxSites doctor` confirms which module (if
     any) is still missing.
 
-??? bug "A project `theme/` override fails to build"
-    A custom `theme/` folder must provide both `layout.bxm` and
-    `page.bxm` - `doctor` reports which one is missing. See
-    [Themes](guides/themes.md) for the full contract, or run
-    `bxSites theme:new` to eject a working built-in theme as a starting
-    point instead of writing one from scratch.
+??? bug "A project `.theme/` override fails to build"
+    A custom `.theme/` folder (living inside your content root - `docs/`,
+    `src/`, or wherever `source` resolves to, not at the bare project
+    root) must provide both `layout.bxm` and `page.bxm` - `doctor` reports
+    which one is missing. See [Themes](guides/themes.md) for the full
+    contract, or run `bxSites theme:new` to eject a working built-in theme
+    as a starting point instead of writing one from scratch.
 
 ??? bug "`serve` doesn't pick up a change"
     `serve` watches `docs/`, your `bxsites.yaml`/`.json`, and a
-    project-level `theme/` override - a change anywhere else (for example
+    content-root `.theme/` override - a change anywhere else (for example
     editing a file under `resources/` in a module checkout, not a real
     project) won't trigger a rebuild. If a change genuinely isn't
     reflected, stop `serve`, run `bxSites clean` to clear any stale build

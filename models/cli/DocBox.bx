@@ -42,7 +42,7 @@ class {
 
 		var config = new "models.config.ConfigLoader@bxsites"().load( root )
 		var settings = config.docbox ?: {}
-		var contentDir = new "models.config.SourceDirResolver@bxsites"().resolve( root )
+		var contentDir = new "models.config.SourceDirResolver@bxsites"().resolveConfigured( root )
 
 		var sources = resolveSources( root, settings, arguments.options )
 		if ( !sources.len() ) {

@@ -22,7 +22,7 @@ class {
 
 		return {
 			exitCode : 0,
-			message  : "Copied the #theme# theme into #result.themeDir# - edit it freely, BX Sites picks up a project-level theme/ automatically"
+			message  : "Copied the #theme# theme into #result.themeDir# - edit it freely, BX Sites picks up a project-level .theme/ automatically"
 		}
 	}
 

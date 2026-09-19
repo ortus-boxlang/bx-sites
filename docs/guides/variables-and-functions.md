@@ -117,7 +117,7 @@ Add a `docs/functions.bxs` file (or `src/functions.bxs`, if your project
 uses `src/` - see [Getting Started](../getting-started.md)) - a plain
 BoxLang script. Any function you name with a leading `$` becomes a *magic
 function*: callable from `{{ }}` in Markdown, and callable bare, directly,
-from a project's own [`theme/`](themes.md#overriding-a-theme)
+from a project's own [`.theme/`](themes.md#overriding-a-theme)
 `.bxm` overrides.
 
 ```bx title="docs/functions.bxs" linenums="1"
@@ -169,11 +169,11 @@ function $price( amount ) {
 ### Calling a magic function from a theme override
 
 Because a magic function is bound directly into template scope, a
-project's own `theme/page.bxm` (or `layout.bxm`) can call it bare, with no
+project's own `.theme/page.bxm` (or `layout.bxm`) can call it bare, with no
 prefix at all - the same way it already reads `variables.page`/
 `variables.siteConfig`:
 
-```bx title="theme/page.bxm (excerpt)"
+```bx title=".theme/page.bxm (excerpt)"
 <p class="build-banner">#$shout( 'built with boxlang' )#</p>
 ```
 
@@ -359,7 +359,7 @@ as broken syntax.
 
 ## Reserved names
 
-A `theme/page.bxm`/`layout.bxm` override calling a magic function bare
+A `.theme/page.bxm`/`layout.bxm` override calling a magic function bare
 (`$name(...)`) works because every loaded function - `$`-prefixed or a
 private helper alike - is bound directly into that same template's own
 rendering scope, right alongside the built-in `variables.page`/

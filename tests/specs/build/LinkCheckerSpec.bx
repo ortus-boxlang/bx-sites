@@ -24,6 +24,7 @@ class extends="testbox.system.BaseSpec" {
 				var dir = createTempDirectory( prefix = "bxsites-check-" );
 				tempDirs.append( dir );
 				fileWrite( dir & "/bxsites.json", arguments.bxsitesJson );
+				directoryCreate( dir & "/docs", true, true );
 				return dir;
 			}
 

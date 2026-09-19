@@ -19,6 +19,8 @@ class extends="testbox.system.BaseSpec" {
 			private string function newProjectRoot() {
 				var dir = createTempDirectory( prefix = "bxsites-cli-themenew-" );
 				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite( dir & "/bxsites.json", '{"name":"Test Site"}' );
 				return dir;
 			}
 
@@ -34,13 +36,13 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.MissingThemeName" );
 			} );
 
-			it( "exits 0 and copies the theme into project theme/", function() {
+			it( "exits 0 and copies the theme into project .theme/", function() {
 				var projectRoot = newProjectRoot();
 
 				var result = verb.run( { projectRoot : projectRoot, theme : "tailwind" } );
 
 				expect( result.exitCode ).toBe( 0 );
-				expect( fileExists( projectRoot & "/theme/layout.bxm" ) ).toBeTrue();
+				expect( fileExists( projectRoot & "/docs/.theme/layout.bxm" ) ).toBeTrue();
 			} );
 
 		} );

@@ -71,6 +71,11 @@ class {
 	 * @projectRoot Absolute path to the target bx-sites project root
 	 */
 	private struct function runGitBook( required string source, required string projectRoot ) {
+		// Bare resolve(), not resolveConfigured() - migrate is commonly the
+		// very first command run against a project (bootstrapping it from an
+		// export), so a bxsites.yaml may not exist on disk yet; unlike
+		// MkdocsMigrator.bx, this migrator writes no config of its own, so
+		// there's nothing for resolveConfigured() to load either way.
 		var docsDir = new "models.config.SourceDirResolver@bxsites"().resolve( arguments.projectRoot )
 		if ( !directoryExists( docsDir ) ) {
 			directoryCreate( docsDir, true, true )
@@ -90,7 +95,7 @@ class {
 	private struct function runMkdocs( required string source, required string projectRoot ) {
 		var migrator = new "models.build.MkdocsMigrator@bxsites"()
 		var result = migrator.migrate( arguments.source, arguments.projectRoot )
-		var sourceDirName = new "models.config.SourceDirResolver@bxsites"().name( arguments.projectRoot )
+		var sourceDirName = new "models.config.SourceDirResolver@bxsites"().nameConfigured( arguments.projectRoot )
 
 		var message = "Migrated #result.pagesConverted# page(s) and #result.assetsConverted# asset(s) from [#arguments.source#] into #arguments.projectRoot#/#sourceDirName#/, wrote #result.configPath#"
 		if ( len( result.navPath ) ) {

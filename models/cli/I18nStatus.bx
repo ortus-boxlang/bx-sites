@@ -13,7 +13,7 @@ class {
 			throw( type = "BxSites.MissingProjectRoot", message = "`i18n:status` requires a project root" )
 		}
 
-		var sourceDirName = new "models.config.SourceDirResolver@bxsites"().name( projectRoot )
+		var sourceDirName = new "models.config.SourceDirResolver@bxsites"().nameConfigured( projectRoot )
 		var builder = new "models.build.I18nStatusBuilder@bxsites"()
 		var result = builder.build( projectRoot & "/" & sourceDirName )
 

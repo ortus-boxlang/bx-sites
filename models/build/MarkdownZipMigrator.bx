@@ -37,6 +37,9 @@ class {
 			)
 		}
 
+		// Bare resolve(), not resolveConfigured() - this migrator writes no
+		// bxsites.yaml of its own and is commonly run against a project root
+		// with no config on disk yet.
 		var docsDir = variables.sourceDirResolver.resolve( arguments.projectRoot )
 		if ( !directoryExists( docsDir ) ) {
 			directoryCreate( docsDir, true, true )

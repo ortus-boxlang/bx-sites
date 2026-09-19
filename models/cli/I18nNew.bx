@@ -17,7 +17,7 @@ class {
 			throw( type = "BxSites.MissingLocaleCode", message = "`i18n:new` requires --code=<locale>" )
 		}
 
-		var sourceDirName = new "models.config.SourceDirResolver@bxsites"().name( projectRoot )
+		var sourceDirName = new "models.config.SourceDirResolver@bxsites"().nameConfigured( projectRoot )
 		var scaffolder = new "models.build.LocaleScaffolder@bxsites"()
 		var result = scaffolder.scaffold( docsDir : projectRoot & "/" & sourceDirName, code : code )
 

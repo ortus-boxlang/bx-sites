@@ -158,7 +158,7 @@ class {
 			}
 			variables.directiveBlockProcessor.setCloudContext( config.cloud.apiUrl, cloudToken, config.cloud.contentBlocksOnError )
 		}
-		var docsDir = variables.sourceDirResolver.resolve( root )
+		var docsDir = variables.sourceDirResolver.resolveConfigured( root )
 		// A project's own "magic functions" (module spec section 8) - a
 		// single project-wide `docs/functions.bxs`, loaded once here rather
 		// than per version/locale tree, so a project doesn't need to
@@ -221,7 +221,7 @@ class {
 
 		// Resolve the navigation configuration for the root documentation directory.
 		var navConfig = resolveExplicitNav( rootDocsDir, config.nav )
-		var mainPages = variables.docsLoader.load( rootDocsDir )
+		var mainPages = variables.docsLoader.load( rootDocsDir, config.exclude )
 		profile( "setup and main docs load", buildStartedAt )
 		// A `404.md` at the root of whichever tree renders at the site root
 		// is the custom-404 convention (write404Page()'s own docblock) -
@@ -293,7 +293,7 @@ class {
 			progress( "Building next documentation tree" )
 			var nextOutputDir = siteDir & "/next"
 			var nextBasePath = urls.basePath & "next/"
-			var nextPages = variables.docsLoader.load( docsDir )
+			var nextPages = variables.docsLoader.load( docsDir, config.exclude )
 			var nextCustom404 = nextPages.filter( p => compareNoCase( p.relativePath, "404.md" ) == 0 )
 			if ( nextCustom404.len() ) {
 				nextPages = nextPages.filter( p => compareNoCase( p.relativePath, "404.md" ) != 0 )
@@ -333,7 +333,7 @@ class {
 				var versionDocsDir   = docsDir & "/versions/" & versionName
 				var versionOutputDir = siteDir & "/versions/" & versionName
 				var versionBasePath  = urls.basePath & "versions/" & versionName & "/"
-				var versionPages = variables.docsLoader.load( versionDocsDir )
+				var versionPages = variables.docsLoader.load( versionDocsDir, config.exclude )
 				var versionLocaleNames = variables.localesDiscoverer.discover(
 					versionDocsDir
 				)
@@ -449,7 +449,8 @@ class {
 							versionOutputDir & "/" & versionLocale.code
 
 						var versionLocalePages = variables.docsLoader.load(
-							versionDocsDir & "/i18n/" & versionLocale.code
+							versionDocsDir & "/i18n/" & versionLocale.code,
+							config.exclude
 						)
 
 						var mergedVersionLocalePages = mergeLocalePages(
@@ -608,7 +609,8 @@ class {
 				var localeOutputDir = siteDir & "/" & locale.code
 				// Load the pages for this locale
 				var localePages = variables.docsLoader.load(
-					rootDocsDir & "/i18n/" & locale.code
+					rootDocsDir & "/i18n/" & locale.code,
+					config.exclude
 				)
 				// Merge the locale-specific pages with the main pages
 				var mergedPages = mergeLocalePages(
@@ -1363,10 +1365,10 @@ class {
 		var plugins = resolvePlugins( config )
 		config = variables.pluginLoader.applyOnConfig( plugins, config )
 
-		var docsDir = variables.sourceDirResolver.resolve( root )
+		var docsDir = variables.sourceDirResolver.resolveConfigured( root )
 		var functions = variables.functionsLoader.load( docsDir )
 		var data = variables.dataLoader.load( docsDir )
-		var pages = variables.docsLoader.load( docsDir )
+		var pages = variables.docsLoader.load( docsDir, config.exclude )
 		profile( "search-index docs load", buildStartedAt )
 		convertMarkdown( pages, config, plugins, "/", docsDir, {}, functions, [], [], "Latest", [], "", "ltr", data )
 		profile( "search-index markdown", buildStartedAt )
@@ -1702,7 +1704,7 @@ class {
 		var editUri = trim( arguments.config.repo.editUri ?: "" )
 		var canEdit = len( repoUrl ) && len( editUri )
 
-		var sourceDirName = variables.sourceDirResolver.name( arguments.root )
+		var sourceDirName = variables.sourceDirResolver.nameConfigured( arguments.root )
 
 		for ( var page in arguments.pages ) {
 			var pathFromDocsRoot = page.keyExists( "sourceRelativePath" ) ? page.sourceRelativePath : ( arguments.docsRelativePrefix & page.relativePath )
@@ -2425,7 +2427,7 @@ class {
 			fileCopy( moduleAssetsDir() & "/cloud-content-init.js", arguments.siteDir & "/assets/cloud-content-init.js" )
 		}
 
-		var docsAssetsDir = variables.sourceDirResolver.resolve( arguments.root ) & "/assets"
+		var docsAssetsDir = variables.sourceDirResolver.resolveConfigured( arguments.root ) & "/assets"
 		if ( directoryExists( docsAssetsDir ) ) {
 			directoryCopy( docsAssetsDir, arguments.siteDir & "/assets", true )
 		}

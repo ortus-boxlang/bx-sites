@@ -24,7 +24,7 @@ It's a general-purpose static site generator, not just for documentation - docs,
 
 ## Features
 
-- **Ten built-in themes** - `bootstrap` (default), `material`, `tailwind`, and seven more inspired by Docsy, Stripe, Docusaurus, Just the Docs, VuePress, GitBook and Notion, all overridable via a project's own `theme/` folder. See [Themes](docs/guides/themes.md).
+- **Ten built-in themes** - `bootstrap` (default), `material`, `tailwind`, and seven more inspired by Docsy, Stripe, Docusaurus, Just the Docs, VuePress, GitBook and Notion, all overridable via a project's own `.theme/` folder (inside its content root). See [Themes](docs/guides/themes.md).
 - **Static, client-side search** - a MiniSearch-powered index (fuzzy matching, prefix search) with a Cmd/Ctrl+K command palette, or wire up Algolia DocSearch/Pagefind/your own provider instead. See [Search](docs/guides/search.md).
 - **A rich Markdown+ toolkit** - GitBook-style content blocks (cards, tabs, expandables, buttons, prompts, conditional/audience-switched content), always-on GFM tables with a sticky-header/responsive-scroll treatment, an embeddable OpenAPI/Swagger widget, admonitions, footnotes, math and Mermaid diagrams. See [Content Blocks](docs/guides/content-blocks.md) and [Markdown Extensions](docs/guides/markdown.md).
 - **Reusable `{{ variables }}` and magic functions** - reference `bxsites.yaml`-defined values or call a small BoxLang helper function straight from Markdown, no plugin needed. See [Variables & Magic Functions](docs/guides/variables-and-functions.md).
@@ -97,10 +97,10 @@ boxlang bxSites <verb> [options]
 | `page:new` | Scaffold a single docs page at an arbitrary path |
 | `plugin:new` | Scaffold a plugin module skeleton |
 | `install:plugin` | Download a plugin from ForgeBox into project-local `boxlang_modules/` |
-| `theme:new` | Eject a built-in theme into project `theme/` for customizing |
-| `install:theme` | Download a theme from ForgeBox into project-local `themes/<name>/` |
+| `theme:new` | Eject a built-in theme into your content root's `.theme/` for customizing |
+| `install:theme` | Download a theme from ForgeBox into your content root's `.themes/<name>/` |
 | `skills:install` | Install the [official AI agent skill pack](docs/guides/ai-agent-skills.md) (`ortus-boxlang/bx-sites-skills`) via `npx skills add` |
-| `theme:import` | Best-effort convert a mkdocs/jekyll/hugo theme's own template files into a `themes/<name>/` scaffold |
+| `theme:import` | Best-effort convert a mkdocs/jekyll/hugo theme's own template files into a `.themes/<name>/` scaffold |
 | `page:rename` | Move a docs page and rewrite every relative link that pointed at it |
 | `blog:drafts` | List every blog post whose frontmatter sets `draft: true` |
 | `blog:find` | Filter blog posts by author/category/tag/date range |
@@ -138,7 +138,7 @@ See [MODULE_SPEC.md](MODULE_SPEC.md) for the design spec driving this module's d
 
 - `.github/workflows` - CI: tests (`tests.yml`), PR checks (`pr.yml`), snapshot/release builds (`snapshot.yml`, `release.yml`), and publishing this repo's own docs to GitHub Pages (`pages.yml`)
 - `models` - the module's own source: `models/cli` (one dispatcher per `bxSites` verb), `models/config` (site config loader/validator - `bxsites.yaml`/`.yml`/`.json`), `models/build` (project scaffolding + the docs/nav/markdown/theme/search/sitemap build pipeline), `models/deploy` (the `deploy` verb's pluggable targets - S3, Azure, GCS, Firebase, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages, local, GitHub Pages), `models/publish` (the `publish` verb's own bxSites Cloud client)
-- `resources/themes` - built-in themes (native BoxLang `.bxm` templates + assets), ten in total: `bootstrap` (default), `material`, `tailwind`, plus seven `material`-forked themes (`docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook`, `notion`) - all with the BoxLang brand palette, dark mode, breadcrumbs and code-copy buttons applied out of the box. A project can override any of them via its own `theme/` folder (same `layout.bxm` + `page.bxm` contract - see [Themes](docs/guides/themes.md))
+- `resources/themes` - built-in themes (native BoxLang `.bxm` templates + assets), ten in total: `bootstrap` (default), `material`, `tailwind`, plus seven `material`-forked themes (`docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook`, `notion`) - all with the BoxLang brand palette, dark mode, breadcrumbs and code-copy buttons applied out of the box. A project can override any of them via its own `.theme/` folder inside its content root (same `layout.bxm` + `page.bxm` contract - see [Themes](docs/guides/themes.md))
 - `resources/assets` - module-wide shared client-side assets: the search widget (`search.js`, MiniSearch-backed with a Cmd/Ctrl+K palette), the copy-code button, and per-feature init scripts (tabs, Mermaid, math, OpenAPI, prompts, conditional content, ...), plus every vendored third-party library under `vendor/` (Bootstrap, highlight.js, Alpine.js, MiniSearch, Mermaid, Swagger UI) - no CDN, no outbound requests from a built site
 - `docs` / `bxsites.yaml` - this repository's own docs, built by BX Sites itself (`boxlang bxSites build`)
 - `tests/specs` - TestBox specs, one bundle per class under `models/`

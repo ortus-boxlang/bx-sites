@@ -19,6 +19,8 @@ class extends="testbox.system.BaseSpec" {
 			private function newProjectRoot() {
 				var dir = createTempDirectory( prefix = "bxsites-themerenderer-" );
 				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite( dir & "/bxsites.json", '{"name":"Test Site"}' );
 				return dir;
 			}
 
@@ -36,68 +38,68 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.ThemeNotFound" );
 			} );
 
-			it( "prefers a project-level theme/ override that satisfies the ThemeProvider contract", function() {
+			it( "prefers a project-level .theme/ override that satisfies the ThemeProvider contract", function() {
 				var root = newProjectRoot();
-				directoryCreate( root & "/theme", true, true );
-				fileWrite( root & "/theme/layout.bxm", "<bx:output>custom layout</bx:output>" );
-				fileWrite( root & "/theme/page.bxm", "<bx:output>custom page</bx:output>" );
+				directoryCreate( root & "/docs/.theme", true, true );
+				fileWrite( root & "/docs/.theme/layout.bxm", "<bx:output>custom layout</bx:output>" );
+				fileWrite( root & "/docs/.theme/page.bxm", "<bx:output>custom page</bx:output>" );
 
 				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
 
-				expect( themeDir ).toBe( root & "/theme" );
+				expect( themeDir ).toBe( root & "/docs/.theme" );
 			} );
 
-			it( "throws BxSites.InvalidTheme when a project theme/ override is missing page.bxm", function() {
+			it( "throws BxSites.InvalidTheme when a project .theme/ override is missing page.bxm", function() {
 				var root = newProjectRoot();
-				directoryCreate( root & "/theme", true, true );
-				fileWrite( root & "/theme/layout.bxm", "<bx:output>custom layout</bx:output>" );
+				directoryCreate( root & "/docs/.theme", true, true );
+				fileWrite( root & "/docs/.theme/layout.bxm", "<bx:output>custom layout</bx:output>" );
 
 				expect( function() {
 					renderer.resolveThemeDir( "bootstrap", root );
 				} ).toThrow( "BxSites.InvalidTheme" );
 			} );
 
-			it( "resolves a themes/<name>/ installed theme (install:theme's own target) when there's no project theme/ override", function() {
+			it( "resolves a .themes/<name>/ installed theme (install:theme's own target) when there's no project .theme/ override", function() {
 				var root = newProjectRoot();
-				directoryCreate( root & "/themes/blog1", true, true );
-				fileWrite( root & "/themes/blog1/layout.bxm", "<bx:output>installed layout</bx:output>" );
-				fileWrite( root & "/themes/blog1/page.bxm", "<bx:output>installed page</bx:output>" );
+				directoryCreate( root & "/docs/.themes/blog1", true, true );
+				fileWrite( root & "/docs/.themes/blog1/layout.bxm", "<bx:output>installed layout</bx:output>" );
+				fileWrite( root & "/docs/.themes/blog1/page.bxm", "<bx:output>installed page</bx:output>" );
 
 				var themeDir = renderer.resolveThemeDir( "blog1", root );
 
-				expect( themeDir ).toBe( root & "/themes/blog1" );
+				expect( themeDir ).toBe( root & "/docs/.themes/blog1" );
 			} );
 
-			it( "prefers a project theme/ override over a same-named themes/<name>/ installed theme", function() {
+			it( "prefers a project .theme/ override over a same-named .themes/<name>/ installed theme", function() {
 				var root = newProjectRoot();
-				directoryCreate( root & "/theme", true, true );
-				fileWrite( root & "/theme/layout.bxm", "<bx:output>override layout</bx:output>" );
-				fileWrite( root & "/theme/page.bxm", "<bx:output>override page</bx:output>" );
-				directoryCreate( root & "/themes/blog1", true, true );
-				fileWrite( root & "/themes/blog1/layout.bxm", "<bx:output>installed layout</bx:output>" );
-				fileWrite( root & "/themes/blog1/page.bxm", "<bx:output>installed page</bx:output>" );
+				directoryCreate( root & "/docs/.theme", true, true );
+				fileWrite( root & "/docs/.theme/layout.bxm", "<bx:output>override layout</bx:output>" );
+				fileWrite( root & "/docs/.theme/page.bxm", "<bx:output>override page</bx:output>" );
+				directoryCreate( root & "/docs/.themes/blog1", true, true );
+				fileWrite( root & "/docs/.themes/blog1/layout.bxm", "<bx:output>installed layout</bx:output>" );
+				fileWrite( root & "/docs/.themes/blog1/page.bxm", "<bx:output>installed page</bx:output>" );
 
 				var themeDir = renderer.resolveThemeDir( "blog1", root );
 
-				expect( themeDir ).toBe( root & "/theme" );
+				expect( themeDir ).toBe( root & "/docs/.theme" );
 			} );
 
-			it( "falls back to a built-in theme when no themes/<name>/ installed theme matches that name", function() {
+			it( "falls back to a built-in theme when no .themes/<name>/ installed theme matches that name", function() {
 				var root = newProjectRoot();
-				directoryCreate( root & "/themes/blog1", true, true );
-				fileWrite( root & "/themes/blog1/layout.bxm", "<bx:output>installed layout</bx:output>" );
-				fileWrite( root & "/themes/blog1/page.bxm", "<bx:output>installed page</bx:output>" );
+				directoryCreate( root & "/docs/.themes/blog1", true, true );
+				fileWrite( root & "/docs/.themes/blog1/layout.bxm", "<bx:output>installed layout</bx:output>" );
+				fileWrite( root & "/docs/.themes/blog1/page.bxm", "<bx:output>installed page</bx:output>" );
 
 				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
 
-				expect( themeDir ).notToBe( root & "/themes/blog1" );
+				expect( themeDir ).notToBe( root & "/docs/.themes/blog1" );
 				expect( fileExists( themeDir & "/layout.bxm" ) ).toBeTrue();
 			} );
 
-			it( "throws BxSites.InvalidTheme when a themes/<name>/ installed theme is missing page.bxm", function() {
+			it( "throws BxSites.InvalidTheme when a .themes/<name>/ installed theme is missing page.bxm", function() {
 				var root = newProjectRoot();
-				directoryCreate( root & "/themes/blog1", true, true );
-				fileWrite( root & "/themes/blog1/layout.bxm", "<bx:output>installed layout</bx:output>" );
+				directoryCreate( root & "/docs/.themes/blog1", true, true );
+				fileWrite( root & "/docs/.themes/blog1/layout.bxm", "<bx:output>installed layout</bx:output>" );
 
 				expect( function() {
 					renderer.resolveThemeDir( "blog1", root );
@@ -140,11 +142,11 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( "<!doctype html>" );
 			} );
 
-			it( "binds data bare into a project theme/ override, readable as variables.data (or bare data)", function() {
+			it( "binds data bare into a project .theme/ override, readable as variables.data (or bare data)", function() {
 				var root = newProjectRoot();
-				directoryCreate( root & "/theme", true, true );
-				fileWrite( root & "/theme/layout.bxm", "<bx:output>##variables.data.products.name##</bx:output>" );
-				fileWrite( root & "/theme/page.bxm", "<bx:output>##variables.page.contentHtml##</bx:output>" );
+				directoryCreate( root & "/docs/.theme", true, true );
+				fileWrite( root & "/docs/.theme/layout.bxm", "<bx:output>##variables.data.products.name##</bx:output>" );
+				fileWrite( root & "/docs/.theme/page.bxm", "<bx:output>##variables.page.contentHtml##</bx:output>" );
 				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
 
 				var page = { title : "My Page", contentHtml : "<p>Hello</p>" };
@@ -731,10 +733,10 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "renders through <themeDir>/<layoutHint>.bxm as the outer shell when it exists, and falls back to layout.bxm when it doesn't", function() {
 				var root = newProjectRoot();
-				directoryCreate( root & "/theme", true, true );
-				fileWrite( root & "/theme/layout.bxm", '<bx:output>DEFAULT-LAYOUT</bx:output><bx:include template="##variables.themeDir##/##variables.bodyFile##">' );
-				fileWrite( root & "/theme/page.bxm", "<bx:output>DEFAULT-BODY</bx:output>" );
-				fileWrite( root & "/theme/blog.bxm", '<bx:output>BLOG-LAYOUT</bx:output><bx:include template="##variables.themeDir##/##variables.bodyFile##">' );
+				directoryCreate( root & "/docs/.theme", true, true );
+				fileWrite( root & "/docs/.theme/layout.bxm", '<bx:output>DEFAULT-LAYOUT</bx:output><bx:include template="##variables.themeDir##/##variables.bodyFile##">' );
+				fileWrite( root & "/docs/.theme/page.bxm", "<bx:output>DEFAULT-BODY</bx:output>" );
+				fileWrite( root & "/docs/.theme/blog.bxm", '<bx:output>BLOG-LAYOUT</bx:output><bx:include template="##variables.themeDir##/##variables.bodyFile##">' );
 				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
 				var page = { title : "My Page", contentHtml : "<p>Hello</p>" };
 
@@ -750,10 +752,10 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "renders through <themeDir>/<bodyHint>.bxm as the body when it exists, and falls back to page.bxm when it doesn't", function() {
 				var root = newProjectRoot();
-				directoryCreate( root & "/theme", true, true );
-				fileWrite( root & "/theme/layout.bxm", '<bx:output>LAYOUT</bx:output><bx:include template="##variables.themeDir##/##variables.bodyFile##">' );
-				fileWrite( root & "/theme/page.bxm", "<bx:output>DEFAULT-BODY</bx:output>" );
-				fileWrite( root & "/theme/blog-page.bxm", "<bx:output>BLOG-BODY</bx:output>" );
+				directoryCreate( root & "/docs/.theme", true, true );
+				fileWrite( root & "/docs/.theme/layout.bxm", '<bx:output>LAYOUT</bx:output><bx:include template="##variables.themeDir##/##variables.bodyFile##">' );
+				fileWrite( root & "/docs/.theme/page.bxm", "<bx:output>DEFAULT-BODY</bx:output>" );
+				fileWrite( root & "/docs/.theme/blog-page.bxm", "<bx:output>BLOG-BODY</bx:output>" );
 				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
 				var page = { title : "My Page", contentHtml : "<p>Hello</p>" };
 
@@ -768,11 +770,11 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "prefers a page's own frontmatter [layout] over bodyHint, and falls back to page.bxm when that named file doesn't exist", function() {
 				var root = newProjectRoot();
-				directoryCreate( root & "/theme", true, true );
-				fileWrite( root & "/theme/layout.bxm", '<bx:output>LAYOUT</bx:output><bx:include template="##variables.themeDir##/##variables.bodyFile##">' );
-				fileWrite( root & "/theme/page.bxm", "<bx:output>DEFAULT-BODY</bx:output>" );
-				fileWrite( root & "/theme/blog-page.bxm", "<bx:output>BLOG-BODY</bx:output>" );
-				fileWrite( root & "/theme/press-release.bxm", "<bx:output>PRESS-RELEASE-BODY</bx:output>" );
+				directoryCreate( root & "/docs/.theme", true, true );
+				fileWrite( root & "/docs/.theme/layout.bxm", '<bx:output>LAYOUT</bx:output><bx:include template="##variables.themeDir##/##variables.bodyFile##">' );
+				fileWrite( root & "/docs/.theme/page.bxm", "<bx:output>DEFAULT-BODY</bx:output>" );
+				fileWrite( root & "/docs/.theme/blog-page.bxm", "<bx:output>BLOG-BODY</bx:output>" );
+				fileWrite( root & "/docs/.theme/press-release.bxm", "<bx:output>PRESS-RELEASE-BODY</bx:output>" );
 				var themeDir = renderer.resolveThemeDir( "bootstrap", root );
 
 				var overriddenPage = { title : "My Page", contentHtml : "<p>Hello</p>", layout : "press-release" };
