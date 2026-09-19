@@ -23,6 +23,8 @@ un progetto ne ha in qualche modo più di uno, vince `bxsites.yaml`, poi
     name: "My Docs"
     description: ""
     baseURL: "/"
+    source: docs
+    exclude: []
     theme:
       name: bootstrap
       options: {}
@@ -64,6 +66,8 @@ un progetto ne ha in qualche modo più di uno, vince `bxsites.yaml`, poi
     	"name": "My Docs",
     	"description": "",
     	"baseURL": "/",
+    	"source": "docs",
+    	"exclude": [],
     	"theme": {
     		"name": "bootstrap",
     		"options": {},
@@ -122,6 +126,8 @@ un progetto ne ha in qualche modo più di uno, vince `bxsites.yaml`, poi
     name = "My Docs"
     description = ""
     baseURL = "/"
+    source = "docs"
+    exclude = []
     search = true
     mcp = false
     nav = []
@@ -194,6 +200,33 @@ pagina.
 `llms.txt` (vedi [sotto](#llmstxt)) viene sempre scritto; preferisce
 semplicemente un URL assoluto quando `baseURL` ne fornisce uno.
 
+## `source`
+
+Quale cartella contiene il contenuto di questo progetto - `docs`, `src`,
+un nome di cartella personalizzato qualsiasi, oppure `.` (l'intero
+repository è il contenuto, senza alcuna sottocartella). Se non impostata,
+vengono rilevate automaticamente prima `docs/` poi `src/`; se sul disco
+non esiste neppure una delle due, il build fallisce in modo esplicito
+invece di indovinare. `bxSites new` scrive sempre questa chiave in modo
+esplicito, così un progetto appena generato non è mai ambiguo su dove
+vive il suo contenuto. Vedi [Origine del contenuto](guides/content-source.md)
+per il quadro completo, incluse le sovrascritture `.theme`/`.themes` che
+vivono dentro questa cartella, e la guida
+[Monorepo multi-dominio](guides/multi-domain.md) per eseguire più project
+root indipendenti da un solo repository.
+
+## `exclude`
+
+Nomi extra di file/cartelle da escludere dal build, oltre a quelli
+tradizionali che bxSites esclude sempre (`.git`, `.github`,
+`node_modules`, `boxlang_modules`, `site`, `.theme`, `.themes`, e il file
+di configurazione proprio di questo progetto). Vengono confrontati nello
+stesso modo - un nome nudo alla radice di `source`, oppure un nome
+ovunque al suo interno tramite un segmento di percorso senza `/`
+iniziale. Utile soprattutto con `source: .`, per tenere fuori cartelle o
+file di tooling che non fanno parte delle esclusioni tradizionali già
+vicine a `README.md`, evitando che vengano raccolti come pagine.
+
 ## `robots.txt`
 
 Ogni build scrive un `robots.txt` alla radice del sito - nessuna chiave di
@@ -250,7 +283,7 @@ senso. Elenca ogni pagina non nascosta secondo il protocollo
 
 - `theme.name` - uno dei temi integrati (`bootstrap`, `material`,
   `tailwind`), oppure il nome di un tema personalizzato che fornisci tu
-  tramite una cartella `theme/` alla radice del progetto (vedi
+  tramite una cartella `.theme/` dentro la content root (vedi
   [Temi](guides/themes.md))
 - `theme.logo` - percorso/URL a un'immagine mostrata accanto al nome del
   sito nel marchio dell'header (al posto del glifo predefinito "⚡") - un
@@ -318,7 +351,7 @@ Quale UI di ricerca `search: true` attiva:
   invece [Algolia DocSearch](guides/search.md#algolia), e `"pagefind"`
   attiva [Pagefind](guides/search.md#pagefind). Qualsiasi altro valore è un
   provider personalizzato del progetto, collegato tramite una
-  sovrascrittura `theme/` - vedi
+  sovrascrittura `.theme/` - vedi
   [Ricerca](guides/search.md#other-search-providers).
 - `algolia` - obbligatorio quando `provider` è `"algolia"`: `appId`,
   `apiKey` (la chiave API pubblica *solo per la ricerca*, non una chiave

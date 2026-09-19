@@ -22,6 +22,8 @@ dann `bxsites.yml`, dann `bxsites.json`.
     name: "My Docs"
     description: ""
     baseURL: "/"
+    source: docs
+    exclude: []
     theme:
       name: bootstrap
       options: {}
@@ -70,6 +72,8 @@ dann `bxsites.yml`, dann `bxsites.json`.
     	"name": "My Docs",
     	"description": "",
     	"baseURL": "/",
+    	"source": "docs",
+    	"exclude": [],
     	"theme": {
     		"name": "bootstrap",
     		"options": {},
@@ -124,6 +128,8 @@ dann `bxsites.yml`, dann `bxsites.json`.
     name = "My Docs"
     description = ""
     baseURL = "/"
+    source = "docs"
+    exclude = []
     search = true
     mcp = false
     nav = []
@@ -197,6 +203,33 @@ vorangestellt wird, und dient zugleich als kanonische URL der Website für
 `llms.txt` (siehe [unten](#llmstxt)) wird immer geschrieben; sie bevorzugt
 lediglich eine absolute URL, wenn `baseURL` eine solche liefert.
 
+## `source`
+
+Welcher Ordner den Inhalt dieses Projekts enthält - `docs`, `src`, ein
+beliebiger eigener Ordnername, oder `.` (das gesamte Repository ist der
+Inhalt, überhaupt kein Unterordner). Bleibt er ungesetzt, werden `docs/`
+und dann `src/` automatisch erkannt; existiert auf der Festplatte auch
+keiner von beiden, schlägt der Build laut fehl, statt zu raten.
+`bxSites new` schreibt diesen Schlüssel immer explizit, sodass ein
+gescaffoldetes Projekt nie mehrdeutig ist. Siehe
+[Content-Quelle](guides/content-source.md) für das vollständige Bild,
+einschließlich der `.theme`/`.themes`-Überschreibungen, die innerhalb
+dieses Ordners leben, sowie die Anleitung
+[Multi-Domain-Monorepo](guides/multi-domain.md) für den Betrieb mehrerer
+unabhängiger Projekt-Wurzeln aus einem einzigen Repository.
+
+## `exclude`
+
+Zusätzliche Datei-/Ordnernamen, die aus dem Build ausgeschlossen werden,
+zusätzlich zu den traditionellen, die bxSites ohnehin immer ausschließt
+(`.git`, `.github`, `node_modules`, `boxlang_modules`, `site`, `.theme`,
+`.themes` und die eigene Konfigurationsdatei dieses Projekts). Wird auf
+dieselbe Weise abgeglichen - ein bloßer Name an der Wurzel von `source`,
+oder ein Name irgendwo darunter über ein führendes, `/`-freies
+Pfadsegment. Vor allem nützlich mit `source: .`, um Tooling-Verzeichnisse
+oder Dateien, die nicht Teil deiner traditionellen, `README.md`-nahen
+Ausschlüsse sind, davon abzuhalten, als Seiten eingesammelt zu werden.
+
 ## `llms.txt`
 
 Jeder Build schreibt eine `llms.txt` in die Wurzel der Website - ein
@@ -256,7 +289,7 @@ existiert.
 - `theme.name` - eines der integrierten Themes (`bootstrap`, `material`,
   `tailwind`, `docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`,
   `gitbook`, `notion`) oder der Name eines eigenen Themes, das du über
-  einen `theme/`-Ordner im Projekt-Wurzelverzeichnis bereitstellst (siehe
+  einen `.theme/`-Ordner innerhalb des Content-Root bereitstellst (siehe
   [Themes](guides/themes.md))
 - `theme.logo` - Pfad/URL zu einem Bild, das neben dem Website-Namen in der
   Kopfzeilen-Marke angezeigt wird (anstelle des standardmäßigen
@@ -370,7 +403,7 @@ Welche Such-UI `search: true` verdrahtet:
   stattdessen [Algolia DocSearch](guides/search.md#algolia), und
   `"pagefind"` verdrahtet [Pagefind](guides/search.md#pagefind). Jeder
   andere Wert ist ein eigener, projektspezifischer Provider, verdrahtet
-  über ein `theme/`-Override - siehe
+  über ein `.theme/`-Override - siehe
   [Suche](guides/search.md#andere-suchprovider).
 - `algolia` - erforderlich, wenn `provider` `"algolia"` ist: `appId`,
   `apiKey` (der *reine Such*-öffentliche API-Schlüssel, kein

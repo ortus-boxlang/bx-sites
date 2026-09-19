@@ -331,7 +331,7 @@ Verifica la versione della JVM, che `docs/` esista, che
 `bxsites.yaml`/`.json` venga effettivamente analizzato e validato, che i
 moduli BoxLang richiesti (`bx-markdown`, `bx-esapi`, `bx-yaml`,
 `bx-image`) siano installati e attivati e - se esiste una sovrascrittura
-`theme/` a livello di progetto - che soddisfi il contratto dei due file
+`.theme/` nella content root - che soddisfi il contratto dei due file
 obbligatori `layout.bxm`/`page.bxm`.
 
 ```bash frame="terminal" title="Terminal"
@@ -449,9 +449,11 @@ aggiungi quel nome all'array `plugins` di `bxsites.yaml` per attivarlo
 
 ## `theme:new`
 
-Estrae uno dei temi integrati nella cartella `theme/` propria del
-progetto per personalizzarlo, rispecchiando il flusso di eject `--theme`
-di mkdocs.
+Estrae uno dei temi integrati nella cartella `.theme/` propria del
+progetto, dentro la content root (vedi
+[Origine del contenuto](guides/content-source.md#dove-vive-una-sovrascrittura-di-tema)),
+per personalizzarlo - rispecchiando il flusso di eject `--theme` di
+mkdocs.
 
 ```bash title="Utilizzo"
 bxSites theme:new --theme=material
@@ -459,15 +461,15 @@ bxSites theme:new --theme=material
 
 - `--theme` (obbligatorio) - `bootstrap`, `material`, `tailwind`, `docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook`, o `notion` - vedi [Temi](guides/themes.md#integrati)
 
-Fallisce invece di sovrascrivere un `theme/` già esistente. Vedi
+Fallisce invece di sovrascrivere un `.theme/` già esistente. Vedi
 [Temi](guides/themes.md) per il contratto di sovrascrittura
 (`layout.bxm` + `page.bxm`).
 
 ## `install:theme`
 
-Scarica un tema pubblicato da ForgeBox nel proprio `themes/<name>/` del
-progetto - nient'altro che il binario `bxSites` serve, come per
-`install:plugin`.
+Scarica un tema pubblicato da ForgeBox nel proprio `.themes/<name>/`,
+dentro la content root - nient'altro che il binario `bxSites` serve,
+come per `install:plugin`.
 
 ```bash title="Utilizzo"
 bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
@@ -487,8 +489,8 @@ vedi [Temi](guides/themes.md#installare-un-tema-pubblicato).
 Conversione con il massimo impegno possibile di un tema proveniente
 dall'ecosistema di un altro generatore di siti statici
 (`mkdocs`/`jekyll`/`hugo`) in uno scheletro di tema bx-sites sotto
-`themes/<name>/` - un punto di partenza, non un porting senza perdite in
-un solo comando.
+`.themes/<name>/`, dentro la content root - un punto di partenza, non un
+porting senza perdite in un solo comando.
 
 ```bash title="Utilizzo"
 bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
@@ -496,7 +498,7 @@ bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-th
 
 - `--source` (obbligatorio) - `mkdocs`, `jekyll`, o `hugo`
 - `--path` (obbligatorio) - la cartella radice propria del tema sorgente
-- `--name` (obbligatorio) - il nome di destinazione, scritto in `themes/<name>/`
+- `--name` (obbligatorio) - il nome di destinazione, scritto in `.themes/<name>/`
 
 Rieseguire il comando con lo stesso `--name` è sicuro - `layout.bxm`/
 `page.bxm` vengono sovrascritti e qualsiasi cartella di asset appena

@@ -92,7 +92,7 @@ proyecto usa `src/` - consulta [Primeros Pasos](../getting-started.md)) -
 un script BoxLang plano. Cualquier función que nombres con un `$` inicial
 se convierte en una *función mágica*: invocable desde `{{ }}` en
 Markdown, e invocable directamente, sin nada más, desde las propias
-sobrescrituras `.bxm` de [`theme/`](themes.md#sobrescribir-un-tema) de un
+sobrescrituras `.bxm` de [`.theme/`](themes.md#sobrescribir-un-tema) de un
 proyecto.
 
 ```bx title="docs/functions.bxs" linenums="1"
@@ -146,11 +146,11 @@ function $price( amount ) {
 ### Llamar a una función mágica desde una sobrescritura de tema
 
 Como una función mágica queda enlazada directamente en el ámbito de la
-plantilla, el propio `theme/page.bxm` (o `layout.bxm`) de un proyecto
+plantilla, el propio `.theme/page.bxm` (o `layout.bxm`) de un proyecto
 puede llamarla sin prefijo, exactamente de la misma forma en que ya lee
 `variables.page`/`variables.siteConfig`:
 
-```bx title="theme/page.bxm (excerpt)"
+```bx title=".theme/page.bxm (excerpt)"
 <p class="build-banner">#$shout( 'built with boxlang' )#</p>
 ```
 
@@ -348,7 +348,7 @@ erróneamente texto `{{ }}` no relacionado como sintaxis rota.
 
 ## Nombres reservados
 
-Una sobrescritura `theme/page.bxm`/`layout.bxm` que llama a una función
+Una sobrescritura `.theme/page.bxm`/`layout.bxm` que llama a una función
 mágica sin prefijo (`$name(...)`) funciona porque toda función cargada -
 con prefijo `$` o ayudante privado por igual - se enlaza directamente en
 ese mismo ámbito de renderizado de la plantilla, justo junto a los

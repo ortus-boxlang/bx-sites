@@ -363,5 +363,5 @@ Dos formas de darle un nuevo estilo, igual que cualquier otra página:
 Lo que no puedes hacer es sustituir tú mismo el propio marcado de
 tarjeta de entrada/paginador/perfil de autor por el tuyo - se genera una
 sola vez mediante `BlogBuilder.bx`, no se lee de un archivo de plantilla
-en `theme/`, así que darle un nuevo estilo con CSS (arriba) es la vía
+en `.theme/`, así que darle un nuevo estilo con CSS (arriba) es la vía
 compatible en lugar de una sobrescritura por componente.

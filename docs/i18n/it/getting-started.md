@@ -136,6 +136,11 @@ cartelle diventa automaticamente annidamento nella navigazione:
     quello che esiste davvero. L'output della build finisce comunque
     sempre in `site/` - i due non entrano mai in conflitto, dato che
     `site/` stesso non è mai un nome valido per la cartella sorgente.
+    Anche questa cartella è configurabile - un nome personalizzato, o
+    l'intero repository senza alcuna sottocartella - tramite la chiave
+    `source` di `bxsites.yaml`; vedi
+    [Origine del contenuto](guides/content-source.md) per il quadro
+    completo.
 
 ```
 docs/
@@ -258,7 +263,7 @@ bxSites serve
 Compila il progetto, serve `site/` su `http://127.0.0.1:8080/`, e
 ricompila automaticamente ogni volta che salvi una modifica sotto
 `docs/`, la configurazione del sito `bxsites.yaml`/`.json`, o una
-personalizzazione di `theme/` a livello di progetto - il browser si
+personalizzazione `.theme/` nella content root - il browser si
 ricarica da solo. Passa `--port=3000` o `--host=0.0.0.0` per cambiare come
 si aggancia.
 

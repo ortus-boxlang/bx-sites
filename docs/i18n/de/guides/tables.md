@@ -119,7 +119,7 @@ Scrollleiste, statt die Seite zu sprengen, und begrenzt hohe Tabellen (ab
 einer `max-height`) auf eine feste Höhe mit eigener vertikaler
 Scrollleiste, wobei die Kopfzeile fixiert bleibt, während der Rumpf
 darunter scrollt - eine kurze Tabelle wie die obigen bekommt nie eine
-Scrollleiste, weil sie ohnehin schon passt. Ein eigenes `theme/`-Override
+Scrollleiste, weil sie ohnehin schon passt. Ein eigenes `.theme/`-Override
 kann `.bxsites-table-wrap` (insbesondere seine `max-height`) genau wie
 jede andere CSS-Klasse umgestalten.
 
@@ -159,7 +159,7 @@ werden über das gezeichnet, was `--bxsites-table-bg` setzt, ein deckender
 Wert überdeckt die Kartenoberfläche also, statt sie zu tönen. Alles
 jenseits von Farbe - Innenabstände, der Eckenradius, die
 Großbuchstaben-Beschriftungen der Kopfzeile - ist ein echter
-`theme/`-Override, genau wie jedes andere CSS in einem Theme.
+`.theme/`-Override, genau wie jedes andere CSS in einem Theme.
 
 ## Über reine Daten hinaus
 

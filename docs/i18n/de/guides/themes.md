@@ -176,9 +176,10 @@ bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
 ```
 
 Das lädt das ZIP des Pakets herunter und entpackt es nach
-`themes/bx-sites-theme-blog1/` im Projekt-Wurzelverzeichnis, wobei vor
-Abschluss geprüft wird, ob es den `ThemeProvider`-Vertrag unten erfüllt.
-Ein Projekt kann auf diese Weise mehrere installierte Themes
+`.themes/bx-sites-theme-blog1/` innerhalb des Content-Root des Projekts
+(siehe [Content-Quelle](content-source.md#wo-eine-theme-überschreibung-lebt)),
+wobei vor Abschluss geprüft wird, ob es den `ThemeProvider`-Vertrag unten
+erfüllt. Ein Projekt kann auf diese Weise mehrere installierte Themes
 nebeneinander vorhalten und rein per Name zwischen ihnen wechseln:
 
 === "YAML"
@@ -208,7 +209,7 @@ Startest du stattdessen von einem Theme, das für einen anderen
 statischen Site-Generator gebaut wurde? Siehe
 [Ein Theme importieren](theme-import.md) - `theme:import` wandelt die
 eigenen Template-Dateien eines mkdocs-/jekyll-/hugo-Themes mechanisch in
-ein bestmögliches `themes/<name>/`-Gerüst um.
+ein bestmögliches `.themes/<name>/`-Gerüst um.
 
 ## Air-gapped/Offline-Websites
 
@@ -334,7 +335,7 @@ layout: press-release
 ```
 
 `layout: press-release` rendert den Body dieser einen Seite über
-`theme/press-release.bxm` (oder das eigene des aktiven integrierten
+`.theme/press-release.bxm` (oder das eigene des aktiven integrierten
 Themes, falls vorhanden) statt über `page.bxm` - weiterhin innerhalb der
 normalen `layout.bxm`-Hülle der Website. Ein `layout:`, das eine Datei
 benennt, die das aktive Theme nicht hat, fällt auf `page.bxm` zurück,
@@ -345,7 +346,7 @@ Themes benannt hat.
 `bootstrap` liefert `blog.bxm`/`blog-page.bxm` als funktionierendes
 Beispiel zum Kopieren mit; die anderen integrierten Themes (noch) nicht
 und fallen für Blog-Inhalte auf `layout.bxm`/`page.bxm` zurück, genau wie
-es ein unvollständiges `theme/`-Override auch täte.
+es ein unvollständiges `.theme/`-Override auch täte.
 
 ### Welches Layout/Body gerade aktiv ist
 
@@ -365,11 +366,11 @@ wurden, auf dieselbe direkte Art, wie sie bereits `variables.page`/
 Nützlich als Hook für eine Body-Klasse, oder um ohne separates Template
 zu verzweigen:
 
-```bx title="theme/layout.bxm"
+```bx title=".theme/layout.bxm"
 <body class="layout-#reReplace( variables.bodyFile, '\.bxm$', '' )#">
 ```
 
-```bx title="theme/page.bxm"
+```bx title=".theme/page.bxm"
 <bx:if variables.bodyFile == "blog-page.bxm">
 	<!-- Chrome nur für Blogbeiträge -->
 </bx:if>
@@ -501,15 +502,19 @@ aufgelöst wird.
 ## Ein Theme überschreiben
 
 Lege deine eigenen `layout.bxm` + `page.bxm` (und optional `search.bxm` /
-`assets/`) in einen `theme/`-Ordner im Wurzelverzeichnis deines Projekts.
-BxSites bevorzugt eine projektweite `theme/`-Überschreibung sowohl
-gegenüber einem installierten `themes/<name>/`-Theme als auch gegenüber
-jedem integrierten Theme, solange sie den obigen Vertrag erfüllt - die
+`assets/`) in einen `.theme/`-Ordner innerhalb des Content-Root deines
+Projekts - `docs/.theme/`, `src/.theme/`, oder `<source>/.theme/` für
+das, worauf `source` auflöst (siehe [Content-Quelle](content-source.md)),
+nicht im bloßen Projekt-Wurzelverzeichnis. BxSites bevorzugt eine
+`.theme/`-Überschreibung im Content-Root sowohl gegenüber einem
+installierten `.themes/<name>/`-Theme als auch gegenüber jedem
+integrierten Theme, solange sie den obigen Vertrag erfüllt - die
 integrierten Themes unter `resources/themes/` dieses Moduls sind ein
 guter Ausgangspunkt zum Kopieren und Anpassen. Vollständige
-Auflösungsreihenfolge: `theme/` (dieser Abschnitt) -> `themes/theme.name/`
-(ein [installiertes Theme](#ein-veröffentlichtes-theme-installieren),
-falls `theme.name` zu einem passt) -> ein integriertes Theme namens
+Auflösungsreihenfolge: `.theme/` (dieser Abschnitt) ->
+`.themes/theme.name/` (ein
+[installiertes Theme](#ein-veröffentlichtes-theme-installieren), falls
+`theme.name` zu einem passt) -> ein integriertes Theme namens
 `theme.name`.
 
 Ein durchgearbeitetes Beispiel - starte mit `bootstrap` und tausche seine
@@ -520,23 +525,25 @@ genau so weiterläuft, wie es bereits funktioniert:
 ```text title="Project structure"
 my-project/
 ├── bxsites.yaml
-├── docs/
-└── theme/                    ← project-level override, checked before any built-in theme
-    ├── layout.bxm             ← copied from resources/themes/bootstrap/layout.bxm
-    ├── page.bxm                ← copied from resources/themes/bootstrap/page.bxm, unchanged
-    ├── search.bxm               ← copied unchanged
-    └── assets/
-        └── style.css              ← copied from bootstrap's assets/style.css, then edited
+└── docs/
+    ├── index.md
+    └── .theme/                    ← content-root override, checked before any built-in theme
+        ├── layout.bxm              ← copied from resources/themes/bootstrap/layout.bxm
+        ├── page.bxm                 ← copied from resources/themes/bootstrap/page.bxm, unchanged
+        ├── search.bxm                ← copied unchanged
+        └── assets/
+            └── style.css               ← copied from bootstrap's assets/style.css, then edited
 ```
 
 1. Kopiere die drei `.bxm`-Dateien und `assets/style.css` aus
-   `resources/themes/bootstrap/` dieses Moduls in das `theme/` deines
-   Projekts.
+   `resources/themes/bootstrap/` dieses Moduls in das `docs/.theme/`
+   deines Projekts (oder `src/.theme/`, oder `<source>/.theme/`, je
+   nachdem, wo dein Content-Root tatsächlich liegt).
 2. Ändere nur das, was du wirklich ändern musst. Um Markenpalette und
    Schriftart zu tauschen, genügt der obere Teil von
-   `theme/assets/style.css`:
+   `.theme/assets/style.css`:
 
-   ```css title="theme/assets/style.css" linenums="1"
+   ```css title="docs/.theme/assets/style.css" linenums="1"
    :root {
    	--bxsites-gradient-start: #7C3AED;  /* was #00FF78 */
    	--bxsites-gradient-end: #DB2777;    /* was #00DBFF */
@@ -549,8 +556,8 @@ my-project/
    ```
 
 3. Führe `bxSites build` aus (oder `serve` während der
-   Iteration) - BxSites übernimmt `theme/` automatisch, keine Änderung an
-   `bxsites.yaml` nötig (ein projektweiter `theme/`-Ordner hat immer
+   Iteration) - BxSites übernimmt `.theme/` automatisch, keine Änderung an
+   `bxsites.yaml` nötig (ein `.theme/`-Ordner im Content-Root hat immer
    Vorrang vor dem im `theme.name` genannten integrierten Theme). Alles,
    was du nicht angefasst hast - Navigations-Rendering, Suche, der
    Dunkelmodus-Umschalter, Code-Annotationen - funktioniert genau so
@@ -558,7 +565,7 @@ my-project/
    es darunter immer noch genau dasselbe `layout.bxm`/`page.bxm`-Markup
    ist.
 
-Ein projektweiter `theme/`-Ordner ist allerdings alles-oder-nichts -
+Ein `.theme/`-Ordner eines Projekts ist allerdings alles-oder-nichts -
 sobald BxSites einen findet, wird er anstelle des integrierten Themes
 vollständig verwendet, braucht also trotzdem seine eigenen `layout.bxm` +
 `page.bxm`, selbst wenn du nur `assets/style.css` geändert hast (ein
@@ -567,7 +574,7 @@ Ordner, dem eine der beiden fehlt, schlägt sofort mit
 eine reine CSS-Anpassung ohne `.bxm`, nutze stattdessen
 [`extraCss`](#farben-anpassen-ohne-ein-theme-zu-überschreiben) von oben - es
 legt sich über das Theme, das `bxsites.yaml` benennt, ganz ohne
-`theme/`-Ordner. `theme/` ist für den Fall, dass du auch das Markup
+`.theme/`-Ordner. `.theme/` ist für den Fall, dass du auch das Markup
 selbst ändern musst, siehe als Nächstes.
 
 ## Ein Theme von Grund auf schreiben
@@ -576,12 +583,13 @@ Ein Theme braucht nur die beiden erforderlichen Dateien, hier also ein
 wirklich minimales Beispiel - kein Bootstrap/Tailwind, kein Dunkelmodus,
 keine Such-UI - um genau zu zeigen, was erforderlich ist im Vergleich zu
 dem, was die integrierten Themes zusätzlich bieten. Speichere beide als
-`theme/layout.bxm` und `theme/page.bxm` in deinem Projekt - ein
-projektweiter `theme/`-Ordner wird automatisch übernommen (wie oben),
+`docs/.theme/layout.bxm` und `docs/.theme/page.bxm` in deinem Projekt
+(oder unter dem Content-Root, auf den dein `source` auflöst) - ein
+`.theme/`-Ordner im Content-Root wird automatisch übernommen (wie oben),
 keine Änderung an `bxsites.yaml` nötig:
 
-```bx title="theme/layout.bxm" linenums="1"
-<!-- theme/layout.bxm -->
+```bx title="docs/.theme/layout.bxm" linenums="1"
+<!-- docs/.theme/layout.bxm -->
 <bx:script>
 	function renderNav( required array nodes ) {
 		var html = "<ul>"
@@ -619,8 +627,8 @@ keine Änderung an `bxsites.yaml` nötig:
 </bx:output>
 ```
 
-```bx title="theme/page.bxm" linenums="1"
-<!-- theme/page.bxm -->
+```bx title="docs/.theme/page.bxm" linenums="1"
+<!-- docs/.theme/page.bxm -->
 <bx:output>
 <article>
 	<h1>#encodeForHTML( variables.page.title )#</h1>

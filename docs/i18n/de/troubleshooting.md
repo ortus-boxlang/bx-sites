@@ -20,8 +20,8 @@ bxSites doctor
 Er prüft die JVM-Version, dass `docs/` (oder `src/`) existiert, dass
 `bxsites.yaml`/`.json` tatsächlich geparst und validiert werden kann, dass
 die benötigten BoxLang-Module installiert und aktiviert sind, und - falls
-ein projektweites `theme/`-Override existiert - dass es den Theme-Vertrag
-erfüllt. Er beendet sich mit `1`, falls eine Prüfung fehlschlägt, und gibt
+ein `.theme/`-Override im Content-Root existiert - dass es den
+Theme-Vertrag erfüllt. Er beendet sich mit `1`, falls eine Prüfung fehlschlägt, und gibt
 aus, was nicht stimmt; nichts hiervon verändert dein Projekt.
 
 ## Häufige Probleme
@@ -56,8 +56,10 @@ aus, was nicht stimmt; nichts hiervon verändert dein Projekt.
     Projekt-Root löst alles neu auf; `bxSites doctor` bestätigt, welches
     Modul (falls überhaupt eines) noch fehlt.
 
-??? bug "Ein projektweites `theme/`-Override lässt sich nicht bauen"
-    Ein eigener `theme/`-Ordner muss sowohl `layout.bxm` als auch
+??? bug "Ein `.theme/`-Override eines Projekts lässt sich nicht bauen"
+    Ein eigener `.theme/`-Ordner (der im Content-Root liegt - `docs/`,
+    `src/`, oder wo auch immer `source` hin auflöst, nicht im bloßen
+    Projekt-Wurzelverzeichnis) muss sowohl `layout.bxm` als auch
     `page.bxm` bereitstellen - `doctor` meldet, welche Datei fehlt.
     Siehe [Themes](guides/themes.md) für den vollständigen Vertrag,
     oder führe `bxSites theme:new` aus, um ein eingebautes Theme als
@@ -66,7 +68,7 @@ aus, was nicht stimmt; nichts hiervon verändert dein Projekt.
 
 ??? bug "`serve` bemerkt eine Änderung nicht"
     `serve` beobachtet `docs/`, deine `bxsites.yaml`/`.json` und ein
-    projektweites `theme/`-Override - eine Änderung anderswo (z. B. an
+    `.theme/`-Override im Content-Root - eine Änderung anderswo (z. B. an
     einer Datei unter `resources/` in einem Modul-Checkout, nicht einem
     echten Projekt) löst keinen Rebuild aus. Wird eine echte Änderung
     trotzdem nicht übernommen, stoppe `serve`, führe `bxSites clean` aus,

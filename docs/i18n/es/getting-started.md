@@ -136,6 +136,11 @@ de carpetas se convierte automáticamente en anidamiento de navegación:
     lo que realmente existe. El resultado de la construcción siempre
     termina en `site/` de cualquier forma - los dos nunca chocan, ya que
     `site/` nunca es en sí mismo un nombre válido de carpeta de origen.
+    Esta carpeta es a su vez configurable - un nombre personalizado, o
+    todo el repositorio sin ninguna subcarpeta - mediante la clave
+    `source` de `bxsites.yaml`; consulta
+    [Origen del Contenido](guides/content-source.md) para el panorama
+    completo.
 
 ```text title="docs/ → nav"
 docs/
@@ -266,8 +271,8 @@ bxSites serve
 
 Construye el proyecto, sirve `site/` en `http://127.0.0.1:8080/`, y
 reconstruye automáticamente cada vez que guardas un cambio bajo `docs/`,
-tu configuración de sitio `bxsites.yaml`/`.json`, o una sobrescritura de
-`theme/` a nivel de proyecto - tu navegador se recarga por sí solo. Pasa
+tu configuración de sitio `bxsites.yaml`/`.json`, o una sobrescritura
+`.theme/` en la raíz de contenido - tu navegador se recarga por sí solo. Pasa
 `--port=3000` o `--host=0.0.0.0` para cambiar cómo se enlaza.
 
 ## Limpieza

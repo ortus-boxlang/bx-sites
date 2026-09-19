@@ -177,10 +177,12 @@ bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
 ```
 
 Questo scarica lo zip del pacchetto e lo estrae in
-`themes/bx-sites-theme-blog1/` alla radice del progetto, verificando che
-soddisfi il contratto `ThemeProvider` sotto prima di terminare. Un
-progetto può portare con sé più temi installati fianco a fianco in
-questo modo e passare dall'uno all'altro semplicemente per nome:
+`.themes/bx-sites-theme-blog1/` dentro la content root del progetto (vedi
+[Content Source](content-source.md#dove-vive-una-sovrascrittura-di-tema)),
+verificando che soddisfi il contratto `ThemeProvider` sotto prima di
+terminare. Un progetto può portare con sé più temi installati fianco a
+fianco in questo modo e passare dall'uno all'altro semplicemente per
+nome:
 
 === "YAML"
     ```yaml title="bxsites.yaml"
@@ -209,7 +211,7 @@ Parti da un tema costruito per un altro generatore di siti statici
 invece? Vedi [Importare un tema](theme-import.md) - `theme:import`
 converte meccanicamente, con il massimo impegno possibile, i file
 template propri di un tema mkdocs/jekyll/hugo in uno scheletro
-`themes/<name>/`.
+`.themes/<name>/`.
 
 ## Siti air-gapped/offline
 
@@ -338,7 +340,7 @@ layout: press-release
 ```
 
 `layout: press-release` renderizza il corpo di questa singola pagina
-tramite `theme/press-release.bxm` (o quello del tema integrato attivo,
+tramite `.theme/press-release.bxm` (o quello del tema integrato attivo,
 se ne ha uno) invece di `page.bxm` - sempre dentro il guscio `layout.bxm`
 normale del sito. Un `layout:` che nomina un file che il tema attivo non
 ha ricade su `page.bxm` invece di far fallire il build, così cambiare
@@ -348,7 +350,7 @@ un altro tema.
 `bootstrap` fornisce `blog.bxm`/`blog-page.bxm` come esempio funzionante
 da copiare; gli altri temi integrati non ancora, e ricadono su
 `layout.bxm`/`page.bxm` per i contenuti del blog nello stesso modo in
-cui lo farebbe qualsiasi override `theme/` incompleto.
+cui lo farebbe qualsiasi override `.theme/` incompleto.
 
 ### Quale layout/corpo è attivo
 
@@ -368,11 +370,11 @@ nello stesso modo diretto in cui già legge `variables.page`/
 Utile come aggancio per una classe del body, o per ramificare senza un
 template separato:
 
-```bx title="theme/layout.bxm"
+```bx title=".theme/layout.bxm"
 <body class="layout-#reReplace( variables.bodyFile, '\.bxm$', '' )#">
 ```
 
-```bx title="theme/page.bxm"
+```bx title=".theme/page.bxm"
 <bx:if variables.bodyFile == "blog-page.bxm">
 	<!-- chrome esclusivo degli articoli del blog -->
 </bx:if>
@@ -503,15 +505,19 @@ stesso modo in cui si risolve qualsiasi altra immagine.
 ## Sovrascrivere un tema
 
 Metti il tuo `layout.bxm` + `page.bxm` (e opzionalmente `search.bxm` /
-`assets/`) in una cartella `theme/` alla radice del tuo progetto. BxSites
-preferisce una sovrascrittura `theme/` a livello di progetto sia rispetto
-a un tema `themes/<name>/` installato sia rispetto a qualsiasi tema
-integrato, purché soddisfi il contratto sopra descritto - i temi
-integrati sotto `resources/themes/` proprio di questo modulo sono un
-buon punto di partenza da copiare e adattare. Ordine di risoluzione
-completo: `theme/` (questa sezione) -> `themes/theme.name/` (un
-[tema installato](#installare-un-tema-pubblicato), se `theme.name`
-corrisponde a uno) -> un tema integrato chiamato `theme.name`.
+`assets/`) in una cartella `.theme/` dentro la content root del tuo
+progetto - `docs/.theme/`, `src/.theme/`, oppure `<contentRoot>/.theme/`
+per qualunque cosa risolva `source` (vedi
+[Origine del contenuto](content-source.md)), non alla radice nuda del
+progetto. BxSites preferisce una sovrascrittura `.theme/` a livello di
+content root sia rispetto a un tema `.themes/<name>/` installato sia
+rispetto a qualsiasi tema integrato, purché soddisfi il contratto sopra
+descritto - i temi integrati sotto `resources/themes/` proprio di questo
+modulo sono un buon punto di partenza da copiare e adattare. Ordine di
+risoluzione completo: `.theme/` (questa sezione) ->
+`.themes/theme.name/` (un [tema installato](#installare-un-tema-pubblicato),
+se `theme.name` corrisponde a uno) -> un tema integrato chiamato
+`theme.name`.
 
 Un esempio pratico - parti da `bootstrap` e sostituisci la sua palette del
 brand e il font delle intestazioni con i tuoi, mantenendo tutto il resto
@@ -521,23 +527,25 @@ come già funziona:
 ```text title="Struttura del progetto"
 my-project/
 ├── bxsites.yaml
-├── docs/
-└── theme/                    ← sovrascrittura a livello di progetto, verificata prima di qualsiasi tema integrato
-    ├── layout.bxm             ← copiato da resources/themes/bootstrap/layout.bxm
-    ├── page.bxm                ← copiato da resources/themes/bootstrap/page.bxm, invariato
-    ├── search.bxm               ← copiato invariato
-    └── assets/
-        └── style.css              ← copiato da assets/style.css di bootstrap, poi modificato
+└── docs/
+    ├── index.md
+    └── .theme/                    ← sovrascrittura a livello di content root, verificata prima di qualsiasi tema integrato
+        ├── layout.bxm              ← copiato da resources/themes/bootstrap/layout.bxm
+        ├── page.bxm                 ← copiato da resources/themes/bootstrap/page.bxm, invariato
+        ├── search.bxm                ← copiato invariato
+        └── assets/
+            └── style.css               ← copiato da assets/style.css di bootstrap, poi modificato
 ```
 
 1. Copia i tre file `.bxm` e `assets/style.css` da
-   `resources/themes/bootstrap/` di questo modulo nel `theme/` del tuo
-   progetto.
+   `resources/themes/bootstrap/` di questo modulo nel `docs/.theme/` del
+   tuo progetto (oppure `src/.theme/`, oppure `<contentRoot>/.theme/`, a
+   seconda di dove si trova davvero la tua content root).
 2. Modifica solo ciò che serve cambiare. Per sostituire la palette del
    brand e il font, basta agire sulla parte iniziale di
-   `theme/assets/style.css`:
+   `.theme/assets/style.css`:
 
-   ```css title="theme/assets/style.css" linenums="1"
+   ```css title="docs/.theme/assets/style.css" linenums="1"
    :root {
    	--bxsites-gradient-start: #7C3AED;  /* era #00FF78 */
    	--bxsites-gradient-end: #DB2777;    /* era #00DBFF */
@@ -550,15 +558,16 @@ my-project/
    ```
 
 3. Esegui `bxSites build` (o `serve` mentre iteri) - BX
-   Sites recepisce `theme/` automaticamente, nessuna modifica a
-   `bxsites.yaml` necessaria (una cartella `theme/` a livello di progetto
-   ha sempre la precedenza sul tema integrato nominato in `theme.name`).
-   Tutto ciò che non hai toccato - rendering della nav, ricerca,
-   interruttore modalità scura, annotazioni del codice - continua a
-   funzionare esattamente come nel tema `bootstrap` originale, dato che è
-   sempre lo stesso identico markup `layout.bxm`/`page.bxm` sottostante.
+   Sites recepisce `.theme/` automaticamente, nessuna modifica a
+   `bxsites.yaml` necessaria (una cartella `.theme/` a livello di content
+   root ha sempre la precedenza sul tema integrato nominato in
+   `theme.name`). Tutto ciò che non hai toccato - rendering della nav,
+   ricerca, interruttore modalità scura, annotazioni del codice -
+   continua a funzionare esattamente come nel tema `bootstrap`
+   originale, dato che è sempre lo stesso identico markup
+   `layout.bxm`/`page.bxm` sottostante.
 
-Una cartella `theme/` di progetto è comunque tutto-o-niente - una volta
+Una cartella `.theme/` di progetto è comunque tutto-o-niente - una volta
 che BxSites ne trova una, viene usata al posto del tema integrato per
 intero, quindi necessita comunque del proprio `layout.bxm` + `page.bxm`
 anche se l'unica cosa cambiata è `assets/style.css` (una cartella priva
@@ -567,8 +576,8 @@ ricadere silenziosamente su un altro tema). Per una modifica solo CSS
 senza `.bxm`, usa
 [`extraCss`](#personalizzare-i-colori-senza-sovrascrivere-un-tema) come
 sopra invece - si sovrappone a qualunque tema `bxsites.yaml` nomini,
-senza alcuna cartella `theme/` coinvolta. `theme/` serve per quando devi
-anche cambiare il markup stesso, argomento trattato di seguito.
+senza alcuna cartella `.theme/` coinvolta. `.theme/` serve per quando
+devi anche cambiare il markup stesso, argomento trattato di seguito.
 
 ## Scrivere un tema da zero
 
@@ -576,12 +585,14 @@ Un tema necessita solo dei due file obbligatori, quindi ecco un esempio
 davvero minimale - niente Bootstrap/Tailwind, niente modalità scura,
 niente UI di ricerca - per mostrare esattamente cosa è richiesto rispetto
 a cosa aggiungono in più i temi integrati. Salva entrambi come
-`theme/layout.bxm` e `theme/page.bxm` nel tuo progetto - una cartella
-`theme/` a livello di progetto viene recepita automaticamente (come
-sopra), nessuna modifica a `bxsites.yaml` necessaria:
+`docs/.theme/layout.bxm` e `docs/.theme/page.bxm` nel tuo progetto
+(oppure sotto qualunque content root risolva il tuo `source`) - una
+cartella `.theme/` a livello di content root viene recepita
+automaticamente (come sopra), nessuna modifica a `bxsites.yaml`
+necessaria:
 
-```bx title="theme/layout.bxm" linenums="1"
-<!-- theme/layout.bxm -->
+```bx title="docs/.theme/layout.bxm" linenums="1"
+<!-- docs/.theme/layout.bxm -->
 <bx:script>
 	function renderNav( required array nodes ) {
 		var html = "<ul>"
@@ -619,8 +630,8 @@ sopra), nessuna modifica a `bxsites.yaml` necessaria:
 </bx:output>
 ```
 
-```bx title="theme/page.bxm" linenums="1"
-<!-- theme/page.bxm -->
+```bx title="docs/.theme/page.bxm" linenums="1"
+<!-- docs/.theme/page.bxm -->
 <bx:output>
 <article>
 	<h1>#encodeForHTML( variables.page.title )#</h1>

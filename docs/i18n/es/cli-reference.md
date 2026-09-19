@@ -331,8 +331,8 @@ Una verificación puntual de salud de entorno/configuración - el verbo
 que `docs/` exista, que `bxsites.yaml`/`.json` realmente analice y valide,
 que los módulos de BoxLang requeridos (`bx-markdown`, `bx-esapi`,
 `bx-yaml`, `bx-image`) estén instalados y activados, y - si existe una
-sobrescritura `theme/` a nivel de proyecto - que satisfaga el contrato de
-los dos archivos obligatorios `layout.bxm`/`page.bxm`.
+sobrescritura `.theme/` en la raíz de contenido - que satisfaga el
+contrato de los dos archivos obligatorios `layout.bxm`/`page.bxm`.
 
 ```bash frame="terminal" title="Terminal"
 bxSites doctor
@@ -448,8 +448,10 @@ activarlo (instalar por sí solo nunca activa un plugin - consulta
 
 ## `theme:new`
 
-Extrae uno de los temas incorporados a la propia carpeta `theme/` del
-proyecto para personalizarlo, siguiendo el flujo de trabajo de extracción
+Extrae uno de los temas incorporados a la propia carpeta `.theme/` del
+proyecto, dentro de la raíz de contenido (consulta
+[Origen del Contenido](guides/content-source.md#dónde-vive-una-sobrescritura-de-tema)),
+para personalizarlo - siguiendo el flujo de trabajo de extracción
 `--theme` de mkdocs.
 
 ```bash title="Uso"
@@ -458,15 +460,15 @@ bxSites theme:new --theme=material
 
 - `--theme` (obligatorio) - `bootstrap`, `material`, `tailwind`, `docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook` o `notion` - consulta [Temas](guides/themes.md#incorporados)
 
-Falla en lugar de sobrescribir un `theme/` existente. Consulta
+Falla en lugar de sobrescribir un `.theme/` existente. Consulta
 [Temas](guides/themes.md) para el contrato de sobrescritura (`layout.bxm`
 + `page.bxm`).
 
 ## `install:theme`
 
-Descarga un tema publicado desde ForgeBox al propio `themes/<name>/` del
-proyecto - nada más que el binario `bxSites` necesario, igual que
-`install:plugin`.
+Descarga un tema publicado desde ForgeBox al propio `.themes/<name>/`
+del proyecto, dentro de la raíz de contenido - nada más que el binario
+`bxSites` necesario, igual que `install:plugin`.
 
 ```bash title="Uso"
 bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
@@ -486,8 +488,8 @@ instalado para usarlo - consulta
 
 Conversión de mejor esfuerzo de un tema del ecosistema de otro generador
 de sitios estáticos (`mkdocs`/`jekyll`/`hugo`) en un scaffold de tema
-bx-sites bajo `themes/<name>/` - un punto de partida, no una migración
-sin pérdidas en un solo comando.
+bx-sites bajo `.themes/<name>/`, dentro de la raíz de contenido - un
+punto de partida, no una migración sin pérdidas en un solo comando.
 
 ```bash title="Uso"
 bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
@@ -495,7 +497,7 @@ bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-th
 
 - `--source` (obligatorio) - `mkdocs`, `jekyll` o `hugo`
 - `--path` (obligatorio) - la propia carpeta raíz del tema de origen
-- `--name` (obligatorio) - el nombre de destino, escrito en `themes/<name>/`
+- `--name` (obligatorio) - el nombre de destino, escrito en `.themes/<name>/`
 
 Seguro de volver a ejecutar contra el mismo `--name` - `layout.bxm`/
 `page.bxm` se sobrescriben y cualquier carpeta de recursos recién

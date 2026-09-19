@@ -264,9 +264,9 @@ Sites solo comprueba los tres proveedores de arriba). No hay ningún hook
 de plugin para esto - los temas incorporados simplemente no renderizan
 nada para un nombre de proveedor no reconocido, y conectar un cuarto
 servicio de búsqueda (Meilisearch, Typesense, etc.) es una
-[sobrescritura de tema](themes.md#sobrescribir-un-tema) a nivel de
-proyecto: copia un tema incorporado en el propio `theme/` de tu proyecto
-y añade el marcado/scripts de tu proveedor a su `layout.bxm`/
+[sobrescritura de tema](themes.md#sobrescribir-un-tema) en la raíz de
+contenido: copia un tema incorporado en el propio `.theme/` de tu
+proyecto y añade el marcado/scripts de tu proveedor a su `layout.bxm`/
 `search.bxm`, leyendo `siteConfig.searchProvider` para decidir cuándo
 renderizarlos - ramas `searchProviderName eq "..."` para el punto de
 montaje en `search.bxm`, ramas equivalentes en `layout.bxm` para su

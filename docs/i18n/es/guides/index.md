@@ -6,6 +6,8 @@ icon: phosphor-duotone:book-open
 
 # Guías
 
+- [Origen del Contenido](content-source.md) - dónde busca bxSites tu contenido, `source`/`exclude`, y dónde vive una sobrescritura de tema
+- [Monorepos Multi-Dominio](multi-domain.md) - ejecuta varios sitios independientes desde un solo repositorio git
 - [Temas](themes.md) - los temas incorporados y cómo escribir el tuyo propio
 - [Iconos](icons.md) - un emoji, o un icono con nombre de una de las ocho bibliotecas incluidas, en cualquier página/entrada de navegación
 - [Búsqueda](search.md) - cómo funciona el índice de búsqueda estático

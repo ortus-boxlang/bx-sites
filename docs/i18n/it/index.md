@@ -24,7 +24,10 @@ cosa tu possa scrivere in Markdown si compila allo stesso modo,
 attraverso gli stessi temi, la stessa ricerca e la stessa i18n. I
 contenuti vivono in `docs/` per impostazione predefinita, o in `src/` se
 il tuo progetto assomiglia più a un sito web che a "docs" - ogni comando
-funziona allo stesso modo in entrambi i casi.
+funziona allo stesso modo in entrambi i casi. Dove vive davvero il
+contenuto è a sua volta configurabile - qualsiasi nome di cartella, o
+l'intero repository senza alcuna sottocartella - vedi
+[Origine del contenuto](guides/content-source.md).
 
 ::: cards
 ::: card title="Markdown in ingresso, HTML statico in uscita" icon="phosphor-duotone:file-html"
