@@ -22,6 +22,8 @@ luego `bxsites.yml`, luego `bxsites.json`.
     name: "My Docs"
     description: ""
     baseURL: "/"
+    source: docs
+    exclude: []
     theme:
       name: bootstrap
       options: {}
@@ -66,6 +68,8 @@ luego `bxsites.yml`, luego `bxsites.json`.
     	"name": "My Docs",
     	"description": "",
     	"baseURL": "/",
+    	"source": "docs",
+    	"exclude": [],
     	"theme": {
     		"name": "bootstrap",
     		"options": {},
@@ -115,6 +119,8 @@ luego `bxsites.yml`, luego `bxsites.json`.
     name = "My Docs"
     description = ""
     baseURL = "/"
+    source = "docs"
+    exclude = []
     search = true
     mcp = false
     nav = []
@@ -189,6 +195,34 @@ etiqueta `<link rel="canonical">` de cada página.
 `llms.txt` (consulta [más abajo](#llmstxt)) siempre se escribe; simplemente
 prefiere una URL absoluta cuando `baseURL` la proporciona.
 
+## `source`
+
+Qué carpeta contiene el contenido de este proyecto - `docs`, `src`,
+cualquier nombre de carpeta personalizado, o `.` (todo el repositorio es
+el contenido, sin ninguna subcarpeta). Si se deja sin establecer, se
+autodetectan `docs/` y luego `src/`; si tampoco existe ninguna de las dos
+en disco, la construcción falla de forma explícita en lugar de adivinar.
+`bxSites new` siempre lo escribe de forma explícita, así que un proyecto
+recién generado nunca es ambiguo. Consulta
+[Origen del Contenido](guides/content-source.md) para el panorama
+completo, incluyendo las sobrescrituras `.theme`/`.themes` que viven
+dentro de esta carpeta, y la guía
+[Monorepos Multi-Dominio](guides/multi-domain.md) para ejecutar varias
+raíces de proyecto independientes desde un solo repositorio.
+
+## `exclude`
+
+Nombres adicionales de archivos/carpetas a dejar fuera de la
+construcción, además de los tradicionales que bxSites siempre excluye
+(`.git`, `.github`, `node_modules`, `boxlang_modules`, `site`, `.theme`,
+`.themes`, y el propio archivo de configuración de este proyecto).
+Coincide de la misma forma - un nombre simple en la raíz de `source`, o
+un nombre en cualquier lugar debajo de ella mediante un segmento de ruta
+sin `/` inicial. Útil sobre todo con `source: .`, para mantener fuera
+carpetas o archivos de herramientas que no forman parte de tus
+exclusiones tradicionales cercanas a `README.md` y que de otro modo
+serían recogidos como páginas.
+
 ## `llms.txt`
 
 Cada construcción escribe un `llms.txt` en la raíz del sitio - un índice
@@ -246,7 +280,7 @@ cual, byte a byte, en lugar del generado, en cada construcción - la clave
 
 - `theme.name` - uno de los temas incorporados (`bootstrap`, `material`,
   `tailwind`), o el nombre de un tema personalizado que proporciones
-  mediante una carpeta `theme/` en la raíz del proyecto (consulta
+  mediante una carpeta `.theme/` dentro de la raíz de contenido (consulta
   [Temas](guides/themes.md))
 - `theme.logo` - ruta/URL a una imagen mostrada junto al nombre del sitio
   en la marca de la cabecera (en lugar del glifo "⚡" por defecto) - una
@@ -362,7 +396,7 @@ Qué interfaz de búsqueda conecta `search: true`:
   [Algolia DocSearch](guides/search.md#algolia), y `"pagefind"` conecta
   [Pagefind](guides/search.md#pagefind). Cualquier otro valor es un
   proveedor personalizado propio de un proyecto, conectado mediante una
-  sobrescritura `theme/` - consulta
+  sobrescritura `.theme/` - consulta
   [Búsqueda](guides/search.md#otros-proveedores-de-búsqueda).
 - `algolia` - obligatorio cuando `provider` es `"algolia"`: `appId`,
   `apiKey` (la clave API pública *solo de búsqueda*, no una clave de

@@ -135,7 +135,11 @@ automatisch zu Navigationsverschachtelung:
     `lint`, `page:new`, ...) sucht zuerst nach `docs/` und weicht auf
     `src/` aus, falls das tatsächlich existiert. Das Build-Ergebnis landet
     in jedem Fall in `site/` - beide kollidieren nie, da `site/` selbst
-    niemals ein gültiger Name für den Quellordner ist.
+    niemals ein gültiger Name für den Quellordner ist. Dieser Ordner ist
+    selbst konfigurierbar - ein eigener Name, oder das gesamte Repository
+    ohne jeden Unterordner - über den Schlüssel `source` in
+    `bxsites.yaml`; siehe [Content-Quelle](guides/content-source.md) für
+    das vollständige Bild.
 
 ```text title="docs/ → nav"
 docs/
@@ -262,8 +266,8 @@ bxSites serve
 
 Baut das Projekt, liefert `site/` unter `http://127.0.0.1:8080/` aus und
 baut automatisch neu, sobald du eine Änderung unter `docs/`, deiner
-`bxsites.yaml`/`.json`-Website-Konfiguration oder einem projektweiten
-`theme/`-Override speicherst - dein Browser lädt von selbst neu. Übergib `--port=3000` oder `--host=0.0.0.0`, um zu ändern,
+`bxsites.yaml`/`.json`-Website-Konfiguration oder einem `.theme/`-Override
+im Content-Root speicherst - dein Browser lädt von selbst neu. Übergib `--port=3000` oder `--host=0.0.0.0`, um zu ändern,
 woran gebunden wird.
 
 ## Clean

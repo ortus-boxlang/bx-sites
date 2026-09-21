@@ -177,12 +177,12 @@ loop belongs:
 
 ### In a theme override
 
-Once a project has a `theme/` override (see
+Once a project has a `.theme/` override (see
 [Themes](themes.md#overriding-a-theme)), `data` is bound bare into
 `layout.bxm`/`page.bxm` the same way `page`/`siteConfig` already are - no
 `{{ }}`, just real BoxLang:
 
-```bx title="theme/layout.bxm (excerpt)"
+```bx title=".theme/layout.bxm (excerpt)"
 <ul class="footer-sponsors">
 <bx:loop array="#data.sponsors#" index="sponsor">
 	<li>#encodeForHTML( sponsor )#</li>

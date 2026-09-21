@@ -92,7 +92,7 @@ progetto usa `src/` - vedi [Per iniziare](../getting-started.md)) - un
 semplice script BoxLang. Ogni funzione che nomini con un `$` iniziale
 diventa una *funzione magica*: richiamabile da `{{ }}` nel Markdown, e
 richiamabile allo stato puro, direttamente, dalle sovrascritture `.bxm`
-del proprio [`theme/`](themes.md#sovrascrivere-un-tema) di un progetto.
+del proprio [`.theme/`](themes.md#sovrascrivere-un-tema) di un progetto.
 
 ```bx title="docs/functions.bxs" linenums="1"
 function $shout( text ) {
@@ -146,11 +146,11 @@ function $price( amount ) {
 ### Richiamare una funzione magica da una sovrascrittura di tema
 
 Poiché una funzione magica viene collegata direttamente nello scope del
-template, il proprio `theme/page.bxm` (o `layout.bxm`) di un progetto può
+template, il proprio `.theme/page.bxm` (o `layout.bxm`) di un progetto può
 richiamarla allo stato puro, senza alcun prefisso - esattamente come già
 legge `variables.page`/`variables.siteConfig`:
 
-```bx title="theme/page.bxm (excerpt)"
+```bx title=".theme/page.bxm (excerpt)"
 <p class="build-banner">#$shout( 'built with boxlang' )#</p>
 ```
 
@@ -351,7 +351,7 @@ rotta.
 
 ## Nomi riservati
 
-Una sovrascrittura `theme/page.bxm`/`layout.bxm` che richiama una
+Una sovrascrittura `.theme/page.bxm`/`layout.bxm` che richiama una
 funzione magica allo stato puro (`$name(...)`) funziona perché ogni
 funzione caricata - con prefisso `$` o helper privato indifferentemente -
 viene collegata direttamente nello stesso scope di rendering di quel

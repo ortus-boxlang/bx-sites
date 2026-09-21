@@ -181,12 +181,12 @@ Hay tres formas de hacerlo, según a dónde pertenezca el bucle:
 
 ### En una sobrescritura de tema
 
-Una vez que un proyecto tiene una sobrescritura `theme/` (consulta
+Una vez que un proyecto tiene una sobrescritura `.theme/` (consulta
 [Temas](themes.md#sobrescribir-un-tema)), `data` se enlaza sin prefijo en
 `layout.bxm`/`page.bxm` de la misma forma en que ya lo hacen
 `page`/`siteConfig` - sin `{{ }}`, solo BoxLang real:
 
-```bx title="theme/layout.bxm (excerpt)"
+```bx title=".theme/layout.bxm (excerpt)"
 <ul class="footer-sponsors">
 <bx:loop array="#data.sponsors#" index="sponsor">
 	<li>#encodeForHTML( sponsor )#</li>

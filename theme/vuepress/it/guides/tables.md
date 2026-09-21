@@ -120,7 +120,7 @@ limita le tabelle alte (oltre una `max-height`) a un'altezza fissa con una
 propria barra di scorrimento verticale, con la riga di intestazione
 fissata mentre il corpo scorre sotto di essa - una tabella corta come
 quelle qui sopra non sviluppa mai una barra di scorrimento, dato che ci
-sta già. Una sovrascrittura personalizzata in `theme/` può ridefinire lo
+sta già. Una sovrascrittura personalizzata in `.theme/` può ridefinire lo
 stile di `.bxsites-table-wrap` (in particolare la sua `max-height`), come
 qualsiasi altra classe CSS.
 
@@ -160,7 +160,7 @@ Mantieni `--bxsites-table-stripe-bg`/`-hover-bg` come colori alfa: sono
 disegnati sopra ciò che imposta `--bxsites-table-bg`, quindi un valore
 opaco copre la superficie della card invece di tingerla. Tutto ciò che va
 oltre il colore - il padding, il raggio degli angoli, le etichette
-maiuscole dell'intestazione - è un vero override `theme/`, esattamente
+maiuscole dell'intestazione - è un vero override `.theme/`, esattamente
 come qualsiasi altro CSS in un tema.
 
 ## Oltre i dati semplici

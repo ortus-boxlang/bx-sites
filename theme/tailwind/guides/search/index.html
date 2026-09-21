@@ -379,30 +379,30 @@ validate it:</li>
 <ol start="2">
 <li>
 <p><strong>Eject a theme to customize</strong> - <code>bxSites theme:new --theme=bootstrap</code>
-copies the built-in <code>bootstrap</code> theme into your project's own <code>theme/</code>
-folder (see <a href="/theme/tailwind/guides/themes/index.html#overriding-a-theme">Overriding a theme</a>);
+copies the built-in <code>bootstrap</code> theme into your project's own <code>.theme/</code>
+folder, inside your content root (see <a href="/theme/tailwind/guides/themes/index.html#overriding-a-theme">Overriding a theme</a>);
 project-theme-wins resolution means bx-sites now renders through your
 copy instead of the built-in one.</p>
 </li>
 <li>
-<p><strong>Add the mount point</strong> - <code>theme/search.bxm</code> already branches on
+<p><strong>Add the mount point</strong> - <code>.theme/search.bxm</code> already branches on
 <code>variables.searchProviderName</code> for <code>local</code>/<code>algolia</code>/<code>pagefind</code>; add
 your own branch the same way:</p>
 </li>
 </ol>
-<pre data-bxsites-title="theme&#x2f;search.bxm"><code class="language-html">   &lt;bx:if variables.searchProviderName eq 'meilisearch'&gt;
+<pre data-bxsites-title=".theme&#x2f;search.bxm"><code class="language-html">   &lt;bx:if variables.searchProviderName eq 'meilisearch'&gt;
        &lt;div id=&quot;bxsites-search-meilisearch&quot;&gt;&lt;/div&gt;
    &lt;/bx:if&gt;
 </code></pre>
 <ol start="4">
-<li><strong>Load the client and wire it up</strong> - <code>theme/layout.bxm</code> already has a
+<li><strong>Load the client and wire it up</strong> - <code>.theme/layout.bxm</code> already has a
 <code>&lt;bx:if variables.searchEnabled and variables.searchProviderName eq 'algolia'&gt;</code>
 block loading DocSearch's CSS/JS and calling <code>docsearch({...})</code>; add the
 equivalent for Meilisearch's own
 <a href="https://github.com/meilisearch/meilisearch-docsearch">instant-meilisearch</a>
 widget, reading your own config block back out of <code>siteConfig</code>:</li>
 </ol>
-<pre data-bxsites-title="theme&#x2f;layout.bxm"><code class="language-html">   &lt;bx:if variables.searchEnabled and variables.searchProviderName eq 'meilisearch'&gt;
+<pre data-bxsites-title=".theme&#x2f;layout.bxm"><code class="language-html">   &lt;bx:if variables.searchEnabled and variables.searchProviderName eq 'meilisearch'&gt;
        &lt;script src=&quot;https://cdn.jsdelivr.net/npm/@meilisearch/instant-meilisearch/dist/instant-meilisearch.umd.min.js&quot;&gt;&lt;/script&gt;
        &lt;script&gt;
            document.addEventListener( &quot;DOMContentLoaded&quot;, function () {
@@ -437,7 +437,7 @@ more branch alongside them, entirely in project-owned files.</p>
 
 				</div>
 
-	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Sep 21, 2026, 12&#x3a;32&#x3a;59 PM</span></div>
+	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/search.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/guides/search.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Sep 21, 2026, 5&#x3a;00&#x3a;33 PM</span></div>
 
 			</article>
 

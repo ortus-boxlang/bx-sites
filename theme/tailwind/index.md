@@ -33,7 +33,10 @@ BxSites isn't only for reference documentation - it's a general-purpose
 product site, a personal site: anything you can write in Markdown builds
 the same way, through the same themes, search, and i18n. Content lives in
 `docs/` by default, or `src/` for a project that reads more like a website
-than "docs" - every command works the same either way.
+than "docs" - every command works the same either way. Where content
+actually lives is itself configurable, too - any folder name, or the
+whole repository with no subfolder at all - see
+[Content Source](guides/content-source.md).
 
 ::: cards
 ::: card title="Markdown in, static HTML out" icon="phosphor-duotone:file-html"

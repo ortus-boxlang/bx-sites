@@ -143,10 +143,11 @@ Ein Theme importieren</h1>
 					<h1 id="ein-theme-importieren"><a href="#ein-theme-importieren" id="ein-theme-importieren" name="ein-theme-importieren" class="anchor"></a>Ein Theme importieren</h1>
 <p><code>bxSites theme:import</code> wandelt ein Theme aus dem Ökosystem eines anderen
 statischen Site-Generators in ein bx-sites-Theme-Gerüst unter
-<code>themes/&lt;name&gt;/</code> um - ein bestmöglicher Ausgangspunkt, kein
-verlustfreier Ein-Befehl-Port. Es deckt die drei Ökosysteme ab, deren
-Theme-Struktur auf den eigenen <code>layout.bxm</code>+<code>page.bxm</code>-Vertrag von
-bx-sites abbildbar ist (siehe
+<code>.themes/&lt;name&gt;/</code> innerhalb des Content-Root des Projekts um (siehe
+<a href="/theme/tailwind/de/guides/content-source/index.html#wo-eine-theme-überschreibung-lebt">Content-Quelle</a>) -
+ein bestmöglicher Ausgangspunkt, kein verlustfreier Ein-Befehl-Port. Es
+deckt die drei Ökosysteme ab, deren Theme-Struktur auf den eigenen
+<code>layout.bxm</code>+<code>page.bxm</code>-Vertrag von bx-sites abbildbar ist (siehe
 <a href="/theme/tailwind/de/guides/themes/index.html#der-themeprovider-vertrag">Themes</a>):</p>
 <ul>
 <li><strong><code>mkdocs</code></strong> - Jinja2-Templates (natives mkdocs und mkdocs-material
@@ -176,7 +177,7 @@ hugo-<em>Projekt</em> - siehe
 des <em>Inhalts</em> eines Projekts, eine andere Aufgabe als die Konvertierung
 seines <em>Themes</em>)</li>
 <li><code>--name</code> (erforderlich) - der Zielname, geschrieben nach
-<code>themes/&lt;name&gt;/</code> (dieselbe
+<code>.themes/&lt;name&gt;/</code> innerhalb des Content-Root (dieselbe
 <a href="/theme/tailwind/de/guides/themes/index.html#ein-veröffentlichtes-theme-installieren">Installiertes-Theme-Konvention</a>,
 die <code>install:theme</code> verwendet) - setze <code>theme.name</code> in <code>bxsites.yaml</code>
 darauf, sobald du mit dem Ergebnis zufrieden bist</li>
@@ -191,7 +192,7 @@ Einmal-Vorgang.</p>
 Quelldatei zu <code>layout.bxm</code>/<code>page.bxm</code> wurde (oder einen Hinweis, dass
 keine gefunden wurde, falls das Quell-Theme keinen der oben genannten
 konventionellen Dateinamen verwendet), welche Asset-Ordner (<code>css/</code>,
-<code>js/</code>, <code>static/</code>, ...) unverändert nach <code>themes/&lt;name&gt;/assets/</code> kopiert
+<code>js/</code>, <code>static/</code>, ...) unverändert nach <code>.themes/&lt;name&gt;/assets/</code> kopiert
 wurden, und eine nummerierte Liste von allem, was einen manuellen Blick
 braucht.</p>
 <p>Innerhalb einer Template-Datei ist dies ein <strong>mechanischer,
@@ -270,7 +271,7 @@ und braucht dieselbe Überprüfung.</p>
 
 				</div>
 
-	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/theme-import.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/de/guides/theme-import.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Sep 21, 2026, 12&#x3a;32&#x3a;59 PM</span></div>
+	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/theme-import.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/de/guides/theme-import.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Sep 21, 2026, 5&#x3a;00&#x3a;33 PM</span></div>
 
 			</article>
 

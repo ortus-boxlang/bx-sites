@@ -168,9 +168,9 @@ resuelve la mayoría de los problemas de esta página de un solo golpe:</p>
 <p>Verifica la versión de la JVM, que <code>docs/</code> (o <code>src/</code>) exista, que
 <code>bxsites.yaml</code>/<code>.json</code> realmente se pueda parsear y validar, que los
 módulos de BoxLang requeridos estén instalados y activados, y - si existe
-un override de <code>theme/</code> a nivel de proyecto - que cumpla el contrato del
-tema. Termina con código <code>1</code> si alguna verificación falla e imprime qué
-está mal; nada de esto modifica tu proyecto.</p>
+un override de <code>.theme/</code> en la raíz de contenido - que cumpla el
+contrato del tema. Termina con código <code>1</code> si alguna verificación falla e
+imprime qué está mal; nada de esto modifica tu proyecto.</p>
 <h2 id="problemas-comunes"><a href="#problemas-comunes" id="problemas-comunes" name="problemas-comunes" class="anchor"></a>Problemas comunes</h2>
 <div class="adm-block adm-bug adm-collapsed">
 <div class="adm-heading">
@@ -214,11 +214,13 @@ el módulo se registró a mano sin sus dependencias. Volver a ejecutar
 </div>
 <div class="adm-block adm-bug adm-collapsed">
 <div class="adm-heading">
-<svg class="adm-icon"><use xlink:href="#adm-bug" /></svg><span>Un override de `theme/` del proyecto falla al construir</span>
+<svg class="adm-icon"><use xlink:href="#adm-bug" /></svg><span>Un override de `.theme/` del proyecto falla al construir</span>
 </div>
 <div class="adm-body">
-<p>Una carpeta <code>theme/</code> personalizada debe proporcionar tanto
-<code>layout.bxm</code> como <code>page.bxm</code> - <code>doctor</code> indica cuál falta. Consulta
+<p>Una carpeta <code>.theme/</code> personalizada (que vive dentro de tu raíz de
+contenido - <code>docs/</code>, <code>src/</code>, o donde sea que resuelva <code>source</code>, no en
+la raíz misma del proyecto) debe proporcionar tanto <code>layout.bxm</code> como
+<code>page.bxm</code> - <code>doctor</code> indica cuál falta. Consulta
 <a href="/theme/material/es/guides/themes/index.html">Temas</a> para el contrato completo, o ejecuta
 <code>bxSites theme:new</code> para exportar un tema integrado como punto de
 partida funcional en lugar de escribir uno desde cero.</p>
@@ -230,7 +232,7 @@ partida funcional en lugar de escribir uno desde cero.</p>
 </div>
 <div class="adm-body">
 <p><code>serve</code> observa <code>docs/</code>, tu <code>bxsites.yaml</code>/<code>.json</code>, y un override de
-<code>theme/</code> a nivel de proyecto - un cambio en cualquier otro lugar (por
+<code>.theme/</code> en la raíz de contenido - un cambio en cualquier otro lugar (por
 ejemplo, editar un archivo bajo <code>resources/</code> en un checkout de
 módulo, no en un proyecto real) no dispara una reconstrucción. Si un
 cambio real no se refleja, detén <code>serve</code>, ejecuta <code>bxSites clean</code>
@@ -292,7 +294,7 @@ Solutions ofrece soporte profesional y consultoría.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/troubleshooting.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/material/es/troubleshooting.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Sep 21, 2026, 12&#x3a;32&#x3a;59 PM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/troubleshooting.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/material/es/troubleshooting.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Sep 21, 2026, 5&#x3a;00&#x3a;33 PM</span></div>
 
 			</article>
 

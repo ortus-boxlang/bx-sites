@@ -267,8 +267,8 @@ rendern für einen nicht erkannten Providernamen einfach nichts, und das
 Verdrahten eines vierten Suchdienstes (Meilisearch, Typesense usw.) ist
 ein projektweites
 [Theme-Override](themes.md#ein-theme-überschreiben): kopiere ein
-integriertes Theme in den eigenen `theme/`-Ordner deines Projekts und
-füge das Markup/die Skripte deines Providers zu dessen
+integriertes Theme in den eigenen `.theme/`-Ordner deines Projekts,
+innerhalb deines Content-Root, und füge das Markup/die Skripte deines Providers zu dessen
 `layout.bxm`/`search.bxm` hinzu, wobei du `siteConfig.searchProvider`
 ausliest, um zu entscheiden, wann sie gerendert werden -
 `searchProviderName eq "..."`-Verzweigungen für den Mount-Punkt in

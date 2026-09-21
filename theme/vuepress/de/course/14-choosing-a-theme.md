@@ -37,8 +37,8 @@ single theme file.
 ## Overriding or writing your own
 
 For real structural changes, a project can override individual files
-from its own `theme/` folder - `theme/page.bxm`, `theme/layout.bxm`, or
-just `theme/assets/style.css` - without forking the whole theme; bx-sites
+from its own `.theme/` folder (inside its content root) - `.theme/page.bxm`, `.theme/layout.bxm`, or
+just `.theme/assets/style.css` - without forking the whole theme; bx-sites
 falls back to the built-in theme's own file for anything not overridden.
 A theme is a small, documented contract (a `ThemeProvider`) - writing one
 completely from scratch is also fully supported.

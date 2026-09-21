@@ -180,12 +180,12 @@ farlo, a seconda di dove appartiene il loop:
 
 ### In una sovrascrittura di tema
 
-Una volta che un progetto ha una sovrascrittura `theme/` (vedi
+Una volta che un progetto ha una sovrascrittura `.theme/` (vedi
 [Temi](themes.md#overriding-a-theme)), `data` viene collegata allo stato
 puro in `layout.bxm`/`page.bxm` allo stesso modo in cui lo sono già
 `page`/`siteConfig` - nessun `{{ }}`, solo vero BoxLang:
 
-```bx title="theme/layout.bxm (excerpt)"
+```bx title=".theme/layout.bxm (excerpt)"
 <ul class="footer-sponsors">
 <bx:loop array="#data.sponsors#" index="sponsor">
 	<li>#encodeForHTML( sponsor )#</li>

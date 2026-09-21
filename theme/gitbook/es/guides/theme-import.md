@@ -8,7 +8,9 @@ tags: [guías, temas, migración]
 # Importar un tema
 
 `bxSites theme:import` convierte un tema del ecosistema de otro generador
-de sitios estáticos en un scaffold de tema bx-sites bajo `themes/<name>/`
+de sitios estáticos en un scaffold de tema bx-sites bajo
+`.themes/<name>/` dentro de la raíz de contenido del proyecto (consulta
+[Origen del Contenido](content-source.md#dónde-vive-una-sobrescritura-de-tema))
 - un punto de partida de mejor esfuerzo, no una migración sin pérdidas en
 un solo comando. Maneja los tres ecosistemas cuya estructura de tema se
 corresponde con el propio contrato `layout.bxm`+`page.bxm` de bx-sites
@@ -41,7 +43,7 @@ bxSites theme:import --source=mkdocs --path=/path/to/mkdocs-theme --name=my-impo
   [Migrar desde GitBook](migrating-from-gitbook.md) para convertir el
   *contenido* de un proyecto, una tarea distinta de convertir su *tema*)
 - `--name` (obligatorio) - el nombre de destino, escrito en
-  `themes/<name>/` (la misma
+  `.themes/<name>/` dentro de la raíz de contenido (la misma
   [convención de tema instalado](themes.md#instalar-un-tema-publicado)
   que usa `install:theme`) - establece el `theme.name` de
   `bxsites.yaml` una vez que estés satisfecho con el resultado
@@ -58,7 +60,7 @@ La salida del comando informa exactamente qué ocurrió - qué archivo de
 origen se convirtió en `layout.bxm`/`page.bxm` (o una nota indicando que
 no se encontró ninguno, si el tema de origen no usa uno de los nombres de
 archivo convencionales de arriba), qué carpetas de recursos (`css/`,
-`js/`, `static/`, ...) se copiaron tal cual en `themes/<name>/assets/`, y
+`js/`, `static/`, ...) se copiaron tal cual en `.themes/<name>/assets/`, y
 una lista numerada de todo lo que necesita revisión manual.
 
 Dentro de un archivo de plantilla, esto es un **traductor mecánico de

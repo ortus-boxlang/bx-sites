@@ -181,12 +181,12 @@ drei Wege, je nachdem, wo die Schleife hingehört:
 
 ### In einem Theme-Override
 
-Sobald ein Projekt ein `theme/`-Override hat (siehe
+Sobald ein Projekt ein `.theme/`-Override hat (siehe
 [Themes](themes.md#ein-theme-überschreiben)), wird `data` auf dieselbe
 Weise bar in `layout.bxm`/`page.bxm` eingebunden, wie es `page`/
 `siteConfig` bereits sind - kein `{{ }}`, nur echtes BoxLang:
 
-```bx title="theme/layout.bxm (excerpt)"
+```bx title=".theme/layout.bxm (excerpt)"
 <ul class="footer-sponsors">
 <bx:loop array="#data.sponsors#" index="sponsor">
 	<li>#encodeForHTML( sponsor )#</li>

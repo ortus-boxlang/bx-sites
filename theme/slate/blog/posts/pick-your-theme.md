@@ -81,8 +81,8 @@ For a color or font tweak, you don't need to fork a whole theme. Every built-in 
 
 ## When you need real control
 
-If you need to change actual markup - not just color - copy a built-in theme's `layout.bxm`/`page.bxm`/`assets/` into a project-level `theme/` folder. BxSites always prefers a project `theme/` override over the built-in one, as long as it satisfies the two required files (`layout.bxm` and `page.bxm`). It's genuinely the same files the built-in themes ship, just sitting in your own project where you can edit them freely.
+If you need to change actual markup - not just color - copy a built-in theme's `layout.bxm`/`page.bxm`/`assets/` into a project-level `.theme/` folder, inside your content root. BxSites always prefers a project `.theme/` override over the built-in one, as long as it satisfies the two required files (`layout.bxm` and `page.bxm`). It's genuinely the same files the built-in themes ship, just sitting in your own project where you can edit them freely.
 
 I still default new projects to `bootstrap` almost every time - it's a safe, familiar baseline - but `material`'s card layout is a great fit for API-reference-heavy docs, and I've reached for `tailwind` more than once on smaller marketing-adjacent sites where I wanted full utility-class control. Since the gallery grew, I've also been reaching for `slate` on anything that wants a permanently-dark sidebar without fighting the light/dark toggle, and `gitbook` when a project's tone is closer to a book than a reference manual.
 
-Which theme did you land on for your own project, and did you end up touching `extraCss`, or a full `theme/` override?
+Which theme did you land on for your own project, and did you end up touching `extraCss`, or a full `.theme/` override?

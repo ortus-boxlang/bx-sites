@@ -6,6 +6,8 @@ icon: phosphor-duotone:book-open
 
 # Guides
 
+- [Content Source](content-source.md) - where bxSites looks for your content, `source`/`exclude`, and where a theme override lives
+- [Multi-Domain Monorepos](multi-domain.md) - running several independent sites out of one git repository
 - [Themes](themes.md) - the built-in themes, and how to write your own
 - [Icons](icons.md) - emoji, or a named icon from one of eight bundled libraries, on any page/nav entry
 - [Search](search.md) - how the static search index works

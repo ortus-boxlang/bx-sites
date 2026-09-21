@@ -21,6 +21,8 @@ somehow has more than one, `bxsites.yaml` wins, then `bxsites.yml`, then
     name: "My Docs"
     description: ""
     baseURL: "/"
+    source: docs
+    exclude: []
     theme:
       name: bootstrap
       options: {}
@@ -69,6 +71,8 @@ somehow has more than one, `bxsites.yaml` wins, then `bxsites.yml`, then
     	"name": "My Docs",
     	"description": "",
     	"baseURL": "/",
+    	"source": "docs",
+    	"exclude": [],
     	"theme": {
     		"name": "bootstrap",
     		"options": {},
@@ -123,6 +127,8 @@ somehow has more than one, `bxsites.yaml` wins, then `bxsites.yml`, then
     name = "My Docs"
     description = ""
     baseURL = "/"
+    source = "docs"
+    exclude = []
     search = true
     mcp = false
     nav = []
@@ -191,6 +197,28 @@ doubles as the site's canonical URL for `sitemap.xml`, `robots.txt`,
 `llms.txt` (see [below](#llmstxt)) is always written; it just prefers an
 absolute URL when `baseURL` provides one.
 
+## `source`
+
+Which folder holds this project's content - `docs`, `src`, any custom folder
+name, or `.` (the whole repository is the content, no subfolder at all).
+Left unset, `docs/` then `src/` are auto-detected; if neither exists on disk
+either, the build fails loudly rather than guessing. `bxSites new` always
+writes this explicitly, so a scaffolded project is never ambiguous. See
+[Content Source](guides/content-source.md) for the full picture, including
+`.theme`/`.themes` overrides living inside this folder and the
+[Multi-Domain Monorepo](guides/multi-domain.md) guide for running several
+independent project roots out of one repository.
+
+## `exclude`
+
+Extra file/folder names to leave out of the build, on top of the traditional
+ones bxSites always excludes (`.git`, `.github`, `node_modules`,
+`boxlang_modules`, `site`, `.theme`, `.themes`, and this project's own config
+file). Matched the same way - a bare name at the root of `source`, or a
+name anywhere under it via a leading `/`-free path segment. Mostly useful
+with `source: .`, to keep tooling directories or files that aren't part of
+your `README.md`-adjacent traditional excludes from being swept up as pages.
+
 ## `llms.txt`
 
 Every build writes a `llms.txt` to the site root - a plain Markdown index of
@@ -245,8 +273,8 @@ build - the `robots` key above is ignored entirely once this file exists.
 ## `theme`
 
 - `theme.name` - one of the built-in themes (`bootstrap`, `material`,
-  `tailwind`), or the name of a custom theme you provide via a `theme/`
-  folder at the project root (see [Themes](guides/themes.md))
+  `tailwind`), or the name of a custom theme you provide via a `.theme/`
+  folder inside the content root (see [Themes](guides/themes.md))
 - `theme.logo` - path/URL to an image shown next to the site name in the
   header brand mark (in place of the default "⚡" glyph) - a relative path
   (e.g. `"assets/logo.svg"`, resolved against `docs/assets/`) is prefixed
@@ -434,7 +462,7 @@ Which search UI `search: true` wires up:
   `"algolia"` wires up [Algolia DocSearch](guides/search.md#algolia)
   instead, and `"pagefind"` wires up [Pagefind](guides/search.md#pagefind).
   Any other value is a project's own custom provider, wired up by a
-  `theme/` override - see [Search](guides/search.md#other-search-providers).
+  `.theme/` override - see [Search](guides/search.md#other-search-providers).
 - `algolia` - required when `provider` is `"algolia"`: `appId`, `apiKey`
   (the *search-only* public API key, not an admin key) and `indexName`,
   exactly as Algolia's own DocSearch client expects them. `insights`

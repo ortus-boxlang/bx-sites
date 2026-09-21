@@ -283,10 +283,11 @@ category on ForgeBox:</p>
 <pre data-bxsites-title="Usage"><code class="language-bash">bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
 </code></pre>
 <p>This downloads the package's zip and extracts it into
-<code>themes/bx-sites-theme-blog1/</code> at the project root, validating it
-satisfies the <code>ThemeProvider</code> contract below before finishing. A project
-can carry several installed themes side by side this way and switch
-between them purely by name:</p>
+<code>.themes/bx-sites-theme-blog1/</code> inside the project's content root (see
+<a href="/theme/tailwind/guides/content-source/index.html#where-a-theme-override-lives">Content Source</a>),
+validating it satisfies the <code>ThemeProvider</code> contract below before
+finishing. A project can carry several installed themes side by side
+this way and switch between them purely by name:</p>
 <div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { name: bx-sites-theme-blog1 }
 </code></pre>
 </div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;name&quot;: &quot;bx-sites-theme-blog1&quot; } }
@@ -303,7 +304,7 @@ plugin) - it's pure files, so there's no separate activation step the way
 <p>Starting from a theme built for a different static site generator
 instead? See <a href="/theme/tailwind/guides/theme-import/index.html">Importing a theme</a> - <code>theme:import</code>
 mechanically converts an mkdocs/jekyll/hugo theme's own template files
-into a best-effort <code>themes/&lt;name&gt;/</code> scaffold.</p>
+into a best-effort <code>.themes/&lt;name&gt;/</code> scaffold.</p>
 <h2 id="air-gappedoffline-sites"><a href="#air-gappedoffline-sites" id="air-gappedoffline-sites" name="air-gappedoffline-sites" class="anchor"></a>Air-gapped/offline sites</h2>
 <p>A built site works with no internet access at all by default, for
 <code>bootstrap</code>, <code>material</code>, and the seven <code>material</code>-forked themes (<code>docsy</code>,
@@ -410,14 +411,14 @@ layout: press-release
 ---
 </code></pre>
 <p><code>layout: press-release</code> renders this one page's body through
-<code>theme/press-release.bxm</code> (or the active built-in theme's own, if it ships
+<code>.theme/press-release.bxm</code> (or the active built-in theme's own, if it ships
 one) instead of <code>page.bxm</code> - still inside the site's normal <code>layout.bxm</code>
 shell. A <code>layout:</code> naming a file the active theme doesn't have falls back
 to <code>page.bxm</code> rather than failing the build, so switching themes never
 breaks a page that named one theme's own custom layout.</p>
 <p><code>bootstrap</code> ships <code>blog.bxm</code>/<code>blog-page.bxm</code> as a working example to copy;
 the other built-in themes don't yet, and fall back to <code>layout.bxm</code>/<code>page.bxm</code>
-for blog content the same way any incomplete <code>theme/</code> override would.</p>
+for blog content the same way any incomplete <code>.theme/</code> override would.</p>
 <h3 id="which-layoutbody-is-active"><a href="#which-layoutbody-is-active" id="which-layoutbody-is-active" name="which-layoutbody-is-active" class="anchor"></a>Which layout/body is active</h3>
 <p>Every <code>.bxm</code> a page renders through - <code>layout.bxm</code>, <code>page.bxm</code>, <code>blog.bxm</code>,
 <code>blog-page.bxm</code>, or a project's own custom one - can read which files
@@ -432,9 +433,9 @@ actually resolved, the same bare way it already reads <code>variables.page</code
 value, if it set one; <code>&quot;&quot;</code> otherwise</li>
 </ul>
 <p>Useful for a body class hook, or branching without a separate template:</p>
-<pre data-bxsites-title="theme&#x2f;layout.bxm"><code class="language-bx">&lt;body class=&quot;layout-#reReplace( variables.bodyFile, '\.bxm$', '' )#&quot;&gt;
+<pre data-bxsites-title=".theme&#x2f;layout.bxm"><code class="language-bx">&lt;body class=&quot;layout-#reReplace( variables.bodyFile, '\.bxm$', '' )#&quot;&gt;
 </code></pre>
-<pre data-bxsites-title="theme&#x2f;page.bxm"><code class="language-bx">&lt;bx:if variables.bodyFile == &quot;blog-page.bxm&quot;&gt;
+<pre data-bxsites-title=".theme&#x2f;page.bxm"><code class="language-bx">&lt;bx:if variables.bodyFile == &quot;blog-page.bxm&quot;&gt;
 	&lt;!-- blog-post-only chrome --&gt;
 &lt;/bx:if&gt;
 </code></pre>
@@ -531,33 +532,39 @@ resize/replace <code>bxsites-hero__banner</code>'s own image via a <code>docs/as
 <code>src</code> the same way any other image resolves.</p>
 <h2 id="overriding-a-theme"><a href="#overriding-a-theme" id="overriding-a-theme" name="overriding-a-theme" class="anchor"></a>Overriding a theme</h2>
 <p>Drop your own <code>layout.bxm</code> + <code>page.bxm</code> (and optionally <code>search.bxm</code> /
-<code>assets/</code>) into a <code>theme/</code> folder at your project root. BxSites prefers a
-project-level <code>theme/</code> override over both an installed <code>themes/&lt;name&gt;/</code>
-theme and any built-in theme, as long as it satisfies the contract below -
-the built-in themes under this module's own <code>resources/themes/</code> are a good
-starting point to copy and adapt. Full resolution order: <code>theme/</code> (this
-section) -&gt; <code>themes/theme.name/</code> (an <a href="#installing-a-published-theme">installed theme</a>,
+<code>assets/</code>) into a <code>.theme/</code> folder inside your project's content root -
+<code>docs/.theme/</code>, <code>src/.theme/</code>, or <code>&lt;source&gt;/.theme/</code> for whatever
+<code>source</code> resolves to (see <a href="/theme/tailwind/guides/content-source/index.html">Content Source</a>), not at
+the bare project root. BxSites prefers a content-root <code>.theme/</code> override
+over both an installed <code>.themes/&lt;name&gt;/</code> theme and any built-in theme, as
+long as it satisfies the contract below - the built-in themes under this
+module's own <code>resources/themes/</code> are a good starting point to copy and
+adapt. Full resolution order: <code>.theme/</code> (this section) -&gt;
+<code>.themes/theme.name/</code> (an <a href="#installing-a-published-theme">installed theme</a>,
 if <code>theme.name</code> matches one) -&gt; a built-in theme named <code>theme.name</code>.</p>
 <p>A worked example - start from <code>bootstrap</code> and swap its brand palette and
 heading font for your own, keeping everything else (nav, search, dark mode,
 code highlighting, ...) exactly as it already works:</p>
 <pre data-bxsites-title="Project structure"><code class="language-text">my-project/
 ├── bxsites.yaml
-├── docs/
-└── theme/                    ← project-level override, checked before any built-in theme
-    ├── layout.bxm             ← copied from resources/themes/bootstrap/layout.bxm
-    ├── page.bxm                ← copied from resources/themes/bootstrap/page.bxm, unchanged
-    ├── search.bxm               ← copied unchanged
-    └── assets/
-        └── style.css              ← copied from bootstrap's assets/style.css, then edited
+└── docs/
+    ├── index.md
+    └── .theme/                    ← content-root override, checked before any built-in theme
+        ├── layout.bxm              ← copied from resources/themes/bootstrap/layout.bxm
+        ├── page.bxm                 ← copied from resources/themes/bootstrap/page.bxm, unchanged
+        ├── search.bxm                ← copied unchanged
+        └── assets/
+            └── style.css               ← copied from bootstrap's assets/style.css, then edited
 </code></pre>
 <ol>
 <li>Copy the three <code>.bxm</code> files and <code>assets/style.css</code> out of this module's
-<code>resources/themes/bootstrap/</code> into your project's <code>theme/</code>.</li>
+<code>resources/themes/bootstrap/</code> into your project's <code>docs/.theme/</code> (or
+<code>src/.theme/</code>, or <code>&lt;source&gt;/.theme/</code>, matching wherever your content
+root actually is).</li>
 <li>Edit only what you need to change. To swap the brand palette and font,
-that's just the top of <code>theme/assets/style.css</code>:</li>
+that's just the top of <code>.theme/assets/style.css</code>:</li>
 </ol>
-<pre data-bxsites-start-line="1" data-bxsites-title="theme&#x2f;assets&#x2f;style.css"><code class="language-css">   :root {
+<pre data-bxsites-start-line="1" data-bxsites-title="docs&#x2f;.theme&#x2f;assets&#x2f;style.css"><code class="language-css">   :root {
    	--bxsites-gradient-start: #7C3AED;  /* was #00FF78 */
    	--bxsites-gradient-end: #DB2777;    /* was #00DBFF */
    	--bxsites-accent: #FBBF24;          /* was #FFF500 */
@@ -569,30 +576,31 @@ that's just the top of <code>theme/assets/style.css</code>:</li>
 </code></pre>
 <ol start="3">
 <li>Run <code>bxSites build</code> (or <code>serve</code> while iterating) - BxSites
-picks up <code>theme/</code> automatically, no <code>bxsites.yaml</code> change needed (a
-project-level <code>theme/</code> folder always takes precedence over the built-in
+picks up <code>.theme/</code> automatically, no <code>bxsites.yaml</code> change needed (a
+content-root <code>.theme/</code> folder always takes precedence over the built-in
 theme named in <code>theme.name</code>). Everything you didn't touch - nav
 rendering, search, the dark-mode toggle, code annotations - keeps
 working exactly as it did in the original <code>bootstrap</code> theme, since it's
 still the exact same <code>layout.bxm</code>/<code>page.bxm</code> markup underneath.</li>
 </ol>
-<p>A project <code>theme/</code> folder is all-or-nothing, though - once BxSites finds
-one, it's used instead of the built-in theme entirely, so it still needs
-its own <code>layout.bxm</code> + <code>page.bxm</code> even if all you changed is
+<p>A project's <code>.theme/</code> folder is all-or-nothing, though - once BxSites
+finds one, it's used instead of the built-in theme entirely, so it still
+needs its own <code>layout.bxm</code> + <code>page.bxm</code> even if all you changed is
 <code>assets/style.css</code> (a folder missing either fails fast with
 <code>BxSites.InvalidTheme</code> rather than silently falling back). For a
 CSS-only/no-<code>.bxm</code> tweak, use <a href="#customizing-colors-without-a-theme-override"><code>extraCss</code></a>
 above instead - it layers on top of whichever theme <code>bxsites.yaml</code> names,
-no <code>theme/</code> folder involved at all. <code>theme/</code> is for when you also need to
-change the markup itself, covered next.</p>
+no <code>.theme/</code> folder involved at all. <code>.theme/</code> is for when you also need
+to change the markup itself, covered next.</p>
 <h2 id="writing-a-theme-from-scratch"><a href="#writing-a-theme-from-scratch" id="writing-a-theme-from-scratch" name="writing-a-theme-from-scratch" class="anchor"></a>Writing a theme from scratch</h2>
 <p>A theme only needs the two required files, so here's a genuinely minimal
 one - no Bootstrap/Tailwind, no dark mode, no search UI - to show exactly
 what's required versus what the built-in themes add on top. Save both as
-<code>theme/layout.bxm</code> and <code>theme/page.bxm</code> in your project - a project-level
-<code>theme/</code> folder is picked up automatically (as above), no <code>bxsites.yaml</code>
+<code>docs/.theme/layout.bxm</code> and <code>docs/.theme/page.bxm</code> in your project (or
+under whichever content root your <code>source</code> resolves to) - a content-root
+<code>.theme/</code> folder is picked up automatically (as above), no <code>bxsites.yaml</code>
 change needed:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="theme&#x2f;layout.bxm"><code class="language-bx">&lt;!-- theme/layout.bxm --&gt;
+<pre data-bxsites-start-line="1" data-bxsites-title="docs&#x2f;.theme&#x2f;layout.bxm"><code class="language-bx">&lt;!-- docs/.theme/layout.bxm --&gt;
 &lt;bx:script&gt;
 	function renderNav( required array nodes ) {
 		var html = &quot;&lt;ul&gt;&quot;
@@ -629,7 +637,7 @@ change needed:</p>
 &lt;/html&gt;
 &lt;/bx:output&gt;
 </code></pre>
-<pre data-bxsites-start-line="1" data-bxsites-title="theme&#x2f;page.bxm"><code class="language-bx">&lt;!-- theme/page.bxm --&gt;
+<pre data-bxsites-start-line="1" data-bxsites-title="docs&#x2f;.theme&#x2f;page.bxm"><code class="language-bx">&lt;!-- docs/.theme/page.bxm --&gt;
 &lt;bx:output&gt;
 &lt;article&gt;
 	&lt;h1&gt;#encodeForHTML( variables.page.title )#&lt;/h1&gt;
@@ -660,7 +668,7 @@ break, it just won't bust caches automatically when the CSS changes.</p>
 
 				</div>
 
-	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Sep 21, 2026, 12&#x3a;32&#x3a;59 PM</span></div>
+	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Sep 21, 2026, 5&#x3a;00&#x3a;33 PM</span></div>
 
 			</article>
 

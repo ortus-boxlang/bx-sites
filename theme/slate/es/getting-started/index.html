@@ -250,7 +250,12 @@ otro cambio: cada verbo (<code>build</code>, <code>serve</code>, <code>audit</co
 <code>page:new</code>, ...) busca primero <code>docs/</code> y recurre a <code>src/</code> cuando es
 lo que realmente existe. El resultado de la construcción siempre
 termina en <code>site/</code> de cualquier forma - los dos nunca chocan, ya que
-<code>site/</code> nunca es en sí mismo un nombre válido de carpeta de origen.</p>
+<code>site/</code> nunca es en sí mismo un nombre válido de carpeta de origen.
+Esta carpeta es a su vez configurable - un nombre personalizado, o
+todo el repositorio sin ninguna subcarpeta - mediante la clave
+<code>source</code> de <code>bxsites.yaml</code>; consulta
+<a href="/theme/slate/es/guides/content-source/index.html">Origen del Contenido</a> para el panorama
+completo.</p>
 </div>
 </div>
 <pre data-bxsites-title="docs&#x2f; &rarr; nav"><code class="language-text">docs/
@@ -361,8 +366,8 @@ para alojarse en cualquier lugar que sirva archivos estáticos.</p>
 </code></pre>
 <p>Construye el proyecto, sirve <code>site/</code> en <code>http://127.0.0.1:8080/</code>, y
 reconstruye automáticamente cada vez que guardas un cambio bajo <code>docs/</code>,
-tu configuración de sitio <code>bxsites.yaml</code>/<code>.json</code>, o una sobrescritura de
-<code>theme/</code> a nivel de proyecto - tu navegador se recarga por sí solo. Pasa
+tu configuración de sitio <code>bxsites.yaml</code>/<code>.json</code>, o una sobrescritura
+<code>.theme/</code> en la raíz de contenido - tu navegador se recarga por sí solo. Pasa
 <code>--port=3000</code> o <code>--host=0.0.0.0</code> para cambiar cómo se enlaza.</p>
 <h2 id="limpieza"><a href="#limpieza" id="limpieza" name="limpieza" class="anchor"></a>Limpieza</h2>
 <pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites clean
@@ -372,7 +377,7 @@ tu configuración de sitio <code>bxsites.yaml</code>/<code>.json</code>, o una s
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/slate/es/getting-started.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Sep 21, 2026, 12&#x3a;32&#x3a;59 PM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/getting-started.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/slate/es/getting-started.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Sep 21, 2026, 5&#x3a;00&#x3a;33 PM</span></div>
 
 			</article>
 

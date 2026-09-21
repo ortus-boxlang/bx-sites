@@ -122,7 +122,7 @@ altura fija con su propia barra de desplazamiento vertical, con la fila
 de encabezado fijada en su sitio mientras el cuerpo se desplaza por
 debajo - una tabla corta como las de arriba nunca llega a tener barra de
 desplazamiento alguna, ya que ya cabe sin problema. Una sobrescritura
-personalizada en `theme/` puede modificar el estilo de
+personalizada en `.theme/` puede modificar el estilo de
 `.bxsites-table-wrap` (su `max-height`, en particular) igual que
 cualquier otra clase CSS.
 
@@ -162,7 +162,7 @@ Mantén `--bxsites-table-stripe-bg`/`-hover-bg` como colores alfa: se
 pintan encima de lo que ponga `--bxsites-table-bg`, así que un valor
 opaco cubre la superficie de la tarjeta en vez de teñirla. Todo lo que va
 más allá del color - el padding, el radio de las esquinas, las etiquetas
-en mayúsculas del encabezado - es un override real de `theme/`, igual que
+en mayúsculas del encabezado - es un override real de `.theme/`, igual que
 cualquier otro CSS de un tema.
 
 ## Más allá de los datos simples

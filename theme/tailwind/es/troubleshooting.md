@@ -20,9 +20,9 @@ bxSites doctor
 Verifica la versión de la JVM, que `docs/` (o `src/`) exista, que
 `bxsites.yaml`/`.json` realmente se pueda parsear y validar, que los
 módulos de BoxLang requeridos estén instalados y activados, y - si existe
-un override de `theme/` a nivel de proyecto - que cumpla el contrato del
-tema. Termina con código `1` si alguna verificación falla e imprime qué
-está mal; nada de esto modifica tu proyecto.
+un override de `.theme/` en la raíz de contenido - que cumpla el
+contrato del tema. Termina con código `1` si alguna verificación falla e
+imprime qué está mal; nada de esto modifica tu proyecto.
 
 ## Problemas comunes
 
@@ -53,16 +53,18 @@ está mal; nada de esto modifica tu proyecto.
     `box install` desde la raíz de tu proyecto resuelve todo de nuevo;
     `bxSites doctor` confirma qué módulo (si alguno) sigue faltando.
 
-??? bug "Un override de `theme/` del proyecto falla al construir"
-    Una carpeta `theme/` personalizada debe proporcionar tanto
-    `layout.bxm` como `page.bxm` - `doctor` indica cuál falta. Consulta
+??? bug "Un override de `.theme/` del proyecto falla al construir"
+    Una carpeta `.theme/` personalizada (que vive dentro de tu raíz de
+    contenido - `docs/`, `src/`, o donde sea que resuelva `source`, no en
+    la raíz misma del proyecto) debe proporcionar tanto `layout.bxm` como
+    `page.bxm` - `doctor` indica cuál falta. Consulta
     [Temas](guides/themes.md) para el contrato completo, o ejecuta
     `bxSites theme:new` para exportar un tema integrado como punto de
     partida funcional en lugar de escribir uno desde cero.
 
 ??? bug "`serve` no detecta un cambio"
     `serve` observa `docs/`, tu `bxsites.yaml`/`.json`, y un override de
-    `theme/` a nivel de proyecto - un cambio en cualquier otro lugar (por
+    `.theme/` en la raíz de contenido - un cambio en cualquier otro lugar (por
     ejemplo, editar un archivo bajo `resources/` en un checkout de
     módulo, no en un proyecto real) no dispara una reconstrucción. Si un
     cambio real no se refleja, detén `serve`, ejecuta `bxSites clean`

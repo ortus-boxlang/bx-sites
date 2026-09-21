@@ -331,7 +331,7 @@ das man "vor dem Melden eines Bugs ausführt". Prüft die JVM-Version, dass
 `docs/` existiert, dass `bxsites.yaml`/`.json` tatsächlich geparst wird
 und gültig ist, dass die erforderlichen BoxLang-Module (`bx-markdown`,
 `bx-esapi`, `bx-yaml`, `bx-image`) installiert und aktiviert sind, und -
-falls ein projektweites `theme/`-Override existiert - dass es den
+falls ein `.theme/`-Override im Content-Root existiert - dass es den
 Zwei-Pflichtdateien-Vertrag (`layout.bxm`/`page.bxm`) erfüllt.
 
 ```bash frame="terminal" title="Terminal"
@@ -451,8 +451,10 @@ siehe [Plugins](guides/plugins.md)).
 
 ## `theme:new`
 
-Wirft eines der integrierten Themes in den eigenen `theme/`-Ordner des
-Projekts zum Anpassen aus, passend zu mkdocs' `--theme`-Eject-Workflow.
+Wirft eines der integrierten Themes in den eigenen `.theme/`-Ordner des
+Projekts aus, innerhalb des Content-Root (siehe
+[Content-Quelle](guides/content-source.md#wo-eine-theme-überschreibung-lebt)),
+zum Anpassen - passend zu mkdocs' `--theme`-Eject-Workflow.
 
 ```bash title="Usage"
 bxSites theme:new --theme=material
@@ -460,15 +462,16 @@ bxSites theme:new --theme=material
 
 - `--theme` (erforderlich) - `bootstrap`, `material`, `tailwind`, `docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook` oder `notion` - siehe [Themes](guides/themes.md#built-in)
 
-Schlägt fehl, statt ein bestehendes `theme/` zu überschreiben. Siehe
+Schlägt fehl, statt ein bestehendes `.theme/` zu überschreiben. Siehe
 [Themes](guides/themes.md) für den Override-Vertrag (`layout.bxm` +
 `page.bxm`).
 
 ## `install:theme`
 
 Lädt ein veröffentlichtes Theme von ForgeBox in die eigenen
-`themes/<name>/` des Projekts herunter - nichts außer der
-`bxSites`-Binary benötigt, genau wie bei `install:plugin`.
+`.themes/<name>/` des Projekts herunter, innerhalb des Content-Root -
+nichts außer der `bxSites`-Binary benötigt, genau wie bei
+`install:plugin`.
 
 ```bash title="Usage"
 bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
@@ -488,8 +491,8 @@ um es zu verwenden - siehe
 
 Bestmögliche Konvertierung eines Themes aus dem Ökosystem eines anderen
 statischen Site-Generators (`mkdocs`/`jekyll`/`hugo`) in ein
-bx-sites-Theme-Gerüst unter `themes/<name>/` - ein Ausgangspunkt, kein
-verlustfreier Ein-Befehl-Port.
+bx-sites-Theme-Gerüst unter `.themes/<name>/`, innerhalb des Content-Root
+des Projekts - ein Ausgangspunkt, kein verlustfreier Ein-Befehl-Port.
 
 ```bash title="Usage"
 bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
@@ -497,7 +500,7 @@ bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-th
 
 - `--source` (erforderlich) - `mkdocs`, `jekyll` oder `hugo`
 - `--path` (erforderlich) - der Wurzelordner des Quell-Themes
-- `--name` (erforderlich) - der Zielname, geschrieben nach `themes/<name>/`
+- `--name` (erforderlich) - der Zielname, geschrieben nach `.themes/<name>/`
 
 Sicher, gegen denselben `--name` erneut auszuführen -
 `layout.bxm`/`page.bxm` werden überschrieben und neu gefundene

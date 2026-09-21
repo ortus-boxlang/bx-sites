@@ -507,8 +507,8 @@ compuerta de aprobado/fallido (ese es el trabajo de <code>audit</code>).</p>
 que <code>docs/</code> exista, que <code>bxsites.yaml</code>/<code>.json</code> realmente analice y valide,
 que los módulos de BoxLang requeridos (<code>bx-markdown</code>, <code>bx-esapi</code>,
 <code>bx-yaml</code>, <code>bx-image</code>) estén instalados y activados, y - si existe una
-sobrescritura <code>theme/</code> a nivel de proyecto - que satisfaga el contrato de
-los dos archivos obligatorios <code>layout.bxm</code>/<code>page.bxm</code>.</p>
+sobrescritura <code>.theme/</code> en la raíz de contenido - que satisfaga el
+contrato de los dos archivos obligatorios <code>layout.bxm</code>/<code>page.bxm</code>.</p>
 <pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites doctor
 </code></pre>
 <p>Sale con <code>1</code> si alguna verificación falla, <code>0</code> en caso contrario. Nada
@@ -591,23 +591,25 @@ se carga - añade ese nombre al array <code>plugins</code> de <code>bxsites.yaml
 activarlo (instalar por sí solo nunca activa un plugin - consulta
 <a href="/es/guides/plugins/index.html">Plugins</a>).</p>
 <h2 id="themenew"><a href="#themenew" id="themenew" name="themenew" class="anchor"></a><code>theme:new</code></h2>
-<p>Extrae uno de los temas incorporados a la propia carpeta <code>theme/</code> del
-proyecto para personalizarlo, siguiendo el flujo de trabajo de extracción
+<p>Extrae uno de los temas incorporados a la propia carpeta <code>.theme/</code> del
+proyecto, dentro de la raíz de contenido (consulta
+<a href="/es/guides/content-source/index.html#dónde-vive-una-sobrescritura-de-tema">Origen del Contenido</a>),
+para personalizarlo - siguiendo el flujo de trabajo de extracción
 <code>--theme</code> de mkdocs.</p>
 <pre data-bxsites-title="Uso"><code class="language-bash">bxSites theme:new --theme=material
 </code></pre>
 <ul>
 <li><code>--theme</code> (obligatorio) - <code>bootstrap</code>, <code>material</code>, <code>tailwind</code>, <code>docsy</code>, <code>slate</code>, <code>docusaurus</code>, <code>justthedocs</code>, <code>vuepress</code>, <code>gitbook</code> o <code>notion</code> - consulta <a href="/es/guides/themes/index.html#incorporados">Temas</a></li>
 </ul>
-<p>Falla en lugar de sobrescribir un <code>theme/</code> existente. Consulta
+<p>Falla en lugar de sobrescribir un <code>.theme/</code> existente. Consulta
 <a href="/es/guides/themes/index.html">Temas</a> para el contrato de sobrescritura (<code>layout.bxm</code></p>
 <ul>
 <li><code>page.bxm</code>).</li>
 </ul>
 <h2 id="installtheme"><a href="#installtheme" id="installtheme" name="installtheme" class="anchor"></a><code>install:theme</code></h2>
-<p>Descarga un tema publicado desde ForgeBox al propio <code>themes/&lt;name&gt;/</code> del
-proyecto - nada más que el binario <code>bxSites</code> necesario, igual que
-<code>install:plugin</code>.</p>
+<p>Descarga un tema publicado desde ForgeBox al propio <code>.themes/&lt;name&gt;/</code>
+del proyecto, dentro de la raíz de contenido - nada más que el binario
+<code>bxSites</code> necesario, igual que <code>install:plugin</code>.</p>
 <pre data-bxsites-title="Uso"><code class="language-bash">bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
 </code></pre>
 <ul>
@@ -623,14 +625,14 @@ instalado para usarlo - consulta
 <h2 id="themeimport"><a href="#themeimport" id="themeimport" name="themeimport" class="anchor"></a><code>theme:import</code></h2>
 <p>Conversión de mejor esfuerzo de un tema del ecosistema de otro generador
 de sitios estáticos (<code>mkdocs</code>/<code>jekyll</code>/<code>hugo</code>) en un scaffold de tema
-bx-sites bajo <code>themes/&lt;name&gt;/</code> - un punto de partida, no una migración
-sin pérdidas en un solo comando.</p>
+bx-sites bajo <code>.themes/&lt;name&gt;/</code>, dentro de la raíz de contenido - un
+punto de partida, no una migración sin pérdidas en un solo comando.</p>
 <pre data-bxsites-title="Uso"><code class="language-bash">bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
 </code></pre>
 <ul>
 <li><code>--source</code> (obligatorio) - <code>mkdocs</code>, <code>jekyll</code> o <code>hugo</code></li>
 <li><code>--path</code> (obligatorio) - la propia carpeta raíz del tema de origen</li>
-<li><code>--name</code> (obligatorio) - el nombre de destino, escrito en <code>themes/&lt;name&gt;/</code></li>
+<li><code>--name</code> (obligatorio) - el nombre de destino, escrito en <code>.themes/&lt;name&gt;/</code></li>
 </ul>
 <p>Seguro de volver a ejecutar contra el mismo <code>--name</code> - <code>layout.bxm</code>/
 <code>page.bxm</code> se sobrescriben y cualquier carpeta de recursos recién
@@ -765,7 +767,7 @@ páginas.</p>
 
 	
 	
-		<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/es/cli-reference.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Sep 21, 2026, 12&#x3a;32&#x3a;59 PM</span></div>
+		<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/es/cli-reference.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Sep 21, 2026, 5&#x3a;00&#x3a;33 PM</span></div>
 	
 </article>
 

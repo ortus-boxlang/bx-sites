@@ -20,7 +20,7 @@ bxSites doctor
 Controlla la versione della JVM, che `docs/` (o `src/`) esista, che
 `bxsites.yaml`/`.json` venga effettivamente analizzato e validato, che i
 moduli BoxLang richiesti siano installati e attivi, e - se esiste un
-override `theme/` a livello di progetto - che soddisfi il contratto del
+override `.theme/` nella content root - che soddisfi il contratto del
 tema. Termina con codice `1` se un controllo fallisce e stampa cosa non
 va; nulla di tutto ciò modifica il tuo progetto.
 
@@ -55,16 +55,18 @@ va; nulla di tutto ciò modifica il tuo progetto.
     nuovo; `bxSites doctor` conferma quale modulo (se presente) manca
     ancora.
 
-??? bug "Un override `theme/` di progetto non si costruisce"
-    Una cartella `theme/` personalizzata deve fornire sia `layout.bxm`
-    che `page.bxm` - `doctor` segnala quale manca. Vedi
-    [Temi](guides/themes.md) per il contratto completo, oppure esegui
-    `bxSites theme:new` per esportare un tema integrato come punto di
-    partenza funzionante invece di scriverne uno da zero.
+??? bug "Un override `.theme/` di progetto non si costruisce"
+    Una cartella `.theme/` personalizzata (che vive dentro la content
+    root - `docs/`, `src/`, o dove risolve `source`, non alla radice
+    nuda del progetto) deve fornire sia `layout.bxm` che `page.bxm` -
+    `doctor` segnala quale manca. Vedi [Temi](guides/themes.md) per il
+    contratto completo, oppure esegui `bxSites theme:new` per esportare
+    un tema integrato come punto di partenza funzionante invece di
+    scriverne uno da zero.
 
 ??? bug "`serve` non rileva una modifica"
     `serve` osserva `docs/`, il tuo `bxsites.yaml`/`.json`, e un override
-    `theme/` a livello di progetto - una modifica altrove (ad esempio
+    `.theme/` nella content root - una modifica altrove (ad esempio
     modificare un file sotto `resources/` in un checkout di un modulo,
     non un progetto reale) non attiva una ricostruzione. Se una modifica
     reale non viene comunque riflessa, ferma `serve`, esegui

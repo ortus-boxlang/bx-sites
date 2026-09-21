@@ -297,10 +297,12 @@ ForgeBox:</p>
 <pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
 </code></pre>
 <p>Questo scarica lo zip del pacchetto e lo estrae in
-<code>themes/bx-sites-theme-blog1/</code> alla radice del progetto, verificando che
-soddisfi il contratto <code>ThemeProvider</code> sotto prima di terminare. Un
-progetto può portare con sé più temi installati fianco a fianco in
-questo modo e passare dall'uno all'altro semplicemente per nome:</p>
+<code>.themes/bx-sites-theme-blog1/</code> dentro la content root del progetto (vedi
+<a href="/theme/vuepress/it/guides/content-source/index.html#dove-vive-una-sovrascrittura-di-tema">Content Source</a>),
+verificando che soddisfi il contratto <code>ThemeProvider</code> sotto prima di
+terminare. Un progetto può portare con sé più temi installati fianco a
+fianco in questo modo e passare dall'uno all'altro semplicemente per
+nome:</p>
 <div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">theme: { name: bx-sites-theme-blog1 }
 </code></pre>
 </div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;theme&quot;: { &quot;name&quot;: &quot;bx-sites-theme-blog1&quot; } }
@@ -319,7 +321,7 @@ impostare <code>theme.name</code> è l'unico collegamento necessario. Vedi
 invece? Vedi <a href="/theme/vuepress/it/guides/theme-import/index.html">Importare un tema</a> - <code>theme:import</code>
 converte meccanicamente, con il massimo impegno possibile, i file
 template propri di un tema mkdocs/jekyll/hugo in uno scheletro
-<code>themes/&lt;name&gt;/</code>.</p>
+<code>.themes/&lt;name&gt;/</code>.</p>
 <h2 id="siti-air-gappedoffline"><a href="#siti-air-gappedoffline" id="siti-air-gappedoffline" name="siti-air-gappedoffline" class="anchor"></a>Siti air-gapped/offline</h2>
 <p>Un sito compilato funziona senza alcun accesso a internet per
 impostazione predefinita, per <code>bootstrap</code>, <code>material</code> e i sette temi
@@ -437,7 +439,7 @@ layout: press-release
 ---
 </code></pre>
 <p><code>layout: press-release</code> renderizza il corpo di questa singola pagina
-tramite <code>theme/press-release.bxm</code> (o quello del tema integrato attivo,
+tramite <code>.theme/press-release.bxm</code> (o quello del tema integrato attivo,
 se ne ha uno) invece di <code>page.bxm</code> - sempre dentro il guscio <code>layout.bxm</code>
 normale del sito. Un <code>layout:</code> che nomina un file che il tema attivo non
 ha ricade su <code>page.bxm</code> invece di far fallire il build, così cambiare
@@ -446,7 +448,7 @@ un altro tema.</p>
 <p><code>bootstrap</code> fornisce <code>blog.bxm</code>/<code>blog-page.bxm</code> come esempio funzionante
 da copiare; gli altri temi integrati non ancora, e ricadono su
 <code>layout.bxm</code>/<code>page.bxm</code> per i contenuti del blog nello stesso modo in
-cui lo farebbe qualsiasi override <code>theme/</code> incompleto.</p>
+cui lo farebbe qualsiasi override <code>.theme/</code> incompleto.</p>
 <h3 id="quale-layoutcorpo-è-attivo"><a href="#quale-layoutcorpo-è-attivo" id="quale-layoutcorpo-è-attivo" name="quale-layoutcorpo-è-attivo" class="anchor"></a>Quale layout/corpo è attivo</h3>
 <p>Ogni <code>.bxm</code> attraverso cui viene renderizzata una pagina - <code>layout.bxm</code>,
 <code>page.bxm</code>, <code>blog.bxm</code>, <code>blog-page.bxm</code>, o uno personalizzato di un
@@ -463,9 +465,9 @@ proprio della pagina, se ne ha impostato uno; <code>&quot;&quot;</code> altrimen
 </ul>
 <p>Utile come aggancio per una classe del body, o per ramificare senza un
 template separato:</p>
-<pre data-bxsites-title="theme&#x2f;layout.bxm"><code class="language-bx">&lt;body class=&quot;layout-#reReplace( variables.bodyFile, '\.bxm$', '' )#&quot;&gt;
+<pre data-bxsites-title=".theme&#x2f;layout.bxm"><code class="language-bx">&lt;body class=&quot;layout-#reReplace( variables.bodyFile, '\.bxm$', '' )#&quot;&gt;
 </code></pre>
-<pre data-bxsites-title="theme&#x2f;page.bxm"><code class="language-bx">&lt;bx:if variables.bodyFile == &quot;blog-page.bxm&quot;&gt;
+<pre data-bxsites-title=".theme&#x2f;page.bxm"><code class="language-bx">&lt;bx:if variables.bodyFile == &quot;blog-page.bxm&quot;&gt;
 	&lt;!-- chrome esclusivo degli articoli del blog --&gt;
 &lt;/bx:if&gt;
 </code></pre>
@@ -574,38 +576,44 @@ pulsanti liberamente, e ridimensiona/sostituisci l'immagine propria di
 stesso modo in cui si risolve qualsiasi altra immagine.</p>
 <h2 id="sovrascrivere-un-tema"><a href="#sovrascrivere-un-tema" id="sovrascrivere-un-tema" name="sovrascrivere-un-tema" class="anchor"></a>Sovrascrivere un tema</h2>
 <p>Metti il tuo <code>layout.bxm</code> + <code>page.bxm</code> (e opzionalmente <code>search.bxm</code> /
-<code>assets/</code>) in una cartella <code>theme/</code> alla radice del tuo progetto. BxSites
-preferisce una sovrascrittura <code>theme/</code> a livello di progetto sia rispetto
-a un tema <code>themes/&lt;name&gt;/</code> installato sia rispetto a qualsiasi tema
-integrato, purché soddisfi il contratto sopra descritto - i temi
-integrati sotto <code>resources/themes/</code> proprio di questo modulo sono un
-buon punto di partenza da copiare e adattare. Ordine di risoluzione
-completo: <code>theme/</code> (questa sezione) -&gt; <code>themes/theme.name/</code> (un
-<a href="#installare-un-tema-pubblicato">tema installato</a>, se <code>theme.name</code>
-corrisponde a uno) -&gt; un tema integrato chiamato <code>theme.name</code>.</p>
+<code>assets/</code>) in una cartella <code>.theme/</code> dentro la content root del tuo
+progetto - <code>docs/.theme/</code>, <code>src/.theme/</code>, oppure <code>&lt;contentRoot&gt;/.theme/</code>
+per qualunque cosa risolva <code>source</code> (vedi
+<a href="/theme/vuepress/it/guides/content-source/index.html">Origine del contenuto</a>), non alla radice nuda del
+progetto. BxSites preferisce una sovrascrittura <code>.theme/</code> a livello di
+content root sia rispetto a un tema <code>.themes/&lt;name&gt;/</code> installato sia
+rispetto a qualsiasi tema integrato, purché soddisfi il contratto sopra
+descritto - i temi integrati sotto <code>resources/themes/</code> proprio di questo
+modulo sono un buon punto di partenza da copiare e adattare. Ordine di
+risoluzione completo: <code>.theme/</code> (questa sezione) -&gt;
+<code>.themes/theme.name/</code> (un <a href="#installare-un-tema-pubblicato">tema installato</a>,
+se <code>theme.name</code> corrisponde a uno) -&gt; un tema integrato chiamato
+<code>theme.name</code>.</p>
 <p>Un esempio pratico - parti da <code>bootstrap</code> e sostituisci la sua palette del
 brand e il font delle intestazioni con i tuoi, mantenendo tutto il resto
 (nav, ricerca, modalità scura, evidenziazione del codice, ...) esattamente
 come già funziona:</p>
 <pre data-bxsites-title="Struttura del progetto"><code class="language-text">my-project/
 ├── bxsites.yaml
-├── docs/
-└── theme/                    ← sovrascrittura a livello di progetto, verificata prima di qualsiasi tema integrato
-    ├── layout.bxm             ← copiato da resources/themes/bootstrap/layout.bxm
-    ├── page.bxm                ← copiato da resources/themes/bootstrap/page.bxm, invariato
-    ├── search.bxm               ← copiato invariato
-    └── assets/
-        └── style.css              ← copiato da assets/style.css di bootstrap, poi modificato
+└── docs/
+    ├── index.md
+    └── .theme/                    ← sovrascrittura a livello di content root, verificata prima di qualsiasi tema integrato
+        ├── layout.bxm              ← copiato da resources/themes/bootstrap/layout.bxm
+        ├── page.bxm                 ← copiato da resources/themes/bootstrap/page.bxm, invariato
+        ├── search.bxm                ← copiato invariato
+        └── assets/
+            └── style.css               ← copiato da assets/style.css di bootstrap, poi modificato
 </code></pre>
 <ol>
 <li>Copia i tre file <code>.bxm</code> e <code>assets/style.css</code> da
-<code>resources/themes/bootstrap/</code> di questo modulo nel <code>theme/</code> del tuo
-progetto.</li>
+<code>resources/themes/bootstrap/</code> di questo modulo nel <code>docs/.theme/</code> del
+tuo progetto (oppure <code>src/.theme/</code>, oppure <code>&lt;contentRoot&gt;/.theme/</code>, a
+seconda di dove si trova davvero la tua content root).</li>
 <li>Modifica solo ciò che serve cambiare. Per sostituire la palette del
 brand e il font, basta agire sulla parte iniziale di
-<code>theme/assets/style.css</code>:</li>
+<code>.theme/assets/style.css</code>:</li>
 </ol>
-<pre data-bxsites-start-line="1" data-bxsites-title="theme&#x2f;assets&#x2f;style.css"><code class="language-css">   :root {
+<pre data-bxsites-start-line="1" data-bxsites-title="docs&#x2f;.theme&#x2f;assets&#x2f;style.css"><code class="language-css">   :root {
    	--bxsites-gradient-start: #7C3AED;  /* era #00FF78 */
    	--bxsites-gradient-end: #DB2777;    /* era #00DBFF */
    	--bxsites-accent: #FBBF24;          /* era #FFF500 */
@@ -617,15 +625,16 @@ brand e il font, basta agire sulla parte iniziale di
 </code></pre>
 <ol start="3">
 <li>Esegui <code>bxSites build</code> (o <code>serve</code> mentre iteri) - BX
-Sites recepisce <code>theme/</code> automaticamente, nessuna modifica a
-<code>bxsites.yaml</code> necessaria (una cartella <code>theme/</code> a livello di progetto
-ha sempre la precedenza sul tema integrato nominato in <code>theme.name</code>).
-Tutto ciò che non hai toccato - rendering della nav, ricerca,
-interruttore modalità scura, annotazioni del codice - continua a
-funzionare esattamente come nel tema <code>bootstrap</code> originale, dato che è
-sempre lo stesso identico markup <code>layout.bxm</code>/<code>page.bxm</code> sottostante.</li>
+Sites recepisce <code>.theme/</code> automaticamente, nessuna modifica a
+<code>bxsites.yaml</code> necessaria (una cartella <code>.theme/</code> a livello di content
+root ha sempre la precedenza sul tema integrato nominato in
+<code>theme.name</code>). Tutto ciò che non hai toccato - rendering della nav,
+ricerca, interruttore modalità scura, annotazioni del codice -
+continua a funzionare esattamente come nel tema <code>bootstrap</code>
+originale, dato che è sempre lo stesso identico markup
+<code>layout.bxm</code>/<code>page.bxm</code> sottostante.</li>
 </ol>
-<p>Una cartella <code>theme/</code> di progetto è comunque tutto-o-niente - una volta
+<p>Una cartella <code>.theme/</code> di progetto è comunque tutto-o-niente - una volta
 che BxSites ne trova una, viene usata al posto del tema integrato per
 intero, quindi necessita comunque del proprio <code>layout.bxm</code> + <code>page.bxm</code>
 anche se l'unica cosa cambiata è <code>assets/style.css</code> (una cartella priva
@@ -634,17 +643,19 @@ ricadere silenziosamente su un altro tema). Per una modifica solo CSS
 senza <code>.bxm</code>, usa
 <a href="#personalizzare-i-colori-senza-sovrascrivere-un-tema"><code>extraCss</code></a> come
 sopra invece - si sovrappone a qualunque tema <code>bxsites.yaml</code> nomini,
-senza alcuna cartella <code>theme/</code> coinvolta. <code>theme/</code> serve per quando devi
-anche cambiare il markup stesso, argomento trattato di seguito.</p>
+senza alcuna cartella <code>.theme/</code> coinvolta. <code>.theme/</code> serve per quando
+devi anche cambiare il markup stesso, argomento trattato di seguito.</p>
 <h2 id="scrivere-un-tema-da-zero"><a href="#scrivere-un-tema-da-zero" id="scrivere-un-tema-da-zero" name="scrivere-un-tema-da-zero" class="anchor"></a>Scrivere un tema da zero</h2>
 <p>Un tema necessita solo dei due file obbligatori, quindi ecco un esempio
 davvero minimale - niente Bootstrap/Tailwind, niente modalità scura,
 niente UI di ricerca - per mostrare esattamente cosa è richiesto rispetto
 a cosa aggiungono in più i temi integrati. Salva entrambi come
-<code>theme/layout.bxm</code> e <code>theme/page.bxm</code> nel tuo progetto - una cartella
-<code>theme/</code> a livello di progetto viene recepita automaticamente (come
-sopra), nessuna modifica a <code>bxsites.yaml</code> necessaria:</p>
-<pre data-bxsites-start-line="1" data-bxsites-title="theme&#x2f;layout.bxm"><code class="language-bx">&lt;!-- theme/layout.bxm --&gt;
+<code>docs/.theme/layout.bxm</code> e <code>docs/.theme/page.bxm</code> nel tuo progetto
+(oppure sotto qualunque content root risolva il tuo <code>source</code>) - una
+cartella <code>.theme/</code> a livello di content root viene recepita
+automaticamente (come sopra), nessuna modifica a <code>bxsites.yaml</code>
+necessaria:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="docs&#x2f;.theme&#x2f;layout.bxm"><code class="language-bx">&lt;!-- docs/.theme/layout.bxm --&gt;
 &lt;bx:script&gt;
 	function renderNav( required array nodes ) {
 		var html = &quot;&lt;ul&gt;&quot;
@@ -681,7 +692,7 @@ sopra), nessuna modifica a <code>bxsites.yaml</code> necessaria:</p>
 &lt;/html&gt;
 &lt;/bx:output&gt;
 </code></pre>
-<pre data-bxsites-start-line="1" data-bxsites-title="theme&#x2f;page.bxm"><code class="language-bx">&lt;!-- theme/page.bxm --&gt;
+<pre data-bxsites-start-line="1" data-bxsites-title="docs&#x2f;.theme&#x2f;page.bxm"><code class="language-bx">&lt;!-- docs/.theme/page.bxm --&gt;
 &lt;bx:output&gt;
 &lt;article&gt;
 	&lt;h1&gt;#encodeForHTML( variables.page.title )#&lt;/h1&gt;
@@ -706,7 +717,7 @@ in <code>site/assets/theme/</code> al momento del build.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/it/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/theme/vuepress/it/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Sep 21, 2026, 12&#x3a;32&#x3a;59 PM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/it/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/theme/vuepress/it/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Sep 21, 2026, 5&#x3a;00&#x3a;33 PM</span></div>
 
 			</article>
 
