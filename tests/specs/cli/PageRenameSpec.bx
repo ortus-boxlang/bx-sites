@@ -19,6 +19,7 @@ class extends="testbox.system.BaseSpec" {
 			private string function newProjectRoot() {
 				var dir = createTempDirectory( prefix = "bxsites-cli-pagerename-" );
 				tempDirs.append( dir );
+				fileWrite( dir & "/bxsites.json", '{"name":"Test Site","theme":{"name":"bootstrap"}}' );
 				directoryCreate( dir & "/docs", true, true );
 				return dir;
 			}

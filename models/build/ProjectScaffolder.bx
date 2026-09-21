@@ -65,10 +65,10 @@ class {
 		fileWrite( indexPath, renderIndexMd( arguments.name, sourceDir ) )
 
 		var configSource = configFormat == "yaml"
-			? renderConfigYaml( arguments.name, arguments.theme, arguments.description )
+			? renderConfigYaml( arguments.name, arguments.theme, arguments.description, sourceDir )
 			: ( configFormat == "toml"
-				? renderConfigToml( arguments.name, arguments.theme, arguments.description )
-				: renderConfigJson( arguments.name, arguments.theme, arguments.description ) )
+				? renderConfigToml( arguments.name, arguments.theme, arguments.description, sourceDir )
+				: renderConfigJson( arguments.name, arguments.theme, arguments.description, sourceDir ) )
 		fileWrite( configPath, configSource )
 
 		return {
@@ -85,14 +85,16 @@ class {
 	 * @name The site name
 	 * @theme The default theme name
 	 * @description The site description
+	 * @source The scaffolded content source folder - written explicitly so the project is never ambiguous (SourceDirResolver.bx's own docblock)
 	 *
 	 * @return The rendered bxsites.yaml source
 	 */
-	private string function renderConfigYaml( required string name, required string theme, required string description ) {
+	private string function renderConfigYaml( required string name, required string theme, required string description, required string source ) {
 		var lines = [
 			"name: #yamlScalar( arguments.name )#",
 			"description: #yamlScalar( arguments.description )#",
 			'baseURL: "/"',
+			"source: #yamlScalar( arguments.source )#",
 			"theme:",
 			"  name: #yamlScalar( arguments.theme )#",
 			"  options: {}",
@@ -111,15 +113,17 @@ class {
 	 * @name The site name
 	 * @theme The default theme name
 	 * @description The site description
+	 * @source The scaffolded content source folder - written explicitly so the project is never ambiguous (SourceDirResolver.bx's own docblock)
 	 *
 	 * @return The rendered bxsites.json source
 	 */
-	private string function renderConfigJson( required string name, required string theme, required string description ) {
+	private string function renderConfigJson( required string name, required string theme, required string description, required string source ) {
 		var lines = [
 			"{",
 			'	"name": "#jsonEscape( arguments.name )#",',
 			'	"description": "#jsonEscape( arguments.description )#",',
 			'	"baseURL": "/",',
+			'	"source": "#jsonEscape( arguments.source )#",',
 			'	"theme": {',
 			'		"name": "#jsonEscape( arguments.theme )#",',
 			'		"options": {}',
@@ -140,14 +144,16 @@ class {
 	 * @name The site name
 	 * @theme The default theme name
 	 * @description The site description
+	 * @source The scaffolded content source folder - written explicitly so the project is never ambiguous (SourceDirResolver.bx's own docblock)
 	 *
 	 * @return The rendered bxsites.toml source
 	 */
-	private string function renderConfigToml( required string name, required string theme, required string description ) {
+	private string function renderConfigToml( required string name, required string theme, required string description, required string source ) {
 		return tomlSerialize( {
 			name        : arguments.name,
 			description : arguments.description,
 			baseURL     : "/",
+			source      : arguments.source,
 			theme       : { name : arguments.theme, options : {} },
 			search      : true,
 			nav         : [],

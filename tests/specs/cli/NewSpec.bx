@@ -48,6 +48,15 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( dir & "/docs/index.md" ) ).toBeFalse();
 			} );
 
+			it( "scaffolds a project whose [source] SourceDirResolver.resolveConfigured() can resolve without throwing", function() {
+				var dir = newTargetDir();
+				verb.run( { projectRoot : dir } );
+
+				var resolver = new "models.config.SourceDirResolver@bxsites"();
+				expect( resolver.nameConfigured( dir ) ).toBe( "docs" );
+				expect( resolver.resolveConfigured( dir ) ).toBe( dir & "/docs" );
+			} );
+
 			it( "scaffolds content under docs when --docs is provided", function() {
 				var dir = newTargetDir();
 				verb.run( { projectRoot : dir, docs : true } );

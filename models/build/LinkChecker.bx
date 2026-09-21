@@ -142,7 +142,7 @@ class {
 	 * @config The project's already-loaded bxsites.json (ConfigLoader.load()'s own return value)
 	 */
 	private array function roots( required string root, required struct config ) {
-		var docsDir = variables.sourceDirResolver.resolve( arguments.root )
+		var docsDir = variables.sourceDirResolver.resolveConfigured( arguments.root )
 		var roots = [ "index.html" ]
 		var defaultLocaleCode = arguments.config.i18n.defaultLocale.code
 

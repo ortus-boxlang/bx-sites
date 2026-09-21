@@ -29,6 +29,9 @@ class {
 	 * @return { pagesConverted: numeric, assetsConverted: numeric, warnings: array of human-readable strings }
 	 */
 	struct function migrate( required string source, required string projectRoot ) {
+		// Bare resolve(), not resolveConfigured() - this migrator writes no
+		// bxsites.yaml of its own (unlike MkdocsMigrator.bx) and is commonly
+		// run against a project root with no config on disk yet.
 		var docsDir = variables.sourceDirResolver.resolve( arguments.projectRoot )
 		if ( !directoryExists( docsDir ) ) {
 			directoryCreate( docsDir, true, true )

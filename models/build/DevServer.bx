@@ -14,8 +14,9 @@
  *
  * `startWatching()`/`stopWatching()` are Serve.bx's own real watch-mode
  * seam - a BoxLang native `watcherNew()` (module docs: "Directory & File
- * Watchers") on `docs/`, `bxsites.json`/`.yaml`/`.yml` and a project
- * `theme/` override reacts to a change almost immediately instead of
+ * Watchers") on the content root, `bxsites.json`/`.yaml`/`.yml` and a
+ * project `.theme/` override (inside that same content root) reacts to a
+ * change almost immediately instead of
  * Serve.bx's own old 1-second `checkAndRebuild()` poll loop, and
  * BuildPipeline.bx's own per-page content cache (see convertMarkdown()'s
  * docblock) turns a single-page edit's own rebuild into reconverting just
@@ -109,17 +110,18 @@ class {
 	}
 
 	/**
-	 * Starts native watching of `docs/` (or `src/`), `bxsites.json`/`.yaml`/
-	 * `.yml`/`.toml` and a project `theme/` override (whichever exist), reacting to
-	 * a real filesystem change instead of Serve.bx's own old 1-second
-	 * `checkAndRebuild()` poll loop - see this class's own docblock. Safe to
-	 * call more than once; a later call replaces the running watcher/scheduler.
+	 * Starts native watching of the resolved content root, `bxsites.json`/
+	 * `.yaml`/`.yml`/`.toml` and a project `.theme/` override inside that
+	 * content root (whichever exist), reacting to a real filesystem change
+	 * instead of Serve.bx's own old 1-second `checkAndRebuild()` poll loop -
+	 * see this class's own docblock. Safe to call more than once; a later
+	 * call replaces the running watcher/scheduler.
 	 */
 	void function startWatching() {
 		stopWatching()
 
-		var docsDir = variables.sourceDirResolver.resolve( variables.projectRoot )
-		var themeDir = variables.projectRoot & "/theme"
+		var docsDir = variables.sourceDirResolver.resolveConfigured( variables.projectRoot )
+		var themeDir = docsDir & "/.theme"
 		var builtInThemeDir = resolveBuiltInThemeDirSafely()
 
 		// watcherNew() only ever registers directories, never a single file
@@ -224,10 +226,10 @@ class {
 	/**
 	 * Best-effort resolution of the active theme's real directory when it is
 	 * one of this module's own built-in themes (i.e. the project root is this
-	 * module's checkout - the dogfooding case). Returns "" for project `theme/`
-	 * overrides, installed `themes/<name>/` folders, unresolvable virtual
-	 * paths, or any error, since those are either already watched or not
-	 * watchable here.
+	 * module's checkout - the dogfooding case). Returns "" for project
+	 * `.theme/` overrides, installed `.themes/<name>/` folders, unresolvable
+	 * virtual paths, or any error, since those are either already watched or
+	 * not watchable here.
 	 */
 	private string function resolveBuiltInThemeDirSafely() {
 		try {
@@ -277,8 +279,8 @@ class {
 	}
 
 	/**
-	 * Rebuilds the project if `docs/` (or `src/`), `bxsites.json` or a project
-	 * `theme/` override changed since the last build, bumping the version the
+	 * Rebuilds the project if the content root, `bxsites.json` or a project
+	 * `.theme/` override changed since the last build, bumping the version the
 	 * live-reload poller compares against. Cheap to call repeatedly - the
 	 * CLI verb's own watch loop is expected to call this every second or so
 	 * while `serve` is running in the foreground.
@@ -332,7 +334,7 @@ class {
 	 * checkAndRebuild() can detect a change without re-reading file
 	 * contents.
 	 *
-	 * @return { count, maxModified } across the site config (bxsites.yaml/.yml/.json, whichever is present), docs/** and a project theme/ override, if present
+	 * @return { count, maxModified } across the site config (bxsites.yaml/.yml/.json, whichever is present), the content root and a project `.theme/` override inside it, if present
 	 */
 	private struct function currentFingerprint() {
 		var paths = []
@@ -340,12 +342,9 @@ class {
 		if ( fileExists( configPath ) ) {
 			paths.append( configPath )
 		}
-		var docsDir = variables.sourceDirResolver.resolve( variables.projectRoot )
+		var docsDir = variables.sourceDirResolver.resolveConfigured( variables.projectRoot )
 		if ( directoryExists( docsDir ) ) {
 			paths.addAll( directoryList( docsDir, true, "path" ) )
-		}
-		if ( directoryExists( variables.projectRoot & "/theme" ) ) {
-			paths.addAll( directoryList( variables.projectRoot & "/theme", true, "path" ) )
 		}
 
 		var maxModified = 0

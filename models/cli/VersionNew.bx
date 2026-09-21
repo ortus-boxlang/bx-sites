@@ -17,7 +17,7 @@ class {
 			throw( type = "BxSites.MissingVersionName", message = "`version:new` requires --name=<version>" )
 		}
 
-		var sourceDirName = new "models.config.SourceDirResolver@bxsites"().name( projectRoot )
+		var sourceDirName = new "models.config.SourceDirResolver@bxsites"().nameConfigured( projectRoot )
 		var scaffolder = new "models.build.VersionScaffolder@bxsites"()
 		var result = scaffolder.scaffold( docsDir : projectRoot & "/" & sourceDirName, name : name )
 

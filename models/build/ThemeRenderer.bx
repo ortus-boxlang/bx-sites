@@ -105,6 +105,27 @@ class {
 	variables.stringsResolver = new "models.config.StringsResolver@bxsites"()
 
 	/**
+	 * Resolves a project's content root (docs/, src/, a custom `source:`, or
+	 * the project root itself) - `.theme`/`.themes/<name>` (below) live
+	 * inside it, not at the project root, so a multi-domain repo's several
+	 * project roots each carry their own theme override independently. Pure/
+	 * stateless (SourceDirResolver.bx's own docblock), so sharing this one
+	 * instance across concurrent `resolveThemeDir()` calls is safe.
+	 */
+	variables.sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
+
+	/**
+	 * Swaps in a fake/test resolver - same pattern as `setConfigLoader()`
+	 * elsewhere, for unit tests that want to drive `resolveThemeDir()`
+	 * without a real bxsites.yaml on disk.
+	 *
+	 * @resolver Any object exposing `resolveConfigured( projectRoot )` -> absolute path
+	 */
+	void function setSourceDirResolver( required any resolver ) {
+		variables.sourceDirResolver = arguments.resolver
+	}
+
+	/**
 	 * Memoized `<themeDir>/<candidate>.bxm` existence checks, keyed
 	 * `"#themeDir#::#candidate#"` - pure and deterministic for the life of
 	 * one build process (a theme's own files don't change mid-build), so
@@ -116,14 +137,20 @@ class {
 	variables.templateResolutionCache = {}
 
 	/**
-	 * Resolution order:
-	 *   1. A project-level `theme/` override (module spec section 3), if it
+	 * Resolution order - both override locations live inside the project's
+	 * resolved content root (`SourceDirResolver.resolveConfigured()`: docs/,
+	 * src/, a custom `source:`, or the project root itself for `source: .`),
+	 * not at the project root - a multi-domain repo's several independent
+	 * project roots (each own `bxsites.yaml` + content root) each carry their
+	 * own theme override this way, with no risk of one domain's `.theme/`
+	 * shadowing another's:
+	 *   1. `<contentRoot>/.theme/` - a project's own authored override, if it
 	 *      satisfies the `ThemeProvider` contract - an all-or-nothing
 	 *      override, wins outright over everything else.
-	 *   2. `themes/<themeName>/` - a theme `install:theme` downloaded from
-	 *      ForgeBox (ThemeInstaller.bx), letting a project carry several
-	 *      installed themes side by side and switch between them purely by
-	 *      name.
+	 *   2. `<contentRoot>/.themes/<themeName>/` - a theme `install:theme`
+	 *      downloaded from ForgeBox (ThemeInstaller.bx), letting a project
+	 *      carry several installed themes side by side and switch between
+	 *      them purely by name.
 	 *   3. This module's own built-in `resources/themes/<themeName>`
 	 *      (section 6).
 	 *
@@ -135,14 +162,14 @@ class {
 	 *         path builtInThemesDir() returns instead (see its own docblock)
 	 */
 	string function resolveThemeDir( required string themeName, required string projectRoot ) {
-		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		var contentRoot = variables.sourceDirResolver.resolveConfigured( arguments.projectRoot )
 
-		var projectTheme = root & "/theme"
+		var projectTheme = contentRoot & "/.theme"
 		if ( directoryExists( projectTheme ) ) {
 			return assertThemeProvider( projectTheme )
 		}
 
-		var installedTheme = root & "/themes/" & arguments.themeName
+		var installedTheme = contentRoot & "/.themes/" & arguments.themeName
 		if ( directoryExists( installedTheme ) ) {
 			return assertThemeProvider( installedTheme )
 		}

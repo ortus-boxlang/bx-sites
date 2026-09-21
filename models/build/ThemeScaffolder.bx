@@ -2,15 +2,21 @@
  * Backs the `theme:new` CLI verb - automates the manual copy-paste
  * docs/guides/themes.md's own "Overriding a theme" section documents:
  * copies one of this module's built-in themes
- * (`resources/themes/<name>/`) into a project's own `theme/` folder, so
- * BX Sites picks it up automatically (a project-level `theme/` always
- * takes precedence over the built-in theme named in `theme.name` - see
- * ThemeRenderer.bx) with nothing left to edit by hand except the copied
+ * (`resources/themes/<name>/`) into a project's own `<contentRoot>/.theme/`
+ * folder, so BX Sites picks it up automatically (a project-level `.theme/`
+ * always takes precedence over the built-in theme named in `theme.name` -
+ * see ThemeRenderer.bx) with nothing left to edit by hand except the copied
  * files themselves.
  */
 class {
 
 	variables.builtInThemes = [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ]
+
+	variables.sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
+
+	void function setSourceDirResolver( required any resolver ) {
+		variables.sourceDirResolver = arguments.resolver
+	}
 
 	/**
 	 * @projectRoot Absolute path to the project root
@@ -27,8 +33,8 @@ class {
 			)
 		}
 
-		var trimmedProjectRoot = arguments.projectRoot.reReplace( "[\/]+$", "" )
-		var themeDir = trimmedProjectRoot & "/theme"
+		var contentRoot = variables.sourceDirResolver.resolveConfigured( arguments.projectRoot )
+		var themeDir = contentRoot & "/.theme"
 
 		if ( directoryExists( themeDir ) ) {
 			throw( type = "BxSites.ThemeOverrideExists", message = "[#themeDir#] already exists - remove it first, or edit it directly" )

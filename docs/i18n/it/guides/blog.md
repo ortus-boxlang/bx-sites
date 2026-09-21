@@ -353,6 +353,6 @@ Due modi per ridisegnarlo, come qualsiasi altra pagina:
 
 Quello che non puoi fare è sostituire tu stesso il markup di
 card-post/paginatore/profilo-autore con uno tuo - viene generato una sola
-volta da `BlogBuilder.bx`, non letto da un file template in `theme/`,
+volta da `BlogBuilder.bx`, non letto da un file template in `.theme/`,
 quindi ridisegnarlo con CSS (sopra) è il percorso supportato invece di una
 sovrascrittura per singolo componente.

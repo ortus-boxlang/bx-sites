@@ -325,5 +325,5 @@ Two ways to restyle it, same as any other page:
 
 What you can't do is swap out the post-card/pager/author-profile markup
 itself for your own - it's generated once by `BlogBuilder.bx`, not read
-from a template file in `theme/`, so restyling it with CSS (above) is the
+from a template file in `.theme/`, so restyling it with CSS (above) is the
 supported path rather than a per-component override.

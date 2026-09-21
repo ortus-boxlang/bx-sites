@@ -22,7 +22,7 @@ class {
 
 		var scaffolder = new "models.build.PostScaffolder@bxsites"()
 		var result = scaffolder.scaffold(
-			docsDir    : new "models.config.SourceDirResolver@bxsites"().resolve( projectRoot ),
+			docsDir    : new "models.config.SourceDirResolver@bxsites"().resolveConfigured( projectRoot ),
 			title      : title,
 			slug       : trim( arguments.options.slug ?: "" ),
 			date       : trim( arguments.options.date ?: "" ),
