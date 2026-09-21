@@ -40,6 +40,15 @@
 		return icons[ key ] ?: icons[ "cube" ]
 	}
 
+	/**
+	 * Renders the sidebar navigation tree as nested <ul>/<li> markup.
+	 * A node is "active" when its URL matches the current page's own
+	 * `urlPath` (or, on a course lesson page, the course index URL).
+	 * URL-less nodes render as disabled <span>s. With `navCollapsible`,
+	 * parent nodes get a toggle button and their child list starts
+	 * collapsed unless the subtree contains the active page or
+	 * `navExpandAll` is on. `nested`/`collapsed` track recursion state.
+	 */
 	function renderNavList( required array nodes, boolean nested = false, boolean collapsed = false ) {
 		var html = sb{ "<ul class=""nav flex-column" & ( arguments.nested ? " nav--nested" : "" ) & """" & ( arguments.collapsed ? " hidden" : "" ) & ">" }
 		for ( var node in arguments.nodes ) {
@@ -71,6 +80,12 @@
 		return html
 	}
 
+	/**
+	 * True when the given nav node (or any descendant) is the current
+	 * page - renderNavList() uses this to decide whether a collapsible
+	 * group should start open. Same active definition as renderNavList()
+	 * itself uses (page URL match, or course index URL on lesson pages).
+	 */
 	boolean function navContainsActive( required struct node ) {
 		if ( len( arguments.node.url ) && ( arguments.node.url == variables.page.urlPath || ( len( variables.page.course.id ) && arguments.node.url == variables.page.course.indexUrl ) ) ) {
 			return true
@@ -83,6 +98,12 @@
 		return false
 	}
 
+	/**
+	 * Renders the footer's/social row icon anchors - one anchor per entry
+	 * in bxsites.yaml's own `social` list. `icon` picks the glyphs via
+	 * bxsitesIcon() (icons.bxm); `label` (or the icon name as fallback)
+	 * goes into aria-label/title. Empty list renders nothing.
+	 */
 	function renderSocialLinks( required array links ) {
 		var html = sb{ "" }
 		for ( var link in arguments.links ) {
@@ -91,6 +112,13 @@
 		return html
 	}
 
+	/**
+	 * Renders the docs version switcher - a plain <select> whose onchange
+	 * handler jumps straight to the picked version's own URL (no JS
+	 * framework needed). Labels/URLs come from bxsites.yaml's own
+	 * versioning config; the current version's option is marked selected.
+	 * Only rendered when there is more than one version.
+	 */
 	function renderVersionSwitcher( required array versions, required string currentVersion ) {
 		var html = sb{ '<select class="version-switcher form-select form-select-sm" onchange="location.href=this.value" aria-label="' & encodeForHTML( variables.strings.version ) & '">' }
 		for ( var v in arguments.versions ) {
@@ -101,6 +129,15 @@
 		return html
 	}
 
+	/**
+	 * A flag-icon dropdown - the trigger button shows the
+	 * current locale's own flag, opening a menu listing every locale by
+	 * its own flag + label. A locale's `flag` (bxsites.json's own
+	 * `i18n.locales[].flag`) wins when set; bxsitesLocaleFlag() falls back
+	 * to a built-in language-code lookup otherwise (locale-flags.bxm).
+	 * Alpine (already loaded for the dark-mode toggle) drives open/close -
+	 * no new JS dependency.
+	 */
 	function renderLocaleDropdown( required array locales, required string currentLocale ) {
 		var current = locales[ 1 ]
 		for ( var l in arguments.locales ) {
@@ -128,10 +165,23 @@
 		return html
 	}
 
+	/**
+	 * Resolves a config URL (favicon/ogImage/extraCss/extraJs/theme style)
+	 * for the head's own <link>/<script> tags. Absolute URLs with a scheme
+	 * (https:, urn:, etc.) pass through untouched (regex protects scheme
+	 * chars like "+" and "." too); everything else gets prefixed with the
+	 * site's own basePath. Used by most head-asset helpers below.
+	 */
 	function resolveAssetUrl( required string url ) {
 		return arguments.url.reFindNoCase( "^[a-z][a-z0-9+.\-]*://" ) ? arguments.url : variables.basePath & arguments.url
 	}
 
+	/**
+	 * Emits `article:published_time` and one `article:author` <meta> tag
+	 * per element of page.articleAuthorUrls - Open Graph extras for blog
+	 * posts (byline data comes from BlogBuilder.bx). Returns "" when the
+	 * page has no publishedTime, so the head stays clean on plain docs.
+	 */
 	function renderArticleMeta() {
 		if ( !len( trim( variables.page.publishedTime ?: "" ) ) ) {
 			return ""
@@ -143,6 +193,12 @@
 		return html
 	}
 
+	/**
+	 * Builds the header/footer brand mark. With a `theme.logo` configured,
+	 * emits an <img> (empty alt - decorative) followed by the site name in
+	 * a <span>; the bare fallback is the ⚡ glyph plus the site name. Runs
+	 * the logo through resolveAssetUrl() so a base path site still finds it.
+	 */
 	function renderBrandMark() {
 		var logo = trim( variables.siteConfig.theme.logo ?: "" )
 		var name = encodeForHTML( variables.siteConfig.name )
@@ -152,6 +208,12 @@
 		return '⚡ ' & name
 	}
 
+	/**
+	 * Emits one <link rel="stylesheet"> per entry of bxsites.yaml's own
+	 * `extraCss` list, resolved through resolveAssetUrl() (absolute URLs
+	 * keep working, relative paths get the basePath). Returns "" for an
+	 * empty list so the head stays clean.
+	 */
 	function renderExtraCss( required array urls ) {
 		var html = sb{ "" }
 		for ( var url in arguments.urls ) {
@@ -160,6 +222,12 @@
 		return html
 	}
 
+	/**
+	 * Emits one deferred <script> per entry of bxsites.yaml's own
+	 * `extraJs` list, resolved through resolveAssetUrl(). Deferred so the
+	 * raw `</body>`-end position alone can't block parsing; matching the
+	 * layouts' own pattern of always-in-list scripts. "" when empty.
+	 */
 	function renderExtraJs( required array urls ) {
 		var html = sb{ "" }
 		for ( var url in arguments.urls ) {

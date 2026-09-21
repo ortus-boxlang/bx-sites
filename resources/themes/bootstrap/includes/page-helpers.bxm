@@ -1,4 +1,10 @@
 <bx:script>
+	/**
+	 * Renders a Bootstrap breadcrumb <nav>/<ol>. Each crumb (a struct with
+	 * `title` + `url`) becomes a linked item except the last one, which is
+	 * rendered as the `active` item with `aria-current="page"`. Returns ""
+	 * when there are no crumbs (page.bxm only calls this with > 1 crumb).
+	 */
 	function renderBreadcrumbs( required array crumbs ) {
 		if ( !arguments.crumbs.len() ) {
 			return ""
@@ -16,6 +22,15 @@
 		return html
 	}
 
+	/**
+	 * Renders the "Page actions" disclosure dropdown (a <details>/<summary>
+	 * with the list built into the `items` buffer and a `C` keyboard hint).
+	 * Individual items are gated on what the current page actually has:
+	 * copy/view raw Markdown (markdownUrl), copy link + Share on
+	 * X/LinkedIn/Facebook (canonicalUrl), open in ChatGPT/Claude
+	 * (canonicalUrl), report an issue (repoUrl), and export to PDF (always).
+	 * page-actions-init.js wires the copy buttons up client-side.
+	 */
 	function renderPageActions() {
 		var markdownHref = len( variables.page.markdownUrl ?: "" ) ? variables.basePath & variables.page.markdownUrl : ""
 		var canonicalUrl = trim( variables.page.canonicalUrl ?: "" )
@@ -60,6 +75,15 @@
 			& '</div>'
 	}
 
+	/**
+	 * Renders the page-meta strip ("Edit this page" link, "Download
+	 * markdown" link, and/or a last-updated timestamp) inside a
+	 * `.page-meta` div. Any one of editUrl/markdownUrl/lastUpdated being
+	 * non-empty is enough to emit the strip - page.bxm's own caller check
+	 * handles that. URLs are escaped char-by-char (&amp; / &quot; / &lt;)
+	 * instead of encodeForHTML() so multi-param edit links keep working.
+	 * Position (top/bottom of the page) is the caller's choice.
+	 */
 	function renderPageMeta( required string editUrl, required string lastUpdated, required string markdownUrl ) {
 		var html = sb{ '<div class="page-meta">' }
 		if ( len( arguments.editUrl ) ) {
@@ -77,6 +101,14 @@
 		return html
 	}
 
+	/**
+	 * Renders a page's own "On this page" table of contents - a flat <ul>
+	 * of anchor links with `toc-level-N` classes (the margin comes from
+	 * CSS). The `hideAtXl` variant wraps the same list in a
+	 * <details>/<summary> that only shows below the xl breakpoint - used
+	 * for "sticky" TOC mode, where the aside rail owns the list on wide
+	 * screens and the mobile dropdown takes over on narrow ones.
+	 */
 	function renderToc( required array toc, boolean hideAtXl = false ) {
 		var listHtml = sb{ '<ul class="list-unstyled">' }
 		for ( var item in arguments.toc ) {
@@ -91,11 +123,24 @@
 		return '<nav class="toc mb-4" aria-label="' & encodeForHTML( variables.strings.onThisPage ) & '"><div class="toc-title">' & encodeForHTML( variables.strings.onThisPage ) & '</div>' & listHtml & '</nav>'
 	}
 
+	/**
+	 * Turns a tag label into the slug used in the anchor of the generated
+	 * `tags/index.html` page - Unicode-aware (keeps \p{L} letters and \p{N}
+	 * digits, lowercases first), collapsing any other run to a single "-"
+	 * and trimming leading/trailing dashes. Must stay in sync with the
+	 * same slugging the tags index page itself does at build time.
+	 */
 	function tagSlug( required string tag ) {
 		var slug = createObject( "java", "java.util.regex.Pattern" ).compile( "[^\p{L}\p{N}]+" ).matcher( lCase( trim( arguments.tag ) ) ).replaceAll( "-" )
 		return slug.reReplace( "(^-|-$)", "", "all" )
 	}
 
+	/**
+	 * Renders a page's own tag chips - one anchor per tag pointing at the
+	 * matching `#tag-<slug>` anchor of the single generated tags index
+	 * (tags/index.html). Returns "" for an empty list so page.bxm doesn't
+	 * emit an empty container.
+	 */
 	function renderTags( required array tags ) {
 		if ( !arguments.tags.len() ) {
 			return ""
@@ -108,6 +153,12 @@
 		return html
 	}
 
+	/**
+	 * The display label of the site's own default locale (always the first
+	 * entry in `variables.locales`) - used in the fallback notice shown on
+	 * untranslated pages ("not yet available in <label>"). Returns "" for
+	 * a single-/non-locale site, where the notice can't render anyway.
+	 */
 	function defaultLocaleLabel() {
 		return variables.locales.len() ? variables.locales[ 1 ].label : ""
 	}

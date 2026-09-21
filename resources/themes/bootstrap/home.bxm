@@ -21,6 +21,7 @@
 	variables.searchEnabled = ( variables.siteConfig.search ?: false ) ? true : false
 	variables.searchProviderName = lCase( trim( variables.siteConfig.searchProvider.provider ?: "local" ) )
 	variables.searchAlgolia = variables.siteConfig.searchProvider.algolia ?: {}
+
 	variables.repoUrl = trim( variables.siteConfig.repo.url ?: "" )
 	variables.socialLinks = variables.siteConfig.social ?: []
 	variables.footerEnabled = ( variables.siteConfig.footer ?: false ) ? true : false
@@ -53,21 +54,33 @@
 	<meta property="og:type" content="#encodeForHTML( len( trim( variables.page.ogType ?: '' ) ) ? variables.page.ogType : 'website' )#">
 	<meta property="og:site_name" content="#encodeForHTML( variables.siteConfig.name )#">
 	<meta property="og:title" content="#encodeForHTML( variables.page.title )#">
+
+	<!--- Open Graph and meta tags for SEO --->
 	#renderArticleMeta()#
-<bx:if len( variables.page.canonicalUrl )>
-	<link rel="canonical" href="#encodeForHTML( variables.page.canonicalUrl )#">
-</bx:if>
-<bx:if len( variables.ogDescription )>
-	<meta name="description" content="#encodeForHTML( variables.ogDescription )#">
-	<meta property="og:description" content="#encodeForHTML( variables.ogDescription )#">
-</bx:if>
-<bx:if len( variables.ogImageUrl )>
-	<meta property="og:image" content="#resolveAssetUrl( variables.ogImageUrl )#">
-	<meta name="twitter:card" content="summary_large_image">
-</bx:if>
-<bx:if len( variables.faviconUrl )>
-	<link rel="icon" href="#resolveAssetUrl( variables.faviconUrl )#">
-</bx:if>
+
+	<!--- Canonical URL --->
+	<bx:if len( variables.page.canonicalUrl )>
+		<link rel="canonical" href="#encodeForHTML( variables.page.canonicalUrl )#">
+	</bx:if>
+
+	<!--- Meta description and Open Graph description --->
+	<bx:if len( variables.ogDescription )>
+		<meta name="description" content="#encodeForHTML( variables.ogDescription )#">
+		<meta property="og:description" content="#encodeForHTML( variables.ogDescription )#">
+	</bx:if>
+
+	<!--- Open Graph image and Twitter card --->
+	<bx:if len( variables.ogImageUrl )>
+		<meta property="og:image" content="#resolveAssetUrl( variables.ogImageUrl )#">
+		<meta name="twitter:card" content="summary_large_image">
+	</bx:if>
+
+	<!--- Favicon --->
+	<bx:if len( variables.faviconUrl )>
+		<link rel="icon" href="#resolveAssetUrl( variables.faviconUrl )#">
+	</bx:if>
+
+	<!--- Color mode detection (before CSS, to avoid flash) --->
 	<script>
 		( function () {
 			var configuredMode = "#variables.siteConfig.theme.options.colorMode ?: 'auto'#";
@@ -79,669 +92,718 @@
 			}
 		} )();
 	</script>
+
+	<!--- Base CSS and theme CSS (+ the homepage-only stylesheet) --->
 	<link rel="stylesheet" href="#variables.basePath#assets/vendor/bootstrap/bootstrap.min.css">
 	<link rel="stylesheet" href="#variables.basePath#assets/vendor/highlight/github.min.css">
 	<link rel="stylesheet" href="#variables.basePath##variables.siteConfig.theme.styleUrl ?: 'assets/theme/style.css'#">
 	<link rel="stylesheet" href="#variables.basePath#assets/home.css">
+
+	<!--- Extra CSS --->
 	#renderExtraCss( variables.siteConfig.extraCss ?: [] )#
-<bx:if len( variables.accentColor ) or len( variables.accentColorDark )>
-	<style>
-<bx:if len( variables.accentColor )>
-		:root {
-			--bxsites-accent: #variables.accentColor#;
-			--bxsites-link: #variables.accentColor#;
-			--bxsites-link-hover: color-mix( in srgb, #variables.accentColor# 85%, black );
-		}
-</bx:if>
-<bx:if len( variables.accentColorDark )>
-		[data-theme="dark"] {
-			--bxsites-accent: #variables.accentColorDark#;
-			--bxsites-link: #variables.accentColorDark#;
-			--bxsites-link-hover: color-mix( in srgb, #variables.accentColorDark# 85%, white );
-		}
-</bx:if>
-	</style>
-</bx:if>
-<bx:if variables.mathEnabled>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-</bx:if>
-<bx:if variables.openapiEnabled>
-	<link rel="stylesheet" href="#variables.basePath#assets/vendor/swagger-ui/swagger-ui.css">
-</bx:if>
-<bx:if variables.analyticsProvider == 'google'>
-	<script async src="https://www.googletagmanager.com/gtag/js?id=#encodeForHTML( variables.analyticsId )#"></script>
-	<script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag(){dataLayer.push(arguments);}
-		gtag('js', new Date());
-		gtag('config', '#variables.analyticsId#');
-	</script>
-</bx:if>
-<bx:if variables.searchEnabled and variables.searchProviderName eq 'local'>
-	<script>window.__BXSITES_BASE_PATH__ = "#variables.basePath#";</script>
-	<script>window.__BXSITES_SEARCH_NO_RESULTS__ = "#encodeForJavaScript( variables.strings.searchNoResults )#";</script>
-	<script src="#variables.basePath#assets/vendor/minisearch/minisearch.js"></script>
-	<script src="#variables.basePath#assets/search.js" defer></script>
-</bx:if>
-<bx:if variables.searchEnabled and variables.searchProviderName eq 'algolia'>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
-</bx:if>
-<bx:if variables.searchEnabled and variables.searchProviderName eq 'pagefind'>
-	<link rel="stylesheet" href="#variables.basePath#pagefind/pagefind-ui.css">
-</bx:if>
+
+	<!--- Accent color overrides --->
+	<bx:if len( variables.accentColor ) or len( variables.accentColorDark )>
+		<style>
+			<!--- Light mode accent color --->
+			<bx:if len( variables.accentColor )>
+				:root {
+					--bxsites-accent: #variables.accentColor#;
+					--bxsites-link: #variables.accentColor#;
+					--bxsites-link-hover: color-mix( in srgb, #variables.accentColor# 85%, black );
+				}
+			</bx:if>
+			<!--- Dark mode accent color --->
+			<bx:if len( variables.accentColorDark )>
+				[data-theme="dark"] {
+					--bxsites-accent: #variables.accentColorDark#;
+					--bxsites-link: #variables.accentColorDark#;
+					--bxsites-link-hover: color-mix( in srgb, #variables.accentColorDark# 85%, white );
+				}
+			</bx:if>
+		</style>
+	</bx:if>
+
+	<!--- Math CSS --->
+	<bx:if variables.mathEnabled>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+	</bx:if>
+
+	<!--- OpenAPI CSS --->
+	<bx:if variables.openapiEnabled>
+		<link rel="stylesheet" href="#variables.basePath#assets/vendor/swagger-ui/swagger-ui.css">
+	</bx:if>
+
+	<!--- Google Analytics --->
+	<bx:if variables.analyticsProvider == 'google'>
+		<script async src="https://www.googletagmanager.com/gtag/js?id=#encodeForHTML( variables.analyticsId )#"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+			gtag('config', '#variables.analyticsId#');
+		</script>
+	</bx:if>
+
+	<!--- Local search CSS and JS --->
+	<bx:if variables.searchEnabled and variables.searchProviderName eq 'local'>
+		<script>window.__BXSITES_BASE_PATH__ = "#variables.basePath#";</script>
+		<script>window.__BXSITES_SEARCH_NO_RESULTS__ = "#encodeForJavaScript( variables.strings.searchNoResults )#";</script>
+		<script src="#variables.basePath#assets/vendor/minisearch/minisearch.js"></script>
+		<script src="#variables.basePath#assets/search.js" defer></script>
+	</bx:if>
+
+	<!--- Algolia search CSS --->
+	<bx:if variables.searchEnabled and variables.searchProviderName eq 'algolia'>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+	</bx:if>
+
+	<!--- Pagefind search CSS --->
+	<bx:if variables.searchEnabled and variables.searchProviderName eq 'pagefind'>
+		<link rel="stylesheet" href="#variables.basePath#pagefind/pagefind-ui.css">
+	</bx:if>
+
+	<!--- Alpine JS --->
 	<script src="#variables.basePath#assets/vendor/alpine/cdn.min.js" defer></script>
 </head>
-<body class="bxsites-home" x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } )">
+<body
+	class="bxsites-home"
+	x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark' }"
+	x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } )">
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-	<defs>
-		<linearGradient id="bxlMarkGrad" x1="15.624" y1="250" x2="484.376" y2="250" gradientUnits="userSpaceOnUse">
-			<stop stop-color="##00DBFF"/><stop offset="1" stop-color="##00FF75"/>
-		</linearGradient>
-	</defs>
-</svg>
+	<!--- SVG gradient defs used by the brand mark / ecosystem icons --->
+	<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+		<defs>
+			<linearGradient id="bxlMarkGrad" x1="15.624" y1="250" x2="484.376" y2="250" gradientUnits="userSpaceOnUse">
+				<stop stop-color="##00DBFF"/><stop offset="1" stop-color="##00FF75"/>
+			</linearGradient>
+		</defs>
+	</svg>
 
-<header class="bxh-nav">
-	<div class="bxh-wrap bxh-navrow">
-		<a class="bxh-brand" href="#variables.basePath#">#renderBrandMark()#</a>
-		<nav class="bxh-navlinks">
-			<a href="#variables.basePath#getting-started/">Docs</a>
-			<a href="#variables.basePath#guides/themes/">Themes</a>
-			<a href="#variables.basePath#blog/">Blog</a>
-			<a href="#variables.basePath#guides/plugins/">Plugins</a>
-		</nav>
-		<div class="bxh-navcta">
-			<div class="bxh-search">
-				<bx:if variables.searchEnabled>
-					<bx:include template="#variables.themeDir#/search.bxm">
+	<!--- Header: horizontal marketing nav (no sidebar toggle here) --->
+	<header class="bxh-nav">
+		<div class="bxh-wrap bxh-navrow">
+			<!--- Brand mark --->
+			<a class="bxh-brand" href="#variables.basePath#">#renderBrandMark()#</a>
+			<!--- Marketing nav links --->
+			<nav class="bxh-navlinks">
+				<a href="#variables.basePath#getting-started/">Docs</a>
+				<a href="#variables.basePath#guides/themes/">Themes</a>
+				<a href="#variables.basePath#blog/">Blog</a>
+				<a href="#variables.basePath#guides/plugins/">Plugins</a>
+			</nav>
+			<div class="bxh-navcta">
+				<!--- Search --->
+				<div class="bxh-search">
+					<bx:if variables.searchEnabled>
+						<bx:include template="#variables.themeDir#/search.bxm">
+					</bx:if>
+				</div>
+				<div class="bxh-nav-utils">
+					<!--- Version switcher --->
+					<bx:if variables.versions.len() gt 1>
+						#renderVersionSwitcher( variables.versions, variables.currentVersion )#
+					</bx:if>
+					<!--- Locale dropdown --->
+					<bx:if variables.locales.len() gt 1>
+						#renderLocaleDropdown( variables.locales, variables.currentLocale )#
+					</bx:if>
+					<!--- Theme toggle --->
+					<button type="button" class="bxh-theme-toggle" @click="dark = !dark" aria-label="#encodeForHTML( variables.strings.toggleDarkMode )#">
+						<span x-show="!dark">#bxsitesIcon( "moon" )#</span>
+						<span x-show="dark" x-cloak>#bxsitesIcon( "sun" )#</span>
+					</button>
+				</div>
+				<!--- Repo CTA (Star on GitHub) --->
+				<bx:if len( variables.repoUrl )>
+					<a
+						class="bxh-btn bxh-btn-ghost bxh-btn-sm"
+						href="#bxsitesUrlAttr( variables.repoUrl )#"
+						target="_blank"
+						rel="noopener noreferrer">
+						#bxsitesIcon( "github" )# Star
+					</a>
 				</bx:if>
 			</div>
-			<div class="bxh-nav-utils">
-<bx:if variables.versions.len() gt 1>
-				#renderVersionSwitcher( variables.versions, variables.currentVersion )#
-</bx:if>
-<bx:if variables.locales.len() gt 1>
-				#renderLocaleDropdown( variables.locales, variables.currentLocale )#
-</bx:if>
-				<button type="button" class="bxh-theme-toggle" @click="dark = !dark" aria-label="#encodeForHTML( variables.strings.toggleDarkMode )#">
-					<span x-show="!dark">#bxsitesIcon( "moon" )#</span>
-					<span x-show="dark" x-cloak">#bxsitesIcon( "sun" )#</span>
-				</button>
-			</div>
-			<bx:if len( variables.repoUrl )>
-				<a
-					class="bxh-btn bxh-btn-ghost bxh-btn-sm"
-					href="#bxsitesUrlAttr( variables.repoUrl )#"
-					target="_blank"
-					rel="noopener noreferrer"
-					>
-					#bxsitesIcon( "github" )# Star
-				</a>
-			</bx:if>
 		</div>
-	</div>
-</header>
+	</header>
 
-<main class="bxh-wrap bxh-hero">
-	<div class="bxh-hero-grid">
-		<div>
-			<span class="eyebrow">BoxLang module &middot; zero runtime dependencies</span>
-			<h1>Markdown in.<br>A <span class="grad">blazing‑fast site</span> out.</h1>
-			<p class="lead">
-				<strong>bxSites</strong> turns a folder of Markdown into a themed, searchable, static site &mdash; docs, blogs, marketing pages, knowledge bases. No JS build step. No server to run. Just files, fast.
-			</p>
-			<div class="hero-actions">
-				<a class="bxh-btn bxh-btn-primary" href="#variables.basePath#getting-started/">Get Started &rarr;</a>
-<bx:if len( variables.repoUrl )>
-				<a class="bxh-btn bxh-btn-ghost" href="#bxsitesUrlAttr( variables.repoUrl )#" target="_blank" rel="noopener noreferrer">#bxsitesIcon( "github" )# Star on GitHub</a>
-</bx:if>
-			</div>
-			<div class="install-chip">
-				<span>$</span><span>install-bx-module bx-sites</span>
-			</div>
-		</div>
-		<div class="preview">
-			<div class="float-badge badge-1">#homeIcon( "search" )# search index built &middot; 42ms</div>
-			<div class="preview-card">
-				<div class="preview-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">yourproject.dev/docs</span></div>
-				<div class="preview-body">
-					<div class="preview-side">
-						<div class="item active">Overview</div>
-						<div class="item">Install</div>
-						<div class="item">Theming</div>
-						<div class="item">Search</div>
-						<div class="item">Deploy</div>
-					</div>
-					<div class="preview-main">
-						<div class="k1"></div><div class="k2"></div><div class="k3"></div>
-						<div class="chipsrow"><span class="chip">bxSites new</span><span class="chip">bxSites serve</span></div>
-					</div>
+	<!--- Hero: eyebrow, headline, lead, CTAs, install chip, floating preview mockup --->
+	<main class="bxh-wrap bxh-hero">
+		<div class="bxh-hero-grid">
+			<div>
+				<span class="eyebrow">BoxLang module &middot; zero runtime dependencies</span>
+				<h1>Markdown in.<br>A <span class="grad">blazing‑fast site</span> out.</h1>
+				<p class="lead">
+					<strong>bxSites</strong> turns a folder of Markdown into a themed, searchable, static site &mdash; docs, blogs, marketing pages, knowledge bases. No JS build step. No server to run. Just files, fast.
+				</p>
+				<div class="hero-actions">
+					<a class="bxh-btn bxh-btn-primary" href="#variables.basePath#getting-started/">Get Started &rarr;</a>
+					<bx:if len( variables.repoUrl )>
+						<a class="bxh-btn bxh-btn-ghost" href="#bxsitesUrlAttr( variables.repoUrl )#" target="_blank" rel="noopener noreferrer">#bxsitesIcon( "github" )# Star on GitHub</a>
+					</bx:if>
+				</div>
+				<div class="install-chip">
+					<span>$</span><span>install-bx-module bx-sites</span>
 				</div>
 			</div>
-			<div class="float-badge badge-2">#homeIcon( "offline" )# 0 outbound requests &middot; air‑gapped</div>
+			<div class="preview">
+				<div class="float-badge badge-1">#homeIcon( "search" )# search index built &middot; 42ms</div>
+				<div class="preview-card">
+					<div class="preview-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">yourproject.dev/docs</span></div>
+					<div class="preview-body">
+						<div class="preview-side">
+							<div class="item active">Overview</div>
+							<div class="item">Install</div>
+							<div class="item">Theming</div>
+							<div class="item">Search</div>
+							<div class="item">Deploy</div>
+						</div>
+						<div class="preview-main">
+							<div class="k1"></div><div class="k2"></div><div class="k3"></div>
+							<div class="chipsrow"><span class="chip">bxSites new</span><span class="chip">bxSites serve</span></div>
+						</div>
+					</div>
+				</div>
+				<div class="float-badge badge-2">#homeIcon( "offline" )# 0 outbound requests &middot; air‑gapped</div>
+			</div>
 		</div>
-	</div>
-</main>
+	</main>
 
-<section>
-	<div class="bxh-wrap bxh-orbit-wrap">
-		<div class="section-head" style="text-align:center;margin-inline:auto">
-			<span class="eyebrow" style="justify-content:center">The pipeline</span>
-			<h2>Markdown in. Everything else, handled.</h2>
+	<!--- Section: the build pipeline (Markdown -> Render -> Index + AI -> Deploy) --->
+	<section>
+		<div class="bxh-wrap bxh-orbit-wrap">
+			<div class="section-head" style="text-align:center;margin-inline:auto">
+				<span class="eyebrow" style="justify-content:center">The pipeline</span>
+				<h2>Markdown in. Everything else, handled.</h2>
+			</div>
+			<div class="flow-row">
+				<div class="flow-stage"><div class="flow-icon">#bxsitesIcon( "markdown" )#</div><span>Markdown</span></div>
+				<div class="flow-connector"><div class="line"></div><span class="flow-pulse" style="animation-delay:0s"></span></div>
+				<div class="flow-stage"><div class="flow-icon">#homeIcon( "themes" )#</div><span>Render</span></div>
+				<div class="flow-connector"><div class="line"></div><span class="flow-pulse" style="animation-delay:.7s"></span></div>
+				<div class="flow-stage"><div class="flow-icon">#bxsitesIcon( "sparkle" )#</div><span>Index + AI</span></div>
+				<div class="flow-connector"><div class="line"></div><span class="flow-pulse" style="animation-delay:1.4s"></span></div>
+				<div class="flow-stage"><div class="flow-icon">#bxsitesIcon( "globe" )#</div><span>Deploy</span></div>
+			</div>
+			<p class="orbit-caption">One build step: your Markdown source, rendered through the theme, indexed for search, packaged as AI-ready context, and shipped &mdash; every pass, automatically in sync.</p>
 		</div>
-		<div class="flow-row">
-			<div class="flow-stage"><div class="flow-icon">#bxsitesIcon( "markdown" )#</div><span>Markdown</span></div>
-			<div class="flow-connector"><div class="line"></div><span class="flow-pulse" style="animation-delay:0s"></span></div>
-			<div class="flow-stage"><div class="flow-icon">#homeIcon( "themes" )#</div><span>Render</span></div>
-			<div class="flow-connector"><div class="line"></div><span class="flow-pulse" style="animation-delay:.7s"></span></div>
-			<div class="flow-stage"><div class="flow-icon">#bxsitesIcon( "sparkle" )#</div><span>Index + AI</span></div>
-			<div class="flow-connector"><div class="line"></div><span class="flow-pulse" style="animation-delay:1.4s"></span></div>
-			<div class="flow-stage"><div class="flow-icon">#bxsitesIcon( "globe" )#</div><span>Deploy</span></div>
-		</div>
-		<p class="orbit-caption">One build step: your Markdown source, rendered through the theme, indexed for search, packaged as AI-ready context, and shipped &mdash; every pass, automatically in sync.</p>
-	</div>
-</section>
+	</section>
 
-<section>
-	<div class="bxh-wrap">
-		<div class="section-head">
-			<span class="eyebrow">Everything included</span>
-			<h2>One tool, the whole pipeline.</h2>
-			<p>From folder structure to a deployed URL &mdash; theming, search, i18n, blog, and shipping are already wired in.</p>
-		</div>
-		<div class="bxh-grid">
-			<div class="bxh-card">
-				<div class="icon">#bxsitesIcon( "markdown" )#</div>
-				<h3><a href="#variables.basePath#">Markdown in, static HTML out</a></h3>
-				<p>Point it at a <code>docs|src/</code> folder and it renders a complete site into <code>site/</code>, no server required to host it.</p>
+	<!--- Section: feature grid (everything included, out of the box) --->
+	<section>
+		<div class="bxh-wrap">
+			<div class="section-head">
+				<span class="eyebrow">Everything included</span>
+				<h2>One tool, the whole pipeline.</h2>
+				<p>From folder structure to a deployed URL &mdash; theming, search, i18n, blog, and shipping are already wired in.</p>
 			</div>
-			<div class="bxh-card">
-				<div class="icon">#homeIcon( "list" )#</div>
-				<h3>Folder structure is nav structure</h3>
-				<p>Nest folders and files under <code>docs/</code> and the navigation builds itself, in the order you set via frontmatter.</p>
-			</div>
-			<div class="bxh-card">
-				<div class="icon">#homeIcon( "themes" )#</div>
-				<h3><a href="#variables.basePath#guides/themes/">Ten built-in themes</a></h3>
-				<p>A full gallery &mdash; <code>bootstrap</code>, <code>material</code>, <code>tailwind</code>, and seven more &mdash; all overridable with your own theme.</p>
-			</div>
-			<div class="bxh-card">
-				<div class="icon">#homeIcon( "search" )#</div>
-				<h3><a href="#variables.basePath#guides/search/">Static, client-side search</a></h3>
-				<p>A MiniSearch-powered search box plus a Cmd/Ctrl+K command palette, wired against a search index built at <code>build</code> time.</p>
-			</div>
-			<div class="bxh-card">
-				<div class="icon">#bxsitesIcon( "rss" )#</div>
-				<h3><a href="#variables.basePath#guides/blog/">A blog, out of the box</a></h3>
-				<p>Drop posts under <code>docs/blog/posts/</code> and get authors, categories, year archives, RSS feeds, and featured images &mdash; zero config.</p>
-			</div>
-			<div class="bxh-card">
-				<div class="icon">#homeIcon( "offline" )#</div>
-				<h3><a href="#variables.basePath#guides/themes/##markdown-air-gapped-offline-sites">Fast, air-gapped by default</a></h3>
-				<p>Bootstrap, highlight.js, Alpine.js, MiniSearch and (opt-in) Mermaid all vendored &mdash; a built site needs zero outbound requests.</p>
-			</div>
-			<div class="bxh-card">
-				<div class="icon">#homeIcon( "plugin" )#</div>
-				<h3><a href="#variables.basePath#guides/plugins/">A real plugin system</a></h3>
-				<p>A plugin is just another installed BoxLang module &mdash; no separate plugin API to learn.</p>
-			</div>
-			<div class="bxh-card">
-				<div class="icon">#homeIcon( "deploy" )#</div>
-				<h3><a href="#variables.basePath#guides/deployment/">Ship it anywhere</a></h3>
-				<p><code>bxSites deploy</code> ships to S3, Azure, GCS, Firebase, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages, or GitHub Pages.</p>
-			</div>
-			<div class="bxh-card">
-				<div class="icon">#homeIcon( "versions" )#</div>
-				<h3><a href="#variables.basePath#guides/versioning/">Versions &amp; i18n</a></h3>
-				<p>Multiple doc versions and translated trees, both nav-aware out of the box.</p>
-			</div>
-			<div class="bxh-card">
-				<div class="icon">#homeIcon( "function" )#</div>
-				<h3><a href="#variables.basePath#guides/variables-and-functions/">Reusable variables &amp; magic functions</a></h3>
-				<p><code>{{ dotted.path }}</code> pulls from <code>bxsites.yaml</code>'s own <code>variables</code> block &mdash; no plugin, no wiring.</p>
-			</div>
-			<div class="bxh-card">
-				<div class="icon">#homeIcon( "blocks" )#</div>
-				<h3><a href="#variables.basePath#guides/content-blocks/">Rich content blocks</a></h3>
-				<p>Tables, buttons, prompts, expandables, tabs, and embedded OpenAPI specs &mdash; a GitBook-style block library on top of plain Markdown.</p>
-			</div>
-			<div class="bxh-card">
-				<div class="icon">#homeIcon( "import" )#</div>
-				<h3><a href="#variables.basePath#guides/theme-import/">Import an existing theme</a></h3>
-				<p><code>theme:import --source=mkdocs|jekyll|hugo</code> converts another generator's own templates into a bx-sites scaffold.</p>
-			</div>
-			</div>
-	</div>
-</section>
-
-<section class="comparison-section">
-	<div class="bxh-wrap">
-		<div class="section-head">
-			<span class="eyebrow">Built for the agentic web</span>
-			<h2>Docs your AI assistant can actually use.</h2>
-			<p>Every build ships machine‑readable context alongside the human‑readable site &mdash; so agents answer from the real docs, not a guess.</p>
-			<div class="stack-strip">
-				<span class="label">Works with</span>
-				<span title="Claude">#homeIcon( "claude" )#</span>
-				<span title="ChatGPT">#homeIcon( "chatgpt" )#</span>
-				<span title="Gemini">#homeIcon( "gemini" )#</span>
-				<span title="Cursor">#homeIcon( "cursor" )#</span>
-				<span title="Any MCP agent">#homeIcon( "robot" )#</span>
-			</div>
-		</div>
-		<div class="term-panel">
-			<div class="preview-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">bxSites build --mcp</span></div>
-			<div class="term-body">
-				<div class="term-line" style="animation-delay:0s"><span class="ok">&check;</span> Rendering pages&hellip;</div>
-				<div class="term-line" style="animation-delay:.9s"><span class="ok">&check;</span> Writing <span class="term-cmd">llms.txt</span> (agent-ready context)</div>
-				<div class="term-line" style="animation-delay:1.8s"><span class="ok">&check;</span> Generating <span class="term-cmd">mcp-manifest.json</span></div>
-				<div class="term-line" style="animation-delay:2.7s"><span class="ok">&check;</span> Search index built<span class="term-cursor"></span></div>
-			</div>
-		</div>
-		<div class="bxh-grid" style="margin-top:32px">
-			<div class="bxh-card">
-				<div class="icon">#bxsitesIcon( "markdown" )#</div>
-				<h3><a href="#variables.basePath#guides/mcp/">llms.txt, automatically</a></h3>
-				<p>Every build emits a spec‑compliant <code>llms.txt</code> &mdash; clean, structured context, no scraping required.</p>
-			</div>
-			<div class="bxh-card">
-				<div class="icon">#homeIcon( "server" )#</div>
-				<h3><a href="#variables.basePath#guides/mcp/">Built‑in MCP support*</a></h3>
-				<p>Set <code>mcp: true</code> to generate an MCP-ready manifest *host it live with <strong>bxSites Cloud</strong> and your docs become a queryable server.</p>
-			</div>
-			<div class="bxh-card">
-				<div class="icon">#bxsitesIcon( "copy" )#</div>
-				<h3>Copy as Markdown, or open in ChatGPT / Claude</h3>
-				<p>Every page ships a page‑action menu &mdash; copy the raw Markdown, open the page in ChatGPT or Claude, or copy a direct link.</p>
-			</div>
-			<div class="bxh-card">
-				<div class="icon">#bxsitesIcon( "sparkle" )#</div>
-				<h3><a href="#variables.basePath#guides/content-blocks/"><code>:::prompt:::</code> blocks</a></h3>
-				<p>Write agent‑only instructions inline &mdash; visible to AI readers, invisible on the rendered page.</p>
-			</div>
-			<div class="bxh-card bxh-card-wide">
-				<div class="icon">#homeIcon( "check-shield" )#</div>
-				<div>
-					<h3><a href="#variables.basePath#guides/ai-agent-skills/">Official Agent Skills pack</a></h3>
-					<p>Drop <a href="https://github.com/ortus-boxlang/bx-sites-skills" target="_blank" rel="noopener noreferrer">bx-sites-skills</a> into Claude Code, Cursor, or any MCP-aware agent &mdash; pre-built skills for scaffolding, theming, and content that know bxSites inside out.</p>
+			<div class="bxh-grid">
+				<div class="bxh-card">
+					<div class="icon">#bxsitesIcon( "markdown" )#</div>
+					<h3><a href="#variables.basePath#">Markdown in, static HTML out</a></h3>
+					<p>Point it at a <code>docs|src/</code> folder and it renders a complete site into <code>site/</code>, no server required to host it.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#homeIcon( "list" )#</div>
+					<h3>Folder structure is nav structure</h3>
+					<p>Nest folders and files under <code>docs/</code> and the navigation builds itself, in the order you set via frontmatter.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#homeIcon( "themes" )#</div>
+					<h3><a href="#variables.basePath#guides/themes/">Ten built-in themes</a></h3>
+					<p>A full gallery &mdash; <code>bootstrap</code>, <code>material</code>, <code>tailwind</code>, and seven more &mdash; all overridable with your own theme.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#homeIcon( "search" )#</div>
+					<h3><a href="#variables.basePath#guides/search/">Static, client-side search</a></h3>
+					<p>A MiniSearch-powered search box plus a Cmd/Ctrl+K command palette, wired against a search index built at <code>build</code> time.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#bxsitesIcon( "rss" )#</div>
+					<h3><a href="#variables.basePath#guides/blog/">A blog, out of the box</a></h3>
+					<p>Drop posts under <code>docs/blog/posts/</code> and get authors, categories, year archives, RSS feeds, and featured images &mdash; zero config.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#homeIcon( "offline" )#</div>
+					<h3><a href="#variables.basePath#guides/themes/##markdown-air-gapped-offline-sites">Fast, air-gapped by default</a></h3>
+					<p>Bootstrap, highlight.js, Alpine.js, MiniSearch and (opt-in) Mermaid all vendored &mdash; a built site needs zero outbound requests.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#homeIcon( "plugin" )#</div>
+					<h3><a href="#variables.basePath#guides/plugins/">A real plugin system</a></h3>
+					<p>A plugin is just another installed BoxLang module &mdash; no separate plugin API to learn.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#homeIcon( "deploy" )#</div>
+					<h3><a href="#variables.basePath#guides/deployment/">Ship it anywhere</a></h3>
+					<p><code>bxSites deploy</code> ships to S3, Azure, GCS, Firebase, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages, or GitHub Pages.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#homeIcon( "versions" )#</div>
+					<h3><a href="#variables.basePath#guides/versioning/">Versions &amp; i18n</a></h3>
+					<p>Multiple doc versions and translated trees, both nav-aware out of the box.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#homeIcon( "function" )#</div>
+					<h3><a href="#variables.basePath#guides/variables-and-functions/">Reusable variables &amp; magic functions</a></h3>
+					<p><code>{{ dotted.path }}</code> pulls from <code>bxsites.yaml</code>'s own <code>variables</code> block &mdash; no plugin, no wiring.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#homeIcon( "blocks" )#</div>
+					<h3><a href="#variables.basePath#guides/content-blocks/">Rich content blocks</a></h3>
+					<p>Tables, buttons, prompts, expandables, tabs, and embedded OpenAPI specs &mdash; a GitBook-style block library on top of plain Markdown.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#homeIcon( "import" )#</div>
+					<h3><a href="#variables.basePath#guides/theme-import/">Import an existing theme</a></h3>
+					<p><code>theme:import --source=mkdocs|jekyll|hugo</code> converts another generator's own templates into a bx-sites scaffold.</p>
 				</div>
 			</div>
 		</div>
-	</div>
-</section>
+	</section>
 
-<section>
-	<div class="bxh-wrap">
-		<div class="section-head">
-			<span class="eyebrow">Already in your build</span>
-			<h2>Docs as a build step, not another toolchain.</h2>
-			<p>
-				<strong>Java or BoxLang</strong> shops don't need a Node pipeline bolted on. Generate docs from the build you already run &mdash; Gradle, Maven, or a Spring Boot app.</p>
-			<div class="stack-strip">
-				<span class="label">Works with</span>
-				<span title="Java">#homeIcon( "java" )#</span>
-				<span title="Gradle">#homeIcon( "gradle" )#</span>
-				<span title="Apache Maven">#homeIcon( "maven" )#</span>
-				<span title="Spring Boot">#homeIcon( "spring" )#</span>
+	<!--- Section: agentic web (terminal mockup + AI-ready cards) --->
+	<section class="comparison-section">
+		<div class="bxh-wrap">
+			<div class="section-head">
+				<span class="eyebrow">Built for the agentic web</span>
+				<h2>Docs your AI assistant can actually use.</h2>
+				<p>Every build ships machine‑readable context alongside the human‑readable site &mdash; so agents answer from the real docs, not a guess.</p>
+				<div class="stack-strip">
+					<span class="label">Works with</span>
+					<span title="Claude">#homeIcon( "claude" )#</span>
+					<span title="ChatGPT">#homeIcon( "chatgpt" )#</span>
+					<span title="Gemini">#homeIcon( "gemini" )#</span>
+					<span title="Cursor">#homeIcon( "cursor" )#</span>
+					<span title="Any MCP agent">#homeIcon( "robot" )#</span>
+				</div>
+			</div>
+			<div class="term-panel">
+				<div class="preview-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">bxSites build --mcp</span></div>
+				<div class="term-body">
+					<div class="term-line" style="animation-delay:0s"><span class="ok">&check;</span> Rendering pages&hellip;</div>
+					<div class="term-line" style="animation-delay:.9s"><span class="ok">&check;</span> Writing <span class="term-cmd">llms.txt</span> (agent-ready context)</div>
+					<div class="term-line" style="animation-delay:1.8s"><span class="ok">&check;</span> Generating <span class="term-cmd">mcp-manifest.json</span></div>
+					<div class="term-line" style="animation-delay:2.7s"><span class="ok">&check;</span> Search index built<span class="term-cursor"></span></div>
+				</div>
+			</div>
+			<div class="bxh-grid" style="margin-top:32px">
+				<div class="bxh-card">
+					<div class="icon">#bxsitesIcon( "markdown" )#</div>
+					<h3><a href="#variables.basePath#guides/mcp/">llms.txt, automatically</a></h3>
+					<p>Every build emits a spec‑compliant <code>llms.txt</code> &mdash; clean, structured context, no scraping required.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#homeIcon( "server" )#</div>
+					<h3><a href="#variables.basePath#guides/mcp/">Built‑in MCP support*</a></h3>
+					<p>Set <code>mcp: true</code> to generate an MCP-ready manifest *host it live with <strong>bxSites Cloud</strong> and your docs become a queryable server.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#bxsitesIcon( "copy" )#</div>
+					<h3>Copy as Markdown, or open in ChatGPT / Claude</h3>
+					<p>Every page ships a page‑action menu &mdash; copy the raw Markdown, open the page in ChatGPT or Claude, or copy a direct link.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#bxsitesIcon( "sparkle" )#</div>
+					<h3><a href="#variables.basePath#guides/content-blocks/"><code>:::prompt:::</code> blocks</a></h3>
+					<p>Write agent‑only instructions inline &mdash; visible to AI readers, invisible on the rendered page.</p>
+				</div>
+				<div class="bxh-card bxh-card-wide">
+					<div class="icon">#homeIcon( "check-shield" )#</div>
+					<div>
+						<h3><a href="#variables.basePath#guides/ai-agent-skills/">Official Agent Skills pack</a></h3>
+						<p>Drop <a href="https://github.com/ortus-boxlang/bx-sites-skills" target="_blank" rel="noopener noreferrer">bx-sites-skills</a> into Claude Code, Cursor, or any MCP-aware agent &mdash; pre-built skills for scaffolding, theming, and content that know bxSites inside out.</p>
+					</div>
+				</div>
 			</div>
 		</div>
-		<div class="flow-row">
-			<div class="flow-stage"><div class="flow-icon">#homeIcon( "search" )#</div><span>Scan controllers</span></div>
-			<div class="flow-connector"><div class="line"></div><span class="flow-pulse" style="animation-delay:0s"></span></div>
-			<div class="flow-stage"><div class="flow-icon">#homeIcon( "api" )#</div><span>OpenAPI</span></div>
-			<div class="flow-connector"><div class="line"></div><span class="flow-pulse" style="animation-delay:.7s"></span></div>
-			<div class="flow-stage"><div class="flow-icon">#bxsitesIcon( "markdown" )#</div><span>Javadoc / DocBox</span></div>
-			<div class="flow-connector"><div class="line"></div><span class="flow-pulse" style="animation-delay:1.4s"></span></div>
-			<div class="flow-stage"><div class="flow-icon">#homeIcon( "cube" )#</div><span>bxSitesBuild</span></div>
-		</div>
-		<div class="bxh-grid" style="margin-top:32px">
-			<div class="bxh-card">
-				<div class="icon">#homeIcon( "gradle" )#</div>
-				<h3><a href="#variables.basePath#guides/gradle-plugin/">Gradle plugin</a></h3>
-				<p>Run <code>./gradlew bxSitesBuild</code> alongside your normal build &mdash; docs regenerate on every CI run.</p>
-			</div>
-			<div class="bxh-card">
-				<div class="icon">#homeIcon( "maven" )#</div>
-				<h3><a href="#variables.basePath#guides/maven-plugin/">Maven plugin</a></h3>
-				<p>Bind <code>bxsites-maven-plugin</code> to the package phase &mdash; <code>mvn install</code> ships docs with the artifact.</p>
-			</div>
-			<div class="bxh-card">
-				<div class="icon">#homeIcon( "spring" )##homeIcon( "coldbox" )#</div>
-				<h3><a href="#variables.basePath#guides/openapi/">Spring Boot / ColdBox</a></h3>
-				<p>Point bxSites at a Spring Boot or ColdBox app and it scans your <code>REST</code> endpoints and OpenAPI spec into browsable reference docs.</p>
-			</div>
-			<div class="bxh-card">
-				<div class="icon">#homeIcon( "search" )#</div>
-				<h3><a href="#variables.basePath#guides/docbox/">Javadoc &amp; DocBox, ingested</a></h3>
-				<p>Point bxSites at your Javadoc or a ColdBox app via DocBox &mdash; reference pages generate themselves.</p>
-			</div>
-		</div>
-		<div class="install-chip" style="margin-top:24px">
-			<span>$</span><span>./gradlew bxSitesBuild</span><span class="sep">|</span><span>mvn bxsites:build</span>
-		</div>
-	</div>
-</section>
+	</section>
 
-<section>
-	<div class="bxh-wrap">
-		<div class="section-head">
-			<span class="eyebrow">How we compare</span>
-			<h2>Built differently, on purpose.</h2>
-			<p>Not a JS framework with a docs mode bolted on &mdash; a docs generator written for the JVM from day one.</p>
+	<!--- Section: JVM build integration (Gradle / Maven / Spring Boot / ColdBox / DocBox) --->
+	<section>
+		<div class="bxh-wrap">
+			<div class="section-head">
+				<span class="eyebrow">Already in your build</span>
+				<h2>Docs as a build step, not another toolchain.</h2>
+				<p>
+					<strong>Java or BoxLang</strong> shops don't need a Node pipeline bolted on. Generate docs from the build you already run &mdash; Gradle, Maven, or a Spring Boot app.</p>
+				<div class="stack-strip">
+					<span class="label">Works with</span>
+					<span title="Java">#homeIcon( "java" )#</span>
+					<span title="Gradle">#homeIcon( "gradle" )#</span>
+					<span title="Apache Maven">#homeIcon( "maven" )#</span>
+					<span title="Spring Boot">#homeIcon( "spring" )#</span>
+				</div>
+			</div>
+			<div class="flow-row">
+				<div class="flow-stage"><div class="flow-icon">#homeIcon( "search" )#</div><span>Scan controllers</span></div>
+				<div class="flow-connector"><div class="line"></div><span class="flow-pulse" style="animation-delay:0s"></span></div>
+				<div class="flow-stage"><div class="flow-icon">#homeIcon( "api" )#</div><span>OpenAPI</span></div>
+				<div class="flow-connector"><div class="line"></div><span class="flow-pulse" style="animation-delay:.7s"></span></div>
+				<div class="flow-stage"><div class="flow-icon">#bxsitesIcon( "markdown" )#</div><span>Javadoc / DocBox</span></div>
+				<div class="flow-connector"><div class="line"></div><span class="flow-pulse" style="animation-delay:1.4s"></span></div>
+				<div class="flow-stage"><div class="flow-icon">#homeIcon( "cube" )#</div><span>bxSitesBuild</span></div>
+			</div>
+			<div class="bxh-grid" style="margin-top:32px">
+				<div class="bxh-card">
+					<div class="icon">#homeIcon( "gradle" )#</div>
+					<h3><a href="#variables.basePath#guides/gradle-plugin/">Gradle plugin</a></h3>
+					<p>Run <code>./gradlew bxSitesBuild</code> alongside your normal build &mdash; docs regenerate on every CI run.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#homeIcon( "maven" )#</div>
+					<h3><a href="#variables.basePath#guides/maven-plugin/">Maven plugin</a></h3>
+					<p>Bind <code>bxsites-maven-plugin</code> to the package phase &mdash; <code>mvn install</code> ships docs with the artifact.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#homeIcon( "spring" )##homeIcon( "coldbox" )#</div>
+					<h3><a href="#variables.basePath#guides/openapi/">Spring Boot / ColdBox</a></h3>
+					<p>Point bxSites at a Spring Boot or ColdBox app and it scans your <code>REST</code> endpoints and OpenAPI spec into browsable reference docs.</p>
+				</div>
+				<div class="bxh-card">
+					<div class="icon">#homeIcon( "search" )#</div>
+					<h3><a href="#variables.basePath#guides/docbox/">Javadoc &amp; DocBox, ingested</a></h3>
+					<p>Point bxSites at your Javadoc or a ColdBox app via DocBox &mdash; reference pages generate themselves.</p>
+				</div>
+			</div>
+			<div class="install-chip" style="margin-top:24px">
+				<span>$</span><span>./gradlew bxSitesBuild</span><span class="sep">|</span><span>mvn bxsites:build</span>
+			</div>
 		</div>
-		<div class="compare-wrap">
-			<table class="compare">
-				<thead>
-					<tr>
-						<th>&nbsp;</th>
-						<th class="us">bxSites</th>
-						<th>Docusaurus</th>
-						<th>VitePress</th>
-						<th>MkDocs Material</th>
-						<th>Hugo</th>
-					</tr>
+	</section>
+
+	<!--- Section: comparison table (vs Docusaurus / VitePress / MkDocs Material / Hugo) --->
+	<section>
+		<div class="bxh-wrap">
+			<div class="section-head">
+				<span class="eyebrow">How we compare</span>
+				<h2>Built differently, on purpose.</h2>
+				<p>Not a JS framework with a docs mode bolted on &mdash; a docs generator written for the JVM from day one.</p>
+			</div>
+			<div class="compare-wrap">
+				<table class="compare">
+					<thead>
+						<tr>
+							<th>&nbsp;</th>
+							<th class="us">bxSites</th>
+							<th>Docusaurus</th>
+							<th>VitePress</th>
+							<th>MkDocs Material</th>
+							<th>Hugo</th>
+						</tr>
 					</thead>
-				<tbody>
-					<tr>
-						<td>Native JVM, zero Node.js</td>
-						<td class="us yes">&check;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-					</tr>
-					<tr>
-						<td>Gradle / Maven / Spring Boot build integration</td>
-						<td class="us yes">&check;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-					</tr>
-					<tr>
-						<td>ColdBox & DocBox integration</td>
-						<td class="us yes">&check;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-					</tr>
-					<tr>
-						<td>Official <code>bxSites</code> CLI</td>
-						<td class="us yes">&check;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-					</tr>
-					<tr>
-						<td>Official AI Agent Skills pack</td>
-						<td class="us yes">&check;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-					</tr>
-					<tr>
-						<td>*Built-in AI / MCP server</td>
-						<td class="us yes">&check;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-					</tr>
-					<tr>
-						<td>10 built-in themes</td>
-						<td class="us yes">&check;</td>
-						<td class="no">1</td>
-						<td class="no">1</td>
-						<td class="no">1</td>
-						<td class="no">&cross;</td>
-					</tr>
-					<tr>
-						<td>Versioning, zero plugins</td>
-						<td class="us yes">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-						<td class="no">&cross;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-						<td class="no">&cross;</td>
-					</tr>
-					<tr>
-						<td>i18n, zero plugins</td>
-						<td class="us yes">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-						<td class="no">&cross;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-					</tr>
-					<tr>
-						<td>Air-gapped build (0 outbound requests)</td>
-						<td class="us yes">&check;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-					</tr>
-					<tr>
-						<td>Built-in blog, zero plugins</td>
-						<td class="us yes">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-					</tr>
-					<tr>
-						<td>One-command deploy (S3, Netlify, Vercel, Cloudflare, FTP&hellip;)</td>
-						<td class="us yes">&check;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-					</tr>
-					<tr>
-						<td>Responsive &lt;picture&gt; + WebP generated from every image</td>
-						<td class="us yes">&check;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-					</tr>
-					<tr>
-						<td>Content-hash fingerprinted assets</td>
-						<td class="us yes">&check;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-					</tr>
-					<tr>
-						<td>CSS/JS bundling + incremental build cache</td>
-						<td class="us yes">&check;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-					</tr>
-					<tr>
-						<td>Sitemap, robots.txt and OG/meta cards generated automatically</td>
-						<td class="us yes">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-						<td class="no">&cross;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-					</tr>
-					<tr>
-						<td>Extensible search providers with built-in and custom options</td>
-						<td class="us yes">&check;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-						<td class="no">&cross;</td>
-					</tr>
-					<tr>
-						<td>Mermaid diagrams from fenced Markdown (opt-in, vendored)</td>
-						<td class="us yes">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-					</tr>
-					<tr>
-						<td>Rich content blocks: cards, tabs, steps, embeds and reusable includes</td>
-						<td class="us yes">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-					</tr>
-					<tr>
-						<td>Interactive OpenAPI / Swagger embeds from JSON or YAML</td>
-						<td class="us yes">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-						<td class="yes" style="color:var(--muted)">&check;</td>
-					</tr>
-				</tbody>
-			</table>
+					<tbody>
+						<tr>
+							<td>Native JVM, zero Node.js</td>
+							<td class="us yes">&check;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+						</tr>
+						<tr>
+							<td>Gradle / Maven / Spring Boot build integration</td>
+							<td class="us yes">&check;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+						</tr>
+						<tr>
+							<td>ColdBox & DocBox integration</td>
+							<td class="us yes">&check;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+						</tr>
+						<tr>
+							<td>Official <code>bxSites</code> CLI</td>
+							<td class="us yes">&check;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+						</tr>
+						<tr>
+							<td>Official AI Agent Skills pack</td>
+							<td class="us yes">&check;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+						</tr>
+						<tr>
+							<td>*Built-in AI / MCP server</td>
+							<td class="us yes">&check;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+						</tr>
+						<tr>
+							<td>10 built-in themes</td>
+							<td class="us yes">&check;</td>
+							<td class="no">1</td>
+							<td class="no">1</td>
+							<td class="no">1</td>
+							<td class="no">&cross;</td>
+						</tr>
+						<tr>
+							<td>Versioning, zero plugins</td>
+							<td class="us yes">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+							<td class="no">&cross;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+							<td class="no">&cross;</td>
+						</tr>
+						<tr>
+							<td>i18n, zero plugins</td>
+							<td class="us yes">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+							<td class="no">&cross;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+						</tr>
+						<tr>
+							<td>Air-gapped build (0 outbound requests)</td>
+							<td class="us yes">&check;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+						</tr>
+						<tr>
+							<td>Built-in blog, zero plugins</td>
+							<td class="us yes">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+						</tr>
+						<tr>
+							<td>One-command deploy (S3, Netlify, Vercel, Cloudflare, FTP&hellip;)</td>
+							<td class="us yes">&check;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+						</tr>
+						<tr>
+							<td>Responsive &lt;picture&gt; + WebP generated from every image</td>
+							<td class="us yes">&check;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+						</tr>
+						<tr>
+							<td>Content-hash fingerprinted assets</td>
+							<td class="us yes">&check;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+						</tr>
+						<tr>
+							<td>CSS/JS bundling + incremental build cache</td>
+							<td class="us yes">&check;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+						</tr>
+						<tr>
+							<td>Sitemap, robots.txt and OG/meta cards generated automatically</td>
+							<td class="us yes">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+							<td class="no">&cross;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+						</tr>
+						<tr>
+							<td>Extensible search providers with built-in and custom options</td>
+							<td class="us yes">&check;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+							<td class="no">&cross;</td>
+						</tr>
+						<tr>
+							<td>Mermaid diagrams from fenced Markdown (opt-in, vendored)</td>
+							<td class="us yes">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+						</tr>
+						<tr>
+							<td>Rich content blocks: cards, tabs, steps, embeds and reusable includes</td>
+							<td class="us yes">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+						</tr>
+						<tr>
+							<td>Interactive OpenAPI / Swagger embeds from JSON or YAML</td>
+							<td class="us yes">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+							<td class="yes" style="color:var(--muted)">&check;</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p class="footnote" style="font-size:smaller;color:var(--muted)">* Requires hosting in bxSites Cloud (coming soon)</p>
 		</div>
-		<p class="footnote" style="font-size:smaller;color:var(--muted)">* Requires hosting in bxSites Cloud (coming soon)</p>
-	</div>
-</section>
+	</section>
 
-<section>
-	<div class="bxh-wrap">
-		<div class="section-head" style="text-align:center;margin-inline:auto">
-			<span class="eyebrow" style="justify-content:center">Part of the BoxLang ecosystem</span>
-			<h2>Not a one‑off tool. A whole platform.</h2>
-			<div class="eco-hero-mark">#homeIcon( "boxlang" )#</div>
-		</div>
-		<div class="eco-row">
-			<a class="eco-card" href="https://boxlang.io" target="_blank" rel="noopener noreferrer">
-				<div class="icon">#homeIcon( "boxlang" )#</div><b>BoxLang Language</b><span>The dynamic JVM language bxSites is built on.</span>
-			</a>
-			<a class="eco-card" href="https://boxlang.ortusbooks.com/boxlang-framework/matchbox" target="_blank" rel="noopener noreferrer">
-				<div class="icon">#homeIcon( "matchbox" )#</div><b>MatchBox</b><span> is a native Rust implementation for the BoxLang Language (WASM|ESP32|Native).</span>
-			</a>
-			<a class="eco-card" href="https://ai.boxlang.io" target="_blank" rel="noopener noreferrer">
-				<div class="icon">#homeIcon( "boxlang" )#</div><b>BoxLang AI</b><span>Part of the BoxLang platform.</span>
-			</a>
-			<a class="eco-card" href="https://bxagents.ai" target="_blank" rel="noopener noreferrer">
-				<div class="icon">#homeIcon( "robot" )#</div><b>bxAgents</b><span> : Build AI agents by convention — a conventions-based framework for AI agents powered by BoxLang AI.</span>
-			</a>
-			<a class="eco-card" href="https://commandbox.ortusbooks.com" target="_blank" rel="noopener noreferrer">
-				<div class="icon">#homeIcon( "commandbox" )#</div><b>CommandBox</b><span>The package manager and CLI that installs bxSites in one line.</span>
-			</a>
-			<a class="eco-card" href="https://www.coldbox.org" target="_blank" rel="noopener noreferrer">
-				<div class="icon">#homeIcon( "coldbox" )#</div><b>ColdBox</b><span>A conventions-based HMVC framework for web applications.</span>
-			</a>
-			<a class="eco-card eco-card-wide" href="https://www.testbox.run" target="_blank" rel="noopener noreferrer">
-				<div class="icon">#homeIcon( "testbox" )#</div><b>TestBox</b><span>The BDD/TDD testing framework used to build bxSites itself.</span>
-			</a>
-		</div>
-	</div>
-</section>
-
-<section>
-	<div class="bxh-wrap">
-		<div class="section-head">
-			<span class="eyebrow">Gallery</span>
-			<h2>Ten themes. Same content, every look.</h2>
-		</div>
-		<div class="themes-strip">
-			<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##0d6efd,##00DBFF)"></div><div class="label">bootstrap</div></a>
-			<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##6750A4,##B69DF8)"></div><div class="label">material</div></a>
-			<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##38bdf8,##0ea5e9)"></div><div class="label">tailwind</div></a>
-			<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##0b3d91,##1c5fbf)"></div><div class="label">docsy</div></a>
-			<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##0a0a0a,##5546FF)"></div><div class="label">slate</div></a>
-			<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##25c2a0,##1a8870)"></div><div class="label">docusaurus</div></a>
-			<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##f3f4f6,##9ca3af)"></div><div class="label">justthedocs</div></a>
-			<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##3eaf7c,##2e8b5e)"></div><div class="label">vuepress</div></a>
-			<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##eef1f4,##3884ff)"></div><div class="label">gitbook</div></a>
-			<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##111,##333)"></div><div class="label">notion</div></a>
-		</div>
-	</div>
-</section>
-
-<section>
-	<div class="bxh-wrap">
-		<div class="cta">
-			<span class="eyebrow">Free &amp; open source</span>
-			<h2>Your docs deserve better than a wiki.</h2>
-			<p>Install the module, scaffold a project, and have a themed, searchable site running locally in under a minute.</p>
-			<div class="hero-actions">
-				<a class="bxh-btn bxh-btn-primary" href="#variables.basePath#getting-started/">Get Started &rarr;</a>
-				<a class="bxh-btn bxh-btn-ghost" href="#variables.basePath#getting-started/">Read the docs</a>
+	<!--- Section: BoxLang ecosystem cards --->
+	<section>
+		<div class="bxh-wrap">
+			<div class="section-head" style="text-align:center;margin-inline:auto">
+				<span class="eyebrow" style="justify-content:center">Part of the BoxLang ecosystem</span>
+				<h2>Not a one‑off tool. A whole platform.</h2>
+				<div class="eco-hero-mark">#homeIcon( "boxlang" )#</div>
+			</div>
+			<div class="eco-row">
+				<a class="eco-card" href="https://boxlang.io" target="_blank" rel="noopener noreferrer">
+					<div class="icon">#homeIcon( "boxlang" )#</div><b>BoxLang Language</b><span>The dynamic JVM language bxSites is built on.</span>
+				</a>
+				<a class="eco-card" href="https://boxlang.ortusbooks.com/boxlang-framework/matchbox" target="_blank" rel="noopener noreferrer">
+					<div class="icon">#homeIcon( "matchbox" )#</div><b>MatchBox</b><span> is a native Rust implementation for the BoxLang Language (WASM|ESP32|Native).</span>
+				</a>
+				<a class="eco-card" href="https://ai.boxlang.io" target="_blank" rel="noopener noreferrer">
+					<div class="icon">#homeIcon( "boxlang" )#</div><b>BoxLang AI</b><span>Part of the BoxLang platform.</span>
+				</a>
+				<a class="eco-card" href="https://bxagents.ai" target="_blank" rel="noopener noreferrer">
+					<div class="icon">#homeIcon( "robot" )#</div><b>bxAgents</b><span> : Build AI agents by convention — a conventions-based framework for AI agents powered by BoxLang AI.</span>
+				</a>
+				<a class="eco-card" href="https://commandbox.ortusbooks.com" target="_blank" rel="noopener noreferrer">
+					<div class="icon">#homeIcon( "commandbox" )#</div><b>CommandBox</b><span>The package manager and CLI that installs bxSites in one line.</span>
+				</a>
+				<a class="eco-card" href="https://www.coldbox.org" target="_blank" rel="noopener noreferrer">
+					<div class="icon">#homeIcon( "coldbox" )#</div><b>ColdBox</b><span>A conventions-based HMVC framework for web applications.</span>
+				</a>
+				<a class="eco-card eco-card-wide" href="https://www.testbox.run" target="_blank" rel="noopener noreferrer">
+					<div class="icon">#homeIcon( "testbox" )#</div><b>TestBox</b><span>The BDD/TDD testing framework used to build bxSites itself.</span>
+				</a>
 			</div>
 		</div>
-	</div>
-</section>
+	</section>
 
-<section>
-	<div class="bxh-wrap">
-		<div class="cta">
-			<span class="eyebrow">Need a hand building your site?</span>
-			<h2>bxSites is free &amp; open source &mdash; or let the team who builds it do the work.</h2>
-			<p><a href="https://www.ortussolutions.com" target="_blank" rel="noopener noreferrer">Ortus Solutions</a> offers professional services and consulting for documentation sites, migrations, and any other static site built with bxSites.</p>
-			<div class="hero-actions">
-				<a class="bxh-btn bxh-btn-primary" href="mailto:consulting@ortussolutions.com">Email consulting@ortussolutions.com</a>
-				<a class="bxh-btn bxh-btn-ghost" href="#variables.basePath#services/">Consulting &amp; Professional Services</a>
+	<!--- Section: theme gallery strip (same content, ten looks) --->
+	<section>
+		<div class="bxh-wrap">
+			<div class="section-head">
+				<span class="eyebrow">Gallery</span>
+				<h2>Ten themes. Same content, every look.</h2>
+			</div>
+			<div class="themes-strip">
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##0d6efd,##00DBFF)"></div><div class="label">bootstrap</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##6750A4,##B69DF8)"></div><div class="label">material</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##38bdf8,##0ea5e9)"></div><div class="label">tailwind</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##0b3d91,##1c5fbf)"></div><div class="label">docsy</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##0a0a0a,##5546FF)"></div><div class="label">slate</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##25c2a0,##1a8870)"></div><div class="label">docusaurus</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##f3f4f6,##9ca3af)"></div><div class="label">justthedocs</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##3eaf7c,##2e8b5e)"></div><div class="label">vuepress</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##eef1f4,##3884ff)"></div><div class="label">gitbook</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##111,##333)"></div><div class="label">notion</div></a>
 			</div>
 		</div>
-	</div>
-</section>
+	</section>
 
-<footer class="bxh-footer">
-	<div class="bxh-wrap footer-top">
-		<div class="footer-brand">
-			<a class="bxh-brand" href="#variables.basePath#">#renderBrandMark()#</a>
-			<p>Markdown in, a themed static site out &mdash; docs, blogs, and knowledge bases, built on BoxLang.</p>
-<bx:if variables.socialLinks.len() gt 0>
-			<div class="social-row">#renderSocialLinks( variables.socialLinks )#</div>
-</bx:if>
-			<div class="madeby"><span>Developed by</span> Ortus Solutions</div>
+	<!--- Section: primary CTA (Get Started / Read the docs) --->
+	<section>
+		<div class="bxh-wrap">
+			<div class="cta">
+				<span class="eyebrow">Free &amp; open source</span>
+				<h2>Your docs deserve better than a wiki.</h2>
+				<p>Install the module, scaffold a project, and have a themed, searchable site running locally in under a minute.</p>
+				<div class="hero-actions">
+					<a class="bxh-btn bxh-btn-primary" href="#variables.basePath#getting-started/">Get Started &rarr;</a>
+					<a class="bxh-btn bxh-btn-ghost" href="#variables.basePath#getting-started/">Read the docs</a>
+				</div>
+			</div>
 		</div>
-		<div class="footer-col">
-			<h4>Discover bxSites</h4>
-			<a href="#variables.basePath#">Why bxSites?</a>
-			<a href="#variables.basePath#guides/">Key Features</a>
-			<a href="#variables.basePath#releases/">Releases</a>
-		</div>
-		<div class="footer-col">
-			<h4>Docs &amp; Learning</h4>
-			<a href="#variables.basePath#getting-started/">Getting Started</a>
-			<a href="#variables.basePath#guides/themes/">Theming Guide</a>
-			<a href="#variables.basePath#cli-reference/">CLI Reference</a>
-			<a href="#variables.basePath#configuration/">Configuration</a>
-		</div>
-		<div class="footer-col">
-			<h4>Get bxSites</h4>
-			<a href="#variables.basePath#getting-started/">CommandBox Install</a>
-			<a href="#variables.basePath#guides/gradle-plugin/">Gradle Plugin</a>
-			<a href="#variables.basePath#guides/maven-plugin/">Maven Plugin</a>
-<bx:if len( variables.repoUrl )>
-			<a href="#bxsitesUrlAttr( variables.repoUrl )#/releases" target="_blank" rel="noopener noreferrer">GitHub Releases</a>
-</bx:if>
-		</div>
-		<div class="footer-col">
-			<h4>Community</h4>
-			<a href="https://www.ortussolutions.com/community/slack" target="_blank" rel="noopener noreferrer">Slack</a>
-<bx:if len( variables.repoUrl )>
-			<a href="#bxsitesUrlAttr( variables.repoUrl )#/issues" target="_blank" rel="noopener noreferrer">Bug Tracker</a>
-</bx:if>
-			<a href="#variables.basePath#contribute/">Contribute</a>
-			<a href="#variables.basePath#services/">Consulting</a>
-		</div>
-	</div>
-	<div class="bxh-wrap footer-bottom footrow">
-		<span>&copy; #year( now() )# #encodeForHTML( variables.siteConfig.name )#</span>
-		<div class="footlinks">
-			<a href="#variables.basePath#license/">License</a>
-			<a class="poweredby" href="https://boxlang.io" target="_blank" rel="noopener noreferrer">Part of the <b>BoxLang</b> ecosystem</a>
-		</div>
-	</div>
-</footer>
+	</section>
 
+	<!--- Section: consulting CTA (Ortus professional services) --->
+	<section>
+		<div class="bxh-wrap">
+			<div class="cta">
+				<span class="eyebrow">Need a hand building your site?</span>
+				<h2>bxSites is free &amp; open source &mdash; or let the team who builds it do the work.</h2>
+				<p><a href="https://www.ortussolutions.com" target="_blank" rel="noopener noreferrer">Ortus Solutions</a> offers professional services and consulting for documentation sites, migrations, and any other static site built with bxSites.</p>
+				<div class="hero-actions">
+					<a class="bxh-btn bxh-btn-primary" href="mailto:consulting@ortussolutions.com">Email consulting@ortussolutions.com</a>
+					<a class="bxh-btn bxh-btn-ghost" href="#variables.basePath#services/">Consulting &amp; Professional Services</a>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!--- Footer: brand, social, link columns, bottom bar --->
+	<footer class="bxh-footer">
+		<div class="bxh-wrap footer-top">
+			<!--- Footer brand block --->
+			<div class="footer-brand">
+				<a class="bxh-brand" href="#variables.basePath#">#renderBrandMark()#</a>
+				<p>Markdown in, a themed static site out &mdash; docs, blogs, and knowledge bases, built on BoxLang.</p>
+				<!--- Social links --->
+				<bx:if variables.socialLinks.len() gt 0>
+					<div class="social-row">#renderSocialLinks( variables.socialLinks )#</div>
+				</bx:if>
+				<div class="madeby"><span>Developed by</span> Ortus Solutions</div>
+			</div>
+			<!--- Footer link columns --->
+			<div class="footer-col">
+				<h4>Discover bxSites</h4>
+				<a href="#variables.basePath#">Why bxSites?</a>
+				<a href="#variables.basePath#guides/">Key Features</a>
+				<a href="#variables.basePath#releases/">Releases</a>
+			</div>
+			<div class="footer-col">
+				<h4>Docs &amp; Learning</h4>
+				<a href="#variables.basePath#getting-started/">Getting Started</a>
+				<a href="#variables.basePath#guides/themes/">Theming Guide</a>
+				<a href="#variables.basePath#cli-reference/">CLI Reference</a>
+				<a href="#variables.basePath#configuration/">Configuration</a>
+			</div>
+			<div class="footer-col">
+				<h4>Get bxSites</h4>
+				<a href="#variables.basePath#getting-started/">CommandBox Install</a>
+				<a href="#variables.basePath#guides/gradle-plugin/">Gradle Plugin</a>
+				<a href="#variables.basePath#guides/maven-plugin/">Maven Plugin</a>
+				<bx:if len( variables.repoUrl )>
+					<a href="#bxsitesUrlAttr( variables.repoUrl )#/releases" target="_blank" rel="noopener noreferrer">GitHub Releases</a>
+				</bx:if>
+			</div>
+			<div class="footer-col">
+				<h4>Community</h4>
+				<a href="https://www.ortussolutions.com/community/slack" target="_blank" rel="noopener noreferrer">Slack</a>
+				<bx:if len( variables.repoUrl )>
+					<a href="#bxsitesUrlAttr( variables.repoUrl )#/issues" target="_blank" rel="noopener noreferrer">Bug Tracker</a>
+				</bx:if>
+				<a href="#variables.basePath#contribute/">Contribute</a>
+				<a href="#variables.basePath#services/">Consulting</a>
+			</div>
+		</div>
+		<!--- Footer bottom bar --->
+		<div class="bxh-wrap footer-bottom footrow">
+			<span>&copy; #year( now() )# #encodeForHTML( variables.siteConfig.name )#</span>
+			<div class="footlinks">
+				<a href="#variables.basePath#license/">License</a>
+				<a class="poweredby" href="https://boxlang.io" target="_blank" rel="noopener noreferrer">Part of the <b>BoxLang</b> ecosystem</a>
+			</div>
+		</div>
+	</footer>
+
+	<!--- Extra JS --->
 	#renderExtraJs( variables.siteConfig.extraJs ?: [] )#
 </body>
 </html>
