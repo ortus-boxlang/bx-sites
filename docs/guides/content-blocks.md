@@ -582,6 +582,38 @@ its next page view. A first-time visitor (or one past that window) always
 gets the current version; an edit is visible to everyone within about a
 minute, not on every single page view.
 
+## Comments
+
+> **Premium feature.** `::: comments` mounts a live, moderated visitor
+> comment thread on the page - it requires a bxSites Cloud account with
+> Comments on your plan and `cloud.comments: true` set in `bxsites.yaml`.
+> Without it, a `::: comments` block always fails the build outright, the
+> same posture as `::: cloud` without `cloud.contentBlocks`.
+
+```markdown title="Example" linenums="1"
+::: comments :::
+```
+
+No attributes are required - the thread id defaults to the page's own
+URL path, so every page gets its own comment thread for free. An
+optional `id="..."` lets two blocks on one page (or blocks on different
+pages) share a single thread instead:
+
+```markdown title="Example" linenums="1"
+::: comments id="general-feedback" :::
+```
+
+Unlike `::: cloud`, nothing is fetched or baked in at build time - a
+comment thread keeps growing after every deploy, so a build-time
+snapshot would go stale the moment a new comment arrives. The block
+renders an empty placeholder; a small client-side script (shipped only
+when `cloud.comments: true`, the same explicit opt-in `cloud.contentBlocks`
+already uses) loads the current, already-moderated comments every time
+the page loads and paginates through older ones on request, then renders
+a form for posting a new one. A newly-submitted comment shows locally, in
+that one visitor's own browser, labeled as pending moderation - it never
+appears for anyone else until a moderator approves it.
+
 ## Loop and conditional (data-driven)
 
 `::: for` and `::: if` render their own content against [reusable
