@@ -20,6 +20,7 @@ class extends="testbox.system.BaseSpec" {
 				var dir = createTempDirectory( prefix = "bxsites-sitestats-" );
 				tempDirs.append( dir );
 				fileWrite( dir & "/bxsites.json", arguments.bxsitesJson );
+				directoryCreate( dir & "/docs", true, true );
 				return dir;
 			}
 

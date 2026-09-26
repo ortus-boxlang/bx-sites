@@ -216,6 +216,65 @@ class extends="testbox.system.BaseSpec" {
 				expect( pages[ 1 ].relativePath ).toBe( "real.md" );
 			} );
 
+			it( "excludes .git/, .github/, node_modules/, boxlang_modules/, site/, .theme/, .themes/ and bxSites' own config files by default", function() {
+				var dir = newDocsDir();
+				directoryCreate( dir & "/.git", true, true );
+				fileWrite( dir & "/.git/not-a-page.md", "excluded" );
+				directoryCreate( dir & "/boxlang_modules/some-module", true, true );
+				fileWrite( dir & "/boxlang_modules/some-module/readme.md", "excluded" );
+				directoryCreate( dir & "/node_modules/some-pkg", true, true );
+				fileWrite( dir & "/node_modules/some-pkg/readme.md", "excluded" );
+				directoryCreate( dir & "/.theme", true, true );
+				fileWrite( dir & "/.theme/notes.md", "excluded" );
+				directoryCreate( dir & "/.themes/blog1", true, true );
+				fileWrite( dir & "/.themes/blog1/notes.md", "excluded" );
+				fileWrite( dir & "/bxsites.yaml", "name: Test" );
+				fileWrite( dir & "/real.md", "Included" );
+
+				var pages = loader.load( dir );
+
+				expect( pages.len() ).toBe( 1 );
+				expect( pages[ 1 ].relativePath ).toBe( "real.md" );
+			} );
+
+			it( "does NOT exclude README.md/LICENSE.md/CHANGELOG.md by default - a project can have real content at that name", function() {
+				var dir = newDocsDir();
+				fileWrite( dir & "/license.md", "Our license" );
+				fileWrite( dir & "/README.md", "Read me" );
+
+				var pages = loader.load( dir );
+
+				expect( pages.len() ).toBe( 2 );
+			} );
+
+			it( "merges the caller-provided [exclude] list on top of the built-in defaults", function() {
+				var dir = newDocsDir();
+				fileWrite( dir & "/drafts.md", "Not ready" );
+				directoryCreate( dir & "/internal", true, true );
+				fileWrite( dir & "/internal/notes.md", "Not ready" );
+				fileWrite( dir & "/real.md", "Included" );
+
+				var pages = loader.load( dir, [ "drafts.md", "internal" ] );
+
+				expect( pages.len() ).toBe( 1 );
+				expect( pages[ 1 ].relativePath ).toBe( "real.md" );
+			} );
+
+			it( "does not mutate its own default excludes list across calls", function() {
+				var dir1 = newDocsDir();
+				fileWrite( dir1 & "/custom.md", "Should stay excluded only for this call" );
+				fileWrite( dir1 & "/real.md", "Included" );
+				loader.load( dir1, [ "custom.md" ] );
+
+				var dir2 = newDocsDir();
+				fileWrite( dir2 & "/custom.md", "Should NOT be excluded here" );
+
+				var pages = loader.load( dir2 );
+
+				expect( pages.len() ).toBe( 1 );
+				expect( pages[ 1 ].relativePath ).toBe( "custom.md" );
+			} );
+
 			it( "sorts pages by order, then by title", function() {
 				var dir = newDocsDir();
 				fileWrite( dir & "/b.md", "---" & char( 10 ) & "title: B Page" & char( 10 ) & "order: 1" & char( 10 ) & "---" & char( 10 ) & "b" );

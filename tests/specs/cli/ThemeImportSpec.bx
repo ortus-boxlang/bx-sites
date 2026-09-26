@@ -29,6 +29,18 @@ class extends="testbox.system.BaseSpec" {
 			}
 
 			/**
+			 * A project root with a real docs/ content folder and a minimal
+			 * bxsites.json on disk, so the verb's own resolveConfigured()
+			 * call resolves instead of throwing BxSites.ConfigNotFound.
+			 */
+			private string function newProjectRoot() {
+				var dir = newTempDir( "bxsites-themeimport-project-" );
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite( dir & "/bxsites.json", '{"name":"Test Site"}' );
+				return dir;
+			}
+
+			/**
 			 * Wraps `inner` in a pair of literal `#` characters, via
 			 * char(35) - a literal `'#variables.page.title#'` would try
 			 * to evaluate `variables.page.title` as a real expression
@@ -68,8 +80,8 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.MissingThemeName" );
 			} );
 
-			it( "converts a minimal MkDocs theme end to end into themes/<name>/", function() {
-				var root = newTempDir( "bxsites-themeimport-project-" );
+			it( "converts a minimal MkDocs theme end to end into .themes/<name>/", function() {
+				var root = newProjectRoot();
 				var sourceTheme = newTempDir( "bxsites-themeimport-mkdocs-" );
 				fileWrite( sourceTheme & "/base.html", '<html><body><h1>{{ config.site_name }}</h1>{% block content %}{{ page.content }}{% endblock %}</body></html>' );
 				fileWrite( sourceTheme & "/main.html", '<article>{% if page.title %}<h2>{{ page.title }}</h2>{% endif %}</article>' );
@@ -80,7 +92,7 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( result.exitCode ).toBe( 0 );
 
-				var destDir = root & "/themes/mkblog";
+				var destDir = root & "/docs/.themes/mkblog";
 				expect( fileExists( destDir & "/layout.bxm" ) ).toBeTrue();
 				expect( fileExists( destDir & "/page.bxm" ) ).toBeTrue();
 				expect( fileExists( destDir & "/assets/css/style.css" ) ).toBeTrue();
@@ -101,7 +113,7 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "converts a minimal Hugo theme end to end, substituting an unmapped condition with a safe placeholder", function() {
-				var root = newTempDir( "bxsites-themeimport-project-" );
+				var root = newProjectRoot();
 				var sourceTheme = newTempDir( "bxsites-themeimport-hugo-" );
 				directoryCreate( sourceTheme & "/layouts/_default", true, true );
 				fileWrite( sourceTheme & "/layouts/_default/baseof.html", '<html><body>{{ .Site.Title }}</body></html>' );
@@ -111,7 +123,7 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( result.exitCode ).toBe( 0 );
 
-				var destDir = root & "/themes/hugoblog";
+				var destDir = root & "/docs/.themes/hugoblog";
 				var layout = fileRead( destDir & "/layout.bxm" );
 				expect( layout ).toInclude( h( "variables.siteConfig.name" ) );
 
@@ -124,14 +136,14 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "reports missing layout/content without throwing when the source theme matches no known filename", function() {
-				var root = newTempDir( "bxsites-themeimport-project-" );
+				var root = newProjectRoot();
 				var sourceTheme = newTempDir( "bxsites-themeimport-empty-" );
 
 				var result = verb.run( { projectRoot : root, source : "jekyll", path : sourceTheme, name : "emptytheme" } );
 
 				expect( result.exitCode ).toBe( 0 );
 				expect( result.message ).toInclude( "NOT created" );
-				expect( fileExists( root & "/themes/emptytheme/layout.bxm" ) ).toBeFalse();
+				expect( fileExists( root & "/docs/.themes/emptytheme/layout.bxm" ) ).toBeFalse();
 			} );
 
 		} );

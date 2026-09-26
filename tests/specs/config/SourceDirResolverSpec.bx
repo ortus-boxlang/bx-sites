@@ -73,6 +73,90 @@ class extends="testbox.system.BaseSpec" {
 				expect( resolver.resolve( dir & "/" ) ).toBe( dir & "/src" );
 			} );
 
+			it( "honors an explicit source over auto-detection", function() {
+				var dir = createTempDirectory( prefix = "bxsites-sourcedir-explicit-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				directoryCreate( dir & "/content", true, true );
+
+				expect( resolver.name( dir, "content" ) ).toBe( "content" );
+				expect( resolver.resolve( dir, "content" ) ).toBe( dir & "/content" );
+			} );
+
+			it( "resolves an explicit source of '.' to the project root itself, not <root>/.", function() {
+				var dir = createTempDirectory( prefix = "bxsites-sourcedir-dot-" );
+				tempDirs.append( dir );
+
+				expect( resolver.name( dir, "." ) ).toBe( "." );
+				expect( resolver.resolve( dir, "." ) ).toBe( dir );
+			} );
+
+			describe( "nameConfigured() / resolveConfigured() - the strict, config-loading pair", function() {
+
+				it( "honors bxsites.yaml's own [source] key", function() {
+					var dir = createTempDirectory( prefix = "bxsites-sourcedir-cfg-explicit-" );
+					tempDirs.append( dir );
+					directoryCreate( dir & "/content", true, true );
+					fileWrite( dir & "/bxsites.yaml", 'name: "Test"' & char( 10 ) & "source: content" & char( 10 ) );
+
+					expect( resolver.nameConfigured( dir ) ).toBe( "content" );
+					expect( resolver.resolveConfigured( dir ) ).toBe( dir & "/content" );
+				} );
+
+				it( "resolves [source]: . to the project root itself", function() {
+					var dir = createTempDirectory( prefix = "bxsites-sourcedir-cfg-dot-" );
+					tempDirs.append( dir );
+					fileWrite( dir & "/index.md", "Home" );
+					fileWrite( dir & "/bxsites.yaml", 'name: "Test"' & char( 10 ) & "source: ." & char( 10 ) );
+
+					expect( resolver.nameConfigured( dir ) ).toBe( "." );
+					expect( resolver.resolveConfigured( dir ) ).toBe( dir );
+				} );
+
+				it( "auto-detects docs/src when [source] is unset but one of them exists on disk", function() {
+					var dir = createTempDirectory( prefix = "bxsites-sourcedir-cfg-autodetect-" );
+					tempDirs.append( dir );
+					directoryCreate( dir & "/src", true, true );
+					fileWrite( dir & "/bxsites.yaml", 'name: "Test"' & char( 10 ) );
+
+					expect( resolver.nameConfigured( dir ) ).toBe( "src" );
+					expect( resolver.resolveConfigured( dir ) ).toBe( dir & "/src" );
+				} );
+
+				it( "throws BxSites.SourceNotConfigured when [source] is unset and neither docs/ nor src/ exists", function() {
+					var dir = createTempDirectory( prefix = "bxsites-sourcedir-cfg-none-" );
+					tempDirs.append( dir );
+					fileWrite( dir & "/bxsites.yaml", 'name: "Test"' & char( 10 ) );
+
+					expect( function() {
+						resolver.nameConfigured( dir );
+					} ).toThrow( "BxSites.SourceNotConfigured" );
+					expect( function() {
+						resolver.resolveConfigured( dir );
+					} ).toThrow( "BxSites.SourceNotConfigured" );
+				} );
+
+				it( "rejects [source]: site outright - that name is reserved for the build output", function() {
+					var dir = createTempDirectory( prefix = "bxsites-sourcedir-cfg-site-" );
+					tempDirs.append( dir );
+					fileWrite( dir & "/bxsites.yaml", 'name: "Test"' & char( 10 ) & "source: site" & char( 10 ) );
+
+					expect( function() {
+						resolver.nameConfigured( dir );
+					} ).toThrow( "BxSites.InvalidConfig" );
+				} );
+
+				it( "throws BxSites.ConfigNotFound when no bxsites.yaml/.toml/.json exists at all", function() {
+					var dir = createTempDirectory( prefix = "bxsites-sourcedir-cfg-missing-" );
+					tempDirs.append( dir );
+
+					expect( function() {
+						resolver.nameConfigured( dir );
+					} ).toThrow( "BxSites.ConfigNotFound" );
+				} );
+
+			} );
+
 		} );
 	}
 

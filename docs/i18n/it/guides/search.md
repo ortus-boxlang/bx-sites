@@ -261,7 +261,8 @@ questo caso - i temi integrati semplicemente non renderizzano nulla per
 un nome di provider non riconosciuto, e collegare un quarto servizio di
 ricerca (Meilisearch, Typesense, ecc.) è una
 [sovrascrittura di tema](themes.md#overriding-a-theme) a livello di
-progetto: copia un tema integrato nel `theme/` proprio del tuo progetto e
+progetto: copia un tema integrato nel `.theme/` proprio del tuo progetto,
+dentro la sua content root, e
 aggiungi il markup/gli script del tuo provider al suo `layout.bxm`/
 `search.bxm`, leggendo `siteConfig.searchProvider` per decidere quando
 renderizzarli - rami `searchProviderName eq "..."` per il punto di

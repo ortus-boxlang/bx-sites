@@ -357,7 +357,7 @@ A one-shot environment/config health check - the "run this before filing a
 bug report" verb. Checks the JVM version, that `docs/` exists, that
 `bxsites.yaml`/`.json` actually parses and validates, that the required
 BoxLang modules (`bx-markdown`, `bx-esapi`, `bx-yaml`, `bx-image`) are
-installed and activated, and - if a project-level `theme/` override
+installed and activated, and - if a content-root `.theme/` override
 exists - that it satisfies the two-required-file `layout.bxm`/`page.bxm`
 contract.
 
@@ -473,8 +473,10 @@ never activates a plugin - see [Plugins](guides/plugins.md)).
 
 ## `theme:new`
 
-Eject one of the built-in themes into the project's own `theme/` folder
-for customizing, matching mkdocs' `--theme` eject workflow.
+Eject one of the built-in themes into the project's own `.theme/` folder,
+inside the content root (see
+[Content Source](guides/content-source.md#where-a-theme-override-lives)),
+for customizing - matching mkdocs' `--theme` eject workflow.
 
 ```bash title="Usage"
 bxSites theme:new --theme=material
@@ -482,15 +484,15 @@ bxSites theme:new --theme=material
 
 - `--theme` (required) - `bootstrap`, `material`, `tailwind`, `docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook`, or `notion` - see [Themes](guides/themes.md#built-in)
 
-Fails rather than overwriting an existing `theme/`. See
+Fails rather than overwriting an existing `.theme/`. See
 [Themes](guides/themes.md) for the override contract (`layout.bxm` +
 `page.bxm`).
 
 ## `install:theme`
 
 Download a published theme from ForgeBox into the project's own
-`themes/<name>/` - nothing but the `bxSites` binary needed, same as
-`install:plugin`.
+`.themes/<name>/`, inside the content root - nothing but the `bxSites`
+binary needed, same as `install:plugin`.
 
 ```bash title="Usage"
 bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
@@ -530,7 +532,8 @@ skills install`) that don't need `bxSites` at all.
 
 Best-effort conversion of a theme from another static site generator's
 ecosystem (`mkdocs`/`jekyll`/`hugo`) into a bx-sites theme scaffold under
-`themes/<name>/` - a starting point, not a lossless one-command port.
+`.themes/<name>/`, inside the content root - a starting point, not a
+lossless one-command port.
 
 ```bash title="Usage"
 bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
@@ -538,7 +541,7 @@ bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-th
 
 - `--source` (required) - `mkdocs`, `jekyll`, or `hugo`
 - `--path` (required) - the source theme's own root folder
-- `--name` (required) - the destination name, written to `themes/<name>/`
+- `--name` (required) - the destination name, written to `.themes/<name>/`
 
 Safe to re-run against the same `--name` - `layout.bxm`/`page.bxm` are
 overwritten and any newly-found asset folders merged in. See

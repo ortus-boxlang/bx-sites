@@ -1,7 +1,7 @@
 /**
  * `theme:import` CLI verb - best-effort conversion of a theme from
  * another static-site-generator ecosystem into a bx-sites theme scaffold
- * under `themes/<name>/`, dispatching to ThemeImporter.bx with the
+ * under `<contentRoot>/.themes/<name>/`, dispatching to ThemeImporter.bx with the
  * matching ecosystem's own layout/content candidate filenames, asset
  * folder names, variable-name map, and translator
  * (JinjaLikeTranslator.bx for `mkdocs`/`jekyll`'s shared Jinja2/Liquid
@@ -18,7 +18,7 @@
 class {
 
 	/**
-	 * @options { projectRoot (required, absolute path), source (required - "mkdocs", "jekyll", or "hugo"), path (required - absolute path to the source theme's own root folder), name (required - the destination name under themes/<name>/) }
+	 * @options { projectRoot (required, absolute path), source (required - "mkdocs", "jekyll", or "hugo"), path (required - absolute path to the source theme's own root folder), name (required - the destination name under .themes/<name>/) }
 	 */
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
@@ -42,7 +42,8 @@ class {
 		}
 
 		var config = ecosystemConfig( source )
-		var destDir = projectRoot.reReplace( "[\/]+$", "" ) & "/themes/" & name
+		var contentRoot = new "models.config.SourceDirResolver@bxsites"().resolveConfigured( projectRoot )
+		var destDir = contentRoot & "/.themes/" & name
 
 		var importer = new "models.build.ThemeImporter@bxsites"()
 		var result = importer.import(
@@ -152,12 +153,12 @@ class {
 	}
 
 	/**
-	 * @name The destination theme name (themes/<name>/)
+	 * @name The destination theme name (.themes/<name>/)
 	 * @destDir Absolute path the scaffold was written to
 	 * @result ThemeImporter.import()'s own return shape
 	 */
 	private string function formatReport( required string name, required string destDir, required struct result ) {
-		var lines = [ "Imported into themes/#arguments.name#/ (#arguments.destDir#)" ]
+		var lines = [ "Imported into .themes/#arguments.name#/ (#arguments.destDir#)" ]
 		lines.append( len( arguments.result.layoutFile ) ? "  layout.bxm <- #arguments.result.layoutFile#" : "  layout.bxm - NOT created (no source template found)" )
 		lines.append( len( arguments.result.contentFile ) ? "  page.bxm   <- #arguments.result.contentFile#" : "  page.bxm   - NOT created (no source template found)" )
 

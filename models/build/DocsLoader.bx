@@ -10,25 +10,48 @@ class {
 	variables.pathRelativizer = new "models.build.PathRelativizer@bxsites"()
 
 	/**
+	 * Names always excluded from content, on top of `load()`'s own
+	 * caller-provided list (bxsites.yaml's own `exclude` key) - matched the
+	 * same way, at the root of whichever tree is being walked. Covers
+	 * repo/tooling directories and bx-sites' own config files that could
+	 * otherwise get swept up as "content" when a project sets `source: .`
+	 * (the whole repo is the docs), and is applied unconditionally in every
+	 * source mode since none of these would ever legitimately be a page.
+	 * Deliberately does NOT include README.md/LICENSE.md/CHANGELOG.md - a
+	 * project is free to have a real content page at that exact path (this
+	 * module's own docs/license.md, for one); a project scanning its whole
+	 * repo via `source: .` and NOT wanting its root README/LICENSE/CHANGELOG
+	 * published opts out of those by name via its own `exclude:` key instead.
+	 */
+	static.defaultExcludes = [
+		".git", ".github", "boxlang_modules", "node_modules", "site", ".theme", ".themes",
+		"bxsites.yaml", "bxsites.yml", "bxsites.toml", "bxsites.json", "box.json"
+	]
+
+	/**
 	 * Walks every `.md` file under `docsDir` (excluding `docs/assets/**`,
-	 * `docs/versions/**`, `docs/i18n/**`, `docs/blog/**` and `docs/includes/**`
-	 * - each is its own separately loaded/built tree, or not a page at all, not
+	 * `docs/versions/**`, `docs/i18n/**`, `docs/blog/**`, `docs/includes/**`,
+	 * `defaultExcludes` above, and `exclude` - each is its own separately
+	 * loaded/built tree, not a page at all, or a project's own opt-out, not
 	 * part of whichever tree `docsDir` itself is) and loads each into a page
 	 * struct. Since every tree (the main tree, each version, each locale, each
-	 * version's own locale) calls this with its own root, `docs/includes/**`
-	 * is excluded the same way at every level - `docs/versions/1.0/includes/**`,
+	 * version's own locale) calls this with its own root, every exclusion is
+	 * applied the same way at every level - `docs/versions/1.0/includes/**`,
 	 * `docs/i18n/es/includes/**`, etc. - with no extra code per tree.
 	 *
 	 * @docsDir Absolute path to the project's docs/ directory
+	 * @exclude Extra names to exclude, on top of `defaultExcludes` - bxsites.yaml's own `exclude` array (ConfigLoader.bx), matched the same way (a bare name at the root of `docsDir`, or a `/`-prefixed subtree under it)
 	 *
 	 * @return Array of page structs, sorted by [order] then [title]: { relativePath, sourcePath, urlPath, title, description, order, hidden, tags, redirectFrom, frontmatter, icon, summary, ogImage, layout, body }
 	 */
-	array function load( required string docsDir ) {
+	array function load( required string docsDir, array exclude = [] ) {
 		var dir = variables.pathRelativizer.normalize( arguments.docsDir ).reReplace( "[\/]+$", "" )
 
 		if ( !directoryExists( dir ) ) {
 			throw( type = "BxSites.DocsDirNotFound", message = "No docs/ directory found at [#dir#]" )
 		}
+
+		var excludeNames = duplicate( static.defaultExcludes ).append( arguments.exclude, true )
 
 		var pages = directoryList( dir, true, "path", "*.md" )
 			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFindNoCase( "^assets[\/]" ) )
@@ -36,6 +59,7 @@ class {
 			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFindNoCase( "^i18n[\/]" ) )
 			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFindNoCase( "^blog[\/]" ) )
 			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFindNoCase( "^includes[\/]" ) )
+			.filter( path => !isExcluded( variables.pathRelativizer.relativeTo( dir, path ), excludeNames ) )
 			.map( path => loadFile( dir, path ) )
 
 		pages.sort( ( a, b ) => {
@@ -96,6 +120,30 @@ class {
 			layout       : trim( fm.layout ?: "" ),
 			body         : parsed.body
 		}
+	}
+
+	/**
+	 * True when `relativePath` sits under (or is exactly) one of
+	 * `excludeNames` at the root of whichever tree is being walked - each
+	 * name matches itself exactly (a root-level file, e.g. `README.md`) or
+	 * as a directory prefix (`name/**`), case-insensitively, the same way
+	 * the built-in `assets`/`versions`/`i18n`/`blog`/`includes` exclusions
+	 * above do.
+	 *
+	 * @relativePath The docs/-relative path being tested
+	 * @excludeNames Bare names (no slashes) to exclude
+	 */
+	private boolean function isExcluded( required string relativePath, required array excludeNames ) {
+		for ( var name in arguments.excludeNames ) {
+			var trimmedName = trim( name )
+			if ( !len( trimmedName ) ) {
+				continue
+			}
+			if ( arguments.relativePath.reFindNoCase( "^" & reEscape( trimmedName ) & "([\/]|$)" ) ) {
+				return true
+			}
+		}
+		return false
 	}
 
 	/**

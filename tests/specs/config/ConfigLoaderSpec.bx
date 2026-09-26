@@ -187,6 +187,53 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
+			it( "defaults [source] to an empty string (auto-detect) when absent", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).source ).toBe( "" );
+			} );
+
+			it( "preserves a user-supplied [source]", function() {
+				var dir = newProjectDir( '{"name":"My Docs","source":"content"}' );
+				expect( loader.load( dir ).source ).toBe( "content" );
+			} );
+
+			it( "preserves [source] of '.'", function() {
+				var dir = newProjectDir( '{"name":"My Docs","source":"."}' );
+				expect( loader.load( dir ).source ).toBe( "." );
+			} );
+
+			it( "throws BxSites.InvalidConfig when [source] is not a string", function() {
+				var dir = newProjectDir( '{"name":"My Docs","source":["docs"]}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
+			it( "defaults [exclude] to an empty array when absent", function() {
+				var dir = newProjectDir( '{"name":"My Docs"}' );
+				expect( loader.load( dir ).exclude ).toBeArray();
+				expect( loader.load( dir ).exclude.len() ).toBe( 0 );
+			} );
+
+			it( "preserves a user-supplied [exclude] array", function() {
+				var dir = newProjectDir( '{"name":"My Docs","exclude":["drafts","internal"]}' );
+				expect( loader.load( dir ).exclude ).toBe( [ "drafts", "internal" ] );
+			} );
+
+			it( "throws BxSites.InvalidConfig when [exclude] is not an array", function() {
+				var dir = newProjectDir( '{"name":"My Docs","exclude":"drafts"}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
+			it( "throws BxSites.InvalidConfig when an [exclude] entry is blank", function() {
+				var dir = newProjectDir( '{"name":"My Docs","exclude":["drafts",""]}' );
+				expect( function() {
+					loader.load( dir );
+				} ).toThrow( "BxSites.InvalidConfig" );
+			} );
+
 			it( "defaults [searchProvider] to the local provider", function() {
 				var dir = newProjectDir( '{"name":"My Docs"}' );
 				var config = loader.load( dir );

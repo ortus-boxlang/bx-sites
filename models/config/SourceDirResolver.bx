@@ -1,43 +1,76 @@
 /**
- * Resolves a project's content source folder - `docs/` (the original,
- * still-default convention) or `src/` (a neutral alternative name that
- * reads naturally for a project that thinks of itself as a general
- * "site" rather than "docs"). Whichever actually exists on disk wins;
- * `docs/` is checked first, so an existing project with both a
- * leftover `src/` folder (unrelated to bx-sites - a mixed-language repo's
- * own source tree, say) and a real `docs/` keeps working exactly as
- * before, with zero behavior change.
+ * Resolves a project's content source folder. The site config's own
+ * `source` key (bxsites.yaml) wins outright when set - any folder name, or
+ * `.` to mean "the project root itself is the content root" (module spec's
+ * "the entire repo is the docs" case, e.g. a repo with no docs/ or src/
+ * subfolder at all).
+ *
+ * When `source` is unset, this falls back to auto-detecting the original
+ * `docs/`/`src/` convention - `docs/` checked first, then `src/`, whichever
+ * actually exists on disk wins. A brand-new project with neither folder yet
+ * (the moment right before `new`/`migrate` scaffolds one) still resolves to
+ * `docs/`, since `New.bx` always writes an explicit `source:` into the
+ * config it generates - this bare-default path only matters for the
+ * `new`/`migrate` scaffolders' own pre-config-write moment.
+ *
+ * `name()`/`resolve()` take an explicit `source` string and never load a
+ * config themselves - the low-level building blocks, used directly by
+ * `new`/`migrate` (no config on disk yet) and internally by the
+ * `*Configured()` pair below. `nameConfigured()`/`resolveConfigured()` load
+ * the project's real config (ConfigLoader.bx) and require an unambiguous
+ * answer: they throw `BxSites.SourceNotConfigured` when `source` is unset
+ * AND neither `docs/` nor `src/` exists on disk, instead of silently
+ * defaulting to `docs/` - every real build/CLI code path against an
+ * already-configured project calls one of these two, not the bare
+ * `name()`/`resolve()` above, so a typo'd or renamed content folder fails
+ * loudly instead of quietly building an empty site or misfiling new content.
  *
  * Deliberately does NOT touch the build *output* folder name - `site/`
  * stays `site/` unconditionally, regardless of which source name was
- * detected. `site/` is BuildPipeline.bx's own hardcoded output directory
- * (deleted and rewritten on every build), so letting it double as a
- * valid *source* name too would make a build delete its own source
- * content - this resolver only ever recognizes `docs/`/`src/`, never
- * `site/`.
- *
- * A brand-new project with neither folder yet (the moment right before
- * `new`/`migrate` scaffolds one) resolves to `docs/` - the long-standing
- * default - so error messages and scaffolding both keep pointing at the
- * familiar name until a project actually opts into `src/` by creating it.
+ * detected or configured. `site/` is BuildPipeline.bx's own hardcoded
+ * output directory (deleted and rewritten on every build), so letting it
+ * double as a valid *source* name too would make a build delete its own
+ * source content - `resolveConfigured()`/`nameConfigured()` reject
+ * `source: site` outright.
  */
 class {
 
 	/**
-	 * Recognized source-folder names, in resolution preference order.
+	 * Recognized source-folder names for auto-detection, in resolution
+	 * preference order - only consulted when `source` is empty.
 	 */
 	static.candidateNames = [ "docs", "src" ]
 
+	variables.configLoader = new "models.config.ConfigLoader@bxsites"()
+
 	/**
-	 * The bare folder name (`"docs"` or `"src"`) this project's source
-	 * content actually lives under - whichever of `candidateNames` exists
-	 * on disk first, or `"docs"` (the default) when neither does yet.
+	 * Swaps in a fake/test config loader - same pattern as
+	 * ThemeRenderer.bx/BuildPipeline.bx's own setters, for unit tests that
+	 * want to drive `*Configured()` without a real bxsites.yaml on disk.
+	 *
+	 * @loader Any object exposing `load( projectRoot )` -> struct with a `source` key
+	 */
+	void function setConfigLoader( required any loader ) {
+		variables.configLoader = arguments.loader
+	}
+
+	/**
+	 * The bare folder name (`"docs"`/`"src"`/a custom name/`"."`) this
+	 * project's source content lives under, given an explicit `source`
+	 * value - or, when that's empty, whichever of `candidateNames` exists
+	 * on disk first, or `"docs"` (the long-standing default) when neither
+	 * does yet.
 	 *
 	 * @projectRoot Absolute path to the project root
+	 * @source A `source` config value - empty string (the default) auto-detects
 	 */
-	string function name( required string projectRoot ) {
-		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+	string function name( required string projectRoot, string source = "" ) {
+		var explicit = trim( arguments.source )
+		if ( len( explicit ) ) {
+			return explicit
+		}
 
+		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
 		for ( var candidate in static.candidateNames ) {
 			if ( directoryExists( root & "/" & candidate ) ) {
 				return candidate
@@ -49,13 +82,66 @@ class {
 
 	/**
 	 * The absolute path to this project's source content folder - `name()`'s
-	 * result joined back onto `projectRoot`.
+	 * result joined back onto `projectRoot`, with `.` resolving to
+	 * `projectRoot` itself rather than `<projectRoot>/.`.
+	 *
+	 * @projectRoot Absolute path to the project root
+	 * @source A `source` config value - empty string (the default) auto-detects
+	 */
+	string function resolve( required string projectRoot, string source = "" ) {
+		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		var sourceName = name( root, arguments.source )
+		return sourceName == "." ? root : ( root & "/" & sourceName )
+	}
+
+	/**
+	 * `name()`, loading the project's real `source` config first and
+	 * requiring an unambiguous answer - see this class's own docblock.
 	 *
 	 * @projectRoot Absolute path to the project root
 	 */
-	string function resolve( required string projectRoot ) {
-		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
-		return root & "/" & name( root )
+	string function nameConfigured( required string projectRoot ) {
+		var config = variables.configLoader.load( arguments.projectRoot )
+		var explicit = trim( config.source ?: "" )
+		assertResolvable( arguments.projectRoot, explicit )
+		return name( arguments.projectRoot, explicit )
+	}
+
+	/**
+	 * `resolve()`, loading the project's real `source` config first and
+	 * requiring an unambiguous answer - see this class's own docblock.
+	 *
+	 * @projectRoot Absolute path to the project root
+	 */
+	string function resolveConfigured( required string projectRoot ) {
+		var config = variables.configLoader.load( arguments.projectRoot )
+		var explicit = trim( config.source ?: "" )
+		assertResolvable( arguments.projectRoot, explicit )
+		return resolve( arguments.projectRoot, explicit )
+	}
+
+	/**
+	 * @projectRoot Absolute path to the project root
+	 * @source The config's own `source` value, already trimmed
+	 */
+	private void function assertResolvable( required string projectRoot, required string source ) {
+		if ( lCase( arguments.source ) == "site" ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "bxsites.yaml [source] cannot be ""site"" - that name is reserved for the generated build output"
+			)
+		}
+
+		if ( !len( arguments.source ) ) {
+			var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+			var found = static.candidateNames.filter( candidate => directoryExists( root & "/" & candidate ) )
+			if ( found.isEmpty() ) {
+				throw(
+					type    = "BxSites.SourceNotConfigured",
+					message = "No docs/ or src/ folder found, and no [source] set in bxsites.yaml - set source: docs, source: src, or source: . (if your whole repo is the content) to tell bxSites where your content lives"
+				)
+			}
+		}
 	}
 
 }

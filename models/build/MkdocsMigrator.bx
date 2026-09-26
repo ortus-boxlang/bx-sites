@@ -101,6 +101,15 @@ class {
 			)
 		}
 
+		// Runs before bxsites.yaml is written below (this migrator generates
+		// the project's whole config, not just its content, unlike
+		// GitBookMigrator.bx/NotionMigrator.bx/MarkdownZipMigrator.bx which
+		// all assume an already-`new`-scaffolded project) - so this has to be
+		// the bare, config-free resolve()/name(), not resolveConfigured()/
+		// nameConfigured(), which would throw BxSites.ConfigNotFound on a
+		// first-time conversion with no bxsites.yaml on disk yet. Always the
+		// "docs" default, since this migrator offers no --source of its own.
+		var sourceName = variables.sourceDirResolver.name( arguments.projectRoot )
 		var docsDir = variables.sourceDirResolver.resolve( arguments.projectRoot )
 		if ( !directoryExists( docsDir ) ) {
 			directoryCreate( docsDir, true, true )
@@ -112,14 +121,14 @@ class {
 		if ( isArray( mkdocsNav ) && mkdocsNav.len() ) {
 			var navPath = docsDir & "/nav.json"
 			if ( fileExists( navPath ) ) {
-				warnings.append( variables.sourceDirResolver.name( arguments.projectRoot ) & "/nav.json already existed and was overwritten by this migration" )
+				warnings.append( sourceName & "/nav.json already existed and was overwritten by this migration" )
 			}
 			fileWrite( navPath, jsonSerialize( convertNav( mkdocsNav ) ) )
 		} else {
 			var navPath = ""
 		}
 
-		var bxsitesConfig = buildBxsitesConfig( mkdocsConfig, arguments.sourceDir, warnings )
+		var bxsitesConfig = buildBxsitesConfig( mkdocsConfig, arguments.sourceDir, warnings, sourceName )
 		var configPath = arguments.projectRoot & "/bxsites.yaml"
 		if ( fileExists( configPath ) ) {
 			warnings.append( "bxsites.yaml already existed and was overwritten by this migration" )
@@ -144,15 +153,16 @@ class {
 	 * @mkdocsConfig The parsed mkdocs.yml struct (variables.yamlRenderer.fromYaml()'s own output)
 	 * @sourceDir Absolute path to the mkdocs project root (for the site-name-fallback warning message)
 	 * @warnings Accumulator array, mutated in place
+	 * @sourceName The resolved content folder name written into the generated config's own [source] key, so the new project is never ambiguous (SourceDirResolver.bx's own docblock)
 	 */
-	private struct function buildBxsitesConfig( required struct mkdocsConfig, required string sourceDir, required array warnings ) {
+	private struct function buildBxsitesConfig( required struct mkdocsConfig, required string sourceDir, required array warnings, required string sourceName ) {
 		var siteName = trim( arguments.mkdocsConfig.site_name ?: "" )
 		if ( !len( siteName ) ) {
 			siteName = listLast( arguments.sourceDir.reReplace( "[\/]+$", "" ), "/\" )
 			arguments.warnings.append( "mkdocs.yml has no [site_name] - defaulted bxsites.yaml [name] to ""#siteName#""" )
 		}
 
-		var config = { "name" : siteName }
+		var config = { "name" : siteName, "source" : arguments.sourceName }
 
 		var description = trim( arguments.mkdocsConfig.site_description ?: "" )
 		if ( len( description ) ) {

@@ -64,7 +64,24 @@ class extends="testbox.system.BaseSpec" {
 				expect( yaml ).toInclude( "My Site" );
 				expect( yaml ).toInclude( "A cool site" );
 				expect( yaml ).toInclude( "material" );
+				expect( yaml ).toInclude( "source:" );
 				expect( new "models.config.ConfigLoader@bxsites"().configPathFor( dir ) ).toBe( dir & "/bxsites.yaml" );
+			} );
+
+			it( "writes an explicit [source] into the scaffolded config, so a fresh project is never ambiguous", function() {
+				var dir = newTargetDir();
+				scaffolder.scaffold( dir, "My Site", "bootstrap" );
+
+				var config = new "models.config.ConfigLoader@bxsites"().load( dir );
+				expect( config.source ).toBe( "docs" );
+			} );
+
+			it( "writes the requested [source] (src) into the scaffolded config", function() {
+				var dir = newTargetDir();
+				scaffolder.scaffold( dir, "My Site", "bootstrap", "", "yaml", "src" );
+
+				var config = new "models.config.ConfigLoader@bxsites"().load( dir );
+				expect( config.source ).toBe( "src" );
 			} );
 
 			it( "escapes quotes in the site name/description so the YAML stays valid", function() {
@@ -86,6 +103,7 @@ class extends="testbox.system.BaseSpec" {
 
 				var config = new "models.config.ConfigLoader@bxsites"().load( dir );
 				expect( config.name ).toBe( "My Site" );
+				expect( config.source ).toBe( "docs" );
 			} );
 
 			it( "scaffolds bxsites.toml instead when format is toml", function() {
@@ -98,6 +116,7 @@ class extends="testbox.system.BaseSpec" {
 
 				var config = new "models.config.ConfigLoader@bxsites"().load( dir );
 				expect( config.name ).toBe( "My Site" );
+				expect( config.source ).toBe( "docs" );
 			} );
 
 			it( "escapes quotes in the site name/description so the scaffolded JSON stays valid", function() {

@@ -50,7 +50,7 @@ class extends="testbox.system.BaseSpec" {
 				var result = verb.run( { projectRoot : projectRoot } );
 
 				expect( result.exitCode ).toBe( 1 );
-				expect( result.message ).toInclude( "no docs/ or src/ directory" );
+				expect( result.message ).toInclude( "No docs/ or src/ folder found" );
 			} );
 
 			it( "exits 1 and reports an invalid bxsites.json", function() {
@@ -64,10 +64,10 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.message ).toInclude( "not valid JSON" );
 			} );
 
-			it( "exits 1 when a project theme/ override is missing a required file", function() {
+			it( "exits 1 when a project .theme/ override is missing a required file", function() {
 				var projectRoot = newProjectRoot();
-				directoryCreate( projectRoot & "/theme", true, true );
-				fileWrite( projectRoot & "/theme/layout.bxm", "<html></html>" );
+				directoryCreate( projectRoot & "/docs/.theme", true, true );
+				fileWrite( projectRoot & "/docs/.theme/layout.bxm", "<html></html>" );
 
 				var result = verb.run( { projectRoot : projectRoot } );
 
@@ -75,11 +75,11 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.message ).toInclude( "missing required page.bxm" );
 			} );
 
-			it( "exits 0 when a project theme/ override has both required files", function() {
+			it( "exits 0 when a project .theme/ override has both required files", function() {
 				var projectRoot = newProjectRoot();
-				directoryCreate( projectRoot & "/theme", true, true );
-				fileWrite( projectRoot & "/theme/layout.bxm", "<html></html>" );
-				fileWrite( projectRoot & "/theme/page.bxm", "<article></article>" );
+				directoryCreate( projectRoot & "/docs/.theme", true, true );
+				fileWrite( projectRoot & "/docs/.theme/layout.bxm", "<html></html>" );
+				fileWrite( projectRoot & "/docs/.theme/page.bxm", "<article></article>" );
 
 				var result = verb.run( { projectRoot : projectRoot } );
 
