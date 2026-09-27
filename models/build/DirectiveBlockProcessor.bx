@@ -138,6 +138,55 @@ class {
 	}
 
 	/**
+	 * `::: comments`'s own build-wide gate (`renderComments()` below) - set
+	 * once per `build()` call (BuildPipeline.bx, right after config
+	 * resolution), the same "build-wide, not per-page" scope as
+	 * `cloudApiUrl` above. Unlike `::: cloud`, there's no build-time fetch
+	 * here at all (comments always live-load client-side, same-origin
+	 * through the edge router), so there's no token/URL/onError to carry -
+	 * just the one on/off gate.
+	 */
+	variables.commentsEnabled = false
+
+	/**
+	 * Wires `config.cloud.comments` into `renderComments()` below - see
+	 * `variables.commentsEnabled`'s own docblock for why this needs no
+	 * other fields. Always called once per `build()` (both true and
+	 * false), unlike `setCloudContext()`'s conditional call - `comments`
+	 * needs no token resolution to guard, so there's no reason to leave a
+	 * stale value from an earlier `build()` call (DevServer.bx's own
+	 * repeated in-process rebuild()s) sitting here if a later call's
+	 * config turns it back off.
+	 *
+	 * @enabled `config.cloud.comments`
+	 */
+	void function setCommentsContext( required boolean enabled ) {
+		variables.commentsEnabled = arguments.enabled
+	}
+
+	/**
+	 * The current page's own `urlPath` (DocsLoader.bx) - `::: comments`'s
+	 * own default thread id when no explicit `id="..."` attribute is given
+	 * (`renderComments()` below), so every page gets its own comment
+	 * thread for free. Set once per page, right alongside
+	 * `setLoopContext()` (BuildPipeline.bx's own per-page rendering loop) -
+	 * NOT build-wide like `commentsEnabled` above, since this genuinely
+	 * varies page to page.
+	 */
+	variables.currentPageUrlPath = ""
+
+	/**
+	 * Wires the current page's own URL path into `renderComments()` below -
+	 * see `variables.currentPageUrlPath`'s own docblock for why this is a
+	 * per-page setter rather than a build-wide one like `setCommentsContext()`.
+	 *
+	 * @urlPath The current page's own `urlPath` (DocsLoader.bx)
+	 */
+	void function setPageContext( required string urlPath ) {
+		variables.currentPageUrlPath = arguments.urlPath
+	}
+
+	/**
 	 * Wires this page's own `{{ }}` resolution context into `renderFor()`/
 	 * `renderIfChain()` - see `variables.loopVariablesProcessor`'s own
 	 * docblock for why this is a setter rather than a constructor/`extract()`
@@ -610,6 +659,8 @@ class {
 				return renderEmbed( attrs )
 			case "cloud":
 				return renderCloud( attrs, renderer, markdownOptions )
+			case "comments":
+				return renderComments( attrs )
 			case "page-link":
 				return renderPageLinkStub( attrs )
 			case "link-preview":
@@ -1497,6 +1548,49 @@ class {
 
 		systemOutput( '[bx-sites] Warning: ::: cloud slug="#arguments.slug#" could not be fetched at build time - rendering an empty placeholder (cloud.contentBlocksOnError = "skip")', true )
 		return '<div class="bxsites-cloud bxsites-cloud--unavailable" data-cloud-slug="' & attrEscape( arguments.slug ) & '"></div>'
+	}
+
+	/**
+	 * `::: comments` (optionally `::: comments id="..."`) - bakes an empty
+	 * container bxSites Cloud's comments (a customer's own moderated,
+	 * paginated visitor comment thread) get mounted into on page load.
+	 * Deliberately never fetches anything at build time, unlike
+	 * `::: cloud` above - a comment thread grows continuously after
+	 * deploy, so baking a snapshot in would go stale the moment a new
+	 * comment lands. The shipped `comments-init.js` (only when
+	 * `cloud.comments: true` - see `copyAssetsFresh()`) does the one and
+	 * only real fetch, every time this page loads, straight from
+	 * `/api/comments/{threadId}` - same-origin, proxied by
+	 * bx-sites-edge-router through to bxSites Cloud (same shape as
+	 * `cloud-content-init.js`'s own `/api/content/{slug}` call).
+	 *
+	 * `id` is an optional explicit thread id (lets two blocks on one page,
+	 * or blocks sharing a thread across pages, opt out of the default)
+	 * - when omitted, the thread id defaults to this page's own `urlPath`
+	 * (`setPageContext()` above), so every page gets its own comment
+	 * thread with zero configuration.
+	 *
+	 * Requires `cloud.comments: true` in `bxsites.yaml` (BuildPipeline.bx
+	 * calls `setCommentsContext()` once per `build()`) - a bare
+	 * `::: comments` block in a project that hasn't turned that on always
+	 * fails the build outright, same posture as `::: cloud` without
+	 * `cloud.contentBlocks` - there's no sensible placeholder for "this
+	 * directive can never work at all here."
+	 */
+	private string function renderComments( required struct attrs ) {
+		if ( !variables.commentsEnabled ) {
+			throw(
+				type    = "BxSites.CommentsNotConfigured",
+				message = "::: comments - requires [cloud.comments] set to true in bxsites.yaml - see the Comments guide"
+			)
+		}
+
+		var threadId = trim( arguments.attrs.id ?: "" )
+		if ( !len( threadId ) ) {
+			threadId = variables.currentPageUrlPath
+		}
+
+		return '<div class="bxsites-comments" data-comments-thread="' & attrEscape( threadId ) & '"></div>'
 	}
 
 	/**

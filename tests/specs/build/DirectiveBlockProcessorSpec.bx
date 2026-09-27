@@ -511,6 +511,40 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).notToInclude( "data-cloud-version" );
 			} );
 
+			it( "throws BxSites.CommentsNotConfigured when a comments block is used without setCommentsContext( true ) ever having been called (cloud.comments not enabled)", function() {
+				expect( function() {
+					render( "::: comments" & char( 10 ) & ":::" );
+				} ).toThrow( "BxSites.CommentsNotConfigured" );
+			} );
+
+			it( "throws BxSites.CommentsNotConfigured when setCommentsContext( false ) was explicitly called", function() {
+				processor.setCommentsContext( false );
+
+				expect( function() {
+					render( "::: comments" & char( 10 ) & ":::" );
+				} ).toThrow( "BxSites.CommentsNotConfigured" );
+			} );
+
+			it( "renders an empty, client-mounted container defaulting its thread id to the current page's own urlPath", function() {
+				processor.setCommentsContext( true );
+				processor.setPageContext( "guides/setup" );
+
+				var html = render( "::: comments" & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( 'class="bxsites-comments"' );
+				expect( html ).toInclude( 'data-comments-thread="guides/setup"' );
+			} );
+
+			it( "an explicit id= attribute overrides the page-path default thread id", function() {
+				processor.setCommentsContext( true );
+				processor.setPageContext( "guides/setup" );
+
+				var html = render( '::: comments id="general-feedback"' & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( 'data-comments-thread="general-feedback"' );
+				expect( html ).notToInclude( "guides/setup" );
+			} );
+
 			it( "renders a link-preview card for an external URL with title/description/image/domain", function() {
 				var md = '::: link-preview url="https://boxlang.io" title="BoxLang" description="A dynamic JVM language." image="https://boxlang.io/og.png"' & char( 10 ) & ":::";
 				var html = render( md );

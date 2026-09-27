@@ -158,6 +158,10 @@ class {
 			}
 			variables.directiveBlockProcessor.setCloudContext( config.cloud.apiUrl, cloudToken, config.cloud.contentBlocksOnError )
 		}
+		// Always called (both true and false) - see setCommentsContext()'s
+		// own docblock for why this doesn't need the conditional
+		// token-guard shape setCloudContext() above has.
+		variables.directiveBlockProcessor.setCommentsContext( config.cloud.comments )
 		var docsDir = variables.sourceDirResolver.resolveConfigured( root )
 		// A project's own "magic functions" (module spec section 8) - a
 		// single project-wide `docs/functions.bxs`, loaded once here rather
@@ -277,7 +281,7 @@ class {
 			default : true
 		} ]
 		var allPages = duplicate( mainResult.pages )
-		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.imageGallery, config.pageActions, config.cloud.contentBlocks, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
+		copyAssets( root, themeDir, siteDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.imageGallery, config.pageActions, config.cloud.contentBlocks, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint, config.cloud.comments )
 		profile( "main assets", buildStartedAt )
 
 		// The plain docs/ tree - "the root" itself when versions.default is
@@ -314,7 +318,7 @@ class {
 				locale  : defaultLocaleCode,
 				default : false
 			} )
-			copyAssets( root, themeDir, nextOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.imageGallery, config.pageActions, config.cloud.contentBlocks, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint )
+			copyAssets( root, themeDir, nextOutputDir, config.theme.name, searchNeedsLocalIndex( config ), config.mermaid, config.math, config.openapi, config.imageGallery, config.pageActions, config.cloud.contentBlocks, imageManifest, assetPipeline.cssBundle, assetPipeline.jsBundle, config.assets.fingerprint, config.cloud.comments )
 			writeTagsPage( nextResult.pages, nextResult.nav, config, themeDir, nextOutputDir, nextBasePath, versions, nextLocales, defaultLocaleCode, siteOrigin, functions, "Next", data )
 			variables.redirectGenerator.write( nextResult.pages, nextOutputDir, nextBasePath )
 			profile( "next tree", buildStartedAt )
@@ -386,7 +390,8 @@ class {
 					imageManifest,
 					assetPipeline.cssBundle,
 					assetPipeline.jsBundle,
-					config.assets.fingerprint
+					config.assets.fingerprint,
+					config.cloud.comments
 				)
 
 				writeTagsPage(
@@ -499,7 +504,8 @@ class {
 							imageManifest,
 							assetPipeline.cssBundle,
 							assetPipeline.jsBundle,
-							config.assets.fingerprint
+							config.assets.fingerprint,
+							config.cloud.comments
 						)
 
 						writeTagsPage(
@@ -659,7 +665,8 @@ class {
 					imageManifest,
 					assetPipeline.cssBundle,
 					assetPipeline.jsBundle,
-					config.assets.fingerprint
+					config.assets.fingerprint,
+					config.cloud.comments
 				)
 				// Write the tags page for this locale
 				writeTagsPage(
@@ -1551,6 +1558,10 @@ class {
 			// renderFor()/renderIf() - see DirectiveBlockProcessor's own
 			// setLoopContext() docblock.
 			activeDirectiveProcessor.setLoopContext( variables.variablesProcessor, pageVars, arguments.functions, functionContext )
+			// Wires this page's own urlPath into renderComments()'s default
+			// thread id - see DirectiveBlockProcessor's own setPageContext()
+			// docblock.
+			activeDirectiveProcessor.setPageContext( page.urlPath )
 			var directivesExtracted = activeDirectiveProcessor.extract( codeExtracted.markdown )
 
 			var html = ""
@@ -2305,8 +2316,9 @@ class {
 	 * @cssBundle AssetBundler.bundleCss()'s own output (via applyAssetPipeline()) - its cached bundle file gets copied into this tree's own site.../assets/ so the `<link>` config.extraCss now points at actually resolves; empty `cachedPath` (the default) copies nothing
 	 * @jsBundle AssetBundler.bundleJs()'s own output - same as cssBundle, for the `<script>` config.extraJs now points at
 	 * @fingerprintEnabled `config.assets.fingerprint` - whether the theme's own `assets/style.css` gets renamed to its fingerprinted filename after copying (resolveThemeStyleUrl()'s own docblock); `true` (the default) matches the site-wide default
+	 * @commentsEnabled Whether to copy the shared comments-init.js widget - `config.cloud.comments`, same explicit-opt-in-only shape as `contentBlocksEnabled`; only ever needed by a project actually using a `::: comments` block (DirectiveBlockProcessor.bx's own `renderComments()`)
 	 */
-	private void function copyAssets( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, boolean imageGalleryEnabled = false, boolean pageActionsEnabled = false, boolean contentBlocksEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {}, boolean fingerprintEnabled = true ) {
+	private void function copyAssets( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, boolean imageGalleryEnabled = false, boolean pageActionsEnabled = false, boolean contentBlocksEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {}, boolean fingerprintEnabled = true, boolean commentsEnabled = false ) {
 		var destAssetsDir = arguments.siteDir & "/assets"
 
 		lock name="bxsites-canonical-assets" type="exclusive" timeout=30 throwOnTimeout=true {
@@ -2355,8 +2367,9 @@ class {
 	 * @cssBundle AssetBundler.bundleCss()'s own output (via applyAssetPipeline()) - its cached bundle file gets copied into this tree's own site.../assets/ so the `<link>` config.extraCss now points at actually resolves; empty `cachedPath` (the default) copies nothing
 	 * @jsBundle AssetBundler.bundleJs()'s own output - same as cssBundle, for the `<script>` config.extraJs now points at
 	 * @fingerprintEnabled `config.assets.fingerprint` - whether the theme's own `assets/style.css` gets renamed to its fingerprinted filename after copying (resolveThemeStyleUrl()'s own docblock); `true` (the default) matches the site-wide default
+	 * @commentsEnabled Whether to copy the shared comments-init.js widget - `config.cloud.comments`, same explicit-opt-in-only shape as `contentBlocksEnabled`; only ever needed by a project actually using a `::: comments` block (DirectiveBlockProcessor.bx's own `renderComments()`)
 	 */
-	private void function copyAssetsFresh( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, boolean imageGalleryEnabled = false, boolean pageActionsEnabled = false, boolean contentBlocksEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {}, boolean fingerprintEnabled = true ) {
+	private void function copyAssetsFresh( required string root, required string themeDir, required string siteDir, required string themeName, required boolean searchEnabled, required boolean mermaidEnabled, boolean mathEnabled = false, boolean openapiEnabled = false, boolean imageGalleryEnabled = false, boolean pageActionsEnabled = false, boolean contentBlocksEnabled = false, struct imageManifest = {}, struct cssBundle = {}, struct jsBundle = {}, boolean fingerprintEnabled = true, boolean commentsEnabled = false ) {
 		var themeAssetsDir = arguments.themeDir & "/assets"
 		if ( directoryExists( themeAssetsDir ) ) {
 			directoryCopy( themeAssetsDir, arguments.siteDir & "/assets/theme", true )
@@ -2425,6 +2438,10 @@ class {
 
 		if ( arguments.contentBlocksEnabled ) {
 			fileCopy( moduleAssetsDir() & "/cloud-content-init.js", arguments.siteDir & "/assets/cloud-content-init.js" )
+		}
+
+		if ( arguments.commentsEnabled ) {
+			fileCopy( moduleAssetsDir() & "/comments-init.js", arguments.siteDir & "/assets/comments-init.js" )
 		}
 
 		var docsAssetsDir = variables.sourceDirResolver.resolveConfigured( arguments.root ) & "/assets"

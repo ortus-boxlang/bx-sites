@@ -67,7 +67,7 @@ class {
 			"i18n"         : { "defaultLocale" : { "code" : "en", "label" : "English" }, "locales" : [] },
 			"blog"         : { "postsPerPage" : 10, "feed" : true, "feedLimit" : 25 },
 			"versions"     : { "default" : "" },
-			"cloud"        : { "siteId" : "", "apiUrl" : "", "contentBlocks" : false, "contentBlocksOnError" : "fail" },
+			"cloud"        : { "siteId" : "", "apiUrl" : "", "contentBlocks" : false, "contentBlocksOnError" : "fail", "comments" : false },
 			"docbox"       : {
 				"projectTitle"   : "",
 				"mappings"       : {},
@@ -697,7 +697,15 @@ class {
 	 * `mermaid`/`openapi`/`math`. `contentBlocksOnError` (`"fail"` or
 	 * `"skip"`, default `"fail"`) controls what a `::: cloud` block does
 	 * when its own build-time fetch fails - DirectiveBlockProcessor.bx's
-	 * own `renderCloud()`. Deliberately no token/secret field here at all, not even an
+	 * own `renderCloud()`. `comments` (default `false`) gates both
+	 * `::: comments` itself (a bare block in a project that hasn't turned
+	 * this on always fails the build, same posture as `contentBlocks`
+	 * below) and whether the small client-side comments-init.js runtime
+	 * gets shipped - see BuildPipeline.bx's `copyAssets()`. Unlike
+	 * `contentBlocks`, there's no build-time fetch for `::: comments` (it
+	 * always live-loads client-side, same-origin through the edge router -
+	 * see DirectiveBlockProcessor.bx's own `renderComments()`), so it needs
+	 * no `apiUrl`/`...OnError` companion field of its own. Deliberately no token/secret field here at all, not even an
 	 * `EnvVar`-suffixed indirection like every `deployments/*` target uses -
 	 * `publish`'s own auth token is a fixed, hardcoded env var name
 	 * (`BXSITES_CLOUD_TOKEN`) plus an optional `--token` CLI flag (see
@@ -750,6 +758,13 @@ class {
 			throw(
 				type    = "BxSites.InvalidConfig",
 				message = "#variables.configFileName# [cloud.contentBlocks] is true but [cloud.apiUrl] is empty - `::: cloud` blocks need it to know where to fetch content from"
+			)
+		}
+
+		if ( !isBoolean( arguments.cloud.comments ?: false ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [cloud.comments], when present, must be true or false"
 			)
 		}
 	}
