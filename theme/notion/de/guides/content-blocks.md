@@ -558,6 +558,43 @@ eine echte Besucherin oder ein echter Besucher nie sieht oder ausfüllt -
 die eigene Spam-Filterung von bxSites Cloud nutzt es, ohne dass hier
 etwas konfiguriert werden muss.
 
+## Kommentare
+
+> **Premium-Funktion.** `::: comments` bindet einen live moderierten
+> Besucher-Kommentarthread auf der Seite ein - dafür ist ein bxSites-
+> Cloud-Konto mit Kommentaren im eigenen Plan erforderlich, sowie
+> `cloud.comments: true` in `bxsites.yaml`. Ohne das schlägt ein
+> `::: comments`-Block den Build immer komplett fehl - dieselbe Haltung
+> wie `::: cloud` ohne `cloud.contentBlocks`.
+
+```markdown title="Beispiel" linenums="1"
+::: comments :::
+```
+
+Keine Attribute sind erforderlich - die Thread-ID entspricht standardmäßig
+dem eigenen URL-Pfad der Seite, sodass jede Seite automatisch ihren
+eigenen Kommentarthread erhält. Ein optionales `id="..."` lässt zwei
+Blöcke auf einer Seite (oder Blöcke auf verschiedenen Seiten) stattdessen
+einen einzigen Thread teilen:
+
+```markdown title="Beispiel" linenums="1"
+::: comments id="general-feedback" :::
+```
+
+Anders als bei `::: cloud` wird beim Build nichts abgerufen oder
+eingebacken - ein Kommentarthread wächst nach jedem Deploy weiter, daher
+würde ein zur Build-Zeit erstellter Schnappschuss veralten, sobald ein
+neuer Kommentar eintrifft. Der Block rendert einen leeren Platzhalter;
+ein kleines clientseitiges Skript (nur ausgeliefert, wenn
+`cloud.comments: true` gesetzt ist - derselbe explizite Opt-in, den
+`cloud.contentBlocks` bereits verwendet) lädt bei jedem Seitenaufruf die
+aktuellen, bereits moderierten Kommentare und blättert bei Bedarf durch
+ältere, und rendert anschließend ein Formular zum Posten eines neuen
+Kommentars. Ein neu eingereichter Kommentar wird lokal, nur im Browser
+dieser einen besuchenden Person, mit dem Hinweis „wartet auf Moderation"
+angezeigt - er erscheint für niemand anderen, bis eine moderierende
+Person ihn freigibt.
+
 ## Schleife und Bedingung (datengesteuert)
 
 `::: for` und `::: if` rendern ihren eigenen Inhalt gegen

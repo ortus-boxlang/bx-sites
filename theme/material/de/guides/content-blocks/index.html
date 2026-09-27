@@ -136,7 +136,7 @@ Content-Bl&ouml;cke</h1>
 
 
 
-	<details class="bxsites-toc-mobile md-toc--mobile"><summary class="md-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="md-toc__item md-toc__item--2"><a href="#expandable">Expandable</a></li><li class="md-toc__item md-toc__item--2"><a href="#cards">Cards</a></li><li class="md-toc__item md-toc__item--2"><a href="#columns">Columns</a></li><li class="md-toc__item md-toc__item--2"><a href="#stepper">Stepper</a></li><li class="md-toc__item md-toc__item--2"><a href="#bildergalerie">Bildergalerie</a></li><li class="md-toc__item md-toc__item--2"><a href="#file">File</a></li><li class="md-toc__item md-toc__item--2"><a href="#buttons">Buttons</a></li><li class="md-toc__item md-toc__item--2"><a href="#embed">Embed</a></li><li class="md-toc__item md-toc__item--2"><a href="#page-link">Page Link</a></li><li class="md-toc__item md-toc__item--2"><a href="#link-preview">Link Preview</a></li><li class="md-toc__item md-toc__item--2"><a href="#ki-prompt">KI-Prompt</a></li><li class="md-toc__item md-toc__item--2"><a href="#updates-changelog">Updates &#x28;Changelog&#x29;</a></li><li class="md-toc__item md-toc__item--2"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte &#x28;Includes&#x29;</a></li><li class="md-toc__item md-toc__item--2"><a href="#conditional-content">Conditional content</a></li><li class="md-toc__item md-toc__item--2"><a href="#kontaktformulare">Kontaktformulare</a></li><li class="md-toc__item md-toc__item--2"><a href="#schleife-und-bedingung-datengesteuert">Schleife und Bedingung &#x28;datengesteuert&#x29;</a></li><li class="md-toc__item md-toc__item--2"><a href="#kursindex">Kursindex</a></li></ul></details>
+	<details class="bxsites-toc-mobile md-toc--mobile"><summary class="md-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="md-toc__item md-toc__item--2"><a href="#expandable">Expandable</a></li><li class="md-toc__item md-toc__item--2"><a href="#cards">Cards</a></li><li class="md-toc__item md-toc__item--2"><a href="#columns">Columns</a></li><li class="md-toc__item md-toc__item--2"><a href="#stepper">Stepper</a></li><li class="md-toc__item md-toc__item--2"><a href="#bildergalerie">Bildergalerie</a></li><li class="md-toc__item md-toc__item--2"><a href="#file">File</a></li><li class="md-toc__item md-toc__item--2"><a href="#buttons">Buttons</a></li><li class="md-toc__item md-toc__item--2"><a href="#embed">Embed</a></li><li class="md-toc__item md-toc__item--2"><a href="#page-link">Page Link</a></li><li class="md-toc__item md-toc__item--2"><a href="#link-preview">Link Preview</a></li><li class="md-toc__item md-toc__item--2"><a href="#ki-prompt">KI-Prompt</a></li><li class="md-toc__item md-toc__item--2"><a href="#updates-changelog">Updates &#x28;Changelog&#x29;</a></li><li class="md-toc__item md-toc__item--2"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte &#x28;Includes&#x29;</a></li><li class="md-toc__item md-toc__item--2"><a href="#conditional-content">Conditional content</a></li><li class="md-toc__item md-toc__item--2"><a href="#kontaktformulare">Kontaktformulare</a></li><li class="md-toc__item md-toc__item--2"><a href="#kommentare">Kommentare</a></li><li class="md-toc__item md-toc__item--2"><a href="#schleife-und-bedingung-datengesteuert">Schleife und Bedingung &#x28;datengesteuert&#x29;</a></li><li class="md-toc__item md-toc__item--2"><a href="#kursindex">Kursindex</a></li></ul></details>
 
 				<div class="md-content-body">
 				<h1 id="content-blöcke"><a href="#content-blöcke" id="content-blöcke" name="content-blöcke" class="anchor"></a>Content-Blöcke</h1>
@@ -545,6 +545,37 @@ Beschriftung jedes Felds wird aus seinem Namen abgeleitet
 eine echte Besucherin oder ein echter Besucher nie sieht oder ausfüllt -
 die eigene Spam-Filterung von bxSites Cloud nutzt es, ohne dass hier
 etwas konfiguriert werden muss.</p>
+<h2 id="kommentare"><a href="#kommentare" id="kommentare" name="kommentare" class="anchor"></a>Kommentare</h2>
+<blockquote>
+<p><strong>Premium-Funktion.</strong> <code>::: comments</code> bindet einen live moderierten
+Besucher-Kommentarthread auf der Seite ein - dafür ist ein bxSites-
+Cloud-Konto mit Kommentaren im eigenen Plan erforderlich, sowie
+<code>cloud.comments: true</code> in <code>bxsites.yaml</code>. Ohne das schlägt ein
+<code>::: comments</code>-Block den Build immer komplett fehl - dieselbe Haltung
+wie <code>::: cloud</code> ohne <code>cloud.contentBlocks</code>.</p>
+</blockquote>
+<pre data-bxsites-start-line="1" data-bxsites-title="Beispiel"><code class="language-markdown">::: comments :::
+</code></pre>
+<p>Keine Attribute sind erforderlich - die Thread-ID entspricht standardmäßig
+dem eigenen URL-Pfad der Seite, sodass jede Seite automatisch ihren
+eigenen Kommentarthread erhält. Ein optionales <code>id=&quot;...&quot;</code> lässt zwei
+Blöcke auf einer Seite (oder Blöcke auf verschiedenen Seiten) stattdessen
+einen einzigen Thread teilen:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="Beispiel"><code class="language-markdown">::: comments id=&quot;general-feedback&quot; :::
+</code></pre>
+<p>Anders als bei <code>::: cloud</code> wird beim Build nichts abgerufen oder
+eingebacken - ein Kommentarthread wächst nach jedem Deploy weiter, daher
+würde ein zur Build-Zeit erstellter Schnappschuss veralten, sobald ein
+neuer Kommentar eintrifft. Der Block rendert einen leeren Platzhalter;
+ein kleines clientseitiges Skript (nur ausgeliefert, wenn
+<code>cloud.comments: true</code> gesetzt ist - derselbe explizite Opt-in, den
+<code>cloud.contentBlocks</code> bereits verwendet) lädt bei jedem Seitenaufruf die
+aktuellen, bereits moderierten Kommentare und blättert bei Bedarf durch
+ältere, und rendert anschließend ein Formular zum Posten eines neuen
+Kommentars. Ein neu eingereichter Kommentar wird lokal, nur im Browser
+dieser einen besuchenden Person, mit dem Hinweis „wartet auf Moderation&quot;
+angezeigt - er erscheint für niemand anderen, bis eine moderierende
+Person ihn freigibt.</p>
 <h2 id="schleife-und-bedingung-datengesteuert"><a href="#schleife-und-bedingung-datengesteuert" id="schleife-und-bedingung-datengesteuert" name="schleife-und-bedingung-datengesteuert" class="anchor"></a>Schleife und Bedingung (datengesteuert)</h2>
 <p><code>::: for</code> und <code>::: if</code> rendern ihren eigenen Inhalt gegen
 <a href="/theme/material/de/guides/data-files/index.html">wiederverwendbare Daten</a> - den eigenen Wert einer
@@ -641,7 +672,7 @@ wird, sobald der Index auf der Seite steht.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/content-blocks.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/material/de/guides/content-blocks.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Sep 21, 2026, 5&#x3a;00&#x3a;33 PM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/content-blocks.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/material/de/guides/content-blocks.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Sep 27, 2026, 1&#x3a;46&#x3a;09 PM</span></div>
 
 			</article>
 
@@ -663,7 +694,7 @@ wird, sobald der Index auf der Seite steht.</p>
 		</main>
 
 		<aside class="md-toc-sidebar">
-			<nav class="md-toc" aria-label="Auf dieser Seite"><div class="md-toc__title">Auf dieser Seite</div><ul><li class="md-toc__item md-toc__item--2"><a href="#expandable">Expandable</a></li><li class="md-toc__item md-toc__item--2"><a href="#cards">Cards</a></li><li class="md-toc__item md-toc__item--2"><a href="#columns">Columns</a></li><li class="md-toc__item md-toc__item--2"><a href="#stepper">Stepper</a></li><li class="md-toc__item md-toc__item--2"><a href="#bildergalerie">Bildergalerie</a></li><li class="md-toc__item md-toc__item--2"><a href="#file">File</a></li><li class="md-toc__item md-toc__item--2"><a href="#buttons">Buttons</a></li><li class="md-toc__item md-toc__item--2"><a href="#embed">Embed</a></li><li class="md-toc__item md-toc__item--2"><a href="#page-link">Page Link</a></li><li class="md-toc__item md-toc__item--2"><a href="#link-preview">Link Preview</a></li><li class="md-toc__item md-toc__item--2"><a href="#ki-prompt">KI-Prompt</a></li><li class="md-toc__item md-toc__item--2"><a href="#updates-changelog">Updates &#x28;Changelog&#x29;</a></li><li class="md-toc__item md-toc__item--2"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte &#x28;Includes&#x29;</a></li><li class="md-toc__item md-toc__item--2"><a href="#conditional-content">Conditional content</a></li><li class="md-toc__item md-toc__item--2"><a href="#kontaktformulare">Kontaktformulare</a></li><li class="md-toc__item md-toc__item--2"><a href="#schleife-und-bedingung-datengesteuert">Schleife und Bedingung &#x28;datengesteuert&#x29;</a></li><li class="md-toc__item md-toc__item--2"><a href="#kursindex">Kursindex</a></li></ul></nav>
+			<nav class="md-toc" aria-label="Auf dieser Seite"><div class="md-toc__title">Auf dieser Seite</div><ul><li class="md-toc__item md-toc__item--2"><a href="#expandable">Expandable</a></li><li class="md-toc__item md-toc__item--2"><a href="#cards">Cards</a></li><li class="md-toc__item md-toc__item--2"><a href="#columns">Columns</a></li><li class="md-toc__item md-toc__item--2"><a href="#stepper">Stepper</a></li><li class="md-toc__item md-toc__item--2"><a href="#bildergalerie">Bildergalerie</a></li><li class="md-toc__item md-toc__item--2"><a href="#file">File</a></li><li class="md-toc__item md-toc__item--2"><a href="#buttons">Buttons</a></li><li class="md-toc__item md-toc__item--2"><a href="#embed">Embed</a></li><li class="md-toc__item md-toc__item--2"><a href="#page-link">Page Link</a></li><li class="md-toc__item md-toc__item--2"><a href="#link-preview">Link Preview</a></li><li class="md-toc__item md-toc__item--2"><a href="#ki-prompt">KI-Prompt</a></li><li class="md-toc__item md-toc__item--2"><a href="#updates-changelog">Updates &#x28;Changelog&#x29;</a></li><li class="md-toc__item md-toc__item--2"><a href="#wiederverwendbare-inhalte-includes">Wiederverwendbare Inhalte &#x28;Includes&#x29;</a></li><li class="md-toc__item md-toc__item--2"><a href="#conditional-content">Conditional content</a></li><li class="md-toc__item md-toc__item--2"><a href="#kontaktformulare">Kontaktformulare</a></li><li class="md-toc__item md-toc__item--2"><a href="#kommentare">Kommentare</a></li><li class="md-toc__item md-toc__item--2"><a href="#schleife-und-bedingung-datengesteuert">Schleife und Bedingung &#x28;datengesteuert&#x29;</a></li><li class="md-toc__item md-toc__item--2"><a href="#kursindex">Kursindex</a></li></ul></nav>
 		</aside>
 
 	</div>

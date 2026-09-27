@@ -558,6 +558,43 @@ Todo formulario también lleva un campo honeypot oculto que una persona
 visitante real nunca ve ni rellena - el propio filtrado de spam de
 bxSites Cloud lo usa, sin necesidad de configuración aquí.
 
+## Comentarios
+
+> **Función premium.** `::: comments` monta un hilo de comentarios de
+> visitantes en vivo y moderado en la página - requiere una cuenta de
+> bxSites Cloud con Comentarios incluidos en el plan y
+> `cloud.comments: true` configurado en `bxsites.yaml`. Sin esto, un
+> bloque `::: comments` siempre falla la build por completo, la misma
+> postura que `::: cloud` sin `cloud.contentBlocks`.
+
+```markdown title="Ejemplo" linenums="1"
+::: comments :::
+```
+
+No se requiere ningún atributo - el id del hilo toma por defecto la
+propia ruta de URL de la página, así que cada página obtiene su propio
+hilo de comentarios sin ninguna configuración. Un `id="..."` opcional
+permite que dos bloques en una página (o bloques en páginas distintas)
+compartan un único hilo en su lugar:
+
+```markdown title="Ejemplo" linenums="1"
+::: comments id="general-feedback" :::
+```
+
+A diferencia de `::: cloud`, no se obtiene ni se incrusta nada en tiempo
+de build - un hilo de comentarios sigue creciendo después de cada
+despliegue, así que una instantánea tomada en tiempo de build quedaría
+obsoleta en cuanto llegara un nuevo comentario. El bloque renderiza un
+marcador de posición vacío; un pequeño script del lado del cliente (solo
+se incluye cuando `cloud.comments: true` está activado - la misma
+adhesión explícita que ya usa `cloud.contentBlocks`) carga los
+comentarios actuales, ya moderados, cada vez que se carga la página y
+pagina hacia comentarios más antiguos a petición, y luego renderiza un
+formulario para publicar uno nuevo. Un comentario recién enviado se
+muestra localmente, solo en el navegador de esa persona visitante,
+etiquetado como pendiente de moderación - nunca aparece para nadie más
+hasta que una persona moderadora lo aprueba.
+
 ## Bucle y condicional (basado en datos)
 
 `::: for` y `::: if` renderizan su propio contenido contra [datos

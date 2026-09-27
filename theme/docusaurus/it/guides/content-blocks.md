@@ -550,6 +550,42 @@ Ogni modulo porta anche un campo honeypot nascosto che una persona reale
 non vede né compila mai - lo usa il filtro antispam di bxSites Cloud,
 senza bisogno di configurazione qui.
 
+## Commenti
+
+> **Funzionalità premium.** `::: comments` monta sulla pagina un thread
+> di commenti dei visitatori dal vivo e moderato - richiede un account
+> bxSites Cloud con i Commenti inclusi nel piano e `cloud.comments: true`
+> impostato in `bxsites.yaml`. Senza questo, un blocco `::: comments` fa
+> sempre fallire completamente la build - la stessa posizione di
+> `::: cloud` senza `cloud.contentBlocks`.
+
+```markdown title="Esempio" linenums="1"
+::: comments :::
+```
+
+Non è richiesto alcun attributo - l'id del thread corrisponde per
+default al percorso URL della pagina stessa, così ogni pagina ottiene il
+proprio thread di commenti senza alcuna configurazione. Un `id="..."`
+opzionale permette invece a due blocchi sulla stessa pagina (o a blocchi
+su pagine diverse) di condividere un singolo thread:
+
+```markdown title="Esempio" linenums="1"
+::: comments id="general-feedback" :::
+```
+
+A differenza di `::: cloud`, in fase di build non viene recuperato o
+incorporato nulla - un thread di commenti continua a crescere dopo ogni
+deploy, quindi uno snapshot preso in fase di build diventerebbe obsoleto
+non appena arriva un nuovo commento. Il blocco renderizza un
+segnaposto vuoto; un piccolo script lato client (incluso solo quando
+`cloud.comments: true` è attivo - la stessa adesione esplicita già usata
+da `cloud.contentBlocks`) carica i commenti attuali, già moderati, a ogni
+caricamento della pagina e pagina quelli più vecchi su richiesta, per poi
+renderizzare un modulo per pubblicarne uno nuovo. Un commento appena
+inviato viene mostrato localmente, solo nel browser di quella persona
+visitatrice, con l'etichetta "in attesa di moderazione" - non appare a
+nessun altro finché una persona moderatrice non lo approva.
+
 ## Loop e condizionale (basati sui dati)
 
 `::: for` e `::: if` renderizzano il proprio contenuto rispetto ai
