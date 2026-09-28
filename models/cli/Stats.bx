@@ -34,14 +34,23 @@ class {
 	private string function formatReport( required struct stats ) {
 		var lines = []
 
-		lines.append( "Pages:   #numberFormat( arguments.stats.pageCount, '9,999' )#" )
-		lines.append( "Words:   #numberFormat( arguments.stats.wordCount, '9,999' )# (avg #numberFormat( arguments.stats.avgWordsPerPage, '9,999' )#/page)" )
+		// Every numberFormat() call below uses a bare "," mask (thousands
+		// separator only), never a digit-placeholder mask like "9,999" -
+		// BoxLang correctly space-pads a "9"-placeholder mask to its full
+		// digit width (e.g. numberFormat(2, "9,999") => "   2", 4 chars),
+		// which silently doubles up with this file's own hand-aligned
+		// literal spacing ("Pages:   ", "Search index: ", etc.) the moment
+		// the runtime's numberFormat() padding is spec-correct. "," has no
+		// digit placeholders to pad, so it only ever adds the separator.
+
+		lines.append( "Pages:   #numberFormat( arguments.stats.pageCount, ',' )#" )
+		lines.append( "Words:   #numberFormat( arguments.stats.wordCount, ',' )# (avg #numberFormat( arguments.stats.avgWordsPerPage, ',' )#/page)" )
 
 		if ( arguments.stats.treeBreakdown.len() > 1 ) {
 			lines.append( "" )
 			lines.append( "By tree:" )
 			for ( var tree in arguments.stats.treeBreakdown ) {
-				lines.append( "  - #tree.label#: #numberFormat( tree.pageCount, '9,999' )# page(s)" )
+				lines.append( "  - #tree.label#: #numberFormat( tree.pageCount, ',' )# page(s)" )
 			}
 		}
 
@@ -65,13 +74,13 @@ class {
 		lines.append( "Tags: #arguments.stats.tagCount# distinct" )
 
 		if ( arguments.stats.searchIndex.enabled ) {
-			lines.append( "Search index: #numberFormat( arguments.stats.searchIndex.entryCount, '9,999' )# entries (#formatBytes( arguments.stats.searchIndex.fileSizeBytes )#)" )
+			lines.append( "Search index: #numberFormat( arguments.stats.searchIndex.entryCount, ',' )# entries (#formatBytes( arguments.stats.searchIndex.fileSizeBytes )#)" )
 		} else {
 			lines.append( "Search index: none (search disabled, or a non-local provider)" )
 		}
 
 		lines.append( "" )
-		lines.append( "Site output: #numberFormat( arguments.stats.siteFileCount, '9,999' )# file(s), #formatBytes( arguments.stats.siteSizeBytes )#" )
+		lines.append( "Site output: #numberFormat( arguments.stats.siteFileCount, ',' )# file(s), #formatBytes( arguments.stats.siteSizeBytes )#" )
 
 		return lines.toList( char( 10 ) )
 	}
@@ -81,10 +90,10 @@ class {
 	 */
 	private string function formatBytes( required numeric bytes ) {
 		if ( arguments.bytes >= 1024 * 1024 ) {
-			return numberFormat( arguments.bytes / ( 1024 * 1024 ), "9,999.0" ) & " MB"
+			return numberFormat( arguments.bytes / ( 1024 * 1024 ), ",.0" ) & " MB"
 		}
 		if ( arguments.bytes >= 1024 ) {
-			return numberFormat( arguments.bytes / 1024, "9,999.0" ) & " KB"
+			return numberFormat( arguments.bytes / 1024, ",.0" ) & " KB"
 		}
 		return arguments.bytes & " B"
 	}
