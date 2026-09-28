@@ -33,9 +33,14 @@
  *        as-is with no client-side moderation state of its own.
  *
  *   POST /api/comments/{threadId}
- *        body: { authorName, authorEmail, body }  (authorName/authorEmail
+ *        body: { authorName, authorEmail, body, _hp }  (authorName/authorEmail
  *              optional depending on the project's own settings; body
- *              required)
+ *              required; _hp is a hidden honeypot value, always sent -
+ *              empty for a real visitor, non-empty only if a bot filled
+ *              it. The server silently drops a filled one while still
+ *              faking a normal 201 response, same posture as
+ *              contact-form-init.js's own `_hp`; this script never
+ *              inspects it or skips the request itself)
  *        -> 201 { commentId, status: "pending" } - accepted, awaiting
  *              moderation; NEVER appears in a later GET for any other
  *              visitor until a moderator approves it. This script shows
@@ -166,10 +171,12 @@
 
 		var authorNameField = form.querySelector( '[name="authorName"]' );
 		var authorEmailField = form.querySelector( '[name="authorEmail"]' );
+		var honeypotField = form.querySelector( '[name="_hp"]' );
 		var payload = {
 			authorName : authorNameField ? authorNameField.value.trim() : "",
 			authorEmail: authorEmailField ? authorEmailField.value.trim() : "",
-			body       : body
+			body       : body,
+			_hp        : honeypotField ? honeypotField.value : ""
 		};
 
 		fetch( "/api/comments/" + encodeURIComponent( state.threadId ), {
@@ -251,6 +258,7 @@
 					'<label for="bxsites-comments-body-' + escapeHtml( threadId ) + '">Comment</label>' +
 					'<textarea id="bxsites-comments-body-' + escapeHtml( threadId ) + '" name="body" rows="3" required></textarea>' +
 				"</div>" +
+				'<input class="bxsites-comments__honeypot" type="text" name="_hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">' +
 				'<p class="bxsites-comments__form-status" hidden></p>' +
 				'<button type="submit">Post comment</button>' +
 			"</form>";
