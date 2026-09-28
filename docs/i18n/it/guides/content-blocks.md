@@ -586,6 +586,10 @@ inviato viene mostrato localmente, solo nel browser di quella persona
 visitatrice, con l'etichetta "in attesa di moderazione" - non appare a
 nessun altro finché una persona moderatrice non lo approva.
 
+Anche questo modulo porta un campo honeypot nascosto che una persona
+reale non vede né compila mai - lo usa il filtro antispam di bxSites
+Cloud, senza bisogno di configurazione qui.
+
 ## Loop e condizionale (basati sui dati)
 
 `::: for` e `::: if` renderizzano il proprio contenuto rispetto ai
