@@ -226,7 +226,10 @@ every non-hidden page, following the emerging
 [llms.txt](https://llmstxt.org) convention for helping LLM-based tools
 navigate a site without crawling its rendered HTML. There's no config key
 for this; it's generated automatically, using an absolute URL per link when
-`baseURL` is a full URL, or a `basePath`-relative one otherwise.
+`baseURL` is a full URL, or a `basePath`-relative one otherwise. For pages
+with a published Markdown source, the page title links to the raw `.md` file
+and a separate `[HTML]` link points to the rendered page. Pages without a
+published Markdown source are listed with their HTML URL.
 
 ## `sitemap.xml`
 

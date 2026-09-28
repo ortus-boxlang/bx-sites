@@ -272,6 +272,11 @@ renderizzato. Non c'è una chiave di configurazione per questo; viene
 generato automaticamente, usando un URL assoluto per link quando `baseURL`
 è un URL completo, oppure uno relativo a `basePath` in caso contrario.
 
+Per le pagine con una sorgente Markdown pubblicata, il link principale punta
+al file `.md` originale e include anche un link `[HTML]` alla pagina
+renderizzata. Le pagine senza una sorgente Markdown pubblicata sono elencate
+con il loro URL HTML.
+
 ## `sitemap.xml`
 
 Scritto alla radice del sito, ma solo quando `baseURL` è un URL completo

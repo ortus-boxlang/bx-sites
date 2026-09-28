@@ -297,9 +297,9 @@ tener sentido. Enumera cada página no oculta según el protocolo de
 <p>Cada construcción escribe un <code>robots.txt</code> en la raíz del sitio - no hace
 falta ninguna clave de configuración a menos que quieras cambiar su
 comportamiento por defecto, permisivo:</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">robots: false
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">robots: false
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;robots&quot;: false }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;robots&quot;: false }
 </code></pre>
 </div></div></div>
 <ul>
@@ -442,7 +442,7 @@ sobrescritura <code>theme/</code> - consulta
 administrador) e <code>indexName</code>, exactamente como los espera el propio
 cliente DocSearch de Algolia. <code>insights</code> (<code>false</code> por defecto) activa la
 analítica de clics/conversión de DocSearch.</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">search: true
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">search: true
 searchProvider:
   provider: algolia
   algolia:
@@ -450,7 +450,7 @@ searchProvider:
     apiKey: a1b2c3d4e5f6...
     indexName: my-docs
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
 	&quot;search&quot;: true,
 	&quot;searchProvider&quot;: {
 		&quot;provider&quot;: &quot;algolia&quot;,
@@ -472,12 +472,12 @@ array de flags de CLI adicionales en bruto que se pasan tal cual. La
 propia CLI de <code>pagefind</code> debe estar ya instalada y en el <code>PATH</code> - BX
 Sites la invoca externamente (como hace con <code>git</code> para
 <code>lastUpdated</code>/<code>gh-deploy</code>), no la instala por ti.</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">search: true
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">search: true
 searchProvider:
   provider: pagefind
   pagefind: { bin: pagefind, options: [] }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
 	&quot;search&quot;: true,
 	&quot;searchProvider&quot;: {
 		&quot;provider&quot;: &quot;pagefind&quot;,
@@ -517,7 +517,7 @@ de <code>icon</code></li>
 <p>Una entrada solo con <code>title</code>, con <code>children</code> y sin <code>path</code> es exactamente
 una etiqueta contenedora/de sección de menú - un encabezado no clicable
 que simplemente agrupa a sus hijos:</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">nav:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">nav:
   - index.md
   - title: Main Components
     children:
@@ -525,7 +525,7 @@ que simplemente agrupa a sus hijos:</p>
         path: guides/setup.md
       - guides/deployment.md
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
 	&quot;nav&quot;: [
 		&quot;index.md&quot;,
 		{
@@ -560,11 +560,11 @@ explícita.</p>
 <h2 id="redirects"><a href="#redirects" id="redirects" name="redirects" class="anchor"></a><code>redirects</code></h2>
 <p><code>[]</code> (el valor por defecto) - redirecciones de URL antiguas <code>from</code>/<code>to</code>
 para todo el sitio, aplicadas solo al árbol principal:</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">redirects:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">redirects:
   - from: old-guide
     to: guides/new-guide/
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
 	&quot;redirects&quot;: [
 		{ &quot;from&quot;: &quot;old-guide&quot;, &quot;to&quot;: &quot;guides/new-guide/&quot; }
 	]
@@ -620,13 +620,13 @@ defecto, pero BxSites lo establece en <code>true</code> por defecto (consulta la
 </tbody>
 </table></div>
 <p>Cada tabla renderizada también recibe automáticamente un wrapper de scroll responsive y encabezado fijo, sin clave de configuración propia - ver <a href="/theme/vuepress/versions/1.0.x/es/guides/tables/index.html#desplazamiento-responsivo-y-un-encabezado-fijo">Tablas</a>.</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">markdown:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">markdown:
   enableFootnotes: true
   enableDefinitionLists: true
   anchorLinks: false
   enableYouTubeTransformer: true
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
 	&quot;markdown&quot;: {
 		&quot;enableFootnotes&quot;: true,
 		&quot;enableDefinitionLists&quot;: true,
@@ -654,9 +654,9 @@ construir su enlace de edición - por ejemplo, con el ejemplo anterior,
 requiere <code>repo.url</code>; déjalo en blanco para omitir los enlaces de edición
 mientras sigues mostrando el icono de la cabecera.</li>
 </ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">repo: { url: &quot;https://github.com/acme/docs&quot;, editUri: &quot;edit/main/docs/&quot; }
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">repo: { url: &quot;https://github.com/acme/docs&quot;, editUri: &quot;edit/main/docs/&quot; }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;repo&quot;: { &quot;url&quot;: &quot;https://github.com/acme/docs&quot;, &quot;editUri&quot;: &quot;edit/main/docs/&quot; } }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;repo&quot;: { &quot;url&quot;: &quot;https://github.com/acme/docs&quot;, &quot;editUri&quot;: &quot;edit/main/docs/&quot; } }
 </code></pre>
 </div></div></div>
 <h2 id="social"><a href="#social" id="social" name="social" class="anchor"></a><code>social</code></h2>
@@ -668,11 +668,11 @@ pequeño conjunto de iconos incorporado (<code>github</code>, <code>twitter</cod
 <code>patreon</code>, <code>rss</code>, <code>email</code>, recurriendo a un glifo de enlace genérico para
 cualquier otra cosa), y <code>label</code> establece el nombre accesible/tooltip del
 enlace (por defecto <code>icon</code>, y luego <code>&quot;Link&quot;</code>).</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">social:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">social:
   - { url: &quot;https://twitter.com/acme&quot;, icon: twitter, label: Twitter }
   - { url: &quot;https://acme.com/rss.xml&quot;, icon: rss, label: RSS }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
 	&quot;social&quot;: [
 		{ &quot;url&quot;: &quot;https://twitter.com/acme&quot;, &quot;icon&quot;: &quot;twitter&quot;, &quot;label&quot;: &quot;Twitter&quot; },
 		{ &quot;url&quot;: &quot;https://acme.com/rss.xml&quot;, &quot;icon&quot;: &quot;rss&quot;, &quot;label&quot;: &quot;RSS&quot; }
@@ -684,9 +684,9 @@ enlace (por defecto <code>icon</code>, y luego <code>&quot;Link&quot;</code>).</
 <p><code>false</code> (el valor por defecto) - sin pie de página en absoluto. <code>true</code>
 añade uno a cada página: una línea de copyright (<code>© &lt;year&gt; &lt;site name&gt;</code>),
 los enlaces <code>social</code> (si los hay), y un crédito &quot;Built with BxSites&quot;.</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">footer: true
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">footer: true
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;footer&quot;: true }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;footer&quot;: true }
 </code></pre>
 </div></div></div>
 <h2 id="lastupdated"><a href="#lastupdated" id="lastupdated" name="lastupdated" class="anchor"></a><code>lastUpdated</code></h2>
@@ -698,9 +698,9 @@ silenciosamente para una página de la que git no tiene historial - un
 <code>git init</code> reciente sin commits todavía, una construcción ejecutándose
 desde un zip descargado sin <code>.git</code> en absoluto, o git no estando instalado
 en la máquina de construcción - en lugar de romper la construcción.</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">lastUpdated: true
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">lastUpdated: true
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;lastUpdated&quot;: true }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;lastUpdated&quot;: true }
 </code></pre>
 </div></div></div>
 <h2 id="analytics"><a href="#analytics" id="analytics" name="analytics" class="anchor"></a><code>analytics</code></h2>
@@ -712,9 +712,9 @@ valor por defecto), no se envía ningún script de análisis en absoluto.</li>
 <li><code>analytics.id</code> - el ID de medición de Google Analytics (por ejemplo,
 <code>&quot;G-ABC123&quot;</code>). Obligatorio cuando <code>provider</code> es <code>&quot;google&quot;</code>.</li>
 </ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">analytics: { provider: google, id: &quot;G-ABC123&quot; }
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">analytics: { provider: google, id: &quot;G-ABC123&quot; }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;analytics&quot;: { &quot;provider&quot;: &quot;google&quot;, &quot;id&quot;: &quot;G-ABC123&quot; } }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;analytics&quot;: { &quot;provider&quot;: &quot;google&quot;, &quot;id&quot;: &quot;G-ABC123&quot; } }
 </code></pre>
 </div></div></div>
 <h2 id="ogimage"><a href="#ogimage" id="ogimage" name="ogimage" class="anchor"></a><code>ogImage</code></h2>
@@ -725,9 +725,9 @@ cada página que no la sobrescriba - resuelta de la misma forma que
 absolutas se usan tal cual). Dejado en blanco (el valor por defecto) y
 con <code>generateOgImages</code> desactivado, no se renderiza ninguna etiqueta
 <code>og:image</code>/<code>twitter:card</code>.</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">ogImage: assets/social-card.png
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">ogImage: assets/social-card.png
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;ogImage&quot;: &quot;assets/social-card.png&quot; }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;ogImage&quot;: &quot;assets/social-card.png&quot; }
 </code></pre>
 </div></div></div>
 <p>El propio <code>ogImage</code> del frontmatter de una página (consulta
@@ -742,9 +742,9 @@ que cada página comparta una imagen genérica de todo el sitio. Puro
 <code>java.awt</code>/<code>javax.imageio</code> por debajo (parte de cualquier JVM en la que
 se ejecute BoxLang), así que esto no necesita navegador headless, servicio
 externo, ni acceso a red en el momento de la construcción.</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">generateOgImages: true
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">generateOgImages: true
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;generateOgImages&quot;: true }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;generateOgImages&quot;: true }
 </code></pre>
 </div></div></div>
 <h2 id="extracss--extrajs"><a href="#extracss--extrajs" id="extracss--extrajs" name="extracss--extrajs" class="anchor"></a><code>extraCss</code> / <code>extraJs</code></h2>
@@ -753,17 +753,17 @@ página, añadidos después de los propios recursos del tema - cada entrada
 se resuelve de la misma forma que <code>theme.logo</code> (una ruta relativa lleva el
 prefijo <code>baseURL</code>; una URL absoluta se usa tal cual). Las entradas de
 <code>extraJs</code> se cargan con <code>defer</code>.</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">extraCss: [ assets/custom.css ]
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">extraCss: [ assets/custom.css ]
 extraJs: [ assets/custom.js ]
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
 	&quot;extraCss&quot;: [&quot;assets/custom.css&quot;],
 	&quot;extraJs&quot;: [&quot;assets/custom.js&quot;]
 }
 </code></pre>
 </div></div></div>
 <h2 id="assets"><a href="#assets" id="assets" name="assets" class="anchor"></a><code>assets</code></h2>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">assets:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">assets:
   fingerprint: true
   bundle: true
   images:
@@ -771,7 +771,7 @@ extraJs: [ assets/custom.js ]
     widths: [ 400, 800, 1200, 1600 ]
     formats: [ original, webp ]
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
 	&quot;assets&quot;: {
 		&quot;fingerprint&quot;: true,
 		&quot;bundle&quot;: true,
@@ -831,9 +831,9 @@ defecto.</li>
 del lado del cliente y renderiza cada bloque de código con fence
 <code>```mermaid</code> como un diagrama. Consulta
 <a href="/theme/vuepress/versions/1.0.x/es/guides/markdown/index.html#diagramas">Extensiones de Markdown</a> para la sintaxis.</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">mermaid: true
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">mermaid: true
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;mermaid&quot;: true }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;mermaid&quot;: true }
 </code></pre>
 </div></div></div>
 <h2 id="math"><a href="#math" id="math" name="math" class="anchor"></a><code>math</code></h2>
@@ -841,9 +841,9 @@ del lado del cliente y renderiza cada bloque de código con fence
 absoluto. <code>true</code> lo carga del lado del cliente y compone <code>&#x24;...&#x24;</code>/<code>&#x24;&#x24;...&#x24;&#x24;</code>
 escrito directamente en el markdown de una página. Consulta
 <a href="/theme/vuepress/versions/1.0.x/es/guides/markdown/index.html#matemáticas">Extensiones de Markdown</a> para la sintaxis.</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">math: true
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">math: true
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;math&quot;: true }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;math&quot;: true }
 </code></pre>
 </div></div></div>
 <p>Las admoniciones (cuadros de aviso al estilo nota/advertencia/consejo),
@@ -859,9 +859,9 @@ carga del lado del cliente y renderiza cada bloque de contenido
 OpenAPI/Swagger referenciada (JSON o YAML). Consulta
 <a href="/theme/vuepress/versions/1.0.x/es/guides/openapi/index.html">OpenAPI / Swagger</a> para la
 sintaxis.</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">openapi: true
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">openapi: true
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;openapi&quot;: true }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;openapi&quot;: true }
 </code></pre>
 </div></div></div>
 <h2 id="plugins"><a href="#plugins" id="plugins" name="plugins" class="anchor"></a><code>plugins</code></h2>
@@ -869,9 +869,9 @@ sintaxis.</p>
 para activar como plugins. Instalar un módulo de plugin (<code>box install</code>)
 nunca lo activa por sí solo; también tiene que nombrarse aquí. Consulta
 <a href="/theme/vuepress/versions/1.0.x/es/guides/plugins/index.html">Plugins</a> para saber cómo escribir uno.</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">plugins: [ myBxSitesPlugin ]
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">plugins: [ myBxSitesPlugin ]
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;plugins&quot;: [&quot;myBxSitesPlugin&quot;] }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;plugins&quot;: [&quot;myBxSitesPlugin&quot;] }
 </code></pre>
 </div></div></div>
 <h2 id="i18n"><a href="#i18n" id="i18n" name="i18n" class="anchor"></a><code>i18n</code></h2>
@@ -901,13 +901,13 @@ para la lista completa de claves; <code>de</code>/<code>es</code>/<code>it</code
 traducción integrada, así que <code>strings</code> solo hace falta para
 sobrescribir una clave o añadir otro idioma.</li>
 </ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">i18n:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">i18n:
   defaultLocale: { code: en, label: English }
   locales:
     - { code: es, label: Español }
     - { code: ar, label: العربية, dir: rtl }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
 	&quot;i18n&quot;: {
 		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
 		&quot;locales&quot;: [
@@ -941,9 +941,9 @@ lectores de feeds solo se preocupan por lo nuevo, así que un feed sin
 límite en un blog con cientos de entradas simplemente desperdicia ancho
 de banda en cada sondeo - consulta <a href="/theme/vuepress/versions/1.0.x/es/guides/blog/index.html#feed">Blog: Feed</a>.</li>
 </ul>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">blog: { postsPerPage: 10, feed: true, feedLimit: 25 }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;blog&quot;: { &quot;postsPerPage&quot;: 10, &quot;feed&quot;: true, &quot;feedLimit&quot;: 25 } }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;blog&quot;: { &quot;postsPerPage&quot;: 10, &quot;feed&quot;: true, &quot;feedLimit&quot;: 25 } }
 </code></pre>
 </div></div></div>
 <p>Consulta <a href="/theme/vuepress/versions/1.0.x/es/guides/blog/index.html">Blog</a> para el frontmatter de entradas/autores,
@@ -953,11 +953,11 @@ categorías, imágenes destacadas y metadatos de SEO/redes sociales.</p>
 forma que prefieras, referenciado desde cualquier página de Markdown como
 <code>{{ dotted.path }}</code>. Consulta
 <a href="/theme/vuepress/versions/1.0.x/es/guides/variables-and-functions/index.html">Variables y Funciones Mágicas</a>.</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">variables:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">variables:
   company: &quot;Ortus Solutions&quot;
   product: { name: &quot;BoxLang&quot;, supportEmail: &quot;support@example.com&quot; }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-title="bxsites.json"><code class="language-json">{
 	&quot;variables&quot;: {
 		&quot;company&quot;: &quot;Ortus Solutions&quot;,
 		&quot;product&quot;: { &quot;name&quot;: &quot;BoxLang&quot;, &quot;supportEmail&quot;: &quot;support@example.com&quot; }
@@ -1011,7 +1011,7 @@ junto a las del sitio principal.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/versions/1.0.x/i18n/es/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/vuepress/versions/1.0.x/es/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Sep 28, 2026, 5&#x3a;32&#x3a;08 PM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/versions/1.0.x/i18n/es/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/vuepress/versions/1.0.x/es/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Sep 28, 2026, 5&#x3a;55&#x3a;07 PM</span></div>
 
 			</article>
 

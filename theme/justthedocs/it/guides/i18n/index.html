@@ -168,14 +168,14 @@ esattamente come oggi - aggiungere <code>docs/i18n/</code> non cambia nulla al
 riguardo.</p>
 <p>Assegna a ogni locale un'etichetta di visualizzazione (e, per una lingua
 scritta da destra a sinistra, la propria direzione) in <code>bxsites.yaml</code>:</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">i18n:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">i18n:
   defaultLocale: { code: en, label: English }
   locales:
     - { code: es, label: Español }
     - { code: ar, label: العربية, dir: rtl }
     - { code: pt-BR, label: &quot;Português (Brasil)&quot;, flag: 🇧🇷 }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
 	&quot;i18n&quot;: {
 		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
 		&quot;locales&quot;: [
@@ -186,7 +186,7 @@ scritta da destra a sinistra, la propria direzione) in <code>bxsites.yaml</code>
 	}
 }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="3"><pre><code class="language-toml">
+</div><div class="bxsites-tab-panel" data-bxsites-tab="3"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.toml"><code class="language-toml">
 [i18n]
 
 [i18n.defaultLocale]
@@ -293,7 +293,7 @@ configurare. Qualsiasi altro codice locale (o una pagina che preferisci
 formulare diversamente) ricade sull'inglese - sovrascrivi solo le chiavi
 che ti interessano con i tuoi <code>strings</code> sulla voce di quella locale in
 <code>bxsites.yaml</code>:</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">i18n:
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">i18n:
   defaultLocale: { code: en, label: English }
   locales:
     - code: fr
@@ -305,7 +305,7 @@ che ti interessano con i tuoi <code>strings</code> sulla voce di quella locale i
       label: Español
       strings: { toggleDarkMode: Cambiar a modo nocturno }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.json"><code class="language-json">{
 	&quot;i18n&quot;: {
 		&quot;defaultLocale&quot;: { &quot;code&quot;: &quot;en&quot;, &quot;label&quot;: &quot;English&quot; },
 		&quot;locales&quot;: [
@@ -326,7 +326,7 @@ che ti interessano con i tuoi <code>strings</code> sulla voce di quella locale i
 	}
 }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="3"><pre><code class="language-toml">
+</div><div class="bxsites-tab-panel" data-bxsites-tab="3"><pre data-bxsites-start-line="1" data-bxsites-title="bxsites.toml"><code class="language-toml">
 [i18n]
 
 [i18n.defaultLocale]
@@ -395,7 +395,7 @@ sono le pagine <a href="/theme/justthedocs/it/configuration/index.html#versionam
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/it/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/theme/justthedocs/it/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Sep 28, 2026, 5&#x3a;32&#x3a;08 PM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/it/guides/i18n.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/theme/justthedocs/it/guides/i18n.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Sep 28, 2026, 5&#x3a;55&#x3a;07 PM</span></div>
 
 			</article>
 

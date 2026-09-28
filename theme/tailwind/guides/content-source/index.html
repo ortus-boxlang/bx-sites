@@ -158,11 +158,11 @@ projects and needs no config at all.</p>
 <h2 id="the-source-config-key"><a href="#the-source-config-key" id="the-source-config-key" name="the-source-config-key" class="anchor"></a>The <code>source</code> config key</h2>
 <p>Set <code>source</code> in <code>bxsites.yaml</code> to skip auto-detection and say explicitly
 where your content lives:</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">source: docs
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">source: docs
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;source&quot;: &quot;docs&quot; }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;source&quot;: &quot;docs&quot; }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="3"><pre><code class="language-toml">source = &quot;docs&quot;
+</div><div class="bxsites-tab-panel" data-bxsites-tab="3"><pre data-bxsites-title="bxsites.toml"><code class="language-toml">source = &quot;docs&quot;
 </code></pre>
 </div></div></div>
 <p><code>source</code> accepts:</p>
@@ -203,11 +203,11 @@ things like <code>README.md</code>, a <code>CHANGELOG.md</code>, CI config, or a
 source code into a build the moment someone renamed <code>docs/</code> to something
 else, or ran bxSites against a repo that was never meant to be a docs
 site at all. The fix is always one line in <code>bxsites.yaml</code>:</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">source: .
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">source: .
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;source&quot;: &quot;.&quot; }
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-title="bxsites.json"><code class="language-json">{ &quot;source&quot;: &quot;.&quot; }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="3"><pre><code class="language-toml">source = &quot;.&quot;
+</div><div class="bxsites-tab-panel" data-bxsites-tab="3"><pre data-bxsites-title="bxsites.toml"><code class="language-toml">source = &quot;.&quot;
 </code></pre>
 </div></div></div>
 <p>(or <code>source: docs</code>/<code>source: src</code> if you meant one of those and the folder
@@ -221,18 +221,18 @@ own - <code>.git</code>, <code>.github</code>, <code>node_modules</code>, <code>
 <code>assets/</code>, <code>versions/</code>, <code>i18n/</code>, <code>blog/</code>, and <code>includes/</code> from being
 scanned as regular pages. <code>exclude</code> adds your own names on top of that
 list:</p>
-<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre><code class="language-yaml">source: .
+<div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav"><button type="button" class="bxsites-tab-btn bxsites-tab-btn--active" data-bxsites-tab="1">YAML</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button><button type="button" class="bxsites-tab-btn" data-bxsites-tab="3">TOML</button></div><div class="bxsites-tabs__panels"><div class="bxsites-tab-panel bxsites-tab-panel--active" data-bxsites-tab="1"><pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">source: .
 exclude:
   - tests
   - build
   - CONTRIBUTING.md
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{
+</div><div class="bxsites-tab-panel" data-bxsites-tab="2"><pre data-bxsites-title="bxsites.json"><code class="language-json">{
 	&quot;source&quot;: &quot;.&quot;,
 	&quot;exclude&quot;: [&quot;tests&quot;, &quot;build&quot;, &quot;CONTRIBUTING.md&quot;]
 }
 </code></pre>
-</div><div class="bxsites-tab-panel" data-bxsites-tab="3"><pre><code class="language-toml">source = &quot;.&quot;
+</div><div class="bxsites-tab-panel" data-bxsites-tab="3"><pre data-bxsites-title="bxsites.toml"><code class="language-toml">source = &quot;.&quot;
 exclude = [ &quot;tests&quot;, &quot;build&quot;, &quot;CONTRIBUTING.md&quot; ]
 </code></pre>
 </div></div></div>
@@ -280,7 +280,7 @@ content it themes, with no question of which domain a bare top-level
 
 				</div>
 
-	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/content-source.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/guides/content-source.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Sep 28, 2026, 5&#x3a;32&#x3a;08 PM</span></div>
+	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/content-source.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/guides/content-source.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Sep 28, 2026, 5&#x3a;55&#x3a;07 PM</span></div>
 
 			</article>
 
