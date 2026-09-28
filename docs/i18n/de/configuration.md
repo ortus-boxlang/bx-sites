@@ -240,6 +240,11 @@ deren gerendertes HTML zu crawlen. Es gibt dafür keinen Konfigurationsschlüsse
 sie wird automatisch erzeugt, mit einer absoluten URL pro Link, wenn
 `baseURL` eine vollständige URL ist, andernfalls relativ zum `basePath`.
 
+Bei Seiten mit veröffentlichter Markdown-Quelle verweist der Haupteintrag
+auf die rohe `.md`-Datei und enthält zusätzlich einen `[HTML]`-Link zur
+gerenderten Seite. Seiten ohne veröffentlichte Markdown-Quelle werden mit
+ihrer HTML-URL aufgeführt.
+
 ## `sitemap.xml`
 
 Wird in der Wurzel der Website geschrieben, aber nur, wenn `baseURL` eine

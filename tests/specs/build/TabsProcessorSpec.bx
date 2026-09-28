@@ -89,6 +89,26 @@ class extends="testbox.system.BaseSpec" {
 				expect( restored ).toInclude( "<p>after</p>" );
 			} );
 
+			it( "strips and reapplies terminal code-fence annotations inside tab content", function() {
+				var md = '=== "Quick installer"' & char( 10 ) &
+					'    ```bash frame="terminal" title="Terminal"' & char( 10 ) &
+					"    curl -fsSL https://install.boxlang.io | bash" & char( 10 ) &
+					"    ```";
+				var extracted = processor.extract( md );
+				var html = '<div class="bxsites-raw-block" data-bxsites-token="' & extracted.groups[ 1 ].token & '"></div>';
+				fakeRenderer.setHtmlOverride( '<pre><code class="language-bash">curl -fsSL https://install.boxlang.io | bash</code></pre>' );
+
+				var restored = processor.restore( html, extracted.groups, fakeRenderer );
+
+				var calls = fakeRenderer.getCalls();
+				expect( calls[ 1 ].markdown ).toInclude( "```bash" & char( 10 ) );
+				expect( calls[ 1 ].markdown ).notToInclude( 'frame="terminal"' );
+				expect( calls[ 1 ].markdown ).notToInclude( 'title="Terminal"' );
+				expect( restored ).toInclude( 'data-bxsites-frame="terminal"' );
+				expect( restored ).toInclude( 'data-bxsites-title="Terminal"' );
+				expect( restored ).toInclude( '<code class="language-bash">' );
+			} );
+
 			it( "marks only the first tab panel/button active", function() {
 				var md = '=== "A"' & char( 10 ) & "    a" & char( 10 ) & char( 10 ) & '=== "B"' & char( 10 ) & "    b";
 				var extracted = processor.extract( md );

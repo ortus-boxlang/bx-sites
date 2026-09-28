@@ -38,6 +38,19 @@ class extends="testbox.system.BaseSpec" {
 				expect( txt ).toInclude( "- [Setup](https://example.com/guides/setup/index.html)" );
 			} );
 
+			it( "links to the published Markdown source first and includes the rendered HTML URL", function() {
+				var pages = [ {
+					title       : "Setup",
+					urlPath     : "guides/setup/index.html",
+					markdownUrl : "guides/setup.md",
+					hidden      : false
+				} ];
+
+				var txt = generator.build( pages, { name : "My Docs", description : "" }, "https://example.com/", "/" );
+
+				expect( txt ).toInclude( "- [Setup](https://example.com/guides/setup.md) ([HTML](https://example.com/guides/setup/index.html))" );
+			} );
+
 			it( "falls back to the root-relative basePath when there is no absolute site URL", function() {
 				var pages = [ page( "Home", "index.html" ) ];
 

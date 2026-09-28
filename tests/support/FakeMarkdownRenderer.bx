@@ -12,9 +12,13 @@ class {
 	 * (body text, and the passthrough options it was given).
 	 */
 	variables.calls = []
+	variables.htmlOverride = ""
 
 	string function toHtml( required string markdown, struct options = {} ) {
 		variables.calls.append( { markdown : arguments.markdown, options : arguments.options } )
+		if ( len( variables.htmlOverride ) ) {
+			return variables.htmlOverride
+		}
 
 		var lines = listToArray( arguments.markdown, char( 10 ), true )
 			.filter( line => len( trim( line ) ) )
@@ -25,6 +29,10 @@ class {
 
 	array function getCalls() {
 		return variables.calls
+	}
+
+	void function setHtmlOverride( required string html ) {
+		variables.htmlOverride = arguments.html
 	}
 
 }

@@ -9,7 +9,8 @@ class {
 
 	/**
 	 * Renders `llms.txt` - an H1 of the site name, an optional description
-	 * blockquote, and a markdown link per visible page.
+	 * blockquote, and a Markdown link per visible page with its rendered HTML
+	 * URL as an alternative when the page has a published Markdown source.
 	 *
 	 * @pages Array of page structs from DocsLoader.load()
 	 * @config The site's bxsites.json config
@@ -36,7 +37,11 @@ class {
 			if ( page.hidden ) {
 				continue
 			}
-			lines.append( "- [" & page.title & "](" & urlPrefix & page.urlPath & ")" )
+			if ( page.keyExists( "markdownUrl" ) && len( trim( page.markdownUrl ) ) ) {
+				lines.append( "- [" & page.title & "](" & urlPrefix & page.markdownUrl & ") ([HTML](" & urlPrefix & page.urlPath & "))" )
+			} else {
+				lines.append( "- [" & page.title & "](" & urlPrefix & page.urlPath & ")" )
+			}
 		}
 
 		lines.append( "" )

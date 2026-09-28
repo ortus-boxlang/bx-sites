@@ -173,6 +173,7 @@ class {
 	private string function renderGroup( required struct group, required any renderer, required struct markdownOptions ) {
 		var navHtml = sb{ "" }
 		var panelsHtml = sb{ "" }
+		var codeAnnotationProcessor = new "models.build.CodeAnnotationProcessor@bxsites"()
 		var idx = 0
 
 		for ( var tab in arguments.group.tabs ) {
@@ -183,8 +184,11 @@ class {
 			navHtml &= '<button type="button" class="bxsites-tab-btn' & active & '" data-bxsites-tab="' & idx & '">'
 				& encodeForHTML( tab.title ) & '</button>'
 
+			var codeExtracted = codeAnnotationProcessor.extractAndStrip( tab.content )
+			var tabHtml = arguments.renderer.toHtml( codeExtracted.markdown, arguments.markdownOptions )
+			tabHtml = codeAnnotationProcessor.applyToHtml( tabHtml, codeExtracted.annotations )
 			panelsHtml &= '<div class="bxsites-tab-panel' & panelActive & '" data-bxsites-tab="' & idx & '">'
-				& arguments.renderer.toHtml( tab.content, arguments.markdownOptions )
+				& tabHtml
 				& '</div>'
 		}
 
