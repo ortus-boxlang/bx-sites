@@ -508,8 +508,12 @@ class {
 		var avgReadingTime = totalPosts ? round( totalWords / variables.wordsPerMinute / totalPosts ) : 0
 
 		var cards = []
-		cards.append( statCard( numberFormat( totalPosts, "9,999" ), totalPosts == 1 ? "Post" : "Posts" ) )
-		cards.append( statCard( numberFormat( totalWords, "9,999" ), "Words Written" ) )
+		// "," not "9,999" - a digit-placeholder mask space-pads to its full
+		// width (e.g. numberFormat(2, "9,999") => "   2"), which would
+		// visibly corrupt this stat card's rendered number. "," only adds
+		// the thousands separator, never padding.
+		cards.append( statCard( numberFormat( totalPosts, "," ), totalPosts == 1 ? "Post" : "Posts" ) )
+		cards.append( statCard( numberFormat( totalWords, "," ), "Words Written" ) )
 		cards.append( statCard( max( avgReadingTime, totalPosts ? 1 : 0 ) & " min", "Average Reading Time" ) )
 		cards.append( statCard( arguments.categories.len(), arguments.categories.len() == 1 ? "Category" : "Categories" ) )
 		cards.append( statCard( arguments.authorIds.len(), arguments.authorIds.len() == 1 ? "Contributor" : "Contributors" ) )
