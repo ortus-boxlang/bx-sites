@@ -595,6 +595,11 @@ dieser einen besuchenden Person, mit dem Hinweis „wartet auf Moderation"
 angezeigt - er erscheint für niemand anderen, bis eine moderierende
 Person ihn freigibt.
 
+Dieses Formular führt außerdem ein verstecktes Honeypot-Feld mit, das
+eine echte Besucherin oder ein echter Besucher nie sieht oder ausfüllt -
+die eigene Spam-Filterung von bxSites Cloud nutzt es, ohne dass hier
+etwas konfiguriert werden muss.
+
 ## Schleife und Bedingung (datengesteuert)
 
 `::: for` und `::: if` rendern ihren eigenen Inhalt gegen

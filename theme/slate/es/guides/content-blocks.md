@@ -595,6 +595,10 @@ muestra localmente, solo en el navegador de esa persona visitante,
 etiquetado como pendiente de moderación - nunca aparece para nadie más
 hasta que una persona moderadora lo aprueba.
 
+Ese formulario también lleva un campo honeypot oculto que una persona
+visitante real nunca ve ni rellena - el propio filtrado de spam de
+bxSites Cloud lo usa, sin necesidad de configuración aquí.
+
 ## Bucle y condicional (basado en datos)
 
 `::: for` y `::: if` renderizan su propio contenido contra [datos

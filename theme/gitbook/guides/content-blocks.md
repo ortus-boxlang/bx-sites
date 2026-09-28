@@ -614,6 +614,10 @@ a form for posting a new one. A newly-submitted comment shows locally, in
 that one visitor's own browser, labeled as pending moderation - it never
 appears for anyone else until a moderator approves it.
 
+That form also carries a hidden honeypot field a real visitor never sees
+or fills in - bxSites Cloud's own spam filtering uses it, no
+configuration needed here.
+
 ## Loop and conditional (data-driven)
 
 `::: for` and `::: if` render their own content against [reusable
