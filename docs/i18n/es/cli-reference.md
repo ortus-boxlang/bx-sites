@@ -45,7 +45,7 @@ predeterminada para proyectos nuevos.
 Crea la estructura de un proyecto de documentación.
 
 ```bash title="Uso"
-bxSites new [path] [--name=...] [--theme=<consulta guides/themes.md para los 10>] [--description=...] [--format=yaml|json] [--source=docs|src]
+bxSites new [path] [--name=...] [--theme=<consulta guides/themes.md para los 10>] [--description=...] [--format=yaml|json] [--source=docs|src] [--agents=agents,claude,cursor]
 ```
 
 - `--name` - el nombre del sitio escrito en la configuración del sitio (por defecto, el nombre del directorio de destino)
@@ -53,6 +53,14 @@ bxSites new [path] [--name=...] [--theme=<consulta guides/themes.md para los 10>
 - `--description` - la descripción del sitio escrita en la configuración del sitio
 - `--format` - `yaml` (por defecto, genera `bxsites.yaml`) o `json` (genera `bxsites.json`) - consulta [Configuración](configuration.md)
 - `--source` - `docs` (por defecto) o `src`, la carpeta donde se generan las páginas y los assets
+- `--agents` - qué archivo(s) de instrucciones para agentes de codificación
+  con IA escribir: una lista separada por comas de `agents` (`AGENTS.md`),
+  `claude` (`CLAUDE.md`), `cursor` (`.cursorrules`). Por defecto solo
+  `agents`; `--agents=none` (o `--no-agents`) los omite todos. Consulta
+  [Instrucciones para Agentes de IA](guides/ai-agent-instructions.md).
+
+También escribe siempre `.markdownlint.json` - un conjunto de reglas de
+markdownlint para todo el proyecto, ajustado al contenido de bx-sites.
 
 ## `build`
 
@@ -483,6 +491,31 @@ falla en el momento de la instalación en lugar de en la siguiente
 `build`. Configura el `theme.name` de `bxsites.yaml` con el nombre
 instalado para usarlo - consulta
 [Temas](guides/themes.md#instalar-un-tema-publicado).
+
+## `agents:sync`
+
+(Re)escribe el/los archivo(s) de instrucciones para agentes de codificación
+con IA y `.markdownlint.json` que `new` genera por defecto - para un
+proyecto creado antes de que existiera esta función, o para actualizarlos
+tras una actualización de bx-sites que añada nuevas directivas de bloques
+de contenido o claves de frontmatter. Seguro de volver a ejecutar: en cada
+archivo de instrucciones solo se reemplaza el bloque marcado entre
+`<!-- bxsites:agents:start -->`/`<!-- bxsites:agents:end -->`, así que
+todo lo que hayas escrito por encima o por debajo se conserva. Un archivo
+de destino sin esos marcadores (escrito a mano antes de esta función, o
+editado para excluirlo deliberadamente) se deja tal cual y se reporta como
+omitido, nunca se sobrescribe.
+
+```bash title="Uso"
+bxSites agents:sync [--agents=agents,claude,cursor]
+```
+
+- `--agents` - igual que en `new`: qué archivo(s) de instrucciones
+  sincronizar (`agents`/`claude`/`cursor`, por defecto solo `agents`;
+  `--agents=none` o `--no-agents` los omite, `.markdownlint.json` se
+  vuelve a escribir de todas formas)
+
+Consulta [Instrucciones para Agentes de IA](guides/ai-agent-instructions.md).
 
 ## `theme:import`
 
