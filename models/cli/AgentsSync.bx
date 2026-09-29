@@ -1,0 +1,47 @@
+/**
+ * `agents:sync` CLI verb - thin dispatcher over AgentsFileGenerator's
+ * `sync()`/`writeMarkdownLintConfig()`. Retrofits an EXISTING project
+ * (one scaffolded before this feature existed, or whose instruction files
+ * were deleted/edited) with the same AGENTS.md/CLAUDE.md/.cursorrules
+ * content-authoring cheat sheet and `.markdownlint.json` `new` now writes
+ * for a fresh project - and refreshes both after a bx-sites upgrade adds
+ * new directives/frontmatter keys this project's copy doesn't know about
+ * yet.
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path), agents (comma-list of "agents"/"claude"/"cursor", default "agents"; `false`/"none" to skip the instruction file(s) - the lint config is always (re)written) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxSites.MissingProjectRoot", message = "`agents:sync` requires a project root" )
+		}
+
+		var generator = new "models.build.AgentsFileGenerator@bxsites"()
+		var lintPath = generator.writeMarkdownLintConfig( projectRoot )
+
+		var targets = generator.resolveTargets( arguments.options.agents ?: "" )
+		var syncResult = targets.len()
+			? generator.sync( projectRoot, targets )
+			: { created : [], updated : [], skipped : [] }
+
+		var lines = [ "Wrote #lintPath.listLast( '/' )#" ]
+		if ( syncResult.created.len() ) {
+			lines.append( "Created: " & syncResult.created.map( p => p.listLast( "/" ) ).toList( ", " ) )
+		}
+		if ( syncResult.updated.len() ) {
+			lines.append( "Updated: " & syncResult.updated.map( p => p.listLast( "/" ) ).toList( ", " ) )
+		}
+		if ( syncResult.skipped.len() ) {
+			lines.append( "Skipped (no bxsites:agents markers found - edited by hand?): " & syncResult.skipped.map( p => p.listLast( "/" ) ).toList( ", " ) )
+		}
+
+		return {
+			exitCode : 0,
+			message  : lines.toList( char( 10 ) )
+		}
+	}
+
+}

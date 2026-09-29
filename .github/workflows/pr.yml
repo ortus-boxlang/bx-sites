@@ -23,6 +23,17 @@ on:
       - "gradle-plugin/**"
       - "maven-plugin/**"
 
+# A branch with an open PR fires both `push` (the branch itself changed) and
+# `pull_request: synchronize` (the PR's head changed) for the same commit -
+# two independent runs of the same suite, wasting CI minutes and occasionally
+# showing one pass and one fail for a flaky test on the exact same SHA.
+# Group by branch name (normalized across both event shapes: `head_ref` is
+# only set on pull_request, `ref_name` is the bare branch name on push) so
+# the older of the two duplicate runs is cancelled instead of both completing.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   tests:
     permissions:

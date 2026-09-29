@@ -45,7 +45,7 @@ für die `docs/`-oder-`src/`-Konvention. `new` erzeugt immer ein Gerüst mit
 Ein Docs-Projekt aufsetzen.
 
 ```bash title="Usage"
-bxSites new [path] [--name=...] [--theme=<siehe guides/themes.md für alle 10>] [--description=...] [--format=yaml|json] [--source=docs|src]
+bxSites new [path] [--name=...] [--theme=<siehe guides/themes.md für alle 10>] [--description=...] [--format=yaml|json] [--source=docs|src] [--agents=agents,claude,cursor]
 ```
 
 - `--name` - der in die Website-Konfiguration geschriebene Website-Name (Standard: der Name des Zielverzeichnisses)
@@ -53,6 +53,14 @@ bxSites new [path] [--name=...] [--theme=<siehe guides/themes.md für alle 10>] 
 - `--description` - die in die Website-Konfiguration geschriebene Website-Beschreibung
 - `--format` - `yaml` (Standard, erzeugt `bxsites.yaml`) oder `json` (erzeugt `bxsites.json`) - siehe [Konfiguration](configuration.md)
 - `--source` - `docs` (Standard) oder `src`, der Quellordner für Seiten und Assets
+- `--agents` - welche KI-Coding-Assistenten-Anweisungsdatei(en) geschrieben
+  werden: eine kommagetrennte Liste aus `agents` (`AGENTS.md`), `claude`
+  (`CLAUDE.md`), `cursor` (`.cursorrules`). Standard ist `agents` allein;
+  `--agents=none` (oder `--no-agents`) überspringt sie alle. Siehe
+  [KI-Agenten-Anweisungen](guides/ai-agent-instructions.md).
+
+Schreibt außerdem immer `.markdownlint.json` - ein projektweites
+Markdownlint-Regelwerk, abgestimmt auf bx-sites-Inhalte.
 
 ## `build`
 
@@ -486,6 +494,31 @@ Paket bereits bei der Installation fehlschlägt statt erst beim nächsten
 `build`. Setze `bxsites.yaml`s `theme.name` auf den installierten Namen,
 um es zu verwenden - siehe
 [Themes](guides/themes.md#ein-veröffentlichtes-theme-installieren).
+
+## `agents:sync`
+
+Schreibt die KI-Coding-Assistenten-Anweisungsdatei(en) und
+`.markdownlint.json` neu, die `new` standardmäßig erzeugt - für ein Projekt,
+das vor Einführung dieser Funktion erstellt wurde, oder um sie nach einem
+bx-sites-Upgrade zu aktualisieren, das neue Content-Block-Direktiven/
+Frontmatter-Schlüssel hinzufügt. Gefahrlos erneut ausführbar: In jeder
+Anweisungsdatei wird nur der markierte Block zwischen
+`<!-- bxsites:agents:start -->`/`<!-- bxsites:agents:end -->` ersetzt,
+sodass alles, was du darüber oder darunter geschrieben hast, erhalten
+bleibt. Eine Zieldatei ohne diese Marker (handgeschrieben vor Einführung
+dieser Funktion, oder bewusst zum Opt-out bearbeitet) wird nicht angerührt
+und als übersprungen gemeldet, niemals überschrieben.
+
+```bash title="Usage"
+bxSites agents:sync [--agents=agents,claude,cursor]
+```
+
+- `--agents` - wie bei `new`: welche Anweisungsdatei(en) synchronisiert
+  werden (`agents`/`claude`/`cursor`, Standard `agents` allein;
+  `--agents=none` oder `--no-agents` überspringt sie, `.markdownlint.json`
+  wird trotzdem neu geschrieben)
+
+Siehe [KI-Agenten-Anweisungen](guides/ai-agent-instructions.md).
 
 ## `theme:import`
 
