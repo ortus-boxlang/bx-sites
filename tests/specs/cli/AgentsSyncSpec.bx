@@ -1,0 +1,67 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.AgentsSync", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.AgentsSync@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newProjectDir() {
+				var parent = createTempDirectory( prefix = "bxsites-cli-agents-sync-" );
+				tempDirs.append( parent );
+				var dir = parent & "/my-site";
+				directoryCreate( dir, true, true );
+				// bxsites.json, not .yaml - see AgentsFileGeneratorSpec.bx's own
+				// comment on why (real bx-yaml BIFs aren't safely callable here).
+				fileWrite( dir & "/bxsites.json", '{"name":"My Site","theme":{"name":"bootstrap"},"source":"docs"}' );
+				return dir;
+			}
+
+			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
+				expect( function() {
+					verb.run( {} );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
+			} );
+
+			it( "creates AGENTS.md and .markdownlint.json for a project that has neither yet", function() {
+				var dir = newProjectDir();
+				var result = verb.run( { projectRoot : dir } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( fileExists( dir & "/AGENTS.md" ) ).toBeTrue();
+				expect( fileExists( dir & "/.markdownlint.json" ) ).toBeTrue();
+				expect( result.message ).toInclude( "Created" );
+			} );
+
+			it( "re-writes .markdownlint.json but reports AGENTS.md as skipped when it has no markers", function() {
+				var dir = newProjectDir();
+				fileWrite( dir & "/AGENTS.md", "Hand-written before this feature existed." );
+
+				var result = verb.run( { projectRoot : dir } );
+
+				expect( fileRead( dir & "/AGENTS.md" ) ).toBe( "Hand-written before this feature existed." );
+				expect( result.message ).toInclude( "Skipped" );
+			} );
+
+			it( "skips the instruction file(s) entirely with --agents=none, still writing the lint config", function() {
+				var dir = newProjectDir();
+				var result = verb.run( { projectRoot : dir, agents : "none" } );
+
+				expect( fileExists( dir & "/AGENTS.md" ) ).toBeFalse();
+				expect( fileExists( dir & "/.markdownlint.json" ) ).toBeTrue();
+			} );
+
+		} );
+	}
+
+}

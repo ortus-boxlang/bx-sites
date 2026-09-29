@@ -12,10 +12,16 @@ class {
 
 	/**
 	 * Dispatches the `new` verb to ProjectScaffolder.scaffold(), after
-	 * validating `--theme` and `--source` against the supported values.
+	 * validating `--theme` and `--source` against the supported values. Also
+	 * writes the project's `.markdownlint.json` and, by default, an
+	 * AGENTS.md content-authoring cheat sheet (AgentsFileGenerator.bx) -
+	 * `--agents=<comma-list>` picks specific targets (`agents`, `claude`,
+	 * `cursor`), `--no-agents`/`--agents=none` skips the instruction
+	 * file(s) entirely (the lint config is still written either way).
 	 *
 	 * @options { projectRoot (required, absolute path), name, theme (defaults to "bootstrap"), description, format ("yaml" default, "toml", or "json") }
 	 * @options { projectRoot (required, absolute path), name, theme (defaults to "bootstrap"), description, format ("yaml" default, "toml", or "json"), source ("docs" default or "src") }
+	 * @options { ..., agents (comma-list of "agents"/"claude"/"cursor", default "agents"; `false`/"none" to skip) }
 	 */
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
@@ -63,9 +69,18 @@ class {
 		var scaffolder = new "models.build.ProjectScaffolder@bxsites"()
 		var result = scaffolder.scaffold( projectRoot, name, theme, arguments.options.description ?: "", format, source )
 
+		var agentsGenerator = new "models.build.AgentsFileGenerator@bxsites"()
+		agentsGenerator.writeMarkdownLintConfig( result.projectRoot )
+
+		var requestedAgents = agentsGenerator.resolveTargets( arguments.options.agents ?: "" )
+		if ( requestedAgents.len() ) {
+			agentsGenerator.scaffold( result.projectRoot, name, theme, source, requestedAgents )
+		}
+
 		return {
 			exitCode : 0,
-			message  : "Created new BX Sites project [#name#] at #result.projectRoot# (theme: #theme#, config: #result.configPath.listLast( '/' )#)"
+			message  : "Created new BX Sites project [#name#] at #result.projectRoot# (theme: #theme#, config: #result.configPath.listLast( '/' )#)" &
+				( requestedAgents.len() ? " + " & requestedAgents.toList( "/" ) & " instructions" : "" )
 		}
 	}
 

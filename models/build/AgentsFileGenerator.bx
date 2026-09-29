@@ -1,0 +1,347 @@
+/**
+ * Generates and maintains AI-coding-agent instruction files (AGENTS.md,
+ * CLAUDE.md, .cursorrules) at a project's root - the content-authoring
+ * counterpart to `skills:install`'s deeper skill pack (SkillsInstaller.bx):
+ * this is a compact, always-present cheat sheet (frontmatter keys, content
+ * block directives, the page-authoring workflow) covering what most agent
+ * edits actually need, generated from THIS project's real theme/source/
+ * config, not a generic template.
+ *
+ * The generated content is written inside a marked block:
+ *
+ *   <!-- bxsites:agents:start -->
+ *   ...generated cheat sheet...
+ *   <!-- bxsites:agents:end -->
+ *
+ * so `agents:sync` (AgentsFileGenerator.sync(), the `agents:sync` CLI verb's
+ * real implementation) can refresh just that block later - as bx-sites'
+ * own directives/frontmatter keys grow - without clobbering any hand-added
+ * content a project owner wrote above or below it. A target file that
+ * exists WITHOUT the markers is left untouched and reported back as
+ * skipped, since there's no safe way to tell a hand-authored file from one
+ * whose markers were simply removed.
+ */
+class {
+
+	/**
+	 * Every install target this generator knows how to write, and the
+	 * literal filename each one is written to at the project root. `agents`
+	 * is the only one `new` writes by default (module spec) - `claude`/
+	 * `cursor` are opt-in via `--agents=agents,claude,cursor` (New.bx) or
+	 * `agents:sync --agents=...` (AgentsSync.bx), for projects that use
+	 * Claude Code/Cursor specifically and want a file their tool looks for
+	 * by name, alongside the cross-tool AGENTS.md.
+	 */
+	variables.targets = {
+		"agents" : "AGENTS.md",
+		"claude" : "CLAUDE.md",
+		"cursor" : ".cursorrules"
+	}
+
+	variables.startMarker = "<!-- bxsites:agents:start -->"
+	variables.endMarker   = "<!-- bxsites:agents:end -->"
+
+	/**
+	 * Resolves a `--agents` CLI option value into a validated array of
+	 * target keys - shared by both `New.bx` and `AgentsSync.bx` so the two
+	 * verbs can't silently drift on what a given `--agents` value means.
+	 * Unset/blank defaults to `["agents"]` (AGENTS.md only, module spec); a
+	 * bare `--agents` (parses to boolean `true`) is treated the same as the
+	 * default, since "true" isn't a meaningful target list on its own;
+	 * `--no-agents` (boolean `false`) or the literal `"none"` disables the
+	 * instruction file(s) entirely.
+	 *
+	 * @rawValue `arguments.options.agents` as-is - a comma-list string, a boolean (negation/bare-flag form), or unset/blank
+	 *
+	 * @return Array of target keys (a subset of `variables.targets`' keys), possibly empty
+	 *
+	 * @throws BxSites.UnknownAgentTarget when a requested target isn't one this generator knows how to write
+	 */
+	array function resolveTargets( required any rawValue ) {
+		if ( isBoolean( arguments.rawValue ) ) {
+			return arguments.rawValue ? [ "agents" ] : []
+		}
+
+		var raw = trim( toString( arguments.rawValue ) )
+		if ( !len( raw ) ) {
+			return [ "agents" ]
+		}
+		if ( raw == "none" ) {
+			return []
+		}
+
+		var knownTargets = variables.targets.keyArray()
+		var requested = raw.listToArray( "," ).map( t => lCase( trim( t ) ) )
+		var unknown = requested.filter( t => !knownTargets.contains( t ) )
+		if ( unknown.len() ) {
+			throw(
+				type    = "BxSites.UnknownAgentTarget",
+				message = "Unknown --agents target [#unknown.toList( ', ' )#] - must be one of [#knownTargets.toList( ', ' )#], or `none`"
+			)
+		}
+
+		return requested
+	}
+
+	/**
+	 * Writes fresh instruction file(s) into a newly scaffolded project -
+	 * called from `New.bx` right after `ProjectScaffolder.scaffold()`. Each
+	 * target is written unconditionally (the project is brand new, so
+	 * there's nothing to preserve).
+	 *
+	 * @projectRoot Absolute path to the project root
+	 * @name The site name (module spec's own scaffold argument)
+	 * @theme The scaffolded theme name
+	 * @source The scaffolded content source folder ("docs" or "src")
+	 * @agentTargets Array of target keys from `variables.targets` to write (e.g. `["agents"]`, `["agents","claude"]`)
+	 *
+	 * @return Array of absolute paths written
+	 */
+	array function scaffold(
+		required string projectRoot,
+		required string name,
+		required string theme,
+		required string source,
+		required array agentTargets
+	) {
+		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		var body = renderBody( arguments.name, arguments.theme, arguments.source )
+		var written = []
+
+		for ( var targetKey in arguments.agentTargets ) {
+			var filename = variables.targets[ targetKey ] ?: ""
+			if ( !len( filename ) ) {
+				continue
+			}
+			var path = root & "/" & filename
+			fileWrite( path, variables.startMarker & char( 10 ) & body & variables.endMarker & char( 10 ) )
+			written.append( path )
+		}
+
+		return written
+	}
+
+	/**
+	 * Refreshes the generated block in an EXISTING project's instruction
+	 * file(s) - the `agents:sync` verb's real implementation. Three cases
+	 * per target:
+	 *   - file missing: created fresh (same as `scaffold()`).
+	 *   - file present WITH both markers: only the text between them is
+	 *     replaced; everything before/after is preserved untouched.
+	 *   - file present WITHOUT markers: left alone entirely and reported
+	 *     as skipped - it may be a hand-authored file this project owner
+	 *     wrote before this feature existed, or edited the markers out of
+	 *     deliberately to stop future syncs from touching it.
+	 *
+	 * @projectRoot Absolute path to an existing project root
+	 * @agentTargets Array of target keys from `variables.targets` to sync
+	 *
+	 * @return { created: array of paths, updated: array of paths, skipped: array of paths }
+	 */
+	struct function sync( required string projectRoot, required array agentTargets ) {
+		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		var config = new "models.config.ConfigLoader@bxsites"().load( root )
+		var sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
+		var sourceName = sourceDirResolver.nameConfigured( root )
+
+		var body = renderBody( config.name ?: "", config.theme.name ?: "", sourceName )
+		var result = { created : [], updated : [], skipped : [] }
+
+		for ( var targetKey in arguments.agentTargets ) {
+			var filename = variables.targets[ targetKey ] ?: ""
+			if ( !len( filename ) ) {
+				continue
+			}
+			var path = root & "/" & filename
+
+			if ( !fileExists( path ) ) {
+				fileWrite( path, variables.startMarker & char( 10 ) & body & variables.endMarker & char( 10 ) )
+				result.created.append( path )
+				continue
+			}
+
+			var existing = fileRead( path )
+			var startIdx = existing.find( variables.startMarker )
+			var endIdx = existing.find( variables.endMarker )
+			if ( !startIdx || !endIdx || endIdx < startIdx ) {
+				result.skipped.append( path )
+				continue
+			}
+
+			var before = existing.left( startIdx - 1 )
+			var after = existing.mid( endIdx + len( variables.endMarker ), len( existing ) )
+			fileWrite( path, before & variables.startMarker & char( 10 ) & body & variables.endMarker & after )
+			result.updated.append( path )
+		}
+
+		return result
+	}
+
+	/**
+	 * Writes/refreshes the project's `.markdownlint.json` - unconditionally,
+	 * on both `new` and `agents:sync` (module spec: a fixed, team-standard
+	 * ruleset bx-sites itself maintains, not something a project is expected
+	 * to diverge from, so there's no marker/preserve logic here the way
+	 * there is for the instruction files above).
+	 *
+	 * @projectRoot Absolute path to the project root
+	 *
+	 * @return The absolute path written
+	 */
+	string function writeMarkdownLintConfig( required string projectRoot ) {
+		var path = arguments.projectRoot.reReplace( "[\/]+$", "" ) & "/.markdownlint.json"
+		fileWrite( path, renderMarkdownLintConfig() )
+		return path
+	}
+
+	/**
+	 * The canonical `.markdownlint.json` ruleset - relaxes the handful of
+	 * stylistic rules that would otherwise flag normal bx-sites content
+	 * (long lines, tab indentation, fenced code blocks with no language,
+	 * bare URLs, inline HTML in directive-adjacent markdown, more than one
+	 * H1 across a versioned/i18n'd doc tree) while keeping structural rules
+	 * (heading order, list formatting, etc.) active.
+	 */
+	private string function renderMarkdownLintConfig() {
+		var lines = [
+			"{",
+			'	"line-length": false,',
+			'	"single-h1": false,',
+			'	"no-hard-tabs": false,',
+			'	"fenced-code-language": false,',
+			'	"no-bare-urls": false,',
+			'	"first-line-h1": false,',
+			'	"no-multiple-blanks": {',
+			'		"maximum": 2',
+			"	},",
+			'	"no-duplicate-header": {',
+			'		"siblings_only": true',
+			"	},",
+			'	"no-duplicate-heading": false,',
+			'	"no-inline-html": false',
+			"}",
+			""
+		]
+		return lines.toList( char( 10 ) )
+	}
+
+	/**
+	 * Renders the shared generated-block body (everything between the
+	 * markers) - identical across every target file, since the content is
+	 * about how to author THIS project's pages, not about any one
+	 * particular coding agent.
+	 *
+	 * @name The site name
+	 * @theme The site's configured theme
+	 * @source The content source folder ("docs", "src", or a custom name)
+	 */
+	private string function renderBody( required string name, required string theme, required string source ) {
+		// A literal `#` inside a BoxLang string opens interpolation, so a bare
+		// markdown heading marker has to be built from char(35) instead of
+		// typed directly - `"## Foo"` would parse as an (invalid) attempt to
+		// interpolate an expression named `Foo`, not two literal hash chars.
+		var hash = char( 35 )
+		var h1 = hash
+		var h2 = hash & hash
+
+		var lines = [
+			h1 & " bxSites content-authoring guide" & ( len( arguments.name ) ? " - #arguments.name#" : "" ),
+			"",
+			"Auto-generated by `bxSites new`/`bxSites agents:sync` - refresh anytime with",
+			"`bxSites agents:sync` after a bx-sites upgrade. Edit freely OUTSIDE the",
+			"`bxsites:agents:start`/`end` markers above/below; a sync only replaces what's",
+			"between them.",
+			"",
+			h2 & " Project shape",
+			"",
+			"- Content lives under `#arguments.source#/**/*.md` - plain CommonMark with a",
+			"  YAML-style frontmatter block. Folder/file nesting becomes the site nav and",
+			"  URL structure automatically (`#arguments.source#/guides/setup.md` ->",
+			"  `/guides/setup/`). Link to other pages with a relative `.md` path",
+			"  (`[Setup](guides/setup.md)`) - rewritten to a pretty URL at build time.",
+			"- `.bxm` files are theme templates only (this project's theme: `#arguments.theme#`)",
+			"  - never page content. Don't edit them unless you're customizing the theme",
+			"  itself (`bxSites theme:new --theme=#arguments.theme#` ejects it to `#arguments.source#/.theme/`).",
+			"- `site/` is generated build output - never hand-edit it, never treat it as a",
+			"  source of truth.",
+			"- Reserved folders inside `#arguments.source#/` (not scanned as pages):",
+			"  `assets/`, `blog/`, `i18n/`, `versions/`, `includes/`, `.theme/`, `.themes/`.",
+			"",
+			h2 & " Frontmatter keys",
+			"",
+			"| Key | Purpose |",
+			"|---|---|",
+			"| `title` | Page/nav title (else derived from the filename) |",
+			"| `order` | Sort position among sibling pages (lower first) |",
+			"| `hidden` | `true` builds the page but excludes it from nav + search |",
+			"| `description` | Meta/social-card text (falls back to `summary`, then an excerpt) |",
+			"| `summary` | One-line lead-in shown on the page itself |",
+			"| `tags` | Array - renders as badges, feeds `/tags/`, boosts search |",
+			"| `icon` | Emoji, a named icon (`rocket`), or `custom:my-icon` |",
+			"| `ogImage` | Per-page social-card image override |",
+			'| `toc` | `false` hides the on-page "On this page" outline (default `true`) |',
+			"| `layout` | Render through a named `.bxm` instead of the theme's default |",
+			"",
+			"Blog posts (`#arguments.source#/blog/`) add `date`/`authors`/`categories`/`draft` -",
+			'scaffold one with `bxSites post:new --title="..."` rather than by hand.',
+			"",
+			h2 & " Content block directives",
+			"",
+			'Syntax: `::: name "Optional Title" key="value" :::` (self-closing) or',
+			'`::: name key="value"` ... body ... `:::` (block). Blocks nest freely.',
+			"",
+			"| Directive | Syntax | Use for |",
+			"|---|---|---|",
+			'| `expandable` | `::: expandable "Title" open="true"` ... `:::` | Collapsible `<details>` section |',
+			'| `cards` / `card` | `::: cards` -> `::: card title="" icon="" href=""` | Link-card grid |',
+			'| `columns` / `column` | `::: columns` -> `::: column width="50%"` | Side-by-side layout |',
+			'| `stepper` / `step` | `::: stepper` -> `::: step "Title" color="success"` | Numbered steps |',
+			'| `image-gallery` / `image` | `::: image-gallery columns="3"` -> `::: image src="" alt=""` | Lightbox gallery |',
+			'| `file` | `::: file src="assets/spec.pdf" title="..." :::` | Download card |',
+			'| `button` / `buttons` | `::: button "Label" href="..." style="primary" :::` | Call-to-action link |',
+			'| `embed` | `::: embed url="..." :::` | YouTube/Vimeo/CodePen/Figma/etc. |',
+			'| `page-link` | `::: page-link href="../other.md" :::` | Link card, auto-pulls target frontmatter |',
+			'| `link-preview` | `::: link-preview url="..." title="..." :::` | External link card, manual fields |',
+			'| `prompt` | `::: prompt description="..." expanded="preview"` ... `:::` | Copyable AI-prompt box |',
+			'| `updates` / `update` | `::: updates` -> `::: update date="YYYY-MM-DD"` | Changelog list + feed.xml |',
+			'| `include` | `::: include src="includes/notice.md" :::` | Splice raw markdown from another file |',
+			'| `conditional` / `audience-switcher` | `::: conditional key="plan" value="pro"` ... `:::` | Client-side variant switching |',
+			'| `course` | `::: course id="getting-started" :::` | Numbered lesson index from `#arguments.source#/data/courses.yaml` |',
+			'| `for` | `::: for item in data.products` ... `:::` | Loop over `#arguments.source#/data/*.yaml|json` |',
+			'| `if` / `elseif` / `else` | `::: if data.flags.x` ... `::: else` ... `:::` (ONE closing `:::` for the whole chain) | Conditional content |',
+			'| `pagebreak` | `::: pagebreak :::` | Print/PDF page break only |',
+			"",
+			"Cloud/Premium (require a bxSites Cloud plan with the feature enabled - the",
+			"block always renders locally, but only *works* once published there):",
+			"",
+			'| Directive | Syntax | Notes |',
+			'|---|---|---|',
+			'| `contact-form` | `::: contact-form id="..." fields="name:text,email*:email,message:textarea" :::` | `fields` is `name:type` pairs, `*` before `:` marks required; types: text/email/textarea |',
+			'| `cloud` | `::: cloud slug="press/release1" :::` | Bakes a bxSites Cloud content block into the page at build time |',
+			"",
+			"Reader comments are not a bx-sites feature yet - don't use a `::: comments :::`",
+			"directive, it doesn't exist.",
+			"",
+			h2 & " Workflow",
+			"",
+			"```",
+			'bxSites page:new --path=guides/new-page --title="New Page"   ' & hash & " scaffold a page",
+			"bxSites serve                                                 " & hash & " live preview, http://localhost",
+			"bxSites lint                                                  " & hash & " pre-build content checks",
+			"bxSites build                                                 " & hash & " render #arguments.source#/**/*.md -> site/",
+			"bxSites publish                                               " & hash & " ship to bxSites Cloud",
+			"```",
+			"",
+			h2 & " Deeper reference",
+			"",
+			"`bxSites skills:install` installs a full Agent Skills pack",
+			"(ortus-boxlang/bx-sites-skills) into this project for on-demand, deeper",
+			"guidance than this cheat sheet covers. bx-sites' own docs (content blocks,",
+			"themes, data files, i18n, versioning, deployment) are the canonical",
+			"reference for anything not summarized above.",
+			""
+		]
+		return lines.toList( char( 10 ) )
+	}
+
+}

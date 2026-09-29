@@ -1,0 +1,161 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.AgentsFileGenerator", function() {
+
+			beforeEach( function() {
+				variables.generator = new "models.build.AgentsFileGenerator@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newProjectDir() {
+				var parent = createTempDirectory( prefix = "bxsites-agents-generator-" );
+				tempDirs.append( parent );
+				return parent & "/my-site";
+			}
+
+			describe( "resolveTargets()", function() {
+
+				it( "defaults to [agents] when the raw value is blank", function() {
+					expect( generator.resolveTargets( "" ) ).toBe( [ "agents" ] );
+				} );
+
+				it( "defaults to [agents] for a bare boolean true (--agents with no value)", function() {
+					expect( generator.resolveTargets( true ) ).toBe( [ "agents" ] );
+				} );
+
+				it( "returns an empty array for boolean false (--no-agents)", function() {
+					expect( generator.resolveTargets( false ) ).toBeArray();
+					expect( generator.resolveTargets( false ).len() ).toBe( 0 );
+				} );
+
+				it( "returns an empty array for the literal 'none'", function() {
+					expect( generator.resolveTargets( "none" ).len() ).toBe( 0 );
+				} );
+
+				it( "parses and lowercases a comma list", function() {
+					expect( generator.resolveTargets( "Agents, CLAUDE" ) ).toBe( [ "agents", "claude" ] );
+				} );
+
+				it( "throws BxSites.UnknownAgentTarget for an unsupported target", function() {
+					expect( function() {
+						generator.resolveTargets( "agents,windsurf" );
+					} ).toThrow( "BxSites.UnknownAgentTarget" );
+				} );
+
+			} );
+
+			describe( "scaffold()", function() {
+
+				it( "writes AGENTS.md with the generated block for the requested target(s)", function() {
+					var dir = newProjectDir();
+					directoryCreate( dir, true, true );
+					var written = generator.scaffold( dir, "My Site", "bootstrap", "docs", [ "agents" ] );
+
+					expect( written ).toBe( [ dir & "/AGENTS.md" ] );
+					expect( fileExists( dir & "/AGENTS.md" ) ).toBeTrue();
+
+					var content = fileRead( dir & "/AGENTS.md" );
+					expect( content ).toInclude( "<!-- bxsites:agents:start -->" );
+					expect( content ).toInclude( "<!-- bxsites:agents:end -->" );
+					expect( content ).toInclude( "docs/**/*.md" );
+					expect( content ).toInclude( "bootstrap" );
+					expect( content ).toInclude( "contact-form" );
+				} );
+
+				it( "writes multiple targets in one call", function() {
+					var dir = newProjectDir();
+					directoryCreate( dir, true, true );
+					var written = generator.scaffold( dir, "My Site", "material", "src", [ "agents", "claude" ] );
+
+					expect( written.len() ).toBe( 2 );
+					expect( fileExists( dir & "/AGENTS.md" ) ).toBeTrue();
+					expect( fileExists( dir & "/CLAUDE.md" ) ).toBeTrue();
+				} );
+
+			} );
+
+			describe( "sync()", function() {
+
+				// bxsites.json (not .yaml) throughout this describe block, same
+				// reason as NewSpec.bx's own re-load tests: real bx-yaml BIFs
+				// aren't safely callable in a bare unit test - JSON routes
+				// ConfigLoader.load() through the core jsonDeserialize() path
+				// instead (YamlRenderer.bx's own docblock).
+				it( "creates AGENTS.md when it doesn't exist yet", function() {
+					var dir = newProjectDir();
+					directoryCreate( dir, true, true );
+					fileWrite( dir & "/bxsites.json", '{"name":"My Site","theme":{"name":"bootstrap"},"source":"docs"}' );
+
+					var result = generator.sync( dir, [ "agents" ] );
+
+					expect( result.created ).toBe( [ dir & "/AGENTS.md" ] );
+					expect( result.updated.len() ).toBe( 0 );
+					expect( result.skipped.len() ).toBe( 0 );
+				} );
+
+				it( "replaces only the marked block, preserving hand-added content around it", function() {
+					var dir = newProjectDir();
+					directoryCreate( dir, true, true );
+					fileWrite( dir & "/bxsites.json", '{"name":"My Site","theme":{"name":"bootstrap"},"source":"docs"}' );
+
+					var before = "Team notes" & char( 10 ) & char( 10 );
+					var after = char( 10 ) & "Also see our style guide" & char( 10 );
+					fileWrite(
+						dir & "/AGENTS.md",
+						before & "<!-- bxsites:agents:start -->" & char( 10 ) & "stale content" & char( 10 ) & "<!-- bxsites:agents:end -->" & after
+					);
+
+					var result = generator.sync( dir, [ "agents" ] );
+
+					expect( result.updated ).toBe( [ dir & "/AGENTS.md" ] );
+					var content = fileRead( dir & "/AGENTS.md" );
+					expect( content ).toInclude( "Team notes" );
+					expect( content ).toInclude( "Also see our style guide" );
+					expect( content ).notToInclude( "stale content" );
+					expect( content ).toInclude( "bootstrap" );
+				} );
+
+				it( "skips a file with no markers instead of overwriting it", function() {
+					var dir = newProjectDir();
+					directoryCreate( dir, true, true );
+					fileWrite( dir & "/bxsites.json", '{"name":"My Site","theme":{"name":"bootstrap"},"source":"docs"}' );
+					fileWrite( dir & "/AGENTS.md", "Hand-written, no markers here." );
+
+					var result = generator.sync( dir, [ "agents" ] );
+
+					expect( result.skipped ).toBe( [ dir & "/AGENTS.md" ] );
+					expect( fileRead( dir & "/AGENTS.md" ) ).toBe( "Hand-written, no markers here." );
+				} );
+
+			} );
+
+			describe( "writeMarkdownLintConfig()", function() {
+
+				it( "writes the canonical ruleset", function() {
+					var dir = newProjectDir();
+					directoryCreate( dir, true, true );
+					var path = generator.writeMarkdownLintConfig( dir );
+
+					expect( path ).toBe( dir & "/.markdownlint.json" );
+					var config = jsonDeserialize( fileRead( path ) );
+					expect( config[ "line-length" ] ).toBeFalse();
+					expect( config[ "no-multiple-blanks" ].maximum ).toBe( 2 );
+					expect( config[ "no-duplicate-header" ].siblings_only ).toBeTrue();
+					expect( config[ "no-duplicate-heading" ] ).toBeFalse();
+				} );
+
+			} );
+
+		} );
+	}
+
+}

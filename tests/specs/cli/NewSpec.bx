@@ -135,6 +135,46 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.UnknownTheme" );
 			} );
 
+			it( "writes .markdownlint.json and AGENTS.md by default", function() {
+				var dir = newTargetDir();
+				var result = verb.run( { projectRoot : dir } );
+
+				expect( fileExists( dir & "/.markdownlint.json" ) ).toBeTrue();
+				expect( fileExists( dir & "/AGENTS.md" ) ).toBeTrue();
+				expect( fileExists( dir & "/CLAUDE.md" ) ).toBeFalse();
+				expect( result.message ).toInclude( "agents instructions" );
+			} );
+
+			it( "writes CLAUDE.md too when --agents=agents,claude is requested", function() {
+				var dir = newTargetDir();
+				verb.run( { projectRoot : dir, agents : "agents,claude" } );
+
+				expect( fileExists( dir & "/AGENTS.md" ) ).toBeTrue();
+				expect( fileExists( dir & "/CLAUDE.md" ) ).toBeTrue();
+			} );
+
+			it( "skips every instruction file when --agents=none, but still writes .markdownlint.json", function() {
+				var dir = newTargetDir();
+				verb.run( { projectRoot : dir, agents : "none" } );
+
+				expect( fileExists( dir & "/AGENTS.md" ) ).toBeFalse();
+				expect( fileExists( dir & "/.markdownlint.json" ) ).toBeTrue();
+			} );
+
+			it( "skips every instruction file when --no-agents (boolean false) is passed", function() {
+				var dir = newTargetDir();
+				verb.run( { projectRoot : dir, agents : false } );
+
+				expect( fileExists( dir & "/AGENTS.md" ) ).toBeFalse();
+			} );
+
+			it( "throws BxSites.UnknownAgentTarget for an unsupported --agents value", function() {
+				var dir = newTargetDir();
+				expect( function() {
+					verb.run( { projectRoot : dir, agents : "windsurf" } );
+				} ).toThrow( "BxSites.UnknownAgentTarget" );
+			} );
+
 		} );
 	}
 
