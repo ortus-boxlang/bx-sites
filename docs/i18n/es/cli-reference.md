@@ -86,6 +86,9 @@ Construye y sirve el sitio localmente con recarga en vivo.
 bxSites serve [--port=8080] [--host=127.0.0.1]
 ```
 
+`--port` y `--host` también aceptan valores separados por espacios, por
+ejemplo `bxSites serve --port 9191 --host 127.0.0.1`.
+
 Se ejecuta en primer plano hasta que se interrumpe (Ctrl+C).
 
 ## `search-index`

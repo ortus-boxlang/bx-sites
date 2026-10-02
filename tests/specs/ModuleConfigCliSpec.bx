@@ -142,6 +142,28 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( projectRoot & "/bxsites.yaml" ) ).toBeTrue();
 			} );
 
+			it( "parses serve values without treating them as project paths or consuming boolean flags", function() {
+				makePublic( moduleConfig, "parseCliOptions" );
+				makePublic( moduleConfig, "resolveProjectRoot" );
+
+				var options = moduleConfig.parseCliOptions( [ "--port", "9191", "--host", "127.0.0.1" ] );
+				expect( options.port ).toBe( "9191" );
+				expect( options.host ).toBe( "127.0.0.1" );
+				expect( options.keyExists( "_positional" ) ).toBeFalse();
+				expect( moduleConfig.resolveProjectRoot( options ) ).toBe( moduleConfig.resolveProjectRoot( {} ) );
+
+				options = moduleConfig.parseCliOptions( [ "--port=8080", "--port", "9191", "--host", "localhost", "--host=127.0.0.1", "--debug", "/project" ] );
+				expect( options.port ).toBe( "9191" );
+				expect( options.host ).toBe( "127.0.0.1" );
+				expect( options.debug ).toBeTrue();
+				expect( options._positional ).toBe( "/project" );
+
+				options = moduleConfig.parseCliOptions( [ "--port", "--no-color", "--host" ] );
+				expect( options.port ).toBeTrue();
+				expect( options.color ).toBeFalse();
+				expect( options.host ).toBeTrue();
+			} );
+
 			it( "returns exit code 0 for --help even when --projectRoot points at a project with no bxsites.yaml", function() {
 				var parent = newTempDir();
 

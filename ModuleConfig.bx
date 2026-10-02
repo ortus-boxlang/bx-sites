@@ -241,8 +241,9 @@ class {
 	 * `--option` (boolean true), `--option=value` / `--option="quoted value"`,
 	 * `-o=value` / `-o` (short form), `-abc` (combined single-char shorthand),
 	 * and `--!option` / `--no-option` (negation, sets false). Everything else
-	 * becomes a positional. There is deliberately no `--key value`
-	 * (space-separated) form - BoxLang's own convention doesn't have one.
+	 * becomes a positional. As a convenience, `--port value` and
+	 * `--host value` also accept space-separated values; other value options
+	 * require `--key=value` so boolean flags do not consume project paths.
 	 *
 	 * `--version`/`-v` and `--help`/`-h` (or no verb, or the `help` verb) are
 	 * handled before verb dispatch and never reach a verb class - though in
@@ -475,6 +476,7 @@ class {
 	 *
 	 * - `--option`          -> `true`
 	 * - `--option=value`    -> `value` (surrounding `"..."` / `'...'` stripped)
+	 * - `--port value` / `--host value` -> value, if the next token is not a flag
 	 * - `-o=value`          -> short form with a value
 	 * - `-o`                -> short form, `true`
 	 * - `-abc`              -> combined single-char shorthand: a/b/c all `true`
@@ -494,7 +496,8 @@ class {
 	private struct function parseCliOptions( required array rawArgs ) {
 		var options = {}
 
-		for ( var token in arguments.rawArgs ) {
+		for ( var argIndex = 1; argIndex <= arguments.rawArgs.len(); argIndex++ ) {
+			var token = arguments.rawArgs[ argIndex ]
 			if ( token.startsWith( "--!" ) ) {
 				options[ token.right( len( token ) - 3 ) ] = false
 			} else if ( token.startsWith( "--no-" ) ) {
@@ -504,6 +507,10 @@ class {
 				var eqPos = body.find( "=" )
 				if ( eqPos ) {
 					options[ body.left( eqPos - 1 ) ] = stripQuotes( body.right( len( body ) - eqPos ) )
+				} else if ( ( body == "port" || body == "host" )
+					&& argIndex < arguments.rawArgs.len()
+					&& !arguments.rawArgs[ argIndex + 1 ].startsWith( "-" ) ) {
+					options[ body ] = stripQuotes( arguments.rawArgs[ ++argIndex ] )
 				} else {
 					options[ body ] = true
 				}

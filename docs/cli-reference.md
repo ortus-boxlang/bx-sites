@@ -106,6 +106,9 @@ Build and serve the site locally with live reload.
 bxSites serve [--port=8080] [--host=127.0.0.1]
 ```
 
+`--port` and `--host` also accept space-separated values, for example
+`bxSites serve --port 9191 --host 127.0.0.1`.
+
 Runs in the foreground until interrupted (Ctrl+C). A native BoxLang file
 watcher - not a poll loop - reacts to a saved change immediately, and only
 reconverts the page(s) that actually changed rather than the whole site,

@@ -86,6 +86,9 @@ Baut und liefert die Website lokal mit Live-Reload aus.
 bxSites serve [--port=8080] [--host=127.0.0.1]
 ```
 
+`--port` und `--host` akzeptieren auch durch Leerzeichen getrennte Werte,
+zum Beispiel `bxSites serve --port 9191 --host 127.0.0.1`.
+
 Läuft im Vordergrund, bis es unterbrochen wird (Strg+C).
 
 ## `search-index`
