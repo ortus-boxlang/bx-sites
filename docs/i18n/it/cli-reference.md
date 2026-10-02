@@ -86,6 +86,9 @@ Compila e serve il sito in locale con ricaricamento automatico.
 bxSites serve [--port=8080] [--host=127.0.0.1]
 ```
 
+`--port` e `--host` accettano anche valori separati da spazi, ad esempio
+`bxSites serve --port 9191 --host 127.0.0.1`.
+
 Gira in primo piano finché non viene interrotto (Ctrl+C).
 
 ## `search-index`
