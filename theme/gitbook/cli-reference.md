@@ -58,7 +58,7 @@ currently activated in your project alongside the verbs below. See
 Scaffold a new project.
 
 ```bash title="Usage"
-bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|toml|json] [--source=docs|src] [--docs|--site]
+bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|toml|json] [--source=docs|src] [--docs|--site] [--agents=agents,claude,cursor]
 ```
 
 - `--name` - the site name written into the site config (defaults to the target directory's name)
@@ -68,11 +68,20 @@ bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--d
 - `--source` - `docs` (default) or `src`, the folder where pages and assets are scaffolded
 - `--docs` - shortcut for `--source=docs`
 - `--site` - shortcut for `--source=src`
+- `--agents` - which AI coding-agent instruction file(s) to write: a comma
+  list of `agents` (`AGENTS.md`), `claude` (`CLAUDE.md`), `cursor`
+  (`.cursorrules`). Defaults to `agents` alone; `--agents=none` (or
+  `--no-agents`) skips them all. See
+  [AI Agent Instructions](guides/ai-agent-instructions.md).
 
 Use `--source=src` when the project is a general site rather than a
 documentation site. The choice affects the initial folder only; all later
 verbs resolve the existing `docs/` or `src/` source folder automatically.
 Use only one of `--docs` or `--site`; build output is always written to `site/`.
+
+Also always writes `.markdownlint.json` - a project-wide markdownlint
+ruleset tuned for bx-sites content (relaxes line-length, hard-tab, and
+bare-URL rules that would otherwise flag normal Markdown here).
 
 ## `build`
 
@@ -96,6 +105,9 @@ Build and serve the site locally with live reload.
 ```bash title="Usage"
 bxSites serve [--port=8080] [--host=127.0.0.1]
 ```
+
+`--port` and `--host` also accept space-separated values, for example
+`bxSites serve --port 9191 --host 127.0.0.1`.
 
 Runs in the foreground until interrupted (Ctrl+C). A native BoxLang file
 watcher - not a poll loop - reacts to a saved change immediately, and only
@@ -527,6 +539,28 @@ Requires Node.js/`npx` on `PATH`. See
 [AI Agent Skills](guides/ai-agent-skills.md) for what a skill is, the full
 skill list, and the other two install paths (`npx skills add`/`coldbox ai
 skills install`) that don't need `bxSites` at all.
+
+## `agents:sync`
+
+(Re)write the AI coding-agent instruction file(s) and `.markdownlint.json`
+`new` scaffolds by default - for a project created before this feature
+existed, or to refresh them after a bx-sites upgrade adds new content
+block directives/frontmatter keys. Safe to re-run: only the marked
+`<!-- bxsites:agents:start -->`/`<!-- bxsites:agents:end -->` block in each
+instruction file is replaced, so anything you wrote above or below it is
+preserved. A target file that exists without those markers (hand-authored
+before this feature existed, or edited to opt out) is left alone and
+reported as skipped, never overwritten.
+
+```bash title="Usage"
+bxSites agents:sync [--agents=agents,claude,cursor]
+```
+
+- `--agents` - same as `new`'s own flag: which instruction file(s) to sync
+  (`agents`/`claude`/`cursor`, default `agents` alone; `--agents=none` or
+  `--no-agents` skips them, still (re)writing `.markdownlint.json`)
+
+See [AI Agent Instructions](guides/ai-agent-instructions.md).
 
 ## `theme:import`
 

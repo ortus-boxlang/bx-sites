@@ -90,13 +90,23 @@ my-docs/
 ├── docs/
 │   ├── assets/
 │   └── index.md
-└── bxsites.yaml
+├── bxsites.yaml
+├── .markdownlint.json
+└── AGENTS.md
 ```
 
 Pasa `--theme=material` o `--theme=tailwind` para generar la estructura
 con un tema predeterminado diferente, y `--name="My Project Docs"` para
 establecer el nombre del sitio de antemano - de lo contrario `new` lo
 deriva del nombre del directorio de destino.
+
+`AGENTS.md` es una chuleta de referencia generada para la creación de
+contenido, pensada para asistentes de codificación con IA, y
+`.markdownlint.json` un conjunto de reglas de lint a juego - ambos se
+escriben por defecto; consulta
+[Instrucciones para Agentes de IA](guides/ai-agent-instructions.md) para
+ver qué contienen, cómo activar también `CLAUDE.md`/`.cursorrules`, y cómo
+actualizarlos más adelante con `agents:sync`.
 
 `docs/` es la carpeta de origen predeterminada. Usa `bxSites new my-site
 --source=src` para generar las páginas bajo `src/`; los comandos posteriores

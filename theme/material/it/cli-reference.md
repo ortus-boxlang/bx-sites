@@ -45,7 +45,7 @@ la convenzione `docs/`-o-`src/`. `new` genera sempre lo scheletro di
 Genera lo scheletro di un progetto di documentazione.
 
 ```bash title="Utilizzo"
-bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|json] [--source=docs|src]
+bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|json] [--source=docs|src] [--agents=agents,claude,cursor]
 ```
 
 - `--name` - il nome del sito scritto nella configurazione del sito (per default, il nome della cartella di destinazione)
@@ -53,6 +53,14 @@ bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--d
 - `--description` - la descrizione del sito scritta nella configurazione del sito
 - `--format` - `yaml` (predefinito, genera lo scheletro di `bxsites.yaml`) oppure `json` (genera lo scheletro di `bxsites.json`)
 - `--source` - `docs` (predefinito) oppure `src`, la cartella in cui vengono generati pagine e asset
+- `--agents` - quale/i file di istruzioni per agenti di coding IA scrivere:
+  un elenco separato da virgole tra `agents` (`AGENTS.md`), `claude`
+  (`CLAUDE.md`), `cursor` (`.cursorrules`). Il valore predefinito è solo
+  `agents`; `--agents=none` (o `--no-agents`) li omette tutti. Vedi
+  [Istruzioni per Agenti IA](guides/ai-agent-instructions.md).
+
+Scrive inoltre sempre `.markdownlint.json` - un insieme di regole
+markdownlint per l'intero progetto, calibrato sui contenuti di bx-sites.
 
 ## `build`
 
@@ -77,6 +85,9 @@ Compila e serve il sito in locale con ricaricamento automatico.
 ```bash title="Utilizzo"
 bxSites serve [--port=8080] [--host=127.0.0.1]
 ```
+
+`--port` e `--host` accettano anche valori separati da spazi, ad esempio
+`bxSites serve --port 9191 --host 127.0.0.1`.
 
 Gira in primo piano finché non viene interrotto (Ctrl+C).
 
@@ -483,6 +494,31 @@ Valida il pacchetto scaricato rispetto al contratto `ThemeProvider`
 fallisce al momento dell'installazione invece che alla prossima `build`.
 Imposta `theme.name` di `bxsites.yaml` sul nome installato per usarlo -
 vedi [Temi](guides/themes.md#installare-un-tema-pubblicato).
+
+## `agents:sync`
+
+(Ri)scrive il/i file di istruzioni per agenti di coding IA e
+`.markdownlint.json` che `new` genera per default - per un progetto creato
+prima che questa funzione esistesse, o per aggiornarli dopo un
+aggiornamento di bx-sites che aggiunge nuove direttive di blocchi di
+contenuto o chiavi di frontmatter. Sicuro da rieseguire: in ogni file di
+istruzioni viene sostituito solo il blocco contrassegnato tra
+`<!-- bxsites:agents:start -->`/`<!-- bxsites:agents:end -->`, quindi
+tutto ciò che hai scritto sopra o sotto viene preservato. Un file di
+destinazione senza questi marcatori (scritto a mano prima che esistesse
+questa funzione, o modificato per escluderlo deliberatamente) viene
+lasciato invariato e segnalato come saltato, mai sovrascritto.
+
+```bash title="Utilizzo"
+bxSites agents:sync [--agents=agents,claude,cursor]
+```
+
+- `--agents` - come in `new`: quale/i file di istruzioni sincronizzare
+  (`agents`/`claude`/`cursor`, predefinito solo `agents`;
+  `--agents=none` o `--no-agents` li omette, `.markdownlint.json` viene
+  comunque riscritto)
+
+Vedi [Istruzioni per Agenti IA](guides/ai-agent-instructions.md).
 
 ## `theme:import`
 

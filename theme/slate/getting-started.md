@@ -87,7 +87,9 @@ my-docs/
 ├── docs/
 │   ├── assets/
 │   └── index.md
-└── bxsites.yaml
+├── bxsites.yaml
+├── .markdownlint.json
+└── AGENTS.md
 ```
 
 Pass `--theme=material` or `--theme=tailwind` to scaffold with a different
@@ -96,6 +98,12 @@ default theme, `--name="My Project Docs"` to set the site name up front, or
 `new` uses the bootstrap theme, derives the site name from the target
 directory, and uses `docs/`. The shorter `--docs` and `--site` flags are
 aliases for `--source=docs` and `--source=src`.
+
+`AGENTS.md` is a generated content-authoring cheat sheet for AI coding
+assistants, and `.markdownlint.json` a matching lint ruleset - both written
+by default; see [AI Agent Instructions](guides/ai-agent-instructions.md) for
+what's in them, how to opt into `CLAUDE.md`/`.cursorrules` too, and how to
+refresh them later with `agents:sync`.
 
 ### Config file format
 

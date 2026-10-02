@@ -90,13 +90,22 @@ my-docs/
 ├── docs/
 │   ├── assets/
 │   └── index.md
-└── bxsites.yaml
+├── bxsites.yaml
+├── .markdownlint.json
+└── AGENTS.md
 ```
 
 Übergib `--theme=material` oder `--theme=tailwind`, um mit einem anderen
 Standard-Theme zu starten, und `--name="My Project Docs"`, um den
 Website-Namen direkt festzulegen - andernfalls leitet `new` ihn aus dem Namen
 des Zielverzeichnisses ab.
+
+`AGENTS.md` ist eine generierte Kurzreferenz für KI-Coding-Assistenten zur
+Inhaltserstellung, und `.markdownlint.json` ein passendes Lint-Regelwerk -
+beide werden standardmäßig geschrieben; siehe
+[KI-Agenten-Anweisungen](guides/ai-agent-instructions.md) für den Inhalt,
+wie man zusätzlich `CLAUDE.md`/`.cursorrules` aktiviert, und wie man sie
+später mit `agents:sync` aktualisiert.
 
 `docs/` ist der Standard-Quellordner. Mit `bxSites new my-site
 --source=src` werden die Seiten stattdessen unter `src/` angelegt; die
