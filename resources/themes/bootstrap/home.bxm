@@ -797,7 +797,7 @@
 		<div class="bxh-wrap footer-bottom footrow">
 			<span>&copy; #year( now() )# #encodeForHTML( variables.siteConfig.name )#</span>
 			<div class="footlinks">
-				<a href="#variables.basePath#license/">License</a>
+				<a class="footverse" href="https://www.bible.com/bible/59/JHN.14.6.ESV" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">&#10084;&#65039;</span> He is the truth and the life</a>
 				<a class="poweredby" href="https://boxlang.io" target="_blank" rel="noopener noreferrer">Part of the <b>BoxLang</b> ecosystem</a>
 			</div>
 		</div>
