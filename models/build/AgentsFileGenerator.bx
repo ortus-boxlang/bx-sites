@@ -104,7 +104,7 @@ class {
 		required string source,
 		required array agentTargets
 	) {
-		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		var root = arguments.projectRoot.reReplace( "[\\\/]+$", "" )
 		var body = renderBody( arguments.name, arguments.theme, arguments.source )
 		var written = []
 
@@ -139,7 +139,7 @@ class {
 	 * @return { created: array of paths, updated: array of paths, skipped: array of paths }
 	 */
 	struct function sync( required string projectRoot, required array agentTargets ) {
-		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		var root = arguments.projectRoot.reReplace( "[\\\/]+$", "" )
 		var config = new "models.config.ConfigLoader@bxsites"().load( root )
 		var sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
 		var sourceName = sourceDirResolver.nameConfigured( root )
@@ -189,7 +189,7 @@ class {
 	 * @return The absolute path written
 	 */
 	string function writeMarkdownLintConfig( required string projectRoot ) {
-		var path = arguments.projectRoot.reReplace( "[\/]+$", "" ) & "/.markdownlint.json"
+		var path = arguments.projectRoot.reReplace( "[\\\/]+$", "" ) & "/.markdownlint.json"
 		fileWrite( path, renderMarkdownLintConfig() )
 		return path
 	}

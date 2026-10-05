@@ -190,7 +190,7 @@ class {
 		config.theme.styleUrl = resolveThemeStyleUrl( themeDir, config.assets.fingerprint )
 
 		// Prepare the site output directory. If it exists, delete it first to ensure a clean build.
-		var siteDir = root & "/site"
+		var siteDir = expandpath(root & "/site")
 		if ( directoryExists( siteDir ) ) {
 			directoryDelete( siteDir, true )
 		}
@@ -1874,7 +1874,7 @@ class {
 		if ( !len( base ) ) {
 			base = "home"
 		}
-		return base.reReplace( "[\/]", "-", "all" ) & ".png"
+		return base.reReplace( "[\\\/]", "-", "all" ) & ".png"
 	}
 
 	/**
@@ -2021,7 +2021,7 @@ class {
 	 * @return The combined edit URL with normalized separators
 	 */
 	private string function buildEditUrl( required string repoUrl, required string editUri, required string relativePath ) {
-		var base = arguments.repoUrl.reReplace( "[\/]+$", "" )
+		var base = arguments.repoUrl.reReplace( "[\\\/]+$", "" )
 		var uri = arguments.editUri.reReplace( "^[\/]+|[\/]+$", "", "all" )
 		return base & "/" & uri & "/" & arguments.relativePath
 	}
@@ -2524,7 +2524,7 @@ class {
 	 * ThemeRenderer.bx uses for its built-in themes folder.
 	 */
 	private string function moduleAssetsDir() {
-		return getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]models[\/]build[\/]?$", "" ) & "/resources/assets"
+		return getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\\\/]models[\\\/]build[\\\/]?$", "" ) & "/resources/assets"
 	}
 
 	/**
@@ -2534,7 +2534,7 @@ class {
 	 * @projectRoot A project root, trailing slash optional
 	 */
 	private string function normalizeRoot( required string projectRoot ) {
-		return arguments.projectRoot.reReplace( "[\/]+$", "" )
+		return arguments.projectRoot.reReplace( "[\\\/]+$", "" )
 	}
 
 }

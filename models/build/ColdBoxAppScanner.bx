@@ -48,7 +48,7 @@ class {
 	 * @return `{ appRoot, isColdBoxApp, configFile, routerFile, wireBoxFile, schedulerFile, handlers, models, interceptors, modules }`
 	 */
 	struct function scan( required string appRoot ) {
-		var root = arguments.appRoot.reReplace( "[\/]+$", "" )
+		var root = arguments.appRoot.reReplace( "[\\\/]+$", "" )
 		var configDir = root & "/" & static.conventionDirs.config
 
 		var app = {
@@ -206,7 +206,7 @@ class {
 	 */
 	private string function relativeClassName( required string baseDir, required string file ) {
 		return arguments.file
-			.replace( arguments.baseDir.reReplace( "[\/]+$", "" ) & "/", "" )
+			.replace( arguments.baseDir.reReplace( "[\\\/]+$", "" ) & "/", "" )
 			.reReplace( "\.(bx|cfc)$", "" )
 			.replace( "/", ".", "all" )
 	}

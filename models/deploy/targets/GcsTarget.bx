@@ -76,7 +76,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 		}
 
 		var prefix = trim( arguments.config.prefix ?: "" )
-		var siteDir = arguments.context.siteDir.reReplace( "[\/]+$", "" )
+		var siteDir = arguments.context.siteDir.reReplace( "[\\\/]+$", "" )
 
 		var files = directoryList( siteDir, true, "path" ).filter( function( path ) {
 			return !directoryExists( path )
@@ -117,7 +117,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 */
 	string function buildObjectName( required string prefix, required string relativePath ) {
 		var normalizedRelative = arguments.relativePath.replace( char( 92 ), "/", "all" ).reReplace( "^[\/]+", "" )
-		var normalizedPrefix = trim( arguments.prefix ).replace( char( 92 ), "/", "all" ).reReplace( "^[\/]+", "" ).reReplace( "[\/]+$", "" )
+		var normalizedPrefix = trim( arguments.prefix ).replace( char( 92 ), "/", "all" ).reReplace( "^[\/]+", "" ).reReplace( "[\\\/]+$", "" )
 		var objectName = len( normalizedPrefix ) ? normalizedPrefix & "/" & normalizedRelative : normalizedRelative
 
 		return urlEncodedFormat( objectName ).reReplaceNoCase( "%2F", "/", "all" )

@@ -47,7 +47,7 @@ class {
 
 		var importer = new "models.build.ThemeImporter@bxsites"()
 		var result = importer.import(
-			sourceThemeDir : sourcePath.reReplace( "[\/]+$", "" ),
+			sourceThemeDir : sourcePath.reReplace( "[\\\/]+$", "" ),
 			destDir        : destDir,
 			layoutCandidates  : config.layoutCandidates,
 			contentCandidates : config.contentCandidates,

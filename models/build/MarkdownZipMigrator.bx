@@ -45,7 +45,7 @@ class {
 			directoryCreate( docsDir, true, true )
 		}
 
-		var tempDir = getTempDirectory().reReplace( "[\/]+$", "" ) & "/bxsites-markdown-zip-" & createUUID()
+		var tempDir = getTempDirectory().reReplace( "[\\\/]+$", "" ) & "/bxsites-markdown-zip-" & createUUID()
 		directoryCreate( tempDir, true, true )
 
 		try {
@@ -141,7 +141,7 @@ class {
 			if ( !relativePath.reFindNoCase( "\.md$" ) ) {
 				continue
 			}
-			var pageDir = getDirectoryFromPath( relativePath ).reReplace( "[\/]$", "" )
+			var pageDir = getDirectoryFromPath( relativePath ).reReplace( "[\\\/]$", "" )
 			if ( pageDir == "." ) {
 				pageDir = ""
 			}

@@ -45,7 +45,7 @@ class {
 	 * @return Array of page structs, sorted by [order] then [title]: { relativePath, sourcePath, urlPath, title, description, order, hidden, tags, redirectFrom, frontmatter, icon, summary, ogImage, layout, body }
 	 */
 	array function load( required string docsDir, array exclude = [] ) {
-		var dir = variables.pathRelativizer.normalize( arguments.docsDir ).reReplace( "[\/]+$", "" )
+		var dir = variables.pathRelativizer.normalize( arguments.docsDir ).reReplace( "[\\\/]+$", "" )
 
 		if ( !directoryExists( dir ) ) {
 			throw( type = "BxSites.DocsDirNotFound", message = "No docs/ directory found at [#dir#]" )

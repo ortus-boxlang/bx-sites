@@ -24,7 +24,7 @@ class {
 			limit = 10
 		}
 
-		var siteDir = projectRoot.reReplace( "[\/]+$", "" ) & "/site"
+		var siteDir = projectRoot.reReplace( "[\\\/]+$", "" ) & "/site"
 		var results = new "models.build.SearchQueryRunner@bxsites"().run( siteDir : siteDir, query : query, limit : limit )
 
 		if ( !results.len() ) {

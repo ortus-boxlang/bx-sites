@@ -102,7 +102,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 			)
 		}
 
-		var siteDir = arguments.context.siteDir.reReplace( "[\/]+$", "" )
+		var siteDir = arguments.context.siteDir.reReplace( "[\\\/]+$", "" )
 		var files = directoryList( siteDir, true, "path" ).filter( function( path ) {
 			return !directoryExists( path )
 		} )

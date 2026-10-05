@@ -49,7 +49,7 @@ class {
 		try {
 			var extractedRoot = arguments.source
 			if ( isZip ) {
-				tempDir = getTempDirectory().reReplace( "[\/]+$", "" ) & "/bxsites-notion-" & createUUID()
+				tempDir = getTempDirectory().reReplace( "[\\\/]+$", "" ) & "/bxsites-notion-" & createUUID()
 				directoryCreate( tempDir, true, true )
 				extract( source = arguments.source, destination = tempDir, format = "zip", overwrite = true )
 				extractedRoot = unwrapSingleFolder( tempDir )
@@ -203,11 +203,11 @@ class {
 				continue
 			}
 			var cleanedRelativePath = arguments.pathMap[ relativePath ]
-			var pageDir = getDirectoryFromPath( relativePath ).reReplace( "[\/]$", "" )
+			var pageDir = getDirectoryFromPath( relativePath ).reReplace( "[\\\/]$", "" )
 			if ( pageDir == "." ) {
 				pageDir = ""
 			}
-			var depth = len( getDirectoryFromPath( cleanedRelativePath ).reReplace( "[\/]$", "" ) ) ? listLen( getDirectoryFromPath( cleanedRelativePath ), "/" ) : 0
+			var depth = len( getDirectoryFromPath( cleanedRelativePath ).reReplace( "[\\\/]$", "" ) ) ? listLen( getDirectoryFromPath( cleanedRelativePath ), "/" ) : 0
 
 			var converted = rewriteContent( fileRead( arguments.sourceRoot & "/" & relativePath ), pageDir, depth, arguments.pathMap )
 

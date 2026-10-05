@@ -125,7 +125,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 *         Vercel's own wire format, which only ever sees `file`/`sha`/`size`)
 	 */
 	array function buildFileManifest( required string siteDir ) {
-		var root = arguments.siteDir.reReplace( "[\/]+$", "" )
+		var root = arguments.siteDir.reReplace( "[\\\/]+$", "" )
 		var files = directoryList( root, true, "path" ).filter( function( path ) {
 			return !directoryExists( path )
 		} )

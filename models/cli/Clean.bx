@@ -16,7 +16,7 @@ class {
 			throw( type = "BxSites.MissingProjectRoot", message = "`clean` requires a project root" )
 		}
 
-		var root = projectRoot.reReplace( "[\/]+$", "" )
+		var root = projectRoot.reReplace( "[\\\/]+$", "" )
 		var removed = []
 
 		for ( var folder in [ "site", ".cache" ] ) {

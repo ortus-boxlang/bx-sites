@@ -34,7 +34,7 @@ class {
 		}
 
 		var computedSlug = len( trim( arguments.slug ) ) ? computeSlug( arguments.slug ) : computeSlug( trimmedTitle )
-		var postsDir = arguments.docsDir.reReplace( "[\/]+$", "" ) & "/blog/posts"
+		var postsDir = arguments.docsDir.reReplace( "[\\\/]+$", "" ) & "/blog/posts"
 		var path = postsDir & "/" & computedSlug & ".md"
 
 		if ( fileExists( path ) ) {

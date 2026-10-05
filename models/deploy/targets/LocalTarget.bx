@@ -57,7 +57,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	private string function resolveDestination( required string destination, required string projectRoot ) {
 		var isAbsolute = arguments.destination.left( 1 ) == "/" || arguments.destination.reFind( "^[A-Za-z]:[\/\\]" )
 		var absolute = isAbsolute ? arguments.destination : arguments.projectRoot & "/" & arguments.destination
-		return absolute.reReplace( "[\/]+$", "" )
+		return absolute.reReplace( "[\\\/]+$", "" )
 	}
 
 }

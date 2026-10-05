@@ -20,7 +20,7 @@ class {
 	 * @return Locale folder names directly under docs/i18n/, alphabetical
 	 */
 	array function discover( required string docsDir ) {
-		var i18nDir = arguments.docsDir.reReplace( "[\/]+$", "" ) & "/i18n"
+		var i18nDir = arguments.docsDir.reReplace( "[\\\/]+$", "" ) & "/i18n"
 
 		if ( !directoryExists( i18nDir ) ) {
 			return []

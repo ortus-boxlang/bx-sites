@@ -156,7 +156,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 * @return { relativePath (no leading slash) : hash }
 	 */
 	struct function hashSiteFiles( required string siteDir ) {
-		var root = arguments.siteDir.reReplace( "[\/]+$", "" )
+		var root = arguments.siteDir.reReplace( "[\\\/]+$", "" )
 		var files = directoryList( root, true, "path" ).filter( function( path ) {
 			return !directoryExists( path )
 		} )
@@ -254,7 +254,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 * @return [ { key, value, metadata: { contentType }, base64 : true } ]
 	 */
 	array function buildUploadPayload( required string siteDir, required struct relativePathToHash ) {
-		var root = arguments.siteDir.reReplace( "[\/]+$", "" )
+		var root = arguments.siteDir.reReplace( "[\\\/]+$", "" )
 		var payload = []
 		for ( var relativePath in arguments.relativePathToHash ) {
 			var bytes = readFileBytes( root & "/" & relativePath )

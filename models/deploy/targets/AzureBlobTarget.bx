@@ -101,7 +101,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 
 		// Trailing-slash-stripped so a plain string.replace() below cleanly
 		// turns each absolute file path into a path relative to siteDir.
-		var siteDir = arguments.context.siteDir.reReplace( "[\/]+$", "" )
+		var siteDir = arguments.context.siteDir.reReplace( "[\\\/]+$", "" )
 
 		// directoryList() with no glob also returns directories, not just
 		// files - filter those out (see this repo's own AGENTS.md gotcha).

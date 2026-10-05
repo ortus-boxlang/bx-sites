@@ -45,7 +45,7 @@ class {
 			throw( type = "BxSites.MissingProjectRoot", message = "`doctor` requires a project root" )
 		}
 
-		var root = projectRoot.reReplace( "[\/]+$", "" )
+		var root = projectRoot.reReplace( "[\\\/]+$", "" )
 		var checks = []
 		var failed = false
 

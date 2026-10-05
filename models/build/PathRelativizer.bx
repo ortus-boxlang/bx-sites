@@ -45,7 +45,7 @@ class {
 	 * @filePath Absolute path to a file under (expected to be under) basePath
 	 */
 	string function relativeTo( required string basePath, required string filePath ) {
-		var normalizedBase = normalize( arguments.basePath ).reReplace( "[\/]+$", "" )
+		var normalizedBase = normalize( arguments.basePath ).reReplace( "[\\\/]+$", "" )
 		var normalizedPath = normalize( arguments.filePath )
 
 		if ( normalizedPath.startsWith( normalizedBase ) ) {

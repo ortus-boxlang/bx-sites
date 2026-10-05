@@ -39,7 +39,7 @@ class {
 
 		var name = trim( arguments.options.name ?: "" )
 		if ( !len( name ) ) {
-			var segments = listToArray( projectRoot.reReplace( "[\/]+$", "" ), "/" )
+			var segments = listToArray( projectRoot.reReplace( "[\\\/]+$", "" ), "/" )
 			name = segments.len() ? segments[ segments.len() ] : "bx-sites-site"
 		}
 

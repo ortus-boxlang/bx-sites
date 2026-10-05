@@ -51,7 +51,7 @@ class {
 	 * @return Array of post structs, newest first: { relativePath, sourcePath, urlPath, slug, title, description, hidden, showToc, tags, frontmatter, icon, summary, ogImage, layout, body, date, authors, categories, draft, image }
 	 */
 	array function load( required string docsDir, boolean includeDrafts = false ) {
-		var postsDir = arguments.docsDir.reReplace( "[\/]+$", "" ) & "/blog/posts"
+		var postsDir = arguments.docsDir.reReplace( "[\\\/]+$", "" ) & "/blog/posts"
 
 		if ( !directoryExists( postsDir ) ) {
 			return []
