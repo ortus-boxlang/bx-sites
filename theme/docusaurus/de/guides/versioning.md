@@ -77,6 +77,56 @@ der äquivalenten Seite des eigenen Baums.
 denen der Hauptwebsite - eine Version ist ein vollwertiger, vollständig
 crawlbarer/verlinkbarer Teil der Website, kein verstecktes Archiv.
 
+## Eine Standardversion am Site-Root veröffentlichen
+
+Sobald ein Projekt eine echte, veröffentlichte Version hat, auf die man
+Besucher verweisen kann, befindet sich `docs/` selbst meist mitten im
+Schreiben der *nächsten* Version - nicht das, worauf ein Erstbesucher
+landen sollte. `versions.default` benennt stattdessen einen
+`docs/versions/<name>/`-Ordner, der am Site-Root gebaut wird:
+
+```yaml title="bxsites.yaml" linenums="1"
+versions:
+  default: "1.0.x"
+```
+
+Sobald gesetzt:
+
+- `docs/versions/1.0.x/` wird am Site-Root (`/`) gebaut, nicht unter
+  `/versions/1.0.x/` - es wird nie an beiden Stellen dupliziert.
+- Der reine `docs/`-Baum - der, der vorher immer an der Wurzel gebaut
+  wurde - wird stattdessen unter `/next/` gebaut, weiterhin vollständig
+  navigierbar/verlinkbar, nur nicht mehr die Standardversion. Nützlich,
+  um die Docs der nächsten Version offen zu schreiben/zu überprüfen,
+  ohne dass sie so aussehen, als wären sie bereits ausgeliefert.
+- Der Versionsumschalter zeigt `1.0.x (Current)` als an der Wurzel
+  ausgewählt, dann jeden anderen `docs/versions/*`-Ordner, dann eine
+  Trennlinie und zuletzt einen `Next`-Eintrag, der auf `/next/` zeigt -
+  veröffentlichte Versionen zuerst, der Work-in-Progress-Baum unten
+  abgesetzt, statt an zweiter Stelle hineingequetscht.
+- Die Seiten von `/next/` sind von `sitemap.xml` ausgeschlossen, und
+  `robots.txt` erhält eine `Disallow: /next/`-Zeile - ein
+  Work-in-Progress-Baum sollte in Suchergebnissen nicht mit den echten
+  Docs konkurrieren. Ansonsten ist er weiterhin ein vollkommen normaler,
+  erreichbarer Teil der Website (eigener Suchindex, eigene Tags-Seite,
+  eigene `redirects`-Unterstützung).
+- `/next/` bekommt in v1 keine eigenen Locale-Unterbäume -
+  `docs/i18n/<code>/` übersetzt weiterhin denselben physischen
+  `docs/`-Ordner wie immer, aber vorerst wird nur der Build der
+  Standard-Locale unter `/next/` veröffentlicht.
+
+Eine falsch konfigurierte `versions.default` (die einen Ordner benennt,
+der unter `docs/versions/` tatsächlich nicht existiert) lässt den Build
+mit einem klaren `BxSites.UnknownDefaultVersion`-Fehler fehlschlagen,
+statt stillschweigend zurückzufallen.
+
+Patch-Releases (1.0.1, 1.0.2, ...) sind nur Bearbeitungen des bereits
+angelegten `docs/versions/1.0.x/`-Ordners an Ort und Stelle -
+`versions.default` ändert sich nicht, und es wird keine neue Version
+angelegt. Nur ein echter Minor-/Major-Sprung (`1.1`, `2.0`) rechtfertigt
+`version:new`, das einen neuen Ordner anlegt, wobei `versions.default`
+dann darauf verschoben wird.
+
 ## Zusammenspiel mit i18n
 
 Eine Version kann ebenfalls übersetzt werden - siehe

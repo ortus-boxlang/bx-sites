@@ -138,7 +138,7 @@ Versionierung</h1>
 
 
 
-	<details class="bxsites-toc-mobile jtd-toc--mobile"><summary class="jtd-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="jtd-toc__item jtd-toc__item--2"><a href="#eine-neue-version-anlegen">Eine neue Version anlegen</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#was-gebaut-wird">Was gebaut wird</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#zusammenspiel-mit-i18n">Zusammenspiel mit i18n</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#was-vorerst-außen-vor-bleibt">Was &#x28;vorerst&#x29; au&szlig;en vor bleibt</a></li></ul></details>
+	<details class="bxsites-toc-mobile jtd-toc--mobile"><summary class="jtd-toc--mobile__summary">Auf dieser Seite</summary><ul><li class="jtd-toc__item jtd-toc__item--2"><a href="#eine-neue-version-anlegen">Eine neue Version anlegen</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#was-gebaut-wird">Was gebaut wird</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#eine-standardversion-am-site-root-veröffentlichen">Eine Standardversion am Site-Root ver&ouml;ffentlichen</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#zusammenspiel-mit-i18n">Zusammenspiel mit i18n</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#was-vorerst-außen-vor-bleibt">Was &#x28;vorerst&#x29; au&szlig;en vor bleibt</a></li></ul></details>
 
 				<div class="jtd-content-body">
 				<h1 id="versionierung"><a href="#versionierung" id="versionierung" name="versionierung" class="anchor"></a>Versionierung</h1>
@@ -199,6 +199,50 @@ der äquivalenten Seite des eigenen Baums.</p>
 <p><code>sitemap.xml</code> und <code>llms.txt</code> enthalten die Seiten jeder Version neben
 denen der Hauptwebsite - eine Version ist ein vollwertiger, vollständig
 crawlbarer/verlinkbarer Teil der Website, kein verstecktes Archiv.</p>
+<h2 id="eine-standardversion-am-site-root-veröffentlichen"><a href="#eine-standardversion-am-site-root-veröffentlichen" id="eine-standardversion-am-site-root-veröffentlichen" name="eine-standardversion-am-site-root-veröffentlichen" class="anchor"></a>Eine Standardversion am Site-Root veröffentlichen</h2>
+<p>Sobald ein Projekt eine echte, veröffentlichte Version hat, auf die man
+Besucher verweisen kann, befindet sich <code>docs/</code> selbst meist mitten im
+Schreiben der <em>nächsten</em> Version - nicht das, worauf ein Erstbesucher
+landen sollte. <code>versions.default</code> benennt stattdessen einen
+<code>docs/versions/&lt;name&gt;/</code>-Ordner, der am Site-Root gebaut wird:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">versions:
+  default: &quot;1.0.x&quot;
+</code></pre>
+<p>Sobald gesetzt:</p>
+<ul>
+<li><code>docs/versions/1.0.x/</code> wird am Site-Root (<code>/</code>) gebaut, nicht unter
+<code>/versions/1.0.x/</code> - es wird nie an beiden Stellen dupliziert.</li>
+<li>Der reine <code>docs/</code>-Baum - der, der vorher immer an der Wurzel gebaut
+wurde - wird stattdessen unter <code>/next/</code> gebaut, weiterhin vollständig
+navigierbar/verlinkbar, nur nicht mehr die Standardversion. Nützlich,
+um die Docs der nächsten Version offen zu schreiben/zu überprüfen,
+ohne dass sie so aussehen, als wären sie bereits ausgeliefert.</li>
+<li>Der Versionsumschalter zeigt <code>1.0.x (Current)</code> als an der Wurzel
+ausgewählt, dann jeden anderen <code>docs/versions/*</code>-Ordner, dann eine
+Trennlinie und zuletzt einen <code>Next</code>-Eintrag, der auf <code>/next/</code> zeigt -
+veröffentlichte Versionen zuerst, der Work-in-Progress-Baum unten
+abgesetzt, statt an zweiter Stelle hineingequetscht.</li>
+<li>Die Seiten von <code>/next/</code> sind von <code>sitemap.xml</code> ausgeschlossen, und
+<code>robots.txt</code> erhält eine <code>Disallow: /next/</code>-Zeile - ein
+Work-in-Progress-Baum sollte in Suchergebnissen nicht mit den echten
+Docs konkurrieren. Ansonsten ist er weiterhin ein vollkommen normaler,
+erreichbarer Teil der Website (eigener Suchindex, eigene Tags-Seite,
+eigene <code>redirects</code>-Unterstützung).</li>
+<li><code>/next/</code> bekommt in v1 keine eigenen Locale-Unterbäume -
+<code>docs/i18n/&lt;code&gt;/</code> übersetzt weiterhin denselben physischen
+<code>docs/</code>-Ordner wie immer, aber vorerst wird nur der Build der
+Standard-Locale unter <code>/next/</code> veröffentlicht.</li>
+</ul>
+<p>Eine falsch konfigurierte <code>versions.default</code> (die einen Ordner benennt,
+der unter <code>docs/versions/</code> tatsächlich nicht existiert) lässt den Build
+mit einem klaren <code>BxSites.UnknownDefaultVersion</code>-Fehler fehlschlagen,
+statt stillschweigend zurückzufallen.</p>
+<p>Patch-Releases (1.0.1, 1.0.2, ...) sind nur Bearbeitungen des bereits
+angelegten <code>docs/versions/1.0.x/</code>-Ordners an Ort und Stelle -
+<code>versions.default</code> ändert sich nicht, und es wird keine neue Version
+angelegt. Nur ein echter Minor-/Major-Sprung (<code>1.1</code>, <code>2.0</code>) rechtfertigt
+<code>version:new</code>, das einen neuen Ordner anlegt, wobei <code>versions.default</code>
+dann darauf verschoben wird.</p>
 <h2 id="zusammenspiel-mit-i18n"><a href="#zusammenspiel-mit-i18n" id="zusammenspiel-mit-i18n" name="zusammenspiel-mit-i18n" class="anchor"></a>Zusammenspiel mit i18n</h2>
 <p>Eine Version kann ebenfalls übersetzt werden - siehe
 <a href="/theme/justthedocs/de/guides/i18n/index.html#versionierte-und-übersetzte-docs">&quot;Versionierte und übersetzte Docs&quot;</a>
@@ -236,7 +280,7 @@ anderen Seite).</li>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/versioning.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/justthedocs/de/guides/versioning.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Oct 6, 2026, 10&#x3a;41&#x3a;09 AM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/versioning.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/justthedocs/de/guides/versioning.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Oct 6, 2026, 8&#x3a;18&#x3a;52 PM</span></div>
 
 			</article>
 
@@ -258,7 +302,7 @@ anderen Seite).</li>
 		</main>
 
 		<aside class="jtd-toc-sidebar">
-			<nav class="jtd-toc" aria-label="Auf dieser Seite"><div class="jtd-toc__title">Auf dieser Seite</div><ul><li class="jtd-toc__item jtd-toc__item--2"><a href="#eine-neue-version-anlegen">Eine neue Version anlegen</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#was-gebaut-wird">Was gebaut wird</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#zusammenspiel-mit-i18n">Zusammenspiel mit i18n</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#was-vorerst-außen-vor-bleibt">Was &#x28;vorerst&#x29; au&szlig;en vor bleibt</a></li></ul></nav>
+			<nav class="jtd-toc" aria-label="Auf dieser Seite"><div class="jtd-toc__title">Auf dieser Seite</div><ul><li class="jtd-toc__item jtd-toc__item--2"><a href="#eine-neue-version-anlegen">Eine neue Version anlegen</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#was-gebaut-wird">Was gebaut wird</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#eine-standardversion-am-site-root-veröffentlichen">Eine Standardversion am Site-Root ver&ouml;ffentlichen</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#zusammenspiel-mit-i18n">Zusammenspiel mit i18n</a></li><li class="jtd-toc__item jtd-toc__item--2"><a href="#was-vorerst-außen-vor-bleibt">Was &#x28;vorerst&#x29; au&szlig;en vor bleibt</a></li></ul></nav>
 		</aside>
 
 	</div>

@@ -397,12 +397,27 @@ konfiguriert) und <code>variables.siteConfig.repo</code>/<code>.social</code>/<c
 ebenfalls immer verfügbar und stützen die oben beschriebenen
 Repo-Link-/Bearbeiten-Link-/Zuletzt-aktualisiert-/Fußzeilen-Funktionen -
 ein eigenes Theme entscheidet selbst, ob und wie es sie rendert, wie auch
-alles andere. <code>variables.versions</code> (<code>[ { label, url } ]</code>, &quot;Latest&quot; zuerst)
-und <code>variables.currentVersion</code> (das gerade gerenderte <code>label</code>) stützen den
-Versionsumschalter - leer/<code>&quot;Latest&quot;</code> für ein nicht versioniertes Projekt,
-sodass ein Theme nur dann einen Umschalter rendern muss, wenn
-<code>variables.versions.len() gt 1</code>. Jedes integrierte Theme bezieht seine
-Repo-/Social-Icons aus einem kleinen gemeinsamen SVG-Lookup,
+alles andere. <code>variables.versions</code> (<code>[ { label, url, kind } ]</code>, &quot;Latest&quot;
+zuerst) und <code>variables.currentVersion</code> (das gerade gerenderte <code>label</code>)
+stützen den Versionsumschalter - leer/<code>&quot;Latest&quot;</code> für ein nicht
+versioniertes Projekt, sodass ein Theme nur dann einen Umschalter rendern
+muss, wenn <code>variables.versions.len() gt 1</code>. Das <code>kind</code> jedes Eintrags ist
+<code>&quot;current&quot;</code> (die Version, auf der ein Besucher an der Website-Wurzel
+landet), <code>&quot;released&quot;</code> (jeder andere angelegte Snapshot) oder <code>&quot;next&quot;</code>
+(der reine <code>docs/</code>-Baum, sobald <code>versions.default</code> gesetzt ist - siehe
+<a href="/theme/tailwind/de/guides/versioning/index.html#eine-standardversion-am-site-root-veröffentlichen">Versionierung</a>).
+Statt <code>variables.versions</code> von Hand zu durchlaufen, ruf
+<code>renderVersionSwitcher( variables.versions, variables.currentVersion )</code>
+auf - eingebunden in den Render-Scope jedes Themes auf dieselbe Weise wie
+<code>themeAssetUrl()</code>/<code>moduleAssetUrl()</code> (oben) - und es baut das gesamte
+<code>&lt;select&gt;</code> auf, gruppiert <code>&quot;next&quot;</code> hinter einer Trennlinie nach jeder
+veröffentlichten Version, und beschriftet den <code>&quot;current&quot;</code>-Eintrag mit
+&quot;(Current)&quot;, alles gesteuert über <code>kind</code>, statt dass ein Theme diese
+Logik selbst nachbaut. Ein optionales zweites Argument fügt dem <code>&lt;select&gt;</code>
+zusätzliche CSS-Klassen hinzu (<code>renderVersionSwitcher( variables.versions, variables.currentVersion, &quot;my-extra-class&quot; )</code>) für ein Theme, das sein
+eigenes Styling möchte, ohne das Markup neu zu implementieren. Jedes
+integrierte Theme bezieht seine Repo-/Social-Icons aus einem kleinen
+gemeinsamen SVG-Lookup,
 <code>&lt;bx:include template=&quot;#variables.moduleAssetsDir#/icons.bxm&quot;&gt;</code>
 (definiert <code>bxsitesIcon( name )</code>, eines von <code>github</code>, <code>twitter</code>/<code>x</code>, <code>rss</code>,
 <code>youtube</code>, <code>linkedin</code>, <code>facebook</code>, <code>bluesky</code>, <code>threads</code>, <code>slack</code>,
@@ -752,7 +767,7 @@ Theme nicht stillschweigend veraltet.</p>
 
 				</div>
 
-	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/de/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Oct 6, 2026, 10&#x3a;41&#x3a;09 AM</span></div>
+	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/de/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Oct 6, 2026, 8&#x3a;18&#x3a;52 PM</span></div>
 
 			</article>
 

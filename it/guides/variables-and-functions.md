@@ -167,7 +167,7 @@ Markdown oppure allo stato puro da una sovrascrittura di tema:
 | `page` | La pagina corrente (vedi la nota sotto - non tutti i campi sono già popolati quando viene richiamata dal Markdown) |
 | `nav` | L'albero di navigazione proprio di questo albero |
 | `basePath` | Il percorso base relativo alla radice, che termina con `/` |
-| `versions` | Le voci del selettore di versione - `[ { label, url } ]` |
+| `versions` | Le voci del selettore di versione - `[ { label, url, kind } ]` (`kind` è `"current"`/`"released"`/`"next"`) |
 | `currentVersion` | Quale voce di `versions` viene renderizzata in questo momento |
 | `locales` | Le voci del selettore di lingua - `[ { code, label, url, dir, flag } ]` |
 | `currentLocale` | Il codice di quale voce di `locales` viene renderizzato in questo momento |

@@ -292,12 +292,28 @@ konfiguriert) und `variables.siteConfig.repo`/`.social`/`.footer` sind
 ebenfalls immer verfügbar und stützen die oben beschriebenen
 Repo-Link-/Bearbeiten-Link-/Zuletzt-aktualisiert-/Fußzeilen-Funktionen -
 ein eigenes Theme entscheidet selbst, ob und wie es sie rendert, wie auch
-alles andere. `variables.versions` (`[ { label, url } ]`, "Latest" zuerst)
-und `variables.currentVersion` (das gerade gerenderte `label`) stützen den
-Versionsumschalter - leer/`"Latest"` für ein nicht versioniertes Projekt,
-sodass ein Theme nur dann einen Umschalter rendern muss, wenn
-`variables.versions.len() gt 1`. Jedes integrierte Theme bezieht seine
-Repo-/Social-Icons aus einem kleinen gemeinsamen SVG-Lookup,
+alles andere. `variables.versions` (`[ { label, url, kind } ]`, "Latest"
+zuerst) und `variables.currentVersion` (das gerade gerenderte `label`)
+stützen den Versionsumschalter - leer/`"Latest"` für ein nicht
+versioniertes Projekt, sodass ein Theme nur dann einen Umschalter rendern
+muss, wenn `variables.versions.len() gt 1`. Das `kind` jedes Eintrags ist
+`"current"` (die Version, auf der ein Besucher an der Website-Wurzel
+landet), `"released"` (jeder andere angelegte Snapshot) oder `"next"`
+(der reine `docs/`-Baum, sobald `versions.default` gesetzt ist - siehe
+[Versionierung](versioning.md#eine-standardversion-am-site-root-veröffentlichen)).
+Statt `variables.versions` von Hand zu durchlaufen, ruf
+`renderVersionSwitcher( variables.versions, variables.currentVersion )`
+auf - eingebunden in den Render-Scope jedes Themes auf dieselbe Weise wie
+`themeAssetUrl()`/`moduleAssetUrl()` (oben) - und es baut das gesamte
+`<select>` auf, gruppiert `"next"` hinter einer Trennlinie nach jeder
+veröffentlichten Version, und beschriftet den `"current"`-Eintrag mit
+"(Current)", alles gesteuert über `kind`, statt dass ein Theme diese
+Logik selbst nachbaut. Ein optionales zweites Argument fügt dem `<select>`
+zusätzliche CSS-Klassen hinzu (`renderVersionSwitcher( variables.versions,
+variables.currentVersion, "my-extra-class" )`) für ein Theme, das sein
+eigenes Styling möchte, ohne das Markup neu zu implementieren. Jedes
+integrierte Theme bezieht seine Repo-/Social-Icons aus einem kleinen
+gemeinsamen SVG-Lookup,
 `<bx:include template="#variables.moduleAssetsDir#/icons.bxm">`
 (definiert `bxsitesIcon( name )`, eines von `github`, `twitter`/`x`, `rss`,
 `youtube`, `linkedin`, `facebook`, `bluesky`, `threads`, `slack`,

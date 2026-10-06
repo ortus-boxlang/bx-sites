@@ -165,7 +165,7 @@ Theme-Override aufgerufen wird:
 | `page` | Die aktuelle Seite (siehe den Hinweis unten - nicht jedes Feld ist schon befüllt, wenn sie aus Markdown aufgerufen wird) |
 | `nav` | Der eigene Navigationsbaum dieses Baums |
 | `basePath` | Root-relativer Basispfad, endet mit `/` |
-| `versions` | Einträge des Versionsumschalters - `[ { label, url } ]` |
+| `versions` | Einträge des Versionsumschalters - `[ { label, url, kind } ]` (`kind` ist `"current"`/`"released"`/`"next"`) |
 | `currentVersion` | Welcher `versions`-Eintrag gerade gerendert wird |
 | `locales` | Einträge des Sprachumschalters - `[ { code, label, url, dir, flag } ]` |
 | `currentLocale` | Der Code welchen `locales`-Eintrags gerade gerendert wird |

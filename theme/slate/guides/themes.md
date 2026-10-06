@@ -267,11 +267,24 @@ A theme is just a folder with:
 and `variables.siteConfig.repo`/`.social`/`.footer` are always available too,
 backing the repo link/edit link/last-updated/footer features above - a
 custom theme decides for itself whether and how to render them, same as
-everything else. `variables.versions` (`[ { label, url } ]`, "Latest"
+everything else. `variables.versions` (`[ { label, url, kind } ]`, "Latest"
 first) and `variables.currentVersion` (the `label` being rendered right
 now) back the version switcher - empty/`"Latest"` for a project that isn't
 versioned, so a theme only needs to render a switcher when
-`variables.versions.len() gt 1`. Every built-in theme gets its repo/social icons from
+`variables.versions.len() gt 1`. Each entry's `kind` is `"current"` (the
+version a visitor lands on at the site root), `"released"` (any other cut
+snapshot), or `"next"` (the plain `docs/` tree, once `versions.default` is
+set - see [Versioning](versioning.md#publishing-a-default-version-at-the-site-root)).
+Rather than looping `variables.versions` by hand, call
+`renderVersionSwitcher( variables.versions, variables.currentVersion )` -
+bound into every theme's render scope the same way `themeAssetUrl()`/
+`moduleAssetUrl()` are (above) - and it builds the whole `<select>`, groups
+`"next"` behind a divider after every released version, and labels the
+`"current"` entry with "(Current)", all driven by `kind` rather than a
+theme re-implementing that logic itself. An optional second argument adds
+extra CSS classes to the `<select>` (`renderVersionSwitcher( variables.versions, variables.currentVersion, "my-extra-class" )`)
+for a theme that wants its own styling without reimplementing the markup.
+Every built-in theme gets its repo/social icons from
 a small shared SVG lookup, `<bx:include template="#variables.moduleAssetsDir#/icons.bxm">`
 (defines `bxsitesIcon( name )`, one of `github`, `twitter`/`x`, `rss`,
 `youtube`, `linkedin`, `facebook`, `bluesky`, `threads`, `slack`,

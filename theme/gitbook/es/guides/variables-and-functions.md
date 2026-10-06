@@ -167,7 +167,7 @@ prefijo desde una sobrescritura de tema:
 | `page` | La página actual (consulta la nota más abajo - no todos los campos están todavía completos cuando se llama desde Markdown) |
 | `nav` | El propio árbol de navegación de este árbol |
 | `basePath` | Ruta base relativa a la raíz, terminada en `/` |
-| `versions` | Entradas del selector de versiones - `[ { label, url } ]` |
+| `versions` | Entradas del selector de versiones - `[ { label, url, kind } ]` (`kind` es `"current"`/`"released"`/`"next"`) |
 | `currentVersion` | Qué entrada de `versions` se está renderizando en este momento |
 | `locales` | Entradas del selector de idioma - `[ { code, label, url, dir, flag } ]` |
 | `currentLocale` | El código de qué entrada de `locales` se está renderizando en este momento |

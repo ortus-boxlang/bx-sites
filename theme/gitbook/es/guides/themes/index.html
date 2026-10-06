@@ -401,11 +401,26 @@ están siempre disponibles, dando soporte a las funciones de enlace al
 repositorio/enlace de edición/última actualización/pie de página
 mencionadas arriba - un tema personalizado decide por sí mismo si y cómo
 renderizarlas, igual que todo lo demás. <code>variables.versions</code>
-(<code>[ { label, url } ]</code>, con &quot;Latest&quot; primero) y
+(<code>[ { label, url, kind } ]</code>, con &quot;Latest&quot; primero) y
 <code>variables.currentVersion</code> (el <code>label</code> que se está renderizando en ese
 momento) dan soporte al selector de versión - vacío/<code>&quot;Latest&quot;</code> para un
 proyecto que no está versionado, así que un tema solo necesita renderizar
-un selector cuando <code>variables.versions.len() gt 1</code>. Todos los temas
+un selector cuando <code>variables.versions.len() gt 1</code>. El <code>kind</code> de cada
+entrada es <code>&quot;current&quot;</code> (la versión en la que aterriza un visitante en la
+raíz del sitio), <code>&quot;released&quot;</code> (cualquier otra instantánea ya creada) o
+<code>&quot;next&quot;</code> (el árbol <code>docs/</code> sin versionar, una vez que <code>versions.default</code>
+está definido - consulta
+<a href="/theme/gitbook/es/guides/versioning/index.html#publicar-una-versión-por-defecto-en-la-raíz-del-sitio">Versionado</a>).
+En lugar de recorrer <code>variables.versions</code> a mano, llama a
+<code>renderVersionSwitcher( variables.versions, variables.currentVersion )</code> -
+vinculada al ámbito de renderizado de cada tema de la misma forma que
+<code>themeAssetUrl()</code>/<code>moduleAssetUrl()</code> (arriba) - y construye todo el
+<code>&lt;select&gt;</code>, agrupa <code>&quot;next&quot;</code> detrás de un separador después de cada
+versión publicada, y etiqueta la entrada <code>&quot;current&quot;</code> con &quot;(Current)&quot;,
+todo ello guiado por <code>kind</code> en lugar de que un tema reimplemente esa
+lógica por su cuenta. Un segundo argumento opcional añade clases CSS
+extra al <code>&lt;select&gt;</code> (<code>renderVersionSwitcher( variables.versions, variables.currentVersion, &quot;my-extra-class&quot; )</code>) para un tema que quiera su
+propio estilo sin reimplementar el marcado. Todos los temas
 incorporados obtienen sus iconos de repositorio/redes sociales de una
 pequeña tabla de búsqueda SVG compartida,
 <code>&lt;bx:include template=&quot;#variables.moduleAssetsDir#/icons.bxm&quot;&gt;</code> (define
@@ -748,7 +763,7 @@ quede obsoleto en silencio.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/gitbook/es/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Oct 6, 2026, 10&#x3a;41&#x3a;09 AM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/gitbook/es/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Oct 6, 2026, 8&#x3a;18&#x3a;52 PM</span></div>
 
 			</article>
 

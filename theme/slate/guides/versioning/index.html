@@ -98,7 +98,7 @@
 
 
 
-			<select class="version-switcher" onchange="location.href=this.value" aria-label="Version"><option value="/theme/slate/" selected>Latest</option><option value="/theme/slate/versions/1.0.x/">1.0.x</option></select>
+			<select class="version-switcher" onchange="location.href=this.value" aria-label="Version"><option value="/theme/slate/" selected>Latest &#x28;Current&#x29;</option><option value="/theme/slate/versions/1.0.x/">1.0.x</option></select>
 
 
 			<div class="locale-dropdown" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false"><button type="button" class="locale-dropdown__trigger" @click="open = !open" aria-haspopup="true" :aria-expanded="open" aria-label="Language&#x3a; English"><span class="locale-dropdown__flag" aria-hidden="true">🇺🇸</span><span class="locale-dropdown__caret" aria-hidden="true">▾</span></button><ul class="locale-dropdown__menu" x-show="open" x-cloak role="menu"><li role="none"><a role="menuitem" class="locale-dropdown__item locale-dropdown__item--active" href="/theme/slate/"><span class="locale-dropdown__flag" aria-hidden="true">🇺🇸</span> English</a></li><li role="none"><a role="menuitem" class="locale-dropdown__item" href="/theme/slate/es/"><span class="locale-dropdown__flag" aria-hidden="true">🇪🇸</span> Espa&ntilde;ol</a></li><li role="none"><a role="menuitem" class="locale-dropdown__item" href="/theme/slate/it/"><span class="locale-dropdown__flag" aria-hidden="true">🇮🇹</span> Italiano</a></li><li role="none"><a role="menuitem" class="locale-dropdown__item" href="/theme/slate/de/"><span class="locale-dropdown__flag" aria-hidden="true">🇩🇪</span> Deutsch</a></li></ul></div>
@@ -212,8 +212,10 @@ first-time visitor should land on. <code>versions.default</code> names a
 instead builds at <code>/next/</code>, still fully browsable/linkable, just no
 longer the default. Useful for writing/reviewing the next release's docs
 in the open without them looking like they've already shipped.</li>
-<li>The version switcher shows <code>1.0.x</code> selected at root, a <code>Next</code> entry
-pointing at <code>/next/</code>, then every other <code>docs/versions/*</code> folder as usual.</li>
+<li>The version switcher shows <code>1.0.x (Current)</code> selected at root, then every
+other <code>docs/versions/*</code> folder, then a divider and a <code>Next</code> entry pointing
+at <code>/next/</code> <em>last</em> - released versions first, the work-in-progress tree
+set apart at the bottom, rather than squeezed in second.</li>
 <li><code>/next/</code>'s pages are excluded from <code>sitemap.xml</code>, and <code>robots.txt</code> gets
 a <code>Disallow: /next/</code> line - a work-in-progress tree shouldn't compete
 with the real docs in search results. It's still a completely normal,
@@ -261,7 +263,7 @@ it and accepting the broken links, same as removing any other page).</li>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/versioning.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/theme/slate/guides/versioning.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Oct 6, 2026, 10&#x3a;41&#x3a;09 AM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/versioning.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/theme/slate/guides/versioning.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Oct 6, 2026, 8&#x3a;18&#x3a;52 PM</span></div>
 
 			</article>
 

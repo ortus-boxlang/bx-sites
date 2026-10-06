@@ -189,7 +189,7 @@ called from `{{ }}` in Markdown or bare from a theme override:
 | `page` | The current page (see the note below - not every field is populated yet when called from Markdown) |
 | `nav` | This tree's own nav tree |
 | `basePath` | Root-relative base path, ending with `/` |
-| `versions` | Version switcher entries - `[ { label, url } ]` |
+| `versions` | Version switcher entries - `[ { label, url, kind } ]` (`kind` is `"current"`/`"released"`/`"next"`) |
 | `currentVersion` | Which `versions` entry is being rendered right now |
 | `locales` | Language switcher entries - `[ { code, label, url, dir, flag } ]` |
 | `currentLocale` | Which `locales` entry's code is being rendered right now |

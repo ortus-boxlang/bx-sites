@@ -138,7 +138,7 @@ Versionado</h1>
 
 
 
-	<details class="bxsites-toc-mobile ntn-toc--mobile"><summary class="ntn-toc--mobile__summary">En esta p&aacute;gina</summary><ul><li class="ntn-toc__item ntn-toc__item--2"><a href="#crear-una-nueva-versión">Crear una nueva versi&oacute;n</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#qué-se-construye">Qu&eacute; se construye</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#combinar-con-i18n">Combinar con i18n</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#qué-queda-fuera-de-alcance-por-ahora">Qu&eacute; queda fuera de alcance &#x28;por ahora&#x29;</a></li></ul></details>
+	<details class="bxsites-toc-mobile ntn-toc--mobile"><summary class="ntn-toc--mobile__summary">En esta p&aacute;gina</summary><ul><li class="ntn-toc__item ntn-toc__item--2"><a href="#crear-una-nueva-versión">Crear una nueva versi&oacute;n</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#qué-se-construye">Qu&eacute; se construye</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#publicar-una-versión-por-defecto-en-la-raíz-del-sitio">Publicar una versi&oacute;n por defecto en la ra&iacute;z del sitio</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#combinar-con-i18n">Combinar con i18n</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#qué-queda-fuera-de-alcance-por-ahora">Qu&eacute; queda fuera de alcance &#x28;por ahora&#x29;</a></li></ul></details>
 
 				<div class="ntn-content-body">
 				<h1 id="versionado"><a href="#versionado" id="versionado" name="versionado" class="anchor"></a>Versionado</h1>
@@ -201,6 +201,53 @@ posible.</p>
 <p><code>sitemap.xml</code> y <code>llms.txt</code> incluyen las páginas de cada versión junto a
 las del sitio principal - una versión es una parte de primera clase,
 totalmente rastreable/enlazable del sitio, no un archivo oculto.</p>
+<h2 id="publicar-una-versión-por-defecto-en-la-raíz-del-sitio"><a href="#publicar-una-versión-por-defecto-en-la-raíz-del-sitio" id="publicar-una-versión-por-defecto-en-la-raíz-del-sitio" name="publicar-una-versión-por-defecto-en-la-raíz-del-sitio" class="anchor"></a>Publicar una versión por defecto en la raíz del sitio</h2>
+<p>Una vez que un proyecto tiene una versión real y publicada a la que
+dirigir a la gente, <code>docs/</code> en sí mismo suele estar a mitad de camino
+escribiendo la <em>siguiente</em> - no es donde debería aterrizar un visitante
+primerizo. <code>versions.default</code> nombra en su lugar una carpeta
+<code>docs/versions/&lt;name&gt;/</code> para construirla en la raíz del sitio:</p>
+<pre data-bxsites-start-line="1" data-bxsites-title="bxsites.yaml"><code class="language-yaml">versions:
+  default: &quot;1.0.x&quot;
+</code></pre>
+<p>Una vez configurado:</p>
+<ul>
+<li><code>docs/versions/1.0.x/</code> se construye en la raíz del sitio (<code>/</code>), no en
+<code>/versions/1.0.x/</code> - nunca se duplica en ambos sitios.</li>
+<li>El árbol <code>docs/</code> simple - el que siempre se construyó antes en la raíz
+<ul>
+<li>se construye en cambio en <code>/next/</code>, totalmente navegable/enlazable,
+solo que ya no es la versión por defecto. Útil para escribir/revisar a
+la vista la documentación del próximo lanzamiento sin que parezca que
+ya se ha publicado.</li>
+</ul>
+</li>
+<li>El selector de versión muestra <code>1.0.x (Current)</code> seleccionado en la
+raíz, luego cada una de las demás carpetas <code>docs/versions/*</code>, luego un
+separador y una entrada <code>Next</code> que apunta a <code>/next/</code> en último lugar -
+las versiones publicadas primero, con el árbol en curso aparte, al
+final, en lugar de encajado en segundo lugar.</li>
+<li>Las páginas de <code>/next/</code> quedan excluidas de <code>sitemap.xml</code>, y
+<code>robots.txt</code> recibe una línea <code>Disallow: /next/</code> - un árbol en curso
+no debería competir con la documentación real en los resultados de
+búsqueda. Por lo demás sigue siendo una parte completamente normal y
+accesible del sitio (su propio índice de búsqueda, su propia página de
+etiquetas, su propio soporte de <code>redirects</code>).</li>
+<li><code>/next/</code> no obtiene sus propios subárboles de idioma en la v1 -
+<code>docs/i18n/&lt;code&gt;/</code> sigue traduciendo la misma carpeta física <code>docs/</code>
+de siempre, pero por ahora solo la construcción del idioma por defecto
+se publica bajo <code>/next/</code>.</li>
+</ul>
+<p>Un <code>versions.default</code> mal configurado (que nombra una carpeta que en
+realidad no existe bajo <code>docs/versions/</code>) hace que la construcción falle
+con un error claro de <code>BxSites.UnknownDefaultVersion</code>, en lugar de caer
+silenciosamente a otra cosa.</p>
+<p>Los lanzamientos de parche (1.0.1, 1.0.2, ...) son solo ediciones en el
+propio sitio de la carpeta <code>docs/versions/1.0.x/</code> ya creada -
+<code>versions.default</code> no cambia y no se crea ninguna versión nueva. Solo un
+incremento real de minor/major (<code>1.1</code>, <code>2.0</code>) justifica <code>version:new</code>
+creando una carpeta nueva, con <code>versions.default</code> pasando a apuntar a
+ella.</p>
 <h2 id="combinar-con-i18n"><a href="#combinar-con-i18n" id="combinar-con-i18n" name="combinar-con-i18n" class="anchor"></a>Combinar con i18n</h2>
 <p>Consulta <a href="/theme/notion/es/guides/i18n/index.html#docs-versionados-y-traducidos">i18n: &quot;Docs versionados y traducidos&quot;</a>
 para la propia convención <code>docs/versions/&lt;name&gt;/i18n/&lt;code&gt;/</code>, que
@@ -235,7 +282,7 @@ enlaces rotos, igual que al eliminar cualquier otra página).</li>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/guides/versioning.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/notion/es/guides/versioning.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Oct 6, 2026, 10&#x3a;41&#x3a;09 AM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/guides/versioning.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/notion/es/guides/versioning.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Oct 6, 2026, 8&#x3a;18&#x3a;52 PM</span></div>
 
 			</article>
 
@@ -257,7 +304,7 @@ enlaces rotos, igual que al eliminar cualquier otra página).</li>
 		</main>
 
 		<aside class="ntn-toc-sidebar">
-			<nav class="ntn-toc" aria-label="En esta p&aacute;gina"><div class="ntn-toc__title">En esta p&aacute;gina</div><ul><li class="ntn-toc__item ntn-toc__item--2"><a href="#crear-una-nueva-versión">Crear una nueva versi&oacute;n</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#qué-se-construye">Qu&eacute; se construye</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#combinar-con-i18n">Combinar con i18n</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#qué-queda-fuera-de-alcance-por-ahora">Qu&eacute; queda fuera de alcance &#x28;por ahora&#x29;</a></li></ul></nav>
+			<nav class="ntn-toc" aria-label="En esta p&aacute;gina"><div class="ntn-toc__title">En esta p&aacute;gina</div><ul><li class="ntn-toc__item ntn-toc__item--2"><a href="#crear-una-nueva-versión">Crear una nueva versi&oacute;n</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#qué-se-construye">Qu&eacute; se construye</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#publicar-una-versión-por-defecto-en-la-raíz-del-sitio">Publicar una versi&oacute;n por defecto en la ra&iacute;z del sitio</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#combinar-con-i18n">Combinar con i18n</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#qué-queda-fuera-de-alcance-por-ahora">Qu&eacute; queda fuera de alcance &#x28;por ahora&#x29;</a></li></ul></nav>
 		</aside>
 
 	</div>
