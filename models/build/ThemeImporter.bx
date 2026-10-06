@@ -52,6 +52,29 @@ class {
 			if ( directoryExists( sourceAssetDir ) ) {
 				directoryCopy( sourceAssetDir, dest & "/assets/" & assetDirName, true )
 				report.assetsCopied.append( assetDirName )
+
+				// `themeAssetUrl()`/`moduleAssetUrl()` (RendererEncapsulator.bx)
+				// only fingerprint a file directly inside a theme's own
+				// `assets/` - never one nested under a subdirectory (see
+				// BuildPipeline.buildTopLevelAssetManifest()'s own docblock
+				// for why: safely renaming a file that something else
+				// references internally, by its old name, requires knowing
+				// every such reference, which this import can't). Every
+				// imported CSS/JS folder lands under `assets/<assetDirName>/`
+				// by construction (the copy two lines up), so NONE of it is
+				// eligible - flag that explicitly rather than silently
+				// leaving the imported theme with the exact cache-busting
+				// gap this whole helper exists to close.
+				if ( listFindNoCase( "css,js", assetDirName ) ) {
+					report.warnings.append(
+						"assets/" & assetDirName & "/ was copied as-is and is NOT cache-busted " &
+						"(only files directly inside a theme's own assets/ folder, not a subdirectory, " &
+						"ever are - see docs/guides/themes.md" & char( 35 ) & "writing-a-theme-from-scratch). To fingerprint " &
+						"your main stylesheet/script, move it to assets/ directly (e.g. assets/style.css) " &
+						"and reference it from layout.bxm with themeAssetUrl( 'style.css' ) instead of a " &
+						"hardcoded path."
+					)
+				}
 			}
 		}
 

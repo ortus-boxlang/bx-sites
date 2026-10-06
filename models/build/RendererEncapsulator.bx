@@ -39,6 +39,11 @@ class {
 	 * @data DataLoader.load()'s own output, bound bare as `variables.data`
 	 * @functions FunctionsLoader.load()'s own output - each `$`-prefixed magic function bound directly into this scope, bare-callable from the included templates
 	 *
+	 * Also binds `themeAssetUrl()`/`moduleAssetUrl()` - see their own inline
+	 * docblocks below - bare-callable from the included templates the same
+	 * way, reading `config.theme.assetUrls`/`config.moduleAssetUrls` (both
+	 * from `BuildPipeline.buildTopLevelAssetManifest()`).
+	 *
 	 * @return The rendered page HTML
 	 */
 	string function render(
@@ -76,6 +81,35 @@ class {
 		variables.data                = arguments.data
 		variables.layoutFile         = arguments.layoutFile
 		variables.bodyFile           = arguments.bodyFile
+
+		// The cache-busting "mixin" every theme's layout (built-in or
+		// custom) renders its own `<link>`/`<script>` tags through, instead
+		// of hand-writing `variables.basePath & "assets/theme/style.css"`
+		// (or similar) and hoping to remember the one-off
+		// `variables.siteConfig.theme.styleUrl ?: '...'` fallback idiom this
+		// replaces. Both close over THIS instance's own `variables` scope
+		// (plain member closures, not arrow-function callbacks, so there's
+		// no separate `arguments`-capture gotcha to work around here) rather
+		// than the constructor arguments directly, so they keep working
+		// exactly the same if a future change here starts re-using this
+		// same instance for more than one render.
+		//
+		// `siteConfig.theme.assetUrls`/`siteConfig.moduleAssetUrls`
+		// (BuildPipeline.bx's `buildTopLevelAssetManifest()`) are only ever
+		// populated for a file's PLAIN name - a path with no directory
+		// segment - so a lookup miss (fingerprinting off, the project
+		// predates this manifest, or the caller named a file that lives in
+		// a subdirectory, e.g. `vendor/bootstrap/bootstrap.min.css`) falls
+		// back to today's exact unhashed path, same as calling this on a
+		// file that simply doesn't exist yet.
+		variables.themeAssetUrl = function( required string fileName ) {
+			var urls = variables.siteConfig.theme.assetUrls ?: {}
+			return variables.basePath & ( urls[ arguments.fileName ] ?: ( "assets/theme/" & arguments.fileName ) )
+		}
+		variables.moduleAssetUrl = function( required string fileName ) {
+			var urls = variables.siteConfig.moduleAssetUrls ?: {}
+			return variables.basePath & ( urls[ arguments.fileName ] ?: ( "assets/" & arguments.fileName ) )
+		}
 
 		// Same bare `$`-function bind-through ThemeRenderer.renderPage() used
 		// to do directly on its own (shared) scope - FunctionsLoader.bx's own

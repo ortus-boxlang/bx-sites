@@ -1035,17 +1035,23 @@ fresh `bxSites new` project needs to touch none of this. See
 what deliberately isn't covered (AVIF, animated GIFs, SVGs).
 
 - `assets.fingerprint` - `true` (the default). Content-hash-names every
-  generated image variant, CSS/JS bundle, and the active theme's own
-  `assets/style.css` (e.g. `screenshot-800w.a3f9c2e1.webp`,
-  `bundle.a3f9c2e1.css`, `style.a3f9c2e1.css`) so they can be served with
-  safe, far-future cache headers - a project's build changes the file's own
-  name only when its content actually changes. This means a theme update -
-  a built-in theme upgrade, or a custom author editing their own theme's
-  CSS - automatically busts every visitor's browser cache on the next
-  deploy, with no manual versioning step. Does not rename a project's own
-  original files under `docs/assets/` - only pipeline-generated output gets
-  fingerprinted, so anything else that references an asset by its plain
-  filename (a `::: file` download card, a raw markdown link) keeps working
+  generated image variant, CSS/JS bundle, and any top-level CSS/JS file
+  directly inside the active theme's own `assets/` folder or this module's
+  own shared `assets/` (e.g. `screenshot-800w.a3f9c2e1.webp`,
+  `bundle.a3f9c2e1.css`, `style.a3f9c2e1.css`, `copy-code.a3f9c2e1.js`) so
+  they can be served with safe, far-future cache headers - a project's build
+  changes a file's own name only when its content actually changes. This
+  means a theme update - a built-in theme upgrade, or a custom author
+  editing their own theme's CSS/JS - automatically busts every visitor's
+  browser cache on the next deploy, with no manual versioning step, as long
+  as the theme's own `layout.bxm` links that file through
+  `themeAssetUrl()`/`moduleAssetUrl()` rather than a hardcoded path - see
+  [Themes](guides/themes.md#writing-a-theme-from-scratch). Does not rename a
+  project's own original files under `docs/assets/`, or anything inside a
+  subdirectory of a theme's own `assets/` - only pipeline-generated output
+  and a theme's own top-level files get fingerprinted, so anything else that
+  references an asset by its plain filename (a `::: file` download card, a
+  raw markdown link, a theme's `@font-face`/`@import`) keeps working
   unchanged.
 - `assets.bundle` - `true` (the default). Concatenates `extraCss`/`extraJs`
   into one fingerprinted file each - pure BoxLang/JVM, no Node/esbuild
