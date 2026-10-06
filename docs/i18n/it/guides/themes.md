@@ -305,7 +305,7 @@ tema deve renderizzare un selettore solo quando
 versione su cui atterra un visitatore alla radice del sito), `"released"`
 (qualsiasi altro snapshot già creato), oppure `"next"` (il semplice
 albero `docs/`, una volta impostato `versions.default` - vedi
-[Versionamento](versioning.md#publishing-a-default-version-at-the-site-root)).
+[Versionamento](versioning.md#pubblicare-una-versione-predefinita-alla-radice-del-sito)).
 Invece di scorrere `variables.versions` a mano, chiama
 `renderVersionSwitcher( variables.versions, variables.currentVersion )` -
 collegata allo scope di rendering di ogni tema nello stesso modo in cui lo

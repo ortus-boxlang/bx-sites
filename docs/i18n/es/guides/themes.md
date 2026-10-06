@@ -303,7 +303,7 @@ entrada es `"current"` (la versión en la que aterriza un visitante en la
 raíz del sitio), `"released"` (cualquier otra instantánea ya creada) o
 `"next"` (el árbol `docs/` sin versionar, una vez que `versions.default`
 está definido - consulta
-[Versionado](versioning.md#publishing-a-default-version-at-the-site-root)).
+[Versionado](versioning.md#publicar-una-versión-por-defecto-en-la-raíz-del-sitio)).
 En lugar de recorrer `variables.versions` a mano, llama a
 `renderVersionSwitcher( variables.versions, variables.currentVersion )` -
 vinculada al ámbito de renderizado de cada tema de la misma forma que

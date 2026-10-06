@@ -300,7 +300,7 @@ muss, wenn `variables.versions.len() gt 1`. Das `kind` jedes Eintrags ist
 `"current"` (die Version, auf der ein Besucher an der Website-Wurzel
 landet), `"released"` (jeder andere angelegte Snapshot) oder `"next"`
 (der reine `docs/`-Baum, sobald `versions.default` gesetzt ist - siehe
-[Versionierung](versioning.md#publishing-a-default-version-at-the-site-root)).
+[Versionierung](versioning.md#eine-standardversion-am-site-root-veröffentlichen)).
 Statt `variables.versions` von Hand zu durchlaufen, ruf
 `renderVersionSwitcher( variables.versions, variables.currentVersion )`
 auf - eingebunden in den Render-Scope jedes Themes auf dieselbe Weise wie
