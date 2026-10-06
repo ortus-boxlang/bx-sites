@@ -294,11 +294,27 @@ están siempre disponibles, dando soporte a las funciones de enlace al
 repositorio/enlace de edición/última actualización/pie de página
 mencionadas arriba - un tema personalizado decide por sí mismo si y cómo
 renderizarlas, igual que todo lo demás. `variables.versions`
-(`[ { label, url } ]`, con "Latest" primero) y
+(`[ { label, url, kind } ]`, con "Latest" primero) y
 `variables.currentVersion` (el `label` que se está renderizando en ese
 momento) dan soporte al selector de versión - vacío/`"Latest"` para un
 proyecto que no está versionado, así que un tema solo necesita renderizar
-un selector cuando `variables.versions.len() gt 1`. Todos los temas
+un selector cuando `variables.versions.len() gt 1`. El `kind` de cada
+entrada es `"current"` (la versión en la que aterriza un visitante en la
+raíz del sitio), `"released"` (cualquier otra instantánea ya creada) o
+`"next"` (el árbol `docs/` sin versionar, una vez que `versions.default`
+está definido - consulta
+[Versionado](versioning.md#publishing-a-default-version-at-the-site-root)).
+En lugar de recorrer `variables.versions` a mano, llama a
+`renderVersionSwitcher( variables.versions, variables.currentVersion )` -
+vinculada al ámbito de renderizado de cada tema de la misma forma que
+`themeAssetUrl()`/`moduleAssetUrl()` (arriba) - y construye todo el
+`<select>`, agrupa `"next"` detrás de un separador después de cada
+versión publicada, y etiqueta la entrada `"current"` con "(Current)",
+todo ello guiado por `kind` en lugar de que un tema reimplemente esa
+lógica por su cuenta. Un segundo argumento opcional añade clases CSS
+extra al `<select>` (`renderVersionSwitcher( variables.versions,
+variables.currentVersion, "my-extra-class" )`) para un tema que quiera su
+propio estilo sin reimplementar el marcado. Todos los temas
 incorporados obtienen sus iconos de repositorio/redes sociales de una
 pequeña tabla de búsqueda SVG compartida,
 `<bx:include template="#variables.moduleAssetsDir#/icons.bxm">` (define

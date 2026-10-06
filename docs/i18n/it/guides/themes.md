@@ -296,12 +296,28 @@ configurati) e `variables.siteConfig.repo`/`.social`/`.footer` sono
 sempre disponibili anch'essi, a supporto delle funzionalità di link al
 repository/link di modifica/ultimo aggiornamento/footer sopra descritte -
 un tema personalizzato decide da sé se e come renderizzarli, come
-tutto il resto. `variables.versions` (`[ { label, url } ]`, con "Latest"
-per primo) e `variables.currentVersion` (l'etichetta `label` in fase di
-rendering in questo momento) sono a supporto del selettore di versione -
-vuoti/`"Latest"` per un progetto non versionato, quindi un tema deve
-renderizzare un selettore solo quando `variables.versions.len() gt 1`.
-Ogni tema integrato ottiene le proprie icone repository/social da una
+tutto il resto. `variables.versions` (`[ { label, url, kind } ]`, con
+"Latest" per primo) e `variables.currentVersion` (l'etichetta `label` in
+fase di rendering in questo momento) sono a supporto del selettore di
+versione - vuoti/`"Latest"` per un progetto non versionato, quindi un
+tema deve renderizzare un selettore solo quando
+`variables.versions.len() gt 1`. Il `kind` di ogni voce è `"current"` (la
+versione su cui atterra un visitatore alla radice del sito), `"released"`
+(qualsiasi altro snapshot già creato), oppure `"next"` (il semplice
+albero `docs/`, una volta impostato `versions.default` - vedi
+[Versionamento](versioning.md#publishing-a-default-version-at-the-site-root)).
+Invece di scorrere `variables.versions` a mano, chiama
+`renderVersionSwitcher( variables.versions, variables.currentVersion )` -
+collegata allo scope di rendering di ogni tema nello stesso modo in cui lo
+sono `themeAssetUrl()`/`moduleAssetUrl()` (sopra) - e questa costruisce
+l'intero `<select>`, raggruppa `"next"` dietro un separatore dopo ogni
+versione rilasciata, ed etichetta la voce `"current"` con "(Current)",
+tutto guidato da `kind` invece che un tema debba reimplementare da sé
+questa logica. Un secondo argomento opzionale aggiunge classi CSS extra
+al `<select>` (`renderVersionSwitcher( variables.versions,
+variables.currentVersion, "my-extra-class" )`) per un tema che vuole uno
+stile proprio senza reimplementare il markup. Ogni tema integrato ottiene
+le proprie icone repository/social da una
 piccola tabella SVG condivisa,
 `<bx:include template="#variables.moduleAssetsDir#/icons.bxm">`
 (definisce `bxsitesIcon( name )`, uno tra `github`, `twitter`/`x`, `rss`,
