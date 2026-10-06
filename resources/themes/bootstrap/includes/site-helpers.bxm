@@ -113,23 +113,6 @@
 	}
 
 	/**
-	 * Renders the docs version switcher - a plain <select> whose onchange
-	 * handler jumps straight to the picked version's own URL (no JS
-	 * framework needed). Labels/URLs come from bxsites.yaml's own
-	 * versioning config; the current version's option is marked selected.
-	 * Only rendered when there is more than one version.
-	 */
-	function renderVersionSwitcher( required array versions, required string currentVersion ) {
-		var html = sb{ '<select class="version-switcher form-select form-select-sm" onchange="location.href=this.value" aria-label="' & encodeForHTML( variables.strings.version ) & '">' }
-		for ( var v in arguments.versions ) {
-			var selected = v.label == arguments.currentVersion ? " selected" : ""
-			html &= '<option value="' & bxsitesUrlAttr( v.url ) & '"' & selected & '>' & encodeForHTML( v.label ) & '</option>'
-		}
-		html &= '</select>'
-		return html
-	}
-
-	/**
 	 * A flag-icon dropdown - the trigger button shows the
 	 * current locale's own flag, opening a menu listing every locale by
 	 * its own flag + label. A locale's `flag` (bxsites.json's own

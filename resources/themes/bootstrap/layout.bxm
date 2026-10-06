@@ -183,7 +183,7 @@
 
 				<!--- Version switcher --->
 				<bx:if variables.versions.len() gt 1>
-					#renderVersionSwitcher( variables.versions, variables.currentVersion )#
+					#renderVersionSwitcher( variables.versions, variables.currentVersion, 'form-select form-select-sm' )#
 				</bx:if>
 
 				<!--- Locale dropdown --->

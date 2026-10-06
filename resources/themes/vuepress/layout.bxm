@@ -70,16 +70,6 @@
 		return html
 	}
 
-	function renderVersionSwitcher( required array versions, required string currentVersion ) {
-		var html = '<select class="version-switcher" onchange="location.href=this.value" aria-label="' & encodeForHTML( variables.strings.version ) & '">'
-		for ( var v in arguments.versions ) {
-			var selected = v.label == arguments.currentVersion ? " selected" : ""
-			html &= '<option value="' & bxsitesUrlAttr( v.url ) & '"' & selected & '>' & encodeForHTML( v.label ) & '</option>'
-		}
-		html &= '</select>'
-		return html
-	}
-
 	/**
 	 * A GitBook-style flag-icon dropdown - the trigger button shows the
 	 * current locale's own flag, opening a menu listing every locale by

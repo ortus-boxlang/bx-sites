@@ -2255,7 +2255,7 @@ class extends="testbox.system.BaseSpec" {
 
 				var mainHtml = fileRead( root & "/site/index.html" );
 				expect( mainHtml ).toInclude( "version-switcher" );
-				expect( mainHtml ).toInclude( ">Latest<" );
+				expect( mainHtml ).toInclude( ">Latest &##x28;Current&##x29;<" );
 				expect( mainHtml ).toInclude( ">1.0<" );
 
 				var v1Html = fileRead( root & "/site/versions/1.0/index.html" );
@@ -2362,14 +2362,50 @@ class extends="testbox.system.BaseSpec" {
 
 				var rootHtml = fileRead( root & "/site/index.html" );
 				expect( rootHtml ).toInclude( "version-switcher" );
-				expect( rootHtml ).toInclude( ">1.0.x<" );
+				expect( rootHtml ).toInclude( ">1.0.x &##x28;Current&##x29;<" );
 				expect( rootHtml ).toInclude( ">Next<" );
 				expect( rootHtml ).toInclude( ">2.0<" );
 				expect( rootHtml ).notToInclude( ">Latest<" );
 
+				// Next comes LAST, after every released version - not
+				// squeezed in right after the current one.
+				var currentPos = rootHtml.find( ">1.0.x &##x28;Current&##x29;<" );
+				var releasedPos = rootHtml.find( ">2.0<" );
+				var nextPos = rootHtml.find( ">Next<" );
+				expect( releasedPos ).toBeGT( currentPos );
+				expect( nextPos ).toBeGT( releasedPos );
+
 				var v2Html = fileRead( root & "/site/versions/2.0/index.html" );
-				expect( v2Html ).toInclude( ">1.0.x<" );
+				expect( v2Html ).toInclude( ">1.0.x &##x28;Current&##x29;<" );
 				expect( v2Html ).toInclude( ">Next<" );
+			} );
+
+			describe( "buildVersionsList() (the version switcher's own kind/ordering)", function() {
+
+				it( "tags Latest as kind:current and every discovered version kind:released, with no next entry, when versions.default is unset", function() {
+					makePublic( pipeline, "buildVersionsList" );
+
+					var versions = pipeline.buildVersionsList( [ "2.0", "1.0" ], "/" );
+
+					expect( versions ).toBe( [
+						{ label : "Latest", url : "/", kind : "current" },
+						{ label : "2.0", url : "/versions/2.0/", kind : "released" },
+						{ label : "1.0", url : "/versions/1.0/", kind : "released" }
+					] );
+				} );
+
+				it( "puts the default version first as kind:current, every other version as kind:released, and Next LAST as kind:next", function() {
+					makePublic( pipeline, "buildVersionsList" );
+
+					var versions = pipeline.buildVersionsList( [ "2.0.x", "1.0.x" ], "/", "2.0.x" );
+
+					expect( versions ).toBe( [
+						{ label : "2.0.x", url : "/", kind : "current" },
+						{ label : "1.0.x", url : "/versions/1.0.x/", kind : "released" },
+						{ label : "Next", url : "/next/", kind : "next" }
+					] );
+				} );
+
 			} );
 
 			it( "computes editUrl and lastUpdated for the root-tree page relative to its own docs/versions/<default>/ folder, once versions.default is set", function() {

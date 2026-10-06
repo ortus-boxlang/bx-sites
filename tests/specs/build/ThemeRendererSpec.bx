@@ -156,6 +156,61 @@ class extends="testbox.system.BaseSpec" {
 
 			} );
 
+			describe( "renderVersionSwitcher() (the version-switcher mixin)", function() {
+
+				private string function versionSwitcherHtml( required array versions, string currentVersion = "Latest" ) {
+					var root = newProjectRoot();
+					directoryCreate( root & "/docs/.theme", true, true );
+					fileWrite(
+						root & "/docs/.theme/layout.bxm",
+						'<bx:output>##renderVersionSwitcher( variables.versions, variables.currentVersion )##<bx:include template="##variables.themeDir##/##variables.bodyFile##"></bx:output>'
+					);
+					fileWrite( root & "/docs/.theme/page.bxm", "<bx:output>body</bx:output>" );
+					var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+
+					return renderer.renderPage(
+						{ title : "P", contentHtml : "" }, [], { name : "My Site" }, themeDir,
+						"/", arguments.versions, arguments.currentVersion
+					);
+				}
+
+				it( "labels the kind:current entry with the (Current) suffix", function() {
+					var html = versionSwitcherHtml( [
+						{ label : "2.0.x", url : "/", kind : "current" },
+						{ label : "1.0.x", url : "/versions/1.0.x/", kind : "released" }
+					] );
+
+					expect( html ).toInclude( ">2.0.x &##x28;Current&##x29;<" );
+					expect( html ).toInclude( ">1.0.x<" );
+					expect( html ).notToInclude( "1.0.x &##x28;Current&##x29;" );
+				} );
+
+				it( "renders a disabled divider option right before the first kind:next entry, after every released version", function() {
+					var html = versionSwitcherHtml( [
+						{ label : "2.0.x", url : "/", kind : "current" },
+						{ label : "1.0.x", url : "/versions/1.0.x/", kind : "released" },
+						{ label : "Next", url : "/next/", kind : "next" }
+					] );
+
+					var dividerPos = html.find( "<option disabled>" );
+					var releasedPos = html.find( ">1.0.x<" );
+					var nextPos = html.find( ">Next<" );
+					expect( dividerPos ).toBeGT( 0 );
+					expect( dividerPos ).toBeGT( releasedPos );
+					expect( nextPos ).toBeGT( dividerPos );
+				} );
+
+				it( "marks the entry whose label matches currentVersion as selected", function() {
+					var html = versionSwitcherHtml(
+						[ { label : "2.0.x", url : "/", kind : "current" }, { label : "1.0.x", url : "/versions/1.0.x/", kind : "released" } ],
+						"1.0.x"
+					);
+
+					expect( html ).toInclude( 'value="/versions/1.0.x/" selected' );
+				} );
+
+			} );
+
 			describe( "findCacheBustingGaps() (the non-fatal theme authoring warning)", function() {
 
 				it( "flags a layout that hardcodes assets/theme/... instead of calling themeAssetUrl()", function() {

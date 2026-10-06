@@ -1343,22 +1343,37 @@ class {
 	}
 
 	/**
-	 * Builds the version switcher's own entries - each one `{ label, url }`,
+	 * Builds the version switcher's own entries - each one `{ label, url, kind }`,
 	 * consumed identically by every built-in theme's own
-	 * `renderVersionSwitcher()` regardless of which branch below produced
-	 * it, so neither this shape nor any theme needs to change between the
-	 * two.
+	 * `renderVersionSwitcher()` (RendererEncapsulator.bx) regardless of which
+	 * branch below produced it, so neither this shape nor any theme needs to
+	 * change between the two. `kind` is one of `"current"` (the version a
+	 * visitor lands on at the site root), `"released"` (any other cut
+	 * `docs/versions/<name>/` snapshot), or `"next"` (the plain `docs/` tree,
+	 * built separately at `/next/` once `defaultVersionName` is set) -
+	 * `renderVersionSwitcher()`'s own grouping/"(Current)" suffix is driven
+	 * entirely by this field rather than string-matching a label, so a
+	 * project's own custom version labeling (nothing stops `version:new`'s
+	 * own name from being anything) never breaks the switcher's grouping.
 	 *
 	 * No `defaultVersionName` (empty, by far the common case): "Latest"
-	 * (the project's regular `docs/`) first, then one per discovered
-	 * `docs/versions/` folder - today's exact, unchanged behavior.
+	 * (the project's regular `docs/`, `kind: "current"`) first, then one
+	 * `kind: "released"` entry per discovered `docs/versions/` folder -
+	 * today's exact ordering, unchanged. There is no `"next"` entry in this
+	 * shape - without `versions.default` there is no separate upcoming tree
+	 * to distinguish from "Latest" (see docs/guides/versioning.md).
 	 *
-	 * `defaultVersionName` set: that version's own name first, pointing at
-	 * the site root (it's the one build() actually renders there - see
-	 * its own docblock), then `"Next"` (the plain `docs/` tree, now built
-	 * separately at `/next/`), then every *other* discovered version -
-	 * `defaultVersionName` itself is skipped here since it's already the
-	 * first entry, never duplicated at its own `/versions/<name>/` URL too.
+	 * `defaultVersionName` set: that version's own name first
+	 * (`kind: "current"`), pointing at the site root (it's the one build()
+	 * actually renders there - see its own docblock), then every *other*
+	 * discovered version (`kind: "released"`, already newest-first per
+	 * VersionsDiscoverer.bx's own sort) - `defaultVersionName` itself is
+	 * skipped here since it's already the first entry, never duplicated at
+	 * its own `/versions/<name>/` URL too - and finally `"Next"`
+	 * (`kind: "next"`) LAST, after every released version, matching how a
+	 * project with both a stable release and an upcoming one is normally
+	 * presented elsewhere ("2.0.x (Current)", "1.0.x", then a separator,
+	 * then "Next") rather than squeezed in second.
 	 *
 	 * @versionNames VersionsDiscoverer.discover()'s own output, newest first
 	 * @basePath The site's own root basePath
@@ -1368,23 +1383,23 @@ class {
 		var hasDefault = len( arguments.defaultVersionName ) > 0
 
 		if ( !hasDefault ) {
-			var versions = [ { label : "Latest", url : arguments.basePath } ]
+			var versions = [ { label : "Latest", url : arguments.basePath, kind : "current" } ]
 			for ( var versionName in arguments.versionNames ) {
-				versions.append( { label : versionName, url : arguments.basePath & "versions/" & versionName & "/" } )
+				versions.append( { label : versionName, url : arguments.basePath & "versions/" & versionName & "/", kind : "released" } )
 			}
 			return versions
 		}
 
 		var versions = [
-			{ label : arguments.defaultVersionName, url : arguments.basePath },
-			{ label : "Next", url : arguments.basePath & "next/" }
+			{ label : arguments.defaultVersionName, url : arguments.basePath, kind : "current" }
 		]
 		for ( var versionName in arguments.versionNames ) {
 			if ( versionName == arguments.defaultVersionName ) {
 				continue
 			}
-			versions.append( { label : versionName, url : arguments.basePath & "versions/" & versionName & "/" } )
+			versions.append( { label : versionName, url : arguments.basePath & "versions/" & versionName & "/", kind : "released" } )
 		}
+		versions.append( { label : "Next", url : arguments.basePath & "next/", kind : "next" } )
 		return versions
 	}
 
