@@ -39,10 +39,11 @@ class {
 	 * @data DataLoader.load()'s own output, bound bare as `variables.data`
 	 * @functions FunctionsLoader.load()'s own output - each `$`-prefixed magic function bound directly into this scope, bare-callable from the included templates
 	 *
-	 * Also binds `themeAssetUrl()`/`moduleAssetUrl()` - see their own inline
-	 * docblocks below - bare-callable from the included templates the same
-	 * way, reading `config.theme.assetUrls`/`config.moduleAssetUrls` (both
-	 * from `BuildPipeline.buildTopLevelAssetManifest()`).
+	 * Also binds `themeAssetUrl()`/`moduleAssetUrl()`/`renderVersionSwitcher()` -
+	 * see their own inline docblocks below - bare-callable from the included
+	 * templates the same way, reading `config.theme.assetUrls`/
+	 * `config.moduleAssetUrls` (both from `BuildPipeline.buildTopLevelAssetManifest()`)
+	 * and `versions`/`currentVersion` (`BuildPipeline.buildVersionsList()`) respectively.
 	 *
 	 * @return The rendered page HTML
 	 */
@@ -109,6 +110,48 @@ class {
 		variables.moduleAssetUrl = function( required string fileName ) {
 			var urls = variables.siteConfig.moduleAssetUrls ?: {}
 			return variables.basePath & ( urls[ arguments.fileName ] ?: ( "assets/" & arguments.fileName ) )
+		}
+
+		// The version switcher, centralized the same way as the two asset
+		// helpers above - every theme (built-in or custom) gets the
+		// grouping/"(Current)" labeling for free instead of re-implementing
+		// this exact loop, which is how all 10 built-in themes had it before
+		// this (byte-identical in 9 of them). A theme that wants fully
+		// custom markup is still free to loop `variables.versions` itself
+		// instead of calling this - nothing requires it.
+		//
+		// Grouping is driven by each entry's own `kind` (BuildPipeline.bx's
+		// `buildVersionsList()`) - `"current"` gets a trailing
+		// `(<versionCurrent string>)` label, and the first `"next"` entry
+		// (there is ever at most one) gets a disabled divider option
+		// rendered immediately before it, visually separating it from the
+		// released versions above - matching how a "stable release(s) then
+		// an upcoming one" switcher is normally laid out elsewhere, rather
+		// than squeezing "Next" in right after the current version.
+		//
+		// Escapes a URL the same minimal way icons.bxm's own
+		// `bxsitesUrlAttr()` does (only `&`/`"`/`<`, never `/`) rather than
+		// calling that function directly - this helper must keep working
+		// even for a from-scratch custom theme that never
+		// `<bx:include template="#variables.moduleAssetsDir#/icons.bxm">`s
+		// at all.
+		variables.renderVersionSwitcher = function( required array versions, required string currentVersion, string extraClass = "" ) {
+			var classAttr = trim( "version-switcher " & arguments.extraClass )
+			var html = '<select class="' & encodeForHTML( classAttr ) & '" onchange="location.href=this.value" aria-label="' & encodeForHTML( variables.strings.version ) & '">'
+			var sawNext = false
+			for ( var v in arguments.versions ) {
+				var kind = v.kind ?: ""
+				if ( kind == "next" && !sawNext ) {
+					html &= '<option disabled>──────────</option>'
+					sawNext = true
+				}
+				var label = v.label & ( kind == "current" ? ( " (" & variables.strings.versionCurrent & ")" ) : "" )
+				var urlAttr = v.url.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
+				var selected = v.label == arguments.currentVersion ? " selected" : ""
+				html &= '<option value="' & urlAttr & '"' & selected & '>' & encodeForHTML( label ) & '</option>'
+			}
+			html &= '</select>'
+			return html
 		}
 
 		// Same bare `$`-function bind-through ThemeRenderer.renderPage() used
