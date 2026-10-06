@@ -71,7 +71,7 @@
 	<script>window.__BXSITES_BASE_PATH__ = "/theme/docsy/de/";</script>
 	<script>window.__BXSITES_SEARCH_NO_RESULTS__ = "Keine\x20Ergebnisse\x20gefunden.";</script>
 	<script src="/theme/docsy/de/assets/vendor/minisearch/minisearch.js"></script>
-	<script src="/theme/docsy/de/assets/search.js" defer></script>
+	<script src="/theme/docsy/de/assets/search.f14e08a2.js" defer></script>
 
 
 
@@ -679,7 +679,7 @@ keine Änderung an <code>bxsites.yaml</code> nötig:</p>
 &lt;head&gt;
 	&lt;meta charset=&quot;UTF-8&quot;&gt;
 	&lt;title&gt;#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#&lt;/title&gt;
-	&lt;link rel=&quot;stylesheet&quot; href=&quot;#variables.basePath#assets/theme/style.css&quot;&gt;
+	&lt;link rel=&quot;stylesheet&quot; href=&quot;#themeAssetUrl( 'style.css' )#&quot;&gt;
 &lt;/head&gt;
 &lt;body&gt;
 	&lt;header&gt;&lt;a href=&quot;#variables.basePath#&quot;&gt;#encodeForHTML( variables.siteConfig.name )#&lt;/a&gt;&lt;/header&gt;
@@ -718,10 +718,44 @@ bereits auf <code>variables.page</code> vorhanden sind), oder einen <code>assets
 für dein eigenes CSS/JS, automatisch zur Build-Zeit nach
 <code>site/assets/theme/</code> kopiert.</li>
 </ul>
+<p><code>themeAssetUrl( &quot;style.css&quot; )</code> (oben verwendet, statt eines fest codierten
+<code>assets/theme/style.css</code>) ist das, was das eigene CSS deines Themes
+<a href="/theme/docsy/de/configuration/index.html#assets">Content-Hash-Fingerprinting</a> nutzen lässt -
+<code>assets.fingerprint</code> (standardmäßig aktiv) bedeutet, dass jede Änderung,
+die du an dieser Datei vornimmst, beim nächsten Build einen neuen
+Dateinamen bekommt, sodass die Browser der Besucher nie eine veraltete,
+zwischengespeicherte Kopie ausliefern. Das funktioniert genauso für jede
+Top-Level-CSS- oder JS-Datei im eigenen <code>assets/</code>-Ordner deines Themes,
+nicht nur für <code>style.css</code> - ein Theme mit einer eigenen <code>assets/main.js</code>
+bindet sie auf dieselbe Weise ein:
+<code>&lt;script src=&quot;themeAssetUrl( 'main.js' )&quot;&gt;&lt;/script&gt;</code>.
+<code>moduleAssetUrl( &quot;copy-code.js&quot; )</code> ist derselbe Helfer für die eigenen,
+themeunabhängigen, gemeinsam genutzten Skripte dieses Moduls (diejenigen,
+die das eigene <code>layout.bxm</code> jedes integrierten Themes über
+<code>variables.moduleAssetsDir</code> einbindet) - verwende ihn anstelle eines fest
+codierten <code>assets/copy-code.js</code>, wenn dein eigenes Theme eines davon
+direkt einbindet.</p>
+<p>Beide Helfer fingerprinten nur eine Datei, die <em>direkt</em> in diesem Ordner
+liegt - nie eine, die in einem Unterordner verschachtelt ist (ein eigenes
+<code>assets/fonts/</code> oder <code>assets/vendor/</code> etwa). Das ist Absicht: Eine Datei,
+auf die <em>indirekt</em> von einer deiner Top-Level-Dateien aus verwiesen wird
+(ein <code>@font-face url(...)</code>, ein CSS-<code>@import</code>), würde kaputtgehen, wenn
+sie umbenannt würde, ohne dass auch jede Stelle, die unter dem alten
+Namen darauf verweist, mit umgeschrieben wird - also rührt dies diese
+Dateien niemals an. Wird einer der beiden Helfer für eine Datei
+aufgerufen, die noch nicht existiert, oder bei deaktiviertem
+<code>assets.fingerprint</code>, greift exakt der heutige, unveränderte Pfad als
+Fallback - nie ein Fehler.</p>
+<p>Jedes <code>.bxm</code> (integriert oder eigen), das stattdessen einen fest
+codierten Pfad hart codiert, statt einen der beiden Helfer aufzurufen,
+bricht dadurch nicht, bustet aber auch nicht automatisch den Cache - und
+ein Build gibt jetzt eine einzeilige, nicht fatale Warnung aus, die die
+betreffende Datei benennt, wenn genau das erkannt wird, damit ein solches
+Theme nicht stillschweigend veraltet.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/docsy/de/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Oct 5, 2026, 8&#x3a;09&#x3a;04 AM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/docsy/de/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Oct 6, 2026, 10&#x3a;41&#x3a;09 AM</span></div>
 
 			</article>
 
@@ -759,37 +793,37 @@ für dein eigenes CSS/JS, automatisch zur Build-Zeit nach
 	</footer>
 
 	<script src="/theme/docsy/de/assets/vendor/highlight/highlight.min.js"></script>
-	<script src="/theme/docsy/de/assets/highlight-boxlang.js"></script>
+	<script src="/theme/docsy/de/assets/highlight-boxlang.c59b5de4.js"></script>
 	<script>hljs.highlightAll();</script>
-	<script src="/theme/docsy/de/assets/code-lines.js"></script>
-	<script src="/theme/docsy/de/assets/copy-code.js" defer></script>
-	<script src="/theme/docsy/de/assets/admonition-collapse.js" defer></script>
-	<script src="/theme/docsy/de/assets/nav-toggle.js" defer></script>
-	<script src="/theme/docsy/de/assets/toc-collapse.js" defer></script>
-	<script src="/theme/docsy/de/assets/tabs.js" defer></script>
-	<script src="/theme/docsy/de/assets/conditional-content-init.js" defer></script>
-	<script src="/theme/docsy/de/assets/course-progress.js" defer></script>
-	<script src="/theme/docsy/de/assets/prompt-init.js" defer></script>
-	<script src="/theme/docsy/de/assets/contact-form-init.js" defer></script>
+	<script src="/theme/docsy/de/assets/code-lines.66ad0c90.js"></script>
+	<script src="/theme/docsy/de/assets/copy-code.5bd76adc.js" defer></script>
+	<script src="/theme/docsy/de/assets/admonition-collapse.df9b134e.js" defer></script>
+	<script src="/theme/docsy/de/assets/nav-toggle.6bc5dbe8.js" defer></script>
+	<script src="/theme/docsy/de/assets/toc-collapse.cb73e778.js" defer></script>
+	<script src="/theme/docsy/de/assets/tabs.24dffad6.js" defer></script>
+	<script src="/theme/docsy/de/assets/conditional-content-init.9ef1e0f9.js" defer></script>
+	<script src="/theme/docsy/de/assets/course-progress.3813411a.js" defer></script>
+	<script src="/theme/docsy/de/assets/prompt-init.774781de.js" defer></script>
+	<script src="/theme/docsy/de/assets/contact-form-init.7f7be308.js" defer></script>
 
-	<script src="/theme/docsy/de/assets/page-actions-init.js" defer></script>
+	<script src="/theme/docsy/de/assets/page-actions-init.e7dd88d0.js" defer></script>
 
 
 	<script src="/theme/docsy/de/assets/vendor/mermaid/mermaid.min.js"></script>
-	<script src="/theme/docsy/de/assets/mermaid-init.js"></script>
+	<script src="/theme/docsy/de/assets/mermaid-init.b2f3ed5c.js"></script>
 
 
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-	<script src="/theme/docsy/de/assets/math-init.js"></script>
+	<script src="/theme/docsy/de/assets/math-init.dcfdf611.js"></script>
 
 
 	<script src="/theme/docsy/de/assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
-	<script src="/theme/docsy/de/assets/openapi-init.js"></script>
+	<script src="/theme/docsy/de/assets/openapi-init.d059449d.js"></script>
 
 
 
-	<script src="/theme/docsy/de/assets/image-gallery-init.js" defer></script>
+	<script src="/theme/docsy/de/assets/image-gallery-init.fecaa494.js" defer></script>
 
 
 

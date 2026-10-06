@@ -612,7 +612,7 @@ keine Änderung an `bxsites.yaml` nötig:
 <head>
 	<meta charset="UTF-8">
 	<title>#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#</title>
-	<link rel="stylesheet" href="#variables.basePath#assets/theme/style.css">
+	<link rel="stylesheet" href="#themeAssetUrl( 'style.css' )#">
 </head>
 <body>
 	<header><a href="#variables.basePath#">#encodeForHTML( variables.siteConfig.name )#</a></header>
@@ -652,3 +652,40 @@ ein `if` um eine kleine Render-Funktion, alle gespeist aus Feldern, die
 bereits auf `variables.page` vorhanden sind), oder einen `assets/`-Ordner
 für dein eigenes CSS/JS, automatisch zur Build-Zeit nach
 `site/assets/theme/` kopiert.
+
+`themeAssetUrl( "style.css" )` (oben verwendet, statt eines fest codierten
+`assets/theme/style.css`) ist das, was das eigene CSS deines Themes
+[Content-Hash-Fingerprinting](../configuration.md#assets) nutzen lässt -
+`assets.fingerprint` (standardmäßig aktiv) bedeutet, dass jede Änderung,
+die du an dieser Datei vornimmst, beim nächsten Build einen neuen
+Dateinamen bekommt, sodass die Browser der Besucher nie eine veraltete,
+zwischengespeicherte Kopie ausliefern. Das funktioniert genauso für jede
+Top-Level-CSS- oder JS-Datei im eigenen `assets/`-Ordner deines Themes,
+nicht nur für `style.css` - ein Theme mit einer eigenen `assets/main.js`
+bindet sie auf dieselbe Weise ein:
+`<script src="themeAssetUrl( 'main.js' )"></script>`.
+`moduleAssetUrl( "copy-code.js" )` ist derselbe Helfer für die eigenen,
+themeunabhängigen, gemeinsam genutzten Skripte dieses Moduls (diejenigen,
+die das eigene `layout.bxm` jedes integrierten Themes über
+`variables.moduleAssetsDir` einbindet) - verwende ihn anstelle eines fest
+codierten `assets/copy-code.js`, wenn dein eigenes Theme eines davon
+direkt einbindet.
+
+Beide Helfer fingerprinten nur eine Datei, die *direkt* in diesem Ordner
+liegt - nie eine, die in einem Unterordner verschachtelt ist (ein eigenes
+`assets/fonts/` oder `assets/vendor/` etwa). Das ist Absicht: Eine Datei,
+auf die *indirekt* von einer deiner Top-Level-Dateien aus verwiesen wird
+(ein `@font-face url(...)`, ein CSS-`@import`), würde kaputtgehen, wenn
+sie umbenannt würde, ohne dass auch jede Stelle, die unter dem alten
+Namen darauf verweist, mit umgeschrieben wird - also rührt dies diese
+Dateien niemals an. Wird einer der beiden Helfer für eine Datei
+aufgerufen, die noch nicht existiert, oder bei deaktiviertem
+`assets.fingerprint`, greift exakt der heutige, unveränderte Pfad als
+Fallback - nie ein Fehler.
+
+Jedes `.bxm` (integriert oder eigen), das stattdessen einen fest
+codierten Pfad hart codiert, statt einen der beiden Helfer aufzurufen,
+bricht dadurch nicht, bustet aber auch nicht automatisch den Cache - und
+ein Build gibt jetzt eine einzeilige, nicht fatale Warnung aus, die die
+betreffende Datei benennt, wenn genau das erkannt wird, damit ein solches
+Theme nicht stillschweigend veraltet.

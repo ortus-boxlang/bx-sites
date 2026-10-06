@@ -612,7 +612,7 @@ arriba), sin necesidad de cambiar `bxsites.yaml`:
 <head>
 	<meta charset="UTF-8">
 	<title>#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#</title>
-	<link rel="stylesheet" href="#variables.basePath#assets/theme/style.css">
+	<link rel="stylesheet" href="#themeAssetUrl( 'style.css' )#">
 </head>
 <body>
 	<header><a href="#variables.basePath#">#encodeForHTML( variables.siteConfig.name )#</a></header>
@@ -652,3 +652,38 @@ pequeña función de renderizado, todas impulsadas por campos ya presentes
 en `variables.page`), o una carpeta `assets/` para tu propio CSS/JS,
 copiada a `site/assets/theme/` automáticamente en el momento de la
 construcción.
+
+`themeAssetUrl( "style.css" )` (usado arriba, en lugar de un
+`assets/theme/style.css` fijo) es lo que hace que el propio CSS de tu
+tema adopte el
+[fingerprinting por hash de contenido](../configuration.md#assets) -
+`assets.fingerprint` (activo por defecto) significa que cada edición que
+hagas a ese archivo obtiene un nombre de archivo nuevo en la siguiente
+construcción, así que los navegadores de los visitantes nunca sirven una
+copia obsoleta en caché. Funciona igual para cualquier archivo CSS o JS
+de nivel superior en la propia carpeta `assets/` de tu tema, no solo para
+`style.css` - un tema con su propio `assets/main.js` lo enlaza de la
+misma forma: `<script src="themeAssetUrl( 'main.js' )"></script>`.
+`moduleAssetUrl( "copy-code.js" )` es el mismo helper para los propios
+scripts compartidos e independientes del tema de este módulo (los que el
+propio `layout.bxm` de cada tema incorporado enlaza mediante
+`variables.moduleAssetsDir`) - úsalo en lugar de fijar
+`assets/copy-code.js` si tu propio tema enlaza uno directamente.
+
+Ambos helpers solo le asignan huella digital a un archivo que esté
+*directamente* dentro de esa carpeta - nunca a uno anidado en un
+subdirectorio (tu propio `assets/fonts/` o `assets/vendor/`, por
+ejemplo). Eso es intencional: un archivo referenciado *indirectamente*
+por uno de tus archivos de nivel superior (un `@font-face url(...)`, un
+`@import` de CSS) se rompería si se renombrara sin reescribir también
+cada lugar que lo referencia por su antiguo nombre, así que esto nunca
+toca esos archivos. Llamar a cualquiera de los dos helpers con un
+archivo que todavía no existe, o con `assets.fingerprint` desactivado,
+recurre exactamente a la ruta fija de hoy - nunca a un error.
+
+Cualquier `.bxm` (incorporado o personalizado) que en su lugar fije una
+ruta plana en vez de llamar a uno de estos dos helpers no se romperá,
+pero tampoco invalidará la caché automáticamente - y una construcción
+ahora imprime una advertencia no fatal de una sola línea que nombra el
+archivo cuando detecta exactamente eso, para que un tema como este no se
+quede obsoleto en silencio.

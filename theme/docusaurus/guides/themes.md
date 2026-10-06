@@ -557,7 +557,7 @@ change needed:
 <head>
 	<meta charset="UTF-8">
 	<title>#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#</title>
-	<link rel="stylesheet" href="#variables.basePath##variables.siteConfig.theme.styleUrl ?: 'assets/theme/style.css'#">
+	<link rel="stylesheet" href="#themeAssetUrl( 'style.css' )#">
 </head>
 <body>
 	<header><a href="#variables.basePath#">#encodeForHTML( variables.siteConfig.name )#</a></header>
@@ -595,11 +595,31 @@ links (`page.bxm` in any built-in theme shows the pattern - each is just an
 on `variables.page`), or an `assets/` folder for your own CSS/JS, copied to
 `site/assets/theme/` automatically at build time.
 
-The `variables.siteConfig.theme.styleUrl ?: 'assets/theme/style.css'`
-pattern used above (rather than a hardcoded `assets/theme/style.css`) is
-what makes your theme's own `assets/style.css` pick up [content-hash
-fingerprinting](../configuration.md#assets) - `assets.fingerprint` (on by
-default) means every edit you make to that CSS gets a new filename on the
-next build, so visitors' browsers never serve a stale cached copy. Any
-`.bxm` (built-in or custom) that hardcodes the plain path instead won't
-break, it just won't bust caches automatically when the CSS changes.
+`themeAssetUrl( "style.css" )` (used above, instead of a hardcoded
+`assets/theme/style.css`) is what makes your theme's own CSS pick up
+[content-hash fingerprinting](../configuration.md#assets) -
+`assets.fingerprint` (on by default) means every edit you make to that
+file gets a new filename on the next build, so visitors' browsers never
+serve a stale cached copy. It works the same way for any top-level CSS or
+JS file in your theme's own `assets/` folder, not just `style.css` - a
+theme with its own `assets/main.js` links it the same way:
+`<script src="themeAssetUrl( 'main.js' )"></script>`. `moduleAssetUrl( "copy-code.js" )`
+is the same helper for this module's own shared, theme-independent
+scripts (the ones every built-in theme's own `layout.bxm` links via
+`variables.moduleAssetsDir`) - use it instead of hardcoding
+`assets/copy-code.js` if your own theme links one directly.
+
+Both helpers only fingerprint a file that sits *directly* inside that
+folder - never one nested in a subdirectory (your own `assets/fonts/` or
+`assets/vendor/`, say). That's deliberate: a file referenced *indirectly*
+by one of your top-level files (a `@font-face url(...)`, a CSS `@import`)
+would break if renamed without also rewriting every place that references
+it by its old name, so this never touches those. Calling either helper on
+a file that doesn't exist yet, or with `assets.fingerprint` off, falls back
+to today's exact plain path - never an error.
+
+Any `.bxm` (built-in or custom) that hardcodes a plain path instead of
+calling one of these two helpers won't break, but it won't bust caches
+automatically either - and a build now prints a one-line, non-fatal
+warning naming the file when it detects exactly that, so a theme like this
+one doesn't go stale silently.

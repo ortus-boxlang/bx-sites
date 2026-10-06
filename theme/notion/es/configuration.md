@@ -960,16 +960,30 @@ completo, incluido lo que deliberadamente no está cubierto (AVIF, GIFs
 animados, SVGs).
 
 - `assets.fingerprint` - `true` (el valor por defecto). Asigna un nombre
-  con hash de contenido a cada variante de imagen generada y cada paquete
-  CSS/JS (por ejemplo, `screenshot-800w.a3f9c2e1.webp`,
-  `bundle.a3f9c2e1.css`), de modo que puedan servirse con cabeceras de
-  caché seguras y de larga duración - una construcción del proyecto solo
-  cambia el propio nombre del archivo cuando su contenido realmente
-  cambia. No renombra los archivos originales propios de un proyecto bajo
-  `docs/assets/` - solo se le asigna huella digital a la salida generada
-  por el pipeline, así que cualquier otra cosa que referencie un recurso
-  por su nombre de archivo simple (una tarjeta de descarga `::: file`, un
-  enlace de markdown en bruto) sigue funcionando sin cambios.
+  con hash de contenido a cada variante de imagen generada, cada paquete
+  CSS/JS y cualquier archivo CSS/JS de nivel superior ubicado
+  directamente dentro de la propia carpeta `assets/` del tema activo o de
+  la propia carpeta `assets/` compartida de este módulo (por ejemplo,
+  `screenshot-800w.a3f9c2e1.webp`, `bundle.a3f9c2e1.css`,
+  `style.a3f9c2e1.css`, `copy-code.a3f9c2e1.js`), de modo que puedan
+  servirse con cabeceras de caché seguras y de larga duración - una
+  construcción del proyecto solo cambia el propio nombre de un archivo
+  cuando su contenido realmente cambia. Esto significa que una
+  actualización de tema - una mejora de un tema incorporado, o un autor
+  personalizado editando el CSS/JS de su propio tema - invalida
+  automáticamente la caché del navegador de cada visitante en el
+  siguiente despliegue, sin ningún paso manual de versionado, siempre que
+  el propio `layout.bxm` del tema enlace ese archivo mediante
+  `themeAssetUrl()`/`moduleAssetUrl()` en lugar de una ruta fija - consulta
+  [Temas](guides/themes.md#escribir-un-tema-desde-cero). No renombra los
+  archivos originales propios de un proyecto bajo `docs/assets/`, ni nada
+  dentro de un subdirectorio de la propia carpeta `assets/` de un tema -
+  solo se le asigna huella digital a la salida generada por el pipeline y
+  a los propios archivos de nivel superior de un tema, así que cualquier
+  otra cosa que referencie un recurso por su nombre de archivo simple
+  (una tarjeta de descarga `::: file`, un enlace de markdown en bruto, el
+  propio `@font-face`/`@import` de un tema) sigue funcionando sin
+  cambios.
 - `assets.bundle` - `true` (el valor por defecto). Concatena
   `extraCss`/`extraJs` en un único archivo con huella digital cada uno -
   BoxLang/JVM puro, sin cadena de herramientas de Node/esbuild. Recurre

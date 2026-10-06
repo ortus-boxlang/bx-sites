@@ -63,6 +63,18 @@ archivo convencionales de arriba), qué carpetas de recursos (`css/`,
 `js/`, `static/`, ...) se copiaron tal cual en `.themes/<name>/assets/`, y
 una lista numerada de todo lo que necesita revisión manual.
 
+Una carpeta `css/` o `js/` copiada es uno de esos elementos: todo lo que
+hay bajo `.themes/<name>/assets/css/`/`assets/js/` **no** tiene la caché
+invalidada, ya que el
+[fingerprinting](../configuration.md#assets) solo cubre un archivo que
+esté directamente dentro de la propia carpeta `assets/` de un tema,
+nunca uno anidado en un subdirectorio. Para asignarle huella digital a tu
+hoja de estilo/script principal, muévelo directamente a `assets/` (por
+ejemplo, `assets/style.css`) y referénciarlo desde el `layout.bxm`
+convertido con `themeAssetUrl( "style.css" )` en lugar de la ruta que
+haya conservado el traductor - consulta
+[Temas](themes.md#escribir-un-tema-desde-cero).
+
 Dentro de un archivo de plantilla, esto es un **traductor mecánico de
 mejor esfuerzo** (`JinjaLikeTranslator.bx` para la sintaxis Jinja2/Liquid
 compartida de mkdocs/jekyll, `GoTemplateTranslator.bx` para las plantillas

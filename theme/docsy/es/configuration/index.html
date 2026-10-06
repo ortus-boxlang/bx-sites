@@ -71,7 +71,7 @@
 	<script>window.__BXSITES_BASE_PATH__ = "/theme/docsy/es/";</script>
 	<script>window.__BXSITES_SEARCH_NO_RESULTS__ = "No\x20se\x20encontraron\x20resultados.";</script>
 	<script src="/theme/docsy/es/assets/vendor/minisearch/minisearch.js"></script>
-	<script src="/theme/docsy/es/assets/search.js" defer></script>
+	<script src="/theme/docsy/es/assets/search.f14e08a2.js" defer></script>
 
 
 
@@ -928,16 +928,30 @@ completo, incluido lo que deliberadamente no está cubierto (AVIF, GIFs
 animados, SVGs).</p>
 <ul>
 <li><code>assets.fingerprint</code> - <code>true</code> (el valor por defecto). Asigna un nombre
-con hash de contenido a cada variante de imagen generada y cada paquete
-CSS/JS (por ejemplo, <code>screenshot-800w.a3f9c2e1.webp</code>,
-<code>bundle.a3f9c2e1.css</code>), de modo que puedan servirse con cabeceras de
-caché seguras y de larga duración - una construcción del proyecto solo
-cambia el propio nombre del archivo cuando su contenido realmente
-cambia. No renombra los archivos originales propios de un proyecto bajo
-<code>docs/assets/</code> - solo se le asigna huella digital a la salida generada
-por el pipeline, así que cualquier otra cosa que referencie un recurso
-por su nombre de archivo simple (una tarjeta de descarga <code>::: file</code>, un
-enlace de markdown en bruto) sigue funcionando sin cambios.</li>
+con hash de contenido a cada variante de imagen generada, cada paquete
+CSS/JS y cualquier archivo CSS/JS de nivel superior ubicado
+directamente dentro de la propia carpeta <code>assets/</code> del tema activo o de
+la propia carpeta <code>assets/</code> compartida de este módulo (por ejemplo,
+<code>screenshot-800w.a3f9c2e1.webp</code>, <code>bundle.a3f9c2e1.css</code>,
+<code>style.a3f9c2e1.css</code>, <code>copy-code.a3f9c2e1.js</code>), de modo que puedan
+servirse con cabeceras de caché seguras y de larga duración - una
+construcción del proyecto solo cambia el propio nombre de un archivo
+cuando su contenido realmente cambia. Esto significa que una
+actualización de tema - una mejora de un tema incorporado, o un autor
+personalizado editando el CSS/JS de su propio tema - invalida
+automáticamente la caché del navegador de cada visitante en el
+siguiente despliegue, sin ningún paso manual de versionado, siempre que
+el propio <code>layout.bxm</code> del tema enlace ese archivo mediante
+<code>themeAssetUrl()</code>/<code>moduleAssetUrl()</code> en lugar de una ruta fija - consulta
+<a href="/theme/docsy/es/guides/themes/index.html#escribir-un-tema-desde-cero">Temas</a>. No renombra los
+archivos originales propios de un proyecto bajo <code>docs/assets/</code>, ni nada
+dentro de un subdirectorio de la propia carpeta <code>assets/</code> de un tema -
+solo se le asigna huella digital a la salida generada por el pipeline y
+a los propios archivos de nivel superior de un tema, así que cualquier
+otra cosa que referencie un recurso por su nombre de archivo simple
+(una tarjeta de descarga <code>::: file</code>, un enlace de markdown en bruto, el
+propio <code>@font-face</code>/<code>@import</code> de un tema) sigue funcionando sin
+cambios.</li>
 <li><code>assets.bundle</code> - <code>true</code> (el valor por defecto). Concatena
 <code>extraCss</code>/<code>extraJs</code> en un único archivo con huella digital cada uno -
 BoxLang/JVM puro, sin cadena de herramientas de Node/esbuild. Recurre
@@ -1234,7 +1248,7 @@ include = [ &quot;routes&quot;, &quot;handlers&quot;, &quot;models&quot;, &quot;
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/docsy/es/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Oct 5, 2026, 8&#x3a;09&#x3a;04 AM</span></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/configuration.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/docsy/es/configuration.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Oct 6, 2026, 10&#x3a;41&#x3a;09 AM</span></div>
 
 			</article>
 
@@ -1272,37 +1286,37 @@ include = [ &quot;routes&quot;, &quot;handlers&quot;, &quot;models&quot;, &quot;
 	</footer>
 
 	<script src="/theme/docsy/es/assets/vendor/highlight/highlight.min.js"></script>
-	<script src="/theme/docsy/es/assets/highlight-boxlang.js"></script>
+	<script src="/theme/docsy/es/assets/highlight-boxlang.c59b5de4.js"></script>
 	<script>hljs.highlightAll();</script>
-	<script src="/theme/docsy/es/assets/code-lines.js"></script>
-	<script src="/theme/docsy/es/assets/copy-code.js" defer></script>
-	<script src="/theme/docsy/es/assets/admonition-collapse.js" defer></script>
-	<script src="/theme/docsy/es/assets/nav-toggle.js" defer></script>
-	<script src="/theme/docsy/es/assets/toc-collapse.js" defer></script>
-	<script src="/theme/docsy/es/assets/tabs.js" defer></script>
-	<script src="/theme/docsy/es/assets/conditional-content-init.js" defer></script>
-	<script src="/theme/docsy/es/assets/course-progress.js" defer></script>
-	<script src="/theme/docsy/es/assets/prompt-init.js" defer></script>
-	<script src="/theme/docsy/es/assets/contact-form-init.js" defer></script>
+	<script src="/theme/docsy/es/assets/code-lines.66ad0c90.js"></script>
+	<script src="/theme/docsy/es/assets/copy-code.5bd76adc.js" defer></script>
+	<script src="/theme/docsy/es/assets/admonition-collapse.df9b134e.js" defer></script>
+	<script src="/theme/docsy/es/assets/nav-toggle.6bc5dbe8.js" defer></script>
+	<script src="/theme/docsy/es/assets/toc-collapse.cb73e778.js" defer></script>
+	<script src="/theme/docsy/es/assets/tabs.24dffad6.js" defer></script>
+	<script src="/theme/docsy/es/assets/conditional-content-init.9ef1e0f9.js" defer></script>
+	<script src="/theme/docsy/es/assets/course-progress.3813411a.js" defer></script>
+	<script src="/theme/docsy/es/assets/prompt-init.774781de.js" defer></script>
+	<script src="/theme/docsy/es/assets/contact-form-init.7f7be308.js" defer></script>
 
-	<script src="/theme/docsy/es/assets/page-actions-init.js" defer></script>
+	<script src="/theme/docsy/es/assets/page-actions-init.e7dd88d0.js" defer></script>
 
 
 	<script src="/theme/docsy/es/assets/vendor/mermaid/mermaid.min.js"></script>
-	<script src="/theme/docsy/es/assets/mermaid-init.js"></script>
+	<script src="/theme/docsy/es/assets/mermaid-init.b2f3ed5c.js"></script>
 
 
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-	<script src="/theme/docsy/es/assets/math-init.js"></script>
+	<script src="/theme/docsy/es/assets/math-init.dcfdf611.js"></script>
 
 
 	<script src="/theme/docsy/es/assets/vendor/swagger-ui/swagger-ui-bundle.js"></script>
-	<script src="/theme/docsy/es/assets/openapi-init.js"></script>
+	<script src="/theme/docsy/es/assets/openapi-init.d059449d.js"></script>
 
 
 
-	<script src="/theme/docsy/es/assets/image-gallery-init.js" defer></script>
+	<script src="/theme/docsy/es/assets/image-gallery-init.fecaa494.js" defer></script>
 
 
 

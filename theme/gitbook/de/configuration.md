@@ -970,15 +970,29 @@ einschließlich dessen, was bewusst nicht abgedeckt wird (AVIF, animierte
 GIFs, SVGs).
 
 - `assets.fingerprint` - `true` (Standard). Benennt jede erzeugte
-  Bildvariante und jedes CSS/JS-Bundle nach einem Inhalts-Hash (z. B.
-  `screenshot-800w.a3f9c2e1.webp`, `bundle.a3f9c2e1.css`), sodass sie mit
-  sicheren, weit in der Zukunft liegenden Cache-Headern ausgeliefert
-  werden können - der Build eines Projekts ändert den eigenen Dateinamen
-  nur, wenn sich dessen Inhalt tatsächlich ändert. Benennt die eigenen
-  Originaldateien eines Projekts unter `docs/assets/` nicht um - nur von
-  der Pipeline erzeugte Ausgabe wird fingerprinted, sodass alles andere,
-  was ein Asset über seinen einfachen Dateinamen referenziert (eine
-  `::: file`-Download-Card, ein roher Markdown-Link), unverändert
+  Bildvariante, jedes CSS/JS-Bundle und jede Top-Level-CSS/JS-Datei direkt
+  innerhalb des eigenen `assets/`-Ordners des aktiven Themes oder des
+  eigenen gemeinsamen `assets/`-Ordners dieses Moduls nach einem
+  Inhalts-Hash (z. B. `screenshot-800w.a3f9c2e1.webp`,
+  `bundle.a3f9c2e1.css`, `style.a3f9c2e1.css`, `copy-code.a3f9c2e1.js`),
+  sodass sie mit sicheren, weit in der Zukunft liegenden Cache-Headern
+  ausgeliefert werden können - der Build eines Projekts ändert den
+  eigenen Dateinamen nur, wenn sich dessen Inhalt tatsächlich ändert. Das
+  bedeutet, dass ein Theme-Update - ein Upgrade eines integrierten
+  Themes, oder ein eigener Autor, der das CSS/JS seines eigenen Themes
+  bearbeitet - beim nächsten Deploy automatisch den Browser-Cache jedes
+  Besuchers invalidiert, ganz ohne manuellen Versionierungsschritt,
+  solange das eigene `layout.bxm` des Themes diese Datei über
+  `themeAssetUrl()`/`moduleAssetUrl()` statt über einen fest codierten
+  Pfad einbindet - siehe
+  [Themes](guides/themes.md#ein-theme-von-grund-auf-schreiben). Benennt
+  die eigenen Originaldateien eines Projekts unter `docs/assets/` nicht
+  um, ebenso wenig wie alles innerhalb eines Unterordners des eigenen
+  `assets/`-Ordners eines Themes - nur von der Pipeline erzeugte Ausgabe
+  und die eigenen Top-Level-Dateien eines Themes werden fingerprinted,
+  sodass alles andere, was ein Asset über seinen einfachen Dateinamen
+  referenziert (eine `::: file`-Download-Card, ein roher Markdown-Link,
+  das eigene `@font-face`/`@import` eines Themes), unverändert
   weiterfunktioniert.
 - `assets.bundle` - `true` (Standard). Verkettet `extraCss`/`extraJs` je
   zu einer fingerprinted Datei - reines BoxLang/JVM, keine
