@@ -30,9 +30,6 @@ jobs:
           distribution: "temurin"
           java-version: "21"
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-
       # Strips the "gradle-plugin-v" tag prefix down to a real version
       # (e.g. "gradle-plugin-v0.1.0" -> "0.1.0") - the Portal rejects
       # "-SNAPSHOT", which is what build.gradle.kts defaults to otherwise.
