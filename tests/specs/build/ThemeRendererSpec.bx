@@ -115,6 +115,98 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			describe( "themeAssetUrl()/moduleAssetUrl() (the cache-busting mixin)", function() {
+
+				it( "resolves to the fingerprinted URL when config.theme.assetUrls/moduleAssetUrls are populated", function() {
+					var root = newProjectRoot();
+					directoryCreate( root & "/docs/.theme", true, true );
+					fileWrite(
+						root & "/docs/.theme/layout.bxm",
+						'<bx:output>##themeAssetUrl( "style.css" )## | ##moduleAssetUrl( "copy-code.js" )##<bx:include template="##variables.themeDir##/##variables.bodyFile##"></bx:output>'
+					);
+					fileWrite( root & "/docs/.theme/page.bxm", "<bx:output>body</bx:output>" );
+					var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+					var config = {
+						name  : "My Site",
+						theme : { assetUrls : { "style.css" : "assets/theme/style.deadbeef.css" } },
+						moduleAssetUrls : { "copy-code.js" : "assets/copy-code.cafef00d.js" }
+					};
+
+					var html = renderer.renderPage( { title : "P", contentHtml : "" }, [], config, themeDir );
+
+					expect( html ).toInclude( "assets/theme/style.deadbeef.css" );
+					expect( html ).toInclude( "assets/copy-code.cafef00d.js" );
+				} );
+
+				it( "falls back to the plain, unhashed path when no manifest entry exists for that file", function() {
+					var root = newProjectRoot();
+					directoryCreate( root & "/docs/.theme", true, true );
+					fileWrite(
+						root & "/docs/.theme/layout.bxm",
+						'<bx:output>##themeAssetUrl( "style.css" )## | ##moduleAssetUrl( "copy-code.js" )##<bx:include template="##variables.themeDir##/##variables.bodyFile##"></bx:output>'
+					);
+					fileWrite( root & "/docs/.theme/page.bxm", "<bx:output>body</bx:output>" );
+					var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+
+					var html = renderer.renderPage( { title : "P", contentHtml : "" }, [], { name : "My Site" }, themeDir );
+
+					expect( html ).toInclude( "assets/theme/style.css" );
+					expect( html ).toInclude( "assets/copy-code.js" );
+				} );
+
+			} );
+
+			describe( "findCacheBustingGaps() (the non-fatal theme authoring warning)", function() {
+
+				it( "flags a layout that hardcodes assets/theme/... instead of calling themeAssetUrl()", function() {
+					var root = newProjectRoot();
+					directoryCreate( root & "/docs/.theme", true, true );
+					fileWrite( root & "/docs/.theme/layout.bxm", '<link rel="stylesheet" href="/assets/theme/style.css">' );
+					fileWrite( root & "/docs/.theme/page.bxm", "<bx:output>body</bx:output>" );
+					makePublic( renderer, "findCacheBustingGaps" );
+
+					var gaps = renderer.findCacheBustingGaps( root & "/docs/.theme" );
+
+					expect( gaps.len() ).toBeGT( 0 );
+					expect( gaps[ 1 ] ).toInclude( "layout.bxm" );
+				} );
+
+				it( "flags a layout that hardcodes a known shared module script path instead of calling moduleAssetUrl()", function() {
+					var root = newProjectRoot();
+					directoryCreate( root & "/docs/.theme", true, true );
+					fileWrite( root & "/docs/.theme/layout.bxm", '<script src="/assets/copy-code.js" defer></script>' );
+					fileWrite( root & "/docs/.theme/page.bxm", "<bx:output>body</bx:output>" );
+					makePublic( renderer, "findCacheBustingGaps" );
+
+					var gaps = renderer.findCacheBustingGaps( root & "/docs/.theme" );
+
+					expect( gaps.len() ).toBeGT( 0 );
+				} );
+
+				it( "does not flag a layout using themeAssetUrl()/moduleAssetUrl(), or the older styleUrl back-compat idiom", function() {
+					var root = newProjectRoot();
+					directoryCreate( root & "/docs/.theme", true, true );
+					fileWrite(
+						root & "/docs/.theme/layout.bxm",
+						'<link rel="stylesheet" href="##themeAssetUrl( ''style.css'' )##"><script src="##moduleAssetUrl( ''copy-code.js'' )##"></script>'
+					);
+					fileWrite( root & "/docs/.theme/page.bxm", "<bx:output>body</bx:output>" );
+					makePublic( renderer, "findCacheBustingGaps" );
+
+					expect( renderer.findCacheBustingGaps( root & "/docs/.theme" ).len() ).toBe( 0 );
+				} );
+
+				it( "does not flag any of the built-in themes", function() {
+					var root = newProjectRoot();
+					makePublic( renderer, "findCacheBustingGaps" );
+					for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
+						var themeDir = renderer.resolveThemeDir( themeName, root );
+						expect( renderer.findCacheBustingGaps( themeDir ).len() ).toBe( 0 );
+					}
+				} );
+
+			} );
+
 			it( "renders a page through the built-in bootstrap theme, including title, nav and content", function() {
 				var root = newProjectRoot();
 				var themeDir = renderer.resolveThemeDir( "bootstrap", root );

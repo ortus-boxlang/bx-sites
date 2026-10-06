@@ -35,7 +35,16 @@
  *     project's own `theme/` override is then free to handle itself - see
  *     docs/guides/search.md.
  *   - `assets/` (optional) - theme CSS/JS, copied to `site/assets/theme/` by
- *     BuildPipeline's asset pipeline.
+ *     BuildPipeline's asset pipeline. A layout should link any file directly
+ *     inside this folder (not a subdirectory - see
+ *     `BuildPipeline.buildTopLevelAssetManifest()`'s own docblock for why)
+ *     through `themeAssetUrl( "style.css" )` rather than a hand-written
+ *     `<link>`/`<script>` path - the same call resolves basePath AND
+ *     cache-busting fingerprinting together, for a built-in theme or a
+ *     custom one alike. `moduleAssetUrl( "copy-code.js" )` is the same
+ *     thing for this module's own shared, theme-independent scripts
+ *     (`variables.moduleAssetsDir`'s contents) - see docs/guides/themes.md's
+ *     "Writing a theme from scratch" section.
  *   - `blog.bxm`/`blog-page.bxm` (both optional) - alternate outer shell/body
  *     templates a theme can add on top of the required pair above. Neither
  *     is enforced by `assertThemeProvider()` below - a theme missing either
@@ -206,7 +215,84 @@ class {
 			)
 		}
 
+		for ( var gap in findCacheBustingGaps( dir ) ) {
+			// A literal "#" (the docs anchor below) can't appear bare in a
+			// BoxLang string - it starts an interpolation - so char( 35 )
+			// builds it instead, same convention as every other
+			// char( 35 )-using string in this codebase.
+			println( "Warning: " & gap & " - see docs/guides/themes.md" & char( 35 ) & "writing-a-theme-from-scratch for themeAssetUrl()/moduleAssetUrl()" )
+		}
+
 		return dir
+	}
+
+	/**
+	 * Non-fatal, best-effort scan for the exact silent-regression class
+	 * that motivated `themeAssetUrl()`/`moduleAssetUrl()`
+	 * (RendererEncapsulator.bx) in the first place: a theme's own template
+	 * source hand-writing a path to its own CSS/JS (or one of this
+	 * module's shared scripts) instead of calling either helper, so a
+	 * content edit never gets a new filename and a browser can go on
+	 * serving a stale cached copy forever - with no build error or broken
+	 * page to point at the mistake. A theme using the older
+	 * `variables.siteConfig.theme.styleUrl ?: '...'` idiom (pre-dating
+	 * `themeAssetUrl()`) is NOT flagged - BuildPipeline.bx still populates
+	 * `theme.styleUrl` for exactly this backward-compat case, so it's
+	 * outdated style, not a cache-busting gap.
+	 *
+	 * Deliberately simple/textual rather than a real `.bxm` parse - a false
+	 * negative (a gap this misses) leaves today's exact silent behavior,
+	 * no worse than before this existed; a false positive is just a noisy
+	 * but harmless println(), never a build failure either way.
+	 *
+	 * @themeDir Absolute/virtual path to an already-contract-validated theme folder
+	 *
+	 * @return Array of human-readable warning strings, one per file with a detected gap - empty when none found
+	 */
+	private array function findCacheBustingGaps( required string themeDir ) {
+		var gaps = []
+		var candidateFiles = [ "layout.bxm", "page.bxm", "blog.bxm", "blog-page.bxm", "home.bxm", "search.bxm" ]
+		// This module's own shared, theme-independent assets (BuildPipeline.bx's
+		// copyAssetsFresh()) - kept in sync by hand since both lists are short
+		// and change rarely; a new shared asset simply isn't flagged here
+		// until added to both.
+		var moduleAssetNames = [
+			"copy-code.js", "admonition-collapse.js", "nav-toggle.js", "toc-collapse.js",
+			"highlight-boxlang.js", "tabs.js", "conditional-content-init.js", "course-progress.js",
+			"prompt-init.js", "contact-form-init.js", "code-lines.js", "home.css",
+			"search.js", "mermaid-init.js", "math-init.js", "openapi-init.js",
+			"image-gallery-init.js", "page-actions-init.js", "cloud-content-init.js", "comments-init.js"
+		]
+
+		for ( var fileName in candidateFiles ) {
+			var filePath = arguments.themeDir & "/" & fileName
+			if ( !fileExists( filePath ) ) {
+				continue
+			}
+
+			var source = fileRead( filePath )
+			var alreadyCacheBusted = source.findNoCase( "themeAssetUrl(" )
+				|| source.findNoCase( "moduleAssetUrl(" )
+				|| source.findNoCase( ".styleUrl" )
+
+			if ( alreadyCacheBusted ) {
+				continue
+			}
+
+			if ( source.find( "assets/theme/" ) ) {
+				gaps.append( "#fileName# references assets/theme/... directly, with no cache-busting" )
+				continue
+			}
+
+			for ( var assetName in moduleAssetNames ) {
+				if ( source.findNoCase( "assets/" & assetName ) ) {
+					gaps.append( "#fileName# references assets/#assetName# directly, with no cache-busting" )
+					break
+				}
+			}
+		}
+
+		return gaps
 	}
 
 	/**

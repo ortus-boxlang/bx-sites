@@ -615,7 +615,7 @@ necessaria:
 <head>
 	<meta charset="UTF-8">
 	<title>#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#</title>
-	<link rel="stylesheet" href="#variables.basePath#assets/theme/style.css">
+	<link rel="stylesheet" href="#themeAssetUrl( 'style.css' )#">
 </head>
 <body>
 	<header><a href="#variables.basePath#">#encodeForHTML( variables.siteConfig.name )#</a></header>
@@ -654,3 +654,38 @@ mostra lo schema - ognuno è solo un `if` intorno a una piccola funzione di
 rendering, tutti guidati da campi già presenti su `variables.page`),
 oppure una cartella `assets/` per il tuo CSS/JS, copiata automaticamente
 in `site/assets/theme/` al momento del build.
+
+`themeAssetUrl( "style.css" )` (usato sopra, invece di un
+`assets/theme/style.css` fisso) è ciò che fa sì che il CSS proprio del
+tuo tema adotti l'
+[impronta digitale basata sull'hash del contenuto](../configuration.md#assets) -
+`assets.fingerprint` (attivo per impostazione predefinita) significa che
+ogni modifica che apporti a quel file ottiene un nuovo nome al build
+successivo, così i browser dei visitatori non servono mai una copia
+obsoleta dalla cache. Funziona allo stesso modo per qualsiasi file CSS o
+JS di primo livello nella cartella `assets/` propria del tuo tema, non
+solo per `style.css` - un tema con un proprio `assets/main.js` lo
+collega allo stesso modo:
+`<script src="themeAssetUrl( 'main.js' )"></script>`.
+`moduleAssetUrl( "copy-code.js" )` è lo stesso helper per gli script
+condivisi e indipendenti dal tema propri di questo modulo (quelli che il
+`layout.bxm` proprio di ogni tema integrato collega tramite
+`variables.moduleAssetsDir`) - usalo al posto di un
+`assets/copy-code.js` fisso se il tuo tema ne collega uno direttamente.
+
+Entrambi gli helper assegnano l'impronta digitale solo a un file che si
+trova *direttamente* dentro quella cartella - mai a uno annidato in una
+sottocartella (una tua `assets/fonts/` o `assets/vendor/`, ad esempio).
+È una scelta deliberata: un file referenziato *indirettamente* da uno
+dei tuoi file di primo livello (un `@font-face url(...)`, un `@import`
+CSS) si romperebbe se rinominato senza riscrivere anche ogni punto che
+vi fa riferimento con il vecchio nome, quindi questo non tocca mai quei
+file. Chiamare uno dei due helper su un file che non esiste ancora,
+oppure con `assets.fingerprint` disattivato, ricade esattamente
+sull'attuale percorso fisso - mai su un errore.
+
+Qualsiasi `.bxm` (integrato o personalizzato) che fissa un percorso
+semplice invece di chiamare uno di questi due helper non si romperà, ma
+non invaliderà automaticamente la cache - e un build ora stampa un
+avviso non fatale di una riga che nomina il file quando rileva esattamente
+questo, così un tema come questo non diventa obsoleto in silenzio.

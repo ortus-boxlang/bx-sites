@@ -187,7 +187,16 @@ class {
 		// see canonicalUrlFor()'s own docblock.
 		var siteOrigin = len( urls.absolute ) ? left( urls.absolute, len( urls.absolute ) - len( urls.basePath ) ) : ""
 		var themeDir = variables.themeRenderer.resolveThemeDir( config.theme.name, root )
-		config.theme.styleUrl = resolveThemeStyleUrl( themeDir, config.assets.fingerprint )
+		config.theme.assetUrls = buildTopLevelAssetManifest( themeDir & "/assets", "assets/theme", config.assets.fingerprint )
+		// Back-compat for any layout (built-in, pre-upgrade, or a custom
+		// theme copied from an older guide) still using the original
+		// `variables.siteConfig.theme.styleUrl ?: 'assets/theme/style.css'`
+		// idiom instead of calling `themeAssetUrl( "style.css" )` - see
+		// buildTopLevelAssetManifest()'s own docblock for why this is now
+		// just one entry of a larger manifest rather than its own
+		// special-cased lookup.
+		config.theme.styleUrl = config.theme.assetUrls[ "style.css" ] ?: "assets/theme/style.css"
+		config.moduleAssetUrls = buildTopLevelAssetManifest( moduleAssetsDir(), "assets", config.assets.fingerprint )
 
 		// Prepare the site output directory. If it exists, delete it first to ensure a clean build.
 		var siteDir = root & "/site"
@@ -1032,36 +1041,65 @@ class {
 	}
 
 	/**
-	 * Fingerprints the theme's own `assets/style.css`, so a theme update -
-	 * a built-in theme upgraded along with the module, or a project's own
-	 * `theme/` override edited by hand - always reaches every visitor on
-	 * the next load instead of possibly serving a browser's stale cached
-	 * copy under the same unchanging filename forever (unlike `extraCss`/
-	 * `extraJs`, which already get this via applyAssetPipeline()'s own
-	 * `assetBundler.bundleCss()`/`bundleJs()`). Runs before renderDocTree()
-	 * ever writes a page (build()'s own call site), mutating `config.theme.styleUrl`
-	 * in place so every theme's own `layout.bxm` already has the final,
-	 * correct filename by the time it renders its own `<link>` tag -
-	 * copyAssets() calls this same method again when it actually copies
-	 * the file into `site/`, deterministic from the same source file, so
-	 * no value needs threading through the rest of the render pipeline
-	 * for this.
+	 * Fingerprints every top-level CSS/JS file directly inside `assetsDir` -
+	 * a theme's own `assets/` (built-in or custom alike - `assetsDir` is
+	 * just a path, this has no idea which kind it got) or this module's
+	 * own shared `resources/assets/` - so an edit to any of them always
+	 * reaches every visitor on the next load instead of possibly serving a
+	 * browser's stale cached copy under the same unchanging filename
+	 * forever (unlike `extraCss`/`extraJs`, which already get this via
+	 * applyAssetPipeline()'s own `assetBundler.bundleCss()`/`bundleJs()`).
 	 *
-	 * @themeDir Absolute path to the resolved theme folder (ThemeRenderer.resolveThemeDir()'s own output)
-	 * @fingerprintEnabled `config.assets.fingerprint` - `false` leaves the plain, unhashed filename (rewritten, never cache-skipped, on every build)
+	 * Deliberately NON-recursive: only files directly inside `assetsDir`
+	 * itself get a manifest entry - anything in a subdirectory (a theme's
+	 * own `assets/fonts/`, `assets/vendor/`, or similar) is left with its
+	 * original name untouched. A top-level file is the convention for
+	 * something a layout links to directly (`themeAssetUrl()`/
+	 * `moduleAssetUrl()`, both below); a subdirectory is assumed to hold
+	 * files referenced only *indirectly* - a `@font-face url(...)`, a CSS
+	 * `@import`, a JS `import`/sourcemap comment - by one of those
+	 * top-level files' own content. Renaming those without rewriting every
+	 * place that references them by its old name would break them outright,
+	 * exactly the risk AssetBundler.bx's own docblock already calls out for
+	 * why it never touches a project's original source file either - so
+	 * this stays scoped to what it can rename safely.
 	 *
-	 * @return "assets/theme/style.css" (fingerprinting off, or this theme has no assets/style.css of its own) or "assets/theme/style.<hash>.css"
+	 * Runs once before renderDocTree() ever writes a page (build()'s own
+	 * call site), so `config.theme.assetUrls`/`config.moduleAssetUrls` are
+	 * already final by the time any layout calls `themeAssetUrl()`/
+	 * `moduleAssetUrl()` to render its own `<link>`/`<script>` tags -
+	 * copyAssetsFresh() calls this same method again when it actually
+	 * copies the files into `site/`, deterministic from the same source
+	 * files, so no manifest needs threading through the rest of the render
+	 * pipeline for this.
+	 *
+	 * @assetsDir Absolute (or virtual module-mapping) path to the folder to scan - not required to exist
+	 * @siteRelativePrefix Prepended to every fingerprinted filename to build its final site-relative URL, e.g. `"assets/theme"` or `"assets"`
+	 * @fingerprintEnabled `config.assets.fingerprint` - `false` maps every file to its own plain, unhashed name (rewritten, never cache-skipped, on every build)
+	 *
+	 * @return Struct keyed by plain filename (`"style.css"`, `"main.js"`), each value that file's final site-relative URL
 	 */
-	private string function resolveThemeStyleUrl( required string themeDir, required boolean fingerprintEnabled ) {
-		var plainUrl = "assets/theme/style.css"
-		var styleCssPath = arguments.themeDir & "/assets/style.css"
-
-		if ( !arguments.fingerprintEnabled || !fileExists( styleCssPath ) ) {
-			return plainUrl
+	private struct function buildTopLevelAssetManifest( required string assetsDir, required string siteRelativePrefix, required boolean fingerprintEnabled ) {
+		var manifest = {}
+		if ( !directoryExists( arguments.assetsDir ) ) {
+			return manifest
 		}
 
-		var hash8 = variables.fingerprinter.hashOf( fileRead( styleCssPath ) )
-		return "assets/theme/" & variables.fingerprinter.fingerprint( "style.css", hash8 )
+		for ( var fileName in directoryList( arguments.assetsDir, false, "name" ) ) {
+			if ( !fileName.reFindNoCase( "\.(css|js)$" ) ) {
+				continue
+			}
+
+			if ( !arguments.fingerprintEnabled ) {
+				manifest[ fileName ] = arguments.siteRelativePrefix & "/" & fileName
+				continue
+			}
+
+			var hash8 = variables.fingerprinter.hashOf( fileRead( arguments.assetsDir & "/" & fileName ) )
+			manifest[ fileName ] = arguments.siteRelativePrefix & "/" & variables.fingerprinter.fingerprint( fileName, hash8 )
+		}
+
+		return manifest
 	}
 
 	/**
@@ -2373,19 +2411,7 @@ class {
 		var themeAssetsDir = arguments.themeDir & "/assets"
 		if ( directoryExists( themeAssetsDir ) ) {
 			directoryCopy( themeAssetsDir, arguments.siteDir & "/assets/theme", true )
-
-			// Renames the just-copied plain style.css to its fingerprinted
-			// name (resolveThemeStyleUrl() recomputes the identical hash
-			// from the same source file build() already used to pick the
-			// filename every rendered page's own <link> tag points at) -
-			// rather than leaving both the old plain name and the new
-			// hashed one sitting in site/, which would just be dead weight
-			// nothing ever links to.
-			var styleUrl = resolveThemeStyleUrl( arguments.themeDir, arguments.fingerprintEnabled )
-			var copiedStylePath = arguments.siteDir & "/assets/theme/style.css"
-			if ( styleUrl != "assets/theme/style.css" && fileExists( copiedStylePath ) ) {
-				fileMove( copiedStylePath, arguments.siteDir & "/" & styleUrl )
-			}
+			renameToFingerprintedNames( themeAssetsDir, arguments.siteDir & "/assets/theme", arguments.fingerprintEnabled )
 		}
 
 		directoryCreate( arguments.siteDir & "/assets", true, true )
@@ -2457,6 +2483,52 @@ class {
 			var cachedPath = bundle.cachedPath ?: ""
 			if ( len( cachedPath ) ) {
 				fileCopy( cachedPath, arguments.siteDir & "/assets/" & bundle.fileName )
+			}
+		}
+
+		// Renames whichever of the shared module scripts/styles above
+		// actually got copied this build to their fingerprinted names - a
+		// feature flag left off (e.g. mathEnabled = false) just means
+		// renameToFingerprintedNames() skips a manifest entry whose file
+		// was never copied in the first place, same as any other missing
+		// file (see its own docblock).
+		renameToFingerprintedNames( moduleAssetsDir(), arguments.siteDir & "/assets", arguments.fingerprintEnabled )
+	}
+
+	/**
+	 * Renames whichever files `copyAssetsFresh()` just copied into
+	 * `destDir` to the fingerprinted names `buildTopLevelAssetManifest()`
+	 * computes for that same `sourceDir` - recomputed here rather than
+	 * threaded through from build()'s own call, deterministic from the
+	 * same source files (buildTopLevelAssetManifest()'s own docblock), so
+	 * no manifest needs passing down through copyAssets()/copyAssetsFresh()'s
+	 * already-long argument lists for this. Silently skips any manifest
+	 * entry whose source file wasn't actually copied this build (a feature
+	 * flag left off, e.g. `mathEnabled = false` for `math-init.js`) - same
+	 * "missing file, nothing to rename" shape `resolveThemeStyleUrl()`
+	 * used to handle for the single-file style.css case this generalizes.
+	 *
+	 * @sourceDir The same absolute/virtual path buildTopLevelAssetManifest() scanned to build the manifest in the first place
+	 * @destDir Where copyAssetsFresh() just copied sourceDir's own files to
+	 * @fingerprintEnabled `config.assets.fingerprint`
+	 */
+	private void function renameToFingerprintedNames( required string sourceDir, required string destDir, required boolean fingerprintEnabled ) {
+		if ( !arguments.fingerprintEnabled ) {
+			return
+		}
+
+		var manifest = buildTopLevelAssetManifest( arguments.sourceDir, "", true )
+		for ( var fileName in manifest ) {
+			// buildTopLevelAssetManifest() was called with an empty prefix
+			// above, so its value is "/" & the fingerprinted filename alone.
+			var fingerprintedName = manifest[ fileName ].right( len( manifest[ fileName ] ) - 1 )
+			if ( fingerprintedName == fileName ) {
+				continue
+			}
+
+			var copiedPath = arguments.destDir & "/" & fileName
+			if ( fileExists( copiedPath ) ) {
+				fileMove( copiedPath, arguments.destDir & "/" & fingerprintedName )
 			}
 		}
 	}

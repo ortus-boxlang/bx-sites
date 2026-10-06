@@ -138,6 +138,41 @@ class extends="testbox.system.BaseSpec" {
 				expect( found ).toBeTrue();
 			} );
 
+			it( "warns that a copied css/ or js/ asset folder isn't cache-busted, but not for other asset folders", function() {
+				var sourceDir = newTempDir( "bxsites-import-source-" );
+				directoryCreate( sourceDir & "/css", true, true );
+				fileWrite( sourceDir & "/css/style.css", "body{}" );
+				directoryCreate( sourceDir & "/js", true, true );
+				fileWrite( sourceDir & "/js/main.js", "" );
+				directoryCreate( sourceDir & "/fonts", true, true );
+				fileWrite( sourceDir & "/fonts/font.woff2", "" );
+
+				var destDir = newTempDir( "bxsites-import-dest-" ) & "/blog1";
+				var result = importer.import(
+					sourceThemeDir : sourceDir,
+					destDir : destDir,
+					layoutCandidates : [],
+					contentCandidates : [],
+					assetDirNames : [ "css", "js", "fonts" ],
+					translator : fakeTranslator(),
+					variableMap : {}
+				);
+
+				expect( result.assetsCopied ).toBe( [ "css", "js", "fonts" ] );
+
+				var cssWarned = false;
+				var jsWarned = false;
+				var fontsWarned = false;
+				for ( var w in result.warnings ) {
+					cssWarned = cssWarned || ( w.findNoCase( "assets/css/" ) > 0 && w.findNoCase( "cache-busted" ) > 0 );
+					jsWarned = jsWarned || ( w.findNoCase( "assets/js/" ) > 0 && w.findNoCase( "cache-busted" ) > 0 );
+					fontsWarned = fontsWarned || w.findNoCase( "assets/fonts/" ) > 0;
+				}
+				expect( cssWarned ).toBeTrue();
+				expect( jsWarned ).toBeTrue();
+				expect( fontsWarned ).toBeFalse();
+			} );
+
 			it( "creates destDir even when it doesn't exist yet", function() {
 				var sourceDir = newTempDir( "bxsites-import-source-" );
 				var destDir = newTempDir( "bxsites-import-dest-" ) & "/nested/blog1";
