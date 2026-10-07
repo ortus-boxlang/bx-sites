@@ -27,7 +27,7 @@ class {
 			throw( type = "BxSites.MissingPluginName", message = "`plugin:new` requires --name=<plugin name>" )
 		}
 
-		var trimmedDestDir = arguments.destDir.reReplace( "[\/]+$", "" )
+		var trimmedDestDir = arguments.destDir.reReplace( "[\\\/]+$", "" )
 		if ( directoryExists( trimmedDestDir ) && directoryList( trimmedDestDir, false, "name" ).len() ) {
 			throw( type = "BxSites.PluginDestExists", message = "[#trimmedDestDir#] already exists and isn't empty" )
 		}

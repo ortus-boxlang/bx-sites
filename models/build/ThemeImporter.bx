@@ -38,8 +38,8 @@ class {
 		required any translator,
 		required struct variableMap
 	) {
-		var root = arguments.sourceThemeDir.reReplace( "[\/]+$", "" )
-		var dest = arguments.destDir.reReplace( "[\/]+$", "" )
+		var root = arguments.sourceThemeDir.reReplace( "[\\\/]+$", "" )
+		var dest = arguments.destDir.reReplace( "[\\\/]+$", "" )
 		directoryCreate( dest, true, true )
 
 		var report = { layoutFile : "", contentFile : "", assetsCopied : [], warnings : [] }

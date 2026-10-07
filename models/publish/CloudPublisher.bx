@@ -65,7 +65,7 @@ class {
 		}
 
 		var zipBytes = buildZipArchive( arguments.siteDir )
-		var tempZipPath = getTempDirectory().reReplace( "[\/]+$", "" ) & "/bxsites-publish-" & createUUID() & ".zip"
+		var tempZipPath = getTempDirectory().reReplace( "[\\\/]+$", "" ) & "/bxsites-publish-" & createUUID() & ".zip"
 
 		try {
 			writeFileBytes( tempZipPath, zipBytes )
@@ -99,7 +99,7 @@ class {
 		required string zipPath,
 		required array dynamicRoutes
 	) {
-		var base = arguments.apiUrl.reReplace( "[\/]+$", "" )
+		var base = arguments.apiUrl.reReplace( "[\\\/]+$", "" )
 		var url = base & "/api/v1/sites/" & arguments.siteId & "/publish"
 		var hasDynamicRoutes = arguments.dynamicRoutes.len() > 0
 
@@ -172,7 +172,7 @@ class {
 	 * @return The zip archive's raw bytes
 	 */
 	binary function buildZipArchive( required string sourceDir ) {
-		var root = arguments.sourceDir.reReplace( "[\/]+$", "" )
+		var root = arguments.sourceDir.reReplace( "[\\\/]+$", "" )
 		var files = directoryList( root, true, "path" ).filter( function( path ) {
 			return !directoryExists( path )
 		} )

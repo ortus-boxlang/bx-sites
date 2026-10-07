@@ -66,7 +66,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 
 		var host = trim( arguments.config.host )
 		var username = trim( arguments.config.username )
-		var remotePath = trim( arguments.config.remotePath ).reReplace( "[\/]+$", "" )
+		var remotePath = trim( arguments.config.remotePath ).reReplace( "[\\\/]+$", "" )
 
 		var result = exec( cmd, siteDir )
 		if ( result.exitCode != 0 ) {
@@ -133,7 +133,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 		}
 		cmd.append( "-e" )
 		cmd.append( sshCmd )
-		cmd.append( arguments.siteDir.reReplace( "[\/]+$", "" ) & "/" )
+		cmd.append( arguments.siteDir.reReplace( "[\\\/]+$", "" ) & "/" )
 		cmd.append( "#username#@#host#:#remotePath.reReplace( '[\/]+$', '' )#/" )
 
 		return cmd

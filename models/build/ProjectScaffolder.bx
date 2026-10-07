@@ -37,7 +37,7 @@ class {
 			)
 		}
 
-		var dir = arguments.targetDir.reReplace( "[\/]+$", "" )
+		var dir = arguments.targetDir.reReplace( "[\\\/]+$", "" )
 		var sourceDir = lCase( trim( arguments.source ) )
 		if ( ![ "docs", "src" ].contains( sourceDir ) ) {
 			throw(

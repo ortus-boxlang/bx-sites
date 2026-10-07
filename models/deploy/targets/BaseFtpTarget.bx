@@ -109,7 +109,7 @@ class {
 			)
 		}
 
-		var remoteRoot = remotePath.reReplace( "[\/]+$", "" )
+		var remoteRoot = remotePath.reReplace( "[\\\/]+$", "" )
 		var files = collectSiteFiles( siteDir )
 		var relativeDirs = files.map( function( f ) { return f.relativeDir; } )
 		var remoteDirs = collectRemoteDirs( relativeDirs )
@@ -198,13 +198,13 @@ class {
 	 * @return [ { path (absolute), name, relativeDir (""  for root, no leading/trailing slash), relativePath } ]
 	 */
 	array function collectSiteFiles( required string siteDir ) {
-		var root = arguments.siteDir.reReplace( "[\/]+$", "" )
+		var root = arguments.siteDir.reReplace( "[\\\/]+$", "" )
 		var allFiles = directoryList( root, true, "path" ).filter( function( p ) { return !directoryExists( p ); } )
 		var files = []
 
 		for ( var p in allFiles ) {
 			var name = getFileFromPath( p )
-			var fileDir = getDirectoryFromPath( p ).reReplace( "[\/]+$", "" )
+			var fileDir = getDirectoryFromPath( p ).reReplace( "[\\\/]+$", "" )
 			var relativeDir = ( fileDir == root ) ? "" : fileDir.replace( root & "/", "", "one" )
 			var relativePath = len( relativeDir ) ? ( relativeDir & "/" & name ) : name
 

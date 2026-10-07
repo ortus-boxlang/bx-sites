@@ -22,7 +22,7 @@ class {
 			throw( type = "BxSites.InvalidLocaleCode", message = "Locale code [#trimmedCode#] must be letters/digits/hyphens only" )
 		}
 
-		var trimmedDocsDir = arguments.docsDir.reReplace( "[\/]+$", "" )
+		var trimmedDocsDir = arguments.docsDir.reReplace( "[\\\/]+$", "" )
 		var localeDir = trimmedDocsDir & "/i18n/" & trimmedCode
 
 		if ( directoryExists( localeDir ) ) {

@@ -110,7 +110,7 @@ class {
 	 * @relativePath The raw `redirect_from`/`redirects.from` entry
 	 */
 	private string function normalizeRedirectPath( required string relativePath ) {
-		var trimmed = trim( arguments.relativePath ).reReplace( "^[\/]+", "" ).reReplace( "[\/]+$", "" )
+		var trimmed = trim( arguments.relativePath ).reReplace( "^[\\\/]+", "" ).reReplace( "[\\\/]+$", "" )
 		if ( !len( trimmed ) ) {
 			throw( type = "BxSites.InvalidRedirect", message = "A redirect's [from]/[redirect_from] entry can't be empty" )
 		}

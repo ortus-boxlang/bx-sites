@@ -108,7 +108,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 * @return The zip archive's raw bytes
 	 */
 	binary function buildZipArchive( required string sourceDir ) {
-		var root = arguments.sourceDir.reReplace( "[\/]+$", "" )
+		var root = arguments.sourceDir.reReplace( "[\\\/]+$", "" )
 		var files = directoryList( root, true, "path" ).filter( function( path ) {
 			return !directoryExists( path )
 		} )

@@ -17,7 +17,7 @@ class {
 	 * @return { defaultPageCount, locales: [ { code, translated, missing, total, percent, missingPaths } ] } - locales sorted alphabetically by code; empty locales array when there's no docs/i18n/ at all
 	 */
 	struct function build( required string docsDir ) {
-		var trimmedDocsDir = arguments.docsDir.reReplace( "[\/]+$", "" )
+		var trimmedDocsDir = arguments.docsDir.reReplace( "[\\\/]+$", "" )
 		var defaultPages = variables.docsLoader.load( trimmedDocsDir )
 		var defaultRelativePaths = defaultPages.map( page => page.relativePath )
 

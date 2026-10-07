@@ -88,7 +88,7 @@ class {
 	 * @return Struct keyed by function name, each value a callable BoxLang function
 	 */
 	struct function load( required string docsDir ) {
-		var dir = arguments.docsDir.reReplace( "[\/]+$", "" )
+		var dir = arguments.docsDir.reReplace( "[\\\/]+$", "" )
 		var functionsPath = dir & "/functions.bxs"
 
 		if ( !fileExists( functionsPath ) ) {
@@ -164,7 +164,7 @@ class {
 	 */
 	private string function toVirtualPath( required string path ) {
 		var cwd = server.boxlang.cliMode ? server.cli.executionPath : server.java.executionPath
-		var normalizedCwd = cwd.replace( char( 92 ), "/", "all" ).reReplace( "[\/]+$", "" )
+		var normalizedCwd = cwd.replace( char( 92 ), "/", "all" ).reReplace( "[\\\/]+$", "" )
 		var normalizedPath = arguments.path.replace( char( 92 ), "/", "all" )
 
 		if ( normalizedPath.left( len( normalizedCwd ) ) == normalizedCwd ) {

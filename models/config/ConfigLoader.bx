@@ -213,7 +213,7 @@ class {
 	 * @projectRoot Absolute path to the project root
 	 */
 	string function configPathFor( required string projectRoot ) {
-		var dir = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		var dir = arguments.projectRoot.reReplace( "[\\\/]+$", "" )
 
 		for ( var fileName in static.configFileNames ) {
 			var candidate = dir & "/" & fileName

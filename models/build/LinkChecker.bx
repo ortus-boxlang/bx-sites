@@ -58,7 +58,7 @@ class {
 	 * @return { brokenLinks: [ { page, href } ], missingAlt: [ { page, src } ], orphanedPages: [ page ] }
 	 */
 	struct function check( required string projectRoot ) {
-		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		var root = arguments.projectRoot.reReplace( "[\\\/]+$", "" )
 		var siteDir = root & "/site"
 
 		if ( !directoryExists( siteDir ) ) {
@@ -78,7 +78,7 @@ class {
 
 		for ( var filePath in htmlFiles ) {
 			var pageRelative = toSiteRelative( filePath, siteDir )
-			var pageDir = getDirectoryFromPath( pageRelative ).reReplace( "[\/]$", "" )
+			var pageDir = getDirectoryFromPath( pageRelative ).reReplace( "[\\\/]$", "" )
 			if ( pageDir == "." ) {
 				pageDir = ""
 			}

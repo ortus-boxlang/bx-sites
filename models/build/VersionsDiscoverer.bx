@@ -16,7 +16,7 @@ class {
 	 * @return Version folder names directly under docs/versions/, newest first
 	 */
 	array function discover( required string docsDir ) {
-		var versionsDir = arguments.docsDir.reReplace( "[\/]+$", "" ) & "/versions"
+		var versionsDir = arguments.docsDir.reReplace( "[\\\/]+$", "" ) & "/versions"
 
 		if ( !directoryExists( versionsDir ) ) {
 			return []

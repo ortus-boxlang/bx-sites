@@ -75,8 +75,9 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 			)
 		}
 
-		var accessKey = getSystemSetting( accessKeyIdEnvVar, "" )
-		var secretKey = getSystemSetting( secretAccessKeyEnvVar, "" )
+		var accessKey = getSystemSetting( accessKeyIdEnvVar, "" ).trim()
+		var secretKey = getSystemSetting( secretAccessKeyEnvVar, "" ).trim()
+		
 		if ( !len( accessKey ) || !len( secretKey ) ) {
 			throw(
 				type    = "BxSites.MissingCredentials",
@@ -90,13 +91,14 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 		var acl = trim( arguments.config.acl ?: "" )
 
 		var signer = new "models.deploy.AwsSigV4Signer@bxsites"()
-		var siteDir = arguments.context.siteDir.reReplace( "[\/]+$", "" )
+		var siteDir = arguments.context.siteDir.reReplace( "[\\\/]+$", "" )
 		var files = directoryList( siteDir, true, "path" )
 			.filter( function( p ) { return !directoryExists( p ) } )
 
 		var uploaded = 0
 		for ( var filePath in files ) {
-			var relativePath = filePath.replace( siteDir & "/", "", "one" )
+			var relativePath = filePath.replace( expandpath(siteDir & "/"), "", "one" )
+			
 			var key = buildObjectKey( prefix, relativePath )
 			uploadFile(
 				signer      : signer,
@@ -203,7 +205,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 		var customEndpoint = trim( arguments.config.endpoint ?: "" )
 
 		var baseHost = len( customEndpoint )
-			? customEndpoint.reReplace( "^https?://", "" ).reReplace( "[\/]+$", "" )
+			? customEndpoint.reReplace( "^https?://", "" ).reReplace( "[\\\/]+$", "" )
 			: "s3.#region#.amazonaws.com"
 
 		if ( forcePathStyle ) {

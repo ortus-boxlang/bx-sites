@@ -30,7 +30,7 @@ class {
 	 * @baseUrl A ForgeBox-API-compatible base URL, trailing slash optional
 	 */
 	void function setBaseUrl( required string baseUrl ) {
-		variables.baseUrl = arguments.baseUrl.reReplace( "[\/]+$", "" )
+		variables.baseUrl = arguments.baseUrl.reReplace( "[\\\/]+$", "" )
 	}
 
 	/**

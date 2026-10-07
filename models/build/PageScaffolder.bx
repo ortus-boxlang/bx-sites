@@ -34,7 +34,7 @@ class {
 			throw( type = "BxSites.InvalidPagePath", message = "--path must end in .md (got [#trimmedPath#])" )
 		}
 
-		var trimmedDocsDir = arguments.docsDir.reReplace( "[\/]+$", "" )
+		var trimmedDocsDir = arguments.docsDir.reReplace( "[\\\/]+$", "" )
 		var fullPath = trimmedDocsDir & "/" & trimmedPath
 
 		if ( fileExists( fullPath ) ) {

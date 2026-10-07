@@ -40,7 +40,7 @@ class {
 	 * @return { entries: [ { name, path, target, config } ], errors: [] }
 	 */
 	struct function resolve( required string projectRoot ) {
-		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		var root = arguments.projectRoot.reReplace( "[\\\/]+$", "" )
 		var deployDir = root & "/deployments"
 		var entries = []
 		var errors = []

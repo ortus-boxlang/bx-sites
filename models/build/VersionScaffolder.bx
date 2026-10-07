@@ -34,7 +34,7 @@ class {
 			throw( type = "BxSites.MissingVersionName", message = "`version:new` requires --name=<version>" )
 		}
 
-		var trimmedDocsDir = arguments.docsDir.reReplace( "[\/]+$", "" )
+		var trimmedDocsDir = arguments.docsDir.reReplace( "[\\\/]+$", "" )
 		var versionDir = trimmedDocsDir & "/versions/" & trimmedName
 
 		if ( directoryExists( versionDir ) ) {

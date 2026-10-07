@@ -132,7 +132,7 @@ class {
 	 * @onError `cloud.contentBlocksOnError` - `"fail"` or `"skip"`
 	 */
 	void function setCloudContext( required string apiUrl, required string token, required string onError ) {
-		variables.cloudApiUrl = arguments.apiUrl.reReplace( "[\/]+$", "" )
+		variables.cloudApiUrl = arguments.apiUrl.reReplace( "[\\\/]+$", "" )
 		variables.cloudToken = arguments.token
 		variables.cloudOnError = arguments.onError
 	}
@@ -1852,7 +1852,7 @@ class {
 	 * @columns 2/3/4 - already validated by renderImageGallery()
 	 */
 	private string function renderConventionGallery( required string name, required string docsDir, required string sourceRelativePath, required string columns ) {
-		var galleryDir = arguments.docsDir.reReplace( "[\/]+$", "" ) & "/assets/gallery/" & arguments.name
+		var galleryDir = arguments.docsDir.reReplace( "[\\\/]+$", "" ) & "/assets/gallery/" & arguments.name
 		var invalid = '<div class="bxsites-image-gallery bxsites-image-gallery--invalid">::: image-gallery - no images found for name="' & encodeForHTML( arguments.name ) & '"</div>'
 
 		if ( !directoryExists( galleryDir ) ) {

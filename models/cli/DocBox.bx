@@ -38,7 +38,7 @@ class {
 		if ( !len( projectRoot ) ) {
 			throw( type = "BxSites.MissingProjectRoot", message = "`docbox` requires a project root" )
 		}
-		var root = projectRoot.reReplace( "[\/]+$", "" )
+		var root = projectRoot.reReplace( "[\\\/]+$", "" )
 
 		var config = new "models.config.ConfigLoader@bxsites"().load( root )
 		var settings = config.docbox ?: {}
@@ -185,10 +185,10 @@ class {
 	 */
 	private string function resolvePath( required string projectRoot, required string path ) {
 		if ( arguments.path.startsWith( "/" ) || reFind( "^[A-Za-z]:[\/]", arguments.path ) ) {
-			return arguments.path.reReplace( "[\/]+$", "" )
+			return arguments.path.reReplace( "[\\\/]+$", "" )
 		}
 
-		return ( arguments.projectRoot & "/" & arguments.path.reReplace( "^\./", "" ) ).reReplace( "[\/]+$", "" )
+		return ( arguments.projectRoot & "/" & arguments.path.reReplace( "^\./", "" ) ).reReplace( "[\\\/]+$", "" )
 	}
 
 	/**

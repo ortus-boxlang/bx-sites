@@ -41,7 +41,7 @@ class {
 	 * @return Struct keyed by author id: { name, title, bio, url, email, avatar, socials }
 	 */
 	struct function load( required string docsDir ) {
-		var dir = arguments.docsDir.reReplace( "[\/]+$", "" )
+		var dir = arguments.docsDir.reReplace( "[\\\/]+$", "" )
 		var authorsPath = ""
 		var authorsFormat = ""
 		for ( var candidate in [ "authors.yml", "authors.toml", "authors.json" ] ) {

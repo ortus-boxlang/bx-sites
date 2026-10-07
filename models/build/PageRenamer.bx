@@ -40,7 +40,7 @@ class {
 			throw( type = "BxSites.SamePagePath", message = "--from and --to are the same path" )
 		}
 
-		var trimmedDocsDir = arguments.docsDir.reReplace( "[\/]+$", "" )
+		var trimmedDocsDir = arguments.docsDir.reReplace( "[\\\/]+$", "" )
 		var fromAbsolute = trimmedDocsDir & "/" & fromRelative
 		var toAbsolute = trimmedDocsDir & "/" & toRelative
 

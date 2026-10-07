@@ -57,7 +57,7 @@ class {
 			return manifest
 		}
 
-		var dir = arguments.docsAssetsDir.reReplace( "[\/]+$", "" )
+		var dir = arguments.docsAssetsDir.reReplace( "[\\\/]+$", "" )
 		var files = directoryList( dir, true, "path" )
 			.filter( path => variables.eligiblePattern.matcher( path ).find() )
 

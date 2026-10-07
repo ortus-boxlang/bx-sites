@@ -31,7 +31,7 @@ class {
 	 * @return { pageCount, wordCount, avgWordsPerPage, treeBreakdown: [ { label, pageCount } ], versions: [ names ], locales: [ codes ], blog: { present, posts, categories, authors, years }, tagCount, searchIndex: { enabled, entryCount, fileSizeBytes }, siteFileCount, siteSizeBytes }
 	 */
 	struct function build( required string projectRoot ) {
-		var root = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		var root = arguments.projectRoot.reReplace( "[\\\/]+$", "" )
 		var siteDir = root & "/site"
 		var docsDir = variables.sourceDirResolver.resolveConfigured( root )
 

@@ -413,7 +413,7 @@ class {
 	 * @pattern The declared pattern
 	 */
 	private string function joinPattern( required string prefix, required string pattern ) {
-		var left = arguments.prefix.reReplace( "[\/]+$", "" )
+		var left = arguments.prefix.reReplace( "[\\\/]+$", "" )
 		var right = arguments.pattern
 
 		if ( !len( left ) ) {

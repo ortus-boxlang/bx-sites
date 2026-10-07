@@ -73,7 +73,7 @@ class {
 	 * @return { url, port }
 	 */
 	struct function start( required string projectRoot, numeric port = 8080, string host = "127.0.0.1" ) {
-		variables.projectRoot = arguments.projectRoot.reReplace( "[\/]+$", "" )
+		variables.projectRoot = arguments.projectRoot.reReplace( "[\\\/]+$", "" )
 
 		println( "Building site for serve..." )
 		variables.buildPipeline.setProfiling( true )

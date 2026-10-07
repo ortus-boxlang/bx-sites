@@ -30,7 +30,7 @@ class {
 		if ( !len( projectRoot ) ) {
 			throw( type = "BxSites.MissingProjectRoot", message = "`publish` requires a project root" )
 		}
-		var root = projectRoot.reReplace( "[\/]+$", "" )
+		var root = projectRoot.reReplace( "[\\\/]+$", "" )
 
 		var configLoader = new "models.config.ConfigLoader@bxsites"()
 		var siteConfig = configLoader.load( root )

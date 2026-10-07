@@ -79,7 +79,7 @@ class {
 		}
 		directoryCreate( dir, true, true )
 
-		var tempZip = getTempDirectory().reReplace( "[\/]+$", "" ) & "/bxsites-install-theme-" & createUUID() & ".zip"
+		var tempZip = getTempDirectory().reReplace( "[\\\/]+$", "" ) & "/bxsites-install-theme-" & createUUID() & ".zip"
 		try {
 			variables.forgeBoxClient.download( entry.location, tempZip )
 			extract( source = tempZip, destination = dir, format = "zip", overwrite = true )

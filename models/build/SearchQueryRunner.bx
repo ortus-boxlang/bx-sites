@@ -26,7 +26,7 @@ class {
 	 * @return Array of { title, url, score }, highest score first, capped at `limit`
 	 */
 	array function run( required string siteDir, required string query, numeric limit = 10 ) {
-		var indexPath = arguments.siteDir.reReplace( "[\/]+$", "" ) & "/search-index.json"
+		var indexPath = arguments.siteDir.reReplace( "[\\\/]+$", "" ) & "/search-index.json"
 		if ( !fileExists( indexPath ) ) {
 			throw(
 				type    = "BxSites.SearchIndexNotBuilt",

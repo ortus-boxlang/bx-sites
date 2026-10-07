@@ -20,7 +20,7 @@ class {
 		if ( !len( projectRoot ) ) {
 			throw( type = "BxSites.MissingProjectRoot", message = "`package` requires a project root" )
 		}
-		var root = projectRoot.reReplace( "[\/]+$", "" )
+		var root = projectRoot.reReplace( "[\\\/]+$", "" )
 
 		var output = resolveOutput( root, trim( arguments.options.output ?: "" ) )
 

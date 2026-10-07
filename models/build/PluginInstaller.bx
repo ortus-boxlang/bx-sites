@@ -41,7 +41,7 @@ class {
 	 * @slug The ForgeBox package slug
 	 */
 	string function targetDir( required string projectRoot, required string slug ) {
-		return arguments.projectRoot.reReplace( "[\/]+$", "" ) & "/boxlang_modules/" & arguments.slug
+		return arguments.projectRoot.reReplace( "[\\\/]+$", "" ) & "/boxlang_modules/" & arguments.slug
 	}
 
 	/**
@@ -67,7 +67,7 @@ class {
 		}
 		directoryCreate( dir, true, true )
 
-		var tempZip = getTempDirectory().reReplace( "[\/]+$", "" ) & "/bxsites-install-plugin-" & createUUID() & ".zip"
+		var tempZip = getTempDirectory().reReplace( "[\\\/]+$", "" ) & "/bxsites-install-plugin-" & createUUID() & ".zip"
 		try {
 			variables.forgeBoxClient.download( entry.location, tempZip )
 			extract( source = tempZip, destination = dir, format = "zip", overwrite = true )
@@ -133,7 +133,7 @@ class {
 		var moduleService = getBoxRuntime().getModuleService()
 		moduleService.loadModule( arguments.installDir )
 
-		var normalizedInstallDir = arguments.installDir.reReplace( "[\/]+$", "" )
+		var normalizedInstallDir = arguments.installDir.reReplace( "[\\\/]+$", "" )
 		var registry = moduleService.getModuleList()
 
 		for ( var mappingName in registry ) {
@@ -141,7 +141,7 @@ class {
 			var recordPath = isStruct( record )
 				? ( record.physicalPath ?: record.modulePath ?: record.path ?: record.directoryPath ?: "" )
 				: ""
-			if ( len( recordPath ) && recordPath.reReplace( "[\/]+$", "" ) == normalizedInstallDir ) {
+			if ( len( recordPath ) && recordPath.reReplace( "[\\\/]+$", "" ) == normalizedInstallDir ) {
 				return mappingName
 			}
 		}

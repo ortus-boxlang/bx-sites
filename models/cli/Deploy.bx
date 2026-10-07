@@ -57,7 +57,7 @@ class {
 		if ( !len( projectRoot ) ) {
 			throw( type = "BxSites.MissingProjectRoot", message = "`deploy` requires a project root" )
 		}
-		var root = projectRoot.reReplace( "[\/]+$", "" )
+		var root = projectRoot.reReplace( "[\\\/]+$", "" )
 		var verbose = arguments.options.verbose ?: false
 
 		var entryName = trim( arguments.options.entry ?: "" )
