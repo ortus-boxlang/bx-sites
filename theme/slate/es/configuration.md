@@ -382,6 +382,26 @@ cual, byte a byte, en lugar del generado, en cada construcción - la clave
         ```json
         { "theme": { "options": { "pageMetaPosition": "top" } } }
         ```
+  - `theme.options.navAccentLine` - `true` (el valor por defecto) dibuja
+    una fina línea vertical junto a una sección anidada de la navegación
+    lateral, vinculando visualmente sus elementos hijos con la sección
+    padre. `false` la desactiva.
+  - `theme.options.navAccentLineColor` - un color hexadecimal (de 3 o 6
+    dígitos) que sobrescribe el color de la línea de acento de la
+    navegación. Si no se define, recurre a
+    `theme.options.accentColor`/`accentColorDark` cuando esté configurado,
+    o al color de acento nativo del tema en caso contrario - solo
+    relevante cuando `navAccentLine` está activo.
+
+    === "YAML"
+        ```yaml
+        theme: { options: { navAccentLine: true, navAccentLineColor: "#2563eb" } }
+        ```
+
+    === "JSON"
+        ```json
+        { "theme": { "options": { "navAccentLine": true, "navAccentLineColor": "#2563eb" } } }
+        ```
 
 ## `search`
 

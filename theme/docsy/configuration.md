@@ -450,6 +450,32 @@ build - the `robots` key above is ignored entirely once this file exists.
       accentColorDark = "#60a5fa"
       ```
 
+  - `theme.options.navAccentLine` - `true` (the default) draws a thin
+    vertical line alongside a nested sidebar nav section, visually tying a
+    section's children to their parent. `false` turns it off.
+  - `theme.options.navAccentLineColor` - a hex color (3- or 6-digit)
+    overriding the nav accent line's own color. Leaving it unset falls back
+    to `theme.options.accentColor`/`accentColorDark` when set, or the
+    theme's own native accent color otherwise - only relevant when
+    `navAccentLine` is on.
+
+    === "YAML"
+        ```yaml
+        theme: { options: { navAccentLine: true, navAccentLineColor: "#2563eb" } }
+        ```
+
+    === "JSON"
+        ```json
+        { "theme": { "options": { "navAccentLine": true, "navAccentLineColor": "#2563eb" } } }
+        ```
+
+    === "TOML"
+      ```toml
+      [theme.options]
+      navAccentLine = true
+      navAccentLineColor = "#2563eb"
+      ```
+
 ## `search`
 
 `true` (the default) builds a static search index and wires up the search

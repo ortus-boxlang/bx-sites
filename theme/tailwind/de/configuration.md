@@ -390,6 +390,25 @@ existiert.
         ```json
         { "theme": { "options": { "pageMetaPosition": "top" } } }
         ```
+  - `theme.options.navAccentLine` - `true` (Standard) zeichnet eine
+    dünne vertikale Linie neben einem verschachtelten Abschnitt der
+    Seitenleisten-Navigation, die dessen untergeordnete Einträge visuell
+    mit dem übergeordneten Abschnitt verbindet. `false` schaltet sie aus.
+  - `theme.options.navAccentLineColor` - eine Hex-Farbe (3- oder
+    6-stellig), die die Farbe der Navigations-Akzentlinie überschreibt.
+    Bleibt sie unbesetzt, greift `theme.options.accentColor`/
+    `accentColorDark`, falls gesetzt, sonst die native Akzentfarbe des
+    Themes - nur relevant, wenn `navAccentLine` aktiv ist.
+
+    === "YAML"
+        ```yaml
+        theme: { options: { navAccentLine: true, navAccentLineColor: "#2563eb" } }
+        ```
+
+    === "JSON"
+        ```json
+        { "theme": { "options": { "navAccentLine": true, "navAccentLineColor": "#2563eb" } } }
+        ```
 
 ## `search`
 

@@ -338,6 +338,25 @@ senso. Elenca ogni pagina non nascosta secondo il protocollo
         ```json
         { "theme": { "options": { "navCollapsible": true, "navExpandAll": false } } }
         ```
+  - `theme.options.navAccentLine` - `true` (il valore predefinito) disegna
+    una sottile linea verticale accanto a una sezione nidificata della nav
+    laterale, collegando visivamente i suoi elementi figli alla sezione
+    padre. `false` la disattiva.
+  - `theme.options.navAccentLineColor` - un colore esadecimale (3 o 6
+    cifre) che sovrascrive il colore della linea di accento della nav. Se
+    non impostato, usa `theme.options.accentColor`/`accentColorDark`
+    quando configurato, altrimenti il colore di accento nativo del tema -
+    rilevante solo quando `navAccentLine` è attivo.
+
+    === "YAML"
+        ```yaml
+        theme: { options: { navAccentLine: true, navAccentLineColor: "#2563eb" } }
+        ```
+
+    === "JSON"
+        ```json
+        { "theme": { "options": { "navAccentLine": true, "navAccentLineColor": "#2563eb" } } }
+        ```
 
 ## `search`
 
