@@ -12,7 +12,7 @@ theme:
             accentColor: "#00C853",
             accentColorDark: "#34D399",
         }
-    logo: "assets/boxlang-icon-full.svg"
+    logo: "assets/bxsites-icon-full.svg"
     favicon: "assets/favicon.png"
 search: true
 mcp: true
