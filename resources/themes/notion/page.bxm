@@ -108,10 +108,10 @@
 		listHtml &= '</ul>'
 
 		if ( arguments.hideAtXl ) {
-			return '<details class="bxsites-toc-mobile ntn-toc--mobile"><summary class="ntn-toc--mobile__summary">' & encodeForHTML( variables.strings.onThisPage ) & '</summary>' & listHtml & '</details>'
+			return '<details class="bxsites-toc-mobile ntn-toc--mobile"><summary class="ntn-toc--mobile__summary">' & bxsitesIcon( "outline" ) & ' ' & encodeForHTML( variables.strings.onThisPage ) & '</summary>' & listHtml & '</details>'
 		}
 
-		return '<nav class="ntn-toc" aria-label="' & encodeForHTML( variables.strings.onThisPage ) & '"><div class="ntn-toc__title">' & encodeForHTML( variables.strings.onThisPage ) & '</div>' & listHtml & '</nav>'
+		return '<nav class="ntn-toc bxsites-toc" aria-label="' & encodeForHTML( variables.strings.onThisPage ) & '"><div class="ntn-toc__title bxsites-toc__title">' & bxsitesIcon( "outline" ) & ' ' & encodeForHTML( variables.strings.onThisPage ) & '</div>' & listHtml & '</nav>'
 	}
 
 	function tagSlug( required string tag ) {

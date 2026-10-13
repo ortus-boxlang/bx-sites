@@ -50,7 +50,7 @@
 	 * `navExpandAll` is on. `nested`/`collapsed` track recursion state.
 	 */
 	function renderNavList( required array nodes, boolean nested = false, boolean collapsed = false ) {
-		var html = sb{ "<ul class=""nav flex-column" & ( arguments.nested ? " nav--nested" : "" ) & """" & ( arguments.collapsed ? " hidden" : "" ) & ">" }
+		var html = sb{ "<ul class=""nav flex-column" & ( arguments.nested ? " nav--nested bxsites-nav-nested" : "" ) & """" & ( arguments.collapsed ? " hidden" : "" ) & ">" }
 		for ( var node in arguments.nodes ) {
 			var isActive = len( node.url ) && ( node.url == variables.page.urlPath || ( len( variables.page.course.id ) && node.url == variables.page.course.indexUrl ) )
 			var linkClass = "nav-link" & ( isActive ? " active" : "" )

@@ -107,7 +107,7 @@
 	function renderToc( required array toc, boolean hideAtXl = false ) {
 		var listHtml = '<ul class="space-y-2">'
 		for ( var item in arguments.toc ) {
-			var indent = item.level == 3 ? " ml-4" : ""
+			var indent = item.level == 3 ? " ml-4 border-l-2 border-slate-200 pl-3" : ""
 			listHtml &= '<li class="leading-snug' & indent & '"><a class="text-slate-700 hover:text-cyan-700" href="##' & item.id & '">' & encodeForHTML( item.text ) & '</a></li>'
 		}
 		listHtml &= '</ul>'
@@ -115,11 +115,11 @@
 		if ( arguments.hideAtXl ) {
 			return '<details class="bxsites-toc-mobile group sticky top-0 z-10 mb-6 max-h-screen overflow-y-auto rounded border border-slate-200 bg-cyan-50/95 text-sm backdrop-blur xl:hidden">' &
 				'<summary class="flex list-none items-center justify-between gap-2 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">' &
-				encodeForHTML( variables.strings.onThisPage ) & '<span class="h-1.5 w-1.5 shrink-0 rotate-45 border-b-2 border-r-2 border-current transition-transform group-open:-rotate-[135deg]"></span>' &
+				'<span class="inline-flex items-center gap-1.5">' & bxsitesIcon( "outline" ) & ' ' & encodeForHTML( variables.strings.onThisPage ) & '</span><span class="h-1.5 w-1.5 shrink-0 rotate-45 border-b-2 border-r-2 border-current transition-transform group-open:-rotate-[135deg]"></span>' &
 				'</summary><div class="px-4 pb-3">' & listHtml & '</div></details>'
 		}
 
-		return '<nav class="mb-6 rounded border border-slate-200 bg-cyan-50/40 px-4 py-3 text-sm"><div class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">' & encodeForHTML( variables.strings.onThisPage ) & '</div>' &
+		return '<nav class="mb-6 rounded border border-slate-200 bg-cyan-50/40 px-4 py-3 text-sm"><div class="mb-1 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">' & bxsitesIcon( "outline" ) & ' ' & encodeForHTML( variables.strings.onThisPage ) & '</div>' &
 			listHtml & '</nav>'
 	}
 

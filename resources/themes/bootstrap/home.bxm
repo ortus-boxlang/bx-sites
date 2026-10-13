@@ -200,10 +200,6 @@
 					</bx:if>
 				</div>
 				<div class="bxh-nav-utils">
-					<!--- Version switcher --->
-					<bx:if variables.versions.len() gt 1>
-						#renderVersionSwitcher( variables.versions, variables.currentVersion )#
-					</bx:if>
 					<!--- Locale dropdown --->
 					<bx:if variables.locales.len() gt 1>
 						#renderLocaleDropdown( variables.locales, variables.currentLocale )#

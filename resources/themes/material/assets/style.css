@@ -154,9 +154,23 @@ body.md-body {
 }
 
 .md-sidebar {
-	width: 260px;
+	display: flex;
+	flex-direction: column;
+	width: 280px;
 	flex-shrink: 0;
 	padding: 1.5rem 1rem;
+	position: sticky;
+	top: 64px;
+	height: calc(100vh - 64px);
+	overflow-y: auto;
+}
+
+.sidebar-version-switcher {
+	width: 100%;
+	max-width: none;
+	height: auto;
+	margin: 0 0 1rem;
+	padding: 0.4rem 0.6rem;
 }
 
 .md-nav {
@@ -995,11 +1009,24 @@ dd {
 }
 
 .md-toc__title {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
 	font-weight: 500;
 	text-transform: uppercase;
 	font-size: 0.75rem;
 	color: var(--md-muted);
 	margin-bottom: 0.25rem;
+}
+
+.md-toc__title svg {
+	flex: 0 0 auto;
+	opacity: 0.8;
+}
+
+.md-toc,
+.md-toc--mobile {
+	font-size: 0.875rem;
 }
 
 .md-toc ul {
@@ -1013,9 +1040,13 @@ dd {
 	line-height: 1.4;
 }
 
-.md-toc__item--3 {
-	padding-left: 1rem;
+.md-toc__item--3,
+.md-toc__item--4 {
+	padding-left: 0.85rem;
+	margin-left: 0.15rem;
+	border-left: 2px solid var(--md-border);
 	font-size: 0.9em;
+	color: var(--md-muted);
 }
 
 .md-page-nav {
@@ -3017,7 +3048,7 @@ a.button.primary {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	margin: 1.5rem 0 0.5rem;
+	margin: auto 0 0.5rem;
 	padding: 0.7rem 0.85rem;
 	border: 1px solid currentColor;
 	border-radius: 0.75rem;
@@ -3032,7 +3063,7 @@ a.button.primary {
 	opacity: 1;
 }
 
-.bxsites-powered-by .bxsites-icon {
+.bxsites-powered-by__logo {
 	width: 1.25rem;
 	height: 1.25rem;
 	flex: 0 0 auto;

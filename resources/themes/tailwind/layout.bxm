@@ -15,7 +15,7 @@
 	 * hides the very link you're on.
 	 */
 	function renderNavList( required array nodes, boolean nested = false, boolean collapsed = false ) {
-		var html = "<ul class=""space-y-1" & ( arguments.nested ? " ms-4 mt-1" : "" ) & """" & ( arguments.collapsed ? " hidden" : "" ) & ">"
+		var html = "<ul class=""space-y-1" & ( arguments.nested ? " ms-4 mt-1 bxsites-nav-nested" : "" ) & """" & ( arguments.collapsed ? " hidden" : "" ) & ">"
 		for ( var node in arguments.nodes ) {
 			var isActive = len( node.url ) && ( node.url == variables.page.urlPath || ( len( variables.page.course.id ) && node.url == variables.page.course.indexUrl ) )
 			var linkClass = "block rounded px-3 py-1.5 text-sm" & ( isActive ? " nav-link--active bg-cyan-50 font-semibold text-cyan-700" : " text-slate-700 hover:bg-cyan-50" )
@@ -179,6 +179,8 @@
 	variables.pageActionsPosition = variables.siteConfig.theme.options.pageActionsPosition ?: "top"
 	variables.accentColor = trim( variables.siteConfig.theme.options.accentColor ?: "" )
 	variables.accentColorDark = trim( variables.siteConfig.theme.options.accentColorDark ?: "" )
+	variables.navAccentLine = ( variables.siteConfig.theme.options.navAccentLine ?: true ) ? true : false
+	variables.navAccentLineColor = trim( variables.siteConfig.theme.options.navAccentLineColor ?: "" )
 </bx:script>
 <bx:output>
 <!doctype html>
@@ -238,6 +240,15 @@
 </bx:if>
 	</style>
 </bx:if>
+<bx:if variables.navAccentLine>
+	<style>
+		.bxsites-nav-nested {
+			border-inline-start: 2px solid #len( variables.navAccentLineColor ) ? variables.navAccentLineColor : 'var(--bxsites-accent, var(--bxsites-border))'#;
+			margin-inline-start: 0.2rem;
+			padding-inline-start: 0.85rem;
+		}
+	</style>
+</bx:if>
 <bx:if variables.mathEnabled>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 </bx:if>
@@ -275,9 +286,6 @@
 <bx:if variables.searchEnabled>
 	<bx:include template="#variables.themeDir#/search.bxm">
 </bx:if>
-<bx:if variables.versions.len() gt 1>
-			#renderVersionSwitcher( variables.versions, variables.currentVersion, 'rounded border border-slate-900/20 bg-transparent px-2 py-1 text-sm' )#
-</bx:if>
 <bx:if variables.locales.len() gt 1>
 			#renderLocaleDropdown( variables.locales, variables.currentLocale )#
 </bx:if>
@@ -291,9 +299,12 @@
 		</div>
 	</header>
 	<div class="mx-auto flex max-w-6xl">
-		<nav id="bxsites-sidebar" class="w-64 shrink-0 p-4" aria-label="Navigation" x-show="navOpen" x-cloak>
+		<nav id="bxsites-sidebar" class="w-64 md:w-[280px] shrink-0 p-4 md:sticky md:top-[64px] md:h-[calc(100vh-64px)] md:overflow-y-auto md:flex md:flex-col" aria-label="Navigation" x-show="navOpen" x-cloak>
+<bx:if variables.versions.len() gt 1>
+			#renderVersionSwitcher( variables.versions, variables.currentVersion, 'sidebar-version-switcher rounded border border-slate-900/20 bg-transparent px-2 py-1 text-sm' )#
+</bx:if>
 			#renderNavList( variables.nav )#
-			<a class="bxsites-powered-by" href="https://bxsites.io" target="_blank" rel="noopener noreferrer">#bxsitesIcon( "phosphor:stack" )# <span>Powered by BxSites</span></a>
+			<a class="bxsites-powered-by" href="https://bxsites.io" target="_blank" rel="noopener noreferrer"><img class="bxsites-powered-by__logo" src="#moduleAssetUrl( 'bxsites-logo.svg' )#" alt="" aria-hidden="true"> <span>Powered by BxSites</span></a>
 		</nav>
 		<main class="min-w-0 flex-1 p-8">
 <bx:include template="#variables.themeDir#/#variables.bodyFile#">

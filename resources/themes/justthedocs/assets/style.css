@@ -152,11 +152,25 @@ body.jtd-body {
 /* A distinct, faintly-tinted column with a thin right border - separation
    by border, not by shadow or a heavy background swap. */
 .jtd-sidebar {
+	display: flex;
+	flex-direction: column;
 	width: 280px;
 	flex-shrink: 0;
 	padding: 2rem 1.25rem;
 	background: var(--md-sidebar-bg);
 	border-right: 1px solid var(--md-border);
+	position: sticky;
+	top: 60px;
+	height: calc(100vh - 60px);
+	overflow-y: auto;
+}
+
+.sidebar-version-switcher {
+	width: 100%;
+	max-width: none;
+	height: auto;
+	margin: 0 0 1rem;
+	padding: 0.4rem 0.6rem;
 }
 
 .jtd-nav {
@@ -992,11 +1006,24 @@ dd {
 }
 
 .jtd-toc__title {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
 	font-weight: 500;
 	text-transform: uppercase;
 	font-size: 0.75rem;
 	color: var(--md-muted);
 	margin-bottom: 0.25rem;
+}
+
+.jtd-toc__title svg {
+	flex: 0 0 auto;
+	opacity: 0.8;
+}
+
+.jtd-toc,
+.jtd-toc--mobile {
+	font-size: 0.875rem;
 }
 
 .jtd-toc ul {
@@ -1010,9 +1037,13 @@ dd {
 	line-height: 1.4;
 }
 
-.jtd-toc__item--3 {
-	padding-left: 1rem;
+.jtd-toc__item--3,
+.jtd-toc__item--4 {
+	padding-left: 0.85rem;
+	margin-left: 0.15rem;
+	border-left: 2px solid var(--md-border);
 	font-size: 0.9em;
+	color: var(--md-muted);
 }
 
 .jtd-page-nav {
@@ -3018,7 +3049,7 @@ a.button.primary {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	margin: 1.5rem 0 0.5rem;
+	margin: auto 0 0.5rem;
 	padding: 0.7rem 0.85rem;
 	border: 1px solid currentColor;
 	border-radius: 0.75rem;
@@ -3033,7 +3064,7 @@ a.button.primary {
 	opacity: 1;
 }
 
-.bxsites-powered-by .bxsites-icon {
+.bxsites-powered-by__logo {
 	width: 1.25rem;
 	height: 1.25rem;
 	flex: 0 0 auto;
