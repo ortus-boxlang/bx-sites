@@ -1174,8 +1174,10 @@ referenced OpenAPI/Swagger spec (JSON or YAML). See
 
 `false` (the default) - no lightbox widget shipped at all. `true` loads a
 small click-to-enlarge lightbox for every `::: image-gallery` content
-block. See [Content Blocks](guides/content-blocks.md#image-gallery) for
-the syntax.
+block and for every other image in page content (opt an image out with
+`class="no-zoom"`). Prev and next move through all the zoomable images on
+the page. See [Images](guides/images.md#click-to-enlarge) and
+[Content Blocks](guides/content-blocks.md#image-gallery).
 
 === "YAML"
     ```yaml title="bxsites.yaml"

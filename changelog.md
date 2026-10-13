@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * First release
+* `imageGallery: true` now makes every content image click-to-enlarge (not only `::: image-gallery` items); arrows cycle through all images on the page, `class="no-zoom"` opts out
 * `docbox` verb - generates a BoxLang/CFML API reference into the content
   directory from DocBox's own JSON output, with the class metadata DocBox's
   JSON strategy drops (declared properties, implemented interfaces,
