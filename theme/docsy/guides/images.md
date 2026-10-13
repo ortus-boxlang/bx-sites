@@ -71,6 +71,23 @@ For a multi-image gallery, use the built-in
 instead of hand-rolled HTML - it gives you a responsive grid and a
 click-to-enlarge lightbox for free.
 
+## Click to enlarge
+
+With [`imageGallery: true`](../configuration.md#imagegallery), every image
+in page content opens in a lightbox when clicked, so a lone screenshot
+needs no special syntax. The arrow keys (or the buttons) move through all
+the zoomable images on the page, in order, and Esc closes it.
+
+An image is left alone when it is smaller than 120 px wide (icons, badges),
+sits inside a link or a button, or is opted out in raw HTML:
+
+```html
+<img src="../assets/logo.png" alt="Logo" class="no-zoom">
+```
+
+Images outside the content area (a custom home page, for example) opt in
+with `data-bxsites-lightbox`.
+
 ## What doesn't get resized
 
 - **SVGs** - already resolution-independent, copied through unchanged.

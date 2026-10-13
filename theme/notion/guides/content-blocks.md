@@ -154,7 +154,7 @@ palette, via CSS custom properties - see [Customizing colors](themes.md#customiz
 
 ## Image gallery
 
-A responsive grid of images. The optional `columns` attribute is `2`,
+A responsive grid of images. (Any other image in page content is already click-to-enlarge with `imageGallery: true`, see [Images](images.md#click-to-enlarge).) The optional `columns` attribute is `2`,
 `3` or `4` (default `3`); any other value falls back to `3`. The grid
 itself needs no configuration, but the click-to-enlarge lightbox needs
 `bxsites.yaml`'s [`imageGallery`](../configuration.md#imagegallery) set
