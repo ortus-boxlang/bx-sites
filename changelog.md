@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Bootstrap theme home page in dark mode: the "Get Started" button took the light page text color on the bright green gradient (about 1.2:1). It now uses the dark text (14:1), and the muted-2 text color passes 4.5:1 in both modes
 * `build`/`serve` crashed on Windows with a `PatternSyntaxException` in any
   project with a blog post or with responsive images enabled -
   `BlogDiscoverer`, `ContentLinter` and `ImageVariantGenerator` derived a

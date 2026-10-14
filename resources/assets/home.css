@@ -24,7 +24,7 @@
 	--border-strong: rgba(6, 40, 32, .17);
 	--text: #0b201b;
 	--muted: #5a7069;
-	--muted-2: #82988f;
+	--muted-2: #5e7269;
 	--brand1: #00c766;
 	--brand2: #00a9c9;
 	--yellow: #caa300;
@@ -55,7 +55,7 @@
 	--border-strong: rgba(255, 255, 255, .16);
 	--text: #eaf6f4;
 	--muted: #8ba6b1;
-	--muted-2: #5f7f8c;
+	--muted-2: #7a98a5;
 	--brand1: #00ff78;
 	--brand2: #00dbff;
 	--yellow: #fff500;
@@ -306,7 +306,8 @@
 	flex: none;
 }
 
-.bxh-btn-primary {
+/* Scoped like ".bxsites-home a { color: inherit }" so the dark text wins: without it the button took the page text color (light in dark mode) on the bright gradient, about 1.2:1 */
+.bxsites-home .bxh-btn-primary {
 	background: var(--grad);
 	color: #04121a;
 	box-shadow: 0 6px 24px rgba(0, 219, 255, .22);
