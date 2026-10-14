@@ -34,7 +34,6 @@
 	function renderPageActions() {
 		var markdownHref = len( variables.page.markdownUrl ?: "" ) ? variables.basePath & variables.page.markdownUrl : ""
 		var canonicalUrl = trim( variables.page.canonicalUrl ?: "" )
-		var repoUrl = trim( variables.repoUrl ?: "" )
 		var editUrl = trim( variables.page.editUrl ?: "" )
 
 		// Every item's own icon + two-line "title / hint" label, the hint in
@@ -71,10 +70,6 @@
 			items &= '<div class="bxsites-page-actions__divider" role="separator"></div>'
 		}
 		items &= '<button type="button" class="bxsites-page-actions__item" data-bxsites-action="print">' & itemLabel( "print", variables.strings.exportAsPdf, variables.strings.exportAsPdfHint ) & '</button>'
-		if ( len( repoUrl ) ) {
-			var issueUrl = repoUrl & "/issues/new?title=" & urlEncodedFormat( "Issue with: " & variables.page.title ) & ( len( canonicalUrl ) ? "&body=" & urlEncodedFormat( "Found on: " & canonicalUrl ) : "" )
-			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( issueUrl ) & '" target="_blank" rel="noopener noreferrer">' & itemLabel( "flag", variables.strings.reportIssue, variables.strings.reportIssueHint, true ) & '</a>'
-		}
 		if ( len( canonicalUrl ) ) {
 			items &= '<div class="bxsites-page-actions__divider" role="separator"></div>'
 			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://x.com/intent/tweet?url=" & urlEncodedFormat( canonicalUrl ) & "&text=" & urlEncodedFormat( variables.page.title ) ) & '" target="_blank" rel="noopener noreferrer">' & itemLabel( "x", variables.strings.shareOnX, variables.strings.shareOnXHint, true ) & '</a>'
