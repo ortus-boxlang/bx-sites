@@ -578,6 +578,31 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "renders a Report an issue link in the page-meta row when [repo.url] is configured, and omits it when unconfigured, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = {
+					title       : "My Page",
+					contentHtml : "<p>Body</p>",
+					canonicalUrl : "https://example.com/my-page/",
+					editUrl     : "https://github.com/acme/docs/edit/main/docs/index.md"
+				};
+				var nav = [ { title : "My Page", url : "index.html", order : 1, children : [] } ];
+				var onConfig = { name : "My Site", repo : { url : "https://github.com/acme/docs" } };
+				var offConfig = { name : "My Site" };
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+
+					var onHtml = renderer.renderPage( page, nav, onConfig, themeDir );
+					expect( onHtml ).toInclude( "Report an issue" );
+					expect( onHtml ).toInclude( "github.com/acme/docs/issues/new?title=" );
+
+					var offHtml = renderer.renderPage( page, nav, offConfig, themeDir );
+					expect( offHtml ).notToInclude( "Report an issue" );
+					expect( offHtml ).notToInclude( "issues/new?title=" );
+				}
+			} );
+
 			it( "renders a Download Markdown link from the page's own markdownUrl, across every built-in theme, and omits it when markdownUrl is empty", function() {
 				var root = newProjectRoot();
 				var page = { title : "My Page", contentHtml : "<p>Body</p>", markdownUrl : "guides/setup.md" };

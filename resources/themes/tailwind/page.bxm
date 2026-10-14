@@ -106,6 +106,12 @@
 		if ( len( arguments.lastUpdated ) ) {
 			html &= '<span class="inline-flex items-center gap-1">' & bxsitesIcon( "clock" ) & ' ' & encodeForHTML( variables.strings.lastUpdated ) & ' ' & encodeForHTML( dateTimeFormat( arguments.lastUpdated, "medium" ) ) & '</span>'
 		}
+		var repoUrl = trim( variables.repoUrl ?: "" )
+		if ( len( repoUrl ) ) {
+			var canonicalUrl = trim( variables.page.canonicalUrl ?: "" )
+			var issueUrl = repoUrl & "/issues/new?title=" & urlEncodedFormat( "Issue with: " & variables.page.title ) & ( len( canonicalUrl ) ? "&body=" & urlEncodedFormat( "Found on: " & canonicalUrl ) : "" )
+			html &= '<a class="inline-flex items-center gap-1 hover:text-cyan-700" href="' & bxsitesUrlAttr( issueUrl ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "flag" ) & ' ' & encodeForHTML( variables.strings.reportIssue ) & '</a>'
+		}
 		html &= '</div>'
 		return html
 	}

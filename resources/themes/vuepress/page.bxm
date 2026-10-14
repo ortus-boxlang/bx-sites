@@ -102,6 +102,12 @@
 		if ( len( arguments.lastUpdated ) ) {
 			html &= '<span class="page-meta__item">' & bxsitesIcon( "clock" ) & ' ' & encodeForHTML( variables.strings.lastUpdated ) & ' ' & encodeForHTML( dateTimeFormat( arguments.lastUpdated, "medium" ) ) & '</span>'
 		}
+		var repoUrl = trim( variables.repoUrl ?: "" )
+		if ( len( repoUrl ) ) {
+			var canonicalUrl = trim( variables.page.canonicalUrl ?: "" )
+			var issueUrl = repoUrl & "/issues/new?title=" & urlEncodedFormat( "Issue with: " & variables.page.title ) & ( len( canonicalUrl ) ? "&body=" & urlEncodedFormat( "Found on: " & canonicalUrl ) : "" )
+			html &= '<a href="' & bxsitesUrlAttr( issueUrl ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "flag" ) & ' ' & encodeForHTML( variables.strings.reportIssue ) & '</a>'
+		}
 		html &= '</div>'
 		return html
 	}
