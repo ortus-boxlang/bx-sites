@@ -35,33 +35,51 @@
 		var markdownHref = len( variables.page.markdownUrl ?: "" ) ? variables.basePath & variables.page.markdownUrl : ""
 		var canonicalUrl = trim( variables.page.canonicalUrl ?: "" )
 		var repoUrl = trim( variables.repoUrl ?: "" )
+		var editUrl = trim( variables.page.editUrl ?: "" )
+
+		// Every item's own icon + two-line "title / hint" label, the hint in
+		// a smaller, muted line under the title - external true also appends
+		// a small "opens in a new tab" arrow next to the title, for any item
+		// whose <a> carries target="_blank" (every one except the three
+		// in-page buttons: copy-markdown, copy-link, print).
+		var itemLabel = function( required string icon, required string title, required string hint, boolean external = false ) {
+			return bxsitesIcon( arguments.icon )
+				& '<span class="bxsites-page-actions__item-text">'
+				& '<span class="bxsites-page-actions__item-title">' & encodeForHTML( arguments.title ) & ( arguments.external ? ' <span class="bxsites-page-actions__item-external" aria-hidden="true">&##8599;</span>' : '' ) & '</span>'
+				& '<span class="bxsites-page-actions__item-hint">' & encodeForHTML( arguments.hint ) & '</span>'
+				& '</span>'
+		}
 
 		var items = sb{ "" }
 		if ( len( markdownHref ) ) {
-			items &= '<button type="button" class="bxsites-page-actions__item" data-bxsites-action="copy-markdown" data-bxsites-markdown-url="' & bxsitesUrlAttr( markdownHref ) & '">' & bxsitesIcon( "copy" ) & '<span>' & encodeForHTML( variables.strings.copyPageMarkdown ) & '</span></button>'
+			items &= '<button type="button" class="bxsites-page-actions__item" data-bxsites-action="copy-markdown" data-bxsites-markdown-url="' & bxsitesUrlAttr( markdownHref ) & '">' & itemLabel( "copy", variables.strings.copyPageMarkdown, variables.strings.copyPageMarkdownHint ) & '</button>'
 		}
 		if ( len( canonicalUrl ) ) {
-			items &= '<button type="button" class="bxsites-page-actions__item" data-bxsites-action="copy-link" data-bxsites-page-url="' & bxsitesUrlAttr( canonicalUrl ) & '">' & bxsitesIcon( "link" ) & '<span>' & encodeForHTML( variables.strings.copyPageLink ) & '</span></button>'
+			items &= '<button type="button" class="bxsites-page-actions__item" data-bxsites-action="copy-link" data-bxsites-page-url="' & bxsitesUrlAttr( canonicalUrl ) & '">' & itemLabel( "link", variables.strings.copyPageLink, variables.strings.copyPageLinkHint ) & '</button>'
 		}
 		if ( len( markdownHref ) ) {
-			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( markdownHref ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "markdown" ) & '<span>' & encodeForHTML( variables.strings.viewAsMarkdown ) & '</span></a>'
+			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( markdownHref ) & '" target="_blank" rel="noopener noreferrer">' & itemLabel( "markdown", variables.strings.viewAsMarkdown, variables.strings.viewAsMarkdownHint, true ) & '</a>'
 		}
 		if ( len( canonicalUrl ) ) {
 			items &= '<div class="bxsites-page-actions__divider" role="separator"></div>'
-			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://chatgpt.com/?q=" & urlEncodedFormat( "Read " & canonicalUrl & " so I can ask questions about it." ) ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "sparkle" ) & '<span>' & encodeForHTML( variables.strings.openInChatGPT ) & '</span></a>'
-			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://claude.ai/new?q=" & urlEncodedFormat( "Read " & canonicalUrl & " so I can ask questions about it." ) ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "sparkle" ) & '<span>' & encodeForHTML( variables.strings.openInClaude ) & '</span></a>'
+			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://chatgpt.com/?q=" & urlEncodedFormat( "Read " & canonicalUrl & " so I can ask questions about it." ) ) & '" target="_blank" rel="noopener noreferrer">' & itemLabel( "sparkle", variables.strings.openInChatGPT, variables.strings.openInChatGPTHint, true ) & '</a>'
+			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://claude.ai/new?q=" & urlEncodedFormat( "Read " & canonicalUrl & " so I can ask questions about it." ) ) & '" target="_blank" rel="noopener noreferrer">' & itemLabel( "sparkle", variables.strings.openInClaude, variables.strings.openInClaudeHint, true ) & '</a>'
 			items &= '<div class="bxsites-page-actions__divider" role="separator"></div>'
 		}
-		items &= '<button type="button" class="bxsites-page-actions__item" data-bxsites-action="print">' & bxsitesIcon( "print" ) & '<span>' & encodeForHTML( variables.strings.exportAsPdf ) & '</span></button>'
+		if ( len( editUrl ) ) {
+			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( editUrl ) & '" target="_blank" rel="noopener noreferrer">' & itemLabel( "github", variables.strings.editOnGitHub, variables.strings.editOnGitHubHint, true ) & '</a>'
+			items &= '<div class="bxsites-page-actions__divider" role="separator"></div>'
+		}
+		items &= '<button type="button" class="bxsites-page-actions__item" data-bxsites-action="print">' & itemLabel( "print", variables.strings.exportAsPdf, variables.strings.exportAsPdfHint ) & '</button>'
 		if ( len( repoUrl ) ) {
 			var issueUrl = repoUrl & "/issues/new?title=" & urlEncodedFormat( "Issue with: " & variables.page.title ) & ( len( canonicalUrl ) ? "&body=" & urlEncodedFormat( "Found on: " & canonicalUrl ) : "" )
-			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( issueUrl ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "flag" ) & '<span>' & encodeForHTML( variables.strings.reportIssue ) & '</span></a>'
+			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( issueUrl ) & '" target="_blank" rel="noopener noreferrer">' & itemLabel( "flag", variables.strings.reportIssue, variables.strings.reportIssueHint, true ) & '</a>'
 		}
 		if ( len( canonicalUrl ) ) {
 			items &= '<div class="bxsites-page-actions__divider" role="separator"></div>'
-			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://x.com/intent/tweet?url=" & urlEncodedFormat( canonicalUrl ) & "&text=" & urlEncodedFormat( variables.page.title ) ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "x" ) & '<span>' & encodeForHTML( variables.strings.shareOnX ) & '</span></a>'
-			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://www.linkedin.com/sharing/share-offsite/?url=" & urlEncodedFormat( canonicalUrl ) ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "linkedin" ) & '<span>' & encodeForHTML( variables.strings.shareOnLinkedIn ) & '</span></a>'
-			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://www.facebook.com/sharer/sharer.php?u=" & urlEncodedFormat( canonicalUrl ) ) & '" target="_blank" rel="noopener noreferrer">' & bxsitesIcon( "facebook" ) & '<span>' & encodeForHTML( variables.strings.shareOnFacebook ) & '</span></a>'
+			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://x.com/intent/tweet?url=" & urlEncodedFormat( canonicalUrl ) & "&text=" & urlEncodedFormat( variables.page.title ) ) & '" target="_blank" rel="noopener noreferrer">' & itemLabel( "x", variables.strings.shareOnX, variables.strings.shareOnXHint, true ) & '</a>'
+			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://www.linkedin.com/sharing/share-offsite/?url=" & urlEncodedFormat( canonicalUrl ) ) & '" target="_blank" rel="noopener noreferrer">' & itemLabel( "linkedin", variables.strings.shareOnLinkedIn, variables.strings.shareOnLinkedInHint, true ) & '</a>'
+			items &= '<a class="bxsites-page-actions__item" href="' & bxsitesUrlAttr( "https://www.facebook.com/sharer/sharer.php?u=" & urlEncodedFormat( canonicalUrl ) ) & '" target="_blank" rel="noopener noreferrer">' & itemLabel( "facebook", variables.strings.shareOnFacebook, variables.strings.shareOnFacebookHint, true ) & '</a>'
 		}
 
 		return '<div class="bxsites-page-actions">'

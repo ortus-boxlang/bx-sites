@@ -263,12 +263,13 @@ body.jtd-body {
 }
 
 .nav-toggle__icon {
-	display: inline-block;
+	display: inline-flex;
+	transform: rotate(-90deg);
 	transition: transform 0.15s ease;
 }
 
 .nav-toggle[aria-expanded="true"] .nav-toggle__icon {
-	transform: rotate(90deg);
+	transform: rotate(0deg);
 }
 
 /* nav-toggle.js measures each list's own real height and transitions
@@ -1049,13 +1050,71 @@ dd {
 .jtd-page-nav {
 	display: flex;
 	justify-content: space-between;
+	gap: 1rem;
 	margin-top: 2rem;
 	padding-top: 1rem;
 	border-top: 1px solid var(--md-border);
 }
 
-.jtd-page-nav a {
+.jtd-page-nav__card {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	flex: 1 1 0;
+	max-width: 48%;
+	padding: 0.75rem 1rem;
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	border-radius: 0.6rem;
+	color: inherit;
+	text-decoration: none;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.jtd-page-nav__card:hover {
+	border-color: var(--bxsites-link);
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.jtd-page-nav__card--next {
+	margin-left: auto;
+	justify-content: flex-end;
+	text-align: right;
+}
+
+.jtd-page-nav__icon {
+	display: inline-flex;
+	flex: 0 0 auto;
+	width: 0.85rem;
+	height: 0.85rem;
+	color: var(--bxsites-muted);
+}
+
+.jtd-page-nav__card--prev .jtd-page-nav__icon {
+	transform: rotate(90deg);
+}
+
+.jtd-page-nav__card--next .jtd-page-nav__icon {
+	transform: rotate(-90deg);
+}
+
+.jtd-page-nav__text {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+	min-width: 0;
+}
+
+.jtd-page-nav__label {
+	font-size: 0.75rem;
+	font-weight: 500;
+	color: var(--bxsites-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+
+.jtd-page-nav__title {
 	font-weight: 600;
+	line-height: 1.3;
 }
 
 .bxsites-pre {
@@ -2548,7 +2607,8 @@ a.bxsites-card:hover {
 [data-theme="dark"] .bxsites-file,
 [data-theme="dark"] .bxsites-page-link,
 [data-theme="dark"] .bxsites-link-preview,
-[data-theme="dark"] .bxsites-update {
+[data-theme="dark"] .bxsites-update,
+[data-theme="dark"] .jtd-page-nav__card {
 	border-color: rgba(255, 255, 255, 0.15);
 }
 
@@ -3129,7 +3189,7 @@ a.button.primary {
 	right: 0;
 	z-index: 20;
 	margin-top: 0.35rem;
-	min-width: 12rem;
+	min-width: 17rem;
 	padding: 0.35rem;
 	background: var(--bxsites-bg, #fff);
 	border: 1px solid var(--bxsites-border);
@@ -3139,8 +3199,8 @@ a.button.primary {
 
 .bxsites-page-actions__item {
 	display: flex;
-	align-items: center;
-	gap: 0.5rem;
+	align-items: flex-start;
+	gap: 0.6rem;
 	width: 100%;
 	padding: 0.45rem 0.6rem;
 	border: 0;
@@ -3154,6 +3214,37 @@ a.button.primary {
 	cursor: pointer;
 }
 
+.bxsites-page-actions__item svg {
+	flex: 0 0 auto;
+	width: 1rem;
+	height: 1rem;
+	margin-top: 0.15rem;
+}
+
+.bxsites-page-actions__item-text {
+	display: flex;
+	flex-direction: column;
+	gap: 0.1rem;
+	min-width: 0;
+}
+
+.bxsites-page-actions__item-title {
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.bxsites-page-actions__item-external {
+	opacity: 0.6;
+	font-weight: 400;
+}
+
+.bxsites-page-actions__item-hint {
+	font-size: 0.76rem;
+	font-weight: 400;
+	color: var(--bxsites-muted);
+	line-height: 1.3;
+}
+
 .bxsites-page-actions__item:hover {
 	background: rgba(0, 0, 0, 0.06);
 }
@@ -3161,7 +3252,7 @@ a.button.primary {
 .bxsites-page-actions__divider {
 	height: 1px;
 	margin: 0.3rem 0.25rem;
-	background: var(--bxsites-border);
+	background: color-mix(in srgb, var(--bxsites-muted) 40%, transparent);
 }
 
 @media print {

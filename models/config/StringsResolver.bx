@@ -54,18 +54,32 @@ class {
 			"notFoundBody"         : "Sorry, that page doesn't exist. Try the search box, or head back to the homepage.",
 			"tagsTitle"            : "Tags",
 			"pageNavigation"       : "Page navigation",
+			"pagePrevious"         : "Previous",
+			"pageNext"             : "Next",
 			"pageActionsButton"    : "Copy",
 			"pageActionsAriaLabel" : "Page actions",
 			"copyPageMarkdown"     : "Copy page",
+			"copyPageMarkdownHint" : "Copy page as Markdown for LLMs",
 			"viewAsMarkdown"       : "View as Markdown",
+			"viewAsMarkdownHint"   : "View this page as plain text",
 			"copyPageLink"         : "Copy link",
+			"copyPageLinkHint"     : "Copy a link to this page",
 			"openInChatGPT"        : "Open in ChatGPT",
+			"openInChatGPTHint"    : "Ask ChatGPT about this page",
 			"openInClaude"         : "Open in Claude",
+			"openInClaudeHint"     : "Ask Claude about this page",
+			"editOnGitHub"         : "Edit on GitHub",
+			"editOnGitHubHint"     : "Edit this page on GitHub",
 			"exportAsPdf"          : "Export as PDF",
+			"exportAsPdfHint"      : "Download this page as a PDF",
 			"reportIssue"          : "Report an issue",
+			"reportIssueHint"      : "Report a problem with this page",
 			"shareOnX"             : "Share on X",
+			"shareOnXHint"         : "Share this page on X",
 			"shareOnLinkedIn"      : "Share on LinkedIn",
-			"shareOnFacebook"      : "Share on Facebook"
+			"shareOnLinkedInHint"  : "Share this page on LinkedIn",
+			"shareOnFacebook"      : "Share on Facebook",
+			"shareOnFacebookHint"  : "Share this page on Facebook"
 		}
 
 		/**

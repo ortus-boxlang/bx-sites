@@ -69,13 +69,25 @@
 	<bx:if len( variables.page.course.prevLesson.url ) or len( variables.page.course.nextLesson.url )>
 		<nav class="page-nav page-nav--course d-flex justify-content-between" aria-label="Course lesson navigation">
 			<bx:if len( variables.page.course.prevLesson.url )>
-				<a class="page-nav__prev" href="#variables.basePath##variables.page.course.prevLesson.url#">&larr; #encodeForHTML( variables.page.course.prevLesson.title )#</a>
+				<a class="page-nav__card page-nav__card--prev" href="#variables.basePath##variables.page.course.prevLesson.url#">
+					<span class="page-nav__icon">#bxsitesIcon( "chevron-down" )#</span>
+					<span class="page-nav__text">
+						<span class="page-nav__label">#encodeForHTML( variables.strings.pagePrevious )#</span>
+						<span class="page-nav__title">#encodeForHTML( variables.page.course.prevLesson.title )#</span>
+					</span>
+				</a>
 			</bx:if>
 			<bx:if !len( variables.page.course.prevLesson.url )>
 				<span></span>
 			</bx:if>
 			<bx:if len( variables.page.course.nextLesson.url )>
-				<a class="page-nav__next" href="#variables.basePath##variables.page.course.nextLesson.url#">#encodeForHTML( variables.page.course.nextLesson.title )# &rarr;</a>
+				<a class="page-nav__card page-nav__card--next" href="#variables.basePath##variables.page.course.nextLesson.url#">
+					<span class="page-nav__text">
+						<span class="page-nav__label">#encodeForHTML( variables.strings.pageNext )#</span>
+						<span class="page-nav__title">#encodeForHTML( variables.page.course.nextLesson.title )#</span>
+					</span>
+					<span class="page-nav__icon">#bxsitesIcon( "chevron-down" )#</span>
+				</a>
 			</bx:if>
 		</nav>
 	</bx:if>
@@ -86,7 +98,13 @@
 	<nav class="page-nav d-flex justify-content-between" aria-label="#encodeForHTML( variables.strings.pageNavigation )#">
 		<!--- Previous and next page navigation --->
 		<bx:if len( variables.page.prevPage.url )>
-			<a class="page-nav__prev" href="#variables.basePath##variables.page.prevPage.url#">&larr; #encodeForHTML( variables.page.prevPage.title )#</a>
+			<a class="page-nav__card page-nav__card--prev" href="#variables.basePath##variables.page.prevPage.url#">
+				<span class="page-nav__icon">#bxsitesIcon( "chevron-down" )#</span>
+				<span class="page-nav__text">
+					<span class="page-nav__label">#encodeForHTML( variables.strings.pagePrevious )#</span>
+					<span class="page-nav__title">#encodeForHTML( variables.page.prevPage.title )#</span>
+				</span>
+			</a>
 		</bx:if>
 		<!--- Placeholder for when there is no previous page --->
 		<bx:if !len( variables.page.prevPage.url )>
@@ -94,7 +112,13 @@
 		</bx:if>
 		<!--- Placeholder for when there is no next page --->
 		<bx:if len( variables.page.nextPage.url )>
-			<a class="page-nav__next" href="#variables.basePath##variables.page.nextPage.url#">#encodeForHTML( variables.page.nextPage.title )# &rarr;</a>
+			<a class="page-nav__card page-nav__card--next" href="#variables.basePath##variables.page.nextPage.url#">
+				<span class="page-nav__text">
+					<span class="page-nav__label">#encodeForHTML( variables.strings.pageNext )#</span>
+					<span class="page-nav__title">#encodeForHTML( variables.page.nextPage.title )#</span>
+				</span>
+				<span class="page-nav__icon">#bxsitesIcon( "chevron-down" )#</span>
+			</a>
 		</bx:if>
 	</nav>
 </bx:if>
