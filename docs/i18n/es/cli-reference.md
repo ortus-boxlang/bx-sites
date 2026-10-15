@@ -211,6 +211,7 @@ bxSites migrate --source=/path/to/notion-export --from=notion
 
 - `--source` (obligatorio) - ruta al directorio raíz de la exportación/proyecto (`SUMMARY.md` para `gitbook`, `mkdocs.yml` para `mkdocs`), o un archivo `.zip` (`markdown-zip`; `notion` acepta tanto un `.zip` como una carpeta ya extraída)
 - `--from` - `gitbook` (predeterminado), `mkdocs`, `markdown-zip`, o `notion`
+- `--force` - omite la confirmación. Si `docs/` ya tiene archivos (o existe `bxsites.yaml`, con `mkdocs`), `migrate` pregunta antes de poder sobrescribirlos
 
 ### `--from=gitbook` (predeterminado)
 
@@ -533,15 +534,17 @@ bx-sites bajo `.themes/<name>/`, dentro de la raíz de contenido - un
 punto de partida, no una migración sin pérdidas en un solo comando.
 
 ```bash title="Uso"
-bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
+bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme [--force]
 ```
 
 - `--source` (obligatorio) - `mkdocs`, `jekyll` o `hugo`
 - `--path` (obligatorio) - la propia carpeta raíz del tema de origen
 - `--name` (obligatorio) - el nombre de destino, escrito en `.themes/<name>/`
 
-Seguro de volver a ejecutar contra el mismo `--name` - `layout.bxm`/
-`page.bxm` se sobrescriben y cualquier carpeta de recursos recién
+- `--force` - omite la confirmación antes de sobrescribir
+
+Volver a ejecutar contra el mismo `--name` pregunta primero (o usa `--force`),
+y luego `layout.bxm`/`page.bxm` se sobrescriben y cualquier carpeta de recursos recién
 encontrada se combina. Consulta
 [Importar un tema](guides/theme-import.md) para exactamente qué se
 traduce y qué no, y qué revisar después.

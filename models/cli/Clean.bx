@@ -6,7 +6,7 @@
  */
 class {
 
-	variables.prompter = ( message ) => cliRead( message )
+	variables.confirm = new "models.cli.Confirm@bxsites"()
 
 	/**
 	 * Replaces the confirmation prompt - specs use this, since the default
@@ -15,7 +15,7 @@ class {
 	 * @prompter Closure taking the prompt text and returning the user's answer
 	 */
 	void function setPrompter( required any prompter ) {
-		variables.prompter = arguments.prompter
+		variables.confirm.setPrompter( arguments.prompter )
 	}
 
 	/**
@@ -38,13 +38,11 @@ class {
 
 		if ( !( arguments.options.force ?: false ) ) {
 			var folderList = targets.map( ( folder ) => folder & "/" ).toList( " and " )
-			try {
-				var answer = trim( variables.prompter( "Delete #folderList# in #root#? [y/N] " ) ?: "" )
-			} catch ( any e ) {
-				// cliRead() throws when stdin is closed (CI, piped scripts)
+			var answer = variables.confirm.ask( "Delete #folderList# in #root#?" )
+			if ( answer == "unanswered" ) {
 				return { exitCode : 1, message : "No answer to the confirmation prompt. Nothing was deleted - pass --force to clean without asking." }
 			}
-			if ( !listFindNoCase( "y,yes", answer ) ) {
+			if ( answer == "no" ) {
 				return { exitCode : 0, message : "Cancelled. Nothing was deleted." }
 			}
 		}

@@ -70,6 +70,82 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( projectRoot & "/docs/index.md" ) ).toBeTrue();
 			} );
 
+			describe( "overwrite prompt", function() {
+
+				beforeEach( function() {
+					variables.projectRoot = createTempDirectory( prefix = "bxsites-cli-migrate-project-" );
+					variables.source = createTempDirectory( prefix = "bxsites-cli-migrate-source-" );
+					tempDirs.append( projectRoot );
+					tempDirs.append( source );
+					fileWrite( source & "/SUMMARY.md", "* [Home](README.md)" );
+					fileWrite( source & "/README.md", "Welcome." );
+					directoryCreate( projectRoot & "/docs", true, true );
+					fileWrite( projectRoot & "/docs/index.md", "Mine." );
+				} );
+
+				it( "asks before migrating into a docs/ folder that already has files, and leaves it alone on no", function() {
+					var asked = "";
+					verb.setPrompter( ( message ) => {
+						asked = message;
+						return "n";
+					} );
+
+					var result = verb.run( { projectRoot : projectRoot, source : source } );
+
+					expect( asked ).toInclude( "docs/ (1 existing file(s))" );
+					expect( result.exitCode ).toBe( 0 );
+					expect( result.message ).toBe( "Cancelled. Nothing was migrated." );
+					expect( fileRead( projectRoot & "/docs/index.md" ) ).toBe( "Mine." );
+				} );
+
+				it( "migrates on yes", function() {
+					verb.setPrompter( ( message ) => "y" );
+
+					var result = verb.run( { projectRoot : projectRoot, source : source } );
+
+					expect( result.exitCode ).toBe( 0 );
+					expect( fileRead( projectRoot & "/docs/index.md" ) ).toInclude( "Welcome." );
+				} );
+
+				it( "exits 1 without writing when stdin is closed, pointing at --force", function() {
+					verb.setPrompter( ( message ) => {
+						throw( message = "Error reading from the CLI" );
+					} );
+
+					var result = verb.run( { projectRoot : projectRoot, source : source } );
+
+					expect( result.exitCode ).toBe( 1 );
+					expect( result.message ).toInclude( "--force" );
+					expect( fileRead( projectRoot & "/docs/index.md" ) ).toBe( "Mine." );
+				} );
+
+				it( "skips the prompt with --force", function() {
+					verb.setPrompter( ( message ) => {
+						throw( message = "should not be asked" );
+					} );
+
+					var result = verb.run( { projectRoot : projectRoot, source : source, force : true } );
+
+					expect( result.exitCode ).toBe( 0 );
+				} );
+
+				it( "lists bxsites.yaml for an mkdocs migration", function() {
+					var asked = "";
+					fileWrite( projectRoot & "/bxsites.yaml", "name: Mine" );
+					fileWrite( source & "/mkdocs.yml", "site_name: Theirs" );
+					verb.setPrompter( ( message ) => {
+						asked = message;
+						return "";
+					} );
+
+					verb.run( { projectRoot : projectRoot, source : source, from : "mkdocs" } );
+
+					expect( asked ).toInclude( "bxsites.yaml" );
+					expect( fileRead( projectRoot & "/bxsites.yaml" ) ).toBe( "name: Mine" );
+				} );
+
+			} );
+
 			it( "defaults --from to gitbook when it's not passed", function() {
 				var projectRoot = createTempDirectory( prefix = "bxsites-cli-migrate-project-" );
 				var source = createTempDirectory( prefix = "bxsites-cli-migrate-source-" );

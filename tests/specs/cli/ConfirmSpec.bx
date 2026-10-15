@@ -1,0 +1,39 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.Confirm", function() {
+
+			beforeEach( function() {
+				variables.confirm = new "models.cli.Confirm@bxsites"();
+			} );
+
+			it( "appends [y/N] to the question and treats y/yes (any case) as yes", function() {
+				var asked = [];
+				for ( var typed in [ "y", "Y", "yes", " YES " ] ) {
+					confirm.setPrompter( ( message ) => {
+						asked.append( message );
+						return typed;
+					} );
+					expect( confirm.ask( "Overwrite?" ) ).toBe( "yes" );
+				}
+				expect( asked[ 1 ] ).toBe( "Overwrite? [y/N] " );
+			} );
+
+			it( "treats anything else, including an empty answer, as no", function() {
+				for ( var typed in [ "", "n", "no", "sure" ] ) {
+					confirm.setPrompter( ( message ) => typed );
+					expect( confirm.ask( "Overwrite?" ) ).toBe( "no" );
+				}
+			} );
+
+			it( "returns unanswered when reading stdin throws (closed stdin in CI)", function() {
+				confirm.setPrompter( ( message ) => {
+					throw( message = "Error reading from the CLI" );
+				} );
+				expect( confirm.ask( "Overwrite?" ) ).toBe( "unanswered" );
+			} );
+
+		} );
+	}
+
+}

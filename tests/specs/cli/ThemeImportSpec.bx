@@ -123,6 +123,33 @@ class extends="testbox.system.BaseSpec" {
 				expect( directoryExists( root & "/docs/.themes/relblog" ) ).toBeTrue();
 			} );
 
+			it( "asks before re-importing over an existing .themes/<name>/, and --force skips the prompt", function() {
+				var root = newProjectRoot();
+				var sourceTheme = newTempDir( "bxsites-themeimport-mkdocs-" );
+				fileWrite( sourceTheme & "/base.html", "<html><body>{{ page.content }}</body></html>" );
+				directoryCreate( root & "/docs/.themes/mkblog", true, true );
+				fileWrite( root & "/docs/.themes/mkblog/layout.bxm", "mine" );
+
+				var asked = "";
+				verb.setPrompter( ( message ) => {
+					asked = message;
+					return "no";
+				} );
+				var declined = verb.run( { projectRoot : root, source : "mkdocs", path : sourceTheme, name : "mkblog" } );
+				expect( asked ).toInclude( "already exists" );
+				expect( declined.message ).toBe( "Cancelled. Nothing was imported." );
+				expect( fileRead( root & "/docs/.themes/mkblog/layout.bxm" ) ).toBe( "mine" );
+
+				verb.setPrompter( ( message ) => {
+					throw( message = "Error reading from the CLI" );
+				} );
+				expect( verb.run( { projectRoot : root, source : "mkdocs", path : sourceTheme, name : "mkblog" } ).exitCode ).toBe( 1 );
+
+				var forced = verb.run( { projectRoot : root, source : "mkdocs", path : sourceTheme, name : "mkblog", force : true } );
+				expect( forced.exitCode ).toBe( 0 );
+				expect( fileRead( root & "/docs/.themes/mkblog/layout.bxm" ) ).notToBe( "mine" );
+			} );
+
 			it( "converts a minimal Hugo theme end to end, substituting an unmapped condition with a safe placeholder", function() {
 				var root = newProjectRoot();
 				var sourceTheme = newTempDir( "bxsites-themeimport-hugo-" );

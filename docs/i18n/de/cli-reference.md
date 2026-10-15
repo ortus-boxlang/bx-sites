@@ -213,6 +213,7 @@ bxSites migrate --source=/path/to/notion-export --from=notion
 
 - `--source` (erforderlich) - Pfad zum Wurzelverzeichnis des Exports/Projekts (`SUMMARY.md` für `gitbook`, `mkdocs.yml` für `mkdocs`), oder eine `.zip`-Datei (`markdown-zip`; `notion` akzeptiert sowohl eine `.zip` als auch einen bereits entpackten Ordner)
 - `--from` - `gitbook` (Standard), `mkdocs`, `markdown-zip` oder `notion`
+- `--force` - überspringt die Rückfrage. Wenn `docs/` bereits Dateien enthält (oder bei `mkdocs` eine `bxsites.yaml` existiert), fragt `migrate` nach, bevor es sie überschreiben könnte
 
 ### `--from=gitbook` (Standard)
 
@@ -536,15 +537,17 @@ bx-sites-Theme-Gerüst unter `.themes/<name>/`, innerhalb des Content-Root
 des Projekts - ein Ausgangspunkt, kein verlustfreier Ein-Befehl-Port.
 
 ```bash title="Usage"
-bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
+bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme [--force]
 ```
 
 - `--source` (erforderlich) - `mkdocs`, `jekyll` oder `hugo`
 - `--path` (erforderlich) - der Wurzelordner des Quell-Themes
 - `--name` (erforderlich) - der Zielname, geschrieben nach `.themes/<name>/`
 
-Sicher, gegen denselben `--name` erneut auszuführen -
-`layout.bxm`/`page.bxm` werden überschrieben und neu gefundene
+- `--force` - überspringt die Rückfrage vor dem Überschreiben
+
+Ein erneuter Lauf gegen denselben `--name` fragt zuerst nach (oder `--force`),
+dann werden `layout.bxm`/`page.bxm` überschrieben und neu gefundene
 Asset-Ordner werden zusammengeführt. Siehe
 [Ein Theme importieren](guides/theme-import.md) für genau das, was
 übersetzt wird und was nicht, und was danach zu prüfen ist.

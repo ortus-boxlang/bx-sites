@@ -246,6 +246,7 @@ bxSites migrate --source=/path/to/notion-export --from=notion
 
 - `--source` (required) - path to the export/project's root directory (`SUMMARY.md` for `gitbook`, `mkdocs.yml` for `mkdocs`), or a `.zip` file (`markdown-zip`; `notion` accepts either a `.zip` or an already-extracted folder)
 - `--from` - `gitbook` (default), `mkdocs`, `markdown-zip`, or `notion`
+- `--force` - skip the prompt. When `docs/` already has files (or `bxsites.yaml` exists, for `mkdocs`), `migrate` asks before it may overwrite them
 
 ### `--from=gitbook` (default)
 
@@ -566,15 +567,17 @@ ecosystem (`mkdocs`/`jekyll`/`hugo`) into a bx-sites theme scaffold under
 lossless one-command port.
 
 ```bash title="Usage"
-bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
+bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme [--force]
 ```
 
 - `--source` (required) - `mkdocs`, `jekyll`, or `hugo`
 - `--path` (required) - the source theme's own root folder
 - `--name` (required) - the destination name, written to `.themes/<name>/`
 
-Safe to re-run against the same `--name` - `layout.bxm`/`page.bxm` are
-overwritten and any newly-found asset folders merged in. See
+- `--force` - skip the overwrite prompt
+
+Re-running against the same `--name` asks first (or pass `--force`), then
+`layout.bxm`/`page.bxm` are overwritten and any newly-found asset folders merged in. See
 [Importing a theme](guides/theme-import.md) for exactly what does and
 doesn't get translated, and what to check afterward.
 

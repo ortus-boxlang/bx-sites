@@ -8,17 +8,26 @@
  * family, GoTemplateTranslator.bx for `hugo`'s Go templates). See
  * docs/guides/theme-import.md.
  *
- * Re-running against the same `--name` is safe/idempotent - `layout.bxm`/
- * `page.bxm` are overwritten and asset folders merged in, not blocked by
- * an already-exists guard, since re-importing to retry after fixing the
- * source (or after editing the variable map) is a normal part of this
- * workflow, unlike `install:theme`'s ForgeBox download (where a stale
- * previous install should always be replaced outright, not merged into).
+ * Re-running against the same `--name` asks first (or `--force`), then
+ * overwrites `layout.bxm`/`page.bxm` and merges asset folders in, since
+ * re-importing to retry after fixing the source (or after editing the
+ * variable map) is a normal part of this workflow, unlike
+ * `install:theme`'s ForgeBox download (where a stale previous install
+ * should always be replaced outright, not merged into).
  */
 class {
 
+	variables.confirm = new "models.cli.Confirm@bxsites"()
+
 	/**
-	 * @options { projectRoot (required, absolute path), source (required - "mkdocs", "jekyll", or "hugo"), path (required - absolute path to the source theme's own root folder), name (required - the destination name under .themes/<name>/) }
+	 * @prompter Test seam - see Confirm.setPrompter()
+	 */
+	void function setPrompter( required any prompter ) {
+		variables.confirm.setPrompter( arguments.prompter )
+	}
+
+	/**
+	 * @options { projectRoot (required, absolute path), source (required - "mkdocs", "jekyll", or "hugo"), path (required - absolute path to the source theme's own root folder), name (required - the destination name under .themes/<name>/), force (skip the overwrite prompt) }
 	 */
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
@@ -44,6 +53,16 @@ class {
 		var config = ecosystemConfig( source )
 		var contentRoot = new "models.config.SourceDirResolver@bxsites"().resolveConfigured( projectRoot )
 		var destDir = contentRoot & "/.themes/" & name
+
+		if ( directoryExists( destDir ) && !( arguments.options.force ?: false ) ) {
+			var answer = variables.confirm.ask( "#destDir# already exists. Overwrite its layout files?" )
+			if ( answer == "unanswered" ) {
+				return { exitCode : 1, message : "No answer to the confirmation prompt. Nothing was imported - pass --force to overwrite without asking." }
+			}
+			if ( answer == "no" ) {
+				return { exitCode : 0, message : "Cancelled. Nothing was imported." }
+			}
+		}
 
 		var importer = new "models.build.ThemeImporter@bxsites"()
 		var result = importer.import(

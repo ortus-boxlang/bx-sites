@@ -8,6 +8,15 @@
  */
 class {
 
+	variables.confirm = new "models.cli.Confirm@bxsites"()
+
+	/**
+	 * @prompter Test seam - see Confirm.setPrompter()
+	 */
+	void function setPrompter( required any prompter ) {
+		variables.confirm.setPrompter( arguments.prompter )
+	}
+
 	/**
 	 * Dispatches the `migrate` verb: validates `--source` points at
 	 * something real for whichever `--from` selects (`gitbook`, the
@@ -18,7 +27,7 @@ class {
 	 * that migrator and reports its own result (including anything it
 	 * couldn't auto-convert) as the verb's own message.
 	 *
-	 * @options { projectRoot (required, absolute path), source (required, path to a GitBook export containing SUMMARY.md, an mkdocs project containing mkdocs.yml, a plain .zip of Markdown files, or a Notion export .zip/folder), from ("gitbook" (default), "mkdocs", "markdown-zip", or "notion") }
+	 * @options { projectRoot (required, absolute path), source (required, path to a GitBook export containing SUMMARY.md, an mkdocs project containing mkdocs.yml, a plain .zip of Markdown files, or a Notion export .zip/folder), from ("gitbook" (default), "mkdocs", "markdown-zip", or "notion"), force (skip the overwrite prompt) }
 	 */
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
@@ -54,6 +63,19 @@ class {
 			}
 		} else if ( !directoryExists( source ) ) {
 			throw( type = "BxSites.MigrateSourceNotFound", message = "No directory at [#source#]" )
+		}
+
+		if ( !( arguments.options.force ?: false ) ) {
+			var conflicts = existingTargets( projectRoot, from )
+			if ( conflicts.len() ) {
+				var answer = variables.confirm.ask( "This migration may overwrite files in #projectRoot#: #conflicts.toList( ', ' )#. Continue?" )
+				if ( answer == "unanswered" ) {
+					return { exitCode : 1, message : "No answer to the confirmation prompt. Nothing was migrated - pass --force to overwrite without asking." }
+				}
+				if ( answer == "no" ) {
+					return { exitCode : 0, message : "Cancelled. Nothing was migrated." }
+				}
+			}
 		}
 
 		switch ( from ) {
@@ -149,6 +171,32 @@ class {
 			}
 		}
 		return result
+	}
+
+	/**
+	 * What a migration into `projectRoot` could overwrite: a content folder
+	 * that already has files (every migrator writes there), plus
+	 * `bxsites.yaml` for mkdocs, the one migrator that writes config.
+	 *
+	 * @projectRoot Absolute path to the target project root
+	 * @from The validated --from value
+	 *
+	 * @return Human-readable descriptions, empty when nothing is at risk
+	 */
+	private array function existingTargets( required string projectRoot, required string from ) {
+		var resolver = new "models.config.SourceDirResolver@bxsites"()
+		var docsDir = resolver.resolve( arguments.projectRoot )
+		var conflicts = []
+		if ( directoryExists( docsDir ) ) {
+			var fileCount = directoryList( docsDir, true, "path" ).filter( ( path ) => !directoryExists( path ) ).len()
+			if ( fileCount ) {
+				conflicts.append( "#resolver.name( arguments.projectRoot )#/ (#fileCount# existing file(s))" )
+			}
+		}
+		if ( arguments.from == "mkdocs" && fileExists( arguments.projectRoot & "/bxsites.yaml" ) ) {
+			conflicts.append( "bxsites.yaml" )
+		}
+		return conflicts
 	}
 
 }

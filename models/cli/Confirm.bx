@@ -1,0 +1,35 @@
+/**
+ * Shared [y/N] confirmation prompt for CLI verbs that delete or overwrite
+ * a user's files (`clean`, `migrate`, `theme:import`). Every caller also
+ * takes `--force` to skip it, for scripts and CI.
+ */
+class {
+
+	variables.prompter = ( message ) => cliRead( message )
+
+	/**
+	 * Swaps the real `cliRead()` for a test double.
+	 *
+	 * @prompter A closure taking the prompt text and returning the typed answer (or throwing, like a closed stdin)
+	 */
+	void function setPrompter( required any prompter ) {
+		variables.prompter = arguments.prompter
+	}
+
+	/**
+	 * Asks a yes/no question, defaulting to no.
+	 *
+	 * @question The question, without the trailing " [y/N] "
+	 *
+	 * @return "yes", "no", or "unanswered" when stdin is closed (CI, piped scripts) and `cliRead()` throws
+	 */
+	string function ask( required string question ) {
+		try {
+			var answer = trim( variables.prompter( arguments.question & " [y/N] " ) ?: "" )
+		} catch ( any e ) {
+			return "unanswered"
+		}
+		return listFindNoCase( "y,yes", answer ) ? "yes" : "no"
+	}
+
+}
