@@ -21,6 +21,13 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			/**
+			 * Forward slashes only, so a path assertion holds on Windows too.
+			 */
+			private string function normalized( required string path ) {
+				return new "models.build.PathRelativizer@bxsites"().normalize( arguments.path );
+			}
+
 			private string function newAppRoot() {
 				var dir = createTempDirectory( prefix = "bxsites-cbscanner-" );
 				tempDirs.append( dir );
@@ -61,7 +68,7 @@ class extends="testbox.system.BaseSpec" {
 				var app = scanner.scan( root );
 
 				expect( app.configFile ).toBe( root & "/config/ColdBox.cfc" );
-				expect( app.routerFile ).toBe( root & "/config/Router.bx" );
+				expect( normalized( app.routerFile ) ).toBe( normalized( root & "/config/Router.bx" ) );
 				expect( app.wireBoxFile ).toBe( root & "/config/WireBox.bx" );
 				expect( app.schedulerFile ).toBe( root & "/config/Scheduler.cfc" );
 			} );
@@ -109,7 +116,7 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( app.modules.len() ).toBe( 1 );
 				expect( app.modules[ 1 ].name ).toBe( "api" );
-				expect( app.modules[ 1 ].routerFile ).toBe( root & "/modules_app/api/config/Router.bx" );
+				expect( normalized( app.modules[ 1 ].routerFile ) ).toBe( normalized( root & "/modules_app/api/config/Router.bx" ) );
 				expect( app.modules[ 1 ].handlers.len() ).toBe( 1 );
 				expect( app.modules[ 1 ].handlers[ 1 ].module ).toBe( "api" );
 				expect( app.modules[ 1 ].models.len() ).toBe( 1 );
