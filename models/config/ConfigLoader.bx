@@ -698,10 +698,11 @@ class {
 	 * `"skip"`, default `"fail"`) controls what a `::: cloud` block does
 	 * when its own build-time fetch fails - DirectiveBlockProcessor.bx's
 	 * own `renderCloud()`. `comments` (default `false`) gates both
-	 * `::: comments` itself (a bare block in a project that hasn't turned
-	 * this on always fails the build, same posture as `contentBlocks`
-	 * below) and whether the small client-side comments-init.js runtime
-	 * gets shipped - see BuildPipeline.bx's `copyAssets()`. Unlike
+	 * `::: comments` itself (a block in a project that hasn't turned this
+	 * on renders an inert placeholder and the build prints a warning,
+	 * unlike `contentBlocks`, which fails) and whether the small
+	 * client-side comments-init.js runtime gets shipped - see
+	 * BuildPipeline.bx's `copyAssets()`. Unlike
 	 * `contentBlocks`, there's no build-time fetch for `::: comments` (it
 	 * always live-loads client-side, same-origin through the edge router -
 	 * see DirectiveBlockProcessor.bx's own `renderComments()`), so it needs

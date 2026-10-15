@@ -149,6 +149,12 @@ class {
 	variables.commentsEnabled = false
 
 	/**
+	 * Pages whose `::: comments` block was skipped because `cloud.comments`
+	 * is off - see `getCommentsSkippedPages()`.
+	 */
+	variables.commentsSkippedPages = []
+
+	/**
 	 * Wires `config.cloud.comments` into `renderComments()` below - see
 	 * `variables.commentsEnabled`'s own docblock for why this needs no
 	 * other fields. Always called once per `build()` (both true and
@@ -162,6 +168,18 @@ class {
 	 */
 	void function setCommentsContext( required boolean enabled ) {
 		variables.commentsEnabled = arguments.enabled
+		variables.commentsSkippedPages = []
+	}
+
+	/**
+	 * The `urlPath` of every page that had a `::: comments` block rendered
+	 * as an inert placeholder because `cloud.comments` is off (unique,
+	 * in first-seen order, reset by `setCommentsContext()` at the start of
+	 * each build). The build warns once about the first one; this is the
+	 * full list.
+	 */
+	array function getCommentsSkippedPages() {
+		return variables.commentsSkippedPages
 	}
 
 	/**
@@ -1570,27 +1588,47 @@ class {
 	 * (`setPageContext()` above), so every page gets its own comment
 	 * thread with zero configuration.
 	 *
-	 * Requires `cloud.comments: true` in `bxsites.yaml` (BuildPipeline.bx
-	 * calls `setCommentsContext()` once per `build()`) - a bare
-	 * `::: comments` block in a project that hasn't turned that on always
-	 * fails the build outright, same posture as `::: cloud` without
-	 * `cloud.contentBlocks` - there's no sensible placeholder for "this
-	 * directive can never work at all here."
+	 * Needs `cloud.comments: true` in `bxsites.yaml` (BuildPipeline.bx
+	 * calls `setCommentsContext()` once per `build()`). A `::: comments`
+	 * block in a project that hasn't turned that on does NOT fail the
+	 * build: it renders an inert, empty placeholder (no comments-init.js
+	 * is shipped, so nothing mounts) and the build prints one warning,
+	 * so a page can carry the block ahead of the account being set up.
+	 * That is the opposite of `::: cloud`, which always fails without
+	 * `cloud.contentBlocks`, because it has to fetch real content at
+	 * build time.
 	 */
 	private string function renderComments( required struct attrs ) {
-		if ( !variables.commentsEnabled ) {
-			throw(
-				type    = "BxSites.CommentsNotConfigured",
-				message = "::: comments - requires [cloud.comments] set to true in bxsites.yaml - see the Comments guide"
-			)
-		}
-
 		var threadId = trim( arguments.attrs.id ?: "" )
 		if ( !len( threadId ) ) {
 			threadId = variables.currentPageUrlPath
 		}
 
+		if ( !variables.commentsEnabled ) {
+			noteCommentsSkipped( variables.currentPageUrlPath )
+			return '<div class="bxsites-comments bxsites-comments--disabled" data-comments-thread="' & attrEscape( threadId ) & '"></div>'
+		}
+
 		return '<div class="bxsites-comments" data-comments-thread="' & attrEscape( threadId ) & '"></div>'
+	}
+
+	/**
+	 * Records a page whose `::: comments` block was skipped and prints the
+	 * one-per-build warning the first time it happens.
+	 *
+	 * @pagePath The page's own `urlPath`
+	 */
+	private void function noteCommentsSkipped( required string pagePath ) {
+		var isFirst = false
+		lock name="bxsites-comments-skipped" type="exclusive" timeout=10 {
+			if ( !variables.commentsSkippedPages.find( arguments.pagePath ) ) {
+				isFirst = !variables.commentsSkippedPages.len()
+				variables.commentsSkippedPages.append( arguments.pagePath )
+			}
+		}
+		if ( isFirst ) {
+			systemOutput( '[bx-sites] Warning: ::: comments on [#arguments.pagePath#] is ignored because cloud.comments is not enabled - set cloud.comments: true in bxsites.yaml (needs a bxSites Cloud account with Comments) to turn it on', true )
+		}
 	}
 
 	/**

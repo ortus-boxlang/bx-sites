@@ -511,18 +511,48 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).notToInclude( "data-cloud-version" );
 			} );
 
-			it( "throws BxSites.CommentsNotConfigured when a comments block is used without setCommentsContext( true ) ever having been called (cloud.comments not enabled)", function() {
-				expect( function() {
-					render( "::: comments" & char( 10 ) & ":::" );
-				} ).toThrow( "BxSites.CommentsNotConfigured" );
+			it( "renders an inert placeholder instead of failing when cloud.comments was never enabled", function() {
+				processor.setPageContext( "guides/setup" );
+
+				var html = render( "::: comments" & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( "bxsites-comments--disabled" );
+				expect( html ).toInclude( 'data-comments-thread="guides/setup"' );
+				expect( processor.getCommentsSkippedPages() ).toBe( [ "guides/setup" ] );
 			} );
 
-			it( "throws BxSites.CommentsNotConfigured when setCommentsContext( false ) was explicitly called", function() {
+			it( "renders the same inert placeholder when setCommentsContext( false ) was explicitly called", function() {
 				processor.setCommentsContext( false );
+				processor.setPageContext( "guides/setup" );
 
-				expect( function() {
-					render( "::: comments" & char( 10 ) & ":::" );
-				} ).toThrow( "BxSites.CommentsNotConfigured" );
+				var html = render( "::: comments id=""general-feedback""" & char( 10 ) & ":::" );
+
+				expect( html ).toInclude( "bxsites-comments--disabled" );
+				expect( html ).toInclude( 'data-comments-thread="general-feedback"' );
+			} );
+
+			it( "lists each skipped page once, and resets the list when the next build calls setCommentsContext()", function() {
+				processor.setCommentsContext( false );
+				processor.setPageContext( "a" );
+				render( "::: comments" & char( 10 ) & ":::" );
+				render( "::: comments" & char( 10 ) & ":::" );
+				processor.setPageContext( "b" );
+				render( "::: comments" & char( 10 ) & ":::" );
+
+				expect( processor.getCommentsSkippedPages() ).toBe( [ "a", "b" ] );
+
+				processor.setCommentsContext( true );
+				expect( processor.getCommentsSkippedPages() ).toBeEmpty();
+			} );
+
+			it( "does not mark the container disabled, and records nothing, when cloud.comments is on", function() {
+				processor.setCommentsContext( true );
+				processor.setPageContext( "guides/setup" );
+
+				var html = render( "::: comments" & char( 10 ) & ":::" );
+
+				expect( html ).notToInclude( "disabled" );
+				expect( processor.getCommentsSkippedPages() ).toBeEmpty();
 			} );
 
 			it( "renders an empty, client-mounted container defaulting its thread id to the current page's own urlPath", function() {
