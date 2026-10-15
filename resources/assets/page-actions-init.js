@@ -15,8 +15,8 @@
  *   (window.print()), scoped to just this page by each theme's own
  *   @media print rules (see the ::: pagebreak content block's own CSS).
  *
- * "View as Markdown"/"Open in ChatGPT"/"Open in Claude"/"Report an
- * issue"/"Share on X"/"Share on LinkedIn" are plain <a> links - no JS
+ * "View as Markdown"/"Open in ChatGPT"/"Open in Claude"/"Edit on
+ * GitHub"/"Share on X"/"Share on LinkedIn" are plain <a> links - no JS
  * needed to fire them, only to close the panel afterwards.
  *
  * A bare "c" keydown (see below) also toggles the whole menu open/closed
@@ -25,7 +25,9 @@
  */
 ( function () {
 	function flashLabel( button, text, revertAfter ) {
-		var label = button.querySelector( "span" );
+		// The title line only, so the hint under it survives; a custom theme
+		// still on the older single-<span> markup falls back to that span.
+		var label = button.querySelector( ".bxsites-page-actions__item-title" ) || button.querySelector( "span" );
 		if ( !label ) {
 			return;
 		}
