@@ -807,7 +807,9 @@ class extends="testbox.system.BaseSpec" {
 				var html = fileRead( root & "/site/index.html" );
 				expect( html ).notToInclude( "bxsites-search-input" );
 				expect( html ).notToInclude( "minisearch" );
-				expect( html ).toInclude( "bxsites-search-algolia" );
+				// The container docsearch() mounts into must actually exist by id -
+				// the class name and the init script also contain this string.
+				expect( html ).toInclude( 'id="bxsites-search-algolia"' );
 				expect( html ).toInclude( "docsearch(" );
 				expect( html ).toInclude( "ABC123" );
 				// encodeForJavaScript() hex-escapes non-alphanumerics for safe JS-string

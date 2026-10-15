@@ -1,6 +1,6 @@
 <bx:output>
 <bx:if variables.searchProviderName neq 'local'>
-	<div id="bxsites-search-pagefind" class="bxsites-search-#encodeForHtml( variables.searchProviderName )#"></div>
+	<div id="bxsites-search-#encodeForHtml( variables.searchProviderName )#" class="bxsites-search-#encodeForHtml( variables.searchProviderName )#"></div>
 <bx:else>
 	<div class="bxsites-search position-relative">
 		<input
