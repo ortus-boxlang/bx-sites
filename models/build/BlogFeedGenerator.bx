@@ -38,16 +38,16 @@ class {
 		var lines = [
 			'<?xml version="1.0" encoding="UTF-8"?>',
 			'<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel>',
-			"	<title>" & encodeForHTML( channelTitle ) & "</title>",
+			"	<title>" & encodeForXML( channelTitle ) & "</title>",
 			"	<link>" & attrEscape( channelLink ) & "</link>",
-			"	<description>" & encodeForHTML( "Blog posts from " & arguments.siteName ) & "</description>"
+			"	<description>" & encodeForXML( "Blog posts from " & arguments.siteName ) & "</description>"
 		]
 
 		for ( var post in filtered ) {
 			var postUrl = arguments.siteUrl & post.urlPath.reReplaceNoCase( "index\.html$", "" )
 
 			lines.append( "	<item>" )
-			lines.append( "		<title>" & encodeForHTML( post.title ) & "</title>" )
+			lines.append( "		<title>" & encodeForXML( post.title ) & "</title>" )
 			lines.append( "		<link>" & attrEscape( postUrl ) & "</link>" )
 			lines.append( '		<guid isPermaLink="true">' & attrEscape( postUrl ) & "</guid>" )
 
@@ -56,15 +56,15 @@ class {
 			}
 
 			for ( var author in ( post.resolvedAuthors ?: [] ) ) {
-				lines.append( "		<dc:creator>" & encodeForHTML( author.name ) & "</dc:creator>" )
+				lines.append( "		<dc:creator>" & encodeForXML( author.name ) & "</dc:creator>" )
 			}
 
 			for ( var postCategory in ( post.categories ?: [] ) ) {
-				lines.append( "		<category>" & encodeForHTML( postCategory ) & "</category>" )
+				lines.append( "		<category>" & encodeForXML( postCategory ) & "</category>" )
 			}
 
 			var description = len( trim( post.excerptText ?: "" ) ) ? post.excerptText : ( len( trim( post.description ?: "" ) ) ? post.description : post.title )
-			lines.append( "		<description>" & encodeForHTML( description ) & "</description>" )
+			lines.append( "		<description>" & encodeForXML( description ) & "</description>" )
 
 			lines.append( "	</item>" )
 		}

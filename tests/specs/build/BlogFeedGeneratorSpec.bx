@@ -134,11 +134,16 @@ class extends="testbox.system.BaseSpec" {
 				expect( xml ).notToInclude( "News A" );
 			} );
 
-			it( "HTML-escapes a post's own title", function() {
-				var xml = generator.build( [ newPost( { title : "A & B" } ) ], "BX Sites", "https://example.com/" );
+			it( "XML-escapes titles so the feed parses, including non-ASCII text", function() {
+				var title = "Café " & char( 8212 ) & " A & B <b>";
+				var xml = generator.build( [ newPost( { title : title, excerptText : title } ) ], "Café Docs", "https://example.com/" );
 
-				expect( xml ).toInclude( "A &amp; B" );
 				expect( xml ).notToInclude( "<title>A & B</title>" );
+				// HTML named entities (&eacute;, &mdash;) aren't valid XML - xmlParse() rejects them
+				var doc = xmlParse( xml );
+				expect( doc.rss.channel.item.title.xmlText ).toBe( title );
+				expect( doc.rss.channel.item.description.xmlText ).toBe( title );
+				expect( doc.rss.channel.title.xmlText ).toBe( "Café Docs Blog" );
 			} );
 
 		} );

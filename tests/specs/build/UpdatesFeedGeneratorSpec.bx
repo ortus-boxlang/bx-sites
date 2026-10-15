@@ -8,7 +8,7 @@ class extends="testbox.system.BaseSpec" {
 				variables.page = { title : "Changelog", urlPath : "changelog/index.html" };
 			} );
 
-			// encodeForHTML()'s exact escaping range for "safe" ASCII
+			// encodeForXML()'s exact escaping range for "safe" ASCII
 			// punctuation (e.g. "/", ":") is environment-dependent
 			// (locale/JVM-charset-driven) - both the escaped numeric-entity
 			// form and the raw character are equally valid, equivalent XML,
@@ -57,13 +57,14 @@ class extends="testbox.system.BaseSpec" {
 				expect( xml ).toInclude( "<category>fix</category>" );
 			} );
 
-			it( "HTML-escapes an entry's rendered content in <description>", function() {
-				var entries = [ { date : "2026-01-01", tags : [], contentHtml : "<p>A & B</p>" } ];
+			it( "escapes an entry's rendered content in <description> so the feed parses, including non-ASCII text", function() {
+				var contentHtml = "<p>Café " & char( 8212 ) & " A & B</p>";
+				var entries = [ { date : "2026-01-01", tags : [], contentHtml : contentHtml } ];
 
 				var xml = generator.build( entries, page, "BX Sites", "https://example.com/" );
 
-				expect( xml ).toInclude( "&lt;p&gt;" );
-				expect( xml ).notToInclude( "<p>A & B</p>" );
+				expect( xml ).notToInclude( "<p>Café" );
+				expect( xmlParse( xml ).rss.channel.item.description.xmlText ).toBe( contentHtml );
 			} );
 
 		} );
