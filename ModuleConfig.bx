@@ -246,17 +246,9 @@ class {
 	 * require `--key=value` so boolean flags do not consume project paths.
 	 *
 	 * `--version`/`-v` and `--help`/`-h` (or no verb, or the `help` verb) are
-	 * handled before verb dispatch and never reach a verb class - though in
-	 * practice only `-v` and `help`/no-args ever get this far intact:
-	 * BoxLang's own CLI reserves `-h`, `--help`, and the long `--version`
-	 * form as ITS OWN global flags and intercepts them before any module,
-	 * this one included, ever runs - `-h`/`--help` show BoxLang's generic
-	 * runtime help instead of this method's own printUsage(), and
-	 * `--version` gets silently stripped from argv, so firstToken below
-	 * ends up empty rather than "--version". Not a bug in this dispatch
-	 * logic to fix - there's no argv this class ever sees to fix it with -
-	 * see docs/cli-reference.md's "Global options" section for the
-	 * user-facing form of this same caveat.
+	 * handled before verb dispatch and never reach a verb class. BoxLang
+	 * 1.18+ passes all four through to modules; earlier versions swallowed
+	 * `--help`/`-h`/`--version` as their own global flags.
 	 *
 	 * BoxLang ignores `main()`'s return value as a process exit code, so
 	 * `main()` hands any non-zero result from `dispatch()` to `cliExit()`.

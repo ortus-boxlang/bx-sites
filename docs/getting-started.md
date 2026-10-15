@@ -10,8 +10,8 @@ tags: [guides, setup]
 
 ## Prerequisite: install BoxLang
 
-Everything below assumes the BoxLang runtime itself is already on your
-machine - `install-bx-module` is BoxLang's own CLI installing a module into
+Everything below assumes the BoxLang runtime itself (1.18 or later) is
+already on your machine - `install-bx-module` is BoxLang's own CLI installing a module into
 an existing installation, and CommandBox's `box install` still needs a
 BoxLang engine to run against. If you don't have BoxLang yet, install it
 first with either:

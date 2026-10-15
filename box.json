@@ -21,7 +21,7 @@
         "markdown"
     ],
     "boxlang":{
-        "minimumVersion":"1.6.0",
+        "minimumVersion":"1.18.0",
         "moduleName":"bxsites",
         "executable":"bxSites"
     },

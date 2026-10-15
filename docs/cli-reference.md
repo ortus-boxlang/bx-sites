@@ -35,17 +35,8 @@ projects.
 
 | Flag | Description |
 |---|---|
-| `-v` | Show the module version and exit |
-| `help`, or no verb at all | Show usage and exit |
-
-`-h`, `--help`, and the long `--version` form are reserved by BoxLang's
-own CLI itself (its own `--help`/`--version` handling short-circuits
-before any module - not just bx-sites - ever sees them), so they never
-reach bx-sites: `-h`/`--help` print BoxLang's own generic runtime help
-instead of bx-sites' usage, and `--version` silently prints usage (not
-the version) since BoxLang strips it from argv before dispatch. Use `-v`
-or `help`/no-args instead - both are unaffected because neither is one of
-BoxLang's own reserved global tokens.
+| `-h`, `--help`, `help`, or no verb at all | Show usage and exit |
+| `-v`, `--version` | Show the module version and exit |
 
 Every verb below ships with core. An installed and activated addon module
 can register further verbs of its own (e.g. a commercial deploy/hosting
