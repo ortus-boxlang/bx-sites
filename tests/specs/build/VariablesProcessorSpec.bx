@@ -109,6 +109,26 @@ class extends="testbox.system.BaseSpec" {
 				expect( result ).toBe( md );
 			} );
 
+			it( "leaves a {{ }} inside an indented fenced code block (a tab or admonition body) untouched", function() {
+				var nl = char( 10 );
+				var fence = repeatString( char( 96 ), 3 );
+				var md = '=== "Vue"' & nl & nl
+					& "    " & fence & "html" & nl
+					& "    <p>{{ message }}</p>" & nl
+					& "    " & fence & nl & nl
+					& '!!! note "Jinja"' & nl
+					& "    " & fence & nl
+					& "    {{ user.name | upper }}" & nl
+					& "    " & fence & nl & nl
+					& "Outside: {{ company }}";
+
+				var result = processor.resolve( md, { "company" : "Ortus" } );
+
+				expect( result ).toInclude( "<p>{{ message }}</p>" );
+				expect( result ).toInclude( "{{ user.name | upper }}" );
+				expect( result ).toInclude( "Outside: Ortus" );
+			} );
+
 			it( "leaves a {{ }} shown inside inline code untouched, even when it looks like a real call", function() {
 				// A doc page listing this syntax inline (not in a fenced
 				// block) must not have the fail-fast UnknownFunction/

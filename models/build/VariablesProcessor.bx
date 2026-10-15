@@ -92,7 +92,7 @@ class {
 	string function resolve( required string markdown, struct vars = {}, struct functions = {}, string context = "", struct functionContext = {} ) {
 		var normalized = arguments.markdown.reReplace( char( 13 ) & char( 10 ), char( 10 ), "all" )
 		var lines = listToArray( normalized, char( 10 ), true )
-		var tracker = new "models.build.FenceTracker@bxsites"()
+		var tracker = new "models.build.FenceTracker@bxsites"( indentedFences = true )
 		var fenced = lines.map( line => tracker.consume( line ) )
 
 		var outputLines = []

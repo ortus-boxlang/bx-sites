@@ -19,6 +19,20 @@ class {
 
 	variables.fenceChar = ""
 	variables.fenceLength = 0
+	variables.indentedFences = false
+
+	/**
+	 * @indentedFences Also treat fences indented 4+ spaces (or a tab) as
+	 * fences - the fenced code inside a tab or admonition body. Off by
+	 * default, since processors that look for their own top-level syntax
+	 * read those bodies as plain content; VariablesProcessor turns it on,
+	 * where over-protecting only leaves a `{{ }}` as written but
+	 * under-protecting fails the build on a code sample.
+	 */
+	function init( boolean indentedFences = false ) {
+		variables.indentedFences = arguments.indentedFences
+		return this
+	}
 
 	/**
 	 * Advances the tracker by one line and reports whether that line is
@@ -36,7 +50,7 @@ class {
 		// at most 3 spaces (CommonMark) - a 4+ space or tab indent makes it
 		// just body content, e.g. a code sample shown *inside* an indented
 		// tab/admonition body that itself contains a fenced snippet.
-		var tooIndented = arguments.line.reFind( "^(\t| {4,})" ) > 0
+		var tooIndented = !variables.indentedFences && arguments.line.reFind( "^(\t| {4,})" ) > 0
 
 		if ( variables.fenceLength > 0 ) {
 			if ( !tooIndented && trimmedLine.reFind( "^" & variables.fenceChar & "{" & variables.fenceLength & ",}$" ) ) {

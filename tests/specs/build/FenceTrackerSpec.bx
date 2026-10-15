@@ -47,6 +47,16 @@ class extends="testbox.system.BaseSpec" {
 				expect( tracker.consume( "back to normal" ) ).toBeFalse();
 			} );
 
+			it( "treats 4+ space indented fences as real fences when indentedFences is on", function() {
+				var indented = new "models.build.FenceTracker@bxsites"( indentedFences = true );
+
+				expect( indented.consume( '=== "Vue"' ) ).toBeFalse();
+				expect( indented.consume( "    ```html" ) ).toBeTrue();
+				expect( indented.consume( "    <p>{{ message }}</p>" ) ).toBeTrue();
+				expect( indented.consume( "    ```" ) ).toBeTrue();
+				expect( indented.consume( "back to normal" ) ).toBeFalse();
+			} );
+
 		} );
 	}
 
