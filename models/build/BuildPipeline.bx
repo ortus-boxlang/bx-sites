@@ -73,6 +73,8 @@ class {
 	// from a previous build() call on the same instance); see
 	// copyAssets()'s own docblock.
 	variables.canonicalAssetsDir = ""
+	// Why the last hardlink attempt fell back to a full copy ("" when it didn't)
+	variables.lastHardlinkError = ""
 	// A blog post's real built URL (`blog/<slug>/index.html`, BlogDiscoverer.bx's
 	// own convention) diverges from what MarkdownLinkResolver.bx's generic
 	// docs/-relative-path convention would compute for it
@@ -142,6 +144,7 @@ class {
 		variables.profileTimings = []
 		variables.profileLastAt = buildStartedAt
 		variables.canonicalAssetsDir = ""
+		variables.lastHardlinkError = ""
 
 		progress( "Loading configuration and content..." )
 
@@ -2384,6 +2387,7 @@ class {
 			try {
 				hardlinkDirectory( variables.canonicalAssetsDir, destAssetsDir )
 			} catch ( any e ) {
+				variables.lastHardlinkError = e.message
 				copyAssetsFresh( argumentCollection = arguments )
 			}
 		}
@@ -2587,10 +2591,10 @@ class {
 
 		var Files = createObject( "java", "java.nio.file.Files" )
 		var Paths = createObject( "java", "java.nio.file.Paths" )
-		var sourcePrefixLength = len( arguments.source ) + 1 // +1 for the separator between source and the relative path below
+		var relativizer = new "models.build.PathRelativizer@bxsites"()
 
 		for ( var sourceFile in directoryList( arguments.source, true, "path", "*", "asc", "file" ) ) {
-			var relativePath = right( sourceFile, len( sourceFile ) - sourcePrefixLength )
+			var relativePath = relativizer.relativeTo( arguments.source, sourceFile )
 			var destFile = arguments.dest & "/" & relativePath
 
 			if ( fileExists( destFile ) ) {
@@ -2604,6 +2608,14 @@ class {
 
 			Files.createLink( Paths.get( destFile ), Paths.get( sourceFile ) )
 		}
+	}
+
+	/**
+	 * Why the last build fell back from hardlinking a tree's assets/ to a
+	 * full copy - "" when every tree hardlinked fine. Diagnostic only.
+	 */
+	string function getLastHardlinkError() {
+		return variables.lastHardlinkError
 	}
 
 	/**

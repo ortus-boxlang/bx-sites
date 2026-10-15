@@ -430,6 +430,7 @@ class extends="testbox.system.BaseSpec" {
 
 				pipeline.build( root );
 
+				expect( pipeline.getLastHardlinkError() ).toBe( "" );
 				var mainCopy = root & "/site/assets/logo.svg";
 				var localeCopy = root & "/site/es/assets/logo.svg";
 				expect( fileExists( mainCopy ) ).toBeTrue();
@@ -494,7 +495,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( hashedPath ).toMatch( ".*[\\/]style\.[0-9a-f]{8}\.css$" );
 
 				var html = fileRead( root & "/site/index.html" );
-				var hashedFileName = listLast( hashedPath, "/" );
+				var hashedFileName = getFileFromPath( hashedPath );
 				expect( html ).toInclude( 'href="/assets/theme/' & hashedFileName & '"' );
 			} );
 

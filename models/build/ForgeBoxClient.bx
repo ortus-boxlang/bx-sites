@@ -125,7 +125,7 @@ class {
 	 */
 	void function download( required string url, required string destZipPath ) {
 		var destDir  = getDirectoryFromPath( arguments.destZipPath )
-		var destFile = arguments.destZipPath.listLast( "/" )
+		var destFile = getFileFromPath( arguments.destZipPath )
 		directoryCreate( destDir, true, true )
 
 		bx:http url="#arguments.url#" method="GET" getAsBinary="yes" throwOnError="false" path="#destDir#" file="#destFile#" result="local.response";

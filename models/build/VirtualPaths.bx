@@ -6,7 +6,8 @@
  *
  * A path on a different Windows drive than cwd (`bxSites build D:\site`
  * run from `C:\`) gets its own `/bxAppRoot<letter>` mapping, registered
- * the first time it's needed, since `/bxAppRoot` only covers cwd's drive.
+ * the first time it's needed (see registerMapping()), since `/bxAppRoot`
+ * only covers cwd's drive.
  *
  * ThemeRenderer.bx, FunctionsLoader.bx and DataLoader.bx each carried a
  * copy of this logic before; this is the one shared version.
@@ -37,8 +38,25 @@ class {
 		}
 
 		var mapping = "/bxAppRoot" & pathDrive
-		getBoxRuntime().getConfiguration().registerMapping( mapping, pathDrive & ":" & char( 92 ) )
+		registerMapping( mapping, pathDrive & ":" & char( 92 ) )
 		return mapping & rest
+	}
+
+	/**
+	 * Registers a mapping so it resolves right away, in this request too:
+	 * on the runtime (for later requests) and on the running application,
+	 * since a runtime mapping added mid-request isn't seen until the next one.
+	 *
+	 * @mapping The mapping name, e.g. "/bxAppRootD"
+	 * @directory The directory it points at
+	 */
+	void function registerMapping( required string mapping, required string directory ) {
+		getBoxRuntime().getConfiguration().registerMapping( arguments.mapping, arguments.directory )
+		var appMappings = getApplicationMetadata().mappings ?: {}
+		if ( ( appMappings[ arguments.mapping ] ?: "" ) != arguments.directory ) {
+			appMappings[ arguments.mapping ] = arguments.directory
+			bx:application action="update" mappings=appMappings;
+		}
 	}
 
 	/**

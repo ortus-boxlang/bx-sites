@@ -32,6 +32,21 @@ class extends="testbox.system.BaseSpec" {
 				expect( paths.toVirtualPath( "d:\site\theme", "C:\users\me" ) ).toBe( "/bxAppRootD/site/theme" );
 			} );
 
+			it( "registers a mapping that templates and classes resolve through in the same request", function() {
+				var dir = createTempDirectory( prefix = "bxsites-virtualpaths-" );
+				try {
+					fileWrite( dir & "/probe.bxm", "probed" );
+					fileWrite( dir & "/Probe.bx", "class { function getData() { return ""ok""; } }" );
+
+					paths.registerMapping( "/bxVirtualPathsProbe", dir );
+
+					expect( fileExists( expandPath( "/bxVirtualPathsProbe/probe.bxm" ) ) ).toBeTrue();
+					expect( new "bxVirtualPathsProbe.Probe"().getData() ).toBe( "ok" );
+				} finally {
+					directoryDelete( dir, true );
+				}
+			} );
+
 			it( "builds a dotted class path", function() {
 				expect( paths.toClassPath( "/work/site/docs/data", "/work/site" ) ).toBe( "bxApp.docs.data" );
 				expect( paths.toClassPath( "D:\site\docs\data", "C:\work" ) ).toBe( "bxAppRootD.site.docs.data" );

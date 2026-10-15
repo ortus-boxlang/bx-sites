@@ -29,13 +29,13 @@ class {
 
 		var lines = [ "Wrote #lintPath.listLast( '/' )#" ]
 		if ( syncResult.created.len() ) {
-			lines.append( "Created: " & syncResult.created.map( p => p.listLast( "/" ) ).toList( ", " ) )
+			lines.append( "Created: " & syncResult.created.map( p => getFileFromPath( p ) ).toList( ", " ) )
 		}
 		if ( syncResult.updated.len() ) {
-			lines.append( "Updated: " & syncResult.updated.map( p => p.listLast( "/" ) ).toList( ", " ) )
+			lines.append( "Updated: " & syncResult.updated.map( p => getFileFromPath( p ) ).toList( ", " ) )
 		}
 		if ( syncResult.skipped.len() ) {
-			lines.append( "Skipped (no bxsites:agents markers found - edited by hand?): " & syncResult.skipped.map( p => p.listLast( "/" ) ).toList( ", " ) )
+			lines.append( "Skipped (no bxsites:agents markers found - edited by hand?): " & syncResult.skipped.map( p => getFileFromPath( p ) ).toList( ", " ) )
 		}
 
 		return {

@@ -59,7 +59,8 @@ class extends="testbox.system.BaseSpec" {
 				var result = target.deploy( { destination : "deployed-relative" }, { siteDir : siteDir, projectRoot : root } );
 
 				expect( result.success ).toBeTrue();
-				expect( result.details.destination ).toBe( root & "/deployed-relative" );
+				var relativizer = new "models.build.PathRelativizer@bxsites"();
+				expect( relativizer.normalize( result.details.destination ) ).toBe( relativizer.normalize( root & "/deployed-relative" ) );
 				expect( fileExists( root & "/deployed-relative/index.html" ) ).toBeTrue();
 			} );
 

@@ -140,7 +140,7 @@ class {
 	 */
 	struct function load( required string projectRoot ) {
 		var configPath = configPathFor( arguments.projectRoot )
-		variables.configFileName = configPath.listLast( "/" )
+		variables.configFileName = getFileFromPath( configPath )
 
 		if ( !fileExists( configPath ) ) {
 			throw(

@@ -260,7 +260,7 @@ class {
 		var indexFiles = [ "overview-summary.json", "package-summary.json" ]
 
 		return directoryList( arguments.outputDir, true, "path", "*.json" )
-			.filter( ( path ) => !directoryExists( path ) && !indexFiles.findNoCase( path.listLast( "/" ) ) )
+			.filter( ( path ) => !directoryExists( path ) && !indexFiles.findNoCase( getFileFromPath( path ) ) )
 			.sort( "textnocase" )
 	}
 

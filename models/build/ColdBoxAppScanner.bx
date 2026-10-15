@@ -145,7 +145,7 @@ class {
 				continue
 			}
 
-			var name = path.listLast( "/" )
+			var name = path.listLast( "/" & char( 92 ) )
 
 			modules.append( {
 				"name"       : name,
