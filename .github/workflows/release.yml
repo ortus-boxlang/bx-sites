@@ -231,6 +231,11 @@ jobs:
           mkdir -p docs/releases
           cp .tmp/docs/releases/*.md docs/releases/ 2>/dev/null || true
 
+      - name: Setup BoxLang
+        uses: ortus-boxlang/setup-boxlang@1.4.0
+        with:
+          modules: bx-cli
+
       - name: Bump Version
         run: |
           box bump --minor --!TagVersion
