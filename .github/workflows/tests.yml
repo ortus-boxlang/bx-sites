@@ -131,7 +131,21 @@ jobs:
           errors=$(grep -ohE 'errors="[0-9]+"' "${resultFiles[@]}" | grep -oE '[0-9]+' | awk '{s+=$1} END {print s+0}')
           echo "Tests: ${totalTests}, Failures: ${failures}, Errors: ${errors}"
           if [ "${failures}" -gt 0 ] || [ "${errors}" -gt 0 ]; then
-            echo "::error::${failures} failing / ${errors} erroring spec(s) - see tests/results/*.xml (uploaded as this job's tests-${{ matrix.os }} artifact) for exactly which ones"
+            # Name every failing spec right here in the log, not just in the artifact
+            "$(command -v python3 || command -v python)" - "${resultFiles[@]}" <<'PY'
+          import sys, xml.etree.ElementTree as ET
+          seen = set()
+          for path in sys.argv[1:]:
+              for case in ET.parse(path).iter("testcase"):
+                  for problem in list(case.iter("failure")) + list(case.iter("error")):
+                      key = (case.get("classname"), case.get("name"))
+                      if key in seen:
+                          continue
+                      seen.add(key)
+                      message = " ".join((problem.get("message") or problem.text or "").split())[:300]
+                      print(f"{problem.tag.upper()}: {key[0]} > {key[1]}\n    {message}")
+          PY
+            echo "::error::${failures} failing / ${errors} erroring spec(s) - listed above, and in tests/results/*.xml (uploaded as this job's tests-${{ matrix.os }} artifact)"
             exit 1
           fi
 
