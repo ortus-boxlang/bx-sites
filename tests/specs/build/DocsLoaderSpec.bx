@@ -237,6 +237,23 @@ class extends="testbox.system.BaseSpec" {
 				expect( pages[ 1 ].relativePath ).toBe( "real.md" );
 			} );
 
+			it( "skips any dot-prefixed folder or file at any depth (.claude/, .cursor/, .agents/, .notes.md)", function() {
+				var dir = newDocsDir();
+				directoryCreate( dir & "/.claude/skills/bx-sites", true, true );
+				fileWrite( dir & "/.claude/skills/bx-sites/SKILL.md", "excluded" );
+				directoryCreate( dir & "/.cursor/rules", true, true );
+				fileWrite( dir & "/.cursor/rules/style.md", "excluded" );
+				directoryCreate( dir & "/guides/.drafts", true, true );
+				fileWrite( dir & "/guides/.drafts/wip.md", "excluded" );
+				fileWrite( dir & "/guides/.notes.md", "excluded" );
+				fileWrite( dir & "/guides/setup.md", "Included" );
+
+				var pages = loader.load( dir );
+
+				expect( pages.len() ).toBe( 1 );
+				expect( pages[ 1 ].relativePath ).toBe( "guides/setup.md" );
+			} );
+
 			it( "does NOT exclude README.md/LICENSE.md/CHANGELOG.md by default - a project can have real content at that name", function() {
 				var dir = newDocsDir();
 				fileWrite( dir & "/license.md", "Our license" );

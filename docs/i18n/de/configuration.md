@@ -222,7 +222,7 @@ unabhängiger Projekt-Wurzeln aus einem einzigen Repository.
 
 Zusätzliche Datei-/Ordnernamen, die aus dem Build ausgeschlossen werden,
 zusätzlich zu den traditionellen, die bxSites ohnehin immer ausschließt
-(`.git`, `.github`, `node_modules`, `boxlang_modules`, `site`, `.theme`,
+(jeder Ordner und jede Datei mit führendem Punkt wie `.git` oder `.claude`, `node_modules`, `boxlang_modules`, `site`, `.theme`,
 `.themes` und die eigene Konfigurationsdatei dieses Projekts). Wird auf
 dieselbe Weise abgeglichen - ein bloßer Name an der Wurzel von `source`,
 oder ein Name irgendwo darunter über ein führendes, `/`-freies

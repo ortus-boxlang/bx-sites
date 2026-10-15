@@ -60,6 +60,9 @@ class {
 			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFindNoCase( "^blog[\/]" ) )
 			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFindNoCase( "^includes[\/]" ) )
 			.filter( path => !isExcluded( variables.pathRelativizer.relativeTo( dir, path ), excludeNames ) )
+			// Dot folders/files are tooling, never pages - with `source: .` that's
+			// .claude/skills/**/SKILL.md (skills:install), .cursor/, .agents/, ...
+			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFind( "(^|[\\\/])\." ) )
 			.map( path => loadFile( dir, path ) )
 
 		pages.sort( ( a, b ) => {
