@@ -179,6 +179,7 @@ la convenzione <code>docs/</code>-o-<code>src/</code>. <code>new</code> genera s
 <tr><td><code>-v</code>, <code>--version</code></td><td>Mostra la versione del modulo ed esce</td></tr>
 </tbody>
 </table></div>
+<p>I flag di percorso (<code>--source</code>, <code>--path</code>, <code>--dest</code>, <code>--output</code>) accettano un percorso assoluto, un percorso <code>~/</code> nella cartella home o un percorso relativo alla radice del progetto.</p>
 <h2 id="new"><a href="#new" id="new" name="new" class="anchor"></a><code>new</code></h2>
 <p>Genera lo scheletro di un progetto di documentazione.</p>
 <pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites new [path] [--name=...] [--theme=&lt;see guides/themes.md for all 10&gt;] [--description=...] [--format=yaml|json] [--source=docs|src] [--agents=agents,claude,cursor]
@@ -230,8 +231,11 @@ scrive invece l'indice con ambito proprio di ogni albero (vedi
 </code></pre>
 <h2 id="clean"><a href="#clean" id="clean" name="clean" class="anchor"></a><code>clean</code></h2>
 <p>Rimuove <code>site/</code> e qualsiasi cache di compilazione, lasciando intatti
-<code>docs/</code> e la configurazione del sito.</p>
+<code>docs/</code> e la configurazione del sito. Chiede conferma prima di eliminare;
+<code>--force</code> salta la domanda (necessario in CI e negli script, dove nessuno
+può rispondere).</p>
 <pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites clean
+bxSites clean --force
 </code></pre>
 <h2 id="gh-deploy"><a href="#gh-deploy" id="gh-deploy" name="gh-deploy" class="anchor"></a><code>gh-deploy</code></h2>
 <p>Compila il sito, poi lo forza (force-push) su un branch in stile
@@ -264,7 +268,7 @@ bxSites deploy [--verbose]
 <p>Tre modi per invocarlo:</p>
 <ol>
 <li><strong><code>--entry=&lt;nome&gt;</code></strong> - smista verso qualunque target dichiarato da un
-file <code>deployments/&lt;nome&gt;.json</code> (vedi sotto). Ogni target eccetto
+file <code>deployments/&lt;nome&gt;.yaml</code> (vedi sotto). Ogni target eccetto
 <code>local</code>/<code>github-pages</code> lo richiede - c'è più configurazione di quanta
 ne possano ragionevolmente portare un paio di flag.</li>
 <li><strong><code>--target=&lt;nome&gt;</code> con i propri flag</strong> - una scorciatoia a soli flag
@@ -272,10 +276,10 @@ per i due target più semplici, che non necessitano affatto di una
 cartella <code>deployments/</code>: <code>local</code> (<code>--destination=&lt;percorso&gt;</code>) e
 <code>github-pages</code> (<code>[--branch] [--remote] [--message]</code>, ogni campo
 opzionale, con gli stessi valori predefiniti di <code>gh-deploy</code>).</li>
-<li><strong>Nessun flag - distribuisce tutto.</strong> Ogni voce <code>deployments/*.json</code>
+<li><strong>Nessun flag - distribuisce tutto.</strong> Ogni voce <code>deployments/*</code>
 viene distribuita a turno, a partire da un'unica build condivisa (il
 sito viene compilato una sola volta, non una volta per target).
-Richiede che esista almeno una voce <code>deployments/*.json</code>. Il
+Richiede che esista almeno una voce <code>deployments/*</code>. Il
 fallimento di un target non ferma gli altri - ogni voce viene tentata,
 e il comando esce con un codice diverso da zero solo se almeno una di
 esse è fallita; il riepilogo finale riporta quante sono andate a buon
@@ -286,7 +290,7 @@ e quando ciascun target inizia/finisce, invece del solo riepilogo finale
 su una riga.</p>
 <p>Vedi <a href="/theme/slate/it/guides/deployment/index.html">Distribuzione</a> per la struttura di
 configurazione propria di ogni target e un esempio reale di
-<code>deployments/*.json</code> per ciascuno.</p>
+<code>deployments/*</code> per ciascuno.</p>
 <h2 id="package"><a href="#package" id="package" name="package" class="anchor"></a><code>package</code></h2>
 <p>Compila il sito, poi lo comprime in un unico archivio distribuibile - uno
 zip semplice la cui radice è il contenuto stesso del sito compilato (non
@@ -310,6 +314,7 @@ bxSites migrate --source=/percorso/dell/export-notion --from=notion
 <ul>
 <li><code>--source</code> (obbligatorio) - percorso alla cartella radice dell'export/progetto (<code>SUMMARY.md</code> per <code>gitbook</code>, <code>mkdocs.yml</code> per <code>mkdocs</code>), oppure un file <code>.zip</code> (<code>markdown-zip</code>; <code>notion</code> accetta sia uno <code>.zip</code> sia una cartella già estratta)</li>
 <li><code>--from</code> - <code>gitbook</code> (predefinito), <code>mkdocs</code>, <code>markdown-zip</code> o <code>notion</code></li>
+<li><code>--force</code> - salta la conferma. Se <code>docs/</code> contiene già dei file (o esiste <code>bxsites.yaml</code>, con <code>mkdocs</code>), <code>migrate</code> chiede prima di poterli sovrascrivere</li>
 </ul>
 <h3 id="--fromgitbook-predefinito"><a href="#--fromgitbook-predefinito" id="--fromgitbook-predefinito" name="--fromgitbook-predefinito" class="anchor"></a><code>--from=gitbook</code> (predefinito)</h3>
 <p>Un export di GitBook - un sommario <code>SUMMARY.md</code> più i suoi file <code>.md</code>, il
@@ -566,15 +571,24 @@ dall'ecosistema di un altro generatore di siti statici
 (<code>mkdocs</code>/<code>jekyll</code>/<code>hugo</code>) in uno scheletro di tema bx-sites sotto
 <code>.themes/&lt;name&gt;/</code>, dentro la content root - un punto di partenza, non un
 porting senza perdite in un solo comando.</p>
-<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
+<pre data-bxsites-title="Utilizzo"><code class="language-bash">bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme [--force]
 </code></pre>
 <ul>
-<li><code>--source</code> (obbligatorio) - <code>mkdocs</code>, <code>jekyll</code>, o <code>hugo</code></li>
-<li><code>--path</code> (obbligatorio) - la cartella radice propria del tema sorgente</li>
-<li><code>--name</code> (obbligatorio) - il nome di destinazione, scritto in <code>.themes/&lt;name&gt;/</code></li>
+<li>
+<p><code>--source</code> (obbligatorio) - <code>mkdocs</code>, <code>jekyll</code>, o <code>hugo</code></p>
+</li>
+<li>
+<p><code>--path</code> (obbligatorio) - la cartella radice propria del tema sorgente</p>
+</li>
+<li>
+<p><code>--name</code> (obbligatorio) - il nome di destinazione, scritto in <code>.themes/&lt;name&gt;/</code></p>
+</li>
+<li>
+<p><code>--force</code> - salta la conferma prima di sovrascrivere</p>
+</li>
 </ul>
-<p>Rieseguire il comando con lo stesso <code>--name</code> è sicuro - <code>layout.bxm</code>/
-<code>page.bxm</code> vengono sovrascritti e qualsiasi cartella di asset appena
+<p>Rieseguire il comando con lo stesso <code>--name</code> chiede prima conferma (o usa <code>--force</code>),
+poi <code>layout.bxm</code>/<code>page.bxm</code> vengono sovrascritti e qualsiasi cartella di asset appena
 trovata viene unita. Vedi <a href="/theme/slate/it/guides/theme-import/index.html">Importare un tema</a>
 per sapere esattamente cosa viene tradotto e cosa no, e cosa controllare
 in seguito.</p>
@@ -700,7 +714,7 @@ quelle pagine.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/it/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/theme/slate/it/cli-reference.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Oct 15, 2026, 9&#x3a;34&#x3a;54 AM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Riferimento%20CLI&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fslate%2Fit%2Fcli-reference%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/it/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/theme/slate/it/cli-reference.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Oct 15, 2026, 1&#x3a;41&#x3a;11 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Riferimento%20CLI&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fslate%2Fit%2Fcli-reference%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
 
 			</article>
 
@@ -763,7 +777,7 @@ quelle pagine.</p>
 	<script src="/theme/slate/it/assets/prompt-init.774781de.js" defer></script>
 	<script src="/theme/slate/it/assets/contact-form-init.7f7be308.js" defer></script>
 
-	<script src="/theme/slate/it/assets/page-actions-init.e7dd88d0.js" defer></script>
+	<script src="/theme/slate/it/assets/page-actions-init.9092e0f1.js" defer></script>
 
 
 	<script src="/theme/slate/it/assets/vendor/mermaid/mermaid.min.js"></script>

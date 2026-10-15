@@ -58,7 +58,8 @@ originale `{% %}`, quindi il contenuto è comunque lì e ancora facile da
 trovare (cerca `{%` nell'albero `docs/` migrato una volta finito).
 Rieseguire `migrate` sovrascrive qualsiasi file o `docs/nav.json` scritto
 in precedenza, quindi è sicuro correggere il proprio export sorgente ed
-eseguirlo di nuovo.
+eseguirlo di nuovo. Chiede prima conferma quando `docs/` contiene già dei
+file; usa `--force` per saltare la conferma.
 
 ## Cosa viene convertito automaticamente
 

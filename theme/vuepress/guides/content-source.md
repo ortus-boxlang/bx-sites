@@ -109,7 +109,7 @@ content actually lives).
 ## Excluding files and folders
 
 bxSites always excludes a handful of names from the content scan on its
-own - `.git`, `.github`, `node_modules`, `boxlang_modules`, `site`,
+own - any dot-prefixed folder or file (`.git`, `.github`, `.claude`, ...), `node_modules`, `boxlang_modules`, `site`,
 `.theme`, `.themes`, and its own config file (`bxsites.yaml`/`.yml`/
 `.toml`/`.json`, `box.json`) - the same way it already excludes
 `assets/`, `versions/`, `i18n/`, `blog/`, and `includes/` from being

@@ -40,6 +40,8 @@ la convenzione `docs/`-o-`src/`. `new` genera sempre lo scheletro di
 | `-h`, `--help` | Mostra l'utilizzo ed esce |
 | `-v`, `--version` | Mostra la versione del modulo ed esce |
 
+I flag di percorso (`--source`, `--path`, `--dest`, `--output`) accettano un percorso assoluto, un percorso `~/` nella cartella home o un percorso relativo alla radice del progetto.
+
 ## `new`
 
 Genera lo scheletro di un progetto di documentazione.
@@ -108,10 +110,13 @@ bxSites search-index
 ## `clean`
 
 Rimuove `site/` e qualsiasi cache di compilazione, lasciando intatti
-`docs/` e la configurazione del sito.
+`docs/` e la configurazione del sito. Chiede conferma prima di eliminare;
+`--force` salta la domanda (necessario in CI e negli script, dove nessuno
+può rispondere).
 
 ```bash frame="terminal" title="Terminal"
 bxSites clean
+bxSites clean --force
 ```
 
 ## `gh-deploy`
@@ -153,7 +158,7 @@ bxSites deploy [--verbose]
 Tre modi per invocarlo:
 
 1. **`--entry=<nome>`** - smista verso qualunque target dichiarato da un
-   file `deployments/<nome>.json` (vedi sotto). Ogni target eccetto
+   file `deployments/<nome>.yaml` (vedi sotto). Ogni target eccetto
    `local`/`github-pages` lo richiede - c'è più configurazione di quanta
    ne possano ragionevolmente portare un paio di flag.
 2. **`--target=<nome>` con i propri flag** - una scorciatoia a soli flag
@@ -161,10 +166,10 @@ Tre modi per invocarlo:
    cartella `deployments/`: `local` (`--destination=<percorso>`) e
    `github-pages` (`[--branch] [--remote] [--message]`, ogni campo
    opzionale, con gli stessi valori predefiniti di `gh-deploy`).
-3. **Nessun flag - distribuisce tutto.** Ogni voce `deployments/*.json`
+3. **Nessun flag - distribuisce tutto.** Ogni voce `deployments/*`
    viene distribuita a turno, a partire da un'unica build condivisa (il
    sito viene compilato una sola volta, non una volta per target).
-   Richiede che esista almeno una voce `deployments/*.json`. Il
+   Richiede che esista almeno una voce `deployments/*`. Il
    fallimento di un target non ferma gli altri - ogni voce viene tentata,
    e il comando esce con un codice diverso da zero solo se almeno una di
    esse è fallita; il riepilogo finale riporta quante sono andate a buon
@@ -176,7 +181,7 @@ su una riga.
 
 Vedi [Distribuzione](guides/deployment.md) per la struttura di
 configurazione propria di ogni target e un esempio reale di
-`deployments/*.json` per ciascuno.
+`deployments/*` per ciascuno.
 
 ## `package`
 
@@ -209,6 +214,7 @@ bxSites migrate --source=/percorso/dell/export-notion --from=notion
 
 - `--source` (obbligatorio) - percorso alla cartella radice dell'export/progetto (`SUMMARY.md` per `gitbook`, `mkdocs.yml` per `mkdocs`), oppure un file `.zip` (`markdown-zip`; `notion` accetta sia uno `.zip` sia una cartella già estratta)
 - `--from` - `gitbook` (predefinito), `mkdocs`, `markdown-zip` o `notion`
+- `--force` - salta la conferma. Se `docs/` contiene già dei file (o esiste `bxsites.yaml`, con `mkdocs`), `migrate` chiede prima di poterli sovrascrivere
 
 ### `--from=gitbook` (predefinito)
 
@@ -529,15 +535,17 @@ dall'ecosistema di un altro generatore di siti statici
 porting senza perdite in un solo comando.
 
 ```bash title="Utilizzo"
-bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
+bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme [--force]
 ```
 
 - `--source` (obbligatorio) - `mkdocs`, `jekyll`, o `hugo`
 - `--path` (obbligatorio) - la cartella radice propria del tema sorgente
 - `--name` (obbligatorio) - il nome di destinazione, scritto in `.themes/<name>/`
 
-Rieseguire il comando con lo stesso `--name` è sicuro - `layout.bxm`/
-`page.bxm` vengono sovrascritti e qualsiasi cartella di asset appena
+- `--force` - salta la conferma prima di sovrascrivere
+
+Rieseguire il comando con lo stesso `--name` chiede prima conferma (o usa `--force`),
+poi `layout.bxm`/`page.bxm` vengono sovrascritti e qualsiasi cartella di asset appena
 trovata viene unita. Vedi [Importare un tema](guides/theme-import.md)
 per sapere esattamente cosa viene tradotto e cosa no, e cosa controllare
 in seguito.

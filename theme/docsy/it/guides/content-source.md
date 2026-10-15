@@ -116,7 +116,7 @@ il contenuto vive realmente).
 ## Escludere file e cartelle
 
 bxSites esclude sempre da sé una manciata di nomi dalla scansione del
-contenuto - `.git`, `.github`, `node_modules`, `boxlang_modules`, `site`,
+contenuto - qualsiasi cartella o file che inizia con un punto (`.git`, `.github`, `.claude`, ...), `node_modules`, `boxlang_modules`, `site`,
 `.theme`, `.themes`, e il proprio file di configurazione
 (`bxsites.yaml`/`.yml`/`.toml`/`.json`, `box.json`) - allo stesso modo in
 cui esclude già `assets/`, `versions/`, `i18n/`, `blog/` e `includes/`

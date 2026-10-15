@@ -160,18 +160,23 @@ Verzeichnis oder GitHub Pages.</p>
 <h2 id="der-befehl-deploy"><a href="#der-befehl-deploy" id="der-befehl-deploy" name="der-befehl-deploy" class="anchor"></a>Der Befehl <code>deploy</code></h2>
 <p>Jedes Ziel außer den beiden einfachsten (<code>local</code>/<code>github-pages</code>, die allein
 mit Flags auskommen - siehe <a href="/theme/tailwind/de/cli-reference/index.html#deploy">CLI-Referenz</a>)
-wird über eine <code>deployments/&lt;name&gt;.json</code>-Datei im Projekt-Wurzelverzeichnis
+wird über eine <code>deployments/&lt;name&gt;.yaml</code>-Datei im Projekt-Wurzelverzeichnis
 konfiguriert - eine Datei pro tatsächlich genutztem Deploy-Ziel, jede
 benennt, welches <code>target</code> es ist, plus die eigenen Felder dieses Ziels:</p>
 <pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites deploy --entry=production
 </code></pre>
-<pre data-bxsites-title="deployments&#x2f;production.json"><code class="language-json">{ &quot;target&quot;: &quot;s3&quot;, &quot;bucket&quot;: &quot;my-docs-site&quot;, &quot;accessKeyIdEnvVar&quot;: &quot;AWS_ACCESS_KEY_ID&quot;, &quot;secretAccessKeyEnvVar&quot;: &quot;AWS_SECRET_ACCESS_KEY&quot; }
+<pre data-bxsites-title="deployments&#x2f;production.yaml"><code class="language-yaml">target: s3
+bucket: my-docs-site
+accessKeyIdEnvVar: AWS_ACCESS_KEY_ID
+secretAccessKeyEnvVar: AWS_SECRET_ACCESS_KEY
 </code></pre>
+<p>Einträge können YAML (<code>.yaml</code>/<code>.yml</code>), TOML (<code>.toml</code>) oder JSON (<code>.json</code>) sein - dieselben Formate wie die Website-Konfiguration. Die Ziel-Abschnitte unten zeigen JSON, aber jedes Feld funktioniert in jedem Format gleich.</p>
+<p>Dateipfade in einem Eintrag (<code>serviceAccountKeyPath</code>, ein SFTP-<code>key</code>, rsyncs <code>identityFile</code>, ein lokales <code>destination</code>) können absolut sein, mit <code>~/</code> beginnen oder relativ zum Projektstamm sein.</p>
 <p><strong>Secrets kommen immer aus einer Umgebungsvariable, nie aus einem
-literalen Wert in <code>deployments/*.json</code>.</strong> Jedes Feld, das auf <code>EnvVar</code>
+literalen Wert in <code>deployments/*</code>.</strong> Jedes Feld, das auf <code>EnvVar</code>
 endet, benennt die <em>Umgebungsvariable</em>, die das eigentliche Secret enthält
 (ein Access Key, ein Passwort, ein API-Token) - zur Deploy-Zeit live
-aufgelöst, sodass <code>deployments/*.json</code> selbst immer gefahrlos committet
+aufgelöst, sodass <code>deployments/*</code> selbst immer gefahrlos committet
 werden kann. Ein Feld, das ein <em>Pfad</em> zu einer Credential-Datei ist, die
 du bereits selbst verwaltest (ein privater SSH-Schlüssel, ein
 heruntergeladener GCP-Service-Account-JSON-Key), ist die eine Ausnahme -
@@ -184,7 +189,7 @@ Shell zu exportieren; in CI werden sie als echte Secrets auf dem Runner
 gesetzt.</p>
 <h3 id="alle-ziele-auf-einmal-deployen"><a href="#alle-ziele-auf-einmal-deployen" id="alle-ziele-auf-einmal-deployen" name="alle-ziele-auf-einmal-deployen" class="anchor"></a>Alle Ziele auf einmal deployen</h3>
 <p><code>bxSites deploy</code> ohne <code>--entry</code> und ohne <code>--target</code> ausgeführt, deployt
-jeden <code>deployments/*.json</code>-Eintrag der Reihe nach, ausgehend von einem
+jeden <code>deployments/*</code>-Eintrag der Reihe nach, ausgehend von einem
 einzigen gemeinsamen Build:</p>
 <pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites deploy
 </code></pre>
@@ -287,6 +292,10 @@ Rebuild, da nur die Änderungen übertragen werden. Erfordert <code>rsync</code>
   &quot;identityFile&quot;: &quot;/home/me/.ssh/id_rsa&quot;
 }
 </code></pre>
+<p>Entfernte Dateien, die in deinem Build nicht mehr vorkommen, bleiben
+erhalten. Mit <code>&quot;deleteExtraneous&quot;: true</code> werden sie ebenfalls gelöscht
+(rsyncs <code>--delete</code>). Ein <code>remotePath</code> von <code>/</code>, <code>~</code> oder <code>.</code> wird
+abgelehnt - gib den eigenen Ordner der Website an.</p>
 <h3 id="netlify"><a href="#netlify" id="netlify" name="netlify" class="anchor"></a><code>netlify</code></h3>
 <pre data-bxsites-title="deployments&#x2f;production.json"><code class="language-json">{
   &quot;target&quot;: &quot;netlify&quot;,
@@ -448,7 +457,7 @@ dort einschaltest, wo <code>site/</code> am Ende ausgeliefert wird.</p>
 
 				</div>
 
-	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/de/guides/deployment.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Oct 15, 2026, 9&#x3a;34&#x3a;54 AM</span><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Deployment&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Ftailwind%2Fde%2Fguides%2Fdeployment%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
+	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/de/guides/deployment.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Oct 15, 2026, 1&#x3a;41&#x3a;11 PM</span><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Deployment&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Ftailwind%2Fde%2Fguides%2Fdeployment%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
 
 			</article>
 
@@ -511,7 +520,7 @@ dort einschaltest, wo <code>site/</code> am Ende ausgeliefert wird.</p>
 	<script src="/theme/tailwind/de/assets/prompt-init.774781de.js" defer></script>
 	<script src="/theme/tailwind/de/assets/contact-form-init.7f7be308.js" defer></script>
 
-	<script src="/theme/tailwind/de/assets/page-actions-init.e7dd88d0.js" defer></script>
+	<script src="/theme/tailwind/de/assets/page-actions-init.9092e0f1.js" defer></script>
 
 
 	<script src="/theme/tailwind/de/assets/vendor/mermaid/mermaid.min.js"></script>

@@ -40,6 +40,8 @@ predeterminada para proyectos nuevos.
 | `-h`, `--help` | Muestra el uso y sale |
 | `-v`, `--version` | Muestra la versión del módulo y sale |
 
+Los flags de ruta (`--source`, `--path`, `--dest`, `--output`) aceptan una ruta absoluta, una ruta `~/` en tu carpeta personal o una ruta relativa a la raíz del proyecto.
+
 ## `new`
 
 Crea la estructura de un proyecto de documentación.
@@ -108,10 +110,13 @@ bxSites search-index
 ## `clean`
 
 Elimina `site/` y cualquier caché de construcción, dejando intactos
-`docs/` y la configuración del sitio.
+`docs/` y la configuración del sitio. Pide confirmación antes de borrar;
+`--force` omite la pregunta (necesario en CI y scripts, donde nadie puede
+responderla).
 
 ```bash frame="terminal" title="Terminal"
 bxSites clean
+bxSites clean --force
 ```
 
 ## `gh-deploy`
@@ -152,7 +157,7 @@ bxSites deploy [--verbose]
 Tres formas de invocarlo:
 
 1. **`--entry=<name>`** - despacha al destino que declare un archivo
-   `deployments/<name>.json` (consulta más abajo). Todo destino salvo
+   `deployments/<name>.yaml` (consulta más abajo). Todo destino salvo
    `local`/`github-pages` lo necesita - hay más configuración de la que
    un par de opciones puede razonablemente llevar.
 2. **`--target=<name>` con sus propias opciones** - un atajo solo con
@@ -161,10 +166,10 @@ Tres formas de invocarlo:
    `github-pages` (`[--branch] [--remote] [--message]`, todos los campos
    opcionales, con los mismos valores por defecto que `gh-deploy`).
 3. **Ni una opción ni la otra - despliega todo.** Cada entrada
-   `deployments/*.json` se despliega por turno, a partir de una única
+   `deployments/*` se despliega por turno, a partir de una única
    construcción compartida (el sitio se construye una sola vez, no una
    vez por destino). Requiere que exista al menos una entrada
-   `deployments/*.json`. Que un destino falle no detiene el resto - se
+   `deployments/*`. Que un destino falle no detiene el resto - se
    intenta cada entrada, y el comando solo sale con un código distinto de
    cero si al menos uno de ellos falló; el resumen final reporta cuántos
    tuvieron éxito (por ejemplo, `Deployed to 2/3 target(s) (1 failed)`).
@@ -174,7 +179,7 @@ comienza/termina y cada destino comienza/termina, en lugar de solo el
 resumen final de una línea.
 
 Consulta [Despliegue](guides/deployment.md) para la configuración propia
-de cada destino y un ejemplo real de `deployments/*.json` para cada uno.
+de cada destino y un ejemplo real de `deployments/*` para cada uno.
 
 ## `package`
 
@@ -206,6 +211,7 @@ bxSites migrate --source=/path/to/notion-export --from=notion
 
 - `--source` (obligatorio) - ruta al directorio raíz de la exportación/proyecto (`SUMMARY.md` para `gitbook`, `mkdocs.yml` para `mkdocs`), o un archivo `.zip` (`markdown-zip`; `notion` acepta tanto un `.zip` como una carpeta ya extraída)
 - `--from` - `gitbook` (predeterminado), `mkdocs`, `markdown-zip`, o `notion`
+- `--force` - omite la confirmación. Si `docs/` ya tiene archivos (o existe `bxsites.yaml`, con `mkdocs`), `migrate` pregunta antes de poder sobrescribirlos
 
 ### `--from=gitbook` (predeterminado)
 
@@ -528,15 +534,17 @@ bx-sites bajo `.themes/<name>/`, dentro de la raíz de contenido - un
 punto de partida, no una migración sin pérdidas en un solo comando.
 
 ```bash title="Uso"
-bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
+bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme [--force]
 ```
 
 - `--source` (obligatorio) - `mkdocs`, `jekyll` o `hugo`
 - `--path` (obligatorio) - la propia carpeta raíz del tema de origen
 - `--name` (obligatorio) - el nombre de destino, escrito en `.themes/<name>/`
 
-Seguro de volver a ejecutar contra el mismo `--name` - `layout.bxm`/
-`page.bxm` se sobrescriben y cualquier carpeta de recursos recién
+- `--force` - omite la confirmación antes de sobrescribir
+
+Volver a ejecutar contra el mismo `--name` pregunta primero (o usa `--force`),
+y luego `layout.bxm`/`page.bxm` se sobrescriben y cualquier carpeta de recursos recién
 encontrada se combina. Consulta
 [Importar un tema](guides/theme-import.md) para exactamente qué se
 traduce y qué no, y qué revisar después.

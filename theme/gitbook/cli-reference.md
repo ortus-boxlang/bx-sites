@@ -35,17 +35,10 @@ projects.
 
 | Flag | Description |
 |---|---|
-| `-v` | Show the module version and exit |
-| `help`, or no verb at all | Show usage and exit |
+| `-h`, `--help`, `help`, or no verb at all | Show usage and exit |
+| `-v`, `--version` | Show the module version and exit |
 
-`-h`, `--help`, and the long `--version` form are reserved by BoxLang's
-own CLI itself (its own `--help`/`--version` handling short-circuits
-before any module - not just bx-sites - ever sees them), so they never
-reach bx-sites: `-h`/`--help` print BoxLang's own generic runtime help
-instead of bx-sites' usage, and `--version` silently prints usage (not
-the version) since BoxLang strips it from argv before dispatch. Use `-v`
-or `help`/no-args instead - both are unaffected because neither is one of
-BoxLang's own reserved global tokens.
+Path flags (`--source`, `--path`, `--dest`, `--output`) take an absolute path, a `~/` path in your home folder, or a path relative to the project root.
 
 Every verb below ships with core. An installed and activated addon module
 can register further verbs of its own (e.g. a commercial deploy/hosting
@@ -130,9 +123,12 @@ bxSites search-index
 ## `clean`
 
 Remove `site/` and any build cache, leaving `docs/` and the site config alone.
+It asks for confirmation first; pass `--force` to skip the prompt (required
+in CI and scripts, where there's no one to answer it).
 
 ```bash frame="terminal" title="Terminal"
 bxSites clean
+bxSites clean --force
 ```
 
 ## `gh-deploy`
@@ -172,7 +168,7 @@ bxSites deploy [--verbose]
 Three ways to invoke it:
 
 1. **`--entry=<name>`** - dispatches to whatever target a
-   `deployments/<name>.json` file declares (see below). Every target
+   `deployments/<name>.yaml` file declares (see below). Every target
    except `local`/`github-pages` needs this - there's more configuration
    than a couple of flags can reasonably carry.
 2. **`--target=<name>` with its own flags** - a flag-only shorthand for
@@ -180,9 +176,9 @@ Three ways to invoke it:
    `local` (`--destination=<path>`) and `github-pages` (`[--branch]
    [--remote] [--message]`, every field optional, same defaults as
    `gh-deploy`).
-3. **Neither flag - deploy everything.** Every `deployments/*.json` entry
+3. **Neither flag - deploy everything.** Every `deployments/*` entry
    is deployed in turn, off a single shared build (the site is built once,
-   not once per target). Requires at least one `deployments/*.json` entry
+   not once per target). Requires at least one `deployments/*` entry
    to exist. One target failing doesn't stop the rest - every entry is
    attempted, and the command only exits non-zero if at least one of them
    failed; the final summary reports how many succeeded (e.g. `Deployed to
@@ -192,7 +188,7 @@ Three ways to invoke it:
 target starts/finishes, instead of just the final one-line summary.
 
 See [Deployment](guides/deployment.md) for every target's own config
-shape and a real `deployments/*.json` example for each.
+shape and a real `deployments/*` example for each.
 
 ## `publish`
 
@@ -250,6 +246,7 @@ bxSites migrate --source=/path/to/notion-export --from=notion
 
 - `--source` (required) - path to the export/project's root directory (`SUMMARY.md` for `gitbook`, `mkdocs.yml` for `mkdocs`), or a `.zip` file (`markdown-zip`; `notion` accepts either a `.zip` or an already-extracted folder)
 - `--from` - `gitbook` (default), `mkdocs`, `markdown-zip`, or `notion`
+- `--force` - skip the prompt. When `docs/` already has files (or `bxsites.yaml` exists, for `mkdocs`), `migrate` asks before it may overwrite them
 
 ### `--from=gitbook` (default)
 
@@ -570,15 +567,17 @@ ecosystem (`mkdocs`/`jekyll`/`hugo`) into a bx-sites theme scaffold under
 lossless one-command port.
 
 ```bash title="Usage"
-bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
+bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme [--force]
 ```
 
 - `--source` (required) - `mkdocs`, `jekyll`, or `hugo`
 - `--path` (required) - the source theme's own root folder
 - `--name` (required) - the destination name, written to `.themes/<name>/`
 
-Safe to re-run against the same `--name` - `layout.bxm`/`page.bxm` are
-overwritten and any newly-found asset folders merged in. See
+- `--force` - skip the overwrite prompt
+
+Re-running against the same `--name` asks first (or pass `--force`), then
+`layout.bxm`/`page.bxm` are overwritten and any newly-found asset folders merged in. See
 [Importing a theme](guides/theme-import.md) for exactly what does and
 doesn't get translated, and what to check afterward.
 

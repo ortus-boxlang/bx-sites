@@ -48,8 +48,8 @@ bxSites theme:import --source=mkdocs --path=/path/to/mkdocs-theme --name=my-impo
   que usa `install:theme`) - establece el `theme.name` de
   `bxsites.yaml` una vez que estés satisfecho con el resultado
 
-Volver a ejecutarlo contra el mismo `--name` es seguro - `layout.bxm`/
-`page.bxm` se sobrescriben y cualquier carpeta de recursos recién
+Volver a ejecutarlo contra el mismo `--name` pregunta primero (usa
+`--force` para omitir la confirmación), y luego `layout.bxm`/`page.bxm` se sobrescriben y cualquier carpeta de recursos recién
 encontrada se combina, así que iterar (ajustar el origen, o el mapeo,
 volver a ejecutar) es el flujo de trabajo normal, no una operación de un
 solo uso.

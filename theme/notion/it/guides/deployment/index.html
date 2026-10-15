@@ -160,18 +160,23 @@ GitHub Pages.</p>
 <p>Ogni target tranne i due più semplici (<code>local</code>/<code>github-pages</code>, che
 funzionano soltanto con dei flag - vedi
 <a href="/theme/notion/it/cli-reference/index.html#deploy">Riferimento CLI</a>) viene configurato tramite
-un file <code>deployments/&lt;nome&gt;.json</code> nella radice del progetto - un file per
+un file <code>deployments/&lt;nome&gt;.yaml</code> nella radice del progetto - un file per
 ogni target di deploy che usi realmente, ciascuno indicando quale
 <code>target</code> è, oltre ai campi propri di quel target:</p>
 <pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites deploy --entry=production
 </code></pre>
-<pre data-bxsites-title="deployments&#x2f;production.json"><code class="language-json">{ &quot;target&quot;: &quot;s3&quot;, &quot;bucket&quot;: &quot;my-docs-site&quot;, &quot;accessKeyIdEnvVar&quot;: &quot;AWS_ACCESS_KEY_ID&quot;, &quot;secretAccessKeyEnvVar&quot;: &quot;AWS_SECRET_ACCESS_KEY&quot; }
+<pre data-bxsites-title="deployments&#x2f;production.yaml"><code class="language-yaml">target: s3
+bucket: my-docs-site
+accessKeyIdEnvVar: AWS_ACCESS_KEY_ID
+secretAccessKeyEnvVar: AWS_SECRET_ACCESS_KEY
 </code></pre>
+<p>Le voci possono essere YAML (<code>.yaml</code>/<code>.yml</code>), TOML (<code>.toml</code>) o JSON (<code>.json</code>) - gli stessi formati accettati dalla configurazione del sito. Le sezioni dei target qui sotto mostrano JSON, ma ogni campo funziona allo stesso modo in qualsiasi formato.</p>
+<p>I percorsi di file in una voce (<code>serviceAccountKeyPath</code>, una <code>key</code> SFTP, l'<code>identityFile</code> di rsync, una <code>destination</code> locale) possono essere assoluti, iniziare con <code>~/</code> o essere relativi alla radice del progetto.</p>
 <p><strong>I segreti provengono sempre da una variabile d'ambiente, mai da un
-valore letterale in <code>deployments/*.json</code>.</strong> Ogni campo che termina in
+valore letterale in <code>deployments/*</code>.</strong> Ogni campo che termina in
 <code>EnvVar</code> indica il nome della <em>variabile d'ambiente</em> che contiene il
 segreto vero e proprio (una chiave d'accesso, una password, un token
-API) - risolta dal vivo al momento del deploy, quindi <code>deployments/*.json</code>
+API) - risolta dal vivo al momento del deploy, quindi <code>deployments/*</code>
 di per sé è sempre sicuro da mettere sotto controllo di versione. Un
 campo che è invece un <em>percorso</em> verso un file di credenziali che già
 gestisci tu stesso (una chiave privata SSH, una chiave JSON di service
@@ -184,7 +189,7 @@ controlla in modo trasparente) invece di esportarle a mano nella tua
 shell; in CI, impostale come veri segreti sul runner.</p>
 <h3 id="distribuire-su-tutti-i-target-contemporaneamente"><a href="#distribuire-su-tutti-i-target-contemporaneamente" id="distribuire-su-tutti-i-target-contemporaneamente" name="distribuire-su-tutti-i-target-contemporaneamente" class="anchor"></a>Distribuire su tutti i target contemporaneamente</h3>
 <p>Esegui <code>bxSites deploy</code> senza <code>--entry</code> né <code>--target</code> e ogni voce
-<code>deployments/*.json</code> viene distribuita a turno, a partire da un'unica
+<code>deployments/*</code> viene distribuita a turno, a partire da un'unica
 build condivisa:</p>
 <pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites deploy
 </code></pre>
@@ -287,6 +292,10 @@ macchina che esegue <code>bxSites</code>.</p>
   &quot;identityFile&quot;: &quot;/home/me/.ssh/id_rsa&quot;
 }
 </code></pre>
+<p>I file remoti che non esistono più nella tua build vengono lasciati al
+loro posto. Aggiungi <code>&quot;deleteExtraneous&quot;: true</code> per rimuovere anche
+quelli (il <code>--delete</code> di rsync). Un <code>remotePath</code> di <code>/</code>, <code>~</code> o <code>.</code> viene
+rifiutato - puntalo alla cartella del sito.</p>
 <h3 id="netlify"><a href="#netlify" id="netlify" name="netlify" class="anchor"></a><code>netlify</code></h3>
 <pre data-bxsites-title="deployments&#x2f;production.json"><code class="language-json">{
   &quot;target&quot;: &quot;netlify&quot;,
@@ -442,7 +451,7 @@ livello di host, che attivi ovunque finisca per essere servito <code>site/</code
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/it/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/theme/notion/it/guides/deployment.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Oct 15, 2026, 9&#x3a;34&#x3a;54 AM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Distribuzione&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fnotion%2Fit%2Fguides%2Fdeployment%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/it/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/theme/notion/it/guides/deployment.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Oct 15, 2026, 1&#x3a;41&#x3a;11 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Distribuzione&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fnotion%2Fit%2Fguides%2Fdeployment%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
 
 			</article>
 
@@ -505,7 +514,7 @@ livello di host, che attivi ovunque finisca per essere servito <code>site/</code
 	<script src="/theme/notion/it/assets/prompt-init.774781de.js" defer></script>
 	<script src="/theme/notion/it/assets/contact-form-init.7f7be308.js" defer></script>
 
-	<script src="/theme/notion/it/assets/page-actions-init.e7dd88d0.js" defer></script>
+	<script src="/theme/notion/it/assets/page-actions-init.9092e0f1.js" defer></script>
 
 
 	<script src="/theme/notion/it/assets/vendor/mermaid/mermaid.min.js"></script>

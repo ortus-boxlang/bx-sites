@@ -118,7 +118,7 @@ donde realmente vive el contenido).
 ## Excluir archivos y carpetas
 
 bxSites siempre excluye por sí solo un puñado de nombres del recorrido
-de contenido - `.git`, `.github`, `node_modules`, `boxlang_modules`,
+de contenido - cualquier carpeta o archivo que empiece por punto (`.git`, `.github`, `.claude`, ...), `node_modules`, `boxlang_modules`,
 `site`, `.theme`, `.themes`, y su propio archivo de configuración
 (`bxsites.yaml`/`.yml`/`.toml`/`.json`, `box.json`) - de la misma forma
 en que ya excluye `assets/`, `versions/`, `i18n/`, `blog/`, e

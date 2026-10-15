@@ -50,8 +50,8 @@ bxSites theme:import --source=mkdocs --path=/path/to/mkdocs-theme --name=my-impo
   die `install:theme` verwendet) - setze `theme.name` in `bxsites.yaml`
   darauf, sobald du mit dem Ergebnis zufrieden bist
 
-Ein erneuter Lauf gegen denselben `--name` ist sicher -
-`layout.bxm`/`page.bxm` werden überschrieben und neu gefundene
+Ein erneuter Lauf gegen denselben `--name` fragt zuerst nach (`--force`
+überspringt die Rückfrage), dann werden `layout.bxm`/`page.bxm` überschrieben und neu gefundene
 Asset-Ordner zusammengeführt, sodass das Iterieren (Quelle oder Mapping
 anpassen, erneut ausführen) der normale Workflow ist, kein
 Einmal-Vorgang.

@@ -212,7 +212,7 @@ independent project roots out of one repository.
 ## `exclude`
 
 Extra file/folder names to leave out of the build, on top of the traditional
-ones bxSites always excludes (`.git`, `.github`, `node_modules`,
+ones bxSites always excludes (any dot-prefixed folder or file such as `.git` or `.claude`, `node_modules`,
 `boxlang_modules`, `site`, `.theme`, `.themes`, and this project's own config
 file). Matched the same way - a bare name at the root of `source`, or a
 name anywhere under it via a leading `/`-free path segment. Mostly useful

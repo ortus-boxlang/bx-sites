@@ -116,7 +116,7 @@ der Ordner einfach noch nicht existiert - lege ihn an, oder richte
 ## Dateien und Ordner ausschließen
 
 bxSites schließt von sich aus immer eine Handvoll Namen vom Content-Scan
-aus - `.git`, `.github`, `node_modules`, `boxlang_modules`, `site`,
+aus - jeder Ordner und jede Datei mit führendem Punkt (`.git`, `.github`, `.claude`, ...), `node_modules`, `boxlang_modules`, `site`,
 `.theme`, `.themes` und die eigene Konfigurationsdatei
 (`bxsites.yaml`/`.yml`/`.toml`/`.json`, `box.json`) -, genau so, wie es
 bereits `assets/`, `versions/`, `i18n/`, `blog/` und `includes/` davon

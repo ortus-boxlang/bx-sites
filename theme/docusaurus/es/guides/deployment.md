@@ -20,7 +20,7 @@ Pages.
 Todo destino salvo los dos más simples (`local`/`github-pages`, que
 funcionan solo con opciones - consulta
 [Referencia de la CLI](../cli-reference.md#deploy)) se configura mediante
-un archivo `deployments/<name>.json` en la raíz de tu proyecto - un
+un archivo `deployments/<name>.yaml` en la raíz de tu proyecto - un
 archivo por cada destino de despliegue que realmente uses, cada uno
 indicando en `target` cuál es, además de los propios campos de ese
 destino:
@@ -29,15 +29,22 @@ destino:
 bxSites deploy --entry=production
 ```
 
-```json title="deployments/production.json"
-{ "target": "s3", "bucket": "my-docs-site", "accessKeyIdEnvVar": "AWS_ACCESS_KEY_ID", "secretAccessKeyEnvVar": "AWS_SECRET_ACCESS_KEY" }
+```yaml title="deployments/production.yaml"
+target: s3
+bucket: my-docs-site
+accessKeyIdEnvVar: AWS_ACCESS_KEY_ID
+secretAccessKeyEnvVar: AWS_SECRET_ACCESS_KEY
 ```
 
+Las entradas pueden ser YAML (`.yaml`/`.yml`), TOML (`.toml`) o JSON (`.json`) - los mismos formatos que acepta la configuración del sitio. Las secciones de destino de abajo muestran JSON, pero cada campo funciona igual en cualquier formato.
+
+Las rutas de archivo de una entrada (`serviceAccountKeyPath`, una `key` de SFTP, el `identityFile` de rsync, un `destination` local) pueden ser absolutas, empezar por `~/` o ser relativas a la raíz del proyecto.
+
 **Los secretos siempre provienen de una variable de entorno, nunca de un
-valor literal en `deployments/*.json`.** Cada campo que termina en
+valor literal en `deployments/*`.** Cada campo que termina en
 `EnvVar` indica el nombre de la *variable de entorno* que contiene el
 secreto real (una clave de acceso, una contraseña, un token de API) -
-resuelta en el momento del despliegue, de modo que `deployments/*.json`
+resuelta en el momento del despliegue, de modo que `deployments/*`
 en sí siempre es seguro de incluir en un commit. Un campo que es una
 *ruta* a un archivo de credenciales que ya gestionas tú mismo (una clave
 privada SSH, una clave JSON de cuenta de servicio de GCP descargada) es
@@ -52,7 +59,7 @@ en el ejecutor.
 ### Desplegar a todos los destinos a la vez
 
 Ejecuta `bxSites deploy` sin `--entry` ni `--target` y cada entrada
-`deployments/*.json` se despliega por turno, a partir de una única
+`deployments/*` se despliega por turno, a partir de una única
 construcción compartida:
 
 ```bash frame="terminal" title="Terminal"
@@ -193,6 +200,11 @@ en la máquina que ejecuta `bxSites`.
   "identityFile": "/home/me/.ssh/id_rsa"
 }
 ```
+
+Los archivos remotos que ya no existen en tu build se conservan. Añade
+`"deleteExtraneous": true` para eliminarlos también (el `--delete` de
+rsync). Un `remotePath` de `/`, `~` o `.` se rechaza - apúntalo a la
+carpeta propia del sitio.
 
 ### `netlify`
 

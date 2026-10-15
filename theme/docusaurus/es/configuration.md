@@ -214,7 +214,7 @@ raíces de proyecto independientes desde un solo repositorio.
 
 Nombres adicionales de archivos/carpetas a dejar fuera de la
 construcción, además de los tradicionales que bxSites siempre excluye
-(`.git`, `.github`, `node_modules`, `boxlang_modules`, `site`, `.theme`,
+(cualquier carpeta o archivo que empiece por punto como `.git` o `.claude`, `node_modules`, `boxlang_modules`, `site`, `.theme`,
 `.themes`, y el propio archivo de configuración de este proyecto).
 Coincide de la misma forma - un nombre simple en la raíz de `source`, o
 un nombre en cualquier lugar debajo de ella mediante un segmento de ruta

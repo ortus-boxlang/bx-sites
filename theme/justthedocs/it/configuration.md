@@ -218,7 +218,7 @@ root indipendenti da un solo repository.
 ## `exclude`
 
 Nomi extra di file/cartelle da escludere dal build, oltre a quelli
-tradizionali che bxSites esclude sempre (`.git`, `.github`,
+tradizionali che bxSites esclude sempre (qualsiasi cartella o file che inizia con un punto come `.git` o `.claude`,
 `node_modules`, `boxlang_modules`, `site`, `.theme`, `.themes`, e il file
 di configurazione proprio di questo progetto). Vengono confrontati nello
 stesso modo - un nome nudo alla radice di `source`, oppure un nome

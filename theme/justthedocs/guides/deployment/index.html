@@ -163,17 +163,22 @@ for that - see <a href="#the-publish-command">below</a>.</p>
 <h2 id="the-deploy-command"><a href="#the-deploy-command" id="the-deploy-command" name="the-deploy-command" class="anchor"></a>The <code>deploy</code> command</h2>
 <p>Every target but the two simplest (<code>local</code>/<code>github-pages</code>, which work from
 flags alone - see <a href="/theme/justthedocs/cli-reference/index.html#deploy">CLI Reference</a>) is
-configured via a <code>deployments/&lt;name&gt;.json</code> file at your project root - one
+configured via a <code>deployments/&lt;name&gt;.yaml</code> file at your project root - one
 file per deploy target you actually use, each naming which <code>target</code> it is
 plus that target's own fields:</p>
 <pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites deploy --entry=production
 </code></pre>
-<pre data-bxsites-title="deployments&#x2f;production.json"><code class="language-json">{ &quot;target&quot;: &quot;s3&quot;, &quot;bucket&quot;: &quot;my-docs-site&quot;, &quot;accessKeyIdEnvVar&quot;: &quot;AWS_ACCESS_KEY_ID&quot;, &quot;secretAccessKeyEnvVar&quot;: &quot;AWS_SECRET_ACCESS_KEY&quot; }
+<pre data-bxsites-title="deployments&#x2f;production.yaml"><code class="language-yaml">target: s3
+bucket: my-docs-site
+accessKeyIdEnvVar: AWS_ACCESS_KEY_ID
+secretAccessKeyEnvVar: AWS_SECRET_ACCESS_KEY
 </code></pre>
+<p>Entries can be YAML (<code>.yaml</code>/<code>.yml</code>), TOML (<code>.toml</code>) or JSON (<code>.json</code>) - the same formats the site config accepts. The target sections below show JSON, but every field works the same in any format.</p>
+<p>File paths in an entry (<code>serviceAccountKeyPath</code>, an SFTP <code>key</code>, rsync's <code>identityFile</code>, a local <code>destination</code>) can be absolute, start with <code>~/</code>, or be relative to the project root.</p>
 <p><strong>Secrets always come from an environment variable, never from a literal
-value in <code>deployments/*.json</code>.</strong> Every field ending in <code>EnvVar</code> names the
+value in <code>deployments/*</code>.</strong> Every field ending in <code>EnvVar</code> names the
 <em>environment variable</em> holding the real secret (an access key, a password,
-an API token) - resolved live at deploy time, so <code>deployments/*.json</code>
+an API token) - resolved live at deploy time, so <code>deployments/*</code>
 itself is always safe to commit. A field that's a <em>path</em> to a credential
 file you already manage yourself (an SSH private key, a downloaded GCP
 service-account JSON key) is the one exception - a plain field, since the
@@ -184,7 +189,7 @@ resolve them - checks it transparently) instead of exporting them into
 your shell by hand; in CI, set them as real secrets on the runner.</p>
 <h3 id="deploying-to-every-target-at-once"><a href="#deploying-to-every-target-at-once" id="deploying-to-every-target-at-once" name="deploying-to-every-target-at-once" class="anchor"></a>Deploying to every target at once</h3>
 <p>Run <code>bxSites deploy</code> with neither <code>--entry</code> nor <code>--target</code> and every
-<code>deployments/*.json</code> entry is deployed in turn, off a single shared build:</p>
+<code>deployments/*</code> entry is deployed in turn, off a single shared build:</p>
 <pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites deploy
 </code></pre>
 <p>The site is only built once no matter how many entries you have. One
@@ -279,6 +284,10 @@ changed. Requires <code>rsync</code> and <code>ssh</code> on the machine running
   &quot;identityFile&quot;: &quot;/home/me/.ssh/id_rsa&quot;
 }
 </code></pre>
+<p>Remote files that no longer exist in your build are left in place. Add
+<code>&quot;deleteExtraneous&quot;: true</code> to remove them too (rsync's <code>--delete</code>). A
+<code>remotePath</code> of <code>/</code>, <code>~</code> or <code>.</code> is refused - point it at the site's own
+folder.</p>
 <h3 id="netlify"><a href="#netlify" id="netlify" name="netlify" class="anchor"></a><code>netlify</code></h3>
 <pre data-bxsites-title="deployments&#x2f;production.json"><code class="language-json">{
   &quot;target&quot;: &quot;netlify&quot;,
@@ -443,7 +452,7 @@ on wherever <code>site/</code> ends up being served.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/theme/justthedocs/guides/deployment.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Oct 15, 2026, 9&#x3a;34&#x3a;54 AM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Deployment&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fjustthedocs%2Fguides%2Fdeployment%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/deployment.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/theme/justthedocs/guides/deployment.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Oct 15, 2026, 1&#x3a;41&#x3a;11 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Deployment&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fjustthedocs%2Fguides%2Fdeployment%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
 
 			</article>
 
@@ -506,7 +515,7 @@ on wherever <code>site/</code> ends up being served.</p>
 	<script src="/theme/justthedocs/assets/prompt-init.774781de.js" defer></script>
 	<script src="/theme/justthedocs/assets/contact-form-init.7f7be308.js" defer></script>
 
-	<script src="/theme/justthedocs/assets/page-actions-init.e7dd88d0.js" defer></script>
+	<script src="/theme/justthedocs/assets/page-actions-init.9092e0f1.js" defer></script>
 
 
 	<script src="/theme/justthedocs/assets/vendor/mermaid/mermaid.min.js"></script>

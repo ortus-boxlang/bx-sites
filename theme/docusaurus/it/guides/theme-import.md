@@ -47,8 +47,8 @@ bxSites theme:import --source=mkdocs --path=/percorso/del/tema-mkdocs --name=my-
   `install:theme`) - imposta `theme.name` di `bxsites.yaml` su questo
   nome una volta soddisfatto del risultato
 
-Rieseguire il comando con lo stesso `--name` è sicuro - `layout.bxm`/
-`page.bxm` vengono sovrascritti e qualsiasi cartella di asset appena
+Rieseguire il comando con lo stesso `--name` chiede prima conferma (usa
+`--force` per saltarla), poi `layout.bxm`/`page.bxm` vengono sovrascritti e qualsiasi cartella di asset appena
 trovata viene unita - quindi iterare (modifica il sorgente, o la
 mappatura, riesegui) è il flusso di lavoro normale, non un'operazione
 one-shot.

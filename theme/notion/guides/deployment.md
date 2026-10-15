@@ -21,7 +21,7 @@ for that - see [below](#the-publish-command).
 
 Every target but the two simplest (`local`/`github-pages`, which work from
 flags alone - see [CLI Reference](../cli-reference.md#deploy)) is
-configured via a `deployments/<name>.json` file at your project root - one
+configured via a `deployments/<name>.yaml` file at your project root - one
 file per deploy target you actually use, each naming which `target` it is
 plus that target's own fields:
 
@@ -29,14 +29,21 @@ plus that target's own fields:
 bxSites deploy --entry=production
 ```
 
-```json title="deployments/production.json"
-{ "target": "s3", "bucket": "my-docs-site", "accessKeyIdEnvVar": "AWS_ACCESS_KEY_ID", "secretAccessKeyEnvVar": "AWS_SECRET_ACCESS_KEY" }
+```yaml title="deployments/production.yaml"
+target: s3
+bucket: my-docs-site
+accessKeyIdEnvVar: AWS_ACCESS_KEY_ID
+secretAccessKeyEnvVar: AWS_SECRET_ACCESS_KEY
 ```
 
+Entries can be YAML (`.yaml`/`.yml`), TOML (`.toml`) or JSON (`.json`) - the same formats the site config accepts. The target sections below show JSON, but every field works the same in any format.
+
+File paths in an entry (`serviceAccountKeyPath`, an SFTP `key`, rsync's `identityFile`, a local `destination`) can be absolute, start with `~/`, or be relative to the project root.
+
 **Secrets always come from an environment variable, never from a literal
-value in `deployments/*.json`.** Every field ending in `EnvVar` names the
+value in `deployments/*`.** Every field ending in `EnvVar` names the
 *environment variable* holding the real secret (an access key, a password,
-an API token) - resolved live at deploy time, so `deployments/*.json`
+an API token) - resolved live at deploy time, so `deployments/*`
 itself is always safe to commit. A field that's a *path* to a credential
 file you already manage yourself (an SSH private key, a downloaded GCP
 service-account JSON key) is the one exception - a plain field, since the
@@ -49,7 +56,7 @@ your shell by hand; in CI, set them as real secrets on the runner.
 ### Deploying to every target at once
 
 Run `bxSites deploy` with neither `--entry` nor `--target` and every
-`deployments/*.json` entry is deployed in turn, off a single shared build:
+`deployments/*` entry is deployed in turn, off a single shared build:
 
 ```bash frame="terminal" title="Terminal"
 bxSites deploy
@@ -182,6 +189,11 @@ changed. Requires `rsync` and `ssh` on the machine running `bxSites`.
   "identityFile": "/home/me/.ssh/id_rsa"
 }
 ```
+
+Remote files that no longer exist in your build are left in place. Add
+`"deleteExtraneous": true` to remove them too (rsync's `--delete`). A
+`remotePath` of `/`, `~` or `.` is refused - point it at the site's own
+folder.
 
 ### `netlify`
 

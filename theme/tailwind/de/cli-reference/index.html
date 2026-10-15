@@ -180,6 +180,7 @@ für die <code>docs/</code>-oder-<code>src/</code>-Konvention. <code>new</code> 
 <tr><td><code>-v</code>, <code>--version</code></td><td>Modulversion anzeigen und beenden</td></tr>
 </tbody>
 </table></div>
+<p>Pfad-Flags (<code>--source</code>, <code>--path</code>, <code>--dest</code>, <code>--output</code>) akzeptieren einen absoluten Pfad, einen <code>~/</code>-Pfad im Home-Ordner oder einen Pfad relativ zum Projektstamm.</p>
 <h2 id="new"><a href="#new" id="new" name="new" class="anchor"></a><code>new</code></h2>
 <p>Ein Docs-Projekt aufsetzen.</p>
 <pre data-bxsites-title="Usage"><code class="language-bash">bxSites new [path] [--name=...] [--theme=&lt;siehe guides/themes.md für alle 10&gt;] [--description=...] [--format=yaml|json] [--source=docs|src] [--agents=agents,claude,cursor]
@@ -229,8 +230,11 @@ schreibt stattdessen den eigenen, begrenzten Index jedes Baums (siehe
 </code></pre>
 <h2 id="clean"><a href="#clean" id="clean" name="clean" class="anchor"></a><code>clean</code></h2>
 <p>Entfernt <code>site/</code> und jeglichen Build-Cache, lässt <code>docs/</code> und die
-Website-Konfiguration unangetastet.</p>
+Website-Konfiguration unangetastet. Fragt vorher nach einer Bestätigung;
+<code>--force</code> überspringt die Abfrage (in CI und Skripten erforderlich, wo
+niemand antworten kann).</p>
 <pre data-bxsites-title="Terminal" data-bxsites-frame="terminal"><code class="language-bash">bxSites clean
+bxSites clean --force
 </code></pre>
 <h2 id="gh-deploy"><a href="#gh-deploy" id="gh-deploy" name="gh-deploy" class="anchor"></a><code>gh-deploy</code></h2>
 <p>Baut die Website und pusht sie dann per Force-Push in einen
@@ -263,7 +267,7 @@ bxSites deploy [--verbose]
 <p>Drei Arten, es aufzurufen:</p>
 <ol>
 <li><strong><code>--entry=&lt;name&gt;</code></strong> - leitet an das Ziel weiter, das eine
-<code>deployments/&lt;name&gt;.json</code>-Datei deklariert (siehe unten). Jedes Ziel
+<code>deployments/&lt;name&gt;.yaml</code>-Datei deklariert (siehe unten). Jedes Ziel
 außer <code>local</code>/<code>github-pages</code> braucht das - es gibt mehr Konfiguration,
 als ein paar Flags sinnvoll tragen könnten.</li>
 <li><strong><code>--target=&lt;name&gt;</code> mit seinen eigenen Flags</strong> - eine reine
@@ -271,10 +275,10 @@ Flag-Kurzform für die beiden einfachsten Ziele, die überhaupt keinen
 <code>deployments/</code>-Ordner brauchen: <code>local</code> (<code>--destination=&lt;path&gt;</code>) und
 <code>github-pages</code> (<code>[--branch] [--remote] [--message]</code>, jedes Feld
 optional, dieselben Standardwerte wie bei <code>gh-deploy</code>).</li>
-<li><strong>Kein Flag - alles deployen.</strong> Jeder <code>deployments/*.json</code>-Eintrag wird
+<li><strong>Kein Flag - alles deployen.</strong> Jeder <code>deployments/*</code>-Eintrag wird
 der Reihe nach deployt, ausgehend von einem einzigen gemeinsamen Build
 (die Website wird einmal gebaut, nicht einmal pro Ziel). Setzt voraus,
-dass mindestens ein <code>deployments/*.json</code>-Eintrag existiert. Schlägt ein
+dass mindestens ein <code>deployments/*</code>-Eintrag existiert. Schlägt ein
 Ziel fehl, stoppt das die übrigen nicht - jeder Eintrag wird versucht,
 und der Befehl liefert nur dann einen von null verschiedenen Exit-Code,
 wenn mindestens einer davon fehlgeschlagen ist; die abschließende
@@ -284,7 +288,7 @@ Zusammenfassung meldet, wie viele erfolgreich waren (z. B. <code>Deployed to 2/3
 und wenn jedes Ziel startet/endet, statt nur der abschließenden
 einzeiligen Zusammenfassung.</p>
 <p>Siehe <a href="/theme/tailwind/de/guides/deployment/index.html">Deployment</a> für die eigene Konfigurationsform
-jedes Ziels und ein echtes <code>deployments/*.json</code>-Beispiel für jedes davon.</p>
+jedes Ziels und ein echtes <code>deployments/*</code>-Beispiel für jedes davon.</p>
 <h2 id="package"><a href="#package" id="package" name="package" class="anchor"></a><code>package</code></h2>
 <p>Baut die Website und packt sie dann in ein einziges, verteilbares Archiv -
 ein einfaches Zip, dessen Wurzel der Inhalt der gebauten Website selbst
@@ -307,6 +311,7 @@ bxSites migrate --source=/path/to/notion-export --from=notion
 <ul>
 <li><code>--source</code> (erforderlich) - Pfad zum Wurzelverzeichnis des Exports/Projekts (<code>SUMMARY.md</code> für <code>gitbook</code>, <code>mkdocs.yml</code> für <code>mkdocs</code>), oder eine <code>.zip</code>-Datei (<code>markdown-zip</code>; <code>notion</code> akzeptiert sowohl eine <code>.zip</code> als auch einen bereits entpackten Ordner)</li>
 <li><code>--from</code> - <code>gitbook</code> (Standard), <code>mkdocs</code>, <code>markdown-zip</code> oder <code>notion</code></li>
+<li><code>--force</code> - überspringt die Rückfrage. Wenn <code>docs/</code> bereits Dateien enthält (oder bei <code>mkdocs</code> eine <code>bxsites.yaml</code> existiert), fragt <code>migrate</code> nach, bevor es sie überschreiben könnte</li>
 </ul>
 <h3 id="--fromgitbook-standard"><a href="#--fromgitbook-standard" id="--fromgitbook-standard" name="--fromgitbook-standard" class="anchor"></a><code>--from=gitbook</code> (Standard)</h3>
 <p>Ein GitBook-Export - ein <code>SUMMARY.md</code>-Inhaltsverzeichnis plus dessen
@@ -564,15 +569,24 @@ wird trotzdem neu geschrieben)</li>
 statischen Site-Generators (<code>mkdocs</code>/<code>jekyll</code>/<code>hugo</code>) in ein
 bx-sites-Theme-Gerüst unter <code>.themes/&lt;name&gt;/</code>, innerhalb des Content-Root
 des Projekts - ein Ausgangspunkt, kein verlustfreier Ein-Befehl-Port.</p>
-<pre data-bxsites-title="Usage"><code class="language-bash">bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
+<pre data-bxsites-title="Usage"><code class="language-bash">bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme [--force]
 </code></pre>
 <ul>
-<li><code>--source</code> (erforderlich) - <code>mkdocs</code>, <code>jekyll</code> oder <code>hugo</code></li>
-<li><code>--path</code> (erforderlich) - der Wurzelordner des Quell-Themes</li>
-<li><code>--name</code> (erforderlich) - der Zielname, geschrieben nach <code>.themes/&lt;name&gt;/</code></li>
+<li>
+<p><code>--source</code> (erforderlich) - <code>mkdocs</code>, <code>jekyll</code> oder <code>hugo</code></p>
+</li>
+<li>
+<p><code>--path</code> (erforderlich) - der Wurzelordner des Quell-Themes</p>
+</li>
+<li>
+<p><code>--name</code> (erforderlich) - der Zielname, geschrieben nach <code>.themes/&lt;name&gt;/</code></p>
+</li>
+<li>
+<p><code>--force</code> - überspringt die Rückfrage vor dem Überschreiben</p>
+</li>
 </ul>
-<p>Sicher, gegen denselben <code>--name</code> erneut auszuführen -
-<code>layout.bxm</code>/<code>page.bxm</code> werden überschrieben und neu gefundene
+<p>Ein erneuter Lauf gegen denselben <code>--name</code> fragt zuerst nach (oder <code>--force</code>),
+dann werden <code>layout.bxm</code>/<code>page.bxm</code> überschrieben und neu gefundene
 Asset-Ordner werden zusammengeführt. Siehe
 <a href="/theme/tailwind/de/guides/theme-import/index.html">Ein Theme importieren</a> für genau das, was
 übersetzt wird und was nicht, und was danach zu prüfen ist.</p>
@@ -704,7 +718,7 @@ reichhaltiger.</p>
 
 				</div>
 
-	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/de/cli-reference.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Oct 15, 2026, 9&#x3a;34&#x3a;54 AM</span><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20CLI-Referenz&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Ftailwind%2Fde%2Fcli-reference%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
+	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/cli-reference.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/de/cli-reference.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Oct 15, 2026, 1&#x3a;41&#x3a;11 PM</span><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20CLI-Referenz&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Ftailwind%2Fde%2Fcli-reference%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
 
 			</article>
 
@@ -767,7 +781,7 @@ reichhaltiger.</p>
 	<script src="/theme/tailwind/de/assets/prompt-init.774781de.js" defer></script>
 	<script src="/theme/tailwind/de/assets/contact-form-init.7f7be308.js" defer></script>
 
-	<script src="/theme/tailwind/de/assets/page-actions-init.e7dd88d0.js" defer></script>
+	<script src="/theme/tailwind/de/assets/page-actions-init.9092e0f1.js" defer></script>
 
 
 	<script src="/theme/tailwind/de/assets/vendor/mermaid/mermaid.min.js"></script>
