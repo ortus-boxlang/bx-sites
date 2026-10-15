@@ -156,7 +156,7 @@ bxSites deploy [--verbose]
 Tre modi per invocarlo:
 
 1. **`--entry=<nome>`** - smista verso qualunque target dichiarato da un
-   file `deployments/<nome>.json` (vedi sotto). Ogni target eccetto
+   file `deployments/<nome>.yaml` (vedi sotto). Ogni target eccetto
    `local`/`github-pages` lo richiede - c'è più configurazione di quanta
    ne possano ragionevolmente portare un paio di flag.
 2. **`--target=<nome>` con i propri flag** - una scorciatoia a soli flag
@@ -164,10 +164,10 @@ Tre modi per invocarlo:
    cartella `deployments/`: `local` (`--destination=<percorso>`) e
    `github-pages` (`[--branch] [--remote] [--message]`, ogni campo
    opzionale, con gli stessi valori predefiniti di `gh-deploy`).
-3. **Nessun flag - distribuisce tutto.** Ogni voce `deployments/*.json`
+3. **Nessun flag - distribuisce tutto.** Ogni voce `deployments/*`
    viene distribuita a turno, a partire da un'unica build condivisa (il
    sito viene compilato una sola volta, non una volta per target).
-   Richiede che esista almeno una voce `deployments/*.json`. Il
+   Richiede che esista almeno una voce `deployments/*`. Il
    fallimento di un target non ferma gli altri - ogni voce viene tentata,
    e il comando esce con un codice diverso da zero solo se almeno una di
    esse è fallita; il riepilogo finale riporta quante sono andate a buon
@@ -179,7 +179,7 @@ su una riga.
 
 Vedi [Distribuzione](guides/deployment.md) per la struttura di
 configurazione propria di ogni target e un esempio reale di
-`deployments/*.json` per ciascuno.
+`deployments/*` per ciascuno.
 
 ## `package`
 

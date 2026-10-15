@@ -1,13 +1,13 @@
 /**
  * Discovers and validates a project's `deployments/*` convention entries.
  *
- * One `.json` file per target attempt under `deployments/` - same shape/format
- * as `docs/nav.json`, the other by-convention project-root JSON file this
- * project already reads. Deploy config is plain data (bucket names, hosts,
- * env var names) with no need for the dynamic-computation a `.bx` script
- * entry would offer, so - unlike similar `deployments/` conventions in sibling
- * BoxLang projects that also accept a `.bx` entry via a custom dynamic
- * class loader - this resolver only ever reads `.json`. Each entry must
+ * One file per target attempt under `deployments/`, in any of the formats
+ * the site config itself accepts: `.yaml`/`.yml`, `.toml` or `.json`.
+ * Deploy config is plain data (bucket names, hosts, env var names) with no
+ * need for the dynamic-computation a `.bx` script entry would offer, so -
+ * unlike similar `deployments/` conventions in sibling BoxLang projects
+ * that also accept a `.bx` entry via a custom dynamic class loader - this
+ * resolver only ever reads data files. Each entry must
  * declare a `target` (one of the registered target names below) plus
  * whatever fields that target type requires. Secrets (API tokens,
  * passwords, access keys) are NEVER expected here - every target resolves
@@ -27,6 +27,9 @@ class {
 	 * @return this
 	 */
 	function init() {
+		variables.FORMATS = [ "yaml", "yml", "toml", "json" ]
+		variables.yamlRenderer = new "models.build.YamlRenderer@bxsites"()
+		variables.tomlRenderer = new "models.build.TomlRenderer@bxsites"()
 		variables.VALID_TARGETS = [
 			"local", "github-pages", "s3", "ftp", "sftp", "rsync",
 			"azure", "gcs", "firebase", "netlify", "vercel", "cloudflare-pages"
@@ -50,9 +53,11 @@ class {
 		}
 
 		var seenNames = {}
-		var files = directoryList( deployDir, false, "path", "*.json", "asc", "file" )
+		var formats = variables.FORMATS
+		var files = directoryList( deployDir, false, "path", "*", "asc", "file" )
 			.filter( function( path ) {
-				return getFileFromPath( path ).left( 1 ) != "."
+				var fileName = getFileFromPath( path )
+				return fileName.left( 1 ) != "." && formats.containsNoCase( listLast( fileName, "." ) )
 			} )
 
 		for ( var path in files ) {
@@ -93,7 +98,7 @@ class {
 	 * doesn't exist or the project's `deployments/` config has validation errors.
 	 *
 	 * @projectRoot Absolute path to the project root
-	 * @name The `deployments/*` entry name to resolve, e.g. "production" for `deployments/production.json`
+	 * @name The `deployments/*` entry name to resolve, e.g. "production" for `deployments/production.yaml`
 	 *
 	 * @return { name, path, target, config }
 	 */
@@ -267,15 +272,28 @@ class {
 	}
 
 	/**
-	 * Reads a discovered `deployments/*.json` entry's config.
+	 * Reads a discovered `deployments/*` entry's config, parsed by its extension.
 	 *
-	 * @path Absolute path to the entry's `.json` file
+	 * @path Absolute path to the entry's `.yaml`/`.yml`/`.toml`/`.json` file
 	 *
-	 * @return The entry's config struct, or null if it could not be read
+	 * @return The entry's config struct, or null if it could not be read or isn't a key/value map
 	 */
 	private any function readEntryConfig( required string path ) {
 		try {
-			return jsonDeserialize( fileRead( arguments.path ) )
+			var content = fileRead( arguments.path )
+			var config = ""
+			switch ( lCase( listLast( arguments.path, "." ) ) ) {
+				case "yaml":
+				case "yml":
+					config = variables.yamlRenderer.fromYaml( content )
+					break
+				case "toml":
+					config = variables.tomlRenderer.fromToml( content )
+					break
+				default:
+					config = jsonDeserialize( content )
+			}
+			return isStruct( config ) ? config : null
 		} catch ( any e ) {
 			return null
 		}

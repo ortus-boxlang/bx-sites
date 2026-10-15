@@ -155,7 +155,7 @@ bxSites deploy [--verbose]
 Tres formas de invocarlo:
 
 1. **`--entry=<name>`** - despacha al destino que declare un archivo
-   `deployments/<name>.json` (consulta más abajo). Todo destino salvo
+   `deployments/<name>.yaml` (consulta más abajo). Todo destino salvo
    `local`/`github-pages` lo necesita - hay más configuración de la que
    un par de opciones puede razonablemente llevar.
 2. **`--target=<name>` con sus propias opciones** - un atajo solo con
@@ -164,10 +164,10 @@ Tres formas de invocarlo:
    `github-pages` (`[--branch] [--remote] [--message]`, todos los campos
    opcionales, con los mismos valores por defecto que `gh-deploy`).
 3. **Ni una opción ni la otra - despliega todo.** Cada entrada
-   `deployments/*.json` se despliega por turno, a partir de una única
+   `deployments/*` se despliega por turno, a partir de una única
    construcción compartida (el sitio se construye una sola vez, no una
    vez por destino). Requiere que exista al menos una entrada
-   `deployments/*.json`. Que un destino falle no detiene el resto - se
+   `deployments/*`. Que un destino falle no detiene el resto - se
    intenta cada entrada, y el comando solo sale con un código distinto de
    cero si al menos uno de ellos falló; el resumen final reporta cuántos
    tuvieron éxito (por ejemplo, `Deployed to 2/3 target(s) (1 failed)`).
@@ -177,7 +177,7 @@ comienza/termina y cada destino comienza/termina, en lugar de solo el
 resumen final de una línea.
 
 Consulta [Despliegue](guides/deployment.md) para la configuración propia
-de cada destino y un ejemplo real de `deployments/*.json` para cada uno.
+de cada destino y un ejemplo real de `deployments/*` para cada uno.
 
 ## `package`
 

@@ -4,7 +4,7 @@
  * are the required BoxLang modules (bx-markdown/bx-esapi/bx-yaml/bx-image)
  * installed/activated, does this SPECIFIC project also need (and have)
  * bx-toml (a `.toml` site config or `docs/data/*.toml` file) or bx-ftp (an
- * `ftp`/`sftp` `deployments/*.json` entry), and (if present) does a
+ * `ftp`/`sftp` `deployments/*` entry), and (if present) does a
  * project-level `.theme/` override (inside the resolved content root)
  * satisfy the two-required-file `ThemeProvider` contract. Nothing here
  * mutates a project - purely
@@ -150,7 +150,7 @@ class {
 
 	/**
 	 * bx-ftp is only actually needed when THIS project has an `ftp`/`sftp`
-	 * `deployments/*.json` entry (models/deploy/targets/FtpTarget.bx,
+	 * `deployments/*` entry (models/deploy/targets/FtpTarget.bx,
 	 * SftpTarget.bx) - same reasoning as checkOptionalTomlModule() above:
 	 * box.json depends on it unconditionally, but a project deploying to
 	 * s3/netlify/vercel/etc. (or not deploying at all) is never at risk.

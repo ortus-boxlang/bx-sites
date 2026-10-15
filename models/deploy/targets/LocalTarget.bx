@@ -1,7 +1,7 @@
 /**
  * Copies the already-built `site/` directory to an arbitrary destination -
  * a shared drive, an artifact folder, a staging directory another tool
- * picks up from, etc. The only target that never needs a `deployments/*.json`
+ * picks up from, etc. The only target that never needs a `deployments/*`
  * entry at all (`deploy --target=local --destination=...`, or that flag
  * with no `--target` given, since it's also the default).
  *

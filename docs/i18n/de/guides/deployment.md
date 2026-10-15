@@ -19,7 +19,7 @@ Verzeichnis oder GitHub Pages.
 
 Jedes Ziel außer den beiden einfachsten (`local`/`github-pages`, die allein
 mit Flags auskommen - siehe [CLI-Referenz](../cli-reference.md#deploy))
-wird über eine `deployments/<name>.json`-Datei im Projekt-Wurzelverzeichnis
+wird über eine `deployments/<name>.yaml`-Datei im Projekt-Wurzelverzeichnis
 konfiguriert - eine Datei pro tatsächlich genutztem Deploy-Ziel, jede
 benennt, welches `target` es ist, plus die eigenen Felder dieses Ziels:
 
@@ -27,15 +27,20 @@ benennt, welches `target` es ist, plus die eigenen Felder dieses Ziels:
 bxSites deploy --entry=production
 ```
 
-```json title="deployments/production.json"
-{ "target": "s3", "bucket": "my-docs-site", "accessKeyIdEnvVar": "AWS_ACCESS_KEY_ID", "secretAccessKeyEnvVar": "AWS_SECRET_ACCESS_KEY" }
+```yaml title="deployments/production.yaml"
+target: s3
+bucket: my-docs-site
+accessKeyIdEnvVar: AWS_ACCESS_KEY_ID
+secretAccessKeyEnvVar: AWS_SECRET_ACCESS_KEY
 ```
 
+Einträge können YAML (`.yaml`/`.yml`), TOML (`.toml`) oder JSON (`.json`) sein - dieselben Formate wie die Website-Konfiguration. Die Ziel-Abschnitte unten zeigen JSON, aber jedes Feld funktioniert in jedem Format gleich.
+
 **Secrets kommen immer aus einer Umgebungsvariable, nie aus einem
-literalen Wert in `deployments/*.json`.** Jedes Feld, das auf `EnvVar`
+literalen Wert in `deployments/*`.** Jedes Feld, das auf `EnvVar`
 endet, benennt die *Umgebungsvariable*, die das eigentliche Secret enthält
 (ein Access Key, ein Passwort, ein API-Token) - zur Deploy-Zeit live
-aufgelöst, sodass `deployments/*.json` selbst immer gefahrlos committet
+aufgelöst, sodass `deployments/*` selbst immer gefahrlos committet
 werden kann. Ein Feld, das ein *Pfad* zu einer Credential-Datei ist, die
 du bereits selbst verwaltest (ein privater SSH-Schlüssel, ein
 heruntergeladener GCP-Service-Account-JSON-Key), ist die eine Ausnahme -
@@ -50,7 +55,7 @@ gesetzt.
 ### Alle Ziele auf einmal deployen
 
 `bxSites deploy` ohne `--entry` und ohne `--target` ausgeführt, deployt
-jeden `deployments/*.json`-Eintrag der Reihe nach, ausgehend von einem
+jeden `deployments/*`-Eintrag der Reihe nach, ausgehend von einem
 einzigen gemeinsamen Build:
 
 ```bash frame="terminal" title="Terminal"

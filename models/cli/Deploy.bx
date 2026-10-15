@@ -7,7 +7,7 @@
  * Three ways to invoke it:
  *
  *  1. `--entry=<name>` - dispatches to whatever target the named
- *     `deployments/<name>.json` convention entry declares (`s3`, `azure`,
+ *     `deployments/<name>.yaml` (or .yml/.toml/.json) convention entry declares (`s3`, `azure`,
  *     `gcs`, `firebase`, `ftp`, `sftp`, `rsync`, `netlify`, `vercel`,
  *     `cloudflare-pages`, `local`, or `github-pages`), resolved and
  *     validated via `DeploymentConfigResolver`.
@@ -17,10 +17,10 @@
  *       - `github-pages`: `[--branch] [--remote] [--message]`, all
  *         optional - the exact defaults `gh-deploy` already has
  *     Every other target needs more configuration than a couple of flags
- *     can reasonably carry, and requires a `deployments/*.json` entry instead.
- *  3. Neither flag - "deploy all": every `deployments/*.json` entry is
+ *     can reasonably carry, and requires a `deployments/*` entry instead.
+ *  3. Neither flag - "deploy all": every `deployments/*` entry is
  *     deployed in turn, off a single shared build (the site is only built
- *     once, not once per target). Requires at least one `deployments/*.json`
+ *     once, not once per target). Requires at least one `deployments/*`
  *     entry to exist; throws `BxSites.NoDeploymentsFound` otherwise, since
  *     there's nothing implicit to fall back to. One target failing doesn't
  *     stop the others - every entry is attempted, and the verb only exits
@@ -50,7 +50,7 @@ class {
 	variables.FLAG_ONLY_TARGETS = [ "local", "github-pages" ]
 
 	/**
-	 * @options { projectRoot (required), entry (optional, a deployments/* entry name - NOT `name`, which collides with a reserved top-level BoxLang CLI flag and crashes the runtime before this class is even reached), target (optional; when neither entry nor target is given, every deployments/*.json entry is deployed instead), destination, branch, remote, message, verbose (optional, prints a progress line per target) }
+	 * @options { projectRoot (required), entry (optional, a deployments/* entry name - NOT `name`, which collides with a reserved top-level BoxLang CLI flag and crashes the runtime before this class is even reached), target (optional; when neither entry nor target is given, every deployments/* entry is deployed instead), destination, branch, remote, message, verbose (optional, prints a progress line per target) }
 	 */
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
@@ -85,7 +85,7 @@ class {
 			if ( !resolved.entries.len() ) {
 				throw(
 					type    = "BxSites.NoDeploymentsFound",
-					message = "No deployments/*.json entries found - add one, or use --entry=<name> / --target=<name> to deploy a single target"
+					message = "No deployments/* entries found - add one, or use --entry=<name> / --target=<name> to deploy a single target"
 				)
 			}
 			allEntries = resolved.entries
@@ -106,7 +106,7 @@ class {
 			if ( !variables.FLAG_ONLY_TARGETS.contains( target ) ) {
 				throw(
 					type    = "BxSites.MissingDeployEntry",
-					message = "deploy target [#target#] requires a deployments/*.json entry (`deploy --entry=<name>`) - only #variables.FLAG_ONLY_TARGETS.toList( '/' )# support the flag-only form"
+					message = "deploy target [#target#] requires a deployments/* entry (`deploy --entry=<name>`) - only #variables.FLAG_ONLY_TARGETS.toList( '/' )# support the flag-only form"
 				)
 			}
 
@@ -147,12 +147,12 @@ class {
 	}
 
 	/**
-	 * "Deploy all" - every already-resolved `deployments/*.json` entry,
+	 * "Deploy all" - every already-resolved `deployments/*` entry,
 	 * deployed in turn off the single build `run()` already produced. One
 	 * entry failing doesn't stop the rest; the overall result only fails if
 	 * at least one did.
 	 *
-	 * @entries The already-resolved+validated deployments/*.json entries ({ name, target, config }[])
+	 * @entries The already-resolved+validated deployments/* entries ({ name, target, config }[])
 	 * @context The shared deploy context ({ projectRoot, siteDir, config }), already built once
 	 * @buildResult The BuildPipeline result, for the page-count summary
 	 * @verbose Whether to print a progress line per target

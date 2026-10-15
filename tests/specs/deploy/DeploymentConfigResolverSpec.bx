@@ -48,6 +48,42 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.entries[ 1 ].target ).toBe( "local" );
 			} );
 
+			it( "reads YAML, YML and TOML entries as well as JSON", function() {
+				var dir = newTempProject();
+				var nl = char( 10 );
+				directoryCreate( dir & "/deployments", true, true );
+				fileWrite( dir & "/deployments/production.yaml", "target: s3" & nl & "bucket: my-site" & nl & "accessKeyIdEnvVar: AWS_ACCESS_KEY_ID" & nl & "secretAccessKeyEnvVar: AWS_SECRET_ACCESS_KEY" & nl );
+				fileWrite( dir & "/deployments/staging.yml", "target: local" & nl & "destination: /tmp/staging" & nl );
+				fileWrite( dir & "/deployments/preview.toml", 'target = "local"' & nl & 'destination = "/tmp/preview"' & nl );
+				writeEntry( dir, "archive", { target : "local", destination : "/tmp/archive" } );
+				fileWrite( dir & "/deployments/notes.txt", "not a deploy entry" );
+
+				var result = resolver.resolve( dir );
+
+				expect( result.errors ).toBeEmpty();
+				var byName = {};
+				for ( var entry in result.entries ) {
+					byName[ entry.name ] = entry;
+				}
+				expect( byName.keyList().listSort( "text" ) ).toBe( "archive,preview,production,staging" );
+				expect( byName.production.target ).toBe( "s3" );
+				expect( byName.production.config.bucket ).toBe( "my-site" );
+				expect( byName.staging.config.destination ).toBe( "/tmp/staging" );
+				expect( byName.preview.config.destination ).toBe( "/tmp/preview" );
+			} );
+
+			it( "reports a same-named entry in two formats as a duplicate, and an unparseable one as unreadable", function() {
+				var dir = newTempProject();
+				writeEntry( dir, "production", { target : "local", destination : "/tmp/a" } );
+				fileWrite( dir & "/deployments/production.yaml", "target: local" & char( 10 ) & "destination: /tmp/b" );
+				fileWrite( dir & "/deployments/broken.yaml", "just a string, not a map" );
+
+				var errors = resolver.resolve( dir ).errors.toList( "|" );
+
+				expect( errors ).toInclude( "Duplicate deploy entry name [production]" );
+				expect( errors ).toInclude( "deployments/broken.yaml could not be read" );
+			} );
+
 			it( "rejects an entry missing a target", function() {
 				var dir = newTempProject();
 				writeEntry( dir, "broken", { destination : "/tmp/wherever" } );

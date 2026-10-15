@@ -166,7 +166,7 @@ bxSites deploy [--verbose]
 Three ways to invoke it:
 
 1. **`--entry=<name>`** - dispatches to whatever target a
-   `deployments/<name>.json` file declares (see below). Every target
+   `deployments/<name>.yaml` file declares (see below). Every target
    except `local`/`github-pages` needs this - there's more configuration
    than a couple of flags can reasonably carry.
 2. **`--target=<name>` with its own flags** - a flag-only shorthand for
@@ -174,9 +174,9 @@ Three ways to invoke it:
    `local` (`--destination=<path>`) and `github-pages` (`[--branch]
    [--remote] [--message]`, every field optional, same defaults as
    `gh-deploy`).
-3. **Neither flag - deploy everything.** Every `deployments/*.json` entry
+3. **Neither flag - deploy everything.** Every `deployments/*` entry
    is deployed in turn, off a single shared build (the site is built once,
-   not once per target). Requires at least one `deployments/*.json` entry
+   not once per target). Requires at least one `deployments/*` entry
    to exist. One target failing doesn't stop the rest - every entry is
    attempted, and the command only exits non-zero if at least one of them
    failed; the final summary reports how many succeeded (e.g. `Deployed to
@@ -186,7 +186,7 @@ Three ways to invoke it:
 target starts/finishes, instead of just the final one-line summary.
 
 See [Deployment](guides/deployment.md) for every target's own config
-shape and a real `deployments/*.json` example for each.
+shape and a real `deployments/*` example for each.
 
 ## `publish`
 

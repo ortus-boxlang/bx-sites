@@ -2,7 +2,7 @@
  * Force-pushes the already-built `site/` to a `gh-pages`-style branch - a
  * thin `IDeploymentTarget` wrapper around `GhPagesDeployer.bx`, the same
  * real implementation the older single-purpose `gh-deploy` verb uses (see
- * GhDeploy.bx). The other target that never needs a `deployments/*.json` entry
+ * GhDeploy.bx). The other target that never needs a `deployments/*` entry
  * (`deploy --target=github-pages`, every field optional).
  *
  * @config { branch ("gh-pages" default), remote ("origin" default), message (default "Deploy site via bxSites deploy") }

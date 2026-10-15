@@ -156,7 +156,7 @@ bxSites deploy [--verbose]
 Drei Arten, es aufzurufen:
 
 1. **`--entry=<name>`** - leitet an das Ziel weiter, das eine
-   `deployments/<name>.json`-Datei deklariert (siehe unten). Jedes Ziel
+   `deployments/<name>.yaml`-Datei deklariert (siehe unten). Jedes Ziel
    außer `local`/`github-pages` braucht das - es gibt mehr Konfiguration,
    als ein paar Flags sinnvoll tragen könnten.
 2. **`--target=<name>` mit seinen eigenen Flags** - eine reine
@@ -164,10 +164,10 @@ Drei Arten, es aufzurufen:
    `deployments/`-Ordner brauchen: `local` (`--destination=<path>`) und
    `github-pages` (`[--branch] [--remote] [--message]`, jedes Feld
    optional, dieselben Standardwerte wie bei `gh-deploy`).
-3. **Kein Flag - alles deployen.** Jeder `deployments/*.json`-Eintrag wird
+3. **Kein Flag - alles deployen.** Jeder `deployments/*`-Eintrag wird
    der Reihe nach deployt, ausgehend von einem einzigen gemeinsamen Build
    (die Website wird einmal gebaut, nicht einmal pro Ziel). Setzt voraus,
-   dass mindestens ein `deployments/*.json`-Eintrag existiert. Schlägt ein
+   dass mindestens ein `deployments/*`-Eintrag existiert. Schlägt ein
    Ziel fehl, stoppt das die übrigen nicht - jeder Eintrag wird versucht,
    und der Befehl liefert nur dann einen von null verschiedenen Exit-Code,
    wenn mindestens einer davon fehlgeschlagen ist; die abschließende
@@ -179,7 +179,7 @@ und wenn jedes Ziel startet/endet, statt nur der abschließenden
 einzeiligen Zusammenfassung.
 
 Siehe [Deployment](guides/deployment.md) für die eigene Konfigurationsform
-jedes Ziels und ein echtes `deployments/*.json`-Beispiel für jedes davon.
+jedes Ziels und ein echtes `deployments/*`-Beispiel für jedes davon.
 
 ## `package`
 
