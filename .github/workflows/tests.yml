@@ -16,7 +16,8 @@ env:
 
 jobs:
   tests:
-    name: Tests ${{ github.event.repository.name }}
+    # The Linux job keeps its original name (required-check settings key on it)
+    name: Tests ${{ github.event.repository.name }}${{ matrix.os != 'ubuntu-latest' && format(' ({0})', matrix.os) || '' }}
     runs-on: ${{ matrix.os }}
     env:
       DB_USER: root
@@ -27,6 +28,15 @@ jobs:
       matrix:
         os: ["ubuntu-latest"]
         experimental: [false]
+        include:
+          # Windows path handling (backslashes, drive letters) gets real
+          # coverage here - experimental until it has a green track record.
+          - os: windows-latest
+            experimental: true
+    defaults:
+      run:
+        # Git Bash on Windows - steps that need boxlang.bat use cmd/pwsh below
+        shell: bash
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -42,18 +52,29 @@ jobs:
           modules: bx-esapi bx-yaml bx-toml bx-markdown bx-image bx-docbox
 
       - name: Check BoxLang Version
+        shell: pwsh
         run: boxlang --version
 
       - name: Install Dev Dependencies
         run: box install --verbose --nosave
 
       - name: Test Module
+        shell: pwsh
         run: |
           # setup-boxlang points BOXLANG_HOME at ${GITHUB_WORKSPACE}/.boxlang
           # (already owned by the runner user) - that's where BoxLang actually
-          # looks for modules/, not under ${HOME}.
-          mkdir -p "${BOXLANG_HOME}/modules"
-          ln -s "$(pwd)" "${BOXLANG_HOME}/modules/$(basename "$(pwd)")"
+          # looks for modules/, not under ${HOME}. A junction on Windows,
+          # since a symlink there needs admin rights.
+          $modules = Join-Path $env:BOXLANG_HOME "modules"
+          New-Item -ItemType Directory -Force -Path $modules | Out-Null
+          $link = Join-Path $modules (Split-Path -Leaf (Get-Location))
+          $type = if ( $IsWindows ) { "Junction" } else { "SymbolicLink" }
+          New-Item -ItemType $type -Path $link -Target (Get-Location).Path | Out-Null
+
+      - name: Run Tests (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: call testbox\run.bat --reporter=ANTJunit --verbose
 
       - name: Run Tests
         run: |
@@ -72,7 +93,9 @@ jobs:
           # JUnit XML this step's own failure check and the
           # publish-test-results job both need) - not worth doubling every
           # CI run's wall-clock time for that.
-          ./testbox/run --reporter=ANTJunit --verbose
+          if [ "${RUNNER_OS}" != "Windows" ]; then
+            ./testbox/run --reporter=ANTJunit --verbose
+          fi
           # BoxLang's TestBox runner never sets a nonzero process exit code
           # based on spec failures - the step above "succeeds" even when
           # specs failed, the same silent-green gap that let a real
@@ -111,6 +134,42 @@ jobs:
             echo "::error::${failures} failing / ${errors} erroring spec(s) - see tests/results/*.xml (uploaded as this job's tests-${{ matrix.os }} artifact) for exactly which ones"
             exit 1
           fi
+
+      - name: Smoke Test - Real CLI Build
+        shell: pwsh
+        run: |
+          # A real `new` + `build` + `page:rename` through the CLI, not the
+          # TestBox fakes - redirects and page:rename are the path-heavy
+          # code that has broken on Windows before.
+          $ErrorActionPreference = "Stop"
+          function Invoke-BxSites {
+            boxlang bxSites @args
+            if ( $LASTEXITCODE -ne 0 ) { throw "bxSites $args exited $LASTEXITCODE" }
+          }
+          function Assert-File( $path ) {
+            if ( -not ( Test-Path $path ) ) { throw "Expected $path to exist" }
+          }
+          $project = Join-Path $env:RUNNER_TEMP "bxsites-smoke"
+          Invoke-BxSites new $project --name=Smoke
+          Set-Location $project
+          New-Item -ItemType Directory -Force -Path docs/guides | Out-Null
+          Set-Content -Path docs/guides/setup.md -Value "---`ntitle: Setup`nredirect_from:`n  - old-setup`n---`n# Setup`n"
+          Set-Content -Path docs/guides/other.md -Value "---`ntitle: Other`n---`n# Other`n`nSee [setup](setup.md).`n"
+
+          Invoke-BxSites build
+          Assert-File site/index.html
+          Assert-File site/guides/setup/index.html
+          Assert-File site/old-setup/index.html
+
+          Invoke-BxSites page:rename --from=guides/setup.md --to=guides/installing.md
+          Assert-File docs/guides/installing.md
+          if ( Test-Path docs/guides/setup.md ) { throw "page:rename left docs/guides/setup.md behind" }
+          if ( -not ( Select-String -Path docs/guides/other.md -Pattern "installing.md" -Quiet ) ) { throw "page:rename didn't rewrite the link in other.md" }
+
+          Invoke-BxSites build
+          Assert-File site/guides/installing/index.html
+          Assert-File site/guides/setup/index.html
+          Write-Host "Smoke test passed"
 
       - name: Upload Test Results
         if: always()
