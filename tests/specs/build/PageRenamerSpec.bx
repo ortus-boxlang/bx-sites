@@ -132,6 +132,17 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileRead( docsDir & "/assets/readme.md" ) ).toInclude( "[link](../guides.md)" );
 			} );
 
+			it( "accepts Windows-style backslash --from/--to paths", function() {
+				var docsDir = newDocsDir();
+				directoryCreate( docsDir & "/guides", true, true );
+				fileWrite( docsDir & "/guides/old-setup.md", "---" & char( 10 ) & "title: Old Setup" & char( 10 ) & "---" & char( 10 ) & "Body." );
+
+				var result = renamer.rename( docsDir : docsDir, from : "guides" & char( 92 ) & "old-setup.md", to : "guides" & char( 92 ) & "new-setup.md" );
+
+				expect( fileExists( docsDir & "/guides/new-setup.md" ) ).toBeTrue();
+				expect( fileRead( result.path ) ).toInclude( "guides/old-setup" );
+			} );
+
 			it( "stamps a new redirect_from key onto a moved page's own frontmatter", function() {
 				var docsDir = newDocsDir();
 				directoryCreate( docsDir & "/guides", true, true );

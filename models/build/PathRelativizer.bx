@@ -62,6 +62,41 @@ class {
 	}
 
 	/**
+	 * Whether `filePath`, once canonicalized (symlinks resolved, `..`
+	 * collapsed), sits inside `dir` or is `dir` itself. Compares path
+	 * components, not strings, so it holds on Windows (backslashes,
+	 * case-insensitive drives) and `/docs2` never counts as inside `/docs`.
+	 *
+	 * @filePath The candidate path, not yet canonicalized
+	 * @dir The directory it must sit inside
+	 */
+	boolean function isWithin( required string filePath, required string dir ) {
+		var file = createObject( "java", "java.io.File" )
+		var candidate = file.init( arguments.filePath ).getCanonicalFile().toPath()
+		var container = file.init( arguments.dir ).getCanonicalFile().toPath()
+		return candidate.startsWith( container )
+	}
+
+	/**
+	 * Whether `path` is `basePath` or sits below it, compared as plain
+	 * strings (no filesystem access): separators normalized, a whole
+	 * folder name at the boundary (`/docs2` is not under `/docs`), and
+	 * case-insensitive for Windows drive paths.
+	 *
+	 * @basePath Absolute base directory
+	 * @path Absolute path to test
+	 */
+	boolean function isUnder( required string basePath, required string path ) {
+		var normalizedBase = normalize( arguments.basePath ).reReplace( "[\\/]+$", "" )
+		var normalizedPath = normalize( arguments.path ).reReplace( "[\\/]+$", "" )
+		if ( reFind( "^[A-Za-z]:", normalizedBase ) ) {
+			normalizedBase = lCase( normalizedBase )
+			normalizedPath = lCase( normalizedPath )
+		}
+		return normalizedPath == normalizedBase || normalizedPath.startsWith( normalizedBase & "/" )
+	}
+
+	/**
 	 * `filePath`'s own path relative to `basePath`, both normalized first
 	 * so a Windows-style backslash and a Unix-style forward slash compare
 	 * equal. Falls back to the normalized `filePath` itself (leading
@@ -76,9 +111,8 @@ class {
 		var normalizedBase = normalize( arguments.basePath ).reReplace( "[\\\/]+$", "" )
 		var normalizedPath = normalize( arguments.filePath )
 
-		if ( normalizedPath.startsWith( normalizedBase ) ) {
-			var relativePath = normalizedPath.right( normalizedPath.len() - normalizedBase.len() )
-			return relativePath.reReplace( "^[\/]+", "" )
+		if ( isUnder( normalizedBase, normalizedPath ) ) {
+			return normalizedPath.mid( normalizedBase.len() + 1, normalizedPath.len() ).reReplace( "^[\/]+", "" )
 		}
 
 		return normalizedPath.reReplace( "^[\/]+", "" )

@@ -64,8 +64,11 @@ class {
 		for ( var filePath in allMdFiles ) {
 			var original = fileRead( filePath )
 			var rewritten = ""
+			// Compared docs-relative: directoryList() hands back backslashes
+			// on Windows, so the absolute strings never match there
+			var isMovedFile = toSiteRelative( filePath, trimmedDocsDir ) == toRelative
 
-			if ( filePath == toAbsolute ) {
+			if ( isMovedFile ) {
 				// The moved file's own relative links all need re-basing
 				// against its new directory - every link, not just ones
 				// that happen to point at the page that moved, since the
@@ -82,7 +85,7 @@ class {
 
 			if ( rewritten != original ) {
 				fileWrite( filePath, rewritten )
-				if ( filePath != toAbsolute ) {
+				if ( !isMovedFile ) {
 					filesUpdated++
 				}
 			}
@@ -100,7 +103,7 @@ class {
 	 * @missingMessage Exception message to throw when blank
 	 */
 	private string function normalizeRelativePath( required string raw, required string missingType, required string missingMessage ) {
-		var trimmed = trim( arguments.raw ).reReplace( "^[\/]+", "" )
+		var trimmed = trim( arguments.raw ).replace( char( 92 ), "/", "all" ).reReplace( "^[\/]+", "" )
 		if ( !len( trimmed ) ) {
 			throw( type = arguments.missingType, message = arguments.missingMessage )
 		}
@@ -398,9 +401,7 @@ class {
 	 * @docsDir Absolute path to the project's docs/ directory
 	 */
 	private string function toSiteRelative( required string filePath, required string docsDir ) {
-		return arguments.filePath
-			.reReplace( "^" & createObject( "java", "java.util.regex.Pattern" ).quote( arguments.docsDir ), "", "one" )
-			.reReplace( "^[\/]", "" )
+		return new "models.build.PathRelativizer@bxsites"().relativeTo( arguments.docsDir, arguments.filePath )
 	}
 
 	/**

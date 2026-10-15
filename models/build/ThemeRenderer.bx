@@ -344,20 +344,7 @@ class {
 	 * @return A virtual path prefixed with whichever of the two mappings applies
 	 */
 	private string function toVirtualPath( required string path ) {
-		var cwd = server.boxlang.cliMode ? server.cli.executionPath : server.java.executionPath
-		var normalizedCwd = cwd.replace( char( 92 ), "/", "all" ).reReplace( "[\\\/]+$", "" )
-		var normalizedPath = arguments.path.replace( char( 92 ), "/", "all" )
-
-		if ( normalizedPath.left( len( normalizedCwd ) ) == normalizedCwd ) {
-			// +2 (not +1) skips both the matched cwd prefix and the path
-			// separator right after it - remaining is never negative here,
-			// since a themeDir is always some real subdirectory deeper
-			// than cwd itself, never cwd exactly.
-			var remaining = len( normalizedPath ) - len( normalizedCwd ) - 1
-			return remaining > 0 ? "/bxApp/" & normalizedPath.mid( len( normalizedCwd ) + 2, remaining ) : "/bxApp"
-		}
-
-		return "/bxAppRoot" & normalizedPath.reReplace( "^[A-Za-z]:", "" )
+		return new "models.build.VirtualPaths@bxsites"().toVirtualPath( arguments.path )
 	}
 
 	/**

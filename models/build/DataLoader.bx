@@ -229,20 +229,7 @@ class {
 	 * @return A dotted, mapping-relative class path, e.g. "bxApp.docs.data.Pricing"
 	 */
 	private string function toClassPath( required string dataDir, required string rawBasename ) {
-		var cwd = server.boxlang.cliMode ? server.cli.executionPath : server.java.executionPath
-		var normalizedCwd = cwd.replace( char( 92 ), "/", "all" ).reReplace( "[\\\/]+$", "" )
-		var normalizedDataDir = arguments.dataDir.replace( char( 92 ), "/", "all" ).reReplace( "[\\\/]+$", "" )
-
-		var relative = "";
-		if ( normalizedDataDir.left( len( normalizedCwd ) ) == normalizedCwd ) {
-			// +2 (not +1) skips both the matched cwd prefix and the path
-			// separator right after it - mirrors FunctionsLoader.bx's own
-			// toVirtualPath(), see its own docblock for why.
-			var remaining = len( normalizedDataDir ) - len( normalizedCwd ) - 1
-			relative = "bxApp" & ( remaining > 0 ? "." & normalizedDataDir.mid( len( normalizedCwd ) + 2, remaining ).replace( "/", ".", "all" ) : "" )
-		} else {
-			relative = "bxAppRoot." & normalizedDataDir.reReplace( "^[A-Za-z]:", "" ).reReplace( "^[\/]+", "" ).replace( "/", ".", "all" )
-		}
+		var relative = new "models.build.VirtualPaths@bxsites"().toClassPath( arguments.dataDir )
 
 		var classPath = relative & "." & arguments.rawBasename
 

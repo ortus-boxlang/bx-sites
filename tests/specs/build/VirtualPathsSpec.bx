@@ -1,0 +1,43 @@
+/**
+ * Every case passes an explicit `cwd`, so the Windows-shaped ones run the
+ * same on any OS.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.VirtualPaths", function() {
+
+			beforeEach( function() {
+				variables.paths = new "models.build.VirtualPaths@bxsites"();
+			} );
+
+			it( "maps a path under cwd onto /bxApp", function() {
+				expect( paths.toVirtualPath( "/work/site/.themes/mine", "/work/site" ) ).toBe( "/bxApp/.themes/mine" );
+				expect( paths.toVirtualPath( "/work/site", "/work/site/" ) ).toBe( "/bxApp" );
+			} );
+
+			it( "doesn't treat a sibling folder that shares cwd's name prefix as under cwd", function() {
+				expect( paths.toVirtualPath( "/work/site2/theme", "/work/site" ) ).toBe( "/bxAppRoot/work/site2/theme" );
+			} );
+
+			it( "maps a Windows path under cwd onto /bxApp regardless of case or slashes", function() {
+				expect( paths.toVirtualPath( "c:\Users\Me\site\docs\.themes\mine", "C:\users\me\site" ) ).toBe( "/bxApp/docs/.themes/mine" );
+			} );
+
+			it( "maps a Windows path elsewhere on cwd's drive onto /bxAppRoot", function() {
+				expect( paths.toVirtualPath( "C:\other\site\theme", "C:\users\me" ) ).toBe( "/bxAppRoot/other/site/theme" );
+			} );
+
+			it( "gives a path on another drive its own /bxAppRoot<drive> mapping", function() {
+				expect( paths.toVirtualPath( "d:\site\theme", "C:\users\me" ) ).toBe( "/bxAppRootD/site/theme" );
+			} );
+
+			it( "builds a dotted class path", function() {
+				expect( paths.toClassPath( "/work/site/docs/data", "/work/site" ) ).toBe( "bxApp.docs.data" );
+				expect( paths.toClassPath( "D:\site\docs\data", "C:\work" ) ).toBe( "bxAppRootD.site.docs.data" );
+			} );
+
+		} );
+	}
+
+}

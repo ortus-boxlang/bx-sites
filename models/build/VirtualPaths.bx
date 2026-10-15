@@ -1,0 +1,70 @@
+/**
+ * Turns a real filesystem path into a BoxLang virtual path that
+ * `include`/`new` can resolve, using the two mappings ModuleConfig.bx
+ * registers on load: `/bxApp` (the current working directory) and
+ * `/bxAppRoot` (the root of cwd's drive, or "/" off Windows).
+ *
+ * A path on a different Windows drive than cwd (`bxSites build D:\site`
+ * run from `C:\`) gets its own `/bxAppRoot<letter>` mapping, registered
+ * the first time it's needed, since `/bxAppRoot` only covers cwd's drive.
+ *
+ * ThemeRenderer.bx, FunctionsLoader.bx and DataLoader.bx each carried a
+ * copy of this logic before; this is the one shared version.
+ */
+class {
+
+	variables.relativizer = new "models.build.PathRelativizer@bxsites"()
+
+	/**
+	 * @path A real absolute path, in whatever format the current OS gives it
+	 * @cwd The directory `/bxApp` points at - defaults to the real cwd
+	 *
+	 * @return "/bxApp/...", "/bxAppRoot/..." or "/bxAppRoot<drive>/..." with forward slashes
+	 */
+	string function toVirtualPath( required string path, string cwd = currentWorkingDirectory() ) {
+		var normalizedCwd = variables.relativizer.normalize( arguments.cwd ).reReplace( "[\\\/]+$", "" )
+		var normalizedPath = variables.relativizer.normalize( arguments.path ).reReplace( "[\\\/]+$", "" )
+
+		if ( variables.relativizer.isUnder( normalizedCwd, normalizedPath ) ) {
+			var relative = variables.relativizer.relativeTo( normalizedCwd, normalizedPath )
+			return len( relative ) ? "/bxApp/" & relative : "/bxApp"
+		}
+
+		var pathDrive = driveOf( normalizedPath )
+		var rest = normalizedPath.reReplace( "^[A-Za-z]:", "" )
+		if ( pathDrive == driveOf( normalizedCwd ) ) {
+			return "/bxAppRoot" & rest
+		}
+
+		var mapping = "/bxAppRoot" & pathDrive
+		getBoxRuntime().getConfiguration().registerMapping( mapping, pathDrive & ":" & char( 92 ) )
+		return mapping & rest
+	}
+
+	/**
+	 * The same location as a dotted class path, e.g. "bxApp.docs.data".
+	 *
+	 * @path A real absolute directory path
+	 * @cwd The directory `/bxApp` points at - defaults to the real cwd
+	 */
+	string function toClassPath( required string path, string cwd = currentWorkingDirectory() ) {
+		return toVirtualPath( arguments.path, arguments.cwd ).reReplace( "^/+", "" ).replace( "/", ".", "all" )
+	}
+
+	/**
+	 * The cwd ModuleConfig.bx mapped `/bxApp` to.
+	 */
+	string function currentWorkingDirectory() {
+		return server.boxlang.cliMode ? server.cli.executionPath : server.java.executionPath
+	}
+
+	/**
+	 * Upper-cased drive letter of a Windows path, or "" for a path without one.
+	 *
+	 * @path A normalized (forward-slash) path
+	 */
+	private string function driveOf( required string path ) {
+		return reFind( "^[A-Za-z]:", arguments.path ) ? uCase( left( arguments.path, 1 ) ) : ""
+	}
+
+}

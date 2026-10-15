@@ -78,9 +78,58 @@ class extends="testbox.system.BaseSpec" {
 					expect( relativizer.relativeTo( "/docs", "/docs/index.md" ) ).toBe( "index.md" );
 				} );
 
+				it( "doesn't treat a sibling folder sharing a name prefix as under basePath", function() {
+					expect( relativizer.relativeTo( "/site/docs", "/site/docs2/index.md" ) )
+						.toBe( "site/docs2/index.md" );
+				} );
+
+				it( "matches a Windows base path regardless of drive letter or folder case", function() {
+					expect( relativizer.relativeTo( "c:\Users\Me\docs", "C:\users\me\Docs\guides\setup.md" ) )
+						.toBe( "guides/setup.md" );
+				} );
+
 				it( "falls back to the normalized path itself, leading slashes stripped, when filePath isn't under basePath", function() {
 					expect( relativizer.relativeTo( "/docs", "/elsewhere/index.md" ) )
 						.toBe( "elsewhere/index.md" );
+				} );
+
+			} );
+
+			describe( "isUnder()", function() {
+
+				it( "compares whole folder names, not string prefixes", function() {
+					expect( relativizer.isUnder( "/site/docs", "/site/docs" ) ).toBeTrue();
+					expect( relativizer.isUnder( "/site/docs/", "/site/docs/a.md" ) ).toBeTrue();
+					expect( relativizer.isUnder( "/site/docs", "/site/docs2/a.md" ) ).toBeFalse();
+				} );
+
+				it( "ignores case and slash direction on Windows drive paths", function() {
+					expect( relativizer.isUnder( "C:\Site\Docs", "c:/site/docs/a.md" ) ).toBeTrue();
+				} );
+
+			} );
+
+			describe( "isWithin()", function() {
+
+				it( "accepts the directory itself and anything below it", function() {
+					var dir = createTempDirectory( prefix = "bxsites-within-" );
+					try {
+						expect( relativizer.isWithin( dir, dir ) ).toBeTrue();
+						expect( relativizer.isWithin( dir & "/a/b.html", dir ) ).toBeTrue();
+						expect( relativizer.isWithin( dir & "/a/../b.html", dir ) ).toBeTrue();
+					} finally {
+						directoryDelete( dir, true );
+					}
+				} );
+
+				it( "rejects .. escapes and sibling folders that only share a name prefix", function() {
+					var dir = createTempDirectory( prefix = "bxsites-within-" );
+					try {
+						expect( relativizer.isWithin( dir & "/../elsewhere.html", dir ) ).toBeFalse();
+						expect( relativizer.isWithin( dir & "2/index.html", dir ) ).toBeFalse();
+					} finally {
+						directoryDelete( dir, true );
+					}
 				} );
 
 			} );

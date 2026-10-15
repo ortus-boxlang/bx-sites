@@ -127,8 +127,7 @@ class {
 	 * @canonicalDir The already-canonicalized directory `filePath` must sit inside
 	 */
 	private boolean function isWithinDirectory( required string filePath, required string canonicalDir ) {
-		var canonicalFile = createObject( "java", "java.io.File" ).init( arguments.filePath ).getCanonicalPath()
-		return canonicalFile == arguments.canonicalDir || canonicalFile.startsWith( arguments.canonicalDir & "/" )
+		return new "models.build.PathRelativizer@bxsites"().isWithin( arguments.filePath, arguments.canonicalDir )
 	}
 
 	/**
