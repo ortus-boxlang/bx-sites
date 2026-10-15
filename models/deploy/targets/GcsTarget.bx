@@ -26,22 +26,7 @@
 class implements="models.deploy.IDeploymentTarget@bxsites" {
 
 	variables.SCOPE = "https://www.googleapis.com/auth/devstorage.read_write"
-	variables.MIME_TYPES = {
-		"html"  : "text/html",
-		"htm"   : "text/html",
-		"css"   : "text/css",
-		"js"    : "application/javascript",
-		"json"  : "application/json",
-		"xml"   : "application/xml",
-		"svg"   : "image/svg+xml",
-		"png"   : "image/png",
-		"jpg"   : "image/jpeg",
-		"jpeg"  : "image/jpeg",
-		"gif"   : "image/gif",
-		"ico"   : "image/x-icon",
-		"woff"  : "font/woff",
-		"woff2" : "font/woff2"
-	}
+	variables.contentTypes = new "models.deploy.ContentTypes@bxsites"()
 
 	/**
 	 * @return this
@@ -85,7 +70,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 		var accessToken = variables.auth.getAccessToken( serviceAccountKeyPath, variables.SCOPE ).accessToken
 
 		for ( var filePath in files ) {
-			var relativePath = filePath.replace( siteDir, "", "one" ).reReplace( "^[\/]+", "" )
+			var relativePath = new "models.build.PathRelativizer@bxsites"().relativeTo( siteDir, filePath )
 			uploadFile( bucket, buildObjectName( prefix, relativePath ), filePath, accessToken )
 		}
 
@@ -133,8 +118,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 * @return The guessed MIME type
 	 */
 	string function guessContentType( required string relativePath ) {
-		var ext = lCase( listLast( arguments.relativePath, "." ) )
-		return variables.MIME_TYPES[ ext ] ?: "application/octet-stream"
+		return variables.contentTypes.guess( arguments.relativePath )
 	}
 
 	/**

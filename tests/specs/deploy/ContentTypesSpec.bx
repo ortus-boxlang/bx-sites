@@ -1,0 +1,35 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "deploy.ContentTypes", function() {
+
+			beforeEach( function() {
+				variables.types = new "models.deploy.ContentTypes@bxsites"();
+			} );
+
+			it( "covers every file type a build writes, not only HTML/CSS/JS", function() {
+				expect( types.guess( "index.html" ) ).toBe( "text/html" );
+				expect( types.guess( "assets/theme/style.css" ) ).toBe( "text/css" );
+				expect( types.guess( "assets/images/hero.webp" ) ).toBe( "image/webp" );
+				expect( types.guess( "llms.txt" ) ).toBe( "text/plain; charset=utf-8" );
+				expect( types.guess( "robots.txt" ) ).toBe( "text/plain; charset=utf-8" );
+				expect( types.guess( "guides/setup.md" ) ).toBe( "text/markdown; charset=utf-8" );
+				expect( types.guess( "site.webmanifest" ) ).toBe( "application/manifest+json" );
+			} );
+
+			it( "ignores case and directory names, and accepts either path separator", function() {
+				expect( types.guess( "Assets/LOGO.PNG" ) ).toBe( "image/png" );
+				expect( types.guess( "v1.2/notes" ) ).toBe( "application/octet-stream" );
+				expect( types.guess( "C:\site\assets\app.js" ) ).toBe( "application/javascript" );
+			} );
+
+			it( "falls back to application/octet-stream for unknown, missing or dotfile-only extensions", function() {
+				expect( types.guess( "archive.xyz" ) ).toBe( "application/octet-stream" );
+				expect( types.guess( "LICENSE" ) ).toBe( "application/octet-stream" );
+				expect( types.guess( ".htaccess" ) ).toBe( "application/octet-stream" );
+			} );
+
+		} );
+	}
+
+}

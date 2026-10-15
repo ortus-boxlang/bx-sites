@@ -51,6 +51,24 @@ class extends="testbox.system.BaseSpec" {
 				return dir;
 			}
 
+			describe( "encodeBlobPath()", function() {
+
+				it( "percent-encodes each segment, keeping the slashes", function() {
+					expect( target.encodeBlobPath( "docs/assets/style.css" ) ).toBe( "docs/assets/style.css" );
+					expect( target.encodeBlobPath( "assets/My Image+1 café.png" ) ).toBe( "assets/My%20Image%2B1%20caf%C3%A9.png" );
+				} );
+
+				it( "signs the encoded name, the same form the request URL carries", function() {
+					var headers = { "x-ms-date" : "Wed, 25 Aug 2026 12:00:00 GMT", "x-ms-version" : "2021-08-06" };
+
+					var result = target.buildStringToSign( headers, "PUT", "acct", "container", "assets/My Image.png" );
+
+					expect( result ).toInclude( "/acct/container/assets/My%20Image.png" );
+					expect( result ).notToInclude( "My Image.png" );
+				} );
+
+			} );
+
 			describe( "buildStringToSign()", function() {
 
 				it( "produces the exact expected string-to-sign for a fixed set of inputs", function() {

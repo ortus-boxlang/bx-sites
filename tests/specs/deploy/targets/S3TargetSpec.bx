@@ -138,6 +138,40 @@ class extends="testbox.system.BaseSpec" {
 				expect( endpoint.baseUrl ).toBe( "https://mybucket.abc123.r2.cloudflarestorage.com" );
 			} );
 
+			it( "buildRequestTarget signs the same path it sends, in path style (MinIO/R2/Spaces)", function() {
+				var signer = new "models.deploy.AwsSigV4Signer@bxsites"();
+				var endpoint = target.resolveEndpoint( {
+					bucket         : "mybucket",
+					endpoint       : "https://minio.example.com",
+					forcePathStyle : true
+				} );
+
+				var requestTarget = target.buildRequestTarget( endpoint, "docs/index.html", signer );
+
+				expect( requestTarget.uriPath ).toBe( "/mybucket/docs/index.html" );
+				expect( requestTarget.url ).toBe( "https://minio.example.com/mybucket/docs/index.html" );
+			} );
+
+			it( "buildRequestTarget signs the same path it sends, virtual-hosted style", function() {
+				var signer = new "models.deploy.AwsSigV4Signer@bxsites"();
+				var endpoint = target.resolveEndpoint( { bucket : "mybucket", region : "us-west-2" } );
+
+				var requestTarget = target.buildRequestTarget( endpoint, "index.html", signer );
+
+				expect( requestTarget.uriPath ).toBe( "/index.html" );
+				expect( requestTarget.url ).toBe( "https://mybucket.s3.us-west-2.amazonaws.com/index.html" );
+			} );
+
+			it( "buildRequestTarget percent-encodes keys with spaces, + and non-ASCII exactly as they're signed", function() {
+				var signer = new "models.deploy.AwsSigV4Signer@bxsites"();
+				var endpoint = target.resolveEndpoint( { bucket : "mybucket", endpoint : "https://minio.example.com", forcePathStyle : true } );
+
+				var requestTarget = target.buildRequestTarget( endpoint, "assets/My Image+1 café.png", signer );
+
+				expect( requestTarget.url ).toBe( "https://minio.example.com/mybucket/assets/My%20Image%2B1%20caf%C3%A9.png" );
+				expect( requestTarget.url ).toBe( "https://minio.example.com" & signer.canonicalUri( requestTarget.uriPath ) );
+			} );
+
 			it( "buildObjectKey joins a normalized prefix and relative path", function() {
 				expect( target.buildObjectKey( "docs/", "assets/style.css" ) ).toBe( "docs/assets/style.css" );
 				expect( target.buildObjectKey( "docs", "index.html" ) ).toBe( "docs/index.html" );

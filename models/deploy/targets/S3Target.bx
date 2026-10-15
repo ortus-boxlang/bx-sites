@@ -30,22 +30,7 @@
  */
 class implements="models.deploy.IDeploymentTarget@bxsites" {
 
-	variables.MIME_TYPES = {
-		"html"  : "text/html",
-		"htm"   : "text/html",
-		"css"   : "text/css",
-		"js"    : "application/javascript",
-		"json"  : "application/json",
-		"xml"   : "application/xml",
-		"svg"   : "image/svg+xml",
-		"png"   : "image/png",
-		"jpg"   : "image/jpeg",
-		"jpeg"  : "image/jpeg",
-		"gif"   : "image/gif",
-		"ico"   : "image/x-icon",
-		"woff"  : "font/woff",
-		"woff2" : "font/woff2"
-	}
+	variables.contentTypes = new "models.deploy.ContentTypes@bxsites"()
 
 	/**
 	 * @config This target's own resolved config (see the class docblock's `@config` shape)
@@ -91,14 +76,14 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 		var acl = trim( arguments.config.acl ?: "" )
 
 		var signer = new "models.deploy.AwsSigV4Signer@bxsites"()
+		var pathRelativizer = new "models.build.PathRelativizer@bxsites"()
 		var siteDir = arguments.context.siteDir.reReplace( "[\\\/]+$", "" )
 		var files = directoryList( siteDir, true, "path" )
 			.filter( function( p ) { return !directoryExists( p ) } )
 
 		var uploaded = 0
 		for ( var filePath in files ) {
-			var relativePath = filePath.replace( expandpath(siteDir & "/"), "", "one" )
-			
+			var relativePath = pathRelativizer.relativeTo( siteDir, filePath )
 			var key = buildObjectKey( prefix, relativePath )
 			uploadFile(
 				signer      : signer,
@@ -146,8 +131,9 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	) {
 		var body = fileReadBinary( arguments.filePath )
 		var payloadHash = arguments.signer.hashBytes( body )
-		var uriPath = "/" & arguments.key
-		var url = arguments.endpoint.baseUrl & uriPath
+		var target = buildRequestTarget( arguments.endpoint, arguments.key, arguments.signer )
+		var uriPath = target.uriPath
+		var url = target.url
 		var contentType = guessContentType( arguments.filePath )
 
 		var extraHeaders = { "Content-Type" : contentType }
@@ -194,9 +180,9 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 *
 	 * @config This target's own resolved config
 	 *
-	 * @return { host, baseUrl } - `host` is the Host header used for
-	 *         signing, `baseUrl` is `https://.../bucket-or-not` ready to
-	 *         have `/<key>` appended
+	 * @return { host, baseUrl, pathPrefix } - `host` is the Host header used
+	 *         for signing, `baseUrl` is `https://.../bucket-or-not` (for
+	 *         display), and `pathPrefix` is `/<bucket>` in path style, else ""
 	 */
 	struct function resolveEndpoint( required struct config ) {
 		var bucket = trim( arguments.config.bucket ?: "" )
@@ -209,10 +195,30 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 			: "s3.#region#.amazonaws.com"
 
 		if ( forcePathStyle ) {
-			return { host : baseHost, baseUrl : "https://#baseHost#/#bucket#" }
+			return { host : baseHost, baseUrl : "https://#baseHost#/#bucket#", pathPrefix : "/" & bucket }
 		}
 
-		return { host : "#bucket#.#baseHost#", baseUrl : "https://#bucket#.#baseHost#" }
+		return { host : "#bucket#.#baseHost#", baseUrl : "https://#bucket#.#baseHost#", pathPrefix : "" }
+	}
+
+	/**
+	 * Pure - the request path an object is signed with and the URL it's
+	 * sent to. SigV4 rejects any difference between the two, so the URL is
+	 * that same path percent-encoded by the signer's own canonicalUri() -
+	 * which is also what makes keys with spaces, `+` or non-ASCII work.
+	 *
+	 * @endpoint This deploy's resolved endpoint (see `resolveEndpoint()`)
+	 * @key The destination object key, unencoded
+	 * @signer An `AwsSigV4Signer@bxsites` instance
+	 *
+	 * @return { uriPath (raw, as passed to sign()), url }
+	 */
+	struct function buildRequestTarget( required struct endpoint, required string key, required any signer ) {
+		var uriPath = arguments.endpoint.pathPrefix & "/" & arguments.key
+		return {
+			uriPath : uriPath,
+			url     : "https://" & arguments.endpoint.host & arguments.signer.canonicalUri( uriPath )
+		}
 	}
 
 	/**
@@ -258,9 +264,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 * @return The guessed MIME type
 	 */
 	string function guessContentType( required string filePath ) {
-		var fileName = getFileFromPath( arguments.filePath )
-		var ext = fileName.find( "." ) ? lCase( listLast( fileName, "." ) ) : ""
-		return variables.MIME_TYPES[ ext ] ?: "application/octet-stream"
+		return variables.contentTypes.guess( arguments.filePath )
 	}
 
 }

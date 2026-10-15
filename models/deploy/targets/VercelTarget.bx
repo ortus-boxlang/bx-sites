@@ -132,9 +132,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 
 		var manifest = []
 		for ( var filePath in files ) {
-			var relativePath = filePath.replace( root, "", "one" )
-				.reReplace( "^[\/]+", "" )
-				.replace( char( 92 ), "/", "all" )
+			var relativePath = new "models.build.PathRelativizer@bxsites"().relativeTo( root, filePath )
 			var bytes = readFileBytes( filePath )
 			manifest.append( { file : relativePath, sha : sha1Hex( bytes ), size : bytes.len(), bytes : bytes } )
 		}

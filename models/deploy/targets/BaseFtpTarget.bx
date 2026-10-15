@@ -204,9 +204,8 @@ class {
 
 		for ( var p in allFiles ) {
 			var name = getFileFromPath( p )
-			var fileDir = getDirectoryFromPath( p ).reReplace( "[\\\/]+$", "" )
-			var relativeDir = ( fileDir == root ) ? "" : fileDir.replace( root & "/", "", "one" )
-			var relativePath = len( relativeDir ) ? ( relativeDir & "/" & name ) : name
+			var relativePath = new "models.build.PathRelativizer@bxsites"().relativeTo( root, p )
+			var relativeDir = relativePath.reReplace( "/?[^/]*$", "" )
 
 			files.append( { path : p, name : name, relativeDir : relativeDir, relativePath : relativePath } )
 		}

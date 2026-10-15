@@ -1,0 +1,52 @@
+/**
+ * File extension -> `Content-Type` for the object-storage deploy targets
+ * (S3, Azure Blob, GCS, Cloudflare Pages) - one list, so every target
+ * serves a site's files the same way. `.md` and `.txt` (the published
+ * Markdown sources, `llms.txt`, `robots.txt`) carry `charset=utf-8`,
+ * since unlike HTML they have no `<meta charset>` of their own and a
+ * browser would otherwise guess the encoding.
+ */
+class {
+
+	variables.TYPES = {
+		"html"        : "text/html",
+		"htm"         : "text/html",
+		"css"         : "text/css",
+		"js"          : "application/javascript",
+		"mjs"         : "application/javascript",
+		"json"        : "application/json",
+		"map"         : "application/json",
+		"webmanifest" : "application/manifest+json",
+		"xml"         : "application/xml",
+		"md"          : "text/markdown; charset=utf-8",
+		"txt"         : "text/plain; charset=utf-8",
+		"pdf"         : "application/pdf",
+		"svg"         : "image/svg+xml",
+		"png"         : "image/png",
+		"jpg"         : "image/jpeg",
+		"jpeg"        : "image/jpeg",
+		"gif"         : "image/gif",
+		"webp"        : "image/webp",
+		"avif"        : "image/avif",
+		"ico"         : "image/x-icon",
+		"woff"        : "font/woff",
+		"woff2"       : "font/woff2",
+		"ttf"         : "font/ttf",
+		"eot"         : "application/vnd.ms-fontobject",
+		"wasm"        : "application/wasm",
+		"mp4"         : "video/mp4",
+		"webm"        : "video/webm"
+	}
+
+	/**
+	 * @path A file name or path, either separator - only the file name's own extension is used
+	 *
+	 * @return The Content-Type, or `application/octet-stream` for an unknown or missing extension
+	 */
+	string function guess( required string path ) {
+		var fileName = listLast( arguments.path.replace( char( 92 ), "/", "all" ), "/" )
+		var ext = listLen( fileName, "." ) > 1 ? lCase( listLast( fileName, "." ) ) : ""
+		return variables.TYPES[ ext ] ?: "application/octet-stream"
+	}
+
+}

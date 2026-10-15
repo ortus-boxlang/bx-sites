@@ -72,17 +72,7 @@
 class implements="models.deploy.IDeploymentTarget@bxsites" {
 
 	variables.API_BASE = "https://api.cloudflare.com/client/v4"
-	variables.CONTENT_TYPES = {
-		"html" : "text/html", "htm" : "text/html", "css" : "text/css",
-		"js" : "application/javascript", "mjs" : "application/javascript",
-		"json" : "application/json", "xml" : "application/xml",
-		"svg" : "image/svg+xml", "png" : "image/png", "jpg" : "image/jpeg",
-		"jpeg" : "image/jpeg", "gif" : "image/gif", "ico" : "image/x-icon",
-		"webp" : "image/webp", "woff" : "font/woff", "woff2" : "font/woff2",
-		"ttf" : "font/ttf", "eot" : "application/vnd.ms-fontobject",
-		"txt" : "text/plain", "pdf" : "application/pdf",
-		"map" : "application/json", "webmanifest" : "application/manifest+json"
-	}
+	variables.contentTypes = new "models.deploy.ContentTypes@bxsites"()
 
 	/**
 	 * @config This target's own resolved config (see the class docblock's `@config` shape)
@@ -163,9 +153,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 
 		var result = {}
 		for ( var filePath in files ) {
-			var relativePath = filePath.replace( root, "", "one" )
-				.reReplace( "^[\/]+", "" )
-				.replace( char( 92 ), "/", "all" )
+			var relativePath = new "models.build.PathRelativizer@bxsites"().relativeTo( root, filePath )
 			var extension = listLen( relativePath, "." ) > 1 ? listLast( relativePath, "." ) : ""
 			result[ relativePath ] = hashFileForCloudflare( readFileBytes( filePath ), extension )
 		}
@@ -278,8 +266,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 * @return The guessed MIME type
 	 */
 	string function guessContentType( required string fileName ) {
-		var extension = listLen( arguments.fileName, "." ) > 1 ? lCase( listLast( arguments.fileName, "." ) ) : ""
-		return variables.CONTENT_TYPES[ extension ] ?: "application/octet-stream"
+		return variables.contentTypes.guess( arguments.fileName )
 	}
 
 	/**

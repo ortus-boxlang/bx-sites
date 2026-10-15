@@ -51,27 +51,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 */
 	variables.API_VERSION = "2021-08-06"
 
-	/**
-	 * Small static-file-server-style extension -> MIME type lookup, same
-	 * idea `guessContentType()` uses for every uploaded file. Anything not
-	 * listed here falls back to `application/octet-stream`.
-	 */
-	variables.MIME_TYPES = {
-		"html"  : "text/html",
-		"htm"   : "text/html",
-		"css"   : "text/css",
-		"js"    : "application/javascript",
-		"json"  : "application/json",
-		"xml"   : "application/xml",
-		"svg"   : "image/svg+xml",
-		"png"   : "image/png",
-		"jpg"   : "image/jpeg",
-		"jpeg"  : "image/jpeg",
-		"gif"   : "image/gif",
-		"ico"   : "image/x-icon",
-		"woff"  : "font/woff",
-		"woff2" : "font/woff2"
-	}
+	variables.contentTypes = new "models.deploy.ContentTypes@bxsites"()
 
 	/**
 	 * @config This target's own resolved config (see the class docblock's `@config` shape)
@@ -99,8 +79,6 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 		var prefix = normalizePrefix( arguments.config.prefix ?: "" )
 		var auth = resolveAuth( arguments.config )
 
-		// Trailing-slash-stripped so a plain string.replace() below cleanly
-		// turns each absolute file path into a path relative to siteDir.
 		var siteDir = arguments.context.siteDir.reReplace( "[\\\/]+$", "" )
 
 		// directoryList() with no glob also returns directories, not just
@@ -112,7 +90,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 
 		var uploaded = 0
 		for ( var filePath in files ) {
-			var relativePath = filePath.replace( siteDir, "", "one" )
+			var relativePath = new "models.build.PathRelativizer@bxsites"().relativeTo( siteDir, filePath )
 			var blobName = buildBlobName( prefix, relativePath )
 			uploadFile( auth, account, container, blobName, filePath )
 			uploaded++
@@ -136,13 +114,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 * @return The guessed MIME type
 	 */
 	string function guessContentType( required string path ) {
-		var fileName = getFileFromPath( arguments.path )
-		var ext = lCase( listLast( fileName, "." ) )
-		if ( ext == lCase( fileName ) ) {
-			// listLast() returned the whole name back - there was no "." to split on
-			return "application/octet-stream"
-		}
-		return variables.MIME_TYPES[ ext ] ?: "application/octet-stream"
+		return variables.contentTypes.guess( arguments.path )
 	}
 
 	/**
@@ -214,6 +186,21 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	}
 
 	/**
+	 * Pure - a blob name percent-encoded one path segment at a time ("/"
+	 * kept), the form Azure expects in both the request URL and the
+	 * Shared Key string-to-sign. Unencoded, a name with a space is rejected
+	 * before it's sent and a non-ASCII one fails the signature check.
+	 *
+	 * @blobName The blob name, unencoded (already prefix-applied)
+	 */
+	string function encodeBlobPath( required string blobName ) {
+		var urlEncoder = createObject( "java", "java.net.URLEncoder" )
+		return arguments.blobName.listToArray( "/", true )
+			.map( ( segment ) => urlEncoder.encode( segment, "UTF-8" ).replace( "+", "%20", "all" ) )
+			.toList( "/" )
+	}
+
+	/**
 	 * Builds the exact Azure "Shared Key" string-to-sign for a `PUT` blob
 	 * upload - pure (no HTTP), so the exact line order/content is directly
 	 * assertable against known-fixed inputs. This is Azure's own scheme,
@@ -279,7 +266,8 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 			canonicalizedHeaders &= name & ":" & trim( lower[ name ] ) & char( 10 )
 		}
 
-		var canonicalizedResource = "/" & arguments.account & "/" & arguments.container & "/" & arguments.blobName
+		// Azure signs the encoded path - the same form the request URL carries
+		var canonicalizedResource = "/" & arguments.account & "/" & arguments.container & "/" & encodeBlobPath( arguments.blobName )
 
 		return arguments.verb & char( 10 ) &
 			contentEncoding & char( 10 ) &
@@ -420,7 +408,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 		var contentType = guessContentType( arguments.filePath )
 		var contentLength = toString( len( bytes ) )
 
-		var url = "https://#arguments.account#.blob.core.windows.net/#arguments.container#/#arguments.blobName#"
+		var url = "https://#arguments.account#.blob.core.windows.net/#arguments.container#/" & encodeBlobPath( arguments.blobName )
 
 		var xmsDate = ""
 		var authorizationHeader = ""

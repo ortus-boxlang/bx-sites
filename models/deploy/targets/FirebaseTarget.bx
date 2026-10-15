@@ -114,7 +114,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 		var gzippedByPath = {}
 		var hashByPath = {}
 		for ( var filePath in files ) {
-			var relativePath = "/" & filePath.replace( siteDir, "", "one" ).reReplace( "^[\/]+", "" ).replace( char( 92 ), "/", "all" )
+			var relativePath = "/" & new "models.build.PathRelativizer@bxsites"().relativeTo( siteDir, filePath )
 			var gzipped = gzip( fileReadBinary( filePath ) )
 			gzippedByPath[ relativePath ] = gzipped
 			hashByPath[ relativePath ] = sha256Hex( gzipped )
