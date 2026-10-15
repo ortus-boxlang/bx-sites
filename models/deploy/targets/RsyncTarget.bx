@@ -55,7 +55,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 		// Validates host/username/remotePath and builds the full argv before
 		// ever touching the filesystem/network, same validate-first order
 		// LocalTarget.bx/BaseFtpTarget.bx already use.
-		var cmd = buildRsyncCommand( arguments.config, siteDir )
+		var cmd = buildRsyncCommand( arguments.config, siteDir, arguments.context.projectRoot ?: "" )
 
 		if ( !directoryExists( siteDir ) ) {
 			throw(
@@ -101,7 +101,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 *
 	 * @return Full argv, `rsync` included as element 1
 	 */
-	array function buildRsyncCommand( required struct config, required string siteDir ) {
+	array function buildRsyncCommand( required struct config, required string siteDir, string projectRoot = "" ) {
 		var host = trim( arguments.config.host ?: "" )
 		var username = trim( arguments.config.username ?: "" )
 		var remotePath = trim( arguments.config.remotePath ?: "" )
@@ -125,6 +125,9 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 
 		var port = arguments.config.port ?: 22
 		var identityFile = trim( arguments.config.identityFile ?: "" )
+		if ( len( identityFile ) && len( arguments.projectRoot ) ) {
+			identityFile = new "models.build.PathRelativizer@bxsites"().resolve( arguments.projectRoot, identityFile )
+		}
 		var sshOptions = trim( arguments.config.sshOptions ?: "" )
 		var deleteExtraneous = arguments.config.deleteExtraneous ?: false
 

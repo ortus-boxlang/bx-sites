@@ -57,6 +57,19 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( projectRoot & "/docs/nav.json" ) ).toBeTrue();
 			} );
 
+			it( "resolves a relative --source against the project root", function() {
+				var projectRoot = createTempDirectory( prefix = "bxsites-cli-migrate-project-" );
+				tempDirs.append( projectRoot );
+				directoryCreate( projectRoot & "/export", true, true );
+				fileWrite( projectRoot & "/export/SUMMARY.md", "* [Home](README.md)" );
+				fileWrite( projectRoot & "/export/README.md", "Welcome." );
+
+				var result = verb.run( { projectRoot : projectRoot, source : "export" } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( fileExists( projectRoot & "/docs/index.md" ) ).toBeTrue();
+			} );
+
 			it( "defaults --from to gitbook when it's not passed", function() {
 				var projectRoot = createTempDirectory( prefix = "bxsites-cli-migrate-project-" );
 				var source = createTempDirectory( prefix = "bxsites-cli-migrate-source-" );

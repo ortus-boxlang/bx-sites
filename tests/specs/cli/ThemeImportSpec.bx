@@ -112,6 +112,17 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.message ).toInclude( "assets copied: css" );
 			} );
 
+			it( "resolves a relative --path against the project root", function() {
+				var root = newProjectRoot();
+				directoryCreate( root & "/vendor/mytheme", true, true );
+				fileWrite( root & "/vendor/mytheme/base.html", "<html><body>{{ page.content }}</body></html>" );
+
+				var result = verb.run( { projectRoot : root, source : "mkdocs", path : "vendor/mytheme", name : "relblog" } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( directoryExists( root & "/docs/.themes/relblog" ) ).toBeTrue();
+			} );
+
 			it( "converts a minimal Hugo theme end to end, substituting an unmapped condition with a safe placeholder", function() {
 				var root = newProjectRoot();
 				var sourceTheme = newTempDir( "bxsites-themeimport-hugo-" );

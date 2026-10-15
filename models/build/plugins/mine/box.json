@@ -1,0 +1,13 @@
+{
+    "name": "My Plugin",
+    "version": "1.0.0",
+    "slug": "my-plugin",
+    "shortDescription": "A bx-sites plugin - see docs/guides/plugins.md in your bx-sites project",
+    "type": "boxlang-modules",
+    "keywords": [ "boxlang", "bxsites-plugin" ],
+    "boxlang": {
+        "minimumVersion": "1.0.0",
+        "moduleName": "myPlugin"
+    },
+    "private": false
+}

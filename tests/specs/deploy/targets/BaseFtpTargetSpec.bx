@@ -108,6 +108,13 @@ class extends="testbox.system.BaseSpec" {
 				expect( attrs.keyExists( "password" ) ).toBeFalse();
 			} );
 
+			it( "resolves a relative sftp key against the project root when one is given", function() {
+				var relativizer = new "models.build.PathRelativizer@bxsites"();
+				var attrs = target.buildConnectAttributes( { host : "h", username : "u", key : "keys/id_rsa" }, "conn3", true, "/projects/site" );
+
+				expect( relativizer.normalize( attrs.key ) ).toInclude( "/projects/site/keys/id_rsa" );
+			} );
+
 			it( "collects every file under siteDir with its path relative to siteDir, filtering out directory entries", function() {
 				var siteDir = newTempDir();
 				directoryCreate( siteDir & "/assets/img", true, true );

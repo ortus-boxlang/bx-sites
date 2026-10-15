@@ -40,6 +40,8 @@ für die `docs/`-oder-`src/`-Konvention. `new` erzeugt immer ein Gerüst mit
 | `-h`, `--help` | Nutzung anzeigen und beenden |
 | `-v`, `--version` | Modulversion anzeigen und beenden |
 
+Pfad-Flags (`--source`, `--path`, `--dest`, `--output`) akzeptieren einen absoluten Pfad, einen `~/`-Pfad im Home-Ordner oder einen Pfad relativ zum Projektstamm.
+
 ## `new`
 
 Ein Docs-Projekt aufsetzen.

@@ -40,6 +40,8 @@ predeterminada para proyectos nuevos.
 | `-h`, `--help` | Muestra el uso y sale |
 | `-v`, `--version` | Muestra la versión del módulo y sale |
 
+Los flags de ruta (`--source`, `--path`, `--dest`, `--output`) aceptan una ruta absoluta, una ruta `~/` en tu carpeta personal o una ruta relativa a la raíz del proyecto.
+
 ## `new`
 
 Crea la estructura de un proyecto de documentación.

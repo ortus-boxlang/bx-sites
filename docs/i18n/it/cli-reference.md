@@ -40,6 +40,8 @@ la convenzione `docs/`-o-`src/`. `new` genera sempre lo scheletro di
 | `-h`, `--help` | Mostra l'utilizzo ed esce |
 | `-v`, `--version` | Mostra la versione del modulo ed esce |
 
+I flag di percorso (`--source`, `--path`, `--dest`, `--output`) accettano un percorso assoluto, un percorso `~/` nella cartella home o un percorso relativo alla radice del progetto.
+
 ## `new`
 
 Genera lo scheletro di un progetto di documentazione.

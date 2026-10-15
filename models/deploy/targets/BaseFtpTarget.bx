@@ -115,7 +115,7 @@ class {
 		var remoteDirs = collectRemoteDirs( relativeDirs )
 
 		var connectionName = "bxsitesDeploy" & createUUID().replace( "-", "", "all" )
-		var connectAttrs = buildConnectAttributes( arguments.config, connectionName, arguments.secure )
+		var connectAttrs = buildConnectAttributes( arguments.config, connectionName, arguments.secure, arguments.context.projectRoot ?: "" )
 		var opened = false
 		var uploadedCount = 0
 
@@ -258,7 +258,7 @@ class {
 	 *
 	 * @return The attribute struct for `bx:ftp action="open" attributeCollection="..."`
 	 */
-	struct function buildConnectAttributes( required struct config, required string connectionName, required boolean secure ) {
+	struct function buildConnectAttributes( required struct config, required string connectionName, required boolean secure, string projectRoot = "" ) {
 		var attrs = {
 			connection : arguments.connectionName,
 			server     : arguments.config.host,
@@ -275,7 +275,9 @@ class {
 
 		if ( arguments.secure ) {
 			if ( len( arguments.config.key ?: "" ) ) {
-				attrs.key = arguments.config.key
+				attrs.key = len( arguments.projectRoot )
+					? new "models.build.PathRelativizer@bxsites"().resolve( arguments.projectRoot, arguments.config.key )
+					: arguments.config.key
 			}
 			var passphraseEnvVar = trim( arguments.config.passphraseEnvVar ?: "" )
 			if ( len( passphraseEnvVar ) ) {

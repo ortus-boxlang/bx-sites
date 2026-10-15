@@ -85,6 +85,32 @@ class extends="testbox.system.BaseSpec" {
 
 			} );
 
+			describe( "resolve()", function() {
+
+				it( "resolves a relative path against the base, not the module folder", function() {
+					expect( relativizer.normalize( relativizer.resolve( "/projects/site", "export/book" ) ) )
+						.toBe( "/projects/site/export/book" );
+					expect( relativizer.normalize( relativizer.resolve( "/projects/site", "../export" ) ) )
+						.toBe( "/projects/export" );
+				} );
+
+				it( "keeps an absolute path as is", function() {
+					expect( relativizer.normalize( relativizer.resolve( "/projects/site", "/var/export" ) ) )
+						.toBe( "/var/export" );
+				} );
+
+				it( "expands a leading ~/ to the user's home folder", function() {
+					var home = relativizer.normalize( getSystemSetting( "user.home" ) );
+					expect( relativizer.normalize( relativizer.resolve( "/projects/site", "~/keys/gcs.json" ) ) )
+						.toBe( home & "/keys/gcs.json" );
+				} );
+
+				it( "returns an empty string for an empty path", function() {
+					expect( relativizer.resolve( "/projects/site", "  " ) ).toBe( "" );
+				} );
+
+			} );
+
 		} );
 	}
 

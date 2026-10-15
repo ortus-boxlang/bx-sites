@@ -55,6 +55,23 @@ class extends="testbox.system.BaseSpec" {
 					} ).toThrow( "BxSites.SiteNotBuilt" );
 				} );
 
+				it( "resolves a relative serviceAccountKeyPath against the project root", function() {
+					var root = newTempDir();
+					directoryCreate( root & "/site", true, true );
+					fileWrite( root & "/site/index.html", "<h1>Home</h1>" );
+					var message = "";
+					try {
+						target.deploy(
+							{ bucket : "my-bucket", serviceAccountKeyPath : "keys/missing.json" },
+							{ projectRoot : root, siteDir : root & "/site" }
+						);
+					} catch ( "BxSites.MissingServiceAccountKey" e ) {
+						message = e.message;
+					}
+					var relativizer = new "models.build.PathRelativizer@bxsites"();
+					expect( relativizer.normalize( message ) ).toInclude( relativizer.normalize( root ) & "/keys/missing.json" );
+				} );
+
 			} );
 
 			describe( "buildObjectName()", function() {

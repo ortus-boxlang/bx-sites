@@ -117,6 +117,12 @@ class extends="testbox.system.BaseSpec" {
 				expect( target.buildRsyncCommand( { host : "h", username : "u", remotePath : "~/www" }, "/tmp/site" ).last() ).toBe( "u@h:~/www/" );
 			} );
 
+			it( "resolves a relative identityFile against the project root when one is given", function() {
+				var cmd = target.buildRsyncCommand( { host : "h", username : "u", remotePath : "/r", identityFile : "keys/id_rsa" }, "/tmp/site", "/projects/site" );
+
+				expect( new "models.build.PathRelativizer@bxsites"().normalize( cmd[ 4 ] ) ).toInclude( "-i /projects/site/keys/id_rsa " );
+			} );
+
 			it( "throws BxSites.InvalidDeployConfig when host/username/remotePath are missing", function() {
 				expect( function() {
 					target.buildRsyncCommand( {}, "/tmp/site" );

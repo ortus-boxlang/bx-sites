@@ -1,0 +1,30 @@
+/**
+ * My Plugin's bx-sites plugin hooks - see docs/guides/plugins.md
+ * in your bx-sites project for the full contract. Every hook below is
+ * optional - uncomment and implement only the ones you need; an
+ * omitted hook is simply never called.
+ */
+class {
+
+	/*
+	string function onConfig( required struct config ) {
+		return arguments.config
+	}
+
+	string function onPageMarkdown( required string markdown, required struct page, required struct config ) {
+		return arguments.markdown
+	}
+
+	string function onPageHtml( required string html, required struct page, required struct config ) {
+		return arguments.html
+	}
+
+	array function onNav( required array nav, required struct config ) {
+		return arguments.nav
+	}
+
+	void function onBuildComplete( required string siteDir, required struct config ) {
+	}
+	*/
+
+}

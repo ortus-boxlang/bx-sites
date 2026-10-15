@@ -120,7 +120,8 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 			hashByPath[ relativePath ] = sha256Hex( gzipped )
 		}
 
-		var accessToken = variables.auth.getAccessToken( serviceAccountKeyPath, variables.SCOPE ).accessToken
+		var keyPath = new "models.build.PathRelativizer@bxsites"().resolve( arguments.context.projectRoot ?: getSystemSetting( "user.dir", "" ), serviceAccountKeyPath )
+		var accessToken = variables.auth.getAccessToken( keyPath, variables.SCOPE ).accessToken
 
 		var versionName = createVersion( siteId, accessToken )
 		var populated = populateFiles( versionName, hashByPath, accessToken )

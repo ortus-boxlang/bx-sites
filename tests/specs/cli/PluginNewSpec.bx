@@ -53,6 +53,15 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( customDest & "/box.json" ) ).toBeTrue();
 			} );
 
+			it( "resolves a relative --dest against the project root", function() {
+				var projectRoot = newProjectRoot();
+
+				var result = verb.run( { projectRoot : projectRoot, name : "My Plugin", dest : "plugins/mine" } );
+
+				expect( result.exitCode ).toBe( 0 );
+				expect( fileExists( projectRoot & "/plugins/mine/box.json" ) ).toBeTrue();
+			} );
+
 		} );
 	}
 

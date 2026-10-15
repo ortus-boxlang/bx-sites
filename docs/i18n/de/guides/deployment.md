@@ -36,6 +36,8 @@ secretAccessKeyEnvVar: AWS_SECRET_ACCESS_KEY
 
 Einträge können YAML (`.yaml`/`.yml`), TOML (`.toml`) oder JSON (`.json`) sein - dieselben Formate wie die Website-Konfiguration. Die Ziel-Abschnitte unten zeigen JSON, aber jedes Feld funktioniert in jedem Format gleich.
 
+Dateipfade in einem Eintrag (`serviceAccountKeyPath`, ein SFTP-`key`, rsyncs `identityFile`, ein lokales `destination`) können absolut sein, mit `~/` beginnen oder relativ zum Projektstamm sein.
+
 **Secrets kommen immer aus einer Umgebungsvariable, nie aus einem
 literalen Wert in `deployments/*`.** Jedes Feld, das auf `EnvVar`
 endet, benennt die *Umgebungsvariable*, die das eigentliche Secret enthält

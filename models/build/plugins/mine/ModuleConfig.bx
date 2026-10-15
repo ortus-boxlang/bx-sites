@@ -1,0 +1,15 @@
+/**
+ * My Plugin - a bx-sites plugin.
+ */
+class {
+
+	this.version = "1.0.0";
+
+	function configure() {
+		settings = {};
+	}
+
+	function onLoad() {
+	}
+
+}

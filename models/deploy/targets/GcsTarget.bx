@@ -67,7 +67,8 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 			return !directoryExists( path )
 		} )
 
-		var accessToken = variables.auth.getAccessToken( serviceAccountKeyPath, variables.SCOPE ).accessToken
+		var keyPath = new "models.build.PathRelativizer@bxsites"().resolve( arguments.context.projectRoot ?: getSystemSetting( "user.dir", "" ), serviceAccountKeyPath )
+		var accessToken = variables.auth.getAccessToken( keyPath, variables.SCOPE ).accessToken
 
 		for ( var filePath in files ) {
 			var relativePath = new "models.build.PathRelativizer@bxsites"().relativeTo( siteDir, filePath )

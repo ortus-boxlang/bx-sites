@@ -34,6 +34,34 @@ class {
 	}
 
 	/**
+	 * Resolves a user-supplied path (a CLI flag, a deploy config value)
+	 * the way a shell user expects: absolute paths are kept, a leading
+	 * "~/" means the user's home folder, and anything else is relative to
+	 * `basePath` - never to this module's own folder, which is what a bare
+	 * relative `fileExists()` resolves against.
+	 *
+	 * @basePath Absolute directory relative values resolve against (usually the project root)
+	 * @path The raw path as the user wrote it
+	 *
+	 * @return The resolved, normalized path ("" when `path` is empty)
+	 */
+	string function resolve( required string basePath, required string path ) {
+		var value = trim( arguments.path )
+		if ( !len( value ) ) {
+			return value
+		}
+		if ( value == "~" || reFind( "^~[\\/]", value ) ) {
+			value = getSystemSetting( "user.home", "" ) & value.mid( 2, value.len() )
+		}
+		return createObject( "java", "java.io.File" )
+			.init( arguments.basePath )
+			.toPath()
+			.resolve( value )
+			.normalize()
+			.toString()
+	}
+
+	/**
 	 * `filePath`'s own path relative to `basePath`, both normalized first
 	 * so a Windows-style backslash and a Unix-style forward slash compare
 	 * equal. Falls back to the normalized `filePath` itself (leading

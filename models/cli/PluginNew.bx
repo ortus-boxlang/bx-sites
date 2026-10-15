@@ -18,7 +18,7 @@ class {
 		}
 
 		var dest = trim( arguments.options.dest ?: "" )
-		var destDir = len( dest ) ? dest : ( projectRoot & "/" & name )
+		var destDir = len( dest ) ? new "models.build.PathRelativizer@bxsites"().resolve( projectRoot, dest ) : ( projectRoot & "/" & name )
 
 		var scaffolder = new "models.build.PluginScaffolder@bxsites"()
 		var result = scaffolder.scaffold( destDir : destDir, name : name )

@@ -37,6 +37,8 @@ secretAccessKeyEnvVar: AWS_SECRET_ACCESS_KEY
 
 Le voci possono essere YAML (`.yaml`/`.yml`), TOML (`.toml`) o JSON (`.json`) - gli stessi formati accettati dalla configurazione del sito. Le sezioni dei target qui sotto mostrano JSON, ma ogni campo funziona allo stesso modo in qualsiasi formato.
 
+I percorsi di file in una voce (`serviceAccountKeyPath`, una `key` SFTP, l'`identityFile` di rsync, una `destination` locale) possono essere assoluti, iniziare con `~/` o essere relativi alla radice del progetto.
+
 **I segreti provengono sempre da una variabile d'ambiente, mai da un
 valore letterale in `deployments/*`.** Ogni campo che termina in
 `EnvVar` indica il nome della *variabile d'ambiente* che contiene il

@@ -34,6 +34,8 @@ class {
 			)
 		}
 
+		source = new "models.build.PathRelativizer@bxsites"().resolve( projectRoot, source )
+
 		var from = lCase( trim( len( trim( arguments.options.from ?: "" ) ) ? arguments.options.from : "gitbook" ) )
 		if ( !listFindNoCase( "gitbook,mkdocs,markdown-zip,notion", from ) ) {
 			throw(

@@ -61,8 +61,7 @@ class {
 		if ( !len( arguments.output ) ) {
 			return arguments.projectRoot & "/site.zip"
 		}
-		var isAbsolute = arguments.output.left( 1 ) == "/" || reFind( "^[A-Za-z]:", arguments.output ) > 0
-		return isAbsolute ? arguments.output : ( arguments.projectRoot & "/" & arguments.output )
+		return new "models.build.PathRelativizer@bxsites"().resolve( arguments.projectRoot, arguments.output )
 	}
 
 }

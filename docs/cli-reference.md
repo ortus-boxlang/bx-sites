@@ -38,6 +38,8 @@ projects.
 | `-h`, `--help`, `help`, or no verb at all | Show usage and exit |
 | `-v`, `--version` | Show the module version and exit |
 
+Path flags (`--source`, `--path`, `--dest`, `--output`) take an absolute path, a `~/` path in your home folder, or a path relative to the project root.
+
 Every verb below ships with core. An installed and activated addon module
 can register further verbs of its own (e.g. a commercial deploy/hosting
 addon adding `bxSites cloud publish`) - `help`/no-args lists whatever's

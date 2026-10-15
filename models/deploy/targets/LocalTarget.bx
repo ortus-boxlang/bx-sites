@@ -55,9 +55,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 * @projectRoot Absolute path to the project root - the base a relative `destination` resolves against
 	 */
 	private string function resolveDestination( required string destination, required string projectRoot ) {
-		var isAbsolute = arguments.destination.left( 1 ) == "/" || arguments.destination.reFind( "^[A-Za-z]:[\/\\]" )
-		var absolute = isAbsolute ? arguments.destination : arguments.projectRoot & "/" & arguments.destination
-		return absolute.reReplace( "[\\\/]+$", "" )
+		return new "models.build.PathRelativizer@bxsites"().resolve( arguments.projectRoot, arguments.destination ).reReplace( "[\\\/]+$", "" )
 	}
 
 }

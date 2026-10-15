@@ -31,7 +31,7 @@ class {
 			throw( type = "BxSites.UnknownThemeImportSource", message = "`theme:import` requires --source=mkdocs|jekyll|hugo" )
 		}
 
-		var sourcePath = trim( arguments.options.path ?: "" )
+		var sourcePath = new "models.build.PathRelativizer@bxsites"().resolve( projectRoot, arguments.options.path ?: "" )
 		if ( !len( sourcePath ) || !directoryExists( sourcePath ) ) {
 			throw( type = "BxSites.MissingThemeImportPath", message = "`theme:import` requires --path=<source theme directory> (must exist)" )
 		}
