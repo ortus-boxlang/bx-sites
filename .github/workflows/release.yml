@@ -44,7 +44,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Setup BoxLang
-        uses: ortus-boxlang/setup-boxlang@1.4.0
+        uses: ortus-boxlang/setup-boxlang@1.6.0
 
       - name: Setup CommandBox
         uses: Ortus-Solutions/setup-commandbox@v2.0.1
@@ -232,7 +232,7 @@ jobs:
           cp .tmp/docs/releases/*.md docs/releases/ 2>/dev/null || true
 
       - name: Setup BoxLang
-        uses: ortus-boxlang/setup-boxlang@1.4.0
+        uses: ortus-boxlang/setup-boxlang@1.6.0
         with:
           modules: bx-cli
 
