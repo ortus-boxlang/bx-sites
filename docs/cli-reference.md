@@ -130,9 +130,12 @@ bxSites search-index
 ## `clean`
 
 Remove `site/` and any build cache, leaving `docs/` and the site config alone.
+It asks for confirmation first; pass `--force` to skip the prompt (required
+in CI and scripts, where there's no one to answer it).
 
 ```bash frame="terminal" title="Terminal"
 bxSites clean
+bxSites clean --force
 ```
 
 ## `gh-deploy`

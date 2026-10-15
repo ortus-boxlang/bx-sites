@@ -131,7 +131,7 @@ class {
 			"build"        : "Render docs/**.md into a static site in site/",
 			"serve"        : "Build and serve the site locally with live reload ([--port], [--host])",
 			"search-index" : "Rebuild the search index standalone",
-			"clean"        : "Remove site/ and any build cache",
+			"clean"        : "Remove site/ and any build cache (asks first; --force skips the prompt)",
 			"gh-deploy"    : "Build and force-push site/ to a gh-pages branch ([--branch], [--remote], [--message])",
 			"deploy"       : "Build and ship site/ to a real target: s3, azure, gcs, firebase, ftp, sftp, rsync, netlify, vercel, cloudflare-pages, local, github-pages ([--entry=<deployments/*.json entry name>] or [--target] with its own flags; no args deploys every deployments/*.json entry; [--verbose])",
 			"publish"      : "Build and publish site/ to bxSites Cloud, using [cloud.siteId]/[cloud.apiUrl] in bxsites.yaml ([--token], overrides the BXSITES_CLOUD_TOKEN env var)",

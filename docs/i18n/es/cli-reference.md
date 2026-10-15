@@ -108,10 +108,13 @@ bxSites search-index
 ## `clean`
 
 Elimina `site/` y cualquier caché de construcción, dejando intactos
-`docs/` y la configuración del sitio.
+`docs/` y la configuración del sitio. Pide confirmación antes de borrar;
+`--force` omite la pregunta (necesario en CI y scripts, donde nadie puede
+responderla).
 
 ```bash frame="terminal" title="Terminal"
 bxSites clean
+bxSites clean --force
 ```
 
 ## `gh-deploy`

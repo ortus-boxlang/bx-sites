@@ -72,7 +72,7 @@ class extends="testbox.system.BaseSpec" {
 				moduleConfig.dispatch( [ "new", projectRoot ] );
 				directoryCreate( projectRoot & "/site", true, true );
 
-				var exitCode = moduleConfig.dispatch( [ "clean", projectRoot ] );
+				var exitCode = moduleConfig.dispatch( [ "clean", projectRoot, "--force" ] );
 
 				expect( exitCode ).toBe( 0 );
 				expect( directoryExists( projectRoot & "/site" ) ).toBeFalse();

@@ -33,7 +33,7 @@ class extends="testbox.system.BaseSpec" {
 				directoryCreate( dir & "/site", true, true );
 				directoryCreate( dir & "/.cache", true, true );
 
-				var result = verb.run( { projectRoot : dir } );
+				var result = verb.run( { projectRoot : dir, force : true } );
 
 				expect( result.exitCode ).toBe( 0 );
 				expect( directoryExists( dir & "/site" ) ).toBeFalse();
@@ -48,7 +48,7 @@ class extends="testbox.system.BaseSpec" {
 				fileWrite( dir & "/bxsites.json", '{"name":"Keep Me"}' );
 				directoryCreate( dir & "/site", true, true );
 
-				verb.run( { projectRoot : dir } );
+				verb.run( { projectRoot : dir, force : true } );
 
 				expect( directoryExists( dir & "/docs" ) ).toBeTrue();
 				expect( fileExists( dir & "/bxsites.json" ) ).toBeTrue();
@@ -60,6 +60,63 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( result.exitCode ).toBe( 0 );
 				expect( result.message ).toBe( "Nothing to clean" );
+			} );
+
+			it( "asks for confirmation without --force, and deletes on yes", function() {
+				var dir = newProjectDir();
+				directoryCreate( dir & "/site", true, true );
+				var asked = [];
+				verb.setPrompter( ( message ) => {
+					asked.append( message );
+					return "y";
+				} );
+
+				var result = verb.run( { projectRoot : dir } );
+
+				expect( asked.len() ).toBe( 1 );
+				expect( asked[ 1 ] ).toInclude( "site/" );
+				expect( asked[ 1 ] ).toInclude( dir );
+				expect( directoryExists( dir & "/site" ) ).toBeFalse();
+				expect( result.message ).toInclude( "Removed" );
+			} );
+
+			it( "deletes nothing when the confirmation is declined or left blank", function() {
+				var dir = newProjectDir();
+				directoryCreate( dir & "/site", true, true );
+
+				for ( var answer in [ "n", "", "maybe" ] ) {
+					var reply = answer;
+					verb.setPrompter( ( message ) => reply );
+
+					var result = verb.run( { projectRoot : dir } );
+
+					expect( result.exitCode ).toBe( 0 );
+					expect( result.message ).toInclude( "Cancelled" );
+					expect( directoryExists( dir & "/site" ) ).toBeTrue();
+				}
+			} );
+
+			it( "fails with a --force hint when the prompt can't be answered (no stdin)", function() {
+				var dir = newProjectDir();
+				directoryCreate( dir & "/site", true, true );
+				verb.setPrompter( ( message ) => {
+					throw( type = "BoxRuntimeException", message = "Error reading from the CLI" );
+				} );
+
+				var result = verb.run( { projectRoot : dir } );
+
+				expect( result.exitCode ).toBe( 1 );
+				expect( result.message ).toInclude( "--force" );
+				expect( directoryExists( dir & "/site" ) ).toBeTrue();
+			} );
+
+			it( "doesn't prompt when there is nothing to clean", function() {
+				var dir = newProjectDir();
+				verb.setPrompter( ( message ) => {
+					throw( type = "Test.ShouldNotPrompt" );
+				} );
+
+				expect( verb.run( { projectRoot : dir } ).message ).toBe( "Nothing to clean" );
 			} );
 
 		} );

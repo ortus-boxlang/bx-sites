@@ -108,10 +108,13 @@ bxSites search-index
 ## `clean`
 
 Entfernt `site/` und jeglichen Build-Cache, lässt `docs/` und die
-Website-Konfiguration unangetastet.
+Website-Konfiguration unangetastet. Fragt vorher nach einer Bestätigung;
+`--force` überspringt die Abfrage (in CI und Skripten erforderlich, wo
+niemand antworten kann).
 
 ```bash frame="terminal" title="Terminal"
 bxSites clean
+bxSites clean --force
 ```
 
 ## `gh-deploy`

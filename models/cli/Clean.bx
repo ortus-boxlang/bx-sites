@@ -1,14 +1,27 @@
 /**
  * `clean` CLI verb - recursively removes a project's `site/` build output
  * and `.cache/` directories, without touching anything else (docs/,
- * bxsites.json, theme/, etc. are never touched).
+ * bxsites.json, theme/, etc. are never touched). Asks for confirmation
+ * first unless `--force` is passed.
  */
 class {
+
+	variables.prompter = ( message ) => cliRead( message )
+
+	/**
+	 * Replaces the confirmation prompt - specs use this, since the default
+	 * reads stdin.
+	 *
+	 * @prompter Closure taking the prompt text and returning the user's answer
+	 */
+	void function setPrompter( required any prompter ) {
+		variables.prompter = arguments.prompter
+	}
 
 	/**
 	 * Dispatches the `clean` verb - removes `site/` and `.cache/`.
 	 *
-	 * @options { projectRoot (required, absolute path) }
+	 * @options { projectRoot (required, absolute path), force (boolean - skip the confirmation prompt) }
 	 */
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )
@@ -17,19 +30,32 @@ class {
 		}
 
 		var root = projectRoot.reReplace( "[\\\/]+$", "" )
-		var removed = []
+		var targets = [ "site", ".cache" ].filter( ( folder ) => directoryExists( root & "/" & folder ) )
 
-		for ( var folder in [ "site", ".cache" ] ) {
-			var path = root & "/" & folder
-			if ( directoryExists( path ) ) {
-				directoryDelete( path, true )
-				removed.append( folder )
+		if ( !targets.len() ) {
+			return { exitCode : 0, message : "Nothing to clean" }
+		}
+
+		if ( !( arguments.options.force ?: false ) ) {
+			var folderList = targets.map( ( folder ) => folder & "/" ).toList( " and " )
+			try {
+				var answer = trim( variables.prompter( "Delete #folderList# in #root#? [y/N] " ) ?: "" )
+			} catch ( any e ) {
+				// cliRead() throws when stdin is closed (CI, piped scripts)
+				return { exitCode : 1, message : "No answer to the confirmation prompt. Nothing was deleted - pass --force to clean without asking." }
 			}
+			if ( !listFindNoCase( "y,yes", answer ) ) {
+				return { exitCode : 0, message : "Cancelled. Nothing was deleted." }
+			}
+		}
+
+		for ( var folder in targets ) {
+			directoryDelete( root & "/" & folder, true )
 		}
 
 		return {
 			exitCode : 0,
-			message  : removed.len() ? "Removed: #removed.toList( ', ' )#" : "Nothing to clean"
+			message  : "Removed: #targets.toList( ', ' )#"
 		}
 	}
 
