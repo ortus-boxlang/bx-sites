@@ -53,13 +53,12 @@ class extends="testbox.system.BaseSpec" {
 				}
 			}
 
-			it( "builds the rsync argv with default port 22, --delete, and trailing slashes on both paths", function() {
+			it( "builds the rsync argv with default port 22, no --delete, and trailing slashes on both paths", function() {
 				var cmd = target.buildRsyncCommand( { host : "example.com", username : "deploy", remotePath : "/var/www/site" }, "/tmp/site" );
 
 				expect( cmd ).toBe( [
 					"rsync",
 					"-avz",
-					"--delete",
 					"-e",
 					"ssh -p 22 -o StrictHostKeyChecking=accept-new",
 					"/tmp/site/",
@@ -70,8 +69,8 @@ class extends="testbox.system.BaseSpec" {
 			it( "strips a pre-existing trailing slash from both siteDir and remotePath rather than doubling it", function() {
 				var cmd = target.buildRsyncCommand( { host : "example.com", username : "deploy", remotePath : "/var/www/site/" }, "/tmp/site/" );
 
-				expect( cmd[ 6 ] ).toBe( "/tmp/site/" );
-				expect( cmd[ 7 ] ).toBe( "deploy@example.com:/var/www/site/" );
+				expect( cmd[ cmd.len() - 1 ] ).toBe( "/tmp/site/" );
+				expect( cmd.last() ).toBe( "deploy@example.com:/var/www/site/" );
 			} );
 
 			it( "honors an explicit port, identityFile, sshOptions, and deleteExtraneous:false", function() {
@@ -98,14 +97,24 @@ class extends="testbox.system.BaseSpec" {
 				] );
 			} );
 
-			it( "omits --delete when deleteExtraneous is explicitly false, but keeps it on true and on the default", function() {
+			it( "only passes --delete when deleteExtraneous is explicitly true - never by default", function() {
 				var withDelete = target.buildRsyncCommand( { host : "h", username : "u", remotePath : "/r", deleteExtraneous : true }, "/tmp/site" );
 				var withoutDelete = target.buildRsyncCommand( { host : "h", username : "u", remotePath : "/r", deleteExtraneous : false }, "/tmp/site" );
 				var defaulted = target.buildRsyncCommand( { host : "h", username : "u", remotePath : "/r" }, "/tmp/site" );
 
 				expect( withDelete ).toInclude( "--delete" );
 				expect( withoutDelete ).notToInclude( "--delete" );
-				expect( defaulted ).toInclude( "--delete" );
+				expect( defaulted ).notToInclude( "--delete" );
+			} );
+
+			it( "refuses a remotePath that is the server root, a home folder or the login directory", function() {
+				for ( var remotePath in [ "/", "//", "~", "~/", ".", "./" ] ) {
+					var config = { host : "h", username : "u", remotePath : remotePath, deleteExtraneous : true };
+					expect( function() {
+						target.buildRsyncCommand( config, "/tmp/site" );
+					} ).toThrow( "BxSites.InvalidDeployConfig", "refuses remotePath", "remotePath [#remotePath#] should be refused" );
+				}
+				expect( target.buildRsyncCommand( { host : "h", username : "u", remotePath : "~/www" }, "/tmp/site" ).last() ).toBe( "u@h:~/www/" );
 			} );
 
 			it( "throws BxSites.InvalidDeployConfig when host/username/remotePath are missing", function() {

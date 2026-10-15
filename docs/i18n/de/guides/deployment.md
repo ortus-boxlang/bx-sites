@@ -193,6 +193,11 @@ Rebuild, da nur die Änderungen übertragen werden. Erfordert `rsync` und
 }
 ```
 
+Entfernte Dateien, die in deinem Build nicht mehr vorkommen, bleiben
+erhalten. Mit `"deleteExtraneous": true` werden sie ebenfalls gelöscht
+(rsyncs `--delete`). Ein `remotePath` von `/`, `~` oder `.` wird
+abgelehnt - gib den eigenen Ordner der Website an.
+
 ### `netlify`
 
 ```json title="deployments/production.json"

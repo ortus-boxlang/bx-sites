@@ -183,6 +183,11 @@ changed. Requires `rsync` and `ssh` on the machine running `bxSites`.
 }
 ```
 
+Remote files that no longer exist in your build are left in place. Add
+`"deleteExtraneous": true` to remove them too (rsync's `--delete`). A
+`remotePath` of `/`, `~` or `.` is refused - point it at the site's own
+folder.
+
 ### `netlify`
 
 ```json title="deployments/production.json"

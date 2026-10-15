@@ -193,6 +193,11 @@ macchina che esegue `bxSites`.
 }
 ```
 
+I file remoti che non esistono più nella tua build vengono lasciati al
+loro posto. Aggiungi `"deleteExtraneous": true` per rimuovere anche
+quelli (il `--delete` di rsync). Un `remotePath` di `/`, `~` o `.` viene
+rifiutato - puntalo alla cartella del sito.
+
 ### `netlify`
 
 ```json title="deployments/production.json"
