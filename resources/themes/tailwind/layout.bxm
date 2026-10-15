@@ -21,7 +21,7 @@
 			var linkClass = "block rounded px-3 py-1.5 text-sm" & ( isActive ? " nav-link--active bg-cyan-50 font-semibold text-cyan-700" : " text-slate-700 hover:bg-cyan-50" )
 			var labelHtml = ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title )
 			var linkOrSpan = len( node.url )
-				? "<a class=""" & linkClass & """ href=""" & variables.basePath & node.url & """>" & labelHtml & "</a>"
+				? "<a class=""" & linkClass & """ href=""" & bxsitesNavHref( node.url, variables.basePath ) & """>" & labelHtml & "</a>"
 				: "<span class=""block px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400"">" & labelHtml & "</span>"
 
 			if ( node.children.len() && variables.navCollapsible ) {

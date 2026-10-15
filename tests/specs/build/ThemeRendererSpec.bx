@@ -346,6 +346,30 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( 'href="/my-docs/"' );
 			} );
 
+			it( "keeps absolute nav URLs as is, escapes them, and neutralizes script URLs, across every built-in theme", function() {
+				var root = newProjectRoot();
+				var page = { title : "My Page", contentHtml : "<p>Body</p>" };
+				var nav = [
+					{ title : "My Page", url : "index.html", order : 1, children : [] },
+					{ title : "GitHub", url : "https://github.com/acme/docs?a=1&b=2", order : 2, children : [] },
+					{ title : "Mail", url : "mailto:docs@example.com", order : 3, children : [] },
+					{ title : "Evil", url : "JavaScript:alert(1)", order : 4, children : [] },
+					{ title : "Sneaky", url : "java" & char( 9 ) & "script:alert(1)", order : 5, children : [] }
+				];
+
+				for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
+					var themeDir = renderer.resolveThemeDir( themeName, root );
+					var html = renderer.renderPage( page, nav, { name : "My Site" }, themeDir, "/my-docs/" );
+
+					expect( html ).toInclude( 'href="/my-docs/index.html"' );
+					expect( html ).toInclude( 'href="https://github.com/acme/docs?a=1&amp;b=2"' );
+					expect( html ).toInclude( 'href="mailto:docs@example.com"' );
+					expect( html ).notToInclude( "/my-docs/https:" );
+					expect( html ).notToInclude( "/my-docs/mailto:" );
+					expect( html.findNoCase( "script:alert" ) ).toBe( 0, "#themeName# rendered a script URL" );
+				}
+			} );
+
 			it( "includes Alpine.js and a dark-mode toggle, and the copy-code script, in every built-in theme", function() {
 				var root = newProjectRoot();
 				var page = { title : "My Page", contentHtml : "<p>Body</p>" };

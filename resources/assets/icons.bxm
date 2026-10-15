@@ -58,4 +58,21 @@
 	function bxsitesUrlAttr( required string value ) {
 		return arguments.value.replace( "&", "&amp;", "all" ).replace( '"', "&quot;", "all" ).replace( "<", "&lt;", "all" )
 	}
+
+	/**
+	 * The `href` for a nav entry, attribute-escaped: a docs-relative URL
+	 * gets `basePath` prepended, an absolute one (`https://...`,
+	 * `mailto:...`, `//host/...`) is kept as is, and a script-capable
+	 * scheme (`javascript:`, `data:`, `vbscript:`) becomes `#`.
+	 */
+	function bxsitesNavHref( required string url, required string basePath ) {
+		var href = trim( arguments.url )
+		// Browsers ignore whitespace/control characters inside a scheme ("java\tscript:")
+		var scheme = href.reReplace( "[\x00-\x20]", "", "all" )
+		if ( scheme.reFindNoCase( "^(javascript|data|vbscript):" ) ) {
+			return "##"
+		}
+		var isAbsolute = href.reFindNoCase( "^([a-z][a-z0-9+.\-]*:|//)" ) > 0
+		return bxsitesUrlAttr( isAbsolute ? href : arguments.basePath & href )
+	}
 </bx:script>

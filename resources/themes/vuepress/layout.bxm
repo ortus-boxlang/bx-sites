@@ -21,7 +21,7 @@
 			var linkClass = "vp-nav__link" & ( isActive ? " vp-nav__link--active" : "" )
 			var labelHtml = ( len( node.iconHtml ?: "" ) ? node.iconHtml & " " : "" ) & encodeForHTML( node.title )
 			var linkOrSpan = len( node.url )
-				? "<a class=""" & linkClass & """ href=""" & variables.basePath & node.url & """>" & labelHtml & "</a>"
+				? "<a class=""" & linkClass & """ href=""" & bxsitesNavHref( node.url, variables.basePath ) & """>" & labelHtml & "</a>"
 				: "<span class=""vp-nav__heading"">" & labelHtml & "</span>"
 
 			if ( node.children.len() && variables.navCollapsible ) {
