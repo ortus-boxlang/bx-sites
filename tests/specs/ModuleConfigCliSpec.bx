@@ -1,5 +1,5 @@
 /**
- * Exercises ModuleConfig.bx's main(args) CLI dispatch end-to-end - argv
+ * Exercises ModuleConfig.bx's dispatch(args) CLI dispatch end-to-end - argv
  * parsing, project-root resolution, and delegating to the real verb classes
  * under models/cli/ (each of which has its own dedicated, more thorough spec).
  */
@@ -28,29 +28,29 @@ class extends="testbox.system.BaseSpec" {
 			}
 
 			it( "returns exit code 1 and prints usage when no verb is given", function() {
-				expect( moduleConfig.main( [] ) ).toBe( 1 );
+				expect( moduleConfig.dispatch( [] ) ).toBe( 1 );
 			} );
 
 			it( "returns exit code 1 for an unknown verb", function() {
-				expect( moduleConfig.main( [ "frobnicate" ] ) ).toBe( 1 );
+				expect( moduleConfig.dispatch( [ "frobnicate" ] ) ).toBe( 1 );
 			} );
 
 			it( "returns exit code 0 and prints usage for --help / -h / help", function() {
-				expect( moduleConfig.main( [ "--help" ] ) ).toBe( 0 );
-				expect( moduleConfig.main( [ "-h" ] ) ).toBe( 0 );
-				expect( moduleConfig.main( [ "help" ] ) ).toBe( 0 );
+				expect( moduleConfig.dispatch( [ "--help" ] ) ).toBe( 0 );
+				expect( moduleConfig.dispatch( [ "-h" ] ) ).toBe( 0 );
+				expect( moduleConfig.dispatch( [ "help" ] ) ).toBe( 0 );
 			} );
 
 			it( "returns exit code 0 and prints the module version for --version / -v", function() {
-				expect( moduleConfig.main( [ "--version" ] ) ).toBe( 0 );
-				expect( moduleConfig.main( [ "-v" ] ) ).toBe( 0 );
+				expect( moduleConfig.dispatch( [ "--version" ] ) ).toBe( 0 );
+				expect( moduleConfig.dispatch( [ "-v" ] ) ).toBe( 0 );
 			} );
 
 			it( "dispatches `new` with an absolute --projectRoot flag and returns exit code 0", function() {
 				var parent = newTempDir();
 				var projectRoot = parent & "/site";
 
-				var exitCode = moduleConfig.main( [ "new", "--projectRoot=#projectRoot#" ] );
+				var exitCode = moduleConfig.dispatch( [ "new", "--projectRoot=#projectRoot#" ] );
 
 				expect( exitCode ).toBe( 0 );
 				expect( fileExists( projectRoot & "/bxsites.yaml" ) ).toBeTrue();
@@ -60,7 +60,7 @@ class extends="testbox.system.BaseSpec" {
 				var parent = newTempDir();
 				var projectRoot = parent & "/site";
 
-				var exitCode = moduleConfig.main( [ "new", projectRoot ] );
+				var exitCode = moduleConfig.dispatch( [ "new", projectRoot ] );
 
 				expect( exitCode ).toBe( 0 );
 				expect( fileExists( projectRoot & "/bxsites.yaml" ) ).toBeTrue();
@@ -69,10 +69,10 @@ class extends="testbox.system.BaseSpec" {
 			it( "dispatches `clean` after `new` and removes site/", function() {
 				var parent = newTempDir();
 				var projectRoot = parent & "/site";
-				moduleConfig.main( [ "new", projectRoot ] );
+				moduleConfig.dispatch( [ "new", projectRoot ] );
 				directoryCreate( projectRoot & "/site", true, true );
 
-				var exitCode = moduleConfig.main( [ "clean", projectRoot ] );
+				var exitCode = moduleConfig.dispatch( [ "clean", projectRoot ] );
 
 				expect( exitCode ).toBe( 0 );
 				expect( directoryExists( projectRoot & "/site" ) ).toBeFalse();
@@ -80,16 +80,16 @@ class extends="testbox.system.BaseSpec" {
 
 			it( "returns exit code 1 when `build` runs against a project with no bxsites.yaml", function() {
 				var parent = newTempDir();
-				var exitCode = moduleConfig.main( [ "build", parent ] );
+				var exitCode = moduleConfig.dispatch( [ "build", parent ] );
 
 				expect( exitCode ).toBe( 1 );
 			} );
 
 			it( "dispatches `gh-deploy` and returns exit code 1 when the project isn't a git repo", function() {
 				var parent = newTempDir();
-				moduleConfig.main( [ "new", parent ] );
+				moduleConfig.dispatch( [ "new", parent ] );
 
-				var exitCode = moduleConfig.main( [ "gh-deploy", parent ] );
+				var exitCode = moduleConfig.dispatch( [ "gh-deploy", parent ] );
 
 				expect( exitCode ).toBe( 1 );
 			} );
@@ -101,7 +101,7 @@ class extends="testbox.system.BaseSpec" {
 				fileWrite( source & "/SUMMARY.md", "* [Home](README.md)" );
 				fileWrite( source & "/README.md", "Welcome." );
 
-				var exitCode = moduleConfig.main( [ "migrate", "--projectRoot=#projectRoot#", "--source=#source#" ] );
+				var exitCode = moduleConfig.dispatch( [ "migrate", "--projectRoot=#projectRoot#", "--source=#source#" ] );
 
 				expect( exitCode ).toBe( 0 );
 				expect( fileExists( projectRoot & "/docs/nav.json" ) ).toBeTrue();
@@ -110,7 +110,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "returns exit code 1 when `migrate` runs with no --source", function() {
 				var parent = newTempDir();
 
-				var exitCode = moduleConfig.main( [ "migrate", parent ] );
+				var exitCode = moduleConfig.dispatch( [ "migrate", parent ] );
 
 				expect( exitCode ).toBe( 1 );
 			} );
@@ -119,7 +119,7 @@ class extends="testbox.system.BaseSpec" {
 				var parent = newTempDir();
 				var projectRoot = parent & "/site"
 
-				var exitCode = moduleConfig.main( [
+				var exitCode = moduleConfig.dispatch( [
 					"new",
 					"--projectRoot=#projectRoot#",
 					'--description="Hello World, quoted!"'
@@ -134,7 +134,7 @@ class extends="testbox.system.BaseSpec" {
 				var parent = newTempDir();
 				var projectRoot = parent & "/site"
 
-				var exitCode = moduleConfig.main( [
+				var exitCode = moduleConfig.dispatch( [
 					"new", "--projectRoot=#projectRoot#", "--debug", "--!verbose", "--no-color", "-abc"
 				] );
 
@@ -167,13 +167,13 @@ class extends="testbox.system.BaseSpec" {
 			it( "returns exit code 0 for --help even when --projectRoot points at a project with no bxsites.yaml", function() {
 				var parent = newTempDir();
 
-				var exitCode = moduleConfig.main( [ "--help", "--projectRoot=#parent#" ] );
+				var exitCode = moduleConfig.dispatch( [ "--help", "--projectRoot=#parent#" ] );
 
 				expect( exitCode ).toBe( 0 );
 			} );
 
 			it( "returns exit code 1 for an unregistered two-token verb pair like `cloud publish` (no CLI-provider module installed)", function() {
-				var exitCode = moduleConfig.main( [ "cloud", "publish" ] );
+				var exitCode = moduleConfig.dispatch( [ "cloud", "publish" ] );
 
 				expect( exitCode ).toBe( 1 );
 			} );

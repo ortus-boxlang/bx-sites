@@ -258,11 +258,29 @@ class {
 	 * see docs/cli-reference.md's "Global options" section for the
 	 * user-facing form of this same caveat.
 	 *
+	 * BoxLang ignores `main()`'s return value as a process exit code, so
+	 * `main()` hands any non-zero result from `dispatch()` to `cliExit()`.
+	 * Tests call `dispatch()` directly, since `cliExit()` ends the JVM.
+	 *
+	 * @args The raw CLI argv, module name and dispatch token excluded
+	 */
+	function main( args = [] ) {
+		var exitCode = dispatch( arguments.args )
+		if ( exitCode != 0 ) {
+			cliExit( exitCode )
+		}
+		return exitCode
+	}
+
+	/**
+	 * Parses argv and runs the matching verb - everything `main()` does
+	 * except ending the process.
+	 *
 	 * @args The raw CLI argv, module name and dispatch token excluded
 	 *
 	 * @return The process exit code (0 success, 1 failure)
 	 */
-	function main( args = [] ) {
+	function dispatch( args = [] ) {
 		// Relative to this file's OWN location (the module root) - BoxLang
 		// resolves a bare dotted path like "models.cli.New" relative to the
 		// module root only from the file the runtime directly invokes as the
