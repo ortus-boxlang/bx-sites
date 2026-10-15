@@ -123,7 +123,7 @@ class {
 		// Assets first, so every .md page's own rewriteAssetRefs() below can
 		// already tell "does this reference point at a file we're relocating".
 		for ( var sourcePath in allFiles ) {
-			var relativePath = sourcePath.reReplace( "^" & reEscape( arguments.sourceDir ), "", "one" ).reReplace( "^[\/]", "" )
+			var relativePath = new "models.build.PathRelativizer@bxsites"().relativeTo( arguments.sourceDir, sourcePath )
 			if ( relativePath.reFindNoCase( "\.md$" ) ) {
 				continue
 			}
@@ -137,7 +137,7 @@ class {
 		}
 
 		for ( var sourcePath in allFiles ) {
-			var relativePath = sourcePath.reReplace( "^" & reEscape( arguments.sourceDir ), "", "one" ).reReplace( "^[\/]", "" )
+			var relativePath = new "models.build.PathRelativizer@bxsites"().relativeTo( arguments.sourceDir, sourcePath )
 			if ( !relativePath.reFindNoCase( "\.md$" ) ) {
 				continue
 			}
@@ -229,15 +229,6 @@ class {
 	 */
 	private string function quoteReplacement( required string text ) {
 		return createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( arguments.text )
-	}
-
-	/**
-	 * @text Literal text to embed in a regular expression
-	 *
-	 * @return text with every regex metacharacter escaped
-	 */
-	private string function reEscape( required string text ) {
-		return createObject( "java", "java.util.regex.Pattern" ).quote( arguments.text )
 	}
 
 }

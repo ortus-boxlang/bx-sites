@@ -18,7 +18,7 @@ class extends="testbox.system.BaseSpec" {
 			body  = () => {
 
 			beforeEach( () => {
-				variables.repoRoot = getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]tests[\/]specs[\/]?$", "" )
+				variables.repoRoot = getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\\/]tests[\\/]specs[\\/]?$", "" )
 				variables.tempRoot = createTempDirectory( prefix = "bxsites-dogfood-" )
 				directoryCopy( variables.repoRoot & "/docs", variables.tempRoot & "/docs", true )
 				fileCopy( variables.repoRoot & "/bxsites.yaml", variables.tempRoot & "/bxsites.yaml" )

@@ -137,7 +137,7 @@ class {
 		var map = {}
 		var allFiles = directoryList( arguments.root, true, "path" ).filter( path => !directoryExists( path ) )
 		for ( var sourcePath in allFiles ) {
-			var relativePath = sourcePath.reReplace( "^" & reEscape( arguments.root ), "", "one" ).reReplace( "^[\/]", "" )
+			var relativePath = new "models.build.PathRelativizer@bxsites"().relativeTo( arguments.root, sourcePath )
 			var cleaned = cleanRelativePath( relativePath )
 			map[ relativePath ] = relativePath.reFindNoCase( "\.md$" ) ? cleaned : ( "assets/imported/" & cleaned )
 		}
@@ -326,15 +326,6 @@ class {
 	 */
 	private string function quoteReplacement( required string text ) {
 		return createObject( "java", "java.util.regex.Matcher" ).quoteReplacement( arguments.text )
-	}
-
-	/**
-	 * @text Literal text to embed in a regular expression
-	 *
-	 * @return text with every regex metacharacter escaped
-	 */
-	private string function reEscape( required string text ) {
-		return createObject( "java", "java.util.regex.Pattern" ).quote( arguments.text )
 	}
 
 }

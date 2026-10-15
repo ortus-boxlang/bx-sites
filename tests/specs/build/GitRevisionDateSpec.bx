@@ -5,7 +5,7 @@ class extends="testbox.system.BaseSpec" {
 
 			beforeEach( function() {
 				variables.service = new "models.build.GitRevisionDate@bxsites"();
-				variables.repoRoot = getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\/]tests[\/]specs[\/]build[\/]?$", "" );
+				variables.repoRoot = getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\\/]tests[\\/]specs[\\/]build[\\/]?$", "" );
 			} );
 
 			it( "returns an ISO-8601 date for a file tracked in a real git repo", function() {

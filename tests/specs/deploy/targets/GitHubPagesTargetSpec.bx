@@ -17,10 +17,21 @@ class extends="testbox.system.BaseSpec" {
 			afterEach( function() {
 				for ( var dir in tempDirs ) {
 					if ( directoryExists( dir ) ) {
-						directoryDelete( dir, true );
+						deleteGitDir( dir );
 					}
 				}
 			} );
+
+			/**
+			 * git marks its object files read-only, which Windows refuses to
+			 * delete - clear that first.
+			 */
+			private void function deleteGitDir( required string dir ) {
+				for ( var path in directoryList( arguments.dir, true, "path" ) ) {
+					createObject( "java", "java.io.File" ).init( path ).setWritable( true );
+				}
+				directoryDelete( arguments.dir, true );
+			}
 
 			private string function git( required array cmd, required string cwd ) {
 				var pb = createObject( "java", "java.lang.ProcessBuilder" ).init( arguments.cmd );

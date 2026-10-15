@@ -48,7 +48,13 @@ class {
 	 * @cwd The directory `/bxApp` points at - defaults to the real cwd
 	 */
 	string function toClassPath( required string path, string cwd = currentWorkingDirectory() ) {
-		return toVirtualPath( arguments.path, arguments.cwd ).reReplace( "^/+", "" ).replace( "/", ".", "all" )
+		var classDir = arguments.path
+		// A Windows 8.3 short name (C:\Users\RUNNER~1\...) can't be a class
+		// name segment - the canonical path spells the long name out
+		if ( classDir.find( "~" ) ) {
+			classDir = createObject( "java", "java.io.File" ).init( classDir ).getCanonicalPath()
+		}
+		return toVirtualPath( classDir, arguments.cwd ).reReplace( "^/+", "" ).replace( "/", ".", "all" )
 	}
 
 	/**

@@ -18,6 +18,13 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			/**
+			 * Forward slashes only, so a path assertion holds on Windows too.
+			 */
+			private string function normalized( required string path ) {
+				return new "models.build.PathRelativizer@bxsites"().normalize( arguments.path );
+			}
+
 			private function newProject( string themeName = "bootstrap" ) {
 				var dir = createTempDirectory( prefix = "bxsites-buildpipeline-" );
 				tempDirs.append( dir );
@@ -55,7 +62,7 @@ class extends="testbox.system.BaseSpec" {
 				var result = pipeline.build( root );
 
 				expect( result.pageCount ).toBe( 1 );
-				expect( result.siteDir ).toBe( root & "/site" );
+				expect( normalized( result.siteDir ) ).toBe( normalized( root & "/site" ) );
 				expect( fileExists( root & "/site/index.html" ) ).toBeTrue();
 
 				var html = fileRead( root & "/site/index.html" );
@@ -73,7 +80,7 @@ class extends="testbox.system.BaseSpec" {
 				var result = pipeline.build( root );
 
 				expect( result.pageCount ).toBe( 1 );
-				expect( result.siteDir ).toBe( root & "/site" );
+				expect( normalized( result.siteDir ) ).toBe( normalized( root & "/site" ) );
 				expect( fileExists( root & "/site/index.html" ) ).toBeTrue();
 				expect( fileRead( root & "/site/index.html" ) ).toInclude( "<p>Welcome from src</p>" );
 			} );
@@ -429,15 +436,14 @@ class extends="testbox.system.BaseSpec" {
 				expect( fileExists( localeCopy ) ).toBeTrue();
 				expect( fileRead( localeCopy ) ).toBe( fileRead( mainCopy ) );
 
-				// Not just equal content - the same inode. Two independent
-				// copies of the same bytes would still pass the assertions
-				// above; this is the one that actually proves the second
-				// tree was hardlinked rather than freshly copied.
+				// Not just equal content - the same file on disk (the same
+				// inode, or file index on Windows). Two independent copies of
+				// the same bytes would still pass the assertions above; this
+				// is the one that actually proves the second tree was
+				// hardlinked rather than freshly copied.
 				var Files = createObject( "java", "java.nio.file.Files" );
 				var Paths = createObject( "java", "java.nio.file.Paths" );
-				var mainInode = Files.getAttribute( Paths.get( mainCopy ), "unix:ino" );
-				var localeInode = Files.getAttribute( Paths.get( localeCopy ), "unix:ino" );
-				expect( mainInode ).toBe( localeInode );
+				expect( Files.isSameFile( Paths.get( mainCopy ), Paths.get( localeCopy ) ) ).toBeTrue();
 			} );
 
 			it( "still writes a locale tree's own og:image PNGs rather than hardlinking the main tree's own (per-page content, not identical across trees)", function() {
@@ -474,9 +480,7 @@ class extends="testbox.system.BaseSpec" {
 				// English og:image.
 				var Files = createObject( "java", "java.nio.file.Files" );
 				var Paths = createObject( "java", "java.nio.file.Paths" );
-				var mainInode = Files.getAttribute( Paths.get( mainOg ), "unix:ino" );
-				var localeInode = Files.getAttribute( Paths.get( localeOg ), "unix:ino" );
-				expect( mainInode ).notToBe( localeInode );
+				expect( Files.isSameFile( Paths.get( mainOg ), Paths.get( localeOg ) ) ).toBeFalse();
 			} );
 
 			it( "fingerprints the theme's own style.css with a content hash by default, and rewrites the rendered <link> to match", function() {
@@ -487,7 +491,7 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( fileExists( root & "/site/assets/theme/style.css" ) ).toBeFalse();
 				var hashedPath = themeCssPath( root & "/site" );
-				expect( hashedPath ).toMatch( ".*/style\.[0-9a-f]{8}\.css$" );
+				expect( hashedPath ).toMatch( ".*[\\/]style\.[0-9a-f]{8}\.css$" );
 
 				var html = fileRead( root & "/site/index.html" );
 				var hashedFileName = listLast( hashedPath, "/" );
@@ -522,7 +526,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( matches.len() ).toBe( 1 );
 
 				var html = fileRead( root & "/site/index.html" );
-				expect( html ).toInclude( 'src="/assets/theme/' & listLast( matches[ 1 ], "/" ) & '"' );
+				expect( html ).toInclude( 'src="/assets/theme/' & getFileFromPath( matches[ 1 ] ) & '"' );
 			} );
 
 			it( "leaves a theme asset inside a subdirectory unfingerprinted, even when fingerprinting is on", function() {
@@ -549,7 +553,7 @@ class extends="testbox.system.BaseSpec" {
 				expect( matches.len() ).toBe( 1 );
 
 				var html = fileRead( root & "/site/index.html" );
-				expect( html ).toInclude( 'src="/assets/' & listLast( matches[ 1 ], "/" ) & '"' );
+				expect( html ).toInclude( 'src="/assets/' & getFileFromPath( matches[ 1 ] ) & '"' );
 			} );
 
 			it( "builds the responsive-image manifest once from docs/assets/ and passes it to buildManifest() with the site's own assets.images config, via the setImageVariantGenerator() test seam", function() {
@@ -855,7 +859,7 @@ class extends="testbox.system.BaseSpec" {
 
 				var calls = fakePagefind.getCalls();
 				expect( calls.len() ).toBe( 1 );
-				expect( calls[ 1 ].siteDir ).toBe( root & "/site" );
+				expect( normalized( calls[ 1 ].siteDir ) ).toBe( normalized( root & "/site" ) );
 				expect( calls[ 1 ].bin ).toBe( "/opt/pagefind" );
 				expect( calls[ 1 ].options ).toBe( [ "--exclude-selectors", ".no-index" ] );
 			} );

@@ -205,9 +205,7 @@ class {
 	 * @siteDir Absolute path to the built `site/`
 	 */
 	private string function toSiteRelative( required string filePath, required string siteDir ) {
-		return arguments.filePath
-			.reReplace( "^" & createObject( "java", "java.util.regex.Pattern" ).quote( arguments.siteDir ), "", "one" )
-			.reReplace( "^[\/]", "" )
+		return new "models.build.PathRelativizer@bxsites"().relativeTo( arguments.siteDir, arguments.filePath )
 	}
 
 	/**

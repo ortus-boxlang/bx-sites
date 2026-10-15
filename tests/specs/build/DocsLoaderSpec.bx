@@ -75,7 +75,12 @@ class extends="testbox.system.BaseSpec" {
 			} );
 
 			it( "loads docs when the docs path contains Windows-style backslashes", function() {
-				var dir = newDocsDir() & "/C:\sites\published\presentations\bxai-chat\my-docs/docs";
+				// Off Windows, a folder whose own name holds backslashes and a
+				// drive-like prefix; on Windows (where ":" can't be in a
+				// folder name) a real path written with backslashes.
+				var dir = server.os.name.findNoCase( "windows" )
+					? newDocsDir().replace( "/", char( 92 ), "all" ) & char( 92 ) & "my-docs" & char( 92 ) & "docs"
+					: newDocsDir() & "/C:\sites\published\presentations\bxai-chat\my-docs/docs";
 				directoryCreate( dir, true, true );
 				fileWrite( dir & "/index.md", "Welcome" );
 

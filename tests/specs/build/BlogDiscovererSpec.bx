@@ -16,6 +16,13 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			/**
+			 * Forward slashes only, so a path assertion holds on Windows too.
+			 */
+			private string function normalized( required string path ) {
+				return new "models.build.PathRelativizer@bxsites"().normalize( arguments.path );
+			}
+
 			private function newDocsDir() {
 				var dir = createTempDirectory( prefix = "bxsites-blogdiscoverer-" );
 				tempDirs.append( dir );
@@ -47,7 +54,7 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( posts.len() ).toBe( 1 );
 				expect( posts[ 1 ].relativePath ).toBe( "blog/posts/hello-world.md" );
-				expect( posts[ 1 ].sourcePath ).toBe( dir & "/blog/posts/hello-world.md" );
+				expect( normalized( posts[ 1 ].sourcePath ) ).toBe( normalized( dir & "/blog/posts/hello-world.md" ) );
 				expect( posts[ 1 ].slug ).toBe( "hello-world" );
 				expect( posts[ 1 ].urlPath ).toBe( "blog/hello-world/index.html" );
 				expect( posts[ 1 ].hidden ).toBeFalse();
@@ -154,7 +161,7 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( posts.len() ).toBe( 1 );
 				expect( posts[ 1 ].relativePath ).toBe( "blog/posts/2026/nested-post.md" );
-				expect( posts[ 1 ].sourcePath ).toBe( dir & "/blog/posts/2026/nested-post.md" );
+				expect( normalized( posts[ 1 ].sourcePath ) ).toBe( normalized( dir & "/blog/posts/2026/nested-post.md" ) );
 			} );
 
 			it( "keeps a nested post's slug/urlPath the bare filename, decoupled from its subfolder", function() {

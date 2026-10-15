@@ -118,9 +118,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 
 		try {
 			for ( var filePath in files ) {
-				var relativePath = filePath.replace( root, "", "one" )
-					.reReplace( "^[\/]+", "" )
-					.replace( char( 92 ), "/", "all" )
+				var relativePath = new "models.build.PathRelativizer@bxsites"().relativeTo( root, filePath )
 				var entry = createObject( "java", "java.util.zip.ZipEntry" ).init( relativePath )
 				zipStream.putNextEntry( entry )
 				zipStream.write( readFileBytes( filePath ) )
