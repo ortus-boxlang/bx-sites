@@ -57,6 +57,7 @@ class {
 	variables.courseBuilder = new "models.build.CourseBuilder@bxsites"()
 	variables.variablesProcessor = new "models.build.VariablesProcessor@bxsites"()
 	variables.iconResolver = new "models.build.IconResolver@bxsites"()
+	variables.implicitLayouts = new "models.build.ImplicitLayouts@bxsites"()
 	variables.imageVariantGenerator = new "models.build.ImageVariantGenerator@bxsites"()
 	variables.responsiveImageProcessor = new "models.build.ResponsiveImageProcessor@bxsites"()
 	variables.assetBundler = new "models.build.AssetBundler@bxsites"()
@@ -772,6 +773,7 @@ class {
 			assignOgImages( blogPosts, config, siteDir )
 			assignMarkdownUrl( blogPosts )
 			assignIconHtml( blogPosts, docsDir )
+			variables.implicitLayouts.apply( blogPosts, config.layouts ?: [] )
 
 			var blogAuthors = variables.blogAuthorsLoader.load( docsDir )
 			var blogResult = variables.blogBuilder.build( blogPosts, blogAuthors, config.blog.postsPerPage, urls.basePath, imageManifest )
@@ -1235,6 +1237,7 @@ class {
 		assignOgImages( pages, arguments.config, arguments.outputDir )
 		assignMarkdownUrl( pages )
 		assignIconHtml( pages, arguments.docsDir )
+		variables.implicitLayouts.apply( pages, arguments.config.layouts ?: [] )
 
 		var renderingStartedAt = getTickCount()
 		for ( var page in pages ) {

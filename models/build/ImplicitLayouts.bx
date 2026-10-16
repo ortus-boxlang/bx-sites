@@ -1,0 +1,125 @@
+/**
+ * Implicit layouts: `layouts:` rules in bxsites.yaml that assign a body
+ * template to every page whose path matches a glob, so a section of the
+ * site renders through one layout without repeating `layout: <name>` in
+ * each page's frontmatter. Analogous to ColdBox's implicit layouts.
+ *
+ * ```yaml
+ * layouts:
+ *   - layout: landing
+ *     match: ["marketing/**", "pricing.md"]
+ *   - layout: post
+ *     match: "blog/**"
+ * ```
+ *
+ * Rules are tried in order and the first match wins. A page's own
+ * frontmatter `layout:` always wins over a rule. The matched name feeds the
+ * same resolution chain a frontmatter `layout:` does (ThemeRenderer.renderPage()),
+ * so `.overrides/<theme>/<name>.bxm` is found first, then the theme's own
+ * file, then `page.bxm`.
+ *
+ * Glob syntax, matched against a page's content-root-relative path with
+ * forward slashes (e.g. `guides/setup.md`), case-sensitively:
+ *   - `*`   any run of characters inside one path segment
+ *   - `**`  any run of characters across segments (`marketing/**` is everything under marketing/)
+ *   - `?`   one character inside a segment
+ *   - a trailing `/` means "everything under", so `marketing/` equals `marketing/**`
+ * Everything else matches literally.
+ *
+ * Stateless apart from a memo of compiled globs, which is safe to share.
+ */
+class {
+
+	variables.compiled = {}
+
+	/**
+	 * Sets `page.layout` on every page that has none and matches a rule.
+	 *
+	 * @pages Page structs with a `relativePath` and a `layout` key
+	 * @rules The config's `layouts` array
+	 */
+	void function apply( required array pages, required array rules ) {
+		if ( !arguments.rules.len() ) {
+			return
+		}
+		for ( var page in arguments.pages ) {
+			if ( len( trim( page.layout ?: "" ) ) ) {
+				continue
+			}
+			var matched = resolve( arguments.rules, page.relativePath ?: "" )
+			if ( len( matched ) ) {
+				page.layout = matched
+			}
+		}
+	}
+
+	/**
+	 * The layout name of the first rule matching `relativePath`, or "".
+	 *
+	 * @rules The config's `layouts` array
+	 * @relativePath A content-root-relative path, e.g. `guides/setup.md`
+	 */
+	string function resolve( required array rules, required string relativePath ) {
+		var path = arguments.relativePath.replace( char( 92 ), "/", "all" ).reReplace( "^/+", "" )
+		for ( var rule in arguments.rules ) {
+			var globs = isArray( rule.match ) ? rule.match : [ rule.match ]
+			for ( var glob in globs ) {
+				if ( reFind( toRegex( glob ), path ) ) {
+					return trim( rule.layout )
+				}
+			}
+		}
+		return ""
+	}
+
+	/**
+	 * Compiles a glob to an anchored regular expression (memoized).
+	 *
+	 * @glob The glob, see the class docblock
+	 */
+	string function toRegex( required string glob ) {
+		if ( variables.compiled.keyExists( arguments.glob ) ) {
+			return variables.compiled[ arguments.glob ]
+		}
+
+		var source = trim( arguments.glob ).replace( char( 92 ), "/", "all" ).reReplace( "^\./", "" ).reReplace( "^/+", "" )
+		if ( source.endsWith( "/" ) ) {
+			source &= "**"
+		}
+
+		var backslash = char( 92 )
+		var special = ".+^$(){}[]|" & backslash
+		var regex = "^"
+		var i = 1
+		var length = source.len()
+		while ( i <= length ) {
+			var c = source.mid( i, 1 )
+			if ( c == "*" ) {
+				if ( i < length && source.mid( i + 1, 1 ) == "*" ) {
+					// "**/" also matches zero directories, so "docs/**/x.md" matches "docs/x.md"
+					if ( i + 2 <= length && source.mid( i + 2, 1 ) == "/" ) {
+						regex &= "(?:.*/)?"
+						i += 3
+					} else {
+						regex &= ".*"
+						i += 2
+					}
+					continue
+				}
+				regex &= "[^/]*"
+			} else if ( c == "?" ) {
+				regex &= "[^/]"
+			} else if ( special.find( c ) ) {
+				regex &= backslash & c
+			} else {
+				regex &= c
+			}
+			i++
+		}
+		regex &= "$"
+
+		variables.compiled[ arguments.glob ] = regex
+		return regex
+	}
+
+}

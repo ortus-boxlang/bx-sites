@@ -1,0 +1,145 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.ImplicitLayouts", function() {
+
+			beforeEach( function() {
+				variables.layouts = new "models.build.ImplicitLayouts@bxsites"();
+			} );
+
+			describe( "glob matching", function() {
+
+				it( "** matches across segments", function() {
+					var rules = [ { layout : "landing", match : "marketing/**" } ];
+					expect( layouts.resolve( rules, "marketing/a.md" ) ).toBe( "landing" );
+					expect( layouts.resolve( rules, "marketing/deep/er/b.md" ) ).toBe( "landing" );
+					expect( layouts.resolve( rules, "other/a.md" ) ).toBe( "" );
+					expect( layouts.resolve( rules, "marketing.md" ) ).toBe( "" );
+				} );
+
+				it( "* stays inside one segment", function() {
+					var rules = [ { layout : "x", match : "guides/*.md" } ];
+					expect( layouts.resolve( rules, "guides/a.md" ) ).toBe( "x" );
+					expect( layouts.resolve( rules, "guides/sub/a.md" ) ).toBe( "" );
+				} );
+
+				it( "**/ also matches zero directories", function() {
+					var rules = [ { layout : "x", match : "docs/**/intro.md" } ];
+					expect( layouts.resolve( rules, "docs/intro.md" ) ).toBe( "x" );
+					expect( layouts.resolve( rules, "docs/a/b/intro.md" ) ).toBe( "x" );
+				} );
+
+				it( "? matches one character inside a segment", function() {
+					var rules = [ { layout : "x", match : "v?.md" } ];
+					expect( layouts.resolve( rules, "v1.md" ) ).toBe( "x" );
+					expect( layouts.resolve( rules, "v12.md" ) ).toBe( "" );
+				} );
+
+				it( "a literal path matches only that file", function() {
+					var rules = [ { layout : "x", match : "pricing.md" } ];
+					expect( layouts.resolve( rules, "pricing.md" ) ).toBe( "x" );
+					expect( layouts.resolve( rules, "sub/pricing.md" ) ).toBe( "" );
+				} );
+
+				it( "a trailing slash means everything under that folder", function() {
+					var rules = [ { layout : "x", match : "marketing/" } ];
+					expect( layouts.resolve( rules, "marketing/a.md" ) ).toBe( "x" );
+				} );
+
+				it( "treats regex metacharacters in a glob literally", function() {
+					var rules = [ { layout : "x", match : "a+b(1).md" } ];
+					expect( layouts.resolve( rules, "a+b(1).md" ) ).toBe( "x" );
+					expect( layouts.resolve( rules, "aab(1).md" ) ).toBe( "" );
+				} );
+
+				it( "normalizes backslashes and a leading slash in the path", function() {
+					var rules = [ { layout : "x", match : "marketing/**" } ];
+					expect( layouts.resolve( rules, "marketing\a.md" ) ).toBe( "x" );
+					expect( layouts.resolve( rules, "/marketing/a.md" ) ).toBe( "x" );
+				} );
+
+				it( "accepts an array of globs per rule", function() {
+					var rules = [ { layout : "landing", match : [ "marketing/**", "pricing.md" ] } ];
+					expect( layouts.resolve( rules, "pricing.md" ) ).toBe( "landing" );
+					expect( layouts.resolve( rules, "marketing/a.md" ) ).toBe( "landing" );
+				} );
+
+			} );
+
+			describe( "rule order and precedence", function() {
+
+				it( "the first matching rule wins", function() {
+					var rules = [
+						{ layout : "first", match : "a/**" },
+						{ layout : "second", match : "a/b/**" }
+					];
+					expect( layouts.resolve( rules, "a/b/c.md" ) ).toBe( "first" );
+				} );
+
+				it( "apply() sets layout on matching pages without one", function() {
+					var pages = [
+						{ relativePath : "marketing/a.md", layout : "" },
+						{ relativePath : "docs/b.md", layout : "" }
+					];
+					layouts.apply( pages, [ { layout : "landing", match : "marketing/**" } ] );
+					expect( pages[ 1 ].layout ).toBe( "landing" );
+					expect( pages[ 2 ].layout ).toBe( "" );
+				} );
+
+				it( "a page's own frontmatter layout always wins over a rule", function() {
+					var pages = [ { relativePath : "marketing/a.md", layout : "press-release" } ];
+					layouts.apply( pages, [ { layout : "landing", match : "marketing/**" } ] );
+					expect( pages[ 1 ].layout ).toBe( "press-release" );
+				} );
+
+				it( "does nothing with no rules", function() {
+					var pages = [ { relativePath : "a.md", layout : "" } ];
+					layouts.apply( pages, [] );
+					expect( pages[ 1 ].layout ).toBe( "" );
+				} );
+
+			} );
+
+		} );
+
+		describe( "implicit layouts in a real build", function() {
+
+			beforeEach( function() {
+				variables.pipeline = new "models.build.BuildPipeline@bxsites"();
+				pipeline.setMarkdownRenderer( new "tests.support.FakeMarkdownRenderer@bxsites"() );
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			it( "renders matching pages through the override layout, leaving others on page.bxm", function() {
+				var root = createTempDirectory( prefix = "bxsites-implicit-" );
+				tempDirs.append( root );
+				directoryCreate( root & "/docs/marketing", true, true );
+				directoryCreate( root & "/docs/.overrides/bootstrap", true, true );
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"layouts":[{"layout":"landing","match":"marketing/**"}]}'
+				);
+				fileWrite( root & "/docs/index.md", "Plain page" );
+				fileWrite( root & "/docs/marketing/offer.md", "Offer page" );
+				fileWrite( root & "/docs/.overrides/bootstrap/landing.bxm", "<bx:output><main class=""my-landing"">##variables.page.contentHtml##</main></bx:output>" );
+
+				pipeline.build( root );
+
+				var offer = fileRead( root & "/site/marketing/offer/index.html" );
+				expect( offer ).toInclude( "my-landing" );
+				expect( offer ).toInclude( "Offer page" );
+				expect( fileRead( root & "/site/index.html" ) ).notToInclude( "my-landing" );
+			} );
+
+		} );
+	}
+
+}

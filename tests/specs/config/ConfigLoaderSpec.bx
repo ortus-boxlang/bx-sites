@@ -30,6 +30,60 @@ class extends="testbox.system.BaseSpec" {
 				return dir;
 			}
 
+			describe( "theme.name slug and layouts validation", function() {
+
+				it( "accepts a slug theme name", function() {
+					var dir = newProjectDir( '{"name":"X","theme":{"name":"bx-sites-theme-blog1"}}' );
+					expect( loader.load( dir ).theme.name ).toBe( "bx-sites-theme-blog1" );
+				} );
+
+				it( "rejects a theme name that is not a slug, suggesting the slug", function() {
+					var dir = newProjectDir( '{"name":"X","theme":{"name":"My Theme"}}' );
+					expect( function() {
+						loader.load( dir );
+					} ).toThrow( "BxSites.InvalidConfig", "my-theme" );
+				} );
+
+				it( "defaults layouts to an empty array", function() {
+					var dir = newProjectDir( '{"name":"X"}' );
+					expect( loader.load( dir ).layouts ).toBe( [] );
+				} );
+
+				it( "accepts layouts rules with a glob or an array of globs", function() {
+					var dir = newProjectDir( '{"name":"X","layouts":[{"layout":"landing","match":"a/**"},{"layout":"post","match":["b/**","c.md"]}]}' );
+					expect( loader.load( dir ).layouts.len() ).toBe( 2 );
+				} );
+
+				it( "rejects layouts that is not an array", function() {
+					var dir = newProjectDir( '{"name":"X","layouts":{"layout":"a"}}' );
+					expect( function() {
+						loader.load( dir );
+					} ).toThrow( "BxSites.InvalidConfig" );
+				} );
+
+				it( "rejects a layouts entry missing layout or match", function() {
+					var dir = newProjectDir( '{"name":"X","layouts":[{"layout":"landing"}]}' );
+					expect( function() {
+						loader.load( dir );
+					} ).toThrow( "BxSites.InvalidConfig" );
+				} );
+
+				it( "rejects a layout name that is not a bare template name", function() {
+					var dir = newProjectDir( '{"name":"X","layouts":[{"layout":"../x","match":"a/**"}]}' );
+					expect( function() {
+						loader.load( dir );
+					} ).toThrow( "BxSites.InvalidConfig" );
+				} );
+
+				it( "rejects an empty match array", function() {
+					var dir = newProjectDir( '{"name":"X","layouts":[{"layout":"x","match":[]}]}' );
+					expect( function() {
+						loader.load( dir );
+					} ).toThrow( "BxSites.InvalidConfig" );
+				} );
+
+			} );
+
 			it( "throws BxSites.ConfigNotFound when bxsites.json is missing", function() {
 				var dir = newProjectDir();
 				expect( function() {
