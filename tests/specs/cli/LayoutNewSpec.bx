@@ -37,7 +37,7 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.MissingLayoutName" );
 			} );
 
-			it( "copies the active theme's page.bxm to .overrides/<theme>/<name>.bxm", function() {
+			it( "copies the active theme's layout.bxm to .overrides/<theme>/<name>.bxm", function() {
 				var root = newProject();
 
 				var result = verb.run( { projectRoot : root, name : "landing" } );
@@ -45,7 +45,7 @@ class extends="testbox.system.BaseSpec" {
 				var target = root & "/docs/.overrides/bootstrap/landing.bxm";
 				expect( result.exitCode ).toBe( 0 );
 				expect( fileExists( target ) ).toBeTrue();
-				expect( fileRead( target ) ).toBe( fileRead( new "models.build.ThemeRenderer@bxsites"().resolveThemeDir( "bootstrap", root ) & "/page.bxm" ) );
+				expect( fileRead( target ) ).toBe( fileRead( new "models.build.ThemeRenderer@bxsites"().resolveThemeDir( "bootstrap", root ) & "/layout.bxm" ) );
 			} );
 
 			it( "copies another template with --from", function() {
@@ -84,7 +84,7 @@ class extends="testbox.system.BaseSpec" {
 				var root = newProject();
 				expect( function() {
 					verb.run( { projectRoot : root, name : "x", from : "nope" } );
-				} ).toThrow( "BxSites.LayoutSourceNotFound", "page" );
+				} ).toThrow( "BxSites.LayoutSourceNotFound", "layout" );
 			} );
 
 			it( "writes into a complete flat .theme/ when the project has one", function() {
@@ -95,7 +95,7 @@ class extends="testbox.system.BaseSpec" {
 
 				verb.run( { projectRoot : root, name : "landing" } );
 
-				expect( fileRead( root & "/docs/.theme/landing.bxm" ) ).toInclude( "p" );
+				expect( fileRead( root & "/docs/.theme/landing.bxm" ) ).toInclude( ">l<" );
 				expect( directoryExists( root & "/docs/.overrides" ) ).toBeFalse();
 			} );
 

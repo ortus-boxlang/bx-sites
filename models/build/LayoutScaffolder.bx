@@ -1,7 +1,10 @@
 /**
  * Backs the `layout:new` CLI verb: copies one of the active theme's
- * templates (default `page.bxm`) to a new, named layout the project can
- * select with `layout: <name>` frontmatter or an implicit-layouts rule.
+ * templates (default `layout.bxm`, the outer shell) to a new, named layout the
+ * project can select with `layout: <name>` frontmatter or an implicit-layouts
+ * rule. A named layout replaces the theme's `layout.bxm` for the pages that
+ * select it, and can include `#variables.themeDir#/#variables.bodyFile#`
+ * to embed the page's own content.
  *
  * The copy lands in `<contentRoot>/.overrides/<theme>/<name>.bxm`, the folder
  * a project's overrides for that theme live in (ThemeRenderer.resolveThemeDir()).
@@ -22,13 +25,13 @@ class {
 	 * @projectRoot Absolute path to the project root
 	 * @theme The theme slug whose template is copied (the project's `theme.name`)
 	 * @name The new layout's name: a bare template name such as `landing`
-	 * @from Which template of the theme to copy, without extension (default `page`)
+	 * @from Which template of the theme to copy, without extension (default `layout`)
 	 *
 	 * @return { path, from } - `path` is the file that was created
 	 */
-	struct function scaffold( required string projectRoot, required string theme, required string name, string from = "page" ) {
+	struct function scaffold( required string projectRoot, required string theme, required string name, string from = "layout" ) {
 		var layoutName = trim( arguments.name )
-		var fromName = len( trim( arguments.from ) ) ? trim( arguments.from ) : "page"
+		var fromName = len( trim( arguments.from ) ) ? trim( arguments.from ) : "layout"
 
 		if ( !reFind( variables.namePattern, layoutName ) ) {
 			throw(
@@ -39,7 +42,7 @@ class {
 		if ( !reFind( variables.namePattern, fromName ) ) {
 			throw(
 				type    = "BxSites.InvalidLayoutName",
-				message = "--from [#fromName#] must be a bare template name such as [page]"
+				message = "--from [#fromName#] must be a bare template name such as [layout]"
 			)
 		}
 

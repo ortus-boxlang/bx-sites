@@ -4,7 +4,7 @@
 class {
 
 	/**
-	 * @options { projectRoot (required, absolute path), name (required - bare template name), from (template to copy, default "page"), theme (defaults to the project's theme.name) }
+	 * @options { projectRoot (required, absolute path), name (required - bare template name), from (template to copy, default "layout"), theme (defaults to the project's theme.name) }
 	 */
 	struct function run( struct options = {} ) {
 		var projectRoot = trim( arguments.options.projectRoot ?: "" )

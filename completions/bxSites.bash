@@ -87,7 +87,7 @@ _bxsites_complete() {
 			"i18n:status --projectRoot") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;
 			"install:plugin --projectRoot") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;
 			"install:theme --projectRoot") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;
-			"layout:new --from") COMPREPLY=($(compgen -W "page" -- "$part")) ;;
+			"layout:new --from") COMPREPLY=($(compgen -W "layout" -- "$part")) ;;
 			"layout:new --theme") COMPREPLY=($(compgen -W "bootstrap docsy docusaurus gitbook justthedocs material notion slate tailwind vuepress" -- "$part")) ;;
 			"layout:new --projectRoot") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;
 			"lint --projectRoot") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;

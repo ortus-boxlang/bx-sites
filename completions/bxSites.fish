@@ -47,7 +47,7 @@ complete -c bxSites -n __bxsites_needs_verb -a 'i18n:new' -d 'Scaffold a new doc
 complete -c bxSites -n __bxsites_needs_verb -a 'i18n:status' -d 'Report per-locale translation coverage against the default tree'
 complete -c bxSites -n __bxsites_needs_verb -a 'install:plugin' -d 'Download a plugin from ForgeBox into boxlang_modules/'
 complete -c bxSites -n __bxsites_needs_verb -a 'install:theme' -d 'Download a theme from ForgeBox into your content root\'s .themes/<name>/'
-complete -c bxSites -n __bxsites_needs_verb -a 'layout:new' -d 'Scaffold a named layout in .overrides/<theme>/ by copying a template of the active theme'
+complete -c bxSites -n __bxsites_needs_verb -a 'layout:new' -d 'Scaffold a named layout in .overrides/<theme>/ by copying a template of the active theme,...'
 complete -c bxSites -n __bxsites_needs_verb -a 'lint' -d 'Pre-build content checks: heading level skips, blog posts missing a valid date'
 complete -c bxSites -n __bxsites_needs_verb -a 'migrate' -d 'Convert a GitBook export, mkdocs project, plain zip of Markdown, or Notion export into a...'
 complete -c bxSites -n __bxsites_needs_verb -a 'new' -d 'Scaffold a new project'
@@ -126,7 +126,7 @@ complete -c bxSites -n '__bxsites_using_verb install:theme' -l name -x
 complete -c bxSites -n '__bxsites_using_verb install:theme' -l version -x
 complete -c bxSites -n '__bxsites_using_verb install:theme' -l projectRoot -r -F
 complete -c bxSites -n '__bxsites_using_verb layout:new' -l name -x
-complete -c bxSites -n '__bxsites_using_verb layout:new' -l from -x -a 'page'
+complete -c bxSites -n '__bxsites_using_verb layout:new' -l from -x -a 'layout'
 complete -c bxSites -n '__bxsites_using_verb layout:new' -l theme -x -a 'bootstrap docsy docusaurus gitbook justthedocs material notion slate tailwind vuepress'
 complete -c bxSites -n '__bxsites_using_verb layout:new' -l projectRoot -r -F
 complete -c bxSites -n '__bxsites_using_verb lint' -l projectRoot -r -F
