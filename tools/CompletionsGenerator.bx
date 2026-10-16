@@ -1,0 +1,344 @@
+import bxModules.bxsites.ModuleConfig;
+
+/**
+ * Builds the bash, fish and PowerShell tab completion scripts of the
+ * `bxSites` command from the verb table in ModuleConfig.bx, so they cannot
+ * drift away from the CLI. `tools/generate-completions.bxs` writes them to
+ * `completions/`; box.json's `boxlang.completions` points the module
+ * installer at the bash one, and all three ship inside the module.
+ *
+ * Flags are read out of each verb's help text (`[--port]`, `--from=a|b|c`),
+ * the same text `bxSites help` prints. The few flags that text does not
+ * mention are listed in `variables.EXTRA_FLAGS` below.
+ */
+class {
+
+	/** Flags that never take a value */
+	variables.BOOLEAN_FLAGS = [ "verbose", "force", "drafts", "draft", "docs", "site", "no-agents" ];
+
+	/** Flags whose value is a path, when they offer no fixed choices */
+	variables.PATH_FLAGS = [ "projectRoot", "source", "path", "dest", "output", "jsonDir", "appRoot", "from", "to" ];
+
+	/** Flags a verb accepts that its help text does not spell out */
+	variables.EXTRA_FLAGS = {
+		"new" : [
+			{ "name" : "description", "value" : true, "choices" : [], "file" : false },
+			{ "name" : "format", "value" : true, "choices" : [ "yaml", "toml", "json" ], "file" : false },
+			{ "name" : "no-agents", "value" : false, "choices" : [], "file" : false }
+		]
+	};
+
+	variables.NL = char( 10 );
+	variables.SHELLS = [ "bash", "fish", "powershell" ];
+	variables.FILE_NAMES = { "bash" : "bxSites.bash", "fish" : "bxSites.fish", "powershell" : "bxSites.ps1" };
+
+	/**
+	 * @root The project root: where tools/templates/ is read from
+	 */
+	function init( required string root ){
+		variables.root = arguments.root.reReplace( "[\\\/]+$", "" );
+		return this;
+	}
+
+	function shells(){
+		return variables.SHELLS;
+	}
+
+	/**
+	 * The file name a shell's script is written to inside completions/
+	 */
+	function fileName( required string shell ){
+		return variables.FILE_NAMES[ arguments.shell ];
+	}
+
+	/**
+	 * The completion script of one shell: "bash", "fish" or "powershell"
+	 */
+	function render( required string shell ){
+		var model = buildModel();
+		var template = fileRead( variables.root & "/tools/templates/" & arguments.shell & ".tpl" );
+		switch( arguments.shell ){
+			case "bash": return bash( template, model );
+			case "fish": return fish( template, model );
+			case "powershell": return powershell( template, model );
+		}
+		throw( type = "bxsites.completions", message = "Unknown shell [#arguments.shell#]. Use one of: #variables.SHELLS.toList( ', ' )#." );
+	}
+
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// The model: what can follow each verb
+	// ---------------------------------------------------------------------------------------------------------------------------
+
+	/**
+	 * One entry per verb, sorted by name: { name, help, options : [ { name, value, choices, file } ], positional }
+	 * where `positional` is "dir" (a folder), "verbs" (a verb name) or "".
+	 */
+	function buildModel(){
+		var verbs = ModuleConfig::verbs;
+		var descriptions = ModuleConfig::verbDescriptions;
+		var themes = themeNames();
+		var model = [];
+		for( var name in verbs.keyArray().sort( "text" ) ){
+			var text = descriptions[ name ];
+			var options = parseOptions( text );
+			if( extraFlagsFor( name ).len() ){
+				mergeOptions( options, extraFlagsFor( name ) );
+			}
+			mergeOptions( options, [ { "name" : "projectRoot", "value" : true, "choices" : [], "file" : false } ] );
+			for( var option in options ){
+				if( option.name == "theme" ){
+					option.choices = themes;
+				}
+				if( name == "deploy" && option.name == "target" ){
+					option.choices = deployTargets( text );
+				}
+				option.file = variables.PATH_FLAGS.contains( option.name ) && !option.choices.len();
+			}
+			model.append( {
+				"name" : name,
+				"help" : shortHelp( text ),
+				"options" : options,
+				"positional" : name == "new" ? "dir" : ""
+			} );
+		}
+		model.append( { "name" : "help", "help" : "Show the usage and the list of verbs", "options" : [], "positional" : "verbs" } );
+		return model;
+	}
+
+	/**
+	 * The flags in a help text: `--name`, `--name=value`, `--name=a|b|c` (fixed choices) or `--name=<placeholder>`
+	 */
+	private array function parseOptions( required string text ){
+		var options = [];
+		var index = {};
+		for( var found in reMatch( "--[A-Za-z][A-Za-z0-9-]*:?(=(<[^>]*>|[^\s\]\[\),;]*))?", arguments.text ) ){
+			var body = found.mid( 3, found.len() );
+			var equals = body.find( "=" );
+			var name = equals ? body.mid( 1, equals - 1 ) : body;
+			var value = equals ? body.mid( equals + 1, body.len() ) : "";
+			var choices = [];
+			if( reFind( "^[A-Za-z0-9-]+(\|[A-Za-z0-9-]+)+$", value ) ){
+				choices = value.listToArray( "|" );
+			} else if( reFind( "^[A-Za-z0-9-]+(,[A-Za-z0-9-]+)+$", value ) ){
+				choices = value.listToArray( "," );
+			} else if( reFind( "^[A-Za-z0-9-]+$", value ) ){
+				choices = [ value ];
+			}
+			var takesValue = equals > 0 || name.endsWith( ":" ) || !variables.BOOLEAN_FLAGS.contains( name );
+			mergeOptions( options, [ { "name" : name, "value" : takesValue, "choices" : choices, "file" : false } ] );
+		}
+		return options;
+	}
+
+	/**
+	 * Adds options to a list, merging the ones it already holds (same flag mentioned twice in one help text)
+	 */
+	private void function mergeOptions( required array options, required array extra ){
+		for( var add in arguments.extra ){
+			var existing = arguments.options.filter( ( o ) => o.name == add.name );
+			if( existing.len() ){
+				existing[ 1 ].value = existing[ 1 ].value || add.value;
+				for( var choice in add.choices ){
+					if( !existing[ 1 ].choices.contains( choice ) ){
+						existing[ 1 ].choices.append( choice );
+					}
+				}
+			} else {
+				arguments.options.append( add );
+			}
+		}
+	}
+
+	private array function extraFlagsFor( required string verb ){
+		return variables.EXTRA_FLAGS.keyExists( arguments.verb ) ? variables.EXTRA_FLAGS[ arguments.verb ] : [];
+	}
+
+	/**
+	 * The built-in theme names: the folders of resources/themes/
+	 */
+	private array function themeNames(){
+		return directoryList( variables.root & "/resources/themes", false, "name" ).sort( "text" );
+	}
+
+	/**
+	 * The deploy targets, read out of the `deploy` help text ("... to a real target: s3, azure, ... (")
+	 */
+	private array function deployTargets( required string text ){
+		var matched = reFind( "target: ([a-z0-9, -]+) \(", arguments.text, 1, true );
+		if( !matched.pos[ 1 ] ){
+			throw( type = "bxsites.completions", message = "The deploy help text no longer lists its targets after `target:`; update tools/CompletionsGenerator.bx" );
+		}
+		return matched.match[ 2 ].reReplace( "\s+", "", "all" ).listToArray( "," );
+	}
+
+	/**
+	 * The first part of a help text, up to its first parenthesis, capped at a readable length
+	 */
+	private string function shortHelp( required string text ){
+		var help = arguments.text.reReplace( "\s+\(.*$", "" ).replace( "`", "", "all" ).reReplace( "\s+", " ", "all" ).trim();
+		if( help.len() > 90 ){
+			help = help.left( 90 ).reReplace( "\s+\S*$", "" ) & "...";
+		}
+		return help;
+	}
+
+	/**
+	 * Verbs written as `group:name` (`page:new`), by group: { page : [ "new", "rename" ] } - the CLI accepts `page new` too
+	 */
+	private struct function groups( required array model ){
+		var groups = {};
+		for( var verb in arguments.model ){
+			if( verb.name.find( ":" ) ){
+				var group = verb.name.listFirst( ":" );
+				if( !groups.keyExists( group ) ){
+					groups[ group ] = [];
+				}
+				groups[ group ].append( verb.name.listRest( ":" ) );
+			}
+		}
+		return groups;
+	}
+
+	private string function words( required array items ){
+		return arguments.items.toList( " " );
+	}
+
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// bash
+	// ---------------------------------------------------------------------------------------------------------------------------
+
+	private string function bash( required string template, required array model ){
+		var t = char( 9 );
+		var flagCases = [];
+		var valueCases = [];
+		var positionalCases = [];
+		var secondCases = [];
+		for( var verb in arguments.model ){
+			var flags = [];
+			for( var option in verb.options ){
+				flags.append( "--" & option.name & ( option.value && !option.name.endsWith( ":" ) ? "=" : "" ) );
+				if( option.choices.len() ){
+					valueCases.append( t & t & t & '"#verb.name# --#option.name#") COMPREPLY=($(compgen -W "#words( option.choices )#" -- "$part")) ;;' );
+				} else if( option.file ){
+					valueCases.append( t & t & t & '"#verb.name# --#option.name#") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;' );
+				}
+			}
+			if( verb.name != "help" ){
+				flagCases.append( t & t & t & '#verb.name#) flags="#words( flags )#" ;;' );
+			}
+			if( verb.positional == "dir" ){
+				positionalCases.append( t & t & '#verb.name#) COMPREPLY=($(compgen -d -- "$cur")); compopt -o filenames 2>/dev/null ;;' );
+			} else if( verb.positional == "verbs" ){
+				positionalCases.append( t & t & '#verb.name#) COMPREPLY=($(compgen -W "$verbs" -- "$cur")); _bxsites_trim_colon "$cur" ;;' );
+			}
+		}
+		var groupWords = groups( arguments.model );
+		for( var group in groupWords.keyArray().sort( "text" ) ){
+			secondCases.append( t & t & t & '#group#) seconds="#words( groupWords[ group ] )#" ;;' );
+		}
+		return fill( arguments.template, {
+			"VERBS" : words( arguments.model.map( ( v ) => v.name ) ),
+			"FLAG_CASES" : flagCases.toList( variables.NL ),
+			"VALUE_CASES" : valueCases.toList( variables.NL ),
+			"POSITIONAL_CASES" : positionalCases.toList( variables.NL ),
+			"SECOND_CASES" : secondCases.toList( variables.NL )
+		} );
+	}
+
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// fish
+	// ---------------------------------------------------------------------------------------------------------------------------
+
+	private string function fish( required string template, required array model ){
+		var verbLines = [];
+		var optionLines = [];
+		for( var verb in arguments.model ){
+			verbLines.append( "complete -c bxSites -n __bxsites_needs_verb -a '#verb.name#' -d '#fishText( verb.help )#'" );
+			var condition = "'__bxsites_using_verb #verb.name#'";
+			for( var option in verb.options ){
+				if( option.name.endsWith( ":" ) ){
+					continue;
+				}
+				var line = "complete -c bxSites -n #condition# -l #option.name#";
+				if( option.choices.len() ){
+					line &= " -x -a '#words( option.choices )#'";
+				} else if( option.file ){
+					line &= " -r -F";
+				} else if( option.value ){
+					line &= " -x";
+				}
+				optionLines.append( line );
+			}
+			if( verb.positional == "dir" ){
+				optionLines.append( "complete -c bxSites -n #condition# -a '(__fish_complete_directories)'" );
+			} else if( verb.positional == "verbs" ){
+				optionLines.append( "complete -c bxSites -n #condition# -a '#words( arguments.model.map( ( v ) => v.name ) )#'" );
+			}
+		}
+		var groupWords = groups( arguments.model );
+		var groupLines = [];
+		for( var group in groupWords.keyArray().sort( "text" ) ){
+			groupLines.append( "complete -c bxSites -n '__bxsites_using_group #group#' -a '#words( groupWords[ group ] )#'" );
+		}
+		return fill( arguments.template, {
+			"VERBS" : verbLines.toList( variables.NL ),
+			"COLON_VERBS" : words( arguments.model.map( ( v ) => v.name ).filter( ( n ) => n.find( ":" ) ) ),
+			"GROUPS" : groupLines.toList( variables.NL ),
+			"OPTIONS" : optionLines.toList( variables.NL )
+		} );
+	}
+
+	private string function fishText( required string text ){
+		return arguments.text.replace( char( 92 ), char( 92 ) & char( 92 ), "all" ).replace( "'", char( 92 ) & "'", "all" );
+	}
+
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// PowerShell
+	// ---------------------------------------------------------------------------------------------------------------------------
+
+	private string function powershell( required string template, required array model ){
+		var t = char( 9 );
+		var verbLines = [];
+		var optionLines = [];
+		for( var verb in arguments.model ){
+			verbLines.append( t & t & "'#verb.name#' = '#psText( verb.help )#'" );
+			var items = [];
+			for( var option in verb.options ){
+				var choices = option.choices.map( ( c ) => "'" & psText( c ) & "'" ).toList( ", " );
+				items.append( t & t & t & "@{ Name = '#psText( option.name )#'; Value = $#option.value#; Choices = @(#choices#); File = $#option.file# }" );
+			}
+			optionLines.append( t & t & "'#verb.name#' = @(" );
+			optionLines.append( items, true );
+			optionLines.append( t & t & ")" );
+			if( verb.positional != "" ){
+				optionLines.append( t & t & "'#verb.name#:positional' = '#verb.positional#'" );
+			}
+		}
+		var groupWords = groups( arguments.model );
+		var groupLines = [];
+		for( var group in groupWords.keyArray().sort( "text" ) ){
+			groupLines.append( "complete -c bxSites -n '__bxsites_using_group #group#' -a '#words( groupWords[ group ] )#'" );
+		}
+		return fill( arguments.template, {
+			"VERBS" : verbLines.toList( variables.NL ),
+			"COLON_VERBS" : words( arguments.model.map( ( v ) => v.name ).filter( ( n ) => n.find( ":" ) ) ),
+			"GROUPS" : groupLines.toList( variables.NL ),
+			"OPTIONS" : optionLines.toList( variables.NL )
+		} );
+	}
+
+	private string function psText( required string text ){
+		return arguments.text.replace( "'", "''", "all" );
+	}
+
+	// ---------------------------------------------------------------------------------------------------------------------------
+
+	private string function fill( required string template, required struct values ){
+		var out = arguments.template;
+		for( var key in arguments.values ){
+			out = out.replace( "@@" & key & "@@", arguments.values[ key ], "all" );
+		}
+		return out;
+	}
+
+}

@@ -1,0 +1,32 @@
+/**
+ * Writes the bash, fish and PowerShell tab completion scripts of the
+ * `bxSites` command to completions/, from the verb table in ModuleConfig.bx.
+ *
+ *   boxlang tools/generate-completions.bxs           write the three files
+ *   boxlang tools/generate-completions.bxs --check   fail if a file is out of date
+ *
+ * Run it after adding or changing a verb or a flag in ModuleConfig.bx.
+ */
+root = getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\\\/]tools[\\\/]?$", "" );
+generator = new "tools.CompletionsGenerator@bxsites"( root );
+check = server.cli.parsed.options.keyExists( "check" );
+stale = [];
+
+for( shell in generator.shells() ){
+	path = root & "/completions/" & generator.fileName( shell );
+	script = generator.render( shell ).trim() & char( 10 );
+	if( check ){
+		if( !fileExists( path ) || fileRead( path ) != script ){
+			stale.append( generator.fileName( shell ) );
+		}
+	} else {
+		directoryCreate( root & "/completions", true, true );
+		fileWrite( path, script );
+		println( "Wrote completions/" & generator.fileName( shell ) );
+	}
+}
+
+if( stale.len() ){
+	println( "Out of date: " & stale.toList( ", " ) & ". Run `boxlang tools/generate-completions.bxs` and commit the result." );
+	cliExit( 1 );
+}

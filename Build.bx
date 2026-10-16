@@ -22,6 +22,8 @@ class{
 			"^\.cache$",
 			"^examples$",
 			"^apidocs$",
+			// Completion generator: only the generated completions/ ships.
+			"^tools$",
 			// Java/Gradle/Maven build-tool plugins - net-new, self-contained
 			// Java subprojects living alongside the BoxLang module (own
 			// build/CI/release pipeline), never part of the module itself.

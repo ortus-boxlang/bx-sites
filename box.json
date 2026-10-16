@@ -23,7 +23,8 @@
     "boxlang":{
         "minimumVersion":"1.18.0",
         "moduleName":"bxsites",
-        "executable":"bxSites"
+        "executable":"bxSites",
+        "completions":"completions/bxSites.bash"
     },
     "private":false,
     "license":[
@@ -54,6 +55,7 @@
         "/apidocs/**",
         "/site/**",
         "/docs/**",
+        "/tools/**",
         "/core/**",
         "/gradle-plugin/**",
         "/maven-plugin/**"

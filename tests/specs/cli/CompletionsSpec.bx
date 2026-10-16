@@ -1,0 +1,100 @@
+import bxModules.bxsites.ModuleConfig;
+
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "shell completions", function() {
+
+			beforeEach( function() {
+				variables.root = getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\\/]tests[\\/]specs[\\/]cli[\\/]?$", "" );
+				variables.generator = new "tools.CompletionsGenerator@bxsites"( root );
+			} );
+
+			// run a command and return { exitCode, output }
+			private function exec( required array cmd ) {
+				var pb = createObject( "java", "java.lang.ProcessBuilder" ).init( arguments.cmd );
+				pb.redirectErrorStream( true );
+				var process = pb.start();
+				var output = createObject( "java", "java.lang.String" ).init( process.getInputStream().readAllBytes(), "UTF-8" );
+				return { exitCode : process.waitFor(), output : output };
+			}
+
+			private function hasCommand( required string name ) {
+				try {
+					return exec( [ "sh", "-c", "command -v " & arguments.name ] ).exitCode == 0;
+				} catch ( any e ) {
+					return false;
+				}
+			}
+
+			private function onWindows() {
+				return server.os.name.findNoCase( "windows" ) > 0;
+			}
+
+			it( "ships a committed script per shell that matches the generator (run boxlang tools/generate-completions.bxs)", function() {
+				for ( var shell in generator.shells() ) {
+					var file = root & "/completions/" & generator.fileName( shell );
+					expect( fileExists( file ) ).toBeTrue( "missing #file#" );
+					expect( fileRead( file ).replace( char( 13 ), "", "all" ) )
+						.toBe( generator.render( shell ).replace( char( 13 ), "", "all" ), "#file# is stale" );
+				}
+			} );
+
+			it( "lists every verb in every script", function() {
+				for ( var shell in generator.shells() ) {
+					var script = fileRead( root & "/completions/" & generator.fileName( shell ) );
+					for ( var verb in ModuleConfig::verbs.keyArray() ) {
+						expect( script ).toInclude( verb, "#shell# is missing #verb#" );
+					}
+				}
+			} );
+
+			it( "points boxlang.completions in box.json at the bash script", function() {
+				var descriptor = jsonDeserialize( fileRead( root & "/box.json" ) );
+				expect( descriptor.boxlang.completions ).toBe( "completions/bxSites.bash" );
+				expect( fileExists( root & "/" & descriptor.boxlang.completions ) ).toBeTrue();
+			} );
+
+			it( "bash completes verbs, colon verbs, two-word verbs and flag values", function() {
+				if ( onWindows() || !hasCommand( "bash" ) ) {
+					return;
+				}
+				var driver = createTempFile( prefix = "bxsites-complete-", suffix = ".sh" );
+				fileWrite( driver, 'source "$1"
+t() { COMP_LINE="$1"; COMP_POINT=${##COMP_LINE}; COMPREPLY=(); _bxsites_complete; echo "$1 => ${COMPREPLY[*]}"; }
+t "bxSites pa"
+t "bxSites page:ne"
+t "bxSites page ne"
+t "bxSites page new --ti"
+t "bxSites new --theme=m"
+t "bxSites deploy --target=s"
+t "bxSites help pa"' );
+				try {
+					var result = exec( [ "bash", driver, root & "/completions/bxSites.bash" ] );
+					expect( result.exitCode ).toBe( 0, result.output );
+					expect( result.output ).toInclude( "bxSites pa => package page:new page:rename" );
+					expect( result.output ).toInclude( "bxSites page:ne => new" );
+					expect( result.output ).toInclude( "bxSites page ne => new" );
+					expect( result.output ).toInclude( "bxSites page new --ti => --title=" );
+					expect( result.output ).toInclude( "bxSites new --theme=m => material" );
+					expect( result.output ).toInclude( "bxSites deploy --target=s => s3 sftp" );
+					expect( result.output ).toInclude( "bxSites help pa => package page:new page:rename" );
+				} finally {
+					fileDelete( driver );
+				}
+			} );
+
+			it( "fish parses the script and completes two-word verbs", function() {
+				if ( onWindows() || !hasCommand( "fish" ) ) {
+					return;
+				}
+				var file = root & "/completions/bxSites.fish";
+				expect( exec( [ "fish", "-n", file ] ).exitCode ).toBe( 0 );
+				var result = exec( [ "fish", "-c", 'source "#file#"; complete -C "bxSites page n"' ] );
+				expect( result.output.trim() ).toBe( "new" );
+			} );
+
+		} );
+	}
+
+}

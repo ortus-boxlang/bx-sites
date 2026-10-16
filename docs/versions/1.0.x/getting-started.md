@@ -73,6 +73,10 @@ boxlang bxSites <verb> [options]
 
 The rest of this guide uses the short form.
 
+### Tab completion
+
+Completion scripts for bash, fish and PowerShell ship with the module. See [Tab completion](cli-reference.md#tab-completion) for the one-line install of each.
+
 ## Scaffold a project
 
 ```bash frame="terminal" title="Terminal" linenums="1"
