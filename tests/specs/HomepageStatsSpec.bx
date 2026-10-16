@@ -1,0 +1,42 @@
+import bxModules.bxsites.ModuleConfig;
+
+/**
+ * The homepage's stat strip (docs/.overrides/bootstrap/home.bxm) hardcodes a
+ * few counts as marketing copy. They must not drift from the code.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "homepage stat strip", function() {
+
+			beforeEach( function() {
+				variables.root = getDirectoryFromPath( getCurrentTemplatePath() ).reReplace( "[\\/]tests[\\/]specs[\\/]?$", "" );
+				variables.home = fileRead( root & "/docs/.overrides/bootstrap/home.bxm" );
+			} );
+
+			private numeric function stat( required string name ) {
+				var found = reFind( 'data-stat="' & arguments.name & '">([0-9]+)<', home, 1, true );
+				expect( found.pos[ 1 ] ).toBeGT( 0, "home.bxm has no data-stat=""#arguments.name#"" cell" );
+				return val( home.mid( found.pos[ 2 ], found.len[ 2 ] ) );
+			}
+
+			it( "counts the built-in themes", function() {
+				var themes = directoryList( root & "/resources/themes", false, "name" ).filter( ( name ) => directoryExists( root & "/resources/themes/" & name ) );
+				expect( stat( "themes" ) ).toBe( themes.len() );
+			} );
+
+			it( "counts the CLI verbs", function() {
+				// "help" is listed by the CLI too, but is not a verb in the table
+				expect( stat( "verbs" ) ).toBe( ModuleConfig::verbs.len() );
+			} );
+
+			it( "counts the deploy targets", function() {
+				var found = reFind( "target: ([a-z0-9, -]+) \(", ModuleConfig::verbDescriptions[ "deploy" ], 1, true );
+				var targets = ModuleConfig::verbDescriptions[ "deploy" ].mid( found.pos[ 2 ], found.len[ 2 ] ).listToArray( "," );
+				expect( stat( "deploy-targets" ) ).toBe( targets.len() );
+			} );
+
+		} );
+	}
+
+}

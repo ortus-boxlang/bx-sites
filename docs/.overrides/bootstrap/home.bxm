@@ -248,24 +248,31 @@
 				<div class="float-badge badge-1">#homeIcon( "search" )# search index built &middot; 42ms</div>
 				<div class="preview-card">
 					<div class="preview-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">yourproject.dev/docs</span></div>
-					<div class="preview-body">
-						<div class="preview-side">
-							<div class="item active">Overview</div>
-							<div class="item">Install</div>
-							<div class="item">Theming</div>
-							<div class="item">Search</div>
-							<div class="item">Deploy</div>
-						</div>
-						<div class="preview-main">
-							<div class="k1"></div><div class="k2"></div><div class="k3"></div>
-							<div class="chipsrow"><span class="chip">bxSites new</span><span class="chip">bxSites serve</span></div>
-						</div>
-					</div>
+					<img class="preview-shot" src="#variables.basePath#assets/home/themes/bootstrap.png" width="1280" height="800" alt="A documentation page built with bxSites in dark mode, with the navigation tree on the left and the page's table of contents on the right">
+				</div>
+				<div class="float-code" aria-hidden="true">
+					<div class="float-code__bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="float-code__name">docs/getting-started.md</span></div>
+					<pre><span class="c">---</span>
+<span class="k">title</span>: Getting Started
+<span class="c">---</span>
+<span class="p">##</span> Getting Started
+Install the module and <span class="s">**build**</span>
+your first site.</pre>
 				</div>
 				<div class="float-badge badge-2">#homeIcon( "offline" )# 0 outbound requests &middot; air‑gapped</div>
 			</div>
 		</div>
 	</main>
+
+	<!--- Stat strip: keep these counts in sync (tests/specs/HomepageStatsSpec.bx checks them) --->
+	<div class="bxh-wrap">
+		<div class="stat-strip">
+			<div><div class="stat-num" data-stat="themes">10</div><div class="stat-label">built-in themes</div></div>
+			<div><div class="stat-num" data-stat="verbs">33</div><div class="stat-label">CLI verbs, with tab completion</div></div>
+			<div><div class="stat-num" data-stat="deploy-targets">12</div><div class="stat-label">one-command deploy targets</div></div>
+			<div><div class="stat-num">0</div><div class="stat-label">Node.js needed, 0 outbound requests</div></div>
+		</div>
+	</div>
 
 	<!--- Section: the build pipeline (Markdown -> Render -> Index + AI -> Deploy) --->
 	<section>
@@ -284,6 +291,58 @@
 				<div class="flow-stage"><div class="flow-icon">#bxsitesIcon( "globe" )#</div><span>Deploy</span></div>
 			</div>
 			<p class="orbit-caption">One build step: your Markdown source, rendered through the theme, indexed for search, packaged as AI-ready context, and shipped &mdash; every pass, automatically in sync.</p>
+		</div>
+		<div class="bxh-wrap">
+			<div class="pipe-cards">
+				<div class="pipe-card">
+					<h3>Markdown</h3>
+					<pre class="pipe-tree">docs/
+├── index.md
+├── guides/
+└── blog/posts/</pre>
+				</div>
+				<div class="pipe-card">
+					<h3>Render</h3>
+					<img src="#variables.basePath#assets/home/themes/notion.png" width="1280" height="800" loading="lazy" alt="The same page rendered with the Notion theme">
+				</div>
+				<div class="pipe-card">
+					<h3>Index + AI</h3>
+					<div class="pipe-chips"><span>search-index.json</span><span>llms.txt</span><span>mcp-manifest.json</span><span>sitemap.xml</span></div>
+				</div>
+				<div class="pipe-card">
+					<h3>Deploy</h3>
+					<div class="pipe-chips pipe-chips--row"><span>s3</span><span>azure</span><span>gcs</span><span>netlify</span><span>vercel</span><span>cloudflare-pages</span><span>github-pages</span><span>+5</span></div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!--- Section: search palette and version/language switchers (visual spotlights) --->
+	<section>
+		<div class="bxh-wrap">
+			<div class="spot-grid">
+				<div class="spot-card">
+					<span class="eyebrow">Search</span>
+					<h3>A Ctrl+K command palette, built at build time</h3>
+					<div class="palette" aria-hidden="true">
+						<div class="palette-input">#homeIcon( "search" )#<span>deploy to s3</span></div>
+						<div class="palette-row active"><b>Deployment</b><small>bxSites deploy --target=s3 ...</small></div>
+						<div class="palette-row"><b>CLI reference: deploy</b><small>Build and ship site/ to a real target</small></div>
+						<div class="palette-row"><b>Air-gapped sites</b><small>Zero outbound requests</small></div>
+					</div>
+				</div>
+				<div class="spot-card">
+					<span class="eyebrow">Versions and languages</span>
+					<h3>Switchers appear as soon as you add a version or a locale</h3>
+					<div class="palette" aria-hidden="true">
+						<div class="switch-bar"><b>bxSites</b><span><i>v1.0 (Current)</i><i>English</i></span></div>
+						<div class="switch-body">
+							<div class="switch-nav"><span class="on">Getting started</span><span>Guides</span><span>CLI reference</span><span>Blog</span></div>
+							<div class="switch-page"><div class="k1"></div><div class="k2"></div><div class="k3"></div><div class="switch-langs"><i>de</i><i>es</i><i>it</i></div></div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</section>
 
@@ -360,6 +419,49 @@
 		</div>
 	</section>
 
+	<!--- Section: overrides and slots (make it yours) --->
+	<section>
+		<div class="bxh-wrap">
+			<div class="section-head">
+				<span class="eyebrow">Make it yours</span>
+				<h2>Override anything. Fork nothing.</h2>
+				<p>Keep the theme and its updates. Drop a layout, a slot or an asset next to your docs and bxSites layers it on top. <a href="#variables.basePath#guides/themes/##project-overrides">How overrides work &rarr;</a></p>
+			</div>
+			<div class="ovr-grid">
+				<div class="ovr-stack">
+					<div class="term-panel">
+						<div class="preview-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">docs/</span></div>
+						<pre class="ovr-code">docs/
+└── .overrides/
+    └── bootstrap/
+        ├── <span class="k">home.bxm</span>                 <span class="c">a layout</span>
+        ├── assets/<span class="k">logo.svg</span>         <span class="c">swap an asset</span>
+        └── slots/
+            ├── <span class="k">announcement-bar.bxm</span>
+            └── <span class="k">footer.bxm</span></pre>
+					</div>
+					<div class="term-panel">
+						<div class="preview-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">bxsites.yaml</span></div>
+						<pre class="ovr-code"><span class="k">layouts</span>:
+  - <span class="k">layout</span>: landing
+    <span class="k">match</span>: [<span class="s">"marketing/**"</span>, <span class="s">"pricing.md"</span>]</pre>
+					</div>
+				</div>
+				<div class="slot-map" aria-label="The five theme slots and where they render">
+					<div class="slot-map__title">Five slots, in every built-in theme</div>
+					<div class="slot-zone slot-zone--fill"><code>announcement-bar</code><small>empty by default</small></div>
+					<div class="slot-zone slot-zone--theme"><code>header</code><small>the theme's navbar</small></div>
+					<div class="slot-body">
+						<div class="slot-side"><small>navigation tree</small><div class="slot-zone slot-zone--fill"><code>sidebar-bottom</code></div></div>
+						<div class="slot-page"><div class="k1"></div><div class="k2"></div><div class="k3"></div></div>
+					</div>
+					<div class="slot-zone slot-zone--theme"><code>footer</code><small>the theme's footer</small></div>
+					<div class="slot-map__note">plus <code>head-extra</code>, just before the closing head tag</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
 	<!--- Section: agentic web (terminal mockup + AI-ready cards) --->
 	<section class="comparison-section">
 		<div class="bxh-wrap">
@@ -376,6 +478,7 @@
 					<span title="Any MCP agent">#homeIcon( "robot" )#</span>
 				</div>
 			</div>
+			<div class="term-split">
 			<div class="term-panel">
 				<div class="preview-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">bxSites build --mcp</span></div>
 				<div class="term-body">
@@ -384,6 +487,14 @@
 					<div class="term-line" style="animation-delay:1.8s"><span class="ok">&check;</span> Generating <span class="term-cmd">mcp-manifest.json</span></div>
 					<div class="term-line" style="animation-delay:2.7s"><span class="ok">&check;</span> Search index built<span class="term-cursor"></span></div>
 				</div>
+			</div>
+			<div class="menu-mock" aria-hidden="true">
+				<div class="menu-mock__head">Page actions <span>▾</span></div>
+				<div class="menu-mock__item active">Copy page as Markdown</div>
+				<div class="menu-mock__item">Open in ChatGPT</div>
+				<div class="menu-mock__item">Open in Claude</div>
+				<div class="menu-mock__item">Copy link</div>
+			</div>
 			</div>
 			<div class="bxh-grid" style="margin-top:32px">
 				<div class="bxh-card">
@@ -699,17 +810,17 @@
 				<span class="eyebrow">Gallery</span>
 				<h2>Ten themes. Same content, every look.</h2>
 			</div>
-			<div class="themes-strip">
-				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##0d6efd,##00DBFF)"></div><div class="label">bootstrap</div></a>
-				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##6750A4,##B69DF8)"></div><div class="label">material</div></a>
-				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##38bdf8,##0ea5e9)"></div><div class="label">tailwind</div></a>
-				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##0b3d91,##1c5fbf)"></div><div class="label">docsy</div></a>
-				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##0a0a0a,##5546FF)"></div><div class="label">slate</div></a>
-				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##25c2a0,##1a8870)"></div><div class="label">docusaurus</div></a>
-				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##f3f4f6,##9ca3af)"></div><div class="label">justthedocs</div></a>
-				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##3eaf7c,##2e8b5e)"></div><div class="label">vuepress</div></a>
-				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##eef1f4,##3884ff)"></div><div class="label">gitbook</div></a>
-				<a class="theme-chip" href="#variables.basePath#guides/themes/"><div class="theme-swatch" style="background:linear-gradient(135deg,##111,##333)"></div><div class="label">notion</div></a>
+			<div class="themes-strip themes-strip--shots">
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><img class="theme-shot" src="#variables.basePath#assets/home/themes/bootstrap.png" width="1280" height="800" loading="lazy" alt="Bootstrap theme, dark mode"><div class="label">bootstrap</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><img class="theme-shot" src="#variables.basePath#assets/home/themes/material.png" width="1280" height="800" loading="lazy" alt="Material theme, dark mode"><div class="label">material</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><img class="theme-shot" src="#variables.basePath#assets/home/themes/tailwind.png" width="1280" height="800" loading="lazy" alt="Tailwind theme, dark mode"><div class="label">tailwind</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><img class="theme-shot" src="#variables.basePath#assets/home/themes/docsy.png" width="1280" height="800" loading="lazy" alt="Docsy theme, dark mode"><div class="label">docsy</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><img class="theme-shot" src="#variables.basePath#assets/home/themes/slate.png" width="1280" height="800" loading="lazy" alt="Slate theme, dark mode"><div class="label">slate</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><img class="theme-shot" src="#variables.basePath#assets/home/themes/docusaurus.png" width="1280" height="800" loading="lazy" alt="Docusaurus theme, dark mode"><div class="label">docusaurus</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><img class="theme-shot" src="#variables.basePath#assets/home/themes/justthedocs.png" width="1280" height="800" loading="lazy" alt="Just the Docs theme, dark mode"><div class="label">justthedocs</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><img class="theme-shot" src="#variables.basePath#assets/home/themes/vuepress.png" width="1280" height="800" loading="lazy" alt="VuePress theme, dark mode"><div class="label">vuepress</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><img class="theme-shot" src="#variables.basePath#assets/home/themes/gitbook.png" width="1280" height="800" loading="lazy" alt="GitBook theme, dark mode"><div class="label">gitbook</div></a>
+				<a class="theme-chip" href="#variables.basePath#guides/themes/"><img class="theme-shot" src="#variables.basePath#assets/home/themes/notion.png" width="1280" height="800" loading="lazy" alt="Notion theme, dark mode"><div class="label">notion</div></a>
 			</div>
 		</div>
 	</section>
