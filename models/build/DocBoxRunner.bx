@@ -66,7 +66,14 @@ class {
 				warnings.append( "Source directory [#source.dir#] does not exist - skipped" )
 				continue
 			}
-			usableSources.append( { "dir" : source.dir, "mapping" : source.mapping } )
+			// The platform's own canonical spelling (all backslashes on
+			// Windows): DocBox derives each class' name by stripping this
+			// directory off the file paths it lists, which never matches
+			// when the two disagree about the separator.
+			usableSources.append( {
+				"dir"     : createObject( "java", "java.io.File" ).init( source.dir ).getCanonicalPath(),
+				"mapping" : source.mapping
+			} )
 		}
 
 		if ( !usableSources.len() ) {
