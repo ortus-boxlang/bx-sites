@@ -22,17 +22,12 @@ jobs:
     env:
       DB_USER: root
       DB_PASSWORD: root
-    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest"]
-        experimental: [false]
-        include:
-          # Windows path handling (backslashes, drive letters) gets real
-          # coverage here - experimental until it has a green track record.
-          - os: windows-latest
-            experimental: true
+        # Windows runs the full suite and the CLI smoke test too: path
+        # handling (backslashes, drive letters) has to keep working there.
+        os: ["ubuntu-latest", "windows-latest"]
     defaults:
       run:
         # Git Bash on Windows - steps that need boxlang.bat use cmd/pwsh below
@@ -42,7 +37,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Setup BoxLang
-        uses: ortus-boxlang/setup-boxlang@1.4.0
+        uses: ortus-boxlang/setup-boxlang@1.6.0
         with:
           with-commandbox: true
           # bx-docbox is a test-only prerequisite: DocBoxRunnerSpec and
