@@ -276,12 +276,15 @@ entrada de referencia completa.</p>
 <h2 id="dónde-vive-una-sobrescritura-de-tema"><a href="#dónde-vive-una-sobrescritura-de-tema" id="dónde-vive-una-sobrescritura-de-tema" name="dónde-vive-una-sobrescritura-de-tema" class="anchor"></a>Dónde vive una sobrescritura de tema</h2>
 <p>La propia sobrescritura de tema de un proyecto - un <code>.theme/</code> escrito a
 mano (consulta
-<a href="/theme/tailwind/es/guides/themes/index.html#sobrescribir-un-tema">Temas: Sobrescribir un tema</a>) o un
-<code>.themes/&lt;name&gt;/</code> instalado mediante <code>install:theme</code> (consulta
+<a href="/theme/tailwind/es/guides/themes/index.html#sobrescribir-un-tema">Temas: Sobrescribir un tema</a>), un
+<code>.overrides/&lt;theme&gt;/</code> por tema (consulta
+<a href="/theme/tailwind/es/guides/themes/index.html#sobrescrituras-del-proyecto">Temas: Sobrescrituras del proyecto</a>),
+o un <code>.themes/&lt;name&gt;/</code> instalado mediante <code>install:theme</code> (consulta
 <a href="/theme/tailwind/es/guides/themes/index.html#instalar-un-tema-publicado">Temas: Instalar un tema publicado</a>)</p>
 <ul>
 <li>vive <strong>dentro de la raíz de contenido resuelta</strong>, no en la raíz misma
-del proyecto: <code>&lt;raízDeContenido&gt;/.theme/</code> y
+del proyecto: <code>&lt;raízDeContenido&gt;/.theme/</code>,
+<code>&lt;raízDeContenido&gt;/.overrides/&lt;theme&gt;/</code> y
 <code>&lt;raízDeContenido&gt;/.themes/&lt;name&gt;/</code>, donde <code>&lt;raízDeContenido&gt;</code> es donde
 sea que resuelva <code>source</code> (o la autodetección) - <code>docs/</code>, <code>src/</code>, un
 nombre de carpeta personalizado, o la propia raíz del proyecto para
@@ -296,7 +299,7 @@ nombre de carpeta personalizado, o la propia raíz del proyecto para
         ├── layout.bxm
         └── page.bxm
 </code></pre>
-<p>Mantener <code>.theme</code>/<code>.themes</code> dentro de la raíz de contenido en lugar de en
+<p>Mantener <code>.theme</code>/<code>.overrides</code>/<code>.themes</code> dentro de la raíz de contenido en lugar de en
 la raíz misma del proyecto importa sobre todo en cuanto un repositorio
 tiene más de una raíz de proyecto - consulta
 <a href="/theme/tailwind/es/guides/multi-domain/index.html">Monorepos Multi-Dominio</a> para ese patrón. La propia
@@ -307,7 +310,7 @@ nivel superior.</p>
 
 				</div>
 
-	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/guides/content-source.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/es/guides/content-source.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Oct 16, 2026, 2&#x3a;01&#x3a;32 PM</span><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Origen%20del%20Contenido&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Ftailwind%2Fes%2Fguides%2Fcontent-source%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
+	<div class="page-meta mt-8 border-t border-slate-200 pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500"><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/guides/content-source.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="/theme/tailwind/es/guides/content-source.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="inline-flex items-center gap-1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Oct 16, 2026, 4&#x3a;17&#x3a;35 PM</span><a class="inline-flex items-center gap-1 hover:text-cyan-700" href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Origen%20del%20Contenido&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Ftailwind%2Fes%2Fguides%2Fcontent-source%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
 
 			</article>
 

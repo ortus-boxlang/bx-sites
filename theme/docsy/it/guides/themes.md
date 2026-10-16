@@ -290,6 +290,11 @@ Un tema è semplicemente una cartella con:
   del tema. Ricade su `page.bxm` quando un tema non lo ha.
 - **`assets/`** (opzionale) - CSS/JS del tema, copiati in
   `site/assets/theme/` al momento del build.
+- **`slots/<name>.bxm`** (opzionale) - il contenuto predefinito del tema
+  per uno [slot](#slot), incluso ovunque il suo `layout.bxm` chiami
+  `renderSlot( "<name>" )`.
+- **`theme.json`** (opzionale) - il manifesto del tema: il suo [slug e gli
+  slot che espone](#manifesto-del-tema-themejson).
 
 `variables.page.editUrl`/`.lastUpdated` (stringhe vuote quando non
 configurati) e `variables.siteConfig.repo`/`.social`/`.footer` sono
@@ -340,13 +345,16 @@ avere un aspetto diverso dal resto del sito riutilizzando comunque il
 chrome e gli asset dello stesso tema. Due catene di risoluzione
 indipendenti:
 
-- **Guscio esterno** - sempre `layout.bxm`, tranne per le pagine di
-  elenco/categoria/archivio/autore/statistiche del blog, che usano
-  `blog.bxm` quando il tema attivo lo ha. Segue il tipo di contenuto -
-  non c'è una chiave di frontmatter per questo.
+- **Guscio esterno** - `layout.bxm` di default. Le pagine di
+  elenco/categoria/archivio/autore/statistiche del blog usano `blog.bxm`
+  quando il tema attivo lo ha. Una pagina che imposta `layout:` nel proprio
+  frontmatter (o che corrisponde a una regola di [layout
+  implicito](#layout-impliciti)) viene invece renderizzata tramite
+  `<name>.bxm`, quando il tema attivo o le [sovrascritture](#sovrascritture-del-progetto)
+  del progetto ne hanno uno.
 - **Corpo** - `page.bxm` di default. Un articolo del blog usa
-  `blog-page.bxm` quando il tema attivo lo ha. In entrambi i casi, il
-  frontmatter proprio di una pagina vince sempre quando ne imposta uno:
+  `blog-page.bxm` quando il tema attivo lo ha. Un guscio include il corpo
+  con `include "#variables.themeDir#/#variables.bodyFile#"`.
 
 ```markdown title="docs/marketing/press-release.md"
 ---
@@ -355,11 +363,14 @@ layout: press-release
 ---
 ```
 
-`layout: press-release` renderizza il corpo di questa singola pagina
-tramite `.theme/press-release.bxm` (o quello del tema integrato attivo,
-se ne ha uno) invece di `page.bxm` - sempre dentro il guscio `layout.bxm`
-normale del sito. Un `layout:` che nomina un file che il tema attivo non
-ha ricade su `page.bxm` invece di far fallire il build, così cambiare
+`layout: press-release` renderizza questa singola pagina tramite
+`.overrides/<theme>/press-release.bxm` (o il `press-release.bxm` proprio
+del tema attivo, se ne ha uno) al posto di `layout.bxm`. Quel file è una
+pagina completa: copia `layout.bxm` per partire dal chrome proprio del
+tema (`bxSites layout:new press-release` fa esattamente questo), oppure
+scrivine uno minimale e usa `include` per il corpo dove serve. Un
+`layout:` che nomina un file che nessuno fornisce ricade su
+`layout.bxm`/`page.bxm` invece di far fallire il build, così cambiare
 tema non rompe mai una pagina che nominava il layout personalizzato di
 un altro tema.
 
@@ -594,6 +605,147 @@ senza `.bxm`, usa
 sopra invece - si sovrappone a qualunque tema `bxsites.yaml` nomini,
 senza alcuna cartella `.theme/` coinvolta. `.theme/` serve per quando
 devi anche cambiare il markup stesso, argomento trattato di seguito.
+
+## Sovrascritture del progetto
+
+Una cartella `.theme/` sostituisce un tema per intero. Per cambiare solo
+poche cose e mantenere tutto il resto, inclusi i futuri aggiornamenti del
+tema, metti invece le modifiche in `.overrides/<theme>/` dentro la content
+root. `<theme>` è lo slug del tema, il valore di `theme.name`:
+
+```text title="Struttura del progetto"
+docs/
+└── .overrides/
+    └── bootstrap/                  ← si applica solo mentre theme.name è bootstrap
+        ├── home.bxm                 ← un layout, usato da `layout: home`
+        ├── page.bxm                 ← sostituisce il page.bxm del tema
+        ├── assets/
+        │   └── logo.svg             ← sostituisce (o aggiunge) un asset del tema
+        └── slots/
+            └── footer.bxm           ← riempie lo slot `footer` del tema
+```
+
+Ogni file in `.overrides/<theme>/` viene sovrapposto al tema: un file con lo
+stesso nome sostituisce quello del tema, qualsiasi altro viene aggiunto. Il
+tema non viene mai modificato. Al momento del build il risultato viene unito
+in `.cache/theme/<theme>/` (rimossa da `bxSites clean`), ed è quella cartella
+unita a essere renderizzata, quindi `themeAssetUrl()`, gli include e il
+fingerprinting funzionano come per un tema semplice.
+
+- **Cambiare tema** cambia anche le sovrascritture. Un build con
+  `material` ignora `.overrides/bootstrap/`; dagli il suo
+  `.overrides/material/`.
+- **Il nome di un tema deve essere uno slug**: lettere minuscole, cifre e
+  trattini, il valore che `slugify()` di BoxLang restituisce per esso
+  (altrimenti `bxSites` fallisce con un suggerimento). Dà il nome alla
+  cartella del tema, alla sua installazione `.themes/<slug>/` e alla sua
+  cartella `.overrides/<slug>/`.
+- **Ordine di risoluzione per qualsiasi file**: un `.theme/` piatto completo
+  (se il progetto ne ha uno vince in modo assoluto), poi
+  `.overrides/<theme>/`, poi un `.themes/<theme>/` installato, poi il tema
+  integrato.
+- `.overrides/` è una cartella con il punto, quindi non viene mai
+  pubblicata come pagine.
+
+`bxSites layout:new <name>` genera un layout in questa cartella.
+
+### Slot
+
+Uno slot è un buco con nome nel `layout.bxm` di un tema che un progetto può
+riempire senza copiare il layout. Crea `slots/<name>.bxm` nella cartella
+delle sovrascritture:
+
+```html title="docs/.overrides/bootstrap/slots/announcement-bar.bxm"
+<bx:output>
+<div class="alert alert-info text-center mb-0">
+	v1.0 is out. <a href="#variables.basePath#releases/1.0.md">Read the notes</a>
+</div>
+</bx:output>
+```
+
+Ogni tema integrato espone gli stessi cinque slot:
+
+| Slot | Dove viene renderizzato | Predefinito del tema |
+|---|---|---|
+| `head-extra` | Subito prima di `</head>`: `<meta>`, `<link>` e script extra | vuoto |
+| `announcement-bar` | Subito dopo `<body>`, sopra l'header | vuoto |
+| `header` | La barra di navigazione in alto | l'header proprio del tema |
+| `footer` | Il footer della pagina | il footer proprio del tema (quando `footer: true`) |
+| `sidebar-bottom` | Sotto l'albero di navigazione nella barra laterale | vuoto |
+
+- **Una sovrascrittura sostituisce il predefinito.** Per `header` e `footer`
+  significa sostituire il markup del tema; per gli altri riempie uno slot
+  vuoto. Elimina il file per riavere il predefinito.
+- **Un file di slot è un template.** Vede le stesse variabili di un layout
+  (`page`, `nav`, `siteConfig`, `basePath`, `data`, ...) e, come
+  `layout.bxm`, racchiude il suo markup in `<bx:output>` così che le
+  `#expressions#` vengano renderizzate.
+- **Un tema può esporre più slot** dei cinque; il suo manifesto li elenca.
+- **Un nome di slot che il tema non espone** stampa un avviso di build e
+  viene ignorato. Non fa mai fallire il build, quindi cambiare tema è sicuro.
+
+Renderizzare uno slot dal tuo layout:
+
+```html
+#renderSlot( "footer" )#
+```
+
+### Manifesto del tema (`theme.json`)
+
+Un file opzionale alla radice della cartella di un tema. Tutti e 10 i temi
+integrati ne includono uno.
+
+```json title="resources/themes/bootstrap/theme.json"
+{
+  "slug": "bootstrap",
+  "name": "Bootstrap",
+  "slots": ["head-extra", "announcement-bar", "header", "footer", "sidebar-bottom"]
+}
+```
+
+- `slug` deve essere uguale al nome della cartella del tema; una
+  discrepanza fa fallire il build con `BxSites.InvalidTheme`.
+- `slots` elenca i nomi degli slot che il layout del tema renderizza, ognuno
+  con lettere minuscole, cifre e trattini. Con un manifesto, una chiamata a
+  `renderSlot()` per un nome non elencato e un file di slot di
+  sovrascrittura che il tema non espone stampano entrambi un avviso.
+- Senza un manifesto un tema funziona come prima; i nomi degli slot non
+  vengono controllati.
+
+### Layout impliciti
+
+Invece di ripetere `layout: landing` nel frontmatter di ogni pagina,
+assegna un layout a un insieme di pagine per percorso in `bxsites.yaml`.
+Funziona come i layout impliciti di ColdBox.
+
+```yaml title="bxsites.yaml"
+layouts:
+  - layout: landing
+    match: ["marketing/**", "pricing.md"]
+  - layout: post
+    match: "blog/posts/**"
+```
+
+- `layout` è un nome di template semplice, risolto come un `layout:` del
+  frontmatter (`.overrides/<theme>/<name>.bxm`, poi quello del tema, poi
+  il predefinito).
+- `match` è un glob o una lista. Le regole vengono provate in ordine e
+  **vince la prima corrispondenza**.
+- **Il frontmatter `layout:` proprio di una pagina vince sempre** su una
+  regola.
+- I glob vengono confrontati con il percorso della pagina relativo alla
+  content root, con barre normali e distinguendo maiuscole e minuscole: `*`
+  è qualsiasi carattere dentro un segmento, `**` attraversa i segmenti
+  (`**/` corrisponde anche a zero cartelle), `?` è un carattere, e una `/`
+  finale significa tutto ciò che sta sotto quella cartella. `marketing/**`
+  corrisponde a `marketing/a.md` e `marketing/deep/b.md`, non a
+  `marketing.md`.
+- Le regole si applicano alle pagine della documentazione e agli articoli
+  del blog (il percorso di un articolo è `blog/posts/<file>`). Le pagine
+  generate (elenchi del blog, tag, ricerca, 404) mantengono i propri
+  template.
+- Le stesse regole si applicano negli alberi versionati e tradotti,
+  confrontate con il percorso all'interno di quell'albero.
 
 ## Scrivere un tema da zero
 

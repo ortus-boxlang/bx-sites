@@ -494,6 +494,26 @@ Fallisce invece di sovrascrivere un `.theme/` già esistente. Vedi
 [Temi](guides/themes.md) per il contratto di sovrascrittura
 (`layout.bxm` + `page.bxm`).
 
+## `layout:new`
+
+Genera un layout con nome copiando un template del tema attivo nella
+cartella `.overrides/<theme>/` del progetto, pronto da modificare e da
+selezionare con `layout: <name>` nel frontmatter di una pagina o con una
+[regola `layouts:`](guides/themes.md#layout-impliciti).
+
+```bash title="Utilizzo"
+bxSites layout:new --name=landing [--from=layout] [--theme=bootstrap]
+```
+
+- `--name` (obbligatorio) - il nome del nuovo layout, un nome di template semplice come `landing`
+- `--from` - quale template del tema copiare, senza estensione; il valore predefinito è `layout` (il guscio esterno)
+- `--theme` - il tema da cui copiare; il valore predefinito è `theme.name` del progetto
+
+Fallisce invece di sovrascrivere un file già esistente, ed elenca i
+template disponibili quando `--from` ne nomina uno che il tema non ha. Un
+progetto con un `.theme/` piatto completo ottiene invece il file lì. Vedi
+[Sovrascritture del progetto](guides/themes.md#sovrascritture-del-progetto).
+
 ## `install:theme`
 
 Scarica un tema pubblicato da ForgeBox nel proprio `.themes/<name>/`,

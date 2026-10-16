@@ -149,7 +149,7 @@ Themes</h1>
 
 
 
-	<details class="bxsites-toc-mobile dsrs-toc--mobile"><summary class="dsrs-toc--mobile__summary"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> Auf dieser Seite</summary><ul><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#integriert">Integriert</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-veröffentlichtes-theme-installieren">Ein ver&ouml;ffentlichtes Theme installieren</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#air-gappedoffline-websites">Air-gapped&#x2f;Offline-Websites</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#der-themeprovider-vertrag">Der ThemeProvider -Vertrag</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#mehrere-layouts-pro-seite">Mehrere Layouts pro Seite</a></li><li class="dsrs-toc__item dsrs-toc__item--3"><a href="#welches-layoutbody-gerade-aktiv-ist">Welches Layout&#x2f;Body gerade aktiv ist</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben">Farben anpassen, ohne ein Theme zu &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#homepage-hero-banner">Homepage-Hero-Banner</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-überschreiben">Ein Theme &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-von-grund-auf-schreiben">Ein Theme von Grund auf schreiben</a></li></ul></details>
+	<details class="bxsites-toc-mobile dsrs-toc--mobile"><summary class="dsrs-toc--mobile__summary"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> Auf dieser Seite</summary><ul><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#integriert">Integriert</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-veröffentlichtes-theme-installieren">Ein ver&ouml;ffentlichtes Theme installieren</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#air-gappedoffline-websites">Air-gapped&#x2f;Offline-Websites</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#der-themeprovider-vertrag">Der ThemeProvider -Vertrag</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#mehrere-layouts-pro-seite">Mehrere Layouts pro Seite</a></li><li class="dsrs-toc__item dsrs-toc__item--3"><a href="#welches-layoutbody-gerade-aktiv-ist">Welches Layout&#x2f;Body gerade aktiv ist</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben">Farben anpassen, ohne ein Theme zu &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#homepage-hero-banner">Homepage-Hero-Banner</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-überschreiben">Ein Theme &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#projekt-überschreibungen">Projekt-&Uuml;berschreibungen</a></li><li class="dsrs-toc__item dsrs-toc__item--3"><a href="#slots">Slots</a></li><li class="dsrs-toc__item dsrs-toc__item--3"><a href="#theme-manifest-themejson">Theme-Manifest &#x28; theme.json &#x29;</a></li><li class="dsrs-toc__item dsrs-toc__item--3"><a href="#implizite-layouts">Implizite Layouts</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-von-grund-auf-schreiben">Ein Theme von Grund auf schreiben</a></li></ul></details>
 
 				<div class="dsrs-content-body">
 				<h1 id="themes"><a href="#themes" id="themes" name="themes" class="anchor"></a>Themes</h1>
@@ -403,6 +403,11 @@ einzelnen Blogbeitrag, weiterhin gerendert unter dem normalen
 nicht hat.</li>
 <li><strong><code>assets/</code></strong> (optional) - Theme-CSS/JS, zur Build-Zeit nach
 <code>site/assets/theme/</code> kopiert.</li>
+<li><strong><code>slots/&lt;name&gt;.bxm</code></strong> (optional) - der Standardinhalt des Themes für einen
+<a href="#slots">Slot</a>, eingebunden überall dort, wo sein <code>layout.bxm</code>
+<code>renderSlot( &quot;&lt;name&gt;&quot; )</code> aufruft.</li>
+<li><strong><code>theme.json</code></strong> (optional) - das Manifest des Themes: sein <a href="#theme-manifest-themejson">Slug und die
+Slots, die es bereitstellt</a>.</li>
 </ul>
 <p><code>variables.page.editUrl</code>/<code>.lastUpdated</code> (leere Zeichenketten, wenn nicht
 konfiguriert) und <code>variables.siteConfig.repo</code>/<code>.social</code>/<code>.footer</code> sind
@@ -448,27 +453,32 @@ aussehen kann als der Rest der Website, während dieselbe Chrome und
 Assets des Themes weiterverwendet werden. Zwei unabhängige
 Auflösungsketten:</p>
 <ul>
-<li><strong>Äußere Hülle</strong> - immer <code>layout.bxm</code>, außer bei den eigenen
-Listen-/Kategorie-/Archiv-/Autoren-/Statistikseiten des Blogs, die
-<code>blog.bxm</code> verwenden, wenn das aktive Theme es hat. Diese folgt dem
-Inhaltstyp - dafür gibt es keinen Frontmatter-Schlüssel.</li>
+<li><strong>Äußere Hülle</strong> - standardmäßig <code>layout.bxm</code>. Die eigenen
+Listen-/Kategorie-/Archiv-/Autoren-/Statistikseiten des Blogs verwenden
+<code>blog.bxm</code>, wenn das aktive Theme es hat. Eine Seite, die <code>layout:</code> in
+ihrem Frontmatter setzt (oder auf eine Regel für
+<a href="#implizite-layouts">implizite Layouts</a> passt), wird stattdessen über
+<code>&lt;name&gt;.bxm</code> gerendert, sofern das aktive Theme oder die
+<a href="#projekt-überschreibungen">Überschreibungen</a> des Projekts eine haben.</li>
 <li><strong>Body</strong> - standardmäßig <code>page.bxm</code>. Ein Blogbeitrag verwendet
-<code>blog-page.bxm</code>, wenn das aktive Theme es hat. So oder so gewinnt immer
-das eigene Frontmatter einer Seite, wenn eines gesetzt ist:</li>
+<code>blog-page.bxm</code>, wenn das aktive Theme es hat. Eine Hülle bindet den Body
+mit <code>include &quot;#variables.themeDir#/#variables.bodyFile#&quot;</code> ein.</li>
 </ul>
 <pre data-bxsites-title="docs&#x2f;marketing&#x2f;press-release.md"><code class="language-markdown">---
 title: We raised a Series A
 layout: press-release
 ---
 </code></pre>
-<p><code>layout: press-release</code> rendert den Body dieser einen Seite über
-<code>.theme/press-release.bxm</code> (oder das eigene des aktiven integrierten
-Themes, falls vorhanden) statt über <code>page.bxm</code> - weiterhin innerhalb der
-normalen <code>layout.bxm</code>-Hülle der Website. Ein <code>layout:</code>, das eine Datei
-benennt, die das aktive Theme nicht hat, fällt auf <code>page.bxm</code> zurück,
-statt den Build fehlschlagen zu lassen, sodass ein Themewechsel niemals
-eine Seite bricht, die das eigene benutzerdefinierte Layout eines anderen
-Themes benannt hat.</p>
+<p><code>layout: press-release</code> rendert diese eine Seite über
+<code>.overrides/&lt;theme&gt;/press-release.bxm</code> (oder das eigene <code>press-release.bxm</code>
+des aktiven Themes, falls vorhanden) anstelle von <code>layout.bxm</code>. Diese Datei
+ist eine vollständige Seite: Kopiere <code>layout.bxm</code>, um mit der eigenen Chrome
+des Themes zu starten (<code>bxSites layout:new press-release</code> tut genau das),
+oder schreibe eine minimale und binde den Body per <code>include</code> dort ein, wo er
+hingehört. Ein <code>layout:</code>, das eine Datei benennt, die niemand bereitstellt,
+fällt auf <code>layout.bxm</code>/<code>page.bxm</code> zurück, statt den Build fehlschlagen zu
+lassen, sodass ein Themewechsel niemals eine Seite bricht, die das eigene
+benutzerdefinierte Layout eines anderen Themes benannt hat.</p>
 <p><code>bootstrap</code> liefert <code>blog.bxm</code>/<code>blog-page.bxm</code> als funktionierendes
 Beispiel zum Kopieren mit; die anderen integrierten Themes (noch) nicht
 und fallen für Blog-Inhalte auf <code>layout.bxm</code>/<code>page.bxm</code> zurück, genau wie
@@ -671,6 +681,137 @@ eine reine CSS-Anpassung ohne <code>.bxm</code>, nutze stattdessen
 legt sich über das Theme, das <code>bxsites.yaml</code> benennt, ganz ohne
 <code>.theme/</code>-Ordner. <code>.theme/</code> ist für den Fall, dass du auch das Markup
 selbst ändern musst, siehe als Nächstes.</p>
+<h2 id="projekt-überschreibungen"><a href="#projekt-überschreibungen" id="projekt-überschreibungen" name="projekt-überschreibungen" class="anchor"></a>Projekt-Überschreibungen</h2>
+<p>Ein <code>.theme/</code>-Ordner ersetzt ein Theme vollständig. Um nur ein paar Dinge zu
+ändern und alles andere zu behalten, einschließlich künftiger Theme-Updates,
+lege die Änderungen stattdessen in <code>.overrides/&lt;theme&gt;/</code> innerhalb des
+Content-Root ab. <code>&lt;theme&gt;</code> ist der Slug des Themes, der Wert von
+<code>theme.name</code>:</p>
+<pre data-bxsites-title="Project structure"><code class="language-text">docs/
+└── .overrides/
+    └── bootstrap/                  ← applies only while theme.name is bootstrap
+        ├── home.bxm                 ← a layout, used by `layout: home`
+        ├── page.bxm                 ← replaces the theme's page.bxm
+        ├── assets/
+        │   └── logo.svg             ← replaces (or adds) one theme asset
+        └── slots/
+            └── footer.bxm           ← fills the theme's `footer` slot
+</code></pre>
+<p>Jede Datei in <code>.overrides/&lt;theme&gt;/</code> wird über das Theme gelegt: Eine Datei
+mit demselben Namen ersetzt die des Themes, alles andere wird hinzugefügt.
+Das Theme selbst wird nie verändert. Zur Build-Zeit wird das Ergebnis in
+<code>.cache/theme/&lt;theme&gt;/</code> zusammengeführt (von <code>bxSites clean</code> entfernt), und
+dieser zusammengeführte Ordner wird gerendert, sodass <code>themeAssetUrl()</code>,
+Includes und Fingerprinting genauso funktionieren wie bei einem normalen
+Theme.</p>
+<ul>
+<li><strong>Ein Themewechsel</strong> wechselt die Überschreibungen mit. Ein
+<code>material</code>-Build ignoriert <code>.overrides/bootstrap/</code>; gib ihm sein eigenes
+<code>.overrides/material/</code>.</li>
+<li><strong>Ein Theme-Name muss ein Slug sein</strong>: Kleinbuchstaben, Ziffern und
+Bindestriche, der Wert, den BoxLangs <code>slugify()</code> dafür zurückgibt
+(<code>bxSites</code> schlägt andernfalls mit einem Vorschlag fehl). Er benennt den
+Ordner des Themes, seine <code>.themes/&lt;slug&gt;/</code>-Installation und seinen
+<code>.overrides/&lt;slug&gt;/</code>-Ordner.</li>
+<li><strong>Auflösungsreihenfolge für jede Datei</strong>: ein vollständiges flaches
+<code>.theme/</code> (hat das Projekt eines, gewinnt es auf ganzer Linie), dann
+<code>.overrides/&lt;theme&gt;/</code>, dann ein installiertes <code>.themes/&lt;theme&gt;/</code>, dann das
+integrierte Theme.</li>
+<li><code>.overrides/</code> ist ein Punkt-Ordner und wird daher nie als Seiten
+veröffentlicht.</li>
+</ul>
+<p><code>bxSites layout:new &lt;name&gt;</code> legt ein Layout in diesem Ordner an.</p>
+<h3 id="slots"><a href="#slots" id="slots" name="slots" class="anchor"></a>Slots</h3>
+<p>Ein Slot ist ein benanntes Loch in der <code>layout.bxm</code> eines Themes, das ein
+Projekt füllen kann, ohne das Layout zu kopieren. Lege <code>slots/&lt;name&gt;.bxm</code> im
+Überschreibungsordner an:</p>
+<pre data-bxsites-title="docs&#x2f;.overrides&#x2f;bootstrap&#x2f;slots&#x2f;announcement-bar.bxm"><code class="language-html">&lt;bx:output&gt;
+&lt;div class=&quot;alert alert-info text-center mb-0&quot;&gt;
+	v1.0 is out. &lt;a href=&quot;#variables.basePath#releases/1.0.md&quot;&gt;Read the notes&lt;/a&gt;
+&lt;/div&gt;
+&lt;/bx:output&gt;
+</code></pre>
+<p>Jedes integrierte Theme stellt dieselben fünf Slots bereit:</p>
+<div class="bxsites-table-wrap"><table class="table">
+<thead>
+<tr><th>Slot</th><th>Wo er gerendert wird</th><th>Theme-Standard</th></tr>
+</thead>
+<tbody>
+<tr><td><code>head-extra</code></td><td>Direkt vor <code>&lt;/head&gt;</code>: zusätzliche <code>&lt;meta&gt;</code>, <code>&lt;link&gt;</code>, Skripte</td><td>leer</td></tr>
+<tr><td><code>announcement-bar</code></td><td>Direkt nach <code>&lt;body&gt;</code>, oberhalb der Kopfzeile</td><td>leer</td></tr>
+<tr><td><code>header</code></td><td>Die obere Navigationsleiste</td><td>die eigene Kopfzeile des Themes</td></tr>
+<tr><td><code>footer</code></td><td>Die Fußzeile der Seite</td><td>die eigene Fußzeile des Themes (bei <code>footer: true</code>)</td></tr>
+<tr><td><code>sidebar-bottom</code></td><td>Unterhalb des Navigationsbaums in der Seitenleiste</td><td>leer</td></tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Eine Überschreibung ersetzt den Standard.</strong> Bei <code>header</code> und <code>footer</code>
+bedeutet das, das Markup des Themes zu ersetzen; bei den anderen füllt sie
+einen leeren Slot. Lösche die Datei, um den Standard zurückzubekommen.</li>
+<li><strong>Eine Slot-Datei ist ein Template.</strong> Sie sieht dieselben Variablen wie ein
+Layout (<code>page</code>, <code>nav</code>, <code>siteConfig</code>, <code>basePath</code>, <code>data</code>, ...) und umschließt
+ihr Markup, wie <code>layout.bxm</code>, mit <code>&lt;bx:output&gt;</code>, damit <code>#expressions#</code>
+gerendert werden.</li>
+<li><strong>Ein Theme kann mehr Slots bereitstellen</strong> als die fünf; sein Manifest
+listet sie auf.</li>
+<li><strong>Ein Slot-Name, den das Theme nicht bereitstellt,</strong> gibt eine
+Build-Warnung aus und wird ignoriert. Er lässt den Build nie fehlschlagen,
+sodass ein Themewechsel unbedenklich ist.</li>
+</ul>
+<p>Einen Slot aus deinem eigenen Layout rendern:</p>
+<pre><code class="language-html">#renderSlot( &quot;footer&quot; )#
+</code></pre>
+<h3 id="theme-manifest-themejson"><a href="#theme-manifest-themejson" id="theme-manifest-themejson" name="theme-manifest-themejson" class="anchor"></a>Theme-Manifest (<code>theme.json</code>)</h3>
+<p>Eine optionale Datei im Wurzelverzeichnis eines Theme-Ordners. Alle 10
+integrierten Themes liefern eine mit.</p>
+<pre data-bxsites-title="resources&#x2f;themes&#x2f;bootstrap&#x2f;theme.json"><code class="language-json">{
+  &quot;slug&quot;: &quot;bootstrap&quot;,
+  &quot;name&quot;: &quot;Bootstrap&quot;,
+  &quot;slots&quot;: [&quot;head-extra&quot;, &quot;announcement-bar&quot;, &quot;header&quot;, &quot;footer&quot;, &quot;sidebar-bottom&quot;]
+}
+</code></pre>
+<ul>
+<li><code>slug</code> muss dem Ordnernamen des Themes entsprechen; eine Abweichung lässt
+den Build mit <code>BxSites.InvalidTheme</code> fehlschlagen.</li>
+<li><code>slots</code> listet die Slot-Namen auf, die das Layout des Themes rendert, jeweils
+Kleinbuchstaben, Ziffern und Bindestriche. Mit einem Manifest geben sowohl
+ein <code>renderSlot()</code>-Aufruf für einen nicht aufgeführten Namen als auch eine
+Überschreibungs-Slot-Datei, die das Theme nicht bereitstellt, eine Warnung
+aus.</li>
+<li>Ohne Manifest funktioniert ein Theme wie bisher; Slot-Namen werden nicht
+geprüft.</li>
+</ul>
+<h3 id="implizite-layouts"><a href="#implizite-layouts" id="implizite-layouts" name="implizite-layouts" class="anchor"></a>Implizite Layouts</h3>
+<p>Statt <code>layout: landing</code> in das Frontmatter jeder Seite zu wiederholen, weise
+einer Gruppe von Seiten in <code>bxsites.yaml</code> per Pfad ein Layout zu. Das
+funktioniert wie die impliziten Layouts von ColdBox.</p>
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">layouts:
+  - layout: landing
+    match: [&quot;marketing/**&quot;, &quot;pricing.md&quot;]
+  - layout: post
+    match: &quot;blog/posts/**&quot;
+</code></pre>
+<ul>
+<li><code>layout</code> ist ein bloßer Template-Name, aufgelöst wie ein
+Frontmatter-<code>layout:</code> (<code>.overrides/&lt;theme&gt;/&lt;name&gt;.bxm</code>, dann das des
+Themes, dann der Standard).</li>
+<li><code>match</code> ist ein Glob oder eine Liste davon. Die Regeln werden der Reihe
+nach geprüft und <strong>der erste Treffer gewinnt</strong>.</li>
+<li><strong>Das eigene <code>layout:</code>-Frontmatter einer Seite gewinnt immer</strong> gegenüber
+einer Regel.</li>
+<li>Globs werden gegen den Pfad der Seite relativ zum Content-Root abgeglichen,
+mit Schrägstrichen und unter Beachtung der Groß-/Kleinschreibung: <code>*</code> ist
+eine beliebige Zeichenfolge innerhalb eines Segments, <code>**</code> überschreitet
+Segmente (<code>**/</code> passt auch auf null Ordner), <code>?</code> ist ein einzelnes Zeichen,
+und ein abschließendes <code>/</code> bedeutet alles unterhalb dieses Ordners.
+<code>marketing/**</code> passt auf <code>marketing/a.md</code> und <code>marketing/deep/b.md</code>, nicht
+auf <code>marketing.md</code>.</li>
+<li>Regeln gelten für Doku-Seiten und Blogbeiträge (der Pfad eines Beitrags ist
+<code>blog/posts/&lt;file&gt;</code>). Generierte Seiten (Blog-Listen, Tags, Suche, 404)
+behalten ihre eigenen Templates.</li>
+<li>Dieselben Regeln gelten in versionierten und übersetzten Bäumen, abgeglichen
+gegen den Pfad innerhalb dieses Baums.</li>
+</ul>
 <h2 id="ein-theme-von-grund-auf-schreiben"><a href="#ein-theme-von-grund-auf-schreiben" id="ein-theme-von-grund-auf-schreiben" name="ein-theme-von-grund-auf-schreiben" class="anchor"></a>Ein Theme von Grund auf schreiben</h2>
 <p>Ein Theme braucht nur die beiden erforderlichen Dateien, hier also ein
 wirklich minimales Beispiel - kein Bootstrap/Tailwind, kein Dunkelmodus,
@@ -779,7 +920,7 @@ Theme nicht stillschweigend veraltet.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/versions/1.0.x/i18n/de/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/docusaurus/versions/1.0.x/de/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Oct 16, 2026, 2&#x3a;01&#x3a;32 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Themes&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fdocusaurus%2Fversions%2F1.0.x%2Fde%2Fguides%2Fthemes%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/versions/1.0.x/i18n/de/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/docusaurus/versions/1.0.x/de/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Oct 16, 2026, 4&#x3a;17&#x3a;35 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Themes&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fdocusaurus%2Fversions%2F1.0.x%2Fde%2Fguides%2Fthemes%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
 
 			</article>
 
@@ -813,7 +954,7 @@ Theme nicht stillschweigend veraltet.</p>
 		</main>
 
 		<aside class="dsrs-toc-sidebar">
-			<nav class="dsrs-toc bxsites-toc" aria-label="Auf dieser Seite"><div class="dsrs-toc__title bxsites-toc__title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> Auf dieser Seite</div><ul><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#integriert">Integriert</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-veröffentlichtes-theme-installieren">Ein ver&ouml;ffentlichtes Theme installieren</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#air-gappedoffline-websites">Air-gapped&#x2f;Offline-Websites</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#der-themeprovider-vertrag">Der ThemeProvider -Vertrag</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#mehrere-layouts-pro-seite">Mehrere Layouts pro Seite</a></li><li class="dsrs-toc__item dsrs-toc__item--3"><a href="#welches-layoutbody-gerade-aktiv-ist">Welches Layout&#x2f;Body gerade aktiv ist</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben">Farben anpassen, ohne ein Theme zu &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#homepage-hero-banner">Homepage-Hero-Banner</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-überschreiben">Ein Theme &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-von-grund-auf-schreiben">Ein Theme von Grund auf schreiben</a></li></ul></nav>
+			<nav class="dsrs-toc bxsites-toc" aria-label="Auf dieser Seite"><div class="dsrs-toc__title bxsites-toc__title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> Auf dieser Seite</div><ul><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#integriert">Integriert</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-veröffentlichtes-theme-installieren">Ein ver&ouml;ffentlichtes Theme installieren</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#air-gappedoffline-websites">Air-gapped&#x2f;Offline-Websites</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#der-themeprovider-vertrag">Der ThemeProvider -Vertrag</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#mehrere-layouts-pro-seite">Mehrere Layouts pro Seite</a></li><li class="dsrs-toc__item dsrs-toc__item--3"><a href="#welches-layoutbody-gerade-aktiv-ist">Welches Layout&#x2f;Body gerade aktiv ist</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#farben-anpassen-ohne-ein-theme-zu-überschreiben">Farben anpassen, ohne ein Theme zu &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#homepage-hero-banner">Homepage-Hero-Banner</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-überschreiben">Ein Theme &uuml;berschreiben</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#projekt-überschreibungen">Projekt-&Uuml;berschreibungen</a></li><li class="dsrs-toc__item dsrs-toc__item--3"><a href="#slots">Slots</a></li><li class="dsrs-toc__item dsrs-toc__item--3"><a href="#theme-manifest-themejson">Theme-Manifest &#x28; theme.json &#x29;</a></li><li class="dsrs-toc__item dsrs-toc__item--3"><a href="#implizite-layouts">Implizite Layouts</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#ein-theme-von-grund-auf-schreiben">Ein Theme von Grund auf schreiben</a></li></ul></nav>
 		</aside>
 
 	</div>

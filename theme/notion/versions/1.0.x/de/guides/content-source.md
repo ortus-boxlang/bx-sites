@@ -171,11 +171,14 @@ vollständigen Referenzeintrag.
 
 Die eigene Theme-Überschreibung eines Projekts - ein handgeschriebenes
 `.theme/` (siehe
-[Themes: Ein Theme überschreiben](themes.md#ein-theme-überschreiben))
+[Themes: Ein Theme überschreiben](themes.md#ein-theme-überschreiben)), ein
+`.overrides/<theme>/` pro Theme (siehe
+[Themes: Projekt-Überschreibungen](themes.md#projekt-überschreibungen))
 oder ein über `install:theme` installiertes `.themes/<name>/` (siehe
 [Themes: Ein veröffentlichtes Theme installieren](themes.md#ein-veröffentlichtes-theme-installieren))
 - lebt **innerhalb des aufgelösten Content-Root**, nicht im bloßen
-Projekt-Wurzelverzeichnis: `<contentRoot>/.theme/` und
+Projekt-Wurzelverzeichnis: `<contentRoot>/.theme/`,
+`<contentRoot>/.overrides/<theme>/` und
 `<contentRoot>/.themes/<name>/`, wobei `<contentRoot>` das ist, worauf
 `source` (oder die automatische Erkennung) auflöst - `docs/`, `src/`,
 ein eigener Ordnername, oder das Projekt-Wurzelverzeichnis selbst bei
@@ -192,7 +195,7 @@ my-project/
         └── page.bxm
 ```
 
-`.theme`/`.themes` innerhalb des Content-Root zu halten statt im bloßen
+`.theme`/`.overrides`/`.themes` innerhalb des Content-Root zu halten statt im bloßen
 Projekt-Wurzelverzeichnis zählt vor allem, sobald ein Repository mehr als
 eine Projekt-Wurzel enthält - siehe
 [Multi-Domain-Monorepos](multi-domain.md) für genau dieses Muster. Die

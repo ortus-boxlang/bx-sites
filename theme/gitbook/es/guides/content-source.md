@@ -174,11 +174,14 @@ entrada de referencia completa.
 
 La propia sobrescritura de tema de un proyecto - un `.theme/` escrito a
 mano (consulta
-[Temas: Sobrescribir un tema](themes.md#sobrescribir-un-tema)) o un
-`.themes/<name>/` instalado mediante `install:theme` (consulta
+[Temas: Sobrescribir un tema](themes.md#sobrescribir-un-tema)), un
+`.overrides/<theme>/` por tema (consulta
+[Temas: Sobrescrituras del proyecto](themes.md#sobrescrituras-del-proyecto)),
+o un `.themes/<name>/` instalado mediante `install:theme` (consulta
 [Temas: Instalar un tema publicado](themes.md#instalar-un-tema-publicado))
 - vive **dentro de la raíz de contenido resuelta**, no en la raíz misma
-del proyecto: `<raízDeContenido>/.theme/` y
+del proyecto: `<raízDeContenido>/.theme/`,
+`<raízDeContenido>/.overrides/<theme>/` y
 `<raízDeContenido>/.themes/<name>/`, donde `<raízDeContenido>` es donde
 sea que resuelva `source` (o la autodetección) - `docs/`, `src/`, un
 nombre de carpeta personalizado, o la propia raíz del proyecto para
@@ -195,7 +198,7 @@ my-project/
         └── page.bxm
 ```
 
-Mantener `.theme`/`.themes` dentro de la raíz de contenido en lugar de en
+Mantener `.theme`/`.overrides`/`.themes` dentro de la raíz de contenido en lugar de en
 la raíz misma del proyecto importa sobre todo en cuanto un repositorio
 tiene más de una raíz de proyecto - consulta
 [Monorepos Multi-Dominio](multi-domain.md) para ese patrón. La propia

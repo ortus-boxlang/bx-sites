@@ -205,7 +205,7 @@ Left unset, `docs/` then `src/` are auto-detected; if neither exists on disk
 either, the build fails loudly rather than guessing. `bxSites new` always
 writes this explicitly, so a scaffolded project is never ambiguous. See
 [Content Source](guides/content-source.md) for the full picture, including
-`.theme`/`.themes` overrides living inside this folder and the
+`.theme`/`.themes`/`.overrides` folders living inside this folder and the
 [Multi-Domain Monorepo](guides/multi-domain.md) guide for running several
 independent project roots out of one repository.
 
@@ -273,11 +273,38 @@ for a `src/`-based project - see [`docs/` or `src/`](getting-started.md#add-page
 and it's copied through byte-for-byte instead of the generated one, on every
 build - the `robots` key above is ignored entirely once this file exists.
 
+## `layouts`
+
+Implicit layouts: assign a layout to every page whose path matches a glob,
+without repeating `layout:` in each page's frontmatter. Rules are tried in
+order and the first match wins; a page's own `layout:` frontmatter always
+wins over a rule.
+
+```yaml title="bxsites.yaml"
+layouts:
+  - layout: landing
+    match: ["marketing/**", "pricing.md"]
+  - layout: post
+    match: "blog/posts/**"
+```
+
+- `layout` - a bare template name such as `landing` (letters, digits, `-`,
+  `_`)
+- `match` - a glob, or a list of globs, matched against the page's path
+  relative to the content root
+
+Defaults to no rules. See
+[Implicit layouts](guides/themes.md#implicit-layouts) for the glob syntax.
+
 ## `theme`
 
 - `theme.name` - one of the built-in themes (`bootstrap`, `material`,
-  `tailwind`), or the name of a custom theme you provide via a `.theme/`
-  folder inside the content root (see [Themes](guides/themes.md))
+  `tailwind`, ...), or the name of an installed theme, or any name when you
+  provide a complete theme via a `.theme/` folder inside the content root
+  (see [Themes](guides/themes.md)). It must be a slug: lowercase letters,
+  digits and hyphens, the same value BoxLang's `slugify()` returns. A
+  project's changes to a theme live in `.overrides/<theme.name>/` (see
+  [Project overrides](guides/themes.md#project-overrides))
 - `theme.logo` - path/URL to an image shown next to the site name in the
   header brand mark (in place of the default "⚡" glyph) - a relative path
   (e.g. `"assets/logo.svg"`, resolved against `docs/assets/`) is prefixed

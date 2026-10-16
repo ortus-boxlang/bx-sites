@@ -205,7 +205,7 @@ en disco, la construcción falla de forma explícita en lugar de adivinar.
 `bxSites new` siempre lo escribe de forma explícita, así que un proyecto
 recién generado nunca es ambiguo. Consulta
 [Origen del Contenido](guides/content-source.md) para el panorama
-completo, incluyendo las sobrescrituras `.theme`/`.themes` que viven
+completo, incluyendo las carpetas `.theme`/`.themes`/`.overrides` que viven
 dentro de esta carpeta, y la guía
 [Monorepos Multi-Dominio](guides/multi-domain.md) para ejecutar varias
 raíces de proyecto independientes desde un solo repositorio.
@@ -281,12 +281,40 @@ basado en `src/` - consulta
 cual, byte a byte, en lugar del generado, en cada construcción - la clave
 `robots` de arriba se ignora por completo en cuanto existe este archivo.
 
+## `layouts`
+
+Layouts implícitos: asigna un layout a cada página cuya ruta coincida con
+un glob, sin repetir `layout:` en el frontmatter de cada página. Las reglas
+se prueban en orden y gana la primera coincidencia; el propio frontmatter
+`layout:` de una página siempre gana sobre una regla.
+
+```yaml title="bxsites.yaml"
+layouts:
+  - layout: landing
+    match: ["marketing/**", "pricing.md"]
+  - layout: post
+    match: "blog/posts/**"
+```
+
+- `layout` - un nombre simple de plantilla como `landing` (letras, dígitos,
+  `-`, `_`)
+- `match` - un glob, o una lista de globs, comparado con la ruta de la
+  página relativa a la raíz de contenido
+
+Por defecto no hay reglas. Consulta
+[Layouts implícitos](guides/themes.md#layouts-implícitos) para la sintaxis
+de los globs.
+
 ## `theme`
 
 - `theme.name` - uno de los temas incorporados (`bootstrap`, `material`,
-  `tailwind`), o el nombre de un tema personalizado que proporciones
-  mediante una carpeta `.theme/` dentro de la raíz de contenido (consulta
-  [Temas](guides/themes.md))
+  `tailwind`, ...), o el nombre de un tema instalado, o cualquier nombre
+  cuando proporcionas un tema completo mediante una carpeta `.theme/`
+  dentro de la raíz de contenido (consulta [Temas](guides/themes.md)). Debe
+  ser un slug: letras minúsculas, dígitos y guiones, el mismo valor que
+  devuelve `slugify()` de BoxLang. Los cambios de un proyecto a un tema
+  viven en `.overrides/<theme.name>/` (consulta
+  [Sobrescrituras del proyecto](guides/themes.md#sobrescrituras-del-proyecto))
 - `theme.logo` - ruta/URL a una imagen mostrada junto al nombre del sitio
   en la marca de la cabecera (en lugar del glifo "⚡" por defecto) - una
   ruta relativa (por ejemplo `"assets/logo.svg"`, resuelta contra

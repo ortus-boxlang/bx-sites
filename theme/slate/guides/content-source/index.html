@@ -261,11 +261,13 @@ names (this module's own <code>docs/license.md</code>, for one), so if your
 reference entry.</p>
 <h2 id="where-a-theme-override-lives"><a href="#where-a-theme-override-lives" id="where-a-theme-override-lives" name="where-a-theme-override-lives" class="anchor"></a>Where a theme override lives</h2>
 <p>A project's own theme override - a hand-authored <code>.theme/</code> (see
-<a href="/theme/slate/guides/themes/index.html#overriding-a-theme">Themes: Overriding a theme</a>) or an
-<code>install:theme</code>-installed <code>.themes/&lt;name&gt;/</code> (see
+<a href="/theme/slate/guides/themes/index.html#overriding-a-theme">Themes: Overriding a theme</a>), a per-theme
+<code>.overrides/&lt;theme&gt;/</code> (see <a href="/theme/slate/guides/themes/index.html#project-overrides">Themes: Project overrides</a>),
+or an <code>install:theme</code>-installed <code>.themes/&lt;name&gt;/</code> (see
 <a href="/theme/slate/guides/themes/index.html#installing-a-published-theme">Themes: Installing a published theme</a>) -
 lives <strong>inside the resolved content root</strong>, not at the bare project root:
-<code>&lt;contentRoot&gt;/.theme/</code> and <code>&lt;contentRoot&gt;/.themes/&lt;name&gt;/</code>, where
+<code>&lt;contentRoot&gt;/.theme/</code>, <code>&lt;contentRoot&gt;/.overrides/&lt;theme&gt;/</code> and
+<code>&lt;contentRoot&gt;/.themes/&lt;name&gt;/</code>, where
 <code>&lt;contentRoot&gt;</code> is wherever <code>source</code> (or auto-detection) resolves to -
 <code>docs/</code>, <code>src/</code>, a custom folder name, or the project root itself for
 <code>source: .</code>.</p>
@@ -278,7 +280,7 @@ lives <strong>inside the resolved content root</strong>, not at the bare project
         ├── layout.bxm
         └── page.bxm
 </code></pre>
-<p>Keeping <code>.theme</code>/<code>.themes</code> inside the content root rather than at the
+<p>Keeping <code>.theme</code>/<code>.overrides</code>/<code>.themes</code> inside the content root rather than at the
 bare project root matters most once a repository has more than one
 project root in it - see
 <a href="/theme/slate/guides/multi-domain/index.html">Multi-Domain Monorepos</a> for that pattern. Each
@@ -288,7 +290,7 @@ content it themes, with no question of which domain a bare top-level
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/content-source.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/theme/slate/guides/content-source.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Oct 16, 2026, 2&#x3a;01&#x3a;32 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Content%20Source&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fslate%2Fguides%2Fcontent-source%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/content-source.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/theme/slate/guides/content-source.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Oct 16, 2026, 4&#x3a;17&#x3a;35 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Content%20Source&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fslate%2Fguides%2Fcontent-source%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
 
 			</article>
 

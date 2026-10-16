@@ -213,7 +213,7 @@ keiner von beiden, schlägt der Build laut fehl, statt zu raten.
 `bxSites new` schreibt diesen Schlüssel immer explizit, sodass ein
 gescaffoldetes Projekt nie mehrdeutig ist. Siehe
 [Content-Quelle](guides/content-source.md) für das vollständige Bild,
-einschließlich der `.theme`/`.themes`-Überschreibungen, die innerhalb
+einschließlich der `.theme`/`.themes`/`.overrides`-Ordner, die innerhalb
 dieses Ordners leben, sowie die Anleitung
 [Multi-Domain-Monorepo](guides/multi-domain.md) für den Betrieb mehrerer
 unabhängiger Projekt-Wurzeln aus einem einzigen Repository.
@@ -289,13 +289,41 @@ byte-für-byte durchgereicht statt der generierten, bei jedem Build - der
 `robots`-Schlüssel oben wird vollständig ignoriert, sobald diese Datei
 existiert.
 
+## `layouts`
+
+Implizite Layouts: Weise jeder Seite, deren Pfad auf einen Glob passt, ein
+Layout zu, ohne `layout:` im Frontmatter jeder Seite zu wiederholen. Die
+Regeln werden der Reihe nach geprüft und der erste Treffer gewinnt; das
+eigene `layout:`-Frontmatter einer Seite gewinnt immer gegenüber einer Regel.
+
+```yaml title="bxsites.yaml"
+layouts:
+  - layout: landing
+    match: ["marketing/**", "pricing.md"]
+  - layout: post
+    match: "blog/posts/**"
+```
+
+- `layout` - ein bloßer Template-Name wie `landing` (Buchstaben, Ziffern,
+  `-`, `_`)
+- `match` - ein Glob oder eine Liste von Globs, abgeglichen gegen den Pfad
+  der Seite relativ zum Content-Root
+
+Standardmäßig keine Regeln. Siehe
+[Implizite Layouts](guides/themes.md#implizite-layouts) für die Glob-Syntax.
+
 ## `theme`
 
 - `theme.name` - eines der integrierten Themes (`bootstrap`, `material`,
   `tailwind`, `docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`,
-  `gitbook`, `notion`) oder der Name eines eigenen Themes, das du über
-  einen `.theme/`-Ordner innerhalb des Content-Root bereitstellst (siehe
-  [Themes](guides/themes.md))
+  `gitbook`, `notion`) oder der Name eines installierten Themes, oder ein
+  beliebiger Name, wenn du ein vollständiges Theme über einen
+  `.theme/`-Ordner innerhalb des Content-Root bereitstellst (siehe
+  [Themes](guides/themes.md)). Er muss ein Slug sein: Kleinbuchstaben,
+  Ziffern und Bindestriche, derselbe Wert, den BoxLangs `slugify()`
+  zurückgibt. Die Änderungen eines Projekts an einem Theme leben in
+  `.overrides/<theme.name>/` (siehe
+  [Projekt-Überschreibungen](guides/themes.md#projekt-überschreibungen))
 - `theme.logo` - Pfad/URL zu einem Bild, das neben dem Website-Namen in der
   Kopfzeilen-Marke angezeigt wird (anstelle des standardmäßigen
   "⚡"-Symbols) - ein relativer Pfad (z. B. `"assets/logo.svg"`, aufgelöst

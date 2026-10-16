@@ -509,6 +509,26 @@ Fails rather than overwriting an existing `.theme/`. See
 [Themes](guides/themes.md) for the override contract (`layout.bxm` +
 `page.bxm`).
 
+## `layout:new`
+
+Scaffold a named layout by copying a template of the active theme into the
+project's `.overrides/<theme>/` folder, ready to edit and select with
+`layout: <name>` in a page's frontmatter or a [`layouts:`
+rule](guides/themes.md#implicit-layouts).
+
+```bash title="Usage"
+bxSites layout:new --name=landing [--from=layout] [--theme=bootstrap]
+```
+
+- `--name` (required) - the new layout's name, a bare template name such as `landing`
+- `--from` - which template of the theme to copy, without extension; defaults to `layout` (the outer shell)
+- `--theme` - the theme to copy from; defaults to the project's `theme.name`
+
+Fails rather than overwriting an existing file, and lists the available
+templates when `--from` names one the theme does not have. A project with a
+complete flat `.theme/` gets the file there instead. See
+[Project overrides](guides/themes.md#project-overrides).
+
 ## `install:theme`
 
 Download a published theme from ForgeBox into the project's own

@@ -9,7 +9,7 @@ ogImage: assets/og-image.png
 ---
 
 <!--
-	This page renders through resources/themes/bootstrap/home.bxm (the
+	This page renders through docs/.overrides/bootstrap/home.bxm (the
 	`layout: home` above), which hardcodes the whole page and never
 	includes this file's own rendered body - everything below is kept,
 	unused, as the starting point for reverting to the normal layout.bxm +

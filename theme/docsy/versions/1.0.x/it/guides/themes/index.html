@@ -153,7 +153,7 @@ Temi</h1>
 
 
 
-	<details class="bxsites-toc-mobile docsy-toc--mobile"><summary class="docsy-toc--mobile__summary"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> In questa pagina</summary><ul><li class="docsy-toc__item docsy-toc__item--2"><a href="#integrati">Integrati</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#installare-un-tema-pubblicato">Installare un tema pubblicato</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#siti-air-gappedoffline">Siti air-gapped&#x2f;offline</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#il-contratto-themeprovider">Il contratto ThemeProvider</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#più-layout-per-pagina">Pi&ugrave; layout per pagina</a></li><li class="docsy-toc__item docsy-toc__item--3"><a href="#quale-layoutcorpo-è-attivo">Quale layout&#x2f;corpo &egrave; attivo</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#personalizzare-i-colori-senza-sovrascrivere-un-tema">Personalizzare i colori senza sovrascrivere un tema</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#banner-hero-della-homepage">Banner hero della homepage</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#sovrascrivere-un-tema">Sovrascrivere un tema</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#scrivere-un-tema-da-zero">Scrivere un tema da zero</a></li></ul></details>
+	<details class="bxsites-toc-mobile docsy-toc--mobile"><summary class="docsy-toc--mobile__summary"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> In questa pagina</summary><ul><li class="docsy-toc__item docsy-toc__item--2"><a href="#integrati">Integrati</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#installare-un-tema-pubblicato">Installare un tema pubblicato</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#siti-air-gappedoffline">Siti air-gapped&#x2f;offline</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#il-contratto-themeprovider">Il contratto ThemeProvider</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#più-layout-per-pagina">Pi&ugrave; layout per pagina</a></li><li class="docsy-toc__item docsy-toc__item--3"><a href="#quale-layoutcorpo-è-attivo">Quale layout&#x2f;corpo &egrave; attivo</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#personalizzare-i-colori-senza-sovrascrivere-un-tema">Personalizzare i colori senza sovrascrivere un tema</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#banner-hero-della-homepage">Banner hero della homepage</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#sovrascrivere-un-tema">Sovrascrivere un tema</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#sovrascritture-del-progetto">Sovrascritture del progetto</a></li><li class="docsy-toc__item docsy-toc__item--3"><a href="#slot">Slot</a></li><li class="docsy-toc__item docsy-toc__item--3"><a href="#manifesto-del-tema-themejson">Manifesto del tema &#x28; theme.json &#x29;</a></li><li class="docsy-toc__item docsy-toc__item--3"><a href="#layout-impliciti">Layout impliciti</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#scrivere-un-tema-da-zero">Scrivere un tema da zero</a></li></ul></details>
 
 				<div class="docsy-content-body">
 				<h1 id="temi"><a href="#temi" id="temi" name="temi" class="anchor"></a>Temi</h1>
@@ -411,6 +411,11 @@ articolo del blog, comunque renderizzato sotto il normale <code>layout.bxm</code
 del tema. Ricade su <code>page.bxm</code> quando un tema non lo ha.</li>
 <li><strong><code>assets/</code></strong> (opzionale) - CSS/JS del tema, copiati in
 <code>site/assets/theme/</code> al momento del build.</li>
+<li><strong><code>slots/&lt;name&gt;.bxm</code></strong> (opzionale) - il contenuto predefinito del tema
+per uno <a href="#slot">slot</a>, incluso ovunque il suo <code>layout.bxm</code> chiami
+<code>renderSlot( &quot;&lt;name&gt;&quot; )</code>.</li>
+<li><strong><code>theme.json</code></strong> (opzionale) - il manifesto del tema: il suo <a href="#manifesto-del-tema-themejson">slug e gli
+slot che espone</a>.</li>
 </ul>
 <p><code>variables.page.editUrl</code>/<code>.lastUpdated</code> (stringhe vuote quando non
 configurati) e <code>variables.siteConfig.repo</code>/<code>.social</code>/<code>.footer</code> sono
@@ -457,24 +462,30 @@ avere un aspetto diverso dal resto del sito riutilizzando comunque il
 chrome e gli asset dello stesso tema. Due catene di risoluzione
 indipendenti:</p>
 <ul>
-<li><strong>Guscio esterno</strong> - sempre <code>layout.bxm</code>, tranne per le pagine di
-elenco/categoria/archivio/autore/statistiche del blog, che usano
-<code>blog.bxm</code> quando il tema attivo lo ha. Segue il tipo di contenuto -
-non c'è una chiave di frontmatter per questo.</li>
+<li><strong>Guscio esterno</strong> - <code>layout.bxm</code> di default. Le pagine di
+elenco/categoria/archivio/autore/statistiche del blog usano <code>blog.bxm</code>
+quando il tema attivo lo ha. Una pagina che imposta <code>layout:</code> nel proprio
+frontmatter (o che corrisponde a una regola di <a href="#layout-impliciti">layout
+implicito</a>) viene invece renderizzata tramite
+<code>&lt;name&gt;.bxm</code>, quando il tema attivo o le <a href="#sovrascritture-del-progetto">sovrascritture</a>
+del progetto ne hanno uno.</li>
 <li><strong>Corpo</strong> - <code>page.bxm</code> di default. Un articolo del blog usa
-<code>blog-page.bxm</code> quando il tema attivo lo ha. In entrambi i casi, il
-frontmatter proprio di una pagina vince sempre quando ne imposta uno:</li>
+<code>blog-page.bxm</code> quando il tema attivo lo ha. Un guscio include il corpo
+con <code>include &quot;#variables.themeDir#/#variables.bodyFile#&quot;</code>.</li>
 </ul>
 <pre data-bxsites-title="docs&#x2f;marketing&#x2f;press-release.md"><code class="language-markdown">---
 title: We raised a Series A
 layout: press-release
 ---
 </code></pre>
-<p><code>layout: press-release</code> renderizza il corpo di questa singola pagina
-tramite <code>.theme/press-release.bxm</code> (o quello del tema integrato attivo,
-se ne ha uno) invece di <code>page.bxm</code> - sempre dentro il guscio <code>layout.bxm</code>
-normale del sito. Un <code>layout:</code> che nomina un file che il tema attivo non
-ha ricade su <code>page.bxm</code> invece di far fallire il build, così cambiare
+<p><code>layout: press-release</code> renderizza questa singola pagina tramite
+<code>.overrides/&lt;theme&gt;/press-release.bxm</code> (o il <code>press-release.bxm</code> proprio
+del tema attivo, se ne ha uno) al posto di <code>layout.bxm</code>. Quel file è una
+pagina completa: copia <code>layout.bxm</code> per partire dal chrome proprio del
+tema (<code>bxSites layout:new press-release</code> fa esattamente questo), oppure
+scrivine uno minimale e usa <code>include</code> per il corpo dove serve. Un
+<code>layout:</code> che nomina un file che nessuno fornisce ricade su
+<code>layout.bxm</code>/<code>page.bxm</code> invece di far fallire il build, così cambiare
 tema non rompe mai una pagina che nominava il layout personalizzato di
 un altro tema.</p>
 <p><code>bootstrap</code> fornisce <code>blog.bxm</code>/<code>blog-page.bxm</code> come esempio funzionante
@@ -677,6 +688,133 @@ senza <code>.bxm</code>, usa
 sopra invece - si sovrappone a qualunque tema <code>bxsites.yaml</code> nomini,
 senza alcuna cartella <code>.theme/</code> coinvolta. <code>.theme/</code> serve per quando
 devi anche cambiare il markup stesso, argomento trattato di seguito.</p>
+<h2 id="sovrascritture-del-progetto"><a href="#sovrascritture-del-progetto" id="sovrascritture-del-progetto" name="sovrascritture-del-progetto" class="anchor"></a>Sovrascritture del progetto</h2>
+<p>Una cartella <code>.theme/</code> sostituisce un tema per intero. Per cambiare solo
+poche cose e mantenere tutto il resto, inclusi i futuri aggiornamenti del
+tema, metti invece le modifiche in <code>.overrides/&lt;theme&gt;/</code> dentro la content
+root. <code>&lt;theme&gt;</code> è lo slug del tema, il valore di <code>theme.name</code>:</p>
+<pre data-bxsites-title="Struttura del progetto"><code class="language-text">docs/
+└── .overrides/
+    └── bootstrap/                  ← si applica solo mentre theme.name è bootstrap
+        ├── home.bxm                 ← un layout, usato da `layout: home`
+        ├── page.bxm                 ← sostituisce il page.bxm del tema
+        ├── assets/
+        │   └── logo.svg             ← sostituisce (o aggiunge) un asset del tema
+        └── slots/
+            └── footer.bxm           ← riempie lo slot `footer` del tema
+</code></pre>
+<p>Ogni file in <code>.overrides/&lt;theme&gt;/</code> viene sovrapposto al tema: un file con lo
+stesso nome sostituisce quello del tema, qualsiasi altro viene aggiunto. Il
+tema non viene mai modificato. Al momento del build il risultato viene unito
+in <code>.cache/theme/&lt;theme&gt;/</code> (rimossa da <code>bxSites clean</code>), ed è quella cartella
+unita a essere renderizzata, quindi <code>themeAssetUrl()</code>, gli include e il
+fingerprinting funzionano come per un tema semplice.</p>
+<ul>
+<li><strong>Cambiare tema</strong> cambia anche le sovrascritture. Un build con
+<code>material</code> ignora <code>.overrides/bootstrap/</code>; dagli il suo
+<code>.overrides/material/</code>.</li>
+<li><strong>Il nome di un tema deve essere uno slug</strong>: lettere minuscole, cifre e
+trattini, il valore che <code>slugify()</code> di BoxLang restituisce per esso
+(altrimenti <code>bxSites</code> fallisce con un suggerimento). Dà il nome alla
+cartella del tema, alla sua installazione <code>.themes/&lt;slug&gt;/</code> e alla sua
+cartella <code>.overrides/&lt;slug&gt;/</code>.</li>
+<li><strong>Ordine di risoluzione per qualsiasi file</strong>: un <code>.theme/</code> piatto completo
+(se il progetto ne ha uno vince in modo assoluto), poi
+<code>.overrides/&lt;theme&gt;/</code>, poi un <code>.themes/&lt;theme&gt;/</code> installato, poi il tema
+integrato.</li>
+<li><code>.overrides/</code> è una cartella con il punto, quindi non viene mai
+pubblicata come pagine.</li>
+</ul>
+<p><code>bxSites layout:new &lt;name&gt;</code> genera un layout in questa cartella.</p>
+<h3 id="slot"><a href="#slot" id="slot" name="slot" class="anchor"></a>Slot</h3>
+<p>Uno slot è un buco con nome nel <code>layout.bxm</code> di un tema che un progetto può
+riempire senza copiare il layout. Crea <code>slots/&lt;name&gt;.bxm</code> nella cartella
+delle sovrascritture:</p>
+<pre data-bxsites-title="docs&#x2f;.overrides&#x2f;bootstrap&#x2f;slots&#x2f;announcement-bar.bxm"><code class="language-html">&lt;bx:output&gt;
+&lt;div class=&quot;alert alert-info text-center mb-0&quot;&gt;
+	v1.0 is out. &lt;a href=&quot;#variables.basePath#releases/1.0.md&quot;&gt;Read the notes&lt;/a&gt;
+&lt;/div&gt;
+&lt;/bx:output&gt;
+</code></pre>
+<p>Ogni tema integrato espone gli stessi cinque slot:</p>
+<div class="bxsites-table-wrap"><table class="table">
+<thead>
+<tr><th>Slot</th><th>Dove viene renderizzato</th><th>Predefinito del tema</th></tr>
+</thead>
+<tbody>
+<tr><td><code>head-extra</code></td><td>Subito prima di <code>&lt;/head&gt;</code>: <code>&lt;meta&gt;</code>, <code>&lt;link&gt;</code> e script extra</td><td>vuoto</td></tr>
+<tr><td><code>announcement-bar</code></td><td>Subito dopo <code>&lt;body&gt;</code>, sopra l'header</td><td>vuoto</td></tr>
+<tr><td><code>header</code></td><td>La barra di navigazione in alto</td><td>l'header proprio del tema</td></tr>
+<tr><td><code>footer</code></td><td>Il footer della pagina</td><td>il footer proprio del tema (quando <code>footer: true</code>)</td></tr>
+<tr><td><code>sidebar-bottom</code></td><td>Sotto l'albero di navigazione nella barra laterale</td><td>vuoto</td></tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Una sovrascrittura sostituisce il predefinito.</strong> Per <code>header</code> e <code>footer</code>
+significa sostituire il markup del tema; per gli altri riempie uno slot
+vuoto. Elimina il file per riavere il predefinito.</li>
+<li><strong>Un file di slot è un template.</strong> Vede le stesse variabili di un layout
+(<code>page</code>, <code>nav</code>, <code>siteConfig</code>, <code>basePath</code>, <code>data</code>, ...) e, come
+<code>layout.bxm</code>, racchiude il suo markup in <code>&lt;bx:output&gt;</code> così che le
+<code>#expressions#</code> vengano renderizzate.</li>
+<li><strong>Un tema può esporre più slot</strong> dei cinque; il suo manifesto li elenca.</li>
+<li><strong>Un nome di slot che il tema non espone</strong> stampa un avviso di build e
+viene ignorato. Non fa mai fallire il build, quindi cambiare tema è sicuro.</li>
+</ul>
+<p>Renderizzare uno slot dal tuo layout:</p>
+<pre><code class="language-html">#renderSlot( &quot;footer&quot; )#
+</code></pre>
+<h3 id="manifesto-del-tema-themejson"><a href="#manifesto-del-tema-themejson" id="manifesto-del-tema-themejson" name="manifesto-del-tema-themejson" class="anchor"></a>Manifesto del tema (<code>theme.json</code>)</h3>
+<p>Un file opzionale alla radice della cartella di un tema. Tutti e 10 i temi
+integrati ne includono uno.</p>
+<pre data-bxsites-title="resources&#x2f;themes&#x2f;bootstrap&#x2f;theme.json"><code class="language-json">{
+  &quot;slug&quot;: &quot;bootstrap&quot;,
+  &quot;name&quot;: &quot;Bootstrap&quot;,
+  &quot;slots&quot;: [&quot;head-extra&quot;, &quot;announcement-bar&quot;, &quot;header&quot;, &quot;footer&quot;, &quot;sidebar-bottom&quot;]
+}
+</code></pre>
+<ul>
+<li><code>slug</code> deve essere uguale al nome della cartella del tema; una
+discrepanza fa fallire il build con <code>BxSites.InvalidTheme</code>.</li>
+<li><code>slots</code> elenca i nomi degli slot che il layout del tema renderizza, ognuno
+con lettere minuscole, cifre e trattini. Con un manifesto, una chiamata a
+<code>renderSlot()</code> per un nome non elencato e un file di slot di
+sovrascrittura che il tema non espone stampano entrambi un avviso.</li>
+<li>Senza un manifesto un tema funziona come prima; i nomi degli slot non
+vengono controllati.</li>
+</ul>
+<h3 id="layout-impliciti"><a href="#layout-impliciti" id="layout-impliciti" name="layout-impliciti" class="anchor"></a>Layout impliciti</h3>
+<p>Invece di ripetere <code>layout: landing</code> nel frontmatter di ogni pagina,
+assegna un layout a un insieme di pagine per percorso in <code>bxsites.yaml</code>.
+Funziona come i layout impliciti di ColdBox.</p>
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">layouts:
+  - layout: landing
+    match: [&quot;marketing/**&quot;, &quot;pricing.md&quot;]
+  - layout: post
+    match: &quot;blog/posts/**&quot;
+</code></pre>
+<ul>
+<li><code>layout</code> è un nome di template semplice, risolto come un <code>layout:</code> del
+frontmatter (<code>.overrides/&lt;theme&gt;/&lt;name&gt;.bxm</code>, poi quello del tema, poi
+il predefinito).</li>
+<li><code>match</code> è un glob o una lista. Le regole vengono provate in ordine e
+<strong>vince la prima corrispondenza</strong>.</li>
+<li><strong>Il frontmatter <code>layout:</code> proprio di una pagina vince sempre</strong> su una
+regola.</li>
+<li>I glob vengono confrontati con il percorso della pagina relativo alla
+content root, con barre normali e distinguendo maiuscole e minuscole: <code>*</code>
+è qualsiasi carattere dentro un segmento, <code>**</code> attraversa i segmenti
+(<code>**/</code> corrisponde anche a zero cartelle), <code>?</code> è un carattere, e una <code>/</code>
+finale significa tutto ciò che sta sotto quella cartella. <code>marketing/**</code>
+corrisponde a <code>marketing/a.md</code> e <code>marketing/deep/b.md</code>, non a
+<code>marketing.md</code>.</li>
+<li>Le regole si applicano alle pagine della documentazione e agli articoli
+del blog (il percorso di un articolo è <code>blog/posts/&lt;file&gt;</code>). Le pagine
+generate (elenchi del blog, tag, ricerca, 404) mantengono i propri
+template.</li>
+<li>Le stesse regole si applicano negli alberi versionati e tradotti,
+confrontate con il percorso all'interno di quell'albero.</li>
+</ul>
 <h2 id="scrivere-un-tema-da-zero"><a href="#scrivere-un-tema-da-zero" id="scrivere-un-tema-da-zero" name="scrivere-un-tema-da-zero" class="anchor"></a>Scrivere un tema da zero</h2>
 <p>Un tema necessita solo dei due file obbligatori, quindi ecco un esempio
 davvero minimale - niente Bootstrap/Tailwind, niente modalità scura,
@@ -781,7 +919,7 @@ questo, così un tema come questo non diventa obsoleto in silenzio.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/versions/1.0.x/i18n/it/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/theme/docsy/versions/1.0.x/it/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Oct 16, 2026, 2&#x3a;01&#x3a;32 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Temi&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fdocsy%2Fversions%2F1.0.x%2Fit%2Fguides%2Fthemes%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/versions/1.0.x/i18n/it/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Modifica questa pagina</a><a href="/theme/docsy/versions/1.0.x/it/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Scarica Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Ultimo aggiornamento Oct 16, 2026, 4&#x3a;17&#x3a;35 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Temi&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fdocsy%2Fversions%2F1.0.x%2Fit%2Fguides%2Fthemes%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
 
 			</article>
 
@@ -815,7 +953,7 @@ questo, così un tema come questo non diventa obsoleto in silenzio.</p>
 		</main>
 
 		<aside class="docsy-toc-sidebar">
-			<nav class="docsy-toc bxsites-toc" aria-label="In questa pagina"><div class="docsy-toc__title bxsites-toc__title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> In questa pagina</div><ul><li class="docsy-toc__item docsy-toc__item--2"><a href="#integrati">Integrati</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#installare-un-tema-pubblicato">Installare un tema pubblicato</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#siti-air-gappedoffline">Siti air-gapped&#x2f;offline</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#il-contratto-themeprovider">Il contratto ThemeProvider</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#più-layout-per-pagina">Pi&ugrave; layout per pagina</a></li><li class="docsy-toc__item docsy-toc__item--3"><a href="#quale-layoutcorpo-è-attivo">Quale layout&#x2f;corpo &egrave; attivo</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#personalizzare-i-colori-senza-sovrascrivere-un-tema">Personalizzare i colori senza sovrascrivere un tema</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#banner-hero-della-homepage">Banner hero della homepage</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#sovrascrivere-un-tema">Sovrascrivere un tema</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#scrivere-un-tema-da-zero">Scrivere un tema da zero</a></li></ul></nav>
+			<nav class="docsy-toc bxsites-toc" aria-label="In questa pagina"><div class="docsy-toc__title bxsites-toc__title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> In questa pagina</div><ul><li class="docsy-toc__item docsy-toc__item--2"><a href="#integrati">Integrati</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#installare-un-tema-pubblicato">Installare un tema pubblicato</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#siti-air-gappedoffline">Siti air-gapped&#x2f;offline</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#il-contratto-themeprovider">Il contratto ThemeProvider</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#più-layout-per-pagina">Pi&ugrave; layout per pagina</a></li><li class="docsy-toc__item docsy-toc__item--3"><a href="#quale-layoutcorpo-è-attivo">Quale layout&#x2f;corpo &egrave; attivo</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#personalizzare-i-colori-senza-sovrascrivere-un-tema">Personalizzare i colori senza sovrascrivere un tema</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#banner-hero-della-homepage">Banner hero della homepage</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#sovrascrivere-un-tema">Sovrascrivere un tema</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#sovrascritture-del-progetto">Sovrascritture del progetto</a></li><li class="docsy-toc__item docsy-toc__item--3"><a href="#slot">Slot</a></li><li class="docsy-toc__item docsy-toc__item--3"><a href="#manifesto-del-tema-themejson">Manifesto del tema &#x28; theme.json &#x29;</a></li><li class="docsy-toc__item docsy-toc__item--3"><a href="#layout-impliciti">Layout impliciti</a></li><li class="docsy-toc__item docsy-toc__item--2"><a href="#scrivere-un-tema-da-zero">Scrivere un tema da zero</a></li></ul></nav>
 		</aside>
 
 	</div>

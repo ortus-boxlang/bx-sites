@@ -262,6 +262,11 @@ A theme is just a folder with:
   `page.bxm` when a theme doesn't have it.
 - **`assets/`** (optional) - theme CSS/JS, copied to `site/assets/theme/`
   at build time.
+- **`slots/<name>.bxm`** (optional) - the theme's default content for a
+  [slot](#slots), included wherever its `layout.bxm` calls
+  `renderSlot( "<name>" )`.
+- **`theme.json`** (optional) - the theme's manifest: its [slug and the slots
+  it exposes](#theme-manifest-themejson).
 
 `variables.page.editUrl`/`.lastUpdated` (empty strings when unconfigured)
 and `variables.siteConfig.repo`/`.social`/`.footer` are always available too,
@@ -304,13 +309,15 @@ template, letting a blog (or any other content type) look different from
 the rest of the site while reusing the same theme's chrome and assets. Two
 independent resolution chains:
 
-- **Outer shell** - always `layout.bxm`, except the blog's own listing/
-  category/archive/author/stats pages, which use `blog.bxm` when the active
-  theme has it. This one follows content type - there's no frontmatter
-  key for it.
+- **Outer shell** - `layout.bxm` by default. The blog's own listing/
+  category/archive/author/stats pages use `blog.bxm` when the active theme
+  has it. A page that sets `layout:` in its frontmatter (or matches an
+  [implicit layout](#implicit-layouts) rule) renders through `<name>.bxm`
+  instead, when the active theme or the project's
+  [overrides](#project-overrides) have one.
 - **Body** - `page.bxm` by default. A blog post uses `blog-page.bxm` when
-  the active theme has it. Either way, a page's own frontmatter always wins
-  when it sets one:
+  the active theme has it. A shell includes the body with
+  `include "#variables.themeDir#/#variables.bodyFile#"`.
 
 ```markdown title="docs/marketing/press-release.md"
 ---
@@ -319,12 +326,15 @@ layout: press-release
 ---
 ```
 
-`layout: press-release` renders this one page's body through
-`.theme/press-release.bxm` (or the active built-in theme's own, if it ships
-one) instead of `page.bxm` - still inside the site's normal `layout.bxm`
-shell. A `layout:` naming a file the active theme doesn't have falls back
-to `page.bxm` rather than failing the build, so switching themes never
-breaks a page that named one theme's own custom layout.
+`layout: press-release` renders this one page through
+`.overrides/<theme>/press-release.bxm` (or the active theme's own
+`press-release.bxm`, if it ships one) in place of `layout.bxm`. That file is a
+complete page: copy `layout.bxm` to start from the theme's own chrome
+(`bxSites layout:new press-release` does exactly that), or write a
+minimal one and `include` the body wherever it belongs. A `layout:` naming a
+file nobody provides falls back to `layout.bxm`/`page.bxm` rather than
+failing the build, so switching themes never breaks a page that named
+another theme's custom layout.
 
 `bootstrap` ships `blog.bxm`/`blog-page.bxm` as a working example to copy;
 the other built-in themes don't yet, and fall back to `layout.bxm`/`page.bxm`
@@ -535,6 +545,137 @@ CSS-only/no-`.bxm` tweak, use [`extraCss`](#customizing-colors-without-a-theme-o
 above instead - it layers on top of whichever theme `bxsites.yaml` names,
 no `.theme/` folder involved at all. `.theme/` is for when you also need
 to change the markup itself, covered next.
+
+## Project overrides
+
+A `.theme/` folder replaces a theme wholesale. To change just a few things
+and keep everything else, including future theme updates, put the changes in
+`.overrides/<theme>/` inside the content root instead. `<theme>` is the
+theme's slug, the value of `theme.name`:
+
+```text title="Project structure"
+docs/
+└── .overrides/
+    └── bootstrap/                  ← applies only while theme.name is bootstrap
+        ├── home.bxm                 ← a layout, used by `layout: home`
+        ├── page.bxm                 ← replaces the theme's page.bxm
+        ├── assets/
+        │   └── logo.svg             ← replaces (or adds) one theme asset
+        └── slots/
+            └── footer.bxm           ← fills the theme's `footer` slot
+```
+
+Every file in `.overrides/<theme>/` is laid over the theme: a file with the
+same name replaces the theme's, anything else is added. The theme is never
+modified. At build time the result is merged into `.cache/theme/<theme>/`
+(removed by `bxSites clean`), and that merged folder renders, so
+`themeAssetUrl()`, includes and fingerprinting all work as they do for a
+plain theme.
+
+- **Switching themes** switches the overrides with it. A `material` build
+  ignores `.overrides/bootstrap/`; give it its own `.overrides/material/`.
+- **A theme name must be a slug**: lowercase letters, digits and hyphens, the
+  value BoxLang's `slugify()` returns for it (`bxSites` fails with a
+  suggestion otherwise). It names the theme's folder, its `.themes/<slug>/`
+  install and its `.overrides/<slug>/` folder.
+- **Resolution order for any file**: a complete flat `.theme/` (if the
+  project has one it wins outright), then `.overrides/<theme>/`, then an
+  installed `.themes/<theme>/`, then the built-in theme.
+- `.overrides/` is a dot folder, so it is never published as pages.
+
+`bxSites layout:new <name>` scaffolds a layout into this folder.
+
+### Slots
+
+A slot is a named hole in a theme's `layout.bxm` that a project can fill
+without copying the layout. Create `slots/<name>.bxm` in the overrides
+folder:
+
+```html title="docs/.overrides/bootstrap/slots/announcement-bar.bxm"
+<bx:output>
+<div class="alert alert-info text-center mb-0">
+	v1.0 is out. <a href="#variables.basePath#releases/1.0.md">Read the notes</a>
+</div>
+</bx:output>
+```
+
+Every built-in theme exposes the same five slots:
+
+| Slot | Where it renders | Theme default |
+|---|---|---|
+| `head-extra` | Just before `</head>`: extra `<meta>`, `<link>`, scripts | empty |
+| `announcement-bar` | Right after `<body>`, above the header | empty |
+| `header` | The top navigation bar | the theme's own header |
+| `footer` | The page footer | the theme's own footer (when `footer: true`) |
+| `sidebar-bottom` | Below the navigation tree in the sidebar | empty |
+
+- **An override replaces the default.** For `header` and `footer` that
+  means replacing the theme's markup; for the others it fills an empty slot.
+  Delete the file to get the default back.
+- **A slot file is a template.** It sees the same variables a layout does
+  (`page`, `nav`, `siteConfig`, `basePath`, `data`, ...) and, like
+  `layout.bxm`, wraps its markup in `<bx:output>` so `#expressions#` render.
+- **A theme can expose more slots** than the five; its manifest lists them.
+- **A slot name the theme does not expose** prints a build warning and is
+  ignored. It never fails the build, so switching themes is safe.
+
+Rendering a slot from your own layout:
+
+```html
+#renderSlot( "footer" )#
+```
+
+### Theme manifest (`theme.json`)
+
+An optional file at the root of a theme folder. All 10 built-in themes ship
+one.
+
+```json title="resources/themes/bootstrap/theme.json"
+{
+  "slug": "bootstrap",
+  "name": "Bootstrap",
+  "slots": ["head-extra", "announcement-bar", "header", "footer", "sidebar-bottom"]
+}
+```
+
+- `slug` must equal the theme's folder name; a mismatch fails the build with
+  `BxSites.InvalidTheme`.
+- `slots` lists the slot names the theme's layout renders, each lowercase
+  letters, digits and hyphens. With a manifest, a `renderSlot()` call for an
+  unlisted name and an override slot file the theme does not expose both
+  print a warning.
+- Without a manifest a theme works as before; slot names are not checked.
+
+### Implicit layouts
+
+Instead of repeating `layout: landing` in every page's frontmatter, assign a
+layout to a set of pages by path in `bxsites.yaml`. This works like ColdBox's
+implicit layouts.
+
+```yaml title="bxsites.yaml"
+layouts:
+  - layout: landing
+    match: ["marketing/**", "pricing.md"]
+  - layout: post
+    match: "blog/posts/**"
+```
+
+- `layout` is a bare template name, resolved like a frontmatter `layout:`
+  (`.overrides/<theme>/<name>.bxm`, then the theme's, then the default).
+- `match` is one glob or a list. Rules are tried in order and **the first
+  match wins**.
+- **A page's own `layout:` frontmatter always wins** over a rule.
+- Globs match the page's path relative to the content root, with forward
+  slashes and case-sensitively: `*` is any characters inside one segment,
+  `**` crosses segments (`**/` also matches zero folders), `?` is one
+  character, and a trailing `/` means everything under that folder.
+  `marketing/**` matches `marketing/a.md` and `marketing/deep/b.md`, not
+  `marketing.md`.
+- Rules apply to docs pages and blog posts (a post's path is
+  `blog/posts/<file>`). Generated pages (blog listings, tags, search, 404)
+  keep their own templates.
+- The same rules apply in versioned and translated trees, matched against the
+  path inside that tree.
 
 ## Writing a theme from scratch
 

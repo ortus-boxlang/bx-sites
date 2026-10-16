@@ -145,7 +145,7 @@ Temas</h1>
 
 
 
-	<details class="bxsites-toc-mobile ntn-toc--mobile"><summary class="ntn-toc--mobile__summary"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> En esta p&aacute;gina</summary><ul><li class="ntn-toc__item ntn-toc__item--2"><a href="#incorporados">Incorporados</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#instalar-un-tema-publicado">Instalar un tema publicado</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#sitios-sin-conexión-a-internet-air-gapped">Sitios sin conexi&oacute;n a internet &#x28;air-gapped&#x29;</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#el-contrato-de-themeprovider">El contrato de ThemeProvider</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#múltiples-layouts-por-página">M&uacute;ltiples layouts por p&aacute;gina</a></li><li class="ntn-toc__item ntn-toc__item--3"><a href="#qué-layoutcuerpo-está-activo">Qu&eacute; layout&#x2f;cuerpo est&aacute; activo</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#personalizar-colores-sin-sobrescribir-un-tema">Personalizar colores sin sobrescribir un tema</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#banner-hero-de-la-página-de-inicio">Banner hero de la p&aacute;gina de inicio</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#sobrescribir-un-tema">Sobrescribir un tema</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#escribir-un-tema-desde-cero">Escribir un tema desde cero</a></li></ul></details>
+	<details class="bxsites-toc-mobile ntn-toc--mobile"><summary class="ntn-toc--mobile__summary"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> En esta p&aacute;gina</summary><ul><li class="ntn-toc__item ntn-toc__item--2"><a href="#incorporados">Incorporados</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#instalar-un-tema-publicado">Instalar un tema publicado</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#sitios-sin-conexión-a-internet-air-gapped">Sitios sin conexi&oacute;n a internet &#x28;air-gapped&#x29;</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#el-contrato-de-themeprovider">El contrato de ThemeProvider</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#múltiples-layouts-por-página">M&uacute;ltiples layouts por p&aacute;gina</a></li><li class="ntn-toc__item ntn-toc__item--3"><a href="#qué-layoutcuerpo-está-activo">Qu&eacute; layout&#x2f;cuerpo est&aacute; activo</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#personalizar-colores-sin-sobrescribir-un-tema">Personalizar colores sin sobrescribir un tema</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#banner-hero-de-la-página-de-inicio">Banner hero de la p&aacute;gina de inicio</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#sobrescribir-un-tema">Sobrescribir un tema</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#sobrescrituras-del-proyecto">Sobrescrituras del proyecto</a></li><li class="ntn-toc__item ntn-toc__item--3"><a href="#slots">Slots</a></li><li class="ntn-toc__item ntn-toc__item--3"><a href="#manifiesto-del-tema-themejson">Manifiesto del tema &#x28; theme.json &#x29;</a></li><li class="ntn-toc__item ntn-toc__item--3"><a href="#layouts-implícitos">Layouts impl&iacute;citos</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#escribir-un-tema-desde-cero">Escribir un tema desde cero</a></li></ul></details>
 
 				<div class="ntn-content-body">
 				<h1 id="temas"><a href="#temas" id="temas" name="temas" class="anchor"></a>Temas</h1>
@@ -403,6 +403,11 @@ de blog individual, renderizado igualmente bajo el <code>layout.bxm</code> norma
 del tema. Recurre a <code>page.bxm</code> cuando un tema no lo tiene.</li>
 <li><strong><code>assets/</code></strong> (opcional) - CSS/JS del tema, copiado a
 <code>site/assets/theme/</code> en el momento de la construcción.</li>
+<li><strong><code>slots/&lt;name&gt;.bxm</code></strong> (opcional) - el contenido por defecto del tema
+para un <a href="#slots">slot</a>, incluido allí donde su <code>layout.bxm</code> llama a
+<code>renderSlot( &quot;&lt;name&gt;&quot; )</code>.</li>
+<li><strong><code>theme.json</code></strong> (opcional) - el manifiesto del tema: su <a href="#manifiesto-del-tema-themejson">slug y los
+slots que expone</a>.</li>
 </ul>
 <p><code>variables.page.editUrl</code>/<code>.lastUpdated</code> (cadenas vacías cuando no están
 configuradas) y <code>variables.siteConfig.repo</code>/<code>.social</code>/<code>.footer</code> también
@@ -451,26 +456,32 @@ tenga un aspecto distinto del resto del sitio mientras reutiliza el mismo
 chrome y los mismos assets del tema. Dos cadenas de resolución
 independientes:</p>
 <ul>
-<li><strong>Shell exterior</strong> - siempre <code>layout.bxm</code>, salvo en las propias
-páginas de listado/categoría/archivo/autor/estadísticas del blog, que
-usan <code>blog.bxm</code> cuando el tema activo lo tiene. Esta cadena sigue el
-tipo de contenido - no hay clave de frontmatter para ella.</li>
+<li><strong>Shell exterior</strong> - <code>layout.bxm</code> por defecto. Las propias páginas de
+listado/categoría/archivo/autor/estadísticas del blog usan <code>blog.bxm</code>
+cuando el tema activo lo tiene. Una página que establece <code>layout:</code> en su
+frontmatter (o que coincide con una regla de <a href="#layouts-implícitos">layout
+implícito</a>) se renderiza en su lugar a través de
+<code>&lt;name&gt;.bxm</code>, cuando el tema activo o las
+<a href="#sobrescrituras-del-proyecto">sobrescrituras</a> del proyecto lo tienen.</li>
 <li><strong>Cuerpo</strong> - <code>page.bxm</code> por defecto. Una entrada de blog usa
-<code>blog-page.bxm</code> cuando el tema activo lo tiene. En cualquier caso, el
-propio frontmatter de una página siempre gana cuando establece uno:</li>
+<code>blog-page.bxm</code> cuando el tema activo lo tiene. Un shell incluye el
+cuerpo con <code>include &quot;#variables.themeDir#/#variables.bodyFile#&quot;</code>.</li>
 </ul>
 <pre data-bxsites-title="docs&#x2f;marketing&#x2f;press-release.md"><code class="language-markdown">---
 title: We raised a Series A
 layout: press-release
 ---
 </code></pre>
-<p><code>layout: press-release</code> renderiza el cuerpo de esta página concreta a
-través de <code>.theme/press-release.bxm</code> (o el propio del tema incorporado
-activo, si tiene uno) en lugar de <code>page.bxm</code> - todavía dentro del shell
-<code>layout.bxm</code> normal del sitio. Un <code>layout:</code> que nombre un archivo que el
-tema activo no tiene recurre a <code>page.bxm</code> en lugar de hacer fallar la
-construcción, así que cambiar de tema nunca rompe una página que nombró
-el layout personalizado propio de otro tema.</p>
+<p><code>layout: press-release</code> renderiza esta página concreta a través de
+<code>.overrides/&lt;theme&gt;/press-release.bxm</code> (o el propio <code>press-release.bxm</code> del
+tema activo, si incluye uno) en lugar de <code>layout.bxm</code>. Ese archivo es una
+página completa: copia <code>layout.bxm</code> para partir del chrome propio del tema
+(<code>bxSites layout:new press-release</code> hace exactamente eso), o escribe uno
+mínimo e incluye el cuerpo con <code>include</code> donde corresponda. Un <code>layout:</code>
+que nombre un archivo que nadie proporciona recurre a
+<code>layout.bxm</code>/<code>page.bxm</code> en lugar de hacer fallar la construcción, así que
+cambiar de tema nunca rompe una página que nombró el layout personalizado
+de otro tema.</p>
 <p><code>bootstrap</code> incluye <code>blog.bxm</code>/<code>blog-page.bxm</code> como ejemplo funcional
 para copiar; los demás temas incorporados todavía no, y recurren a
 <code>layout.bxm</code>/<code>page.bxm</code> para el contenido del blog del mismo modo que lo
@@ -668,6 +679,137 @@ Para un ajuste solo de CSS/sin <code>.bxm</code>, usa
 se superpone a cualquier tema que nombre <code>bxsites.yaml</code>, sin ninguna
 carpeta <code>.theme/</code> involucrada en absoluto. <code>.theme/</code> es para cuando
 también necesitas cambiar el propio marcado, que se cubre a continuación.</p>
+<h2 id="sobrescrituras-del-proyecto"><a href="#sobrescrituras-del-proyecto" id="sobrescrituras-del-proyecto" name="sobrescrituras-del-proyecto" class="anchor"></a>Sobrescrituras del proyecto</h2>
+<p>Una carpeta <code>.theme/</code> reemplaza un tema por completo. Para cambiar solo unas
+pocas cosas y conservar todo lo demás, incluidas las futuras actualizaciones
+del tema, coloca los cambios en su lugar en <code>.overrides/&lt;theme&gt;/</code> dentro de
+la raíz de contenido. <code>&lt;theme&gt;</code> es el slug del tema, el valor de
+<code>theme.name</code>:</p>
+<pre data-bxsites-title="Estructura del proyecto"><code class="language-text">docs/
+└── .overrides/
+    └── bootstrap/                  ← applies only while theme.name is bootstrap
+        ├── home.bxm                 ← a layout, used by `layout: home`
+        ├── page.bxm                 ← replaces the theme's page.bxm
+        ├── assets/
+        │   └── logo.svg             ← replaces (or adds) one theme asset
+        └── slots/
+            └── footer.bxm           ← fills the theme's `footer` slot
+</code></pre>
+<p>Cada archivo de <code>.overrides/&lt;theme&gt;/</code> se superpone al tema: un archivo con el
+mismo nombre reemplaza al del tema, y cualquier otro se añade. El tema nunca
+se modifica. En el momento de la construcción el resultado se fusiona en
+<code>.cache/theme/&lt;theme&gt;/</code> (eliminado por <code>bxSites clean</code>), y esa carpeta
+fusionada es la que se renderiza, así que <code>themeAssetUrl()</code>, los includes y
+el fingerprinting funcionan igual que con un tema normal.</p>
+<ul>
+<li><strong>Cambiar de tema</strong> cambia también las sobrescrituras. Una construcción con
+<code>material</code> ignora <code>.overrides/bootstrap/</code>; dale su propio
+<code>.overrides/material/</code>.</li>
+<li><strong>El nombre de un tema debe ser un slug</strong>: letras minúsculas, dígitos y
+guiones, el valor que devuelve <code>slugify()</code> de BoxLang para él (<code>bxSites</code>
+falla con una sugerencia en caso contrario). Da nombre a la carpeta del
+tema, a su instalación en <code>.themes/&lt;slug&gt;/</code> y a su carpeta
+<code>.overrides/&lt;slug&gt;/</code>.</li>
+<li><strong>Orden de resolución de cualquier archivo</strong>: un <code>.theme/</code> plano completo
+(si el proyecto tiene uno, gana sin más), luego <code>.overrides/&lt;theme&gt;/</code>,
+luego un <code>.themes/&lt;theme&gt;/</code> instalado y por último el tema incorporado.</li>
+<li><code>.overrides/</code> es una carpeta que empieza por punto, así que nunca se
+publica como páginas.</li>
+</ul>
+<p><code>bxSites layout:new &lt;name&gt;</code> genera un layout en esta carpeta.</p>
+<h3 id="slots"><a href="#slots" id="slots" name="slots" class="anchor"></a>Slots</h3>
+<p>Un slot es un hueco con nombre en el <code>layout.bxm</code> de un tema que un proyecto
+puede rellenar sin copiar el layout. Crea <code>slots/&lt;name&gt;.bxm</code> en la carpeta de
+sobrescrituras:</p>
+<pre data-bxsites-title="docs&#x2f;.overrides&#x2f;bootstrap&#x2f;slots&#x2f;announcement-bar.bxm"><code class="language-html">&lt;bx:output&gt;
+&lt;div class=&quot;alert alert-info text-center mb-0&quot;&gt;
+	v1.0 is out. &lt;a href=&quot;#variables.basePath#releases/1.0.md&quot;&gt;Read the notes&lt;/a&gt;
+&lt;/div&gt;
+&lt;/bx:output&gt;
+</code></pre>
+<p>Todos los temas incorporados exponen los mismos cinco slots:</p>
+<div class="bxsites-table-wrap"><table class="table">
+<thead>
+<tr><th>Slot</th><th>Dónde se renderiza</th><th>Valor por defecto del tema</th></tr>
+</thead>
+<tbody>
+<tr><td><code>head-extra</code></td><td>Justo antes de <code>&lt;/head&gt;</code>: <code>&lt;meta&gt;</code>, <code>&lt;link&gt;</code> y scripts adicionales</td><td>vacío</td></tr>
+<tr><td><code>announcement-bar</code></td><td>Justo después de <code>&lt;body&gt;</code>, encima de la cabecera</td><td>vacío</td></tr>
+<tr><td><code>header</code></td><td>La barra de navegación superior</td><td>la cabecera propia del tema</td></tr>
+<tr><td><code>footer</code></td><td>El pie de página</td><td>el pie de página propio del tema (cuando <code>footer: true</code>)</td></tr>
+<tr><td><code>sidebar-bottom</code></td><td>Debajo del árbol de navegación en la barra lateral</td><td>vacío</td></tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Una sobrescritura reemplaza el valor por defecto.</strong> Para <code>header</code> y
+<code>footer</code> eso significa reemplazar el marcado del tema; para los demás
+rellena un slot vacío. Elimina el archivo para recuperar el valor por
+defecto.</li>
+<li><strong>Un archivo de slot es una plantilla.</strong> Ve las mismas variables que un
+layout (<code>page</code>, <code>nav</code>, <code>siteConfig</code>, <code>basePath</code>, <code>data</code>, ...) y, igual que
+<code>layout.bxm</code>, envuelve su marcado en <code>&lt;bx:output&gt;</code> para que se rendericen
+las <code>#expressions#</code>.</li>
+<li><strong>Un tema puede exponer más slots</strong> que los cinco; su manifiesto los
+enumera.</li>
+<li><strong>Un nombre de slot que el tema no expone</strong> imprime una advertencia de
+construcción y se ignora. Nunca hace fallar la construcción, así que
+cambiar de tema es seguro.</li>
+</ul>
+<p>Renderizar un slot desde tu propio layout:</p>
+<pre><code class="language-html">#renderSlot( &quot;footer&quot; )#
+</code></pre>
+<h3 id="manifiesto-del-tema-themejson"><a href="#manifiesto-del-tema-themejson" id="manifiesto-del-tema-themejson" name="manifiesto-del-tema-themejson" class="anchor"></a>Manifiesto del tema (<code>theme.json</code>)</h3>
+<p>Un archivo opcional en la raíz de la carpeta de un tema. Los 10 temas
+incorporados incluyen uno.</p>
+<pre data-bxsites-title="resources&#x2f;themes&#x2f;bootstrap&#x2f;theme.json"><code class="language-json">{
+  &quot;slug&quot;: &quot;bootstrap&quot;,
+  &quot;name&quot;: &quot;Bootstrap&quot;,
+  &quot;slots&quot;: [&quot;head-extra&quot;, &quot;announcement-bar&quot;, &quot;header&quot;, &quot;footer&quot;, &quot;sidebar-bottom&quot;]
+}
+</code></pre>
+<ul>
+<li><code>slug</code> debe ser igual al nombre de la carpeta del tema; una discrepancia
+hace fallar la construcción con <code>BxSites.InvalidTheme</code>.</li>
+<li><code>slots</code> enumera los nombres de los slots que renderiza el layout del tema,
+cada uno con letras minúsculas, dígitos y guiones. Con un manifiesto, tanto
+una llamada a <code>renderSlot()</code> con un nombre que no figura en la lista como
+un archivo de slot de sobrescritura que el tema no expone imprimen una
+advertencia.</li>
+<li>Sin manifiesto un tema funciona como antes; los nombres de slot no se
+comprueban.</li>
+</ul>
+<h3 id="layouts-implícitos"><a href="#layouts-implícitos" id="layouts-implícitos" name="layouts-implícitos" class="anchor"></a>Layouts implícitos</h3>
+<p>En lugar de repetir <code>layout: landing</code> en el frontmatter de cada página,
+asigna un layout a un conjunto de páginas por ruta en <code>bxsites.yaml</code>. Esto
+funciona como los layouts implícitos de ColdBox.</p>
+<pre data-bxsites-title="bxsites.yaml"><code class="language-yaml">layouts:
+  - layout: landing
+    match: [&quot;marketing/**&quot;, &quot;pricing.md&quot;]
+  - layout: post
+    match: &quot;blog/posts/**&quot;
+</code></pre>
+<ul>
+<li><code>layout</code> es un nombre simple de plantilla, resuelto igual que un
+<code>layout:</code> de frontmatter (<code>.overrides/&lt;theme&gt;/&lt;name&gt;.bxm</code>, luego el del
+tema y luego el valor por defecto).</li>
+<li><code>match</code> es un glob o una lista de ellos. Las reglas se prueban en orden y
+<strong>gana la primera coincidencia</strong>.</li>
+<li><strong>El propio frontmatter <code>layout:</code> de una página siempre gana</strong> sobre una
+regla.</li>
+<li>Los globs se comparan con la ruta de la página relativa a la raíz de
+contenido, con barras normales y distinguiendo mayúsculas de minúsculas:
+<code>*</code> es cualquier cantidad de caracteres dentro de un segmento, <code>**</code> cruza
+segmentos (<code>**/</code> también coincide con cero carpetas), <code>?</code> es un carácter,
+y una <code>/</code> final significa todo lo que hay debajo de esa carpeta.
+<code>marketing/**</code> coincide con <code>marketing/a.md</code> y <code>marketing/deep/b.md</code>, no
+con <code>marketing.md</code>.</li>
+<li>Las reglas se aplican a páginas de documentación y entradas de blog (la
+ruta de una entrada es <code>blog/posts/&lt;file&gt;</code>). Las páginas generadas
+(listados del blog, etiquetas, búsqueda, 404) conservan sus propias
+plantillas.</li>
+<li>Las mismas reglas se aplican en los árboles versionados y traducidos,
+comparadas con la ruta dentro de ese árbol.</li>
+</ul>
 <h2 id="escribir-un-tema-desde-cero"><a href="#escribir-un-tema-desde-cero" id="escribir-un-tema-desde-cero" name="escribir-un-tema-desde-cero" class="anchor"></a>Escribir un tema desde cero</h2>
 <p>Un tema solo necesita los dos archivos obligatorios, así que aquí hay uno
 genuinamente mínimo - sin Bootstrap/Tailwind, sin modo oscuro, sin
@@ -772,7 +914,7 @@ quede obsoleto en silencio.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/notion/es/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Oct 16, 2026, 2&#x3a;01&#x3a;32 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Temas&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fnotion%2Fes%2Fguides%2Fthemes%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/guides/themes.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/notion/es/guides/themes.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Oct 16, 2026, 4&#x3a;17&#x3a;35 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Temas&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fnotion%2Fes%2Fguides%2Fthemes%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
 
 			</article>
 
@@ -806,7 +948,7 @@ quede obsoleto en silencio.</p>
 		</main>
 
 		<aside class="ntn-toc-sidebar">
-			<nav class="ntn-toc bxsites-toc" aria-label="En esta p&aacute;gina"><div class="ntn-toc__title bxsites-toc__title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> En esta p&aacute;gina</div><ul><li class="ntn-toc__item ntn-toc__item--2"><a href="#incorporados">Incorporados</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#instalar-un-tema-publicado">Instalar un tema publicado</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#sitios-sin-conexión-a-internet-air-gapped">Sitios sin conexi&oacute;n a internet &#x28;air-gapped&#x29;</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#el-contrato-de-themeprovider">El contrato de ThemeProvider</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#múltiples-layouts-por-página">M&uacute;ltiples layouts por p&aacute;gina</a></li><li class="ntn-toc__item ntn-toc__item--3"><a href="#qué-layoutcuerpo-está-activo">Qu&eacute; layout&#x2f;cuerpo est&aacute; activo</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#personalizar-colores-sin-sobrescribir-un-tema">Personalizar colores sin sobrescribir un tema</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#banner-hero-de-la-página-de-inicio">Banner hero de la p&aacute;gina de inicio</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#sobrescribir-un-tema">Sobrescribir un tema</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#escribir-un-tema-desde-cero">Escribir un tema desde cero</a></li></ul></nav>
+			<nav class="ntn-toc bxsites-toc" aria-label="En esta p&aacute;gina"><div class="ntn-toc__title bxsites-toc__title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> En esta p&aacute;gina</div><ul><li class="ntn-toc__item ntn-toc__item--2"><a href="#incorporados">Incorporados</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#instalar-un-tema-publicado">Instalar un tema publicado</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#sitios-sin-conexión-a-internet-air-gapped">Sitios sin conexi&oacute;n a internet &#x28;air-gapped&#x29;</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#el-contrato-de-themeprovider">El contrato de ThemeProvider</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#múltiples-layouts-por-página">M&uacute;ltiples layouts por p&aacute;gina</a></li><li class="ntn-toc__item ntn-toc__item--3"><a href="#qué-layoutcuerpo-está-activo">Qu&eacute; layout&#x2f;cuerpo est&aacute; activo</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#personalizar-colores-sin-sobrescribir-un-tema">Personalizar colores sin sobrescribir un tema</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#banner-hero-de-la-página-de-inicio">Banner hero de la p&aacute;gina de inicio</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#sobrescribir-un-tema">Sobrescribir un tema</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#sobrescrituras-del-proyecto">Sobrescrituras del proyecto</a></li><li class="ntn-toc__item ntn-toc__item--3"><a href="#slots">Slots</a></li><li class="ntn-toc__item ntn-toc__item--3"><a href="#manifiesto-del-tema-themejson">Manifiesto del tema &#x28; theme.json &#x29;</a></li><li class="ntn-toc__item ntn-toc__item--3"><a href="#layouts-implícitos">Layouts impl&iacute;citos</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#escribir-un-tema-desde-cero">Escribir un tema desde cero</a></li></ul></nav>
 		</aside>
 
 	</div>

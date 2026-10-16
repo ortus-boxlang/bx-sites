@@ -495,6 +495,27 @@ Schlägt fehl, statt ein bestehendes `.theme/` zu überschreiben. Siehe
 [Themes](guides/themes.md) für den Override-Vertrag (`layout.bxm` +
 `page.bxm`).
 
+## `layout:new`
+
+Legt ein benanntes Layout an, indem ein Template des aktiven Themes in den
+Ordner `.overrides/<theme>/` des Projekts kopiert wird, bereit zum Bearbeiten
+und zur Auswahl mit `layout: <name>` im Frontmatter einer Seite oder über eine
+[`layouts:`-Regel](guides/themes.md#implizite-layouts).
+
+```bash title="Usage"
+bxSites layout:new --name=landing [--from=layout] [--theme=bootstrap]
+```
+
+- `--name` (erforderlich) - der Name des neuen Layouts, ein bloßer Template-Name wie `landing`
+- `--from` - welches Template des Themes kopiert werden soll, ohne Erweiterung; Standard ist `layout` (die äußere Hülle)
+- `--theme` - das Theme, von dem kopiert wird; Standard ist das `theme.name` des Projekts
+
+Schlägt fehl, statt eine bestehende Datei zu überschreiben, und listet die
+verfügbaren Templates auf, wenn `--from` eines benennt, das das Theme nicht
+hat. Ein Projekt mit einem vollständigen flachen `.theme/` erhält die Datei
+stattdessen dort. Siehe
+[Projekt-Überschreibungen](guides/themes.md#projekt-überschreibungen).
+
 ## `install:theme`
 
 Lädt ein veröffentlichtes Theme von ForgeBox in die eigenen
