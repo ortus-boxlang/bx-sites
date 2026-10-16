@@ -369,7 +369,7 @@ class {
 		var moduleAssetNames = [
 			"copy-code.js", "admonition-collapse.js", "nav-toggle.js", "toc-collapse.js",
 			"highlight-boxlang.js", "tabs.js", "conditional-content-init.js", "course-progress.js",
-			"prompt-init.js", "contact-form-init.js", "code-lines.js", "home.css",
+			"prompt-init.js", "contact-form-init.js", "code-lines.js",
 			"search.js", "mermaid-init.js", "math-init.js", "openapi-init.js",
 			"image-gallery-init.js", "page-actions-init.js", "cloud-content-init.js", "comments-init.js"
 		]

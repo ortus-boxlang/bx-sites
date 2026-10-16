@@ -1,10 +1,10 @@
 <!---
 	The outer shell for the site's own homepage (`docs/index.md`'s own
-	`layout: home` frontmatter) - selected in place of `layout.bxm` via
-	ThemeRenderer.renderPage()'s own `layoutHint` (BuildPipeline.bx's
-	renderDocTree() forwards every page's own `page.layout` as the
-	layoutHint, so any page can opt into an alternate outer shell this way,
-	not just the blog). Unlike `blog.bxm`, this is NOT a close derivative of
+	`layout: home` frontmatter). It lives in this project's own
+	`docs/.overrides/bootstrap/` rather than in the Bootstrap theme: a page's
+	`layout: <name>` renders through `<name>.bxm` in place of `layout.bxm`
+	(ThemeRenderer.renderPage()'s `layoutHint`), and a project's
+	`.overrides/<theme>/` folder is layered over the theme it names. Unlike `blog.bxm`, this is NOT a close derivative of
 	`layout.bxm` - there's no sidebar, no TOC rail, and the header is a
 	horizontal marketing nav instead of the docs hamburger/sidebar toggle.
 	It never includes `#variables.bodyFile#` - the whole page is hardcoded
@@ -14,6 +14,7 @@
 <bx:include template="#variables.moduleAssetsDir#/icons.bxm">
 <bx:include template="#variables.moduleAssetsDir#/locale-flags.bxm">
 <bx:include template="includes/site-helpers.bxm">
+<bx:include template="includes/home-helpers.bxm">
 <bx:script>
 	// module spec section 7 - search is fully static/client-side (provider "local") by
 	// default, opt-out via bxsites.json's `search`; `searchProvider.provider` picks a
@@ -97,7 +98,7 @@
 	<link rel="stylesheet" href="#variables.basePath#assets/vendor/bootstrap/bootstrap.min.css">
 	<link rel="stylesheet" href="#variables.basePath#assets/vendor/highlight/github.min.css">
 	<link rel="stylesheet" href="#themeAssetUrl( 'style.css' )#">
-	<link rel="stylesheet" href="#moduleAssetUrl( 'home.css' )#">
+	<link rel="stylesheet" href="#themeAssetUrl( 'home.css' )#">
 
 	<!--- Extra CSS --->
 	#renderExtraCss( variables.siteConfig.extraCss ?: [] )#

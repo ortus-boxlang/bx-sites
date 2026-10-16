@@ -51,7 +51,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "copies another template with --from", function() {
 				var root = newProject();
 
-				verb.run( { projectRoot : root, name : "front", from : "home" } );
+				verb.run( { projectRoot : root, name : "front", from : "blog" } );
 
 				expect( fileExists( root & "/docs/.overrides/bootstrap/front.bxm" ) ).toBeTrue();
 			} );
