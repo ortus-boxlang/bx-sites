@@ -107,7 +107,11 @@ in full on the post's own page.
 Jeder andere Seiten-Frontmatter-Schlüssel, der bereits in
 [Erste Schritte](../getting-started.md#seiten-hinzufügen) dokumentiert ist
 (`icon`, `description`, `ogImage`, `toc`), funktioniert auch auf einem
-Beitrag.
+Beitrag - einschließlich `layout`, das den Body dieses Beitrags über eine
+benannte `.bxm`-Datei rendert statt über die Standarddatei des aktiven
+Themes (dessen eigenes `blog-page.bxm`, falls vorhanden, sonst
+`page.bxm`) - siehe
+[Mehrere Layouts pro Seite](themes.md#mehrere-layouts-pro-seite).
 
 ## Beitragsbilder und andere Blog-Assets
 
@@ -208,6 +212,21 @@ also nie ein Duplikat:
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+
+    [[nav]]
+    path = "index.md"
+
+    [[nav]]
+    title = "Blog"
+    url = "blog/index.html"
+    icon = "lucide:newspaper"
+
+    [[nav]]
+    path = "about.md"
+    ```
+
 Einzelne Beiträge werden nicht selbst zur Navigation hinzugefügt
 (genau wie der Tags-Index) - sie sind erreichbar von `/blog/`, ihrer
 eigenen Kategorie-Seite, ihrer eigenen Jahresarchiv-Seite, der Seite
@@ -242,6 +261,15 @@ für jeden Beitrag, unbegrenzt:
 === "JSON"
     ```json title="bxsites.json"
     { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+
+    [blog]
+    postsPerPage = 10
+    feed = true
+    feedLimit = 25
     ```
 
 ## Entwürfe ansehen
@@ -336,6 +364,6 @@ Zwei Wege, es umzugestalten, genau wie bei jeder anderen Seite:
 
 Was du nicht tun kannst, ist, das Markup von Beitrags-Card/Pager/
 Autoren-Profil selbst gegen ein eigenes auszutauschen - es wird einmal
-von `BlogBuilder.bx` erzeugt, nicht aus einer Vorlagendatei in `theme/`
+von `BlogBuilder.bx` erzeugt, nicht aus einer Vorlagendatei in `.theme/`
 gelesen, sodass das Umgestalten mit CSS (oben) der unterstützte Weg ist,
 statt eine Pro-Komponenten-Überschreibung.

@@ -10,8 +10,8 @@ tags: [guide, configurazione-iniziale]
 
 ## Prerequisito: installare BoxLang
 
-Tutto quanto segue presuppone che il runtime di BoxLang sia già presente
-sulla tua macchina - `install-bx-module` è il comando CLI nativo di
+Tutto quanto segue presuppone che il runtime di BoxLang (1.18 o
+successivo) sia già presente sulla tua macchina - `install-bx-module` è il comando CLI nativo di
 BoxLang che installa un modulo in un'installazione già esistente, e anche
 `box install` di CommandBox richiede un motore BoxLang già presente su cui
 girare. Se non hai ancora BoxLang, installalo prima con uno di questi due
@@ -90,13 +90,28 @@ my-docs/
 ├── docs/
 │   ├── assets/
 │   └── index.md
-└── bxsites.yaml
+├── bxsites.yaml
+├── .markdownlint.json
+└── AGENTS.md
 ```
 
 Passa `--theme=material` o `--theme=tailwind` per generare lo scheletro con
 un tema predefinito diverso, e `--name="My Project Docs"` per impostare
 subito il nome del sito - altrimenti `new` lo ricava dal nome della
 cartella di destinazione.
+
+`AGENTS.md` è un prontuario generato per la stesura dei contenuti, pensato
+per gli assistenti di coding IA, e `.markdownlint.json` un insieme di
+regole lint corrispondente - entrambi vengono scritti per default; vedi
+[Istruzioni per Agenti IA](guides/ai-agent-instructions.md) per il loro
+contenuto, come attivare anche `CLAUDE.md`/`.cursorrules`, e come
+aggiornarli in seguito con `agents:sync`.
+
+`docs/` è la cartella sorgente predefinita. Usa `bxSites new my-site
+--source=src` per generare le pagine sotto `src/`; i comandi successivi
+rilevano automaticamente la cartella sorgente e l'output resta in `site/`.
+Le opzioni brevi `--docs` e `--site` sono alias di `--source=docs` e
+`--source=src`.
 
 ### Formato del file di configurazione
 
@@ -130,6 +145,11 @@ cartelle diventa automaticamente annidamento nella navigazione:
     quello che esiste davvero. L'output della build finisce comunque
     sempre in `site/` - i due non entrano mai in conflitto, dato che
     `site/` stesso non è mai un nome valido per la cartella sorgente.
+    Anche questa cartella è configurabile - un nome personalizzato, o
+    l'intero repository senza alcuna sottocartella - tramite la chiave
+    `source` di `bxsites.yaml`; vedi
+    [Origine del contenuto](guides/content-source.md) per il quadro
+    completo.
 
 ```
 docs/
@@ -221,6 +241,12 @@ Your content here.
   sulla pagina stessa)
 - `ogImage` - sovrascrive l'immagine social-card di questa singola pagina -
   vedi [`ogImage`](configuration.md#ogimage)
+- `layout` - renderizza il corpo di questa pagina tramite un file `.bxm`
+  con un nome specifico invece del `page.bxm` predefinito del tema attivo
+  (il proprio `blog-page.bxm` del tema attivo per un articolo del blog, se
+  presente) - ricade su `page.bxm` quando il file indicato non esiste,
+  invece di far fallire la build - vedi
+  [Più layout per pagina](guides/themes.md#piu-layout-per-pagina)
 
 I valori del frontmatter possono essere liste inline (`tags: [a, b, c]`),
 liste in stile YAML a blocchi (`tags:` seguito da righe `- elemento`
@@ -246,7 +272,7 @@ bxSites serve
 Compila il progetto, serve `site/` su `http://127.0.0.1:8080/`, e
 ricompila automaticamente ogni volta che salvi una modifica sotto
 `docs/`, la configurazione del sito `bxsites.yaml`/`.json`, o una
-personalizzazione di `theme/` a livello di progetto - il browser si
+personalizzazione `.theme/` nella content root - il browser si
 ricarica da solo. Passa `--port=3000` o `--host=0.0.0.0` per cambiare come
 si aggancia.
 

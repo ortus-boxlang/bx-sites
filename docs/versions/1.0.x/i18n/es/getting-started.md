@@ -10,8 +10,8 @@ tags: [guías, configuración]
 
 ## Requisito previo: instalar BoxLang
 
-Todo lo que sigue asume que el runtime de BoxLang ya está instalado en tu
-máquina - `install-bx-module` es el propio CLI de BoxLang instalando un
+Todo lo que sigue asume que el runtime de BoxLang (1.18 o posterior) ya
+está instalado en tu máquina - `install-bx-module` es el propio CLI de BoxLang instalando un
 módulo dentro de una instalación existente, y `box install` de CommandBox
 también necesita un motor de BoxLang ya presente contra el cual ejecutarse.
 Si aún no tienes BoxLang, instálalo primero con cualquiera de estas dos
@@ -90,13 +90,29 @@ my-docs/
 ├── docs/
 │   ├── assets/
 │   └── index.md
-└── bxsites.yaml
+├── bxsites.yaml
+├── .markdownlint.json
+└── AGENTS.md
 ```
 
 Pasa `--theme=material` o `--theme=tailwind` para generar la estructura
 con un tema predeterminado diferente, y `--name="My Project Docs"` para
 establecer el nombre del sitio de antemano - de lo contrario `new` lo
 deriva del nombre del directorio de destino.
+
+`AGENTS.md` es una chuleta de referencia generada para la creación de
+contenido, pensada para asistentes de codificación con IA, y
+`.markdownlint.json` un conjunto de reglas de lint a juego - ambos se
+escriben por defecto; consulta
+[Instrucciones para Agentes de IA](guides/ai-agent-instructions.md) para
+ver qué contienen, cómo activar también `CLAUDE.md`/`.cursorrules`, y cómo
+actualizarlos más adelante con `agents:sync`.
+
+`docs/` es la carpeta de origen predeterminada. Usa `bxSites new my-site
+--source=src` para generar las páginas bajo `src/`; los comandos posteriores
+detectan automáticamente la carpeta de origen y la salida sigue estando en
+`site/`. Las opciones abreviadas `--docs` y `--site` son alias de
+`--source=docs` y `--source=src`.
 
 ### Formato del archivo de configuración
 
@@ -130,6 +146,11 @@ de carpetas se convierte automáticamente en anidamiento de navegación:
     lo que realmente existe. El resultado de la construcción siempre
     termina en `site/` de cualquier forma - los dos nunca chocan, ya que
     `site/` nunca es en sí mismo un nombre válido de carpeta de origen.
+    Esta carpeta es a su vez configurable - un nombre personalizado, o
+    todo el repositorio sin ninguna subcarpeta - mediante la clave
+    `source` de `bxsites.yaml`; consulta
+    [Origen del Contenido](guides/content-source.md) para el panorama
+    completo.
 
 ```text title="docs/ → nav"
 docs/
@@ -230,6 +251,12 @@ Your content here.
   para que se renderice) - útil para una página de aterrizaje/hero que no
   quiere una TOC flotante compitiendo con su propio contenido; por
   defecto `true`
+- `layout` - renderiza el cuerpo de esta página a través de un `.bxm` con
+  nombre en lugar del `page.bxm` predeterminado del tema activo (el propio
+  `blog-page.bxm` del tema activo para una entrada de blog, si lo tiene) -
+  recurre a `page.bxm` cuando el archivo indicado no existe, en lugar de
+  hacer fallar la compilación - consulta
+  [Múltiples layouts por página](guides/themes.md#multiples-layouts-por-pagina)
 
 Los valores del frontmatter pueden ser listas en línea (`tags: [a, b, c]`),
 listas de bloque al estilo YAML (`tags:` seguido de líneas `- item`
@@ -254,8 +281,8 @@ bxSites serve
 
 Construye el proyecto, sirve `site/` en `http://127.0.0.1:8080/`, y
 reconstruye automáticamente cada vez que guardas un cambio bajo `docs/`,
-tu configuración de sitio `bxsites.yaml`/`.json`, o una sobrescritura de
-`theme/` a nivel de proyecto - tu navegador se recarga por sí solo. Pasa
+tu configuración de sitio `bxsites.yaml`/`.json`, o una sobrescritura
+`.theme/` en la raíz de contenido - tu navegador se recarga por sí solo. Pasa
 `--port=3000` o `--host=0.0.0.0` para cambiar cómo se enlaza.
 
 ## Limpieza

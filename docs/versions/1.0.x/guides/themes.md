@@ -141,6 +141,13 @@ Set which one a project uses in `bxsites.yaml`:
     { "theme": { "name": "material" } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+
+    [theme]
+    name = "material"
+    ```
+
 ## Installing a published theme
 
 A theme published to ForgeBox installs with nothing but the `bxSites`
@@ -153,10 +160,11 @@ bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
 ```
 
 This downloads the package's zip and extracts it into
-`themes/bx-sites-theme-blog1/` at the project root, validating it
-satisfies the `ThemeProvider` contract below before finishing. A project
-can carry several installed themes side by side this way and switch
-between them purely by name:
+`.themes/bx-sites-theme-blog1/` inside the project's content root (see
+[Content Source](content-source.md#where-a-theme-override-lives)),
+validating it satisfies the `ThemeProvider` contract below before
+finishing. A project can carry several installed themes side by side
+this way and switch between them purely by name:
 
 === "YAML"
     ```yaml title="bxsites.yaml"
@@ -168,6 +176,13 @@ between them purely by name:
     { "theme": { "name": "bx-sites-theme-blog1" } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+
+    [theme]
+    name = "bx-sites-theme-blog1"
+    ```
+
 A theme needs no BoxLang module/class-loader involvement at all (unlike a
 plugin) - it's pure files, so there's no separate activation step the way
 `install:plugin` has; setting `theme.name` is the only wiring needed. See
@@ -176,7 +191,7 @@ plugin) - it's pure files, so there's no separate activation step the way
 Starting from a theme built for a different static site generator
 instead? See [Importing a theme](theme-import.md) - `theme:import`
 mechanically converts an mkdocs/jekyll/hugo theme's own template files
-into a best-effort `themes/<name>/` scaffold.
+into a best-effort `.themes/<name>/` scaffold.
 
 ## Air-gapped/offline sites
 
@@ -226,7 +241,9 @@ A theme is just a folder with:
 - **`layout.bxm`** (required) - the outer HTML shell + nav. Receives
   `variables.page`, `variables.nav`, `variables.siteConfig`,
   `variables.themeDir` and `variables.basePath` in scope, and includes the
-  sibling `page.bxm` via `#variables.themeDir#/page.bxm`.
+  resolved body template via `#variables.themeDir#/#variables.bodyFile#`
+  (`page.bxm` unless a page/content type resolves to something else - see
+  [Multiple layouts per page](#multiple-layouts-per-page) below).
   `variables.basePath` is always a root-relative path ending in `/` (`/` by
   default, `/my-docs/` when `bxsites.yaml`'s `baseURL` overrides it) - prefix
   every internal `href`/`src` with it, rather than hardcoding a leading `/`,
@@ -236,6 +253,13 @@ A theme is just a folder with:
 - **`search.bxm`** (optional) - the search box markup, included by
   `layout.bxm` only when `bxsites.yaml`'s `search` is `true`. See
   [Search](search.md).
+- **`blog.bxm`** (optional) - an alternate outer shell for the blog's own
+  listing/category/archive/author/stats pages. Falls back to `layout.bxm`
+  when a theme doesn't have it. See
+  [Multiple layouts per page](#multiple-layouts-per-page).
+- **`blog-page.bxm`** (optional) - an alternate body for an individual blog
+  post, still rendered under the theme's normal `layout.bxm`. Falls back to
+  `page.bxm` when a theme doesn't have it.
 - **`assets/`** (optional) - theme CSS/JS, copied to `site/assets/theme/`
   at build time.
 
@@ -243,11 +267,24 @@ A theme is just a folder with:
 and `variables.siteConfig.repo`/`.social`/`.footer` are always available too,
 backing the repo link/edit link/last-updated/footer features above - a
 custom theme decides for itself whether and how to render them, same as
-everything else. `variables.versions` (`[ { label, url } ]`, "Latest"
+everything else. `variables.versions` (`[ { label, url, kind } ]`, "Latest"
 first) and `variables.currentVersion` (the `label` being rendered right
 now) back the version switcher - empty/`"Latest"` for a project that isn't
 versioned, so a theme only needs to render a switcher when
-`variables.versions.len() gt 1`. Every built-in theme gets its repo/social icons from
+`variables.versions.len() gt 1`. Each entry's `kind` is `"current"` (the
+version a visitor lands on at the site root), `"released"` (any other cut
+snapshot), or `"next"` (the plain `docs/` tree, once `versions.default` is
+set - see [Versioning](versioning.md#publishing-a-default-version-at-the-site-root)).
+Rather than looping `variables.versions` by hand, call
+`renderVersionSwitcher( variables.versions, variables.currentVersion )` -
+bound into every theme's render scope the same way `themeAssetUrl()`/
+`moduleAssetUrl()` are (above) - and it builds the whole `<select>`, groups
+`"next"` behind a divider after every released version, and labels the
+`"current"` entry with "(Current)", all driven by `kind` rather than a
+theme re-implementing that logic itself. An optional second argument adds
+extra CSS classes to the `<select>` (`renderVersionSwitcher( variables.versions, variables.currentVersion, "my-extra-class" )`)
+for a theme that wants its own styling without reimplementing the markup.
+Every built-in theme gets its repo/social icons from
 a small shared SVG lookup, `<bx:include template="#variables.moduleAssetsDir#/icons.bxm">`
 (defines `bxsitesIcon( name )`, one of `github`, `twitter`/`x`, `rss`,
 `youtube`, `linkedin`, `facebook`, `bluesky`, `threads`, `slack`,
@@ -257,7 +294,67 @@ theme can include it the same way, or supply its own icons entirely.
 
 A theme folder missing either required file fails fast with a clear
 `BxSites.InvalidTheme` error at build time, rather than a confusing template
-error deep inside rendering.
+error deep inside rendering. `blog.bxm`/`blog-page.bxm` are never
+enforced - same "optional, falls back" shape `search.bxm` already has.
+
+## Multiple layouts per page
+
+A theme can offer more than one outer shell and more than one body
+template, letting a blog (or any other content type) look different from
+the rest of the site while reusing the same theme's chrome and assets. Two
+independent resolution chains:
+
+- **Outer shell** - always `layout.bxm`, except the blog's own listing/
+  category/archive/author/stats pages, which use `blog.bxm` when the active
+  theme has it. This one follows content type - there's no frontmatter
+  key for it.
+- **Body** - `page.bxm` by default. A blog post uses `blog-page.bxm` when
+  the active theme has it. Either way, a page's own frontmatter always wins
+  when it sets one:
+
+```markdown title="docs/marketing/press-release.md"
+---
+title: We raised a Series A
+layout: press-release
+---
+```
+
+`layout: press-release` renders this one page's body through
+`.theme/press-release.bxm` (or the active built-in theme's own, if it ships
+one) instead of `page.bxm` - still inside the site's normal `layout.bxm`
+shell. A `layout:` naming a file the active theme doesn't have falls back
+to `page.bxm` rather than failing the build, so switching themes never
+breaks a page that named one theme's own custom layout.
+
+`bootstrap` ships `blog.bxm`/`blog-page.bxm` as a working example to copy;
+the other built-in themes don't yet, and fall back to `layout.bxm`/`page.bxm`
+for blog content the same way any incomplete `.theme/` override would.
+
+### Which layout/body is active
+
+Every `.bxm` a page renders through - `layout.bxm`, `page.bxm`, `blog.bxm`,
+`blog-page.bxm`, or a project's own custom one - can read which files
+actually resolved, the same bare way it already reads `variables.page`/
+`variables.data`:
+
+- `variables.layoutFile` - the outer shell in use, e.g. `"layout.bxm"` or
+  `"blog.bxm"`
+- `variables.bodyFile` - the body in use, e.g. `"page.bxm"`,
+  `"blog-page.bxm"`, or a frontmatter-named one
+- `variables.page.layout` - the page's own raw frontmatter `layout:`
+  value, if it set one; `""` otherwise
+
+Useful for a body class hook, or branching without a separate template:
+
+```bx title=".theme/layout.bxm"
+<body class="layout-#reReplace( variables.bodyFile, '\.bxm$', '' )#">
+```
+
+```bx title=".theme/page.bxm"
+<bx:if variables.bodyFile == "blog-page.bxm">
+	<!-- blog-post-only chrome -->
+</bx:if>
+```
 
 ## Customizing colors without a theme override
 
@@ -276,6 +373,11 @@ without touching `resources/themes/` at all:
 === "JSON"
     ```json title="bxsites.json"
     { "extraCss": ["assets/brand.css"] }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    extraCss = [ "assets/brand.css" ]
     ```
 
 ```css title="docs/assets/brand.css" linenums="1"
@@ -300,9 +402,12 @@ is `--bxsites-gradient-start`/`-end`, `--bxsites-accent`, `--bxsites-bg`,
 `--bxsites-border`, `--bxsites-link`, `--bxsites-link-hover`,
 `--bxsites-code-bg`, `--bxsites-step-marker-bg`, `--bxsites-step-marker-text`,
 `--bxsites-step-line`, `--bxsites-step-success-bg`/`-text`,
-`--bxsites-step-warning-bg`/`-text` and `--bxsites-step-danger-bg`/`-text`.
+`--bxsites-step-warning-bg`/`-text`, `--bxsites-step-danger-bg`/`-text` and
+the [`--bxsites-table-*` set](tables.md#theming) that paints a rendered
+table's card, header strip, dividers and zebra/hover tints.
 Every built-in theme guarantees `--bxsites-gradient-start`/`-end`,
-`--bxsites-accent` and the `--bxsites-step-*` set under those exact names,
+`--bxsites-accent`, the `--bxsites-step-*` set and the `--bxsites-table-*`
+set under those exact names,
 so `extraCss` can always retarget the brand color/stepper accents
 regardless of theme - but only `bootstrap`, `slate` and `notion` also
 expose `--bxsites-bg`/`-text`/`-sidebar-bg`/`-sidebar-text`/`-border`/`-link`/`-link-hover`/`-code-bg`
@@ -366,12 +471,15 @@ resize/replace `bxsites-hero__banner`'s own image via a `docs/assets/`-relative
 ## Overriding a theme
 
 Drop your own `layout.bxm` + `page.bxm` (and optionally `search.bxm` /
-`assets/`) into a `theme/` folder at your project root. BxSites prefers a
-project-level `theme/` override over both an installed `themes/<name>/`
-theme and any built-in theme, as long as it satisfies the contract below -
-the built-in themes under this module's own `resources/themes/` are a good
-starting point to copy and adapt. Full resolution order: `theme/` (this
-section) -> `themes/theme.name/` (an [installed theme](#installing-a-published-theme),
+`assets/`) into a `.theme/` folder inside your project's content root -
+`docs/.theme/`, `src/.theme/`, or `<source>/.theme/` for whatever
+`source` resolves to (see [Content Source](content-source.md)), not at
+the bare project root. BxSites prefers a content-root `.theme/` override
+over both an installed `.themes/<name>/` theme and any built-in theme, as
+long as it satisfies the contract below - the built-in themes under this
+module's own `resources/themes/` are a good starting point to copy and
+adapt. Full resolution order: `.theme/` (this section) ->
+`.themes/theme.name/` (an [installed theme](#installing-a-published-theme),
 if `theme.name` matches one) -> a built-in theme named `theme.name`.
 
 A worked example - start from `bootstrap` and swap its brand palette and
@@ -381,21 +489,24 @@ code highlighting, ...) exactly as it already works:
 ```text title="Project structure"
 my-project/
 ├── bxsites.yaml
-├── docs/
-└── theme/                    ← project-level override, checked before any built-in theme
-    ├── layout.bxm             ← copied from resources/themes/bootstrap/layout.bxm
-    ├── page.bxm                ← copied from resources/themes/bootstrap/page.bxm, unchanged
-    ├── search.bxm               ← copied unchanged
-    └── assets/
-        └── style.css              ← copied from bootstrap's assets/style.css, then edited
+└── docs/
+    ├── index.md
+    └── .theme/                    ← content-root override, checked before any built-in theme
+        ├── layout.bxm              ← copied from resources/themes/bootstrap/layout.bxm
+        ├── page.bxm                 ← copied from resources/themes/bootstrap/page.bxm, unchanged
+        ├── search.bxm                ← copied unchanged
+        └── assets/
+            └── style.css               ← copied from bootstrap's assets/style.css, then edited
 ```
 
 1. Copy the three `.bxm` files and `assets/style.css` out of this module's
-   `resources/themes/bootstrap/` into your project's `theme/`.
+   `resources/themes/bootstrap/` into your project's `docs/.theme/` (or
+   `src/.theme/`, or `<source>/.theme/`, matching wherever your content
+   root actually is).
 2. Edit only what you need to change. To swap the brand palette and font,
-   that's just the top of `theme/assets/style.css`:
+   that's just the top of `.theme/assets/style.css`:
 
-   ```css title="theme/assets/style.css" linenums="1"
+   ```css title="docs/.theme/assets/style.css" linenums="1"
    :root {
    	--bxsites-gradient-start: #7C3AED;  /* was #00FF78 */
    	--bxsites-gradient-end: #DB2777;    /* was #00DBFF */
@@ -408,34 +519,35 @@ my-project/
    ```
 
 3. Run `bxSites build` (or `serve` while iterating) - BxSites
-   picks up `theme/` automatically, no `bxsites.yaml` change needed (a
-   project-level `theme/` folder always takes precedence over the built-in
+   picks up `.theme/` automatically, no `bxsites.yaml` change needed (a
+   content-root `.theme/` folder always takes precedence over the built-in
    theme named in `theme.name`). Everything you didn't touch - nav
    rendering, search, the dark-mode toggle, code annotations - keeps
    working exactly as it did in the original `bootstrap` theme, since it's
    still the exact same `layout.bxm`/`page.bxm` markup underneath.
 
-A project `theme/` folder is all-or-nothing, though - once BxSites finds
-one, it's used instead of the built-in theme entirely, so it still needs
-its own `layout.bxm` + `page.bxm` even if all you changed is
+A project's `.theme/` folder is all-or-nothing, though - once BxSites
+finds one, it's used instead of the built-in theme entirely, so it still
+needs its own `layout.bxm` + `page.bxm` even if all you changed is
 `assets/style.css` (a folder missing either fails fast with
 `BxSites.InvalidTheme` rather than silently falling back). For a
 CSS-only/no-`.bxm` tweak, use [`extraCss`](#customizing-colors-without-a-theme-override)
 above instead - it layers on top of whichever theme `bxsites.yaml` names,
-no `theme/` folder involved at all. `theme/` is for when you also need to
-change the markup itself, covered next.
+no `.theme/` folder involved at all. `.theme/` is for when you also need
+to change the markup itself, covered next.
 
 ## Writing a theme from scratch
 
 A theme only needs the two required files, so here's a genuinely minimal
 one - no Bootstrap/Tailwind, no dark mode, no search UI - to show exactly
 what's required versus what the built-in themes add on top. Save both as
-`theme/layout.bxm` and `theme/page.bxm` in your project - a project-level
-`theme/` folder is picked up automatically (as above), no `bxsites.yaml`
+`docs/.theme/layout.bxm` and `docs/.theme/page.bxm` in your project (or
+under whichever content root your `source` resolves to) - a content-root
+`.theme/` folder is picked up automatically (as above), no `bxsites.yaml`
 change needed:
 
-```bx title="theme/layout.bxm" linenums="1"
-<!-- theme/layout.bxm -->
+```bx title="docs/.theme/layout.bxm" linenums="1"
+<!-- docs/.theme/layout.bxm -->
 <bx:script>
 	function renderNav( required array nodes ) {
 		var html = "<ul>"
@@ -458,14 +570,14 @@ change needed:
 <head>
 	<meta charset="UTF-8">
 	<title>#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#</title>
-	<link rel="stylesheet" href="#variables.basePath##variables.siteConfig.theme.styleUrl ?: 'assets/theme/style.css'#">
+	<link rel="stylesheet" href="#themeAssetUrl( 'style.css' )#">
 </head>
 <body>
 	<header><a href="#variables.basePath#">#encodeForHTML( variables.siteConfig.name )#</a></header>
 	<nav>#renderNav( variables.nav )#</nav>
 	<main>
 </bx:output>
-<bx:include template="#variables.themeDir#/page.bxm">
+<bx:include template="#variables.themeDir#/#variables.bodyFile#">
 <bx:output>
 	</main>
 </body>
@@ -473,8 +585,8 @@ change needed:
 </bx:output>
 ```
 
-```bx title="theme/page.bxm" linenums="1"
-<!-- theme/page.bxm -->
+```bx title="docs/.theme/page.bxm" linenums="1"
+<!-- docs/.theme/page.bxm -->
 <bx:output>
 <article>
 	<h1>#encodeForHTML( variables.page.title )#</h1>
@@ -496,11 +608,31 @@ links (`page.bxm` in any built-in theme shows the pattern - each is just an
 on `variables.page`), or an `assets/` folder for your own CSS/JS, copied to
 `site/assets/theme/` automatically at build time.
 
-The `variables.siteConfig.theme.styleUrl ?: 'assets/theme/style.css'`
-pattern used above (rather than a hardcoded `assets/theme/style.css`) is
-what makes your theme's own `assets/style.css` pick up [content-hash
-fingerprinting](../configuration.md#assets) - `assets.fingerprint` (on by
-default) means every edit you make to that CSS gets a new filename on the
-next build, so visitors' browsers never serve a stale cached copy. Any
-`.bxm` (built-in or custom) that hardcodes the plain path instead won't
-break, it just won't bust caches automatically when the CSS changes.
+`themeAssetUrl( "style.css" )` (used above, instead of a hardcoded
+`assets/theme/style.css`) is what makes your theme's own CSS pick up
+[content-hash fingerprinting](../configuration.md#assets) -
+`assets.fingerprint` (on by default) means every edit you make to that
+file gets a new filename on the next build, so visitors' browsers never
+serve a stale cached copy. It works the same way for any top-level CSS or
+JS file in your theme's own `assets/` folder, not just `style.css` - a
+theme with its own `assets/main.js` links it the same way:
+`<script src="themeAssetUrl( 'main.js' )"></script>`. `moduleAssetUrl( "copy-code.js" )`
+is the same helper for this module's own shared, theme-independent
+scripts (the ones every built-in theme's own `layout.bxm` links via
+`variables.moduleAssetsDir`) - use it instead of hardcoding
+`assets/copy-code.js` if your own theme links one directly.
+
+Both helpers only fingerprint a file that sits *directly* inside that
+folder - never one nested in a subdirectory (your own `assets/fonts/` or
+`assets/vendor/`, say). That's deliberate: a file referenced *indirectly*
+by one of your top-level files (a `@font-face url(...)`, a CSS `@import`)
+would break if renamed without also rewriting every place that references
+it by its old name, so this never touches those. Calling either helper on
+a file that doesn't exist yet, or with `assets.fingerprint` off, falls back
+to today's exact plain path - never an error.
+
+Any `.bxm` (built-in or custom) that hardcodes a plain path instead of
+calling one of these two helpers won't break, but it won't bust caches
+automatically either - and a build now prints a one-line, non-fatal
+warning naming the file when it detects exactly that, so a theme like this
+one doesn't go stale silently.

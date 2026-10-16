@@ -56,7 +56,8 @@ convert is left in the migrated file in its original `{% %}` syntax, so
 the content is still there and still easy to find (search the migrated
 `docs/` tree for `{%` once you're done). Re-running `migrate` overwrites
 any file or `docs/nav.json` it wrote before, so it's safe to fix your
-source export and run it again.
+source export and run it again. It asks first when `docs/` already has
+files; pass `--force` to skip the prompt.
 
 ## What gets converted automatically
 

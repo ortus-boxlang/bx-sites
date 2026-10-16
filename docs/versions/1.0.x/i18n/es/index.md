@@ -23,7 +23,10 @@ marketing, un blog, una base de conocimiento, un sitio de producto, un sitio
 personal: todo lo que puedas escribir en Markdown se construye de la misma
 forma, a través de los mismos temas, búsqueda e i18n. El contenido vive en
 `docs/` por defecto, o en `src/` si tu proyecto se parece más a un sitio
-web que a "docs" - cada comando funciona igual en ambos casos.
+web que a "docs" - cada comando funciona igual en ambos casos. Dónde vive
+realmente el contenido es en sí mismo configurable, además - cualquier
+nombre de carpeta, o todo el repositorio sin ninguna subcarpeta -
+consulta [Origen del Contenido](guides/content-source.md).
 
 ::: cards
 ::: card title="Markdown como entrada, HTML estático como salida" icon="phosphor-duotone:file-html"

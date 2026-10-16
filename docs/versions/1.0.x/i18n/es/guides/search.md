@@ -83,6 +83,11 @@ ninguno de los dos abre la propia paleta de este módulo.
     { "search": false }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    search = false
+    ```
+
 Omite la construcción de `search-index.json` por completo, y omite el
 cuadro de búsqueda, el script incluido/autoalojado de `lunr.js`, y el
 widget compartido `search.js` en cada página renderizada - un proyecto
@@ -139,6 +144,20 @@ mkdocs-material, VitePress, Starlight y Docusaurus:
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    search = true
+
+    [searchProvider]
+    provider = "algolia"
+
+    [searchProvider.algolia]
+    appId = "ABC123"
+    apiKey = "a1b2c3d4e5f6..."
+    indexName = "my-docs"
+    insights = false
+    ```
+
 `appId`, `apiKey` e `indexName` son obligatorios - `apiKey` es la clave
 API pública **solo de búsqueda** que te da DocSearch (nunca una clave de
 administrador; se envía directamente en cada página renderizada).
@@ -189,6 +208,18 @@ propio HTML *construido* de `site/` en lugar de rastreado como Algolia:
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    search = true
+
+    [searchProvider]
+    provider = "pagefind"
+
+    [searchProvider.pagefind]
+    bin = "pagefind"
+    options = []
+    ```
+
 Ambas claves de `pagefind` son opcionales - `bin` (por defecto
 `"pagefind"`) es el nombre/ruta del ejecutable, resuelto contra `PATH`
 cuando es un nombre simple; `options` es un array de flags de CLI en
@@ -233,9 +264,9 @@ Sites solo comprueba los tres proveedores de arriba). No hay ningún hook
 de plugin para esto - los temas incorporados simplemente no renderizan
 nada para un nombre de proveedor no reconocido, y conectar un cuarto
 servicio de búsqueda (Meilisearch, Typesense, etc.) es una
-[sobrescritura de tema](themes.md#sobrescribir-un-tema) a nivel de
-proyecto: copia un tema incorporado en el propio `theme/` de tu proyecto
-y añade el marcado/scripts de tu proveedor a su `layout.bxm`/
+[sobrescritura de tema](themes.md#sobrescribir-un-tema) en la raíz de
+contenido: copia un tema incorporado en el propio `.theme/` de tu
+proyecto y añade el marcado/scripts de tu proveedor a su `layout.bxm`/
 `search.bxm`, leyendo `siteConfig.searchProvider` para decidir cuándo
 renderizarlos - ramas `searchProviderName eq "..."` para el punto de
 montaje en `search.bxm`, ramas equivalentes en `layout.bxm` para su

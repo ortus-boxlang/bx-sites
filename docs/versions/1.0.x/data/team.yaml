@@ -1,0 +1,7 @@
+# Sample data for docs/guides/data-files.md and docs/guides/content-blocks.md's
+# own live ::: for examples - a small, real docs/data/*.yaml file, loaded
+# the same "opt-in by presence" way any project's own would be.
+- name: Luis Majano
+  role: CEO
+- name: Jon Clausen
+  role: CTO

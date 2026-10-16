@@ -105,7 +105,11 @@ in full on the post's own page.
 
 Cualquier otra clave de frontmatter a nivel de página ya documentada en
 [Primeros Pasos](../getting-started.md#añadir-páginas) (`icon`, `description`,
-`ogImage`, `toc`) funciona también en una entrada.
+`ogImage`, `toc`) funciona también en una entrada - incluida `layout`,
+que renderiza el cuerpo de esta entrada a través de un `.bxm` con nombre
+en lugar del predeterminado del tema activo (su propio `blog-page.bxm`,
+si lo tiene, o si no `page.bxm`) - consulta
+[Múltiples layouts por página](themes.md#multiples-layouts-por-pagina).
 
 ## Imágenes destacadas y otros recursos del blog
 
@@ -204,6 +208,21 @@ añadida automáticamente, así que nunca hay una duplicada:
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+
+    [[nav]]
+    path = "index.md"
+
+    [[nav]]
+    title = "Blog"
+    url = "blog/index.html"
+    icon = "lucide:newspaper"
+
+    [[nav]]
+    path = "about.md"
+    ```
+
 Las entradas individuales no se añaden a la nav por sí mismas (igual que
 el índice de etiquetas) - son accesibles desde `/blog/`, su propia
 página de categoría, su propio archivo por año, la página de su autor,
@@ -238,6 +257,15 @@ cada sondeo; establécelo en `0` para no tener límite:
 === "JSON"
     ```json title="bxsites.json"
     { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+
+    [blog]
+    postsPerPage = 10
+    feed = true
+    feedLimit = 25
     ```
 
 ## Vista previa de borradores
@@ -335,5 +363,5 @@ Dos formas de darle un nuevo estilo, igual que cualquier otra página:
 Lo que no puedes hacer es sustituir tú mismo el propio marcado de
 tarjeta de entrada/paginador/perfil de autor por el tuyo - se genera una
 sola vez mediante `BlogBuilder.bx`, no se lee de un archivo de plantilla
-en `theme/`, así que darle un nuevo estilo con CSS (arriba) es la vía
+en `.theme/`, así que darle un nuevo estilo con CSS (arriba) es la vía
 compatible en lugar de una sobrescritura por componente.

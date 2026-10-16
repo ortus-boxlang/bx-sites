@@ -101,7 +101,11 @@ in full on the post's own page.
 
 Ogni altra chiave di frontmatter a livello di pagina già documentata in
 [Per iniziare](../getting-started.md#add-pages) (`icon`, `description`,
-`ogImage`, `toc`) funziona anche su un post.
+`ogImage`, `toc`) funziona anche su un post - inclusa `layout`, che
+renderizza il corpo di questo post tramite un file `.bxm` con nome
+specifico invece del predefinito del tema attivo (il proprio
+`blog-page.bxm`, se presente, altrimenti `page.bxm`) - vedi
+[Più layout per pagina](themes.md#piu-layout-per-pagina).
 
 ## Immagini in evidenza e altri asset del blog
 
@@ -198,6 +202,21 @@ automaticamente, quindi non c'è mai un duplicato:
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+
+    [[nav]]
+    path = "index.md"
+
+    [[nav]]
+    title = "Blog"
+    url = "blog/index.html"
+    icon = "lucide:newspaper"
+
+    [[nav]]
+    path = "about.md"
+    ```
+
 I singoli post non vengono aggiunti loro stessi alla nav (come l'indice
 dei tag) - sono raggiungibili da `/blog/`, dalla propria pagina categoria,
 dal proprio archivio annuale, dalla pagina del proprio autore, dalla
@@ -231,6 +250,15 @@ tutti i post, senza limite:
 === "JSON"
     ```json title="bxsites.json"
     { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+
+    [blog]
+    postsPerPage = 10
+    feed = true
+    feedLimit = 25
     ```
 
 ## Vedere in anteprima le bozze
@@ -325,6 +353,6 @@ Due modi per ridisegnarlo, come qualsiasi altra pagina:
 
 Quello che non puoi fare è sostituire tu stesso il markup di
 card-post/paginatore/profilo-autore con uno tuo - viene generato una sola
-volta da `BlogBuilder.bx`, non letto da un file template in `theme/`,
+volta da `BlogBuilder.bx`, non letto da un file template in `.theme/`,
 quindi ridisegnarlo con CSS (sopra) è il percorso supportato invece di una
 sovrascrittura per singolo componente.

@@ -10,8 +10,8 @@ tags: [guides, setup]
 
 ## Prerequisite: install BoxLang
 
-Everything below assumes the BoxLang runtime itself is already on your
-machine - `install-bx-module` is BoxLang's own CLI installing a module into
+Everything below assumes the BoxLang runtime itself (1.18 or later) is
+already on your machine - `install-bx-module` is BoxLang's own CLI installing a module into
 an existing installation, and CommandBox's `box install` still needs a
 BoxLang engine to run against. If you don't have BoxLang yet, install it
 first with either:
@@ -87,24 +87,35 @@ my-docs/
 ├── docs/
 │   ├── assets/
 │   └── index.md
-└── bxsites.yaml
+├── bxsites.yaml
+├── .markdownlint.json
+└── AGENTS.md
 ```
 
 Pass `--theme=material` or `--theme=tailwind` to scaffold with a different
-default theme, and `--name="My Project Docs"` to set the site name up
-front - otherwise `new` derives it from the target directory name.
+default theme, `--name="My Project Docs"` to set the site name up front, or
+`--source=src` to scaffold pages under `src/` instead of `docs/`. Otherwise,
+`new` uses the bootstrap theme, derives the site name from the target
+directory, and uses `docs/`. The shorter `--docs` and `--site` flags are
+aliases for `--source=docs` and `--source=src`.
+
+`AGENTS.md` is a generated content-authoring cheat sheet for AI coding
+assistants, and `.markdownlint.json` a matching lint ruleset - both written
+by default; see [AI Agent Instructions](guides/ai-agent-instructions.md) for
+what's in them, how to opt into `CLAUDE.md`/`.cursorrules` too, and how to
+refresh them later with `agents:sync`.
 
 ### Config file format
 
 `bxsites.yaml` is the default and preferred format - it's what `new`
 scaffolds unless told otherwise, and every example in this guide and in
-[Configuration](configuration.md) shows it first. `bxsites.json` is fully
-supported too, for a project that prefers it: pass `--format=json` to
-scaffold one instead, or just hand-write/rename one yourself - ConfigLoader
-resolves whichever of `bxsites.yaml`/`.yml`/`.json` is actually present, in
-that order, with no other config needed to switch. See
-[Configuration](configuration.md) for the full key reference in both
-formats.
+[Configuration](configuration.md) shows it first. `bxsites.toml` and
+`bxsites.json` are fully supported too: pass `--format=toml` or
+`--format=json` to scaffold one instead, or just hand-write/rename one
+yourself. ConfigLoader resolves whichever of `bxsites.yaml`/`.yml`/`.toml`/
+`.json` is actually present, in that order, with no other config needed to
+switch. See [Configuration](configuration.md) for the full key reference in
+all three formats.
 
 Already have content in GitBook? `bxSites migrate --source=/path/to/export`
 converts a GitBook export straight into `docs/` - see
@@ -113,8 +124,9 @@ skip ahead to [Build](#build).
 
 ## Add pages
 
-Every `.md` file under `docs/` becomes a page. Folder nesting becomes nav
-nesting automatically:
+Every `.md` file under the project's source folder becomes a page. New
+projects use `docs/` by default, or use `bxSites new my-site --source=src`
+to start with `src/`. Folder nesting becomes nav nesting automatically:
 
 !!! note "docs/ or src/"
     `docs/` is what `new` scaffolds and what every example here uses, but a
@@ -123,7 +135,10 @@ nesting automatically:
     (`build`, `serve`, `audit`, `lint`, `page:new`, ...) looks for `docs/`
     first and falls back to `src/` when that's what actually exists. Build
     output always lands in `site/` either way - the two never collide, since
-    `site/` is never itself a valid source-folder name.
+    `site/` is never itself a valid source-folder name. This folder is
+    itself configurable - a custom name, or the whole repository with no
+    subfolder at all - via `bxsites.yaml`'s `source` key; see
+    [Content Source](guides/content-source.md) for the full picture.
 
 ```text title="docs/ → nav"
 docs/
@@ -213,6 +228,11 @@ Your content here.
   even with 2+ headings (the usual trigger for it to render) - handy for a
   landing/hero page that doesn't want a floating TOC competing with its own
   content; defaults to `true`
+- `layout` - renders this page's body through a named `.bxm` instead of the
+  active theme's default `page.bxm` (the active theme's own `blog-page.bxm`
+  for a blog post, if it has one) - falls back to `page.bxm` when the named
+  file doesn't exist, rather than failing the build - see
+  [Multiple layouts per page](guides/themes.md#multiple-layouts-per-page)
 
 Frontmatter values can be inline lists (`tags: [a, b, c]`), YAML-style block
 lists (`tags:` followed by indented `- item` lines), or `>`/`|` block
@@ -236,7 +256,7 @@ bxSites serve
 
 Builds the project, serves `site/` at `http://127.0.0.1:8080/`, and
 rebuilds automatically whenever you save a change under `docs/`, your
-`bxsites.yaml`/`.json` site config, or a project-level `theme/` override -
+`bxsites.yaml`/`.json` site config, or a content-root `.theme/` override -
 your browser reloads on its own. Reacts to the save itself (a native
 BoxLang file watcher, not a poll loop) and only reconverts the page(s) you
 actually changed, reusing everything else from the last build - so saving

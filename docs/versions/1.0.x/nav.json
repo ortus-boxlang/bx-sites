@@ -1,18 +1,18 @@
 [
 	"index.md",
-	"course/index.md",
 	{
 		"title": "Introduction",
 		"children": [
 			"getting-started.md",
-			"cli-reference.md"
+			"course/index.md",
+			"releases/index.md"
 		]
 	},
 	{
 		"title": "Configuration & Reference",
 		"children": [
 			"configuration.md",
-			"releases/index.md"
+			"cli-reference.md"
 		]
 	},
 	{
@@ -44,7 +44,9 @@
 			"guides/openapi.md",
 			"guides/plugins.md",
 			"guides/cli-providers.md",
-			"guides/ai-agent-skills.md"
+			"guides/ai-agent-skills.md",
+			"guides/ai-agent-instructions.md",
+			"guides/mcp.md"
 		]
 	},
 	{
@@ -62,6 +64,25 @@
 			"guides/deployment.md",
 			"guides/migrating-from-gitbook.md",
 			"guides/migrating-from-mkdocs.md"
+		]
+	},
+	{
+		"title": "Java Integration",
+		"children": [
+			"guides/gradle-plugin.md",
+			"guides/maven-plugin.md",
+			"guides/java-openapi-example.md",
+			"guides/java-javadoc-example.md",
+			"guides/java-controller-scan-example.md"
+		]
+	},
+	{
+		"title": "BoxLang Integration",
+		"children": [
+			"guides/docbox.md",
+			"guides/coldbox.md",
+			"guides/docbox-example.md",
+			"guides/coldbox-example.md"
 		]
 	},
 	{

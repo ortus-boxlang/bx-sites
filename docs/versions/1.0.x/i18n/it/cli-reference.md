@@ -40,18 +40,29 @@ la convenzione `docs/`-o-`src/`. `new` genera sempre lo scheletro di
 | `-h`, `--help` | Mostra l'utilizzo ed esce |
 | `-v`, `--version` | Mostra la versione del modulo ed esce |
 
+I flag di percorso (`--source`, `--path`, `--dest`, `--output`) accettano un percorso assoluto, un percorso `~/` nella cartella home o un percorso relativo alla radice del progetto.
+
 ## `new`
 
 Genera lo scheletro di un progetto di documentazione.
 
 ```bash title="Utilizzo"
-bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|json]
+bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|json] [--source=docs|src] [--agents=agents,claude,cursor]
 ```
 
 - `--name` - il nome del sito scritto nella configurazione del sito (per default, il nome della cartella di destinazione)
 - `--theme` - il valore predefinito è `bootstrap`
 - `--description` - la descrizione del sito scritta nella configurazione del sito
 - `--format` - `yaml` (predefinito, genera lo scheletro di `bxsites.yaml`) oppure `json` (genera lo scheletro di `bxsites.json`)
+- `--source` - `docs` (predefinito) oppure `src`, la cartella in cui vengono generati pagine e asset
+- `--agents` - quale/i file di istruzioni per agenti di coding IA scrivere:
+  un elenco separato da virgole tra `agents` (`AGENTS.md`), `claude`
+  (`CLAUDE.md`), `cursor` (`.cursorrules`). Il valore predefinito è solo
+  `agents`; `--agents=none` (o `--no-agents`) li omette tutti. Vedi
+  [Istruzioni per Agenti IA](guides/ai-agent-instructions.md).
+
+Scrive inoltre sempre `.markdownlint.json` - un insieme di regole
+markdownlint per l'intero progetto, calibrato sui contenuti di bx-sites.
 
 ## `build`
 
@@ -77,6 +88,9 @@ Compila e serve il sito in locale con ricaricamento automatico.
 bxSites serve [--port=8080] [--host=127.0.0.1]
 ```
 
+`--port` e `--host` accettano anche valori separati da spazi, ad esempio
+`bxSites serve --port 9191 --host 127.0.0.1`.
+
 Gira in primo piano finché non viene interrotto (Ctrl+C).
 
 ## `search-index`
@@ -96,10 +110,13 @@ bxSites search-index
 ## `clean`
 
 Rimuove `site/` e qualsiasi cache di compilazione, lasciando intatti
-`docs/` e la configurazione del sito.
+`docs/` e la configurazione del sito. Chiede conferma prima di eliminare;
+`--force` salta la domanda (necessario in CI e negli script, dove nessuno
+può rispondere).
 
 ```bash frame="terminal" title="Terminal"
 bxSites clean
+bxSites clean --force
 ```
 
 ## `gh-deploy`
@@ -141,7 +158,7 @@ bxSites deploy [--verbose]
 Tre modi per invocarlo:
 
 1. **`--entry=<nome>`** - smista verso qualunque target dichiarato da un
-   file `deployments/<nome>.json` (vedi sotto). Ogni target eccetto
+   file `deployments/<nome>.yaml` (vedi sotto). Ogni target eccetto
    `local`/`github-pages` lo richiede - c'è più configurazione di quanta
    ne possano ragionevolmente portare un paio di flag.
 2. **`--target=<nome>` con i propri flag** - una scorciatoia a soli flag
@@ -149,10 +166,10 @@ Tre modi per invocarlo:
    cartella `deployments/`: `local` (`--destination=<percorso>`) e
    `github-pages` (`[--branch] [--remote] [--message]`, ogni campo
    opzionale, con gli stessi valori predefiniti di `gh-deploy`).
-3. **Nessun flag - distribuisce tutto.** Ogni voce `deployments/*.json`
+3. **Nessun flag - distribuisce tutto.** Ogni voce `deployments/*`
    viene distribuita a turno, a partire da un'unica build condivisa (il
    sito viene compilato una sola volta, non una volta per target).
-   Richiede che esista almeno una voce `deployments/*.json`. Il
+   Richiede che esista almeno una voce `deployments/*`. Il
    fallimento di un target non ferma gli altri - ogni voce viene tentata,
    e il comando esce con un codice diverso da zero solo se almeno una di
    esse è fallita; il riepilogo finale riporta quante sono andate a buon
@@ -164,7 +181,7 @@ su una riga.
 
 Vedi [Distribuzione](guides/deployment.md) per la struttura di
 configurazione propria di ogni target e un esempio reale di
-`deployments/*.json` per ciascuno.
+`deployments/*` per ciascuno.
 
 ## `package`
 
@@ -197,6 +214,7 @@ bxSites migrate --source=/percorso/dell/export-notion --from=notion
 
 - `--source` (obbligatorio) - percorso alla cartella radice dell'export/progetto (`SUMMARY.md` per `gitbook`, `mkdocs.yml` per `mkdocs`), oppure un file `.zip` (`markdown-zip`; `notion` accetta sia uno `.zip` sia una cartella già estratta)
 - `--from` - `gitbook` (predefinito), `mkdocs`, `markdown-zip` o `notion`
+- `--force` - salta la conferma. Se `docs/` contiene già dei file (o esiste `bxsites.yaml`, con `mkdocs`), `migrate` chiede prima di poterli sovrascrivere
 
 ### `--from=gitbook` (predefinito)
 
@@ -330,7 +348,7 @@ Verifica la versione della JVM, che `docs/` esista, che
 `bxsites.yaml`/`.json` venga effettivamente analizzato e validato, che i
 moduli BoxLang richiesti (`bx-markdown`, `bx-esapi`, `bx-yaml`,
 `bx-image`) siano installati e attivati e - se esiste una sovrascrittura
-`theme/` a livello di progetto - che soddisfi il contratto dei due file
+`.theme/` nella content root - che soddisfi il contratto dei due file
 obbligatori `layout.bxm`/`page.bxm`.
 
 ```bash frame="terminal" title="Terminal"
@@ -448,9 +466,11 @@ aggiungi quel nome all'array `plugins` di `bxsites.yaml` per attivarlo
 
 ## `theme:new`
 
-Estrae uno dei temi integrati nella cartella `theme/` propria del
-progetto per personalizzarlo, rispecchiando il flusso di eject `--theme`
-di mkdocs.
+Estrae uno dei temi integrati nella cartella `.theme/` propria del
+progetto, dentro la content root (vedi
+[Origine del contenuto](guides/content-source.md#dove-vive-una-sovrascrittura-di-tema)),
+per personalizzarlo - rispecchiando il flusso di eject `--theme` di
+mkdocs.
 
 ```bash title="Utilizzo"
 bxSites theme:new --theme=material
@@ -458,15 +478,15 @@ bxSites theme:new --theme=material
 
 - `--theme` (obbligatorio) - `bootstrap`, `material`, `tailwind`, `docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook`, o `notion` - vedi [Temi](guides/themes.md#integrati)
 
-Fallisce invece di sovrascrivere un `theme/` già esistente. Vedi
+Fallisce invece di sovrascrivere un `.theme/` già esistente. Vedi
 [Temi](guides/themes.md) per il contratto di sovrascrittura
 (`layout.bxm` + `page.bxm`).
 
 ## `install:theme`
 
-Scarica un tema pubblicato da ForgeBox nel proprio `themes/<name>/` del
-progetto - nient'altro che il binario `bxSites` serve, come per
-`install:plugin`.
+Scarica un tema pubblicato da ForgeBox nel proprio `.themes/<name>/`,
+dentro la content root - nient'altro che il binario `bxSites` serve,
+come per `install:plugin`.
 
 ```bash title="Utilizzo"
 bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
@@ -481,24 +501,51 @@ fallisce al momento dell'installazione invece che alla prossima `build`.
 Imposta `theme.name` di `bxsites.yaml` sul nome installato per usarlo -
 vedi [Temi](guides/themes.md#installare-un-tema-pubblicato).
 
+## `agents:sync`
+
+(Ri)scrive il/i file di istruzioni per agenti di coding IA e
+`.markdownlint.json` che `new` genera per default - per un progetto creato
+prima che questa funzione esistesse, o per aggiornarli dopo un
+aggiornamento di bx-sites che aggiunge nuove direttive di blocchi di
+contenuto o chiavi di frontmatter. Sicuro da rieseguire: in ogni file di
+istruzioni viene sostituito solo il blocco contrassegnato tra
+`<!-- bxsites:agents:start -->`/`<!-- bxsites:agents:end -->`, quindi
+tutto ciò che hai scritto sopra o sotto viene preservato. Un file di
+destinazione senza questi marcatori (scritto a mano prima che esistesse
+questa funzione, o modificato per escluderlo deliberatamente) viene
+lasciato invariato e segnalato come saltato, mai sovrascritto.
+
+```bash title="Utilizzo"
+bxSites agents:sync [--agents=agents,claude,cursor]
+```
+
+- `--agents` - come in `new`: quale/i file di istruzioni sincronizzare
+  (`agents`/`claude`/`cursor`, predefinito solo `agents`;
+  `--agents=none` o `--no-agents` li omette, `.markdownlint.json` viene
+  comunque riscritto)
+
+Vedi [Istruzioni per Agenti IA](guides/ai-agent-instructions.md).
+
 ## `theme:import`
 
 Conversione con il massimo impegno possibile di un tema proveniente
 dall'ecosistema di un altro generatore di siti statici
 (`mkdocs`/`jekyll`/`hugo`) in uno scheletro di tema bx-sites sotto
-`themes/<name>/` - un punto di partenza, non un porting senza perdite in
-un solo comando.
+`.themes/<name>/`, dentro la content root - un punto di partenza, non un
+porting senza perdite in un solo comando.
 
 ```bash title="Utilizzo"
-bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
+bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme [--force]
 ```
 
 - `--source` (obbligatorio) - `mkdocs`, `jekyll`, o `hugo`
 - `--path` (obbligatorio) - la cartella radice propria del tema sorgente
-- `--name` (obbligatorio) - il nome di destinazione, scritto in `themes/<name>/`
+- `--name` (obbligatorio) - il nome di destinazione, scritto in `.themes/<name>/`
 
-Rieseguire il comando con lo stesso `--name` è sicuro - `layout.bxm`/
-`page.bxm` vengono sovrascritti e qualsiasi cartella di asset appena
+- `--force` - salta la conferma prima di sovrascrivere
+
+Rieseguire il comando con lo stesso `--name` chiede prima conferma (o usa `--force`),
+poi `layout.bxm`/`page.bxm` vengono sovrascritti e qualsiasi cartella di asset appena
 trovata viene unita. Vedi [Importare un tema](guides/theme-import.md)
 per sapere esattamente cosa viene tradotto e cosa no, e cosa controllare
 in seguito.
@@ -591,3 +638,57 @@ bxSites lint
 ```
 
 Esce con `1` quando uno dei due controlli trova qualcosa, `0` altrimenti.
+
+
+## `docbox`
+
+Genera un riferimento API BoxLang/CFML nella directory dei contenuti a
+partire dall'output JSON di [DocBox](https://docbox.ortusbooks.com): la
+controparte BoxLang del generatore Javadoc dei plugin Java. Vedi
+[Riferimento API con DocBox](guides/docbox.md) e
+[`docbox`](configuration.md#docbox).
+
+```bash frame="terminal" title="Terminal"
+bxSites docbox
+bxSites docbox --mappings:models=models --projectTitle="La mia API"
+bxSites docbox --pagePathPrefix=api/classes --tags=api,classes
+bxSites docbox --jsonDir=build/docbox-json
+```
+
+| Flag | Scopo |
+|---|---|
+| `--mappings:<nome>=<percorso>` | Un albero di sorgenti da documentare, ripetibile |
+| `--projectTitle` | Titolo della pagina di panoramica |
+| `--excludes` | Regex dei percorsi che DocBox salta |
+| `--pagePathPrefix` | Dove finiscono le pagine |
+| `--tags` | Tag di frontmatter, separati da virgola |
+| `--jsonDir` | Conserva l'output JSON di DocBox invece di scartarlo |
+
+Senza mapping documenta le cartelle convenzionali: `models`, `handlers`,
+`bifs`, `components`, `interceptors`. Richiede il modulo `bx-docbox`
+(`install-bx-module bx-docbox`).
+
+## `coldbox`
+
+Documenta un'applicazione ColdBox a partire dalle sue convenzioni - rotte,
+handler, model e mapping WireBox, moduli, interceptor e task pianificati -
+senza avviarla. Vedi [Applicazioni ColdBox](guides/coldbox.md) e
+[`coldbox`](configuration.md#coldbox).
+
+```bash frame="terminal" title="Terminal"
+bxSites coldbox
+bxSites coldbox --appRoot=app
+bxSites coldbox --include=routes,handlers
+```
+
+| Flag | Scopo |
+|---|---|
+| `--appRoot` | Dove si trova l'app ColdBox, relativo alla radice del progetto |
+| `--pagePathPrefix` | Dove finiscono le pagine |
+| `--tags` | Tag di frontmatter, separati da virgola |
+| `--include` | Gruppi di pagine: `routes`, `handlers`, `models`, `modules`, `interceptors`, `scheduler` |
+
+Fallisce con `BxSites.NotAColdBoxApp` se la radice risolta non contiene
+`handlers/`, `config/ColdBox`, `config/Router` o `modules_app/`. Il
+dettaglio per classe arriva da DocBox, quindi `bx-docbox` arricchisce
+quelle pagine.
