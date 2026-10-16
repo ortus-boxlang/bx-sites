@@ -1,0 +1,11 @@
+{
+  "slug": "justthedocs",
+  "name": "Just the Docs",
+  "slots": [
+    "head-extra",
+    "announcement-bar",
+    "header",
+    "footer",
+    "sidebar-bottom"
+  ]
+}

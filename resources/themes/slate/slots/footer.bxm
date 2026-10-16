@@ -1,0 +1,11 @@
+<bx:output><bx:if variables.footerEnabled>
+	<footer class="bxsites-footer">
+		<div class="bxsites-footer__inner">
+			<div class="bxsites-footer__copy">&copy; #year( now() )# #encodeForHTML( variables.siteConfig.name )#</div>
+<bx:if variables.socialLinks.len() gt 0>
+			<div class="bxsites-footer__social">#renderSocialLinks( variables.socialLinks )#</div>
+</bx:if>
+			<div class="bxsites-footer__credit">Built with <a href="https://bxsites.io" target="_blank" rel="noopener noreferrer">BxSites</a></div>
+		</div>
+	</footer>
+</bx:if></bx:output>

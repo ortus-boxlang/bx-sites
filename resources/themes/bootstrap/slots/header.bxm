@@ -1,0 +1,55 @@
+<bx:output><nav class="navbar navbar-expand-lg brand-navbar">
+		<div class="container-fluid navbar-row">
+			<!--- Navbar toggler button --->
+			<button
+				class="navbar-toggler"
+				type="button"
+				@click="navOpen = !navOpen"
+				:aria-expanded="navOpen.toString()"
+				aria-controls="bxsites-sidebar"
+				aria-label="#encodeForHTML( variables.strings.toggleNavigation )#">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<!--- Brand mark --->
+			<a class="navbar-brand brand-mark" href="#variables.basePath#">#renderBrandMark()#</a>
+
+			<!--- Navbar controls --->
+			<div class="navbar-controls">
+				<!--- Search --->
+				<bx:if variables.searchEnabled>
+					<bx:include template="#variables.themeDir#/search.bxm">
+				</bx:if>
+
+				<!--- Locale dropdown --->
+				<bx:if variables.locales.len() gt 1>
+					#renderLocaleDropdown( variables.locales, variables.currentLocale )#
+				</bx:if>
+
+				<!--- Repository link --->
+				<bx:if len( variables.repoUrl )>
+					<a
+						class="repo-link"
+						href="#bxsitesUrlAttr( variables.repoUrl )#"
+						target="_blank"
+						rel="noopener noreferrer"
+						aria-label="#encodeForHTML( variables.strings.repository )#"
+						title="#encodeForHTML( variables.strings.repository )#">
+						#bxsitesIcon( "github" )#
+					</a>
+				</bx:if>
+
+				<!--- Theme toggle button --->
+				<button
+					type="button"
+					class="theme-toggle"
+					@click="dark = !dark"
+					aria-label="#encodeForHTML( variables.strings.toggleDarkMode )#">
+					<span x-show="!dark">#bxsitesIcon( "moon" )#</span>
+					<span x-show="dark" x-cloak>#bxsitesIcon( "sun" )#</span>
+				</button>
+			</div>
+			<!--- End of navbar controls --->
+		</div>
+		<!--- End of navbar --->
+	</nav></bx:output>

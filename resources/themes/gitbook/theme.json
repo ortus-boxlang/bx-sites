@@ -1,0 +1,11 @@
+{
+  "slug": "gitbook",
+  "name": "GitBook",
+  "slots": [
+    "head-extra",
+    "announcement-bar",
+    "header",
+    "footer",
+    "sidebar-bottom"
+  ]
+}

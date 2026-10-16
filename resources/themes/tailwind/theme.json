@@ -1,0 +1,11 @@
+{
+  "slug": "tailwind",
+  "name": "Tailwind",
+  "slots": [
+    "head-extra",
+    "announcement-bar",
+    "header",
+    "footer",
+    "sidebar-bottom"
+  ]
+}

@@ -124,6 +124,14 @@ class {
 	variables.sourceDirResolver = new "models.config.SourceDirResolver@bxsites"()
 
 	/**
+	 * Reads a theme's optional `theme.json` manifest (slug + exposed slots).
+	 * Memoized per theme folder, so safe to share across concurrent renders.
+	 */
+	variables.manifestReader = new "models.build.ThemeManifest@bxsites"()
+
+	variables.pathRelativizer = new "models.build.PathRelativizer@bxsites"()
+
+	/**
 	 * Swaps in a fake/test resolver - same pattern as `setConfigLoader()`
 	 * elsewhere, for unit tests that want to drive `resolveThemeDir()`
 	 * without a real bxsites.yaml on disk.
@@ -146,29 +154,36 @@ class {
 	variables.templateResolutionCache = {}
 
 	/**
-	 * Resolution order - both override locations live inside the project's
+	 * Resolution order - every override location lives inside the project's
 	 * resolved content root (`SourceDirResolver.resolveConfigured()`: docs/,
 	 * src/, a custom `source:`, or the project root itself for `source: .`),
 	 * not at the project root - a multi-domain repo's several independent
 	 * project roots (each own `bxsites.yaml` + content root) each carry their
 	 * own theme override this way, with no risk of one domain's `.theme/`
 	 * shadowing another's:
-	 *   1. `<contentRoot>/.theme/` - a project's own authored override, if it
-	 *      satisfies the `ThemeProvider` contract - an all-or-nothing
-	 *      override, wins outright over everything else.
+	 *   1. `<contentRoot>/.theme/` - a project's own authored, complete theme,
+	 *      if it satisfies the `ThemeProvider` contract - an all-or-nothing
+	 *      replacement, wins outright over everything else.
 	 *   2. `<contentRoot>/.themes/<themeName>/` - a theme `install:theme`
 	 *      downloaded from ForgeBox (ThemeInstaller.bx), letting a project
 	 *      carry several installed themes side by side and switch between
 	 *      them purely by name.
 	 *   3. This module's own built-in `resources/themes/<themeName>`
 	 *      (section 6).
+	 * For 2 and 3, a `<contentRoot>/.overrides/<themeName>/` folder, when
+	 * present, is layered on top: its files (layouts, body templates, slots,
+	 * assets, ...) replace the theme's same-named files and add new ones. The
+	 * theme and its overrides are merged into `<projectRoot>/.cache/theme/<themeName>/`
+	 * and that merged folder is what renders, so every include, asset and
+	 * cache-busting path works exactly as it does for an unmodified theme.
 	 *
 	 * @themeName The configured theme name (bxsites.json's `theme.name`)
 	 * @projectRoot Absolute path to the project root
 	 *
 	 * @return Absolute path to the resolved theme's own folder - or, for
-	 *         a built-in theme (case 3 above), the virtual `/bxmodules/bxsites/...`
-	 *         path builtInThemesDir() returns instead (see its own docblock)
+	 *         a built-in theme with no overrides (case 3 above), the virtual
+	 *         `/bxmodules/bxsites/...` path builtInThemesDir() returns instead
+	 *         (see its own docblock)
 	 */
 	string function resolveThemeDir( required string themeName, required string projectRoot ) {
 		var contentRoot = variables.sourceDirResolver.resolveConfigured( arguments.projectRoot )
@@ -178,20 +193,115 @@ class {
 			return assertThemeProvider( projectTheme )
 		}
 
+		var baseDir = ""
 		var installedTheme = contentRoot & "/.themes/" & arguments.themeName
-		if ( directoryExists( installedTheme ) ) {
-			return assertThemeProvider( installedTheme )
-		}
-
 		var builtIn = builtInThemesDir() & "/" & arguments.themeName
-		if ( directoryExists( builtIn ) ) {
-			return assertThemeProvider( builtIn )
+		if ( directoryExists( installedTheme ) ) {
+			baseDir = installedTheme
+		} else if ( directoryExists( builtIn ) ) {
+			baseDir = builtIn
+		} else {
+			throw(
+				type    = "BxSites.ThemeNotFound",
+				message = "No theme found for [#arguments.themeName#] - looked in [#projectTheme#], [#installedTheme#] and [#builtIn#]"
+			)
 		}
 
-		throw(
-			type    = "BxSites.ThemeNotFound",
-			message = "No theme found for [#arguments.themeName#] - looked in [#projectTheme#], [#installedTheme#] and [#builtIn#]"
-		)
+		assertManifestSlug( baseDir, arguments.themeName )
+		assertThemeProvider( baseDir )
+
+		var overridesDir = contentRoot & "/.overrides/" & arguments.themeName
+		if ( directoryExists( overridesDir ) ) {
+			return applyOverrides( baseDir, overridesDir, arguments.projectRoot, arguments.themeName )
+		}
+		return baseDir
+	}
+
+	/**
+	 * Layers a project's `.overrides/<themeName>/` folder onto a resolved
+	 * theme: copies the theme into `<projectRoot>/.cache/theme/<themeName>/`
+	 * (fresh every build), then copies the overrides over it. Merging into one
+	 * folder, rather than resolving file by file at render time, keeps the
+	 * theme contract untouched: a theme's `layout.bxm` still includes
+	 * `#variables.themeDir#/#variables.bodyFile#`, and asset fingerprinting
+	 * and `themeAssetUrl()` see the final, merged files.
+	 *
+	 * @baseDir The theme folder being overridden (virtual path for a built-in theme)
+	 * @overridesDir `<contentRoot>/.overrides/<themeName>`
+	 * @projectRoot Absolute path to the project root (owns `.cache/`)
+	 * @themeName The theme slug
+	 *
+	 * @return Absolute path to the merged theme folder
+	 */
+	private string function applyOverrides( required string baseDir, required string overridesDir, required string projectRoot, required string themeName ) {
+		warnUnknownSlotOverrides( arguments.baseDir, arguments.overridesDir, arguments.themeName )
+
+		var merged = arguments.projectRoot & "/.cache/theme/" & arguments.themeName
+		if ( directoryExists( merged ) ) {
+			directoryDelete( merged, true )
+		}
+		directoryCreate( merged, true )
+		directoryCopy( arguments.baseDir, merged, true )
+
+		// directoryCopy() refuses to overwrite an existing file, so the
+		// overrides are laid over the copy one file at a time.
+		for ( var overrideFile in directoryList( arguments.overridesDir, true, "path", "*", "asc", "file" ) ) {
+			var destination = merged & "/" & variables.pathRelativizer.relativeTo( arguments.overridesDir, overrideFile )
+			directoryCreate( getDirectoryFromPath( destination ), true, true )
+			fileCopy( overrideFile, destination )
+		}
+
+		return merged
+	}
+
+	/**
+	 * Prints a build warning for each `.overrides/<themeName>/slots/<name>.bxm`
+	 * the theme does not expose (per its `theme.json`), so a typo in a slot
+	 * name is visible instead of silently ignored. A theme with no manifest
+	 * has nothing to check against, so it never warns here.
+	 *
+	 * @baseDir The theme folder being overridden
+	 * @overridesDir `<contentRoot>/.overrides/<themeName>`
+	 * @themeName The theme slug
+	 */
+	private void function warnUnknownSlotOverrides( required string baseDir, required string overridesDir, required string themeName ) {
+		var slotsDir = arguments.overridesDir & "/slots"
+		if ( !directoryExists( slotsDir ) ) {
+			return
+		}
+
+		var manifest = variables.manifestReader.load( arguments.baseDir )
+		if ( !manifest.exists ) {
+			return
+		}
+
+		for ( var fileName in directoryList( slotsDir, false, "name" ) ) {
+			if ( !fileName.reFindNoCase( "\.bxm$" ) ) {
+				continue
+			}
+			var slotName = fileName.reReplaceNoCase( "\.bxm$", "" )
+			if ( !manifest.slots.contains( slotName ) ) {
+				println( "Warning: .overrides/#arguments.themeName#/slots/#fileName# is not a slot theme [#arguments.themeName#] exposes (exposes: #manifest.slots.len() ? manifest.slots.toList( ', ' ) : 'none'#); it will be ignored" )
+			}
+		}
+	}
+
+	/**
+	 * Fails fast when a built-in or installed theme's `theme.json` names a
+	 * different slug than the folder it lives in, since the slug is what
+	 * `theme.name` and `.overrides/<slug>/` resolve against.
+	 *
+	 * @themeDir The theme folder
+	 * @themeName The folder name / configured theme name
+	 */
+	private void function assertManifestSlug( required string themeDir, required string themeName ) {
+		var manifest = variables.manifestReader.load( arguments.themeDir )
+		if ( manifest.exists && len( manifest.slug ) && manifest.slug != arguments.themeName ) {
+			throw(
+				type    = "BxSites.InvalidTheme",
+				message = "Theme at [#arguments.themeDir#] declares slug [#manifest.slug#] in theme.json but lives in a folder named [#arguments.themeName#]"
+			)
+		}
 	}
 
 	/**
@@ -538,7 +648,8 @@ class {
 			strings,
 			variables.stringsResolver,
 			arguments.data,
-			arguments.functions
+			arguments.functions,
+			variables.manifestReader.load( themeDirVirtual )
 		)
 	}
 

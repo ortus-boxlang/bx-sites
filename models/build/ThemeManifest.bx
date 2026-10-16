@@ -1,0 +1,92 @@
+/**
+ * Reads a theme folder's optional `theme.json` manifest.
+ *
+ * ```json
+ * { "slug": "bootstrap", "name": "Bootstrap", "slots": [ "head-extra", "announcement-bar", "header", "footer", "sidebar-bottom" ] }
+ * ```
+ *
+ * The manifest is optional. A theme without one keeps working exactly as
+ * before; there is just nothing to validate a slot name against, so no
+ * slot warnings are raised for it.
+ *
+ * Pure and stateless apart from a memo keyed by theme folder, which is safe
+ * for one build process (a theme's own files don't change mid-build).
+ */
+class {
+
+	/**
+	 * A theme slot name: lowercase letters, digits and hyphens. It is also a
+	 * file name (`slots/<name>.bxm`), so nothing else is accepted.
+	 */
+	variables.slotNamePattern = "^[a-z][a-z0-9-]*$"
+
+	variables.memo = {}
+
+	/**
+	 * Loads and normalizes `<themeDir>/theme.json`.
+	 *
+	 * @themeDir Absolute or virtual path to a resolved theme folder
+	 *
+	 * @return { exists, slug, name, slots } - `exists` is `false` (and the rest empty) when the theme has no manifest
+	 */
+	struct function load( required string themeDir ) {
+		if ( variables.memo.keyExists( arguments.themeDir ) ) {
+			return variables.memo[ arguments.themeDir ]
+		}
+
+		var manifest = { exists : false, slug : "", name : "", slots : [] }
+		var file = arguments.themeDir & "/theme.json"
+
+		if ( fileExists( file ) ) {
+			var raw = ""
+			try {
+				raw = jsonDeserialize( fileRead( file ) )
+			} catch ( any e ) {
+				throw(
+					type    = "BxSites.InvalidTheme",
+					message = "Theme manifest [#file#] is not valid JSON: #e.message#"
+				)
+			}
+			if ( !isStruct( raw ) ) {
+				throw(
+					type    = "BxSites.InvalidTheme",
+					message = "Theme manifest [#file#] must be a JSON object"
+				)
+			}
+
+			manifest.exists = true
+			manifest.slug   = trim( raw.slug ?: "" )
+			manifest.name   = trim( raw.name ?: "" )
+
+			var slots = raw.slots ?: []
+			if ( !isArray( slots ) ) {
+				throw(
+					type    = "BxSites.InvalidTheme",
+					message = "Theme manifest [#file#]: [slots] must be an array of slot names"
+				)
+			}
+			for ( var slot in slots ) {
+				if ( !isSimpleValue( slot ) || !reFind( variables.slotNamePattern, slot ) ) {
+					throw(
+						type    = "BxSites.InvalidTheme",
+						message = "Theme manifest [#file#]: slot name [#isSimpleValue( slot ) ? slot : '?'#] must be lowercase letters, digits and hyphens"
+					)
+				}
+				manifest.slots.append( slot )
+			}
+		}
+
+		variables.memo[ arguments.themeDir ] = manifest
+		return manifest
+	}
+
+	/**
+	 * True when `name` is a legal slot name.
+	 *
+	 * @name The slot name to test
+	 */
+	boolean function isValidSlotName( required string name ) {
+		return reFind( variables.slotNamePattern, arguments.name ) > 0
+	}
+
+}

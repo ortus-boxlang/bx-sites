@@ -1,0 +1,11 @@
+{
+  "slug": "notion",
+  "name": "Notion",
+  "slots": [
+    "head-extra",
+    "announcement-bar",
+    "header",
+    "footer",
+    "sidebar-bottom"
+  ]
+}

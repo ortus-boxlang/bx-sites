@@ -40,6 +40,7 @@ class {
 				"pagefind" : { "bin" : "pagefind", "options" : [] }
 			},
 			"nav"          : [],
+			"layouts"      : [],
 			"markdown"     : { "enableAdmonition" : true },
 			"repo"         : { "url" : "", "editUri" : "" },
 			"social"       : [],
@@ -252,6 +253,47 @@ class {
 	}
 
 	/**
+	 * Validates the implicit-layouts rules (`layouts:` in bxsites.yaml): an
+	 * array of `{ layout, match }` entries, where `layout` is a bare template
+	 * name and `match` is one glob or an array of globs matched against each
+	 * page's content-root-relative path.
+	 *
+	 * @layouts The raw `layouts` value from the merged config
+	 */
+	private void function validateLayouts( required any layouts ) {
+		if ( !isArray( arguments.layouts ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [layouts] must be an array of { layout, match } entries"
+			)
+		}
+
+		var position = 0
+		for ( var rule in arguments.layouts ) {
+			position++
+			if ( !isStruct( rule ) || !len( trim( rule.layout ?: "" ) ) || !rule.keyExists( "match" ) ) {
+				throw(
+					type    = "BxSites.InvalidConfig",
+					message = "#variables.configFileName# [layouts] entry #position# must have a [layout] name and a [match] glob (or array of globs)"
+				)
+			}
+			if ( !reFind( "^[A-Za-z0-9][A-Za-z0-9_-]*$", trim( rule.layout ) ) ) {
+				throw(
+					type    = "BxSites.InvalidConfig",
+					message = "#variables.configFileName# [layouts] entry #position#: [layout] must be a bare template name like [landing], got [#rule.layout#]"
+				)
+			}
+			var globs = isArray( rule.match ) ? rule.match : [ rule.match ]
+			if ( !globs.len() || globs.some( ( glob ) => !isSimpleValue( glob ) || !len( trim( glob ) ) ) ) {
+				throw(
+					type    = "BxSites.InvalidConfig",
+					message = "#variables.configFileName# [layouts] entry #position#: [match] must be a non-empty glob string or an array of them"
+				)
+			}
+		}
+	}
+
+	/**
 	 * Validates a merged site configuration struct.
 	 *
 	 * @config The merged config struct to validate
@@ -273,6 +315,18 @@ class {
 				message = "#variables.configFileName# [theme] must be an object with a [name] property"
 			)
 		}
+
+		// A theme name is a slug: it names the theme's folder (built-in,
+		// `.themes/<name>/`) and its `.overrides/<name>/` folder, so it must be
+		// exactly what BoxLang's own slugify() would produce from it.
+		if ( slugify( theme.name ) != theme.name ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [theme.name] must be a slug (lowercase letters, digits and hyphens), got [#theme.name#]; did you mean [#slugify( theme.name )#]?"
+			)
+		}
+
+		validateLayouts( arguments.config.layouts ?: [] )
 
 		var colorMode = theme.options.colorMode ?: "auto"
 		if ( !listFindNoCase( "light,dark,auto", colorMode ) ) {

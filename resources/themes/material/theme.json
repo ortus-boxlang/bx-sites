@@ -1,0 +1,11 @@
+{
+  "slug": "material",
+  "name": "Material",
+  "slots": [
+    "head-extra",
+    "announcement-bar",
+    "header",
+    "footer",
+    "sidebar-bottom"
+  ]
+}

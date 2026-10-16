@@ -1,0 +1,11 @@
+{
+  "slug": "bootstrap",
+  "name": "Bootstrap",
+  "slots": [
+    "head-extra",
+    "announcement-bar",
+    "header",
+    "footer",
+    "sidebar-bottom"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "slug": "docsy",
+  "name": "Docsy",
+  "slots": [
+    "head-extra",
+    "announcement-bar",
+    "header",
+    "footer",
+    "sidebar-bottom"
+  ]
+}

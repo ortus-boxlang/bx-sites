@@ -1,0 +1,19 @@
+<bx:output><header class="slate-header">
+		<button class="slate-nav-toggle" type="button" aria-controls="bxsites-sidebar" @click="navOpen = !navOpen" :aria-expanded="navOpen.toString()" aria-label="#encodeForHTML( variables.strings.toggleNavigation )#">☰</button>
+		<a class="slate-header__brand" href="#variables.basePath#">#renderBrandMark()#</a>
+		<div class="slate-header__controls">
+<bx:if variables.searchEnabled>
+	<bx:include template="#variables.themeDir#/search.bxm">
+</bx:if>
+<bx:if variables.locales.len() gt 1>
+			#renderLocaleDropdown( variables.locales, variables.currentLocale )#
+</bx:if>
+<bx:if len( variables.repoUrl )>
+			<a class="repo-link" href="#bxsitesUrlAttr( variables.repoUrl )#" target="_blank" rel="noopener noreferrer" aria-label="#encodeForHTML( variables.strings.repository )#" title="#encodeForHTML( variables.strings.repository )#">#bxsitesIcon( "github" )#</a>
+</bx:if>
+			<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="#encodeForHTML( variables.strings.toggleDarkMode )#">
+				<span x-show="!dark">#bxsitesIcon( "moon" )#</span>
+				<span x-show="dark" x-cloak>#bxsitesIcon( "sun" )#</span>
+			</button>
+		</div>
+	</header></bx:output>

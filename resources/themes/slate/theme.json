@@ -1,0 +1,11 @@
+{
+  "slug": "slate",
+  "name": "Slate",
+  "slots": [
+    "head-extra",
+    "announcement-bar",
+    "header",
+    "footer",
+    "sidebar-bottom"
+  ]
+}

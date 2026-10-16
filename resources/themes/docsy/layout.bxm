@@ -276,33 +276,15 @@
 	<link rel="stylesheet" href="#variables.basePath#pagefind/pagefind-ui.css">
 </bx:if>
 	<script src="#variables.basePath#assets/vendor/alpine/cdn.min.js" defer></script>
-</head>
-<body class="docsy-body" x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark', navOpen: window.matchMedia( '(min-width: 900px)' ).matches ? ( localStorage.getItem( 'bxsites-nav-open' ) !== null ? localStorage.getItem( 'bxsites-nav-open' ) === 'true' : true ) : false }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } ); $watch( 'navOpen', v => { if ( window.matchMedia( '(min-width: 900px)' ).matches ) localStorage.setItem( 'bxsites-nav-open', v ) } )">
-	<header class="docsy-header">
-		<button class="docsy-nav-toggle" type="button" aria-controls="bxsites-sidebar" @click="navOpen = !navOpen" :aria-expanded="navOpen.toString()" aria-label="#encodeForHTML( variables.strings.toggleNavigation )#">☰</button>
-		<a class="docsy-header__brand" href="#variables.basePath#">#renderBrandMark()#</a>
-		<div class="docsy-header__controls">
-<bx:if variables.searchEnabled>
-	<bx:include template="#variables.themeDir#/search.bxm">
-</bx:if>
-<bx:if variables.locales.len() gt 1>
-			#renderLocaleDropdown( variables.locales, variables.currentLocale )#
-</bx:if>
-<bx:if len( variables.repoUrl )>
-			<a class="repo-link" href="#bxsitesUrlAttr( variables.repoUrl )#" target="_blank" rel="noopener noreferrer" aria-label="#encodeForHTML( variables.strings.repository )#" title="#encodeForHTML( variables.strings.repository )#">#bxsitesIcon( "github" )#</a>
-</bx:if>
-			<button type="button" class="theme-toggle" @click="dark = !dark" aria-label="#encodeForHTML( variables.strings.toggleDarkMode )#">
-				<span x-show="!dark">#bxsitesIcon( "moon" )#</span>
-				<span x-show="dark" x-cloak>#bxsitesIcon( "sun" )#</span>
-			</button>
-		</div>
-	</header>
+#renderSlot( "head-extra" )#</head>
+<body class="docsy-body" x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark', navOpen: window.matchMedia( '(min-width: 900px)' ).matches ? ( localStorage.getItem( 'bxsites-nav-open' ) !== null ? localStorage.getItem( 'bxsites-nav-open' ) === 'true' : true ) : false }" x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } ); $watch( 'navOpen', v => { if ( window.matchMedia( '(min-width: 900px)' ).matches ) localStorage.setItem( 'bxsites-nav-open', v ) } )">#renderSlot( "announcement-bar" )#
+	#renderSlot( "header" )#
 	<div class="docsy-layout">
 		<nav class="docsy-sidebar" id="bxsites-sidebar" aria-label="Navigation" x-show="navOpen" x-cloak>
 <bx:if variables.versions.len() gt 1>
 			#renderVersionSwitcher( variables.versions, variables.currentVersion, 'sidebar-version-switcher' )#
 </bx:if>
-			#renderNavList( variables.nav )#
+			#renderNavList( variables.nav ) & renderSlot( "sidebar-bottom" )#
 			<a class="bxsites-powered-by" href="https://bxsites.io" target="_blank" rel="noopener noreferrer"><img class="bxsites-powered-by__logo" src="#moduleAssetUrl( 'bxsites-logo.svg' )#" alt="" aria-hidden="true"> <span>Powered by BxSites</span></a>
 		</nav>
 		<main class="docsy-content">
@@ -314,17 +296,7 @@
 		</aside>
 </bx:if>
 	</div>
-<bx:if variables.footerEnabled>
-	<footer class="bxsites-footer">
-		<div class="bxsites-footer__inner">
-			<div class="bxsites-footer__copy">&copy; #year( now() )# #encodeForHTML( variables.siteConfig.name )#</div>
-<bx:if variables.socialLinks.len() gt 0>
-			<div class="bxsites-footer__social">#renderSocialLinks( variables.socialLinks )#</div>
-</bx:if>
-			<div class="bxsites-footer__credit">Built with <a href="https://bxsites.io" target="_blank" rel="noopener noreferrer">BxSites</a></div>
-		</div>
-	</footer>
-</bx:if>
+#renderSlot( "footer" )#
 	<script src="#variables.basePath#assets/vendor/highlight/highlight.min.js"></script>
 	<script src="#moduleAssetUrl( 'highlight-boxlang.js' )#"></script>
 	<script>hljs.highlightAll();</script>

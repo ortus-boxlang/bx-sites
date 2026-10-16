@@ -164,68 +164,14 @@
 	</bx:if>
 <!--- Alpine JS --->
 	<script src="#variables.basePath#assets/vendor/alpine/cdn.min.js" defer></script>
-</head>
+#renderSlot( "head-extra" )#</head>
 
 <!--- Body --->
 <body
 	x-data="{ dark: document.documentElement.getAttribute( 'data-theme' ) === 'dark', navOpen: window.matchMedia( '(min-width: 992px)' ).matches ? ( localStorage.getItem( 'bxsites-nav-open' ) !== null ? localStorage.getItem( 'bxsites-nav-open' ) === 'true' : true ) : false }"
-	x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } ); $watch( 'navOpen', v => { if ( window.matchMedia( '(min-width: 992px)' ).matches ) localStorage.setItem( 'bxsites-nav-open', v ) } )">
+	x-init="$watch( 'dark', v => { document.documentElement.setAttribute( 'data-theme', v ? 'dark' : 'light' ); localStorage.setItem( 'bxsites-theme', v ? 'dark' : 'light' ) } ); $watch( 'navOpen', v => { if ( window.matchMedia( '(min-width: 992px)' ).matches ) localStorage.setItem( 'bxsites-nav-open', v ) } )">#renderSlot( "announcement-bar" )#
 	<!--- Navigation bar --->
-	<nav class="navbar navbar-expand-lg brand-navbar">
-		<div class="container-fluid navbar-row">
-			<!--- Navbar toggler button --->
-			<button
-				class="navbar-toggler"
-				type="button"
-				@click="navOpen = !navOpen"
-				:aria-expanded="navOpen.toString()"
-				aria-controls="bxsites-sidebar"
-				aria-label="#encodeForHTML( variables.strings.toggleNavigation )#">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-
-			<!--- Brand mark --->
-			<a class="navbar-brand brand-mark" href="#variables.basePath#">#renderBrandMark()#</a>
-
-			<!--- Navbar controls --->
-			<div class="navbar-controls">
-				<!--- Search --->
-				<bx:if variables.searchEnabled>
-					<bx:include template="#variables.themeDir#/search.bxm">
-				</bx:if>
-
-				<!--- Locale dropdown --->
-				<bx:if variables.locales.len() gt 1>
-					#renderLocaleDropdown( variables.locales, variables.currentLocale )#
-				</bx:if>
-
-				<!--- Repository link --->
-				<bx:if len( variables.repoUrl )>
-					<a
-						class="repo-link"
-						href="#bxsitesUrlAttr( variables.repoUrl )#"
-						target="_blank"
-						rel="noopener noreferrer"
-						aria-label="#encodeForHTML( variables.strings.repository )#"
-						title="#encodeForHTML( variables.strings.repository )#">
-						#bxsitesIcon( "github" )#
-					</a>
-				</bx:if>
-
-				<!--- Theme toggle button --->
-				<button
-					type="button"
-					class="theme-toggle"
-					@click="dark = !dark"
-					aria-label="#encodeForHTML( variables.strings.toggleDarkMode )#">
-					<span x-show="!dark">#bxsitesIcon( "moon" )#</span>
-					<span x-show="dark" x-cloak>#bxsitesIcon( "sun" )#</span>
-				</button>
-			</div>
-			<!--- End of navbar controls --->
-		</div>
-		<!--- End of navbar --->
-	</nav>
+	#renderSlot( "header" )#
 
 	<!--- Main content and sidebar layout --->
 	<div class="container-fluid">
@@ -239,7 +185,7 @@
 				<bx:if variables.versions.len() gt 1>
 					#renderVersionSwitcher( variables.versions, variables.currentVersion, 'form-select form-select-sm sidebar-version-switcher' )#
 				</bx:if>
-				#renderNavList( variables.nav )#
+				#renderNavList( variables.nav ) & renderSlot( "sidebar-bottom" )#
 				<a class="bxsites-powered-by" href="https://bxsites.io" target="_blank" rel="noopener noreferrer">
 					<img class="bxsites-powered-by__logo" src="#moduleAssetUrl( 'bxsites-logo.svg' )#" alt="" aria-hidden="true"> <span>Powered by BxSites</span>
 				</a>
@@ -262,20 +208,7 @@
 	<!--- End of main content and sidebar layout --->
 
 	<!--- Footer --->
-	<bx:if variables.footerEnabled>
-		<footer class="bxsites-footer">
-			<div class="container-fluid bxsites-footer__inner">
-				<!--- Footer content --->
-				<div class="bxsites-footer__copy">&copy; #year( now() )# #encodeForHTML( variables.siteConfig.name )#</div>
-				<!--- Social links --->
-				<bx:if variables.socialLinks.len() gt 0>
-					<div class="bxsites-footer__social">#renderSocialLinks( variables.socialLinks )#</div>
-				</bx:if>
-				<!--- Footer credit --->
-				<div class="bxsites-footer__credit">Built with <a href="https://bxsites.io" target="_blank" rel="noopener noreferrer">BxSites</a></div>
-			</div>
-		</footer>
-	</bx:if>
+	#renderSlot( "footer" )#
 
 	<!--- Scripts --->
 	<script src="#variables.basePath#assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>

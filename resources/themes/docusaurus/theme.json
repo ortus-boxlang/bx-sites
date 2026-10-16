@@ -1,0 +1,11 @@
+{
+  "slug": "docusaurus",
+  "name": "Docusaurus",
+  "slots": [
+    "head-extra",
+    "announcement-bar",
+    "header",
+    "footer",
+    "sidebar-bottom"
+  ]
+}

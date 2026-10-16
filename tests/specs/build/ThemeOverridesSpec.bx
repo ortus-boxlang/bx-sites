@@ -1,0 +1,220 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.ThemeRenderer overrides and slots", function() {
+
+			beforeEach( function() {
+				variables.renderer = new "models.build.ThemeRenderer@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			// A project with an installed theme `mini` (layout, page, one slot, one asset)
+			private function newProjectWithMiniTheme( string manifest = '{"slug":"mini","slots":["footer","announcement-bar"]}' ) {
+				var dir = createTempDirectory( prefix = "bxsites-overrides-" );
+				tempDirs.append( dir );
+				var theme = dir & "/docs/.themes/mini";
+				directoryCreate( theme & "/slots", true, true );
+				directoryCreate( theme & "/assets", true, true );
+				fileWrite( dir & "/bxsites.json", '{"name":"Test Site"}' );
+				fileWrite(
+					theme & "/layout.bxm",
+					'<bx:output>[bar:##renderSlot( "announcement-bar" )##][foot:##renderSlot( "footer" )##][body:<bx:include template="##variables.themeDir##/##variables.bodyFile##">]</bx:output>'
+				);
+				fileWrite( theme & "/page.bxm", "<bx:output>page</bx:output>" );
+				fileWrite( theme & "/slots/footer.bxm", "<bx:output>theme footer</bx:output>" );
+				fileWrite( theme & "/assets/style.css", "theme css" );
+				if ( len( manifest ) ) {
+					fileWrite( theme & "/theme.json", manifest );
+				}
+				return dir;
+			}
+
+			private function render( required string root, struct page = {} ) {
+				var themeDir = renderer.resolveThemeDir( "mini", root );
+				var pageData = { title : "P", contentHtml : "" };
+				pageData.append( page );
+				return renderer.renderPage( pageData, [], { name : "My Site" }, themeDir );
+			}
+
+			describe( ".overrides/<theme>/", function() {
+
+				it( "returns the theme folder itself when there is no overrides folder", function() {
+					var root = newProjectWithMiniTheme();
+					expect( renderer.resolveThemeDir( "mini", root ) ).toBe( root & "/docs/.themes/mini" );
+				} );
+
+				it( "layers override files over the theme, replacing same-named files and adding new ones", function() {
+					var root = newProjectWithMiniTheme();
+					directoryCreate( root & "/docs/.overrides/mini/assets", true, true );
+					fileWrite( root & "/docs/.overrides/mini/page.bxm", "<bx:output>override page</bx:output>" );
+					fileWrite( root & "/docs/.overrides/mini/home.bxm", "<bx:output>home</bx:output>" );
+					fileWrite( root & "/docs/.overrides/mini/assets/style.css", "override css" );
+
+					var themeDir = renderer.resolveThemeDir( "mini", root );
+
+					expect( themeDir ).toBe( root & "/.cache/theme/mini" );
+					expect( fileRead( themeDir & "/page.bxm" ) ).toInclude( "override page" );
+					expect( fileRead( themeDir & "/home.bxm" ) ).toInclude( "home" );
+					expect( fileRead( themeDir & "/assets/style.css" ) ).toBe( "override css" );
+					expect( fileRead( themeDir & "/layout.bxm" ) ).toInclude( "renderSlot" );
+				} );
+
+				it( "never modifies the theme folder it layers onto", function() {
+					var root = newProjectWithMiniTheme();
+					directoryCreate( root & "/docs/.overrides/mini", true, true );
+					fileWrite( root & "/docs/.overrides/mini/page.bxm", "<bx:output>override page</bx:output>" );
+
+					renderer.resolveThemeDir( "mini", root );
+
+					expect( fileRead( root & "/docs/.themes/mini/page.bxm" ) ).toInclude( "page" );
+					expect( fileRead( root & "/docs/.themes/mini/page.bxm" ) ).notToInclude( "override" );
+				} );
+
+				it( "layers over a built-in theme too", function() {
+					var root = newProjectWithMiniTheme();
+					directoryCreate( root & "/docs/.overrides/bootstrap", true, true );
+					fileWrite( root & "/docs/.overrides/bootstrap/home.bxm", "<bx:output>custom home</bx:output>" );
+
+					var themeDir = renderer.resolveThemeDir( "bootstrap", root );
+
+					expect( fileRead( themeDir & "/home.bxm" ) ).toInclude( "custom home" );
+					expect( fileExists( themeDir & "/layout.bxm" ) ).toBeTrue();
+				} );
+
+				it( "re-merges on every call so an edited override is picked up", function() {
+					var root = newProjectWithMiniTheme();
+					directoryCreate( root & "/docs/.overrides/mini", true, true );
+					fileWrite( root & "/docs/.overrides/mini/page.bxm", "<bx:output>one</bx:output>" );
+					renderer.resolveThemeDir( "mini", root );
+					fileWrite( root & "/docs/.overrides/mini/page.bxm", "<bx:output>two</bx:output>" );
+
+					var themeDir = renderer.resolveThemeDir( "mini", root );
+
+					expect( fileRead( themeDir & "/page.bxm" ) ).toInclude( "two" );
+				} );
+
+				it( "a complete flat .theme/ still wins outright over .overrides/", function() {
+					var root = newProjectWithMiniTheme();
+					directoryCreate( root & "/docs/.theme", true, true );
+					fileWrite( root & "/docs/.theme/layout.bxm", "<bx:output>flat</bx:output>" );
+					fileWrite( root & "/docs/.theme/page.bxm", "<bx:output>flat</bx:output>" );
+					directoryCreate( root & "/docs/.overrides/mini", true, true );
+					fileWrite( root & "/docs/.overrides/mini/page.bxm", "<bx:output>override</bx:output>" );
+
+					expect( renderer.resolveThemeDir( "mini", root ) ).toBe( root & "/docs/.theme" );
+				} );
+
+				it( "only applies the overrides folder named after the active theme", function() {
+					var root = newProjectWithMiniTheme();
+					directoryCreate( root & "/docs/.overrides/material", true, true );
+					fileWrite( root & "/docs/.overrides/material/page.bxm", "<bx:output>material only</bx:output>" );
+
+					expect( renderer.resolveThemeDir( "mini", root ) ).toBe( root & "/docs/.themes/mini" );
+				} );
+
+				it( "renders a page through an overriding body template named by frontmatter layout", function() {
+					var root = newProjectWithMiniTheme();
+					directoryCreate( root & "/docs/.overrides/mini", true, true );
+					fileWrite( root & "/docs/.overrides/mini/landing.bxm", "<bx:output>landing body</bx:output>" );
+
+					var html = render( root, { layout : "landing" } );
+
+					expect( html ).toInclude( "[body:landing body]" );
+				} );
+
+			} );
+
+			describe( "slots", function() {
+
+				it( "renders the theme's own default slot content", function() {
+					var html = render( newProjectWithMiniTheme() );
+					expect( html ).toInclude( "[foot:theme footer]" );
+				} );
+
+				it( "renders nothing for a slot the theme has no file for", function() {
+					var html = render( newProjectWithMiniTheme() );
+					expect( html ).toInclude( "[bar:]" );
+				} );
+
+				it( "an override slot file replaces the theme's default", function() {
+					var root = newProjectWithMiniTheme();
+					directoryCreate( root & "/docs/.overrides/mini/slots", true, true );
+					fileWrite( root & "/docs/.overrides/mini/slots/footer.bxm", "<bx:output>my footer</bx:output>" );
+
+					var html = render( root );
+
+					expect( html ).toInclude( "[foot:my footer]" );
+					expect( html ).notToInclude( "theme footer" );
+				} );
+
+				it( "an override slot file fills an empty slot", function() {
+					var root = newProjectWithMiniTheme();
+					directoryCreate( root & "/docs/.overrides/mini/slots", true, true );
+					fileWrite( root & "/docs/.overrides/mini/slots/announcement-bar.bxm", "<bx:output>v1 is out</bx:output>" );
+
+					expect( render( root ) ).toInclude( "[bar:v1 is out]" );
+				} );
+
+				it( "a slot file sees the page variables a layout does", function() {
+					var root = newProjectWithMiniTheme();
+					directoryCreate( root & "/docs/.overrides/mini/slots", true, true );
+					fileWrite( root & "/docs/.overrides/mini/slots/footer.bxm", "<bx:output>on ##variables.page.title##</bx:output>" );
+
+					expect( render( root ) ).toInclude( "[foot:on P]" );
+				} );
+
+				it( "still builds when the theme has no theme.json", function() {
+					var root = newProjectWithMiniTheme( "" );
+					expect( render( root ) ).toInclude( "[foot:theme footer]" );
+				} );
+
+				it( "throws BxSites.InvalidTheme when theme.json names a different slug than its folder", function() {
+					var root = newProjectWithMiniTheme( '{"slug":"other","slots":[]}' );
+					expect( function() {
+						renderer.resolveThemeDir( "mini", root );
+					} ).toThrow( "BxSites.InvalidTheme" );
+				} );
+
+				it( "throws BxSites.InvalidTheme for a slot name that is not a slug", function() {
+					var root = newProjectWithMiniTheme( '{"slug":"mini","slots":["Bad Name"]}' );
+					expect( function() {
+						renderer.resolveThemeDir( "mini", root );
+						render( root );
+					} ).toThrow( "BxSites.InvalidTheme" );
+				} );
+
+			} );
+
+			describe( "built-in theme manifests", function() {
+
+				it( "every built-in theme ships a theme.json whose slug is its folder name and exposes the five core slots", function() {
+					var core = [ "head-extra", "announcement-bar", "header", "footer", "sidebar-bottom" ];
+					var manifests = new "models.build.ThemeManifest@bxsites"();
+					var root = createTempDirectory( prefix = "bxsites-manifest-" );
+					tempDirs.append( root );
+					directoryCreate( root & "/docs", true, true );
+					fileWrite( root & "/bxsites.json", '{"name":"Test Site"}' );
+					for ( var themeName in [ "bootstrap", "material", "tailwind", "docsy", "slate", "docusaurus", "justthedocs", "vuepress", "gitbook", "notion" ] ) {
+						var manifest = manifests.load( renderer.resolveThemeDir( themeName, root ) );
+						expect( manifest.exists ).toBeTrue( "#themeName# has no theme.json" );
+						expect( manifest.slug ).toBe( themeName );
+						for ( var slot in core ) {
+							expect( manifest.slots ).toInclude( slot, "#themeName# does not expose #slot#" );
+						}
+					}
+				} );
+
+			} );
+
+		} );
+	}
+
+}

@@ -20,6 +20,11 @@
  */
 class {
 
+	static {
+		// Warnings already printed this process (see warnOnce()).
+		warned = {}
+	}
+
 	/**
 	 * @page A page struct with an added `contentHtml` key (already defaulted by ThemeRenderer.renderPage())
 	 * @nav The site's nav tree
@@ -64,7 +69,8 @@ class {
 		required struct strings,
 		required any stringsResolver,
 		required struct data,
-		struct functions = {}
+		struct functions = {},
+		struct themeManifest = {}
 	) {
 		variables.page              = arguments.page
 		variables.nav                = arguments.nav
@@ -82,6 +88,7 @@ class {
 		variables.data                = arguments.data
 		variables.layoutFile         = arguments.layoutFile
 		variables.bodyFile           = arguments.bodyFile
+		variables.themeManifest      = arguments.themeManifest
 
 		// The cache-busting "mixin" every theme's layout (built-in or
 		// custom) renders its own `<link>`/`<script>` tags through, instead
@@ -167,6 +174,62 @@ class {
 			include variables.themeDir & "/" & variables.layoutFile
 		}
 		return html
+	}
+
+
+	/**
+	 * Renders the active theme's `slots/<name>.bxm` and returns its HTML, or
+	 * an empty string when the theme has no such file. A theme's own
+	 * `layout.bxm` calls this where a slot belongs, e.g.
+	 * `#renderSlot( "footer" )#`. A project's `.overrides/<theme>/slots/<name>.bxm`
+	 * replaces the theme's file of the same name (ThemeRenderer.applyOverrides()),
+	 * so this never needs to know which of the two it is rendering.
+	 *
+	 * The slot file sees the same variables a layout does (`page`, `nav`,
+	 * `siteConfig`, `basePath`, `data`, ...).
+	 *
+	 * A slot name the theme's `theme.json` does not list prints one warning
+	 * per build and still renders if a file exists. A theme with no manifest
+	 * is never warned about.
+	 *
+	 * @name The slot name: lowercase letters, digits and hyphens
+	 */
+	string function renderSlot( required string name ) {
+		var manifest = variables.themeManifest ?: {}
+		if ( ( manifest.exists ?: false ) && !manifest.slots.contains( arguments.name ) ) {
+			warnOnce( "slot:" & variables.themeDir & ":" & arguments.name, "Warning: theme [#manifest.slug.len() ? manifest.slug : variables.themeDir#] renders slot [#arguments.name#] but does not list it in theme.json" )
+		}
+
+		if ( !reFind( "^[a-z][a-z0-9-]*$", arguments.name ) ) {
+			warnOnce( "slotname:" & arguments.name, "Warning: renderSlot() name [#arguments.name#] must be lowercase letters, digits and hyphens; nothing rendered" )
+			return ""
+		}
+
+		var slotFile = variables.themeDir & "/slots/" & arguments.name & ".bxm"
+		if ( !fileExists( slotFile ) ) {
+			return ""
+		}
+
+		var html = ""
+		bx:savecontent variable="html" {
+			include slotFile
+		}
+		return html
+	}
+
+	/**
+	 * Prints a build warning the first time `key` is seen in this process.
+	 * A slot is rendered once per page, so without this a missing slot would
+	 * repeat for every page of the site.
+	 *
+	 * @key Identifies the warning
+	 * @message The text to print
+	 */
+	private void function warnOnce( required string key, required string message ) {
+		if ( !static.warned.keyExists( arguments.key ) ) {
+			static.warned[ arguments.key ] = true
+			println( arguments.message )
+		}
 	}
 
 }
