@@ -76,6 +76,10 @@ boxlang bxSites <verb> [options]
 
 El resto de esta guía usa la forma corta.
 
+### Autocompletado con Tab
+
+El módulo incluye scripts de autocompletado para bash, fish y PowerShell. Consulta [Autocompletado con Tab](cli-reference.md#autocompletado-con-tab) para la instalación de cada uno.
+
 ## Crear la estructura de un proyecto
 
 ```bash frame="terminal" title="Terminal" linenums="1"

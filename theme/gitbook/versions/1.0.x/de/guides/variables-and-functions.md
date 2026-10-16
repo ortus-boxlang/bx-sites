@@ -48,6 +48,17 @@ oder verschachtelt:
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+
+    [variables]
+    company = "Ortus Solutions"
+
+    [variables.product]
+    name = "BoxLang"
+    supportEmail = "support@example.com"
+    ```
+
 Referenziere davon dann alles, per Punktpfad, von jeder Markdown-Seite aus:
 
 ```markdown title="docs/index.md"
@@ -79,7 +90,7 @@ dein Projekt `src/` verwendet - siehe
 [Erste Schritte](../getting-started.md)) - ein einfaches BoxLang-Skript.
 Jede Funktion, die du mit einem führenden `$` benennst, wird zu einer
 *magischen Funktion*: aufrufbar aus `{{ }}` in Markdown, und aufrufbar bar,
-direkt, aus den eigenen [`theme/`](themes.md#ein-theme-überschreiben)
+direkt, aus den eigenen [`.theme/`](themes.md#ein-theme-überschreiben)
 `.bxm`-Überschreibungen eines Projekts.
 
 ```bx title="docs/functions.bxs" linenums="1"
@@ -133,11 +144,11 @@ function $price( amount ) {
 ### Eine magische Funktion aus einem Theme-Override aufrufen
 
 Weil eine magische Funktion direkt in den Template-Scope eingebunden wird,
-kann das eigene `theme/page.bxm` (oder `layout.bxm`) eines Projekts sie bar
+kann das eigene `.theme/page.bxm` (oder `layout.bxm`) eines Projekts sie bar
 aufrufen, ganz ohne Präfix - auf dieselbe Weise, wie es bereits
 `variables.page`/`variables.siteConfig` liest:
 
-```bx title="theme/page.bxm (excerpt)"
+```bx title=".theme/page.bxm (excerpt)"
 <p class="build-banner">#$shout( 'built with boxlang' )#</p>
 ```
 
@@ -154,7 +165,7 @@ Theme-Override aufgerufen wird:
 | `page` | Die aktuelle Seite (siehe den Hinweis unten - nicht jedes Feld ist schon befüllt, wenn sie aus Markdown aufgerufen wird) |
 | `nav` | Der eigene Navigationsbaum dieses Baums |
 | `basePath` | Root-relativer Basispfad, endet mit `/` |
-| `versions` | Einträge des Versionsumschalters - `[ { label, url } ]` |
+| `versions` | Einträge des Versionsumschalters - `[ { label, url, kind } ]` (`kind` ist `"current"`/`"released"`/`"next"`) |
 | `currentVersion` | Welcher `versions`-Eintrag gerade gerendert wird |
 | `locales` | Einträge des Sprachumschalters - `[ { code, label, url, dir, flag } ]` |
 | `currentLocale` | Der Code welchen `locales`-Eintrags gerade gerendert wird |
@@ -333,7 +344,7 @@ beabsichtigt, um einen echten Tippfehler zu erkennen, ohne unbeteiligten
 
 ## Reservierte Namen
 
-Ein `theme/page.bxm`/`layout.bxm`-Override, das eine magische Funktion bar
+Ein `.theme/page.bxm`/`layout.bxm`-Override, das eine magische Funktion bar
 aufruft (`$name(...)`), funktioniert, weil jede geladene Funktion -
 `$`-präfigiert oder privater Helfer gleichermaßen - direkt in denselben
 eigenen Rendering-Scope dieses Templates eingebunden wird, genau neben den

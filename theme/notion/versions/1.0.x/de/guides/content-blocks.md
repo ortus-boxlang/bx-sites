@@ -158,6 +158,53 @@ Der nummerierte Marker, die Verbindungslinie und jede der drei
 der Website themen, über CSS-Custom-Properties - siehe
 [Farben anpassen](themes.md#farben-anpassen-ohne-ein-theme-zu-überschreiben).
 
+## Bildergalerie
+
+Ein responsives Bilderraster. Das optionale Attribut `columns` ist `2`,
+`3` oder `4` (Standard `3`); jeder andere Wert fällt auf `3` zurück. Das
+Raster selbst benötigt keine Konfiguration, aber die
+Klick-zum-Vergrößern-Lightbox benötigt
+[`imageGallery`](../configuration.md#imagegallery) in `bxsites.yaml` auf
+`true` gesetzt - ohne das rendert das Raster trotzdem, nur ohne das
+JS der Lightbox. Es gibt zwei Wege, eine Galerie zu bauen:
+
+Liste jedes Bild explizit mit `::: image`-Kindern auf - `src` ist
+erforderlich, `alt` und `caption` sind beide optional:
+
+```markdown title="Beispiel" linenums="1"
+::: image-gallery columns="3"
+::: image src="../assets/favicon.png" alt="BoxLang icon" caption="Icon"
+:::
+::: image src="../assets/home-banner.jpg" alt="Home banner"
+:::
+::: image src="../assets/og-image.png" caption="Social preview"
+:::
+:::
+```
+
+::: image-gallery columns="3"
+::: image src="../assets/favicon.png" alt="BoxLang icon" caption="Icon"
+:::
+::: image src="../assets/home-banner.jpg" alt="Home banner"
+:::
+::: image src="../assets/og-image.png" caption="Social preview"
+:::
+:::
+
+Oder lass bxSites die Bilder per Konvention selbst finden: Lege Dateien
+mit dem Namen `{name}-{order}.{jpg,jpeg,png,webp,gif}` in
+`docs/assets/gallery/{name}/` ab und referenziere sie allein über `name`
+- keine Kind-Blöcke nötig. Die Dateien werden numerisch nach `{order}`
+sortiert:
+
+```markdown title="Beispiel" linenums="1"
+::: image-gallery name="showcase" columns="3"
+:::
+```
+
+::: image-gallery name="showcase" columns="3"
+:::
+
 ## File
 
 Eine Download-Card für ein PDF, ein Video oder ein beliebiges anderes
@@ -463,6 +510,98 @@ Präferenz (praktisch, um einen direkten Link zu "der Pro-Version dieser
 Seite" zu teilen), und das eigene Theme-Override eines Projekts kann
 stattdessen direkt `window.bxSitesSetPreference( key, value )` aufrufen,
 um es von einer eigenen UI aus zu steuern.
+
+## Kontaktformulare
+
+> **Premium-Funktion.** Ein `::: contact-form`-Block wird immer als
+> echtes, vollständiges Formular gerendert - Felder, Beschriftungen,
+> Absende-Button, alles - aber das *Absenden* funktioniert erst, wenn der
+> bxSites-Cloud-Plan des Projekts funktionierende Formulare enthält. Bei
+> einem Plan ohne diese Funktion sieht jemand, der trotzdem absendet,
+> eine freundliche Meldung „Upgrade erforderlich, um dieses Formular zu
+> aktivieren" statt dass die Nachricht irgendwo ankommt. Es gibt hier
+> nichts zu konfigurieren, um das ein- oder auszuschalten - es ist
+> ausschließlich eine Eigenschaft des Konto-Plans.
+
+Ein beschriftetes Kontakt-/Lead-Formular, das per `fetch()` an
+bxSites Cloud gesendet wird statt einen Seiten-Reload auszulösen:
+
+```markdown title="Beispiel" linenums="1"
+::: contact-form id="demo-request" to="sales@acme.com" fields="name:text,email*:email,message:textarea" submitLabel="Send" :::
+```
+
+::: contact-form id="demo-request" to="sales@acme.com" fields="name:text,email*:email,message:textarea" submitLabel="Send" :::
+
+- `id` - der eigene Slug dieses Formulars. Entspricht einer
+  Formularkonfiguration (wer benachrichtigt wird, Spam-Filterung usw.),
+  die du in bxSites Cloud einrichtest, nicht in diesem Markdown - diese
+  Build prüft nie, ob die hier geschriebene id dort tatsächlich
+  existiert, sie wird einfach unverändert durchgereicht. Standardmäßig
+  `"contact"`, wenn weggelassen.
+- `to` - optional und rein informativ (das eigentliche Routing der
+  Zustellung wird serverseitig vom Konto-Administrator konfiguriert) -
+  praktisch als Erinnerung, wohin die Einsendungen eines Formulars gehen,
+  wenn du später den Seitenquelltext überfliegst.
+- `fields` - erforderlich; ein kleines DSL, durch Kommas getrennte
+  `name:type`-Paare: ein abschließendes `*` direkt nach dem Feldnamen
+  (vor seinem `:`) markiert das Feld als Pflichtfeld, z. B.
+  `email*:email`. Unterstützte Typen sind `text`, `email` und
+  `textarea`; jeder andere/unbekannte Typ fällt auf ein einfaches
+  `text`-Feld zurück, statt den Build fehlschlagen zu lassen. Die
+  Beschriftung jedes Felds wird aus seinem Namen abgeleitet
+  (`full-name` wird zu „Full Name").
+- `submitLabel` - der eigene Text des Absende-Buttons; Standard ist
+  `"Send"`.
+
+Jedes Formular führt außerdem ein verstecktes Honeypot-Feld mit, das
+eine echte Besucherin oder ein echter Besucher nie sieht oder ausfüllt -
+die eigene Spam-Filterung von bxSites Cloud nutzt es, ohne dass hier
+etwas konfiguriert werden muss.
+
+## Kommentare
+
+> **Premium-Funktion.** `::: comments` bindet einen live moderierten
+> Besucher-Kommentarthread auf der Seite ein - dafür ist ein bxSites-
+> Cloud-Konto mit Kommentaren im eigenen Plan erforderlich, sowie
+> `cloud.comments: true` in `bxsites.yaml`. Ohne das lässt ein
+> `::: comments`-Block den Build nicht fehlschlagen: Er wird als leerer,
+> inaktiver Platzhalter gerendert, und der Build gibt einmal eine Warnung
+> aus, die die erste betroffene Seite nennt. Anders als `::: cloud` ohne
+> `cloud.contentBlocks`, das den Build fehlschlagen lässt, weil es echte
+> Inhalte abrufen muss.
+
+```markdown title="Beispiel" linenums="1"
+::: comments :::
+```
+
+Keine Attribute sind erforderlich - die Thread-ID entspricht standardmäßig
+dem eigenen URL-Pfad der Seite, sodass jede Seite automatisch ihren
+eigenen Kommentarthread erhält. Ein optionales `id="..."` lässt zwei
+Blöcke auf einer Seite (oder Blöcke auf verschiedenen Seiten) stattdessen
+einen einzigen Thread teilen:
+
+```markdown title="Beispiel" linenums="1"
+::: comments id="general-feedback" :::
+```
+
+Anders als bei `::: cloud` wird beim Build nichts abgerufen oder
+eingebacken - ein Kommentarthread wächst nach jedem Deploy weiter, daher
+würde ein zur Build-Zeit erstellter Schnappschuss veralten, sobald ein
+neuer Kommentar eintrifft. Der Block rendert einen leeren Platzhalter;
+ein kleines clientseitiges Skript (nur ausgeliefert, wenn
+`cloud.comments: true` gesetzt ist - derselbe explizite Opt-in, den
+`cloud.contentBlocks` bereits verwendet) lädt bei jedem Seitenaufruf die
+aktuellen, bereits moderierten Kommentare und blättert bei Bedarf durch
+ältere, und rendert anschließend ein Formular zum Posten eines neuen
+Kommentars. Ein neu eingereichter Kommentar wird lokal, nur im Browser
+dieser einen besuchenden Person, mit dem Hinweis „wartet auf Moderation"
+angezeigt - er erscheint für niemand anderen, bis eine moderierende
+Person ihn freigibt.
+
+Dieses Formular führt außerdem ein verstecktes Honeypot-Feld mit, das
+eine echte Besucherin oder ein echter Besucher nie sieht oder ausfüllt -
+die eigene Spam-Filterung von bxSites Cloud nutzt es, ohne dass hier
+etwas konfiguriert werden muss.
 
 ## Schleife und Bedingung (datengesteuert)
 

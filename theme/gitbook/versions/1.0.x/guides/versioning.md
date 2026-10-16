@@ -90,8 +90,10 @@ Once set:
   instead builds at `/next/`, still fully browsable/linkable, just no
   longer the default. Useful for writing/reviewing the next release's docs
   in the open without them looking like they've already shipped.
-- The version switcher shows `1.0.x` selected at root, a `Next` entry
-  pointing at `/next/`, then every other `docs/versions/*` folder as usual.
+- The version switcher shows `1.0.x (Current)` selected at root, then every
+  other `docs/versions/*` folder, then a divider and a `Next` entry pointing
+  at `/next/` *last* - released versions first, the work-in-progress tree
+  set apart at the bottom, rather than squeezed in second.
 - `/next/`'s pages are excluded from `sitemap.xml`, and `robots.txt` gets
   a `Disallow: /next/` line - a work-in-progress tree shouldn't compete
   with the real docs in search results. It's still a completely normal,

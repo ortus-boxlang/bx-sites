@@ -76,6 +76,10 @@ boxlang bxSites <verb> [options]
 
 Der Rest dieser Anleitung verwendet die Kurzform.
 
+### Tab-Vervollständigung
+
+Vervollständigungs-Skripte für bash, fish und PowerShell gehören zum Modul. Die einzeilige Installation steht unter [Tab-Vervollständigung](cli-reference.md#tab-vervollständigung).
+
 ## Ein Projekt aufsetzen
 
 ```bash frame="terminal" title="Terminal" linenums="1"

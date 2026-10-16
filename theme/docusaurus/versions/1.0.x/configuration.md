@@ -9,24 +9,27 @@ tags: [reference, configuration]
 # Configuration
 
 Every project has one site config at its root - `bxsites.yaml` (or `.yml`),
-the default/preferred format, or `bxsites.json` for a project that wants to
-stay on it. Both are fully supported and produce the exact same result;
-`bxSites new` scaffolds `bxsites.yaml` unless `--format=json` is passed (see
+the default/preferred format, `bxsites.toml`, or `bxsites.json`. All are fully
+supported and produce the exact same result; `bxSites new` scaffolds
+`bxsites.yaml` unless `--format=toml` or `--format=json` is passed (see
 [Getting Started](getting-started.md#config-file-format)). If a project
 somehow has more than one, `bxsites.yaml` wins, then `bxsites.yml`, then
-`bxsites.json`.
+`bxsites.toml`, then `bxsites.json`.
 
 === "YAML"
     ```yaml title="bxsites.yaml" linenums="1"
     name: "My Docs"
     description: ""
     baseURL: "/"
+    source: docs
+    exclude: []
     theme:
       name: bootstrap
       options: {}
       logo: ""
       favicon: ""
     search: true
+    mcp: false
     searchProvider:
       provider: local
       algolia: { appId: "", apiKey: "", indexName: "", insights: false }
@@ -68,6 +71,8 @@ somehow has more than one, `bxsites.yaml` wins, then `bxsites.yml`, then
     	"name": "My Docs",
     	"description": "",
     	"baseURL": "/",
+    	"source": "docs",
+    	"exclude": [],
     	"theme": {
     		"name": "bootstrap",
     		"options": {},
@@ -75,6 +80,7 @@ somehow has more than one, `bxsites.yaml` wins, then `bxsites.yml`, then
     		"favicon": ""
     	},
     	"search": true,
+    	"mcp": false,
     	"searchProvider": {
     		"provider": "local",
     		"algolia": { "appId": "", "apiKey": "", "indexName": "", "insights": false }
@@ -118,23 +124,13 @@ somehow has more than one, `bxsites.yaml` wins, then `bxsites.yml`, then
 
 === "TOML"
     ```toml title="bxsites.toml" linenums="1"
-    [[nav]]
-    path = "index.md"
-
-    [[nav]]
-    title = "Main Components"
-    children = [
-      { title = "Quick Start", path = "guides/setup.md" },
-      { path = "guides/deployment.md" }
-    ]
-    ```
-
-=== "TOML"
-    ```toml title="bxsites.toml" linenums="1"
     name = "My Docs"
     description = ""
     baseURL = "/"
+    source = "docs"
+    exclude = []
     search = true
+    mcp = false
     nav = []
     social = []
     footer = false
@@ -201,6 +197,28 @@ doubles as the site's canonical URL for `sitemap.xml`, `robots.txt`,
 `llms.txt` (see [below](#llmstxt)) is always written; it just prefers an
 absolute URL when `baseURL` provides one.
 
+## `source`
+
+Which folder holds this project's content - `docs`, `src`, any custom folder
+name, or `.` (the whole repository is the content, no subfolder at all).
+Left unset, `docs/` then `src/` are auto-detected; if neither exists on disk
+either, the build fails loudly rather than guessing. `bxSites new` always
+writes this explicitly, so a scaffolded project is never ambiguous. See
+[Content Source](guides/content-source.md) for the full picture, including
+`.theme`/`.themes` overrides living inside this folder and the
+[Multi-Domain Monorepo](guides/multi-domain.md) guide for running several
+independent project roots out of one repository.
+
+## `exclude`
+
+Extra file/folder names to leave out of the build, on top of the traditional
+ones bxSites always excludes (any dot-prefixed folder or file such as `.git` or `.claude`, `node_modules`,
+`boxlang_modules`, `site`, `.theme`, `.themes`, and this project's own config
+file). Matched the same way - a bare name at the root of `source`, or a
+name anywhere under it via a leading `/`-free path segment. Mostly useful
+with `source: .`, to keep tooling directories or files that aren't part of
+your `README.md`-adjacent traditional excludes from being swept up as pages.
+
 ## `llms.txt`
 
 Every build writes a `llms.txt` to the site root - a plain Markdown index of
@@ -208,7 +226,10 @@ every non-hidden page, following the emerging
 [llms.txt](https://llmstxt.org) convention for helping LLM-based tools
 navigate a site without crawling its rendered HTML. There's no config key
 for this; it's generated automatically, using an absolute URL per link when
-`baseURL` is a full URL, or a `basePath`-relative one otherwise.
+`baseURL` is a full URL, or a `basePath`-relative one otherwise. For pages
+with a published Markdown source, the page title links to the raw `.md` file
+and a separate `[HTML]` link points to the rendered page. Pages without a
+published Markdown source are listed with their HTML URL.
 
 ## `sitemap.xml`
 
@@ -231,6 +252,11 @@ unless you want to change its default, permissive behavior:
     { "robots": false }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    robots = false
+    ```
+
 - `true` (the default) - `Allow: /` for every crawler, plus a `Sitemap:`
   line pointing at `sitemap.xml` when `baseURL` is a full URL (see above).
 - `false` - `Disallow: /` for every crawler instead, and no `Sitemap:`
@@ -250,8 +276,8 @@ build - the `robots` key above is ignored entirely once this file exists.
 ## `theme`
 
 - `theme.name` - one of the built-in themes (`bootstrap`, `material`,
-  `tailwind`), or the name of a custom theme you provide via a `theme/`
-  folder at the project root (see [Themes](guides/themes.md))
+  `tailwind`), or the name of a custom theme you provide via a `.theme/`
+  folder inside the content root (see [Themes](guides/themes.md))
 - `theme.logo` - path/URL to an image shown next to the site name in the
   header brand mark (in place of the default "⚡" glyph) - a relative path
   (e.g. `"assets/logo.svg"`, resolved against `docs/assets/`) is prefixed
@@ -277,6 +303,12 @@ build - the `robots` key above is ignored entirely once this file exists.
         ```json
         { "theme": { "options": { "colorMode": "dark" } } }
         ```
+
+    === "TOML"
+      ```toml
+      [theme.options]
+      colorMode = "dark"
+      ```
   - `theme.options.navCollapsible` - `false` (the default) renders every nav
     section always expanded, as today. `true` gives every section with
     children a toggle button the visitor can click to collapse/expand it -
@@ -297,6 +329,13 @@ build - the `robots` key above is ignored entirely once this file exists.
         ```json
         { "theme": { "options": { "navCollapsible": true, "navExpandAll": false } } }
         ```
+
+    === "TOML"
+      ```toml
+      [theme.options]
+      navCollapsible = true
+      navExpandAll = false
+      ```
   - `theme.options.tocPosition` - where a page's own "On this page" table of
     contents renders. `"top"` (the default) renders it inline, at the top of
     the article, same as today. `"sticky"` moves it into its own right-hand
@@ -318,6 +357,12 @@ build - the `robots` key above is ignored entirely once this file exists.
         ```json
         { "theme": { "options": { "tocPosition": "sticky" } } }
         ```
+
+    === "TOML"
+      ```toml
+      [theme.options]
+      tocPosition = "sticky"
+      ```
   - `theme.options.pageMetaPosition` - where the edit-this-page/download-
     markdown/last-updated row renders relative to a page's own content.
     `"bottom"` (the default) renders it as a small footer note right before
@@ -333,6 +378,12 @@ build - the `robots` key above is ignored entirely once this file exists.
         ```json
         { "theme": { "options": { "pageMetaPosition": "top" } } }
         ```
+
+    === "TOML"
+      ```toml
+      [theme.options]
+      pageMetaPosition = "top"
+      ```
   - `theme.options.pageActionsPosition` - where the [page-actions
     dropdown](#pageactions) renders relative to a page's own content.
     `"top"` (the default) renders it right-aligned above the breadcrumbs/
@@ -347,6 +398,83 @@ build - the `robots` key above is ignored entirely once this file exists.
         ```json
         { "theme": { "options": { "pageActionsPosition": "bottom" } } }
         ```
+
+    === "TOML"
+      ```toml
+      [theme.options]
+      pageActionsPosition = "bottom"
+      ```
+  - `theme.options.breadcrumbs` - `true` (the default) renders the
+    "Guides > Setup" trail above a page's own title, whenever that page is
+    nested more than one level deep (a page at the top of `docs/` never
+    has one - there's nothing to trail from). `false` turns breadcrumbs
+    off site-wide, across every built-in theme.
+
+    === "YAML"
+        ```yaml
+        theme: { options: { breadcrumbs: false } }
+        ```
+
+    === "JSON"
+        ```json
+        { "theme": { "options": { "breadcrumbs": false } } }
+        ```
+
+    === "TOML"
+      ```toml
+      [theme.options]
+      breadcrumbs = false
+      ```
+  - `theme.options.accentColor`/`theme.options.accentColorDark` - a hex
+    color (3- or 6-digit, e.g. `#2563eb`) overriding the theme's own
+    interactive/accent color (links, active nav items, focus states, ...)
+    for light mode and dark mode respectively. This is a site-wide,
+    build-time setting picked by the site owner - there's no visitor-facing
+    UI to change it. Either or both can be set independently; leaving one
+    unset keeps that mode on the theme's own native accent color.
+
+    === "YAML"
+        ```yaml
+        theme: { options: { accentColor: "#2563eb", accentColorDark: "#60a5fa" } }
+        ```
+
+    === "JSON"
+        ```json
+        { "theme": { "options": { "accentColor": "#2563eb", "accentColorDark": "#60a5fa" } } }
+        ```
+
+    === "TOML"
+      ```toml
+      [theme.options]
+      accentColor = "#2563eb"
+      accentColorDark = "#60a5fa"
+      ```
+
+  - `theme.options.navAccentLine` - `true` (the default) draws a thin
+    vertical line alongside a nested sidebar nav section, visually tying a
+    section's children to their parent. `false` turns it off.
+  - `theme.options.navAccentLineColor` - a hex color (3- or 6-digit)
+    overriding the nav accent line's own color. Leaving it unset falls back
+    to `theme.options.accentColor`/`accentColorDark` when set, or the
+    theme's own native accent color otherwise - only relevant when
+    `navAccentLine` is on.
+
+    === "YAML"
+        ```yaml
+        theme: { options: { navAccentLine: true, navAccentLineColor: "#2563eb" } }
+        ```
+
+    === "JSON"
+        ```json
+        { "theme": { "options": { "navAccentLine": true, "navAccentLineColor": "#2563eb" } } }
+        ```
+
+    === "TOML"
+      ```toml
+      [theme.options]
+      navAccentLine = true
+      navAccentLineColor = "#2563eb"
+      ```
 
 ## `search`
 
@@ -363,7 +491,7 @@ Which search UI `search: true` wires up:
   `"algolia"` wires up [Algolia DocSearch](guides/search.md#algolia)
   instead, and `"pagefind"` wires up [Pagefind](guides/search.md#pagefind).
   Any other value is a project's own custom provider, wired up by a
-  `theme/` override - see [Search](guides/search.md#other-search-providers).
+  `.theme/` override - see [Search](guides/search.md#other-search-providers).
 - `algolia` - required when `provider` is `"algolia"`: `appId`, `apiKey`
   (the *search-only* public API key, not an admin key) and `indexName`,
   exactly as Algolia's own DocSearch client expects them. `insights`
@@ -395,6 +523,16 @@ Which search UI `search: true` wires up:
       }
       ```
 
+  === "TOML"
+      ```toml title="bxsites.toml" linenums="1"
+      search = true
+      [searchProvider]
+      provider = "pagefind"
+      [searchProvider.pagefind]
+      bin = "pagefind"
+      options = []
+      ```
+
 - `pagefind` - both keys optional when `provider` is `"pagefind"`: `bin`
   (default `"pagefind"`) is the CLI executable name/path, resolved against
   `PATH` when it's a bare name; `options` is an array of extra raw CLI
@@ -420,6 +558,30 @@ Which search UI `search: true` wires up:
       	}
       }
       ```
+
+  === "TOML"
+      ```toml title="bxsites.toml" linenums="1"
+      search = true
+
+      [searchProvider]
+      provider = "pagefind"
+
+      [searchProvider.pagefind]
+      bin = "pagefind"
+      options = []
+      ```
+
+## `mcp`
+
+`false` (the default) skips it entirely. `true` writes three files on
+every `build` - a full-text, untruncated `mcp-index.json`, a per-tree
+`mcp-nav.json`, and a site-wide `mcp-manifest.json` listing every tree -
+for [bxSites Cloud](https://bxsites.io/cloud)'s public, read-only MCP
+server for your published site. Entirely independent of `search`/
+`searchProvider` above - it's produced no matter which search provider
+(or none) is configured. Building the files themselves is free; bxSites
+Cloud only actually serves them as a live MCP server on its paid plans,
+not the free plan. See [MCP Server](guides/mcp.md).
 
 ## `nav`
 
@@ -475,11 +637,27 @@ children:
     }
     ```
 
+  === "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [i18n.defaultLocale]
+    code = "en"
+    label = "English"
+    [[i18n.locales]]
+    code = "es"
+    label = "Español"
+    ```
+
 === "TOML"
     ```toml title="bxsites.toml" linenums="1"
-    [[redirects]]
-    from = "old-guide"
-    to = "guides/new-guide/"
+    [[nav]]
+    path = "index.md"
+
+    [[nav]]
+    title = "Main Components"
+    children = [
+      { title = "Quick Start", path = "guides/setup.md" },
+      { path = "guides/deployment.md" }
+    ]
     ```
 
 Give that same group entry a `path` instead and it becomes a normal linked
@@ -525,11 +703,9 @@ applied to the main tree:
 
 === "TOML"
     ```toml title="bxsites.toml" linenums="1"
-    [markdown]
-    enableFootnotes = true
-    enableDefinitionLists = true
-    anchorLinks = false
-    enableYouTubeTransformer = true
+    [[redirects]]
+    from = "old-guide"
+    to = "guides/new-guide/"
     ```
 
 - `redirects[].from` - the old pretty-URL segment a static redirect stub
@@ -595,6 +771,15 @@ Every rendered table also gets a responsive-scroll/sticky-header wrapper automat
     		"enableYouTubeTransformer": true
     	}
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [markdown]
+    enableFootnotes = true
+    enableDefinitionLists = true
+    anchorLinks = false
+    enableYouTubeTransformer = true
     ```
 
 ## `repo`
@@ -876,17 +1061,23 @@ fresh `bxSites new` project needs to touch none of this. See
 what deliberately isn't covered (AVIF, animated GIFs, SVGs).
 
 - `assets.fingerprint` - `true` (the default). Content-hash-names every
-  generated image variant, CSS/JS bundle, and the active theme's own
-  `assets/style.css` (e.g. `screenshot-800w.a3f9c2e1.webp`,
-  `bundle.a3f9c2e1.css`, `style.a3f9c2e1.css`) so they can be served with
-  safe, far-future cache headers - a project's build changes the file's own
-  name only when its content actually changes. This means a theme update -
-  a built-in theme upgrade, or a custom author editing their own theme's
-  CSS - automatically busts every visitor's browser cache on the next
-  deploy, with no manual versioning step. Does not rename a project's own
-  original files under `docs/assets/` - only pipeline-generated output gets
-  fingerprinted, so anything else that references an asset by its plain
-  filename (a `::: file` download card, a raw markdown link) keeps working
+  generated image variant, CSS/JS bundle, and any top-level CSS/JS file
+  directly inside the active theme's own `assets/` folder or this module's
+  own shared `assets/` (e.g. `screenshot-800w.a3f9c2e1.webp`,
+  `bundle.a3f9c2e1.css`, `style.a3f9c2e1.css`, `copy-code.a3f9c2e1.js`) so
+  they can be served with safe, far-future cache headers - a project's build
+  changes a file's own name only when its content actually changes. This
+  means a theme update - a built-in theme upgrade, or a custom author
+  editing their own theme's CSS/JS - automatically busts every visitor's
+  browser cache on the next deploy, with no manual versioning step, as long
+  as the theme's own `layout.bxm` links that file through
+  `themeAssetUrl()`/`moduleAssetUrl()` rather than a hardcoded path - see
+  [Themes](guides/themes.md#writing-a-theme-from-scratch). Does not rename a
+  project's own original files under `docs/assets/`, or anything inside a
+  subdirectory of a theme's own `assets/` - only pipeline-generated output
+  and a theme's own top-level files get fingerprinted, so anything else that
+  references an asset by its plain filename (a `::: file` download card, a
+  raw markdown link, a theme's `@font-face`/`@import`) keeps working
   unchanged.
 - `assets.bundle` - `true` (the default). Concatenates `extraCss`/`extraJs`
   into one fingerprinted file each - pure BoxLang/JVM, no Node/esbuild
@@ -924,6 +1115,11 @@ every ` ```mermaid ` fenced code block as a diagram. See
     { "mermaid": true }
     ```
 
+  === "TOML"
+    ```toml title="bxsites.toml"
+    mermaid = true
+    ```
+
 ## `math`
 
 `false` (the default) - no [KaTeX](https://katex.org/) shipped at all.
@@ -939,6 +1135,11 @@ into a page's markdown. See
 === "JSON"
     ```json title="bxsites.json"
     { "math": true }
+    ```
+
+  === "TOML"
+    ```toml title="bxsites.toml"
+    math = true
     ```
 
 Admonitions (note/warning/tip-style callout boxes), content tabs, and
@@ -962,6 +1163,35 @@ referenced OpenAPI/Swagger spec (JSON or YAML). See
 === "JSON"
     ```json title="bxsites.json"
     { "openapi": true }
+    ```
+
+  === "TOML"
+    ```toml title="bxsites.toml"
+    openapi = true
+    ```
+
+## `imageGallery`
+
+`false` (the default) - no lightbox widget shipped at all. `true` loads a
+small click-to-enlarge lightbox for every `::: image-gallery` content
+block and for every other image in page content (opt an image out with
+`class="no-zoom"`). Prev and next move through all the zoomable images on
+the page. See [Images](guides/images.md#click-to-enlarge) and
+[Content Blocks](guides/content-blocks.md#image-gallery).
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    imageGallery: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "imageGallery": true }
+    ```
+
+  === "TOML"
+    ```toml title="bxsites.toml"
+    imageGallery = true
     ```
 
 ## `pageActions`
@@ -1012,6 +1242,11 @@ running together with everything else.
     { "pageActions": true }
     ```
 
+  === "TOML"
+    ```toml title="bxsites.toml"
+    pageActions = true
+    ```
+
 ## `plugins`
 
 `[]` (the default) - an array of BoxLang module names to activate as
@@ -1027,6 +1262,11 @@ for how to write one.
 === "JSON"
     ```json title="bxsites.json"
     { "plugins": ["myBxSitesPlugin"] }
+    ```
+
+  === "TOML"
+    ```toml title="bxsites.toml"
+    plugins = [ "myBxSitesPlugin" ]
     ```
 
 ## `i18n`
@@ -1073,6 +1313,22 @@ switcher.
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [i18n.defaultLocale]
+    code = "en"
+    label = "English"
+
+    [[i18n.locales]]
+    code = "es"
+    label = "Español"
+
+    [[i18n.locales]]
+    code = "ar"
+    label = "العربية"
+    dir = "rtl"
+    ```
+
 See [Internationalization](guides/i18n.md) for the full picture -
 untranslated-page fallback, the language switcher, and what isn't
 translated yet.
@@ -1104,6 +1360,14 @@ Options for the [blog](guides/blog.md) - itself a by-convention feature
     { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
     ```
 
+  === "TOML"
+    ```toml title="bxsites.toml"
+    [blog]
+    postsPerPage = 10
+    feed = true
+    feedLimit = 25
+    ```
+
 See [Blog](guides/blog.md) for post/author frontmatter, categories,
 featured images, and SEO/social metadata.
 
@@ -1130,6 +1394,12 @@ featured images, and SEO/social metadata.
     { "versions": { "default": "1.0.x" } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [versions]
+    default = "1.0.x"
+    ```
+
 See [Versioning](guides/versioning.md#publishing-a-default-version-at-the-site-root)
 for what publishing a default version actually changes (the `/next/` tree,
 the version switcher, `sitemap.xml`/`robots.txt` exclusion).
@@ -1137,8 +1407,9 @@ the version switcher, `sitemap.xml`/`robots.txt` exclusion).
 ## `variables`
 
 `{}` (the default) - an object of reusable values, any shape, referenced
-from any Markdown page as `{{ dotted.path }}`. See
-[Variables & Magic Functions](guides/variables-and-functions.md).
+from any Markdown page as `{{ dotted.path }}`. A page's own frontmatter is
+also reachable this way, with no entry needed here - see
+[Variables & Magic Functions](guides/variables-and-functions.md#page-variables).
 
 === "YAML"
     ```yaml title="bxsites.yaml"
@@ -1157,6 +1428,15 @@ from any Markdown page as `{{ dotted.path }}`. See
     }
     ```
 
+  === "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [variables]
+    company = "Ortus Solutions"
+    [variables.product]
+    name = "BoxLang"
+    supportEmail = "support@example.com"
+    ```
+
 ```markdown title="docs/index.md"
 Welcome to {{ company }}! We build {{ product.name }}.
 ```
@@ -1171,6 +1451,171 @@ A `docs/data/*.yaml`/`.yml`/`.json` folder (also no config key of its own)
 adds structured, nested/array-shaped data - reachable as `{{ data.<file>.<key> }}` -
 for anything `variables`' own flat shape doesn't fit well (a team roster,
 a pricing table). See [Data Files](guides/data-files.md).
+
+## `cloud`
+
+Where [`bxSites publish`](cli-reference.md#publish) ships the built site -
+`cloud.siteId` (the target site's UUID in
+[bxSites Cloud](guides/deployment.md#the-publish-command)) and
+`cloud.apiUrl` (that instance's base URL, e.g. `https://cloud.bxsites.app`,
+or a self-hosted URL). Both default to `""` - not configuring this block at
+all is fine for every other verb; `publish` is the only one that needs it,
+and fails with a clear error if either is missing. `cloud.apiUrl` is also
+where [`::: cloud`](guides/content-blocks.md#cloud-content) blocks fetch
+content from at build time - `cloud.siteId` isn't needed for that.
+
+**No API token field lives here, ever** - `publish` (and a build using
+`::: cloud`) both read it from the `BXSITES_CLOUD_TOKEN` environment
+variable (`publish` also accepts an explicit `--token` flag), never from
+`bxsites.yaml`, so this file always stays safe to commit.
+
+`cloud.contentBlocks` (`false` by default) turns on
+[`::: cloud`](guides/content-blocks.md#cloud-content) blocks - explicit
+opt-in, the same convention `mermaid`/`openapi`/`math` already use, since it
+gates whether the small client-side runtime that live-refreshes a block
+gets shipped at all. Requires `cloud.apiUrl` to be set too.
+`cloud.contentBlocksOnError` (`"fail"`, the default, or `"skip"`) controls
+what happens when a `::: cloud` block's own build-time fetch fails - see
+[Cloud content](guides/content-blocks.md#cloud-content) for the full
+behavior of each.
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    cloud:
+      siteId: "3f2b1c9a-....-....-............"
+      apiUrl: "https://cloud.bxsites.app"
+      contentBlocks: true
+      contentBlocksOnError: "fail"
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    {
+    	"cloud": {
+    		"siteId": "3f2b1c9a-....-....-............",
+    		"apiUrl": "https://cloud.bxsites.app",
+    		"contentBlocks": true,
+    		"contentBlocksOnError": "fail"
+    	}
+    }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [cloud]
+    siteId = "3f2b1c9a-....-....-............"
+    apiUrl = "https://cloud.bxsites.app"
+    contentBlocks = true
+    contentBlocksOnError = "fail"
+    ```
+
+See [Deployment](guides/deployment.md#the-publish-command) for the full
+`publish` workflow.
+
+## `docbox`
+
+Settings for [`bxSites docbox`](cli-reference.md#docbox), which generates a
+BoxLang/CFML API reference from DocBox - see
+[DocBox API Reference](guides/docbox.md). Every key is optional; with no
+`docbox` block at all the verb documents whichever conventional source
+folders the project has (`models`, `handlers`, `bifs`, `components`,
+`interceptors`).
+
+- `projectTitle` - the title on the generated overview page. Defaults to
+  the site's own `name` with `" API"` appended.
+- `mappings` - mapping name to source directory. Each becomes a BoxLang
+  mapping DocBox resolves classes through, so the name is what appears as
+  the package on generated pages.
+- `excludes` - a regex of paths for DocBox to skip.
+- `pagePathPrefix` - where pages go, relative to the content dir. Defaults
+  to `api/docbox`.
+- `tags` - frontmatter tags on every generated page. Defaults to
+  `[ "api", "docbox" ]`.
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    docbox:
+      projectTitle: "My API"
+      mappings:
+        models: models
+        bifs: bifs
+      excludes: "tests|build"
+      pagePathPrefix: api/docbox
+      tags: [ api, docbox ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    {
+    	"docbox": {
+    		"projectTitle": "My API",
+    		"mappings": { "models": "models", "bifs": "bifs" },
+    		"excludes": "tests|build",
+    		"pagePathPrefix": "api/docbox",
+    		"tags": [ "api", "docbox" ]
+    	}
+    }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [docbox]
+    projectTitle = "My API"
+    excludes = "tests|build"
+    pagePathPrefix = "api/docbox"
+    tags = [ "api", "docbox" ]
+
+    [docbox.mappings]
+    models = "models"
+    bifs = "bifs"
+    ```
+
+## `coldbox`
+
+Settings for [`bxSites coldbox`](cli-reference.md#coldbox), which documents
+a ColdBox application from its conventions - see
+[ColdBox Applications](guides/coldbox.md). Every key is optional.
+
+- `appRoot` - where the ColdBox application lives, relative to the project
+  root. Defaults to the project root itself, which is the common case: a
+  site documenting the app it sits in.
+- `pagePathPrefix` - where pages go, relative to the content dir. Defaults
+  to `api/coldbox`.
+- `tags` - frontmatter tags on every generated page. Defaults to
+  `[ "api", "coldbox" ]`.
+- `include` - which page sets to generate, any of `routes`, `handlers`,
+  `models`, `modules`, `interceptors`, `scheduler`. All of them by default;
+  leave one out and it's skipped entirely.
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    coldbox:
+      appRoot: "."
+      pagePathPrefix: api/coldbox
+      tags: [ api, coldbox ]
+      include: [ routes, handlers, models, modules, interceptors, scheduler ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    {
+    	"coldbox": {
+    		"appRoot": ".",
+    		"pagePathPrefix": "api/coldbox",
+    		"tags": [ "api", "coldbox" ],
+    		"include": [ "routes", "handlers", "models", "modules", "interceptors", "scheduler" ]
+    	}
+    }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [coldbox]
+    appRoot = "."
+    pagePathPrefix = "api/coldbox"
+    tags = [ "api", "coldbox" ]
+    include = [ "routes", "handlers", "models", "modules", "interceptors", "scheduler" ]
+    ```
 
 ## Versioning
 

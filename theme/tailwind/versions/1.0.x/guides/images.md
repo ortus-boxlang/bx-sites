@@ -48,10 +48,9 @@ breakpoint to offer.
 
 ## Captions, alignment and framing
 
-A caption, a frame, or a multi-image gallery are all just block-level
-HTML - which bx-markdown/Flexmark passes through completely untouched
-(CommonMark's own "HTML block" rule), so no bx-sites-specific syntax is
-needed at all:
+A caption or a frame is just block-level HTML - which bx-markdown/Flexmark
+passes through completely untouched (CommonMark's own "HTML block" rule),
+so no bx-sites-specific syntax is needed at all:
 
 ```markdown title="Example" linenums="1"
 <figure>
@@ -62,16 +61,32 @@ needed at all:
 <div data-with-frame="true">
   <img src="../assets/screenshot.png" alt="Framed">
 </div>
-
-<div class="bxsites-gallery">
-  <img src="../assets/one.png" alt="">
-  <img src="../assets/two.png" alt="">
-  <img src="../assets/three.png" alt="">
-</div>
 ```
 
 The same is true of `x-data`/`x-show`/`@click` and any other Alpine.js
 attribute - see [Interactivity with Alpine.js](interactivity.md).
+
+For a multi-image gallery, use the built-in
+[`::: image-gallery`](content-blocks.md#image-gallery) content block
+instead of hand-rolled HTML - it gives you a responsive grid and a
+click-to-enlarge lightbox for free.
+
+## Click to enlarge
+
+With [`imageGallery: true`](../configuration.md#imagegallery), every image
+in page content opens in a lightbox when clicked, so a lone screenshot
+needs no special syntax. The arrow keys (or the buttons) move through all
+the zoomable images on the page, in order, and Esc closes it.
+
+An image is left alone when it is smaller than 120 px wide (icons, badges),
+sits inside a link or a button, or is opted out in raw HTML:
+
+```html
+<img src="../assets/logo.png" alt="Logo" class="no-zoom">
+```
+
+Images outside the content area (a custom home page, for example) opt in
+with `data-bxsites-lightbox`.
 
 ## What doesn't get resized
 
@@ -104,6 +119,15 @@ adds AVIF upstream.
     { "assets": { "images": { "enabled": false } } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+
+    [assets]
+
+    [assets.images]
+    enabled = false
+    ```
+
 Falls back to plain, unprocessed `docs/assets/**` copying - exactly how
 every image was handled before this feature existed.
 
@@ -127,6 +151,16 @@ every image was handled before this feature existed.
     		}
     	}
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+
+    [assets]
+
+    [assets.images]
+    widths = [ 480, 960, 1440 ]
+    formats = [ "webp" ]
     ```
 
 `widths` defaults to `[400, 800, 1200, 1600]`; `formats` defaults to
@@ -155,6 +189,12 @@ every `assets.images` key.
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    extraCss = [ "assets/a.css", "assets/b.css" ]
+    extraJs = [ "assets/app.js" ]
+    ```
+
 builds one fingerprinted `assets/bundle.<hash>.css` (in the order
 listed) and one `assets/bundle.<hash>.js`, instead of one `<link>`/
 `<script>` tag per entry. CSS gets its comments stripped and whitespace
@@ -179,6 +219,11 @@ reordering a CSS cascade a project depended on:
 === "JSON"
     ```json title="bxsites.json"
     { "extraCss": ["assets/custom.css", "https://cdn.example.com/lib.css"] }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    extraCss = [ "assets/custom.css", "https://cdn.example.com/lib.css" ]
     ```
 
 renders two separate `<link>` tags, unbundled, exactly as before this

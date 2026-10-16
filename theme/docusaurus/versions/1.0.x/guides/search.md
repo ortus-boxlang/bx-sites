@@ -80,6 +80,11 @@ own - neither opens this module's own palette.
     { "search": false }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    search = false
+    ```
+
 Skips building `search-index.json` entirely, and skips the search box, the
 vendored MiniSearch script, and the shared `search.js` widget in every
 rendered page - a project with search off ships nothing search-related at
@@ -135,6 +140,20 @@ all support:
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    search = true
+
+    [searchProvider]
+    provider = "algolia"
+
+    [searchProvider.algolia]
+    appId = "ABC123"
+    apiKey = "a1b2c3d4e5f6..."
+    indexName = "my-docs"
+    insights = false
+    ```
+
 `appId`, `apiKey` and `indexName` are required - `apiKey` is the
 **search-only** public API key DocSearch gives you (never an admin key; it's
 shipped straight into every rendered page). `insights` (`false` by default)
@@ -178,6 +197,18 @@ Algolia:
     		"pagefind": { "bin": "pagefind", "options": [] }
     	}
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    search = true
+
+    [searchProvider]
+    provider = "pagefind"
+
+    [searchProvider.pagefind]
+    bin = "pagefind"
+    options = []
     ```
 
 Both `pagefind` keys are optional - `bin` (default `"pagefind"`) is the
@@ -252,29 +283,29 @@ Typesense, a proprietary internal search API, ...) is a project-level
    ```
 
 2. **Eject a theme to customize** - `bxSites theme:new --theme=bootstrap`
-   copies the built-in `bootstrap` theme into your project's own `theme/`
-   folder (see [Overriding a theme](themes.md#overriding-a-theme));
+   copies the built-in `bootstrap` theme into your project's own `.theme/`
+   folder, inside your content root (see [Overriding a theme](themes.md#overriding-a-theme));
    project-theme-wins resolution means bx-sites now renders through your
    copy instead of the built-in one.
 
-3. **Add the mount point** - `theme/search.bxm` already branches on
+3. **Add the mount point** - `.theme/search.bxm` already branches on
    `variables.searchProviderName` for `local`/`algolia`/`pagefind`; add
    your own branch the same way:
 
-   ```html title="theme/search.bxm"
+   ```html title=".theme/search.bxm"
    <bx:if variables.searchProviderName eq 'meilisearch'>
        <div id="bxsites-search-meilisearch"></div>
    </bx:if>
    ```
 
-4. **Load the client and wire it up** - `theme/layout.bxm` already has a
+4. **Load the client and wire it up** - `.theme/layout.bxm` already has a
    `<bx:if variables.searchEnabled and variables.searchProviderName eq 'algolia'>`
    block loading DocSearch's CSS/JS and calling `docsearch({...})`; add the
    equivalent for Meilisearch's own
    [instant-meilisearch](https://github.com/meilisearch/meilisearch-docsearch)
    widget, reading your own config block back out of `siteConfig`:
 
-   ```html title="theme/layout.bxm"
+   ```html title=".theme/layout.bxm"
    <bx:if variables.searchEnabled and variables.searchProviderName eq 'meilisearch'>
        <script src="https://cdn.jsdelivr.net/npm/@meilisearch/instant-meilisearch/dist/instant-meilisearch.umd.min.js"></script>
        <script>

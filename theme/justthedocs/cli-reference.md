@@ -46,6 +46,18 @@ addon adding `bxSites cloud publish`) - `help`/no-args lists whatever's
 currently activated in your project alongside the verbs below. See
 [CLI Providers](guides/cli-providers.md) if you're writing one.
 
+## Tab completion
+
+The module ships completion scripts for bash, fish and PowerShell in its `completions/` folder. They complete verbs (`page:new`, or written as `page new`), flags, and the values of flags with a fixed set (`--theme=`, `--target=`, `--from=`, ...).
+
+| Shell | Install |
+|---|---|
+| bash | Automatic with `install-bx-module bx-sites`, which reads `boxlang.completions` from the module's `box.json`. Otherwise add `source <module folder>/completions/bxSites.bash` to `~/.bashrc`. |
+| fish | `cp <module folder>/completions/bxSites.fish ~/.config/fish/completions/` |
+| PowerShell | Add `. <module folder>/completions/bxSites.ps1` to your `$PROFILE`. |
+
+The scripts are generated from the verb table in `ModuleConfig.bx`. After changing a verb, regenerate them with `boxlang tools/generate-completions.bxs`; a spec fails when the committed scripts are stale.
+
 ## `new`
 
 Scaffold a new project.

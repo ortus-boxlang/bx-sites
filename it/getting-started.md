@@ -76,6 +76,10 @@ boxlang bxSites <verbo> [opzioni]
 
 Il resto di questa guida usa la forma breve.
 
+### Completamento con Tab
+
+Il modulo include script di completamento per bash, fish e PowerShell. Vedi [Completamento con Tab](cli-reference.md#completamento-con-tab) per l'installazione di ciascuno.
+
 ## Generare lo scheletro di un progetto
 
 ```bash

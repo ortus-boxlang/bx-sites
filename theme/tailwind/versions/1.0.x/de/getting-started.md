@@ -11,7 +11,7 @@ tags: [anleitungen, einrichtung]
 ## Voraussetzung: BoxLang installieren
 
 Alles Folgende setzt voraus, dass die BoxLang-Laufzeitumgebung selbst
-bereits auf deinem Rechner vorhanden ist - `install-bx-module` ist
+(1.18 oder neuer) bereits auf deinem Rechner vorhanden ist - `install-bx-module` ist
 BoxLangs eigener CLI-Befehl zum Installieren eines Moduls in eine
 bestehende Installation, und CommandBox' `box install` benötigt ebenfalls
 eine bereits vorhandene BoxLang-Engine, gegen die es laufen kann. Falls du
@@ -76,6 +76,10 @@ boxlang bxSites <verb> [options]
 
 Der Rest dieser Anleitung verwendet die Kurzform.
 
+### Tab-Vervollständigung
+
+Vervollständigungs-Skripte für bash, fish und PowerShell gehören zum Modul. Die einzeilige Installation steht unter [Tab-Vervollständigung](cli-reference.md#tab-vervollständigung).
+
 ## Ein Projekt aufsetzen
 
 ```bash frame="terminal" title="Terminal" linenums="1"
@@ -90,13 +94,28 @@ my-docs/
 ├── docs/
 │   ├── assets/
 │   └── index.md
-└── bxsites.yaml
+├── bxsites.yaml
+├── .markdownlint.json
+└── AGENTS.md
 ```
 
 Übergib `--theme=material` oder `--theme=tailwind`, um mit einem anderen
 Standard-Theme zu starten, und `--name="My Project Docs"`, um den
 Website-Namen direkt festzulegen - andernfalls leitet `new` ihn aus dem Namen
 des Zielverzeichnisses ab.
+
+`AGENTS.md` ist eine generierte Kurzreferenz für KI-Coding-Assistenten zur
+Inhaltserstellung, und `.markdownlint.json` ein passendes Lint-Regelwerk -
+beide werden standardmäßig geschrieben; siehe
+[KI-Agenten-Anweisungen](guides/ai-agent-instructions.md) für den Inhalt,
+wie man zusätzlich `CLAUDE.md`/`.cursorrules` aktiviert, und wie man sie
+später mit `agents:sync` aktualisiert.
+
+`docs/` ist der Standard-Quellordner. Mit `bxSites new my-site
+--source=src` werden die Seiten stattdessen unter `src/` angelegt; die
+folgenden Befehle erkennen den Quellordner automatisch und die Ausgabe bleibt
+unter `site/`. Die Kurzoptionen `--docs` und `--site` sind Aliase für
+`--source=docs` und `--source=src`.
 
 ### Format der Konfigurationsdatei
 
@@ -129,7 +148,11 @@ automatisch zu Navigationsverschachtelung:
     `lint`, `page:new`, ...) sucht zuerst nach `docs/` und weicht auf
     `src/` aus, falls das tatsächlich existiert. Das Build-Ergebnis landet
     in jedem Fall in `site/` - beide kollidieren nie, da `site/` selbst
-    niemals ein gültiger Name für den Quellordner ist.
+    niemals ein gültiger Name für den Quellordner ist. Dieser Ordner ist
+    selbst konfigurierbar - ein eigener Name, oder das gesamte Repository
+    ohne jeden Unterordner - über den Schlüssel `source` in
+    `bxsites.yaml`; siehe [Content-Quelle](guides/content-source.md) für
+    das vollständige Bild.
 
 ```text title="docs/ → nav"
 docs/
@@ -225,6 +248,12 @@ Your content here.
   dessen Anzeige) - praktisch für eine Landing-/Hero-Seite, die kein
   schwebendes Inhaltsverzeichnis neben ihrem eigenen Inhalt haben möchte;
   Standard ist `true`
+- `layout` - rendert den Inhalt dieser Seite über eine benannte `.bxm`-Datei
+  statt über das Standard-`page.bxm` des aktiven Themes (bei einem
+  Blogbeitrag über das eigene `blog-page.bxm` des aktiven Themes, falls
+  vorhanden) - fällt auf `page.bxm` zurück, wenn die benannte Datei nicht
+  existiert, statt den Build fehlschlagen zu lassen - siehe
+  [Mehrere Layouts pro Seite](guides/themes.md#mehrere-layouts-pro-seite)
 
 Frontmatter-Werte können Inline-Listen (`tags: [a, b, c]`), YAML-artige
 Blocklisten (`tags:` gefolgt von eingerückten `- item`-Zeilen) oder
@@ -250,8 +279,8 @@ bxSites serve
 
 Baut das Projekt, liefert `site/` unter `http://127.0.0.1:8080/` aus und
 baut automatisch neu, sobald du eine Änderung unter `docs/`, deiner
-`bxsites.yaml`/`.json`-Website-Konfiguration oder einem projektweiten
-`theme/`-Override speicherst - dein Browser lädt von selbst neu. Übergib `--port=3000` oder `--host=0.0.0.0`, um zu ändern,
+`bxsites.yaml`/`.json`-Website-Konfiguration oder einem `.theme/`-Override
+im Content-Root speicherst - dein Browser lädt von selbst neu. Übergib `--port=3000` oder `--host=0.0.0.0`, um zu ändern,
 woran gebunden wird.
 
 ## Clean

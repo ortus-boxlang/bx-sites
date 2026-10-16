@@ -50,10 +50,10 @@ Dateigrößen-Gewinn, auch ganz ohne responsiven Breakpoint.
 
 ## Bildunterschriften, Ausrichtung und Rahmung
 
-Eine Bildunterschrift, ein Rahmen oder eine Mehrbild-Galerie sind alle
-einfach block-level HTML - das bx-markdown/Flexmark vollständig
-unverändert durchreicht (CommonMarks eigene "HTML-Block"-Regel), sodass
-dafür überhaupt keine bx-sites-spezifische Syntax nötig ist:
+Eine Bildunterschrift oder ein Rahmen sind einfach block-level HTML -
+das bx-markdown/Flexmark vollständig unverändert durchreicht (CommonMarks
+eigene "HTML-Block"-Regel), sodass dafür überhaupt keine
+bx-sites-spezifische Syntax nötig ist:
 
 ```markdown title="Beispiel" linenums="1"
 <figure>
@@ -64,17 +64,16 @@ dafür überhaupt keine bx-sites-spezifische Syntax nötig ist:
 <div data-with-frame="true">
   <img src="../assets/screenshot.png" alt="Framed">
 </div>
-
-<div class="bxsites-gallery">
-  <img src="../assets/one.png" alt="">
-  <img src="../assets/two.png" alt="">
-  <img src="../assets/three.png" alt="">
-</div>
 ```
 
 Dasselbe gilt für `x-data`/`x-show`/`@click` und jedes andere
 Alpine.js-Attribut - siehe
 [Interaktivität mit Alpine.js](interactivity.md).
+
+Für eine Mehrbild-Galerie nutze den eingebauten
+[`::: image-gallery`](content-blocks.md#image-gallery)-Content-Block
+anstelle von handgestricktem HTML - er liefert dir ein responsives
+Raster und eine Klick-zum-Vergrößern-Lightbox gratis dazu.
 
 ## Was nicht skaliert wird
 
@@ -108,6 +107,15 @@ AVIF upstream hinzufügt.
     { "assets": { "images": { "enabled": false } } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+
+    [assets]
+
+    [assets.images]
+    enabled = false
+    ```
+
 Fällt zurück auf das schlichte, unverarbeitete Kopieren von
 `docs/assets/**` - genau so, wie jedes Bild behandelt wurde, bevor es
 diese Funktion gab.
@@ -132,6 +140,16 @@ diese Funktion gab.
     		}
     	}
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+
+    [assets]
+
+    [assets.images]
+    widths = [ 480, 960, 1440 ]
+    formats = [ "webp" ]
     ```
 
 `widths` ist standardmäßig `[400, 800, 1200, 1600]`; `formats` ist
@@ -161,6 +179,12 @@ aktiv (`assets.bundle`):
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    extraCss = [ "assets/a.css", "assets/b.css" ]
+    extraJs = [ "assets/app.js" ]
+    ```
+
 baut ein einzelnes, fingerprint-versehenes `assets/bundle.<hash>.css`
 (in der aufgeführten Reihenfolge) und ein `assets/bundle.<hash>.js`,
 statt eines `<link>`-/`<script>`-Tags pro Eintrag. CSS werden dabei
@@ -188,6 +212,11 @@ umzusortieren, auf die sich ein Projekt verlassen hat:
 === "JSON"
     ```json title="bxsites.json"
     { "extraCss": ["assets/custom.css", "https://cdn.example.com/lib.css"] }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    extraCss = [ "assets/custom.css", "https://cdn.example.com/lib.css" ]
     ```
 
 rendert zwei separate `<link>`-Tags, ungebündelt, genau wie vor

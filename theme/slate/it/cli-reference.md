@@ -42,6 +42,18 @@ la convenzione `docs/`-o-`src/`. `new` genera sempre lo scheletro di
 
 I flag di percorso (`--source`, `--path`, `--dest`, `--output`) accettano un percorso assoluto, un percorso `~/` nella cartella home o un percorso relativo alla radice del progetto.
 
+## Completamento con Tab
+
+Il modulo include script di completamento per bash, fish e PowerShell nella cartella `completions/`. Completano i verbi (`page:new`, o scritto come `page new`), i flag e i valori dei flag con un insieme fisso (`--theme=`, `--target=`, `--from=`, ...).
+
+| Shell | Installazione |
+|---|---|
+| bash | Automatica con `install-bx-module bx-sites`, che legge `boxlang.completions` dal `box.json` del modulo. Altrimenti aggiungi `source <cartella del modulo>/completions/bxSites.bash` a `~/.bashrc`. |
+| fish | `cp <cartella del modulo>/completions/bxSites.fish ~/.config/fish/completions/` |
+| PowerShell | Aggiungi `. <cartella del modulo>/completions/bxSites.ps1` al tuo `$PROFILE`. |
+
+Gli script sono generati dalla tabella dei verbi in `ModuleConfig.bx`. Dopo aver cambiato un verbo, rigenerali con `boxlang tools/generate-completions.bxs`; uno spec fallisce se gli script versionati sono obsoleti.
+
 ## `new`
 
 Genera lo scheletro di un progetto di documentazione.

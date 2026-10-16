@@ -22,12 +22,15 @@ dann `bxsites.yml`, dann `bxsites.json`.
     name: "My Docs"
     description: ""
     baseURL: "/"
+    source: docs
+    exclude: []
     theme:
       name: bootstrap
       options: {}
       logo: ""
       favicon: ""
     search: true
+    mcp: false
     searchProvider:
       provider: local
       algolia: { appId: "", apiKey: "", indexName: "", insights: false }
@@ -69,6 +72,8 @@ dann `bxsites.yml`, dann `bxsites.json`.
     	"name": "My Docs",
     	"description": "",
     	"baseURL": "/",
+    	"source": "docs",
+    	"exclude": [],
     	"theme": {
     		"name": "bootstrap",
     		"options": {},
@@ -76,6 +81,7 @@ dann `bxsites.yml`, dann `bxsites.json`.
     		"favicon": ""
     	},
     	"search": true,
+    	"mcp": false,
     	"searchProvider": {
     		"provider": "local",
     		"algolia": { "appId": "", "apiKey": "", "indexName": "", "insights": false }
@@ -115,6 +121,38 @@ dann `bxsites.yml`, dann `bxsites.json`.
     	},
     	"variables": {}
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    name = "My Docs"
+    description = ""
+    baseURL = "/"
+    source = "docs"
+    exclude = []
+    search = true
+    mcp = false
+    nav = []
+    social = []
+    footer = false
+    lastUpdated = false
+    extraCss = []
+    extraJs = []
+    plugins = []
+    variables = {}
+
+    [theme]
+    name = "bootstrap"
+    options = {}
+    logo = ""
+    favicon = ""
+
+    [markdown]
+    enableAdmonition = true
+
+    [repo]
+    url = ""
+    editUri = ""
     ```
 
 Nur `name` ist erforderlich - alles andere fällt auf die oben gezeigten
@@ -165,6 +203,33 @@ vorangestellt wird, und dient zugleich als kanonische URL der Website für
 `llms.txt` (siehe [unten](#llmstxt)) wird immer geschrieben; sie bevorzugt
 lediglich eine absolute URL, wenn `baseURL` eine solche liefert.
 
+## `source`
+
+Welcher Ordner den Inhalt dieses Projekts enthält - `docs`, `src`, ein
+beliebiger eigener Ordnername, oder `.` (das gesamte Repository ist der
+Inhalt, überhaupt kein Unterordner). Bleibt er ungesetzt, werden `docs/`
+und dann `src/` automatisch erkannt; existiert auf der Festplatte auch
+keiner von beiden, schlägt der Build laut fehl, statt zu raten.
+`bxSites new` schreibt diesen Schlüssel immer explizit, sodass ein
+gescaffoldetes Projekt nie mehrdeutig ist. Siehe
+[Content-Quelle](guides/content-source.md) für das vollständige Bild,
+einschließlich der `.theme`/`.themes`-Überschreibungen, die innerhalb
+dieses Ordners leben, sowie die Anleitung
+[Multi-Domain-Monorepo](guides/multi-domain.md) für den Betrieb mehrerer
+unabhängiger Projekt-Wurzeln aus einem einzigen Repository.
+
+## `exclude`
+
+Zusätzliche Datei-/Ordnernamen, die aus dem Build ausgeschlossen werden,
+zusätzlich zu den traditionellen, die bxSites ohnehin immer ausschließt
+(jeder Ordner und jede Datei mit führendem Punkt wie `.git` oder `.claude`, `node_modules`, `boxlang_modules`, `site`, `.theme`,
+`.themes` und die eigene Konfigurationsdatei dieses Projekts). Wird auf
+dieselbe Weise abgeglichen - ein bloßer Name an der Wurzel von `source`,
+oder ein Name irgendwo darunter über ein führendes, `/`-freies
+Pfadsegment. Vor allem nützlich mit `source: .`, um Tooling-Verzeichnisse
+oder Dateien, die nicht Teil deiner traditionellen, `README.md`-nahen
+Ausschlüsse sind, davon abzuhalten, als Seiten eingesammelt zu werden.
+
 ## `llms.txt`
 
 Jeder Build schreibt eine `llms.txt` in die Wurzel der Website - ein
@@ -174,6 +239,11 @@ LLM-basierten Tools hilft, sich auf einer Website zurechtzufinden, ohne
 deren gerendertes HTML zu crawlen. Es gibt dafür keinen Konfigurationsschlüssel;
 sie wird automatisch erzeugt, mit einer absoluten URL pro Link, wenn
 `baseURL` eine vollständige URL ist, andernfalls relativ zum `basePath`.
+
+Bei Seiten mit veröffentlichter Markdown-Quelle verweist der Haupteintrag
+auf die rohe `.md`-Datei und enthält zusätzlich einen `[HTML]`-Link zur
+gerenderten Seite. Seiten ohne veröffentlichte Markdown-Quelle werden mit
+ihrer HTML-URL aufgeführt.
 
 ## `sitemap.xml`
 
@@ -224,7 +294,7 @@ existiert.
 - `theme.name` - eines der integrierten Themes (`bootstrap`, `material`,
   `tailwind`, `docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`,
   `gitbook`, `notion`) oder der Name eines eigenen Themes, das du über
-  einen `theme/`-Ordner im Projekt-Wurzelverzeichnis bereitstellst (siehe
+  einen `.theme/`-Ordner innerhalb des Content-Root bereitstellst (siehe
   [Themes](guides/themes.md))
 - `theme.logo` - Pfad/URL zu einem Bild, das neben dem Website-Namen in der
   Kopfzeilen-Marke angezeigt wird (anstelle des standardmäßigen
@@ -320,6 +390,25 @@ existiert.
         ```json
         { "theme": { "options": { "pageMetaPosition": "top" } } }
         ```
+  - `theme.options.navAccentLine` - `true` (Standard) zeichnet eine
+    dünne vertikale Linie neben einem verschachtelten Abschnitt der
+    Seitenleisten-Navigation, die dessen untergeordnete Einträge visuell
+    mit dem übergeordneten Abschnitt verbindet. `false` schaltet sie aus.
+  - `theme.options.navAccentLineColor` - eine Hex-Farbe (3- oder
+    6-stellig), die die Farbe der Navigations-Akzentlinie überschreibt.
+    Bleibt sie unbesetzt, greift `theme.options.accentColor`/
+    `accentColorDark`, falls gesetzt, sonst die native Akzentfarbe des
+    Themes - nur relevant, wenn `navAccentLine` aktiv ist.
+
+    === "YAML"
+        ```yaml
+        theme: { options: { navAccentLine: true, navAccentLineColor: "#2563eb" } }
+        ```
+
+    === "JSON"
+        ```json
+        { "theme": { "options": { "navAccentLine": true, "navAccentLineColor": "#2563eb" } } }
+        ```
 
 ## `search`
 
@@ -338,7 +427,7 @@ Welche Such-UI `search: true` verdrahtet:
   stattdessen [Algolia DocSearch](guides/search.md#algolia), und
   `"pagefind"` verdrahtet [Pagefind](guides/search.md#pagefind). Jeder
   andere Wert ist ein eigener, projektspezifischer Provider, verdrahtet
-  über ein `theme/`-Override - siehe
+  über ein `.theme/`-Override - siehe
   [Suche](guides/search.md#andere-suchprovider).
 - `algolia` - erforderlich, wenn `provider` `"algolia"` ist: `appId`,
   `apiKey` (der *reine Such*-öffentliche API-Schlüssel, kein
@@ -399,6 +488,21 @@ Welche Such-UI `search: true` verdrahtet:
       }
       ```
 
+## `mcp`
+
+`false` (Standard) überspringt es vollständig. `true` schreibt bei jedem
+`build` drei Dateien - eine vollständige, unabgeschnittene
+`mcp-index.json`, eine `mcp-nav.json` pro Baum und eine websiteweite
+`mcp-manifest.json`, die jeden Baum auflistet - für den öffentlichen,
+schreibgeschützten MCP-Server von
+[bxSites Cloud](https://bxsites.io/cloud) für deine veröffentlichte
+Website. Vollständig unabhängig von `search`/`searchProvider` oben - sie
+werden unabhängig davon erzeugt, welcher Such-Provider (oder keiner)
+konfiguriert ist. Das Erzeugen der Dateien selbst ist kostenlos; bxSites
+Cloud liefert sie nur in den kostenpflichtigen Plänen tatsächlich als
+laufenden MCP-Server aus, nicht im kostenlosen Plan. Siehe
+[MCP-Server](guides/mcp.md).
+
 ## `nav`
 
 Standardmäßig wird die Navigation aus der eigenen Ordner-/Dateistruktur von
@@ -456,6 +560,19 @@ nur ihre Kinder gruppiert:
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[nav]]
+    path = "index.md"
+
+    [[nav]]
+    title = "Main Components"
+    children = [
+      { title = "Quick Start", path = "guides/setup.md" },
+      { path = "guides/deployment.md" }
+    ]
+    ```
+
 Gib demselben Gruppeneintrag stattdessen einen `path`, und er wird zu
 einem normal verlinkten Abschnitt (mit eigener Landingpage plus Kindern)
 statt eines reinen Labels - beide Formen verschachteln sich unter
@@ -497,6 +614,13 @@ nur auf den Hauptbaum angewendet:
     		{ "from": "old-guide", "to": "guides/new-guide/" }
     	]
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[redirects]]
+    from = "old-guide"
+    to = "guides/new-guide/"
     ```
 
 - `redirects[].from` - das alte hübsche URL-Segment, an dem eine
@@ -569,6 +693,15 @@ Jede gerenderte Tabelle erhält außerdem automatisch einen Wrapper für respons
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [markdown]
+    enableFootnotes = true
+    enableDefinitionLists = true
+    anchorLinks = false
+    enableYouTubeTransformer = true
+    ```
+
 ## `repo`
 
 Fügt der Kopfzeile (in jedem integrierten Theme) einen
@@ -595,6 +728,13 @@ Seite einen "Diese Seite bearbeiten"-Link.
 === "JSON"
     ```json title="bxsites.json"
     { "repo": { "url": "https://github.com/acme/docs", "editUri": "edit/main/docs/" } }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [repo]
+    url = "https://github.com/acme/docs"
+    editUri = "edit/main/docs/"
     ```
 
 ## `social`
@@ -625,6 +765,19 @@ barrierefreien Namen/Tooltip des Links (Standard ist `icon`, dann
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [[social]]
+    url = "https://twitter.com/acme"
+    icon = "twitter"
+    label = "Twitter"
+
+    [[social]]
+    url = "https://acme.com/rss.xml"
+    icon = "rss"
+    label = "RSS"
+    ```
+
 ## `footer`
 
 `false` (Standard) - überhaupt keine Fußzeile. `true` fügt jeder Seite eine
@@ -639,6 +792,11 @@ hinzu: eine Copyright-Zeile (`© <Jahr> <Website-Name>`), die `social`-Links
 === "JSON"
     ```json title="bxsites.json"
     { "footer": true }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    footer = true
     ```
 
 ## `lastUpdated`
@@ -662,6 +820,11 @@ Build-Maschine nicht installiert - statt den Build abzubrechen.
     { "lastUpdated": true }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    lastUpdated = true
+    ```
+
 ## `analytics`
 
 Bindet Pageview-Analytics ein. Unterstützt derzeit nur Google Analytics
@@ -682,6 +845,13 @@ Bindet Pageview-Analytics ein. Unterstützt derzeit nur Google Analytics
     { "analytics": { "provider": "google", "id": "G-ABC123" } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [analytics]
+    provider = "google"
+    id = "G-ABC123"
+    ```
+
 ## `ogImage`
 
 Pfad/URL zu einem Standard-Social-Card-Bild, gerendert als `og:image`
@@ -699,6 +869,11 @@ deaktiviert, werden gar keine `og:image`/`twitter:card`-Tags gerendert.
 === "JSON"
     ```json title="bxsites.json"
     { "ogImage": "assets/social-card.png" }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    ogImage = "assets/social-card.png"
     ```
 
 Die eigene `ogImage`-Frontmatter einer Seite (siehe
@@ -726,6 +901,11 @@ Build-Zeit nötig ist.
     { "generateOgImages": true }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    generateOgImages = true
+    ```
+
 ## `extraCss` / `extraJs`
 
 Arrays zusätzlicher Stylesheet-/Skript-URLs, die auf jeder Seite
@@ -748,12 +928,30 @@ verwendet). `extraJs`-Einträge werden mit `defer` geladen.
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    extraCss = [ "assets/custom.css" ]
+    extraJs = [ "assets/custom.js" ]
+    ```
+
 Wenn `assets.bundle` aktiv ist (Standard), wird eine lokale
 `extraCss`/`extraJs`-Liste wie die obige jeweils zu einer fingerprinted
 Datei gebündelt, statt einem `<link>`/`<script>`-Tag pro Eintrag - siehe
 [`assets`](#assets) unten.
 
 ## `assets`
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    [assets]
+    fingerprint = true
+    bundle = true
+
+    [assets.images]
+    enabled = true
+    widths = [ 400, 800, 1200, 1600 ]
+    formats = [ "original", "webp" ]
+    ```
 
 === "YAML"
     ```yaml title="bxsites.yaml" linenums="1"
@@ -791,15 +989,29 @@ einschließlich dessen, was bewusst nicht abgedeckt wird (AVIF, animierte
 GIFs, SVGs).
 
 - `assets.fingerprint` - `true` (Standard). Benennt jede erzeugte
-  Bildvariante und jedes CSS/JS-Bundle nach einem Inhalts-Hash (z. B.
-  `screenshot-800w.a3f9c2e1.webp`, `bundle.a3f9c2e1.css`), sodass sie mit
-  sicheren, weit in der Zukunft liegenden Cache-Headern ausgeliefert
-  werden können - der Build eines Projekts ändert den eigenen Dateinamen
-  nur, wenn sich dessen Inhalt tatsächlich ändert. Benennt die eigenen
-  Originaldateien eines Projekts unter `docs/assets/` nicht um - nur von
-  der Pipeline erzeugte Ausgabe wird fingerprinted, sodass alles andere,
-  was ein Asset über seinen einfachen Dateinamen referenziert (eine
-  `::: file`-Download-Card, ein roher Markdown-Link), unverändert
+  Bildvariante, jedes CSS/JS-Bundle und jede Top-Level-CSS/JS-Datei direkt
+  innerhalb des eigenen `assets/`-Ordners des aktiven Themes oder des
+  eigenen gemeinsamen `assets/`-Ordners dieses Moduls nach einem
+  Inhalts-Hash (z. B. `screenshot-800w.a3f9c2e1.webp`,
+  `bundle.a3f9c2e1.css`, `style.a3f9c2e1.css`, `copy-code.a3f9c2e1.js`),
+  sodass sie mit sicheren, weit in der Zukunft liegenden Cache-Headern
+  ausgeliefert werden können - der Build eines Projekts ändert den
+  eigenen Dateinamen nur, wenn sich dessen Inhalt tatsächlich ändert. Das
+  bedeutet, dass ein Theme-Update - ein Upgrade eines integrierten
+  Themes, oder ein eigener Autor, der das CSS/JS seines eigenen Themes
+  bearbeitet - beim nächsten Deploy automatisch den Browser-Cache jedes
+  Besuchers invalidiert, ganz ohne manuellen Versionierungsschritt,
+  solange das eigene `layout.bxm` des Themes diese Datei über
+  `themeAssetUrl()`/`moduleAssetUrl()` statt über einen fest codierten
+  Pfad einbindet - siehe
+  [Themes](guides/themes.md#ein-theme-von-grund-auf-schreiben). Benennt
+  die eigenen Originaldateien eines Projekts unter `docs/assets/` nicht
+  um, ebenso wenig wie alles innerhalb eines Unterordners des eigenen
+  `assets/`-Ordners eines Themes - nur von der Pipeline erzeugte Ausgabe
+  und die eigenen Top-Level-Dateien eines Themes werden fingerprinted,
+  sodass alles andere, was ein Asset über seinen einfachen Dateinamen
+  referenziert (eine `::: file`-Download-Card, ein roher Markdown-Link,
+  das eigene `@font-face`/`@import` eines Themes), unverändert
   weiterfunktioniert.
 - `assets.bundle` - `true` (Standard). Verkettet `extraCss`/`extraJs` je
   zu einer fingerprinted Datei - reines BoxLang/JVM, keine
@@ -878,6 +1090,23 @@ referenzierte OpenAPI-/Swagger-Spezifikation (JSON oder YAML). Siehe
 === "JSON"
     ```json title="bxsites.json"
     { "openapi": true }
+    ```
+
+## `imageGallery`
+
+`false` (Standard) - keine Lightbox ausgeliefert. `true` lädt eine kleine
+Klick-zum-Vergrößern-Lightbox für jeden `::: image-gallery`-Content-Block.
+Siehe [Content-Blöcke](guides/content-blocks.md#image-gallery) für die
+Syntax.
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    imageGallery: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    { "imageGallery": true }
     ```
 
 ## `plugins`
@@ -1030,3 +1259,100 @@ eine Version existiert. Siehe [Versionierung](guides/versioning.md) für
 das vollständige Bild - eine neue Version mit `version:new` anlegen, wie
 Versionen sortieren und bauen, und was außen vor bleibt (Suche pro Baum
 begrenzt, kein Deprecated-/EOL-Flag).
+
+
+## `docbox`
+
+Einstellungen für [`bxSites docbox`](cli-reference.md#docbox), das aus
+DocBox eine BoxLang-/CFML-API-Referenz erzeugt - siehe
+[DocBox-API-Referenz](guides/docbox.md). Alle Schlüssel sind optional; ohne
+`docbox`-Block werden die üblichen Quellordner dokumentiert (`models`,
+`handlers`, `bifs`, `components`, `interceptors`).
+
+- `projectTitle` - Titel der Überblicksseite. Standard: der `name` der Site
+  plus `" API"`.
+- `mappings` - Mapping-Name zu Quellverzeichnis. Der Name erscheint als
+  Package auf den erzeugten Seiten.
+- `excludes` - Regex für Pfade, die DocBox überspringt.
+- `pagePathPrefix` - Wohin die Seiten geschrieben werden. Standard:
+  `api/docbox`.
+- `tags` - Frontmatter-Tags jeder erzeugten Seite. Standard:
+  `[ "api", "docbox" ]`.
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    docbox:
+      projectTitle: "Meine API"
+      mappings:
+        models: models
+      pagePathPrefix: api/docbox
+      tags: [ api, docbox ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    {
+    	"docbox": {
+    		"projectTitle": "Meine API",
+    		"mappings": { "models": "models" },
+    		"pagePathPrefix": "api/docbox",
+    		"tags": [ "api", "docbox" ]
+    	}
+    }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [docbox]
+    projectTitle = "Meine API"
+    pagePathPrefix = "api/docbox"
+    tags = [ "api", "docbox" ]
+
+    [docbox.mappings]
+    models = "models"
+    ```
+
+## `coldbox`
+
+Einstellungen für [`bxSites coldbox`](cli-reference.md#coldbox), das eine
+ColdBox-Anwendung anhand ihrer Konventionen dokumentiert - siehe
+[ColdBox-Anwendungen](guides/coldbox.md). Alle Schlüssel sind optional.
+
+- `appRoot` - wo die ColdBox-Anwendung liegt, relativ zum Projektstamm.
+  Standard ist der Projektstamm selbst.
+- `pagePathPrefix` - Wohin die Seiten geschrieben werden. Standard:
+  `api/coldbox`.
+- `tags` - Frontmatter-Tags jeder erzeugten Seite. Standard:
+  `[ "api", "coldbox" ]`.
+- `include` - welche Seitengruppen erzeugt werden: `routes`, `handlers`,
+  `models`, `modules`, `interceptors`, `scheduler`. Standardmäßig alle.
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    coldbox:
+      appRoot: "."
+      pagePathPrefix: api/coldbox
+      tags: [ api, coldbox ]
+      include: [ routes, handlers, models, modules, interceptors, scheduler ]
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    {
+    	"coldbox": {
+    		"appRoot": ".",
+    		"pagePathPrefix": "api/coldbox",
+    		"tags": [ "api", "coldbox" ],
+    		"include": [ "routes", "handlers", "models", "modules", "interceptors", "scheduler" ]
+    	}
+    }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    [coldbox]
+    appRoot = "."
+    pagePathPrefix = "api/coldbox"
+    tags = [ "api", "coldbox" ]
+    include = [ "routes", "handlers", "models", "modules", "interceptors", "scheduler" ]
+    ```

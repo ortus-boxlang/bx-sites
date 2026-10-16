@@ -159,6 +159,52 @@ independiente al resto de la paleta del sitio, mediante propiedades CSS
 personalizadas - consulta
 [Personalizar colores](themes.md#personalizar-colores-sin-sobrescribir-un-tema).
 
+## Galería de imágenes
+
+Una cuadrícula responsiva de imágenes. El atributo opcional `columns` es
+`2`, `3` o `4` (por defecto `3`); cualquier otro valor recurre a `3`. La
+cuadrícula en sí no necesita configuración, pero la lightbox de clic
+para ampliar necesita que
+[`imageGallery`](../configuration.md#imagegallery) esté en `true` en
+`bxsites.yaml` - sin eso, la cuadrícula igual se renderiza, solo sin el
+JS de la lightbox. Hay dos formas de construir una:
+
+Enumera cada imagen explícitamente con hijos `::: image` - `src` es
+obligatorio, `alt` y `caption` son ambos opcionales:
+
+```markdown title="Ejemplo" linenums="1"
+::: image-gallery columns="3"
+::: image src="../assets/favicon.png" alt="BoxLang icon" caption="Icon"
+:::
+::: image src="../assets/home-banner.jpg" alt="Home banner"
+:::
+::: image src="../assets/og-image.png" caption="Social preview"
+:::
+:::
+```
+
+::: image-gallery columns="3"
+::: image src="../assets/favicon.png" alt="BoxLang icon" caption="Icon"
+:::
+::: image src="../assets/home-banner.jpg" alt="Home banner"
+:::
+::: image src="../assets/og-image.png" caption="Social preview"
+:::
+:::
+
+O deja que bxSites descubra las imágenes por convención: coloca archivos
+llamados `{name}-{order}.{jpg,jpeg,png,webp,gif}` en
+`docs/assets/gallery/{name}/` y referéncialos solo con `name` - sin
+necesidad de hijos. Los archivos se ordenan numéricamente por `{order}`:
+
+```markdown title="Ejemplo" linenums="1"
+::: image-gallery name="showcase" columns="3"
+:::
+```
+
+::: image-gallery name="showcase" columns="3"
+:::
+
 ## Archivo
 
 Una tarjeta de descarga para un PDF, video, o cualquier otro recurso del
@@ -465,6 +511,96 @@ versión Pro de esta página"), y la sobrescritura de tema propia de un
 proyecto puede llamar directamente a
 `window.bxSitesSetPreference( key, value )` para controlarlo desde una
 UI personalizada en su lugar.
+
+## Formularios de contacto
+
+> **Función premium.** Un bloque `::: contact-form` siempre se renderiza
+> como un formulario real y completo - campos, etiquetas, botón de
+> envío, todo - pero *enviarlo* solo funciona una vez que el plan de
+> bxSites Cloud del proyecto incluye formularios funcionales. En un plan
+> que no lo incluye, quien lo envíe de todos modos verá un mensaje
+> amistoso de "actualiza tu plan para activar este formulario" en lugar
+> de que su mensaje llegue a alguna parte. No hay nada que configurar
+> aquí para activar o desactivar eso - es enteramente una propiedad del
+> plan de la cuenta.
+
+Un formulario de contacto/generación de leads con etiquetas, enviado
+mediante `fetch()` a bxSites Cloud en lugar de recargar la página:
+
+```markdown title="Ejemplo" linenums="1"
+::: contact-form id="demo-request" to="sales@acme.com" fields="name:text,email*:email,message:textarea" submitLabel="Send" :::
+```
+
+::: contact-form id="demo-request" to="sales@acme.com" fields="name:text,email*:email,message:textarea" submitLabel="Send" :::
+
+- `id` - el slug propio de este formulario. Coincide con una
+  configuración de formulario (a quién notifica, filtrado de spam, etc.)
+  que configuras en bxSites Cloud, no en este markdown - esta build
+  nunca comprueba que el id que escribes aquí exista realmente allí,
+  simplemente se pasa tal cual. Por defecto es `"contact"` cuando se
+  omite.
+- `to` - opcional y puramente informativo (el enrutamiento real de
+  entrega se configura del lado del servidor, por el administrador de la
+  cuenta) - útil como recordatorio de a dónde van las respuestas de un
+  formulario dado cuando repases el código fuente de la página más
+  tarde.
+- `fields` - obligatorio; un pequeño DSL, pares `name:type` separados
+  por comas: añade un `*` final justo después del nombre del campo
+  (antes de sus dos puntos) para marcarlo como obligatorio, p. ej.
+  `email*:email`. Los tipos admitidos son `text`, `email` y `textarea`;
+  cualquier otro tipo no reconocido cae de vuelta a un simple campo
+  `text` en lugar de fallar la build. La etiqueta de cada campo se
+  deriva de su nombre (`full-name` se convierte en "Full Name").
+- `submitLabel` - el texto propio del botón de envío; por defecto es
+  `"Send"`.
+
+Todo formulario también lleva un campo honeypot oculto que una persona
+visitante real nunca ve ni rellena - el propio filtrado de spam de
+bxSites Cloud lo usa, sin necesidad de configuración aquí.
+
+## Comentarios
+
+> **Función premium.** `::: comments` monta un hilo de comentarios de
+> visitantes en vivo y moderado en la página - requiere una cuenta de
+> bxSites Cloud con Comentarios incluidos en el plan y
+> `cloud.comments: true` configurado en `bxsites.yaml`. Sin esto, un
+> bloque `::: comments` no hace fallar la build: se renderiza como un
+> marcador vacío e inactivo, y la build muestra una advertencia una sola
+> vez, con la primera página afectada. A diferencia de `::: cloud` sin
+> `cloud.contentBlocks`, que sí hace fallar la build porque debe obtener
+> contenido real.
+
+```markdown title="Ejemplo" linenums="1"
+::: comments :::
+```
+
+No se requiere ningún atributo - el id del hilo toma por defecto la
+propia ruta de URL de la página, así que cada página obtiene su propio
+hilo de comentarios sin ninguna configuración. Un `id="..."` opcional
+permite que dos bloques en una página (o bloques en páginas distintas)
+compartan un único hilo en su lugar:
+
+```markdown title="Ejemplo" linenums="1"
+::: comments id="general-feedback" :::
+```
+
+A diferencia de `::: cloud`, no se obtiene ni se incrusta nada en tiempo
+de build - un hilo de comentarios sigue creciendo después de cada
+despliegue, así que una instantánea tomada en tiempo de build quedaría
+obsoleta en cuanto llegara un nuevo comentario. El bloque renderiza un
+marcador de posición vacío; un pequeño script del lado del cliente (solo
+se incluye cuando `cloud.comments: true` está activado - la misma
+adhesión explícita que ya usa `cloud.contentBlocks`) carga los
+comentarios actuales, ya moderados, cada vez que se carga la página y
+pagina hacia comentarios más antiguos a petición, y luego renderiza un
+formulario para publicar uno nuevo. Un comentario recién enviado se
+muestra localmente, solo en el navegador de esa persona visitante,
+etiquetado como pendiente de moderación - nunca aparece para nadie más
+hasta que una persona moderadora lo aprueba.
+
+Ese formulario también lleva un campo honeypot oculto que una persona
+visitante real nunca ve ni rellena - el propio filtrado de spam de
+bxSites Cloud lo usa, sin necesidad de configuración aquí.
 
 ## Bucle y condicional (basado en datos)
 

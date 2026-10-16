@@ -42,6 +42,18 @@ predeterminada para proyectos nuevos.
 
 Los flags de ruta (`--source`, `--path`, `--dest`, `--output`) aceptan una ruta absoluta, una ruta `~/` en tu carpeta personal o una ruta relativa a la raíz del proyecto.
 
+## Autocompletado con Tab
+
+El módulo incluye scripts de autocompletado para bash, fish y PowerShell en su carpeta `completions/`. Completan verbos (`page:new`, o escrito como `page new`), flags y los valores de los flags con un conjunto fijo (`--theme=`, `--target=`, `--from=`, ...).
+
+| Shell | Instalación |
+|---|---|
+| bash | Automática con `install-bx-module bx-sites`, que lee `boxlang.completions` del `box.json` del módulo. En otro caso, añade `source <carpeta del módulo>/completions/bxSites.bash` a `~/.bashrc`. |
+| fish | `cp <carpeta del módulo>/completions/bxSites.fish ~/.config/fish/completions/` |
+| PowerShell | Añade `. <carpeta del módulo>/completions/bxSites.ps1` a tu `$PROFILE`. |
+
+Los scripts se generan a partir de la tabla de verbos de `ModuleConfig.bx`. Tras cambiar un verbo, regenéralos con `boxlang tools/generate-completions.bxs`; un spec falla si los scripts versionados están desactualizados.
+
 ## `new`
 
 Crea la estructura de un proyecto de documentación.

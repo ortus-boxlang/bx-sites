@@ -50,10 +50,10 @@ offrire.
 
 ## Didascalie, allineamento e cornici
 
-Una didascalia, una cornice, o una galleria multi-immagine sono tutte
-semplicemente HTML a livello di blocco - che bx-markdown/Flexmark lascia
-passare completamente intatto (la regola "HTML block" propria di
-CommonMark), quindi non serve alcuna sintassi specifica di bx-sites:
+Una didascalia o una cornice sono semplicemente HTML a livello di
+blocco - che bx-markdown/Flexmark lascia passare completamente intatto
+(la regola "HTML block" propria di CommonMark), quindi non serve alcuna
+sintassi specifica di bx-sites:
 
 ```markdown title="Esempio" linenums="1"
 <figure>
@@ -64,16 +64,15 @@ CommonMark), quindi non serve alcuna sintassi specifica di bx-sites:
 <div data-with-frame="true">
   <img src="../assets/screenshot.png" alt="Framed">
 </div>
-
-<div class="bxsites-gallery">
-  <img src="../assets/one.png" alt="">
-  <img src="../assets/two.png" alt="">
-  <img src="../assets/three.png" alt="">
-</div>
 ```
 
 Lo stesso vale per `x-data`/`x-show`/`@click` e qualsiasi altro attributo
 Alpine.js - vedi [Interattività con Alpine.js](interactivity.md).
+
+Per una galleria multi-immagine, usa il blocco di contenuto integrato
+[`::: image-gallery`](content-blocks.md#image-gallery) invece di HTML
+scritto a mano - ti dà una griglia responsiva e una lightbox
+click-per-ingrandire senza costi aggiuntivi.
 
 ## Cosa non viene ridimensionato
 
@@ -108,6 +107,15 @@ vale la pena rivederlo se bx-image aggiunge AVIF a monte.
     { "assets": { "images": { "enabled": false } } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+
+    [assets]
+
+    [assets.images]
+    enabled = false
+    ```
+
 Ricade sulla semplice copia non elaborata di `docs/assets/**` - esattamente
 come veniva gestita ogni immagine prima che questa funzionalità esistesse.
 
@@ -131,6 +139,16 @@ come veniva gestita ogni immagine prima che questa funzionalità esistesse.
     		}
     	}
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+
+    [assets]
+
+    [assets.images]
+    widths = [ 480, 960, 1440 ]
+    formats = [ "webp" ]
     ```
 
 `widths` ha come predefinito `[400, 800, 1200, 1600]`; `formats` ha come
@@ -160,6 +178,12 @@ default (`assets.bundle`):
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    extraCss = [ "assets/a.css", "assets/b.css" ]
+    extraJs = [ "assets/app.js" ]
+    ```
+
 compila un unico `assets/bundle.<hash>.css` con impronta digitale
 (nell'ordine elencato) e un unico `assets/bundle.<hash>.js`, invece di un
 tag `<link>`/`<script>` per ogni voce. Il CSS ha i propri commenti
@@ -186,6 +210,11 @@ un progetto dipendeva:
 === "JSON"
     ```json title="bxsites.json"
     { "extraCss": ["assets/custom.css", "https://cdn.example.com/lib.css"] }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    extraCss = [ "assets/custom.css", "https://cdn.example.com/lib.css" ]
     ```
 
 renderizza due tag `<link>` separati, non raggruppati, esattamente come

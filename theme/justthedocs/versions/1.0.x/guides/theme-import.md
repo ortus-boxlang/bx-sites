@@ -9,9 +9,11 @@ tags: [guides, themes, migration]
 
 `bxSites theme:import` converts a theme from another static site
 generator's ecosystem into a bx-sites theme scaffold under
-`themes/<name>/` - a best-effort starting point, not a lossless
-one-command port. It handles the three ecosystems whose theme structure
-maps onto bx-sites' own `layout.bxm`+`page.bxm` contract (see
+`.themes/<name>/` inside the project's content root (see
+[Content Source](content-source.md#where-a-theme-override-lives)) - a
+best-effort starting point, not a lossless one-command port. It handles
+the three ecosystems whose theme structure maps onto bx-sites' own
+`layout.bxm`+`page.bxm` contract (see
 [Themes](themes.md#the-themeprovider-contract)):
 
 - **`mkdocs`** - Jinja2 templates (native mkdocs and mkdocs-material both
@@ -38,13 +40,14 @@ bxSites theme:import --source=mkdocs --path=/path/to/mkdocs-theme --name=my-impo
   *project* - see [Migrating from mkdocs](migrating-from-mkdocs.md)/
   [Migrating from GitBook](migrating-from-gitbook.md) for converting a
   project's *content*, a different job from converting its *theme*)
-- `--name` (required) - the destination name, written to `themes/<name>/`
-  (the same [installed-theme convention](themes.md#installing-a-published-theme)
+- `--name` (required) - the destination name, written to `.themes/<name>/`
+  inside the content root (the same
+  [installed-theme convention](themes.md#installing-a-published-theme)
   `install:theme` uses) - set `bxsites.yaml`'s `theme.name` to it once
   you're happy with the result
 
-Re-running against the same `--name` is safe - `layout.bxm`/`page.bxm`
-are overwritten and any newly-found asset folders merged in, so iterating
+Re-running against the same `--name` asks first (pass `--force` to skip
+the prompt), then `layout.bxm`/`page.bxm` are overwritten and any newly-found asset folders merged in, so iterating
 (tweak the source, or the mapping, re-run) is the normal workflow, not a
 one-shot operation.
 
@@ -54,8 +57,18 @@ The command output reports exactly what happened - which source file
 became `layout.bxm`/`page.bxm` (or a note that none was found, if the
 source theme doesn't use one of the conventional filenames above), which
 asset folders (`css/`, `js/`, `static/`, ...) were copied verbatim into
-`themes/<name>/assets/`, and a numbered list of everything that needs a
+`.themes/<name>/assets/`, and a numbered list of everything that needs a
 manual look.
+
+A copied `css/` or `js/` folder is one such item: everything under
+`.themes/<name>/assets/css/`/`assets/js/` is **not** cache-busted, since
+[fingerprinting](../configuration.md#assets) only ever covers a file that
+sits directly inside a theme's own `assets/` folder, never one nested in a
+subdirectory. To fingerprint your main stylesheet/script, move it to
+`assets/` directly (e.g. `assets/style.css`) and reference it from the
+converted `layout.bxm` with `themeAssetUrl( "style.css" )` instead of
+whatever path the translator carried over - see
+[Themes](themes.md#writing-a-theme-from-scratch).
 
 Within a template file, this is a **mechanical, best-effort translator**
 (`JinjaLikeTranslator.bx` for mkdocs/jekyll's shared Jinja2/Liquid syntax,

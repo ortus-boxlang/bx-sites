@@ -83,6 +83,11 @@ Moduls.
     { "search": false }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+    search = false
+    ```
+
 Überspringt den Aufbau von `search-index.json` vollständig und
 überspringt die Suchbox, das vendorierte `lunr.js`-Skript sowie das
 gemeinsame `search.js`-Widget auf jeder gerenderten Seite - ein Projekt
@@ -139,6 +144,20 @@ Starlight und Docusaurus alle unterstützen:
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    search = true
+
+    [searchProvider]
+    provider = "algolia"
+
+    [searchProvider.algolia]
+    appId = "ABC123"
+    apiKey = "a1b2c3d4e5f6..."
+    indexName = "my-docs"
+    insights = false
+    ```
+
 `appId`, `apiKey` und `indexName` sind erforderlich - `apiKey` ist der
 **reine Such**-öffentliche API-Schlüssel, den DocSearch dir gibt (nie
 ein Administrator-Schlüssel; er wird direkt in jede gerenderte Seite
@@ -186,6 +205,18 @@ vollständig statische Suchmaschine ohne Server, aber indiziert aus dem
     		"pagefind": { "bin": "pagefind", "options": [] }
     	}
     }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+    search = true
+
+    [searchProvider]
+    provider = "pagefind"
+
+    [searchProvider.pagefind]
+    bin = "pagefind"
+    options = []
     ```
 
 Beide `pagefind`-Schlüssel sind optional - `bin` (Standard `"pagefind"`)
@@ -236,8 +267,8 @@ rendern für einen nicht erkannten Providernamen einfach nichts, und das
 Verdrahten eines vierten Suchdienstes (Meilisearch, Typesense usw.) ist
 ein projektweites
 [Theme-Override](themes.md#ein-theme-überschreiben): kopiere ein
-integriertes Theme in den eigenen `theme/`-Ordner deines Projekts und
-füge das Markup/die Skripte deines Providers zu dessen
+integriertes Theme in den eigenen `.theme/`-Ordner deines Projekts,
+innerhalb deines Content-Root, und füge das Markup/die Skripte deines Providers zu dessen
 `layout.bxm`/`search.bxm` hinzu, wobei du `siteConfig.searchProvider`
 ausliest, um zu entscheiden, wann sie gerendert werden -
 `searchProviderName eq "..."`-Verzweigungen für den Mount-Punkt in

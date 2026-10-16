@@ -152,6 +152,51 @@ The numbered marker, connecting line, and each of the three `color`
 palettes above are themeable independently of the rest of the site's
 palette, via CSS custom properties - see [Customizing colors](themes.md#customizing-colors-without-a-theme-override).
 
+## Image gallery
+
+A responsive grid of images. (Any other image in page content is already click-to-enlarge with `imageGallery: true`, see [Images](images.md#click-to-enlarge).) The optional `columns` attribute is `2`,
+`3` or `4` (default `3`); any other value falls back to `3`. The grid
+itself needs no configuration, but the click-to-enlarge lightbox needs
+`bxsites.yaml`'s [`imageGallery`](../configuration.md#imagegallery) set
+to `true` - unset, the grid still renders, just without the lightbox's
+JS. There are two ways to build one:
+
+List each image explicitly with `::: image` children - `src` is
+required, `alt` and `caption` are both optional:
+
+```markdown title="Example" linenums="1"
+::: image-gallery columns="3"
+::: image src="../assets/favicon.png" alt="BoxLang icon" caption="Icon"
+:::
+::: image src="../assets/home-banner.jpg" alt="Home banner"
+:::
+::: image src="../assets/og-image.png" caption="Social preview"
+:::
+:::
+```
+
+::: image-gallery columns="3"
+::: image src="../assets/favicon.png" alt="BoxLang icon" caption="Icon"
+:::
+::: image src="../assets/home-banner.jpg" alt="Home banner"
+:::
+::: image src="../assets/og-image.png" caption="Social preview"
+:::
+:::
+
+Or let bxSites discover the images for you by convention: drop files
+named `{name}-{order}.{jpg,jpeg,png,webp,gif}` into
+`docs/assets/gallery/{name}/` and reference them by `name` alone - no
+children needed. Files are sorted numerically by `{order}`:
+
+```markdown title="Example" linenums="1"
+::: image-gallery name="showcase" columns="3"
+:::
+```
+
+::: image-gallery name="showcase" columns="3"
+:::
+
 ## File
 
 A download card for a PDF, video, or any other project asset - `src` is
@@ -448,6 +493,133 @@ same preference automatically on load (handy for sharing a direct link to
 "the Pro version of this page"), and a project's own theme override can
 call `window.bxSitesSetPreference( key, value )` directly to drive it from
 custom UI instead.
+
+## Contact forms
+
+> **Premium feature.** A `::: contact-form` block always renders as a
+> real, complete form - inputs, labels, a submit button, all of it - but
+> *submitting* it only works once the project's own bxSites Cloud plan
+> includes working forms. On a plan that doesn't, a reader who submits
+> anyway sees a friendly "upgrade to enable this form" message instead of
+> their message going anywhere. There's nothing to configure here to turn
+> that on or off - it's entirely a property of the account's plan.
+
+A labeled contact/lead-gen form, submitted with `fetch()` to bxSites
+Cloud rather than a page reload:
+
+```markdown title="Example" linenums="1"
+::: contact-form id="demo-request" to="sales@acme.com" fields="name:text,email*:email,message:textarea" submitLabel="Send" :::
+```
+
+::: contact-form id="demo-request" to="sales@acme.com" fields="name:text,email*:email,message:textarea" submitLabel="Send" :::
+
+- `id` - this form's own slug. Matches a form configuration (who it
+  notifies, spam filtering, and so on) that you set up in bxSites Cloud,
+  not in this markdown - this build never checks that the id you write
+  here actually exists there, it's just passed straight through.
+  Defaults to `"contact"` when omitted.
+- `to` - optional and purely informational (real delivery routing is
+  configured server-side, by the account admin) - handy as a reminder of
+  where a given form's submissions end up when you're skimming the page
+  source later.
+- `fields` - required; a small DSL, comma-separated `name:type` pairs:
+  add a trailing `*` right after a field's own name (before its `:`) to
+  mark it required, e.g. `email*:email`. Supported types are `text`,
+  `email`, and `textarea`; any other/unrecognized type falls back to a
+  plain `text` input rather than failing the build. Each field's own
+  label is derived from its name (`full-name` becomes "Full Name").
+- `submitLabel` - the submit button's own text; defaults to `"Send"`.
+
+Every form also carries a hidden honeypot field a real visitor never
+sees or fills in - bxSites Cloud's own spam filtering uses it, no
+configuration needed here.
+
+## Cloud content
+
+> **Premium feature.** `::: cloud` bakes a [bxSites Cloud](deployment.md)
+> content block into the page at build time - it requires a bxSites Cloud
+> account with Content Blocks on your plan, `cloud.apiUrl`/
+> `cloud.contentBlocks: true` set in `bxsites.yaml`, and a
+> `BXSITES_CLOUD_TOKEN` environment variable holding a valid API token
+> (never written to `bxsites.yaml` itself - same convention
+> [`publish`](../cli-reference.md#publish) already uses for its own token).
+> Without `cloud.contentBlocks: true`, a `::: cloud` block always fails the
+> build outright.
+
+`slug` is the content block's own slug (set when it was created in bxSites
+Cloud's portal, or via its headless API) - it can itself contain `/` for a
+hierarchical slug like `press/release1`:
+
+```markdown title="Example" linenums="1"
+::: cloud slug="press/release1" :::
+```
+
+At build time, this fetches that block's current *published* content,
+renders it through this site's own Markdown pipeline exactly like any other
+page (so this project's own plugins/syntax highlighting/nested content
+blocks all apply), sanitizes the resulting HTML, and bakes it straight into
+the page - instant paint, fully readable with no JavaScript, real indexable
+text for search engines. A draft or expired block is treated the same as a
+missing one.
+
+What happens when that fetch fails (unknown slug, not published, or a
+request failure) is configurable per project via `cloud.contentBlocksOnError`
+in `bxsites.yaml`:
+
+- `"fail"` (the default) - fails the whole build, the same posture as a
+  broken internal link.
+- `"skip"` - logs a build warning and renders an empty placeholder instead.
+
+Either way, once the page is live, a small client-side script (shipped only
+when `cloud.contentBlocks: true` - the same explicit opt-in
+`mermaid`/`openapi` already use) checks bxSites Cloud again on page load and
+swaps in the latest content if it's changed since the build - so a content
+edit shows up for visitors without waiting for the next deploy. That check
+is a plain `fetch()`, so it honors the delivery endpoint's own
+`Cache-Control: private, max-age=60` header automatically - a browser that's
+already checked within the last minute skips the network call entirely on
+its next page view. A first-time visitor (or one past that window) always
+gets the current version; an edit is visible to everyone within about a
+minute, not on every single page view.
+
+## Comments
+
+> **Premium feature.** `::: comments` mounts a live, moderated visitor
+> comment thread on the page - it requires a bxSites Cloud account with
+> Comments on your plan and `cloud.comments: true` set in `bxsites.yaml`.
+> Without it, a `::: comments` block does not fail the build: it renders an
+> inert, empty placeholder and the build prints a warning once, naming the
+> first page affected. That is unlike `::: cloud` without
+> `cloud.contentBlocks`, which fails the build because it has to fetch real
+> content.
+
+```markdown title="Example" linenums="1"
+::: comments :::
+```
+
+No attributes are required - the thread id defaults to the page's own
+URL path, so every page gets its own comment thread for free. An
+optional `id="..."` lets two blocks on one page (or blocks on different
+pages) share a single thread instead:
+
+```markdown title="Example" linenums="1"
+::: comments id="general-feedback" :::
+```
+
+Unlike `::: cloud`, nothing is fetched or baked in at build time - a
+comment thread keeps growing after every deploy, so a build-time
+snapshot would go stale the moment a new comment arrives. The block
+renders an empty placeholder; a small client-side script (shipped only
+when `cloud.comments: true`, the same explicit opt-in `cloud.contentBlocks`
+already uses) loads the current, already-moderated comments every time
+the page loads and paginates through older ones on request, then renders
+a form for posting a new one. A newly-submitted comment shows locally, in
+that one visitor's own browser, labeled as pending moderation - it never
+appears for anyone else until a moderator approves it.
+
+That form also carries a hidden honeypot field a real visitor never sees
+or fills in - bxSites Cloud's own spam filtering uses it, no
+configuration needed here.
 
 ## Loop and conditional (data-driven)
 

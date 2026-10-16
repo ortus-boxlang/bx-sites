@@ -59,7 +59,8 @@ no sabe cómo convertir se deja en el archivo migrado en su sintaxis
 encontrar (busca `{%` en el árbol `docs/` migrado una vez que hayas
 terminado). Volver a ejecutar `migrate` sobrescribe cualquier archivo o
 `docs/nav.json` que haya escrito antes, así que es seguro corregir tu
-exportación de origen y volver a ejecutarlo.
+exportación de origen y volver a ejecutarlo. Pregunta primero cuando `docs/`
+ya tiene archivos; usa `--force` para omitir la confirmación.
 
 ## Qué se convierte automáticamente
 

@@ -79,6 +79,56 @@ posible.
 las del sitio principal - una versión es una parte de primera clase,
 totalmente rastreable/enlazable del sitio, no un archivo oculto.
 
+## Publicar una versión por defecto en la raíz del sitio
+
+Una vez que un proyecto tiene una versión real y publicada a la que
+dirigir a la gente, `docs/` en sí mismo suele estar a mitad de camino
+escribiendo la *siguiente* - no es donde debería aterrizar un visitante
+primerizo. `versions.default` nombra en su lugar una carpeta
+`docs/versions/<name>/` para construirla en la raíz del sitio:
+
+```yaml title="bxsites.yaml" linenums="1"
+versions:
+  default: "1.0.x"
+```
+
+Una vez configurado:
+
+- `docs/versions/1.0.x/` se construye en la raíz del sitio (`/`), no en
+  `/versions/1.0.x/` - nunca se duplica en ambos sitios.
+- El árbol `docs/` simple - el que siempre se construyó antes en la raíz
+  - se construye en cambio en `/next/`, totalmente navegable/enlazable,
+  solo que ya no es la versión por defecto. Útil para escribir/revisar a
+  la vista la documentación del próximo lanzamiento sin que parezca que
+  ya se ha publicado.
+- El selector de versión muestra `1.0.x (Current)` seleccionado en la
+  raíz, luego cada una de las demás carpetas `docs/versions/*`, luego un
+  separador y una entrada `Next` que apunta a `/next/` en último lugar -
+  las versiones publicadas primero, con el árbol en curso aparte, al
+  final, en lugar de encajado en segundo lugar.
+- Las páginas de `/next/` quedan excluidas de `sitemap.xml`, y
+  `robots.txt` recibe una línea `Disallow: /next/` - un árbol en curso
+  no debería competir con la documentación real en los resultados de
+  búsqueda. Por lo demás sigue siendo una parte completamente normal y
+  accesible del sitio (su propio índice de búsqueda, su propia página de
+  etiquetas, su propio soporte de `redirects`).
+- `/next/` no obtiene sus propios subárboles de idioma en la v1 -
+  `docs/i18n/<code>/` sigue traduciendo la misma carpeta física `docs/`
+  de siempre, pero por ahora solo la construcción del idioma por defecto
+  se publica bajo `/next/`.
+
+Un `versions.default` mal configurado (que nombra una carpeta que en
+realidad no existe bajo `docs/versions/`) hace que la construcción falle
+con un error claro de `BxSites.UnknownDefaultVersion`, en lugar de caer
+silenciosamente a otra cosa.
+
+Los lanzamientos de parche (1.0.1, 1.0.2, ...) son solo ediciones en el
+propio sitio de la carpeta `docs/versions/1.0.x/` ya creada -
+`versions.default` no cambia y no se crea ninguna versión nueva. Solo un
+incremento real de minor/major (`1.1`, `2.0`) justifica `version:new`
+creando una carpeta nueva, con `versions.default` pasando a apuntar a
+ella.
+
 ## Combinar con i18n
 
 Consulta [i18n: "Docs versionados y traducidos"](i18n.md#docs-versionados-y-traducidos)

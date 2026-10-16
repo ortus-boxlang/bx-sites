@@ -8,7 +8,9 @@ tags: [guías, temas, migración]
 # Importar un tema
 
 `bxSites theme:import` convierte un tema del ecosistema de otro generador
-de sitios estáticos en un scaffold de tema bx-sites bajo `themes/<name>/`
+de sitios estáticos en un scaffold de tema bx-sites bajo
+`.themes/<name>/` dentro de la raíz de contenido del proyecto (consulta
+[Origen del Contenido](content-source.md#dónde-vive-una-sobrescritura-de-tema))
 - un punto de partida de mejor esfuerzo, no una migración sin pérdidas en
 un solo comando. Maneja los tres ecosistemas cuya estructura de tema se
 corresponde con el propio contrato `layout.bxm`+`page.bxm` de bx-sites
@@ -41,13 +43,13 @@ bxSites theme:import --source=mkdocs --path=/path/to/mkdocs-theme --name=my-impo
   [Migrar desde GitBook](migrating-from-gitbook.md) para convertir el
   *contenido* de un proyecto, una tarea distinta de convertir su *tema*)
 - `--name` (obligatorio) - el nombre de destino, escrito en
-  `themes/<name>/` (la misma
+  `.themes/<name>/` dentro de la raíz de contenido (la misma
   [convención de tema instalado](themes.md#instalar-un-tema-publicado)
   que usa `install:theme`) - establece el `theme.name` de
   `bxsites.yaml` una vez que estés satisfecho con el resultado
 
-Volver a ejecutarlo contra el mismo `--name` es seguro - `layout.bxm`/
-`page.bxm` se sobrescriben y cualquier carpeta de recursos recién
+Volver a ejecutarlo contra el mismo `--name` pregunta primero (usa
+`--force` para omitir la confirmación), y luego `layout.bxm`/`page.bxm` se sobrescriben y cualquier carpeta de recursos recién
 encontrada se combina, así que iterar (ajustar el origen, o el mapeo,
 volver a ejecutar) es el flujo de trabajo normal, no una operación de un
 solo uso.
@@ -58,8 +60,20 @@ La salida del comando informa exactamente qué ocurrió - qué archivo de
 origen se convirtió en `layout.bxm`/`page.bxm` (o una nota indicando que
 no se encontró ninguno, si el tema de origen no usa uno de los nombres de
 archivo convencionales de arriba), qué carpetas de recursos (`css/`,
-`js/`, `static/`, ...) se copiaron tal cual en `themes/<name>/assets/`, y
+`js/`, `static/`, ...) se copiaron tal cual en `.themes/<name>/assets/`, y
 una lista numerada de todo lo que necesita revisión manual.
+
+Una carpeta `css/` o `js/` copiada es uno de esos elementos: todo lo que
+hay bajo `.themes/<name>/assets/css/`/`assets/js/` **no** tiene la caché
+invalidada, ya que el
+[fingerprinting](../configuration.md#assets) solo cubre un archivo que
+esté directamente dentro de la propia carpeta `assets/` de un tema,
+nunca uno anidado en un subdirectorio. Para asignarle huella digital a tu
+hoja de estilo/script principal, muévelo directamente a `assets/` (por
+ejemplo, `assets/style.css`) y referénciarlo desde el `layout.bxm`
+convertido con `themeAssetUrl( "style.css" )` en lugar de la ruta que
+haya conservado el traductor - consulta
+[Temas](themes.md#escribir-un-tema-desde-cero).
 
 Dentro de un archivo de plantilla, esto es un **traductor mecánico de
 mejor esfuerzo** (`JinjaLikeTranslator.bx` para la sintaxis Jinja2/Liquid

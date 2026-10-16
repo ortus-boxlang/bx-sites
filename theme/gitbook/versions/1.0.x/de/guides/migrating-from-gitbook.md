@@ -61,7 +61,8 @@ vorhanden und leicht zu finden (durchsuche den migrierten `docs/`-Baum
 nach `{%`, wenn du fertig bist). Ein erneuter Lauf von `migrate`
 überschreibt jede Datei oder `docs/nav.json`, die er zuvor geschrieben
 hat, es ist also sicher, deinen Quell-Export zu korrigieren und es erneut
-auszuführen.
+auszuführen. Wenn `docs/` bereits Dateien enthält, fragt es zuerst nach;
+`--force` überspringt die Rückfrage.
 
 ## Was automatisch konvertiert wird
 

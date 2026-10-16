@@ -156,6 +156,13 @@ Lege in `bxsites.yaml` fest, welches Theme ein Projekt verwendet:
     { "theme": { "name": "material" } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+
+    [theme]
+    name = "material"
+    ```
+
 ## Ein veröffentlichtes Theme installieren
 
 Ein auf ForgeBox veröffentlichtes Theme installiert sich mit nichts
@@ -169,9 +176,10 @@ bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
 ```
 
 Das lädt das ZIP des Pakets herunter und entpackt es nach
-`themes/bx-sites-theme-blog1/` im Projekt-Wurzelverzeichnis, wobei vor
-Abschluss geprüft wird, ob es den `ThemeProvider`-Vertrag unten erfüllt.
-Ein Projekt kann auf diese Weise mehrere installierte Themes
+`.themes/bx-sites-theme-blog1/` innerhalb des Content-Root des Projekts
+(siehe [Content-Quelle](content-source.md#wo-eine-theme-überschreibung-lebt)),
+wobei vor Abschluss geprüft wird, ob es den `ThemeProvider`-Vertrag unten
+erfüllt. Ein Projekt kann auf diese Weise mehrere installierte Themes
 nebeneinander vorhalten und rein per Name zwischen ihnen wechseln:
 
 === "YAML"
@@ -184,6 +192,13 @@ nebeneinander vorhalten und rein per Name zwischen ihnen wechseln:
     { "theme": { "name": "bx-sites-theme-blog1" } }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+
+    [theme]
+    name = "bx-sites-theme-blog1"
+    ```
+
 Ein Theme braucht überhaupt keine BoxLang-Modul-/Klassenlader-Beteiligung
 (anders als ein Plugin) - es sind reine Dateien, es gibt also keinen
 separaten Aktivierungsschritt, wie ihn `install:plugin` hat; das Setzen
@@ -194,7 +209,7 @@ Startest du stattdessen von einem Theme, das für einen anderen
 statischen Site-Generator gebaut wurde? Siehe
 [Ein Theme importieren](theme-import.md) - `theme:import` wandelt die
 eigenen Template-Dateien eines mkdocs-/jekyll-/hugo-Themes mechanisch in
-ein bestmögliches `themes/<name>/`-Gerüst um.
+ein bestmögliches `.themes/<name>/`-Gerüst um.
 
 ## Air-gapped/Offline-Websites
 
@@ -247,7 +262,10 @@ Ein Theme ist einfach ein Ordner mit:
 - **`layout.bxm`** (erforderlich) - die äußere HTML-Hülle + Navigation.
   Erhält `variables.page`, `variables.nav`, `variables.siteConfig`,
   `variables.themeDir` und `variables.basePath` im Scope, und bindet das
-  benachbarte `page.bxm` über `#variables.themeDir#/page.bxm` ein.
+  aufgelöste Body-Template über `#variables.themeDir#/#variables.bodyFile#`
+  ein (`page.bxm`, sofern eine Seite/ein Inhaltstyp nicht auf etwas anderes
+  auflöst - siehe [Mehrere Layouts pro Seite](#mehrere-layouts-pro-seite)
+  unten).
   `variables.basePath` ist immer ein root-relativer, auf `/` endender Pfad
   (standardmäßig `/`, `/my-docs/`, wenn `baseURL` in `bxsites.yaml` das
   überschreibt) - stelle diesen jedem internen `href`/`src` voran, statt
@@ -258,6 +276,14 @@ Ein Theme ist einfach ein Ordner mit:
 - **`search.bxm`** (optional) - das Markup der Suchbox, von `layout.bxm`
   nur eingebunden, wenn `search` in `bxsites.yaml` `true` ist. Siehe
   [Suche](search.md).
+- **`blog.bxm`** (optional) - eine alternative äußere Hülle für die
+  eigenen Listen-/Kategorie-/Archiv-/Autoren-/Statistikseiten des Blogs.
+  Fällt auf `layout.bxm` zurück, wenn ein Theme sie nicht hat. Siehe
+  [Mehrere Layouts pro Seite](#mehrere-layouts-pro-seite).
+- **`blog-page.bxm`** (optional) - ein alternativer Body für einen
+  einzelnen Blogbeitrag, weiterhin gerendert unter dem normalen
+  `layout.bxm` des Themes. Fällt auf `page.bxm` zurück, wenn ein Theme sie
+  nicht hat.
 - **`assets/`** (optional) - Theme-CSS/JS, zur Build-Zeit nach
   `site/assets/theme/` kopiert.
 
@@ -266,12 +292,28 @@ konfiguriert) und `variables.siteConfig.repo`/`.social`/`.footer` sind
 ebenfalls immer verfügbar und stützen die oben beschriebenen
 Repo-Link-/Bearbeiten-Link-/Zuletzt-aktualisiert-/Fußzeilen-Funktionen -
 ein eigenes Theme entscheidet selbst, ob und wie es sie rendert, wie auch
-alles andere. `variables.versions` (`[ { label, url } ]`, "Latest" zuerst)
-und `variables.currentVersion` (das gerade gerenderte `label`) stützen den
-Versionsumschalter - leer/`"Latest"` für ein nicht versioniertes Projekt,
-sodass ein Theme nur dann einen Umschalter rendern muss, wenn
-`variables.versions.len() gt 1`. Jedes integrierte Theme bezieht seine
-Repo-/Social-Icons aus einem kleinen gemeinsamen SVG-Lookup,
+alles andere. `variables.versions` (`[ { label, url, kind } ]`, "Latest"
+zuerst) und `variables.currentVersion` (das gerade gerenderte `label`)
+stützen den Versionsumschalter - leer/`"Latest"` für ein nicht
+versioniertes Projekt, sodass ein Theme nur dann einen Umschalter rendern
+muss, wenn `variables.versions.len() gt 1`. Das `kind` jedes Eintrags ist
+`"current"` (die Version, auf der ein Besucher an der Website-Wurzel
+landet), `"released"` (jeder andere angelegte Snapshot) oder `"next"`
+(der reine `docs/`-Baum, sobald `versions.default` gesetzt ist - siehe
+[Versionierung](versioning.md#eine-standardversion-am-site-root-veröffentlichen)).
+Statt `variables.versions` von Hand zu durchlaufen, ruf
+`renderVersionSwitcher( variables.versions, variables.currentVersion )`
+auf - eingebunden in den Render-Scope jedes Themes auf dieselbe Weise wie
+`themeAssetUrl()`/`moduleAssetUrl()` (oben) - und es baut das gesamte
+`<select>` auf, gruppiert `"next"` hinter einer Trennlinie nach jeder
+veröffentlichten Version, und beschriftet den `"current"`-Eintrag mit
+"(Current)", alles gesteuert über `kind`, statt dass ein Theme diese
+Logik selbst nachbaut. Ein optionales zweites Argument fügt dem `<select>`
+zusätzliche CSS-Klassen hinzu (`renderVersionSwitcher( variables.versions,
+variables.currentVersion, "my-extra-class" )`) für ein Theme, das sein
+eigenes Styling möchte, ohne das Markup neu zu implementieren. Jedes
+integrierte Theme bezieht seine Repo-/Social-Icons aus einem kleinen
+gemeinsamen SVG-Lookup,
 `<bx:include template="#variables.moduleAssetsDir#/icons.bxm">`
 (definiert `bxsitesIcon( name )`, eines von `github`, `twitter`/`x`, `rss`,
 `youtube`, `linkedin`, `facebook`, `bluesky`, `threads`, `slack`,
@@ -282,6 +324,73 @@ seine Icons vollständig selbst bereitstellen.
 Ein Theme-Ordner, dem eine der beiden erforderlichen Dateien fehlt,
 schlägt sofort mit einem klaren `BxSites.InvalidTheme`-Fehler zur Build-Zeit
 fehl, statt mit einem verwirrenden Template-Fehler tief im Rendering.
+`blog.bxm`/`blog-page.bxm` werden nie erzwungen - dieselbe "optional, fällt
+zurück"-Form, die `search.bxm` bereits hat.
+
+## Mehrere Layouts pro Seite
+
+Ein Theme kann mehr als eine äußere Hülle und mehr als ein Body-Template
+anbieten, sodass ein Blog (oder ein beliebiger anderer Inhaltstyp) anders
+aussehen kann als der Rest der Website, während dieselbe Chrome und
+Assets des Themes weiterverwendet werden. Zwei unabhängige
+Auflösungsketten:
+
+- **Äußere Hülle** - immer `layout.bxm`, außer bei den eigenen
+  Listen-/Kategorie-/Archiv-/Autoren-/Statistikseiten des Blogs, die
+  `blog.bxm` verwenden, wenn das aktive Theme es hat. Diese folgt dem
+  Inhaltstyp - dafür gibt es keinen Frontmatter-Schlüssel.
+- **Body** - standardmäßig `page.bxm`. Ein Blogbeitrag verwendet
+  `blog-page.bxm`, wenn das aktive Theme es hat. So oder so gewinnt immer
+  das eigene Frontmatter einer Seite, wenn eines gesetzt ist:
+
+```markdown title="docs/marketing/press-release.md"
+---
+title: We raised a Series A
+layout: press-release
+---
+```
+
+`layout: press-release` rendert den Body dieser einen Seite über
+`.theme/press-release.bxm` (oder das eigene des aktiven integrierten
+Themes, falls vorhanden) statt über `page.bxm` - weiterhin innerhalb der
+normalen `layout.bxm`-Hülle der Website. Ein `layout:`, das eine Datei
+benennt, die das aktive Theme nicht hat, fällt auf `page.bxm` zurück,
+statt den Build fehlschlagen zu lassen, sodass ein Themewechsel niemals
+eine Seite bricht, die das eigene benutzerdefinierte Layout eines anderen
+Themes benannt hat.
+
+`bootstrap` liefert `blog.bxm`/`blog-page.bxm` als funktionierendes
+Beispiel zum Kopieren mit; die anderen integrierten Themes (noch) nicht
+und fallen für Blog-Inhalte auf `layout.bxm`/`page.bxm` zurück, genau wie
+es ein unvollständiges `.theme/`-Override auch täte.
+
+### Welches Layout/Body gerade aktiv ist
+
+Jede `.bxm`-Datei, durch die eine Seite gerendert wird - `layout.bxm`,
+`page.bxm`, `blog.bxm`, `blog-page.bxm`, oder eine eigene benutzerdefinierte
+eines Projekts - kann auslesen, welche Dateien tatsächlich aufgelöst
+wurden, auf dieselbe direkte Art, wie sie bereits `variables.page`/
+`variables.data` liest:
+
+- `variables.layoutFile` - die aktive äußere Hülle, z. B. `"layout.bxm"`
+  oder `"blog.bxm"`
+- `variables.bodyFile` - der aktive Body, z. B. `"page.bxm"`,
+  `"blog-page.bxm"`, oder ein per Frontmatter benannter
+- `variables.page.layout` - der eigene, unverarbeitete Frontmatter-Wert
+  `layout:` der Seite, falls einer gesetzt wurde; sonst `""`
+
+Nützlich als Hook für eine Body-Klasse, oder um ohne separates Template
+zu verzweigen:
+
+```bx title=".theme/layout.bxm"
+<body class="layout-#reReplace( variables.bodyFile, '\.bxm$', '' )#">
+```
+
+```bx title=".theme/page.bxm"
+<bx:if variables.bodyFile == "blog-page.bxm">
+	<!-- Chrome nur für Blogbeiträge -->
+</bx:if>
+```
 
 ## Farben anpassen, ohne ein Theme zu überschreiben
 
@@ -302,6 +411,11 @@ Deklaration mit gleicher Spezifität darin gewinnt, ohne `resources/themes/`
 === "JSON"
     ```json title="bxsites.json"
     { "extraCss": ["assets/brand.css"] }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    extraCss = [ "assets/brand.css" ]
     ```
 
 ```css title="docs/assets/brand.css" linenums="1"
@@ -327,10 +441,12 @@ Das eigene Set des `bootstrap`-Themes
 `--bxsites-border`, `--bxsites-link`, `--bxsites-link-hover`,
 `--bxsites-code-bg`, `--bxsites-step-marker-bg`, `--bxsites-step-marker-text`,
 `--bxsites-step-line`, `--bxsites-step-success-bg`/`-text`,
-`--bxsites-step-warning-bg`/`-text` und `--bxsites-step-danger-bg`/`-text`.
+`--bxsites-step-warning-bg`/`-text`, `--bxsites-step-danger-bg`/`-text` und
+das [`--bxsites-table-*`-Set](tables.md#theming), das bei einer gerenderten
+Tabelle Karte, Kopfleiste, Trennlinien und Zebra-/Hover-Tönung zeichnet.
 Jedes integrierte Theme garantiert `--bxsites-gradient-start`/`-end`,
-`--bxsites-accent` sowie das `--bxsites-step-*`-Set unter genau diesen
-Namen, sodass `extraCss` unabhängig vom Theme immer die
+`--bxsites-accent` sowie die Sets `--bxsites-step-*` und
+`--bxsites-table-*` unter genau diesen Namen, sodass `extraCss` unabhängig vom Theme immer die
 Markenfarbe/Stepper-Akzente umlenken kann - aber nur `bootstrap`, `slate`
 und `notion` legen zusätzlich auch
 `--bxsites-bg`/`-text`/`-sidebar-bg`/`-sidebar-text`/`-border`/`-link`/`-link-hover`/`-code-bg`
@@ -402,15 +518,19 @@ aufgelöst wird.
 ## Ein Theme überschreiben
 
 Lege deine eigenen `layout.bxm` + `page.bxm` (und optional `search.bxm` /
-`assets/`) in einen `theme/`-Ordner im Wurzelverzeichnis deines Projekts.
-BxSites bevorzugt eine projektweite `theme/`-Überschreibung sowohl
-gegenüber einem installierten `themes/<name>/`-Theme als auch gegenüber
-jedem integrierten Theme, solange sie den obigen Vertrag erfüllt - die
+`assets/`) in einen `.theme/`-Ordner innerhalb des Content-Root deines
+Projekts - `docs/.theme/`, `src/.theme/`, oder `<source>/.theme/` für
+das, worauf `source` auflöst (siehe [Content-Quelle](content-source.md)),
+nicht im bloßen Projekt-Wurzelverzeichnis. BxSites bevorzugt eine
+`.theme/`-Überschreibung im Content-Root sowohl gegenüber einem
+installierten `.themes/<name>/`-Theme als auch gegenüber jedem
+integrierten Theme, solange sie den obigen Vertrag erfüllt - die
 integrierten Themes unter `resources/themes/` dieses Moduls sind ein
 guter Ausgangspunkt zum Kopieren und Anpassen. Vollständige
-Auflösungsreihenfolge: `theme/` (dieser Abschnitt) -> `themes/theme.name/`
-(ein [installiertes Theme](#ein-veröffentlichtes-theme-installieren),
-falls `theme.name` zu einem passt) -> ein integriertes Theme namens
+Auflösungsreihenfolge: `.theme/` (dieser Abschnitt) ->
+`.themes/theme.name/` (ein
+[installiertes Theme](#ein-veröffentlichtes-theme-installieren), falls
+`theme.name` zu einem passt) -> ein integriertes Theme namens
 `theme.name`.
 
 Ein durchgearbeitetes Beispiel - starte mit `bootstrap` und tausche seine
@@ -421,23 +541,25 @@ genau so weiterläuft, wie es bereits funktioniert:
 ```text title="Project structure"
 my-project/
 ├── bxsites.yaml
-├── docs/
-└── theme/                    ← project-level override, checked before any built-in theme
-    ├── layout.bxm             ← copied from resources/themes/bootstrap/layout.bxm
-    ├── page.bxm                ← copied from resources/themes/bootstrap/page.bxm, unchanged
-    ├── search.bxm               ← copied unchanged
-    └── assets/
-        └── style.css              ← copied from bootstrap's assets/style.css, then edited
+└── docs/
+    ├── index.md
+    └── .theme/                    ← content-root override, checked before any built-in theme
+        ├── layout.bxm              ← copied from resources/themes/bootstrap/layout.bxm
+        ├── page.bxm                 ← copied from resources/themes/bootstrap/page.bxm, unchanged
+        ├── search.bxm                ← copied unchanged
+        └── assets/
+            └── style.css               ← copied from bootstrap's assets/style.css, then edited
 ```
 
 1. Kopiere die drei `.bxm`-Dateien und `assets/style.css` aus
-   `resources/themes/bootstrap/` dieses Moduls in das `theme/` deines
-   Projekts.
+   `resources/themes/bootstrap/` dieses Moduls in das `docs/.theme/`
+   deines Projekts (oder `src/.theme/`, oder `<source>/.theme/`, je
+   nachdem, wo dein Content-Root tatsächlich liegt).
 2. Ändere nur das, was du wirklich ändern musst. Um Markenpalette und
    Schriftart zu tauschen, genügt der obere Teil von
-   `theme/assets/style.css`:
+   `.theme/assets/style.css`:
 
-   ```css title="theme/assets/style.css" linenums="1"
+   ```css title="docs/.theme/assets/style.css" linenums="1"
    :root {
    	--bxsites-gradient-start: #7C3AED;  /* was #00FF78 */
    	--bxsites-gradient-end: #DB2777;    /* was #00DBFF */
@@ -450,8 +572,8 @@ my-project/
    ```
 
 3. Führe `bxSites build` aus (oder `serve` während der
-   Iteration) - BxSites übernimmt `theme/` automatisch, keine Änderung an
-   `bxsites.yaml` nötig (ein projektweiter `theme/`-Ordner hat immer
+   Iteration) - BxSites übernimmt `.theme/` automatisch, keine Änderung an
+   `bxsites.yaml` nötig (ein `.theme/`-Ordner im Content-Root hat immer
    Vorrang vor dem im `theme.name` genannten integrierten Theme). Alles,
    was du nicht angefasst hast - Navigations-Rendering, Suche, der
    Dunkelmodus-Umschalter, Code-Annotationen - funktioniert genau so
@@ -459,7 +581,7 @@ my-project/
    es darunter immer noch genau dasselbe `layout.bxm`/`page.bxm`-Markup
    ist.
 
-Ein projektweiter `theme/`-Ordner ist allerdings alles-oder-nichts -
+Ein `.theme/`-Ordner eines Projekts ist allerdings alles-oder-nichts -
 sobald BxSites einen findet, wird er anstelle des integrierten Themes
 vollständig verwendet, braucht also trotzdem seine eigenen `layout.bxm` +
 `page.bxm`, selbst wenn du nur `assets/style.css` geändert hast (ein
@@ -468,7 +590,7 @@ Ordner, dem eine der beiden fehlt, schlägt sofort mit
 eine reine CSS-Anpassung ohne `.bxm`, nutze stattdessen
 [`extraCss`](#farben-anpassen-ohne-ein-theme-zu-überschreiben) von oben - es
 legt sich über das Theme, das `bxsites.yaml` benennt, ganz ohne
-`theme/`-Ordner. `theme/` ist für den Fall, dass du auch das Markup
+`.theme/`-Ordner. `.theme/` ist für den Fall, dass du auch das Markup
 selbst ändern musst, siehe als Nächstes.
 
 ## Ein Theme von Grund auf schreiben
@@ -477,12 +599,13 @@ Ein Theme braucht nur die beiden erforderlichen Dateien, hier also ein
 wirklich minimales Beispiel - kein Bootstrap/Tailwind, kein Dunkelmodus,
 keine Such-UI - um genau zu zeigen, was erforderlich ist im Vergleich zu
 dem, was die integrierten Themes zusätzlich bieten. Speichere beide als
-`theme/layout.bxm` und `theme/page.bxm` in deinem Projekt - ein
-projektweiter `theme/`-Ordner wird automatisch übernommen (wie oben),
+`docs/.theme/layout.bxm` und `docs/.theme/page.bxm` in deinem Projekt
+(oder unter dem Content-Root, auf den dein `source` auflöst) - ein
+`.theme/`-Ordner im Content-Root wird automatisch übernommen (wie oben),
 keine Änderung an `bxsites.yaml` nötig:
 
-```bx title="theme/layout.bxm" linenums="1"
-<!-- theme/layout.bxm -->
+```bx title="docs/.theme/layout.bxm" linenums="1"
+<!-- docs/.theme/layout.bxm -->
 <bx:script>
 	function renderNav( required array nodes ) {
 		var html = "<ul>"
@@ -505,14 +628,14 @@ keine Änderung an `bxsites.yaml` nötig:
 <head>
 	<meta charset="UTF-8">
 	<title>#encodeForHTML( variables.page.title )# - #encodeForHTML( variables.siteConfig.name )#</title>
-	<link rel="stylesheet" href="#variables.basePath#assets/theme/style.css">
+	<link rel="stylesheet" href="#themeAssetUrl( 'style.css' )#">
 </head>
 <body>
 	<header><a href="#variables.basePath#">#encodeForHTML( variables.siteConfig.name )#</a></header>
 	<nav>#renderNav( variables.nav )#</nav>
 	<main>
 </bx:output>
-<bx:include template="#variables.themeDir#/page.bxm">
+<bx:include template="#variables.themeDir#/#variables.bodyFile#">
 <bx:output>
 	</main>
 </body>
@@ -520,8 +643,8 @@ keine Änderung an `bxsites.yaml` nötig:
 </bx:output>
 ```
 
-```bx title="theme/page.bxm" linenums="1"
-<!-- theme/page.bxm -->
+```bx title="docs/.theme/page.bxm" linenums="1"
+<!-- docs/.theme/page.bxm -->
 <bx:output>
 <article>
 	<h1>#encodeForHTML( variables.page.title )#</h1>
@@ -545,3 +668,40 @@ ein `if` um eine kleine Render-Funktion, alle gespeist aus Feldern, die
 bereits auf `variables.page` vorhanden sind), oder einen `assets/`-Ordner
 für dein eigenes CSS/JS, automatisch zur Build-Zeit nach
 `site/assets/theme/` kopiert.
+
+`themeAssetUrl( "style.css" )` (oben verwendet, statt eines fest codierten
+`assets/theme/style.css`) ist das, was das eigene CSS deines Themes
+[Content-Hash-Fingerprinting](../configuration.md#assets) nutzen lässt -
+`assets.fingerprint` (standardmäßig aktiv) bedeutet, dass jede Änderung,
+die du an dieser Datei vornimmst, beim nächsten Build einen neuen
+Dateinamen bekommt, sodass die Browser der Besucher nie eine veraltete,
+zwischengespeicherte Kopie ausliefern. Das funktioniert genauso für jede
+Top-Level-CSS- oder JS-Datei im eigenen `assets/`-Ordner deines Themes,
+nicht nur für `style.css` - ein Theme mit einer eigenen `assets/main.js`
+bindet sie auf dieselbe Weise ein:
+`<script src="themeAssetUrl( 'main.js' )"></script>`.
+`moduleAssetUrl( "copy-code.js" )` ist derselbe Helfer für die eigenen,
+themeunabhängigen, gemeinsam genutzten Skripte dieses Moduls (diejenigen,
+die das eigene `layout.bxm` jedes integrierten Themes über
+`variables.moduleAssetsDir` einbindet) - verwende ihn anstelle eines fest
+codierten `assets/copy-code.js`, wenn dein eigenes Theme eines davon
+direkt einbindet.
+
+Beide Helfer fingerprinten nur eine Datei, die *direkt* in diesem Ordner
+liegt - nie eine, die in einem Unterordner verschachtelt ist (ein eigenes
+`assets/fonts/` oder `assets/vendor/` etwa). Das ist Absicht: Eine Datei,
+auf die *indirekt* von einer deiner Top-Level-Dateien aus verwiesen wird
+(ein `@font-face url(...)`, ein CSS-`@import`), würde kaputtgehen, wenn
+sie umbenannt würde, ohne dass auch jede Stelle, die unter dem alten
+Namen darauf verweist, mit umgeschrieben wird - also rührt dies diese
+Dateien niemals an. Wird einer der beiden Helfer für eine Datei
+aufgerufen, die noch nicht existiert, oder bei deaktiviertem
+`assets.fingerprint`, greift exakt der heutige, unveränderte Pfad als
+Fallback - nie ein Fehler.
+
+Jedes `.bxm` (integriert oder eigen), das stattdessen einen fest
+codierten Pfad hart codiert, statt einen der beiden Helfer aufzurufen,
+bricht dadurch nicht, bustet aber auch nicht automatisch den Cache - und
+ein Build gibt jetzt eine einzeilige, nicht fatale Warnung aus, die die
+betreffende Datei benennt, wenn genau das erkannt wird, damit ein solches
+Theme nicht stillschweigend veraltet.

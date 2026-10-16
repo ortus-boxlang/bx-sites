@@ -42,6 +42,18 @@ für die `docs/`-oder-`src/`-Konvention. `new` erzeugt immer ein Gerüst mit
 
 Pfad-Flags (`--source`, `--path`, `--dest`, `--output`) akzeptieren einen absoluten Pfad, einen `~/`-Pfad im Home-Ordner oder einen Pfad relativ zum Projektstamm.
 
+## Tab-Vervollständigung
+
+Das Modul liefert Vervollständigungs-Skripte für bash, fish und PowerShell im Ordner `completions/` mit. Sie vervollständigen Verben (`page:new`, auch als `page new` geschrieben), Flags und die Werte von Flags mit festem Wertebereich (`--theme=`, `--target=`, `--from=`, ...).
+
+| Shell | Installation |
+|---|---|
+| bash | Automatisch mit `install-bx-module bx-sites`, das `boxlang.completions` aus der `box.json` des Moduls liest. Andernfalls `source <Modulordner>/completions/bxSites.bash` in `~/.bashrc` eintragen. |
+| fish | `cp <Modulordner>/completions/bxSites.fish ~/.config/fish/completions/` |
+| PowerShell | `. <Modulordner>/completions/bxSites.ps1` in `$PROFILE` eintragen. |
+
+Die Skripte werden aus der Verb-Tabelle in `ModuleConfig.bx` generiert. Nach der Änderung eines Verbs mit `boxlang tools/generate-completions.bxs` neu erzeugen; ein Spec schlägt fehl, wenn die eingecheckten Skripte veraltet sind.
+
 ## `new`
 
 Ein Docs-Projekt aufsetzen.

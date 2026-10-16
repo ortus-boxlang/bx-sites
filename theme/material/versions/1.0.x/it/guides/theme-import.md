@@ -9,11 +9,12 @@ tags: [guide, temi, migrazione]
 
 `bxSites theme:import` converte un tema proveniente dall'ecosistema di un
 altro generatore di siti statici in uno scheletro di tema bx-sites sotto
-`themes/<name>/` - un punto di partenza fatto con il massimo impegno
-possibile, non una conversione senza perdite in un solo comando. Gestisce
-i tre ecosistemi la cui struttura di tema si mappa sul contratto
-`layout.bxm`+`page.bxm` proprio di bx-sites (vedi
-[Temi](themes.md#il-contratto-themeprovider)):
+`.themes/<name>/`, dentro la content root del progetto (vedi
+[Origine del contenuto](content-source.md#dove-vive-una-sovrascrittura-di-tema)) -
+un punto di partenza fatto con il massimo impegno possibile, non una
+conversione senza perdite in un solo comando. Gestisce i tre ecosistemi
+la cui struttura di tema si mappa sul contratto `layout.bxm`+`page.bxm`
+proprio di bx-sites (vedi [Temi](themes.md#il-contratto-themeprovider)):
 
 - **`mkdocs`** - template Jinja2 (sia mkdocs nativo sia mkdocs-material
   usano `base.html`+`main.html`)
@@ -41,13 +42,13 @@ bxSites theme:import --source=mkdocs --path=/percorso/del/tema-mkdocs --name=my-
   [Migrare da GitBook](migrating-from-gitbook.md) per convertire il
   *contenuto* di un progetto, un lavoro diverso dal convertirne il *tema*)
 - `--name` (obbligatorio) - il nome di destinazione, scritto in
-  `themes/<name>/` (la stessa convenzione dei
+  `.themes/<name>/`, dentro la content root (la stessa convenzione dei
   [temi installati](themes.md#installare-un-tema-pubblicato) usata da
   `install:theme`) - imposta `theme.name` di `bxsites.yaml` su questo
   nome una volta soddisfatto del risultato
 
-Rieseguire il comando con lo stesso `--name` è sicuro - `layout.bxm`/
-`page.bxm` vengono sovrascritti e qualsiasi cartella di asset appena
+Rieseguire il comando con lo stesso `--name` chiede prima conferma (usa
+`--force` per saltarla), poi `layout.bxm`/`page.bxm` vengono sovrascritti e qualsiasi cartella di asset appena
 trovata viene unita - quindi iterare (modifica il sorgente, o la
 mappatura, riesegui) è il flusso di lavoro normale, non un'operazione
 one-shot.
@@ -58,8 +59,19 @@ L'output del comando riporta esattamente cosa è successo - quale file
 sorgente è diventato `layout.bxm`/`page.bxm` (oppure una nota che non ne
 è stato trovato nessuno, se il tema sorgente non usa uno dei nomi file
 convenzionali sopra), quali cartelle di asset (`css/`, `js/`, `static/`,
-...) sono state copiate testualmente in `themes/<name>/assets/`, e un
+...) sono state copiate testualmente in `.themes/<name>/assets/`, e un
 elenco numerato di tutto ciò che richiede un controllo manuale.
+
+Una cartella `css/` o `js/` copiata è proprio uno di questi casi: tutto
+ciò che sta sotto `.themes/<name>/assets/css/`/`assets/js/` **non** ha la
+cache invalidata, poiché l'[impronta digitale](../configuration.md#assets)
+copre solo un file che si trova direttamente dentro la cartella
+`assets/` propria di un tema, mai uno annidato in una sottocartella. Per
+assegnare l'impronta digitale al tuo foglio di stile/script principale,
+spostalo direttamente in `assets/` (ad es. `assets/style.css`) e
+referenzialo dal `layout.bxm` convertito con
+`themeAssetUrl( "style.css" )` invece del percorso che il traduttore ha
+portato con sé - vedi [Temi](themes.md#scrivere-un-tema-da-zero).
 
 All'interno di un file template, questo è un **traduttore meccanico e con
 il massimo impegno possibile** (`JinjaLikeTranslator.bx` per la sintassi

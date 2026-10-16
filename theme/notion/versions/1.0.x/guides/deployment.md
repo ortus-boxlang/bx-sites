@@ -12,13 +12,16 @@ files. [`bxSites deploy`](../cli-reference.md#deploy) ships it there
 directly, in one command: S3 (and any S3-compatible service - DigitalOcean
 Spaces, Cloudflare R2, Backblaze B2, MinIO), Azure Blob Storage, Google
 Cloud Storage, Firebase Hosting, FTP, SFTP, rsync-over-SSH, Netlify,
-Vercel, Cloudflare Pages, a local directory, or GitHub Pages.
+Vercel, Cloudflare Pages, a local directory, or GitHub Pages. Hosting on
+[bxSites Cloud](https://bxsites.io) itself instead?
+[`bxSites publish`](../cli-reference.md#publish) is the dedicated command
+for that - see [below](#the-publish-command).
 
 ## The `deploy` command
 
 Every target but the two simplest (`local`/`github-pages`, which work from
 flags alone - see [CLI Reference](../cli-reference.md#deploy)) is
-configured via a `deployments/<name>.json` file at your project root - one
+configured via a `deployments/<name>.yaml` file at your project root - one
 file per deploy target you actually use, each naming which `target` it is
 plus that target's own fields:
 
@@ -26,14 +29,21 @@ plus that target's own fields:
 bxSites deploy --entry=production
 ```
 
-```json title="deployments/production.json"
-{ "target": "s3", "bucket": "my-docs-site", "accessKeyIdEnvVar": "AWS_ACCESS_KEY_ID", "secretAccessKeyEnvVar": "AWS_SECRET_ACCESS_KEY" }
+```yaml title="deployments/production.yaml"
+target: s3
+bucket: my-docs-site
+accessKeyIdEnvVar: AWS_ACCESS_KEY_ID
+secretAccessKeyEnvVar: AWS_SECRET_ACCESS_KEY
 ```
 
+Entries can be YAML (`.yaml`/`.yml`), TOML (`.toml`) or JSON (`.json`) - the same formats the site config accepts. The target sections below show JSON, but every field works the same in any format.
+
+File paths in an entry (`serviceAccountKeyPath`, an SFTP `key`, rsync's `identityFile`, a local `destination`) can be absolute, start with `~/`, or be relative to the project root.
+
 **Secrets always come from an environment variable, never from a literal
-value in `deployments/*.json`.** Every field ending in `EnvVar` names the
+value in `deployments/*`.** Every field ending in `EnvVar` names the
 *environment variable* holding the real secret (an access key, a password,
-an API token) - resolved live at deploy time, so `deployments/*.json`
+an API token) - resolved live at deploy time, so `deployments/*`
 itself is always safe to commit. A field that's a *path* to a credential
 file you already manage yourself (an SSH private key, a downloaded GCP
 service-account JSON key) is the one exception - a plain field, since the
@@ -46,7 +56,7 @@ your shell by hand; in CI, set them as real secrets on the runner.
 ### Deploying to every target at once
 
 Run `bxSites deploy` with neither `--entry` nor `--target` and every
-`deployments/*.json` entry is deployed in turn, off a single shared build:
+`deployments/*` entry is deployed in turn, off a single shared build:
 
 ```bash frame="terminal" title="Terminal"
 bxSites deploy
@@ -180,6 +190,11 @@ changed. Requires `rsync` and `ssh` on the machine running `bxSites`.
 }
 ```
 
+Remote files that no longer exist in your build are left in place. Add
+`"deleteExtraneous": true` to remove them too (rsync's `--delete`). A
+`remotePath` of `/`, `~` or `.` is refused - point it at the site's own
+folder.
+
 ### `netlify`
 
 ```json title="deployments/production.json"
@@ -217,6 +232,49 @@ for the full, honest detail on this one's rough edges.
   "apiTokenEnvVar": "CLOUDFLARE_API_TOKEN"
 }
 ```
+
+## The `publish` command
+
+[bxSites Cloud](https://bxsites.io) is a hosting SaaS built specifically
+for bxSites sites. `bxSites publish` builds the site and ships it there
+directly, over bxSites Cloud's own publish API - distinct from `deploy`'s
+pluggable targets above (which all ship to infrastructure *you* own).
+
+```bash frame="terminal" title="Terminal"
+export BXSITES_CLOUD_TOKEN="cb_..."
+bxSites publish
+```
+
+Configure the destination in `bxsites.yaml`'s [`cloud`](../configuration.md#cloud)
+block - the target site's UUID and your bxSites Cloud instance's base URL:
+
+```yaml title="bxsites.yaml"
+cloud:
+  siteId: "3f2b1c9a-....-....-............"
+  apiUrl: "https://cloud.bxsites.app"
+```
+
+**The API token never goes in `bxsites.yaml`.** `publish` reads it from the
+`BXSITES_CLOUD_TOKEN` environment variable, or an explicit `--token=<token>`
+flag which wins when both are set:
+
+```bash frame="terminal" title="Terminal"
+bxSites publish --token=cb_...
+```
+
+On success, `publish` prints the site's live URL. It fails with a clear,
+specific error (not a raw exception or stack trace) for every case worth
+distinguishing:
+
+- **No `[cloud]` block, or an incomplete one** - add `cloud.siteId`/
+  `cloud.apiUrl` to `bxsites.yaml` as shown above.
+- **No token available** - set `BXSITES_CLOUD_TOKEN` or pass `--token`.
+- **401/403 (authentication failed)** - the token is missing, invalid, or
+  doesn't have access to this site.
+- **404 (site not found)** - double check `cloud.siteId` is correct.
+- **Anything else (400/413/500, or a network failure)** - the actual HTTP
+  status and any error body the server returned are included, for
+  debugging.
 
 ## The `package` command
 
@@ -306,6 +364,11 @@ and so a real `sitemap.xml` gets generated too:
 === "JSON"
     ```json title="bxsites.json"
     { "baseURL": "https://<user>.github.io/<repo>/" }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    baseURL = "https://<user>.github.io/<repo>/"
     ```
 
 See [Configuration](../configuration.md#baseurl) for the full breakdown of

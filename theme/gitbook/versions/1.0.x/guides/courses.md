@@ -17,7 +17,7 @@ visited.
 
 ## The manifest
 
-Add a `docs/data/courses.yaml` (`.yml`/`.json` also work - see
+Add a `docs/data/courses.yaml` (`.yml`/`.toml`/`.json` also work - see
 [Data Files](data-files.md)) file. Each top-level key is one course; its
 `lessons` array lists that course's own pages, in order - array position
 *is* the lesson number:
@@ -31,6 +31,33 @@ getting-started:
     - guides/course/windows-installation.md
     - guides/course/mac-installation.md
     - guides/course/creating-a-new-site.md
+```
+
+```toml title="docs/data/courses.toml"
+[getting-started]
+title = "Getting Started with BoxLang"
+description = "A guided walkthrough from install to your first deployed site."
+lessons = [
+  "guides/course/introduction.md",
+  "guides/course/windows-installation.md",
+  "guides/course/mac-installation.md",
+  "guides/course/creating-a-new-site.md"
+]
+```
+
+```json title="docs/data/courses.json"
+{
+  "getting-started": {
+    "title": "Getting Started with BoxLang",
+    "description": "A guided walkthrough from install to your first deployed site.",
+    "lessons": [
+      "guides/course/introduction.md",
+      "guides/course/windows-installation.md",
+      "guides/course/mac-installation.md",
+      "guides/course/creating-a-new-site.md"
+    ]
+  }
+}
 ```
 
 Every `lessons` entry is a `docs/`-relative path string, the same

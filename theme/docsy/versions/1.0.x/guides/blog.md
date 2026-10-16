@@ -94,7 +94,10 @@ in full on the post's own page.
 
 Every other page-level frontmatter key already documented in
 [Getting Started](../getting-started.md#add-pages) (`icon`, `description`,
-`ogImage`, `toc`) works on a post too.
+`ogImage`, `toc`) works on a post too - including `layout`, which renders
+this post's own body through a named `.bxm` instead of the active theme's
+default (its own `blog-page.bxm`, if it has one, else `page.bxm`) - see
+[Multiple layouts per page](themes.md#multiple-layouts-per-page).
 
 ## Featured images and other blog assets
 
@@ -185,6 +188,21 @@ the auto-appended one entirely, so there's never a duplicate:
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml" linenums="1"
+
+    [[nav]]
+    path = "index.md"
+
+    [[nav]]
+    title = "Blog"
+    url = "blog/index.html"
+    icon = "lucide:newspaper"
+
+    [[nav]]
+    path = "about.md"
+    ```
+
 Individual posts aren't added to the nav themselves (same as the tags
 index) - they're reachable from `/blog/`, their own category page, their
 own year archive, their author's page, search, and each other's prev/next
@@ -215,6 +233,15 @@ to `0` for every post, uncapped:
 === "JSON"
     ```json title="bxsites.json"
     { "blog": { "postsPerPage": 10, "feed": true, "feedLimit": 25 } }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+
+    [blog]
+    postsPerPage = 10
+    feed = true
+    feedLimit = 25
     ```
 
 ## Previewing drafts
@@ -298,5 +325,5 @@ Two ways to restyle it, same as any other page:
 
 What you can't do is swap out the post-card/pager/author-profile markup
 itself for your own - it's generated once by `BlogBuilder.bx`, not read
-from a template file in `theme/`, so restyling it with CSS (above) is the
+from a template file in `.theme/`, so restyling it with CSS (above) is the
 supported path rather than a per-component override.

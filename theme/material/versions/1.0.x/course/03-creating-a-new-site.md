@@ -29,6 +29,18 @@ setting you'll meet later in this course, all covered in full in
 [Configuration](../configuration.md). `docs/` is where every page you
 write lives - you'll spend most of the rest of this course inside it.
 
+`docs/` is the default source folder. For a site whose content is better
+organized under `src/`, use the same scaffold command with an explicit
+source choice:
+
+```bash title="Terminal"
+bxSites new my-site --source=src
+```
+
+That creates `src/index.md` and `src/assets/` instead. The build, serve, and
+other content commands resolve the selected source folder automatically;
+generated files still go to `site/`.
+
 Two flags worth knowing now:
 
 - `--theme=material` (or any other [built-in theme](14-choosing-a-theme.md))
@@ -43,7 +55,8 @@ Two flags worth knowing now:
 bxSites build
 ```
 
-This converts every page under `docs/` into a static `site/` folder -
+This converts every page under the project's source folder (`docs/` by
+default, or `src/`) into a static `site/` folder -
 plain HTML, CSS, and JS, ready to host anywhere. Every built-in theme
 renders identically from the same Markdown, so switching themes later
 never means rewriting content.

@@ -158,6 +158,52 @@ palette `color` sopra sono personalizzabili indipendentemente dal resto
 della palette del sito, tramite proprietà CSS personalizzate - vedi
 [Personalizzare i colori](themes.md#customizing-colors-without-a-theme-override).
 
+## Galleria di immagini
+
+Una griglia responsiva di immagini. L'attributo opzionale `columns` è
+`2`, `3` o `4` (predefinito `3`); qualsiasi altro valore ricade su `3`.
+La griglia stessa non richiede configurazione, ma la lightbox
+click-per-ingrandire richiede che
+[`imageGallery`](../configuration.md#imagegallery) sia impostato su
+`true` in `bxsites.yaml` - senza, la griglia si renderizza comunque, solo
+senza il JS della lightbox. Ci sono due modi per costruirne una:
+
+Elenca ogni immagine esplicitamente con figli `::: image` - `src` è
+obbligatorio, `alt` e `caption` sono entrambi opzionali:
+
+```markdown title="Esempio" linenums="1"
+::: image-gallery columns="3"
+::: image src="../assets/favicon.png" alt="BoxLang icon" caption="Icon"
+:::
+::: image src="../assets/home-banner.jpg" alt="Home banner"
+:::
+::: image src="../assets/og-image.png" caption="Social preview"
+:::
+:::
+```
+
+::: image-gallery columns="3"
+::: image src="../assets/favicon.png" alt="BoxLang icon" caption="Icon"
+:::
+::: image src="../assets/home-banner.jpg" alt="Home banner"
+:::
+::: image src="../assets/og-image.png" caption="Social preview"
+:::
+:::
+
+Oppure lascia che bxSites scopra le immagini per convenzione: metti i
+file chiamati `{name}-{order}.{jpg,jpeg,png,webp,gif}` in
+`docs/assets/gallery/{name}/` e referenziali solo con `name` - nessun
+figlio necessario. I file vengono ordinati numericamente per `{order}`:
+
+```markdown title="Esempio" linenums="1"
+::: image-gallery name="showcase" columns="3"
+:::
+```
+
+::: image-gallery name="showcase" columns="3"
+:::
+
 ## File
 
 Una card di download per un PDF, un video, o qualsiasi altro asset di
@@ -459,6 +505,92 @@ preferenza al caricamento (comodo per condividere un link diretto verso
 di un progetto può chiamare direttamente
 `window.bxSitesSetPreference( key, value )` per pilotarla da
 un'interfaccia personalizzata invece.
+
+## Moduli di contatto
+
+> **Funzionalità premium.** Un blocco `::: contact-form` viene sempre
+> renderizzato come un modulo reale e completo - campi, etichette,
+> pulsante di invio, tutto - ma *l'invio* funziona solo quando il piano
+> bxSites Cloud del progetto include moduli funzionanti. Su un piano che
+> non lo include, chi invia comunque vede un messaggio amichevole "esegui
+> l'upgrade per abilitare questo modulo" invece di vedere il proprio
+> messaggio arrivare a destinazione. Non c'è nulla da configurare qui per
+> attivarlo o disattivarlo - è interamente una proprietà del piano
+> dell'account.
+
+Un modulo di contatto/lead-gen con etichette, inviato con `fetch()` a
+bxSites Cloud invece di un ricaricamento della pagina:
+
+```markdown title="Esempio" linenums="1"
+::: contact-form id="demo-request" to="sales@acme.com" fields="name:text,email*:email,message:textarea" submitLabel="Send" :::
+```
+
+::: contact-form id="demo-request" to="sales@acme.com" fields="name:text,email*:email,message:textarea" submitLabel="Send" :::
+
+- `id` - lo slug di questo modulo. Corrisponde a una configurazione del
+  modulo (a chi notifica, filtro antispam, e così via) che imposti in
+  bxSites Cloud, non in questo markdown - questa build non verifica mai
+  che l'id scritto qui esista davvero lì, viene semplicemente passato
+  così com'è. Il valore predefinito è `"contact"` se omesso.
+- `to` - opzionale e puramente informativo (l'instradamento reale della
+  consegna è configurato lato server, dall'amministratore dell'account) -
+  utile come promemoria di dove finiscono gli invii di un dato modulo
+  quando in seguito scorri il sorgente della pagina.
+- `fields` - obbligatorio; un piccolo DSL, coppie `name:type` separate da
+  virgole: aggiungi un `*` finale subito dopo il nome del campo (prima
+  dei due punti) per contrassegnarlo come obbligatorio, es.
+  `email*:email`. I tipi supportati sono `text`, `email` e `textarea`;
+  qualsiasi altro tipo non riconosciuto ripiega su un semplice campo
+  `text` invece di far fallire la build. L'etichetta di ogni campo viene
+  derivata dal suo nome (`full-name` diventa "Full Name").
+- `submitLabel` - il testo del pulsante di invio; il valore predefinito è
+  `"Send"`.
+
+Ogni modulo porta anche un campo honeypot nascosto che una persona reale
+non vede né compila mai - lo usa il filtro antispam di bxSites Cloud,
+senza bisogno di configurazione qui.
+
+## Commenti
+
+> **Funzionalità premium.** `::: comments` monta sulla pagina un thread
+> di commenti dei visitatori dal vivo e moderato - richiede un account
+> bxSites Cloud con i Commenti inclusi nel piano e `cloud.comments: true`
+> impostato in `bxsites.yaml`. Senza questo, un blocco `::: comments` non
+> fa fallire la build: viene reso come segnaposto vuoto e inattivo, e la
+> build stampa un avviso una sola volta, con la prima pagina interessata.
+> A differenza di `::: cloud` senza `cloud.contentBlocks`, che fa fallire
+> la build perché deve recuperare contenuto reale.
+
+```markdown title="Esempio" linenums="1"
+::: comments :::
+```
+
+Non è richiesto alcun attributo - l'id del thread corrisponde per
+default al percorso URL della pagina stessa, così ogni pagina ottiene il
+proprio thread di commenti senza alcuna configurazione. Un `id="..."`
+opzionale permette invece a due blocchi sulla stessa pagina (o a blocchi
+su pagine diverse) di condividere un singolo thread:
+
+```markdown title="Esempio" linenums="1"
+::: comments id="general-feedback" :::
+```
+
+A differenza di `::: cloud`, in fase di build non viene recuperato o
+incorporato nulla - un thread di commenti continua a crescere dopo ogni
+deploy, quindi uno snapshot preso in fase di build diventerebbe obsoleto
+non appena arriva un nuovo commento. Il blocco renderizza un
+segnaposto vuoto; un piccolo script lato client (incluso solo quando
+`cloud.comments: true` è attivo - la stessa adesione esplicita già usata
+da `cloud.contentBlocks`) carica i commenti attuali, già moderati, a ogni
+caricamento della pagina e pagina quelli più vecchi su richiesta, per poi
+renderizzare un modulo per pubblicarne uno nuovo. Un commento appena
+inviato viene mostrato localmente, solo nel browser di quella persona
+visitatrice, con l'etichetta "in attesa di moderazione" - non appare a
+nessun altro finché una persona moderatrice non lo approva.
+
+Anche questo modulo porta un campo honeypot nascosto che una persona
+reale non vede né compila mai - lo usa il filtro antispam di bxSites
+Cloud, senza bisogno di configurazione qui.
 
 ## Loop e condizionale (basati sui dati)
 

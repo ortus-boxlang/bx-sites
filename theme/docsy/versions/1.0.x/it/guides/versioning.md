@@ -77,6 +77,56 @@ possibile.
 quelle del sito principale - una versione è una parte di prima classe,
 completamente esplorabile/collegabile del sito, non un archivio nascosto.
 
+## Pubblicare una versione predefinita alla radice del sito
+
+Una volta che un progetto ha una versione reale e rilasciata a cui
+indirizzare le persone, `docs/` stesso di solito è a metà della stesura
+della *prossima* - non è quello su cui dovrebbe atterrare un visitatore
+alle prime armi. `versions.default` indica invece una cartella
+`docs/versions/<name>/` da compilare alla radice del sito:
+
+```yaml title="bxsites.yaml" linenums="1"
+versions:
+  default: "1.0.x"
+```
+
+Una volta impostato:
+
+- `docs/versions/1.0.x/` si compila alla radice del sito (`/`), non in
+  `/versions/1.0.x/` - non viene mai duplicato in entrambi i posti.
+- Il semplice albero `docs/` - quello che prima si compilava sempre alla
+  radice - si compila invece in `/next/`, ancora completamente
+  navigabile/collegabile, solo che non è più quello predefinito. Utile
+  per scrivere/revisionare apertamente la documentazione della prossima
+  release senza che sembri già distribuita.
+- Il selettore di versione mostra `1.0.x (Current)` selezionato alla
+  radice, poi ogni altra cartella `docs/versions/*`, poi un separatore e
+  una voce `Next` che punta a `/next/` *per ultima* - prima le versioni
+  rilasciate, con l'albero ancora in lavorazione tenuto a parte in
+  fondo, invece che infilato al secondo posto.
+- Le pagine di `/next/` sono escluse da `sitemap.xml`, e `robots.txt`
+  riceve una riga `Disallow: /next/` - un albero ancora in lavorazione
+  non dovrebbe competere con la documentazione vera nei risultati di
+  ricerca. Resta comunque una parte completamente normale e
+  raggiungibile del sito (proprio indice di ricerca, propria pagina dei
+  tag, proprio supporto `redirects`).
+- `/next/` non ottiene propri sottoalberi di locale nella v1 -
+  `docs/i18n/<code>/` continua a tradurre la stessa cartella fisica
+  `docs/` di sempre, ma per ora solo la build della locale predefinita
+  viene pubblicata sotto `/next/`.
+
+Un `versions.default` configurato male (che indica una cartella che non
+esiste realmente sotto `docs/versions/`) fa fallire il build con un
+chiaro errore `BxSites.UnknownDefaultVersion`, invece di ricadere
+silenziosamente su qualcos'altro.
+
+Le release di patch (1.0.1, 1.0.2, ...) sono solo modifiche sul posto
+alla cartella `docs/versions/1.0.x/` già creata - `versions.default` non
+cambia e non viene creata nessuna nuova versione. Solo un vero
+incremento minor/major (`1.1`, `2.0`) giustifica `version:new`, che crea
+una cartella nuova, con `versions.default` che si sposta a puntare a
+essa.
+
 ## Combinare con i18n
 
 Anche una versione può essere tradotta - vedi

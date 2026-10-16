@@ -28,33 +28,65 @@ flags below can appear before any verb.
 
 Every `docs/` mentioned below applies equally to a project using `src/`
 instead - see [Getting Started](getting-started.md#add-pages) for the
-`docs/`-or-`src/` convention. `new` always scaffolds `docs/`.
+`docs/`-or-`src/` convention. `docs/` is the default source folder for new
+projects.
 
 ## Global options
 
 | Flag | Description |
 |---|---|
-| `-h`, `--help` | Show usage and exit |
+| `-h`, `--help`, `help`, or no verb at all | Show usage and exit |
 | `-v`, `--version` | Show the module version and exit |
+
+Path flags (`--source`, `--path`, `--dest`, `--output`) take an absolute path, a `~/` path in your home folder, or a path relative to the project root.
 
 Every verb below ships with core. An installed and activated addon module
 can register further verbs of its own (e.g. a commercial deploy/hosting
-addon adding `bxSites cloud publish`) - `--help` lists whatever's
+addon adding `bxSites cloud publish`) - `help`/no-args lists whatever's
 currently activated in your project alongside the verbs below. See
 [CLI Providers](guides/cli-providers.md) if you're writing one.
+
+## Tab completion
+
+The module ships completion scripts for bash, fish and PowerShell in its `completions/` folder. They complete verbs (`page:new`, or written as `page new`), flags, and the values of flags with a fixed set (`--theme=`, `--target=`, `--from=`, ...).
+
+| Shell | Install |
+|---|---|
+| bash | Automatic with `install-bx-module bx-sites`, which reads `boxlang.completions` from the module's `box.json`. Otherwise add `source <module folder>/completions/bxSites.bash` to `~/.bashrc`. |
+| fish | `cp <module folder>/completions/bxSites.fish ~/.config/fish/completions/` |
+| PowerShell | Add `. <module folder>/completions/bxSites.ps1` to your `$PROFILE`. |
+
+The scripts are generated from the verb table in `ModuleConfig.bx`. After changing a verb, regenerate them with `boxlang tools/generate-completions.bxs`; a spec fails when the committed scripts are stale.
 
 ## `new`
 
 Scaffold a new project.
 
 ```bash title="Usage"
-bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|json]
+bxSites new [path] [--name=...] [--theme=<see guides/themes.md for all 10>] [--description=...] [--format=yaml|toml|json] [--source=docs|src] [--docs|--site] [--agents=agents,claude,cursor]
 ```
 
 - `--name` - the site name written into the site config (defaults to the target directory's name)
 - `--theme` - defaults to `bootstrap`
 - `--description` - the site description written into the site config
 - `--format` - `yaml` (default, scaffolds `bxsites.yaml`) or `json` (scaffolds `bxsites.json`) - see [Configuration](configuration.md)
+- `--source` - `docs` (default) or `src`, the folder where pages and assets are scaffolded
+- `--docs` - shortcut for `--source=docs`
+- `--site` - shortcut for `--source=src`
+- `--agents` - which AI coding-agent instruction file(s) to write: a comma
+  list of `agents` (`AGENTS.md`), `claude` (`CLAUDE.md`), `cursor`
+  (`.cursorrules`). Defaults to `agents` alone; `--agents=none` (or
+  `--no-agents`) skips them all. See
+  [AI Agent Instructions](guides/ai-agent-instructions.md).
+
+Use `--source=src` when the project is a general site rather than a
+documentation site. The choice affects the initial folder only; all later
+verbs resolve the existing `docs/` or `src/` source folder automatically.
+Use only one of `--docs` or `--site`; build output is always written to `site/`.
+
+Also always writes `.markdownlint.json` - a project-wide markdownlint
+ruleset tuned for bx-sites content (relaxes line-length, hard-tab, and
+bare-URL rules that would otherwise flag normal Markdown here).
 
 ## `build`
 
@@ -79,6 +111,9 @@ Build and serve the site locally with live reload.
 bxSites serve [--port=8080] [--host=127.0.0.1]
 ```
 
+`--port` and `--host` also accept space-separated values, for example
+`bxSites serve --port 9191 --host 127.0.0.1`.
+
 Runs in the foreground until interrupted (Ctrl+C). A native BoxLang file
 watcher - not a poll loop - reacts to a saved change immediately, and only
 reconverts the page(s) that actually changed rather than the whole site,
@@ -100,9 +135,12 @@ bxSites search-index
 ## `clean`
 
 Remove `site/` and any build cache, leaving `docs/` and the site config alone.
+It asks for confirmation first; pass `--force` to skip the prompt (required
+in CI and scripts, where there's no one to answer it).
 
 ```bash frame="terminal" title="Terminal"
 bxSites clean
+bxSites clean --force
 ```
 
 ## `gh-deploy`
@@ -142,7 +180,7 @@ bxSites deploy [--verbose]
 Three ways to invoke it:
 
 1. **`--entry=<name>`** - dispatches to whatever target a
-   `deployments/<name>.json` file declares (see below). Every target
+   `deployments/<name>.yaml` file declares (see below). Every target
    except `local`/`github-pages` needs this - there's more configuration
    than a couple of flags can reasonably carry.
 2. **`--target=<name>` with its own flags** - a flag-only shorthand for
@@ -150,9 +188,9 @@ Three ways to invoke it:
    `local` (`--destination=<path>`) and `github-pages` (`[--branch]
    [--remote] [--message]`, every field optional, same defaults as
    `gh-deploy`).
-3. **Neither flag - deploy everything.** Every `deployments/*.json` entry
+3. **Neither flag - deploy everything.** Every `deployments/*` entry
    is deployed in turn, off a single shared build (the site is built once,
-   not once per target). Requires at least one `deployments/*.json` entry
+   not once per target). Requires at least one `deployments/*` entry
    to exist. One target failing doesn't stop the rest - every entry is
    attempted, and the command only exits non-zero if at least one of them
    failed; the final summary reports how many succeeded (e.g. `Deployed to
@@ -162,7 +200,34 @@ Three ways to invoke it:
 target starts/finishes, instead of just the final one-line summary.
 
 See [Deployment](guides/deployment.md) for every target's own config
-shape and a real `deployments/*.json` example for each.
+shape and a real `deployments/*` example for each.
+
+## `publish`
+
+Builds the site, then ships it to [bxSites Cloud](guides/deployment.md#the-publish-command)
+- the hosting SaaS this module targets - over its publish API. Distinct
+from `deploy`'s pluggable targets (which ship to infrastructure *you* own):
+`publish` always ships to bxSites Cloud, identified by
+[`cloud.siteId`/`cloud.apiUrl`](configuration.md#cloud) in `bxsites.yaml`.
+
+```bash title="Usage"
+bxSites publish [--token=<token>]
+```
+
+- `--token` - a bxSites Cloud API token, overriding the `BXSITES_CLOUD_TOKEN`
+  environment variable when both are set. One of the two is required - the
+  token is never read from `bxsites.yaml` itself.
+
+On success, prints the published site's live URL. Fails with a clear error
+(not a raw exception) when: the `[cloud]` block is missing/incomplete in
+`bxsites.yaml`; no token is available from either source; the token is
+rejected (401/403 - check it's valid and has access to this site); the
+configured `[cloud.siteId]` isn't found (404 - check it's correct); or any
+other server/network failure (the actual HTTP status and response body are
+included).
+
+See [Deployment](guides/deployment.md#the-publish-command) for the full
+setup.
 
 ## `package`
 
@@ -193,6 +258,7 @@ bxSites migrate --source=/path/to/notion-export --from=notion
 
 - `--source` (required) - path to the export/project's root directory (`SUMMARY.md` for `gitbook`, `mkdocs.yml` for `mkdocs`), or a `.zip` file (`markdown-zip`; `notion` accepts either a `.zip` or an already-extracted folder)
 - `--from` - `gitbook` (default), `mkdocs`, `markdown-zip`, or `notion`
+- `--force` - skip the prompt. When `docs/` already has files (or `bxsites.yaml` exists, for `mkdocs`), `migrate` asks before it may overwrite them
 
 ### `--from=gitbook` (default)
 
@@ -312,7 +378,7 @@ A one-shot environment/config health check - the "run this before filing a
 bug report" verb. Checks the JVM version, that `docs/` exists, that
 `bxsites.yaml`/`.json` actually parses and validates, that the required
 BoxLang modules (`bx-markdown`, `bx-esapi`, `bx-yaml`, `bx-image`) are
-installed and activated, and - if a project-level `theme/` override
+installed and activated, and - if a content-root `.theme/` override
 exists - that it satisfies the two-required-file `layout.bxm`/`page.bxm`
 contract.
 
@@ -428,8 +494,10 @@ never activates a plugin - see [Plugins](guides/plugins.md)).
 
 ## `theme:new`
 
-Eject one of the built-in themes into the project's own `theme/` folder
-for customizing, matching mkdocs' `--theme` eject workflow.
+Eject one of the built-in themes into the project's own `.theme/` folder,
+inside the content root (see
+[Content Source](guides/content-source.md#where-a-theme-override-lives)),
+for customizing - matching mkdocs' `--theme` eject workflow.
 
 ```bash title="Usage"
 bxSites theme:new --theme=material
@@ -437,15 +505,15 @@ bxSites theme:new --theme=material
 
 - `--theme` (required) - `bootstrap`, `material`, `tailwind`, `docsy`, `slate`, `docusaurus`, `justthedocs`, `vuepress`, `gitbook`, or `notion` - see [Themes](guides/themes.md#built-in)
 
-Fails rather than overwriting an existing `theme/`. See
+Fails rather than overwriting an existing `.theme/`. See
 [Themes](guides/themes.md) for the override contract (`layout.bxm` +
 `page.bxm`).
 
 ## `install:theme`
 
 Download a published theme from ForgeBox into the project's own
-`themes/<name>/` - nothing but the `bxSites` binary needed, same as
-`install:plugin`.
+`.themes/<name>/`, inside the content root - nothing but the `bxSites`
+binary needed, same as `install:plugin`.
 
 ```bash title="Usage"
 bxSites install:theme --name=bx-sites-theme-blog1 [--version=1.0.0]
@@ -481,22 +549,47 @@ Requires Node.js/`npx` on `PATH`. See
 skill list, and the other two install paths (`npx skills add`/`coldbox ai
 skills install`) that don't need `bxSites` at all.
 
+## `agents:sync`
+
+(Re)write the AI coding-agent instruction file(s) and `.markdownlint.json`
+`new` scaffolds by default - for a project created before this feature
+existed, or to refresh them after a bx-sites upgrade adds new content
+block directives/frontmatter keys. Safe to re-run: only the marked
+`<!-- bxsites:agents:start -->`/`<!-- bxsites:agents:end -->` block in each
+instruction file is replaced, so anything you wrote above or below it is
+preserved. A target file that exists without those markers (hand-authored
+before this feature existed, or edited to opt out) is left alone and
+reported as skipped, never overwritten.
+
+```bash title="Usage"
+bxSites agents:sync [--agents=agents,claude,cursor]
+```
+
+- `--agents` - same as `new`'s own flag: which instruction file(s) to sync
+  (`agents`/`claude`/`cursor`, default `agents` alone; `--agents=none` or
+  `--no-agents` skips them, still (re)writing `.markdownlint.json`)
+
+See [AI Agent Instructions](guides/ai-agent-instructions.md).
+
 ## `theme:import`
 
 Best-effort conversion of a theme from another static site generator's
 ecosystem (`mkdocs`/`jekyll`/`hugo`) into a bx-sites theme scaffold under
-`themes/<name>/` - a starting point, not a lossless one-command port.
+`.themes/<name>/`, inside the content root - a starting point, not a
+lossless one-command port.
 
 ```bash title="Usage"
-bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme
+bxSites theme:import --source=mkdocs --path=/path/to/theme --name=my-imported-theme [--force]
 ```
 
 - `--source` (required) - `mkdocs`, `jekyll`, or `hugo`
 - `--path` (required) - the source theme's own root folder
-- `--name` (required) - the destination name, written to `themes/<name>/`
+- `--name` (required) - the destination name, written to `.themes/<name>/`
 
-Safe to re-run against the same `--name` - `layout.bxm`/`page.bxm` are
-overwritten and any newly-found asset folders merged in. See
+- `--force` - skip the overwrite prompt
+
+Re-running against the same `--name` asks first (or pass `--force`), then
+`layout.bxm`/`page.bxm` are overwritten and any newly-found asset folders merged in. See
 [Importing a theme](guides/theme-import.md) for exactly what does and
 doesn't get translated, and what to check afterward.
 
@@ -585,3 +678,59 @@ bxSites lint
 ```
 
 Exits `1` when either check finds anything, `0` otherwise.
+
+## `docbox`
+
+Generates a BoxLang/CFML API reference into the content directory from
+[DocBox](https://docbox.ortusbooks.com)' own JSON output - the BoxLang
+counterpart of the Java plugins' Javadoc generator. See
+[DocBox API Reference](guides/docbox.md) for the full walkthrough and
+[`docbox`](configuration.md#docbox) for the config block.
+
+```bash frame="terminal" title="Terminal"
+bxSites docbox
+bxSites docbox --mappings:models=models --projectTitle="My API"
+bxSites docbox --pagePathPrefix=api/classes --tags=api,classes
+bxSites docbox --jsonDir=build/docbox-json
+```
+
+| Flag | Purpose |
+|---|---|
+| `--mappings:<name>=<path>` | A source tree to document, repeatable. Overrides `docbox.mappings` |
+| `--projectTitle` | Title on the generated overview page |
+| `--excludes` | A regex of paths for DocBox to skip |
+| `--pagePathPrefix` | Where pages go, relative to the content dir |
+| `--tags` | Comma-separated frontmatter tags for every generated page |
+| `--jsonDir` | Keep DocBox's JSON output at this path instead of discarding it |
+
+With no mappings configured or passed, it documents whichever conventional
+folders the project has: `models`, `handlers`, `bifs`, `components`,
+`interceptors`. Needs the `bx-docbox` module installed
+(`install-bx-module bx-docbox`), and says so plainly when it isn't.
+
+## `coldbox`
+
+Documents a ColdBox application from its conventions on disk - routes,
+handlers, models and WireBox mappings, modules, interceptors and scheduled
+tasks - without booting it. See
+[ColdBox Applications](guides/coldbox.md) for the full walkthrough and
+[`coldbox`](configuration.md#coldbox) for the config block.
+
+```bash frame="terminal" title="Terminal"
+bxSites coldbox
+bxSites coldbox --appRoot=app
+bxSites coldbox --include=routes,handlers
+```
+
+| Flag | Purpose |
+|---|---|
+| `--appRoot` | Where the ColdBox app lives, relative to the project root |
+| `--pagePathPrefix` | Where pages go, relative to the content dir |
+| `--tags` | Comma-separated frontmatter tags for every generated page |
+| `--include` | Which page sets to generate: `routes`, `handlers`, `models`, `modules`, `interceptors`, `scheduler` |
+
+Fails with `BxSites.NotAColdBoxApp` when the resolved root holds no
+`handlers/`, `config/ColdBox`, `config/Router` or `modules_app/`.
+Per-class detail (a handler's actions, a model's methods) comes from
+DocBox, so `bx-docbox` makes those pages richer; without it every page is
+still generated and says what's missing.

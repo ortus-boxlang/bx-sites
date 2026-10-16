@@ -2,9 +2,20 @@
 title: Home
 order: 1
 icon: phosphor-duotone:house
-summary: Point BxSites at a docs/ folder (or src/, for a project that isn't really "docs" in spirit). Get a fast, themeable static site out - documentation, a marketing site, a blog, or anything else Markdown can express - complete with search, i18n, and a markdown toolkit built for real content.
+summary: BxSites is a modern, BoxLang-powered static site generator that turns Markdown into fast, themed, searchable websites for documentation, blogs, marketing sites, and knowledge bases.
 toc: false
+layout: home
+ogImage: assets/og-image.png
 ---
+
+<!--
+	This page renders through resources/themes/bootstrap/home.bxm (the
+	`layout: home` above), which hardcodes the whole page and never
+	includes this file's own rendered body - everything below is kept,
+	unused, as the starting point for reverting to the normal layout.bxm +
+	page.bxm rendering if `layout: home` is ever removed.
+-->
+
 
 <div class="bxsites-hero">
 	<img class="bxsites-hero__banner" src="assets/home-banner.jpg" alt="BxSites - Write. Build. Publish Beautiful Docs. The official documentation engine for BoxLang. Markdown Powered, Beautiful Themes, Blazing Fast Search, Developer Focused.">
@@ -14,7 +25,7 @@ toc: false
 	</div>
 </div>
 
-This very site is built by BxSites, from the Markdown files in this
+This very site is built by **BxSites**, from the Markdown files in this
 repository's own `docs/` folder.
 
 BxSites isn't only for reference documentation - it's a general-purpose
@@ -22,7 +33,10 @@ BxSites isn't only for reference documentation - it's a general-purpose
 product site, a personal site: anything you can write in Markdown builds
 the same way, through the same themes, search, and i18n. Content lives in
 `docs/` by default, or `src/` for a project that reads more like a website
-than "docs" - every command works the same either way.
+than "docs" - every command works the same either way. Where content
+actually lives is itself configurable, too - any folder name, or the
+whole repository with no subfolder at all - see
+[Content Source](guides/content-source.md).
 
 ::: cards
 ::: card title="Markdown in, static HTML out" icon="phosphor-duotone:file-html"

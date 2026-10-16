@@ -47,6 +47,17 @@ nested:
     }
     ```
 
+=== "TOML"
+    ```toml title="bxsites.toml"
+
+    [variables]
+    company = "Ortus Solutions"
+
+    [variables.product]
+    name = "BoxLang"
+    supportEmail = "support@example.com"
+    ```
+
 Then reference any of it, by dotted path, from any Markdown page:
 
 ```markdown title="docs/index.md"
@@ -70,13 +81,43 @@ using it picks up the change on the next build. See
 [`variables`](../configuration.md#variables) in the configuration
 reference.
 
+## Page variables
+
+Every page's own frontmatter is available the same way, under a reserved
+`page` name - no `bxsites.yaml` `variables` entry needed:
+
+```markdown title="docs/guides/setup.md"
+---
+title: Setup
+product: BoxLang
+---
+
+# {{ page.title }}
+
+This guide covers installing {{ page.frontmatter.product }}.
+```
+
+`page.title`/`page.summary`/`page.description`/etc. - anything bx-sites
+itself already reads off frontmatter (see [Getting Started](../getting-started.md#add-pages)'s
+frontmatter reference) - are reachable directly; any other, project-defined
+frontmatter key (`product` above) is reachable under `page.frontmatter.<key>`,
+since only bx-sites' own known fields get promoted to a top-level `page.*`
+name of their own. A blog post's own frontmatter works identically (see
+[Writing a post](blog.md#writing-a-post)).
+
+`page` is a reserved name here, the same way it's already reserved for a
+magic function's own bare `page` reference (see [Reserved names](#reserved-names)
+below) - a `bxsites.yaml` `variables.page` entry, if a project somehow
+declared one, would be shadowed by the current page's own struct rather
+than winning.
+
 ## Magic functions
 
 Add a `docs/functions.bxs` file (or `src/functions.bxs`, if your project
 uses `src/` - see [Getting Started](../getting-started.md)) - a plain
 BoxLang script. Any function you name with a leading `$` becomes a *magic
 function*: callable from `{{ }}` in Markdown, and callable bare, directly,
-from a project's own [`theme/`](themes.md#overriding-a-theme)
+from a project's own [`.theme/`](themes.md#overriding-a-theme)
 `.bxm` overrides.
 
 ```bx title="docs/functions.bxs" linenums="1"
@@ -128,11 +169,11 @@ function $price( amount ) {
 ### Calling a magic function from a theme override
 
 Because a magic function is bound directly into template scope, a
-project's own `theme/page.bxm` (or `layout.bxm`) can call it bare, with no
+project's own `.theme/page.bxm` (or `layout.bxm`) can call it bare, with no
 prefix at all - the same way it already reads `variables.page`/
 `variables.siteConfig`:
 
-```bx title="theme/page.bxm (excerpt)"
+```bx title=".theme/page.bxm (excerpt)"
 <p class="build-banner">#$shout( 'built with boxlang' )#</p>
 ```
 
@@ -148,7 +189,7 @@ called from `{{ }}` in Markdown or bare from a theme override:
 | `page` | The current page (see the note below - not every field is populated yet when called from Markdown) |
 | `nav` | This tree's own nav tree |
 | `basePath` | Root-relative base path, ending with `/` |
-| `versions` | Version switcher entries - `[ { label, url } ]` |
+| `versions` | Version switcher entries - `[ { label, url, kind } ]` (`kind` is `"current"`/`"released"`/`"next"`) |
 | `currentVersion` | Which `versions` entry is being rendered right now |
 | `locales` | Language switcher entries - `[ { code, label, url, dir, flag } ]` |
 | `currentLocale` | Which `locales` entry's code is being rendered right now |
@@ -318,7 +359,7 @@ as broken syntax.
 
 ## Reserved names
 
-A `theme/page.bxm`/`layout.bxm` override calling a magic function bare
+A `.theme/page.bxm`/`layout.bxm` override calling a magic function bare
 (`$name(...)`) works because every loaded function - `$`-prefixed or a
 private helper alike - is bound directly into that same template's own
 rendering scope, right alongside the built-in `variables.page`/

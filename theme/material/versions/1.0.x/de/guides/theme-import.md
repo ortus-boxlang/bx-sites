@@ -9,10 +9,11 @@ tags: [anleitungen, themes, migration]
 
 `bxSites theme:import` wandelt ein Theme aus dem Ökosystem eines anderen
 statischen Site-Generators in ein bx-sites-Theme-Gerüst unter
-`themes/<name>/` um - ein bestmöglicher Ausgangspunkt, kein
-verlustfreier Ein-Befehl-Port. Es deckt die drei Ökosysteme ab, deren
-Theme-Struktur auf den eigenen `layout.bxm`+`page.bxm`-Vertrag von
-bx-sites abbildbar ist (siehe
+`.themes/<name>/` innerhalb des Content-Root des Projekts um (siehe
+[Content-Quelle](content-source.md#wo-eine-theme-überschreibung-lebt)) -
+ein bestmöglicher Ausgangspunkt, kein verlustfreier Ein-Befehl-Port. Es
+deckt die drei Ökosysteme ab, deren Theme-Struktur auf den eigenen
+`layout.bxm`+`page.bxm`-Vertrag von bx-sites abbildbar ist (siehe
 [Themes](themes.md#der-themeprovider-vertrag)):
 
 - **`mkdocs`** - Jinja2-Templates (natives mkdocs und mkdocs-material
@@ -44,13 +45,13 @@ bxSites theme:import --source=mkdocs --path=/path/to/mkdocs-theme --name=my-impo
   des *Inhalts* eines Projekts, eine andere Aufgabe als die Konvertierung
   seines *Themes*)
 - `--name` (erforderlich) - der Zielname, geschrieben nach
-  `themes/<name>/` (dieselbe
+  `.themes/<name>/` innerhalb des Content-Root (dieselbe
   [Installiertes-Theme-Konvention](themes.md#ein-veröffentlichtes-theme-installieren),
   die `install:theme` verwendet) - setze `theme.name` in `bxsites.yaml`
   darauf, sobald du mit dem Ergebnis zufrieden bist
 
-Ein erneuter Lauf gegen denselben `--name` ist sicher -
-`layout.bxm`/`page.bxm` werden überschrieben und neu gefundene
+Ein erneuter Lauf gegen denselben `--name` fragt zuerst nach (`--force`
+überspringt die Rückfrage), dann werden `layout.bxm`/`page.bxm` überschrieben und neu gefundene
 Asset-Ordner zusammengeführt, sodass das Iterieren (Quelle oder Mapping
 anpassen, erneut ausführen) der normale Workflow ist, kein
 Einmal-Vorgang.
@@ -61,9 +62,20 @@ Die Ausgabe des Befehls meldet genau, was passiert ist - welche
 Quelldatei zu `layout.bxm`/`page.bxm` wurde (oder einen Hinweis, dass
 keine gefunden wurde, falls das Quell-Theme keinen der oben genannten
 konventionellen Dateinamen verwendet), welche Asset-Ordner (`css/`,
-`js/`, `static/`, ...) unverändert nach `themes/<name>/assets/` kopiert
+`js/`, `static/`, ...) unverändert nach `.themes/<name>/assets/` kopiert
 wurden, und eine nummerierte Liste von allem, was einen manuellen Blick
 braucht.
+
+Ein kopierter `css/`- oder `js/`-Ordner ist genau so ein Punkt: alles
+unter `.themes/<name>/assets/css/`/`assets/js/` ist **nicht**
+cache-gebustet, da [Fingerprinting](../configuration.md#assets) immer nur
+eine Datei erfasst, die direkt im eigenen `assets/`-Ordner eines Themes
+liegt, nie eine, die in einem Unterordner verschachtelt ist. Um dein
+Haupt-Stylesheet/-Skript fingerprinten zu lassen, verschiebe es direkt
+nach `assets/` (z. B. `assets/style.css`) und referenziere es im
+konvertierten `layout.bxm` mit `themeAssetUrl( "style.css" )` statt mit
+dem Pfad, den der Übersetzer übernommen hat - siehe
+[Themes](themes.md#ein-theme-von-grund-auf-schreiben).
 
 Innerhalb einer Template-Datei ist dies ein **mechanischer,
 bestmöglicher Übersetzer** (`JinjaLikeTranslator.bx` für die gemeinsame

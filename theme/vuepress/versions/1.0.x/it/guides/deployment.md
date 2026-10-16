@@ -20,7 +20,7 @@ GitHub Pages.
 Ogni target tranne i due più semplici (`local`/`github-pages`, che
 funzionano soltanto con dei flag - vedi
 [Riferimento CLI](../cli-reference.md#deploy)) viene configurato tramite
-un file `deployments/<nome>.json` nella radice del progetto - un file per
+un file `deployments/<nome>.yaml` nella radice del progetto - un file per
 ogni target di deploy che usi realmente, ciascuno indicando quale
 `target` è, oltre ai campi propri di quel target:
 
@@ -28,15 +28,22 @@ ogni target di deploy che usi realmente, ciascuno indicando quale
 bxSites deploy --entry=production
 ```
 
-```json title="deployments/production.json"
-{ "target": "s3", "bucket": "my-docs-site", "accessKeyIdEnvVar": "AWS_ACCESS_KEY_ID", "secretAccessKeyEnvVar": "AWS_SECRET_ACCESS_KEY" }
+```yaml title="deployments/production.yaml"
+target: s3
+bucket: my-docs-site
+accessKeyIdEnvVar: AWS_ACCESS_KEY_ID
+secretAccessKeyEnvVar: AWS_SECRET_ACCESS_KEY
 ```
 
+Le voci possono essere YAML (`.yaml`/`.yml`), TOML (`.toml`) o JSON (`.json`) - gli stessi formati accettati dalla configurazione del sito. Le sezioni dei target qui sotto mostrano JSON, ma ogni campo funziona allo stesso modo in qualsiasi formato.
+
+I percorsi di file in una voce (`serviceAccountKeyPath`, una `key` SFTP, l'`identityFile` di rsync, una `destination` locale) possono essere assoluti, iniziare con `~/` o essere relativi alla radice del progetto.
+
 **I segreti provengono sempre da una variabile d'ambiente, mai da un
-valore letterale in `deployments/*.json`.** Ogni campo che termina in
+valore letterale in `deployments/*`.** Ogni campo che termina in
 `EnvVar` indica il nome della *variabile d'ambiente* che contiene il
 segreto vero e proprio (una chiave d'accesso, una password, un token
-API) - risolta dal vivo al momento del deploy, quindi `deployments/*.json`
+API) - risolta dal vivo al momento del deploy, quindi `deployments/*`
 di per sé è sempre sicuro da mettere sotto controllo di versione. Un
 campo che è invece un *percorso* verso un file di credenziali che già
 gestisci tu stesso (una chiave privata SSH, una chiave JSON di service
@@ -51,7 +58,7 @@ shell; in CI, impostale come veri segreti sul runner.
 ### Distribuire su tutti i target contemporaneamente
 
 Esegui `bxSites deploy` senza `--entry` né `--target` e ogni voce
-`deployments/*.json` viene distribuita a turno, a partire da un'unica
+`deployments/*` viene distribuita a turno, a partire da un'unica
 build condivisa:
 
 ```bash frame="terminal" title="Terminal"
@@ -192,6 +199,11 @@ macchina che esegue `bxSites`.
   "identityFile": "/home/me/.ssh/id_rsa"
 }
 ```
+
+I file remoti che non esistono più nella tua build vengono lasciati al
+loro posto. Aggiungi `"deleteExtraneous": true` per rimuovere anche
+quelli (il `--delete` di rsync). Un `remotePath` di `/`, `~` o `.` viene
+rifiutato - puntalo alla cartella del sito.
 
 ### `netlify`
 
@@ -344,6 +356,11 @@ bisogno - e così che venga generato anche un vero `sitemap.xml`:
 === "JSON"
     ```json title="bxsites.json"
     { "baseURL": "https://<user>.github.io/<repo>/" }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    baseURL = "https://<user>.github.io/<repo>/"
     ```
 
 Vedi [Configurazione](../configuration.md#baseurl) per il quadro completo
