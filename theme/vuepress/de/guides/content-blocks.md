@@ -563,9 +563,12 @@ etwas konfiguriert werden muss.
 > **Premium-Funktion.** `::: comments` bindet einen live moderierten
 > Besucher-Kommentarthread auf der Seite ein - dafür ist ein bxSites-
 > Cloud-Konto mit Kommentaren im eigenen Plan erforderlich, sowie
-> `cloud.comments: true` in `bxsites.yaml`. Ohne das schlägt ein
-> `::: comments`-Block den Build immer komplett fehl - dieselbe Haltung
-> wie `::: cloud` ohne `cloud.contentBlocks`.
+> `cloud.comments: true` in `bxsites.yaml`. Ohne das lässt ein
+> `::: comments`-Block den Build nicht fehlschlagen: Er wird als leerer,
+> inaktiver Platzhalter gerendert, und der Build gibt einmal eine Warnung
+> aus, die die erste betroffene Seite nennt. Anders als `::: cloud` ohne
+> `cloud.contentBlocks`, das den Build fehlschlagen lässt, weil es echte
+> Inhalte abrufen muss.
 
 ```markdown title="Beispiel" linenums="1"
 ::: comments :::

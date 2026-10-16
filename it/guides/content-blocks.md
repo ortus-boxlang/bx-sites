@@ -555,9 +555,11 @@ senza bisogno di configurazione qui.
 > **Funzionalità premium.** `::: comments` monta sulla pagina un thread
 > di commenti dei visitatori dal vivo e moderato - richiede un account
 > bxSites Cloud con i Commenti inclusi nel piano e `cloud.comments: true`
-> impostato in `bxsites.yaml`. Senza questo, un blocco `::: comments` fa
-> sempre fallire completamente la build - la stessa posizione di
-> `::: cloud` senza `cloud.contentBlocks`.
+> impostato in `bxsites.yaml`. Senza questo, un blocco `::: comments` non
+> fa fallire la build: viene reso come segnaposto vuoto e inattivo, e la
+> build stampa un avviso una sola volta, con la prima pagina interessata.
+> A differenza di `::: cloud` senza `cloud.contentBlocks`, che fa fallire
+> la build perché deve recuperare contenuto reale.
 
 ```markdown title="Esempio" linenums="1"
 ::: comments :::

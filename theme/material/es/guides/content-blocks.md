@@ -564,8 +564,11 @@ bxSites Cloud lo usa, sin necesidad de configuración aquí.
 > visitantes en vivo y moderado en la página - requiere una cuenta de
 > bxSites Cloud con Comentarios incluidos en el plan y
 > `cloud.comments: true` configurado en `bxsites.yaml`. Sin esto, un
-> bloque `::: comments` siempre falla la build por completo, la misma
-> postura que `::: cloud` sin `cloud.contentBlocks`.
+> bloque `::: comments` no hace fallar la build: se renderiza como un
+> marcador vacío e inactivo, y la build muestra una advertencia una sola
+> vez, con la primera página afectada. A diferencia de `::: cloud` sin
+> `cloud.contentBlocks`, que sí hace fallar la build porque debe obtener
+> contenido real.
 
 ```markdown title="Ejemplo" linenums="1"
 ::: comments :::

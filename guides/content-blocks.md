@@ -587,8 +587,11 @@ minute, not on every single page view.
 > **Premium feature.** `::: comments` mounts a live, moderated visitor
 > comment thread on the page - it requires a bxSites Cloud account with
 > Comments on your plan and `cloud.comments: true` set in `bxsites.yaml`.
-> Without it, a `::: comments` block always fails the build outright, the
-> same posture as `::: cloud` without `cloud.contentBlocks`.
+> Without it, a `::: comments` block does not fail the build: it renders an
+> inert, empty placeholder and the build prints a warning once, naming the
+> first page affected. That is unlike `::: cloud` without
+> `cloud.contentBlocks`, which fails the build because it has to fetch real
+> content.
 
 ```markdown title="Example" linenums="1"
 ::: comments :::
