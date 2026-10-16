@@ -170,11 +170,14 @@ riferimento completo.
 ## Dove vive una sovrascrittura di tema
 
 La sovrascrittura di tema propria di un progetto - un `.theme/` scritto a
-mano (vedi [Temi: Sovrascrivere un tema](themes.md#sovrascrivere-un-tema))
+mano (vedi [Temi: Sovrascrivere un tema](themes.md#sovrascrivere-un-tema)),
+un `.overrides/<theme>/` per tema (vedi [Temi: Sovrascritture del
+progetto](themes.md#sovrascritture-del-progetto)),
 oppure un `.themes/<name>/` installato con `install:theme` (vedi
 [Temi: Installare un tema pubblicato](themes.md#installare-un-tema-pubblicato)) -
 vive **dentro la content root risolta**, non alla radice nuda del
-progetto: `<contentRoot>/.theme/` e `<contentRoot>/.themes/<name>/`, dove
+progetto: `<contentRoot>/.theme/`, `<contentRoot>/.overrides/<theme>/` e
+`<contentRoot>/.themes/<name>/`, dove
 `<contentRoot>` è qualunque cosa risolva `source` (o il rilevamento
 automatico) - `docs/`, `src/`, un nome di cartella personalizzato, oppure
 la radice del progetto stessa per `source: .`.
@@ -190,7 +193,7 @@ my-project/
         └── page.bxm
 ```
 
-Tenere `.theme`/`.themes` dentro la content root invece che alla radice
+Tenere `.theme`/`.overrides`/`.themes` dentro la content root invece che alla radice
 nuda del progetto conta soprattutto una volta che un repository ha più
 di una content root al suo interno - vedi
 [Monorepo multi-dominio](multi-domain.md) per questo schema. La
