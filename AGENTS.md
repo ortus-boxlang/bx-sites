@@ -30,9 +30,10 @@ contracts.
   unset, `docs/` then `src/` are auto-detected; when neither exists AND
   `source` is unset, resolving throws `BxSites.SourceNotConfigured` instead of
   silently falling back to the project root - see docs/guides/content-source.md.
-- A project's `.theme/` (an authored override) and `.themes/<name>/` (an
-  `install:theme`-installed theme) both live inside that resolved content
-  root, not at the project root.
+- A project's `.theme/` (an authored, complete theme), `.overrides/<theme>/`
+  (files layered over the theme named in `theme.name`: layouts, slots,
+  assets) and `.themes/<name>/` (an `install:theme`-installed theme) all
+  live inside that resolved content root, not at the project root.
 - `site/` is always generated build output. Never treat it as a source folder;
   builds remove and recreate it.
 - Deployment configuration belongs under `deployments/`, not `deploy/`, to
