@@ -11,7 +11,7 @@ end
 function __bxsites_verb
     set -l words (commandline -opc)
     test (count $words) -ge 2; or return 1
-    if test (count $words) -ge 3; and contains -- "$words[2]:$words[3]" agents:sync blog:drafts blog:find i18n:new i18n:status install:plugin install:theme page:new page:rename plugin:new post:new search:query skills:install theme:import theme:new version:new
+    if test (count $words) -ge 3; and contains -- "$words[2]:$words[3]" agents:sync blog:drafts blog:find i18n:new i18n:status install:plugin install:theme layout:new page:new page:rename plugin:new post:new search:query skills:install theme:import theme:new version:new
         echo "$words[2]:$words[3]"
     else
         echo $words[2]
@@ -47,6 +47,7 @@ complete -c bxSites -n __bxsites_needs_verb -a 'i18n:new' -d 'Scaffold a new doc
 complete -c bxSites -n __bxsites_needs_verb -a 'i18n:status' -d 'Report per-locale translation coverage against the default tree'
 complete -c bxSites -n __bxsites_needs_verb -a 'install:plugin' -d 'Download a plugin from ForgeBox into boxlang_modules/'
 complete -c bxSites -n __bxsites_needs_verb -a 'install:theme' -d 'Download a theme from ForgeBox into your content root\'s .themes/<name>/'
+complete -c bxSites -n __bxsites_needs_verb -a 'layout:new' -d 'Scaffold a named layout in .overrides/<theme>/ by copying a template of the active theme'
 complete -c bxSites -n __bxsites_needs_verb -a 'lint' -d 'Pre-build content checks: heading level skips, blog posts missing a valid date'
 complete -c bxSites -n __bxsites_needs_verb -a 'migrate' -d 'Convert a GitBook export, mkdocs project, plain zip of Markdown, or Notion export into a...'
 complete -c bxSites -n __bxsites_needs_verb -a 'new' -d 'Scaffold a new project'
@@ -71,6 +72,7 @@ complete -c bxSites -n '__bxsites_using_group agents' -a 'sync'
 complete -c bxSites -n '__bxsites_using_group blog' -a 'drafts find'
 complete -c bxSites -n '__bxsites_using_group i18n' -a 'new status'
 complete -c bxSites -n '__bxsites_using_group install' -a 'plugin theme'
+complete -c bxSites -n '__bxsites_using_group layout' -a 'new'
 complete -c bxSites -n '__bxsites_using_group page' -a 'new rename'
 complete -c bxSites -n '__bxsites_using_group plugin' -a 'new'
 complete -c bxSites -n '__bxsites_using_group post' -a 'new'
@@ -123,6 +125,10 @@ complete -c bxSites -n '__bxsites_using_verb install:plugin' -l projectRoot -r -
 complete -c bxSites -n '__bxsites_using_verb install:theme' -l name -x
 complete -c bxSites -n '__bxsites_using_verb install:theme' -l version -x
 complete -c bxSites -n '__bxsites_using_verb install:theme' -l projectRoot -r -F
+complete -c bxSites -n '__bxsites_using_verb layout:new' -l name -x
+complete -c bxSites -n '__bxsites_using_verb layout:new' -l from -x -a 'page'
+complete -c bxSites -n '__bxsites_using_verb layout:new' -l theme -x -a 'bootstrap docsy docusaurus gitbook justthedocs material notion slate tailwind vuepress'
+complete -c bxSites -n '__bxsites_using_verb layout:new' -l projectRoot -r -F
 complete -c bxSites -n '__bxsites_using_verb lint' -l projectRoot -r -F
 complete -c bxSites -n '__bxsites_using_verb migrate' -l source -r -F
 complete -c bxSites -n '__bxsites_using_verb migrate' -l from -x -a 'gitbook mkdocs markdown-zip notion'
@@ -183,4 +189,4 @@ complete -c bxSites -n '__bxsites_using_verb theme:new' -l theme -x -a 'bootstra
 complete -c bxSites -n '__bxsites_using_verb theme:new' -l projectRoot -r -F
 complete -c bxSites -n '__bxsites_using_verb version:new' -l name -x
 complete -c bxSites -n '__bxsites_using_verb version:new' -l projectRoot -r -F
-complete -c bxSites -n '__bxsites_using_verb help' -a 'agents:sync audit blog:drafts blog:find build clean coldbox deploy docbox doctor gh-deploy i18n:new i18n:status install:plugin install:theme lint migrate new package page:new page:rename plugin:new post:new publish search-index search:query serve skills:install stats theme:import theme:new version:new help'
+complete -c bxSites -n '__bxsites_using_verb help' -a 'agents:sync audit blog:drafts blog:find build clean coldbox deploy docbox doctor gh-deploy i18n:new i18n:status install:plugin install:theme layout:new lint migrate new package page:new page:rename plugin:new post:new publish search-index search:query serve skills:install stats theme:import theme:new version:new help'

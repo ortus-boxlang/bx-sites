@@ -21,7 +21,7 @@ _bxsites_complete() {
 	fi
 	local count=${#words[@]}
 	local cur="${words[count-1]}"
-	local verbs="agents:sync audit blog:drafts blog:find build clean coldbox deploy docbox doctor gh-deploy i18n:new i18n:status install:plugin install:theme lint migrate new package page:new page:rename plugin:new post:new publish search-index search:query serve skills:install stats theme:import theme:new version:new help"
+	local verbs="agents:sync audit blog:drafts blog:find build clean coldbox deploy docbox doctor gh-deploy i18n:new i18n:status install:plugin install:theme layout:new lint migrate new package page:new page:rename plugin:new post:new publish search-index search:query serve skills:install stats theme:import theme:new version:new help"
 	local globals="--help -h --version -v"
 	COMPREPLY=()
 
@@ -44,6 +44,7 @@ _bxsites_complete() {
 			blog) seconds="drafts find" ;;
 			i18n) seconds="new status" ;;
 			install) seconds="plugin theme" ;;
+			layout) seconds="new" ;;
 			page) seconds="new rename" ;;
 			plugin) seconds="new" ;;
 			post) seconds="new" ;;
@@ -86,6 +87,9 @@ _bxsites_complete() {
 			"i18n:status --projectRoot") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;
 			"install:plugin --projectRoot") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;
 			"install:theme --projectRoot") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;
+			"layout:new --from") COMPREPLY=($(compgen -W "page" -- "$part")) ;;
+			"layout:new --theme") COMPREPLY=($(compgen -W "bootstrap docsy docusaurus gitbook justthedocs material notion slate tailwind vuepress" -- "$part")) ;;
+			"layout:new --projectRoot") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;
 			"lint --projectRoot") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;
 			"migrate --source") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;
 			"migrate --from") COMPREPLY=($(compgen -W "gitbook mkdocs markdown-zip notion" -- "$part")) ;;
@@ -139,6 +143,7 @@ _bxsites_complete() {
 			i18n:status) flags="--projectRoot=" ;;
 			install:plugin) flags="--name= --version= --projectRoot=" ;;
 			install:theme) flags="--name= --version= --projectRoot=" ;;
+			layout:new) flags="--name= --from= --theme= --projectRoot=" ;;
 			lint) flags="--projectRoot=" ;;
 			migrate) flags="--source= --from= --force --projectRoot=" ;;
 			new) flags="--theme= --name= --source= --docs --site --agents= --description= --format= --no-agents --projectRoot=" ;;

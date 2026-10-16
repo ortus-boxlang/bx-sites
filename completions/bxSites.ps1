@@ -22,6 +22,7 @@ Register-ArgumentCompleter -Native -CommandName 'bxSites', 'bxsites' -ScriptBloc
 		'i18n:status' = 'Report per-locale translation coverage against the default tree'
 		'install:plugin' = 'Download a plugin from ForgeBox into boxlang_modules/'
 		'install:theme' = 'Download a theme from ForgeBox into your content root''s .themes/<name>/'
+		'layout:new' = 'Scaffold a named layout in .overrides/<theme>/ by copying a template of the active theme'
 		'lint' = 'Pre-build content checks: heading level skips, blog posts missing a valid date'
 		'migrate' = 'Convert a GitBook export, mkdocs project, plain zip of Markdown, or Notion export into a...'
 		'new' = 'Scaffold a new project'
@@ -114,6 +115,12 @@ Register-ArgumentCompleter -Native -CommandName 'bxSites', 'bxsites' -ScriptBloc
 		'install:theme' = @(
 			@{ Name = 'name'; Value = $true; Choices = @(); File = $false }
 			@{ Name = 'version'; Value = $true; Choices = @(); File = $false }
+			@{ Name = 'projectRoot'; Value = $true; Choices = @(); File = $true }
+		)
+		'layout:new' = @(
+			@{ Name = 'name'; Value = $true; Choices = @(); File = $false }
+			@{ Name = 'from'; Value = $true; Choices = @('page'); File = $false }
+			@{ Name = 'theme'; Value = $true; Choices = @('bootstrap', 'docsy', 'docusaurus', 'gitbook', 'justthedocs', 'material', 'notion', 'slate', 'tailwind', 'vuepress'); File = $false }
 			@{ Name = 'projectRoot'; Value = $true; Choices = @(); File = $true }
 		)
 		'lint' = @(

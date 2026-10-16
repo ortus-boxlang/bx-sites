@@ -1,0 +1,38 @@
+/**
+ * `layout:new` CLI verb - thin dispatcher over LayoutScaffolder.scaffold().
+ */
+class {
+
+	/**
+	 * @options { projectRoot (required, absolute path), name (required - bare template name), from (template to copy, default "page"), theme (defaults to the project's theme.name) }
+	 */
+	struct function run( struct options = {} ) {
+		var projectRoot = trim( arguments.options.projectRoot ?: "" )
+		if ( !len( projectRoot ) ) {
+			throw( type = "BxSites.MissingProjectRoot", message = "`layout:new` requires a project root" )
+		}
+
+		var name = trim( arguments.options.name ?: "" )
+		if ( !len( name ) ) {
+			throw( type = "BxSites.MissingLayoutName", message = "`layout:new` requires --name=<layout name>" )
+		}
+
+		var theme = trim( arguments.options.theme ?: "" )
+		if ( !len( theme ) ) {
+			theme = new "models.config.ConfigLoader@bxsites"().load( projectRoot ).theme.name
+		}
+
+		var result = new "models.build.LayoutScaffolder@bxsites"().scaffold(
+			projectRoot : projectRoot,
+			theme       : theme,
+			name        : name,
+			from        : trim( arguments.options.from ?: "" )
+		)
+
+		return {
+			exitCode : 0,
+			message  : "Created layout [#name#] at #result.path# (copied from #result.from#.bxm); use it with `layout: #name#` in a page's frontmatter or a `layouts:` rule in bxsites.yaml"
+		}
+	}
+
+}

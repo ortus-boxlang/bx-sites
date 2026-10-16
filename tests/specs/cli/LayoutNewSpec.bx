@@ -1,0 +1,118 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "cli.LayoutNew", function() {
+
+			beforeEach( function() {
+				variables.verb = new "models.cli.LayoutNew@bxsites"();
+				variables.tempDirs = [];
+			} );
+
+			afterEach( function() {
+				for ( var dir in tempDirs ) {
+					if ( directoryExists( dir ) ) {
+						directoryDelete( dir, true );
+					}
+				}
+			} );
+
+			private function newProject( string config = '{"name":"Test Site","theme":{"name":"bootstrap"}}' ) {
+				var dir = createTempDirectory( prefix = "bxsites-layoutnew-" );
+				tempDirs.append( dir );
+				directoryCreate( dir & "/docs", true, true );
+				fileWrite( dir & "/bxsites.json", config );
+				return dir;
+			}
+
+			it( "throws BxSites.MissingProjectRoot without a project root", function() {
+				expect( function() {
+					verb.run( { name : "landing" } );
+				} ).toThrow( "BxSites.MissingProjectRoot" );
+			} );
+
+			it( "throws BxSites.MissingLayoutName without --name", function() {
+				var root = newProject();
+				expect( function() {
+					verb.run( { projectRoot : root } );
+				} ).toThrow( "BxSites.MissingLayoutName" );
+			} );
+
+			it( "copies the active theme's page.bxm to .overrides/<theme>/<name>.bxm", function() {
+				var root = newProject();
+
+				var result = verb.run( { projectRoot : root, name : "landing" } );
+
+				var target = root & "/docs/.overrides/bootstrap/landing.bxm";
+				expect( result.exitCode ).toBe( 0 );
+				expect( fileExists( target ) ).toBeTrue();
+				expect( fileRead( target ) ).toBe( fileRead( new "models.build.ThemeRenderer@bxsites"().resolveThemeDir( "bootstrap", root ) & "/page.bxm" ) );
+			} );
+
+			it( "copies another template with --from", function() {
+				var root = newProject();
+
+				verb.run( { projectRoot : root, name : "front", from : "home" } );
+
+				expect( fileExists( root & "/docs/.overrides/bootstrap/front.bxm" ) ).toBeTrue();
+			} );
+
+			it( "uses --theme instead of the configured theme", function() {
+				var root = newProject();
+
+				verb.run( { projectRoot : root, name : "landing", theme : "material" } );
+
+				expect( fileExists( root & "/docs/.overrides/material/landing.bxm" ) ).toBeTrue();
+			} );
+
+			it( "refuses to overwrite an existing layout", function() {
+				var root = newProject();
+				verb.run( { projectRoot : root, name : "landing" } );
+
+				expect( function() {
+					verb.run( { projectRoot : root, name : "landing" } );
+				} ).toThrow( "BxSites.LayoutExists" );
+			} );
+
+			it( "rejects a name that is not a bare template name", function() {
+				var root = newProject();
+				expect( function() {
+					verb.run( { projectRoot : root, name : "../evil" } );
+				} ).toThrow( "BxSites.InvalidLayoutName" );
+			} );
+
+			it( "lists the available templates when --from names one the theme lacks", function() {
+				var root = newProject();
+				expect( function() {
+					verb.run( { projectRoot : root, name : "x", from : "nope" } );
+				} ).toThrow( "BxSites.LayoutSourceNotFound", "page" );
+			} );
+
+			it( "writes into a complete flat .theme/ when the project has one", function() {
+				var root = newProject();
+				directoryCreate( root & "/docs/.theme", true, true );
+				fileWrite( root & "/docs/.theme/layout.bxm", "<bx:output>l</bx:output>" );
+				fileWrite( root & "/docs/.theme/page.bxm", "<bx:output>p</bx:output>" );
+
+				verb.run( { projectRoot : root, name : "landing" } );
+
+				expect( fileRead( root & "/docs/.theme/landing.bxm" ) ).toInclude( "p" );
+				expect( directoryExists( root & "/docs/.overrides" ) ).toBeFalse();
+			} );
+
+			it( "the new layout is picked up by a build via frontmatter", function() {
+				var root = newProject();
+				verb.run( { projectRoot : root, name : "plain" } );
+				fileWrite( root & "/docs/.overrides/bootstrap/plain.bxm", "<bx:output><div class=""scaffolded"">##variables.page.contentHtml##</div></bx:output>" );
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "layout: plain" & char( 10 ) & "---" & char( 10 ) & "Hello" );
+				var pipeline = new "models.build.BuildPipeline@bxsites"();
+				pipeline.setMarkdownRenderer( new "tests.support.FakeMarkdownRenderer@bxsites"() );
+
+				pipeline.build( root );
+
+				expect( fileRead( root & "/site/index.html" ) ).toInclude( "scaffolded" );
+			} );
+
+		} );
+	}
+
+}
