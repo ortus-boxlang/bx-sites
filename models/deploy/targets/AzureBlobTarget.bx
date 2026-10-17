@@ -129,7 +129,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 * @return The normalized prefix, or "" if none was configured
 	 */
 	string function normalizePrefix( required string prefix ) {
-		return trim( arguments.prefix ).reReplace( "^[\/]+", "" )
+		return trim( arguments.prefix ).reReplace( "^[\\\/]+", "" )
 	}
 
 	/**
@@ -146,7 +146,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 */
 	string function buildBlobName( required string prefix, required string relativePath ) {
 		var backslash = char( 92 )
-		var normalized = arguments.relativePath.replace( backslash, "/", "all" ).reReplace( "^[\/]+", "" )
+		var normalized = arguments.relativePath.replace( backslash, "/", "all" ).reReplace( "^[\\\/]+", "" )
 		return arguments.prefix & normalized
 	}
 

@@ -115,7 +115,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 
 		// The whole server or a home folder is never a site directory - syncing
 		// into one scatters the site there (and with --delete, wipes it)
-		var normalizedRemote = remotePath.reReplace( "[\/]+$", "" )
+		var normalizedRemote = remotePath.reReplace( "[\\\/]+$", "" )
 		if ( !len( normalizedRemote ) || normalizedRemote == "~" || normalizedRemote == "." ) {
 			throw(
 				type    = "BxSites.InvalidDeployConfig",
@@ -147,7 +147,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 		cmd.append( "-e" )
 		cmd.append( sshCmd )
 		cmd.append( arguments.siteDir.reReplace( "[\\\/]+$", "" ) & "/" )
-		cmd.append( "#username#@#host#:#remotePath.reReplace( '[\/]+$', '' )#/" )
+		cmd.append( "#username#@#host#:#remotePath.reReplace( '[\\\/]+$', '' )#/" )
 
 		return cmd
 	}

@@ -109,7 +109,7 @@ class {
 	 * @return Its directory, e.g. "guides" - "" for a root-level page
 	 */
 	private string function directoryOf( required string relativePath ) {
-		var segments = listToArray( arguments.relativePath, "/", true )
+		var segments = listToArray( arguments.relativePath.replace( char( 92 ), "/", "all" ), "/", true )
 		segments.deleteAt( segments.len() )
 		return segments.toList( "/" )
 	}
@@ -120,7 +120,7 @@ class {
 	 * @return true when `src` is explicitly `./`- or `../`-prefixed (resolve against the including page's own directory) - false for a bare path (resolve against the tree's own includes/ instead)
 	 */
 	private boolean function isExplicitRelative( required string src ) {
-		return arguments.src.reFind( "^\.\.?[\/]" ) > 0
+		return arguments.src.reFind( "^\.\.?[\\\/]" ) > 0
 	}
 
 	/**
@@ -133,7 +133,8 @@ class {
 	 */
 	private string function resolvePath( required string baseDir, required string relativePath ) {
 		var stack = []
-		for ( var segment in listToArray( arguments.baseDir & "/" & arguments.relativePath, "/", true ) ) {
+		var normalizedPath = ( arguments.baseDir & "/" & arguments.relativePath ).replace( char( 92 ), "/", "all" )
+		for ( var segment in listToArray( normalizedPath, "/", true ) ) {
 			if ( segment == "." || !len( segment ) ) {
 				continue
 			} else if ( segment == ".." ) {

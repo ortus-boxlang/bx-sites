@@ -140,7 +140,7 @@ class {
 	 * @basePath This tree's own root-relative base path ending with `/`
 	 */
 	private string function resolveTarget( required string to, required string basePath ) {
-		return arguments.to.reFindNoCase( "^[a-z][a-z0-9+.\-]*://" ) ? arguments.to : arguments.basePath & arguments.to.reReplace( "^[\/]+", "" )
+		return arguments.to.reFindNoCase( "^[a-z][a-z0-9+.\-]*://" ) ? arguments.to : arguments.basePath & arguments.to.reReplace( "^[\\\/]+", "" )
 	}
 
 	/**

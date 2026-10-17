@@ -59,7 +59,7 @@ class {
 
 		var filesUpdated = 0
 		var allMdFiles = directoryList( trimmedDocsDir, true, "path", "*.md" )
-			.filter( path => !toSiteRelative( path, trimmedDocsDir ).reFindNoCase( "^assets[\/]" ) )
+			.filter( path => !toSiteRelative( path, trimmedDocsDir ).reFindNoCase( "^assets[\\\/]" ) )
 
 		for ( var filePath in allMdFiles ) {
 			var original = fileRead( filePath )
@@ -103,7 +103,7 @@ class {
 	 * @missingMessage Exception message to throw when blank
 	 */
 	private string function normalizeRelativePath( required string raw, required string missingType, required string missingMessage ) {
-		var trimmed = trim( arguments.raw ).replace( char( 92 ), "/", "all" ).reReplace( "^[\/]+", "" )
+		var trimmed = trim( arguments.raw ).replace( char( 92 ), "/", "all" ).reReplace( "^[\\\/]+", "" )
 		if ( !len( trimmed ) ) {
 			throw( type = arguments.missingType, message = arguments.missingMessage )
 		}

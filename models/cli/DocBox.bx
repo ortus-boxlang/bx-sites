@@ -184,7 +184,7 @@ class {
 	 * @path The raw configured path
 	 */
 	private string function resolvePath( required string projectRoot, required string path ) {
-		if ( arguments.path.startsWith( "/" ) || reFind( "^[A-Za-z]:[\/]", arguments.path ) ) {
+		if ( arguments.path.startsWith( "/" ) || reFind( "^[A-Za-z]:[\\\/]", arguments.path ) ) {
 			return arguments.path.reReplace( "[\\\/]+$", "" )
 		}
 
