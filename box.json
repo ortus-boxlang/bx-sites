@@ -36,7 +36,7 @@
     "dependencies":{
         "bx-markdown":"*",
         "bx-esapi":"*",
-        "bx-yaml":"*",
+        "bx-yaml":"^1.1.0",
         "bx-image":"*",
         "bx-ftp":"*",
         "bx-toml":"*"
