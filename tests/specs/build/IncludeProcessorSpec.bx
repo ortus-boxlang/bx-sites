@@ -24,6 +24,17 @@ class extends="testbox.system.BaseSpec" {
 				expect( processor.isExplicitRelative( "note.md" ) ).toBeFalse();
 			} );
 
+			it( "resolves nested Windows-style includes relative to each including file", function() {
+				directoryCreate( docsDir & "/guides/partials", true, true );
+				fileWrite( docsDir & "/guides/partials/note.md", '::: include src=".\fragment.md"' );
+				fileWrite( docsDir & "/guides/partials/fragment.md", '::: include src="..\shared.md"' );
+				fileWrite( docsDir & "/guides/shared.md", "Shared content." );
+
+				var result = processor.process( '::: include src=".\partials\note.md"', docsDir, "guides\setup.md" );
+
+				expect( result ).toBe( "Shared content." );
+			} );
+
 			it( "resolves a bare src against the tree's own includes/ folder", function() {
 				directoryCreate( docsDir & "/includes", true, true );
 				fileWrite( docsDir & "/includes/note.md", "Shared note." );
