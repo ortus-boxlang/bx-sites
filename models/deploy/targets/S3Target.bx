@@ -233,7 +233,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 */
 	string function buildObjectKey( required string prefix, required string relativePath ) {
 		var backslash = char( 92 )
-		var cleanRelative = arguments.relativePath.replace( backslash, "/", "all" ).reReplace( "^[\/]+", "" )
+		var cleanRelative = arguments.relativePath.replace( backslash, "/", "all" ).reReplace( "^[\\\/]+", "" )
 		return normalizePrefix( arguments.prefix ) & cleanRelative
 	}
 
@@ -247,7 +247,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 * @return The normalized prefix
 	 */
 	string function normalizePrefix( required string prefix ) {
-		var cleaned = trim( arguments.prefix ).reReplace( "^[\/]+", "" )
+		var cleaned = trim( arguments.prefix ).reReplace( "^[\\\/]+", "" )
 		if ( !len( cleaned ) ) {
 			return ""
 		}

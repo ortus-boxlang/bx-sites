@@ -112,10 +112,10 @@ class {
 		var normalizedPath = normalize( arguments.filePath )
 
 		if ( isUnder( normalizedBase, normalizedPath ) ) {
-			return normalizedPath.mid( normalizedBase.len() + 1, normalizedPath.len() ).reReplace( "^[\/]+", "" )
+			return normalizedPath.mid( normalizedBase.len() + 1, normalizedPath.len() ).reReplace( "^[\\\/]+", "" )
 		}
 
-		return normalizedPath.reReplace( "^[\/]+", "" )
+		return normalizedPath.reReplace( "^[\\\/]+", "" )
 	}
 
 }

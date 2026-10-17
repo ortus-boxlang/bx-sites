@@ -46,6 +46,14 @@ class extends="testbox.system.BaseSpec" {
 				expect( moduleConfig.dispatch( [ "-v" ] ) ).toBe( 0 );
 			} );
 
+			it( "strips trailing Windows and Unix separators from project roots", function() {
+				makePublic( moduleConfig, "resolveProjectRoot" );
+
+				expect( moduleConfig.resolveProjectRoot( { projectRoot : "C:\Users\name\site\" } ) ).toBe( "C:\Users\name\site" );
+				expect( moduleConfig.resolveProjectRoot( { _positional : "C:\Users\name\site\/" } ) ).toBe( "C:\Users\name\site" );
+				expect( moduleConfig.resolveProjectRoot( { projectRoot : "/home/user/site/" } ) ).toBe( "/home/user/site" );
+			} );
+
 			it( "dispatches `new` with an absolute --projectRoot flag and returns exit code 0", function() {
 				var parent = newTempDir();
 				var projectRoot = parent & "/site";

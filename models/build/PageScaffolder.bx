@@ -26,7 +26,7 @@ class {
 		string tags = "",
 		string order = ""
 	) {
-		var trimmedPath = trim( arguments.path ).reReplace( "^[\/]+", "" )
+		var trimmedPath = trim( arguments.path ).reReplace( "^[\\\/]+", "" )
 		if ( !len( trimmedPath ) ) {
 			throw( type = "BxSites.MissingPagePath", message = "`page:new` requires --path=<relative path>.md" )
 		}

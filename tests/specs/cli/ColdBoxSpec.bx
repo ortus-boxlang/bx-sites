@@ -21,6 +21,16 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "recognizes Windows app roots without prepending the project root", function() {
+				makePublic( verb, "resolveAppRoot" );
+
+				expect( verb.resolveAppRoot( "/project", {}, { appRoot : "C:\apps\demo\" } ) ).toBe( "C:\apps\demo" );
+				expect( verb.resolveAppRoot( "/project", { appRoot : "C:\apps\demo\" }, {} ) ).toBe( "C:\apps\demo" );
+				expect( verb.resolveAppRoot( "/project", {}, { appRoot : "C:/apps/demo/" } ) ).toBe( "C:/apps/demo" );
+				expect( verb.resolveAppRoot( "/project", {}, { appRoot : "/apps/demo/" } ) ).toBe( "/apps/demo" );
+				expect( verb.resolveAppRoot( "/project", {}, { appRoot : "app" } ) ).toBe( "/project/app" );
+			} );
+
 			private void function writeFile( required string path, required string content ) {
 				var parent = path.reReplace( "/[^/]+$", "" );
 				if ( !directoryExists( parent ) ) {

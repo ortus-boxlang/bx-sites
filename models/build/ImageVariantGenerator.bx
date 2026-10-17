@@ -85,7 +85,7 @@ class {
 	void function copyToOutput( required struct manifest, required string outputAssetsDir ) {
 		for ( var key in arguments.manifest ) {
 			var entry = arguments.manifest[ key ]
-			var relativeKey = key.reReplace( "^assets[\/]", "" )
+			var relativeKey = key.reReplace( "^assets[\\\/]", "" )
 			var relativeDir = directoryOf( relativeKey )
 			var destDir = arguments.outputAssetsDir & ( len( relativeDir ) ? "/" & relativeDir : "" )
 			directoryCreate( destDir, true, true )

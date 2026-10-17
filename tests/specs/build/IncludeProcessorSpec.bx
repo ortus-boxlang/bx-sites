@@ -14,6 +14,16 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			it( "recognizes explicit relative paths with either separator", function() {
+				makePublic( processor, "isExplicitRelative" );
+
+				expect( processor.isExplicitRelative( ".\note.md" ) ).toBeTrue();
+				expect( processor.isExplicitRelative( "..\note.md" ) ).toBeTrue();
+				expect( processor.isExplicitRelative( "./note.md" ) ).toBeTrue();
+				expect( processor.isExplicitRelative( "../note.md" ) ).toBeTrue();
+				expect( processor.isExplicitRelative( "note.md" ) ).toBeFalse();
+			} );
+
 			it( "resolves a bare src against the tree's own includes/ folder", function() {
 				directoryCreate( docsDir & "/includes", true, true );
 				fileWrite( docsDir & "/includes/note.md", "Shared note." );

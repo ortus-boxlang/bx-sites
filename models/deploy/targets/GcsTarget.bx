@@ -102,8 +102,8 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 	 * @return The URL-encoded object name, safe to place directly after `name=` in a query string
 	 */
 	string function buildObjectName( required string prefix, required string relativePath ) {
-		var normalizedRelative = arguments.relativePath.replace( char( 92 ), "/", "all" ).reReplace( "^[\/]+", "" )
-		var normalizedPrefix = trim( arguments.prefix ).replace( char( 92 ), "/", "all" ).reReplace( "^[\/]+", "" ).reReplace( "[\\\/]+$", "" )
+		var normalizedRelative = arguments.relativePath.replace( char( 92 ), "/", "all" ).reReplace( "^[\\\/]+", "" )
+		var normalizedPrefix = trim( arguments.prefix ).replace( char( 92 ), "/", "all" ).reReplace( "^[\\\/]+", "" ).reReplace( "[\\\/]+$", "" )
 		var objectName = len( normalizedPrefix ) ? normalizedPrefix & "/" & normalizedRelative : normalizedRelative
 
 		return urlEncodedFormat( objectName ).reReplaceNoCase( "%2F", "/", "all" )
