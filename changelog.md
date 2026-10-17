@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* Requires `bx-yaml` 1.1.0 or later, which fixed YAML lists coming back wrapped in an extra array. bx-sites no longer repairs them itself (the repair flattened a list holding exactly one inner list), and a clear `BxSites.UnsupportedYamlModule` error replaces silent double wrapped lists when an older `bx-yaml` is installed.
+* Requires `bx-yaml` 1.1.0 or later, which fixed YAML lists coming back wrapped in an extra array. bx-sites no longer repairs them itself (the repair flattened a list holding exactly one inner list), and a clear `BxSites.UnsupportedYamlModule` error replaces silent double wrapped lists when an older `bx-yaml` is installed. The `box.json` dependency is `*`, so `install-bx-module` installs the latest `bx-yaml` (it does not resolve version ranges like `^1.1.0`).
 
 ### Added
 
