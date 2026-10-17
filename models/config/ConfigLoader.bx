@@ -55,6 +55,7 @@ class {
 			"analytics"    : { "provider" : "", "id" : "" },
 			"ogImage"      : "",
 			"generateOgImages" : false,
+			"ogCard"       : {},
 			"extraCss"     : [],
 			"extraJs"      : [],
 			"assets"       : {
@@ -548,6 +549,29 @@ class {
 				type    = "BxSites.InvalidConfig",
 				message = "#variables.configFileName# [generateOgImages], when present, must be a boolean"
 			)
+		}
+
+		if ( !isStruct( arguments.config.ogCard ?: {} ) ) {
+			throw(
+				type    = "BxSites.InvalidConfig",
+				message = "#variables.configFileName# [ogCard], when present, must be an object"
+			)
+		}
+		for ( var ogCardKey in [ "background", "accent", "accentEnd", "text", "muted", "logo", "font" ] ) {
+			if ( !isSimpleValue( ( arguments.config.ogCard ?: {} )[ ogCardKey ] ?: "" ) ) {
+				throw(
+					type    = "BxSites.InvalidConfig",
+					message = "#variables.configFileName# [ogCard.#ogCardKey#], when present, must be a string"
+				)
+			}
+		}
+		for ( var ogCardFlag in [ "description", "url", "section" ] ) {
+			if ( !isBoolean( ( arguments.config.ogCard ?: {} )[ ogCardFlag ] ?: true ) ) {
+				throw(
+					type    = "BxSites.InvalidConfig",
+					message = "#variables.configFileName# [ogCard.#ogCardFlag#], when present, must be a boolean"
+				)
+			}
 		}
 
 		for ( var assetsKey in [ "extraCss", "extraJs" ] ) {

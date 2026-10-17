@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Generated social cards (`generateOgImages`) are redesigned: a brand-tinted background with glow and rings, the site logo and name, a section chip, the page title, the page description and its URL, and the accent gradient bar. Accent colors come from `theme.options.accentColor` and `accentColorDark`, the logo from `theme.logo` when it is a raster image, and the new optional `ogCard` object tunes colors, logo, font and which parts are drawn. The three-argument `SocialCardGenerator.generate()` call still works.
 * Requires `bx-yaml` 1.1.0 or later, which fixed YAML lists coming back wrapped in an extra array. bx-sites no longer repairs them itself (the repair flattened a list holding exactly one inner list), and a clear `BxSites.UnsupportedYamlModule` error replaces silent double wrapped lists when an older `bx-yaml` is installed.
 
 ### Added

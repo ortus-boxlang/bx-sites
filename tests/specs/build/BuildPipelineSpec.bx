@@ -2005,6 +2005,28 @@ class extends="testbox.system.BaseSpec" {
 				expect( html ).toInclude( '<meta property="og:image" content="/assets/og/home.png">' );
 			} );
 
+			it( "renders the social card from [ogCard], the theme accent colors and the page's own description", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","baseURL":"https://example.com/","theme":{"name":"bootstrap","options":{"accentColor":"##00ff78","accentColorDark":"##00dbff"}},"generateOgImages":true,"ogCard":{"section":false,"url":true}}'
+				);
+				fileWrite( root & "/docs/index.md", "---" & char( 10 ) & "title: Home" & char( 10 ) & "description: A short description" & char( 10 ) & "---" & char( 10 ) & "Welcome" );
+				directoryCreate( root & "/docs/guides", true, true );
+				fileWrite( root & "/docs/guides/setup.md", "Setup" );
+
+				pipeline.build( root );
+
+				var image = createObject( "java", "javax.imageio.ImageIO" ).read( createObject( "java", "java.io.File" ).init( root & "/site/assets/og/guides-setup.png" ) );
+				expect( image.getWidth() ).toBe( 1200 );
+				// the bottom bar runs from the theme accent (green) to accentDark (cyan)
+				var left = createObject( "java", "java.awt.Color" ).init( javaCast( "int", image.getRGB( 2, 625 ) ) );
+				var right = createObject( "java", "java.awt.Color" ).init( javaCast( "int", image.getRGB( 1197, 625 ) ) );
+				expect( left.getGreen() ).toBeGT( 200 );
+				expect( left.getBlue() ).toBeLT( 160 );
+				expect( right.getBlue() ).toBeGT( 200 );
+			} );
+
 			it( "prefers a page's own frontmatter [ogImage] over auto-generating one", function() {
 				var root = newProject();
 				fileWrite(

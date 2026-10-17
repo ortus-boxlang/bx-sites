@@ -51,6 +51,64 @@ class extends="testbox.system.BaseSpec" {
 				expect( image.getHeight() ).toBe( 630 );
 			} );
 
+			it( "renders a card with every option set and a raster logo", function() {
+				var outputPath = newOutputPath();
+				var logoPath = getDirectoryFromPath( outputPath ) & "logo.png";
+				var logo = createObject( "java", "java.awt.image.BufferedImage" ).init( 64, 32, 2 );
+				createObject( "java", "javax.imageio.ImageIO" ).write( logo, "png", createObject( "java", "java.io.File" ).init( logoPath ) );
+
+				generator.generate( "A Page Title", "My Site", outputPath, {
+					description : "What this page is about, in a sentence or two.",
+					section     : "Getting Started",
+					url         : "example.com/getting-started/page",
+					logoPath    : logoPath,
+					background  : "##101820",
+					accent      : "##f0a",
+					accentEnd   : "##00DBFF",
+					text        : "##ffffff",
+					muted       : "##99aab5"
+				} );
+
+				var image = createObject( "java", "javax.imageio.ImageIO" ).read( createObject( "java", "java.io.File" ).init( outputPath ) );
+				expect( image.getWidth() ).toBe( 1200 );
+				expect( image.getHeight() ).toBe( 630 );
+			} );
+
+			it( "paints the accent gradient along the bottom edge", function() {
+				var outputPath = newOutputPath();
+
+				generator.generate( "Title", "My Site", outputPath, { accent : "##ff0000", accentEnd : "##0000ff" } );
+
+				var image = createObject( "java", "javax.imageio.ImageIO" ).read( createObject( "java", "java.io.File" ).init( outputPath ) );
+				var left = createObject( "java", "java.awt.Color" ).init( javaCast( "int", image.getRGB( 2, 625 ) ) );
+				var right = createObject( "java", "java.awt.Color" ).init( javaCast( "int", image.getRGB( 1197, 625 ) ) );
+				expect( left.getRed() ).toBeGT( left.getBlue() );
+				expect( right.getBlue() ).toBeGT( right.getRed() );
+			} );
+
+			it( "falls back to the default colors for an invalid color value", function() {
+				var outputPath = newOutputPath();
+
+				generator.generate( "Title", "My Site", outputPath, { accent : "not-a-color", background : "##12" } );
+
+				expect( fileExists( outputPath ) ).toBeTrue();
+			} );
+
+			it( "ignores a logo or font that is missing or not a raster image", function() {
+				var outputPath = newOutputPath();
+				var notAnImage = getDirectoryFromPath( outputPath ) & "logo.svg";
+				fileWrite( notAnImage, "<svg xmlns='http://www.w3.org/2000/svg'/>" );
+
+				generator.generate( "Title", "My Site", outputPath, {
+					logoPath : notAnImage,
+					fontPath : getDirectoryFromPath( outputPath ) & "missing.ttf"
+				} );
+				expect( fileExists( outputPath ) ).toBeTrue();
+
+				generator.generate( "Title", "My Site", outputPath, { logoPath : getDirectoryFromPath( outputPath ) & "missing.png" } );
+				expect( fileExists( outputPath ) ).toBeTrue();
+			} );
+
 			it( "produces a valid PNG for an empty title", function() {
 				var outputPath = newOutputPath();
 

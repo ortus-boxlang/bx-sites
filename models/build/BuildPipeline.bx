@@ -770,7 +770,7 @@ class {
 			)
 			assignTableOfContents( blogPosts )
 			assignEditAndLastUpdated( blogPosts, config, root, "" )
-			assignOgImages( blogPosts, config, siteDir )
+			assignOgImages( blogPosts, config, siteDir, docsDir )
 			assignMarkdownUrl( blogPosts )
 			assignIconHtml( blogPosts, docsDir )
 			variables.implicitLayouts.apply( blogPosts, config.layouts ?: [] )
@@ -1234,7 +1234,7 @@ class {
 		assignBreadcrumbs( pages, nav )
 		assignEditAndLastUpdated( pages, arguments.config, arguments.root, arguments.docsRelativePrefix )
 		assignDescriptions( pages )
-		assignOgImages( pages, arguments.config, arguments.outputDir )
+		assignOgImages( pages, arguments.config, arguments.outputDir, arguments.docsDir )
 		assignMarkdownUrl( pages )
 		assignIconHtml( pages, arguments.docsDir )
 		variables.implicitLayouts.apply( pages, arguments.config.layouts ?: [] )
@@ -1902,10 +1902,26 @@ class {
 	 * @config The site's bxsites.json config
 	 * @outputDir Absolute path this tree's pages are being written under (`site/` or `site/versions/<name>/`)
 	 */
-	private void function assignOgImages( required array pages, required struct config, required string outputDir ) {
+	private void function assignOgImages( required array pages, required struct config, required string outputDir, string docsDir = "" ) {
 		if ( !arguments.config.generateOgImages ) {
 			return
 		}
+
+		var card = arguments.config.ogCard ?: {}
+		var themeOptions = arguments.config.theme.options ?: {}
+		var cardOptions = {
+			background : card.background ?: "",
+			accent     : len( card.accent ?: "" ) ? card.accent : ( themeOptions.accentColor ?: "" ),
+			accentEnd  : len( card.accentEnd ?: "" ) ? card.accentEnd : ( themeOptions.accentColorDark ?: "" ),
+			text       : card.text ?: "",
+			muted      : card.muted ?: "",
+			logoPath   : resolveOgSourceFile( len( card.logo ?: "" ) ? card.logo : ( arguments.config.theme.logo ?: "" ), arguments.docsDir ),
+			fontPath   : resolveOgSourceFile( card.font ?: "", arguments.docsDir )
+		}
+		var showDescription = card.description ?: true
+		var showUrl = card.url ?: true
+		var showSection = card.section ?: true
+		var siteHost = reReplaceNoCase( arguments.config.baseURL ?: "", "^https?://", "" ).reReplace( "/+$", "" )
 
 		for ( var page in arguments.pages ) {
 			if ( len( trim( page.ogImage ?: "" ) ) ) {
@@ -1915,9 +1931,44 @@ class {
 			var relativePath = "assets/og/" & generatedOgImageFileName( page.urlPath )
 			var outputPath = arguments.outputDir & "/" & relativePath
 			directoryCreate( getDirectoryFromPath( outputPath ), true, true )
-			variables.socialCardGenerator.generate( page.title, arguments.config.name, outputPath )
+
+			var pageOptions = duplicate( cardOptions )
+			var pagePath = page.urlPath.reReplaceNoCase( "/?index\.html$", "", "one" ).reReplace( "^/+", "" )
+			if ( showDescription ) {
+				pageOptions.description = page.description ?: ""
+			}
+			if ( showUrl && len( siteHost ) ) {
+				pageOptions.url = siteHost & ( len( pagePath ) ? "/" & pagePath : "" )
+			}
+			if ( showSection && listLen( pagePath, "/" ) > 1 ) {
+				pageOptions.section = humanizeOgSection( listFirst( pagePath, "/" ) )
+			}
+			variables.socialCardGenerator.generate( page.title, arguments.config.name, outputPath, pageOptions )
 			page.ogImage = relativePath
 		}
+	}
+
+	/**
+	 * Resolves a social-card logo/font setting to an absolute file path under
+	 * the source directory, or "" when unset. An absolute path is kept as is.
+	 */
+	private string function resolveOgSourceFile( required string value, required string docsDir ) {
+		var trimmed = trim( arguments.value )
+		if ( !len( trimmed ) ) {
+			return ""
+		}
+		if ( fileExists( trimmed ) ) {
+			return trimmed
+		}
+		var candidate = arguments.docsDir & "/" & reReplace( trimmed, "^/+", "" )
+		return fileExists( candidate ) ? candidate : ""
+	}
+
+	/**
+	 * "building-and-deploying" -> "Building And Deploying", for the card's section chip.
+	 */
+	private string function humanizeOgSection( required string segment ) {
+		return arguments.segment.replace( "-", " ", "all" ).replace( "_", " ", "all" ).listToArray( " " ).map( ( word ) => uCase( left( word, 1 ) ) & mid( word, 2, len( word ) ) ).toList( " " )
 	}
 
 	/**

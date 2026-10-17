@@ -4,24 +4,46 @@
  * BoxLang runs on), no headless browser or external service involved.
  * Used when `bxsites.json`'s `generateOgImages` is on and a page has no
  * explicit `ogImage` frontmatter/site-wide override of its own - see
- * BuildPipeline.bx's `resolveOgImage()`.
+ * BuildPipeline.bx's `assignOgImages()`.
+ *
+ * The card is a dark brand-tinted background with a soft accent glow and
+ * rings, the site logo and name, an optional section chip, the page title,
+ * the page description and the page URL, with the accent gradient bar along
+ * the bottom edge. Every visual input beyond the title, site name and output
+ * path is optional (see `generate()`'s `options`), and the original
+ * three-argument call still works.
  */
 class {
 
 	variables.width = 1200
 	variables.height = 630
 	variables.barHeight = 14
+	variables.marginX = 80
 
 	/**
 	 * Renders a 1200x630 branded PNG social card via pure `java.awt`/
 	 * `javax.imageio` - no headless browser needed.
 	 *
 	 * @title The page (or site) title to render, word-wrapped to fit
-	 * @subtitle A smaller line under the title - typically the site name
+	 * @subtitle The site name, drawn next to the logo
 	 * @outputPath Absolute path to write the PNG to (parent directory must already exist)
+	 * @options Optional struct. Every key is optional:
+	 *   `description` (string, under the title, up to 3 lines),
+	 *   `section` (string, a small chip top right),
+	 *   `url` (string, drawn bottom left),
+	 *   `logoPath` (absolute path to a PNG/JPG/GIF, drawn left of the site name),
+	 *   `fontPath` (absolute path to a TTF/OTF used for all text),
+	 *   `background`, `accent`, `accentEnd`, `text`, `muted` (`#RGB` or `#RRGGBB` colors).
 	 */
-	void function generate( required string title, required string subtitle, required string outputPath ) {
+	void function generate( required string title, required string subtitle, required string outputPath, struct options = {} ) {
 		createObject( "java", "java.lang.System" ).setProperty( "java.awt.headless", "true" )
+
+		var opts = arguments.options
+		var background = parseColor( opts.background ?: "", 11, 22, 27 )
+		var accent = parseColor( opts.accent ?: "", 0, 255, 120 )
+		var accentEnd = parseColor( opts.accentEnd ?: "", 0, 219, 255 )
+		var textColor = parseColor( opts.text ?: "", 255, 255, 255 )
+		var mutedColor = parseColor( opts.muted ?: "", 160, 184, 181 )
 
 		var BufferedImage = createObject( "java", "java.awt.image.BufferedImage" )
 		var image = BufferedImage.init( variables.width, variables.height, BufferedImage.TYPE_INT_RGB )
@@ -30,42 +52,228 @@ class {
 		var RenderingHints = createObject( "java", "java.awt.RenderingHints" )
 		g.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON )
 		g.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON )
+		g.setRenderingHint( RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC )
+		g.setRenderingHint( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY )
 
 		var Color = createObject( "java", "java.awt.Color" )
-
-		g.setColor( Color.init( 20, 24, 28 ) )
-		g.fillRect( 0, 0, variables.width, variables.height )
-
 		var GradientPaint = createObject( "java", "java.awt.GradientPaint" )
-		var barY = variables.height - variables.barHeight
-		g.setPaint( GradientPaint.init(
-			0, javaCast( "float", barY ), Color.init( 0, 255, 120 ),
-			variables.width, javaCast( "float", barY ), Color.init( 0, 219, 255 )
-		) )
-		g.fillRect( 0, barY, variables.width, variables.barHeight )
 
-		var Font = createObject( "java", "java.awt.Font" )
-		var marginX = 90
-		var maxTextWidth = variables.width - ( marginX * 2 )
+		drawBackground( g, background, accent, accentEnd )
 
-		g.setColor( Color.WHITE )
-		g.setFont( Font.init( "SansSerif", Font.BOLD, 64 ) )
-		var titleLines = wrapText( g, arguments.title, maxTextWidth, 3 )
-		var lineHeight = 74
-		var titleY = 260
-		for ( var line in titleLines ) {
-			g.drawString( line, marginX, titleY )
-			titleY += lineHeight
+		var fonts = loadFonts( opts.fontPath ?: "" )
+		var headerY = 64
+
+		// Logo and site name
+		var textX = variables.marginX
+		var logo = loadLogo( opts.logoPath ?: "" )
+		if ( !isNull( logo ) ) {
+			var logoSize = 56
+			var scale = min( logoSize / logo.getWidth(), logoSize / logo.getHeight() )
+			var drawW = int( logo.getWidth() * scale )
+			var drawH = int( logo.getHeight() * scale )
+			g.drawImage( logo, variables.marginX, headerY + int( ( logoSize - drawH ) / 2 ), drawW, drawH, javaCast( "null", "" ) )
+			textX = variables.marginX + logoSize + 18
+		}
+		g.setColor( mutedColor )
+		g.setFont( fonts.bold( 30 ) )
+		g.drawString( arguments.subtitle, textX, headerY + 39 )
+
+		// Section chip, top right
+		var section = trim( opts.section ?: "" )
+		if ( len( section ) ) {
+			g.setFont( fonts.bold( 20 ) )
+			var chipText = uCase( section )
+			var chipMetrics = g.getFontMetrics()
+			var chipW = chipMetrics.stringWidth( chipText ) + 44
+			var chipX = variables.width - variables.marginX - chipW
+			var chipY = headerY + 8
+			g.setColor( withAlpha( accent, 28 ) )
+			g.fillRoundRect( chipX, chipY, chipW, 40, 40, 40 )
+			g.setColor( withAlpha( accent, 150 ) )
+			g.setStroke( createObject( "java", "java.awt.BasicStroke" ).init( javaCast( "float", 2 ) ) )
+			g.drawRoundRect( chipX, chipY, chipW, 40, 40, 40 )
+			g.setColor( accent )
+			g.drawString( chipText, chipX + 22, chipY + 27 )
 		}
 
-		g.setColor( Color.init( 169, 180, 189 ) )
-		g.setFont( Font.init( "SansSerif", Font.PLAIN, 30 ) )
-		g.drawString( arguments.subtitle, marginX, titleY + 20 )
+		// Accent rule above the title
+		g.setPaint( GradientPaint.init( variables.marginX, 0, accent, variables.marginX + 110, 0, accentEnd ) )
+		g.fillRoundRect( variables.marginX, 176, 110, 8, 8, 8 )
+
+		// Title: shrink until it fits in 3 lines
+		var maxTextWidth = 880
+		var titleSize = 76
+		var titleLines = []
+		while ( true ) {
+			g.setFont( fonts.bold( titleSize ) )
+			titleLines = wrapText( g, arguments.title, maxTextWidth, 3 )
+			if ( !titleLines.len() || right( titleLines[ titleLines.len() ], 1 ) != "…" || titleSize <= 52 ) {
+				break
+			}
+			titleSize -= 4
+		}
+		var lineHeight = int( titleSize * 1.16 )
+		var y = 184 + 24 + titleSize
+		g.setColor( textColor )
+		g.setFont( fonts.bold( titleSize ) )
+		for ( var line in titleLines ) {
+			g.drawString( line, variables.marginX, y )
+			y += lineHeight
+		}
+
+		// Description
+		var description = trim( opts.description ?: "" )
+		if ( len( description ) ) {
+			g.setColor( mutedColor )
+			g.setFont( fonts.plain( 32 ) )
+			var descLines = wrapText( g, description, maxTextWidth, y > 400 ? 2 : 3 )
+			y += 14
+			for ( var line in descLines ) {
+				g.drawString( line, variables.marginX, y )
+				y += 46
+			}
+		}
+
+		// URL, bottom left
+		var url = trim( opts.url ?: "" )
+		if ( len( url ) ) {
+			g.setColor( withAlpha( mutedColor, 190 ) )
+			g.setFont( fonts.mono( 26 ) )
+			g.drawString( url, variables.marginX, variables.height - variables.barHeight - 36 )
+		}
+
+		// Gradient bar along the bottom edge
+		var barY = variables.height - variables.barHeight
+		g.setPaint( GradientPaint.init( 0, javaCast( "float", barY ), accent, variables.width, javaCast( "float", barY ), accentEnd ) )
+		g.fillRect( 0, barY, variables.width, variables.barHeight )
 
 		g.dispose()
 
 		var ImageIO = createObject( "java", "javax.imageio.ImageIO" )
 		ImageIO.write( image, "png", createObject( "java", "java.io.File" ).init( arguments.outputPath ) )
+	}
+
+	/**
+	 * Dark brand-tinted background: a diagonal gradient, a soft accent glow
+	 * top left, a faint dot grid, and two accent-gradient rings bleeding off
+	 * the bottom right corner.
+	 */
+	private void function drawBackground( required any g, required any background, required any accent, required any accentEnd ) {
+		var GradientPaint = createObject( "java", "java.awt.GradientPaint" )
+
+		var bg2 = mix( arguments.background, arguments.accentEnd, 0.10 )
+		arguments.g.setPaint( GradientPaint.init( 0, 0, arguments.background, variables.width, variables.height, bg2 ) )
+		arguments.g.fillRect( 0, 0, variables.width, variables.height )
+
+		// Soft glow, concentric translucent discs
+		for ( var i = 30; i >= 1; i-- ) {
+			var radius = 80 + i * 19
+			arguments.g.setColor( withAlpha( arguments.accent, 3 ) )
+			arguments.g.fillOval( 160 - radius, 40 - radius, radius * 2, radius * 2 )
+		}
+
+		// Dot grid
+		arguments.g.setColor( withAlpha( arguments.accentEnd, 22 ) )
+		for ( var gx = variables.marginX; gx < variables.width; gx += 40 ) {
+			for ( var gy = 40; gy < variables.height - variables.barHeight; gy += 40 ) {
+				arguments.g.fillRect( gx, gy, 3, 3 )
+			}
+		}
+
+		// Rings bleeding off the bottom right
+		var BasicStroke = createObject( "java", "java.awt.BasicStroke" )
+		arguments.g.setStroke( BasicStroke.init( javaCast( "float", 16 ) ) )
+		arguments.g.setPaint( GradientPaint.init( 820, 260, withAlpha( arguments.accent, 70 ), 1200, 630, withAlpha( arguments.accentEnd, 70 ) ) )
+		arguments.g.drawOval( 830, 270, 520, 520 )
+		arguments.g.setStroke( BasicStroke.init( javaCast( "float", 8 ) ) )
+		arguments.g.setPaint( GradientPaint.init( 900, 340, withAlpha( arguments.accent, 45 ), 1200, 630, withAlpha( arguments.accentEnd, 45 ) ) )
+		arguments.g.drawOval( 930, 370, 360, 360 )
+	}
+
+	/**
+	 * Returns a struct of font factories (`plain`, `bold`, `mono`) - the
+	 * given TTF/OTF when it loads, otherwise the JVM's logical fonts.
+	 */
+	private struct function loadFonts( required string fontPath ) {
+		var Font = createObject( "java", "java.awt.Font" )
+		var custom = ""
+		if ( len( arguments.fontPath ) && fileExists( arguments.fontPath ) ) {
+			try {
+				custom = Font.createFont( Font.TRUETYPE_FONT, createObject( "java", "java.io.File" ).init( arguments.fontPath ) )
+			} catch ( any e ) {
+				custom = ""
+			}
+		}
+		var hasCustom = !isSimpleValue( custom )
+		return {
+			plain : function( size ) {
+				return hasCustom ? custom.deriveFont( Font.PLAIN, javaCast( "float", size ) ) : Font.init( "SansSerif", Font.PLAIN, size )
+			},
+			bold : function( size ) {
+				return hasCustom ? custom.deriveFont( Font.BOLD, javaCast( "float", size ) ) : Font.init( "SansSerif", Font.BOLD, size )
+			},
+			mono : function( size ) {
+				return Font.init( "Monospaced", Font.PLAIN, size )
+			}
+		}
+	}
+
+	/**
+	 * Reads a PNG/JPG/GIF logo, or returns null when the path is empty,
+	 * missing or not a readable raster image (for example an SVG).
+	 */
+	private any function loadLogo( required string logoPath ) {
+		if ( !len( arguments.logoPath ) || !fileExists( arguments.logoPath ) ) {
+			return
+		}
+		try {
+			var img = createObject( "java", "javax.imageio.ImageIO" ).read( createObject( "java", "java.io.File" ).init( arguments.logoPath ) )
+			return img
+		} catch ( any e ) {
+			return
+		}
+	}
+
+	/**
+	 * Parses `#RGB` or `#RRGGBB` into a java.awt.Color, falling back to the
+	 * given default for anything else.
+	 */
+	private any function parseColor( required string value, required numeric r, required numeric g, required numeric b ) {
+		var Color = createObject( "java", "java.awt.Color" )
+		var hex = trim( arguments.value )
+		if ( reFind( "^##?[0-9a-fA-F]{3}$", hex ) ) {
+			hex = replace( hex, "##", "" )
+			hex = left( hex, 1 ) & left( hex, 1 ) & mid( hex, 2, 1 ) & mid( hex, 2, 1 ) & right( hex, 1 ) & right( hex, 1 )
+		} else if ( reFind( "^##?[0-9a-fA-F]{6}$", hex ) ) {
+			hex = replace( hex, "##", "" )
+		} else {
+			return Color.init( javaCast( "int", arguments.r ), javaCast( "int", arguments.g ), javaCast( "int", arguments.b ) )
+		}
+		// javaCast to int so Color's (int, int, int) constructor is chosen, never the 0..1 (float, float, float) one
+		return Color.init(
+			javaCast( "int", inputBaseN( mid( hex, 1, 2 ), 16 ) ),
+			javaCast( "int", inputBaseN( mid( hex, 3, 2 ), 16 ) ),
+			javaCast( "int", inputBaseN( mid( hex, 5, 2 ), 16 ) )
+		)
+	}
+
+	private any function withAlpha( required any color, required numeric alpha ) {
+		return createObject( "java", "java.awt.Color" ).init(
+			javaCast( "int", arguments.color.getRed() ),
+			javaCast( "int", arguments.color.getGreen() ),
+			javaCast( "int", arguments.color.getBlue() ),
+			javaCast( "int", arguments.alpha )
+		)
+	}
+
+	/** Blends `fraction` of `b` into `a`. */
+	private any function mix( required any a, required any b, required numeric fraction ) {
+		var f = arguments.fraction
+		return createObject( "java", "java.awt.Color" ).init(
+			javaCast( "int", int( arguments.a.getRed() * ( 1 - f ) + arguments.b.getRed() * f ) ),
+			javaCast( "int", int( arguments.a.getGreen() * ( 1 - f ) + arguments.b.getGreen() * f ) ),
+			javaCast( "int", int( arguments.a.getBlue() * ( 1 - f ) + arguments.b.getBlue() * f ) )
+		)
 	}
 
 	/**

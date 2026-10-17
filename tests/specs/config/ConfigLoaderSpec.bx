@@ -646,6 +646,28 @@ class extends="testbox.system.BaseSpec" {
 				} ).toThrow( "BxSites.InvalidConfig" );
 			} );
 
+			it( "defaults [ogCard] to an empty object and preserves a user-supplied one", function() {
+				expect( loader.load( newProjectDir( '{"name":"My Docs"}' ) ).ogCard ).toBe( {} );
+
+				var config = loader.load( newProjectDir( '{"name":"My Docs","ogCard":{"accent":"##00ff78","logo":"assets/logo.png","description":false}}' ) );
+				expect( config.ogCard.accent ).toBe( "##00ff78" );
+				expect( config.ogCard.logo ).toBe( "assets/logo.png" );
+				expect( config.ogCard.description ).toBeFalse();
+			} );
+
+			it( "throws BxSites.InvalidConfig when [ogCard] isn't an object, a color isn't a string or a flag isn't a boolean", function() {
+				for ( var json in [
+					'{"name":"My Docs","ogCard":"nope"}',
+					'{"name":"My Docs","ogCard":{"accent":["##fff"]}}',
+					'{"name":"My Docs","ogCard":{"url":"maybe"}}'
+				] ) {
+					var dir = newProjectDir( json );
+					expect( function() {
+						loader.load( dir );
+					} ).toThrow( "BxSites.InvalidConfig" );
+				}
+			} );
+
 			it( "preserves user-supplied [extraCss] and [extraJs] arrays", function() {
 				var dir = newProjectDir( '{"name":"My Docs","extraCss":["assets/extra.css"],"extraJs":["assets/extra.js"]}' );
 				var config = loader.load( dir );
