@@ -24,6 +24,9 @@
 	variables.searchAlgolia = variables.siteConfig.searchProvider.algolia ?: {}
 
 	variables.repoUrl = trim( variables.siteConfig.repo.url ?: "" )
+	// The synthetic Blog nav entry exists only in the main tree and only when the site has posts
+	// (BuildPipeline's blogNavUrl); a versioned or translated tree has no blog/ to link to.
+	variables.hasBlogPage = variables.nav.some( ( node ) => ( node.url ?: "" ) == "blog/index.html" )
 	variables.socialLinks = variables.siteConfig.social ?: []
 	variables.footerEnabled = ( variables.siteConfig.footer ?: false ) ? true : false
 	variables.navCollapsible = ( variables.siteConfig.theme.options.navCollapsible ?: false ) ? true : false
@@ -190,7 +193,9 @@
 			<nav class="bxh-navlinks">
 				<a href="#variables.basePath#getting-started/">Docs</a>
 				<a href="#variables.basePath#guides/themes/">Themes</a>
-				<a href="#variables.basePath#blog/">Blog</a>
+				<bx:if variables.hasBlogPage>
+					<a href="#variables.basePath#blog/">Blog</a>
+				</bx:if>
 				<a href="#variables.basePath#guides/plugins/">Plugins</a>
 			</nav>
 			<div class="bxh-navcta">
@@ -218,7 +223,7 @@
 						href="#bxsitesUrlAttr( variables.repoUrl )#"
 						target="_blank"
 						rel="noopener noreferrer">
-						#bxsitesIcon( "github" )# Star
+						#bxsitesIcon( "github" )# <span class="bxh-star-label">Star</span>
 					</a>
 				</bx:if>
 			</div>

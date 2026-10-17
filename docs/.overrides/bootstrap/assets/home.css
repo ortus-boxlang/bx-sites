@@ -1926,3 +1926,60 @@
 		grid-template-columns: repeat(2, 1fr);
 	}
 }
+
+/* ---------- small phones ---------- */
+.ovr-code,
+.pipe-tree {
+	overflow-x: auto;
+}
+
+@media (max-width: 520px) {
+	/* Four stages in a row do not fit: a dangling connector wraps onto its own line.
+	   Two by two reads cleanly, and the arrows add nothing once stacked. */
+	.flow-row {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		justify-items: center;
+		row-gap: 28px;
+	}
+
+	.flow-row .flow-connector {
+		display: none;
+	}
+
+	.flow-row .flow-stage {
+		width: auto;
+	}
+}
+
+@media (max-width: 400px) {
+	.bxh-wrap {
+		padding-inline: 16px;
+	}
+
+	/* the header (logo, language, theme toggle, GitHub) is wider than a 320px screen:
+	   keep the GitHub icon, drop its label */
+	.bxh-star-label {
+		display: none;
+	}
+
+	.install-chip {
+		max-width: 100%;
+		font-size: .8rem;
+	}
+}
+
+@media (max-width: 520px) {
+	/* "Email consulting@ortussolutions.com" is one unbreakable string wider than a small phone */
+	.cta .hero-actions {
+		width: 100%;
+	}
+
+	.cta .bxh-btn {
+		max-width: 100%;
+		white-space: normal;
+		overflow-wrap: anywhere;
+		text-align: center;
+		justify-content: center;
+	}
+}

@@ -52,6 +52,19 @@ class extends="testbox.system.BaseSpec" {
 				expect( nav.len() ).toBeGT( 0 )
 			} );
 
+			it( "gives the homepage of every tree (main, versions, locales) no broken links or images", () => {
+				pipeline.build( tempRoot )
+
+				var report = new "models.build.LinkChecker@bxsites"().check( tempRoot )
+
+				// Only the homepages: the fake markdown/image seams above make
+				// docs pages with code samples look broken, which a real build
+				// (`bxSites audit`) does not.
+				var homepages = report.brokenLinks.filter( ( item ) => reFind( "^((versions/[^/]+/)?([a-z]{2}/)?|[a-z]{2}/)index\.html$", item.page ) )
+
+				expect( homepages ).toBe( [], jsonSerialize( homepages ) )
+			} );
+
 			it( "builds a non-empty search index for the dogfooded docs", () => {
 				pipeline.build( tempRoot )
 
