@@ -1,0 +1,68 @@
+/**
+ * Runs the REAL YamlRenderer against the real bx-yaml module (every other spec
+ * injects FakeYamlRenderer), because the thing worth pinning here is exactly
+ * what the fake hides: the shape of the lists bx-yaml hands back. bx-yaml
+ * 1.0.0 wrapped every list in an extra array; 1.1.0 fixed it.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.YamlRenderer", function() {
+
+			beforeEach( function() {
+				variables.renderer = new "models.build.YamlRenderer@bxsites"();
+			} );
+
+			it( "parses a flow list as a flat array", function() {
+				var data = renderer.fromYaml( "tags: [ a, b, c ]" );
+				expect( data.tags ).toBeArray();
+				expect( data.tags ).toHaveLength( 3 );
+				expect( data.tags[ 1 ] ).toBe( "a" );
+				expect( data.tags[ 3 ] ).toBe( "c" );
+			} );
+
+			it( "parses a block list as a flat array", function() {
+				var data = renderer.fromYaml( "tags:" & char( 10 ) & "  - a" & char( 10 ) & "  - b" );
+				expect( data.tags ).toHaveLength( 2 );
+				expect( data.tags[ 2 ] ).toBe( "b" );
+			} );
+
+			it( "keeps a one item list a one item array", function() {
+				var data = renderer.fromYaml( "tags: [ only ]" );
+				expect( data.tags ).toHaveLength( 1 );
+				expect( data.tags[ 1 ] ).toBe( "only" );
+			} );
+
+			it( "keeps a list holding exactly one inner list as a list of one list", function() {
+				var data = renderer.fromYaml( "grid: [ [ 1, 2 ] ]" );
+				expect( data.grid ).toHaveLength( 1 );
+				expect( data.grid[ 1 ] ).toBeArray();
+				expect( data.grid[ 1 ] ).toHaveLength( 2 );
+			} );
+
+			it( "keeps several inner lists as they are", function() {
+				var data = renderer.fromYaml( "grid: [ [ 1, 2 ], [ 3, 4 ] ]" );
+				expect( data.grid ).toHaveLength( 2 );
+				expect( data.grid[ 2 ][ 1 ] ).toBe( 3 );
+			} );
+
+			it( "parses a list of mappings as an array of structs", function() {
+				var data = renderer.fromYaml( "social:" & char( 10 ) & "  - name: github" & char( 10 ) & "  - name: x" );
+				expect( data.social ).toHaveLength( 2 );
+				expect( data.social[ 2 ].name ).toBe( "x" );
+			} );
+
+			it( "parses an empty list as an empty array", function() {
+				expect( renderer.fromYaml( "tags: []" ).tags ).toHaveLength( 0 );
+			} );
+
+			it( "round trips a struct with a list", function() {
+				var data = renderer.fromYaml( renderer.toYaml( { name : "Docs", tags : [ "a", "b" ] } ) );
+				expect( data.name ).toBe( "Docs" );
+				expect( data.tags ).toHaveLength( 2 );
+			} );
+
+		} );
+	}
+
+}
