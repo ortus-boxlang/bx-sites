@@ -886,17 +886,34 @@ your first site.</pre>
 		</div>
 	</section>
 
-	<!--- Section: consulting CTA (Ortus professional services) --->
+	<!--- Section: consulting and support (Ortus professional services); same layout as bxaudio.boxlang.io --->
 	<section>
 		<div class="bxh-wrap">
-			<div class="cta">
-				<span class="eyebrow">Need a hand building your site?</span>
-				<h2>bxSites is free &amp; open source &mdash; or let the team who builds it do the work.</h2>
-				<p><a href="https://www.ortussolutions.com" target="_blank" rel="noopener noreferrer">Ortus Solutions</a> offers professional services and consulting for documentation sites, migrations, and any other static site built with bxSites.</p>
-				<div class="hero-actions">
-					<a class="bxh-btn bxh-btn-primary" href="mailto:consulting@ortussolutions.com">Email consulting@ortussolutions.com</a>
-					<a class="bxh-btn bxh-btn-ghost" href="#variables.basePath#services/">Consulting &amp; Professional Services</a>
+			<div class="consult">
+				<div class="consult-main">
+					<span class="eyebrow eyebrow--icon">#homeIcon( "handshake" )# Consulting and support</span>
+					<h2>Need help with your docs site? <span class="grad">Talk to the people who build BoxLang.</span></h2>
+					<p>Ortus Solutions offers professional support, architecture reviews and custom development for BoxLang, including documentation sites, migrations and any static site built with bxSites.</p>
+					<div class="hero-actions">
+						<a class="bxh-btn bxh-btn-primary" href="https://www.ortussolutions.com/services" target="_blank" rel="noopener noreferrer">Talk to Ortus &rarr;</a>
+						<a class="bxh-btn bxh-btn-ghost" href="https://boxlang.io/plans" target="_blank" rel="noopener noreferrer">See BoxLang+ plans</a>
+						<a class="bxh-btn bxh-btn-ghost" href="mailto:consulting@ortussolutions.com">#bxsitesIcon( "email" )# consulting@ortussolutions.com</a>
+					</div>
 				</div>
+				<ul class="consult-points">
+					<li>
+						<span class="consult-icon">#homeIcon( "headset" )#</span>
+						<div><h3>Priority support</h3><p>Answers from the team that wrote the runtime.</p></div>
+					</li>
+					<li>
+						<span class="consult-icon">#homeIcon( "wrench" )#</span>
+						<div><h3>Custom development</h3><p>Themes, plugins, migrations and integrations built to your brief.</p></div>
+					</li>
+					<li>
+						<span class="consult-icon">#homeIcon( "training" )#</span>
+						<div><h3>Training and review</h3><p>Get your team productive and your docs setup checked.</p></div>
+					</li>
+				</ul>
 			</div>
 		</div>
 	</section>
