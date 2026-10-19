@@ -16,9 +16,9 @@
 
 <p>&nbsp;</p>
 
-Write your content in Markdown. BX Sites turns it into a complete, themed, searchable website - ready to deploy.
+Write your content in Markdown. bxSites is an AI-first static site generator: it turns your Markdown into a complete, themed, searchable website that people and AI agents can both use - ready to host anywhere, or on [bxSites Cloud](https://bxsites.io/cloud).
 
-It's a general-purpose static site generator, not just for documentation - docs, a blog, a marketing site, a knowledge base, anything Markdown can express, all built the same way, with the same themes, search and i18n. Built in BoxLang on top of [bx-markdown](https://github.com/ortus-boxlang/bx-markdown), in the spirit of [mkdocs](https://www.mkdocs.org/): point it at a `docs/` folder (or `src/`, if that reads better for your project) and get a themed, searchable static site out. Already on GitBook, mkdocs, or Notion, or just have a folder of Markdown? `bxSites migrate --from=gitbook|mkdocs|markdown-zip|notion` converts it straight into a bx-sites project - see [Migrating from GitBook](docs/guides/migrating-from-gitbook.md) or [Migrating from mkdocs](docs/guides/migrating-from-mkdocs.md).
+It's a general-purpose static site generator, not just for documentation - docs, a blog, a marketing site, a knowledge base, anything Markdown can express, all built the same way, with the same themes, search and i18n. Every build also writes `llms.txt`, new projects get an `AGENTS.md`, and an optional MCP manifest lets bxSites Cloud serve your published site to AI agents. Built in BoxLang on top of [bx-markdown](https://github.com/ortus-boxlang/bx-markdown), in the spirit of [mkdocs](https://www.mkdocs.org/): point it at a `docs/` folder (or `src/`, if that reads better for your project) and get a themed, searchable static site out. Already on GitBook, mkdocs, or Notion, or just have a folder of Markdown? `bxSites migrate --from=gitbook|mkdocs|markdown-zip|notion` converts it straight into a bx-sites project - see [Migrating from GitBook](docs/guides/migrating-from-gitbook.md) or [Migrating from mkdocs](docs/guides/migrating-from-mkdocs.md).
 
 ----
 

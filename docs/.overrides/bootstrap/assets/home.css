@@ -1983,3 +1983,215 @@
 		justify-content: center;
 	}
 }
+
+/* ---------- consulting and support (same layout as bxaudio.boxlang.io) ---------- */
+.consult {
+	display: grid;
+	grid-template-columns: 1.25fr 1fr;
+	border: 1px solid var(--border-strong);
+	border-radius: 24px;
+	overflow: hidden;
+	background:
+		radial-gradient(700px 380px at 0% 0%, rgba(0, 219, 255, .14), transparent 65%),
+		var(--surface);
+}
+
+.consult-main {
+	padding: 48px 52px;
+}
+
+.bxsites-home .consult h2 {
+	font-weight: 700;
+	font-size: clamp(1.7rem, 3vw, 2.35rem);
+	line-height: 1.2;
+	margin-top: 16px;
+}
+
+.bxsites-home .consult .grad {
+	background: var(--grad);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+.consult-main > p {
+	color: var(--muted);
+	line-height: 1.65;
+	max-width: 52ch;
+	margin-top: 18px;
+}
+
+.consult .hero-actions {
+	margin-top: 28px;
+}
+
+.consult .hero-actions .bxh-btn {
+	white-space: normal;
+}
+
+.consult .hero-actions .bxh-btn svg {
+	width: 16px;
+	height: 16px;
+}
+
+.eyebrow--icon {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.eyebrow--icon::before {
+	display: none;
+}
+
+.eyebrow--icon svg {
+	width: 16px;
+	height: 16px;
+	flex: none;
+}
+
+.consult-points {
+	list-style: none;
+	margin: 0;
+	padding: 48px 44px;
+	border-left: 1px solid var(--border);
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 28px;
+}
+
+.consult-points li {
+	display: flex;
+	align-items: flex-start;
+	gap: 16px;
+}
+
+.consult-icon {
+	flex: none;
+	width: 44px;
+	height: 44px;
+	border-radius: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--surface-2);
+	border: 1px solid var(--border);
+	color: var(--brand2);
+}
+
+.consult-icon svg {
+	width: 22px;
+	height: 22px;
+}
+
+.bxsites-home .consult-points h3 {
+	font-weight: 700;
+	font-size: 1.02rem;
+}
+
+.consult-points p {
+	margin: 4px 0 0;
+	color: var(--muted);
+	line-height: 1.55;
+	font-size: .95rem;
+}
+
+@media (max-width: 900px) {
+	.consult {
+		grid-template-columns: 1fr;
+	}
+
+	.consult-points {
+		border-left: 0;
+		border-top: 1px solid var(--border);
+	}
+}
+
+@media (max-width: 520px) {
+	.consult-main,
+	.consult-points {
+		padding: 32px 24px;
+	}
+
+	.consult .hero-actions .bxh-btn {
+		overflow-wrap: anywhere;
+	}
+
+	/* keep the long email address on one line down to ~360px wide screens */
+	.consult .hero-actions .bxh-btn:last-child {
+		font-size: .8rem;
+		padding-inline: .9rem;
+	}
+}
+
+/* ---------- bxSites Cloud section ---------- */
+.cloud-split {
+	display: grid;
+	grid-template-columns: 1fr 1.15fr;
+	gap: 28px;
+	align-items: center;
+}
+
+.cloud-points {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 22px;
+}
+
+.cloud-points li {
+	display: flex;
+	align-items: flex-start;
+	gap: 16px;
+}
+
+.bxsites-home .cloud-points h3 {
+	font-weight: 700;
+	font-size: 1.02rem;
+}
+
+.cloud-points h3 a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.cloud-points h3 a:hover {
+	color: var(--brand1);
+}
+
+.cloud-points p {
+	margin: 4px 0 0;
+	color: var(--muted);
+	line-height: 1.55;
+	font-size: .95rem;
+}
+
+.cloud-note {
+	margin: 28px 0 0;
+	color: var(--muted);
+	font-size: .92rem;
+}
+
+.cloud-split + .cloud-note + .hero-actions {
+	margin-top: 18px;
+}
+
+.pipe-chips span.chip-cloud {
+	background: var(--grad);
+	color: #04121f;
+	border-color: transparent;
+	font-weight: 600;
+}
+
+.bxsites-home .lead a {
+	color: var(--brand1);
+}
+
+@media (max-width: 900px) {
+	.cloud-split {
+		grid-template-columns: 1fr;
+	}
+}

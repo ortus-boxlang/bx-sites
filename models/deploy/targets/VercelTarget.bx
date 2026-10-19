@@ -83,7 +83,7 @@ class implements="models.deploy.IDeploymentTarget@bxsites" {
 			)
 		}
 
-		var token = getSystemSetting( authTokenEnvVar, "" )
+		var token = getSystemSetting( authTokenEnvVar, "" ).trim()
 		if ( !len( token ) ) {
 			throw(
 				type    = "BxSites.MissingCredentials",

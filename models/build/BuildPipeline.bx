@@ -2132,7 +2132,7 @@ class {
 	 */
 	private string function buildEditUrl( required string repoUrl, required string editUri, required string relativePath ) {
 		var base = arguments.repoUrl.reReplace( "[\\\/]+$", "" )
-		var uri = arguments.editUri.reReplace( "^[\/]+|[\/]+$", "", "all" )
+		var uri = arguments.editUri.reReplace( "^[\\\/]+|[\\\/]+$", "", "all" )
 		return base & "/" & uri & "/" & arguments.relativePath
 	}
 

@@ -270,7 +270,7 @@ class {
 
 		var passwordEnvVar = trim( arguments.config.passwordEnvVar ?: "" )
 		if ( len( passwordEnvVar ) ) {
-			attrs.password = getSystemSetting( passwordEnvVar, "" )
+			attrs.password = getSystemSetting( passwordEnvVar, "" ).trim()
 		}
 
 		if ( arguments.secure ) {
@@ -281,7 +281,7 @@ class {
 			}
 			var passphraseEnvVar = trim( arguments.config.passphraseEnvVar ?: "" )
 			if ( len( passphraseEnvVar ) ) {
-				attrs.passphrase = getSystemSetting( passphraseEnvVar, "" )
+				attrs.passphrase = getSystemSetting( passphraseEnvVar, "" ).trim()
 			}
 			if ( len( arguments.config.fingerprint ?: "" ) ) {
 				attrs.fingerprint = arguments.config.fingerprint

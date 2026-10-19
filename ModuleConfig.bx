@@ -583,12 +583,12 @@ class {
 			: ( len( arguments.options._positional ?: "" ) ? arguments.options._positional : "." )
 
 		if ( candidate == "." ) {
-			return cwd.reReplace( "[\/]+$", "" )
+			return cwd.reReplace( "[\\\/]+$", "" )
 		}
 
 		var isAbsolute = candidate.startsWith( "/" ) || reFind( "^[A-Za-z]:", candidate ) > 0
 		var resolved = isAbsolute ? candidate : ( cwd & "/" & candidate )
-		return resolved.reReplace( "[\/]+$", "" )
+		return resolved.reReplace( "[\\\/]+$", "" )
 	}
 
 }

@@ -54,11 +54,11 @@ class {
 		var excludeNames = duplicate( static.defaultExcludes ).append( arguments.exclude, true )
 
 		var pages = directoryList( dir, true, "path", "*.md" )
-			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFindNoCase( "^assets[\/]" ) )
-			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFindNoCase( "^versions[\/]" ) )
-			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFindNoCase( "^i18n[\/]" ) )
-			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFindNoCase( "^blog[\/]" ) )
-			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFindNoCase( "^includes[\/]" ) )
+			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFindNoCase( "^assets[\\\/]" ) )
+			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFindNoCase( "^versions[\\\/]" ) )
+			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFindNoCase( "^i18n[\\\/]" ) )
+			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFindNoCase( "^blog[\\\/]" ) )
+			.filter( path => !variables.pathRelativizer.relativeTo( dir, path ).reFindNoCase( "^includes[\\\/]" ) )
 			.filter( path => !isExcluded( variables.pathRelativizer.relativeTo( dir, path ), excludeNames ) )
 			// Dot folders/files are tooling, never pages - with `source: .` that's
 			// .claude/skills/**/SKILL.md (skills:install), .cursor/, .agents/, ...
@@ -142,7 +142,7 @@ class {
 			if ( !len( trimmedName ) ) {
 				continue
 			}
-			if ( arguments.relativePath.reFindNoCase( "^" & reEscape( trimmedName ) & "([\/]|$)" ) ) {
+			if ( arguments.relativePath.reFindNoCase( "^" & reEscape( trimmedName ) & "([\\\/]|$)" ) ) {
 				return true
 			}
 		}

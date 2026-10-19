@@ -320,7 +320,7 @@ class {
 			return arguments.projectRoot
 		}
 
-		if ( configured.startsWith( "/" ) || reFind( "^[A-Za-z]:[\/]", configured ) ) {
+		if ( configured.startsWith( "/" ) || reFind( "^[A-Za-z]:[\\\/]", configured ) ) {
 			return configured.reReplace( "[\\\/]+$", "" )
 		}
 

@@ -57,6 +57,15 @@ class {
 				return dir;
 			}
 
+			it( "recognizes Windows drive paths without prepending the project root", function() {
+				makePublic( verb, "resolvePath" );
+
+				expect( verb.resolvePath( "/project", "C:\sources\models\" ) ).toBe( "C:\sources\models" );
+				expect( verb.resolvePath( "/project", "C:/sources/models/" ) ).toBe( "C:/sources/models" );
+				expect( verb.resolvePath( "/project", "/sources/models/" ) ).toBe( "/sources/models" );
+				expect( verb.resolvePath( "/project", "models" ) ).toBe( "/project/models" );
+			} );
+
 			it( "throws BxSites.MissingProjectRoot when projectRoot is blank", function() {
 				expect( () => verb.run( {} ) ).toThrow( "BxSites.MissingProjectRoot" );
 			} );
