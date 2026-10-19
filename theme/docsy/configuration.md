@@ -992,6 +992,13 @@ site-wide image. Pure `java.awt`/`javax.imageio` under the hood (part of
 any JVM BoxLang runs on), so this needs no headless browser, external
 service, or network access at build time.
 
+Each card is a dark, brand-tinted background with a soft glow, the site
+logo and name, a section chip (the page's first folder), the page title, the
+page's description and its URL, with an accent gradient bar along the
+bottom. The accent colors come from `theme.options.accentColor` and
+`accentColorDark`, and the logo from `theme.logo` when it is a PNG, JPG or
+GIF. Tune the card with [`ogCard`](#ogcard).
+
 === "YAML"
     ```yaml title="bxsites.yaml"
     generateOgImages: true
@@ -1006,6 +1013,52 @@ service, or network access at build time.
     ```toml title="bxsites.toml"
     generateOgImages = true
     ```
+
+### `ogCard`
+
+Optional object that tunes the cards `generateOgImages` renders. Every key
+is optional.
+
+| Key | Default | Meaning |
+|-----|---------|---------|
+| `background` | `#0b161b` | Card background (`#RGB` or `#RRGGBB`) |
+| `accent`, `accentEnd` | `theme.options.accentColor`, `accentColorDark`, else `#00ff78` and `#00dbff` | Start and end of the accent gradient (bar, rule, glow, rings, chip) |
+| `text`, `muted` | `#ffffff`, `#a0b8b5` | Title color, and the site name, description and URL color |
+| `logo` | `theme.logo` | A PNG, JPG or GIF in the source folder, or an absolute path. SVG cannot be drawn, so a card without a raster logo shows only the site name |
+| `font` | JVM `SansSerif` | A TTF or OTF in the source folder, or an absolute path, used for all text but the URL |
+| `description` | `true` | Draw the page description under the title |
+| `url` | `true` | Draw the page URL (from `baseURL`) bottom left |
+| `section` | `true` | Draw the section chip (pages in a subfolder only) |
+
+=== "YAML"
+    ```yaml title="bxsites.yaml"
+    generateOgImages: true
+    ogCard:
+      background: '#06141a'
+      logo: assets/og-logo.png
+      description: true
+    ```
+
+=== "JSON"
+    ```json title="bxsites.json"
+    {
+    	"generateOgImages": true,
+    	"ogCard": { "background": "#06141a", "logo": "assets/og-logo.png", "description": true }
+    }
+    ```
+
+=== "TOML"
+    ```toml title="bxsites.toml"
+    generateOgImages = true
+
+    [ogCard]
+    background = "#06141a"
+    logo = "assets/og-logo.png"
+    description = true
+    ```
+
+A page's own frontmatter `ogImage` still wins, and its `title` and
+`description` frontmatter are what the card shows.
 
 ## `extraCss` / `extraJs`
 
