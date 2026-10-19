@@ -80,8 +80,8 @@ class extends="testbox.system.BaseSpec" {
 				generator.generate( "Title", "My Site", outputPath, { accent : "##ff0000", accentEnd : "##0000ff" } );
 
 				var image = createObject( "java", "javax.imageio.ImageIO" ).read( createObject( "java", "java.io.File" ).init( outputPath ) );
-				var left = createObject( "java", "java.awt.Color" ).init( javaCast( "int", image.getRGB( 2, 625 ) ) );
-				var right = createObject( "java", "java.awt.Color" ).init( javaCast( "int", image.getRGB( 1197, 625 ) ) );
+				var left = createObject( "java", "java.awt.Color" ).init( image.getRGB( 2, 625 ) castAs int );
+				var right = createObject( "java", "java.awt.Color" ).init( image.getRGB( 1197, 625 ) castAs int );
 				expect( left.getRed() ).toBeGT( left.getBlue() );
 				expect( right.getBlue() ).toBeGT( right.getRed() );
 			} );

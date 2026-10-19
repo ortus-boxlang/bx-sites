@@ -101,7 +101,7 @@ class extends="testbox.system.BaseSpec" {
 					// build some non-UTF8-safe bytes (0..255) and write them via real Java I/O
 					var out = createObject( "java", "java.io.ByteArrayOutputStream" ).init();
 					for ( var i = 0; i <= 255; i++ ) {
-						out.write( javaCast( "int", i ) );
+						out.write( i castAs int );
 					}
 					var rawBytes = out.toByteArray();
 					var fos = createObject( "java", "java.io.FileOutputStream" ).init( siteDir & "/image.bin" );

@@ -80,7 +80,7 @@ class {
 		rebuild()
 		println( "Initial site build complete." )
 
-		var addr = createObject( "java", "java.net.InetSocketAddress" ).init( arguments.host, javaCast( "int", arguments.port ) )
+		var addr = createObject( "java", "java.net.InetSocketAddress" ).init( arguments.host, arguments.port )
 		var rootPath = createObject( "java", "java.nio.file.Paths" ).get( variables.projectRoot & "/site", [] )
 		var outputLevel = createObject( "java", "com.sun.net.httpserver.SimpleFileServer$OutputLevel" ).NONE
 
@@ -104,7 +104,7 @@ class {
 	void function stop() {
 		stopWatching()
 		if ( variables.started ) {
-			variables.httpServer.stop( javaCast( "int", 0 ) )
+			variables.httpServer.stop( 0 )
 			variables.started = false
 		}
 	}
@@ -184,7 +184,7 @@ class {
 	void function stopWatching() {
 		if ( variables.watching ) {
 			if ( variables.hasWatcher ) {
-				variables.watcher.stop( javaCast( "boolean", true ) )
+				variables.watcher.stop( true )
 				variables.hasWatcher = false
 			}
 			variables.scheduler.shutdown()
@@ -368,7 +368,7 @@ class {
 			var body = createObject( "java", "java.lang.String" ).init( toString( variables.buildVersion ) ).getBytes()
 			exchange.getResponseHeaders().add( "Content-Type", "text/plain" )
 			exchange.getResponseHeaders().add( "Cache-Control", "no-store" )
-			exchange.sendResponseHeaders( javaCast( "int", 200 ), javaCast( "long", arrayLen( body ) ) )
+			exchange.sendResponseHeaders( 200, arrayLen( body ) )
 			var responseBody = exchange.getResponseBody()
 			responseBody.write( body )
 			responseBody.close()

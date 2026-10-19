@@ -71,7 +71,7 @@ class {
 			var scale = min( logoSize / logo.getWidth(), logoSize / logo.getHeight() )
 			var drawW = int( logo.getWidth() * scale )
 			var drawH = int( logo.getHeight() * scale )
-			g.drawImage( logo, variables.marginX, headerY + int( ( logoSize - drawH ) / 2 ), drawW, drawH, javaCast( "null", "" ) )
+			g.drawImage( logo, variables.marginX, headerY + int( ( logoSize - drawH ) / 2 ), drawW, drawH, nullValue() )
 			textX = variables.marginX + logoSize + 18
 		}
 		g.setColor( mutedColor )
@@ -90,7 +90,7 @@ class {
 			g.setColor( withAlpha( accent, 28 ) )
 			g.fillRoundRect( chipX, chipY, chipW, 40, 40, 40 )
 			g.setColor( withAlpha( accent, 150 ) )
-			g.setStroke( createObject( "java", "java.awt.BasicStroke" ).init( javaCast( "float", 2 ) ) )
+			g.setStroke( createObject( "java", "java.awt.BasicStroke" ).init( 2 castAs float ) )
 			g.drawRoundRect( chipX, chipY, chipW, 40, 40, 40 )
 			g.setColor( accent )
 			g.drawString( chipText, chipX + 22, chipY + 27 )
@@ -144,7 +144,7 @@ class {
 
 		// Gradient bar along the bottom edge
 		var barY = variables.height - variables.barHeight
-		g.setPaint( GradientPaint.init( 0, javaCast( "float", barY ), accent, variables.width, javaCast( "float", barY ), accentEnd ) )
+		g.setPaint( GradientPaint.init( 0, barY castAs float, accent, variables.width, barY castAs float, accentEnd ) )
 		g.fillRect( 0, barY, variables.width, variables.barHeight )
 
 		g.dispose()
@@ -182,10 +182,10 @@ class {
 
 		// Rings bleeding off the bottom right
 		var BasicStroke = createObject( "java", "java.awt.BasicStroke" )
-		arguments.g.setStroke( BasicStroke.init( javaCast( "float", 16 ) ) )
+		arguments.g.setStroke( BasicStroke.init( 16 castAs float ) )
 		arguments.g.setPaint( GradientPaint.init( 820, 260, withAlpha( arguments.accent, 70 ), 1200, 630, withAlpha( arguments.accentEnd, 70 ) ) )
 		arguments.g.drawOval( 830, 270, 520, 520 )
-		arguments.g.setStroke( BasicStroke.init( javaCast( "float", 8 ) ) )
+		arguments.g.setStroke( BasicStroke.init( 8 castAs float ) )
 		arguments.g.setPaint( GradientPaint.init( 900, 340, withAlpha( arguments.accent, 45 ), 1200, 630, withAlpha( arguments.accentEnd, 45 ) ) )
 		arguments.g.drawOval( 930, 370, 360, 360 )
 	}
@@ -207,10 +207,10 @@ class {
 		var hasCustom = !isSimpleValue( custom )
 		return {
 			plain : function( size ) {
-				return hasCustom ? custom.deriveFont( Font.PLAIN, javaCast( "float", size ) ) : Font.init( "SansSerif", Font.PLAIN, size )
+				return hasCustom ? custom.deriveFont( Font.PLAIN, size castAs float ) : Font.init( "SansSerif", Font.PLAIN, size )
 			},
 			bold : function( size ) {
-				return hasCustom ? custom.deriveFont( Font.BOLD, javaCast( "float", size ) ) : Font.init( "SansSerif", Font.BOLD, size )
+				return hasCustom ? custom.deriveFont( Font.BOLD, size castAs float ) : Font.init( "SansSerif", Font.BOLD, size )
 			},
 			mono : function( size ) {
 				return Font.init( "Monospaced", Font.PLAIN, size )
@@ -247,22 +247,22 @@ class {
 		} else if ( reFind( "^##?[0-9a-fA-F]{6}$", hex ) ) {
 			hex = replace( hex, "##", "" )
 		} else {
-			return Color.init( javaCast( "int", arguments.r ), javaCast( "int", arguments.g ), javaCast( "int", arguments.b ) )
+			return Color.init( arguments.r castAs int, arguments.g castAs int, arguments.b castAs int )
 		}
-		// javaCast to int so Color's (int, int, int) constructor is chosen, never the 0..1 (float, float, float) one
+		// castAs int so Color's (int, int, int) constructor is chosen, never the 0..1 (float, float, float) one
 		return Color.init(
-			javaCast( "int", inputBaseN( mid( hex, 1, 2 ), 16 ) ),
-			javaCast( "int", inputBaseN( mid( hex, 3, 2 ), 16 ) ),
-			javaCast( "int", inputBaseN( mid( hex, 5, 2 ), 16 ) )
+			inputBaseN( mid( hex, 1, 2 ), 16 ) castAs int,
+			inputBaseN( mid( hex, 3, 2 ), 16 ) castAs int,
+			inputBaseN( mid( hex, 5, 2 ), 16 ) castAs int
 		)
 	}
 
 	private any function withAlpha( required any color, required numeric alpha ) {
 		return createObject( "java", "java.awt.Color" ).init(
-			javaCast( "int", arguments.color.getRed() ),
-			javaCast( "int", arguments.color.getGreen() ),
-			javaCast( "int", arguments.color.getBlue() ),
-			javaCast( "int", arguments.alpha )
+			arguments.color.getRed() castAs int,
+			arguments.color.getGreen() castAs int,
+			arguments.color.getBlue() castAs int,
+			arguments.alpha castAs int
 		)
 	}
 
@@ -270,9 +270,9 @@ class {
 	private any function mix( required any a, required any b, required numeric fraction ) {
 		var f = arguments.fraction
 		return createObject( "java", "java.awt.Color" ).init(
-			javaCast( "int", int( arguments.a.getRed() * ( 1 - f ) + arguments.b.getRed() * f ) ),
-			javaCast( "int", int( arguments.a.getGreen() * ( 1 - f ) + arguments.b.getGreen() * f ) ),
-			javaCast( "int", int( arguments.a.getBlue() * ( 1 - f ) + arguments.b.getBlue() * f ) )
+			int( arguments.a.getRed() * ( 1 - f ) + arguments.b.getRed() * f ) castAs int,
+			int( arguments.a.getGreen() * ( 1 - f ) + arguments.b.getGreen() * f ) castAs int,
+			int( arguments.a.getBlue() * ( 1 - f ) + arguments.b.getBlue() * f ) castAs int
 		)
 	}
 

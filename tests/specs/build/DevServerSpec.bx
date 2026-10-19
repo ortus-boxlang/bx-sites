@@ -91,7 +91,7 @@ class extends="testbox.system.BaseSpec" {
 
 				fileWrite( root & "/docs/index.md", "Updated content" );
 				var futureMillis = createObject( "java", "java.lang.System" ).currentTimeMillis() + 5000;
-				createObject( "java", "java.io.File" ).init( root & "/docs/index.md" ).setLastModified( javaCast( "long", futureMillis ) );
+				createObject( "java", "java.io.File" ).init( root & "/docs/index.md" ).setLastModified( futureMillis );
 
 				expect( devServer.checkAndRebuild() ).toBeTrue();
 				expect( devServer.getBuildVersion() ).toBe( 2 );
@@ -106,7 +106,7 @@ class extends="testbox.system.BaseSpec" {
 
 				fileWrite( root & "/bxsites.json", '{"name":"Renamed Site","theme":{"name":"bootstrap"}}' );
 				var futureMillis = createObject( "java", "java.lang.System" ).currentTimeMillis() + 5000;
-				createObject( "java", "java.io.File" ).init( root & "/bxsites.json" ).setLastModified( javaCast( "long", futureMillis ) );
+				createObject( "java", "java.io.File" ).init( root & "/bxsites.json" ).setLastModified( futureMillis );
 
 				expect( devServer.checkAndRebuild() ).toBeTrue();
 

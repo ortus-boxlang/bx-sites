@@ -137,7 +137,7 @@ class extends="testbox.system.BaseSpec" {
 
 				pageStruct.contentHtml = "<p>Changed body</p>";
 				var futureMillis = createObject( "java", "java.lang.System" ).currentTimeMillis() + 5000;
-				createObject( "java", "java.io.File" ).init( sourcePath ).setLastModified( javaCast( "long", futureMillis ) );
+				createObject( "java", "java.io.File" ).init( sourcePath ).setLastModified( futureMillis );
 
 				var second = indexer.build( [ pageStruct ] );
 

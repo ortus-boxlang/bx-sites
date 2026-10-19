@@ -2020,8 +2020,8 @@ class extends="testbox.system.BaseSpec" {
 				var image = createObject( "java", "javax.imageio.ImageIO" ).read( createObject( "java", "java.io.File" ).init( root & "/site/assets/og/guides-setup.png" ) );
 				expect( image.getWidth() ).toBe( 1200 );
 				// the bottom bar runs from the theme accent (green) to accentDark (cyan)
-				var left = createObject( "java", "java.awt.Color" ).init( javaCast( "int", image.getRGB( 2, 625 ) ) );
-				var right = createObject( "java", "java.awt.Color" ).init( javaCast( "int", image.getRGB( 1197, 625 ) ) );
+				var left = createObject( "java", "java.awt.Color" ).init( image.getRGB( 2, 625 ) castAs int );
+				var right = createObject( "java", "java.awt.Color" ).init( image.getRGB( 1197, 625 ) castAs int );
 				expect( left.getGreen() ).toBeGT( 200 );
 				expect( left.getBlue() ).toBeLT( 160 );
 				expect( right.getBlue() ).toBeGT( 200 );
@@ -2925,7 +2925,7 @@ class extends="testbox.system.BaseSpec" {
 
 				fileWrite( root & "/docs/index.md", "Second body" );
 				var futureMillis = createObject( "java", "java.lang.System" ).currentTimeMillis() + 5000;
-				createObject( "java", "java.io.File" ).init( root & "/docs/index.md" ).setLastModified( javaCast( "long", futureMillis ) );
+				createObject( "java", "java.io.File" ).init( root & "/docs/index.md" ).setLastModified( futureMillis );
 
 				pipeline.build( root );
 				expect( fileRead( root & "/site/index.html" ) ).toInclude( "<p>Second body</p>" );

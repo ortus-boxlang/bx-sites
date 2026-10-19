@@ -147,6 +147,17 @@ rm -rf "${BOXLANG_HOME}/classes/$(pwd | tr '/' '_')"
 
 ## BoxLang Conventions
 
+- Use the BoxLang ecosystem first: a built-in function, a component or an
+  installed module (`bx-image` for images, `bx-yaml`, `bx-toml`,
+  `bx-markdown`, `bx-esapi`, `bx-ftp`...) before reaching for Java. Only go
+  down to `createObject( "java", ... )` when no BoxLang module can do the
+  job, and when a module is missing a capability, say so so it can be added
+  to the module rather than working around it in this repo.
+- Cast with the `castAs` operator (`value castAs int`, `value castAs
+  String[]`), never the `javaCast()` BIF. BoxLang already auto-casts
+  arguments and interpolates strings, so only cast when a call is genuinely
+  ambiguous (for example a Java class with overloaded constructors where a
+  number could match more than one).
 - Avoid private helper names that collide with built-in functions, and qualify
   helper calls when name resolution could be ambiguous.
 - An arrow closure has its own `arguments` scope. Capture outer arguments in a
