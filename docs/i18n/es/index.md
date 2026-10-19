@@ -2,7 +2,7 @@
 title: Inicio
 order: 1
 icon: phosphor-duotone:house
-summary: Apunta BxSites a una carpeta docs/ (o src/, si tu proyecto no es realmente "docs" en espíritu). Obtén un sitio estático rápido y personalizable - documentación, un sitio de marketing, un blog o cualquier otra cosa que Markdown pueda expresar - completo con búsqueda, i18n y un conjunto de herramientas Markdown pensado para contenido real.
+summary: Apunta BxSites a una carpeta docs/ (o src/, si tu proyecto no es realmente "docs" en espíritu). Obtén un sitio estático rápido y personalizable - documentación, un sitio de marketing, un blog o cualquier otra cosa que Markdown pueda expresar - completo con búsqueda, i18n y un conjunto de herramientas Markdown pensado para contenido real. Pensado primero para la IA, con llms.txt, AGENTS.md y salida MCP incluidos. Alójalo donde quieras o en bxSites Cloud.
 toc: false
 ---
 
