@@ -1,0 +1,166 @@
+class extends="testbox.system.BaseSpec" {
+
+	function run() {
+		describe( "build.HtmlToMarkdownConverter", function() {
+
+			beforeEach( function() {
+				variables.converter = new "models.build.HtmlToMarkdownConverter@bxsites"();
+			} );
+
+			private string function hashes( required numeric count ) {
+				return repeatString( char( 35 ), arguments.count ) & " ";
+			}
+
+			it( "returns an empty string for empty input", function() {
+				expect( converter.convert( "" ) ).toBe( "" );
+			} );
+
+			it( "converts headings to ATX at every level and drops the anchor and id noise", function() {
+				var md = converter.convert(
+					'<h1 id="top"><a href="##top" id="top" name="top" class="anchor"></a>Title</h1>' &
+					'<h2 id="sub"><a href="##sub" id="sub" name="sub" class="anchor"></a>Sub <code>code</code></h2>' &
+					'<h4 id="deep">Deep</h4>'
+				);
+
+				expect( md ).toStartWith( hashes( 1 ) & "Title" );
+				expect( md ).toInclude( hashes( 2 ) & "Sub `code`" );
+				expect( md ).toInclude( hashes( 4 ) & "Deep" );
+				expect( md ).notToInclude( "{" & hashes( 1 ).trim() );
+				expect( md ).notToInclude( "](" & hashes( 1 ).trim() );
+				expect( md ).notToInclude( "BXSMDH" );
+			} );
+
+			it( "keeps h1 and h2 as ATX headings, not setext underlines", function() {
+				var md = converter.convert( '<h1 id="t">Title</h1><p>Body</p><h2 id="s">Sub</h2>' );
+
+				expect( md ).notToInclude( "====" );
+				expect( md ).notToInclude( "----" );
+			} );
+
+			it( "converts inline formatting, lists and nested lists", function() {
+				var md = converter.convert(
+					'<p>Some <strong>bold</strong>, <em>em</em> and <code>inline</code>.</p>' &
+					'<ul><li>one</li><li>two<ul><li>nested</li></ul></li></ul><ol><li>a</li><li>b</li></ol>'
+				);
+
+				expect( md ).toInclude( "**bold**" );
+				expect( md ).toInclude( "*em*" );
+				expect( md ).toInclude( "`inline`" );
+				expect( md ).toInclude( "* one" );
+				expect( md ).toInclude( "  * nested" );
+				expect( md ).toInclude( "1. a" );
+			} );
+
+			it( "keeps fenced code blocks with their language and the raw code text", function() {
+				var md = converter.convert(
+					'<pre data-bxsites-title="app.bx"><code class="language-boxlang">function hi() {' & char( 10 ) &
+					'  return &quot;&lt;b&gt;&quot;' & char( 10 ) & '}' & char( 10 ) & '</code></pre>'
+				);
+
+				expect( md ).toInclude( "```boxlang" );
+				expect( md ).toInclude( 'return "<b>"' );
+				expect( md ).toInclude( "function hi() {" );
+			} );
+
+			it( "converts tables, including the bxsites-table-wrap container", function() {
+				var md = converter.convert(
+					'<div class="bxsites-table-wrap"><table class="table"><thead><tr><th>Name</th><th>Type</th></tr></thead>' &
+					'<tbody><tr><td>id</td><td><code>string</code></td></tr></tbody></table></div>'
+				);
+
+				expect( md ).toInclude( "| Name" );
+				expect( md ).toInclude( "|---" );
+				expect( md ).toInclude( "`string`" );
+			} );
+
+			it( "keeps links exactly as rendered, site-absolute paths and anchors included", function() {
+				var md = converter.convert(
+					'<p><a href="/guides/search/index.html##local">search</a> and <a href="https://x.io/a?b=1&amp;c=2">ext</a></p>'
+				);
+
+				expect( md ).toInclude( "[search](/guides/search/index.html##local)" );
+				expect( md ).toInclude( "[ext](https://x.io/a?b=1&c=2)" );
+			} );
+
+			it( "keeps an image's alt text and src, collapsing a picture wrapper to its img", function() {
+				var md = converter.convert(
+					'<figure><picture><source type="image/webp" srcset="/assets/a-256w.webp 256w">' &
+					'<img src="/assets/a.jpg" srcset="/assets/a-400w.jpg 400w" sizes="100vw" class="x" alt="Home banner" loading="lazy"></picture>' &
+					'<figcaption>Caption here</figcaption></figure>'
+				);
+
+				expect( md ).toInclude( "![Home banner](/assets/a.jpg)" );
+				expect( md ).toInclude( "Caption here" );
+				expect( md ).notToInclude( "srcset" );
+				expect( md ).notToInclude( "webp" );
+				expect( md ).notToInclude( "![Home banner](/assets/a.jpg)Caption here" );
+			} );
+
+			it( "drops a decorative image with no alt text", function() {
+				var md = converter.convert( '<p>Text</p><picture><img src="/assets/deco.png" alt=""></picture>' );
+
+				expect( md ).notToInclude( "deco.png" );
+				expect( md ).toBe( "Text" );
+			} );
+
+			it( "labels each tab panel with its tab button's text and drops the button row", function() {
+				var md = converter.convert(
+					'<p>Intro</p><div class="bxsites-tabs" data-bxsites-tabgroup role="tablist"><div class="bxsites-tabs__nav">' &
+					'<button type="button" class="bxsites-tab-btn" data-bxsites-tab="1">YAML</button>' &
+					'<button type="button" class="bxsites-tab-btn" data-bxsites-tab="2">JSON</button></div>' &
+					'<div class="bxsites-tabs__panels">' &
+					'<div class="bxsites-tab-panel" data-bxsites-tab="1"><pre><code class="language-yaml">a: 1' & char( 10 ) & '</code></pre></div>' &
+					'<div class="bxsites-tab-panel" data-bxsites-tab="2"><pre><code class="language-json">{ &quot;a&quot;: 1 }' & char( 10 ) & '</code></pre></div>' &
+					'</div></div>'
+				);
+
+				expect( md ).toInclude( "**YAML**" & char( 10 ) & char( 10 ) & "```yaml" );
+				expect( md ).toInclude( "**JSON**" & char( 10 ) & char( 10 ) & "```json" );
+				expect( md ).notToInclude( "YAMLJSON" );
+				expect( md ).toInclude( "Intro" & char( 10 ) & char( 10 ) & "**YAML**" );
+			} );
+
+			it( "turns an admonition into a blockquote headed by its bold title", function() {
+				var md = converter.convert(
+					'<div class="adm-block adm-note"><div class="adm-heading"><svg class="adm-icon"><use xlink:href="##adm-note" /></svg>' &
+					'<span>Requires a paid plan</span></div><div class="adm-body"><p>Building it is <strong>free</strong>.</p></div></div>'
+				);
+
+				expect( md ).toInclude( "> **Requires a paid plan**" );
+				expect( md ).toInclude( "> Building it is **free**." );
+				expect( md ).notToInclude( "adm-" );
+			} );
+
+			it( "renders a horizontal rule as ---", function() {
+				var md = converter.convert( '<p>a</p><hr><p>b</p>' );
+
+				expect( md ).toInclude( char( 10 ) & "---" & char( 10 ) );
+				expect( md ).notToInclude( "***" );
+				expect( md ).notToInclude( "BXSMDH" );
+			} );
+
+			it( "removes scripts, styles, svg sprites and form controls", function() {
+				var md = converter.convert(
+					'<svg class="adm-hidden"><symbol id="x"><path d="m1"/></symbol></svg><style>p{color:red}</style>' &
+					'<p>Kept</p><script>alert(1)</script><form><input name="q"><button>Go</button></form>'
+				);
+
+				expect( md ).toBe( "Kept" );
+			} );
+
+			it( "separates a paragraph from the content of a following container", function() {
+				var md = converter.convert( '<p>before</p><div class="wrap"><p>inside</p></div><p>after</p>' );
+
+				expect( md ).toBe( "before" & char( 10 ) & char( 10 ) & "inside" & char( 10 ) & char( 10 ) & "after" );
+			} );
+
+			it( "collapses runs of blank lines and trims the result", function() {
+				var md = converter.convert( '<p>one</p>' & char( 10 ) & char( 10 ) & char( 10 ) & '<p>two</p>' & char( 10 ) );
+
+				expect( md ).toBe( "one" & char( 10 ) & char( 10 ) & "two" );
+			} );
+
+		} );
+	}
+
+}

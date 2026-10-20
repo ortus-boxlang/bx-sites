@@ -91,6 +91,7 @@ docs pages and [blog](blog.md) posts:
     "tags": ["guides"],
     "headings": ["Getting Started", "Installation", "Next steps"],
     "body": "Getting Started Installation Run bxSites new to scaffold a project... Next steps ...",
+    "markdown": "# Getting Started\n\n## Installation\n\nRun `bxSites new` to scaffold a project...\n\n## Next steps\n\n...",
     "type": "page",
     "categories": [],
     "updatedAt": "2026-08-18T10:15:00.000Z"
@@ -101,6 +102,7 @@ docs pages and [blog](blog.md) posts:
     "tags": ["release"],
     "headings": ["Announcing bxSites 2.0"],
     "body": "Announcing bxSites 2.0 Today we're shipping...",
+    "markdown": "# Announcing bxSites 2.0\n\nToday we're shipping...",
     "type": "post",
     "categories": ["Releases"],
     "updatedAt": "2026-08-15"
@@ -111,17 +113,64 @@ docs pages and [blog](blog.md) posts:
 | Field | Description |
 |---|---|
 | `title` | The page's title (frontmatter `title`, same as `search-index.json`) |
-| `url` | The page's URL path, relative to the site root |
+| `url` | The page's URL path, relative to the root of its own tree - never root-absolute, never carrying the tree's own `path` (see Tree-relative URLs below) |
 | `tags` | The page's frontmatter `tags` array |
 | `headings` | The plain text of every `h1`-`h6` on the page, in document order |
 | `body` | The **complete** plain-text page content, HTML tags stripped - never truncated |
+| `markdown` | The same page content converted to Markdown from its rendered HTML, never truncated (see Markdown content below). Missing from an index built by an older bxSites - fall back to `body` there. |
 | `type` | `"page"` for a regular docs page, `"post"` for a [blog](blog.md) post |
 | `categories` | A post's own frontmatter `categories` array; always `[]` for a docs page (docs pages don't have categories) |
 | `updatedAt` | A post's own frontmatter `date`; a docs page's own frontmatter `date` when it sets one, else its source file's last-modified time as an ISO-8601 instant. `""` when neither is available. |
 
-Aside from `type`/`categories`/`updatedAt`, this is the same entry shape
+Aside from `markdown`, `type`, `categories` and `updatedAt`, this is the same entry shape
 `search-index.json` uses, with one difference: there, `body` is cut to 400
 characters with a trailing ellipsis; here, it's the full page.
+
+## Markdown content
+
+`markdown` is the page's rendered content converted to Markdown, so an AI
+agent can read headings, code, lists and tables without parsing HTML. It is
+converted from the rendered HTML, not from the source file (which can contain
+build directives and variables), so it matches what visitors see. `body` is
+unchanged and stays the plain text used for search.
+
+What the conversion produces:
+
+- Headings as ATX (`# Title`, `## Section`), without the anchor links
+- Fenced code blocks keep their language when the rendered code has one
+  (a `boxlang` fence); a block with no language comes out as an indented code block
+- Lists, nested lists, tables and inline formatting
+- Tab groups: each panel is prefixed with its tab label in bold (`**YAML**`)
+- Admonitions: a blockquote whose first line is the title in bold
+- Images as `![alt](src)`; decorative images with empty alt text are dropped
+- Scripts, styles, svg sprites and form controls are removed
+- Links and image sources are kept exactly as rendered: site-absolute paths
+  that already carry the build's `baseUrl` path and the tree's own prefix
+  (for example `/versions/0.9/guides/setup/index.html`)
+
+!!! note "Index size"
+    `markdown` roughly doubles the size of `mcp-index.json`. On this
+    documentation site the main tree's 73 pages went from about 460 KB to
+    about 1 MB.
+
+## Tree-relative URLs
+
+`mcp-index.json` is written once per tree, and each entry's `url` is relative
+to that tree's own root: no leading slash, no tree prefix, no `baseUrl` path.
+A page's full path is the tree's manifest `path` joined with its `url` (just
+the `url` when `path` is `""`):
+
+| Tree (manifest `path`) | Index file | Entry `url` | Page file |
+|---|---|---|---|
+| `""` | `mcp-index.json` | `guides/setup/index.html` | `guides/setup/index.html` |
+| `versions/0.9` | `versions/0.9/mcp-index.json` | `guides/setup/index.html` | `versions/0.9/guides/setup/index.html` |
+| `es` | `es/mcp-index.json` | `guides/setup/index.html` | `es/guides/setup/index.html` |
+
+So the same `url` appears in every tree that has that page. Anything that
+matches an entry against a site-absolute request path, such as a
+password-gated subtree, must prepend the tree's `path` first. This only
+applies to `url`: the links and image sources inside `markdown` are already
+site-absolute.
 
 ## The `mcp-manifest.json` format
 

@@ -10,7 +10,8 @@
  *
  * Same per-page entry shape as SearchIndexer.bx's own `search-index.json`
  * (title/url/headings/tags/body), reusing its shared PageTextExtractor.bx
- * for the heading/body extraction. The one difference: `body` here is the
+ * for the heading/body extraction, plus a `markdown` copy of the page for
+ * AI agents to read. The one difference: `body` here is the
  * complete plain-text page content, never truncated - this file is fetched
  * server-side by bxSites Cloud's edge worker, not shipped to every page
  * visitor's browser, so there's no download-size reason to truncate it,
@@ -27,13 +28,19 @@ class {
 	variables.textExtractor = new "models.build.PageTextExtractor@bxsites"()
 
 	/**
+	 * Rendered-HTML -> Markdown, for each entry's `markdown` field - see
+	 * HtmlToMarkdownConverter.bx's own docblock.
+	 */
+	variables.markdownConverter = new "models.build.HtmlToMarkdownConverter@bxsites"()
+
+	/**
 	 * Hidden pages are excluded, matching SearchIndexer.bx's own treatment
 	 * of them - a page that isn't linked from the nav shouldn't be exposed
 	 * to the MCP server either.
 	 *
 	 * @pages Array of page structs with an added `contentHtml` key (BuildPipeline sets this before calling) - a blog post's own struct (BlogDiscoverer.bx/BlogBuilder.bx) always carries a `categories` key (even when empty), which is this method's own signal that a given entry is a post rather than a docs page - see buildEntry()'s own docblock
 	 *
-	 * @return Array of { title, url, headings, body, tags, type, categories, updatedAt } - body is the full, untruncated plain-text page content
+	 * @return Array of { title, url, headings, body, markdown, tags, type, categories, updatedAt } - body is the full, untruncated plain-text page content; markdown is the same content converted from the rendered HTML (consumers must tolerate its absence in an index built by an older bxSites)
 	 */
 	array function build( required array pages ) {
 		return arguments.pages
@@ -73,6 +80,7 @@ class {
 			url        : arguments.page.urlPath,
 			headings   : variables.textExtractor.extractHeadings( arguments.page.contentHtml ),
 			body       : variables.textExtractor.stripTags( arguments.page.contentHtml ),
+			markdown   : variables.markdownConverter.convert( arguments.page.contentHtml ),
 			tags       : arguments.page.tags ?: [],
 			type       : isPost ? "post" : "page",
 			categories : isPost ? arguments.page.categories : [],

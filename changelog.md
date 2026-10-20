@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Every `mcp-index.json` entry now carries a `markdown` field: the page's rendered content converted to Markdown (ATX headings, fenced code with language, lists, tables, tab labels, admonitions as blockquotes, images with alt text), alongside the unchanged plain-text `body`. The guide also documents that each tree's entry `url` is relative to that tree's own root (manifest `path` + `url` is the page file).
 * First release
 * `imageGallery: true` now makes every content image click-to-enlarge (not only `::: image-gallery` items); arrows cycle through all images on the page, `class="no-zoom"` opts out
 * `docbox` verb - generates a BoxLang/CFML API reference into the content

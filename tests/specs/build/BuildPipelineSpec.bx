@@ -25,6 +25,26 @@ class extends="testbox.system.BaseSpec" {
 				return new "models.build.PathRelativizer@bxsites"().normalize( arguments.path );
 			}
 
+			/**
+			 * Every manifest tree's mcp-index.json `url`s are relative to that tree's own
+			 * root - never root-absolute, never carrying the tree's own `path` - so
+			 * `path` + "/" + `url` is the page's real file under site/.
+			 */
+			private function expectUrlsRelativeToTree( required string root, required array manifest ) {
+				for ( var tree in arguments.manifest ) {
+					var treeDir = len( tree.path ) ? arguments.root & "/site/" & tree.path : arguments.root & "/site";
+					var entries = jsonDeserialize( fileRead( treeDir & "/mcp-index.json" ) );
+					expect( entries.len() ).toBeGT( 0 );
+					for ( var entry in entries ) {
+						expect( entry.url ).notToStartWith( "/" );
+						if ( len( tree.path ) ) {
+							expect( entry.url ).notToStartWith( tree.path & "/" );
+						}
+						expect( fileExists( treeDir & "/" & entry.url ) ).toBeTrue();
+					}
+				}
+			}
+
 			private function newProject( string themeName = "bootstrap" ) {
 				var dir = createTempDirectory( prefix = "bxsites-buildpipeline-" );
 				tempDirs.append( dir );
@@ -1221,6 +1241,77 @@ class extends="testbox.system.BaseSpec" {
 				expect( esTree.label ).toBe( "Español" );
 				expect( esTree.locale ).toBe( "es" );
 				expect( esTree.default ).toBeFalse();
+			} );
+
+			it( "writes a markdown field on every mcp-index.json entry, converted from the rendered page", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"mcp":true}'
+				);
+				fileWrite(
+					root & "/docs/index.md",
+					"---" & char( 10 ) & "title: Home" & char( 10 ) & "---" & char( 10 ) &
+					'<p>A paragraph with <strong>bold</strong> text.</p>' & char( 10 ) &
+					'<pre><code class="language-bash">bxSites build' & char( 10 ) & '</code></pre>'
+				);
+
+				pipeline.build( root );
+
+				var entry = jsonDeserialize( fileRead( root & "/site/mcp-index.json" ) )[ 1 ];
+				expect( entry.markdown ).toInclude( "A paragraph with **bold** text." );
+				expect( entry.markdown ).toInclude( "```bash" & char( 10 ) & "bxSites build" );
+				expect( entry.markdown ).notToInclude( "<p>" );
+				expect( entry.body ).notToInclude( "**" );
+			} );
+
+			it( "writes every mcp-index.json url relative to its own version tree, so manifest path + url is the page's file", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"mcp":true,"versions":{"default":"1.0.x"}}'
+				);
+				fileWrite( root & "/docs/index.md", "Next home" );
+				directoryCreate( root & "/docs/guides", true, true );
+				fileWrite( root & "/docs/guides/setup.md", "---" & char( 10 ) & "title: Setup" & char( 10 ) & "---" & char( 10 ) & "Setup body" );
+				directoryCreate( root & "/docs/versions/1.0.x/guides", true, true );
+				fileWrite( root & "/docs/versions/1.0.x/index.md", "1.0.x home" );
+				fileWrite( root & "/docs/versions/1.0.x/guides/setup.md", "---" & char( 10 ) & "title: Setup" & char( 10 ) & "---" & char( 10 ) & "Old setup body" );
+				directoryCreate( root & "/docs/versions/2.0/guides", true, true );
+				fileWrite( root & "/docs/versions/2.0/index.md", "2.0 home" );
+				fileWrite( root & "/docs/versions/2.0/guides/setup.md", "---" & char( 10 ) & "title: Setup" & char( 10 ) & "---" & char( 10 ) & "Newer setup body" );
+
+				pipeline.build( root );
+
+				var manifest = jsonDeserialize( fileRead( root & "/site/mcp-manifest.json" ) );
+				expect( manifest.map( tree => tree.path ) ).toInclude( "versions/2.0" );
+				expectUrlsRelativeToTree( root, manifest );
+
+				var v2Urls = jsonDeserialize( fileRead( root & "/site/versions/2.0/mcp-index.json" ) ).map( entry => entry.url );
+				expect( v2Urls ).toInclude( "guides/setup/index.html" );
+			} );
+
+			it( "writes every mcp-index.json url relative to its own locale tree, so manifest path + url is the page's file", function() {
+				var root = newProject();
+				fileWrite(
+					root & "/bxsites.json",
+					'{"name":"Test Site","theme":{"name":"bootstrap"},"mcp":true,"i18n":{"locales":[{"code":"es","label":"Español"}]}}'
+				);
+				fileWrite( root & "/docs/index.md", "Welcome home" );
+				directoryCreate( root & "/docs/guides", true, true );
+				fileWrite( root & "/docs/guides/setup.md", "---" & char( 10 ) & "title: Setup" & char( 10 ) & "---" & char( 10 ) & "Setup body" );
+				directoryCreate( root & "/docs/i18n/es/guides", true, true );
+				fileWrite( root & "/docs/i18n/es/index.md", "Bienvenido" );
+				fileWrite( root & "/docs/i18n/es/guides/setup.md", "---" & char( 10 ) & "title: Configuracion" & char( 10 ) & "---" & char( 10 ) & "Cuerpo" );
+
+				pipeline.build( root );
+
+				var manifest = jsonDeserialize( fileRead( root & "/site/mcp-manifest.json" ) );
+				expect( manifest.map( tree => tree.path ) ).toInclude( "es" );
+				expectUrlsRelativeToTree( root, manifest );
+
+				var esUrls = jsonDeserialize( fileRead( root & "/site/es/mcp-index.json" ) ).map( entry => entry.url );
+				expect( esUrls ).toInclude( "guides/setup/index.html" );
 			} );
 
 			it( "renders an in-page table of contents from the page's own headings", function() {

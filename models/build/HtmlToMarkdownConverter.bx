@@ -1,0 +1,160 @@
+/**
+ * Rendered page HTML -> Markdown, for McpIndexer.bx's `markdown` field.
+ *
+ * bx-markdown's own `HtmlToMarkdown()` (Flexmark's html2md converter) does
+ * the actual conversion; this class only cleans bxSites' own rendered
+ * markup first, using the jsoup DOM that ships inside the same bx-markdown
+ * jar (so no extra dependency), because the converter alone mangles it:
+ *
+ * - heading anchors (`<a class="anchor">`) and heading `id`s turn into
+ *   `[#](#x) {#x}` noise, and h1/h2 come out as setext underlines; headings
+ *   are rewritten as ATX (`## Title`) via a placeholder instead
+ * - tab groups lose their tab labels; each panel gets its label as a bold line
+ * - `adm-block` admonitions flatten to loose text; they become a blockquote
+ *   headed by the admonition's title
+ * - `<picture>` wrappers, `<source>`/`srcset` and decorative (empty-alt)
+ *   images are dropped so a real image becomes `![alt](src)`
+ * - `<hr>` comes out as `*** ** * ** ***`; it becomes `---`
+ * - scripts, styles, svg sprites, iframes and form controls are removed
+ *
+ * Links and image sources are kept exactly as rendered (site-absolute paths,
+ * already carrying the build's basePath and the tree's own prefix).
+ */
+class {
+
+	variables.jsoup           = createObject( "java", "org.jsoup.Jsoup", "bxMarkdown" )
+	variables.blankLinesRegex = createObject( "java", "java.util.regex.Pattern" ).compile( "\n{3,}" )
+	variables.trailingSpacesRegex = createObject( "java", "java.util.regex.Pattern" ).compile( "[ \t]+(?=\n\n)" )
+
+	/**
+	 * @html A page's rendered content HTML (McpIndexer's `contentHtml`)
+	 *
+	 * @return The page as Markdown, trimmed; "" for empty input
+	 */
+	string function convert( required string html ) {
+		var doc = variables.jsoup.parseBodyFragment( arguments.html )
+		doc.outputSettings().prettyPrint( false )
+		var root = doc.body()
+
+		convertTabGroups( root )
+		root.select( "script, style, svg, iframe, noscript, template, form, button, input, select, textarea, source" ).remove()
+
+		convertAdmonitions( root )
+		convertHeadings( root )
+		convertImages( root )
+		for ( var rule in root.select( "hr" ) ) {
+			rule.tagName( "p" ).text( "BXSMDHR" )
+		}
+		unwrapContainers( root )
+
+		var markdown = HtmlToMarkdown( root.html() )
+		for ( var level = 1; level <= 6; level++ ) {
+			markdown = markdown.replace( "BXSMDH#level# ", repeatString( char( 35 ), level ) & " ", "all" )
+		}
+		markdown = markdown.replace( "BXSMDHR", "---", "all" )
+
+		markdown = variables.blankLinesRegex.matcher( markdown.replace( char( 13 ), "", "all" ) ).replaceAll( char( 10 ) & char( 10 ) )
+		return trim( variables.trailingSpacesRegex.matcher( markdown ).replaceAll( "" ) )
+	}
+
+	/**
+	 * Each tab panel gets its tab button's label as a bold first line; the
+	 * button row itself is dropped.
+	 */
+	private void function convertTabGroups( required any root ) {
+		for ( var group in arguments.root.select( ".bxsites-tabs" ) ) {
+			var labels = {}
+			for ( var tabButton in group.select( ".bxsites-tabs__nav [data-bxsites-tab]" ) ) {
+				labels[ tabButton.attr( "data-bxsites-tab" ) ] = trim( tabButton.text() )
+			}
+			for ( var panel in group.select( ".bxsites-tab-panel" ) ) {
+				var label = labels[ panel.attr( "data-bxsites-tab" ) ] ?: ""
+				if ( len( label ) ) {
+					panel.prependElement( "p" ).appendElement( "strong" ).text( label )
+				}
+			}
+			group.select( ".bxsites-tabs__nav" ).remove()
+		}
+	}
+
+	/**
+	 * `adm-block` (heading + body) -> a blockquote whose first line is the
+	 * admonition's title in bold.
+	 */
+	private void function convertAdmonitions( required any root ) {
+		for ( var block in arguments.root.select( "div.adm-block" ) ) {
+			var heading = block.selectFirst( ".adm-heading" )
+			if ( !isNull( heading ) ) {
+				var title = trim( heading.text() )
+				heading.empty().tagName( "p" )
+				if ( len( title ) ) {
+					heading.appendElement( "strong" ).text( title )
+				}
+			}
+			block.tagName( "blockquote" )
+		}
+	}
+
+	/**
+	 * Headings become paragraphs led by a `BXSMDH<level>` placeholder that
+	 * convert() swaps for the ATX hashes afterwards.
+	 */
+	private void function convertHeadings( required any root ) {
+		for ( var heading in arguments.root.select( "h1, h2, h3, h4, h5, h6" ) ) {
+			var level = right( heading.tagName(), 1 )
+			heading.select( "a.anchor, a.headerlink" ).remove()
+			heading.removeAttr( "id" ).tagName( "p" ).prependText( "BXSMDH#level# " )
+		}
+	}
+
+	/**
+	 * The converter glues a paragraph to the first paragraph inside a
+	 * following `<div>`/`<section>`/`<figure>`, so structural containers are
+	 * unwrapped; one holding only inline content becomes a paragraph.
+	 */
+	private void function unwrapContainers( required any root ) {
+		for ( var container in arguments.root.select( "div, section, figure" ) ) {
+			var hasBlockChild = false
+			for ( var child in container.children() ) {
+				if ( child.isBlock() ) {
+					hasBlockChild = true
+					break
+				}
+			}
+			if ( hasBlockChild ) {
+				container.unwrap()
+			} else {
+				container.tagName( "p" )
+			}
+		}
+	}
+
+	/**
+	 * `<picture>` collapses to its `<img>`, responsive/display attributes
+	 * are dropped, and an image with no alt text (decorative) is removed.
+	 */
+	private void function convertImages( required any root ) {
+		for ( var picture in arguments.root.select( "picture" ) ) {
+			var img = picture.selectFirst( "img" )
+			if ( isNull( img ) ) {
+				picture.remove()
+			} else {
+				picture.replaceWith( img )
+			}
+		}
+		for ( var img in arguments.root.select( "img" ) ) {
+			if ( !len( trim( img.attr( "alt" ) ) ) ) {
+				img.remove()
+				continue
+			}
+			for ( var attribute in [ "srcset", "sizes", "class", "loading", "width", "height" ] ) {
+				img.removeAttr( attribute )
+			}
+			if ( [ "figure", "div", "body" ].contains( img.parent().tagName() ) ) {
+				img.wrap( "<p></p>" )
+			}
+		}
+		arguments.root.select( "figcaption" ).tagName( "p" )
+	}
+
+}

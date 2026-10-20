@@ -235,6 +235,62 @@ class extends="testbox.system.BaseSpec" {
 				expect( index[ 1 ].updatedAt ).toBe( "2026-02-10" );
 			} );
 
+			it( "adds a markdown copy of the page, converted from the rendered HTML", function() {
+				var index = indexer.build( [
+					page(
+						title       = "Getting Started",
+						urlPath     = "getting-started/index.html",
+						contentHtml = '<h1 id="gs">Getting Started</h1><p>Hello <strong>World</strong>!</p><pre><code class="language-bash">bxSites build' & char( 10 ) & '</code></pre>'
+					)
+				] );
+
+				expect( index[ 1 ].markdown ).toStartWith( repeatString( char( 35 ), 1 ) & " Getting Started" );
+				expect( index[ 1 ].markdown ).toInclude( "Hello **World**!" );
+				expect( index[ 1 ].markdown ).toInclude( "```bash" & char( 10 ) & "bxSites build" );
+			} );
+
+			it( "keeps body plain text while markdown carries the formatting", function() {
+				var index = indexer.build( [
+					page( title = "Fmt", urlPath = "fmt/index.html", contentHtml = '<p>A <strong>bold</strong> <a href="/x/index.html">link</a></p>' )
+				] );
+
+				expect( index[ 1 ].body ).toBe( "A bold link" );
+				expect( index[ 1 ].markdown ).toBe( "A **bold** [link](/x/index.html)" );
+			} );
+
+			it( "never truncates the markdown of a long page", function() {
+				var longText = "";
+				for ( var i = 1; i <= 200; i++ ) {
+					longText &= "word "
+				}
+
+				var index = indexer.build( [ page( title = "Long", urlPath = "long/index.html", contentHtml = "<p>" & longText & "</p>" ) ] );
+
+				expect( index[ 1 ].markdown ).toBe( trim( longText ) );
+			} );
+
+			it( "gives a page with no content an empty markdown string", function() {
+				var index = indexer.build( [ page( title = "Empty", urlPath = "empty/index.html", contentHtml = "" ) ] );
+
+				expect( index[ 1 ].markdown ).toBe( "" );
+			} );
+
+			it( "serves the cached entry's markdown too when a page's sourcePath mtime hasn't changed", function() {
+				var dir = createTempDirectory( prefix = "bxsites-mcpindexer-" );
+				tempDirs.append( dir );
+				var sourcePath = dir & "/page.md";
+				fileWrite( sourcePath, "original" );
+
+				var pageStruct = page( title = "First", urlPath = "p/index.html", contentHtml = "<p>Original <em>body</em></p>" );
+				pageStruct.sourcePath = sourcePath;
+				indexer.build( [ pageStruct ] );
+
+				pageStruct.contentHtml = "<p>Changed</p>";
+				var second = indexer.build( [ pageStruct ] );
+
+				expect( second[ 1 ].markdown ).toBe( "Original *body*" );
+			} );
+
 			it( "marks a blog post as type post even when its categories array is empty", function() {
 				var index = indexer.build( [ post( title = "Uncategorized", urlPath = "blog/uncategorized/index.html", contentHtml = "<p>Body</p>" ) ] );
 
