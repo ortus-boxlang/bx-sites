@@ -101,6 +101,7 @@ post del [blog](blog.md):
     "tags": ["guides"],
     "headings": ["Getting Started", "Installation", "Next steps"],
     "body": "Getting Started Installation Run bxSites new to scaffold a project... Next steps ...",
+    "markdown": "# Getting Started\n\n## Installation\n\nRun `bxSites new` to scaffold a project...\n\n## Next steps\n\n...",
     "type": "page",
     "categories": [],
     "updatedAt": "2026-08-18T10:15:00.000Z"
@@ -111,6 +112,7 @@ post del [blog](blog.md):
     "tags": ["release"],
     "headings": ["Announcing bxSites 2.0"],
     "body": "Announcing bxSites 2.0 Today we're shipping...",
+    "markdown": "# Announcing bxSites 2.0\n\nToday we're shipping...",
     "type": "post",
     "categories": ["Releases"],
     "updatedAt": "2026-08-15"
@@ -121,18 +123,68 @@ post del [blog](blog.md):
 | Campo | Descrizione |
 |---|---|
 | `title` | Il titolo della pagina (frontmatter `title`, come in `search-index.json`) |
-| `url` | Il percorso URL della pagina, relativo alla radice del sito |
+| `url` | Il percorso URL della pagina, relativo alla radice del proprio albero - mai assoluto dalla radice e senza il `path` proprio dell'albero (vedi URL relativi all'albero più sotto) |
 | `tags` | L'array `tags` del frontmatter della pagina |
 | `headings` | Il testo semplice di ogni intestazione `h1`-`h6` della pagina, nell'ordine del documento |
 | `body` | Il contenuto testuale **completo** della pagina, senza tag HTML - mai troncato |
+| `markdown` | Lo stesso contenuto della pagina convertito in Markdown dal suo HTML renderizzato, mai troncato (vedi Contenuto in Markdown più sotto). Assente in un indice generato da una versione precedente di bxSites - in quel caso usa `body`. |
 | `type` | `"page"` per una normale pagina di documentazione, `"post"` per un post del [blog](blog.md) |
 | `categories` | L'array `categories` del frontmatter proprio di un post; sempre `[]` per una pagina di documentazione (le pagine di documentazione non hanno categorie) |
 | `updatedAt` | Il `date` del frontmatter proprio di un post; il `date` del frontmatter proprio di una pagina di documentazione quando lo imposta, altrimenti l'orario dell'ultima modifica del suo file sorgente come istante ISO-8601. `""` quando nessuno dei due è disponibile. |
 
-A parte `type`/`categories`/`updatedAt`, questa è la stessa forma di
+A parte `markdown`, `type`, `categories` e `updatedAt`, questa è la stessa forma di
 voce usata da `search-index.json`, con una differenza: lì `body` viene
 tagliato a 400 caratteri con puntini di sospensione finali; qui è la
 pagina intera.
+
+## Contenuto in Markdown
+
+`markdown` è il contenuto renderizzato della pagina convertito in Markdown,
+così un agente di IA può leggere intestazioni, codice, elenchi e tabelle
+senza analizzare l'HTML. La conversione parte dall'HTML renderizzato, non
+dal file sorgente (che può contenere direttive di build e variabili), quindi
+corrisponde a ciò che vedono i visitatori. `body` resta invariato ed è
+ancora il testo semplice usato per la ricerca.
+
+Cosa produce la conversione:
+
+- Intestazioni in formato ATX (`# Titolo`, `## Sezione`), senza i link di ancoraggio
+- I blocchi di codice recintati mantengono il loro linguaggio quando il codice
+  renderizzato ne ha uno (una recinzione `boxlang`); un blocco senza linguaggio esce come blocco di codice indentato
+- Elenchi, elenchi annidati, tabelle e formattazione inline
+- Gruppi di schede: ogni pannello è preceduto dal nome della sua scheda in grassetto (`**YAML**`)
+- Avvisi: una citazione la cui prima riga è il titolo in grassetto
+- Immagini come `![alt](src)`; le immagini decorative senza testo alternativo vengono omesse
+- Script, stili, sprite svg e controlli dei moduli vengono rimossi
+- Link e sorgenti delle immagini restano esattamente come renderizzati:
+  percorsi assoluti del sito che portano già il percorso di `baseUrl` della
+  build e il prefisso proprio dell'albero
+  (per esempio `/versions/0.9/guides/setup/index.html`)
+
+!!! note "Dimensione dell'indice"
+    `markdown` raddoppia circa la dimensione di `mcp-index.json`. In questo
+    sito di documentazione le 73 pagine dell'albero principale sono passate
+    da circa 460 KB a circa 1 MB.
+
+## URL relativi all'albero
+
+`mcp-index.json` viene scritto una volta per albero, e l'`url` di ogni voce
+è relativo alla radice del proprio albero: nessuna barra iniziale, nessun
+prefisso dell'albero, nessun percorso di `baseUrl`. Il percorso completo di
+una pagina è il `path` dell'albero nel manifesto unito al suo `url` (solo
+l'`url` quando `path` è `""`):
+
+| Albero (`path` del manifesto) | File indice | `url` della voce | File della pagina |
+|---|---|---|---|
+| `""` | `mcp-index.json` | `guides/setup/index.html` | `guides/setup/index.html` |
+| `versions/0.9` | `versions/0.9/mcp-index.json` | `guides/setup/index.html` | `versions/0.9/guides/setup/index.html` |
+| `es` | `es/mcp-index.json` | `guides/setup/index.html` | `es/guides/setup/index.html` |
+
+Quindi lo stesso `url` compare in ogni albero che ha quella pagina. Tutto
+ciò che confronta una voce con un percorso di richiesta assoluto del sito,
+come un sottoalbero protetto da password, deve prima anteporre il `path`
+dell'albero. Riguarda solo `url`: i link e le sorgenti delle immagini dentro
+`markdown` sono già assoluti del sito.
 
 ## Il formato di `mcp-manifest.json`
 

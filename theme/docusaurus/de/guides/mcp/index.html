@@ -147,7 +147,7 @@ MCP-Server</h1>
 
 
 
-	<details class="bxsites-toc-mobile dsrs-toc--mobile"><summary class="dsrs-toc--mobile__summary"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> Auf dieser Seite</summary><ul><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#aktivieren">Aktivieren</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#unabhängig-von-search">Unabh&auml;ngig von search</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#das-format-von-mcp-indexjson">Das Format von mcp-index.json</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#das-format-von-mcp-manifestjson">Das Format von mcp-manifest.json</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#das-format-von-mcp-navjson">Das Format von mcp-nav.json</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#websites-mit-mehreren-versionen-und-sprachen">Websites mit mehreren Versionen und Sprachen</a></li></ul></details>
+	<details class="bxsites-toc-mobile dsrs-toc--mobile"><summary class="dsrs-toc--mobile__summary"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> Auf dieser Seite</summary><ul><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#aktivieren">Aktivieren</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#unabhängig-von-search">Unabh&auml;ngig von search</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#das-format-von-mcp-indexjson">Das Format von mcp-index.json</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#markdown-inhalt">Markdown-Inhalt</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#baumrelative-urls">Baumrelative URLs</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#das-format-von-mcp-manifestjson">Das Format von mcp-manifest.json</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#das-format-von-mcp-navjson">Das Format von mcp-nav.json</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#websites-mit-mehreren-versionen-und-sprachen">Websites mit mehreren Versionen und Sprachen</a></li></ul></details>
 
 				<div class="dsrs-content-body">
 				<svg xmlns="http://www.w3.org/2000/svg" class="adm-hidden">
@@ -244,6 +244,7 @@ Navigation verwenden), sowohl für reguläre Doku-Seiten als auch für
     &quot;tags&quot;: [&quot;guides&quot;],
     &quot;headings&quot;: [&quot;Getting Started&quot;, &quot;Installation&quot;, &quot;Next steps&quot;],
     &quot;body&quot;: &quot;Getting Started Installation Run bxSites new to scaffold a project... Next steps ...&quot;,
+    &quot;markdown&quot;: &quot;# Getting Started\n\n## Installation\n\nRun `bxSites new` to scaffold a project...\n\n## Next steps\n\n...&quot;,
     &quot;type&quot;: &quot;page&quot;,
     &quot;categories&quot;: [],
     &quot;updatedAt&quot;: &quot;2026-08-18T10:15:00.000Z&quot;
@@ -254,6 +255,7 @@ Navigation verwenden), sowohl für reguläre Doku-Seiten als auch für
     &quot;tags&quot;: [&quot;release&quot;],
     &quot;headings&quot;: [&quot;Announcing bxSites 2.0&quot;],
     &quot;body&quot;: &quot;Announcing bxSites 2.0 Today we're shipping...&quot;,
+    &quot;markdown&quot;: &quot;# Announcing bxSites 2.0\n\nToday we're shipping...&quot;,
     &quot;type&quot;: &quot;post&quot;,
     &quot;categories&quot;: [&quot;Releases&quot;],
     &quot;updatedAt&quot;: &quot;2026-08-15&quot;
@@ -266,19 +268,72 @@ Navigation verwenden), sowohl für reguläre Doku-Seiten als auch für
 </thead>
 <tbody>
 <tr><td><code>title</code></td><td>Der Titel der Seite (Frontmatter <code>title</code>, wie bei <code>search-index.json</code>)</td></tr>
-<tr><td><code>url</code></td><td>Der URL-Pfad der Seite, relativ zur Website-Wurzel</td></tr>
+<tr><td><code>url</code></td><td>Der URL-Pfad der Seite, relativ zur Wurzel ihres eigenen Baums - nie wurzelabsolut und ohne den eigenen <code>path</code> des Baums (siehe Baumrelative URLs weiter unten)</td></tr>
 <tr><td><code>tags</code></td><td>Das Frontmatter-Array <code>tags</code> der Seite</td></tr>
 <tr><td><code>headings</code></td><td>Der reine Text jeder Überschrift <code>h1</code>-<code>h6</code> auf der Seite, in Dokumentreihenfolge</td></tr>
 <tr><td><code>body</code></td><td>Der <strong>vollständige</strong> reine Textinhalt der Seite, HTML-Tags entfernt - nie abgeschnitten</td></tr>
+<tr><td><code>markdown</code></td><td>Derselbe Seiteninhalt, aus dem gerenderten HTML in Markdown umgewandelt, nie abgeschnitten (siehe Markdown-Inhalt weiter unten). Fehlt in einem Index, der von einer älteren bxSites-Version erzeugt wurde - dort auf <code>body</code> zurückfallen.</td></tr>
 <tr><td><code>type</code></td><td><code>&quot;page&quot;</code> für eine reguläre Doku-Seite, <code>&quot;post&quot;</code> für einen <a href="/theme/docusaurus/de/guides/blog/index.html">Blog</a>-Beitrag</td></tr>
 <tr><td><code>categories</code></td><td>Das eigene Frontmatter-Array <code>categories</code> eines Beitrags; bei einer Doku-Seite immer <code>[]</code> (Doku-Seiten haben keine Kategorien)</td></tr>
 <tr><td><code>updatedAt</code></td><td>Das eigene Frontmatter-<code>date</code> eines Beitrags; bei einer Doku-Seite deren eigenes Frontmatter-<code>date</code>, sofern gesetzt, sonst der Zeitpunkt der letzten Änderung ihrer Quelldatei als ISO-8601-Zeitpunkt. <code>&quot;&quot;</code>, wenn keines von beidem verfügbar ist.</td></tr>
 </tbody>
 </table></div>
-<p>Abgesehen von <code>type</code>/<code>categories</code>/<code>updatedAt</code> ist dies dieselbe
+<p>Abgesehen von <code>markdown</code>, <code>type</code>, <code>categories</code> und <code>updatedAt</code> ist dies dieselbe
 Eintragsform wie bei <code>search-index.json</code>, mit einem Unterschied: dort
 wird <code>body</code> auf 400 Zeichen mit abschließender Ellipse gekürzt; hier ist
 es die vollständige Seite.</p>
+<h2 id="markdown-inhalt"><a href="#markdown-inhalt" id="markdown-inhalt" name="markdown-inhalt" class="anchor"></a>Markdown-Inhalt</h2>
+<p><code>markdown</code> ist der gerenderte Seiteninhalt, in Markdown umgewandelt, damit
+ein KI-Agent Überschriften, Code, Listen und Tabellen lesen kann, ohne HTML
+zu parsen. Die Umwandlung geht vom gerenderten HTML aus, nicht von der
+Quelldatei (die Build-Direktiven und Variablen enthalten kann), und
+entspricht daher dem, was Besucher sehen. <code>body</code> bleibt unverändert und ist
+weiterhin der reine Text für die Suche.</p>
+<p>Das liefert die Umwandlung:</p>
+<ul>
+<li>Überschriften als ATX (<code># Titel</code>, <code>## Abschnitt</code>), ohne die Anker-Links</li>
+<li>Codeblöcke mit Zaun behalten ihre Sprache, wenn der gerenderte Code eine hat
+(ein <code>boxlang</code>-Zaun); ein Block ohne Sprache wird als eingerückter Codeblock ausgegeben</li>
+<li>Listen, verschachtelte Listen, Tabellen und Inline-Formatierung</li>
+<li>Tab-Gruppen: Jedem Panel wird sein Tab-Name fett vorangestellt (<code>**YAML**</code>)</li>
+<li>Hinweisboxen: ein Zitatblock, dessen erste Zeile der Titel in Fettschrift ist</li>
+<li>Bilder als <code>![alt](src)</code>; dekorative Bilder ohne Alt-Text werden weggelassen</li>
+<li>Skripte, Stile, SVG-Sprites und Formularelemente werden entfernt</li>
+<li>Links und Bildquellen bleiben genau wie gerendert: websiteabsolute Pfade,
+die bereits den <code>baseUrl</code>-Pfad des Builds und das Präfix des Baums enthalten
+(zum Beispiel <code>/versions/0.9/guides/setup/index.html</code>)</li>
+</ul>
+<div class="adm-block adm-note">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-note" /></svg><span>Größe des Index</span>
+</div>
+<div class="adm-body">
+<p><code>markdown</code> verdoppelt die Größe von <code>mcp-index.json</code> in etwa. Bei dieser
+Dokumentations-Website wuchsen die 73 Seiten des Hauptbaums von etwa
+460 KB auf etwa 1 MB.</p>
+</div>
+</div>
+<h2 id="baumrelative-urls"><a href="#baumrelative-urls" id="baumrelative-urls" name="baumrelative-urls" class="anchor"></a>Baumrelative URLs</h2>
+<p><code>mcp-index.json</code> wird einmal pro Baum geschrieben, und die <code>url</code> jedes
+Eintrags ist relativ zur Wurzel des eigenen Baums: kein führender Schrägstrich,
+kein Baum-Präfix, kein <code>baseUrl</code>-Pfad. Der vollständige Pfad einer Seite ist
+der <code>path</code> des Baums aus dem Manifest, verbunden mit ihrer <code>url</code> (nur die
+<code>url</code>, wenn <code>path</code> <code>&quot;&quot;</code> ist):</p>
+<div class="bxsites-table-wrap"><table class="table">
+<thead>
+<tr><th>Baum (Manifest-<code>path</code>)</th><th>Index-Datei</th><th><code>url</code> des Eintrags</th><th>Seitendatei</th></tr>
+</thead>
+<tbody>
+<tr><td><code>&quot;&quot;</code></td><td><code>mcp-index.json</code></td><td><code>guides/setup/index.html</code></td><td><code>guides/setup/index.html</code></td></tr>
+<tr><td><code>versions/0.9</code></td><td><code>versions/0.9/mcp-index.json</code></td><td><code>guides/setup/index.html</code></td><td><code>versions/0.9/guides/setup/index.html</code></td></tr>
+<tr><td><code>es</code></td><td><code>es/mcp-index.json</code></td><td><code>guides/setup/index.html</code></td><td><code>es/guides/setup/index.html</code></td></tr>
+</tbody>
+</table></div>
+<p>Dieselbe <code>url</code> kommt also in jedem Baum vor, der diese Seite hat. Alles, was
+einen Eintrag mit einem websiteabsoluten Anfragepfad abgleicht, etwa ein
+passwortgeschützter Teilbaum, muss zuerst den <code>path</code> des Baums voranstellen.
+Das betrifft nur <code>url</code>: Die Links und Bildquellen innerhalb von <code>markdown</code>
+sind bereits websiteabsolut.</p>
 <h2 id="das-format-von-mcp-manifestjson"><a href="#das-format-von-mcp-manifestjson" id="das-format-von-mcp-manifestjson" name="das-format-von-mcp-manifestjson" class="anchor"></a>Das Format von <code>mcp-manifest.json</code></h2>
 <p>Einmal pro Website-Build geschrieben (nicht einmal pro Baum), listet
 <code>site/mcp-manifest.json</code> jeden Baum auf, der eine eigene
@@ -345,7 +400,7 @@ geschrieben, nur an der Website-Wurzel, und listet jeden dieser Bäume auf.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/mcp.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/docusaurus/de/guides/mcp.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Oct 19, 2026, 1&#x3a;40&#x3a;25 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20MCP-Server&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fdocusaurus%2Fde%2Fguides%2Fmcp%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/mcp.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/docusaurus/de/guides/mcp.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Oct 23, 2026, 2&#x3a;40&#x3a;18 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20MCP-Server&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fdocusaurus%2Fde%2Fguides%2Fmcp%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
 
 			</article>
 
@@ -379,7 +434,7 @@ geschrieben, nur an der Website-Wurzel, und listet jeden dieser Bäume auf.</p>
 		</main>
 
 		<aside class="dsrs-toc-sidebar">
-			<nav class="dsrs-toc bxsites-toc" aria-label="Auf dieser Seite"><div class="dsrs-toc__title bxsites-toc__title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> Auf dieser Seite</div><ul><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#aktivieren">Aktivieren</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#unabhängig-von-search">Unabh&auml;ngig von search</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#das-format-von-mcp-indexjson">Das Format von mcp-index.json</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#das-format-von-mcp-manifestjson">Das Format von mcp-manifest.json</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#das-format-von-mcp-navjson">Das Format von mcp-nav.json</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#websites-mit-mehreren-versionen-und-sprachen">Websites mit mehreren Versionen und Sprachen</a></li></ul></nav>
+			<nav class="dsrs-toc bxsites-toc" aria-label="Auf dieser Seite"><div class="dsrs-toc__title bxsites-toc__title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> Auf dieser Seite</div><ul><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#aktivieren">Aktivieren</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#unabhängig-von-search">Unabh&auml;ngig von search</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#das-format-von-mcp-indexjson">Das Format von mcp-index.json</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#markdown-inhalt">Markdown-Inhalt</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#baumrelative-urls">Baumrelative URLs</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#das-format-von-mcp-manifestjson">Das Format von mcp-manifest.json</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#das-format-von-mcp-navjson">Das Format von mcp-nav.json</a></li><li class="dsrs-toc__item dsrs-toc__item--2"><a href="#websites-mit-mehreren-versionen-und-sprachen">Websites mit mehreren Versionen und Sprachen</a></li></ul></nav>
 		</aside>
 
 	</div>

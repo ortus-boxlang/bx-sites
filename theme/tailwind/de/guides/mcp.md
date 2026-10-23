@@ -102,6 +102,7 @@ Navigation verwenden), sowohl für reguläre Doku-Seiten als auch für
     "tags": ["guides"],
     "headings": ["Getting Started", "Installation", "Next steps"],
     "body": "Getting Started Installation Run bxSites new to scaffold a project... Next steps ...",
+    "markdown": "# Getting Started\n\n## Installation\n\nRun `bxSites new` to scaffold a project...\n\n## Next steps\n\n...",
     "type": "page",
     "categories": [],
     "updatedAt": "2026-08-18T10:15:00.000Z"
@@ -112,6 +113,7 @@ Navigation verwenden), sowohl für reguläre Doku-Seiten als auch für
     "tags": ["release"],
     "headings": ["Announcing bxSites 2.0"],
     "body": "Announcing bxSites 2.0 Today we're shipping...",
+    "markdown": "# Announcing bxSites 2.0\n\nToday we're shipping...",
     "type": "post",
     "categories": ["Releases"],
     "updatedAt": "2026-08-15"
@@ -122,18 +124,67 @@ Navigation verwenden), sowohl für reguläre Doku-Seiten als auch für
 | Feld | Beschreibung |
 |---|---|
 | `title` | Der Titel der Seite (Frontmatter `title`, wie bei `search-index.json`) |
-| `url` | Der URL-Pfad der Seite, relativ zur Website-Wurzel |
+| `url` | Der URL-Pfad der Seite, relativ zur Wurzel ihres eigenen Baums - nie wurzelabsolut und ohne den eigenen `path` des Baums (siehe Baumrelative URLs weiter unten) |
 | `tags` | Das Frontmatter-Array `tags` der Seite |
 | `headings` | Der reine Text jeder Überschrift `h1`-`h6` auf der Seite, in Dokumentreihenfolge |
 | `body` | Der **vollständige** reine Textinhalt der Seite, HTML-Tags entfernt - nie abgeschnitten |
+| `markdown` | Derselbe Seiteninhalt, aus dem gerenderten HTML in Markdown umgewandelt, nie abgeschnitten (siehe Markdown-Inhalt weiter unten). Fehlt in einem Index, der von einer älteren bxSites-Version erzeugt wurde - dort auf `body` zurückfallen. |
 | `type` | `"page"` für eine reguläre Doku-Seite, `"post"` für einen [Blog](blog.md)-Beitrag |
 | `categories` | Das eigene Frontmatter-Array `categories` eines Beitrags; bei einer Doku-Seite immer `[]` (Doku-Seiten haben keine Kategorien) |
 | `updatedAt` | Das eigene Frontmatter-`date` eines Beitrags; bei einer Doku-Seite deren eigenes Frontmatter-`date`, sofern gesetzt, sonst der Zeitpunkt der letzten Änderung ihrer Quelldatei als ISO-8601-Zeitpunkt. `""`, wenn keines von beidem verfügbar ist. |
 
-Abgesehen von `type`/`categories`/`updatedAt` ist dies dieselbe
+Abgesehen von `markdown`, `type`, `categories` und `updatedAt` ist dies dieselbe
 Eintragsform wie bei `search-index.json`, mit einem Unterschied: dort
 wird `body` auf 400 Zeichen mit abschließender Ellipse gekürzt; hier ist
 es die vollständige Seite.
+
+## Markdown-Inhalt
+
+`markdown` ist der gerenderte Seiteninhalt, in Markdown umgewandelt, damit
+ein KI-Agent Überschriften, Code, Listen und Tabellen lesen kann, ohne HTML
+zu parsen. Die Umwandlung geht vom gerenderten HTML aus, nicht von der
+Quelldatei (die Build-Direktiven und Variablen enthalten kann), und
+entspricht daher dem, was Besucher sehen. `body` bleibt unverändert und ist
+weiterhin der reine Text für die Suche.
+
+Das liefert die Umwandlung:
+
+- Überschriften als ATX (`# Titel`, `## Abschnitt`), ohne die Anker-Links
+- Codeblöcke mit Zaun behalten ihre Sprache, wenn der gerenderte Code eine hat
+  (ein `boxlang`-Zaun); ein Block ohne Sprache wird als eingerückter Codeblock ausgegeben
+- Listen, verschachtelte Listen, Tabellen und Inline-Formatierung
+- Tab-Gruppen: Jedem Panel wird sein Tab-Name fett vorangestellt (`**YAML**`)
+- Hinweisboxen: ein Zitatblock, dessen erste Zeile der Titel in Fettschrift ist
+- Bilder als `![alt](src)`; dekorative Bilder ohne Alt-Text werden weggelassen
+- Skripte, Stile, SVG-Sprites und Formularelemente werden entfernt
+- Links und Bildquellen bleiben genau wie gerendert: websiteabsolute Pfade,
+  die bereits den `baseUrl`-Pfad des Builds und das Präfix des Baums enthalten
+  (zum Beispiel `/versions/0.9/guides/setup/index.html`)
+
+!!! note "Größe des Index"
+    `markdown` verdoppelt die Größe von `mcp-index.json` in etwa. Bei dieser
+    Dokumentations-Website wuchsen die 73 Seiten des Hauptbaums von etwa
+    460 KB auf etwa 1 MB.
+
+## Baumrelative URLs
+
+`mcp-index.json` wird einmal pro Baum geschrieben, und die `url` jedes
+Eintrags ist relativ zur Wurzel des eigenen Baums: kein führender Schrägstrich,
+kein Baum-Präfix, kein `baseUrl`-Pfad. Der vollständige Pfad einer Seite ist
+der `path` des Baums aus dem Manifest, verbunden mit ihrer `url` (nur die
+`url`, wenn `path` `""` ist):
+
+| Baum (Manifest-`path`) | Index-Datei | `url` des Eintrags | Seitendatei |
+|---|---|---|---|
+| `""` | `mcp-index.json` | `guides/setup/index.html` | `guides/setup/index.html` |
+| `versions/0.9` | `versions/0.9/mcp-index.json` | `guides/setup/index.html` | `versions/0.9/guides/setup/index.html` |
+| `es` | `es/mcp-index.json` | `guides/setup/index.html` | `es/guides/setup/index.html` |
+
+Dieselbe `url` kommt also in jedem Baum vor, der diese Seite hat. Alles, was
+einen Eintrag mit einem websiteabsoluten Anfragepfad abgleicht, etwa ein
+passwortgeschützter Teilbaum, muss zuerst den `path` des Baums voranstellen.
+Das betrifft nur `url`: Die Links und Bildquellen innerhalb von `markdown`
+sind bereits websiteabsolut.
 
 ## Das Format von `mcp-manifest.json`
 

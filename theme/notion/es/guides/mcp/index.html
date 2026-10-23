@@ -147,7 +147,7 @@ Servidor MCP</h1>
 
 
 
-	<details class="bxsites-toc-mobile ntn-toc--mobile"><summary class="ntn-toc--mobile__summary"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> En esta p&aacute;gina</summary><ul><li class="ntn-toc__item ntn-toc__item--2"><a href="#activarlo">Activarlo</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#independiente-de-search">Independiente de search</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#el-formato-de-mcp-indexjson">El formato de mcp-index.json</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#el-formato-de-mcp-manifestjson">El formato de mcp-manifest.json</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#el-formato-de-mcp-navjson">El formato de mcp-nav.json</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#sitios-con-múltiples-versiones-e-idiomas">Sitios con m&uacute;ltiples versiones e idiomas</a></li></ul></details>
+	<details class="bxsites-toc-mobile ntn-toc--mobile"><summary class="ntn-toc--mobile__summary"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> En esta p&aacute;gina</summary><ul><li class="ntn-toc__item ntn-toc__item--2"><a href="#activarlo">Activarlo</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#independiente-de-search">Independiente de search</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#el-formato-de-mcp-indexjson">El formato de mcp-index.json</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#contenido-en-markdown">Contenido en Markdown</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#urls-relativas-al-árbol">URLs relativas al &aacute;rbol</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#el-formato-de-mcp-manifestjson">El formato de mcp-manifest.json</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#el-formato-de-mcp-navjson">El formato de mcp-nav.json</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#sitios-con-múltiples-versiones-e-idiomas">Sitios con m&uacute;ltiples versiones e idiomas</a></li></ul></details>
 
 				<div class="ntn-content-body">
 				<svg xmlns="http://www.w3.org/2000/svg" class="adm-hidden">
@@ -243,6 +243,7 @@ del <a href="/theme/notion/es/guides/blog/index.html">blog</a>:</p>
     &quot;tags&quot;: [&quot;guides&quot;],
     &quot;headings&quot;: [&quot;Getting Started&quot;, &quot;Installation&quot;, &quot;Next steps&quot;],
     &quot;body&quot;: &quot;Getting Started Installation Run bxSites new to scaffold a project... Next steps ...&quot;,
+    &quot;markdown&quot;: &quot;# Getting Started\n\n## Installation\n\nRun `bxSites new` to scaffold a project...\n\n## Next steps\n\n...&quot;,
     &quot;type&quot;: &quot;page&quot;,
     &quot;categories&quot;: [],
     &quot;updatedAt&quot;: &quot;2026-08-18T10:15:00.000Z&quot;
@@ -253,6 +254,7 @@ del <a href="/theme/notion/es/guides/blog/index.html">blog</a>:</p>
     &quot;tags&quot;: [&quot;release&quot;],
     &quot;headings&quot;: [&quot;Announcing bxSites 2.0&quot;],
     &quot;body&quot;: &quot;Announcing bxSites 2.0 Today we're shipping...&quot;,
+    &quot;markdown&quot;: &quot;# Announcing bxSites 2.0\n\nToday we're shipping...&quot;,
     &quot;type&quot;: &quot;post&quot;,
     &quot;categories&quot;: [&quot;Releases&quot;],
     &quot;updatedAt&quot;: &quot;2026-08-15&quot;
@@ -265,19 +267,73 @@ del <a href="/theme/notion/es/guides/blog/index.html">blog</a>:</p>
 </thead>
 <tbody>
 <tr><td><code>title</code></td><td>El título de la página (frontmatter <code>title</code>, igual que en <code>search-index.json</code>)</td></tr>
-<tr><td><code>url</code></td><td>La ruta URL de la página, relativa a la raíz del sitio</td></tr>
+<tr><td><code>url</code></td><td>La ruta URL de la página, relativa a la raíz de su propio árbol - nunca absoluta desde la raíz y sin el <code>path</code> propio del árbol (consulta URLs relativas al árbol más abajo)</td></tr>
 <tr><td><code>tags</code></td><td>El array <code>tags</code> del frontmatter de la página</td></tr>
 <tr><td><code>headings</code></td><td>El texto plano de cada encabezado <code>h1</code>-<code>h6</code> de la página, en el orden del documento</td></tr>
 <tr><td><code>body</code></td><td>El contenido de texto plano <strong>completo</strong> de la página, sin etiquetas HTML - nunca truncado</td></tr>
+<tr><td><code>markdown</code></td><td>El mismo contenido de la página convertido a Markdown desde su HTML renderizado, nunca truncado (consulta Contenido en Markdown más abajo). Falta en un índice generado por una versión anterior de bxSites - usa <code>body</code> en ese caso.</td></tr>
 <tr><td><code>type</code></td><td><code>&quot;page&quot;</code> para una página de documentación normal, <code>&quot;post&quot;</code> para una entrada de <a href="/theme/notion/es/guides/blog/index.html">blog</a></td></tr>
 <tr><td><code>categories</code></td><td>El propio array <code>categories</code> del frontmatter de una entrada; siempre <code>[]</code> para una página de documentación (las páginas de documentación no tienen categorías)</td></tr>
 <tr><td><code>updatedAt</code></td><td>El propio <code>date</code> del frontmatter de una entrada; el propio <code>date</code> del frontmatter de una página de documentación cuando lo define, o si no, la fecha de última modificación de su archivo fuente como instante ISO-8601. <code>&quot;&quot;</code> cuando ninguno de los dos está disponible.</td></tr>
 </tbody>
 </table></div>
-<p>Aparte de <code>type</code>/<code>categories</code>/<code>updatedAt</code>, esta es la misma forma de
+<p>Aparte de <code>markdown</code>, <code>type</code>, <code>categories</code> y <code>updatedAt</code>, esta es la misma forma de
 entrada que usa <code>search-index.json</code>, con una diferencia: allí, <code>body</code> se
 recorta a 400 caracteres con puntos suspensivos al final; aquí, es la
 página completa.</p>
+<h2 id="contenido-en-markdown"><a href="#contenido-en-markdown" id="contenido-en-markdown" name="contenido-en-markdown" class="anchor"></a>Contenido en Markdown</h2>
+<p><code>markdown</code> es el contenido renderizado de la página convertido a Markdown,
+para que un agente de IA pueda leer encabezados, código, listas y tablas
+sin analizar HTML. Se convierte desde el HTML renderizado, no desde el
+archivo fuente (que puede contener directivas de compilación y variables),
+así que coincide con lo que ven los visitantes. <code>body</code> no cambia y sigue
+siendo el texto plano que se usa para la búsqueda.</p>
+<p>Lo que produce la conversión:</p>
+<ul>
+<li>Encabezados en formato ATX (<code># Título</code>, <code>## Sección</code>), sin los enlaces ancla</li>
+<li>Los bloques de código con valla conservan su lenguaje cuando el código
+renderizado lo tiene (una valla <code>boxlang</code>); un bloque sin lenguaje sale como bloque de código con sangría</li>
+<li>Listas, listas anidadas, tablas y formato en línea</li>
+<li>Grupos de pestañas: cada panel lleva antes el nombre de su pestaña en negrita (<code>**YAML**</code>)</li>
+<li>Avisos: una cita cuya primera línea es el título en negrita</li>
+<li>Imágenes como <code>![alt](src)</code>; las imágenes decorativas sin texto alternativo se omiten</li>
+<li>Se eliminan scripts, estilos, sprites svg y controles de formulario</li>
+<li>Los enlaces y las fuentes de imagen se conservan tal como se renderizaron:
+rutas absolutas del sitio que ya llevan la ruta de <code>baseUrl</code> de la
+compilación y el prefijo propio del árbol
+(por ejemplo <code>/versions/0.9/guides/setup/index.html</code>)</li>
+</ul>
+<div class="adm-block adm-note">
+<div class="adm-heading">
+<svg class="adm-icon"><use xlink:href="#adm-note" /></svg><span>Tamaño del índice</span>
+</div>
+<div class="adm-body">
+<p><code>markdown</code> multiplica aproximadamente por dos el tamaño de
+<code>mcp-index.json</code>. En este sitio de documentación, las 73 páginas del
+árbol principal pasaron de unos 460 KB a cerca de 1 MB.</p>
+</div>
+</div>
+<h2 id="urls-relativas-al-árbol"><a href="#urls-relativas-al-árbol" id="urls-relativas-al-árbol" name="urls-relativas-al-árbol" class="anchor"></a>URLs relativas al árbol</h2>
+<p><code>mcp-index.json</code> se escribe una vez por árbol, y la <code>url</code> de cada entrada
+es relativa a la raíz de su propio árbol: sin barra inicial, sin prefijo
+del árbol, sin ruta de <code>baseUrl</code>. La ruta completa de una página es el
+<code>path</code> del árbol en el manifiesto unido a su <code>url</code> (solo la <code>url</code> cuando
+<code>path</code> es <code>&quot;&quot;</code>):</p>
+<div class="bxsites-table-wrap"><table class="table">
+<thead>
+<tr><th>Árbol (<code>path</code> del manifiesto)</th><th>Archivo de índice</th><th><code>url</code> de la entrada</th><th>Archivo de la página</th></tr>
+</thead>
+<tbody>
+<tr><td><code>&quot;&quot;</code></td><td><code>mcp-index.json</code></td><td><code>guides/setup/index.html</code></td><td><code>guides/setup/index.html</code></td></tr>
+<tr><td><code>versions/0.9</code></td><td><code>versions/0.9/mcp-index.json</code></td><td><code>guides/setup/index.html</code></td><td><code>versions/0.9/guides/setup/index.html</code></td></tr>
+<tr><td><code>es</code></td><td><code>es/mcp-index.json</code></td><td><code>guides/setup/index.html</code></td><td><code>es/guides/setup/index.html</code></td></tr>
+</tbody>
+</table></div>
+<p>Así, la misma <code>url</code> aparece en todos los árboles que tienen esa página.
+Todo lo que compare una entrada con una ruta de solicitud absoluta del
+sitio, como un subárbol protegido con contraseña, debe anteponer primero el
+<code>path</code> del árbol. Esto solo afecta a <code>url</code>: los enlaces y las fuentes de
+imagen dentro de <code>markdown</code> ya son absolutos del sitio.</p>
 <h2 id="el-formato-de-mcp-manifestjson"><a href="#el-formato-de-mcp-manifestjson" id="el-formato-de-mcp-manifestjson" name="el-formato-de-mcp-manifestjson" class="anchor"></a>El formato de <code>mcp-manifest.json</code></h2>
 <p>Escrito una vez por build del sitio (no una vez por árbol),
 <code>site/mcp-manifest.json</code> enumera cada árbol que obtuvo su propio
@@ -345,7 +401,7 @@ esos árboles.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/guides/mcp.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/notion/es/guides/mcp.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Oct 19, 2026, 1&#x3a;40&#x3a;25 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Servidor%20MCP&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fnotion%2Fes%2Fguides%2Fmcp%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/es/guides/mcp.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Editar esta p&aacute;gina</a><a href="/theme/notion/es/guides/mcp.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Descargar Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> &Uacute;ltima actualizaci&oacute;n Oct 23, 2026, 2&#x3a;40&#x3a;18 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20Servidor%20MCP&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fnotion%2Fes%2Fguides%2Fmcp%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
 
 			</article>
 
@@ -379,7 +435,7 @@ esos árboles.</p>
 		</main>
 
 		<aside class="ntn-toc-sidebar">
-			<nav class="ntn-toc bxsites-toc" aria-label="En esta p&aacute;gina"><div class="ntn-toc__title bxsites-toc__title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> En esta p&aacute;gina</div><ul><li class="ntn-toc__item ntn-toc__item--2"><a href="#activarlo">Activarlo</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#independiente-de-search">Independiente de search</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#el-formato-de-mcp-indexjson">El formato de mcp-index.json</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#el-formato-de-mcp-manifestjson">El formato de mcp-manifest.json</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#el-formato-de-mcp-navjson">El formato de mcp-nav.json</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#sitios-con-múltiples-versiones-e-idiomas">Sitios con m&uacute;ltiples versiones e idiomas</a></li></ul></nav>
+			<nav class="ntn-toc bxsites-toc" aria-label="En esta p&aacute;gina"><div class="ntn-toc__title bxsites-toc__title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16"/><path d="M6 8h6"/><path d="M6 14h9"/><path d="M6 20h4"/></svg> En esta p&aacute;gina</div><ul><li class="ntn-toc__item ntn-toc__item--2"><a href="#activarlo">Activarlo</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#independiente-de-search">Independiente de search</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#el-formato-de-mcp-indexjson">El formato de mcp-index.json</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#contenido-en-markdown">Contenido en Markdown</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#urls-relativas-al-árbol">URLs relativas al &aacute;rbol</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#el-formato-de-mcp-manifestjson">El formato de mcp-manifest.json</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#el-formato-de-mcp-navjson">El formato de mcp-nav.json</a></li><li class="ntn-toc__item ntn-toc__item--2"><a href="#sitios-con-múltiples-versiones-e-idiomas">Sitios con m&uacute;ltiples versiones e idiomas</a></li></ul></nav>
 		</aside>
 
 	</div>
