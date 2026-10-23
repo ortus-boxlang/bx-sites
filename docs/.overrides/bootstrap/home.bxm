@@ -829,40 +829,6 @@ your first site.</pre>
 		</div>
 	</section>
 
-	<!--- Section: BoxLang ecosystem cards --->
-	<section>
-		<div class="bxh-wrap">
-			<div class="section-head" style="text-align:center;margin-inline:auto">
-				<span class="eyebrow" style="justify-content:center">Powered by BoxLang</span>
-				<h2>Not a one‑off tool. A whole platform.</h2>
-				<div class="eco-hero-mark">#homeIcon( "boxlang" )#</div>
-			</div>
-			<div class="eco-row">
-				<a class="eco-card" href="https://boxlang.io" target="_blank" rel="noopener noreferrer">
-					<div class="icon">#homeIcon( "boxlang" )#</div><b>BoxLang Language</b><span>The dynamic JVM language bxSites is built on.</span>
-				</a>
-				<a class="eco-card" href="https://boxlang.ortusbooks.com/boxlang-framework/matchbox" target="_blank" rel="noopener noreferrer">
-					<div class="icon">#homeIcon( "matchbox" )#</div><b>MatchBox</b><span> is a native Rust implementation for the BoxLang Language (WASM|ESP32|Native).</span>
-				</a>
-				<a class="eco-card" href="https://ai.boxlang.io" target="_blank" rel="noopener noreferrer">
-					<div class="icon">#homeIcon( "boxlang" )#</div><b>BoxLang AI</b><span>Part of the BoxLang platform.</span>
-				</a>
-				<a class="eco-card" href="https://bxagents.ai" target="_blank" rel="noopener noreferrer">
-					<div class="icon">#homeIcon( "robot" )#</div><b>bxAgents</b><span> : Build AI agents by convention — a conventions-based framework for AI agents powered by BoxLang AI.</span>
-				</a>
-				<a class="eco-card" href="https://commandbox.ortusbooks.com" target="_blank" rel="noopener noreferrer">
-					<div class="icon">#homeIcon( "commandbox" )#</div><b>CommandBox</b><span>The package manager and CLI that installs bxSites in one line.</span>
-				</a>
-				<a class="eco-card" href="https://www.coldbox.org" target="_blank" rel="noopener noreferrer">
-					<div class="icon">#homeIcon( "coldbox" )#</div><b>ColdBox</b><span>A conventions-based HMVC framework for web applications.</span>
-				</a>
-				<a class="eco-card eco-card-wide" href="https://www.testbox.run" target="_blank" rel="noopener noreferrer">
-					<div class="icon">#homeIcon( "testbox" )#</div><b>TestBox</b><span>The BDD/TDD testing framework used to build bxSites itself.</span>
-				</a>
-			</div>
-		</div>
-	</section>
-
 	<!--- Section: theme gallery strip (same content, ten looks) --->
 	<section>
 		<div class="bxh-wrap">
@@ -937,6 +903,63 @@ your first site.</pre>
 					<a class="bxh-btn bxh-btn-primary" href="#variables.basePath#getting-started/">Get Started &rarr;</a>
 					<a class="bxh-btn bxh-btn-ghost" href="#variables.basePath#getting-started/">Read the docs</a>
 				</div>
+			</div>
+		</div>
+	</section>
+
+	<!--- Section: BoxLang ecosystem (same cards and icons as bxaudio.boxlang.io) --->
+	<section>
+		<div class="bxh-wrap">
+			<div class="section-head" style="text-align:center;margin-inline:auto">
+				<span class="eyebrow" style="justify-content:center">Part of the BoxLang ecosystem</span>
+				<h2>Built with <span class="grad">BoxLang</span>. A whole platform.</h2>
+			</div>
+			<div class="eco-grid">
+				<a class="eco-card" style="--d:0.0s" href="https://boxlang.io" target="_blank" rel="noopener noreferrer">
+					<div class="ic"><img src="#variables.basePath#assets/home/ecosystem/boxlang.svg" width="52" height="52" loading="lazy" alt="BoxLang"></div>
+					<b>BoxLang <span class="eco-arrow" aria-hidden="true">&nearr;</span></b>
+					<span>The dynamic JVM language bxSites is built on.</span>
+				</a>
+				<a class="eco-card" style="--d:0.05s" href="https://boxlang.io/plans" target="_blank" rel="noopener noreferrer">
+					<div class="ic ic--plus">#homeIcon( "seal-check" )#</div>
+					<b>BoxLang+ <span class="eco-arrow" aria-hidden="true">&nearr;</span></b>
+					<span>Support, modules and the features that run a fleet.</span>
+				</a>
+				<a class="eco-card" style="--d:0.1s" href="https://ai.boxlang.io" target="_blank" rel="noopener noreferrer">
+					<div class="ic"><img src="#variables.basePath#assets/home/ecosystem/boxlang-ai.svg" width="52" height="52" loading="lazy" alt="BoxLang AI"></div>
+					<b>BoxLang AI <span class="eco-arrow" aria-hidden="true">&nearr;</span></b>
+					<span>The AI layer of the BoxLang platform.</span>
+				</a>
+				<a class="eco-card" style="--d:0.15s" href="https://matchbox.boxlang.io" target="_blank" rel="noopener noreferrer">
+					<div class="ic"><img src="#variables.basePath#assets/home/ecosystem/matchbox.svg" width="52" height="52" loading="lazy" alt="MatchBox"></div>
+					<b>MatchBox <span class="eco-arrow" aria-hidden="true">&nearr;</span></b>
+					<span>A native Rust implementation of BoxLang for WASM, ESP32 and native.</span>
+				</a>
+				<a class="eco-card" style="--d:0.2s" href="https://www.coldbox.org" target="_blank" rel="noopener noreferrer">
+					<div class="ic"><img src="#variables.basePath#assets/home/ecosystem/coldbox.svg" width="52" height="52" loading="lazy" alt="ColdBox"></div>
+					<b>ColdBox <span class="eco-arrow" aria-hidden="true">&nearr;</span></b>
+					<span>A conventions-based HMVC framework for web applications.</span>
+				</a>
+				<a class="eco-card" style="--d:0.25s" href="https://commandbox.ortusbooks.com" target="_blank" rel="noopener noreferrer">
+					<div class="ic"><img src="#variables.basePath#assets/home/ecosystem/commandbox.svg" width="52" height="52" loading="lazy" alt="CommandBox"></div>
+					<b>CommandBox <span class="eco-arrow" aria-hidden="true">&nearr;</span></b>
+					<span>The CLI and Package Manager for BoxLang.</span>
+				</a>
+				<a class="eco-card" style="--d:0.3s" href="https://bxplaywright.boxlang.io" target="_blank" rel="noopener noreferrer">
+					<div class="ic"><img src="#variables.basePath#assets/home/ecosystem/bxplaywright.svg" width="52" height="52" loading="lazy" alt="BxPlaywright"></div>
+					<b>BxPlaywright <span class="eco-arrow" aria-hidden="true">&nearr;</span></b>
+					<span>Browser automation and testing for BoxLang.</span>
+				</a>
+				<a class="eco-card" style="--d:0.35s" href="https://bxlens.boxlang.io" target="_blank" rel="noopener noreferrer">
+					<div class="ic"><img src="#variables.basePath#assets/home/ecosystem/bxlens.svg" width="52" height="52" loading="lazy" alt="BxLens"></div>
+					<b>BxLens <span class="eco-arrow" aria-hidden="true">&nearr;</span></b>
+					<span>The debug bar and ops console for BoxLang apps.</span>
+				</a>
+				<a class="eco-card" style="--d:0.4s" href="https://bxagents.ai" target="_blank" rel="noopener noreferrer">
+					<div class="ic"><img src="#variables.basePath#assets/home/ecosystem/bxagents.svg" width="52" height="52" loading="lazy" alt="BxAgents"></div>
+					<b>BxAgents <span class="eco-arrow" aria-hidden="true">&nearr;</span></b>
+					<span>Build AI agents by convention, powered by BoxLang AI.</span>
+				</a>
 			</div>
 		</div>
 	</section>
