@@ -910,9 +910,8 @@ este valor por defecto de todo el sitio para esa página en particular.
 una tarjeta social PNG real de 1200x630 para cada página que aún no tenga
 su propio `ogImage` en el frontmatter - el título de la página sobre el
 degradado de marca, escrito en `site/assets/og/<page>.png` - en lugar de
-que cada página comparta una imagen genérica de todo el sitio. Puro
-`java.awt`/`javax.imageio` por debajo (parte de cualquier JVM en la que
-se ejecute BoxLang), así que esto no necesita navegador headless, servicio
+que cada página comparta una imagen genérica de todo el sitio. Dibujado con el módulo `bx-image` (1.13.0 o posterior)
+por debajo, así que esto no necesita navegador headless, servicio
 externo, ni acceso a red en el momento de la construcción.
 
 === "YAML"

@@ -914,8 +914,8 @@ Seite immer gegenüber diesem websiteweiten Standard.
 Seite, die noch keine eigene `ogImage`-Frontmatter hat, eine echte
 1200x630-PNG-Social-Card - den Seitentitel auf dem Marken-Gradienten,
 geschrieben nach `site/assets/og/<page>.png` - statt dass sich alle Seiten
-ein generisches, websiteweites Bild teilen. Rein `java.awt`/`javax.imageio`
-unter der Haube (Teil jeder JVM, auf der BoxLang läuft), sodass dafür kein
+ein generisches, websiteweites Bild teilen. Gezeichnet mit dem Modul `bx-image` (ab 1.13.0)
+unter der Haube, sodass dafür kein
 Headless-Browser, kein externer Dienst und kein Netzwerkzugriff zur
 Build-Zeit nötig ist.
 

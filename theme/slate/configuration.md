@@ -988,8 +988,8 @@ always wins over this site-wide default for that one page.
 PNG social card for every page that doesn't already have its own
 frontmatter `ogImage` - the page's title on the brand gradient, written to
 `site/assets/og/<page>.png` - instead of every page sharing one generic
-site-wide image. Pure `java.awt`/`javax.imageio` under the hood (part of
-any JVM BoxLang runs on), so this needs no headless browser, external
+site-wide image. Drawn with the `bx-image` module (1.13.0 or later) under the
+hood, so this needs no headless browser, external
 service, or network access at build time.
 
 Each card is a dark, brand-tinted background with a soft glow, the site

@@ -842,9 +842,8 @@ renderizza una vera immagine PNG 1200x630 come social card per ogni
 pagina che non ha già un proprio `ogImage` nel frontmatter - il titolo
 della pagina sul gradiente del brand, scritto in
 `site/assets/og/<page>.png` - invece di condividere tutte le pagine
-un'unica immagine generica a livello di sito. Solo `java.awt`/
-`javax.imageio` dietro le quinte (parte di qualsiasi JVM su cui gira
-BoxLang), quindi non serve alcun browser headless, servizio esterno, o
+un'unica immagine generica a livello di sito. Disegnato con il modulo `bx-image` (1.13.0 o successivo)
+dietro le quinte, quindi non serve alcun browser headless, servizio esterno, o
 accesso alla rete al momento del build.
 
 === "YAML"
