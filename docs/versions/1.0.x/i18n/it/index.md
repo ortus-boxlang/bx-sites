@@ -81,7 +81,7 @@ unico comando.
 :::
 ::: card title="Distribuiscilo ovunque" icon="phosphor-duotone:cloud-arrow-up" href="guides/deployment.md"
 `bxSites deploy` invia il sito compilato direttamente a S3, Azure, GCS,
-Firebase, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages, o GitHub
+Firebase, FTP/SFTP, rsync, Cloudflare Pages, o GitHub
 Pages - oppure `bxSites package` lo comprime in un unico archivio.
 :::
 ::: card title="Variabili riutilizzabili e funzioni magiche" icon="phosphor-duotone:function" href="guides/variables-and-functions.md"

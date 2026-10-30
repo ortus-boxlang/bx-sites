@@ -5,7 +5,7 @@ import ortus.boxlang.bxsites.core.BxSitesVerb;
 /**
  * Wraps bx-sites' {@code deploy} verb - builds the site, then ships it via
  * whichever {@code target} its own {@code bxsites.yaml}/CLI flags configure
- * (S3, GitHub Pages, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages,
+ * (S3, GitHub Pages, FTP/SFTP, rsync, Cloudflare Pages,
  * local, etc.). Confirmed against {@code Deploy.bx}: the verb itself writes
  * no separate manifest/log file - any local-disk side effect is whatever the
  * chosen target does - so there's no single output artifact to check here;

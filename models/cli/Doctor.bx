@@ -153,7 +153,7 @@ class {
 	 * `deployments/*` entry (models/deploy/targets/FtpTarget.bx,
 	 * SftpTarget.bx) - same reasoning as checkOptionalTomlModule() above:
 	 * box.json depends on it unconditionally, but a project deploying to
-	 * s3/netlify/vercel/etc. (or not deploying at all) is never at risk.
+	 * s3/cloudflare-pages/etc. (or not deploying at all) is never at risk.
 	 *
 	 * @root Absolute project root
 	 * @moduleService getBoxRuntime().getModuleService()'s own singleton

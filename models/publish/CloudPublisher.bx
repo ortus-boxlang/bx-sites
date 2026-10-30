@@ -17,10 +17,10 @@
  * publish*, exactly like `publish`'s own contract says.
  *
  * `buildZipArchive()` is a pure, in-memory zip builder with the exact same
- * shape/behavior as `NetlifyTarget.bx`'s own (its root IS the site's own
- * contents, no wrapping folder) - deliberately duplicated rather than
- * shared, matching every other "target" in this module that also builds
- * its own zip independently (Netlify/Cloudflare Pages). The real HTTP path
+ * shape/behavior as `CloudflarePagesTarget.bx`'s own (its root IS the site's
+ * own contents, no wrapping folder) - deliberately duplicated rather than
+ * shared, matching the other "target" in this module that also builds
+ * its own zip independently. The real HTTP path
  * writes those bytes out to a real temp file only because BoxLang's own
  * `bx:httpparam type="file"` requires an actual filesystem path, not raw
  * bytes - never left behind on either success or failure (see `publish()`).
@@ -30,7 +30,7 @@
  * against this exact same contract, in the separate `bx-sites-cloud`
  * repo). Everything below the zip-building step is implemented purely
  * from that documented contract, the same honesty pattern this module
- * already uses for `NetlifyTarget.bx`/`CloudflarePagesTarget.bx`.
+ * already uses for `CloudflarePagesTarget.bx`.
  */
 class {
 
@@ -119,7 +119,7 @@ class {
 	 * or a clear, typed error distinguishing auth failure/unknown site/
 	 * everything else - per the publish API's own documented error contract
 	 * (401/403/404/400/413/500), matching this module's existing
-	 * `assertOk()` convention (see e.g. `NetlifyTarget.bx`) but with the
+	 * `assertOk()` convention (see e.g. `CloudflarePagesTarget.bx`) but with the
 	 * finer-grained error types `publish`'s own CLI verb needs to phrase a
 	 * human-readable message for each case.
 	 *

@@ -77,7 +77,7 @@ _bxsites_complete() {
 			"clean --projectRoot") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;
 			"coldbox --appRoot") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;
 			"coldbox --projectRoot") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;
-			"deploy --target") COMPREPLY=($(compgen -W "s3 azure gcs firebase ftp sftp rsync netlify vercel cloudflare-pages local github-pages" -- "$part")) ;;
+			"deploy --target") COMPREPLY=($(compgen -W "s3 azure gcs firebase ftp sftp rsync cloudflare-pages local github-pages" -- "$part")) ;;
 			"deploy --projectRoot") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;
 			"docbox --jsonDir") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;
 			"docbox --projectRoot") COMPREPLY=($(compgen -f -- "$part")); compopt -o filenames 2>/dev/null ;;

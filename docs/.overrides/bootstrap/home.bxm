@@ -275,7 +275,7 @@ your first site.</pre>
 		<div class="stat-strip">
 			<div><div class="stat-num" data-stat="themes">10</div><div class="stat-label">built-in themes</div></div>
 			<div><div class="stat-num" data-stat="verbs">33</div><div class="stat-label">CLI verbs, with tab completion</div></div>
-			<div><div class="stat-num" data-stat="deploy-targets">12</div><div class="stat-label">one-command deploy targets</div></div>
+			<div><div class="stat-num" data-stat="deploy-targets">10</div><div class="stat-label">one-command deploy targets</div></div>
 			<div><div class="stat-num">0</div><div class="stat-label">Node.js needed, 0 outbound requests</div></div>
 		</div>
 	</div>
@@ -317,7 +317,7 @@ your first site.</pre>
 				</div>
 				<div class="pipe-card">
 					<h3>Deploy</h3>
-					<div class="pipe-chips pipe-chips--row"><span>s3</span><span>azure</span><span>gcs</span><span>netlify</span><span>vercel</span><span>cloudflare-pages</span><span>github-pages</span><span>+5</span><span class="chip-cloud">bxSites Cloud</span></div>
+					<div class="pipe-chips pipe-chips--row"><span>s3</span><span>azure</span><span>gcs</span><span>cloudflare-pages</span><span>github-pages</span><span>+3</span><span class="chip-cloud">bxSites Cloud</span></div>
 				</div>
 			</div>
 		</div>
@@ -519,7 +519,7 @@ your first site.</pre>
 				<div class="bxh-card">
 					<div class="icon">#homeIcon( "deploy" )#</div>
 					<h3><a href="#variables.basePath#guides/deployment/">Ship it anywhere</a></h3>
-					<p><code>bxSites deploy</code> ships to S3, Azure, GCS, Firebase, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages, or GitHub Pages.</p>
+					<p><code>bxSites deploy</code> ships to S3, Azure, GCS, Firebase, FTP/SFTP, rsync, Cloudflare Pages, or GitHub Pages.</p>
 				</div>
 				<div class="bxh-card">
 					<div class="icon">#homeIcon( "versions" )#</div>
@@ -751,7 +751,7 @@ your first site.</pre>
 							<td class="yes" style="color:var(--muted)">&check;</td>
 						</tr>
 						<tr>
-							<td>One-command deploy (S3, Netlify, Vercel, Cloudflare, FTP&hellip;)</td>
+							<td>One-command deploy (S3, Cloudflare, FTP&hellip;)</td>
 							<td class="us yes">&check;</td>
 							<td class="no">&cross;</td>
 							<td class="no">&cross;</td>

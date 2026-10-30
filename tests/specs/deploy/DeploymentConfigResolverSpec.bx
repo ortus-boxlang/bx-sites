@@ -218,24 +218,15 @@ class extends="testbox.system.BaseSpec" {
 				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'serviceAccountKeyPath'" );
 			} );
 
-			it( "requires siteId and authTokenEnvVar for a netlify target", function() {
-				var dir = newTempProject();
-				writeEntry( dir, "prod", { target : "netlify" } );
+			it( "treats the removed netlify and vercel targets as unknown", function() {
+				for ( var removed in [ "netlify", "vercel" ] ) {
+					var dir = newTempProject();
+					writeEntry( dir, "prod", { target : removed } );
 
-				var result = resolver.resolve( dir );
+					var result = resolver.resolve( dir );
 
-				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'siteId'" );
-				expect( result.errors.toList( "|" ) ).toInclude( "missing an 'authTokenEnvVar'" );
-			} );
-
-			it( "requires projectId and authTokenEnvVar for a vercel target", function() {
-				var dir = newTempProject();
-				writeEntry( dir, "prod", { target : "vercel" } );
-
-				var result = resolver.resolve( dir );
-
-				expect( result.errors.toList( "|" ) ).toInclude( "missing a 'projectId'" );
-				expect( result.errors.toList( "|" ) ).toInclude( "missing an 'authTokenEnvVar'" );
+					expect( result.errors.toList( "|" ) ).toInclude( "unknown target [#removed#]" );
+				}
 			} );
 
 			it( "requires accountId, projectName, and apiTokenEnvVar for a cloudflare-pages target", function() {
