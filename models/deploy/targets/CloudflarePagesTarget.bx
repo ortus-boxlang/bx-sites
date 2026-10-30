@@ -1,7 +1,7 @@
 /**
  * Deploys the already-built `site/` directory to Cloudflare Pages via its
  * "Direct Upload" flow - by a wide margin the least-documented of the
- * three new static-host targets (Netlify/Vercel/Cloudflare Pages).
+ * static-host targets.
  *
  * WHAT'S ACTUALLY OFFICIALLY DOCUMENTED (confirmed this session,
  * 2026-08-26, developers.cloudflare.com/pages/get-started/direct-upload/

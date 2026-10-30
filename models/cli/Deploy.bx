@@ -8,7 +8,7 @@
  *
  *  1. `--entry=<name>` - dispatches to whatever target the named
  *     `deployments/<name>.yaml` (or .yml/.toml/.json) convention entry declares (`s3`, `azure`,
- *     `gcs`, `firebase`, `ftp`, `sftp`, `rsync`, `netlify`, `vercel`,
+ *     `gcs`, `firebase`, `ftp`, `sftp`, `rsync`,
  *     `cloudflare-pages`, `local`, or `github-pages`), resolved and
  *     validated via `DeploymentConfigResolver`.
  *  2. `--target=<name> [flags]` - a flag-only shorthand, kept working with
@@ -42,8 +42,6 @@ class {
 		"azure"            : "models.deploy.targets.AzureBlobTarget@bxsites",
 		"gcs"              : "models.deploy.targets.GcsTarget@bxsites",
 		"firebase"         : "models.deploy.targets.FirebaseTarget@bxsites",
-		"netlify"          : "models.deploy.targets.NetlifyTarget@bxsites",
-		"vercel"           : "models.deploy.targets.VercelTarget@bxsites",
 		"cloudflare-pages" : "models.deploy.targets.CloudflarePagesTarget@bxsites"
 	}
 

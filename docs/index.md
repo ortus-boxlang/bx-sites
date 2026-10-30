@@ -87,7 +87,7 @@ existing export or project into a working bx-sites project in one command.
 :::
 ::: card title="Ship it anywhere" icon="phosphor-duotone:cloud-arrow-up" href="guides/deployment.md"
 `bxSites deploy` ships the built site straight to S3, Azure, GCS, Firebase,
-FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages, or GitHub Pages - or
+FTP/SFTP, rsync, Cloudflare Pages, or GitHub Pages - or
 `bxSites package` zips it into a single archive instead.
 :::
 ::: card title="Reusable variables & magic functions" icon="phosphor-duotone:function" href="guides/variables-and-functions.md"

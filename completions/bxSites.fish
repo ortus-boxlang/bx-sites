@@ -102,7 +102,7 @@ complete -c bxSites -n '__bxsites_using_verb coldbox' -l tags -x
 complete -c bxSites -n '__bxsites_using_verb coldbox' -l include -x
 complete -c bxSites -n '__bxsites_using_verb coldbox' -l projectRoot -r -F
 complete -c bxSites -n '__bxsites_using_verb deploy' -l entry -x
-complete -c bxSites -n '__bxsites_using_verb deploy' -l target -x -a 's3 azure gcs firebase ftp sftp rsync netlify vercel cloudflare-pages local github-pages'
+complete -c bxSites -n '__bxsites_using_verb deploy' -l target -x -a 's3 azure gcs firebase ftp sftp rsync cloudflare-pages local github-pages'
 complete -c bxSites -n '__bxsites_using_verb deploy' -l verbose
 complete -c bxSites -n '__bxsites_using_verb deploy' -l projectRoot -r -F
 complete -c bxSites -n '__bxsites_using_verb docbox' -l projectTitle -x

@@ -78,7 +78,7 @@ Register-ArgumentCompleter -Native -CommandName 'bxSites', 'bxsites' -ScriptBloc
 		)
 		'deploy' = @(
 			@{ Name = 'entry'; Value = $true; Choices = @(); File = $false }
-			@{ Name = 'target'; Value = $true; Choices = @('s3', 'azure', 'gcs', 'firebase', 'ftp', 'sftp', 'rsync', 'netlify', 'vercel', 'cloudflare-pages', 'local', 'github-pages'); File = $false }
+			@{ Name = 'target'; Value = $true; Choices = @('s3', 'azure', 'gcs', 'firebase', 'ftp', 'sftp', 'rsync', 'cloudflare-pages', 'local', 'github-pages'); File = $false }
 			@{ Name = 'verbose'; Value = $false; Choices = @(); File = $false }
 			@{ Name = 'projectRoot'; Value = $true; Choices = @(); File = $true }
 		)

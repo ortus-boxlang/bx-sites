@@ -12,7 +12,7 @@ Dateien ausgeliefert werden können. [`bxSites deploy`](../cli-reference.md#depl
 bringt sie mit einem einzigen Befehl direkt dorthin: S3 (und jeder
 S3-kompatible Dienst - DigitalOcean Spaces, Cloudflare R2, Backblaze B2,
 MinIO), Azure Blob Storage, Google Cloud Storage, Firebase Hosting, FTP,
-SFTP, rsync über SSH, Netlify, Vercel, Cloudflare Pages, ein lokales
+SFTP, rsync über SSH, Cloudflare Pages, ein lokales
 Verzeichnis oder GitHub Pages.
 
 ## Der Befehl `deploy`
@@ -205,26 +205,6 @@ erhalten. Mit `"deleteExtraneous": true` werden sie ebenfalls gelöscht
 (rsyncs `--delete`). Ein `remotePath` von `/`, `~` oder `.` wird
 abgelehnt - gib den eigenen Ordner der Website an.
 
-### `netlify`
-
-```json title="deployments/production.json"
-{
-  "target": "netlify",
-  "siteId": "my-site-id-or-name.netlify.app",
-  "authTokenEnvVar": "NETLIFY_AUTH_TOKEN"
-}
-```
-
-### `vercel`
-
-```json title="deployments/production.json"
-{
-  "target": "vercel",
-  "projectId": "my-project",
-  "authTokenEnvVar": "VERCEL_TOKEN"
-}
-```
-
 ### `cloudflare-pages`
 
 Cloudflare hat keine offiziell dokumentierte REST-API für
@@ -391,12 +371,9 @@ geeignete Optionen:
   [Cloudflare-Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)-Richtlinie
   (E-Mail-Allowlist, SSO oder eine Einmal-PIN) - ohne eigenen
   Anwendungscode.
-- **Netlify** - eingebauter
-  [Passwortschutz](https://docs.netlify.com/manage/security/secure-access-to-sites/site-protection/)
-  pro Website oder pro Deploy, allein aus den Website-Einstellungen heraus.
 - **Ein kleiner Reverse-Proxy** (beliebiger Host) - HTTP-Basic-Auth vor den
   statischen Dateien (eine `.htpasswd`-artige Regel, oder ein
-  Ein-Datei-Cloudflare-Worker/Netlify-Edge-Function) reicht, um Suchmaschinen
+  Ein-Datei-Cloudflare-Worker) reicht, um Suchmaschinen
   und Zufallsbesucher fernzuhalten, auch wenn das keine echte
   Pro-Benutzer-Identität ist, wie sie eine eingeloggte Anwendung hätte.
 

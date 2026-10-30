@@ -3,7 +3,7 @@
  * hosting SaaS this module targets) over its documented publish API, via
  * `models/publish/CloudPublisher.bx`. Distinct from the pluggable
  * `deploy`/`gh-deploy` verbs (which ship to a target the *caller* owns -
- * S3, Netlify, a git branch, ...) - `publish` always ships to bxSites
+ * S3, Cloudflare Pages, a git branch, ...) - `publish` always ships to bxSites
  * Cloud specifically, identified by `cloud.siteId`/`cloud.apiUrl` in
  * `bxsites.yaml`.
  *

@@ -32,7 +32,7 @@ class {
 		variables.tomlRenderer = new "models.build.TomlRenderer@bxsites"()
 		variables.VALID_TARGETS = [
 			"local", "github-pages", "s3", "ftp", "sftp", "rsync",
-			"azure", "gcs", "firebase", "netlify", "vercel", "cloudflare-pages"
+			"azure", "gcs", "firebase", "cloudflare-pages"
 		]
 		return this
 	}
@@ -210,24 +210,6 @@ class {
 				}
 				if ( !len( arguments.config.serviceAccountKeyPath ?: "" ) ) {
 					arguments.errors.append( "deployments/#arguments.name# (firebase) is missing a 'serviceAccountKeyPath'" )
-				}
-				break
-			}
-			case "netlify": {
-				if ( !len( arguments.config.siteId ?: "" ) ) {
-					arguments.errors.append( "deployments/#arguments.name# (netlify) is missing a 'siteId'" )
-				}
-				if ( !len( arguments.config.authTokenEnvVar ?: "" ) ) {
-					arguments.errors.append( "deployments/#arguments.name# (netlify) is missing an 'authTokenEnvVar'" )
-				}
-				break
-			}
-			case "vercel": {
-				if ( !len( arguments.config.projectId ?: "" ) ) {
-					arguments.errors.append( "deployments/#arguments.name# (vercel) is missing a 'projectId'" )
-				}
-				if ( !len( arguments.config.authTokenEnvVar ?: "" ) ) {
-					arguments.errors.append( "deployments/#arguments.name# (vercel) is missing an 'authTokenEnvVar'" )
 				}
 				break
 			}

@@ -80,7 +80,7 @@ bx-sites-Projekt um.
 :::
 ::: card title="Überall ausliefern" icon="phosphor-duotone:cloud-arrow-up" href="guides/deployment.md"
 `bxSites deploy` liefert die gebaute Website direkt an S3, Azure, GCS,
-Firebase, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages oder GitHub
+Firebase, FTP/SFTP, rsync, Cloudflare Pages oder GitHub
 Pages aus - oder `bxSites package` packt sie stattdessen in ein einzelnes
 Archiv.
 :::

@@ -4,7 +4,7 @@
  * Cloud account), and a genuine connection-failure test against an
  * unreachable endpoint (no server mocked) - matching this repo's existing
  * pattern for untestable-without-real-credentials/servers code (see
- * `NetlifyTargetSpec.bx`/`S3TargetSpec.bx`'s own docblocks). The publish
+ * `CloudflarePagesTargetSpec.bx`/`S3TargetSpec.bx`'s own docblocks). The publish
  * API itself doesn't exist yet (built in parallel, against this same
  * contract, in the separate `bx-sites-cloud` repo) - so a real successful
  * `publish()` call has not been exercised anywhere in this repo either.
