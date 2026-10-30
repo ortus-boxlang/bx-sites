@@ -37,7 +37,7 @@
         "bx-markdown":"*",
         "bx-esapi":"*",
         "bx-yaml":"*",
-        "bx-image":"*",
+        "bx-image":">=1.13.0",
         "bx-ftp":"*",
         "bx-toml":"*"
     },
