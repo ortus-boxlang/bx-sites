@@ -40,7 +40,7 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( fileExists( outputPath ) ).toBeTrue();
 
-				var image = imageNew( outputPath );
+				var image = imageRead( outputPath );
 				expect( image.getWidth() ).toBe( 1200 );
 				expect( image.getHeight() ).toBe( 630 );
 			} );
@@ -51,7 +51,7 @@ class extends="testbox.system.BaseSpec" {
 
 				generator.generate( longTitle, "My Site", outputPath );
 
-				var image = imageNew( outputPath );
+				var image = imageRead( outputPath );
 				expect( image.getWidth() ).toBe( 1200 );
 				expect( image.getHeight() ).toBe( 630 );
 			} );
@@ -73,7 +73,7 @@ class extends="testbox.system.BaseSpec" {
 					muted       : "##99aab5"
 				} );
 
-				var image = imageNew( outputPath );
+				var image = imageRead( outputPath );
 				expect( image.getWidth() ).toBe( 1200 );
 				expect( image.getHeight() ).toBe( 630 );
 			} );
@@ -83,7 +83,7 @@ class extends="testbox.system.BaseSpec" {
 
 				generator.generate( "Title", "My Site", outputPath, { accent : "##ff0000", accentEnd : "##0000ff" } );
 
-				var image = imageNew( outputPath );
+				var image = imageRead( outputPath );
 				var left = pixelAt( image, 2, 625 );
 				var right = pixelAt( image, 1197, 625 );
 				expect( left.red ).toBeGT( left.blue );

@@ -223,7 +223,7 @@ class {
 			return
 		}
 		try {
-			return imageNew( arguments.logoPath )
+			return imageRead( arguments.logoPath )
 		} catch ( any e ) {
 			return
 		}
