@@ -1,8 +1,7 @@
 /**
- * SocialCardGenerator.bx renders real PNGs via java.awt/javax.imageio, so
- * these specs exercise the actual renderer rather than a fake - there's no
- * external dependency to seam around (unlike MarkdownRenderer.bx's bx-markdown
- * dependency), just the JVM's own always-available AWT/ImageIO classes.
+ * SocialCardGenerator.bx renders real PNGs with bx-image, so these specs
+ * exercise the actual renderer rather than a fake - the module is a plain
+ * dependency, with nothing to seam around.
  */
 class extends="testbox.system.BaseSpec" {
 
@@ -22,6 +21,12 @@ class extends="testbox.system.BaseSpec" {
 				}
 			} );
 
+			// bx-image has no pixel getter, so read the packed ARGB int off its BufferedImage
+			private struct function pixelAt( required any image, required numeric x, required numeric y ) {
+				var rgb = arguments.image.getBufferedImage().getRGB( arguments.x, arguments.y );
+				return { red : bitAnd( bitSHRN( rgb, 16 ), 255 ), green : bitAnd( bitSHRN( rgb, 8 ), 255 ), blue : bitAnd( rgb, 255 ) };
+			}
+
 			private function newOutputPath() {
 				var dir = createTempDirectory( prefix = "bxsites-socialcard-" );
 				tempDirs.append( dir );
@@ -35,7 +40,7 @@ class extends="testbox.system.BaseSpec" {
 
 				expect( fileExists( outputPath ) ).toBeTrue();
 
-				var image = createObject( "java", "javax.imageio.ImageIO" ).read( createObject( "java", "java.io.File" ).init( outputPath ) );
+				var image = imageNew( outputPath );
 				expect( image.getWidth() ).toBe( 1200 );
 				expect( image.getHeight() ).toBe( 630 );
 			} );
@@ -46,7 +51,7 @@ class extends="testbox.system.BaseSpec" {
 
 				generator.generate( longTitle, "My Site", outputPath );
 
-				var image = createObject( "java", "javax.imageio.ImageIO" ).read( createObject( "java", "java.io.File" ).init( outputPath ) );
+				var image = imageNew( outputPath );
 				expect( image.getWidth() ).toBe( 1200 );
 				expect( image.getHeight() ).toBe( 630 );
 			} );
@@ -54,8 +59,7 @@ class extends="testbox.system.BaseSpec" {
 			it( "renders a card with every option set and a raster logo", function() {
 				var outputPath = newOutputPath();
 				var logoPath = getDirectoryFromPath( outputPath ) & "logo.png";
-				var logo = createObject( "java", "java.awt.image.BufferedImage" ).init( 64, 32, 2 );
-				createObject( "java", "javax.imageio.ImageIO" ).write( logo, "png", createObject( "java", "java.io.File" ).init( logoPath ) );
+				imageNew( "", 64, 32, "argb", "red" ).write( logoPath );
 
 				generator.generate( "A Page Title", "My Site", outputPath, {
 					description : "What this page is about, in a sentence or two.",
@@ -69,7 +73,7 @@ class extends="testbox.system.BaseSpec" {
 					muted       : "##99aab5"
 				} );
 
-				var image = createObject( "java", "javax.imageio.ImageIO" ).read( createObject( "java", "java.io.File" ).init( outputPath ) );
+				var image = imageNew( outputPath );
 				expect( image.getWidth() ).toBe( 1200 );
 				expect( image.getHeight() ).toBe( 630 );
 			} );
@@ -79,11 +83,11 @@ class extends="testbox.system.BaseSpec" {
 
 				generator.generate( "Title", "My Site", outputPath, { accent : "##ff0000", accentEnd : "##0000ff" } );
 
-				var image = createObject( "java", "javax.imageio.ImageIO" ).read( createObject( "java", "java.io.File" ).init( outputPath ) );
-				var left = createObject( "java", "java.awt.Color" ).init( image.getRGB( 2, 625 ) castAs int );
-				var right = createObject( "java", "java.awt.Color" ).init( image.getRGB( 1197, 625 ) castAs int );
-				expect( left.getRed() ).toBeGT( left.getBlue() );
-				expect( right.getBlue() ).toBeGT( right.getRed() );
+				var image = imageNew( outputPath );
+				var left = pixelAt( image, 2, 625 );
+				var right = pixelAt( image, 1197, 625 );
+				expect( left.red ).toBeGT( left.blue );
+				expect( right.blue ).toBeGT( right.red );
 			} );
 
 			it( "falls back to the default colors for an invalid color value", function() {

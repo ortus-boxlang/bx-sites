@@ -2108,14 +2108,14 @@ class extends="testbox.system.BaseSpec" {
 
 				pipeline.build( root );
 
-				var image = createObject( "java", "javax.imageio.ImageIO" ).read( createObject( "java", "java.io.File" ).init( root & "/site/assets/og/guides-setup.png" ) );
+				var image = imageNew( root & "/site/assets/og/guides-setup.png" );
 				expect( image.getWidth() ).toBe( 1200 );
 				// the bottom bar runs from the theme accent (green) to accentDark (cyan)
-				var left = createObject( "java", "java.awt.Color" ).init( image.getRGB( 2, 625 ) castAs int );
-				var right = createObject( "java", "java.awt.Color" ).init( image.getRGB( 1197, 625 ) castAs int );
-				expect( left.getGreen() ).toBeGT( 200 );
-				expect( left.getBlue() ).toBeLT( 160 );
-				expect( right.getBlue() ).toBeGT( 200 );
+				var left = image.getBufferedImage().getRGB( 2, 625 );
+				var right = image.getBufferedImage().getRGB( 1197, 625 );
+				expect( bitAnd( bitSHRN( left, 8 ), 255 ) ).toBeGT( 200 );
+				expect( bitAnd( left, 255 ) ).toBeLT( 160 );
+				expect( bitAnd( right, 255 ) ).toBeGT( 200 );
 			} );
 
 			it( "prefers a page's own frontmatter [ogImage] over auto-generating one", function() {
