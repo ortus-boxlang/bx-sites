@@ -108,11 +108,13 @@ class {
 
 		// Description
 		var description = trim( opts.description ?: "" )
-		if ( len( description ) ) {
+		// Only as many lines as fit above the URL, none when a 3-line title leaves no room
+		y += 14
+		var descRoom = int( ( variables.height - variables.barHeight - 90 - y ) / 46 ) + 1
+		if ( len( description ) && descRoom > 0 ) {
 			var descAttrs = fontAttrs( family, 32, "plain" )
-			var descLines = wrapText( image, description, descAttrs, maxTextWidth, y > 400 ? 2 : 3 )
+			var descLines = wrapText( image, description, descAttrs, maxTextWidth, min( 3, descRoom ) )
 			image.setDrawingColor( mutedColor )
-			y += 14
 			for ( var line in descLines ) {
 				image.drawText( line, variables.marginX, y, descAttrs )
 				y += 46

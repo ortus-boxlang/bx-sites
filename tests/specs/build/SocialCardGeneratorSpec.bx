@@ -56,6 +56,25 @@ class extends="testbox.system.BaseSpec" {
 				expect( image.getHeight() ).toBe( 630 );
 			} );
 
+			it( "keeps the description clear of the URL when a three line title leaves little room", function() {
+				var longTitle = "A medium length title that wraps onto two lines here";
+				var description = "A description long enough that it would wrap onto several lines of its own if there were room for them on the card.";
+				var withDesc = newOutputPath();
+				var withoutDesc = newOutputPath();
+
+				generator.generate( longTitle, "My Site", withDesc, { description : description, url : "example.com/page" } );
+				generator.generate( longTitle, "My Site", withoutDesc, { url : "example.com/page" } );
+
+				// the strip just above the URL must be untouched by the description
+				var a = imageRead( withDesc );
+				var b = imageRead( withoutDesc );
+				for ( var y = 542; y < 556; y += 2 ) {
+					for ( var x = 80; x < 700; x += 4 ) {
+						expect( pixelAt( a, x, y ) ).toBe( pixelAt( b, x, y ) );
+					}
+				}
+			} );
+
 			it( "renders a card with every option set and a raster logo", function() {
 				var outputPath = newOutputPath();
 				var logoPath = getDirectoryFromPath( outputPath ) & "logo.png";
