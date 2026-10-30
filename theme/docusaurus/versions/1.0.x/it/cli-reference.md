@@ -156,7 +156,7 @@ di GitHub Pages (attivare Pages per il branch, `baseURL`, ecc.).
 Compila il sito, poi lo invia a un vero target di deploy - S3 (e
 qualsiasi servizio compatibile con S3 - DigitalOcean Spaces, Cloudflare
 R2, Backblaze B2, MinIO), Azure Blob Storage, Google Cloud Storage,
-Firebase Hosting, FTP, SFTP, rsync via SSH, Netlify, Vercel, Cloudflare
+Firebase Hosting, FTP, SFTP, rsync via SSH, Cloudflare
 Pages, una directory locale, oppure GitHub Pages (lo stesso push che fa
 `gh-deploy`, semplicemente raggiungibile anche da questo unico comando
 unificato).

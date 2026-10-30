@@ -94,7 +94,7 @@ files), so it installs correctly through every path above:
 | `bx-sites-themes` | Choosing, customizing, overriding, installing, or writing a theme; the `ThemeProvider` contract. |
 | `bx-sites-search` | Search providers - local (MiniSearch), Algolia DocSearch, Pagefind, and wiring up a custom provider. |
 | `bx-sites-plugins` | Writing/installing a bx-sites plugin (build-lifecycle hooks) or a CLI provider (new `bxSites` verbs). |
-| `bx-sites-deployment` | Deploy targets (S3/Azure/GCS/Firebase/FTP/SFTP/rsync/Netlify/Vercel/Cloudflare Pages/GitHub Pages), `package`, and the GitHub Actions publishing workflow. |
+| `bx-sites-deployment` | Deploy targets (S3/Azure/GCS/Firebase/FTP/SFTP/rsync/Cloudflare Pages/GitHub Pages), `package`, and the GitHub Actions publishing workflow. |
 | `bx-sites-actions` | Operate and troubleshoot bx-sites' own GitHub Actions workflows (tests, snapshot, release, docs, pages). |
 
 ## Example prompts
@@ -114,8 +114,8 @@ to the three main guides.
 ```
 
 ```text title="Ship it"
-Add a Netlify deploy target to bxsites.yaml and explain which
-environment variable it expects for the auth token.
+Add a Cloudflare Pages deploy target to bxsites.yaml and explain which
+environment variable it expects for the API token.
 ```
 
 ## FAQ
@@ -144,7 +144,7 @@ environment variable it expects for the auth token.
     Check for a new `SKILL.md` under your assistant's own skills directory
     (e.g. `.claude/skills/bx-sites-getting-started/SKILL.md` for Claude
     Code) - or just ask your assistant something the skill covers (e.g.
-    "how do I add a Netlify deploy target?") and see whether its answer
+    "how do I add a Cloudflare Pages deploy target?") and see whether its answer
     matches this documentation.
 
 ??? faq "`bxSites skills:install` failed with an error about npx/Node.js"

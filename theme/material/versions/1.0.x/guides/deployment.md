@@ -11,8 +11,7 @@ tags: [guides, deployment]
 files. [`bxSites deploy`](../cli-reference.md#deploy) ships it there
 directly, in one command: S3 (and any S3-compatible service - DigitalOcean
 Spaces, Cloudflare R2, Backblaze B2, MinIO), Azure Blob Storage, Google
-Cloud Storage, Firebase Hosting, FTP, SFTP, rsync-over-SSH, Netlify,
-Vercel, Cloudflare Pages, a local directory, or GitHub Pages. Hosting on
+Cloud Storage, Firebase Hosting, FTP, SFTP, rsync-over-SSH, Cloudflare Pages, a local directory, or GitHub Pages. Hosting on
 [bxSites Cloud](https://bxsites.io) itself instead?
 [`bxSites publish`](../cli-reference.md#publish) is the dedicated command
 for that - see [below](#the-publish-command).
@@ -195,26 +194,6 @@ Remote files that no longer exist in your build are left in place. Add
 `remotePath` of `/`, `~` or `.` is refused - point it at the site's own
 folder.
 
-### `netlify`
-
-```json title="deployments/production.json"
-{
-  "target": "netlify",
-  "siteId": "my-site-id-or-name.netlify.app",
-  "authTokenEnvVar": "NETLIFY_AUTH_TOKEN"
-}
-```
-
-### `vercel`
-
-```json title="deployments/production.json"
-{
-  "target": "vercel",
-  "projectId": "my-project",
-  "authTokenEnvVar": "VERCEL_TOKEN"
-}
-```
-
 ### `cloudflare-pages`
 
 Cloudflare has no officially documented REST API for direct-upload
@@ -391,12 +370,9 @@ options:
   [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)
   policy (email allowlist, SSO, or a one-time PIN), no application code
   needed.
-- **Netlify** - built-in
-  [password protection](https://docs.netlify.com/manage/security/secure-access-to-sites/site-protection/)
-  per site or per deploy, from the site settings alone.
 - **A tiny reverse-proxy** (any host) - HTTP Basic Auth in front of the
   static files (an `.htpasswd`-style rule, or a one-file
-  Cloudflare Worker/Netlify Edge Function) is enough for "keep search
+  Cloudflare Worker) is enough for "keep search
   engines and randoms out," though it's not real per-user identity the way
   a signed-in app would have.
 

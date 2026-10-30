@@ -156,7 +156,7 @@ de GitHub Pages (activar Pages para la rama, `baseURL`, etc.).
 Construye el sitio y luego lo envía a un destino de despliegue real - S3
 (y cualquier servicio compatible con S3 - DigitalOcean Spaces, Cloudflare
 R2, Backblaze B2, MinIO), Azure Blob Storage, Google Cloud Storage,
-Firebase Hosting, FTP, SFTP, rsync sobre SSH, Netlify, Vercel, Cloudflare
+Firebase Hosting, FTP, SFTP, rsync sobre SSH, Cloudflare
 Pages, un directorio local, o GitHub Pages (el mismo push que hace
 `gh-deploy`, solo que también accesible desde este comando unificado).
 

@@ -167,7 +167,7 @@ See [Deployment](guides/deployment.md) for the full GitHub Pages setup
 Builds the site, then ships it to a real deployment target - S3 (and any
 S3-compatible service - DigitalOcean Spaces, Cloudflare R2, Backblaze B2,
 MinIO), Azure Blob Storage, Google Cloud Storage, Firebase Hosting, FTP,
-SFTP, rsync-over-SSH, Netlify, Vercel, Cloudflare Pages, a local directory,
+SFTP, rsync-over-SSH, Cloudflare Pages, a local directory,
 or GitHub Pages (the same push `gh-deploy` does, just reachable from this
 one unified command too).
 

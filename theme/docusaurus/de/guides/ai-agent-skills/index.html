@@ -227,7 +227,7 @@ korrekt installiert wird:</p>
 <tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>bx-sites-themes</code></td><td>Ein Theme auswählen, anpassen, überschreiben, installieren oder schreiben; der <code>ThemeProvider</code>-Vertrag.</td></tr>
 <tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>bx-sites-search</code></td><td>Suchanbieter - lokal (MiniSearch), Algolia DocSearch, Pagefind, und einen benutzerdefinierten Anbieter anbinden.</td></tr>
 <tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>bx-sites-plugins</code></td><td>Ein bx-sites-Plugin (Build-Lifecycle-Hooks) oder einen CLI-Provider (neue <code>bxSites</code>-Verben) schreiben/installieren.</td></tr>
-<tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>bx-sites-deployment</code></td><td>Deploy-Ziele (S3/Azure/GCS/Firebase/FTP/SFTP/rsync/Netlify/Vercel/Cloudflare Pages/GitHub Pages), <code>package</code>, und der GitHub-Actions-Publishing-Workflow.</td></tr>
+<tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>bx-sites-deployment</code></td><td>Deploy-Ziele (S3/Azure/GCS/Firebase/FTP/SFTP/rsync/Cloudflare Pages/GitHub Pages), <code>package</code>, und der GitHub-Actions-Publishing-Workflow.</td></tr>
 <tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>bx-sites-actions</code></td><td>Die eigenen GitHub-Actions-Workflows von bx-sites bedienen und Fehler beheben (tests, snapshot, release, docs, pages).</td></tr>
 </tbody>
 </table></div>
@@ -241,8 +241,8 @@ theme, add a Getting Started page, and start the dev server.
 through install, scaffold, and build - and a ::: cards ::: grid linking
 to the three main guides.
 </code></pre>
-<pre data-bxsites-title="Ausliefern"><code class="language-text">Add a Netlify deploy target to bxsites.yaml and explain which
-environment variable it expects for the auth token.
+<pre data-bxsites-title="Ausliefern"><code class="language-text">Add a Cloudflare Pages deploy target to bxsites.yaml and explain which
+environment variable it expects for the API token.
 </code></pre>
 <h2 id="faq"><a href="#faq" id="faq" name="faq" class="anchor"></a>FAQ</h2>
 <div class="adm-block adm-faq adm-collapsed">
@@ -290,7 +290,7 @@ konfiguriert sind, und installieren automatisch in jeden davon.</p>
 <p>Prüfen Sie, ob eine neue <code>SKILL.md</code> im eigenen Skills-Verzeichnis Ihres
 Assistenten existiert (z. B. <code>.claude/skills/bx-sites-getting-started/SKILL.md</code>
 für Claude Code) - oder fragen Sie Ihren Assistenten einfach etwas, das
-der Skill abdeckt (z. B. &quot;Wie füge ich ein Netlify-Deploy-Ziel hinzu?&quot;),
+der Skill abdeckt (z. B. &quot;Wie füge ich ein Cloudflare-Pages-Deploy-Ziel hinzu?&quot;),
 und prüfen Sie, ob die Antwort mit dieser Dokumentation übereinstimmt.</p>
 </div>
 </div>
@@ -330,7 +330,7 @@ Assistent bx-sites schon beim allerersten Prompt kennt.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/ai-agent-skills.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/docusaurus/de/guides/ai-agent-skills.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Oct 23, 2026, 2&#x3a;40&#x3a;18 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20KI-Agenten-Skills&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fdocusaurus%2Fde%2Fguides%2Fai-agent-skills%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/i18n/de/guides/ai-agent-skills.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Diese Seite bearbeiten</a><a href="/theme/docusaurus/de/guides/ai-agent-skills.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Markdown herunterladen</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Zuletzt aktualisiert Oct 30, 2026, 9&#x3a;56&#x3a;31 AM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20KI-Agenten-Skills&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fdocusaurus%2Fde%2Fguides%2Fai-agent-skills%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
 
 			</article>
 

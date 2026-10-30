@@ -23,10 +23,10 @@ it however you like.
 bxSites deploy
 ```
 
-One command, over a dozen targets: S3 (and any S3-compatible service -
+One command, ten targets: S3 (and any S3-compatible service -
 DigitalOcean Spaces, Cloudflare R2, Backblaze B2, MinIO), Azure Blob
 Storage, Google Cloud Storage, Firebase Hosting, FTP, SFTP, rsync,
-Netlify, Vercel, Cloudflare Pages, GitHub Pages, or a local directory.
+Cloudflare Pages, GitHub Pages, or a local directory.
 Each target is a `deployments/<name>.json` file - `bxSites deploy` with
 no flags runs every one of them, off a single shared build.
 

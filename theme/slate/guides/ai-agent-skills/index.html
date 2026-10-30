@@ -222,7 +222,7 @@ files), so it installs correctly through every path above:</p>
 <tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>bx-sites-themes</code></td><td>Choosing, customizing, overriding, installing, or writing a theme; the <code>ThemeProvider</code> contract.</td></tr>
 <tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>bx-sites-search</code></td><td>Search providers - local (MiniSearch), Algolia DocSearch, Pagefind, and wiring up a custom provider.</td></tr>
 <tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>bx-sites-plugins</code></td><td>Writing/installing a bx-sites plugin (build-lifecycle hooks) or a CLI provider (new <code>bxSites</code> verbs).</td></tr>
-<tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>bx-sites-deployment</code></td><td>Deploy targets (S3/Azure/GCS/Firebase/FTP/SFTP/rsync/Netlify/Vercel/Cloudflare Pages/GitHub Pages), <code>package</code>, and the GitHub Actions publishing workflow.</td></tr>
+<tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>bx-sites-deployment</code></td><td>Deploy targets (S3/Azure/GCS/Firebase/FTP/SFTP/rsync/Cloudflare Pages/GitHub Pages), <code>package</code>, and the GitHub Actions publishing workflow.</td></tr>
 <tr x-show="!q || $el.textContent.toLowerCase().includes( q.toLowerCase() )"><td><code>bx-sites-actions</code></td><td>Operate and troubleshoot bx-sites' own GitHub Actions workflows (tests, snapshot, release, docs, pages).</td></tr>
 </tbody>
 </table></div>
@@ -236,8 +236,8 @@ theme, add a Getting Started page, and start the dev server.
 through install, scaffold, and build - and a ::: cards ::: grid linking
 to the three main guides.
 </code></pre>
-<pre data-bxsites-title="Ship it"><code class="language-text">Add a Netlify deploy target to bxsites.yaml and explain which
-environment variable it expects for the auth token.
+<pre data-bxsites-title="Ship it"><code class="language-text">Add a Cloudflare Pages deploy target to bxsites.yaml and explain which
+environment variable it expects for the API token.
 </code></pre>
 <h2 id="faq"><a href="#faq" id="faq" name="faq" class="anchor"></a>FAQ</h2>
 <div class="adm-block adm-faq adm-collapsed">
@@ -282,7 +282,7 @@ install into each one automatically.</p>
 <p>Check for a new <code>SKILL.md</code> under your assistant's own skills directory
 (e.g. <code>.claude/skills/bx-sites-getting-started/SKILL.md</code> for Claude
 Code) - or just ask your assistant something the skill covers (e.g.
-&quot;how do I add a Netlify deploy target?&quot;) and see whether its answer
+&quot;how do I add a Cloudflare Pages deploy target?&quot;) and see whether its answer
 matches this documentation.</p>
 </div>
 </div>
@@ -320,7 +320,7 @@ prompt.</p>
 
 			</div>
 
-	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/ai-agent-skills.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/theme/slate/guides/ai-agent-skills.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Oct 23, 2026, 2&#x3a;40&#x3a;18 PM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20AI%20Agent%20Skills&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fslate%2Fguides%2Fai-agent-skills%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
+	<div class="page-meta"><a href="https://github.com/ortus-boxlang/bx-sites/edit/main/docs/guides/ai-agent-skills.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit this page</a><a href="/theme/slate/guides/ai-agent-skills.md" download><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 15v-3l1.5 2 1.5-2v3"/><path d="M14.5 12v4M13 15.5l1.5 1.5 1.5-1.5"/></svg> Download Markdown</a><span class="page-meta__item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last updated Oct 30, 2026, 9&#x3a;56&#x3a;31 AM</span><a href="https://github.com/ortus-boxlang/bx-sites/issues/new?title=Issue%20with%3A%20AI%20Agent%20Skills&amp;body=Found%20on%3A%20https%3A%2F%2Fbxsites.io%2Ftheme%2Fslate%2Fguides%2Fai-agent-skills%2Findex.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Report an issue</a></div>
 
 			</article>
 

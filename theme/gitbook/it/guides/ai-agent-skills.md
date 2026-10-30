@@ -103,7 +103,7 @@ sopra indicate:
 | `bx-sites-themes` | Scegliere, personalizzare, sovrascrivere, installare o scrivere un tema; il contratto `ThemeProvider`. |
 | `bx-sites-search` | Provider di ricerca - locale (MiniSearch), Algolia DocSearch, Pagefind, e come collegare un provider personalizzato. |
 | `bx-sites-plugins` | Scrivere/installare un plugin bx-sites (hook del ciclo di vita della build) o un provider CLI (nuovi verbi `bxSites`). |
-| `bx-sites-deployment` | Target di deploy (S3/Azure/GCS/Firebase/FTP/SFTP/rsync/Netlify/Vercel/Cloudflare Pages/GitHub Pages), `package`, e il workflow di pubblicazione GitHub Actions. |
+| `bx-sites-deployment` | Target di deploy (S3/Azure/GCS/Firebase/FTP/SFTP/rsync/Cloudflare Pages/GitHub Pages), `package`, e il workflow di pubblicazione GitHub Actions. |
 | `bx-sites-actions` | Gestire e risolvere i problemi dei workflow GitHub Actions propri di bx-sites (tests, snapshot, release, docs, pages). |
 
 ## Prompt di esempio
@@ -123,8 +123,8 @@ to the three main guides.
 ```
 
 ```text title="Pubblicarlo"
-Add a Netlify deploy target to bxsites.yaml and explain which
-environment variable it expects for the auth token.
+Add a Cloudflare Pages deploy target to bxsites.yaml and explain which
+environment variable it expects for the API token.
 ```
 
 ## FAQ
@@ -157,7 +157,7 @@ environment variable it expects for the auth token.
     del tuo assistente (es. `.claude/skills/bx-sites-getting-started/SKILL.md`
     per Claude Code) - oppure chiedi semplicemente al tuo assistente
     qualcosa che lo skill copre (es. "come aggiungo un target di deploy
-    Netlify?") e verifica se la sua risposta corrisponde a questa
+    Cloudflare Pages?") e verifica se la sua risposta corrisponde a questa
     documentazione.
 
 ??? faq "`bxSites skills:install` è fallito con un errore su npx/Node.js"

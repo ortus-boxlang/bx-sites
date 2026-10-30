@@ -12,7 +12,7 @@ file statici. [`bxSites deploy`](../cli-reference.md#deploy) lo invia lì
 direttamente, con un solo comando: S3 (e qualsiasi servizio compatibile
 con S3 - DigitalOcean Spaces, Cloudflare R2, Backblaze B2, MinIO), Azure
 Blob Storage, Google Cloud Storage, Firebase Hosting, FTP, SFTP, rsync
-via SSH, Netlify, Vercel, Cloudflare Pages, una directory locale, oppure
+via SSH, Cloudflare Pages, una directory locale, oppure
 GitHub Pages.
 
 ## Il comando `deploy`
@@ -205,26 +205,6 @@ loro posto. Aggiungi `"deleteExtraneous": true` per rimuovere anche
 quelli (il `--delete` di rsync). Un `remotePath` di `/`, `~` o `.` viene
 rifiutato - puntalo alla cartella del sito.
 
-### `netlify`
-
-```json title="deployments/production.json"
-{
-  "target": "netlify",
-  "siteId": "my-site-id-or-name.netlify.app",
-  "authTokenEnvVar": "NETLIFY_AUTH_TOKEN"
-}
-```
-
-### `vercel`
-
-```json title="deployments/production.json"
-{
-  "target": "vercel",
-  "projectId": "my-project",
-  "authTokenEnvVar": "VERCEL_TOKEN"
-}
-```
-
 ### `cloudflare-pages`
 
 Cloudflare non dispone di un'API REST ufficialmente documentata per i
@@ -385,12 +365,9 @@ li stia servendo - alcune opzioni comuni, adatte a siti statici:
   policy [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)
   (lista email consentite, SSO, o un PIN monouso), senza bisogno di
   codice applicativo.
-- **Netlify** - [protezione con password](https://docs.netlify.com/manage/security/secure-access-to-sites/site-protection/)
-  integrata, per sito o per singolo deploy, dalle sole impostazioni del
-  sito.
 - **Un piccolo reverse-proxy** (qualsiasi host) - l'HTTP Basic Auth
   davanti ai file statici (una regola in stile `.htpasswd`, oppure una
-  Cloudflare Worker/Netlify Edge Function di un solo file) basta per
+  Cloudflare Worker di un solo file) basta per
   "tenere fuori i motori di ricerca e i visitatori a caso", anche se non
   è una vera identità per-utente come l'avrebbe un'app con login.
 

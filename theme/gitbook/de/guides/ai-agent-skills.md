@@ -100,7 +100,7 @@ korrekt installiert wird:
 | `bx-sites-themes` | Ein Theme auswählen, anpassen, überschreiben, installieren oder schreiben; der `ThemeProvider`-Vertrag. |
 | `bx-sites-search` | Suchanbieter - lokal (MiniSearch), Algolia DocSearch, Pagefind, und einen benutzerdefinierten Anbieter anbinden. |
 | `bx-sites-plugins` | Ein bx-sites-Plugin (Build-Lifecycle-Hooks) oder einen CLI-Provider (neue `bxSites`-Verben) schreiben/installieren. |
-| `bx-sites-deployment` | Deploy-Ziele (S3/Azure/GCS/Firebase/FTP/SFTP/rsync/Netlify/Vercel/Cloudflare Pages/GitHub Pages), `package`, und der GitHub-Actions-Publishing-Workflow. |
+| `bx-sites-deployment` | Deploy-Ziele (S3/Azure/GCS/Firebase/FTP/SFTP/rsync/Cloudflare Pages/GitHub Pages), `package`, und der GitHub-Actions-Publishing-Workflow. |
 | `bx-sites-actions` | Die eigenen GitHub-Actions-Workflows von bx-sites bedienen und Fehler beheben (tests, snapshot, release, docs, pages). |
 
 ## Beispiel-Prompts
@@ -120,8 +120,8 @@ to the three main guides.
 ```
 
 ```text title="Ausliefern"
-Add a Netlify deploy target to bxsites.yaml and explain which
-environment variable it expects for the auth token.
+Add a Cloudflare Pages deploy target to bxsites.yaml and explain which
+environment variable it expects for the API token.
 ```
 
 ## FAQ
@@ -153,7 +153,7 @@ environment variable it expects for the auth token.
     Prüfen Sie, ob eine neue `SKILL.md` im eigenen Skills-Verzeichnis Ihres
     Assistenten existiert (z. B. `.claude/skills/bx-sites-getting-started/SKILL.md`
     für Claude Code) - oder fragen Sie Ihren Assistenten einfach etwas, das
-    der Skill abdeckt (z. B. "Wie füge ich ein Netlify-Deploy-Ziel hinzu?"),
+    der Skill abdeckt (z. B. "Wie füge ich ein Cloudflare-Pages-Deploy-Ziel hinzu?"),
     und prüfen Sie, ob die Antwort mit dieser Dokumentation übereinstimmt.
 
 ??? faq "`bxSites skills:install` ist mit einem Fehler zu npx/Node.js fehlgeschlagen"

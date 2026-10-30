@@ -80,7 +80,7 @@ solo comando.
 :::
 ::: card title="Despliégalo donde quieras" icon="phosphor-duotone:cloud-arrow-up" href="guides/deployment.md"
 `bxSites deploy` envía el sitio construido directamente a S3, Azure, GCS,
-Firebase, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages o GitHub
+Firebase, FTP/SFTP, rsync, Cloudflare Pages o GitHub
 Pages - o `bxSites package` lo empaqueta en un único archivo.
 :::
 ::: card title="Variables reutilizables y funciones mágicas" icon="phosphor-duotone:function" href="guides/variables-and-functions.md"

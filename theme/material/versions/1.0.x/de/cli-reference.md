@@ -157,7 +157,7 @@ GitHub-Pages-Einrichtung (Pages für den Branch aktivieren, `baseURL` usw.).
 Baut die Website und liefert sie dann an ein echtes Deployment-Ziel aus -
 S3 (und jeden S3-kompatiblen Dienst - DigitalOcean Spaces, Cloudflare R2,
 Backblaze B2, MinIO), Azure Blob Storage, Google Cloud Storage, Firebase
-Hosting, FTP, SFTP, rsync über SSH, Netlify, Vercel, Cloudflare Pages, ein
+Hosting, FTP, SFTP, rsync über SSH, Cloudflare Pages, ein
 lokales Verzeichnis oder GitHub Pages (derselbe Push, den auch `gh-deploy`
 macht, nur eben auch über diesen einen einheitlichen Befehl erreichbar).
 

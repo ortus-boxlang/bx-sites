@@ -11,7 +11,7 @@ icon: phosphor-duotone:book-open
 - [Temas](themes.md) - los temas incorporados y cómo escribir el tuyo propio
 - [Iconos](icons.md) - un emoji, o un icono con nombre de una de las ocho bibliotecas incluidas, en cualquier página/entrada de navegación
 - [Búsqueda](search.md) - cómo funciona el índice de búsqueda estático
-- [Despliegue](deployment.md) - `bxSites deploy` a S3, Azure, GCS, Firebase, FTP/SFTP, rsync, Netlify, Vercel, Cloudflare Pages, o GitHub Pages
+- [Despliegue](deployment.md) - `bxSites deploy` a S3, Azure, GCS, Firebase, FTP/SFTP, rsync, Cloudflare Pages, o GitHub Pages
 - [Extensiones de Markdown](markdown.md) - admoniciones, notas al pie, listas de definiciones y diagramas Mermaid
 - [Bloques de Contenido](content-blocks.md) - bloques de contenido enriquecido: expandibles, tarjetas, columnas, un stepper, botones, y contenido reutilizable incluible
 - [Tablas](tables.md) - tablas de pipes GFM, siempre activas, con un tratamiento automático de desplazamiento responsivo/encabezado fijo
