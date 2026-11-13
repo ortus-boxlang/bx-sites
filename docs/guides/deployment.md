@@ -18,11 +18,8 @@ for that - see [below](#the-publish-command).
 
 ## The `deploy` command
 
-Every target but the two simplest (`local`/`github-pages`, which work from
-flags alone - see [CLI Reference](../cli-reference.md#deploy)) is
-configured via a `deployments/<name>.yaml` file at your project root - one
-file per deploy target you actually use, each naming which `target` it is
-plus that target's own fields:
+Targets are primarily configured via yaml/toml/json files located in the deployments folder in the project root with the except of `local` and `github-pages` which can work from command line flags alone. The names of the config files themselves can be descriptive as to their purpose but each file must have a `target` key which must correspond with one of the types listed below. For a full reference of the `deploy` command see [CLI Reference](../cli-reference.md#deploy). Each deployment type has its own fields as listed below. 
+
 
 ```bash frame="terminal" title="Terminal"
 bxSites deploy --entry=production
@@ -76,6 +73,21 @@ anywhere. The only target that needs no `deployments/` entry at all.
 
 ```bash frame="terminal" title="Terminal"
 bxSites deploy --target=local --destination=/path/to/somewhere
+```
+
+However, to persist the path to the destination folder if desired, the deployments file would include `target` and `destination` keys.
+
+```json title="deployments/toLocal.json"
+{
+  "target": "local",
+  "destination":"/path/to/somewhere"
+}
+```
+
+NOTE: When deploying from the local deployment file, the syntax is slightly different as highlighted below.
+
+```bash frame="terminal" title="Deploying Locally From deployment/filename.json"
+bxSites deploy --entry=filename
 ```
 
 ### `github-pages`
