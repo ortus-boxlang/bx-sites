@@ -84,6 +84,12 @@ However, to persist the path to the destination folder if desired, the deploymen
 }
 ```
 
+NOTE: When deploying from the local deployment file, the syntax is slightly different as highlighted below.
+
+```bash frame="terminal" title="Deploying Locally From deployment/filename.json"
+bxSites deploy --entry=filename
+```
+
 ### `github-pages`
 
 The same push [`gh-deploy`](../cli-reference.md#gh-deploy) does, reachable
